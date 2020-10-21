@@ -16,10 +16,10 @@
 
 import {
   Context,
-  GetterFunction,
+  TextMapGetter,
   TextMapPropagator,
   Logger,
-  SetterFunction,
+  TextMapSetter,
 } from '@opentelemetry/api';
 import { NoopLogger } from '../../common/NoopLogger';
 import { CompositePropagatorConfig } from './types';
@@ -48,7 +48,7 @@ export class CompositePropagator implements TextMapPropagator {
    * @param context Context to inject
    * @param carrier Carrier into which context will be injected
    */
-  inject(context: Context, carrier: unknown, setter: SetterFunction) {
+  inject(context: Context, carrier: unknown, setter: TextMapSetter) {
     for (const propagator of this._propagators) {
       try {
         propagator.inject(context, carrier, setter);
@@ -69,7 +69,7 @@ export class CompositePropagator implements TextMapPropagator {
    * @param context Context to add values to
    * @param carrier Carrier from which to extract context
    */
-  extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
+  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
     return this._propagators.reduce((ctx, propagator) => {
       try {
         return propagator.extract(ctx, carrier, getter);

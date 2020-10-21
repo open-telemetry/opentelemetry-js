@@ -16,15 +16,15 @@
 
 import {
   Context,
-  GetterFunction,
-  TextMapPropagator,
-  SetterFunction,
-  TraceFlags,
+  getParentSpanContext,
+  isSpanContextValid,
   isValidSpanId,
   isValidTraceId,
-  isSpanContextValid,
-  getParentSpanContext,
   setExtractedSpanContext,
+  TextMapGetter,
+  TextMapPropagator,
+  TextMapSetter,
+  TraceFlags,
 } from '@opentelemetry/api';
 import { B3_DEBUG_FLAG_KEY } from './b3-common';
 
@@ -46,12 +46,12 @@ export function parseHeader(header: unknown) {
   return Array.isArray(header) ? header[0] : header;
 }
 
-function getHeaderValue(carrier: unknown, getter: GetterFunction, key: string) {
-  const header = getter(carrier, key);
+function getHeaderValue(carrier: unknown, getter: TextMapGetter, key: string) {
+  const header = getter.get(carrier, key);
   return parseHeader(header);
 }
 
-function getTraceId(carrier: unknown, getter: GetterFunction): string {
+function getTraceId(carrier: unknown, getter: TextMapGetter): string {
   const traceId = getHeaderValue(carrier, getter, X_B3_TRACE_ID);
   if (typeof traceId === 'string') {
     return traceId.padStart(32, '0');
@@ -59,7 +59,7 @@ function getTraceId(carrier: unknown, getter: GetterFunction): string {
   return '';
 }
 
-function getSpanId(carrier: unknown, getter: GetterFunction): string {
+function getSpanId(carrier: unknown, getter: TextMapGetter): string {
   const spanId = getHeaderValue(carrier, getter, X_B3_SPAN_ID);
   if (typeof spanId === 'string') {
     return spanId;
@@ -67,17 +67,14 @@ function getSpanId(carrier: unknown, getter: GetterFunction): string {
   return '';
 }
 
-function getDebug(
-  carrier: unknown,
-  getter: GetterFunction
-): string | undefined {
+function getDebug(carrier: unknown, getter: TextMapGetter): string | undefined {
   const debug = getHeaderValue(carrier, getter, X_B3_FLAGS);
   return debug === '1' ? '1' : undefined;
 }
 
 function getTraceFlags(
   carrier: unknown,
-  getter: GetterFunction
+  getter: TextMapGetter
 ): TraceFlags | undefined {
   const traceFlags = getHeaderValue(carrier, getter, X_B3_SAMPLED);
   const debug = getDebug(carrier, getter);
@@ -96,21 +93,21 @@ function getTraceFlags(
  * Based on: https://github.com/openzipkin/b3-propagation
  */
 export class B3MultiPropagator implements TextMapPropagator {
-  inject(context: Context, carrier: unknown, setter: SetterFunction) {
+  inject(context: Context, carrier: unknown, setter: TextMapSetter) {
     const spanContext = getParentSpanContext(context);
     if (!spanContext || !isSpanContextValid(spanContext)) return;
 
     const debug = context.getValue(B3_DEBUG_FLAG_KEY);
-    setter(carrier, X_B3_TRACE_ID, spanContext.traceId);
-    setter(carrier, X_B3_SPAN_ID, spanContext.spanId);
+    setter.set(carrier, X_B3_TRACE_ID, spanContext.traceId);
+    setter.set(carrier, X_B3_SPAN_ID, spanContext.spanId);
     // According to the B3 spec, if the debug flag is set,
     // the sampled flag shouldn't be propagated as well.
     if (debug === '1') {
-      setter(carrier, X_B3_FLAGS, debug);
+      setter.set(carrier, X_B3_FLAGS, debug);
     } else if (spanContext.traceFlags !== undefined) {
       // We set the header only if there is an existing sampling decision.
       // Otherwise we will omit it => Absent.
-      setter(
+      setter.set(
         carrier,
         X_B3_SAMPLED,
         (TraceFlags.SAMPLED & spanContext.traceFlags) === TraceFlags.SAMPLED
@@ -120,7 +117,7 @@ export class B3MultiPropagator implements TextMapPropagator {
     }
   }
 
-  extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
+  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
     const traceId = getTraceId(carrier, getter);
     const spanId = getSpanId(carrier, getter);
     const traceFlags = getTraceFlags(carrier, getter) as TraceFlags;

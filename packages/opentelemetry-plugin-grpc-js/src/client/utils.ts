@@ -243,7 +243,7 @@ function getMetadata(
  * @param metadata
  */
 export function setSpanContext(metadata: grpcJs.Metadata): void {
-  propagation.inject(metadata, (metadata, k, v) =>
-    metadata.set(k, v as grpcJs.MetadataValue)
-  );
+  propagation.inject(metadata, {
+    set: (metadata, k, v) => metadata.set(k, v as grpcJs.MetadataValue),
+  });
 }

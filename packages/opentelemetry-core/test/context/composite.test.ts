@@ -15,8 +15,8 @@
  */
 
 import {
-  defaultGetter,
-  defaultSetter,
+  defaultTextMapGetter,
+  defaultTextMapSetter,
   TextMapPropagator,
   SpanContext,
   getActiveSpan,
@@ -71,7 +71,7 @@ describe('Composite Propagator', () => {
       const composite = new CompositePropagator({
         propagators: [new B3MultiPropagator(), new HttpTraceContext()],
       });
-      composite.inject(ctxWithSpanContext, carrier, defaultSetter);
+      composite.inject(ctxWithSpanContext, carrier, defaultTextMapSetter);
 
       assert.strictEqual(carrier[X_B3_TRACE_ID], traceId);
       assert.strictEqual(carrier[X_B3_SPAN_ID], spanId);
@@ -87,7 +87,7 @@ describe('Composite Propagator', () => {
       const composite = new CompositePropagator({
         propagators: [new ThrowingPropagator(), new HttpTraceContext()],
       });
-      composite.inject(ctxWithSpanContext, carrier, defaultSetter);
+      composite.inject(ctxWithSpanContext, carrier, defaultTextMapSetter);
 
       assert.strictEqual(
         carrier[TRACE_PARENT_HEADER],
@@ -114,7 +114,7 @@ describe('Composite Propagator', () => {
         propagators: [new B3MultiPropagator(), new HttpTraceContext()],
       });
       const spanContext = getActiveSpan(
-        composite.extract(ROOT_CONTEXT, carrier, defaultGetter)
+        composite.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       )?.context();
 
       if (!spanContext) {
@@ -133,7 +133,7 @@ describe('Composite Propagator', () => {
         propagators: [new ThrowingPropagator(), new HttpTraceContext()],
       });
       const spanContext = getActiveSpan(
-        composite.extract(ROOT_CONTEXT, carrier, defaultGetter)
+        composite.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       )?.context();
 
       if (!spanContext) {

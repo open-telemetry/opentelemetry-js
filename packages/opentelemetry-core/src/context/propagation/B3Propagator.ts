@@ -16,12 +16,12 @@
 
 import {
   Context,
-  GetterFunction,
+  TextMapGetter,
   TextMapPropagator,
-  SetterFunction,
+  TextMapSetter,
 } from '@opentelemetry/api';
-import { B3SinglePropagator, B3_CONTEXT_HEADER } from './B3SinglePropagator';
 import { B3MultiPropagator } from './B3MultiPropagator';
+import { B3SinglePropagator, B3_CONTEXT_HEADER } from './B3SinglePropagator';
 
 /** Enumeraion of B3 inject encodings */
 export enum B3InjectEncoding {
@@ -47,7 +47,7 @@ export class B3Propagator implements TextMapPropagator {
   private readonly _inject: (
     context: Context,
     carrier: unknown,
-    setter: SetterFunction
+    setter: TextMapSetter
   ) => void;
 
   constructor(config: B3PropagatorConfig = {}) {
@@ -58,12 +58,12 @@ export class B3Propagator implements TextMapPropagator {
     }
   }
 
-  inject(context: Context, carrier: unknown, setter: SetterFunction) {
+  inject(context: Context, carrier: unknown, setter: TextMapSetter) {
     this._inject(context, carrier, setter);
   }
 
-  extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
-    if (getter(carrier, B3_CONTEXT_HEADER)) {
+  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
+    if (getter.get(carrier, B3_CONTEXT_HEADER)) {
       return this._b3SinglePropagator.extract(context, carrier, getter);
     } else {
       return this._b3MultiPropagator.extract(context, carrier, getter);

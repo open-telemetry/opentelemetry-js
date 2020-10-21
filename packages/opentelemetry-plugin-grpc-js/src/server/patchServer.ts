@@ -101,9 +101,10 @@ export function patchServer(
             plugin.logger.debug('patch func: %s', JSON.stringify(spanOptions));
 
             context.with(
-              propagation.extract(call.metadata, (carrier, key) =>
-                carrier.get(key)
-              ),
+              propagation.extract(call.metadata, {
+                get: (carrier, key) => carrier.get(key).map(String),
+                keys: carrier => Object.keys(carrier.getMap()),
+              }),
               () => {
                 const span = plugin.tracer
                   .startSpan(spanName, spanOptions)
