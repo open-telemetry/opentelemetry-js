@@ -140,6 +140,12 @@ export class B3MultiPropagator implements TextMapPropagator {
   }
 
   fields() {
-    return [X_B3_TRACE_ID, X_B3_SPAN_ID, X_B3_FLAGS, X_B3_SAMPLED, X_B3_PARENT_SPAN_ID]
+    return [
+      X_B3_TRACE_ID,
+      X_B3_SPAN_ID,
+      X_B3_FLAGS,
+      X_B3_SAMPLED,
+      X_B3_PARENT_SPAN_ID,
+    ];
   }
 }

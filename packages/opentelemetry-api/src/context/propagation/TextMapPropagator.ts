@@ -67,7 +67,7 @@ export interface TextMapPropagator<Carrier = any> {
 
   /**
    * Return a list of all fields which may be used by the propagator.
-   * 
+   *
    * This list should be used to clear fields before calling inject if a carrier is
    * used more than once.
    */

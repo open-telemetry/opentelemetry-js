@@ -89,6 +89,6 @@ export class CompositePropagator implements TextMapPropagator {
         fields.add(field);
       }
     }
-    return Array.from(fields)
+    return Array.from(fields);
   }
 }
