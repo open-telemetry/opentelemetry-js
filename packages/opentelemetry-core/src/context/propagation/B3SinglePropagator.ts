@@ -88,4 +88,8 @@ export class B3SinglePropagator implements TextMapPropagator {
       traceFlags,
     });
   }
+
+  fields() {
+    return [B3_CONTEXT_HEADER]
+  }
 }

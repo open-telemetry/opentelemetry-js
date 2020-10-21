@@ -81,4 +81,14 @@ export class CompositePropagator implements TextMapPropagator {
       return ctx;
     }, context);
   }
+
+  fields() {
+    const fields = new Set<string>();
+    for (const child of this._propagators) {
+      for (const field of child.fields()) {
+        fields.add(field);
+      }
+    }
+    return Array.from(fields)
+  }
 }

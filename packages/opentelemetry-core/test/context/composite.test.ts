@@ -157,4 +157,8 @@ class ThrowingPropagator implements TextMapPropagator {
   extract(context: Context, carrier: unknown): Context {
     throw new Error('This propagator throws');
   }
+
+  fields() {
+    return [];
+  }
 }

@@ -118,4 +118,8 @@ export class HttpCorrelationContext implements TextMapPropagator {
     }
     return { key, value };
   }
+
+  fields() {
+    return [CORRELATION_CONTEXT_HEADER];
+  }
 }
