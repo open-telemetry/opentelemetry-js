@@ -30,11 +30,14 @@ export class NoopTracer implements Tracer {
 
   // startSpan starts a noop span.
   startSpan(name: string, options?: SpanOptions, context?: Context): Span {
-    const parent = options?.parent;
+    const root = Boolean(options?.root);
+    if (root) {
+      return NOOP_SPAN;
+    }
+
     const parentFromContext = context && getActiveSpan(context)?.context();
-    if (isSpanContext(parent) && isSpanContextValid(parent)) {
-      return new NoopSpan(parent);
-    } else if (
+
+    if (
       isSpanContext(parentFromContext) &&
       isSpanContextValid(parentFromContext)
     ) {
