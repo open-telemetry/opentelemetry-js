@@ -24,7 +24,10 @@ import {
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/context-base';
 import * as assert from 'assert';
-import { B3_DEBUG_FLAG_KEY } from '../../src/context/propagation/b3-common';
+import {
+  B3_PARENT_SPAN_ID_KEY,
+  B3_DEBUG_FLAG_KEY,
+} from '../../src/context/propagation/b3-common';
 import {
   B3MultiPropagator,
   X_B3_FLAGS,
@@ -63,6 +66,7 @@ describe('B3MultiPropagator', () => {
       assert.deepStrictEqual(carrier[X_B3_SPAN_ID], '6e0c63257de34c92');
       assert.deepStrictEqual(carrier[X_B3_SAMPLED], '1');
       assert.deepStrictEqual(carrier[X_B3_FLAGS], undefined);
+      assert.deepStrictEqual(carrier[X_B3_PARENT_SPAN_ID], undefined);
     });
 
     it('should set b3 traceId and spanId headers - ignore tracestate', () => {
@@ -86,6 +90,7 @@ describe('B3MultiPropagator', () => {
       assert.deepStrictEqual(carrier[X_B3_SPAN_ID], '6e0c63257de34c92');
       assert.deepStrictEqual(carrier[X_B3_SAMPLED], '0');
       assert.deepStrictEqual(carrier[X_B3_FLAGS], undefined);
+      assert.deepStrictEqual(carrier[X_B3_PARENT_SPAN_ID], undefined);
     });
 
     it('should set flags headers', () => {
@@ -108,6 +113,33 @@ describe('B3MultiPropagator', () => {
       assert.deepStrictEqual(carrier[X_B3_SPAN_ID], '6e0c63257de34c92');
       assert.deepStrictEqual(carrier[X_B3_FLAGS], '1');
       assert.deepStrictEqual(carrier[X_B3_SAMPLED], undefined);
+      assert.deepStrictEqual(carrier[X_B3_PARENT_SPAN_ID], undefined);
+    });
+
+    it('should set parentSpanId headers', () => {
+      const spanContext: SpanContext = {
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: '6e0c63257de34c92',
+        traceFlags: TraceFlags.NONE,
+      };
+
+      const contextWithParentSpanId = ROOT_CONTEXT.setValue(
+        B3_PARENT_SPAN_ID_KEY,
+        'f4592dc481026a8c'
+      );
+      b3Propagator.inject(
+        setExtractedSpanContext(contextWithParentSpanId, spanContext),
+        carrier,
+        defaultTextMapSetter
+      );
+      assert.deepStrictEqual(
+        carrier[X_B3_TRACE_ID],
+        'd4cda95b652f4a1592b449d5929fda1b'
+      );
+      assert.deepStrictEqual(carrier[X_B3_PARENT_SPAN_ID], 'f4592dc481026a8c');
+      assert.deepStrictEqual(carrier[X_B3_SPAN_ID], '6e0c63257de34c92');
+      assert.deepStrictEqual(carrier[X_B3_FLAGS], undefined);
+      assert.deepStrictEqual(carrier[X_B3_SAMPLED], '0');
     });
 
     it('should not inject empty spancontext', () => {
@@ -145,6 +177,7 @@ describe('B3MultiPropagator', () => {
         traceFlags: TraceFlags.NONE,
       });
       assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
+      assert.equal(context.getValue(B3_PARENT_SPAN_ID_KEY), undefined);
     });
 
     describe('when sampled flag is valid', () => {
@@ -167,6 +200,7 @@ describe('B3MultiPropagator', () => {
             traceFlags: TraceFlags.SAMPLED,
           });
           assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
+          assert.equal(context.getValue(B3_PARENT_SPAN_ID_KEY), undefined);
         });
       });
 
@@ -189,6 +223,7 @@ describe('B3MultiPropagator', () => {
             traceFlags: TraceFlags.SAMPLED,
           });
           assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
+          assert.equal(context.getValue(B3_PARENT_SPAN_ID_KEY), undefined);
         });
       });
 
@@ -211,6 +246,7 @@ describe('B3MultiPropagator', () => {
             traceFlags: TraceFlags.NONE,
           });
           assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
+          assert.equal(context.getValue(B3_PARENT_SPAN_ID_KEY), undefined);
         });
       });
     });
@@ -235,6 +271,7 @@ describe('B3MultiPropagator', () => {
             traceFlags: TraceFlags.SAMPLED,
           });
           assert.strictEqual(context.getValue(B3_DEBUG_FLAG_KEY), '1');
+          assert.equal(context.getValue(B3_PARENT_SPAN_ID_KEY), undefined);
         });
       });
     });
@@ -260,6 +297,7 @@ describe('B3MultiPropagator', () => {
             traceFlags: TraceFlags.SAMPLED,
           });
           assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
+          assert.equal(context.getValue(B3_PARENT_SPAN_ID_KEY), undefined);
         });
       });
 
@@ -283,6 +321,7 @@ describe('B3MultiPropagator', () => {
             traceFlags: TraceFlags.NONE,
           });
           assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
+          assert.equal(context.getValue(B3_PARENT_SPAN_ID_KEY), undefined);
         });
       });
 
@@ -306,6 +345,7 @@ describe('B3MultiPropagator', () => {
             traceFlags: TraceFlags.NONE,
           });
           assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
+          assert.equal(context.getValue(B3_PARENT_SPAN_ID_KEY), undefined);
         });
       });
 
@@ -329,6 +369,63 @@ describe('B3MultiPropagator', () => {
             traceFlags: TraceFlags.NONE,
           });
           assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
+          assert.equal(context.getValue(B3_PARENT_SPAN_ID_KEY), undefined);
+        });
+      });
+    });
+
+    describe('when parent span id is valid', () => {
+      it('should extract context of a span from carrier', () => {
+        carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+        carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+        carrier[X_B3_PARENT_SPAN_ID] = 'f4592dc481026a8c';
+        carrier[X_B3_FLAGS] = '0';
+        carrier[X_B3_SAMPLED] = '1';
+        const context = b3Propagator.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        );
+        const extractedSpanContext = getActiveSpan(context)?.context();
+
+        assert.deepStrictEqual(extractedSpanContext, {
+          spanId: 'b7ad6b7169203331',
+          traceId: '0af7651916cd43dd8448eb211c80319c',
+          isRemote: true,
+          traceFlags: TraceFlags.SAMPLED,
+        });
+        assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
+        assert.equal(
+          context.getValue(B3_PARENT_SPAN_ID_KEY),
+          'f4592dc481026a8c'
+        );
+      });
+
+      describe('AND debug is 1', () => {
+        it('should extract context of a span from carrier', () => {
+          carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+          carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+          carrier[X_B3_PARENT_SPAN_ID] = 'f4592dc481026a8c';
+          carrier[X_B3_FLAGS] = '1';
+          carrier[X_B3_SAMPLED] = '0';
+          const context = b3Propagator.extract(
+            ROOT_CONTEXT,
+            carrier,
+            defaultTextMapGetter
+          );
+          const extractedSpanContext = getActiveSpan(context)?.context();
+
+          assert.deepStrictEqual(extractedSpanContext, {
+            spanId: 'b7ad6b7169203331',
+            traceId: '0af7651916cd43dd8448eb211c80319c',
+            isRemote: true,
+            traceFlags: TraceFlags.SAMPLED,
+          });
+          assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), '1');
+          assert.equal(
+            context.getValue(B3_PARENT_SPAN_ID_KEY),
+            'f4592dc481026a8c'
+          );
         });
       });
     });
@@ -349,6 +446,30 @@ describe('B3MultiPropagator', () => {
         it('should return undefined', () => {
           carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
           carrier[X_B3_SPAN_ID] = undefined;
+          const context = getActiveSpan(
+            b3Propagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
+          )?.context();
+          assert.deepStrictEqual(context, undefined);
+        });
+      });
+
+      describe('AND parentSpanId is invalid', () => {
+        it('should return undefined', () => {
+          carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+          carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+          carrier[X_B3_PARENT_SPAN_ID] = 'invalid';
+          const context = getActiveSpan(
+            b3Propagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
+          )?.context();
+          assert.deepStrictEqual(context, undefined);
+        });
+      });
+
+      describe('AND parentSpanId is a trace id', () => {
+        it('should return undefined', () => {
+          carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+          carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+          carrier[X_B3_PARENT_SPAN_ID] = '0af7651916cd43dd8448eb211c80319d';
           const context = getActiveSpan(
             b3Propagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
           )?.context();
@@ -406,6 +527,7 @@ describe('B3MultiPropagator', () => {
         traceFlags: TraceFlags.SAMPLED,
       });
       assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
+      assert.equal(context.getValue(B3_PARENT_SPAN_ID_KEY), undefined);
     });
 
     it('should gracefully handle an invalid b3 header', () => {
@@ -492,6 +614,7 @@ describe('B3MultiPropagator', () => {
         traceFlags: TraceFlags.SAMPLED,
       });
       assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
+      assert.equal(context.getValue(B3_PARENT_SPAN_ID_KEY), undefined);
     });
   });
 });

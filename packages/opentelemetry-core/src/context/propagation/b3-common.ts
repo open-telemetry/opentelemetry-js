@@ -16,6 +16,11 @@
 
 import { createContextKey } from '@opentelemetry/api';
 
+/** shared context for storing an extracted b3 parent span id */
+export const B3_PARENT_SPAN_ID_KEY = createContextKey(
+  'OpenTelemetry Context Key B3 Parent Span Id'
+);
+
 /** shared context for storing an extracted b3 debug flag */
 export const B3_DEBUG_FLAG_KEY = createContextKey(
   'OpenTelemetry Context Key B3 Debug Flag'
