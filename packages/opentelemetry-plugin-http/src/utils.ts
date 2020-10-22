@@ -218,33 +218,38 @@ export const setSpanWithError = (
 };
 
 /**
- * 
- * @param headers 
- * @param Attributes 
+ * Adds attributes for content-length and content-encoding HTTP headers
+ * @param { OutgoingHttpHeaders | IncomingHttpHeaders } headers http headers
+ * @param { Attributes } Attributes span attributes
+ * @param { boolean } isRequest set true for setting request content-header
  */
-export const setRequestContentLengthAttributes = (
+export const setContentLengthAttributes = (
   headers: OutgoingHttpHeaders | IncomingHttpHeaders,
-  attributes: Attributes
+  attributes: Attributes,
+  isRequest: boolean
 ) => {
-  let isCompressed = false
+  let isCompressed = false;
+
+  if (headers['content-length'] === undefined)
+    return;
 
   if (headers['content-encoding'] && headers['content-encoding'] !== 'identity') {
     isCompressed = true
-  }
+  };
 
   if (isCompressed) {
-    if (headers as OutgoingHttpHeaders) {
+    if (isRequest) {
       attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH] = headers['content-length']
     } else {
       attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH] = headers['content-length']
-    }
+    };
   } else {
-    if (headers as OutgoingHttpHeaders) {
+    if (isRequest) {
       attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED] = headers['content-length']
     } else {
       attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED] = headers['content-length']
-    }
-  }
+    };
+  };
 };
 
 /**
@@ -396,7 +401,7 @@ export const getOutgoingRequestAttributesOnResponse = (
     [HttpAttribute.HTTP_HOST]: `${options.hostname}:${remotePort}`,
   };
 
-  // Place content-length func here?  
+  setContentLengthAttributes(headers, attributes, false)
 
   if (statusCode) {
     attributes[HttpAttribute.HTTP_STATUS_CODE] = statusCode;
@@ -458,7 +463,7 @@ export const getIncomingRequestAttributes = (
     attributes[HttpAttribute.HTTP_USER_AGENT] = userAgent;
   }
 
-  // Place content-length func here?
+  setContentLengthAttributes(headers, attributes, true)
 
   const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
   return Object.assign(attributes, httpKindAttributes);
