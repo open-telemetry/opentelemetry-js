@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 export interface TraceState {
   /**
-   * Adds or updates the TraceState that has the given `key` if it is
-   * present. The new State will always be added in the front of the
-   * list of states.
+   * Create a new TraceState which inherits from this TraceState and has the
+   * given key set.
+   * The new entry will always be added in the front of the list of states.
    *
    * @param key key of the TraceState entry.
    * @param value value of the TraceState entry.
    */
-  set(key: string, value: string): void;
+  set(key: string, value: string): TraceState;
 
   /**
-   * Removes the TraceState Entry that has the given `key` if it is present.
+   * Return a new TraceState which inherits from this TraceState but does not
+   * contain the given key.
    *
-   * @param key the key for the TraceState Entry to be removed.
+   * @param key the key for the TraceState entry to be removed.
    */
-  unset(key: string): void;
+  unset(key: string): TraceState;
 
   /**
    * Returns the value to which the specified key is mapped, or `undefined` if

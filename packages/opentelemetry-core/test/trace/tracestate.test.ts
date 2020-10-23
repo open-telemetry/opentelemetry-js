@@ -24,31 +24,31 @@ describe('TraceState', () => {
       assert.deepStrictEqual(state.serialize(), 'a=1,b=2');
     });
 
-    it('must replace keys and move them to the front', () => {
-      const state = new TraceState('a=1,b=2');
-      state.set('b', '3');
+    it('must create a new TraceState and move updated keys to the front', () => {
+      const orgState = new TraceState('a=1,b=2');
+      const state = orgState.set('b', '3');
+      assert.deepStrictEqual(orgState.serialize(), 'a=1,b=2');
       assert.deepStrictEqual(state.serialize(), 'b=3,a=1');
     });
 
-    it('must add new keys to the front', () => {
-      const state = new TraceState();
-      state.set('vendorname1', 'opaqueValue1');
+    it('must create a new TraceState and add new keys to the front', () => {
+      let state = new TraceState().set('vendorname1', 'opaqueValue1');
       assert.deepStrictEqual(state.serialize(), 'vendorname1=opaqueValue1');
 
-      state.set('vendorname2', 'opaqueValue2');
+      state = state.set('vendorname2', 'opaqueValue2');
       assert.deepStrictEqual(
         state.serialize(),
         'vendorname2=opaqueValue2,vendorname1=opaqueValue1'
       );
     });
 
-    it('must unset the entries', () => {
-      const state = new TraceState('c=4,b=3,a=1');
-      state.unset('b');
+    it('must create a new TraceState and unset the entries', () => {
+      const orgState = new TraceState('c=4,b=3,a=1');
+      let state = orgState.unset('b');
       assert.deepStrictEqual(state.serialize(), 'c=4,a=1');
-      state.unset('c');
-      state.unset('A');
+      state = state.unset('c').unset('A');
       assert.deepStrictEqual(state.serialize(), 'a=1');
+      assert.strictEqual(orgState.serialize(), 'c=4,b=3,a=1');
     });
   });
 
