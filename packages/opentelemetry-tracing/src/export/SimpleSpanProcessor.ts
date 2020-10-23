@@ -15,7 +15,7 @@
  */
 
 import { context, suppressInstrumentation } from '@opentelemetry/api';
-import { Span } from "../Span";
+import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
 import { ReadableSpan } from './ReadableSpan';
 import { SpanExporter } from './SpanExporter';
