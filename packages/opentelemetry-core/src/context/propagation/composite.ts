@@ -92,6 +92,7 @@ export class CompositePropagator implements TextMapPropagator {
   }
 
   fields(): string[] {
-    return this._fields;
+    // return a new array so our fields cannot be modified
+    return this._fields.slice();
   }
 }
