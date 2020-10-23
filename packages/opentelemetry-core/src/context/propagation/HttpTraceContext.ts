@@ -129,7 +129,7 @@ export class HttpTraceContext implements TextMapPropagator {
     return setExtractedSpanContext(context, spanContext);
   }
 
-  fields() {
+  fields(): string[] {
     return [TRACE_PARENT_HEADER, TRACE_STATE_HEADER];
   }
 }

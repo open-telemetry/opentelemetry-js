@@ -89,7 +89,7 @@ export class B3SinglePropagator implements TextMapPropagator {
     });
   }
 
-  fields() {
+  fields(): string[] {
     return [B3_CONTEXT_HEADER];
   }
 }

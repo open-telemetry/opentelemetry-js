@@ -73,7 +73,7 @@ export class B3Propagator implements TextMapPropagator {
     }
   }
 
-  fields() {
+  fields(): string[] {
     return this._fields;
   }
 }

@@ -139,7 +139,7 @@ export class B3MultiPropagator implements TextMapPropagator {
     return context;
   }
 
-  fields() {
+  fields(): string[] {
     return [
       X_B3_TRACE_ID,
       X_B3_SPAN_ID,

@@ -158,7 +158,7 @@ class ThrowingPropagator implements TextMapPropagator {
     throw new Error('This propagator throws');
   }
 
-  fields() {
+  fields(): string[] {
     return [];
   }
 }
