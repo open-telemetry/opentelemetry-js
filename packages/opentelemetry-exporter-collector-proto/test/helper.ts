@@ -21,6 +21,7 @@ import { Resource } from '@opentelemetry/resources';
 import { collectorTypes } from '@opentelemetry/exporter-collector';
 import * as assert from 'assert';
 import { MeterProvider, MetricRecord } from '@opentelemetry/metrics';
+import { Stream } from 'stream';
 
 const meterProvider = new MeterProvider({
   interval: 30000,
@@ -423,4 +424,23 @@ export function ensureExportMetricsServiceRequestIsSet(
 
   const metrics = resourceMetrics[0].instrumentationLibraryMetrics[0].metrics;
   assert.strictEqual(metrics.length, 3, 'Metrics are missing');
+}
+
+export class MockedResponse extends Stream {
+  constructor(private _code: number, private _msg?: string) {
+    super();
+  }
+
+  send(data: string) {
+    this.emit('data', data);
+    this.emit('end');
+  }
+
+  get statusCode() {
+    return this._code;
+  }
+
+  get statusMessage() {
+    return this._msg;
+  }
 }
