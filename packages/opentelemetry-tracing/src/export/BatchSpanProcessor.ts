@@ -15,7 +15,11 @@
  */
 
 import { context, suppressInstrumentation } from '@opentelemetry/api';
-import { ExportResult, unrefTimer } from '@opentelemetry/core';
+import {
+  ExportResult,
+  globalErrorHandler,
+  unrefTimer,
+} from '@opentelemetry/core';
 import { SpanProcessor } from '../SpanProcessor';
 import { BufferConfig } from '../types';
 import { ReadableSpan } from './ReadableSpan';
@@ -99,16 +103,17 @@ export class BatchSpanProcessor implements SpanProcessor {
     if (this._finishedSpans.length === 0) {
       return Promise.resolve();
     }
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       // prevent downstream exporter calls from generating spans
       context.with(suppressInstrumentation(context.active()), () => {
         this._exporter.export(this._finishedSpans, result => {
           this._finishedSpans = [];
-          if (result === ExportResult.SUCCESS) {
-            resolve();
-          } else {
-            reject(result);
+          if (result !== ExportResult.SUCCESS) {
+            globalErrorHandler(
+              new Error('BatchSpanProcessor: span export failed')
+            );
           }
+          resolve();
         });
       });
     });

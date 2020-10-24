@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { AlwaysOnSampler, ExportResult } from '@opentelemetry/core';
+import {
+  AlwaysOnSampler,
+  ExportResult,
+  loggingErrorHandler,
+  setGlobalErrorHandler,
+} from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
@@ -227,6 +232,32 @@ describe('BatchSpanProcessor', () => {
           assert.strictEqual(exportedSpans, 1);
           done();
         });
+      });
+
+      it('should call globalErrorHandler when exporting fails', async () => {
+        const expectedError = new Error(
+          'BatchSpanProcessor: span export failed'
+        );
+        sinon.stub(exporter, 'export').callsFake((_, callback) => {
+          setTimeout(() => {
+            callback(ExportResult.FAILED_NOT_RETRYABLE);
+          }, 0);
+        });
+
+        const errorHandlerSpy = sinon.spy();
+
+        setGlobalErrorHandler(errorHandlerSpy);
+
+        await processor.forceFlush();
+
+        assert.strictEqual(errorHandlerSpy.callCount, 1);
+
+        const [[error]] = errorHandlerSpy.args;
+
+        assert.deepStrictEqual(error, expectedError);
+
+        //reset global error handler
+        setGlobalErrorHandler(loggingErrorHandler());
       });
     });
 
