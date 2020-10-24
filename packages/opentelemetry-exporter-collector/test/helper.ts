@@ -22,7 +22,6 @@ import { hexToBase64, InstrumentationLibrary } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { opentelemetryProto } from '../src/types';
 import * as collectorTypes from '../src/types';
-import { Stream } from 'stream';
 
 const meterProvider = new MeterProvider({
   interval: 30000,
@@ -680,23 +679,4 @@ export function ensureHeadersContain(
       `Expected ${actual} to contain ${k}: ${v}`
     );
   });
-}
-
-export class MockedResponse extends Stream {
-  constructor(private _code: number, private _msg?: string) {
-    super();
-  }
-
-  send(data: string) {
-    this.emit('data', data);
-    this.emit('end');
-  }
-
-  get statusCode() {
-    return this._code;
-  }
-
-  get statusMessage() {
-    return this._msg;
-  }
 }

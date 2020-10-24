@@ -27,7 +27,7 @@ import * as sinon from 'sinon';
 import { CollectorMetricExporter } from '../../src/platform/node';
 import { CollectorExporterConfigBase } from '../../src/types';
 import * as collectorTypes from '../../src/types';
-
+import { MockedResponse } from './nodeHelpers';
 import {
   mockCounter,
   mockObserver,
@@ -36,7 +36,6 @@ import {
   mockValueRecorder,
   ensureValueRecorderIsCorrect,
   ensureObserverIsCorrect,
-  MockedResponse,
 } from '../helper';
 import { MetricRecord } from '@opentelemetry/metrics';
 
