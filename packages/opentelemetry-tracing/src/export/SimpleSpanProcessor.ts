@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-import { Span } from '../Span';
-import { SpanProcessor } from '../SpanProcessor';
-import { ReadableSpan } from './ReadableSpan';
 import { context, suppressInstrumentation } from '@opentelemetry/api';
 import { ExportResult, globalErrorHandler } from '@opentelemetry/core';
+import { Span } from '../Span';
+import { SpanExporter } from './SpanExporter';
+import { SpanProcessor } from '../SpanProcessor';
+import { ReadableSpan } from './ReadableSpan';
 
 /**
  * An implementation of the {@link SpanProcessor} that converts the {@link Span}
