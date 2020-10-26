@@ -73,8 +73,12 @@ describe('B3MultiPropagator', () => {
           get: (key: string) => {
             return undefined;
           },
-          set: (key: string, value: string) => {},
-          unset: (key: string) => {},
+          set: function(key: string, value: string) {
+            return this;
+          },
+          unset: function(key: string) {
+            return this;
+          },
           serialize: () => {
             return 'foo=bar,baz=quux';
           },
