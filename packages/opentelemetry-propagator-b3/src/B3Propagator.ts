@@ -22,17 +22,7 @@ import {
 } from '@opentelemetry/api';
 import { B3MultiPropagator } from './B3MultiPropagator';
 import { B3SinglePropagator, B3_CONTEXT_HEADER } from './B3SinglePropagator';
-
-/** Enumeraion of B3 inject encodings */
-export enum B3InjectEncoding {
-  SINGLE_HEADER,
-  MULTI_HEADER,
-}
-
-/** Configuration for the B3Propagator */
-export interface B3PropagatorConfig {
-  injectEncoding?: B3InjectEncoding;
-}
+import { B3InjectEncoding, B3PropagatorConfig } from './types';
 
 /**
  * Propagator that extracts B3 context in both single and multi-header variants,
