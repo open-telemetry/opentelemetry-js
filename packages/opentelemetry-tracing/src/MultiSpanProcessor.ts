@@ -15,8 +15,9 @@
  */
 
 import { globalErrorHandler } from '@opentelemetry/core';
-import { SpanProcessor } from './SpanProcessor';
 import { ReadableSpan } from './export/ReadableSpan';
+import { Span } from './Span';
+import { SpanProcessor } from './SpanProcessor';
 
 /**
  * Implementation of the {@link SpanProcessor} that simply forwards all
@@ -45,7 +46,7 @@ export class MultiSpanProcessor implements SpanProcessor {
     });
   }
 
-  onStart(span: ReadableSpan): void {
+  onStart(span: Span): void {
     for (const spanProcessor of this._spanProcessors) {
       spanProcessor.onStart(span);
     }
