@@ -86,16 +86,21 @@ export const assertSpan = (
 
   if (span.kind === SpanKind.CLIENT) {
     if (validations.resHeaders['content-length']) {
-      const contentLength = validations.resHeaders['content-length']
+      const contentLength = validations.resHeaders['content-length'];
 
-      if (validations.resHeaders['content-encoding'] && validations.resHeaders['content-encoding'] != 'identity') {
+      if (
+        validations.resHeaders['content-encoding'] &&
+        validations.resHeaders['content-encoding'] != 'identity'
+      ) {
         assert.strictEqual(
           span.attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH],
           contentLength
         );
       } else {
         assert.strictEqual(
-          span.attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED],
+          span.attributes[
+            HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED
+          ],
           contentLength
         );
       }
@@ -123,16 +128,21 @@ export const assertSpan = (
   }
   if (span.kind === SpanKind.SERVER) {
     if (validations.reqHeaders && validations.reqHeaders['content-length']) {
-      const contentLength = validations.reqHeaders['content-length']
+      const contentLength = validations.reqHeaders['content-length'];
 
-      if (validations.reqHeaders['content-encoding'] && validations.reqHeaders['content-encoding'] != 'identity') {
+      if (
+        validations.reqHeaders['content-encoding'] &&
+        validations.reqHeaders['content-encoding'] != 'identity'
+      ) {
         assert.strictEqual(
           span.attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH],
           contentLength
         );
       } else {
         assert.strictEqual(
-          span.attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
+          span.attributes[
+            HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
+          ],
           contentLength
         );
       }

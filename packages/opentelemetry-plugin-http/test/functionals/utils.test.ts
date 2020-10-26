@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Attributes, CanonicalCode, SpanKind, TraceFlags } from '@opentelemetry/api';
+import {
+  Attributes,
+  CanonicalCode,
+  SpanKind,
+  TraceFlags,
+} from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
 import { HttpAttribute } from '@opentelemetry/semantic-conventions';
@@ -314,110 +319,194 @@ describe('Utility', () => {
     it('should set response content-length uncompressed attribute with no content-encoding header', () => {
       const attributes: Attributes = {};
 
-      let headers: http.IncomingHttpHeaders = {};
+      const headers: http.IncomingHttpHeaders = {};
 
-      headers["content-length"] = '1200';
+      headers['content-length'] = '1200';
 
       utils.setContentLengthAttributes(headers, attributes, false);
 
-      assert.strictEqual(attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED], '1200');
-      assert.strictEqual(attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH], undefined);
-      assert.strictEqual(attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED], undefined);
-      assert.strictEqual(attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH], undefined);
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED],
+        '1200'
+      );
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH],
+        undefined
+      );
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
+        undefined
+      );
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH],
+        undefined
+      );
     });
 
     it('should set response content-length uncompressed attribute with "identity" content-encoding header', () => {
       const attributes: Attributes = {};
 
-      let headers: http.IncomingHttpHeaders = {};
+      const headers: http.IncomingHttpHeaders = {};
 
-      headers["content-length"] = '1200';
-      headers["content-encoding"] = 'identity';
+      headers['content-length'] = '1200';
+      headers['content-encoding'] = 'identity';
 
       utils.setContentLengthAttributes(headers, attributes, false);
 
-      assert.strictEqual(attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED], '1200');
-      assert.strictEqual(attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH], undefined);
-      assert.strictEqual(attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED], undefined);
-      assert.strictEqual(attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH], undefined);
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED],
+        '1200'
+      );
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH],
+        undefined
+      );
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
+        undefined
+      );
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH],
+        undefined
+      );
     });
 
     it('should set response content-length compressed attribute with "gzip" content-encoding header', () => {
       const attributes: Attributes = {};
 
-      let headers: http.IncomingHttpHeaders = {};
+      const headers: http.IncomingHttpHeaders = {};
 
-      headers["content-length"] = '1200';
-      headers["content-encoding"] = 'gzip';
+      headers['content-length'] = '1200';
+      headers['content-encoding'] = 'gzip';
 
       utils.setContentLengthAttributes(headers, attributes, false);
 
-      assert.strictEqual(attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH], '1200');
-      assert.strictEqual(attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED], undefined);
-      assert.strictEqual(attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED], undefined);
-      assert.strictEqual(attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH], undefined);
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH],
+        '1200'
+      );
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED],
+        undefined
+      );
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
+        undefined
+      );
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH],
+        undefined
+      );
     });
 
     it('should set request content-length uncompressed attribute with no content-encoding header', () => {
       const attributes: Attributes = {};
 
-      let headers: http.OutgoingHttpHeaders = {};
+      const headers: http.OutgoingHttpHeaders = {};
 
-      headers["content-length"] = '1200';
+      headers['content-length'] = '1200';
 
       utils.setContentLengthAttributes(headers, attributes, true);
 
-      assert.strictEqual(attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED], '1200');
-      assert.strictEqual(attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH], undefined);
-      assert.strictEqual(attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED], undefined);
-      assert.strictEqual(attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH], undefined);
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
+        '1200'
+      );
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH],
+        undefined
+      );
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED],
+        undefined
+      );
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH],
+        undefined
+      );
     });
 
     it('should set request content-length uncompressed attribute with "identity" content-encoding header', () => {
       const attributes: Attributes = {};
 
-      let headers: http.OutgoingHttpHeaders = {};
+      const headers: http.OutgoingHttpHeaders = {};
 
-      headers["content-length"] = '1200';
-      headers["content-encoding"] = 'identity';
+      headers['content-length'] = '1200';
+      headers['content-encoding'] = 'identity';
 
       utils.setContentLengthAttributes(headers, attributes, true);
 
-      assert.strictEqual(attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED], '1200');
-      assert.strictEqual(attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH], undefined);
-      assert.strictEqual(attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED], undefined);
-      assert.strictEqual(attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH], undefined);
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
+        '1200'
+      );
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH],
+        undefined
+      );
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED],
+        undefined
+      );
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH],
+        undefined
+      );
     });
 
     it('should set request content-length compressed attribute with "gzip" content-encoding header', () => {
       const attributes: Attributes = {};
 
-      let headers: http.OutgoingHttpHeaders = {};
+      const headers: http.OutgoingHttpHeaders = {};
 
-      headers["content-length"] = '1200';
-      headers["content-encoding"] = 'gzip';
+      headers['content-length'] = '1200';
+      headers['content-encoding'] = 'gzip';
 
       utils.setContentLengthAttributes(headers, attributes, true);
 
-      assert.strictEqual(attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH], '1200');
-      assert.strictEqual(attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED], undefined);
-      assert.strictEqual(attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED], undefined);
-      assert.strictEqual(attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH], undefined);
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH],
+        '1200'
+      );
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
+        undefined
+      );
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED],
+        undefined
+      );
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH],
+        undefined
+      );
     });
 
     it('should set no attributes with no content-length header', () => {
       const attributes: Attributes = {};
 
-      let headers: http.OutgoingHttpHeaders = {};
+      const headers: http.OutgoingHttpHeaders = {};
 
-      headers["content-encoding"] = 'gzip';
+      headers['content-encoding'] = 'gzip';
 
       utils.setContentLengthAttributes(headers, attributes, true);
 
-      assert.strictEqual(attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH], undefined);
-      assert.strictEqual(attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED], undefined);
-      assert.strictEqual(attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED], undefined);
-      assert.strictEqual(attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH], undefined);
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH],
+        undefined
+      );
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED],
+        undefined
+      );
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED],
+        undefined
+      );
+      assert.strictEqual(
+        attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH],
+        undefined
+      );
     });
   });
 });

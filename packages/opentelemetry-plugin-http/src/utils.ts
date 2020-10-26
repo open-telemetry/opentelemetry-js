@@ -230,26 +230,32 @@ export const setContentLengthAttributes = (
 ) => {
   let isCompressed = false;
 
-  if (headers['content-length'] === undefined)
-    return;
+  if (headers['content-length'] === undefined) return;
 
-  if (headers['content-encoding'] && headers['content-encoding'] !== 'identity') {
-    isCompressed = true
-  };
+  if (
+    headers['content-encoding'] &&
+    headers['content-encoding'] !== 'identity'
+  ) {
+    isCompressed = true;
+  }
 
   if (isCompressed) {
     if (isRequest) {
-      attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH] = headers['content-length']
+      attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH] =
+        headers['content-length'];
     } else {
-      attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH] = headers['content-length']
-    };
+      attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH] =
+        headers['content-length'];
+    }
   } else {
     if (isRequest) {
-      attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED] = headers['content-length']
+      attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED] =
+        headers['content-length'];
     } else {
-      attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED] = headers['content-length']
-    };
-  };
+      attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED] =
+        headers['content-length'];
+    }
+  }
 };
 
 /**
@@ -394,14 +400,13 @@ export const getOutgoingRequestAttributesOnResponse = (
   const { statusCode, statusMessage, httpVersion, headers, socket } = response;
   const { remoteAddress, remotePort } = socket;
 
-  
   const attributes: Attributes = {
     [GeneralAttribute.NET_PEER_IP]: remoteAddress,
     [GeneralAttribute.NET_PEER_PORT]: remotePort,
     [HttpAttribute.HTTP_HOST]: `${options.hostname}:${remotePort}`,
   };
 
-  setContentLengthAttributes(headers, attributes, false)
+  setContentLengthAttributes(headers, attributes, false);
 
   if (statusCode) {
     attributes[HttpAttribute.HTTP_STATUS_CODE] = statusCode;
@@ -463,7 +468,7 @@ export const getIncomingRequestAttributes = (
     attributes[HttpAttribute.HTTP_USER_AGENT] = userAgent;
   }
 
-  setContentLengthAttributes(headers, attributes, true)
+  setContentLengthAttributes(headers, attributes, true);
 
   const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
   return Object.assign(attributes, httpKindAttributes);
