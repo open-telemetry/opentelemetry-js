@@ -20,6 +20,7 @@ import {
   globalErrorHandler,
   unrefTimer,
 } from '@opentelemetry/core';
+import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
 import { BufferConfig } from '../types';
 import { ReadableSpan } from './ReadableSpan';
@@ -58,7 +59,7 @@ export class BatchSpanProcessor implements SpanProcessor {
   }
 
   // does nothing.
-  onStart(span: ReadableSpan): void {}
+  onStart(span: Span): void {}
 
   onEnd(span: ReadableSpan): void {
     if (this._isShutdown) {

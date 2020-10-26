@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-import { SpanProcessor } from './SpanProcessor';
 import { ReadableSpan } from './export/ReadableSpan';
+import { Span } from './Span';
+import { SpanProcessor } from './SpanProcessor';
 
 /** No-op implementation of SpanProcessor */
 export class NoopSpanProcessor implements SpanProcessor {
-  onStart(span: ReadableSpan): void {}
+  onStart(span: Span): void {}
   onEnd(span: ReadableSpan): void {}
   shutdown(): Promise<void> {
     return Promise.resolve();

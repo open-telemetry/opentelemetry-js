@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
+import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
-import { SpanExporter } from './SpanExporter';
 import { ReadableSpan } from './ReadableSpan';
 import { context, suppressInstrumentation } from '@opentelemetry/api';
 import { ExportResult, globalErrorHandler } from '@opentelemetry/core';
@@ -38,7 +38,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
   }
 
   // does nothing.
-  onStart(span: ReadableSpan): void {}
+  onStart(span: Span): void {}
 
   onEnd(span: ReadableSpan): void {
     if (this._isShutdown) {
