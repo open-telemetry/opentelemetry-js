@@ -23,8 +23,6 @@
     "nodejs",
     "tracing",
     "profiling",
-    "metrics",
-    "stats",
     "monitoring",
     "b3"
   ],
