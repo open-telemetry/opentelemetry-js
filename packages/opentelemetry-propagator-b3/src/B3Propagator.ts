@@ -24,7 +24,6 @@ import { B3MultiPropagator } from './B3MultiPropagator';
 import { B3SinglePropagator, B3_CONTEXT_HEADER } from './B3SinglePropagator';
 import { B3InjectEncoding, B3PropagatorConfig } from './types';
 
-
 /**
  * Propagator that extracts B3 context in both single and multi-header variants,
  * with configurable injection format defaulting to B3 single-header. Due to
