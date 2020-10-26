@@ -26,7 +26,7 @@ import {
   TextMapSetter,
   TraceFlags,
 } from '@opentelemetry/api';
-import { B3_DEBUG_FLAG_KEY } from './b3-common';
+import { B3_DEBUG_FLAG_KEY } from './common';
 
 /** B3 single-header name */
 export const B3_CONTEXT_HEADER = 'b3';

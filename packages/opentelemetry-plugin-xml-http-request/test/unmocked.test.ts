@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { XMLHttpRequestPlugin } from '../src';
+import { Span } from '@opentelemetry/api';
+import { HttpAttribute } from '@opentelemetry/semantic-conventions';
 import { ReadableSpan, SpanProcessor } from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
+import { XMLHttpRequestPlugin } from '../src';
 import assert = require('assert');
-import { HttpAttribute } from '@opentelemetry/semantic-conventions';
 
 class TestSpanProcessor implements SpanProcessor {
   spans: ReadableSpan[] = [];
@@ -25,7 +26,7 @@ class TestSpanProcessor implements SpanProcessor {
   forceFlush(): Promise<void> {
     return Promise.resolve();
   }
-  onStart(span: ReadableSpan): void {}
+  onStart(span: Span): void {}
   shutdown(): Promise<void> {
     return Promise.resolve();
   }
