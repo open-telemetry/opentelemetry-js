@@ -94,7 +94,7 @@ describe('transform', () => {
 
   describe('toCollectorSpan', () => {
     it('should convert span', () => {
-      ensureSpanIsCorrect(transform.toCollectorSpan(mockedReadableSpan));
+      ensureSpanIsCorrect(transform.toCollectorSpan(mockedReadableSpan, true));
     });
   });
 
