@@ -43,4 +43,10 @@ export class DummyPropagation implements TextMapPropagator {
     headers[DummyPropagation.TRACE_CONTEXT_KEY] = spanContext.traceId;
     headers[DummyPropagation.SPAN_CONTEXT_KEY] = spanContext.spanId;
   }
+  fields(): string[] {
+    return [
+      DummyPropagation.TRACE_CONTEXT_KEY,
+      DummyPropagation.SPAN_CONTEXT_KEY,
+    ];
+  }
 }
