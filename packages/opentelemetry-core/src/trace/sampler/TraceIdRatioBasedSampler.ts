@@ -17,8 +17,7 @@
 import {
   Sampler,
   SamplingDecision,
-  SamplingResult,
-  SpanContext,
+  SamplingResult
 } from '@opentelemetry/api';
 
 /** Sampler that samples a given fraction of traces based of trace id deterministically. */
@@ -28,7 +27,7 @@ export class TraceIdRatioBasedSampler implements Sampler {
   }
 
   shouldSample(
-    parentContext: SpanContext | undefined,
+    context: unknown,
     traceId: string
   ): SamplingResult {
     let accumulation = 0;
