@@ -28,6 +28,7 @@ import { CompositePropagatorConfig } from './types';
 export class CompositePropagator implements TextMapPropagator {
   private readonly _propagators: TextMapPropagator[];
   private readonly _logger: Logger;
+  private readonly _fields: string[];
 
   /**
    * Construct a composite propagator from a list of propagators.
@@ -37,6 +38,14 @@ export class CompositePropagator implements TextMapPropagator {
   constructor(config: CompositePropagatorConfig = {}) {
     this._propagators = config.propagators ?? [];
     this._logger = config.logger ?? new NoopLogger();
+    this._fields = Array.from(
+      new Set(
+        this._propagators
+          // older propagators may not have fields function, null check to be sure
+          .map(p => (typeof p.fields === 'function' ? p.fields() : []))
+          .reduce((x, y) => x.concat(y))
+      )
+    );
   }
 
   /**
@@ -80,5 +89,10 @@ export class CompositePropagator implements TextMapPropagator {
       }
       return ctx;
     }, context);
+  }
+
+  fields(): string[] {
+    // return a new array so our fields cannot be modified
+    return this._fields.slice();
   }
 }

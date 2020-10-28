@@ -14,18 +14,7 @@
  * limitations under the License.
  */
 
-import { ReadableSpan } from './export/ReadableSpan';
-import { Span } from './Span';
-import { SpanProcessor } from './SpanProcessor';
-
-/** No-op implementation of SpanProcessor */
-export class NoopSpanProcessor implements SpanProcessor {
-  onStart(span: Span): void {}
-  onEnd(span: ReadableSpan): void {}
-  shutdown(): Promise<void> {
-    return Promise.resolve();
-  }
-  forceFlush(): Promise<void> {
-    return Promise.resolve();
-  }
-}
+export * from './B3Propagator';
+export * from './B3SinglePropagator';
+export * from './B3MultiPropagator';
+export * from './types';

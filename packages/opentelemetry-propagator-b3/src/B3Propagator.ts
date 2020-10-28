@@ -22,17 +22,7 @@ import {
 } from '@opentelemetry/api';
 import { B3MultiPropagator } from './B3MultiPropagator';
 import { B3SinglePropagator, B3_CONTEXT_HEADER } from './B3SinglePropagator';
-
-/** Enumeraion of B3 inject encodings */
-export enum B3InjectEncoding {
-  SINGLE_HEADER,
-  MULTI_HEADER,
-}
-
-/** Configuration for the B3Propagator */
-export interface B3PropagatorConfig {
-  injectEncoding?: B3InjectEncoding;
-}
+import { B3InjectEncoding, B3PropagatorConfig } from './types';
 
 /**
  * Propagator that extracts B3 context in both single and multi-header variants,
@@ -49,12 +39,15 @@ export class B3Propagator implements TextMapPropagator {
     carrier: unknown,
     setter: TextMapSetter
   ) => void;
+  public readonly _fields: string[];
 
   constructor(config: B3PropagatorConfig = {}) {
     if (config.injectEncoding === B3InjectEncoding.MULTI_HEADER) {
       this._inject = this._b3MultiPropagator.inject;
+      this._fields = this._b3MultiPropagator.fields();
     } else {
       this._inject = this._b3SinglePropagator.inject;
+      this._fields = this._b3SinglePropagator.fields();
     }
   }
 
@@ -68,5 +61,9 @@ export class B3Propagator implements TextMapPropagator {
     } else {
       return this._b3MultiPropagator.extract(context, carrier, getter);
     }
+  }
+
+  fields(): string[] {
+    return this._fields;
   }
 }

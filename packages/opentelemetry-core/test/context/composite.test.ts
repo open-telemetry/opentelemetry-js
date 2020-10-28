@@ -34,7 +34,7 @@ import {
   X_B3_SAMPLED,
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
-} from '../../src/context/propagation/B3MultiPropagator';
+} from '@opentelemetry/propagator-b3';
 import {
   TRACE_PARENT_HEADER,
   TRACE_STATE_HEADER,
@@ -147,6 +147,68 @@ describe('Composite Propagator', () => {
       assert.strictEqual(spanContext.traceState!.get('foo'), 'bar');
     });
   });
+
+  describe('fields()', () => {
+    it('should combine fields from both propagators', () => {
+      const composite = new CompositePropagator({
+        propagators: [
+          {
+            extract: c => c,
+            inject: () => {},
+            fields: () => ['p1'],
+          },
+          {
+            extract: c => c,
+            inject: () => {},
+            fields: () => ['p2'],
+          },
+        ],
+      });
+
+      assert.deepStrictEqual(composite.fields(), ['p1', 'p2']);
+    });
+
+    it('should ignore propagators without fields function', () => {
+      const composite = new CompositePropagator({
+        propagators: [
+          {
+            extract: c => c,
+            inject: () => {},
+            fields: () => ['p1'],
+          },
+          // @ts-expect-error
+          {
+            extract: c => c,
+            inject: () => {},
+          },
+        ],
+      });
+
+      assert.deepStrictEqual(composite.fields(), ['p1']);
+    });
+
+    it('should not allow caller to modify fields', () => {
+      const composite = new CompositePropagator({
+        propagators: [
+          {
+            extract: c => c,
+            inject: () => {},
+            fields: () => ['p1'],
+          },
+          {
+            extract: c => c,
+            inject: () => {},
+            fields: () => ['p2'],
+          },
+        ],
+      });
+
+      const fields = composite.fields();
+      assert.deepStrictEqual(fields, ['p1', 'p2']);
+      fields[1] = 'p3';
+      assert.deepStrictEqual(composite.fields(), ['p1', 'p2']);
+    });
+  });
 });
 
 class ThrowingPropagator implements TextMapPropagator {
@@ -156,5 +218,9 @@ class ThrowingPropagator implements TextMapPropagator {
 
   extract(context: Context, carrier: unknown): Context {
     throw new Error('This propagator throws');
+  }
+
+  fields(): string[] {
+    return [];
   }
 }

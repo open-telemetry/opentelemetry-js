@@ -5,7 +5,7 @@ import { CollectorTraceExporter } from '@opentelemetry/exporter-collector';
 import { WebTracerProvider } from '@opentelemetry/web';
 import { FetchPlugin } from '@opentelemetry/plugin-fetch';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
-import { B3Propagator } from '@opentelemetry/core';
+import { B3Propagator } from '@opentelemetry/propagator-b3';
 
 const provider = new WebTracerProvider({
   plugins: [

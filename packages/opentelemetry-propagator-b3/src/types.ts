@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-import { ReadableSpan } from './export/ReadableSpan';
-import { Span } from './Span';
-import { SpanProcessor } from './SpanProcessor';
+/** Enumeration of B3 inject encodings */
+export enum B3InjectEncoding {
+  SINGLE_HEADER,
+  MULTI_HEADER,
+}
 
-/** No-op implementation of SpanProcessor */
-export class NoopSpanProcessor implements SpanProcessor {
-  onStart(span: Span): void {}
-  onEnd(span: ReadableSpan): void {}
-  shutdown(): Promise<void> {
-    return Promise.resolve();
-  }
-  forceFlush(): Promise<void> {
-    return Promise.resolve();
-  }
+/** Configuration for the B3Propagator */
+export interface B3PropagatorConfig {
+  injectEncoding?: B3InjectEncoding;
 }
