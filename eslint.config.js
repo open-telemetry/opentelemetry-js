@@ -23,6 +23,7 @@ module.exports = {
           "leadingUnderscore": "require"
         }
     ],
+    "@typescript-eslint/no-unused-vars": ["error", {"argsIgnorePattern": "^_", "args": "after-used"}],
     "@typescript-eslint/no-inferrable-types": ["error", { ignoreProperties: true }],
     "arrow-parens": ["error", "as-needed"],
     "prettier/prettier": ["error", { "singleQuote": true, "arrowParens": "avoid" }],
@@ -41,8 +42,8 @@ module.exports = {
         "@typescript-eslint/ban-ts-ignore": "off",
         "@typescript-eslint/no-empty-function": "off",
         "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/no-unused-vars": "off",
-        "@typescript-eslint/no-var-requires": "off"
+        "@typescript-eslint/no-var-requires": "off",
+        "@typescript-eslint/no-unused-vars": "off"
       }
     }
   ]

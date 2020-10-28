@@ -56,11 +56,13 @@
     "husky": "4.2.5",
     "lerna": "3.22.1",
     "lerna-changelog": "1.0.1",
+    "lint-staged": "^10.5.0",
     "markdownlint-cli": "0.23.2",
     "typescript": "3.9.7"
   },
   "husky": {
     "hooks": {
+      "pre-commit": "lerna run --concurrency 1 --stream lint:fix --since HEAD --exclude-dependents",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   }
