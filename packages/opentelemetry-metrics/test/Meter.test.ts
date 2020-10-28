@@ -571,17 +571,14 @@ describe('Meter', () => {
 
       await meter.collect();
       const [record] = meter.getBatcher().checkPointSet();
-      assert.deepStrictEqual(
-        record.aggregator.toPoint().value as Histogram,
-        {
-          buckets: {
-            boundaries: [10, 20, 30, 100],
-            counts: [0, 1, 0, 2, 1],
-          },
-          count: 4,
-          sum: 290,
-        }
-      );
+      assert.deepStrictEqual(record.aggregator.toPoint().value as Histogram, {
+        buckets: {
+          boundaries: [10, 20, 30, 100],
+          counts: [0, 1, 0, 2, 1],
+        },
+        count: 4,
+        sum: 290,
+      });
 
       assert.ok(valueRecorder instanceof Metric);
     });

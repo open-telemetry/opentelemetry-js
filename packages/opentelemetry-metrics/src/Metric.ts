@@ -107,7 +107,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
       unit: this._options.unit || '1',
       metricKind: this._kind,
       valueType: this._valueType,
-      ...(this._boundaries && {boundaries: this._boundaries}),
+      ...(this._boundaries && { boundaries: this._boundaries }),
     };
   }
 
