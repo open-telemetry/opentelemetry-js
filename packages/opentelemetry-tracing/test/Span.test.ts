@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-import { ExceptionAttribute } from '@opentelemetry/semantic-conventions';
-import * as assert from 'assert';
 import {
-  SpanKind,
   CanonicalCode,
-  TraceFlags,
-  SpanContext,
-  LinkContext,
   Exception,
+  LinkContext,
+  SpanContext,
+  SpanKind,
+  TraceFlags,
 } from '@opentelemetry/api';
-import { BasicTracerProvider, Span } from '../src';
 import {
   hrTime,
-  hrTimeToNanoseconds,
-  hrTimeToMilliseconds,
-  NoopLogger,
   hrTimeDuration,
+  hrTimeToMilliseconds,
+  hrTimeToNanoseconds,
+  NoopLogger,
 } from '@opentelemetry/core';
+import { ExceptionAttribute } from '@opentelemetry/semantic-conventions';
+import * as assert from 'assert';
+import { BasicTracerProvider, Span, SpanProcessor } from '../src';
 
 const performanceTimeOrigin = hrTime();
 
@@ -410,6 +410,70 @@ describe('Span', () => {
     assert.strictEqual(span.ended, false);
     span.end();
     assert.strictEqual(span.ended, true);
+  });
+
+  describe('span processor', () => {
+    it('should call onStart synchronously when span is started', () => {
+      let started = false;
+      const processor: SpanProcessor = {
+        onStart: () => {
+          started = true;
+        },
+        forceFlush: () => Promise.resolve(),
+        onEnd() {},
+        shutdown: () => Promise.resolve(),
+      };
+
+      const provider = new BasicTracerProvider({
+        logger: new NoopLogger(),
+      });
+
+      provider.addSpanProcessor(processor);
+
+      provider.getTracer('default').startSpan('test');
+      assert.ok(started);
+    });
+
+    it('should call onEnd synchronously when span is ended', () => {
+      let ended = false;
+      const processor: SpanProcessor = {
+        onStart: () => {},
+        forceFlush: () => Promise.resolve(),
+        onEnd() {
+          ended = true;
+        },
+        shutdown: () => Promise.resolve(),
+      };
+
+      const provider = new BasicTracerProvider({
+        logger: new NoopLogger(),
+      });
+
+      provider.addSpanProcessor(processor);
+
+      provider.getTracer('default').startSpan('test').end();
+      assert.ok(ended);
+    });
+
+    it('should call onStart with a writeable span', () => {
+      const processor: SpanProcessor = {
+        onStart: span => {
+          span.setAttribute('attr', true);
+        },
+        forceFlush: () => Promise.resolve(),
+        onEnd() {},
+        shutdown: () => Promise.resolve(),
+      };
+
+      const provider = new BasicTracerProvider({
+        logger: new NoopLogger(),
+      });
+
+      provider.addSpanProcessor(processor);
+
+      const s = provider.getTracer('default').startSpan('test') as Span;
+      assert.ok(s.attributes.attr);
+    });
   });
 
   describe('recordException', () => {

@@ -289,4 +289,11 @@ describe('HttpTraceContext', () => {
       assert.ok(ctx3 === ROOT_CONTEXT);
     });
   });
+
+  describe('fields()', () => {
+    it('should return fields used by trace context', () => {
+      const fields = httpTraceContext.fields();
+      assert.deepStrictEqual(fields, [TRACE_PARENT_HEADER, TRACE_STATE_HEADER]);
+    });
+  });
 });
