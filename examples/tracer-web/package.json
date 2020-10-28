@@ -39,6 +39,7 @@
     "@opentelemetry/exporter-collector": "^0.12.0",
     "@opentelemetry/exporter-zipkin": "^0.12.0",
     "@opentelemetry/metrics": "^0.12.0",
+    "@opentelemetry/propagator-b3": "^0.12.0",
     "@opentelemetry/plugin-document-load": "^0.9.0",
     "@opentelemetry/plugin-fetch": "^0.12.0",
     "@opentelemetry/plugin-user-interaction": "^0.9.0",

@@ -17,7 +17,8 @@
 import { context } from '@opentelemetry/api';
 import { ContextManager } from '@opentelemetry/context-base';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
-import { B3Propagator, BasePlugin, NoopLogger } from '@opentelemetry/core';
+import { BasePlugin, NoopLogger } from '@opentelemetry/core';
+import { B3Propagator } from '@opentelemetry/propagator-b3';
 import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
 import { Span, Tracer } from '@opentelemetry/tracing';
 import * as assert from 'assert';
