@@ -67,17 +67,17 @@ export abstract class CollectorExporterBrowserBase<
     }
     const serviceRequest = this.convert(items);
     const body = JSON.stringify(serviceRequest);
+    let _onFinish = () => {};
 
     const promise = new Promise(resolve => {
       const _onSuccess = (): void => {
-        Promise.resolve(onSuccess()).then(() => _onFinish());
+        onSuccess();
+        _onFinish();
+        resolve();
       };
       const _onError = (error: collectorTypes.CollectorExporterError): void => {
-        Promise.resolve(onError(error)).then(() => _onFinish());
-      };
-      const _onFinish = () => {
-        const index = this._sendingPromises.indexOf(promise);
-        this._sendingPromises.splice(index, 1);
+        onError(error);
+        _onFinish();
         resolve();
       };
 
@@ -94,6 +94,10 @@ export abstract class CollectorExporterBrowserBase<
         sendWithBeacon(body, this.url, this.logger, _onSuccess, _onError);
       }
     });
+    _onFinish = () => {
+      const index = this._sendingPromises.indexOf(promise);
+      this._sendingPromises.splice(index, 1);
+    };
     this._sendingPromises.push(promise);
   }
 }
