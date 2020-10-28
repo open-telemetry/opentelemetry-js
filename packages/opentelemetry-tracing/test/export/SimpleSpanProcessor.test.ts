@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
+import {
+  context,
+  ROOT_CONTEXT,
+  SpanContext,
+  SpanKind,
+  TraceFlags,
+} from '@opentelemetry/api';
 import * as assert from 'assert';
 import {
-  Span,
   BasicTracerProvider,
   InMemorySpanExporter,
   SimpleSpanProcessor,
+  Span,
 } from '../../src';
-import { SpanContext, SpanKind, TraceFlags, context } from '@opentelemetry/api';
-import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { TestStackContextManager } from './TestStackContextManager';
+import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 
 describe('SimpleSpanProcessor', () => {
   const provider = new BasicTracerProvider();
@@ -46,6 +52,7 @@ describe('SimpleSpanProcessor', () => {
       };
       const span = new Span(
         provider.getTracer('default'),
+        ROOT_CONTEXT,
         'span-name',
         spanContext,
         SpanKind.CLIENT
@@ -69,6 +76,7 @@ describe('SimpleSpanProcessor', () => {
       };
       const span = new Span(
         provider.getTracer('default'),
+        ROOT_CONTEXT,
         'span-name',
         spanContext,
         SpanKind.CLIENT
@@ -125,6 +133,7 @@ describe('SimpleSpanProcessor', () => {
       };
       const span = new Span(
         provider.getTracer('default'),
+        ROOT_CONTEXT,
         'span-name',
         spanContext,
         SpanKind.CLIENT

@@ -109,6 +109,7 @@ export class Tracer implements api.Tracer {
 
     const span = new Span(
       this,
+      context,
       name,
       spanContext,
       spanKind,
