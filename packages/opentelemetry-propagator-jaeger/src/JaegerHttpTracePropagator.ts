@@ -21,11 +21,9 @@ import {
   TraceFlags,
   SetterFunction,
   GetterFunction,
-} from '@opentelemetry/api';
-import {
   getParentSpanContext,
   setExtractedSpanContext,
-} from '@opentelemetry/core';
+} from '@opentelemetry/api';
 
 export const UBER_TRACE_ID_HEADER = 'uber-trace-id';
 

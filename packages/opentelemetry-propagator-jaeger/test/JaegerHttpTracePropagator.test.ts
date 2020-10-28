@@ -15,16 +15,14 @@
  */
 
 import {
-  Context,
   defaultGetter,
   defaultSetter,
+  getParentSpanContext,
+  ROOT_CONTEXT,
+  setExtractedSpanContext,
   SpanContext,
   TraceFlags,
 } from '@opentelemetry/api';
-import {
-  getExtractedSpanContext,
-  setExtractedSpanContext,
-} from '@opentelemetry/core';
 import * as assert from 'assert';
 import {
   JaegerHttpTracePropagator,
@@ -52,7 +50,7 @@ describe('JaegerHttpTracePropagator', () => {
       };
 
       jaegerHttpTracePropagator.inject(
-        setExtractedSpanContext(Context.ROOT_CONTEXT, spanContext),
+        setExtractedSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
         defaultSetter
       );
@@ -70,7 +68,7 @@ describe('JaegerHttpTracePropagator', () => {
       };
 
       customJaegerHttpTracePropagator.inject(
-        setExtractedSpanContext(Context.ROOT_CONTEXT, spanContext),
+        setExtractedSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
         defaultSetter
       );
@@ -85,12 +83,8 @@ describe('JaegerHttpTracePropagator', () => {
     it('should extract context of a sampled span from carrier', () => {
       carrier[UBER_TRACE_ID_HEADER] =
         'd4cda95b652f4a1592b449d5929fda1b:6e0c63257de34c92:0:01';
-      const extractedSpanContext = getExtractedSpanContext(
-        jaegerHttpTracePropagator.extract(
-          Context.ROOT_CONTEXT,
-          carrier,
-          defaultGetter
-        )
+      const extractedSpanContext = getParentSpanContext(
+        jaegerHttpTracePropagator.extract(ROOT_CONTEXT, carrier, defaultGetter)
       );
 
       assert.deepStrictEqual(extractedSpanContext, {
@@ -104,12 +98,8 @@ describe('JaegerHttpTracePropagator', () => {
     it('should extract context of a sampled span from carrier with 1 bit flag', () => {
       carrier[UBER_TRACE_ID_HEADER] =
         '9c41e35aeb6d1272:45fd2a9709dadcf1:a13699e3fb724f40:1';
-      const extractedSpanContext = getExtractedSpanContext(
-        jaegerHttpTracePropagator.extract(
-          Context.ROOT_CONTEXT,
-          carrier,
-          defaultGetter
-        )
+      const extractedSpanContext = getParentSpanContext(
+        jaegerHttpTracePropagator.extract(ROOT_CONTEXT, carrier, defaultGetter)
       );
 
       assert.deepStrictEqual(extractedSpanContext, {
@@ -123,12 +113,8 @@ describe('JaegerHttpTracePropagator', () => {
     it('should extract context of a sampled span from UTF-8 encoded carrier', () => {
       carrier[UBER_TRACE_ID_HEADER] =
         'ac1f3dc3c2c0b06e%3A5ac292c4a11a163e%3Ac086aaa825821068%3A1';
-      const extractedSpanContext = getExtractedSpanContext(
-        jaegerHttpTracePropagator.extract(
-          Context.ROOT_CONTEXT,
-          carrier,
-          defaultGetter
-        )
+      const extractedSpanContext = getParentSpanContext(
+        jaegerHttpTracePropagator.extract(ROOT_CONTEXT, carrier, defaultGetter)
       );
 
       assert.deepStrictEqual(extractedSpanContext, {
@@ -142,9 +128,9 @@ describe('JaegerHttpTracePropagator', () => {
     it('should use custom header if provided', () => {
       carrier[customHeader] =
         'd4cda95b652f4a1592b449d5929fda1b:6e0c63257de34c92:0:01';
-      const extractedSpanContext = getExtractedSpanContext(
+      const extractedSpanContext = getParentSpanContext(
         customJaegerHttpTracePropagator.extract(
-          Context.ROOT_CONTEXT,
+          ROOT_CONTEXT,
           carrier,
           defaultGetter
         )
@@ -160,9 +146,9 @@ describe('JaegerHttpTracePropagator', () => {
 
     it('returns undefined if UBER_TRACE_ID_HEADER header is missing', () => {
       assert.deepStrictEqual(
-        getExtractedSpanContext(
+        getParentSpanContext(
           jaegerHttpTracePropagator.extract(
-            Context.ROOT_CONTEXT,
+            ROOT_CONTEXT,
             carrier,
             defaultGetter
           )
@@ -174,9 +160,9 @@ describe('JaegerHttpTracePropagator', () => {
     it('returns undefined if UBER_TRACE_ID_HEADER header is invalid', () => {
       carrier[UBER_TRACE_ID_HEADER] = 'invalid!';
       assert.deepStrictEqual(
-        getExtractedSpanContext(
+        getParentSpanContext(
           jaegerHttpTracePropagator.extract(
-            Context.ROOT_CONTEXT,
+            ROOT_CONTEXT,
             carrier,
             defaultGetter
           )
@@ -188,23 +174,23 @@ describe('JaegerHttpTracePropagator', () => {
 
   it('should fail gracefully on bad responses from getter', () => {
     const ctx1 = jaegerHttpTracePropagator.extract(
-      Context.ROOT_CONTEXT,
+      ROOT_CONTEXT,
       carrier,
       (c, k) => 1 // not a number
     );
     const ctx2 = jaegerHttpTracePropagator.extract(
-      Context.ROOT_CONTEXT,
+      ROOT_CONTEXT,
       carrier,
       (c, k) => [] // empty array
     );
     const ctx3 = jaegerHttpTracePropagator.extract(
-      Context.ROOT_CONTEXT,
+      ROOT_CONTEXT,
       carrier,
       (c, k) => undefined // missing value
     );
 
-    assert.ok(ctx1 === Context.ROOT_CONTEXT);
-    assert.ok(ctx2 === Context.ROOT_CONTEXT);
-    assert.ok(ctx3 === Context.ROOT_CONTEXT);
+    assert.ok(ctx1 === ROOT_CONTEXT);
+    assert.ok(ctx2 === ROOT_CONTEXT);
+    assert.ok(ctx3 === ROOT_CONTEXT);
   });
 });
