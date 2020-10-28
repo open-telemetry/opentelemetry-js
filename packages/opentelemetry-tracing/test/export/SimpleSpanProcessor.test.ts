@@ -91,7 +91,7 @@ describe('SimpleSpanProcessor', () => {
 
     it('should call globalErrorHandler when exporting fails', async () => {
       const expectedError = new Error(
-        'SimpleSpanProcessor: span export failed'
+        'SimpleSpanProcessor: span export failed (status 1)'
       );
       const processor = new SimpleSpanProcessor(exporter);
       const spanContext: SpanContext = {

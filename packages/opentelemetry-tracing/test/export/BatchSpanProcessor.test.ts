@@ -204,7 +204,7 @@ describe('BatchSpanProcessor', () => {
       let processor: BatchSpanProcessor;
 
       beforeEach(() => {
-        processor = new BatchSpanProcessor(exporter);
+        processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
         const span = createSampledSpan('test');
         processor.onStart(span);
         processor.onEnd(span);
@@ -236,7 +236,7 @@ describe('BatchSpanProcessor', () => {
 
       it('should call globalErrorHandler when exporting fails', async () => {
         const expectedError = new Error(
-          'BatchSpanProcessor: span export failed'
+          'BatchSpanProcessor: span export failed (status 1)'
         );
         sinon.stub(exporter, 'export').callsFake((_, callback) => {
           setTimeout(() => {
@@ -248,7 +248,18 @@ describe('BatchSpanProcessor', () => {
 
         setGlobalErrorHandler(errorHandlerSpy);
 
-        await processor.forceFlush();
+        // Cause a flush by emitting more spans then the default buffer size
+        for (let i = 0; i < defaultBufferConfig.bufferSize; i++) {
+          const span = createSampledSpan('test');
+          processor.onStart(span);
+          processor.onEnd(span);
+        }
+
+        await new Promise(resolve => {
+          setTimeout(() => {
+            resolve();
+          }, 0);
+        });
 
         assert.strictEqual(errorHandlerSpy.callCount, 1);
 

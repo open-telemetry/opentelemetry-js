@@ -51,7 +51,9 @@ export class SimpleSpanProcessor implements SpanProcessor {
       this._exporter.export([span], result => {
         if (result !== ExportResult.SUCCESS) {
           globalErrorHandler(
-            new Error('SimpleSpanProcessor: span export failed')
+            new Error(
+              `SimpleSpanProcessor: span export failed (status ${result})`
+            )
           );
         }
       });

@@ -94,7 +94,9 @@ export class BatchSpanProcessor implements SpanProcessor {
     this._finishedSpans.push(span);
     this._maybeStartTimer();
     if (this._finishedSpans.length > this._bufferSize) {
-      this._flush();
+      this._flush().catch(e => {
+        globalErrorHandler(e);
+      });
     }
   }
 
@@ -104,17 +106,20 @@ export class BatchSpanProcessor implements SpanProcessor {
     if (this._finishedSpans.length === 0) {
       return Promise.resolve();
     }
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       // prevent downstream exporter calls from generating spans
       context.with(suppressInstrumentation(context.active()), () => {
         this._exporter.export(this._finishedSpans, result => {
           this._finishedSpans = [];
-          if (result !== ExportResult.SUCCESS) {
-            globalErrorHandler(
-              new Error('BatchSpanProcessor: span export failed')
+          if (result === ExportResult.SUCCESS) {
+            resolve();
+          } else {
+            reject(
+              new Error(
+                `BatchSpanProcessor: span export failed (status ${result})`
+              )
             );
           }
-          resolve();
         });
       });
     });
@@ -124,7 +129,9 @@ export class BatchSpanProcessor implements SpanProcessor {
     if (this._timer !== undefined) return;
 
     this._timer = setTimeout(() => {
-      this._flush().catch();
+      this._flush().catch(e => {
+        globalErrorHandler(e);
+      });
     }, this._bufferTimeout);
     unrefTimer(this._timer);
   }
