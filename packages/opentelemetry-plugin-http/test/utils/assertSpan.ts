@@ -86,7 +86,7 @@ export const assertSpan = (
 
   if (span.kind === SpanKind.CLIENT) {
     if (validations.resHeaders['content-length']) {
-      const contentLength = validations.resHeaders['content-length'];
+      const contentLength = Number(validations.resHeaders['content-length']);
 
       if (
         validations.resHeaders['content-encoding'] &&

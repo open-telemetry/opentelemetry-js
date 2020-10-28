@@ -239,23 +239,22 @@ export const setContentLengthAttributes = (
     isCompressed = true;
   }
 
+  let key = null;
   if (isCompressed) {
     if (isRequest) {
-      attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH] =
-        headers['content-length'];
+      key = HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH;
     } else {
-      attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH] =
-        headers['content-length'];
+      key = HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH;
     }
   } else {
     if (isRequest) {
-      attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED] =
-        headers['content-length'];
+      key = HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED;
     } else {
-      attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED] =
-        headers['content-length'];
+      key = HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED;
     }
   }
+
+  attributes[key] = Number(headers['content-length']);
 };
 
 /**
