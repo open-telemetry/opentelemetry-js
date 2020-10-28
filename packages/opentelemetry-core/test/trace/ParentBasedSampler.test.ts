@@ -17,7 +17,11 @@ import * as assert from 'assert';
 import * as api from '@opentelemetry/api';
 import { AlwaysOnSampler } from '../../src/trace/sampler/AlwaysOnSampler';
 import { ParentBasedSampler } from '../../src/trace/sampler/ParentBasedSampler';
-import { TraceFlags, SpanKind, setExtractedSpanContext } from '@opentelemetry/api';
+import {
+  TraceFlags,
+  SpanKind,
+  setExtractedSpanContext,
+} from '@opentelemetry/api';
 import { AlwaysOffSampler } from '../../src/trace/sampler/AlwaysOffSampler';
 import { TraceIdRatioBasedSampler } from '../../src';
 

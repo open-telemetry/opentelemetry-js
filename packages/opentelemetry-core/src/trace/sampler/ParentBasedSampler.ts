@@ -22,7 +22,7 @@ import {
   Sampler,
   SamplingResult,
   SpanKind,
-  TraceFlags
+  TraceFlags,
 } from '@opentelemetry/api';
 import { globalErrorHandler } from '../../common/global-error-handler';
 import { AlwaysOffSampler } from './AlwaysOffSampler';
@@ -67,7 +67,6 @@ export class ParentBasedSampler implements Sampler {
     attributes: Attributes,
     links: Link[]
   ): SamplingResult {
-
     const parentContext = getParentSpanContext(context);
 
     if (!parentContext) {
