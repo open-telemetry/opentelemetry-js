@@ -39,12 +39,15 @@ export class B3Propagator implements TextMapPropagator {
     carrier: unknown,
     setter: TextMapSetter
   ) => void;
+  public readonly _fields: string[];
 
   constructor(config: B3PropagatorConfig = {}) {
     if (config.injectEncoding === B3InjectEncoding.MULTI_HEADER) {
       this._inject = this._b3MultiPropagator.inject;
+      this._fields = this._b3MultiPropagator.fields();
     } else {
       this._inject = this._b3SinglePropagator.inject;
+      this._fields = this._b3SinglePropagator.fields();
     }
   }
 
@@ -58,5 +61,9 @@ export class B3Propagator implements TextMapPropagator {
     } else {
       return this._b3MultiPropagator.extract(context, carrier, getter);
     }
+  }
+
+  fields(): string[] {
+    return this._fields;
   }
 }
