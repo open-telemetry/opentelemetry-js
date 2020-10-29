@@ -93,8 +93,11 @@ describe('transform', () => {
   });
 
   describe('toCollectorSpan', () => {
-    it('should convert span', () => {
+    it('should convert span using hex', () => {
       ensureSpanIsCorrect(transform.toCollectorSpan(mockedReadableSpan, true));
+    });
+    it('should convert span using base64', () => {
+      ensureSpanIsCorrect(transform.toCollectorSpan(mockedReadableSpan), false);
     });
   });
 

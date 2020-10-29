@@ -18,7 +18,7 @@ import { TraceFlags, ValueType } from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
 import { MetricRecord, MeterProvider } from '@opentelemetry/metrics';
-import { InstrumentationLibrary } from '@opentelemetry/core';
+import { hexToBase64, InstrumentationLibrary } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { opentelemetryProto } from '../src/types';
 import * as collectorTypes from '../src/types';
@@ -387,14 +387,15 @@ export function ensureAttributesAreCorrect(
 }
 
 export function ensureLinksAreCorrect(
-  attributes: opentelemetryProto.trace.v1.Span.Link[]
+  attributes: opentelemetryProto.trace.v1.Span.Link[],
+  useHex?: boolean
 ) {
   assert.deepStrictEqual(
     attributes,
     [
       {
-        traceId: traceIdHex,
-        spanId: parentIdHex,
+        traceId: useHex ? traceIdHex : hexToBase64(traceIdHex),
+        spanId: useHex ? parentIdHex : hexToBase64(parentIdHex),
         attributes: [
           {
             key: 'component',
@@ -411,7 +412,8 @@ export function ensureLinksAreCorrect(
 }
 
 export function ensureSpanIsCorrect(
-  span: collectorTypes.opentelemetryProto.trace.v1.Span
+  span: collectorTypes.opentelemetryProto.trace.v1.Span,
+  useHex = true
 ) {
   if (span.attributes) {
     ensureAttributesAreCorrect(span.attributes);
@@ -420,13 +422,21 @@ export function ensureSpanIsCorrect(
     ensureEventsAreCorrect(span.events);
   }
   if (span.links) {
-    ensureLinksAreCorrect(span.links);
+    ensureLinksAreCorrect(span.links, useHex);
   }
-  assert.deepStrictEqual(span.traceId, traceIdHex, 'traceId is wrong');
-  assert.deepStrictEqual(span.spanId, spanIdHex, 'spanId is wrong');
+  assert.deepStrictEqual(
+    span.traceId,
+    useHex ? traceIdHex : hexToBase64(traceIdHex),
+    'traceId is' + ' wrong'
+  );
+  assert.deepStrictEqual(
+    span.spanId,
+    useHex ? spanIdHex : hexToBase64(spanIdHex),
+    'spanId is' + ' wrong'
+  );
   assert.deepStrictEqual(
     span.parentSpanId,
-    parentIdHex,
+    useHex ? parentIdHex : hexToBase64(parentIdHex),
     'parentIdArr is wrong'
   );
   assert.strictEqual(span.name, 'documentFetch', 'name is wrong');
