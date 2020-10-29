@@ -15,6 +15,7 @@
  */
 
 import { TraceFlags, ValueType } from '@opentelemetry/api';
+import { hexToBase64 } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
 import { collectorTypes } from '@opentelemetry/exporter-collector';
@@ -97,11 +98,11 @@ export const mockedReadableSpan: ReadableSpan = {
   name: 'documentFetch',
   kind: 0,
   spanContext: {
-    traceId: '1f1008dc8e270e85c40a0d7c3939b278',
-    spanId: '5e107261f64fa53e',
+    traceId: traceIdHex,
+    spanId: spanIdHex,
     traceFlags: TraceFlags.SAMPLED,
   },
-  parentSpanId: '78a8915098864388',
+  parentSpanId: parentIdHex,
   startTime: [1574120165, 429803070],
   endTime: [1574120165, 438688070],
   ended: true,
@@ -110,8 +111,8 @@ export const mockedReadableSpan: ReadableSpan = {
   links: [
     {
       context: {
-        traceId: '1f1008dc8e270e85c40a0d7c3939b278',
-        spanId: '78a8915098864388',
+        traceId: traceIdHex,
+        spanId: parentIdHex,
       },
       attributes: { component: 'document-load' },
     },
@@ -222,8 +223,8 @@ export function ensureProtoLinksAreCorrect(
     attributes,
     [
       {
-        traceId: traceIdHex,
-        spanId: parentIdHex,
+        traceId: hexToBase64(traceIdHex),
+        spanId: hexToBase64(parentIdHex),
         attributes: [
           {
             key: 'component',
@@ -251,11 +252,19 @@ export function ensureProtoSpanIsCorrect(
   if (span.links) {
     ensureProtoLinksAreCorrect(span.links);
   }
-  assert.deepStrictEqual(span.traceId, traceIdHex, 'traceId is wrong');
-  assert.deepStrictEqual(span.spanId, spanIdHex, 'spanId is wrong');
+  assert.deepStrictEqual(
+    span.traceId,
+    hexToBase64(traceIdHex),
+    'traceId is' + ' wrong'
+  );
+  assert.deepStrictEqual(
+    span.spanId,
+    hexToBase64(spanIdHex),
+    'spanId is' + ' wrong'
+  );
   assert.deepStrictEqual(
     span.parentSpanId,
-    parentIdHex,
+    hexToBase64(parentIdHex),
     'parentIdArr is wrong'
   );
   assert.strictEqual(span.name, 'documentFetch', 'name is wrong');
