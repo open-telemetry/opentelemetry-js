@@ -36,7 +36,7 @@ import {
  * for more details about detecting information for Elastic Kubernetes plugins
  */
   
-  class AwsEksDetector implements Detector {
+export class AwsEksDetector implements Detector {
     readonly K8S_SVC_URL = "https://kubernetes.default.svc";
     readonly K8S_TOKEN_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/token";
     readonly K8S_CERT_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt";
@@ -85,7 +85,9 @@ import {
         HEADERS: {
           "Authorization" : this._getK8sCredHeader(config),
         },
-        ca: secureContext,
+        agentOptions: {
+          ca: secureContext,
+        }
       }
       const awsAuth = this._fetchString(options);
       return !!awsAuth;
@@ -97,13 +99,15 @@ import {
         });
         const options = {
         host: this.K8S_SVC_URL,
-        path: this.AUTH_CONFIGMAP_PATH,
+        path: this.CW_CONFIGMAP_PATH,
         method: 'GET',
         timeout: this.MILLISECOND_TIME_OUT,
         HEADERS: {
           "Authorization" : this._getK8sCredHeader(config),
         },
-        ca: secureContext,
+        agentOptions: {
+          ca: secureContext,
+        }
       }
         const clusterName = this._fetchString(options);
         return clusterName;
