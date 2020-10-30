@@ -63,5 +63,19 @@
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
+  },
+  "changelog": {
+    "labels": {
+      "breaking": ":boom: Breaking Change",
+      "bug": ":bug: Bug Fix",
+      "plugin-request": ":tada: New Plugins",
+      "enhancement": ":rocket: Enhancement",
+      "internal": ":house: Internal",
+      "documentation": ":memo: Documentation"
+    },
+    "ignoreCommitters": [
+      "renovate-bot",
+      "dependabot"
+    ]
   }
 }
