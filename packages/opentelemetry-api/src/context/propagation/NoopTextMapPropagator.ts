@@ -27,6 +27,9 @@ export class NoopTextMapPropagator implements TextMapPropagator {
   extract(context: Context, carrier: unknown): Context {
     return context;
   }
+  fields(): string[] {
+    return [];
+  }
 }
 
 export const NOOP_TEXT_MAP_PROPAGATOR = new NoopTextMapPropagator();
