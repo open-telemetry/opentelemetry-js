@@ -15,10 +15,11 @@
  */
 
 import { context, suppressInstrumentation } from '@opentelemetry/api';
+import { ExportResult, globalErrorHandler } from '@opentelemetry/core';
 import { Span } from '../Span';
+import { SpanExporter } from './SpanExporter';
 import { SpanProcessor } from '../SpanProcessor';
 import { ReadableSpan } from './ReadableSpan';
-import { SpanExporter } from './SpanExporter';
 
 /**
  * An implementation of the {@link SpanProcessor} that converts the {@link Span}
@@ -47,7 +48,15 @@ export class SimpleSpanProcessor implements SpanProcessor {
 
     // prevent downstream exporter calls from generating spans
     context.with(suppressInstrumentation(context.active()), () => {
-      this._exporter.export([span], () => {});
+      this._exporter.export([span], result => {
+        if (result !== ExportResult.SUCCESS) {
+          globalErrorHandler(
+            new Error(
+              `SimpleSpanProcessor: span export failed (status ${result})`
+            )
+          );
+        }
+      });
     });
   }
 
