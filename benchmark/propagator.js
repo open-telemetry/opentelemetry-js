@@ -4,11 +4,12 @@ const benchmark = require('./benchmark');
 const opentelemetry = require('../packages/opentelemetry-core');
 const api = require('../packages/opentelemetry-api');
 const { Context } = require('../packages/opentelemetry-context-base');
+const { B3Propagator } = require('../packages/opentelemetry-propagator-b3');
 
 const setups = [
   {
     name: 'B3Propagator',
-    propagator: new opentelemetry.B3Propagator(),
+    propagator: new B3Propagator(),
     injectCarrier: {},
     extractCarrier: {
       'x-b3-traceid': 'd4cda95b652f4a1592b449d5929fda1b',

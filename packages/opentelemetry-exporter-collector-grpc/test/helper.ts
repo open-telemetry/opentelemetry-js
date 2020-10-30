@@ -34,33 +34,25 @@ const meterProvider = new MeterProvider({
 const meter = meterProvider.getMeter('default', '0.0.1');
 
 const traceIdArr = [
-  213,
-  253,
-  116,
-  211,
-  199,
-  92,
-  241,
-  237,
-  187,
-  209,
-  239,
-  57,
-  115,
-  141,
-  26,
-  209,
-  222,
+  31,
+  16,
+  8,
   220,
-  223,
-  221,
-  253,
-  111,
-  110,
-  252,
+  142,
+  39,
+  14,
+  133,
+  196,
+  10,
+  13,
+  124,
+  57,
+  57,
+  178,
+  120,
 ];
-const spanIdArr = [229, 237, 116, 239, 110, 181, 127, 174, 31, 107, 157, 222];
-const parentIdArr = [239, 198, 188, 247, 94, 116, 247, 207, 58, 227, 127, 60];
+const spanIdArr = [94, 16, 114, 97, 246, 79, 165, 62];
+const parentIdArr = [120, 168, 145, 80, 152, 134, 67, 136];
 
 export async function mockCounter(): Promise<MetricRecord> {
   const name = 'int-counter';

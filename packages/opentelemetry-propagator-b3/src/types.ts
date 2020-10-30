@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/context-base';
-import { TextMapPropagator } from './TextMapPropagator';
-
-/**
- * No-op implementations of {@link TextMapPropagator}.
- */
-export class NoopTextMapPropagator implements TextMapPropagator {
-  /** Noop inject function does nothing */
-  inject(context: Context, carrier: unknown): void {}
-  /** Noop extract function does nothing and returns the input context */
-  extract(context: Context, carrier: unknown): Context {
-    return context;
-  }
-  fields(): string[] {
-    return [];
-  }
+/** Enumeration of B3 inject encodings */
+export enum B3InjectEncoding {
+  SINGLE_HEADER,
+  MULTI_HEADER,
 }
 
-export const NOOP_TEXT_MAP_PROPAGATOR = new NoopTextMapPropagator();
+/** Configuration for the B3Propagator */
+export interface B3PropagatorConfig {
+  injectEncoding?: B3InjectEncoding;
+}

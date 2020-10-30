@@ -24,7 +24,6 @@ import {
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/context-base';
 import * as assert from 'assert';
-import { B3_DEBUG_FLAG_KEY } from '../../src/context/propagation/b3-common';
 import {
   B3MultiPropagator,
   X_B3_FLAGS,
@@ -32,8 +31,8 @@ import {
   X_B3_SAMPLED,
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
-} from '../../src/context/propagation/B3MultiPropagator';
-import { TraceState } from '../../src/trace/TraceState';
+} from '../src/B3MultiPropagator';
+import { B3_DEBUG_FLAG_KEY } from '../src/common';
 
 describe('B3MultiPropagator', () => {
   const b3Propagator = new B3MultiPropagator();
@@ -70,7 +69,20 @@ describe('B3MultiPropagator', () => {
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
         spanId: '6e0c63257de34c92',
         traceFlags: TraceFlags.NONE,
-        traceState: new TraceState('foo=bar,baz=qux'),
+        traceState: {
+          get: (key: string) => {
+            return undefined;
+          },
+          set: function (key: string, value: string) {
+            return this;
+          },
+          unset: function (key: string) {
+            return this;
+          },
+          serialize: () => {
+            return 'foo=bar,baz=quux';
+          },
+        },
         isRemote: false,
       };
 

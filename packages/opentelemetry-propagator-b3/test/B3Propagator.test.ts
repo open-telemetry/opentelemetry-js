@@ -24,16 +24,16 @@ import {
   setExtractedSpanContext,
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/context-base';
+import { B3Propagator } from '../src/B3Propagator';
+import { B3InjectEncoding } from '../src/types';
+import { B3_CONTEXT_HEADER } from '../src/B3SinglePropagator';
 import {
-  B3Propagator,
-  B3InjectEncoding,
-} from '../../src/context/propagation/B3Propagator';
-import { B3_CONTEXT_HEADER } from '../../src/context/propagation/B3SinglePropagator';
-import {
+  X_B3_FLAGS,
+  X_B3_PARENT_SPAN_ID,
   X_B3_SAMPLED,
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
-} from '../../src/context/propagation/B3MultiPropagator';
+} from '../src/B3MultiPropagator';
 
 describe('B3Propagator', () => {
   let propagator: B3Propagator;
@@ -148,6 +148,25 @@ describe('B3Propagator', () => {
         isRemote: true,
         traceFlags: TraceFlags.NONE,
       });
+    });
+  });
+
+  describe('fields()', () => {
+    it('returns single header field by default', () => {
+      const propagator = new B3Propagator();
+      assert.deepStrictEqual(propagator.fields(), [B3_CONTEXT_HEADER]);
+    });
+    it('returns multi fields when configured to use multi fields', () => {
+      const propagator = new B3Propagator({
+        injectEncoding: B3InjectEncoding.MULTI_HEADER,
+      });
+      assert.deepStrictEqual(propagator.fields(), [
+        X_B3_TRACE_ID,
+        X_B3_SPAN_ID,
+        X_B3_FLAGS,
+        X_B3_SAMPLED,
+        X_B3_PARENT_SPAN_ID,
+      ]);
     });
   });
 });
