@@ -22,10 +22,9 @@ import {
     K8S_RESOURCE,
     ResourceDetectionConfigWithLogger,
   } from '@opentelemetry/resources';
-  import * as http from 'http';
+  import * as https from 'https';
   import * as fs from 'fs';
   import * as util from 'util';
-  import * as tls from 'tls';
 
   /**
  * The AwsEksDetector can be used to detect if a process is running in AWS Elastic
@@ -51,8 +50,8 @@ export class AwsEksDetector implements Detector {
   
     async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
       try {
-        AwsEksDetector.fileAccessAsync(this.K8S_TOKEN_PATH);
-        AwsEksDetector.fileAccessAsync(this.K8S_CERT_PATH);
+        await AwsEksDetector.fileAccessAsync(this.K8S_TOKEN_PATH);
+        await AwsEksDetector.fileAccessAsync(this.K8S_CERT_PATH);
         
         if (!this._isEks(config)) {
           config.logger.debug('AwsEcsDetector failed: Process is not running on Eks');
@@ -62,42 +61,34 @@ export class AwsEksDetector implements Detector {
         const containerId = await this._getContainerId(config);
         const clusterName = await this._getClusterName(config);
 
-        return !containerId
+        return !containerId && !clusterName
         ? Resource.empty()
         : new Resource({
           [K8S_RESOURCE.CLUSTER_NAME]: clusterName || '',
           [CONTAINER_RESOURCE.ID]: containerId || '',
         });
       } catch (e) {
-        config.logger.debug('Not running on K8S');
+        config.logger.warn('Not running on K8S');
         return Resource.empty();
       }
     }
 
     private async _isEks(config: ResourceDetectionConfigWithLogger): Promise<boolean> {
-      const secureContext = tls.createSecureContext({
-        ca: JSON.stringify(AwsEksDetector.readFileAsync(this.K8S_CERT_PATH)),
-      });
       const options = {
-        host: this.K8S_SVC_URL,
+        hostname: this.K8S_SVC_URL,
         path: this.AUTH_CONFIGMAP_PATH,
         method: 'GET',
         timeout: this.MILLISECOND_TIME_OUT,
         HEADERS: {
           "Authorization" : this._getK8sCredHeader(config),
         },
-        agentOptions: {
-          ca: secureContext,
-        }
+        ca: JSON.stringify(AwsEksDetector.readFileAsync(this.K8S_CERT_PATH)),
       }
       const awsAuth = this._fetchString(options);
       return !!awsAuth;
     }
 
      private async _getClusterName(config: ResourceDetectionConfigWithLogger): Promise<string | undefined> {
-        const secureContext = tls.createSecureContext({
-          ca: JSON.stringify(AwsEksDetector.readFileAsync(this.K8S_CERT_PATH)),
-        });
         const options = {
         host: this.K8S_SVC_URL,
         path: this.CW_CONFIGMAP_PATH,
@@ -106,9 +97,7 @@ export class AwsEksDetector implements Detector {
         HEADERS: {
           "Authorization" : this._getK8sCredHeader(config),
         },
-        agentOptions: {
-          ca: secureContext,
-        }
+        ca: JSON.stringify(AwsEksDetector.readFileAsync(this.K8S_CERT_PATH)),
       }
         return this._fetchString(options);
      }
@@ -157,14 +146,14 @@ export class AwsEksDetector implements Detector {
    * to get back a valid JSON document. Parses that document and stores
    * the identity properties in a local map.
    */
-  private async _fetchString(options: http.RequestOptions): Promise<string | undefined> {
+  private async _fetchString(options: https.RequestOptions): Promise<string | undefined> {
     return new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         req.abort();
         reject(new Error('Eks metadata api request timed out.'));
       }, 2000);
 
-      const req = http.request(options, res => {
+      const req = https.request(options, res => {
         clearTimeout(timeoutId);
         const { statusCode } = res;
         res.setEncoding('utf8');

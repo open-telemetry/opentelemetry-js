@@ -20,27 +20,21 @@ import * as assert from 'assert';
 import { Resource } from '@opentelemetry/resources';
 import { awsEksDetector, AwsEksDetector } from '../../src';
 import {
-  assertK8sResource, assertContainerResource,
+  assertK8sResource, assertContainerResource, assertEmptyResource,
 } from '@opentelemetry/resources/test/util/resource-assertions';
 import { NoopLogger } from '@opentelemetry/core';
 
-const K8S_SVC_URL = awsEksDetector.K8S_SVC_URL;
-const K8S_TOKEN_PATH = awsEksDetector.K8S_TOKEN_PATH;
-const K8S_CERT_PATH = awsEksDetector.K8S_CERT_PATH;
-const AUTH_CONFIGMAP_PATH = awsEksDetector.AUTH_CONFIGMAP_PATH;
-const CW_CONFIGMAP_PATH = awsEksDetector.CW_CONFIGMAP_PATH;
-
 describe('awsEksDetector', () => {
+  const errorMsg = {
+    fileNotFoundError: new Error('cannot find cgroup file'),
+  };
   let sandbox: sinon.SinonSandbox;
-  let readStub, fileStub;
+  let readStub, fileStub, isEksStub, getClusterStub, getContainerStub, fetchStub;
   const correctCgroupData =
     'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklm';
   const mockedClusterResponse = "my-cluster";
-  const mockedK8sCredentials = "Bearer 31ada4fd-adec-460c-809a-9e56ceb75269";
 
   beforeEach(() => {
-    nock.disableNetConnect();
-    nock.cleanAll();
     sandbox = sinon.createSandbox();
   });
 
@@ -49,32 +43,21 @@ describe('awsEksDetector', () => {
     sandbox.restore();
   });
 
-  describe('on succesful request', () => {
+  describe('on successful request', () => {
     it ('should return an aws_eks_instance_resource', async () => {
       fileStub = sandbox
         .stub(AwsEksDetector, 'fileAccessAsync' as any)
         .resolves();
-      readStub = sinon.stub(AwsEksDetector, 'readFileAsync' as any);
-      readStub.onCall(1).resolves(correctCgroupData);
-      readStub.onCall(2).returns(mockedK8sCredentials);
-      readStub.onCall(3).returns(mockedK8sCredentials);
+      readStub = sandbox.stub(AwsEksDetector, 'readFileAsync' as any);
+      readStub.resolves(correctCgroupData);
 
-      const scope = nock(K8S_SVC_URL)
-        .get(AUTH_CONFIGMAP_PATH)
-        .matchHeader('Authorizations', mockedK8sCredentials)
-        .reply(200, () => true)
-        .get(CW_CONFIGMAP_PATH)
-        .matchHeader('Authorizations', mockedK8sCredentials)
-        .reply(200, () => mockedClusterResponse);
+      fetchStub = sandbox.stub(awsEksDetector, '_fetchString' as any)
+        .onCall(0).resolves('aws-auth');
+      getClusterStub = sandbox.stub(awsEksDetector, '_getClusterName' as any).resolves(mockedClusterResponse);
       
       const resource: Resource = await awsEksDetector.detect({
         logger: new NoopLogger(),
       });
-
-      scope.done();
-      
-      sandbox.assert.calledTwice(fileStub);
-      sandbox.assert.calledThrice(readStub);
 
       assert.ok(resource);
       assertK8sResource(resource, {
@@ -83,6 +66,151 @@ describe('awsEksDetector', () => {
       assertContainerResource(resource, {
         id: 'bcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklm',
       })
+    });
+
+    it ('should return a resource with cluster Name attribute without a container Id', async () => {
+      fileStub = sandbox
+        .stub(AwsEksDetector, 'fileAccessAsync' as any)
+        .resolves('');
+      readStub = sandbox.stub(AwsEksDetector, 'readFileAsync' as any)
+        .resolves(correctCgroupData);
+      
+      isEksStub = sandbox.stub(awsEksDetector, '_isEks' as any).resolves(true);
+      getContainerStub = sandbox.stub(awsEksDetector, '_getContainerId' as any).resolves('');
+      getClusterStub = sandbox.stub(awsEksDetector, '_getClusterName' as any).resolves(mockedClusterResponse);
+      
+      const resource: Resource = await awsEksDetector.detect({
+          logger: new NoopLogger(),
+      });
+
+      assert.ok(resource);
+      assertContainerResource(resource, {
+        id: '',
+      });
+      assertK8sResource(resource, {
+        clusterName: 'my-cluster',
+      })
+    });
+
+    it ('should return a resource with container ID attribute without a clusterName', async () => {
+      fileStub = sandbox
+        .stub(AwsEksDetector, 'fileAccessAsync' as any)
+        .resolves('');
+      readStub = sandbox.stub(AwsEksDetector, 'readFileAsync' as any)
+        .resolves(correctCgroupData);
+
+      isEksStub = sandbox.stub(awsEksDetector, '_isEks' as any).resolves(true);
+      getClusterStub = sandbox.stub(awsEksDetector, '_getClusterName' as any).resolves('');
+      
+      const resource: Resource = await awsEksDetector.detect({
+          logger: new NoopLogger(),
+      });
+
+      assert.ok(resource);
+      assertK8sResource(resource, {
+        clusterName: '',
+      })
+      assertContainerResource(resource, {
+        id: 'bcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklm'
+      });
+    });
+
+    it ('should return a resource with clusterName attribute when cgroup file does not contain valid Container ID', async () => {
+      fileStub = sandbox
+        .stub(AwsEksDetector, 'fileAccessAsync' as any)
+        .resolves('');
+      readStub = sandbox.stub(AwsEksDetector, 'readFileAsync' as any)
+        .resolves('');
+       
+      isEksStub = sandbox.stub(awsEksDetector, '_isEks' as any).resolves(true);
+      getClusterStub = sandbox.stub(awsEksDetector, '_getClusterName' as any).resolves(mockedClusterResponse);
+      
+      const resource: Resource = await awsEksDetector.detect({
+        logger: new NoopLogger(),
+      });
+
+      assert.ok(resource);
+      assert.ok(resource);
+      assertK8sResource(resource, {
+        clusterName: 'my-cluster'
+      })
+      assertContainerResource(resource, {
+        id: ''
+      });
+    });
+
+    it ('should return a resource with clusterName attribute when cgroup file does not exist', async () => {
+      fileStub = sandbox
+        .stub(AwsEksDetector, 'fileAccessAsync' as any)
+        .resolves('');
+      readStub = sandbox.stub(AwsEksDetector, 'readFileAsync' as any)
+        .rejects(errorMsg.fileNotFoundError);
+       
+      isEksStub = sandbox.stub(awsEksDetector, '_isEks' as any).resolves(true);
+      getClusterStub = sandbox.stub(awsEksDetector, '_getClusterName' as any).resolves(mockedClusterResponse);
+
+      const resource: Resource = await awsEksDetector.detect({
+        logger: new NoopLogger(),
+      });
+
+      assert.ok(resource);
+      assert.ok(resource);
+      assertK8sResource(resource, {
+        clusterName: 'my-cluster'
+      })
+      assertContainerResource(resource, {
+        id: ''
+      });
+    });
+
+    it ('should return an empty resource when not running on Eks', async () => {
+      fileStub = sandbox
+        .stub(AwsEksDetector, 'fileAccessAsync' as any)
+        .resolves('');
+
+      isEksStub = sandbox.stub(awsEksDetector, '_isEks' as any).resolves(false);
+
+      const resource: Resource = await awsEksDetector.detect({
+        logger: new NoopLogger(),
+      });
+
+      assert.ok(resource);
+      assertEmptyResource(resource);
+    });
+
+    it ('should return an empty resource when k8s file does not exist', async () => {
+      const errorMsg = {
+        fileNotFoundError: new Error('cannot file k8s token file'),
+      };
+      fileStub = sandbox
+        .stub(AwsEksDetector, 'fileAccessAsync' as any)
+        .rejects(errorMsg.fileNotFoundError);
+       
+      const resource: Resource = await awsEksDetector.detect({
+        logger: new NoopLogger(),
+      });
+
+      assert.ok(resource);
+      assertEmptyResource(resource);
+    });
+
+    it ('should return an empty resource when containerId and clusterName are invalid', async () => {
+      fileStub = sandbox
+        .stub(AwsEksDetector, 'fileAccessAsync' as any)
+        .resolves('');
+      readStub = sandbox.stub(AwsEksDetector, 'readFileAsync' as any)
+        .resolves(correctCgroupData);
+
+      isEksStub = sandbox.stub(awsEksDetector, '_isEks' as any).resolves(true);
+      getContainerStub = sandbox.stub(awsEksDetector, '_getContainerId' as any).resolves('');
+      getClusterStub = sandbox.stub(awsEksDetector, '_getClusterName' as any).resolves('');
+      
+      const resource: Resource = await awsEksDetector.detect({
+          logger: new NoopLogger(),
+      });
+
+      assert.ok(resource);
+      assertEmptyResource(resource);
     });
   });
 });
