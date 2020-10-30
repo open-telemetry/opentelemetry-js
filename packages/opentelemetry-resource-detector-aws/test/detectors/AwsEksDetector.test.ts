@@ -16,6 +16,7 @@
 
 import * as nock from 'nock';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { Resource } from '@opentelemetry/resources';
@@ -25,12 +26,19 @@ import {
   assertContainerResource,
   assertEmptyResource,
 =======
+=======
+import * as sinon from 'sinon';
+>>>>>>> 7d354c340... fix: use file read async instead of sync
 import * as assert from 'assert';
 import { Resource } from '@opentelemetry/resources';
-import { awsEksDetector } from '../../src';
+import { awsEksDetector, AwsEksDetector } from '../../src';
 import {
+<<<<<<< HEAD
   assertK8sResource,
 >>>>>>> 4c54840bb... test: add mock tests
+=======
+  assertK8sResource, assertContainerResource,
+>>>>>>> 7d354c340... fix: use file read async instead of sync
 } from '@opentelemetry/resources/test/util/resource-assertions';
 import { NoopLogger } from '@opentelemetry/core';
 
@@ -60,18 +68,19 @@ const K8S_CERT_PATH = awsEksDetector.K8S_CERT_PATH;
 const AUTH_CONFIGMAP_PATH = awsEksDetector.AUTH_CONFIGMAP_PATH;
 const CW_CONFIGMAP_PATH = awsEksDetector.CW_CONFIGMAP_PATH;
 
-const mockedClusterResponse = "my-cluster";
-const correctCgroupData =
-    'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklm';
-const unexpectedCgroupdata =
-    'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
-const mockedK8sCredentials = "Bearer 31ada4fd-adec-460c-809a-9e56ceb75269";
-
 describe('awsEksDetector', () => {
+  let sandbox: sinon.SinonSandbox;
+  let readStub, fileStub;
+  const correctCgroupData =
+    'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklm';
+  const mockedClusterResponse = "my-cluster";
+  const mockedK8sCredentials = "Bearer 31ada4fd-adec-460c-809a-9e56ceb75269";
+
   beforeEach(() => {
 >>>>>>> 4c54840bb... test: add mock tests
     nock.disableNetConnect();
     nock.cleanAll();
+    sandbox = sinon.createSandbox();
   });
 
   afterEach(() => {
@@ -314,7 +323,9 @@ describe('awsEksDetector', () => {
         });
 =======
     nock.enableNetConnect();
+    sandbox.restore();
   });
+<<<<<<< HEAD
 });
  
 describe('on succesful request', () => {
@@ -380,14 +391,27 @@ describe('on unsuccessful request', () => {
           logger: new NoopLogger(),
         });
 =======
+=======
 
-      it ('should throw when timed out', async () => {
-        const expectedError = new Error('Failed to load page, status code: 404');
-        const scope = nock(K8S_SVC_URL)
+  describe('on succesful request', () => {
+    it ('should return an aws_eks_instance_resource', async () => {
+      fileStub = sandbox
+        .stub(AwsEksDetector, 'fileAccessAsync' as any)
+        .resolves();
+      readStub = sinon.stub(AwsEksDetector, 'readFileAsync' as any);
+      readStub.onCall(1).resolves(correctCgroupData);
+      readStub.onCall(2).returns(mockedK8sCredentials);
+      readStub.onCall(3).returns(mockedK8sCredentials);
+>>>>>>> 7d354c340... fix: use file read async instead of sync
+
+      const scope = nock(K8S_SVC_URL)
+        .get(AUTH_CONFIGMAP_PATH)
+        .matchHeader('Authorizations', mockedK8sCredentials)
+        .reply(200, () => true)
         .get(CW_CONFIGMAP_PATH)
-        .matchHeader("Authorizations", mockedK8sCredentials)
-        .delayConnection(2500)
+        .matchHeader('Authorizations', mockedK8sCredentials)
         .reply(200, () => mockedClusterResponse);
+<<<<<<< HEAD
 
     try {
         await awsEksDetector.detect({
@@ -398,9 +422,27 @@ describe('on unsuccessful request', () => {
       } catch (err) {
         assert.deepStrictEqual(err, expectedError);
       }
+=======
+      
+      const resource: Resource = await awsEksDetector.detect({
+        logger: new NoopLogger(),
+      });
+>>>>>>> 7d354c340... fix: use file read async instead of sync
 
       scope.done();
+      
+      sandbox.assert.calledTwice(fileStub);
+      sandbox.assert.calledThrice(readStub);
+
+      assert.ok(resource);
+      assertK8sResource(resource, {
+        clusterName: 'my-cluster',
+      })
+      assertContainerResource(resource, {
+        id: 'bcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklm',
+      })
     });
+<<<<<<< HEAD
 <<<<<<< HEAD
   });
 });
@@ -408,3 +450,7 @@ describe('on unsuccessful request', () => {
 });
 });
 >>>>>>> 4c54840bb... test: add mock tests
+=======
+  });
+});
+>>>>>>> 7d354c340... fix: use file read async instead of sync

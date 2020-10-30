@@ -49,6 +49,7 @@ export class AwsEksDetector implements Detector {
   readonly TIMEOUT_MS = 2000;
   readonly UTF8_UNICODE = 'utf8';
 
+<<<<<<< HEAD
   private static readFileAsync = util.promisify(fs.readFile);
   private static fileAccessAsync = util.promisify(fs.access);
 
@@ -81,9 +82,38 @@ export class AwsEksDetector implements Detector {
     } catch (e) {
       config.logger.warn('Process is not running on K8S', e);
       return Resource.empty();
+=======
+    private static readFileAsync = util.promisify(fs.readFile);
+    private static fileAccessAsync = util.promisify(fs.access);
+  
+    async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
+      try {
+        AwsEksDetector.fileAccessAsync(this.K8S_TOKEN_PATH);
+        AwsEksDetector.fileAccessAsync(this.K8S_CERT_PATH);
+        
+        if (!this._isEks(config)) {
+          config.logger.debug('AwsEcsDetector failed: Process is not running on Eks');
+          return Resource.empty();
+        }
+      
+        const containerId = await this._getContainerId(config);
+        const clusterName = await this._getClusterName(config);
+
+        return !containerId
+        ? Resource.empty()
+        : new Resource({
+          [K8S_RESOURCE.CLUSTER_NAME]: clusterName || '',
+          [CONTAINER_RESOURCE.ID]: containerId || '',
+        });
+      } catch (e) {
+        config.logger.debug('Not running on K8S');
+        return Resource.empty();
+      }
+>>>>>>> 7d354c340... fix: use file read async instead of sync
     }
   }
 
+<<<<<<< HEAD
   /**
    * Attempts to make a connection to AWS Config map which will
    * determine whether the process is running on an EKS
@@ -150,10 +180,31 @@ export class AwsEksDetector implements Detector {
       return 'Bearer ' + content;
     } catch (e) {
       config.logger.warn('Unable to read Kubernetes client token.', e);
+=======
+    private async _isEks(config: ResourceDetectionConfigWithLogger): Promise<boolean> {
+      const secureContext = tls.createSecureContext({
+        ca: JSON.stringify(AwsEksDetector.readFileAsync(this.K8S_CERT_PATH)),
+      });
+      const options = {
+        host: this.K8S_SVC_URL,
+        path: this.AUTH_CONFIGMAP_PATH,
+        method: 'GET',
+        timeout: this.MILLISECOND_TIME_OUT,
+        HEADERS: {
+          "Authorization" : this._getK8sCredHeader(config),
+        },
+        agentOptions: {
+          ca: secureContext,
+        }
+      }
+      const awsAuth = this._fetchString(options);
+      return !!awsAuth;
+>>>>>>> 7d354c340... fix: use file read async instead of sync
     }
     return '';
   }
 
+<<<<<<< HEAD
   /**
    * Read container ID from cgroup file
    * In EKS, even if we fail to find target file
@@ -182,6 +233,64 @@ export class AwsEksDetector implements Detector {
     }
     return undefined;
   }
+=======
+     private async _getClusterName(config: ResourceDetectionConfigWithLogger): Promise<string | undefined> {
+        const secureContext = tls.createSecureContext({
+          ca: JSON.stringify(AwsEksDetector.readFileAsync(this.K8S_CERT_PATH)),
+        });
+        const options = {
+        host: this.K8S_SVC_URL,
+        path: this.CW_CONFIGMAP_PATH,
+        method: 'GET',
+        timeout: this.MILLISECOND_TIME_OUT,
+        HEADERS: {
+          "Authorization" : this._getK8sCredHeader(config),
+        },
+        agentOptions: {
+          ca: secureContext,
+        }
+      }
+        return this._fetchString(options);
+     }
+
+     private async _getK8sCredHeader(config: ResourceDetectionConfigWithLogger): Promise<string> {
+        try {
+          const content = await AwsEksDetector.readFileAsync(
+              this.K8S_TOKEN_PATH,
+              'utf8'
+          );
+          return "Bearer " + content;
+        } catch (e) {
+            config.logger.warn(`AwsEksDetector failed to read container ID: ${e.message}`);
+        }
+        return "";
+    }
+
+    /**
+    * Read container ID from cgroup file
+    * In EKS, even if we fail to find target file
+    * or target file does not contain container ID
+    * we do not throw an error but throw warning message
+    * and then return null string
+    */
+    private async _getContainerId(config: ResourceDetectionConfigWithLogger): Promise<string | undefined> {
+        try {
+          const rawData = await AwsEksDetector.readFileAsync(
+            this.DEFAULT_CGROUP_PATH,
+            'utf8'
+          );
+          const splitData = rawData.trim().split('\n');
+          for (const str of splitData) {
+            if (str.length > this.CONTAINER_ID_LENGTH) {
+              return str.substring(str.length - this.CONTAINER_ID_LENGTH);
+              }
+            }
+          } catch (e) {
+            config.logger.warn(`AwsEksDetector failed to read container ID: ${e.message}`);
+          }
+        return undefined;
+      }
+>>>>>>> 7d354c340... fix: use file read async instead of sync
 
   /**
    * Establishes an HTTP connection to AWS instance document url.
