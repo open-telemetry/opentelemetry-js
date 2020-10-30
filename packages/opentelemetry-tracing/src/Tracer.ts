@@ -89,7 +89,7 @@ export class Tracer implements api.Tracer {
     const attributes = sanitizeAttributes(options.attributes);
     // make sampling decision
     const samplingResult = this._sampler.shouldSample(
-      parentContext,
+      context,
       traceId,
       name,
       spanKind,
