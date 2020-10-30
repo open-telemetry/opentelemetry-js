@@ -15,11 +15,12 @@
  */
 
 import * as nock from 'nock';
+import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { Resource } from '@opentelemetry/resources';
-import { awsEksDetector } from '../../src';
+import { awsEksDetector, AwsEksDetector } from '../../src';
 import {
-  assertK8sResource,
+  assertK8sResource, assertContainerResource,
 } from '@opentelemetry/resources/test/util/resource-assertions';
 import { NoopLogger } from '@opentelemetry/core';
 
@@ -29,80 +30,59 @@ const K8S_CERT_PATH = awsEksDetector.K8S_CERT_PATH;
 const AUTH_CONFIGMAP_PATH = awsEksDetector.AUTH_CONFIGMAP_PATH;
 const CW_CONFIGMAP_PATH = awsEksDetector.CW_CONFIGMAP_PATH;
 
-const mockedClusterResponse = "my-cluster";
-const correctCgroupData =
-    'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklm';
-const unexpectedCgroupdata =
-    'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
-const mockedK8sCredentials = "Bearer 31ada4fd-adec-460c-809a-9e56ceb75269";
-
 describe('awsEksDetector', () => {
+  let sandbox: sinon.SinonSandbox;
+  let readStub, fileStub;
+  const correctCgroupData =
+    'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklm';
+  const mockedClusterResponse = "my-cluster";
+  const mockedK8sCredentials = "Bearer 31ada4fd-adec-460c-809a-9e56ceb75269";
+
   beforeEach(() => {
     nock.disableNetConnect();
     nock.cleanAll();
+    sandbox = sinon.createSandbox();
   });
 
   afterEach(() => {
     nock.enableNetConnect();
+    sandbox.restore();
   });
-});
- 
-describe('on succesful request', () => {
+
+  describe('on succesful request', () => {
     it ('should return an aws_eks_instance_resource', async () => {
-        const scope = nock(K8S_SVC_URL)
+      fileStub = sandbox
+        .stub(AwsEksDetector, 'fileAccessAsync' as any)
+        .resolves();
+      readStub = sinon.stub(AwsEksDetector, 'readFileAsync' as any);
+      readStub.onCall(1).resolves(correctCgroupData);
+      readStub.onCall(2).returns(mockedK8sCredentials);
+      readStub.onCall(3).returns(mockedK8sCredentials);
+
+      const scope = nock(K8S_SVC_URL)
+        .get(AUTH_CONFIGMAP_PATH)
+        .matchHeader('Authorizations', mockedK8sCredentials)
+        .reply(200, () => true)
         .get(CW_CONFIGMAP_PATH)
-        .matchHeader("Authorizations", mockedK8sCredentials)
-        .reply(200, mockedClusterResponse)
-    const resource: Resource = await awsEksDetector.detect({
-        logger: new NoopLogger(),
-    });
-    
-    scope.done();
-
-    assert.ok(resource);
-    assertK8sResource(resource, {
-        clusterName: 'my-cluster'
-    })
-});
-});
-
-describe('on unsuccessful request', () => {
-    it ('should throw when receiving error response code', async () => {
-        const expectedError = new Error('Failed to load page, status code: 404');
-        const scope = nock(K8S_SVC_URL)
-        .get(CW_CONFIGMAP_PATH)
-        .matchHeader("Authorizations", mockedK8sCredentials)
-        .reply(404, () => new Error());
-
-    try {
-        await awsEksDetector.detect({
-          logger: new NoopLogger(),
-        });
-        assert.ok(false, 'Expected to throw');
-      } catch (err) {
-        assert.deepStrictEqual(err, expectedError);
-      }
-
-      scope.done();
-
-      it ('should throw when timed out', async () => {
-        const expectedError = new Error('Failed to load page, status code: 404');
-        const scope = nock(K8S_SVC_URL)
-        .get(CW_CONFIGMAP_PATH)
-        .matchHeader("Authorizations", mockedK8sCredentials)
-        .delayConnection(2500)
+        .matchHeader('Authorizations', mockedK8sCredentials)
         .reply(200, () => mockedClusterResponse);
-
-    try {
-        await awsEksDetector.detect({
-          logger: new NoopLogger(),
-        });
-        assert.ok(false, 'Expected to throw');
-      } catch (err) {
-        assert.deepStrictEqual(err, expectedError);
-      }
+      
+      const resource: Resource = await awsEksDetector.detect({
+        logger: new NoopLogger(),
+      });
 
       scope.done();
+      
+      sandbox.assert.calledTwice(fileStub);
+      sandbox.assert.calledThrice(readStub);
+
+      assert.ok(resource);
+      assertK8sResource(resource, {
+        clusterName: 'my-cluster',
+      })
+      assertContainerResource(resource, {
+        id: 'bcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklm',
+      })
     });
-});
+  });
 });

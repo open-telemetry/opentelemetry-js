@@ -47,35 +47,36 @@ export class AwsEksDetector implements Detector {
     readonly MILLISECOND_TIME_OUT = 2000;
 
     private static readFileAsync = util.promisify(fs.readFile);
+    private static fileAccessAsync = util.promisify(fs.access);
   
     async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
-      if (!this._isEks(config)) {
-        config.logger.debug('AwsEcsDetector failed: Process is not running on Eks');
+      try {
+        AwsEksDetector.fileAccessAsync(this.K8S_TOKEN_PATH);
+        AwsEksDetector.fileAccessAsync(this.K8S_CERT_PATH);
+        
+        if (!this._isEks(config)) {
+          config.logger.debug('AwsEcsDetector failed: Process is not running on Eks');
+          return Resource.empty();
+        }
+      
+        const containerId = await this._getContainerId(config);
+        const clusterName = await this._getClusterName(config);
+
+        return !containerId
+        ? Resource.empty()
+        : new Resource({
+          [K8S_RESOURCE.CLUSTER_NAME]: clusterName || '',
+          [CONTAINER_RESOURCE.ID]: containerId || '',
+        });
+      } catch (e) {
+        config.logger.debug('Not running on K8S');
         return Resource.empty();
       }
-      
-      const containerId = await this._getContainerId(config);
-      const clusterName = await this._getClusterName(config);
-
-      return !containerId && !clusterName
-      ? Resource.empty()
-      : new Resource({
-        [K8S_RESOURCE.CLUSTER_NAME]: clusterName || '',
-        [CONTAINER_RESOURCE.ID]: containerId || '',
-      });
     }
 
     private async _isEks(config: ResourceDetectionConfigWithLogger): Promise<boolean> {
-      fs.access(this.K8S_TOKEN_PATH, (err) => {
-        config.logger.debug('Not running on K8S');
-        return false;
-      });
-      fs.access(this.K8S_CERT_PATH, (err) => {
-        config.logger.debug('Not running on K8S');
-        return false;
-      });
       const secureContext = tls.createSecureContext({
-        ca: fs.readFileSync(this.K8S_CERT_PATH),
+        ca: JSON.stringify(AwsEksDetector.readFileAsync(this.K8S_CERT_PATH)),
       });
       const options = {
         host: this.K8S_SVC_URL,
@@ -95,7 +96,7 @@ export class AwsEksDetector implements Detector {
 
      private async _getClusterName(config: ResourceDetectionConfigWithLogger): Promise<string | undefined> {
         const secureContext = tls.createSecureContext({
-          ca: fs.readFileSync(this.K8S_CERT_PATH),
+          ca: JSON.stringify(AwsEksDetector.readFileAsync(this.K8S_CERT_PATH)),
         });
         const options = {
         host: this.K8S_SVC_URL,
@@ -109,8 +110,7 @@ export class AwsEksDetector implements Detector {
           ca: secureContext,
         }
       }
-        const clusterName = this._fetchString(options);
-        return clusterName;
+        return this._fetchString(options);
      }
 
      private async _getK8sCredHeader(config: ResourceDetectionConfigWithLogger): Promise<string> {
@@ -135,18 +135,17 @@ export class AwsEksDetector implements Detector {
     */
     private async _getContainerId(config: ResourceDetectionConfigWithLogger): Promise<string | undefined> {
         try {
-          const content = await AwsEksDetector.readFileAsync(
+          const rawData = await AwsEksDetector.readFileAsync(
             this.DEFAULT_CGROUP_PATH,
             'utf8'
           );
-          const splitData = content.trim().split('\n');
+          const splitData = rawData.trim().split('\n');
           for (const str of splitData) {
             if (str.length > this.CONTAINER_ID_LENGTH) {
               return str.substring(str.length - this.CONTAINER_ID_LENGTH);
               }
             }
-          }
-          catch (e) {
+          } catch (e) {
             config.logger.warn(`AwsEksDetector failed to read container ID: ${e.message}`);
           }
         return undefined;
