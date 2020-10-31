@@ -19,6 +19,7 @@ import {
   ExportResult,
   NoopLogger,
   globalErrorHandler,
+  ExportResultCode,
 } from '@opentelemetry/core';
 import { MetricExporter, MetricRecord } from '@opentelemetry/metrics';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
@@ -86,7 +87,7 @@ export class PrometheusExporter implements MetricExporter {
     if (!this._server) {
       // It is conceivable that the _server may not be started as it is an async startup
       // However unlikely, if this happens the caller may retry the export
-      cb(ExportResult.FAILED_RETRYABLE);
+      cb({ code: ExportResultCode.FAILED });
       return;
     }
 
@@ -96,7 +97,7 @@ export class PrometheusExporter implements MetricExporter {
       this._batcher.process(record);
     }
 
-    cb(ExportResult.SUCCESS);
+    cb({ code: ExportResultCode.SUCCESS });
   }
 
   /**
