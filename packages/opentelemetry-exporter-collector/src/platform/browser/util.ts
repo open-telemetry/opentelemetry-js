@@ -72,7 +72,7 @@ export function sendWithXhr(
         onSuccess();
       } else {
         const error = new collectorTypes.CollectorExporterError(
-          xhr.responseText,
+          `Failed to export with XHR (status: ${xhr.status})`,
           xhr.status
         );
 

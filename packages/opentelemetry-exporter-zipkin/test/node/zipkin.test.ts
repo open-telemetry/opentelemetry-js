@@ -16,7 +16,6 @@
 
 import * as assert from 'assert';
 import * as nock from 'nock';
-import * as sinon from 'sinon';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import {
   ExportResult,

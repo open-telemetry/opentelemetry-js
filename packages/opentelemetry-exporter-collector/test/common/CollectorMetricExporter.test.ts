@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  ExportResult,
-  ExportResultCode,
-  NoopLogger,
-} from '@opentelemetry/core';
+import { ExportResultCode, NoopLogger } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorExporterBase } from '../../src/CollectorExporterBase';
