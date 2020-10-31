@@ -15,7 +15,7 @@
  */
 
 import { context, suppressInstrumentation } from '@opentelemetry/api';
-import { ExportResult, globalErrorHandler } from '@opentelemetry/core';
+import { ExportResultCode, globalErrorHandler } from '@opentelemetry/core';
 import { Span } from '../Span';
 import { SpanExporter } from './SpanExporter';
 import { SpanProcessor } from '../SpanProcessor';
@@ -49,11 +49,12 @@ export class SimpleSpanProcessor implements SpanProcessor {
     // prevent downstream exporter calls from generating spans
     context.with(suppressInstrumentation(context.active()), () => {
       this._exporter.export([span], result => {
-        if (result !== ExportResult.SUCCESS) {
+        if (result.code !== ExportResultCode.SUCCESS) {
           globalErrorHandler(
-            new Error(
-              `SimpleSpanProcessor: span export failed (status ${result})`
-            )
+            result.error ??
+              new Error(
+                `SimpleSpanProcessor: span export failed (status ${result})`
+              )
           );
         }
       });

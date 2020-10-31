@@ -16,7 +16,7 @@
 
 import { context, suppressInstrumentation } from '@opentelemetry/api';
 import {
-  ExportResult,
+  ExportResultCode,
   globalErrorHandler,
   unrefTimer,
 } from '@opentelemetry/core';
@@ -111,13 +111,12 @@ export class BatchSpanProcessor implements SpanProcessor {
       context.with(suppressInstrumentation(context.active()), () => {
         this._exporter.export(this._finishedSpans, result => {
           this._finishedSpans = [];
-          if (result === ExportResult.SUCCESS) {
+          if (result.code === ExportResultCode.SUCCESS) {
             resolve();
           } else {
             reject(
-              new Error(
-                `BatchSpanProcessor: span export failed (status ${result})`
-              )
+              result.error ??
+                new Error('BatchSpanProcessor: span export failed')
             );
           }
         });
