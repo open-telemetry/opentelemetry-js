@@ -15,13 +15,11 @@
  */
 
 import * as assert from 'assert';
-import * as sinon from 'sinon';
 import { JaegerExporter } from '../src';
 import {
   ExportResult,
-  loggingErrorHandler,
+  ExportResultCode,
   NoopLogger,
-  setGlobalErrorHandler,
 } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
 import { ThriftProcess } from '../src/types';
@@ -151,13 +149,13 @@ describe('JaegerExporter', () => {
 
     it('should skip send with empty list', () => {
       exporter.export([], (result: ExportResult) => {
-        assert.strictEqual(result, ExportResult.SUCCESS);
+        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
       });
     });
 
     it('should send spans to Jaeger backend and return with Success', () => {
       exporter.export([readableSpan], (result: ExportResult) => {
-        assert.strictEqual(result, ExportResult.SUCCESS);
+        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
       });
     });
 
@@ -181,10 +179,8 @@ describe('JaegerExporter', () => {
       exporter.export([readableSpan], () => {});
     });
 
-    it('should call globalErrorHandler on error', () => {
+    it('should return failed export result on error', () => {
       nock.cleanAll();
-      const errorHandlerSpy = sinon.spy();
-      setGlobalErrorHandler(errorHandlerSpy);
       const expectedError = new Error('whoops');
       const mockedEndpoint = 'http://testendpoint';
       const scope = nock(mockedEndpoint)
@@ -195,16 +191,11 @@ describe('JaegerExporter', () => {
         endpoint: mockedEndpoint,
       });
 
-      exporter.export([readableSpan], () => {
+      exporter.export([readableSpan], result => {
         scope.done();
-        assert.strictEqual(errorHandlerSpy.callCount, 1);
-
-        const [[error]] = errorHandlerSpy.args;
-        assert.strictEqual(error, expectedError);
+        assert.strictEqual(result.code, ExportResultCode.FAILED);
+        assert.ok(result.error?.message.includes(expectedError.message));
       });
-
-      // reset global error handler
-      setGlobalErrorHandler(loggingErrorHandler());
     });
   });
 });
