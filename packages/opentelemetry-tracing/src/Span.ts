@@ -191,7 +191,7 @@ export class Span implements api.Span, ReadableSpan {
   }
 
   isRecording(): boolean {
-    return true;
+    return this._ended === false;
   }
 
   recordException(exception: api.Exception, time: api.TimeInput = hrTime()) {
