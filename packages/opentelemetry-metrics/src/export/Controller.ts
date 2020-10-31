@@ -15,7 +15,7 @@
  */
 
 import {
-  ExportResult,
+  ExportResultCode,
   unrefTimer,
   globalErrorHandler,
 } from '@opentelemetry/core';
@@ -53,9 +53,10 @@ export class PushController extends Controller {
       this._exporter.export(
         this._meter.getBatcher().checkPointSet(),
         result => {
-          if (result !== ExportResult.SUCCESS) {
+          if (result.code !== ExportResultCode.SUCCESS) {
             globalErrorHandler(
-              new Error('PushController: export failed in _collect')
+              result.error ??
+                new Error('PushController: export failed in _collect')
             );
           }
           resolve();
