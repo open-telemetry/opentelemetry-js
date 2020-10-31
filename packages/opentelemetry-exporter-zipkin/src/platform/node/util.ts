@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ExportResult, globalErrorHandler } from '@opentelemetry/core';
+import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import * as http from 'http';
 import * as https from 'https';
 import * as url from 'url';
@@ -51,7 +51,7 @@ export function prepareSend(
   ) {
     if (zipkinSpans.length === 0) {
       logger.debug('Zipkin send with empty spans');
-      return done(ExportResult.SUCCESS);
+      return done({ code: ExportResultCode.SUCCESS });
     }
 
     const { request } = reqOpts.protocol === 'http:' ? http : https;
@@ -70,20 +70,24 @@ export function prepareSend(
 
         // Consider 2xx and 3xx as success.
         if (statusCode < 400) {
-          return done(ExportResult.SUCCESS);
+          return done({ code: ExportResultCode.SUCCESS });
           // Consider 4xx as failed non-retriable.
-        } else if (statusCode < 500) {
-          return done(ExportResult.FAILED_NOT_RETRYABLE);
-          // Consider 5xx as failed retriable.
         } else {
-          return done(ExportResult.FAILED_RETRYABLE);
+          return done({
+            code: ExportResultCode.FAILED,
+            error: new Error(
+              `Got unexpected status code from zipkin: ${statusCode}`
+            ),
+          });
         }
       });
     });
 
-    req.on('error', (err: Error) => {
-      globalErrorHandler(err);
-      return done(ExportResult.FAILED_RETRYABLE);
+    req.on('error', error => {
+      return done({
+        code: ExportResultCode.FAILED,
+        error,
+      });
     });
 
     // Issue request to remote service
