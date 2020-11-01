@@ -15,7 +15,11 @@
  */
 
 import { context, suppressInstrumentation } from '@opentelemetry/api';
-import { ExportResult, unrefTimer } from '@opentelemetry/core';
+import {
+  ExportResult,
+  globalErrorHandler,
+  unrefTimer,
+} from '@opentelemetry/core';
 import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
 import { BufferConfig } from '../types';
@@ -90,7 +94,9 @@ export class BatchSpanProcessor implements SpanProcessor {
     this._finishedSpans.push(span);
     this._maybeStartTimer();
     if (this._finishedSpans.length > this._bufferSize) {
-      this._flush();
+      this._flush().catch(e => {
+        globalErrorHandler(e);
+      });
     }
   }
 
@@ -108,7 +114,11 @@ export class BatchSpanProcessor implements SpanProcessor {
           if (result === ExportResult.SUCCESS) {
             resolve();
           } else {
-            reject(result);
+            reject(
+              new Error(
+                `BatchSpanProcessor: span export failed (status ${result})`
+              )
+            );
           }
         });
       });
@@ -119,7 +129,9 @@ export class BatchSpanProcessor implements SpanProcessor {
     if (this._timer !== undefined) return;
 
     this._timer = setTimeout(() => {
-      this._flush().catch();
+      this._flush().catch(e => {
+        globalErrorHandler(e);
+      });
     }, this._bufferTimeout);
     unrefTimer(this._timer);
   }

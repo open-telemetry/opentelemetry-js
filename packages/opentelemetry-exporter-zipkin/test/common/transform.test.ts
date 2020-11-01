@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
 import * as api from '@opentelemetry/api';
-import { Span, BasicTracerProvider } from '@opentelemetry/tracing';
 import {
-  NoopLogger,
-  hrTimeToMicroseconds,
   hrTimeDuration,
+  hrTimeToMicroseconds,
+  NoopLogger,
   VERSION,
 } from '@opentelemetry/core';
+import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
+import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
+import * as assert from 'assert';
 import {
-  toZipkinSpan,
-  _toZipkinTags,
-  _toZipkinAnnotations,
   statusCodeTagName,
   statusDescriptionTagName,
+  toZipkinSpan,
+  _toZipkinAnnotations,
+  _toZipkinTags,
 } from '../../src/transform';
 import * as zipkinTypes from '../../src/types';
-import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
 const logger = new NoopLogger();
 const tracer = new BasicTracerProvider({
   logger,
@@ -57,6 +57,7 @@ describe('transform', () => {
     it('should convert an OpenTelemetry span to a Zipkin span', () => {
       const span = new Span(
         tracer,
+        api.ROOT_CONTEXT,
         'my-span',
         spanContext,
         api.SpanKind.SERVER,
@@ -107,6 +108,7 @@ describe('transform', () => {
     it("should skip parentSpanId if doesn't exist", () => {
       const span = new Span(
         tracer,
+        api.ROOT_CONTEXT,
         'my-span',
         spanContext,
         api.SpanKind.SERVER
@@ -152,7 +154,13 @@ describe('transform', () => {
       it(`should map OpenTelemetry SpanKind ${
         api.SpanKind[item.ot]
       } to Zipkin ${item.zipkin}`, () => {
-        const span = new Span(tracer, 'my-span', spanContext, item.ot);
+        const span = new Span(
+          tracer,
+          api.ROOT_CONTEXT,
+          'my-span',
+          spanContext,
+          item.ot
+        );
         span.end();
 
         const zipkinSpan = toZipkinSpan(
@@ -190,6 +198,7 @@ describe('transform', () => {
     it('should convert OpenTelemetry attributes to Zipkin tags', () => {
       const span = new Span(
         tracer,
+        api.ROOT_CONTEXT,
         'my-span',
         spanContext,
         api.SpanKind.SERVER,
@@ -219,6 +228,7 @@ describe('transform', () => {
     it('should map OpenTelemetry Status.code to a Zipkin tag', () => {
       const span = new Span(
         tracer,
+        api.ROOT_CONTEXT,
         'my-span',
         spanContext,
         api.SpanKind.SERVER,
@@ -249,6 +259,7 @@ describe('transform', () => {
     it('should map OpenTelemetry Status.message to a Zipkin tag', () => {
       const span = new Span(
         tracer,
+        api.ROOT_CONTEXT,
         'my-span',
         spanContext,
         api.SpanKind.SERVER,
@@ -284,6 +295,7 @@ describe('transform', () => {
     it('should convert OpenTelemetry events to Zipkin annotations', () => {
       const span = new Span(
         tracer,
+        api.ROOT_CONTEXT,
         'my-span',
         spanContext,
         api.SpanKind.SERVER,

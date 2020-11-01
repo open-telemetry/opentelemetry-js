@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  Sampler,
-  SamplingDecision,
-  SamplingResult,
-  SpanContext,
-} from '@opentelemetry/api';
+import { Sampler, SamplingDecision, SamplingResult } from '@opentelemetry/api';
 
 /** Sampler that samples a given fraction of traces based of trace id deterministically. */
 export class TraceIdRatioBasedSampler implements Sampler {
@@ -27,10 +22,7 @@ export class TraceIdRatioBasedSampler implements Sampler {
     this._ratio = this._normalize(_ratio);
   }
 
-  shouldSample(
-    parentContext: SpanContext | undefined,
-    traceId: string
-  ): SamplingResult {
+  shouldSample(context: unknown, traceId: string): SamplingResult {
     let accumulation = 0;
     for (let idx = 0; idx < traceId.length; idx++) {
       accumulation += traceId.charCodeAt(idx);
