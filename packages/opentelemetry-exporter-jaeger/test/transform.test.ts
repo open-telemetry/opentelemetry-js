@@ -202,10 +202,10 @@ describe('transform', () => {
       const [tag1, tag2, tag3, tag4, tag5] = thriftSpan.tags;
       assert.strictEqual(tag1.key, 'status.code');
       assert.strictEqual(tag1.vType, 'DOUBLE');
-      assert.strictEqual(tag1.vDouble, 15);
+      assert.strictEqual(tag1.vDouble, 2);
       assert.strictEqual(tag2.key, 'status.name');
       assert.strictEqual(tag2.vType, 'STRING');
-      assert.strictEqual(tag2.vStr, 'DATA_LOSS');
+      assert.strictEqual(tag2.vStr, 'ERROR');
       assert.strictEqual(tag3.key, 'status.message');
       assert.strictEqual(tag3.vType, 'STRING');
       assert.strictEqual(tag3.vStr, 'data loss');
