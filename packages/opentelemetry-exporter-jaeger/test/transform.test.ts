@@ -40,7 +40,7 @@ describe('transform', () => {
         endTime: [1566156731, 709],
         ended: true,
         status: {
-          code: api.CanonicalCode.OK,
+          code: api.StatusCode.OK,
         },
         attributes: {
           testBool: true,
@@ -165,7 +165,7 @@ describe('transform', () => {
         endTime: [1566156731, 709],
         ended: true,
         status: {
-          code: api.CanonicalCode.DATA_LOSS,
+          code: api.StatusCode.ERROR,
           message: 'data loss',
         },
         attributes: {},
@@ -227,7 +227,7 @@ describe('transform', () => {
         endTime: [1566156731, 709],
         ended: true,
         status: {
-          code: api.CanonicalCode.OK,
+          code: api.StatusCode.OK,
         },
         attributes: {},
         parentSpanId: '3e0c63257de34c92',
@@ -277,7 +277,7 @@ describe('transform', () => {
         endTime: [1566156731, 709],
         ended: true,
         status: {
-          code: api.CanonicalCode.DATA_LOSS,
+          code: api.StatusCode.ERROR,
           message: 'data loss',
         },
         attributes: {},

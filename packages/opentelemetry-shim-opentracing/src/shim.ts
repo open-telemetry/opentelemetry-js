@@ -319,7 +319,7 @@ export class SpanShim extends opentracing.Span {
       key === opentracing.Tags.ERROR &&
       (value === true || value === 'true')
     ) {
-      this._span.setStatus({ code: api.CanonicalCode.UNKNOWN });
+      this._span.setStatus({ code: api.StatusCode.ERROR });
       return this;
     }
 

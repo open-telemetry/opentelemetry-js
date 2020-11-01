@@ -235,7 +235,7 @@ describe('transform', () => {
         parentId
       );
       const status: api.Status = {
-        code: api.CanonicalCode.ABORTED,
+        code: api.StatusCode.ERROR,
       };
       span.setStatus(status);
       span.setAttributes({
@@ -266,7 +266,7 @@ describe('transform', () => {
         parentId
       );
       const status: api.Status = {
-        code: api.CanonicalCode.ABORTED,
+        code: api.StatusCode.ERROR,
         message: 'my-message',
       };
       span.setStatus(status);

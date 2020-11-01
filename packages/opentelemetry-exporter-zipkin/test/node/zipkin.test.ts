@@ -50,7 +50,7 @@ function getReadableSpan() {
     ended: true,
     duration: [duration, 0],
     status: {
-      code: api.CanonicalCode.OK,
+      code: api.StatusCode.OK,
     },
     attributes: {},
     links: [],
@@ -149,7 +149,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.CanonicalCode.OK,
+          code: api.StatusCode.OK,
         },
         attributes: {
           key1: 'value1',
@@ -179,7 +179,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.CanonicalCode.OK,
+          code: api.StatusCode.OK,
         },
         attributes: {},
         links: [],
@@ -341,7 +341,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.CanonicalCode.OK,
+          code: api.StatusCode.OK,
         },
         attributes: {
           key1: 'value1',
@@ -371,7 +371,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.CanonicalCode.OK,
+          code: api.StatusCode.OK,
         },
         attributes: {},
         links: [],
@@ -413,7 +413,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.CanonicalCode.OK,
+          code: api.StatusCode.OK,
         },
         attributes: {
           key1: 'value1',
@@ -445,7 +445,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.CanonicalCode.OK,
+          code: api.StatusCode.OK,
         },
         attributes: {},
         links: [],
