@@ -462,7 +462,11 @@ export function ensureSpanIsCorrect(
   );
   assert.strictEqual(span.droppedEventsCount, 0, 'droppedEventsCount is wrong');
   assert.strictEqual(span.droppedLinksCount, 0, 'droppedLinksCount is wrong');
-  assert.deepStrictEqual(span.status, { code: StatusCode.OK }, 'status is wrong');
+  assert.deepStrictEqual(
+    span.status,
+    { code: StatusCode.OK },
+    'status is wrong'
+  );
 }
 
 export function ensureWebResourceIsCorrect(
