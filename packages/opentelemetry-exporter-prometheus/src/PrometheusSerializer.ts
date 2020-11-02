@@ -206,16 +206,33 @@ export class PrometheusSerializer {
         }
 
         let cumulativeSum = 0;
-        for (const [idx, val] of value.buckets.counts.entries()) {
+        const countEntries = value.buckets.counts.entries();
+        let infiniteBoundaryDefined = false;
+        for (const [idx, val] of countEntries) {
           cumulativeSum += val;
           const upperBound = value.buckets.boundaries[idx];
+          /** HistogramAggregator is producing different boundary output -
+           * in one case not including inifinity values, in other -
+           * full, e.g. [0, 100] and [0, 100, Infinity]
+           * we should consider that in export, if Infinity is defined, use it
+           * as boundary
+           */
+          if (upperBound === undefined && infiniteBoundaryDefined) {
+            break;
+          }
+          if (upperBound === Infinity) {
+            infiniteBoundaryDefined = true;
+          }
           results += stringify(
             name + '_bucket',
             record.labels,
             cumulativeSum,
             this._appendTimestamp ? timestamp : undefined,
             {
-              le: upperBound === undefined ? '+Inf' : String(upperBound),
+              le:
+                upperBound === undefined || upperBound === Infinity
+                  ? '+Inf'
+                  : String(upperBound),
             }
           );
         }

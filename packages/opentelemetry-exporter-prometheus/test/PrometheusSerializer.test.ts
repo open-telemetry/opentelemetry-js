@@ -175,6 +175,34 @@ describe('PrometheusSerializer', () => {
         );
       });
 
+      it('should serialize metric record with sum aggregator, boundaries defined in constructor', async () => {
+        const serializer = new PrometheusSerializer();
+
+        const meter = new MeterProvider().getMeter('test');
+        const recorder = meter.createValueRecorder('test', {
+          description: 'foobar',
+          boundaries: [1, 10, 100],
+        }) as ValueRecorderMetric;
+        recorder.bind(labels).record(5);
+
+        const records = await recorder.getMetricRecord();
+        const record = records[0];
+
+        const result = serializer.serializeRecord(
+          record.descriptor.name,
+          record
+        );
+        assert.strictEqual(
+          result,
+          `test_count{foo1="bar1",foo2="bar2"} 1 ${mockedHrTimeMs}\n` +
+            `test_sum{foo1="bar1",foo2="bar2"} 5 ${mockedHrTimeMs}\n` +
+            `test_bucket{foo1="bar1",foo2="bar2",le="1"} 0 ${mockedHrTimeMs}\n` +
+            `test_bucket{foo1="bar1",foo2="bar2",le="10"} 1 ${mockedHrTimeMs}\n` +
+            `test_bucket{foo1="bar1",foo2="bar2",le="100"} 1 ${mockedHrTimeMs}\n` +
+            `test_bucket{foo1="bar1",foo2="bar2",le="+Inf"} 1 ${mockedHrTimeMs}\n`
+        );
+      });
+
       it('serialize metric record with sum aggregator without timestamp', async () => {
         const serializer = new PrometheusSerializer(undefined, false);
 
