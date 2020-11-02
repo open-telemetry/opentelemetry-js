@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CanonicalCode, SpanKind, TraceFlags } from '@opentelemetry/api';
+import {
+  CanonicalCode,
+  ROOT_CONTEXT,
+  SpanKind,
+  TraceFlags,
+} from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
 import { HttpAttribute } from '@opentelemetry/semantic-conventions';
@@ -256,6 +261,7 @@ describe('Utility', () => {
       for (const obj of [undefined, { statusCode: 400 }]) {
         const span = new Span(
           new BasicTracerProvider().getTracer('default'),
+          ROOT_CONTEXT,
           'test',
           { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
           SpanKind.INTERNAL

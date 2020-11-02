@@ -32,7 +32,7 @@ import { ReadableSpan } from './export/ReadableSpan';
 import { Tracer } from './Tracer';
 import { SpanProcessor } from './SpanProcessor';
 import { TraceParams } from './types';
-import { AttributeValue } from '@opentelemetry/api';
+import { AttributeValue, Context } from '@opentelemetry/api';
 
 /**
  * This class represents a span.
@@ -63,6 +63,7 @@ export class Span implements api.Span, ReadableSpan {
   /** Constructs a new Span instance. */
   constructor(
     parentTracer: Tracer,
+    context: Context,
     spanName: string,
     spanContext: api.SpanContext,
     kind: api.SpanKind,
@@ -81,7 +82,7 @@ export class Span implements api.Span, ReadableSpan {
     this._logger = parentTracer.logger;
     this._traceParams = parentTracer.getActiveTraceParams();
     this._spanProcessor = parentTracer.getActiveSpanProcessor();
-    this._spanProcessor.onStart(this);
+    this._spanProcessor.onStart(this, context);
   }
 
   context(): api.SpanContext {

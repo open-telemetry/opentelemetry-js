@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { Context } from '@opentelemetry/api';
 import { globalErrorHandler } from '@opentelemetry/core';
 import { ReadableSpan } from './export/ReadableSpan';
 import { Span } from './Span';
@@ -46,9 +47,9 @@ export class MultiSpanProcessor implements SpanProcessor {
     });
   }
 
-  onStart(span: Span): void {
+  onStart(span: Span, context: Context): void {
     for (const spanProcessor of this._spanProcessors) {
-      spanProcessor.onStart(span);
+      spanProcessor.onStart(span, context);
     }
   }
 
