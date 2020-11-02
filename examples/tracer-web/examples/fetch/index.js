@@ -5,7 +5,7 @@ import { CollectorTraceExporter } from '@opentelemetry/exporter-collector';
 import { WebTracerProvider } from '@opentelemetry/web';
 import { FetchPlugin } from '@opentelemetry/plugin-fetch';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
-import { B3Propagator } from '@opentelemetry/core';
+import { B3Propagator } from '@opentelemetry/propagator-b3';
 
 const provider = new WebTracerProvider({
   plugins: [
@@ -39,28 +39,28 @@ const getData = (url) => fetch(url, {
 
 // example of keeping track of context between async operations
 const prepareClickEvent = () => {
-  const url1 = 'https://httpbin.org/get';
+  const url = 'https://httpbin.org/get';
 
   const element = document.getElementById('button1');
 
   const onClick = () => {
-    const span1 = webTracerWithZone.startSpan(`files-series-info`, {
+    const singleSpan = webTracerWithZone.startSpan(`files-series-info`, {
       parent: webTracerWithZone.getCurrentSpan(),
     });
-    webTracerWithZone.withSpan(span1, () => {
-      getData(url1).then((_data) => {
-        webTracerWithZone.getCurrentSpan().addEvent('fetching-span1-completed');
-        span1.end();
+    webTracerWithZone.withSpan(singleSpan, () => {
+      getData(url).then((_data) => {
+        webTracerWithZone.getCurrentSpan().addEvent('fetching-single-span-completed');
+        singleSpan.end();
       });
     });
     for (let i = 0, j = 5; i < j; i += 1) {
-      const span1 = webTracerWithZone.startSpan(`files-series-info-${i}`, {
+      const span = webTracerWithZone.startSpan(`files-series-info-${i}`, {
         parent: webTracerWithZone.getCurrentSpan(),
       });
-      webTracerWithZone.withSpan(span1, () => {
-        getData(url1).then((_data) => {
-          webTracerWithZone.getCurrentSpan().addEvent('fetching-span1-completed');
-          span1.end();
+      webTracerWithZone.withSpan(span, () => {
+        getData(url).then((_data) => {
+          webTracerWithZone.getCurrentSpan().addEvent(`fetching-span-${i}-completed`);
+          span.end();
         });
       });
     }

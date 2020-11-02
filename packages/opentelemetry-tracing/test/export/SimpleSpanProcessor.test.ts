@@ -14,16 +14,28 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
 import {
-  Span,
+  context,
+  ROOT_CONTEXT,
+  SpanContext,
+  SpanKind,
+  TraceFlags,
+} from '@opentelemetry/api';
+import {
+  ExportResult,
+  loggingErrorHandler,
+  setGlobalErrorHandler,
+} from '@opentelemetry/core';
+import * as assert from 'assert';
+import * as sinon from 'sinon';
+import {
   BasicTracerProvider,
   InMemorySpanExporter,
   SimpleSpanProcessor,
+  Span,
 } from '../../src';
-import { SpanContext, SpanKind, TraceFlags, context } from '@opentelemetry/api';
-import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { TestStackContextManager } from './TestStackContextManager';
+import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 
 describe('SimpleSpanProcessor', () => {
   const provider = new BasicTracerProvider();
@@ -37,7 +49,7 @@ describe('SimpleSpanProcessor', () => {
   });
 
   describe('.onStart/.onEnd/.shutdown', () => {
-    it('should handle span started and ended when SAMPLED', () => {
+    it('should handle span started and ended when SAMPLED', async () => {
       const processor = new SimpleSpanProcessor(exporter);
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
@@ -46,6 +58,7 @@ describe('SimpleSpanProcessor', () => {
       };
       const span = new Span(
         provider.getTracer('default'),
+        ROOT_CONTEXT,
         'span-name',
         spanContext,
         SpanKind.CLIENT
@@ -56,11 +69,11 @@ describe('SimpleSpanProcessor', () => {
       processor.onEnd(span);
       assert.strictEqual(exporter.getFinishedSpans().length, 1);
 
-      processor.shutdown();
+      await processor.shutdown();
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
     });
 
-    it('should handle span started and ended when UNSAMPLED', () => {
+    it('should handle span started and ended when UNSAMPLED', async () => {
       const processor = new SimpleSpanProcessor(exporter);
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
@@ -69,6 +82,7 @@ describe('SimpleSpanProcessor', () => {
       };
       const span = new Span(
         provider.getTracer('default'),
+        ROOT_CONTEXT,
         'span-name',
         spanContext,
         SpanKind.CLIENT
@@ -79,8 +93,54 @@ describe('SimpleSpanProcessor', () => {
       processor.onEnd(span);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
-      processor.shutdown();
+      await processor.shutdown();
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
+    });
+
+    it('should call globalErrorHandler when exporting fails', async () => {
+      const expectedError = new Error(
+        'SimpleSpanProcessor: span export failed (status 1)'
+      );
+      const processor = new SimpleSpanProcessor(exporter);
+      const spanContext: SpanContext = {
+        traceId: 'a3cda95b652f4a1592b449d5929fda1b',
+        spanId: '5e0c63257de34c92',
+        traceFlags: TraceFlags.NONE,
+      };
+      const span = new Span(
+        provider.getTracer('default'),
+        ROOT_CONTEXT,
+        'span-name',
+        spanContext,
+        SpanKind.CLIENT
+      );
+
+      sinon.stub(exporter, 'export').callsFake((_, callback) => {
+        setTimeout(() => {
+          callback(ExportResult.FAILED_NOT_RETRYABLE);
+        }, 0);
+      });
+
+      const errorHandlerSpy = sinon.spy();
+
+      setGlobalErrorHandler(errorHandlerSpy);
+
+      processor.onEnd(span);
+
+      await new Promise(resolve => {
+        setTimeout(() => {
+          resolve();
+        }, 0);
+      });
+
+      assert.strictEqual(errorHandlerSpy.callCount, 1);
+
+      const [[error]] = errorHandlerSpy.args;
+
+      assert.deepStrictEqual(error, expectedError);
+
+      //reset global error handler
+      setGlobalErrorHandler(loggingErrorHandler());
     });
   });
 
@@ -88,7 +148,7 @@ describe('SimpleSpanProcessor', () => {
     describe('when flushing complete', () => {
       it('should call an async callback', done => {
         const processor = new SimpleSpanProcessor(exporter);
-        processor.forceFlush(() => {
+        processor.forceFlush().then(() => {
           done();
         });
       });
@@ -97,7 +157,7 @@ describe('SimpleSpanProcessor', () => {
     describe('when shutdown is complete', () => {
       it('should call an async callback', done => {
         const processor = new SimpleSpanProcessor(exporter);
-        processor.shutdown(() => {
+        processor.shutdown().then(() => {
           done();
         });
       });
@@ -125,6 +185,7 @@ describe('SimpleSpanProcessor', () => {
       };
       const span = new Span(
         provider.getTracer('default'),
+        ROOT_CONTEXT,
         'span-name',
         spanContext,
         SpanKind.CLIENT

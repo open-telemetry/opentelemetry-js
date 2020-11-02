@@ -15,12 +15,15 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ExportResult, NoopLogger } from '@opentelemetry/core';
+import {
+  ExportResult,
+  NoopLogger,
+  globalErrorHandler,
+} from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { Socket } from 'dgram';
 import { spanToThrift } from './transform';
 import * as jaegerTypes from './types';
-import { OT_REQUEST_HEADER } from './utils';
 
 /**
  * Format and sends span information to Jaeger Exporter.
@@ -30,6 +33,9 @@ export class JaegerExporter implements SpanExporter {
   private readonly _process: jaegerTypes.ThriftProcess;
   private readonly _sender: typeof jaegerTypes.UDPSender;
   private readonly _onShutdownFlushTimeout: number;
+  private _isShutdown = false;
+  private _shutdownFlushTimeout: NodeJS.Timeout | undefined;
+  private _shuttingDownPromise: Promise<void> = Promise.resolve();
 
   constructor(config: jaegerTypes.ExporterConfig) {
     const localConfig = Object.assign({}, config);
@@ -51,7 +57,6 @@ export class JaegerExporter implements SpanExporter {
     localConfig.host = localConfig.host || process.env.JAEGER_AGENT_HOST;
     if (localConfig.endpoint) {
       this._sender = new jaegerTypes.HTTPSender(localConfig);
-      this._sender._httpOptions.headers[OT_REQUEST_HEADER] = 1;
     } else {
       this._sender = localConfig.endpoint = new jaegerTypes.UDPSender(
         localConfig
@@ -80,19 +85,45 @@ export class JaegerExporter implements SpanExporter {
     }
     this._logger.debug('Jaeger exporter export');
     this._sendSpans(spans, resultCallback).catch(err => {
-      this._logger.error(`JaegerExporter failed to export: ${err}`);
+      globalErrorHandler(err);
     });
   }
 
   /** Shutdown exporter. */
-  shutdown(): void {
-    // Make an optimistic flush.
-    this._flush();
-    // Sleeping x seconds before closing the sender's connection to ensure
-    // all spans are flushed.
-    setTimeout(() => {
-      this._sender.close();
-    }, this._onShutdownFlushTimeout);
+  shutdown(): Promise<void> {
+    if (this._isShutdown) {
+      return this._shuttingDownPromise;
+    }
+    this._isShutdown = true;
+
+    this._shuttingDownPromise = new Promise((resolve, reject) => {
+      let rejected = false;
+      this._shutdownFlushTimeout = setTimeout(() => {
+        rejected = true;
+        reject('timeout');
+        this._sender.close();
+      }, this._onShutdownFlushTimeout);
+
+      Promise.resolve()
+        .then(() => {
+          // Make an optimistic flush.
+          return this._flush();
+        })
+        .then(() => {
+          if (rejected) {
+            return;
+          } else {
+            this._shutdownFlushTimeout &&
+              clearTimeout(this._shutdownFlushTimeout);
+            resolve();
+            this._sender.close();
+          }
+        })
+        .catch(e => {
+          reject(e);
+        });
+    });
+    return this._shuttingDownPromise;
   }
 
   /** Transform spans and sends to Jaeger service. */
@@ -105,7 +136,7 @@ export class JaegerExporter implements SpanExporter {
       try {
         await this._append(span);
       } catch (err) {
-        this._logger.error(`failed to append span: ${err}`);
+        globalErrorHandler(err);
         // TODO right now we break out on first error, is that desirable?
         if (done) return done(ExportResult.FAILED_NOT_RETRYABLE);
       }

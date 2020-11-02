@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CanonicalCode, SpanKind, TraceFlags } from '@opentelemetry/api';
+import {
+  CanonicalCode,
+  ROOT_CONTEXT,
+  SpanKind,
+  TraceFlags,
+} from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
 import { HttpAttribute } from '@opentelemetry/semantic-conventions';
@@ -256,6 +261,7 @@ describe('Utility', () => {
       for (const obj of [undefined, { statusCode: 400 }]) {
         const span = new Span(
           new BasicTracerProvider().getTracer('default'),
+          ROOT_CONTEXT,
           'test',
           { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
           SpanKind.INTERNAL
@@ -270,33 +276,6 @@ describe('Utility', () => {
         assert.ok(attributes[HttpAttribute.HTTP_ERROR_NAME]);
       }
     });
-  });
-  describe('isOpenTelemetryRequest()', () => {
-    [
-      {},
-      { headers: {} },
-      url.parse('http://url.com'),
-      { headers: { [utils.OT_REQUEST_HEADER]: 0 } },
-      { headers: { [utils.OT_REQUEST_HEADER]: false } },
-    ].forEach(options => {
-      it(`should return false with the following value: ${JSON.stringify(
-        options
-      )}`, () => {
-        /* tslint:disable-next-line:no-any */
-        assert.strictEqual(utils.isOpenTelemetryRequest(options as any), false);
-      });
-    });
-    for (const options of [
-      { headers: { [utils.OT_REQUEST_HEADER]: 1 } },
-      { headers: { [utils.OT_REQUEST_HEADER]: true } },
-    ]) {
-      it(`should return true with the following value: ${JSON.stringify(
-        options
-      )}`, () => {
-        /* tslint:disable-next-line:no-any */
-        assert.strictEqual(utils.isOpenTelemetryRequest(options as any), true);
-      });
-    }
   });
 
   describe('isValidOptionsType()', () => {

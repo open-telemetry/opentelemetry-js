@@ -15,6 +15,13 @@
  */
 import * as api from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
+import {
+  B3Propagator,
+  B3InjectEncoding,
+  X_B3_TRACE_ID,
+  X_B3_SPAN_ID,
+  X_B3_SAMPLED,
+} from '@opentelemetry/propagator-b3';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import * as tracing from '@opentelemetry/tracing';
 import {
@@ -29,7 +36,9 @@ import { AttributeNames } from '../src/enums/AttributeNames';
 class DummySpanExporter implements tracing.SpanExporter {
   export(spans: any) {}
 
-  shutdown() {}
+  shutdown() {
+    return Promise.resolve();
+  }
 }
 
 const getData = (url: string, method?: string) =>
@@ -74,14 +83,14 @@ function createResource(resource = {}): PerformanceResourceTiming {
   ) as PerformanceResourceTiming;
 }
 
-function createMasterResource(resource = {}): PerformanceResourceTiming {
-  const masterResource: any = createResource(resource);
-  Object.keys(masterResource).forEach((key: string) => {
-    if (typeof masterResource[key] === 'number') {
-      masterResource[key] = masterResource[key] + 30;
+function createMainResource(resource = {}): PerformanceResourceTiming {
+  const mainResource: any = createResource(resource);
+  Object.keys(mainResource).forEach((key: string) => {
+    if (typeof mainResource[key] === 'number') {
+      mainResource[key] = mainResource[key] + 30;
     }
   });
-  return masterResource;
+  return mainResource;
 }
 
 describe('fetch', () => {
@@ -148,7 +157,7 @@ describe('fetch', () => {
       createResource({
         name: fileUrl,
       }),
-      createMasterResource({
+      createMainResource({
         name: fileUrl,
       })
     );
@@ -216,7 +225,11 @@ describe('fetch', () => {
   });
 
   before(() => {
-    api.propagation.setGlobalPropagator(new core.B3Propagator());
+    api.propagation.setGlobalPropagator(
+      new B3Propagator({
+        injectEncoding: B3InjectEncoding.MULTI_HEADER,
+      })
+    );
   });
 
   describe('when request is successful', () => {
@@ -443,26 +456,26 @@ describe('fetch', () => {
     it('should set trace headers', () => {
       const span: api.Span = exportSpy.args[1][0][0];
       assert.strictEqual(
-        lastResponse.headers[core.X_B3_TRACE_ID],
+        lastResponse.headers[X_B3_TRACE_ID],
         span.context().traceId,
-        `trace header '${core.X_B3_TRACE_ID}' not set`
+        `trace header '${X_B3_TRACE_ID}' not set`
       );
       assert.strictEqual(
-        lastResponse.headers[core.X_B3_SPAN_ID],
+        lastResponse.headers[X_B3_SPAN_ID],
         span.context().spanId,
-        `trace header '${core.X_B3_SPAN_ID}' not set`
+        `trace header '${X_B3_SPAN_ID}' not set`
       );
       assert.strictEqual(
-        lastResponse.headers[core.X_B3_SAMPLED],
+        lastResponse.headers[X_B3_SAMPLED],
         String(span.context().traceFlags),
-        `trace header '${core.X_B3_SAMPLED}' not set`
+        `trace header '${X_B3_SAMPLED}' not set`
       );
     });
 
     it('should set trace headers with a request object', () => {
       const r = new Request('url');
       window.fetch(r);
-      assert.ok(typeof r.headers.get(core.X_B3_TRACE_ID) === 'string');
+      assert.ok(typeof r.headers.get(X_B3_TRACE_ID) === 'string');
     });
 
     it('should NOT clear the resources', () => {
@@ -480,19 +493,19 @@ describe('fetch', () => {
       });
       it('should NOT set trace headers', () => {
         assert.strictEqual(
-          lastResponse.headers[core.X_B3_TRACE_ID],
+          lastResponse.headers[X_B3_TRACE_ID],
           undefined,
-          `trace header '${core.X_B3_TRACE_ID}' should not be set`
+          `trace header '${X_B3_TRACE_ID}' should not be set`
         );
         assert.strictEqual(
-          lastResponse.headers[core.X_B3_SPAN_ID],
+          lastResponse.headers[X_B3_SPAN_ID],
           undefined,
-          `trace header '${core.X_B3_SPAN_ID}' should not be set`
+          `trace header '${X_B3_SPAN_ID}' should not be set`
         );
         assert.strictEqual(
-          lastResponse.headers[core.X_B3_SAMPLED],
+          lastResponse.headers[X_B3_SAMPLED],
           undefined,
-          `trace header '${core.X_B3_SAMPLED}' should not be set`
+          `trace header '${X_B3_SAMPLED}' should not be set`
         );
       });
     });

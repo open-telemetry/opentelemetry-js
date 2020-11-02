@@ -15,7 +15,11 @@
  */
 
 import { Attributes, Logger } from '@opentelemetry/api';
-import { ExportResult, NoopLogger } from '@opentelemetry/core';
+import {
+  ExportResult,
+  NoopLogger,
+  globalErrorHandler,
+} from '@opentelemetry/core';
 import {
   CollectorExporterError,
   CollectorExporterConfigBase,
@@ -36,6 +40,8 @@ export abstract class CollectorExporterBase<
   public readonly hostname: string | undefined;
   public readonly attributes?: Attributes;
   protected _isShutdown: boolean = false;
+  private _shuttingDownPromise: Promise<void> = Promise.resolve();
+  protected _sendingPromises: Promise<unknown>[] = [];
 
   /**
    * @param config
@@ -73,9 +79,7 @@ export abstract class CollectorExporterBase<
         resultCallback(ExportResult.SUCCESS);
       })
       .catch((error: ExportServiceError) => {
-        if (error.message) {
-          this.logger.error(error.message);
-        }
+        globalErrorHandler(error);
         if (error.code && error.code < 500) {
           resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
         } else {
@@ -98,16 +102,29 @@ export abstract class CollectorExporterBase<
   /**
    * Shutdown the exporter.
    */
-  shutdown(): void {
+  shutdown(): Promise<void> {
     if (this._isShutdown) {
       this.logger.debug('shutdown already started');
-      return;
+      return this._shuttingDownPromise;
     }
     this._isShutdown = true;
     this.logger.debug('shutdown started');
-
-    // platform dependent
-    this.onShutdown();
+    this._shuttingDownPromise = new Promise((resolve, reject) => {
+      Promise.resolve()
+        .then(() => {
+          return this.onShutdown();
+        })
+        .then(() => {
+          return Promise.all(this._sendingPromises);
+        })
+        .then(() => {
+          resolve();
+        })
+        .catch(e => {
+          reject(e);
+        });
+    });
+    return this._shuttingDownPromise;
   }
 
   abstract onShutdown(): void;

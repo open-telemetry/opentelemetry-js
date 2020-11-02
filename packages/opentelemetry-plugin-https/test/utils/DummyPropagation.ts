@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Context, TextMapPropagator, TraceFlags } from '@opentelemetry/api';
 import {
+  Context,
+  TextMapPropagator,
+  TraceFlags,
   setExtractedSpanContext,
   getParentSpanContext,
-} from '@opentelemetry/core';
+} from '@opentelemetry/api';
 import * as http from 'http';
 
 export class DummyPropagation implements TextMapPropagator {
@@ -28,6 +30,7 @@ export class DummyPropagation implements TextMapPropagator {
       traceId: carrier[DummyPropagation.TRACE_CONTEXT_KEY] as string,
       spanId: DummyPropagation.SPAN_CONTEXT_KEY,
       traceFlags: TraceFlags.SAMPLED,
+      isRemote: true,
     };
     if (extractedSpanContext.traceId && extractedSpanContext.spanId) {
       return setExtractedSpanContext(context, extractedSpanContext);
@@ -39,5 +42,11 @@ export class DummyPropagation implements TextMapPropagator {
     if (!spanContext) return;
     headers[DummyPropagation.TRACE_CONTEXT_KEY] = spanContext.traceId;
     headers[DummyPropagation.SPAN_CONTEXT_KEY] = spanContext.spanId;
+  }
+  fields(): string[] {
+    return [
+      DummyPropagation.TRACE_CONTEXT_KEY,
+      DummyPropagation.SPAN_CONTEXT_KEY,
+    ];
   }
 }

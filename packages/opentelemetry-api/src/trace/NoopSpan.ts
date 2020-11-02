@@ -20,15 +20,7 @@ import { Attributes } from './attributes';
 import { Span } from './span';
 import { SpanContext } from './span_context';
 import { Status } from './status';
-import { TraceFlags } from './trace_flags';
-
-export const INVALID_TRACE_ID = '0';
-export const INVALID_SPAN_ID = '0';
-const INVALID_SPAN_CONTEXT: SpanContext = {
-  traceId: INVALID_TRACE_ID,
-  spanId: INVALID_SPAN_ID,
-  traceFlags: TraceFlags.NONE,
-};
+import { INVALID_SPAN_CONTEXT } from './spancontext-utils';
 
 /**
  * The NoopSpan is the default {@link Span} that is used when no Span
@@ -46,32 +38,32 @@ export class NoopSpan implements Span {
   }
 
   // By default does nothing
-  setAttribute(key: string, value: unknown): this {
+  setAttribute(_key: string, _value: unknown): this {
     return this;
   }
 
   // By default does nothing
-  setAttributes(attributes: Attributes): this {
+  setAttributes(_attributes: Attributes): this {
     return this;
   }
 
   // By default does nothing
-  addEvent(name: string, attributes?: Attributes): this {
+  addEvent(_name: string, _attributes?: Attributes): this {
     return this;
   }
 
   // By default does nothing
-  setStatus(status: Status): this {
+  setStatus(_status: Status): this {
     return this;
   }
 
   // By default does nothing
-  updateName(name: string): this {
+  updateName(_name: string): this {
     return this;
   }
 
   // By default does nothing
-  end(endTime?: TimeInput): void {}
+  end(_endTime?: TimeInput): void {}
 
   // isRecording always returns false for noopSpan.
   isRecording(): boolean {
@@ -79,7 +71,7 @@ export class NoopSpan implements Span {
   }
 
   // By default does nothing
-  recordException(exception: Exception, time?: TimeInput): void {}
+  recordException(_exception: Exception, _time?: TimeInput): void {}
 }
 
 export const NOOP_SPAN = new NoopSpan();

@@ -16,14 +16,12 @@
 
 import * as api from '@opentelemetry/api';
 import {
-  getExtractedSpanContext,
   NoopLogger,
-  setExtractedSpanContext,
   setCorrelationContext,
-  setActiveSpan,
   getCorrelationContext,
 } from '@opentelemetry/core';
 import * as opentracing from 'opentracing';
+import { Attributes, AttributeValue } from '@opentelemetry/api';
 
 function translateReferences(references: opentracing.Reference[]): api.Link[] {
   const links: api.Link[] = [];
@@ -32,7 +30,7 @@ function translateReferences(references: opentracing.Reference[]): api.Link[] {
     if (context instanceof SpanContextShim) {
       links.push({
         context: (context as SpanContextShim).getSpanContext(),
-        attributes: { 'span.kind': reference.type },
+        attributes: { 'span.kind': reference.type() },
       });
     }
   }
@@ -56,9 +54,9 @@ function translateSpanOptions(
 function getContextWithParent(options: opentracing.SpanOptions) {
   if (options.childOf) {
     if (options.childOf instanceof SpanShim) {
-      return setActiveSpan(api.context.active(), options.childOf.getSpan());
+      return api.setActiveSpan(api.context.active(), options.childOf.getSpan());
     } else if (options.childOf instanceof SpanContextShim) {
-      return setExtractedSpanContext(
+      return api.setExtractedSpanContext(
         api.context.active(),
         options.childOf.getSpanContext()
       );
@@ -178,9 +176,9 @@ export class TracerShim extends opentracing.Tracer {
       case opentracing.FORMAT_TEXT_MAP: {
         api.propagation.inject(
           carrier,
-          api.defaultSetter,
+          api.defaultTextMapSetter,
           setCorrelationContext(
-            setExtractedSpanContext(api.Context.ROOT_CONTEXT, oTelSpanContext),
+            api.setExtractedSpanContext(api.ROOT_CONTEXT, oTelSpanContext),
             oTelSpanCorrelationContext
           )
         );
@@ -202,7 +200,7 @@ export class TracerShim extends opentracing.Tracer {
       case opentracing.FORMAT_HTTP_HEADERS:
       case opentracing.FORMAT_TEXT_MAP: {
         const context: api.Context = api.propagation.extract(carrier);
-        const spanContext = getExtractedSpanContext(context);
+        const spanContext = api.getActiveSpan(context)?.context();
         const correlationContext = getCorrelationContext(context);
 
         if (!spanContext) {
@@ -287,19 +285,15 @@ export class SpanShim extends opentracing.Span {
    * @param eventName name of the event.
    * @param payload an arbitrary object to be attached to the event.
    */
-  logEvent(eventName: string, payload?: unknown): void {
-    let attrs: api.Attributes = {};
-    if (payload) {
-      attrs = { payload };
-    }
-    this._span.addEvent(eventName, attrs);
+  logEvent(eventName: string, payload?: Attributes): void {
+    this._span.addEvent(eventName, payload);
   }
 
   /**
    * Logs a set of key value pairs. Since OpenTelemetry only supports events,
    * the KV pairs are used as attributes on an event named "log".
    */
-  log(keyValuePairs: { [key: string]: unknown }, timestamp?: number): this {
+  log(keyValuePairs: Attributes, _timestamp?: number): this {
     // @todo: Handle timestamp
     this._span.addEvent('log', keyValuePairs);
     return this;
@@ -309,7 +303,7 @@ export class SpanShim extends opentracing.Span {
    * Adds a set of tags to the span.
    * @param keyValueMap set of KV pairs representing tags
    */
-  addTags(keyValueMap: { [key: string]: unknown }): this {
+  addTags(keyValueMap: Attributes): this {
     this._span.setAttributes(keyValueMap);
     return this;
   }
@@ -320,7 +314,7 @@ export class SpanShim extends opentracing.Span {
    * @param key key for the tag
    * @param value value for the tag
    */
-  setTag(key: string, value: unknown): this {
+  setTag(key: string, value: AttributeValue): this {
     if (
       key === opentracing.Tags.ERROR &&
       (value === true || value === 'true')

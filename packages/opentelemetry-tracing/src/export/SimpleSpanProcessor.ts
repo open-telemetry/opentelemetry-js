@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-import { SpanProcessor } from '../SpanProcessor';
+import { context, suppressInstrumentation } from '@opentelemetry/api';
+import { ExportResult, globalErrorHandler } from '@opentelemetry/core';
+import { Span } from '../Span';
 import { SpanExporter } from './SpanExporter';
+import { SpanProcessor } from '../SpanProcessor';
 import { ReadableSpan } from './ReadableSpan';
-import { context } from '@opentelemetry/api';
-import { suppressInstrumentation } from '@opentelemetry/core';
 
 /**
  * An implementation of the {@link SpanProcessor} that converts the {@link Span}
@@ -28,15 +29,17 @@ import { suppressInstrumentation } from '@opentelemetry/core';
  */
 export class SimpleSpanProcessor implements SpanProcessor {
   constructor(private readonly _exporter: SpanExporter) {}
-  private _isShutdown = false;
 
-  forceFlush(cb: () => void = () => {}): void {
+  private _isShutdown = false;
+  private _shuttingDownPromise: Promise<void> = Promise.resolve();
+
+  forceFlush(): Promise<void> {
     // do nothing as all spans are being exported without waiting
-    setTimeout(cb, 0);
+    return Promise.resolve();
   }
 
   // does nothing.
-  onStart(span: ReadableSpan): void {}
+  onStart(_span: Span): void {}
 
   onEnd(span: ReadableSpan): void {
     if (this._isShutdown) {
@@ -45,18 +48,33 @@ export class SimpleSpanProcessor implements SpanProcessor {
 
     // prevent downstream exporter calls from generating spans
     context.with(suppressInstrumentation(context.active()), () => {
-      this._exporter.export([span], () => {});
+      this._exporter.export([span], result => {
+        if (result !== ExportResult.SUCCESS) {
+          globalErrorHandler(
+            new Error(
+              `SimpleSpanProcessor: span export failed (status ${result})`
+            )
+          );
+        }
+      });
     });
   }
 
-  shutdown(cb: () => void = () => {}): void {
+  shutdown(): Promise<void> {
     if (this._isShutdown) {
-      setTimeout(cb, 0);
-      return;
+      return this._shuttingDownPromise;
     }
     this._isShutdown = true;
-
-    this._exporter.shutdown();
-    setTimeout(cb, 0);
+    this._shuttingDownPromise = new Promise((resolve, reject) => {
+      Promise.resolve()
+        .then(() => {
+          return this._exporter.shutdown();
+        })
+        .then(resolve)
+        .catch(e => {
+          reject(e);
+        });
+    });
+    return this._shuttingDownPromise;
   }
 }

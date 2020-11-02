@@ -26,13 +26,15 @@ export enum MetricKind {
   SUM_OBSERVER,
   UP_DOWN_SUM_OBSERVER,
   VALUE_OBSERVER,
+  BATCH_OBSERVER,
 }
+
+export const MetricKindValues = Object.values(MetricKind);
 
 /** The kind of aggregator. */
 export enum AggregatorKind {
   SUM,
   LAST_VALUE,
-  DISTRIBUTION,
   HISTOGRAM,
 }
 
@@ -41,15 +43,6 @@ export type Sum = number;
 
 /** LastValue returns last value. */
 export type LastValue = number;
-
-/** Distribution returns an aggregated distribution. */
-export interface Distribution {
-  min: number;
-  max: number;
-  last: number;
-  count: number;
-  sum: number;
-}
 
 export interface Histogram {
   /**
@@ -76,7 +69,7 @@ export interface Histogram {
   count: number;
 }
 
-export type PointValueType = Sum | LastValue | Distribution | Histogram;
+export type PointValueType = Sum | LastValue | Histogram;
 
 export interface MetricRecord {
   readonly descriptor: MetricDescriptor;
@@ -92,6 +85,7 @@ export interface MetricDescriptor {
   readonly unit: string;
   readonly metricKind: MetricKind;
   readonly valueType: ValueType;
+  readonly boundaries?: number[];
 }
 
 /**
@@ -105,7 +99,7 @@ export interface MetricExporter {
   ): void;
 
   /** Stops the exporter. */
-  shutdown(): void;
+  shutdown(): Promise<void>;
 }
 
 /**
@@ -142,17 +136,6 @@ export interface LastValueAggregatorType extends BaseAggregator {
 }
 
 /**
- * DistributionAggregatorType aggregate values into a {@link Distribution}
- * point type.
- */
-export interface DistributionAggregatorType extends BaseAggregator {
-  kind: AggregatorKind.DISTRIBUTION;
-
-  /** Returns snapshot of the current point (value with timestamp). */
-  toPoint(): Point<Distribution>;
-}
-
-/**
  * HistogramAggregatorType aggregate values into a {@link Histogram} point
  * type.
  */
@@ -166,7 +149,6 @@ export interface HistogramAggregatorType extends BaseAggregator {
 export type Aggregator =
   | SumAggregatorType
   | LastValueAggregatorType
-  | DistributionAggregatorType
   | HistogramAggregatorType;
 
 /**

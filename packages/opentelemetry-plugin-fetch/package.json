@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-fetch",
-  "version": "0.10.2",
+  "version": "0.12.0",
   "description": "OpenTelemetry fetch automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -45,12 +45,13 @@
   },
   "devDependencies": {
     "@babel/core": "7.11.1",
-    "@opentelemetry/context-zone": "^0.10.2",
-    "@opentelemetry/tracing": "^0.10.2",
+    "@opentelemetry/context-zone": "^0.12.0",
+    "@opentelemetry/propagator-b3": "^0.12.0",
+    "@opentelemetry/tracing": "^0.12.0",
     "@types/mocha": "8.0.2",
     "@types/node": "14.0.27",
     "@types/shimmer": "1.0.1",
-    "@types/sinon": "7.5.2",
+    "@types/sinon": "9.0.5",
     "@types/webpack-env": "1.15.2",
     "babel-loader": "8.1.0",
     "codecov": "3.7.2",
@@ -65,19 +66,19 @@
     "mocha": "7.2.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "sinon": "7.5.0",
+    "sinon": "9.0.3",
     "ts-loader": "8.0.2",
     "ts-mocha": "7.0.0",
-    "ts-node": "8.10.2",
+    "ts-node": "9.0.0",
     "typescript": "3.9.7",
     "webpack": "4.44.1",
-    "webpack-cli": "3.3.12",
+    "webpack-cli": "4.1.0",
     "webpack-merge": "5.1.1"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.10.2",
-    "@opentelemetry/core": "^0.10.2",
-    "@opentelemetry/web": "^0.10.2",
+    "@opentelemetry/api": "^0.12.0",
+    "@opentelemetry/core": "^0.12.0",
+    "@opentelemetry/web": "^0.12.0",
     "shimmer": "^1.2.1"
   }
 }

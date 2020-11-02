@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { MetricExporter, MetricRecord, Distribution, Histogram } from './types';
+import { MetricExporter, MetricRecord, Histogram } from './types';
 import { ExportResult } from '@opentelemetry/core';
 
 /**
@@ -38,23 +38,14 @@ export class ConsoleMetricExporter implements MetricExporter {
           `count: ${histogram.count}, sum: ${histogram.sum}, buckets: ${histogram.buckets}`
         );
       } else {
-        const distribution = point.value as Distribution;
-        console.log(
-          'min: ' +
-            distribution.min +
-            ', max: ' +
-            distribution.max +
-            ', count: ' +
-            distribution.count +
-            ', sum: ' +
-            distribution.sum
-        );
+        console.log(point.value);
       }
     }
     return resultCallback(ExportResult.SUCCESS);
   }
 
-  shutdown(): void {
+  shutdown(): Promise<void> {
     // By default does nothing
+    return Promise.resolve();
   }
 }

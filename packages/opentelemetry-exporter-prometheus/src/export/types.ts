@@ -43,10 +43,10 @@ export interface ExporterConfig {
   port?: number;
 
   /**
-   * Define if the Prometheus exporter server will be started
+   * Prevent the Prometheus exporter server from starting
    * @default false
    */
-  startServer?: boolean;
+  preventServerStart?: boolean;
 
   /** Standard logging interface */
   logger?: api.Logger;

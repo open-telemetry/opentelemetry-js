@@ -15,7 +15,8 @@
  */
 
 import * as assert from 'assert';
-import { NoopContextManager, Context } from '../src';
+import { NoopContextManager, ROOT_CONTEXT } from '../src';
+import { createContextKey } from '../src/context';
 
 describe('NoopContextManager', () => {
   let contextManager: NoopContextManager;
@@ -45,17 +46,17 @@ describe('NoopContextManager', () => {
   });
 
   describe('.with()', () => {
-    it('should run the callback (Context.ROOT_CONTEXT as target)', done => {
-      contextManager.with(Context.ROOT_CONTEXT, done);
+    it('should run the callback (ROOT_CONTEXT as target)', done => {
+      contextManager.with(ROOT_CONTEXT, done);
     });
 
     it('should run the callback (object as target)', done => {
-      const key = Context.createKey('test key 1');
-      const test = Context.ROOT_CONTEXT.setValue(key, 1);
+      const key = createContextKey('test key 1');
+      const test = ROOT_CONTEXT.setValue(key, 1);
       contextManager.with(test, () => {
         assert.strictEqual(
           contextManager.active(),
-          Context.ROOT_CONTEXT,
+          ROOT_CONTEXT,
           'should not have context'
         );
         return done();
@@ -64,7 +65,7 @@ describe('NoopContextManager', () => {
 
     it('should run the callback (when disabled)', done => {
       contextManager.disable();
-      contextManager.with(Context.ROOT_CONTEXT, () => {
+      contextManager.with(ROOT_CONTEXT, () => {
         contextManager.enable();
         return done();
       });
@@ -72,19 +73,19 @@ describe('NoopContextManager', () => {
   });
 
   describe('.active()', () => {
-    it('should always return Context.ROOT_CONTEXT (when enabled)', () => {
+    it('should always return ROOT_CONTEXT (when enabled)', () => {
       assert.strictEqual(
         contextManager.active(),
-        Context.ROOT_CONTEXT,
+        ROOT_CONTEXT,
         'should not have context'
       );
     });
 
-    it('should always return Context.ROOT_CONTEXT (when disabled)', () => {
+    it('should always return ROOT_CONTEXT (when disabled)', () => {
       contextManager.disable();
       assert.strictEqual(
         contextManager.active(),
-        Context.ROOT_CONTEXT,
+        ROOT_CONTEXT,
         'should not have context'
       );
       contextManager.enable();

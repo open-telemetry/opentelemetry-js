@@ -15,15 +15,18 @@
  */
 import * as api from '@opentelemetry/api';
 import {
-  B3Propagator,
   LogLevel,
   otperformance as performance,
-  X_B3_SAMPLED,
-  X_B3_SPAN_ID,
-  X_B3_TRACE_ID,
   isWrapped,
   NoopLogger,
 } from '@opentelemetry/core';
+import {
+  B3Propagator,
+  B3InjectEncoding,
+  X_B3_SAMPLED,
+  X_B3_SPAN_ID,
+  X_B3_TRACE_ID,
+} from '@opentelemetry/propagator-b3';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import * as tracing from '@opentelemetry/tracing';
 import { HttpAttribute } from '@opentelemetry/semantic-conventions';
@@ -40,7 +43,9 @@ import { XMLHttpRequestPlugin } from '../src/xhr';
 class DummySpanExporter implements tracing.SpanExporter {
   export(spans: any) {}
 
-  shutdown() {}
+  shutdown() {
+    return Promise.resolve();
+  }
 }
 
 const XHR_TIMEOUT = 2000;
@@ -110,14 +115,14 @@ function createResource(resource = {}): PerformanceResourceTiming {
   ) as PerformanceResourceTiming;
 }
 
-function createMasterResource(resource = {}): PerformanceResourceTiming {
-  const masterResource: any = createResource(resource);
-  Object.keys(masterResource).forEach((key: string) => {
-    if (typeof masterResource[key] === 'number') {
-      masterResource[key] = masterResource[key] + 30;
+function createMainResource(resource = {}): PerformanceResourceTiming {
+  const mainResource: any = createResource(resource);
+  Object.keys(mainResource).forEach((key: string) => {
+    if (typeof mainResource[key] === 'number') {
+      mainResource[key] = mainResource[key] + 30;
     }
   });
-  return masterResource;
+  return mainResource;
 }
 
 describe('xhr', () => {
@@ -141,7 +146,9 @@ describe('xhr', () => {
       });
 
       before(() => {
-        api.propagation.setGlobalPropagator(new B3Propagator());
+        api.propagation.setGlobalPropagator(
+          new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER })
+        );
       });
 
       describe('when request is successful', () => {
@@ -178,7 +185,7 @@ describe('xhr', () => {
             createResource({
               name: fileUrl,
             }),
-            createMasterResource({
+            createMainResource({
               name: fileUrl,
             })
           );
@@ -263,7 +270,7 @@ describe('xhr', () => {
 
         it('span should have correct name', () => {
           const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-          assert.strictEqual(span.name, url, 'span has wrong name');
+          assert.strictEqual(span.name, 'HTTP GET', 'span has wrong name');
         });
 
         it('span should have correct kind', () => {

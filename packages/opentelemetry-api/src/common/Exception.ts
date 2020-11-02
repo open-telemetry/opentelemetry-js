@@ -15,21 +15,21 @@
  */
 
 interface ExceptionWithCode {
-  code: string;
+  code: string | number;
   name?: string;
   message?: string;
   stack?: string;
 }
 
 interface ExceptionWithMessage {
-  code?: string;
+  code?: string | number;
   message: string;
   name?: string;
   stack?: string;
 }
 
 interface ExceptionWithName {
-  code?: string;
+  code?: string | number;
   message?: string;
   name: string;
   stack?: string;

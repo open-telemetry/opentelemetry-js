@@ -19,6 +19,7 @@ import {
   propagation,
   Span as ISpan,
   SpanKind,
+  getActiveSpan,
 } from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
@@ -36,7 +37,6 @@ import * as nock from 'nock';
 import * as path from 'path';
 import { HttpPlugin, plugin } from '../../src/http';
 import { Http, HttpPluginConfig } from '../../src/types';
-import { OT_REQUEST_HEADER } from '../../src/utils';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
@@ -185,27 +185,6 @@ describe('HttpPlugin', () => {
           serverPort
         );
       });
-
-      it(`should not trace requests with '${OT_REQUEST_HEADER}' header`, async () => {
-        const testPath = '/outgoing/do-not-trace';
-        doNock(hostname, testPath, 200, 'Ok');
-
-        const options = {
-          host: hostname,
-          path: testPath,
-          headers: { [OT_REQUEST_HEADER]: 1 },
-        };
-
-        const result = await httpRequest.get(options);
-        assert(
-          result.reqHeaders[OT_REQUEST_HEADER] === undefined,
-          'custom header should be stripped'
-        );
-        const spans = memoryExporter.getFinishedSpans();
-        assert.strictEqual(result.data, 'Ok');
-        assert.strictEqual(spans.length, 0);
-        assert.strictEqual(options.headers[OT_REQUEST_HEADER], 1);
-      });
     });
     describe('with good plugin options', () => {
       beforeEach(() => {
@@ -303,26 +282,6 @@ describe('HttpPlugin', () => {
         });
       });
 
-      it(`should not trace requests with '${OT_REQUEST_HEADER}' header`, async () => {
-        const testPath = '/outgoing/do-not-trace';
-        doNock(hostname, testPath, 200, 'Ok');
-
-        const options = {
-          host: hostname,
-          path: testPath,
-          headers: { [OT_REQUEST_HEADER]: 1 },
-        };
-
-        const result = await httpRequest.get(options);
-        assert(
-          result.reqHeaders[OT_REQUEST_HEADER] === undefined,
-          'custom header should be stripped'
-        );
-        const spans = memoryExporter.getFinishedSpans();
-        assert.strictEqual(result.data, 'Ok');
-        assert.strictEqual(spans.length, 0);
-      });
-
       const httpErrorCodes = [
         400,
         401,
@@ -398,7 +357,7 @@ describe('HttpPlugin', () => {
 
           assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
           assert.strictEqual(spans.length, 2);
-          assert.ok(reqSpan.name.indexOf(testPath) >= 0);
+          assert.strictEqual(reqSpan.name, 'HTTP GET');
           assert.strictEqual(
             localSpan.spanContext.traceId,
             reqSpan.spanContext.traceId
@@ -441,7 +400,7 @@ describe('HttpPlugin', () => {
 
             assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
             assert.strictEqual(spans.length, 2);
-            assert.ok(reqSpan.name.indexOf(testPath) >= 0);
+            assert.strictEqual(reqSpan.name, 'HTTP GET');
             assert.strictEqual(
               localSpan.spanContext.traceId,
               reqSpan.spanContext.traceId
@@ -465,7 +424,7 @@ describe('HttpPlugin', () => {
           for (let i = 0; i < num; i++) {
             await httpRequest.get(`${protocol}://${hostname}${testPath}`);
             const spans = memoryExporter.getFinishedSpans();
-            assert.ok(spans[i].name.indexOf(testPath) >= 0);
+            assert.strictEqual(spans[i].name, 'HTTP GET');
             assert.strictEqual(
               span.context().traceId,
               spans[i].spanContext.traceId
@@ -750,6 +709,14 @@ describe('HttpPlugin', () => {
           outgoingSpan.attributes['span kind'],
           SpanKind.CLIENT
         );
+      });
+
+      it('should not set span as active in context for outgoing request', done => {
+        assert.deepStrictEqual(getActiveSpan(context.active()), undefined);
+        http.get(`${protocol}://${hostname}:${serverPort}/test`, res => {
+          assert.deepStrictEqual(getActiveSpan(context.active()), undefined);
+          done();
+        });
       });
     });
 

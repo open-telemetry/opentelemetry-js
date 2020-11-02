@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-import { SpanProcessor } from './SpanProcessor';
+import { Context } from '@opentelemetry/api';
+import { globalErrorHandler } from '@opentelemetry/core';
 import { ReadableSpan } from './export/ReadableSpan';
+import { Span } from './Span';
+import { SpanProcessor } from './SpanProcessor';
 
 /**
  * Implementation of the {@link SpanProcessor} that simply forwards all
@@ -24,21 +27,29 @@ import { ReadableSpan } from './export/ReadableSpan';
 export class MultiSpanProcessor implements SpanProcessor {
   constructor(private readonly _spanProcessors: SpanProcessor[]) {}
 
-  forceFlush(cb: () => void = () => {}): void {
-    let finished = 0;
-    const total = this._spanProcessors.length;
+  forceFlush(): Promise<void> {
+    const promises: Promise<void>[] = [];
+
     for (const spanProcessor of this._spanProcessors) {
-      spanProcessor.forceFlush(() => {
-        if (++finished === total) {
-          cb();
-        }
-      });
+      promises.push(spanProcessor.forceFlush());
     }
+    return new Promise(resolve => {
+      Promise.all(promises)
+        .then(() => {
+          resolve();
+        })
+        .catch(error => {
+          globalErrorHandler(
+            error || new Error('MultiSpanProcessor: forceFlush failed')
+          );
+          resolve();
+        });
+    });
   }
 
-  onStart(span: ReadableSpan): void {
+  onStart(span: Span, context: Context): void {
     for (const spanProcessor of this._spanProcessors) {
-      spanProcessor.onStart(span);
+      spanProcessor.onStart(span, context);
     }
   }
 
@@ -48,15 +59,16 @@ export class MultiSpanProcessor implements SpanProcessor {
     }
   }
 
-  shutdown(cb: () => void = () => {}): void {
-    let finished = 0;
-    const total = this._spanProcessors.length;
+  shutdown(): Promise<void> {
+    const promises: Promise<void>[] = [];
+
     for (const spanProcessor of this._spanProcessors) {
-      spanProcessor.shutdown(() => {
-        if (++finished === total) {
-          cb();
-        }
-      });
+      promises.push(spanProcessor.shutdown());
     }
+    return new Promise((resolve, reject) => {
+      Promise.all(promises).then(() => {
+        resolve();
+      }, reject);
+    });
   }
 }

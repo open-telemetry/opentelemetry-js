@@ -16,6 +16,7 @@
 
 import * as api from '@opentelemetry/api';
 import {
+  isAttributeValue,
   hrTime,
   hrTimeDuration,
   InstrumentationLibrary,
@@ -31,6 +32,7 @@ import { ReadableSpan } from './export/ReadableSpan';
 import { Tracer } from './Tracer';
 import { SpanProcessor } from './SpanProcessor';
 import { TraceParams } from './types';
+import { AttributeValue, Context } from '@opentelemetry/api';
 
 /**
  * This class represents a span.
@@ -61,6 +63,7 @@ export class Span implements api.Span, ReadableSpan {
   /** Constructs a new Span instance. */
   constructor(
     parentTracer: Tracer,
+    context: Context,
     spanName: string,
     spanContext: api.SpanContext,
     kind: api.SpanKind,
@@ -79,15 +82,24 @@ export class Span implements api.Span, ReadableSpan {
     this._logger = parentTracer.logger;
     this._traceParams = parentTracer.getActiveTraceParams();
     this._spanProcessor = parentTracer.getActiveSpanProcessor();
-    this._spanProcessor.onStart(this);
+    this._spanProcessor.onStart(this, context);
   }
 
   context(): api.SpanContext {
     return this.spanContext;
   }
 
+  setAttribute(key: string, value?: AttributeValue): this;
   setAttribute(key: string, value: unknown): this {
-    if (this._isSpanEnded()) return this;
+    if (value == null || this._isSpanEnded()) return this;
+    if (key.length === 0) {
+      this._logger.warn(`Invalid attribute key: ${key}`);
+      return this;
+    }
+    if (!isAttributeValue(value)) {
+      this._logger.warn(`Invalid attribute value set for key: ${key}`);
+      return this;
+    }
 
     if (
       Object.keys(this.attributes).length >=
@@ -106,9 +118,9 @@ export class Span implements api.Span, ReadableSpan {
   }
 
   setAttributes(attributes: api.Attributes): this {
-    Object.keys(attributes).forEach(key => {
-      this.setAttribute(key, attributes[key]);
-    });
+    for (const [k, v] of Object.entries(attributes)) {
+      this.setAttribute(k, v);
+    }
     return this;
   }
 
@@ -179,7 +191,7 @@ export class Span implements api.Span, ReadableSpan {
   }
 
   isRecording(): boolean {
-    return true;
+    return this._ended === false;
   }
 
   recordException(exception: api.Exception, time: api.TimeInput = hrTime()) {

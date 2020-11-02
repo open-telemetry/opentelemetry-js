@@ -16,7 +16,6 @@
 import {
   MetricRecord,
   AggregatorKind,
-  Distribution,
   MetricKind,
 } from '@opentelemetry/metrics';
 import { PrometheusCheckpoint } from './types';
@@ -94,8 +93,6 @@ function toPrometheusType(
       return 'gauge';
     case AggregatorKind.LAST_VALUE:
       return 'gauge';
-    case AggregatorKind.DISTRIBUTION:
-      return 'summary';
     case AggregatorKind.HISTOGRAM:
       return 'histogram';
     default:
@@ -194,38 +191,6 @@ export class PrometheusSerializer {
         );
         break;
       }
-      case AggregatorKind.DISTRIBUTION: {
-        const { value, timestamp: hrtime } = record.aggregator.toPoint();
-        const timestamp = hrTimeToMilliseconds(hrtime);
-        for (const key of ['count', 'sum'] as (keyof Distribution)[]) {
-          results += stringify(
-            name + '_' + key,
-            record.labels,
-            value[key],
-            this._appendTimestamp ? timestamp : undefined,
-            undefined
-          );
-        }
-        results += stringify(
-          name,
-          record.labels,
-          value.min,
-          this._appendTimestamp ? timestamp : undefined,
-          {
-            quantile: '0',
-          }
-        );
-        results += stringify(
-          name,
-          record.labels,
-          value.max,
-          this._appendTimestamp ? timestamp : undefined,
-          {
-            quantile: '1',
-          }
-        );
-        break;
-      }
       case AggregatorKind.HISTOGRAM: {
         const { value, timestamp: hrtime } = record.aggregator.toPoint();
         const timestamp = hrTimeToMilliseconds(hrtime);
@@ -239,12 +204,15 @@ export class PrometheusSerializer {
             undefined
           );
         }
+
+        let cumulativeSum = 0;
         for (const [idx, val] of value.buckets.counts.entries()) {
+          cumulativeSum += val;
           const upperBound = value.buckets.boundaries[idx];
           results += stringify(
             name + '_bucket',
             record.labels,
-            val,
+            cumulativeSum,
             this._appendTimestamp ? timestamp : undefined,
             {
               le: upperBound === undefined ? '+Inf' : String(upperBound),

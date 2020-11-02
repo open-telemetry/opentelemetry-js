@@ -31,9 +31,7 @@ export abstract class CollectorExporterNodeBase<
   ExportItem,
   ServiceRequest
 > {
-  DEFAULT_HEADERS: Record<string, string> = {
-    [collectorTypes.OT_REQUEST_HEADER]: '1',
-  };
+  DEFAULT_HEADERS: Record<string, string> = {};
   headers: Record<string, string>;
   constructor(config: CollectorExporterConfigBase = {}) {
     super(config);
@@ -44,7 +42,7 @@ export abstract class CollectorExporterNodeBase<
       parseHeaders(config.headers, this.logger) || this.DEFAULT_HEADERS;
   }
 
-  onInit(config: CollectorExporterConfigBase): void {
+  onInit(_config: CollectorExporterConfigBase): void {
     this._isShutdown = false;
   }
 
@@ -59,13 +57,30 @@ export abstract class CollectorExporterNodeBase<
     }
     const serviceRequest = this.convert(objects);
 
-    sendWithHttp(
-      this,
-      JSON.stringify(serviceRequest),
-      'application/json',
-      onSuccess,
-      onError
-    );
+    const promise = new Promise(resolve => {
+      const _onSuccess = (): void => {
+        onSuccess();
+        _onFinish();
+      };
+      const _onError = (error: collectorTypes.CollectorExporterError): void => {
+        onError(error);
+        _onFinish();
+      };
+      const _onFinish = () => {
+        const index = this._sendingPromises.indexOf(promise);
+        this._sendingPromises.splice(index, 1);
+        resolve();
+      };
+      sendWithHttp(
+        this,
+        JSON.stringify(serviceRequest),
+        'application/json',
+        _onSuccess,
+        _onError
+      );
+    });
+
+    this._sendingPromises.push(promise);
   }
 
   onShutdown(): void {}

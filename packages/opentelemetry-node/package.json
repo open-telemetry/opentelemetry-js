@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/node",
-  "version": "0.10.2",
+  "version": "0.12.0",
   "description": "OpenTelemetry Node SDK provides automatic telemetry (tracing, metrics, etc) for Node.js applications",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -15,7 +15,8 @@
     "precompile": "tsc --version",
     "version:update": "node ../../scripts/version-update.js",
     "compile": "npm run version:update && tsc -p .",
-    "prepare": "npm run compile"
+    "prepare": "npm run compile",
+    "watch": "tsc -w"
   },
   "keywords": [
     "opentelemetry",
@@ -42,8 +43,8 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/context-base": "^0.10.2",
-    "@opentelemetry/resources": "^0.10.2",
+    "@opentelemetry/context-base": "^0.12.0",
+    "@opentelemetry/resources": "^0.12.0",
     "@types/mocha": "8.0.2",
     "@types/node": "14.0.27",
     "@types/semver": "7.3.2",
@@ -55,14 +56,14 @@
     "rimraf": "3.0.2",
     "shimmer": "1.2.1",
     "ts-mocha": "7.0.0",
-    "ts-node": "8.10.2",
+    "ts-node": "9.0.0",
     "typescript": "3.9.7"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.10.2",
-    "@opentelemetry/context-async-hooks": "^0.10.2",
-    "@opentelemetry/core": "^0.10.2",
-    "@opentelemetry/tracing": "^0.10.2",
+    "@opentelemetry/api": "^0.12.0",
+    "@opentelemetry/context-async-hooks": "^0.12.0",
+    "@opentelemetry/core": "^0.12.0",
+    "@opentelemetry/tracing": "^0.12.0",
     "require-in-the-middle": "^5.0.0",
     "semver": "^7.1.3"
   }

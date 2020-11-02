@@ -39,12 +39,13 @@ export class HistogramAggregator implements HistogramAggregatorType {
     }
     // we need to an ordered set to be able to correctly compute count for each
     // boundary since we'll iterate on each in order.
-    this._boundaries = boundaries.sort();
+    this._boundaries = boundaries.sort((a, b) => a - b);
     this._current = this._newEmptyCheckpoint();
     this._lastUpdateTime = hrTime();
   }
 
   update(value: number): void {
+    this._lastUpdateTime = hrTime();
     this._current.count += 1;
     this._current.sum += value;
 
@@ -54,7 +55,6 @@ export class HistogramAggregator implements HistogramAggregatorType {
         return;
       }
     }
-
     // value is above all observed boundaries
     this._current.buckets.counts[this._boundaries.length] += 1;
   }

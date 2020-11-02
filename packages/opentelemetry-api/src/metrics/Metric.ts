@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import { CorrelationContext } from '../correlation_context/CorrelationContext';
-import { SpanContext } from '../trace/span_context';
 import {
   BoundBaseObserver,
   BoundCounter,
@@ -52,12 +50,6 @@ export interface MetricOptions {
   disabled?: boolean;
 
   /**
-   * (Measure only, default true) Asserts that this metric will only accept
-   * non-negative values (e.g. disk usage).
-   */
-  absolute?: boolean;
-
-  /**
    * Indicates the type of the recorded value.
    * @default {@link ValueType.DOUBLE}
    */
@@ -67,6 +59,11 @@ export interface MetricOptions {
    * User provided logger.
    */
   logger?: Logger;
+
+  /**
+   * Boundaries optional for histogram
+   */
+  boundaries?: number[];
 }
 
 export interface BatchMetricOptions extends MetricOptions {
@@ -148,19 +145,6 @@ export interface ValueRecorder extends UnboundMetric<BoundValueRecorder> {
    * Records the given value to this value recorder.
    */
   record(value: number, labels?: Labels): void;
-
-  record(
-    value: number,
-    labels: Labels,
-    correlationContext: CorrelationContext
-  ): void;
-
-  record(
-    value: number,
-    labels: Labels,
-    correlationContext: CorrelationContext,
-    spanContext: SpanContext
-  ): void;
 }
 
 /** Base interface for the Observer metrics. */

@@ -21,6 +21,7 @@ import * as web from '@opentelemetry/web';
 import { AttributeNames } from './enums/AttributeNames';
 import { FetchError, FetchResponse, SpanData } from './types';
 import { VERSION } from './version';
+import { setActiveSpan } from '@opentelemetry/api';
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
@@ -63,10 +64,13 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
     span: api.Span,
     corsPreFlightRequest: PerformanceResourceTiming
   ): void {
-    const childSpan = this._tracer.startSpan('CORS Preflight', {
-      parent: span,
-      startTime: corsPreFlightRequest[web.PerformanceTimingNames.FETCH_START],
-    });
+    const childSpan = this._tracer.startSpan(
+      'CORS Preflight',
+      {
+        startTime: corsPreFlightRequest[web.PerformanceTimingNames.FETCH_START],
+      },
+      setActiveSpan(api.context.active(), span)
+    );
     web.addSpanNetworkEvents(childSpan, corsPreFlightRequest);
     childSpan.end(
       corsPreFlightRequest[web.PerformanceTimingNames.RESPONSE_END]
@@ -109,9 +113,9 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
     }
 
     if (options instanceof Request) {
-      api.propagation.inject(options.headers, (h, k, v) =>
-        h.set(k, typeof v === 'string' ? v : String(v))
-      );
+      api.propagation.inject(options.headers, {
+        set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
+      });
     } else {
       const headers: Partial<Record<string, unknown>> = {};
       api.propagation.inject(headers);

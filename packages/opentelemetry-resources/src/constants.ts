@@ -35,6 +35,9 @@ export const CONTAINER_RESOURCE = {
   /** The container name. */
   NAME: 'container.name',
 
+  /** The container id. */
+  ID: 'container.id',
+
   /** The name of the image the container was built on. */
   IMAGE_NAME: 'container.image.name',
 
@@ -44,12 +47,6 @@ export const CONTAINER_RESOURCE = {
 
 /** Attributes defining a computing instance (e.g. host). */
 export const HOST_RESOURCE = {
-  /**
-   * Hostname of the host. It contains what the hostname command returns on the
-   * host machine.
-   */
-  HOSTNAME: 'host.hostname',
-
   /**
    * Unique host id. For Cloud this must be the instance_id assigned by the
    * cloud provider
@@ -115,4 +112,25 @@ export const SERVICE_RESOURCE = {
 
   /** The version string of the service API or implementation. */
   VERSION: 'service.version',
+};
+
+/** Attributes describing a Process. */
+export const PROCESS_RESOURCE = {
+  /** A command which launced this proces.  */
+  COMMAND: 'process.command',
+
+  /** The full command with arguments as string.  */
+  COMMAND_LINE: 'process.command_line',
+
+  /** A name given to currently running porcess defaults to executable (process.title) .  */
+  NAME: 'process.executable.name',
+
+  /** An owner of currently running process.  */
+  OWNER: 'process.owner',
+
+  /** The full path to the process executable.  */
+  PATH: 'process.executable.path',
+
+  /** Process identifier of currently running process.  */
+  PID: 'process.id',
 };

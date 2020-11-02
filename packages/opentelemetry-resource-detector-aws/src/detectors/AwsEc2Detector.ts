@@ -71,7 +71,6 @@ class AwsEc2Detector implements Detector {
       [HOST_RESOURCE.ID]: instanceId,
       [HOST_RESOURCE.TYPE]: instanceType,
       [HOST_RESOURCE.NAME]: hostname,
-      [HOST_RESOURCE.HOSTNAME]: hostname,
     });
   }
 
