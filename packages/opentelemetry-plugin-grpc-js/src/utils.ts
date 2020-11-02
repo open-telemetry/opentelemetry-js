@@ -43,7 +43,7 @@ export const grpcStatusCodeToOpenTelemetryStatusCode = (
  * @param status
  */
 export const grpcStatusCodeToSpanStatus = (status: number): Status => {
-  return { code: status };
+  return { code: grpcStatusCodeToOpenTelemetryStatusCode(status) };
 };
 
 /**

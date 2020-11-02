@@ -47,7 +47,7 @@ export const _grpcStatusCodeToOpenTelemetryStatusCode = (
 };
 
 export const _grpcStatusCodeToSpanStatus = (status: number): Status => {
-  return { code: status };
+  return { code: _grpcStatusCodeToOpenTelemetryStatusCode(status) };
 };
 
 /**
