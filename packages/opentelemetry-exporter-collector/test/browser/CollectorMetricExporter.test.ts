@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/core';
+import {
+  NoopLogger,
+  setGlobalErrorHandler,
+  loggingErrorHandler,
+} from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorMetricExporter } from '../../src/platform/browser/index';
@@ -29,12 +33,11 @@ import {
   ensureWebResourceIsCorrect,
   ensureExportMetricsServiceRequestIsSet,
   ensureHeadersContain,
-  mockHistogram,
   mockValueRecorder,
   ensureValueRecorderIsCorrect,
-  ensureHistogramIsCorrect,
 } from '../helper';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
+
 const sendBeacon = navigator.sendBeacon;
 
 describe('CollectorMetricExporter - web', () => {
@@ -44,22 +47,20 @@ describe('CollectorMetricExporter - web', () => {
   let spyBeacon: any;
   let metrics: MetricRecord[];
 
-  beforeEach(() => {
+  beforeEach(async () => {
     spyOpen = sinon.stub(XMLHttpRequest.prototype, 'open');
     spySend = sinon.stub(XMLHttpRequest.prototype, 'send');
     spyBeacon = sinon.stub(navigator, 'sendBeacon');
     metrics = [];
-    metrics.push(mockCounter());
-    metrics.push(mockObserver());
-    metrics.push(mockHistogram());
-    metrics.push(mockValueRecorder());
+    metrics.push(await mockCounter());
+    metrics.push(await mockObserver());
+    metrics.push(await mockValueRecorder());
 
     metrics[0].aggregator.update(1);
     metrics[1].aggregator.update(3);
     metrics[1].aggregator.update(6);
     metrics[2].aggregator.update(7);
     metrics[2].aggregator.update(14);
-    metrics[3].aggregator.update(5);
   });
 
   afterEach(() => {
@@ -95,11 +96,10 @@ describe('CollectorMetricExporter - web', () => {
           const metric1 =
             json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
           const metric2 =
-            json.resourceMetrics[1].instrumentationLibraryMetrics[0].metrics[0];
+            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[1];
           const metric3 =
-            json.resourceMetrics[2].instrumentationLibraryMetrics[0].metrics[0];
-          const metric4 =
-            json.resourceMetrics[3].instrumentationLibraryMetrics[0].metrics[0];
+            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[2];
+
           assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
           if (metric1) {
             ensureCounterIsCorrect(
@@ -124,20 +124,10 @@ describe('CollectorMetricExporter - web', () => {
             "third metric doesn't exist"
           );
           if (metric3) {
-            ensureHistogramIsCorrect(
-              metric3,
-              hrTimeToNanoseconds(metrics[2].aggregator.toPoint().timestamp)
-            );
-          }
-
-          assert.ok(
-            typeof metric4 !== 'undefined',
-            "fourth metric doesn't exist"
-          );
-          if (metric4) {
             ensureValueRecorderIsCorrect(
-              metric4,
-              hrTimeToNanoseconds(metrics[3].aggregator.toPoint().timestamp)
+              metric3,
+              hrTimeToNanoseconds(metrics[2].aggregator.toPoint().timestamp),
+              true
             );
           }
 
@@ -176,16 +166,23 @@ describe('CollectorMetricExporter - web', () => {
       });
 
       it('should log the error message', done => {
+        const spyLoggerError = sinon.spy();
+        const handler = loggingErrorHandler({
+          debug: sinon.fake(),
+          info: sinon.fake(),
+          warn: sinon.fake(),
+          error: spyLoggerError,
+        });
+        setGlobalErrorHandler(handler);
         const spyLoggerDebug = sinon.stub(collectorExporter.logger, 'debug');
-        const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
         spyBeacon.restore();
         spyBeacon = sinon.stub(window.navigator, 'sendBeacon').returns(false);
 
         collectorExporter.export(metrics, () => {});
 
         setTimeout(() => {
-          const response: any = spyLoggerError.args[0][0];
-          assert.strictEqual(response, 'sendBeacon - cannot send');
+          const response: any = spyLoggerError.args[0][0] as string;
+          assert.ok(response.includes('sendBeacon - cannot send'));
           assert.strictEqual(spyLoggerDebug.args.length, 1);
 
           done();
@@ -227,11 +224,9 @@ describe('CollectorMetricExporter - web', () => {
           const metric1 =
             json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
           const metric2 =
-            json.resourceMetrics[1].instrumentationLibraryMetrics[0].metrics[0];
+            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[1];
           const metric3 =
-            json.resourceMetrics[2].instrumentationLibraryMetrics[0].metrics[0];
-          const metric4 =
-            json.resourceMetrics[3].instrumentationLibraryMetrics[0].metrics[0];
+            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[2];
           assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
           if (metric1) {
             ensureCounterIsCorrect(
@@ -255,20 +250,10 @@ describe('CollectorMetricExporter - web', () => {
             "third metric doesn't exist"
           );
           if (metric3) {
-            ensureHistogramIsCorrect(
-              metric3,
-              hrTimeToNanoseconds(metrics[2].aggregator.toPoint().timestamp)
-            );
-          }
-
-          assert.ok(
-            typeof metric4 !== 'undefined',
-            "fourth metric doesn't exist"
-          );
-          if (metric4) {
             ensureValueRecorderIsCorrect(
-              metric4,
-              hrTimeToNanoseconds(metrics[3].aggregator.toPoint().timestamp)
+              metric3,
+              hrTimeToNanoseconds(metrics[2].aggregator.toPoint().timestamp),
+              true
             );
           }
 
@@ -305,21 +290,26 @@ describe('CollectorMetricExporter - web', () => {
       });
 
       it('should log the error message', done => {
-        const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
+        const spyLoggerError = sinon.spy();
+        const handler = loggingErrorHandler({
+          debug: sinon.fake(),
+          info: sinon.fake(),
+          warn: sinon.fake(),
+          error: spyLoggerError,
+        });
+        setGlobalErrorHandler(handler);
 
-        collectorExporter.export(metrics, () => {});
+        collectorExporter.export(metrics, () => {
+          const response = spyLoggerError.args[0][0] as string;
+          assert.ok(response.includes('"code":"400"'));
+
+          assert.strictEqual(spyBeacon.callCount, 0);
+          done();
+        });
 
         setTimeout(() => {
           const request = server.requests[0];
           request.respond(400);
-
-          const response1: any = spyLoggerError.args[0][0];
-          const response2: any = spyLoggerError.args[1][0];
-          assert.strictEqual(response1, 'body');
-          assert.strictEqual(response2, 'xhr error');
-
-          assert.strictEqual(spyBeacon.callCount, 0);
-          done();
         });
       });
       it('should send custom headers', done => {

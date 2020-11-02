@@ -12,6 +12,9 @@ If you don't have your own [zone-js] please use [@opentelemetry/context-zone]
 
 ## Installation
 
+Please note that due to an issue with `zone.js`, the `ZoneContextManager` does not work with JS code targeting `ES2017+`.
+In order to use the `ZoneContextManager`, please transpile back to `ES2015`.
+
 ```bash
 npm install --save @opentelemetry/context-zone-peer-dep
 ```

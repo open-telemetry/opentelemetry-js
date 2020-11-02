@@ -29,7 +29,6 @@ import {
   grpcStatusCodeToSpanStatus,
   grpcStatusCodeToCanonicalCode,
   CALL_SPAN_ENDED,
-  containsOtelMetadata,
   methodIsIgnored,
 } from '../utils';
 import { EventEmitter } from 'events';
@@ -77,9 +76,6 @@ export function getPatchedClientMethods(
       const name = `grpc.${original.path.replace('/', '')}`;
       const args = [...arguments];
       const metadata = getMetadata.call(plugin, original, args);
-      if (containsOtelMetadata(metadata)) {
-        return original.apply(this, args);
-      }
       const span = plugin.tracer.startSpan(name, {
         kind: SpanKind.CLIENT,
       });
@@ -247,7 +243,7 @@ function getMetadata(
  * @param metadata
  */
 export function setSpanContext(metadata: grpcJs.Metadata): void {
-  propagation.inject(metadata, (metadata, k, v) =>
-    metadata.set(k, v as grpcJs.MetadataValue)
-  );
+  propagation.inject(metadata, {
+    set: (metadata, k, v) => metadata.set(k, v as grpcJs.MetadataValue),
+  });
 }

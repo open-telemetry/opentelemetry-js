@@ -15,10 +15,12 @@
  */
 
 import {
-  defaultGetter,
-  defaultSetter,
+  defaultTextMapGetter,
+  defaultTextMapSetter,
   TextMapPropagator,
   SpanContext,
+  getActiveSpan,
+  setExtractedSpanContext,
 } from '@opentelemetry/api';
 import { Context, ROOT_CONTEXT } from '@opentelemetry/context-base';
 import * as assert from 'assert';
@@ -28,15 +30,11 @@ import {
   RandomIdGenerator,
 } from '../../src';
 import {
-  getExtractedSpanContext,
-  setExtractedSpanContext,
-} from '../../src/context/context';
-import {
-  B3Propagator,
+  B3MultiPropagator,
   X_B3_SAMPLED,
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
-} from '../../src/context/propagation/B3Propagator';
+} from '@opentelemetry/propagator-b3';
 import {
   TRACE_PARENT_HEADER,
   TRACE_STATE_HEADER,
@@ -71,9 +69,9 @@ describe('Composite Propagator', () => {
 
     it('should inject context using all configured propagators', () => {
       const composite = new CompositePropagator({
-        propagators: [new B3Propagator(), new HttpTraceContext()],
+        propagators: [new B3MultiPropagator(), new HttpTraceContext()],
       });
-      composite.inject(ctxWithSpanContext, carrier, defaultSetter);
+      composite.inject(ctxWithSpanContext, carrier, defaultTextMapSetter);
 
       assert.strictEqual(carrier[X_B3_TRACE_ID], traceId);
       assert.strictEqual(carrier[X_B3_SPAN_ID], spanId);
@@ -89,7 +87,7 @@ describe('Composite Propagator', () => {
       const composite = new CompositePropagator({
         propagators: [new ThrowingPropagator(), new HttpTraceContext()],
       });
-      composite.inject(ctxWithSpanContext, carrier, defaultSetter);
+      composite.inject(ctxWithSpanContext, carrier, defaultTextMapSetter);
 
       assert.strictEqual(
         carrier[TRACE_PARENT_HEADER],
@@ -113,11 +111,11 @@ describe('Composite Propagator', () => {
 
     it('should extract context using all configured propagators', () => {
       const composite = new CompositePropagator({
-        propagators: [new B3Propagator(), new HttpTraceContext()],
+        propagators: [new B3MultiPropagator(), new HttpTraceContext()],
       });
-      const spanContext = getExtractedSpanContext(
-        composite.extract(ROOT_CONTEXT, carrier, defaultGetter)
-      );
+      const spanContext = getActiveSpan(
+        composite.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
+      )?.context();
 
       if (!spanContext) {
         throw new Error('no extracted context');
@@ -134,9 +132,9 @@ describe('Composite Propagator', () => {
       const composite = new CompositePropagator({
         propagators: [new ThrowingPropagator(), new HttpTraceContext()],
       });
-      const spanContext = getExtractedSpanContext(
-        composite.extract(ROOT_CONTEXT, carrier, defaultGetter)
-      );
+      const spanContext = getActiveSpan(
+        composite.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
+      )?.context();
 
       if (!spanContext) {
         throw new Error('no extracted context');
@@ -149,6 +147,68 @@ describe('Composite Propagator', () => {
       assert.strictEqual(spanContext.traceState!.get('foo'), 'bar');
     });
   });
+
+  describe('fields()', () => {
+    it('should combine fields from both propagators', () => {
+      const composite = new CompositePropagator({
+        propagators: [
+          {
+            extract: c => c,
+            inject: () => {},
+            fields: () => ['p1'],
+          },
+          {
+            extract: c => c,
+            inject: () => {},
+            fields: () => ['p2'],
+          },
+        ],
+      });
+
+      assert.deepStrictEqual(composite.fields(), ['p1', 'p2']);
+    });
+
+    it('should ignore propagators without fields function', () => {
+      const composite = new CompositePropagator({
+        propagators: [
+          {
+            extract: c => c,
+            inject: () => {},
+            fields: () => ['p1'],
+          },
+          // @ts-expect-error
+          {
+            extract: c => c,
+            inject: () => {},
+          },
+        ],
+      });
+
+      assert.deepStrictEqual(composite.fields(), ['p1']);
+    });
+
+    it('should not allow caller to modify fields', () => {
+      const composite = new CompositePropagator({
+        propagators: [
+          {
+            extract: c => c,
+            inject: () => {},
+            fields: () => ['p1'],
+          },
+          {
+            extract: c => c,
+            inject: () => {},
+            fields: () => ['p2'],
+          },
+        ],
+      });
+
+      const fields = composite.fields();
+      assert.deepStrictEqual(fields, ['p1', 'p2']);
+      fields[1] = 'p3';
+      assert.deepStrictEqual(composite.fields(), ['p1', 'p2']);
+    });
+  });
 });
 
 class ThrowingPropagator implements TextMapPropagator {
@@ -158,5 +218,9 @@ class ThrowingPropagator implements TextMapPropagator {
 
   extract(context: Context, carrier: unknown): Context {
     throw new Error('This propagator throws');
+  }
+
+  fields(): string[] {
+    return [];
   }
 }

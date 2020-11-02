@@ -17,9 +17,9 @@
 import {
   Context,
   CorrelationContext,
-  GetterFunction,
+  TextMapGetter,
   TextMapPropagator,
-  SetterFunction,
+  TextMapSetter,
 } from '@opentelemetry/api';
 import {
   getCorrelationContext,
@@ -31,7 +31,7 @@ const PROPERTIES_SEPARATOR = ';';
 const ITEMS_SEPARATOR = ',';
 
 // Name of the http header used to propagate the correlation context
-export const CORRELATION_CONTEXT_HEADER = 'otcorrelations';
+export const CORRELATION_CONTEXT_HEADER = 'baggage';
 // Maximum number of name-value pairs allowed by w3c spec
 export const MAX_NAME_VALUE_PAIRS = 180;
 // Maximum number of bytes per a single name-value pair allowed by w3c spec
@@ -50,7 +50,7 @@ type KeyPair = {
  * https://w3c.github.io/correlation-context/
  */
 export class HttpCorrelationContext implements TextMapPropagator {
-  inject(context: Context, carrier: unknown, setter: SetterFunction) {
+  inject(context: Context, carrier: unknown, setter: TextMapSetter) {
     const correlationContext = getCorrelationContext(context);
     if (!correlationContext) return;
     const keyPairs = this._getKeyPairs(correlationContext)
@@ -60,7 +60,7 @@ export class HttpCorrelationContext implements TextMapPropagator {
       .slice(0, MAX_NAME_VALUE_PAIRS);
     const headerValue = this._serializeKeyPairs(keyPairs);
     if (headerValue.length > 0) {
-      setter(carrier, CORRELATION_CONTEXT_HEADER, headerValue);
+      setter.set(carrier, CORRELATION_CONTEXT_HEADER, headerValue);
     }
   }
 
@@ -80,8 +80,8 @@ export class HttpCorrelationContext implements TextMapPropagator {
     );
   }
 
-  extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
-    const headerValue: string = getter(
+  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
+    const headerValue: string = getter.get(
       carrier,
       CORRELATION_CONTEXT_HEADER
     ) as string;
@@ -117,5 +117,9 @@ export class HttpCorrelationContext implements TextMapPropagator {
         value + PROPERTIES_SEPARATOR + valueProps.join(PROPERTIES_SEPARATOR);
     }
     return { key, value };
+  }
+
+  fields(): string[] {
+    return [CORRELATION_CONTEXT_HEADER];
   }
 }

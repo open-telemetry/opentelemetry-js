@@ -17,10 +17,9 @@
 export * from './common/Exception';
 export * from './common/Logger';
 export * from './common/Time';
-export * from './context/propagation/getter';
+export * from './context/context';
 export * from './context/propagation/TextMapPropagator';
 export * from './context/propagation/NoopTextMapPropagator';
-export * from './context/propagation/setter';
 export * from './correlation_context/CorrelationContext';
 export * from './correlation_context/EntryValue';
 export * from './metrics/BatchObserverResult';
@@ -37,6 +36,7 @@ export * from './trace/Event';
 export * from './trace/instrumentation/Plugin';
 export * from './trace/link_context';
 export * from './trace/link';
+export * from './trace/NoopLogger';
 export * from './trace/NoopSpan';
 export * from './trace/NoopTracer';
 export * from './trace/NoopTracerProvider';
@@ -59,6 +59,9 @@ export {
   INVALID_SPANID,
   INVALID_TRACEID,
   INVALID_SPAN_CONTEXT,
+  isSpanContextValid,
+  isValidTraceId,
+  isValidSpanId,
 } from './trace/spancontext-utils';
 
 export {

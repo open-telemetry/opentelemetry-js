@@ -15,7 +15,11 @@
  */
 
 import { Attributes, Logger } from '@opentelemetry/api';
-import { ExportResult, NoopLogger } from '@opentelemetry/core';
+import {
+  ExportResult,
+  NoopLogger,
+  globalErrorHandler,
+} from '@opentelemetry/core';
 import {
   CollectorExporterError,
   CollectorExporterConfigBase,
@@ -75,9 +79,7 @@ export abstract class CollectorExporterBase<
         resultCallback(ExportResult.SUCCESS);
       })
       .catch((error: ExportServiceError) => {
-        if (error.message) {
-          this.logger.error(error.message);
-        }
+        globalErrorHandler(error);
         if (error.code && error.code < 500) {
           resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
         } else {

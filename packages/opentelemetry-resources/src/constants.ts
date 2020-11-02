@@ -48,12 +48,6 @@ export const CONTAINER_RESOURCE = {
 /** Attributes defining a computing instance (e.g. host). */
 export const HOST_RESOURCE = {
   /**
-   * Hostname of the host. It contains what the hostname command returns on the
-   * host machine.
-   */
-  HOSTNAME: 'host.hostname',
-
-  /**
    * Unique host id. For Cloud this must be the instance_id assigned by the
    * cloud provider
    */

@@ -23,12 +23,9 @@ import {
   Status,
   SpanContext,
   TraceFlags,
+  setActiveSpan,
 } from '@opentelemetry/api';
-import {
-  BasePlugin,
-  NoRecordingSpan,
-  getExtractedSpanContext,
-} from '@opentelemetry/core';
+import { BasePlugin, NoRecordingSpan } from '@opentelemetry/core';
 import type {
   ClientRequest,
   IncomingMessage,
@@ -158,7 +155,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       ...args: HttpRequestArgs
     ) => ClientRequest
   ) {
-    return (original: Func<ClientRequest>): Func<ClientRequest> => {
+    return (_original: Func<ClientRequest>): Func<ClientRequest> => {
       // Re-implement http.get. This needs to be done (instead of using
       // getPatchOutgoingRequestFunction to patch it) because we need to
       // set the trace context header before the returned ClientRequest is
@@ -328,7 +325,7 @@ export class HttpPlugin extends BasePlugin<Http> {
           const originalEnd = response.end;
           response.end = function (
             this: ServerResponse,
-            ...args: ResponseEndArgs
+            ..._args: ResponseEndArgs
           ) {
             response.end = originalEnd;
             // Cannot pass args of type ResponseEndArgs,
@@ -397,15 +394,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         extraOptions
       );
 
-      if (utils.isOpenTelemetryRequest(optionsParsed)) {
-        // clone the headers so delete will not modify the user's object
-        optionsParsed.headers = Object.assign({}, optionsParsed.headers);
-        delete optionsParsed.headers[utils.OT_REQUEST_HEADER];
-        return original.apply(this, [optionsParsed, ...args]);
-      }
-
       if (
-        utils.isOpenTelemetryRequest(optionsParsed) ||
         utils.isIgnored(
           origin + pathname,
           plugin._config.ignoreOutgoingUrls,
@@ -421,21 +410,24 @@ export class HttpPlugin extends BasePlugin<Http> {
         kind: SpanKind.CLIENT,
       };
       const span = plugin._startHttpSpan(operationName, spanOptions);
+      if (!optionsParsed.headers) {
+        optionsParsed.headers = {};
+      }
+      propagation.inject(
+        optionsParsed.headers,
+        undefined,
+        setActiveSpan(context.active(), span)
+      );
 
-      return plugin._tracer.withSpan(span, () => {
-        if (!optionsParsed.headers) optionsParsed.headers = {};
-        propagation.inject(optionsParsed.headers);
+      const request: ClientRequest = plugin._safeExecute(
+        span,
+        () => original.apply(this, [optionsParsed, ...args]),
+        true
+      );
 
-        const request: ClientRequest = plugin._safeExecute(
-          span,
-          () => original.apply(this, [optionsParsed, ...args]),
-          true
-        );
-
-        plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
-        plugin._tracer.bind(request);
-        return plugin._traceClientRequest(request, optionsParsed, span);
-      });
+      plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
+      plugin._tracer.bind(request);
+      return plugin._traceClientRequest(request, optionsParsed, span);
     };
   }
 
@@ -448,13 +440,16 @@ export class HttpPlugin extends BasePlugin<Http> {
       options.kind === SpanKind.CLIENT
         ? this._config.requireParentforOutgoingSpans
         : this._config.requireParentforIncomingSpans;
+
     let span: Span;
-    if (requireParent === true && this._tracer.getCurrentSpan() === undefined) {
-      const spanContext =
-        getExtractedSpanContext(context.active()) ?? plugin._emptySpanContext;
+    const currentSpan = this._tracer.getCurrentSpan();
+
+    if (requireParent === true && currentSpan === undefined) {
       // TODO: Refactor this when a solution is found in
       // https://github.com/open-telemetry/opentelemetry-specification/issues/530
-      span = new NoRecordingSpan(spanContext);
+      span = new NoRecordingSpan(plugin._emptySpanContext);
+    } else if (requireParent === true && currentSpan?.context().isRemote) {
+      span = currentSpan;
     } else {
       span = this._tracer.startSpan(name, options);
     }

@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-import { SpanProcessor } from './SpanProcessor';
+import { Context } from '@opentelemetry/api';
+import { globalErrorHandler } from '@opentelemetry/core';
 import { ReadableSpan } from './export/ReadableSpan';
+import { Span } from './Span';
+import { SpanProcessor } from './SpanProcessor';
 
 /**
  * Implementation of the {@link SpanProcessor} that simply forwards all
@@ -30,16 +33,23 @@ export class MultiSpanProcessor implements SpanProcessor {
     for (const spanProcessor of this._spanProcessors) {
       promises.push(spanProcessor.forceFlush());
     }
-    return new Promise((resolve, reject) => {
-      Promise.all(promises).then(() => {
-        resolve();
-      }, reject);
+    return new Promise(resolve => {
+      Promise.all(promises)
+        .then(() => {
+          resolve();
+        })
+        .catch(error => {
+          globalErrorHandler(
+            error || new Error('MultiSpanProcessor: forceFlush failed')
+          );
+          resolve();
+        });
     });
   }
 
-  onStart(span: ReadableSpan): void {
+  onStart(span: Span, context: Context): void {
     for (const spanProcessor of this._spanProcessors) {
-      spanProcessor.onStart(span);
+      spanProcessor.onStart(span, context);
     }
   }
 

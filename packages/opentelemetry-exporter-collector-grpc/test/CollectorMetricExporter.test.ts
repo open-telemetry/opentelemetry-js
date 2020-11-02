@@ -27,12 +27,10 @@ import { CollectorMetricExporter } from '../src';
 import {
   mockCounter,
   mockObserver,
-  mockHistogram,
   ensureExportedCounterIsCorrect,
   ensureExportedObserverIsCorrect,
   ensureMetadataIsCorrect,
   ensureResourceIsCorrect,
-  ensureExportedHistogramIsCorrect,
   ensureExportedValueRecorderIsCorrect,
   mockValueRecorder,
 } from './helper';
@@ -117,7 +115,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
       server.forceShutdown();
     });
 
-    beforeEach(done => {
+    beforeEach(async () => {
       const credentials = params.useTLS
         ? grpc.credentials.createSsl(
             fs.readFileSync('./test/certs/ca.crt'),
@@ -136,10 +134,9 @@ const testCollectorMetricExporter = (params: TestParams) =>
         value: 1592602232694000000,
       });
       metrics = [];
-      metrics.push(mockCounter());
-      metrics.push(mockObserver());
-      metrics.push(mockHistogram());
-      metrics.push(mockValueRecorder());
+      metrics.push(await mockCounter());
+      metrics.push(await mockObserver());
+      metrics.push(await mockValueRecorder());
 
       metrics[0].aggregator.update(1);
 
@@ -148,8 +145,6 @@ const testCollectorMetricExporter = (params: TestParams) =>
 
       metrics[2].aggregator.update(7);
       metrics[2].aggregator.update(14);
-      metrics[3].aggregator.update(5);
-      done();
     });
 
     afterEach(() => {
@@ -189,15 +184,21 @@ const testCollectorMetricExporter = (params: TestParams) =>
             const counter =
               exportedData[0].instrumentationLibraryMetrics[0].metrics[0];
             const observer =
-              exportedData[1].instrumentationLibraryMetrics[0].metrics[0];
-            const histogram =
-              exportedData[2].instrumentationLibraryMetrics[0].metrics[0];
+              exportedData[0].instrumentationLibraryMetrics[0].metrics[1];
             const recorder =
-              exportedData[3].instrumentationLibraryMetrics[0].metrics[0];
-            ensureExportedCounterIsCorrect(counter);
-            ensureExportedObserverIsCorrect(observer);
-            ensureExportedHistogramIsCorrect(histogram);
-            ensureExportedValueRecorderIsCorrect(recorder);
+              exportedData[0].instrumentationLibraryMetrics[0].metrics[2];
+            ensureExportedCounterIsCorrect(
+              counter,
+              counter.intSum?.dataPoints[0].timeUnixNano
+            );
+            ensureExportedObserverIsCorrect(
+              observer,
+              observer.doubleGauge?.dataPoints[0].timeUnixNano
+            );
+            ensureExportedValueRecorderIsCorrect(
+              recorder,
+              recorder.intHistogram?.dataPoints[0].timeUnixNano
+            );
             assert.ok(
               typeof resource !== 'undefined',
               "resource doesn't exist"

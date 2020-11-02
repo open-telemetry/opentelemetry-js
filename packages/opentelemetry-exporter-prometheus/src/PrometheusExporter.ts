@@ -15,7 +15,11 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ExportResult, NoopLogger } from '@opentelemetry/core';
+import {
+  ExportResult,
+  NoopLogger,
+  globalErrorHandler,
+} from '@opentelemetry/core';
 import { MetricExporter, MetricRecord } from '@opentelemetry/metrics';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
 import * as url from 'url';
@@ -26,7 +30,6 @@ import { PrometheusLabelsBatcher } from './PrometheusLabelsBatcher';
 export class PrometheusExporter implements MetricExporter {
   static readonly DEFAULT_OPTIONS = {
     port: 9464,
-    startServer: false,
     endpoint: '/metrics',
     prefix: '',
   };
@@ -59,7 +62,7 @@ export class PrometheusExporter implements MetricExporter {
       config.endpoint || PrometheusExporter.DEFAULT_OPTIONS.endpoint
     ).replace(/^([^/])/, '/$1');
 
-    if (config.startServer || PrometheusExporter.DEFAULT_OPTIONS.startServer) {
+    if (config.preventServerStart !== true) {
       this.startServer().then(callback);
     } else if (callback) {
       callback();
@@ -122,9 +125,7 @@ export class PrometheusExporter implements MetricExporter {
               ((err as unknown) as { code: string }).code !==
               'ERR_SERVER_NOT_RUNNING'
             ) {
-              this._logger.error(
-                `Error during stopping the Prometheus Exporter "${err.message}"`
-              );
+              globalErrorHandler(err);
             }
           }
           resolve();

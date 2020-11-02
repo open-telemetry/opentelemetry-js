@@ -33,7 +33,7 @@ import {
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import { clientStreamAndUnaryHandler } from './clientStreamAndUnary';
 import { serverStreamAndBidiHandler } from './serverStreamAndBidi';
-import { containsOtelMetadata, methodIsIgnored } from '../utils';
+import { methodIsIgnored } from '../utils';
 
 type ServerRegisterFunction = typeof grpcJs.Server.prototype.register;
 
@@ -101,9 +101,10 @@ export function patchServer(
             plugin.logger.debug('patch func: %s', JSON.stringify(spanOptions));
 
             context.with(
-              propagation.extract(call.metadata, (carrier, key) =>
-                carrier.get(key)
-              ),
+              propagation.extract(call.metadata, {
+                get: (carrier, key) => carrier.get(key).map(String),
+                keys: carrier => Object.keys(carrier.getMap()),
+              }),
               () => {
                 const span = plugin.tracer
                   .startSpan(spanName, spanOptions)
@@ -141,12 +142,9 @@ function shouldNotTraceServerCall(
   ignoreGrpcMethods?: IgnoreMatcher[]
 ): boolean {
   const parsedName = methodName.split('/');
-  return (
-    containsOtelMetadata(metadata) ||
-    methodIsIgnored(
-      parsedName[parsedName.length - 1] || methodName,
-      ignoreGrpcMethods
-    )
+  return methodIsIgnored(
+    parsedName[parsedName.length - 1] || methodName,
+    ignoreGrpcMethods
   );
 }
 

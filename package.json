@@ -1,6 +1,6 @@
 {
   "name": "opentelemetry-base",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "OpenTelemetry is a distributed tracing and stats collection framework.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -61,6 +61,7 @@
   },
   "husky": {
     "hooks": {
+      "pre-commit": "lerna run --concurrency 1 --stream lint:fix --since HEAD --exclude-dependents",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   }

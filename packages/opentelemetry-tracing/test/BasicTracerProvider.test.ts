@@ -20,14 +20,14 @@ import {
   TraceFlags,
   ContextManager,
   ROOT_CONTEXT,
+  setActiveSpan,
+  setExtractedSpanContext,
 } from '@opentelemetry/api';
 import {
   AlwaysOnSampler,
   AlwaysOffSampler,
   NoopLogger,
   NoRecordingSpan,
-  setActiveSpan,
-  setExtractedSpanContext,
   TraceState,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
@@ -210,49 +210,13 @@ describe('BasicTracerProvider', () => {
       childSpan.end();
     });
 
-    it('should override context parent with option parent', () => {
-      const tracer = new BasicTracerProvider().getTracer('default');
-      const span = tracer.startSpan('my-span');
-      const overrideParent = tracer.startSpan('my-parent-override-span');
-      const childSpan = tracer.startSpan(
-        'child-span',
-        {
-          parent: overrideParent,
-        },
-        setActiveSpan(ROOT_CONTEXT, span)
-      );
-      const context = childSpan.context();
-      assert.strictEqual(context.traceId, overrideParent.context().traceId);
-      assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
-      span.end();
-      childSpan.end();
-    });
-
-    it('should override context parent with option parent context', () => {
-      const tracer = new BasicTracerProvider().getTracer('default');
-      const span = tracer.startSpan('my-span');
-      const overrideParent = tracer.startSpan('my-parent-override-span');
-      const childSpan = tracer.startSpan(
-        'child-span',
-        {
-          parent: overrideParent.context(),
-        },
-        setActiveSpan(ROOT_CONTEXT, span)
-      );
-      const context = childSpan.context();
-      assert.strictEqual(context.traceId, overrideParent.context().traceId);
-      assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
-      span.end();
-      childSpan.end();
-    });
-
-    it('should create a root span when parent is null', () => {
+    it('should create a root span when root is true', () => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
       const overrideParent = tracer.startSpan('my-parent-override-span');
       const rootSpan = tracer.startSpan(
         'root-span',
-        { parent: null },
+        { root: true },
         setActiveSpan(ROOT_CONTEXT, span)
       );
       const context = rootSpan.context();

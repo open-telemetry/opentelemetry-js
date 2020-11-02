@@ -15,15 +15,18 @@
  */
 import * as api from '@opentelemetry/api';
 import {
-  B3Propagator,
   LogLevel,
   otperformance as performance,
-  X_B3_SAMPLED,
-  X_B3_SPAN_ID,
-  X_B3_TRACE_ID,
   isWrapped,
   NoopLogger,
 } from '@opentelemetry/core';
+import {
+  B3Propagator,
+  B3InjectEncoding,
+  X_B3_SAMPLED,
+  X_B3_SPAN_ID,
+  X_B3_TRACE_ID,
+} from '@opentelemetry/propagator-b3';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import * as tracing from '@opentelemetry/tracing';
 import { HttpAttribute } from '@opentelemetry/semantic-conventions';
@@ -143,7 +146,9 @@ describe('xhr', () => {
       });
 
       before(() => {
-        api.propagation.setGlobalPropagator(new B3Propagator());
+        api.propagation.setGlobalPropagator(
+          new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER })
+        );
       });
 
       describe('when request is successful', () => {

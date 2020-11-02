@@ -15,9 +15,8 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ExportResult } from '@opentelemetry/core';
+import { ExportResult, globalErrorHandler } from '@opentelemetry/core';
 import * as zipkinTypes from '../../types';
-import { OT_REQUEST_HEADER } from '../../utils';
 
 /**
  * Prepares send function that will send spans to the remote Zipkin service.
@@ -33,7 +32,6 @@ export function prepareSend(
     xhrHeaders = {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      [OT_REQUEST_HEADER]: '1',
       ...headers,
     };
   }
@@ -75,7 +73,7 @@ function sendWithBeacon(
     logger.debug('sendBeacon - can send', data);
     done(ExportResult.SUCCESS);
   } else {
-    logger.error('sendBeacon - cannot send', data);
+    globalErrorHandler(new Error(`sendBeacon - cannot send ${data}`));
     done(ExportResult.FAILED_NOT_RETRYABLE);
   }
 }
@@ -120,8 +118,8 @@ function sendWithXhr(
     }
   };
 
-  xhr.onerror = err => {
-    logger.error('Zipkin request error', err);
+  xhr.onerror = msg => {
+    globalErrorHandler(new Error(`Zipkin request error: ${msg}`));
     return done(ExportResult.FAILED_RETRYABLE);
   };
 

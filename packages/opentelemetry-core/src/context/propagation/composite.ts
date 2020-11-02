@@ -16,10 +16,10 @@
 
 import {
   Context,
-  GetterFunction,
+  TextMapGetter,
   TextMapPropagator,
   Logger,
-  SetterFunction,
+  TextMapSetter,
 } from '@opentelemetry/api';
 import { NoopLogger } from '../../common/NoopLogger';
 import { CompositePropagatorConfig } from './types';
@@ -28,6 +28,7 @@ import { CompositePropagatorConfig } from './types';
 export class CompositePropagator implements TextMapPropagator {
   private readonly _propagators: TextMapPropagator[];
   private readonly _logger: Logger;
+  private readonly _fields: string[];
 
   /**
    * Construct a composite propagator from a list of propagators.
@@ -37,6 +38,14 @@ export class CompositePropagator implements TextMapPropagator {
   constructor(config: CompositePropagatorConfig = {}) {
     this._propagators = config.propagators ?? [];
     this._logger = config.logger ?? new NoopLogger();
+    this._fields = Array.from(
+      new Set(
+        this._propagators
+          // older propagators may not have fields function, null check to be sure
+          .map(p => (typeof p.fields === 'function' ? p.fields() : []))
+          .reduce((x, y) => x.concat(y))
+      )
+    );
   }
 
   /**
@@ -48,7 +57,7 @@ export class CompositePropagator implements TextMapPropagator {
    * @param context Context to inject
    * @param carrier Carrier into which context will be injected
    */
-  inject(context: Context, carrier: unknown, setter: SetterFunction) {
+  inject(context: Context, carrier: unknown, setter: TextMapSetter) {
     for (const propagator of this._propagators) {
       try {
         propagator.inject(context, carrier, setter);
@@ -69,7 +78,7 @@ export class CompositePropagator implements TextMapPropagator {
    * @param context Context to add values to
    * @param carrier Carrier from which to extract context
    */
-  extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
+  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
     return this._propagators.reduce((ctx, propagator) => {
       try {
         return propagator.extract(ctx, carrier, getter);
@@ -80,5 +89,10 @@ export class CompositePropagator implements TextMapPropagator {
       }
       return ctx;
     }, context);
+  }
+
+  fields(): string[] {
+    // return a new array so our fields cannot be modified
+    return this._fields.slice();
   }
 }

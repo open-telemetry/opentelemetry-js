@@ -18,11 +18,6 @@ import { CanonicalCode, Status } from '@opentelemetry/api';
 import * as grpcTypes from 'grpc'; // For types only
 import { IgnoreMatcher } from './types';
 
-/**
- * Metadata key used to denote an outgoing opentelemetry request.
- */
-const _otRequestHeader = 'x-opentelemetry-outgoing-request';
-
 // Equivalent to lodash _.findIndex
 export const findIndex: <T>(args: T[], fn: (arg: T) => boolean) => number = (
   args,
@@ -53,16 +48,6 @@ export const _grpcStatusCodeToCanonicalCode = (
 
 export const _grpcStatusCodeToSpanStatus = (status: number): Status => {
   return { code: status };
-};
-
-/**
- * Returns true if the metadata contains
- * the opentelemetry outgoing request header.
- */
-export const _containsOtelMetadata = (
-  metadata: grpcTypes.Metadata
-): boolean => {
-  return metadata.get(_otRequestHeader).length > 0;
 };
 
 /**

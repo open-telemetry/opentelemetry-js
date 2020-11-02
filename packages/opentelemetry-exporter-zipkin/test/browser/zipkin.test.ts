@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/core';
+import {
+  NoopLogger,
+  setGlobalErrorHandler,
+  loggingErrorHandler,
+} from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -132,6 +136,25 @@ describe('Zipkin Exporter - web', () => {
           done();
         });
       });
+
+      it('should call globalErrorHandler on error', () => {
+        const errorHandlerSpy = sinon.spy();
+        setGlobalErrorHandler(errorHandlerSpy);
+
+        zipkinExporter.export(spans, () => {
+          const [[error]] = errorHandlerSpy.args;
+          assert.strictEqual(errorHandlerSpy.callCount, 1);
+          assert.ok(error.message.includes('Zipkin request error'));
+
+          //reset global error handler
+          setGlobalErrorHandler(loggingErrorHandler());
+        });
+
+        setTimeout(() => {
+          const request = server.requests[0];
+          request.respond(400);
+        });
+      });
     });
 
     describe('when "sendBeacon" is NOT available', () => {
@@ -150,6 +173,25 @@ describe('Zipkin Exporter - web', () => {
           assert.strictEqual(spyBeacon.callCount, 0);
 
           done();
+        });
+      });
+
+      it('should call globalErrorHandler on error', () => {
+        const errorHandlerSpy = sinon.spy();
+        setGlobalErrorHandler(errorHandlerSpy);
+
+        zipkinExporter.export(spans, () => {
+          const [[error]] = errorHandlerSpy.args;
+          assert.strictEqual(errorHandlerSpy.callCount, 1);
+          assert.ok(error.message.includes('sendBeacon - cannot send'));
+
+          //reset global error handler
+          setGlobalErrorHandler(loggingErrorHandler());
+        });
+
+        setTimeout(() => {
+          const request = server.requests[0];
+          request.respond(400);
         });
       });
     });

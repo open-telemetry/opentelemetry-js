@@ -16,11 +16,8 @@
 
 import * as api from '@opentelemetry/api';
 import {
-  getExtractedSpanContext,
   NoopLogger,
-  setExtractedSpanContext,
   setCorrelationContext,
-  setActiveSpan,
   getCorrelationContext,
 } from '@opentelemetry/core';
 import * as opentracing from 'opentracing';
@@ -57,9 +54,9 @@ function translateSpanOptions(
 function getContextWithParent(options: opentracing.SpanOptions) {
   if (options.childOf) {
     if (options.childOf instanceof SpanShim) {
-      return setActiveSpan(api.context.active(), options.childOf.getSpan());
+      return api.setActiveSpan(api.context.active(), options.childOf.getSpan());
     } else if (options.childOf instanceof SpanContextShim) {
-      return setExtractedSpanContext(
+      return api.setExtractedSpanContext(
         api.context.active(),
         options.childOf.getSpanContext()
       );
@@ -179,9 +176,9 @@ export class TracerShim extends opentracing.Tracer {
       case opentracing.FORMAT_TEXT_MAP: {
         api.propagation.inject(
           carrier,
-          api.defaultSetter,
+          api.defaultTextMapSetter,
           setCorrelationContext(
-            setExtractedSpanContext(api.ROOT_CONTEXT, oTelSpanContext),
+            api.setExtractedSpanContext(api.ROOT_CONTEXT, oTelSpanContext),
             oTelSpanCorrelationContext
           )
         );
@@ -203,7 +200,7 @@ export class TracerShim extends opentracing.Tracer {
       case opentracing.FORMAT_HTTP_HEADERS:
       case opentracing.FORMAT_TEXT_MAP: {
         const context: api.Context = api.propagation.extract(carrier);
-        const spanContext = getExtractedSpanContext(context);
+        const spanContext = api.getActiveSpan(context)?.context();
         const correlationContext = getCorrelationContext(context);
 
         if (!spanContext) {
@@ -296,7 +293,7 @@ export class SpanShim extends opentracing.Span {
    * Logs a set of key value pairs. Since OpenTelemetry only supports events,
    * the KV pairs are used as attributes on an event named "log".
    */
-  log(keyValuePairs: Attributes, timestamp?: number): this {
+  log(keyValuePairs: Attributes, _timestamp?: number): this {
     // @todo: Handle timestamp
     this._span.addEvent('log', keyValuePairs);
     return this;

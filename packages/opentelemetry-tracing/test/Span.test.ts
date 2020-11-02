@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
-import { ExceptionAttribute } from '@opentelemetry/semantic-conventions';
-import * as assert from 'assert';
 import {
-  SpanKind,
   CanonicalCode,
-  TraceFlags,
-  SpanContext,
-  LinkContext,
   Exception,
+  LinkContext,
+  ROOT_CONTEXT,
+  SpanContext,
+  SpanKind,
+  TraceFlags,
 } from '@opentelemetry/api';
-import { BasicTracerProvider, Span } from '../src';
 import {
   hrTime,
-  hrTimeToNanoseconds,
-  hrTimeToMilliseconds,
-  NoopLogger,
   hrTimeDuration,
+  hrTimeToMilliseconds,
+  hrTimeToNanoseconds,
+  NoopLogger,
 } from '@opentelemetry/core';
+import { ExceptionAttribute } from '@opentelemetry/semantic-conventions';
+import * as assert from 'assert';
+import { BasicTracerProvider, Span, SpanProcessor } from '../src';
 
 const performanceTimeOrigin = hrTime();
 
@@ -51,13 +52,25 @@ describe('Span', () => {
   };
 
   it('should create a Span instance', () => {
-    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.SERVER
+    );
     assert.ok(span instanceof Span);
     span.end();
   });
 
   it('should have valid startTime', () => {
-    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.SERVER
+    );
     assert.ok(
       hrTimeToMilliseconds(span.startTime) >
         hrTimeToMilliseconds(performanceTimeOrigin)
@@ -65,7 +78,13 @@ describe('Span', () => {
   });
 
   it('should have valid endTime', () => {
-    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.SERVER
+    );
     span.end();
     assert.ok(
       hrTimeToNanoseconds(span.endTime) >= hrTimeToNanoseconds(span.startTime),
@@ -80,13 +99,25 @@ describe('Span', () => {
   });
 
   it('should have a duration', () => {
-    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.SERVER
+    );
     span.end();
     assert.ok(hrTimeToNanoseconds(span.duration) >= 0);
   });
 
   it('should have valid event.time', () => {
-    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.SERVER
+    );
     span.addEvent('my-event');
     assert.ok(
       hrTimeToMilliseconds(span.events[0].time) >
@@ -97,6 +128,7 @@ describe('Span', () => {
   it('should have an entered time for event', () => {
     const span = new Span(
       tracer,
+      ROOT_CONTEXT,
       name,
       spanContext,
       SpanKind.SERVER,
@@ -118,6 +150,7 @@ describe('Span', () => {
     it('should have an entered time for event - ', () => {
       const span = new Span(
         tracer,
+        ROOT_CONTEXT,
         name,
         spanContext,
         SpanKind.SERVER,
@@ -137,7 +170,13 @@ describe('Span', () => {
   });
 
   it('should get the span context of span', () => {
-    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.CLIENT
+    );
     const context = span.context();
     assert.strictEqual(context.traceId, spanContext.traceId);
     assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
@@ -147,14 +186,39 @@ describe('Span', () => {
     span.end();
   });
 
-  it('should return true when isRecording:true', () => {
-    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
-    assert.ok(span.isRecording());
-    span.end();
+  describe('isRecording', () => {
+    it('should return true when span is not ended', () => {
+      const span = new Span(
+        tracer,
+        ROOT_CONTEXT,
+        name,
+        spanContext,
+        SpanKind.CLIENT
+      );
+      assert.ok(span.isRecording());
+      span.end();
+    });
+    it('should return false when span is ended', () => {
+      const span = new Span(
+        tracer,
+        ROOT_CONTEXT,
+        name,
+        spanContext,
+        SpanKind.CLIENT
+      );
+      span.end();
+      assert.ok(span.isRecording() === false);
+    });
   });
 
   it('should set an attribute', () => {
-    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.CLIENT
+    );
 
     span.setAttribute('string', 'string');
     span.setAttribute('number', 0);
@@ -179,7 +243,13 @@ describe('Span', () => {
   });
 
   it('should overwrite attributes', () => {
-    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.CLIENT
+    );
 
     span.setAttribute('overwrite', 'initial value');
     span.setAttribute('overwrite', 'overwritten value');
@@ -190,7 +260,13 @@ describe('Span', () => {
   });
 
   it('should set attributes', () => {
-    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.CLIENT
+    );
 
     span.setAttributes({
       string: 'string',
@@ -216,7 +292,13 @@ describe('Span', () => {
   });
 
   it('should set an event', () => {
-    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.CLIENT
+    );
     span.addEvent('sent');
     span.addEvent('rev', { attr1: 'value', attr2: 123, attr3: true });
     span.end();
@@ -233,15 +315,26 @@ describe('Span', () => {
       spanId: '6e0c63257de34c92',
     };
     const attributes = { attr1: 'value', attr2: 123, attr3: true };
-    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT, '12345', [
-      { context: linkContext },
-      { context: linkContext, attributes },
-    ]);
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.CLIENT,
+      '12345',
+      [{ context: linkContext }, { context: linkContext, attributes }]
+    );
     span.end();
   });
 
   it('should drop extra links, attributes and events', () => {
-    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.CLIENT
+    );
     for (let i = 0; i < 150; i++) {
       span.setAttribute('foo' + i, 'bar' + i);
       span.addEvent('sent' + i);
@@ -256,7 +349,13 @@ describe('Span', () => {
   });
 
   it('should set an error status', () => {
-    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.CLIENT
+    );
     span.setStatus({
       code: CanonicalCode.PERMISSION_DENIED,
       message: 'This is an error',
@@ -268,6 +367,7 @@ describe('Span', () => {
     const parentId = '5c1c63257de34c67';
     const span = new Span(
       tracer,
+      ROOT_CONTEXT,
       'my-span',
       spanContext,
       SpanKind.INTERNAL,
@@ -292,7 +392,13 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with attributes', () => {
-    const span = new Span(tracer, 'my-span', spanContext, SpanKind.CLIENT);
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      'my-span',
+      spanContext,
+      SpanKind.CLIENT
+    );
     span.setAttribute('attr1', 'value1');
     assert.deepStrictEqual(span.attributes, { attr1: 'value1' });
 
@@ -314,6 +420,7 @@ describe('Span', () => {
   it('should return ReadableSpan with links', () => {
     const span = new Span(
       tracer,
+      ROOT_CONTEXT,
       'my-span',
       spanContext,
       SpanKind.CLIENT,
@@ -341,7 +448,13 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with events', () => {
-    const span = new Span(tracer, 'my-span', spanContext, SpanKind.CLIENT);
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      'my-span',
+      spanContext,
+      SpanKind.CLIENT
+    );
     span.addEvent('sent');
     assert.strictEqual(span.events.length, 1);
     const [event] = span.events;
@@ -370,7 +483,13 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with new status', () => {
-    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.CLIENT
+    );
     span.setStatus({
       code: CanonicalCode.PERMISSION_DENIED,
       message: 'This is an error',
@@ -388,7 +507,13 @@ describe('Span', () => {
   });
 
   it('should only end a span once', () => {
-    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.SERVER
+    );
     const endTime = Date.now();
     span.end(endTime);
     span.end(endTime + 10);
@@ -396,7 +521,13 @@ describe('Span', () => {
   });
 
   it('should update name', () => {
-    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.SERVER
+    );
     span.updateName('foo-span');
     span.end();
 
@@ -406,10 +537,80 @@ describe('Span', () => {
   });
 
   it('should have ended', () => {
-    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.SERVER
+    );
     assert.strictEqual(span.ended, false);
     span.end();
     assert.strictEqual(span.ended, true);
+  });
+
+  describe('span processor', () => {
+    it('should call onStart synchronously when span is started', () => {
+      let started = false;
+      const processor: SpanProcessor = {
+        onStart: () => {
+          started = true;
+        },
+        forceFlush: () => Promise.resolve(),
+        onEnd() {},
+        shutdown: () => Promise.resolve(),
+      };
+
+      const provider = new BasicTracerProvider({
+        logger: new NoopLogger(),
+      });
+
+      provider.addSpanProcessor(processor);
+
+      provider.getTracer('default').startSpan('test');
+      assert.ok(started);
+    });
+
+    it('should call onEnd synchronously when span is ended', () => {
+      let ended = false;
+      const processor: SpanProcessor = {
+        onStart: () => {},
+        forceFlush: () => Promise.resolve(),
+        onEnd() {
+          ended = true;
+        },
+        shutdown: () => Promise.resolve(),
+      };
+
+      const provider = new BasicTracerProvider({
+        logger: new NoopLogger(),
+      });
+
+      provider.addSpanProcessor(processor);
+
+      provider.getTracer('default').startSpan('test').end();
+      assert.ok(ended);
+    });
+
+    it('should call onStart with a writeable span', () => {
+      const processor: SpanProcessor = {
+        onStart: span => {
+          span.setAttribute('attr', true);
+        },
+        forceFlush: () => Promise.resolve(),
+        onEnd() {},
+        shutdown: () => Promise.resolve(),
+      };
+
+      const provider = new BasicTracerProvider({
+        logger: new NoopLogger(),
+      });
+
+      provider.addSpanProcessor(processor);
+
+      const s = provider.getTracer('default').startSpan('test') as Span;
+      assert.ok(s.attributes.attr);
+    });
   });
 
   describe('recordException', () => {
@@ -425,7 +626,13 @@ describe('Span', () => {
     invalidExceptions.forEach(key => {
       describe(`when exception is (${JSON.stringify(key)})`, () => {
         it('should NOT record an exception', () => {
-          const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
+          const span = new Span(
+            tracer,
+            ROOT_CONTEXT,
+            name,
+            spanContext,
+            SpanKind.CLIENT
+          );
           assert.strictEqual(span.events.length, 0);
           span.recordException(key);
           assert.strictEqual(span.events.length, 0);
@@ -439,7 +646,13 @@ describe('Span', () => {
         error = 'boom';
       });
       it('should record an exception', () => {
-        const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
         assert.strictEqual(span.events.length, 0);
         span.recordException(error);
 
@@ -466,7 +679,13 @@ describe('Span', () => {
       describe(`when exception type is an object with ${errorObj.description}`, () => {
         const error: Exception = errorObj.obj;
         it('should record an exception', () => {
-          const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
+          const span = new Span(
+            tracer,
+            ROOT_CONTEXT,
+            name,
+            spanContext,
+            SpanKind.CLIENT
+          );
           assert.strictEqual(span.events.length, 0);
           span.recordException(error);
 
@@ -490,7 +709,13 @@ describe('Span', () => {
 
     describe('when time is provided', () => {
       it('should record an exception with provided time', () => {
-        const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
         assert.strictEqual(span.events.length, 0);
         span.recordException('boom', [0, 123]);
         const event = span.events[0];
