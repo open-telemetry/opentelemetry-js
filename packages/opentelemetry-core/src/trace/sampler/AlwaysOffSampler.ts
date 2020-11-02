@@ -25,6 +25,6 @@ export class AlwaysOffSampler implements Sampler {
   }
 
   toString(): string {
-    return `AlwaysOffSampler`;
+    return 'AlwaysOffSampler';
   }
 }

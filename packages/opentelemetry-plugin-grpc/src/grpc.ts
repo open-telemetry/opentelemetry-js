@@ -342,8 +342,8 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       return function makeClientConstructor(
         this: typeof grpcTypes.Client,
         methods: { [key: string]: { originalName?: string } },
-        serviceName: string,
-        options: grpcTypes.GenericClientOptions
+        _serviceName: string,
+        _options: grpcTypes.GenericClientOptions
       ) {
         const client = original.apply(this, arguments as any);
         shimmer.massWrap(
@@ -421,7 +421,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     function patchedCallback(
       span: Span,
       callback: SendUnaryDataCallback,
-      metadata: grpcTypes.Metadata
+      _metadata: grpcTypes.Metadata
     ) {
       const wrappedFn = (err: grpcTypes.ServiceError, res: any) => {
         if (err) {
