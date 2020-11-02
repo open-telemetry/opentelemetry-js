@@ -21,8 +21,8 @@ import { SpanProcessor } from './SpanProcessor';
 
 /** No-op implementation of SpanProcessor */
 export class NoopSpanProcessor implements SpanProcessor {
-  onStart(span: Span, context: Context): void {}
-  onEnd(span: ReadableSpan): void {}
+  onStart(_span: Span, _context: Context): void {}
+  onEnd(_span: ReadableSpan): void {}
   shutdown(): Promise<void> {
     return Promise.resolve();
   }
