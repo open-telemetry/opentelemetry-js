@@ -574,7 +574,7 @@ export function ensureValueRecorderIsCorrect(
   metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
   time: number,
   explicitBounds: (number | null)[] = [Infinity],
-  bucketCounts: number[] = [2, 0],
+  bucketCounts: number[] = [2, 0]
 ) {
   assert.deepStrictEqual(metric, {
     name: 'int-recorder',

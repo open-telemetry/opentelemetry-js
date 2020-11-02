@@ -197,7 +197,9 @@ const testCollectorMetricExporter = (params: TestParams) =>
             );
             ensureExportedValueRecorderIsCorrect(
               recorder,
-              recorder.intHistogram?.dataPoints[0].timeUnixNano
+              recorder.intHistogram?.dataPoints[0].timeUnixNano,
+              [0, 100],
+              ['0', '2', '0']
             );
             assert.ok(
               typeof resource !== 'undefined',
