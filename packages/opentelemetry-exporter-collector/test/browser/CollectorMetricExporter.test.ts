@@ -126,8 +126,7 @@ describe('CollectorMetricExporter - web', () => {
           if (metric3) {
             ensureValueRecorderIsCorrect(
               metric3,
-              hrTimeToNanoseconds(metrics[2].aggregator.toPoint().timestamp),
-              true
+              hrTimeToNanoseconds(metrics[2].aggregator.toPoint().timestamp)
             );
           }
 
@@ -252,8 +251,7 @@ describe('CollectorMetricExporter - web', () => {
           if (metric3) {
             ensureValueRecorderIsCorrect(
               metric3,
-              hrTimeToNanoseconds(metrics[2].aggregator.toPoint().timestamp),
-              true
+              hrTimeToNanoseconds(metrics[2].aggregator.toPoint().timestamp)
             );
           }
 
