@@ -13,4 +13,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export function unrefTimer(timer: number): void {}
+export function unrefTimer(_timer: number): void {}

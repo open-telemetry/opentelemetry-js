@@ -48,7 +48,7 @@ export class NoopMeter implements Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createValueRecorder(name: string, options?: MetricOptions): ValueRecorder {
+  createValueRecorder(_name: string, _options?: MetricOptions): ValueRecorder {
     return NOOP_VALUE_RECORDER_METRIC;
   }
 
@@ -57,7 +57,7 @@ export class NoopMeter implements Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createCounter(name: string, options?: MetricOptions): Counter {
+  createCounter(_name: string, _options?: MetricOptions): Counter {
     return NOOP_COUNTER_METRIC;
   }
 
@@ -66,7 +66,7 @@ export class NoopMeter implements Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createUpDownCounter(name: string, options?: MetricOptions): UpDownCounter {
+  createUpDownCounter(_name: string, _options?: MetricOptions): UpDownCounter {
     return NOOP_COUNTER_METRIC;
   }
 
@@ -77,9 +77,9 @@ export class NoopMeter implements Meter {
    * @param [callback] the value observer callback
    */
   createValueObserver(
-    name: string,
-    options?: MetricOptions,
-    callback?: (observerResult: ObserverResult) => void
+    _name: string,
+    _options?: MetricOptions,
+    _callback?: (observerResult: ObserverResult) => void
   ): ValueObserver {
     return NOOP_VALUE_OBSERVER_METRIC;
   }
@@ -90,8 +90,8 @@ export class NoopMeter implements Meter {
    * @param callback the batch observer callback
    */
   createBatchObserver(
-    name: string,
-    callback: (batchObserverResult: BatchObserverResult) => void
+    _name: string,
+    _callback: (batchObserverResult: BatchObserverResult) => void
   ): BatchObserver {
     return NOOP_BATCH_OBSERVER_METRIC;
   }
@@ -111,7 +111,7 @@ export class NoopMetric<T> implements UnboundMetric<T> {
    * @param labels key-values pairs that are associated with a specific metric
    *     that you want to record.
    */
-  bind(labels: Labels): T {
+  bind(_labels: Labels): T {
     return this._instrument;
   }
 
@@ -119,7 +119,7 @@ export class NoopMetric<T> implements UnboundMetric<T> {
    * Removes the Binding from the metric, if it is present.
    * @param labels key-values pairs that are associated with a specific metric.
    */
-  unbind(labels: Labels): void {
+  unbind(_labels: Labels): void {
     return;
   }
 
@@ -163,23 +163,23 @@ export class NoopBatchObserverMetric
   implements BatchObserver {}
 
 export class NoopBoundCounter implements BoundCounter {
-  add(value: number): void {
+  add(_value: number): void {
     return;
   }
 }
 
 export class NoopBoundValueRecorder implements BoundValueRecorder {
   record(
-    value: number,
-    correlationContext?: CorrelationContext,
-    spanContext?: SpanContext
+    _value: number,
+    _correlationContext?: CorrelationContext,
+    _spanContext?: SpanContext
   ): void {
     return;
   }
 }
 
 export class NoopBoundBaseObserver implements BoundBaseObserver {
-  update(value: number) {}
+  update(_value: number) {}
 }
 
 export const NOOP_METER = new NoopMeter();
