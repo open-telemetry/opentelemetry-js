@@ -51,7 +51,7 @@ export class NoopTracer implements Tracer {
     return fn();
   }
 
-  bind<T>(target: T, span?: Span): T {
+  bind<T>(target: T, _span?: Span): T {
     return target;
   }
 }
