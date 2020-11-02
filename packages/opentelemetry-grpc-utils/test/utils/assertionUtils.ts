@@ -24,7 +24,6 @@ import {
   hrTimeToMicroseconds,
 } from '@opentelemetry/core';
 
-
 export const grpcStatusCodeToOpenTelemetryStatusCode = (
   status: grpc.status | grpcJs.status
 ): StatusCode => {
@@ -58,7 +57,10 @@ export const assertSpan = (
 
   // validations
   assert.strictEqual(span.name, validations.name);
-  assert.strictEqual(span.status.code, grpcStatusCodeToOpenTelemetryStatusCode(validations.status));
+  assert.strictEqual(
+    span.status.code,
+    grpcStatusCodeToOpenTelemetryStatusCode(validations.status)
+  );
 };
 
 // Check if sourceSpan was propagated to targetSpan
