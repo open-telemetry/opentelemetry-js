@@ -15,3 +15,4 @@
  */
 
 export * from './jaeger';
+export { ExporterConfig } from './types';
