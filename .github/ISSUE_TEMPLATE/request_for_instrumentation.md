@@ -1,6 +1,6 @@
 ---
 name: Suggest Instrumentation
-about: Suggest an instrumentation for a module or framework
+about: Suggest instrumentation for a module or framework
 labels: instrumentation
 ---
 
