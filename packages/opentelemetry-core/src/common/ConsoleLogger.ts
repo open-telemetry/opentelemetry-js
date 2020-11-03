@@ -42,11 +42,11 @@ export class ConsoleLogger implements Logger {
     }
   }
 
-  debug(message: string, ...args: unknown[]) {}
+  debug(_message: string, ..._args: unknown[]) {}
 
-  error(message: string, ...args: unknown[]) {}
+  error(_message: string, ..._args: unknown[]) {}
 
-  warn(message: string, ...args: unknown[]) {}
+  warn(_message: string, ..._args: unknown[]) {}
 
-  info(message: string, ...args: unknown[]) {}
+  info(_message: string, ..._args: unknown[]) {}
 }

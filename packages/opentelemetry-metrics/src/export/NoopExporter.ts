@@ -20,8 +20,8 @@ import { ExportResult } from '@opentelemetry/core';
 export class NoopExporter implements MetricExporter {
   // By default does nothing
   export(
-    metrics: MetricRecord[],
-    resultCallback: (result: ExportResult) => void
+    _metrics: MetricRecord[],
+    _resultCallback: (result: ExportResult) => void
   ): void {}
 
   // By default does nothing

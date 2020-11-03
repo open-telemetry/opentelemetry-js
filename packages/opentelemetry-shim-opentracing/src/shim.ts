@@ -293,7 +293,7 @@ export class SpanShim extends opentracing.Span {
    * Logs a set of key value pairs. Since OpenTelemetry only supports events,
    * the KV pairs are used as attributes on an event named "log".
    */
-  log(keyValuePairs: Attributes, timestamp?: number): this {
+  log(keyValuePairs: Attributes, _timestamp?: number): this {
     // @todo: Handle timestamp
     this._span.addEvent('log', keyValuePairs);
     return this;

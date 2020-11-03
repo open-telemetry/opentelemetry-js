@@ -186,16 +186,29 @@ describe('Span', () => {
     span.end();
   });
 
-  it('should return true when isRecording:true', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
-      spanContext,
-      SpanKind.CLIENT
-    );
-    assert.ok(span.isRecording());
-    span.end();
+  describe('isRecording', () => {
+    it('should return true when span is not ended', () => {
+      const span = new Span(
+        tracer,
+        ROOT_CONTEXT,
+        name,
+        spanContext,
+        SpanKind.CLIENT
+      );
+      assert.ok(span.isRecording());
+      span.end();
+    });
+    it('should return false when span is ended', () => {
+      const span = new Span(
+        tracer,
+        ROOT_CONTEXT,
+        name,
+        spanContext,
+        SpanKind.CLIENT
+      );
+      span.end();
+      assert.ok(span.isRecording() === false);
+    });
   });
 
   it('should set an attribute', () => {
