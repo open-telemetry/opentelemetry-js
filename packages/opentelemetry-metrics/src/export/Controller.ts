@@ -49,7 +49,7 @@ export class PushController extends Controller {
 
   private async _collect(): Promise<void> {
     await this._meter.collect();
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       this._exporter.export(
         this._meter.getBatcher().checkPointSet(),
         result => {
