@@ -1,19 +1,13 @@
 ---
-name: Plugin request
-about: Create a report to add support for plugin
-labels: plugin-request
+name: Suggest Instrumentation
+about: Suggest instrumentation for a module or framework
+labels: instrumentation
 ---
 
 <!--
-**NB:** Before opening a plugin support request against this repo, consider whether the plugin should/could be implemented in the [other OpenTelemetry client libraries](https://github.com/open-telemetry/). If so, please [open an issue on opentelemetry-specification](https://github.com/open-telemetry/opentelemetry-specification/issues/new) first.
+**NB:** Before opening a plugin support request against this repo, consider whether the plugin should reside in the [contrib repository](https://github.com/open-telemetry/opentelemetry-js-contrib).
 
 You are welcome to try out the [plugin api](https://github.com/open-telemetry/opentelemetry-js/blob/master/doc/plugin-guide.md) to build your own plugin. If you do try out the plugin api, please let us know if you have any questions/feedback.
--->
-
-### Is your plugin request related to a problem? Please describe
-
-<!--
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
 -->
 
 ### Is it applicable for Node or Browser or both
