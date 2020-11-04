@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  NoopLogger,
-  setGlobalErrorHandler,
-  loggingErrorHandler,
-} from '@opentelemetry/core';
+import { NoopLogger, ExportResultCode } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -135,29 +131,12 @@ describe('CollectorTraceExporter - web', () => {
       });
 
       it('should log the error message', done => {
-        const spyLoggerError = sinon.spy();
-        const handler = loggingErrorHandler({
-          debug: sinon.fake(),
-          info: sinon.fake(),
-          warn: sinon.fake(),
-          error: spyLoggerError,
-        });
-        setGlobalErrorHandler(handler);
-
-        const spyLoggerDebug = sinon.stub(
-          collectorTraceExporter.logger,
-          'debug'
-        );
         spyBeacon.restore();
         spyBeacon = sinon.stub(window.navigator, 'sendBeacon').returns(false);
 
-        collectorTraceExporter.export(spans, () => {});
-
-        setTimeout(() => {
-          const response = spyLoggerError.args[0][0] as string;
-          assert.ok(response.includes('sendBeacon - cannot send'));
-          assert.strictEqual(spyLoggerDebug.args.length, 1);
-
+        collectorTraceExporter.export(spans, result => {
+          assert.deepStrictEqual(result.code, ExportResultCode.FAILED);
+          assert.ok(result.error?.message.includes('cannot send'));
           done();
         });
       });
@@ -236,21 +215,9 @@ describe('CollectorTraceExporter - web', () => {
       });
 
       it('should log the error message', done => {
-        const spyLoggerError = sinon.spy();
-        const handler = loggingErrorHandler({
-          debug: sinon.fake(),
-          info: sinon.fake(),
-          warn: sinon.fake(),
-          error: spyLoggerError,
-        });
-        setGlobalErrorHandler(handler);
-
-        collectorTraceExporter.export(spans, () => {
-          const response = spyLoggerError.args[0][0] as string;
-
-          assert.ok(response.includes('"code":"400"'));
-
-          assert.strictEqual(spyBeacon.callCount, 0);
+        collectorTraceExporter.export(spans, result => {
+          assert.deepStrictEqual(result.code, ExportResultCode.FAILED);
+          assert.ok(result.error?.message.includes('Failed to export'));
           done();
         });
 

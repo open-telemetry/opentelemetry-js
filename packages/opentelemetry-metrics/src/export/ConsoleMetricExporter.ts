@@ -15,7 +15,7 @@
  */
 
 import { MetricExporter, MetricRecord, Histogram } from './types';
-import { ExportResult } from '@opentelemetry/core';
+import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 
 /**
  * This is implementation of {@link MetricExporter} that prints metrics data to
@@ -41,7 +41,7 @@ export class ConsoleMetricExporter implements MetricExporter {
         console.log(point.value);
       }
     }
-    return resultCallback(ExportResult.SUCCESS);
+    return resultCallback({ code: ExportResultCode.SUCCESS });
   }
 
   shutdown(): Promise<void> {
