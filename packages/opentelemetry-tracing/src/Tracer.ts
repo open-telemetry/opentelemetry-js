@@ -177,15 +177,6 @@ function getParent(
   options: api.SpanOptions,
   context: api.Context
 ): api.SpanContext | undefined {
-  if (options.parent === null) return undefined;
-  if (options.parent) return getContext(options.parent);
+  if (options.root) return undefined;
   return api.getParentSpanContext(context);
-}
-
-function getContext(span: api.Span | api.SpanContext): api.SpanContext {
-  return isSpan(span) ? span.context() : span;
-}
-
-function isSpan(span: api.Span | api.SpanContext): span is api.Span {
-  return typeof (span as api.Span).context === 'function';
 }

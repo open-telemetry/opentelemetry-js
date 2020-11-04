@@ -22,9 +22,9 @@ import { TextMapPropagator } from './TextMapPropagator';
  */
 export class NoopTextMapPropagator implements TextMapPropagator {
   /** Noop inject function does nothing */
-  inject(context: Context, carrier: unknown): void {}
+  inject(_context: Context, _carrier: unknown): void {}
   /** Noop extract function does nothing and returns the input context */
-  extract(context: Context, carrier: unknown): Context {
+  extract(context: Context, _carrier: unknown): Context {
     return context;
   }
   fields(): string[] {

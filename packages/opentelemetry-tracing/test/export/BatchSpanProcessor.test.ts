@@ -16,7 +16,7 @@
 
 import {
   AlwaysOnSampler,
-  ExportResult,
+  ExportResultCode,
   loggingErrorHandler,
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
@@ -224,7 +224,7 @@ describe('BatchSpanProcessor', () => {
         sinon.stub(exporter, 'export').callsFake((spans, callback) => {
           setTimeout(() => {
             exportedSpans = exportedSpans + spans.length;
-            callback(ExportResult.SUCCESS);
+            callback({ code: ExportResultCode.SUCCESS });
           }, 0);
         });
 
@@ -235,12 +235,10 @@ describe('BatchSpanProcessor', () => {
       });
 
       it('should call globalErrorHandler when exporting fails', async () => {
-        const expectedError = new Error(
-          'BatchSpanProcessor: span export failed (status 1)'
-        );
+        const expectedError = new Error('Exporter failed');
         sinon.stub(exporter, 'export').callsFake((_, callback) => {
           setTimeout(() => {
-            callback(ExportResult.FAILED_NOT_RETRYABLE);
+            callback({ code: ExportResultCode.FAILED, error: expectedError });
           }, 0);
         });
 

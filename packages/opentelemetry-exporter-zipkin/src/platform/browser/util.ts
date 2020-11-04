@@ -15,7 +15,11 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ExportResult, globalErrorHandler } from '@opentelemetry/core';
+import {
+  ExportResult,
+  ExportResultCode,
+  globalErrorHandler,
+} from '@opentelemetry/core';
 import * as zipkinTypes from '../../types';
 
 /**
@@ -45,7 +49,7 @@ export function prepareSend(
   ) {
     if (zipkinSpans.length === 0) {
       logger.debug('Zipkin send with empty spans');
-      return done(ExportResult.SUCCESS);
+      return done({ code: ExportResultCode.SUCCESS });
     }
     const payload = JSON.stringify(zipkinSpans);
     if (useBeacon) {
@@ -71,10 +75,12 @@ function sendWithBeacon(
 ) {
   if (navigator.sendBeacon(urlStr, data)) {
     logger.debug('sendBeacon - can send', data);
-    done(ExportResult.SUCCESS);
+    done({ code: ExportResultCode.SUCCESS });
   } else {
-    globalErrorHandler(new Error(`sendBeacon - cannot send ${data}`));
-    done(ExportResult.FAILED_NOT_RETRYABLE);
+    done({
+      code: ExportResultCode.FAILED,
+      error: new Error(`sendBeacon - cannot send ${data}`),
+    });
   }
 }
 
@@ -109,18 +115,21 @@ function sendWithXhr(
       );
 
       if (xhr.status >= 200 && xhr.status < 400) {
-        return done(ExportResult.SUCCESS);
-      } else if (statusCode < 500) {
-        return done(ExportResult.FAILED_NOT_RETRYABLE);
+        return done({ code: ExportResultCode.SUCCESS });
       } else {
-        return done(ExportResult.FAILED_RETRYABLE);
+        return done({
+          code: ExportResultCode.FAILED,
+          error: new Error(
+            `Got unexpected status code from zipkin: ${xhr.status}`
+          ),
+        });
       }
     }
   };
 
   xhr.onerror = msg => {
     globalErrorHandler(new Error(`Zipkin request error: ${msg}`));
-    return done(ExportResult.FAILED_RETRYABLE);
+    return done({ code: ExportResultCode.FAILED });
   };
 
   // Issue request to remote service

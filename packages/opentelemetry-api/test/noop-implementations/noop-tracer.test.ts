@@ -60,19 +60,6 @@ describe('NoopTracer', () => {
     return patchedFn();
   });
 
-  it('should propagate valid spanContext on the span (from parent)', () => {
-    const tracer = new NoopTracer();
-    const parent: SpanContext = {
-      traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-      spanId: '6e0c63257de34c92',
-      traceFlags: TraceFlags.NONE,
-    };
-    const span = tracer.startSpan('test-1', { parent });
-    assert(span.context().traceId === parent.traceId);
-    assert(span.context().spanId === parent.spanId);
-    assert(span.context().traceFlags === parent.traceFlags);
-  });
-
   it('should propagate valid spanContext on the span (from context)', () => {
     const tracer = new NoopTracer();
     const parent: SpanContext = {

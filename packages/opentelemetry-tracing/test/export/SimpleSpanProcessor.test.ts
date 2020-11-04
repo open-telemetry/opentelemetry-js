@@ -22,7 +22,7 @@ import {
   TraceFlags,
 } from '@opentelemetry/api';
 import {
-  ExportResult,
+  ExportResultCode,
   loggingErrorHandler,
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
@@ -98,9 +98,7 @@ describe('SimpleSpanProcessor', () => {
     });
 
     it('should call globalErrorHandler when exporting fails', async () => {
-      const expectedError = new Error(
-        'SimpleSpanProcessor: span export failed (status 1)'
-      );
+      const expectedError = new Error('Exporter failed');
       const processor = new SimpleSpanProcessor(exporter);
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
@@ -117,7 +115,7 @@ describe('SimpleSpanProcessor', () => {
 
       sinon.stub(exporter, 'export').callsFake((_, callback) => {
         setTimeout(() => {
-          callback(ExportResult.FAILED_NOT_RETRYABLE);
+          callback({ code: ExportResultCode.FAILED, error: expectedError });
         }, 0);
       });
 
