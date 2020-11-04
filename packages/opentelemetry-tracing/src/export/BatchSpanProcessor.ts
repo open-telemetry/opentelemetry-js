@@ -59,7 +59,7 @@ export class BatchSpanProcessor implements SpanProcessor {
   }
 
   // does nothing.
-  onStart(span: Span): void {}
+  onStart(_span: Span): void {}
 
   onEnd(span: ReadableSpan): void {
     if (this._isShutdown) {

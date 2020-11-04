@@ -42,7 +42,7 @@ export abstract class CollectorExporterNodeBase<
       parseHeaders(config.headers, this.logger) || this.DEFAULT_HEADERS;
   }
 
-  onInit(config: CollectorExporterConfigBase): void {
+  onInit(_config: CollectorExporterConfigBase): void {
     this._isShutdown = false;
   }
 
