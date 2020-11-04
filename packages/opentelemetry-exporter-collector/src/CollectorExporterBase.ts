@@ -17,8 +17,8 @@
 import { Attributes, Logger } from '@opentelemetry/api';
 import {
   ExportResult,
+  ExportResultCode,
   NoopLogger,
-  globalErrorHandler,
 } from '@opentelemetry/core';
 import {
   CollectorExporterError,
@@ -70,21 +70,19 @@ export abstract class CollectorExporterBase<
    */
   export(items: ExportItem[], resultCallback: (result: ExportResult) => void) {
     if (this._isShutdown) {
-      resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
+      resultCallback({
+        code: ExportResultCode.FAILED,
+        error: new Error('Exporter has been shutdown'),
+      });
       return;
     }
 
     this._export(items)
       .then(() => {
-        resultCallback(ExportResult.SUCCESS);
+        resultCallback({ code: ExportResultCode.SUCCESS });
       })
       .catch((error: ExportServiceError) => {
-        globalErrorHandler(error);
-        if (error.code && error.code < 500) {
-          resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
-        } else {
-          resultCallback(ExportResult.FAILED_RETRYABLE);
-        }
+        resultCallback({ code: ExportResultCode.FAILED, error });
       });
   }
 

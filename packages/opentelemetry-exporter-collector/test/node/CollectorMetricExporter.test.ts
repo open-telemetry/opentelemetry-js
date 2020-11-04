@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ConsoleLogger, LogLevel } from '@opentelemetry/core';
+import { ConsoleLogger, ExportResultCode, LogLevel } from '@opentelemetry/core';
 import * as core from '@opentelemetry/core';
 import * as http from 'http';
 import * as assert from 'assert';
@@ -42,10 +42,6 @@ const fakeRequest = {
 
 const mockRes = {
   statusCode: 200,
-};
-
-const mockResError = {
-  statusCode: 400,
 };
 
 const address = 'localhost:1501';
@@ -185,33 +181,10 @@ describe('CollectorMetricExporter - node with json over http', () => {
           const response: any = spyLoggerDebug.args[1][0];
           assert.strictEqual(response, 'statusCode: 200');
           assert.strictEqual(spyLoggerError.args.length, 0);
-          assert.strictEqual(responseSpy.args[0][0], 0);
-          done();
-        });
-      });
-    });
-
-    it('should log the error message', done => {
-      const spyLoggerError = sinon.spy();
-      const handler = core.loggingErrorHandler({
-        debug: sinon.fake(),
-        info: sinon.fake(),
-        warn: sinon.fake(),
-        error: spyLoggerError,
-      });
-      core.setGlobalErrorHandler(handler);
-
-      const responseSpy = sinon.spy();
-      collectorExporter.export(metrics, responseSpy);
-
-      setTimeout(() => {
-        const args = spyRequest.args[0];
-        const callback = args[1];
-        callback(mockResError);
-        setTimeout(() => {
-          const response = spyLoggerError.args[0][0] as string;
-          assert.ok(response.includes('"code":"400"'));
-          assert.strictEqual(responseSpy.args[0][0], 1);
+          assert.strictEqual(
+            responseSpy.args[0][0].code,
+            ExportResultCode.SUCCESS
+          );
           done();
         });
       });
