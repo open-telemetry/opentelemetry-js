@@ -224,7 +224,7 @@ export const setSpanWithError = (
  */
 export const setRequestContentLengthAttribute = (
   request: IncomingMessage,
-  attributes: Attributes,
+  attributes: Attributes
 ) => {
   const length = getContentLength(request.headers);
   if (length === null) return;
@@ -232,9 +232,9 @@ export const setRequestContentLengthAttribute = (
   if (isCompressed(request.headers)) {
     attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH] = length;
   } else {
-    attributes[HttpAttribute. HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED] = length;
+    attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED] = length;
   }
-}
+};
 
 /**
  * Adds attributes for content-length and content-encoding HTTP headers
@@ -243,7 +243,7 @@ export const setRequestContentLengthAttribute = (
  */
 export const setResponseContentLengthAttribute = (
   response: IncomingMessage,
-  attributes: Attributes,
+  attributes: Attributes
 ) => {
   const length = getContentLength(response.headers);
   if (length === null) return;
@@ -251,7 +251,7 @@ export const setResponseContentLengthAttribute = (
   if (isCompressed(response.headers)) {
     attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH] = length;
   } else {
-    attributes[HttpAttribute. HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED] = length;
+    attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED] = length;
   }
 };
 
