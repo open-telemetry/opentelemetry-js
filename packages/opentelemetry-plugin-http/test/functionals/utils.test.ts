@@ -315,76 +315,38 @@ describe('Utility', () => {
     });
   });
 
-  describe('setContentLengthAttributes', () => {
-    // Verify the key in the given attributes is set to the given value,
-    // and that no other HTTP Content Length attributes are set.
-    function verifyValueInAttributes(
-      attributes: Attributes,
-      key: string | undefined,
-      value: number
-    ) {
-      const httpAttributes = [
-        HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-        HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH,
-        HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-        HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH,
-      ];
+  // Verify the key in the given attributes is set to the given value,
+  // and that no other HTTP Content Length attributes are set.
+  function verifyValueInAttributes(
+    attributes: Attributes,
+    key: string | undefined,
+    value: number
+  ) {
+    const httpAttributes = [
+      HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+      HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH,
+      HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+      HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH,
+    ];
 
-      for (const attr of httpAttributes) {
-        if (attr === key) {
-          assert.strictEqual(attributes[attr], value);
-        } else {
-          assert.strictEqual(attributes[attr], undefined);
-        }
+    for (const attr of httpAttributes) {
+      if (attr === key) {
+        assert.strictEqual(attributes[attr], value);
+      } else {
+        assert.strictEqual(attributes[attr], undefined);
       }
     }
+  }
 
-    it('should set response content-length uncompressed attribute with no content-encoding header', () => {
-      const attributes: Attributes = {};
-      const headers: http.IncomingHttpHeaders = {};
-      headers['content-length'] = '1200';
-      utils.setContentLengthAttributes(headers, attributes, false);
-
-      verifyValueInAttributes(
-        attributes,
-        HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-        1200
-      );
-    });
-
-    it('should set response content-length uncompressed attribute with "identity" content-encoding header', () => {
-      const attributes: Attributes = {};
-      const headers: http.IncomingHttpHeaders = {};
-      headers['content-length'] = '1200';
-      headers['content-encoding'] = 'identity';
-      utils.setContentLengthAttributes(headers, attributes, false);
-
-      verifyValueInAttributes(
-        attributes,
-        HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-        1200
-      );
-    });
-
-    it('should set response content-length compressed attribute with "gzip" content-encoding header', () => {
-      const attributes: Attributes = {};
-      const headers: http.IncomingHttpHeaders = {};
-      headers['content-length'] = '1200';
-      headers['content-encoding'] = 'gzip';
-      utils.setContentLengthAttributes(headers, attributes, false);
-
-      verifyValueInAttributes(
-        attributes,
-        HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH,
-        1200
-      );
-    });
-
+  describe('setRequestContentLengthAttributes()', () => {
     it('should set request content-length uncompressed attribute with no content-encoding header', () => {
       const attributes: Attributes = {};
-      const headers: http.OutgoingHttpHeaders = {};
-      headers['content-length'] = '1200';
-      utils.setContentLengthAttributes(headers, attributes, true);
+      const request = {} as IncomingMessage;
+
+      request.headers = {
+        'content-length': '1200'
+      };
+      utils.setRequestContentLengthAttribute(request, attributes);
 
       verifyValueInAttributes(
         attributes,
@@ -395,10 +357,12 @@ describe('Utility', () => {
 
     it('should set request content-length uncompressed attribute with "identity" content-encoding header', () => {
       const attributes: Attributes = {};
-      const headers: http.OutgoingHttpHeaders = {};
-      headers['content-length'] = '1200';
-      headers['content-encoding'] = 'identity';
-      utils.setContentLengthAttributes(headers, attributes, true);
+      const request = {} as IncomingMessage;
+      request.headers = {
+        'content-length': '1200',
+        'content-encoding': 'identity'
+      };
+      utils.setRequestContentLengthAttribute(request, attributes);
 
       verifyValueInAttributes(
         attributes,
@@ -409,10 +373,12 @@ describe('Utility', () => {
 
     it('should set request content-length compressed attribute with "gzip" content-encoding header', () => {
       const attributes: Attributes = {};
-      const headers: http.OutgoingHttpHeaders = {};
-      headers['content-length'] = '1200';
-      headers['content-encoding'] = 'gzip';
-      utils.setContentLengthAttributes(headers, attributes, true);
+      const request = {} as IncomingMessage;
+      request.headers = {
+        "content-length": "1200",
+        "content-encoding": "gzip"
+      };
+      utils.setRequestContentLengthAttribute(request, attributes);
 
       verifyValueInAttributes(
         attributes,
@@ -420,12 +386,72 @@ describe('Utility', () => {
         1200
       );
     });
+  })
+
+  describe('setResponseContentLengthAttributes()', () => {
+    it('should set response content-length uncompressed attribute with no content-encoding header', () => {
+      const attributes: Attributes = {};
+
+      const response = {} as IncomingMessage;
+      
+      response.headers = {
+        "content-length": "1200"
+      };
+      utils.setResponseContentLengthAttribute(response, attributes);
+
+      verifyValueInAttributes(
+        attributes,
+        HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+        1200
+      );
+    });
+
+    it('should set response content-length uncompressed attribute with "identity" content-encoding header', () => {
+      const attributes: Attributes = {};
+      
+      const response = {} as IncomingMessage;
+
+      response.headers = {
+        "content-length": "1200",
+        "content-encoding": "identity"
+      };
+
+      utils.setResponseContentLengthAttribute(response, attributes);
+
+      verifyValueInAttributes(
+        attributes,
+        HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+        1200
+      );
+    });
+
+    it('should set response content-length compressed attribute with "gzip" content-encoding header', () => {
+      const attributes: Attributes = {};
+      
+      const response = {} as IncomingMessage;
+
+      response.headers = {
+        "content-length": "1200",
+        "content-encoding": "gzip"
+      };
+
+      utils.setResponseContentLengthAttribute(response, attributes);
+
+      verifyValueInAttributes(
+        attributes,
+        HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH,
+        1200
+      );
+    });
 
     it('should set no attributes with no content-length header', () => {
       const attributes: Attributes = {};
-      const headers: http.OutgoingHttpHeaders = {};
-      headers['content-encoding'] = 'gzip';
-      utils.setContentLengthAttributes(headers, attributes, true);
+      const message = {} as IncomingMessage;
+
+      message.headers = {
+        "content-encoding": "gzip"
+      };
+      utils.setResponseContentLengthAttribute(message, attributes);
 
       verifyValueInAttributes(attributes, undefined, 1200);
     });

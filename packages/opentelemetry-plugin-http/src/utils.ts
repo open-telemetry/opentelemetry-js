@@ -221,41 +221,55 @@ export const setSpanWithError = (
  * Adds attributes for content-length and content-encoding HTTP headers
  * @param { OutgoingHttpHeaders | IncomingHttpHeaders } headers http headers
  * @param { Attributes } Attributes span attributes
- * @param { boolean } isRequest set true for setting request content-header
  */
-export const setContentLengthAttributes = (
-  headers: OutgoingHttpHeaders | IncomingHttpHeaders,
+export const setRequestContentLengthAttribute = (
+  request: IncomingMessage,
   attributes: Attributes,
-  isRequest: boolean
 ) => {
-  let isCompressed = false;
+  const length = getContentLength(request.headers);
+  if (length === null) return;
 
-  if (headers['content-length'] === undefined) return;
-
-  if (
-    headers['content-encoding'] &&
-    headers['content-encoding'] !== 'identity'
-  ) {
-    isCompressed = true;
-  }
-
-  let key = null;
-  if (isCompressed) {
-    if (isRequest) {
-      key = HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH;
-    } else {
-      key = HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH;
-    }
+  if (isCompressed(request.headers)) {
+    attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH] = length;
   } else {
-    if (isRequest) {
-      key = HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED;
-    } else {
-      key = HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED;
-    }
+    attributes[HttpAttribute. HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED] = length;
   }
+}
 
-  attributes[key] = Number(headers['content-length']);
+/**
+ * Adds attributes for content-length and content-encoding HTTP headers
+ * @param { OutgoingHttpHeaders | IncomingHttpHeaders } headers http headers
+ * @param { Attributes } Attributes span attributes
+ */
+export const setResponseContentLengthAttribute = (
+  response: IncomingMessage,
+  attributes: Attributes,
+) => {
+  const length = getContentLength(response.headers);
+  if (length === null) return;
+
+  if (isCompressed(response.headers)) {
+    attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH] = length;
+  } else {
+    attributes[HttpAttribute. HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED] = length;
+  }
 };
+
+function getContentLength(headers: OutgoingHttpHeaders | IncomingHttpHeaders) : number | null {
+  const contentLengthHeader = headers['content-length'];
+  if (contentLengthHeader === undefined) return null;
+
+  const contentLength = parseInt(contentLengthHeader as string, 10);
+  if (isNaN(contentLength)) return null;
+
+  return contentLength;
+}
+
+export const isCompressed = (headers: OutgoingHttpHeaders | IncomingHttpHeaders) : Boolean => {
+  const encoding = headers['content-encoding'];
+
+  return !!encoding && encoding != 'identity'
+}
 
 /**
  * Makes sure options is an url object
@@ -396,7 +410,7 @@ export const getOutgoingRequestAttributesOnResponse = (
   response: IncomingMessage,
   options: { hostname: string }
 ): Attributes => {
-  const { statusCode, statusMessage, httpVersion, headers, socket } = response;
+  const { statusCode, statusMessage, httpVersion, socket } = response;
   const { remoteAddress, remotePort } = socket;
 
   const attributes: Attributes = {
@@ -405,7 +419,7 @@ export const getOutgoingRequestAttributesOnResponse = (
     [HttpAttribute.HTTP_HOST]: `${options.hostname}:${remotePort}`,
   };
 
-  setContentLengthAttributes(headers, attributes, false);
+  setResponseContentLengthAttribute(response, attributes);
 
   if (statusCode) {
     attributes[HttpAttribute.HTTP_STATUS_CODE] = statusCode;
@@ -467,7 +481,7 @@ export const getIncomingRequestAttributes = (
     attributes[HttpAttribute.HTTP_USER_AGENT] = userAgent;
   }
 
-  setContentLengthAttributes(headers, attributes, true);
+  setRequestContentLengthAttribute(request, attributes);
 
   const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
   return Object.assign(attributes, httpKindAttributes);
