@@ -127,6 +127,13 @@ describe('HttpCorrelationContext', () => {
     });
   });
 
+  describe('fields()', () => {
+    it('returns the fields used by the baggage spec', () => {
+      const propagator = new HttpCorrelationContext();
+      assert.deepStrictEqual(propagator.fields(), [CORRELATION_CONTEXT_HEADER]);
+    });
+  });
+
   it('returns undefined if header is missing', () => {
     assert.deepStrictEqual(
       getCorrelationContext(

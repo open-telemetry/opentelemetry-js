@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanKind } from '@opentelemetry/api';
+import { SpanKind, StatusCode } from '@opentelemetry/api';
 import * as assert from 'assert';
 import type * as grpc from 'grpc';
 import type * as grpcJs from '@grpc/grpc-js';
@@ -23,6 +23,15 @@ import {
   hrTimeToMilliseconds,
   hrTimeToMicroseconds,
 } from '@opentelemetry/core';
+
+export const grpcStatusCodeToOpenTelemetryStatusCode = (
+  status: grpc.status | grpcJs.status
+): StatusCode => {
+  if (status !== undefined && status === 0) {
+    return StatusCode.OK;
+  }
+  return StatusCode.ERROR;
+};
 
 export const assertSpan = (
   component: string,
@@ -48,7 +57,10 @@ export const assertSpan = (
 
   // validations
   assert.strictEqual(span.name, validations.name);
-  assert.strictEqual(span.status.code, validations.status);
+  assert.strictEqual(
+    span.status.code,
+    grpcStatusCodeToOpenTelemetryStatusCode(validations.status)
+  );
 };
 
 // Check if sourceSpan was propagated to targetSpan

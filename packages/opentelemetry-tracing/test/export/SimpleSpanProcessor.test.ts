@@ -14,16 +14,28 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
 import {
-  Span,
+  context,
+  ROOT_CONTEXT,
+  SpanContext,
+  SpanKind,
+  TraceFlags,
+} from '@opentelemetry/api';
+import {
+  ExportResultCode,
+  loggingErrorHandler,
+  setGlobalErrorHandler,
+} from '@opentelemetry/core';
+import * as assert from 'assert';
+import * as sinon from 'sinon';
+import {
   BasicTracerProvider,
   InMemorySpanExporter,
   SimpleSpanProcessor,
+  Span,
 } from '../../src';
-import { SpanContext, SpanKind, TraceFlags, context } from '@opentelemetry/api';
-import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { TestStackContextManager } from './TestStackContextManager';
+import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 
 describe('SimpleSpanProcessor', () => {
   const provider = new BasicTracerProvider();
@@ -46,6 +58,7 @@ describe('SimpleSpanProcessor', () => {
       };
       const span = new Span(
         provider.getTracer('default'),
+        ROOT_CONTEXT,
         'span-name',
         spanContext,
         SpanKind.CLIENT
@@ -69,6 +82,7 @@ describe('SimpleSpanProcessor', () => {
       };
       const span = new Span(
         provider.getTracer('default'),
+        ROOT_CONTEXT,
         'span-name',
         spanContext,
         SpanKind.CLIENT
@@ -81,6 +95,50 @@ describe('SimpleSpanProcessor', () => {
 
       await processor.shutdown();
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
+    });
+
+    it('should call globalErrorHandler when exporting fails', async () => {
+      const expectedError = new Error('Exporter failed');
+      const processor = new SimpleSpanProcessor(exporter);
+      const spanContext: SpanContext = {
+        traceId: 'a3cda95b652f4a1592b449d5929fda1b',
+        spanId: '5e0c63257de34c92',
+        traceFlags: TraceFlags.NONE,
+      };
+      const span = new Span(
+        provider.getTracer('default'),
+        ROOT_CONTEXT,
+        'span-name',
+        spanContext,
+        SpanKind.CLIENT
+      );
+
+      sinon.stub(exporter, 'export').callsFake((_, callback) => {
+        setTimeout(() => {
+          callback({ code: ExportResultCode.FAILED, error: expectedError });
+        }, 0);
+      });
+
+      const errorHandlerSpy = sinon.spy();
+
+      setGlobalErrorHandler(errorHandlerSpy);
+
+      processor.onEnd(span);
+
+      await new Promise(resolve => {
+        setTimeout(() => {
+          resolve();
+        }, 0);
+      });
+
+      assert.strictEqual(errorHandlerSpy.callCount, 1);
+
+      const [[error]] = errorHandlerSpy.args;
+
+      assert.deepStrictEqual(error, expectedError);
+
+      //reset global error handler
+      setGlobalErrorHandler(loggingErrorHandler());
     });
   });
 
@@ -125,6 +183,7 @@ describe('SimpleSpanProcessor', () => {
       };
       const span = new Span(
         provider.getTracer('default'),
+        ROOT_CONTEXT,
         'span-name',
         spanContext,
         SpanKind.CLIENT

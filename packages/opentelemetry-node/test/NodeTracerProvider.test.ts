@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { context, TraceFlags, setActiveSpan } from '@opentelemetry/api';
+import {
+  context,
+  TraceFlags,
+  setActiveSpan,
+  setExtractedSpanContext,
+} from '@opentelemetry/api';
 import {
   AlwaysOnSampler,
   AlwaysOffSampler,
@@ -26,7 +31,7 @@ import { Span } from '@opentelemetry/tracing';
 import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as path from 'path';
-import { ContextManager } from '@opentelemetry/context-base';
+import { ContextManager, ROOT_CONTEXT } from '@opentelemetry/context-base';
 import { NodeTracerProvider } from '../src/NodeTracerProvider';
 
 const sleep = (time: number) =>
@@ -160,15 +165,15 @@ describe('NodeTracerProvider', () => {
         logger: new NoopLogger(),
       });
 
-      const sampledParent = provider
-        .getTracer('default')
-        .startSpan('not-sampled-span', {
-          parent: {
-            traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-            spanId: '6e0c63257de34c92',
-            traceFlags: TraceFlags.NONE,
-          },
-        });
+      const sampledParent = provider.getTracer('default').startSpan(
+        'not-sampled-span',
+        {},
+        setExtractedSpanContext(ROOT_CONTEXT, {
+          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+          spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
+        })
+      );
       assert.ok(sampledParent instanceof Span);
       assert.strictEqual(
         sampledParent.context().traceFlags,
@@ -176,9 +181,13 @@ describe('NodeTracerProvider', () => {
       );
       assert.strictEqual(sampledParent.isRecording(), true);
 
-      const span = provider.getTracer('default').startSpan('child-span', {
-        parent: sampledParent,
-      });
+      const span = provider
+        .getTracer('default')
+        .startSpan(
+          'child-span',
+          {},
+          setActiveSpan(ROOT_CONTEXT, sampledParent)
+        );
       assert.ok(span instanceof Span);
       assert.strictEqual(span.context().traceFlags, TraceFlags.SAMPLED);
       assert.strictEqual(span.isRecording(), true);
