@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { CanonicalCode, Status } from '@opentelemetry/api';
+import { StatusCode, Status } from '@opentelemetry/api';
 import * as grpcTypes from 'grpc'; // For types only
 import { IgnoreMatcher } from './types';
 
@@ -34,20 +34,20 @@ export const findIndex: <T>(args: T[], fn: (arg: T) => boolean) => number = (
 };
 
 /**
- * Convert a grpc status code to an opentelemetry Canonical code. For now, the enums are exactly the same
+ * Convert a grpc status code to an opentelemetry Status code.
  * @param status
  */
-export const _grpcStatusCodeToCanonicalCode = (
+export const _grpcStatusCodeToOpenTelemetryStatusCode = (
   status?: grpcTypes.status
-): CanonicalCode => {
-  if (status !== 0 && !status) {
-    return CanonicalCode.UNKNOWN;
+): StatusCode => {
+  if (status !== undefined && status === 0) {
+    return StatusCode.OK;
   }
-  return status as number;
+  return StatusCode.ERROR;
 };
 
 export const _grpcStatusCodeToSpanStatus = (status: number): Status => {
-  return { code: status };
+  return { code: _grpcStatusCodeToOpenTelemetryStatusCode(status) };
 };
 
 /**

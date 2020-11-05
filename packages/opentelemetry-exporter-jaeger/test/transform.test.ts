@@ -40,7 +40,7 @@ describe('transform', () => {
         endTime: [1566156731, 709],
         ended: true,
         status: {
-          code: api.CanonicalCode.OK,
+          code: api.StatusCode.OK,
         },
         attributes: {
           testBool: true,
@@ -165,7 +165,7 @@ describe('transform', () => {
         endTime: [1566156731, 709],
         ended: true,
         status: {
-          code: api.CanonicalCode.DATA_LOSS,
+          code: api.StatusCode.ERROR,
           message: 'data loss',
         },
         attributes: {},
@@ -202,10 +202,10 @@ describe('transform', () => {
       const [tag1, tag2, tag3, tag4, tag5] = thriftSpan.tags;
       assert.strictEqual(tag1.key, 'status.code');
       assert.strictEqual(tag1.vType, 'DOUBLE');
-      assert.strictEqual(tag1.vDouble, 15);
+      assert.strictEqual(tag1.vDouble, 2);
       assert.strictEqual(tag2.key, 'status.name');
       assert.strictEqual(tag2.vType, 'STRING');
-      assert.strictEqual(tag2.vStr, 'DATA_LOSS');
+      assert.strictEqual(tag2.vStr, 'ERROR');
       assert.strictEqual(tag3.key, 'status.message');
       assert.strictEqual(tag3.vType, 'STRING');
       assert.strictEqual(tag3.vStr, 'data loss');
@@ -227,7 +227,7 @@ describe('transform', () => {
         endTime: [1566156731, 709],
         ended: true,
         status: {
-          code: api.CanonicalCode.OK,
+          code: api.StatusCode.OK,
         },
         attributes: {},
         parentSpanId: '3e0c63257de34c92',
@@ -277,7 +277,7 @@ describe('transform', () => {
         endTime: [1566156731, 709],
         ended: true,
         status: {
-          code: api.CanonicalCode.DATA_LOSS,
+          code: api.StatusCode.ERROR,
           message: 'data loss',
         },
         attributes: {},

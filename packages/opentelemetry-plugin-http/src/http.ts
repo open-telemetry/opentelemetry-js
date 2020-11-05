@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import {
-  CanonicalCode,
+  StatusCode,
   context,
   propagation,
   Span,
@@ -220,7 +220,7 @@ export class HttpPlugin extends BasePlugin<Http> {
           let status: Status;
 
           if (response.aborted && !response.complete) {
-            status = { code: CanonicalCode.ABORTED };
+            status = { code: StatusCode.ERROR };
           } else {
             status = utils.parseResponseStatus(response.statusCode!);
           }

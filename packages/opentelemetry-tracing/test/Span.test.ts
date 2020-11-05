@@ -15,7 +15,7 @@
  */
 
 import {
-  CanonicalCode,
+  StatusCode,
   Exception,
   LinkContext,
   ROOT_CONTEXT,
@@ -357,7 +357,7 @@ describe('Span', () => {
       SpanKind.CLIENT
     );
     span.setStatus({
-      code: CanonicalCode.PERMISSION_DENIED,
+      code: StatusCode.ERROR,
       message: 'This is an error',
     });
     span.end();
@@ -379,7 +379,7 @@ describe('Span', () => {
     assert.strictEqual(span.parentSpanId, parentId);
     assert.strictEqual(span.spanContext.traceId, spanContext.traceId);
     assert.deepStrictEqual(span.status, {
-      code: CanonicalCode.OK,
+      code: StatusCode.UNSET,
     });
     assert.deepStrictEqual(span.attributes, {});
     assert.deepStrictEqual(span.links, []);
@@ -491,19 +491,19 @@ describe('Span', () => {
       SpanKind.CLIENT
     );
     span.setStatus({
-      code: CanonicalCode.PERMISSION_DENIED,
+      code: StatusCode.ERROR,
       message: 'This is an error',
     });
-    assert.strictEqual(span.status.code, CanonicalCode.PERMISSION_DENIED);
+    assert.strictEqual(span.status.code, StatusCode.ERROR);
     assert.strictEqual(span.status.message, 'This is an error');
     span.end();
 
     // shouldn't update status
     span.setStatus({
-      code: CanonicalCode.OK,
+      code: StatusCode.OK,
       message: 'OK',
     });
-    assert.strictEqual(span.status.code, CanonicalCode.PERMISSION_DENIED);
+    assert.strictEqual(span.status.code, StatusCode.ERROR);
   });
 
   it('should only end a span once', () => {

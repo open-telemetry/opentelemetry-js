@@ -51,7 +51,7 @@ export class Span implements api.Span, ReadableSpan {
   readonly instrumentationLibrary: InstrumentationLibrary;
   name: string;
   status: api.Status = {
-    code: api.CanonicalCode.OK,
+    code: api.StatusCode.UNSET,
   };
   endTime: api.HrTime = [0, 0];
   private _ended = false;
