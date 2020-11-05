@@ -29,6 +29,7 @@ import {
   ensureProtoSpanIsCorrect,
   mockedReadableSpan,
 } from './helper';
+import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 
 const fakeRequest = {
   end: function () {},
@@ -123,7 +124,6 @@ describe('CollectorTraceExporter - node with proto over http', () => {
     });
 
     it('should log the successful message', done => {
-      const spyLoggerDebug = sinon.stub(collectorExporter.logger, 'debug');
       const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
 
       const responseSpy = sinon.spy();
@@ -134,25 +134,15 @@ describe('CollectorTraceExporter - node with proto over http', () => {
         const callback = args[1];
         callback(mockRes);
         setTimeout(() => {
-          const response: any = spyLoggerDebug.args[1][0];
-          assert.strictEqual(response, 'statusCode: 200');
+          const result = responseSpy.args[0][0] as ExportResult;
+          assert.strictEqual(result.code, ExportResultCode.SUCCESS);
           assert.strictEqual(spyLoggerError.args.length, 0);
-          assert.strictEqual(responseSpy.args[0][0], 0);
           done();
         });
       }, waitTimeMS);
     });
 
     it('should log the error message', done => {
-      const spyLoggerError = sinon.spy();
-      const handler = core.loggingErrorHandler({
-        debug: sinon.fake(),
-        info: sinon.fake(),
-        warn: sinon.fake(),
-        error: spyLoggerError,
-      });
-      core.setGlobalErrorHandler(handler);
-
       const responseSpy = sinon.spy();
       collectorExporter.export(spans, responseSpy);
 
@@ -161,10 +151,10 @@ describe('CollectorTraceExporter - node with proto over http', () => {
         const callback = args[1];
         callback(mockResError);
         setTimeout(() => {
-          const response = spyLoggerError.args[0][0] as string;
-
-          assert.ok(response.includes('"code":"400"'));
-          assert.strictEqual(responseSpy.args[0][0], 1);
+          const result = responseSpy.args[0][0] as ExportResult;
+          assert.strictEqual(result.code, ExportResultCode.FAILED);
+          // @ts-expect-error
+          assert.strictEqual(result.error.code, 400);
           done();
         });
       }, waitTimeMS);

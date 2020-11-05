@@ -21,7 +21,7 @@ import {
   BasicTracerProvider,
 } from '../../src';
 import { context, setActiveSpan } from '@opentelemetry/api';
-import { ExportResult } from '@opentelemetry/core';
+import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 
 describe('InMemorySpanExporter', () => {
   let memoryExporter: InMemorySpanExporter;
@@ -83,7 +83,7 @@ describe('InMemorySpanExporter', () => {
   it('should return the success result', () => {
     const exorter = new InMemorySpanExporter();
     exorter.export([], (result: ExportResult) => {
-      assert.strictEqual(result, ExportResult.SUCCESS);
+      assert.strictEqual(result.code, ExportResultCode.SUCCESS);
     });
   });
 
@@ -93,7 +93,7 @@ describe('InMemorySpanExporter', () => {
 
     // after shutdown export should fail
     exorter.export([], (result: ExportResult) => {
-      assert.strictEqual(result, ExportResult.FAILED_NOT_RETRYABLE);
+      assert.strictEqual(result.code, ExportResultCode.FAILED);
     });
   });
 });

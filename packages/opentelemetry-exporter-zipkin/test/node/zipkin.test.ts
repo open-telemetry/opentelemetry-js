@@ -16,14 +16,12 @@
 
 import * as assert from 'assert';
 import * as nock from 'nock';
-import * as sinon from 'sinon';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import {
   ExportResult,
   NoopLogger,
   hrTimeToMicroseconds,
-  setGlobalErrorHandler,
-  loggingErrorHandler,
+  ExportResultCode,
 } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
@@ -118,7 +116,7 @@ describe('Zipkin Exporter - node', () => {
       });
 
       exporter.export([], (result: ExportResult) => {
-        assert.strictEqual(result, ExportResult.SUCCESS);
+        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
       });
     });
 
@@ -195,7 +193,7 @@ describe('Zipkin Exporter - node', () => {
 
       exporter.export([span1, span2], (result: ExportResult) => {
         scope.done();
-        assert.strictEqual(result, ExportResult.SUCCESS);
+        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
         assert.deepStrictEqual(requestBody, [
           // Span 1
           {
@@ -252,11 +250,11 @@ describe('Zipkin Exporter - node', () => {
 
       exporter.export([getReadableSpan()], (result: ExportResult) => {
         scope.done();
-        assert.strictEqual(result, ExportResult.SUCCESS);
+        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
       });
     });
 
-    it('should return FailedNonRetryable with 4xx', () => {
+    it('should return Failed result with 4xx', () => {
       const scope = nock('http://localhost:9411')
         .post('/api/v2/spans')
         .reply(400);
@@ -268,11 +266,11 @@ describe('Zipkin Exporter - node', () => {
 
       exporter.export([getReadableSpan()], (result: ExportResult) => {
         scope.done();
-        assert.strictEqual(result, ExportResult.FAILED_NOT_RETRYABLE);
+        assert.strictEqual(result.code, ExportResultCode.FAILED);
       });
     });
 
-    it('should return FailedRetryable with 5xx', () => {
+    it('should return failed result with 5xx', () => {
       const scope = nock('http://localhost:9411')
         .post('/api/v2/spans')
         .reply(500);
@@ -284,11 +282,11 @@ describe('Zipkin Exporter - node', () => {
 
       exporter.export([getReadableSpan()], (result: ExportResult) => {
         scope.done();
-        assert.strictEqual(result, ExportResult.FAILED_RETRYABLE);
+        assert.strictEqual(result.code, ExportResultCode.FAILED);
       });
     });
 
-    it('should return FailedRetryable with socket error', () => {
+    it('should return failed result with socket error', () => {
       const scope = nock('http://localhost:9411')
         .post('/api/v2/spans')
         .replyWithError(new Error('My Socket Error'));
@@ -300,11 +298,11 @@ describe('Zipkin Exporter - node', () => {
 
       exporter.export([getReadableSpan()], (result: ExportResult) => {
         scope.done();
-        assert.strictEqual(result, ExportResult.FAILED_RETRYABLE);
+        assert.strictEqual(result.code, ExportResultCode.FAILED);
       });
     });
 
-    it('should return FailedNonRetryable after shutdown', done => {
+    it('should return failed result after shutdown', done => {
       const exporter = new ZipkinExporter({
         serviceName: 'my-service',
         logger: new NoopLogger(),
@@ -313,7 +311,7 @@ describe('Zipkin Exporter - node', () => {
       exporter.shutdown();
 
       exporter.export([getReadableSpan()], (result: ExportResult) => {
-        assert.strictEqual(result, ExportResult.FAILED_NOT_RETRYABLE);
+        assert.strictEqual(result.code, ExportResultCode.FAILED);
         done();
       });
     });
@@ -468,8 +466,6 @@ describe('Zipkin Exporter - node', () => {
       });
 
       it('should call globalErrorHandler on error', () => {
-        const errorHandlerSpy = sinon.spy();
-        setGlobalErrorHandler(errorHandlerSpy);
         const expectedError = new Error('Whoops');
         const scope = nock('http://localhost:9411')
           .post('/api/v2/spans')
@@ -481,14 +477,10 @@ describe('Zipkin Exporter - node', () => {
         });
 
         exporter.export([getReadableSpan()], (result: ExportResult) => {
+          assert.deepStrictEqual(result.code, ExportResultCode.FAILED);
+          assert.deepStrictEqual(result.error, expectedError);
           scope.done();
         });
-
-        const [[error]] = errorHandlerSpy.args;
-
-        assert.strictEqual(errorHandlerSpy.callCount, 1);
-        assert.strictEqual(error, expectedError);
-        setGlobalErrorHandler(loggingErrorHandler());
       });
     });
   });
