@@ -251,11 +251,15 @@ export const setResponseContentLengthAttribute = (
   if (isCompressed(response.headers)) {
     attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH] = length;
   } else {
-    attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED] = length;
+    attributes[
+      HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED
+    ] = length;
   }
 };
 
-function getContentLength(headers: OutgoingHttpHeaders | IncomingHttpHeaders) : number | null {
+function getContentLength(
+  headers: OutgoingHttpHeaders | IncomingHttpHeaders
+): number | null {
   const contentLengthHeader = headers['content-length'];
   if (contentLengthHeader === undefined) return null;
 
@@ -265,11 +269,13 @@ function getContentLength(headers: OutgoingHttpHeaders | IncomingHttpHeaders) : 
   return contentLength;
 }
 
-export const isCompressed = (headers: OutgoingHttpHeaders | IncomingHttpHeaders) : Boolean => {
+export const isCompressed = (
+  headers: OutgoingHttpHeaders | IncomingHttpHeaders
+): boolean => {
   const encoding = headers['content-encoding'];
 
-  return !!encoding && encoding != 'identity'
-}
+  return !!encoding && encoding != 'identity';
+};
 
 /**
  * Makes sure options is an url object

@@ -344,7 +344,7 @@ describe('Utility', () => {
       const request = {} as IncomingMessage;
 
       request.headers = {
-        'content-length': '1200'
+        'content-length': '1200',
       };
       utils.setRequestContentLengthAttribute(request, attributes);
 
@@ -360,7 +360,7 @@ describe('Utility', () => {
       const request = {} as IncomingMessage;
       request.headers = {
         'content-length': '1200',
-        'content-encoding': 'identity'
+        'content-encoding': 'identity',
       };
       utils.setRequestContentLengthAttribute(request, attributes);
 
@@ -375,8 +375,8 @@ describe('Utility', () => {
       const attributes: Attributes = {};
       const request = {} as IncomingMessage;
       request.headers = {
-        "content-length": "1200",
-        "content-encoding": "gzip"
+        'content-length': '1200',
+        'content-encoding': 'gzip',
       };
       utils.setRequestContentLengthAttribute(request, attributes);
 
@@ -386,16 +386,16 @@ describe('Utility', () => {
         1200
       );
     });
-  })
+  });
 
   describe('setResponseContentLengthAttributes()', () => {
     it('should set response content-length uncompressed attribute with no content-encoding header', () => {
       const attributes: Attributes = {};
 
       const response = {} as IncomingMessage;
-      
+
       response.headers = {
-        "content-length": "1200"
+        'content-length': '1200',
       };
       utils.setResponseContentLengthAttribute(response, attributes);
 
@@ -408,12 +408,12 @@ describe('Utility', () => {
 
     it('should set response content-length uncompressed attribute with "identity" content-encoding header', () => {
       const attributes: Attributes = {};
-      
+
       const response = {} as IncomingMessage;
 
       response.headers = {
-        "content-length": "1200",
-        "content-encoding": "identity"
+        'content-length': '1200',
+        'content-encoding': 'identity',
       };
 
       utils.setResponseContentLengthAttribute(response, attributes);
@@ -427,12 +427,12 @@ describe('Utility', () => {
 
     it('should set response content-length compressed attribute with "gzip" content-encoding header', () => {
       const attributes: Attributes = {};
-      
+
       const response = {} as IncomingMessage;
 
       response.headers = {
-        "content-length": "1200",
-        "content-encoding": "gzip"
+        'content-length': '1200',
+        'content-encoding': 'gzip',
       };
 
       utils.setResponseContentLengthAttribute(response, attributes);
@@ -449,7 +449,7 @@ describe('Utility', () => {
       const message = {} as IncomingMessage;
 
       message.headers = {
-        "content-encoding": "gzip"
+        'content-encoding': 'gzip',
       };
       utils.setResponseContentLengthAttribute(message, attributes);
 
