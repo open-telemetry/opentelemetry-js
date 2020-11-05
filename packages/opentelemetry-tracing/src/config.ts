@@ -16,13 +16,6 @@
 
 import { AlwaysOnSampler, getEnv } from '@opentelemetry/core';
 
-/** Default limit for Message events per span */
-export const DEFAULT_MAX_EVENTS_PER_SPAN = 128;
-/** Default limit for Attributes per span */
-export const DEFAULT_MAX_ATTRIBUTES_PER_SPAN = 32;
-/** Default limit for Links per span */
-export const DEFAULT_MAX_LINKS_PER_SPAN = 32;
-
 /**
  * Default configuration. For fields with primitive values, any user-provided
  * value will override the corresponding default value. For fields with
@@ -33,9 +26,9 @@ export const DEFAULT_CONFIG = {
   logLevel: getEnv().OTEL_LOG_LEVEL,
   sampler: new AlwaysOnSampler(),
   traceParams: {
-    numberOfAttributesPerSpan: DEFAULT_MAX_ATTRIBUTES_PER_SPAN,
-    numberOfLinksPerSpan: DEFAULT_MAX_LINKS_PER_SPAN,
-    numberOfEventsPerSpan: DEFAULT_MAX_EVENTS_PER_SPAN,
+    numberOfAttributesPerSpan: getEnv().OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT,
+    numberOfLinksPerSpan: getEnv().OTEL_SPAN_LINK_COUNT_LIMIT,
+    numberOfEventsPerSpan: getEnv().OTEL_SPAN_EVENT_COUNT_LIMIT,
   },
   gracefulShutdown: true,
 };

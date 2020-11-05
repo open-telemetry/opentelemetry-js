@@ -39,6 +39,10 @@ const performanceTimeOrigin = hrTime();
 describe('Span', () => {
   const tracer = new BasicTracerProvider({
     logger: new NoopLogger(),
+    traceParams: {
+      numberOfAttributesPerSpan: 100,
+      numberOfEventsPerSpan: 100,
+    },
   }).getTracer('default');
   const name = 'span1';
   const spanContext: SpanContext = {
@@ -327,7 +331,7 @@ describe('Span', () => {
     span.end();
   });
 
-  it('should drop extra links, attributes and events', () => {
+  it('should drop extra attributes and events', () => {
     const span = new Span(
       tracer,
       ROOT_CONTEXT,
@@ -341,8 +345,8 @@ describe('Span', () => {
     }
     span.end();
 
-    assert.strictEqual(span.events.length, 128);
-    assert.strictEqual(Object.keys(span.attributes).length, 32);
+    assert.strictEqual(span.events.length, 100);
+    assert.strictEqual(Object.keys(span.attributes).length, 100);
     assert.strictEqual(span.events[span.events.length - 1].name, 'sent149');
     assert.strictEqual(span.attributes['foo0'], undefined);
     assert.strictEqual(span.attributes['foo149'], 'bar149');
