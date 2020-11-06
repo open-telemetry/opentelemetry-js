@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import {
-  CanonicalCode,
+  StatusCode,
   context,
   propagation,
   Span as ISpan,
@@ -598,7 +598,7 @@ describe('HttpPlugin', () => {
           const spans = memoryExporter.getFinishedSpans();
           const [span] = spans;
           assert.strictEqual(spans.length, 1);
-          assert.strictEqual(span.status.code, CanonicalCode.ABORTED);
+          assert.strictEqual(span.status.code, StatusCode.ERROR);
           assert.ok(Object.keys(span.attributes).length >= 6);
         }
       });
@@ -636,7 +636,7 @@ describe('HttpPlugin', () => {
           const spans = memoryExporter.getFinishedSpans();
           const [span] = spans;
           assert.strictEqual(spans.length, 1);
-          assert.strictEqual(span.status.code, CanonicalCode.ABORTED);
+          assert.strictEqual(span.status.code, StatusCode.ERROR);
           assert.ok(Object.keys(span.attributes).length > 7);
         }
       });
@@ -670,7 +670,7 @@ describe('HttpPlugin', () => {
               span.attributes[HttpAttribute.HTTP_STATUS_CODE],
               404
             );
-            assert.strictEqual(span.status.code, CanonicalCode.NOT_FOUND);
+            assert.strictEqual(span.status.code, StatusCode.ERROR);
             done();
           });
         });

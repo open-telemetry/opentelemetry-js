@@ -96,7 +96,7 @@ describe('transform', () => {
         tags: {
           key1: 'value1',
           key2: 'value2',
-          [statusCodeTagName]: 'OK',
+          [statusCodeTagName]: 'UNSET',
           'telemetry.sdk.language': language,
           'telemetry.sdk.name': 'opentelemetry',
           'telemetry.sdk.version': VERSION,
@@ -134,7 +134,7 @@ describe('transform', () => {
         name: span.name,
         parentId: undefined,
         tags: {
-          [statusCodeTagName]: 'OK',
+          [statusCodeTagName]: 'UNSET',
           'telemetry.sdk.language': language,
           'telemetry.sdk.name': 'opentelemetry',
           'telemetry.sdk.version': VERSION,
@@ -182,7 +182,7 @@ describe('transform', () => {
           name: span.name,
           parentId: undefined,
           tags: {
-            [statusCodeTagName]: 'OK',
+            [statusCodeTagName]: 'UNSET',
             'telemetry.sdk.language': language,
             'telemetry.sdk.name': 'opentelemetry',
             'telemetry.sdk.version': VERSION,
@@ -219,7 +219,7 @@ describe('transform', () => {
       assert.deepStrictEqual(tags, {
         key1: 'value1',
         key2: 'value2',
-        [statusCodeTagName]: 'OK',
+        [statusCodeTagName]: 'UNSET',
         cost: '112.12',
         service: 'ui',
         version: '1',
@@ -235,7 +235,7 @@ describe('transform', () => {
         parentId
       );
       const status: api.Status = {
-        code: api.CanonicalCode.ABORTED,
+        code: api.StatusCode.ERROR,
       };
       span.setStatus(status);
       span.setAttributes({
@@ -253,7 +253,7 @@ describe('transform', () => {
       assert.deepStrictEqual(tags, {
         key1: 'value1',
         key2: 'value2',
-        [statusCodeTagName]: 'ABORTED',
+        [statusCodeTagName]: 'ERROR',
       });
     });
     it('should map OpenTelemetry Status.message to a Zipkin tag', () => {
@@ -266,7 +266,7 @@ describe('transform', () => {
         parentId
       );
       const status: api.Status = {
-        code: api.CanonicalCode.ABORTED,
+        code: api.StatusCode.ERROR,
         message: 'my-message',
       };
       span.setStatus(status);
@@ -285,7 +285,7 @@ describe('transform', () => {
       assert.deepStrictEqual(tags, {
         key1: 'value1',
         key2: 'value2',
-        [statusCodeTagName]: 'ABORTED',
+        [statusCodeTagName]: 'ERROR',
         [statusDescriptionTagName]: status.message,
       });
     });

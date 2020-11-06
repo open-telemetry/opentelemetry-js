@@ -93,7 +93,3 @@ export interface Err extends Error {
   syscall?: string;
   stack?: string;
 }
-
-export interface SpecialHttpStatusCodeMapping {
-  [custom: number]: number;
-}
