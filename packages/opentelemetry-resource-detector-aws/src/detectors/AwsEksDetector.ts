@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-
 import {
-    Detector,
-    Resource,
-    CONTAINER_RESOURCE,
-    K8S_RESOURCE,
-    ResourceDetectionConfigWithLogger,
-  } from '@opentelemetry/resources';
-  import * as https from 'https';
-  import * as fs from 'fs';
-  import * as util from 'util';
+  Detector,
+  Resource,
+  CONTAINER_RESOURCE,
+  K8S_RESOURCE,
+  ResourceDetectionConfigWithLogger,
+} from '@opentelemetry/resources';
+import * as https from 'https';
+import * as fs from 'fs';
+import * as util from 'util';
 
-  /**
+/**
  * The AwsEksDetector can be used to detect if a process is running in AWS Elastic
  * Kubernetes and return a {@link Resource} populated with data about the Kubernetes
  * plugins of AWS X-Ray. Returns an empty Resource if detection fails.
@@ -34,111 +33,148 @@ import {
  * See https://docs.amazonaws.cn/en_us/xray/latest/devguide/xray-guide.pdf
  * for more details about detecting information for Elastic Kubernetes plugins
  */
-  
+
 export class AwsEksDetector implements Detector {
-    readonly K8S_SVC_URL = "https://kubernetes.default.svc";
-    readonly K8S_TOKEN_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/token";
-    readonly K8S_CERT_PATH = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt";
-    readonly AUTH_CONFIGMAP_PATH ="/api/v1/namespaces/kube-system/configmaps/aws-auth";
-    readonly CW_CONFIGMAP_PATH = "/api/v1/namespaces/amazon-cloudwatch/configmaps/cluster-info";
-    readonly CONTAINER_ID_LENGTH = 64;
-    readonly DEFAULT_CGROUP_PATH = "/proc/self/cgroup";
-    readonly MILLISECOND_TIME_OUT = 2000;
+  readonly K8S_SVC_URL = 'kubernetes.default.svc';
+  readonly K8S_TOKEN_PATH =
+    '/var/run/secrets/kubernetes.io/serviceaccount/token';
+  readonly K8S_CERT_PATH =
+    '/var/run/secrets/kubernetes.io/serviceaccount/ca.crt';
+  readonly AUTH_CONFIGMAP_PATH =
+    '/api/v1/namespaces/kube-system/configmaps/aws-auth';
+  readonly CW_CONFIGMAP_PATH =
+    '/api/v1/namespaces/amazon-cloudwatch/configmaps/cluster-info';
+  readonly CONTAINER_ID_LENGTH = 64;
+  readonly DEFAULT_CGROUP_PATH = '/proc/self/cgroup';
+  readonly MILLISECOND_TIME_OUT = 2000;
 
-    private static readFileAsync = util.promisify(fs.readFile);
-    private static fileAccessAsync = util.promisify(fs.access);
-  
-    async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
-      try {
-        await AwsEksDetector.fileAccessAsync(this.K8S_TOKEN_PATH);
-        await AwsEksDetector.fileAccessAsync(this.K8S_CERT_PATH);
-        
-        if (!this._isEks(config)) {
-          config.logger.debug('AwsEcsDetector failed: Process is not running on Eks');
-          return Resource.empty();
-        }
-      
-        const containerId = await this._getContainerId(config);
-        const clusterName = await this._getClusterName(config);
+  private static readFileAsync = util.promisify(fs.readFile);
+  private static fileAccessAsync = util.promisify(fs.access);
 
-        return !containerId && !clusterName
-        ? Resource.empty()
-        : new Resource({
-          [K8S_RESOURCE.CLUSTER_NAME]: clusterName || '',
-          [CONTAINER_RESOURCE.ID]: containerId || '',
-        });
-      } catch (e) {
-        config.logger.warn('Not running on K8S');
+  /**
+   * The AWSEksDetector can be used to detect if a process is running in AWS
+   * Eks and returns a promise containing a {@link Resource}
+   * populated with instance metadata. Returns a promise containing an
+   * empty {@link Resource} if the connection to kubernetes process
+   * or aws config maps fails
+   * @param config The resource detection config with a required logger
+   */
+  async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
+    try {
+      await AwsEksDetector.fileAccessAsync(this.K8S_TOKEN_PATH);
+      const k8Scert = await AwsEksDetector.readFileAsync(this.K8S_CERT_PATH);
+
+      if (!this._isEks(config, k8Scert)) {
         return Resource.empty();
       }
+
+      const containerId = await this._getContainerId(config);
+      const clusterName = await this._getClusterName(config, k8Scert);
+
+      return !containerId && !clusterName
+        ? Resource.empty()
+        : new Resource({
+            [K8S_RESOURCE.CLUSTER_NAME]: clusterName || '',
+            [CONTAINER_RESOURCE.ID]: containerId || '',
+          });
+    } catch (e) {
+      config.logger.warn('Not running on K8S');
+      return Resource.empty();
     }
+  }
 
-    private async _isEks(config: ResourceDetectionConfigWithLogger): Promise<boolean> {
-      const options = {
-        hostname: this.K8S_SVC_URL,
-        path: this.AUTH_CONFIGMAP_PATH,
-        method: 'GET',
-        timeout: this.MILLISECOND_TIME_OUT,
-        HEADERS: {
-          "Authorization" : this._getK8sCredHeader(config),
-        },
-        ca: JSON.stringify(AwsEksDetector.readFileAsync(this.K8S_CERT_PATH)),
-      }
-      const awsAuth = this._fetchString(options);
-      return !!awsAuth;
+  /**
+   * Attempts to make a connection to AWS Config map which will
+   * determine whether the process is running on an Eks
+   * process if the config map is empty or not
+   * @param config The resource detection config with a required logger
+   */
+  private async _isEks(
+    config: ResourceDetectionConfigWithLogger,
+    k8scert: Buffer
+  ): Promise<boolean> {
+    const options = {
+      hostname: this.K8S_SVC_URL,
+      path: this.AUTH_CONFIGMAP_PATH,
+      method: 'GET',
+      timeout: this.MILLISECOND_TIME_OUT,
+      headers: {
+        Authorization: await this._getK8sCredHeader(config),
+      },
+      ca: k8scert,
+    };
+    return !!(await this._fetchString(options));
+  }
+
+  /**
+   * Attempts to make a connection to Amazon Cloudwatch
+   * Config Maps to grab cluster name
+   * @param config The resource detection config with a required logger
+   */
+  private async _getClusterName(
+    config: ResourceDetectionConfigWithLogger,
+    k8scert: Buffer
+  ): Promise<string | undefined> {
+    const options = {
+      host: this.K8S_SVC_URL,
+      path: this.CW_CONFIGMAP_PATH,
+      method: 'GET',
+      timeout: this.MILLISECOND_TIME_OUT,
+      headers: {
+        Authorization: await this._getK8sCredHeader(config),
+      },
+      ca: k8scert,
+    };
+    return await this._fetchString(options);
+  }
+  /**
+   * Reads the Kubernetes token path and returns kubernetes
+   * credential header
+   * @param config The resource detection config with a required logger
+   */
+  private async _getK8sCredHeader(
+    config: ResourceDetectionConfigWithLogger
+  ): Promise<string> {
+    try {
+      const content = await AwsEksDetector.readFileAsync(
+        this.K8S_TOKEN_PATH,
+        'utf8'
+      );
+      return 'Bearer ' + content;
+    } catch (e) {
+      config.logger.warn('Unable to load K8s client token.', e);
     }
+    return '';
+  }
 
-     private async _getClusterName(config: ResourceDetectionConfigWithLogger): Promise<string | undefined> {
-        const options = {
-        host: this.K8S_SVC_URL,
-        path: this.CW_CONFIGMAP_PATH,
-        method: 'GET',
-        timeout: this.MILLISECOND_TIME_OUT,
-        HEADERS: {
-          "Authorization" : this._getK8sCredHeader(config),
-        },
-        ca: JSON.stringify(AwsEksDetector.readFileAsync(this.K8S_CERT_PATH)),
-      }
-        return this._fetchString(options);
-     }
-
-     private async _getK8sCredHeader(config: ResourceDetectionConfigWithLogger): Promise<string> {
-        try {
-          const content = await AwsEksDetector.readFileAsync(
-              this.K8S_TOKEN_PATH,
-              'utf8'
-          );
-          return "Bearer " + content;
-        } catch (e) {
-            config.logger.warn(`AwsEksDetector failed to read container ID: ${e.message}`);
+  /**
+   * Read container ID from cgroup file
+   * In EKS, even if we fail to find target file
+   * or target file does not contain container ID
+   * we do not throw an error but throw warning message
+   * and then return null string
+   */
+  private async _getContainerId(
+    config: ResourceDetectionConfigWithLogger
+  ): Promise<string | undefined> {
+    try {
+      const rawData = await AwsEksDetector.readFileAsync(
+        this.DEFAULT_CGROUP_PATH,
+        'utf8'
+      );
+      const splitData = rawData.trim().split('\n');
+      for (const str of splitData) {
+        if (str.length > this.CONTAINER_ID_LENGTH) {
+          return str.substring(str.length - this.CONTAINER_ID_LENGTH);
         }
-        return "";
-    }
-
-    /**
-    * Read container ID from cgroup file
-    * In EKS, even if we fail to find target file
-    * or target file does not contain container ID
-    * we do not throw an error but throw warning message
-    * and then return null string
-    */
-    private async _getContainerId(config: ResourceDetectionConfigWithLogger): Promise<string | undefined> {
-        try {
-          const rawData = await AwsEksDetector.readFileAsync(
-            this.DEFAULT_CGROUP_PATH,
-            'utf8'
-          );
-          const splitData = rawData.trim().split('\n');
-          for (const str of splitData) {
-            if (str.length > this.CONTAINER_ID_LENGTH) {
-              return str.substring(str.length - this.CONTAINER_ID_LENGTH);
-              }
-            }
-          } catch (e) {
-            config.logger.warn(`AwsEksDetector failed to read container ID: ${e.message}`);
-          }
-        return undefined;
       }
+    } catch (e) {
+      config.logger.warn(
+        `AwsEksDetector failed to read container ID: ${e.message}`
+      );
+    }
+    return undefined;
+  }
 
   /**
    * Establishes an HTTP connection to AWS instance document url.
@@ -146,8 +182,10 @@ export class AwsEksDetector implements Detector {
    * to get back a valid JSON document. Parses that document and stores
    * the identity properties in a local map.
    */
-  private async _fetchString(options: https.RequestOptions): Promise<string | undefined> {
-    return new Promise((resolve, reject) => {
+  private async _fetchString(
+    options: https.RequestOptions
+  ): Promise<string | undefined> {
+    return await new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         req.abort();
         reject(new Error('Eks metadata api request timed out.'));
@@ -179,7 +217,7 @@ export class AwsEksDetector implements Detector {
       });
       req.end();
     });
-  }  
+  }
 }
-  
-  export const awsEksDetector = new AwsEksDetector();
+
+export const awsEksDetector = new AwsEksDetector();
