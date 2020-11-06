@@ -67,9 +67,9 @@ export abstract class CollectorExporterNodeBase<
         _onFinish();
       };
       const _onFinish = () => {
+        resolve();
         const index = this._sendingPromises.indexOf(promise);
         this._sendingPromises.splice(index, 1);
-        resolve();
       };
       sendWithHttp(
         this,
