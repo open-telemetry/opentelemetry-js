@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { AlwaysOnSampler, ExportResult } from '@opentelemetry/core';
+import {
+  AlwaysOnSampler,
+  ExportResultCode,
+  loggingErrorHandler,
+  setGlobalErrorHandler,
+} from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
@@ -199,7 +204,7 @@ describe('BatchSpanProcessor', () => {
       let processor: BatchSpanProcessor;
 
       beforeEach(() => {
-        processor = new BatchSpanProcessor(exporter);
+        processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
         const span = createSampledSpan('test');
         processor.onStart(span);
         processor.onEnd(span);
@@ -219,7 +224,7 @@ describe('BatchSpanProcessor', () => {
         sinon.stub(exporter, 'export').callsFake((spans, callback) => {
           setTimeout(() => {
             exportedSpans = exportedSpans + spans.length;
-            callback(ExportResult.SUCCESS);
+            callback({ code: ExportResultCode.SUCCESS });
           }, 0);
         });
 
@@ -227,6 +232,41 @@ describe('BatchSpanProcessor', () => {
           assert.strictEqual(exportedSpans, 1);
           done();
         });
+      });
+
+      it('should call globalErrorHandler when exporting fails', async () => {
+        const expectedError = new Error('Exporter failed');
+        sinon.stub(exporter, 'export').callsFake((_, callback) => {
+          setTimeout(() => {
+            callback({ code: ExportResultCode.FAILED, error: expectedError });
+          }, 0);
+        });
+
+        const errorHandlerSpy = sinon.spy();
+
+        setGlobalErrorHandler(errorHandlerSpy);
+
+        // Cause a flush by emitting more spans then the default buffer size
+        for (let i = 0; i < defaultBufferConfig.bufferSize; i++) {
+          const span = createSampledSpan('test');
+          processor.onStart(span);
+          processor.onEnd(span);
+        }
+
+        await new Promise(resolve => {
+          setTimeout(() => {
+            resolve();
+          }, 0);
+        });
+
+        assert.strictEqual(errorHandlerSpy.callCount, 1);
+
+        const [[error]] = errorHandlerSpy.args;
+
+        assert.deepStrictEqual(error, expectedError);
+
+        //reset global error handler
+        setGlobalErrorHandler(loggingErrorHandler());
       });
     });
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import {
-  CanonicalCode,
+  StatusCode,
   context,
   propagation,
   Span,
@@ -155,7 +155,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       ...args: HttpRequestArgs
     ) => ClientRequest
   ) {
-    return (original: Func<ClientRequest>): Func<ClientRequest> => {
+    return (_original: Func<ClientRequest>): Func<ClientRequest> => {
       // Re-implement http.get. This needs to be done (instead of using
       // getPatchOutgoingRequestFunction to patch it) because we need to
       // set the trace context header before the returned ClientRequest is
@@ -220,7 +220,7 @@ export class HttpPlugin extends BasePlugin<Http> {
           let status: Status;
 
           if (response.aborted && !response.complete) {
-            status = { code: CanonicalCode.ABORTED };
+            status = { code: StatusCode.ERROR };
           } else {
             status = utils.parseResponseStatus(response.statusCode!);
           }
@@ -325,7 +325,7 @@ export class HttpPlugin extends BasePlugin<Http> {
           const originalEnd = response.end;
           response.end = function (
             this: ServerResponse,
-            ...args: ResponseEndArgs
+            ..._args: ResponseEndArgs
           ) {
             response.end = originalEnd;
             // Cannot pass args of type ResponseEndArgs,

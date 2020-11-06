@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-export enum ExportResult {
+export interface ExportResult {
+  code: ExportResultCode;
+  error?: Error;
+}
+
+export enum ExportResultCode {
   SUCCESS,
-  FAILED_NOT_RETRYABLE,
-  FAILED_RETRYABLE,
+  FAILED,
 }

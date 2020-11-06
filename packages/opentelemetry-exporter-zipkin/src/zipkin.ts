@@ -15,7 +15,11 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ExportResult, NoopLogger } from '@opentelemetry/core';
+import {
+  ExportResult,
+  ExportResultCode,
+  NoopLogger,
+} from '@opentelemetry/core';
 import { SpanExporter, ReadableSpan } from '@opentelemetry/tracing';
 import { prepareSend } from './platform/index';
 import * as zipkinTypes from './types';
@@ -66,7 +70,12 @@ export class ZipkinExporter implements SpanExporter {
     }
     this._logger.debug('Zipkin exporter export');
     if (this._isShutdown) {
-      setTimeout(() => resultCallback(ExportResult.FAILED_NOT_RETRYABLE));
+      setTimeout(() =>
+        resultCallback({
+          code: ExportResultCode.FAILED,
+          error: new Error('Exporter has been shutdown'),
+        })
+      );
       return;
     }
     const promise = new Promise(resolve => {

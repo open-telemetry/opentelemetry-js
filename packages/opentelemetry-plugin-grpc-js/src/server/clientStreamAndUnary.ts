@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { Span, CanonicalCode } from '@opentelemetry/api';
+import { Span, StatusCode } from '@opentelemetry/api';
 import type { ServerCallWithMeta, SendUnaryDataCallback } from '../types';
-import { grpcStatusCodeToCanonicalCode } from '../utils';
+import { grpcStatusCodeToOpenTelemetryStatusCode } from '../utils';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import type { GrpcJsPlugin } from '../grpcJs';
 import type * as grpcJs from '@grpc/grpc-js';
@@ -40,7 +40,7 @@ export function clientStreamAndUnaryHandler<RequestType, ResponseType>(
     if (err) {
       if (err.code) {
         span.setStatus({
-          code: grpcStatusCodeToCanonicalCode(err.code),
+          code: grpcStatusCodeToOpenTelemetryStatusCode(err.code),
           message: err.message,
         });
         span.setAttribute(RpcAttribute.GRPC_STATUS_CODE, err.code.toString());
@@ -50,10 +50,10 @@ export function clientStreamAndUnaryHandler<RequestType, ResponseType>(
         [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
       });
     } else {
-      span.setStatus({ code: CanonicalCode.OK });
+      span.setStatus({ code: StatusCode.OK });
       span.setAttribute(
         RpcAttribute.GRPC_STATUS_CODE,
-        CanonicalCode.OK.toString()
+        StatusCode.OK.toString()
       );
     }
 
