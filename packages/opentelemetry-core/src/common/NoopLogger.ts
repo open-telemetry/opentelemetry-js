@@ -19,14 +19,14 @@ import { Logger } from '@opentelemetry/api';
 /** No-op implementation of Logger */
 export class NoopLogger implements Logger {
   // By default does nothing
-  debug(message: string, ...args: unknown[]) {}
+  debug(_message: string, ..._args: unknown[]) {}
 
   // By default does nothing
-  error(message: string, ...args: unknown[]) {}
+  error(_message: string, ..._args: unknown[]) {}
 
   // By default does nothing
-  warn(message: string, ...args: unknown[]) {}
+  warn(_message: string, ..._args: unknown[]) {}
 
   // By default does nothing
-  info(message: string, ...args: unknown[]) {}
+  info(_message: string, ..._args: unknown[]) {}
 }

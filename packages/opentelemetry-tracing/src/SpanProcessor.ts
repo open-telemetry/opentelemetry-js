@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { Context } from '@opentelemetry/api';
 import { ReadableSpan } from './export/ReadableSpan';
 import { Span } from './Span';
 
@@ -32,7 +33,7 @@ export interface SpanProcessor {
    * returns true.
    * @param span the Span that just started.
    */
-  onStart(span: Span): void;
+  onStart(span: Span, parentContext: Context): void;
 
   /**
    * Called when a {@link ReadableSpan} is ended, if the `span.isRecording()`

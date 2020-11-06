@@ -16,7 +16,11 @@
 
 import { SpanExporter } from './SpanExporter';
 import { ReadableSpan } from './ReadableSpan';
-import { ExportResult, hrTimeToMicroseconds } from '@opentelemetry/core';
+import {
+  ExportResult,
+  ExportResultCode,
+  hrTimeToMicroseconds,
+} from '@opentelemetry/core';
 
 /**
  * This is implementation of {@link SpanExporter} that prints spans to the
@@ -75,7 +79,7 @@ export class ConsoleSpanExporter implements SpanExporter {
       console.log(this._exportInfo(span));
     }
     if (done) {
-      return done(ExportResult.SUCCESS);
+      return done({ code: ExportResultCode.SUCCESS });
     }
   }
 }

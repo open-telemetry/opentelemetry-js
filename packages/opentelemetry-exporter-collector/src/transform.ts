@@ -133,14 +133,20 @@ export function toCollectorEvents(
 /**
  * Converts links
  * @param span
+ * @param useHex - if ids should be kept as hex without converting to base64
  */
-export function toCollectorLinks(
-  span: ReadableSpan
+function toCollectorLinks(
+  span: ReadableSpan,
+  useHex?: boolean
 ): opentelemetryProto.trace.v1.Span.Link[] {
   return span.links.map((link: Link) => {
     const protoLink: opentelemetryProto.trace.v1.Span.Link = {
-      traceId: link.context.traceId,
-      spanId: link.context.spanId,
+      traceId: useHex
+        ? link.context.traceId
+        : core.hexToBase64(link.context.traceId),
+      spanId: useHex
+        ? link.context.spanId
+        : core.hexToBase64(link.context.spanId),
       attributes: toCollectorAttributes(link.attributes || {}),
       droppedAttributesCount: 0,
     };
@@ -151,14 +157,24 @@ export function toCollectorLinks(
 /**
  * Converts span
  * @param span
+ * @param useHex - if ids should be kept as hex without converting to base64
  */
 export function toCollectorSpan(
-  span: ReadableSpan
+  span: ReadableSpan,
+  useHex?: boolean
 ): opentelemetryProto.trace.v1.Span {
   return {
-    traceId: span.spanContext.traceId,
-    spanId: span.spanContext.spanId,
-    parentSpanId: span.parentSpanId ? span.parentSpanId : undefined,
+    traceId: useHex
+      ? span.spanContext.traceId
+      : core.hexToBase64(span.spanContext.traceId),
+    spanId: useHex
+      ? span.spanContext.spanId
+      : core.hexToBase64(span.spanContext.spanId),
+    parentSpanId: span.parentSpanId
+      ? useHex
+        ? span.parentSpanId
+        : core.hexToBase64(span.parentSpanId)
+      : undefined,
     traceState: toCollectorTraceState(span.spanContext.traceState),
     name: span.name,
     kind: toCollectorKind(span.kind),
@@ -169,7 +185,7 @@ export function toCollectorSpan(
     events: toCollectorEvents(span.events),
     droppedEventsCount: 0,
     status: span.status,
-    links: toCollectorLinks(span),
+    links: toCollectorLinks(span, useHex),
     droppedLinksCount: 0,
   };
 }
@@ -224,6 +240,7 @@ export function toCollectorTraceState(
  * Prepares trace service request to be sent to collector
  * @param spans spans
  * @param collectorExporterBase
+ * @param useHex - if ids should be kept as hex without converting to base64
  */
 export function toCollectorExportTraceServiceRequest<
   T extends CollectorExporterConfigBase
@@ -233,7 +250,8 @@ export function toCollectorExportTraceServiceRequest<
     T,
     ReadableSpan,
     opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
-  >
+  >,
+  useHex?: boolean
 ): opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
   const groupedSpans: Map<
     Resource,
@@ -249,7 +267,11 @@ export function toCollectorExportTraceServiceRequest<
   );
 
   return {
-    resourceSpans: toCollectorResourceSpans(groupedSpans, additionalAttributes),
+    resourceSpans: toCollectorResourceSpans(
+      groupedSpans,
+      additionalAttributes,
+      useHex
+    ),
   };
 }
 
@@ -283,13 +305,15 @@ export function groupSpansByResourceAndLibrary(
  * Convert to InstrumentationLibrarySpans
  * @param instrumentationLibrary
  * @param spans
+ * @param useHex - if ids should be kept as hex without converting to base64
  */
 function toCollectorInstrumentationLibrarySpans(
   instrumentationLibrary: core.InstrumentationLibrary,
-  spans: ReadableSpan[]
+  spans: ReadableSpan[],
+  useHex?: boolean
 ): opentelemetryProto.trace.v1.InstrumentationLibrarySpans {
   return {
-    spans: spans.map(toCollectorSpan),
+    spans: spans.map(span => toCollectorSpan(span, useHex)),
     instrumentationLibrary,
   };
 }
@@ -298,10 +322,12 @@ function toCollectorInstrumentationLibrarySpans(
  * Returns a list of resource spans which will be exported to the collector
  * @param groupedSpans
  * @param baseAttributes
+ * @param useHex - if ids should be kept as hex without converting to base64
  */
 function toCollectorResourceSpans(
   groupedSpans: Map<Resource, Map<core.InstrumentationLibrary, ReadableSpan[]>>,
-  baseAttributes: Attributes
+  baseAttributes: Attributes,
+  useHex?: boolean
 ): opentelemetryProto.trace.v1.ResourceSpans[] {
   return Array.from(groupedSpans, ([resource, libSpans]) => {
     return {
@@ -309,7 +335,11 @@ function toCollectorResourceSpans(
       instrumentationLibrarySpans: Array.from(
         libSpans,
         ([instrumentationLibrary, spans]) =>
-          toCollectorInstrumentationLibrarySpans(instrumentationLibrary, spans)
+          toCollectorInstrumentationLibrarySpans(
+            instrumentationLibrary,
+            spans,
+            useHex
+          )
       ),
     };
   });

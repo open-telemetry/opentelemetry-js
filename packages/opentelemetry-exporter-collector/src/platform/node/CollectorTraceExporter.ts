@@ -35,7 +35,7 @@ export class CollectorTraceExporter
   convert(
     spans: ReadableSpan[]
   ): collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
-    return toCollectorExportTraceServiceRequest(spans, this);
+    return toCollectorExportTraceServiceRequest(spans, this, true);
   }
 
   getDefaultUrl(config: CollectorExporterConfigBase): string {
