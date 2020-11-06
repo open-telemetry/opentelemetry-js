@@ -15,7 +15,7 @@
  */
 
 import {
-  CanonicalCode,
+  StatusCode,
   context,
   propagation,
   Span,
@@ -40,7 +40,7 @@ import {
 } from './types';
 import {
   findIndex,
-  _grpcStatusCodeToCanonicalCode,
+  _grpcStatusCodeToOpenTelemetryStatusCode,
   _grpcStatusCodeToSpanStatus,
   _methodIsIgnored,
 } from './utils';
@@ -262,7 +262,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       if (err) {
         if (err.code) {
           span.setStatus({
-            code: _grpcStatusCodeToCanonicalCode(err.code),
+            code: _grpcStatusCodeToOpenTelemetryStatusCode(err.code),
             message: err.message,
           });
           span.setAttribute(RpcAttribute.GRPC_STATUS_CODE, err.code.toString());
@@ -272,7 +272,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
           [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
         });
       } else {
-        span.setStatus({ code: CanonicalCode.OK });
+        span.setStatus({ code: StatusCode.OK });
         span.setAttribute(
           RpcAttribute.GRPC_STATUS_CODE,
           plugin._moduleExports.status.OK.toString()
@@ -321,7 +321,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
     call.on('error', (err: grpcTypes.ServiceError) => {
       span.setStatus({
-        code: _grpcStatusCodeToCanonicalCode(err.code),
+        code: _grpcStatusCodeToOpenTelemetryStatusCode(err.code),
         message: err.message,
       });
       span.addEvent('finished with error');
@@ -437,7 +437,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
             [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
           });
         } else {
-          span.setStatus({ code: CanonicalCode.OK });
+          span.setStatus({ code: StatusCode.OK });
           span.setAttribute(
             RpcAttribute.GRPC_STATUS_CODE,
             plugin._moduleExports.status.OK.toString()
@@ -494,7 +494,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
           'error',
           (err: grpcTypes.ServiceError) => {
             span.setStatus({
-              code: _grpcStatusCodeToCanonicalCode(err.code),
+              code: _grpcStatusCodeToOpenTelemetryStatusCode(err.code),
               message: err.message,
             });
             span.setAttributes({
@@ -508,7 +508,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         ((call as unknown) as events.EventEmitter).on(
           'status',
           (status: Status) => {
-            span.setStatus({ code: CanonicalCode.OK });
+            span.setStatus({ code: StatusCode.OK });
             span.setAttribute(
               RpcAttribute.GRPC_STATUS_CODE,
               status.code.toString()
