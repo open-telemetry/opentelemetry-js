@@ -33,6 +33,7 @@ export abstract class CollectorExporterNodeBase<
 > {
   DEFAULT_HEADERS: Record<string, string> = {};
   headers: Record<string, string>;
+  keepAlive: boolean = false;
   constructor(config: CollectorExporterConfigBase = {}) {
     super(config);
     if ((config as any).metadata) {
@@ -40,6 +41,9 @@ export abstract class CollectorExporterNodeBase<
     }
     this.headers =
       parseHeaders(config.headers, this.logger) || this.DEFAULT_HEADERS;
+    if (config.connectionReuse) {
+      this.keepAlive = true;
+    }
   }
 
   onInit(_config: CollectorExporterConfigBase): void {
