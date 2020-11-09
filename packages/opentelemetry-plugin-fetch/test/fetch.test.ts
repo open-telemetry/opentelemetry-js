@@ -583,4 +583,22 @@ describe('fetch', () => {
       );
     });
   });
+
+  describe('when PerformanceObserver is undefined', () => {
+    beforeEach(done => {
+      Object.defineProperty(window, 'PerformanceObserver', {
+        value: undefined,
+      });
+
+      prepareData(done, url, {});
+    });
+
+    afterEach(() => {
+      clearData();
+    });
+
+    it('should still create spans', () => {
+      assert.strictEqual(exportSpy.args.length, 2, 'no spans created');
+    });
+  });
 });
