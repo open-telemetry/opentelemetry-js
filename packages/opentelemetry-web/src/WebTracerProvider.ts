@@ -15,7 +15,7 @@
  */
 
 import { BasePlugin } from '@opentelemetry/core';
-import { InstrumentationBase } from '@opentelemetry/instrumentation/build/src/platform/browser';
+import { InstrumentationBase } from '@opentelemetry/instrumentation';
 import {
   BasicTracerProvider,
   SDKRegistrationConfig,
@@ -48,9 +48,10 @@ export class WebTracerProvider extends BasicTracerProvider {
     super(config);
 
     for (const plugin of config.plugins) {
-      if (plugin instanceof InstrumentationBase) {
-        plugin.setTracerProvider(this);
-        plugin.enable();
+      const instrumentation = (plugin as unknown) as InstrumentationBase;
+      if (typeof instrumentation.setTracerProvider === 'function') {
+        instrumentation.setTracerProvider(this);
+        instrumentation.enable();
       } else {
         plugin.enable([], this, this.logger);
       }
