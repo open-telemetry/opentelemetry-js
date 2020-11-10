@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  DEFAULT_CONFIG,
-  DEFAULT_MAX_ATTRIBUTES_PER_SPAN,
-  DEFAULT_MAX_EVENTS_PER_SPAN,
-  DEFAULT_MAX_LINKS_PER_SPAN,
-} from './config';
+import { DEFAULT_CONFIG } from './config';
 import { TracerConfig } from './types';
 import {
   ParentBasedSampler,
@@ -32,10 +27,10 @@ import {
  * user provided configurations.
  */
 export function mergeConfig(userConfig: TracerConfig) {
-  const traceParams = userConfig.traceParams;
   const otelSamplingProbability = getEnv().OTEL_SAMPLING_PROBABILITY;
 
   const target = Object.assign(
+    {},
     DEFAULT_CONFIG,
     // use default AlwaysOnSampler if otelSamplingProbability is 1
     otelSamplingProbability !== undefined && otelSamplingProbability < 1
@@ -48,14 +43,11 @@ export function mergeConfig(userConfig: TracerConfig) {
     userConfig
   );
 
-  // the user-provided value will be used to extend the default value.
-  if (traceParams) {
-    target.traceParams.numberOfAttributesPerSpan =
-      traceParams.numberOfAttributesPerSpan || DEFAULT_MAX_ATTRIBUTES_PER_SPAN;
-    target.traceParams.numberOfEventsPerSpan =
-      traceParams.numberOfEventsPerSpan || DEFAULT_MAX_EVENTS_PER_SPAN;
-    target.traceParams.numberOfLinksPerSpan =
-      traceParams.numberOfLinksPerSpan || DEFAULT_MAX_LINKS_PER_SPAN;
-  }
+  target.traceParams = Object.assign(
+    {},
+    DEFAULT_CONFIG.traceParams,
+    userConfig.traceParams || {}
+  );
+
   return target;
 }
