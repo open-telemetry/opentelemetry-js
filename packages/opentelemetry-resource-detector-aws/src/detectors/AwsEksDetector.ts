@@ -66,8 +66,13 @@ export class AwsEksDetector implements Detector {
   private static fileAccessAsync = util.promisify(fs.access);
 
   /**
+<<<<<<< HEAD
    * The AwsEksDetector can be used to detect if a process is running on Amazon
    * Elastic Kubernetes and returns a promise containing a {@link Resource}
+=======
+   * The AwsEksDetector can be used to detect if a process is running in AWS
+   * Eks and returns a promise containing a {@link Resource}
+>>>>>>> 37f44d48d... fix: updated naming consistency
    * populated with instance metadata. Returns a promise containing an
    * empty {@link Resource} if the connection to kubernetes process
    * or aws config maps fails
