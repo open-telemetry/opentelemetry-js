@@ -41,7 +41,7 @@ export abstract class CollectorExporterNodeBase<
     }
     this.headers =
       parseHeaders(config.headers, this.logger) || this.DEFAULT_HEADERS;
-    if (config.connectionReuse) {
+    if (config.keepAlive) {
       this.keepAlive = true;
     }
   }
