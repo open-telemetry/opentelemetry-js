@@ -16,6 +16,7 @@
 
 import * as api from '@opentelemetry/api';
 import * as shimmer from 'shimmer';
+import { InstrumentationModuleDefinition } from './platform/node';
 import * as types from './types';
 
 /**
@@ -97,4 +98,13 @@ export abstract class InstrumentationAbstract<T = any>
 
   /* Enable plugin */
   public abstract disable(): void;
+
+  /**
+   * Init method in which plugin should define _modules and patches for
+   * methods
+   */
+  protected abstract init():
+    | InstrumentationModuleDefinition<T>
+    | InstrumentationModuleDefinition<T>[]
+    | void;
 }

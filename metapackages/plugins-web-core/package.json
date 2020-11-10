@@ -16,6 +16,6 @@
         "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
     },
     "dependencies": {
-        "@opentelemetry/plugin-xml-http-request": "^0.12.0"
+        "@opentelemetry/instrumentation-xml-http-request": "^0.12.0"
     }
 }
