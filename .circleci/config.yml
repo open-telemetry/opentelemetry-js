@@ -31,7 +31,7 @@ cache_2: &cache_2
     - packages/opentelemetry-plugin-http/node_modules
     - packages/opentelemetry-plugin-https/node_modules
     - packages/opentelemetry-exporter-collector/node_modules
-    - packages/opentelemetry-plugin-xml-http-request/node_modules
+    - packages/opentelemetry-instrumentation-xml-http-request/node_modules
     - packages/opentelemetry-resource-detector-aws/node_modules
     - packages/opentelemetry-resource-detector-gcp/node_modules
     - packages/opentelemetry-resources/node_modules

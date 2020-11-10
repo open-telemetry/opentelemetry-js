@@ -16,12 +16,11 @@
 
 import * as api from '@opentelemetry/api';
 import {
-  BasePlugin,
-  hrTime,
-  isUrlIgnored,
   isWrapped,
-  otperformance,
-} from '@opentelemetry/core';
+  InstrumentationBase,
+  InstrumentationConfig,
+} from '@opentelemetry/instrumentation';
+import { hrTime, isUrlIgnored, otperformance } from '@opentelemetry/core';
 import { HttpAttribute } from '@opentelemetry/semantic-conventions';
 import {
   addSpanNetworkEvents,
@@ -30,7 +29,6 @@ import {
   PerformanceTimingNames as PTN,
   shouldPropagateTraceHeaders,
 } from '@opentelemetry/web';
-import * as shimmer from 'shimmer';
 import { EventNames } from './enums/EventNames';
 import {
   OpenFunction,
@@ -49,7 +47,8 @@ const OBSERVER_WAIT_TIME_MS = 300;
 /**
  * XMLHttpRequest config
  */
-export interface XMLHttpRequestPluginConfig extends api.PluginConfig {
+export interface XMLHttpRequestInstrumentationConfig
+  extends InstrumentationConfig {
   // the number of timing resources is limited, after the limit
   // (chrome 250, safari 150) the information is not collected anymore
   // the only way to prevent that is to regularly clean the resources
@@ -58,12 +57,20 @@ export interface XMLHttpRequestPluginConfig extends api.PluginConfig {
   clearTimingResources?: boolean;
   // urls which should include trace headers when origin doesn't match
   propagateTraceHeaderCorsUrls?: PropagateTraceHeaderCorsUrls;
+  /**
+   * URLs that partially match any regex in ignoreUrls will not be traced.
+   * In addition, URLs that are _exact matches_ of strings in ignoreUrls will
+   * also not be traced.
+   */
+  ignoreUrls?: Array<string | RegExp>;
 }
 
 /**
  * This class represents a XMLHttpRequest plugin for auto instrumentation
  */
-export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
+export class XMLHttpRequestInstrumentation extends InstrumentationBase<
+  XMLHttpRequest
+> {
   readonly component: string = 'xml-http-request';
   readonly version: string = VERSION;
   moduleName = this.component;
@@ -72,8 +79,20 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   private _xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
 
-  constructor(protected _config: XMLHttpRequestPluginConfig = {}) {
-    super('@opentelemetry/plugin-xml-http-request', VERSION);
+  constructor(
+    config: XMLHttpRequestInstrumentationConfig & InstrumentationConfig = {}
+  ) {
+    super(
+      '@opentelemetry/instrumentation-xml-http-request',
+      VERSION,
+      Object.assign({}, config)
+    );
+  }
+
+  init() {}
+
+  private _getConfig(): XMLHttpRequestInstrumentationConfig {
+    return this._config;
   }
 
   /**
@@ -86,7 +105,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     if (
       !shouldPropagateTraceHeaders(
         spanUrl,
-        this._config.propagateTraceHeaderCorsUrls
+        this._getConfig().propagateTraceHeaderCorsUrls
       )
     ) {
       return;
@@ -108,8 +127,8 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     span: api.Span,
     corsPreFlightRequest: PerformanceResourceTiming
   ): void {
-    this._tracer.withSpan(span, () => {
-      const childSpan = this._tracer.startSpan('CORS Preflight', {
+    this.tracer.withSpan(span, () => {
+      const childSpan = this.tracer.startSpan('CORS Preflight', {
         startTime: corsPreFlightRequest[PTN.FETCH_START],
       });
       addSpanNetworkEvents(childSpan, corsPreFlightRequest);
@@ -177,12 +196,12 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
 
   /**
    * Clears the resource timings and all resources assigned with spans
-   *     when {@link XMLHttpRequestPluginConfig.clearTimingResources} is
+   *     when {@link XMLHttpRequestInstrumentationConfig.clearTimingResources} is
    *     set to true (default false)
    * @private
    */
   private _clearResources() {
-    if (this._tasksCount === 0 && this._config.clearTimingResources) {
+    if (this._tasksCount === 0 && this._getConfig().clearTimingResources) {
       ((otperformance as unknown) as Performance).clearResourceTimings();
       this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
       this._usedResources = new WeakSet<PerformanceResourceTiming>();
@@ -268,13 +287,13 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     url: string,
     method: string
   ): api.Span | undefined {
-    if (isUrlIgnored(url, this._config.ignoreUrls)) {
+    if (isUrlIgnored(url, this._getConfig().ignoreUrls)) {
       this._logger.debug('ignoring span as url matches ignored url');
       return;
     }
     const spanName = `HTTP ${method.toUpperCase()}`;
 
-    const currentSpan = this._tracer.startSpan(spanName, {
+    const currentSpan = this.tracer.startSpan(spanName, {
       kind: api.SpanKind.CLIENT,
       attributes: {
         [HttpAttribute.HTTP_METHOD]: method,
@@ -417,7 +436,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
         const spanUrl = xhrMem.spanUrl;
 
         if (currentSpan && spanUrl) {
-          plugin._tracer.withSpan(currentSpan, () => {
+          plugin.tracer.withSpan(currentSpan, () => {
             plugin._tasksCount++;
             xhrMem.sendStartTime = hrTime();
             currentSpan.addEvent(EventNames.METHOD_SEND);
@@ -443,35 +462,33 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   }
 
   /**
-   * implements patch function
+   * implements enable function
    */
-  protected patch() {
+  enable() {
     this._logger.debug('applying patch to', this.moduleName, this.version);
 
     if (isWrapped(XMLHttpRequest.prototype.open)) {
-      shimmer.unwrap(XMLHttpRequest.prototype, 'open');
+      this._unwrap(XMLHttpRequest.prototype, 'open');
       this._logger.debug('removing previous patch from method open');
     }
 
     if (isWrapped(XMLHttpRequest.prototype.send)) {
-      shimmer.unwrap(XMLHttpRequest.prototype, 'send');
+      this._unwrap(XMLHttpRequest.prototype, 'send');
       this._logger.debug('removing previous patch from method send');
     }
 
-    shimmer.wrap(XMLHttpRequest.prototype, 'open', this._patchOpen());
-    shimmer.wrap(XMLHttpRequest.prototype, 'send', this._patchSend());
-
-    return this._moduleExports;
+    this._wrap(XMLHttpRequest.prototype, 'open', this._patchOpen());
+    this._wrap(XMLHttpRequest.prototype, 'send', this._patchSend());
   }
 
   /**
-   * implements unpatch function
+   * implements disable function
    */
-  protected unpatch() {
+  disable() {
     this._logger.debug('removing patch from', this.moduleName, this.version);
 
-    shimmer.unwrap(XMLHttpRequest.prototype, 'open');
-    shimmer.unwrap(XMLHttpRequest.prototype, 'send');
+    this._unwrap(XMLHttpRequest.prototype, 'open');
+    this._unwrap(XMLHttpRequest.prototype, 'send');
 
     this._tasksCount = 0;
     this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
