@@ -109,8 +109,10 @@ export class BatchSpanProcessor implements SpanProcessor {
     return new Promise((resolve, reject) => {
       // prevent downstream exporter calls from generating spans
       context.with(suppressInstrumentation(context.active()), () => {
-        this._exporter.export(this._finishedSpans, result => {
-          this._finishedSpans = [];
+        // Reset the finished spans buffer here because the next invocations of the _flush method
+        // could pass the same finished spans to the exporter if the buffer is cleared
+        // outside of the execution of this callback.
+        this._exporter.export(this._finishedSpans.splice(0), result => {
           if (result.code === ExportResultCode.SUCCESS) {
             resolve();
           } else {
