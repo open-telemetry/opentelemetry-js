@@ -62,14 +62,14 @@ export class AwsEksDetector implements Detector {
   async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
     try {
       await AwsEksDetector.fileAccessAsync(this.K8S_TOKEN_PATH);
-      const k8Scert = await AwsEksDetector.readFileAsync(this.K8S_CERT_PATH);
+      const k8scert = await AwsEksDetector.readFileAsync(this.K8S_CERT_PATH);
 
-      if (!this._isEks(config, k8Scert)) {
+      if (!this._isEks(config, k8scert)) {
         return Resource.empty();
       }
 
       const containerId = await this._getContainerId(config);
-      const clusterName = await this._getClusterName(config, k8Scert);
+      const clusterName = await this._getClusterName(config, k8scert);
 
       return !containerId && !clusterName
         ? Resource.empty()
@@ -78,7 +78,7 @@ export class AwsEksDetector implements Detector {
             [CONTAINER_RESOURCE.ID]: containerId || '',
           });
     } catch (e) {
-      config.logger.warn('Not running on K8S');
+      config.logger.warn('This process is not running on Kubernetes because either the token path or certificate path cannot be accessed ', e);
       return Resource.empty();
     }
   }
@@ -91,7 +91,7 @@ export class AwsEksDetector implements Detector {
    */
   private async _isEks(
     config: ResourceDetectionConfigWithLogger,
-    k8scert: Buffer
+    cert: Buffer
   ): Promise<boolean> {
     const options = {
       hostname: this.K8S_SVC_URL,
@@ -101,7 +101,7 @@ export class AwsEksDetector implements Detector {
       headers: {
         Authorization: await this._getK8sCredHeader(config),
       },
-      ca: k8scert,
+      ca: cert,
     };
     return !!(await this._fetchString(options));
   }
@@ -113,7 +113,7 @@ export class AwsEksDetector implements Detector {
    */
   private async _getClusterName(
     config: ResourceDetectionConfigWithLogger,
-    k8scert: Buffer
+    cert: Buffer
   ): Promise<string | undefined> {
     const options = {
       host: this.K8S_SVC_URL,
@@ -123,7 +123,7 @@ export class AwsEksDetector implements Detector {
       headers: {
         Authorization: await this._getK8sCredHeader(config),
       },
-      ca: k8scert,
+      ca: cert,
     };
     return await this._fetchString(options);
   }
@@ -142,7 +142,7 @@ export class AwsEksDetector implements Detector {
       );
       return 'Bearer ' + content;
     } catch (e) {
-      config.logger.warn('Unable to load K8s client token.', e);
+      config.logger.warn('Unable to read Kubernetes client token.', e);
     }
     return '';
   }
