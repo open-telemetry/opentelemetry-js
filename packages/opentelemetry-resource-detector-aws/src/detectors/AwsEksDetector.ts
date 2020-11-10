@@ -92,7 +92,11 @@ export class AwsEksDetector implements Detector {
             [CONTAINER_RESOURCE.ID]: containerId || '',
           });
     } catch (e) {
+<<<<<<< HEAD
       config.logger.warn('Process is not running on K8S', e);
+=======
+      config.logger.warn('This process is not running on Kubernetes because either the token path or certificate path cannot be accessed ', e);
+>>>>>>> 21e3884b1... fix: update naming conventions consistentcy
       return Resource.empty();
 =======
     private static readFileAsync = util.promisify(fs.readFile);
@@ -141,10 +145,14 @@ export class AwsEksDetector implements Detector {
       headers: {
         Authorization: await this._getK8sCredHeader(config),
       },
+<<<<<<< HEAD
       hostname: this.K8S_SVC_URL,
       method: 'GET',
       path: this.AUTH_CONFIGMAP_PATH,
       timeout: this.TIMEOUT_MS,
+=======
+      ca: cert,
+>>>>>>> 21e3884b1... fix: update naming conventions consistentcy
     };
     return !!(await this._fetchString(options));
   }
@@ -163,10 +171,14 @@ export class AwsEksDetector implements Detector {
       headers: {
         Authorization: await this._getK8sCredHeader(config),
       },
+<<<<<<< HEAD
       host: this.K8S_SVC_URL,
       method: 'GET',
       path: this.CW_CONFIGMAP_PATH,
       timeout: this.TIMEOUT_MS,
+=======
+      ca: cert,
+>>>>>>> 21e3884b1... fix: update naming conventions consistentcy
     };
     const response = await this._fetchString(options);
     try {
@@ -192,6 +204,7 @@ export class AwsEksDetector implements Detector {
       return 'Bearer ' + content;
     } catch (e) {
       config.logger.warn('Unable to read Kubernetes client token.', e);
+<<<<<<< HEAD
 =======
     private async _isEks(config: ResourceDetectionConfigWithLogger): Promise<boolean> {
       const options = {
@@ -207,6 +220,8 @@ export class AwsEksDetector implements Detector {
       const awsAuth = this._fetchString(options);
       return !!awsAuth;
 >>>>>>> 7d354c340... fix: use file read async instead of sync
+=======
+>>>>>>> 21e3884b1... fix: update naming conventions consistentcy
     }
     return '';
   }
