@@ -206,7 +206,7 @@ These plugins are hosted at <https://github.com/open-telemetry/opentelemetry-js-
 
 ##### Core
 
-- [@opentelemetry/plugin-xml-http-request][otel-plugin-xml-http-request]
+- [@opentelemetry/instrumentation-xml-http-request][otel-instrumentation-xml-http-request]
 - [@opentelemetry/plugin-fetch][otel-plugin-fetch]
 
 ##### Contrib
@@ -248,7 +248,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-plugin-grpc-js]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-grpc-js
 [otel-plugin-http]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-http
 [otel-plugin-https]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-https
-[otel-plugin-xml-http-request]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-xml-http-request
+[otel-instrumentation-xml-http-request]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-instrumentation-xml-http-request
 
 [otel-shim-opentracing]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-shim-opentracing
 [otel-tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Attributes, CanonicalCode, Span, Status } from '@opentelemetry/api';
+import { Attributes, StatusCode, Span, Status } from '@opentelemetry/api';
 import {
   HttpAttribute,
   GeneralAttribute,
@@ -28,25 +28,7 @@ import {
 } from 'http';
 import { Socket } from 'net';
 import * as url from 'url';
-import {
-  Err,
-  IgnoreMatcher,
-  ParsedRequestOptions,
-  SpecialHttpStatusCodeMapping,
-} from './types';
-
-export const HTTP_STATUS_SPECIAL_CASES: SpecialHttpStatusCodeMapping = {
-  401: CanonicalCode.UNAUTHENTICATED,
-  403: CanonicalCode.PERMISSION_DENIED,
-  404: CanonicalCode.NOT_FOUND,
-  429: CanonicalCode.RESOURCE_EXHAUSTED,
-  499: CanonicalCode.CANCELLED,
-  501: CanonicalCode.UNIMPLEMENTED,
-  503: CanonicalCode.UNAVAILABLE,
-  504: CanonicalCode.DEADLINE_EXCEEDED,
-  598: CanonicalCode.INTERNAL,
-  599: CanonicalCode.INTERNAL,
-};
+import { Err, IgnoreMatcher, ParsedRequestOptions } from './types';
 
 /**
  * Get an absolute url
@@ -82,35 +64,13 @@ export const getAbsoluteUrl = (
 export const parseResponseStatus = (
   statusCode: number
 ): Omit<Status, 'message'> => {
-  // search for special case
-  const code: number | undefined = HTTP_STATUS_SPECIAL_CASES[statusCode];
-
-  if (code !== undefined) {
-    return { code };
-  }
-
-  // 0xx are unknown
-  if (statusCode < 100) {
-    return { code: CanonicalCode.UNKNOWN };
-  }
-
   // 1xx, 2xx, 3xx are OK
-  if (statusCode < 400) {
-    return { code: CanonicalCode.OK };
+  if (statusCode >= 100 && statusCode < 400) {
+    return { code: StatusCode.OK };
   }
 
-  // 4xx are client errors
-  if (statusCode < 500) {
-    return { code: CanonicalCode.INVALID_ARGUMENT };
-  }
-
-  // 5xx are internal errors
-  if (statusCode < 512) {
-    return { code: CanonicalCode.INTERNAL };
-  }
-
-  // All other codes are unknown
-  return { code: CanonicalCode.UNKNOWN };
+  // All other codes are error
+  return { code: StatusCode.ERROR };
 };
 
 /**
@@ -199,7 +159,7 @@ export const setSpanWithError = (
   });
 
   if (!obj) {
-    span.setStatus({ code: CanonicalCode.UNKNOWN, message });
+    span.setStatus({ code: StatusCode.ERROR, message });
     return;
   }
 
@@ -207,9 +167,9 @@ export const setSpanWithError = (
   if ((obj as IncomingMessage).statusCode) {
     status = parseResponseStatus((obj as IncomingMessage).statusCode!);
   } else if ((obj as ClientRequest).aborted) {
-    status = { code: CanonicalCode.ABORTED };
+    status = { code: StatusCode.ERROR };
   } else {
-    status = { code: CanonicalCode.UNKNOWN };
+    status = { code: StatusCode.ERROR };
   }
 
   status.message = message;

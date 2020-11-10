@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { CanonicalCode, Status } from '@opentelemetry/api';
+import { StatusCode, Status } from '@opentelemetry/api';
 import type * as grpcTypes from '@grpc/grpc-js'; // For types only
 import { IgnoreMatcher } from './types';
 
@@ -26,16 +26,16 @@ import { IgnoreMatcher } from './types';
 export const CALL_SPAN_ENDED = Symbol('opentelemetry call span ended');
 
 /**
- * Convert a grpc status code to an opentelemetry Canonical code. For now, the enums are exactly the same
+ * Convert a grpc status code to an opentelemetry Status code.
  * @param status
  */
-export const grpcStatusCodeToCanonicalCode = (
+export const grpcStatusCodeToOpenTelemetryStatusCode = (
   status?: grpcTypes.status
-): CanonicalCode => {
-  if (status !== 0 && !status) {
-    return CanonicalCode.UNKNOWN;
+): StatusCode => {
+  if (status !== undefined && status === 0) {
+    return StatusCode.OK;
   }
-  return status as number;
+  return StatusCode.ERROR;
 };
 
 /**
@@ -43,7 +43,7 @@ export const grpcStatusCodeToCanonicalCode = (
  * @param status
  */
 export const grpcStatusCodeToSpanStatus = (status: number): Status => {
-  return { code: status };
+  return { code: grpcStatusCodeToOpenTelemetryStatusCode(status) };
 };
 
 /**

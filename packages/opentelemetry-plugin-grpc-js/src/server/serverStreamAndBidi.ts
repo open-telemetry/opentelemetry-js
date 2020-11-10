@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-import { Span, CanonicalCode } from '@opentelemetry/api';
+import { Span, StatusCode } from '@opentelemetry/api';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import type * as grpcJs from '@grpc/grpc-js';
 import type { GrpcJsPlugin } from '../grpcJs';
 import { GrpcEmitter } from '../types';
-import { CALL_SPAN_ENDED, grpcStatusCodeToCanonicalCode } from '../utils';
+import {
+  CALL_SPAN_ENDED,
+  grpcStatusCodeToOpenTelemetryStatusCode,
+} from '../utils';
 
 /**
  * Handle patching for serverStream and Bidi type server handlers
@@ -52,12 +55,9 @@ export function serverStreamAndBidiHandler<RequestType, ResponseType>(
     call[CALL_SPAN_ENDED] = true;
 
     span.setStatus({
-      code: CanonicalCode.OK,
+      code: StatusCode.OK,
     });
-    span.setAttribute(
-      RpcAttribute.GRPC_STATUS_CODE,
-      CanonicalCode.OK.toString()
-    );
+    span.setAttribute(RpcAttribute.GRPC_STATUS_CODE, StatusCode.OK.toString());
 
     endSpan();
   });
@@ -71,7 +71,7 @@ export function serverStreamAndBidiHandler<RequestType, ResponseType>(
     call[CALL_SPAN_ENDED] = true;
 
     span.setStatus({
-      code: grpcStatusCodeToCanonicalCode(err.code),
+      code: grpcStatusCodeToOpenTelemetryStatusCode(err.code),
       message: err.message,
     });
     span.setAttributes({
