@@ -230,10 +230,9 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<
       // fallback - either Observer is not available or it took longer
       // then OBSERVER_WAIT_TIME_MS and observer didn't collect enough
       // information
-      resources = otperformance.getEntriesByType(
-        // ts thinks this is the perf_hooks module, but it is the browser performance api
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        'resource' as any
+      // ts thinks this is the perf_hooks module, but it is the browser performance api
+      resources = ((otperformance as unknown) as Performance).getEntriesByType(
+        'resource'
       ) as PerformanceResourceTiming[];
     }
 
