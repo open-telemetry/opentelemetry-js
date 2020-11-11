@@ -91,7 +91,7 @@ export const FaasAttribute = {
    * @remarks
    * Optional.
    */
-  FASS_INVOKED_NAME: 'faas.invoked_name',
+  FAAS_INVOKED_NAME: 'faas.invoked_name',
 
   /**
    * The cloud provider of the invoked function.
@@ -100,7 +100,7 @@ export const FaasAttribute = {
    * @remarks
    * Optional.
    */
-  FASS_INVOKED_PROVIDER: 'faas.invoked_provider',
+  FAAS_INVOKED_PROVIDER: 'faas.invoked_provider',
 
   /**
    * The cloud region of the invoked function.
@@ -109,7 +109,7 @@ export const FaasAttribute = {
    * @remarks
    * Optional.
    */
-  FASS_INVOKED_REGION: 'faas.invoked_region',
+  FAAS_INVOKED_REGION: 'faas.invoked_region',
 
   // Datesource Trigger
 
