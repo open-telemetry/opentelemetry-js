@@ -15,7 +15,7 @@
  */
 
 /**
- * Database attribute names defined by the Opetelemetry Semantic Conventions specification
+ * FaaS (Function as a Service) attribute names defined by the Opetelemetry Semantic Conventions specification
  * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/faas.md
  */
 export const FaasAttribute = {
