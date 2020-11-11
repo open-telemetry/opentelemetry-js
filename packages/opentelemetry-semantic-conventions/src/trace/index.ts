@@ -20,3 +20,4 @@ export * from './general';
 export * from './http';
 export * from './os';
 export * from './rpc';
+export * from './faas';
