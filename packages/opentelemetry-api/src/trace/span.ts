@@ -75,7 +75,7 @@ export interface Span {
 
   /**
    * Sets a status to the span. If used, this will override the default Span
-   * status. Default is {@link CanonicalCode.OK}. SetStatus overrides the value
+   * status. Default is {@link StatusCode.UNSET}. SetStatus overrides the value
    * of previous calls to SetStatus on the Span.
    *
    * @param status the Status to set.

@@ -228,9 +228,8 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
     response: FetchResponse
   ) {
     const endTime = core.hrTime();
-    if (spanData.observer) {
-      spanData.observer.disconnect();
-    }
+    spanData.observer?.disconnect();
+
     this._addFinalSpanAttributes(span, response);
 
     setTimeout(() => {

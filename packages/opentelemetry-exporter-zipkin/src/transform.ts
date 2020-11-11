@@ -78,7 +78,7 @@ export function _toZipkinTags(
   for (const key of Object.keys(attributes)) {
     tags[key] = String(attributes[key]);
   }
-  tags[statusCodeTagName] = String(api.CanonicalCode[status.code]);
+  tags[statusCodeTagName] = String(api.StatusCode[status.code]);
   if (status.message) {
     tags[statusDescriptionTagName] = status.message;
   }
