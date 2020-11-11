@@ -34,14 +34,15 @@ describe('awsEksDetector', () => {
   const errorMsg = {
     fileNotFoundError: new Error('cannot find cgroup file'),
   };
+
   const correctCgroupData =
     'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklm';
   const mockedClusterResponse = 'my-cluster';
   const mockedAwsAuth = 'my-auth';
   const k8s_token = 'Bearer 31ada4fd-adec-460c-809a-9e56ceb75269';
-
   let sandbox: sinon.SinonSandbox;
   let readStub, fileStub, getCredStub;
+
   beforeEach(() => {
     sandbox = sinon.createSandbox();
     nock.disableNetConnect();
@@ -80,8 +81,9 @@ describe('awsEksDetector', () => {
       scope.done();
 
       sandbox.assert.calledOnce(fileStub);
-      sandbox.assert.calledOnce(readStub);
-      sandbox.assert.calledOnce(getCredStub);
+      sandbox.assert.calledTwice(readStub);
+      sandbox.assert.calledTwice(getCredStub);
+
       assert.ok(resource);
       assertK8sResource(resource, {
         clusterName: 'my-cluster',
