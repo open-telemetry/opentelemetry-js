@@ -36,7 +36,7 @@ export const FaasAttribute = {
      * @remarks
      * Required.
      */
-    FAAS_ID: 'faas.name',
+    FAAS_ID: 'faas.id',
 
     /**
      * The version string of the function being executed.
