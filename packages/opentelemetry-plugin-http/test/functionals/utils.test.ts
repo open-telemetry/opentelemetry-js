@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import {
-  CanonicalCode,
+  StatusCode,
   ROOT_CONTEXT,
   SpanKind,
   TraceFlags,
@@ -33,31 +33,24 @@ import * as utils from '../../src/utils';
 
 describe('Utility', () => {
   describe('parseResponseStatus()', () => {
-    it('should return UNKNOWN code by default', () => {
+    it('should return ERROR code by default', () => {
       const status = utils.parseResponseStatus(
         (undefined as unknown) as number
       );
-      assert.deepStrictEqual(status, { code: CanonicalCode.UNKNOWN });
+      assert.deepStrictEqual(status, { code: StatusCode.ERROR });
     });
 
     it('should return OK for Success HTTP status code', () => {
       for (let index = 100; index < 400; index++) {
         const status = utils.parseResponseStatus(index);
-        assert.deepStrictEqual(status, { code: CanonicalCode.OK });
+        assert.deepStrictEqual(status, { code: StatusCode.OK });
       }
     });
 
     it('should not return OK for Bad HTTP status code', () => {
       for (let index = 400; index <= 600; index++) {
         const status = utils.parseResponseStatus(index);
-        assert.notStrictEqual(status.code, CanonicalCode.OK);
-      }
-    });
-    it('should handle special HTTP status codes', () => {
-      for (const key in utils.HTTP_STATUS_SPECIAL_CASES) {
-        const status = utils.parseResponseStatus(key as any);
-        const canonicalCode = utils.HTTP_STATUS_SPECIAL_CASES[key];
-        assert.deepStrictEqual(status.code, canonicalCode);
+        assert.notStrictEqual(status.code, StatusCode.OK);
       }
     });
   });

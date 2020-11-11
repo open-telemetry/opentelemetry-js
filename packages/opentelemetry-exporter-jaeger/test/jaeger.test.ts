@@ -122,7 +122,7 @@ describe('JaegerExporter', () => {
       endTime: [1566156731, 709],
       ended: true,
       status: {
-        code: api.CanonicalCode.DATA_LOSS,
+        code: api.StatusCode.ERROR,
       },
       attributes: {},
       links: [],
