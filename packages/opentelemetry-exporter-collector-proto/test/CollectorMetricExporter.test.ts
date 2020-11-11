@@ -30,22 +30,16 @@ import {
   ensureExportedCounterIsCorrect,
   ensureExportedObserverIsCorrect,
   ensureExportedValueRecorderIsCorrect,
+  MockedResponse,
 } from './helper';
 import { MetricRecord } from '@opentelemetry/metrics';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
+import { CollectorExporterError } from '@opentelemetry/exporter-collector/build/src/types';
 
 const fakeRequest = {
   end: function () {},
   on: function () {},
   write: function () {},
-};
-
-const mockRes = {
-  statusCode: 200,
-};
-
-const mockResError = {
-  statusCode: 400,
 };
 
 // send is lazy loading file so need to wait a bit
@@ -164,9 +158,11 @@ describe('CollectorMetricExporter - node with proto over http', () => {
       collectorExporter.export(metrics, responseSpy);
 
       setTimeout(() => {
+        const mockRes = new MockedResponse(200);
         const args = spyRequest.args[0];
         const callback = args[1];
         callback(mockRes);
+        mockRes.send('success');
         setTimeout(() => {
           const result = responseSpy.args[0][0] as ExportResult;
           assert.strictEqual(result.code, ExportResultCode.SUCCESS);
@@ -181,14 +177,17 @@ describe('CollectorMetricExporter - node with proto over http', () => {
       collectorExporter.export(metrics, responseSpy);
 
       setTimeout(() => {
+        const mockRes = new MockedResponse(400);
         const args = spyRequest.args[0];
         const callback = args[1];
-        callback(mockResError);
+        callback(mockRes);
+        mockRes.send('failed');
         setTimeout(() => {
           const result = responseSpy.args[0][0] as ExportResult;
           assert.strictEqual(result.code, ExportResultCode.FAILED);
-          // @ts-expect-error
-          assert.strictEqual(result.error?.code, 400);
+          const error = result.error as CollectorExporterError;
+          assert.strictEqual(error.code, 400);
+          assert.strictEqual(error.data, 'failed');
           done();
         });
       }, waitTimeMS);
