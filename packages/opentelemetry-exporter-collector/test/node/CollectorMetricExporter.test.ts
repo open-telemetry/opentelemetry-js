@@ -158,7 +158,8 @@ describe('CollectorMetricExporter - node with json over http', () => {
         ensureValueRecorderIsCorrect(
           metric3,
           core.hrTimeToNanoseconds(metrics[2].aggregator.toPoint().timestamp),
-          true
+          [0, 100],
+          [0, 2, 0]
         );
 
         ensureExportMetricsServiceRequestIsSet(json);

@@ -338,7 +338,9 @@ export function ensureExportedObserverIsCorrect(
 
 export function ensureExportedValueRecorderIsCorrect(
   metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
-  time?: number
+  time?: number,
+  explicitBounds: number[] = [Infinity],
+  bucketCounts: string[] = ['2', '0']
 ) {
   assert.deepStrictEqual(metric, {
     name: 'int-recorder',
@@ -351,8 +353,8 @@ export function ensureExportedValueRecorderIsCorrect(
           count: '2',
           startTimeUnixNano: '1592602232694000128',
           timeUnixNano: time,
-          bucketCounts: ['2', '0'],
-          explicitBounds: ['Infinity'],
+          bucketCounts,
+          explicitBounds,
         },
       ],
       aggregationTemporality: 'AGGREGATION_TEMPORALITY_CUMULATIVE',
