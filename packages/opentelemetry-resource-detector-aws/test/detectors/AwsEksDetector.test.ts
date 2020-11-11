@@ -52,7 +52,10 @@ describe('awsEksDetector', () => {
   const errorMsg = {
     fileNotFoundError: new Error('cannot find cgroup file'),
   };
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7359cb1e4... fix: updated files to adhere to linter
   const correctCgroupData =
     'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklm';
   const mockedClusterResponse = '{"data":{"cluster.name":"my-cluster"}}';
@@ -61,6 +64,8 @@ describe('awsEksDetector', () => {
   let sandbox: sinon.SinonSandbox;
   let readStub, fileStub, getCredStub;
 
+  let sandbox: sinon.SinonSandbox;
+  let readStub, fileStub, getCredStub;
   beforeEach(() => {
     sandbox = sinon.createSandbox();
 =======
@@ -128,9 +133,14 @@ describe('awsEksDetector', () => {
       scope.done();
 
       sandbox.assert.calledOnce(fileStub);
+<<<<<<< HEAD
       sandbox.assert.calledTwice(readStub);
       sandbox.assert.calledTwice(getCredStub);
 
+=======
+      sandbox.assert.calledOnce(readStub);
+      sandbox.assert.calledOnce(getCredStub);
+>>>>>>> 7359cb1e4... fix: updated files to adhere to linter
       assert.ok(resource);
       assertK8sResource(resource, {
         clusterName: 'my-cluster',

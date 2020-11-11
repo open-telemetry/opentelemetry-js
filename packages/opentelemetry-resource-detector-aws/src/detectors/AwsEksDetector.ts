@@ -98,10 +98,14 @@ export class AwsEksDetector implements Detector {
           });
     } catch (e) {
 <<<<<<< HEAD
+<<<<<<< HEAD
       config.logger.warn('Process is not running on K8S', e);
 =======
       config.logger.warn('This process is not running on Kubernetes because either the token path or certificate path cannot be accessed ', e);
 >>>>>>> 21e3884b1... fix: update naming conventions consistentcy
+=======
+      config.logger.warn('Process is not running on K8S', e);
+>>>>>>> 7359cb1e4... fix: updated files to adhere to linter
       return Resource.empty();
 =======
     private static readFileAsync = util.promisify(fs.readFile);
