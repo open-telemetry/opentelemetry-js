@@ -50,16 +50,21 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
 
   const request = parsedUrl.protocol === 'http:' ? http.request : https.request;
   const req = request(options, (res: http.IncomingMessage) => {
-    if (res.statusCode && res.statusCode < 299) {
-      collector.logger.debug(`statusCode: ${res.statusCode}`);
-      onSuccess();
-    } else {
-      const error = new collectorTypes.CollectorExporterError(
-        res.statusMessage,
-        res.statusCode
-      );
-      onError(error);
-    }
+    let data = '';
+    res.on('data', chunk => (data += chunk));
+    res.on('end', () => {
+      if (res.statusCode && res.statusCode < 299) {
+        collector.logger.debug(`statusCode: ${res.statusCode}`, data);
+        onSuccess();
+      } else {
+        const error = new collectorTypes.CollectorExporterError(
+          res.statusMessage,
+          res.statusCode,
+          data
+        );
+        onError(error);
+      }
+    });
   });
 
   req.on('error', (error: Error) => {

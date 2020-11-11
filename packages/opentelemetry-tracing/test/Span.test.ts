@@ -15,7 +15,7 @@
  */
 
 import {
-  CanonicalCode,
+  StatusCode,
   Exception,
   LinkContext,
   ROOT_CONTEXT,
@@ -39,6 +39,10 @@ const performanceTimeOrigin = hrTime();
 describe('Span', () => {
   const tracer = new BasicTracerProvider({
     logger: new NoopLogger(),
+    traceParams: {
+      numberOfAttributesPerSpan: 100,
+      numberOfEventsPerSpan: 100,
+    },
   }).getTracer('default');
   const name = 'span1';
   const spanContext: SpanContext = {
@@ -327,7 +331,7 @@ describe('Span', () => {
     span.end();
   });
 
-  it('should drop extra links, attributes and events', () => {
+  it('should drop extra attributes and events', () => {
     const span = new Span(
       tracer,
       ROOT_CONTEXT,
@@ -341,8 +345,8 @@ describe('Span', () => {
     }
     span.end();
 
-    assert.strictEqual(span.events.length, 128);
-    assert.strictEqual(Object.keys(span.attributes).length, 32);
+    assert.strictEqual(span.events.length, 100);
+    assert.strictEqual(Object.keys(span.attributes).length, 100);
     assert.strictEqual(span.events[span.events.length - 1].name, 'sent149');
     assert.strictEqual(span.attributes['foo0'], undefined);
     assert.strictEqual(span.attributes['foo149'], 'bar149');
@@ -357,7 +361,7 @@ describe('Span', () => {
       SpanKind.CLIENT
     );
     span.setStatus({
-      code: CanonicalCode.PERMISSION_DENIED,
+      code: StatusCode.ERROR,
       message: 'This is an error',
     });
     span.end();
@@ -379,7 +383,7 @@ describe('Span', () => {
     assert.strictEqual(span.parentSpanId, parentId);
     assert.strictEqual(span.spanContext.traceId, spanContext.traceId);
     assert.deepStrictEqual(span.status, {
-      code: CanonicalCode.OK,
+      code: StatusCode.UNSET,
     });
     assert.deepStrictEqual(span.attributes, {});
     assert.deepStrictEqual(span.links, []);
@@ -491,19 +495,19 @@ describe('Span', () => {
       SpanKind.CLIENT
     );
     span.setStatus({
-      code: CanonicalCode.PERMISSION_DENIED,
+      code: StatusCode.ERROR,
       message: 'This is an error',
     });
-    assert.strictEqual(span.status.code, CanonicalCode.PERMISSION_DENIED);
+    assert.strictEqual(span.status.code, StatusCode.ERROR);
     assert.strictEqual(span.status.message, 'This is an error');
     span.end();
 
     // shouldn't update status
     span.setStatus({
-      code: CanonicalCode.OK,
+      code: StatusCode.OK,
       message: 'OK',
     });
-    assert.strictEqual(span.status.code, CanonicalCode.PERMISSION_DENIED);
+    assert.strictEqual(span.status.code, StatusCode.ERROR);
   });
 
   it('should only end a span once', () => {

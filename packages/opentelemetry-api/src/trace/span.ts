@@ -47,7 +47,8 @@ export interface Span {
    * Sets a single Attribute with the key and value passed as arguments.
    *
    * @param key the key for this attribute.
-   * @param value the value for this attribute.
+   * @param value the value for this attribute. Setting a value null or
+   *              undefined is invalid and will result in undefined behavior.
    */
   setAttribute(key: string, value?: AttributeValue): this;
 
@@ -55,6 +56,8 @@ export interface Span {
    * Sets attributes to the span.
    *
    * @param attributes the attributes that will be added.
+   *                   null or undefined attribute values
+   *                   are invalid and will result in undefined behavior.
    */
   setAttributes(attributes: Attributes): this;
 
@@ -75,7 +78,7 @@ export interface Span {
 
   /**
    * Sets a status to the span. If used, this will override the default Span
-   * status. Default is {@link CanonicalCode.OK}. SetStatus overrides the value
+   * status. Default is {@link StatusCode.UNSET}. SetStatus overrides the value
    * of previous calls to SetStatus on the Span.
    *
    * @param status the Status to set.

@@ -9,7 +9,7 @@ This package depends on all core web plugins maintained by OpenTelemetry authors
 
 ## Plugins
 
-- [@opentelemetry/plugin-xml-http-request][otel-plugin-xml-http-request]
+- [@opentelemetry/instrumentation-xml-http-request][otel-instrumentation-xml-http-request]
 
 ## Useful links
 
@@ -30,4 +30,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/plugins-web-core
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fplugins-web-core.svg
 
-[otel-plugin-xml-http-request]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-xml-http-request
+[otel-instrumentation-xml-http-request]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-instrumentation-xml-http-request

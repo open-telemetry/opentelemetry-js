@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { TraceFlags, ValueType } from '@opentelemetry/api';
+import { TraceFlags, ValueType, StatusCode } from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
 import { MetricRecord, MeterProvider } from '@opentelemetry/metrics';
@@ -115,7 +115,7 @@ export const mockedReadableSpan: ReadableSpan = {
   startTime: [1574120165, 429803070],
   endTime: [1574120165, 438688070],
   ended: true,
-  status: { code: 0 },
+  status: { code: StatusCode.OK },
   attributes: { component: 'document-load' },
   links: [
     {
@@ -186,7 +186,7 @@ export const basicTrace: ReadableSpan[] = [
     startTime: [1574120165, 429803070],
     endTime: [1574120165, 438688070],
     ended: true,
-    status: { code: 0 },
+    status: { code: StatusCode.OK },
     attributes: {},
     links: [],
     events: [],
@@ -206,7 +206,7 @@ export const basicTrace: ReadableSpan[] = [
     startTime: [1575120165, 439803070],
     endTime: [1575120165, 448688070],
     ended: true,
-    status: { code: 0 },
+    status: { code: StatusCode.OK },
     attributes: {},
     links: [],
     events: [],
@@ -226,7 +226,7 @@ export const basicTrace: ReadableSpan[] = [
     startTime: [1575120165, 439803070],
     endTime: [1575120165, 448688070],
     ended: true,
-    status: { code: 0 },
+    status: { code: StatusCode.OK },
     attributes: {},
     links: [],
     events: [],
@@ -462,7 +462,11 @@ export function ensureSpanIsCorrect(
   );
   assert.strictEqual(span.droppedEventsCount, 0, 'droppedEventsCount is wrong');
   assert.strictEqual(span.droppedLinksCount, 0, 'droppedLinksCount is wrong');
-  assert.deepStrictEqual(span.status, { code: 0 }, 'status is wrong');
+  assert.deepStrictEqual(
+    span.status,
+    { code: StatusCode.OK },
+    'status is wrong'
+  );
 }
 
 export function ensureWebResourceIsCorrect(

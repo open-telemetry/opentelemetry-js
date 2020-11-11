@@ -11,7 +11,7 @@ This module provides auto instrumentation for web using XMLHttpRequest .
 ## Installation
 
 ```bash
-npm install --save @opentelemetry/plugin-xml-http-request
+npm install --save @opentelemetry/instrumentation-xml-http-request
 ```
 
 ## Usage
@@ -19,17 +19,30 @@ npm install --save @opentelemetry/plugin-xml-http-request
 ```js
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracer } from '@opentelemetry/web';
-import { XMLHttpRequestPlugin } from '@opentelemetry/plugin-xml-http-request';
+import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xml-http-request';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 
+// this is still possible
 const webTracerWithZone = new WebTracer({
   contextManager: new ZoneContextManager(),
   plugins: [
-    new XMLHttpRequestPlugin({
+    new XMLHttpRequestInstrumentation({
       propagateTraceHeaderCorsUrls: ['http://localhost:8090']
     })
   ]
 });
+/////////////////////////////////////////
+
+// or plugin can be also initialised separately and then set the tracer provider or meter provider
+const xmlHttpRequestInstrumentation = new XMLHttpRequestInstrumentation({
+  propagateTraceHeaderCorsUrls: ['http://localhost:8090']
+});
+const webTracerWithZone = new WebTracer({
+  contextManager: new ZoneContextManager(),
+});
+xmlHttpRequestInstrumentation.setTracerProvider(webTracerWithZone);
+/////////////////////////////////////////
+
 webTracerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
 // and some test
@@ -61,9 +74,9 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [gitter-url]: https://gitter.im/open-telemetry/opentelemetry-node?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-plugin-xml-http-request
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-plugin-xml-http-request
-[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-plugin-xml-http-request
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-plugin-xml-http-request&type=dev
-[npm-url]: https://www.npmjs.com/package/@opentelemetry/plugin-xml-http-request
-[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fplugin-xml-http-request.svg
+[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-instrumentation-xml-http-request
+[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-instrumentation-xml-http-request
+[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-instrumentation-xml-http-request
+[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-instrumentation-xml-http-request&type=dev
+[npm-url]: https://www.npmjs.com/package/@opentelemetry/instrumentation-xml-http-request
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Finstrumentation-xml-http-request.svg

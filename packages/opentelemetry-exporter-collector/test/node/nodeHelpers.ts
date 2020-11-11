@@ -13,28 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface Status {
-  /** The status code of this message. */
-  code: StatusCode;
-  /** A developer-facing error message. */
-  message?: string;
-}
 
-/**
- * An enumeration of status codes.
- */
-export enum StatusCode {
-  /**
-   * The operation has been validated by an Application developer or
-   * Operator to have completed successfully.
-   */
-  OK = 0,
-  /**
-   * The default status.
-   */
-  UNSET = 1,
-  /**
-   * The operation contains an error.
-   */
-  ERROR = 2,
+import { Stream } from 'stream';
+
+export class MockedResponse extends Stream {
+  constructor(private _code: number, private _msg?: string) {
+    super();
+  }
+
+  send(data: string) {
+    this.emit('data', data);
+    this.emit('end');
+  }
+
+  get statusCode() {
+    return this._code;
+  }
+
+  get statusMessage() {
+    return this._msg;
+  }
 }

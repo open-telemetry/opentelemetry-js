@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-import { TraceFlags, ValueType } from '@opentelemetry/api';
+import { TraceFlags, ValueType, StatusCode } from '@opentelemetry/api';
 import { hexToBase64 } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
 import { collectorTypes } from '@opentelemetry/exporter-collector';
 import * as assert from 'assert';
 import { MeterProvider, MetricRecord } from '@opentelemetry/metrics';
+import { Stream } from 'stream';
 
 const meterProvider = new MeterProvider({
   interval: 30000,
@@ -106,7 +107,7 @@ export const mockedReadableSpan: ReadableSpan = {
   startTime: [1574120165, 429803070],
   endTime: [1574120165, 438688070],
   ended: true,
-  status: { code: 0 },
+  status: { code: StatusCode.OK },
   attributes: { component: 'document-load' },
   links: [
     {
@@ -425,4 +426,23 @@ export function ensureExportMetricsServiceRequestIsSet(
 
   const metrics = resourceMetrics[0].instrumentationLibraryMetrics[0].metrics;
   assert.strictEqual(metrics.length, 3, 'Metrics are missing');
+}
+
+export class MockedResponse extends Stream {
+  constructor(private _code: number, private _msg?: string) {
+    super();
+  }
+
+  send(data: string) {
+    this.emit('data', data);
+    this.emit('end');
+  }
+
+  get statusCode() {
+    return this._code;
+  }
+
+  get statusMessage() {
+    return this._msg;
+  }
 }

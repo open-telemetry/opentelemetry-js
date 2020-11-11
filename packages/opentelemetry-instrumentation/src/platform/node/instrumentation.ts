@@ -177,12 +177,4 @@ export abstract class InstrumentationBase<T = any>
       }
     }
   }
-
-  /**
-   * Init method in which plugin should define _modules and patches for
-   * methods
-   */
-  protected abstract init():
-    | InstrumentationModuleDefinition<T>
-    | InstrumentationModuleDefinition<T>[];
 }
