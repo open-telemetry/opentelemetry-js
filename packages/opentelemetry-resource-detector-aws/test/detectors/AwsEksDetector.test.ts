@@ -53,19 +53,27 @@ describe('awsEksDetector', () => {
     fileNotFoundError: new Error('cannot find cgroup file'),
   };
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> 7359cb1e4... fix: updated files to adhere to linter
+=======
+
+>>>>>>> 7d6a1c05d... fix: updated files to adhere to linter
   const correctCgroupData =
     'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklm';
   const mockedClusterResponse = '{"data":{"cluster.name":"my-cluster"}}';
   const mockedAwsAuth = 'my-auth';
   const k8s_token = 'Bearer 31ada4fd-adec-460c-809a-9e56ceb75269';
+<<<<<<< HEAD
   let sandbox: sinon.SinonSandbox;
   let readStub, fileStub, getCredStub;
 
+=======
+>>>>>>> 7d6a1c05d... fix: updated files to adhere to linter
   let sandbox: sinon.SinonSandbox;
   let readStub, fileStub, getCredStub;
+
   beforeEach(() => {
     sandbox = sinon.createSandbox();
 =======
@@ -134,6 +142,7 @@ describe('awsEksDetector', () => {
 
       sandbox.assert.calledOnce(fileStub);
 <<<<<<< HEAD
+<<<<<<< HEAD
       sandbox.assert.calledTwice(readStub);
       sandbox.assert.calledTwice(getCredStub);
 
@@ -141,6 +150,11 @@ describe('awsEksDetector', () => {
       sandbox.assert.calledOnce(readStub);
       sandbox.assert.calledOnce(getCredStub);
 >>>>>>> 7359cb1e4... fix: updated files to adhere to linter
+=======
+      sandbox.assert.calledTwice(readStub);
+      sandbox.assert.calledTwice(getCredStub);
+
+>>>>>>> 7d6a1c05d... fix: updated files to adhere to linter
       assert.ok(resource);
       assertK8sResource(resource, {
         clusterName: 'my-cluster',
