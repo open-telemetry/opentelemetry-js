@@ -18,6 +18,7 @@ import { context } from '@opentelemetry/api';
 import { ContextManager } from '@opentelemetry/context-base';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { BasePlugin, NoopLogger } from '@opentelemetry/core';
+import { InstrumentationBase } from '@opentelemetry/instrumentation';
 import { B3Propagator } from '@opentelemetry/propagator-b3';
 import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
 import { Span, Tracer } from '@opentelemetry/tracing';
@@ -34,6 +35,15 @@ class DummyPlugin extends BasePlugin<unknown> {
 
   patch() {}
   unpatch() {}
+}
+
+class DummyInstrumentation extends InstrumentationBase<unknown> {
+  constructor() {
+    super('dummy', '1');
+  }
+  enable() {}
+  disable() {}
+  init() {}
 }
 
 describe('WebTracerProvider', () => {
@@ -62,16 +72,21 @@ describe('WebTracerProvider', () => {
     it('should enable all plugins', () => {
       const dummyPlugin1 = new DummyPlugin();
       const dummyPlugin2 = new DummyPlugin();
+      const dummyPlugin3 = new DummyInstrumentation();
       const spyEnable1 = sinon.spy(dummyPlugin1, 'enable');
       const spyEnable2 = sinon.spy(dummyPlugin2, 'enable');
+      const spyEnable3 = sinon.spy(dummyPlugin3, 'enable');
+      const spySetTracerProvider = sinon.spy(dummyPlugin3, 'setTracerProvider');
 
-      const plugins = [dummyPlugin1, dummyPlugin2];
+      const plugins = [dummyPlugin1, dummyPlugin2, dummyPlugin3];
 
       const options = { plugins };
       new WebTracerProvider(options);
 
       assert.ok(spyEnable1.calledOnce === true);
       assert.ok(spyEnable2.calledOnce === true);
+      assert.ok(spyEnable3.calledOnce === true);
+      assert.ok(spySetTracerProvider.calledOnce === true);
     });
 
     it('should work without default context manager', () => {

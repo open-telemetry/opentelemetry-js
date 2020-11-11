@@ -79,6 +79,7 @@
     "@opentelemetry/api": "^0.12.0",
     "@opentelemetry/context-base": "^0.12.0",
     "@opentelemetry/core": "^0.12.0",
+    "@opentelemetry/instrumentation": "^0.12.0",
     "@opentelemetry/semantic-conventions": "^0.12.0",
     "@opentelemetry/tracing": "^0.12.0"
   }

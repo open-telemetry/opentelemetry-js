@@ -1,15 +1,15 @@
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
-import { XMLHttpRequestPlugin } from '@opentelemetry/plugin-xml-http-request';
 import { UserInteractionPlugin } from '@opentelemetry/plugin-user-interaction';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { CollectorTraceExporter } from '@opentelemetry/exporter-collector';
 import { B3Propagator } from '@opentelemetry/propagator-b3';
+import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xml-http-request';
 
 const providerWithZone = new WebTracerProvider({
   plugins: [
     new UserInteractionPlugin(),
-    new XMLHttpRequestPlugin({
+    new XMLHttpRequestInstrumentation({
       ignoreUrls: [/localhost/],
       propagateTraceHeaderCorsUrls: [
         'http://localhost:8090',

@@ -25,10 +25,16 @@ export interface ENVIRONMENT {
   OTEL_LOG_LEVEL?: LogLevel;
   OTEL_NO_PATCH_MODULES?: string;
   OTEL_SAMPLING_PROBABILITY?: number;
+  OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT?: number;
+  OTEL_SPAN_EVENT_COUNT_LIMIT?: number;
+  OTEL_SPAN_LINK_COUNT_LIMIT?: number;
 }
 
 const ENVIRONMENT_NUMBERS: Partial<keyof ENVIRONMENT>[] = [
   'OTEL_SAMPLING_PROBABILITY',
+  'OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT',
+  'OTEL_SPAN_EVENT_COUNT_LIMIT',
+  'OTEL_SPAN_LINK_COUNT_LIMIT',
 ];
 
 /**
@@ -38,6 +44,9 @@ export const DEFAULT_ENVIRONMENT: Required<ENVIRONMENT> = {
   OTEL_NO_PATCH_MODULES: '',
   OTEL_LOG_LEVEL: LogLevel.INFO,
   OTEL_SAMPLING_PROBABILITY: 1,
+  OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT: 1000,
+  OTEL_SPAN_EVENT_COUNT_LIMIT: 1000,
+  OTEL_SPAN_LINK_COUNT_LIMIT: 1000,
 };
 
 /**
@@ -57,8 +66,15 @@ function parseNumber(
 ) {
   if (typeof values[name] !== 'undefined') {
     const value = Number(values[name] as string);
-    if (!isNaN(value) && value >= min && value <= max) {
-      environment[name] = value;
+
+    if (!isNaN(value)) {
+      if (value < min) {
+        environment[name] = min;
+      } else if (value > max) {
+        environment[name] = max;
+      } else {
+        environment[name] = value;
+      }
     }
   }
 }
