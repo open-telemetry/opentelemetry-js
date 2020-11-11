@@ -47,7 +47,8 @@ export interface Span {
    * Sets a single Attribute with the key and value passed as arguments.
    *
    * @param key the key for this attribute.
-   * @param value the value for this attribute.
+   * @param value the value for this attribute. Setting a value null or
+   *              undefined is invalid and will result in undefined behavior.
    */
   setAttribute(key: string, value?: AttributeValue): this;
 
@@ -55,6 +56,8 @@ export interface Span {
    * Sets attributes to the span.
    *
    * @param attributes the attributes that will be added.
+   *                   null or undefined attribute values
+   *                   are invalid and will result in undefined behavior.
    */
   setAttributes(attributes: Attributes): this;
 
