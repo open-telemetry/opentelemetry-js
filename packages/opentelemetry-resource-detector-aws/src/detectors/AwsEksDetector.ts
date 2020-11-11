@@ -78,7 +78,7 @@ export class AwsEksDetector implements Detector {
             [CONTAINER_RESOURCE.ID]: containerId || '',
           });
     } catch (e) {
-      config.logger.warn('This process is not running on Kubernetes because either the token path or certificate path cannot be accessed ', e);
+      config.logger.warn('Process is not running on K8S', e);
       return Resource.empty();
     }
   }
