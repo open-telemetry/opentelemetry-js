@@ -14,19 +14,23 @@
  * limitations under the License.
  */
 
-export interface Attributes {
-  [attributeKey: string]: AttributeValue | undefined;
-}
+import { Stream } from 'stream';
 
-/**
- * Attribute values may be any non-nullish primitive value except an object.
- *
- * null or undefined attribute values are invalid and will result in undefined behavior.
- */
-export type AttributeValue =
-  | string
-  | number
-  | boolean
-  | Array<null | undefined | string>
-  | Array<null | undefined | number>
-  | Array<null | undefined | boolean>;
+export class MockedResponse extends Stream {
+  constructor(private _code: number, private _msg?: string) {
+    super();
+  }
+
+  send(data: string) {
+    this.emit('data', data);
+    this.emit('end');
+  }
+
+  get statusCode() {
+    return this._code;
+  }
+
+  get statusMessage() {
+    return this._msg;
+  }
+}
