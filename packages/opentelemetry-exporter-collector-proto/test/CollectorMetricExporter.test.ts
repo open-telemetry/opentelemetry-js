@@ -142,7 +142,9 @@ describe('CollectorMetricExporter - node with proto over http', () => {
         );
         ensureExportedValueRecorderIsCorrect(
           metric3,
-          metric3.intHistogram?.dataPoints[0].timeUnixNano
+          metric3.intHistogram?.dataPoints[0].timeUnixNano,
+          [0, 100],
+          ['0', '2', '0']
         );
 
         ensureExportMetricsServiceRequestIsSet(json);
