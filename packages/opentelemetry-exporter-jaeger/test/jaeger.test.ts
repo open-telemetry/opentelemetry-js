@@ -31,7 +31,7 @@ import * as nock from 'nock';
 describe('JaegerExporter', () => {
   describe('constructor', () => {
     afterEach(() => {
-      delete process.env.JAEGER_AGENT_HOST;
+      delete process.env.OTEL_EXPORTER_JAEGER_AGENT_HOST;
     });
 
     it('should construct an exporter', () => {
@@ -71,7 +71,7 @@ describe('JaegerExporter', () => {
     });
 
     it('should respect jaeger host env variable', () => {
-      process.env.JAEGER_AGENT_HOST = 'env-set-host';
+      process.env.OTEL_EXPORTER_JAEGER_AGENT_HOST = 'env-set-host';
       const exporter = new JaegerExporter({
         serviceName: 'test-service',
       });
@@ -79,7 +79,7 @@ describe('JaegerExporter', () => {
     });
 
     it('should prioritize host option over env variable', () => {
-      process.env.JAEGER_AGENT_HOST = 'env-set-host';
+      process.env.OTEL_EXPORTER_JAEGER_AGENT_HOST = 'env-set-host';
       const exporter = new JaegerExporter({
         serviceName: 'test-service',
         host: 'option-set-host',

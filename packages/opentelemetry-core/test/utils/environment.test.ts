@@ -18,18 +18,18 @@ import { getEnv } from '../../src/platform';
 import {
   DEFAULT_ENVIRONMENT,
   ENVIRONMENT,
-  ENVIRONMENT_MAP,
+  RAW_ENVIRONMENT,
 } from '../../src/utils/environment';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { LogLevel } from '../../src';
 
-let lastMock: ENVIRONMENT_MAP = {};
+let lastMock: RAW_ENVIRONMENT = {};
 
 /**
  * Mocks environment used for tests.
  */
-export function mockEnvironment(values: ENVIRONMENT_MAP) {
+export function mockEnvironment(values: RAW_ENVIRONMENT) {
   lastMock = values;
   if (typeof process !== 'undefined') {
     Object.keys(values).forEach(key => {
@@ -37,7 +37,7 @@ export function mockEnvironment(values: ENVIRONMENT_MAP) {
     });
   } else {
     Object.keys(values).forEach(key => {
-      ((window as unknown) as ENVIRONMENT_MAP)[key] = String(values[key]);
+      ((window as unknown) as RAW_ENVIRONMENT)[key] = String(values[key]);
     });
   }
 }
@@ -52,7 +52,7 @@ export function removeMockEnvironment() {
     });
   } else {
     Object.keys(lastMock).forEach(key => {
-      delete ((window as unknown) as ENVIRONMENT_MAP)[key];
+      delete ((window as unknown) as RAW_ENVIRONMENT)[key];
     });
   }
   lastMock = {};
@@ -80,14 +80,45 @@ describe('environment', () => {
         OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT: 10,
         OTEL_SPAN_EVENT_COUNT_LIMIT: 20,
         OTEL_SPAN_LINK_COUNT_LIMIT: 30,
+        OTEL_EXPORTER_JAEGER_ENDPOINT: 'https://example.com/endpoint',
+        OTEL_EXPORTER_JAEGER_USER: 'whoami',
+        OTEL_EXPORTER_JAEGER_PASSWORD: 'secret',
+        OTEL_EXPORTER_JAEGER_AGENT_HOST: 'host.domain.com',
+        ECS_CONTAINER_METADATA_URI_V4: 'https://ecs.uri/v4',
+        ECS_CONTAINER_METADATA_URI: 'https://ecs.uri/',
+        NAMESPACE: 'namespace',
+        HOSTNAME: 'hostname',
+        CONTAINER_NAME: 'container-1',
+        KUBERNETES_SERVICE_HOST: 'https://k8s.host/',
+        OTEL_RESOURCE_ATTRIBUTES: '<attrs>',
       });
       const env = getEnv();
-      assert.strictEqual(env.OTEL_NO_PATCH_MODULES, 'a,b,c');
+      assert.deepStrictEqual(env.OTEL_NO_PATCH_MODULES, ['a', 'b', 'c']);
       assert.strictEqual(env.OTEL_LOG_LEVEL, LogLevel.ERROR);
       assert.strictEqual(env.OTEL_SAMPLING_PROBABILITY, 0.5);
       assert.strictEqual(env.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT, 10);
       assert.strictEqual(env.OTEL_SPAN_EVENT_COUNT_LIMIT, 20);
       assert.strictEqual(env.OTEL_SPAN_LINK_COUNT_LIMIT, 30);
+      assert.strictEqual(
+        env.OTEL_EXPORTER_JAEGER_ENDPOINT,
+        'https://example.com/endpoint'
+      );
+      assert.strictEqual(env.OTEL_EXPORTER_JAEGER_USER, 'whoami');
+      assert.strictEqual(env.OTEL_EXPORTER_JAEGER_PASSWORD, 'secret');
+      assert.strictEqual(
+        env.OTEL_EXPORTER_JAEGER_AGENT_HOST,
+        'host.domain.com'
+      );
+      assert.strictEqual(
+        env.ECS_CONTAINER_METADATA_URI_V4,
+        'https://ecs.uri/v4'
+      );
+      assert.strictEqual(env.ECS_CONTAINER_METADATA_URI, 'https://ecs.uri/');
+      assert.strictEqual(env.NAMESPACE, 'namespace');
+      assert.strictEqual(env.HOSTNAME, 'hostname');
+      assert.strictEqual(env.CONTAINER_NAME, 'container-1');
+      assert.strictEqual(env.KUBERNETES_SERVICE_HOST, 'https://k8s.host/');
+      assert.strictEqual(env.OTEL_RESOURCE_ATTRIBUTES, '<attrs>');
     });
 
     it('should match invalid values to closest valid equivalent', () => {
