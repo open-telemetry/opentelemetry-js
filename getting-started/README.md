@@ -69,7 +69,7 @@ $ npm install \
 
 ([link to TypeScript version](ts-example/README.md#initialize-a-global-tracer))
 
-All tracing initialization should happen before your application code runs. The easiest way to do this is to initialize tracing in a separate file that is required using NodeJS's `-r` option before your application code runs.
+All tracing initialization should happen before your application code runs. The easiest way to do this is to initialize tracing in a separate file that is required using the `node` `-r` option before your application code runs.
 
 Create a file named `tracing.js` and add the following code:
 
