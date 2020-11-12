@@ -235,7 +235,7 @@ $ npm install \
 
 ([link to TypeScript version](ts-example/README.md#initialize-a-meter-and-collect-metrics))
 
-To create and monitor metrics, we need a `Meter`. In OpenTelemetry, a `Meter` is the mechanism used to create and manage metrics, labels, and metric exporters.
+You need a `Meter` to create and monitor metrics. A `Meter` in OpenTelemetry is the mechanism used to create and manage metrics, labels, and metric exporters.
 
 Create a file named `monitoring.js` and add the following code:
 
