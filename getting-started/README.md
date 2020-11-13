@@ -208,7 +208,7 @@ scrape_configs:
       - targets: ['localhost:9464']
 ```
 
-### Monitor Your NodeJS application
+### Monitor your NodeJS application
 
 ([link to TypeScript version](ts-example/README.md#monitor-your-nodejs-application))
 
