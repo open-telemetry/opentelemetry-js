@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import * as http from 'http';
-import * as https from 'https';
+import type * as http from 'http';
+import type * as https from 'https';
 
 import { CollectorExporterBase } from '../../CollectorExporterBase';
 import { CollectorExporterNodeConfigBase } from '../../types';
@@ -45,11 +45,11 @@ export abstract class CollectorExporterNodeBase<
     }
     this.headers =
       parseHeaders(config.headers, this.logger) || this.DEFAULT_HEADERS;
-    if (config.keepAlive !== undefined && !config.keepAlive) {
+    if (typeof config.keepAlive === 'boolean') {
       this.keepAlive = config.keepAlive;
     }
     if (config.httpAgentOptions) {
-      this.httpAgentOptions = config.httpAgentOptions;
+      this.httpAgentOptions = Object.assign({}, config.httpAgentOptions);
     }
   }
 
