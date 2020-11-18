@@ -32,7 +32,7 @@ import {
   BoundCounter,
   BoundBaseObserver,
 } from './BoundInstrument';
-import { CorrelationContext } from '../correlation_context/CorrelationContext';
+import { Baggage } from '../baggage/Baggage';
 import { SpanContext } from '../trace/span_context';
 import { ObserverResult } from './ObserverResult';
 
@@ -169,11 +169,7 @@ export class NoopBoundCounter implements BoundCounter {
 }
 
 export class NoopBoundValueRecorder implements BoundValueRecorder {
-  record(
-    _value: number,
-    _correlationContext?: CorrelationContext,
-    _spanContext?: SpanContext
-  ): void {
+  record(_value: number, _baggage?: Baggage, _spanContext?: SpanContext): void {
     return;
   }
 }

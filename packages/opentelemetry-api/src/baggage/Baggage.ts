@@ -17,13 +17,13 @@
 import { EntryValue } from './EntryValue';
 
 /**
- * CorrelationContext represents collection of entries. Each key of
- * CorrelationContext is associated with exactly one value. CorrelationContext
+ * Baggage represents collection of entries. Each key of
+ * Baggage is associated with exactly one value. Baggage
  * is serializable, to facilitate propagating it not only inside the process
- * but also across process boundaries. CorrelationContext is used to annotate
+ * but also across process boundaries. Baggage is used to annotate
  * telemetry with the name:value pair Entry. Those values can be used to add
  * dimension to the metric or additional contest properties to logs and traces.
  */
-export interface CorrelationContext {
+export interface Baggage {
   [entryKey: string]: EntryValue;
 }
