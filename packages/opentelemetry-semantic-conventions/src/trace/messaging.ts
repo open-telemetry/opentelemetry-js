@@ -132,3 +132,20 @@ export const MessagingAttribute = {
   MESSAGING_KAFKA_PARTITION: 'messaging.kafka.partition',
   MESSAGING_KAFKA_TOMBSTONE: 'messaging.kafka.tombstone',
 };
+
+export const MessagingOperationName = {
+  /**
+   *  A message is sent to a destination by a message producer/client.
+   */
+  SEND: 'send',
+
+  /**
+   *  A message is received from a destination by a message consumer/server.
+   */
+  RECEIVE: 'receive',
+
+  /**
+   *  A message that was previously received from a destination is processed by a message consumer/server.
+   */
+  PROCESS: 'process',
+};
