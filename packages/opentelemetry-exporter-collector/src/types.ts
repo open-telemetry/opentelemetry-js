@@ -16,6 +16,8 @@
 
 import { SpanKind, Logger, Attributes } from '@opentelemetry/api';
 import * as api from '@opentelemetry/api';
+import * as http from 'http';
+import * as https from 'https';
 
 /* eslint-disable @typescript-eslint/no-namespace */
 export namespace opentelemetryProto {
@@ -339,7 +341,15 @@ export interface CollectorExporterConfigBase {
   serviceName?: string;
   attributes?: Attributes;
   url?: string;
+}
+
+/**
+ * Collector Exporter node base config
+ */
+export interface CollectorExporterNodeConfigBase
+  extends CollectorExporterConfigBase {
   keepAlive?: boolean;
+  httpAgentOptions?: http.AgentOptions | https.AgentOptions;
 }
 
 /**

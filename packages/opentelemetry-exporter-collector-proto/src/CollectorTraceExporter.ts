@@ -40,7 +40,9 @@ export class CollectorTraceExporter
     return toCollectorExportTraceServiceRequest(spans, this);
   }
 
-  getDefaultUrl(config: collectorTypes.CollectorExporterConfigBase): string {
+  getDefaultUrl(
+    config: collectorTypes.CollectorExporterNodeConfigBase
+  ): string {
     if (!config.url) {
       return DEFAULT_COLLECTOR_URL;
     }
@@ -48,7 +50,7 @@ export class CollectorTraceExporter
   }
 
   getDefaultServiceName(
-    config: collectorTypes.CollectorExporterConfigBase
+    config: collectorTypes.CollectorExporterNodeConfigBase
   ): string {
     return config.serviceName || DEFAULT_SERVICE_NAME;
   }

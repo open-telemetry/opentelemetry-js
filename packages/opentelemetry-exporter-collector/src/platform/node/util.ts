@@ -51,8 +51,10 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
   const request = parsedUrl.protocol === 'http:' ? http.request : https.request;
   const Agent = parsedUrl.protocol === 'http:' ? http.Agent : https.Agent;
   if (collector.keepAlive) {
-    const keepAliveAgent = new Agent({ keepAlive: true });
-    options.agent = keepAliveAgent;
+    options.agent = new Agent({
+      ...collector.httpAgentOptions,
+      keepAlive: true,
+    });
   }
 
   const req = request(options, (res: http.IncomingMessage) => {

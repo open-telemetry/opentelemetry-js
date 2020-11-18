@@ -21,7 +21,6 @@ import * as http from 'http';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorTraceExporter } from '../../src/platform/node';
-import { CollectorExporterConfigBase } from '../../src/types';
 import * as collectorTypes from '../../src/types';
 
 import {
@@ -44,7 +43,7 @@ const address = 'localhost:1501';
 
 describe('CollectorTraceExporter - node with json over http', () => {
   let collectorExporter: CollectorTraceExporter;
-  let collectorExporterConfig: CollectorExporterConfigBase;
+  let collectorExporterConfig: collectorTypes.CollectorExporterNodeConfigBase;
   let spyRequest: sinon.SinonSpy;
   let spyWrite: sinon.SinonSpy;
   let spans: ReadableSpan[];
@@ -77,6 +76,8 @@ describe('CollectorTraceExporter - node with json over http', () => {
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
+        keepAlive: true,
+        httpAgentOptions: { keepAliveMsecs: 2000 },
       };
       collectorExporter = new CollectorTraceExporter(collectorExporterConfig);
       spans = [];
@@ -108,6 +109,19 @@ describe('CollectorTraceExporter - node with json over http', () => {
         const args = spyRequest.args[0];
         const options = args[0];
         assert.strictEqual(options.headers['foo'], 'bar');
+        done();
+      });
+    });
+
+    it('should have keep alive and keepAliveMsecs option set', done => {
+      collectorExporter.export(spans, () => {});
+
+      setTimeout(() => {
+        const args = spyRequest.args[0];
+        const options = args[0];
+        const agent = options.agent;
+        assert.strictEqual(agent.keepAlive, true);
+        assert.strictEqual(agent.options.keepAliveMsecs, 2000);
         done();
       });
     });

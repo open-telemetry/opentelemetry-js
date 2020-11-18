@@ -33,7 +33,7 @@ export function getExportRequestProto(): Type | undefined {
 
 export function onInit<ExportItem, ServiceRequest>(
   collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
-  _config: collectorTypes.CollectorExporterConfigBase
+  _config: collectorTypes.CollectorExporterNodeConfigBase
 ): void {
   const dir = path.resolve(__dirname, '..', 'protos');
   const root = new protobufjs.Root();

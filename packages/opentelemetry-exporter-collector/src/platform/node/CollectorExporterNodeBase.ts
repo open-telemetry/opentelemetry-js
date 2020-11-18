@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
+import * as http from 'http';
+import * as https from 'https';
+
 import { CollectorExporterBase } from '../../CollectorExporterBase';
-import { CollectorExporterConfigBase } from '../../types';
+import { CollectorExporterNodeConfigBase } from '../../types';
 import * as collectorTypes from '../../types';
 import { parseHeaders } from '../../util';
 import { sendWithHttp } from './util';
@@ -27,26 +30,30 @@ export abstract class CollectorExporterNodeBase<
   ExportItem,
   ServiceRequest
 > extends CollectorExporterBase<
-  CollectorExporterConfigBase,
+  CollectorExporterNodeConfigBase,
   ExportItem,
   ServiceRequest
 > {
   DEFAULT_HEADERS: Record<string, string> = {};
   headers: Record<string, string>;
-  keepAlive: boolean = false;
-  constructor(config: CollectorExporterConfigBase = {}) {
+  keepAlive: boolean = true;
+  httpAgentOptions: http.AgentOptions | https.AgentOptions = {};
+  constructor(config: CollectorExporterNodeConfigBase = {}) {
     super(config);
     if ((config as any).metadata) {
       this.logger.warn('Metadata cannot be set when using http');
     }
     this.headers =
       parseHeaders(config.headers, this.logger) || this.DEFAULT_HEADERS;
-    if (config.keepAlive) {
-      this.keepAlive = true;
+    if (config.keepAlive !== undefined && !config.keepAlive) {
+      this.keepAlive = config.keepAlive;
+    }
+    if (config.httpAgentOptions) {
+      this.httpAgentOptions = config.httpAgentOptions;
     }
   }
 
-  onInit(_config: CollectorExporterConfigBase): void {
+  onInit(_config: CollectorExporterNodeConfigBase): void {
     this._isShutdown = false;
   }
 
