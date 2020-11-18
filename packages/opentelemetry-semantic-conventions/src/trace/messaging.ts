@@ -44,7 +44,7 @@ export const MessagingAttribute = {
    * @remarks
    * Required only if the message destination is either a queue or topic.
    */
-  MESSAGING_DESTINATION_KIND: 'messaging.destination.kind',
+  MESSAGING_DESTINATION_KIND: 'messaging.destination_kind',
 
   /**
    * A boolean that is true if the message destination is temporary
