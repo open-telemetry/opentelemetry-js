@@ -14,10 +14,23 @@
  * limitations under the License.
  */
 
-export * from './database';
-export * from './exception';
-export * from './general';
-export * from './http';
-export * from './os';
-export * from './rpc';
-export * from './faas';
+import { Stream } from 'stream';
+
+export class MockedResponse extends Stream {
+  constructor(private _code: number, private _msg?: string) {
+    super();
+  }
+
+  send(data: string) {
+    this.emit('data', data);
+    this.emit('end');
+  }
+
+  get statusCode() {
+    return this._code;
+  }
+
+  get statusMessage() {
+    return this._msg;
+  }
+}

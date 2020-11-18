@@ -28,6 +28,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
   protected readonly _valueType: api.ValueType;
   protected readonly _logger: api.Logger;
   protected readonly _descriptor: MetricDescriptor;
+  protected readonly _boundaries: number[] | undefined;
   private readonly _instruments: Map<string, T> = new Map();
 
   constructor(
@@ -43,6 +44,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
         ? _options.valueType
         : api.ValueType.DOUBLE;
     this._logger = _options.logger ?? new NoopLogger();
+    this._boundaries = _options.boundaries;
     this._descriptor = this._getMetricDescriptor();
   }
 
@@ -105,6 +107,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
       unit: this._options.unit || '1',
       metricKind: this._kind,
       valueType: this._valueType,
+      ...(this._boundaries && { boundaries: this._boundaries }),
     };
   }
 
