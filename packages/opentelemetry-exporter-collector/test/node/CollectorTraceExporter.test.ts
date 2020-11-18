@@ -20,7 +20,10 @@ import { ReadableSpan } from '@opentelemetry/tracing';
 import * as http from 'http';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { CollectorTraceExporter } from '../../src/platform/node';
+import {
+  CollectorTraceExporter,
+  CollectorExporterNodeConfigBase,
+} from '../../src/platform/node';
 import * as collectorTypes from '../../src/types';
 
 import {
@@ -43,7 +46,7 @@ const address = 'localhost:1501';
 
 describe('CollectorTraceExporter - node with json over http', () => {
   let collectorExporter: CollectorTraceExporter;
-  let collectorExporterConfig: collectorTypes.CollectorExporterNodeConfigBase;
+  let collectorExporterConfig: CollectorExporterNodeConfigBase;
   let spyRequest: sinon.SinonSpy;
   let spyWrite: sinon.SinonSpy;
   let spans: ReadableSpan[];

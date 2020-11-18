@@ -18,7 +18,7 @@ import type * as http from 'http';
 import type * as https from 'https';
 
 import { CollectorExporterBase } from '../../CollectorExporterBase';
-import { CollectorExporterNodeConfigBase } from '../../types';
+import { CollectorExporterNodeConfigBase } from './types';
 import * as collectorTypes from '../../types';
 import { parseHeaders } from '../../util';
 import { sendWithHttp } from './util';
@@ -49,6 +49,11 @@ export abstract class CollectorExporterNodeBase<
       this.keepAlive = config.keepAlive;
     }
     if (config.httpAgentOptions) {
+      if (!this.keepAlive) {
+        this.logger.warn(
+          'httpAgentOptions is used only when keepAlive is true'
+        );
+      }
       this.httpAgentOptions = Object.assign({}, config.httpAgentOptions);
     }
   }

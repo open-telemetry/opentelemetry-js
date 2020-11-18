@@ -19,7 +19,10 @@ import * as core from '@opentelemetry/core';
 import * as http from 'http';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { CollectorMetricExporter } from '../../src/platform/node';
+import {
+  CollectorMetricExporter,
+  CollectorExporterNodeConfigBase,
+} from '../../src/platform/node';
 import * as collectorTypes from '../../src/types';
 
 import {
@@ -47,7 +50,7 @@ const address = 'localhost:1501';
 
 describe('CollectorMetricExporter - node with json over http', () => {
   let collectorExporter: CollectorMetricExporter;
-  let collectorExporterConfig: collectorTypes.CollectorExporterNodeConfigBase;
+  let collectorExporterConfig: CollectorExporterNodeConfigBase;
   let spyRequest: sinon.SinonSpy;
   let spyWrite: sinon.SinonSpy;
   let metrics: MetricRecord[];

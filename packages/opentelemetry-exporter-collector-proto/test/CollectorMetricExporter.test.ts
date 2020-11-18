@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import { collectorTypes } from '@opentelemetry/exporter-collector';
+import {
+  collectorTypes,
+  CollectorExporterNodeConfigBase,
+} from '@opentelemetry/exporter-collector';
 import * as core from '@opentelemetry/core';
 import * as http from 'http';
 import * as assert from 'assert';
@@ -53,7 +56,7 @@ const waitTimeMS = 20;
 
 describe('CollectorMetricExporter - node with proto over http', () => {
   let collectorExporter: CollectorMetricExporter;
-  let collectorExporterConfig: collectorTypes.CollectorExporterNodeConfigBase;
+  let collectorExporterConfig: CollectorExporterNodeConfigBase;
   let spyRequest: sinon.SinonSpy;
   let spyWrite: sinon.SinonSpy;
   let metrics: MetricRecord[];
