@@ -18,6 +18,11 @@ export interface Attributes {
   [attributeKey: string]: AttributeValue | undefined;
 }
 
+/**
+ * Attribute values may be any non-nullish primitive value except an object.
+ *
+ * null or undefined attribute values are invalid and will result in undefined behavior.
+ */
 export type AttributeValue =
   | string
   | number

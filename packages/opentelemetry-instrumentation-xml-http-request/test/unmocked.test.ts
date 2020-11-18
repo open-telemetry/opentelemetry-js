@@ -17,7 +17,7 @@ import { Span } from '@opentelemetry/api';
 import { HttpAttribute } from '@opentelemetry/semantic-conventions';
 import { ReadableSpan, SpanProcessor } from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
-import { XMLHttpRequestPlugin } from '../src';
+import { XMLHttpRequestInstrumentation } from '../src';
 import assert = require('assert');
 
 class TestSpanProcessor implements SpanProcessor {
@@ -41,7 +41,7 @@ describe('unmocked xhr', () => {
   let provider: WebTracerProvider;
   beforeEach(() => {
     provider = new WebTracerProvider({
-      plugins: [new XMLHttpRequestPlugin()],
+      plugins: [new XMLHttpRequestInstrumentation()],
     });
     testSpans = new TestSpanProcessor();
     provider.addSpanProcessor(testSpans);

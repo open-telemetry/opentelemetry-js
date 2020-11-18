@@ -67,7 +67,9 @@ describe('transformMetrics', () => {
 
       ensureValueRecorderIsCorrect(
         transform.toCollectorMetric(recorder, 1592602232694000000),
-        hrTimeToNanoseconds(recorder.aggregator.toPoint().timestamp)
+        hrTimeToNanoseconds(recorder.aggregator.toPoint().timestamp),
+        [0, 100],
+        [0, 2, 0]
       );
 
       ensureDoubleCounterIsCorrect(

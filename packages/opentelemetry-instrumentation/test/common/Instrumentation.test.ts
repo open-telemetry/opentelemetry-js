@@ -24,6 +24,7 @@ class TestInstrumentation extends InstrumentationAbstract {
   }
   enable() {}
   disable() {}
+  init() {}
 }
 
 describe('BaseInstrumentation', () => {
