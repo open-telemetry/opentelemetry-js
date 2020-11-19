@@ -30,5 +30,4 @@ export const DEFAULT_CONFIG = {
     numberOfLinksPerSpan: getEnv().OTEL_SPAN_LINK_COUNT_LIMIT,
     numberOfEventsPerSpan: getEnv().OTEL_SPAN_EVENT_COUNT_LIMIT,
   },
-  gracefulShutdown: true,
 };
