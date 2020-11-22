@@ -48,6 +48,7 @@ import {
   InstrumentationConfig,
   InstrumentationNodeModuleDefinition,
   isWrapped,
+  safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 
 /**
@@ -317,15 +318,14 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           span.setStatus(status);
 
           if (this._getConfig().applyCustomAttributesOnSpan) {
-            this._safeExecute(
-              span,
+            safeExecuteInTheMiddle(
               () =>
                 this._getConfig().applyCustomAttributesOnSpan!(
                   span,
                   request,
                   response
                 ),
-              false
+              () => {}
             );
           }
 
@@ -422,10 +422,15 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           ) {
             response.end = originalEnd;
             // Cannot pass args of type ResponseEndArgs,
-            const returned = plugin._safeExecute(
-              span,
+            const returned = safeExecuteInTheMiddle(
               () => response.end.apply(this, arguments as any),
-              true
+              error => {
+                if (error) {
+                  utils.setSpanWithError(span, error);
+                  plugin._closeHttpSpan(span);
+                  throw error;
+                }
+              }
             );
 
             const attributes = utils.getIncomingRequestAttributesOnResponse(
@@ -438,15 +443,14 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
               .setStatus(utils.parseResponseStatus(response.statusCode));
 
             if (plugin._getConfig().applyCustomAttributesOnSpan) {
-              plugin._safeExecute(
-                span,
+              safeExecuteInTheMiddle(
                 () =>
                   plugin._getConfig().applyCustomAttributesOnSpan!(
                     span,
                     request,
                     response
                   ),
-                false
+                () => {}
               );
             }
 
@@ -454,10 +458,15 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
             return returned;
           };
 
-          return plugin._safeExecute(
-            span,
+          return safeExecuteInTheMiddle(
             () => original.apply(this, [event, ...args]),
-            true
+            error => {
+              if (error) {
+                utils.setSpanWithError(span, error);
+                plugin._closeHttpSpan(span);
+                throw error;
+              }
+            }
           );
         });
       });
@@ -524,10 +533,15 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         setActiveSpan(context.active(), span)
       );
 
-      const request: http.ClientRequest = plugin._safeExecute(
-        span,
+      const request: http.ClientRequest = safeExecuteInTheMiddle(
         () => original.apply(this, [optionsParsed, ...args]),
-        true
+        error => {
+          if (error) {
+            utils.setSpanWithError(span, error);
+            plugin._closeHttpSpan(span);
+            throw error;
+          }
+        }
       );
 
       plugin._logger.debug('%s plugin outgoingRequest', component);
@@ -580,10 +594,9 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     span: Span,
     response: http.IncomingMessage | http.ServerResponse
   ) {
-    this._safeExecute(
-      span,
+    safeExecuteInTheMiddle(
       () => this._getConfig().responseHook!(span, response),
-      false
+      () => {}
     );
   }
 
@@ -591,35 +604,9 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     span: Span,
     request: http.ClientRequest | http.IncomingMessage
   ) {
-    this._safeExecute(
-      span,
+    safeExecuteInTheMiddle(
       () => this._getConfig().requestHook!(span, request),
-      false
+      () => {}
     );
-  }
-
-  private _safeExecute<
-    T extends (...args: unknown[]) => ReturnType<T>,
-    K extends boolean
-  >(
-    span: Span,
-    execute: T,
-    rethrow: K
-  ): K extends true ? ReturnType<T> : ReturnType<T> | void;
-  private _safeExecute<T extends (...args: unknown[]) => ReturnType<T>>(
-    span: Span,
-    execute: T,
-    rethrow: boolean
-  ): ReturnType<T> | void {
-    try {
-      return execute();
-    } catch (error) {
-      if (rethrow) {
-        utils.setSpanWithError(span, error);
-        this._closeHttpSpan(span);
-        throw error;
-      }
-      this._logger.error('caught error ', error);
-    }
   }
 }

@@ -33,10 +33,6 @@ export function safeExecuteInTheMiddle<T>(
     error = e;
   } finally {
     onFinish(error, result);
-    if (error) {
-      // eslint-disable-next-line no-unsafe-finally
-      throw error;
-    }
     // eslint-disable-next-line no-unsafe-finally
     return result as T;
   }
