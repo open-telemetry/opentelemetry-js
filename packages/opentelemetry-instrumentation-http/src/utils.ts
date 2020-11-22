@@ -218,7 +218,10 @@ export const getRequestInfo = (
       Object.assign(optionsParsed, extraOptions);
     }
   } else {
-    optionsParsed = Object.assign({}, options);
+    optionsParsed = Object.assign(
+      { protocol: options.host ? 'http:' : undefined },
+      options
+    );
     pathname = (options as url.URL).pathname;
     if (!pathname && optionsParsed.path) {
       pathname = url.parse(optionsParsed.path).pathname || '/';

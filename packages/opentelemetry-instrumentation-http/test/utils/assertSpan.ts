@@ -44,7 +44,10 @@ export const assertSpan = (
   assert.strictEqual(span.spanContext.traceId.length, 32);
   assert.strictEqual(span.spanContext.spanId.length, 16);
   assert.strictEqual(span.kind, kind);
-  assert.strictEqual(span.name, `HTTP ${validations.httpMethod}`);
+  assert.strictEqual(
+    span.name,
+    `${validations.component.toUpperCase()} ${validations.httpMethod}`
+  );
   assert.strictEqual(
     span.attributes[HttpAttribute.HTTP_ERROR_MESSAGE],
     span.status.message

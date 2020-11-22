@@ -15,6 +15,7 @@
  */
 import { Span } from '@opentelemetry/api';
 import type * as http from 'http';
+import type * as https from 'https';
 import {
   ClientRequest,
   get,
@@ -42,6 +43,7 @@ export type ParsedRequestOptions =
   | (http.RequestOptions & Partial<url.UrlWithParsedQuery>)
   | http.RequestOptions;
 export type Http = typeof http;
+export type Https = typeof https;
 /* tslint:disable-next-line:no-any */
 export type Func<T> = (...args: any[]) => T;
 export type ResponseEndArgs =

@@ -22,10 +22,10 @@ import {
   SpanKind,
 } from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracerProvider } from '@opentelemetry/node';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { ContextManager } from '@opentelemetry/context-base';
 import {
+  BasicTracerProvider,
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
@@ -35,6 +35,7 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as fs from 'fs';
+import * as semver from 'semver';
 import * as nock from 'nock';
 import * as path from 'path';
 import { HttpInstrumentation } from '../../src/http';
@@ -61,7 +62,7 @@ const hostname = 'localhost';
 const serverName = 'my.server.name';
 const pathname = '/test';
 const memoryExporter = new InMemorySpanExporter();
-const provider = new NodeTracerProvider({
+const provider = new BasicTracerProvider({
   logger,
 });
 plugin.setTracerProvider(provider);
@@ -326,7 +327,7 @@ describe('HttpsPlugin', () => {
 
           assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
           assert.strictEqual(spans.length, 2);
-          assert.strictEqual(reqSpan.name, 'HTTP GET');
+          assert.strictEqual(reqSpan.name, 'HTTPS GET');
           assert.strictEqual(
             localSpan.spanContext.traceId,
             reqSpan.spanContext.traceId
@@ -369,7 +370,7 @@ describe('HttpsPlugin', () => {
 
             assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
             assert.strictEqual(spans.length, 2);
-            assert.strictEqual(reqSpan.name, 'HTTP GET');
+            assert.strictEqual(reqSpan.name, 'HTTPS GET');
             assert.strictEqual(
               localSpan.spanContext.traceId,
               reqSpan.spanContext.traceId
@@ -393,7 +394,7 @@ describe('HttpsPlugin', () => {
           for (let i = 0; i < num; i++) {
             await httpsRequest.get(`${protocol}://${hostname}${testPath}`);
             const spans = memoryExporter.getFinishedSpans();
-            assert.strictEqual(spans[i].name, 'HTTP GET');
+            assert.strictEqual(spans[i].name, 'HTTPS GET');
             assert.strictEqual(
               span.context().traceId,
               spans[i].spanContext.traceId
@@ -501,7 +502,15 @@ describe('HttpsPlugin', () => {
           assert.fail();
         } catch (error) {
           const spans = memoryExporter.getFinishedSpans();
-          assert.strictEqual(spans.length, 1);
+          /**
+           * There is an edge case with node 8 because the https module
+           * just call the http one, resulting in 2 span. The fix only works
+           * if the protocol is 'https:' resulting in 2 span only for this test.
+           */
+          assert.strictEqual(
+            spans.length,
+            semver.gt(process.version, '9.0.0') ? 1 : 2
+          );
         }
       });
 

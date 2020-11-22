@@ -37,6 +37,7 @@ import {
   Http,
   HttpInstrumentationConfig,
   HttpRequestArgs,
+  Https,
   ParsedRequestOptions,
   ResponseEndArgs,
 } from './types';
@@ -79,7 +80,11 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   }
 
   init() {
-    const httpModule = new InstrumentationNodeModuleDefinition<Http>(
+    return [this._getHttpsInstrumentation(), this._getHttpInstrumentation()];
+  }
+
+  private _getHttpInstrumentation() {
+    return new InstrumentationNodeModuleDefinition<Http>(
       'http',
       ['*'],
       moduleExports => {
@@ -92,18 +97,14 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           'request',
           this._getPatchOutgoingRequestFunction('http')
         );
-        // In Node >=8, http.get calls a private request method, therefore
-        // we patch it here too.
-        if (semver.satisfies(this._version, '>=8.0.0')) {
-          if (isWrapped(moduleExports.get)) {
-            this._unwrap(moduleExports, 'get');
-          }
-          this._wrap(
-            moduleExports,
-            'get',
-            this._getPatchOutgoingGetFunction(moduleExports.request)
-          );
+        if (isWrapped(moduleExports.get)) {
+          this._unwrap(moduleExports, 'get');
         }
+        this._wrap(
+          moduleExports,
+          'get',
+          this._getPatchOutgoingGetFunction(moduleExports.request)
+        );
         if (isWrapped(moduleExports.Server.prototype.emit)) {
           this._unwrap(moduleExports.Server.prototype, 'emit');
         }
@@ -119,13 +120,14 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         this._logger.debug(`Removing patch for http@${this._version}`);
 
         this._unwrap(moduleExports, 'request');
-        if (semver.satisfies(this._version, '>=8.0.0')) {
-          this._unwrap(moduleExports, 'get');
-        }
+        this._unwrap(moduleExports, 'get');
         this._unwrap(moduleExports.Server.prototype, 'emit');
       }
     );
-    const httpsModule = new InstrumentationNodeModuleDefinition<Http>(
+  }
+
+  private _getHttpsInstrumentation() {
+    return new InstrumentationNodeModuleDefinition<Https>(
       'https',
       ['*'],
       moduleExports => {
@@ -138,18 +140,14 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           'request',
           this._getPatchHttpsOutgoingRequestFunction('https')
         );
-        // In Node >=8, http.get calls a private request method, therefore
-        // we patch it here too.
-        if (semver.satisfies(this._version, '>=8.0.0')) {
-          if (isWrapped(moduleExports.get)) {
-            this._unwrap(moduleExports, 'get');
-          }
-          this._wrap(
-            moduleExports,
-            'get',
-            this._getPatchHttpsOutgoingGetFunction(moduleExports.request)
-          );
+        if (isWrapped(moduleExports.get)) {
+          this._unwrap(moduleExports, 'get');
         }
+        this._wrap(
+          moduleExports,
+          'get',
+          this._getPatchHttpsOutgoingGetFunction(moduleExports.request)
+        );
         if (isWrapped(moduleExports.Server.prototype.emit)) {
           this._unwrap(moduleExports.Server.prototype, 'emit');
         }
@@ -165,13 +163,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         this._logger.debug(`Removing patch for https@${this._version}`);
 
         this._unwrap(moduleExports, 'request');
-        if (semver.satisfies(this._version, '>=8.0.0')) {
-          this._unwrap(moduleExports, 'get');
-        }
+        this._unwrap(moduleExports, 'get');
         this._unwrap(moduleExports.Server.prototype, 'emit');
       }
     );
-    return [httpModule, httpsModule];
   }
 
   /**
@@ -229,8 +224,11 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         ...args: HttpRequestArgs
       ): http.ClientRequest {
         // Makes sure options will have default HTTPS parameters
-        // eslint-disable-next-line node/no-unsupported-features/node-builtins
-        if (typeof options === 'object' && !(options instanceof URL)) {
+        if (
+          component === 'https' &&
+          typeof options === 'object' &&
+          options?.constructor.name !== 'URL'
+        ) {
           options = Object.assign({}, options);
           instrumentation._setDefaultOptions(options);
         }
@@ -349,7 +347,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       this._closeHttpSpan(span);
     });
 
-    this._logger.debug('_tracehttp.ClientRequest return request');
+    this._logger.debug('http.ClientRequest return request');
     return request;
   }
 
@@ -399,7 +397,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       };
 
       return context.with(propagation.extract(headers), () => {
-        const span = plugin._startHttpSpan(`HTTP ${method}`, spanOptions);
+        const span = plugin._startHttpSpan(
+          `${component.toLocaleUpperCase()} ${method}`,
+          spanOptions
+        );
 
         return plugin.tracer.withSpan(span, () => {
           context.bind(request);
@@ -476,7 +477,6 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       if (!utils.isValidOptionsType(options)) {
         return original.apply(this, [options, ...args]);
       }
-
       const extraOptions =
         typeof args[0] === 'object' &&
         (typeof options === 'string' || options instanceof url.URL)
@@ -486,6 +486,18 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         options,
         extraOptions
       );
+      /**
+       * Node 8's https module directly call the http one so to avoid creating
+       * 2 span for the same request we need to check that the protocol is correct
+       * See: https://github.com/nodejs/node/blob/v8.17.0/lib/https.js#L245
+       */
+      if (
+        component === 'http' &&
+        semver.lt(process.version, '9.0.0') &&
+        optionsParsed.protocol === 'https:'
+      ) {
+        return original.apply(this, [optionsParsed, ...args]);
+      }
 
       if (
         utils.isIgnored(
@@ -498,7 +510,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         return original.apply(this, [optionsParsed, ...args]);
       }
 
-      const operationName = `HTTP ${method}`;
+      const operationName = `${component.toUpperCase()} ${method}`;
       const spanOptions: SpanOptions = {
         kind: SpanKind.CLIENT,
       };
