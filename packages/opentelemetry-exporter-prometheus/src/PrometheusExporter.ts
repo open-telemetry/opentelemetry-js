@@ -58,9 +58,14 @@ export class PrometheusExporter implements MetricExporter {
     this._logger = config.logger || new NoopLogger();
     this._port = config.port || PrometheusExporter.DEFAULT_OPTIONS.port;
     this._prefix = config.prefix || PrometheusExporter.DEFAULT_OPTIONS.prefix;
-    this._appendTimestamp = config.appendTimestamp ?? PrometheusExporter.DEFAULT_OPTIONS.appendTimestamp;
+    this._appendTimestamp =
+      config.appendTimestamp ??
+      PrometheusExporter.DEFAULT_OPTIONS.appendTimestamp;
     this._server = createServer(this._requestHandler);
-    this._serializer = new PrometheusSerializer(this._prefix, this._appendTimestamp);
+    this._serializer = new PrometheusSerializer(
+      this._prefix,
+      this._appendTimestamp
+    );
 
     this._endpoint = (
       config.endpoint || PrometheusExporter.DEFAULT_OPTIONS.endpoint
