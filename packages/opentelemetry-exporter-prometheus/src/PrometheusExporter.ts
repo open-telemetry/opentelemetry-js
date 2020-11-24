@@ -41,7 +41,7 @@ export class PrometheusExporter implements MetricExporter {
   private readonly _endpoint: string;
   private readonly _server: Server;
   private readonly _prefix?: string;
-  private readonly _appendTimestamp?: boolean;
+  private readonly _appendTimestamp: boolean;
   private _serializer: PrometheusSerializer;
   private _batcher = new PrometheusLabelsBatcher();
 
