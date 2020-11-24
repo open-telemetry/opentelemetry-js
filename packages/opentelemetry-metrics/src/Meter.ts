@@ -19,6 +19,7 @@ import { ConsoleLogger, InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BatchObserverMetric } from './BatchObserverMetric';
 import { BaseBoundInstrument } from './BoundInstrument';
+import { Processor } from './export/Processor';
 import { MetricKind } from './export/types';
 import { UpDownCounterMetric } from './UpDownCounterMetric';
 import { CounterMetric } from './CounterMetric';
@@ -28,7 +29,7 @@ import { Metric } from './Metric';
 import { ValueObserverMetric } from './ValueObserverMetric';
 import { SumObserverMetric } from './SumObserverMetric';
 import { DEFAULT_METRIC_OPTIONS, DEFAULT_CONFIG, MeterConfig } from './types';
-import { Batcher, UngroupedBatcher } from './export/Batcher';
+import { UngroupedProcessor } from './export/Processor';
 import { PushController } from './export/Controller';
 import { NoopExporter } from './export/NoopExporter';
 
@@ -38,7 +39,7 @@ import { NoopExporter } from './export/NoopExporter';
 export class Meter implements api.Meter {
   private readonly _logger: api.Logger;
   private readonly _metrics = new Map<string, Metric<BaseBoundInstrument>>();
-  private readonly _batcher: Batcher;
+  private readonly _processor: Processor;
   private readonly _resource: Resource;
   private readonly _instrumentationLibrary: InstrumentationLibrary;
   private readonly _controller: PushController;
@@ -53,7 +54,7 @@ export class Meter implements api.Meter {
     config: MeterConfig = DEFAULT_CONFIG
   ) {
     this._logger = config.logger || new ConsoleLogger(config.logLevel);
-    this._batcher = config.batcher ?? new UngroupedBatcher();
+    this._processor = config.processor ?? new UngroupedProcessor();
     this._resource = config.resource || Resource.createTelemetrySDKResource();
     this._instrumentationLibrary = instrumentationLibrary;
     // start the push controller
@@ -86,7 +87,7 @@ export class Meter implements api.Meter {
     const valueRecorder = new ValueRecorderMetric(
       name,
       opt,
-      this._batcher,
+      this._processor,
       this._resource,
       this._instrumentationLibrary
     );
@@ -116,7 +117,7 @@ export class Meter implements api.Meter {
     const counter = new CounterMetric(
       name,
       opt,
-      this._batcher,
+      this._processor,
       this._resource,
       this._instrumentationLibrary
     );
@@ -152,7 +153,7 @@ export class Meter implements api.Meter {
     const upDownCounter = new UpDownCounterMetric(
       name,
       opt,
-      this._batcher,
+      this._processor,
       this._resource,
       this._instrumentationLibrary
     );
@@ -185,7 +186,7 @@ export class Meter implements api.Meter {
     const valueObserver = new ValueObserverMetric(
       name,
       opt,
-      this._batcher,
+      this._processor,
       this._resource,
       this._instrumentationLibrary,
       callback
@@ -213,7 +214,7 @@ export class Meter implements api.Meter {
     const sumObserver = new SumObserverMetric(
       name,
       opt,
-      this._batcher,
+      this._processor,
       this._resource,
       this._instrumentationLibrary,
       callback
@@ -247,7 +248,7 @@ export class Meter implements api.Meter {
     const upDownSumObserver = new UpDownSumObserverMetric(
       name,
       opt,
-      this._batcher,
+      this._processor,
       this._resource,
       this._instrumentationLibrary,
       callback
@@ -281,7 +282,7 @@ export class Meter implements api.Meter {
     const batchObserver = new BatchObserverMetric(
       name,
       opt,
-      this._batcher,
+      this._processor,
       this._resource,
       this._instrumentationLibrary,
       callback
@@ -293,7 +294,7 @@ export class Meter implements api.Meter {
   /**
    * Collects all the metrics created with this `Meter` for export.
    *
-   * Utilizes the batcher to create checkpoints of the current values in
+   * Utilizes the processor to create checkpoints of the current values in
    * each aggregator belonging to the metrics that were created with this
    * meter instance.
    */
@@ -308,7 +309,7 @@ export class Meter implements api.Meter {
       });
     await Promise.all(batchObservers).then(records => {
       records.forEach(metrics => {
-        metrics.forEach(metric => this._batcher.process(metric));
+        metrics.forEach(metric => this._processor.process(metric));
       });
     });
 
@@ -323,13 +324,13 @@ export class Meter implements api.Meter {
 
     await Promise.all(metrics).then(records => {
       records.forEach(metrics => {
-        metrics.forEach(metric => this._batcher.process(metric));
+        metrics.forEach(metric => this._processor.process(metric));
       });
     });
   }
 
-  getBatcher(): Batcher {
-    return this._batcher;
+  getProcessor(): Processor {
+    return this._processor;
   }
 
   shutdown(): Promise<void> {

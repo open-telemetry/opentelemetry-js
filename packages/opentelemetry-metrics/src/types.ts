@@ -16,9 +16,9 @@
 
 import { LogLevel, getEnv } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
+import { Processor } from './export/Processor';
 import { MetricExporter } from './export/types';
 import { Resource } from '@opentelemetry/resources';
-import { Batcher } from './export/Batcher';
 
 /** MeterConfig provides an interface for configuring a Meter. */
 export interface MeterConfig {
@@ -37,8 +37,8 @@ export interface MeterConfig {
   /** Resource associated with metric telemetry */
   resource?: Resource;
 
-  /** Metric batcher. */
-  batcher?: Batcher;
+  /** Metric Processor. */
+  processor?: Processor;
 }
 
 /** Default Meter configuration. */

@@ -20,7 +20,7 @@ import { Resource } from '@opentelemetry/resources';
 import { BaseObserverMetric } from './BaseObserverMetric';
 import { ObserverResult } from './ObserverResult';
 import { MonotonicObserverResult } from './MonotonicObserverResult';
-import { Batcher } from './export/Batcher';
+import { Processor } from './export/Processor';
 import { MetricKind } from './export/types';
 
 /** This is a SDK implementation of SumObserver Metric. */
@@ -30,7 +30,7 @@ export class SumObserverMetric
   constructor(
     name: string,
     options: api.MetricOptions,
-    batcher: Batcher,
+    processor: Processor,
     resource: Resource,
     instrumentationLibrary: InstrumentationLibrary,
     callback?: (observerResult: api.ObserverResult) => unknown
@@ -38,7 +38,7 @@ export class SumObserverMetric
     super(
       name,
       options,
-      batcher,
+      processor,
       resource,
       MetricKind.SUM_OBSERVER,
       instrumentationLibrary,
