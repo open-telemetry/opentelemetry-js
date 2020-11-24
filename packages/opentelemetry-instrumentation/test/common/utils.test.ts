@@ -52,8 +52,24 @@ describe('safeExecuteInTheMiddle', () => {
       },
       err => {
         assert.deepStrictEqual(error, err);
-      }
+      },
+      true
     );
+  });
+  it('should throw error', () => {
+    const error = new Error('test');
+    try {
+      safeExecuteInTheMiddle(
+        () => {
+          throw error;
+        },
+        err => {
+          assert.deepStrictEqual(error, err);
+        }
+      );
+    } catch (err) {
+      assert.deepStrictEqual(error, err);
+    }
   });
   it('should return result', () => {
     const result = safeExecuteInTheMiddle(

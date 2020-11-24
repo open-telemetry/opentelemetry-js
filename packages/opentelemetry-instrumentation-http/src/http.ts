@@ -325,7 +325,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
                   request,
                   response
                 ),
-              () => {}
+              () => {},
+              true
             );
           }
 
@@ -450,7 +451,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
                     request,
                     response
                   ),
-                () => {}
+                () => {},
+                true
               );
             }
 
@@ -596,7 +598,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   ) {
     safeExecuteInTheMiddle(
       () => this._getConfig().responseHook!(span, response),
-      () => {}
+      () => {},
+      true
     );
   }
 
@@ -606,7 +609,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   ) {
     safeExecuteInTheMiddle(
       () => this._getConfig().requestHook!(span, request),
-      () => {}
+      () => {},
+      true
     );
   }
 }
