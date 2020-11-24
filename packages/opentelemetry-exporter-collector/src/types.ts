@@ -310,9 +310,11 @@ export namespace opentelemetryProto {
 export class CollectorExporterError extends Error {
   readonly code?: number;
   readonly name: string = 'CollectorExporterError';
+  readonly data?: string;
 
-  constructor(message?: string, code?: number) {
+  constructor(message?: string, code?: number, data?: string) {
     super(message);
+    this.data = data;
     this.code = code;
   }
 }

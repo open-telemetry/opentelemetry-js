@@ -31,6 +31,7 @@ import {
   ensureExportTraceServiceRequestIsSet,
   ensureProtoSpanIsCorrect,
   mockedReadableSpan,
+  MockedResponse,
 } from './helper';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 
@@ -38,14 +39,6 @@ const fakeRequest = {
   end: function () {},
   on: function () {},
   write: function () {},
-};
-
-const mockRes = {
-  statusCode: 200,
-};
-
-const mockResError = {
-  statusCode: 400,
 };
 
 // send is lazy loading file so need to wait a bit
@@ -148,9 +141,11 @@ describe('CollectorTraceExporter - node with proto over http', () => {
       collectorExporter.export(spans, responseSpy);
 
       setTimeout(() => {
+        const mockRes = new MockedResponse(200);
         const args = spyRequest.args[0];
         const callback = args[1];
         callback(mockRes);
+        mockRes.send('success');
         setTimeout(() => {
           const result = responseSpy.args[0][0] as ExportResult;
           assert.strictEqual(result.code, ExportResultCode.SUCCESS);
@@ -165,9 +160,11 @@ describe('CollectorTraceExporter - node with proto over http', () => {
       collectorExporter.export(spans, responseSpy);
 
       setTimeout(() => {
+        const mockResError = new MockedResponse(400);
         const args = spyRequest.args[0];
         const callback = args[1];
         callback(mockResError);
+        mockResError.send('failed');
         setTimeout(() => {
           const result = responseSpy.args[0][0] as ExportResult;
           assert.strictEqual(result.code, ExportResultCode.FAILED);
