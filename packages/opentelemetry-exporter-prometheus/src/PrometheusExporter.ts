@@ -59,9 +59,9 @@ export class PrometheusExporter implements MetricExporter {
     this._port = config.port || PrometheusExporter.DEFAULT_OPTIONS.port;
     this._prefix = config.prefix || PrometheusExporter.DEFAULT_OPTIONS.prefix;
     this._appendTimestamp =
-      typeof config.appendTimestamp === 'boolean' ?
-      config.appendTimestamp :
-      PrometheusExporter.DEFAULT_OPTIONS.appendTimestamp;
+      typeof config.appendTimestamp === 'boolean'
+        ? config.appendTimestamp
+        : PrometheusExporter.DEFAULT_OPTIONS.appendTimestamp;
     this._server = createServer(this._requestHandler);
     this._serializer = new PrometheusSerializer(
       this._prefix,
