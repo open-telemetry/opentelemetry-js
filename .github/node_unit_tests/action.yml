@@ -1,8 +1,6 @@
 name: Node Unit Tests
 runs:
   using: "composite"
-  env:
-    NPM_CONFIG_UNSAFE_PERM: true
   steps:
     - run:
         name: Create Checksum
@@ -10,6 +8,8 @@ runs:
     - run:
         name: Install Root Dependencies
         command: npm install --ignore-scripts
+        env:
+          NPM_CONFIG_UNSAFE_PERM: true
     - run:
         name: Boostrap dependencies
         command: npx lerna bootstrap --no-ci
