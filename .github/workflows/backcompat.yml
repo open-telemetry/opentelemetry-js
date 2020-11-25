@@ -3,7 +3,7 @@ name: Backwards Compatability
 on:
   push:
     branches: [master]
-  pull_request:
+  # pull_request:
 
 jobs:
   types-node:
