@@ -17,8 +17,8 @@
 import * as api from '@opentelemetry/api';
 import {
   ExportResult,
+  ExportResultCode,
   NoopLogger,
-  globalErrorHandler,
 } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { Socket } from 'dgram';
@@ -81,11 +81,11 @@ export class JaegerExporter implements SpanExporter {
     resultCallback: (result: ExportResult) => void
   ): void {
     if (spans.length === 0) {
-      return resultCallback(ExportResult.SUCCESS);
+      return resultCallback({ code: ExportResultCode.SUCCESS });
     }
     this._logger.debug('Jaeger exporter export');
-    this._sendSpans(spans, resultCallback).catch(err => {
-      globalErrorHandler(err);
+    this._sendSpans(spans, resultCallback).catch(error => {
+      return resultCallback({ code: ExportResultCode.FAILED, error });
     });
   }
 
@@ -135,10 +135,9 @@ export class JaegerExporter implements SpanExporter {
     for (const span of thriftSpan) {
       try {
         await this._append(span);
-      } catch (err) {
-        globalErrorHandler(err);
+      } catch (error) {
         // TODO right now we break out on first error, is that desirable?
-        if (done) return done(ExportResult.FAILED_NOT_RETRYABLE);
+        if (done) return done({ code: ExportResultCode.FAILED, error });
       }
     }
     this._logger.debug('successful append for : %s', thriftSpan.length);
@@ -146,7 +145,7 @@ export class JaegerExporter implements SpanExporter {
     // Flush all spans on each export. No-op if span buffer is empty
     await this._flush();
 
-    if (done) return done(ExportResult.SUCCESS);
+    if (done) return done({ code: ExportResultCode.SUCCESS });
   }
 
   private async _append(span: jaegerTypes.ThriftSpan): Promise<number> {

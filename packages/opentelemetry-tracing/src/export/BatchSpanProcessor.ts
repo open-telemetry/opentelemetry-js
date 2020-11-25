@@ -15,7 +15,12 @@
  */
 
 import { context, suppressInstrumentation } from '@opentelemetry/api';
-import { ExportResult, unrefTimer } from '@opentelemetry/core';
+import {
+  ExportResultCode,
+  globalErrorHandler,
+  unrefTimer,
+} from '@opentelemetry/core';
+import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
 import { BufferConfig } from '../types';
 import { ReadableSpan } from './ReadableSpan';
@@ -54,7 +59,7 @@ export class BatchSpanProcessor implements SpanProcessor {
   }
 
   // does nothing.
-  onStart(span: ReadableSpan): void {}
+  onStart(_span: Span): void {}
 
   onEnd(span: ReadableSpan): void {
     if (this._isShutdown) {
@@ -89,7 +94,9 @@ export class BatchSpanProcessor implements SpanProcessor {
     this._finishedSpans.push(span);
     this._maybeStartTimer();
     if (this._finishedSpans.length > this._bufferSize) {
-      this._flush();
+      this._flush().catch(e => {
+        globalErrorHandler(e);
+      });
     }
   }
 
@@ -102,12 +109,17 @@ export class BatchSpanProcessor implements SpanProcessor {
     return new Promise((resolve, reject) => {
       // prevent downstream exporter calls from generating spans
       context.with(suppressInstrumentation(context.active()), () => {
-        this._exporter.export(this._finishedSpans, result => {
-          this._finishedSpans = [];
-          if (result === ExportResult.SUCCESS) {
+        // Reset the finished spans buffer here because the next invocations of the _flush method
+        // could pass the same finished spans to the exporter if the buffer is cleared
+        // outside of the execution of this callback.
+        this._exporter.export(this._finishedSpans.splice(0), result => {
+          if (result.code === ExportResultCode.SUCCESS) {
             resolve();
           } else {
-            reject(result);
+            reject(
+              result.error ??
+                new Error('BatchSpanProcessor: span export failed')
+            );
           }
         });
       });
@@ -118,7 +130,9 @@ export class BatchSpanProcessor implements SpanProcessor {
     if (this._timer !== undefined) return;
 
     this._timer = setTimeout(() => {
-      this._flush().catch();
+      this._flush().catch(e => {
+        globalErrorHandler(e);
+      });
     }, this._bufferTimeout);
     unrefTimer(this._timer);
   }

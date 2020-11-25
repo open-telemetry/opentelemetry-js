@@ -106,7 +106,7 @@ Because the npm installer and node module resolution algorithm could potentially
 If you prefer to choose your own propagator or context manager, you may pass an options object into the `tracerProvider.register()` method. Omitted or `undefined` options will be replaced by a default value and `null` values will be skipped.
 
 ```javascript
-const { B3Propagator } = require("@opentelemetry/core");
+const { B3Propagator } = require("@opentelemetry/propagator-b3");
 
 tracerProvider.register({
   // Use B3 Propagation
@@ -168,7 +168,7 @@ async function doSomething() {
   } catch (err) {
     span.setStatus({
       // use an appropriate status code here
-      code: api.CanonicalCode.INTERNAL,
+      code: api.StatusCode.ERROR,
       message: err.message,
     });
     span.end();

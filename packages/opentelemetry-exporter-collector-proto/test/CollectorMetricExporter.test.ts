@@ -30,21 +30,16 @@ import {
   ensureExportedCounterIsCorrect,
   ensureExportedObserverIsCorrect,
   ensureExportedValueRecorderIsCorrect,
+  MockedResponse,
 } from './helper';
 import { MetricRecord } from '@opentelemetry/metrics';
+import { ExportResult, ExportResultCode } from '@opentelemetry/core';
+import { CollectorExporterError } from '@opentelemetry/exporter-collector/build/src/types';
 
 const fakeRequest = {
   end: function () {},
   on: function () {},
   write: function () {},
-};
-
-const mockRes = {
-  statusCode: 200,
-};
-
-const mockResError = {
-  statusCode: 400,
 };
 
 // send is lazy loading file so need to wait a bit
@@ -147,7 +142,9 @@ describe('CollectorMetricExporter - node with proto over http', () => {
         );
         ensureExportedValueRecorderIsCorrect(
           metric3,
-          metric3.intHistogram?.dataPoints[0].timeUnixNano
+          metric3.intHistogram?.dataPoints[0].timeUnixNano,
+          [0, 100],
+          ['0', '2', '0']
         );
 
         ensureExportMetricsServiceRequestIsSet(json);
@@ -157,47 +154,42 @@ describe('CollectorMetricExporter - node with proto over http', () => {
     });
 
     it('should log the successful message', done => {
-      const spyLoggerDebug = sinon.stub(collectorExporter.logger, 'debug');
       const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
 
       const responseSpy = sinon.spy();
       collectorExporter.export(metrics, responseSpy);
 
       setTimeout(() => {
+        const mockRes = new MockedResponse(200);
         const args = spyRequest.args[0];
         const callback = args[1];
         callback(mockRes);
+        mockRes.send('success');
         setTimeout(() => {
-          const response: any = spyLoggerDebug.args[1][0];
-          assert.strictEqual(response, 'statusCode: 200');
+          const result = responseSpy.args[0][0] as ExportResult;
+          assert.strictEqual(result.code, ExportResultCode.SUCCESS);
           assert.strictEqual(spyLoggerError.args.length, 0);
-          assert.strictEqual(responseSpy.args[0][0], 0);
           done();
         });
       }, waitTimeMS);
     });
 
     it('should log the error message', done => {
-      const spyLoggerError = sinon.spy();
-      const handler = core.loggingErrorHandler({
-        debug: sinon.fake(),
-        info: sinon.fake(),
-        warn: sinon.fake(),
-        error: spyLoggerError,
-      });
-      core.setGlobalErrorHandler(handler);
-
       const responseSpy = sinon.spy();
       collectorExporter.export(metrics, responseSpy);
 
       setTimeout(() => {
+        const mockRes = new MockedResponse(400);
         const args = spyRequest.args[0];
         const callback = args[1];
-        callback(mockResError);
+        callback(mockRes);
+        mockRes.send('failed');
         setTimeout(() => {
-          const response = spyLoggerError.args[0][0] as string;
-          assert.ok(response.includes('"code":"400"'));
-          assert.strictEqual(responseSpy.args[0][0], 1);
+          const result = responseSpy.args[0][0] as ExportResult;
+          assert.strictEqual(result.code, ExportResultCode.FAILED);
+          const error = result.error as CollectorExporterError;
+          assert.strictEqual(error.code, 400);
+          assert.strictEqual(error.data, 'failed');
           done();
         });
       }, waitTimeMS);

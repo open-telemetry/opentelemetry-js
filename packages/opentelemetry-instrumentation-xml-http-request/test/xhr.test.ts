@@ -15,16 +15,17 @@
  */
 import * as api from '@opentelemetry/api';
 import {
-  B3Propagator,
   LogLevel,
   otperformance as performance,
+  isWrapped,
+} from '@opentelemetry/core';
+import {
+  B3Propagator,
+  B3InjectEncoding,
   X_B3_SAMPLED,
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
-  isWrapped,
-  NoopLogger,
-  B3InjectEncoding,
-} from '@opentelemetry/core';
+} from '@opentelemetry/propagator-b3';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import * as tracing from '@opentelemetry/tracing';
 import { HttpAttribute } from '@opentelemetry/semantic-conventions';
@@ -36,7 +37,7 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { EventNames } from '../src/enums/EventNames';
-import { XMLHttpRequestPlugin } from '../src/xhr';
+import { XMLHttpRequestInstrumentation } from '../src/xhr';
 
 class DummySpanExporter implements tracing.SpanExporter {
   export(spans: any) {}
@@ -159,7 +160,7 @@ describe('xhr', () => {
         let spyEntries: any;
         const url = 'http://localhost:8090/xml-http-request.js';
         let fakeNow = 0;
-        let xmlHttpRequestPlugin: XMLHttpRequestPlugin;
+        let xmlHttpRequestInstrumentation: XMLHttpRequestInstrumentation;
 
         clearData = () => {
           requests = [];
@@ -188,12 +189,17 @@ describe('xhr', () => {
             })
           );
 
-          spyEntries = sandbox.stub(performance, 'getEntriesByType');
+          spyEntries = sandbox.stub(
+            (performance as unknown) as Performance,
+            'getEntriesByType'
+          );
           spyEntries.withArgs('resource').returns(resources);
-          xmlHttpRequestPlugin = new XMLHttpRequestPlugin(config);
+          xmlHttpRequestInstrumentation = new XMLHttpRequestInstrumentation(
+            config
+          );
           webTracerProviderWithZone = new WebTracerProvider({
             logLevel: LogLevel.ERROR,
-            plugins: [xmlHttpRequestPlugin],
+            plugins: [xmlHttpRequestInstrumentation],
           });
           webTracerWithZone = webTracerProviderWithZone.getTracer('xhr-test');
           dummySpanExporter = new DummySpanExporter();
@@ -242,18 +248,14 @@ describe('xhr', () => {
         it('should patch to wrap XML HTTP Requests when enabled', () => {
           const xhttp = new XMLHttpRequest();
           assert.ok(isWrapped(xhttp.send));
-          xmlHttpRequestPlugin.enable(
-            XMLHttpRequest.prototype,
-            new api.NoopTracerProvider(),
-            new NoopLogger()
-          );
+          xmlHttpRequestInstrumentation.enable();
           assert.ok(isWrapped(xhttp.send));
         });
 
         it('should unpatch to unwrap XML HTTP Requests when disabled', () => {
           const xhttp = new XMLHttpRequest();
           assert.ok(isWrapped(xhttp.send));
-          xmlHttpRequestPlugin.disable();
+          xmlHttpRequestInstrumentation.disable();
           assert.ok(!isWrapped(xhttp.send));
         });
 
@@ -710,12 +712,15 @@ describe('xhr', () => {
             })
           );
 
-          spyEntries = sandbox.stub(performance, 'getEntriesByType');
+          spyEntries = sandbox.stub(
+            (performance as unknown) as Performance,
+            'getEntriesByType'
+          );
           spyEntries.withArgs('resource').returns(resources);
 
           webTracerWithZoneProvider = new WebTracerProvider({
             logLevel: LogLevel.ERROR,
-            plugins: [new XMLHttpRequestPlugin()],
+            plugins: [new XMLHttpRequestInstrumentation()],
           });
           dummySpanExporter = new DummySpanExporter();
           exportSpy = sinon.stub(dummySpanExporter, 'export');

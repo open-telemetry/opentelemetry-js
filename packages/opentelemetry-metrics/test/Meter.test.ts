@@ -556,6 +556,33 @@ describe('Meter', () => {
       assert.ok(valueRecorder instanceof Metric);
     });
 
+    it('should set histogram boundaries for value recorder', async () => {
+      const valueRecorder = meter.createValueRecorder('name', {
+        description: 'desc',
+        unit: '1',
+        disabled: false,
+        boundaries: [10, 20, 30, 100],
+      }) as ValueRecorderMetric;
+
+      valueRecorder.record(10);
+      valueRecorder.record(30);
+      valueRecorder.record(50);
+      valueRecorder.record(200);
+
+      await meter.collect();
+      const [record] = meter.getBatcher().checkPointSet();
+      assert.deepStrictEqual(record.aggregator.toPoint().value as Histogram, {
+        buckets: {
+          boundaries: [10, 20, 30, 100],
+          counts: [0, 1, 0, 2, 1],
+        },
+        count: 4,
+        sum: 290,
+      });
+
+      assert.ok(valueRecorder instanceof Metric);
+    });
+
     it('should pipe through resource', async () => {
       const valueRecorder = meter.createValueRecorder(
         'name'

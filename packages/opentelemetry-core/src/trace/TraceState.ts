@@ -38,15 +38,21 @@ export class TraceState implements api.TraceState {
     if (rawTraceState) this._parse(rawTraceState);
   }
 
-  set(key: string, value: string): void {
+  set(key: string, value: string): TraceState {
     // TODO: Benchmark the different approaches(map vs list) and
     // use the faster one.
-    if (this._internalState.has(key)) this._internalState.delete(key);
-    this._internalState.set(key, value);
+    const traceState = this._clone();
+    if (traceState._internalState.has(key)) {
+      traceState._internalState.delete(key);
+    }
+    traceState._internalState.set(key, value);
+    return traceState;
   }
 
-  unset(key: string): void {
-    this._internalState.delete(key);
+  unset(key: string): TraceState {
+    const traceState = this._clone();
+    traceState._internalState.delete(key);
+    return traceState;
   }
 
   get(key: string): string | undefined {
@@ -94,5 +100,11 @@ export class TraceState implements api.TraceState {
 
   private _keys(): string[] {
     return Array.from(this._internalState.keys()).reverse();
+  }
+
+  private _clone(): TraceState {
+    const traceState = new TraceState();
+    traceState._internalState = new Map(this._internalState);
+    return traceState;
   }
 }

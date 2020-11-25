@@ -26,7 +26,7 @@ import {
   TextMapSetter,
   TraceFlags,
 } from '@opentelemetry/api';
-import { B3_DEBUG_FLAG_KEY } from './b3-common';
+import { B3_DEBUG_FLAG_KEY } from './common';
 
 /* b3 multi-header keys */
 export const X_B3_TRACE_ID = 'x-b3-traceid';
@@ -137,5 +137,15 @@ export class B3MultiPropagator implements TextMapPropagator {
       });
     }
     return context;
+  }
+
+  fields(): string[] {
+    return [
+      X_B3_TRACE_ID,
+      X_B3_SPAN_ID,
+      X_B3_FLAGS,
+      X_B3_SAMPLED,
+      X_B3_PARENT_SPAN_ID,
+    ];
   }
 }

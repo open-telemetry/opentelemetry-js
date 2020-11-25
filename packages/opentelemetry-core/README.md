@@ -14,7 +14,6 @@ This package provides default implementations of the OpenTelemetry API for trace
   - [Built-in Implementations](#built-in-implementations)
     - [Built-in Propagators](#built-in-propagators)
       - [HttpTraceContext Propagator](#httptracecontext-propagator)
-      - [B3 Propagator](#b3-propagator)
       - [Composite Propagator](#composite-propagator)
       - [Correlation Context Propagator](#correlation-context-propagator)
     - [Built-in Sampler](#built-in-sampler)
@@ -36,18 +35,6 @@ const { HttpTraceContext } = require("@opentelemetry/core");
 
 /* Set Global Propagator */
 api.propagation.setGlobalPropagator(new HttpTraceContext());
-```
-
-#### B3 Propagator
-
-This is propagator for the B3 HTTP header format, which sends a `SpanContext` on the wire in an HTTP request, allowing other services to create spans with the right context. Based on: <https://github.com/openzipkin/b3-propagation>
-
-```js
-const api = require("@opentelemetry/api");
-const { B3Propagator } = require("@opentelemetry/core");
-
-/* Set Global Propagator */
-api.propagation.setGlobalPropagator(new B3Propagator());
 ```
 
 #### Composite Propagator

@@ -78,9 +78,9 @@ export abstract class CollectorExporterBrowserBase<
         _onFinish();
       };
       const _onFinish = () => {
+        resolve();
         const index = this._sendingPromises.indexOf(promise);
         this._sendingPromises.splice(index, 1);
-        resolve();
       };
 
       if (this._useXHR) {

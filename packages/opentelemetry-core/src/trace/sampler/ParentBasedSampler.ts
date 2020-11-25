@@ -16,16 +16,17 @@
 
 import {
   Attributes,
+  Context,
+  getParentSpanContext,
   Link,
   Sampler,
   SamplingResult,
-  SpanContext,
   SpanKind,
   TraceFlags,
 } from '@opentelemetry/api';
+import { globalErrorHandler } from '../../common/global-error-handler';
 import { AlwaysOffSampler } from './AlwaysOffSampler';
 import { AlwaysOnSampler } from './AlwaysOnSampler';
-import { globalErrorHandler } from '../../common/global-error-handler';
 
 /**
  * A composite sampler that either respects the parent span's sampling decision
@@ -59,16 +60,18 @@ export class ParentBasedSampler implements Sampler {
   }
 
   shouldSample(
-    parentContext: SpanContext | undefined,
+    context: Context,
     traceId: string,
     spanName: string,
     spanKind: SpanKind,
     attributes: Attributes,
     links: Link[]
   ): SamplingResult {
+    const parentContext = getParentSpanContext(context);
+
     if (!parentContext) {
       return this._root.shouldSample(
-        parentContext,
+        context,
         traceId,
         spanName,
         spanKind,
@@ -80,7 +83,7 @@ export class ParentBasedSampler implements Sampler {
     if (parentContext.isRemote) {
       if (parentContext.traceFlags & TraceFlags.SAMPLED) {
         return this._remoteParentSampled.shouldSample(
-          parentContext,
+          context,
           traceId,
           spanName,
           spanKind,
@@ -89,7 +92,7 @@ export class ParentBasedSampler implements Sampler {
         );
       }
       return this._remoteParentNotSampled.shouldSample(
-        parentContext,
+        context,
         traceId,
         spanName,
         spanKind,
@@ -100,7 +103,7 @@ export class ParentBasedSampler implements Sampler {
 
     if (parentContext.traceFlags & TraceFlags.SAMPLED) {
       return this._localParentSampled.shouldSample(
-        parentContext,
+        context,
         traceId,
         spanName,
         spanKind,
@@ -110,7 +113,7 @@ export class ParentBasedSampler implements Sampler {
     }
 
     return this._localParentNotSampled.shouldSample(
-      parentContext,
+      context,
       traceId,
       spanName,
       spanKind,

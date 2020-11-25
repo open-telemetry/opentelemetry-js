@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ExportResult, NoopLogger } from '@opentelemetry/core';
+import { ExportResultCode, NoopLogger } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorExporterBase } from '../../src/CollectorExporterBase';
@@ -149,8 +149,8 @@ describe('CollectorMetricExporter - common', () => {
           collectorExporter.export(metrics, callbackSpy);
           const returnCode = callbackSpy.args[0][0];
           assert.strictEqual(
-            returnCode,
-            ExportResult.FAILED_NOT_RETRYABLE,
+            returnCode.code,
+            ExportResultCode.FAILED,
             'return value is wrong'
           );
           assert.strictEqual(spySend.callCount, 0, 'should not call send');
@@ -158,34 +158,12 @@ describe('CollectorMetricExporter - common', () => {
       );
     });
     describe('when an error occurs', () => {
-      it('should return a Not Retryable Error', done => {
-        spySend.throws({
-          code: 100,
-          details: 'Test error',
-          metadata: {},
-          message: 'Non-retryable',
-          stack: 'Stack',
-        });
-        const callbackSpy = sinon.spy();
-        collectorExporter.export(metrics, callbackSpy);
-        setTimeout(() => {
-          const returnCode = callbackSpy.args[0][0];
-          assert.strictEqual(
-            returnCode,
-            ExportResult.FAILED_NOT_RETRYABLE,
-            'return value is wrong'
-          );
-          assert.strictEqual(spySend.callCount, 1, 'should call send');
-          done();
-        });
-      });
-
-      it('should return a Retryable Error', done => {
+      it('should return failed export result', done => {
         spySend.throws({
           code: 600,
           details: 'Test error',
           metadata: {},
-          message: 'Retryable',
+          message: 'Non-Retryable',
           stack: 'Stack',
         });
         const callbackSpy = sinon.spy();
@@ -193,9 +171,14 @@ describe('CollectorMetricExporter - common', () => {
         setTimeout(() => {
           const returnCode = callbackSpy.args[0][0];
           assert.strictEqual(
-            returnCode,
-            ExportResult.FAILED_RETRYABLE,
+            returnCode.code,
+            ExportResultCode.FAILED,
             'return value is wrong'
+          );
+          assert.strictEqual(
+            returnCode.error.message,
+            'Non-Retryable',
+            'return error message is wrong'
           );
           assert.strictEqual(spySend.callCount, 1, 'should call send');
           done();

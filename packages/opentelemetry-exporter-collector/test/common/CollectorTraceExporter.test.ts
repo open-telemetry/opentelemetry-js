@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ExportResult, NoopLogger } from '@opentelemetry/core';
+import { ExportResultCode, NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -148,8 +148,8 @@ describe('CollectorTraceExporter - common', () => {
           const returnCode = callbackSpy.args[0][0];
 
           assert.strictEqual(
-            returnCode,
-            ExportResult.FAILED_NOT_RETRYABLE,
+            returnCode.code,
+            ExportResultCode.FAILED,
             'return value is wrong'
           );
           assert.strictEqual(spySend.callCount, 0, 'should not call send');
@@ -157,7 +157,7 @@ describe('CollectorTraceExporter - common', () => {
       );
     });
     describe('when an error occurs', () => {
-      it('should return a Not Retryable Error', done => {
+      it('should return failed export result', done => {
         const spans: ReadableSpan[] = [];
         spans.push(Object.assign({}, mockedReadableSpan));
         spySend.throws({
@@ -172,33 +172,14 @@ describe('CollectorTraceExporter - common', () => {
         setTimeout(() => {
           const returnCode = callbackSpy.args[0][0];
           assert.strictEqual(
-            returnCode,
-            ExportResult.FAILED_NOT_RETRYABLE,
+            returnCode.code,
+            ExportResultCode.FAILED,
             'return value is wrong'
           );
-          assert.strictEqual(spySend.callCount, 1, 'should call send');
-          done();
-        });
-      });
-
-      it('should return a Retryable Error', done => {
-        const spans: ReadableSpan[] = [];
-        spans.push(Object.assign({}, mockedReadableSpan));
-        spySend.throws({
-          code: 600,
-          details: 'Test error',
-          metadata: {},
-          message: 'Retryable',
-          stack: 'Stack',
-        });
-        const callbackSpy = sinon.spy();
-        collectorExporter.export(spans, callbackSpy);
-        setTimeout(() => {
-          const returnCode = callbackSpy.args[0][0];
           assert.strictEqual(
-            returnCode,
-            ExportResult.FAILED_RETRYABLE,
-            'return value is wrong'
+            returnCode.error.message,
+            'Non-retryable',
+            'return error message is wrong'
           );
           assert.strictEqual(spySend.callCount, 1, 'should call send');
           done();
