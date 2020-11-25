@@ -1,5 +1,18 @@
 name: Node Unit Tests
 runs:
   using: "composite"
+  env:
+    NPM_CONFIG_UNSAFE_PERM: true
   steps:
-    - run: echo "$(ls -al)"
+    - run:
+        name: Create Checksum
+        command: sh .github/scripts/checksum.sh /tmp/checksums.txt
+    - run:
+        name: Install Root Dependencies
+        command: npm install --ignore-scripts
+    - run:
+        name: Boostrap dependencies
+        command: npx lerna bootstrap --no-ci
+    - run:
+        name: Unit tests
+        command: npm run test
