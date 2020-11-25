@@ -2,4 +2,4 @@ name: Node Unit Tests
 runs:
   using: "composite"
   steps:
-    - uses: actions/checkout@v2
+    - run: echo "$(ls -al)"
