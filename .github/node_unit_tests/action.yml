@@ -2,17 +2,13 @@ name: Node Unit Tests
 runs:
   using: "composite"
   steps:
-    - run:
-        name: Create Checksum
-        command: sh .github/scripts/checksum.sh /tmp/checksums.txt
-    - run:
-        name: Install Root Dependencies
-        command: npm install --ignore-scripts
-        env:
-          NPM_CONFIG_UNSAFE_PERM: true
-    - run:
-        name: Boostrap dependencies
-        command: npx lerna bootstrap --no-ci
-    - run:
-        name: Unit tests
-        command: npm run test
+    - name: Create Checksum
+      run: sh .github/scripts/checksum.sh /tmp/checksums.txt
+    - name: Install Root Dependencies
+      run: npm install --ignore-scripts
+      env:
+        NPM_CONFIG_UNSAFE_PERM: true
+    - name: Boostrap Dependencies
+      run: npx lerna bootstrap --no-ci
+    - name: Unit tests
+      run: npm run test
