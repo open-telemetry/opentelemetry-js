@@ -128,7 +128,9 @@ describe('transformMetrics', () => {
       const recorderMetric = (await recorder.getMetricRecord())[0];
       ensureValueRecorderIsCorrect(
         transform.toCollectorMetric(recorderMetric, 1592602232694000000),
-        hrTimeToNanoseconds(recorderMetric.aggregator.toPoint().timestamp)
+        hrTimeToNanoseconds(recorderMetric.aggregator.toPoint().timestamp),
+        [0, 100],
+        [0, 2, 0]
       );
     });
 

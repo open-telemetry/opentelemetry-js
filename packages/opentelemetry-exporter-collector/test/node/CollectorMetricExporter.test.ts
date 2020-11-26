@@ -22,7 +22,7 @@ import * as sinon from 'sinon';
 import { CollectorMetricExporter } from '../../src/platform/node';
 import { CollectorExporterConfigBase } from '../../src/types';
 import * as collectorTypes from '../../src/types';
-
+import { MockedResponse } from './nodeHelpers';
 import {
   mockCounter,
   mockObserver,
@@ -44,10 +44,6 @@ const fakeRequest = {
   end: function () {},
   on: function () {},
   write: function () {},
-};
-
-const mockRes = {
-  statusCode: 200,
 };
 
 const address = 'localhost:1501';
@@ -171,7 +167,8 @@ describe('CollectorMetricExporter - node with json over http', () => {
         ensureValueRecorderIsCorrect(
           metric3,
           core.hrTimeToNanoseconds(metrics[2].aggregator.toPoint().timestamp),
-          true
+          [0, 100],
+          [0, 2, 0]
         );
 
         ensureExportMetricsServiceRequestIsSet(json);
@@ -181,24 +178,54 @@ describe('CollectorMetricExporter - node with json over http', () => {
     });
 
     it('should log the successful message', done => {
-      const spyLoggerDebug = sinon.stub(collectorExporter.logger, 'debug');
       const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
 
       const responseSpy = sinon.spy();
       collectorExporter.export(metrics, responseSpy);
 
       setTimeout(() => {
+        const mockRes = new MockedResponse(200);
         const args = spyRequest.args[0];
         const callback = args[1];
         callback(mockRes);
+        mockRes.send('success');
         setTimeout(() => {
-          const response: any = spyLoggerDebug.args[1][0];
-          assert.strictEqual(response, 'statusCode: 200');
           assert.strictEqual(spyLoggerError.args.length, 0);
           assert.strictEqual(
             responseSpy.args[0][0].code,
             core.ExportResultCode.SUCCESS
           );
+          done();
+        });
+      });
+    });
+
+    it('should log the error message', done => {
+      const spyLoggerError = sinon.spy();
+      const handler = core.loggingErrorHandler({
+        debug: sinon.fake(),
+        info: sinon.fake(),
+        warn: sinon.fake(),
+        error: spyLoggerError,
+      });
+      core.setGlobalErrorHandler(handler);
+
+      const responseSpy = sinon.spy();
+      collectorExporter.export(metrics, responseSpy);
+
+      setTimeout(() => {
+        const mockRes = new MockedResponse(400);
+        const args = spyRequest.args[0];
+        const callback = args[1];
+        callback(mockRes);
+        mockRes.send('failed');
+        setTimeout(() => {
+          const result = responseSpy.args[0][0] as core.ExportResult;
+          assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+          const error = result.error as collectorTypes.CollectorExporterError;
+          assert.ok(error !== undefined);
+          assert.strictEqual(error.code, 400);
+          assert.strictEqual(error.data, 'failed');
           done();
         });
       });

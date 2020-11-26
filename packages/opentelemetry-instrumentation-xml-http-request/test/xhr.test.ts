@@ -189,7 +189,10 @@ describe('xhr', () => {
             })
           );
 
-          spyEntries = sandbox.stub(performance, 'getEntriesByType');
+          spyEntries = sandbox.stub(
+            (performance as unknown) as Performance,
+            'getEntriesByType'
+          );
           spyEntries.withArgs('resource').returns(resources);
           xmlHttpRequestInstrumentation = new XMLHttpRequestInstrumentation(
             config
@@ -709,7 +712,10 @@ describe('xhr', () => {
             })
           );
 
-          spyEntries = sandbox.stub(performance, 'getEntriesByType');
+          spyEntries = sandbox.stub(
+            (performance as unknown) as Performance,
+            'getEntriesByType'
+          );
           spyEntries.withArgs('resource').returns(resources);
 
           webTracerWithZoneProvider = new WebTracerProvider({
