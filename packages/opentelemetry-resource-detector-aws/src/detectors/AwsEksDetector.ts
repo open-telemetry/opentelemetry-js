@@ -325,6 +325,9 @@ export class AwsEksDetector implements Detector {
    * the identity properties in a local map.
    */
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> eda056317... fix: add parsing to Cluster JSON response
   private async _fetchString(options: https.RequestOptions): Promise<string> {
     return await new Promise((resolve, reject) => {
 =======
