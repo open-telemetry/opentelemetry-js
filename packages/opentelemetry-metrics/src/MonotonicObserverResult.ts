@@ -19,7 +19,10 @@ import { ObserverResult } from './ObserverResult';
 export class MonotonicObserverResult extends ObserverResult {
   observe(value: number, labels: Labels): void {
     if (value >= 0) {
-      this.values.set(labels, value);
+      const currentValue = this.values.get(labels) || 0;
+      if (value >= currentValue) {
+        this.values.set(labels, value);
+      }
     }
   }
 }

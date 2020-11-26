@@ -14,10 +14,26 @@
  * limitations under the License.
  */
 
-import { TraceFlags, ValueType, StatusCode } from '@opentelemetry/api';
+import {
+  TraceFlags,
+  ValueType,
+  StatusCode,
+  SumObserver,
+  UpDownSumObserver,
+  ValueObserver,
+  ValueRecorder,
+  Counter,
+  ObserverResult,
+} from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
-import { MetricRecord, MeterProvider } from '@opentelemetry/metrics';
+import {
+  MeterProvider,
+  Metric,
+  BoundCounter,
+  BoundObserver,
+  BoundValueRecorder,
+} from '@opentelemetry/metrics';
 import { hexToBase64, InstrumentationLibrary } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { opentelemetryProto } from '../src/types';
@@ -42,7 +58,7 @@ if (typeof Buffer === 'undefined') {
   };
 }
 
-export async function mockCounter(): Promise<MetricRecord> {
+export function mockCounter(): Metric<BoundCounter> & Counter {
   const name = 'int-counter';
   const metric =
     meter['_metrics'].get(name) ||
@@ -52,11 +68,10 @@ export async function mockCounter(): Promise<MetricRecord> {
     });
   metric.clear();
   metric.bind({});
-
-  return (await metric.getMetricRecord())[0];
+  return metric;
 }
 
-export async function mockDoubleCounter(): Promise<MetricRecord> {
+export function mockDoubleCounter(): Metric<BoundCounter> & Counter {
   const name = 'double-counter';
   const metric =
     meter['_metrics'].get(name) ||
@@ -66,25 +81,68 @@ export async function mockDoubleCounter(): Promise<MetricRecord> {
     });
   metric.clear();
   metric.bind({});
-
-  return (await metric.getMetricRecord())[0];
+  return metric;
 }
 
-export async function mockObserver(): Promise<MetricRecord> {
+export function mockObserver(
+  callback: (observerResult: ObserverResult) => void
+): Metric<BoundCounter> & ValueObserver {
   const name = 'double-observer';
   const metric =
     meter['_metrics'].get(name) ||
-    meter.createValueObserver(name, {
-      description: 'sample observer description',
-      valueType: ValueType.DOUBLE,
-    });
+    meter.createValueObserver(
+      name,
+      {
+        description: 'sample observer description',
+        valueType: ValueType.DOUBLE,
+      },
+      callback
+    );
   metric.clear();
   metric.bind({});
-
-  return (await metric.getMetricRecord())[0];
+  return metric;
 }
 
-export async function mockValueRecorder(): Promise<MetricRecord> {
+export function mockSumObserver(
+  callback: (observerResult: ObserverResult) => void
+): Metric<BoundObserver> & SumObserver {
+  const name = 'double-sum-observer';
+  const metric =
+    meter['_metrics'].get(name) ||
+    meter.createSumObserver(
+      name,
+      {
+        description: 'sample sum observer description',
+        valueType: ValueType.DOUBLE,
+      },
+      callback
+    );
+  metric.clear();
+  metric.bind({});
+  return metric;
+}
+
+export function mockUpDownSumObserver(
+  callback: (observerResult: ObserverResult) => void
+): Metric<BoundObserver> & UpDownSumObserver {
+  const name = 'double-up-down-sum-observer';
+  const metric =
+    meter['_metrics'].get(name) ||
+    meter.createUpDownSumObserver(
+      name,
+      {
+        description: 'sample up down sum observer description',
+        valueType: ValueType.DOUBLE,
+      },
+      callback
+    );
+  metric.clear();
+  metric.bind({});
+  return metric;
+}
+
+export function mockValueRecorder(): Metric<BoundValueRecorder> &
+  ValueRecorder {
   const name = 'int-recorder';
   const metric =
     meter['_metrics'].get(name) ||
@@ -95,8 +153,7 @@ export async function mockValueRecorder(): Promise<MetricRecord> {
     });
   metric.clear();
   metric.bind({});
-
-  return (await metric.getMetricRecord())[0];
+  return metric;
 }
 
 const traceIdHex = '1f1008dc8e270e85c40a0d7c3939b278';
@@ -251,44 +308,44 @@ export const multiResourceTrace: ReadableSpan[] = [
   },
 ];
 
-export const multiResourceMetricsGet = async function (): Promise<
-  MetricRecord[]
-> {
+export const multiResourceMetricsGet = function (
+  callback: (observerResult: ObserverResult) => void
+): any[] {
   return [
     {
-      ...(await mockCounter()),
+      ...mockCounter(),
       resource: mockedResources[0],
       instrumentationLibrary: mockedInstrumentationLibraries[0],
     },
     {
-      ...(await mockObserver()),
+      ...mockObserver(callback),
       resource: mockedResources[1],
       instrumentationLibrary: mockedInstrumentationLibraries[0],
     },
     {
-      ...(await mockCounter()),
+      ...mockCounter(),
       resource: mockedResources[0],
       instrumentationLibrary: mockedInstrumentationLibraries[0],
     },
   ];
 };
 
-export const multiInstrumentationLibraryMetricsGet = async function (): Promise<
-  MetricRecord[]
-> {
+export const multiInstrumentationLibraryMetricsGet = function (
+  callback: (observerResult: ObserverResult) => void
+): any[] {
   return [
     {
-      ...(await mockCounter()),
+      ...mockCounter(),
       resource: mockedResources[0],
       instrumentationLibrary: mockedInstrumentationLibraries[0],
     },
     {
-      ...(await mockObserver()),
+      ...mockObserver(callback),
       resource: mockedResources[0],
       instrumentationLibrary: mockedInstrumentationLibraries[1],
     },
     {
-      ...(await mockCounter()),
+      ...mockCounter(),
       resource: mockedResources[0],
       instrumentationLibrary: mockedInstrumentationLibraries[0],
     },
@@ -570,6 +627,56 @@ export function ensureObserverIsCorrect(
           timeUnixNano: time,
         },
       ],
+    },
+  });
+}
+
+export function ensureSumObserverIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  time: number
+) {
+  assert.deepStrictEqual(metric, {
+    name: 'double-sum-observer',
+    description: 'sample sum observer description',
+    unit: '1',
+    doubleSum: {
+      isMonotonic: true,
+      dataPoints: [
+        {
+          labels: [],
+          value: 5,
+          startTimeUnixNano: 1592602232694000000,
+          timeUnixNano: time,
+        },
+      ],
+      aggregationTemporality:
+        collectorTypes.opentelemetryProto.metrics.v1.AggregationTemporality
+          .AGGREGATION_TEMPORALITY_CUMULATIVE,
+    },
+  });
+}
+
+export function ensureUpDownSumObserverIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  time: number
+) {
+  assert.deepStrictEqual(metric, {
+    name: 'double-up-down-sum-observer',
+    description: 'sample up down sum observer description',
+    unit: '1',
+    doubleSum: {
+      isMonotonic: false,
+      dataPoints: [
+        {
+          labels: [],
+          value: 4,
+          startTimeUnixNano: 1592602232694000000,
+          timeUnixNano: time,
+        },
+      ],
+      aggregationTemporality:
+        collectorTypes.opentelemetryProto.metrics.v1.AggregationTemporality
+          .AGGREGATION_TEMPORALITY_CUMULATIVE,
     },
   });
 }

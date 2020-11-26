@@ -28,51 +28,107 @@ import {
   mockedInstrumentationLibraries,
   multiResourceMetricsGet,
   multiInstrumentationLibraryMetricsGet,
+  mockSumObserver,
+  mockUpDownSumObserver,
+  ensureSumObserverIsCorrect,
+  ensureUpDownSumObserverIsCorrect,
 } from '../helper';
-import { MetricRecord, SumAggregator } from '@opentelemetry/metrics';
+import {
+  BoundCounter,
+  BoundObserver,
+  BoundValueRecorder,
+  Metric,
+  SumAggregator,
+} from '@opentelemetry/metrics';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
+import * as api from '@opentelemetry/api';
 
 describe('transformMetrics', () => {
   describe('toCollectorMetric', async () => {
-    const counter: MetricRecord = await mockCounter();
-    const doubleCounter: MetricRecord = await mockDoubleCounter();
-    const observer: MetricRecord = await mockObserver();
-    const recorder: MetricRecord = await mockValueRecorder();
+    let counter: Metric<BoundCounter> & api.Counter;
+    let doubleCounter: Metric<BoundCounter> & api.Counter;
+    let observer: Metric<BoundObserver> & api.ValueObserver;
+    let sumObserver: Metric<BoundObserver> & api.SumObserver;
+    let upDownSumObserver: Metric<BoundObserver> & api.UpDownSumObserver;
+    let recorder: Metric<BoundValueRecorder> & api.ValueRecorder;
     beforeEach(() => {
+      counter = mockCounter();
+      doubleCounter = mockDoubleCounter();
+      observer = mockObserver(observerResult => {
+        observerResult.observe(3, {});
+        observerResult.observe(6, {});
+      });
+      sumObserver = mockSumObserver(observerResult => {
+        const labels = {};
+        observerResult.observe(3, labels);
+        observerResult.observe(5, labels);
+        observerResult.observe(4, labels);
+        observerResult.observe(-1, labels);
+      });
+      upDownSumObserver = mockUpDownSumObserver(observerResult => {
+        const labels = {};
+        observerResult.observe(3, labels);
+        observerResult.observe(5, labels);
+        observerResult.observe(4, labels);
+        observerResult.observe(-1, labels);
+      });
+
+      recorder = mockValueRecorder();
+
       // Counter
-      counter.aggregator.update(1);
+      counter.add(1);
 
       // Double Counter
-      doubleCounter.aggregator.update(8);
-
-      // Observer
-      observer.aggregator.update(3);
-      observer.aggregator.update(6);
+      doubleCounter.add(8);
 
       // ValueRecorder
-      recorder.aggregator.update(7);
-      recorder.aggregator.update(14);
+      recorder.record(7);
+      recorder.record(14);
     });
 
-    it('should convert metric', () => {
+    it('should convert metric', async () => {
+      const counterMetric = (await counter.getMetricRecord())[0];
       ensureCounterIsCorrect(
-        transform.toCollectorMetric(counter, 1592602232694000000),
-        hrTimeToNanoseconds(counter.aggregator.toPoint().timestamp)
-      );
-      ensureObserverIsCorrect(
-        transform.toCollectorMetric(observer, 1592602232694000000),
-        hrTimeToNanoseconds(observer.aggregator.toPoint().timestamp)
+        transform.toCollectorMetric(counterMetric, 1592602232694000000),
+        hrTimeToNanoseconds(await counterMetric.aggregator.toPoint().timestamp)
       );
 
-      ensureValueRecorderIsCorrect(
-        transform.toCollectorMetric(recorder, 1592602232694000000),
-        hrTimeToNanoseconds(recorder.aggregator.toPoint().timestamp)
-      );
-
+      const doubleCounterMetric = (await doubleCounter.getMetricRecord())[0];
       ensureDoubleCounterIsCorrect(
-        transform.toCollectorMetric(doubleCounter, 1592602232694000000),
-        hrTimeToNanoseconds(doubleCounter.aggregator.toPoint().timestamp)
+        transform.toCollectorMetric(doubleCounterMetric, 1592602232694000000),
+        hrTimeToNanoseconds(doubleCounterMetric.aggregator.toPoint().timestamp)
+      );
+
+      const observerMetric = (await observer.getMetricRecord())[0];
+      ensureObserverIsCorrect(
+        transform.toCollectorMetric(observerMetric, 1592602232694000000),
+        hrTimeToNanoseconds(observerMetric.aggregator.toPoint().timestamp)
+      );
+
+      const sumObserverMetric = (await sumObserver.getMetricRecord())[0];
+      ensureSumObserverIsCorrect(
+        transform.toCollectorMetric(sumObserverMetric, 1592602232694000000),
+        hrTimeToNanoseconds(sumObserverMetric.aggregator.toPoint().timestamp)
+      );
+
+      const upDownSumObserverMetric = (
+        await upDownSumObserver.getMetricRecord()
+      )[0];
+      ensureUpDownSumObserverIsCorrect(
+        transform.toCollectorMetric(
+          upDownSumObserverMetric,
+          1592602232694000000
+        ),
+        hrTimeToNanoseconds(
+          upDownSumObserverMetric.aggregator.toPoint().timestamp
+        )
+      );
+
+      const recorderMetric = (await recorder.getMetricRecord())[0];
+      ensureValueRecorderIsCorrect(
+        transform.toCollectorMetric(recorderMetric, 1592602232694000000),
+        hrTimeToNanoseconds(recorderMetric.aggregator.toPoint().timestamp)
       );
     });
 
@@ -102,7 +158,11 @@ describe('transformMetrics', () => {
     it('should group by resource', async () => {
       const [resource1, resource2] = mockedResources;
       const [library] = mockedInstrumentationLibraries;
-      const [metric1, metric2, metric3] = await multiResourceMetricsGet();
+      const [metric1, metric2, metric3] = multiResourceMetricsGet(
+        observerResult => {
+          observerResult.observe(1, {});
+        }
+      );
 
       const expected = new Map([
         [resource1, new Map([[library, [metric1, metric3]]])],
@@ -110,7 +170,9 @@ describe('transformMetrics', () => {
       ]);
 
       const result = transform.groupMetricsByResourceAndLibrary(
-        await multiResourceMetricsGet()
+        multiResourceMetricsGet(observerResult => {
+          observerResult.observe(1, {});
+        })
       );
 
       assert.deepStrictEqual(result, expected);
@@ -123,7 +185,7 @@ describe('transformMetrics', () => {
         metric1,
         metric2,
         metric3,
-      ] = await multiInstrumentationLibraryMetricsGet();
+      ] = multiInstrumentationLibraryMetricsGet(observerResult => {});
       const expected = new Map([
         [
           resource,
@@ -135,7 +197,7 @@ describe('transformMetrics', () => {
       ]);
 
       const result = transform.groupMetricsByResourceAndLibrary(
-        await multiInstrumentationLibraryMetricsGet()
+        multiInstrumentationLibraryMetricsGet(observerResult => {})
       );
 
       assert.deepStrictEqual(result, expected);
