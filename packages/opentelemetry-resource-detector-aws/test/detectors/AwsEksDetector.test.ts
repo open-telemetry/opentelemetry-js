@@ -37,7 +37,7 @@ describe('awsEksDetector', () => {
 
   const correctCgroupData =
     'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklm';
-  const mockedClusterResponse = 'my-cluster';
+  const mockedClusterResponse = '{"data":{"cluster.name":"my-cluster"}}';
   const mockedAwsAuth = 'my-auth';
   const k8s_token = 'Bearer 31ada4fd-adec-460c-809a-9e56ceb75269';
   let sandbox: sinon.SinonSandbox;

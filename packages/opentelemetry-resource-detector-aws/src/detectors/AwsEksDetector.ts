@@ -125,7 +125,13 @@ export class AwsEksDetector implements Detector {
       },
       ca: cert,
     };
-    return await this._fetchString(options);
+    const response = await this._fetchString(options);
+    try {
+      return JSON.parse(response).data['cluster.name'];
+    } catch (e) {
+      config.logger.warn('Cannot get cluster name on EKS', e);
+    }
+    return '';
   }
   /**
    * Reads the Kubernetes token path and returns kubernetes
@@ -182,9 +188,7 @@ export class AwsEksDetector implements Detector {
    * to get back a valid JSON document. Parses that document and stores
    * the identity properties in a local map.
    */
-  private async _fetchString(
-    options: https.RequestOptions
-  ): Promise<string | undefined> {
+  private async _fetchString(options: https.RequestOptions): Promise<string> {
     return await new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         req.abort();
