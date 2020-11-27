@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import * as api from '@opentelemetry/api';
+import * as metrics from '@opentelemetry/metrics';
 import { collectorTypes } from '@opentelemetry/exporter-collector';
 import * as core from '@opentelemetry/core';
 import * as http from 'http';
@@ -32,7 +34,6 @@ import {
   ensureExportedValueRecorderIsCorrect,
   MockedResponse,
 } from './helper';
-import { MetricRecord } from '@opentelemetry/metrics';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import { CollectorExporterError } from '@opentelemetry/exporter-collector/build/src/types';
 
@@ -50,7 +51,7 @@ describe('CollectorMetricExporter - node with proto over http', () => {
   let collectorExporterConfig: collectorTypes.CollectorExporterConfigBase;
   let spyRequest: sinon.SinonSpy;
   let spyWrite: sinon.SinonSpy;
-  let metrics: MetricRecord[];
+  let metrics: metrics.MetricRecord[];
   describe('export', () => {
     beforeEach(async () => {
       spyRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
@@ -71,14 +72,23 @@ describe('CollectorMetricExporter - node with proto over http', () => {
         value: 1592602232694000000,
       });
       metrics = [];
-      metrics.push(await mockCounter());
-      metrics.push(await mockObserver());
-      metrics.push(await mockValueRecorder());
-      metrics[0].aggregator.update(1);
-      metrics[1].aggregator.update(3);
-      metrics[1].aggregator.update(6);
-      metrics[2].aggregator.update(7);
-      metrics[2].aggregator.update(14);
+      const counter: metrics.Metric<metrics.BoundCounter> &
+        api.Counter = mockCounter();
+      const observer: metrics.Metric<metrics.BoundObserver> &
+        api.ValueObserver = mockObserver(observerResult => {
+        observerResult.observe(3, {});
+        observerResult.observe(6, {});
+      });
+      const recorder: metrics.Metric<metrics.BoundValueRecorder> &
+        api.ValueRecorder = mockValueRecorder();
+
+      counter.add(1);
+      recorder.record(7);
+      recorder.record(14);
+
+      metrics.push((await counter.getMetricRecord())[0]);
+      metrics.push((await observer.getMetricRecord())[0]);
+      metrics.push((await recorder.getMetricRecord())[0]);
     });
     afterEach(() => {
       spyRequest.restore();
