@@ -38,6 +38,7 @@ describe('PrometheusExporter', () => {
       const exporter = new PrometheusExporter();
       assert.ok(typeof exporter.startServer === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
+      assert.ok(typeof exporter.requestHandler === 'function');
       exporter.shutdown().then(done);
     });
 

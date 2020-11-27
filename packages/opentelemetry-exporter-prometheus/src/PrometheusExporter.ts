@@ -56,7 +56,7 @@ export class PrometheusExporter implements MetricExporter {
     this._logger = config.logger || new NoopLogger();
     this._port = config.port || PrometheusExporter.DEFAULT_OPTIONS.port;
     this._prefix = config.prefix || PrometheusExporter.DEFAULT_OPTIONS.prefix;
-    this._server = createServer(this._requestHandler);
+    this._server = createServer(this.requestHandler);
     this._serializer = new PrometheusSerializer(this._prefix);
 
     this._endpoint = (
@@ -156,10 +156,7 @@ export class PrometheusExporter implements MetricExporter {
    * @param request Incoming HTTP request to export server
    * @param response HTTP response object used to respond to request
    */
-  private _requestHandler = (
-    request: IncomingMessage,
-    response: ServerResponse
-  ) => {
+  requestHandler = (request: IncomingMessage, response: ServerResponse) => {
     if (url.parse(request.url!).pathname === this._endpoint) {
       this._exportMetrics(response);
     } else {

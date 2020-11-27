@@ -25,17 +25,17 @@ Create & register the exporter on your application.
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 const { MeterProvider }  = require('@opentelemetry/metrics');
 
-// Add your port and startServer to the Prometheus options
-const options = {port: 9464, startServer: true};
+// Add your port to the Prometheus options.
+const options = {port: 9464};
 const exporter = new PrometheusExporter(options);
 
-// Register the exporter
+// Register the exporter.
 const meter = new MeterProvider({
   exporter,
   interval: 1000,
 }).getMeter('example-prometheus');
 
-// Now, start recording data
+// Now, start recording data.
 const counter = meter.createCounter('metric_name', {
   description: 'Example of a counter'
 });
@@ -47,6 +47,44 @@ const boundCounter = counter.bind({ pid: process.pid });
 boundCounter.add(10);
 
 // .. some other work
+```
+
+Use with an existing http server.
+
+```js
+const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
+const { MeterProvider }  = require('@opentelemetry/metrics');
+
+// Add preventServerStart and endpoint to the Prometheus options.
+const options = {preventServerStart: true, endpoint: '/metrics'};
+const exporter = new PrometheusExporter(options);
+
+// Register the exporter.
+const meter = new MeterProvider({
+  exporter,
+  interval: 1000,
+}).getMeter('example-prometheus');
+
+// Create a counter.
+const counter = meter.createCounter('metric_name', {
+  description: 'Example of a counter'
+});
+
+
+// Create the http server.
+const app = require('express')();
+
+// Register a router.
+app.get('/', (request, response) => {
+  counter.add(1);
+  response.end('index');
+});
+
+// Register the Prometheus endpoint.
+app.get(options.endpoint, exporter.requestHandler);
+
+// Start the http server.
+app.listen(9464);
 ```
 
 ## Viewing your metrics
