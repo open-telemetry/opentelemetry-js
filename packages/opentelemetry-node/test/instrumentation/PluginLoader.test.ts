@@ -37,6 +37,14 @@ const simplePlugins: Plugins = {
   },
 };
 
+const simpleModulePlugin = require('@opentelemetry/plugin-simple-module');
+const resolvedPlugins: Plugins = {
+  'simple-module': {
+    enabled: true,
+    plugin: simpleModulePlugin.plugin,
+  },
+};
+
 const httpPlugins: Plugins = {
   http: {
     enabled: true,
@@ -241,6 +249,18 @@ describe('PluginLoader', () => {
       const pluginLoader = new PluginLoader(provider, logger);
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
       pluginLoader.load(simplePlugins);
+      // The hook is only called the first time the module is loaded.
+      const simpleModule = require('simple-module');
+      assert.strictEqual(pluginLoader['_plugins'].length, 1);
+      assert.strictEqual(simpleModule.value(), 1);
+      assert.strictEqual(simpleModule.name(), 'patched-simple-module');
+      pluginLoader.unload();
+    });
+
+    it('should load a resolved plugin and patch the target modules', () => {
+      const pluginLoader = new PluginLoader(provider, logger);
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+      pluginLoader.load(resolvedPlugins);
       // The hook is only called the first time the module is loaded.
       const simpleModule = require('simple-module');
       assert.strictEqual(pluginLoader['_plugins'].length, 1);
