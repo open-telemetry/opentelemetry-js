@@ -52,7 +52,9 @@ export interface Plugins {
 function filterPlugins(plugins: Plugins): Plugins {
   const keys = Object.keys(plugins);
   return keys.reduce((acc: Plugins, key: string) => {
-    if (plugins[key].enabled && plugins[key].path) acc[key] = plugins[key];
+    if (plugins[key].enabled && (plugins[key].path || plugins[key].plugin)) {
+      acc[key] = plugins[key];
+    }
     return acc;
   }, {});
 }
@@ -131,6 +133,7 @@ export class PluginLoader {
         if (this._hookState !== HookState.ENABLED) return exports;
         const config = pluginsToLoad[name];
         const modulePath = config.path!;
+        const modulePlugin = config.plugin;
         let version = null;
 
         if (!baseDir) {
@@ -170,7 +173,7 @@ export class PluginLoader {
 
         // Expecting a plugin from module;
         try {
-          const plugin: Plugin = require(modulePath).plugin;
+          const plugin: Plugin = modulePlugin ?? require(modulePath).plugin;
           if (!utils.isSupportedVersion(version, plugin.supportedVersions)) {
             this.logger.warn(
               `PluginLoader#load: Plugin ${name} only supports module ${plugin.moduleName} with the versions: ${plugin.supportedVersions}`

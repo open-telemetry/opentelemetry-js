@@ -82,9 +82,12 @@ In the following example:
 - the default express plugin is disabled
 - the http plugin has a custom config for a `requestHook`
 - the customPlugin is loaded from the user supplied path
+- the customPlugin2 is resolved locally and injected
 - all default plugins are still loaded if installed.
 
 ```js
+import {plugin as httpsPlugin} from '@opentelemetry/plugin-https';
+
 const provider = new NodeTracerProvider({
   plugins: {
     express: {
@@ -97,6 +100,9 @@ const provider = new NodeTracerProvider({
     },
     customPlugin: {
       path: "/path/to/custom/module",
+    },
+    customPlugin2: {
+      plugin: httpsPlugin,
     },
   },
 });
