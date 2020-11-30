@@ -65,6 +65,12 @@ export interface PluginConfig {
   path?: string;
 
   /**
+   * Plugin to load
+   * @example import {plugin} from '@opentelemetry/plugin-http' in case of http.
+   */
+  plugin?: Plugin;
+
+  /**
    * Request methods that match any string in ignoreMethods will not be traced.
    */
   ignoreMethods?: string[];
