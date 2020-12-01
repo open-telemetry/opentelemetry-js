@@ -801,10 +801,11 @@ describe('Meter', () => {
       let counter = 0;
 
       function getValue() {
+        console.log('getting value, counter:', counter);
         if (++counter % 2 == 0) {
-          return -1;
+          return 3;
         }
-        return 3;
+        return -1;
       }
 
       const sumObserver = meter.createSumObserver(
@@ -826,7 +827,7 @@ describe('Meter', () => {
       let metricRecords = await sumObserver.getMetricRecord();
       assert.strictEqual(metricRecords.length, 1);
       let point = metricRecords[0].aggregator.toPoint();
-      assert.strictEqual(point.value, 3);
+      assert.strictEqual(point.value, -1);
       assert.strictEqual(
         hashLabels(metricRecords[0].labels),
         '|#core:1,pid:123'

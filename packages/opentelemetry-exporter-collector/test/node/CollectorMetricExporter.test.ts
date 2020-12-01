@@ -93,9 +93,9 @@ describe('CollectorMetricExporter - node with json over http', () => {
       const counter: Metric<BoundCounter> & api.Counter = mockCounter();
       const observer: Metric<BoundObserver> & api.ValueObserver = mockObserver(
         observerResult => {
-          observerResult.observe(3, {});
           observerResult.observe(6, {});
-        }
+        },
+        'double-observer2'
       );
       const recorder: Metric<BoundValueRecorder> &
         api.ValueRecorder = mockValueRecorder();
@@ -161,7 +161,9 @@ describe('CollectorMetricExporter - node with json over http', () => {
         assert.ok(typeof metric2 !== 'undefined', "observer doesn't exist");
         ensureObserverIsCorrect(
           metric2,
-          core.hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp)
+          core.hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp),
+          6,
+          'double-observer2'
         );
         assert.ok(typeof metric3 !== 'undefined', "histogram doesn't exist");
         ensureValueRecorderIsCorrect(

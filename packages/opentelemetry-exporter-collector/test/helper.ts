@@ -71,9 +71,9 @@ export function mockDoubleCounter(): metrics.Metric<metrics.BoundCounter> &
 }
 
 export function mockObserver(
-  callback: (observerResult: api.ObserverResult) => unknown
-): metrics.Metric<metrics.BoundCounter> & api.ValueObserver {
-  const name = 'double-observer';
+  callback: (observerResult: api.ObserverResult) => unknown,
+  name = 'double-observer'
+): metrics.Metric<metrics.BoundObserver> & api.ValueObserver {
   const metric =
     meter['_metrics'].get(name) ||
     meter.createValueObserver(
@@ -90,9 +90,9 @@ export function mockObserver(
 }
 
 export function mockSumObserver(
-  callback: (observerResult: api.ObserverResult) => unknown
+  callback: (observerResult: api.ObserverResult) => unknown,
+  name = 'double-sum-observer'
 ): metrics.Metric<metrics.BoundObserver> & api.SumObserver {
-  const name = 'double-sum-observer';
   const metric =
     meter['_metrics'].get(name) ||
     meter.createSumObserver(
@@ -109,9 +109,9 @@ export function mockSumObserver(
 }
 
 export function mockUpDownSumObserver(
-  callback: (observerResult: api.ObserverResult) => unknown
+  callback: (observerResult: api.ObserverResult) => unknown,
+  name = 'double-up-down-sum-observer'
 ): metrics.Metric<metrics.BoundObserver> & api.UpDownSumObserver {
-  const name = 'double-up-down-sum-observer';
   const metric =
     meter['_metrics'].get(name) ||
     meter.createUpDownSumObserver(
@@ -598,17 +598,19 @@ export function ensureDoubleCounterIsCorrect(
 
 export function ensureObserverIsCorrect(
   metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
-  time: number
+  time: number,
+  value: number,
+  name = 'double-observer'
 ) {
   assert.deepStrictEqual(metric, {
-    name: 'double-observer',
+    name,
     description: 'sample observer description',
     unit: '1',
     doubleGauge: {
       dataPoints: [
         {
           labels: [],
-          value: 6,
+          value,
           startTimeUnixNano: 1592602232694000000,
           timeUnixNano: time,
         },
@@ -619,10 +621,12 @@ export function ensureObserverIsCorrect(
 
 export function ensureSumObserverIsCorrect(
   metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
-  time: number
+  time: number,
+  value: number,
+  name = 'double-sum-observer'
 ) {
   assert.deepStrictEqual(metric, {
-    name: 'double-sum-observer',
+    name,
     description: 'sample sum observer description',
     unit: '1',
     doubleSum: {
@@ -630,7 +634,7 @@ export function ensureSumObserverIsCorrect(
       dataPoints: [
         {
           labels: [],
-          value: 5,
+          value,
           startTimeUnixNano: 1592602232694000000,
           timeUnixNano: time,
         },
@@ -644,10 +648,12 @@ export function ensureSumObserverIsCorrect(
 
 export function ensureUpDownSumObserverIsCorrect(
   metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
-  time: number
+  time: number,
+  value: number,
+  name = 'double-up-down-sum-observer'
 ) {
   assert.deepStrictEqual(metric, {
-    name: 'double-up-down-sum-observer',
+    name,
     description: 'sample up down sum observer description',
     unit: '1',
     doubleSum: {
@@ -655,7 +661,7 @@ export function ensureUpDownSumObserverIsCorrect(
       dataPoints: [
         {
           labels: [],
-          value: 4,
+          value,
           startTimeUnixNano: 1592602232694000000,
           timeUnixNano: time,
         },

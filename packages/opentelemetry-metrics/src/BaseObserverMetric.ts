@@ -56,18 +56,20 @@ export abstract class BaseObserverMetric
     );
   }
 
-  protected createObserverResult(): ObserverResult {
-    return new ObserverResult();
+  async getMetricRecord(): Promise<MetricRecord[]> {
+    const observerResult = new ObserverResult();
+    await this._callback(observerResult);
+
+    this._processResults(observerResult);
+
+    return super.getMetricRecord();
   }
 
-  async getMetricRecord(): Promise<MetricRecord[]> {
-    const observerResult = this.createObserverResult();
-    await this._callback(observerResult);
+  protected _processResults(observerResult: ObserverResult) {
     observerResult.values.forEach((value, labels) => {
       const instrument = this.bind(labels);
       instrument.update(value);
     });
-    return super.getMetricRecord();
   }
 
   observation(value: number) {

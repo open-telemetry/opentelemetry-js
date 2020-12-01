@@ -60,7 +60,8 @@ describe('CollectorMetricExporter - web', () => {
       observerResult => {
         observerResult.observe(3, {});
         observerResult.observe(6, {});
-      }
+      },
+      'double-observer2'
     );
     const recorder: Metric<BoundValueRecorder> &
       api.ValueRecorder = mockValueRecorder();
@@ -125,7 +126,9 @@ describe('CollectorMetricExporter - web', () => {
           if (metric2) {
             ensureObserverIsCorrect(
               metric2,
-              hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp)
+              hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp),
+              6,
+              'double-observer2'
             );
           }
 
@@ -239,7 +242,9 @@ describe('CollectorMetricExporter - web', () => {
           if (metric2) {
             ensureObserverIsCorrect(
               metric2,
-              hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp)
+              hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp),
+              6,
+              'double-observer2'
             );
           }
 

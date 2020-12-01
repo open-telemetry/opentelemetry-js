@@ -55,23 +55,30 @@ describe('transformMetrics', () => {
     beforeEach(() => {
       counter = mockCounter();
       doubleCounter = mockDoubleCounter();
+      let count1 = 0;
+      let count2 = 0;
+      let count3 = 0;
+
+      function getValue(count: number) {
+        if (count % 2 == 0) {
+          return 3;
+        }
+        return -1;
+      }
+
       observer = mockObserver(observerResult => {
-        observerResult.observe(3, {});
-        observerResult.observe(6, {});
+        count1++;
+        observerResult.observe(getValue(count1), {});
       });
+
       sumObserver = mockSumObserver(observerResult => {
-        const labels = {};
-        observerResult.observe(3, labels);
-        observerResult.observe(5, labels);
-        observerResult.observe(4, labels);
-        observerResult.observe(-1, labels);
+        count2++;
+        observerResult.observe(getValue(count2), {});
       });
+
       upDownSumObserver = mockUpDownSumObserver(observerResult => {
-        const labels = {};
-        observerResult.observe(3, labels);
-        observerResult.observe(5, labels);
-        observerResult.observe(4, labels);
-        observerResult.observe(-1, labels);
+        count3++;
+        observerResult.observe(getValue(count3), {});
       });
 
       recorder = mockValueRecorder();
@@ -100,18 +107,28 @@ describe('transformMetrics', () => {
         hrTimeToNanoseconds(doubleCounterMetric.aggregator.toPoint().timestamp)
       );
 
+      await observer.getMetricRecord();
+      await observer.getMetricRecord();
       const observerMetric = (await observer.getMetricRecord())[0];
       ensureObserverIsCorrect(
         transform.toCollectorMetric(observerMetric, 1592602232694000000),
-        hrTimeToNanoseconds(observerMetric.aggregator.toPoint().timestamp)
+        hrTimeToNanoseconds(observerMetric.aggregator.toPoint().timestamp),
+        -1
       );
 
+      // collect 3 times
+      await sumObserver.getMetricRecord();
+      await sumObserver.getMetricRecord();
       const sumObserverMetric = (await sumObserver.getMetricRecord())[0];
       ensureSumObserverIsCorrect(
         transform.toCollectorMetric(sumObserverMetric, 1592602232694000000),
-        hrTimeToNanoseconds(sumObserverMetric.aggregator.toPoint().timestamp)
+        hrTimeToNanoseconds(sumObserverMetric.aggregator.toPoint().timestamp),
+        3
       );
 
+      // collect 3 times
+      await upDownSumObserver.getMetricRecord();
+      await upDownSumObserver.getMetricRecord();
       const upDownSumObserverMetric = (
         await upDownSumObserver.getMetricRecord()
       )[0];
@@ -122,7 +139,8 @@ describe('transformMetrics', () => {
         ),
         hrTimeToNanoseconds(
           upDownSumObserverMetric.aggregator.toPoint().timestamp
-        )
+        ),
+        -1
       );
 
       const recorderMetric = (await recorder.getMetricRecord())[0];

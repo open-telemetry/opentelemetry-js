@@ -26,8 +26,6 @@ export class ObserverResult implements TypeObserverResult {
   values: Map<Labels, number> = new Map<Labels, number>();
 
   observe(value: number, labels: Labels): void {
-    if (value >= 0) {
-      this.values.set(labels, value);
-    }
+    this.values.set(labels, value);
   }
 }

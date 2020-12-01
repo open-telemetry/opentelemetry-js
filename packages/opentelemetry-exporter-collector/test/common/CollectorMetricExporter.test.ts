@@ -74,7 +74,8 @@ describe('CollectorMetricExporter - common', () => {
         observerResult => {
           observerResult.observe(3, {});
           observerResult.observe(6, {});
-        }
+        },
+        'double-observer3'
       );
       counter.add(1);
 
