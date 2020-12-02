@@ -100,9 +100,9 @@ Use a custom logger. Default: Logging disabled
 
 Default: [INFO](../opentelemetry-core/src/common/types.ts#L19)
 
-### metricBatcher
+### metricProcessor
 
-Use a custom batcher for metrics. Default: [UngroupedBatcher](../opentelemetry-metrics/src/export/Batcher.ts#L50)
+Use a custom processor for metrics. Default: [UngroupedProcessor](../opentelemetry-metrics/src/export/Processor.ts#L50)
 
 ### metricExporter
 

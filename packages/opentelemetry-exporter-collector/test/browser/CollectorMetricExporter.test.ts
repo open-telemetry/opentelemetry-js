@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 
+import * as api from '@opentelemetry/api';
 import { ExportResultCode, NoopLogger } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorMetricExporter } from '../../src/platform/browser/index';
 import { CollectorExporterConfigBase } from '../../src/types';
 import * as collectorTypes from '../../src/types';
-import { MetricRecord } from '@opentelemetry/metrics';
+import {
+  BoundCounter,
+  BoundObserver,
+  BoundValueRecorder,
+  Metric,
+  MetricRecord,
+} from '@opentelemetry/metrics';
 import {
   mockCounter,
   mockObserver,
@@ -48,15 +55,23 @@ describe('CollectorMetricExporter - web', () => {
     spySend = sinon.stub(XMLHttpRequest.prototype, 'send');
     spyBeacon = sinon.stub(navigator, 'sendBeacon');
     metrics = [];
-    metrics.push(await mockCounter());
-    metrics.push(await mockObserver());
-    metrics.push(await mockValueRecorder());
+    const counter: Metric<BoundCounter> & api.Counter = mockCounter();
+    const observer: Metric<BoundObserver> & api.ValueObserver = mockObserver(
+      observerResult => {
+        observerResult.observe(3, {});
+        observerResult.observe(6, {});
+      },
+      'double-observer2'
+    );
+    const recorder: Metric<BoundValueRecorder> &
+      api.ValueRecorder = mockValueRecorder();
+    counter.add(1);
+    recorder.record(7);
+    recorder.record(14);
 
-    metrics[0].aggregator.update(1);
-    metrics[1].aggregator.update(3);
-    metrics[1].aggregator.update(6);
-    metrics[2].aggregator.update(7);
-    metrics[2].aggregator.update(14);
+    metrics.push((await counter.getMetricRecord())[0]);
+    metrics.push((await observer.getMetricRecord())[0]);
+    metrics.push((await recorder.getMetricRecord())[0]);
   });
 
   afterEach(() => {
@@ -111,7 +126,9 @@ describe('CollectorMetricExporter - web', () => {
           if (metric2) {
             ensureObserverIsCorrect(
               metric2,
-              hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp)
+              hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp),
+              6,
+              'double-observer2'
             );
           }
 
@@ -225,7 +242,9 @@ describe('CollectorMetricExporter - web', () => {
           if (metric2) {
             ensureObserverIsCorrect(
               metric2,
-              hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp)
+              hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp),
+              6,
+              'double-observer2'
             );
           }
 
