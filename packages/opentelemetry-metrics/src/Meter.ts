@@ -284,11 +284,9 @@ export class Meter implements api.Meter {
    */
   async collect(): Promise<void> {
     // call batch observers first
-    const observations = Array.from(this._batchObservers.values()).map(
-      observer => {
-        return observer.collect();
-      }
-    );
+    const observations = this._batchObservers.map(observer => {
+      return observer.collect();
+    });
     await Promise.all(observations);
 
     // after this all remaining metrics can be run
