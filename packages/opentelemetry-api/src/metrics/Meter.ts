@@ -20,7 +20,6 @@ import {
   Counter,
   ValueRecorder,
   ValueObserver,
-  BatchObserver,
   BatchMetricOptions,
   UpDownCounter,
 } from './Metric';
@@ -82,15 +81,13 @@ export interface Meter {
   ): ValueObserver;
 
   /**
-   * Creates a new `BatchObserver` metric, can be used to update many metrics
+   * Creates a new `BatchObserver`, can be used to update many observer metrics
    * at the same time and when operations needs to be async
-   * @param name the name of the metric.
    * @param callback the batch observer callback
    * @param [options] the metric batch options.
    */
   createBatchObserver(
-    name: string,
     callback: (batchObserverResult: BatchObserverResult) => void,
     options?: BatchMetricOptions
-  ): BatchObserver;
+  ): void;
 }

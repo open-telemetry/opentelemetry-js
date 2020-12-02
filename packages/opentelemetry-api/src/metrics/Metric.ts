@@ -166,9 +166,6 @@ export type UpDownSumObserver = BaseObserver;
 /** Base interface for the SumObserver metrics. */
 export type SumObserver = BaseObserver;
 
-/** Base interface for the Batch Observer metrics. */
-export type BatchObserver = Metric;
-
 /**
  * key-value pairs passed by the user.
  */

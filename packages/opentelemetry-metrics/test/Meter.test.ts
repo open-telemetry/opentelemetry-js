@@ -43,6 +43,7 @@ import { UpDownSumObserverMetric } from '../src/UpDownSumObserverMetric';
 import { hashLabels } from '../src/Utils';
 import { Batcher } from '../src/export/Batcher';
 import { ValueType } from '@opentelemetry/api';
+import { BatchObserver } from '../src/BatchObserver';
 
 const nonNumberValues = [
   // type undefined
@@ -1137,18 +1138,18 @@ describe('Meter', () => {
 
   describe('#batchObserver', () => {
     it('should create a batch observer', () => {
-      const measure = meter.createBatchObserver('name', () => {});
-      assert.ok(measure instanceof Metric);
+      const measure = meter.createBatchObserver(() => {});
+      assert.ok(measure instanceof BatchObserver);
     });
 
     it('should create batch observer with options', () => {
-      const measure = meter.createBatchObserver('name', () => {}, {
+      const measure = meter.createBatchObserver(() => {}, {
         description: 'desc',
         unit: '1',
         disabled: false,
         maxTimeoutUpdateMS: 100,
       });
-      assert.ok(measure instanceof Metric);
+      assert.ok(measure instanceof BatchObserver);
     });
 
     it('should use callback to observe values ', async () => {
@@ -1160,59 +1161,56 @@ describe('Meter', () => {
         description: 'desc',
       }) as ValueObserverMetric;
 
-      meter.createBatchObserver(
-        'metric_batch_observer',
-        observerBatchResult => {
-          interface StatItem {
-            usage: number;
-            temp: number;
-          }
+      meter.createBatchObserver(observerBatchResult => {
+        interface StatItem {
+          usage: number;
+          temp: number;
+        }
 
-          interface Stat {
-            name: string;
-            core1: StatItem;
-            core2: StatItem;
-          }
+        interface Stat {
+          name: string;
+          core1: StatItem;
+          core2: StatItem;
+        }
 
-          function someAsyncMetrics() {
-            return new Promise(resolve => {
-              const stats: Stat[] = [
-                {
-                  name: 'app1',
-                  core1: { usage: 2.1, temp: 67 },
-                  core2: { usage: 3.1, temp: 69 },
-                },
-                {
-                  name: 'app2',
-                  core1: { usage: 1.2, temp: 67 },
-                  core2: { usage: 4.5, temp: 69 },
-                },
-              ];
-              resolve(stats);
-            });
-          }
-
-          Promise.all([
-            someAsyncMetrics(),
-            // simulate waiting
-            new Promise((resolve, reject) => {
-              setTimeout(resolve, 1);
-            }),
-          ]).then((stats: unknown[]) => {
-            const apps = (stats[0] as unknown) as Stat[];
-            apps.forEach(app => {
-              observerBatchResult.observe({ app: app.name, core: '1' }, [
-                tempMetric.observation(app.core1.temp),
-                cpuUsageMetric.observation(app.core1.usage),
-              ]);
-              observerBatchResult.observe({ app: app.name, core: '2' }, [
-                tempMetric.observation(app.core2.temp),
-                cpuUsageMetric.observation(app.core2.usage),
-              ]);
-            });
+        function someAsyncMetrics() {
+          return new Promise(resolve => {
+            const stats: Stat[] = [
+              {
+                name: 'app1',
+                core1: { usage: 2.1, temp: 67 },
+                core2: { usage: 3.1, temp: 69 },
+              },
+              {
+                name: 'app2',
+                core1: { usage: 1.2, temp: 67 },
+                core2: { usage: 4.5, temp: 69 },
+              },
+            ];
+            resolve(stats);
           });
         }
-      );
+
+        Promise.all([
+          someAsyncMetrics(),
+          // simulate waiting
+          new Promise((resolve, reject) => {
+            setTimeout(resolve, 1);
+          }),
+        ]).then((stats: unknown[]) => {
+          const apps = (stats[0] as unknown) as Stat[];
+          apps.forEach(app => {
+            observerBatchResult.observe({ app: app.name, core: '1' }, [
+              tempMetric.observation(app.core1.temp),
+              cpuUsageMetric.observation(app.core1.usage),
+            ]);
+            observerBatchResult.observe({ app: app.name, core: '2' }, [
+              tempMetric.observation(app.core2.temp),
+              cpuUsageMetric.observation(app.core2.usage),
+            ]);
+          });
+        });
+      });
 
       await meter.collect();
       const records = meter.getBatcher().checkPointSet();
@@ -1253,7 +1251,6 @@ describe('Meter', () => {
       }) as ValueObserverMetric;
 
       meter.createBatchObserver(
-        'metric_batch_observer',
         observerBatchResult => {
           Promise.all([
             // simulate waiting 11ms
