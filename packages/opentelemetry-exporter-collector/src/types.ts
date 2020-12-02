@@ -341,6 +341,7 @@ export interface CollectorExporterConfigBase {
   serviceName?: string;
   attributes?: Attributes;
   url?: string;
+  concurrencyLimit?: number;
 }
 
 /**
