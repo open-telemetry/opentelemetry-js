@@ -265,7 +265,7 @@ describe('awsEksDetector', () => {
 
   describe('on unsuccesful request', () => {
     it('should throw when receiving error response code', async () => {
-      const expectedError = new Error('Eks metadata api request timed out.');
+      const expectedError = new Error('EKS metadata api request timed out.');
       fileStub = sandbox
         .stub(AwsEksDetector, 'fileAccessAsync' as any)
         .resolves();
