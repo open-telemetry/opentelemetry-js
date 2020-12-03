@@ -46,14 +46,15 @@ export class AwsEksDetector implements Detector {
     '/api/v1/namespaces/amazon-cloudwatch/configmaps/cluster-info';
   readonly CONTAINER_ID_LENGTH = 64;
   readonly DEFAULT_CGROUP_PATH = '/proc/self/cgroup';
-  readonly MILLISECOND_TIME_OUT = 2000;
+  readonly TIMEOUT_MS = 2000;
+  readonly UTF8_UNICODE = 'utf8';
 
   private static readFileAsync = util.promisify(fs.readFile);
   private static fileAccessAsync = util.promisify(fs.access);
 
   /**
-   * The AwsEksDetector can be used to detect if a process is running in AWS
-   * Eks and returns a promise containing a {@link Resource}
+   * The AwsEksDetector can be used to detect if a process is running on Amazon
+   * Elastic Kubernetes and returns a promise containing a {@link Resource}
    * populated with instance metadata. Returns a promise containing an
    * empty {@link Resource} if the connection to kubernetes process
    * or aws config maps fails
@@ -85,7 +86,7 @@ export class AwsEksDetector implements Detector {
 
   /**
    * Attempts to make a connection to AWS Config map which will
-   * determine whether the process is running on an Eks
+   * determine whether the process is running on an EKS
    * process if the config map is empty or not
    * @param config The resource detection config with a required logger
    */
@@ -94,14 +95,14 @@ export class AwsEksDetector implements Detector {
     cert: Buffer
   ): Promise<boolean> {
     const options = {
-      hostname: this.K8S_SVC_URL,
-      path: this.AUTH_CONFIGMAP_PATH,
-      method: 'GET',
-      timeout: this.MILLISECOND_TIME_OUT,
+      ca: cert,
       headers: {
         Authorization: await this._getK8sCredHeader(config),
       },
-      ca: cert,
+      hostname: this.K8S_SVC_URL,
+      method: 'GET',
+      path: this.AUTH_CONFIGMAP_PATH,
+      timeout: this.TIMEOUT_MS,
     };
     return !!(await this._fetchString(options));
   }
@@ -116,14 +117,14 @@ export class AwsEksDetector implements Detector {
     cert: Buffer
   ): Promise<string | undefined> {
     const options = {
-      host: this.K8S_SVC_URL,
-      path: this.CW_CONFIGMAP_PATH,
-      method: 'GET',
-      timeout: this.MILLISECOND_TIME_OUT,
+      ca: cert,
       headers: {
         Authorization: await this._getK8sCredHeader(config),
       },
-      ca: cert,
+      host: this.K8S_SVC_URL,
+      method: 'GET',
+      path: this.CW_CONFIGMAP_PATH,
+      timeout: this.TIMEOUT_MS,
     };
     const response = await this._fetchString(options);
     try {
@@ -144,7 +145,7 @@ export class AwsEksDetector implements Detector {
     try {
       const content = await AwsEksDetector.readFileAsync(
         this.K8S_TOKEN_PATH,
-        'utf8'
+        this.UTF8_UNICODE
       );
       return 'Bearer ' + content;
     } catch (e) {
@@ -166,7 +167,7 @@ export class AwsEksDetector implements Detector {
     try {
       const rawData = await AwsEksDetector.readFileAsync(
         this.DEFAULT_CGROUP_PATH,
-        'utf8'
+        this.UTF8_UNICODE
       );
       const splitData = rawData.trim().split('\n');
       for (const str of splitData) {
@@ -192,13 +193,13 @@ export class AwsEksDetector implements Detector {
     return await new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         req.abort();
-        reject(new Error('Eks metadata api request timed out.'));
+        reject(new Error('EKS metadata api request timed out.'));
       }, 2000);
 
       const req = https.request(options, res => {
         clearTimeout(timeoutId);
         const { statusCode } = res;
-        res.setEncoding('utf8');
+        res.setEncoding(this.UTF8_UNICODE);
         let rawData = '';
         res.on('data', chunk => (rawData += chunk));
         res.on('end', () => {

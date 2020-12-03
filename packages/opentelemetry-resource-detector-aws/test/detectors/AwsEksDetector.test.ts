@@ -189,7 +189,7 @@ describe('awsEksDetector', () => {
       });
     });
 
-    it('should return an empty resource when not running on Eks', async () => {
+    it('should return an empty resource when not running on EKS', async () => {
       fileStub = sandbox
         .stub(AwsEksDetector, 'fileAccessAsync' as any)
         .resolves('');
