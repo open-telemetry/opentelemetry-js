@@ -90,8 +90,8 @@ export class NoopMeter implements Meter {
    */
   createBatchObserver(
     _callback: (batchObserverResult: BatchObserverResult) => void
-  ): void {
-    return;
+  ): NoopBatchObserver {
+    return NOOP_BATCH_OBSERVER;
   }
 }
 
@@ -156,6 +156,8 @@ export class NoopBaseObserverMetric
   }
 }
 
+export class NoopBatchObserver {}
+
 export class NoopBoundCounter implements BoundCounter {
   add(_value: number): void {
     return;
@@ -197,3 +199,5 @@ export const NOOP_UP_DOWN_SUM_OBSERVER_METRIC = new NoopBaseObserverMetric(
 export const NOOP_SUM_OBSERVER_METRIC = new NoopBaseObserverMetric(
   NOOP_BOUND_BASE_OBSERVER
 );
+
+export const NOOP_BATCH_OBSERVER = new NoopBatchObserver();

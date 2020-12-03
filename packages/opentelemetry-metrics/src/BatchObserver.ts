@@ -22,14 +22,14 @@ import { MetricRecord } from './export/types';
 const NOOP_CALLBACK = () => {};
 const MAX_TIMEOUT_UPDATE_MS = 500;
 
-/** This is a SDK implementation of Batch Observer Metric. */
+/** This is a SDK implementation of Batch Observer. */
 export class BatchObserver {
   private _callback: (observerResult: api.BatchObserverResult) => void;
   private _maxTimeoutUpdateMS: number;
   private _logger: Logger;
 
   constructor(
-    options: api.BatchMetricOptions,
+    options: api.BatchObserverOptions,
     callback?: (observerResult: api.BatchObserverResult) => void
   ) {
     this._logger = options.logger ?? new NoopLogger();

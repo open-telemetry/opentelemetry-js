@@ -20,7 +20,7 @@ import {
   Counter,
   ValueRecorder,
   ValueObserver,
-  BatchMetricOptions,
+  BatchObserverOptions,
   UpDownCounter,
 } from './Metric';
 import { ObserverResult } from './ObserverResult';
@@ -88,6 +88,6 @@ export interface Meter {
    */
   createBatchObserver(
     callback: (batchObserverResult: BatchObserverResult) => void,
-    options?: BatchMetricOptions
+    options?: BatchObserverOptions
   ): void;
 }

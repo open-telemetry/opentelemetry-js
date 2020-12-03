@@ -66,11 +66,16 @@ export interface MetricOptions {
   boundaries?: number[];
 }
 
-export interface BatchMetricOptions extends MetricOptions {
+export interface BatchObserverOptions {
   /**
    * Indicates how long the batch metric should wait to update before cancel
    */
   maxTimeoutUpdateMS?: number;
+
+  /**
+   * User provided logger.
+   */
+  logger?: Logger;
 }
 
 /** The Type of value. It describes how the data is reported. */

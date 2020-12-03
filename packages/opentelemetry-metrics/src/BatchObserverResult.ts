@@ -26,7 +26,7 @@ export class BatchObserverResult implements api.BatchObserverResult {
    * Cancels the further updates.
    * This is used to prevent updating the value of result that took too
    * long to update. For example to avoid update after timeout.
-   * See {@link BatchObserverMetric.getMetricRecord}
+   * See {@link BatchObserver.collect}
    */
   cancelled = false;
 

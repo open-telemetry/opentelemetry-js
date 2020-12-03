@@ -1138,18 +1138,15 @@ describe('Meter', () => {
 
   describe('#batchObserver', () => {
     it('should create a batch observer', () => {
-      const measure = meter.createBatchObserver(() => {});
-      assert.ok(measure instanceof BatchObserver);
+      const observer = meter.createBatchObserver(() => {});
+      assert.ok(observer instanceof BatchObserver);
     });
 
     it('should create batch observer with options', () => {
-      const measure = meter.createBatchObserver(() => {}, {
-        description: 'desc',
-        unit: '1',
-        disabled: false,
+      const observer = meter.createBatchObserver(() => {}, {
         maxTimeoutUpdateMS: 100,
       });
-      assert.ok(measure instanceof BatchObserver);
+      assert.ok(observer instanceof BatchObserver);
     });
 
     it('should use callback to observe values ', async () => {

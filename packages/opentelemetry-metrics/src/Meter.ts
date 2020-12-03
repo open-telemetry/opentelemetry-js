@@ -257,17 +257,16 @@ export class Meter implements api.Meter {
   }
 
   /**
-   * Creates a new batch observer metric.
+   * Creates a new batch observer.
    * @param callback the batch observer callback
-   * @param [options] the metric batch options.
+   * @param [options] the batch options.
    */
   createBatchObserver(
     callback: (observerResult: api.BatchObserverResult) => void,
-    options: api.BatchMetricOptions = {}
-  ) {
-    const opt: api.BatchMetricOptions = {
+    options: api.BatchObserverOptions = {}
+  ): BatchObserver {
+    const opt: api.BatchObserverOptions = {
       logger: this._logger,
-      ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
     const batchObserver = new BatchObserver(opt, callback);
