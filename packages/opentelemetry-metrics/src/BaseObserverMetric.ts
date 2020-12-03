@@ -17,7 +17,7 @@ import * as api from '@opentelemetry/api';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BoundObserver } from './BoundInstrument';
-import { Processor } from './export/Processor';
+import { AggregatorSelector } from './export/AggregatorSelector';
 import { MetricKind, MetricRecord } from './export/types';
 import { Metric } from './Metric';
 import { ObserverResult } from './ObserverResult';
@@ -36,7 +36,7 @@ export abstract class BaseObserverMetric
   constructor(
     name: string,
     options: api.MetricOptions,
-    private readonly _processor: Processor,
+    private readonly _aggregatorSelector: AggregatorSelector,
     resource: Resource,
     metricKind: MetricKind,
     instrumentationLibrary: InstrumentationLibrary,
@@ -52,7 +52,7 @@ export abstract class BaseObserverMetric
       this._disabled,
       this._valueType,
       this._logger,
-      this._processor.aggregatorFor(this._descriptor)
+      this._aggregatorSelector.aggregatorFor(this._descriptor)
     );
   }
 

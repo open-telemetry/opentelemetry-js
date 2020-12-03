@@ -19,7 +19,7 @@ import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BatchObserverResult } from './BatchObserverResult';
 import { BoundObserver } from './BoundInstrument';
-import { Processor } from './export/Processor';
+import { AggregatorSelector } from './export/AggregatorSelector';
 import { MetricKind, MetricRecord } from './export/types';
 import { Metric } from './Metric';
 
@@ -36,7 +36,7 @@ export class BatchObserverMetric
   constructor(
     name: string,
     options: api.BatchMetricOptions,
-    private readonly _processor: Processor,
+    private readonly _aggregatorSelector: AggregatorSelector,
     resource: Resource,
     instrumentationLibrary: InstrumentationLibrary,
     callback?: (observerResult: api.BatchObserverResult) => void
@@ -59,7 +59,7 @@ export class BatchObserverMetric
       this._disabled,
       this._valueType,
       this._logger,
-      this._processor.aggregatorFor(this._descriptor)
+      this._aggregatorSelector.aggregatorFor(this._descriptor)
     );
   }
 

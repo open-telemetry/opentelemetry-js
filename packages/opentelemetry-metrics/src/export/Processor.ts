@@ -15,6 +15,7 @@
  */
 
 import * as aggregators from './aggregators';
+import { AggregatorSelector } from './AggregatorSelector';
 import {
   MetricRecord,
   MetricKind,
@@ -29,7 +30,7 @@ import {
  * values received from updates from metrics in the meter. The stored values
  * will be sent to an exporter for exporting.
  */
-export abstract class Processor {
+export abstract class Processor implements AggregatorSelector {
   protected readonly _batchMap = new Map<string, MetricRecord>();
 
   /** Returns an aggregator based off metric descriptor. */

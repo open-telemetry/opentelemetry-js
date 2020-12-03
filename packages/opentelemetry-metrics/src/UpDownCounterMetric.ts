@@ -19,8 +19,8 @@ import { Resource } from '@opentelemetry/resources';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { BoundUpDownCounter } from './BoundInstrument';
 import { MetricKind } from './export/types';
-import { Processor } from './export/Processor';
 import { Metric } from './Metric';
+import { AggregatorSelector } from './export/AggregatorSelector';
 
 /** This is a SDK implementation of UpDownCounter Metric. */
 export class UpDownCounterMetric
@@ -29,7 +29,7 @@ export class UpDownCounterMetric
   constructor(
     name: string,
     options: api.MetricOptions,
-    private readonly _processor: Processor,
+    private readonly _aggregatorSelector: AggregatorSelector,
     resource: Resource,
     instrumentationLibrary: InstrumentationLibrary
   ) {
@@ -47,7 +47,7 @@ export class UpDownCounterMetric
       this._disabled,
       this._valueType,
       this._logger,
-      this._processor.aggregatorFor(this._descriptor)
+      this._aggregatorSelector.aggregatorFor(this._descriptor)
     );
   }
 

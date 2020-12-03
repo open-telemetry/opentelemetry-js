@@ -18,7 +18,7 @@ import * as api from '@opentelemetry/api';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BaseObserverMetric } from './BaseObserverMetric';
-import { Processor } from './export/Processor';
+import { AggregatorSelector } from './export/AggregatorSelector';
 import { LastValue, MetricKind } from './export/types';
 import { ObserverResult } from './ObserverResult';
 
@@ -29,7 +29,7 @@ export class SumObserverMetric
   constructor(
     name: string,
     options: api.MetricOptions,
-    processor: Processor,
+    aggregatorSelector: AggregatorSelector,
     resource: Resource,
     instrumentationLibrary: InstrumentationLibrary,
     callback?: (observerResult: api.ObserverResult) => unknown
@@ -37,7 +37,7 @@ export class SumObserverMetric
     super(
       name,
       options,
-      processor,
+      aggregatorSelector,
       resource,
       MetricKind.SUM_OBSERVER,
       instrumentationLibrary,

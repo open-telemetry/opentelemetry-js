@@ -13,18 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Aggregator, MetricDescriptor } from './types';
 
-export * from './BoundInstrument';
-export * from './CounterMetric';
-export * from './ValueRecorderMetric';
-export * from './Meter';
-export * from './MeterProvider';
-export * from './Metric';
-export * from './ValueObserverMetric';
-export * from './export/aggregators';
-export * from './export/ConsoleMetricExporter';
-export * from './export/Processor';
-export * from './export/AggregatorSelector';
-export * from './export/types';
-export * from './UpDownCounterMetric';
-export { MeterConfig } from './types';
+export interface AggregatorSelector {
+  aggregatorFor(metricKind: MetricDescriptor): Aggregator;
+}

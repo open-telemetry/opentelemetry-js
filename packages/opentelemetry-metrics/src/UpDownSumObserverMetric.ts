@@ -18,7 +18,7 @@ import * as api from '@opentelemetry/api';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BaseObserverMetric } from './BaseObserverMetric';
-import { Processor } from './export/Processor';
+import { AggregatorSelector } from './export/AggregatorSelector';
 import { MetricKind } from './export/types';
 
 /** This is a SDK implementation of UpDownSumObserver Metric. */
@@ -28,7 +28,7 @@ export class UpDownSumObserverMetric
   constructor(
     name: string,
     options: api.MetricOptions,
-    processor: Processor,
+    aggregatorSelector: AggregatorSelector,
     resource: Resource,
     instrumentationLibrary: InstrumentationLibrary,
     callback?: (observerResult: api.ObserverResult) => unknown
@@ -36,7 +36,7 @@ export class UpDownSumObserverMetric
     super(
       name,
       options,
-      processor,
+      aggregatorSelector,
       resource,
       MetricKind.UP_DOWN_SUM_OBSERVER,
       instrumentationLibrary,
