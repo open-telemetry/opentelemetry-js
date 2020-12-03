@@ -15,7 +15,6 @@
  */
 
 import {
-<<<<<<< HEAD
   Detector,
   Resource,
   CONTAINER_RESOURCE,
@@ -25,17 +24,6 @@ import {
 import * as https from 'https';
 import * as fs from 'fs';
 import * as util from 'util';
-=======
-    Detector,
-    Resource,
-    CONTAINER_RESOURCE,
-    K8S_RESOURCE,
-    ResourceDetectionConfigWithLogger,
-  } from '@opentelemetry/resources';
-  import * as https from 'https';
-  import * as fs from 'fs';
-  import * as util from 'util';
->>>>>>> b9e63372f... feat: update implementation of https requests
 
 /**
  * The AwsEksDetector can be used to detect if a process is running in AWS Elastic
@@ -61,18 +49,12 @@ export class AwsEksDetector implements Detector {
   readonly TIMEOUT_MS = 2000;
   readonly UTF8_UNICODE = 'utf8';
 
-<<<<<<< HEAD
   private static readFileAsync = util.promisify(fs.readFile);
   private static fileAccessAsync = util.promisify(fs.access);
 
   /**
-<<<<<<< HEAD
    * The AwsEksDetector can be used to detect if a process is running on Amazon
    * Elastic Kubernetes and returns a promise containing a {@link Resource}
-=======
-   * The AwsEksDetector can be used to detect if a process is running in AWS
-   * Eks and returns a promise containing a {@link Resource}
->>>>>>> 37f44d48d... fix: updated naming consistency
    * populated with instance metadata. Returns a promise containing an
    * empty {@link Resource} if the connection to kubernetes process
    * or aws config maps fails
@@ -97,48 +79,11 @@ export class AwsEksDetector implements Detector {
             [CONTAINER_RESOURCE.ID]: containerId || '',
           });
     } catch (e) {
-<<<<<<< HEAD
-<<<<<<< HEAD
       config.logger.warn('Process is not running on K8S', e);
-=======
-      config.logger.warn('This process is not running on Kubernetes because either the token path or certificate path cannot be accessed ', e);
->>>>>>> 21e3884b1... fix: update naming conventions consistentcy
-=======
-      config.logger.warn('Process is not running on K8S', e);
->>>>>>> 7359cb1e4... fix: updated files to adhere to linter
       return Resource.empty();
-=======
-    private static readFileAsync = util.promisify(fs.readFile);
-    private static fileAccessAsync = util.promisify(fs.access);
-  
-    async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
-      try {
-        await AwsEksDetector.fileAccessAsync(this.K8S_TOKEN_PATH);
-        await AwsEksDetector.fileAccessAsync(this.K8S_CERT_PATH);
-        
-        if (!this._isEks(config)) {
-          config.logger.debug('AwsEcsDetector failed: Process is not running on Eks');
-          return Resource.empty();
-        }
-      
-        const containerId = await this._getContainerId(config);
-        const clusterName = await this._getClusterName(config);
-
-        return !containerId && !clusterName
-        ? Resource.empty()
-        : new Resource({
-          [K8S_RESOURCE.CLUSTER_NAME]: clusterName || '',
-          [CONTAINER_RESOURCE.ID]: containerId || '',
-        });
-      } catch (e) {
-        config.logger.warn('Not running on K8S');
-        return Resource.empty();
-      }
->>>>>>> 7d354c340... fix: use file read async instead of sync
     }
   }
 
-<<<<<<< HEAD
   /**
    * Attempts to make a connection to AWS Config map which will
    * determine whether the process is running on an EKS
@@ -154,14 +99,10 @@ export class AwsEksDetector implements Detector {
       headers: {
         Authorization: await this._getK8sCredHeader(config),
       },
-<<<<<<< HEAD
       hostname: this.K8S_SVC_URL,
       method: 'GET',
       path: this.AUTH_CONFIGMAP_PATH,
       timeout: this.TIMEOUT_MS,
-=======
-      ca: cert,
->>>>>>> 21e3884b1... fix: update naming conventions consistentcy
     };
     return !!(await this._fetchString(options));
   }
@@ -180,14 +121,10 @@ export class AwsEksDetector implements Detector {
       headers: {
         Authorization: await this._getK8sCredHeader(config),
       },
-<<<<<<< HEAD
       host: this.K8S_SVC_URL,
       method: 'GET',
       path: this.CW_CONFIGMAP_PATH,
       timeout: this.TIMEOUT_MS,
-=======
-      ca: cert,
->>>>>>> 21e3884b1... fix: update naming conventions consistentcy
     };
     const response = await this._fetchString(options);
     try {
@@ -213,29 +150,10 @@ export class AwsEksDetector implements Detector {
       return 'Bearer ' + content;
     } catch (e) {
       config.logger.warn('Unable to read Kubernetes client token.', e);
-<<<<<<< HEAD
-=======
-    private async _isEks(config: ResourceDetectionConfigWithLogger): Promise<boolean> {
-      const options = {
-        hostname: this.K8S_SVC_URL,
-        path: this.AUTH_CONFIGMAP_PATH,
-        method: 'GET',
-        timeout: this.MILLISECOND_TIME_OUT,
-        HEADERS: {
-          "Authorization" : this._getK8sCredHeader(config),
-        },
-        ca: JSON.stringify(AwsEksDetector.readFileAsync(this.K8S_CERT_PATH)),
-      }
-      const awsAuth = this._fetchString(options);
-      return !!awsAuth;
->>>>>>> 7d354c340... fix: use file read async instead of sync
-=======
->>>>>>> 21e3884b1... fix: update naming conventions consistentcy
     }
     return '';
   }
 
-<<<<<<< HEAD
   /**
    * Read container ID from cgroup file
    * In EKS, even if we fail to find target file
@@ -264,59 +182,6 @@ export class AwsEksDetector implements Detector {
     }
     return undefined;
   }
-=======
-     private async _getClusterName(config: ResourceDetectionConfigWithLogger): Promise<string | undefined> {
-        const options = {
-        host: this.K8S_SVC_URL,
-        path: this.CW_CONFIGMAP_PATH,
-        method: 'GET',
-        timeout: this.MILLISECOND_TIME_OUT,
-        HEADERS: {
-          "Authorization" : this._getK8sCredHeader(config),
-        },
-        ca: JSON.stringify(AwsEksDetector.readFileAsync(this.K8S_CERT_PATH)),
-      }
-        return this._fetchString(options);
-     }
-
-     private async _getK8sCredHeader(config: ResourceDetectionConfigWithLogger): Promise<string> {
-        try {
-          const content = await AwsEksDetector.readFileAsync(
-              this.K8S_TOKEN_PATH,
-              'utf8'
-          );
-          return "Bearer " + content;
-        } catch (e) {
-            config.logger.warn(`AwsEksDetector failed to read container ID: ${e.message}`);
-        }
-        return "";
-    }
-
-    /**
-    * Read container ID from cgroup file
-    * In EKS, even if we fail to find target file
-    * or target file does not contain container ID
-    * we do not throw an error but throw warning message
-    * and then return null string
-    */
-    private async _getContainerId(config: ResourceDetectionConfigWithLogger): Promise<string | undefined> {
-        try {
-          const rawData = await AwsEksDetector.readFileAsync(
-            this.DEFAULT_CGROUP_PATH,
-            'utf8'
-          );
-          const splitData = rawData.trim().split('\n');
-          for (const str of splitData) {
-            if (str.length > this.CONTAINER_ID_LENGTH) {
-              return str.substring(str.length - this.CONTAINER_ID_LENGTH);
-              }
-            }
-          } catch (e) {
-            config.logger.warn(`AwsEksDetector failed to read container ID: ${e.message}`);
-          }
-        return undefined;
-      }
->>>>>>> 7d354c340... fix: use file read async instead of sync
 
   /**
    * Establishes an HTTP connection to AWS instance document url.
@@ -324,16 +189,8 @@ export class AwsEksDetector implements Detector {
    * to get back a valid JSON document. Parses that document and stores
    * the identity properties in a local map.
    */
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> eda056317... fix: add parsing to Cluster JSON response
   private async _fetchString(options: https.RequestOptions): Promise<string> {
     return await new Promise((resolve, reject) => {
-=======
-  private async _fetchString(options: https.RequestOptions): Promise<string | undefined> {
-    return new Promise((resolve, reject) => {
->>>>>>> b9e63372f... feat: update implementation of https requests
       const timeoutId = setTimeout(() => {
         req.abort();
         reject(new Error('EKS metadata api request timed out.'));
