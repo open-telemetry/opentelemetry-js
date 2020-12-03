@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/context-base';
+import { Context, ROOT_CONTEXT } from '@opentelemetry/context-base';
 import { NOOP_TEXT_MAP_PROPAGATOR } from '../context/propagation/NoopTextMapPropagator';
 import {
   defaultTextMapGetter,
@@ -89,12 +89,12 @@ export class PropagationAPI {
    *
    * @param carrier Carrier to extract context from
    * @param getter Function used to extract keys from a carrier
-   * @param context Context which the newly created context will inherit from. Defaults to the currently active context.
+   * @param context Context which the newly created context will inherit from. Defaults to ROOT_CONTEXT.
    */
   public extract<Carrier>(
     carrier: Carrier,
     getter: TextMapGetter<Carrier> = defaultTextMapGetter,
-    context: Context = contextApi.active()
+    context: Context = ROOT_CONTEXT
   ): Context {
     return this._getGlobalPropagator().extract(context, carrier, getter);
   }
