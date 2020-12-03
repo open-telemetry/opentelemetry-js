@@ -157,16 +157,16 @@ export class AwsEksDetector implements Detector {
   /**
    * Read container ID from cgroup file generated from docker which lists the full
    * untruncated docker container ID at the end of each line.
-   * 
+   *
    * The predefined structure of calling /proc/self/cgroup when in a docker container has the structure:
-   * 
-   * #:xxxxxx:/ 
+   *
+   * #:xxxxxx:/
    * or
-   * 
+   *
    * #:xxxxxx:/docker/64characterID
-   * 
+   *
    * This function takes advantage of that fact by just reading the 64-character ID from the end of the
-   * first line. In EKS, even if we fail to find target file or target file does 
+   * first line. In EKS, even if we fail to find target file or target file does
    * not contain container ID we do not throw an error but throw warning message
    * and then return null string
    */
