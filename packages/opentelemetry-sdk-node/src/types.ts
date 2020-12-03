@@ -24,7 +24,7 @@ export interface NodeSDKConfiguration {
   textMapPropagator: api.TextMapPropagator;
   logger: api.Logger;
   logLevel: core.LogLevel;
-  metricBatcher: metrics.Batcher;
+  metricProcessor: metrics.Processor;
   metricExporter: metrics.MetricExporter;
   metricInterval: number;
   plugins: node.Plugins;

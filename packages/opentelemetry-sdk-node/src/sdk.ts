@@ -89,8 +89,8 @@ export class NodeSDK {
     if (configuration.metricExporter) {
       const meterConfig: MeterConfig = {};
 
-      if (configuration.metricBatcher) {
-        meterConfig.batcher = configuration.metricBatcher;
+      if (configuration.metricProcessor) {
+        meterConfig.processor = configuration.metricProcessor;
       }
       if (configuration.metricExporter) {
         meterConfig.exporter = configuration.metricExporter;
