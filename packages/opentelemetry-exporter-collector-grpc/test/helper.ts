@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import { TraceFlags, ValueType, StatusCode } from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
+import * as metrics from '@opentelemetry/metrics';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
 import { collectorTypes } from '@opentelemetry/exporter-collector';
 import * as assert from 'assert';
-import { MetricRecord, MeterProvider } from '@opentelemetry/metrics';
 import * as grpc from 'grpc';
 
-const meterProvider = new MeterProvider({
+const meterProvider = new metrics.MeterProvider({
   interval: 30000,
   resource: new Resource({
     service: 'ui',
@@ -54,61 +54,52 @@ const traceIdArr = [
 const spanIdArr = [94, 16, 114, 97, 246, 79, 165, 62];
 const parentIdArr = [120, 168, 145, 80, 152, 134, 67, 136];
 
-export async function mockCounter(): Promise<MetricRecord> {
+export function mockCounter(): metrics.Metric<metrics.BoundCounter> &
+  api.Counter {
   const name = 'int-counter';
   const metric =
     meter['_metrics'].get(name) ||
     meter.createCounter(name, {
       description: 'sample counter description',
-      valueType: ValueType.INT,
+      valueType: api.ValueType.INT,
     });
   metric.clear();
   metric.bind({});
-
-  return (await metric.getMetricRecord())[0];
+  return metric;
 }
 
-export async function mockDoubleCounter(): Promise<MetricRecord> {
-  const name = 'double-counter';
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createCounter(name, {
-      description: 'sample counter description',
-      valueType: ValueType.DOUBLE,
-    });
-  metric.clear();
-  metric.bind({});
-
-  return (await metric.getMetricRecord())[0];
-}
-
-export async function mockObserver(): Promise<MetricRecord> {
+export function mockObserver(
+  callback: (observerResult: api.ObserverResult) => void
+): metrics.Metric<metrics.BoundCounter> & api.ValueObserver {
   const name = 'double-observer';
   const metric =
     meter['_metrics'].get(name) ||
-    meter.createValueObserver(name, {
-      description: 'sample observer description',
-      valueType: ValueType.DOUBLE,
-    });
+    meter.createValueObserver(
+      name,
+      {
+        description: 'sample observer description',
+        valueType: api.ValueType.DOUBLE,
+      },
+      callback
+    );
   metric.clear();
   metric.bind({});
-
-  return (await metric.getMetricRecord())[0];
+  return metric;
 }
 
-export async function mockValueRecorder(): Promise<MetricRecord> {
+export function mockValueRecorder(): metrics.Metric<metrics.BoundValueRecorder> &
+  api.ValueRecorder {
   const name = 'int-recorder';
   const metric =
     meter['_metrics'].get(name) ||
     meter.createValueRecorder(name, {
       description: 'sample recorder description',
-      valueType: ValueType.INT,
+      valueType: api.ValueType.INT,
       boundaries: [0, 100],
     });
   metric.clear();
   metric.bind({});
-
-  return (await metric.getMetricRecord())[0];
+  return metric;
 }
 
 export const mockedReadableSpan: ReadableSpan = {
@@ -117,13 +108,13 @@ export const mockedReadableSpan: ReadableSpan = {
   spanContext: {
     traceId: '1f1008dc8e270e85c40a0d7c3939b278',
     spanId: '5e107261f64fa53e',
-    traceFlags: TraceFlags.SAMPLED,
+    traceFlags: api.TraceFlags.SAMPLED,
   },
   parentSpanId: '78a8915098864388',
   startTime: [1574120165, 429803070],
   endTime: [1574120165, 438688070],
   ended: true,
-  status: { code: StatusCode.OK },
+  status: { code: api.StatusCode.OK },
   attributes: { component: 'document-load' },
   links: [
     {

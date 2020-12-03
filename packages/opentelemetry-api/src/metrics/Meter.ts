@@ -22,6 +22,8 @@ import {
   ValueObserver,
   BatchObserverOptions,
   UpDownCounter,
+  SumObserver,
+  UpDownSumObserver,
 } from './Metric';
 import { ObserverResult } from './ObserverResult';
 
@@ -81,10 +83,34 @@ export interface Meter {
   ): ValueObserver;
 
   /**
-   * Creates a new `BatchObserver`, can be used to update many observer metrics
+   * Creates a new `SumObserver` metric.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   * @param [callback] the observer callback
+   */
+  createSumObserver(
+    name: string,
+    options?: MetricOptions,
+    callback?: (observerResult: ObserverResult) => void
+  ): SumObserver;
+
+  /**
+   * Creates a new `UpDownSumObserver` metric.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   * @param [callback] the observer callback
+   */
+  createUpDownSumObserver(
+    name: string,
+    options?: MetricOptions,
+    callback?: (observerResult: ObserverResult) => void
+  ): UpDownSumObserver;
+
+  /**
+   * Creates a new `BatchObserver`, can be used to update many metrics
    * at the same time and when operations needs to be async
    * @param callback the batch observer callback
-   * @param [options] the metric batch options.
+   * @param [options] the batch observer options.
    */
   createBatchObserver(
     callback: (batchObserverResult: BatchObserverResult) => void,

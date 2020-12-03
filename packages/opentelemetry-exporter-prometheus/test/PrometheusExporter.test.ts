@@ -202,13 +202,13 @@ describe('PrometheusExporter', () => {
       const boundCounter = counter.bind({ key1: 'labelValue1' });
       boundCounter.add(10);
       meter.collect().then(() => {
-        exporter.export(meter.getBatcher().checkPointSet(), () => {
+        exporter.export(meter.getProcessor().checkPointSet(), () => {
           // TODO: Remove this special case once the PR is ready.
           // This is to test the special case where counters are destroyed
           // and recreated in the exporter in order to get around prom-client's
           // aggregation and use ours.
           boundCounter.add(10);
-          exporter.export(meter.getBatcher().checkPointSet(), () => {
+          exporter.export(meter.getProcessor().checkPointSet(), () => {
             http
               .get('http://localhost:9464/metrics', res => {
                 res.on('data', chunk => {
@@ -255,8 +255,8 @@ describe('PrometheusExporter', () => {
       );
 
       meter.collect().then(() => {
-        exporter.export(meter.getBatcher().checkPointSet(), () => {
-          exporter.export(meter.getBatcher().checkPointSet(), () => {
+        exporter.export(meter.getProcessor().checkPointSet(), () => {
+          exporter.export(meter.getProcessor().checkPointSet(), () => {
             http
               .get('http://localhost:9464/metrics', res => {
                 res.on('data', chunk => {
@@ -286,7 +286,7 @@ describe('PrometheusExporter', () => {
       counter.bind({ counterKey1: 'labelValue1' }).add(10);
       counter.bind({ counterKey1: 'labelValue2' }).add(20);
       meter.collect().then(() => {
-        exporter.export(meter.getBatcher().checkPointSet(), () => {
+        exporter.export(meter.getProcessor().checkPointSet(), () => {
           http
             .get('http://localhost:9464/metrics', res => {
               res.on('data', chunk => {
@@ -363,7 +363,7 @@ describe('PrometheusExporter', () => {
       const boundCounter = counter.bind({ key1: 'labelValue1' });
       boundCounter.add(10);
       meter.collect().then(() => {
-        exporter.export(meter.getBatcher().checkPointSet(), () => {
+        exporter.export(meter.getProcessor().checkPointSet(), () => {
           http
             .get('http://localhost:9464/metrics', res => {
               res.on('data', chunk => {
@@ -390,7 +390,7 @@ describe('PrometheusExporter', () => {
       const boundCounter = counter.bind({ key1: 'labelValue1' });
       boundCounter.add(10);
       meter.collect().then(() => {
-        exporter.export(meter.getBatcher().checkPointSet(), () => {
+        exporter.export(meter.getProcessor().checkPointSet(), () => {
           http
             .get('http://localhost:9464/metrics', res => {
               res.on('data', chunk => {
@@ -419,7 +419,7 @@ describe('PrometheusExporter', () => {
 
       counter.bind({ key1: 'labelValue1' }).add(20);
       meter.collect().then(() => {
-        exporter.export(meter.getBatcher().checkPointSet(), () => {
+        exporter.export(meter.getProcessor().checkPointSet(), () => {
           http
             .get('http://localhost:9464/metrics', res => {
               res.on('data', chunk => {
@@ -456,7 +456,7 @@ describe('PrometheusExporter', () => {
       );
 
       meter.collect().then(() => {
-        exporter.export(meter.getBatcher().checkPointSet(), () => {
+        exporter.export(meter.getProcessor().checkPointSet(), () => {
           http
             .get('http://localhost:9464/metrics', res => {
               res.on('data', chunk => {
@@ -465,7 +465,7 @@ describe('PrometheusExporter', () => {
 
                 assert.deepStrictEqual(lines, [
                   '# HELP sum_observer a test description',
-                  '# TYPE sum_observer counter',
+                  '# TYPE sum_observer gauge',
                   `sum_observer{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
                   '',
                 ]);
@@ -496,7 +496,7 @@ describe('PrometheusExporter', () => {
       );
 
       meter.collect().then(() => {
-        exporter.export(meter.getBatcher().checkPointSet(), () => {
+        exporter.export(meter.getProcessor().checkPointSet(), () => {
           http
             .get('http://localhost:9464/metrics', res => {
               res.on('data', chunk => {
@@ -526,7 +526,7 @@ describe('PrometheusExporter', () => {
       valueRecorder.bind({ key1: 'labelValue1' }).record(20);
 
       meter.collect().then(() => {
-        exporter.export(meter.getBatcher().checkPointSet(), () => {
+        exporter.export(meter.getProcessor().checkPointSet(), () => {
           http
             .get('http://localhost:9464/metrics', res => {
               res.on('data', chunk => {
@@ -578,7 +578,7 @@ describe('PrometheusExporter', () => {
         },
         async () => {
           await meter.collect();
-          exporter!.export(meter.getBatcher().checkPointSet(), () => {
+          exporter!.export(meter.getProcessor().checkPointSet(), () => {
             http
               .get('http://localhost:9464/metrics', res => {
                 res.on('data', chunk => {
@@ -608,7 +608,7 @@ describe('PrometheusExporter', () => {
         },
         async () => {
           await meter.collect();
-          exporter!.export(meter.getBatcher().checkPointSet(), () => {
+          exporter!.export(meter.getProcessor().checkPointSet(), () => {
             http
               .get('http://localhost:8080/metrics', res => {
                 res.on('data', chunk => {
@@ -638,7 +638,7 @@ describe('PrometheusExporter', () => {
         },
         async () => {
           await meter.collect();
-          exporter!.export(meter.getBatcher().checkPointSet(), () => {
+          exporter!.export(meter.getProcessor().checkPointSet(), () => {
             http
               .get('http://localhost:9464/test', res => {
                 res.on('data', chunk => {

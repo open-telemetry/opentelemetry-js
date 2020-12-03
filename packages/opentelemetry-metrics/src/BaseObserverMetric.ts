@@ -17,7 +17,7 @@ import * as api from '@opentelemetry/api';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BoundObserver } from './BoundInstrument';
-import { Batcher } from './export/Batcher';
+import { Processor } from './export/Processor';
 import { MetricKind, MetricRecord } from './export/types';
 import { Metric } from './Metric';
 import { ObserverResult } from './ObserverResult';
@@ -36,7 +36,7 @@ export abstract class BaseObserverMetric
   constructor(
     name: string,
     options: api.MetricOptions,
-    private readonly _batcher: Batcher,
+    private readonly _processor: Processor,
     resource: Resource,
     metricKind: MetricKind,
     instrumentationLibrary: InstrumentationLibrary,
@@ -52,22 +52,24 @@ export abstract class BaseObserverMetric
       this._disabled,
       this._valueType,
       this._logger,
-      this._batcher.aggregatorFor(this._descriptor)
+      this._processor.aggregatorFor(this._descriptor)
     );
   }
 
-  protected createObserverResult(): ObserverResult {
-    return new ObserverResult();
+  async getMetricRecord(): Promise<MetricRecord[]> {
+    const observerResult = new ObserverResult();
+    await this._callback(observerResult);
+
+    this._processResults(observerResult);
+
+    return super.getMetricRecord();
   }
 
-  async getMetricRecord(): Promise<MetricRecord[]> {
-    const observerResult = this.createObserverResult();
-    await this._callback(observerResult);
+  protected _processResults(observerResult: ObserverResult) {
     observerResult.values.forEach((value, labels) => {
       const instrument = this.bind(labels);
       instrument.update(value);
     });
-    return super.getMetricRecord();
   }
 
   observation(value: number) {

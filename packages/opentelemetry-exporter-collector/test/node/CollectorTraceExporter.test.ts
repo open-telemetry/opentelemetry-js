@@ -14,12 +14,6 @@
  * limitations under the License.
  */
 
-import {
-  ConsoleLogger,
-  ExportResultCode,
-  ExportResult,
-  LogLevel,
-} from '@opentelemetry/core';
 import * as core from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as http from 'http';
@@ -53,7 +47,7 @@ describe('CollectorTraceExporter - node with json over http', () => {
   describe('instance', () => {
     it('should warn about metadata when using json', () => {
       const metadata = 'foo';
-      const logger = new ConsoleLogger(LogLevel.DEBUG);
+      const logger = new core.ConsoleLogger(core.LogLevel.DEBUG);
       const spyLoggerWarn = sinon.stub(logger, 'warn');
       collectorExporter = new CollectorTraceExporter({
         logger,
@@ -150,7 +144,7 @@ describe('CollectorTraceExporter - node with json over http', () => {
           assert.strictEqual(spyLoggerError.args.length, 0);
           assert.strictEqual(
             responseSpy.args[0][0].code,
-            ExportResultCode.SUCCESS
+            core.ExportResultCode.SUCCESS
           );
           done();
         });
@@ -168,8 +162,8 @@ describe('CollectorTraceExporter - node with json over http', () => {
         callback(mockResError);
         mockResError.send('failed');
         setTimeout(() => {
-          const result = responseSpy.args[0][0] as ExportResult;
-          assert.strictEqual(result.code, ExportResultCode.FAILED);
+          const result = responseSpy.args[0][0] as core.ExportResult;
+          assert.strictEqual(result.code, core.ExportResultCode.FAILED);
           const error = result.error as collectorTypes.CollectorExporterError;
           assert.ok(error !== undefined);
           assert.strictEqual(error.code, 400);
