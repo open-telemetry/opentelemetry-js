@@ -185,7 +185,7 @@ export class AwsEksDetector implements Detector {
 
   /**
    * Establishes an HTTP connection to AWS instance document url.
-   * If the application is running on an Eks instance, we should be able
+   * If the application is running on an EKS instance, we should be able
    * to get back a valid JSON document. Parses that document and stores
    * the identity properties in a local map.
    */
