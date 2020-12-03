@@ -161,6 +161,7 @@ export class AwsEksDetector implements Detector {
    * The predefined structure of calling /proc/self/cgroup when in a docker container has the structure:
    *
    * #:xxxxxx:/
+   *
    * or
    *
    * #:xxxxxx:/docker/64characterID
