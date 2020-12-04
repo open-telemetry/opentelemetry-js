@@ -1,7 +1,7 @@
 {
   "name": "example-metrics",
   "private": true,
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "Example of using @opentelemetry/metrics",
   "main": "index.js",
   "scripts": {
@@ -26,9 +26,9 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.12.0",
-    "@opentelemetry/exporter-prometheus": "^0.12.0",
-    "@opentelemetry/metrics": "^0.12.0"
+    "@opentelemetry/core": "^0.13.0",
+    "@opentelemetry/exporter-prometheus": "^0.13.0",
+    "@opentelemetry/metrics": "^0.13.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme"
 }
