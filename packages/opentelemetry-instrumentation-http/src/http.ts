@@ -52,7 +52,7 @@ import {
 } from '@opentelemetry/instrumentation';
 
 /**
- * Http instrumentation plugin for Opentelemetry
+ * Http instrumentation instrumentation for Opentelemetry
  */
 export class HttpInstrumentation extends InstrumentationBase<Http> {
   /** keep track on spans not ended */
@@ -205,7 +205,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       // already true (at least in supported Node versions up to v10), so we
       // simply follow the latter. Ref:
       // https://nodejs.org/dist/latest/docs/api/http.html#http_http_get_options_callback
-      // https://github.com/googleapis/cloud-trace-nodejs/blob/master/src/plugins/plugin-http.ts#L198
+      // https://github.com/googleapis/cloud-trace-nodejs/blob/master/src/instrumentations/instrumentation-http.ts#L198
       return function outgoingGetRequest<
         T extends http.RequestOptions | string | url.URL
       >(options: T, ...args: HttpRequestArgs): http.ClientRequest {
@@ -356,7 +356,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     component: 'http' | 'https',
     original: (event: string, ...args: unknown[]) => boolean
   ) {
-    const plugin = this;
+    const instrumentation = this;
     return function incomingRequest(
       this: {},
       event: string,
@@ -374,14 +374,20 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         : '/';
       const method = request.method || 'GET';
 
-      plugin._logger.debug('%s plugin incomingRequest', component);
+      instrumentation._logger.debug(
+        '%s instrumentation incomingRequest',
+        component
+      );
 
       if (
         utils.isIgnored(
           pathname,
-          plugin._getConfig().ignoreIncomingPaths,
+          instrumentation._getConfig().ignoreIncomingPaths,
           (e: Error) =>
-            plugin._logger.error('caught ignoreIncomingPaths error: ', e)
+            instrumentation._logger.error(
+              'caught ignoreIncomingPaths error: ',
+              e
+            )
         )
       ) {
         return original.apply(this, [event, ...args]);
@@ -393,29 +399,29 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         kind: SpanKind.SERVER,
         attributes: utils.getIncomingRequestAttributes(request, {
           component: component,
-          serverName: plugin._getConfig().serverName,
+          serverName: instrumentation._getConfig().serverName,
         }),
       };
 
       return context.with(propagation.extract(headers), () => {
-        const span = plugin._startHttpSpan(
+        const span = instrumentation._startHttpSpan(
           `${component.toLocaleUpperCase()} ${method}`,
           spanOptions
         );
 
-        return plugin.tracer.withSpan(span, () => {
+        return instrumentation.tracer.withSpan(span, () => {
           context.bind(request);
           context.bind(response);
 
-          if (plugin._getConfig().requestHook) {
-            plugin._callRequestHook(span, request);
+          if (instrumentation._getConfig().requestHook) {
+            instrumentation._callRequestHook(span, request);
           }
-          if (plugin._getConfig().responseHook) {
-            plugin._callResponseHook(span, response);
+          if (instrumentation._getConfig().responseHook) {
+            instrumentation._callResponseHook(span, response);
           }
 
           // Wraps end (inspired by:
-          // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/plugins/plugin-connect.ts#L75)
+          // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/instrumentations/instrumentation-connect.ts#L75)
           const originalEnd = response.end;
           response.end = function (
             this: http.ServerResponse,
@@ -428,7 +434,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
               error => {
                 if (error) {
                   utils.setSpanWithError(span, error);
-                  plugin._closeHttpSpan(span);
+                  instrumentation._closeHttpSpan(span);
                   throw error;
                 }
               }
@@ -443,10 +449,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
               .setAttributes(attributes)
               .setStatus(utils.parseResponseStatus(response.statusCode));
 
-            if (plugin._getConfig().applyCustomAttributesOnSpan) {
+            if (instrumentation._getConfig().applyCustomAttributesOnSpan) {
               safeExecuteInTheMiddle(
                 () =>
-                  plugin._getConfig().applyCustomAttributesOnSpan!(
+                  instrumentation._getConfig().applyCustomAttributesOnSpan!(
                     span,
                     request,
                     response
@@ -456,7 +462,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
               );
             }
 
-            plugin._closeHttpSpan(span);
+            instrumentation._closeHttpSpan(span);
             return returned;
           };
 
@@ -465,7 +471,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
             error => {
               if (error) {
                 utils.setSpanWithError(span, error);
-                plugin._closeHttpSpan(span);
+                instrumentation._closeHttpSpan(span);
                 throw error;
               }
             }
@@ -479,7 +485,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     component: 'http' | 'https',
     original: Func<http.ClientRequest>
   ): Func<http.ClientRequest> {
-    const plugin = this;
+    const instrumentation = this;
     return function outgoingRequest(
       this: {},
       options: url.URL | http.RequestOptions | string,
@@ -513,9 +519,12 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       if (
         utils.isIgnored(
           origin + pathname,
-          plugin._getConfig().ignoreOutgoingUrls,
+          instrumentation._getConfig().ignoreOutgoingUrls,
           (e: Error) =>
-            plugin._logger.error('caught ignoreOutgoingUrls error: ', e)
+            instrumentation._logger.error(
+              'caught ignoreOutgoingUrls error: ',
+              e
+            )
         )
       ) {
         return original.apply(this, [optionsParsed, ...args]);
@@ -525,7 +534,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       const spanOptions: SpanOptions = {
         kind: SpanKind.CLIENT,
       };
-      const span = plugin._startHttpSpan(operationName, spanOptions);
+      const span = instrumentation._startHttpSpan(operationName, spanOptions);
       if (!optionsParsed.headers) {
         optionsParsed.headers = {};
       }
@@ -540,15 +549,18 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         error => {
           if (error) {
             utils.setSpanWithError(span, error);
-            plugin._closeHttpSpan(span);
+            instrumentation._closeHttpSpan(span);
             throw error;
           }
         }
       );
 
-      plugin._logger.debug('%s plugin outgoingRequest', component);
-      plugin.tracer.bind(request);
-      return plugin._traceClientRequest(
+      instrumentation._logger.debug(
+        '%s instrumentation outgoingRequest',
+        component
+      );
+      instrumentation.tracer.bind(request);
+      return instrumentation._traceClientRequest(
         component,
         request,
         optionsParsed,

@@ -45,9 +45,9 @@ import type { ClientRequest, IncomingMessage, ServerResponse } from 'http';
 import { isWrapped } from '@opentelemetry/instrumentation';
 
 const logger = new NoopLogger();
-const plugin = new HttpInstrumentation({ logger });
-plugin.enable();
-plugin.disable();
+const instrumentation = new HttpInstrumentation({ logger });
+instrumentation.enable();
+instrumentation.disable();
 
 import * as http from 'http';
 
@@ -65,7 +65,7 @@ const provider = new NodeTracerProvider({
   logger,
 });
 provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
-plugin.setTracerProvider(provider);
+instrumentation.setTracerProvider(provider);
 propagation.setGlobalPropagator(new DummyPropagation());
 
 function doNock(
@@ -100,7 +100,7 @@ export const responseHookFunction = (
   span.setAttribute('custom response hook attribute', 'response');
 };
 
-describe('HttpPlugin', () => {
+describe('HttpInstrumentation', () => {
   let contextManager: ContextManager;
 
   beforeEach(() => {
@@ -113,7 +113,7 @@ describe('HttpPlugin', () => {
   });
 
   describe('enable()', () => {
-    describe('with bad plugin options', () => {
+    describe('with bad instrumentation options', () => {
       beforeEach(() => {
         memoryExporter.reset();
       });
@@ -134,8 +134,8 @@ describe('HttpPlugin', () => {
             throw new Error(applyCustomAttributesOnSpanErrorMessage);
           },
         };
-        plugin.setConfig(config);
-        plugin.enable();
+        instrumentation.setConfig(config);
+        instrumentation.enable();
         server = http.createServer((request, response) => {
           response.end('Test Server Response');
         });
@@ -145,7 +145,7 @@ describe('HttpPlugin', () => {
 
       after(() => {
         server.close();
-        plugin.disable();
+        instrumentation.disable();
       });
 
       it('should generate valid spans (client side and server side)', async () => {
@@ -177,13 +177,13 @@ describe('HttpPlugin', () => {
         );
       });
     });
-    describe('with good plugin options', () => {
+    describe('with good instrumentation options', () => {
       beforeEach(() => {
         memoryExporter.reset();
       });
 
       before(() => {
-        plugin.setConfig({
+        instrumentation.setConfig({
           ignoreIncomingPaths: [
             '/ignored/string',
             /\/ignored\/regexp$/i,
@@ -199,7 +199,7 @@ describe('HttpPlugin', () => {
           responseHook: responseHookFunction,
           serverName,
         });
-        plugin.enable();
+        instrumentation.enable();
         server = http.createServer((request, response) => {
           response.end('Test Server Response');
         });
@@ -209,7 +209,7 @@ describe('HttpPlugin', () => {
 
       after(() => {
         server.close();
-        plugin.disable();
+        instrumentation.disable();
       });
 
       it(`${protocol} module should be patched`, () => {
@@ -433,7 +433,7 @@ describe('HttpPlugin', () => {
       }
 
       for (const arg of ['string', {}, new Date()]) {
-        it(`should be tracable and not throw exception in ${protocol} plugin when passing the following argument ${JSON.stringify(
+        it(`should be tracable and not throw exception in ${protocol} instrumentation when passing the following argument ${JSON.stringify(
           arg
         )}`, async () => {
           try {
@@ -449,7 +449,7 @@ describe('HttpPlugin', () => {
       }
 
       for (const arg of [true, 1, false, 0, '']) {
-        it(`should not throw exception in ${protocol} plugin when passing the following argument ${JSON.stringify(
+        it(`should not throw exception in ${protocol} instrumentation when passing the following argument ${JSON.stringify(
           arg
         )}`, async () => {
           try {
@@ -706,8 +706,8 @@ describe('HttpPlugin', () => {
     describe('with require parent span', () => {
       beforeEach(done => {
         memoryExporter.reset();
-        plugin.setConfig({});
-        plugin.enable();
+        instrumentation.setConfig({});
+        instrumentation.enable();
         server = http.createServer((request, response) => {
           response.end('Test Server Response');
         });
@@ -716,16 +716,16 @@ describe('HttpPlugin', () => {
 
       afterEach(() => {
         server.close();
-        plugin.disable();
+        instrumentation.disable();
       });
 
       it('should not trace without parent with options enabled (both client & server)', async () => {
-        plugin.disable();
-        plugin.setConfig({
+        instrumentation.disable();
+        instrumentation.setConfig({
           requireParentforIncomingSpans: true,
           requireParentforOutgoingSpans: true,
         });
-        plugin.enable();
+        instrumentation.enable();
         const testPath = '/test/test';
         await httpRequest.get(
           `${protocol}://${hostname}:${serverPort}${testPath}`
@@ -735,11 +735,11 @@ describe('HttpPlugin', () => {
       });
 
       it('should not trace without parent with options enabled (client only)', async () => {
-        plugin.disable();
-        plugin.setConfig({
+        instrumentation.disable();
+        instrumentation.setConfig({
           requireParentforOutgoingSpans: true,
         });
-        plugin.enable();
+        instrumentation.enable();
         const testPath = '/test/test';
         const result = await httpRequest.get(
           `${protocol}://${hostname}:${serverPort}${testPath}`
@@ -759,11 +759,11 @@ describe('HttpPlugin', () => {
       });
 
       it('should not trace without parent with options enabled (server only)', async () => {
-        plugin.disable();
-        plugin.setConfig({
+        instrumentation.disable();
+        instrumentation.setConfig({
           requireParentforIncomingSpans: true,
         });
-        plugin.enable();
+        instrumentation.enable();
         const testPath = '/test/test';
         const result = await httpRequest.get(
           `${protocol}://${hostname}:${serverPort}${testPath}`
@@ -783,12 +783,12 @@ describe('HttpPlugin', () => {
       });
 
       it('should trace with parent with both requireParent options enabled', done => {
-        plugin.disable();
-        plugin.setConfig({
+        instrumentation.disable();
+        instrumentation.setConfig({
           requireParentforIncomingSpans: true,
           requireParentforOutgoingSpans: true,
         });
-        plugin.enable();
+        instrumentation.enable();
         const testPath = '/test/test';
         const tracer = provider.getTracer('default');
         const span = tracer.startSpan('parentSpan', {

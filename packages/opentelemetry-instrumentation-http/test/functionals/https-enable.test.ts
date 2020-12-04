@@ -44,9 +44,9 @@ import { DummyPropagation } from '../utils/DummyPropagation';
 import { isWrapped } from '@opentelemetry/instrumentation';
 
 const logger = new NoopLogger();
-const plugin = new HttpInstrumentation({ logger });
-plugin.enable();
-plugin.disable();
+const instrumentation = new HttpInstrumentation({ logger });
+instrumentation.enable();
+instrumentation.disable();
 
 import * as http from 'http';
 import * as https from 'https';
@@ -65,7 +65,7 @@ const memoryExporter = new InMemorySpanExporter();
 const provider = new BasicTracerProvider({
   logger,
 });
-plugin.setTracerProvider(provider);
+instrumentation.setTracerProvider(provider);
 const tracer = provider.getTracer('test-https');
 provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 propagation.setGlobalPropagator(new DummyPropagation());
@@ -88,7 +88,7 @@ export const customAttributeFunction = (span: ISpan): void => {
   span.setAttribute('span kind', SpanKind.CLIENT);
 };
 
-describe('HttpsPlugin', () => {
+describe('HttpsInstrumentation', () => {
   let contextManager: ContextManager;
 
   beforeEach(() => {
@@ -102,13 +102,13 @@ describe('HttpsPlugin', () => {
   });
 
   describe('enable()', () => {
-    describe('with bad plugin options', () => {
+    describe('with bad instrumentation options', () => {
       beforeEach(() => {
         memoryExporter.reset();
       });
 
       before(() => {
-        plugin.setConfig({
+        instrumentation.setConfig({
           ignoreIncomingPaths: [
             (url: string) => {
               throw new Error('bad ignoreIncomingPaths function');
@@ -123,7 +123,7 @@ describe('HttpsPlugin', () => {
             throw new Error(applyCustomAttributesOnSpanErrorMessage);
           },
         });
-        plugin.enable();
+        instrumentation.enable();
         server = https.createServer(
           {
             key: fs.readFileSync('test/fixtures/server-key.pem'),
@@ -139,7 +139,7 @@ describe('HttpsPlugin', () => {
 
       after(() => {
         server.close();
-        plugin.disable();
+        instrumentation.disable();
       });
 
       it('should generate valid spans (client side and server side)', async () => {
@@ -171,13 +171,13 @@ describe('HttpsPlugin', () => {
         );
       });
     });
-    describe('with good plugin options', () => {
+    describe('with good instrumentation options', () => {
       beforeEach(() => {
         memoryExporter.reset();
       });
 
       before(() => {
-        plugin.setConfig({
+        instrumentation.setConfig({
           ignoreIncomingPaths: [
             '/ignored/string',
             /\/ignored\/regexp$/i,
@@ -191,7 +191,7 @@ describe('HttpsPlugin', () => {
           applyCustomAttributesOnSpan: customAttributeFunction,
           serverName,
         });
-        plugin.enable();
+        instrumentation.enable();
         server = https.createServer(
           {
             key: fs.readFileSync('test/fixtures/server-key.pem'),
@@ -207,7 +207,7 @@ describe('HttpsPlugin', () => {
 
       after(() => {
         server.close();
-        plugin.disable();
+        instrumentation.disable();
       });
 
       it(`${protocol} module should be patched`, () => {
@@ -420,7 +420,7 @@ describe('HttpsPlugin', () => {
       }
 
       for (const arg of ['string', {}, new Date()]) {
-        it(`should be tracable and not throw exception in ${protocol} plugin when passing the following argument ${JSON.stringify(
+        it(`should be tracable and not throw exception in ${protocol} instrumentation when passing the following argument ${JSON.stringify(
           arg
         )}`, async () => {
           try {
@@ -436,7 +436,7 @@ describe('HttpsPlugin', () => {
       }
 
       for (const arg of [true, 1, false, 0, '']) {
-        it(`should not throw exception in https plugin when passing the following argument ${JSON.stringify(
+        it(`should not throw exception in https instrumentation when passing the following argument ${JSON.stringify(
           arg
         )}`, async () => {
           try {

@@ -25,14 +25,14 @@ import { HttpInstrumentation } from '../../src';
 import { isWrapped } from '@opentelemetry/instrumentation';
 
 const logger = new NoopLogger();
-const plugin = new HttpInstrumentation({ logger });
-plugin.enable();
-plugin.disable();
+const instrumentation = new HttpInstrumentation({ logger });
+instrumentation.enable();
+instrumentation.disable();
 
 import * as https from 'https';
 import { httpsRequest } from '../utils/httpsRequest';
 
-describe('HttpsPlugin', () => {
+describe('HttpsInstrumentation', () => {
   let server: https.Server;
   let serverPort = 0;
 
@@ -42,9 +42,9 @@ describe('HttpsPlugin', () => {
       nock.cleanAll();
       nock.enableNetConnect();
 
-      plugin.enable();
+      instrumentation.enable();
       assert.strictEqual(isWrapped(https.Server.prototype.emit), true);
-      plugin.setTracerProvider(provider);
+      instrumentation.setTracerProvider(provider);
 
       server = https.createServer(
         {
@@ -76,7 +76,7 @@ describe('HttpsPlugin', () => {
     });
     describe('unpatch()', () => {
       it('should not call tracer methods for creating span', async () => {
-        plugin.disable();
+        instrumentation.disable();
         const testPath = '/incoming/unpatch/';
 
         const options = { host: 'localhost', path: testPath, port: serverPort };

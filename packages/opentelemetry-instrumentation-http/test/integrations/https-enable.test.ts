@@ -34,9 +34,9 @@ import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { HttpInstrumentation } from '../../src';
 
 const logger = new NoopLogger();
-const plugin = new HttpInstrumentation({ logger });
-plugin.enable();
-plugin.disable();
+const instrumentation = new HttpInstrumentation({ logger });
+instrumentation.enable();
+instrumentation.disable();
 
 import * as https from 'https';
 import { httpsRequest } from '../utils/httpsRequest';
@@ -51,7 +51,7 @@ export const customAttributeFunction = (span: Span): void => {
   span.setAttribute('span kind', SpanKind.CLIENT);
 };
 
-describe('HttpsPlugin Integration tests', () => {
+describe('HttpsInstrumentation Integration tests', () => {
   beforeEach(() => {
     memoryExporter.reset();
     context.setGlobalContextManager(new AsyncHooksContextManager().enable());
@@ -83,7 +83,7 @@ describe('HttpsPlugin Integration tests', () => {
     });
     propagation.setGlobalPropagator(new DummyPropagation());
     provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
-    plugin.setTracerProvider(provider);
+    instrumentation.setTracerProvider(provider);
     beforeEach(() => {
       memoryExporter.reset();
     });
@@ -94,16 +94,16 @@ describe('HttpsPlugin Integration tests', () => {
         /\/ignored\/regexp$/i,
         (url: string) => url.endsWith('/ignored/function'),
       ];
-      plugin.setConfig({
+      instrumentation.setConfig({
         ignoreIncomingPaths: ignoreConfig,
         ignoreOutgoingUrls: ignoreConfig,
         applyCustomAttributesOnSpan: customAttributeFunction,
       });
-      plugin.enable();
+      instrumentation.enable();
     });
 
     after(() => {
-      plugin.disable();
+      instrumentation.disable();
     });
 
     it('should create a rootSpan for GET requests and add propagation headers', async () => {
@@ -244,8 +244,8 @@ describe('HttpsPlugin Integration tests', () => {
       }
     });
     for (const headers of [
-      { Expect: '100-continue', 'user-agent': 'https-plugin-test' },
-      { 'user-agent': 'https-plugin-test' },
+      { Expect: '100-continue', 'user-agent': 'https-instrumentation-test' },
+      { 'user-agent': 'https-instrumentation-test' },
     ]) {
       it(`should create a span for GET requests and add propagation when using the following signature: get(url, options, callback) and following headers: ${JSON.stringify(
         headers

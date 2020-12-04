@@ -30,9 +30,9 @@ import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 
 const logger = new NoopLogger();
-const plugin = new HttpInstrumentation({ logger });
-plugin.enable();
-plugin.disable();
+const instrumentation = new HttpInstrumentation({ logger });
+instrumentation.enable();
+instrumentation.disable();
 
 import * as http from 'http';
 import * as request from 'request-promise-native';
@@ -61,17 +61,17 @@ describe('Packages', () => {
       logger,
     });
     provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
-    plugin.setTracerProvider(provider);
+    instrumentation.setTracerProvider(provider);
     propagation.setGlobalPropagator(new DummyPropagation());
     beforeEach(() => {
       memoryExporter.reset();
     });
 
     before(() => {
-      plugin.setConfig({
+      instrumentation.setConfig({
         applyCustomAttributesOnSpan: customAttributeFunction,
       });
-      plugin.enable();
+      instrumentation.enable();
     });
 
     after(() => {

@@ -24,7 +24,7 @@
     "nodejs",
     "tracing",
     "profiling",
-    "plugin"
+    "instrumentation"
   ],
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
