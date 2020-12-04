@@ -16,12 +16,42 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { MeterProvider, MetricExporter, MetricRecord } from '../../src';
+import {
+  MeterProvider,
+  MetricExporter,
+  MetricRecord,
+  UngroupedProcessor,
+} from '../../src';
 import {
   ExportResult,
   ExportResultCode,
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
+
+class MockProcessor extends UngroupedProcessor {
+  private _started = false;
+  private _finished = false;
+
+  start() {
+    assert(!this._started);
+    this._started = true;
+  }
+
+  process(record: MetricRecord) {
+    assert(this._started);
+    super.process(record);
+  }
+
+  finish() {
+    assert(this._started);
+    this._started = false;
+    this._finished = true;
+  }
+
+  get finished() {
+    return this._finished;
+  }
+}
 
 class MockExporter implements MetricExporter {
   constructor(private _result: ExportResult) {}
@@ -44,7 +74,9 @@ describe('Controller', () => {
       const errorHandlerSpy = sinon.spy();
       setGlobalErrorHandler(errorHandlerSpy);
       const expectedError = new Error('Failed to export');
+      const processor = new MockProcessor();
       const meter = new MeterProvider({
+        processor,
         exporter: new MockExporter({
           code: ExportResultCode.FAILED,
           error: expectedError,
@@ -65,6 +97,7 @@ describe('Controller', () => {
           errorHandlerSpy.args[0][0].message,
           expectedError.message
         );
+        assert(processor.finished);
         setGlobalErrorHandler(() => {});
         return done();
       }, 0);

@@ -320,6 +320,7 @@ export class Meter implements api.Meter {
       })
       .map(async metric => {
         const records = await metric.getMetricRecord();
+        // process the records in place to reduce required memory footprints.
         for (const record of records) {
           this._processor.process(record);
         }
