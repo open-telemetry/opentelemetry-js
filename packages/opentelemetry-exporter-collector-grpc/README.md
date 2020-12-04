@@ -24,7 +24,7 @@ const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector-g
 
 const collectorOptions = {
   serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>' // url is optional and can be omitted - default is localhost:55680
+  url: '<opentelemetry-collector-url>' // url is optional and can be omitted - default is localhost:4317
 };
 
 const provider = new BasicTracerProvider();
@@ -45,7 +45,7 @@ const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector-g
 
 const collectorOptions = {
   serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is localhost:55680
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is localhost:4317
   credentials: grpc.credentials.createSsl(
     fs.readFileSync('./ca.crt'),
     fs.readFileSync('./client.key'),
@@ -74,7 +74,7 @@ metadata.set('k', 'v');
 
 const collectorOptions = {
   serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is localhost:55680
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is localhost:4317
   metadata, // // an optional grpc.Metadata object to be sent with each request
 };
 
