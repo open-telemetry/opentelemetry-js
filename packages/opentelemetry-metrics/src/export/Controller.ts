@@ -53,18 +53,15 @@ export class PushController extends Controller {
     await this._meter.collect();
     processor.finish();
     return new Promise(resolve => {
-      this._exporter.export(
-        this._meter.getProcessor().checkPointSet(),
-        result => {
-          if (result.code !== ExportResultCode.SUCCESS) {
-            globalErrorHandler(
-              result.error ??
-                new Error('PushController: export failed in _collect')
-            );
-          }
-          resolve();
+      this._exporter.export(processor.checkPointSet(), result => {
+        if (result.code !== ExportResultCode.SUCCESS) {
+          globalErrorHandler(
+            result.error ??
+              new Error('PushController: export failed in _collect')
+          );
         }
-      );
+        resolve();
+      });
     });
   }
 }
