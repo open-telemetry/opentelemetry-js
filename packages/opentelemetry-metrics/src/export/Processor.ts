@@ -14,13 +14,7 @@
  * limitations under the License.
  */
 
-import * as aggregators from './aggregators';
-import {
-  MetricRecord,
-  MetricKind,
-  Aggregator,
-  MetricDescriptor,
-} from './types';
+import { MetricRecord, Aggregator, MetricDescriptor } from './types';
 
 /**
  * Base class for all processor types.
@@ -35,44 +29,19 @@ export abstract class Processor {
   /** Returns an aggregator based off metric descriptor. */
   abstract aggregatorFor(metricKind: MetricDescriptor): Aggregator;
 
+  /** Prepare for new collection. */
+  abstract start(): void;
+
   /** Stores record information to be ready for exporting. */
   abstract process(record: MetricRecord): void;
 
+  /**
+   * Indicates a collection finishes. The processor can aggregate aggregations,
+   * e.g. handle delta to cumulative set.
+   */
+  abstract finish(): void;
+
   checkPointSet(): MetricRecord[] {
     return Array.from(this._batchMap.values());
-  }
-}
-
-/**
- * Processor which retains all dimensions/labels. It accepts all records and
- * passes them for exporting.
- */
-export class UngroupedProcessor extends Processor {
-  aggregatorFor(metricDescriptor: MetricDescriptor): Aggregator {
-    switch (metricDescriptor.metricKind) {
-      case MetricKind.COUNTER:
-      case MetricKind.UP_DOWN_COUNTER:
-        return new aggregators.SumAggregator();
-
-      case MetricKind.SUM_OBSERVER:
-      case MetricKind.UP_DOWN_SUM_OBSERVER:
-      case MetricKind.VALUE_OBSERVER:
-        return new aggregators.LastValueAggregator();
-
-      case MetricKind.VALUE_RECORDER:
-        return new aggregators.HistogramAggregator(
-          metricDescriptor.boundaries || [Infinity]
-        );
-
-      default:
-        return new aggregators.LastValueAggregator();
-    }
-  }
-
-  process(record: MetricRecord): void {
-    const labels = Object.keys(record.labels)
-      .map(k => `${k}=${record.labels[k]}`)
-      .join(',');
-    this._batchMap.set(record.descriptor.name + labels, record);
   }
 }

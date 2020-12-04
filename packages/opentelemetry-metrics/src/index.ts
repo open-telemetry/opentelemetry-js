@@ -24,6 +24,7 @@ export * from './ValueObserverMetric';
 export * from './export/aggregators';
 export * from './export/ConsoleMetricExporter';
 export * from './export/Processor';
+export * from './export/UngroupedProcessor';
 export * from './export/types';
 export * from './UpDownCounterMetric';
 export { MeterConfig } from './types';

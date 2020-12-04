@@ -1372,8 +1372,16 @@ describe('Meter', () => {
 });
 
 class CustomProcessor extends Processor {
+  start(): void {
+    throw new Error('start method not implemented.');
+  }
+
   process(record: MetricRecord): void {
     throw new Error('process method not implemented.');
+  }
+
+  finish(): void {
+    throw new Error('finish method not implemented.');
   }
 
   aggregatorFor(metricKind: MetricDescriptor): Aggregator {

@@ -29,7 +29,7 @@ import { Metric } from './Metric';
 import { ValueObserverMetric } from './ValueObserverMetric';
 import { SumObserverMetric } from './SumObserverMetric';
 import { DEFAULT_METRIC_OPTIONS, DEFAULT_CONFIG, MeterConfig } from './types';
-import { UngroupedProcessor } from './export/Processor';
+import { UngroupedProcessor } from './export/UngroupedProcessor';
 import { PushController } from './export/Controller';
 import { NoopExporter } from './export/NoopExporter';
 
@@ -318,15 +318,14 @@ export class Meter implements api.Meter {
       .filter(metric => {
         return metric.getKind() !== MetricKind.BATCH_OBSERVER;
       })
-      .map(metric => {
-        return metric.getMetricRecord();
+      .map(async metric => {
+        const records = await metric.getMetricRecord();
+        for (const record of records) {
+          this._processor.process(record);
+        }
       });
 
-    await Promise.all(metrics).then(records => {
-      records.forEach(metrics => {
-        metrics.forEach(metric => this._processor.process(metric));
-      });
-    });
+    await Promise.all(metrics);
   }
 
   getProcessor(): Processor {

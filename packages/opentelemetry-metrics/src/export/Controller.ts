@@ -48,7 +48,10 @@ export class PushController extends Controller {
   }
 
   private async _collect(): Promise<void> {
+    const processor = this._meter.getProcessor();
+    processor.start();
     await this._meter.collect();
+    processor.finish();
     return new Promise(resolve => {
       this._exporter.export(
         this._meter.getProcessor().checkPointSet(),

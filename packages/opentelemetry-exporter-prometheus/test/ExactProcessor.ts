@@ -40,10 +40,18 @@ export class ExactProcessor<T, R extends Aggregator> extends Processor {
     return aggregator;
   }
 
+  start() {
+    /** Nothing to do with ExactProcessor on start */
+  }
+
   process(record: MetricRecord): void {
     const labels = Object.keys(record.labels)
       .map(k => `${k}=${record.labels[k]}`)
       .join(',');
     this._batchMap.set(record.descriptor.name + labels, record);
+  }
+
+  finish() {
+    /** Nothing to do with ExactProcessor on finish */
   }
 }
