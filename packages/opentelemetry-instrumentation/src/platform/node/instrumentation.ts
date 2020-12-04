@@ -87,6 +87,7 @@ export abstract class InstrumentationBase<T = any>
   ): T {
     if (!baseDir) {
       if (typeof module.patch === 'function') {
+        module.moduleExports = exports;
         return module.patch(exports);
       }
       return exports;
