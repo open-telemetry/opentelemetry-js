@@ -32,7 +32,7 @@ const OBSERVER_WAIT_TIME_MS = 300;
 /**
  * FetchPlugin Config
  */
-export interface FetchPluginConfig extends api.PluginConfig {
+export interface FetchPluginConfig extends core.PluginConfig {
   // the number of timing resources is limited, after the limit
   // (chrome 250, safari 150) the information is not collected anymore
   // the only way to prevent that is to regularly clean the resources
