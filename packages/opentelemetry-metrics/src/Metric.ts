@@ -17,24 +17,33 @@ import * as api from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BaseBoundInstrument } from './BoundInstrument';
-import { MetricDescriptor, MetricKind, MetricRecord } from './export/types';
+import {
+  Aggregator,
+  MetricDescriptor,
+  MetricKind,
+  MetricRecord,
+} from './export/types';
 import { hashLabels } from './Utils';
 import { InstrumentationLibrary } from '@opentelemetry/core';
+import { Processor } from './export/Processor';
+import { Accumulator } from './Accumulator';
 
 /** This is a SDK implementation of {@link Metric} interface. */
 export abstract class Metric<T extends BaseBoundInstrument>
-  implements api.UnboundMetric<T> {
+  implements api.UnboundMetric<T>, Accumulator {
   protected readonly _disabled: boolean;
   protected readonly _valueType: api.ValueType;
   protected readonly _logger: api.Logger;
   protected readonly _descriptor: MetricDescriptor;
   protected readonly _boundaries: number[] | undefined;
-  private readonly _instruments: Map<string, T> = new Map();
+  private _aggregators: Map<string, Aggregator> = new Map();
+  private _labelHashed: Map<string, api.Labels> = new Map();
 
   constructor(
     private readonly _name: string,
     private readonly _options: api.MetricOptions,
     private readonly _kind: MetricKind,
+    private readonly _processor: Processor,
     readonly resource: Resource,
     readonly instrumentationLibrary: InstrumentationLibrary
   ) {
@@ -56,11 +65,8 @@ export abstract class Metric<T extends BaseBoundInstrument>
    *     that you want to record.
    */
   bind(labels: api.Labels): T {
-    const hash = hashLabels(labels);
-    if (this._instruments.has(hash)) return this._instruments.get(hash)!;
-
-    const instrument = this._makeInstrument(labels);
-    this._instruments.set(hash, instrument);
+    const accumulationKey = hashLabels(labels);
+    const instrument = this._makeInstrument(accumulationKey, labels, this);
     return instrument;
   }
 
@@ -69,14 +75,21 @@ export abstract class Metric<T extends BaseBoundInstrument>
    * @param labels key-values pairs that are associated with a specific metric.
    */
   unbind(labels: api.Labels): void {
-    this._instruments.delete(hashLabels(labels));
+    this._aggregators.delete(hashLabels(labels));
+    this._labelHashed.delete(hashLabels(labels));
+  }
+
+  update(accumulationKey: string, labels: api.Labels, value: number) {
+    const aggregator = this._getAggregator(accumulationKey, labels);
+    aggregator.update(value);
   }
 
   /**
    * Clears all Instruments from the Metric.
    */
   clear(): void {
-    this._instruments.clear();
+    this._aggregators.clear();
+    this._labelHashed.clear();
   }
 
   /**
@@ -87,17 +100,37 @@ export abstract class Metric<T extends BaseBoundInstrument>
   }
 
   getMetricRecord(): Promise<MetricRecord[]> {
-    return new Promise(resolve => {
-      resolve(
-        Array.from(this._instruments.values()).map(instrument => ({
-          descriptor: this._descriptor,
-          labels: instrument.getLabels(),
-          aggregator: instrument.getAggregator(),
-          resource: this.resource,
-          instrumentationLibrary: this.instrumentationLibrary,
-        }))
-      );
-    });
+    const records = Array.from(this._aggregators.entries()).map(
+      ([key, aggregator]) => ({
+        descriptor: this._descriptor,
+        labels: this._labelHashed.get(key)!,
+        aggregator: aggregator,
+        resource: this.resource,
+        instrumentationLibrary: this.instrumentationLibrary,
+      })
+    );
+
+    this._aggregators.clear();
+    this._labelHashed.clear();
+    return Promise.resolve(records);
+  }
+
+  getAggregator(labels: api.Labels): Aggregator {
+    const accumulationKey = hashLabels(labels);
+    return this._getAggregator(accumulationKey, labels);
+  }
+
+  private _getAggregator(
+    accumulationKey: string,
+    labels: api.Labels
+  ): Aggregator {
+    let aggregator = this._aggregators.get(accumulationKey);
+    if (aggregator === undefined) {
+      aggregator = this._processor.aggregatorFor(this._descriptor);
+      this._aggregators.set(accumulationKey, aggregator);
+      this._labelHashed.set(accumulationKey, labels);
+    }
+    return aggregator;
   }
 
   private _getMetricDescriptor(): MetricDescriptor {
@@ -111,5 +144,9 @@ export abstract class Metric<T extends BaseBoundInstrument>
     };
   }
 
-  protected abstract _makeInstrument(labels: api.Labels): T;
+  protected abstract _makeInstrument(
+    accumulationKey: string,
+    labels: api.Labels,
+    accumulator: Accumulator
+  ): T;
 }

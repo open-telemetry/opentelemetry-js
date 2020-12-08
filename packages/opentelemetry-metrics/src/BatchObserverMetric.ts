@@ -17,6 +17,7 @@
 import * as api from '@opentelemetry/api';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
+import { Accumulator } from './Accumulator';
 import { BatchObserverResult } from './BatchObserverResult';
 import { BoundObserver } from './BoundInstrument';
 import { Processor } from './export/Processor';
@@ -27,8 +28,7 @@ const NOOP_CALLBACK = () => {};
 const MAX_TIMEOUT_UPDATE_MS = 500;
 
 /** This is a SDK implementation of Batch Observer Metric. */
-export class BatchObserverMetric
-  extends Metric<BoundObserver>
+export class BatchObserverMetric extends Metric<BoundObserver>
   implements api.BatchObserver {
   private _callback: (observerResult: api.BatchObserverResult) => void;
   private _maxTimeoutUpdateMS: number;
@@ -36,7 +36,7 @@ export class BatchObserverMetric
   constructor(
     name: string,
     options: api.BatchMetricOptions,
-    private readonly _processor: Processor,
+    processor: Processor,
     resource: Resource,
     instrumentationLibrary: InstrumentationLibrary,
     callback?: (observerResult: api.BatchObserverResult) => void
@@ -45,6 +45,7 @@ export class BatchObserverMetric
       name,
       options,
       MetricKind.BATCH_OBSERVER,
+      processor,
       resource,
       instrumentationLibrary
     );
@@ -53,13 +54,18 @@ export class BatchObserverMetric
     this._callback = callback || NOOP_CALLBACK;
   }
 
-  protected _makeInstrument(labels: api.Labels): BoundObserver {
+  protected _makeInstrument(
+    accumulationKey: string,
+    labels: api.Labels,
+    accumulator: Accumulator
+  ): BoundObserver {
     return new BoundObserver(
+      accumulationKey,
       labels,
-      this._disabled,
-      this._valueType,
+      accumulator,
       this._logger,
-      this._processor.aggregatorFor(this._descriptor)
+      this._disabled,
+      this._valueType
     );
   }
 

@@ -29,7 +29,7 @@ import { Metric } from './Metric';
 import { ValueObserverMetric } from './ValueObserverMetric';
 import { SumObserverMetric } from './SumObserverMetric';
 import { DEFAULT_METRIC_OPTIONS, DEFAULT_CONFIG, MeterConfig } from './types';
-import { UngroupedProcessor } from './export/UngroupedProcessor';
+import { BasicProcessor } from './export/BasicProcessor';
 import { PushController } from './export/Controller';
 import { NoopExporter } from './export/NoopExporter';
 
@@ -54,7 +54,7 @@ export class Meter implements api.Meter {
     config: MeterConfig = DEFAULT_CONFIG
   ) {
     this._logger = config.logger || new ConsoleLogger(config.logLevel);
-    this._processor = config.processor ?? new UngroupedProcessor();
+    this._processor = config.processor ?? new BasicProcessor();
     this._resource = config.resource || Resource.createTelemetrySDKResource();
     this._instrumentationLibrary = instrumentationLibrary;
     // start the push controller
@@ -322,7 +322,12 @@ export class Meter implements api.Meter {
         const records = await metric.getMetricRecord();
         // process the records in place to reduce required memory footprints.
         for (const record of records) {
-          this._processor.process(record);
+          this._processor.process({
+            ...record,
+            // TODO: split aggregator from MetricRecord metadata part and
+            // prevent from duplicating record fields here.
+            aggregator: record.aggregator.move(),
+          });
         }
       });
 

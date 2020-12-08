@@ -105,21 +105,28 @@ describe('Meter', () => {
       const counter = meter.createCounter('name') as CounterMetric;
       counter.add(10, labels);
       await meter.collect();
-      const [record1] = meter.getProcessor().checkPointSet();
+      let lastTimestamp: api.HrTime;
+      {
+        const [record1] = meter.getProcessor().checkPointSet();
 
-      assert.strictEqual(record1.aggregator.toPoint().value, 10);
-      const lastTimestamp = record1.aggregator.toPoint().timestamp;
-      assert.ok(
-        hrTimeToNanoseconds(lastTimestamp) >
-          hrTimeToNanoseconds(performanceTimeOrigin)
-      );
+        assert.strictEqual(record1.aggregator.toPoint().value, 10);
+        lastTimestamp = record1.aggregator.toPoint().timestamp;
+        assert.ok(
+          hrTimeToNanoseconds(lastTimestamp) >
+            hrTimeToNanoseconds(performanceTimeOrigin)
+        );
+      }
+
       counter.add(10, labels);
-      assert.strictEqual(record1.aggregator.toPoint().value, 20);
-
-      assert.ok(
-        hrTimeToNanoseconds(record1.aggregator.toPoint().timestamp) >
-          hrTimeToNanoseconds(lastTimestamp)
-      );
+      await meter.collect();
+      {
+        const [record1] = meter.getProcessor().checkPointSet();
+        assert.strictEqual(record1.aggregator.toPoint().value, 20);
+        assert.ok(
+          hrTimeToNanoseconds(record1.aggregator.toPoint().timestamp) >
+            hrTimeToNanoseconds(lastTimestamp)
+        );
+      }
     });
 
     it('should be able to call add with no labels', async () => {
@@ -162,18 +169,22 @@ describe('Meter', () => {
         const boundCounter = counter.bind(labels);
         boundCounter.add(10);
         await meter.collect();
-        const [record1] = meter.getProcessor().checkPointSet();
-
-        assert.strictEqual(record1.aggregator.toPoint().value, 10);
+        {
+          const [record1] = meter.getProcessor().checkPointSet();
+          assert.strictEqual(record1.aggregator.toPoint().value, 10);
+        }
         boundCounter.add(10);
-        assert.strictEqual(record1.aggregator.toPoint().value, 20);
+        await meter.collect();
+        {
+          const [record1] = meter.getProcessor().checkPointSet();
+          assert.strictEqual(record1.aggregator.toPoint().value, 20);
+        }
       });
 
-      it('should return the aggregator', () => {
+      it('should return the bound labels', () => {
         const counter = meter.createCounter('name') as CounterMetric;
         const boundCounter = counter.bind(labels);
         boundCounter.add(20);
-        assert.ok(boundCounter.getAggregator() instanceof SumAggregator);
         assert.strictEqual(boundCounter.getLabels(), labels);
       });
 
@@ -197,8 +208,8 @@ describe('Meter', () => {
         const boundCounter = counter.bind(labels);
         boundCounter.add(10);
         await meter.collect();
-        const [record1] = meter.getProcessor().checkPointSet();
-        assert.strictEqual(record1.aggregator.toPoint().value, 0);
+        const records = meter.getProcessor().checkPointSet();
+        assert.strictEqual(records.length, 0);
       });
 
       it('should return same instrument on same label values', async () => {
@@ -211,7 +222,7 @@ describe('Meter', () => {
         const [record1] = meter.getProcessor().checkPointSet();
 
         assert.strictEqual(record1.aggregator.toPoint().value, 20);
-        assert.strictEqual(boundCounter, boundCounter1);
+        assert(boundCounter.equalWith(boundCounter1));
       });
     });
 
@@ -219,12 +230,11 @@ describe('Meter', () => {
       it('should remove a counter instrument', () => {
         const counter = meter.createCounter('name') as CounterMetric;
         const boundCounter = counter.bind(labels);
-        assert.strictEqual(counter['_instruments'].size, 1);
+        // Force update with a metric event;
+        boundCounter.add(1);
+        assert.strictEqual(counter['_aggregators'].size, 1);
         counter.unbind(labels);
-        assert.strictEqual(counter['_instruments'].size, 0);
-        const boundCounter1 = counter.bind(labels);
-        assert.strictEqual(counter['_instruments'].size, 1);
-        assert.notStrictEqual(boundCounter, boundCounter1);
+        assert.strictEqual(counter['_aggregators'].size, 0);
       });
 
       it('should not fail when removing non existing instrument', () => {
@@ -235,9 +245,11 @@ describe('Meter', () => {
       it('should clear all instruments', () => {
         const counter = meter.createCounter('name') as CounterMetric;
         counter.bind(labels);
-        assert.strictEqual(counter['_instruments'].size, 1);
+        // Force update with a metric event;
+        counter.add(1);
+        assert.strictEqual(counter['_aggregators'].size, 1);
         counter.clear();
-        assert.strictEqual(counter['_instruments'].size, 0);
+        assert.strictEqual(counter['_aggregators'].size, 0);
       });
     });
 
@@ -317,21 +329,27 @@ describe('Meter', () => {
       const upDownCounter = meter.createUpDownCounter('name');
       upDownCounter.add(10, labels);
       await meter.collect();
-      const [record1] = meter.getProcessor().checkPointSet();
+      let lastTimestamp: api.HrTime;
+      {
+        const [record1] = meter.getProcessor().checkPointSet();
+        assert.strictEqual(record1.aggregator.toPoint().value, 10);
+        lastTimestamp = record1.aggregator.toPoint().timestamp;
+        assert.ok(
+          hrTimeToNanoseconds(lastTimestamp) >
+            hrTimeToNanoseconds(performanceTimeOrigin)
+        );
+      }
 
-      assert.strictEqual(record1.aggregator.toPoint().value, 10);
-      const lastTimestamp = record1.aggregator.toPoint().timestamp;
-      assert.ok(
-        hrTimeToNanoseconds(lastTimestamp) >
-          hrTimeToNanoseconds(performanceTimeOrigin)
-      );
       upDownCounter.add(10, labels);
-      assert.strictEqual(record1.aggregator.toPoint().value, 20);
-
-      assert.ok(
-        hrTimeToNanoseconds(record1.aggregator.toPoint().timestamp) >
-          hrTimeToNanoseconds(lastTimestamp)
-      );
+      await meter.collect();
+      {
+        const [record1] = meter.getProcessor().checkPointSet();
+        assert.strictEqual(record1.aggregator.toPoint().value, 20);
+        assert.ok(
+          hrTimeToNanoseconds(record1.aggregator.toPoint().timestamp) >
+            hrTimeToNanoseconds(lastTimestamp)
+        );
+      }
     });
 
     it('should be able to call add with no labels', async () => {
@@ -364,11 +382,17 @@ describe('Meter', () => {
         const boundCounter = upDownCounter.bind(labels);
         boundCounter.add(10);
         await meter.collect();
-        const [record1] = meter.getProcessor().checkPointSet();
+        {
+          const [record1] = meter.getProcessor().checkPointSet();
+          assert.strictEqual(record1.aggregator.toPoint().value, 10);
+        }
 
-        assert.strictEqual(record1.aggregator.toPoint().value, 10);
         boundCounter.add(-200);
-        assert.strictEqual(record1.aggregator.toPoint().value, -190);
+        await meter.collect();
+        {
+          const [record1] = meter.getProcessor().checkPointSet();
+          assert.strictEqual(record1.aggregator.toPoint().value, -190);
+        }
       });
 
       it('should return the aggregator', () => {
@@ -377,7 +401,7 @@ describe('Meter', () => {
         ) as UpDownCounterMetric;
         const boundCounter = upDownCounter.bind(labels);
         boundCounter.add(20);
-        assert.ok(boundCounter.getAggregator() instanceof SumAggregator);
+        assert.ok(upDownCounter.getAggregator(labels) instanceof SumAggregator);
         assert.strictEqual(boundCounter.getLabels(), labels);
       });
 
@@ -388,12 +412,14 @@ describe('Meter', () => {
         const boundCounter = upDownCounter.bind(labels);
         boundCounter.add(10);
         await meter.collect();
-        const [record1] = meter.getProcessor().checkPointSet();
-        assert.strictEqual(record1.aggregator.toPoint().value, 0);
+        const records = meter.getProcessor().checkPointSet();
+        assert.strictEqual(records.length, 0);
       });
 
       it('should return same instrument on same label values', async () => {
-        const upDownCounter = meter.createUpDownCounter('name');
+        const upDownCounter = meter.createUpDownCounter(
+          'name'
+        ) as UpDownCounterMetric;
         const boundCounter = upDownCounter.bind(labels);
         boundCounter.add(10);
         const boundCounter1 = upDownCounter.bind(labels);
@@ -402,7 +428,7 @@ describe('Meter', () => {
         const [record1] = meter.getProcessor().checkPointSet();
 
         assert.strictEqual(record1.aggregator.toPoint().value, 20);
-        assert.strictEqual(boundCounter, boundCounter1);
+        assert(boundCounter.equalWith(boundCounter1));
       });
 
       it('should truncate non-integer values for INT valueType', async () => {
@@ -430,9 +456,8 @@ describe('Meter', () => {
             // @ts-expect-error
             boundCounter.add(val);
             await meter.collect();
-            const [record1] = meter.getProcessor().checkPointSet();
-
-            assert.strictEqual(record1.aggregator.toPoint().value, 0);
+            const records = meter.getProcessor().checkPointSet();
+            assert.strictEqual(records.length, 0);
           })
         );
       });
@@ -448,9 +473,8 @@ describe('Meter', () => {
             // @ts-expect-error
             boundCounter.add(val);
             await meter.collect();
-            const [record1] = meter.getProcessor().checkPointSet();
-
-            assert.strictEqual(record1.aggregator.toPoint().value, 0);
+            const records = meter.getProcessor().checkPointSet();
+            assert.strictEqual(records.length, 0);
           })
         );
       });
@@ -462,11 +486,16 @@ describe('Meter', () => {
           'name'
         ) as UpDownCounterMetric;
         const boundCounter = upDownCounter.bind(labels);
-        assert.strictEqual(upDownCounter['_instruments'].size, 1);
+        // Force update with a metric event;
+        boundCounter.add(1);
+        assert.strictEqual(upDownCounter['_aggregators'].size, 1);
         upDownCounter.unbind(labels);
-        assert.strictEqual(upDownCounter['_instruments'].size, 0);
+        assert.strictEqual(upDownCounter['_aggregators'].size, 0);
+
         const boundCounter1 = upDownCounter.bind(labels);
-        assert.strictEqual(upDownCounter['_instruments'].size, 1);
+        // Force update with a metric event;
+        boundCounter.add(1);
+        assert.strictEqual(upDownCounter['_aggregators'].size, 1);
         assert.notStrictEqual(boundCounter, boundCounter1);
       });
 
@@ -480,9 +509,11 @@ describe('Meter', () => {
           'name'
         ) as CounterMetric;
         upDownCounter.bind(labels);
-        assert.strictEqual(upDownCounter['_instruments'].size, 1);
+        // Force update with a metric event;
+        upDownCounter.add(-1);
+        assert.strictEqual(upDownCounter['_aggregators'].size, 1);
         upDownCounter.clear();
-        assert.strictEqual(upDownCounter['_instruments'].size, 0);
+        assert.strictEqual(upDownCounter['_aggregators'].size, 0);
       });
     });
 
@@ -649,18 +680,8 @@ describe('Meter', () => {
         boundValueRecorder.record(10);
 
         await meter.collect();
-        const [record1] = meter.getProcessor().checkPointSet();
-        assert.deepStrictEqual(
-          record1.aggregator.toPoint().value as Histogram,
-          {
-            buckets: {
-              boundaries: [Infinity],
-              counts: [0, 0],
-            },
-            count: 0,
-            sum: 0,
-          }
-        );
+        const records = meter.getProcessor().checkPointSet();
+        assert.strictEqual(records.length, 0);
       });
 
       it('should accept negative (and positive) values', async () => {
@@ -709,7 +730,7 @@ describe('Meter', () => {
             sum: 110,
           }
         );
-        assert.strictEqual(boundValueRecorder1, boundValueRecorder2);
+        assert(boundValueRecorder1.equalWith(boundValueRecorder2));
       });
 
       it('should ignore non-number values', async () => {
@@ -723,18 +744,8 @@ describe('Meter', () => {
             // @ts-expect-error
             boundValueRecorder.record(val);
             await meter.collect();
-            const [record1] = meter.getProcessor().checkPointSet();
-            assert.deepStrictEqual(
-              record1.aggregator.toPoint().value as Histogram,
-              {
-                buckets: {
-                  boundaries: [Infinity],
-                  counts: [0, 0],
-                },
-                count: 0,
-                sum: 0,
-              }
-            );
+            const records = meter.getProcessor().checkPointSet();
+            assert.strictEqual(records.length, 0);
           })
         );
       });
@@ -746,11 +757,16 @@ describe('Meter', () => {
           'name'
         ) as ValueRecorderMetric;
         const boundValueRecorder = valueRecorder.bind(labels);
-        assert.strictEqual(valueRecorder['_instruments'].size, 1);
+        // Force update with a metric event;
+        boundValueRecorder.record(1);
+        assert.strictEqual(valueRecorder['_aggregators'].size, 1);
         valueRecorder.unbind(labels);
-        assert.strictEqual(valueRecorder['_instruments'].size, 0);
+        assert.strictEqual(valueRecorder['_aggregators'].size, 0);
+
         const boundValueRecorder2 = valueRecorder.bind(labels);
-        assert.strictEqual(valueRecorder['_instruments'].size, 1);
+        // Force update with a metric event;
+        boundValueRecorder2.record(1);
+        assert.strictEqual(valueRecorder['_aggregators'].size, 1);
         assert.notStrictEqual(boundValueRecorder, boundValueRecorder2);
       });
 
@@ -764,9 +780,11 @@ describe('Meter', () => {
           'name'
         ) as ValueRecorderMetric;
         valueRecorder.bind(labels);
-        assert.strictEqual(valueRecorder['_instruments'].size, 1);
+        // Force update with a metric event;
+        valueRecorder.record(1);
+        assert.strictEqual(valueRecorder['_aggregators'].size, 1);
         valueRecorder.clear();
-        assert.strictEqual(valueRecorder['_instruments'].size, 0);
+        assert.strictEqual(valueRecorder['_aggregators'].size, 0);
       });
     });
   });
@@ -841,7 +859,7 @@ describe('Meter', () => {
       metricRecords = await sumObserver.getMetricRecord();
       assert.strictEqual(metricRecords.length, 1);
       point = metricRecords[0].aggregator.toPoint();
-      assert.strictEqual(point.value, 3);
+      assert.strictEqual(point.value, -1);
     });
 
     it('should set callback and observe value when callback returns nothing', async () => {
@@ -1272,10 +1290,8 @@ describe('Meter', () => {
             await setTimeout(() => {}, 5);
 
             const cpuUsageMetricRecords: MetricRecord[] = await cpuUsageMetric.getMetricRecord();
-            const value = cpuUsageMetric
-              .bind({ foo: 'bar' })
-              .getAggregator()
-              .toPoint().value;
+            const value = cpuUsageMetric.getAggregator({ foo: 'bar' }).toPoint()
+              .value;
 
             assert.deepStrictEqual(value, 0);
             assert.strictEqual(cpuUsageMetricRecords.length, 0);

@@ -20,7 +20,7 @@ import {
   MeterProvider,
   MetricExporter,
   MetricRecord,
-  UngroupedProcessor,
+  BasicProcessor,
 } from '../../src';
 import {
   ExportResult,
@@ -28,7 +28,7 @@ import {
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
 
-class MockProcessor extends UngroupedProcessor {
+class MockProcessor extends BasicProcessor {
   private _started = false;
   private _finished = false;
 

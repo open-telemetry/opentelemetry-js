@@ -22,6 +22,7 @@ import {
 } from '../types';
 import { HrTime } from '@opentelemetry/api';
 import { hrTime } from '@opentelemetry/core';
+import { hrTimeCompare } from '../../Utils';
 
 /** Basic aggregator for LastValue which keeps the last recorded value. */
 export class LastValueAggregator implements LastValueAggregatorType {
@@ -39,5 +40,22 @@ export class LastValueAggregator implements LastValueAggregatorType {
       value: this._current,
       timestamp: this._lastUpdateTime,
     };
+  }
+
+  move(): LastValueAggregator {
+    const other = new LastValueAggregator();
+    other._current = this._current;
+    other._lastUpdateTime = this._lastUpdateTime;
+    this._current = 0;
+    this._lastUpdateTime = [0, 0];
+    return other;
+  }
+
+  merge(other: LastValueAggregator): void {
+    const cmx = hrTimeCompare(this._lastUpdateTime, other._lastUpdateTime);
+    if (cmx < 0) {
+      this._current = other._current;
+      this._lastUpdateTime = other._lastUpdateTime;
+    }
   }
 }

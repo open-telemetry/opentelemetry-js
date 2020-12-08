@@ -22,6 +22,7 @@ import {
 } from '../types';
 import { HrTime } from '@opentelemetry/api';
 import { hrTime } from '@opentelemetry/core';
+import { hrTimeCompare } from '../../Utils';
 
 /**
  * Basic aggregator which observes events and counts them in pre-defined buckets
@@ -30,7 +31,7 @@ import { hrTime } from '@opentelemetry/core';
 export class HistogramAggregator implements HistogramAggregatorType {
   public kind: AggregatorKind.HISTOGRAM = AggregatorKind.HISTOGRAM;
   private _current: Histogram;
-  private _lastUpdateTime: HrTime;
+  private _lastUpdateTime: HrTime = [0, 0];
   private readonly _boundaries: number[];
 
   constructor(boundaries: number[]) {
@@ -41,7 +42,6 @@ export class HistogramAggregator implements HistogramAggregatorType {
     // boundary since we'll iterate on each in order.
     this._boundaries = boundaries.sort((a, b) => a - b);
     this._current = this._newEmptyCheckpoint();
-    this._lastUpdateTime = hrTime();
   }
 
   update(value: number): void {
@@ -66,6 +66,23 @@ export class HistogramAggregator implements HistogramAggregatorType {
     };
   }
 
+  move(): HistogramAggregator {
+    const other = new HistogramAggregator(this._boundaries);
+    other._current = this._current;
+    other._lastUpdateTime = this._lastUpdateTime;
+    this._current = this._newEmptyCheckpoint();
+    this._lastUpdateTime = [0, 0];
+    return other;
+  }
+
+  merge(other: HistogramAggregator): void {
+    this._mergeCheckpoint(this._current, other._current);
+    this._lastUpdateTime =
+      hrTimeCompare(this._lastUpdateTime, other._lastUpdateTime) >= 0
+        ? this._lastUpdateTime
+        : other._lastUpdateTime;
+  }
+
   private _newEmptyCheckpoint(): Histogram {
     return {
       buckets: {
@@ -75,5 +92,17 @@ export class HistogramAggregator implements HistogramAggregatorType {
       sum: 0,
       count: 0,
     };
+  }
+
+  /**
+   * Merge two Histogram in place.
+   */
+  private _mergeCheckpoint(histogram: Histogram, other: Histogram): void {
+    histogram.count += other.count;
+    histogram.sum += other.sum;
+    // TODO: asserts same boundaries
+    for (let idx = 0; idx < histogram.buckets.counts.length; ++idx) {
+      histogram.buckets.counts[idx] += other.buckets.counts[idx];
+    }
   }
 }

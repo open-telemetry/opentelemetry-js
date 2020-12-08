@@ -203,35 +203,28 @@ describe('PrometheusExporter', () => {
       boundCounter.add(10);
       meter.collect().then(() => {
         exporter.export(meter.getProcessor().checkPointSet(), () => {
-          // TODO: Remove this special case once the PR is ready.
-          // This is to test the special case where counters are destroyed
-          // and recreated in the exporter in order to get around prom-client's
-          // aggregation and use ours.
-          boundCounter.add(10);
-          exporter.export(meter.getProcessor().checkPointSet(), () => {
-            http
-              .get('http://localhost:9464/metrics', res => {
-                res.on('data', chunk => {
-                  const body = chunk.toString();
-                  const lines = body.split('\n');
+          http
+            .get('http://localhost:9464/metrics', res => {
+              res.on('data', chunk => {
+                const body = chunk.toString();
+                const lines = body.split('\n');
 
-                  assert.strictEqual(
-                    lines[0],
-                    '# HELP counter a test description'
-                  );
+                assert.strictEqual(
+                  lines[0],
+                  '# HELP counter a test description'
+                );
 
-                  assert.deepStrictEqual(lines, [
-                    '# HELP counter a test description',
-                    '# TYPE counter counter',
-                    `counter{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
-                    '',
-                  ]);
+                assert.deepStrictEqual(lines, [
+                  '# HELP counter a test description',
+                  '# TYPE counter counter',
+                  `counter{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
+                  '',
+                ]);
 
-                  done();
-                });
-              })
-              .on('error', errorHandler(done));
-          });
+                done();
+              });
+            })
+            .on('error', errorHandler(done));
         });
       });
     });

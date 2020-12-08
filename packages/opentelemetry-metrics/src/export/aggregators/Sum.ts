@@ -17,6 +17,7 @@
 import { Point, Sum, AggregatorKind, SumAggregatorType } from '../types';
 import { HrTime } from '@opentelemetry/api';
 import { hrTime } from '@opentelemetry/core';
+import { hrTimeCompare } from '../../Utils';
 
 /** Basic aggregator which calculates a Sum from individual measurements. */
 export class SumAggregator implements SumAggregatorType {
@@ -34,5 +35,22 @@ export class SumAggregator implements SumAggregatorType {
       value: this._current,
       timestamp: this._lastUpdateTime,
     };
+  }
+
+  move(): SumAggregator {
+    const other = new SumAggregator();
+    other._current = this._current;
+    other._lastUpdateTime = this._lastUpdateTime;
+    this._current = 0;
+    this._lastUpdateTime = [0, 0];
+    return other;
+  }
+
+  merge(other: SumAggregator): void {
+    this._current += other._current;
+    this._lastUpdateTime =
+      hrTimeCompare(this._lastUpdateTime, other._lastUpdateTime) >= 0
+        ? this._lastUpdateTime
+        : other._lastUpdateTime;
   }
 }

@@ -178,7 +178,7 @@ describe('HistogramAggregator', () => {
       const aggregator = new HistogramAggregator([100]);
       const point = aggregator.toPoint().value as Histogram;
       assert.deepEqual(aggregator.toPoint().value, point);
-      assert(aggregator.toPoint().timestamp.every(nbr => nbr > 0));
+      assert(aggregator.toPoint().timestamp.every(nbr => nbr >= 0));
     });
 
     it('should return last checkpoint if updated', () => {

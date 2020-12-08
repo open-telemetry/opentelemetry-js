@@ -19,12 +19,11 @@ import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BaseObserverMetric } from './BaseObserverMetric';
 import { Processor } from './export/Processor';
-import { LastValue, MetricKind } from './export/types';
+import { MetricKind } from './export/types';
 import { ObserverResult } from './ObserverResult';
 
 /** This is a SDK implementation of SumObserver Metric. */
-export class SumObserverMetric
-  extends BaseObserverMetric
+export class SumObserverMetric extends BaseObserverMetric
   implements api.SumObserver {
   constructor(
     name: string,
@@ -49,15 +48,11 @@ export class SumObserverMetric
     observerResult.values.forEach((value, labels) => {
       const instrument = this.bind(labels);
       // SumObserver is monotonic which means it should only accept values
-      // greater or equal then previous value
-      const previous = instrument.getAggregator().toPoint();
-      let previousValue = -Infinity;
-      if (previous.timestamp[0] !== 0 || previous.timestamp[1] !== 0) {
-        previousValue = previous.value as LastValue;
-      }
-      if (value >= previousValue) {
-        instrument.update(value);
-      }
+      // greater or equal then previous value.
+      // However it is impractical for the stateless accumulator to remember
+      // last recorded value. Some practice may recognize the value drop as a
+      // reset and correctly reflect true trend.
+      instrument.update(value);
     });
   }
 }

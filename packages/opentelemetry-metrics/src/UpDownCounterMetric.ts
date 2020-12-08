@@ -21,15 +21,15 @@ import { BoundUpDownCounter } from './BoundInstrument';
 import { MetricKind } from './export/types';
 import { Processor } from './export/Processor';
 import { Metric } from './Metric';
+import { Accumulator } from './Accumulator';
 
 /** This is a SDK implementation of UpDownCounter Metric. */
-export class UpDownCounterMetric
-  extends Metric<BoundUpDownCounter>
+export class UpDownCounterMetric extends Metric<BoundUpDownCounter>
   implements api.UpDownCounter {
   constructor(
     name: string,
     options: api.MetricOptions,
-    private readonly _processor: Processor,
+    processor: Processor,
     resource: Resource,
     instrumentationLibrary: InstrumentationLibrary
   ) {
@@ -37,17 +37,23 @@ export class UpDownCounterMetric
       name,
       options,
       MetricKind.UP_DOWN_COUNTER,
+      processor,
       resource,
       instrumentationLibrary
     );
   }
-  protected _makeInstrument(labels: api.Labels): BoundUpDownCounter {
+  protected _makeInstrument(
+    accumulationKey: string,
+    labels: api.Labels,
+    accumulator: Accumulator
+  ): BoundUpDownCounter {
     return new BoundUpDownCounter(
+      accumulationKey,
       labels,
-      this._disabled,
-      this._valueType,
+      accumulator,
       this._logger,
-      this._processor.aggregatorFor(this._descriptor)
+      this._disabled,
+      this._valueType
     );
   }
 

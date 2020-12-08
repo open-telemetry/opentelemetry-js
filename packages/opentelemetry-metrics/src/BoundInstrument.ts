@@ -15,26 +15,21 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { Aggregator } from './export/types';
+import { Accumulator } from './Accumulator';
 
 /**
  * This class represent the base to BoundInstrument, which is responsible for generating
  * the TimeSeries.
  */
 export class BaseBoundInstrument {
-  protected _labels: api.Labels;
-  protected _logger: api.Logger;
-
   constructor(
-    labels: api.Labels,
-    logger: api.Logger,
+    protected readonly _accumulationKey: string,
+    protected readonly _labels: api.Labels,
+    protected readonly _accumulator: Accumulator,
+    protected readonly _logger: api.Logger,
     private readonly _disabled: boolean,
-    private readonly _valueType: api.ValueType,
-    private readonly _aggregator: Aggregator
-  ) {
-    this._labels = labels;
-    this._logger = logger;
-  }
+    private readonly _valueType: api.ValueType
+  ) {}
 
   update(value: number): void {
     if (this._disabled) return;
@@ -56,15 +51,22 @@ export class BaseBoundInstrument {
       value = Math.trunc(value);
     }
 
-    this._aggregator.update(value);
+    this._accumulator.update(this._accumulationKey, this._labels, value);
   }
 
   getLabels(): api.Labels {
     return this._labels;
   }
 
-  getAggregator(): Aggregator {
-    return this._aggregator;
+  getAccumulator(): Accumulator {
+    return this._accumulator;
+  }
+
+  equalWith(other: BaseBoundInstrument): boolean {
+    return (
+      this._accumulator === other._accumulator &&
+      this._accumulationKey === other._accumulationKey
+    );
   }
 }
 
@@ -72,19 +74,8 @@ export class BaseBoundInstrument {
  * BoundCounter allows the SDK to observe/record a single metric event. The
  * value of single instrument in the `Counter` associated with specified Labels.
  */
-export class BoundCounter
-  extends BaseBoundInstrument
+export class BoundCounter extends BaseBoundInstrument
   implements api.BoundCounter {
-  constructor(
-    labels: api.Labels,
-    disabled: boolean,
-    valueType: api.ValueType,
-    logger: api.Logger,
-    aggregator: Aggregator
-  ) {
-    super(labels, logger, disabled, valueType, aggregator);
-  }
-
   add(value: number): void {
     if (value < 0) {
       this._logger.error(
@@ -102,19 +93,8 @@ export class BoundCounter
  * The value of single instrument in the `UpDownCounter` associated with
  * specified Labels.
  */
-export class BoundUpDownCounter
-  extends BaseBoundInstrument
+export class BoundUpDownCounter extends BaseBoundInstrument
   implements api.BoundCounter {
-  constructor(
-    labels: api.Labels,
-    disabled: boolean,
-    valueType: api.ValueType,
-    logger: api.Logger,
-    aggregator: Aggregator
-  ) {
-    super(labels, logger, disabled, valueType, aggregator);
-  }
-
   add(value: number): void {
     this.update(value);
   }
@@ -123,19 +103,8 @@ export class BoundUpDownCounter
 /**
  * BoundMeasure is an implementation of the {@link BoundMeasure} interface.
  */
-export class BoundValueRecorder
-  extends BaseBoundInstrument
+export class BoundValueRecorder extends BaseBoundInstrument
   implements api.BoundValueRecorder {
-  constructor(
-    labels: api.Labels,
-    disabled: boolean,
-    valueType: api.ValueType,
-    logger: api.Logger,
-    aggregator: Aggregator
-  ) {
-    super(labels, logger, disabled, valueType, aggregator);
-  }
-
   record(value: number): void {
     this.update(value);
   }
@@ -144,16 +113,5 @@ export class BoundValueRecorder
 /**
  * BoundObserver is an implementation of the {@link BoundObserver} interface.
  */
-export class BoundObserver
-  extends BaseBoundInstrument
-  implements api.BoundBaseObserver {
-  constructor(
-    labels: api.Labels,
-    disabled: boolean,
-    valueType: api.ValueType,
-    logger: api.Logger,
-    aggregator: Aggregator
-  ) {
-    super(labels, logger, disabled, valueType, aggregator);
-  }
-}
+export class BoundObserver extends BaseBoundInstrument
+  implements api.BoundBaseObserver {}

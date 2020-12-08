@@ -16,6 +16,7 @@
 import * as api from '@opentelemetry/api';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
+import { Accumulator } from './Accumulator';
 import { BoundObserver } from './BoundInstrument';
 import { Processor } from './export/Processor';
 import { MetricKind, MetricRecord } from './export/types';
@@ -28,31 +29,42 @@ const NOOP_CALLBACK = () => {};
  * This is a SDK implementation of Base Observer Metric.
  * All observers should extend this class
  */
-export abstract class BaseObserverMetric
-  extends Metric<BoundObserver>
+export abstract class BaseObserverMetric extends Metric<BoundObserver>
   implements api.BaseObserver {
   protected _callback: (observerResult: api.ObserverResult) => unknown;
 
   constructor(
     name: string,
     options: api.MetricOptions,
-    private readonly _processor: Processor,
+    processor: Processor,
     resource: Resource,
     metricKind: MetricKind,
     instrumentationLibrary: InstrumentationLibrary,
     callback?: (observerResult: api.ObserverResult) => unknown
   ) {
-    super(name, options, metricKind, resource, instrumentationLibrary);
+    super(
+      name,
+      options,
+      metricKind,
+      processor,
+      resource,
+      instrumentationLibrary
+    );
     this._callback = callback || NOOP_CALLBACK;
   }
 
-  protected _makeInstrument(labels: api.Labels): BoundObserver {
+  protected _makeInstrument(
+    accumulationKey: string,
+    labels: api.Labels,
+    accumulator: Accumulator
+  ): BoundObserver {
     return new BoundObserver(
+      accumulationKey,
       labels,
-      this._disabled,
-      this._valueType,
+      accumulator,
       this._logger,
-      this._processor.aggregatorFor(this._descriptor)
+      this._disabled,
+      this._valueType
     );
   }
 

@@ -17,6 +17,7 @@
 import * as api from '@opentelemetry/api';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
+import { Accumulator } from './Accumulator';
 import { BoundCounter } from './BoundInstrument';
 import { Processor } from './export/Processor';
 import { MetricKind } from './export/types';
@@ -27,19 +28,31 @@ export class CounterMetric extends Metric<BoundCounter> implements api.Counter {
   constructor(
     name: string,
     options: api.MetricOptions,
-    private readonly _processor: Processor,
+    processor: Processor,
     resource: Resource,
     instrumentationLibrary: InstrumentationLibrary
   ) {
-    super(name, options, MetricKind.COUNTER, resource, instrumentationLibrary);
+    super(
+      name,
+      options,
+      MetricKind.COUNTER,
+      processor,
+      resource,
+      instrumentationLibrary
+    );
   }
-  protected _makeInstrument(labels: api.Labels): BoundCounter {
+  protected _makeInstrument(
+    accumulationKey: string,
+    labels: api.Labels,
+    accumulator: Accumulator
+  ): BoundCounter {
     return new BoundCounter(
+      accumulationKey,
       labels,
-      this._disabled,
-      this._valueType,
+      accumulator,
       this._logger,
-      this._processor.aggregatorFor(this._descriptor)
+      this._disabled,
+      this._valueType
     );
   }
 

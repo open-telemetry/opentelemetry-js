@@ -38,6 +38,11 @@ export enum AggregatorKind {
   HISTOGRAM,
 }
 
+export enum AggregationTemporality {
+  CUMULATIVE,
+  DELTA,
+}
+
 /** Sum returns an aggregated sum. */
 export type Sum = number;
 
@@ -88,6 +93,13 @@ export interface MetricDescriptor {
   readonly boundaries?: number[];
 }
 
+/** The kind of exporter. */
+export enum ExporterKind {
+  DELTA,
+  CUMULATIVE,
+  PASS_THROUGH,
+}
+
 /**
  * Base interface that represents a metric exporter
  */
@@ -108,42 +120,48 @@ export interface MetricExporter {
  *
  * Use {@link Aggregator} instead of this BaseAggregator.
  */
-interface BaseAggregator {
+interface BaseAggregator<T extends PointValueType> {
   /** The kind of the aggregator. */
   kind: AggregatorKind;
 
   /** Updates the current with the new value. */
   update(value: number): void;
+
+  /** Returns snapshot of the current point (value with timestamp). */
+  toPoint(): Point<T>;
+
+  /**
+   * Move current snapshot to a new aggregator and reset the current aggregator
+   * to the zero state.
+   */
+  move(): BaseAggregator<T>;
+
+  /** Merge current snapshot with another aggregator in place. */
+  merge(other: BaseAggregator<T>): void;
 }
 
 /** SumAggregatorType aggregate values into a {@link Sum} point type. */
-export interface SumAggregatorType extends BaseAggregator {
+export interface SumAggregatorType extends BaseAggregator<Sum> {
   kind: AggregatorKind.SUM;
-
-  /** Returns snapshot of the current point (value with timestamp). */
-  toPoint(): Point<Sum>;
+  move(): SumAggregatorType;
 }
 
 /**
  * LastValueAggregatorType aggregate values into a {@link LastValue} point
  * type.
  */
-export interface LastValueAggregatorType extends BaseAggregator {
+export interface LastValueAggregatorType extends BaseAggregator<LastValue> {
   kind: AggregatorKind.LAST_VALUE;
-
-  /** Returns snapshot of the current point (value with timestamp). */
-  toPoint(): Point<LastValue>;
+  move(): LastValueAggregatorType;
 }
 
 /**
  * HistogramAggregatorType aggregate values into a {@link Histogram} point
  * type.
  */
-export interface HistogramAggregatorType extends BaseAggregator {
+export interface HistogramAggregatorType extends BaseAggregator<Histogram> {
   kind: AggregatorKind.HISTOGRAM;
-
-  /** Returns snapshot of the current point (value with timestamp). */
-  toPoint(): Point<Histogram>;
+  move(): HistogramAggregatorType;
 }
 
 export type Aggregator =

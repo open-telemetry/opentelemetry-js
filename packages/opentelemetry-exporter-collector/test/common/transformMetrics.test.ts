@@ -123,7 +123,7 @@ describe('transformMetrics', () => {
       ensureSumObserverIsCorrect(
         transform.toCollectorMetric(sumObserverMetric, 1592602232694000000),
         hrTimeToNanoseconds(sumObserverMetric.aggregator.toPoint().timestamp),
-        3
+        -1
       );
 
       // collect 3 times

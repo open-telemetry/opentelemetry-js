@@ -21,13 +21,15 @@ import {
   MetricKind,
   Aggregator,
   MetricDescriptor,
+  AggregationTemporality,
 } from './types';
+import { mergeAggregator } from '../Utils';
 
 /**
  * Processor which retains all dimensions/labels. It accepts all records and
  * passes them for exporting.
  */
-export class UngroupedProcessor extends Processor {
+export class BasicProcessor extends Processor {
   aggregatorFor(metricDescriptor: MetricDescriptor): Aggregator {
     switch (metricDescriptor.metricKind) {
       case MetricKind.COUNTER:
@@ -49,18 +51,42 @@ export class UngroupedProcessor extends Processor {
     }
   }
 
+  aggregationTemporalityFor(
+    _metricDescriptor: MetricDescriptor
+  ): AggregationTemporality {
+    return AggregationTemporality.CUMULATIVE;
+  }
+
   start() {
-    /** Nothing to do with UngroupedProcessor on start */
+    /** Nothing to do with BasicProcessor on start */
   }
 
   process(record: MetricRecord): void {
     const labels = Object.keys(record.labels)
       .map(k => `${k}=${record.labels[k]}`)
       .join(',');
-    this._batchMap.set(record.descriptor.name + labels, record);
+
+    const key = record.descriptor.name + labels;
+    const cumulation = this._batchMap.get(key);
+
+    if (
+      cumulation &&
+      this.aggregationTemporalityFor(record.descriptor) ===
+        AggregationTemporality.CUMULATIVE
+    ) {
+      mergeAggregator(record.aggregator, cumulation.aggregator);
+    }
+    this._batchMap.set(key, record);
   }
 
   finish() {
-    /** Nothing to do with UngroupedProcessor on finish */
+    for (const [key, record] of this._batchMap.entries()) {
+      if (
+        this.aggregationTemporalityFor(record.descriptor) ===
+        AggregationTemporality.DELTA
+      ) {
+        this._batchMap.delete(key);
+      }
+    }
   }
 }

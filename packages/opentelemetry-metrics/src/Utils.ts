@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { Labels } from '@opentelemetry/api';
+import { HrTime, Labels } from '@opentelemetry/api';
+import { Aggregator, AggregatorKind } from './export/types';
 
 /**
  * Type guard to remove nulls from arrays
@@ -40,4 +41,45 @@ export function hashLabels(labels: Labels): string {
     }
     return (result += key + ':' + labels[key]);
   }, '|#');
+}
+
+export function hrTimeCompare(lhs: HrTime, rhs: HrTime): -1 | 0 | 1 {
+  if (lhs[0] > rhs[0]) {
+    return 1;
+  } else if (lhs[0] < rhs[0]) {
+    return -1;
+  } else if (lhs[1] > rhs[1]) {
+    return 1;
+  } else if (lhs[1] < rhs[1]) {
+    return -1;
+  } else {
+    return 0;
+  }
+}
+
+/**
+ * Merge two aggregator in place with lhs.
+ * @param lhs
+ * @param rhs
+ */
+export function mergeAggregator(lhs: Aggregator, rhs: Aggregator) {
+  // Type narrowing
+  if (lhs.kind === AggregatorKind.SUM && rhs.kind === AggregatorKind.SUM) {
+    lhs.merge(rhs);
+  }
+  if (
+    lhs.kind === AggregatorKind.LAST_VALUE &&
+    rhs.kind === AggregatorKind.LAST_VALUE
+  ) {
+    lhs.merge(rhs);
+  }
+  if (
+    lhs.kind === AggregatorKind.HISTOGRAM &&
+    rhs.kind === AggregatorKind.HISTOGRAM
+  ) {
+    lhs.merge(rhs);
+  }
+  // Something unexpected is happening -- we could throw here. This
+  // will become an error when the exporter tries to access the point,
+  // presumably, so let it be.
 }

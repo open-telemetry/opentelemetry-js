@@ -15,14 +15,13 @@
  */
 import {
   Aggregator,
+  BasicProcessor,
   MetricDescriptor,
-  MetricRecord,
-  Processor,
 } from '@opentelemetry/metrics';
 
 type Constructor<T, R extends Aggregator> = new (...args: T[]) => R;
 
-export class ExactProcessor<T, R extends Aggregator> extends Processor {
+export class ExactProcessor<T, R extends Aggregator> extends BasicProcessor {
   private readonly args: ConstructorParameters<Constructor<T, R>>;
   public aggregators: R[] = [];
 
@@ -38,20 +37,5 @@ export class ExactProcessor<T, R extends Aggregator> extends Processor {
     const aggregator = new this.aggregator(...this.args);
     this.aggregators.push(aggregator);
     return aggregator;
-  }
-
-  start() {
-    /** Nothing to do with ExactProcessor on start */
-  }
-
-  process(record: MetricRecord): void {
-    const labels = Object.keys(record.labels)
-      .map(k => `${k}=${record.labels[k]}`)
-      .join(',');
-    this._batchMap.set(record.descriptor.name + labels, record);
-  }
-
-  finish() {
-    /** Nothing to do with ExactProcessor on finish */
   }
 }
