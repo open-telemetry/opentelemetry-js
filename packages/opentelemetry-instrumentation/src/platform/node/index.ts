@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+export * from './old/autoLoader';
 export * from './instrumentation';
 export * from './instrumentationNodeModuleDefinition';
 export * from './instrumentationNodeModuleFile';

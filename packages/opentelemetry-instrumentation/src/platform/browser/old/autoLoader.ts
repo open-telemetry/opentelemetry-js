@@ -14,7 +14,18 @@
  * limitations under the License.
  */
 
-export * from './autoLoader';
-export * from './platform/index';
-export * from './types';
-export * from './utils';
+// This should be removed after plugins are gone
+
+import * as api from '@opentelemetry/api';
+import { NodePlugins, OldClassPlugin } from '../../../types_plugin_only';
+
+export function loadOldPlugins(
+  pluginsNode: NodePlugins,
+  pluginsWeb: OldClassPlugin[],
+  logger: api.Logger,
+  tracerProvider: api.TracerProvider
+): void {
+  pluginsWeb.forEach(plugin => {
+    plugin.enable([], tracerProvider, logger);
+  });
+}
