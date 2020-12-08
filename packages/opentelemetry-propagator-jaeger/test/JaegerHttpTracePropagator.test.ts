@@ -172,6 +172,19 @@ describe('JaegerHttpTracePropagator', () => {
     });
   });
 
+  describe('.fields()', () => {
+    it('returns the default header if not customized', () => {
+      assert.deepStrictEqual(jaegerHttpTracePropagator.fields(), [
+        'uber-trace-id',
+      ]);
+    });
+    it('returns the customized header if customized', () => {
+      assert.deepStrictEqual(customJaegerHttpTracePropagator.fields(), [
+        customHeader,
+      ]);
+    });
+  });
+
   it('should fail gracefully on bad responses from getter', () => {
     const ctx1 = jaegerHttpTracePropagator.extract(
       ROOT_CONTEXT,

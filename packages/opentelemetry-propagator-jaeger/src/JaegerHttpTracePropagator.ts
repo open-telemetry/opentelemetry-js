@@ -80,6 +80,10 @@ export class JaegerHttpTracePropagator implements TextMapPropagator {
 
     return setExtractedSpanContext(context, spanContext);
   }
+
+  fields(): string[] {
+    return [this._jaegerTraceHeader];
+  }
 }
 
 /**
