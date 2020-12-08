@@ -2,6 +2,8 @@
   "lerna": "3.13.4",
   "npmClient": "npm",
   "packages": [
+    "examples/test",
+    "examples/tracer-web",
     "benchmark/*",
     "backwards-compatability/*",
     "metapackages/*",

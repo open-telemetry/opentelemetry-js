@@ -1,0 +1,52 @@
+{
+  "name": "opentelemetry-testing",
+  "private": true,
+  "version": "0.11.0",
+  "description": "Testing",
+  "main": "index.js",
+  "scripts": {
+    "docker:start": "cd ./docker && docker-compose down && docker-compose up",
+    "docker:stop": "cd ./docker && docker-compose down",
+    "start:test": "node ./client.js",
+    "server:express": "node ./server-express.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/open-telemetry/opentelemetry-js.git"
+  },
+  "keywords": [
+    "opentelemetry",
+    "http",
+    "tracing",
+    "graphql"
+  ],
+  "engines": {
+    "node": ">=8"
+  },
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^0.12.0",
+    "@opentelemetry/context-async-hooks": "^0.12.0",
+    "@opentelemetry/exporter-collector": "^0.12.0",
+    "@opentelemetry/node": "^0.12.0",
+    "@opentelemetry/plugin-express": "^0.11.0",
+    "@opentelemetry/instrumentation": "^0.12.0",
+    "@opentelemetry/instrumentation-graphql": "^0.11.0",
+    "@opentelemetry/plugin-http": "^0.12.0",
+    "@opentelemetry/plugin-https": "^0.12.0",
+    "@opentelemetry/tracing": "^0.12.0",
+    "apollo-server": "^2.18.1",
+    "express": "^4.17.1",
+    "express-graphql": "^0.11.0",
+    "graphql": "^15.3.0",
+    "qs-middleware": "^1.0.3"
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+  "devDependencies": {
+    "cross-env": "^6.0.0"
+  }
+}

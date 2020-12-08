@@ -1,6 +1,7 @@
 {
   "extends": "../tsconfig.base",
   "compilerOptions": {
+//    "sourceMap": false,
     "rootDir": ".",
     "outDir": "build"
   },

@@ -4,16 +4,35 @@ import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xm
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { CollectorTraceExporter } from '@opentelemetry/exporter-collector';
 import { B3Propagator } from '@opentelemetry/propagator-b3';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
+import { UserInteractionPlugin } from '@opentelemetry/plugin-user-interaction';
+import { DocumentLoad } from '@opentelemetry/plugin-document-load';
+
 
 const providerWithZone = new WebTracerProvider({
-  plugins: [
+  // plugins: [
+  //   new XMLHttpRequestInstrumentation({
+  //     ignoreUrls: [/localhost:8090\/sockjs-node/],
+  //     propagateTraceHeaderCorsUrls: [
+  //       'https://httpbin.org/get',
+  //     ],
+  //   }),
+  // ],
+});
+
+registerInstrumentations({
+  // instrumentations: [XMLHttpRequestInstrumentation],
+  instrumentations: [
     new XMLHttpRequestInstrumentation({
       ignoreUrls: [/localhost:8090\/sockjs-node/],
       propagateTraceHeaderCorsUrls: [
         'https://httpbin.org/get',
       ],
     }),
+    new UserInteractionPlugin(),
+    new DocumentLoad(),
   ],
+  tracerProvider: providerWithZone,
 });
 
 providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
@@ -56,7 +75,7 @@ const prepareClickEvent = () => {
         getData(url1).then((_data) => {
           webTracerWithZone.getCurrentSpan().addEvent('fetching-span1-completed');
           span1.end();
-        }, ()=> {
+        }, () => {
           webTracerWithZone.getCurrentSpan().addEvent('fetching-error');
           span1.end();
         });
