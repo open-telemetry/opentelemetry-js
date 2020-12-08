@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/semantic-conventions",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "OpenTelemetry semantic conventions",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
