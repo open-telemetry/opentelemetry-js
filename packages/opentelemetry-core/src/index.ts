@@ -30,6 +30,7 @@ export * from './correlation-context/correlation-context';
 export * from './correlation-context/propagation/HttpCorrelationContext';
 export * from './platform';
 export * from './trace/NoRecordingSpan';
+export * from './trace/Plugin';
 export * from './trace/sampler/AlwaysOffSampler';
 export * from './trace/sampler/AlwaysOnSampler';
 export * from './trace/sampler/ParentBasedSampler';
