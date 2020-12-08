@@ -17,7 +17,7 @@
 import type * as grpcJs from '@grpc/grpc-js';
 import type { EventEmitter } from 'events';
 import type { CALL_SPAN_ENDED } from './utils';
-import { PluginConfig } from '@opentelemetry/api';
+import { PluginConfig } from '@opentelemetry/core';
 
 export type IgnoreMatcher = string | RegExp | ((str: string) => boolean);
 
