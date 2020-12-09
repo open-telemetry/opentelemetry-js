@@ -90,7 +90,7 @@ export const assertSpan = (
 
       if (
         validations.resHeaders['content-encoding'] &&
-        validations.resHeaders['content-encoding'] != 'identity'
+        validations.resHeaders['content-encoding'] !== 'identity'
       ) {
         assert.strictEqual(
           span.attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH],
@@ -132,7 +132,7 @@ export const assertSpan = (
 
       if (
         validations.reqHeaders['content-encoding'] &&
-        validations.reqHeaders['content-encoding'] != 'identity'
+        validations.reqHeaders['content-encoding'] !== 'identity'
       ) {
         assert.strictEqual(
           span.attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH],

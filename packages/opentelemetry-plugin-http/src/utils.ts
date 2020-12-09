@@ -178,9 +178,9 @@ export const setSpanWithError = (
 };
 
 /**
- * Adds attributes for content-length and content-encoding HTTP headers
- * @param { OutgoingHttpHeaders | IncomingHttpHeaders } headers http headers
- * @param { Attributes } Attributes span attributes
+ * Adds attributes for request content-length and content-encoding HTTP headers
+ * @param { IncomingMessage } Request object whose headers will be analyzed
+ * @param { Attributes } Attributes object to be modified
  */
 export const setRequestContentLengthAttribute = (
   request: IncomingMessage,
@@ -197,9 +197,9 @@ export const setRequestContentLengthAttribute = (
 };
 
 /**
- * Adds attributes for content-length and content-encoding HTTP headers
- * @param { OutgoingHttpHeaders | IncomingHttpHeaders } headers http headers
- * @param { Attributes } Attributes span attributes
+ * Adds attributes for response content-length and content-encoding HTTP headers
+ * @param { IncomingMessage } Response object whose headers will be analyzed
+ * @param { Attributes } Attributes object to be modified
  */
 export const setResponseContentLengthAttribute = (
   response: IncomingMessage,
@@ -234,7 +234,7 @@ export const isCompressed = (
 ): boolean => {
   const encoding = headers['content-encoding'];
 
-  return !!encoding && encoding != 'identity';
+  return !!encoding && encoding !== 'identity';
 };
 
 /**
