@@ -68,9 +68,7 @@ export interface XMLHttpRequestInstrumentationConfig
 /**
  * This class represents a XMLHttpRequest plugin for auto instrumentation
  */
-export class XMLHttpRequestInstrumentation extends InstrumentationBase<
-  XMLHttpRequest
-> {
+export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRequest> {
   readonly component: string = 'xml-http-request';
   readonly version: string = VERSION;
   moduleName = this.component;
@@ -170,7 +168,11 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<
    */
   private _addResourceObserver(xhr: XMLHttpRequest, spanUrl: string) {
     const xhrMem = this._xhrMem.get(xhr);
-    if (!xhrMem || typeof window.PerformanceObserver === 'undefined') {
+    if (
+      !xhrMem ||
+      typeof window.PerformanceObserver === 'undefined' ||
+      typeof window.PerformanceResourceTiming === 'undefined'
+    ) {
       return;
     }
     xhrMem.createdResources = {

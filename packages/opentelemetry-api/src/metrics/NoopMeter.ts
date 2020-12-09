@@ -26,6 +26,7 @@ import {
   BatchObserver,
   UpDownCounter,
   BaseObserver,
+  UpDownSumObserver,
 } from './Metric';
 import {
   BoundValueRecorder,
@@ -82,6 +83,34 @@ export class NoopMeter implements Meter {
     _callback?: (observerResult: ObserverResult) => void
   ): ValueObserver {
     return NOOP_VALUE_OBSERVER_METRIC;
+  }
+
+  /**
+   * Returns constant noop sum observer.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   * @param [callback] the sum observer callback
+   */
+  createSumObserver(
+    _name: string,
+    _options?: MetricOptions,
+    _callback?: (observerResult: ObserverResult) => void
+  ): ValueObserver {
+    return NOOP_SUM_OBSERVER_METRIC;
+  }
+
+  /**
+   * Returns constant noop up down sum observer.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   * @param [callback] the up down sum observer callback
+   */
+  createUpDownSumObserver(
+    _name: string,
+    _options?: MetricOptions,
+    _callback?: (observerResult: ObserverResult) => void
+  ): UpDownSumObserver {
+    return NOOP_UP_DOWN_SUM_OBSERVER_METRIC;
   }
 
   /**

@@ -22,7 +22,6 @@ import * as fs from 'fs';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { collectorTypes } from '@opentelemetry/exporter-collector';
-import { MetricRecord } from '@opentelemetry/metrics';
 import { CollectorMetricExporter } from '../src';
 import {
   mockCounter,
@@ -35,6 +34,8 @@ import {
   mockValueRecorder,
 } from './helper';
 import { ConsoleLogger, LogLevel } from '@opentelemetry/core';
+import * as api from '@opentelemetry/api';
+import * as metrics from '@opentelemetry/metrics';
 
 const metricsServiceProtoPath =
   'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
@@ -59,7 +60,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
     let exportedData:
       | collectorTypes.opentelemetryProto.metrics.v1.ResourceMetrics[]
       | undefined;
-    let metrics: MetricRecord[];
+    let metrics: metrics.MetricRecord[];
     let reqMetadata: grpc.Metadata | undefined;
 
     before(done => {
@@ -134,17 +135,23 @@ const testCollectorMetricExporter = (params: TestParams) =>
         value: 1592602232694000000,
       });
       metrics = [];
-      metrics.push(await mockCounter());
-      metrics.push(await mockObserver());
-      metrics.push(await mockValueRecorder());
+      const counter: metrics.Metric<metrics.BoundCounter> &
+        api.Counter = mockCounter();
+      const observer: metrics.Metric<metrics.BoundObserver> &
+        api.ValueObserver = mockObserver(observerResult => {
+        observerResult.observe(3, {});
+        observerResult.observe(6, {});
+      });
+      const recorder: metrics.Metric<metrics.BoundValueRecorder> &
+        api.ValueRecorder = mockValueRecorder();
 
-      metrics[0].aggregator.update(1);
+      counter.add(1);
+      recorder.record(7);
+      recorder.record(14);
 
-      metrics[1].aggregator.update(3);
-      metrics[1].aggregator.update(6);
-
-      metrics[2].aggregator.update(7);
-      metrics[2].aggregator.update(14);
+      metrics.push((await counter.getMetricRecord())[0]);
+      metrics.push((await observer.getMetricRecord())[0]);
+      metrics.push((await recorder.getMetricRecord())[0]);
     });
 
     afterEach(() => {
