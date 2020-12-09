@@ -168,7 +168,11 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    */
   private _addResourceObserver(xhr: XMLHttpRequest, spanUrl: string) {
     const xhrMem = this._xhrMem.get(xhr);
-    if (!xhrMem || typeof window.PerformanceObserver === 'undefined') {
+    if (
+      !xhrMem ||
+      typeof window.PerformanceObserver === 'undefined' ||
+      typeof window.PerformanceResourceTiming === 'undefined'
+    ) {
       return;
     }
     xhrMem.createdResources = {
