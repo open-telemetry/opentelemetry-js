@@ -1,6 +1,6 @@
-# Batcher API Guide
+# Processor API Guide
 
-[The batcher](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-metrics/src/export/Batcher.ts?rgh-link-date=2020-05-25T18%3A43%3A57Z) has two responsibilities: choosing which aggregator to choose for a metric instrument and store the last record for each metric ready to be exported.
+[The processor](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-metrics/src/export/Processor.ts?rgh-link-date=2020-05-25T18%3A43%3A57Z) has two responsibilities: choosing which aggregator to choose for a metric instrument and store the last record for each metric ready to be exported.
 
 ## Selecting a specific aggregator for metrics
 
@@ -41,25 +41,25 @@ export class AverageAggregator implements Aggregator {
 }
 ```
 
-Now we will need to implement our own batcher to configure the sdk to use our new aggregator. To simplify even more, we will just extend the `UngroupedBatcher` (which is the default) to avoid re-implementing the whole `Aggregator` interface.
+Now we will need to implement our own processor to configure the sdk to use our new aggregator. To simplify even more, we will just extend the `UngroupedProcessor` (which is the default) to avoid re-implementing the whole `Aggregator` interface.
 
 Here the result:
 
 ```ts
 import {
-  UngroupedBatcher,
+  UngroupedProcessor,
   MetricDescriptor,
   CounterSumAggregator,
   ObserverAggregator,
   MeasureExactAggregator,
 } from '@opentelemetry/metrics';
 
-export class CustomBatcher extends UngroupedBatcher {
+export class CustomProcessor extends UngroupedProcessor {
   aggregatorFor (metricDescriptor: MetricDescriptor) {
     if (metricDescriptor.name === 'requests') {
       return new AverageAggregator(10);
     }
-    // this is exactly what the "UngroupedBatcher" does, we will re-use it
+    // this is exactly what the "UngroupedProcessor" does, we will re-use it
     // to fallback on the default behavior
     switch (metricDescriptor.metricKind) {
       case MetricKind.COUNTER:
@@ -73,11 +73,11 @@ export class CustomBatcher extends UngroupedBatcher {
 }
 ```
 
-Finally, we need to specify to the `MeterProvider` to use our `CustomBatcher` when creating new meter:
+Finally, we need to specify to the `MeterProvider` to use our `CustomProcessor` when creating new meter:
 
 ```ts
 import {
-  UngroupedBatcher,
+  UngroupedProcessor,
   MetricDescriptor,
   CounterSumAggregator,
   ObserverAggregator,
@@ -115,12 +115,12 @@ export class AverageAggregator implements Aggregator {
   }
 }
 
-export class CustomBatcher extends UngroupedBatcher {
+export class CustomProcessor extends UngroupedProcessor {
   aggregatorFor (metricDescriptor: MetricDescriptor) {
     if (metricDescriptor.name === 'requests') {
       return new AverageAggregator(10);
     }
-    // this is exactly what the "UngroupedBatcher" does, we will re-use it
+    // this is exactly what the "UngroupedProcessor" does, we will re-use it
     // to fallback on the default behavior
     switch (metricDescriptor.metricKind) {
       case MetricKind.COUNTER:
@@ -134,9 +134,9 @@ export class CustomBatcher extends UngroupedBatcher {
 }
 
 const meter = new MeterProvider({
-  batcher: new CustomBatcher(),
+  processor: new CustomProcessor(),
   interval: 1000,
-}).getMeter('example-custom-batcher');
+}).getMeter('example-custom-processor');
 
 const requestsLatency = meter.createValueRecorder('requests', {
   monotonic: true,

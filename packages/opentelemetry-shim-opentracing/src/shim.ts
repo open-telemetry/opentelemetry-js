@@ -193,7 +193,7 @@ export class TracerShim extends opentracing.Tracer {
       case opentracing.FORMAT_HTTP_HEADERS:
       case opentracing.FORMAT_TEXT_MAP: {
         const context: api.Context = api.propagation.extract(carrier);
-        const spanContext = api.getActiveSpan(context)?.context();
+        const spanContext = api.getParentSpanContext(context);
         const baggage = api.getBaggage(context);
 
         if (!spanContext) {

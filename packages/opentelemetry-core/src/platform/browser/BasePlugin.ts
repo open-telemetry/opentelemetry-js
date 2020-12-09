@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-import {
-  Logger,
-  Plugin,
-  PluginConfig,
-  TracerProvider,
-} from '@opentelemetry/api';
+import { Logger, TracerProvider } from '@opentelemetry/api';
+import { Plugin, PluginConfig } from '../../trace/Plugin';
 import { BaseAbstractPlugin } from '../BaseAbstractPlugin';
 
 /** This class represent the base to patch plugin. */

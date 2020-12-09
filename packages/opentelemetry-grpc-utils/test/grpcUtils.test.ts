@@ -19,9 +19,13 @@ import {
   NoopTracerProvider,
   SpanKind,
   propagation,
-  PluginConfig,
 } from '@opentelemetry/api';
-import { NoopLogger, HttpTraceContext, BasePlugin } from '@opentelemetry/core';
+import {
+  NoopLogger,
+  HttpTraceContext,
+  BasePlugin,
+  PluginConfig,
+} from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { ContextManager } from '@opentelemetry/context-base';
