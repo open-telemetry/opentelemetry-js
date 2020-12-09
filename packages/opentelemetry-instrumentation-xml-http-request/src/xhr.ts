@@ -68,7 +68,9 @@ export interface XMLHttpRequestInstrumentationConfig
 /**
  * This class represents a XMLHttpRequest plugin for auto instrumentation
  */
-export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRequest> {
+export class XMLHttpRequestInstrumentation extends InstrumentationBase<
+  XMLHttpRequest
+> {
   readonly component: string = 'xml-http-request';
   readonly version: string = VERSION;
   moduleName = this.component;
@@ -109,7 +111,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       return;
     }
     const headers: { [key: string]: unknown } = {};
-    api.propagation.inject(headers);
+    api.propagation.inject(api.context.active(), headers);
     Object.keys(headers).forEach(key => {
       xhr.setRequestHeader(key, String(headers[key]));
     });

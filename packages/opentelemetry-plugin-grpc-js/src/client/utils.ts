@@ -22,6 +22,7 @@ import {
   StatusCode,
   Status,
   propagation,
+  context,
 } from '@opentelemetry/api';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import type * as grpcJs from '@grpc/grpc-js';
@@ -243,7 +244,7 @@ function getMetadata(
  * @param metadata
  */
 export function setSpanContext(metadata: grpcJs.Metadata): void {
-  propagation.inject(metadata, {
+  propagation.inject(context.active(), metadata, {
     set: (metadata, k, v) => metadata.set(k, v as grpcJs.MetadataValue),
   });
 }
