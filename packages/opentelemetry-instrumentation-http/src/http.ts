@@ -24,6 +24,7 @@ import {
   setActiveSpan,
   SpanContext,
   TraceFlags,
+  ROOT_CONTEXT,
 } from '@opentelemetry/api';
 import { NoRecordingSpan } from '@opentelemetry/core';
 import type * as http from 'http';
@@ -403,7 +404,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         }),
       };
 
-      return context.with(propagation.extract(headers), () => {
+      return context.with(propagation.extract(ROOT_CONTEXT, headers), () => {
         const span = instrumentation._startHttpSpan(
           `${component.toLocaleUpperCase()} ${method}`,
           spanOptions
@@ -539,9 +540,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         optionsParsed.headers = {};
       }
       propagation.inject(
-        optionsParsed.headers,
-        undefined,
-        setActiveSpan(context.active(), span)
+        setActiveSpan(context.active(), span),
+        optionsParsed.headers
       );
 
       const request: http.ClientRequest = safeExecuteInTheMiddle(
