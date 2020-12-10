@@ -13,22 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import * as dns from 'dns';
 
-import {
-  InstrumentationModuleDefinition,
-  InstrumentationModuleFile,
-} from './types';
-
-export class InstrumentationNodeModuleDefinition<T>
-  implements InstrumentationModuleDefinition<T> {
-  files: InstrumentationModuleFile<T>[];
-  constructor(
-    public name: string,
-    public supportedVersions: string[],
-    public patch?: (exports: T) => T,
-    public unpatch?: (exports: T) => void,
-    files?: InstrumentationModuleFile<T>[]
-  ) {
-    this.files = files || [];
-  }
-}
+export const checkInternet = (cb: (isConnected: boolean) => void) => {
+  dns.lookup('google.com', err => {
+    if (err && err.code === 'ENOTFOUND') {
+      cb(false);
+    } else {
+      cb(true);
+    }
+  });
+};

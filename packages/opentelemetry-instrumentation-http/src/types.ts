@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 import { Span } from '@opentelemetry/api';
-import { PluginConfig } from '@opentelemetry/core';
 import type * as http from 'http';
+import type * as https from 'https';
 import {
   ClientRequest,
   get,
@@ -24,6 +24,7 @@ import {
   ServerResponse,
 } from 'http';
 import * as url from 'url';
+import { InstrumentationConfig } from '@opentelemetry/instrumentation';
 
 export type IgnoreMatcher = string | RegExp | ((url: string) => boolean);
 export type HttpCallback = (res: IncomingMessage) => void;
@@ -42,6 +43,7 @@ export type ParsedRequestOptions =
   | (http.RequestOptions & Partial<url.UrlWithParsedQuery>)
   | http.RequestOptions;
 export type Http = typeof http;
+export type Https = typeof https;
 /* tslint:disable-next-line:no-any */
 export type Func<T> = (...args: any[]) => T;
 export type ResponseEndArgs =
@@ -66,9 +68,9 @@ export interface HttpResponseCustomAttributeFunction {
 }
 
 /**
- * Options available for the HTTP Plugin (see [documentation](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-http#http-plugin-options))
+ * Options available for the HTTP instrumentation (see [documentation](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-instrumentation-http#http-instrumentation-options))
  */
-export interface HttpPluginConfig extends PluginConfig {
+export interface HttpInstrumentationConfig extends InstrumentationConfig {
   /** Not trace all incoming requests that match paths */
   ignoreIncomingPaths?: IgnoreMatcher[];
   /** Not trace all outgoing requests that match urls */
