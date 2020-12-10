@@ -145,7 +145,7 @@ tracerProvider.register();</code></pre>
 <span class="hljs-keyword">const</span> meterProvider = <span class="hljs-keyword">new</span> MeterProvider({
   <span class="hljs-comment">// The Prometheus exporter runs an HTTP server which</span>
   <span class="hljs-comment">// the Prometheus backend scrapes to collect metrics.</span>
-  exporter: <span class="hljs-keyword">new</span> PrometheusExporter({ <span class="hljs-attr">startServer</span>: <span class="hljs-literal">true</span> }),
+  <span class="hljs-attr">exporter</span>: <span class="hljs-keyword">new</span> PrometheusExporter({ <span class="hljs-attr">startServer</span>: <span class="hljs-literal">true</span> }),
   <span class="hljs-attr">interval</span>: <span class="hljs-number">1000</span>,
 });
 
@@ -165,7 +165,7 @@ api.metrics.setGlobalMeterProvider(meterProvider);</code></pre>
 					<h3>API Registration Options</h3>
 				</a>
 				<p>If you prefer to choose your own propagator or context manager, you may pass an options object into the <code>tracerProvider.register()</code> method. Omitted or <code>undefined</code> options will be replaced by a default value and <code>null</code> values will be skipped.</p>
-				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { B3Propagator } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;@opentelemetry/core&quot;</span>);
+				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { B3Propagator } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;@opentelemetry/propagator-b3&quot;</span>);
 
 tracerProvider.register({
   <span class="hljs-comment">// Use B3 Propagation</span>
@@ -222,7 +222,7 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
   } <span class="hljs-keyword">catch</span> (err) {
     span.setStatus({
       <span class="hljs-comment">// use an appropriate status code here</span>
-      <span class="hljs-attr">code</span>: api.CanonicalCode.INTERNAL,
+      <span class="hljs-attr">code</span>: api.StatusCode.ERROR,
       <span class="hljs-attr">message</span>: err.message,
     });
     span.end();
@@ -254,9 +254,6 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-enum tsd-is-external">
-						<a href="enums/canonicalcode.html" class="tsd-kind-icon">Canonical<wbr>Code</a>
-					</li>
-					<li class=" tsd-kind-enum tsd-is-external">
 						<a href="enums/entryttl.html" class="tsd-kind-icon">Entry<wbr>Ttl</a>
 					</li>
 					<li class=" tsd-kind-enum tsd-is-external">
@@ -264,6 +261,9 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					</li>
 					<li class=" tsd-kind-enum tsd-is-external">
 						<a href="enums/spankind.html" class="tsd-kind-icon">Span<wbr>Kind</a>
+					</li>
+					<li class=" tsd-kind-enum tsd-is-external">
+						<a href="enums/statuscode.html" class="tsd-kind-icon">Status<wbr>Code</a>
 					</li>
 					<li class=" tsd-kind-enum tsd-is-external">
 						<a href="enums/traceflags.html" class="tsd-kind-icon">Trace<wbr>Flags</a>
@@ -430,8 +430,14 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/status.html" class="tsd-kind-icon">Status</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
+					<li class=" tsd-kind-interface tsd-has-type-parameter tsd-is-external">
+						<a href="interfaces/textmapgetter.html" class="tsd-kind-icon">Text<wbr>Map<wbr>Getter</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter tsd-is-external">
 						<a href="interfaces/textmappropagator.html" class="tsd-kind-icon">Text<wbr>Map<wbr>Propagator</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter tsd-is-external">
+						<a href="interfaces/textmapsetter.html" class="tsd-kind-icon">Text<wbr>Map<wbr>Setter</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/timedevent.html" class="tsd-kind-icon">Timed<wbr>Event</a>
@@ -466,9 +472,6 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
 						<a href="globals.html#get" class="tsd-kind-icon">Get</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
-						<a href="globals.html#getterfunction" class="tsd-kind-icon">Getter<wbr>Function</a>
-					</li>
 					<li class=" tsd-kind-type-alias tsd-is-external">
 						<a href="globals.html#hrtime" class="tsd-kind-icon">Hr<wbr>Time</a>
 					</li>
@@ -483,9 +486,6 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-is-external">
 						<a href="globals.html#otelglobal" class="tsd-kind-icon">Otel<wbr>Global</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
-						<a href="globals.html#setterfunction" class="tsd-kind-icon">Setter<wbr>Function</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-is-external">
 						<a href="globals.html#sumobserver" class="tsd-kind-icon">Sum<wbr>Observer</a>
@@ -608,12 +608,6 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="globals.html#trace" class="tsd-kind-icon">trace</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#defaultgetter" class="tsd-kind-icon">default<wbr>Getter</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#defaultsetter" class="tsd-kind-icon">default<wbr>Setter</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
 						<a href="globals.html#getactivespan" class="tsd-kind-icon">get<wbr>Active<wbr>Span</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
@@ -651,6 +645,12 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					</li>
 					<li class=" tsd-kind-object-literal tsd-is-external">
 						<a href="globals.html#invalid_span_context" class="tsd-kind-icon">INVALID_<wbr>SPAN_<wbr>CONTEXT</a>
+					</li>
+					<li class=" tsd-kind-object-literal tsd-is-external">
+						<a href="globals.html#defaulttextmapgetter" class="tsd-kind-icon">default<wbr>Text<wbr>Map<wbr>Getter</a>
+					</li>
+					<li class=" tsd-kind-object-literal tsd-is-external">
+						<a href="globals.html#defaulttextmapsetter" class="tsd-kind-icon">default<wbr>Text<wbr>Map<wbr>Setter</a>
 					</li>
 				</ul>
 			</nav>

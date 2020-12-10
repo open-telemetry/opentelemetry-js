@@ -123,7 +123,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/3f72613/packages/opentelemetry-api/src/api/propagation.ts#L36">src/api/propagation.ts:36</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/api/propagation.ts#L40">src/api/propagation.ts:40</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -144,7 +144,7 @@
 					<div class="tsd-signature tsd-kind-icon">_instance<span class="tsd-signature-symbol">:</span> <a href="propagationapi.html" class="tsd-signature-type">PropagationAPI</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/3f72613/packages/opentelemetry-api/src/api/propagation.ts#L36">src/api/propagation.ts:36</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/api/propagation.ts#L40">src/api/propagation.ts:40</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -161,7 +161,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/3f72613/packages/opentelemetry-api/src/api/propagation.ts#L103">src/api/propagation.ts:103</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/api/propagation.ts#L107">src/api/propagation.ts:107</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="../interfaces/textmappropagator.html" class="tsd-signature-type">TextMapPropagator</a></h4>
@@ -178,7 +178,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/3f72613/packages/opentelemetry-api/src/api/propagation.ts#L99">src/api/propagation.ts:99</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/api/propagation.ts#L103">src/api/propagation.ts:103</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -194,13 +194,13 @@
 					<a name="extract" class="tsd-anchor"></a>
 					<h3>extract</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">extract&lt;Carrier&gt;<span class="tsd-signature-symbol">(</span>carrier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Carrier</span>, getter<span class="tsd-signature-symbol">?: </span><a href="../globals.html#getterfunction" class="tsd-signature-type">GetterFunction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Carrier</span><span class="tsd-signature-symbol">&gt;</span>, context<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Context</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span></li>
+						<li class="tsd-signature tsd-kind-icon">extract&lt;Carrier&gt;<span class="tsd-signature-symbol">(</span>carrier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Carrier</span>, getter<span class="tsd-signature-symbol">?: </span><a href="../interfaces/textmapgetter.html" class="tsd-signature-type">TextMapGetter</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Carrier</span><span class="tsd-signature-symbol">&gt;</span>, context<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Context</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/3f72613/packages/opentelemetry-api/src/api/propagation.ts#L90">src/api/propagation.ts:90</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/api/propagation.ts#L94">src/api/propagation.ts:94</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -223,7 +223,7 @@
 									</div>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> getter: <a href="../globals.html#getterfunction" class="tsd-signature-type">GetterFunction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Carrier</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = defaultGetter</span></h5>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> getter: <a href="../interfaces/textmapgetter.html" class="tsd-signature-type">TextMapGetter</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Carrier</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = defaultTextMapGetter</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>Function used to extract keys from a carrier</p>
 									</div>
@@ -243,13 +243,13 @@
 					<a name="inject" class="tsd-anchor"></a>
 					<h3>inject</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">inject&lt;Carrier&gt;<span class="tsd-signature-symbol">(</span>carrier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Carrier</span>, setter<span class="tsd-signature-symbol">?: </span><a href="../globals.html#setterfunction" class="tsd-signature-type">SetterFunction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Carrier</span><span class="tsd-signature-symbol">&gt;</span>, context<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Context</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">inject&lt;Carrier&gt;<span class="tsd-signature-symbol">(</span>carrier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Carrier</span>, setter<span class="tsd-signature-symbol">?: </span><a href="../interfaces/textmapsetter.html" class="tsd-signature-type">TextMapSetter</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Carrier</span><span class="tsd-signature-symbol">&gt;</span>, context<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Context</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/3f72613/packages/opentelemetry-api/src/api/propagation.ts#L75">src/api/propagation.ts:75</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/api/propagation.ts#L79">src/api/propagation.ts:79</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -272,7 +272,7 @@
 									</div>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> setter: <a href="../globals.html#setterfunction" class="tsd-signature-type">SetterFunction</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Carrier</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = defaultSetter</span></h5>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> setter: <a href="../interfaces/textmapsetter.html" class="tsd-signature-type">TextMapSetter</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Carrier</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> = defaultTextMapSetter</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>Function used to set values on the carrier</p>
 									</div>
@@ -298,7 +298,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/3f72613/packages/opentelemetry-api/src/api/propagation.ts#L53">src/api/propagation.ts:53</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/api/propagation.ts#L57">src/api/propagation.ts:57</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -326,7 +326,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/3f72613/packages/opentelemetry-api/src/api/propagation.ts#L42">src/api/propagation.ts:42</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/api/propagation.ts#L46">src/api/propagation.ts:46</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">

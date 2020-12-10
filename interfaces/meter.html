@@ -99,7 +99,9 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="meter.html#createbatchobserver" class="tsd-kind-icon">create<wbr>Batch<wbr>Observer</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="meter.html#createcounter" class="tsd-kind-icon">create<wbr>Counter</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="meter.html#createsumobserver" class="tsd-kind-icon">create<wbr>Sum<wbr>Observer</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="meter.html#createupdowncounter" class="tsd-kind-icon">create<wbr>UpDown<wbr>Counter</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="meter.html#createupdownsumobserver" class="tsd-kind-icon">create<wbr>UpDown<wbr>Sum<wbr>Observer</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="meter.html#createvalueobserver" class="tsd-kind-icon">create<wbr>Value<wbr>Observer</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="meter.html#createvaluerecorder" class="tsd-kind-icon">create<wbr>Value<wbr>Recorder</a></li>
 							</ul>
@@ -119,7 +121,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/3f72613/packages/opentelemetry-api/src/metrics/Meter.ts#L91">src/metrics/Meter.ts:91</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/metrics/Meter.ts#L117">src/metrics/Meter.ts:117</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -178,7 +180,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/3f72613/packages/opentelemetry-api/src/metrics/Meter.ts#L51">src/metrics/Meter.ts:51</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/metrics/Meter.ts#L53">src/metrics/Meter.ts:53</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -205,6 +207,43 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+					<a name="createsumobserver" class="tsd-anchor"></a>
+					<h3>create<wbr>Sum<wbr>Observer</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Sum<wbr>Observer<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><a href="metricoptions.html" class="tsd-signature-type">MetricOptions</a>, callback<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>observerResult<span class="tsd-signature-symbol">: </span><a href="observerresult.html" class="tsd-signature-type">ObserverResult</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../globals.html#sumobserver" class="tsd-signature-type">SumObserver</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/metrics/Meter.ts#L92">src/metrics/Meter.ts:92</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Creates a new <code>SumObserver</code> metric.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the name of the metric.</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="metricoptions.html" class="tsd-signature-type">MetricOptions</a></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> callback: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>observerResult<span class="tsd-signature-symbol">: </span><a href="observerresult.html" class="tsd-signature-type">ObserverResult</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../globals.html#sumobserver" class="tsd-signature-type">SumObserver</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 					<a name="createupdowncounter" class="tsd-anchor"></a>
 					<h3>create<wbr>UpDown<wbr>Counter</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
@@ -214,7 +253,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/3f72613/packages/opentelemetry-api/src/metrics/Meter.ts#L70">src/metrics/Meter.ts:70</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/metrics/Meter.ts#L72">src/metrics/Meter.ts:72</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -250,6 +289,43 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+					<a name="createupdownsumobserver" class="tsd-anchor"></a>
+					<h3>create<wbr>UpDown<wbr>Sum<wbr>Observer</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>UpDown<wbr>Sum<wbr>Observer<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><a href="metricoptions.html" class="tsd-signature-type">MetricOptions</a>, callback<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>observerResult<span class="tsd-signature-symbol">: </span><a href="observerresult.html" class="tsd-signature-type">ObserverResult</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../globals.html#updownsumobserver" class="tsd-signature-type">UpDownSumObserver</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/metrics/Meter.ts#L104">src/metrics/Meter.ts:104</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Creates a new <code>UpDownSumObserver</code> metric.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the name of the metric.</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="metricoptions.html" class="tsd-signature-type">MetricOptions</a></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> callback: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>observerResult<span class="tsd-signature-symbol">: </span><a href="observerresult.html" class="tsd-signature-type">ObserverResult</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../globals.html#updownsumobserver" class="tsd-signature-type">UpDownSumObserver</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 					<a name="createvalueobserver" class="tsd-anchor"></a>
 					<h3>create<wbr>Value<wbr>Observer</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
@@ -259,7 +335,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/3f72613/packages/opentelemetry-api/src/metrics/Meter.ts#L78">src/metrics/Meter.ts:78</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/metrics/Meter.ts#L80">src/metrics/Meter.ts:80</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -296,7 +372,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/3f72613/packages/opentelemetry-api/src/metrics/Meter.ts#L42">src/metrics/Meter.ts:42</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/metrics/Meter.ts#L44">src/metrics/Meter.ts:44</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -344,7 +420,13 @@
 								<a href="meter.html#createcounter" class="tsd-kind-icon">create<wbr>Counter</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+								<a href="meter.html#createsumobserver" class="tsd-kind-icon">create<wbr>Sum<wbr>Observer</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 								<a href="meter.html#createupdowncounter" class="tsd-kind-icon">create<wbr>UpDown<wbr>Counter</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+								<a href="meter.html#createupdownsumobserver" class="tsd-kind-icon">create<wbr>UpDown<wbr>Sum<wbr>Observer</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 								<a href="meter.html#createvalueobserver" class="tsd-kind-icon">create<wbr>Value<wbr>Observer</a>

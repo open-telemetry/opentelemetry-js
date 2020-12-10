@@ -95,6 +95,7 @@
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="nooptextmappropagator.html#extract" class="tsd-kind-icon">extract</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="nooptextmappropagator.html#fields" class="tsd-kind-icon">fields</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="nooptextmappropagator.html#inject" class="tsd-kind-icon">inject</a></li>
 							</ul>
 						</section>
@@ -107,13 +108,13 @@
 					<a name="extract" class="tsd-anchor"></a>
 					<h3>extract</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">extract<span class="tsd-signature-symbol">(</span>context<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span>, carrier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, getter<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span></li>
+						<li class="tsd-signature tsd-kind-icon">extract<span class="tsd-signature-symbol">(</span>context<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span>, _carrier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/3f72613/packages/opentelemetry-api/src/context/propagation/NoopTextMapPropagator.ts#L27">src/context/propagation/NoopTextMapPropagator.ts:27</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/context/propagation/NoopTextMapPropagator.ts#L27">src/context/propagation/NoopTextMapPropagator.ts:27</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -127,10 +128,7 @@
 									<h5>context: <span class="tsd-signature-type">Context</span></h5>
 								</li>
 								<li>
-									<h5>carrier: <span class="tsd-signature-type">unknown</span></h5>
-								</li>
-								<li>
-									<h5>getter: <span class="tsd-signature-type">Function</span></h5>
+									<h5>_carrier: <span class="tsd-signature-type">unknown</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Context</span></h4>
@@ -138,16 +136,34 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
+					<a name="fields" class="tsd-anchor"></a>
+					<h3>fields</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">fields<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/textmappropagator.html">TextMapPropagator</a>.<a href="../interfaces/textmappropagator.html#fields">fields</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/context/propagation/NoopTextMapPropagator.ts#L30">src/context/propagation/NoopTextMapPropagator.ts:30</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
 					<a name="inject" class="tsd-anchor"></a>
 					<h3>inject</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">inject<span class="tsd-signature-symbol">(</span>context<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span>, carrier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, setter<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">inject<span class="tsd-signature-symbol">(</span>_context<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span>, _carrier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/3f72613/packages/opentelemetry-api/src/context/propagation/NoopTextMapPropagator.ts#L25">src/context/propagation/NoopTextMapPropagator.ts:25</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/context/propagation/NoopTextMapPropagator.ts#L25">src/context/propagation/NoopTextMapPropagator.ts:25</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -158,13 +174,10 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>context: <span class="tsd-signature-type">Context</span></h5>
+									<h5>_context: <span class="tsd-signature-type">Context</span></h5>
 								</li>
 								<li>
-									<h5>carrier: <span class="tsd-signature-type">unknown</span></h5>
-								</li>
-								<li>
-									<h5>setter: <span class="tsd-signature-type">Function</span></h5>
+									<h5>_carrier: <span class="tsd-signature-type">unknown</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -190,6 +203,9 @@
 						<ul>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
 								<a href="nooptextmappropagator.html#extract" class="tsd-kind-icon">extract</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
+								<a href="nooptextmappropagator.html#fields" class="tsd-kind-icon">fields</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
 								<a href="nooptextmappropagator.html#inject" class="tsd-kind-icon">inject</a>

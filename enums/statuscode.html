@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Observation | OpenTelemetry API for JavaScript</title>
+	<title>StatusCode | OpenTelemetry API for JavaScript</title>
 	<meta name="description" content="Documentation for OpenTelemetry API for JavaScript">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,10 +56,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="observation.html">Observation</a>
+					<a href="statuscode.html">StatusCode</a>
 				</li>
 			</ul>
-			<h1>Interface Observation</h1>
+			<h1>Enumeration StatusCode</h1>
 		</div>
 	</div>
 </header>
@@ -69,53 +69,72 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Interface for updating value of certain value observer</p>
+						<p>An enumeration of status codes.</p>
 					</div>
 				</div>
-			</section>
-			<section class="tsd-panel tsd-hierarchy">
-				<h3>Hierarchy</h3>
-				<ul class="tsd-hierarchy">
-					<li>
-						<span class="target">Observation</span>
-					</li>
-				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section tsd-is-external">
-							<h3>Properties</h3>
+							<h3>Enumeration members</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="observation.html#observer" class="tsd-kind-icon">observer</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="observation.html#value" class="tsd-kind-icon">value</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external"><a href="statuscode.html#error" class="tsd-kind-icon">ERROR</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external"><a href="statuscode.html#ok" class="tsd-kind-icon">OK</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external"><a href="statuscode.html#unset" class="tsd-kind-icon">UNSET</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group tsd-is-external">
-				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-					<a name="observer" class="tsd-anchor"></a>
-					<h3>observer</h3>
-					<div class="tsd-signature tsd-kind-icon">observer<span class="tsd-signature-symbol">:</span> <a href="baseobserver.html" class="tsd-signature-type">BaseObserver</a></div>
+				<h2>Enumeration members</h2>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
+					<a name="error" class="tsd-anchor"></a>
+					<h3>ERROR</h3>
+					<div class="tsd-signature tsd-kind-icon">ERROR<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 2</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/metrics/Observation.ts#L23">src/metrics/Observation.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/trace/status.ts#L39">src/trace/status.ts:39</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The operation contains an error.</p>
+						</div>
+					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-					<a name="value" class="tsd-anchor"></a>
-					<h3>value</h3>
-					<div class="tsd-signature tsd-kind-icon">value<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
+					<a name="ok" class="tsd-anchor"></a>
+					<h3>OK</h3>
+					<div class="tsd-signature tsd-kind-icon">OK<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 0</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/metrics/Observation.ts#L24">src/metrics/Observation.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/trace/status.ts#L31">src/trace/status.ts:31</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The operation has been validated by an Application developer or
+							Operator to have completed successfully.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
+					<a name="unset" class="tsd-anchor"></a>
+					<h3>UNSET</h3>
+					<div class="tsd-signature tsd-kind-icon">UNSET<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 1</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/trace/status.ts#L35">src/trace/status.ts:35</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The default status.</p>
+						</div>
+					</div>
 				</section>
 			</section>
 		</div>
@@ -131,14 +150,17 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface tsd-is-external">
-						<a href="observation.html" class="tsd-kind-icon">Observation</a>
+					<li class="current tsd-kind-enum tsd-is-external">
+						<a href="statuscode.html" class="tsd-kind-icon">Status<wbr>Code</a>
 						<ul>
-							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-								<a href="observation.html#observer" class="tsd-kind-icon">observer</a>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
+								<a href="statuscode.html#error" class="tsd-kind-icon">ERROR</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-								<a href="observation.html#value" class="tsd-kind-icon">value</a>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
+								<a href="statuscode.html#ok" class="tsd-kind-icon">OK</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
+								<a href="statuscode.html#unset" class="tsd-kind-icon">UNSET</a>
 							</li>
 						</ul>
 					</li>

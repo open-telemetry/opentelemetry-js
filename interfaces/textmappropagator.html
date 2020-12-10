@@ -59,7 +59,7 @@
 					<a href="textmappropagator.html">TextMapPropagator</a>
 				</li>
 			</ul>
-			<h1>Interface TextMapPropagator</h1>
+			<h1>Interface TextMapPropagator&lt;Carrier&gt;</h1>
 		</div>
 	</div>
 </header>
@@ -79,6 +79,14 @@
 						usually implemented via library-specific request interceptors, where the
 					client-side injects values and the server-side extracts them.</p>
 				</div>
+			</section>
+			<section class="tsd-panel tsd-type-parameters">
+				<h3>Type parameters</h3>
+				<ul class="tsd-type-parameters">
+					<li>
+						<h4>Carrier = <span class="tsd-signature-type">any</span></h4>
+					</li>
+				</ul>
 			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
@@ -102,6 +110,7 @@
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="textmappropagator.html#extract" class="tsd-kind-icon">extract</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="textmappropagator.html#fields" class="tsd-kind-icon">fields</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="textmappropagator.html#inject" class="tsd-kind-icon">inject</a></li>
 							</ul>
 						</section>
@@ -114,13 +123,13 @@
 					<a name="extract" class="tsd-anchor"></a>
 					<h3>extract</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">extract<span class="tsd-signature-symbol">(</span>context<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span>, carrier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, getter<span class="tsd-signature-symbol">: </span><a href="../globals.html#getterfunction" class="tsd-signature-type">GetterFunction</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span></li>
+						<li class="tsd-signature tsd-kind-icon">extract<span class="tsd-signature-symbol">(</span>context<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span>, carrier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Carrier</span>, getter<span class="tsd-signature-symbol">: </span><a href="textmapgetter.html" class="tsd-signature-type">TextMapGetter</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Carrier</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/3f72613/packages/opentelemetry-api/src/context/propagation/TextMapPropagator.ts#L60">src/context/propagation/TextMapPropagator.ts:60</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/context/propagation/TextMapPropagator.ts#L62">src/context/propagation/TextMapPropagator.ts:62</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -140,17 +149,17 @@
 									</div>
 								</li>
 								<li>
-									<h5>carrier: <span class="tsd-signature-type">unknown</span></h5>
+									<h5>carrier: <span class="tsd-signature-type">Carrier</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>the carrier of propagation fields, such as http request
 										headers.</p>
 									</div>
 								</li>
 								<li>
-									<h5>getter: <a href="../globals.html#getterfunction" class="tsd-signature-type">GetterFunction</a></h5>
+									<h5>getter: <a href="textmapgetter.html" class="tsd-signature-type">TextMapGetter</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Carrier</span><span class="tsd-signature-symbol">&gt;</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>a function which accepts a carrier and a key, and returns
-										the value from the carrier identified by the key.</p>
+										<p>an optional <a href="textmapgetter.html">TextMapGetter</a>. If undefined, keys will be all
+										own properties, and keys will be accessed by direct object access.</p>
 									</div>
 								</li>
 							</ul>
@@ -159,16 +168,40 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
-					<a name="inject" class="tsd-anchor"></a>
-					<h3>inject</h3>
+					<a name="fields" class="tsd-anchor"></a>
+					<h3>fields</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">inject<span class="tsd-signature-symbol">(</span>context<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span>, carrier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span>, setter<span class="tsd-signature-symbol">: </span><a href="../globals.html#setterfunction" class="tsd-signature-type">SetterFunction</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">fields<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/3f72613/packages/opentelemetry-api/src/context/propagation/TextMapPropagator.ts#L46">src/context/propagation/TextMapPropagator.ts:46</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/context/propagation/TextMapPropagator.ts#L74">src/context/propagation/TextMapPropagator.ts:74</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Return a list of all fields which may be used by the propagator.</p>
+								</div>
+								<p>This list should be used to clear fields before calling inject if a carrier is
+								used more than once.</p>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+					<a name="inject" class="tsd-anchor"></a>
+					<h3>inject</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">inject<span class="tsd-signature-symbol">(</span>context<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span>, carrier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Carrier</span>, setter<span class="tsd-signature-symbol">: </span><a href="textmapsetter.html" class="tsd-signature-type">TextMapSetter</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Carrier</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/context/propagation/TextMapPropagator.ts#L44">src/context/propagation/TextMapPropagator.ts:44</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -188,17 +221,17 @@
 									</div>
 								</li>
 								<li>
-									<h5>carrier: <span class="tsd-signature-type">unknown</span></h5>
+									<h5>carrier: <span class="tsd-signature-type">Carrier</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>the carrier of propagation fields, such as http request
 										headers.</p>
 									</div>
 								</li>
 								<li>
-									<h5>setter: <a href="../globals.html#setterfunction" class="tsd-signature-type">SetterFunction</a></h5>
+									<h5>setter: <a href="textmapsetter.html" class="tsd-signature-type">TextMapSetter</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Carrier</span><span class="tsd-signature-symbol">&gt;</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>a function which accepts a carrier, key, and value, which
-										sets the key on the carrier to the value.</p>
+										<p>an optional <a href="textmapsetter.html">TextMapSetter</a>. If undefined, values will be
+										set by direct object assignment.</p>
 									</div>
 								</li>
 							</ul>
@@ -220,11 +253,14 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface tsd-is-external">
+					<li class="current tsd-kind-interface tsd-has-type-parameter tsd-is-external">
 						<a href="textmappropagator.html" class="tsd-kind-icon">Text<wbr>Map<wbr>Propagator</a>
 						<ul>
 							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 								<a href="textmappropagator.html#extract" class="tsd-kind-icon">extract</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+								<a href="textmappropagator.html#fields" class="tsd-kind-icon">fields</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 								<a href="textmappropagator.html#inject" class="tsd-kind-icon">inject</a>

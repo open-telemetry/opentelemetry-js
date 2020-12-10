@@ -103,13 +103,13 @@
 					<a name="shouldsample" class="tsd-anchor"></a>
 					<h3>should<wbr>Sample</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">should<wbr>Sample<span class="tsd-signature-symbol">(</span>parentContext<span class="tsd-signature-symbol">: </span><a href="spancontext.html" class="tsd-signature-type">SpanContext</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span>, traceId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, spanName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, spanKind<span class="tsd-signature-symbol">: </span><a href="../enums/spankind.html" class="tsd-signature-type">SpanKind</a>, attributes<span class="tsd-signature-symbol">: </span><a href="attributes.html" class="tsd-signature-type">Attributes</a>, links<span class="tsd-signature-symbol">: </span><a href="link.html" class="tsd-signature-type">Link</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="samplingresult.html" class="tsd-signature-type">SamplingResult</a></li>
+						<li class="tsd-signature tsd-kind-icon">should<wbr>Sample<span class="tsd-signature-symbol">(</span>context<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span>, traceId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, spanName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, spanKind<span class="tsd-signature-symbol">: </span><a href="../enums/spankind.html" class="tsd-signature-type">SpanKind</a>, attributes<span class="tsd-signature-symbol">: </span><a href="attributes.html" class="tsd-signature-type">Attributes</a>, links<span class="tsd-signature-symbol">: </span><a href="link.html" class="tsd-signature-type">Link</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="samplingresult.html" class="tsd-signature-type">SamplingResult</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/3f72613/packages/opentelemetry-api/src/trace/Sampler.ts#L44">src/trace/Sampler.ts:44</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/trace/Sampler.ts#L43">src/trace/Sampler.ts:43</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -120,10 +120,9 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>parentContext: <a href="spancontext.html" class="tsd-signature-type">SpanContext</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></h5>
+									<h5>context: <span class="tsd-signature-type">Context</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>Parent span context. Typically taken from the wire.
-										Can be null.</p>
+										<p>Parent Context which may contain a span.</p>
 									</div>
 								</li>
 								<li>
@@ -175,7 +174,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/3f72613/packages/opentelemetry-api/src/trace/Sampler.ts#L54">src/trace/Sampler.ts:54</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/trace/Sampler.ts#L53">src/trace/Sampler.ts:53</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
