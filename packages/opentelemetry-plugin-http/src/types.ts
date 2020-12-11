@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { PluginConfig, Span } from '@opentelemetry/api';
+import { Span } from '@opentelemetry/api';
+import { PluginConfig } from '@opentelemetry/core';
 import type * as http from 'http';
 import {
   ClientRequest,
