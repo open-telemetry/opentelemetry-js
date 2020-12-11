@@ -42,8 +42,8 @@
   },
   "devDependencies": {
     "@opentelemetry/core": "^0.13.0",
-    "@types/mocha": "8.0.4",
-    "@types/node": "14.14.10",
+    "@types/mocha": "8.2.0",
+    "@types/node": "14.14.12",
     "@types/semver": "7.3.4",
     "codecov": "3.8.1",
     "gts": "2.0.2",
@@ -52,12 +52,12 @@
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "ts-mocha": "8.0.0",
-    "ts-node": "9.0.0",
+    "ts-node": "9.1.1",
     "typescript": "3.9.7"
   },
   "dependencies": {
     "@opentelemetry/resources": "^0.13.0",
     "gcp-metadata": "^4.1.4",
-    "semver": "7.3.2"
+    "semver": "7.3.4"
   }
 }
