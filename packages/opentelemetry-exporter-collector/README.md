@@ -19,18 +19,24 @@ npm install --save @opentelemetry/exporter-collector
 The CollectorTraceExporter in Web expects the endpoint to end in `/v1/trace`.
 
 ```js
-import { SimpleSpanProcessor } from '@opentelemetry/tracing';
+import { BatchSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
 import { CollectorTraceExporter } from '@opentelemetry/exporter-collector';
 
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/trace
-  headers: {}, //an optional object containing custom headers to be sent with each request
+  headers: {}, // an optional object containing custom headers to be sent with each request
+  concurrencyLimit: 10, // an optional limit on pending requests
 };
 
 const provider = new WebTracerProvider();
 const exporter = new CollectorTraceExporter(collectorOptions);
-provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+provider.addSpanProcessor(new BatchSpanProcessor(exporter, {
+  // send spans as soon as we have this many
+  bufferSize: 10,
+  // send spans if we have buffered spans older than this
+  bufferTimeout: 500,
+}));
 
 provider.register();
 
@@ -45,7 +51,8 @@ import { MetricProvider } from '@opentelemetry/metrics';
 import { CollectorMetricExporter } from '@opentelemetry/exporter-collector';
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/metrics
-  headers: {}, //an optional object containing custom headers to be sent with each request
+  headers: {}, // an optional object containing custom headers to be sent with each request
+  concurrencyLimit: 1, // an optional limit on pending requests
 };
 const exporter = new CollectorMetricExporter(collectorOptions);
 
@@ -64,7 +71,7 @@ counter.add(10, { 'key': 'value' });
 ## Traces in Node - JSON over http
 
 ```js
-const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
+const { BasicTracerProvider, BatchSpanProcessor } = require('@opentelemetry/tracing');
 const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector');
 
 const collectorOptions = {
@@ -72,12 +79,18 @@ const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/trace
   headers: {
     foo: 'bar'
-  }, //an optional object containing custom headers to be sent with each request will only work with http
+  }, // an optional object containing custom headers to be sent with each request will only work with http
+  concurrencyLimit: 10, // an optional limit on pending requests
 };
 
 const provider = new BasicTracerProvider();
 const exporter = new CollectorTraceExporter(collectorOptions);
-provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+provider.addSpanProcessor(new BatchSpanProcessor(exporter, {
+  // send spans as soon as we have this many
+  bufferSize: 1000,
+  // send spans if we have buffered spans older than this
+  bufferTimeout: 30000,
+}));
 
 provider.register();
 
@@ -91,6 +104,7 @@ const { CollectorMetricExporter } =  require('@opentelemetry/exporter-collector'
 const collectorOptions = {
   serviceName: 'basic-service',
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/metrics
+  concurrencyLimit: 1, // an optional limit on pending requests
 };
 const exporter = new CollectorMetricExporter(collectorOptions);
 

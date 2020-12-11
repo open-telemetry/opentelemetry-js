@@ -14,21 +14,6 @@
  * limitations under the License.
  */
 
-import {
-  InstrumentationModuleDefinition,
-  InstrumentationModuleFile,
-} from './types';
-
-export class InstrumentationNodeModuleDefinition<T>
-  implements InstrumentationModuleDefinition<T> {
-  files: InstrumentationModuleFile<T>[];
-  constructor(
-    public name: string,
-    public supportedVersions: string[],
-    public patch?: (exports: T) => T,
-    public unpatch?: (exports: T) => void,
-    files?: InstrumentationModuleFile<T>[]
-  ) {
-    this.files = files || [];
-  }
-}
+export * from './http';
+export * from './types';
+export * from './utils';
