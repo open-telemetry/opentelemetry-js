@@ -88,14 +88,15 @@ export abstract class InstrumentationBase<T = any>
       return exports;
     }
 
+    const version = require(path.join(baseDir, 'package.json')).version;
+    module.moduleVersion = version;
     if (module.name === name) {
       // main module
-      const version = require(path.join(baseDir, 'package.json')).version;
       if (typeof version === 'string' && this._isSupported(name, version)) {
         if (typeof module.patch === 'function') {
           module.moduleExports = exports;
           if (this._enabled) {
-            return module.patch(exports);
+            return module.patch(exports, module.moduleVersion);
           }
         }
       }
@@ -111,7 +112,7 @@ export abstract class InstrumentationBase<T = any>
       ) {
         file.moduleExports = exports;
         if (this._enabled) {
-          return file.patch(exports);
+          return file.patch(exports, module.moduleVersion);
         }
       }
     }
@@ -128,11 +129,11 @@ export abstract class InstrumentationBase<T = any>
     if (this._hooks.length > 0) {
       for (const module of this._modules) {
         if (typeof module.patch === 'function' && module.moduleExports) {
-          module.patch(module.moduleExports);
+          module.patch(module.moduleExports, module.moduleVersion);
         }
         for (const file of module.files) {
           if (file.moduleExports) {
-            file.patch(file.moduleExports);
+            file.patch(file.moduleExports, module.moduleVersion);
           }
         }
       }
@@ -167,11 +168,11 @@ export abstract class InstrumentationBase<T = any>
 
     for (const module of this._modules) {
       if (typeof module.unpatch === 'function' && module.moduleExports) {
-        module.unpatch(module.moduleExports);
+        module.unpatch(module.moduleExports, module.moduleVersion);
       }
       for (const file of module.files) {
         if (file.moduleExports) {
-          file.unpatch(file.moduleExports);
+          file.unpatch(file.moduleExports, module.moduleVersion);
         }
       }
     }
