@@ -20,6 +20,9 @@ export interface InstrumentationModuleFile<T> {
 
   moduleExports?: T;
 
+  /** Supported version this file */
+  supportedVersions: string[];
+
   /** Method to patch the instrumentation  */
   patch(moduleExports: T): T;
 

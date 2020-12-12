@@ -19,10 +19,7 @@ import * as path from 'path';
 import * as RequireInTheMiddle from 'require-in-the-middle';
 import * as semver from 'semver';
 import { InstrumentationAbstract } from '../../instrumentation';
-import {
-  InstrumentationModuleDefinition,
-  InstrumentationModuleFile,
-} from './types';
+import { InstrumentationModuleDefinition } from './types';
 
 /**
  * Base abstract class for instrumenting node plugins
@@ -68,11 +65,9 @@ export abstract class InstrumentationBase<T = any>
           return true;
         }
 
-        for (const supportedVersions of module.supportedVersions) {
-          if (semver.satisfies(version, supportedVersions)) {
-            return true;
-          }
-        }
+        return module.supportedVersions.some(supportedVersion => {
+          return semver.satisfies(version, supportedVersion);
+        });
       }
     }
 
@@ -106,11 +101,14 @@ export abstract class InstrumentationBase<T = any>
       }
     } else {
       // internal file
-      const files = module.files || [];
-      const file = files.find(
-        (file: InstrumentationModuleFile<T>) => file.name === name
-      );
-      if (file) {
+      const files = module.files ?? [];
+      const file = files.find(file => file.name === name);
+      if (
+        file &&
+        file.supportedVersions.some(supportedVersion =>
+          semver.satisfies(version, supportedVersion)
+        )
+      ) {
         file.moduleExports = exports;
         if (this._enabled) {
           return file.patch(exports);
