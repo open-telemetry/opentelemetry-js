@@ -45,7 +45,7 @@ export interface InstrumentationModuleDefinition<T> {
   supportedVersions: string[];
 
   /** Module internal files to be patched  */
-  files: InstrumentationModuleFile<T>[];
+  files: InstrumentationModuleFile<any>[];
 
   /** Method to patch the instrumentation  */
   patch?: (moduleExports: T, moduleVersion?: string) => T;
