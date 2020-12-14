@@ -17,7 +17,7 @@
 import {
   Attributes,
   Context,
-  getParentSpanContext,
+  getSpanContext,
   Link,
   Sampler,
   SamplingResult,
@@ -67,7 +67,7 @@ export class ParentBasedSampler implements Sampler {
     attributes: Attributes,
     links: Link[]
   ): SamplingResult {
-    const parentContext = getParentSpanContext(context);
+    const parentContext = getSpanContext(context);
 
     if (!parentContext) {
       return this._root.shouldSample(

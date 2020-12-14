@@ -130,7 +130,7 @@ export class Tracer implements api.Tracer {
   getCurrentSpan(): api.Span | undefined {
     const ctx = api.context.active();
     // Get the current Span from the context or null if none found.
-    return api.getActiveSpan(ctx);
+    return api.getSpan(ctx);
   }
 
   /**
@@ -141,7 +141,7 @@ export class Tracer implements api.Tracer {
     fn: T
   ): ReturnType<T> {
     // Set given span to context.
-    return api.context.with(api.setActiveSpan(api.context.active(), span), fn);
+    return api.context.with(api.setSpan(api.context.active(), span), fn);
   }
 
   /**
@@ -150,9 +150,7 @@ export class Tracer implements api.Tracer {
   bind<T>(target: T, span?: api.Span): T {
     return api.context.bind(
       target,
-      span
-        ? api.setActiveSpan(api.context.active(), span)
-        : api.context.active()
+      span ? api.setSpan(api.context.active(), span) : api.context.active()
     );
   }
 
@@ -178,5 +176,5 @@ function getParent(
   context: api.Context
 ): api.SpanContext | undefined {
   if (options.root) return undefined;
-  return api.getParentSpanContext(context);
+  return api.getSpanContext(context);
 }

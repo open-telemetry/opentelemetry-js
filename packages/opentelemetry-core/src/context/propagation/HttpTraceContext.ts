@@ -16,8 +16,8 @@
 
 import {
   Context,
-  getParentSpanContext,
-  setExtractedSpanContext,
+  getSpanContext,
+  setSpanContext,
   SpanContext,
   TextMapGetter,
   TextMapPropagator,
@@ -86,7 +86,7 @@ export function parseTraceParent(traceParent: string): SpanContext | null {
  */
 export class HttpTraceContext implements TextMapPropagator {
   inject(context: Context, carrier: unknown, setter: TextMapSetter) {
-    const spanContext = getParentSpanContext(context);
+    const spanContext = getSpanContext(context);
     if (!spanContext) return;
 
     const traceParent = `${VERSION}-${spanContext.traceId}-${
@@ -126,7 +126,7 @@ export class HttpTraceContext implements TextMapPropagator {
         typeof state === 'string' ? state : undefined
       );
     }
-    return setExtractedSpanContext(context, spanContext);
+    return setSpanContext(context, spanContext);
   }
 
   fields(): string[] {
