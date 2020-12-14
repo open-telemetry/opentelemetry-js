@@ -668,7 +668,7 @@ describe('PrometheusExporter', () => {
         },
         async () => {
           await meter.collect();
-          exporter!.export(meter.getBatcher().checkPointSet(), () => {
+          exporter!.export(meter.getProcessor().checkPointSet(), () => {
             http
               .get('http://localhost:9464/metrics', res => {
                 res.on('data', chunk => {
