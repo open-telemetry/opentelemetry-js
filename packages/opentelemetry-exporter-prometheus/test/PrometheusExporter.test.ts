@@ -660,6 +660,36 @@ describe('PrometheusExporter', () => {
         }
       );
     });
+
+    it('should export a metric without timestamp', done => {
+      exporter = new PrometheusExporter(
+        {
+          appendTimestamp: false,
+        },
+        async () => {
+          await meter.collect();
+          exporter!.export(meter.getProcessor().checkPointSet(), () => {
+            http
+              .get('http://localhost:9464/metrics', res => {
+                res.on('data', chunk => {
+                  const body = chunk.toString();
+                  const lines = body.split('\n');
+
+                  assert.deepStrictEqual(lines, [
+                    '# HELP counter description missing',
+                    '# TYPE counter counter',
+                    'counter{key1="labelValue1"} 10',
+                    '',
+                  ]);
+
+                  done();
+                });
+              })
+              .on('error', errorHandler(done));
+          });
+        }
+      );
+    });
   });
 });
 
