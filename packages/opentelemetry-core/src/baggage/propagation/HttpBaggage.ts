@@ -15,23 +15,21 @@
  */
 
 import {
+  Baggage,
   Context,
-  CorrelationContext,
+  getBaggage,
+  setBaggage,
   TextMapGetter,
   TextMapPropagator,
   TextMapSetter,
 } from '@opentelemetry/api';
-import {
-  getCorrelationContext,
-  setCorrelationContext,
-} from '../correlation-context';
 
 const KEY_PAIR_SEPARATOR = '=';
 const PROPERTIES_SEPARATOR = ';';
 const ITEMS_SEPARATOR = ',';
 
-// Name of the http header used to propagate the correlation context
-export const CORRELATION_CONTEXT_HEADER = 'baggage';
+// Name of the http header used to propagate the baggage
+export const BAGGAGE_HEADER = 'baggage';
 // Maximum number of name-value pairs allowed by w3c spec
 export const MAX_NAME_VALUE_PAIRS = 180;
 // Maximum number of bytes per a single name-value pair allowed by w3c spec
@@ -44,23 +42,23 @@ type KeyPair = {
 };
 
 /**
- * Propagates {@link CorrelationContext} through Context format propagation.
+ * Propagates {@link Baggage} through Context format propagation.
  *
- * Based on the Correlation Context specification:
- * https://w3c.github.io/correlation-context/
+ * Based on the Baggage specification:
+ * https://w3c.github.io/baggage/
  */
-export class HttpCorrelationContext implements TextMapPropagator {
+export class HttpBaggage implements TextMapPropagator {
   inject(context: Context, carrier: unknown, setter: TextMapSetter) {
-    const correlationContext = getCorrelationContext(context);
-    if (!correlationContext) return;
-    const keyPairs = this._getKeyPairs(correlationContext)
+    const baggage = getBaggage(context);
+    if (!baggage) return;
+    const keyPairs = this._getKeyPairs(baggage)
       .filter((pair: string) => {
         return pair.length <= MAX_PER_NAME_VALUE_PAIRS;
       })
       .slice(0, MAX_NAME_VALUE_PAIRS);
     const headerValue = this._serializeKeyPairs(keyPairs);
     if (headerValue.length > 0) {
-      setter.set(carrier, CORRELATION_CONTEXT_HEADER, headerValue);
+      setter.set(carrier, BAGGAGE_HEADER, headerValue);
     }
   }
 
@@ -71,22 +69,17 @@ export class HttpCorrelationContext implements TextMapPropagator {
     }, '');
   }
 
-  private _getKeyPairs(correlationContext: CorrelationContext): string[] {
-    return Object.keys(correlationContext).map(
+  private _getKeyPairs(baggage: Baggage): string[] {
+    return Object.keys(baggage).map(
       (key: string) =>
-        `${encodeURIComponent(key)}=${encodeURIComponent(
-          correlationContext[key].value
-        )}`
+        `${encodeURIComponent(key)}=${encodeURIComponent(baggage[key].value)}`
     );
   }
 
   extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
-    const headerValue: string = getter.get(
-      carrier,
-      CORRELATION_CONTEXT_HEADER
-    ) as string;
+    const headerValue: string = getter.get(carrier, BAGGAGE_HEADER) as string;
     if (!headerValue) return context;
-    const correlationContext: CorrelationContext = {};
+    const baggage: Baggage = {};
     if (headerValue.length == 0) {
       return context;
     }
@@ -94,13 +87,13 @@ export class HttpCorrelationContext implements TextMapPropagator {
     pairs.forEach(entry => {
       const keyPair = this._parsePairKeyValue(entry);
       if (keyPair) {
-        correlationContext[keyPair.key] = { value: keyPair.value };
+        baggage[keyPair.key] = { value: keyPair.value };
       }
     });
-    if (Object.entries(correlationContext).length === 0) {
+    if (Object.entries(baggage).length === 0) {
       return context;
     }
-    return setCorrelationContext(context, correlationContext);
+    return setBaggage(context, baggage);
   }
 
   private _parsePairKeyValue(entry: string): KeyPair | undefined {
@@ -120,6 +113,6 @@ export class HttpCorrelationContext implements TextMapPropagator {
   }
 
   fields(): string[] {
-    return [CORRELATION_CONTEXT_HEADER];
+    return [BAGGAGE_HEADER];
   }
 }
