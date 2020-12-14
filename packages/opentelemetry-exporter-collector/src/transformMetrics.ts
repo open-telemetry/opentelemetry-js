@@ -136,50 +136,42 @@ export function toCollectorMetric(
     unit: metric.descriptor.unit,
   };
 
-  switch (metric.aggregator.kind) {
-    case AggregatorKind.SUM:
-      {
-        const result = {
-          dataPoints: [toDataPoint(metric, startTime)],
-          isMonotonic:
-            metric.descriptor.metricKind === MetricKind.COUNTER ||
-            metric.descriptor.metricKind === MetricKind.SUM_OBSERVER,
-          aggregationTemporality: toAggregationTemporality(metric),
-        };
-        if (metric.descriptor.valueType === api.ValueType.INT) {
-          metricCollector.intSum = result;
-        } else {
-          metricCollector.doubleSum = result;
-        }
-      }
-      break;
-
-    case AggregatorKind.LAST_VALUE:
-      {
-        const result = {
-          dataPoints: [toDataPoint(metric, startTime)],
-        };
-        if (metric.descriptor.valueType === api.ValueType.INT) {
-          metricCollector.intGauge = result;
-        } else {
-          metricCollector.doubleGauge = result;
-        }
-      }
-      break;
-
-    case AggregatorKind.HISTOGRAM:
-      {
-        const result = {
-          dataPoints: [toHistogramPoint(metric, startTime)],
-          aggregationTemporality: toAggregationTemporality(metric),
-        };
-        if (metric.descriptor.valueType === api.ValueType.INT) {
-          metricCollector.intHistogram = result;
-        } else {
-          metricCollector.doubleHistogram = result;
-        }
-      }
-      break;
+  if (
+    metric.aggregator.kind === AggregatorKind.SUM ||
+    metric.descriptor.metricKind === MetricKind.SUM_OBSERVER ||
+    metric.descriptor.metricKind === MetricKind.UP_DOWN_SUM_OBSERVER
+  ) {
+    const result = {
+      dataPoints: [toDataPoint(metric, startTime)],
+      isMonotonic:
+        metric.descriptor.metricKind === MetricKind.COUNTER ||
+        metric.descriptor.metricKind === MetricKind.SUM_OBSERVER,
+      aggregationTemporality: toAggregationTemporality(metric),
+    };
+    if (metric.descriptor.valueType === api.ValueType.INT) {
+      metricCollector.intSum = result;
+    } else {
+      metricCollector.doubleSum = result;
+    }
+  } else if (metric.aggregator.kind === AggregatorKind.LAST_VALUE) {
+    const result = {
+      dataPoints: [toDataPoint(metric, startTime)],
+    };
+    if (metric.descriptor.valueType === api.ValueType.INT) {
+      metricCollector.intGauge = result;
+    } else {
+      metricCollector.doubleGauge = result;
+    }
+  } else if (metric.aggregator.kind === AggregatorKind.HISTOGRAM) {
+    const result = {
+      dataPoints: [toHistogramPoint(metric, startTime)],
+      aggregationTemporality: toAggregationTemporality(metric),
+    };
+    if (metric.descriptor.valueType === api.ValueType.INT) {
+      metricCollector.intHistogram = result;
+    } else {
+      metricCollector.doubleHistogram = result;
+    }
   }
 
   return metricCollector;

@@ -18,10 +18,9 @@ import * as api from '@opentelemetry/api';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BaseObserverMetric } from './BaseObserverMetric';
+import { Processor } from './export/Processor';
+import { LastValue, MetricKind } from './export/types';
 import { ObserverResult } from './ObserverResult';
-import { MonotonicObserverResult } from './MonotonicObserverResult';
-import { Batcher } from './export/Batcher';
-import { MetricKind } from './export/types';
 
 /** This is a SDK implementation of SumObserver Metric. */
 export class SumObserverMetric
@@ -30,7 +29,7 @@ export class SumObserverMetric
   constructor(
     name: string,
     options: api.MetricOptions,
-    batcher: Batcher,
+    processor: Processor,
     resource: Resource,
     instrumentationLibrary: InstrumentationLibrary,
     callback?: (observerResult: api.ObserverResult) => unknown
@@ -38,7 +37,7 @@ export class SumObserverMetric
     super(
       name,
       options,
-      batcher,
+      processor,
       resource,
       MetricKind.SUM_OBSERVER,
       instrumentationLibrary,
@@ -46,7 +45,19 @@ export class SumObserverMetric
     );
   }
 
-  protected createObserverResult(): ObserverResult {
-    return new MonotonicObserverResult();
+  protected _processResults(observerResult: ObserverResult) {
+    observerResult.values.forEach((value, labels) => {
+      const instrument = this.bind(labels);
+      // SumObserver is monotonic which means it should only accept values
+      // greater or equal then previous value
+      const previous = instrument.getAggregator().toPoint();
+      let previousValue = -Infinity;
+      if (previous.timestamp[0] !== 0 || previous.timestamp[1] !== 0) {
+        previousValue = previous.value as LastValue;
+      }
+      if (value >= previousValue) {
+        instrument.update(value);
+      }
+    });
   }
 }

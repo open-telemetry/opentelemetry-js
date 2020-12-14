@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 import {
-  Batcher,
-  MetricDescriptor,
   Aggregator,
+  MetricDescriptor,
   MetricRecord,
+  Processor,
 } from '@opentelemetry/metrics';
 
 type Constructor<T, R extends Aggregator> = new (...args: T[]) => R;
 
-export class ExactBatcher<T, R extends Aggregator> extends Batcher {
+export class ExactProcessor<T, R extends Aggregator> extends Processor {
   private readonly args: ConstructorParameters<Constructor<T, R>>;
   public aggregators: R[] = [];
 

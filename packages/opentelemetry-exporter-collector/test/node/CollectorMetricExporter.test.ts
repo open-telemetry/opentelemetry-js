@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  ConsoleLogger,
-  ExportResult,
-  ExportResultCode,
-  LogLevel,
-} from '@opentelemetry/core';
+import * as api from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
 import * as http from 'http';
 import * as assert from 'assert';
@@ -37,7 +32,13 @@ import {
   ensureValueRecorderIsCorrect,
   ensureObserverIsCorrect,
 } from '../helper';
-import { MetricRecord } from '@opentelemetry/metrics';
+import {
+  BoundCounter,
+  BoundObserver,
+  BoundValueRecorder,
+  Metric,
+  MetricRecord,
+} from '@opentelemetry/metrics';
 
 const fakeRequest = {
   end: function () {},
@@ -56,7 +57,7 @@ describe('CollectorMetricExporter - node with json over http', () => {
   describe('instance', () => {
     it('should warn about metadata when using json', () => {
       const metadata = 'foo';
-      const logger = new ConsoleLogger(LogLevel.DEBUG);
+      const logger = new core.ConsoleLogger(core.LogLevel.DEBUG);
       const spyLoggerWarn = sinon.stub(logger, 'warn');
       collectorExporter = new CollectorMetricExporter({
         logger,
@@ -89,14 +90,22 @@ describe('CollectorMetricExporter - node with json over http', () => {
         value: 1592602232694000000,
       });
       metrics = [];
-      metrics.push(await mockCounter());
-      metrics.push(await mockObserver());
-      metrics.push(await mockValueRecorder());
-      metrics[0].aggregator.update(1);
-      metrics[1].aggregator.update(3);
-      metrics[1].aggregator.update(6);
-      metrics[2].aggregator.update(7);
-      metrics[2].aggregator.update(14);
+      const counter: Metric<BoundCounter> & api.Counter = mockCounter();
+      const observer: Metric<BoundObserver> & api.ValueObserver = mockObserver(
+        observerResult => {
+          observerResult.observe(6, {});
+        },
+        'double-observer2'
+      );
+      const recorder: Metric<BoundValueRecorder> &
+        api.ValueRecorder = mockValueRecorder();
+      counter.add(1);
+      recorder.record(7);
+      recorder.record(14);
+
+      metrics.push((await counter.getMetricRecord())[0]);
+      metrics.push((await observer.getMetricRecord())[0]);
+      metrics.push((await recorder.getMetricRecord())[0]);
     });
 
     afterEach(() => {
@@ -152,7 +161,9 @@ describe('CollectorMetricExporter - node with json over http', () => {
         assert.ok(typeof metric2 !== 'undefined', "observer doesn't exist");
         ensureObserverIsCorrect(
           metric2,
-          core.hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp)
+          core.hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp),
+          6,
+          'double-observer2'
         );
         assert.ok(typeof metric3 !== 'undefined', "histogram doesn't exist");
         ensureValueRecorderIsCorrect(
@@ -184,7 +195,7 @@ describe('CollectorMetricExporter - node with json over http', () => {
           assert.strictEqual(spyLoggerError.args.length, 0);
           assert.strictEqual(
             responseSpy.args[0][0].code,
-            ExportResultCode.SUCCESS
+            core.ExportResultCode.SUCCESS
           );
           done();
         });
@@ -211,8 +222,8 @@ describe('CollectorMetricExporter - node with json over http', () => {
         callback(mockRes);
         mockRes.send('failed');
         setTimeout(() => {
-          const result = responseSpy.args[0][0] as ExportResult;
-          assert.strictEqual(result.code, ExportResultCode.FAILED);
+          const result = responseSpy.args[0][0] as core.ExportResult;
+          assert.strictEqual(result.code, core.ExportResultCode.FAILED);
           const error = result.error as collectorTypes.CollectorExporterError;
           assert.ok(error !== undefined);
           assert.strictEqual(error.code, 400);

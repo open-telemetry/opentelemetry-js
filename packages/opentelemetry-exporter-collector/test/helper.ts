@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import { TraceFlags, ValueType, StatusCode } from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
+import * as metrics from '@opentelemetry/metrics';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
-import { MetricRecord, MeterProvider } from '@opentelemetry/metrics';
 import { hexToBase64, InstrumentationLibrary } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { opentelemetryProto } from '../src/types';
 import * as collectorTypes from '../src/types';
 
-const meterProvider = new MeterProvider({
+const meterProvider = new metrics.MeterProvider({
   interval: 30000,
   resource: new Resource({
     service: 'ui',
@@ -42,61 +42,104 @@ if (typeof Buffer === 'undefined') {
   };
 }
 
-export async function mockCounter(): Promise<MetricRecord> {
+export function mockCounter(): metrics.Metric<metrics.BoundCounter> &
+  api.Counter {
   const name = 'int-counter';
   const metric =
     meter['_metrics'].get(name) ||
     meter.createCounter(name, {
       description: 'sample counter description',
-      valueType: ValueType.INT,
+      valueType: api.ValueType.INT,
     });
   metric.clear();
   metric.bind({});
-
-  return (await metric.getMetricRecord())[0];
+  return metric;
 }
 
-export async function mockDoubleCounter(): Promise<MetricRecord> {
+export function mockDoubleCounter(): metrics.Metric<metrics.BoundCounter> &
+  api.Counter {
   const name = 'double-counter';
   const metric =
     meter['_metrics'].get(name) ||
     meter.createCounter(name, {
       description: 'sample counter description',
-      valueType: ValueType.DOUBLE,
+      valueType: api.ValueType.DOUBLE,
     });
   metric.clear();
   metric.bind({});
-
-  return (await metric.getMetricRecord())[0];
+  return metric;
 }
 
-export async function mockObserver(): Promise<MetricRecord> {
-  const name = 'double-observer';
+export function mockObserver(
+  callback: (observerResult: api.ObserverResult) => unknown,
+  name = 'double-observer'
+): metrics.Metric<metrics.BoundObserver> & api.ValueObserver {
   const metric =
     meter['_metrics'].get(name) ||
-    meter.createValueObserver(name, {
-      description: 'sample observer description',
-      valueType: ValueType.DOUBLE,
-    });
+    meter.createValueObserver(
+      name,
+      {
+        description: 'sample observer description',
+        valueType: api.ValueType.DOUBLE,
+      },
+      callback
+    );
   metric.clear();
   metric.bind({});
-
-  return (await metric.getMetricRecord())[0];
+  return metric;
 }
 
-export async function mockValueRecorder(): Promise<MetricRecord> {
+export function mockSumObserver(
+  callback: (observerResult: api.ObserverResult) => unknown,
+  name = 'double-sum-observer'
+): metrics.Metric<metrics.BoundObserver> & api.SumObserver {
+  const metric =
+    meter['_metrics'].get(name) ||
+    meter.createSumObserver(
+      name,
+      {
+        description: 'sample sum observer description',
+        valueType: api.ValueType.DOUBLE,
+      },
+      callback
+    );
+  metric.clear();
+  metric.bind({});
+  return metric;
+}
+
+export function mockUpDownSumObserver(
+  callback: (observerResult: api.ObserverResult) => unknown,
+  name = 'double-up-down-sum-observer'
+): metrics.Metric<metrics.BoundObserver> & api.UpDownSumObserver {
+  const metric =
+    meter['_metrics'].get(name) ||
+    meter.createUpDownSumObserver(
+      name,
+      {
+        description: 'sample up down sum observer description',
+        valueType: api.ValueType.DOUBLE,
+      },
+      callback
+    );
+  metric.clear();
+  metric.bind({});
+  return metric;
+}
+
+export function mockValueRecorder(): metrics.Metric<metrics.BoundValueRecorder> &
+  api.ValueRecorder {
   const name = 'int-recorder';
   const metric =
     meter['_metrics'].get(name) ||
     meter.createValueRecorder(name, {
       description: 'sample recorder description',
-      valueType: ValueType.INT,
+      valueType: api.ValueType.INT,
       boundaries: [0, 100],
     });
   metric.clear();
   metric.bind({});
-
-  return (await metric.getMetricRecord())[0];
+  return metric;
 }
 
 const traceIdHex = '1f1008dc8e270e85c40a0d7c3939b278';
@@ -109,13 +152,13 @@ export const mockedReadableSpan: ReadableSpan = {
   spanContext: {
     traceId: '1f1008dc8e270e85c40a0d7c3939b278',
     spanId: '5e107261f64fa53e',
-    traceFlags: TraceFlags.SAMPLED,
+    traceFlags: api.TraceFlags.SAMPLED,
   },
   parentSpanId: '78a8915098864388',
   startTime: [1574120165, 429803070],
   endTime: [1574120165, 438688070],
   ended: true,
-  status: { code: StatusCode.OK },
+  status: { code: api.StatusCode.OK },
   attributes: { component: 'document-load' },
   links: [
     {
@@ -180,13 +223,13 @@ export const basicTrace: ReadableSpan[] = [
     spanContext: {
       traceId: '1f1008dc8e270e85c40a0d7c3939b278',
       spanId: '5e107261f64fa53e',
-      traceFlags: TraceFlags.SAMPLED,
+      traceFlags: api.TraceFlags.SAMPLED,
     },
     parentSpanId: '78a8915098864388',
     startTime: [1574120165, 429803070],
     endTime: [1574120165, 438688070],
     ended: true,
-    status: { code: StatusCode.OK },
+    status: { code: api.StatusCode.OK },
     attributes: {},
     links: [],
     events: [],
@@ -200,13 +243,13 @@ export const basicTrace: ReadableSpan[] = [
     spanContext: {
       traceId: '1f1008dc8e270e85c40a0d7c3939b278',
       spanId: 'f64fa53e5e107261',
-      traceFlags: TraceFlags.SAMPLED,
+      traceFlags: api.TraceFlags.SAMPLED,
     },
     parentSpanId: '78a8915098864388',
     startTime: [1575120165, 439803070],
     endTime: [1575120165, 448688070],
     ended: true,
-    status: { code: StatusCode.OK },
+    status: { code: api.StatusCode.OK },
     attributes: {},
     links: [],
     events: [],
@@ -220,13 +263,13 @@ export const basicTrace: ReadableSpan[] = [
     spanContext: {
       traceId: '1f1008dc8e270e85c40a0d7c3939b278',
       spanId: '07261f64fa53e5e1',
-      traceFlags: TraceFlags.SAMPLED,
+      traceFlags: api.TraceFlags.SAMPLED,
     },
     parentSpanId: 'a891578098864388',
     startTime: [1575120165, 439803070],
     endTime: [1575120165, 448688070],
     ended: true,
-    status: { code: StatusCode.OK },
+    status: { code: api.StatusCode.OK },
     attributes: {},
     links: [],
     events: [],
@@ -251,44 +294,44 @@ export const multiResourceTrace: ReadableSpan[] = [
   },
 ];
 
-export const multiResourceMetricsGet = async function (): Promise<
-  MetricRecord[]
-> {
+export const multiResourceMetricsGet = function (
+  callback: (observerResult: api.ObserverResult) => unknown
+): any[] {
   return [
     {
-      ...(await mockCounter()),
+      ...mockCounter(),
       resource: mockedResources[0],
       instrumentationLibrary: mockedInstrumentationLibraries[0],
     },
     {
-      ...(await mockObserver()),
+      ...mockObserver(callback),
       resource: mockedResources[1],
       instrumentationLibrary: mockedInstrumentationLibraries[0],
     },
     {
-      ...(await mockCounter()),
+      ...mockCounter(),
       resource: mockedResources[0],
       instrumentationLibrary: mockedInstrumentationLibraries[0],
     },
   ];
 };
 
-export const multiInstrumentationLibraryMetricsGet = async function (): Promise<
-  MetricRecord[]
-> {
+export const multiInstrumentationLibraryMetricsGet = function (
+  callback: (observerResult: api.ObserverResult) => unknown
+): any[] {
   return [
     {
-      ...(await mockCounter()),
+      ...mockCounter(),
       resource: mockedResources[0],
       instrumentationLibrary: mockedInstrumentationLibraries[0],
     },
     {
-      ...(await mockObserver()),
+      ...mockObserver(callback),
       resource: mockedResources[0],
       instrumentationLibrary: mockedInstrumentationLibraries[1],
     },
     {
-      ...(await mockCounter()),
+      ...mockCounter(),
       resource: mockedResources[0],
       instrumentationLibrary: mockedInstrumentationLibraries[0],
     },
@@ -464,7 +507,7 @@ export function ensureSpanIsCorrect(
   assert.strictEqual(span.droppedLinksCount, 0, 'droppedLinksCount is wrong');
   assert.deepStrictEqual(
     span.status,
-    { code: StatusCode.OK },
+    { code: api.StatusCode.OK },
     'status is wrong'
   );
 }
@@ -555,21 +598,77 @@ export function ensureDoubleCounterIsCorrect(
 
 export function ensureObserverIsCorrect(
   metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
-  time: number
+  time: number,
+  value: number,
+  name = 'double-observer'
 ) {
   assert.deepStrictEqual(metric, {
-    name: 'double-observer',
+    name,
     description: 'sample observer description',
     unit: '1',
     doubleGauge: {
       dataPoints: [
         {
           labels: [],
-          value: 6,
+          value,
           startTimeUnixNano: 1592602232694000000,
           timeUnixNano: time,
         },
       ],
+    },
+  });
+}
+
+export function ensureSumObserverIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  time: number,
+  value: number,
+  name = 'double-sum-observer'
+) {
+  assert.deepStrictEqual(metric, {
+    name,
+    description: 'sample sum observer description',
+    unit: '1',
+    doubleSum: {
+      isMonotonic: true,
+      dataPoints: [
+        {
+          labels: [],
+          value,
+          startTimeUnixNano: 1592602232694000000,
+          timeUnixNano: time,
+        },
+      ],
+      aggregationTemporality:
+        collectorTypes.opentelemetryProto.metrics.v1.AggregationTemporality
+          .AGGREGATION_TEMPORALITY_CUMULATIVE,
+    },
+  });
+}
+
+export function ensureUpDownSumObserverIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  time: number,
+  value: number,
+  name = 'double-up-down-sum-observer'
+) {
+  assert.deepStrictEqual(metric, {
+    name,
+    description: 'sample up down sum observer description',
+    unit: '1',
+    doubleSum: {
+      isMonotonic: false,
+      dataPoints: [
+        {
+          labels: [],
+          value,
+          startTimeUnixNano: 1592602232694000000,
+          timeUnixNano: time,
+        },
+      ],
+      aggregationTemporality:
+        collectorTypes.opentelemetryProto.metrics.v1.AggregationTemporality
+          .AGGREGATION_TEMPORALITY_CUMULATIVE,
     },
   });
 }

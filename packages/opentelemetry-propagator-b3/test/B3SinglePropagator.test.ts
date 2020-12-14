@@ -19,7 +19,7 @@ import {
   defaultTextMapSetter,
   INVALID_SPANID,
   INVALID_TRACEID,
-  getActiveSpan,
+  getParentSpanContext,
   setExtractedSpanContext,
   SpanContext,
   TraceFlags,
@@ -140,7 +140,7 @@ describe('B3SinglePropagator', () => {
         defaultTextMapGetter
       );
 
-      const extractedSpanContext = getActiveSpan(context)?.context();
+      const extractedSpanContext = getParentSpanContext(context);
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'e457b5a2e4d86bd1',
         traceId: '80f198ee56343ba864fe8b2a57d3eff7',
@@ -161,7 +161,7 @@ describe('B3SinglePropagator', () => {
         defaultTextMapGetter
       );
 
-      const extractedSpanContext = getActiveSpan(context)?.context();
+      const extractedSpanContext = getParentSpanContext(context);
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'e457b5a2e4d86bd1',
         traceId: '80f198ee56343ba864fe8b2a57d3eff7',
@@ -182,7 +182,7 @@ describe('B3SinglePropagator', () => {
         defaultTextMapGetter
       );
 
-      const extractedSpanContext = getActiveSpan(context)?.context();
+      const extractedSpanContext = getParentSpanContext(context);
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'e457b5a2e4d86bd1',
         traceId: '80f198ee56343ba864fe8b2a57d3eff7',
@@ -202,7 +202,7 @@ describe('B3SinglePropagator', () => {
         defaultTextMapGetter
       );
 
-      const extractedSpanContext = getActiveSpan(context)?.context();
+      const extractedSpanContext = getParentSpanContext(context);
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'e457b5a2e4d86bd1',
         traceId: '00000000000000004aaba1a52cf8ee09',
@@ -223,7 +223,7 @@ describe('B3SinglePropagator', () => {
         defaultTextMapGetter
       );
 
-      const extractedSpanContext = getActiveSpan(context)?.context();
+      const extractedSpanContext = getParentSpanContext(context);
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'e457b5a2e4d86bd1',
         traceId: '80f198ee56343ba864fe8b2a57d3eff7',
@@ -244,7 +244,7 @@ describe('B3SinglePropagator', () => {
         defaultTextMapGetter
       );
 
-      const extractedSpanContext = getActiveSpan(context)?.context();
+      const extractedSpanContext = getParentSpanContext(context);
       assert.deepStrictEqual(undefined, extractedSpanContext);
     });
 
@@ -259,7 +259,7 @@ describe('B3SinglePropagator', () => {
         defaultTextMapGetter
       );
 
-      const extractedSpanContext = getActiveSpan(context)?.context();
+      const extractedSpanContext = getParentSpanContext(context);
       assert.deepStrictEqual(undefined, extractedSpanContext);
     });
 
@@ -274,7 +274,7 @@ describe('B3SinglePropagator', () => {
         defaultTextMapGetter
       );
 
-      const extractedSpanContext = getActiveSpan(context)?.context();
+      const extractedSpanContext = getParentSpanContext(context);
       assert.deepStrictEqual(undefined, extractedSpanContext);
     });
 
@@ -289,7 +289,7 @@ describe('B3SinglePropagator', () => {
         defaultTextMapGetter
       );
 
-      const extractedSpanContext = getActiveSpan(context)?.context();
+      const extractedSpanContext = getParentSpanContext(context);
       assert.deepStrictEqual(undefined, extractedSpanContext);
     });
   });

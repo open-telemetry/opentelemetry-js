@@ -19,7 +19,7 @@ import { Resource } from '@opentelemetry/resources';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { BoundUpDownCounter } from './BoundInstrument';
 import { MetricKind } from './export/types';
-import { Batcher } from './export/Batcher';
+import { Processor } from './export/Processor';
 import { Metric } from './Metric';
 
 /** This is a SDK implementation of UpDownCounter Metric. */
@@ -29,7 +29,7 @@ export class UpDownCounterMetric
   constructor(
     name: string,
     options: api.MetricOptions,
-    private readonly _batcher: Batcher,
+    private readonly _processor: Processor,
     resource: Resource,
     instrumentationLibrary: InstrumentationLibrary
   ) {
@@ -47,7 +47,7 @@ export class UpDownCounterMetric
       this._disabled,
       this._valueType,
       this._logger,
-      this._batcher.aggregatorFor(this._descriptor)
+      this._processor.aggregatorFor(this._descriptor)
     );
   }
 

@@ -17,7 +17,7 @@ import * as api from '@opentelemetry/api';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BaseObserverMetric } from './BaseObserverMetric';
-import { Batcher } from './export/Batcher';
+import { Processor } from './export/Processor';
 import { MetricKind } from './export/types';
 
 /** This is a SDK implementation of Value Observer Metric. */
@@ -27,7 +27,7 @@ export class ValueObserverMetric
   constructor(
     name: string,
     options: api.MetricOptions,
-    batcher: Batcher,
+    processor: Processor,
     resource: Resource,
     instrumentationLibrary: InstrumentationLibrary,
     callback?: (observerResult: api.ObserverResult) => unknown
@@ -35,7 +35,7 @@ export class ValueObserverMetric
     super(
       name,
       options,
-      batcher,
+      processor,
       resource,
       MetricKind.VALUE_OBSERVER,
       instrumentationLibrary,
