@@ -216,8 +216,8 @@ export function toCollectorCode(
 export function toCollectorStatus(
   status: Status
 ): opentelemetryProto.trace.v1.Status {
-  const spanStatus : opentelemetryProto.trace.v1.Status = {
-    code: toCollectorCode(status.code)
+  const spanStatus: opentelemetryProto.trace.v1.Status = {
+    code: toCollectorCode(status.code),
   };
   if (typeof status.message !== 'undefined') {
     spanStatus.message = status.message;
