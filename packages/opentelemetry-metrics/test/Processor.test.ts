@@ -19,7 +19,7 @@ import * as api from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { Meter, MeterProvider } from '../src';
 
-describe('Batcher', () => {
+describe('Processor', () => {
   describe('Ungrouped', () => {
     let meter: Meter;
     let fooCounter: api.BoundCounter;
@@ -30,7 +30,7 @@ describe('Batcher', () => {
         logger: new NoopLogger(),
         interval: 10000,
       }).getMeter('test-meter');
-      counter = meter.createCounter('ungrouped-batcher-test');
+      counter = meter.createCounter('ungrouped-processor-test');
       fooCounter = counter.bind({ key: 'foo' });
       barCounter = counter.bind({ key: 'bar' });
     });
@@ -40,7 +40,7 @@ describe('Batcher', () => {
       barCounter.add(1);
       barCounter.add(2);
       await meter.collect();
-      const checkPointSet = meter.getBatcher().checkPointSet();
+      const checkPointSet = meter.getProcessor().checkPointSet();
       assert.strictEqual(checkPointSet.length, 2);
       for (const record of checkPointSet) {
         switch (record.labels.key) {

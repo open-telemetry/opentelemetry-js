@@ -23,15 +23,17 @@ npm install --save @opentelemetry/context-zone-peer-dep
 
 ```js
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
-import { WebTracer } from '@opentelemetry/web';
+import { WebTracerProvider } from '@opentelemetry/web';
 import { ZoneContextManager } from '@opentelemetry/context-zone-peer-dep';
 
-const webTracerWithZone = new WebTracer({
+const providerWithZone = new WebTracerProvider();
+providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+providerWithZone.register({
   contextManager: new ZoneContextManager()
 });
-webTracerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
 // Example how the ZoneContextManager keeps the reference to the correct context during async operations
+const webTracerWithZone = providerWithZone.getTracer('default');
 const span1 = webTracerWithZone.startSpan('foo1');
 webTracerWithZone.withSpan(span1, () => {
   console.log('Current span is span1', webTracerWithZone.getCurrentSpan() === span1);

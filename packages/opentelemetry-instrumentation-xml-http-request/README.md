@@ -18,32 +18,36 @@ npm install --save @opentelemetry/instrumentation-xml-http-request
 
 ```js
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
-import { WebTracer } from '@opentelemetry/web';
+import { WebTracerProvider } from '@opentelemetry/web';
 import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xml-http-request';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 
 // this is still possible
-const webTracerWithZone = new WebTracer({
-  contextManager: new ZoneContextManager(),
+const providerWithZone = new WebTracerProvider({
   plugins: [
     new XMLHttpRequestInstrumentation({
       propagateTraceHeaderCorsUrls: ['http://localhost:8090']
     })
   ]
 });
+providerWithZone.register({
+  contextManager: new ZoneContextManager(),
+});
+const webTracerWithZone = providerWithZone.getTracer('default');
 /////////////////////////////////////////
 
 // or plugin can be also initialised separately and then set the tracer provider or meter provider
 const xmlHttpRequestInstrumentation = new XMLHttpRequestInstrumentation({
   propagateTraceHeaderCorsUrls: ['http://localhost:8090']
 });
-const webTracerWithZone = new WebTracer({
+const providerWithZone = new WebTracerProvider();
+providerWithZone.register({
   contextManager: new ZoneContextManager(),
 });
-xmlHttpRequestInstrumentation.setTracerProvider(webTracerWithZone);
+xmlHttpRequestInstrumentation.setTracerProvider(providerWithZone);
 /////////////////////////////////////////
 
-webTracerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
 // and some test
 const req = new XMLHttpRequest();
