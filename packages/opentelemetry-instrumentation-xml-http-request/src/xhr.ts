@@ -111,7 +111,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<
       return;
     }
     const headers: { [key: string]: unknown } = {};
-    api.propagation.inject(headers);
+    api.propagation.inject(api.context.active(), headers);
     Object.keys(headers).forEach(key => {
       xhr.setRequestHeader(key, String(headers[key]));
     });
