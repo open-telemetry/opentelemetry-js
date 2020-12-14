@@ -172,7 +172,7 @@ export class TracerShim extends opentracing.Tracer {
             api.setExtractedSpanContext(api.ROOT_CONTEXT, oTelSpanContext),
             oTelSpanBaggage
           ),
-          carrier,
+          carrier
         );
         return;
       }
