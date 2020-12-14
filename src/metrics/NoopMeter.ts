@@ -23,7 +23,6 @@ import {
   Counter,
   ValueRecorder,
   ValueObserver,
-  BatchObserver,
   UpDownCounter,
   BaseObserver,
   UpDownSumObserver,
@@ -119,10 +118,9 @@ export class NoopMeter implements Meter {
    * @param callback the batch observer callback
    */
   createBatchObserver(
-    _name: string,
     _callback: (batchObserverResult: BatchObserverResult) => void
-  ): BatchObserver {
-    return NOOP_BATCH_OBSERVER_METRIC;
+  ): NoopBatchObserver {
+    return NOOP_BATCH_OBSERVER;
   }
 }
 
@@ -187,9 +185,7 @@ export class NoopBaseObserverMetric
   }
 }
 
-export class NoopBatchObserverMetric
-  extends NoopMetric<void>
-  implements BatchObserver {}
+export class NoopBatchObserver {}
 
 export class NoopBoundCounter implements BoundCounter {
   add(_value: number): void {
@@ -229,4 +225,4 @@ export const NOOP_SUM_OBSERVER_METRIC = new NoopBaseObserverMetric(
   NOOP_BOUND_BASE_OBSERVER
 );
 
-export const NOOP_BATCH_OBSERVER_METRIC = new NoopBatchObserverMetric();
+export const NOOP_BATCH_OBSERVER = new NoopBatchObserver();
