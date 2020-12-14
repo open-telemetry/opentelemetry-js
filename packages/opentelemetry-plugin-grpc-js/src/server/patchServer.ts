@@ -29,6 +29,7 @@ import {
   SpanKind,
   propagation,
   Span,
+  ROOT_CONTEXT,
 } from '@opentelemetry/api';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import { clientStreamAndUnaryHandler } from './clientStreamAndUnary';
@@ -101,7 +102,7 @@ export function patchServer(
             plugin.logger.debug('patch func: %s', JSON.stringify(spanOptions));
 
             context.with(
-              propagation.extract(call.metadata, {
+              propagation.extract(ROOT_CONTEXT, call.metadata, {
                 get: (carrier, key) => carrier.get(key).map(String),
                 keys: carrier => Object.keys(carrier.getMap()),
               }),
