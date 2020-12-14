@@ -22,11 +22,11 @@ import {
   ROOT_CONTEXT,
   setActiveSpan,
   setExtractedSpanContext,
+  NoopLogger,
 } from '@opentelemetry/api';
 import {
   AlwaysOnSampler,
   AlwaysOffSampler,
-  NoopLogger,
   NoRecordingSpan,
   TraceState,
 } from '@opentelemetry/core';

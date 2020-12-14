@@ -87,7 +87,9 @@ export function mockObserver(
   return metric;
 }
 
-export function mockValueRecorder(): metrics.Metric<metrics.BoundValueRecorder> &
+export function mockValueRecorder(): metrics.Metric<
+  metrics.BoundValueRecorder
+> &
   api.ValueRecorder {
   const name = 'int-recorder';
   const metric =

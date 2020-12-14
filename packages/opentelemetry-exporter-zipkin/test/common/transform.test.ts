@@ -18,7 +18,6 @@ import * as api from '@opentelemetry/api';
 import {
   hrTimeDuration,
   hrTimeToMicroseconds,
-  NoopLogger,
   VERSION,
 } from '@opentelemetry/core';
 import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
@@ -32,7 +31,7 @@ import {
   _toZipkinTags,
 } from '../../src/transform';
 import * as zipkinTypes from '../../src/types';
-const logger = new NoopLogger();
+const logger = new api.NoopLogger();
 const tracer = new BasicTracerProvider({
   logger,
 }).getTracer('default');

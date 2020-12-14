@@ -20,8 +20,8 @@ import {
   propagation,
   Span as ISpan,
   SpanKind,
+  NoopLogger,
 } from '@opentelemetry/api';
-import { NoopLogger } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { ContextManager } from '@opentelemetry/context-base';
 import {

@@ -16,7 +16,6 @@
 
 import * as api from '@opentelemetry/api';
 import {
-  NoopLogger,
   setCorrelationContext,
   getCorrelationContext,
 } from '@opentelemetry/core';
@@ -133,7 +132,7 @@ export class TracerShim extends opentracing.Tracer {
     super();
 
     this._tracer = tracer;
-    this._logger = logger || new NoopLogger();
+    this._logger = logger || new api.NoopLogger();
   }
 
   startSpan(

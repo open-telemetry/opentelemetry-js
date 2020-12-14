@@ -125,7 +125,9 @@ export function getResource(
   startTimeHR: api.HrTime,
   endTimeHR: api.HrTime,
   resources: PerformanceResourceTiming[],
-  ignoredResources: WeakSet<PerformanceResourceTiming> = new WeakSet<PerformanceResourceTiming>(),
+  ignoredResources: WeakSet<PerformanceResourceTiming> = new WeakSet<
+    PerformanceResourceTiming
+  >(),
   initiatorType?: string
 ): PerformanceResourceTimingInfo {
   // de-relativize the URL before usage (does no harm to absolute URLs)

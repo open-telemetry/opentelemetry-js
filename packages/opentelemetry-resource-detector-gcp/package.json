@@ -56,6 +56,7 @@
     "typescript": "3.9.7"
   },
   "dependencies": {
+    "@opentelemetry/api": "^0.13.0",
     "@opentelemetry/resources": "^0.13.0",
     "gcp-metadata": "^4.1.4",
     "semver": "7.3.4"

@@ -16,7 +16,7 @@
 
 import { collectorTypes } from '@opentelemetry/exporter-collector';
 
-import * as core from '@opentelemetry/core';
+import { NoopLogger } from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as http from 'http';
 import * as assert from 'assert';
@@ -56,7 +56,7 @@ describe('CollectorTraceExporter - node with proto over http', () => {
           foo: 'bar',
         },
         hostname: 'foo',
-        logger: new core.NoopLogger(),
+        logger: new NoopLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',

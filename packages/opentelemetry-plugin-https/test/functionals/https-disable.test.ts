@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/core';
+import { NoopLogger } from '@opentelemetry/api';
 import { Http } from '@opentelemetry/plugin-http';
 import * as assert from 'assert';
 import * as fs from 'fs';

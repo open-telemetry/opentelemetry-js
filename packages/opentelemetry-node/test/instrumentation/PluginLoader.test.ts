@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopTracerProvider } from '@opentelemetry/api';
-import { NoopLogger } from '@opentelemetry/core';
+import { NoopTracerProvider, NoopLogger } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as path from 'path';
 import {

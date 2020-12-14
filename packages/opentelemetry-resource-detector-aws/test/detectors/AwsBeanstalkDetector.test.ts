@@ -21,7 +21,7 @@ import {
   assertEmptyResource,
   assertServiceResource,
 } from '@opentelemetry/resources/test/util/resource-assertions';
-import { NoopLogger } from '@opentelemetry/core';
+import { NoopLogger } from '@opentelemetry/api';
 
 describe('BeanstalkResourceDetector', () => {
   const err = new Error('failed to read config file');

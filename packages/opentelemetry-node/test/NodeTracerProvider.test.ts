@@ -19,11 +19,11 @@ import {
   TraceFlags,
   setActiveSpan,
   setExtractedSpanContext,
+  NoopLogger,
 } from '@opentelemetry/api';
 import {
   AlwaysOnSampler,
   AlwaysOffSampler,
-  NoopLogger,
   NoRecordingSpan,
 } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';

@@ -20,8 +20,8 @@ import {
   Span as ISpan,
   SpanKind,
   getActiveSpan,
+  NoopLogger,
 } from '@opentelemetry/api';
-import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,

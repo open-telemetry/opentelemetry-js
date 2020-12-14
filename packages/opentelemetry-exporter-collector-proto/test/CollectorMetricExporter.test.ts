@@ -17,7 +17,6 @@
 import * as api from '@opentelemetry/api';
 import * as metrics from '@opentelemetry/metrics';
 import { collectorTypes } from '@opentelemetry/exporter-collector';
-import * as core from '@opentelemetry/core';
 import * as http from 'http';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -61,7 +60,7 @@ describe('CollectorMetricExporter - node with proto over http', () => {
           foo: 'bar',
         },
         hostname: 'foo',
-        logger: new core.NoopLogger(),
+        logger: new api.NoopLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',

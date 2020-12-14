@@ -18,8 +18,8 @@ import {
   ROOT_CONTEXT,
   SpanKind,
   TraceFlags,
+  NoopLogger,
 } from '@opentelemetry/api';
-import { NoopLogger } from '@opentelemetry/core';
 import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
 import { HttpAttribute } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
