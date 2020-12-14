@@ -23,7 +23,8 @@ import { ShimWrapped } from './types';
  */
 export function safeExecuteInTheMiddle<T>(
   execute: () => T,
-  onFinish: (e: Error | undefined, result: T | undefined) => void
+  onFinish: (e: Error | undefined, result: T | undefined) => void,
+  preventThrowingError?: boolean
 ): T {
   let error: Error | undefined;
   let result: T | undefined;
@@ -33,7 +34,7 @@ export function safeExecuteInTheMiddle<T>(
     error = e;
   } finally {
     onFinish(error, result);
-    if (error) {
+    if (error && !preventThrowingError) {
       // eslint-disable-next-line no-unsafe-finally
       throw error;
     }

@@ -51,7 +51,7 @@ export class PushController extends Controller {
     await this._meter.collect();
     return new Promise(resolve => {
       this._exporter.export(
-        this._meter.getBatcher().checkPointSet(),
+        this._meter.getProcessor().checkPointSet(),
         result => {
           if (result.code !== ExportResultCode.SUCCESS) {
             globalErrorHandler(

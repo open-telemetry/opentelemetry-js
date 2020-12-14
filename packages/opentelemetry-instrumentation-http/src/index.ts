@@ -14,12 +14,6 @@
  * limitations under the License.
  */
 
-import { Labels } from '@opentelemetry/api';
-import { ObserverResult } from './ObserverResult';
-export class MonotonicObserverResult extends ObserverResult {
-  observe(value: number, labels: Labels): void {
-    if (value >= 0) {
-      this.values.set(labels, value);
-    }
-  }
-}
+export * from './http';
+export * from './types';
+export * from './utils';

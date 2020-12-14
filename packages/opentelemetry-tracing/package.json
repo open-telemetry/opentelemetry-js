@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/tracing",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "OpenTelemetry Tracing",
   "main": "build/src/index.js",
   "browser": {
@@ -50,14 +50,14 @@
     "access": "public"
   },
   "devDependencies": {
-    "@types/mocha": "8.0.2",
-    "@types/node": "14.0.27",
-    "@types/sinon": "9.0.4",
-    "@types/webpack-env": "1.15.2",
-    "codecov": "3.7.2",
+    "@types/mocha": "8.2.0",
+    "@types/node": "14.14.12",
+    "@types/sinon": "9.0.9",
+    "@types/webpack-env": "1.16.0",
+    "codecov": "3.8.1",
     "gts": "2.0.2",
     "istanbul-instrumenter-loader": "3.0.1",
-    "karma": "5.1.1",
+    "karma": "5.2.3",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage-istanbul-reporter": "3.0.3",
     "karma-mocha": "2.0.1",
@@ -66,18 +66,18 @@
     "mocha": "7.2.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "sinon": "9.0.3",
-    "ts-loader": "8.0.2",
-    "ts-mocha": "7.0.0",
-    "ts-node": "9.0.0",
+    "sinon": "9.2.2",
+    "ts-loader": "8.0.12",
+    "ts-mocha": "8.0.0",
+    "ts-node": "9.1.1",
     "typescript": "3.9.7",
-    "webpack": "4.44.1"
+    "webpack": "4.44.2"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.12.0",
-    "@opentelemetry/context-base": "^0.12.0",
-    "@opentelemetry/core": "^0.12.0",
-    "@opentelemetry/resources": "^0.12.0",
-    "@opentelemetry/semantic-conventions": "^0.12.0"
+    "@opentelemetry/api": "^0.13.0",
+    "@opentelemetry/context-base": "^0.13.0",
+    "@opentelemetry/core": "^0.13.0",
+    "@opentelemetry/resources": "^0.13.0",
+    "@opentelemetry/semantic-conventions": "^0.13.0"
   }
 }

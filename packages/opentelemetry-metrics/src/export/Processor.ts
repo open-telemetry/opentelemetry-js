@@ -23,13 +23,13 @@ import {
 } from './types';
 
 /**
- * Base class for all batcher types.
+ * Base class for all processor types.
  *
- * The batcher is responsible for storing the aggregators and aggregated
+ * The processor is responsible for storing the aggregators and aggregated
  * values received from updates from metrics in the meter. The stored values
  * will be sent to an exporter for exporting.
  */
-export abstract class Batcher {
+export abstract class Processor {
   protected readonly _batchMap = new Map<string, MetricRecord>();
 
   /** Returns an aggregator based off metric descriptor. */
@@ -44,23 +44,26 @@ export abstract class Batcher {
 }
 
 /**
- * Batcher which retains all dimensions/labels. It accepts all records and
+ * Processor which retains all dimensions/labels. It accepts all records and
  * passes them for exporting.
  */
-export class UngroupedBatcher extends Batcher {
+export class UngroupedProcessor extends Processor {
   aggregatorFor(metricDescriptor: MetricDescriptor): Aggregator {
     switch (metricDescriptor.metricKind) {
       case MetricKind.COUNTER:
       case MetricKind.UP_DOWN_COUNTER:
+        return new aggregators.SumAggregator();
+
       case MetricKind.SUM_OBSERVER:
       case MetricKind.UP_DOWN_SUM_OBSERVER:
-        return new aggregators.SumAggregator();
+      case MetricKind.VALUE_OBSERVER:
+        return new aggregators.LastValueAggregator();
+
       case MetricKind.VALUE_RECORDER:
         return new aggregators.HistogramAggregator(
           metricDescriptor.boundaries || [Infinity]
         );
-      case MetricKind.VALUE_OBSERVER:
-        return new aggregators.LastValueAggregator();
+
       default:
         return new aggregators.LastValueAggregator();
     }
