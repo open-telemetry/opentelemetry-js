@@ -10,7 +10,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@types/express": "4.17.9",
-    "@types/node": "14.14.10",
+    "@types/node": "14.14.12",
     "ts-node": "8.10.2"
   },
   "dependencies": {
