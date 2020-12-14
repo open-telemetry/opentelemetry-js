@@ -168,12 +168,11 @@ export class TracerShim extends opentracing.Tracer {
       case opentracing.FORMAT_HTTP_HEADERS:
       case opentracing.FORMAT_TEXT_MAP: {
         api.propagation.inject(
-          carrier,
-          api.defaultTextMapSetter,
           api.setBaggage(
             api.setExtractedSpanContext(api.ROOT_CONTEXT, oTelSpanContext),
             oTelSpanBaggage
-          )
+          ),
+          carrier,
         );
         return;
       }
@@ -192,7 +191,10 @@ export class TracerShim extends opentracing.Tracer {
     switch (format) {
       case opentracing.FORMAT_HTTP_HEADERS:
       case opentracing.FORMAT_TEXT_MAP: {
-        const context: api.Context = api.propagation.extract(carrier);
+        const context: api.Context = api.propagation.extract(
+          api.ROOT_CONTEXT,
+          carrier
+        );
         const spanContext = api.getParentSpanContext(context);
         const baggage = api.getBaggage(context);
 
