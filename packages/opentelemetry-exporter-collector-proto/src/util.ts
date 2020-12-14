@@ -17,6 +17,7 @@
 import {
   collectorTypes,
   sendWithHttp,
+  CollectorExporterNodeConfigBase,
 } from '@opentelemetry/exporter-collector';
 import * as path from 'path';
 
@@ -33,7 +34,7 @@ export function getExportRequestProto(): Type | undefined {
 
 export function onInit<ExportItem, ServiceRequest>(
   collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
-  _config: collectorTypes.CollectorExporterConfigBase
+  _config: CollectorExporterNodeConfigBase
 ): void {
   const dir = path.resolve(__dirname, '..', 'protos');
   const root = new protobufjs.Root();
