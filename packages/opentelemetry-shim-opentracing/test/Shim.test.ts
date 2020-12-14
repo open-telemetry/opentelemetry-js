@@ -22,7 +22,7 @@ import {
   timeInputToHrTime,
   HttpTraceContext,
   CompositePropagator,
-  HttpCorrelationContext,
+  HttpBaggage,
 } from '@opentelemetry/core';
 import { INVALID_SPAN_CONTEXT, propagation } from '@opentelemetry/api';
 import { performance } from 'perf_hooks';
@@ -34,7 +34,7 @@ describe('OpenTracing Shim', () => {
   );
   opentracing.initGlobalTracer(shimTracer);
   const compositePropagator = new CompositePropagator({
-    propagators: [new HttpTraceContext(), new HttpCorrelationContext()],
+    propagators: [new HttpTraceContext(), new HttpBaggage()],
   });
 
   propagation.setGlobalPropagator(compositePropagator);

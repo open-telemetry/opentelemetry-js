@@ -47,9 +47,9 @@
     "access": "public"
   },
   "devDependencies": {
-    "@babel/core": "7.12.9",
-    "@types/mocha": "8.0.4",
-    "@types/node": "14.14.10",
+    "@babel/core": "7.12.10",
+    "@types/mocha": "8.2.0",
+    "@types/node": "14.14.12",
     "@types/sinon": "9.0.9",
     "codecov": "3.8.1",
     "cpx": "1.5.0",
@@ -57,10 +57,10 @@
     "mocha": "7.2.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "sinon": "9.2.1",
-    "ts-loader": "8.0.11",
+    "sinon": "9.2.2",
+    "ts-loader": "8.0.12",
     "ts-mocha": "8.0.0",
-    "ts-node": "9.0.0",
+    "ts-node": "9.1.1",
     "typescript": "3.9.7"
   },
   "dependencies": {

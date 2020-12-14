@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { NoopSpan, Span, SpanContext } from '../';
 import { Context, createContextKey } from '@opentelemetry/context-base';
+import { Baggage, NoopSpan, Span, SpanContext } from '../';
 
 /**
  * Active span key
@@ -31,6 +31,11 @@ const ACTIVE_SPAN_KEY = createContextKey(
 const SUPPRESS_INSTRUMENTATION_KEY = createContextKey(
   'OpenTelemetry Context Key SUPPRESS_INSTRUMENTATION'
 );
+
+/**
+ * Baggage key
+ */
+const BAGGAGE_KEY = createContextKey('OpenTelemetry Baggage Key');
 
 /**
  * Return the active span if one exists
@@ -106,4 +111,20 @@ export function unsuppressInstrumentation(context: Context): Context {
  */
 export function isInstrumentationSuppressed(context: Context): boolean {
   return Boolean(context.getValue(SUPPRESS_INSTRUMENTATION_KEY));
+}
+
+/**
+ * @param {Context} Context that manage all context values
+ * @returns {Baggage} Extracted baggage from the context
+ */
+export function getBaggage(context: Context): Baggage | undefined {
+  return (context.getValue(BAGGAGE_KEY) as Baggage) || undefined;
+}
+
+/**
+ * @param {Context} Context that manage all context values
+ * @param {Baggage} baggage that will be set in the actual context
+ */
+export function setBaggage(context: Context, baggage: Baggage): Context {
+  return context.setValue(BAGGAGE_KEY, baggage);
 }
