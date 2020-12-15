@@ -20,7 +20,6 @@ import {
 } from '@opentelemetry/exporter-collector';
 import * as api from '@opentelemetry/api';
 import * as metrics from '@opentelemetry/metrics';
-import * as core from '@opentelemetry/core';
 import * as http from 'http';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
