@@ -103,15 +103,10 @@ export class Span implements api.Span, ReadableSpan {
 
     if (
       Object.keys(this.attributes).length >=
-      this._traceParams.numberOfAttributesPerSpan!
+        this._traceParams.numberOfAttributesPerSpan! &&
+      !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
-      const attributeKeyToDelete = Object.keys(this.attributes).shift();
-      if (attributeKeyToDelete) {
-        this._logger.warn(
-          `Dropping extra attributes : ${attributeKeyToDelete}`
-        );
-        delete this.attributes[attributeKeyToDelete];
-      }
+      return this;
     }
     this.attributes[key] = value;
     return this;

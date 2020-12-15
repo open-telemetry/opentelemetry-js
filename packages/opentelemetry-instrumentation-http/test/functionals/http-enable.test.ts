@@ -55,7 +55,7 @@ const applyCustomAttributesOnSpanErrorMessage =
   'bad applyCustomAttributesOnSpan function';
 
 let server: http.Server;
-const serverPort = 22345;
+const serverPort = 22346;
 const protocol = 'http';
 const hostname = 'localhost';
 const pathname = '/test';
