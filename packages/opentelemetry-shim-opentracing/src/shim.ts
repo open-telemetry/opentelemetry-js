@@ -15,10 +15,6 @@
  */
 
 import * as api from '@opentelemetry/api';
-import {
-  setCorrelationContext,
-  getCorrelationContext,
-} from '@opentelemetry/core';
 import * as opentracing from 'opentracing';
 import { Attributes, AttributeValue } from '@opentelemetry/api';
 
