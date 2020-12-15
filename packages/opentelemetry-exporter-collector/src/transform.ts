@@ -200,12 +200,12 @@ export function toCollectorCode(
   code: StatusCode
 ): opentelemetryProto.trace.v1.StatusCode {
   switch (code) {
-    case 0:
-      return 1;
-    case 1:
-      return 0;
+    case StatusCode.OK:
+      return opentelemetryProto.trace.v1.StatusCode.OK;
+    case StatusCode.UNSET:
+      return opentelemetryProto.trace.v1.StatusCode.UNSET;
     default:
-      return 2;
+      return opentelemetryProto.trace.v1.StatusCode.ERROR;
   }
 }
 
