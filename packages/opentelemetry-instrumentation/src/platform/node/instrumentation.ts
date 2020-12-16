@@ -87,6 +87,7 @@ export abstract class InstrumentationBase<T = any>
   ): T {
     if (!baseDir) {
       if (typeof module.patch === 'function') {
+        module.moduleExports = exports;
         return module.patch(exports);
       }
       return exports;
@@ -177,12 +178,4 @@ export abstract class InstrumentationBase<T = any>
       }
     }
   }
-
-  /**
-   * Init method in which plugin should define _modules and patches for
-   * methods
-   */
-  protected abstract init():
-    | InstrumentationModuleDefinition<T>
-    | InstrumentationModuleDefinition<T>[];
 }

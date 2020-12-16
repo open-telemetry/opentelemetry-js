@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import { collectorTypes } from '@opentelemetry/exporter-collector';
+import {
+  collectorTypes,
+  CollectorExporterNodeConfigBase,
+} from '@opentelemetry/exporter-collector';
 
 import * as core from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
@@ -28,6 +31,7 @@ import {
   ensureExportTraceServiceRequestIsSet,
   ensureProtoSpanIsCorrect,
   mockedReadableSpan,
+  MockedResponse,
 } from './helper';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 
@@ -37,20 +41,12 @@ const fakeRequest = {
   write: function () {},
 };
 
-const mockRes = {
-  statusCode: 200,
-};
-
-const mockResError = {
-  statusCode: 400,
-};
-
 // send is lazy loading file so need to wait a bit
 const waitTimeMS = 20;
 
 describe('CollectorTraceExporter - node with proto over http', () => {
   let collectorExporter: CollectorTraceExporter;
-  let collectorExporterConfig: collectorTypes.CollectorExporterConfigBase;
+  let collectorExporterConfig: CollectorExporterNodeConfigBase;
   let spyRequest: sinon.SinonSpy;
   let spyWrite: sinon.SinonSpy;
   let spans: ReadableSpan[];
@@ -67,6 +63,8 @@ describe('CollectorTraceExporter - node with proto over http', () => {
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
+        keepAlive: true,
+        httpAgentOptions: { keepAliveMsecs: 2000 },
       };
       collectorExporter = new CollectorTraceExporter(collectorExporterConfig);
       spans = [];
@@ -102,6 +100,19 @@ describe('CollectorTraceExporter - node with proto over http', () => {
       }, waitTimeMS);
     });
 
+    it('should have keep alive and keepAliveMsecs option set', done => {
+      collectorExporter.export(spans, () => {});
+
+      setTimeout(() => {
+        const args = spyRequest.args[0];
+        const options = args[0];
+        const agent = options.agent;
+        assert.strictEqual(agent.keepAlive, true);
+        assert.strictEqual(agent.options.keepAliveMsecs, 2000);
+        done();
+      });
+    });
+
     it('should successfully send the spans', done => {
       collectorExporter.export(spans, () => {});
 
@@ -130,9 +141,11 @@ describe('CollectorTraceExporter - node with proto over http', () => {
       collectorExporter.export(spans, responseSpy);
 
       setTimeout(() => {
+        const mockRes = new MockedResponse(200);
         const args = spyRequest.args[0];
         const callback = args[1];
         callback(mockRes);
+        mockRes.send('success');
         setTimeout(() => {
           const result = responseSpy.args[0][0] as ExportResult;
           assert.strictEqual(result.code, ExportResultCode.SUCCESS);
@@ -147,9 +160,11 @@ describe('CollectorTraceExporter - node with proto over http', () => {
       collectorExporter.export(spans, responseSpy);
 
       setTimeout(() => {
+        const mockResError = new MockedResponse(400);
         const args = spyRequest.args[0];
         const callback = args[1];
         callback(mockResError);
+        mockResError.send('failed');
         setTimeout(() => {
           const result = responseSpy.args[0][0] as ExportResult;
           assert.strictEqual(result.code, ExportResultCode.FAILED);

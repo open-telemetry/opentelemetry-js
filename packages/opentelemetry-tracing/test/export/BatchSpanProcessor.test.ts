@@ -181,6 +181,23 @@ describe('BatchSpanProcessor', () => {
 
       clock.restore();
     });
+
+    it('should export each sampled span exactly once with buffer size reached multiple times', async () => {
+      const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
+      const totalSpans = defaultBufferConfig.bufferSize * 2;
+      for (let i = 0; i <= totalSpans; i++) {
+        const span = createSampledSpan(`${name}_${i}`);
+
+        processor.onEnd(span);
+      }
+      // Now we should start seeing the spans in exporter
+      const span = createSampledSpan(`${name}_last`);
+      processor.onEnd(span);
+      assert.strictEqual(exporter.getFinishedSpans().length, totalSpans + 2);
+
+      await processor.shutdown();
+      assert.strictEqual(exporter.getFinishedSpans().length, 0);
+    });
   });
 
   describe('force flush', () => {

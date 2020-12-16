@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { collectorTypes } from '@opentelemetry/exporter-collector';
+import {
+  collectorTypes,
+  CollectorExporterNodeConfigBase,
+} from '@opentelemetry/exporter-collector';
+import * as api from '@opentelemetry/api';
+import * as metrics from '@opentelemetry/metrics';
 import * as core from '@opentelemetry/core';
 import * as http from 'http';
 import * as assert from 'assert';
@@ -30,9 +35,10 @@ import {
   ensureExportedCounterIsCorrect,
   ensureExportedObserverIsCorrect,
   ensureExportedValueRecorderIsCorrect,
+  MockedResponse,
 } from './helper';
-import { MetricRecord } from '@opentelemetry/metrics';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
+import { CollectorExporterError } from '@opentelemetry/exporter-collector/build/src/types';
 
 const fakeRequest = {
   end: function () {},
@@ -40,23 +46,15 @@ const fakeRequest = {
   write: function () {},
 };
 
-const mockRes = {
-  statusCode: 200,
-};
-
-const mockResError = {
-  statusCode: 400,
-};
-
 // send is lazy loading file so need to wait a bit
 const waitTimeMS = 20;
 
 describe('CollectorMetricExporter - node with proto over http', () => {
   let collectorExporter: CollectorMetricExporter;
-  let collectorExporterConfig: collectorTypes.CollectorExporterConfigBase;
+  let collectorExporterConfig: CollectorExporterNodeConfigBase;
   let spyRequest: sinon.SinonSpy;
   let spyWrite: sinon.SinonSpy;
-  let metrics: MetricRecord[];
+  let metrics: metrics.MetricRecord[];
   describe('export', () => {
     beforeEach(async () => {
       spyRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
@@ -70,6 +68,8 @@ describe('CollectorMetricExporter - node with proto over http', () => {
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
+        keepAlive: true,
+        httpAgentOptions: { keepAliveMsecs: 2000 },
       };
       collectorExporter = new CollectorMetricExporter(collectorExporterConfig);
       // Overwrites the start time to make tests consistent
@@ -77,14 +77,23 @@ describe('CollectorMetricExporter - node with proto over http', () => {
         value: 1592602232694000000,
       });
       metrics = [];
-      metrics.push(await mockCounter());
-      metrics.push(await mockObserver());
-      metrics.push(await mockValueRecorder());
-      metrics[0].aggregator.update(1);
-      metrics[1].aggregator.update(3);
-      metrics[1].aggregator.update(6);
-      metrics[2].aggregator.update(7);
-      metrics[2].aggregator.update(14);
+      const counter: metrics.Metric<metrics.BoundCounter> &
+        api.Counter = mockCounter();
+      const observer: metrics.Metric<metrics.BoundObserver> &
+        api.ValueObserver = mockObserver(observerResult => {
+        observerResult.observe(3, {});
+        observerResult.observe(6, {});
+      });
+      const recorder: metrics.Metric<metrics.BoundValueRecorder> &
+        api.ValueRecorder = mockValueRecorder();
+
+      counter.add(1);
+      recorder.record(7);
+      recorder.record(14);
+
+      metrics.push((await counter.getMetricRecord())[0]);
+      metrics.push((await observer.getMetricRecord())[0]);
+      metrics.push((await recorder.getMetricRecord())[0]);
     });
     afterEach(() => {
       spyRequest.restore();
@@ -114,6 +123,19 @@ describe('CollectorMetricExporter - node with proto over http', () => {
         assert.strictEqual(options.headers['foo'], 'bar');
         done();
       }, waitTimeMS);
+    });
+
+    it('should have keep alive and keepAliveMsecs option set', done => {
+      collectorExporter.export(metrics, () => {});
+
+      setTimeout(() => {
+        const args = spyRequest.args[0];
+        const options = args[0];
+        const agent = options.agent;
+        assert.strictEqual(agent.keepAlive, true);
+        assert.strictEqual(agent.options.keepAliveMsecs, 2000);
+        done();
+      });
     });
 
     it('should successfully send metrics', done => {
@@ -148,7 +170,9 @@ describe('CollectorMetricExporter - node with proto over http', () => {
         );
         ensureExportedValueRecorderIsCorrect(
           metric3,
-          metric3.intHistogram?.dataPoints[0].timeUnixNano
+          metric3.intHistogram?.dataPoints[0].timeUnixNano,
+          [0, 100],
+          ['0', '2', '0']
         );
 
         ensureExportMetricsServiceRequestIsSet(json);
@@ -164,9 +188,11 @@ describe('CollectorMetricExporter - node with proto over http', () => {
       collectorExporter.export(metrics, responseSpy);
 
       setTimeout(() => {
+        const mockRes = new MockedResponse(200);
         const args = spyRequest.args[0];
         const callback = args[1];
         callback(mockRes);
+        mockRes.send('success');
         setTimeout(() => {
           const result = responseSpy.args[0][0] as ExportResult;
           assert.strictEqual(result.code, ExportResultCode.SUCCESS);
@@ -181,14 +207,17 @@ describe('CollectorMetricExporter - node with proto over http', () => {
       collectorExporter.export(metrics, responseSpy);
 
       setTimeout(() => {
+        const mockRes = new MockedResponse(400);
         const args = spyRequest.args[0];
         const callback = args[1];
-        callback(mockResError);
+        callback(mockRes);
+        mockRes.send('failed');
         setTimeout(() => {
           const result = responseSpy.args[0][0] as ExportResult;
           assert.strictEqual(result.code, ExportResultCode.FAILED);
-          // @ts-expect-error
-          assert.strictEqual(result.error?.code, 400);
+          const error = result.error as CollectorExporterError;
+          assert.strictEqual(error.code, 400);
+          assert.strictEqual(error.data, 'failed');
           done();
         });
       }, waitTimeMS);

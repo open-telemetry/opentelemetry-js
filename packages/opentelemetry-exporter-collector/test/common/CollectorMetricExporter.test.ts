@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
+import * as api from '@opentelemetry/api';
 import { ExportResultCode, NoopLogger } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorExporterBase } from '../../src/CollectorExporterBase';
 import { CollectorExporterConfigBase } from '../../src/types';
-import { MetricRecord } from '@opentelemetry/metrics';
+import {
+  BoundCounter,
+  BoundObserver,
+  Metric,
+  MetricRecord,
+} from '@opentelemetry/metrics';
 import { mockCounter, mockObserver } from '../helper';
 import * as collectorTypes from '../../src/types';
 
@@ -63,8 +69,18 @@ describe('CollectorMetricExporter - common', () => {
       };
       collectorExporter = new CollectorMetricExporter(collectorExporterConfig);
       metrics = [];
-      metrics.push(await mockCounter());
-      metrics.push(await mockObserver());
+      const counter: Metric<BoundCounter> & api.Counter = mockCounter();
+      const observer: Metric<BoundObserver> & api.ValueObserver = mockObserver(
+        observerResult => {
+          observerResult.observe(3, {});
+          observerResult.observe(6, {});
+        },
+        'double-observer3'
+      );
+      counter.add(1);
+
+      metrics.push((await counter.getMetricRecord())[0]);
+      metrics.push((await observer.getMetricRecord())[0]);
     });
 
     afterEach(() => {

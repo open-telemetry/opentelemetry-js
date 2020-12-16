@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-import { TraceFlags, ValueType, StatusCode } from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
+import * as metrics from '@opentelemetry/metrics';
 import { hexToBase64 } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
 import { collectorTypes } from '@opentelemetry/exporter-collector';
 import * as assert from 'assert';
-import { MeterProvider, MetricRecord } from '@opentelemetry/metrics';
+import { Stream } from 'stream';
 
-const meterProvider = new MeterProvider({
+const meterProvider = new metrics.MeterProvider({
   interval: 30000,
   resource: new Resource({
     service: 'ui',
@@ -33,61 +34,52 @@ const meterProvider = new MeterProvider({
 
 const meter = meterProvider.getMeter('default', '0.0.1');
 
-export async function mockCounter(): Promise<MetricRecord> {
+export function mockCounter(): metrics.Metric<metrics.BoundCounter> &
+  api.Counter {
   const name = 'int-counter';
   const metric =
     meter['_metrics'].get(name) ||
     meter.createCounter(name, {
       description: 'sample counter description',
-      valueType: ValueType.INT,
+      valueType: api.ValueType.INT,
     });
   metric.clear();
   metric.bind({});
-
-  return (await metric.getMetricRecord())[0];
+  return metric;
 }
 
-export async function mockDoubleCounter(): Promise<MetricRecord> {
-  const name = 'double-counter';
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createCounter(name, {
-      description: 'sample counter description',
-      valueType: ValueType.DOUBLE,
-    });
-  metric.clear();
-  metric.bind({});
-
-  return (await metric.getMetricRecord())[0];
-}
-
-export async function mockObserver(): Promise<MetricRecord> {
+export function mockObserver(
+  callback: (observerResult: api.ObserverResult) => void
+): metrics.Metric<metrics.BoundCounter> & api.ValueObserver {
   const name = 'double-observer';
   const metric =
     meter['_metrics'].get(name) ||
-    meter.createValueObserver(name, {
-      description: 'sample observer description',
-      valueType: ValueType.DOUBLE,
-    });
+    meter.createValueObserver(
+      name,
+      {
+        description: 'sample observer description',
+        valueType: api.ValueType.DOUBLE,
+      },
+      callback
+    );
   metric.clear();
   metric.bind({});
-
-  return (await metric.getMetricRecord())[0];
+  return metric;
 }
 
-export async function mockValueRecorder(): Promise<MetricRecord> {
+export function mockValueRecorder(): metrics.Metric<metrics.BoundValueRecorder> &
+  api.ValueRecorder {
   const name = 'int-recorder';
   const metric =
     meter['_metrics'].get(name) ||
     meter.createValueRecorder(name, {
       description: 'sample recorder description',
-      valueType: ValueType.INT,
+      valueType: api.ValueType.INT,
       boundaries: [0, 100],
     });
   metric.clear();
   metric.bind({});
-
-  return (await metric.getMetricRecord())[0];
+  return metric;
 }
 
 const traceIdHex = '1f1008dc8e270e85c40a0d7c3939b278';
@@ -100,13 +92,13 @@ export const mockedReadableSpan: ReadableSpan = {
   spanContext: {
     traceId: traceIdHex,
     spanId: spanIdHex,
-    traceFlags: TraceFlags.SAMPLED,
+    traceFlags: api.TraceFlags.SAMPLED,
   },
   parentSpanId: parentIdHex,
   startTime: [1574120165, 429803070],
   endTime: [1574120165, 438688070],
   ended: true,
-  status: { code: StatusCode.OK },
+  status: { code: api.StatusCode.OK },
   attributes: { component: 'document-load' },
   links: [
     {
@@ -337,7 +329,9 @@ export function ensureExportedObserverIsCorrect(
 
 export function ensureExportedValueRecorderIsCorrect(
   metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
-  time?: number
+  time?: number,
+  explicitBounds: number[] = [Infinity],
+  bucketCounts: string[] = ['2', '0']
 ) {
   assert.deepStrictEqual(metric, {
     name: 'int-recorder',
@@ -350,8 +344,8 @@ export function ensureExportedValueRecorderIsCorrect(
           count: '2',
           startTimeUnixNano: '1592602232694000128',
           timeUnixNano: time,
-          bucketCounts: ['2', '0'],
-          explicitBounds: ['Infinity'],
+          bucketCounts,
+          explicitBounds,
         },
       ],
       aggregationTemporality: 'AGGREGATION_TEMPORALITY_CUMULATIVE',
@@ -423,4 +417,23 @@ export function ensureExportMetricsServiceRequestIsSet(
 
   const metrics = resourceMetrics[0].instrumentationLibraryMetrics[0].metrics;
   assert.strictEqual(metrics.length, 3, 'Metrics are missing');
+}
+
+export class MockedResponse extends Stream {
+  constructor(private _code: number, private _msg?: string) {
+    super();
+  }
+
+  send(data: string) {
+    this.emit('data', data);
+    this.emit('end');
+  }
+
+  get statusCode() {
+    return this._code;
+  }
+
+  get statusMessage() {
+    return this._msg;
+  }
 }
