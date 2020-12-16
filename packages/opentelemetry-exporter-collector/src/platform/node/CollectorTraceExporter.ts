@@ -15,8 +15,8 @@
  */
 
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
-import { CollectorExporterConfigBase } from '../../types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
+import { CollectorExporterNodeConfigBase } from './types';
 import * as collectorTypes from '../../types';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
 
@@ -38,14 +38,14 @@ export class CollectorTraceExporter
     return toCollectorExportTraceServiceRequest(spans, this, true);
   }
 
-  getDefaultUrl(config: CollectorExporterConfigBase): string {
+  getDefaultUrl(config: CollectorExporterNodeConfigBase): string {
     if (!config.url) {
       return DEFAULT_COLLECTOR_URL;
     }
     return config.url;
   }
 
-  getDefaultServiceName(config: CollectorExporterConfigBase): string {
+  getDefaultServiceName(config: CollectorExporterNodeConfigBase): string {
     return config.serviceName || DEFAULT_SERVICE_NAME;
   }
 }

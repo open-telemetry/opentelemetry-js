@@ -40,7 +40,7 @@ const cpuUsageMetric = meter.createValueObserver('cpu_usage_per_app', {
   description: 'Example of sync value observer used with async batch observer',
 });
 
-meter.createBatchObserver('metric_batch_observer', (observerBatchResult) => {
+meter.createBatchObserver((observerBatchResult) => {
     Promise.all([
       someAsyncMetrics(),
       // simulate waiting

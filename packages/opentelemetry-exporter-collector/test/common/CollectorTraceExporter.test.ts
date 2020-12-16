@@ -31,7 +31,18 @@ class CollectorTraceExporter extends CollectorExporterBase<
 > {
   onInit() {}
   onShutdown() {}
-  send() {}
+  send(
+    items: any[],
+    onSuccess: () => void,
+    onError: (error: collectorTypes.CollectorExporterError) => void
+  ) {
+    const promise = Promise.resolve(null);
+    this._sendingPromises.push(
+      promise.then(() =>
+        this._sendingPromises.splice(this._sendingPromises.indexOf(promise), 1)
+      )
+    );
+  }
   getDefaultUrl(config: CollectorExporterConfig): string {
     return config.url || '';
   }
@@ -187,7 +198,32 @@ describe('CollectorTraceExporter - common', () => {
       });
     });
   });
+  describe('export - concurrency limit', () => {
+    it('should error if too many concurrent exports are queued', done => {
+      const collectorExporterWithConcurrencyLimit = new CollectorTraceExporter({
+        ...collectorExporterConfig,
+        concurrencyLimit: 3,
+      });
+      const spans: ReadableSpan[] = [{ ...mockedReadableSpan }];
+      const callbackSpy = sinon.spy();
+      for (let i = 0; i < 7; i++) {
+        collectorExporterWithConcurrencyLimit.export(spans, callbackSpy);
+      }
 
+      setTimeout(() => {
+        // Expect 4 failures
+        assert.strictEqual(callbackSpy.args.length, 4);
+        callbackSpy.args.forEach(([result]) => {
+          assert.strictEqual(result.code, ExportResultCode.FAILED);
+          assert.strictEqual(
+            result.error!.message,
+            'Concurrent export limit reached'
+          );
+        });
+        done();
+      });
+    });
+  });
   describe('shutdown', () => {
     let onShutdownSpy: any;
     beforeEach(() => {
