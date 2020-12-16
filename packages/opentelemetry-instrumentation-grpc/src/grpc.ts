@@ -158,7 +158,7 @@ export class GrpcInstrumentation extends InstrumentationBase<typeof grpcTypes> {
   }
 
   private _setSpanContext(metadata: grpcTypes.Metadata): void {
-    propagation.inject(metadata, {
+    propagation.inject(context.active(), metadata, {
       set: (metadata, k, v) => metadata.set(k, v as grpcTypes.MetadataValue),
     });
   }
@@ -216,7 +216,7 @@ export class GrpcInstrumentation extends InstrumentationBase<typeof grpcTypes> {
               );
 
               context.with(
-                propagation.extract(call.metadata, {
+                propagation.extract(context.active(), call.metadata, {
                   get: (metadata, key) => metadata.get(key).map(String),
                   keys: metadata => Object.keys(metadata.getMap()),
                 }),
