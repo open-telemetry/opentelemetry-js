@@ -80,6 +80,8 @@ describe('environment', () => {
         OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT: 10,
         OTEL_SPAN_EVENT_COUNT_LIMIT: 20,
         OTEL_SPAN_LINK_COUNT_LIMIT: 30,
+        OTEL_BSP_MAX_BATCH_SIZE: 40,
+        OTEL_BSP_SCHEDULE_DELAY_MILLIS: 50,
       });
       const env = getEnv();
       assert.strictEqual(env.OTEL_NO_PATCH_MODULES, 'a,b,c');
@@ -88,6 +90,8 @@ describe('environment', () => {
       assert.strictEqual(env.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT, 10);
       assert.strictEqual(env.OTEL_SPAN_EVENT_COUNT_LIMIT, 20);
       assert.strictEqual(env.OTEL_SPAN_LINK_COUNT_LIMIT, 30);
+      assert.strictEqual(env.OTEL_BSP_MAX_BATCH_SIZE, 40);
+      assert.strictEqual(env.OTEL_BSP_SCHEDULE_DELAY_MILLIS, 50);
     });
 
     it('should match invalid values to closest valid equivalent', () => {
