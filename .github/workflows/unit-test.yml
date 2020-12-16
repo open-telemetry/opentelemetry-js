@@ -1,0 +1,64 @@
+name: Unit Tests
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  unit-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        container: ["node:8", "node:10", "node:12", "node:14"]
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ matrix.container }}
+    env:
+      NPM_CONFIG_UNSAFE_PERM: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Cache Dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            package-lock.json
+            packages/*/node_modules
+          key: ${{ runner.os }}-${{ matrix.container }}-${{ hashFiles('**/package.json') }}
+      - name: Install Root Dependencies
+        run: npm install --ignore-scripts
+      - name: Boostrap Dependencies
+        run: npx lerna bootstrap --no-ci
+      - name: Unit tests
+        run: npm run test
+      - name: Report Coverage
+        run: npm run codecov
+        if: ${{ matrix.container }} == 'node:12'
+  browser-tests:
+    runs-on: ubuntu-latest
+    container:
+      image: circleci/node:12-browsers
+    env:
+      NPM_CONFIG_UNSAFE_PERM: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Permission Setup
+        run: sudo chmod -R 777 /github /__w
+      - name: Cache Dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            package-lock.json
+            packages/*/node_modules
+          key: ${{ runner.os }}-node:12-${{ hashFiles('**/package.json') }}
+      - name: Install Root Dependencies
+        run: npm install --ignore-scripts
+      - name: Boostrap Dependencies
+        run: npx lerna bootstrap --no-ci
+      - name: Unit tests
+        run: npm run test:browser
+      - name: Report Coverage
+        run: npm run codecov:browser

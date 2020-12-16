@@ -26,7 +26,7 @@ export class InstrumentationNodeModuleDefinition<T>
     public name: string,
     public supportedVersions: string[],
     public patch?: (exports: T) => T,
-    public unpatch?: () => void,
+    public unpatch?: (exports: T) => void,
     files?: InstrumentationModuleFile<T>[]
   ) {
     this.files = files || [];

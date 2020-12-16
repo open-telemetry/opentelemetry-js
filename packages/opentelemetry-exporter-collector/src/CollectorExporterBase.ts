@@ -39,6 +39,7 @@ export abstract class CollectorExporterBase<
   public readonly logger: Logger;
   public readonly hostname: string | undefined;
   public readonly attributes?: Attributes;
+  protected _concurrencyLimit: number;
   protected _isShutdown: boolean = false;
   private _shuttingDownPromise: Promise<void> = Promise.resolve();
   protected _sendingPromises: Promise<unknown>[] = [];
@@ -59,6 +60,11 @@ export abstract class CollectorExporterBase<
 
     this.shutdown = this.shutdown.bind(this);
 
+    this._concurrencyLimit =
+      typeof config.concurrencyLimit === 'number'
+        ? config.concurrencyLimit
+        : Infinity;
+
     // platform dependent
     this.onInit(config);
   }
@@ -73,6 +79,14 @@ export abstract class CollectorExporterBase<
       resultCallback({
         code: ExportResultCode.FAILED,
         error: new Error('Exporter has been shutdown'),
+      });
+      return;
+    }
+
+    if (this._sendingPromises.length >= this._concurrencyLimit) {
+      resultCallback({
+        code: ExportResultCode.FAILED,
+        error: new Error('Concurrent export limit reached'),
       });
       return;
     }

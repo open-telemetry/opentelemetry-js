@@ -108,7 +108,7 @@ Last updated March 2020
 | Metrics             | Beta       | v0.3                 | Beta        |
 | Context             | Beta       | v0.3                 | Beta        |
 | Propagation         | Beta       | v0.3                 | Beta        |
-| Correlation Context | Alpha      | v0.3                 | Development |
+| Baggage             | Alpha      | v0.3                 | Development |
 | OpenTracing Bridge  | N/A        | v0.3                 | Beta        |
 | Resources           | N/A        | v0.3                 | Beta        |
 

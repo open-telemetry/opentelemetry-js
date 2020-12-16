@@ -109,7 +109,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       return;
     }
     const headers: { [key: string]: unknown } = {};
-    api.propagation.inject(headers);
+    api.propagation.inject(api.context.active(), headers);
     Object.keys(headers).forEach(key => {
       xhr.setRequestHeader(key, String(headers[key]));
     });
@@ -168,7 +168,11 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    */
   private _addResourceObserver(xhr: XMLHttpRequest, spanUrl: string) {
     const xhrMem = this._xhrMem.get(xhr);
-    if (!xhrMem || typeof window.PerformanceObserver === 'undefined') {
+    if (
+      !xhrMem ||
+      typeof window.PerformanceObserver === 'undefined' ||
+      typeof window.PerformanceResourceTiming === 'undefined'
+    ) {
       return;
     }
     xhrMem.createdResources = {
