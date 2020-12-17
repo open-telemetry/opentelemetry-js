@@ -74,6 +74,19 @@ describe('BatchSpanProcessor', () => {
       assert.ok(processor instanceof BatchSpanProcessor);
       processor.shutdown();
     });
+
+    it('should read defaults from environment', () => {
+      const envStub = sinon.stub(process, 'env').value({
+        OTEL_BSP_MAX_BATCH_SIZE: 256,
+        OTEL_BSP_SCHEDULE_DELAY_MILLIS: 2500,
+      });
+      const processor = new BatchSpanProcessor(exporter);
+      assert.ok(processor instanceof BatchSpanProcessor);
+      assert.strictEqual(processor['_bufferSize'], 256);
+      assert.strictEqual(processor['_bufferTimeout'], 2500);
+      processor.shutdown();
+      envStub.restore();
+    });
   });
 
   describe('.onStart/.onEnd/.shutdown', () => {
