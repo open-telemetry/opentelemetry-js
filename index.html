@@ -281,7 +281,7 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="classes/noopbaseobservermetric.html" class="tsd-kind-icon">Noop<wbr>Base<wbr>Observer<wbr>Metric</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/noopbatchobservermetric.html" class="tsd-kind-icon">Noop<wbr>Batch<wbr>Observer<wbr>Metric</a>
+						<a href="classes/noopbatchobserver.html" class="tsd-kind-icon">Noop<wbr>Batch<wbr>Observer</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/noopboundbaseobserver.html" class="tsd-kind-icon">Noop<wbr>Bound<wbr>Base<wbr>Observer</a>
@@ -338,10 +338,13 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="interfaces/attributes.html" class="tsd-kind-icon">Attributes</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/baggage.html" class="tsd-kind-icon">Baggage</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/baseobserver.html" class="tsd-kind-icon">Base<wbr>Observer</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/batchmetricoptions.html" class="tsd-kind-icon">Batch<wbr>Metric<wbr>Options</a>
+						<a href="interfaces/batchobserveroptions.html" class="tsd-kind-icon">Batch<wbr>Observer<wbr>Options</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/batchobserverresult.html" class="tsd-kind-icon">Batch<wbr>Observer<wbr>Result</a>
@@ -354,9 +357,6 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/boundvaluerecorder.html" class="tsd-kind-icon">Bound<wbr>Value<wbr>Recorder</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/correlationcontext.html" class="tsd-kind-icon">Correlation<wbr>Context</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/counter.html" class="tsd-kind-icon">Counter</a>
@@ -399,18 +399,6 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/observerresult.html" class="tsd-kind-icon">Observer<wbr>Result</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-has-type-parameter tsd-is-external">
-						<a href="interfaces/plugin.html" class="tsd-kind-icon">Plugin</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/pluginconfig.html" class="tsd-kind-icon">Plugin<wbr>Config</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/plugininternalfiles.html" class="tsd-kind-icon">Plugin<wbr>Internal<wbr>Files</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/plugininternalfilesversion.html" class="tsd-kind-icon">Plugin<wbr>Internal<wbr>Files<wbr>Version</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/sampler.html" class="tsd-kind-icon">Sampler</a>
@@ -464,9 +452,6 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="globals.html#attributevalue" class="tsd-kind-icon">Attribute<wbr>Value</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="globals.html#batchobserver" class="tsd-kind-icon">Batch<wbr>Observer</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
 						<a href="globals.html#exception" class="tsd-kind-icon">Exception</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
@@ -506,6 +491,9 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="globals.html#api_backwards_compatibility_version" class="tsd-kind-icon">API_<wbr>BACKWARDS_<wbr>COMPATIBILITY_<wbr>VERSION</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#baggage_key" class="tsd-kind-icon">BAGGAGE_<wbr>KEY</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#global_context_manager_api_key" class="tsd-kind-icon">GLOBAL_<wbr>CONTEXT_<wbr>MANAGER_<wbr>API_<wbr>KEY</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
@@ -524,7 +512,7 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="globals.html#invalid_traceid" class="tsd-kind-icon">INVALID_<wbr>TRACEID</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_batch_observer_metric" class="tsd-kind-icon">NOOP_<wbr>BATCH_<wbr>OBSERVER_<wbr>METRIC</a>
+						<a href="globals.html#noop_batch_observer" class="tsd-kind-icon">NOOP_<wbr>BATCH_<wbr>OBSERVER</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#noop_bound_base_observer" class="tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>BASE_<wbr>OBSERVER</a>
@@ -596,9 +584,6 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="globals.html#context" class="tsd-kind-icon">context</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#contextapi" class="tsd-kind-icon">context<wbr>Api</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#metrics" class="tsd-kind-icon">metrics</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
@@ -609,6 +594,9 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
 						<a href="globals.html#getactivespan" class="tsd-kind-icon">get<wbr>Active<wbr>Span</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#getbaggage" class="tsd-kind-icon">get<wbr>Baggage</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
 						<a href="globals.html#getparentspancontext" class="tsd-kind-icon">get<wbr>Parent<wbr>Span<wbr>Context</a>
@@ -633,6 +621,9 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
 						<a href="globals.html#setactivespan" class="tsd-kind-icon">set<wbr>Active<wbr>Span</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#setbaggage" class="tsd-kind-icon">set<wbr>Baggage</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
 						<a href="globals.html#setextractedspancontext" class="tsd-kind-icon">set<wbr>Extracted<wbr>Span<wbr>Context</a>

@@ -115,29 +115,23 @@
 					<a name="createbatchobserver" class="tsd-anchor"></a>
 					<h3>create<wbr>Batch<wbr>Observer</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">create<wbr>Batch<wbr>Observer<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>batchObserverResult<span class="tsd-signature-symbol">: </span><a href="batchobserverresult.html" class="tsd-signature-type">BatchObserverResult</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span>, options<span class="tsd-signature-symbol">?: </span><a href="batchmetricoptions.html" class="tsd-signature-type">BatchMetricOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../globals.html#batchobserver" class="tsd-signature-type">BatchObserver</a></li>
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Batch<wbr>Observer<span class="tsd-signature-symbol">(</span>callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>batchObserverResult<span class="tsd-signature-symbol">: </span><a href="batchobserverresult.html" class="tsd-signature-type">BatchObserverResult</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span>, options<span class="tsd-signature-symbol">?: </span><a href="batchobserveroptions.html" class="tsd-signature-type">BatchObserverOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/metrics/Meter.ts#L117">src/metrics/Meter.ts:117</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/27a8d45/packages/opentelemetry-api/src/metrics/Meter.ts#L115">src/metrics/Meter.ts:115</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Creates a new <code>BatchObserver</code> metric, can be used to update many metrics
+									<p>Creates a new <code>BatchObserver</code>, can be used to update many metrics
 									at the same time and when operations needs to be async</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
-								<li>
-									<h5>name: <span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>the name of the metric.</p>
-									</div>
-								</li>
 								<li>
 									<h5>callback: <span class="tsd-signature-symbol">(</span>batchObserverResult<span class="tsd-signature-symbol">: </span><a href="batchobserverresult.html" class="tsd-signature-type">BatchObserverResult</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></h5>
 									<div class="tsd-comment tsd-typography">
@@ -163,10 +157,10 @@
 									</ul>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="batchmetricoptions.html" class="tsd-signature-type">BatchMetricOptions</a></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="batchobserveroptions.html" class="tsd-signature-type">BatchObserverOptions</a></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="../globals.html#batchobserver" class="tsd-signature-type">BatchObserver</a></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -180,7 +174,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/metrics/Meter.ts#L53">src/metrics/Meter.ts:53</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/27a8d45/packages/opentelemetry-api/src/metrics/Meter.ts#L52">src/metrics/Meter.ts:52</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -216,7 +210,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/metrics/Meter.ts#L92">src/metrics/Meter.ts:92</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/27a8d45/packages/opentelemetry-api/src/metrics/Meter.ts#L91">src/metrics/Meter.ts:91</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -253,7 +247,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/metrics/Meter.ts#L72">src/metrics/Meter.ts:72</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/27a8d45/packages/opentelemetry-api/src/metrics/Meter.ts#L71">src/metrics/Meter.ts:71</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -298,7 +292,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/metrics/Meter.ts#L104">src/metrics/Meter.ts:104</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/27a8d45/packages/opentelemetry-api/src/metrics/Meter.ts#L103">src/metrics/Meter.ts:103</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -335,7 +329,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/metrics/Meter.ts#L80">src/metrics/Meter.ts:80</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/27a8d45/packages/opentelemetry-api/src/metrics/Meter.ts#L79">src/metrics/Meter.ts:79</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -372,7 +366,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/86cbd67/packages/opentelemetry-api/src/metrics/Meter.ts#L44">src/metrics/Meter.ts:44</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/27a8d45/packages/opentelemetry-api/src/metrics/Meter.ts#L43">src/metrics/Meter.ts:43</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
