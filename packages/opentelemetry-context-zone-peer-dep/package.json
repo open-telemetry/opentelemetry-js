@@ -14,7 +14,7 @@
     "version": "node ../../scripts/version-update.js",
     "tdd": "karma start",
     "test:browser": "nyc karma start --single-run",
-    "watch": "tsc -w"
+    "watch": "tsc --build --watch"
   },
   "keywords": [
     "opentelemetry",

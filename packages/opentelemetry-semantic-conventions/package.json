@@ -13,7 +13,7 @@
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "version": "node ../../scripts/version-update.js",
-    "watch": "tsc -w"
+    "watch": "tsc --build --watch"
   },
   "keywords": [
     "opentelemetry",

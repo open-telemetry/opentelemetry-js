@@ -22,7 +22,7 @@
     "version": "node ../../scripts/version-update.js",
     "docs-test": "linkinator docs/out --silent --skip david-dm.org",
     "docs": "typedoc --tsconfig tsconfig.docs.json",
-    "watch": "tsc -w"
+    "watch": "tsc --build --watch"
   },
   "keywords": [
     "opentelemetry",

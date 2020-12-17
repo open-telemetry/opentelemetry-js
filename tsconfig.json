@@ -108,6 +108,9 @@
       "path": "packages/opentelemetry-web"
     },
     {
+      "path": "packages/template"
+    },
+    {
       "path": "integration-tests/propagation-validation-server"
     }
   ]

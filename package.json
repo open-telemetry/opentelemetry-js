@@ -6,6 +6,7 @@
   "types": "build/src/index.d.ts",
   "scripts": {
     "compile": "tsc --build",
+    "watch": "tsc --build --watch",
     "clean": "tsc --build --clean",
     "bench": "node benchmark",
     "postinstall": "update-ts-references && npm run bootstrap",

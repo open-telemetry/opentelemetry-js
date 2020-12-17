@@ -13,7 +13,7 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../scripts/version-update.js",
-    "watch": "tsc -w"
+    "watch": "tsc --build --watch"
   },
   "keywords": [
     "opentelemetry",

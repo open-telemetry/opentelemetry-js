@@ -39,7 +39,7 @@
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "nyc karma start --single-run",
     "version": "node ../../scripts/version-update.js",
-    "watch": "tsc -w"
+    "watch": "tsc --build --watch"
   },
   "keywords": [
     "opentelemetry",
