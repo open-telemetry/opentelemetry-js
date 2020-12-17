@@ -16,13 +16,13 @@
 
 import {
   Context,
-  TextMapPropagator,
-  SpanContext,
-  TraceFlags,
-  SetterFunction,
-  GetterFunction,
   getParentSpanContext,
   setExtractedSpanContext,
+  SpanContext,
+  TraceFlags,
+  TextMapGetter,
+  TextMapPropagator,
+  TextMapSetter,
 } from '@opentelemetry/api';
 
 export const UBER_TRACE_ID_HEADER = 'uber-trace-id';
@@ -52,7 +52,7 @@ export class JaegerHttpTracePropagator implements TextMapPropagator {
     this._jaegerTraceHeader = customTraceHeader || UBER_TRACE_ID_HEADER;
   }
 
-  inject(context: Context, carrier: unknown, setter: SetterFunction) {
+  inject(context: Context, carrier: unknown, setter: TextMapSetter) {
     const spanContext = getParentSpanContext(context);
     if (!spanContext) return;
 
@@ -60,15 +60,15 @@ export class JaegerHttpTracePropagator implements TextMapPropagator {
       16
     )}`;
 
-    setter(
+    setter.set(
       carrier,
       this._jaegerTraceHeader,
       `${spanContext.traceId}:${spanContext.spanId}:0:${traceFlags}`
     );
   }
 
-  extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
-    const uberTraceIdHeader = getter(carrier, this._jaegerTraceHeader);
+  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
+    const uberTraceIdHeader = getter.get(carrier, this._jaegerTraceHeader);
     const uberTraceId = Array.isArray(uberTraceIdHeader)
       ? uberTraceIdHeader[0]
       : uberTraceIdHeader;
