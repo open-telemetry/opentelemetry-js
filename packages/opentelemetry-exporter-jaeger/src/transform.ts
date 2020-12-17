@@ -55,9 +55,9 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
   if (span.status.message) {
     tags.push({ key: 'status.message', value: span.status.message });
   }
-  // Ensure that if Status.Code is not OK, that we set the "error" tag on the
+  // Ensure that if Status.Code is ERROR, that we set the "error" tag on the
   // Jaeger span.
-  if (span.status.code !== StatusCode.OK) {
+  if (span.status.code === StatusCode.ERROR) {
     tags.push({ key: 'error', value: true });
   }
 
