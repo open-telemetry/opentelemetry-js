@@ -21,15 +21,13 @@ import {
   suppressInstrumentation,
   TraceFlags,
 } from '@opentelemetry/api';
-import {
-  NoopSpan,
-  NOOP_SPAN,
-} from '@opentelemetry/api/build/src/trace/NoopSpan';
+import { NoopSpan } from '@opentelemetry/api/build/src/trace/NoopSpan';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,
   InstrumentationLibrary,
   NoopLogger,
+  NoRecordingSpan,
 } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { BasicTracerProvider, Span, Tracer } from '../src';
@@ -81,7 +79,8 @@ describe('Tracer', () => {
       tracerProvider
     );
     const span = tracer.startSpan('span1');
-    assert.ok(span instanceof NoopSpan);
+    console.log(span);
+    assert.ok(span instanceof NoRecordingSpan);
     span.end();
   });
 
@@ -123,7 +122,7 @@ describe('Tracer', () => {
   describe('when suppressInstrumentation true', () => {
     const context = suppressInstrumentation(ROOT_CONTEXT);
 
-    it('should return cached no-op span ', done => {
+    it('should return no-recording span ', done => {
       const tracer = new Tracer(
         { name: 'default', version: '0.0.1' },
         { sampler: new TestSampler() },
@@ -132,7 +131,7 @@ describe('Tracer', () => {
 
       const span = tracer.startSpan('span3', undefined, context);
 
-      assert.equal(span, NOOP_SPAN);
+      assert.ok(span instanceof NoRecordingSpan);
       span.end();
 
       done();
