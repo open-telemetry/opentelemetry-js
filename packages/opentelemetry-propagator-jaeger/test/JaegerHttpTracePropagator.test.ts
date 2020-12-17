@@ -15,12 +15,13 @@
  */
 
 import {
-  defaultGetter,
-  defaultSetter,
+  defaultTextMapGetter,
+  defaultTextMapSetter,
   getParentSpanContext,
   ROOT_CONTEXT,
   setExtractedSpanContext,
   SpanContext,
+  TextMapGetter,
   TraceFlags,
 } from '@opentelemetry/api';
 import * as assert from 'assert';
@@ -52,7 +53,7 @@ describe('JaegerHttpTracePropagator', () => {
       jaegerHttpTracePropagator.inject(
         setExtractedSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
-        defaultSetter
+        defaultTextMapSetter
       );
       assert.deepStrictEqual(
         carrier[UBER_TRACE_ID_HEADER],
@@ -70,7 +71,7 @@ describe('JaegerHttpTracePropagator', () => {
       customJaegerHttpTracePropagator.inject(
         setExtractedSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
-        defaultSetter
+        defaultTextMapSetter
       );
       assert.deepStrictEqual(
         carrier[customHeader],
@@ -84,7 +85,11 @@ describe('JaegerHttpTracePropagator', () => {
       carrier[UBER_TRACE_ID_HEADER] =
         'd4cda95b652f4a1592b449d5929fda1b:6e0c63257de34c92:0:01';
       const extractedSpanContext = getParentSpanContext(
-        jaegerHttpTracePropagator.extract(ROOT_CONTEXT, carrier, defaultGetter)
+        jaegerHttpTracePropagator.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        )
       );
 
       assert.deepStrictEqual(extractedSpanContext, {
@@ -99,7 +104,11 @@ describe('JaegerHttpTracePropagator', () => {
       carrier[UBER_TRACE_ID_HEADER] =
         '9c41e35aeb6d1272:45fd2a9709dadcf1:a13699e3fb724f40:1';
       const extractedSpanContext = getParentSpanContext(
-        jaegerHttpTracePropagator.extract(ROOT_CONTEXT, carrier, defaultGetter)
+        jaegerHttpTracePropagator.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        )
       );
 
       assert.deepStrictEqual(extractedSpanContext, {
@@ -114,7 +123,11 @@ describe('JaegerHttpTracePropagator', () => {
       carrier[UBER_TRACE_ID_HEADER] =
         'ac1f3dc3c2c0b06e%3A5ac292c4a11a163e%3Ac086aaa825821068%3A1';
       const extractedSpanContext = getParentSpanContext(
-        jaegerHttpTracePropagator.extract(ROOT_CONTEXT, carrier, defaultGetter)
+        jaegerHttpTracePropagator.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        )
       );
 
       assert.deepStrictEqual(extractedSpanContext, {
@@ -132,7 +145,7 @@ describe('JaegerHttpTracePropagator', () => {
         customJaegerHttpTracePropagator.extract(
           ROOT_CONTEXT,
           carrier,
-          defaultGetter
+          defaultTextMapGetter
         )
       );
 
@@ -150,7 +163,7 @@ describe('JaegerHttpTracePropagator', () => {
           jaegerHttpTracePropagator.extract(
             ROOT_CONTEXT,
             carrier,
-            defaultGetter
+            defaultTextMapGetter
           )
         ),
         undefined
@@ -164,7 +177,7 @@ describe('JaegerHttpTracePropagator', () => {
           jaegerHttpTracePropagator.extract(
             ROOT_CONTEXT,
             carrier,
-            defaultGetter
+            defaultTextMapGetter
           )
         ),
         undefined
@@ -189,17 +202,17 @@ describe('JaegerHttpTracePropagator', () => {
     const ctx1 = jaegerHttpTracePropagator.extract(
       ROOT_CONTEXT,
       carrier,
-      (c, k) => 1 // not a number
+      makeGetter(1) // not a number
     );
     const ctx2 = jaegerHttpTracePropagator.extract(
       ROOT_CONTEXT,
       carrier,
-      (c, k) => [] // empty array
+      makeGetter([]) // empty array
     );
     const ctx3 = jaegerHttpTracePropagator.extract(
       ROOT_CONTEXT,
       carrier,
-      (c, k) => undefined // missing value
+      makeGetter(undefined) // missing value
     );
 
     assert.ok(ctx1 === ROOT_CONTEXT);
@@ -207,3 +220,18 @@ describe('JaegerHttpTracePropagator', () => {
     assert.ok(ctx3 === ROOT_CONTEXT);
   });
 });
+
+function makeGetter(value: any) {
+  const getter: TextMapGetter = {
+    get(carrier, key) {
+      return value;
+    },
+    keys(carrier) {
+      if (carrier == null) {
+        return [];
+      }
+      return Object.keys(carrier);
+    },
+  };
+  return getter;
+}
