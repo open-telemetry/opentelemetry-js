@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation-xml-http-request",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "OpenTelemetry XMLHttpRequest automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -45,9 +45,9 @@
   },
   "devDependencies": {
     "@babel/core": "7.12.10",
-    "@opentelemetry/context-zone": "^0.13.0",
-    "@opentelemetry/propagator-b3": "^0.13.0",
-    "@opentelemetry/tracing": "^0.13.0",
+    "@opentelemetry/context-zone": "^0.14.0",
+    "@opentelemetry/propagator-b3": "^0.14.0",
+    "@opentelemetry/tracing": "^0.14.0",
     "@types/mocha": "8.2.0",
     "@types/node": "14.14.12",
     "@types/sinon": "9.0.9",
@@ -75,10 +75,10 @@
     "webpack-merge": "5.6.1"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.13.0",
-    "@opentelemetry/core": "^0.13.0",
-    "@opentelemetry/instrumentation": "^0.13.0",
-    "@opentelemetry/semantic-conventions": "^0.13.0",
-    "@opentelemetry/web": "^0.13.0"
+    "@opentelemetry/api": "^0.14.0",
+    "@opentelemetry/core": "^0.14.0",
+    "@opentelemetry/instrumentation": "^0.14.0",
+    "@opentelemetry/semantic-conventions": "^0.14.0",
+    "@opentelemetry/web": "^0.14.0"
   }
 }
