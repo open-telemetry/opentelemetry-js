@@ -19,6 +19,7 @@ import {
   TraceFlags,
   setActiveSpan,
   setExtractedSpanContext,
+  getActiveSpan,
 } from '@opentelemetry/api';
 import {
   AlwaysOnSampler,
@@ -207,49 +208,27 @@ describe('NodeTracerProvider', () => {
     });
   });
 
-  describe('.getCurrentSpan()', () => {
-    it('should return undefined with AsyncHooksContextManager when no span started', () => {
-      provider = new NodeTracerProvider({});
-      assert.deepStrictEqual(
-        provider.getTracer('default').getCurrentSpan(),
-        undefined
-      );
-    });
-  });
-
   describe('.withSpan()', () => {
     it('should run context with AsyncHooksContextManager context manager', done => {
       provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');
-      provider.getTracer('default').withSpan(span, () => {
-        assert.deepStrictEqual(
-          provider.getTracer('default').getCurrentSpan(),
-          span
-        );
+      context.with(setActiveSpan(context.active(), span), () => {
+        assert.deepStrictEqual(getActiveSpan(context.active()), span);
         return done();
       });
-      assert.deepStrictEqual(
-        provider.getTracer('default').getCurrentSpan(),
-        undefined
-      );
+      assert.deepStrictEqual(getActiveSpan(context.active()), undefined);
     });
 
     it('should run context with AsyncHooksContextManager context manager with multiple spans', done => {
       provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');
-      provider.getTracer('default').withSpan(span, () => {
-        assert.deepStrictEqual(
-          provider.getTracer('default').getCurrentSpan(),
-          span
-        );
+      context.with(setActiveSpan(context.active(), span), () => {
+        assert.deepStrictEqual(getActiveSpan(context.active()), span);
 
         const span1 = provider.getTracer('default').startSpan('my-span1');
 
-        provider.getTracer('default').withSpan(span1, () => {
-          assert.deepStrictEqual(
-            provider.getTracer('default').getCurrentSpan(),
-            span1
-          );
+        context.with(setActiveSpan(context.active(), span1), () => {
+          assert.deepStrictEqual(getActiveSpan(context.active()), span1);
           assert.deepStrictEqual(
             span1.context().traceId,
             span.context().traceId
@@ -259,29 +238,20 @@ describe('NodeTracerProvider', () => {
       });
       // when span ended.
       // @todo: below check is not running.
-      assert.deepStrictEqual(
-        provider.getTracer('default').getCurrentSpan(),
-        undefined
-      );
+      assert.deepStrictEqual(getActiveSpan(context.active()), undefined);
     });
 
     it('should find correct context with promises', async () => {
       provider = new NodeTracerProvider();
       const span = provider.getTracer('default').startSpan('my-span');
-      await provider.getTracer('default').withSpan(span, async () => {
+      await context.with(setActiveSpan(context.active(), span), async () => {
         for (let i = 0; i < 3; i++) {
           await sleep(5).then(() => {
-            assert.deepStrictEqual(
-              provider.getTracer('default').getCurrentSpan(),
-              span
-            );
+            assert.deepStrictEqual(getActiveSpan(context.active()), span);
           });
         }
       });
-      assert.deepStrictEqual(
-        provider.getTracer('default').getCurrentSpan(),
-        undefined
-      );
+      assert.deepStrictEqual(getActiveSpan(context.active()), undefined);
     });
   });
 
@@ -290,10 +260,7 @@ describe('NodeTracerProvider', () => {
       const provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');
       const fn = () => {
-        assert.deepStrictEqual(
-          provider.getTracer('default').getCurrentSpan(),
-          span
-        );
+        assert.deepStrictEqual(getActiveSpan(context.active()), span);
         return done();
       };
       const patchedFn = context.bind(fn, setActiveSpan(context.active(), span));

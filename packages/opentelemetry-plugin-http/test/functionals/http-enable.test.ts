@@ -20,6 +20,7 @@ import {
   Span as ISpan,
   SpanKind,
   getActiveSpan,
+  setActiveSpan,
 } from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
@@ -338,7 +339,7 @@ describe('HttpPlugin', () => {
         doNock(hostname, testPath, 200, 'Ok');
         const name = 'TestRootSpan';
         const span = provider.getTracer('default').startSpan(name);
-        return provider.getTracer('default').withSpan(span, async () => {
+        return context.with(setActiveSpan(context.active(), span), async () => {
           const result = await httpRequest.get(
             `${protocol}://${hostname}${testPath}`
           );
@@ -381,36 +382,39 @@ describe('HttpPlugin', () => {
           );
           const name = 'TestRootSpan';
           const span = provider.getTracer('default').startSpan(name);
-          return provider.getTracer('default').withSpan(span, async () => {
-            const result = await httpRequest.get(
-              `${protocol}://${hostname}${testPath}`
-            );
-            span.end();
-            const spans = memoryExporter.getFinishedSpans();
-            const [reqSpan, localSpan] = spans;
-            const validations = {
-              hostname,
-              httpStatusCode: result.statusCode!,
-              httpMethod: 'GET',
-              pathname: testPath,
-              resHeaders: result.resHeaders,
-              reqHeaders: result.reqHeaders,
-              component: plugin.component,
-            };
+          return context.with(
+            setActiveSpan(context.active(), span),
+            async () => {
+              const result = await httpRequest.get(
+                `${protocol}://${hostname}${testPath}`
+              );
+              span.end();
+              const spans = memoryExporter.getFinishedSpans();
+              const [reqSpan, localSpan] = spans;
+              const validations = {
+                hostname,
+                httpStatusCode: result.statusCode!,
+                httpMethod: 'GET',
+                pathname: testPath,
+                resHeaders: result.resHeaders,
+                reqHeaders: result.reqHeaders,
+                component: plugin.component,
+              };
 
-            assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
-            assert.strictEqual(spans.length, 2);
-            assert.strictEqual(reqSpan.name, 'HTTP GET');
-            assert.strictEqual(
-              localSpan.spanContext.traceId,
-              reqSpan.spanContext.traceId
-            );
-            assertSpan(reqSpan, SpanKind.CLIENT, validations);
-            assert.notStrictEqual(
-              localSpan.spanContext.spanId,
-              reqSpan.spanContext.spanId
-            );
-          });
+              assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
+              assert.strictEqual(spans.length, 2);
+              assert.strictEqual(reqSpan.name, 'HTTP GET');
+              assert.strictEqual(
+                localSpan.spanContext.traceId,
+                reqSpan.spanContext.traceId
+              );
+              assertSpan(reqSpan, SpanKind.CLIENT, validations);
+              assert.notStrictEqual(
+                localSpan.spanContext.spanId,
+                reqSpan.spanContext.spanId
+              );
+            }
+          );
         });
       }
 
@@ -420,7 +424,7 @@ describe('HttpPlugin', () => {
         doNock(hostname, testPath, 200, 'Ok', num);
         const name = 'TestRootSpan';
         const span = provider.getTracer('default').startSpan(name);
-        await provider.getTracer('default').withSpan(span, async () => {
+        await context.with(setActiveSpan(context.active(), span), async () => {
           for (let i = 0; i < num; i++) {
             await httpRequest.get(`${protocol}://${hostname}${testPath}`);
             const spans = memoryExporter.getFinishedSpans();
@@ -810,7 +814,7 @@ describe('HttpPlugin', () => {
         const span = tracer.startSpan('parentSpan', {
           kind: SpanKind.INTERNAL,
         });
-        tracer.withSpan(span, () => {
+        context.with(setActiveSpan(context.active(), span), () => {
           httpRequest
             .get(`${protocol}://${hostname}:${serverPort}${testPath}`)
             .then(result => {

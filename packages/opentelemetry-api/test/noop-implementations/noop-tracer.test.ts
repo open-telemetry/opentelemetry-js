@@ -40,24 +40,6 @@ describe('NoopTracer', () => {
       }),
       NOOP_SPAN
     );
-
-    assert.deepStrictEqual(tracer.getCurrentSpan(), NOOP_SPAN);
-  });
-
-  it('should not crash when .withSpan()', done => {
-    const tracer = new NoopTracer();
-    tracer.withSpan(NOOP_SPAN, () => {
-      return done();
-    });
-  });
-
-  it('should not crash when .bind()', done => {
-    const tracer = new NoopTracer();
-    const fn = () => {
-      return done();
-    };
-    const patchedFn = tracer.bind(fn, NOOP_SPAN);
-    return patchedFn();
   });
 
   it('should propagate valid spanContext on the span (from context)', () => {

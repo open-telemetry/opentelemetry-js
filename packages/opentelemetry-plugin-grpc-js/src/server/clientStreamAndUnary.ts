@@ -61,6 +61,6 @@ export function clientStreamAndUnaryHandler<RequestType, ResponseType>(
     return callback(err, value);
   };
 
-  plugin.tracer.bind(call);
+  context.bind(call);
   return (original as Function).call({}, call, patchedCallback);
 }

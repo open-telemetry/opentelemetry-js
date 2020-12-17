@@ -19,6 +19,7 @@ npm install --save @opentelemetry/context-zone
 ## Usage
 
 ```js
+import { context } from '@opentelemetry/api';
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
@@ -32,12 +33,13 @@ provider.register({
 // Example how the ZoneContextManager keeps the reference to the correct context during async operations
 const webTracerWithZone = providerWithZone.getTracer('default');
 const span1 = webTracerWithZone.startSpan('foo1');
-webTracerWithZone.withSpan(span1, () => {
+
+context.with(setActiveSpan(context.active(), span1), () => {
   console.log('Current span is span1', webTracerWithZone.getCurrentSpan() === span1);
   setTimeout(() => {
     const span2 = webTracerWithZone.startSpan('foo2');
     console.log('Current span is span1', webTracerWithZone.getCurrentSpan() === span1);
-    webTracerWithZone.withSpan(span2, () => {
+    context.with(setActiveSpan(context.active(), span2), () => {
       console.log('Current span is span2', webTracerWithZone.getCurrentSpan() === span2);
       setTimeout(() => {
         console.log('Current span is span2', webTracerWithZone.getCurrentSpan() === span2);

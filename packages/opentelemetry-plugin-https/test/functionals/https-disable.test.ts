@@ -64,7 +64,6 @@ describe('HttpsPlugin', () => {
 
     beforeEach(() => {
       tracer.startSpan = sinon.spy();
-      tracer.withSpan = sinon.spy();
     });
 
     afterEach(() => {
@@ -88,7 +87,6 @@ describe('HttpsPlugin', () => {
           );
 
           assert.strictEqual(https.Server.prototype.emit.__wrapped, undefined);
-          assert.strictEqual((tracer.withSpan as sinon.SinonSpy).called, false);
         });
       });
     });
