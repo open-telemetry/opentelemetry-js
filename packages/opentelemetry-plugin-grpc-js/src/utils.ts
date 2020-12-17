@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { StatusCode, Status } from '@opentelemetry/api';
+import { SpanStatusCode, Status } from '@opentelemetry/api';
 import type * as grpcTypes from '@grpc/grpc-js'; // For types only
 import { IgnoreMatcher } from './types';
 
@@ -29,21 +29,21 @@ export const CALL_SPAN_ENDED = Symbol('opentelemetry call span ended');
  * Convert a grpc status code to an opentelemetry Status code.
  * @param status
  */
-export const grpcStatusCodeToOpenTelemetryStatusCode = (
+export const grpcSpanStatusCodeToOpenTelemetrySpanStatusCode = (
   status?: grpcTypes.status
-): StatusCode => {
+): SpanStatusCode => {
   if (status !== undefined && status === 0) {
-    return StatusCode.OK;
+    return SpanStatusCode.OK;
   }
-  return StatusCode.ERROR;
+  return SpanStatusCode.ERROR;
 };
 
 /**
  * Convert grpc status code to an opentelemetry Status object.
  * @param status
  */
-export const grpcStatusCodeToSpanStatus = (status: number): Status => {
-  return { code: grpcStatusCodeToOpenTelemetryStatusCode(status) };
+export const grpcSpanStatusCodeToSpanStatus = (status: number): Status => {
+  return { code: grpcSpanStatusCodeToOpenTelemetrySpanStatusCode(status) };
 };
 
 /**

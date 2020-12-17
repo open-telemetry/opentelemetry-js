@@ -24,8 +24,14 @@ import {
   CompositePropagator,
   HttpBaggage,
 } from '@opentelemetry/core';
-import { INVALID_SPAN_CONTEXT, propagation } from '@opentelemetry/api';
+import { propagation } from '@opentelemetry/api';
 import { performance } from 'perf_hooks';
+
+const INVALID_SPAN_CONTEXT = {
+  traceId: '00000000000000000000000000000000',
+  spanId: '0000000000000000',
+  traceFlags: 0,
+};
 
 describe('OpenTracing Shim', () => {
   const provider = new BasicTracerProvider();

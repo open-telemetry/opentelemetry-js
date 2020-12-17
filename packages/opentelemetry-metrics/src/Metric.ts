@@ -25,7 +25,7 @@ import { InstrumentationLibrary } from '@opentelemetry/core';
 export abstract class Metric<T extends BaseBoundInstrument>
   implements api.UnboundMetric<T> {
   protected readonly _disabled: boolean;
-  protected readonly _valueType: api.ValueType;
+  protected readonly _valueType: api.MetricValueType;
   protected readonly _logger: api.Logger;
   protected readonly _descriptor: MetricDescriptor;
   protected readonly _boundaries: number[] | undefined;
@@ -42,7 +42,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
     this._valueType =
       typeof _options.valueType === 'number'
         ? _options.valueType
-        : api.ValueType.DOUBLE;
+        : api.MetricValueType.DOUBLE;
     this._logger = _options.logger ?? new NoopLogger();
     this._boundaries = _options.boundaries;
     this._descriptor = this._getMetricDescriptor();

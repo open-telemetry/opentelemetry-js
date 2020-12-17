@@ -49,7 +49,7 @@ export function mockCounter(): metrics.Metric<metrics.BoundCounter> &
     meter['_metrics'].get(name) ||
     meter.createCounter(name, {
       description: 'sample counter description',
-      valueType: api.ValueType.INT,
+      valueType: api.MetricValueType.INT,
     });
   metric.clear();
   metric.bind({});
@@ -63,7 +63,7 @@ export function mockDoubleCounter(): metrics.Metric<metrics.BoundCounter> &
     meter['_metrics'].get(name) ||
     meter.createCounter(name, {
       description: 'sample counter description',
-      valueType: api.ValueType.DOUBLE,
+      valueType: api.MetricValueType.DOUBLE,
     });
   metric.clear();
   metric.bind({});
@@ -80,7 +80,7 @@ export function mockObserver(
       name,
       {
         description: 'sample observer description',
-        valueType: api.ValueType.DOUBLE,
+        valueType: api.MetricValueType.DOUBLE,
       },
       callback
     );
@@ -99,7 +99,7 @@ export function mockSumObserver(
       name,
       {
         description: 'sample sum observer description',
-        valueType: api.ValueType.DOUBLE,
+        valueType: api.MetricValueType.DOUBLE,
       },
       callback
     );
@@ -118,7 +118,7 @@ export function mockUpDownSumObserver(
       name,
       {
         description: 'sample up down sum observer description',
-        valueType: api.ValueType.DOUBLE,
+        valueType: api.MetricValueType.DOUBLE,
       },
       callback
     );
@@ -134,7 +134,7 @@ export function mockValueRecorder(): metrics.Metric<metrics.BoundValueRecorder> 
     meter['_metrics'].get(name) ||
     meter.createValueRecorder(name, {
       description: 'sample recorder description',
-      valueType: api.ValueType.INT,
+      valueType: api.MetricValueType.INT,
       boundaries: [0, 100],
     });
   metric.clear();
@@ -158,7 +158,7 @@ export const mockedReadableSpan: ReadableSpan = {
   startTime: [1574120165, 429803070],
   endTime: [1574120165, 438688070],
   ended: true,
-  status: { code: api.StatusCode.OK },
+  status: { code: api.SpanStatusCode.OK },
   attributes: { component: 'document-load' },
   links: [
     {
@@ -229,7 +229,7 @@ export const basicTrace: ReadableSpan[] = [
     startTime: [1574120165, 429803070],
     endTime: [1574120165, 438688070],
     ended: true,
-    status: { code: api.StatusCode.OK },
+    status: { code: api.SpanStatusCode.OK },
     attributes: {},
     links: [],
     events: [],
@@ -249,7 +249,7 @@ export const basicTrace: ReadableSpan[] = [
     startTime: [1575120165, 439803070],
     endTime: [1575120165, 448688070],
     ended: true,
-    status: { code: api.StatusCode.OK },
+    status: { code: api.SpanStatusCode.OK },
     attributes: {},
     links: [],
     events: [],
@@ -269,7 +269,7 @@ export const basicTrace: ReadableSpan[] = [
     startTime: [1575120165, 439803070],
     endTime: [1575120165, 448688070],
     ended: true,
-    status: { code: api.StatusCode.OK },
+    status: { code: api.SpanStatusCode.OK },
     attributes: {},
     links: [],
     events: [],

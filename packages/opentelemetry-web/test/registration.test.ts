@@ -14,13 +14,9 @@
  * limitations under the License.
  */
 
-import {
-  context,
-  NoopTextMapPropagator,
-  propagation,
-  trace,
-  ProxyTracerProvider,
-} from '@opentelemetry/api';
+import { context, propagation, trace } from '@opentelemetry/api';
+import { NoopTextMapPropagator } from '@opentelemetry/api/build/src/context/propagation/NoopTextMapPropagator';
+import { ProxyTracerProvider } from '@opentelemetry/api/build/src/trace/ProxyTracerProvider';
 import { NoopContextManager } from '@opentelemetry/context-base';
 import { CompositePropagator } from '@opentelemetry/core';
 import * as assert from 'assert';

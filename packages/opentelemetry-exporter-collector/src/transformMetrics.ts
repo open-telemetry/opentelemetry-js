@@ -148,7 +148,7 @@ export function toCollectorMetric(
         metric.descriptor.metricKind === MetricKind.SUM_OBSERVER,
       aggregationTemporality: toAggregationTemporality(metric),
     };
-    if (metric.descriptor.valueType === api.ValueType.INT) {
+    if (metric.descriptor.valueType === api.MetricValueType.INT) {
       metricCollector.intSum = result;
     } else {
       metricCollector.doubleSum = result;
@@ -157,7 +157,7 @@ export function toCollectorMetric(
     const result = {
       dataPoints: [toDataPoint(metric, startTime)],
     };
-    if (metric.descriptor.valueType === api.ValueType.INT) {
+    if (metric.descriptor.valueType === api.MetricValueType.INT) {
       metricCollector.intGauge = result;
     } else {
       metricCollector.doubleGauge = result;
@@ -167,7 +167,7 @@ export function toCollectorMetric(
       dataPoints: [toHistogramPoint(metric, startTime)],
       aggregationTemporality: toAggregationTemporality(metric),
     };
-    if (metric.descriptor.valueType === api.ValueType.INT) {
+    if (metric.descriptor.valueType === api.MetricValueType.INT) {
       metricCollector.intHistogram = result;
     } else {
       metricCollector.doubleHistogram = result;

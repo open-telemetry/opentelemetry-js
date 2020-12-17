@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ValueType, HrTime, Labels } from '@opentelemetry/api';
+import { MetricValueType, HrTime, Labels } from '@opentelemetry/api';
 import { ExportResult, InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 
@@ -84,7 +84,7 @@ export interface MetricDescriptor {
   readonly description: string;
   readonly unit: string;
   readonly metricKind: MetricKind;
-  readonly valueType: ValueType;
+  readonly valueType: MetricValueType;
   readonly boundaries?: number[];
 }
 

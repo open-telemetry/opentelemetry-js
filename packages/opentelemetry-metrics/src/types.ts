@@ -51,5 +51,5 @@ export const DEFAULT_METRIC_OPTIONS = {
   disabled: false,
   description: '',
   unit: '1',
-  valueType: api.ValueType.DOUBLE,
+  valueType: api.MetricValueType.DOUBLE,
 };

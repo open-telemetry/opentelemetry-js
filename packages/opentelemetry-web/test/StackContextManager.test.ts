@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { createContextKey, ROOT_CONTEXT } from '@opentelemetry/api';
+import { context, ROOT_CONTEXT } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { StackContextManager } from '../src';
 
 describe('StackContextManager', () => {
   let contextManager: StackContextManager;
-  const key1 = createContextKey('test key 1');
+  const key1 = context.createKey('test key 1');
 
   beforeEach(() => {
     contextManager = new StackContextManager();

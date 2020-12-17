@@ -53,7 +53,7 @@ export interface MetricOptions {
    * Indicates the type of the recorded value.
    * @default {@link ValueType.DOUBLE}
    */
-  valueType?: ValueType;
+  valueType?: MetricValueType;
 
   /**
    * User provided logger.
@@ -79,7 +79,7 @@ export interface BatchObserverOptions {
 }
 
 /** The Type of value. It describes how the data is reported. */
-export enum ValueType {
+export enum MetricValueType {
   INT,
   DOUBLE,
 }

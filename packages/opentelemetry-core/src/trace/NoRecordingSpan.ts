@@ -15,25 +15,57 @@
  */
 
 import {
+  Attributes,
+  AttributeValue,
+  Exception,
+  HrTime,
+  Span,
   SpanContext,
-  NoopSpan,
-  INVALID_SPAN_CONTEXT,
+  Status,
+  TimeInput,
 } from '@opentelemetry/api';
 
 /**
- * The NoRecordingSpan extends the {@link NoopSpan}, making all operations no-op
- * except context propagation.
+ * The NoRecordingSpan provides context propagation only
  */
-export class NoRecordingSpan extends NoopSpan {
+export class NoRecordingSpan implements Span {
   private readonly _context: SpanContext;
 
   constructor(spanContext: SpanContext) {
-    super(spanContext);
-    this._context = spanContext || INVALID_SPAN_CONTEXT;
+    this._context = spanContext || {
+      traceId: '00000000000000000000000000000000',
+      spanId: '0000000000000000',
+      traceFlags: 0,
+    };
   }
 
   // Returns a SpanContext.
   context(): SpanContext {
     return this._context;
   }
+
+  setAttribute(_key: string, _value?: AttributeValue): this {
+    return this;
+  }
+  setAttributes(_attributes: Attributes): this {
+    return this;
+  }
+  addEvent(
+    _name: string,
+    _attributesOrStartTime?: number | Attributes | HrTime | Date,
+    _startTime?: TimeInput
+  ): this {
+    return this;
+  }
+  setStatus(_status: Status): this {
+    return this;
+  }
+  updateName(_name: string): this {
+    return this;
+  }
+  end(_endTime?: TimeInput): void {}
+  isRecording(): boolean {
+    return false;
+  }
+  recordException(_exception: Exception, _time?: TimeInput): void {}
 }

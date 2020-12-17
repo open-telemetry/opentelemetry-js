@@ -30,7 +30,7 @@ export const assertSpan = (
   span: ReadableSpan,
   kind: SpanKind,
   validations: {
-    httpStatusCode: number;
+    httpSpanStatusCode: number;
     httpMethod: string;
     resHeaders: http.IncomingHttpHeaders;
     hostname: string;
@@ -59,14 +59,14 @@ export const assertSpan = (
   );
   assert.strictEqual(
     span.attributes[HttpAttribute.HTTP_STATUS_CODE],
-    validations.httpStatusCode
+    validations.httpSpanStatusCode
   );
   assert.ok(span.endTime);
   assert.strictEqual(span.links.length, 0);
   assert.strictEqual(span.events.length, 0);
   assert.deepStrictEqual(
     span.status,
-    parseResponseStatus(validations.httpStatusCode)
+    parseResponseStatus(validations.httpSpanStatusCode)
   );
 
   assert.ok(span.endTime, 'must be finished');

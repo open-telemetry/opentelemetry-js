@@ -17,8 +17,6 @@
 import {
   defaultTextMapGetter,
   defaultTextMapSetter,
-  INVALID_SPANID,
-  INVALID_TRACEID,
   getParentSpanContext,
   setExtractedSpanContext,
   SpanContext,
@@ -96,7 +94,7 @@ describe('B3SinglePropagator', () => {
 
     it('no-ops if traceid invalid', () => {
       const spanContext: SpanContext = {
-        traceId: INVALID_TRACEID,
+        traceId: '0',
         spanId: 'e457b5a2e4d86bd1',
         traceFlags: TraceFlags.SAMPLED,
       };
@@ -113,7 +111,7 @@ describe('B3SinglePropagator', () => {
     it('no-ops if spanid invalid', () => {
       const spanContext: SpanContext = {
         traceId: '80f198ee56343ba864fe8b2a57d3eff7',
-        spanId: INVALID_SPANID,
+        spanId: '0',
         traceFlags: TraceFlags.SAMPLED,
       };
 
@@ -265,7 +263,7 @@ describe('B3SinglePropagator', () => {
 
     it('handles invalid traceid', () => {
       carrier = {
-        [B3_CONTEXT_HEADER]: `${INVALID_TRACEID}-e457b5a2e4d86bd1`,
+        [B3_CONTEXT_HEADER]: `${'0'}-e457b5a2e4d86bd1`,
       };
 
       const context = propagator.extract(
@@ -280,7 +278,7 @@ describe('B3SinglePropagator', () => {
 
     it('handles invalid spanid', () => {
       carrier = {
-        [B3_CONTEXT_HEADER]: `80f198ee56343ba864fe8b2a57d3eff7-${INVALID_SPANID}`,
+        [B3_CONTEXT_HEADER]: `80f198ee56343ba864fe8b2a57d3eff7-${'0'}`,
       };
 
       const context = propagator.extract(

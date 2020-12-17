@@ -17,6 +17,7 @@
 import {
   Context,
   ContextManager,
+  createContextKey,
   NoopContextManager,
 } from '@opentelemetry/context-base';
 import {
@@ -108,5 +109,10 @@ export class ContextAPI {
   public disable() {
     this._getContextManager().disable();
     delete _global[GLOBAL_CONTEXT_MANAGER_API_KEY];
+  }
+
+  /** Create a key to store context variables */
+  public createKey(description: string): symbol {
+    return createContextKey(description);
   }
 }

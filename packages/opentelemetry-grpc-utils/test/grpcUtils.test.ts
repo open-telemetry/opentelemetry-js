@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-import {
-  context,
-  NoopTracerProvider,
-  SpanKind,
-  propagation,
-} from '@opentelemetry/api';
+import { context, SpanKind, propagation } from '@opentelemetry/api';
+import { NoopTracerProvider } from '@opentelemetry/api/build/src/trace/NoopTracerProvider';
 import {
   NoopLogger,
   HttpTraceContext,

@@ -14,13 +14,8 @@
  * limitations under the License.
  */
 
-import {
-  context,
-  NoopTextMapPropagator,
-  propagation,
-  trace,
-  ProxyTracerProvider,
-} from '@opentelemetry/api';
+import { context, propagation, trace } from '@opentelemetry/api';
+import { ProxyTracerProvider } from '@opentelemetry/api/build/src/trace/ProxyTracerProvider';
 import {
   AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
@@ -30,6 +25,7 @@ import { CompositePropagator } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { NodeTracerProvider } from '../src';
 import * as semver from 'semver';
+import { NoopTextMapPropagator } from '@opentelemetry/api/build/src/context/propagation/NoopTextMapPropagator';
 
 const DefaultContextManager = semver.gte(process.version, '14.8.0')
   ? AsyncLocalStorageContextManager

@@ -19,7 +19,7 @@ import type { GrpcClientFunc, SendUnaryDataCallback } from '../types';
 import {
   SpanKind,
   Span,
-  StatusCode,
+  SpanStatusCode,
   Status,
   propagation,
   context,
@@ -27,8 +27,8 @@ import {
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import type * as grpcJs from '@grpc/grpc-js';
 import {
-  grpcStatusCodeToSpanStatus,
-  grpcStatusCodeToOpenTelemetryStatusCode,
+  grpcSpanStatusCodeToSpanStatus,
+  grpcSpanStatusCodeToOpenTelemetrySpanStatusCode,
   CALL_SPAN_ENDED,
   methodIsIgnored,
 } from '../utils';
@@ -112,7 +112,7 @@ export function makeGrpcClientRemoteCall(
     ) => {
       if (err) {
         if (err.code) {
-          span.setStatus(grpcStatusCodeToSpanStatus(err.code));
+          span.setStatus(grpcSpanStatusCodeToSpanStatus(err.code));
           span.setAttribute(RpcAttribute.GRPC_STATUS_CODE, err.code.toString());
         }
         span.setAttributes({
@@ -120,10 +120,10 @@ export function makeGrpcClientRemoteCall(
           [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
         });
       } else {
-        span.setStatus({ code: StatusCode.OK });
+        span.setStatus({ code: SpanStatusCode.OK });
         span.setAttribute(
           RpcAttribute.GRPC_STATUS_CODE,
-          StatusCode.OK.toString()
+          SpanStatusCode.OK.toString()
         );
       }
 
@@ -174,7 +174,7 @@ export function makeGrpcClientRemoteCall(
         call[CALL_SPAN_ENDED] = true;
 
         span.setStatus({
-          code: grpcStatusCodeToOpenTelemetryStatusCode(err.code),
+          code: grpcSpanStatusCodeToOpenTelemetrySpanStatusCode(err.code),
           message: err.message,
         });
         span.setAttributes({
@@ -191,7 +191,7 @@ export function makeGrpcClientRemoteCall(
         }
         call[CALL_SPAN_ENDED] = true;
 
-        span.setStatus(grpcStatusCodeToSpanStatus(status.code));
+        span.setStatus(grpcSpanStatusCodeToSpanStatus(status.code));
 
         endSpan();
       });

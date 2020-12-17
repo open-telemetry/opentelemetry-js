@@ -29,7 +29,7 @@ export class BaseBoundInstrument {
     labels: api.Labels,
     logger: api.Logger,
     private readonly _disabled: boolean,
-    private readonly _valueType: api.ValueType,
+    private readonly _valueType: api.MetricValueType,
     private readonly _aggregator: Aggregator
   ) {
     this._labels = labels;
@@ -47,7 +47,10 @@ export class BaseBoundInstrument {
       return;
     }
 
-    if (this._valueType === api.ValueType.INT && !Number.isInteger(value)) {
+    if (
+      this._valueType === api.MetricValueType.INT &&
+      !Number.isInteger(value)
+    ) {
       this._logger.warn(
         `INT value type cannot accept a floating-point value for ${Object.values(
           this._labels
@@ -78,7 +81,7 @@ export class BoundCounter
   constructor(
     labels: api.Labels,
     disabled: boolean,
-    valueType: api.ValueType,
+    valueType: api.MetricValueType,
     logger: api.Logger,
     aggregator: Aggregator
   ) {
@@ -108,7 +111,7 @@ export class BoundUpDownCounter
   constructor(
     labels: api.Labels,
     disabled: boolean,
-    valueType: api.ValueType,
+    valueType: api.MetricValueType,
     logger: api.Logger,
     aggregator: Aggregator
   ) {
@@ -129,7 +132,7 @@ export class BoundValueRecorder
   constructor(
     labels: api.Labels,
     disabled: boolean,
-    valueType: api.ValueType,
+    valueType: api.MetricValueType,
     logger: api.Logger,
     aggregator: Aggregator
   ) {
@@ -150,7 +153,7 @@ export class BoundObserver
   constructor(
     labels: api.Labels,
     disabled: boolean,
-    valueType: api.ValueType,
+    valueType: api.MetricValueType,
     logger: api.Logger,
     aggregator: Aggregator
   ) {

@@ -117,7 +117,7 @@ describe('HttpInstrumentation Integration tests', () => {
       const span = spans[0];
       const validations = {
         hostname: 'google.fr',
-        httpStatusCode: result.statusCode!,
+        httpSpanStatusCode: result.statusCode!,
         httpMethod: 'GET',
         pathname: '/',
         path: '/?query=test',
@@ -143,7 +143,7 @@ describe('HttpInstrumentation Integration tests', () => {
       const span = spans[0];
       const validations = {
         hostname: 'google.fr',
-        httpStatusCode: result.statusCode!,
+        httpSpanStatusCode: result.statusCode!,
         httpMethod: 'GET',
         pathname: '/',
         path: '/?query=test',
@@ -172,7 +172,7 @@ describe('HttpInstrumentation Integration tests', () => {
       const span = spans[0];
       const validations = {
         hostname: 'google.fr',
-        httpStatusCode: result.statusCode!,
+        httpSpanStatusCode: result.statusCode!,
         httpMethod: 'GET',
         pathname: '/',
         path: '/?query=test',
@@ -198,7 +198,7 @@ describe('HttpInstrumentation Integration tests', () => {
       const span = spans[0];
       const validations = {
         hostname: 'google.fr',
-        httpStatusCode: result.statusCode!,
+        httpSpanStatusCode: result.statusCode!,
         httpMethod: 'GET',
         pathname: '/',
         resHeaders: result.resHeaders,
@@ -225,7 +225,7 @@ describe('HttpInstrumentation Integration tests', () => {
       const span = spans[0];
       const validations = {
         hostname: 'google.fr',
-        httpStatusCode: 301,
+        httpSpanStatusCode: 301,
         httpMethod: 'GET',
         pathname: '/',
         resHeaders: result.resHeaders,
@@ -240,7 +240,7 @@ describe('HttpInstrumentation Integration tests', () => {
         assertSpan(span, SpanKind.CLIENT, validations);
       } catch (error) {
         // temporary redirect is also correct
-        validations.httpStatusCode = 307;
+        validations.httpSpanStatusCode = 307;
         assertSpan(span, SpanKind.CLIENT, validations);
       }
     });
@@ -253,7 +253,7 @@ describe('HttpInstrumentation Integration tests', () => {
       )}`, done => {
         let validations: {
           hostname: string;
-          httpStatusCode: number;
+          httpSpanStatusCode: number;
           httpMethod: string;
           pathname: string;
           reqHeaders: http.OutgoingHttpHeaders;
@@ -277,7 +277,7 @@ describe('HttpInstrumentation Integration tests', () => {
             resp.on('end', () => {
               validations = {
                 hostname: 'google.fr',
-                httpStatusCode: 301,
+                httpSpanStatusCode: 301,
                 httpMethod: 'GET',
                 pathname: '/',
                 resHeaders: resp.headers,

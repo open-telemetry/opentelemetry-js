@@ -15,7 +15,7 @@
  */
 export interface Status {
   /** The status code of this message. */
-  code: StatusCode;
+  code: SpanStatusCode;
   /** A developer-facing error message. */
   message?: string;
 }
@@ -23,7 +23,7 @@ export interface Status {
 /**
  * An enumeration of status codes.
  */
-export enum StatusCode {
+export enum SpanStatusCode {
   /**
    * The operation has been validated by an Application developer or
    * Operator to have completed successfully.

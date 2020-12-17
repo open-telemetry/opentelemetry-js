@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Attributes, StatusCode, Span, Status } from '@opentelemetry/api';
+import { Attributes, SpanStatusCode, Span, Status } from '@opentelemetry/api';
 import {
   HttpAttribute,
   GeneralAttribute,
@@ -66,11 +66,11 @@ export const parseResponseStatus = (
 ): Omit<Status, 'message'> => {
   // 1xx, 2xx, 3xx are OK
   if (statusCode >= 100 && statusCode < 400) {
-    return { code: StatusCode.OK };
+    return { code: SpanStatusCode.OK };
   }
 
   // All other codes are error
-  return { code: StatusCode.ERROR };
+  return { code: SpanStatusCode.ERROR };
 };
 
 /**
@@ -159,7 +159,7 @@ export const setSpanWithError = (
   });
 
   if (!obj) {
-    span.setStatus({ code: StatusCode.ERROR, message });
+    span.setStatus({ code: SpanStatusCode.ERROR, message });
     return;
   }
 
@@ -167,9 +167,9 @@ export const setSpanWithError = (
   if ((obj as IncomingMessage).statusCode) {
     status = parseResponseStatus((obj as IncomingMessage).statusCode!);
   } else if ((obj as ClientRequest).aborted) {
-    status = { code: StatusCode.ERROR };
+    status = { code: SpanStatusCode.ERROR };
   } else {
-    status = { code: StatusCode.ERROR };
+    status = { code: SpanStatusCode.ERROR };
   }
 
   status.message = message;

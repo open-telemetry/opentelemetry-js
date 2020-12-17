@@ -14,36 +14,42 @@
  * limitations under the License.
  */
 
+import * as api from '@opentelemetry/api';
+import { MetricValueType } from '@opentelemetry/api';
+import {
+  NoopMetric,
+  NOOP_SUM_OBSERVER_METRIC,
+  NOOP_UP_DOWN_SUM_OBSERVER_METRIC,
+  NOOP_VALUE_OBSERVER_METRIC,
+} from '@opentelemetry/api/build/src/metrics/NoopMeter';
+import { hrTime, hrTimeToNanoseconds, NoopLogger } from '@opentelemetry/core';
+import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
-  Meter,
-  Metric,
-  CounterMetric,
-  MetricKind,
-  Sum,
-  MeterProvider,
-  ValueRecorderMetric,
-  ValueObserverMetric,
-  MetricRecord,
   Aggregator,
-  MetricDescriptor,
-  UpDownCounterMetric,
-  LastValueAggregator,
-  LastValue,
+  CounterMetric,
   Histogram,
+  LastValue,
+  LastValueAggregator,
+  Meter,
+  MeterProvider,
+  Metric,
+  MetricDescriptor,
+  MetricKind,
+  MetricRecord,
+  Sum,
+  UpDownCounterMetric,
+  ValueObserverMetric,
+  ValueRecorderMetric,
 } from '../src';
-import * as api from '@opentelemetry/api';
-import { NoopLogger, hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
+import { BatchObserver } from '../src/BatchObserver';
 import { BatchObserverResult } from '../src/BatchObserverResult';
 import { SumAggregator } from '../src/export/aggregators';
+import { Processor } from '../src/export/Processor';
 import { SumObserverMetric } from '../src/SumObserverMetric';
-import { Resource } from '@opentelemetry/resources';
 import { UpDownSumObserverMetric } from '../src/UpDownSumObserverMetric';
 import { hashLabels } from '../src/Utils';
-import { Processor } from '../src/export/Processor';
-import { ValueType } from '@opentelemetry/api';
-import { BatchObserver } from '../src/BatchObserver';
 
 const nonNumberValues = [
   // type undefined
@@ -249,7 +255,7 @@ describe('Meter', () => {
 
         // should skip below metric
         const counter2 = meter.createCounter('name1', {
-          valueType: api.ValueType.INT,
+          valueType: api.MetricValueType.INT,
         }) as CounterMetric;
         counter2.bind(labels).add(500);
 
@@ -262,7 +268,7 @@ describe('Meter', () => {
           metricKind: MetricKind.COUNTER,
           name: 'name1',
           unit: '1',
-          valueType: api.ValueType.DOUBLE,
+          valueType: api.MetricValueType.DOUBLE,
         });
         assert.strictEqual(record[0].aggregator.toPoint().value, 10);
       });
@@ -280,19 +286,19 @@ describe('Meter', () => {
 
       it('should return no op metric if name is an empty string', () => {
         const counter = meter.createCounter('');
-        assert.ok(counter instanceof api.NoopMetric);
+        assert.ok(counter instanceof NoopMetric);
       });
 
       it('should return no op metric if name does not start with a letter', () => {
         const counter1 = meter.createCounter('1name');
         const counter_ = meter.createCounter('_name');
-        assert.ok(counter1 instanceof api.NoopMetric);
-        assert.ok(counter_ instanceof api.NoopMetric);
+        assert.ok(counter1 instanceof NoopMetric);
+        assert.ok(counter_ instanceof NoopMetric);
       });
 
       it('should return no op metric if name is an empty string contain only letters, numbers, ".", "_", and "-"', () => {
         const counter = meter.createCounter('name with invalid characters^&*(');
-        assert.ok(counter instanceof api.NoopMetric);
+        assert.ok(counter instanceof NoopMetric);
       });
     });
   });
@@ -408,7 +414,7 @@ describe('Meter', () => {
 
       it('should truncate non-integer values for INT valueType', async () => {
         const upDownCounter = meter.createUpDownCounter('name', {
-          valueType: ValueType.INT,
+          valueType: MetricValueType.INT,
         });
         const boundCounter = upDownCounter.bind(labels);
 
@@ -422,7 +428,7 @@ describe('Meter', () => {
 
       it('should ignore non-number values for INT valueType', async () => {
         const upDownCounter = meter.createUpDownCounter('name', {
-          valueType: ValueType.DOUBLE,
+          valueType: MetricValueType.DOUBLE,
         });
         const boundCounter = upDownCounter.bind(labels);
 
@@ -440,7 +446,7 @@ describe('Meter', () => {
 
       it('should ignore non-number values for DOUBLE valueType', async () => {
         const upDownCounter = meter.createUpDownCounter('name', {
-          valueType: ValueType.DOUBLE,
+          valueType: MetricValueType.DOUBLE,
         });
         const boundCounter = upDownCounter.bind(labels);
 
@@ -494,7 +500,7 @@ describe('Meter', () => {
 
         // should skip below metric
         const counter2 = meter.createCounter('name1', {
-          valueType: api.ValueType.INT,
+          valueType: api.MetricValueType.INT,
         }) as CounterMetric;
         counter2.bind(labels).add(500);
 
@@ -507,7 +513,7 @@ describe('Meter', () => {
           metricKind: MetricKind.COUNTER,
           name: 'name1',
           unit: '1',
-          valueType: api.ValueType.DOUBLE,
+          valueType: api.MetricValueType.DOUBLE,
         });
         assert.strictEqual(record[0].aggregator.toPoint().value, 10);
       });
@@ -525,19 +531,19 @@ describe('Meter', () => {
 
       it('should return no op metric if name is an empty string', () => {
         const counter = meter.createCounter('');
-        assert.ok(counter instanceof api.NoopMetric);
+        assert.ok(counter instanceof NoopMetric);
       });
 
       it('should return no op metric if name does not start with a letter', () => {
         const counter1 = meter.createCounter('1name');
         const counter_ = meter.createCounter('_name');
-        assert.ok(counter1 instanceof api.NoopMetric);
-        assert.ok(counter_ instanceof api.NoopMetric);
+        assert.ok(counter1 instanceof NoopMetric);
+        assert.ok(counter_ instanceof NoopMetric);
       });
 
       it('should return no op metric if name is an empty string contain only letters, numbers, ".", "_", and "-"', () => {
         const counter = meter.createCounter('name with invalid characters^&*(');
-        assert.ok(counter instanceof api.NoopMetric);
+        assert.ok(counter instanceof NoopMetric);
       });
     });
   });
@@ -613,21 +619,21 @@ describe('Meter', () => {
     describe('names', () => {
       it('should return no op metric if name is an empty string', () => {
         const valueRecorder = meter.createValueRecorder('');
-        assert.ok(valueRecorder instanceof api.NoopMetric);
+        assert.ok(valueRecorder instanceof NoopMetric);
       });
 
       it('should return no op metric if name does not start with a letter', () => {
         const valueRecorder1 = meter.createValueRecorder('1name');
         const valueRecorder_ = meter.createValueRecorder('_name');
-        assert.ok(valueRecorder1 instanceof api.NoopMetric);
-        assert.ok(valueRecorder_ instanceof api.NoopMetric);
+        assert.ok(valueRecorder1 instanceof NoopMetric);
+        assert.ok(valueRecorder_ instanceof NoopMetric);
       });
 
       it('should return no op metric if name is an empty string contain only letters, numbers, ".", "_", and "-"', () => {
         const valueRecorder = meter.createValueRecorder(
           'name with invalid characters^&*('
         );
-        assert.ok(valueRecorder instanceof api.NoopMetric);
+        assert.ok(valueRecorder instanceof NoopMetric);
       });
     });
 
@@ -781,7 +787,7 @@ describe('Meter', () => {
     it('should return noop observer when name is invalid', () => {
       const spy = sinon.stub(meter['_logger'], 'warn');
       const sumObserver = meter.createSumObserver('na me');
-      assert.ok(sumObserver === api.NOOP_SUM_OBSERVER_METRIC);
+      assert.ok(sumObserver === NOOP_SUM_OBSERVER_METRIC);
       const args = spy.args[0];
       assert.ok(
         args[0],
@@ -922,7 +928,7 @@ describe('Meter', () => {
     it('should return noop observer when name is invalid', () => {
       const spy = sinon.stub(meter['_logger'], 'warn');
       const valueObserver = meter.createValueObserver('na me');
-      assert.ok(valueObserver === api.NOOP_VALUE_OBSERVER_METRIC);
+      assert.ok(valueObserver === NOOP_VALUE_OBSERVER_METRIC);
       const args = spy.args[0];
       assert.ok(
         args[0],
@@ -1003,7 +1009,7 @@ describe('Meter', () => {
     it('should return noop observer when name is invalid', () => {
       const spy = sinon.stub(meter['_logger'], 'warn');
       const upDownSumObserver = meter.createUpDownSumObserver('na me');
-      assert.ok(upDownSumObserver === api.NOOP_UP_DOWN_SUM_OBSERVER_METRIC);
+      assert.ok(upDownSumObserver === NOOP_UP_DOWN_SUM_OBSERVER_METRIC);
       const args = spy.args[0];
       assert.ok(
         args[0],
@@ -1320,7 +1326,7 @@ describe('Meter', () => {
         description: 'test',
         metricKind: MetricKind.COUNTER,
         unit: '1',
-        valueType: api.ValueType.DOUBLE,
+        valueType: api.MetricValueType.DOUBLE,
       });
       assert.strictEqual(record[0].labels, labels);
       const value = record[0].aggregator.toPoint().value as Sum;
@@ -1331,7 +1337,7 @@ describe('Meter', () => {
       const key = 'key';
       const counter = meter.createCounter('counter', {
         description: 'test',
-        valueType: api.ValueType.INT,
+        valueType: api.MetricValueType.INT,
       });
       const labels = { [key]: 'counter-value' };
       const boundCounter = counter.bind(labels);
@@ -1346,7 +1352,7 @@ describe('Meter', () => {
         description: 'test',
         metricKind: MetricKind.COUNTER,
         unit: '1',
-        valueType: api.ValueType.INT,
+        valueType: api.MetricValueType.INT,
       });
       assert.strictEqual(record[0].labels, labels);
       const value = record[0].aggregator.toPoint().value as Sum;
@@ -1386,5 +1392,5 @@ function ensureMetric(metric: MetricRecord, name?: string, value?: LastValue) {
   assert.strictEqual(descriptor.description, 'desc');
   assert.strictEqual(descriptor.unit, '1');
   assert.strictEqual(descriptor.metricKind, MetricKind.VALUE_OBSERVER);
-  assert.strictEqual(descriptor.valueType, api.ValueType.DOUBLE);
+  assert.strictEqual(descriptor.valueType, api.MetricValueType.DOUBLE);
 }

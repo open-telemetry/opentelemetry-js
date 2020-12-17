@@ -310,7 +310,7 @@ export class SpanShim extends opentracing.Span {
       key === opentracing.Tags.ERROR &&
       (value === true || value === 'true')
     ) {
-      this._span.setStatus({ code: api.StatusCode.ERROR });
+      this._span.setStatus({ code: api.SpanStatusCode.ERROR });
       return this;
     }
 

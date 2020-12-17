@@ -13,22 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface EntryValue {
-  /** `String` value of the `EntryValue`. */
+export interface BaggageEntryValue {
+  /** `String` value of the `BaggageEntryValue`. */
   value: string;
   /**
    * ttl is an integer that represents number of hops an entry can
    * propagate.
    */
-  ttl?: EntryTtl;
+  ttl?: BaggageEntryTtl;
 }
 
 /**
- * EntryTtl is an integer that represents number of hops an entry can propagate.
+ * BaggageEntryTtl is an integer that represents number of hops an entry can propagate.
  *
  * For now, ONLY special values (0 and -1) are supported.
  */
-export enum EntryTtl {
+export enum BaggageEntryTtl {
   /**
    * NO_PROPAGATION is considered to have local context and is used within the
    * process it created.

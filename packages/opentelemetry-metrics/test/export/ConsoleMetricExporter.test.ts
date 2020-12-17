@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { ConsoleMetricExporter, MeterProvider, MetricKind } from '../../src';
-import { ValueType } from '@opentelemetry/api';
+import { MetricValueType } from '@opentelemetry/api';
 
 describe('ConsoleMetricExporter', () => {
   let consoleExporter: ConsoleMetricExporter;
@@ -59,7 +59,7 @@ describe('ConsoleMetricExporter', () => {
           metricKind: MetricKind.COUNTER,
           name: 'counter',
           unit: '1',
-          valueType: ValueType.DOUBLE,
+          valueType: MetricValueType.DOUBLE,
         },
       ]);
       assert.deepStrictEqual(labels, [

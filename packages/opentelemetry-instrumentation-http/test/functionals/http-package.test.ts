@@ -113,7 +113,7 @@ describe('Packages', () => {
         const span = spans[0];
         const validations = {
           hostname: urlparsed.hostname!,
-          httpStatusCode: 200,
+          httpSpanStatusCode: 200,
           httpMethod: 'GET',
           pathname: urlparsed.pathname!,
           path: urlparsed.path,

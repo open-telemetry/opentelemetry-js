@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
 import {
-  NoopSpan,
+  ROOT_CONTEXT,
   Sampler,
   SamplingDecision,
-  NOOP_SPAN,
-  TraceFlags,
-  ROOT_CONTEXT,
   suppressInstrumentation,
+  TraceFlags,
 } from '@opentelemetry/api';
-import { BasicTracerProvider, Tracer, Span } from '../src';
 import {
+  NoopSpan,
+  NOOP_SPAN,
+} from '@opentelemetry/api/build/src/trace/NoopSpan';
+import {
+  AlwaysOffSampler,
+  AlwaysOnSampler,
   InstrumentationLibrary,
   NoopLogger,
-  AlwaysOnSampler,
-  AlwaysOffSampler,
 } from '@opentelemetry/core';
+import * as assert from 'assert';
+import { BasicTracerProvider, Span, Tracer } from '../src';
 
 describe('Tracer', () => {
   const tracerProvider = new BasicTracerProvider({

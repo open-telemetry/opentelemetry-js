@@ -16,24 +16,24 @@
 
 import * as assert from 'assert';
 import api, {
-  TraceFlags,
-  NoopSpan,
-  NoopTracerProvider,
-  NoopTracer,
-  SpanOptions,
-  Span,
   context,
-  trace,
-  propagation,
-  metrics,
-  TextMapPropagator,
   Context,
-  TextMapSetter,
-  TextMapGetter,
-  ROOT_CONTEXT,
-  defaultTextMapSetter,
   defaultTextMapGetter,
+  defaultTextMapSetter,
+  metrics,
+  propagation,
+  ROOT_CONTEXT,
+  Span,
+  SpanOptions,
+  TextMapGetter,
+  TextMapPropagator,
+  TextMapSetter,
+  trace,
+  TraceFlags,
 } from '../../src';
+import { NoopSpan } from '../../src/trace/NoopSpan';
+import { NoopTracer } from '../../src/trace/NoopTracer';
+import { NoopTracerProvider } from '../../src/trace/NoopTracerProvider';
 
 describe('API', () => {
   const functions = ['getCurrentSpan', 'startSpan', 'withSpan'];

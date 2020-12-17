@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import {
-  StatusCode,
+  SpanStatusCode,
   context,
   propagation,
   Span,
@@ -311,7 +311,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           let status: Status;
 
           if (response.aborted && !response.complete) {
-            status = { code: StatusCode.ERROR };
+            status = { code: SpanStatusCode.ERROR };
           } else {
             status = utils.parseResponseStatus(response.statusCode!);
           }

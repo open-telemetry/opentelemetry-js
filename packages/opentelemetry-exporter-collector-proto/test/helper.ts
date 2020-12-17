@@ -41,7 +41,7 @@ export function mockCounter(): metrics.Metric<metrics.BoundCounter> &
     meter['_metrics'].get(name) ||
     meter.createCounter(name, {
       description: 'sample counter description',
-      valueType: api.ValueType.INT,
+      valueType: api.MetricValueType.INT,
     });
   metric.clear();
   metric.bind({});
@@ -58,7 +58,7 @@ export function mockObserver(
       name,
       {
         description: 'sample observer description',
-        valueType: api.ValueType.DOUBLE,
+        valueType: api.MetricValueType.DOUBLE,
       },
       callback
     );
@@ -74,7 +74,7 @@ export function mockValueRecorder(): metrics.Metric<metrics.BoundValueRecorder> 
     meter['_metrics'].get(name) ||
     meter.createValueRecorder(name, {
       description: 'sample recorder description',
-      valueType: api.ValueType.INT,
+      valueType: api.MetricValueType.INT,
       boundaries: [0, 100],
     });
   metric.clear();
@@ -98,7 +98,7 @@ export const mockedReadableSpan: ReadableSpan = {
   startTime: [1574120165, 429803070],
   endTime: [1574120165, 438688070],
   ended: true,
-  status: { code: api.StatusCode.OK },
+  status: { code: api.SpanStatusCode.OK },
   attributes: { component: 'document-load' },
   links: [
     {

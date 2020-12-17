@@ -21,7 +21,7 @@ import { Resource } from '@opentelemetry/resources';
 import * as api from '@opentelemetry/api';
 import { ThriftUtils, Utils, ThriftReferenceType } from '../src/types';
 import { hrTimeToMicroseconds } from '@opentelemetry/core';
-import { StatusCode, TraceFlags } from '@opentelemetry/api';
+import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 
 describe('transform', () => {
   const spanContext = {
@@ -40,7 +40,7 @@ describe('transform', () => {
         endTime: [1566156731, 709],
         ended: true,
         status: {
-          code: api.StatusCode.OK,
+          code: api.SpanStatusCode.OK,
         },
         attributes: {
           testBool: true,
@@ -165,7 +165,7 @@ describe('transform', () => {
         endTime: [1566156731, 709],
         ended: true,
         status: {
-          code: api.StatusCode.ERROR,
+          code: api.SpanStatusCode.ERROR,
           message: 'data loss',
         },
         attributes: {},
@@ -227,7 +227,7 @@ describe('transform', () => {
         endTime: [1566156731, 709],
         ended: true,
         status: {
-          code: api.StatusCode.OK,
+          code: api.SpanStatusCode.OK,
         },
         attributes: {},
         parentSpanId: '3e0c63257de34c92',
@@ -277,7 +277,7 @@ describe('transform', () => {
         endTime: [1566156731, 709],
         ended: true,
         status: {
-          code: api.StatusCode.ERROR,
+          code: api.SpanStatusCode.ERROR,
           message: 'data loss',
         },
         attributes: {},
@@ -311,7 +311,7 @@ describe('transform', () => {
         endTime: [1566156731, 709],
         ended: true,
         status: {
-          code: api.StatusCode.OK,
+          code: api.SpanStatusCode.OK,
         },
         attributes: {
           testBool: true,
@@ -358,7 +358,7 @@ describe('transform', () => {
         'If span status OK, no error tag'
       );
 
-      readableSpan.status.code = StatusCode.UNSET;
+      readableSpan.status.code = SpanStatusCode.UNSET;
       thriftSpan = spanToThrift(readableSpan);
       assert.strictEqual(
         thriftSpan.tags.find(tag => tag.key === 'error'),
@@ -366,7 +366,7 @@ describe('transform', () => {
         'If span status USET, no error tag'
       );
 
-      readableSpan.status.code = StatusCode.ERROR;
+      readableSpan.status.code = SpanStatusCode.ERROR;
       thriftSpan = spanToThrift(readableSpan);
       const errorTag = thriftSpan.tags.find(tag => tag.key === 'error');
 

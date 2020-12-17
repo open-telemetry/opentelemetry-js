@@ -168,7 +168,7 @@ async function doSomething() {
   } catch (err) {
     span.setStatus({
       // use an appropriate status code here
-      code: api.StatusCode.ERROR,
+      code: api.SpanStatusCode.ERROR,
       message: err.message,
     });
     span.end();

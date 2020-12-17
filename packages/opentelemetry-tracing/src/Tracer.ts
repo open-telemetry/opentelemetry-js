@@ -29,6 +29,8 @@ import { Span } from './Span';
 import { TraceParams, TracerConfig } from './types';
 import { mergeConfig } from './utility';
 
+// api.ProxyTracer
+
 /**
  * This class represents a basic tracer.
  */
@@ -68,7 +70,11 @@ export class Tracer implements api.Tracer {
   ): api.Span {
     if (api.isInstrumentationSuppressed(context)) {
       this.logger.debug('Instrumentation suppressed, returning Noop Span');
-      return api.NOOP_SPAN;
+      return new NoRecordingSpan({
+        traceId: '00000000000000000000000000000000',
+        spanId: '0000000000000000',
+        traceFlags: 0,
+      });
     }
 
     const parentContext = getParent(options, context);

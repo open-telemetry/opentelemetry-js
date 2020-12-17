@@ -16,17 +16,11 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
-  NoopSpan,
-  NOOP_SPAN,
-  ProxyTracerProvider,
-  SpanKind,
-  TracerProvider,
-  ProxyTracer,
-  Tracer,
-  Span,
-  NoopTracer,
-} from '../../src';
+import { Span, SpanKind, Tracer, TracerProvider } from '../../src';
+import { NoopSpan, NOOP_SPAN } from '../../src/trace/NoopSpan';
+import { NoopTracer } from '../../src/trace/NoopTracer';
+import { ProxyTracer } from '../../src/trace/ProxyTracer';
+import { ProxyTracerProvider } from '../../src/trace/ProxyTracerProvider';
 
 describe('ProxyTracer', () => {
   let provider: ProxyTracerProvider;

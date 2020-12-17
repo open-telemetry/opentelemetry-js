@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import {
-  StatusCode,
+  SpanStatusCode,
   ROOT_CONTEXT,
   SpanKind,
   TraceFlags,
@@ -37,20 +37,20 @@ describe('Utility', () => {
       const status = utils.parseResponseStatus(
         (undefined as unknown) as number
       );
-      assert.deepStrictEqual(status, { code: StatusCode.ERROR });
+      assert.deepStrictEqual(status, { code: SpanStatusCode.ERROR });
     });
 
     it('should return OK for Success HTTP status code', () => {
       for (let index = 100; index < 400; index++) {
         const status = utils.parseResponseStatus(index);
-        assert.deepStrictEqual(status, { code: StatusCode.OK });
+        assert.deepStrictEqual(status, { code: SpanStatusCode.OK });
       }
     });
 
     it('should not return OK for Bad HTTP status code', () => {
       for (let index = 400; index <= 600; index++) {
         const status = utils.parseResponseStatus(index);
-        assert.notStrictEqual(status.code, StatusCode.OK);
+        assert.notStrictEqual(status.code, SpanStatusCode.OK);
       }
     });
   });

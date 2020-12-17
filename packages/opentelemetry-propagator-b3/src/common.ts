@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { createContextKey } from '@opentelemetry/api';
+import { context } from '@opentelemetry/api';
 
 /** shared context for storing an extracted b3 debug flag */
-export const B3_DEBUG_FLAG_KEY = createContextKey(
+export const B3_DEBUG_FLAG_KEY = context.createKey(
   'OpenTelemetry Context Key B3 Debug Flag'
 );

@@ -31,6 +31,13 @@ import { DEFAULT_METRIC_OPTIONS, DEFAULT_CONFIG, MeterConfig } from './types';
 import { UngroupedProcessor } from './export/Processor';
 import { PushController } from './export/Controller';
 import { NoopExporter } from './export/NoopExporter';
+import {
+  NOOP_COUNTER_METRIC,
+  NOOP_SUM_OBSERVER_METRIC,
+  NOOP_UP_DOWN_SUM_OBSERVER_METRIC,
+  NOOP_VALUE_OBSERVER_METRIC,
+  NOOP_VALUE_RECORDER_METRIC,
+} from '@opentelemetry/api/build/src/metrics/NoopMeter';
 
 /**
  * Meter is an implementation of the {@link Meter} interface.
@@ -76,7 +83,7 @@ export class Meter implements api.Meter {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return api.NOOP_VALUE_RECORDER_METRIC;
+      return NOOP_VALUE_RECORDER_METRIC;
     }
     const opt: api.MetricOptions = {
       logger: this._logger,
@@ -107,7 +114,7 @@ export class Meter implements api.Meter {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return api.NOOP_COUNTER_METRIC;
+      return NOOP_COUNTER_METRIC;
     }
     const opt: api.MetricOptions = {
       logger: this._logger,
@@ -143,7 +150,7 @@ export class Meter implements api.Meter {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return api.NOOP_COUNTER_METRIC;
+      return NOOP_COUNTER_METRIC;
     }
     const opt: api.MetricOptions = {
       ...DEFAULT_METRIC_OPTIONS,
@@ -176,7 +183,7 @@ export class Meter implements api.Meter {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return api.NOOP_VALUE_OBSERVER_METRIC;
+      return NOOP_VALUE_OBSERVER_METRIC;
     }
     const opt: api.MetricOptions = {
       logger: this._logger,
@@ -204,7 +211,7 @@ export class Meter implements api.Meter {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return api.NOOP_SUM_OBSERVER_METRIC;
+      return NOOP_SUM_OBSERVER_METRIC;
     }
     const opt: api.MetricOptions = {
       logger: this._logger,
@@ -238,7 +245,7 @@ export class Meter implements api.Meter {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return api.NOOP_UP_DOWN_SUM_OBSERVER_METRIC;
+      return NOOP_UP_DOWN_SUM_OBSERVER_METRIC;
     }
     const opt: api.MetricOptions = {
       logger: this._logger,

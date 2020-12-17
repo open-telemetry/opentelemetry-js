@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { NoopTracerProvider, NOOP_TRACER } from '@opentelemetry/api';
+import { NoopTracerProvider } from '@opentelemetry/api/build/src/trace/NoopTracerProvider';
+import { NOOP_TRACER } from '@opentelemetry/api/build/src/trace/NoopTracer';
 import { NoopLogger } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { HttpInstrumentation } from '../../src/http';

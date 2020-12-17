@@ -19,7 +19,6 @@ export * from './common/Logger';
 export * from './common/Time';
 export * from './context/context';
 export * from './context/propagation/TextMapPropagator';
-export * from './context/propagation/NoopTextMapPropagator';
 export * from './baggage/Baggage';
 export * from './baggage/EntryValue';
 export * from './metrics/BatchObserverResult';
@@ -27,8 +26,6 @@ export * from './metrics/BoundInstrument';
 export * from './metrics/Meter';
 export * from './metrics/MeterProvider';
 export * from './metrics/Metric';
-export * from './metrics/NoopMeter';
-export * from './metrics/NoopMeterProvider';
 export * from './metrics/Observation';
 export * from './metrics/ObserverResult';
 export * from './trace/attributes';
@@ -36,11 +33,6 @@ export * from './trace/Event';
 export * from './trace/link_context';
 export * from './trace/link';
 export * from './trace/NoopLogger';
-export * from './trace/NoopSpan';
-export * from './trace/NoopTracer';
-export * from './trace/NoopTracerProvider';
-export * from './trace/ProxyTracer';
-export * from './trace/ProxyTracerProvider';
 export * from './trace/Sampler';
 export * from './trace/SamplingResult';
 export * from './trace/span_context';
@@ -55,9 +47,6 @@ export * from './trace/tracer_provider';
 export * from './trace/tracer';
 
 export {
-  INVALID_SPANID,
-  INVALID_TRACEID,
-  INVALID_SPAN_CONTEXT,
   isSpanContextValid,
   isValidTraceId,
   isValidSpanId,
@@ -66,7 +55,6 @@ export {
 export {
   Context,
   ROOT_CONTEXT,
-  createContextKey,
   ContextManager,
 } from '@opentelemetry/context-base';
 

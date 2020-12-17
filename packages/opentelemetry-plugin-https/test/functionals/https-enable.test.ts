@@ -15,7 +15,7 @@
  */
 
 import {
-  StatusCode,
+  SpanStatusCode,
   context,
   propagation,
   Span as ISpan,
@@ -162,7 +162,7 @@ describe('HttpsPlugin', () => {
         const [incomingSpan, outgoingSpan] = spans;
         const validations = {
           hostname,
-          httpStatusCode: result.statusCode!,
+          httpSpanStatusCode: result.statusCode!,
           httpMethod: result.method!,
           pathname,
           resHeaders: result.resHeaders,
@@ -255,7 +255,7 @@ describe('HttpsPlugin', () => {
         const [incomingSpan, outgoingSpan] = spans;
         const validations = {
           hostname,
-          httpStatusCode: result.statusCode!,
+          httpSpanStatusCode: result.statusCode!,
           httpMethod: result.method!,
           pathname,
           resHeaders: result.resHeaders,
@@ -318,7 +318,7 @@ describe('HttpsPlugin', () => {
 
           const validations = {
             hostname,
-            httpStatusCode: result.statusCode!,
+            httpSpanStatusCode: result.statusCode!,
             httpMethod: 'GET',
             pathname: testPath,
             resHeaders: result.resHeaders,
@@ -344,7 +344,7 @@ describe('HttpsPlugin', () => {
           const [reqSpan, localSpan] = spans;
           const validations = {
             hostname,
-            httpStatusCode: result.statusCode!,
+            httpSpanStatusCode: result.statusCode!,
             httpMethod: 'GET',
             pathname: testPath,
             resHeaders: result.resHeaders,
@@ -387,7 +387,7 @@ describe('HttpsPlugin', () => {
             const [reqSpan, localSpan] = spans;
             const validations = {
               hostname,
-              httpStatusCode: result.statusCode!,
+              httpSpanStatusCode: result.statusCode!,
               httpMethod: 'GET',
               pathname: testPath,
               resHeaders: result.resHeaders,
@@ -595,7 +595,7 @@ describe('HttpsPlugin', () => {
           const spans = memoryExporter.getFinishedSpans();
           const [span] = spans;
           assert.strictEqual(spans.length, 1);
-          assert.strictEqual(span.status.code, StatusCode.ERROR);
+          assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
           assert.ok(Object.keys(span.attributes).length >= 6);
         }
       });
@@ -633,7 +633,7 @@ describe('HttpsPlugin', () => {
           const spans = memoryExporter.getFinishedSpans();
           const [span] = spans;
           assert.strictEqual(spans.length, 1);
-          assert.strictEqual(span.status.code, StatusCode.ERROR);
+          assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
           assert.ok(Object.keys(span.attributes).length > 7);
         }
       });
@@ -653,7 +653,7 @@ describe('HttpsPlugin', () => {
               span.attributes[HttpAttribute.HTTP_STATUS_CODE],
               404
             );
-            assert.strictEqual(span.status.code, StatusCode.ERROR);
+            assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
             done();
           });
         });

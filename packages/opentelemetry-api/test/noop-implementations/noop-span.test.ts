@@ -15,13 +15,12 @@
  */
 
 import * as assert from 'assert';
+import { SpanStatusCode, TraceFlags } from '../../src';
+import { NoopSpan } from '../../src/trace/NoopSpan';
 import {
-  StatusCode,
   INVALID_SPANID,
   INVALID_TRACEID,
-  NoopSpan,
-  TraceFlags,
-} from '../../src';
+} from '../../src/trace/spancontext-utils';
 
 describe('NoopSpan', () => {
   it('do not crash', () => {
@@ -39,7 +38,7 @@ describe('NoopSpan', () => {
     span.addEvent('sent');
     span.addEvent('sent', { id: '42', key: 'value' });
 
-    span.setStatus({ code: StatusCode.ERROR });
+    span.setStatus({ code: SpanStatusCode.ERROR });
 
     span.updateName('my-span');
 

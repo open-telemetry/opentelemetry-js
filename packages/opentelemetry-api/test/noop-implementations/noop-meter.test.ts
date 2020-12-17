@@ -16,12 +16,12 @@
 
 import * as assert from 'assert';
 import {
-  NoopMeterProvider,
-  NOOP_BOUND_COUNTER,
-  NOOP_BOUND_VALUE_RECORDER,
   NOOP_COUNTER_METRIC,
+  NOOP_BOUND_COUNTER,
   NOOP_VALUE_RECORDER_METRIC,
-} from '../../src';
+  NOOP_BOUND_VALUE_RECORDER,
+} from '../../src/metrics/NoopMeter';
+import { NoopMeterProvider } from '../../src/metrics/NoopMeterProvider';
 
 describe('NoopMeter', () => {
   it('should not crash', () => {
