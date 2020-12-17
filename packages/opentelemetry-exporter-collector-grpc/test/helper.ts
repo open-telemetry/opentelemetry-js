@@ -308,7 +308,11 @@ export function ensureExportedSpanIsCorrect(
   assert.strictEqual(span.droppedLinksCount, 0, 'droppedLinksCount is wrong');
   assert.deepStrictEqual(
     span.status,
-    { code: 'STATUS_CODE_OK', message: '' },
+    {
+      code: 'STATUS_CODE_OK',
+      deprecatedCode: 'DEPRECATED_STATUS_CODE_OK',
+      message: '',
+    },
     'status is wrong'
   );
 }
