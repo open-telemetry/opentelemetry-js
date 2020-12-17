@@ -4,8 +4,6 @@
 
 ## Usage
 
-```
-const template = require('@opentelemetry/template');
-
+```typescript
 // TODO: DEMONSTRATE API
 ```

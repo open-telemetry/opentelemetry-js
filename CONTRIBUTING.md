@@ -8,11 +8,11 @@ To get the project started quickly, you can follow these steps. For more
 detailed instructions, see [development](#development) below.
 
 ```sh
-$ git clone https://github.com/open-telemetry/opentelemetry-js.git
-$ cd opentelemetry-js
-$ npm install
-$ npm run compile
-$ npm test
+git clone https://github.com/open-telemetry/opentelemetry-js.git
+cd opentelemetry-js
+npm install
+npm run compile
+npm test
 ```
 
 ## Report a bug or requesting feature
@@ -88,7 +88,7 @@ Most of the commands needed for development are accessed as [npm scripts](https:
 This will install all dependencies for the root project and all modules managed by `lerna`. By default, a `postinstall` script will run `lerna bootstrap` automatically after an install. This can be avoided using the `--ignore-scripts` option if desired.
 
 ```sh
-$ npm install
+npm install
 ```
 
 ### Compile modules
@@ -99,29 +99,29 @@ DO NOT use lerna to compile all modules unless you know what you are doing becau
 
 ```sh
 # Build all modules
-$ npm run compile
+npm run compile
 
 # Remove compiled output
-$ npm run clean
+npm run clean
 ```
 
 These commands can also be run for specific packages instead of the whole project, which can speed up compilations while developing.
 
 ```sh
 # Build a single module and all of its dependencies
-$ cd packages/opentelemetry-module-name
-$ npm run compile
+cd packages/opentelemetry-module-name
+npm run compile
 ```
 
 Finally, builds can be run continuously as files change using the `watch` npm script.
 
 ```sh
 # Build all modules
-$ npm run watch
+npm run watch
 
 # Build a single module and all of its dependencies
-$ cd packages/opentelemetry-module-name
-$ npm run watch
+cd packages/opentelemetry-module-name
+npm run watch
 ```
 
 ### Running tests
@@ -130,11 +130,11 @@ Similar to compilations, tests can be run from the root to run all tests or from
 
 ```sh
 # Test all modules
-$ npm test
+npm test
 
 # Test a single module
-$ cd packages/opentelemetry-module-name
-$ npm test
+cd packages/opentelemetry-module-name
+npm test
 ```
 
 ### Linting
@@ -143,22 +143,22 @@ This project uses a combination of `gts` and `eslint`. Just like tests and compi
 
 ```sh
 # Lint all modules
-$ npm lint
+npm lint
 
 # Lint a single module
-$ cd packages/opentelemetry-module-name
-$ npm lint
+cd packages/opentelemetry-module-name
+npm lint
 ```
 
 There is also a script which will automatically fix many linting errors.
 
 ```sh
 # Lint all modules, fixing errors
-$ npm lint:fix
+npm lint:fix
 
 # Lint a single module, fixing errors
-$ cd packages/opentelemetry-module-name
-$ npm lint:fix
+cd packages/opentelemetry-module-name
+npm lint:fix
 ```
 
 ### Adding a package
