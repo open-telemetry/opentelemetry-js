@@ -43,8 +43,6 @@
   },
   "devDependencies": {
     "@opentelemetry/context-base": "^0.14.0",
-    "@types/mocha": "8.2.0",
-    "@types/node": "14.14.12",
     "codecov": "3.8.1",
     "gts": "2.0.2",
     "istanbul-instrumenter-loader": "3.0.1",

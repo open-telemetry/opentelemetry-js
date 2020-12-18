@@ -12,7 +12,6 @@
     "@opentelemetry/tracing": "^0.14.0"
   },
   "devDependencies": {
-    "@types/node": "8.10.66",
     "typescript": "3.9.7"
   },
   "author": "OpenTelemetry Authors",

@@ -53,10 +53,6 @@
   },
   "devDependencies": {
     "@opentelemetry/context-async-hooks": "^0.14.0",
-    "@types/mocha": "8.2.0",
-    "@types/node": "14.14.12",
-    "@types/semver": "7.3.4",
-    "@types/sinon": "9.0.9",
     "codecov": "3.8.1",
     "gcp-metadata": "^4.1.4",
     "gts": "2.0.2",
