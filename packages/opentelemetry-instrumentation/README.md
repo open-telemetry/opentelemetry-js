@@ -159,10 +159,12 @@ myPLugin.enable();
 ```
 
 ## AutoLoader
+
 Successor of loading plugins through TracerProvider "plugins" option.
 It also supersedes PluginLoader for node. The old configurations usually looks like
 
 ### NODE - old way using TracerProvider
+
 ```javascript
 const { NodeTracerProvider } = require('@opentelemetry/node');
 const { B3Propagator } = require('@opentelemetry/propagator-b3');
@@ -177,6 +179,7 @@ provider.register({
 ```
 
 ### WEB - old way using TracerProvider
+
 ```javascript
 const { WebTracerProvider } = require('@opentelemetry/web');
 const { UserInteractionPlugin } = require('@opentelemetry/plugin-user-interaction');
@@ -202,6 +205,7 @@ After change it will look like this - mixing plugins and instrumentations togeth
 All plugins will be bound to TracerProvider as well as instrumentations
 
 ### NODE - Auto Loader
+
 ```javascript
 const { B3Propagator } = require('@opentelemetry/propagator-b3');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
@@ -231,6 +235,7 @@ tracerProvider.register({
 ```
 
 ### WEB - Auto Loader
+
 ```javascript
 const { B3Propagator } = require('@opentelemetry/propagator-b3');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
