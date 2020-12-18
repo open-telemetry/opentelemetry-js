@@ -42,7 +42,7 @@ jobs:
 
       - name: Lint
         run: |
-          npm run lint -- --quiet
+          npm run lint
           npm run lint:examples
 
       - name: Install API Dependencies
