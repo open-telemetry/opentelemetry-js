@@ -56,7 +56,6 @@
     "LICENSE",
     "README.md"
   ],
-  "devDependencies": {},
   "Add these to devDependencies for testing": {
     "codecov": "3.8.1",
     "istanbul-instrumenter-loader": "3.0.1",
