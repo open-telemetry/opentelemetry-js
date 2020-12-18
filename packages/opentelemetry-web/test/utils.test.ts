@@ -197,7 +197,11 @@ describe('utils', () => {
 
         assert.strictEqual(addEventSpy.callCount, 0);
 
-        addSpanNetworkEvent(span, PTN.FETCH_START, entries as PerformanceEntries);
+        addSpanNetworkEvent(
+          span,
+          PTN.FETCH_START,
+          entries as PerformanceEntries
+        );
 
         assert.strictEqual(addEventSpy.callCount, 0);
       });
