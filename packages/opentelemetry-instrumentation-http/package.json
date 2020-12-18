@@ -1,22 +1,20 @@
 {
   "name": "@opentelemetry/instrumentation-http",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "OpenTelemetry http/https automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
+    "compile": "tsc --build",
+    "clean": "tsc --build --clean",
     "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
     "tdd": "npm run test -- --watch-extensions ts --watch",
-    "clean": "rimraf build/*",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
-    "precompile": "tsc --version",
-    "version:update": "node ../../scripts/version-update.js",
-    "compile": "npm run version:update && tsc -p .",
-    "prepare": "npm run compile",
-    "watch": "tsc -w"
+    "version": "node ../../scripts/version-update.js",
+    "watch": "tsc --build --watch"
   },
   "keywords": [
     "opentelemetry",
@@ -43,10 +41,10 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/context-async-hooks": "^0.13.0",
-    "@opentelemetry/context-base": "^0.13.0",
-    "@opentelemetry/node": "^0.13.0",
-    "@opentelemetry/tracing": "^0.13.0",
+    "@opentelemetry/context-async-hooks": "^0.14.0",
+    "@opentelemetry/context-base": "^0.14.0",
+    "@opentelemetry/node": "^0.14.0",
+    "@opentelemetry/tracing": "^0.14.0",
     "@types/got": "9.6.11",
     "@types/mocha": "8.2.0",
     "@types/node": "14.14.12",
@@ -71,10 +69,10 @@
     "typescript": "3.9.7"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.13.0",
-    "@opentelemetry/core": "^0.13.0",
-    "@opentelemetry/instrumentation": "^0.13.0",
-    "@opentelemetry/semantic-conventions": "^0.13.0",
+    "@opentelemetry/api": "^0.14.0",
+    "@opentelemetry/core": "^0.14.0",
+    "@opentelemetry/instrumentation": "^0.14.0",
+    "@opentelemetry/semantic-conventions": "^0.14.0",
     "semver": "^7.1.3"
   }
 }

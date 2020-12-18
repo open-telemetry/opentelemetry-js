@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-zipkin",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "OpenTelemetry Zipkin Exporter allows the user to send collected traces to Zipkin.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -10,19 +10,17 @@
     "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
   },
   "scripts": {
-    "clean": "rimraf build/*",
+    "compile": "tsc --build",
+    "clean": "tsc --build --clean",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
-    "compile": "npm run version:update && tsc -p .",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "precompile": "tsc --version",
-    "prepare": "npm run compile",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "nyc karma start --single-run",
-    "version:update": "node ../../scripts/version-update.js",
-    "watch": "tsc -w"
+    "version": "node ../../scripts/version-update.js",
+    "watch": "tsc --build --watch"
   },
   "keywords": [
     "opentelemetry",
@@ -77,9 +75,9 @@
     "webpack-merge": "5.6.1"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.13.0",
-    "@opentelemetry/core": "^0.13.0",
-    "@opentelemetry/resources": "^0.13.0",
-    "@opentelemetry/tracing": "^0.13.0"
+    "@opentelemetry/api": "^0.14.0",
+    "@opentelemetry/core": "^0.14.0",
+    "@opentelemetry/resources": "^0.14.0",
+    "@opentelemetry/tracing": "^0.14.0"
   }
 }

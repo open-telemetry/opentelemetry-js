@@ -4,6 +4,63 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.14.0
+
+### :boom: Breaking Change
+
+* `opentelemetry-api`, `opentelemetry-metrics`
+  * [#1709](https://github.com/open-telemetry/opentelemetry-js/pull/1709) refactor: batch observer to be independent from metric types ([@legendecas](https://github.com/legendecas))
+* `opentelemetry-api`, `opentelemetry-instrumentation-http`, `opentelemetry-instrumentation-xml-http-request`, `opentelemetry-plugin-fetch`, `opentelemetry-plugin-grpc-js`, `opentelemetry-plugin-grpc`, `opentelemetry-plugin-http`, `opentelemetry-shim-opentracing`
+  * [#1734](https://github.com/open-telemetry/opentelemetry-js/pull/1734) chore: requires user to pass context to propagation APIs ([@Flarna](https://github.com/Flarna))
+* `opentelemetry-api`, `opentelemetry-core`, `opentelemetry-grpc-utils`, `opentelemetry-node`, `opentelemetry-plugin-fetch`, `opentelemetry-plugin-grpc-js`, `opentelemetry-plugin-grpc`, `opentelemetry-plugin-http`
+  * [#1715](https://github.com/open-telemetry/opentelemetry-js/pull/1715) chore: moving plugin from api to core ([@obecny](https://github.com/obecny))
+
+### :rocket: (Enhancement)
+
+* `opentelemetry-semantic-conventions`
+  * [#1684](https://github.com/open-telemetry/opentelemetry-js/pull/1684) feat(semantic-conventions): messaging specifications ([@nirsky](https://github.com/nirsky))
+* `opentelemetry-tracing`
+  * [#1685](https://github.com/open-telemetry/opentelemetry-js/pull/1685) chore: remove ordered attribute dropping ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-api`, `opentelemetry-core`, `opentelemetry-sdk-node`, `opentelemetry-shim-opentracing`, `opentelemetry-tracing`
+  * [#1687](https://github.com/open-telemetry/opentelemetry-js/pull/1687) chore: rename CorrelationContext to Baggage ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-exporter-prometheus`
+  * [#1697](https://github.com/open-telemetry/opentelemetry-js/pull/1697) fix(exporter-prometheus): add appendTimestamp option to ExporterConfig ([@antoniomrfranco](https://github.com/antoniomrfranco))
+* `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`
+  * [#1661](https://github.com/open-telemetry/opentelemetry-js/pull/1661) Use http keep-alive in collector exporter ([@lonewolf3739](https://github.com/lonewolf3739))
+* `opentelemetry-plugin-http`, `opentelemetry-semantic-conventions`
+  * [#1625](https://github.com/open-telemetry/opentelemetry-js/pull/1625)  feat(opentelemetry-js): add content size attributes to HTTP spans  ([@nijotz](https://github.com/nijotz))
+* `opentelemetry-exporter-collector`
+  * [#1708](https://github.com/open-telemetry/opentelemetry-js/pull/1708) feat(exporter-collector): implement concurrencyLimit option ([@dobesv](https://github.com/dobesv))
+* `opentelemetry-api`, `opentelemetry-core`, `opentelemetry-grpc-utils`, `opentelemetry-node`, `opentelemetry-plugin-fetch`, `opentelemetry-plugin-grpc-js`, `opentelemetry-plugin-grpc`, `opentelemetry-plugin-http`
+  * [#1715](https://github.com/open-telemetry/opentelemetry-js/pull/1715) chore: moving plugin from api to core ([@obecny](https://github.com/obecny))
+
+### :bug: (Bug Fix)
+
+* `opentelemetry-exporter-jaeger`
+  * [#1758](https://github.com/open-telemetry/opentelemetry-js/pull/1758) fix(@opentelemetry/exporter-jaeger): fixed issue #1757 ([@debagger](https://github.com/debagger))
+* `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`
+  * [#1751](https://github.com/open-telemetry/opentelemetry-js/pull/1751) Fixing Span status when exporting span ([@obecny](https://github.com/obecny))
+* `opentelemetry-instrumentation-http`, `opentelemetry-plugin-http`
+  * [#1747](https://github.com/open-telemetry/opentelemetry-js/pull/1747) feat: fixing failing test ([@obecny](https://github.com/obecny))
+* `opentelemetry-instrumentation-xml-http-request`
+  * [#1720](https://github.com/open-telemetry/opentelemetry-js/pull/1720) fix(xhr): check for resource timing support ([@bradfrosty](https://github.com/bradfrosty))
+
+### Committers: 13
+
+* Antônio Franco ([@antoniomrfranco](https://github.com/antoniomrfranco))
+* Bartlomiej Obecny ([@obecny](https://github.com/obecny))
+* Brad Frost ([@bradfrosty](https://github.com/bradfrosty))
+* Daniel Dyla ([@dyladan](https://github.com/dyladan))
+* Dobes Vandermeer ([@dobesv](https://github.com/dobesv))
+* Gerhard Stöbich ([@Flarna](https://github.com/Flarna))
+* Mikhail Sokolov ([@debagger](https://github.com/debagger))
+* Nik Zap ([@nijotz](https://github.com/nijotz))
+* Nir Hadassi ([@nirsky](https://github.com/nirsky))
+* Shovnik Bhattacharya ([@shovnik](https://github.com/shovnik))
+* Srikanth Chekuri ([@lonewolf3739](https://github.com/lonewolf3739))
+* Valentin Marchaud ([@vmarchaud](https://github.com/vmarchaud))
+* legendecas ([@legendecas](https://github.com/legendecas))
+
 ## 0.13.0
 
 ### :boom: Breaking Change
@@ -72,7 +129,7 @@ All notable changes to this project will be documented in this file.
 * `opentelemetry-context-zone-peer-dep`, `opentelemetry-web`
   * [#1616](https://github.com/open-telemetry/opentelemetry-js/pull/1616) docs: zone ctx manager can only be used with es2015 ([@dyladan](https://github.com/dyladan))
 
-#### Committers: 16
+### Committers: 16
 
 * Andrew ([@AndrewGrachov](https://github.com/AndrewGrachov))
 * Bartlomiej Obecny ([@obecny](https://github.com/obecny))
@@ -267,7 +324,7 @@ All notable changes to this project will be documented in this file.
 * Other
   * [#1431](https://github.com/open-telemetry/opentelemetry-js/pull/1431) Fix typo in document. ([@dengliming](https://github.com/dengliming))
 
-#### Committers: 21
+### Committers: 21
 
 * Andrew ([@AndrewGrachov](https://github.com/AndrewGrachov))
 * Bartlomiej Obecny ([@obecny](https://github.com/obecny))
@@ -391,7 +448,7 @@ All notable changes to this project will be documented in this file.
 * `opentelemetry-api`, `opentelemetry-metrics`
   * [#1272](https://github.com/open-telemetry/opentelemetry-js/pull/1272) feat: adding new metric: up down sum observer ([@obecny](https://github.com/obecny))
 
-#### Committers: 21
+### Committers: 21
 
 * Adam Egyed ([@adamegyed](https://github.com/adamegyed))
 * Aravin ([@aravinsiva](https://github.com/aravinsiva))
@@ -469,7 +526,7 @@ All notable changes to this project will be documented in this file.
   * [#1142](https://github.com/open-telemetry/opentelemetry-js/pull/1142) chore: template prometheus endpoint in examples rather than hardcode ([@naseemkullah](https://github.com/naseemkullah))
   * [#1217](https://github.com/open-telemetry/opentelemetry-js/pull/1217) chore: fix markdown linting and add npm script ([@dyladan](https://github.com/dyladan))
 
-#### Committers: 13
+### Committers: 13
 
 * David W. ([@davidwitten](https://github.com/davidwitten))
 * Bartlomiej Obecny ([@obecny](https://github.com/obecny))
@@ -504,7 +561,7 @@ All notable changes to this project will be documented in this file.
 * `opentelemetry-api`
   * [#1106](https://github.com/open-telemetry/opentelemetry-js/pull/1106) chore: improve API documentation ([@mayurkale22](https://github.com/mayurkale22))
 
-#### Committers: 7
+### Committers: 7
 
 * Bartlomiej Obecny ([@obecny](https://github.com/obecny))
 * Daniel Dyla ([@dyladan](https://github.com/dyladan))
@@ -535,7 +592,7 @@ All notable changes to this project will be documented in this file.
 * `opentelemetry-core`
   * [#1080](https://github.com/open-telemetry/opentelemetry-js/pull/1080) docs: document CorrelationContext propagator under Built-in Implement… ([@rubenvp8510](https://github.com/rubenvp8510))
 
-#### Committers: 5
+### Committers: 5
 
 * Marian Zagoruiko ([@mzahor](https://github.com/mzahor))
 * Mayur Kale ([@mayurkale22](https://github.com/mayurkale22))
@@ -574,7 +631,7 @@ All notable changes to this project will be documented in this file.
 * `opentelemetry-exporter-prometheus`
   * [#1056](https://github.com/open-telemetry/opentelemetry-js/pull/1056) fix readme: setting labelKeys when creating the counter ([@luebken](https://github.com/luebken))
 
-#### Committers: 9
+### Committers: 9
 
 * Alan Storm ([@astorm](https://github.com/astorm))
 * Amir Blum ([@BlumAmir](https://github.com/BlumAmir))
@@ -635,7 +692,7 @@ Released 2020-05-12
   * [#1003](https://github.com/open-telemetry/opentelemetry-js/pull/1003) chore: test on node 14 ([@dyladan](https://github.com/dyladan))
   * [#990](https://github.com/open-telemetry/opentelemetry-js/pull/990) fix(opentracing-shim): update opentracing shim example ([@sleighzy](https://github.com/sleighzy))
 
-#### Committers: 7
+### Committers: 7
 
 * legendecas ([@legendecas](https://github.com/legendecas))
 * Valentin Marchaud ([@vmarchaud](https://github.com/vmarchaud))
@@ -670,7 +727,7 @@ Released 2020-04-23
 * `opentelemetry-metrics`
   * [#930](https://github.com/open-telemetry/opentelemetry-js/pull/930) feat(aggregators): implement histogram aggregator ([@vmarchaud](https://github.com/vmarchaud))
 
-#### Committers: 5
+### Committers: 5
 
 * Naseem ([@naseemkullah](https://github.com/naseemkullah))
 * Matthew Wear ([@mwear](https://github.com/mwear))
@@ -701,7 +758,7 @@ Released 2020-04-08
 * `opentelemetry-propagator-jaeger`
   * [#937](https://github.com/open-telemetry/opentelemetry-js/pull/937) fix: Jaeger propagator example of usage" ([@shivkanya9146](https://github.com/shivkanya9146))
 
-#### Committers: 4
+### Committers: 4
 
 * Daniel Dyla ([@dyladan](https://github.com/dyladan))
 * Naseem ([@naseemkullah](https://github.com/naseemkullah))
@@ -729,7 +786,7 @@ Released 2020-04-01
 * `opentelemetry-node`
   * [#921](https://github.com/open-telemetry/opentelemetry-js/pull/921) chore: fix Require Path in README [@shivkanya9146](https://github.com/shivkanya9146))
 
-#### Committers: 4
+### Committers: 4
 
 * Mayur Kale ([@mayurkale22](https://github.com/mayurkale22))
 * Bartlomiej Obecny ([@obecny](https://github.com/obecny))
@@ -763,7 +820,7 @@ Released 2020-03-27
 * `opentelemetry-context-base`, `opentelemetry-core`, `opentelemetry-plugin-document-load`, `opentelemetry-plugin-user-interaction`, `opentelemetry-web`
   * [#906](https://github.com/open-telemetry/opentelemetry-js/pull/906) chore: fixing documentation for web tracer provider, fixing examples … ([@obecny](https://github.com/obecny))
 
-#### Committers: 4
+### Committers: 4
 
 * Bartlomiej Obecny ([@obecny](https://github.com/obecny))
 * Daniel Dyla ([@dyladan](https://github.com/dyladan))
@@ -783,7 +840,7 @@ Released 2020-03-19
 * `opentelemetry-metrics`
   * [#881](https://github.com/open-telemetry/opentelemetry-js/pull/881)  fix: @opentelemetry/metrics fails to run due to bad import ([@mayurkale22](https://github.com/mayurkale22))
 
-#### Committers: 2
+### Committers: 2
 
 * Daniel Dyla ([@dyladan](https://github.com/dyladan))
 * Mayur Kale ([@mayurkale22](https://github.com/mayurkale22))

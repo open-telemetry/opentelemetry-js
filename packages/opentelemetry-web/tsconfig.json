@@ -1,5 +1,5 @@
 {
-  "extends": "../tsconfig.base",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "build",
@@ -8,5 +8,34 @@
   "include": [
     "src/**/*.ts",
     "test/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../opentelemetry-api"
+    },
+    {
+      "path": "../opentelemetry-context-base"
+    },
+    {
+      "path": "../opentelemetry-context-zone"
+    },
+    {
+      "path": "../opentelemetry-core"
+    },
+    {
+      "path": "../opentelemetry-instrumentation"
+    },
+    {
+      "path": "../opentelemetry-propagator-b3"
+    },
+    {
+      "path": "../opentelemetry-resources"
+    },
+    {
+      "path": "../opentelemetry-semantic-conventions"
+    },
+    {
+      "path": "../opentelemetry-tracing"
+    }
   ]
 }
