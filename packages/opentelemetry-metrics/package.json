@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/metrics",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "OpenTelemetry metrics SDK",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -56,8 +56,8 @@
     "typescript": "3.9.7"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.13.0",
-    "@opentelemetry/core": "^0.13.0",
-    "@opentelemetry/resources": "^0.13.0"
+    "@opentelemetry/api": "^0.14.0",
+    "@opentelemetry/core": "^0.14.0",
+    "@opentelemetry/resources": "^0.14.0"
   }
 }
