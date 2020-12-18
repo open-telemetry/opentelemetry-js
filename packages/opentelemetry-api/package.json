@@ -10,6 +10,8 @@
   },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
+    "compile": "tsc --build",
+    "clean": "tsc --build --clean",
     "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
     "test:browser": "nyc karma start --single-run",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
@@ -17,13 +19,10 @@
     "build": "npm run compile",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "precompile": "tsc --version",
-    "version:update": "node ../../scripts/version-update.js",
-    "compile": "npm run version:update && tsc -p .",
+    "version": "node ../../scripts/version-update.js",
     "docs-test": "linkinator docs/out --silent --skip david-dm.org",
-    "docs": "typedoc --tsconfig tsconfig.json --exclude test/**/*.ts",
-    "prepare": "npm run compile",
-    "watch": "tsc -w"
+    "docs": "typedoc --tsconfig tsconfig.docs.json",
+    "watch": "tsc --build --watch"
   },
   "keywords": [
     "opentelemetry",
