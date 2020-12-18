@@ -10,8 +10,8 @@
     "clean": "tsc --build --clean",
     "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
+    "lint": "../../node_modules/.bin/eslint --ext .ts .",
+    "lint:fix": "../../node_modules/.bin/eslint --ext .ts --fix .",
     "version": "node ../../scripts/version-update.js",
     "watch": "tsc --build --watch"
   },
@@ -44,13 +44,11 @@
   "devDependencies": {
     "@opentelemetry/context-base": "^0.14.0",
     "codecov": "3.8.1",
-    "gts": "2.0.2",
     "istanbul-instrumenter-loader": "3.0.1",
     "mocha": "7.2.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "ts-loader": "8.0.12",
-    "ts-mocha": "8.0.0",
-    "typescript": "3.9.7"
+    "ts-mocha": "8.0.0"
   }
 }

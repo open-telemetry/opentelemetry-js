@@ -30,8 +30,8 @@
     "clean": "tsc --build --clean",
     "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
+    "lint": "../../node_modules/.bin/eslint --ext .ts .",
+    "lint:fix": "../../node_modules/.bin/eslint --ext .ts --fix .",
     "version": "node ../../scripts/version-update.js",
     "watch": "tsc --build --watch"
   },
@@ -56,9 +56,7 @@
     "LICENSE",
     "README.md"
   ],
-  "devDependencies": {
-    "typescript": "3.9.7"
-  },
+  "devDependencies": {},
   "Add these to devDependencies for testing": {
     "codecov": "3.8.1",
     "istanbul-instrumenter-loader": "3.0.1",

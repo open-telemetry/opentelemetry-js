@@ -11,9 +11,7 @@
     "@opentelemetry/sdk-node": "^0.14.0",
     "@opentelemetry/tracing": "^0.14.0"
   },
-  "devDependencies": {
-    "typescript": "3.9.7"
-  },
+  "devDependencies": {},
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0"
 }

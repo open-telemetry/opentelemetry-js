@@ -8,8 +8,8 @@
   "scripts": {
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
+    "lint": "../../node_modules/.bin/eslint --ext .ts .",
+    "lint:fix": "../../node_modules/.bin/eslint --ext .ts --fix .",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "version": "node ../../scripts/version-update.js",
     "tdd": "karma start",
@@ -48,7 +48,6 @@
     "@opentelemetry/tracing": "^0.14.0",
     "babel-loader": "8.2.2",
     "codecov": "3.8.1",
-    "gts": "2.0.2",
     "istanbul-instrumenter-loader": "3.0.1",
     "karma": "5.2.3",
     "karma-chrome-launcher": "3.1.0",
@@ -63,7 +62,6 @@
     "ts-loader": "8.0.12",
     "ts-mocha": "8.0.0",
     "ts-node": "9.1.1",
-    "typescript": "3.9.7",
     "webpack": "4.44.2",
     "webpack-cli": "4.2.0",
     "webpack-merge": "5.6.1"

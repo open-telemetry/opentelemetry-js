@@ -16,6 +16,7 @@
 
 import { SpanKind, Logger, Attributes } from '@opentelemetry/api';
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-namespace */
 export namespace opentelemetryProto {
   export namespace collector {

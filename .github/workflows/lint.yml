@@ -33,19 +33,16 @@ jobs:
         with:
           path: |
             node_modules
-            packages/*/node_modules
-            metapackages/*/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
+          key: ${{ runner.os }}-${{ hashFiles('package.json') }}
 
       - name: Bootstrap
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           npm install --only=dev --ignore-scripts
-          npx lerna bootstrap --no-ci --ignore-scripts -- --only=dev
 
       - name: Lint
         run: |
-          npm run lint
+          npm run lint -- --quiet
           npm run lint:examples
 
       - name: Install API Dependencies
