@@ -5,20 +5,21 @@
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "scripts": {
+    "compile": "tsc --build",
+    "watch": "tsc --build --watch",
+    "clean": "tsc --build --clean",
     "bench": "node benchmark",
-    "clean": "lerna run clean",
-    "postinstall": "npm run bootstrap",
-    "precompile": "tsc --version",
+    "postinstall": "update-ts-references && npm run bootstrap",
+    "postcompile": "npm run submodule && npm run protos:copy",
+    "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
+    "protos:copy": "lerna run protos:copy",
     "version:update": "lerna run version:update",
-    "compile": "lerna run compile",
     "test": "lerna run test",
     "test:browser": "lerna run test:browser",
     "test:backcompat": "lerna run test:backcompat",
     "bootstrap": "lerna bootstrap",
-    "bump": "lerna publish",
     "codecov": "lerna run codecov",
     "codecov:browser": "lerna run codecov:browser",
-    "changelog": "lerna-changelog",
     "predocs-test": "npm run docs",
     "docs-test": "lerna run docs-test",
     "docs": "lerna run docs",
@@ -57,7 +58,8 @@
     "lerna": "3.22.1",
     "lerna-changelog": "1.0.1",
     "markdownlint-cli": "0.25.0",
-    "typescript": "3.9.7"
+    "typescript": "3.9.7",
+    "update-ts-references": "^1.3.0"
   },
   "husky": {
     "hooks": {

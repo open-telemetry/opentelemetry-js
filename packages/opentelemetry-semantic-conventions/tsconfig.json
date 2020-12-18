@@ -1,5 +1,5 @@
 {
-  "extends": "../tsconfig.es5",
+  "extends": "../../tsconfig.es5.json",
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "build"
