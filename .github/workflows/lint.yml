@@ -48,8 +48,15 @@ jobs:
           npm run lint
           npm run lint:examples
 
-      - name: Install and Build API Dependencies
-        run: npx lerna bootstrap --no-ci --scope @opentelemetry/api --include-filtered-dependencies
+      - name: Install API Dependencies
+        run: |
+          npm install --ignore-scripts
+          npx lerna bootstrap --no-ci --scope @opentelemetry/api --include-dependencies
+
+      - name: Build 🔧
+        run: |
+          npx lerna run compile --scope @opentelemetry/api
+          npx lerna run docs
 
       - name: Test Docs
         run: npm run docs-test

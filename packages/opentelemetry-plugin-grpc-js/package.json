@@ -1,22 +1,20 @@
 {
   "name": "@opentelemetry/plugin-grpc-js",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "OpenTelemetry @grpc/grpc-js automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
+    "compile": "tsc --build",
+    "clean": "tsc --build --clean",
     "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
     "test:deubg": "ts-mocha --inspect-brk -p tsconfig.json test/**/*.test.ts",
     "tdd": "npm run test -- --watch-extensions ts --watch",
-    "clean": "rimraf build/*",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
-    "precompile": "tsc --version",
-    "version:update": "node ../../scripts/version-update.js",
-    "compile": "npm run version:update && tsc -p .",
-    "prepare": "npm run compile"
+    "version": "node ../../scripts/version-update.js"
   },
   "keywords": [
     "opentelemetry",
@@ -45,11 +43,11 @@
   },
   "devDependencies": {
     "@grpc/grpc-js": "1.2.2",
-    "@opentelemetry/context-async-hooks": "^0.13.0",
-    "@opentelemetry/context-base": "^0.13.0",
-    "@opentelemetry/grpc-utils": "^0.13.0",
-    "@opentelemetry/node": "^0.13.0",
-    "@opentelemetry/tracing": "^0.13.0",
+    "@opentelemetry/context-async-hooks": "^0.14.0",
+    "@opentelemetry/context-base": "^0.14.0",
+    "@opentelemetry/grpc-utils": "^0.14.0",
+    "@opentelemetry/node": "^0.14.0",
+    "@opentelemetry/tracing": "^0.14.0",
     "@types/mocha": "8.2.0",
     "@types/node": "14.14.12",
     "@types/semver": "7.3.4",
@@ -67,9 +65,9 @@
     "typescript": "3.9.7"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.13.0",
-    "@opentelemetry/core": "^0.13.0",
-    "@opentelemetry/semantic-conventions": "^0.13.0",
+    "@opentelemetry/api": "^0.14.0",
+    "@opentelemetry/core": "^0.14.0",
+    "@opentelemetry/semantic-conventions": "^0.14.0",
     "shimmer": "1.2.1"
   }
 }

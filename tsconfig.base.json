@@ -2,6 +2,7 @@
   "compilerOptions": {
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
+    "composite": true,
     "declaration": true,
     "declarationMap": true,
     "forceConsistentCasingInFileNames": true,
