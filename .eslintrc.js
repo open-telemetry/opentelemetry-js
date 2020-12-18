@@ -85,5 +85,4 @@ module.exports = {
     "backwards-compatability/*/build",
     "getting-started",
   ],
-  
 };
