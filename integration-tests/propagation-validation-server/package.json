@@ -8,7 +8,7 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "scripts": {
-    "compile": "tsc --build"
+    "compile": "../../node_modules/.bin/tsc --build"
   },
   "dependencies": {
     "@opentelemetry/api": "^0.14.0",
