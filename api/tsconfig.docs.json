@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "build"
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "typedocOptions": {
+    "name": "OpenTelemetry API for JavaScript",
+    "out": "docs/out",
+    "mode": "file",
+    "hideGenerator": true
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "extends": "./tsconfig.base.json",
+  "files": [],
+  "references": [
+    {
+      "path": "backwards-compatability/node10"
+    },
+    {
+      "path": "backwards-compatability/node12"
+    },
+    {
+      "path": "backwards-compatability/node8"
+    },
+    {
+      "path": "packages/opentelemetry-api"
+    },
+    {
+      "path": "packages/opentelemetry-context-async-hooks"
+    },
+    {
+      "path": "packages/opentelemetry-context-base"
+    },
+    {
+      "path": "packages/opentelemetry-context-zone-peer-dep"
+    },
+    {
+      "path": "packages/opentelemetry-context-zone"
+    },
+    {
+      "path": "packages/opentelemetry-core"
+    },
+    {
+      "path": "packages/opentelemetry-exporter-collector-grpc"
+    },
+    {
+      "path": "packages/opentelemetry-exporter-collector-proto"
+    },
+    {
+      "path": "packages/opentelemetry-exporter-collector"
+    },
+    {
+      "path": "packages/opentelemetry-exporter-jaeger"
+    },
+    {
+      "path": "packages/opentelemetry-exporter-prometheus"
+    },
+    {
+      "path": "packages/opentelemetry-exporter-zipkin"
+    },
+    {
+      "path": "packages/opentelemetry-grpc-utils"
+    },
+    {
+      "path": "packages/opentelemetry-instrumentation-http"
+    },
+    {
+      "path": "packages/opentelemetry-instrumentation-xml-http-request"
+    },
+    {
+      "path": "packages/opentelemetry-instrumentation"
+    },
+    {
+      "path": "packages/opentelemetry-metrics"
+    },
+    {
+      "path": "packages/opentelemetry-node"
+    },
+    {
+      "path": "packages/opentelemetry-plugin-fetch"
+    },
+    {
+      "path": "packages/opentelemetry-plugin-grpc-js"
+    },
+    {
+      "path": "packages/opentelemetry-plugin-grpc"
+    },
+    {
+      "path": "packages/opentelemetry-plugin-http"
+    },
+    {
+      "path": "packages/opentelemetry-plugin-https"
+    },
+    {
+      "path": "packages/opentelemetry-propagator-b3"
+    },
+    {
+      "path": "packages/opentelemetry-resource-detector-aws"
+    },
+    {
+      "path": "packages/opentelemetry-resource-detector-gcp"
+    },
+    {
+      "path": "packages/opentelemetry-resources"
+    },
+    {
+      "path": "packages/opentelemetry-sdk-node"
+    },
+    {
+      "path": "packages/opentelemetry-semantic-conventions"
+    },
+    {
+      "path": "packages/opentelemetry-shim-opentracing"
+    },
+    {
+      "path": "packages/opentelemetry-tracing"
+    },
+    {
+      "path": "packages/opentelemetry-web"
+    },
+    {
+      "path": "packages/template"
+    },
+    {
+      "path": "integration-tests/propagation-validation-server"
+    }
+  ]
+}

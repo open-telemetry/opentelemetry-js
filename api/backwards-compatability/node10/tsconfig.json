@@ -5,12 +5,14 @@
     "outDir": "build"
   },
   "include": [
-    "src/**/*.ts",
-    "test/**/*.ts"
+    "index.ts"
   ],
   "references": [
     {
-      "path": "../opentelemetry-context-base"
+      "path": "../../packages/opentelemetry-sdk-node"
+    },
+    {
+      "path": "../../packages/opentelemetry-tracing"
     }
   ]
 }
