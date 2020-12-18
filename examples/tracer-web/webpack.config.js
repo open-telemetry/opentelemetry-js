@@ -17,7 +17,7 @@ const common = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
-    // sourceMapFilename: '[file].map',
+    sourceMapFilename: '[file].map',
   },
   target: 'web',
   module: {
