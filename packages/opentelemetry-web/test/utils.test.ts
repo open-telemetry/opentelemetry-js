@@ -185,19 +185,19 @@ describe('utils', () => {
         assert.strictEqual(args[1], 123);
       });
     });
-    describe('when entry has time equal to 0', () => {
+    describe('when entry is not numeric', () => {
       it('should NOT add event to span', () => {
         const addEventSpy = sinon.spy();
         const span = ({
           addEvent: addEventSpy,
         } as unknown) as tracing.Span;
         const entries = {
-          [PTN.FETCH_START]: 0,
-        } as PerformanceEntries;
+          [PTN.FETCH_START]: 'non-numeric',
+        } as unknown;
 
         assert.strictEqual(addEventSpy.callCount, 0);
 
-        addSpanNetworkEvent(span, PTN.FETCH_START, entries);
+        addSpanNetworkEvent(span, PTN.FETCH_START, entries as PerformanceEntries);
 
         assert.strictEqual(addEventSpy.callCount, 0);
       });
