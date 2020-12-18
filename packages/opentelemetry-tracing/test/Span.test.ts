@@ -348,8 +348,9 @@ describe('Span', () => {
     assert.strictEqual(span.events.length, 100);
     assert.strictEqual(Object.keys(span.attributes).length, 100);
     assert.strictEqual(span.events[span.events.length - 1].name, 'sent149');
-    assert.strictEqual(span.attributes['foo0'], undefined);
-    assert.strictEqual(span.attributes['foo149'], 'bar149');
+    assert.strictEqual(span.attributes['foo0'], 'bar0');
+    assert.strictEqual(span.attributes['foo99'], 'bar99');
+    assert.strictEqual(span.attributes['sent100'], undefined);
   });
 
   it('should set an error status', () => {

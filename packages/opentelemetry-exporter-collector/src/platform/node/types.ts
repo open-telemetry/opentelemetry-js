@@ -13,12 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import type * as http from 'http';
+import type * as https from 'https';
 
-export * from './database';
-export * from './exception';
-export * from './general';
-export * from './http';
-export * from './os';
-export * from './rpc';
-export * from './faas';
-export * from './messaging';
+import { CollectorExporterConfigBase } from '../../types';
+
+/**
+ * Collector Exporter node base config
+ */
+export interface CollectorExporterNodeConfigBase
+  extends CollectorExporterConfigBase {
+  keepAlive?: boolean;
+  httpAgentOptions?: http.AgentOptions | https.AgentOptions;
+}

@@ -222,7 +222,7 @@ const MemUsageMetric = meter.createValueObserver('mem_usage_per_app', {
   description: 'Memory',
 });
 
-meter.createBatchObserver('metric_batch_observer', (observerBatchResult) => {
+meter.createBatchObserver((observerBatchResult) => {
   getSomeAsyncMetrics().then(metrics => {
     observerBatchResult.observe({ app: 'myApp' }, [
       cpuUsageMetric.observation(metrics.value1),

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-collector-proto",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -47,9 +47,9 @@
     "access": "public"
   },
   "devDependencies": {
-    "@babel/core": "7.12.9",
-    "@types/mocha": "8.0.4",
-    "@types/node": "14.14.10",
+    "@babel/core": "7.12.10",
+    "@types/mocha": "8.2.0",
+    "@types/node": "14.14.12",
     "@types/sinon": "9.0.9",
     "codecov": "3.8.1",
     "cpx": "1.5.0",
@@ -57,20 +57,20 @@
     "mocha": "7.2.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "sinon": "9.2.1",
-    "ts-loader": "8.0.11",
+    "sinon": "9.2.2",
+    "ts-loader": "8.0.12",
     "ts-mocha": "8.0.0",
-    "ts-node": "9.0.0",
+    "ts-node": "9.1.1",
     "typescript": "3.9.7"
   },
   "dependencies": {
     "@grpc/proto-loader": "^0.5.4",
-    "@opentelemetry/api": "^0.13.0",
-    "@opentelemetry/core": "^0.13.0",
-    "@opentelemetry/exporter-collector": "^0.13.0",
-    "@opentelemetry/metrics": "^0.13.0",
-    "@opentelemetry/resources": "^0.13.0",
-    "@opentelemetry/tracing": "^0.13.0",
+    "@opentelemetry/api": "^0.14.0",
+    "@opentelemetry/core": "^0.14.0",
+    "@opentelemetry/exporter-collector": "^0.14.0",
+    "@opentelemetry/metrics": "^0.14.0",
+    "@opentelemetry/resources": "^0.14.0",
+    "@opentelemetry/tracing": "^0.14.0",
     "protobufjs": "^6.9.0"
   }
 }

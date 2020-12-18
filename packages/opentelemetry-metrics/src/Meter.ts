@@ -17,10 +17,9 @@
 import * as api from '@opentelemetry/api';
 import { ConsoleLogger, InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { BatchObserverMetric } from './BatchObserverMetric';
+import { BatchObserver } from './BatchObserver';
 import { BaseBoundInstrument } from './BoundInstrument';
 import { Processor } from './export/Processor';
-import { MetricKind } from './export/types';
 import { UpDownCounterMetric } from './UpDownCounterMetric';
 import { CounterMetric } from './CounterMetric';
 import { UpDownSumObserverMetric } from './UpDownSumObserverMetric';
@@ -38,6 +37,7 @@ import { NoopExporter } from './export/NoopExporter';
  */
 export class Meter implements api.Meter {
   private readonly _logger: api.Logger;
+  private readonly _batchObservers: BatchObserver[] = [];
   private readonly _metrics = new Map<string, Metric<BaseBoundInstrument>>();
   private readonly _processor: Processor;
   private readonly _resource: Resource;
@@ -258,36 +258,20 @@ export class Meter implements api.Meter {
   }
 
   /**
-   * Creates a new batch observer metric.
-   * @param name the name of the metric.
+   * Creates a new batch observer.
    * @param callback the batch observer callback
-   * @param [options] the metric batch options.
+   * @param [options] the batch options.
    */
   createBatchObserver(
-    name: string,
     callback: (observerResult: api.BatchObserverResult) => void,
-    options: api.BatchMetricOptions = {}
-  ): api.BatchObserver {
-    if (!this._isValidName(name)) {
-      this._logger.warn(
-        `Invalid metric name ${name}. Defaulting to noop metric implementation.`
-      );
-      return api.NOOP_BATCH_OBSERVER_METRIC;
-    }
-    const opt: api.BatchMetricOptions = {
+    options: api.BatchObserverOptions = {}
+  ): BatchObserver {
+    const opt: api.BatchObserverOptions = {
       logger: this._logger,
-      ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    const batchObserver = new BatchObserverMetric(
-      name,
-      opt,
-      this._processor,
-      this._resource,
-      this._instrumentationLibrary,
-      callback
-    );
-    this._registerMetric(name, batchObserver);
+    const batchObserver = new BatchObserver(opt, callback);
+    this._batchObservers.push(batchObserver);
     return batchObserver;
   }
 
@@ -300,27 +284,15 @@ export class Meter implements api.Meter {
    */
   async collect(): Promise<void> {
     // call batch observers first
-    const batchObservers = Array.from(this._metrics.values())
-      .filter(metric => {
-        return metric.getKind() === MetricKind.BATCH_OBSERVER;
-      })
-      .map(metric => {
-        return metric.getMetricRecord();
-      });
-    await Promise.all(batchObservers).then(records => {
-      records.forEach(metrics => {
-        metrics.forEach(metric => this._processor.process(metric));
-      });
+    const observations = this._batchObservers.map(observer => {
+      return observer.collect();
     });
+    await Promise.all(observations);
 
     // after this all remaining metrics can be run
-    const metrics = Array.from(this._metrics.values())
-      .filter(metric => {
-        return metric.getKind() !== MetricKind.BATCH_OBSERVER;
-      })
-      .map(metric => {
-        return metric.getMetricRecord();
-      });
+    const metrics = Array.from(this._metrics.values()).map(metric => {
+      return metric.getMetricRecord();
+    });
 
     await Promise.all(metrics).then(records => {
       records.forEach(metrics => {

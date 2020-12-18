@@ -17,6 +17,7 @@
 import {
   collectorTypes,
   toCollectorExportMetricServiceRequest,
+  CollectorExporterNodeConfigBase,
 } from '@opentelemetry/exporter-collector';
 import { MetricRecord, MetricExporter } from '@opentelemetry/metrics';
 import { ServiceClientType } from './types';
@@ -47,16 +48,14 @@ export class CollectorMetricExporter
     );
   }
 
-  getDefaultUrl(config: collectorTypes.CollectorExporterConfigBase): string {
+  getDefaultUrl(config: CollectorExporterNodeConfigBase): string {
     if (!config.url) {
       return DEFAULT_COLLECTOR_URL;
     }
     return config.url;
   }
 
-  getDefaultServiceName(
-    config: collectorTypes.CollectorExporterConfigBase
-  ): string {
+  getDefaultServiceName(config: CollectorExporterNodeConfigBase): string {
     return config.serviceName || DEFAULT_SERVICE_NAME;
   }
 

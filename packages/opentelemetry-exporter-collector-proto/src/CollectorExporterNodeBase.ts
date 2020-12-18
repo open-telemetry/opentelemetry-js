@@ -17,6 +17,7 @@
 import {
   CollectorExporterNodeBase as CollectorExporterBaseMain,
   collectorTypes,
+  CollectorExporterNodeConfigBase,
 } from '@opentelemetry/exporter-collector';
 import { ServiceClientType } from './types';
 
@@ -55,7 +56,7 @@ export abstract class CollectorExporterNodeBase<
     this._sendingPromises.push(promise);
   }
 
-  onInit(config: collectorTypes.CollectorExporterConfigBase): void {
+  onInit(config: CollectorExporterNodeConfigBase): void {
     this._isShutdown = false;
     // defer to next tick and lazy load to avoid loading protobufjs too early
     // and making this impossible to be instrumented
