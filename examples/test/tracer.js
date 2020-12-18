@@ -26,6 +26,7 @@ const provider = new BasicTracerProvider();
 const currentDir = __dirname;
 registerInstrumentations({
   instrumentations: [
+    // new GraphQLInstrumentation(),
     GraphQLInstrumentation,
     {
       plugins: {

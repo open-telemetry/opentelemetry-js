@@ -38,21 +38,26 @@ export const DEFAULT_INSTRUMENTATION_PLUGINS: NodePlugins = {
   dns: { enabled: true, path: '@opentelemetry/plugin-dns' },
 };
 
+/**
+ * Loads provided node plugins
+ * @param pluginsNode
+ * @param pluginsWeb
+ * @param logger
+ * @param tracerProvider
+ * @return returns function to disable all plugins
+ */
 export function loadOldPlugins(
   pluginsNode: NodePlugins,
   pluginsWeb: OldClassPlugin[],
   logger: api.Logger,
   tracerProvider: api.TracerProvider
-): void {
-  let allPlugins;
-  if (Object.keys(pluginsNode).length > 0) {
-    // allPlugins = mergePlugins(DEFAULT_INSTRUMENTATION_PLUGINS, pluginsNode);
-    allPlugins = mergePlugins({}, pluginsNode);
-  } else {
-    allPlugins = pluginsNode;
-  }
+): () => void {
+  const allPlugins = mergePlugins(DEFAULT_INSTRUMENTATION_PLUGINS, pluginsNode);
   const pluginLoader = new PluginLoader(tracerProvider, logger);
   pluginLoader.load(allPlugins);
+  return () => {
+    pluginLoader.unload();
+  };
 }
 
 function mergePlugins(

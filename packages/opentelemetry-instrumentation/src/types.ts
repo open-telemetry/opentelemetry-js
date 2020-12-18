@@ -15,12 +15,6 @@
  */
 
 import { Logger, MeterProvider, TracerProvider } from '@opentelemetry/api';
-import { InstrumentationBase } from './platform';
-import {
-  NodePlugins,
-  NodePluginsTracerConfiguration,
-  OldClassPlugin,
-} from './types_plugin_only';
 
 /** Interface Instrumentation to apply patch. */
 export interface Instrumentation {
@@ -82,25 +76,4 @@ export interface ShimWrapped {
   __wrapped: boolean;
   __unwrap: Function;
   __original: Function;
-}
-
-export type InstrumentationOption =
-  | InstrumentationBase
-  | InstrumentationBase[]
-  | Instrumentation
-  | Instrumentation[]
-  | NodePluginsTracerConfiguration
-  | OldClassPlugin;
-
-export interface AutoLoaderResult {
-  instrumentations: Instrumentation[];
-  pluginsNode: NodePlugins;
-  pluginsWeb: OldClassPlugin[];
-}
-
-export interface AutoLoaderOptions {
-  instrumentations: InstrumentationOption[];
-  tracerProvider?: TracerProvider;
-  meterProvider?: MeterProvider;
-  logger?: Logger;
 }

@@ -16,13 +16,22 @@
 
 import * as api from '@opentelemetry/api';
 import {
+  disableInstrumentations,
   enableInstrumentations,
   parseInstrumentationOptions,
 } from './autoLoaderUtils';
 import { loadOldPlugins } from './platform';
-import { AutoLoaderOptions } from './types';
+import { AutoLoaderOptions } from './types_internal';
 
-export function registerInstrumentations(options: AutoLoaderOptions) {
+/**
+ * It will register instrumentations and plugins
+ * @param options
+ * @return returns function to unload instrumentation and plugins that were
+ *   registered
+ */
+export function registerInstrumentations(
+  options: AutoLoaderOptions
+): () => void {
   const {
     instrumentations,
     pluginsNode,
@@ -44,5 +53,15 @@ export function registerInstrumentations(options: AutoLoaderOptions) {
     meterProvider
   );
 
-  loadOldPlugins(pluginsNode, pluginsWeb, logger, tracerProvider);
+  const unload = loadOldPlugins(
+    pluginsNode,
+    pluginsWeb,
+    logger,
+    tracerProvider
+  );
+
+  return () => {
+    unload();
+    disableInstrumentations(instrumentations);
+  };
 }

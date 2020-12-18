@@ -75,7 +75,7 @@ function getIgnoreList(): string[] | typeof DISABLE_ALL_PLUGINS {
  */
 export class PluginLoader {
   /** A list of loaded plugins. */
-  private _plugins: OldClassPlugin[] = [];
+  plugins: OldClassPlugin[] = [];
   /**
    * A field that tracks whether the require-in-the-middle hook has been loaded
    * for the first time, as well as whether the hook body is activated or not.
@@ -186,7 +186,7 @@ export class PluginLoader {
             return exports;
           }
 
-          this._plugins.push(plugin);
+          this.plugins.push(plugin);
           // Enable each supported plugin.
           return plugin.enable(exports, this.provider, this.logger, config);
         } catch (e) {
@@ -210,10 +210,10 @@ export class PluginLoader {
   /** Unloads plugins. */
   unload(): PluginLoader {
     if (this._hookState === HookState.ENABLED) {
-      for (const plugin of this._plugins) {
+      for (const plugin of this.plugins) {
         plugin.disable();
       }
-      this._plugins = [];
+      this.plugins = [];
       this._hookState = HookState.DISABLED;
     }
     return this;

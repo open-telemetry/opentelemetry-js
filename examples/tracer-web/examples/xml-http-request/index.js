@@ -23,12 +23,14 @@ const providerWithZone = new WebTracerProvider({
 registerInstrumentations({
   // instrumentations: [XMLHttpRequestInstrumentation],
   instrumentations: [
-    new XMLHttpRequestInstrumentation({
-      ignoreUrls: [/localhost:8090\/sockjs-node/],
-      propagateTraceHeaderCorsUrls: [
-        'https://httpbin.org/get',
-      ],
-    }),
+    XMLHttpRequestInstrumentation,
+    // new XMLHttpRequestInstrumentation({
+    //   ignoreUrls: [/localhost:8090\/sockjs-node/],
+    //   propagateTraceHeaderCorsUrls: [
+    //     'https://httpbin.org/get',
+    //   ],
+    // }),
+    new UserInteractionPlugin(),
     new UserInteractionPlugin(),
     new DocumentLoad(),
   ],
