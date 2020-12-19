@@ -1,23 +1,21 @@
 {
   "name": "@opentelemetry/exporter-collector-grpc",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
-    "clean": "rimraf build/*",
-    "compile": "npm run version:update && tsc -p .",
+    "compile": "tsc --build",
+    "clean": "tsc --build --clean",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "postcompile": "npm run submodule && npm run protos:copy",
-    "precompile": "tsc --version",
-    "prepare": "npm run compile",
     "protos:copy": "cpx protos/opentelemetry/**/*.* build/protos/opentelemetry",
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
-    "version:update": "node ../../scripts/version-update.js",
+    "version": "node ../../scripts/version-update.js",
     "watch": "npm run protos:copy && tsc -w"
   },
   "keywords": [
@@ -65,12 +63,12 @@
   },
   "dependencies": {
     "@grpc/proto-loader": "^0.5.4",
-    "@opentelemetry/api": "^0.13.0",
-    "@opentelemetry/core": "^0.13.0",
-    "@opentelemetry/exporter-collector": "^0.13.0",
-    "@opentelemetry/metrics": "^0.13.0",
-    "@opentelemetry/resources": "^0.13.0",
-    "@opentelemetry/tracing": "^0.13.0",
+    "@opentelemetry/api": "^0.14.0",
+    "@opentelemetry/core": "^0.14.0",
+    "@opentelemetry/exporter-collector": "^0.14.0",
+    "@opentelemetry/metrics": "^0.14.0",
+    "@opentelemetry/resources": "^0.14.0",
+    "@opentelemetry/tracing": "^0.14.0",
     "grpc": "^1.24.2"
   }
 }

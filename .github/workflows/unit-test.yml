@@ -30,6 +30,8 @@ jobs:
         run: npm install --ignore-scripts
       - name: Boostrap Dependencies
         run: npx lerna bootstrap --no-ci
+      - name: Build
+        run: npm run compile
       - name: Unit tests
         run: npm run test
       - name: Report Coverage
@@ -58,6 +60,8 @@ jobs:
         run: npm install --ignore-scripts
       - name: Boostrap Dependencies
         run: npx lerna bootstrap --no-ci
+      - name: Build
+        run: npm run compile
       - name: Unit tests
         run: npm run test:browser
       - name: Report Coverage

@@ -1,5 +1,5 @@
 {
-  "extends": "../tsconfig.es5",
+  "extends": "../../tsconfig.es5.json",
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "build"
@@ -8,10 +8,9 @@
     "src/**/*.ts",
     "test/**/*.ts"
   ],
-  "typedocOptions": {
-    "name": "OpenTelemetry API for JavaScript",
-    "out": "docs/out",
-    "mode": "file",
-    "hideGenerator": true
-  }
+  "references": [
+    {
+      "path": "../opentelemetry-context-base"
+    }
+  ]
 }

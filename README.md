@@ -120,8 +120,9 @@ estimates, and subject to change.
 ## Contributing
 
 We'd love your help!. Use tags [up-for-grabs][up-for-grabs-issues] and
-[good first issue][good-first-issues] to get started with the project. Follow
-[CONTRIBUTING](CONTRIBUTING.md) guide to report issues or submit a proposal.
+[good first issue][good-first-issues] to get started with the project. For
+instructions to build and make changes to this project, see the
+[CONTRIBUTING](CONTRIBUTING.md) guide.
 
 We have a weekly SIG meeting! See the [community page](https://github.com/open-telemetry/community#javascript-sdk) for meeting details and notes.
 
