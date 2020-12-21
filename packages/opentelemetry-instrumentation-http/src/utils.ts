@@ -447,7 +447,7 @@ export const getIncomingRequestAttributes = (
   if (userAgent !== undefined) {
     attributes[HttpAttribute.HTTP_USER_AGENT] = userAgent;
   }
-  setResponseContentLengthAttribute(request, attributes);
+  setRequestContentLengthAttribute(request, attributes);
 
   const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
   return Object.assign(attributes, httpKindAttributes);
