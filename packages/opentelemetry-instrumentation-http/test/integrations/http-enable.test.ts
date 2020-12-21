@@ -72,6 +72,7 @@ describe('HttpInstrumentation Integration tests', () => {
           this.skip();
           // don't disturb people
         }
+        propagation.setGlobalPropagator(new DummyPropagation());
         done();
       });
     });
@@ -80,7 +81,6 @@ describe('HttpInstrumentation Integration tests', () => {
     const provider = new NodeTracerProvider({
       logger,
     });
-    propagation.setGlobalPropagator(new DummyPropagation());
     provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     instrumentation.setTracerProvider(provider);
     beforeEach(() => {
@@ -103,6 +103,7 @@ describe('HttpInstrumentation Integration tests', () => {
 
     after(() => {
       instrumentation.disable();
+      propagation.disable();
     });
 
     it('should create a rootSpan for GET requests and add propagation headers', async () => {

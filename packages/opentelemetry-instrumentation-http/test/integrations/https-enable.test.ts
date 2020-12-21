@@ -81,7 +81,6 @@ describe('HttpsInstrumentation Integration tests', () => {
     const provider = new NodeTracerProvider({
       logger,
     });
-    propagation.setGlobalPropagator(new DummyPropagation());
     provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     instrumentation.setTracerProvider(provider);
     beforeEach(() => {
@@ -94,6 +93,7 @@ describe('HttpsInstrumentation Integration tests', () => {
         /\/ignored\/regexp$/i,
         (url: string) => url.endsWith('/ignored/function'),
       ];
+      propagation.setGlobalPropagator(new DummyPropagation());
       instrumentation.setConfig({
         ignoreIncomingPaths: ignoreConfig,
         ignoreOutgoingUrls: ignoreConfig,
@@ -104,6 +104,7 @@ describe('HttpsInstrumentation Integration tests', () => {
 
     after(() => {
       instrumentation.disable();
+      propagation.disable();
     });
 
     it('should create a rootSpan for GET requests and add propagation headers', async () => {
