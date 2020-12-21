@@ -64,7 +64,6 @@ describe('HttpsInstrumentation', () => {
 
     beforeEach(() => {
       NOOP_TRACER.startSpan = sinon.spy();
-      NOOP_TRACER.withSpan = sinon.spy();
     });
 
     afterEach(() => {
@@ -88,10 +87,6 @@ describe('HttpsInstrumentation', () => {
           );
 
           assert.strictEqual(isWrapped(https.Server.prototype.emit), false);
-          assert.strictEqual(
-            (NOOP_TRACER.withSpan as sinon.SinonSpy).called,
-            false
-          );
         });
       });
     });

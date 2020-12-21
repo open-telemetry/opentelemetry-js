@@ -20,6 +20,7 @@ import {
   propagation,
   Span as ISpan,
   SpanKind,
+  setSpan,
 } from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
@@ -335,7 +336,7 @@ describe('HttpsPlugin', () => {
         doNock(hostname, testPath, 200, 'Ok');
         const name = 'TestRootSpan';
         const span = tracer.startSpan(name);
-        return tracer.withSpan(span, async () => {
+        return context.with(setSpan(context.active(), span), async () => {
           const result = await httpsRequest.get(
             `${protocol}://${hostname}${testPath}`
           );
@@ -378,7 +379,7 @@ describe('HttpsPlugin', () => {
           );
           const name = 'TestRootSpan';
           const span = tracer.startSpan(name);
-          return tracer.withSpan(span, async () => {
+          return context.with(setSpan(context.active(), span), async () => {
             const result = await httpsRequest.get(
               `${protocol}://${hostname}${testPath}`
             );
@@ -417,7 +418,7 @@ describe('HttpsPlugin', () => {
         doNock(hostname, testPath, 200, 'Ok', num);
         const name = 'TestRootSpan';
         const span = tracer.startSpan(name);
-        await tracer.withSpan(span, async () => {
+        await context.with(setSpan(context.active(), span), async () => {
           for (let i = 0; i < num; i++) {
             await httpsRequest.get(`${protocol}://${hostname}${testPath}`);
             const spans = memoryExporter.getFinishedSpans();

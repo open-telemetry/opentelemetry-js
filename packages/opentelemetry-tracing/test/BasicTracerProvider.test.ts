@@ -18,10 +18,10 @@ import {
   context,
   SpanContext,
   TraceFlags,
-  ContextManager,
   ROOT_CONTEXT,
   setSpan,
   setSpanContext,
+  getSpan,
 } from '@opentelemetry/api';
 import {
   AlwaysOnSampler,
@@ -291,24 +291,12 @@ describe('BasicTracerProvider', () => {
     });
   });
 
-  describe('.getCurrentSpan()', () => {
-    it('should return current span when it exists', () => {
-      context.setGlobalContextManager({
-        active: () => setSpan(ROOT_CONTEXT, ('foo' as any) as Span),
-        disable: () => {},
-      } as ContextManager);
-
-      const tracer = new BasicTracerProvider().getTracer('default');
-      assert.deepStrictEqual(tracer.getCurrentSpan(), 'foo');
-    });
-  });
-
   describe('.withSpan()', () => {
     it('should run context with NoopContextManager context manager', done => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
-      tracer.withSpan(span, () => {
-        assert.deepStrictEqual(tracer.getCurrentSpan(), undefined);
+      context.with(setSpan(context.active(), span), () => {
+        assert.deepStrictEqual(getSpan(context.active()), undefined);
         return done();
       });
     });
@@ -319,10 +307,10 @@ describe('BasicTracerProvider', () => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
       const fn = () => {
-        assert.deepStrictEqual(tracer.getCurrentSpan(), undefined);
+        assert.deepStrictEqual(getSpan(context.active()), undefined);
         return done();
       };
-      const patchedFn = tracer.bind(fn, span);
+      const patchedFn = context.bind(fn, setSpan(context.active(), span));
       return patchedFn();
     });
   });

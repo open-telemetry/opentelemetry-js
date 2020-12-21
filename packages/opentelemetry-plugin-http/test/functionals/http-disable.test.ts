@@ -49,7 +49,6 @@ describe('HttpPlugin', () => {
 
     beforeEach(() => {
       NOOP_TRACER.startSpan = sinon.spy();
-      NOOP_TRACER.withSpan = sinon.spy();
     });
 
     afterEach(() => {
@@ -73,10 +72,6 @@ describe('HttpPlugin', () => {
           );
 
           assert.strictEqual(http.Server.prototype.emit.__wrapped, undefined);
-          assert.strictEqual(
-            (NOOP_TRACER.withSpan as sinon.SinonSpy).called,
-            false
-          );
         });
       });
     });

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { context } from '@opentelemetry/api';
+import { context, getSpan, setSpan } from '@opentelemetry/api';
 import { ContextManager } from '@opentelemetry/context-base';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { BasePlugin, NoopLogger } from '@opentelemetry/core';
@@ -133,9 +133,9 @@ describe('WebTracerProvider', () => {
 
         const rootSpan = webTracerWithZone.startSpan('rootSpan');
 
-        webTracerWithZone.withSpan(rootSpan, () => {
+        context.with(setSpan(context.active(), rootSpan), () => {
           assert.ok(
-            webTracerWithZone.getCurrentSpan() === rootSpan,
+            getSpan(context.active()) === rootSpan,
             'Current span is rootSpan'
           );
           const concurrentSpan1 = webTracerWithZone.startSpan(
@@ -145,19 +145,19 @@ describe('WebTracerProvider', () => {
             'concurrentSpan2'
           );
 
-          webTracerWithZone.withSpan(concurrentSpan1, () => {
+          context.with(setSpan(context.active(), concurrentSpan1), () => {
             setTimeout(() => {
               assert.ok(
-                webTracerWithZone.getCurrentSpan() === concurrentSpan1,
+                getSpan(context.active()) === concurrentSpan1,
                 'Current span is concurrentSpan1'
               );
             }, 10);
           });
 
-          webTracerWithZone.withSpan(concurrentSpan2, () => {
+          context.with(setSpan(context.active(), concurrentSpan2), () => {
             setTimeout(() => {
               assert.ok(
-                webTracerWithZone.getCurrentSpan() === concurrentSpan2,
+                getSpan(context.active()) === concurrentSpan2,
                 'Current span is concurrentSpan2'
               );
               done();

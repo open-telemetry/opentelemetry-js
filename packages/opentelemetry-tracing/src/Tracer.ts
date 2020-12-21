@@ -122,38 +122,6 @@ export class Tracer implements api.Tracer {
     return span;
   }
 
-  /**
-   * Returns the current Span from the current context.
-   *
-   * If there is no Span associated with the current context, undefined is returned.
-   */
-  getCurrentSpan(): api.Span | undefined {
-    const ctx = api.context.active();
-    // Get the current Span from the context or null if none found.
-    return api.getSpan(ctx);
-  }
-
-  /**
-   * Enters the context of code where the given Span is in the current context.
-   */
-  withSpan<T extends (...args: unknown[]) => ReturnType<T>>(
-    span: api.Span,
-    fn: T
-  ): ReturnType<T> {
-    // Set given span to context.
-    return api.context.with(api.setSpan(api.context.active(), span), fn);
-  }
-
-  /**
-   * Bind a span (or the current one) to the target's context
-   */
-  bind<T>(target: T, span?: api.Span): T {
-    return api.context.bind(
-      target,
-      span ? api.setSpan(api.context.active(), span) : api.context.active()
-    );
-  }
-
   /** Returns the active {@link TraceParams}. */
   getActiveTraceParams(): TraceParams {
     return this._traceParams;
