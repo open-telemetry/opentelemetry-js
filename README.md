@@ -230,7 +230,7 @@ To request automatic tracing support for a module not on this list, please [file
 
 [PR-1764](https://github.com/open-telemetry/opentelemetry-js/pull/1764) removed some APIs from `Tracer`:
 
-- `Tracer.getCurrentSpan()`: use `api.getActiveSpan(api.context.active()))`
+- `Tracer.getCurrentSpan()`: use `api.getActiveSpan(api.context.active())`
 - `Tracer.withSpan(span)`: use `api.context.with(api.setActiveSpan(api.context.active(), span))`
 - `Tracer.bind(target)`: use `api.context.bind(target)`
 
