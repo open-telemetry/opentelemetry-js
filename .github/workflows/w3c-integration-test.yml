@@ -12,10 +12,14 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v2
 
-      - name: Install and Build 🔧
+      - name: Install
         run: |
           npm install --ignore-scripts
-          npx lerna bootstrap --scope=propagation-validation-server --include-dependencies
+          npx lerna bootstrap --no-ci --scope=propagation-validation-server --include-dependencies
+      
+      - name: Build 🔧
+        run: npm run compile 
+        working-directory: ./integration-tests/propagation-validation-server
 
       - name: Run W3C Test harness
         run: ./integration-tests/tracecontext-integration-test.sh
