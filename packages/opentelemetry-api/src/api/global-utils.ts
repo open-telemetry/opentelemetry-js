@@ -23,7 +23,7 @@ import { TracerProvider } from '../trace/tracer_provider';
 import { VERSION } from '../version';
 
 const _global = _globalThis as OTelGlobal;
-const semantic = semver.parse(VERSION)!;
+const acceptableRange = new semver.Range(`^${VERSION}`);
 const GLOBAL_OPENTELEMETRY_API_KEY = Symbol.for('io.opentelemetry.js.api');
 
 export function registerGlobal(type: 'trace', instance: TracerProvider): void;
@@ -33,7 +33,7 @@ export function registerGlobal(
   type: 'propagation',
   instance: TextMapPropagator
 ): void;
-export function registerGlobal(type: keyof OTelGlobalApi, instance: unknown) {
+export function registerGlobal(type: keyof OTelGlobalApi, instance: any) {
   _global[GLOBAL_OPENTELEMETRY_API_KEY] =
     _global[GLOBAL_OPENTELEMETRY_API_KEY] ?? {};
 
@@ -44,7 +44,7 @@ export function registerGlobal(type: keyof OTelGlobalApi, instance: unknown) {
   }
 
   api[type] = {
-    instance: instance as any,
+    instance,
     version: VERSION,
   };
 }
@@ -68,9 +68,7 @@ export function unregisterGlobal(type: keyof OTelGlobalApi) {
 }
 
 export function isCompatible(version: string) {
-  return (
-    semver.major(version) === semantic.major && semver.gte(version, semantic)
-  );
+  return semver.satisfies(version, acceptableRange);
 }
 
 type OTelGlobal = Partial<{
