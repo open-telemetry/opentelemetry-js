@@ -70,7 +70,7 @@
     "lerna-changelog": "1.0.1",
     "linkinator": "2.8.0",
     "markdownlint-cli": "0.25.0",
-    "mocha": "^8.2.1",
+    "mocha": "7.2.0",
     "prettier": "^2.2.1",
     "ts-mocha": "^8.0.0",
     "typedoc": "0.19.2",
