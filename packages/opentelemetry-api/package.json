@@ -51,11 +51,13 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/context-base": "^0.14.0"
+    "@opentelemetry/context-base": "^0.14.0",
+    "semver": "^7.3.2"
   },
   "devDependencies": {
     "@types/mocha": "8.2.0",
     "@types/node": "14.14.12",
+    "@types/semver": "7.3.4",
     "@types/sinon": "9.0.9",
     "@types/webpack-env": "1.16.0",
     "codecov": "3.8.1",

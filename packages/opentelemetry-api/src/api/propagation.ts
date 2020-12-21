@@ -24,10 +24,10 @@ import {
   TextMapSetter,
 } from '../context/propagation/TextMapPropagator';
 import {
-  API_BACKWARDS_COMPATIBILITY_VERSION,
-  GLOBAL_PROPAGATION_API_KEY,
-  makeGetter,
-  _global,
+  getGlobal,
+  isCompatible,
+  registerGlobal,
+  unregisterGlobal,
 } from './global-utils';
 
 /**
@@ -52,16 +52,11 @@ export class PropagationAPI {
    * Set the current propagator. Returns the initialized propagator
    */
   public setGlobalPropagator(propagator: TextMapPropagator): TextMapPropagator {
-    if (_global[GLOBAL_PROPAGATION_API_KEY]) {
-      // global propagator has already been set
-      return this._getGlobalPropagator();
+    if (getGlobal('propagation')) {
+      throw new Error('Attempted to set global Propagator multiple times');
     }
 
-    _global[GLOBAL_PROPAGATION_API_KEY] = makeGetter(
-      API_BACKWARDS_COMPATIBILITY_VERSION,
-      propagator,
-      NOOP_TEXT_MAP_PROPAGATOR
-    );
+    registerGlobal('propagation', propagator);
 
     return propagator;
   }
@@ -98,14 +93,16 @@ export class PropagationAPI {
 
   /** Remove the global propagator */
   public disable() {
-    delete _global[GLOBAL_PROPAGATION_API_KEY];
+    unregisterGlobal('propagation');
   }
 
   private _getGlobalPropagator(): TextMapPropagator {
-    return (
-      _global[GLOBAL_PROPAGATION_API_KEY]?.(
-        API_BACKWARDS_COMPATIBILITY_VERSION
-      ) ?? NOOP_TEXT_MAP_PROPAGATOR
-    );
+    const signal = getGlobal('propagation');
+
+    if (signal && isCompatible(signal.version)) {
+      return signal.instance;
+    }
+
+    return NOOP_TEXT_MAP_PROPAGATOR;
   }
 }

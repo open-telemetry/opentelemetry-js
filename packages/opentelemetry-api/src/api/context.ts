@@ -20,10 +20,10 @@ import {
   NoopContextManager,
 } from '@opentelemetry/context-base';
 import {
-  API_BACKWARDS_COMPATIBILITY_VERSION,
-  GLOBAL_CONTEXT_MANAGER_API_KEY,
-  makeGetter,
-  _global,
+  getGlobal,
+  isCompatible,
+  registerGlobal,
+  unregisterGlobal,
 } from './global-utils';
 
 const NOOP_CONTEXT_MANAGER = new NoopContextManager();
@@ -52,17 +52,11 @@ export class ContextAPI {
   public setGlobalContextManager(
     contextManager: ContextManager
   ): ContextManager {
-    if (_global[GLOBAL_CONTEXT_MANAGER_API_KEY]) {
-      // global context manager has already been set
-      return this._getContextManager();
+    if (getGlobal('context')) {
+      throw new Error('Attempted to set global Context Manager multiple times');
     }
 
-    _global[GLOBAL_CONTEXT_MANAGER_API_KEY] = makeGetter(
-      API_BACKWARDS_COMPATIBILITY_VERSION,
-      contextManager,
-      NOOP_CONTEXT_MANAGER
-    );
-
+    registerGlobal('context', contextManager);
     return contextManager;
   }
 
@@ -97,16 +91,18 @@ export class ContextAPI {
   }
 
   private _getContextManager(): ContextManager {
-    return (
-      _global[GLOBAL_CONTEXT_MANAGER_API_KEY]?.(
-        API_BACKWARDS_COMPATIBILITY_VERSION
-      ) ?? NOOP_CONTEXT_MANAGER
-    );
+    const signal = getGlobal('context');
+
+    if (signal && isCompatible(signal.version)) {
+      return signal.instance;
+    }
+
+    return NOOP_CONTEXT_MANAGER;
   }
 
   /** Disable and remove the global context manager */
   public disable() {
     this._getContextManager().disable();
-    delete _global[GLOBAL_CONTEXT_MANAGER_API_KEY];
+    unregisterGlobal('context');
   }
 }

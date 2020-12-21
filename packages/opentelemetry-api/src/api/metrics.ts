@@ -18,10 +18,10 @@ import { Meter } from '../metrics/Meter';
 import { MeterProvider } from '../metrics/MeterProvider';
 import { NOOP_METER_PROVIDER } from '../metrics/NoopMeterProvider';
 import {
-  API_BACKWARDS_COMPATIBILITY_VERSION,
-  GLOBAL_METRICS_API_KEY,
-  makeGetter,
-  _global,
+  getGlobal,
+  isCompatible,
+  registerGlobal,
+  unregisterGlobal,
 } from './global-utils';
 
 /**
@@ -46,17 +46,11 @@ export class MetricsAPI {
    * Set the current global meter. Returns the initialized global meter provider.
    */
   public setGlobalMeterProvider(provider: MeterProvider): MeterProvider {
-    if (_global[GLOBAL_METRICS_API_KEY]) {
-      // global meter provider has already been set
-      return this.getMeterProvider();
+    if (getGlobal('metrics')) {
+      throw new Error('Attempted to set global Meter Provider multiple times');
     }
 
-    _global[GLOBAL_METRICS_API_KEY] = makeGetter(
-      API_BACKWARDS_COMPATIBILITY_VERSION,
-      provider,
-      NOOP_METER_PROVIDER
-    );
-
+    registerGlobal('metrics', provider);
     return provider;
   }
 
@@ -64,10 +58,13 @@ export class MetricsAPI {
    * Returns the global meter provider.
    */
   public getMeterProvider(): MeterProvider {
-    return (
-      _global[GLOBAL_METRICS_API_KEY]?.(API_BACKWARDS_COMPATIBILITY_VERSION) ??
-      NOOP_METER_PROVIDER
-    );
+    const signal = getGlobal('metrics');
+
+    if (signal && isCompatible(signal.version)) {
+      return signal.instance;
+    }
+
+    return NOOP_METER_PROVIDER;
   }
 
   /**
@@ -79,6 +76,6 @@ export class MetricsAPI {
 
   /** Remove the global meter provider */
   public disable() {
-    delete _global[GLOBAL_METRICS_API_KEY];
+    unregisterGlobal('metrics');
   }
 }

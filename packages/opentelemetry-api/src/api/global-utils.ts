@@ -15,54 +15,76 @@
  */
 
 import { ContextManager } from '@opentelemetry/context-base';
+import * as semver from 'semver';
 import { TextMapPropagator } from '../context/propagation/TextMapPropagator';
 import { MeterProvider } from '../metrics/MeterProvider';
-import { TracerProvider } from '../trace/tracer_provider';
 import { _globalThis } from '../platform';
+import { TracerProvider } from '../trace/tracer_provider';
+import { VERSION } from '../version';
 
-export const GLOBAL_CONTEXT_MANAGER_API_KEY = Symbol.for(
-  'io.opentelemetry.js.api.context'
-);
-export const GLOBAL_METRICS_API_KEY = Symbol.for(
-  'io.opentelemetry.js.api.metrics'
-);
-export const GLOBAL_PROPAGATION_API_KEY = Symbol.for(
-  'io.opentelemetry.js.api.propagation'
-);
-export const GLOBAL_TRACE_API_KEY = Symbol.for('io.opentelemetry.js.api.trace');
+const _global = _globalThis as OTelGlobal;
+const semantic = semver.parse(VERSION)!;
+const GLOBAL_OPENTELEMETRY_API_KEY = Symbol.for('io.opentelemetry.js.api');
 
-type Get<T> = (version: number) => T;
-type OtelGlobal = Partial<{
-  [GLOBAL_CONTEXT_MANAGER_API_KEY]: Get<ContextManager>;
-  [GLOBAL_METRICS_API_KEY]: Get<MeterProvider>;
-  [GLOBAL_PROPAGATION_API_KEY]: Get<TextMapPropagator>;
-  [GLOBAL_TRACE_API_KEY]: Get<TracerProvider>;
-}>;
+export function registerGlobal(type: 'trace', instance: TracerProvider): void;
+export function registerGlobal(type: 'metrics', instance: MeterProvider): void;
+export function registerGlobal(type: 'context', instance: ContextManager): void;
+export function registerGlobal(
+  type: 'propagation',
+  instance: TextMapPropagator
+): void;
+export function registerGlobal(type: keyof OTelGlobalApi, instance: unknown) {
+  _global[GLOBAL_OPENTELEMETRY_API_KEY] =
+    _global[GLOBAL_OPENTELEMETRY_API_KEY] ?? {};
 
-export const _global = _globalThis as OtelGlobal;
+  const api = _global[GLOBAL_OPENTELEMETRY_API_KEY]!;
+  if (api[type]) {
+    // already registered an API of this type
+    return;
+  }
 
-/**
- * Make a function which accepts a version integer and returns the instance of an API if the version
- * is compatible, or a fallback version (usually NOOP) if it is not.
- *
- * @param requiredVersion Backwards compatibility version which is required to return the instance
- * @param instance Instance which should be returned if the required version is compatible
- * @param fallback Fallback instance, usually NOOP, which will be returned if the required version is not compatible
- */
-export function makeGetter<T>(
-  requiredVersion: number,
-  instance: T,
-  fallback: T
-): Get<T> {
-  return (version: number): T =>
-    version === requiredVersion ? instance : fallback;
+  api[type] = {
+    instance: instance as any,
+    version: VERSION,
+  };
 }
 
-/**
- * A number which should be incremented each time a backwards incompatible
- * change is made to the API. This number is used when an API package
- * attempts to access the global API to ensure it is getting a compatible
- * version. If the global API is not compatible with the API package
- * attempting to get it, a NOOP API implementation will be returned.
- */
-export const API_BACKWARDS_COMPATIBILITY_VERSION = 3;
+export function getGlobal(type: 'trace'): Signal<TracerProvider> | undefined;
+export function getGlobal(type: 'metrics'): Signal<MeterProvider> | undefined;
+export function getGlobal(type: 'context'): Signal<ContextManager> | undefined;
+export function getGlobal(
+  type: 'propagation'
+): Signal<TextMapPropagator> | undefined;
+export function getGlobal(type: keyof OTelGlobalApi) {
+  return _global[GLOBAL_OPENTELEMETRY_API_KEY]?.[type];
+}
+
+export function unregisterGlobal(type: keyof OTelGlobalApi) {
+  const api = _global[GLOBAL_OPENTELEMETRY_API_KEY];
+
+  if (api) {
+    delete api[type];
+  }
+}
+
+export function isCompatible(version: string) {
+  return (
+    semver.major(version) === semantic.major && semver.gte(version, semantic)
+  );
+}
+
+type OTelGlobal = Partial<{
+  [GLOBAL_OPENTELEMETRY_API_KEY]: OTelGlobalApi;
+}>;
+
+type OTelGlobalApi = Partial<{
+  trace: Signal<TracerProvider>;
+  metrics: Signal<MeterProvider>;
+  context: Signal<ContextManager>;
+  propagation: Signal<TextMapPropagator>;
+}>;
+
+type Signal<T> = {
+  instance: T;
+  version: string;
+};
