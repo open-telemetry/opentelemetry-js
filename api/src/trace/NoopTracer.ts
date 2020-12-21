@@ -24,10 +24,6 @@ import { getSpanContext } from '../context/context';
  * No-op implementations of {@link Tracer}.
  */
 export class NoopTracer implements Tracer {
-  getCurrentSpan(): Span {
-    return NOOP_SPAN;
-  }
-
   // startSpan starts a noop span.
   startSpan(name: string, options?: SpanOptions, context?: Context): Span {
     const root = Boolean(options?.root);
@@ -45,17 +41,6 @@ export class NoopTracer implements Tracer {
     } else {
       return NOOP_SPAN;
     }
-  }
-
-  withSpan<T extends (...args: unknown[]) => ReturnType<T>>(
-    span: Span,
-    fn: T
-  ): ReturnType<T> {
-    return fn();
-  }
-
-  bind<T>(target: T, _span?: Span): T {
-    return target;
   }
 }
 
