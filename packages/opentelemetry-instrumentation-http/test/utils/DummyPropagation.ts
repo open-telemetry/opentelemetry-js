@@ -17,8 +17,8 @@ import {
   Context,
   TextMapPropagator,
   TraceFlags,
-  getParentSpanContext,
-  setExtractedSpanContext,
+  getSpanContext,
+  setSpanContext,
 } from '@opentelemetry/api';
 import type * as http from 'http';
 
@@ -33,12 +33,12 @@ export class DummyPropagation implements TextMapPropagator {
       isRemote: true,
     };
     if (extractedSpanContext.traceId && extractedSpanContext.spanId) {
-      return setExtractedSpanContext(context, extractedSpanContext);
+      return setSpanContext(context, extractedSpanContext);
     }
     return context;
   }
   inject(context: Context, headers: { [custom: string]: string }): void {
-    const spanContext = getParentSpanContext(context);
+    const spanContext = getSpanContext(context);
     if (!spanContext) return;
     headers[DummyPropagation.TRACE_CONTEXT_KEY] = spanContext.traceId;
     headers[DummyPropagation.SPAN_CONTEXT_KEY] = spanContext.spanId;
