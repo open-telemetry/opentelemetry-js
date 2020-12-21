@@ -19,8 +19,8 @@ import {
   defaultTextMapSetter,
   INVALID_SPANID,
   INVALID_TRACEID,
-  getParentSpanContext,
-  setExtractedSpanContext,
+  getSpanContext,
+  setSpanContext,
   SpanContext,
   TraceFlags,
 } from '@opentelemetry/api';
@@ -49,7 +49,7 @@ describe('B3SinglePropagator', () => {
       };
 
       propagator.inject(
-        setExtractedSpanContext(ROOT_CONTEXT, spanContext),
+        setSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
         defaultTextMapSetter
       );
@@ -66,7 +66,7 @@ describe('B3SinglePropagator', () => {
       };
 
       propagator.inject(
-        setExtractedSpanContext(ROOT_CONTEXT, spanContext),
+        setSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
         defaultTextMapSetter
       );
@@ -85,7 +85,7 @@ describe('B3SinglePropagator', () => {
       const context = ROOT_CONTEXT.setValue(B3_DEBUG_FLAG_KEY, 'd');
 
       propagator.inject(
-        setExtractedSpanContext(context, spanContext),
+        setSpanContext(context, spanContext),
         carrier,
         defaultTextMapSetter
       );
@@ -102,7 +102,7 @@ describe('B3SinglePropagator', () => {
       };
 
       propagator.inject(
-        setExtractedSpanContext(ROOT_CONTEXT, spanContext),
+        setSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
         defaultTextMapSetter
       );
@@ -118,7 +118,7 @@ describe('B3SinglePropagator', () => {
       };
 
       propagator.inject(
-        setExtractedSpanContext(ROOT_CONTEXT, spanContext),
+        setSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
         defaultTextMapSetter
       );
@@ -140,7 +140,7 @@ describe('B3SinglePropagator', () => {
         defaultTextMapGetter
       );
 
-      const extractedSpanContext = getParentSpanContext(context);
+      const extractedSpanContext = getSpanContext(context);
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'e457b5a2e4d86bd1',
         traceId: '80f198ee56343ba864fe8b2a57d3eff7',
@@ -161,7 +161,7 @@ describe('B3SinglePropagator', () => {
         defaultTextMapGetter
       );
 
-      const extractedSpanContext = getParentSpanContext(context);
+      const extractedSpanContext = getSpanContext(context);
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'e457b5a2e4d86bd1',
         traceId: '80f198ee56343ba864fe8b2a57d3eff7',
@@ -182,7 +182,7 @@ describe('B3SinglePropagator', () => {
         defaultTextMapGetter
       );
 
-      const extractedSpanContext = getParentSpanContext(context);
+      const extractedSpanContext = getSpanContext(context);
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'e457b5a2e4d86bd1',
         traceId: '80f198ee56343ba864fe8b2a57d3eff7',
@@ -202,7 +202,7 @@ describe('B3SinglePropagator', () => {
         defaultTextMapGetter
       );
 
-      const extractedSpanContext = getParentSpanContext(context);
+      const extractedSpanContext = getSpanContext(context);
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'e457b5a2e4d86bd1',
         traceId: '00000000000000004aaba1a52cf8ee09',
@@ -223,7 +223,7 @@ describe('B3SinglePropagator', () => {
         defaultTextMapGetter
       );
 
-      const extractedSpanContext = getParentSpanContext(context);
+      const extractedSpanContext = getSpanContext(context);
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'e457b5a2e4d86bd1',
         traceId: '80f198ee56343ba864fe8b2a57d3eff7',
@@ -244,7 +244,7 @@ describe('B3SinglePropagator', () => {
         defaultTextMapGetter
       );
 
-      const extractedSpanContext = getParentSpanContext(context);
+      const extractedSpanContext = getSpanContext(context);
       assert.deepStrictEqual(undefined, extractedSpanContext);
     });
 
@@ -259,7 +259,7 @@ describe('B3SinglePropagator', () => {
         defaultTextMapGetter
       );
 
-      const extractedSpanContext = getParentSpanContext(context);
+      const extractedSpanContext = getSpanContext(context);
       assert.deepStrictEqual(undefined, extractedSpanContext);
     });
 
@@ -274,7 +274,7 @@ describe('B3SinglePropagator', () => {
         defaultTextMapGetter
       );
 
-      const extractedSpanContext = getParentSpanContext(context);
+      const extractedSpanContext = getSpanContext(context);
       assert.deepStrictEqual(undefined, extractedSpanContext);
     });
 
@@ -289,7 +289,7 @@ describe('B3SinglePropagator', () => {
         defaultTextMapGetter
       );
 
-      const extractedSpanContext = getParentSpanContext(context);
+      const extractedSpanContext = getSpanContext(context);
       assert.deepStrictEqual(undefined, extractedSpanContext);
     });
   });

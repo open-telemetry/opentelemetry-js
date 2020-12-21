@@ -17,9 +17,9 @@
 import {
   context,
   TraceFlags,
-  setActiveSpan,
-  setExtractedSpanContext,
-  getActiveSpan,
+  setSpan,
+  setSpanContext,
+  getSpan,
 } from '@opentelemetry/api';
 import {
   AlwaysOnSampler,
@@ -169,7 +169,7 @@ describe('NodeTracerProvider', () => {
       const sampledParent = provider.getTracer('default').startSpan(
         'not-sampled-span',
         {},
-        setExtractedSpanContext(ROOT_CONTEXT, {
+        setSpanContext(ROOT_CONTEXT, {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
           traceFlags: TraceFlags.NONE,
@@ -184,11 +184,7 @@ describe('NodeTracerProvider', () => {
 
       const span = provider
         .getTracer('default')
-        .startSpan(
-          'child-span',
-          {},
-          setActiveSpan(ROOT_CONTEXT, sampledParent)
-        );
+        .startSpan('child-span', {}, setSpan(ROOT_CONTEXT, sampledParent));
       assert.ok(span instanceof Span);
       assert.strictEqual(span.context().traceFlags, TraceFlags.SAMPLED);
       assert.strictEqual(span.isRecording(), true);
@@ -263,7 +259,7 @@ describe('NodeTracerProvider', () => {
         assert.deepStrictEqual(getActiveSpan(context.active()), span);
         return done();
       };
-      const patchedFn = context.bind(fn, setActiveSpan(context.active(), span));
+      const patchedFn = context.bind(fn, setSpan(context.active(), span));
       return patchedFn();
     });
   });

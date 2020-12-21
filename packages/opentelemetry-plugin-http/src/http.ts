@@ -23,7 +23,7 @@ import {
   Status,
   SpanContext,
   TraceFlags,
-  setActiveSpan,
+  setSpan,
   ROOT_CONTEXT,
   getActiveSpan,
 } from '@opentelemetry/api';
@@ -416,7 +416,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         optionsParsed.headers = {};
       }
       propagation.inject(
-        setActiveSpan(context.active(), span),
+        setSpan(context.active(), span),
         optionsParsed.headers
       );
 

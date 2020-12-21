@@ -68,7 +68,7 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
       {
         startTime: corsPreFlightRequest[web.PerformanceTimingNames.FETCH_START],
       },
-      api.setActiveSpan(api.context.active(), span)
+      api.setSpan(api.context.active(), span)
     );
     web.addSpanNetworkEvents(childSpan, corsPreFlightRequest);
     childSpan.end(

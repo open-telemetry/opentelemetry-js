@@ -144,5 +144,5 @@ function getParent(
   context: api.Context
 ): api.SpanContext | undefined {
   if (options.root) return undefined;
-  return api.getParentSpanContext(context);
+  return api.getSpanContext(context);
 }

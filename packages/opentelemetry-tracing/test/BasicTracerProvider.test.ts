@@ -19,9 +19,9 @@ import {
   SpanContext,
   TraceFlags,
   ROOT_CONTEXT,
-  setActiveSpan,
-  setExtractedSpanContext,
-  getActiveSpan,
+  setSpan,
+  setSpanContext,
+  getSpan,
 } from '@opentelemetry/api';
 import {
   AlwaysOnSampler,
@@ -180,7 +180,7 @@ describe('BasicTracerProvider', () => {
       const span = tracer.startSpan(
         'my-span',
         {},
-        setExtractedSpanContext(ROOT_CONTEXT, {
+        setSpanContext(ROOT_CONTEXT, {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
           traceFlags: TraceFlags.SAMPLED,
@@ -201,7 +201,7 @@ describe('BasicTracerProvider', () => {
       const childSpan = tracer.startSpan(
         'child-span',
         {},
-        setActiveSpan(ROOT_CONTEXT, span)
+        setSpan(ROOT_CONTEXT, span)
       );
       const context = childSpan.context();
       assert.strictEqual(context.traceId, span.context().traceId);
@@ -217,7 +217,7 @@ describe('BasicTracerProvider', () => {
       const rootSpan = tracer.startSpan(
         'root-span',
         { root: true },
-        setActiveSpan(ROOT_CONTEXT, span)
+        setSpan(ROOT_CONTEXT, span)
       );
       const context = rootSpan.context();
       assert.notStrictEqual(context.traceId, overrideParent.context().traceId);
@@ -230,7 +230,7 @@ describe('BasicTracerProvider', () => {
       const span = tracer.startSpan(
         'my-span',
         {},
-        setExtractedSpanContext(
+        setSpanContext(
           ROOT_CONTEXT,
           ('invalid-parent' as unknown) as SpanContext
         )
@@ -244,7 +244,7 @@ describe('BasicTracerProvider', () => {
       const span = tracer.startSpan(
         'my-span',
         {},
-        setExtractedSpanContext(ROOT_CONTEXT, {
+        setSpanContext(ROOT_CONTEXT, {
           traceId: '0',
           spanId: '0',
           traceFlags: TraceFlags.SAMPLED,
