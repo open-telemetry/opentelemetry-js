@@ -50,9 +50,9 @@ function translateSpanOptions(
 function getContextWithParent(options: opentracing.SpanOptions) {
   if (options.childOf) {
     if (options.childOf instanceof SpanShim) {
-      return api.setActiveSpan(api.context.active(), options.childOf.getSpan());
+      return api.setSpan(api.context.active(), options.childOf.getSpan());
     } else if (options.childOf instanceof SpanContextShim) {
-      return api.setExtractedSpanContext(
+      return api.setSpanContext(
         api.context.active(),
         options.childOf.getSpanContext()
       );
@@ -169,7 +169,7 @@ export class TracerShim extends opentracing.Tracer {
       case opentracing.FORMAT_TEXT_MAP: {
         api.propagation.inject(
           api.setBaggage(
-            api.setExtractedSpanContext(api.ROOT_CONTEXT, oTelSpanContext),
+            api.setSpanContext(api.ROOT_CONTEXT, oTelSpanContext),
             oTelSpanBaggage
           ),
           carrier
@@ -195,7 +195,7 @@ export class TracerShim extends opentracing.Tracer {
           api.ROOT_CONTEXT,
           carrier
         );
-        const spanContext = api.getParentSpanContext(context);
+        const spanContext = api.getSpanContext(context);
         const baggage = api.getBaggage(context);
 
         if (!spanContext) {

@@ -21,7 +21,7 @@ import {
   SpanKind,
   SpanOptions,
   Status,
-  setActiveSpan,
+  setSpan,
   SpanContext,
   TraceFlags,
   ROOT_CONTEXT,
@@ -540,7 +540,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         optionsParsed.headers = {};
       }
       propagation.inject(
-        setActiveSpan(context.active(), span),
+        setSpan(context.active(), span),
         optionsParsed.headers
       );
 
