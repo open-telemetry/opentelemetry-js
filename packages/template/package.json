@@ -28,7 +28,7 @@
   "Add these to scripts": {
     "compile": "../../node_modules/.bin/tsc --build",
     "clean": "../../node_modules/.bin/tsc --build --clean",
-    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
+    "test": "nyc ../../node_modules/.bin/ts-mocha -p tsconfig.json test/**/*.test.ts",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "lint": "../../node_modules/.bin/eslint --ext .ts .",
     "lint:fix": "../../node_modules/.bin/eslint --ext .ts --fix .",

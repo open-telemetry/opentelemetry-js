@@ -8,7 +8,7 @@
   "scripts": {
     "compile": "../../node_modules/.bin/tsc --build",
     "clean": "../../node_modules/.bin/tsc --build --clean",
-    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
+    "test": "nyc ../../node_modules/.bin/ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "lint": "../../node_modules/.bin/eslint --ext .ts .",
@@ -44,12 +44,9 @@
     "@opentelemetry/context-base": "^0.14.0",
     "@opentelemetry/resources": "^0.14.0",
     "codecov": "3.8.1",
-    "mocha": "7.2.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "shimmer": "1.2.1",
-    "ts-mocha": "8.0.0",
-    "ts-node": "9.1.1"
+    "shimmer": "1.2.1"
   },
   "dependencies": {
     "@opentelemetry/api": "^0.14.0",

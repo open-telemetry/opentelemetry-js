@@ -12,7 +12,7 @@
   "scripts": {
     "compile": "../../node_modules/.bin/tsc --build",
     "clean": "../../node_modules/.bin/tsc --build --clean",
-    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
+    "test": "nyc ../../node_modules/.bin/ts-mocha -p tsconfig.json test/**/*.test.ts",
     "test:browser": "nyc karma start --single-run",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
@@ -61,11 +61,9 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "4.0.2",
-    "mocha": "7.2.0",
     "nyc": "15.1.0",
     "sinon": "9.2.2",
     "ts-loader": "8.0.12",
-    "ts-mocha": "8.0.0",
     "webpack": "4.44.2"
   }
 }

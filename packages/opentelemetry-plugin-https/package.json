@@ -8,7 +8,7 @@
   "scripts": {
     "compile": "../../node_modules/.bin/tsc --build",
     "clean": "../../node_modules/.bin/tsc --build --clean",
-    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
+    "test": "nyc ../../node_modules/.bin/ts-mocha -p tsconfig.json test/**/*.test.ts",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "lint": "../../node_modules/.bin/eslint --ext .ts .",
     "lint:fix": "../../node_modules/.bin/eslint --ext .ts --fix .",
@@ -47,16 +47,13 @@
     "axios": "0.21.0",
     "codecov": "3.8.1",
     "got": "9.6.0",
-    "mocha": "7.2.0",
     "nock": "12.0.3",
     "nyc": "15.1.0",
     "request": "2.88.2",
     "request-promise-native": "1.0.9",
     "rimraf": "3.0.2",
     "sinon": "9.2.2",
-    "superagent": "6.1.0",
-    "ts-mocha": "8.0.0",
-    "ts-node": "9.1.1"
+    "superagent": "6.1.0"
   },
   "dependencies": {
     "@opentelemetry/api": "^0.14.0",

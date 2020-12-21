@@ -14,7 +14,7 @@
     "protos:copy": "cpx protos/opentelemetry/**/*.* build/protos/opentelemetry",
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "tdd": "npm run test -- --watch-extensions ts --watch",
-    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
+    "test": "nyc ../../node_modules/.bin/ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "version": "node ../../scripts/version-update.js",
     "watch": "npm run protos:copy && tsc -w"
   },
@@ -48,13 +48,10 @@
     "@babel/core": "7.12.10",
     "codecov": "3.8.1",
     "cpx": "1.5.0",
-    "mocha": "7.2.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "sinon": "9.2.2",
-    "ts-loader": "8.0.12",
-    "ts-mocha": "8.0.0",
-    "ts-node": "9.1.1"
+    "ts-loader": "8.0.12"
   },
   "dependencies": {
     "@grpc/proto-loader": "^0.5.4",
