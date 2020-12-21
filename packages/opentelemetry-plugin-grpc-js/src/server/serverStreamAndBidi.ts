@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Span, StatusCode } from '@opentelemetry/api';
+import { context, Span, StatusCode } from '@opentelemetry/api';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import type * as grpcJs from '@grpc/grpc-js';
 import type { GrpcJsPlugin } from '../grpcJs';
