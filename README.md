@@ -160,7 +160,7 @@ const api = require("@opentelemetry/api");
 const tracer = api.trace.getTracer("my-library-name", "0.2.3");
 
 async function doSomething() {
-  const span = tracer.startSpan("doSomething", { parent: tracer.getCurrentSpan() });
+  const span = tracer.startSpan("doSomething");
   try {
     const result = await doSomethingElse();
     span.end();
