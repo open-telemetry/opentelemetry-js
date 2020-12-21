@@ -300,7 +300,7 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
 
         return new Promise((resolve, reject) => {
           return api.context.with(
-            api.setActiveSpan(api.context.active(), span),
+            api.setSpan(api.context.active(), span),
             () => {
               plugin._addHeaders(options, url);
               plugin._tasksCount++;

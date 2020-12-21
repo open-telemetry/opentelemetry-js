@@ -19,8 +19,8 @@ import {
   NoopTracerProvider,
   SpanKind,
   propagation,
-  getActiveSpan,
-  setActiveSpan,
+  getSpan,
+  setSpan,
 } from '@opentelemetry/api';
 import {
   NoopLogger,
@@ -529,8 +529,8 @@ export const runTests = (
         const span = provider
           .getTracer('default')
           .startSpan('TestSpan', { kind: SpanKind.PRODUCER });
-        return context.with(setActiveSpan(context.active(), span), async () => {
-          const rootSpan = getActiveSpan(context.active());
+        return context.with(setSpan(context.active(), span), async () => {
+          const rootSpan = getSpan(context.active());
           if (!rootSpan) {
             return assert.ok(false);
           }
@@ -625,8 +625,8 @@ export const runTests = (
         const span = provider
           .getTracer('default')
           .startSpan('TestSpan', { kind: SpanKind.PRODUCER });
-        return context.with(setActiveSpan(context.active(), span), async () => {
-          const rootSpan = getActiveSpan(context.active());
+        return context.with(setSpan(context.active(), span), async () => {
+          const rootSpan = getSpan(context.active());
           if (!rootSpan) {
             return assert.ok(false);
           }

@@ -178,7 +178,7 @@ describe('fetch', () => {
     );
 
     rootSpan = webTracerWithZone.startSpan('root');
-    api.context.with(api.setActiveSpan(api.context.active(), rootSpan), () => {
+    api.context.with(api.setSpan(api.context.active(), rootSpan), () => {
       fakeNow = 0;
       getData(fileUrl, method).then(
         response => {

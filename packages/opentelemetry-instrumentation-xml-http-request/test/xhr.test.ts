@@ -213,30 +213,27 @@ describe('xhr', () => {
           );
 
           rootSpan = webTracerWithZone.startSpan('root');
-          api.context.with(
-            api.setActiveSpan(api.context.active(), rootSpan),
-            () => {
-              getData(
-                new XMLHttpRequest(),
-                fileUrl,
-                () => {
-                  fakeNow = 100;
-                },
-                testAsync
-              ).then(() => {
-                fakeNow = 0;
-                sandbox.clock.tick(1000);
-                done();
-              });
-              assert.strictEqual(requests.length, 1, 'request not called');
+          api.context.with(api.setSpan(api.context.active(), rootSpan), () => {
+            getData(
+              new XMLHttpRequest(),
+              fileUrl,
+              () => {
+                fakeNow = 100;
+              },
+              testAsync
+            ).then(() => {
+              fakeNow = 0;
+              sandbox.clock.tick(1000);
+              done();
+            });
+            assert.strictEqual(requests.length, 1, 'request not called');
 
-              requests[0].respond(
-                200,
-                { 'Content-Type': 'application/json' },
-                '{"foo":"bar"}'
-              );
-            }
-          );
+            requests[0].respond(
+              200,
+              { 'Content-Type': 'application/json' },
+              '{"foo":"bar"}'
+            );
+          });
         };
 
         beforeEach(done => {
@@ -630,7 +627,7 @@ describe('xhr', () => {
             );
             const reusableReq = new XMLHttpRequest();
             api.context.with(
-              api.setActiveSpan(api.context.active(), rootSpan),
+              api.setSpan(api.context.active(), rootSpan),
               () => {
                 getData(
                   reusableReq,
@@ -647,7 +644,7 @@ describe('xhr', () => {
             );
 
             api.context.with(
-              api.setActiveSpan(api.context.active(), rootSpan),
+              api.setSpan(api.context.active(), rootSpan),
               () => {
                 getData(
                   reusableReq,
@@ -748,7 +745,7 @@ describe('xhr', () => {
         describe('when request loads and receives an error code', () => {
           beforeEach(done => {
             api.context.with(
-              api.setActiveSpan(api.context.active(), rootSpan),
+              api.setSpan(api.context.active(), rootSpan),
               () => {
                 getData(
                   new XMLHttpRequest(),
@@ -885,7 +882,7 @@ describe('xhr', () => {
         describe('when request encounters a network error', () => {
           beforeEach(done => {
             api.context.with(
-              api.setActiveSpan(api.context.active(), rootSpan),
+              api.setSpan(api.context.active(), rootSpan),
               () => {
                 getData(new XMLHttpRequest(), url, () => {}, testAsync).then(
                   () => {
@@ -977,7 +974,7 @@ describe('xhr', () => {
 
           beforeEach(done => {
             api.context.with(
-              api.setActiveSpan(api.context.active(), rootSpan),
+              api.setSpan(api.context.active(), rootSpan),
               () => {
                 getData(new XMLHttpRequest(), url, () => {}, testAsync).then(
                   () => {
@@ -1069,7 +1066,7 @@ describe('xhr', () => {
 
           beforeEach(done => {
             api.context.with(
-              api.setActiveSpan(api.context.active(), rootSpan),
+              api.setSpan(api.context.active(), rootSpan),
               () => {
                 getData(
                   new XMLHttpRequest(),

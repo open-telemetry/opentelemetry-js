@@ -20,7 +20,7 @@ import {
   propagation,
   Span as ISpan,
   SpanKind,
-  setActiveSpan,
+  setSpan,
 } from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
@@ -309,7 +309,7 @@ describe('HttpsInstrumentation', () => {
         doNock(hostname, testPath, 200, 'Ok');
         const name = 'TestRootSpan';
         const span = tracer.startSpan(name);
-        return context.with(setActiveSpan(context.active(), span), async () => {
+        return context.with(setSpan(context.active(), span), async () => {
           const result = await httpsRequest.get(
             `${protocol}://${hostname}${testPath}`
           );
@@ -352,39 +352,36 @@ describe('HttpsInstrumentation', () => {
           );
           const name = 'TestRootSpan';
           const span = tracer.startSpan(name);
-          return context.with(
-            setActiveSpan(context.active(), span),
-            async () => {
-              const result = await httpsRequest.get(
-                `${protocol}://${hostname}${testPath}`
-              );
-              span.end();
-              const spans = memoryExporter.getFinishedSpans();
-              const [reqSpan, localSpan] = spans;
-              const validations = {
-                hostname,
-                httpStatusCode: result.statusCode!,
-                httpMethod: 'GET',
-                pathname: testPath,
-                resHeaders: result.resHeaders,
-                reqHeaders: result.reqHeaders,
-                component: 'https',
-              };
+          return context.with(setSpan(context.active(), span), async () => {
+            const result = await httpsRequest.get(
+              `${protocol}://${hostname}${testPath}`
+            );
+            span.end();
+            const spans = memoryExporter.getFinishedSpans();
+            const [reqSpan, localSpan] = spans;
+            const validations = {
+              hostname,
+              httpStatusCode: result.statusCode!,
+              httpMethod: 'GET',
+              pathname: testPath,
+              resHeaders: result.resHeaders,
+              reqHeaders: result.reqHeaders,
+              component: 'https',
+            };
 
-              assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
-              assert.strictEqual(spans.length, 2);
-              assert.strictEqual(reqSpan.name, 'HTTPS GET');
-              assert.strictEqual(
-                localSpan.spanContext.traceId,
-                reqSpan.spanContext.traceId
-              );
-              assertSpan(reqSpan, SpanKind.CLIENT, validations);
-              assert.notStrictEqual(
-                localSpan.spanContext.spanId,
-                reqSpan.spanContext.spanId
-              );
-            }
-          );
+            assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
+            assert.strictEqual(spans.length, 2);
+            assert.strictEqual(reqSpan.name, 'HTTPS GET');
+            assert.strictEqual(
+              localSpan.spanContext.traceId,
+              reqSpan.spanContext.traceId
+            );
+            assertSpan(reqSpan, SpanKind.CLIENT, validations);
+            assert.notStrictEqual(
+              localSpan.spanContext.spanId,
+              reqSpan.spanContext.spanId
+            );
+          });
         });
       }
 
@@ -394,7 +391,7 @@ describe('HttpsInstrumentation', () => {
         doNock(hostname, testPath, 200, 'Ok', num);
         const name = 'TestRootSpan';
         const span = tracer.startSpan(name);
-        await context.with(setActiveSpan(context.active(), span), async () => {
+        await context.with(setSpan(context.active(), span), async () => {
           for (let i = 0; i < num; i++) {
             await httpsRequest.get(`${protocol}://${hostname}${testPath}`);
             const spans = memoryExporter.getFinishedSpans();

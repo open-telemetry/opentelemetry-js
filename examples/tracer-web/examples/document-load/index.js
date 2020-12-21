@@ -1,4 +1,4 @@
-import { context, getActiveSpan, setActiveSpan } from '@opentelemetry/api';
+import { context, getSpan, setSpan } from '@opentelemetry/api';
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
 import { DocumentLoad } from '@opentelemetry/plugin-document-load';
@@ -53,14 +53,14 @@ const prepareClickEvent = () => {
     }
 
     const mainSpan = tracer.startSpan('click button');
-    context.with(setActiveSpan(context.active(), mainSpan), () => {
+    context.with(setSpan(context.active(), mainSpan), () => {
       const span1 = tracer.startSpan('files-series-info-1');
 
       const span2 = tracer.startSpan('files-series-info-2');
 
-      context.with(setActiveSpan(context.active(), span1), () => {
+      context.with(setSpan(context.active(), span1), () => {
         getData(url1).then((data) => {
-          const curSpan = getActiveSpan(context.active());
+          const curSpan = getSpan(context.active());
           console.log('current span is span1', curSpan === span1);
           console.log('info from package.json', data.description, data.version);
           curSpan.addEvent('fetching-span1-completed');
@@ -69,10 +69,10 @@ const prepareClickEvent = () => {
         });
       });
 
-      context.with(setActiveSpan(context.active(), span2), () => {
+      context.with(setSpan(context.active(), span2), () => {
         getData(url2).then((data) => {
           setTimeout(() => {
-            const curSpan = getActiveSpan(context.active());
+            const curSpan = getSpan(context.active());
             console.log('current span is span2', curSpan === span2);
             console.log('info from package.json', data.description, data.version);
             curSpan.addEvent('fetching-span2-completed');

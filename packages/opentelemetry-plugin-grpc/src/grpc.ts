@@ -23,7 +23,7 @@ import {
   SpanOptions,
   Status,
   ROOT_CONTEXT,
-  setActiveSpan,
+  setSpan,
 } from '@opentelemetry/api';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import { BasePlugin } from '@opentelemetry/core';
@@ -195,7 +195,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
                       [RpcAttribute.GRPC_KIND]: spanOptions.kind,
                     });
 
-                  context.with(setActiveSpan(context.active(), span), () => {
+                  context.with(setSpan(context.active(), span), () => {
                     switch (type) {
                       case 'unary':
                       case 'client_stream':
@@ -393,7 +393,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         const span = plugin._tracer.startSpan(name, {
           kind: SpanKind.CLIENT,
         });
-        return context.with(setActiveSpan(context.active(), span), () =>
+        return context.with(setSpan(context.active(), span), () =>
           plugin._makeGrpcClientRemoteCall(
             original,
             args,

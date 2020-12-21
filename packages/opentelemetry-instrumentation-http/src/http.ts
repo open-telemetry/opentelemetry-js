@@ -25,7 +25,7 @@ import {
   SpanContext,
   TraceFlags,
   ROOT_CONTEXT,
-  getActiveSpan,
+  getSpan,
 } from '@opentelemetry/api';
 import { NoRecordingSpan } from '@opentelemetry/core';
 import type * as http from 'http';
@@ -411,7 +411,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           spanOptions
         );
 
-        return context.with(setActiveSpan(context.active(), span), () => {
+        return context.with(setSpan(context.active(), span), () => {
           context.bind(request);
           context.bind(response);
 
@@ -581,7 +581,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         : this._getConfig().requireParentforIncomingSpans;
 
     let span: Span;
-    const currentSpan = getActiveSpan(context.active());
+    const currentSpan = getSpan(context.active());
 
     if (requireParent === true && currentSpan === undefined) {
       // TODO: Refactor this when a solution is found in

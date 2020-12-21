@@ -30,7 +30,7 @@ import {
   propagation,
   Span,
   ROOT_CONTEXT,
-  setActiveSpan,
+  setSpan,
 } from '@opentelemetry/api';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import { clientStreamAndUnaryHandler } from './clientStreamAndUnary';
@@ -114,7 +114,7 @@ export function patchServer(
                     [RpcAttribute.GRPC_KIND]: spanOptions.kind,
                   });
 
-                context.with(setActiveSpan(context.active(), span), () => {
+                context.with(setSpan(context.active(), span), () => {
                   handleServerFunction.call(
                     self,
                     plugin,

@@ -23,7 +23,7 @@ import {
   Status,
   propagation,
   context,
-  setActiveSpan,
+  setSpan,
 } from '@opentelemetry/api';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import type * as grpcJs from '@grpc/grpc-js';
@@ -81,7 +81,7 @@ export function getPatchedClientMethods(
       const span = plugin.tracer.startSpan(name, {
         kind: SpanKind.CLIENT,
       });
-      return context.with(setActiveSpan(context.active(), span), () =>
+      return context.with(setSpan(context.active(), span), () =>
         makeGrpcClientRemoteCall(original, args, metadata, this)(span)
       );
     };

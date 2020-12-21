@@ -295,8 +295,8 @@ describe('BasicTracerProvider', () => {
     it('should run context with NoopContextManager context manager', done => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
-      context.with(setActiveSpan(context.active(), span), () => {
-        assert.deepStrictEqual(getActiveSpan(context.active()), undefined);
+      context.with(setSpan(context.active(), span), () => {
+        assert.deepStrictEqual(getSpan(context.active()), undefined);
         return done();
       });
     });
@@ -307,10 +307,10 @@ describe('BasicTracerProvider', () => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
       const fn = () => {
-        assert.deepStrictEqual(getActiveSpan(context.active()), undefined);
+        assert.deepStrictEqual(getSpan(context.active()), undefined);
         return done();
       };
-      const patchedFn = context.bind(fn, setActiveSpan(context.active(), span));
+      const patchedFn = context.bind(fn, setSpan(context.active(), span));
       return patchedFn();
     });
   });
