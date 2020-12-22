@@ -23,12 +23,7 @@ import {
   TextMapPropagator,
   TextMapSetter,
 } from '../context/propagation/TextMapPropagator';
-import {
-  getGlobal,
-  isCompatible,
-  registerGlobal,
-  unregisterGlobal,
-} from './global-utils';
+import { getGlobal, registerGlobal, unregisterGlobal } from './global-utils';
 
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Propagation API
@@ -92,10 +87,6 @@ export class PropagationAPI {
   }
 
   private _getGlobalPropagator(): TextMapPropagator {
-    const version = getGlobal('version');
-    return (
-      (version && isCompatible(version) && getGlobal('propagation')) ||
-      NOOP_TEXT_MAP_PROPAGATOR
-    );
+    return getGlobal('propagation') || NOOP_TEXT_MAP_PROPAGATOR;
   }
 }

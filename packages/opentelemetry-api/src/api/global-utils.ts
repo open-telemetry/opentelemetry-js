@@ -58,6 +58,10 @@ export function registerGlobal<Type extends keyof OTelGlobalAPI>(
 export function getGlobal<Type extends keyof OTelGlobalAPI>(
   type: Type
 ): OTelGlobalAPI[Type] | undefined {
+  const version = _global[GLOBAL_OPENTELEMETRY_API_KEY]?.version;
+  if (!version || !semver.satisfies(version, acceptableRange)) {
+    return;
+  }
   return _global[GLOBAL_OPENTELEMETRY_API_KEY]?.[type];
 }
 
@@ -67,10 +71,6 @@ export function unregisterGlobal(type: keyof OTelGlobalAPI) {
   if (api) {
     delete api[type];
   }
-}
-
-export function isCompatible(version: string) {
-  return semver.satisfies(version, acceptableRange);
 }
 
 type OTelGlobal = {

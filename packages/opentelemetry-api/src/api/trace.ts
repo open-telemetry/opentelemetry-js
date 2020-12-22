@@ -18,12 +18,7 @@ import { ProxyTracerProvider } from '../trace/ProxyTracerProvider';
 import { Tracer } from '../trace/tracer';
 import { TracerProvider } from '../trace/tracer_provider';
 import { isSpanContextValid } from '../trace/spancontext-utils';
-import {
-  getGlobal,
-  isCompatible,
-  registerGlobal,
-  unregisterGlobal,
-} from './global-utils';
+import { getGlobal, registerGlobal, unregisterGlobal } from './global-utils';
 
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Tracing API
@@ -58,11 +53,7 @@ export class TraceAPI {
    * Returns the global tracer provider.
    */
   public getTracerProvider(): TracerProvider {
-    const version = getGlobal('version');
-    return (
-      (version && isCompatible(version) && getGlobal('trace')) ||
-      this._proxyTracerProvider
-    );
+    return getGlobal('trace') || this._proxyTracerProvider;
   }
 
   /**

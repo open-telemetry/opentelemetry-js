@@ -17,12 +17,7 @@
 import { Meter } from '../metrics/Meter';
 import { MeterProvider } from '../metrics/MeterProvider';
 import { NOOP_METER_PROVIDER } from '../metrics/NoopMeterProvider';
-import {
-  getGlobal,
-  isCompatible,
-  registerGlobal,
-  unregisterGlobal,
-} from './global-utils';
+import { getGlobal, registerGlobal, unregisterGlobal } from './global-utils';
 
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Metrics API
@@ -54,11 +49,7 @@ export class MetricsAPI {
    * Returns the global meter provider.
    */
   public getMeterProvider(): MeterProvider {
-    const version = getGlobal('version');
-    return (
-      (version && isCompatible(version) && getGlobal('metrics')) ||
-      NOOP_METER_PROVIDER
-    );
+    return getGlobal('metrics') || NOOP_METER_PROVIDER;
   }
 
   /**

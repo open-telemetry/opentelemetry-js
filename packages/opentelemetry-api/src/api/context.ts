@@ -19,12 +19,7 @@ import {
   ContextManager,
   NoopContextManager,
 } from '@opentelemetry/context-base';
-import {
-  getGlobal,
-  isCompatible,
-  registerGlobal,
-  unregisterGlobal,
-} from './global-utils';
+import { getGlobal, registerGlobal, unregisterGlobal } from './global-utils';
 
 const NOOP_CONTEXT_MANAGER = new NoopContextManager();
 
@@ -87,11 +82,7 @@ export class ContextAPI {
   }
 
   private _getContextManager(): ContextManager {
-    const version = getGlobal('version');
-    return (
-      (version && isCompatible(version) && getGlobal('context')) ||
-      NOOP_CONTEXT_MANAGER
-    );
+    return getGlobal('context') || NOOP_CONTEXT_MANAGER;
   }
 
   /** Disable and remove the global context manager */
