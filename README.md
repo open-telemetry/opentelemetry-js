@@ -120,8 +120,9 @@ estimates, and subject to change.
 ## Contributing
 
 We'd love your help!. Use tags [up-for-grabs][up-for-grabs-issues] and
-[good first issue][good-first-issues] to get started with the project. Follow
-[CONTRIBUTING](CONTRIBUTING.md) guide to report issues or submit a proposal.
+[good first issue][good-first-issues] to get started with the project. For
+instructions to build and make changes to this project, see the
+[CONTRIBUTING](CONTRIBUTING.md) guide.
 
 We have a weekly SIG meeting! See the [community page](https://github.com/open-telemetry/community#javascript-sdk) for meeting details and notes.
 
@@ -223,6 +224,16 @@ To request automatic tracing support for a module not on this list, please [file
 | Package                                                  | Description                                                                             |
 |----------------------------------------------------------|-----------------------------------------------------------------------------------------|
 | [@opentelemetry/shim-opentracing][otel-shim-opentracing] | OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry |
+
+## Upgrade guidelines
+
+### 0.14.0 to 0.15.0
+
+[PR-1764](https://github.com/open-telemetry/opentelemetry-js/pull/1764) removed some APIs from `Tracer`:
+
+- `Tracer.getCurrentSpan()`: use `api.getSpan(api.context.active())`
+- `Tracer.withSpan(span)`: use `api.context.with(api.setSpan(api.context.active(), span))`
+- `Tracer.bind(target)`: use `api.context.bind(target)`
 
 ## Useful links
 

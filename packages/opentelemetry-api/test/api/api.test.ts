@@ -36,8 +36,6 @@ import api, {
 } from '../../src';
 
 describe('API', () => {
-  const functions = ['getCurrentSpan', 'startSpan', 'withSpan'];
-
   it('should expose a tracer provider via getTracerProvider', () => {
     const tracer = api.trace.getTracerProvider();
     assert.ok(tracer);
@@ -57,20 +55,6 @@ describe('API', () => {
       trace.disable();
       propagation.disable();
       metrics.disable();
-    });
-
-    it('should not crash', () => {
-      functions.forEach(fn => {
-        const tracer = api.trace.getTracerProvider();
-        try {
-          ((tracer as unknown) as { [fn: string]: Function })[fn](); // Try to run the function
-          assert.ok(true, fn);
-        } catch (err) {
-          if (err.message !== 'Method not implemented.') {
-            assert.ok(true, fn);
-          }
-        }
-      });
     });
 
     it('should use the global tracer provider', () => {

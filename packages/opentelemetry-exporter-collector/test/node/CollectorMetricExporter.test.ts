@@ -81,7 +81,7 @@ describe('CollectorMetricExporter - node with json over http', () => {
           foo: 'bar',
         },
         hostname: 'foo',
-        logger: new core.NoopLogger(),
+        logger: new api.NoopLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',

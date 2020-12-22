@@ -21,7 +21,8 @@ import {
   Tracer,
   SpanProcessor,
 } from '../../src';
-import { ExportResult, NoopLogger, AlwaysOnSampler } from '@opentelemetry/core';
+import { ExportResult, AlwaysOnSampler } from '@opentelemetry/core';
+import { NoopLogger } from '@opentelemetry/api';
 
 /**
  * A test-only span exporter that naively simulates triggering instrumentation

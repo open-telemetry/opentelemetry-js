@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/core';
-import { SpanKind, Span, context, propagation } from '@opentelemetry/api';
+import {
+  SpanKind,
+  Span,
+  context,
+  propagation,
+  NoopLogger,
+} from '@opentelemetry/api';
 import {
   HttpAttribute,
   GeneralAttribute,

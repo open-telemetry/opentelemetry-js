@@ -31,23 +31,8 @@ export class ProxyTracer implements Tracer {
     public readonly version?: string
   ) {}
 
-  getCurrentSpan(): Span | undefined {
-    return this._getTracer().getCurrentSpan();
-  }
-
   startSpan(name: string, options?: SpanOptions): Span {
     return this._getTracer().startSpan(name, options);
-  }
-
-  withSpan<T extends (...args: unknown[]) => ReturnType<T>>(
-    span: Span,
-    fn: T
-  ): ReturnType<T> {
-    return this._getTracer().withSpan(span, fn);
-  }
-
-  bind<T>(target: T, span?: Span): T {
-    return this._getTracer().bind(target, span);
   }
 
   /**

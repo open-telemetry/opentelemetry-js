@@ -19,9 +19,10 @@ import {
   propagation,
   Span as ISpan,
   SpanKind,
-  getActiveSpan,
+  NoopLogger,
+  getSpan,
+  setSpan,
 } from '@opentelemetry/api';
-import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
@@ -338,7 +339,7 @@ describe('HttpPlugin', () => {
         doNock(hostname, testPath, 200, 'Ok');
         const name = 'TestRootSpan';
         const span = provider.getTracer('default').startSpan(name);
-        return provider.getTracer('default').withSpan(span, async () => {
+        return context.with(setSpan(context.active(), span), async () => {
           const result = await httpRequest.get(
             `${protocol}://${hostname}${testPath}`
           );
@@ -381,7 +382,7 @@ describe('HttpPlugin', () => {
           );
           const name = 'TestRootSpan';
           const span = provider.getTracer('default').startSpan(name);
-          return provider.getTracer('default').withSpan(span, async () => {
+          return context.with(setSpan(context.active(), span), async () => {
             const result = await httpRequest.get(
               `${protocol}://${hostname}${testPath}`
             );
@@ -420,7 +421,7 @@ describe('HttpPlugin', () => {
         doNock(hostname, testPath, 200, 'Ok', num);
         const name = 'TestRootSpan';
         const span = provider.getTracer('default').startSpan(name);
-        await provider.getTracer('default').withSpan(span, async () => {
+        await context.with(setSpan(context.active(), span), async () => {
           for (let i = 0; i < num; i++) {
             await httpRequest.get(`${protocol}://${hostname}${testPath}`);
             const spans = memoryExporter.getFinishedSpans();
@@ -712,9 +713,9 @@ describe('HttpPlugin', () => {
       });
 
       it('should not set span as active in context for outgoing request', done => {
-        assert.deepStrictEqual(getActiveSpan(context.active()), undefined);
+        assert.deepStrictEqual(getSpan(context.active()), undefined);
         http.get(`${protocol}://${hostname}:${serverPort}/test`, res => {
-          assert.deepStrictEqual(getActiveSpan(context.active()), undefined);
+          assert.deepStrictEqual(getSpan(context.active()), undefined);
           done();
         });
       });
@@ -810,7 +811,7 @@ describe('HttpPlugin', () => {
         const span = tracer.startSpan('parentSpan', {
           kind: SpanKind.INTERNAL,
         });
-        tracer.withSpan(span, () => {
+        context.with(setSpan(context.active(), span), () => {
           httpRequest
             .get(`${protocol}://${hostname}:${serverPort}${testPath}`)
             .then(result => {

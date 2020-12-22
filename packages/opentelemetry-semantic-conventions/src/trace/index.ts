@@ -21,3 +21,4 @@ export * from './http';
 export * from './os';
 export * from './rpc';
 export * from './faas';
+export * from './messaging';

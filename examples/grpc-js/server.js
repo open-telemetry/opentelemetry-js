@@ -1,5 +1,6 @@
 'use strict';
 
+const api = require('@opentelemetry/api');
 const tracer = require('./tracer')(('example-grpc-server'));
 // eslint-disable-next-line import/order
 const grpc = require('@grpc/grpc-js');
@@ -21,11 +22,10 @@ function startServer() {
 }
 
 function sayHello(call, callback) {
-  const currentSpan = tracer.getCurrentSpan();
+  const currentSpan = api.getSpan(api.context.active());
   // display traceid in the terminal
   console.log(`traceid: ${currentSpan.context().traceId}`);
   const span = tracer.startSpan('server.js:sayHello()', {
-    parent: currentSpan,
     kind: 1, // server
     attributes: { key: 'value' },
   });

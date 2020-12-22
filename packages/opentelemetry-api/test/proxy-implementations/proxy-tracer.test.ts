@@ -56,8 +56,6 @@ describe('ProxyTracer', () => {
         }),
         NOOP_SPAN
       );
-
-      assert.deepStrictEqual(tracer.getCurrentSpan(), NOOP_SPAN);
     });
   });
 
@@ -96,17 +94,8 @@ describe('ProxyTracer', () => {
     beforeEach(() => {
       delegateSpan = new NoopSpan();
       delegateTracer = {
-        bind(target) {
-          return target;
-        },
-        getCurrentSpan() {
-          return delegateSpan;
-        },
         startSpan() {
           return delegateSpan;
-        },
-        withSpan(span, fn) {
-          return fn();
         },
       };
 
