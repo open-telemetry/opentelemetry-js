@@ -7,17 +7,14 @@ const {
 } = require("@opentelemetry/context-async-hooks");
 const bodyParser = require("body-parser");
 
-// set global propagator
-propagation.setGlobalPropagator(new HttpTraceContext());
-
-// set global context manager
-context.setGlobalContextManager(new AsyncHooksContextManager());
-
 // Create a provider for activating and tracking spans
 const tracerProvider = new BasicTracerProvider();
 
 // Register the tracer
-tracerProvider.register();
+tracerProvider.register({
+   propagator: new HttpTraceContext(),
+   contextManager: new AsyncHooksContextManager().enable(),
+});
 
 // Get a tracer
 const tracer = trace.getTracer("w3c-tests");
