@@ -232,6 +232,10 @@ describe('fetch', () => {
     );
   });
 
+  after(() => {
+    api.propagation.disable();
+  });
+
   describe('when request is successful', () => {
     beforeEach(done => {
       const propagateTraceHeaderCorsUrls = [url];

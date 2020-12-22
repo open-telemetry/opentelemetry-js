@@ -60,7 +60,6 @@ const provider = new NodeTracerProvider({
   logger,
 });
 provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
-propagation.setGlobalPropagator(new DummyPropagation());
 
 function doNock(
   hostname: string,
@@ -96,6 +95,14 @@ export const responseHookFunction = (
 
 describe('HttpPlugin', () => {
   let contextManager: ContextManager;
+
+  before(() => {
+    propagation.setGlobalPropagator(new DummyPropagation());
+  });
+
+  after(() => {
+    propagation.disable();
+  });
 
   beforeEach(() => {
     contextManager = new AsyncHooksContextManager().enable();

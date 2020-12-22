@@ -15,7 +15,7 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { SpanKind, Span, context } from '@opentelemetry/api';
+import { SpanKind, Span, context, propagation } from '@opentelemetry/api';
 import {
   HttpAttribute,
   GeneralAttribute,
@@ -47,11 +47,16 @@ export const customAttributeFunction = (span: Span): void => {
 describe('HttpPlugin Integration tests', () => {
   beforeEach(() => {
     memoryExporter.reset();
-    context.setGlobalContextManager(new AsyncHooksContextManager().enable());
   });
 
-  afterEach(() => {
+  before(() => {
+    context.setGlobalContextManager(new AsyncHooksContextManager().enable());
+    propagation.setGlobalPropagator(new DummyPropagation());
+  });
+
+  after(() => {
     context.disable();
+    propagation.disable();
   });
   describe('enable()', () => {
     before(function (done) {

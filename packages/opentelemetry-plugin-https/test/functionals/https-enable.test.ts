@@ -62,7 +62,6 @@ const provider = new NodeTracerProvider({
 });
 const tracer = provider.getTracer('test-https');
 provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
-propagation.setGlobalPropagator(new DummyPropagation());
 
 function doNock(
   hostname: string,
@@ -84,6 +83,14 @@ export const customAttributeFunction = (span: ISpan): void => {
 
 describe('HttpsPlugin', () => {
   let contextManager: ContextManager;
+
+  before(() => {
+    propagation.setGlobalPropagator(new DummyPropagation());
+  });
+
+  after(() => {
+    propagation.disable();
+  });
 
   beforeEach(() => {
     contextManager = new AsyncHooksContextManager().enable();

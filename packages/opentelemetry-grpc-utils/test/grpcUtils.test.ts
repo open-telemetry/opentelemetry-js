@@ -397,6 +397,10 @@ export const runTests = (
       propagation.setGlobalPropagator(new HttpTraceContext());
     });
 
+    after(() => {
+      propagation.disable();
+    });
+
     beforeEach(() => {
       contextManager = new AsyncHooksContextManager().enable();
       context.setGlobalContextManager(contextManager);

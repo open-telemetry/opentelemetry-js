@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { context, SpanKind } from '@opentelemetry/api';
+import { context, propagation, SpanKind } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
@@ -43,9 +43,11 @@ const protocol = 'http';
 describe('Packages', () => {
   beforeEach(() => {
     context.setGlobalContextManager(new AsyncHooksContextManager().enable());
+    propagation.setGlobalPropagator(new DummyPropagation());
   });
 
   afterEach(() => {
+    propagation.disable();
     context.disable();
   });
   describe('get', () => {

@@ -37,7 +37,13 @@ describe('OpenTracing Shim', () => {
     propagators: [new HttpTraceContext(), new HttpBaggage()],
   });
 
-  propagation.setGlobalPropagator(compositePropagator);
+  before(() => {
+    propagation.setGlobalPropagator(compositePropagator);
+  });
+
+  after(() => {
+    propagation.disable();
+  });
 
   describe('TracerShim', () => {
     let span: opentracing.Span;

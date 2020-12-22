@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { context, Span, SpanKind } from '@opentelemetry/api';
+import { context, propagation, Span, SpanKind } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
@@ -46,11 +46,16 @@ export const customAttributeFunction = (span: Span): void => {
 describe('Packages', () => {
   beforeEach(() => {
     memoryExporter.reset();
-    context.setGlobalContextManager(new AsyncHooksContextManager().enable());
   });
 
-  afterEach(() => {
+  before(() => {
+    context.setGlobalContextManager(new AsyncHooksContextManager().enable());
+    propagation.setGlobalPropagator(new DummyPropagation());
+  });
+
+  after(() => {
     context.disable();
+    propagation.disable();
   });
   describe('get', () => {
     const logger = new NoopLogger();
