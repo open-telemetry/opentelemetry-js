@@ -52,10 +52,6 @@ export class ContextAPI {
   public setGlobalContextManager(
     contextManager: ContextManager
   ): ContextManager {
-    if (getGlobal('context')) {
-      throw new Error('Attempted to set global Context Manager multiple times');
-    }
-
     registerGlobal('context', contextManager);
     return contextManager;
   }
@@ -91,13 +87,11 @@ export class ContextAPI {
   }
 
   private _getContextManager(): ContextManager {
-    const signal = getGlobal('context');
-
-    if (signal && isCompatible(signal.version)) {
-      return signal.instance;
-    }
-
-    return NOOP_CONTEXT_MANAGER;
+    const version = getGlobal('version');
+    return (
+      (version && isCompatible(version) && getGlobal('context')) ||
+      NOOP_CONTEXT_MANAGER
+    );
   }
 
   /** Disable and remove the global context manager */

@@ -52,12 +52,7 @@ export class PropagationAPI {
    * Set the current propagator. Returns the initialized propagator
    */
   public setGlobalPropagator(propagator: TextMapPropagator): TextMapPropagator {
-    if (getGlobal('propagation')) {
-      throw new Error('Attempted to set global Propagator multiple times');
-    }
-
     registerGlobal('propagation', propagator);
-
     return propagator;
   }
 
@@ -97,12 +92,10 @@ export class PropagationAPI {
   }
 
   private _getGlobalPropagator(): TextMapPropagator {
-    const signal = getGlobal('propagation');
-
-    if (signal && isCompatible(signal.version)) {
-      return signal.instance;
-    }
-
-    return NOOP_TEXT_MAP_PROPAGATOR;
+    const version = getGlobal('version');
+    return (
+      (version && isCompatible(version) && getGlobal('propagation')) ||
+      NOOP_TEXT_MAP_PROPAGATOR
+    );
   }
 }

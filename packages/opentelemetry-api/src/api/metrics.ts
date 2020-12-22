@@ -46,10 +46,6 @@ export class MetricsAPI {
    * Set the current global meter. Returns the initialized global meter provider.
    */
   public setGlobalMeterProvider(provider: MeterProvider): MeterProvider {
-    if (getGlobal('metrics')) {
-      throw new Error('Attempted to set global Meter Provider multiple times');
-    }
-
     registerGlobal('metrics', provider);
     return provider;
   }
@@ -58,13 +54,11 @@ export class MetricsAPI {
    * Returns the global meter provider.
    */
   public getMeterProvider(): MeterProvider {
-    const signal = getGlobal('metrics');
-
-    if (signal && isCompatible(signal.version)) {
-      return signal.instance;
-    }
-
-    return NOOP_METER_PROVIDER;
+    const version = getGlobal('version');
+    return (
+      (version && isCompatible(version) && getGlobal('metrics')) ||
+      NOOP_METER_PROVIDER
+    );
   }
 
   /**

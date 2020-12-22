@@ -49,13 +49,8 @@ export class TraceAPI {
    * Set the current global tracer. Returns the initialized global tracer provider
    */
   public setGlobalTracerProvider(provider: TracerProvider): TracerProvider {
-    if (getGlobal('trace')) {
-      throw new Error('Attempted to set global Tracer Provider multiple times');
-    }
-
     this._proxyTracerProvider.setDelegate(provider);
     registerGlobal('trace', this._proxyTracerProvider);
-
     return this._proxyTracerProvider;
   }
 
@@ -63,13 +58,11 @@ export class TraceAPI {
    * Returns the global tracer provider.
    */
   public getTracerProvider(): TracerProvider {
-    const traceSignal = getGlobal('trace');
-
-    if (traceSignal && isCompatible(traceSignal.version)) {
-      return traceSignal.instance;
-    }
-
-    return this._proxyTracerProvider;
+    const version = getGlobal('version');
+    return (
+      (version && isCompatible(version) && getGlobal('trace')) ||
+      this._proxyTracerProvider
+    );
   }
 
   /**

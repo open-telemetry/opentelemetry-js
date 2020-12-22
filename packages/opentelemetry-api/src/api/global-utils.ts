@@ -29,27 +29,36 @@ const acceptableRange = new semver.Range(`^${VERSION}`);
 
 export function registerGlobal<Type extends keyof OTelGlobalAPI>(
   type: Type,
-  instance: APIProviders[Type]
+  instance: OTelGlobalAPI[Type]
 ): void {
-  _global[GLOBAL_OPENTELEMETRY_API_KEY] =
-    _global[GLOBAL_OPENTELEMETRY_API_KEY] ?? {};
+  _global[GLOBAL_OPENTELEMETRY_API_KEY] = _global[
+    GLOBAL_OPENTELEMETRY_API_KEY
+  ] ?? {
+    version: VERSION,
+  };
 
   const api = _global[GLOBAL_OPENTELEMETRY_API_KEY]!;
   if (api[type]) {
     // already registered an API of this type
-    return;
+    throw new Error(
+      `@opentelemetry/api: Attempted duplicate registration of API: ${type}`
+    );
   }
 
-  api[type] = {
-    instance: instance as any,
-    version: VERSION,
-  };
+  if (api.version != VERSION) {
+    // All registered APIs must be of the same version exactly
+    throw new Error(
+      '@opentelemetry/api: All API registration versions must match'
+    );
+  }
+
+  api[type] = instance;
 }
 
 export function getGlobal<Type extends keyof OTelGlobalAPI>(
   type: Type
-): Signal<APIProviders[Type]> | undefined {
-  return _global[GLOBAL_OPENTELEMETRY_API_KEY]?.[type] as any;
+): OTelGlobalAPI[Type] | undefined {
+  return _global[GLOBAL_OPENTELEMETRY_API_KEY]?.[type];
 }
 
 export function unregisterGlobal(type: keyof OTelGlobalAPI) {
@@ -69,17 +78,10 @@ type OTelGlobal = {
 };
 
 type OTelGlobalAPI = {
-  [T in keyof APIProviders]?: Signal<APIProviders[T]>;
-};
-
-type Signal<T> = {
-  instance: T;
   version: string;
-};
 
-type APIProviders = {
-  trace: TracerProvider;
-  metrics: MeterProvider;
-  context: ContextManager;
-  propagation: TextMapPropagator;
+  trace?: TracerProvider;
+  metrics?: MeterProvider;
+  context?: ContextManager;
+  propagation?: TextMapPropagator;
 };

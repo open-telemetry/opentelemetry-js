@@ -17,6 +17,7 @@
 import * as assert from 'assert';
 import { NoopContextManager } from '@opentelemetry/context-base';
 import { getGlobal } from '../../src/api/global-utils';
+import { _globalThis } from '../../src/platform';
 
 const api1 = require('../../src') as typeof import('../../src');
 
@@ -78,7 +79,8 @@ describe('Global Utils', () => {
 
     const globalInstance = getGlobal('context');
     assert.ok(globalInstance);
-    globalInstance.version = '0.0.1';
+    // @ts-ignore we are modifying internals for testing purposes here
+    _globalThis[Symbol.for('io.opentelemetry.js.api')].version = '0.0.1';
 
     assert.strictEqual(api1.context['_getContextManager'](), original);
   });
