@@ -19,6 +19,7 @@ import {
   SpanContext,
   TraceFlags,
   ROOT_CONTEXT,
+  NoopLogger,
   setSpan,
   setSpanContext,
   getSpan,
@@ -26,7 +27,6 @@ import {
 import {
   AlwaysOnSampler,
   AlwaysOffSampler,
-  NoopLogger,
   NoRecordingSpan,
   TraceState,
 } from '@opentelemetry/core';

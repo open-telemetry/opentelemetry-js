@@ -15,11 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import {
-  ExportResult,
-  ExportResultCode,
-  NoopLogger,
-} from '@opentelemetry/core';
+import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { Socket } from 'dgram';
 import { spanToThrift } from './transform';
@@ -39,7 +35,7 @@ export class JaegerExporter implements SpanExporter {
 
   constructor(config: jaegerTypes.ExporterConfig) {
     const localConfig = Object.assign({}, config);
-    this._logger = localConfig.logger || new NoopLogger();
+    this._logger = localConfig.logger || new api.NoopLogger();
     const tags: jaegerTypes.Tag[] = localConfig.tags || [];
     this._onShutdownFlushTimeout =
       typeof localConfig.flushTimeout === 'number'

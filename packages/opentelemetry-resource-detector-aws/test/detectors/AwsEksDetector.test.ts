@@ -24,7 +24,7 @@ import {
   assertContainerResource,
   assertEmptyResource,
 } from '@opentelemetry/resources/test/util/resource-assertions';
-import { NoopLogger } from '@opentelemetry/core';
+import { NoopLogger } from '@opentelemetry/api';
 
 const K8S_SVC_URL = awsEksDetector.K8S_SVC_URL;
 const AUTH_CONFIGMAP_PATH = awsEksDetector.AUTH_CONFIGMAP_PATH;
