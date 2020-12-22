@@ -22,18 +22,15 @@ import { _globalThis } from '../platform';
 import { TracerProvider } from '../trace/tracer_provider';
 import { VERSION } from '../version';
 
-const _global = _globalThis as OTelGlobal;
-const acceptableRange = new semver.Range(`^${VERSION}`);
 const GLOBAL_OPENTELEMETRY_API_KEY = Symbol.for('io.opentelemetry.js.api');
 
-export function registerGlobal(type: 'trace', instance: TracerProvider): void;
-export function registerGlobal(type: 'metrics', instance: MeterProvider): void;
-export function registerGlobal(type: 'context', instance: ContextManager): void;
-export function registerGlobal(
-  type: 'propagation',
-  instance: TextMapPropagator
-): void;
-export function registerGlobal(type: keyof OTelGlobalApi, instance: any) {
+const _global = _globalThis as OTelGlobal;
+const acceptableRange = new semver.Range(`^${VERSION}`);
+
+export function registerGlobal<Type extends keyof OTelGlobalAPI>(
+  type: Type,
+  instance: APIProviders[Type]
+): void {
   _global[GLOBAL_OPENTELEMETRY_API_KEY] =
     _global[GLOBAL_OPENTELEMETRY_API_KEY] ?? {};
 
@@ -44,22 +41,18 @@ export function registerGlobal(type: keyof OTelGlobalApi, instance: any) {
   }
 
   api[type] = {
-    instance,
+    instance: instance as any,
     version: VERSION,
   };
 }
 
-export function getGlobal(type: 'trace'): Signal<TracerProvider> | undefined;
-export function getGlobal(type: 'metrics'): Signal<MeterProvider> | undefined;
-export function getGlobal(type: 'context'): Signal<ContextManager> | undefined;
-export function getGlobal(
-  type: 'propagation'
-): Signal<TextMapPropagator> | undefined;
-export function getGlobal(type: keyof OTelGlobalApi) {
-  return _global[GLOBAL_OPENTELEMETRY_API_KEY]?.[type];
+export function getGlobal<Type extends keyof OTelGlobalAPI>(
+  type: Type
+): Signal<APIProviders[Type]> | undefined {
+  return _global[GLOBAL_OPENTELEMETRY_API_KEY]?.[type] as any;
 }
 
-export function unregisterGlobal(type: keyof OTelGlobalApi) {
+export function unregisterGlobal(type: keyof OTelGlobalAPI) {
   const api = _global[GLOBAL_OPENTELEMETRY_API_KEY];
 
   if (api) {
@@ -71,18 +64,22 @@ export function isCompatible(version: string) {
   return semver.satisfies(version, acceptableRange);
 }
 
-type OTelGlobal = Partial<{
-  [GLOBAL_OPENTELEMETRY_API_KEY]: OTelGlobalApi;
-}>;
+type OTelGlobal = {
+  [GLOBAL_OPENTELEMETRY_API_KEY]?: OTelGlobalAPI;
+};
 
-type OTelGlobalApi = Partial<{
-  trace: Signal<TracerProvider>;
-  metrics: Signal<MeterProvider>;
-  context: Signal<ContextManager>;
-  propagation: Signal<TextMapPropagator>;
-}>;
+type OTelGlobalAPI = {
+  [T in keyof APIProviders]?: Signal<APIProviders[T]>;
+};
 
 type Signal<T> = {
   instance: T;
   version: string;
+};
+
+type APIProviders = {
+  trace: TracerProvider;
+  metrics: MeterProvider;
+  context: ContextManager;
+  propagation: TextMapPropagator;
 };
