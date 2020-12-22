@@ -53,11 +53,16 @@ const customAttributeFunction = (span: Span): void => {
 describe('HttpInstrumentation Integration tests', () => {
   beforeEach(() => {
     memoryExporter.reset();
+  });
+
+  before(() => {
+    propagation.setGlobalPropagator(new DummyPropagation());
     context.setGlobalContextManager(new AsyncHooksContextManager().enable());
   });
 
-  afterEach(() => {
+  after(() => {
     context.disable();
+    propagation.disable();
   });
   describe('enable()', () => {
     before(function (done) {
@@ -72,7 +77,6 @@ describe('HttpInstrumentation Integration tests', () => {
           this.skip();
           // don't disturb people
         }
-        propagation.setGlobalPropagator(new DummyPropagation());
         done();
       });
     });
@@ -103,7 +107,6 @@ describe('HttpInstrumentation Integration tests', () => {
 
     after(() => {
       instrumentation.disable();
-      propagation.disable();
     });
 
     it('should create a rootSpan for GET requests and add propagation headers', async () => {
