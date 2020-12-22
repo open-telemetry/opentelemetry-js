@@ -17,6 +17,7 @@
 import {
   context,
   TraceFlags,
+  NoopLogger,
   setSpan,
   setSpanContext,
   getSpan,
@@ -24,7 +25,6 @@ import {
 import {
   AlwaysOnSampler,
   AlwaysOffSampler,
-  NoopLogger,
   NoRecordingSpan,
 } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';

@@ -19,11 +19,11 @@ import {
   NoopTracerProvider,
   SpanKind,
   propagation,
+  NoopLogger,
   getSpan,
   setSpan,
 } from '@opentelemetry/api';
 import {
-  NoopLogger,
   HttpTraceContext,
   BasePlugin,
   PluginConfig,

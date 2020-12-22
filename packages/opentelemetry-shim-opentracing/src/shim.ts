@@ -15,7 +15,6 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { NoopLogger } from '@opentelemetry/core';
 import * as opentracing from 'opentracing';
 import { Attributes, AttributeValue } from '@opentelemetry/api';
 
@@ -126,7 +125,7 @@ export class TracerShim extends opentracing.Tracer {
     super();
 
     this._tracer = tracer;
-    this._logger = logger || new NoopLogger();
+    this._logger = logger || new api.NoopLogger();
   }
 
   startSpan(

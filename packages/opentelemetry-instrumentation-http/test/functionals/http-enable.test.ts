@@ -19,10 +19,10 @@ import {
   propagation,
   Span as ISpan,
   SpanKind,
+  NoopLogger,
   getSpan,
   setSpan,
 } from '@opentelemetry/api';
-import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,

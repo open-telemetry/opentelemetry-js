@@ -16,11 +16,7 @@
 
 import * as assert from 'assert';
 import { JaegerExporter } from '../src';
-import {
-  ExportResult,
-  ExportResultCode,
-  NoopLogger,
-} from '@opentelemetry/core';
+import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
 import { ThriftProcess } from '../src/types';
 import { ReadableSpan } from '@opentelemetry/tracing';
@@ -48,7 +44,7 @@ describe('JaegerExporter', () => {
         serviceName: 'opentelemetry',
         host: 'remotehost',
         port: 8080,
-        logger: new NoopLogger(),
+        logger: new api.NoopLogger(),
         tags: [{ key: 'opentelemetry-exporter-jaeger', value: '0.1.0' }],
       });
       assert.ok(typeof exporter.export === 'function');

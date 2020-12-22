@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
+import { context, propagation, Span, SpanKind } from '@opentelemetry/api';
+import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { NoopLogger } from '@opentelemetry/core';
-import { SpanKind, Span, context, propagation } from '@opentelemetry/api';
+import { NodeTracerProvider } from '@opentelemetry/node';
 import {
-  HttpAttribute,
-  GeneralAttribute,
+  GeneralAttribute, HttpAttribute
 } from '@opentelemetry/semantic-conventions';
+import {
+  InMemorySpanExporter,
+  SimpleSpanProcessor
+} from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as url from 'url';
 import { plugin } from '../../src/http';
+import { HttpPluginConfig } from '../../src/types';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
 import * as utils from '../utils/utils';
-import { NodeTracerProvider } from '@opentelemetry/node';
-import {
-  InMemorySpanExporter,
-  SimpleSpanProcessor,
-} from '@opentelemetry/tracing';
-import { HttpPluginConfig } from '../../src/types';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+
 const protocol = 'http';
 const serverPort = 32345;
 const hostname = 'localhost';
