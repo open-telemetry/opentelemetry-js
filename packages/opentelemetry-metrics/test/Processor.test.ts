@@ -16,7 +16,6 @@
 
 import * as assert from 'assert';
 import * as api from '@opentelemetry/api';
-import { NoopLogger } from '@opentelemetry/core';
 import { Meter, MeterProvider } from '../src';
 
 describe('Processor', () => {
@@ -27,7 +26,7 @@ describe('Processor', () => {
     let counter: api.Counter;
     beforeEach(() => {
       meter = new MeterProvider({
-        logger: new NoopLogger(),
+        logger: new api.NoopLogger(),
         interval: 10000,
       }).getMeter('test-meter');
       counter = meter.createCounter('ungrouped-processor-test');

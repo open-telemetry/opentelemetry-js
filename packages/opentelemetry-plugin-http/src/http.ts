@@ -25,6 +25,7 @@ import {
   TraceFlags,
   setSpan,
   ROOT_CONTEXT,
+  getSpan,
 } from '@opentelemetry/api';
 import { BasePlugin, NoRecordingSpan } from '@opentelemetry/core';
 import type {
@@ -214,7 +215,7 @@ export class HttpPlugin extends BasePlugin<Http> {
           this._callResponseHook(span, response);
         }
 
-        this._tracer.bind(response);
+        context.bind(response);
         this._logger.debug('outgoingRequest on response()');
         response.on('end', () => {
           this._logger.debug('outgoingRequest on end()');
@@ -310,7 +311,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       return context.with(propagation.extract(ROOT_CONTEXT, headers), () => {
         const span = plugin._startHttpSpan(`HTTP ${method}`, spanOptions);
 
-        return plugin._tracer.withSpan(span, () => {
+        return context.with(setSpan(context.active(), span), () => {
           context.bind(request);
           context.bind(response);
 
@@ -426,7 +427,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       );
 
       plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
-      plugin._tracer.bind(request);
+      context.bind(request);
       return plugin._traceClientRequest(request, optionsParsed, span);
     };
   }
@@ -442,7 +443,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         : this._config.requireParentforIncomingSpans;
 
     let span: Span;
-    const currentSpan = this._tracer.getCurrentSpan();
+    const currentSpan = getSpan(context.active());
 
     if (requireParent === true && currentSpan === undefined) {
       // TODO: Refactor this when a solution is found in

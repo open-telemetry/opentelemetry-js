@@ -299,16 +299,19 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
         }
 
         return new Promise((resolve, reject) => {
-          return plugin._tracer.withSpan(span, () => {
-            plugin._addHeaders(options, url);
-            plugin._tasksCount++;
-            return original
-              .apply(this, [url, options])
-              .then(
-                onSuccess.bind(this, span, resolve),
-                onError.bind(this, span, reject)
-              );
-          });
+          return api.context.with(
+            api.setSpan(api.context.active(), span),
+            () => {
+              plugin._addHeaders(options, url);
+              plugin._tasksCount++;
+              return original
+                .apply(this, [url, options])
+                .then(
+                  onSuccess.bind(this, span, resolve),
+                  onError.bind(this, span, reject)
+                );
+            }
+          );
         });
       };
     };
