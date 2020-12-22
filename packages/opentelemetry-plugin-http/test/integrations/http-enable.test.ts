@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-import { context, propagation, Span, SpanKind } from '@opentelemetry/api';
+import {
+  context,
+  NoopLogger,
+  propagation,
+  Span,
+  SpanKind,
+} from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
-import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
-  GeneralAttribute, HttpAttribute
+  GeneralAttribute,
+  HttpAttribute,
 } from '@opentelemetry/semantic-conventions';
 import {
   InMemorySpanExporter,
-  SimpleSpanProcessor
+  SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as http from 'http';

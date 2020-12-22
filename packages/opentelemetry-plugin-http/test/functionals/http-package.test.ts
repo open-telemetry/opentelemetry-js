@@ -19,7 +19,7 @@ import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
-  SimpleSpanProcessor
+  SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import axios, { AxiosResponse } from 'axios';
