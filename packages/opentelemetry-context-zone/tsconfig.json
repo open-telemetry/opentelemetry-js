@@ -1,13 +1,20 @@
 {
-  "extends": "../tsconfig.base",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "build",
     "skipLibCheck": true
   },
-  "files": [ "node_modules/zone.js/dist/zone.js.d.ts"],
+  "files": [
+    "node_modules/zone.js/dist/zone.js.d.ts"
+  ],
   "include": [
     "src/**/*.ts",
     "test/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../opentelemetry-context-zone-peer-dep"
+    }
   ]
 }

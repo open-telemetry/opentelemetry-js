@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Span, StatusCode } from '@opentelemetry/api';
+import { context, Span, StatusCode } from '@opentelemetry/api';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import type * as grpcJs from '@grpc/grpc-js';
 import type { GrpcJsPlugin } from '../grpcJs';
@@ -43,7 +43,7 @@ export function serverStreamAndBidiHandler<RequestType, ResponseType>(
     }
   };
 
-  plugin.tracer.bind(call);
+  context.bind(call);
   call.on('finish', () => {
     // @grpc/js does not expose a way to check if this call also emitted an error,
     // e.g. call.status.code !== 0

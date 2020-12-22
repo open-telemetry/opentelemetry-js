@@ -23,6 +23,7 @@ import {
   SpanOptions,
   Status,
   ROOT_CONTEXT,
+  setSpan,
 } from '@opentelemetry/api';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import { BasePlugin } from '@opentelemetry/core';
@@ -194,7 +195,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
                       [RpcAttribute.GRPC_KIND]: spanOptions.kind,
                     });
 
-                  plugin._tracer.withSpan(span, () => {
+                  context.with(setSpan(context.active(), span), () => {
                     switch (type) {
                       case 'unary':
                       case 'client_stream':
@@ -286,7 +287,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       return callback(err, value, trailer, flags);
     }
 
-    plugin._tracer.bind(call);
+    context.bind(call);
     return (original as Function).call(self, call, patchedCallback);
   }
 
@@ -305,7 +306,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       }
     };
 
-    plugin._tracer.bind(call);
+    context.bind(call);
     call.on('finish', () => {
       span.setStatus(_grpcStatusCodeToSpanStatus(call.status.code));
       span.setAttribute(
@@ -392,7 +393,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         const span = plugin._tracer.startSpan(name, {
           kind: SpanKind.CLIENT,
         });
-        return plugin._tracer.withSpan(span, () =>
+        return context.with(setSpan(context.active(), span), () =>
           plugin._makeGrpcClientRemoteCall(
             original,
             args,
@@ -448,7 +449,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         span.end();
         callback(err, res);
       };
-      return plugin._tracer.bind(wrappedFn);
+      return context.bind(wrappedFn);
     }
 
     return (span: Span) => {
@@ -490,7 +491,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
             spanEnded = true;
           }
         };
-        plugin._tracer.bind(call);
+        context.bind(call);
         ((call as unknown) as events.EventEmitter).on(
           'error',
           (err: grpcTypes.ServiceError) => {

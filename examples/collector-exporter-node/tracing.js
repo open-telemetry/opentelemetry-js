@@ -39,9 +39,8 @@ setTimeout(() => {
 function doWork(parent) {
   // Start another span. In this example, the main method already started a
   // span, so that'll be the parent span, and this will be a child span.
-  const span = tracer.startSpan('doWork', {
-    parent,
-  });
+  const ctx = opentelemetry.setSpan(opentelemetry.context.active(), parent);
+  const span = tracer.startSpan('doWork', undefined, ctx);
 
   // simulate some random work.
   for (let i = 0; i <= Math.floor(Math.random() * 40000000); i += 1) {

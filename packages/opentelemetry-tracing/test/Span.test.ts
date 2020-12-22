@@ -22,13 +22,13 @@ import {
   SpanContext,
   SpanKind,
   TraceFlags,
+  NoopLogger,
 } from '@opentelemetry/api';
 import {
   hrTime,
   hrTimeDuration,
   hrTimeToMilliseconds,
   hrTimeToNanoseconds,
-  NoopLogger,
 } from '@opentelemetry/core';
 import { ExceptionAttribute } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';

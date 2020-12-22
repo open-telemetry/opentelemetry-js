@@ -2,6 +2,19 @@
 
 We'd love your help!
 
+## Development Quick Start
+
+To get the project started quickly, you can follow these steps. For more
+detailed instructions, see [development](#development) below.
+
+```sh
+git clone https://github.com/open-telemetry/opentelemetry-js.git
+cd opentelemetry-js
+npm install
+npm run compile
+npm test
+```
+
 ## Report a bug or requesting feature
 
 Reporting bugs is an important contribution. Please make sure to include:
@@ -57,15 +70,102 @@ Remember to always work in a branch of your local copy, as you might otherwise h
 
 Please also see [GitHub workflow](https://github.com/open-telemetry/community/blob/master/CONTRIBUTING.md#github-workflow) section of general project contributing guide.
 
-### Running the tests
+## Development
 
-The `opentelemetry-js` project is written in TypeScript.
+### Tools used
 
-- `npm install` to install dependencies.
-- `npm run compile` compiles the code, checking for type errors.
-- `npm run bootstrap` Bootstrap the packages in the current Lerna repo. Installs all of their dependencies and links any cross-dependencies.
-- `npm test` tests code the same way that our CI will test it.
-- `npm run lint:fix` lint (and maybe fix) any changes.
+- [NPM](https://npmjs.com)
+- [TypeScript](https://www.typescriptlang.org/)
+- [lerna](https://github.com/lerna/lerna) to manage dependencies, compilations, and links between packages. Most lerna commands should be run by calling the provided npm scripts.
+- [MochaJS](https://mochajs.org/) for tests
+- [gts](https://github.com/google/gts)
+- [eslint](https://eslint.org/)
+
+Most of the commands needed for development are accessed as [npm scripts](https://docs.npmjs.com/cli/v6/using-npm/scripts). It is recommended that you use the provided npm scripts instead of using `lerna run` in most cases.
+
+### Install dependencies
+
+This will install all dependencies for the root project and all modules managed by `lerna`. By default, a `postinstall` script will run `lerna bootstrap` automatically after an install. This can be avoided using the `--ignore-scripts` option if desired.
+
+```sh
+npm install
+```
+
+### Compile modules
+
+All modules are managed as a composite typescript project using [Project References](https://www.typescriptlang.org/docs/handbook/project-references.html). This means that a breaking change in one module will be reflected in compilations of its dependent modules automatically.
+
+DO NOT use lerna to compile all modules unless you know what you are doing because this will cause a new typescript process to be spawned for every module in the project.
+
+```sh
+# Build all modules
+npm run compile
+
+# Remove compiled output
+npm run clean
+```
+
+These commands can also be run for specific packages instead of the whole project, which can speed up compilations while developing.
+
+```sh
+# Build a single module and all of its dependencies
+cd packages/opentelemetry-module-name
+npm run compile
+```
+
+Finally, builds can be run continuously as files change using the `watch` npm script.
+
+```sh
+# Build all modules
+npm run watch
+
+# Build a single module and all of its dependencies
+cd packages/opentelemetry-module-name
+npm run watch
+```
+
+### Running tests
+
+Similar to compilations, tests can be run from the root to run all tests or from a single module to run only the tests for that module.
+
+```sh
+# Test all modules
+npm test
+
+# Test a single module
+cd packages/opentelemetry-module-name
+npm test
+```
+
+### Linting
+
+This project uses a combination of `gts` and `eslint`. Just like tests and compilation, linting can be done for all packages or only a single package.
+
+```sh
+# Lint all modules
+npm lint
+
+# Lint a single module
+cd packages/opentelemetry-module-name
+npm lint
+```
+
+There is also a script which will automatically fix many linting errors.
+
+```sh
+# Lint all modules, fixing errors
+npm lint:fix
+
+# Lint a single module, fixing errors
+cd packages/opentelemetry-module-name
+npm lint:fix
+```
+
+### Adding a package
+
+To add a new package, copy `packages/template` to your new package directory and modify the `package.json` file to reflect your desired package settings. If the package will not support browser, the `karma.conf` file may be deleted. If the package will support es5 targets, the reference to `tsconfig.base.json` in `tsconfig.json` should be changed to `tsconfig.es5.json`.
+
+After adding the package, run `npm install` from the root of the project. This will update the `tsconfig.json` project references automatically and install all dependencies in your new package.
 
 ### Guidelines for Pull Requests
 

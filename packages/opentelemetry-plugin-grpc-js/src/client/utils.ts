@@ -23,6 +23,7 @@ import {
   Status,
   propagation,
   context,
+  setSpan,
 } from '@opentelemetry/api';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import type * as grpcJs from '@grpc/grpc-js';
@@ -80,8 +81,8 @@ export function getPatchedClientMethods(
       const span = plugin.tracer.startSpan(name, {
         kind: SpanKind.CLIENT,
       });
-      return plugin.tracer.withSpan(span, () =>
-        makeGrpcClientRemoteCall(original, args, metadata, this, plugin)(span)
+      return context.with(setSpan(context.active(), span), () =>
+        makeGrpcClientRemoteCall(original, args, metadata, this)(span)
       );
     };
   };
@@ -95,8 +96,7 @@ export function makeGrpcClientRemoteCall(
   original: GrpcClientFunc,
   args: unknown[],
   metadata: grpcJs.Metadata,
-  self: grpcJs.Client,
-  plugin: GrpcJsPlugin
+  self: grpcJs.Client
 ): (span: Span) => EventEmitter {
   /**
    * Patches a callback so that the current span for this trace is also ended
@@ -130,7 +130,7 @@ export function makeGrpcClientRemoteCall(
       span.end();
       callback(err, res);
     };
-    return plugin.tracer.bind(wrappedFn);
+    return context.bind(wrappedFn);
   }
 
   return (span: Span) => {
@@ -166,7 +166,7 @@ export function makeGrpcClientRemoteCall(
           spanEnded = true;
         }
       };
-      plugin.tracer.bind(call);
+      context.bind(call);
       call.on('error', (err: grpcJs.ServiceError) => {
         if (call[CALL_SPAN_ENDED]) {
           return;

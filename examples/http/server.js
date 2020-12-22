@@ -1,5 +1,6 @@
 'use strict';
 
+const api = require('@opentelemetry/api');
 const tracer = require('./tracer')('example-http-server');
 // eslint-disable-next-line import/order
 const http = require('http');
@@ -19,11 +20,10 @@ function startServer(port) {
 
 /** A function which handles requests and send response. */
 function handleRequest(request, response) {
-  const currentSpan = tracer.getCurrentSpan();
+  const currentSpan = api.getSpan(api.context.active());
   // display traceid in the terminal
   console.log(`traceid: ${currentSpan.context().traceId}`);
   const span = tracer.startSpan('handleRequest', {
-    parent: currentSpan,
     kind: 1, // server
     attributes: { key: 'value' },
   });

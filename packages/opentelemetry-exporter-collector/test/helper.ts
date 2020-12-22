@@ -507,7 +507,7 @@ export function ensureSpanIsCorrect(
   assert.strictEqual(span.droppedLinksCount, 0, 'droppedLinksCount is wrong');
   assert.deepStrictEqual(
     span.status,
-    { code: api.StatusCode.OK },
+    { code: opentelemetryProto.trace.v1.StatusCode.OK },
     'status is wrong'
   );
 }
