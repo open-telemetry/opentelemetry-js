@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
+import { NoopLogger } from '@opentelemetry/api';
 import {
-  NoopLogger,
   setGlobalErrorHandler,
   loggingErrorHandler,
 } from '@opentelemetry/core';

@@ -19,7 +19,7 @@ import {
   assertK8sResource,
   assertEmptyResource,
 } from '../util/resource-assertions';
-import { NoopLogger } from '@opentelemetry/core';
+import { NoopLogger } from '@opentelemetry/api';
 
 describe('envDetector()', () => {
   describe('with valid env', () => {
