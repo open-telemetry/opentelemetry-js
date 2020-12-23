@@ -25,7 +25,7 @@ import { collectorTypes } from '@opentelemetry/exporter-collector';
 import * as metrics from '@opentelemetry/metrics';
 import * as assert from 'assert';
 import * as fs from 'fs';
-import * as grpc from 'grpc';
+import * as grpc from '@grpc/grpc-js';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import { CollectorMetricExporter } from '../src';

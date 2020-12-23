@@ -17,7 +17,7 @@
 import { diag } from '@opentelemetry/api';
 import * as protoLoader from '@grpc/proto-loader';
 import { collectorTypes } from '@opentelemetry/exporter-collector';
-import * as grpc from 'grpc';
+import * as grpc from '@grpc/grpc-js';
 import * as path from 'path';
 
 import {

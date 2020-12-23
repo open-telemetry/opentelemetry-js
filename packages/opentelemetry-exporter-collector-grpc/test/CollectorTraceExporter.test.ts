@@ -24,7 +24,7 @@ import {
 
 import * as assert from 'assert';
 import * as fs from 'fs';
-import * as grpc from 'grpc';
+import * as grpc from '@grpc/grpc-js';
 import * as path from 'path';
 import * as sinon from 'sinon';
 import { CollectorTraceExporter } from '../src';
