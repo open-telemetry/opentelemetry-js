@@ -22,23 +22,18 @@ const DEFAULT_LIST_SEPARATOR = ',';
  * Environment interface to define all names
  */
 
-type ENVIRONMENT_NUMBERS = {
-  OTEL_BSP_MAX_BATCH_SIZE?: number;
-  OTEL_BSP_SCHEDULE_DELAY_MILLIS?: number;
-  OTEL_SAMPLING_PROBABILITY?: number;
-  OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT?: number;
-  OTEL_SPAN_EVENT_COUNT_LIMIT?: number;
-  OTEL_SPAN_LINK_COUNT_LIMIT?: number;
-};
-
-const ENVIRONMENT_NUMBERS_KEYS: (keyof ENVIRONMENT_NUMBERS)[] = [
+const ENVIRONMENT_NUMBERS_KEYS = [
   'OTEL_BSP_MAX_BATCH_SIZE',
   'OTEL_BSP_SCHEDULE_DELAY_MILLIS',
   'OTEL_SAMPLING_PROBABILITY',
   'OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT',
   'OTEL_SPAN_EVENT_COUNT_LIMIT',
   'OTEL_SPAN_LINK_COUNT_LIMIT',
-];
+] as const;
+
+type ENVIRONMENT_NUMBERS = {
+  [K in typeof ENVIRONMENT_NUMBERS_KEYS[number]]?: number;
+};
 
 function isEnvVarANumber(key: unknown): key is keyof ENVIRONMENT_NUMBERS {
   return (
@@ -46,13 +41,11 @@ function isEnvVarANumber(key: unknown): key is keyof ENVIRONMENT_NUMBERS {
   );
 }
 
-type ENVIRONMENT_LISTS = {
-  OTEL_NO_PATCH_MODULES?: string[];
-};
+const ENVIRONMENT_LISTS_KEYS = ['OTEL_NO_PATCH_MODULES'] as const;
 
-const ENVIRONMENT_LISTS_KEYS: (keyof ENVIRONMENT_LISTS)[] = [
-  'OTEL_NO_PATCH_MODULES',
-];
+type ENVIRONMENT_LISTS = {
+  [K in typeof ENVIRONMENT_LISTS_KEYS[number]]?: string[];
+};
 
 function isEnvVarAList(key: unknown): key is keyof ENVIRONMENT_LISTS {
   return ENVIRONMENT_LISTS_KEYS.indexOf(key as keyof ENVIRONMENT_LISTS) > -1;
