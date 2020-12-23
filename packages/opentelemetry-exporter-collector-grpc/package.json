@@ -62,13 +62,13 @@
     "typescript": "3.9.7"
   },
   "dependencies": {
+    "@grpc/grpc-js": "^1.2.2",
     "@grpc/proto-loader": "^0.5.4",
     "@opentelemetry/api": "^0.14.0",
     "@opentelemetry/core": "^0.14.0",
     "@opentelemetry/exporter-collector": "^0.14.0",
     "@opentelemetry/metrics": "^0.14.0",
     "@opentelemetry/resources": "^0.14.0",
-    "@opentelemetry/tracing": "^0.14.0",
-    "grpc": "^1.24.2"
+    "@opentelemetry/tracing": "^0.14.0"
   }
 }

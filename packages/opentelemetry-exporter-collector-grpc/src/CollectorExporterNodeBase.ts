@@ -18,7 +18,7 @@ import {
   CollectorExporterBase,
   collectorTypes,
 } from '@opentelemetry/exporter-collector';
-import type { Metadata } from 'grpc';
+import type { Metadata } from '@grpc/grpc-js';
 import {
   CollectorExporterConfigNode,
   GRPCQueueItem,
