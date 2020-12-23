@@ -50,7 +50,7 @@ describe('ConsoleMetricExporter', () => {
       boundCounter.add(10);
 
       await meter.collect();
-      consoleExporter.export(meter.getBatcher().checkPointSet(), () => {});
+      consoleExporter.export(meter.getProcessor().checkPointSet(), () => {});
       assert.strictEqual(spyConsole.args.length, 3);
       const [descriptor, labels, value] = spyConsole.args;
       assert.deepStrictEqual(descriptor, [

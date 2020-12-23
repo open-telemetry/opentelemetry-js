@@ -18,3 +18,4 @@ export * from './CollectorTraceExporter';
 export * from './CollectorMetricExporter';
 export * from './CollectorExporterNodeBase';
 export * from './util';
+export * from './types';

@@ -1,5 +1,6 @@
 'use strict';
 
+const api = require('@opentelemetry/api');
 const tracer = require('./tracer')('example-https-client');
 // eslint-disable-next-line import/order
 const https = require('https');
@@ -10,7 +11,7 @@ function makeRequest() {
   // the span, which is created to track work that happens outside of the
   // request lifecycle entirely.
   const span = tracer.startSpan('makeRequest');
-  tracer.withSpan(span, () => {
+  api.context.with(api.setSpan(api.context.active(), span), () => {
     https.get({
       host: 'localhost',
       port: 443,

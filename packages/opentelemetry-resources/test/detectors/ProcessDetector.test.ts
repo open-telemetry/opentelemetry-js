@@ -19,7 +19,7 @@ import {
   assertProcessResource,
   assertEmptyResource,
 } from '../util/resource-assertions';
-import { NoopLogger } from '@opentelemetry/core';
+import { NoopLogger } from '@opentelemetry/api';
 
 describe('processDetector()', () => {
   let sandbox: sinon.SinonSandbox;

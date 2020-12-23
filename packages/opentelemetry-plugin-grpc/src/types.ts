@@ -16,7 +16,7 @@
 
 import * as grpcModule from 'grpc';
 import * as events from 'events';
-import { PluginConfig } from '@opentelemetry/api';
+import { PluginConfig } from '@opentelemetry/core';
 
 export type grpc = typeof grpcModule;
 

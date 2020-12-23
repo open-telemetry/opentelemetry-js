@@ -26,11 +26,16 @@ import api, {
   trace,
   propagation,
   metrics,
+  TextMapPropagator,
+  Context,
+  TextMapSetter,
+  TextMapGetter,
+  ROOT_CONTEXT,
+  defaultTextMapSetter,
+  defaultTextMapGetter,
 } from '../../src';
 
 describe('API', () => {
-  const functions = ['getCurrentSpan', 'startSpan', 'withSpan'];
-
   it('should expose a tracer provider via getTracerProvider', () => {
     const tracer = api.trace.getTracerProvider();
     assert.ok(tracer);
@@ -52,20 +57,6 @@ describe('API', () => {
       metrics.disable();
     });
 
-    it('should not crash', () => {
-      functions.forEach(fn => {
-        const tracer = api.trace.getTracerProvider();
-        try {
-          ((tracer as unknown) as { [fn: string]: Function })[fn](); // Try to run the function
-          assert.ok(true, fn);
-        } catch (err) {
-          if (err.message !== 'Method not implemented.') {
-            assert.ok(true, fn);
-          }
-        }
-      });
-    });
-
     it('should use the global tracer provider', () => {
       api.trace.setGlobalTracerProvider(new TestTracerProvider());
       const tracer = api.trace.getTracerProvider().getTracer('name');
@@ -84,5 +75,81 @@ describe('API', () => {
         return new TestTracer();
       }
     }
+
+    describe('should use the global propagation', () => {
+      const testKey = Symbol('kTestKey');
+
+      interface Carrier {
+        context?: Context;
+        setter?: TextMapSetter;
+      }
+
+      class TestTextMapPropagation implements TextMapPropagator<Carrier> {
+        inject(
+          context: Context,
+          carrier: Carrier,
+          setter: TextMapSetter
+        ): void {
+          carrier.context = context;
+          carrier.setter = setter;
+        }
+
+        extract(
+          context: Context,
+          carrier: Carrier,
+          getter: TextMapGetter
+        ): Context {
+          return context.setValue(testKey, {
+            context,
+            carrier,
+            getter,
+          });
+        }
+
+        fields(): string[] {
+          return ['TestField'];
+        }
+      }
+
+      it('inject', () => {
+        api.propagation.setGlobalPropagator(new TestTextMapPropagation());
+
+        const context = ROOT_CONTEXT.setValue(testKey, 15);
+        const carrier: Carrier = {};
+        api.propagation.inject(context, carrier);
+        assert.strictEqual(carrier.context, context);
+        assert.strictEqual(carrier.setter, defaultTextMapSetter);
+
+        const setter: TextMapSetter = {
+          set: () => {},
+        };
+        api.propagation.inject(context, carrier, setter);
+        assert.strictEqual(carrier.context, context);
+        assert.strictEqual(carrier.setter, setter);
+      });
+
+      it('extract', () => {
+        api.propagation.setGlobalPropagator(new TestTextMapPropagation());
+
+        const carrier: Carrier = {};
+        let context = api.propagation.extract(ROOT_CONTEXT, carrier);
+        let data: any = context.getValue(testKey);
+        assert.ok(data != null);
+        assert.strictEqual(data.context, ROOT_CONTEXT);
+        assert.strictEqual(data.carrier, carrier);
+        assert.strictEqual(data.getter, defaultTextMapGetter);
+
+        const getter: TextMapGetter = {
+          keys: () => [],
+          get: () => undefined,
+        };
+        context = api.propagation.extract(ROOT_CONTEXT, carrier, getter);
+        data = context.getValue(testKey);
+        assert.ok(data != null);
+        assert.strictEqual(data.context, ROOT_CONTEXT);
+        assert.strictEqual(data.carrier, carrier);
+        assert.strictEqual(data.getter, getter);
+      });
+    });
   });
 });

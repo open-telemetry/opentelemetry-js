@@ -19,9 +19,8 @@ import {
   ResourceDetectionConfig,
   ResourceDetectionConfigWithLogger,
 } from '../../config';
-import { Logger } from '@opentelemetry/api';
+import { Logger, NoopLogger } from '@opentelemetry/api';
 import * as util from 'util';
-import { NoopLogger } from '@opentelemetry/core';
 
 /**
  * Runs all resource detectors and returns the results merged into a single

@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-import { collectorTypes } from '@opentelemetry/exporter-collector';
+import {
+  collectorTypes,
+  CollectorExporterNodeConfigBase,
+} from '@opentelemetry/exporter-collector';
 
-import * as core from '@opentelemetry/core';
+import { NoopLogger } from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as http from 'http';
 import * as assert from 'assert';
@@ -43,7 +46,7 @@ const waitTimeMS = 20;
 
 describe('CollectorTraceExporter - node with proto over http', () => {
   let collectorExporter: CollectorTraceExporter;
-  let collectorExporterConfig: collectorTypes.CollectorExporterConfigBase;
+  let collectorExporterConfig: CollectorExporterNodeConfigBase;
   let spyRequest: sinon.SinonSpy;
   let spyWrite: sinon.SinonSpy;
   let spans: ReadableSpan[];
@@ -56,10 +59,12 @@ describe('CollectorTraceExporter - node with proto over http', () => {
           foo: 'bar',
         },
         hostname: 'foo',
-        logger: new core.NoopLogger(),
+        logger: new NoopLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
+        keepAlive: true,
+        httpAgentOptions: { keepAliveMsecs: 2000 },
       };
       collectorExporter = new CollectorTraceExporter(collectorExporterConfig);
       spans = [];
@@ -93,6 +98,19 @@ describe('CollectorTraceExporter - node with proto over http', () => {
         assert.strictEqual(options.headers['foo'], 'bar');
         done();
       }, waitTimeMS);
+    });
+
+    it('should have keep alive and keepAliveMsecs option set', done => {
+      collectorExporter.export(spans, () => {});
+
+      setTimeout(() => {
+        const args = spyRequest.args[0];
+        const options = args[0];
+        const agent = options.agent;
+        assert.strictEqual(agent.keepAlive, true);
+        assert.strictEqual(agent.options.keepAliveMsecs, 2000);
+        done();
+      });
     });
 
     it('should successfully send the spans', done => {

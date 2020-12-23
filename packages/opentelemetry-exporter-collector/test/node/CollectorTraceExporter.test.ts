@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-import {
-  ConsoleLogger,
-  ExportResultCode,
-  ExportResult,
-  LogLevel,
-} from '@opentelemetry/core';
+import { NoopLogger } from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as http from 'http';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { CollectorTraceExporter } from '../../src/platform/node';
-import { CollectorExporterConfigBase } from '../../src/types';
+import {
+  CollectorTraceExporter,
+  CollectorExporterNodeConfigBase,
+} from '../../src/platform/node';
 import * as collectorTypes from '../../src/types';
 import { MockedResponse } from './nodeHelpers';
 
@@ -46,14 +43,14 @@ const address = 'localhost:1501';
 
 describe('CollectorTraceExporter - node with json over http', () => {
   let collectorExporter: CollectorTraceExporter;
-  let collectorExporterConfig: CollectorExporterConfigBase;
+  let collectorExporterConfig: CollectorExporterNodeConfigBase;
   let spyRequest: sinon.SinonSpy;
   let spyWrite: sinon.SinonSpy;
   let spans: ReadableSpan[];
   describe('instance', () => {
     it('should warn about metadata when using json', () => {
       const metadata = 'foo';
-      const logger = new ConsoleLogger(LogLevel.DEBUG);
+      const logger = new core.ConsoleLogger(core.LogLevel.DEBUG);
       const spyLoggerWarn = sinon.stub(logger, 'warn');
       collectorExporter = new CollectorTraceExporter({
         logger,
@@ -75,10 +72,12 @@ describe('CollectorTraceExporter - node with json over http', () => {
           foo: 'bar',
         },
         hostname: 'foo',
-        logger: new core.NoopLogger(),
+        logger: new NoopLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
+        keepAlive: true,
+        httpAgentOptions: { keepAliveMsecs: 2000 },
       };
       collectorExporter = new CollectorTraceExporter(collectorExporterConfig);
       spans = [];
@@ -110,6 +109,19 @@ describe('CollectorTraceExporter - node with json over http', () => {
         const args = spyRequest.args[0];
         const options = args[0];
         assert.strictEqual(options.headers['foo'], 'bar');
+        done();
+      });
+    });
+
+    it('should have keep alive and keepAliveMsecs option set', done => {
+      collectorExporter.export(spans, () => {});
+
+      setTimeout(() => {
+        const args = spyRequest.args[0];
+        const options = args[0];
+        const agent = options.agent;
+        assert.strictEqual(agent.keepAlive, true);
+        assert.strictEqual(agent.options.keepAliveMsecs, 2000);
         done();
       });
     });
@@ -150,7 +162,7 @@ describe('CollectorTraceExporter - node with json over http', () => {
           assert.strictEqual(spyLoggerError.args.length, 0);
           assert.strictEqual(
             responseSpy.args[0][0].code,
-            ExportResultCode.SUCCESS
+            core.ExportResultCode.SUCCESS
           );
           done();
         });
@@ -168,8 +180,8 @@ describe('CollectorTraceExporter - node with json over http', () => {
         callback(mockResError);
         mockResError.send('failed');
         setTimeout(() => {
-          const result = responseSpy.args[0][0] as ExportResult;
-          assert.strictEqual(result.code, ExportResultCode.FAILED);
+          const result = responseSpy.args[0][0] as core.ExportResult;
+          assert.strictEqual(result.code, core.ExportResultCode.FAILED);
           const error = result.error as collectorTypes.CollectorExporterError;
           assert.ok(error !== undefined);
           assert.strictEqual(error.code, 400);
