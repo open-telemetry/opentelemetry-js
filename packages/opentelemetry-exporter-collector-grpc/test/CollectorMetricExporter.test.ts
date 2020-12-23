@@ -109,9 +109,10 @@ const testCollectorMetricExporter = (params: TestParams) =>
                 ]
               )
             : grpc.ServerCredentials.createInsecure();
-          server.bind(address, credentials);
-          server.start();
-          done();
+          server.bindAsync(address, credentials, () => {
+            server.start();
+            done();
+          });
         });
     });
 
