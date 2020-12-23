@@ -82,7 +82,7 @@ export function send<ExportItem, ServiceRequest>(
 
     collector.serviceClient.export(
       serviceRequest,
-      collector.metadata,
+      collector.metadata || new grpc.Metadata(),
       (err: collectorTypes.ExportServiceError) => {
         if (err) {
           diag.error('Service request', serviceRequest);
