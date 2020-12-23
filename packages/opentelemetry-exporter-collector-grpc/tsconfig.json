@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "noUnusedLocals": false,
     "rootDir": ".",
     "outDir": "build"
   },
