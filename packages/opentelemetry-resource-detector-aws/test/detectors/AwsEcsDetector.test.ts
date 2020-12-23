@@ -24,7 +24,7 @@ import {
   assertEmptyResource,
   assertContainerResource,
 } from '@opentelemetry/resources/test/util/resource-assertions';
-import { NoopLogger } from '@opentelemetry/core';
+import { NoopLogger } from '@opentelemetry/api';
 import * as os from 'os';
 
 describe('BeanstalkResourceDetector', () => {

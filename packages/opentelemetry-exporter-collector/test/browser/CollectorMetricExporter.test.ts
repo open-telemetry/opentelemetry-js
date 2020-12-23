@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ExportResultCode, NoopLogger } from '@opentelemetry/core';
+import { ExportResultCode } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorMetricExporter } from '../../src/platform/browser/index';
@@ -85,7 +85,7 @@ describe('CollectorMetricExporter - web', () => {
     describe('when "sendBeacon" is available', () => {
       beforeEach(() => {
         collectorExporter = new CollectorMetricExporter({
-          logger: new NoopLogger(),
+          logger: new api.NoopLogger(),
           url: 'http://foo.bar.com',
           serviceName: 'bar',
         });
@@ -196,7 +196,7 @@ describe('CollectorMetricExporter - web', () => {
       beforeEach(() => {
         (window.navigator as any).sendBeacon = false;
         collectorExporter = new CollectorMetricExporter({
-          logger: new NoopLogger(),
+          logger: new api.NoopLogger(),
           url: 'http://foo.bar.com',
           serviceName: 'bar',
         });
@@ -330,7 +330,7 @@ describe('CollectorMetricExporter - web', () => {
 
     beforeEach(() => {
       collectorExporterConfig = {
-        logger: new NoopLogger(),
+        logger: new api.NoopLogger(),
         headers: customHeaders,
       };
       server = sinon.fakeServer.create();

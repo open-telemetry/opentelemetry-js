@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ExportResultCode, NoopLogger } from '@opentelemetry/core';
+import { ExportResultCode } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorExporterBase } from '../../src/CollectorExporterBase';
@@ -62,7 +62,7 @@ describe('CollectorMetricExporter - common', () => {
       onInitSpy = sinon.stub(CollectorMetricExporter.prototype, 'onInit');
       collectorExporterConfig = {
         hostname: 'foo',
-        logger: new NoopLogger(),
+        logger: new api.NoopLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
@@ -126,7 +126,7 @@ describe('CollectorMetricExporter - common', () => {
       });
 
       it('should set default logger', () => {
-        assert.ok(collectorExporter.logger instanceof NoopLogger);
+        assert.ok(collectorExporter.logger instanceof api.NoopLogger);
       });
     });
   });
@@ -212,7 +212,7 @@ describe('CollectorMetricExporter - common', () => {
       );
       collectorExporterConfig = {
         hostname: 'foo',
-        logger: new NoopLogger(),
+        logger: new api.NoopLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',

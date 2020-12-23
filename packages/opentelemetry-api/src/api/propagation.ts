@@ -23,15 +23,12 @@ import {
   TextMapPropagator,
   TextMapSetter,
 } from '../context/propagation/TextMapPropagator';
-import { ContextAPI } from './context';
 import {
   API_BACKWARDS_COMPATIBILITY_VERSION,
   GLOBAL_PROPAGATION_API_KEY,
   makeGetter,
   _global,
 } from './global-utils';
-
-const contextApi = ContextAPI.getInstance();
 
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Propagation API
@@ -72,14 +69,14 @@ export class PropagationAPI {
   /**
    * Inject context into a carrier to be propagated inter-process
    *
+   * @param context Context carrying tracing data to inject
    * @param carrier carrier to inject context into
    * @param setter Function used to set values on the carrier
-   * @param context Context carrying tracing data to inject. Defaults to the currently active context.
    */
   public inject<Carrier>(
+    context: Context,
     carrier: Carrier,
-    setter: TextMapSetter<Carrier> = defaultTextMapSetter,
-    context: Context = contextApi.active()
+    setter: TextMapSetter<Carrier> = defaultTextMapSetter
   ): void {
     return this._getGlobalPropagator().inject(context, carrier, setter);
   }
@@ -87,14 +84,14 @@ export class PropagationAPI {
   /**
    * Extract context from a carrier
    *
+   * @param context Context which the newly created context will inherit from
    * @param carrier Carrier to extract context from
    * @param getter Function used to extract keys from a carrier
-   * @param context Context which the newly created context will inherit from. Defaults to the currently active context.
    */
   public extract<Carrier>(
+    context: Context,
     carrier: Carrier,
-    getter: TextMapGetter<Carrier> = defaultTextMapGetter,
-    context: Context = contextApi.active()
+    getter: TextMapGetter<Carrier> = defaultTextMapGetter
   ): Context {
     return this._getGlobalPropagator().extract(context, carrier, getter);
   }

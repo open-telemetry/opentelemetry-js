@@ -1,21 +1,19 @@
 {
   "name": "@opentelemetry/semantic-conventions",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "OpenTelemetry semantic conventions",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
+    "compile": "tsc --build",
+    "clean": "tsc --build --clean",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "tdd": "npm run test -- --watch-extensions ts --watch",
-    "clean": "rimraf build/*",
-    "precompile": "tsc --version",
-    "version:update": "node ../../scripts/version-update.js",
-    "compile": "npm run version:update && tsc -p .",
-    "prepare": "npm run compile",
-    "watch": "tsc -w"
+    "version": "node ../../scripts/version-update.js",
+    "watch": "tsc --build --watch"
   },
   "keywords": [
     "opentelemetry",
@@ -41,8 +39,8 @@
     "access": "public"
   },
   "devDependencies": {
-    "@types/mocha": "8.0.4",
-    "@types/node": "14.14.10",
+    "@types/mocha": "8.2.0",
+    "@types/node": "14.14.12",
     "@types/sinon": "9.0.9",
     "codecov": "3.8.1",
     "gts": "2.0.2",
@@ -50,9 +48,9 @@
     "nock": "12.0.3",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "sinon": "9.2.1",
+    "sinon": "9.2.2",
     "ts-mocha": "8.0.0",
-    "ts-node": "9.0.0",
+    "ts-node": "9.1.1",
     "typescript": "3.9.7"
   }
 }

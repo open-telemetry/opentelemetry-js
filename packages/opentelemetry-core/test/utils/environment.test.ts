@@ -73,24 +73,26 @@ describe('environment', () => {
   describe('parseEnvironment', () => {
     it('should parse environment variables', () => {
       mockEnvironment({
+        CONTAINER_NAME: 'container-1',
+        ECS_CONTAINER_METADATA_URI_V4: 'https://ecs.uri/v4',
+        ECS_CONTAINER_METADATA_URI: 'https://ecs.uri/',
         FOO: '1',
-        OTEL_NO_PATCH_MODULES: 'a,b,c',
+        HOSTNAME: 'hostname',
+        KUBERNETES_SERVICE_HOST: 'https://k8s.host/',
+        NAMESPACE: 'namespace',
+        OTEL_BSP_MAX_BATCH_SIZE: 40,
+        OTEL_BSP_SCHEDULE_DELAY_MILLIS: 50,
+        OTEL_EXPORTER_JAEGER_AGENT_HOST: 'host.domain.com',
+        OTEL_EXPORTER_JAEGER_ENDPOINT: 'https://example.com/endpoint',
+        OTEL_EXPORTER_JAEGER_PASSWORD: 'secret',
+        OTEL_EXPORTER_JAEGER_USER: 'whoami',
         OTEL_LOG_LEVEL: 'ERROR',
+        OTEL_NO_PATCH_MODULES: 'a,b,c',
+        OTEL_RESOURCE_ATTRIBUTES: '<attrs>',
         OTEL_SAMPLING_PROBABILITY: '0.5',
         OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT: 10,
         OTEL_SPAN_EVENT_COUNT_LIMIT: 20,
         OTEL_SPAN_LINK_COUNT_LIMIT: 30,
-        OTEL_EXPORTER_JAEGER_ENDPOINT: 'https://example.com/endpoint',
-        OTEL_EXPORTER_JAEGER_USER: 'whoami',
-        OTEL_EXPORTER_JAEGER_PASSWORD: 'secret',
-        OTEL_EXPORTER_JAEGER_AGENT_HOST: 'host.domain.com',
-        ECS_CONTAINER_METADATA_URI_V4: 'https://ecs.uri/v4',
-        ECS_CONTAINER_METADATA_URI: 'https://ecs.uri/',
-        NAMESPACE: 'namespace',
-        HOSTNAME: 'hostname',
-        CONTAINER_NAME: 'container-1',
-        KUBERNETES_SERVICE_HOST: 'https://k8s.host/',
-        OTEL_RESOURCE_ATTRIBUTES: '<attrs>',
       });
       const env = getEnv();
       assert.deepStrictEqual(env.OTEL_NO_PATCH_MODULES, ['a', 'b', 'c']);
@@ -119,6 +121,8 @@ describe('environment', () => {
       assert.strictEqual(env.CONTAINER_NAME, 'container-1');
       assert.strictEqual(env.KUBERNETES_SERVICE_HOST, 'https://k8s.host/');
       assert.strictEqual(env.OTEL_RESOURCE_ATTRIBUTES, '<attrs>');
+      assert.strictEqual(env.OTEL_BSP_MAX_BATCH_SIZE, 40);
+      assert.strictEqual(env.OTEL_BSP_SCHEDULE_DELAY_MILLIS, 50);
     });
 
     it('should match invalid values to closest valid equivalent', () => {

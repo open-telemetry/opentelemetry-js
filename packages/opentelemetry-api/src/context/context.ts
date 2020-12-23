@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-import { NoopSpan, Span, SpanContext } from '../';
 import { Context, createContextKey } from '@opentelemetry/context-base';
+import { Baggage, NoopSpan, Span, SpanContext } from '../';
 
 /**
- * Active span key
+ * span key
  */
-const ACTIVE_SPAN_KEY = createContextKey(
-  'OpenTelemetry Context Key ACTIVE_SPAN'
-);
+const SPAN_KEY = createContextKey('OpenTelemetry Context Key SPAN');
 
 /**
  * Shared key for indicating if instrumentation should be suppressed beyond
@@ -33,49 +31,50 @@ const SUPPRESS_INSTRUMENTATION_KEY = createContextKey(
 );
 
 /**
- * Return the active span if one exists
+ * Baggage key
+ */
+const BAGGAGE_KEY = createContextKey('OpenTelemetry Baggage Key');
+
+/**
+ * Return the span if one exists
  *
  * @param context context to get span from
  */
-export function getActiveSpan(context: Context): Span | undefined {
-  return (context.getValue(ACTIVE_SPAN_KEY) as Span) || undefined;
+export function getSpan(context: Context): Span | undefined {
+  return (context.getValue(SPAN_KEY) as Span) || undefined;
 }
 
 /**
- * Set the active span on a context
+ * Set the span on a context
  *
  * @param context context to use as parent
  * @param span span to set active
  */
-export function setActiveSpan(context: Context, span: Span): Context {
-  return context.setValue(ACTIVE_SPAN_KEY, span);
+export function setSpan(context: Context, span: Span): Context {
+  return context.setValue(SPAN_KEY, span);
 }
 
 /**
- * Wrap extracted span context in a NoopSpan and set as active span in a new
+ * Wrap span context in a NoopSpan and set as span in a new
  * context
  *
  * @param context context to set active span on
  * @param spanContext span context to be wrapped
  */
-export function setExtractedSpanContext(
+export function setSpanContext(
   context: Context,
   spanContext: SpanContext
 ): Context {
-  return setActiveSpan(context, new NoopSpan(spanContext));
+  return setSpan(context, new NoopSpan(spanContext));
 }
 
 /**
- * Get the span context of the parent span if it exists,
- * or the extracted span context if there is no active
- * span.
+ * Get the span context of the span if it exists.
  *
  * @param context context to get values from
  */
-export function getParentSpanContext(
-  context: Context
-): SpanContext | undefined {
-  return getActiveSpan(context)?.context();
+export function getSpanContext(context: Context): SpanContext | undefined {
+  return getSpan(context)?.context();
 }
 
 /**
@@ -106,4 +105,20 @@ export function unsuppressInstrumentation(context: Context): Context {
  */
 export function isInstrumentationSuppressed(context: Context): boolean {
   return Boolean(context.getValue(SUPPRESS_INSTRUMENTATION_KEY));
+}
+
+/**
+ * @param {Context} Context that manage all context values
+ * @returns {Baggage} Extracted baggage from the context
+ */
+export function getBaggage(context: Context): Baggage | undefined {
+  return (context.getValue(BAGGAGE_KEY) as Baggage) || undefined;
+}
+
+/**
+ * @param {Context} Context that manage all context values
+ * @param {Baggage} baggage that will be set in the actual context
+ */
+export function setBaggage(context: Context, baggage: Baggage): Context {
+  return context.setValue(BAGGAGE_KEY, baggage);
 }

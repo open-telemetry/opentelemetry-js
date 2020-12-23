@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
+import {
+  collectorTypes,
+  CollectorExporterNodeConfigBase,
+} from '@opentelemetry/exporter-collector';
 import * as api from '@opentelemetry/api';
 import * as metrics from '@opentelemetry/metrics';
-import { collectorTypes } from '@opentelemetry/exporter-collector';
-import * as core from '@opentelemetry/core';
 import * as http from 'http';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -48,7 +50,7 @@ const waitTimeMS = 20;
 
 describe('CollectorMetricExporter - node with proto over http', () => {
   let collectorExporter: CollectorMetricExporter;
-  let collectorExporterConfig: collectorTypes.CollectorExporterConfigBase;
+  let collectorExporterConfig: CollectorExporterNodeConfigBase;
   let spyRequest: sinon.SinonSpy;
   let spyWrite: sinon.SinonSpy;
   let metrics: metrics.MetricRecord[];
@@ -61,10 +63,12 @@ describe('CollectorMetricExporter - node with proto over http', () => {
           foo: 'bar',
         },
         hostname: 'foo',
-        logger: new core.NoopLogger(),
+        logger: new api.NoopLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
+        keepAlive: true,
+        httpAgentOptions: { keepAliveMsecs: 2000 },
       };
       collectorExporter = new CollectorMetricExporter(collectorExporterConfig);
       // Overwrites the start time to make tests consistent
@@ -118,6 +122,19 @@ describe('CollectorMetricExporter - node with proto over http', () => {
         assert.strictEqual(options.headers['foo'], 'bar');
         done();
       }, waitTimeMS);
+    });
+
+    it('should have keep alive and keepAliveMsecs option set', done => {
+      collectorExporter.export(metrics, () => {});
+
+      setTimeout(() => {
+        const args = spyRequest.args[0];
+        const options = args[0];
+        const agent = options.agent;
+        assert.strictEqual(agent.keepAlive, true);
+        assert.strictEqual(agent.options.keepAliveMsecs, 2000);
+        done();
+      });
     });
 
     it('should successfully send metrics', done => {

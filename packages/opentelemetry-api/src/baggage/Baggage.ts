@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-import { Logger } from '@opentelemetry/api';
+import { EntryValue } from './EntryValue';
 
-/** No-op implementation of Logger */
-export class NoopLogger implements Logger {
-  // By default does nothing
-  debug(_message: string, ..._args: unknown[]) {}
-
-  // By default does nothing
-  error(_message: string, ..._args: unknown[]) {}
-
-  // By default does nothing
-  warn(_message: string, ..._args: unknown[]) {}
-
-  // By default does nothing
-  info(_message: string, ..._args: unknown[]) {}
+/**
+ * Baggage represents collection of entries. Each key of
+ * Baggage is associated with exactly one value. Baggage
+ * is serializable, to facilitate propagating it not only inside the process
+ * but also across process boundaries. Baggage is used to annotate
+ * telemetry with the name:value pair Entry. Those values can be used to add
+ * dimension to the metric or additional contest properties to logs and traces.
+ */
+export interface Baggage {
+  [entryKey: string]: EntryValue;
 }

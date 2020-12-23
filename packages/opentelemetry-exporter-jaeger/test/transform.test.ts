@@ -21,7 +21,7 @@ import { Resource } from '@opentelemetry/resources';
 import * as api from '@opentelemetry/api';
 import { ThriftUtils, Utils, ThriftReferenceType } from '../src/types';
 import { hrTimeToMicroseconds } from '@opentelemetry/core';
-import { TraceFlags } from '@opentelemetry/api';
+import { StatusCode, TraceFlags } from '@opentelemetry/api';
 
 describe('transform', () => {
   const spanContext = {
@@ -300,6 +300,80 @@ describe('transform', () => {
       assert.strictEqual(
         thriftSpan.traceIdHigh.toString('hex'),
         '0000000000000000'
+      );
+    });
+    it('should set error flag only if span.status.code is ERROR', () => {
+      const readableSpan: ReadableSpan = {
+        name: 'my-span',
+        kind: api.SpanKind.INTERNAL,
+        spanContext,
+        startTime: [1566156729, 709],
+        endTime: [1566156731, 709],
+        ended: true,
+        status: {
+          code: api.StatusCode.OK,
+        },
+        attributes: {
+          testBool: true,
+          testString: 'test',
+          testNum: 3.142,
+        },
+        links: [
+          {
+            context: {
+              traceId: 'a4cda95b652f4a1592b449d5929fda1b',
+              spanId: '3e0c63257de34c92',
+            },
+            attributes: {
+              testBool: true,
+              testString: 'test',
+              testNum: 3.142,
+            },
+          },
+        ],
+        events: [
+          {
+            name: 'something happened',
+            attributes: {
+              error: true,
+            },
+            time: [1566156729, 809],
+          },
+        ],
+        duration: [32, 800000000],
+        resource: new Resource({
+          service: 'ui',
+          version: 1,
+          cost: 112.12,
+        }),
+        instrumentationLibrary: {
+          name: 'default',
+          version: '0.0.1',
+        },
+      };
+      let thriftSpan = spanToThrift(readableSpan);
+      assert.strictEqual(
+        thriftSpan.tags.find(tag => tag.key === 'error'),
+        undefined,
+        'If span status OK, no error tag'
+      );
+
+      readableSpan.status.code = StatusCode.UNSET;
+      thriftSpan = spanToThrift(readableSpan);
+      assert.strictEqual(
+        thriftSpan.tags.find(tag => tag.key === 'error'),
+        undefined,
+        'If span status USET, no error tag'
+      );
+
+      readableSpan.status.code = StatusCode.ERROR;
+      thriftSpan = spanToThrift(readableSpan);
+      const errorTag = thriftSpan.tags.find(tag => tag.key === 'error');
+
+      assert.strictEqual(
+        errorTag?.vBool,
+        true,
+        'If span status ERROR, error tag must be true'
       );
     });
   });

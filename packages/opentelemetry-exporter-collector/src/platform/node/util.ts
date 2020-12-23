@@ -36,7 +36,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
 ): void {
   const parsedUrl = new url.URL(collector.url);
 
-  const options = {
+  const options: http.RequestOptions | https.RequestOptions = {
     hostname: parsedUrl.hostname,
     port: parsedUrl.port,
     path: parsedUrl.pathname,
@@ -49,6 +49,14 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
   };
 
   const request = parsedUrl.protocol === 'http:' ? http.request : https.request;
+  const Agent = parsedUrl.protocol === 'http:' ? http.Agent : https.Agent;
+  if (collector.keepAlive) {
+    options.agent = new Agent({
+      ...collector.httpAgentOptions,
+      keepAlive: true,
+    });
+  }
+
   const req = request(options, (res: http.IncomingMessage) => {
     let data = '';
     res.on('data', chunk => (data += chunk));

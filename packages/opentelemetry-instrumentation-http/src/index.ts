@@ -14,16 +14,6 @@
  * limitations under the License.
  */
 
-import { EntryValue } from './EntryValue';
-
-/**
- * CorrelationContext represents collection of entries. Each key of
- * CorrelationContext is associated with exactly one value. CorrelationContext
- * is serializable, to facilitate propagating it not only inside the process
- * but also across process boundaries. CorrelationContext is used to annotate
- * telemetry with the name:value pair Entry. Those values can be used to add
- * dimension to the metric or additional contest properties to logs and traces.
- */
-export interface CorrelationContext {
-  [entryKey: string]: EntryValue;
-}
+export * from './http';
+export * from './types';
+export * from './utils';

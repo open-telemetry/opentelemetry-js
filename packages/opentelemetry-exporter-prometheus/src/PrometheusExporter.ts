@@ -17,7 +17,6 @@
 import * as api from '@opentelemetry/api';
 import {
   ExportResult,
-  NoopLogger,
   globalErrorHandler,
   ExportResultCode,
 } from '@opentelemetry/core';
@@ -33,6 +32,7 @@ export class PrometheusExporter implements MetricExporter {
     port: 9464,
     endpoint: '/metrics',
     prefix: '',
+    appendTimestamp: true,
   };
 
   private readonly _logger: api.Logger;
@@ -40,6 +40,7 @@ export class PrometheusExporter implements MetricExporter {
   private readonly _endpoint: string;
   private readonly _server: Server;
   private readonly _prefix?: string;
+  private readonly _appendTimestamp: boolean;
   private _serializer: PrometheusSerializer;
   private _batcher = new PrometheusLabelsBatcher();
 
@@ -53,11 +54,18 @@ export class PrometheusExporter implements MetricExporter {
    * @param callback Callback to be called after a server was started
    */
   constructor(config: ExporterConfig = {}, callback?: () => void) {
-    this._logger = config.logger || new NoopLogger();
+    this._logger = config.logger || new api.NoopLogger();
     this._port = config.port || PrometheusExporter.DEFAULT_OPTIONS.port;
     this._prefix = config.prefix || PrometheusExporter.DEFAULT_OPTIONS.prefix;
+    this._appendTimestamp =
+      typeof config.appendTimestamp === 'boolean'
+        ? config.appendTimestamp
+        : PrometheusExporter.DEFAULT_OPTIONS.appendTimestamp;
     this._server = createServer(this._requestHandler);
-    this._serializer = new PrometheusSerializer(this._prefix);
+    this._serializer = new PrometheusSerializer(
+      this._prefix,
+      this._appendTimestamp
+    );
 
     this._endpoint = (
       config.endpoint || PrometheusExporter.DEFAULT_OPTIONS.endpoint

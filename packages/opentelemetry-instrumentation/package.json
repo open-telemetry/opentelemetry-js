@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "Base class for node which OpenTelemetry instrumentation modules extend",
   "author": "OpenTelemetry Authors",
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
@@ -27,21 +27,19 @@
     "README.md"
   ],
   "scripts": {
-    "clean": "rimraf build/*",
+    "compile": "tsc --build",
+    "clean": "tsc --build --clean",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
-    "compile": "npm run version:update && tsc -p .",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "precompile": "tsc --version",
-    "prepare": "npm run compile",
     "tdd": "npm run tdd:node",
     "tdd:node": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "nyc karma start --single-run",
-    "version:update": "node ../../scripts/version-update.js",
-    "watch": "tsc -w"
+    "version": "node ../../scripts/version-update.js",
+    "watch": "tsc --build --watch"
   },
   "keywords": [
     "opentelemetry",
@@ -56,15 +54,15 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.13.0",
+    "@opentelemetry/api": "^0.14.0",
     "require-in-the-middle": "^5.0.3",
     "semver": "^7.3.2",
     "shimmer": "^1.2.1"
   },
   "devDependencies": {
-    "@babel/core": "7.12.9",
-    "@types/mocha": "8.0.4",
-    "@types/node": "14.14.10",
+    "@babel/core": "7.12.10",
+    "@types/mocha": "8.2.0",
+    "@types/node": "14.14.12",
     "@types/semver": "7.3.4",
     "@types/shimmer": "1.0.1",
     "@types/sinon": "9.0.9",
@@ -83,13 +81,13 @@
     "mocha": "7.2.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "sinon": "9.2.1",
-    "ts-loader": "8.0.11",
+    "sinon": "9.2.2",
+    "ts-loader": "8.0.12",
     "ts-mocha": "8.0.0",
-    "ts-node": "9.0.0",
+    "ts-node": "9.1.1",
     "typescript": "3.9.7",
     "webpack": "4.44.2",
     "webpack-cli": "4.2.0",
-    "webpack-merge": "5.4.0"
+    "webpack-merge": "5.6.1"
   }
 }

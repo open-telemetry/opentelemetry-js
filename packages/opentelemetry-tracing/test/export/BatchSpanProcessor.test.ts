@@ -74,6 +74,32 @@ describe('BatchSpanProcessor', () => {
       assert.ok(processor instanceof BatchSpanProcessor);
       processor.shutdown();
     });
+
+    it('should read defaults from environment', () => {
+      const bspConfig = {
+        OTEL_BSP_MAX_BATCH_SIZE: 256,
+        OTEL_BSP_SCHEDULE_DELAY_MILLIS: 2500,
+      };
+
+      let env: Record<string, any>;
+      if (typeof process === 'undefined') {
+        env = (window as unknown) as Record<string, any>;
+      } else {
+        env = process.env as Record<string, any>;
+      }
+
+      Object.entries(bspConfig).forEach(([k, v]) => {
+        env[k] = v;
+      });
+
+      const processor = new BatchSpanProcessor(exporter);
+      assert.ok(processor instanceof BatchSpanProcessor);
+      assert.strictEqual(processor['_bufferSize'], 256);
+      assert.strictEqual(processor['_bufferTimeout'], 2500);
+      processor.shutdown();
+
+      Object.keys(bspConfig).forEach(k => delete env[k]);
+    });
   });
 
   describe('.onStart/.onEnd/.shutdown', () => {
