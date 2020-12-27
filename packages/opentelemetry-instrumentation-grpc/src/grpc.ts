@@ -22,6 +22,7 @@ import {
   SpanKind,
   SpanOptions,
   Status,
+  setSpan,
 } from '@opentelemetry/api';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import {
@@ -227,7 +228,7 @@ export class GrpcInstrumentation extends InstrumentationBase<typeof grpcTypes> {
                       [RpcAttribute.GRPC_KIND]: spanOptions.kind,
                     });
 
-                  plugin.tracer.withSpan(span, () => {
+                  context.with(setSpan(context.active(), span), () => {
                     switch (type) {
                       case 'unary':
                       case 'client_stream':
@@ -306,7 +307,7 @@ export class GrpcInstrumentation extends InstrumentationBase<typeof grpcTypes> {
           [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
         });
       } else {
-        span.setStatus({ code: StatusCode.OK });
+        span.setStatus({ code: StatusCode.UNSET });
         span.setAttribute(
           RpcAttribute.GRPC_STATUS_CODE,
           grpcClient.status.OK.toString()
@@ -319,7 +320,7 @@ export class GrpcInstrumentation extends InstrumentationBase<typeof grpcTypes> {
       return callback(err, value, trailer, flags);
     }
 
-    plugin.tracer.bind(call);
+    context.bind(call);
     return (original as Function).call(self, call, patchedCallback);
   }
 
@@ -338,7 +339,7 @@ export class GrpcInstrumentation extends InstrumentationBase<typeof grpcTypes> {
       }
     };
 
-    plugin.tracer.bind(call);
+    context.bind(call);
     call.on('finish', () => {
       span.setStatus(_grpcStatusCodeToSpanStatus(call.status.code));
       span.setAttribute(
@@ -425,14 +426,8 @@ export class GrpcInstrumentation extends InstrumentationBase<typeof grpcTypes> {
         const span = plugin.tracer.startSpan(name, {
           kind: SpanKind.CLIENT,
         });
-        return plugin.tracer.withSpan(span, () =>
-          plugin._makeGrpcClientRemoteCall(
-            original,
-            args,
-            metadata,
-            this,
-            plugin
-          )(span)
+        return context.with(setSpan(context.active(), span), () =>
+          plugin._makeGrpcClientRemoteCall(original, args, metadata, this)(span)
         );
       };
     };
@@ -445,8 +440,7 @@ export class GrpcInstrumentation extends InstrumentationBase<typeof grpcTypes> {
     original: GrpcClientFunc,
     args: any[],
     metadata: grpcTypes.Metadata,
-    self: grpcTypes.Client,
-    plugin: GrpcInstrumentation
+    self: grpcTypes.Client
   ) {
     /**
      * Patches a callback so that the current span for this trace is also ended
@@ -471,7 +465,7 @@ export class GrpcInstrumentation extends InstrumentationBase<typeof grpcTypes> {
             [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
           });
         } else {
-          span.setStatus({ code: StatusCode.OK });
+          span.setStatus({ code: StatusCode.UNSET });
           span.setAttribute(
             RpcAttribute.GRPC_STATUS_CODE,
             grpcClient.status.OK.toString()
@@ -481,7 +475,7 @@ export class GrpcInstrumentation extends InstrumentationBase<typeof grpcTypes> {
         span.end();
         callback(err, res);
       };
-      return plugin.tracer.bind(wrappedFn);
+      return context.bind(wrappedFn);
     }
 
     return (span: Span) => {
@@ -523,7 +517,7 @@ export class GrpcInstrumentation extends InstrumentationBase<typeof grpcTypes> {
             spanEnded = true;
           }
         };
-        plugin.tracer.bind(call);
+        context.bind(call);
         ((call as unknown) as events.EventEmitter).on(
           'error',
           (err: grpcTypes.ServiceError) => {
@@ -542,7 +536,7 @@ export class GrpcInstrumentation extends InstrumentationBase<typeof grpcTypes> {
         ((call as unknown) as events.EventEmitter).on(
           'status',
           (status: Status) => {
-            span.setStatus({ code: StatusCode.OK });
+            span.setStatus({ code: StatusCode.UNSET });
             span.setAttribute(
               RpcAttribute.GRPC_STATUS_CODE,
               status.code.toString()

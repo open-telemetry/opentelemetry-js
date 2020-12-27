@@ -28,7 +28,7 @@ export const grpcStatusCodeToOpenTelemetryStatusCode = (
   status: grpc.status | grpcJs.status
 ): StatusCode => {
   if (status !== undefined && status === 0) {
-    return StatusCode.OK;
+    return StatusCode.UNSET;
   }
   return StatusCode.ERROR;
 };

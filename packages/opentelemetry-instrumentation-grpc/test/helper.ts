@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 
-import { context, SpanKind, propagation } from '@opentelemetry/api';
-import { NoopLogger, HttpTraceContext } from '@opentelemetry/core';
+import {
+  context,
+  SpanKind,
+  propagation,
+  NoopLogger,
+  setSpan,
+  getSpan,
+} from '@opentelemetry/api';
+import { HttpTraceContext } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { ContextManager } from '@opentelemetry/context-base';
@@ -506,8 +513,8 @@ export const runTests = (
         const span = provider
           .getTracer('default')
           .startSpan('TestSpan', { kind: SpanKind.PRODUCER });
-        return provider.getTracer('default').withSpan(span, async () => {
-          const rootSpan = provider.getTracer('default').getCurrentSpan();
+        return context.with(setSpan(context.active(), span), async () => {
+          const rootSpan = getSpan(context.active());
           if (!rootSpan) {
             return assert.ok(false);
           }
@@ -602,8 +609,8 @@ export const runTests = (
         const span = provider
           .getTracer('default')
           .startSpan('TestSpan', { kind: SpanKind.PRODUCER });
-        return provider.getTracer('default').withSpan(span, async () => {
-          const rootSpan = provider.getTracer('default').getCurrentSpan();
+        return context.with(setSpan(context.active(), span), async () => {
+          const rootSpan = getSpan(context.active());
           if (!rootSpan) {
             return assert.ok(false);
           }
