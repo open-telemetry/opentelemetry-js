@@ -110,50 +110,37 @@ export class GrpcInstrumentation extends InstrumentationBase<typeof grpcTypes> {
   }
 
   private _getInternalPatchs() {
+    const onPatch = (
+      moduleExports: GrpcInternalClientTypes,
+      version?: string
+    ) => {
+      this._logger.debug(`Applying internal patch for grpc@${version}`);
+      if (isWrapped(moduleExports.makeClientConstructor)) {
+        this._unwrap(moduleExports, 'makeClientConstructor');
+      }
+      this._wrap(moduleExports, 'makeClientConstructor', this._patchClient());
+      return moduleExports;
+    };
+    const onUnPatch = (
+      moduleExports?: GrpcInternalClientTypes,
+      version?: string
+    ) => {
+      if (moduleExports === undefined) return;
+      this._logger.debug(`Removing internal patch for grpc@${version}`);
+      this._unwrap(moduleExports, 'makeClientConstructor');
+    };
     return [
       new InstrumentationNodeModuleFile<GrpcInternalClientTypes>(
         'grpc/src/node/src/client.js',
         ['0.13 - 1.6'],
-        (moduleExports, version) => {
-          this._logger.debug(`Applying internal patch for grpc@${version}`);
-          if (isWrapped(moduleExports.makeClientConstructor)) {
-            this._unwrap(moduleExports, 'makeClientConstructor');
-          }
-          // Wrap the internally used client constructor for version 0.13 - 1.6
-          this._wrap(
-            moduleExports,
-            'makeClientConstructor',
-            this._patchClient()
-          );
-          return moduleExports;
-        },
-        (moduleExports, version) => {
-          if (moduleExports === undefined) return;
-          this._logger.debug(`Removing internal patch for grpc@${version}`);
-          this._unwrap(moduleExports, 'makeClientConstructor');
-        }
+        onPatch,
+        onUnPatch
       ),
       new InstrumentationNodeModuleFile<GrpcInternalClientTypes>(
         'grpc/src/client.js',
         ['^1.7'],
-        (moduleExports, version) => {
-          this._logger.debug(`Applying internal patch for grpc@${version}`);
-          if (isWrapped(moduleExports.makeClientConstructor)) {
-            this._unwrap(moduleExports, 'makeClientConstructor');
-          }
-          // Wrap the internally used client constructor for version ^1.7
-          this._wrap(
-            moduleExports,
-            'makeClientConstructor',
-            this._patchClient()
-          );
-          return moduleExports;
-        },
-        (moduleExports, version) => {
-          if (moduleExports === undefined) return;
-          this._logger.debug(`Removing internal patch for grpc@${version}`);
-          this._unwrap(moduleExports, 'makeClientConstructor');
-        }
+        onPatch,
+        onUnPatch
       ),
     ];
   }
