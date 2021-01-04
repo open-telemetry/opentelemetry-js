@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-import { context, Span, SpanKind } from '@opentelemetry/api';
+import { context, Span, SpanKind, NoopLogger } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
-import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import { Http } from '@opentelemetry/plugin-http';
 import {

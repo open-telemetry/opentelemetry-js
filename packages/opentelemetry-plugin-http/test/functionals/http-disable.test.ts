@@ -13,8 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { NoopTracerProvider, NOOP_TRACER } from '@opentelemetry/api';
-import { NoopLogger } from '@opentelemetry/core';
+import {
+  NoopTracerProvider,
+  NoopLogger,
+  NOOP_TRACER,
+} from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as http from 'http';
 import { AddressInfo } from 'net';
@@ -49,7 +52,6 @@ describe('HttpPlugin', () => {
 
     beforeEach(() => {
       NOOP_TRACER.startSpan = sinon.spy();
-      NOOP_TRACER.withSpan = sinon.spy();
     });
 
     afterEach(() => {
@@ -73,10 +75,6 @@ describe('HttpPlugin', () => {
           );
 
           assert.strictEqual(http.Server.prototype.emit.__wrapped, undefined);
-          assert.strictEqual(
-            (NOOP_TRACER.withSpan as sinon.SinonSpy).called,
-            false
-          );
         });
       });
     });

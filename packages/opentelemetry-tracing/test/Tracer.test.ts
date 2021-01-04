@@ -23,11 +23,11 @@ import {
   TraceFlags,
   ROOT_CONTEXT,
   suppressInstrumentation,
+  NoopLogger,
 } from '@opentelemetry/api';
 import { BasicTracerProvider, Tracer, Span } from '../src';
 import {
   InstrumentationLibrary,
-  NoopLogger,
   AlwaysOnSampler,
   AlwaysOffSampler,
 } from '@opentelemetry/core';

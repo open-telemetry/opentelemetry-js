@@ -23,7 +23,7 @@ import { CollectorExporterConfigNode, ServiceClientType } from './types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 
 const DEFAULT_SERVICE_NAME = 'collector-metric-exporter';
-const DEFAULT_COLLECTOR_URL = 'localhost:55680';
+const DEFAULT_COLLECTOR_URL = 'localhost:4317';
 
 /**
  * Collector Metric Exporter for Node

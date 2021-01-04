@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/core';
+import { NoopLogger } from '@opentelemetry/api';
 import { Http } from '@opentelemetry/plugin-http';
 import * as assert from 'assert';
 import * as fs from 'fs';
@@ -64,7 +64,6 @@ describe('HttpsPlugin', () => {
 
     beforeEach(() => {
       tracer.startSpan = sinon.spy();
-      tracer.withSpan = sinon.spy();
     });
 
     afterEach(() => {
@@ -88,7 +87,6 @@ describe('HttpsPlugin', () => {
           );
 
           assert.strictEqual(https.Server.prototype.emit.__wrapped, undefined);
-          assert.strictEqual((tracer.withSpan as sinon.SinonSpy).called, false);
         });
       });
     });

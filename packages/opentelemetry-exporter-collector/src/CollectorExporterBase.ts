@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-import { Attributes, Logger } from '@opentelemetry/api';
-import {
-  ExportResult,
-  ExportResultCode,
-  NoopLogger,
-} from '@opentelemetry/core';
+import { Attributes, Logger, NoopLogger } from '@opentelemetry/api';
+import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import {
   CollectorExporterError,
   CollectorExporterConfigBase,

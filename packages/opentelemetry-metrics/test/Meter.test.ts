@@ -34,7 +34,7 @@ import {
   Histogram,
 } from '../src';
 import * as api from '@opentelemetry/api';
-import { NoopLogger, hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
+import { hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
 import { BatchObserverResult } from '../src/BatchObserverResult';
 import { SumAggregator } from '../src/export/aggregators';
 import { SumObserverMetric } from '../src/SumObserverMetric';
@@ -81,7 +81,7 @@ describe('Meter', () => {
 
   beforeEach(() => {
     meter = new MeterProvider({
-      logger: new NoopLogger(),
+      logger: new api.NoopLogger(),
     }).getMeter('test-meter');
   });
 

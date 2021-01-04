@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Span, StatusCode } from '@opentelemetry/api';
+import { context, Span, StatusCode } from '@opentelemetry/api';
 import type { ServerCallWithMeta, SendUnaryDataCallback } from '../types';
 import { grpcStatusCodeToOpenTelemetryStatusCode } from '../utils';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
@@ -61,6 +61,6 @@ export function clientStreamAndUnaryHandler<RequestType, ResponseType>(
     return callback(err, value);
   };
 
-  plugin.tracer.bind(call);
+  context.bind(call);
   return (original as Function).call({}, call, patchedCallback);
 }

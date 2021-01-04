@@ -19,15 +19,13 @@ import {
   ExportResultCode,
   globalErrorHandler,
   unrefTimer,
+  getEnv,
 } from '@opentelemetry/core';
 import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
 import { BufferConfig } from '../types';
 import { ReadableSpan } from './ReadableSpan';
 import { SpanExporter } from './SpanExporter';
-
-const DEFAULT_BUFFER_SIZE = 100;
-const DEFAULT_BUFFER_TIMEOUT_MS = 20_000;
 
 /**
  * Implementation of the {@link SpanProcessor} that batches spans exported by
@@ -43,12 +41,15 @@ export class BatchSpanProcessor implements SpanProcessor {
   private _shuttingDownPromise: Promise<void> = Promise.resolve();
 
   constructor(private readonly _exporter: SpanExporter, config?: BufferConfig) {
+    const env = getEnv();
     this._bufferSize =
-      config && config.bufferSize ? config.bufferSize : DEFAULT_BUFFER_SIZE;
+      config && config.bufferSize
+        ? config.bufferSize
+        : env.OTEL_BSP_MAX_BATCH_SIZE;
     this._bufferTimeout =
       config && typeof config.bufferTimeout === 'number'
         ? config.bufferTimeout
-        : DEFAULT_BUFFER_TIMEOUT_MS;
+        : env.OTEL_BSP_SCHEDULE_DELAY_MILLIS;
   }
 
   forceFlush(): Promise<void> {

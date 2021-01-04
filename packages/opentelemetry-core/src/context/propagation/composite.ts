@@ -20,8 +20,8 @@ import {
   TextMapPropagator,
   Logger,
   TextMapSetter,
+  NoopLogger,
 } from '@opentelemetry/api';
-import { NoopLogger } from '../../common/NoopLogger';
 import { CompositePropagatorConfig } from './types';
 
 /** Combines multiple propagators into a single propagator. */
