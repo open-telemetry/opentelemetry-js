@@ -111,13 +111,18 @@ describe('time', () => {
     it('should convert Date hrTime', () => {
       const timeInput = new Date();
       const output = timeInputToHrTime(timeInput);
-      assert.deepStrictEqual(output, [timeInput.getTime(), 0]);
+      // Should exactly match the epoch millis conversion
+      assert.deepStrictEqual(output, timeInputToHrTime(timeInput.getTime()));
     });
 
     it('should convert epoch milliseconds hrTime', () => {
       const timeInput = Date.now();
+      const epochSecs = timeInput / 1000;
       const output = timeInputToHrTime(timeInput);
-      assert.deepStrictEqual(output[0], Math.trunc(timeInput / 1000));
+      assert.deepStrictEqual(output, [
+        Math.trunc(epochSecs),
+        Number((epochSecs - Math.trunc(epochSecs)).toFixed(9)) * 1000000000,
+      ]);
     });
 
     it('should convert performance.now() hrTime', () => {
