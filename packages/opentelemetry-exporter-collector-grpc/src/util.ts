@@ -38,6 +38,7 @@ export function onInit<ExportItem, ServiceRequest>(
 
   const includeDirs = [path.resolve(__dirname, '..', 'protos')];
 
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   protoLoader
     .load(collector.getServiceProtoPath(), {
       keepCase: false,
