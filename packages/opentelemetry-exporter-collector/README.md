@@ -47,7 +47,7 @@ provider.register();
 The CollectorMetricExporter in Web expects the endpoint to end in `/v1/metrics`.
 
 ```js
-import { MetricProvider } from '@opentelemetry/metrics';
+import { MeterProvider } from '@opentelemetry/metrics';
 import { CollectorMetricExporter } from '@opentelemetry/exporter-collector';
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/metrics
