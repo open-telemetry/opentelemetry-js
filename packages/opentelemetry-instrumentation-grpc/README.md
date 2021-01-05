@@ -25,6 +25,7 @@ To load a specific instrumentation (**gRPC** in this case), specify it in the No
 
 ```javascript
 const { NodeTracerProvider } = require('@opentelemetry/node');
+const { GrpcInstrumentation } = require('@opentelemetry/instrumentation-grpc');
 
 const provider = new NodeTracerProvider({
   // be sure to disable old plugin
@@ -33,10 +34,10 @@ const provider = new NodeTracerProvider({
   },
 });
 
-const httpInstrumentation = new HttpInstrumentation({
+const grpcInstrumentation = new GrpcInstrumentation({
   // see under for available configuration
 });
-httpInstrumentation.enable();
+grpcInstrumentation.enable();
 
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.register();
