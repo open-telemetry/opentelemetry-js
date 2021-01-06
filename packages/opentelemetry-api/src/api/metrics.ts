@@ -17,7 +17,11 @@
 import { Meter } from '../metrics/Meter';
 import { MeterProvider } from '../metrics/MeterProvider';
 import { NOOP_METER_PROVIDER } from '../metrics/NoopMeterProvider';
-import { getGlobal, registerGlobal, unregisterGlobal } from './global-utils';
+import {
+  getGlobal,
+  registerGlobal,
+  unregisterGlobal,
+} from '../internal/global-utils';
 
 const API_NAME = 'metrics';
 

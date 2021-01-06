@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import { NoopContextManager } from '@opentelemetry/context-base';
-import { getGlobal } from '../../src/api/global-utils';
+import { getGlobal } from '../../src/internal/global-utils';
 import { _globalThis } from '../../src/platform';
 
 const api1 = require('../../src') as typeof import('../../src');

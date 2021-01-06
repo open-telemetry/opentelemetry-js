@@ -23,7 +23,11 @@ import {
   TextMapPropagator,
   TextMapSetter,
 } from '../context/propagation/TextMapPropagator';
-import { getGlobal, registerGlobal, unregisterGlobal } from './global-utils';
+import {
+  getGlobal,
+  registerGlobal,
+  unregisterGlobal,
+} from '../internal/global-utils';
 
 const API_NAME = 'propagation';
 

@@ -18,7 +18,11 @@ import { ProxyTracerProvider } from '../trace/ProxyTracerProvider';
 import { Tracer } from '../trace/tracer';
 import { TracerProvider } from '../trace/tracer_provider';
 import { isSpanContextValid } from '../trace/spancontext-utils';
-import { getGlobal, registerGlobal, unregisterGlobal } from './global-utils';
+import {
+  getGlobal,
+  registerGlobal,
+  unregisterGlobal,
+} from '../internal/global-utils';
 
 const API_NAME = 'trace';
 

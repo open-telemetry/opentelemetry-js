@@ -19,7 +19,11 @@ import {
   ContextManager,
   NoopContextManager,
 } from '@opentelemetry/context-base';
-import { getGlobal, registerGlobal, unregisterGlobal } from './global-utils';
+import {
+  getGlobal,
+  registerGlobal,
+  unregisterGlobal,
+} from '../internal/global-utils';
 
 const API_NAME = 'context';
 const NOOP_CONTEXT_MANAGER = new NoopContextManager();
