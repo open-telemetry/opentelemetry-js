@@ -14,14 +14,4 @@
  * limitations under the License.
  */
 
-import { InstrumentationModuleFile } from './types';
-
-export class InstrumentationNodeModuleFile<T>
-  implements InstrumentationModuleFile<T> {
-  constructor(
-    public name: string,
-    public supportedVersions: string[],
-    public patch: (moduleExports: T, moduleVersion?: string) => T,
-    public unpatch: (moduleExports?: T, moduleVersion?: string) => void
-  ) {}
-}
+export * from './grpc';
