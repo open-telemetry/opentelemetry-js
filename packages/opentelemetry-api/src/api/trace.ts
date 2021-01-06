@@ -20,6 +20,8 @@ import { TracerProvider } from '../trace/tracer_provider';
 import { isSpanContextValid } from '../trace/spancontext-utils';
 import { getGlobal, registerGlobal, unregisterGlobal } from './global-utils';
 
+const API_NAME = 'trace';
+
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Tracing API
  */
@@ -45,7 +47,7 @@ export class TraceAPI {
    */
   public setGlobalTracerProvider(provider: TracerProvider): TracerProvider {
     this._proxyTracerProvider.setDelegate(provider);
-    registerGlobal('trace', this._proxyTracerProvider);
+    registerGlobal(API_NAME, this._proxyTracerProvider);
     return this._proxyTracerProvider;
   }
 
@@ -53,7 +55,7 @@ export class TraceAPI {
    * Returns the global tracer provider.
    */
   public getTracerProvider(): TracerProvider {
-    return getGlobal('trace') || this._proxyTracerProvider;
+    return getGlobal(API_NAME) || this._proxyTracerProvider;
   }
 
   /**
@@ -65,7 +67,7 @@ export class TraceAPI {
 
   /** Remove the global tracer provider */
   public disable() {
-    unregisterGlobal('trace');
+    unregisterGlobal(API_NAME);
     this._proxyTracerProvider = new ProxyTracerProvider();
   }
 

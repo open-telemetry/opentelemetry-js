@@ -21,6 +21,7 @@ import {
 } from '@opentelemetry/context-base';
 import { getGlobal, registerGlobal, unregisterGlobal } from './global-utils';
 
+const API_NAME = 'context';
 const NOOP_CONTEXT_MANAGER = new NoopContextManager();
 
 /**
@@ -47,7 +48,7 @@ export class ContextAPI {
   public setGlobalContextManager(
     contextManager: ContextManager
   ): ContextManager {
-    registerGlobal('context', contextManager);
+    registerGlobal(API_NAME, contextManager);
     return contextManager;
   }
 
@@ -82,12 +83,12 @@ export class ContextAPI {
   }
 
   private _getContextManager(): ContextManager {
-    return getGlobal('context') || NOOP_CONTEXT_MANAGER;
+    return getGlobal(API_NAME) || NOOP_CONTEXT_MANAGER;
   }
 
   /** Disable and remove the global context manager */
   public disable() {
     this._getContextManager().disable();
-    unregisterGlobal('context');
+    unregisterGlobal(API_NAME);
   }
 }

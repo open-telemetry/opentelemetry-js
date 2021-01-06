@@ -19,6 +19,8 @@ import { MeterProvider } from '../metrics/MeterProvider';
 import { NOOP_METER_PROVIDER } from '../metrics/NoopMeterProvider';
 import { getGlobal, registerGlobal, unregisterGlobal } from './global-utils';
 
+const API_NAME = 'metrics';
+
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Metrics API
  */
@@ -41,7 +43,7 @@ export class MetricsAPI {
    * Set the current global meter. Returns the initialized global meter provider.
    */
   public setGlobalMeterProvider(provider: MeterProvider): MeterProvider {
-    registerGlobal('metrics', provider);
+    registerGlobal(API_NAME, provider);
     return provider;
   }
 
@@ -49,7 +51,7 @@ export class MetricsAPI {
    * Returns the global meter provider.
    */
   public getMeterProvider(): MeterProvider {
-    return getGlobal('metrics') || NOOP_METER_PROVIDER;
+    return getGlobal(API_NAME) || NOOP_METER_PROVIDER;
   }
 
   /**
@@ -61,6 +63,6 @@ export class MetricsAPI {
 
   /** Remove the global meter provider */
   public disable() {
-    unregisterGlobal('metrics');
+    unregisterGlobal(API_NAME);
   }
 }
