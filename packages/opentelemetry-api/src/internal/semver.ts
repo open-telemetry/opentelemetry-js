@@ -18,79 +18,75 @@ import { VERSION } from '../version';
 
 const re = /^(\d+)\.(\d+)\.(\d+)(?:-(.*))?$/;
 
-const acceptedVersions = new Set<string>([VERSION]);
-const rejectedVersions = new Set<string>();
+export function _makeCompatibilityCheck(
+  myVersion: string
+): (version: string) => boolean {
+  const acceptedVersions = new Set<string>([myVersion]);
+  const rejectedVersions = new Set<string>();
 
-const myVersionMatch = VERSION.match(re);
-if (!myVersionMatch) {
-  throw new Error('Cannot parse own version');
-}
-
-const ownVersion = {
-  major: +myVersionMatch[1],
-  minor: +myVersionMatch[2],
-  patch: +myVersionMatch[3],
-};
-
-/**
- * Test an API version to see if it is compatible with this API.
- *
- * Exact match is always compatible
- * Major versions must always match
- * The minor version of the API module requesting access to the global API must be greater or equal to the minor version of this API
- * Patch and build tag differences are not considered at this time
- *
- * @param version version of the API requesting an instance of the global API
- */
-export function isVersionCompatible(version: string): boolean {
-  if (acceptedVersions.has(version)) {
-    return true;
+  const myVersionMatch = myVersion.match(re);
+  if (!myVersionMatch) {
+    throw new Error('Cannot parse own version');
   }
 
-  if (rejectedVersions.has(version)) {
-    return false;
-  }
-
-  const m = version.match(re);
-  if (!m) {
-    // cannot parse other version
-    rejectedVersions.add(version);
-    return false;
-  }
-
-  const other = {
-    major: +m[1],
-    minor: +m[2],
-    patch: +m[3],
+  const ownVersion = {
+    major: +myVersionMatch[1],
+    minor: +myVersionMatch[2],
+    patch: +myVersionMatch[3],
   };
 
-  // major versions must match
-  if (ownVersion.major != other.major) {
-    rejectedVersions.add(version);
-    return false;
-  }
+  return function isCompatible(version: string): boolean {
+    if (acceptedVersions.has(version)) {
+      return true;
+    }
 
-  // if major version is 0, minor is treated like major and patch is treated like minor
-  if (ownVersion.major === 0) {
-    if (ownVersion.minor != other.minor) {
+    if (rejectedVersions.has(version)) {
+      return false;
+    }
+
+    const m = version.match(re);
+    if (!m) {
+      // cannot parse other version
       rejectedVersions.add(version);
       return false;
     }
 
-    if (ownVersion.patch < other.patch) {
+    const other = {
+      major: +m[1],
+      minor: +m[2],
+      patch: +m[3],
+    };
+
+    // major versions must match
+    if (ownVersion.major != other.major) {
+      rejectedVersions.add(version);
+      return false;
+    }
+
+    // if major version is 0, minor is treated like major and patch is treated like minor
+    if (ownVersion.major === 0) {
+      if (ownVersion.minor != other.minor) {
+        rejectedVersions.add(version);
+        return false;
+      }
+
+      if (ownVersion.patch < other.patch) {
+        rejectedVersions.add(version);
+        return false;
+      }
+
+      acceptedVersions.add(version);
+      return true;
+    }
+
+    if (ownVersion.minor < other.minor) {
       rejectedVersions.add(version);
       return false;
     }
 
     acceptedVersions.add(version);
     return true;
-  }
-
-  if (ownVersion.minor < other.minor) {
-    rejectedVersions.add(version);
-    return false;
-  }
-
-  acceptedVersions.add(version);
-  return true;
+  };
 }
+
+export const isCompatible = _makeCompatibilityCheck(VERSION);

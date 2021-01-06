@@ -20,7 +20,7 @@ import type { MeterProvider } from '../metrics/MeterProvider';
 import { _globalThis } from '../platform';
 import type { TracerProvider } from '../trace/tracer_provider';
 import { VERSION } from '../version';
-import { isVersionCompatible } from './semver';
+import { isCompatible } from './semver';
 
 const GLOBAL_OPENTELEMETRY_API_KEY = Symbol.for('io.opentelemetry.js.api');
 
@@ -58,7 +58,7 @@ export function getGlobal<Type extends keyof OTelGlobalAPI>(
   type: Type
 ): OTelGlobalAPI[Type] | undefined {
   const version = _global[GLOBAL_OPENTELEMETRY_API_KEY]?.version;
-  if (!version || !isVersionCompatible(version)) {
+  if (!version || !isCompatible(version)) {
     return;
   }
   return _global[GLOBAL_OPENTELEMETRY_API_KEY]?.[type];
