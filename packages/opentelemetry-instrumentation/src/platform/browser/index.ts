@@ -15,3 +15,4 @@
  */
 
 export * from './instrumentation';
+export * from './old/autoLoader';
