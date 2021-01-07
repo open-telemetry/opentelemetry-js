@@ -15,11 +15,8 @@
  */
 
 import * as assert from 'assert';
-import { NoopContextManager } from '@opentelemetry/context-base';
-import {
-  _global,
-  GLOBAL_CONTEXT_MANAGER_API_KEY,
-} from '../../src/api/global-utils';
+import { _global, GLOBAL_METRICS_API_KEY } from '../../src/api/global-utils';
+import { NoopMeterProvider } from '../../src';
 
 const api1 = require('../../src') as typeof import('../../src');
 
@@ -31,49 +28,48 @@ const api2 = require('../../src') as typeof import('../../src');
 
 describe('Global Utils', () => {
   // prove they are separate instances
-  assert.notEqual(api1, api2);
+  assert.notStrictEqual(api1, api2);
   // that return separate noop instances to start
   assert.notStrictEqual(
-    api1.context['_getContextManager'](),
-    api2.context['_getContextManager']()
+    api1.metrics.getMeterProvider(),
+    api2.metrics.getMeterProvider()
   );
 
   beforeEach(() => {
-    api1.context.disable();
-    api1.propagation.disable();
-    api1.trace.disable();
+    api1.metrics.disable();
+    api1.metrics.disable();
   });
 
-  it('should change the global context manager', () => {
-    const original = api1.context['_getContextManager']();
-    const newContextManager = new NoopContextManager();
-    api1.context.setGlobalContextManager(newContextManager);
-    assert.notStrictEqual(api1.context['_getContextManager'](), original);
-    assert.strictEqual(api1.context['_getContextManager'](), newContextManager);
+  it('should change the global meter provider', () => {
+    const original = api1.metrics.getMeterProvider();
+    const newMeterProvider = new NoopMeterProvider();
+    api1.metrics.setGlobalMeterProvider(newMeterProvider);
+    assert.notStrictEqual(api1.metrics.getMeterProvider(), original);
+    assert.strictEqual(api1.metrics.getMeterProvider(), newMeterProvider);
   });
 
   it('should load an instance from one which was set in the other', () => {
-    api1.context.setGlobalContextManager(new NoopContextManager());
+    api1.metrics.setGlobalMeterProvider(new NoopMeterProvider());
     assert.strictEqual(
-      api1.context['_getContextManager'](),
-      api2.context['_getContextManager']()
+      api1.metrics.getMeterProvider(),
+      api2.metrics.getMeterProvider()
     );
   });
 
   it('should disable both if one is disabled', () => {
-    const original = api1.context['_getContextManager']();
+    const original = api1.metrics.getMeterProvider();
 
-    api1.context.setGlobalContextManager(new NoopContextManager());
+    api1.metrics.setGlobalMeterProvider(new NoopMeterProvider());
 
-    assert.notStrictEqual(original, api1.context['_getContextManager']());
-    api2.context.disable();
-    assert.strictEqual(original, api1.context['_getContextManager']());
+    assert.notStrictEqual(original, api1.metrics.getMeterProvider());
+    api2.metrics.disable();
+    assert.strictEqual(original, api1.metrics.getMeterProvider());
   });
 
   it('should return the module NoOp implementation if the version is a mismatch', () => {
-    const original = api1.context['_getContextManager']();
-    api1.context.setGlobalContextManager(new NoopContextManager());
-    const afterSet = _global[GLOBAL_CONTEXT_MANAGER_API_KEY]!(-1);
+    const original = api1.metrics.getMeterProvider();
+    api1.metrics.setGlobalMeterProvider(new NoopMeterProvider());
+    const afterSet = _global[GLOBAL_METRICS_API_KEY]!(-1);
 
     assert.strictEqual(original, afterSet);
   });

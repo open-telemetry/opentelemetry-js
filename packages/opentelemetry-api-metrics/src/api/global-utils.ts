@@ -14,25 +14,16 @@
  * limitations under the License.
  */
 
-import { ContextManager } from '@opentelemetry/context-base';
-import { TextMapPropagator } from '../context/propagation/TextMapPropagator';
-import { TracerProvider } from '../trace/tracer_provider';
+import { MeterProvider } from '../MeterProvider';
 import { _globalThis } from '../platform';
 
-export const GLOBAL_CONTEXT_MANAGER_API_KEY = Symbol.for(
-  'io.opentelemetry.js.api.context'
+export const GLOBAL_METRICS_API_KEY = Symbol.for(
+  'io.opentelemetry.js.api.metrics'
 );
-
-export const GLOBAL_PROPAGATION_API_KEY = Symbol.for(
-  'io.opentelemetry.js.api.propagation'
-);
-export const GLOBAL_TRACE_API_KEY = Symbol.for('io.opentelemetry.js.api.trace');
 
 type Get<T> = (version: number) => T;
 type OtelGlobal = Partial<{
-  [GLOBAL_CONTEXT_MANAGER_API_KEY]: Get<ContextManager>;
-  [GLOBAL_PROPAGATION_API_KEY]: Get<TextMapPropagator>;
-  [GLOBAL_TRACE_API_KEY]: Get<TracerProvider>;
+  [GLOBAL_METRICS_API_KEY]: Get<MeterProvider>;
 }>;
 
 export const _global = _globalThis as OtelGlobal;

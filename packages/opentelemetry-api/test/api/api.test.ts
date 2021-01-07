@@ -25,7 +25,6 @@ import api, {
   context,
   trace,
   propagation,
-  metrics,
   TextMapPropagator,
   Context,
   TextMapSetter,
@@ -54,7 +53,6 @@ describe('API', () => {
       context.disable();
       trace.disable();
       propagation.disable();
-      metrics.disable();
     });
 
     it('should use the global tracer provider', () => {
