@@ -14,29 +14,29 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import { Logger } from '@opentelemetry/api';
+import * as api from '@opentelemetry/api-metrics';
 import { ConsoleLogger, InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BatchObserver } from './BatchObserver';
 import { BaseBoundInstrument } from './BoundInstrument';
-import { Processor } from './export/Processor';
-import { UpDownCounterMetric } from './UpDownCounterMetric';
 import { CounterMetric } from './CounterMetric';
-import { UpDownSumObserverMetric } from './UpDownSumObserverMetric';
-import { ValueRecorderMetric } from './ValueRecorderMetric';
-import { Metric } from './Metric';
-import { ValueObserverMetric } from './ValueObserverMetric';
-import { SumObserverMetric } from './SumObserverMetric';
-import { DEFAULT_METRIC_OPTIONS, DEFAULT_CONFIG, MeterConfig } from './types';
-import { UngroupedProcessor } from './export/Processor';
 import { PushController } from './export/Controller';
 import { NoopExporter } from './export/NoopExporter';
+import { Processor, UngroupedProcessor } from './export/Processor';
+import { Metric } from './Metric';
+import { SumObserverMetric } from './SumObserverMetric';
+import { DEFAULT_CONFIG, DEFAULT_METRIC_OPTIONS, MeterConfig } from './types';
+import { UpDownCounterMetric } from './UpDownCounterMetric';
+import { UpDownSumObserverMetric } from './UpDownSumObserverMetric';
+import { ValueObserverMetric } from './ValueObserverMetric';
+import { ValueRecorderMetric } from './ValueRecorderMetric';
 
 /**
  * Meter is an implementation of the {@link Meter} interface.
  */
 export class Meter implements api.Meter {
-  private readonly _logger: api.Logger;
+  private readonly _logger: Logger;
   private readonly _batchObservers: BatchObserver[] = [];
   private readonly _metrics = new Map<string, Metric<BaseBoundInstrument>>();
   private readonly _processor: Processor;

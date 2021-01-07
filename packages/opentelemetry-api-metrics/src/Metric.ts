@@ -19,7 +19,7 @@ import {
   BoundCounter,
   BoundValueRecorder,
 } from './BoundInstrument';
-import { Logger } from '../common/Logger';
+import { Logger } from '@opentelemetry/api';
 
 /**
  * Options needed for metric creation

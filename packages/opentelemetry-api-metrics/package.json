@@ -49,6 +49,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "dependencies": {
+    "@opentelemetry/api": "^0.14.0"
+  },
   "devDependencies": {
     "@types/mocha": "8.2.0",
     "@types/node": "14.14.12",

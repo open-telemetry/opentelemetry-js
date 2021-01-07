@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
+import { NoopLogger } from '@opentelemetry/api';
+import * as api from '@opentelemetry/api-metrics';
 import * as assert from 'assert';
-import * as api from '@opentelemetry/api';
 import { Meter, MeterProvider } from '../src';
 
 describe('Processor', () => {
@@ -26,7 +27,7 @@ describe('Processor', () => {
     let counter: api.Counter;
     beforeEach(() => {
       meter = new MeterProvider({
-        logger: new api.NoopLogger(),
+        logger: new NoopLogger(),
         interval: 10000,
       }).getMeter('test-meter');
       counter = meter.createCounter('ungrouped-processor-test');
