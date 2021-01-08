@@ -6,7 +6,10 @@ import * as http from 'http';
 // Maintain a hash of all connected sockets
 var sockets: Array<Socket> = []
 
+let requests = 0;
+
 const server = new http.Server(function requestListener(req, res) {
+    requests++
     res.statusCode = 200;
     res.setHeader("content-type", "application/json");
     res.write(JSON.stringify({
@@ -14,8 +17,10 @@ const server = new http.Server(function requestListener(req, res) {
     }))
     res.end();
     res.on('close', () => {
-        server.close();
-        sockets.forEach(s => s.destroy());
+        if (requests === 5) {
+            server.close();
+            sockets.forEach(s => s.destroy());
+        }
     });
 })
     // bind to a random port assigned by the server

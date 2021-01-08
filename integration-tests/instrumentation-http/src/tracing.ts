@@ -33,6 +33,8 @@ export function setup(filename: string) {
     const provider = new NodeTracerProvider({
         plugins: {
             http: { enabled: false, path: '@opentelemetry/plugin-http' },
+            https: { enabled: false, path: '@opentelemetry/plugin-https' },
+            dns: { enabled: false, path: '@opentelemetry/plugin-dns' },
         },
     });
 

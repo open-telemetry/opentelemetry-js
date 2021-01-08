@@ -17,10 +17,18 @@
       "@opentelemetry/instrumentation-http": "^0.14.0",
       "@opentelemetry/node": "^0.14.0",
       "@opentelemetry/tracing": "^0.14.0",
-      "assert": "2.0.0"
+      "assert": "2.0.0",
+      "axios": "0.21.1",
+      "got": "11.8.1",
+      "request": "2.88.2",
+      "superagent": "6.1.0"
     }, 
     "devDependencies": {
+      "@types/axios": "0.14.0",
+      "@types/got": "9.6.11",
       "@types/node": "14.14.20",
+      "@types/request": "2.48.5",
+      "@types/superagent": "4.1.10",
       "typescript": "3.9.7"
     }
   }
