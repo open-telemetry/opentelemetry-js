@@ -14,7 +14,15 @@
  * limitations under the License.
  */
 
-export * from './autoLoader';
-export * from './platform/index';
-export * from './types';
-export * from './utils';
+import { runTests } from './helper';
+import { GrpcInstrumentation } from '../src/grpc';
+
+const instrumentation = new GrpcInstrumentation();
+instrumentation.enable();
+instrumentation.disable();
+
+import * as grpc from 'grpc';
+
+describe('#grpc', () => {
+  runTests(instrumentation, 'grpc', grpc, 12345);
+});

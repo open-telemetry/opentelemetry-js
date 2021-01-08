@@ -20,13 +20,16 @@ export interface InstrumentationModuleFile<T> {
 
   moduleExports?: T;
 
+  /** Supported version this file */
+  supportedVersions: string[];
+
   /** Method to patch the instrumentation  */
-  patch(moduleExports: T): T;
+  patch(moduleExports: T, moduleVersion?: string): T;
 
   /** Method to patch the instrumentation  */
 
   /** Method to unpatch the instrumentation  */
-  unpatch(moduleExports?: T): void;
+  unpatch(moduleExports?: T, moduleVersion?: string): void;
 }
 
 export interface InstrumentationModuleDefinition<T> {
@@ -35,15 +38,18 @@ export interface InstrumentationModuleDefinition<T> {
 
   moduleExports?: T;
 
+  /** Instrumented module version */
+  moduleVersion?: string;
+
   /** Supported version of module  */
   supportedVersions: string[];
 
   /** Module internal files to be patched  */
-  files: InstrumentationModuleFile<T>[];
+  files: InstrumentationModuleFile<any>[];
 
   /** Method to patch the instrumentation  */
-  patch?: (moduleExports: T) => T;
+  patch?: (moduleExports: T, moduleVersion?: string) => T;
 
   /** Method to unpatch the instrumentation  */
-  unpatch?: (moduleExports: T) => void;
+  unpatch?: (moduleExports: T, moduleVersion?: string) => void;
 }
