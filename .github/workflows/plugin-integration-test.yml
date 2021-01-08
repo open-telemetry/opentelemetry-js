@@ -1,0 +1,26 @@
+name: Run instrumentation integration tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2
+
+      - name: Install
+        run: |
+          npm install --ignore-scripts
+          npx lerna bootstrap --no-ci --scope=instrumentation-http-integration --include-dependencies
+      
+      - name: Build 🔧
+        run: npm run compile 
+        working-directory: ./integration-tests/instrumentation-http
+
+      - name: Run tests
+        run: npm run test:integration 
+        working-directory: ./integration-tests/instrumentation-http

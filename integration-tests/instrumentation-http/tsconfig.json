@@ -1,0 +1,27 @@
+{
+  "extends": "../../tsconfig.es5.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "build"
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../../packages/opentelemetry-api"
+    },
+    {
+      "path": "../../packages/opentelemetry-core"
+    },
+    {
+      "path": "../../packages/opentelemetry-instrumentation-http"
+    },
+    {
+      "path": "../../packages/opentelemetry-node"
+    },
+    {
+      "path": "../../packages/opentelemetry-tracing"
+    }
+  ]
+}

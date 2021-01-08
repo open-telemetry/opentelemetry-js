@@ -114,6 +114,9 @@
       "path": "packages/template"
     },
     {
+      "path": "integration-tests/instrumentation-http"
+    },
+    {
       "path": "integration-tests/propagation-validation-server"
     }
   ]

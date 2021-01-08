@@ -1,0 +1,27 @@
+{
+    "name": "instrumentation-http-integration",
+    "version": "0.14.0",
+    "description": "integration tests for http instrumentation",
+    "main": "index.js",
+    "private": true,
+    "repository": "open-telemetry/opentelemetry-js",
+    "author": "OpenTelemetry Authors",
+    "license": "Apache-2.0",
+    "scripts": {
+      "test:integration": "node build/src/index.js",
+      "compile": "tsc --build"
+    },
+    "dependencies": {
+      "@opentelemetry/api": "^0.14.0",
+      "@opentelemetry/core": "^0.14.0",
+      "@opentelemetry/instrumentation-http": "^0.14.0",
+      "@opentelemetry/node": "^0.14.0",
+      "@opentelemetry/tracing": "^0.14.0",
+      "assert": "2.0.0"
+    }, 
+    "devDependencies": {
+      "@types/node": "14.14.20",
+      "typescript": "3.9.7"
+    }
+  }
+  
