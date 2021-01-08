@@ -68,9 +68,7 @@ export interface XMLHttpRequestInstrumentationConfig
 /**
  * This class represents a XMLHttpRequest plugin for auto instrumentation
  */
-export class XMLHttpRequestInstrumentation extends InstrumentationBase<
-  XMLHttpRequest
-> {
+export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRequest> {
   readonly component: string = 'xml-http-request';
   readonly version: string = VERSION;
   moduleName = this.component;
@@ -111,7 +109,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<
       return;
     }
     const headers: { [key: string]: unknown } = {};
-    api.propagation.inject(headers);
+    api.propagation.inject(api.context.active(), headers);
     Object.keys(headers).forEach(key => {
       xhr.setRequestHeader(key, String(headers[key]));
     });
@@ -127,7 +125,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<
     span: api.Span,
     corsPreFlightRequest: PerformanceResourceTiming
   ): void {
-    this.tracer.withSpan(span, () => {
+    api.context.with(api.setSpan(api.context.active(), span), () => {
       const childSpan = this.tracer.startSpan('CORS Preflight', {
         startTime: corsPreFlightRequest[PTN.FETCH_START],
       });
@@ -170,7 +168,11 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<
    */
   private _addResourceObserver(xhr: XMLHttpRequest, spanUrl: string) {
     const xhrMem = this._xhrMem.get(xhr);
-    if (!xhrMem || typeof window.PerformanceObserver === 'undefined') {
+    if (
+      !xhrMem ||
+      typeof window.PerformanceObserver === 'undefined' ||
+      typeof window.PerformanceResourceTiming === 'undefined'
+    ) {
       return;
     }
     xhrMem.createdResources = {
@@ -435,25 +437,28 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<
         const spanUrl = xhrMem.spanUrl;
 
         if (currentSpan && spanUrl) {
-          plugin.tracer.withSpan(currentSpan, () => {
-            plugin._tasksCount++;
-            xhrMem.sendStartTime = hrTime();
-            currentSpan.addEvent(EventNames.METHOD_SEND);
+          api.context.with(
+            api.setSpan(api.context.active(), currentSpan),
+            () => {
+              plugin._tasksCount++;
+              xhrMem.sendStartTime = hrTime();
+              currentSpan.addEvent(EventNames.METHOD_SEND);
 
-            this.addEventListener('abort', onAbort);
-            this.addEventListener('error', onError);
-            this.addEventListener('load', onLoad);
-            this.addEventListener('timeout', onTimeout);
+              this.addEventListener('abort', onAbort);
+              this.addEventListener('error', onError);
+              this.addEventListener('load', onLoad);
+              this.addEventListener('timeout', onTimeout);
 
-            xhrMem.callbackToRemoveEvents = () => {
-              unregister(this);
-              if (xhrMem.createdResources) {
-                xhrMem.createdResources.observer.disconnect();
-              }
-            };
-            plugin._addHeaders(this, spanUrl);
-            plugin._addResourceObserver(this, spanUrl);
-          });
+              xhrMem.callbackToRemoveEvents = () => {
+                unregister(this);
+                if (xhrMem.createdResources) {
+                  xhrMem.createdResources.observer.disconnect();
+                }
+              };
+              plugin._addHeaders(this, spanUrl);
+              plugin._addResourceObserver(this, spanUrl);
+            }
+          );
         }
         return original.apply(this, args);
       };

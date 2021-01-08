@@ -19,8 +19,8 @@ import {
   defaultTextMapSetter,
   TextMapPropagator,
   SpanContext,
-  getActiveSpan,
-  setExtractedSpanContext,
+  getSpanContext,
+  setSpanContext,
 } from '@opentelemetry/api';
 import { Context, ROOT_CONTEXT } from '@opentelemetry/context-base';
 import * as assert from 'assert';
@@ -64,7 +64,7 @@ describe('Composite Propagator', () => {
         traceFlags: 1,
         traceState: new TraceState('foo=bar'),
       };
-      ctxWithSpanContext = setExtractedSpanContext(ROOT_CONTEXT, spanContext);
+      ctxWithSpanContext = setSpanContext(ROOT_CONTEXT, spanContext);
     });
 
     it('should inject context using all configured propagators', () => {
@@ -113,9 +113,9 @@ describe('Composite Propagator', () => {
       const composite = new CompositePropagator({
         propagators: [new B3MultiPropagator(), new HttpTraceContext()],
       });
-      const spanContext = getActiveSpan(
+      const spanContext = getSpanContext(
         composite.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
-      )?.context();
+      );
 
       if (!spanContext) {
         throw new Error('no extracted context');
@@ -132,9 +132,9 @@ describe('Composite Propagator', () => {
       const composite = new CompositePropagator({
         propagators: [new ThrowingPropagator(), new HttpTraceContext()],
       });
-      const spanContext = getActiveSpan(
+      const spanContext = getSpanContext(
         composite.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
-      )?.context();
+      );
 
       if (!spanContext) {
         throw new Error('no extracted context');

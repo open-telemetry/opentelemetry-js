@@ -23,7 +23,7 @@ import {
 import { CollectorExporterConfigNode, ServiceClientType } from './types';
 
 const DEFAULT_SERVICE_NAME = 'collector-trace-exporter';
-const DEFAULT_COLLECTOR_URL = 'localhost:55680';
+const DEFAULT_COLLECTOR_URL = 'localhost:4317';
 
 /**
  * Collector Trace Exporter for Node

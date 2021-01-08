@@ -26,6 +26,11 @@ export const HttpAttribute = {
   HTTP_CLIENT_IP: 'http.client_ip',
   HTTP_SCHEME: 'http.scheme',
   HTTP_RESPONSE_CONTENT_LENGTH: 'http.response_content_length',
+  HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED:
+    'http.response_content_length_uncompressed',
+  HTTP_REQUEST_CONTENT_LENGTH: 'http.request_content_length',
+  HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED:
+    'http.request_content_length_uncompressed',
 
   // NOT ON OFFICIAL SPEC
   HTTP_ERROR_NAME: 'http.error_name',

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-zipkin",
-  "version": "0.12.0",
+  "version": "0.14.0",
   "description": "OpenTelemetry Zipkin Exporter allows the user to send collected traces to Zipkin.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -10,19 +10,17 @@
     "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
   },
   "scripts": {
-    "clean": "rimraf build/*",
+    "compile": "tsc --build",
+    "clean": "tsc --build --clean",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
-    "compile": "npm run version:update && tsc -p .",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "precompile": "tsc --version",
-    "prepare": "npm run compile",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "nyc karma start --single-run",
-    "version:update": "node ../../scripts/version-update.js",
-    "watch": "tsc -w"
+    "version": "node ../../scripts/version-update.js",
+    "watch": "tsc --build --watch"
   },
   "keywords": [
     "opentelemetry",
@@ -48,16 +46,16 @@
     "access": "public"
   },
   "devDependencies": {
-    "@babel/core": "7.11.0",
-    "@types/mocha": "8.0.2",
-    "@types/node": "14.0.27",
-    "@types/sinon": "9.0.4",
-    "@types/webpack-env": "1.15.2",
-    "babel-loader": "8.1.0",
-    "codecov": "3.7.2",
+    "@babel/core": "7.12.10",
+    "@types/mocha": "8.2.0",
+    "@types/node": "14.14.12",
+    "@types/sinon": "9.0.9",
+    "@types/webpack-env": "1.16.0",
+    "babel-loader": "8.2.2",
+    "codecov": "3.8.1",
     "gts": "2.0.2",
     "istanbul-instrumenter-loader": "3.0.1",
-    "karma": "5.1.1",
+    "karma": "5.2.3",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage-istanbul-reporter": "3.0.3",
     "karma-mocha": "2.0.1",
@@ -67,19 +65,19 @@
     "nock": "12.0.3",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "sinon": "9.0.2",
-    "ts-loader": "8.0.1",
-    "ts-mocha": "7.0.0",
-    "ts-node": "9.0.0",
+    "sinon": "9.2.2",
+    "ts-loader": "8.0.12",
+    "ts-mocha": "8.0.0",
+    "ts-node": "9.1.1",
     "typescript": "3.9.7",
-    "webpack": "4.44.1",
-    "webpack-cli": "4.1.0",
-    "webpack-merge": "5.0.9"
+    "webpack": "4.44.2",
+    "webpack-cli": "4.2.0",
+    "webpack-merge": "5.6.1"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.12.0",
-    "@opentelemetry/core": "^0.12.0",
-    "@opentelemetry/resources": "^0.12.0",
-    "@opentelemetry/tracing": "^0.12.0"
+    "@opentelemetry/api": "^0.14.0",
+    "@opentelemetry/core": "^0.14.0",
+    "@opentelemetry/resources": "^0.14.0",
+    "@opentelemetry/tracing": "^0.14.0"
   }
 }

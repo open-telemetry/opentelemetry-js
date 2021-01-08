@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-import { ExportResultCode, NoopLogger } from '@opentelemetry/core';
+import * as api from '@opentelemetry/api';
+import { ExportResultCode } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorExporterBase } from '../../src/CollectorExporterBase';
 import { CollectorExporterConfigBase } from '../../src/types';
-import { MetricRecord } from '@opentelemetry/metrics';
+import {
+  BoundCounter,
+  BoundObserver,
+  Metric,
+  MetricRecord,
+} from '@opentelemetry/metrics';
 import { mockCounter, mockObserver } from '../helper';
 import * as collectorTypes from '../../src/types';
 
@@ -56,15 +62,25 @@ describe('CollectorMetricExporter - common', () => {
       onInitSpy = sinon.stub(CollectorMetricExporter.prototype, 'onInit');
       collectorExporterConfig = {
         hostname: 'foo',
-        logger: new NoopLogger(),
+        logger: new api.NoopLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
       };
       collectorExporter = new CollectorMetricExporter(collectorExporterConfig);
       metrics = [];
-      metrics.push(await mockCounter());
-      metrics.push(await mockObserver());
+      const counter: Metric<BoundCounter> & api.Counter = mockCounter();
+      const observer: Metric<BoundObserver> & api.ValueObserver = mockObserver(
+        observerResult => {
+          observerResult.observe(3, {});
+          observerResult.observe(6, {});
+        },
+        'double-observer3'
+      );
+      counter.add(1);
+
+      metrics.push((await counter.getMetricRecord())[0]);
+      metrics.push((await observer.getMetricRecord())[0]);
     });
 
     afterEach(() => {
@@ -110,7 +126,7 @@ describe('CollectorMetricExporter - common', () => {
       });
 
       it('should set default logger', () => {
-        assert.ok(collectorExporter.logger instanceof NoopLogger);
+        assert.ok(collectorExporter.logger instanceof api.NoopLogger);
       });
     });
   });
@@ -196,7 +212,7 @@ describe('CollectorMetricExporter - common', () => {
       );
       collectorExporterConfig = {
         hostname: 'foo',
-        logger: new NoopLogger(),
+        logger: new api.NoopLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',

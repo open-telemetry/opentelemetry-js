@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
+import { Logger, TracerProvider } from '@opentelemetry/api';
 import {
   Plugin,
-  Logger,
   PluginConfig,
   PluginInternalFiles,
   PluginInternalFilesVersion,
-  TracerProvider,
-} from '@opentelemetry/api';
+} from '../../trace/Plugin';
 import * as semver from 'semver';
 import * as path from 'path';
 import { BaseAbstractPlugin } from '../BaseAbstractPlugin';

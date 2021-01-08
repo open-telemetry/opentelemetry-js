@@ -2,10 +2,9 @@
 
 const benchmark = require('./benchmark');
 const opentelemetry = require('../packages/opentelemetry-api');
-const { NoopLogger } = require('../packages/opentelemetry-core');
 const { BasicTracerProvider, BatchSpanProcessor, InMemorySpanExporter, SimpleSpanProcessor } = require('../packages/opentelemetry-tracing');
 
-const logger = new NoopLogger();
+const logger = new opentelemetry.NoopLogger();
 
 const setups = [
   {

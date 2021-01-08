@@ -213,7 +213,7 @@ describe('xhr', () => {
           );
 
           rootSpan = webTracerWithZone.startSpan('root');
-          webTracerWithZone.withSpan(rootSpan, () => {
+          api.context.with(api.setSpan(api.context.active(), rootSpan), () => {
             getData(
               new XMLHttpRequest(),
               fileUrl,
@@ -626,46 +626,52 @@ describe('xhr', () => {
               })
             );
             const reusableReq = new XMLHttpRequest();
-            webTracerWithZone.withSpan(rootSpan, () => {
-              getData(
-                reusableReq,
-                firstUrl,
-                () => {
-                  fakeNow = 100;
-                },
-                testAsync
-              ).then(() => {
-                fakeNow = 0;
-                sandbox.clock.tick(1000);
-              });
-            });
+            api.context.with(
+              api.setSpan(api.context.active(), rootSpan),
+              () => {
+                getData(
+                  reusableReq,
+                  firstUrl,
+                  () => {
+                    fakeNow = 100;
+                  },
+                  testAsync
+                ).then(() => {
+                  fakeNow = 0;
+                  sandbox.clock.tick(1000);
+                });
+              }
+            );
 
-            webTracerWithZone.withSpan(rootSpan, () => {
-              getData(
-                reusableReq,
-                secondUrl,
-                () => {
-                  fakeNow = 100;
-                },
-                testAsync
-              ).then(() => {
-                fakeNow = 0;
-                sandbox.clock.tick(1000);
-                done();
-              });
+            api.context.with(
+              api.setSpan(api.context.active(), rootSpan),
+              () => {
+                getData(
+                  reusableReq,
+                  secondUrl,
+                  () => {
+                    fakeNow = 100;
+                  },
+                  testAsync
+                ).then(() => {
+                  fakeNow = 0;
+                  sandbox.clock.tick(1000);
+                  done();
+                });
 
-              assert.strictEqual(
-                requests.length,
-                1,
-                'first request not called'
-              );
+                assert.strictEqual(
+                  requests.length,
+                  1,
+                  'first request not called'
+                );
 
-              requests[0].respond(
-                200,
-                { 'Content-Type': 'application/json' },
-                '{"foo":"bar"}'
-              );
-            });
+                requests[0].respond(
+                  200,
+                  { 'Content-Type': 'application/json' },
+                  '{"foo":"bar"}'
+                );
+              }
+            );
           });
 
           it('should clear previous span information', () => {
@@ -738,26 +744,29 @@ describe('xhr', () => {
 
         describe('when request loads and receives an error code', () => {
           beforeEach(done => {
-            webTracerWithZone.withSpan(rootSpan, () => {
-              getData(
-                new XMLHttpRequest(),
-                url,
-                () => {
-                  fakeNow = 100;
-                },
-                testAsync
-              ).then(() => {
-                fakeNow = 0;
-                sandbox.clock.tick(1000);
-                done();
-              });
-              assert.strictEqual(requests.length, 1, 'request not called');
-              requests[0].respond(
-                400,
-                { 'Content-Type': 'text/plain' },
-                'Bad Request'
-              );
-            });
+            api.context.with(
+              api.setSpan(api.context.active(), rootSpan),
+              () => {
+                getData(
+                  new XMLHttpRequest(),
+                  url,
+                  () => {
+                    fakeNow = 100;
+                  },
+                  testAsync
+                ).then(() => {
+                  fakeNow = 0;
+                  sandbox.clock.tick(1000);
+                  done();
+                });
+                assert.strictEqual(requests.length, 1, 'request not called');
+                requests[0].respond(
+                  400,
+                  { 'Content-Type': 'text/plain' },
+                  'Bad Request'
+                );
+              }
+            );
           });
           it('span should have correct attributes', () => {
             const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
@@ -872,18 +881,21 @@ describe('xhr', () => {
 
         describe('when request encounters a network error', () => {
           beforeEach(done => {
-            webTracerWithZone.withSpan(rootSpan, () => {
-              getData(new XMLHttpRequest(), url, () => {}, testAsync).then(
-                () => {
-                  fakeNow = 0;
-                  sandbox.clock.tick(1000);
-                  done();
-                }
-              );
+            api.context.with(
+              api.setSpan(api.context.active(), rootSpan),
+              () => {
+                getData(new XMLHttpRequest(), url, () => {}, testAsync).then(
+                  () => {
+                    fakeNow = 0;
+                    sandbox.clock.tick(1000);
+                    done();
+                  }
+                );
 
-              assert.strictEqual(requests.length, 1, 'request not called');
-              requests[0].error();
-            });
+                assert.strictEqual(requests.length, 1, 'request not called');
+                requests[0].error();
+              }
+            );
           });
 
           it('span should have correct attributes', () => {
@@ -961,18 +973,21 @@ describe('xhr', () => {
           });
 
           beforeEach(done => {
-            webTracerWithZone.withSpan(rootSpan, () => {
-              getData(new XMLHttpRequest(), url, () => {}, testAsync).then(
-                () => {
-                  fakeNow = 0;
-                  sandbox.clock.tick(1000);
-                  done();
-                }
-              );
+            api.context.with(
+              api.setSpan(api.context.active(), rootSpan),
+              () => {
+                getData(new XMLHttpRequest(), url, () => {}, testAsync).then(
+                  () => {
+                    fakeNow = 0;
+                    sandbox.clock.tick(1000);
+                    done();
+                  }
+                );
 
-              assert.strictEqual(requests.length, 1, 'request not called');
-              requests[0].abort();
-            });
+                assert.strictEqual(requests.length, 1, 'request not called');
+                requests[0].abort();
+              }
+            );
           });
 
           it('span should have correct attributes', () => {
@@ -1050,20 +1065,23 @@ describe('xhr', () => {
           });
 
           beforeEach(done => {
-            webTracerWithZone.withSpan(rootSpan, () => {
-              getData(
-                new XMLHttpRequest(),
-                url,
-                () => {
-                  sandbox.clock.tick(XHR_TIMEOUT);
-                },
-                testAsync
-              ).then(() => {
-                fakeNow = 0;
-                sandbox.clock.tick(1000);
-                done();
-              });
-            });
+            api.context.with(
+              api.setSpan(api.context.active(), rootSpan),
+              () => {
+                getData(
+                  new XMLHttpRequest(),
+                  url,
+                  () => {
+                    sandbox.clock.tick(XHR_TIMEOUT);
+                  },
+                  testAsync
+                ).then(() => {
+                  fakeNow = 0;
+                  sandbox.clock.tick(1000);
+                  done();
+                });
+              }
+            );
           });
 
           it('span should have correct attributes', () => {

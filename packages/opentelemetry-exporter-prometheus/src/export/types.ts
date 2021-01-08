@@ -28,6 +28,12 @@ export interface ExporterConfig {
   prefix?: string;
 
   /**
+   * Append timestamp to metrics
+   * @default true
+   */
+  appendTimestamp?: boolean;
+
+  /**
    * Endpoint the metrics should be exposed at with preceding slash
    * @default '/metrics'
    */

@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { Logger } from '@opentelemetry/api';
-import { NoopLogger } from '@opentelemetry/core';
+import { Logger, NoopLogger } from '@opentelemetry/api';
 
 /**
  * Parses headers from config leaving only those that have defined values

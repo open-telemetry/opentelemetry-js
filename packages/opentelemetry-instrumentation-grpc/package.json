@@ -1,0 +1,74 @@
+{
+  "name": "@opentelemetry/instrumentation-grpc",
+  "version": "0.13.0",
+  "description": "OpenTelemetry grpc automatic instrumentation package.",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "repository": "open-telemetry/opentelemetry-js",
+  "scripts": {
+    "compile": "tsc --build",
+    "clean": "tsc --build --clean",
+    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
+    "tdd": "npm run test -- --watch-extensions ts --watch",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "version": "node ../../scripts/version-update.js",
+    "watch": "tsc --build --watch"
+  },
+  "keywords": [
+    "opentelemetry",
+    "grpc",
+    "nodejs",
+    "tracing",
+    "profiling",
+    "instrumentation"
+  ],
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "build/src/**/*.js",
+    "build/src/**/*.js.map",
+    "build/src/**/*.d.ts",
+    "doc",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@grpc/grpc-js": "^1.2.2",
+    "@grpc/proto-loader": "^0.5.5",
+    "@opentelemetry/context-async-hooks": "^0.14.0",
+    "@opentelemetry/context-base": "^0.14.0",
+    "@opentelemetry/core": "^0.14.0",
+    "@opentelemetry/node": "^0.14.0",
+    "@opentelemetry/tracing": "^0.14.0",
+    "@types/mocha": "8.0.4",
+    "@types/node": "14.14.10",
+    "@types/semver": "7.3.4",
+    "@types/shimmer": "1.0.1",
+    "@types/sinon": "9.0.9",
+    "codecov": "3.8.1",
+    "grpc": "1.24.4",
+    "gts": "2.0.2",
+    "mocha": "7.2.0",
+    "node-pre-gyp": "0.16.0",
+    "nyc": "15.1.0",
+    "rimraf": "3.0.2",
+    "semver": "7.3.2",
+    "sinon": "9.2.1",
+    "ts-mocha": "8.0.0",
+    "ts-node": "9.0.0",
+    "typescript": "3.9.7"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^0.14.0",
+    "@opentelemetry/instrumentation": "^0.14.0",
+    "@opentelemetry/semantic-conventions": "^0.14.0"
+  }
+}
