@@ -60,86 +60,167 @@ function checkResults() {
 
     const attributes = [
         {
-            "http.url": `http://localhost:${port}/integration/http?arg=yes`,
-            "http.host": `localhost:${port}`,
-            "net.host.name": "localhost",
-            "http.method": "GET",
-            "http.route": `/integration/http`,
-            "http.target": `/integration/http`,
-            "http.flavor": "1.1",
-            "net.transport": "IP.TCP",
-            "net.host.ip": "::ffff:127.0.0.1",
-            "net.host.port": port,
-            "net.peer.ip": "::ffff:127.0.0.1",
-            "net.peer.port": serverResults[0].attributes["net.peer.port"],
-            "http.status_code": 200,
-            "http.status_text": "OK"
+            name: "http",
+            server: {
+                "http.url": `http://localhost:${port}/integration/http?arg=yes`,
+                "http.host": `localhost:${port}`,
+                "net.host.name": "localhost",
+                "http.method": "GET",
+                "http.route": `/integration/http`,
+                "http.target": `/integration/http`,
+                "http.flavor": "1.1",
+                "net.transport": "IP.TCP",
+                "net.host.ip": "::ffff:127.0.0.1",
+                "net.host.port": port,
+                "net.peer.ip": "::ffff:127.0.0.1",
+                "net.peer.port": serverResults[0].attributes["net.peer.port"],
+                "http.status_code": 200,
+                "http.status_text": "OK"
+            },
+            client: {
+                "http.url": `http://localhost:${port}/integration/http?arg=yes`,
+                "http.method": "GET",
+                "http.target": "/integration/http?arg=yes",
+                "net.peer.name": "localhost",
+                "net.peer.ip": "127.0.0.1",
+                "net.peer.port": clientResults[0].attributes["net.peer.port"],
+                "http.host": `localhost:${port}`,
+                "http.status_code": 200,
+                "http.status_text": "OK",
+                "http.flavor": "1.1",
+                "net.transport": "IP.TCP"
+            }
         },
         {
-            "http.url": `http://localhost:${port}/integration/axios?arg=yes`,
-            "http.host": `localhost:${port}`,
-            "net.host.name": "localhost",
-            "http.method": "GET",
-            "http.route": `/integration/axios`,
-            "http.target": `/integration/axios`,
-            "http.user_agent": "axios/0.21.1",
-            "http.flavor": "1.1",
-            "net.transport": "IP.TCP",
-            "net.host.ip": "::ffff:127.0.0.1",
-            "net.host.port": port,
-            "net.peer.ip": "::ffff:127.0.0.1",
-            "net.peer.port": serverResults[1].attributes["net.peer.port"],
-            "http.status_code": 200,
-            "http.status_text": "OK"
+            name: "axios",
+            server: {
+                "http.url": `http://localhost:${port}/integration/axios?arg=yes`,
+                "http.host": `localhost:${port}`,
+                "net.host.name": "localhost",
+                "http.method": "GET",
+                "http.route": `/integration/axios`,
+                "http.target": `/integration/axios`,
+                "http.user_agent": "axios/0.21.1",
+                "http.flavor": "1.1",
+                "net.transport": "IP.TCP",
+                "net.host.ip": "::ffff:127.0.0.1",
+                "net.host.port": port,
+                "net.peer.ip": "::ffff:127.0.0.1",
+                "net.peer.port": serverResults[1].attributes["net.peer.port"],
+                "http.status_code": 200,
+                "http.status_text": "OK"
+            },
+            client: {
+                "http.url": `http://localhost:${port}/integration/axios?arg=yes`,
+                "http.method": "GET",
+                "http.target": "/integration/axios?arg=yes",
+                "net.peer.name": "localhost",
+                "net.peer.ip": "127.0.0.1",
+                "net.peer.port": clientResults[1].attributes["net.peer.port"],
+                "http.host": `localhost:${port}`,
+                "http.status_code": 200,
+                "http.status_text": "OK",
+                "http.flavor": "1.1",
+                "net.transport": "IP.TCP"
+            }
         },
         {
-            "http.url": `http://localhost:${port}/integration/got?arg=yes`,
-            "http.host": `localhost:${port}`,
-            "net.host.name": "localhost",
-            "http.method": "GET",
-            "http.route": `/integration/got`,
-            "http.target": `/integration/got`,
-            "http.user_agent": "got (https://github.com/sindresorhus/got)",
-            "http.flavor": "1.1",
-            "net.transport": "IP.TCP",
-            "net.host.ip": "::ffff:127.0.0.1",
-            "net.host.port": port,
-            "net.peer.ip": "::ffff:127.0.0.1",
-            "net.peer.port": serverResults[2].attributes["net.peer.port"],
-            "http.status_code": 200,
-            "http.status_text": "OK"
+            name: "got",
+            server: {
+                "http.url": `http://localhost:${port}/integration/got?arg=yes`,
+                "http.host": `localhost:${port}`,
+                "net.host.name": "localhost",
+                "http.method": "GET",
+                "http.route": `/integration/got`,
+                "http.target": `/integration/got`,
+                "http.user_agent": "got (https://github.com/sindresorhus/got)",
+                "http.flavor": "1.1",
+                "net.transport": "IP.TCP",
+                "net.host.ip": "::ffff:127.0.0.1",
+                "net.host.port": port,
+                "net.peer.ip": "::ffff:127.0.0.1",
+                "net.peer.port": serverResults[2].attributes["net.peer.port"],
+                "http.status_code": 200,
+                "http.status_text": "OK"
+            },
+            client: {
+                "http.url": `http://localhost:${port}/integration/got?arg=yes`,
+                "http.user_agent": "got (https://github.com/sindresorhus/got)",
+                "http.method": "GET",
+                "http.target": "/integration/got?arg=yes",
+                "net.peer.name": "localhost",
+                "net.peer.ip": "127.0.0.1",
+                "net.peer.port": clientResults[2].attributes["net.peer.port"],
+                "http.host": `localhost:${port}`,
+                "http.status_code": 200,
+                "http.status_text": "OK",
+                "http.flavor": "1.1",
+                "net.transport": "IP.TCP"
+            }
         },
         {
-            "http.url": `http://localhost:${port}/integration/request?arg=yes`,
-            "http.host": `localhost:${port}`,
-            "net.host.name": "localhost",
-            "http.method": "GET",
-            "http.route": `/integration/request`,
-            "http.target": `/integration/request`,
-            "http.flavor": "1.1",
-            "net.transport": "IP.TCP",
-            "net.host.ip": "::ffff:127.0.0.1",
-            "net.host.port": port,
-            "net.peer.ip": "::ffff:127.0.0.1",
-            "net.peer.port": serverResults[3].attributes["net.peer.port"],
-            "http.status_code": 200,
-            "http.status_text": "OK"
+            name: "request",
+            server: {
+                "http.url": `http://localhost:${port}/integration/request?arg=yes`,
+                "http.host": `localhost:${port}`,
+                "net.host.name": "localhost",
+                "http.method": "GET",
+                "http.route": `/integration/request`,
+                "http.target": `/integration/request`,
+                "http.flavor": "1.1",
+                "net.transport": "IP.TCP",
+                "net.host.ip": "::ffff:127.0.0.1",
+                "net.host.port": port,
+                "net.peer.ip": "::ffff:127.0.0.1",
+                "net.peer.port": serverResults[3].attributes["net.peer.port"],
+                "http.status_code": 200,
+                "http.status_text": "OK"
+            },
+            client: {
+                "http.url": `http://localhost:${port}/integration/request?arg=yes`,
+                "http.method": "GET",
+                "http.target": "/integration/request?arg=yes",
+                "net.peer.name": "localhost",
+                "net.peer.ip": "127.0.0.1",
+                "net.peer.port": clientResults[3].attributes["net.peer.port"],
+                "http.host": `localhost:${port}`,
+                "http.status_code": 200,
+                "http.status_text": "OK",
+                "http.flavor": "1.1",
+                "net.transport": "IP.TCP"
+            }
         },
         {
-            "http.url": `http://localhost:${port}/integration/superagent?arg=yes`,
-            "http.host": `localhost:${port}`,
-            "net.host.name": "localhost",
-            "http.method": "GET",
-            "http.route": `/integration/superagent`,
-            "http.target": `/integration/superagent`,
-            "http.flavor": "1.1",
-            "net.transport": "IP.TCP",
-            "net.host.ip": "::ffff:127.0.0.1",
-            "net.host.port": port,
-            "net.peer.ip": "::ffff:127.0.0.1",
-            "net.peer.port": serverResults[4].attributes["net.peer.port"],
-            "http.status_code": 200,
-            "http.status_text": "OK"
+            name: "superagent",
+            server: {
+                "http.url": `http://localhost:${port}/integration/superagent?arg=yes`,
+                "http.host": `localhost:${port}`,
+                "net.host.name": "localhost",
+                "http.method": "GET",
+                "http.route": `/integration/superagent`,
+                "http.target": `/integration/superagent`,
+                "http.flavor": "1.1",
+                "net.transport": "IP.TCP",
+                "net.host.ip": "::ffff:127.0.0.1",
+                "net.host.port": port,
+                "net.peer.ip": "::ffff:127.0.0.1",
+                "net.peer.port": serverResults[4].attributes["net.peer.port"],
+                "http.status_code": 200,
+                "http.status_text": "OK"
+            },
+            client: {
+                "http.url": `http://localhost:${port}/integration/superagent?arg=yes`,
+                "http.method": "GET",
+                "http.target": "/integration/superagent?arg=yes",
+                "net.peer.name": "localhost",
+                "net.peer.ip": "127.0.0.1",
+                "net.peer.port": clientResults[4].attributes["net.peer.port"],
+                "http.host": `localhost:${port}`,
+                "http.status_code": 200,
+                "http.status_text": "OK",
+                "http.flavor": "1.1",
+                "net.transport": "IP.TCP"
+            }
         },
     ]
 
@@ -147,7 +228,11 @@ function checkResults() {
         const serverSpan = serverResults[i];
         const clientSpan = clientResults[i];
 
-        assert.deepStrictEqual(serverSpan.attributes, attributes[i]);
+        
+        console.log(`checking ${attributes[i].name} server attributes`)
+        assert.deepStrictEqual(serverSpan.attributes, attributes[i].server);
+        console.log(`checking ${attributes[i].name} client attributes`)
+        assert.deepStrictEqual(clientSpan.attributes, attributes[i].client);
 
         // Names properly set
         assert.strictEqual(serverSpan.name, "HTTP GET");
