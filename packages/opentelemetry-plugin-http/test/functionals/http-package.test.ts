@@ -25,6 +25,7 @@ import * as assert from 'assert';
 import axios, { AxiosResponse } from 'axios';
 import * as got from 'got';
 import * as http from 'http';
+import { Socket } from 'net';
 import * as nock from 'nock';
 import * as path from 'path';
 import * as request from 'request-promise-native';
@@ -40,6 +41,47 @@ const memoryExporter = new InMemorySpanExporter();
 const protocol = 'http';
 
 describe('Packages', () => {
+  let mockServerPort = 0;
+  let mockServer: http.Server;
+  const sockets: Array<Socket> = [];
+  before(done => {
+    mockServer = http.createServer((req, res) => {
+      res.statusCode = 200;
+      res.setHeader('content-type', 'application/json');
+      res.write(
+        JSON.stringify({
+          success: true,
+        })
+      );
+      res.end();
+    });
+
+    mockServer.listen(0, () => {
+      const addr = mockServer.address();
+      if (addr == null) {
+        done(new Error('unexpected addr null'));
+        return;
+      }
+
+      if (typeof addr === 'string') {
+        done(new Error(`unexpected addr ${addr}`));
+        return;
+      }
+
+      if (addr.port <= 0) {
+        done(new Error('Could not get port'));
+        return;
+      }
+      mockServerPort = addr.port;
+      done();
+    });
+  });
+
+  after(done => {
+    sockets.forEach(s => s.destroy());
+    mockServer.close(done);
+  });
+
   beforeEach(() => {
     context.setGlobalContextManager(new AsyncHooksContextManager().enable());
   });
@@ -92,7 +134,7 @@ describe('Packages', () => {
         }
 
         const urlparsed = url.parse(
-          `${protocol}://www.google.com/search?q=axios&oq=axios&aqs=chrome.0.69i59l2j0l3j69i60.811j0j7&sourceid=chrome&ie=UTF-8`
+          `${protocol}://localhost:${mockServerPort}/search?q=axios&oq=axios&aqs=chrome.0.69i59l2j0l3j69i60.811j0j7&sourceid=chrome&ie=UTF-8`
         );
         const result = await httpPackage.get(urlparsed.href!);
         if (!resHeaders) {
@@ -100,7 +142,8 @@ describe('Packages', () => {
           resHeaders = res.headers;
         }
         const spans = memoryExporter.getFinishedSpans();
-        const span = spans[0];
+        const span = spans.find(s => s.kind === SpanKind.CLIENT);
+        assert.ok(span);
         const validations = {
           hostname: urlparsed.hostname!,
           httpStatusCode: 200,
@@ -111,7 +154,7 @@ describe('Packages', () => {
           component: plugin.component,
         };
 
-        assert.strictEqual(spans.length, 1);
+        assert.strictEqual(spans.length, 2);
         assert.strictEqual(span.name, 'HTTP GET');
 
         switch (name) {
