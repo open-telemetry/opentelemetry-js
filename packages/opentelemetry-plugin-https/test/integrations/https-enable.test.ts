@@ -22,6 +22,8 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as http from 'http';
+import * as fs from 'fs';
+import * as path from 'path';
 import * as https from 'https';
 import { plugin } from '../../src/https';
 import { assertSpan } from '../utils/assertSpan';
@@ -35,6 +37,7 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { Socket } from 'net';
 
 const protocol = 'https';
 const serverPort = 42345;
@@ -46,6 +49,57 @@ export const customAttributeFunction = (span: Span): void => {
 };
 
 describe('HttpsPlugin Integration tests', () => {
+  let mockServerPort = 0;
+  let mockServer: https.Server;
+  const sockets: Array<Socket> = [];
+  before(done => {
+    mockServer = https.createServer(
+      {
+        key: fs.readFileSync(
+          path.join(__dirname, '..', 'fixtures', 'server-key.pem')
+        ),
+        cert: fs.readFileSync(
+          path.join(__dirname, '..', 'fixtures', 'server-cert.pem')
+        ),
+      },
+      (req, res) => {
+        res.statusCode = 200;
+        res.setHeader('content-type', 'application/json');
+        res.write(
+          JSON.stringify({
+            success: true,
+          })
+        );
+        res.end();
+      }
+    );
+
+    mockServer.listen(0, () => {
+      const addr = mockServer.address();
+      if (addr == null) {
+        done(new Error('unexpected addr null'));
+        return;
+      }
+
+      if (typeof addr === 'string') {
+        done(new Error(`unexpected addr ${addr}`));
+        return;
+      }
+
+      if (addr.port <= 0) {
+        done(new Error('Could not get port'));
+        return;
+      }
+      mockServerPort = addr.port;
+      done();
+    });
+  });
+
+  after(done => {
+    sockets.forEach(s => s.destroy());
+    mockServer.close(done);
+  });
+
   beforeEach(() => {
     memoryExporter.reset();
     context.setGlobalContextManager(new AsyncHooksContextManager().enable());
@@ -111,13 +165,14 @@ describe('HttpsPlugin Integration tests', () => {
       assert.strictEqual(spans.length, 0);
 
       const result = await httpsRequest.get(
-        `${protocol}://google.fr/?query=test`
+        `${protocol}://localhost:${mockServerPort}/?query=test`
       );
 
       spans = memoryExporter.getFinishedSpans();
-      const span = spans[0];
+      const span = spans.find(s => s.kind === SpanKind.CLIENT);
+      assert.ok(span);
       const validations = {
-        hostname: 'google.fr',
+        hostname: 'localhost',
         httpStatusCode: result.statusCode!,
         httpMethod: 'GET',
         pathname: '/',
@@ -127,7 +182,7 @@ describe('HttpsPlugin Integration tests', () => {
         component: plugin.component,
       };
 
-      assert.strictEqual(spans.length, 1);
+      assert.strictEqual(spans.length, 2);
       assert.strictEqual(span.name, 'HTTP GET');
       assertSpan(span, SpanKind.CLIENT, validations);
     });
@@ -137,13 +192,14 @@ describe('HttpsPlugin Integration tests', () => {
       assert.strictEqual(spans.length, 0);
 
       const result = await httpsRequest.get(
-        new url.URL(`${protocol}://google.fr/?query=test`)
+        new url.URL(`${protocol}://localhost:${mockServerPort}/?query=test`)
       );
 
       spans = memoryExporter.getFinishedSpans();
-      const span = spans[0];
+      const span = spans.find(s => s.kind === SpanKind.CLIENT);
+      assert.ok(span);
       const validations = {
-        hostname: 'google.fr',
+        hostname: 'localhost',
         httpStatusCode: result.statusCode!,
         httpMethod: 'GET',
         pathname: '/',
@@ -153,7 +209,7 @@ describe('HttpsPlugin Integration tests', () => {
         component: plugin.component,
       };
 
-      assert.strictEqual(spans.length, 1);
+      assert.strictEqual(spans.length, 2);
       assert.strictEqual(span.name, 'HTTP GET');
       assertSpan(span, SpanKind.CLIENT, validations);
     });
@@ -163,14 +219,17 @@ describe('HttpsPlugin Integration tests', () => {
       assert.strictEqual(spans.length, 0);
 
       const result = await httpsRequest.get(
-        new url.URL(`${protocol}://google.fr/?query=test`),
-        { headers: { 'x-foo': 'foo' } }
+        new url.URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
+        {
+          headers: { 'x-foo': 'foo' },
+        }
       );
 
       spans = memoryExporter.getFinishedSpans();
-      const span = spans[0];
+      const span = spans.find(s => s.kind === SpanKind.CLIENT);
+      assert.ok(span);
       const validations = {
-        hostname: 'google.fr',
+        hostname: 'localhost',
         httpStatusCode: result.statusCode!,
         httpMethod: 'GET',
         pathname: '/',
@@ -180,7 +239,7 @@ describe('HttpsPlugin Integration tests', () => {
         component: plugin.component,
       };
 
-      assert.strictEqual(spans.length, 1);
+      assert.strictEqual(spans.length, 2);
       assert.strictEqual(span.name, 'HTTP GET');
       assert.strictEqual(result.reqHeaders['x-foo'], 'foo');
       assert.strictEqual(span.attributes[HttpAttribute.HTTP_FLAVOR], '1.1');
@@ -192,11 +251,14 @@ describe('HttpsPlugin Integration tests', () => {
     });
 
     it('custom attributes should show up on client spans', async () => {
-      const result = await httpsRequest.get(`${protocol}://google.fr/`);
+      const result = await httpsRequest.get(
+        `${protocol}://localhost:${mockServerPort}/`
+      );
       const spans = memoryExporter.getFinishedSpans();
-      const span = spans[0];
+      const span = spans.find(s => s.kind === SpanKind.CLIENT);
+      assert.ok(span);
       const validations = {
-        hostname: 'google.fr',
+        hostname: 'localhost',
         httpStatusCode: result.statusCode!,
         httpMethod: 'GET',
         pathname: '/',
@@ -205,7 +267,7 @@ describe('HttpsPlugin Integration tests', () => {
         component: plugin.component,
       };
 
-      assert.strictEqual(spans.length, 1);
+      assert.strictEqual(spans.length, 2);
       assert.strictEqual(span.name, 'HTTP GET');
       assert.strictEqual(span.attributes['span kind'], SpanKind.CLIENT);
       assertSpan(span, SpanKind.CLIENT, validations);
@@ -216,15 +278,16 @@ describe('HttpsPlugin Integration tests', () => {
       assert.strictEqual(spans.length, 0);
       const options = Object.assign(
         { headers: { Expect: '100-continue' } },
-        url.parse(`${protocol}://google.fr/`)
+        url.parse(`${protocol}://localhost:${mockServerPort}/`)
       );
 
       const result = await httpsRequest.get(options);
       spans = memoryExporter.getFinishedSpans();
-      const span = spans[0];
+      const span = spans.find(s => s.kind === SpanKind.CLIENT);
+      assert.ok(span);
       const validations = {
-        hostname: 'google.fr',
-        httpStatusCode: 301,
+        hostname: 'localhost',
+        httpStatusCode: 200,
         httpMethod: 'GET',
         pathname: '/',
         resHeaders: result.resHeaders,
@@ -232,20 +295,13 @@ describe('HttpsPlugin Integration tests', () => {
         component: plugin.component,
       };
 
-      assert.strictEqual(spans.length, 1);
+      assert.strictEqual(spans.length, 2);
       assert.strictEqual(span.name, 'HTTP GET');
-
-      try {
-        assertSpan(span, SpanKind.CLIENT, validations);
-      } catch (error) {
-        // temporary redirect is also correct
-        validations.httpStatusCode = 307;
-        assertSpan(span, SpanKind.CLIENT, validations);
-      }
+      assertSpan(span, SpanKind.CLIENT, validations);
     });
     for (const headers of [
-      { Expect: '100-continue', 'user-agent': 'https-plugin-test' },
-      { 'user-agent': 'https-plugin-test' },
+      { Expect: '100-continue', 'user-agent': 'http-plugin-test' },
+      { 'user-agent': 'http-plugin-test' },
     ]) {
       it(`should create a span for GET requests and add propagation when using the following signature: get(url, options, callback) and following headers: ${JSON.stringify(
         headers
@@ -263,7 +319,7 @@ describe('HttpsPlugin Integration tests', () => {
         assert.strictEqual(spans.length, 0);
         const options = { headers };
         const req = https.get(
-          `${protocol}://google.fr/`,
+          `${protocol}://localhost:${mockServerPort}/`,
           options,
           (resp: http.IncomingMessage) => {
             const res = (resp as unknown) as http.IncomingMessage & {
@@ -275,7 +331,7 @@ describe('HttpsPlugin Integration tests', () => {
             });
             resp.on('end', () => {
               validations = {
-                hostname: 'google.fr',
+                hostname: 'localhost',
                 httpStatusCode: 301,
                 httpMethod: 'GET',
                 pathname: '/',
@@ -292,8 +348,10 @@ describe('HttpsPlugin Integration tests', () => {
 
         req.on('close', () => {
           const spans = memoryExporter.getFinishedSpans();
-          assert.strictEqual(spans.length, 1);
-          assert.strictEqual(spans[0].name, 'HTTP GET');
+          const span = spans.find(s => s.kind === SpanKind.CLIENT);
+          assert.ok(span);
+          assert.strictEqual(spans.length, 2);
+          assert.strictEqual(span.name, 'HTTP GET');
           assert.ok(data);
           assert.ok(validations.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);
           assert.ok(validations.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]);

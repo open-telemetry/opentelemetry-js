@@ -25,6 +25,7 @@ import {
 import * as assert from 'assert';
 import axios, { AxiosResponse } from 'axios';
 import * as got from 'got';
+import * as fs from 'fs';
 import * as http from 'http';
 import * as https from 'https';
 import * as nock from 'nock';
@@ -35,6 +36,7 @@ import * as url from 'url';
 import { plugin } from '../../src/https';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
+import { Socket } from 'net';
 
 const memoryExporter = new InMemorySpanExporter();
 
@@ -43,6 +45,57 @@ export const customAttributeFunction = (span: Span): void => {
 };
 
 describe('Packages', () => {
+  let mockServerPort = 0;
+  let mockServer: https.Server;
+  const sockets: Array<Socket> = [];
+  before(done => {
+    mockServer = https.createServer(
+      {
+        key: fs.readFileSync(
+          path.join(__dirname, '..', 'fixtures', 'server-key.pem')
+        ),
+        cert: fs.readFileSync(
+          path.join(__dirname, '..', 'fixtures', 'server-cert.pem')
+        ),
+      },
+      (req, res) => {
+        res.statusCode = 200;
+        res.setHeader('content-type', 'application/json');
+        res.write(
+          JSON.stringify({
+            success: true,
+          })
+        );
+        res.end();
+      }
+    );
+
+    mockServer.listen(0, () => {
+      const addr = mockServer.address();
+      if (addr == null) {
+        done(new Error('unexpected addr null'));
+        return;
+      }
+
+      if (typeof addr === 'string') {
+        done(new Error(`unexpected addr ${addr}`));
+        return;
+      }
+
+      if (addr.port <= 0) {
+        done(new Error('Could not get port'));
+        return;
+      }
+      mockServerPort = addr.port;
+      done();
+    });
+  });
+
+  after(done => {
+    sockets.forEach(s => s.destroy());
+    mockServer.close(done);
+  });
+
   beforeEach(() => {
     memoryExporter.reset();
     context.setGlobalContextManager(new AsyncHooksContextManager().enable());
@@ -94,13 +147,7 @@ describe('Packages', () => {
         }
 
         const urlparsed = url.parse(
-          name === 'got' && process.versions.node.startsWith('12')
-            ? // there is an issue with got 9.6 version and node 12 when redirecting so url above will not work
-              // https://github.com/nock/nock/pull/1551
-              // https://github.com/sindresorhus/got/commit/bf1aa5492ae2bc78cbbec6b7d764906fb156e6c2#diff-707a4781d57c42085155dcb27edb9ccbR258
-              // TODO: check if this is still the case when new version
-              'https://www.google.com'
-            : 'https://www.google.com/search?q=axios&oq=axios&aqs=chrome.0.69i59l2j0l3j69i60.811j0j7&sourceid=chrome&ie=UTF-8'
+          `https://localhost:${mockServerPort}/?query=test`
         );
         const result = await httpPackage.get(urlparsed.href!);
         if (!resHeaders) {
@@ -108,7 +155,8 @@ describe('Packages', () => {
           resHeaders = res.headers;
         }
         const spans = memoryExporter.getFinishedSpans();
-        const span = spans[0];
+        const span = spans.find(s => s.kind === SpanKind.CLIENT);
+        assert.ok(span);
         const validations = {
           hostname: urlparsed.hostname!,
           httpStatusCode: 200,
@@ -119,7 +167,7 @@ describe('Packages', () => {
           component: plugin.component,
         };
 
-        assert.strictEqual(spans.length, 1);
+        assert.strictEqual(spans.length, 2);
         assert.strictEqual(span.name, 'HTTP GET');
 
         switch (name) {
