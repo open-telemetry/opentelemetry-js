@@ -63,7 +63,7 @@ describe('HttpsInstrumentation Integration tests', () => {
   let mockServerPort = 0;
   let mockServer: https.Server;
   const sockets: Array<Socket> = [];
-  before(() => {
+  before(done => {
     mockServer = https.createServer(
       {
         key: fs.readFileSync(
@@ -88,23 +88,27 @@ describe('HttpsInstrumentation Integration tests', () => {
     mockServer.listen(0, () => {
       const addr = mockServer.address();
       if (addr == null) {
-        throw new Error('unexpected addr null');
+        done(new Error('unexpected addr null'));
+        return;
       }
 
       if (typeof addr === 'string') {
-        throw new Error(`unexpected addr ${addr}`);
+        done(new Error(`unexpected addr ${addr}`));
+        return;
       }
 
       if (addr.port <= 0) {
-        throw new Error('Could not get port');
+        done(new Error('Could not get port'));
+        return;
       }
       mockServerPort = addr.port;
+      done();
     });
   });
 
-  after(() => {
-    mockServer.close();
+  after(done => {
     sockets.forEach(s => s.destroy());
+    mockServer.close(done);
   });
 
   beforeEach(() => {

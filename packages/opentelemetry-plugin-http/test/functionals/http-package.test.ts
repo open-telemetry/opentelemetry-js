@@ -44,7 +44,7 @@ describe('Packages', () => {
   let mockServerPort = 0;
   let mockServer: http.Server;
   const sockets: Array<Socket> = [];
-  before(() => {
+  before(done => {
     mockServer = http.createServer((req, res) => {
       res.statusCode = 200;
       res.setHeader('content-type', 'application/json');
@@ -59,23 +59,27 @@ describe('Packages', () => {
     mockServer.listen(0, () => {
       const addr = mockServer.address();
       if (addr == null) {
-        throw new Error('unexpected addr null');
+        done(new Error('unexpected addr null'));
+        return;
       }
 
       if (typeof addr === 'string') {
-        throw new Error(`unexpected addr ${addr}`);
+        done(new Error(`unexpected addr ${addr}`));
+        return;
       }
 
       if (addr.port <= 0) {
-        throw new Error('Could not get port');
+        done(new Error('Could not get port'));
+        return;
       }
       mockServerPort = addr.port;
+      done();
     });
   });
 
-  after(() => {
-    mockServer.close();
+  after(done => {
     sockets.forEach(s => s.destroy());
+    mockServer.close(done);
   });
 
   beforeEach(() => {
@@ -138,7 +142,8 @@ describe('Packages', () => {
           resHeaders = res.headers;
         }
         const spans = memoryExporter.getFinishedSpans();
-        const span = spans[0];
+        const span = spans.find(s => s.kind === SpanKind.CLIENT);
+        assert.ok(span);
         const validations = {
           hostname: urlparsed.hostname!,
           httpStatusCode: 200,
@@ -149,7 +154,7 @@ describe('Packages', () => {
           component: plugin.component,
         };
 
-        assert.strictEqual(spans.length, 1);
+        assert.strictEqual(spans.length, 2);
         assert.strictEqual(span.name, 'HTTP GET');
 
         switch (name) {
