@@ -30,7 +30,7 @@ LICENSE*                text
 ## Non-text documentation
 *.html                  text diff=html
 *.pdf                   binary
-*.json                  text
+*.json                  text eol=lf
 *.rtf                   binary
 
 ## Git Properties
