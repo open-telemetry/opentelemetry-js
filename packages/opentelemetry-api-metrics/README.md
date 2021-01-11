@@ -6,7 +6,11 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-This package provides everything needed to interact with the OpenTelemetry Metrics API, including all TypeScript interfaces, enums, and no-op implementations. It is intended for use both on the server and in the browser.
+This package provides everything needed to interact with the unstable OpenTelemetry Metrics API, including all TypeScript interfaces, enums, and no-op implementations. It is intended for use both on the server and in the browser.
+
+## Beta Software - Use at your own risk
+
+The metrics API is considered beta software and there is no guarantee of stability or long-term support. When the API is stabilized, it will be made available and supported long-term in the `@opentelemetry/api` package and this package will be deprecated.
 
 ## Quick Start
 
