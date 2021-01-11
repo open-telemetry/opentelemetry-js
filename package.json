@@ -59,7 +59,7 @@
     "lerna-changelog": "1.0.1",
     "markdownlint-cli": "0.25.0",
     "typescript": "3.9.7",
-    "update-ts-references": "^1.3.0"
+    "update-ts-references": "2.0.0"
   },
   "husky": {
     "hooks": {
