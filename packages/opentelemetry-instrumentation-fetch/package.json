@@ -1,5 +1,5 @@
 {
-  "name": "@opentelemetry/plugin-fetch",
+  "name": "@opentelemetry/instrumentation-fetch",
   "version": "0.14.0",
   "description": "OpenTelemetry fetch automatic instrumentation package.",
   "main": "build/src/index.js",
@@ -76,7 +76,8 @@
   "dependencies": {
     "@opentelemetry/api": "^0.14.0",
     "@opentelemetry/core": "^0.14.0",
-    "@opentelemetry/web": "^0.14.0",
-    "shimmer": "^1.2.1"
+    "@opentelemetry/instrumentation": "^0.14.0",
+    "@opentelemetry/semantic-conventions": "^0.14.0",
+    "@opentelemetry/web": "^0.14.0"
   }
 }

@@ -51,6 +51,9 @@
       "path": "packages/opentelemetry-grpc-utils"
     },
     {
+      "path": "packages/opentelemetry-instrumentation-fetch"
+    },
+    {
       "path": "packages/opentelemetry-instrumentation-grpc"
     },
     {
@@ -67,9 +70,6 @@
     },
     {
       "path": "packages/opentelemetry-node"
-    },
-    {
-      "path": "packages/opentelemetry-plugin-fetch"
     },
     {
       "path": "packages/opentelemetry-plugin-grpc-js"
