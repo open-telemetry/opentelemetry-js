@@ -487,7 +487,7 @@ describe('Zipkin Exporter - node', () => {
       const resource_service_name = 'resource_service_name';
       const resource_service_name_prime = 'resource_service_name_prime';
 
-      let requestBody: any;
+      let requestBody: zipkinTypes.Span[];
       const scope = nock('http://localhost:9411')
         .post('/api/v2/spans', body => {
           requestBody = body;
