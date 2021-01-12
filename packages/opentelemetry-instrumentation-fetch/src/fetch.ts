@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-import * as shimmer from 'shimmer';
 import * as api from '@opentelemetry/api';
+import {
+  isWrapped,
+  InstrumentationBase,
+  InstrumentationConfig,
+} from '@opentelemetry/instrumentation';
 import * as core from '@opentelemetry/core';
 import * as web from '@opentelemetry/web';
 import { AttributeNames } from './enums/AttributeNames';
+import { HttpAttribute } from '@opentelemetry/semantic-conventions';
 import { FetchError, FetchResponse, SpanData } from './types';
 import { VERSION } from './version';
 
@@ -31,7 +36,7 @@ const OBSERVER_WAIT_TIME_MS = 300;
 /**
  * FetchPlugin Config
  */
-export interface FetchPluginConfig extends core.PluginConfig {
+export interface FetchInstrumentationConfig extends InstrumentationConfig {
   // the number of timing resources is limited, after the limit
   // (chrome 250, safari 150) the information is not collected anymore
   // the only way to prevent that is to regularly clean the resources
@@ -40,18 +45,38 @@ export interface FetchPluginConfig extends core.PluginConfig {
   clearTimingResources?: boolean;
   // urls which should include trace headers when origin doesn't match
   propagateTraceHeaderCorsUrls?: web.PropagateTraceHeaderCorsUrls;
+  /**
+   * URLs that partially match any regex in ignoreUrls will not be traced.
+   * In addition, URLs that are _exact matches_ of strings in ignoreUrls will
+   * also not be traced.
+   */
+  ignoreUrls?: Array<string | RegExp>;
 }
 
 /**
  * This class represents a fetch plugin for auto instrumentation
  */
-export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
-  moduleName = 'fetch';
+export class FetchInstrumentation extends InstrumentationBase<
+  Promise<Response>
+> {
+  readonly component: string = 'fetch';
+  readonly version: string = VERSION;
+  moduleName = this.component;
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
   private _tasksCount = 0;
 
-  constructor(protected _config: FetchPluginConfig = {}) {
-    super('@opentelemetry/plugin-fetch', VERSION);
+  constructor(config: FetchInstrumentationConfig = {}) {
+    super(
+      '@opentelemetry/instrumentation-fetch',
+      VERSION,
+      Object.assign({}, config)
+    );
+  }
+
+  init() {}
+
+  private _getConfig(): FetchInstrumentationConfig {
+    return this._config;
   }
 
   /**
@@ -63,7 +88,7 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
     span: api.Span,
     corsPreFlightRequest: PerformanceResourceTiming
   ): void {
-    const childSpan = this._tracer.startSpan(
+    const childSpan = this.tracer.startSpan(
       'CORS Preflight',
       {
         startTime: corsPreFlightRequest[web.PerformanceTimingNames.FETCH_START],
@@ -86,14 +111,14 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
     response: FetchResponse
   ): void {
     const parsedUrl = web.parseUrl(response.url);
-    span.setAttribute(AttributeNames.HTTP_STATUS_CODE, response.status);
-    span.setAttribute(AttributeNames.HTTP_STATUS_TEXT, response.statusText);
-    span.setAttribute(AttributeNames.HTTP_HOST, parsedUrl.host);
+    span.setAttribute(HttpAttribute.HTTP_STATUS_CODE, response.status);
+    span.setAttribute(HttpAttribute.HTTP_STATUS_TEXT, response.statusText);
+    span.setAttribute(HttpAttribute.HTTP_HOST, parsedUrl.host);
     span.setAttribute(
-      AttributeNames.HTTP_SCHEME,
+      HttpAttribute.HTTP_SCHEME,
       parsedUrl.protocol.replace(':', '')
     );
-    span.setAttribute(AttributeNames.HTTP_USER_AGENT, navigator.userAgent);
+    span.setAttribute(HttpAttribute.HTTP_USER_AGENT, navigator.userAgent);
   }
 
   /**
@@ -105,7 +130,7 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
     if (
       !web.shouldPropagateTraceHeaders(
         spanUrl,
-        this._config.propagateTraceHeaderCorsUrls
+        this._getConfig().propagateTraceHeaderCorsUrls
       )
     ) {
       return;
@@ -129,7 +154,7 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
    * @private
    */
   private _clearResources() {
-    if (this._tasksCount === 0 && this._config.clearTimingResources) {
+    if (this._tasksCount === 0 && this._getConfig().clearTimingResources) {
       performance.clearResourceTimings();
       this._usedResources = new WeakSet<PerformanceResourceTiming>();
     }
@@ -144,18 +169,18 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
     url: string,
     options: Partial<Request | RequestInit> = {}
   ): api.Span | undefined {
-    if (core.isUrlIgnored(url, this._config.ignoreUrls)) {
+    if (core.isUrlIgnored(url, this._getConfig().ignoreUrls)) {
       this._logger.debug('ignoring span as url matches ignored url');
       return;
     }
     const method = (options.method || 'GET').toUpperCase();
     const spanName = `HTTP ${method}`;
-    return this._tracer.startSpan(spanName, {
+    return this.tracer.startSpan(spanName, {
       kind: api.SpanKind.CLIENT,
       attributes: {
         [AttributeNames.COMPONENT]: this.moduleName,
-        [AttributeNames.HTTP_METHOD]: method,
-        [AttributeNames.HTTP_URL]: url,
+        [HttpAttribute.HTTP_METHOD]: method,
+        [HttpAttribute.HTTP_URL]: url,
       },
     });
   }
@@ -245,7 +270,6 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
       original: (input: RequestInfo, init?: RequestInit) => Promise<Response>
     ): ((input: RequestInfo, init?: RequestInit) => Promise<Response>) => {
       const plugin = this;
-
       return function patchConstructor(
         this: (input: RequestInfo, init?: RequestInit) => Promise<Response>,
         input: RequestInfo,
@@ -253,7 +277,6 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
       ): Promise<Response> {
         const url = input instanceof Request ? input.url : input;
         const options = input instanceof Request ? input : init || {};
-
         const span = plugin._createSpan(url, options);
         if (!span) {
           return original.apply(this, [url, options]);
@@ -340,24 +363,21 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
   }
 
   /**
-   * implements patch function
+   * implements enable function
    */
-  patch() {
-    if (core.isWrapped(window.fetch)) {
-      shimmer.unwrap(window, 'fetch');
+  enable() {
+    if (isWrapped(window.fetch)) {
+      this._unwrap(window, 'fetch');
       this._logger.debug('removing previous patch for constructor');
     }
-
-    shimmer.wrap(window, 'fetch', this._patchConstructor());
-
-    return this._moduleExports;
+    this._wrap(window, 'fetch', this._patchConstructor());
   }
 
   /**
    * implements unpatch function
    */
-  unpatch() {
-    shimmer.unwrap(window, 'fetch');
+  disable() {
+    this._unwrap(window, 'fetch');
     this._usedResources = new WeakSet<PerformanceResourceTiming>();
   }
 }
