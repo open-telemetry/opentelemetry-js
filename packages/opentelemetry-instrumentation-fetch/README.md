@@ -11,7 +11,7 @@ This module provides auto instrumentation for web using fetch.
 ## Installation
 
 ```bash
-npm install --save @opentelemetry/plugin-fetch
+npm install --save @opentelemetry/instrumentation-fetch
 ```
 
 ## Usage
@@ -20,12 +20,12 @@ npm install --save @opentelemetry/plugin-fetch
 'use strict';
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
-import { FetchPlugin } from '@opentelemetry/plugin-fetch';
+import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 
 const provider = new WebTracerProvider({
   plugins: [
-    new FetchPlugin(),
+    new FetchInstrumentation(),
   ],
 });
 
@@ -34,6 +34,17 @@ provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.register({
   contextManager: new ZoneContextManager(),
 });
+
+// or plugin can be also initialised separately and then set the tracer provider or meter provider
+const fetchInstrumentation = new FetchInstrumentation();
+const provider = new WebTracerProvider();
+provider.register({
+  contextManager: new ZoneContextManager(),
+});
+fetchInstrumentation.setTracerProvider(provider);
+
+provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+
 
 // and some test
 
@@ -63,9 +74,9 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [gitter-url]: https://gitter.im/open-telemetry/opentelemetry-node?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-plugin-fetch
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-plugin-fetch
-[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-plugin-fetch
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-plugin-fetch&type=dev
-[npm-url]: https://www.npmjs.com/package/@opentelemetry/plugin-fetch
-[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fplugin-fetch.svg
+[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-instrumentation-fetch
+[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-instrumentation-fetch
+[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-instrumentation-fetch
+[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-instrumentation-fetch&type=dev
+[npm-url]: https://www.npmjs.com/package/@opentelemetry/instrumentation-fetch
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Finstrumentation-fetch.svg
