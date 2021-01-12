@@ -103,17 +103,14 @@ export class PluginLoader {
         return this;
       }
 
-      const alreadyRequiredModules = Object.keys(require.cache);
-      const requiredModulesToHook = modulesToHook.filter(
-        name =>
-          alreadyRequiredModules.find(cached => {
-            try {
-              return require.resolve(name) === cached;
-            } catch (err) {
-              return false;
-            }
-          }) !== undefined
-      );
+      const requiredModulesToHook = modulesToHook.filter((name: string) => {
+        try {
+          const moduleResolvedFilename = require.resolve(name);
+          return moduleResolvedFilename in require.cache;
+        } catch {
+          return false;
+        }
+      });
       if (requiredModulesToHook.length > 0) {
         this.logger.warn(
           `Some modules (${requiredModulesToHook.join(
