@@ -59,7 +59,10 @@ export class ZipkinExporter implements SpanExporter {
     resultCallback: (result: ExportResult) => void
   ) {
     if (typeof this._serviceName !== 'string') {
-      this._serviceName = this.DEFAULT_SERVICE_NAME;
+      this._serviceName = String(
+        spans[0].resource.attributes[SERVICE_RESOURCE.NAME] ||
+          this.DEFAULT_SERVICE_NAME
+      );
     }
     this._logger.debug('Zipkin exporter export');
     if (this._isShutdown) {
