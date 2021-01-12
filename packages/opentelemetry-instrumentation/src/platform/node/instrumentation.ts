@@ -19,10 +19,7 @@ import * as path from 'path';
 import * as RequireInTheMiddle from 'require-in-the-middle';
 import * as semver from 'semver';
 import { InstrumentationAbstract } from '../../instrumentation';
-import {
-  InstrumentationModuleDefinition,
-  InstrumentationModuleFile,
-} from './types';
+import { InstrumentationModuleDefinition } from './types';
 
 /**
  * Base abstract class for instrumenting node plugins
@@ -68,11 +65,9 @@ export abstract class InstrumentationBase<T = any>
           return true;
         }
 
-        for (const supportedVersions of module.supportedVersions) {
-          if (semver.satisfies(version, supportedVersions)) {
-            return true;
-          }
-        }
+        return module.supportedVersions.some(supportedVersion => {
+          return semver.satisfies(version, supportedVersion);
+        });
       }
     }
 
@@ -93,27 +88,31 @@ export abstract class InstrumentationBase<T = any>
       return exports;
     }
 
+    const version = require(path.join(baseDir, 'package.json')).version;
+    module.moduleVersion = version;
     if (module.name === name) {
       // main module
-      const version = require(path.join(baseDir, 'package.json')).version;
       if (typeof version === 'string' && this._isSupported(name, version)) {
         if (typeof module.patch === 'function') {
           module.moduleExports = exports;
           if (this._enabled) {
-            return module.patch(exports);
+            return module.patch(exports, module.moduleVersion);
           }
         }
       }
     } else {
       // internal file
-      const files = module.files || [];
-      const file = files.find(
-        (file: InstrumentationModuleFile<T>) => file.name === name
-      );
-      if (file) {
+      const files = module.files ?? [];
+      const file = files.find(file => file.name === name);
+      if (
+        file &&
+        file.supportedVersions.some(supportedVersion =>
+          semver.satisfies(version, supportedVersion)
+        )
+      ) {
         file.moduleExports = exports;
         if (this._enabled) {
-          return file.patch(exports);
+          return file.patch(exports, module.moduleVersion);
         }
       }
     }
@@ -130,11 +129,11 @@ export abstract class InstrumentationBase<T = any>
     if (this._hooks.length > 0) {
       for (const module of this._modules) {
         if (typeof module.patch === 'function' && module.moduleExports) {
-          module.patch(module.moduleExports);
+          module.patch(module.moduleExports, module.moduleVersion);
         }
         for (const file of module.files) {
           if (file.moduleExports) {
-            file.patch(file.moduleExports);
+            file.patch(file.moduleExports, module.moduleVersion);
           }
         }
       }
@@ -169,11 +168,11 @@ export abstract class InstrumentationBase<T = any>
 
     for (const module of this._modules) {
       if (typeof module.unpatch === 'function' && module.moduleExports) {
-        module.unpatch(module.moduleExports);
+        module.unpatch(module.moduleExports, module.moduleVersion);
       }
       for (const file of module.files) {
         if (file.moduleExports) {
-          file.unpatch(file.moduleExports);
+          file.unpatch(file.moduleExports, module.moduleVersion);
         }
       }
     }

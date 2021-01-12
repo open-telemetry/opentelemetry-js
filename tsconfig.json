@@ -51,6 +51,9 @@
       "path": "packages/opentelemetry-grpc-utils"
     },
     {
+      "path": "packages/opentelemetry-instrumentation-grpc"
+    },
+    {
       "path": "packages/opentelemetry-instrumentation-http"
     },
     {
