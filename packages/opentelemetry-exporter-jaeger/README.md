@@ -56,7 +56,7 @@ npm install --save @opentelemetry/exporter-jaeger
 Install the exporter on your application and pass the options, it must contain a service name.
 
 Furthermore, the `host` option (which defaults to `localhost`), can instead be set by the
-`JAEGER_AGENT_HOST` environment variable to reduce in-code config. If both are
+`OTEL_EXPORTER_JAEGER_AGENT_HOST` environment variable to reduce in-code config. If both are
 set, the value set by the option in code is authoritative.
 
 ```js
