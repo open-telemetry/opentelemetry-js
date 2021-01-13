@@ -44,6 +44,32 @@ export function safeExecuteInTheMiddle<T>(
 }
 
 /**
+ * Async function to execute patched function and being able to catch errors
+ * @param execute - function to be executed
+ * @param onFinish - callback to run when execute finishes
+ */
+export async function safeExecuteInTheMiddleAsync<T>(
+  execute: () => T,
+  onFinish: (e: Error | undefined, result: T | undefined) => void,
+  preventThrowingError?: boolean
+): Promise<T> {
+  let error: Error | undefined;
+  let result: T | undefined;
+  try {
+    result = await execute();
+  } catch (e) {
+    error = e;
+  } finally {
+    onFinish(error, result);
+    if (error && !preventThrowingError) {
+      // eslint-disable-next-line no-unsafe-finally
+      throw error;
+    }
+    // eslint-disable-next-line no-unsafe-finally
+    return result as T;
+  }
+}
+/**
  * Checks if certain function has been already wrapped
  * @param func
  */
