@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { Meter } from './Meter';
-import { MeterProvider } from './MeterProvider';
+import { Meter } from './types/Meter';
+import { MeterProvider } from './types/MeterProvider';
 import { NOOP_METER } from './NoopMeter';
 
 /**

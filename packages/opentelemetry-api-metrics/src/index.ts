@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-export * from './BatchObserverResult';
-export * from './BoundInstrument';
-export * from './Meter';
-export * from './MeterProvider';
-export * from './Metric';
 export * from './NoopMeter';
 export * from './NoopMeterProvider';
-export * from './Observation';
-export * from './ObserverResult';
+export * from './types/BatchObserverResult';
+export * from './types/BoundInstrument';
+export * from './types/Meter';
+export * from './types/MeterProvider';
+export * from './types/Metric';
+export * from './types/Observation';
+export * from './types/ObserverResult';
 
 import { MetricsAPI } from './api/metrics';
 /** Entrypoint for metrics API */

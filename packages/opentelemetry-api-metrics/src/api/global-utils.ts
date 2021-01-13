@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { MeterProvider } from '../MeterProvider';
+import { MeterProvider } from '../types/MeterProvider';
 import { _globalThis } from '../platform';
 
 export const GLOBAL_METRICS_API_KEY = Symbol.for(

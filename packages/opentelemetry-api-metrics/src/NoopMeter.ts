@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { BatchObserverResult } from './BatchObserverResult';
-import { Meter } from './Meter';
+import { BatchObserverResult } from './types/BatchObserverResult';
+import { Meter } from './types/Meter';
 import {
   MetricOptions,
   UnboundMetric,
@@ -26,13 +26,13 @@ import {
   UpDownCounter,
   BaseObserver,
   UpDownSumObserver,
-} from './Metric';
+} from './types/Metric';
 import {
   BoundValueRecorder,
   BoundCounter,
   BoundBaseObserver,
-} from './BoundInstrument';
-import { ObserverResult } from './ObserverResult';
+} from './types/BoundInstrument';
+import { ObserverResult } from './types/ObserverResult';
 
 /**
  * NoopMeter is a noop implementation of the {@link Meter} interface. It reuses
