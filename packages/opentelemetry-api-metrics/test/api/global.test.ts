@@ -37,7 +37,7 @@ describe('Global Utils', () => {
 
   beforeEach(() => {
     api1.metrics.disable();
-    api1.metrics.disable();
+    api2.metrics.disable();
   });
 
   it('should change the global meter provider', () => {

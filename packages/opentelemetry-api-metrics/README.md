@@ -10,11 +10,11 @@ This package provides everything needed to interact with the unstable OpenTeleme
 
 ## Beta Software - Use at your own risk
 
-The metrics API is considered beta software and there is no guarantee of stability or long-term support. When the API is stabilized, it will be made available and supported long-term in the `@opentelemetry/api` package and this package will be deprecated.
+The metrics API is considered alpha software and there is no guarantee of stability or long-term support. When the API is stabilized, it will be made available and supported long-term in the `@opentelemetry/api` package and this package will be deprecated.
 
 ## Quick Start
 
-To get started you need to install the SDK and plugins, create a MeterProvider, and register it with the API.
+To get started you need to install the SDK and instrumentations, create a MeterProvider, and register it with the API.
 
 ### Install Dependencies
 
