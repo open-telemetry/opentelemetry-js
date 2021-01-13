@@ -85,7 +85,7 @@ export function timeInputToHrTime(time: api.TimeInput): api.HrTime {
       return numberToHrtime(time);
     }
   } else if (time instanceof Date) {
-    return [time.getTime(), 0];
+    return numberToHrtime(time.getTime());
   } else {
     throw TypeError('Invalid input type');
   }
