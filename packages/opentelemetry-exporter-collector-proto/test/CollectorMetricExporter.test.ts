@@ -48,8 +48,6 @@ describe('CollectorMetricExporter - node with proto over http', () => {
   let collectorExporterConfig: CollectorExporterNodeConfigBase;
   let metrics: metrics.MetricRecord[];
 
-  const sandbox = sinon.createSandbox();
-
   describe('export', () => {
     beforeEach(async () => {
       collectorExporterConfig = {
@@ -89,13 +87,13 @@ describe('CollectorMetricExporter - node with proto over http', () => {
       metrics.push((await recorder.getMetricRecord())[0]);
     });
     afterEach(() => {
-      sandbox.restore();
+      sinon.restore();
     });
 
     it('should open the connection', done => {
       collectorExporter.export(metrics, () => {});
 
-      sandbox.stub(http, 'request').callsFake((options: any) => {
+      sinon.stub(http, 'request').callsFake((options: any) => {
         assert.strictEqual(options.hostname, 'foo.bar.com');
         assert.strictEqual(options.method, 'POST');
         assert.strictEqual(options.path, '/');
@@ -107,7 +105,7 @@ describe('CollectorMetricExporter - node with proto over http', () => {
     it('should set custom headers', done => {
       collectorExporter.export(metrics, () => {});
 
-      sandbox.stub(http, 'request').callsFake((options: any) => {
+      sinon.stub(http, 'request').callsFake((options: any) => {
         assert.strictEqual(options.headers['foo'], 'bar');
         done();
         return fakeRequest as any;
@@ -117,7 +115,7 @@ describe('CollectorMetricExporter - node with proto over http', () => {
     it('should have keep alive and keepAliveMsecs option set', done => {
       collectorExporter.export(metrics, () => {});
 
-      sandbox.stub(http, 'request').callsFake((options: any) => {
+      sinon.stub(http, 'request').callsFake((options: any) => {
         assert.strictEqual(options.agent.keepAlive, true);
         assert.strictEqual(options.agent.options.keepAliveMsecs, 2000);
         done();
@@ -128,7 +126,7 @@ describe('CollectorMetricExporter - node with proto over http', () => {
     it('should successfully send metrics', done => {
       collectorExporter.export(metrics, () => {});
 
-      sandbox.stub(http, 'request').returns({
+      sinon.stub(http, 'request').returns({
         end: () => {},
         on: () => {},
         write: (...writeArgs: any[]) => {
@@ -180,7 +178,7 @@ describe('CollectorMetricExporter - node with proto over http', () => {
         done();
       });
 
-      sandbox.stub(http, 'request').callsFake((options: any, cb: any) => {
+      sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         const mockRes = new MockedResponse(200);
         cb(mockRes);
         mockRes.send('success');
@@ -196,7 +194,7 @@ describe('CollectorMetricExporter - node with proto over http', () => {
         done();
       });
 
-      sandbox.stub(http, 'request').callsFake((options: any, cb: any) => {
+      sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         const mockResError = new MockedResponse(400);
         cb(mockResError);
         mockResError.send('failed');

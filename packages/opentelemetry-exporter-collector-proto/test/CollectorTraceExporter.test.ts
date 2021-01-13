@@ -44,8 +44,6 @@ describe('CollectorTraceExporter - node with proto over http', () => {
   let collectorExporterConfig: CollectorExporterNodeConfigBase;
   let spans: ReadableSpan[];
 
-  const sandbox = sinon.createSandbox();
-
   describe('export', () => {
     beforeEach(() => {
       collectorExporterConfig = {
@@ -65,13 +63,13 @@ describe('CollectorTraceExporter - node with proto over http', () => {
       spans.push(Object.assign({}, mockedReadableSpan));
     });
     afterEach(() => {
-      sandbox.restore();
+      sinon.restore();
     });
 
     it('should open the connection', done => {
       collectorExporter.export(spans, () => {});
 
-      sandbox.stub(http, 'request').callsFake((options: any) => {
+      sinon.stub(http, 'request').callsFake((options: any) => {
         assert.strictEqual(options.hostname, 'foo.bar.com');
         assert.strictEqual(options.method, 'POST');
         assert.strictEqual(options.path, '/');
@@ -83,7 +81,7 @@ describe('CollectorTraceExporter - node with proto over http', () => {
     it('should set custom headers', done => {
       collectorExporter.export(spans, () => {});
 
-      sandbox.stub(http, 'request').callsFake((options: any) => {
+      sinon.stub(http, 'request').callsFake((options: any) => {
         assert.strictEqual(options.headers['foo'], 'bar');
         done();
         return fakeRequest as any;
@@ -93,7 +91,7 @@ describe('CollectorTraceExporter - node with proto over http', () => {
     it('should have keep alive and keepAliveMsecs option set', done => {
       collectorExporter.export(spans, () => {});
 
-      sandbox.stub(http, 'request').callsFake((options: any) => {
+      sinon.stub(http, 'request').callsFake((options: any) => {
         assert.strictEqual(options.agent.keepAlive, true);
         assert.strictEqual(options.agent.options.keepAliveMsecs, 2000);
         done();
@@ -104,7 +102,7 @@ describe('CollectorTraceExporter - node with proto over http', () => {
     it('should successfully send the spans', done => {
       collectorExporter.export(spans, () => {});
 
-      sandbox.stub(http, 'request').returns({
+      sinon.stub(http, 'request').returns({
         end: () => {},
         on: () => {},
         write: (...args: any[]) => {
@@ -126,7 +124,7 @@ describe('CollectorTraceExporter - node with proto over http', () => {
     });
 
     it('should log the successful message', done => {
-      const spyLoggerError = sandbox.stub(collectorExporter.logger, 'error');
+      const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
 
       collectorExporter.export(spans, result => {
         assert.strictEqual(result.code, ExportResultCode.SUCCESS);
@@ -134,7 +132,7 @@ describe('CollectorTraceExporter - node with proto over http', () => {
         done();
       });
 
-      sandbox.stub(http, 'request').callsFake((options: any, cb: any) => {
+      sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         const mockRes = new MockedResponse(200);
         cb(mockRes);
         mockRes.send('success');
@@ -150,7 +148,7 @@ describe('CollectorTraceExporter - node with proto over http', () => {
         done();
       });
 
-      sandbox.stub(http, 'request').callsFake((options: any, cb: any) => {
+      sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         const mockResError = new MockedResponse(400);
         cb(mockResError);
         mockResError.send('failed');
