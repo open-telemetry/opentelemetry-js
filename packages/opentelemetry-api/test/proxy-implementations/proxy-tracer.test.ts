@@ -26,13 +26,20 @@ import {
   Tracer,
   Span,
   NoopTracer,
+  ROOT_CONTEXT,
+  SpanOptions,
 } from '../../src';
 
 describe('ProxyTracer', () => {
   let provider: ProxyTracerProvider;
+  const sandbox = sinon.createSandbox();
 
   beforeEach(() => {
     provider = new ProxyTracerProvider();
+  });
+
+  afterEach(() => {
+    sandbox.restore();
   });
 
   describe('when no delegate is set', () => {
@@ -61,7 +68,6 @@ describe('ProxyTracer', () => {
 
   describe('when delegate is set before getTracer', () => {
     let delegate: TracerProvider;
-    const sandbox = sinon.createSandbox();
     let getTracerStub: sinon.SinonStub;
 
     beforeEach(() => {
@@ -70,10 +76,6 @@ describe('ProxyTracer', () => {
         getTracer: getTracerStub,
       };
       provider.setDelegate(delegate);
-    });
-
-    afterEach(() => {
-      sandbox.restore();
     });
 
     it('should return tracers directly from the delegate', () => {
@@ -113,6 +115,26 @@ describe('ProxyTracer', () => {
       const span = tracer.startSpan('test');
 
       assert.strictEqual(span, delegateSpan);
+    });
+
+    it('should pass original arguments to DelegateTracer#startSpan', () => {
+      const startSpanStub = sandbox.stub(delegateTracer, 'startSpan');
+
+      const name = 'name1';
+      const options: SpanOptions = {};
+      const ctx = ROOT_CONTEXT.setValue(Symbol('test'), 1);
+      tracer.startSpan(name, options, ctx);
+
+      // Assert the proxy tracer has the full API of the NoopTracer
+      assert.strictEqual(
+        NoopTracer.prototype.startSpan.length,
+        ProxyTracer.prototype.startSpan.length
+      );
+      assert.deepStrictEqual(Object.getOwnPropertyNames(NoopTracer.prototype), [
+        'constructor',
+        'startSpan',
+      ]);
+      sandbox.assert.calledOnceWithExactly(startSpanStub, name, options, ctx);
     });
   });
 });
