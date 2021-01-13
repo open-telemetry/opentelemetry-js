@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { TimeInput } from '../common/Time';
 import { Attributes } from './attributes';
 import { Link } from './link';
 import { SpanKind } from './span_kind';
@@ -35,7 +36,7 @@ export interface SpanOptions {
   links?: Link[];
 
   /** A manually specified start time for the created `Span` object. */
-  startTime?: number;
+  startTime?: TimeInput;
 
   /** The new span should be a root span. (Ignore parent from context). */
   root?: boolean;
