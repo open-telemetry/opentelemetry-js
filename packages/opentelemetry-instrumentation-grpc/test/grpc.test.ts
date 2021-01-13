@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-/**
- * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/http.md
- */
-export enum AttributeNames {
-  COMPONENT = 'component',
-  HTTP_HOST = 'http.host',
-  HTTP_FLAVOR = 'http.flavor',
-  HTTP_METHOD = 'http.method',
-  HTTP_SCHEME = 'http.scheme',
-  HTTP_STATUS_CODE = 'http.status_code',
-  HTTP_STATUS_TEXT = 'http.status_text',
-  HTTP_URL = 'http.url',
-  HTTP_TARGET = 'http.target',
-  HTTP_USER_AGENT = 'http.user_agent',
-  HTTP_RESPONSE_CONTENT_LENGTH = 'http.response_content_length',
-}
+import { runTests } from './helper';
+import { GrpcInstrumentation } from '../src/grpc';
+
+const instrumentation = new GrpcInstrumentation();
+instrumentation.enable();
+instrumentation.disable();
+
+import * as grpc from 'grpc';
+
+describe('#grpc', () => {
+  runTests(instrumentation, 'grpc', grpc, 12345);
+});
