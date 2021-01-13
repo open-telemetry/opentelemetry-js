@@ -16,37 +16,78 @@
 
 import { LogLevel } from '../common/types';
 
-export type ENVIRONMENT_MAP = { [key: string]: string | number };
+const DEFAULT_LIST_SEPARATOR = ',';
 
 /**
  * Environment interface to define all names
  */
-export interface ENVIRONMENT {
-  OTEL_LOG_LEVEL?: LogLevel;
-  OTEL_NO_PATCH_MODULES?: string;
-  OTEL_SAMPLING_PROBABILITY?: number;
-  OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT?: number;
-  OTEL_SPAN_EVENT_COUNT_LIMIT?: number;
-  OTEL_SPAN_LINK_COUNT_LIMIT?: number;
-  OTEL_BSP_MAX_BATCH_SIZE?: number;
-  OTEL_BSP_SCHEDULE_DELAY_MILLIS?: number;
-}
 
-const ENVIRONMENT_NUMBERS: Partial<keyof ENVIRONMENT>[] = [
+const ENVIRONMENT_NUMBERS_KEYS = [
+  'OTEL_BSP_MAX_BATCH_SIZE',
+  'OTEL_BSP_SCHEDULE_DELAY_MILLIS',
   'OTEL_SAMPLING_PROBABILITY',
   'OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT',
   'OTEL_SPAN_EVENT_COUNT_LIMIT',
   'OTEL_SPAN_LINK_COUNT_LIMIT',
-  'OTEL_BSP_MAX_BATCH_SIZE',
-  'OTEL_BSP_SCHEDULE_DELAY_MILLIS',
-];
+] as const;
+
+type ENVIRONMENT_NUMBERS = {
+  [K in typeof ENVIRONMENT_NUMBERS_KEYS[number]]?: number;
+};
+
+function isEnvVarANumber(key: unknown): key is keyof ENVIRONMENT_NUMBERS {
+  return (
+    ENVIRONMENT_NUMBERS_KEYS.indexOf(key as keyof ENVIRONMENT_NUMBERS) > -1
+  );
+}
+
+const ENVIRONMENT_LISTS_KEYS = ['OTEL_NO_PATCH_MODULES'] as const;
+
+type ENVIRONMENT_LISTS = {
+  [K in typeof ENVIRONMENT_LISTS_KEYS[number]]?: string[];
+};
+
+function isEnvVarAList(key: unknown): key is keyof ENVIRONMENT_LISTS {
+  return ENVIRONMENT_LISTS_KEYS.indexOf(key as keyof ENVIRONMENT_LISTS) > -1;
+}
+
+export type ENVIRONMENT = {
+  CONTAINER_NAME?: string;
+  ECS_CONTAINER_METADATA_URI_V4?: string;
+  ECS_CONTAINER_METADATA_URI?: string;
+  HOSTNAME?: string;
+  KUBERNETES_SERVICE_HOST?: string;
+  NAMESPACE?: string;
+  OTEL_EXPORTER_JAEGER_AGENT_HOST?: string;
+  OTEL_EXPORTER_JAEGER_ENDPOINT?: string;
+  OTEL_EXPORTER_JAEGER_PASSWORD?: string;
+  OTEL_EXPORTER_JAEGER_USER?: string;
+  OTEL_LOG_LEVEL?: LogLevel;
+  OTEL_RESOURCE_ATTRIBUTES?: string;
+} & ENVIRONMENT_NUMBERS &
+  ENVIRONMENT_LISTS;
+
+export type RAW_ENVIRONMENT = {
+  [key: string]: string | number | undefined | string[];
+};
 
 /**
  * Default environment variables
  */
 export const DEFAULT_ENVIRONMENT: Required<ENVIRONMENT> = {
-  OTEL_NO_PATCH_MODULES: '',
+  CONTAINER_NAME: '',
+  ECS_CONTAINER_METADATA_URI_V4: '',
+  ECS_CONTAINER_METADATA_URI: '',
+  HOSTNAME: '',
+  KUBERNETES_SERVICE_HOST: '',
+  NAMESPACE: '',
+  OTEL_EXPORTER_JAEGER_AGENT_HOST: '',
+  OTEL_EXPORTER_JAEGER_ENDPOINT: '',
+  OTEL_EXPORTER_JAEGER_PASSWORD: '',
+  OTEL_EXPORTER_JAEGER_USER: '',
   OTEL_LOG_LEVEL: LogLevel.INFO,
+  OTEL_NO_PATCH_MODULES: [],
+  OTEL_RESOURCE_ATTRIBUTES: '',
   OTEL_SAMPLING_PROBABILITY: 1,
   OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT: 1000,
   OTEL_SPAN_EVENT_COUNT_LIMIT: 1000,
@@ -64,15 +105,14 @@ export const DEFAULT_ENVIRONMENT: Required<ENVIRONMENT> = {
  * @param max
  */
 function parseNumber(
-  name: keyof ENVIRONMENT,
-  environment: ENVIRONMENT_MAP | ENVIRONMENT,
-  values: ENVIRONMENT_MAP,
+  name: keyof ENVIRONMENT_NUMBERS,
+  environment: ENVIRONMENT,
+  values: RAW_ENVIRONMENT,
   min = -Infinity,
   max = Infinity
 ) {
   if (typeof values[name] !== 'undefined') {
     const value = Number(values[name] as string);
-
     if (!isNaN(value)) {
       if (value < min) {
         environment[name] = min;
@@ -86,6 +126,25 @@ function parseNumber(
 }
 
 /**
+ * Parses list-like strings from input into output.
+ * @param name
+ * @param environment
+ * @param values
+ * @param separator
+ */
+function parseStringList(
+  name: keyof ENVIRONMENT_LISTS,
+  output: ENVIRONMENT,
+  input: RAW_ENVIRONMENT,
+  separator = DEFAULT_LIST_SEPARATOR
+) {
+  const givenValue = input[name];
+  if (typeof givenValue === 'string') {
+    output[name] = givenValue.split(separator).map(v => v.trim());
+  }
+}
+
+/**
  * Environmentally sets log level if valid log level string is provided
  * @param key
  * @param environment
@@ -93,8 +152,8 @@ function parseNumber(
  */
 function setLogLevelFromEnv(
   key: keyof ENVIRONMENT,
-  environment: ENVIRONMENT_MAP | ENVIRONMENT,
-  values: ENVIRONMENT_MAP
+  environment: RAW_ENVIRONMENT | ENVIRONMENT,
+  values: RAW_ENVIRONMENT
 ) {
   const value = values[key];
   switch (typeof value === 'string' ? value.toUpperCase() : value) {
@@ -124,11 +183,12 @@ function setLogLevelFromEnv(
  * Parses environment values
  * @param values
  */
-export function parseEnvironment(values: ENVIRONMENT_MAP): ENVIRONMENT {
-  const environment: ENVIRONMENT_MAP = {};
+export function parseEnvironment(values: RAW_ENVIRONMENT): ENVIRONMENT {
+  const environment: ENVIRONMENT = {};
 
   for (const env in DEFAULT_ENVIRONMENT) {
     const key = env as keyof ENVIRONMENT;
+
     switch (key) {
       case 'OTEL_SAMPLING_PROBABILITY':
         parseNumber(key, environment, values, 0, 1);
@@ -139,11 +199,14 @@ export function parseEnvironment(values: ENVIRONMENT_MAP): ENVIRONMENT {
         break;
 
       default:
-        if (ENVIRONMENT_NUMBERS.indexOf(key) >= 0) {
+        if (isEnvVarANumber(key)) {
           parseNumber(key, environment, values);
+        } else if (isEnvVarAList(key)) {
+          parseStringList(key, environment, values);
         } else {
-          if (typeof values[key] !== 'undefined') {
-            environment[key] = values[key];
+          const value = values[key];
+          if (typeof value !== 'undefined' && value !== null) {
+            environment[key] = String(value);
           }
         }
     }

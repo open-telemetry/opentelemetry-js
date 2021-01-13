@@ -15,6 +15,8 @@
  */
 import * as api from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
+import { isWrapped } from '@opentelemetry/instrumentation';
+
 import {
   B3Propagator,
   B3InjectEncoding,
@@ -30,8 +32,9 @@ import {
 } from '@opentelemetry/web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { FetchPlugin, FetchPluginConfig } from '../src';
+import { FetchInstrumentation, FetchInstrumentationConfig } from '../src';
 import { AttributeNames } from '../src/enums/AttributeNames';
+import { HttpAttribute } from '@opentelemetry/semantic-conventions';
 
 class DummySpanExporter implements tracing.SpanExporter {
   export(spans: any) {}
@@ -104,7 +107,7 @@ describe('fetch', () => {
   let clearResourceTimingsSpy: any;
   let rootSpan: api.Span;
   let fakeNow = 0;
-  let fetchPlugin: FetchPlugin;
+  let fetchInstrumentation: FetchInstrumentation;
 
   const url = 'http://localhost:8090/get';
   const badUrl = 'http://foo.bar.com/get';
@@ -117,7 +120,7 @@ describe('fetch', () => {
   const prepareData = (
     done: any,
     fileUrl: string,
-    config: FetchPluginConfig,
+    config: FetchInstrumentationConfig,
     method?: string
   ) => {
     sandbox = sinon.createSandbox();
@@ -164,10 +167,10 @@ describe('fetch', () => {
 
     const spyEntries = sandbox.stub(performance, 'getEntriesByType');
     spyEntries.withArgs('resource').returns(resources);
-    fetchPlugin = new FetchPlugin(config);
+    fetchInstrumentation = new FetchInstrumentation(config);
     webTracerProviderWithZone = new WebTracerProvider({
       logLevel: core.LogLevel.ERROR,
-      plugins: [fetchPlugin],
+      plugins: [fetchInstrumentation],
     });
     webTracerWithZone = webTracerProviderWithZone.getTracer('fetch-test');
     dummySpanExporter = new DummySpanExporter();
@@ -243,15 +246,15 @@ describe('fetch', () => {
     });
 
     it('should wrap methods', () => {
-      assert.ok(core.isWrapped(window.fetch));
-      fetchPlugin.patch();
-      assert.ok(core.isWrapped(window.fetch));
+      assert.ok(isWrapped(window.fetch));
+      fetchInstrumentation.enable();
+      assert.ok(isWrapped(window.fetch));
     });
 
     it('should unwrap methods', () => {
-      assert.ok(core.isWrapped(window.fetch));
-      fetchPlugin.unpatch();
-      assert.ok(!core.isWrapped(window.fetch));
+      assert.ok(isWrapped(window.fetch));
+      fetchInstrumentation.disable();
+      assert.ok(!isWrapped(window.fetch));
     });
 
     it('should create a span with correct root span', () => {
@@ -285,37 +288,37 @@ describe('fetch', () => {
       assert.strictEqual(
         attributes[keys[1]],
         'GET',
-        `attributes ${AttributeNames.HTTP_METHOD} is wrong`
+        `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
       );
       assert.strictEqual(
         attributes[keys[2]],
         url,
-        `attributes ${AttributeNames.HTTP_URL} is wrong`
+        `attributes ${HttpAttribute.HTTP_URL} is wrong`
       );
       assert.strictEqual(
         attributes[keys[3]],
         200,
-        `attributes ${AttributeNames.HTTP_STATUS_CODE} is wrong`
+        `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
       );
       assert.ok(
         attributes[keys[4]] === 'OK' || attributes[keys[4]] === '',
-        `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
+        `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
       );
       assert.ok(
         (attributes[keys[5]] as string).indexOf('localhost') === 0,
-        `attributes ${AttributeNames.HTTP_HOST} is wrong`
+        `attributes ${HttpAttribute.HTTP_HOST} is wrong`
       );
       assert.ok(
         attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
-        `attributes ${AttributeNames.HTTP_SCHEME} is wrong`
+        `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
       );
       assert.ok(
         attributes[keys[7]] !== '',
-        `attributes ${AttributeNames.HTTP_USER_AGENT} is not defined`
+        `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
       );
       assert.ok(
         (attributes[keys[8]] as number) > 0,
-        `attributes ${AttributeNames.HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
+        `attributes ${HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
       );
 
       assert.strictEqual(keys.length, 9, 'number of attributes is wrong');
