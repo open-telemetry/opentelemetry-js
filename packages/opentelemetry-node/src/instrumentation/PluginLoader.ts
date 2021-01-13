@@ -16,6 +16,7 @@
 
 import { Logger, TracerProvider } from '@opentelemetry/api';
 import { Plugin, PluginConfig } from '@opentelemetry/core';
+import { getEnv } from '@opentelemetry/core';
 import * as hook from 'require-in-the-middle';
 import * as utils from './utils';
 
@@ -25,12 +26,6 @@ export enum HookState {
   ENABLED,
   DISABLED,
 }
-
-/**
- * Environment variable which will contain list of modules to not load corresponding plugins for
- * e.g.OTEL_NO_PATCH_MODULES=pg,https,mongodb
- */
-export const ENV_PLUGIN_DISABLED_LIST = 'OTEL_NO_PATCH_MODULES';
 
 /**
  * Wildcard symbol. If ignore list is set to this, disable all plugins
@@ -51,18 +46,6 @@ function filterPlugins(plugins: Plugins): Plugins {
     if (plugins[key].enabled && plugins[key].path) acc[key] = plugins[key];
     return acc;
   }, {});
-}
-
-/**
- * Parse process.env[ENV_PLUGIN_DISABLED_LIST] for a list of modules
- * not to load corresponding plugins for.
- */
-function getIgnoreList(): string[] | typeof DISABLE_ALL_PLUGINS {
-  const envIgnoreList: string = process.env[ENV_PLUGIN_DISABLED_LIST] || '';
-  if (envIgnoreList === DISABLE_ALL_PLUGINS) {
-    return envIgnoreList;
-  }
-  return envIgnoreList.split(',').map(v => v.trim());
 }
 
 /**
@@ -93,7 +76,7 @@ export class PluginLoader {
     if (this._hookState === HookState.UNINITIALIZED) {
       const pluginsToLoad = filterPlugins(plugins);
       const modulesToHook = Object.keys(pluginsToLoad);
-      const modulesToIgnore = getIgnoreList();
+      const modulesToIgnore = getEnv().OTEL_NO_PATCH_MODULES;
       // Do not hook require when no module is provided. In this case it is
       // not necessary. With skipping this step we lower our footprint in
       // customer applications and require-in-the-middle won't show up in CPU
@@ -137,16 +120,20 @@ export class PluginLoader {
         }
 
         // Skip loading of all modules if '*' is provided
-        if (modulesToIgnore === DISABLE_ALL_PLUGINS) {
+        if (modulesToIgnore[0] === DISABLE_ALL_PLUGINS) {
           this.logger.info(
-            `PluginLoader#load: skipped patching module ${name} because all plugins are disabled (${ENV_PLUGIN_DISABLED_LIST})`
+            `PluginLoader#load: skipped patching module ${name} because all plugins are disabled (${modulesToIgnore.join(
+              ','
+            )})`
           );
           return exports;
         }
 
         if (modulesToIgnore.includes(name)) {
           this.logger.info(
-            `PluginLoader#load: skipped patching module ${name} because it was on the ignore list (${ENV_PLUGIN_DISABLED_LIST})`
+            `PluginLoader#load: skipped patching module ${name} because it was on the ignore list (${modulesToIgnore.join(
+              ','
+            )})`
           );
           return exports;
         }
