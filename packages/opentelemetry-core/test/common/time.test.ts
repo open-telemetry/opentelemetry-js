@@ -109,9 +109,9 @@ describe('time', () => {
 
   describe('#timeInputToHrTime', () => {
     it('should convert Date hrTime', () => {
-      const timeInput = new Date();
+      const timeInput = new Date(1609297640313);
       const output = timeInputToHrTime(timeInput);
-      assert.deepStrictEqual(output, [timeInput.getTime(), 0]);
+      assert.deepStrictEqual(output, [1609297640, 312999964]);
     });
 
     it('should convert epoch milliseconds hrTime', () => {
