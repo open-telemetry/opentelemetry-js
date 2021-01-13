@@ -96,6 +96,16 @@ export class PropagationAPI {
     return this._getGlobalPropagator().extract(context, carrier, getter);
   }
 
+  /**
+   * Return a list of all fields which may be used by the propagator.
+   *
+   * This list should be used to clear fields before calling inject if a carrier is
+   * used more than once.
+   */
+  public fields(): string[] {
+    return this._getGlobalPropagator().fields();
+  }
+
   /** Remove the global propagator */
   public disable() {
     delete _global[GLOBAL_PROPAGATION_API_KEY];
