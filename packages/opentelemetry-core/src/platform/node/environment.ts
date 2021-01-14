@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
+import * as os from 'os';
 import {
   DEFAULT_ENVIRONMENT,
   ENVIRONMENT,
-  ENVIRONMENT_MAP,
+  RAW_ENVIRONMENT,
   parseEnvironment,
 } from '../../utils/environment';
 
@@ -25,6 +26,12 @@ import {
  * Gets the environment variables
  */
 export function getEnv(): Required<ENVIRONMENT> {
-  const processEnv = parseEnvironment(process.env as ENVIRONMENT_MAP);
-  return Object.assign({}, DEFAULT_ENVIRONMENT, processEnv);
+  const processEnv = parseEnvironment(process.env as RAW_ENVIRONMENT);
+  return Object.assign(
+    {
+      HOSTNAME: os.hostname(),
+    },
+    DEFAULT_ENVIRONMENT,
+    processEnv
+  );
 }

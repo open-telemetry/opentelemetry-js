@@ -17,7 +17,7 @@
 import {
   DEFAULT_ENVIRONMENT,
   ENVIRONMENT,
-  ENVIRONMENT_MAP,
+  RAW_ENVIRONMENT,
   parseEnvironment,
 } from '../../utils/environment';
 
@@ -25,7 +25,7 @@ import {
  * Gets the environment variables
  */
 export function getEnv(): Required<ENVIRONMENT> {
-  const _window = window as typeof window & ENVIRONMENT_MAP;
+  const _window = window as typeof window & RAW_ENVIRONMENT;
   const globalEnv = parseEnvironment(_window);
   return Object.assign({}, DEFAULT_ENVIRONMENT, globalEnv);
 }
