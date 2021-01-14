@@ -23,6 +23,7 @@ import {
 import * as util from 'util';
 import * as fs from 'fs';
 import * as os from 'os';
+import { getEnv } from '@opentelemetry/core';
 
 /**
  * The AwsEcsDetector can be used to detect if a process is running in AWS
@@ -35,10 +36,8 @@ export class AwsEcsDetector implements Detector {
   private static readFileAsync = util.promisify(fs.readFile);
 
   async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
-    if (
-      !process.env.ECS_CONTAINER_METADATA_URI_V4 &&
-      !process.env.ECS_CONTAINER_METADATA_URI
-    ) {
+    const env = getEnv();
+    if (!env.ECS_CONTAINER_METADATA_URI_V4 && !env.ECS_CONTAINER_METADATA_URI) {
       config.logger.debug('AwsEcsDetector failed: Process is not on ECS');
       return Resource.empty();
     }
