@@ -81,7 +81,6 @@
     "@opentelemetry/core": "^0.14.0",
     "@opentelemetry/metrics": "^0.14.0",
     "@opentelemetry/resources": "^0.14.0",
-    "@opentelemetry/tracing": "^0.14.0",
-    "axios": "^0.21.0"
+    "@opentelemetry/tracing": "^0.14.0"
   }
 }
