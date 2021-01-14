@@ -134,6 +134,7 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 - [Matthew Wear](https://github.com/mwear), LightStep
 - [Naseem K. Ullah](https://github.com/naseemkullah), Transit
 - [Chengzhong Wu](https://github.com/legendecas), Alibaba
+- [Gerhard Stöbich](https://github.com/Flarna), Dynatrace
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver).*
 
