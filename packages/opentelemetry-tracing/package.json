@@ -48,6 +48,7 @@
     "access": "public"
   },
   "devDependencies": {
+    "@types/lodash.merge": "^4.6.6",
     "@types/mocha": "8.2.0",
     "@types/node": "14.14.20",
     "@types/sinon": "9.0.10",
@@ -76,6 +77,7 @@
     "@opentelemetry/context-base": "^0.14.0",
     "@opentelemetry/core": "^0.14.0",
     "@opentelemetry/resources": "^0.14.0",
-    "@opentelemetry/semantic-conventions": "^0.14.0"
+    "@opentelemetry/semantic-conventions": "^0.14.0",
+    "lodash.merge": "^4.6.2"
   }
 }

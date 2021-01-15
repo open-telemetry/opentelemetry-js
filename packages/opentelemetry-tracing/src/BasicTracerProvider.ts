@@ -16,18 +16,18 @@
 
 import * as api from '@opentelemetry/api';
 import {
-  ConsoleLogger,
-  HttpTraceContext,
-  HttpBaggage,
   CompositePropagator,
+  ConsoleLogger,
+  HttpBaggage,
+  HttpTraceContext,
 } from '@opentelemetry/core';
+import { Resource } from '@opentelemetry/resources';
 import { SpanProcessor, Tracer } from '.';
 import { DEFAULT_CONFIG } from './config';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
 import { NoopSpanProcessor } from './NoopSpanProcessor';
 import { SDKRegistrationConfig, TracerConfig } from './types';
-import { Resource } from '@opentelemetry/resources';
-
+import merge = require('lodash.merge');
 /**
  * This class represents a basic tracer provider which platform libraries can extend
  */
@@ -40,10 +40,13 @@ export class BasicTracerProvider implements api.TracerProvider {
   readonly logger: api.Logger;
   readonly resource: Resource;
 
-  constructor(config: TracerConfig = DEFAULT_CONFIG) {
-    this.logger = config.logger ?? new ConsoleLogger(config.logLevel);
-    this.resource = config.resource ?? Resource.createTelemetrySDKResource();
-    this._config = Object.assign({}, config, {
+  constructor(config: TracerConfig = {}) {
+    const mergedConfig = merge({}, DEFAULT_CONFIG, config);
+    this.logger =
+      mergedConfig.logger ?? new ConsoleLogger(mergedConfig.logLevel);
+    this.resource =
+      mergedConfig.resource ?? Resource.createTelemetrySDKResource();
+    this._config = Object.assign({}, mergedConfig, {
       logger: this.logger,
       resource: this.resource,
     });
