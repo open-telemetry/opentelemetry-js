@@ -48,7 +48,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@types/lodash.merge": "^4.6.6",
+    "@types/lodash.merge": "4.6.6",
     "@types/mocha": "8.2.0",
     "@types/node": "14.14.20",
     "@types/sinon": "9.0.10",
