@@ -19,7 +19,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
       - name: Install Root Dependencies
-        run: npm install --ignore-scripts
+        run: npm ci --ignore-scripts
       - name: Boostrap Dependencies
         run: npx lerna bootstrap
       - name: Build
@@ -41,7 +41,7 @@ jobs:
       - name: Permission Setup
         run: sudo chmod -R 777 /github /__w
       - name: Install Root Dependencies
-        run: npm install --ignore-scripts
+        run: npm ci --ignore-scripts
       - name: Boostrap Dependencies
         run: npx lerna bootstrap
       - name: Build
