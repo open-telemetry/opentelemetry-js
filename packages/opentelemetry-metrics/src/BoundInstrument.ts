@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import { Logger } from '@opentelemetry/api';
+import * as api from '@opentelemetry/api-metrics';
 import { Aggregator } from './export/types';
 
 /**
@@ -23,11 +24,11 @@ import { Aggregator } from './export/types';
  */
 export class BaseBoundInstrument {
   protected _labels: api.Labels;
-  protected _logger: api.Logger;
+  protected _logger: Logger;
 
   constructor(
     labels: api.Labels,
-    logger: api.Logger,
+    logger: Logger,
     private readonly _disabled: boolean,
     private readonly _valueType: api.ValueType,
     private readonly _aggregator: Aggregator
@@ -79,7 +80,7 @@ export class BoundCounter
     labels: api.Labels,
     disabled: boolean,
     valueType: api.ValueType,
-    logger: api.Logger,
+    logger: Logger,
     aggregator: Aggregator
   ) {
     super(labels, logger, disabled, valueType, aggregator);
@@ -109,7 +110,7 @@ export class BoundUpDownCounter
     labels: api.Labels,
     disabled: boolean,
     valueType: api.ValueType,
-    logger: api.Logger,
+    logger: Logger,
     aggregator: Aggregator
   ) {
     super(labels, logger, disabled, valueType, aggregator);
@@ -130,7 +131,7 @@ export class BoundValueRecorder
     labels: api.Labels,
     disabled: boolean,
     valueType: api.ValueType,
-    logger: api.Logger,
+    logger: Logger,
     aggregator: Aggregator
   ) {
     super(labels, logger, disabled, valueType, aggregator);
@@ -151,7 +152,7 @@ export class BoundObserver
     labels: api.Labels,
     disabled: boolean,
     valueType: api.ValueType,
-    logger: api.Logger,
+    logger: Logger,
     aggregator: Aggregator
   ) {
     super(labels, logger, disabled, valueType, aggregator);

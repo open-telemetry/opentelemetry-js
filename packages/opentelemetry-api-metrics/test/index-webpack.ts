@@ -13,19 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+const testsContext = require.context('.', true, /test$/);
+testsContext.keys().forEach(testsContext);
 
-import { Meter } from './Meter';
-import { MeterProvider } from './MeterProvider';
-import { NOOP_METER } from './NoopMeter';
-
-/**
- * An implementation of the {@link MeterProvider} which returns an impotent Meter
- * for all calls to `getMeter`
- */
-export class NoopMeterProvider implements MeterProvider {
-  getMeter(_name?: string, _version?: string): Meter {
-    return NOOP_METER;
-  }
-}
-
-export const NOOP_METER_PROVIDER = new NoopMeterProvider();
+const srcContext = require.context('.', true, /src$/);
+srcContext.keys().forEach(srcContext);

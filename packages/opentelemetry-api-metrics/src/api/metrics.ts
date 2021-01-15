@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { Meter } from '../metrics/Meter';
-import { MeterProvider } from '../metrics/MeterProvider';
-import { NOOP_METER_PROVIDER } from '../metrics/NoopMeterProvider';
+import { Meter } from '../types/Meter';
+import { MeterProvider } from '../types/MeterProvider';
+import { NOOP_METER_PROVIDER } from '../NoopMeterProvider';
 import {
   API_BACKWARDS_COMPATIBILITY_VERSION,
   GLOBAL_METRICS_API_KEY,

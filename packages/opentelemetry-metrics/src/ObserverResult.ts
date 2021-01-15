@@ -17,7 +17,7 @@
 import {
   ObserverResult as TypeObserverResult,
   Labels,
-} from '@opentelemetry/api';
+} from '@opentelemetry/api-metrics';
 
 /**
  * Implementation of {@link TypeObserverResult}

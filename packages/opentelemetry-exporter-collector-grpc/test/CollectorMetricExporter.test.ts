@@ -15,27 +15,30 @@
  */
 
 import * as protoLoader from '@grpc/proto-loader';
+import {
+  Counter,
+  ValueObserver,
+  ValueRecorder,
+} from '@opentelemetry/api-metrics';
+import { ConsoleLogger, LogLevel } from '@opentelemetry/core';
+import { collectorTypes } from '@opentelemetry/exporter-collector';
+import * as metrics from '@opentelemetry/metrics';
+import * as assert from 'assert';
+import * as fs from 'fs';
 import * as grpc from 'grpc';
 import * as path from 'path';
-import * as fs from 'fs';
-
-import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { collectorTypes } from '@opentelemetry/exporter-collector';
 import { CollectorMetricExporter } from '../src';
 import {
-  mockCounter,
-  mockObserver,
   ensureExportedCounterIsCorrect,
   ensureExportedObserverIsCorrect,
+  ensureExportedValueRecorderIsCorrect,
   ensureMetadataIsCorrect,
   ensureResourceIsCorrect,
-  ensureExportedValueRecorderIsCorrect,
+  mockCounter,
+  mockObserver,
   mockValueRecorder,
 } from './helper';
-import { ConsoleLogger, LogLevel } from '@opentelemetry/core';
-import * as api from '@opentelemetry/api';
-import * as metrics from '@opentelemetry/metrics';
 
 const metricsServiceProtoPath =
   'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
@@ -136,14 +139,14 @@ const testCollectorMetricExporter = (params: TestParams) =>
       });
       metrics = [];
       const counter: metrics.Metric<metrics.BoundCounter> &
-        api.Counter = mockCounter();
+        Counter = mockCounter();
       const observer: metrics.Metric<metrics.BoundObserver> &
-        api.ValueObserver = mockObserver(observerResult => {
+        ValueObserver = mockObserver(observerResult => {
         observerResult.observe(3, {});
         observerResult.observe(6, {});
       });
       const recorder: metrics.Metric<metrics.BoundValueRecorder> &
-        api.ValueRecorder = mockValueRecorder();
+        ValueRecorder = mockValueRecorder();
 
       counter.add(1);
       recorder.record(7);

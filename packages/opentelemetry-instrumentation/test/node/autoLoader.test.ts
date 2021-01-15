@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { NOOP_METER_PROVIDER, NOOP_TRACER_PROVIDER } from '@opentelemetry/api';
+import { NOOP_TRACER_PROVIDER } from '@opentelemetry/api';
+import { NOOP_METER_PROVIDER } from '@opentelemetry/api-metrics';
 import * as assert from 'assert';
 import * as path from 'path';
 import * as sinon from 'sinon';
-
 import { registerInstrumentations } from '../../src';
 import {
   Plugins,
