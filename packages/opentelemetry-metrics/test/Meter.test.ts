@@ -154,7 +154,7 @@ describe('Meter', () => {
       const [record] = await counter.getMetricRecord();
       const { name, version } = record.instrumentationLibrary;
       assert.strictEqual(name, 'test-meter');
-      assert.strictEqual(version, '*');
+      assert.strictEqual(version, undefined);
     });
 
     describe('.bind()', () => {
@@ -607,7 +607,7 @@ describe('Meter', () => {
       const [record] = await valueRecorder.getMetricRecord();
       const { name, version } = record.instrumentationLibrary;
       assert.strictEqual(name, 'test-meter');
-      assert.strictEqual(version, '*');
+      assert.strictEqual(version, undefined);
     });
 
     describe('names', () => {
@@ -1297,7 +1297,7 @@ describe('Meter', () => {
       const [record] = await observer.getMetricRecord();
       const { name, version } = record.instrumentationLibrary;
       assert.strictEqual(name, 'test-meter');
-      assert.strictEqual(version, '*');
+      assert.strictEqual(version, undefined);
     });
   });
 
