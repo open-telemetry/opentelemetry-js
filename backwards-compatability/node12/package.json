@@ -12,7 +12,7 @@
     "@opentelemetry/tracing": "^0.14.0"
   },
   "devDependencies": {
-    "@types/node": "12.19.8",
+    "@types/node": "12.19.13",
     "typescript": "3.9.7"
   },
   "author": "OpenTelemetry Authors",

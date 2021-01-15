@@ -96,6 +96,13 @@ export class PropagationAPI {
     return this._getGlobalPropagator().extract(context, carrier, getter);
   }
 
+  /**
+   * Return a list of all fields which may be used by the propagator.
+   */
+  public fields(): string[] {
+    return this._getGlobalPropagator().fields();
+  }
+
   /** Remove the global propagator */
   public disable() {
     delete _global[GLOBAL_PROPAGATION_API_KEY];
