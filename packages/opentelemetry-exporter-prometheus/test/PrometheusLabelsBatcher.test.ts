@@ -21,7 +21,7 @@ import {
   MeterProvider,
   Meter,
 } from '@opentelemetry/metrics';
-import { Labels } from '@opentelemetry/api';
+import { Labels } from '@opentelemetry/api-metrics';
 
 describe('PrometheusBatcher', () => {
   let meter: Meter;

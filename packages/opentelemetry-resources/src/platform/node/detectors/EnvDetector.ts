@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { getEnv } from '@opentelemetry/core';
 import {
   Detector,
   Resource,
@@ -54,7 +55,7 @@ class EnvDetector implements Detector {
    */
   async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
     try {
-      const rawAttributes = process.env.OTEL_RESOURCE_ATTRIBUTES;
+      const rawAttributes = getEnv().OTEL_RESOURCE_ATTRIBUTES;
       if (!rawAttributes) {
         config.logger.debug(
           'EnvDetector failed: Environment variable "OTEL_RESOURCE_ATTRIBUTES" is missing.'

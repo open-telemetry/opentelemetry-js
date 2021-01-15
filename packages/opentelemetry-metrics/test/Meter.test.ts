@@ -14,36 +14,36 @@
  * limitations under the License.
  */
 
+import { NoopLogger } from '@opentelemetry/api';
+import * as api from '@opentelemetry/api-metrics';
+import { hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
+import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
-  Meter,
-  Metric,
-  CounterMetric,
-  MetricKind,
-  Sum,
-  MeterProvider,
-  ValueRecorderMetric,
-  ValueObserverMetric,
-  MetricRecord,
   Aggregator,
-  MetricDescriptor,
-  UpDownCounterMetric,
-  LastValueAggregator,
-  LastValue,
+  CounterMetric,
   Histogram,
+  LastValue,
+  LastValueAggregator,
+  Meter,
+  MeterProvider,
+  Metric,
+  MetricDescriptor,
+  MetricKind,
+  MetricRecord,
+  Sum,
+  UpDownCounterMetric,
+  ValueObserverMetric,
+  ValueRecorderMetric,
 } from '../src';
-import * as api from '@opentelemetry/api';
-import { hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
+import { BatchObserver } from '../src/BatchObserver';
 import { BatchObserverResult } from '../src/BatchObserverResult';
 import { SumAggregator } from '../src/export/aggregators';
+import { Processor } from '../src/export/Processor';
 import { SumObserverMetric } from '../src/SumObserverMetric';
-import { Resource } from '@opentelemetry/resources';
 import { UpDownSumObserverMetric } from '../src/UpDownSumObserverMetric';
 import { hashLabels } from '../src/Utils';
-import { Processor } from '../src/export/Processor';
-import { ValueType } from '@opentelemetry/api';
-import { BatchObserver } from '../src/BatchObserver';
 
 const nonNumberValues = [
   // type undefined
@@ -81,7 +81,7 @@ describe('Meter', () => {
 
   beforeEach(() => {
     meter = new MeterProvider({
-      logger: new api.NoopLogger(),
+      logger: new NoopLogger(),
     }).getMeter('test-meter');
   });
 
@@ -408,7 +408,7 @@ describe('Meter', () => {
 
       it('should truncate non-integer values for INT valueType', async () => {
         const upDownCounter = meter.createUpDownCounter('name', {
-          valueType: ValueType.INT,
+          valueType: api.ValueType.INT,
         });
         const boundCounter = upDownCounter.bind(labels);
 
@@ -422,7 +422,7 @@ describe('Meter', () => {
 
       it('should ignore non-number values for INT valueType', async () => {
         const upDownCounter = meter.createUpDownCounter('name', {
-          valueType: ValueType.DOUBLE,
+          valueType: api.ValueType.DOUBLE,
         });
         const boundCounter = upDownCounter.bind(labels);
 
@@ -440,7 +440,7 @@ describe('Meter', () => {
 
       it('should ignore non-number values for DOUBLE valueType', async () => {
         const upDownCounter = meter.createUpDownCounter('name', {
-          valueType: ValueType.DOUBLE,
+          valueType: api.ValueType.DOUBLE,
         });
         const boundCounter = upDownCounter.bind(labels);
 

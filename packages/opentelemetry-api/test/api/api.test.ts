@@ -25,7 +25,6 @@ import api, {
   context,
   trace,
   propagation,
-  metrics,
   TextMapPropagator,
   Context,
   TextMapSetter,
@@ -54,7 +53,6 @@ describe('API', () => {
       context.disable();
       trace.disable();
       propagation.disable();
-      metrics.disable();
     });
 
     it('should use the global tracer provider', () => {
@@ -149,6 +147,13 @@ describe('API', () => {
         assert.strictEqual(data.context, ROOT_CONTEXT);
         assert.strictEqual(data.carrier, carrier);
         assert.strictEqual(data.getter, getter);
+      });
+
+      it('fields', () => {
+        api.propagation.setGlobalPropagator(new TestTextMapPropagation());
+
+        const fields = api.propagation.fields();
+        assert.deepStrictEqual(fields, ['TestField']);
       });
     });
   });
