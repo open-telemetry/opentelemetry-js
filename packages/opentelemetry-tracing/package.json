@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/tracing",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "OpenTelemetry Tracing",
   "main": "build/src/index.js",
   "browser": {
@@ -73,11 +73,11 @@
     "webpack": "4.46.0"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.14.0",
-    "@opentelemetry/context-base": "^0.14.0",
-    "@opentelemetry/core": "^0.14.0",
-    "@opentelemetry/resources": "^0.14.0",
-    "@opentelemetry/semantic-conventions": "^0.14.0",
+    "@opentelemetry/api": "^0.15.0",
+    "@opentelemetry/context-base": "^0.15.0",
+    "@opentelemetry/core": "^0.15.0",
+    "@opentelemetry/resources": "^0.15.0",
+    "@opentelemetry/semantic-conventions": "^0.15.0",
     "lodash.merge": "^4.6.2"
   }
 }
