@@ -42,7 +42,6 @@ describe('Global Utils', () => {
     api1.context.disable();
     api1.propagation.disable();
     api1.trace.disable();
-    api1.metrics.disable();
   });
 
   it('should change the global context manager', () => {
