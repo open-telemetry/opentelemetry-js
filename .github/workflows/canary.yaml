@@ -37,7 +37,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           npm install --ignore-scripts
-          npx lerna bootstrap --no-ci
+          npx lerna bootstrap
 
       - name: Publish
         run: npx lerna publish --canary --yes

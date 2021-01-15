@@ -15,7 +15,7 @@ jobs:
       - name: Install
         run: |
           npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --scope=propagation-validation-server --include-dependencies
+          npx lerna bootstrap --scope=propagation-validation-server --include-dependencies
       
       - name: Build 🔧
         run: npm run compile 

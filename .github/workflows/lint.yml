@@ -41,7 +41,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           npm install --only=dev --ignore-scripts
-          npx lerna bootstrap --no-ci --ignore-scripts -- --only=dev
+          npx lerna bootstrap --ignore-scripts -- --only=dev
 
       - name: Lint
         run: |
@@ -51,7 +51,7 @@ jobs:
       - name: Install API Dependencies
         run: |
           npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --scope @opentelemetry/api --include-dependencies
+          npx lerna bootstrap --scope @opentelemetry/api --include-dependencies
 
       - name: Build 🔧
         run: |

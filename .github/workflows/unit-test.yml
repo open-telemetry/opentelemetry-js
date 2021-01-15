@@ -29,7 +29,7 @@ jobs:
       - name: Install Root Dependencies
         run: npm install --ignore-scripts
       - name: Boostrap Dependencies
-        run: npx lerna bootstrap --no-ci
+        run: npx lerna bootstrap
       - name: Build
         run: npm run compile
       - name: Unit tests
@@ -59,7 +59,7 @@ jobs:
       - name: Install Root Dependencies
         run: npm install --ignore-scripts
       - name: Boostrap Dependencies
-        run: npx lerna bootstrap --no-ci
+        run: npx lerna bootstrap
       - name: Build
         run: npm run compile
       - name: Unit tests
