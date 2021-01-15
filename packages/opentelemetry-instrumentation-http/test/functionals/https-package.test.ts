@@ -68,12 +68,12 @@ describe('Packages', () => {
     });
     provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     instrumentation.setTracerProvider(provider);
-    propagation.setGlobalPropagator(new DummyPropagation());
     beforeEach(() => {
       memoryExporter.reset();
     });
 
     before(() => {
+      propagation.setGlobalPropagator(new DummyPropagation());
       instrumentation.setConfig({
         applyCustomAttributesOnSpan: customAttributeFunction,
       });
@@ -84,6 +84,7 @@ describe('Packages', () => {
       // back to normal
       nock.cleanAll();
       nock.enableNetConnect();
+      propagation.disable();
     });
 
     let resHeaders: http.IncomingHttpHeaders;

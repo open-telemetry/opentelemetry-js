@@ -100,11 +100,16 @@ describe('HttpInstrumentation Integration tests', () => {
 
   beforeEach(() => {
     memoryExporter.reset();
+  });
+
+  before(() => {
+    propagation.setGlobalPropagator(new DummyPropagation());
     context.setGlobalContextManager(new AsyncHooksContextManager().enable());
   });
 
-  afterEach(() => {
+  after(() => {
     context.disable();
+    propagation.disable();
   });
   describe('enable()', () => {
     before(function (done) {
@@ -127,7 +132,6 @@ describe('HttpInstrumentation Integration tests', () => {
     const provider = new NodeTracerProvider({
       logger,
     });
-    propagation.setGlobalPropagator(new DummyPropagation());
     provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     instrumentation.setTracerProvider(provider);
     beforeEach(() => {
