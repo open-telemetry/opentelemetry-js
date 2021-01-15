@@ -2,8 +2,7 @@ name: Deploy Canary Release
 
 on:
   push:
-    branches:
-      - master
+    branches: [master, main]
 
 jobs:
   build-and-test:
