@@ -40,15 +40,16 @@
     "access": "public"
   },
   "devDependencies": {
+    "@types/lodash.merge": "4.6.6",
     "@types/mocha": "8.2.0",
-    "@types/node": "14.14.12",
-    "@types/sinon": "9.0.9",
+    "@types/node": "14.14.20",
+    "@types/sinon": "9.0.10",
     "codecov": "3.8.1",
     "gts": "2.0.2",
     "mocha": "7.2.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "sinon": "9.2.2",
+    "sinon": "9.2.3",
     "ts-mocha": "8.0.0",
     "ts-node": "9.1.1",
     "typescript": "3.9.7"
@@ -57,6 +58,7 @@
     "@opentelemetry/api": "^0.14.0",
     "@opentelemetry/api-metrics": "^0.14.0",
     "@opentelemetry/core": "^0.14.0",
-    "@opentelemetry/resources": "^0.14.0"
+    "@opentelemetry/resources": "^0.14.0",
+    "lodash.merge": "^4.6.2"
   }
 }

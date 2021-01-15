@@ -20,6 +20,7 @@ import { ConsoleLogger } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { Meter } from '.';
 import { DEFAULT_CONFIG, MeterConfig } from './types';
+import merge = require('lodash.merge');
 
 /**
  * This class represents a meter provider which platform libraries can extend
@@ -32,10 +33,13 @@ export class MeterProvider implements api.MeterProvider {
   readonly resource: Resource;
   readonly logger: Logger;
 
-  constructor(config: MeterConfig = DEFAULT_CONFIG) {
-    this.logger = config.logger ?? new ConsoleLogger(config.logLevel);
-    this.resource = config.resource ?? Resource.createTelemetrySDKResource();
-    this._config = Object.assign({}, config, {
+  constructor(config: MeterConfig = {}) {
+    const mergedConfig = merge({}, DEFAULT_CONFIG, config);
+    this.logger =
+      mergedConfig.logger ?? new ConsoleLogger(mergedConfig.logLevel);
+    this.resource =
+      mergedConfig.resource ?? Resource.createTelemetrySDKResource();
+    this._config = Object.assign({}, mergedConfig, {
       logger: this.logger,
       resource: this.resource,
     });

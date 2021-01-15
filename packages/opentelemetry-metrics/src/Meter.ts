@@ -31,6 +31,7 @@ import { UpDownCounterMetric } from './UpDownCounterMetric';
 import { UpDownSumObserverMetric } from './UpDownSumObserverMetric';
 import { ValueObserverMetric } from './ValueObserverMetric';
 import { ValueRecorderMetric } from './ValueRecorderMetric';
+import merge = require('lodash.merge');
 
 /**
  * Meter is an implementation of the {@link Meter} interface.
@@ -51,15 +52,17 @@ export class Meter implements api.Meter {
    */
   constructor(
     instrumentationLibrary: InstrumentationLibrary,
-    config: MeterConfig = DEFAULT_CONFIG
+    config: MeterConfig = {}
   ) {
-    this._logger = config.logger || new ConsoleLogger(config.logLevel);
-    this._processor = config.processor ?? new UngroupedProcessor();
-    this._resource = config.resource || Resource.createTelemetrySDKResource();
+    const mergedConfig = merge({}, DEFAULT_CONFIG, config);
+    this._logger = mergedConfig.logger || new ConsoleLogger(config.logLevel);
+    this._processor = mergedConfig.processor ?? new UngroupedProcessor();
+    this._resource =
+      mergedConfig.resource || Resource.createTelemetrySDKResource();
     this._instrumentationLibrary = instrumentationLibrary;
     // start the push controller
-    const exporter = config.exporter || new NoopExporter();
-    const interval = config.interval;
+    const exporter = mergedConfig.exporter || new NoopExporter();
+    const interval = mergedConfig.interval;
     this._controller = new PushController(this, exporter, interval);
   }
 
