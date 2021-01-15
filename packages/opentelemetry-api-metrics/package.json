@@ -1,0 +1,73 @@
+{
+  "name": "@opentelemetry/api-metrics",
+  "version": "0.14.0",
+  "description": "Public metrics API for OpenTelemetry",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "browser": {
+    "./src/platform/index.ts": "./src/platform/browser/index.ts",
+    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
+  },
+  "repository": "open-telemetry/opentelemetry-js",
+  "scripts": {
+    "compile": "tsc --build",
+    "clean": "tsc --build --clean",
+    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
+    "test:browser": "nyc karma start --single-run",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "build": "npm run compile",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "version": "node ../../scripts/version-update.js",
+    "watch": "tsc --build --watch"
+  },
+  "keywords": [
+    "opentelemetry",
+    "nodejs",
+    "browser",
+    "profiling",
+    "metrics",
+    "stats",
+    "monitoring"
+  ],
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "build/src/**/*.js",
+    "build/src/**/*.js.map",
+    "build/src/**/*.d.ts",
+    "doc",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^0.14.0"
+  },
+  "devDependencies": {
+    "@types/mocha": "8.2.0",
+    "@types/node": "14.14.12",
+    "@types/webpack-env": "1.16.0",
+    "codecov": "3.8.1",
+    "gts": "2.0.2",
+    "istanbul-instrumenter-loader": "3.0.1",
+    "karma": "5.2.3",
+    "karma-chrome-launcher": "3.1.0",
+    "karma-coverage-istanbul-reporter": "3.0.3",
+    "karma-mocha": "2.0.1",
+    "karma-spec-reporter": "0.0.32",
+    "karma-webpack": "4.0.2",
+    "mocha": "7.2.0",
+    "nyc": "15.1.0",
+    "ts-loader": "8.0.12",
+    "ts-mocha": "8.0.0",
+    "typescript": "3.9.7",
+    "webpack": "4.44.2"
+  }
+}

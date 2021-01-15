@@ -15,6 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
+import { metrics } from '@opentelemetry/api-metrics';
 import {
   disableInstrumentations,
   enableInstrumentations,
@@ -42,7 +43,7 @@ export function registerInstrumentations(
   };
   const tracerProvider =
     options.tracerProvider || api.trace.getTracerProvider();
-  const meterProvider = options.meterProvider || api.metrics.getMeterProvider();
+  const meterProvider = options.meterProvider || metrics.getMeterProvider();
   const logger =
     options.logger || tracerWithLogger?.logger || new api.NoopLogger();
 

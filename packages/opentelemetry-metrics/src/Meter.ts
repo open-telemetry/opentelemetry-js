@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import { Logger } from '@opentelemetry/api';
+import * as api from '@opentelemetry/api-metrics';
 import { ConsoleLogger, InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BatchObserver } from './BatchObserver';
@@ -36,7 +37,7 @@ import merge = require('lodash.merge');
  * Meter is an implementation of the {@link Meter} interface.
  */
 export class Meter implements api.Meter {
-  private readonly _logger: api.Logger;
+  private readonly _logger: Logger;
   private readonly _batchObservers: BatchObserver[] = [];
   private readonly _metrics = new Map<string, Metric<BaseBoundInstrument>>();
   private readonly _processor: Processor;

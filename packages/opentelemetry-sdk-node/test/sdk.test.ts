@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-import * as nock from 'nock';
-import * as semver from 'semver';
 import {
   context,
-  metrics,
   NoopTextMapPropagator,
-  NoopMeterProvider,
   NoopTracerProvider,
   propagation,
-  trace,
   ProxyTracerProvider,
+  trace,
 } from '@opentelemetry/api';
+import { metrics, NoopMeterProvider } from '@opentelemetry/api-metrics';
 import {
   AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
@@ -34,21 +31,20 @@ import { NoopContextManager } from '@opentelemetry/context-base';
 import { CompositePropagator } from '@opentelemetry/core';
 import { ConsoleMetricExporter, MeterProvider } from '@opentelemetry/metrics';
 import { NodeTracerProvider } from '@opentelemetry/node';
+import * as NodeConfig from '@opentelemetry/node/build/src/config';
+import { awsEc2Detector } from '@opentelemetry/resource-detector-aws';
+import { resetIsAvailableCache } from '@opentelemetry/resource-detector-gcp';
+import { Resource } from '@opentelemetry/resources';
+import {
+  assertCloudResource,
+  assertHostResource,
+  assertServiceResource,
+} from '@opentelemetry/resources/test/util/resource-assertions';
 import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
 import * as assert from 'assert';
-import { NodeSDK } from '../src';
-import * as NodeConfig from '@opentelemetry/node/build/src/config';
-import * as Sinon from 'sinon';
-import { awsEc2Detector } from '@opentelemetry/resource-detector-aws';
-import { resetIsAvailableCache } from '@opentelemetry/resource-detector-gcp';
-import {
-  assertServiceResource,
-  assertCloudResource,
-  assertHostResource,
-} from '@opentelemetry/resources/test/util/resource-assertions';
 import {
   BASE_PATH,
   HEADER_NAME,
@@ -56,7 +52,10 @@ import {
   HOST_ADDRESS,
   SECONDARY_HOST_ADDRESS,
 } from 'gcp-metadata';
-import { Resource } from '@opentelemetry/resources';
+import * as nock from 'nock';
+import * as semver from 'semver';
+import * as Sinon from 'sinon';
+import { NodeSDK } from '../src';
 
 const HEADERS = {
   [HEADER_NAME.toLowerCase()]: HEADER_VALUE,

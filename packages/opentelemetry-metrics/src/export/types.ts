@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { ValueType, HrTime, Labels } from '@opentelemetry/api';
+import { HrTime } from '@opentelemetry/api';
+import { Labels, ValueType } from '@opentelemetry/api-metrics';
 import { ExportResult, InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 

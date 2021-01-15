@@ -30,7 +30,6 @@
     "browser",
     "tracing",
     "profiling",
-    "metrics",
     "stats",
     "monitoring"
   ],
