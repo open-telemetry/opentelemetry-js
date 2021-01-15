@@ -150,6 +150,13 @@ describe('API', () => {
         assert.strictEqual(data.carrier, carrier);
         assert.strictEqual(data.getter, getter);
       });
+
+      it('fields', () => {
+        api.propagation.setGlobalPropagator(new TestTextMapPropagation());
+
+        const fields = api.propagation.fields();
+        assert.deepStrictEqual(fields, ['TestField']);
+      });
     });
   });
 });
