@@ -15,6 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
+import { Meter, MeterProvider, metrics } from '@opentelemetry/api-metrics';
 import * as shimmer from 'shimmer';
 import { InstrumentationModuleDefinition } from './platform/node';
 import * as types from './types';
@@ -27,7 +28,7 @@ export abstract class InstrumentationAbstract<T = any>
   protected _config: types.InstrumentationConfig;
 
   private _tracer: api.Tracer;
-  private _meter: api.Meter;
+  private _meter: Meter;
   protected _logger: api.Logger;
 
   constructor(
@@ -46,10 +47,7 @@ export abstract class InstrumentationAbstract<T = any>
       instrumentationVersion
     );
 
-    this._meter = api.metrics.getMeter(
-      instrumentationName,
-      instrumentationVersion
-    );
+    this._meter = metrics.getMeter(instrumentationName, instrumentationVersion);
   }
 
   /* Api to wrap instrumented method */
@@ -62,7 +60,7 @@ export abstract class InstrumentationAbstract<T = any>
   protected _massUnwrap = shimmer.massUnwrap;
 
   /* Returns meter */
-  protected get meter(): api.Meter {
+  protected get meter(): Meter {
     return this._meter;
   }
 
@@ -70,7 +68,7 @@ export abstract class InstrumentationAbstract<T = any>
    * Sets MeterProvider to this plugin
    * @param meterProvider
    */
-  public setMeterProvider(meterProvider: api.MeterProvider) {
+  public setMeterProvider(meterProvider: MeterProvider) {
     this._meter = meterProvider.getMeter(
       this.instrumentationName,
       this.instrumentationVersion

@@ -150,6 +150,10 @@ describe('xhr', () => {
         );
       });
 
+      after(() => {
+        api.propagation.disable();
+      });
+
       describe('when request is successful', () => {
         let webTracerWithZone: api.Tracer;
         let webTracerProviderWithZone: WebTracerProvider;

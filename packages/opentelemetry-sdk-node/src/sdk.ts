@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-import { TextMapPropagator, metrics } from '@opentelemetry/api';
+import { TextMapPropagator } from '@opentelemetry/api';
+import { metrics } from '@opentelemetry/api-metrics';
 import { ContextManager } from '@opentelemetry/context-base';
 import { MeterConfig, MeterProvider } from '@opentelemetry/metrics';
 import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/node';
+import { awsEc2Detector } from '@opentelemetry/resource-detector-aws';
+import { gcpDetector } from '@opentelemetry/resource-detector-gcp';
 import {
   detectResources,
-  Resource,
-  ResourceDetectionConfig,
   envDetector,
   processDetector,
+  Resource,
+  ResourceDetectionConfig,
 } from '@opentelemetry/resources';
 import { BatchSpanProcessor, SpanProcessor } from '@opentelemetry/tracing';
 import { NodeSDKConfiguration } from './types';
-import { awsEc2Detector } from '@opentelemetry/resource-detector-aws';
-import { gcpDetector } from '@opentelemetry/resource-detector-gcp';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 export class NodeSDK {

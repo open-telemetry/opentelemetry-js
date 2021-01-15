@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { BatchObserverResult } from './BatchObserverResult';
-import { Meter } from './Meter';
+import { BatchObserverResult } from './types/BatchObserverResult';
+import { Meter } from './types/Meter';
 import {
   MetricOptions,
   UnboundMetric,
@@ -26,15 +26,13 @@ import {
   UpDownCounter,
   BaseObserver,
   UpDownSumObserver,
-} from './Metric';
+} from './types/Metric';
 import {
   BoundValueRecorder,
   BoundCounter,
   BoundBaseObserver,
-} from './BoundInstrument';
-import { Baggage } from '../baggage/Baggage';
-import { SpanContext } from '../trace/span_context';
-import { ObserverResult } from './ObserverResult';
+} from './types/BoundInstrument';
+import { ObserverResult } from './types/ObserverResult';
 
 /**
  * NoopMeter is a noop implementation of the {@link Meter} interface. It reuses
@@ -194,7 +192,7 @@ export class NoopBoundCounter implements BoundCounter {
 }
 
 export class NoopBoundValueRecorder implements BoundValueRecorder {
-  record(_value: number, _baggage?: Baggage, _spanContext?: SpanContext): void {
+  record(_value: number, _baggage?: unknown, _spanContext?: unknown): void {
     return;
   }
 }

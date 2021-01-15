@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import { Logger } from '@opentelemetry/api';
+import * as api from '@opentelemetry/api-metrics';
 import { ConsoleLogger } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { Meter } from '.';
@@ -30,7 +31,7 @@ export class MeterProvider implements api.MeterProvider {
   private _shuttingDownPromise: Promise<void> = Promise.resolve();
   private _isShutdown = false;
   readonly resource: Resource;
-  readonly logger: api.Logger;
+  readonly logger: Logger;
 
   constructor(config: MeterConfig = {}) {
     const mergedConfig = merge({}, DEFAULT_CONFIG, config);

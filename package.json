@@ -25,7 +25,9 @@
     "docs": "lerna run docs",
     "docs-deploy": "gh-pages --dist packages/opentelemetry-api/docs/out",
     "lint": "lerna run lint",
+    "lint:changed": "lerna run --concurrency 1 --stream lint --since HEAD --exclude-dependents",
     "lint:fix": "lerna run lint:fix",
+    "lint:fix:changed": "lerna run --concurrency 1 --stream lint:fix --since HEAD --exclude-dependents",
     "lint:examples": "eslint ./examples/**/*.js",
     "lint:examples:fix": "eslint ./examples/**/*.js --fix",
     "lint:markdown": "./node_modules/.bin/markdownlint $(git ls-files '*.md') -i ./CHANGELOG.md",
@@ -63,7 +65,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lerna run --concurrency 1 --stream lint --since HEAD --exclude-dependents",
+      "pre-commit": "npm run lint:changed",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
   }
