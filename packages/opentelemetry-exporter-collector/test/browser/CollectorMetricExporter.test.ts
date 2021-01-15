@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
-import { ExportResultCode } from '@opentelemetry/core';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { CollectorMetricExporter } from '../../src/platform/browser/index';
-import { CollectorExporterConfigBase } from '../../src/types';
-import * as collectorTypes from '../../src/types';
+import { NoopLogger } from '@opentelemetry/api';
+import {
+  Counter,
+  ValueObserver,
+  ValueRecorder,
+} from '@opentelemetry/api-metrics';
+import { ExportResultCode, hrTimeToNanoseconds } from '@opentelemetry/core';
 import {
   BoundCounter,
   BoundObserver,
@@ -28,18 +28,22 @@ import {
   Metric,
   MetricRecord,
 } from '@opentelemetry/metrics';
+import * as assert from 'assert';
+import * as sinon from 'sinon';
+import { CollectorMetricExporter } from '../../src/platform/browser/index';
+import * as collectorTypes from '../../src/types';
+import { CollectorExporterConfigBase } from '../../src/types';
 import {
-  mockCounter,
-  mockObserver,
   ensureCounterIsCorrect,
-  ensureObserverIsCorrect,
-  ensureWebResourceIsCorrect,
   ensureExportMetricsServiceRequestIsSet,
   ensureHeadersContain,
-  mockValueRecorder,
+  ensureObserverIsCorrect,
   ensureValueRecorderIsCorrect,
+  ensureWebResourceIsCorrect,
+  mockCounter,
+  mockObserver,
+  mockValueRecorder,
 } from '../helper';
-import { hrTimeToNanoseconds } from '@opentelemetry/core';
 
 const sendBeacon = navigator.sendBeacon;
 
@@ -55,8 +59,8 @@ describe('CollectorMetricExporter - web', () => {
     spySend = sinon.stub(XMLHttpRequest.prototype, 'send');
     spyBeacon = sinon.stub(navigator, 'sendBeacon');
     metrics = [];
-    const counter: Metric<BoundCounter> & api.Counter = mockCounter();
-    const observer: Metric<BoundObserver> & api.ValueObserver = mockObserver(
+    const counter: Metric<BoundCounter> & Counter = mockCounter();
+    const observer: Metric<BoundObserver> & ValueObserver = mockObserver(
       observerResult => {
         observerResult.observe(3, {});
         observerResult.observe(6, {});
@@ -64,7 +68,7 @@ describe('CollectorMetricExporter - web', () => {
       'double-observer2'
     );
     const recorder: Metric<BoundValueRecorder> &
-      api.ValueRecorder = mockValueRecorder();
+      ValueRecorder = mockValueRecorder();
     counter.add(1);
     recorder.record(7);
     recorder.record(14);
@@ -85,7 +89,7 @@ describe('CollectorMetricExporter - web', () => {
     describe('when "sendBeacon" is available', () => {
       beforeEach(() => {
         collectorExporter = new CollectorMetricExporter({
-          logger: new api.NoopLogger(),
+          logger: new NoopLogger(),
           url: 'http://foo.bar.com',
           serviceName: 'bar',
         });
@@ -196,7 +200,7 @@ describe('CollectorMetricExporter - web', () => {
       beforeEach(() => {
         (window.navigator as any).sendBeacon = false;
         collectorExporter = new CollectorMetricExporter({
-          logger: new api.NoopLogger(),
+          logger: new NoopLogger(),
           url: 'http://foo.bar.com',
           serviceName: 'bar',
         });
@@ -330,7 +334,7 @@ describe('CollectorMetricExporter - web', () => {
 
     beforeEach(() => {
       collectorExporterConfig = {
-        logger: new api.NoopLogger(),
+        logger: new NoopLogger(),
         headers: customHeaders,
       };
       server = sinon.fakeServer.create();

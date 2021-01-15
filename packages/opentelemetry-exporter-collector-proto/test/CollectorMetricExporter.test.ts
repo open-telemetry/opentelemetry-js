@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import { NoopLogger } from '@opentelemetry/api';
+import {
+  Counter,
+  ValueObserver,
+  ValueRecorder,
+} from '@opentelemetry/api-metrics';
 import { ExportResultCode } from '@opentelemetry/core';
 import {
   CollectorExporterNodeConfigBase,
@@ -55,7 +60,7 @@ describe('CollectorMetricExporter - node with proto over http', () => {
           foo: 'bar',
         },
         hostname: 'foo',
-        logger: new api.NoopLogger(),
+        logger: new NoopLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
@@ -69,14 +74,14 @@ describe('CollectorMetricExporter - node with proto over http', () => {
       });
       metrics = [];
       const counter: metrics.Metric<metrics.BoundCounter> &
-        api.Counter = mockCounter();
+        Counter = mockCounter();
       const observer: metrics.Metric<metrics.BoundObserver> &
-        api.ValueObserver = mockObserver(observerResult => {
+        ValueObserver = mockObserver(observerResult => {
         observerResult.observe(3, {});
         observerResult.observe(6, {});
       });
       const recorder: metrics.Metric<metrics.BoundValueRecorder> &
-        api.ValueRecorder = mockValueRecorder();
+        ValueRecorder = mockValueRecorder();
 
       counter.add(1);
       recorder.record(7);

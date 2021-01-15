@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as api from '@opentelemetry/api';
+import { Logger, NoopLogger } from '@opentelemetry/api';
+import * as api from '@opentelemetry/api-metrics';
+import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BaseBoundInstrument } from './BoundInstrument';
 import { MetricDescriptor, MetricKind, MetricRecord } from './export/types';
 import { hashLabels } from './Utils';
-import { InstrumentationLibrary } from '@opentelemetry/core';
 
 /** This is a SDK implementation of {@link Metric} interface. */
 export abstract class Metric<T extends BaseBoundInstrument>
   implements api.UnboundMetric<T> {
   protected readonly _disabled: boolean;
   protected readonly _valueType: api.ValueType;
-  protected readonly _logger: api.Logger;
+  protected readonly _logger: Logger;
   protected readonly _descriptor: MetricDescriptor;
   protected readonly _boundaries: number[] | undefined;
   private readonly _instruments: Map<string, T> = new Map();
@@ -42,7 +43,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
       typeof _options.valueType === 'number'
         ? _options.valueType
         : api.ValueType.DOUBLE;
-    this._logger = _options.logger ?? new api.NoopLogger();
+    this._logger = _options.logger ?? new NoopLogger();
     this._boundaries = _options.boundaries;
     this._descriptor = this._getMetricDescriptor();
   }

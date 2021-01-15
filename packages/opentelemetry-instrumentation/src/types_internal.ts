@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { Logger, MeterProvider, TracerProvider } from '@opentelemetry/api';
+import { Logger, TracerProvider } from '@opentelemetry/api';
+import { MeterProvider } from '@opentelemetry/api-metrics';
 import { InstrumentationBase } from './platform';
 import { Instrumentation } from './types';
 import {

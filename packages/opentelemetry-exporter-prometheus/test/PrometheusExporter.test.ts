@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ObserverResult } from '@opentelemetry/api';
+import { ObserverResult } from '@opentelemetry/api-metrics';
 import {
   CounterMetric,
   SumAggregator,

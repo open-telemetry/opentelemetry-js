@@ -128,21 +128,20 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers)):
 
-- [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal
-- [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
+- [Chengzhong Wu](https://github.com/legendecas), Alibaba
+- [Gerhard Stöbich](https://github.com/Flarna), Dynatrace
 - [Mark Wolff](https://github.com/markwolff), Microsoft
 - [Matthew Wear](https://github.com/mwear), LightStep
 - [Naseem K. Ullah](https://github.com/naseemkullah), Transit
-- [Chengzhong Wu](https://github.com/legendecas), Alibaba
-- [Gerhard Stöbich](https://github.com/Flarna), Dynatrace
+- [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver).*
 
 Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers)):
 
-- [Mayur Kale](https://github.com/mayurkale22), Google
-- [Daniel Dyla](https://github.com/dyladan), Dynatrace
 - [Bartlomiej Obecny](https://github.com/obecny), LightStep
+- [Daniel Dyla](https://github.com/dyladan), Dynatrace
+- [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
 
 *Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer).*
 
@@ -151,6 +150,13 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 <a href="https://github.com/open-telemetry/opentelemetry-js/graphs/contributors">
   <img src="https://contributors-img.web.app/image?repo=open-telemetry/opentelemetry-js" />
 </a>
+
+### Thanks to all previous approvers and maintainers
+
+- [Daniel Khan](https://github.com/dkhan), Dynatrace, Maintainer
+- [Mayur Kale](https://github.com/mayurkale22), Google, Maintainer
+- [Brandon Gonzalez](https://github.com/bg451), LightStep, Approver
+- [Roch Devost](https://github.com/rochdev), DataDog, Approver
 
 ## Packages
 
