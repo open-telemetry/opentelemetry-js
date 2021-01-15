@@ -68,6 +68,6 @@
     "sinon": "9.2.3",
     "ts-loader": "8.0.14",
     "ts-mocha": "8.0.0",
-    "typescript": "3.9.7"
+    "typescript": "4.1.3"
   }
 }
