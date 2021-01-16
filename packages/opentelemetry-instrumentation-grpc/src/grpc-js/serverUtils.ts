@@ -14,20 +14,33 @@
  * limitations under the License.
  */
 
+/**
+ * Symbol to include on grpc call if it has already emitted an error event.
+ * grpc events that emit 'error' will also emit 'finish' and so only the
+ * error event should be processed.
+ */
+
 import { context, Span, StatusCode } from '@opentelemetry/api';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import type * as grpcJs from '@grpc/grpc-js';
-import type { GrpcInstrumentation } from '../../instrumentation';
-import { GrpcEmitter } from '../types';
-import type { ServerCallWithMeta, SendUnaryDataCallback } from '../types';
-import { _grpcStatusCodeToOpenTelemetryStatusCode } from '../../utils';
-import { CALL_SPAN_ENDED } from '../utils';
+import type {
+  ServerCallWithMeta,
+  SendUnaryDataCallback,
+  GrpcEmitter,
+  HandleCall,
+} from './types';
+import {
+  _grpcStatusCodeToOpenTelemetryStatusCode,
+  _methodIsIgnored,
+} from '../utils';
+import { IgnoreMatcher } from '../types';
+
+export const CALL_SPAN_ENDED = Symbol('opentelemetry call span ended');
 
 /**
  * Handle patching for serverStream and Bidi type server handlers
  */
-export function serverStreamAndBidiHandler<RequestType, ResponseType>(
-  plugin: GrpcInstrumentation,
+function serverStreamAndBidiHandler<RequestType, ResponseType>(
   span: Span,
   call: GrpcEmitter,
   original:
@@ -87,8 +100,7 @@ export function serverStreamAndBidiHandler<RequestType, ResponseType>(
 /**
  * Handle patching for clientStream and unary type server handlers
  */
-export function clientStreamAndUnaryHandler<RequestType, ResponseType>(
-  plugin: GrpcInstrumentation,
+function clientStreamAndUnaryHandler<RequestType, ResponseType>(
   span: Span,
   call: ServerCallWithMeta<RequestType, ResponseType>,
   callback: SendUnaryDataCallback<ResponseType>,
@@ -126,4 +138,81 @@ export function clientStreamAndUnaryHandler<RequestType, ResponseType>(
 
   context.bind(call);
   return (original as Function).call({}, call, patchedCallback);
+}
+
+/**
+ * Patch callback or EventEmitter provided by `originalFunc` and set appropriate `span`
+ * properties based on its result.
+ */
+export function handleServerFunction<RequestType, ResponseType>(
+  span: Span,
+  type: string,
+  originalFunc: HandleCall<RequestType, ResponseType>,
+  call: ServerCallWithMeta<RequestType, ResponseType>,
+  callback: SendUnaryDataCallback<unknown>
+): void {
+  switch (type) {
+    case 'unary':
+    case 'clientStream':
+    case 'client_stream':
+      return clientStreamAndUnaryHandler(
+        span,
+        call,
+        callback,
+        originalFunc as
+          | grpcJs.handleUnaryCall<RequestType, ResponseType>
+          | grpcJs.ClientReadableStream<RequestType>
+      );
+    case 'serverStream':
+    case 'server_stream':
+    case 'bidi':
+      return serverStreamAndBidiHandler(
+        span,
+        call,
+        originalFunc as
+          | grpcJs.handleBidiStreamingCall<RequestType, ResponseType>
+          | grpcJs.handleServerStreamingCall<RequestType, ResponseType>
+      );
+    default:
+      break;
+  }
+}
+
+/**
+ * Does not patch any callbacks or EventEmitters to omit tracing on requests
+ * that should not be traced.
+ */
+export function handleUntracedServerFunction<RequestType, ResponseType>(
+  type: string,
+  originalFunc: HandleCall<RequestType, ResponseType>,
+  call: ServerCallWithMeta<RequestType, ResponseType>,
+  callback: SendUnaryDataCallback<unknown>
+): void {
+  switch (type) {
+    case 'unary':
+    case 'clientStream':
+    case 'client_stream':
+      return (originalFunc as Function).call({}, call, callback);
+    case 'serverStream':
+    case 'server_stream':
+    case 'bidi':
+      return (originalFunc as Function).call({}, call);
+    default:
+      break;
+  }
+}
+
+/**
+ * Returns true if the server call should not be traced.
+ */
+export function shouldNotTraceServerCall(
+  metadata: grpcJs.Metadata,
+  methodName: string,
+  ignoreGrpcMethods?: IgnoreMatcher[]
+): boolean {
+  const parsedName = methodName.split('/');
+  return _methodIsIgnored(
+    parsedName[parsedName.length - 1] || methodName,
+    ignoreGrpcMethods
+  );
 }

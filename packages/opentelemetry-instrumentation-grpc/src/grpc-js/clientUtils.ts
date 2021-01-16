@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { GrpcInstrumentation } from '../../instrumentation';
-import type { GrpcClientFunc, SendUnaryDataCallback } from '../types';
+import { GrpcJsInstrumentation } from './';
+import type { GrpcClientFunc, SendUnaryDataCallback } from './types';
 import {
   SpanKind,
   Span,
@@ -23,7 +23,6 @@ import {
   Status,
   propagation,
   context,
-  setSpan,
 } from '@opentelemetry/api';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import type * as grpcJs from '@grpc/grpc-js';
@@ -31,8 +30,8 @@ import {
   _grpcStatusCodeToSpanStatus,
   _grpcStatusCodeToOpenTelemetryStatusCode,
   _methodIsIgnored,
-} from '../../utils';
-import { CALL_SPAN_ENDED } from '../utils';
+} from '../utils';
+import { CALL_SPAN_ENDED } from './serverUtils';
 import { EventEmitter } from 'events';
 
 /**
@@ -40,7 +39,7 @@ import { EventEmitter } from 'events';
  * with both possible casings e.g. "TestMethod" & "testMethod"
  */
 export function getMethodsToWrap(
-  this: GrpcInstrumentation,
+  this: GrpcJsInstrumentation,
   client: typeof grpcJs.Client,
   methods: { [key: string]: { originalName?: string } }
 ): string[] {
@@ -66,30 +65,6 @@ export function getMethodsToWrap(
 }
 
 /**
- * Parse initial client call properties and start a span to trace its execution
- */
-export function getPatchedClientMethods(
-  this: GrpcInstrumentation,
-  grpcClient: typeof grpcJs
-): (original: GrpcClientFunc) => () => EventEmitter {
-  const plugin = this;
-  return (original: GrpcClientFunc) => {
-    plugin._logger.debug('patch all client methods');
-    return function clientMethodTrace(this: grpcJs.Client) {
-      const name = `grpc.${original.path.replace('/', '')}`;
-      const args = [...arguments];
-      const metadata = getMetadata.call(plugin, grpcClient, original, args);
-      const span = plugin.getTracer().startSpan(name, {
-        kind: SpanKind.CLIENT,
-      });
-      return context.with(setSpan(context.active(), span), () =>
-        makeGrpcClientRemoteCall(original, args, metadata, this)(span)
-      );
-    };
-  };
-}
-
-/**
  * Execute grpc client call. Apply completitionspan properties and end the
  * span on callback or receiving an emitted event.
  */
@@ -109,7 +84,7 @@ export function makeGrpcClientRemoteCall(
   ) {
     const wrappedFn: SendUnaryDataCallback<ResponseType> = (
       err: grpcJs.ServiceError | null,
-      res
+      res: any
     ) => {
       if (err) {
         if (err.code) {
@@ -204,8 +179,8 @@ export function makeGrpcClientRemoteCall(
 /**
  * Returns the metadata argument from user provided arguments (`args`)
  */
-function getMetadata(
-  this: GrpcInstrumentation,
+export function getMetadata(
+  this: GrpcJsInstrumentation,
   grpcClient: typeof grpcJs,
   original: GrpcClientFunc,
   args: Array<unknown | grpcJs.Metadata>
