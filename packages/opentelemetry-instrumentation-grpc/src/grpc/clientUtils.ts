@@ -16,83 +16,26 @@
 
 import type * as grpcTypes from 'grpc';
 import type * as events from 'events';
-import { SendUnaryDataCallback, GrpcClientFunc } from '../types';
-import { GrpcInstrumentation } from '../../instrumentation';
+import { SendUnaryDataCallback, GrpcClientFunc } from './types';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import {
   context,
   Span,
   StatusCode,
   SpanKind,
-  setSpan,
   Status,
   propagation,
 } from '@opentelemetry/api';
 import {
-  _methodIsIgnored,
   _grpcStatusCodeToSpanStatus,
   _grpcStatusCodeToOpenTelemetryStatusCode,
   findIndex,
-} from '../../utils';
-
-export const getMethodsToWrap = function (
-  instrumentation: GrpcInstrumentation,
-  client: typeof grpcTypes.Client,
-  methods: { [key: string]: { originalName?: string } }
-): string[] {
-  const methodList: string[] = [];
-
-  // For a method defined in .proto as "UnaryMethod"
-  Object.entries(methods).forEach(([name, { originalName }]) => {
-    if (
-      !_methodIsIgnored(name, instrumentation.getConfig().ignoreGrpcMethods)
-    ) {
-      methodList.push(name); // adds camel case method name: "unaryMethod"
-      if (
-        originalName &&
-        // eslint-disable-next-line no-prototype-builtins
-        client.prototype.hasOwnProperty(originalName) &&
-        name !== originalName // do not add duplicates
-      ) {
-        // adds original method name: "UnaryMethod",
-        methodList.push(originalName);
-      }
-    }
-  });
-  return methodList;
-};
-
-export const getPatchedClientMethods = function (
-  this: GrpcInstrumentation,
-  grpcClient: typeof grpcTypes
-) {
-  const instrumentation = this;
-  return (original: GrpcClientFunc) => {
-    instrumentation.getLogger().debug('patch all client methods');
-    return function clientMethodTrace(this: grpcTypes.Client) {
-      const name = `grpc.${original.path.replace('/', '')}`;
-      const args = Array.prototype.slice.call(arguments);
-      const metadata = getMetadata(grpcClient, original, args);
-      const span = instrumentation.getTracer().startSpan(name, {
-        kind: SpanKind.CLIENT,
-      });
-      return context.with(setSpan(context.active(), span), () =>
-        makeGrpcClientRemoteCall(
-          grpcClient,
-          original,
-          args,
-          metadata,
-          this
-        )(span)
-      );
-    };
-  };
-};
+} from '../utils';
 
 /**
  * This method handles the client remote call
  */
-const makeGrpcClientRemoteCall = function (
+export const makeGrpcClientRemoteCall = function (
   grpcClient: typeof grpcTypes,
   original: GrpcClientFunc,
   args: any[],
@@ -203,7 +146,7 @@ const makeGrpcClientRemoteCall = function (
   };
 };
 
-const getMetadata = function (
+export const getMetadata = function (
   grpcClient: typeof grpcTypes,
   original: GrpcClientFunc,
   args: any[]

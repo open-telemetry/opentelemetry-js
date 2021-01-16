@@ -15,17 +15,17 @@
  */
 
 import type * as grpcTypes from 'grpc';
-import { SendUnaryDataCallback, ServerCallWithMeta } from '../types';
-import { GrpcInstrumentation } from '../../instrumentation';
+import { SendUnaryDataCallback, ServerCallWithMeta } from './types';
+import { GrpcNativeInstrumentation } from './';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import { context, Span, StatusCode } from '@opentelemetry/api';
 import {
   _grpcStatusCodeToOpenTelemetryStatusCode,
   _grpcStatusCodeToSpanStatus,
-} from '../../utils';
+  _methodIsIgnored,
+} from '../utils';
 
 export const clientStreamAndUnaryHandler = function <RequestType, ResponseType>(
-  instrumentation: GrpcInstrumentation,
   grpcClient: typeof grpcTypes,
   span: Span,
   call: ServerCallWithMeta,
@@ -72,7 +72,6 @@ export const clientStreamAndUnaryHandler = function <RequestType, ResponseType>(
 };
 
 export const serverStreamAndBidiHandler = function <RequestType, ResponseType>(
-  instrumentation: GrpcInstrumentation,
   span: Span,
   call: ServerCallWithMeta,
   original: grpcTypes.handleCall<RequestType, ResponseType>,
@@ -115,4 +114,19 @@ export const serverStreamAndBidiHandler = function <RequestType, ResponseType>(
   });
 
   return (original as any).call(self, call);
+};
+
+/**
+ * Returns true if the server call should not be traced.
+ */
+export const shouldNotTraceServerCall = function (
+  this: GrpcNativeInstrumentation,
+  call: ServerCallWithMeta,
+  name: string
+): boolean {
+  const parsedName = name.split('/');
+  return _methodIsIgnored(
+    parsedName[parsedName.length - 1] || name,
+    this._config.ignoreGrpcMethods
+  );
 };
