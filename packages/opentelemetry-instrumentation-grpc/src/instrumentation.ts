@@ -14,61 +14,45 @@
  * limitations under the License.
  */
 
-import {
-  InstrumentationBase,
-  InstrumentationConfig,
-} from '@opentelemetry/instrumentation';
+import { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import { GrpcInstrumentationConfig } from './types';
 import { VERSION } from './version';
-import { getGrpcPatches } from './grpc';
-import { getGrpcJsPatches } from './grpc-js';
+import { GrpcNativeInstrumentation } from './grpc';
+import { GrpcJsInstrumentation } from './grpc-js';
+import * as api from '@opentelemetry/api';
 
 /** The metadata key under which span context is stored as a binary value. */
 export const GRPC_TRACE_KEY = 'grpc-trace-bin';
 
-export class GrpcInstrumentation extends InstrumentationBase {
+export class GrpcInstrumentation {
+  private _grpcNativeInstrumentation: GrpcNativeInstrumentation;
+  private _grpcJsInstrumentation: GrpcJsInstrumentation;
+
+  public readonly instrumentationName: string =
+    '@opentelemetry/instrumentation-grpc';
+  public readonly instrumentationVersion: string = VERSION;
+
   constructor(
     protected _config: GrpcInstrumentationConfig & InstrumentationConfig = {}
   ) {
-    super('@opentelemetry/instrumentation-grpc', VERSION, _config);
+    this._grpcJsInstrumentation = new GrpcJsInstrumentation(
+      _config,
+      this.instrumentationName,
+      this.instrumentationVersion
+    );
+    this._grpcNativeInstrumentation = new GrpcNativeInstrumentation(
+      _config,
+      this.instrumentationName,
+      this.instrumentationVersion
+    );
   }
 
   public setConfig(
     config: GrpcInstrumentationConfig & InstrumentationConfig = {}
   ) {
     this._config = Object.assign({}, config);
-  }
-
-  /**
-   * @internal
-   * Public reference to the protected BaseInstrumentation shimmer utils to be used by this
-   * plugin's external helper functions
-   */
-  public getShimmer() {
-    return {
-      wrap: this._wrap,
-      unwrap: this._unwrap,
-      massWrap: this._massWrap,
-      massUnwrap: this._massUnwrap,
-    };
-  }
-
-  /**
-   * @internal
-   * Public reference to the protected BaseInstrumentation `_logger` instance to be used by this
-   * plugin's external helper functions
-   */
-  public getLogger() {
-    return this._logger;
-  }
-
-  /**
-   * @internal
-   * Public reference to the protected BaseInstrumentation `tracer` instance to be used by this
-   * plugin's external helper functions
-   */
-  public getTracer() {
-    return this.tracer;
+    this._grpcJsInstrumentation.setConfig(this._config);
+    this._grpcNativeInstrumentation.setConfig(this._config);
   }
 
   /**
@@ -81,6 +65,35 @@ export class GrpcInstrumentation extends InstrumentationBase {
   }
 
   init() {
-    return [...getGrpcJsPatches.call(this), ...getGrpcPatches.call(this)];
+    // sub instrumentations will already be init when constructing them
+    return;
+  }
+
+  enable() {
+    this._grpcJsInstrumentation.enable();
+    this._grpcNativeInstrumentation.enable();
+  }
+
+  disable() {
+    this._grpcJsInstrumentation.disable();
+    this._grpcNativeInstrumentation.disable();
+  }
+
+  /**
+   * Sets MeterProvider to this plugin
+   * @param meterProvider
+   */
+  public setMeterProvider(meterProvider: api.MeterProvider) {
+    this._grpcJsInstrumentation.setMeterProvider(meterProvider);
+    this._grpcNativeInstrumentation.setMeterProvider(meterProvider);
+  }
+
+  /**
+   * Sets TraceProvider to this plugin
+   * @param tracerProvider
+   */
+  public setTracerProvider(tracerProvider: api.TracerProvider) {
+    this._grpcJsInstrumentation.setTracerProvider(tracerProvider);
+    this._grpcNativeInstrumentation.setTracerProvider(tracerProvider);
   }
 }
