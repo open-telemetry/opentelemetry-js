@@ -297,6 +297,8 @@ export class HttpPlugin extends BasePlugin<Http> {
         )
       ) {
         return context.with(suppressInstrumentation(context.active()), () => {
+          context.bind(request);
+          context.bind(response);
           return original.apply(this, [event, ...args]);
         });
       }
