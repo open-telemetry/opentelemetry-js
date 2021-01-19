@@ -20,8 +20,8 @@ import {
   propagation,
   Span as ISpan,
   SpanKind,
-  NoopLogger,
   setSpan,
+  getLogger,
 } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import { Http, HttpPluginConfig } from '@opentelemetry/plugin-http';
@@ -56,7 +56,7 @@ const hostname = 'localhost';
 const serverName = 'my.server.name';
 const pathname = '/test';
 const memoryExporter = new InMemorySpanExporter();
-const logger = new NoopLogger();
+const logger = getLogger();
 const provider = new NodeTracerProvider({
   logger,
 });

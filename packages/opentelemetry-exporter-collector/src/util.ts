@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Logger, NoopLogger } from '@opentelemetry/api';
+import { Logger, getLogger } from '@opentelemetry/api';
 
 /**
  * Parses headers from config leaving only those that have defined values
@@ -23,7 +23,7 @@ import { Logger, NoopLogger } from '@opentelemetry/api';
  */
 export function parseHeaders(
   partialHeaders: Partial<Record<string, unknown>> = {},
-  logger: Logger = new NoopLogger()
+  logger: Logger = getLogger()
 ): Record<string, string> {
   const headers: Record<string, string> = {};
   Object.entries(partialHeaders).forEach(([key, value]) => {

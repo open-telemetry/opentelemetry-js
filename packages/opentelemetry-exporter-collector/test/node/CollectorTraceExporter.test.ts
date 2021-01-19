@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/api';
+import { getLogger } from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as http from 'http';
@@ -72,7 +72,7 @@ describe('CollectorTraceExporter - node with json over http', () => {
           foo: 'bar',
         },
         hostname: 'foo',
-        logger: new NoopLogger(),
+        logger: getLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',

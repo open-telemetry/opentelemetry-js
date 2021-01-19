@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Logger, NoopLogger } from '@opentelemetry/api';
+import { Logger, getLogger } from '@opentelemetry/api';
 import * as api from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
@@ -43,7 +43,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
       typeof _options.valueType === 'number'
         ? _options.valueType
         : api.ValueType.DOUBLE;
-    this._logger = _options.logger ?? new NoopLogger();
+    this._logger = getLogger(_options.logger);
     this._boundaries = _options.boundaries;
     this._descriptor = this._getMetricDescriptor();
   }

@@ -19,9 +19,9 @@ import {
   propagation,
   Span as ISpan,
   SpanKind,
-  NoopLogger,
   getSpan,
   setSpan,
+  getLogger,
 } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
@@ -45,7 +45,7 @@ import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import type { ClientRequest, IncomingMessage, ServerResponse } from 'http';
 import { isWrapped } from '@opentelemetry/instrumentation';
 
-const logger = new NoopLogger();
+const logger = getLogger();
 const instrumentation = new HttpInstrumentation({ logger });
 instrumentation.enable();
 instrumentation.disable();

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanKind, Span, context, NoopLogger } from '@opentelemetry/api';
+import { SpanKind, Span, context, getLogger } from '@opentelemetry/api';
 import {
   HttpAttribute,
   GeneralAttribute,
@@ -111,7 +111,7 @@ describe('HttpPlugin Integration tests', () => {
       });
     });
 
-    const logger = new NoopLogger();
+    const logger = getLogger();
     const provider = new NodeTracerProvider({
       logger,
     });

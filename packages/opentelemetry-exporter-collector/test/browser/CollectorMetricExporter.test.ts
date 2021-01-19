@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/api';
+import { getLogger } from '@opentelemetry/api';
 import {
   Counter,
   ValueObserver,
@@ -89,7 +89,7 @@ describe('CollectorMetricExporter - web', () => {
     describe('when "sendBeacon" is available', () => {
       beforeEach(() => {
         collectorExporter = new CollectorMetricExporter({
-          logger: new NoopLogger(),
+          logger: getLogger(),
           url: 'http://foo.bar.com',
           serviceName: 'bar',
         });
@@ -200,7 +200,7 @@ describe('CollectorMetricExporter - web', () => {
       beforeEach(() => {
         (window.navigator as any).sendBeacon = false;
         collectorExporter = new CollectorMetricExporter({
-          logger: new NoopLogger(),
+          logger: getLogger(),
           url: 'http://foo.bar.com',
           serviceName: 'bar',
         });
@@ -334,7 +334,7 @@ describe('CollectorMetricExporter - web', () => {
 
     beforeEach(() => {
       collectorExporterConfig = {
-        logger: new NoopLogger(),
+        logger: getLogger(),
         headers: customHeaders,
       };
       server = sinon.fakeServer.create();

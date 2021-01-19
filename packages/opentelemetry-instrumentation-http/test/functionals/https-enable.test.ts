@@ -20,8 +20,8 @@ import {
   propagation,
   Span as ISpan,
   SpanKind,
-  NoopLogger,
   setSpan,
+  getLogger,
 } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { ContextManager } from '@opentelemetry/context-base';
@@ -44,7 +44,7 @@ import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { isWrapped } from '@opentelemetry/instrumentation';
 
-const logger = new NoopLogger();
+const logger = getLogger();
 const instrumentation = new HttpInstrumentation({ logger });
 instrumentation.enable();
 instrumentation.disable();

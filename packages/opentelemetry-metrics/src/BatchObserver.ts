@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api-metrics';
-import { Logger, NoopLogger } from '@opentelemetry/api';
+import { Logger, getLogger } from '@opentelemetry/api';
 import { BatchObserverResult } from './BatchObserverResult';
 import { MetricRecord } from './export/types';
 
@@ -32,7 +32,7 @@ export class BatchObserver {
     options: api.BatchObserverOptions,
     callback?: (observerResult: api.BatchObserverResult) => void
   ) {
-    this._logger = options.logger ?? new NoopLogger();
+    this._logger = getLogger(options.logger);
     this._maxTimeoutUpdateMS =
       options.maxTimeoutUpdateMS ?? MAX_TIMEOUT_UPDATE_MS;
     this._callback = callback || NOOP_CALLBACK;

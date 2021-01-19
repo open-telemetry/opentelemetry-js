@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/api';
+import { Tracer, getLogger } from '@opentelemetry/api';
 import { Http } from '@opentelemetry/plugin-http';
 import * as assert from 'assert';
 import * as fs from 'fs';
@@ -25,19 +25,18 @@ import * as sinon from 'sinon';
 import { plugin } from '../../src/https';
 import { httpsRequest } from '../utils/httpsRequest';
 import { NodeTracerProvider } from '@opentelemetry/node';
-import * as api from '@opentelemetry/api';
 
 describe('HttpsPlugin', () => {
   let server: https.Server;
   let serverPort = 0;
 
   describe('disable()', () => {
-    const logger = new NoopLogger();
+    const logger = getLogger();
     const provider = new NodeTracerProvider({
       logger,
     });
     // const tracer = provider.getTracer('test-https')
-    let tracer: api.Tracer;
+    let tracer: Tracer;
     before(() => {
       nock.cleanAll();
       nock.enableNetConnect();

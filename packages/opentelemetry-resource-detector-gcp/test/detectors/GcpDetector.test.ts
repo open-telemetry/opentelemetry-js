@@ -32,7 +32,7 @@ import {
   assertContainerResource,
   assertEmptyResource,
 } from '@opentelemetry/resources/test/util/resource-assertions';
-import { NoopLogger } from '@opentelemetry/api';
+import { getLogger } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 
 const HEADERS = {
@@ -85,7 +85,7 @@ const CLUSTER_NAME_PATH = BASE_PATH + '/instance/attributes/cluster-name';
           .get(INSTANCE_PATH)
           .reply(200, {}, HEADERS);
         const resource: Resource = await gcpDetector.detect({
-          logger: new NoopLogger(),
+          logger: getLogger(),
         });
         secondaryScope.done();
         scope.done();
@@ -117,7 +117,7 @@ const CLUSTER_NAME_PATH = BASE_PATH + '/instance/attributes/cluster-name';
         const secondaryScope = nock(SECONDARY_HOST_ADDRESS)
           .get(INSTANCE_PATH)
           .reply(200, {}, HEADERS);
-        const resource = await gcpDetector.detect({ logger: new NoopLogger() });
+        const resource = await gcpDetector.detect({ logger: getLogger() });
         secondaryScope.done();
         scope.done();
 
@@ -149,7 +149,7 @@ const CLUSTER_NAME_PATH = BASE_PATH + '/instance/attributes/cluster-name';
         const secondaryScope = nock(SECONDARY_HOST_ADDRESS)
           .get(INSTANCE_PATH)
           .reply(200, {}, HEADERS);
-        const resource = await gcpDetector.detect({ logger: new NoopLogger() });
+        const resource = await gcpDetector.detect({ logger: getLogger() });
         secondaryScope.done();
         scope.done();
 
@@ -161,7 +161,7 @@ const CLUSTER_NAME_PATH = BASE_PATH + '/instance/attributes/cluster-name';
       });
 
       it('returns empty resource if not detected', async () => {
-        const resource = await gcpDetector.detect({ logger: new NoopLogger() });
+        const resource = await gcpDetector.detect({ logger: getLogger() });
         assertEmptyResource(resource);
       });
     });

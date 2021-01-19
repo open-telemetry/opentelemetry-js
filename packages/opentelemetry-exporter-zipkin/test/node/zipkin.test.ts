@@ -22,7 +22,7 @@ import {
   hrTimeToMicroseconds,
   ExportResultCode,
 } from '@opentelemetry/core';
-import * as api from '@opentelemetry/api';
+import { SpanKind, StatusCode, getLogger } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import { ZipkinExporter } from '../../src';
 import * as zipkinTypes from '../../src/types';
@@ -36,7 +36,7 @@ function getReadableSpan() {
   const duration = 2000;
   const readableSpan: ReadableSpan = {
     name: 'my-span',
-    kind: api.SpanKind.INTERNAL,
+    kind: SpanKind.INTERNAL,
     spanContext: {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
       spanId: '6e0c63257de34c92',
@@ -47,7 +47,7 @@ function getReadableSpan() {
     ended: true,
     duration: [duration, 0],
     status: {
-      code: api.StatusCode.OK,
+      code: StatusCode.OK,
     },
     attributes: {},
     links: [],
@@ -76,7 +76,7 @@ describe('Zipkin Exporter - node', () => {
     it('should construct an exporter with logger', () => {
       const exporter = new ZipkinExporter({
         serviceName: 'my-service',
-        logger: new api.NoopLogger(),
+        logger: getLogger(),
       });
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
@@ -111,7 +111,7 @@ describe('Zipkin Exporter - node', () => {
     it('should skip send with empty array', () => {
       const exporter = new ZipkinExporter({
         serviceName: 'my-service',
-        logger: new api.NoopLogger(),
+        logger: getLogger(),
       });
 
       exporter.export([], (result: ExportResult) => {
@@ -134,7 +134,7 @@ describe('Zipkin Exporter - node', () => {
 
       const span1: ReadableSpan = {
         name: 'my-span',
-        kind: api.SpanKind.INTERNAL,
+        kind: SpanKind.INTERNAL,
         parentSpanId,
         spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
@@ -146,7 +146,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.StatusCode.OK,
+          code: StatusCode.OK,
         },
         attributes: {
           key1: 'value1',
@@ -165,7 +165,7 @@ describe('Zipkin Exporter - node', () => {
       };
       const span2: ReadableSpan = {
         name: 'my-span',
-        kind: api.SpanKind.SERVER,
+        kind: SpanKind.SERVER,
         spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
@@ -176,7 +176,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.StatusCode.OK,
+          code: StatusCode.OK,
         },
         attributes: {},
         links: [],
@@ -187,7 +187,7 @@ describe('Zipkin Exporter - node', () => {
 
       const exporter = new ZipkinExporter({
         serviceName: 'my-service',
-        logger: new api.NoopLogger(),
+        logger: getLogger(),
       });
 
       exporter.export([span1, span2], (result: ExportResult) => {
@@ -243,7 +243,7 @@ describe('Zipkin Exporter - node', () => {
 
       const exporter = new ZipkinExporter({
         serviceName: 'my-service',
-        logger: new api.NoopLogger(),
+        logger: getLogger(),
         url: 'https://localhost:9411/api/v2/spans',
       });
 
@@ -260,7 +260,7 @@ describe('Zipkin Exporter - node', () => {
 
       const exporter = new ZipkinExporter({
         serviceName: 'my-service',
-        logger: new api.NoopLogger(),
+        logger: getLogger(),
       });
 
       exporter.export([getReadableSpan()], (result: ExportResult) => {
@@ -276,7 +276,7 @@ describe('Zipkin Exporter - node', () => {
 
       const exporter = new ZipkinExporter({
         serviceName: 'my-service',
-        logger: new api.NoopLogger(),
+        logger: getLogger(),
       });
 
       exporter.export([getReadableSpan()], (result: ExportResult) => {
@@ -292,7 +292,7 @@ describe('Zipkin Exporter - node', () => {
 
       const exporter = new ZipkinExporter({
         serviceName: 'my-service',
-        logger: new api.NoopLogger(),
+        logger: getLogger(),
       });
 
       exporter.export([getReadableSpan()], (result: ExportResult) => {
@@ -304,7 +304,7 @@ describe('Zipkin Exporter - node', () => {
     it('should return failed result after shutdown', done => {
       const exporter = new ZipkinExporter({
         serviceName: 'my-service',
-        logger: new api.NoopLogger(),
+        logger: getLogger(),
       });
 
       exporter.shutdown();
@@ -326,7 +326,7 @@ describe('Zipkin Exporter - node', () => {
 
       const span1: ReadableSpan = {
         name: 'my-span',
-        kind: api.SpanKind.INTERNAL,
+        kind: SpanKind.INTERNAL,
         parentSpanId,
         spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
@@ -338,7 +338,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.StatusCode.OK,
+          code: StatusCode.OK,
         },
         attributes: {
           key1: 'value1',
@@ -357,7 +357,7 @@ describe('Zipkin Exporter - node', () => {
       };
       const span2: ReadableSpan = {
         name: 'my-span',
-        kind: api.SpanKind.SERVER,
+        kind: SpanKind.SERVER,
         spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
@@ -368,7 +368,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.StatusCode.OK,
+          code: StatusCode.OK,
         },
         attributes: {},
         links: [],
@@ -398,7 +398,7 @@ describe('Zipkin Exporter - node', () => {
 
       const span1: ReadableSpan = {
         name: 'my-span',
-        kind: api.SpanKind.INTERNAL,
+        kind: SpanKind.INTERNAL,
         parentSpanId,
         spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
@@ -410,7 +410,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.StatusCode.OK,
+          code: StatusCode.OK,
         },
         attributes: {
           key1: 'value1',
@@ -431,7 +431,7 @@ describe('Zipkin Exporter - node', () => {
       };
       const span2: ReadableSpan = {
         name: 'my-span',
-        kind: api.SpanKind.SERVER,
+        kind: SpanKind.SERVER,
         spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
@@ -442,7 +442,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.StatusCode.OK,
+          code: StatusCode.OK,
         },
         attributes: {},
         links: [],
@@ -472,7 +472,7 @@ describe('Zipkin Exporter - node', () => {
 
         const exporter = new ZipkinExporter({
           serviceName: 'my-service',
-          logger: new api.NoopLogger(),
+          logger: getLogger(),
         });
 
         exporter.export([getReadableSpan()], (result: ExportResult) => {
@@ -501,7 +501,7 @@ describe('Zipkin Exporter - node', () => {
 
       const span1: ReadableSpan = {
         name: 'my-span',
-        kind: api.SpanKind.INTERNAL,
+        kind: SpanKind.INTERNAL,
         parentSpanId,
         spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
@@ -513,7 +513,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.StatusCode.OK,
+          code: StatusCode.OK,
         },
         attributes: {
           key1: 'value1',
@@ -534,7 +534,7 @@ describe('Zipkin Exporter - node', () => {
       };
       const span2: ReadableSpan = {
         name: 'my-span',
-        kind: api.SpanKind.SERVER,
+        kind: SpanKind.SERVER,
         spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
@@ -545,7 +545,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.StatusCode.OK,
+          code: StatusCode.OK,
         },
         attributes: {},
         links: [],
@@ -590,7 +590,7 @@ describe('Zipkin Exporter - node', () => {
 
       const span1: ReadableSpan = {
         name: 'my-span',
-        kind: api.SpanKind.INTERNAL,
+        kind: SpanKind.INTERNAL,
         parentSpanId,
         spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
@@ -602,7 +602,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.StatusCode.OK,
+          code: StatusCode.OK,
         },
         attributes: {
           key1: 'value1',
@@ -622,7 +622,7 @@ describe('Zipkin Exporter - node', () => {
       };
       const span2: ReadableSpan = {
         name: 'my-span',
-        kind: api.SpanKind.SERVER,
+        kind: SpanKind.SERVER,
         spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
@@ -633,7 +633,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.StatusCode.OK,
+          code: StatusCode.OK,
         },
         attributes: {
           [SERVICE_RESOURCE.NAME]: span_service_name_prime,

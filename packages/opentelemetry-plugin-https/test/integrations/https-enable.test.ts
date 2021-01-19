@@ -15,7 +15,7 @@
  */
 
 import { HttpPluginConfig, Http } from '@opentelemetry/plugin-http';
-import { SpanKind, Span, context, NoopLogger } from '@opentelemetry/api';
+import { SpanKind, Span, context, getLogger } from '@opentelemetry/api';
 import {
   HttpAttribute,
   GeneralAttribute,
@@ -125,7 +125,7 @@ describe('HttpsPlugin Integration tests', () => {
         done();
       });
     });
-    const logger = new NoopLogger();
+    const logger = getLogger();
     const provider = new NodeTracerProvider({
       logger,
     });

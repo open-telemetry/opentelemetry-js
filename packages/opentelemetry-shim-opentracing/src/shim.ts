@@ -125,7 +125,7 @@ export class TracerShim extends opentracing.Tracer {
     super();
 
     this._tracer = tracer;
-    this._logger = logger || new api.NoopLogger();
+    this._logger = api.getLogger(logger);
   }
 
   startSpan(

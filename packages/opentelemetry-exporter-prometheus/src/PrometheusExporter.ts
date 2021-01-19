@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import { Logger, getLogger } from '@opentelemetry/api';
 import {
   ExportResult,
   globalErrorHandler,
@@ -35,7 +35,7 @@ export class PrometheusExporter implements MetricExporter {
     appendTimestamp: true,
   };
 
-  private readonly _logger: api.Logger;
+  private readonly _logger: Logger;
   private readonly _port: number;
   private readonly _endpoint: string;
   private readonly _server: Server;
@@ -54,7 +54,7 @@ export class PrometheusExporter implements MetricExporter {
    * @param callback Callback to be called after a server was started
    */
   constructor(config: ExporterConfig = {}, callback?: () => void) {
-    this._logger = config.logger || new api.NoopLogger();
+    this._logger = getLogger(config.logger);
     this._port = config.port || PrometheusExporter.DEFAULT_OPTIONS.port;
     this._prefix = config.prefix || PrometheusExporter.DEFAULT_OPTIONS.prefix;
     this._appendTimestamp =

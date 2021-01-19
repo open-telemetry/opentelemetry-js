@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { NoopTracerProvider, NoopLogger } from '@opentelemetry/api';
+import { NoopTracerProvider, getLogger } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as path from 'path';
 import { BasePlugin } from '../../src';
 import * as types from '../trace/fixtures/test-package/foo/bar/internal';
 
 const provider = new NoopTracerProvider();
-const logger = new NoopLogger();
+const logger = getLogger();
 describe('BasePlugin', () => {
   describe('internalFilesLoader', () => {
     it('should load internally exported files', () => {

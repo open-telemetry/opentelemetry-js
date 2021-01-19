@@ -19,7 +19,7 @@ import {
   ResourceDetectionConfig,
   ResourceDetectionConfigWithLogger,
 } from '../../config';
-import { Logger, NoopLogger } from '@opentelemetry/api';
+import { Logger, getLogger } from '@opentelemetry/api';
 import * as util from 'util';
 
 /**
@@ -33,7 +33,7 @@ export const detectResources = async (
 ): Promise<Resource> => {
   const internalConfig: ResourceDetectionConfigWithLogger = Object.assign(
     {
-      logger: new NoopLogger(),
+      logger: getLogger(),
     },
     config
   );

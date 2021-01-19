@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes, Logger, NoopLogger } from '@opentelemetry/api';
+import { Attributes, Logger, getLogger } from '@opentelemetry/api';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import {
   CollectorExporterError,
@@ -52,7 +52,7 @@ export abstract class CollectorExporterBase<
 
     this.attributes = config.attributes;
 
-    this.logger = config.logger || new NoopLogger();
+    this.logger = getLogger(config.logger);
 
     this.shutdown = this.shutdown.bind(this);
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/api';
+import { getLogger } from '@opentelemetry/api';
 import {
   Counter,
   ValueObserver,
@@ -86,7 +86,7 @@ describe('CollectorMetricExporter - node with json over http', () => {
           foo: 'bar',
         },
         hostname: 'foo',
-        logger: new NoopLogger(),
+        logger: getLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',

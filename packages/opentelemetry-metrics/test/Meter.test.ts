@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/api';
+import { getLogger } from '@opentelemetry/api';
 import * as api from '@opentelemetry/api-metrics';
 import { hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
@@ -81,7 +81,7 @@ describe('Meter', () => {
 
   beforeEach(() => {
     meter = new MeterProvider({
-      logger: new NoopLogger(),
+      logger: getLogger(),
     }).getMeter('test-meter');
   });
 

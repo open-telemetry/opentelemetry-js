@@ -19,9 +19,9 @@ import {
   NoopTracerProvider,
   SpanKind,
   propagation,
-  NoopLogger,
   getSpan,
   setSpan,
+  getLogger,
 } from '@opentelemetry/api';
 import {
   HttpTraceContext,
@@ -416,7 +416,7 @@ export const runTests = (
       });
 
       it('should patch client constructor makeClientConstructor() and makeGenericClientConstructor()', () => {
-        plugin.enable(grpc, new NoopTracerProvider(), new NoopLogger());
+        plugin.enable(grpc, new NoopTracerProvider(), getLogger());
         (plugin['_moduleExports'] as any).makeGenericClientConstructor({});
         assert.ok(
           plugin['_moduleExports'].makeGenericClientConstructor.__wrapped
@@ -666,7 +666,7 @@ export const runTests = (
     };
 
     describe('enable()', () => {
-      const logger = new NoopLogger();
+      const logger = getLogger();
       const provider = new NodeTracerProvider({ logger });
       provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
       beforeEach(() => {
@@ -714,7 +714,7 @@ export const runTests = (
     });
 
     describe('disable()', () => {
-      const logger = new NoopLogger();
+      const logger = getLogger();
       const provider = new NodeTracerProvider({ logger });
       provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
       beforeEach(() => {
@@ -747,7 +747,7 @@ export const runTests = (
     });
 
     describe('Test filtering requests using metadata', () => {
-      const logger = new NoopLogger();
+      const logger = getLogger();
       const provider = new NodeTracerProvider({ logger });
       provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
       beforeEach(() => {
@@ -778,7 +778,7 @@ export const runTests = (
     });
 
     describe('Test filtering requests using options', () => {
-      const logger = new NoopLogger();
+      const logger = getLogger();
       const provider = new NodeTracerProvider({ logger });
       const checkSpans: { [key: string]: boolean } = {
         unaryMethod: false,

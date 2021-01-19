@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { NoopLogger } from '@opentelemetry/api';
+import { getLogger } from '@opentelemetry/api';
 import { ExportResultCode } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
@@ -68,7 +68,7 @@ describe('CollectorTraceExporter - common', () => {
       onInitSpy = sinon.stub(CollectorTraceExporter.prototype, 'onInit');
       collectorExporterConfig = {
         hostname: 'foo',
-        logger: new NoopLogger(),
+        logger: getLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
@@ -116,7 +116,12 @@ describe('CollectorTraceExporter - common', () => {
       });
 
       it('should set default logger', () => {
-        assert.ok(collectorExporter.logger instanceof NoopLogger);
+        const noopLogger = getLogger();
+        assert.strictEqual(
+          collectorExporter.logger.error,
+          noopLogger.error,
+          'The error method should reference the default logger'
+        );
       });
     });
   });
@@ -233,7 +238,7 @@ describe('CollectorTraceExporter - common', () => {
       );
       collectorExporterConfig = {
         hostname: 'foo',
-        logger: new NoopLogger(),
+        logger: getLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',

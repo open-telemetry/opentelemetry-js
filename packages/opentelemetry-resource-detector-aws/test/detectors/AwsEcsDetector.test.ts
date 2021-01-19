@@ -24,7 +24,7 @@ import {
   assertEmptyResource,
   assertContainerResource,
 } from '@opentelemetry/resources/test/util/resource-assertions';
-import { NoopLogger } from '@opentelemetry/api';
+import { getLogger } from '@opentelemetry/api';
 import * as os from 'os';
 
 describe('BeanstalkResourceDetector', () => {
@@ -61,7 +61,7 @@ describe('BeanstalkResourceDetector', () => {
       .resolves(correctCgroupData);
 
     const resource = await awsEcsDetector.detect({
-      logger: new NoopLogger(),
+      logger: getLogger(),
     });
 
     sandbox.assert.calledOnce(readStub);
@@ -80,7 +80,7 @@ describe('BeanstalkResourceDetector', () => {
       .resolves(noisyCgroupData);
 
     const resource = await awsEcsDetector.detect({
-      logger: new NoopLogger(),
+      logger: getLogger(),
     });
 
     sandbox.assert.calledOnce(readStub);
@@ -99,7 +99,7 @@ describe('BeanstalkResourceDetector', () => {
       .resolves(multiValidCgroupData);
 
     const resource = await awsEcsDetector.detect({
-      logger: new NoopLogger(),
+      logger: getLogger(),
     });
 
     sandbox.assert.calledOnce(readStub);
@@ -117,7 +117,7 @@ describe('BeanstalkResourceDetector', () => {
       .resolves(correctCgroupData);
 
     const resource = await awsEcsDetector.detect({
-      logger: new NoopLogger(),
+      logger: getLogger(),
     });
 
     sandbox.assert.notCalled(readStub);
@@ -133,7 +133,7 @@ describe('BeanstalkResourceDetector', () => {
       .rejects(errorMsg.fileNotFoundError);
 
     const resource = await awsEcsDetector.detect({
-      logger: new NoopLogger(),
+      logger: getLogger(),
     });
 
     sandbox.assert.calledOnce(readStub);
@@ -151,7 +151,7 @@ describe('BeanstalkResourceDetector', () => {
       .resolves('');
 
     const resource = await awsEcsDetector.detect({
-      logger: new NoopLogger(),
+      logger: getLogger(),
     });
 
     sandbox.assert.calledOnce(readStub);
@@ -169,7 +169,7 @@ describe('BeanstalkResourceDetector', () => {
       .resolves(correctCgroupData);
 
     const resource = await awsEcsDetector.detect({
-      logger: new NoopLogger(),
+      logger: getLogger(),
     });
 
     sandbox.assert.calledOnce(readStub);
@@ -187,7 +187,7 @@ describe('BeanstalkResourceDetector', () => {
       .rejects(errorMsg.fileNotFoundError);
 
     const resource = await awsEcsDetector.detect({
-      logger: new NoopLogger(),
+      logger: getLogger(),
     });
 
     sandbox.assert.calledOnce(readStub);

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/api';
+import { getLogger } from '@opentelemetry/api';
 import { ExportResultCode } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
@@ -59,7 +59,7 @@ describe('CollectorTraceExporter - web', () => {
     beforeEach(() => {
       collectorExporterConfig = {
         hostname: 'foo',
-        logger: new NoopLogger(),
+        logger: getLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
@@ -251,7 +251,7 @@ describe('CollectorTraceExporter - web', () => {
 
     beforeEach(() => {
       collectorExporterConfig = {
-        logger: new NoopLogger(),
+        logger: getLogger(),
         headers: customHeaders,
       };
       server = sinon.fakeServer.create();

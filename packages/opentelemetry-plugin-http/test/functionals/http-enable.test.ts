@@ -19,9 +19,9 @@ import {
   propagation,
   Span as ISpan,
   SpanKind,
-  NoopLogger,
   getSpan,
   setSpan,
+  getLogger,
 } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
@@ -55,7 +55,7 @@ const hostname = 'localhost';
 const pathname = '/test';
 const serverName = 'my.server.name';
 const memoryExporter = new InMemorySpanExporter();
-const logger = new NoopLogger();
+const logger = getLogger();
 const provider = new NodeTracerProvider({
   logger,
 });

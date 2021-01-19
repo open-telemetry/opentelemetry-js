@@ -19,10 +19,10 @@ import {
   SpanContext,
   TraceFlags,
   ROOT_CONTEXT,
-  NoopLogger,
   setSpan,
   setSpanContext,
   getSpan,
+  getLogger,
 } from '@opentelemetry/api';
 import {
   AlwaysOnSampler,
@@ -60,7 +60,7 @@ describe('BasicTracerProvider', () => {
 
     it('should construct an instance with logger', () => {
       const provider = new BasicTracerProvider({
-        logger: new NoopLogger(),
+        logger: getLogger(),
       });
       assert.ok(provider instanceof BasicTracerProvider);
     });
@@ -261,7 +261,7 @@ describe('BasicTracerProvider', () => {
     it('should return a no recording span when never sampling', () => {
       const tracer = new BasicTracerProvider({
         sampler: new AlwaysOffSampler(),
-        logger: new NoopLogger(),
+        logger: getLogger(),
       }).getTracer('default');
       const span = tracer.startSpan('my-span');
       assert.ok(span instanceof NoRecordingSpan);

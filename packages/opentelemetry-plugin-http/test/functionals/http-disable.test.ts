@@ -13,11 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  NoopTracerProvider,
-  NoopLogger,
-  NOOP_TRACER,
-} from '@opentelemetry/api';
+import { NoopTracerProvider, NOOP_TRACER, getLogger } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as http from 'http';
 import { AddressInfo } from 'net';
@@ -31,7 +27,7 @@ describe('HttpPlugin', () => {
   let serverPort = 0;
 
   describe('disable()', () => {
-    const logger = new NoopLogger();
+    const logger = getLogger();
     const provider = new NoopTracerProvider();
     before(() => {
       nock.cleanAll();

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import { Logger, getLogger } from '@opentelemetry/api';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import { SpanExporter, ReadableSpan } from '@opentelemetry/tracing';
 import { prepareSend } from './platform/index';
@@ -32,7 +32,7 @@ import { SERVICE_RESOURCE } from '@opentelemetry/resources';
 export class ZipkinExporter implements SpanExporter {
   static readonly DEFAULT_URL = 'http://localhost:9411/api/v2/spans';
   private readonly DEFAULT_SERVICE_NAME = 'OpenTelemetry Service';
-  private readonly _logger: api.Logger;
+  private readonly _logger: Logger;
   private readonly _statusCodeTagName: string;
   private readonly _statusDescriptionTagName: string;
   private _send: zipkinTypes.SendFunction;
@@ -42,7 +42,7 @@ export class ZipkinExporter implements SpanExporter {
 
   constructor(config: zipkinTypes.ExporterConfig = {}) {
     const urlStr = config.url || ZipkinExporter.DEFAULT_URL;
-    this._logger = config.logger || new api.NoopLogger();
+    this._logger = getLogger(config.logger);
     this._send = prepareSend(this._logger, urlStr, config.headers);
     this._serviceName = config.serviceName;
     this._statusCodeTagName = config.statusCodeTagName || statusCodeTagName;

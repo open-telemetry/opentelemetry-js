@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopTracerProvider, NoopLogger } from '@opentelemetry/api';
+import { NoopTracerProvider, getLogger } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as path from 'path';
 import {
@@ -101,7 +101,7 @@ const differentNamePlugins: Plugins = {
 
 describe('PluginLoader', () => {
   const provider = new NoopTracerProvider();
-  const logger = new NoopLogger();
+  const logger = getLogger();
 
   before(() => {
     module.paths.push(INSTALLED_PLUGINS_PATH);

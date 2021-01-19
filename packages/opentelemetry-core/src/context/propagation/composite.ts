@@ -20,7 +20,7 @@ import {
   TextMapPropagator,
   Logger,
   TextMapSetter,
-  NoopLogger,
+  getLogger,
 } from '@opentelemetry/api';
 import { CompositePropagatorConfig } from './types';
 
@@ -37,7 +37,7 @@ export class CompositePropagator implements TextMapPropagator {
    */
   constructor(config: CompositePropagatorConfig = {}) {
     this._propagators = config.propagators ?? [];
-    this._logger = config.logger ?? new NoopLogger();
+    this._logger = getLogger(config.logger);
     this._fields = Array.from(
       new Set(
         this._propagators

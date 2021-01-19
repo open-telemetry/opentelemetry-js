@@ -16,13 +16,13 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { NoopLogger } from '@opentelemetry/api';
+import { getLogger } from '@opentelemetry/api';
 import { parseHeaders } from '../../src/util';
 
 describe('utils', () => {
   describe('parseHeaders', () => {
     it('should ignore undefined headers', () => {
-      const logger = new NoopLogger();
+      const logger = getLogger();
       const spyWarn = sinon.stub(logger, 'warn');
       const headers: Partial<Record<string, unknown>> = {
         foo1: undefined,

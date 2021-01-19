@@ -18,9 +18,9 @@ import {
   context,
   SpanKind,
   propagation,
-  NoopLogger,
   setSpan,
   getSpan,
+  getLogger,
 } from '@opentelemetry/api';
 import { HttpTraceContext } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
@@ -650,7 +650,7 @@ export const runTests = (
     };
 
     describe('enable()', () => {
-      const logger = new NoopLogger();
+      const logger = getLogger();
       const provider = new NodeTracerProvider({ logger });
       provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
       beforeEach(() => {
@@ -695,7 +695,7 @@ export const runTests = (
     });
 
     describe('disable()', () => {
-      const logger = new NoopLogger();
+      const logger = getLogger();
       const provider = new NodeTracerProvider({ logger });
       provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
       beforeEach(() => {
@@ -727,7 +727,7 @@ export const runTests = (
     });
 
     describe('Test filtering requests using metadata', () => {
-      const logger = new NoopLogger();
+      const logger = getLogger();
       const provider = new NodeTracerProvider({ logger });
       provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
       beforeEach(() => {
@@ -757,7 +757,7 @@ export const runTests = (
     });
 
     describe('Test filtering requests using options', () => {
-      const logger = new NoopLogger();
+      const logger = getLogger();
       const provider = new NodeTracerProvider({ logger });
       const checkSpans: { [key: string]: boolean } = {
         unaryMethod: false,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/api';
+import { getLogger } from '@opentelemetry/api';
 import { Counter, ValueObserver } from '@opentelemetry/api-metrics';
 import { ExportResultCode } from '@opentelemetry/core';
 import {
@@ -63,7 +63,7 @@ describe('CollectorMetricExporter - common', () => {
       onInitSpy = sinon.stub(CollectorMetricExporter.prototype, 'onInit');
       collectorExporterConfig = {
         hostname: 'foo',
-        logger: new NoopLogger(),
+        logger: getLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
@@ -127,7 +127,12 @@ describe('CollectorMetricExporter - common', () => {
       });
 
       it('should set default logger', () => {
-        assert.ok(collectorExporter.logger instanceof NoopLogger);
+        const noopLogger = getLogger();
+        assert.strictEqual(
+          collectorExporter.logger.error,
+          noopLogger.error,
+          'This should be the default noopLogger method'
+        );
       });
     });
   });
@@ -213,7 +218,7 @@ describe('CollectorMetricExporter - common', () => {
       );
       collectorExporterConfig = {
         hostname: 'foo',
-        logger: new NoopLogger(),
+        logger: getLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',

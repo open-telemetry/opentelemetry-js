@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import { Logger, getLogger } from '@opentelemetry/api';
 import { ExportResult, ExportResultCode, getEnv } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { Socket } from 'dgram';
@@ -25,7 +25,7 @@ import * as jaegerTypes from './types';
  * Format and sends span information to Jaeger Exporter.
  */
 export class JaegerExporter implements SpanExporter {
-  private readonly _logger: api.Logger;
+  private readonly _logger: Logger;
   private readonly _process: jaegerTypes.ThriftProcess;
   private readonly _sender: typeof jaegerTypes.UDPSender;
   private readonly _onShutdownFlushTimeout: number;
@@ -35,7 +35,7 @@ export class JaegerExporter implements SpanExporter {
 
   constructor(config: jaegerTypes.ExporterConfig) {
     const localConfig = Object.assign({}, config);
-    this._logger = localConfig.logger || new api.NoopLogger();
+    this._logger = getLogger(localConfig.logger);
     const tags: jaegerTypes.Tag[] = localConfig.tags || [];
     this._onShutdownFlushTimeout =
       typeof localConfig.flushTimeout === 'number'
