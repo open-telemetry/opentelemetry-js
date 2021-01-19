@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import * as api from '@opentelemetry/api-metrics';
 import { Logger, NoopLogger } from '@opentelemetry/api';
 import { BatchObserverResult } from './BatchObserverResult';
 import { MetricRecord } from './export/types';

@@ -187,12 +187,14 @@ After adding the package, run `npm install` from the root of the project. This w
 - No “changes requested” reviews.
 - No unresolved conversations.
 - 3 approvals, including the approvals of at least 2 maintainers
-  - A pull request opened by an approver may be merged with only 2 reviews.
+  - A pull request opened by an approver may be merged with only the 2 maintainer reviews.
   - Small (simple typo, URL, update docs, or grammatical fix) or high-priority changes may be merged more quickly or with fewer reviewers at the discretion of the maintainers. This is typically indicated with the express label.
 - For plugins, exporters, and propagators approval of the original code module author is preferred but not required.
 - New or changed functionality is tested by unit tests.
 - New or changed functionality is documented.
 - Substantial changes should not be merged within 24 hours of opening in order to allow reviewers from all time zones to have a chance to review.
+
+If all of the above requirements are met and there are no unresolved discussions, a pull request may be merged by either a maintainer or an approver.
 
 ### Generating API documentation
 

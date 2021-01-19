@@ -311,7 +311,7 @@ export namespace opentelemetryProto {
 
     export interface InstrumentationLibrary {
       name: string;
-      version: string;
+      version?: string;
     }
 
     export interface StringKeyValue {

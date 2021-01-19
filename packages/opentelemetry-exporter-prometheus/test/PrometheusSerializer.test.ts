@@ -24,7 +24,7 @@ import {
   ValueObserverMetric,
 } from '@opentelemetry/metrics';
 import * as assert from 'assert';
-import { Labels } from '@opentelemetry/api';
+import { Labels } from '@opentelemetry/api-metrics';
 import { PrometheusSerializer } from '../src/PrometheusSerializer';
 import { PrometheusLabelsBatcher } from '../src/PrometheusLabelsBatcher';
 import { ExactProcessor } from './ExactProcessor';
