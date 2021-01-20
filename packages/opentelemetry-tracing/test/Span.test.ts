@@ -393,7 +393,7 @@ describe('Span', () => {
     assert.ok(span.instrumentationLibrary);
     const { name, version } = span.instrumentationLibrary;
     assert.strictEqual(name, 'default');
-    assert.strictEqual(version, '*');
+    assert.strictEqual(version, undefined);
   });
 
   it('should return ReadableSpan with attributes', () => {
