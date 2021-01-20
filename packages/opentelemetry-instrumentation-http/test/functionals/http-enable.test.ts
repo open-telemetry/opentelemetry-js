@@ -209,6 +209,9 @@ describe('HttpInstrumentation', () => {
         });
         instrumentation.enable();
         server = http.createServer((request, response) => {
+          if (request.url?.includes('/ignored')) {
+            provider.getTracer('test').startSpan('some-span').end();
+          }
           response.end('Test Server Response');
         });
 
