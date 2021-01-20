@@ -19,6 +19,7 @@ import {
   otperformance as performance,
   isWrapped,
 } from '@opentelemetry/core';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import {
   B3Propagator,
   B3InjectEncoding,
@@ -203,7 +204,10 @@ describe('xhr', () => {
           );
           webTracerProviderWithZone = new WebTracerProvider({
             logLevel: LogLevel.ERROR,
-            plugins: [xmlHttpRequestInstrumentation],
+          });
+          registerInstrumentations({
+            instrumentations: [xmlHttpRequestInstrumentation],
+            tracerProvider: webTracerProviderWithZone,
           });
           webTracerWithZone = webTracerProviderWithZone.getTracer('xhr-test');
           dummySpanExporter = new DummySpanExporter();
@@ -730,8 +734,13 @@ describe('xhr', () => {
 
           webTracerWithZoneProvider = new WebTracerProvider({
             logLevel: LogLevel.ERROR,
-            plugins: [new XMLHttpRequestInstrumentation()],
           });
+
+          registerInstrumentations({
+            instrumentations: [new XMLHttpRequestInstrumentation()],
+            tracerProvider: webTracerWithZoneProvider,
+          });
+
           dummySpanExporter = new DummySpanExporter();
           exportSpy = sinon.stub(dummySpanExporter, 'export');
           webTracerWithZoneProvider.addSpanProcessor(

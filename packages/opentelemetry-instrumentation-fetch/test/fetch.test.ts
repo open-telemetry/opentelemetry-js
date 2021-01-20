@@ -15,7 +15,10 @@
  */
 import * as api from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
-import { isWrapped } from '@opentelemetry/instrumentation';
+import {
+  isWrapped,
+  registerInstrumentations,
+} from '@opentelemetry/instrumentation';
 
 import {
   B3Propagator,
@@ -170,7 +173,10 @@ describe('fetch', () => {
     fetchInstrumentation = new FetchInstrumentation(config);
     webTracerProviderWithZone = new WebTracerProvider({
       logLevel: core.LogLevel.ERROR,
-      plugins: [fetchInstrumentation],
+    });
+    registerInstrumentations({
+      tracerProvider: webTracerProviderWithZone,
+      instrumentations: [fetchInstrumentation],
     });
     webTracerWithZone = webTracerProviderWithZone.getTracer('fetch-test');
     dummySpanExporter = new DummySpanExporter();
