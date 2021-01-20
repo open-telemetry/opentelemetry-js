@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-import { LogLevel, getEnv } from '@opentelemetry/core';
-import * as api from '@opentelemetry/api';
+import { Logger } from '@opentelemetry/api';
+import * as api from '@opentelemetry/api-metrics';
+import { getEnv, LogLevel } from '@opentelemetry/core';
+import { Resource } from '@opentelemetry/resources';
 import { Processor } from './export/Processor';
 import { MetricExporter } from './export/types';
-import { Resource } from '@opentelemetry/resources';
 
 /** MeterConfig provides an interface for configuring a Meter. */
 export interface MeterConfig {
   /** User provided logger. */
-  logger?: api.Logger;
+  logger?: Logger;
 
   /** level of logger. */
   logLevel?: LogLevel;

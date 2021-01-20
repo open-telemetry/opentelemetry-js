@@ -15,7 +15,11 @@
  */
 
 import * as assert from 'assert';
-import { isWrapped, safeExecuteInTheMiddle } from '../../src';
+import {
+  isWrapped,
+  safeExecuteInTheMiddle,
+  safeExecuteInTheMiddleAsync,
+} from '../../src';
 
 describe('isWrapped', () => {
   describe('when function is wrapped', () => {
@@ -45,13 +49,12 @@ describe('isWrapped', () => {
 
 describe('safeExecuteInTheMiddle', () => {
   it('should not throw error', () => {
-    const error = new Error('test');
     safeExecuteInTheMiddle(
       () => {
-        throw error;
+        return 'foo';
       },
       err => {
-        assert.deepStrictEqual(error, err);
+        assert.deepStrictEqual(err, undefined);
       },
       true
     );
@@ -74,6 +77,50 @@ describe('safeExecuteInTheMiddle', () => {
   it('should return result', () => {
     const result = safeExecuteInTheMiddle(
       () => {
+        return 1;
+      },
+      (err, result) => {
+        assert.deepStrictEqual(err, undefined);
+        assert.deepStrictEqual(result, 1);
+      }
+    );
+    assert.deepStrictEqual(result, 1);
+  });
+});
+
+describe('safeExecuteInTheMiddleAsync', () => {
+  it('should not throw error', () => {
+    safeExecuteInTheMiddleAsync(
+      async () => {
+        await setTimeout(() => {}, 1);
+        return 'foo';
+      },
+      err => {
+        assert.deepStrictEqual(err, undefined);
+      },
+      true
+    );
+  });
+  it('should throw error', () => {
+    const error = new Error('test');
+    try {
+      safeExecuteInTheMiddleAsync(
+        async () => {
+          await setTimeout(() => {}, 1);
+          throw error;
+        },
+        err => {
+          assert.deepStrictEqual(error, err);
+        }
+      );
+    } catch (err) {
+      assert.deepStrictEqual(error, err);
+    }
+  });
+  it('should return result', async () => {
+    const result = await safeExecuteInTheMiddleAsync(
+      async () => {
+        await setTimeout(() => {}, 1);
         return 1;
       },
       (err, result) => {

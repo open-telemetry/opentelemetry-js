@@ -10,7 +10,7 @@ This package provides everything needed to interact with the OpenTelemetry API, 
 
 ## Quick Start
 
-To get started you need to install the SDK and plugins, create a TracerProvider and/or MeterProvider, and register it with the API.
+To get started you need to install the SDK and plugins, create a TracerProvider, and register it with the API.
 
 ### Install Dependencies
 
@@ -23,11 +23,6 @@ $ npm install \
     @opentelemetry/tracing \
     @opentelemetry/exporter-jaeger \ # add exporters as needed
     @opentelemetry/plugin-http # add plugins as needed
-
-$ # Install metrics dependencies
-$ npm install \
-    @opentelemetry/metrics \
-    @opentelemetry/exporter-prometheus # add exporters as needed
 ```
 
 > Note: this example is for node.js. See [examples/tracer-web](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/tracer-web) for a browser example.
@@ -74,27 +69,6 @@ tracerProvider.addSpanProcessor(
 tracerProvider.register();
 ```
 
-#### Metrics
-
-```javascript
-const api = require("@opentelemetry/api");
-const { MeterProvider } = require("@opentelemetry/metrics");
-const { PrometheusExporter } = require("@opentelemetry/exporter-prometheus");
-
-const meterProvider = new MeterProvider({
-  // The Prometheus exporter runs an HTTP server which
-  // the Prometheus backend scrapes to collect metrics.
-  exporter: new PrometheusExporter({ startServer: true }),
-  interval: 1000,
-});
-
-/**
- * Registering the provider with the API allows it to be discovered
- * and used by instrumentation libraries.
- */
-api.metrics.setGlobalMeterProvider(meterProvider);
-```
-
 ## Version Compatibility
 
 Because the npm installer and node module resolution algorithm could potentially allow two or more copies of any given package to exist within the same `node_modules` structure, the OpenTelemetry API takes advantage of a variable on the `global` object to store the global API. When an API method in the API package is called, it checks if this `global` API exists and proxies calls to it if and only if it is a compatible API version. This means if a package has a dependency on an OpenTelemetry API version which is not compatible with the API used by the end user, the package will receive a no-op implementation of the API.
@@ -122,7 +96,6 @@ tracerProvider.register({
 If you are writing an instrumentation library, or prefer to call the API methods directly rather than using the `register` method on the Tracer/Meter Provider, OpenTelemetry provides direct access to the underlying API methods through the `@opentelemetry/api` package. API entry points are defined as global singleton objects `trace`, `metrics`, `propagation`, and `context` which contain methods used to initialize SDK implementations and acquire resources from the API.
 
 - [Trace API Documentation][trace-api-docs]
-- [Metrics API Documentation][metrics-api-docs]
 - [Propagation API Documentation][propagation-api-docs]
 - [Context API Documentation][context-api-docs]
 
@@ -135,13 +108,6 @@ api.trace.setGlobalTracerProvider(tracerProvider);
 api.trace.getTracerProvider();
 /* returns a tracer from the registered global tracer provider (no-op if a working provider has not been initialized) */
 api.trace.getTracer(name, version);
-
-/* Initialize MeterProvider */
-api.metrics.setGlobalMeterProvider(meterProvider);
-/* returns meterProvider (no-op if a working provider has not been initialized) */
-api.metrics.getMeterProvider();
-/* returns a meter from the registered global meter provider (no-op if a working provider has not been initialized) */
-api.metrics.getMeter(name, version);
 
 /* Initialize Propagator */
 api.propagation.setGlobalPropagator(httpTraceContextPropagator);

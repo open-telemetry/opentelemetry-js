@@ -19,7 +19,7 @@ import {
   MetricKind,
 } from '@opentelemetry/metrics';
 import { PrometheusCheckpoint } from './types';
-import { Labels } from '@opentelemetry/api';
+import { Labels } from '@opentelemetry/api-metrics';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
 
 type PrometheusDataTypeLiteral =

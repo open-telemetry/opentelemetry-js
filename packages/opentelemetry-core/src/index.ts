@@ -35,6 +35,5 @@ export * from './trace/sampler/ParentBasedSampler';
 export * from './trace/sampler/TraceIdRatioBasedSampler';
 export * from './trace/TraceState';
 export * from './trace/IdGenerator';
-export * from './utils/deep-merge';
 export * from './utils/url';
 export * from './utils/wrap';

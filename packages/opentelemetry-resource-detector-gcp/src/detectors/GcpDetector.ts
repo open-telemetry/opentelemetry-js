@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import * as os from 'os';
 import * as semver from 'semver';
 import * as gcpMetadata from 'gcp-metadata';
 import {
@@ -27,6 +26,7 @@ import {
   K8S_RESOURCE,
   CONTAINER_RESOURCE,
 } from '@opentelemetry/resources';
+import { getEnv } from '@opentelemetry/core';
 
 /**
  * The GcpDetector can be used to detect if a process is running in the Google
@@ -64,7 +64,7 @@ class GcpDetector implements Detector {
     attributes[CLOUD_RESOURCE.ZONE] = zoneId;
     attributes[CLOUD_RESOURCE.PROVIDER] = 'gcp';
 
-    if (process.env.KUBERNETES_SERVICE_HOST)
+    if (getEnv().KUBERNETES_SERVICE_HOST)
       this._addK8sAttributes(attributes, clusterName);
 
     return new Resource(attributes);
@@ -75,10 +75,12 @@ class GcpDetector implements Detector {
     attributes: ResourceAttributes,
     clusterName: string
   ): void {
+    const env = getEnv();
+
     attributes[K8S_RESOURCE.CLUSTER_NAME] = clusterName;
-    attributes[K8S_RESOURCE.NAMESPACE_NAME] = process.env.NAMESPACE || '';
-    attributes[K8S_RESOURCE.POD_NAME] = process.env.HOSTNAME || os.hostname();
-    attributes[CONTAINER_RESOURCE.NAME] = process.env.CONTAINER_NAME || '';
+    attributes[K8S_RESOURCE.NAMESPACE_NAME] = env.NAMESPACE;
+    attributes[K8S_RESOURCE.POD_NAME] = env.HOSTNAME;
+    attributes[CONTAINER_RESOURCE.NAME] = env.CONTAINER_NAME;
   }
 
   /** Gets project id from GCP project metadata. */

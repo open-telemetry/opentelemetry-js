@@ -109,7 +109,11 @@ export class ZipkinExporter implements SpanExporter {
     const zipkinSpans = spans.map(span =>
       toZipkinSpan(
         span,
-        serviceName,
+        String(
+          span.attributes[SERVICE_RESOURCE.NAME] ||
+            span.resource.attributes[SERVICE_RESOURCE.NAME] ||
+            serviceName
+        ),
         this._statusCodeTagName,
         this._statusDescriptionTagName
       )

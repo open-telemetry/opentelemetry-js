@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { Context } from '@opentelemetry/context-base';
 import { Span, SpanOptions, Tracer } from '..';
 import { NOOP_TRACER } from './NoopTracer';
 import { ProxyTracerProvider } from './ProxyTracerProvider';
@@ -31,8 +32,8 @@ export class ProxyTracer implements Tracer {
     public readonly version?: string
   ) {}
 
-  startSpan(name: string, options?: SpanOptions): Span {
-    return this._getTracer().startSpan(name, options);
+  startSpan(name: string, options?: SpanOptions, context?: Context): Span {
+    return this._getTracer().startSpan(name, options, context);
   }
 
   /**

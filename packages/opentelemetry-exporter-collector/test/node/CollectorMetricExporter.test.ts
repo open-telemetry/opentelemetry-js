@@ -14,26 +14,13 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import { NoopLogger } from '@opentelemetry/api';
+import {
+  Counter,
+  ValueObserver,
+  ValueRecorder,
+} from '@opentelemetry/api-metrics';
 import * as core from '@opentelemetry/core';
-import * as http from 'http';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import {
-  CollectorMetricExporter,
-  CollectorExporterNodeConfigBase,
-} from '../../src/platform/node';
-import * as collectorTypes from '../../src/types';
-import { MockedResponse } from './nodeHelpers';
-import {
-  mockCounter,
-  mockObserver,
-  ensureExportMetricsServiceRequestIsSet,
-  ensureCounterIsCorrect,
-  mockValueRecorder,
-  ensureValueRecorderIsCorrect,
-  ensureObserverIsCorrect,
-} from '../helper';
 import {
   BoundCounter,
   BoundObserver,
@@ -41,6 +28,24 @@ import {
   Metric,
   MetricRecord,
 } from '@opentelemetry/metrics';
+import * as assert from 'assert';
+import * as http from 'http';
+import * as sinon from 'sinon';
+import {
+  CollectorExporterNodeConfigBase,
+  CollectorMetricExporter,
+} from '../../src/platform/node';
+import * as collectorTypes from '../../src/types';
+import {
+  ensureCounterIsCorrect,
+  ensureExportMetricsServiceRequestIsSet,
+  ensureObserverIsCorrect,
+  ensureValueRecorderIsCorrect,
+  mockCounter,
+  mockObserver,
+  mockValueRecorder,
+} from '../helper';
+import { MockedResponse } from './nodeHelpers';
 
 const fakeRequest = {
   end: function () {},
@@ -81,7 +86,7 @@ describe('CollectorMetricExporter - node with json over http', () => {
           foo: 'bar',
         },
         hostname: 'foo',
-        logger: new api.NoopLogger(),
+        logger: new NoopLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
@@ -94,15 +99,15 @@ describe('CollectorMetricExporter - node with json over http', () => {
         value: 1592602232694000000,
       });
       metrics = [];
-      const counter: Metric<BoundCounter> & api.Counter = mockCounter();
-      const observer: Metric<BoundObserver> & api.ValueObserver = mockObserver(
+      const counter: Metric<BoundCounter> & Counter = mockCounter();
+      const observer: Metric<BoundObserver> & ValueObserver = mockObserver(
         observerResult => {
           observerResult.observe(6, {});
         },
         'double-observer2'
       );
       const recorder: Metric<BoundValueRecorder> &
-        api.ValueRecorder = mockValueRecorder();
+        ValueRecorder = mockValueRecorder();
       counter.add(1);
       recorder.record(7);
       recorder.record(14);

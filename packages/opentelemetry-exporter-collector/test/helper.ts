@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
-import * as metrics from '@opentelemetry/metrics';
-import { ReadableSpan } from '@opentelemetry/tracing';
-import { Resource } from '@opentelemetry/resources';
+import { StatusCode, TraceFlags } from '@opentelemetry/api';
+import {
+  Counter,
+  ObserverResult,
+  SumObserver,
+  UpDownSumObserver,
+  ValueObserver,
+  ValueRecorder,
+  ValueType,
+} from '@opentelemetry/api-metrics';
 import { hexToBase64, InstrumentationLibrary } from '@opentelemetry/core';
+import * as metrics from '@opentelemetry/metrics';
+import { Resource } from '@opentelemetry/resources';
+import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
-import { opentelemetryProto } from '../src/types';
 import * as collectorTypes from '../src/types';
+import { opentelemetryProto } from '../src/types';
 
 const meterProvider = new metrics.MeterProvider({
   interval: 30000,
@@ -42,14 +51,13 @@ if (typeof Buffer === 'undefined') {
   };
 }
 
-export function mockCounter(): metrics.Metric<metrics.BoundCounter> &
-  api.Counter {
+export function mockCounter(): metrics.Metric<metrics.BoundCounter> & Counter {
   const name = 'int-counter';
   const metric =
     meter['_metrics'].get(name) ||
     meter.createCounter(name, {
       description: 'sample counter description',
-      valueType: api.ValueType.INT,
+      valueType: ValueType.INT,
     });
   metric.clear();
   metric.bind({});
@@ -57,13 +65,13 @@ export function mockCounter(): metrics.Metric<metrics.BoundCounter> &
 }
 
 export function mockDoubleCounter(): metrics.Metric<metrics.BoundCounter> &
-  api.Counter {
+  Counter {
   const name = 'double-counter';
   const metric =
     meter['_metrics'].get(name) ||
     meter.createCounter(name, {
       description: 'sample counter description',
-      valueType: api.ValueType.DOUBLE,
+      valueType: ValueType.DOUBLE,
     });
   metric.clear();
   metric.bind({});
@@ -71,16 +79,16 @@ export function mockDoubleCounter(): metrics.Metric<metrics.BoundCounter> &
 }
 
 export function mockObserver(
-  callback: (observerResult: api.ObserverResult) => unknown,
+  callback: (observerResult: ObserverResult) => unknown,
   name = 'double-observer'
-): metrics.Metric<metrics.BoundObserver> & api.ValueObserver {
+): metrics.Metric<metrics.BoundObserver> & ValueObserver {
   const metric =
     meter['_metrics'].get(name) ||
     meter.createValueObserver(
       name,
       {
         description: 'sample observer description',
-        valueType: api.ValueType.DOUBLE,
+        valueType: ValueType.DOUBLE,
       },
       callback
     );
@@ -90,16 +98,16 @@ export function mockObserver(
 }
 
 export function mockSumObserver(
-  callback: (observerResult: api.ObserverResult) => unknown,
+  callback: (observerResult: ObserverResult) => unknown,
   name = 'double-sum-observer'
-): metrics.Metric<metrics.BoundObserver> & api.SumObserver {
+): metrics.Metric<metrics.BoundObserver> & SumObserver {
   const metric =
     meter['_metrics'].get(name) ||
     meter.createSumObserver(
       name,
       {
         description: 'sample sum observer description',
-        valueType: api.ValueType.DOUBLE,
+        valueType: ValueType.DOUBLE,
       },
       callback
     );
@@ -109,16 +117,16 @@ export function mockSumObserver(
 }
 
 export function mockUpDownSumObserver(
-  callback: (observerResult: api.ObserverResult) => unknown,
+  callback: (observerResult: ObserverResult) => unknown,
   name = 'double-up-down-sum-observer'
-): metrics.Metric<metrics.BoundObserver> & api.UpDownSumObserver {
+): metrics.Metric<metrics.BoundObserver> & UpDownSumObserver {
   const metric =
     meter['_metrics'].get(name) ||
     meter.createUpDownSumObserver(
       name,
       {
         description: 'sample up down sum observer description',
-        valueType: api.ValueType.DOUBLE,
+        valueType: ValueType.DOUBLE,
       },
       callback
     );
@@ -128,13 +136,13 @@ export function mockUpDownSumObserver(
 }
 
 export function mockValueRecorder(): metrics.Metric<metrics.BoundValueRecorder> &
-  api.ValueRecorder {
+  ValueRecorder {
   const name = 'int-recorder';
   const metric =
     meter['_metrics'].get(name) ||
     meter.createValueRecorder(name, {
       description: 'sample recorder description',
-      valueType: api.ValueType.INT,
+      valueType: ValueType.INT,
       boundaries: [0, 100],
     });
   metric.clear();
@@ -152,13 +160,13 @@ export const mockedReadableSpan: ReadableSpan = {
   spanContext: {
     traceId: '1f1008dc8e270e85c40a0d7c3939b278',
     spanId: '5e107261f64fa53e',
-    traceFlags: api.TraceFlags.SAMPLED,
+    traceFlags: TraceFlags.SAMPLED,
   },
   parentSpanId: '78a8915098864388',
   startTime: [1574120165, 429803070],
   endTime: [1574120165, 438688070],
   ended: true,
-  status: { code: api.StatusCode.OK },
+  status: { code: StatusCode.OK },
   attributes: { component: 'document-load' },
   links: [
     {
@@ -223,13 +231,13 @@ export const basicTrace: ReadableSpan[] = [
     spanContext: {
       traceId: '1f1008dc8e270e85c40a0d7c3939b278',
       spanId: '5e107261f64fa53e',
-      traceFlags: api.TraceFlags.SAMPLED,
+      traceFlags: TraceFlags.SAMPLED,
     },
     parentSpanId: '78a8915098864388',
     startTime: [1574120165, 429803070],
     endTime: [1574120165, 438688070],
     ended: true,
-    status: { code: api.StatusCode.OK },
+    status: { code: StatusCode.OK },
     attributes: {},
     links: [],
     events: [],
@@ -243,13 +251,13 @@ export const basicTrace: ReadableSpan[] = [
     spanContext: {
       traceId: '1f1008dc8e270e85c40a0d7c3939b278',
       spanId: 'f64fa53e5e107261',
-      traceFlags: api.TraceFlags.SAMPLED,
+      traceFlags: TraceFlags.SAMPLED,
     },
     parentSpanId: '78a8915098864388',
     startTime: [1575120165, 439803070],
     endTime: [1575120165, 448688070],
     ended: true,
-    status: { code: api.StatusCode.OK },
+    status: { code: StatusCode.OK },
     attributes: {},
     links: [],
     events: [],
@@ -263,13 +271,13 @@ export const basicTrace: ReadableSpan[] = [
     spanContext: {
       traceId: '1f1008dc8e270e85c40a0d7c3939b278',
       spanId: '07261f64fa53e5e1',
-      traceFlags: api.TraceFlags.SAMPLED,
+      traceFlags: TraceFlags.SAMPLED,
     },
     parentSpanId: 'a891578098864388',
     startTime: [1575120165, 439803070],
     endTime: [1575120165, 448688070],
     ended: true,
-    status: { code: api.StatusCode.OK },
+    status: { code: StatusCode.OK },
     attributes: {},
     links: [],
     events: [],
@@ -295,7 +303,7 @@ export const multiResourceTrace: ReadableSpan[] = [
 ];
 
 export const multiResourceMetricsGet = function (
-  callback: (observerResult: api.ObserverResult) => unknown
+  callback: (observerResult: ObserverResult) => unknown
 ): any[] {
   return [
     {
@@ -317,7 +325,7 @@ export const multiResourceMetricsGet = function (
 };
 
 export const multiInstrumentationLibraryMetricsGet = function (
-  callback: (observerResult: api.ObserverResult) => unknown
+  callback: (observerResult: ObserverResult) => unknown
 ): any[] {
   return [
     {
