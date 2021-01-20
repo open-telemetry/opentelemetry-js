@@ -39,7 +39,7 @@ export interface FetchError {
  */
 export interface SpanData {
   entries: PerformanceResourceTiming[];
-  observer: PerformanceObserver;
+  observer?: PerformanceObserver;
   spanUrl: string;
   startTime: api.HrTime;
 }
