@@ -241,7 +241,6 @@ To request automatic tracing support for a module not on this list, please [file
 - `Tracer.withSpan(span)`: use `api.context.with(api.setSpan(api.context.active(), span))`
 - `Tracer.bind(target)`: use `api.context.bind(target)`
 
-
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
