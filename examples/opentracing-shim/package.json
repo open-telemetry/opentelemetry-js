@@ -1,7 +1,7 @@
 {
   "name": "opentracing-shim",
   "private": true,
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "Example of using @opentelemetry/shim-opentracing in Node.js",
   "main": "index.js",
   "scripts": {
