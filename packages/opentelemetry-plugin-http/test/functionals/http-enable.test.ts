@@ -211,6 +211,9 @@ describe('HttpPlugin', () => {
         };
         plugin.enable(http, provider, provider.logger, config);
         server = http.createServer((request, response) => {
+          if (request.url?.includes('/ignored')) {
+            provider.getTracer('test').startSpan('some-span').end();
+          }
           response.end('Test Server Response');
         });
 
