@@ -130,6 +130,7 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 
 - [Chengzhong Wu](https://github.com/legendecas), Alibaba
 - [Gerhard Stöbich](https://github.com/Flarna), Dynatrace
+- [John Bley](https://github.com/johnbley), Splunk
 - [Mark Wolff](https://github.com/markwolff), Microsoft
 - [Matthew Wear](https://github.com/mwear), LightStep
 - [Naseem K. Ullah](https://github.com/naseemkullah), Transit
