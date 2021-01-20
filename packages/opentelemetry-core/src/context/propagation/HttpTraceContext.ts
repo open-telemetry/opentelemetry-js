@@ -30,12 +30,12 @@ export const TRACE_PARENT_HEADER = 'traceparent';
 export const TRACE_STATE_HEADER = 'tracestate';
 
 const VERSION = '00';
-const VERSION_REGEX = '(?!ff)[\\da-f]{2}';
-const TRACE_ID_REGEX = '(?![0]{32})[\\da-f]{32}';
-const PARENT_ID_REGEX = '(?![0]{16})[\\da-f]{16}';
-const FLAGS_REGEX = '[\\da-f]{2}';
+const VERSION_PART = '(?!ff)[\\da-f]{2}';
+const TRACE_ID_PART = '(?![0]{32})[\\da-f]{32}';
+const PARENT_ID_PART = '(?![0]{16})[\\da-f]{16}';
+const FLAGS_PART = '[\\da-f]{2}';
 const TRACE_PARENT_REGEX = new RegExp(
-  `^\\s?(${VERSION_REGEX})-(${TRACE_ID_REGEX})-(${PARENT_ID_REGEX})-(${FLAGS_REGEX})(-.*)?\\s?$`
+  `^\\s?(${VERSION_PART})-(${TRACE_ID_PART})-(${PARENT_ID_PART})-(${FLAGS_PART})(-.*)?\\s?$`
 );
 
 /**
