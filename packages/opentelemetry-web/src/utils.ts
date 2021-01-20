@@ -81,7 +81,7 @@ export function addSpanNetworkEvents(
   addSpanNetworkEvent(span, PTN.RESPONSE_START, resource);
   addSpanNetworkEvent(span, PTN.RESPONSE_END, resource);
   const contentLength = resource[PTN.ENCODED_BODY_SIZE];
-  if (contentLength) {
+  if (contentLength !== undefined) {
     span.setAttribute(
       HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH,
       contentLength
