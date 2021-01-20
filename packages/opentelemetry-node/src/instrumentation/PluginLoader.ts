@@ -150,7 +150,9 @@ export class PluginLoader {
 
         // Expecting a plugin from module;
         try {
-          const plugin: Plugin = require(modulePath).plugin;
+          const plugin: Plugin = config.loader
+            ? config.loader()
+            : require(modulePath).plugin;
           if (!utils.isSupportedVersion(version, plugin.supportedVersions)) {
             this.logger.warn(
               `PluginLoader#load: Plugin ${name} only supports module ${plugin.moduleName} with the versions: ${plugin.supportedVersions}`

@@ -64,6 +64,15 @@ export interface PluginConfig {
   path?: string;
 
   /**
+   * Function to load the plugin.  Needed in environments like Yarn PnP
+   * where modules cannot use require() to load modules not listed in their
+   * own dependencies.
+   *
+   * Example: `loader: () => require('@opentelemetry/plugin-xxx').plugin`
+   */
+  loader?: () => Plugin;
+
+  /**
    * Request methods that match any string in ignoreMethods will not be traced.
    */
   ignoreMethods?: string[];
