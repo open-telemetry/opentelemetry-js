@@ -64,5 +64,65 @@
     "@opentelemetry/tracing": "^0.14.0",
     "require-in-the-middle": "^5.0.0",
     "semver": "^7.1.3"
+  },
+  "peerDependencies": {
+    "@opentelemetry/hapi-instrumentation": "^0.12.0",
+    "@opentelemetry/koa-instrumentation": "^0.12.0",
+    "@opentelemetry/plugin-dns": "^0.12.0",
+    "@opentelemetry/plugin-express": "^0.12.0",
+    "@opentelemetry/plugin-grpc": "^0.14.0",
+    "@opentelemetry/plugin-grpc-js": "^0.14.0",
+    "@opentelemetry/plugin-http": "^0.14.0",
+    "@opentelemetry/plugin-https": "^0.14.0",
+    "@opentelemetry/plugin-redis": "^0.12.0",
+    "@opentelemetry/plugin-ioredis": "^0.12.0",
+    "@opentelemetry/plugin-mongodb": "^0.12.0",
+    "@opentelemetry/plugin-mysql": "^0.12.0",
+    "@opentelemetry/plugin-pg": "^0.12.0",
+    "@opentelemetry/plugin-pg-pool": "^0.12.0"
+  },
+  "peerDependenciesMeta": {
+    "@opentelemetry/hapi-instrumentation": {
+      "optional": true
+    },
+    "@opentelemetry/koa-instrumentation": {
+      "optional": true
+    },
+    "@opentelemetry/plugin-dns": {
+      "optional": true
+    },
+    "@opentelemetry/plugin-express": {
+      "optional": true
+    },
+    "@opentelemetry/plugin-grpc": {
+      "optional": true
+    },
+    "@opentelemetry/plugin-grpc-js": {
+      "optional": true
+    },
+    "@opentelemetry/plugin-http": {
+      "optional": true
+    },
+    "@opentelemetry/plugin-https": {
+      "optional": true
+    },
+    "@opentelemetry/plugin-redis": {
+      "optional": true
+    },
+    "@opentelemetry/plugin-ioredis": {
+      "optional": true
+    },
+    "@opentelemetry/plugin-mongodb": {
+      "optional": true
+    },
+    "@opentelemetry/plugin-mysql": {
+      "optional": true
+    },
+    "@opentelemetry/plugin-pg": {
+      "optional": true
+    },
+    "@opentelemetry/plugin-pg-pool": {
+      "optional": true
+    }
   }
 }
