@@ -7,6 +7,7 @@
 	<meta name="description" content="Documentation for OpenTelemetry API for JavaScript">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
+	<script async src="assets/js/search.js" id="search-script"></script>
 </head>
 <body>
 <header>
@@ -40,8 +41,6 @@
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
 							<input type="checkbox" id="tsd-filter-externals" checked />
 							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
-							<input type="checkbox" id="tsd-filter-only-exported" />
-							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
 						</div>
 					</div>
 					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
@@ -51,12 +50,7 @@
 	</div>
 	<div class="tsd-page-title">
 		<div class="container">
-			<ul class="tsd-breadcrumb">
-				<li>
-					<a href="globals.html">Globals</a>
-				</li>
-			</ul>
-			<h1>OpenTelemetry API for JavaScript</h1>
+			<h1>Project OpenTelemetry API for JavaScript</h1>
 		</div>
 	</div>
 </header>
@@ -76,23 +70,19 @@
 				<a href="#quick-start" id="quick-start" style="color: inherit; text-decoration: none;">
 					<h2>Quick Start</h2>
 				</a>
-				<p>To get started you need to install the SDK and plugins, create a TracerProvider and/or MeterProvider, and register it with the API.</p>
+				<p>To get started you need to install the SDK and plugins, create a TracerProvider, and register it with the API.</p>
 				<a href="#install-dependencies" id="install-dependencies" style="color: inherit; text-decoration: none;">
 					<h3>Install Dependencies</h3>
 				</a>
-				<pre><code class="language-sh">$ <span class="hljs-comment"># Install tracing dependencies</span>
-$ npm install \
-    @opentelemetry/api \
-    @opentelemetry/core \
-    @opentelemetry/node \
-    @opentelemetry/tracing \
-    @opentelemetry/exporter-jaeger \ <span class="hljs-comment"># add exporters as needed</span>
-    @opentelemetry/plugin-http <span class="hljs-comment"># add plugins as needed</span>
-
-$ <span class="hljs-comment"># Install metrics dependencies</span>
-$ npm install \
-    @opentelemetry/metrics \
-    @opentelemetry/exporter-prometheus <span class="hljs-comment"># add exporters as needed</span></code></pre>
+				<pre><code class="language-sh"><span style="color: #000000">$ </span><span style="color: #008000"># Install tracing dependencies</span>
+<span style="color: #000000">$ npm install \</span>
+<span style="color: #000000">    @opentelemetry/api \</span>
+<span style="color: #000000">    @opentelemetry/core \</span>
+<span style="color: #000000">    @opentelemetry/node \</span>
+<span style="color: #000000">    @opentelemetry/tracing \</span>
+<span style="color: #000000">    @opentelemetry/exporter-jaeger </span><span style="color: #EE0000">\ </span><span style="color: #008000"># add exporters as needed</span>
+<span style="color: #000000">    @opentelemetry/plugin-http </span><span style="color: #008000"># add plugins as needed</span>
+</code></pre>
 				<blockquote>
 					<p>Note: this example is for node.js. See <a href="https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/tracer-web">examples/tracer-web</a> for a browser example.</p>
 				</blockquote>
@@ -104,56 +94,38 @@ $ npm install \
 				<a href="#tracing" id="tracing" style="color: inherit; text-decoration: none;">
 					<h4>Tracing</h4>
 				</a>
-				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { NodeTracerProvider } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;@opentelemetry/node&quot;</span>);
-<span class="hljs-keyword">const</span> { SimpleSpanProcessor } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;@opentelemetry/tracing&quot;</span>);
-<span class="hljs-keyword">const</span> { JaegerExporter } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;@opentelemetry/exporter-jaeger&quot;</span>);
+				<pre><code class="language-javascript"><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">NodeTracerProvider</span><span style="color: #000000"> } = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;@opentelemetry/node&quot;</span><span style="color: #000000">);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">SimpleSpanProcessor</span><span style="color: #000000"> } = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;@opentelemetry/tracing&quot;</span><span style="color: #000000">);</span>
+<span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">JaegerExporter</span><span style="color: #000000"> } = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;@opentelemetry/exporter-jaeger&quot;</span><span style="color: #000000">);</span>
 
-<span class="hljs-keyword">const</span> tracerProvider = <span class="hljs-keyword">new</span> NodeTracerProvider();
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">tracerProvider</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">NodeTracerProvider</span><span style="color: #000000">();</span>
 
-<span class="hljs-comment">/**
- * The SimpleSpanProcessor does no batching and exports spans
- * immediately when they end. For most production use cases,
- * OpenTelemetry recommends use of the BatchSpanProcessor.
- */</span>
-tracerProvider.addSpanProcessor(
-  <span class="hljs-keyword">new</span> SimpleSpanProcessor(
-    <span class="hljs-keyword">new</span> JaegerExporter({
-      <span class="hljs-attr">serviceName</span>: <span class="hljs-string">&#x27;my-service&#x27;</span>
-    })
-  )
-);
+<span style="color: #008000">/**</span>
+<span style="color: #008000"> * The SimpleSpanProcessor does no batching and exports spans</span>
+<span style="color: #008000"> * immediately when they end. For most production use cases,</span>
+<span style="color: #008000"> * OpenTelemetry recommends use of the BatchSpanProcessor.</span>
+<span style="color: #008000"> */</span>
+<span style="color: #001080">tracerProvider</span><span style="color: #000000">.</span><span style="color: #795E26">addSpanProcessor</span><span style="color: #000000">(</span>
+<span style="color: #000000">  </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">SimpleSpanProcessor</span><span style="color: #000000">(</span>
+<span style="color: #000000">    </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">JaegerExporter</span><span style="color: #000000">({</span>
+<span style="color: #000000">      </span><span style="color: #001080">serviceName:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;my-service&#039;</span>
+<span style="color: #000000">    })</span>
+<span style="color: #000000">  )</span>
+<span style="color: #000000">);</span>
 
-<span class="hljs-comment">/**
- * Registering the provider with the API allows it to be discovered
- * and used by instrumentation libraries. The OpenTelemetry API provides
- * methods to set global SDK implementations, but the default SDK provides
- * a convenience method named `register` which registers same defaults
- * for you.
- *
- * By default the NodeTracerProvider uses Trace Context for propagation
- * and AsyncHooksScopeManager for context management. To learn about
- * customizing this behavior, see API Registration Options below.
- */</span>
-tracerProvider.register();</code></pre>
-				<a href="#metrics" id="metrics" style="color: inherit; text-decoration: none;">
-					<h4>Metrics</h4>
-				</a>
-				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> api = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;@opentelemetry/api&quot;</span>);
-<span class="hljs-keyword">const</span> { MeterProvider } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;@opentelemetry/metrics&quot;</span>);
-<span class="hljs-keyword">const</span> { PrometheusExporter } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;@opentelemetry/exporter-prometheus&quot;</span>);
-
-<span class="hljs-keyword">const</span> meterProvider = <span class="hljs-keyword">new</span> MeterProvider({
-  <span class="hljs-comment">// The Prometheus exporter runs an HTTP server which</span>
-  <span class="hljs-comment">// the Prometheus backend scrapes to collect metrics.</span>
-  <span class="hljs-attr">exporter</span>: <span class="hljs-keyword">new</span> PrometheusExporter({ <span class="hljs-attr">startServer</span>: <span class="hljs-literal">true</span> }),
-  <span class="hljs-attr">interval</span>: <span class="hljs-number">1000</span>,
-});
-
-<span class="hljs-comment">/**
- * Registering the provider with the API allows it to be discovered
- * and used by instrumentation libraries.
- */</span>
-api.metrics.setGlobalMeterProvider(meterProvider);</code></pre>
+<span style="color: #008000">/**</span>
+<span style="color: #008000"> * Registering the provider with the API allows it to be discovered</span>
+<span style="color: #008000"> * and used by instrumentation libraries. The OpenTelemetry API provides</span>
+<span style="color: #008000"> * methods to set global SDK implementations, but the default SDK provides</span>
+<span style="color: #008000"> * a convenience method named `register` which registers same defaults</span>
+<span style="color: #008000"> * for you.</span>
+<span style="color: #008000"> *</span>
+<span style="color: #008000"> * By default the NodeTracerProvider uses Trace Context for propagation</span>
+<span style="color: #008000"> * and AsyncHooksScopeManager for context management. To learn about</span>
+<span style="color: #008000"> * customizing this behavior, see API Registration Options below.</span>
+<span style="color: #008000"> */</span>
+<span style="color: #001080">tracerProvider</span><span style="color: #000000">.</span><span style="color: #795E26">register</span><span style="color: #000000">();</span>
+</code></pre>
 				<a href="#version-compatibility" id="version-compatibility" style="color: inherit; text-decoration: none;">
 					<h2>Version Compatibility</h2>
 				</a>
@@ -165,70 +137,65 @@ api.metrics.setGlobalMeterProvider(meterProvider);</code></pre>
 					<h3>API Registration Options</h3>
 				</a>
 				<p>If you prefer to choose your own propagator or context manager, you may pass an options object into the <code>tracerProvider.register()</code> method. Omitted or <code>undefined</code> options will be replaced by a default value and <code>null</code> values will be skipped.</p>
-				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> { B3Propagator } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;@opentelemetry/propagator-b3&quot;</span>);
+				<pre><code class="language-javascript"><span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">B3Propagator</span><span style="color: #000000"> } = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;@opentelemetry/propagator-b3&quot;</span><span style="color: #000000">);</span>
 
-tracerProvider.register({
-  <span class="hljs-comment">// Use B3 Propagation</span>
-  <span class="hljs-attr">propagator</span>: <span class="hljs-keyword">new</span> B3Propagator(),
+<span style="color: #001080">tracerProvider</span><span style="color: #000000">.</span><span style="color: #795E26">register</span><span style="color: #000000">({</span>
+<span style="color: #000000">  </span><span style="color: #008000">// Use B3 Propagation</span>
+<span style="color: #000000">  </span><span style="color: #001080">propagator:</span><span style="color: #000000"> </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">B3Propagator</span><span style="color: #000000">(),</span>
 
-  <span class="hljs-comment">// Skip registering a default context manager</span>
-  <span class="hljs-attr">contextManager</span>: <span class="hljs-literal">null</span>,
-});</code></pre>
+<span style="color: #000000">  </span><span style="color: #008000">// Skip registering a default context manager</span>
+<span style="color: #000000">  </span><span style="color: #001080">contextManager:</span><span style="color: #000000"> </span><span style="color: #0000FF">null</span><span style="color: #000000">,</span>
+<span style="color: #000000">});</span>
+</code></pre>
 				<a href="#api-methods" id="api-methods" style="color: inherit; text-decoration: none;">
 					<h3>API Methods</h3>
 				</a>
 				<p>If you are writing an instrumentation library, or prefer to call the API methods directly rather than using the <code>register</code> method on the Tracer/Meter Provider, OpenTelemetry provides direct access to the underlying API methods through the <code>@opentelemetry/api</code> package. API entry points are defined as global singleton objects <code>trace</code>, <code>metrics</code>, <code>propagation</code>, and <code>context</code> which contain methods used to initialize SDK implementations and acquire resources from the API.</p>
 				<ul>
 					<li><a href="https://open-telemetry.github.io/opentelemetry-js/classes/traceapi.html">Trace API Documentation</a></li>
-					<li><a href="https://open-telemetry.github.io/opentelemetry-js/classes/metricsapi.html">Metrics API Documentation</a></li>
 					<li><a href="https://open-telemetry.github.io/opentelemetry-js/classes/propagationapi.html">Propagation API Documentation</a></li>
 					<li><a href="https://open-telemetry.github.io/opentelemetry-js/classes/contextapi.html">Context API Documentation</a></li>
 				</ul>
-				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> api = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;@opentelemetry/api&quot;</span>);
+				<pre><code class="language-javascript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">api</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;@opentelemetry/api&quot;</span><span style="color: #000000">);</span>
 
-<span class="hljs-comment">/* Initialize TracerProvider */</span>
-api.trace.setGlobalTracerProvider(tracerProvider);
-<span class="hljs-comment">/* returns tracerProvider (no-op if a working provider has not been initialized) */</span>
-api.trace.getTracerProvider();
-<span class="hljs-comment">/* returns a tracer from the registered global tracer provider (no-op if a working provider has not been initialized) */</span>
-api.trace.getTracer(name, version);
+<span style="color: #008000">/* Initialize TracerProvider */</span>
+<span style="color: #001080">api</span><span style="color: #000000">.</span><span style="color: #001080">trace</span><span style="color: #000000">.</span><span style="color: #795E26">setGlobalTracerProvider</span><span style="color: #000000">(</span><span style="color: #001080">tracerProvider</span><span style="color: #000000">);</span>
+<span style="color: #008000">/* returns tracerProvider (no-op if a working provider has not been initialized) */</span>
+<span style="color: #001080">api</span><span style="color: #000000">.</span><span style="color: #001080">trace</span><span style="color: #000000">.</span><span style="color: #795E26">getTracerProvider</span><span style="color: #000000">();</span>
+<span style="color: #008000">/* returns a tracer from the registered global tracer provider (no-op if a working provider has not been initialized) */</span>
+<span style="color: #001080">api</span><span style="color: #000000">.</span><span style="color: #001080">trace</span><span style="color: #000000">.</span><span style="color: #795E26">getTracer</span><span style="color: #000000">(</span><span style="color: #001080">name</span><span style="color: #000000">, </span><span style="color: #001080">version</span><span style="color: #000000">);</span>
 
-<span class="hljs-comment">/* Initialize MeterProvider */</span>
-api.metrics.setGlobalMeterProvider(meterProvider);
-<span class="hljs-comment">/* returns meterProvider (no-op if a working provider has not been initialized) */</span>
-api.metrics.getMeterProvider();
-<span class="hljs-comment">/* returns a meter from the registered global meter provider (no-op if a working provider has not been initialized) */</span>
-api.metrics.getMeter(name, version);
+<span style="color: #008000">/* Initialize Propagator */</span>
+<span style="color: #001080">api</span><span style="color: #000000">.</span><span style="color: #001080">propagation</span><span style="color: #000000">.</span><span style="color: #795E26">setGlobalPropagator</span><span style="color: #000000">(</span><span style="color: #001080">httpTraceContextPropagator</span><span style="color: #000000">);</span>
 
-<span class="hljs-comment">/* Initialize Propagator */</span>
-api.propagation.setGlobalPropagator(httpTraceContextPropagator);
-
-<span class="hljs-comment">/* Initialize Context Manager */</span>
-api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
+<span style="color: #008000">/* Initialize Context Manager */</span>
+<span style="color: #001080">api</span><span style="color: #000000">.</span><span style="color: #001080">context</span><span style="color: #000000">.</span><span style="color: #795E26">setGlobalContextManager</span><span style="color: #000000">(</span><span style="color: #001080">asyncHooksContextManager</span><span style="color: #000000">);</span>
+</code></pre>
 				<a href="#library-authors" id="library-authors" style="color: inherit; text-decoration: none;">
 					<h3>Library Authors</h3>
 				</a>
 				<p>Library authors need only to depend on the <code>@opentelemetry/api</code> package and trust that the application owners which use their library will initialize an appropriate SDK.</p>
-				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> api = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;@opentelemetry/api&quot;</span>);
+				<pre><code class="language-javascript"><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">api</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;@opentelemetry/api&quot;</span><span style="color: #000000">);</span>
 
-<span class="hljs-keyword">const</span> tracer = api.trace.getTracer(<span class="hljs-string">&quot;my-library-name&quot;</span>, <span class="hljs-string">&quot;0.2.3&quot;</span>);
+<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">tracer</span><span style="color: #000000"> = </span><span style="color: #001080">api</span><span style="color: #000000">.</span><span style="color: #001080">trace</span><span style="color: #000000">.</span><span style="color: #795E26">getTracer</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;my-library-name&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;0.2.3&quot;</span><span style="color: #000000">);</span>
 
-<span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">doSomething</span>(<span class="hljs-params"></span>) </span>{
-  <span class="hljs-keyword">const</span> span = tracer.startSpan(<span class="hljs-string">&quot;doSomething&quot;</span>, { <span class="hljs-attr">parent</span>: tracer.getCurrentSpan() });
-  <span class="hljs-keyword">try</span> {
-    <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> doSomethingElse();
-    span.end();
-    <span class="hljs-keyword">return</span> result;
-  } <span class="hljs-keyword">catch</span> (err) {
-    span.setStatus({
-      <span class="hljs-comment">// use an appropriate status code here</span>
-      <span class="hljs-attr">code</span>: api.StatusCode.ERROR,
-      <span class="hljs-attr">message</span>: err.message,
-    });
-    span.end();
-    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
-  }
-}</code></pre>
+<span style="color: #0000FF">async</span><span style="color: #000000"> </span><span style="color: #0000FF">function</span><span style="color: #000000"> </span><span style="color: #795E26">doSomething</span><span style="color: #000000">() {</span>
+<span style="color: #000000">  </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">span</span><span style="color: #000000"> = </span><span style="color: #001080">tracer</span><span style="color: #000000">.</span><span style="color: #795E26">startSpan</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;doSomething&quot;</span><span style="color: #000000">);</span>
+<span style="color: #000000">  </span><span style="color: #AF00DB">try</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">result</span><span style="color: #000000"> = </span><span style="color: #AF00DB">await</span><span style="color: #000000"> </span><span style="color: #795E26">doSomethingElse</span><span style="color: #000000">();</span>
+<span style="color: #000000">    </span><span style="color: #001080">span</span><span style="color: #000000">.</span><span style="color: #795E26">end</span><span style="color: #000000">();</span>
+<span style="color: #000000">    </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #001080">result</span><span style="color: #000000">;</span>
+<span style="color: #000000">  } </span><span style="color: #AF00DB">catch</span><span style="color: #000000"> (</span><span style="color: #001080">err</span><span style="color: #000000">) {</span>
+<span style="color: #000000">    </span><span style="color: #001080">span</span><span style="color: #000000">.</span><span style="color: #795E26">setStatus</span><span style="color: #000000">({</span>
+<span style="color: #000000">      </span><span style="color: #008000">// use an appropriate status code here</span>
+<span style="color: #000000">      </span><span style="color: #001080">code:</span><span style="color: #000000"> </span><span style="color: #001080">api</span><span style="color: #000000">.</span><span style="color: #001080">StatusCode</span><span style="color: #000000">.</span><span style="color: #0070C1">ERROR</span><span style="color: #000000">,</span>
+<span style="color: #000000">      </span><span style="color: #001080">message:</span><span style="color: #000000"> </span><span style="color: #001080">err</span><span style="color: #000000">.</span><span style="color: #001080">message</span><span style="color: #000000">,</span>
+<span style="color: #000000">    });</span>
+<span style="color: #000000">    </span><span style="color: #001080">span</span><span style="color: #000000">.</span><span style="color: #795E26">end</span><span style="color: #000000">();</span>
+<span style="color: #000000">    </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #0000FF">null</span><span style="color: #000000">;</span>
+<span style="color: #000000">  }</span>
+<span style="color: #000000">}</span>
+</code></pre>
 				<a href="#useful-links" id="useful-links" style="color: inherit; text-decoration: none;">
 					<h2>Useful links</h2>
 				</a>
@@ -246,402 +213,210 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 			<nav class="tsd-navigation primary">
 				<ul>
-					<li class="globals  ">
-						<a href="globals.html"><em>Globals</em></a>
+					<li class=" ">
+						<a href="modules.html">Exports</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-enum tsd-is-external">
+					<li class=" tsd-kind-enum">
 						<a href="enums/entryttl.html" class="tsd-kind-icon">Entry<wbr>Ttl</a>
 					</li>
-					<li class=" tsd-kind-enum tsd-is-external">
+					<li class=" tsd-kind-enum">
 						<a href="enums/samplingdecision.html" class="tsd-kind-icon">Sampling<wbr>Decision</a>
 					</li>
-					<li class=" tsd-kind-enum tsd-is-external">
+					<li class=" tsd-kind-enum">
 						<a href="enums/spankind.html" class="tsd-kind-icon">Span<wbr>Kind</a>
 					</li>
-					<li class=" tsd-kind-enum tsd-is-external">
+					<li class=" tsd-kind-enum">
 						<a href="enums/statuscode.html" class="tsd-kind-icon">Status<wbr>Code</a>
 					</li>
-					<li class=" tsd-kind-enum tsd-is-external">
+					<li class=" tsd-kind-enum">
 						<a href="enums/traceflags.html" class="tsd-kind-icon">Trace<wbr>Flags</a>
 					</li>
-					<li class=" tsd-kind-enum tsd-is-external">
-						<a href="enums/valuetype.html" class="tsd-kind-icon">Value<wbr>Type</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/contextapi.html" class="tsd-kind-icon">ContextAPI</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/metricsapi.html" class="tsd-kind-icon">MetricsAPI</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/noopbaseobservermetric.html" class="tsd-kind-icon">Noop<wbr>Base<wbr>Observer<wbr>Metric</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/noopbatchobserver.html" class="tsd-kind-icon">Noop<wbr>Batch<wbr>Observer</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/noopboundbaseobserver.html" class="tsd-kind-icon">Noop<wbr>Bound<wbr>Base<wbr>Observer</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/noopboundcounter.html" class="tsd-kind-icon">Noop<wbr>Bound<wbr>Counter</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/noopboundvaluerecorder.html" class="tsd-kind-icon">Noop<wbr>Bound<wbr>Value<wbr>Recorder</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/noopcountermetric.html" class="tsd-kind-icon">Noop<wbr>Counter<wbr>Metric</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="classes/nooplogger.html" class="tsd-kind-icon">Noop<wbr>Logger</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/noopmeter.html" class="tsd-kind-icon">Noop<wbr>Meter</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/noopmeterprovider.html" class="tsd-kind-icon">Noop<wbr>Meter<wbr>Provider</a>
-					</li>
-					<li class=" tsd-kind-class tsd-has-type-parameter tsd-is-external">
-						<a href="classes/noopmetric.html" class="tsd-kind-icon">Noop<wbr>Metric</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="classes/noopspan.html" class="tsd-kind-icon">Noop<wbr>Span</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="classes/nooptextmappropagator.html" class="tsd-kind-icon">Noop<wbr>Text<wbr>Map<wbr>Propagator</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="classes/nooptracer.html" class="tsd-kind-icon">Noop<wbr>Tracer</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="classes/nooptracerprovider.html" class="tsd-kind-icon">Noop<wbr>Tracer<wbr>Provider</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/noopvaluerecordermetric.html" class="tsd-kind-icon">Noop<wbr>Value<wbr>Recorder<wbr>Metric</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/propagationapi.html" class="tsd-kind-icon">PropagationAPI</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="classes/proxytracer.html" class="tsd-kind-icon">Proxy<wbr>Tracer</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
+					<li class=" tsd-kind-class">
 						<a href="classes/proxytracerprovider.html" class="tsd-kind-icon">Proxy<wbr>Tracer<wbr>Provider</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/traceapi.html" class="tsd-kind-icon">TraceAPI</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/attributes.html" class="tsd-kind-icon">Attributes</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/baggage.html" class="tsd-kind-icon">Baggage</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/baseobserver.html" class="tsd-kind-icon">Base<wbr>Observer</a>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/context.html" class="tsd-kind-icon">Context</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/batchobserveroptions.html" class="tsd-kind-icon">Batch<wbr>Observer<wbr>Options</a>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/contextmanager.html" class="tsd-kind-icon">Context<wbr>Manager</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/batchobserverresult.html" class="tsd-kind-icon">Batch<wbr>Observer<wbr>Result</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/boundbaseobserver.html" class="tsd-kind-icon">Bound<wbr>Base<wbr>Observer</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/boundcounter.html" class="tsd-kind-icon">Bound<wbr>Counter</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/boundvaluerecorder.html" class="tsd-kind-icon">Bound<wbr>Value<wbr>Recorder</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/counter.html" class="tsd-kind-icon">Counter</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/entryvalue.html" class="tsd-kind-icon">Entry<wbr>Value</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/event.html" class="tsd-kind-icon">Event</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/exceptionwithcode.html" class="tsd-kind-icon">Exception<wbr>With<wbr>Code</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/exceptionwithmessage.html" class="tsd-kind-icon">Exception<wbr>With<wbr>Message</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/exceptionwithname.html" class="tsd-kind-icon">Exception<wbr>With<wbr>Name</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/link.html" class="tsd-kind-icon">Link</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/logger.html" class="tsd-kind-icon">Logger</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/meter.html" class="tsd-kind-icon">Meter</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/meterprovider.html" class="tsd-kind-icon">Meter<wbr>Provider</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/metric.html" class="tsd-kind-icon">Metric</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/metricoptions.html" class="tsd-kind-icon">Metric<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/observation.html" class="tsd-kind-icon">Observation</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/observerresult.html" class="tsd-kind-icon">Observer<wbr>Result</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/sampler.html" class="tsd-kind-icon">Sampler</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/samplingresult.html" class="tsd-kind-icon">Sampling<wbr>Result</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/span.html" class="tsd-kind-icon">Span</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/spancontext.html" class="tsd-kind-icon">Span<wbr>Context</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/spanoptions.html" class="tsd-kind-icon">Span<wbr>Options</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/status.html" class="tsd-kind-icon">Status</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-has-type-parameter tsd-is-external">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/textmapgetter.html" class="tsd-kind-icon">Text<wbr>Map<wbr>Getter</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-has-type-parameter tsd-is-external">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/textmappropagator.html" class="tsd-kind-icon">Text<wbr>Map<wbr>Propagator</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-has-type-parameter tsd-is-external">
+					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/textmapsetter.html" class="tsd-kind-icon">Text<wbr>Map<wbr>Setter</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/timedevent.html" class="tsd-kind-icon">Timed<wbr>Event</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/tracestate.html" class="tsd-kind-icon">Trace<wbr>State</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/tracer.html" class="tsd-kind-icon">Tracer</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/tracerprovider.html" class="tsd-kind-icon">Tracer<wbr>Provider</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-has-type-parameter tsd-is-external">
-						<a href="interfaces/unboundmetric.html" class="tsd-kind-icon">Unbound<wbr>Metric</a>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#attributevalue" class="tsd-kind-icon">Attribute<wbr>Value</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/updowncounter.html" class="tsd-kind-icon">Up<wbr>Down<wbr>Counter</a>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#exception" class="tsd-kind-icon">Exception</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/valuerecorder.html" class="tsd-kind-icon">Value<wbr>Recorder</a>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#hrtime" class="tsd-kind-icon">Hr<wbr>Time</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="globals.html#attributevalue" class="tsd-kind-icon">Attribute<wbr>Value</a>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#linkcontext" class="tsd-kind-icon">Link<wbr>Context</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="globals.html#exception" class="tsd-kind-icon">Exception</a>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#logfunction" class="tsd-kind-icon">Log<wbr>Function</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
-						<a href="globals.html#get" class="tsd-kind-icon">Get</a>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#timeinput" class="tsd-kind-icon">Time<wbr>Input</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="globals.html#hrtime" class="tsd-kind-icon">Hr<wbr>Time</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="globals.html#labels" class="tsd-kind-icon">Labels</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="globals.html#linkcontext" class="tsd-kind-icon">Link<wbr>Context</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="globals.html#logfunction" class="tsd-kind-icon">Log<wbr>Function</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="globals.html#otelglobal" class="tsd-kind-icon">Otel<wbr>Global</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="globals.html#sumobserver" class="tsd-kind-icon">Sum<wbr>Observer</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="globals.html#timeinput" class="tsd-kind-icon">Time<wbr>Input</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="globals.html#updownsumobserver" class="tsd-kind-icon">Up<wbr>Down<wbr>Sum<wbr>Observer</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="globals.html#valueobserver" class="tsd-kind-icon">Value<wbr>Observer</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#active_span_key" class="tsd-kind-icon">ACTIVE_<wbr>SPAN_<wbr>KEY</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#api_backwards_compatibility_version" class="tsd-kind-icon">API_<wbr>BACKWARDS_<wbr>COMPATIBILITY_<wbr>VERSION</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#baggage_key" class="tsd-kind-icon">BAGGAGE_<wbr>KEY</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#global_context_manager_api_key" class="tsd-kind-icon">GLOBAL_<wbr>CONTEXT_<wbr>MANAGER_<wbr>API_<wbr>KEY</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#global_metrics_api_key" class="tsd-kind-icon">GLOBAL_<wbr>METRICS_<wbr>API_<wbr>KEY</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#global_propagation_api_key" class="tsd-kind-icon">GLOBAL_<wbr>PROPAGATION_<wbr>API_<wbr>KEY</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#global_trace_api_key" class="tsd-kind-icon">GLOBAL_<wbr>TRACE_<wbr>API_<wbr>KEY</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#invalid_spanid" class="tsd-kind-icon">INVALID_<wbr>SPANID</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#invalid_traceid" class="tsd-kind-icon">INVALID_<wbr>TRACEID</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_batch_observer" class="tsd-kind-icon">NOOP_<wbr>BATCH_<wbr>OBSERVER</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_bound_base_observer" class="tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>BASE_<wbr>OBSERVER</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_bound_counter" class="tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>COUNTER</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_bound_value_recorder" class="tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>VALUE_<wbr>RECORDER</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_context_manager" class="tsd-kind-icon">NOOP_<wbr>CONTEXT_<wbr>MANAGER</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_counter_metric" class="tsd-kind-icon">NOOP_<wbr>COUNTER_<wbr>METRIC</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_meter" class="tsd-kind-icon">NOOP_<wbr>METER</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_meter_provider" class="tsd-kind-icon">NOOP_<wbr>METER_<wbr>PROVIDER</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_span" class="tsd-kind-icon">NOOP_<wbr>SPAN</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_sum_observer_metric" class="tsd-kind-icon">NOOP_<wbr>SUM_<wbr>OBSERVER_<wbr>METRIC</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_text_map_propagator" class="tsd-kind-icon">NOOP_<wbr>TEXT_<wbr>MAP_<wbr>PROPAGATOR</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_tracer" class="tsd-kind-icon">NOOP_<wbr>TRACER</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_tracer_provider" class="tsd-kind-icon">NOOP_<wbr>TRACER_<wbr>PROVIDER</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_up_down_sum_observer_metric" class="tsd-kind-icon">NOOP_<wbr>UP_<wbr>DOWN_<wbr>SUM_<wbr>OBSERVER_<wbr>METRIC</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_value_observer_metric" class="tsd-kind-icon">NOOP_<wbr>VALUE_<wbr>OBSERVER_<wbr>METRIC</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_value_recorder_metric" class="tsd-kind-icon">NOOP_<wbr>VALUE_<wbr>RECORDER_<wbr>METRIC</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#suppress_instrumentation_key" class="tsd-kind-icon">SUPPRESS_<wbr>INSTRUMENTATION_<wbr>KEY</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#valid_spanid_regex" class="tsd-kind-icon">VALID_<wbr>SPANID_<wbr>REGEX</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#valid_traceid_regex" class="tsd-kind-icon">VALID_<wbr>TRACEID_<wbr>REGEX</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#_global" class="tsd-kind-icon">_global</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#_globalthis" class="tsd-kind-icon">_global<wbr>This</a>
+					<li class=" tsd-kind-property">
+						<a href="modules.html#default" class="tsd-kind-icon">default</a>
 					</li>
 					<li class=" tsd-kind-variable">
-						<a href="globals.html#api1" class="tsd-kind-icon">api1</a>
+						<a href="modules.html#invalid_spanid" class="tsd-kind-icon">INVALID_<wbr>SPANID</a>
 					</li>
 					<li class=" tsd-kind-variable">
-						<a href="globals.html#api2" class="tsd-kind-icon">api2</a>
+						<a href="modules.html#invalid_span_context" class="tsd-kind-icon">INVALID_<wbr>SPAN_<wbr>CONTEXT</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#context" class="tsd-kind-icon">context</a>
+					<li class=" tsd-kind-variable">
+						<a href="modules.html#invalid_traceid" class="tsd-kind-icon">INVALID_<wbr>TRACEID</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#metrics" class="tsd-kind-icon">metrics</a>
+					<li class=" tsd-kind-variable">
+						<a href="modules.html#noop_span" class="tsd-kind-icon">NOOP_<wbr>SPAN</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#propagation" class="tsd-kind-icon">propagation</a>
+					<li class=" tsd-kind-variable">
+						<a href="modules.html#noop_text_map_propagator" class="tsd-kind-icon">NOOP_<wbr>TEXT_<wbr>MAP_<wbr>PROPAGATOR</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#trace" class="tsd-kind-icon">trace</a>
+					<li class=" tsd-kind-variable">
+						<a href="modules.html#noop_tracer" class="tsd-kind-icon">NOOP_<wbr>TRACER</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#getactivespan" class="tsd-kind-icon">get<wbr>Active<wbr>Span</a>
+					<li class=" tsd-kind-variable">
+						<a href="modules.html#noop_tracer_provider" class="tsd-kind-icon">NOOP_<wbr>TRACER_<wbr>PROVIDER</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#getbaggage" class="tsd-kind-icon">get<wbr>Baggage</a>
+					<li class=" tsd-kind-variable">
+						<a href="modules.html#root_context" class="tsd-kind-icon">ROOT_<wbr>CONTEXT</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#getparentspancontext" class="tsd-kind-icon">get<wbr>Parent<wbr>Span<wbr>Context</a>
+					<li class=" tsd-kind-variable">
+						<a href="modules.html#context" class="tsd-kind-icon">context</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#isinstrumentationsuppressed" class="tsd-kind-icon">is<wbr>Instrumentation<wbr>Suppressed</a>
+					<li class=" tsd-kind-variable">
+						<a href="modules.html#defaulttextmapgetter" class="tsd-kind-icon">default<wbr>Text<wbr>Map<wbr>Getter</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#isspancontext" class="tsd-kind-icon">is<wbr>Span<wbr>Context</a>
+					<li class=" tsd-kind-variable">
+						<a href="modules.html#defaulttextmapsetter" class="tsd-kind-icon">default<wbr>Text<wbr>Map<wbr>Setter</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#isspancontextvalid" class="tsd-kind-icon">is<wbr>Span<wbr>Context<wbr>Valid</a>
+					<li class=" tsd-kind-variable">
+						<a href="modules.html#propagation" class="tsd-kind-icon">propagation</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#isvalidspanid" class="tsd-kind-icon">is<wbr>Valid<wbr>Span<wbr>Id</a>
+					<li class=" tsd-kind-variable">
+						<a href="modules.html#trace" class="tsd-kind-icon">trace</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#isvalidtraceid" class="tsd-kind-icon">is<wbr>Valid<wbr>Trace<wbr>Id</a>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#createcontextkey" class="tsd-kind-icon">create<wbr>Context<wbr>Key</a>
 					</li>
-					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
-						<a href="globals.html#makegetter" class="tsd-kind-icon">make<wbr>Getter</a>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#getbaggage" class="tsd-kind-icon">get<wbr>Baggage</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#setactivespan" class="tsd-kind-icon">set<wbr>Active<wbr>Span</a>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#getspan" class="tsd-kind-icon">get<wbr>Span</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#setbaggage" class="tsd-kind-icon">set<wbr>Baggage</a>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#getspancontext" class="tsd-kind-icon">get<wbr>Span<wbr>Context</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#setextractedspancontext" class="tsd-kind-icon">set<wbr>Extracted<wbr>Span<wbr>Context</a>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#isinstrumentationsuppressed" class="tsd-kind-icon">is<wbr>Instrumentation<wbr>Suppressed</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#suppressinstrumentation" class="tsd-kind-icon">suppress<wbr>Instrumentation</a>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#isspancontextvalid" class="tsd-kind-icon">is<wbr>Span<wbr>Context<wbr>Valid</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#unsuppressinstrumentation" class="tsd-kind-icon">unsuppress<wbr>Instrumentation</a>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#isvalidspanid" class="tsd-kind-icon">is<wbr>Valid<wbr>Span<wbr>Id</a>
 					</li>
-					<li class=" tsd-kind-object-literal tsd-is-external">
-						<a href="globals.html#invalid_span_context" class="tsd-kind-icon">INVALID_<wbr>SPAN_<wbr>CONTEXT</a>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#isvalidtraceid" class="tsd-kind-icon">is<wbr>Valid<wbr>Trace<wbr>Id</a>
 					</li>
-					<li class=" tsd-kind-object-literal tsd-is-external">
-						<a href="globals.html#defaulttextmapgetter" class="tsd-kind-icon">default<wbr>Text<wbr>Map<wbr>Getter</a>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#setbaggage" class="tsd-kind-icon">set<wbr>Baggage</a>
 					</li>
-					<li class=" tsd-kind-object-literal tsd-is-external">
-						<a href="globals.html#defaulttextmapsetter" class="tsd-kind-icon">default<wbr>Text<wbr>Map<wbr>Setter</a>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#setspan" class="tsd-kind-icon">set<wbr>Span</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#setspancontext" class="tsd-kind-icon">set<wbr>Span<wbr>Context</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#suppressinstrumentation" class="tsd-kind-icon">suppress<wbr>Instrumentation</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#unsuppressinstrumentation" class="tsd-kind-icon">unsuppress<wbr>Instrumentation</a>
 					</li>
 				</ul>
 			</nav>
@@ -652,6 +427,19 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 	<div class="container">
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+			</ul>
 		</div>
 	</div>
 </footer>

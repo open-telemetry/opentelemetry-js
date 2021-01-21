@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Tracer | OpenTelemetry API for JavaScript</title>
+	<title>Context | OpenTelemetry API for JavaScript</title>
 	<meta name="description" content="Documentation for OpenTelemetry API for JavaScript">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,39 +55,22 @@
 					<a href="../modules.html">OpenTelemetry API for JavaScript</a>
 				</li>
 				<li>
-					<a href="tracer.html">Tracer</a>
+					<a href="context.html">Context</a>
 				</li>
 			</ul>
-			<h1>Interface Tracer</h1>
+			<h1>Interface Context</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<section class="tsd-panel tsd-comment">
-				<div class="tsd-comment tsd-typography">
-					<div class="lead">
-						<p>Tracer provides an interface for creating <a href="span.html">Span</a>s and propagating
-						context in-process.</p>
-					</div>
-					<p>Users may choose to use manual or automatic Context propagation. Because of
-					that this class offers APIs to facilitate both usages.</p>
-				</div>
-			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">Tracer</span>
+						<span class="target">Context</span>
 					</li>
-				</ul>
-			</section>
-			<section class="tsd-panel">
-				<h3>Implemented by</h3>
-				<ul class="tsd-hierarchy">
-					<li><a href="../classes/nooptracer.html" class="tsd-signature-type" data-tsd-kind="Class">NoopTracer</a></li>
-					<li><a href="../classes/proxytracer.html" class="tsd-signature-type" data-tsd-kind="Class">ProxyTracer</a></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -97,7 +80,9 @@
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="tracer.html#startspan" class="tsd-kind-icon">start<wbr>Span</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="context.html#deletevalue" class="tsd-kind-icon">delete<wbr>Value</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="context.html#getvalue" class="tsd-kind-icon">get<wbr>Value</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="context.html#setvalue" class="tsd-kind-icon">set<wbr>Value</a></li>
 							</ul>
 						</section>
 					</div>
@@ -106,49 +91,103 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="startspan" class="tsd-anchor"></a>
-					<h3>start<wbr>Span</h3>
+					<a name="deletevalue" class="tsd-anchor"></a>
+					<h3>delete<wbr>Value</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">start<wbr>Span<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><a href="spanoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">SpanOptions</a>, context<span class="tsd-signature-symbol">?: </span><a href="context.html" class="tsd-signature-type" data-tsd-kind="Interface">Context</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="span.html" class="tsd-signature-type" data-tsd-kind="Interface">Span</a></li>
+						<li class="tsd-signature tsd-kind-icon">delete<wbr>Value<span class="tsd-signature-symbol">(</span>key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="context.html" class="tsd-signature-type" data-tsd-kind="Interface">Context</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/960b868/packages/opentelemetry-api/src/trace/tracer.ts#L43">opentelemetry-api/src/trace/tracer.ts:43</a></li>
+									<li>Defined in opentelemetry-context-base/build/src/types.d.ts:22</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Starts a new <a href="span.html">Span</a>. Start the span without setting it on context.</p>
+									<p>Return a new context which inherits from this context but does
+									not contain a value for the given key.</p>
 								</div>
-								<p>This method do NOT modify the current Context.</p>
-								<dl class="tsd-comment-tags">
-									<dt>example</dt>
-									<dd><pre><code><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">span</span><span style="color: #000000"> = </span><span style="color: #001080">tracer</span><span style="color: #000000">.</span><span style="color: #795E26">startSpan</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;op&#039;</span><span style="color: #000000">);</span>
-<span style="color: #001080">span</span><span style="color: #000000">.</span><span style="color: #795E26">setAttribute</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;key&#039;</span><span style="color: #000000">, </span><span style="color: #A31515">&#039;value&#039;</span><span style="color: #000000">);</span>
-<span style="color: #001080">span</span><span style="color: #000000">.</span><span style="color: #795E26">end</span><span style="color: #000000">();</span>
-</code></pre>
-									</dd>
-								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>name: <span class="tsd-signature-type">string</span></h5>
+									<h5>key: <span class="tsd-signature-type">symbol</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>The name of the span</p>
+										<p>context key for which to clear a value</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="context.html" class="tsd-signature-type" data-tsd-kind="Interface">Context</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="getvalue" class="tsd-anchor"></a>
+					<h3>get<wbr>Value</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Value<span class="tsd-signature-symbol">(</span>key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in opentelemetry-context-base/build/src/types.d.ts:7</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Get a value from the context.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>key: <span class="tsd-signature-type">symbol</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>key which identifies a context value</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">unknown</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="setvalue" class="tsd-anchor"></a>
+					<h3>set<wbr>Value</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Value<span class="tsd-signature-symbol">(</span>key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">symbol</span>, value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="context.html" class="tsd-signature-type" data-tsd-kind="Interface">Context</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in opentelemetry-context-base/build/src/types.d.ts:15</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Create a new context which inherits from this context and has
+									the given key set to the given value.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>key: <span class="tsd-signature-type">symbol</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>context key for which to set the value</p>
 									</div>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="spanoptions.html" class="tsd-signature-type" data-tsd-kind="Interface">SpanOptions</a></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> context: <a href="context.html" class="tsd-signature-type" data-tsd-kind="Interface">Context</a></h5>
+									<h5>value: <span class="tsd-signature-type">unknown</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>value to set for the given key</p>
+									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="span.html" class="tsd-signature-type" data-tsd-kind="Interface">Span</a></h4>
-							<p>Span The newly created span</p>
+							<h4 class="tsd-returns-title">Returns <a href="context.html" class="tsd-signature-type" data-tsd-kind="Interface">Context</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -167,10 +206,16 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface">
-						<a href="tracer.html" class="tsd-kind-icon">Tracer</a>
+						<a href="context.html" class="tsd-kind-icon">Context</a>
 						<ul>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="tracer.html#startspan" class="tsd-kind-icon">start<wbr>Span</a>
+								<a href="context.html#deletevalue" class="tsd-kind-icon">delete<wbr>Value</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="context.html#getvalue" class="tsd-kind-icon">get<wbr>Value</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="context.html#setvalue" class="tsd-kind-icon">set<wbr>Value</a>
 							</li>
 						</ul>
 					</li>

@@ -7,6 +7,7 @@
 	<meta name="description" content="Documentation for OpenTelemetry API for JavaScript">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
+	<script async src="../assets/js/search.js" id="search-script"></script>
 </head>
 <body>
 <header>
@@ -40,8 +41,6 @@
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
 							<input type="checkbox" id="tsd-filter-externals" checked />
 							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
-							<input type="checkbox" id="tsd-filter-only-exported" />
-							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
 						</div>
 					</div>
 					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
@@ -53,7 +52,7 @@
 		<div class="container">
 			<ul class="tsd-breadcrumb">
 				<li>
-					<a href="../globals.html">Globals</a>
+					<a href="../modules.html">OpenTelemetry API for JavaScript</a>
 				</li>
 				<li>
 					<a href="sampler.html">Sampler</a>
@@ -87,29 +86,29 @@
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
-						<section class="tsd-index-section tsd-is-external">
+						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="sampler.html#shouldsample" class="tsd-kind-icon">should<wbr>Sample</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="sampler.html#tostring" class="tsd-kind-icon">to<wbr>String</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="sampler.html#shouldsample" class="tsd-kind-icon">should<wbr>Sample</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="sampler.html#tostring" class="tsd-kind-icon">to<wbr>String</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group tsd-is-external">
+			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
 					<a name="shouldsample" class="tsd-anchor"></a>
 					<h3>should<wbr>Sample</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">should<wbr>Sample<span class="tsd-signature-symbol">(</span>context<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span>, traceId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, spanName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, spanKind<span class="tsd-signature-symbol">: </span><a href="../enums/spankind.html" class="tsd-signature-type">SpanKind</a>, attributes<span class="tsd-signature-symbol">: </span><a href="attributes.html" class="tsd-signature-type">Attributes</a>, links<span class="tsd-signature-symbol">: </span><a href="link.html" class="tsd-signature-type">Link</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="samplingresult.html" class="tsd-signature-type">SamplingResult</a></li>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">should<wbr>Sample<span class="tsd-signature-symbol">(</span>context<span class="tsd-signature-symbol">: </span><a href="context.html" class="tsd-signature-type" data-tsd-kind="Interface">Context</a>, traceId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, spanName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, spanKind<span class="tsd-signature-symbol">: </span><a href="../enums/spankind.html" class="tsd-signature-type" data-tsd-kind="Enumeration">SpanKind</a>, attributes<span class="tsd-signature-symbol">: </span><a href="attributes.html" class="tsd-signature-type" data-tsd-kind="Interface">Attributes</a>, links<span class="tsd-signature-symbol">: </span><a href="link.html" class="tsd-signature-type" data-tsd-kind="Interface">Link</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="samplingresult.html" class="tsd-signature-type" data-tsd-kind="Interface">SamplingResult</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/27a8d45/packages/opentelemetry-api/src/trace/Sampler.ts#L43">src/trace/Sampler.ts:43</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/960b868/packages/opentelemetry-api/src/trace/Sampler.ts#L43">opentelemetry-api/src/trace/Sampler.ts:43</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -120,7 +119,7 @@
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>context: <span class="tsd-signature-type">Context</span></h5>
+									<h5>context: <a href="context.html" class="tsd-signature-type" data-tsd-kind="Interface">Context</a></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>Parent Context which may contain a span.</p>
 									</div>
@@ -140,41 +139,41 @@
 									</div>
 								</li>
 								<li>
-									<h5>spanKind: <a href="../enums/spankind.html" class="tsd-signature-type">SpanKind</a></h5>
+									<h5>spanKind: <a href="../enums/spankind.html" class="tsd-signature-type" data-tsd-kind="Enumeration">SpanKind</a></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>of the span to be created.</p>
 									</div>
 								</li>
 								<li>
-									<h5>attributes: <a href="attributes.html" class="tsd-signature-type">Attributes</a></h5>
+									<h5>attributes: <a href="attributes.html" class="tsd-signature-type" data-tsd-kind="Interface">Attributes</a></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>Initial set of Attributes for the Span being constructed.</p>
 									</div>
 								</li>
 								<li>
-									<h5>links: <a href="link.html" class="tsd-signature-type">Link</a><span class="tsd-signature-symbol">[]</span></h5>
+									<h5>links: <a href="link.html" class="tsd-signature-type" data-tsd-kind="Interface">Link</a><span class="tsd-signature-symbol">[]</span></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>Collection of links that will be associated with the Span to
 										be created. Typically useful for batch operations.</p>
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="samplingresult.html" class="tsd-signature-type">SamplingResult</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="samplingresult.html" class="tsd-signature-type" data-tsd-kind="Interface">SamplingResult</a></h4>
 							<p>a <a href="samplingresult.html">SamplingResult</a>.</p>
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
 					<a name="tostring" class="tsd-anchor"></a>
 					<h3>to<wbr>String</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
 						<li class="tsd-signature tsd-kind-icon">to<wbr>String<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/27a8d45/packages/opentelemetry-api/src/trace/Sampler.ts#L53">src/trace/Sampler.ts:53</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/960b868/packages/opentelemetry-api/src/trace/Sampler.ts#L53">opentelemetry-api/src/trace/Sampler.ts:53</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -191,8 +190,8 @@
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 			<nav class="tsd-navigation primary">
 				<ul>
-					<li class="globals  ">
-						<a href="../globals.html"><em>Globals</em></a>
+					<li class=" ">
+						<a href="../modules.html">Exports</a>
 					</li>
 				</ul>
 			</nav>
@@ -200,13 +199,13 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface tsd-is-external">
+					<li class="current tsd-kind-interface">
 						<a href="sampler.html" class="tsd-kind-icon">Sampler</a>
 						<ul>
-							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="sampler.html#shouldsample" class="tsd-kind-icon">should<wbr>Sample</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="sampler.html#tostring" class="tsd-kind-icon">to<wbr>String</a>
 							</li>
 						</ul>
@@ -222,6 +221,19 @@
 	<div class="container">
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+			</ul>
 		</div>
 	</div>
 </footer>
