@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
-## Unreleased (2021-01-15)
+## 0.15.0
 
 ### :boom: Breaking Change
 
@@ -19,6 +19,13 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* `opentelemetry-instrumentation-http`, `opentelemetry-plugin-http`, `opentelemetry-plugin-https`
+  * [#1838](https://github.com/open-telemetry/opentelemetry-js/pull/1838) improv(instrumentation-http): supressInstrumentation when we get a request on ignoredPath [#1831] ([@vmarchaud](https://github.com/vmarchaud))
+* `opentelemetry-web`
+  * [#1769](https://github.com/open-telemetry/opentelemetry-js/pull/1769) Allow zero/negative performance timings ([@johnbley](https://github.com/johnbley))
+* `opentelemetry-instrumentation-fetch`
+  * [#1662](https://github.com/open-telemetry/opentelemetry-js/pull/1662) fix(plugin-fetch): check if PerformanceObserver exists ([@mhennoch](https://github.com/mhennoch))
+  * [#1796](https://github.com/open-telemetry/opentelemetry-js/pull/1796) Convert fetch plugin to instrumentation ([@obecny](https://github.com/obecny))
 * `opentelemetry-exporter-zipkin`
   * [#1789](https://github.com/open-telemetry/opentelemetry-js/pull/1789) feat(exporter-zipkin): per-span service name ([@sfishel-splunk](https://github.com/sfishel-splunk))
 * `opentelemetry-api-metrics`, `opentelemetry-api`, `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`, `opentelemetry-exporter-prometheus`, `opentelemetry-instrumentation`, `opentelemetry-metrics`, `opentelemetry-sdk-node`
@@ -33,8 +40,6 @@ All notable changes to this project will be documented in this file.
   * [#1731](https://github.com/open-telemetry/opentelemetry-js/pull/1731) feat: creating one auto loader for instrumentation and old plugins ([@obecny](https://github.com/obecny))
 * `opentelemetry-instrumentation`, `opentelemetry-node`
   * [#1807](https://github.com/open-telemetry/opentelemetry-js/pull/1807) perf(opentelemetry-node): plugin loader search required cache ([@blumamir](https://github.com/blumamir))
-* `opentelemetry-instrumentation-fetch`
-  * [#1796](https://github.com/open-telemetry/opentelemetry-js/pull/1796) Convert fetch plugin to instrumentation ([@obecny](https://github.com/obecny))
 * Other
   * [#1785](https://github.com/open-telemetry/opentelemetry-js/pull/1785) Add CodeQL security scans ([@amanbrar1999](https://github.com/amanbrar1999))
 * `opentelemetry-instrumentation-grpc`, `opentelemetry-instrumentation`
@@ -58,7 +63,7 @@ All notable changes to this project will be documented in this file.
 * `opentelemetry-exporter-collector`
   * [#1791](https://github.com/open-telemetry/opentelemetry-js/pull/1791) docs: fix readme MetricProvider -> MeterProvider ([@aabmass](https://github.com/aabmass))
 
-### Committers: 15
+### Committers: 17
 
 * Aaron Abbott ([@aabmass](https://github.com/aabmass))
 * Aman Brar ([@amanbrar1999](https://github.com/amanbrar1999))
@@ -67,7 +72,9 @@ All notable changes to this project will be documented in this file.
 * Daniel Dyla ([@dyladan](https://github.com/dyladan))
 * Gerhard Stöbich ([@Flarna](https://github.com/Flarna))
 * Jakub Malinowski ([@jtmalinowski](https://github.com/jtmalinowski))
+* John Bley ([@johnbley](https://github.com/johnbley))
 * Julien Fabre ([@jufab](https://github.com/jufab))
+* MartenH ([@mhennoch](https://github.com/mhennoch))
 * Matthew Wear ([@mwear](https://github.com/mwear))
 * Naseem ([@naseemkullah](https://github.com/naseemkullah))
 * Paul Draper ([@pauldraper](https://github.com/pauldraper))
