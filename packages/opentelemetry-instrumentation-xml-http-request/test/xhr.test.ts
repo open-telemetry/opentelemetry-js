@@ -776,8 +776,7 @@ describe('xhr', () => {
             const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const attributes = span.attributes;
             const keys = Object.keys(attributes);
-            console.log('KEYS: ', keys);
-            console.log('ATTRIBUTES', attributes);
+
             assert.strictEqual(
               attributes[keys[0]],
               'GET',
