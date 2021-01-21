@@ -143,22 +143,22 @@ This project uses a combination of `gts` and `eslint`. Just like tests and compi
 
 ```sh
 # Lint all modules
-npm lint
+npm run lint
 
 # Lint a single module
 cd packages/opentelemetry-module-name
-npm lint
+npm run lint
 ```
 
 There is also a script which will automatically fix many linting errors.
 
 ```sh
 # Lint all modules, fixing errors
-npm lint:fix
+npm run lint:fix
 
 # Lint a single module, fixing errors
 cd packages/opentelemetry-module-name
-npm lint:fix
+npm run lint:fix
 ```
 
 ### Adding a package
@@ -202,6 +202,7 @@ If all of the above requirements are met and there are no unresolved discussions
 
 ### Generating CHANGELOG documentation
 
+- Generate and export your [Github access token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token): `export GITHUB_AUTH=<your_token>`
 - `npm run changelog` to generate CHANGELOG documentation in your terminal (see [RELEASING.md](RELEASING.md) for more details).
 
 ### Benchmarks
