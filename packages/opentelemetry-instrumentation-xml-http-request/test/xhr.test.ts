@@ -776,7 +776,8 @@ describe('xhr', () => {
             const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
             const attributes = span.attributes;
             const keys = Object.keys(attributes);
-
+            console.log('KEYS: ', keys);
+            console.log('ATTRIBUTES', attributes);
             assert.strictEqual(
               attributes[keys[0]],
               'GET',
@@ -789,29 +790,34 @@ describe('xhr', () => {
             );
             assert.strictEqual(
               attributes[keys[2]],
+              0,
+              `attributes ${HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH} is wrong`
+            );
+            assert.strictEqual(
+              attributes[keys[3]],
               400,
               `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[3]],
+              attributes[keys[4]],
               'Bad Request',
               `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[4]],
+              attributes[keys[5]],
               'raw.githubusercontent.com',
               `attributes ${HttpAttribute.HTTP_HOST} is wrong`
             );
             assert.ok(
-              attributes[keys[5]] === 'http' || attributes[keys[5]] === 'https',
+              attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
               `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
             );
             assert.ok(
-              attributes[keys[6]] !== '',
+              attributes[keys[7]] !== '',
               `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
             );
 
-            assert.strictEqual(keys.length, 7, 'number of attributes is wrong');
+            assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
           });
 
           it('span should have correct events', () => {
