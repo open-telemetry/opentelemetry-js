@@ -40,6 +40,11 @@ export interface ExporterConfig {
   endpoint?: string;
 
   /**
+   * @default undefined (all interfaces)
+   */
+  host?: string;
+
+  /**
    * Port number for Prometheus exporter server
    *
    * Default registered port is 9464:

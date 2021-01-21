@@ -29,6 +29,7 @@ import { PrometheusLabelsBatcher } from './PrometheusLabelsBatcher';
 
 export class PrometheusExporter implements MetricExporter {
   static readonly DEFAULT_OPTIONS = {
+    host: undefined,
     port: 9464,
     endpoint: '/metrics',
     prefix: '',
@@ -36,6 +37,7 @@ export class PrometheusExporter implements MetricExporter {
   };
 
   private readonly _logger: api.Logger;
+  private readonly _host?: string;
   private readonly _port: number;
   private readonly _endpoint: string;
   private readonly _server: Server;
@@ -55,7 +57,14 @@ export class PrometheusExporter implements MetricExporter {
    */
   constructor(config: ExporterConfig = {}, callback?: () => void) {
     this._logger = config.logger || new api.NoopLogger();
-    this._port = config.port || PrometheusExporter.DEFAULT_OPTIONS.port;
+    this._host =
+      config.host ||
+      process.env.OTEL_EXPORTER_PROMETHEUS_HOST ||
+      PrometheusExporter.DEFAULT_OPTIONS.host;
+    this._port =
+      config.port ||
+      Number(process.env.OTEL_EXPORTER_PROMETHEUS_PORT) ||
+      PrometheusExporter.DEFAULT_OPTIONS.port;
     this._prefix = config.prefix || PrometheusExporter.DEFAULT_OPTIONS.prefix;
     this._appendTimestamp =
       typeof config.appendTimestamp === 'boolean'
@@ -72,7 +81,9 @@ export class PrometheusExporter implements MetricExporter {
     ).replace(/^([^/])/, '/$1');
 
     if (config.preventServerStart !== true) {
-      this.startServer().then(callback);
+      this.startServer()
+        .then(callback)
+        .catch(err => this._logger.error(err));
     } else if (callback) {
       callback();
     }
@@ -148,12 +159,18 @@ export class PrometheusExporter implements MetricExporter {
    */
   startServer(): Promise<void> {
     return new Promise(resolve => {
-      this._server.listen(this._port, () => {
-        this._logger.debug(
-          `Prometheus exporter started on port ${this._port} at endpoint ${this._endpoint}`
-        );
-        resolve();
-      });
+      this._server.listen(
+        {
+          port: this._port,
+          host: this._host,
+        },
+        () => {
+          this._logger.debug(
+            `Prometheus exporter server started: ${this._host}:${this._port}/${this._endpoint}`
+          );
+          resolve();
+        }
+      );
     });
   }
 
