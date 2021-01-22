@@ -243,6 +243,20 @@ To request automatic tracing support for a module not on this list, please [file
 - `Tracer.withSpan(span)`: use `api.context.with(api.setSpan(api.context.active(), span))`
 - `Tracer.bind(target)`: use `api.context.bind(target)`
 
+[PR-1797](https://github.com/open-telemetry/opentelemetry-js/pull/1797) chore!: split metrics into its own api package:
+
+- Any references to `require("@opentelemetry/api").metrics` will need to be changed to `require("@opentelemetry/api-metrics").metrics`
+
+[PR-1725](https://github.com/open-telemetry/opentelemetry-js/pull/1725) Use new gRPC default port
+
+- The default port used by `@opentelemetry/exporter-collector-grpc` is changed from `55680` to `4317`
+
+[PR-1749](https://github.com/open-telemetry/opentelemetry-js/pull/1749) chore: improve naming of span related context APIs
+
+- Rename `[gs]etActiveSpan()` to `[gs]etSpan()`
+- Rename `setExtractedSpanContext()` to `setSpanContext()`
+- Rename `getParentSpanContext()` to `getSpanContext()`
+
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
