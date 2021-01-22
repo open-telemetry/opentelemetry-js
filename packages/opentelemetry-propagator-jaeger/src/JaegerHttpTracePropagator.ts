@@ -16,8 +16,8 @@
 
 import {
   Context,
-  getParentSpanContext,
-  setExtractedSpanContext,
+  getSpanContext,
+  setSpanContext,
   SpanContext,
   TraceFlags,
   TextMapGetter,
@@ -53,7 +53,7 @@ export class JaegerHttpTracePropagator implements TextMapPropagator {
   }
 
   inject(context: Context, carrier: unknown, setter: TextMapSetter) {
-    const spanContext = getParentSpanContext(context);
+    const spanContext = getSpanContext(context);
     if (!spanContext) return;
 
     const traceFlags = `0${(spanContext.traceFlags || TraceFlags.NONE).toString(
@@ -78,7 +78,7 @@ export class JaegerHttpTracePropagator implements TextMapPropagator {
     const spanContext = deserializeSpanContext(uberTraceId);
     if (!spanContext) return context;
 
-    return setExtractedSpanContext(context, spanContext);
+    return setSpanContext(context, spanContext);
   }
 
   fields(): string[] {
