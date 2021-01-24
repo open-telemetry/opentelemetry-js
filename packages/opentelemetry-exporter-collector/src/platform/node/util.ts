@@ -94,8 +94,10 @@ export function createHttpAgent(
     const httpAgentOptions = config.httpAgentOptions ?? {};
     const Agent = parsedUrl.protocol === 'http:' ? http.Agent : https.Agent;
     return new Agent({ keepAlive: true, ...httpAgentOptions });
-  } catch {
-    logger.error('collector exporter failed to create http agent');
+  } catch (err) {
+    logger.error(
+      `collector exporter failed to create http agent. err: ${err.message}`
+    );
     return undefined;
   }
 }
