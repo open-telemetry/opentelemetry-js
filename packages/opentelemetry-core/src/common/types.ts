@@ -51,13 +51,13 @@ export interface ShimWrapped {
 }
 
 /**
- * An instrumentation library consists of the name and version used to
- * obtain a tracer or meter from a provider. This metadata is made available
- * on ReadableSpan and MetricRecord for use by the export pipeline.
+ * An instrumentation library consists of the name and and optional version
+ * used to obtain a tracer or meter from a provider. This metadata is made
+ * available on ReadableSpan and MetricRecord for use by the export pipeline.
  */
 export interface InstrumentationLibrary {
   readonly name: string;
-  readonly version: string;
+  readonly version?: string;
 }
 
 /** Defines an error handler function */

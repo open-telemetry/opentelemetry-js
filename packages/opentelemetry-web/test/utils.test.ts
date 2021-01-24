@@ -164,40 +164,46 @@ describe('utils', () => {
     });
   });
   describe('addSpanNetworkEvent', () => {
-    describe('when entries contain the performance', () => {
-      it('should add event to span', () => {
-        const addEventSpy = sinon.spy();
-        const span = ({
-          addEvent: addEventSpy,
-        } as unknown) as tracing.Span;
-        const entries = {
-          [PTN.FETCH_START]: 123,
-        } as PerformanceEntries;
+    [0, -2, 123].forEach(value => {
+      describe(`when entry is ${value}`, () => {
+        it('should add event to span', () => {
+          const addEventSpy = sinon.spy();
+          const span = ({
+            addEvent: addEventSpy,
+          } as unknown) as tracing.Span;
+          const entries = {
+            [PTN.FETCH_START]: value,
+          } as PerformanceEntries;
 
-        assert.strictEqual(addEventSpy.callCount, 0);
+          assert.strictEqual(addEventSpy.callCount, 0);
 
-        addSpanNetworkEvent(span, PTN.FETCH_START, entries);
+          addSpanNetworkEvent(span, PTN.FETCH_START, entries);
 
-        assert.strictEqual(addEventSpy.callCount, 1);
-        const args = addEventSpy.args[0];
+          assert.strictEqual(addEventSpy.callCount, 1);
+          const args = addEventSpy.args[0];
 
-        assert.strictEqual(args[0], 'fetchStart');
-        assert.strictEqual(args[1], 123);
+          assert.strictEqual(args[0], 'fetchStart');
+          assert.strictEqual(args[1], value);
+        });
       });
     });
-    describe('when entry has time equal to 0', () => {
+    describe('when entry is not numeric', () => {
       it('should NOT add event to span', () => {
         const addEventSpy = sinon.spy();
         const span = ({
           addEvent: addEventSpy,
         } as unknown) as tracing.Span;
         const entries = {
-          [PTN.FETCH_START]: 0,
-        } as PerformanceEntries;
+          [PTN.FETCH_START]: 'non-numeric',
+        } as unknown;
 
         assert.strictEqual(addEventSpy.callCount, 0);
 
-        addSpanNetworkEvent(span, PTN.FETCH_START, entries);
+        addSpanNetworkEvent(
+          span,
+          PTN.FETCH_START,
+          entries as PerformanceEntries
+        );
 
         assert.strictEqual(addEventSpy.callCount, 0);
       });
