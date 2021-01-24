@@ -82,8 +82,9 @@ export function createHttpAgent(
   logger: Logger,
   config: CollectorExporterNodeConfigBase
 ): http.Agent | https.Agent | undefined {
-  if (config.httpAgentOptions && !config.keepAlive) {
+  if (config.httpAgentOptions && config.keepAlive === false) {
     logger.warn('httpAgentOptions is used only when keepAlive is true');
+    return undefined;
   }
 
   if (config.keepAlive === false || !config.url) return undefined;
