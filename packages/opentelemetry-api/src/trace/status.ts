@@ -25,14 +25,14 @@ export interface Status {
  */
 export enum StatusCode {
   /**
+   * The default status.
+   */
+  UNSET = 0,
+  /**
    * The operation has been validated by an Application developer or
    * Operator to have completed successfully.
    */
-  OK = 0,
-  /**
-   * The default status.
-   */
-  UNSET = 1,
+  OK = 1,
   /**
    * The operation contains an error.
    */
