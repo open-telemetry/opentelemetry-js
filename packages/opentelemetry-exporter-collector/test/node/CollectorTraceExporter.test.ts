@@ -126,7 +126,7 @@ describe('CollectorTraceExporter - node with json over http', () => {
       });
     });
 
-    it('different http export request should use the same agent', done => {
+    it('different http export requests should use the same agent', done => {
       collectorExporter.export(spans, () => {});
       collectorExporter.export(spans, () => {});
 
