@@ -18,6 +18,7 @@
     "test:browser": "lerna run test:browser",
     "test:backcompat": "lerna run test:backcompat",
     "bootstrap": "lerna bootstrap",
+    "changelog": "lerna-changelog",
     "codecov": "lerna run codecov",
     "codecov:browser": "lerna run codecov:browser",
     "predocs-test": "npm run docs",
