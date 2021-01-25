@@ -130,6 +130,7 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 
 - [Chengzhong Wu](https://github.com/legendecas), Alibaba
 - [Gerhard Stöbich](https://github.com/Flarna), Dynatrace
+- [John Bley](https://github.com/johnbley), Splunk
 - [Mark Wolff](https://github.com/markwolff), Microsoft
 - [Matthew Wear](https://github.com/mwear), LightStep
 - [Naseem K. Ullah](https://github.com/naseemkullah), Transit
@@ -240,6 +241,20 @@ To request automatic tracing support for a module not on this list, please [file
 - `Tracer.getCurrentSpan()`: use `api.getSpan(api.context.active())`
 - `Tracer.withSpan(span)`: use `api.context.with(api.setSpan(api.context.active(), span))`
 - `Tracer.bind(target)`: use `api.context.bind(target)`
+
+[PR-1797](https://github.com/open-telemetry/opentelemetry-js/pull/1797) chore!: split metrics into its own api package:
+
+- Any references to `require("@opentelemetry/api").metrics` will need to be changed to `require("@opentelemetry/api-metrics").metrics`
+
+[PR-1725](https://github.com/open-telemetry/opentelemetry-js/pull/1725) Use new gRPC default port
+
+- The default port used by `@opentelemetry/exporter-collector-grpc` is changed from `55680` to `4317`
+
+[PR-1749](https://github.com/open-telemetry/opentelemetry-js/pull/1749) chore: improve naming of span related context APIs
+
+- Rename `[gs]etActiveSpan()` to `[gs]etSpan()`
+- Rename `setExtractedSpanContext()` to `setSpanContext()`
+- Rename `getParentSpanContext()` to `getSpanContext()`
 
 ## Useful links
 

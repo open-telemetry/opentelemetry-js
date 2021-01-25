@@ -198,6 +198,9 @@ export class FetchInstrumentation extends InstrumentationBase<
   ): void {
     let resources: PerformanceResourceTiming[] = resourcesObserver.entries;
     if (!resources.length) {
+      if (!performance.getEntriesByType) {
+        return;
+      }
       // fallback - either Observer is not available or it took longer
       // then OBSERVER_WAIT_TIME_MS and observer didn't collect enough
       // information
@@ -249,7 +252,8 @@ export class FetchInstrumentation extends InstrumentationBase<
     response: FetchResponse
   ) {
     const endTime = core.hrTime();
-    spanData.observer.disconnect();
+    spanData.observer?.disconnect();
+
     this._addFinalSpanAttributes(span, response);
 
     setTimeout(() => {
@@ -348,6 +352,11 @@ export class FetchInstrumentation extends InstrumentationBase<
   private _prepareSpanData(spanUrl: string): SpanData {
     const startTime = core.hrTime();
     const entries: PerformanceResourceTiming[] = [];
+
+    if (typeof window.PerformanceObserver === 'undefined') {
+      return { entries, startTime, spanUrl };
+    }
+
     const observer: PerformanceObserver = new PerformanceObserver(list => {
       const entries = list.getEntries() as PerformanceResourceTiming[];
       entries.forEach(entry => {

@@ -200,6 +200,9 @@ describe('HttpsInstrumentation', () => {
             cert: fs.readFileSync('test/fixtures/server-cert.pem'),
           },
           (request, response) => {
+            if (request.url?.includes('/ignored')) {
+              tracer.startSpan('some-span').end();
+            }
             response.end('Test Server Response');
           }
         );
