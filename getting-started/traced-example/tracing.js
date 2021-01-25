@@ -21,6 +21,7 @@ provider.addSpanProcessor(
 
 provider.register();
 
+// load old default plugins
 registerInstrumentations({
   tracerProvider: provider,
 });
