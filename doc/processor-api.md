@@ -1,6 +1,6 @@
 # Processor API Guide
 
-[The processor](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-metrics/src/export/Processor.ts?rgh-link-date=2020-05-25T18%3A43%3A57Z) has two responsibilities: choosing which aggregator to choose for a metric instrument and store the last record for each metric ready to be exported.
+[The processor](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-metrics/src/export/Processor.ts?rgh-link-date=2020-05-25T18%3A43%3A57Z) has two responsibilities: choosing which aggregator to choose for a metric instrument and store the last record for each metric ready to be exported.
 
 ## Selecting a specific aggregator for metrics
 

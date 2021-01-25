@@ -25,7 +25,7 @@ $ npm install \
     @opentelemetry/plugin-http # add plugins as needed
 ```
 
-> Note: this example is for node.js. See [examples/tracer-web](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/tracer-web) for a browser example.
+> Note: this example is for node.js. See [examples/tracer-web](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/tracer-web) for a browser example.
 
 ### Initialize the SDK
 
@@ -155,7 +155,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 
 [gitter-image]: https://badges.gitter.im/open-telemetry/opentelemetry-js.svg
 [gitter-url]: https://gitter.im/open-telemetry/opentelemetry-node?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
+[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-api
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-api
@@ -169,9 +169,9 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [propagation-api-docs]: https://open-telemetry.github.io/opentelemetry-js/classes/propagationapi.html
 [context-api-docs]: https://open-telemetry.github.io/opentelemetry-js/classes/contextapi.html
 
-[web]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-web
-[tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing
-[node]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node
-[metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-metrics
+[web]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-web
+[tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-tracing
+[node]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-node
+[metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-metrics
 
 [other-tracing-backends]: https://github.com/open-telemetry/opentelemetry-js#trace-exporters
