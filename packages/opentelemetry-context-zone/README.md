@@ -63,7 +63,7 @@ context.with(setSpan(context.active(), span1), () => {
 Apache 2.0 - See [LICENSE][license-url] for more information.
 
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
-[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
+[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-context-zone
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-context-zone

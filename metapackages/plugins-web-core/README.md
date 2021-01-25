@@ -21,11 +21,11 @@ This package depends on all core web plugins maintained by OpenTelemetry authors
 Apache 2.0 - See [LICENSE][license-url] for more information.
 
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
-[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
+[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=metapackages/plugins-web-core
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetryplugins-web-core
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/plugins-web-core
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fplugins-web-core.svg
 
-[otel-instrumentation-xml-http-request]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-instrumentation-xml-http-request
+[otel-instrumentation-xml-http-request]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-xml-http-request

@@ -57,7 +57,7 @@ fetch('http://localhost:8090/fetch.js');
 ![Screenshot of the running example](images/trace2.png)
 ![Screenshot of the running example](images/trace3.png)
 
-See [examples/tracer-web/fetch](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/tracer-web) for a short example.
+See [examples/tracer-web/fetch](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/tracer-web) for a short example.
 
 ## Useful links
 
@@ -70,7 +70,7 @@ See [examples/tracer-web/fetch](https://github.com/open-telemetry/opentelemetry-
 Apache 2.0 - See [LICENSE][license-url] for more information.
 
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
-[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
+[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-instrumentation-fetch
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-instrumentation-fetch

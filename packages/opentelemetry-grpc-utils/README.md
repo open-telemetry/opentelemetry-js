@@ -8,7 +8,7 @@
 This module provides automatic instrumentation for [`grpc`](https://grpc.github.io/grpc/node/). Currently, version [`1.x`](https://www.npmjs.com/package/grpc?activeTab=versions) of the Node.js gRPC library is supported.
 
 For automatic instrumentation see the
-[@opentelemetry/node](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node) package.
+[@opentelemetry/node](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-node) package.
 
 ## Installation
 
@@ -44,7 +44,7 @@ const { NodeTracerProvider } = require('@opentelemetry/node');
 const provider = new NodeTracerProvider();
 ```
 
-See [examples/grpc](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/grpc) for a short example.
+See [examples/grpc](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/grpc) for a short example.
 
 ## Useful links
 
@@ -57,7 +57,7 @@ See [examples/grpc](https://github.com/open-telemetry/opentelemetry-js/tree/mast
 Apache 2.0 - See [LICENSE][license-url] for more information.
 
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
-[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
+[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-plugin-grpc
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-plugin-grpc

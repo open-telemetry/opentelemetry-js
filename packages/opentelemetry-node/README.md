@@ -8,7 +8,7 @@
 This module provides *automated instrumentation and tracing* for Node.js applications.
 
 For manual instrumentation see the
-[@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing) package.
+[@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-tracing) package.
 
 ## How auto instrumentation works
 
@@ -16,7 +16,7 @@ This package exposes a `NodeTracerProvider` that will automatically hook into th
 
 For this to work, please make sure that `NodeTracerProvider` is initialized before any other module of your application, (like `http` or `express`) is loaded.
 
-OpenTelemetry comes with a growing number of instrumentation plugins for well know modules (see [supported modules](https://github.com/open-telemetry/opentelemetry-js#plugins)) and an API to create custom plugins (see [the plugin developer guide](https://github.com/open-telemetry/opentelemetry-js/blob/master/doc/plugin-guide.md)).
+OpenTelemetry comes with a growing number of instrumentation plugins for well know modules (see [supported modules](https://github.com/open-telemetry/opentelemetry-js#plugins)) and an API to create custom plugins (see [the plugin developer guide](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/plugin-guide.md)).
 
 Whenever a module is loaded `NodeTracerProvider` will check if a matching instrumentation plugin has been installed.
 
@@ -28,7 +28,7 @@ This is done by wrapping all tracing-relevant functions.
 This instrumentation code will automatically
 
 - extract a trace-context identifier from inbound requests to allow distributed tracing (if applicable)
-- make sure that this current trace-context is propagated while the transaction traverses an application (see [@opentelemetry/context-base](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-context-base/README.md) for an in-depth explanation)
+- make sure that this current trace-context is propagated while the transaction traverses an application (see [@opentelemetry/context-base](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-context-base/README.md) for an in-depth explanation)
 - add this trace-context identifier to outbound requests to allow continuing the distributed trace on the next hop (if applicable)
 - create and end spans
 
@@ -36,7 +36,7 @@ In short, this means that this module will use provided plugins to automatically
 
 ## Creating custom spans on top of auto-instrumentation
 
-Additionally to automated instrumentation, `NodeTracerProvider` exposes the same API as [@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing), allowing creating custom spans if needed.
+Additionally to automated instrumentation, `NodeTracerProvider` exposes the same API as [@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-tracing), allowing creating custom spans if needed.
 
 ## Installation
 
@@ -111,7 +111,7 @@ For example, `OTEL_NO_PATCH_MODULES=pg,https` will disable the postgres plugin a
 
 ## Examples
 
-See how to automatically instrument [http](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/http) and [gRPC](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/grpc) / [grpc-js](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/grpc-js) using node-sdk.
+See how to automatically instrument [http](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/http) and [gRPC](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/grpc) / [grpc-js](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/grpc-js) using node-sdk.
 
 ## Useful links
 
@@ -124,7 +124,7 @@ See how to automatically instrument [http](https://github.com/open-telemetry/ope
 Apache 2.0 - See [LICENSE][license-url] for more information.
 
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
-[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
+[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-node
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-node

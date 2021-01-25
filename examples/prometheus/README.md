@@ -54,8 +54,8 @@ If you are using the default configurations, the prometheus client will be avail
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For more information on OpenTelemetry metrics, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-metrics>
-- For more information on OpenTelemetry for Node.js, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node>
+- For more information on OpenTelemetry metrics, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-metrics>
+- For more information on OpenTelemetry for Node.js, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-node>
 
 ## LICENSE
 

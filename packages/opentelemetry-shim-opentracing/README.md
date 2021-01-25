@@ -34,14 +34,19 @@ opentracing.initGlobalTracer(new TracerShim(tracer));
 
 ```
 
-See [examples/opentracing-shim](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/opentracing-shim) for a short example.
+See [examples/opentracing-shim](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/opentracing-shim) for a short example.
 
 ## License
 
 Apache 2.0 - See [LICENSE][license-url] for more information.
 
+## Useful links
+
+- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
+- For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
+
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
-[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
+[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-tracing
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-tracing
