@@ -44,15 +44,15 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 
 [gitter-image]: https://badges.gitter.im/open-telemetry/opentelemetry-js.svg
 [gitter-url]: https://gitter.im/open-telemetry/opentelemetry-node?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
+[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-context-async-hooks
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-context-async-hooks
 [devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-context-async-hooks
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-context-async-hooks&type=dev
 [async-hooks-doc]: http://nodejs.org/dist/latest/docs/api/async_hooks.html
-[def-context-manager]: https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-context-base/README.md
-[dd-js-tracer-scope]: https://github.com/DataDog/dd-trace-js/tree/master/packages/dd-trace/src/scope
+[def-context-manager]: https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-context-base/README.md
+[dd-js-tracer-scope]: https://github.com/DataDog/dd-trace-js/tree/main/packages/dd-trace/src/scope
 [opentracing-scope]: https://github.com/opentracing/opentracing-javascript/pull/113
 [diag-team-scope-discussion]: https://github.com/nodejs/diagnostics/issues/300
 [pkgs-that-break-ah]: https://github.com/nodejs/diagnostics/blob/master/tracing/AsyncHooks/problematic-modules.md

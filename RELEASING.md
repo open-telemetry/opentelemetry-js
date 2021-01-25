@@ -21,7 +21,7 @@ Release Process:
 
 ## Update to latest locally
 
-Use `git fetch` and `git checkout origin/master` to ensure you’re on the latest commit. Make sure you have no unstaged changes. Ideally, also use `git clean -dfx` to remove all ignored and untracked files.
+Use `git fetch` and `git checkout origin/main` to ensure you’re on the latest commit. Make sure you have no unstaged changes. Ideally, also use `git clean -dfx` to remove all ignored and untracked files.
 
 ## Create a new branch
 
@@ -80,7 +80,7 @@ GITHUB_AUTH=xxxxx lerna-changelog --from=v1.0.0 --to=v2.0.0
 
 From what `lerna-changelog` has generated, starts new Unreleased label. Follow the example set by recent Released label.
 
-On [GitHub Releases](https://github.com/open-telemetry/opentelemetry-js/releases), follow the example set by recent releases to populate a summary of changes, as well as a list of commits that were applied since the last release. Save it as a draft, don’t publish it. Don’t forget the tag -- call it `vx.y.z` and leave it pointing at `master` for now (this can be changed as long as the GitHub release isn’t published).
+On [GitHub Releases](https://github.com/open-telemetry/opentelemetry-js/releases), follow the example set by recent releases to populate a summary of changes, as well as a list of commits that were applied since the last release. Save it as a draft, don’t publish it. Don’t forget the tag -- call it `vx.y.z` and leave it pointing at `main` for now (this can be changed as long as the GitHub release isn’t published).
 
 ## Create a new PR
 
@@ -112,9 +112,9 @@ Publish the GitHub release, ensuring that the tag points to the newly landed com
 
 ## Update CHANGELOG
 
-- After releasing is done, update the [CHANGELOG.md](https://github.com/open-telemetry/opentelemetry-js/blob/master/CHANGELOG.md) and start new Unreleased label.
+- After releasing is done, update the [CHANGELOG.md](https://github.com/open-telemetry/opentelemetry-js/blob/main/CHANGELOG.md) and start new Unreleased label.
 - Create a new commit with the exact title: `Post Release: update CHANGELOG.md`.
-- Go through PR review and merge it to GitHub master branch.
+- Go through PR review and merge it to GitHub main branch.
 
 ## Known Issues
 

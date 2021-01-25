@@ -14,10 +14,10 @@
   <a href="https://github.com/open-telemetry/opentelemetry-js/releases">
     <img alt="GitHub release (latest by date including pre-releases)" src="https://img.shields.io/github/v/release/open-telemetry/opentelemetry-js?include_prereleases&style=for-the-badge">
   </a>
-  <a href="https://codecov.io/gh/open-telemetry/opentelemetry-js/branch/master/">
+  <a href="https://codecov.io/gh/open-telemetry/opentelemetry-js/branch/main/">
     <img alt="Codecov Status" src="https://img.shields.io/codecov/c/github/open-telemetry/opentelemetry-js?style=for-the-badge">
   </a>
-  <a href="https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE">
+  <a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE">
     <img alt="license" src="https://img.shields.io/badge/license-Apache_2.0-green.svg?style=for-the-badge">
   </a>
   <br/>
@@ -225,7 +225,7 @@ These plugins are hosted at <https://github.com/open-telemetry/opentelemetry-js-
 - [@opentelemetry/plugin-document-load][otel-contrib-plugin-document-load]
 - [@opentelemetry/plugin-user-interaction][otel-contrib-plugin-user-interaction]
 
-To request automatic tracing support for a module not on this list, please [file an issue](https://github.com/open-telemetry/opentelemetry-js/issues). Alternatively, you can [write a plugin yourself](https://github.com/open-telemetry/opentelemetry-js/blob/master/doc/plugin-guide.md).
+To request automatic tracing support for a module not on this list, please [file an issue](https://github.com/open-telemetry/opentelemetry-js/issues). Alternatively, you can [write a plugin yourself](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/plugin-guide.md).
 
 ### Shims
 
@@ -267,28 +267,28 @@ To request automatic tracing support for a module not on this list, please [file
 Apache 2.0 - See [LICENSE][license-url] for more information.
 
 [node-gitter-url]: https://gitter.im/open-telemetry/opentelemetry-node?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
+[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [up-for-grabs-issues]: https://github.com/open-telemetry/OpenTelemetry-js/issues?q=is%3Aissue+is%3Aopen+label%3Aup-for-grabs
 [good-first-issues]: https://github.com/open-telemetry/OpenTelemetry-js/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22
 
 [docs]: https://open-telemetry.github.io/opentelemetry-js
 
-[otel-metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-metrics
-[otel-node]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node
+[otel-metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-metrics
+[otel-node]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-node
 
-[otel-plugin-fetch]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-fetch
-[otel-plugin-grpc]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-grpc
-[otel-plugin-grpc-js]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-grpc-js
-[otel-plugin-http]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-http
-[otel-plugin-https]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-https
-[otel-instrumentation-xml-http-request]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-instrumentation-xml-http-request
+[otel-plugin-fetch]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-plugin-fetch
+[otel-plugin-grpc]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-plugin-grpc
+[otel-plugin-grpc-js]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-plugin-grpc-js
+[otel-plugin-http]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-plugin-http
+[otel-plugin-https]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-plugin-https
+[otel-instrumentation-xml-http-request]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-xml-http-request
 
-[otel-shim-opentracing]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-shim-opentracing
-[otel-tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing
-[otel-web]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-web
-[otel-api]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-api
-[otel-core]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-core
-[generate-api-documentation]: https://github.com/open-telemetry/opentelemetry-js/blob/master/CONTRIBUTING.md#generating-api-documentation
+[otel-shim-opentracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-shim-opentracing
+[otel-tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-tracing
+[otel-web]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-web
+[otel-api]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-api
+[otel-core]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-core
+[generate-api-documentation]: https://github.com/open-telemetry/opentelemetry-js/blob/main/CONTRIBUTING.md#generating-api-documentation
 
 [otel-contrib-plugin-dns]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-plugin-dns
 [otel-contrib-plugin-ioredis]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-plugin-ioredis

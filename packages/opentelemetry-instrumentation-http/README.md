@@ -9,7 +9,7 @@
 This module provides automatic instrumentation for [`http`](https://nodejs.org/api/http.html) and [`https`](https://nodejs.org/api/https.html).
 
 For automatic instrumentation see the
-[@opentelemetry/node](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node) package.
+[@opentelemetry/node](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-node) package.
 
 ## Installation
 
@@ -46,7 +46,7 @@ provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.register();
 ```
 
-See [examples/http](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/http) for a short example.
+See [examples/http](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/http) for a short example.
 
 ### Http instrumentation Options
 
@@ -54,12 +54,12 @@ Http instrumentation has few options available to choose from. You can set the f
 
 | Options | Type | Description |
 | ------- | ---- | ----------- |
-| [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-instrumentation-http/src/types.ts#L79) | `HttpCustomAttributeFunction` | Function for adding custom attributes |
-| [`requestHook`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-instrumentation-http/src/types.ts#81) | `HttpRequestCustomAttributeFunction` | Function for adding custom attributes before request is handled |
-| [`responseHook`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-instrumentation-http/src/types.ts#L83) | `HttpResponseCustomAttributeFunction` | Function for adding custom attributes before response is handled |
-| [`ignoreIncomingPaths`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-instrumentation-http/src/types.ts#L75) | `IgnoreMatcher[]` | Http instrumentation will not trace all incoming requests that match paths |
-| [`ignoreOutgoingUrls`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-instrumentation-http/src/types.ts#L77) | `IgnoreMatcher[]` | Http instrumentation will not trace all outgoing requests that match urls |
-| [`serverName`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-instrumentation-http/src/types.ts#L85) | `string` | The primary server name of the matched virtual host. |
+| [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-instrumentation-http/src/types.ts#L79) | `HttpCustomAttributeFunction` | Function for adding custom attributes |
+| [`requestHook`](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-instrumentation-http/src/types.ts#81) | `HttpRequestCustomAttributeFunction` | Function for adding custom attributes before request is handled |
+| [`responseHook`](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-instrumentation-http/src/types.ts#L83) | `HttpResponseCustomAttributeFunction` | Function for adding custom attributes before response is handled |
+| [`ignoreIncomingPaths`](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-instrumentation-http/src/types.ts#L75) | `IgnoreMatcher[]` | Http instrumentation will not trace all incoming requests that match paths |
+| [`ignoreOutgoingUrls`](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-instrumentation-http/src/types.ts#L77) | `IgnoreMatcher[]` | Http instrumentation will not trace all outgoing requests that match urls |
+| [`serverName`](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-instrumentation-http/src/types.ts#L85) | `string` | The primary server name of the matched virtual host. |
 | `requireParentforOutgoingSpans` | Boolean | Require that is a parent span to create new span for outgoing requests. |
 | `requireParentforIncomingSpans` | Boolean | Require that is a parent span to create new span for incoming requests. |
 
@@ -75,7 +75,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 
 [gitter-image]: https://badges.gitter.im/open-telemetry/opentelemetry-js.svg
 [gitter-url]: https://gitter.im/open-telemetry/opentelemetry-node?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
+[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-instrumentation-http
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-instrumentation-http
