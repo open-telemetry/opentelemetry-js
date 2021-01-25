@@ -126,6 +126,19 @@ describe('CollectorTraceExporter - node with json over http', () => {
       });
     });
 
+    it('different http export requests should use the same agent', done => {
+      collectorExporter.export(spans, () => {});
+      collectorExporter.export(spans, () => {});
+
+      setTimeout(() => {
+        const [firstExportAgent, secondExportAgent] = spyRequest.args.map(
+          a => a[0].agent
+        );
+        assert.strictEqual(firstExportAgent, secondExportAgent);
+        done();
+      });
+    });
+
     it('should successfully send the spans', done => {
       collectorExporter.export(spans, () => {});
 
