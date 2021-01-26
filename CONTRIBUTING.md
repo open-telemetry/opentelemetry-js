@@ -58,15 +58,15 @@ git remote add upstream https://github.com/open-telemetry/opentelemetry-js.git
 git remote -v
 ```
 
-To update your fork, fetch the upstream repo's branches and commits, then merge your master with upstream's master:
+To update your fork, fetch the upstream repo's branches and commits, then merge your main with upstream's main:
 
 ```sh
 git fetch upstream
-git checkout master
-git merge upstream/master
+git checkout main
+git merge upstream/main
 ```
 
-Remember to always work in a branch of your local copy, as you might otherwise have to contend with conflicts in master.
+Remember to always work in a branch of your local copy, as you might otherwise have to contend with conflicts in main.
 
 Please also see [GitHub workflow](https://github.com/open-telemetry/community/blob/master/CONTRIBUTING.md#github-workflow) section of general project contributing guide.
 

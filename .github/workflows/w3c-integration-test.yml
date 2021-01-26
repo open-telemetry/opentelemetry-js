@@ -2,7 +2,8 @@ name: Run w3c tests on push
 
 on:
   push:
-    branches: [master, main]
+    branches:
+      - main
   pull_request:
 
 jobs:
