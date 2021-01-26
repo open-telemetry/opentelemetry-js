@@ -32,7 +32,7 @@ import { VERSION } from './version';
 // hard to say how long it should really wait, seems like 300ms is
 // safe enough
 const OBSERVER_WAIT_TIME_MS = 300;
-
+const urlNormalizingA = document.createElement('a');
 /**
  * FetchPlugin Config
  */
@@ -252,11 +252,10 @@ export class FetchInstrumentation extends InstrumentationBase<
     response: FetchResponse
   ) {
     const endTime = core.hrTime();
-    spanData.observer?.disconnect();
-
     this._addFinalSpanAttributes(span, response);
 
     setTimeout(() => {
+      spanData.observer?.disconnect();
       this._findResourceAndAddNetworkEvents(span, spanData, endTime);
       this._tasksCount--;
       this._clearResources();
@@ -352,15 +351,18 @@ export class FetchInstrumentation extends InstrumentationBase<
   private _prepareSpanData(spanUrl: string): SpanData {
     const startTime = core.hrTime();
     const entries: PerformanceResourceTiming[] = [];
-
     if (typeof window.PerformanceObserver === 'undefined') {
       return { entries, startTime, spanUrl };
     }
 
     const observer: PerformanceObserver = new PerformanceObserver(list => {
-      const entries = list.getEntries() as PerformanceResourceTiming[];
-      entries.forEach(entry => {
-        if (entry.initiatorType === 'fetch' && entry.name === spanUrl) {
+      const perfObsEntries = list.getEntries() as PerformanceResourceTiming[];
+      urlNormalizingA.href = spanUrl;
+      perfObsEntries.forEach(entry => {
+        if (
+          entry.initiatorType === 'fetch' &&
+          entry.name === urlNormalizingA.href
+        ) {
           entries.push(entry);
         }
       });
