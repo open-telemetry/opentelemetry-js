@@ -18,6 +18,8 @@ OpenTelemetry Jaeger Trace Exporter allows the user to send collected traces to 
 
 ## Prerequisites
 
+This project relies on [jaeger-client](https://github.com/jaegertracing/jaeger-client-node) library and is thus only supported for **Node.js**.
+
 Get up and running with Jaeger in your local environment.
 
 [Jaeger](https://www.jaegertracing.io/docs/latest/) stores and queries traces exported by
