@@ -126,7 +126,7 @@ describe('transform', () => {
       assert.strictEqual(tag3.vDouble, 3.142);
       assert.strictEqual(tag4.key, 'status.code');
       assert.strictEqual(tag4.vType, 'DOUBLE');
-      assert.strictEqual(tag4.vDouble, 0);
+      assert.strictEqual(tag4.vDouble, api.StatusCode.OK);
       assert.strictEqual(tag5.key, 'status.name');
       assert.strictEqual(tag5.vType, 'STRING');
       assert.strictEqual(tag5.vStr, 'OK');

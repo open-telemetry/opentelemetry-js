@@ -6,7 +6,7 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-The OpenTelemetry Prometheus Metrics Exporter allows the user to send collected [OpenTelemetry Metrics](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-metrics) to Prometheus.
+The OpenTelemetry Prometheus Metrics Exporter allows the user to send collected [OpenTelemetry Metrics](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-metrics) to Prometheus.
 
 [Prometheus](https://prometheus.io/) is a monitoring system that collects metrics, by scraping exposed endpoints at regular intervals, evaluating rule expressions. It can also trigger alerts if certain conditions are met. For assistance setting up Prometheus, [Click here](https://opencensus.io/codelabs/prometheus/#0) for a guided codelab.
 
@@ -66,7 +66,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 
 [gitter-image]: https://badges.gitter.im/open-telemetry/opentelemetry-js.svg
 [gitter-url]: https://gitter.im/open-telemetry/opentelemetry-node?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
+[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-exporter-prometheus
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-prometheus
