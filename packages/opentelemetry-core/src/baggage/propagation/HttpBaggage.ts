@@ -17,11 +17,14 @@
 import {
   Baggage,
   Context,
+  BaggageEntry,
   getBaggage,
   setBaggage,
   TextMapGetter,
   TextMapPropagator,
   TextMapSetter,
+  createBaggage,
+  baggageEntryMetadataFromString,
 } from '@opentelemetry/api';
 
 const KEY_PAIR_SEPARATOR = '=';
@@ -36,10 +39,6 @@ export const MAX_NAME_VALUE_PAIRS = 180;
 export const MAX_PER_NAME_VALUE_PAIRS = 4096;
 // Maximum total length of all name-value pairs allowed by w3c spec
 export const MAX_TOTAL_LENGTH = 8192;
-type KeyPair = {
-  key: string;
-  value: string;
-};
 
 /**
  * Propagates {@link Baggage} through Context format propagation.
@@ -70,33 +69,35 @@ export class HttpBaggage implements TextMapPropagator {
   }
 
   private _getKeyPairs(baggage: Baggage): string[] {
-    return Object.keys(baggage).map(
-      (key: string) =>
-        `${encodeURIComponent(key)}=${encodeURIComponent(baggage[key].value)}`
-    );
+    return baggage
+      .getAllEntries()
+      .map(
+        entry =>
+          `${encodeURIComponent(entry.key)}=${encodeURIComponent(entry.value)}`
+      );
   }
 
   extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
     const headerValue: string = getter.get(carrier, BAGGAGE_HEADER) as string;
     if (!headerValue) return context;
-    const baggage: Baggage = {};
+    const entries: BaggageEntry[] = [];
     if (headerValue.length == 0) {
       return context;
     }
     const pairs = headerValue.split(ITEMS_SEPARATOR);
     pairs.forEach(entry => {
-      const keyPair = this._parsePairKeyValue(entry);
-      if (keyPair) {
-        baggage[keyPair.key] = { value: keyPair.value };
+      const parsedEntry = this._parsePairKeyValue(entry);
+      if (parsedEntry) {
+        entries.push(parsedEntry);
       }
     });
-    if (Object.entries(baggage).length === 0) {
+    if (entries.length === 0) {
       return context;
     }
-    return setBaggage(context, baggage);
+    return setBaggage(context, createBaggage(entries));
   }
 
-  private _parsePairKeyValue(entry: string): KeyPair | undefined {
+  private _parsePairKeyValue(entry: string): BaggageEntry | undefined {
     const valueProps = entry.split(PROPERTIES_SEPARATOR);
     if (valueProps.length <= 0) return;
     const keyPairPart = valueProps.shift();
@@ -104,12 +105,14 @@ export class HttpBaggage implements TextMapPropagator {
     const keyPair = keyPairPart.split(KEY_PAIR_SEPARATOR);
     if (keyPair.length != 2) return;
     const key = decodeURIComponent(keyPair[0].trim());
-    let value = decodeURIComponent(keyPair[1].trim());
+    const value = decodeURIComponent(keyPair[1].trim());
+    let metadata;
     if (valueProps.length > 0) {
-      value =
-        value + PROPERTIES_SEPARATOR + valueProps.join(PROPERTIES_SEPARATOR);
+      metadata = baggageEntryMetadataFromString(
+        valueProps.join(PROPERTIES_SEPARATOR)
+      );
     }
-    return { key, value };
+    return { key, value, metadata };
   }
 
   fields(): string[] {

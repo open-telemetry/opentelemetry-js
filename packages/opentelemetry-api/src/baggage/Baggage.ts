@@ -14,16 +14,43 @@
  * limitations under the License.
  */
 
-import { EntryValue } from './EntryValue';
+import { BaggageEntry, BaggageEntryMetadata } from './Entry';
 
 /**
- * Baggage represents collection of entries. Each key of
- * Baggage is associated with exactly one value. Baggage
- * is serializable, to facilitate propagating it not only inside the process
- * but also across process boundaries. Baggage is used to annotate
- * telemetry with the name:value pair Entry. Those values can be used to add
- * dimension to the metric or additional contest properties to logs and traces.
+ * Baggage represents collection of key-value pairs with optional metadata.
+ * Each key of Baggage is associated with exactly one value.
+ * Baggage may be used to annotate and enrich telemetry data.
  */
 export interface Baggage {
-  [entryKey: string]: EntryValue;
+  /**
+   * Get an entry from Baggage if it exists
+   *
+   * @param key The key which identifies the BaggageEntry
+   */
+  getEntry(key: string): BaggageEntry | undefined;
+
+  /**
+   * Get a list of all entries in the Baggage
+   */
+  getAllEntries(): BaggageEntry[];
+
+  /**
+   * Create a new Baggage from this baggage with a new entry.
+   *
+   * @param key string which identifies the baggage entry
+   * @param value string value of the baggage
+   * @param metadata optional entry metadata
+   */
+  setEntry(
+    key: string,
+    value: string,
+    metadata?: BaggageEntryMetadata
+  ): Baggage;
+
+  /**
+   * Create a new baggage containing all entries from this except the removed entry
+   *
+   * @param key key identifying the entry to be removed
+   */
+  removeEntry(key: string): Baggage;
 }
