@@ -22,7 +22,7 @@ use the latest and greatest features, and best practices.
 
 ## Contributing
 
-Please see [CONTRIBUTING.md](https://github.com/open-telemetry/opentelemetry-js/blob/master/CONTRIBUTING.md) for instructions on how to contribute.
+Please see [CONTRIBUTING.md](https://github.com/open-telemetry/opentelemetry-js/blob/main/CONTRIBUTING.md) for instructions on how to contribute.
 
 ## LICENSE
 

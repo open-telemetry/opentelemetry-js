@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-base",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "OpenTelemetry Base Context Manager",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
