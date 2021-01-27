@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { TraceFlags, StatusCode } from '@opentelemetry/api';
+import { TraceFlags, SpanStatusCode } from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -32,7 +32,7 @@ export const mockedReadableSpan: ReadableSpan = {
   startTime: [1574120165, 429803070],
   endTime: [1574120165, 438688070],
   ended: true,
-  status: { code: StatusCode.OK },
+  status: { code: SpanStatusCode.OK },
   attributes: { component: 'foo' },
   links: [],
   events: [],

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 import {
-  StatusCode,
+  SpanStatusCode,
   context,
   propagation,
   Span,
   SpanKind,
   SpanOptions,
-  Status,
+  SpanStatus,
   setSpan,
   SpanContext,
   TraceFlags,
@@ -310,10 +310,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         this._logger.debug('outgoingRequest on response()');
         response.on('end', () => {
           this._logger.debug('outgoingRequest on end()');
-          let status: Status;
+          let status: SpanStatus;
 
           if (response.aborted && !response.complete) {
-            status = { code: StatusCode.ERROR };
+            status = { code: SpanStatusCode.ERROR };
           } else {
             status = utils.parseResponseStatus(response.statusCode!);
           }

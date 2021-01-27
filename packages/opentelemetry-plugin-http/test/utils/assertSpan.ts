@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { SpanKind, Status } from '@opentelemetry/api';
+import { SpanKind, SpanStatus } from '@opentelemetry/api';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import {
@@ -36,7 +36,7 @@ export const assertSpan = (
     pathname: string;
     reqHeaders?: http.OutgoingHttpHeaders;
     path?: string | null;
-    forceStatus?: Status;
+    forceStatus?: SpanStatus;
     serverName?: string;
     component: string;
   }

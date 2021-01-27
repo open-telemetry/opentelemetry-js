@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 import {
-  Attributes,
-  StatusCode,
+  SpanAttributes,
+  SpanStatusCode,
   ROOT_CONTEXT,
   SpanKind,
   TraceFlags,
@@ -38,20 +38,20 @@ describe('Utility', () => {
       const status = utils.parseResponseStatus(
         (undefined as unknown) as number
       );
-      assert.deepStrictEqual(status, { code: StatusCode.ERROR });
+      assert.deepStrictEqual(status, { code: SpanStatusCode.ERROR });
     });
 
     it('should return OK for Success HTTP status code', () => {
       for (let index = 100; index < 400; index++) {
         const status = utils.parseResponseStatus(index);
-        assert.deepStrictEqual(status, { code: StatusCode.OK });
+        assert.deepStrictEqual(status, { code: SpanStatusCode.OK });
       }
     });
 
     it('should not return OK for Bad HTTP status code', () => {
       for (let index = 400; index <= 600; index++) {
         const status = utils.parseResponseStatus(index);
-        assert.notStrictEqual(status.code, StatusCode.OK);
+        assert.notStrictEqual(status.code, SpanStatusCode.OK);
       }
     });
   });
@@ -313,7 +313,7 @@ describe('Utility', () => {
   // Verify the key in the given attributes is set to the given value,
   // and that no other HTTP Content Length attributes are set.
   function verifyValueInAttributes(
-    attributes: Attributes,
+    attributes: SpanAttributes,
     key: string | undefined,
     value: number
   ) {
@@ -335,7 +335,7 @@ describe('Utility', () => {
 
   describe('setRequestContentLengthAttributes()', () => {
     it('should set request content-length uncompressed attribute with no content-encoding header', () => {
-      const attributes: Attributes = {};
+      const attributes: SpanAttributes = {};
       const request = {} as IncomingMessage;
 
       request.headers = {
@@ -351,7 +351,7 @@ describe('Utility', () => {
     });
 
     it('should set request content-length uncompressed attribute with "identity" content-encoding header', () => {
-      const attributes: Attributes = {};
+      const attributes: SpanAttributes = {};
       const request = {} as IncomingMessage;
       request.headers = {
         'content-length': '1200',
@@ -367,7 +367,7 @@ describe('Utility', () => {
     });
 
     it('should set request content-length compressed attribute with "gzip" content-encoding header', () => {
-      const attributes: Attributes = {};
+      const attributes: SpanAttributes = {};
       const request = {} as IncomingMessage;
       request.headers = {
         'content-length': '1200',
@@ -385,7 +385,7 @@ describe('Utility', () => {
 
   describe('setResponseContentLengthAttributes()', () => {
     it('should set response content-length uncompressed attribute with no content-encoding header', () => {
-      const attributes: Attributes = {};
+      const attributes: SpanAttributes = {};
 
       const response = {} as IncomingMessage;
 
@@ -402,7 +402,7 @@ describe('Utility', () => {
     });
 
     it('should set response content-length uncompressed attribute with "identity" content-encoding header', () => {
-      const attributes: Attributes = {};
+      const attributes: SpanAttributes = {};
 
       const response = {} as IncomingMessage;
 
@@ -421,7 +421,7 @@ describe('Utility', () => {
     });
 
     it('should set response content-length compressed attribute with "gzip" content-encoding header', () => {
-      const attributes: Attributes = {};
+      const attributes: SpanAttributes = {};
 
       const response = {} as IncomingMessage;
 
@@ -440,7 +440,7 @@ describe('Utility', () => {
     });
 
     it('should set no attributes with no content-length header', () => {
-      const attributes: Attributes = {};
+      const attributes: SpanAttributes = {};
       const message = {} as IncomingMessage;
 
       message.headers = {
