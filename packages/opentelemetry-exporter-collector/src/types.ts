@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { SpanAttributes, Logger, SpanKind, SpanStatusCode } from '@opentelemetry/api';
+import {
+  SpanAttributes,
+  Logger,
+  SpanKind,
+  SpanStatusCode,
+} from '@opentelemetry/api';
 
 /* eslint-disable @typescript-eslint/no-namespace */
 export namespace opentelemetryProto {

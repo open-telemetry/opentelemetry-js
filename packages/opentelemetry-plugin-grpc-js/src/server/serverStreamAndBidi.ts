@@ -57,7 +57,10 @@ export function serverStreamAndBidiHandler<RequestType, ResponseType>(
     span.setStatus({
       code: SpanStatusCode.OK,
     });
-    span.setAttribute(RpcAttribute.GRPC_STATUS_CODE, SpanStatusCode.OK.toString());
+    span.setAttribute(
+      RpcAttribute.GRPC_STATUS_CODE,
+      SpanStatusCode.OK.toString()
+    );
 
     endSpan();
   });
