@@ -27,6 +27,7 @@ export enum PerformanceTimingNames {
   FETCH_START = 'fetchStart',
   LOAD_EVENT_END = 'loadEventEnd',
   LOAD_EVENT_START = 'loadEventStart',
+  NAVIGATION_START = 'navigationStart',
   REDIRECT_END = 'redirectEnd',
   REDIRECT_START = 'redirectStart',
   REQUEST_START = 'requestStart',

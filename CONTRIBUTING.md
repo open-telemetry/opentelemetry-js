@@ -58,15 +58,15 @@ git remote add upstream https://github.com/open-telemetry/opentelemetry-js.git
 git remote -v
 ```
 
-To update your fork, fetch the upstream repo's branches and commits, then merge your master with upstream's master:
+To update your fork, fetch the upstream repo's branches and commits, then merge your main with upstream's main:
 
 ```sh
 git fetch upstream
-git checkout master
-git merge upstream/master
+git checkout main
+git merge upstream/main
 ```
 
-Remember to always work in a branch of your local copy, as you might otherwise have to contend with conflicts in master.
+Remember to always work in a branch of your local copy, as you might otherwise have to contend with conflicts in main.
 
 Please also see [GitHub workflow](https://github.com/open-telemetry/community/blob/master/CONTRIBUTING.md#github-workflow) section of general project contributing guide.
 
@@ -143,22 +143,22 @@ This project uses a combination of `gts` and `eslint`. Just like tests and compi
 
 ```sh
 # Lint all modules
-npm lint
+npm run lint
 
 # Lint a single module
 cd packages/opentelemetry-module-name
-npm lint
+npm run lint
 ```
 
 There is also a script which will automatically fix many linting errors.
 
 ```sh
 # Lint all modules, fixing errors
-npm lint:fix
+npm run lint:fix
 
 # Lint a single module, fixing errors
 cd packages/opentelemetry-module-name
-npm lint:fix
+npm run lint:fix
 ```
 
 ### Adding a package
@@ -175,7 +175,7 @@ After adding the package, run `npm install` from the root of the project. This w
 - Most PRs should be merged in one to two weeks.
 - If a PR is taking longer than 30 days, please ping the approvers ([@open-telemetry/javascript-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers)) as it may have been lost
 - Dependency upgrades and Security fixes: This PR is small and/or low-risk and can be merged with only maintainer reviews.
-- If your patch is not getting reviewed or you need a specific person to review it, you can @username or @open-telemetry/javascript-approvers a reviewer asking for a review in the pull request, or you can ask for a review on Gitter channel.
+- If your patch is not getting reviewed or you need a specific person to review it, you can @username or @open-telemetry/javascript-approvers a reviewer asking for a review in the pull request.
 - API changes, breaking changes, or large changes will be subject to more scrutiny and may require more reviewers. These PRs should only be merged by maintainers.
 - Changes to existing plugins and exporters will typically require the approval of the original plugin/exporter author.
 
@@ -202,6 +202,7 @@ If all of the above requirements are met and there are no unresolved discussions
 
 ### Generating CHANGELOG documentation
 
+- Generate and export your [Github access token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token): `export GITHUB_AUTH=<your_token>`
 - `npm run changelog` to generate CHANGELOG documentation in your terminal (see [RELEASING.md](RELEASING.md) for more details).
 
 ### Benchmarks

@@ -52,8 +52,8 @@ export class BasicTracerProvider implements api.TracerProvider {
     });
   }
 
-  getTracer(name: string, version = '*', config?: TracerConfig): Tracer {
-    const key = `${name}@${version}`;
+  getTracer(name: string, version?: string, config?: TracerConfig): Tracer {
+    const key = `${name}@${version || ''}`;
     if (!this._tracers.has(key)) {
       this._tracers.set(
         key,

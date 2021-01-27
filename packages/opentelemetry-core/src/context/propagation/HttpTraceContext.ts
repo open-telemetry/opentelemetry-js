@@ -30,12 +30,13 @@ export const TRACE_PARENT_HEADER = 'traceparent';
 export const TRACE_STATE_HEADER = 'tracestate';
 
 const VERSION = '00';
-const VERSION_PART_COUNT = 4; // Version 00 only allows the specific 4 fields.
-
-const VERSION_REGEX = /^(?!ff)[\da-f]{2}$/;
-const TRACE_ID_REGEX = /^(?![0]{32})[\da-f]{32}$/;
-const PARENT_ID_REGEX = /^(?![0]{16})[\da-f]{16}$/;
-const FLAGS_REGEX = /^[\da-f]{2}$/;
+const VERSION_PART = '(?!ff)[\\da-f]{2}';
+const TRACE_ID_PART = '(?![0]{32})[\\da-f]{32}';
+const PARENT_ID_PART = '(?![0]{16})[\\da-f]{16}';
+const FLAGS_PART = '[\\da-f]{2}';
+const TRACE_PARENT_REGEX = new RegExp(
+  `^\\s?(${VERSION_PART})-(${TRACE_ID_PART})-(${PARENT_ID_PART})-(${FLAGS_PART})(-.*)?\\s?$`
+);
 
 /**
  * Parses information from the [traceparent] span tag and converts it into {@link SpanContext}
@@ -48,33 +49,18 @@ const FLAGS_REGEX = /^[\da-f]{2}$/;
  *     For more information see {@link https://www.w3.org/TR/trace-context/}
  */
 export function parseTraceParent(traceParent: string): SpanContext | null {
-  const trimmed = traceParent.trim();
-  const traceParentParts = trimmed.split('-');
+  const match = TRACE_PARENT_REGEX.exec(traceParent);
+  if (!match) return null;
 
-  // Current version must be structured correctly.
-  // For future versions, we can grab just the parts we do support.
-  if (
-    traceParentParts[0] === VERSION &&
-    traceParentParts.length !== VERSION_PART_COUNT
-  ) {
-    return null;
-  }
-
-  const [version, traceId, parentId, flags] = traceParentParts;
-  const isValidParent =
-    VERSION_REGEX.test(version) &&
-    TRACE_ID_REGEX.test(traceId) &&
-    PARENT_ID_REGEX.test(parentId) &&
-    FLAGS_REGEX.test(flags);
-
-  if (!isValidParent) {
-    return null;
-  }
+  // According to the specification the implementation should be compatible
+  // with future versions. If there are more parts, we only reject it if it's using version 00
+  // See https://www.w3.org/TR/trace-context/#versioning-of-traceparent
+  if (match[1] === '00' && match[5]) return null;
 
   return {
-    traceId: traceId,
-    spanId: parentId,
-    traceFlags: parseInt(flags, 16),
+    traceId: match[2],
+    spanId: match[3],
+    traceFlags: parseInt(match[4], 16),
   };
 }
 

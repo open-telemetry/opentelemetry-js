@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanKind, Logger, Attributes } from '@opentelemetry/api';
+import { Attributes, Logger, SpanKind, StatusCode } from '@opentelemetry/api';
 
 /* eslint-disable @typescript-eslint/no-namespace */
 export namespace opentelemetryProto {
@@ -260,26 +260,6 @@ export namespace opentelemetryProto {
       message?: string;
     }
 
-    /**
-     * An enumeration of status codes.
-     * https://github.com/open-telemetry/opentelemetry-proto/blob/master/opentelemetry/proto/trace/v1/trace.proto#L304
-     */
-    export enum StatusCode {
-      /**
-       * The default status.
-       */
-      UNSET = 0,
-      /**
-       * The operation has been validated by an Application developer or
-       * Operator to have completed successfully.
-       */
-      OK = 1,
-      /**
-       * The operation contains an error.
-       */
-      ERROR = 2,
-    }
-
     export interface TraceConfig {
       constantSampler?: ConstantSampler | null;
       probabilitySampler?: ProbabilitySampler | null;
@@ -311,7 +291,7 @@ export namespace opentelemetryProto {
 
     export interface InstrumentationLibrary {
       name: string;
-      version: string;
+      version?: string;
     }
 
     export interface StringKeyValue {

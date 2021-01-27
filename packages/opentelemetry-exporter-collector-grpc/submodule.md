@@ -1,6 +1,6 @@
 # Important
 
-**Submodule is always pointing to certain revision number. So updating the master of the submodule repo will not have impact on your code.
+**Submodule is always pointing to certain revision number. So updating the submodule repo will not have impact on your code.
 Knowing this if you want to change the submodule to point to a different version (when for example proto has changed) here is how to do it:**
 
 ## Updating submodule to point to certain revision number

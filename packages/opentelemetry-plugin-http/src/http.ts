@@ -26,6 +26,7 @@ import {
   setSpan,
   ROOT_CONTEXT,
   getSpan,
+  suppressInstrumentation,
 } from '@opentelemetry/api';
 import { BasePlugin, NoRecordingSpan } from '@opentelemetry/core';
 import type {
@@ -295,7 +296,11 @@ export class HttpPlugin extends BasePlugin<Http> {
             plugin._logger.error('caught ignoreIncomingPaths error: ', e)
         )
       ) {
-        return original.apply(this, [event, ...args]);
+        return context.with(suppressInstrumentation(context.active()), () => {
+          context.bind(request);
+          context.bind(response);
+          return original.apply(this, [event, ...args]);
+        });
       }
 
       const headers = request.headers;

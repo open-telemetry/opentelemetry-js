@@ -121,7 +121,9 @@ describe('fetch', () => {
     done: any,
     fileUrl: string,
     config: FetchInstrumentationConfig,
-    method?: string
+    method?: string,
+    disablePerfObserver?: boolean,
+    disableGetEntries?: boolean
   ) => {
     sandbox = sinon.createSandbox();
     sandbox.useFakeTimers();
@@ -165,8 +167,16 @@ describe('fetch', () => {
       })
     );
 
-    const spyEntries = sandbox.stub(performance, 'getEntriesByType');
-    spyEntries.withArgs('resource').returns(resources);
+    if (disablePerfObserver) {
+      sandbox.stub(window, 'PerformanceObserver').value(undefined);
+    }
+    if (disableGetEntries) {
+      sandbox.stub(performance, 'getEntriesByType').value(undefined);
+    } else {
+      const spyEntries = sandbox.stub(performance, 'getEntriesByType');
+      spyEntries.withArgs('resource').returns(resources);
+    }
+
     fetchInstrumentation = new FetchInstrumentation(config);
     webTracerProviderWithZone = new WebTracerProvider({
       logLevel: core.LogLevel.ERROR,
@@ -583,6 +593,45 @@ describe('fetch', () => {
         span.parentSpanId,
         rootSpan.context().spanId,
         'parent span is not root span'
+      );
+    });
+  });
+
+  describe('when PerformanceObserver is undefined', () => {
+    beforeEach(done => {
+      prepareData(done, url, {}, undefined, true, false);
+    });
+
+    afterEach(() => {
+      clearData();
+    });
+
+    it('should still create spans', () => {
+      assert.strictEqual(
+        exportSpy.args.length,
+        2,
+        `Wrong number of spans: ${exportSpy.args.length}`
+      );
+    });
+  });
+
+  describe('when PerformanceObserver and performance.getEntriesByType are undefined', () => {
+    beforeEach(done => {
+      prepareData(done, url, {}, undefined, true, true);
+    });
+    afterEach(() => {
+      clearData();
+    });
+    it('should capture fetch without preflight', () => {
+      assert.strictEqual(
+        exportSpy.args.length,
+        1,
+        `Wrong number of spans: ${exportSpy.args.length}`
+      );
+      assert.strictEqual(
+        exportSpy.args[0][0][0].name,
+        'HTTP GET',
+        'wrong span captured'
       );
     });
   });

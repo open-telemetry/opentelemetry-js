@@ -6,7 +6,6 @@
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
     <a href="https://open-telemetry.github.io/opentelemetry-js">API Documentation<a/>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="https://gitter.im/open-telemetry/opentelemetry-node">Getting In Touch (Gitter)<a/>
   </strong>
 </p>
 
@@ -14,10 +13,10 @@
   <a href="https://github.com/open-telemetry/opentelemetry-js/releases">
     <img alt="GitHub release (latest by date including pre-releases)" src="https://img.shields.io/github/v/release/open-telemetry/opentelemetry-js?include_prereleases&style=for-the-badge">
   </a>
-  <a href="https://codecov.io/gh/open-telemetry/opentelemetry-js/branch/master/">
+  <a href="https://codecov.io/gh/open-telemetry/opentelemetry-js/branch/main/">
     <img alt="Codecov Status" src="https://img.shields.io/codecov/c/github/open-telemetry/opentelemetry-js?style=for-the-badge">
   </a>
-  <a href="https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE">
+  <a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE">
     <img alt="license" src="https://img.shields.io/badge/license-Apache_2.0-green.svg?style=for-the-badge">
   </a>
   <br/>
@@ -130,6 +129,7 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 
 - [Chengzhong Wu](https://github.com/legendecas), Alibaba
 - [Gerhard Stöbich](https://github.com/Flarna), Dynatrace
+- [John Bley](https://github.com/johnbley), Splunk
 - [Mark Wolff](https://github.com/markwolff), Microsoft
 - [Matthew Wear](https://github.com/mwear), LightStep
 - [Naseem K. Ullah](https://github.com/naseemkullah), Transit
@@ -224,7 +224,7 @@ These plugins are hosted at <https://github.com/open-telemetry/opentelemetry-js-
 - [@opentelemetry/plugin-document-load][otel-contrib-plugin-document-load]
 - [@opentelemetry/plugin-user-interaction][otel-contrib-plugin-user-interaction]
 
-To request automatic tracing support for a module not on this list, please [file an issue](https://github.com/open-telemetry/opentelemetry-js/issues). Alternatively, you can [write a plugin yourself](https://github.com/open-telemetry/opentelemetry-js/blob/master/doc/plugin-guide.md).
+To request automatic tracing support for a module not on this list, please [file an issue](https://github.com/open-telemetry/opentelemetry-js/issues). Alternatively, you can [write a plugin yourself](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/plugin-guide.md).
 
 ### Shims
 
@@ -242,38 +242,52 @@ To request automatic tracing support for a module not on this list, please [file
 - `Tracer.withSpan(span)`: use `api.context.with(api.setSpan(api.context.active(), span))`
 - `Tracer.bind(target)`: use `api.context.bind(target)`
 
+[PR-1797](https://github.com/open-telemetry/opentelemetry-js/pull/1797) chore!: split metrics into its own api package:
+
+- Any references to `require("@opentelemetry/api").metrics` will need to be changed to `require("@opentelemetry/api-metrics").metrics`
+
+[PR-1725](https://github.com/open-telemetry/opentelemetry-js/pull/1725) Use new gRPC default port
+
+- The default port used by `@opentelemetry/exporter-collector-grpc` is changed from `55680` to `4317`
+
+[PR-1749](https://github.com/open-telemetry/opentelemetry-js/pull/1749) chore: improve naming of span related context APIs
+
+- Rename `[gs]etActiveSpan()` to `[gs]etSpan()`
+- Rename `setExtractedSpanContext()` to `setSpanContext()`
+- Rename `getParentSpanContext()` to `getSpanContext()`
+
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For help or feedback on this project, join us on [gitter][node-gitter-url]
+- For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
 
 ## License
 
 Apache 2.0 - See [LICENSE][license-url] for more information.
 
-[node-gitter-url]: https://gitter.im/open-telemetry/opentelemetry-node?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
+[discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
+[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [up-for-grabs-issues]: https://github.com/open-telemetry/OpenTelemetry-js/issues?q=is%3Aissue+is%3Aopen+label%3Aup-for-grabs
 [good-first-issues]: https://github.com/open-telemetry/OpenTelemetry-js/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22
 
 [docs]: https://open-telemetry.github.io/opentelemetry-js
 
-[otel-metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-metrics
-[otel-node]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node
+[otel-metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-metrics
+[otel-node]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-node
 
-[otel-plugin-fetch]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-fetch
-[otel-plugin-grpc]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-grpc
-[otel-plugin-grpc-js]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-grpc-js
-[otel-plugin-http]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-http
-[otel-plugin-https]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-https
-[otel-instrumentation-xml-http-request]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-instrumentation-xml-http-request
+[otel-plugin-fetch]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-plugin-fetch
+[otel-plugin-grpc]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-plugin-grpc
+[otel-plugin-grpc-js]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-plugin-grpc-js
+[otel-plugin-http]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-plugin-http
+[otel-plugin-https]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-plugin-https
+[otel-instrumentation-xml-http-request]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-xml-http-request
 
-[otel-shim-opentracing]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-shim-opentracing
-[otel-tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing
-[otel-web]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-web
-[otel-api]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-api
-[otel-core]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-core
-[generate-api-documentation]: https://github.com/open-telemetry/opentelemetry-js/blob/master/CONTRIBUTING.md#generating-api-documentation
+[otel-shim-opentracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-shim-opentracing
+[otel-tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-tracing
+[otel-web]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-web
+[otel-api]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-api
+[otel-core]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-core
+[generate-api-documentation]: https://github.com/open-telemetry/opentelemetry-js/blob/main/CONTRIBUTING.md#generating-api-documentation
 
 [otel-contrib-plugin-dns]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-plugin-dns
 [otel-contrib-plugin-ioredis]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-plugin-ioredis
