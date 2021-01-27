@@ -171,6 +171,27 @@ describe('PrometheusExporter', () => {
         return done();
       });
     });
+
+    it('should able to call getMetricsRequestHandler function to generate response with metrics', () => {
+      const exporter = new PrometheusExporter({ preventServerStart: true });
+      const mockRequest = {} as http.IncomingMessage;
+      let calledEnd = false;
+      let calledSetHeader = false;
+      const mockResponse = {
+        statusCode: 0,
+        setHeader: (_name: string, _value: string) => {
+          calledSetHeader = true;
+        },
+        end: () => {
+          calledEnd = true;
+        },
+      } as http.ServerResponse;
+
+      exporter.getMetricsRequestHandler(mockRequest, mockResponse);
+      assert.strictEqual(calledEnd, true);
+      assert.strictEqual(calledSetHeader, true);
+      assert.strictEqual(mockResponse.statusCode, 200);
+    });
   });
 
   describe('export', () => {

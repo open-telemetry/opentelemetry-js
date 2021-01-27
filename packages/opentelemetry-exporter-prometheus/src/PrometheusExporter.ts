@@ -158,6 +158,18 @@ export class PrometheusExporter implements MetricExporter {
   }
 
   /**
+   * Request handler that responds with the current state of metrics
+   * @param request Incoming HTTP request of server instance
+   * @param response HTTP response objet used to response to request
+   */
+  public getMetricsRequestHandler(
+    _request: IncomingMessage,
+    response: ServerResponse
+  ) {
+    this._exportMetrics(response);
+  }
+
+  /**
    * Request handler used by http library to respond to incoming requests
    * for the current state of metrics by the Prometheus backend.
    *
