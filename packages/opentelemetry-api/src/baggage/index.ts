@@ -17,6 +17,7 @@
 import { Baggage } from './Baggage';
 import { BaggageEntry, BaggageEntryMetadata } from './Entry';
 import { BaggageImpl } from './internal/baggage';
+import { baggageEntryMetadataSymbol } from './internal/symbol';
 
 export * from './Baggage';
 export * from './Entry';
@@ -41,8 +42,14 @@ export function createBaggage(
 export function baggageEntryMetadataFromString(
   str: string
 ): BaggageEntryMetadata {
+  if (typeof str !== 'string') {
+    // TODO log diagnostic
+    str = '';
+  }
+
   return {
-    toString: function () {
+    __TYPE__: baggageEntryMetadataSymbol,
+    toString() {
       return str;
     },
   };

@@ -30,7 +30,7 @@ export class BaggageImpl implements Baggage {
       return undefined;
     }
 
-    return Object.assign(Object.create(null), entry);
+    return Object.assign({}, entry);
   }
 
   getAllEntries(): [string, BaggageEntry][] {
