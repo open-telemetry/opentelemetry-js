@@ -41,6 +41,25 @@ describe('API', () => {
     assert.strictEqual(typeof tracer, 'object');
   });
 
+  describe('Context', () => {
+    it('with should forward arguments and return value', () => {
+      const res = context.with(
+        ROOT_CONTEXT,
+        function cb(a, b, c) {
+          assert.strictEqual(arguments.length, 3);
+          assert.strictEqual(a, 'one');
+          assert.strictEqual(b, 2);
+          assert.strictEqual(c, 'three');
+          return 'done';
+        },
+        'one',
+        2,
+        'three'
+      );
+      assert.strictEqual(res, 'done');
+    });
+  });
+
   describe('GlobalTracerProvider', () => {
     const spanContext = {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',

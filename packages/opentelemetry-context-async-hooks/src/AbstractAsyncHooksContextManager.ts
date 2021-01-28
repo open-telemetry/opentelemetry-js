@@ -44,7 +44,8 @@ export abstract class AbstractAsyncHooksContextManager
 
   abstract with<T extends (...args: unknown[]) => ReturnType<T>>(
     context: Context,
-    fn: T
+    fn: T,
+    ...args: unknown[]
   ): ReturnType<T>;
 
   abstract enable(): this;

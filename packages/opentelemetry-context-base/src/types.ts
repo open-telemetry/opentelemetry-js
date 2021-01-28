@@ -50,10 +50,12 @@ export interface ContextManager {
    * Run the fn callback with object set as the current active context
    * @param context Any object to set as the current active context
    * @param fn A callback to be immediately run within a specific context
+   * @param args optional arguments forwarded to fn
    */
   with<T extends (...args: unknown[]) => ReturnType<T>>(
     context: Context,
-    fn: T
+    fn: T,
+    ...args: unknown[]
   ): ReturnType<T>;
 
   /**

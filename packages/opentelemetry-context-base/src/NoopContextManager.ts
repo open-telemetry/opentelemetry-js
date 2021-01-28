@@ -24,9 +24,10 @@ export class NoopContextManager implements types.ContextManager {
 
   with<T extends (...args: unknown[]) => ReturnType<T>>(
     _context: types.Context,
-    fn: T
+    fn: T,
+    ...args: unknown[]
   ): ReturnType<T> {
-    return fn();
+    return fn(...args);
   }
 
   bind<T>(target: T, _context?: types.Context): T {

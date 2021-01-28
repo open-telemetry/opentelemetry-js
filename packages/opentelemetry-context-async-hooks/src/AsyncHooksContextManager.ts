@@ -40,11 +40,12 @@ export class AsyncHooksContextManager extends AbstractAsyncHooksContextManager {
 
   with<T extends (...args: unknown[]) => ReturnType<T>>(
     context: Context,
-    fn: T
+    fn: T,
+    ...args: unknown[]
   ): ReturnType<T> {
     this._enterContext(context);
     try {
-      return fn();
+      return fn(...args);
     } finally {
       this._exitContext();
     }

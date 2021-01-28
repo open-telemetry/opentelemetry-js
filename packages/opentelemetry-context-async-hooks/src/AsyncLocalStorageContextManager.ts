@@ -32,9 +32,10 @@ export class AsyncLocalStorageContextManager extends AbstractAsyncHooksContextMa
 
   with<T extends (...args: unknown[]) => ReturnType<T>>(
     context: Context,
-    fn: T
+    fn: T,
+    ...args: unknown[]
   ): ReturnType<T> {
-    return this._asyncLocalStorage.run(context, fn) as ReturnType<T>;
+    return this._asyncLocalStorage.run(context, fn, ...args);
   }
 
   enable(): this {

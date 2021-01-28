@@ -105,6 +105,23 @@ describe('ZoneContextManager', () => {
       return done();
     });
 
+    it('should forward arguments and return code', () => {
+      const res = contextManager.with(
+        ROOT_CONTEXT,
+        function cb(a, b, c) {
+          assert.strictEqual(arguments.length, 3);
+          assert.strictEqual(a, 'one');
+          assert.strictEqual(b, 2);
+          assert.strictEqual(c, 'three');
+          return 'done';
+        },
+        'one',
+        2,
+        'three'
+      );
+      assert.strictEqual(res, 'done');
+    });
+
     it('should finally restore an old context, including the async task', done => {
       const ctx1 = ROOT_CONTEXT.setValue(key1, 'ctx1');
       const ctx2 = ROOT_CONTEXT.setValue(key1, 'ctx2');

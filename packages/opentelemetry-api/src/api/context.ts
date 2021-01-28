@@ -78,12 +78,14 @@ export class ContextAPI {
    *
    * @param context context to be active during function execution
    * @param fn function to execute in a context
+   * @param args optional arguments forwarded to fn
    */
   public with<T extends (...args: unknown[]) => ReturnType<T>>(
     context: Context,
-    fn: T
+    fn: T,
+    ...args: unknown[]
   ): ReturnType<T> {
-    return this._getContextManager().with(context, fn);
+    return this._getContextManager().with(context, fn, ...args);
   }
 
   /**
