@@ -23,7 +23,7 @@ OpenTelemetry HTTP Instrumentation allows the user to automatically collect trac
 To load a specific instrumentation (HTTP in this case), specify it in the Node Tracer's configuration.
 
 ```js
-const { HttpInstrumentation } = require('@opentelemetry/instrumentation-graphql');
+const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
 
 const { ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { NodeTracerProvider } = require('@opentelemetry/node');
