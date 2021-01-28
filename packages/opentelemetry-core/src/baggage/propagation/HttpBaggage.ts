@@ -72,32 +72,36 @@ export class HttpBaggage implements TextMapPropagator {
     return baggage
       .getAllEntries()
       .map(
-        entry =>
-          `${encodeURIComponent(entry.key)}=${encodeURIComponent(entry.value)}`
+        ([key, value]) =>
+          `${encodeURIComponent(key)}=${encodeURIComponent(value.value)}`
       );
   }
 
   extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
     const headerValue: string = getter.get(carrier, BAGGAGE_HEADER) as string;
     if (!headerValue) return context;
-    const entries: BaggageEntry[] = [];
+    const baggage: Record<string, BaggageEntry> = {};
     if (headerValue.length == 0) {
       return context;
     }
     const pairs = headerValue.split(ITEMS_SEPARATOR);
     pairs.forEach(entry => {
-      const parsedEntry = this._parsePairKeyValue(entry);
-      if (parsedEntry) {
-        entries.push(parsedEntry);
+      const keyPair = this._parsePairKeyValue(entry);
+      if (keyPair) {
+        const entry: BaggageEntry = { value: keyPair.value };
+        if (keyPair.metadata) {
+          entry.metadata = keyPair.metadata;
+        }
+        baggage[keyPair.key] = entry;
       }
     });
-    if (entries.length === 0) {
+    if (Object.entries(baggage).length === 0) {
       return context;
     }
-    return setBaggage(context, createBaggage(entries));
+    return setBaggage(context, createBaggage(baggage));
   }
 
-  private _parsePairKeyValue(entry: string): BaggageEntry | undefined {
+  private _parsePairKeyValue(entry: string) {
     const valueProps = entry.split(PROPERTIES_SEPARATOR);
     if (valueProps.length <= 0) return;
     const keyPairPart = valueProps.shift();

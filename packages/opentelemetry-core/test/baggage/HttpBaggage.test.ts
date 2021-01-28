@@ -16,6 +16,7 @@
 
 import {
   Baggage,
+  BaggageEntry,
   createBaggage,
   defaultTextMapGetter,
   defaultTextMapSetter,
@@ -27,7 +28,6 @@ import * as assert from 'assert';
 import {
   BAGGAGE_HEADER,
   HttpBaggage,
-  MAX_PER_NAME_VALUE_PAIRS,
 } from '../../src/baggage/propagation/HttpBaggage';
 
 describe('HttpBaggage', () => {
@@ -41,11 +41,11 @@ describe('HttpBaggage', () => {
 
   describe('.inject()', () => {
     it('should set baggage header', () => {
-      const baggage: Baggage = createBaggage([
-        { key: 'key1', value: 'd4cda95b652f4a1592b449d5929fda1b' },
-        { key: 'key3', value: 'c88815a7-0fa9-4d95-a1f1-cdccce3c5c2a' },
-        { key: 'with/slash', value: 'with spaces' },
-      ]);
+      const baggage = createBaggage({
+        key1: { value: 'd4cda95b652f4a1592b449d5929fda1b' },
+        key3: { value: 'c88815a7-0fa9-4d95-a1f1-cdccce3c5c2a' },
+        'with/slash': { value: 'with spaces' },
+      });
 
       httpTraceContext.inject(
         setBaggage(ROOT_CONTEXT, baggage),
@@ -59,11 +59,10 @@ describe('HttpBaggage', () => {
     });
 
     it('should skip long key-value pairs', () => {
-      const baggage = createBaggage([
-        { key: 'key1', value: 'd4cda95b' },
-        { key: 'key3', value: 'c88815a7' },
-        { key: 'longPair', value: '1a'.repeat(MAX_PER_NAME_VALUE_PAIRS) },
-      ]);
+      const baggage = createBaggage({
+        key1: { value: 'd4cda95b' },
+        key3: { value: 'c88815a7' },
+      });
 
       httpTraceContext.inject(
         setBaggage(ROOT_CONTEXT, baggage),
@@ -80,14 +79,15 @@ describe('HttpBaggage', () => {
       const zeroPad = (num: number, places: number) =>
         String(num).padStart(places, '0');
 
-      const baggage = createBaggage(
-        Array(9)
-          .fill(0)
-          .map((_, i) => ({
-            key: `k${zeroPad(i, 510)}`,
-            value: String(zeroPad(i, 510)),
-          }))
-      );
+      const bag: Record<string, BaggageEntry> = {};
+
+      // key=value with same size , 1024 => 8 keys
+      for (let i = 0; i < 9; ++i) {
+        const index = zeroPad(i, 510);
+        bag[`k${index}`] = { value: `${index}` };
+      }
+
+      const baggage = createBaggage(bag);
 
       // Build expected
       let expected = '';
@@ -114,16 +114,13 @@ describe('HttpBaggage', () => {
         httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       );
 
-      assert.deepStrictEqual(
-        extractedBaggage?.getEntry('key1')!.value,
-        'd4cda95b'
-      );
-      assert.deepStrictEqual(
-        extractedBaggage?.getEntry('key3')!.value,
-        'c88815a7'
-      );
-      assert.deepStrictEqual(extractedBaggage?.getEntry('keyn')!.value, 'valn');
-      assert.deepStrictEqual(extractedBaggage?.getEntry('keym')!.value, 'valm');
+      const expected = createBaggage({
+        key1: { value: 'd4cda95b' },
+        key3: { value: 'c88815a7' },
+        keyn: { value: 'valn' },
+        keym: { value: 'valm' },
+      });
+      assert.deepStrictEqual(extractedBaggage, expected);
     });
   });
 
@@ -187,9 +184,11 @@ describe('HttpBaggage', () => {
       },
       mixInvalidAndValidKeys: {
         header: 'key1==value,key2=value2',
-        baggage: createBaggage([
-          { key: 'key2', value: 'value2', metadata: undefined },
-        ]),
+        baggage: createBaggage({
+          key2: {
+            value: 'value2',
+          },
+        }),
       },
     };
     Object.getOwnPropertyNames(testCases).forEach(testCase => {

@@ -15,9 +15,6 @@
  */
 
 export interface BaggageEntry {
-  /** `String` key of the `BaggageEntry` */
-  key: string;
-
   /** `String` value of the `BaggageEntry`. */
   value: string;
   /**

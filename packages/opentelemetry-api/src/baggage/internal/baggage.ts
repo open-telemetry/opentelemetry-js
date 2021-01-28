@@ -18,10 +18,14 @@ import type { Baggage } from '../Baggage';
 import type { BaggageEntry } from '../Entry';
 
 export class BaggageImpl implements Baggage {
-  constructor(private _entries: BaggageEntry[]) {}
+  private _entries: Map<string, BaggageEntry>;
+
+  constructor(entries: Map<string, BaggageEntry>) {
+    this._entries = new Map(entries);
+  }
 
   getEntry(key: string): BaggageEntry | undefined {
-    const entry = this._entries.find(e => e.key === key);
+    const entry = this._entries.get(key);
     if (!entry) {
       return undefined;
     }
@@ -29,19 +33,19 @@ export class BaggageImpl implements Baggage {
     return Object.assign(Object.create(null), entry);
   }
 
-  getAllEntries(): BaggageEntry[] {
-    return this._entries.map(e => Object.assign(Object.create(null), e));
+  getAllEntries(): [string, BaggageEntry][] {
+    return Array.from(this._entries.entries()).map(([k, v]) => [k, v]);
   }
 
-  setEntry(key: string, value: string, metadata?: string): BaggageImpl {
-    const newBaggage = this.removeEntry(key);
-    newBaggage._entries.push(
-      Object.assign(Object.create(null), { key, value, metadata })
-    );
+  setEntry(key: string, entry: BaggageEntry): BaggageImpl {
+    const newBaggage = new BaggageImpl(this._entries);
+    newBaggage._entries.set(key, entry);
     return newBaggage;
   }
 
   removeEntry(key: string): BaggageImpl {
-    return new BaggageImpl(this._entries.filter(e => e.key !== key));
+    const newBaggage = new BaggageImpl(this._entries);
+    newBaggage._entries.delete(key);
+    return newBaggage;
   }
 }

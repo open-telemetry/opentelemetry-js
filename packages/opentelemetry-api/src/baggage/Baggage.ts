@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { BaggageEntry, BaggageEntryMetadata } from './Entry';
+import { BaggageEntry } from './Entry';
 
 /**
  * Baggage represents collection of key-value pairs with optional metadata.
@@ -32,20 +32,15 @@ export interface Baggage {
   /**
    * Get a list of all entries in the Baggage
    */
-  getAllEntries(): BaggageEntry[];
+  getAllEntries(): [string, BaggageEntry][];
 
   /**
    * Create a new Baggage from this baggage with a new entry.
    *
    * @param key string which identifies the baggage entry
-   * @param value string value of the baggage
-   * @param metadata optional entry metadata
+   * @param entry BaggageEntry for the given key
    */
-  setEntry(
-    key: string,
-    value: string,
-    metadata?: BaggageEntryMetadata
-  ): Baggage;
+  setEntry(key: string, entry: BaggageEntry): Baggage;
 
   /**
    * Create a new baggage containing all entries from this except the removed entry

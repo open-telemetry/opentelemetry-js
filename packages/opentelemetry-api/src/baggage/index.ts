@@ -26,8 +26,10 @@ export * from './Entry';
  *
  * @param entries An array of baggage entries the new baggage should contain
  */
-export function createBaggage(entries: BaggageEntry[] = []): Baggage {
-  return new BaggageImpl(entries);
+export function createBaggage(
+  entries: Record<string, BaggageEntry> = {}
+): Baggage {
+  return new BaggageImpl(new Map(Object.entries(entries)));
 }
 
 /**
