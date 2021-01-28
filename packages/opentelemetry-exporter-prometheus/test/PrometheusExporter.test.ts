@@ -176,12 +176,19 @@ describe('PrometheusExporter', () => {
 
     it('should able to call getMetricsRequestHandler function to generate response with metrics', () => {
       const exporter = new PrometheusExporter({ preventServerStart: true });
-      const mockRequest: SinonStubbedInstance<http.IncomingMessage> = sinon.createStubInstance(http.IncomingMessage)
-      const mockResponse: SinonStubbedInstance<http.ServerResponse> = sinon.createStubInstance(http.ServerResponse)
-      exporter.getMetricsRequestHandler(mockRequest as unknown as http.IncomingMessage, mockResponse as unknown as http.ServerResponse);
-      sinon.assert.calledOnce(mockResponse.setHeader)
-      sinon.assert.calledOnce(mockResponse.end)
-      assert.strictEqual(mockResponse.statusCode, 200)
+      const mockRequest: SinonStubbedInstance<http.IncomingMessage> = sinon.createStubInstance(
+        http.IncomingMessage
+      );
+      const mockResponse: SinonStubbedInstance<http.ServerResponse> = sinon.createStubInstance(
+        http.ServerResponse
+      );
+      exporter.getMetricsRequestHandler(
+        (mockRequest as unknown) as http.IncomingMessage,
+        (mockResponse as unknown) as http.ServerResponse
+      );
+      sinon.assert.calledOnce(mockResponse.setHeader);
+      sinon.assert.calledOnce(mockResponse.end);
+      assert.strictEqual(mockResponse.statusCode, 200);
     });
   });
 
