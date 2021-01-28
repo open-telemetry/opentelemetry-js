@@ -234,7 +234,20 @@ To request automatic tracing support for a module not on this list, please [file
 
 ## Upgrade guidelines
 
-### 0.14.0 to 0.15.0
+### 0.15 to 0.16
+
+[PR-1874](https://github.com/open-telemetry/opentelemetry-js/pull/1874) More specific API type names
+
+Some types exported from `"@opentelemetry/api"` have been changed to be more specific.
+
+- `AttributeValue` renamed to `SpanAttributeValue`
+- `Attributes` renamed to `SpanAttributes`
+- `EntryTtl` renamed to `BaggageEntryTtl`
+- `EntryValue` renamed to `BaggageEntryValue`
+- `Status` renamed to `SpanStatus`
+- `StatusCode` renamed to `SpanStatusCode`
+
+### 0.14 to 0.15
 
 [PR-1764](https://github.com/open-telemetry/opentelemetry-js/pull/1764) removed some APIs from `Tracer`:
 
