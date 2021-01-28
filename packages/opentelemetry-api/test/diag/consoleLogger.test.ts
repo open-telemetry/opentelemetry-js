@@ -32,6 +32,16 @@ describe('DiagConsoleLogger', () => {
   let errorCalledArgs: unknown;
   let logCalledArgs: unknown;
 
+  let canMockConsole = true;
+
+  try {
+    // eslint-disable-next-line no-global-assign
+    console = origConsole;
+  } catch (ex) {
+    // Not supported on CI pipeline (works locally)
+    canMockConsole = false;
+  }
+
   beforeEach(() => {
     // mock
     console.debug = (...args: unknown[]) => {
@@ -62,8 +72,16 @@ describe('DiagConsoleLogger', () => {
     errorCalledArgs = null;
     logCalledArgs = null;
     traceCalledArgs = null;
-    // eslint-disable-next-line no-global-assign
-    console = origConsole;
+
+    if (canMockConsole) {
+      try {
+        // eslint-disable-next-line no-global-assign
+        console = origConsole;
+      } catch (ex) {
+        // Not supported on CI pipeline
+        canMockConsole = false;
+      }
+    }
     console.debug = origDebug;
     console.info = origInfo;
     console.warn = origWarn;
@@ -221,110 +239,112 @@ describe('DiagConsoleLogger', () => {
       ]);
     });
 
-    it('should not throw even when console is not supported', () => {
-      (console as any) = undefined;
-      const consoleLogger = new DiagConsoleLogger();
-      consoleLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, null);
-      consoleLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, null);
-      consoleLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, null);
-      consoleLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, null);
-      consoleLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, null);
-      consoleLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, null);
-      consoleLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, null);
-      assert.deepStrictEqual(logCalledArgs, null);
-      consoleLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, null);
-    });
+    if (canMockConsole) {
+      it('should not throw even when console is not supported', () => {
+        (console as any) = undefined;
+        const consoleLogger = new DiagConsoleLogger();
+        consoleLogger.terminal('terminal called %s', 'param1');
+        assert.deepStrictEqual(errorCalledArgs, null);
+        consoleLogger.critical('critical called %s', 'param1');
+        assert.deepStrictEqual(errorCalledArgs, null);
+        consoleLogger.error('error called %s', 'param1');
+        assert.deepStrictEqual(errorCalledArgs, null);
+        consoleLogger.warn('warn called %s', 'param1');
+        assert.deepStrictEqual(warnCalledArgs, null);
+        consoleLogger.info('info called %s', 'param1');
+        assert.deepStrictEqual(infoCalledArgs, null);
+        consoleLogger.debug('debug called %s', 'param1');
+        assert.deepStrictEqual(debugCalledArgs, null);
+        consoleLogger.trace('trace called %s', 'param1');
+        assert.deepStrictEqual(traceCalledArgs, null);
+        assert.deepStrictEqual(logCalledArgs, null);
+        consoleLogger.forcedInfo('forcedInfo called %s', 'param1');
+        assert.deepStrictEqual(infoCalledArgs, null);
+      });
 
-    it('should not throw even when console is disabled after construction', () => {
-      const consoleLogger = new DiagConsoleLogger();
-      (console as any) = undefined;
-      consoleLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, null);
-      consoleLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, null);
-      consoleLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, null);
-      consoleLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, null);
-      consoleLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, null);
-      consoleLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, null);
-      consoleLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, null);
-      assert.deepStrictEqual(logCalledArgs, null);
-      consoleLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, null);
-    });
+      it('should not throw even when console is disabled after construction', () => {
+        const consoleLogger = new DiagConsoleLogger();
+        (console as any) = undefined;
+        consoleLogger.terminal('terminal called %s', 'param1');
+        assert.deepStrictEqual(errorCalledArgs, null);
+        consoleLogger.critical('critical called %s', 'param1');
+        assert.deepStrictEqual(errorCalledArgs, null);
+        consoleLogger.error('error called %s', 'param1');
+        assert.deepStrictEqual(errorCalledArgs, null);
+        consoleLogger.warn('warn called %s', 'param1');
+        assert.deepStrictEqual(warnCalledArgs, null);
+        consoleLogger.info('info called %s', 'param1');
+        assert.deepStrictEqual(infoCalledArgs, null);
+        consoleLogger.debug('debug called %s', 'param1');
+        assert.deepStrictEqual(debugCalledArgs, null);
+        consoleLogger.trace('trace called %s', 'param1');
+        assert.deepStrictEqual(traceCalledArgs, null);
+        assert.deepStrictEqual(logCalledArgs, null);
+        consoleLogger.forcedInfo('forcedInfo called %s', 'param1');
+        assert.deepStrictEqual(infoCalledArgs, null);
+      });
 
-    it('should not throw even when console is invalid after construction', () => {
-      const invalidConsole = {
-        debug: 1,
-        warn: 2,
-        error: 3,
-        trace: 4,
-        info: 5,
-        log: 6,
-      };
+      it('should not throw even when console is invalid after construction', () => {
+        const invalidConsole = {
+          debug: 1,
+          warn: 2,
+          error: 3,
+          trace: 4,
+          info: 5,
+          log: 6,
+        };
 
-      const consoleLogger = new DiagConsoleLogger();
-      (console as any) = invalidConsole;
-      consoleLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, null);
-      consoleLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, null);
-      consoleLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, null);
-      consoleLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, null);
-      consoleLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, null);
-      consoleLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, null);
-      consoleLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, null);
-      assert.deepStrictEqual(logCalledArgs, null);
-      consoleLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, null);
-    });
+        const consoleLogger = new DiagConsoleLogger();
+        (console as any) = invalidConsole;
+        consoleLogger.terminal('terminal called %s', 'param1');
+        assert.deepStrictEqual(errorCalledArgs, null);
+        consoleLogger.critical('critical called %s', 'param1');
+        assert.deepStrictEqual(errorCalledArgs, null);
+        consoleLogger.error('error called %s', 'param1');
+        assert.deepStrictEqual(errorCalledArgs, null);
+        consoleLogger.warn('warn called %s', 'param1');
+        assert.deepStrictEqual(warnCalledArgs, null);
+        consoleLogger.info('info called %s', 'param1');
+        assert.deepStrictEqual(infoCalledArgs, null);
+        consoleLogger.debug('debug called %s', 'param1');
+        assert.deepStrictEqual(debugCalledArgs, null);
+        consoleLogger.trace('trace called %s', 'param1');
+        assert.deepStrictEqual(traceCalledArgs, null);
+        assert.deepStrictEqual(logCalledArgs, null);
+        consoleLogger.forcedInfo('forcedInfo called %s', 'param1');
+        assert.deepStrictEqual(infoCalledArgs, null);
+      });
 
-    it('should not throw even when console is invalid before construction', () => {
-      const invalidConsole = {
-        debug: 1,
-        warn: 2,
-        error: 3,
-        trace: 4,
-        info: 5,
-        log: 6,
-      };
+      it('should not throw even when console is invalid before construction', () => {
+        const invalidConsole = {
+          debug: 1,
+          warn: 2,
+          error: 3,
+          trace: 4,
+          info: 5,
+          log: 6,
+        };
 
-      (console as any) = invalidConsole;
-      const consoleLogger = new DiagConsoleLogger();
-      consoleLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, null);
-      consoleLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, null);
-      consoleLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, null);
-      consoleLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, null);
-      consoleLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, null);
-      consoleLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, null);
-      consoleLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, null);
-      assert.deepStrictEqual(logCalledArgs, null);
-      consoleLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, null);
-    });
+        (console as any) = invalidConsole;
+        const consoleLogger = new DiagConsoleLogger();
+        consoleLogger.terminal('terminal called %s', 'param1');
+        assert.deepStrictEqual(errorCalledArgs, null);
+        consoleLogger.critical('critical called %s', 'param1');
+        assert.deepStrictEqual(errorCalledArgs, null);
+        consoleLogger.error('error called %s', 'param1');
+        assert.deepStrictEqual(errorCalledArgs, null);
+        consoleLogger.warn('warn called %s', 'param1');
+        assert.deepStrictEqual(warnCalledArgs, null);
+        consoleLogger.info('info called %s', 'param1');
+        assert.deepStrictEqual(infoCalledArgs, null);
+        consoleLogger.debug('debug called %s', 'param1');
+        assert.deepStrictEqual(debugCalledArgs, null);
+        consoleLogger.trace('trace called %s', 'param1');
+        assert.deepStrictEqual(traceCalledArgs, null);
+        assert.deepStrictEqual(logCalledArgs, null);
+        consoleLogger.forcedInfo('forcedInfo called %s', 'param1');
+        assert.deepStrictEqual(infoCalledArgs, null);
+      });
+    }
   });
 });
