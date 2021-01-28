@@ -19,18 +19,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-      - name: Cache Dependencies
-        uses: actions/cache@v2
-        with:
-          path: |
-            node_modules
-            package-lock.json
-            packages/*/node_modules
-          key: ${{ runner.os }}-${{ matrix.container }}-${{ hashFiles('**/package.json') }}
       - name: Install Root Dependencies
-        run: npm install --ignore-scripts
+        run: npm ci --ignore-scripts
       - name: Boostrap Dependencies
-        run: npx lerna bootstrap --no-ci
+        run: npx lerna bootstrap
       - name: Build
         run: npm run compile
       - name: Unit tests
@@ -49,18 +41,10 @@ jobs:
         uses: actions/checkout@v1
       - name: Permission Setup
         run: sudo chmod -R 777 /github /__w
-      - name: Cache Dependencies
-        uses: actions/cache@v2
-        with:
-          path: |
-            node_modules
-            package-lock.json
-            packages/*/node_modules
-          key: ${{ runner.os }}-node:12-${{ hashFiles('**/package.json') }}
       - name: Install Root Dependencies
-        run: npm install --ignore-scripts
+        run: npm ci --ignore-scripts
       - name: Boostrap Dependencies
-        run: npx lerna bootstrap --no-ci
+        run: npx lerna bootstrap
       - name: Build
         run: npm run compile
       - name: Unit tests
