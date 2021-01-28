@@ -13,8 +13,8 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --scope @opentelemetry/api --include-dependencies
+          npm ci --ignore-scripts
+          npx lerna bootstrap --scope @opentelemetry/api --include-dependencies
 
       - name: Build 🔧
         run: |

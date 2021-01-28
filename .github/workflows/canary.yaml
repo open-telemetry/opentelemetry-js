@@ -36,8 +36,8 @@ jobs:
       - name: Install and Build 🔧
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          npm install --ignore-scripts
-          npx lerna bootstrap --no-ci
+          npm ci --ignore-scripts
+          npx lerna bootstrap
 
       - name: Publish
         run: npx lerna publish --canary --yes
