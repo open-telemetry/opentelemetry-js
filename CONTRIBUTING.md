@@ -175,7 +175,7 @@ After adding the package, run `npm install` from the root of the project. This w
 - Most PRs should be merged in one to two weeks.
 - If a PR is taking longer than 30 days, please ping the approvers ([@open-telemetry/javascript-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers)) as it may have been lost
 - Dependency upgrades and Security fixes: This PR is small and/or low-risk and can be merged with only maintainer reviews.
-- If your patch is not getting reviewed or you need a specific person to review it, you can @username or @open-telemetry/javascript-approvers a reviewer asking for a review in the pull request, or you can ask for a review on Gitter channel.
+- If your patch is not getting reviewed or you need a specific person to review it, you can @username or @open-telemetry/javascript-approvers a reviewer asking for a review in the pull request.
 - API changes, breaking changes, or large changes will be subject to more scrutiny and may require more reviewers. These PRs should only be merged by maintainers.
 - Changes to existing plugins and exporters will typically require the approval of the original plugin/exporter author.
 
