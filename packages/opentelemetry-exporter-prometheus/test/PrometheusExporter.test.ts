@@ -24,9 +24,11 @@ import {
   HistogramAggregator,
 } from '@opentelemetry/metrics';
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import * as http from 'http';
 import { PrometheusExporter } from '../src';
 import { mockAggregator, mockedHrTimeMs } from './util';
+import { SinonStubbedInstance } from 'sinon';
 
 describe('PrometheusExporter', () => {
   mockAggregator(SumAggregator);
@@ -174,23 +176,12 @@ describe('PrometheusExporter', () => {
 
     it('should able to call getMetricsRequestHandler function to generate response with metrics', () => {
       const exporter = new PrometheusExporter({ preventServerStart: true });
-      const mockRequest = {} as http.IncomingMessage;
-      let calledEnd = false;
-      let calledSetHeader = false;
-      const mockResponse = {
-        statusCode: 0,
-        setHeader: (_name: string, _value: string) => {
-          calledSetHeader = true;
-        },
-        end: () => {
-          calledEnd = true;
-        },
-      } as http.ServerResponse;
-
-      exporter.getMetricsRequestHandler(mockRequest, mockResponse);
-      assert.strictEqual(calledEnd, true);
-      assert.strictEqual(calledSetHeader, true);
-      assert.strictEqual(mockResponse.statusCode, 200);
+      const mockRequest: SinonStubbedInstance<http.IncomingMessage> = sinon.createStubInstance(http.IncomingMessage)
+      const mockResponse: SinonStubbedInstance<http.ServerResponse> = sinon.createStubInstance(http.ServerResponse)
+      exporter.getMetricsRequestHandler(mockRequest as unknown as http.IncomingMessage, mockResponse as unknown as http.ServerResponse);
+      sinon.assert.calledOnce(mockResponse.setHeader)
+      sinon.assert.calledOnce(mockResponse.end)
+      assert.strictEqual(mockResponse.statusCode, 200)
     });
   });
 
