@@ -28,21 +28,11 @@ jobs:
         with:
           args: "./**/*.md -i ./CHANGELOG.md"
 
-      - name: restore lerna
-        uses: actions/cache@master # must use unreleased master to cache multiple paths
-        id: cache
-        with:
-          path: |
-            node_modules
-            packages/*/node_modules
-            metapackages/*/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
-
       - name: Bootstrap
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          npm install --only=dev --ignore-scripts
-          npx lerna bootstrap --no-ci --ignore-scripts -- --only=dev
+          npm ci --ignore-scripts
+          npx lerna bootstrap --ignore-scripts
 
       - name: Lint
         run: |
@@ -50,9 +40,7 @@ jobs:
           npm run lint:examples
 
       - name: Install API Dependencies
-        run: |
-          npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --scope @opentelemetry/api --include-dependencies
+        run: npx lerna bootstrap --scope @opentelemetry/api --include-dependencies
 
       - name: Build 🔧
         run: |
