@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/api",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "description": "Public API for OpenTelemetry",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -50,7 +50,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/context-base": "^0.15.0"
+    "@opentelemetry/context-base": "^0.16.0"
   },
   "devDependencies": {
     "@types/mocha": "8.2.0",

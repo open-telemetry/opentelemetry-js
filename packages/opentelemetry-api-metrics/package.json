@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/api-metrics",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "description": "Public metrics API for OpenTelemetry",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -48,7 +48,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.15.0"
+    "@opentelemetry/api": "^0.16.0"
   },
   "devDependencies": {
     "@types/mocha": "8.2.0",
