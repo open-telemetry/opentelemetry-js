@@ -97,7 +97,7 @@ export abstract class CollectorExporterBase<
   }
 
   private _export(items: ExportItem[]): Promise<unknown> {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       try {
         this.logger.debug('items to be sent', items);
         this.send(items, resolve, reject);

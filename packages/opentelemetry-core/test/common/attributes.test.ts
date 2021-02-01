@@ -31,7 +31,7 @@ describe('attributes', () => {
     it('should allow nullish values', () => {
       assert.ok(isAttributeValue(null));
       assert.ok(isAttributeValue(undefined));
-      // @ts-expect-error
+      // @ts-expect-error verify that no arg works
       assert.ok(isAttributeValue());
     });
 

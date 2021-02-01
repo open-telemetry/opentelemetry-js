@@ -194,7 +194,7 @@ describe('CollectorMetricExporter - node with proto over http', () => {
     it('should log the error message', done => {
       collectorExporter.export(metrics, result => {
         assert.strictEqual(result.code, ExportResultCode.FAILED);
-        // @ts-expect-error
+        // @ts-expect-error verify error code
         assert.strictEqual(result.error.code, 400);
         done();
       });

@@ -31,11 +31,11 @@ type PatchedEventEmitter = {
 } & EventEmitter;
 
 const ADD_LISTENER_METHODS = [
-  'addListener' as 'addListener',
-  'on' as 'on',
-  'once' as 'once',
-  'prependListener' as 'prependListener',
-  'prependOnceListener' as 'prependOnceListener',
+  'addListener' as const,
+  'on' as const,
+  'once' as const,
+  'prependListener' as const,
+  'prependOnceListener' as const,
 ];
 
 export abstract class AbstractAsyncHooksContextManager
