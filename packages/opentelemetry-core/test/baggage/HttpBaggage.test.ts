@@ -75,34 +75,85 @@ describe('HttpBaggage', () => {
       );
     });
 
-    it('should skip all keys that surpassed the max limit of the header', () => {
-      const zeroPad = (num: number, places: number) =>
-        String(num).padStart(places, '0');
+    it('should skip all entries whose length exceeds the W3C standard limit of 4096 bytes', () => {
+      const longKey = Array(96).fill('k').join('');
+      const shortKey = Array(95).fill('k').join('');
+      const value = Array(4000).fill('v').join('');
 
-      const bag: Record<string, BaggageEntry> = {};
-
-      // key=value with same size , 1024 => 8 keys
-      for (let i = 0; i < 9; ++i) {
-        const index = zeroPad(i, 510);
-        bag[`k${index}`] = { value: `${index}` };
-      }
-
-      const baggage = createBaggage(bag);
-
-      // Build expected
-      let expected = '';
-      for (let i = 0; i < 8; ++i) {
-        const index = zeroPad(i, 510);
-        expected += `k${index}=${index},`;
-      }
-      expected = expected.slice(0, -1);
+      const baggage = createBaggage({
+        [shortKey]: { value: value },
+        [longKey]: { value: value },
+      });
 
       httpTraceContext.inject(
         setBaggage(ROOT_CONTEXT, baggage),
         carrier,
         defaultTextMapSetter
       );
-      assert.deepStrictEqual(carrier[BAGGAGE_HEADER], expected);
+
+      assert.deepStrictEqual(carrier[BAGGAGE_HEADER], `${shortKey}=${value}`);
+    });
+
+    it('should not exceed the W3C standard header length limit of 8192 bytes', () => {
+      const longKey0 = Array(48).fill('0').join('');
+      const longKey1 = Array(49).fill('1').join('');
+      const longValue = Array(4000).fill('v').join('');
+
+      let baggage = createBaggage({
+        [longKey0]: { value: longValue },
+        [longKey1]: { value: longValue },
+        aa: { value: Array(88).fill('v').join('') },
+      });
+
+      httpTraceContext.inject(
+        setBaggage(ROOT_CONTEXT, baggage),
+        carrier,
+        defaultTextMapSetter
+      );
+
+      let header = carrier[BAGGAGE_HEADER];
+      assert.ok(typeof header === 'string');
+      assert.deepStrictEqual(header.length, 8192);
+      assert.deepStrictEqual(header.split(',').length, 3);
+
+      baggage = createBaggage({
+        [longKey0]: { value: longValue },
+        [longKey1]: { value: longValue },
+        aa: { value: Array(89).fill('v').join('') },
+      });
+
+      httpTraceContext.inject(
+        setBaggage(ROOT_CONTEXT, baggage),
+        carrier,
+        defaultTextMapSetter
+      );
+
+      header = carrier[BAGGAGE_HEADER];
+      assert.ok(typeof header === 'string');
+      assert.deepStrictEqual(header.length, 8100);
+      assert.deepStrictEqual(header.split(',').length, 2);
+    });
+
+    it('should not exceed the W3C standard header entry limit of 180 entries', () => {
+      const entries: Record<string, BaggageEntry> = {};
+
+      Array(200)
+        .fill(0)
+        .forEach((_, i) => {
+          entries[`${i}`] = { value: 'v' };
+        });
+
+      const baggage = createBaggage(entries);
+
+      httpTraceContext.inject(
+        setBaggage(ROOT_CONTEXT, baggage),
+        carrier,
+        defaultTextMapSetter
+      );
+
+      const header = carrier[BAGGAGE_HEADER];
+      assert.ok(typeof header === 'string');
+      assert.strictEqual(header.split(',').length, 180);
     });
   });
 
