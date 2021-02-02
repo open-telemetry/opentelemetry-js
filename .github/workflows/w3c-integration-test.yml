@@ -19,8 +19,12 @@ jobs:
         with:
           # must be done before bootstrap to not include node_modules files in the cache paths
           path: |
-            package-lock.json
-            */*/package-lock.json
+            packages/*/package-lock.json
+            benchmark/*/package-lock.json
+            backwards-compatability/*/package-lock.json
+            metapackages/*/package-lock.json
+            packages/*/package-lock.json
+            integration-tests/*/package-lock.json
           key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
 
       - name: Install root dependencies
