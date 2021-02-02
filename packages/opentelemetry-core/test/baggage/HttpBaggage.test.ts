@@ -80,9 +80,9 @@ describe('HttpBaggage', () => {
       const shortKey = Array(95).fill('k').join('');
       const value = Array(4000).fill('v').join('');
 
-      const baggage = createBaggage({
+      let baggage = createBaggage({
+        aa: { value: 'shortvalue' },
         [shortKey]: { value: value },
-        [longKey]: { value: value },
       });
 
       httpTraceContext.inject(
@@ -91,7 +91,25 @@ describe('HttpBaggage', () => {
         defaultTextMapSetter
       );
 
-      assert.deepStrictEqual(carrier[BAGGAGE_HEADER], `${shortKey}=${value}`);
+      let header = carrier[BAGGAGE_HEADER];
+      assert.ok(typeof header === 'string');
+      assert.deepStrictEqual(header, `aa=shortvalue,${shortKey}=${value}`);
+
+      baggage = createBaggage({
+        aa: { value: 'shortvalue' },
+        [longKey]: { value: value },
+      });
+
+      carrier = {};
+      httpTraceContext.inject(
+        setBaggage(ROOT_CONTEXT, baggage),
+        carrier,
+        defaultTextMapSetter
+      );
+
+      header = carrier[BAGGAGE_HEADER];
+      assert.ok(typeof header === 'string');
+      assert.deepStrictEqual(header, 'aa=shortvalue');
     });
 
     it('should not exceed the W3C standard header length limit of 8192 bytes', () => {
@@ -122,6 +140,7 @@ describe('HttpBaggage', () => {
         aa: { value: Array(89).fill('v').join('') },
       });
 
+      carrier = {};
       httpTraceContext.inject(
         setBaggage(ROOT_CONTEXT, baggage),
         carrier,
