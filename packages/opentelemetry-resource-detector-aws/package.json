@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/resource-detector-aws",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "description": "OpenTelemetry SDK resource detector for AWS",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -54,8 +54,8 @@
     "typescript": "3.9.7"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.15.0",
-    "@opentelemetry/core": "^0.15.0",
-    "@opentelemetry/resources": "^0.15.0"
+    "@opentelemetry/api": "^0.16.0",
+    "@opentelemetry/core": "^0.16.0",
+    "@opentelemetry/resources": "^0.16.0"
   }
 }
