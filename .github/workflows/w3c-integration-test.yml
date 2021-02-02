@@ -1,4 +1,4 @@
-name: Run w3c tests on push
+name: W3C Trace Context Integration Test
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  build-and-deploy:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
@@ -25,7 +25,7 @@ jobs:
             metapackages/*/package-lock.json
             packages/*/package-lock.json
             integration-tests/*/package-lock.json
-          key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
+          key: ${{ runner.os }}-w3c_integration-${{ hashFiles('**/package.json') }}
 
       - name: Install root dependencies
         run: npm ci --ignore-scripts

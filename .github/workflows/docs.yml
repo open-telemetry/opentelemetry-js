@@ -1,4 +1,4 @@
-name: Deploy docs on a new release
+name: Deploy API Documentation
 
 on:
   release:
@@ -23,7 +23,7 @@ jobs:
             metapackages/*/package-lock.json
             packages/*/package-lock.json
             integration-tests/*/package-lock.json
-          key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
+          key: ${{ runner.os }}-docs-${{ hashFiles('**/package.json') }}
 
       - name: Install root dependencies
         run: npm ci --ignore-scripts
