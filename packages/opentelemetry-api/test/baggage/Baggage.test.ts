@@ -85,6 +85,42 @@ describe('Baggage', () => {
 
       assert.deepStrictEqual(bag2.getAllEntries(), []);
     });
+
+    it('should create an empty bag multiple keys are removed', () => {
+      const bag = createBaggage({
+        key: { value: 'value' },
+        key1: { value: 'value1' },
+        key2: { value: 'value2' },
+      });
+
+      const bag2 = bag.removeEntries('key', 'key1');
+
+      assert.deepStrictEqual(bag.getAllEntries(), [
+        ['key', { value: 'value' }],
+        ['key1', { value: 'value1' }],
+        ['key2', { value: 'value2' }],
+      ]);
+
+      assert.deepStrictEqual(bag2.getAllEntries(), [
+        ['key2', { value: 'value2' }],
+      ]);
+    });
+
+    it('should create an empty bag when it cleared', () => {
+      const bag = createBaggage({
+        key: { value: 'value' },
+        key1: { value: 'value1' },
+      });
+
+      const bag2 = bag.clear();
+
+      assert.deepStrictEqual(bag.getAllEntries(), [
+        ['key', { value: 'value' }],
+        ['key1', { value: 'value1' }],
+      ]);
+
+      assert.deepStrictEqual(bag2.getAllEntries(), []);
+    });
   });
 
   describe('context', () => {
