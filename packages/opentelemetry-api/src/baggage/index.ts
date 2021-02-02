@@ -43,7 +43,7 @@ export function baggageEntryMetadataFromString(
   str: string
 ): BaggageEntryMetadata {
   if (typeof str !== 'string') {
-    // TODO log diagnostic
+    // @TODO log diagnostic
     str = '';
   }
 

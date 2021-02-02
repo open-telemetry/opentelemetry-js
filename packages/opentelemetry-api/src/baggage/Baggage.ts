@@ -35,7 +35,7 @@ export interface Baggage {
   getAllEntries(): [string, BaggageEntry][];
 
   /**
-   * Create a new Baggage from this baggage with a new entry.
+   * Returns a new baggage with the entries from the current bag and the specified entry
    *
    * @param key string which identifies the baggage entry
    * @param entry BaggageEntry for the given key
@@ -43,9 +43,21 @@ export interface Baggage {
   setEntry(key: string, entry: BaggageEntry): Baggage;
 
   /**
-   * Create a new baggage containing all entries from this except the removed entry
+   * Returns a new baggage with the entries from the current bag except the removed entry
    *
    * @param key key identifying the entry to be removed
    */
   removeEntry(key: string): Baggage;
+
+  /**
+   * Returns a new baggage with the entries from the current bag except the removed entries
+   *
+   * @param key keys identifying the entries to be removed
+   */
+  removeEntries(...key: string[]): Baggage;
+
+  /**
+   * Returns a new baggage with no entries
+   */
+  clear(): Baggage;
 }

@@ -31,7 +31,7 @@ describe('Baggage', () => {
       assert.deepStrictEqual(bag.getAllEntries(), []);
     });
 
-    it('should create a bag with  entries', () => {
+    it('should create a bag with entries', () => {
       const meta = baggageEntryMetadataFromString('opaque string');
       const bag = createBaggage({
         key1: { value: 'value1' },
@@ -72,7 +72,7 @@ describe('Baggage', () => {
   });
 
   describe('remove', () => {
-    it('should create a new bag when an entry is deleted', () => {
+    it('should create a new bag when an entry is removed', () => {
       const bag = createBaggage({
         key: { value: 'value' },
       });
