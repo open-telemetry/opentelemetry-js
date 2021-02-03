@@ -105,21 +105,28 @@ describe('ZoneContextManager', () => {
       return done();
     });
 
-    it('should forward arguments and return code', () => {
+    it('should forward this, arguments and return value', () => {
+      function fnWithThis(this: string, a: string, b: number): string {
+        assert.strictEqual(this, 'that');
+        assert.strictEqual(arguments.length, 2);
+        assert.strictEqual(a, 'one');
+        assert.strictEqual(b, 2);
+        return 'done';
+      }
+
       const res = contextManager.with(
         ROOT_CONTEXT,
-        function cb(a, b, c) {
-          assert.strictEqual(arguments.length, 3);
-          assert.strictEqual(a, 'one');
-          assert.strictEqual(b, 2);
-          assert.strictEqual(c, 'three');
-          return 'done';
-        },
+        fnWithThis,
+        'that',
         'one',
-        2,
-        'three'
+        2
       );
       assert.strictEqual(res, 'done');
+
+      assert.strictEqual(
+        contextManager.with(ROOT_CONTEXT, () => 3.14),
+        3.14
+      );
     });
 
     it('should finally restore an old context, including the async task', done => {

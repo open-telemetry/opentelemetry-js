@@ -42,21 +42,22 @@ describe('API', () => {
   });
 
   describe('Context', () => {
-    it('with should forward arguments and return value', () => {
-      const res = context.with(
-        ROOT_CONTEXT,
-        function cb(a, b, c) {
-          assert.strictEqual(arguments.length, 3);
-          assert.strictEqual(a, 'one');
-          assert.strictEqual(b, 2);
-          assert.strictEqual(c, 'three');
-          return 'done';
-        },
-        'one',
-        2,
-        'three'
-      );
+    it('with should forward this, arguments and return value', () => {
+      function fnWithThis(this: string, a: string, b: number): string {
+        assert.strictEqual(this, 'that');
+        assert.strictEqual(arguments.length, 2);
+        assert.strictEqual(a, 'one');
+        assert.strictEqual(b, 2);
+        return 'done';
+      }
+
+      const res = context.with(ROOT_CONTEXT, fnWithThis, 'that', 'one', 2);
       assert.strictEqual(res, 'done');
+
+      assert.strictEqual(
+        context.with(ROOT_CONTEXT, () => 3.14),
+        3.14
+      );
     });
   });
 
