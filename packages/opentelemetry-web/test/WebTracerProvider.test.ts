@@ -69,6 +69,18 @@ describe('WebTracerProvider', () => {
       assert.ok(tracer instanceof Tracer);
     });
 
+    it('should propgate resource attributes from tracer config to tracer instance', () => {
+      const tracer = new WebTracerProvider(
+        Object.assign({}, defaultOptions)
+      ).getTracer('default', '*', {
+        resource: new Resource({ dummyAttribute: 'dummyValue' }),
+      });
+      assert.ok(tracer instanceof Tracer);
+      assert.deepStrictEqual(tracer.resource.attributes, {
+        dummyAttribute: 'dummyValue',
+      });
+    });
+
     it('should enable all plugins', () => {
       const dummyPlugin1 = new DummyPlugin();
       const dummyPlugin2 = new DummyPlugin();

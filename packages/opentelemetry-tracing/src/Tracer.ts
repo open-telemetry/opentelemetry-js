@@ -52,7 +52,7 @@ export class Tracer implements api.Tracer {
     this._sampler = localConfig.sampler;
     this._traceParams = localConfig.traceParams;
     this._idGenerator = config.idGenerator || new RandomIdGenerator();
-    this.resource = _tracerProvider.resource;
+    this.resource = localConfig.resource || _tracerProvider.resource;
     this.instrumentationLibrary = instrumentationLibrary;
     this.logger = config.logger || new ConsoleLogger(config.logLevel);
   }
