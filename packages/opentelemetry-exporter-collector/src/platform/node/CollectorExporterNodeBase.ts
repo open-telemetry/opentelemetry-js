@@ -62,7 +62,7 @@ export abstract class CollectorExporterNodeBase<
     }
     const serviceRequest = this.convert(objects);
 
-    const promise = new Promise(resolve => {
+    const promise = new Promise<void>(resolve => {
       const _onSuccess = (): void => {
         onSuccess();
         _onFinish();

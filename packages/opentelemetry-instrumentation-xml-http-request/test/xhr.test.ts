@@ -56,7 +56,7 @@ const getData = (
   async?: boolean
 ) => {
   // eslint-disable-next-line no-async-promise-executor
-  return new Promise(async (resolve, reject) => {
+  return new Promise<void>(async (resolve, reject) => {
     if (async === undefined) {
       async = true;
     }
