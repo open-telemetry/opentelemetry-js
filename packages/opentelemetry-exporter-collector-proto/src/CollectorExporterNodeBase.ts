@@ -35,7 +35,7 @@ export abstract class CollectorExporterNodeBase<
     onSuccess: () => void,
     onError: (error: collectorTypes.CollectorExporterError) => void
   ): void {
-    const promise = new Promise(resolve => {
+    const promise = new Promise<void>(resolve => {
       const _onSuccess = (): void => {
         onSuccess();
         _onFinish();

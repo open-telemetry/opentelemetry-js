@@ -89,10 +89,9 @@ export const hasExpectHeader = (options: RequestOptions): boolean => {
 /**
  * Check whether the given obj match pattern
  * @param constant e.g URL of request
- * @param obj obj to inspect
  * @param pattern Match pattern
  */
-export const satisfiesPattern = <T>(
+export const satisfiesPattern = (
   constant: string,
   pattern: IgnoreMatcher
 ): boolean => {

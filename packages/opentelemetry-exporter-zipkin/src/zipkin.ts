@@ -74,7 +74,7 @@ export class ZipkinExporter implements SpanExporter {
       );
       return;
     }
-    const promise = new Promise(resolve => {
+    const promise = new Promise<void>(resolve => {
       this._sendSpans(spans, this._serviceName!, result => {
         resolve();
         resultCallback(result);
