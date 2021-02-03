@@ -20,7 +20,7 @@ import * as types from '../../types';
 /**
  * Base abstract class for instrumenting web plugins
  */
-export abstract class InstrumentationBase<T = any>
+export abstract class InstrumentationBase
   extends InstrumentationAbstract
   implements types.Instrumentation {
   constructor(

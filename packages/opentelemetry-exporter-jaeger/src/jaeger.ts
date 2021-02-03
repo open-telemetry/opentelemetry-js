@@ -161,7 +161,7 @@ export class JaegerExporter implements SpanExporter {
   }
 
   private async _flush(): Promise<void> {
-    await new Promise((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       this._sender.flush((_count: number, err?: string) => {
         if (err) {
           return reject(new Error(err));
