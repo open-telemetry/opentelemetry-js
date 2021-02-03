@@ -81,12 +81,13 @@ export const propagation = PropagationAPI.getInstance();
 import { DiagAPI } from './api/diag';
 export type { DiagAPI } from './api/diag';
 
-/** Entrypoint for Diag API.
+/**
+ * Entrypoint for Diag API.
  * Defines Diagnostic handler used for internal diagnostic logging operations.
  * The default provides a Noop DiagLogger implementation which may be changed via the
  * diag.setLogger(logger: DiagLogger) function.
  */
-export const diag = DiagAPI.inst();
+export const diag = DiagAPI.instance();
 
 export default {
   trace,

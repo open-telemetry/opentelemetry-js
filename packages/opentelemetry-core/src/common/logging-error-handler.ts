@@ -19,7 +19,7 @@ import {
   Exception,
   DiagLogLevel,
   DiagConsoleLogger,
-  diagLogLevelFilter,
+  createLogLevelDiagLogger,
 } from '@opentelemetry/api';
 import { ErrorHandler } from './types';
 
@@ -30,7 +30,8 @@ import { ErrorHandler } from './types';
  */
 export function loggingErrorHandler(logger?: Logger): ErrorHandler {
   logger =
-    logger ?? diagLogLevelFilter(DiagLogLevel.ERROR, new DiagConsoleLogger());
+    logger ??
+    createLogLevelDiagLogger(DiagLogLevel.ERROR, new DiagConsoleLogger());
   return (ex: Exception) => {
     logger!.error(stringifyException(ex));
   };

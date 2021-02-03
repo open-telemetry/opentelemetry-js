@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-import { DiagLogger, DiagLogFunction, noopDiagLogger } from '../diag/logger';
-import { DiagLogLevel, diagLogLevelFilter } from '../diag/logLevel';
+import {
+  DiagLogger,
+  DiagLogFunction,
+  createNoopDiagLogger,
+  diagLoggerFunctions,
+} from '../diag/logger';
+import { DiagLogLevel, createLogLevelDiagLogger } from '../diag/logLevel';
 import {
   API_BACKWARDS_COMPATIBILITY_VERSION,
   GLOBAL_DIAG_LOGGER_API_KEY,
@@ -25,7 +30,7 @@ import {
 
 /** Internal simple Noop Diag API that returns a noop logger and does not allow any changes */
 function noopDiagApi(): DiagAPI {
-  const noopApi = noopDiagLogger() as DiagAPI;
+  const noopApi = createNoopDiagLogger() as DiagAPI;
 
   noopApi.getLogger = () => noopApi;
   noopApi.setLogger = noopApi.getLogger;
@@ -40,7 +45,7 @@ function noopDiagApi(): DiagAPI {
  */
 export class DiagAPI implements DiagLogger {
   /** Get the singleton instance of the DiagAPI API */
-  public static inst(): DiagAPI {
+  public static instance(): DiagAPI {
     let theInst = null;
     if (_global[GLOBAL_DIAG_LOGGER_API_KEY]) {
       // Looks like a previous instance was set, so try and fetch it
@@ -61,19 +66,21 @@ export class DiagAPI implements DiagLogger {
     return theInst;
   }
 
-  /** Private internal constructor
-   * @private */
+  /**
+   * Private internal constructor
+   * @private
+   */
   private constructor() {
     let _logLevel: DiagLogLevel = DiagLogLevel.INFO;
     let _filteredLogger: DiagLogger | null;
-    let _logger: DiagLogger = noopDiagLogger();
+    let _logger: DiagLogger = createNoopDiagLogger();
 
     function _logProxy(funcName: keyof DiagLogger): DiagLogFunction {
       return function () {
         const orgArguments = arguments as unknown;
         const theLogger = _filteredLogger || _logger;
         const theFunc = theLogger[funcName];
-        if (theFunc && typeof theFunc === 'function') {
+        if (typeof theFunc === 'function') {
           return theFunc.apply(
             theLogger,
             orgArguments as Parameters<DiagLogFunction>
@@ -96,8 +103,8 @@ export class DiagAPI implements DiagLogger {
       const prevLogger = _logger;
       if (prevLogger !== logger && logger !== self) {
         // Simple special case to avoid any possible infinite recursion on the logging functions
-        _logger = logger || noopDiagLogger();
-        _filteredLogger = diagLogLevelFilter(_logLevel, _logger);
+        _logger = logger || createNoopDiagLogger();
+        _filteredLogger = createLogLevelDiagLogger(_logLevel, _logger);
       }
 
       return prevLogger;
@@ -107,34 +114,25 @@ export class DiagAPI implements DiagLogger {
       if (maxLogLevel !== _logLevel) {
         _logLevel = maxLogLevel;
         if (_logger) {
-          _filteredLogger = diagLogLevelFilter(maxLogLevel, _logger);
+          _filteredLogger = createLogLevelDiagLogger(maxLogLevel, _logger);
         }
       }
     };
 
-    // DiagLogger implementation
-    const theFuncs: Array<keyof DiagLogger> = [
-      'trace',
-      'debug',
-      'info',
-      'warn',
-      'error',
-      'critical',
-      'terminal',
-      'forcedInfo',
-    ];
-    for (let lp = 0; lp < theFuncs.length; lp++) {
-      const name = theFuncs[lp];
+    for (let i = 0; i < diagLoggerFunctions.length; i++) {
+      const name = diagLoggerFunctions[i];
       self[name] = _logProxy(name);
     }
   }
 
-  /** Return the currently configured logger instance, if no logger has been configured
+  /**
+   * Return the currently configured logger instance, if no logger has been configured
    * it will return itself so any log level filtering will still be applied in this case.
    */
   public getLogger!: () => DiagLogger;
 
-  /** Set the DiagLogger instance
+  /**
+   * Set the DiagLogger instance
    * @param logger - The DiagLogger instance to set as the default logger
    * @returns The previously registered DiagLogger
    */
@@ -144,7 +142,7 @@ export class DiagAPI implements DiagLogger {
   public setLogLevel!: (maxLogLevel: DiagLogLevel) => void;
 
   // DiagLogger implementation
-  public trace!: DiagLogFunction;
+  public verbose!: DiagLogFunction;
   public debug!: DiagLogFunction;
   public info!: DiagLogFunction;
   public warn!: DiagLogFunction;

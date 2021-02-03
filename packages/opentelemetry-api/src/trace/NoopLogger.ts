@@ -18,7 +18,7 @@ import { Logger } from '../common/Logger';
 
 /** No-op implementation of Logger
  * @deprecated This class will be removed prior to v1.0, use the api.diag
- * @see {@link DiagAPI}, {@link DiagLogger} and {@link noopDiagLogger}
+ * @see {@link DiagAPI}, {@link DiagLogger} and {@link createNoopDiagLogger}
  */
 export class NoopLogger implements Logger {
   // By default does nothing

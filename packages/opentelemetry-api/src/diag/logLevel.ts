@@ -15,7 +15,8 @@
  */
 
 import { DiagAPI } from '../api/diag';
-import { DiagLogger, DiagLogFunction } from './logger';
+import { Logger } from '../common/Logger';
+import { DiagLogger, DiagLogFunction, createNoopDiagLogger } from './logger';
 
 /**
  * Defines the available internal logging levels for the diagnostic logger, the numeric values
@@ -26,12 +27,14 @@ export enum DiagLogLevel {
   /** DIagnostic Logging level setting to disable all logging (except and forced logs) */
   NONE = -99,
 
-  /** Identifies a terminal situation that would cause the API to completely fail to initialize,
+  /**
+   * Identifies a terminal situation that would cause the API to completely fail to initialize,
    * if this type of error is logged functionality of the API is not expected to be functional.
    */
   TERMINAL = -2,
 
-  /** Identifies a critical error that needs to be addressed, functionality of the component
+  /**
+   * Identifies a critical error that needs to be addressed, functionality of the component
    * that emits this log detail may non-functional.
    */
   CRITICAL = -1,
@@ -48,10 +51,11 @@ export enum DiagLogLevel {
   /** General debug log message */
   DEBUG = 3,
 
-  /** Detailed trace level logging should only be used for development, should only be set
+  /**
+   * Detailed trace level logging should only be used for development, should only be set
    * in a development environment.
    */
-  TRACE = 4,
+  VERBOSE = 4,
 
   /** Used to set the logging level to include all logging */
   ALL = 9999,
@@ -59,13 +63,26 @@ export enum DiagLogLevel {
 
 /**
  * This is equivalent to:
- * type LogLevelString = 'NONE' | TERMINAL' | 'CRITICAL' | 'ERROR' | 'WARN' | 'INFO' | 'DEBUG' | 'TRACE' | 'ALL';
+ * type LogLevelString = 'NONE' | TERMINAL' | 'CRITICAL' | 'ERROR' | 'WARN' | 'INFO' | 'DEBUG' | 'VERBOSE' | 'ALL';
  */
 export type DiagLogLevelString = keyof typeof DiagLogLevel;
 
 /**
- * Mapping from DiagLogger function name to logging level
+ * Mapping from DiagLogger function name to Legacy Logger function used if
+ * the logger instance doesn't have the DiagLogger function
  */
+const fallbackLoggerFuncMap: { [n: string]: keyof Logger } = {
+  terminal: 'error',
+  critical: 'error',
+  error: 'error',
+  warn: 'warn',
+  info: 'info',
+  debug: 'debug',
+  verbose: 'debug',
+  forcedInfo: 'info',
+};
+
+/** Mapping from DiagLogger function name to logging level. */
 const levelMap: { n: keyof DiagLogger; l: DiagLogLevel; f?: boolean }[] = [
   { n: 'terminal', l: DiagLogLevel.TERMINAL },
   { n: 'critical', l: DiagLogLevel.CRITICAL },
@@ -73,21 +90,15 @@ const levelMap: { n: keyof DiagLogger; l: DiagLogLevel; f?: boolean }[] = [
   { n: 'warn', l: DiagLogLevel.WARN },
   { n: 'info', l: DiagLogLevel.INFO },
   { n: 'debug', l: DiagLogLevel.DEBUG },
-  { n: 'trace', l: DiagLogLevel.TRACE },
+  { n: 'verbose', l: DiagLogLevel.VERBOSE },
   { n: 'forcedInfo', l: DiagLogLevel.INFO, f: true },
 ];
 
 /**
- * An Immutable Diagnostic logger that limits the reported diagnostic log messages to those at the
- * maximum logging level or lower.
- * This can be useful to reduce the amount of logging used for a specific component based on any
- * local configuration
- */
-
-/**
- * Create a Diagnostic filter logger which limits the logged messages to the defined provided maximum
- * logging level or lower. This can be useful to reduce the amount of logging used for the system or
- * for a specific component based on any local configuration.
+ * Create a Diagnostic logger which limits the messages that are logged via the wrapped logger based on whether the
+ * message has a {@link DiagLogLevel} equal to the maximum logging level or lower, unless the {@link DiagLogLevel} is
+ * NONE which will return a noop logger instance. This can be useful to reduce the amount of logging used for the
+ * system or for a specific component based on any local configuration.
  * If you don't supply a logger it will use the global api.diag as the destination which will use the
  * current logger and any filtering it may have applied.
  * To avoid / bypass any global level filtering you should pass the current logger returned via
@@ -98,18 +109,22 @@ const levelMap: { n: keyof DiagLogger; l: DiagLogLevel; f?: boolean }[] = [
  * @returns {DiagLogger}
  */
 
-export function diagLogLevelFilter(
+export function createLogLevelDiagLogger(
   maxLevel: DiagLogLevel,
   logger?: DiagLogger | null
 ): DiagLogger {
-  if (!logger) {
-    logger = DiagAPI.inst() as DiagLogger;
-  }
-
   if (maxLevel < DiagLogLevel.NONE) {
     maxLevel = DiagLogLevel.NONE;
   } else if (maxLevel > DiagLogLevel.ALL) {
     maxLevel = DiagLogLevel.ALL;
+  }
+
+  if (maxLevel === DiagLogLevel.NONE) {
+    return createNoopDiagLogger();
+  }
+
+  if (!logger) {
+    logger = DiagAPI.instance().getLogger();
   }
 
   function _filterFunc(
@@ -121,7 +136,8 @@ export function diagLogLevelFilter(
     if (isForced || maxLevel >= theLevel) {
       return function () {
         const orgArguments = arguments as unknown;
-        const theFunc = theLogger[funcName];
+        const theFunc =
+          theLogger[funcName] || theLogger[fallbackLoggerFuncMap[funcName]];
         if (theFunc && typeof theFunc === 'function') {
           return theFunc.apply(
             logger,
@@ -134,9 +150,9 @@ export function diagLogLevelFilter(
   }
 
   const newLogger = {} as DiagLogger;
-  for (let lp = 0; lp < levelMap.length; lp++) {
-    const name = levelMap[lp].n;
-    newLogger[name] = _filterFunc(logger, name, levelMap[lp].l, levelMap[lp].f);
+  for (let i = 0; i < levelMap.length; i++) {
+    const name = levelMap[i].n;
+    newLogger[name] = _filterFunc(logger, name, levelMap[i].l, levelMap[i].f);
   }
 
   return newLogger;

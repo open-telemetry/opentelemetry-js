@@ -15,18 +15,47 @@
  */
 
 import * as assert from 'assert';
-import { DiagLogger } from '../../src/diag/logger';
-import { DiagLogLevel, diagLogLevelFilter } from '../../src/diag/logLevel';
+import { diag } from '../../src';
+import { Logger } from '../../src/common/Logger';
+import {
+  createNoopDiagLogger,
+  DiagLogger,
+  diagLoggerFunctions,
+} from '../../src/diag/logger';
+import {
+  DiagLogLevel,
+  createLogLevelDiagLogger,
+} from '../../src/diag/logLevel';
+
+const incompleteLoggerFuncs: Array<keyof Logger> = [
+  'debug',
+  'info',
+  'warn',
+  'error',
+];
+
+const expectedIncompleteMap: { [n: string]: keyof Console } = {
+  terminal: 'error',
+  critical: 'error',
+  error: 'error',
+  warn: 'warn',
+  info: 'info',
+  debug: 'debug',
+  verbose: 'debug',
+  forcedInfo: 'info',
+};
 
 describe('LogLevelFilter DiagLogger', () => {
-  let terminalCalledArgs: unknown;
-  let criticalCalledArgs: unknown;
-  let errorCalledArgs: unknown;
-  let warnCalledArgs: unknown;
-  let infoCalledArgs: unknown;
-  let debugCalledArgs: unknown;
-  let traceCalledArgs: unknown;
-  let forcedInfoCalledArgs: unknown;
+  const calledArgs: any = {
+    terminal: null,
+    critical: null,
+    error: null,
+    warn: null,
+    info: null,
+    debug: null,
+    verbose: null,
+    forcedInfo: null,
+  };
 
   let dummyLogger: DiagLogger;
 
@@ -34,617 +63,258 @@ describe('LogLevelFilter DiagLogger', () => {
   let incompleteLogger: DiagLogger;
 
   beforeEach(() => {
-    // mock
-    dummyLogger = {
-      terminal: (...args: unknown[]) => {
-        terminalCalledArgs = args;
-      },
-      critical: (...args: unknown[]) => {
-        criticalCalledArgs = args;
-      },
-      error: (...args: unknown[]) => {
-        errorCalledArgs = args;
-      },
-      warn: (...args: unknown[]) => {
-        warnCalledArgs = args;
-      },
-      info: (...args: unknown[]) => {
-        infoCalledArgs = args;
-      },
-      debug: (...args: unknown[]) => {
-        debugCalledArgs = args;
-      },
-      trace: (...args: unknown[]) => {
-        traceCalledArgs = args;
-      },
-      forcedInfo: (...args: unknown[]) => {
-        forcedInfoCalledArgs = args;
-      },
-    };
+    // set no logger
+    diag.setLogger(null as any);
 
-    incompleteLogger = {
-      error: (...args: unknown[]) => {
-        errorCalledArgs = args;
-      },
-      warn: (...args: unknown[]) => {
-        warnCalledArgs = args;
-      },
-      info: (...args: unknown[]) => {
-        infoCalledArgs = args;
-      },
-      debug: (...args: unknown[]) => {
-        debugCalledArgs = args;
-      },
-    } as DiagLogger;
+    // mock
+    dummyLogger = {} as DiagLogger;
+    diagLoggerFunctions.forEach(fName => {
+      dummyLogger[fName] = (...args: unknown[]) => {
+        calledArgs[fName] = args;
+      };
+    });
+
+    incompleteLogger = {} as DiagLogger;
+    incompleteLoggerFuncs.forEach(fName => {
+      incompleteLogger[fName] = (...args: unknown[]) => {
+        calledArgs[fName] = args;
+      };
+    });
   });
 
   afterEach(() => {
     // restore
-    terminalCalledArgs = null;
-    criticalCalledArgs = null;
-    errorCalledArgs = null;
-    warnCalledArgs = null;
-    infoCalledArgs = null;
-    debugCalledArgs = null;
-    traceCalledArgs = null;
-    forcedInfoCalledArgs = null;
+    diagLoggerFunctions.forEach(fName => {
+      calledArgs[fName] = null;
+    });
   });
 
   describe('constructor', () => {
-    it('should log all calls', () => {
-      const testLogger = dummyLogger;
-      testLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(terminalCalledArgs, [
-        'terminal called %s',
-        'param1',
-      ]);
-      testLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(criticalCalledArgs, [
-        'critical called %s',
-        'param1',
-      ]);
-      testLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, ['error called %s', 'param1']);
-      testLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, ['warn called %s', 'param1']);
-      testLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, ['info called %s', 'param1']);
-      testLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, ['debug called %s', 'param1']);
-      testLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, ['trace called %s', 'param1']);
-      testLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(forcedInfoCalledArgs, [
-        'forcedInfo called %s',
-        'param1',
-      ]);
-    });
+    const levelMap: Array<{
+      message: string;
+      level: DiagLogLevel;
+      ignoreFuncs: Array<keyof DiagLogger>;
+    }> = [
+      { message: 'ALL', level: DiagLogLevel.ALL, ignoreFuncs: [] },
+      { message: 'greater than ALL', level: 32768, ignoreFuncs: [] },
+      { message: 'VERBOSE', level: DiagLogLevel.VERBOSE, ignoreFuncs: [] },
+      { message: 'DEBUG', level: DiagLogLevel.DEBUG, ignoreFuncs: ['verbose'] },
+      {
+        message: 'INFO',
+        level: DiagLogLevel.INFO,
+        ignoreFuncs: ['verbose', 'debug'],
+      },
+      {
+        message: 'WARN',
+        level: DiagLogLevel.WARN,
+        ignoreFuncs: ['verbose', 'debug', 'info'],
+      },
+      {
+        message: 'ERROR',
+        level: DiagLogLevel.ERROR,
+        ignoreFuncs: ['verbose', 'debug', 'info', 'warn'],
+      },
+      {
+        message: 'CRITICAL',
+        level: DiagLogLevel.CRITICAL,
+        ignoreFuncs: ['verbose', 'debug', 'info', 'warn', 'error'],
+      },
+      {
+        message: 'TERMINAL',
+        level: DiagLogLevel.TERMINAL,
+        ignoreFuncs: ['verbose', 'debug', 'info', 'warn', 'error', 'critical'],
+      },
+      {
+        message: 'between TERMINAL and NONE',
+        level: -10,
+        ignoreFuncs: [
+          'verbose',
+          'debug',
+          'info',
+          'warn',
+          'error',
+          'critical',
+          'terminal',
+        ],
+      },
+      {
+        message: 'NONE',
+        level: DiagLogLevel.NONE,
+        ignoreFuncs: [
+          'verbose',
+          'debug',
+          'info',
+          'warn',
+          'error',
+          'critical',
+          'terminal',
+          'forcedInfo',
+        ],
+      },
+      {
+        message: 'less than NONE',
+        level: -1000,
+        ignoreFuncs: [
+          'verbose',
+          'debug',
+          'info',
+          'warn',
+          'error',
+          'critical',
+          'terminal',
+          'forcedInfo',
+        ],
+      },
+    ];
 
-    it('should log with ALL level', () => {
-      const testLogger = diagLogLevelFilter(DiagLogLevel.ALL, dummyLogger);
+    levelMap.forEach(map => {
+      diagLoggerFunctions.forEach(fName => {
+        it(`should log ${fName} message with ${map.message} level`, () => {
+          const testLogger = createLogLevelDiagLogger(map.level, dummyLogger);
+          testLogger[fName](`${fName} called %s`, 'param1');
+          diagLoggerFunctions.forEach(lName => {
+            if (fName === lName && map.ignoreFuncs.indexOf(lName) === -1) {
+              assert.deepStrictEqual(calledArgs[lName], [
+                `${fName} called %s`,
+                'param1',
+              ]);
+            } else {
+              assert.strictEqual(calledArgs[lName], null);
+            }
+          });
+        });
 
-      testLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(terminalCalledArgs, [
-        'terminal called %s',
-        'param1',
-      ]);
-      testLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(criticalCalledArgs, [
-        'critical called %s',
-        'param1',
-      ]);
-      testLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, ['error called %s', 'param1']);
-      testLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, ['warn called %s', 'param1']);
-      testLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, ['info called %s', 'param1']);
-      testLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, ['debug called %s', 'param1']);
-      testLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, ['trace called %s', 'param1']);
-      testLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(forcedInfoCalledArgs, [
-        'forcedInfo called %s',
-        'param1',
-      ]);
-    });
+        it(`should be noop for null with explicit noop Logger log ${fName} message with ${map.message} level`, () => {
+          const testLogger = createLogLevelDiagLogger(
+            map.level,
+            createNoopDiagLogger()
+          );
+          testLogger[fName](`${fName} called %s`, 'param1');
+          diagLoggerFunctions.forEach(lName => {
+            assert.strictEqual(calledArgs[lName], null);
+          });
+        });
 
-    it('should log with level greater than ALL', () => {
-      const testLogger = diagLogLevelFilter(32768, dummyLogger);
+        it(`should be noop and not throw for null and no default Logger log ${fName} message with ${map.message} level`, () => {
+          const testLogger = createLogLevelDiagLogger(map.level, null);
+          testLogger[fName](`${fName} called %s`, 'param1');
+          diagLoggerFunctions.forEach(lName => {
+            assert.strictEqual(calledArgs[lName], null);
+          });
+        });
 
-      testLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(terminalCalledArgs, [
-        'terminal called %s',
-        'param1',
-      ]);
-      testLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(criticalCalledArgs, [
-        'critical called %s',
-        'param1',
-      ]);
-      testLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, ['error called %s', 'param1']);
-      testLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, ['warn called %s', 'param1']);
-      testLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, ['info called %s', 'param1']);
-      testLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, ['debug called %s', 'param1']);
-      testLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, ['trace called %s', 'param1']);
-      testLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(forcedInfoCalledArgs, [
-        'forcedInfo called %s',
-        'param1',
-      ]);
-    });
+        it(`should be noop and not throw for undefined and no default Logger log ${fName} message with ${map.message} level`, () => {
+          const testLogger = createLogLevelDiagLogger(map.level, undefined);
+          testLogger[fName](`${fName} called %s`, 'param1');
+          diagLoggerFunctions.forEach(lName => {
+            assert.strictEqual(calledArgs[lName], null);
+          });
+        });
 
-    it('should log with TRACE level', () => {
-      const testLogger = diagLogLevelFilter(DiagLogLevel.TRACE, dummyLogger);
+        it(`should use default logger for undefined and log ${fName} message with ${map.message} level`, () => {
+          diag.setLogger(dummyLogger);
+          const testLogger = createLogLevelDiagLogger(map.level, undefined);
+          testLogger[fName](`${fName} called %s`, 'param1');
+          diagLoggerFunctions.forEach(lName => {
+            if (fName === lName && map.ignoreFuncs.indexOf(lName) === -1) {
+              assert.deepStrictEqual(calledArgs[lName], [
+                `${fName} called %s`,
+                'param1',
+              ]);
+            } else {
+              assert.strictEqual(calledArgs[lName], null);
+            }
+          });
+        });
 
-      testLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(terminalCalledArgs, [
-        'terminal called %s',
-        'param1',
-      ]);
-      testLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(criticalCalledArgs, [
-        'critical called %s',
-        'param1',
-      ]);
-      testLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, ['error called %s', 'param1']);
-      testLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, ['warn called %s', 'param1']);
-      testLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, ['info called %s', 'param1']);
-      testLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, ['debug called %s', 'param1']);
-      testLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, ['trace called %s', 'param1']);
-      testLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(forcedInfoCalledArgs, [
-        'forcedInfo called %s',
-        'param1',
-      ]);
-    });
+        it(`should use default logger for null and log ${fName} message with ${map.message} level`, () => {
+          diag.setLogger(dummyLogger);
+          const testLogger = createLogLevelDiagLogger(map.level, null);
+          testLogger[fName](`${fName} called %s`, 'param1');
+          diagLoggerFunctions.forEach(lName => {
+            if (fName === lName && map.ignoreFuncs.indexOf(lName) === -1) {
+              assert.deepStrictEqual(calledArgs[lName], [
+                `${fName} called %s`,
+                'param1',
+              ]);
+            } else {
+              assert.strictEqual(calledArgs[lName], null);
+            }
+          });
+        });
 
-    it('should log with debug', () => {
-      const testLogger = diagLogLevelFilter(DiagLogLevel.DEBUG, dummyLogger);
+        it(`incomplete (legacy) logger should log ${fName} message to ${expectedIncompleteMap[fName]} with ${map.message} level`, () => {
+          const testLogger = createLogLevelDiagLogger(
+            map.level,
+            incompleteLogger
+          );
+          testLogger[fName](`${fName} called %s`, 'param1');
+          diagLoggerFunctions.forEach(lName => {
+            const expectedLog = expectedIncompleteMap[lName];
+            if (fName === lName && map.ignoreFuncs.indexOf(lName) === -1) {
+              assert.deepStrictEqual(calledArgs[expectedLog], [
+                `${fName} called %s`,
+                'param1',
+              ]);
+            }
+          });
+        });
 
-      testLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(terminalCalledArgs, [
-        'terminal called %s',
-        'param1',
-      ]);
-      testLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(criticalCalledArgs, [
-        'critical called %s',
-        'param1',
-      ]);
-      testLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, ['error called %s', 'param1']);
-      testLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, ['warn called %s', 'param1']);
-      testLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, ['info called %s', 'param1']);
-      testLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, ['debug called %s', 'param1']);
-      testLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, null);
-      testLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(forcedInfoCalledArgs, [
-        'forcedInfo called %s',
-        'param1',
-      ]);
-    });
+        it(`diag setLogLevel is ignored for specific logLevel logger and should log ${fName} message with ${map.message} level`, () => {
+          diag.setLogger(dummyLogger);
+          diag.setLogLevel(DiagLogLevel.NONE);
 
-    it('should log with info', () => {
-      const testLogger = diagLogLevelFilter(DiagLogLevel.INFO, dummyLogger);
+          const testLogger = createLogLevelDiagLogger(map.level);
+          testLogger[fName](`${fName} called %s`, 'param1');
+          diagLoggerFunctions.forEach(lName => {
+            if (fName === lName && map.ignoreFuncs.indexOf(lName) === -1) {
+              assert.deepStrictEqual(calledArgs[lName], [
+                `${fName} called %s`,
+                'param1',
+              ]);
+            } else {
+              assert.strictEqual(calledArgs[lName], null);
+            }
+          });
+        });
 
-      testLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(terminalCalledArgs, [
-        'terminal called %s',
-        'param1',
-      ]);
-      testLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(criticalCalledArgs, [
-        'critical called %s',
-        'param1',
-      ]);
-      testLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, ['error called %s', 'param1']);
-      testLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, ['warn called %s', 'param1']);
-      testLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, ['info called %s', 'param1']);
-      testLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, null);
-      testLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, null);
-      testLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(forcedInfoCalledArgs, [
-        'forcedInfo called %s',
-        'param1',
-      ]);
-    });
+        it(`diag setLogLevel and logger should log ${fName} message with ${map.message} level`, () => {
+          diag.setLogger(dummyLogger);
+          diag.setLogLevel(map.level);
+          diag[fName](`${fName} called %s`, 'param1');
+          diagLoggerFunctions.forEach(lName => {
+            if (fName === lName && map.ignoreFuncs.indexOf(lName) === -1) {
+              assert.deepStrictEqual(calledArgs[lName], [
+                `${fName} called %s`,
+                'param1',
+              ]);
+            } else {
+              assert.strictEqual(calledArgs[lName], null);
+            }
+          });
+        });
 
-    it('should log with warning', () => {
-      const testLogger = diagLogLevelFilter(DiagLogLevel.WARN, dummyLogger);
+        it(`should not throw with an invalid DiagLogger calling ${fName} with ${map.message} level`, () => {
+          const invalidLogger = {
+            debug: 1,
+            warn: 2,
+            error: 3,
+            trace: 4,
+            info: 5,
+            log: 6,
+          };
 
-      testLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(terminalCalledArgs, [
-        'terminal called %s',
-        'param1',
-      ]);
-      testLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(criticalCalledArgs, [
-        'critical called %s',
-        'param1',
-      ]);
-      testLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, ['error called %s', 'param1']);
-      testLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, ['warn called %s', 'param1']);
-      testLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, null);
-      testLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, null);
-      testLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, null);
-      testLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(forcedInfoCalledArgs, [
-        'forcedInfo called %s',
-        'param1',
-      ]);
-    });
+          const testLogger = createLogLevelDiagLogger(
+            map.level,
+            invalidLogger as any
+          );
 
-    it('should log with error', () => {
-      const testLogger = diagLogLevelFilter(DiagLogLevel.ERROR, dummyLogger);
-
-      testLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(terminalCalledArgs, [
-        'terminal called %s',
-        'param1',
-      ]);
-      testLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(criticalCalledArgs, [
-        'critical called %s',
-        'param1',
-      ]);
-      testLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, ['error called %s', 'param1']);
-      testLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, null);
-      testLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, null);
-      testLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, null);
-      testLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, null);
-      testLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(forcedInfoCalledArgs, [
-        'forcedInfo called %s',
-        'param1',
-      ]);
-    });
-
-    it('should log with critical', () => {
-      const testLogger = diagLogLevelFilter(DiagLogLevel.CRITICAL, dummyLogger);
-
-      testLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(terminalCalledArgs, [
-        'terminal called %s',
-        'param1',
-      ]);
-      testLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(criticalCalledArgs, [
-        'critical called %s',
-        'param1',
-      ]);
-      testLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, null);
-      testLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, null);
-      testLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, null);
-      testLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, null);
-      testLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, null);
-      testLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(forcedInfoCalledArgs, [
-        'forcedInfo called %s',
-        'param1',
-      ]);
-    });
-
-    it('should log with terminal', () => {
-      const testLogger = diagLogLevelFilter(DiagLogLevel.TERMINAL, dummyLogger);
-
-      testLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(terminalCalledArgs, [
-        'terminal called %s',
-        'param1',
-      ]);
-      testLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(criticalCalledArgs, null);
-      testLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, null);
-      testLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, null);
-      testLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, null);
-      testLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, null);
-      testLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, null);
-      testLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(forcedInfoCalledArgs, [
-        'forcedInfo called %s',
-        'param1',
-      ]);
-    });
-
-    it('should log with none', () => {
-      const testLogger = diagLogLevelFilter(DiagLogLevel.NONE, dummyLogger);
-
-      testLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(terminalCalledArgs, null);
-      testLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(criticalCalledArgs, null);
-      testLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, null);
-      testLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, null);
-      testLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, null);
-      testLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, null);
-      testLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, null);
-      testLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(forcedInfoCalledArgs, [
-        'forcedInfo called %s',
-        'param1',
-      ]);
-    });
-
-    it('should log with value less than NONE', () => {
-      const testLogger = diagLogLevelFilter(-1000, dummyLogger);
-
-      testLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(terminalCalledArgs, null);
-      testLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(criticalCalledArgs, null);
-      testLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, null);
-      testLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, null);
-      testLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, null);
-      testLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, null);
-      testLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, null);
-      testLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(forcedInfoCalledArgs, [
-        'forcedInfo called %s',
-        'param1',
-      ]);
-    });
-    it('legacyLogger should log with ALL level', () => {
-      const testLogger = diagLogLevelFilter(DiagLogLevel.ALL, incompleteLogger);
-
-      testLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(terminalCalledArgs, null);
-      testLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(criticalCalledArgs, null);
-      testLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, ['error called %s', 'param1']);
-      testLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, ['warn called %s', 'param1']);
-      testLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, ['info called %s', 'param1']);
-      testLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, ['debug called %s', 'param1']);
-      testLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, null);
-      testLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(forcedInfoCalledArgs, null);
-    });
-
-    it('legacyLogger should log with TRACE level', () => {
-      const testLogger = diagLogLevelFilter(
-        DiagLogLevel.TRACE,
-        incompleteLogger
-      );
-
-      testLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(terminalCalledArgs, null);
-      testLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(criticalCalledArgs, null);
-      testLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, ['error called %s', 'param1']);
-      testLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, ['warn called %s', 'param1']);
-      testLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, ['info called %s', 'param1']);
-      testLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, ['debug called %s', 'param1']);
-      testLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, null);
-      testLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(forcedInfoCalledArgs, null);
-    });
-
-    it('legacyLogger should log with debug', () => {
-      const testLogger = diagLogLevelFilter(
-        DiagLogLevel.DEBUG,
-        incompleteLogger
-      );
-
-      testLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(terminalCalledArgs, null);
-      testLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(criticalCalledArgs, null);
-      testLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, ['error called %s', 'param1']);
-      testLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, ['warn called %s', 'param1']);
-      testLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, ['info called %s', 'param1']);
-      testLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, ['debug called %s', 'param1']);
-      testLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, null);
-      testLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(forcedInfoCalledArgs, null);
-    });
-
-    it('legacyLogger should log with info', () => {
-      const testLogger = diagLogLevelFilter(
-        DiagLogLevel.INFO,
-        incompleteLogger
-      );
-
-      testLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(terminalCalledArgs, null);
-      testLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(criticalCalledArgs, null);
-      testLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, ['error called %s', 'param1']);
-      testLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, ['warn called %s', 'param1']);
-      testLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, ['info called %s', 'param1']);
-      testLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, null);
-      testLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, null);
-      testLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(forcedInfoCalledArgs, null);
-    });
-
-    it('legacyLogger should log with warning', () => {
-      const testLogger = diagLogLevelFilter(
-        DiagLogLevel.WARN,
-        incompleteLogger
-      );
-
-      testLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(terminalCalledArgs, null);
-      testLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(criticalCalledArgs, null);
-      testLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, ['error called %s', 'param1']);
-      testLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, ['warn called %s', 'param1']);
-      testLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, null);
-      testLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, null);
-      testLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, null);
-      testLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(forcedInfoCalledArgs, null);
-    });
-
-    it('legacyLogger should log with error', () => {
-      const testLogger = diagLogLevelFilter(
-        DiagLogLevel.ERROR,
-        incompleteLogger
-      );
-
-      testLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(terminalCalledArgs, null);
-      testLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(criticalCalledArgs, null);
-      testLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, ['error called %s', 'param1']);
-      testLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, null);
-      testLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, null);
-      testLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, null);
-      testLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, null);
-      testLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(forcedInfoCalledArgs, null);
-    });
-
-    it('legacyLogger should log with critical', () => {
-      const testLogger = diagLogLevelFilter(
-        DiagLogLevel.CRITICAL,
-        incompleteLogger
-      );
-
-      testLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(terminalCalledArgs, null);
-      testLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(criticalCalledArgs, null);
-      testLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, null);
-      testLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, null);
-      testLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, null);
-      testLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, null);
-      testLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, null);
-      testLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(forcedInfoCalledArgs, null);
-    });
-
-    it('legacyLogger should log with terminal', () => {
-      const testLogger = diagLogLevelFilter(
-        DiagLogLevel.TERMINAL,
-        incompleteLogger
-      );
-
-      testLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(terminalCalledArgs, null);
-      testLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(criticalCalledArgs, null);
-      testLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, null);
-      testLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, null);
-      testLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, null);
-      testLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, null);
-      testLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, null);
-      testLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(forcedInfoCalledArgs, null);
-    });
-
-    it('legacyLogger should log with none', () => {
-      const testLogger = diagLogLevelFilter(
-        DiagLogLevel.NONE,
-        incompleteLogger
-      );
-
-      testLogger.terminal('terminal called %s', 'param1');
-      assert.deepStrictEqual(terminalCalledArgs, null);
-      testLogger.critical('critical called %s', 'param1');
-      assert.deepStrictEqual(criticalCalledArgs, null);
-      testLogger.error('error called %s', 'param1');
-      assert.deepStrictEqual(errorCalledArgs, null);
-      testLogger.warn('warn called %s', 'param1');
-      assert.deepStrictEqual(warnCalledArgs, null);
-      testLogger.info('info called %s', 'param1');
-      assert.deepStrictEqual(infoCalledArgs, null);
-      testLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, null);
-      testLogger.trace('trace called %s', 'param1');
-      assert.deepStrictEqual(traceCalledArgs, null);
-      testLogger.forcedInfo('forcedInfo called %s', 'param1');
-      assert.deepStrictEqual(forcedInfoCalledArgs, null);
+          testLogger[fName](`${fName} called %s`, 'param1');
+          diagLoggerFunctions.forEach(lName => {
+            assert.strictEqual(calledArgs[lName], null);
+          });
+        });
+      });
     });
   });
 });

@@ -23,7 +23,7 @@ const consoleMap: { n: keyof DiagLogger; c: keyof Console }[] = [
   { n: 'warn', c: 'warn' },
   { n: 'info', c: 'info' },
   { n: 'debug', c: 'debug' },
-  { n: 'trace', c: 'trace' },
+  { n: 'verbose', c: 'trace' },
   { n: 'forcedInfo', c: 'info' },
 ];
 
@@ -40,35 +40,32 @@ export class DiagConsoleLogger implements DiagLogger {
         if (console) {
           // Some environments only expose the console when the F12 developer console is open
           let theFunc = console[funcName];
-          if (!theFunc) {
+          if (typeof theFunc !== 'function') {
             // Not all environments support all functions
             theFunc = console.log;
           }
 
           // One last final check
-          if (theFunc && typeof theFunc === 'function') {
+          if (typeof theFunc === 'function') {
             return theFunc.apply(console, orgArguments);
           }
         }
       };
     }
 
-    for (let lp = 0; lp < consoleMap.length; lp++) {
-      const name = consoleMap[lp].n;
-      let consoleFunc = consoleMap[lp].c;
-      if (console && !console[consoleFunc]) {
-        consoleFunc = 'log';
-      }
-      this[name] = _consoleFunc(consoleFunc);
+    for (let i = 0; i < consoleMap.length; i++) {
+      this[consoleMap[i].n] = _consoleFunc(consoleMap[i].c);
     }
   }
 
-  /** Log a terminal situation that would cause the API to completely fail to initialize,
+  /**
+   * Log a terminal situation that would cause the API to completely fail to initialize,
    * if this type of message is logged functionality of the API is not expected to be functional.
    */
   public terminal!: DiagLogFunction;
 
-  /** Log a critical error that NEEDS to be addressed, functionality of the component that emits
+  /**
+   * Log a critical error that NEEDS to be addressed, functionality of the component that emits
    * this log detail may non-functional. While the overall API may be.
    */
   public critical!: DiagLogFunction;
@@ -76,33 +73,38 @@ export class DiagConsoleLogger implements DiagLogger {
   /** Log an error scenario that was not expected and caused the requested operation to fail. */
   public error!: DiagLogFunction;
 
-  /** Log a warning scenario to inform the developer of an issues that should be investigated.
+  /**
+   * Log a warning scenario to inform the developer of an issues that should be investigated.
    * The requested operation may or may not have succeeded or completed.
    */
   public warn!: DiagLogFunction;
 
-  /** Log a general informational message, this should not affect functionality.
+  /**
+   * Log a general informational message, this should not affect functionality.
    * This is also the default logging level so this should NOT be used for logging
    * debugging level information.
    */
   public info!: DiagLogFunction;
 
-  /** Log a general debug message that can be useful for identifying a failure.
+  /**
+   * Log a general debug message that can be useful for identifying a failure.
    * Information logged at this level may include diagnostic details that would
    * help identify a failure scenario. Useful scenarios would be to log the execution
    * order of async operations
    */
   public debug!: DiagLogFunction;
 
-  /** Log a detailed (verbose) trace level logging that can be used to identify failures
+  /**
+   * Log a detailed (verbose) trace level logging that can be used to identify failures
    * where debug level logging would be insufficient, this level of tracing can include
    * input and output parameters and as such may include PII information passing through
    * the API. As such it is recommended that this level of tracing should not be enabled
    * in a production environment.
    */
-  public trace!: DiagLogFunction;
+  public verbose!: DiagLogFunction;
 
-  /** Log a general informational message that should always be logged regardless of the
+  /**
+   * Log a general informational message that should always be logged regardless of the
    * current {@Link DiagLogLevel) and configured filtering level. This type of logging is
    * useful for logging component startup and version information without causing additional
    * general informational messages when the logging level is set to DiagLogLevel.WARN or lower.

@@ -16,7 +16,8 @@
 
 import { Logger } from '../common/Logger';
 
-/** Defines a type which can be used for as a parameter without breaking backward
+/**
+ * Defines a type which can be used for as a parameter without breaking backward
  * compatibility. The {@link Logger} reference will be removed with the removal
  * of the Logger definition, this can be used as a replacement for functions
  * that are currently passing Logger references during migration to minimize
@@ -26,70 +27,82 @@ export type OptionalDiagLogger = Logger | DiagLogger | null | undefined;
 
 export type DiagLogFunction = (message: string, ...args: unknown[]) => void;
 
-/** Defines an internal diagnostic logger interface which is used to log internal diagnostic
+/**
+ * Defines an internal diagnostic logger interface which is used to log internal diagnostic
  * messages, you can set the default diagnostic logger via the {@link DiagAPI} setLogger function.
  * API provided implementations include :-
- * - a No-Op {@link noopDiagLogger}
+ * - a No-Op {@link createNoopDiagLogger}
  * - a {@link DiagLogLevel} filtering wrapper {@link diagLogLevelFilter}
  * - a general Console {@link DiagConsoleLogger} version.
  */
 export interface DiagLogger {
-  /** Log a terminal situation that would cause the API to completely fail to initialize,
+  /**
+   * Log a terminal situation that would cause the API to completely fail to initialize,
    * if this type of message is logged functionality of the API is not expected to be functional.
    */
   terminal: DiagLogFunction;
 
-  /** Log a critical error that NEEDS to be addressed, functionality of the component that emits
-   * this log detail may non-functional. While the overall API may be.
+  /**
+   * Log a critical error that NEEDS to be addressed, functionality of the component that emits
+   * this log detail may be limited or non-functional depending on when this message is emitted.
+   * Unlike terminal message, it is expected that the overall API may still be functional, again
+   * depending on what component and when this message is emitted.
    */
   critical: DiagLogFunction;
 
   /** Log an error scenario that was not expected and caused the requested operation to fail. */
   error: DiagLogFunction;
 
-  /** Log a warning scenario to inform the developer of an issues that should be investigated.
+  /**
+   * Log a warning scenario to inform the developer of an issues that should be investigated.
    * The requested operation may or may not have succeeded or completed.
    */
   warn: DiagLogFunction;
 
-  /** Log a general informational message, this should not affect functionality.
+  /**
+   * Log a general informational message, this should not affect functionality.
    * This is also the default logging level so this should NOT be used for logging
    * debugging level information.
    */
   info: DiagLogFunction;
 
-  /** Log a general debug message that can be useful for identifying a failure.
+  /**
+   * Log a general debug message that can be useful for identifying a failure.
    * Information logged at this level may include diagnostic details that would
-   * help identify a failure scenario. Useful scenarios would be to log the execution
-   * order of async operations
+   * help identify a failure scenario.
+   * For example: Logging the order of execution of async operations.
    */
   debug: DiagLogFunction;
 
-  /** Log a detailed (verbose) trace level logging that can be used to identify failures
+  /**
+   * Log a detailed (verbose) trace level logging that can be used to identify failures
    * where debug level logging would be insufficient, this level of tracing can include
    * input and output parameters and as such may include PII information passing through
    * the API. As such it is recommended that this level of tracing should not be enabled
    * in a production environment.
    */
-  trace: DiagLogFunction;
+  verbose: DiagLogFunction;
 
-  /** Log a general informational message that should always be logged regardless of the
-   * current {@Link DiagLogLevel) and configured filtering level. This type of logging is
-   * useful for logging component startup and version information without causing additional
-   * general informational messages when the logging level is set to DiagLogLevel.WARN or lower.
+  /**
+   * Log a general informational message that should always be logged regardless of the
+   * current or configured logging level {@Link DiagLogLevel} except when the level is set
+   * to {@Link DiagLogLevel.NONE). This type of logging is useful for logging component
+   * startup and version information without causing additional general informational messages
+   * when the logging level is set to DiagLogLevel.WARN or lower.
    */
   forcedInfo: DiagLogFunction;
 }
 
-const loggerMapFuncs: { d: keyof DiagLogger; l: keyof Logger }[] = [
-  { d: 'trace', l: 'debug' },
-  { d: 'debug', l: 'debug' },
-  { d: 'info', l: 'info' },
-  { d: 'warn', l: 'warn' },
-  { d: 'error', l: 'error' },
-  { d: 'critical', l: 'error' },
-  { d: 'terminal', l: 'error' },
-  { d: 'forcedInfo', l: 'info' },
+// DiagLogger implementation
+export const diagLoggerFunctions: Array<keyof DiagLogger> = [
+  'verbose',
+  'debug',
+  'info',
+  'warn',
+  'error',
+  'critical',
+  'terminal',
+  'forcedInfo',
 ];
 
 function noopLogFunction() {}
@@ -99,59 +112,11 @@ function noopLogFunction() {}
  * @implements {@link DiagLogger}
  * @returns {DiagLogger}
  */
-export function noopDiagLogger(): DiagLogger {
+export function createNoopDiagLogger(): DiagLogger {
   const diagLogger = {} as DiagLogger;
 
-  for (let lp = 0; lp < loggerMapFuncs.length; lp++) {
-    const map = loggerMapFuncs[lp];
-    diagLogger[map.d] = noopLogFunction;
-  }
-
-  return diagLogger;
-}
-
-/**
- * @deprecated This helper will return either the original passed logger if it implements {@link DiagLogger} a
- * wrapped instance if it only implements {@link Logger} or null if it's null, undefined.
- * This helper will be removed as part of the {@link Logger} deprecation, please use {@link DiagLogger} from the api.
- * @see {@link DiagLogLevel} and {@link DiagLogger}
- * @returns The passed Logger wrapped as a DiagLogger or null if no Logger was supplied.
- */
-export function diagLoggerAdapter(
-  logger?: OptionalDiagLogger
-): DiagLogger | null | undefined {
-  if (!logger) {
-    return null;
-  }
-
-  if (typeof (logger as DiagLogger).forcedInfo === 'function') {
-    // already looks like a DiagLogger;
-    return logger as DiagLogger;
-  }
-
-  function _mapToLogger(
-    theLogger: Logger,
-    funcName: keyof Logger
-  ): DiagLogFunction {
-    const theFunc = theLogger[funcName];
-    if (theFunc && typeof theFunc === 'function') {
-      return function () {
-        const orgArguments = arguments as unknown;
-        return theFunc.apply(
-          theLogger,
-          orgArguments as Parameters<DiagLogFunction>
-        );
-      };
-    }
-
-    return noopLogFunction;
-  }
-
-  const diagLogger = {} as DiagLogger;
-
-  for (let lp = 0; lp < loggerMapFuncs.length; lp++) {
-    const map = loggerMapFuncs[lp];
-    diagLogger[map.d] = _mapToLogger(logger, map.l);
+  for (let i = 0; i < diagLoggerFunctions.length; i++) {
+    diagLogger[diagLoggerFunctions[i]] = noopLogFunction;
   }
 
   return diagLogger;
