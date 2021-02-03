@@ -50,7 +50,7 @@ export interface Span {
    * @param value the value for this attribute. Setting a value null or
    *              undefined is invalid and will result in undefined behavior.
    */
-  setAttribute(key: string, value?: SpanAttributeValue): this;
+  setAttribute(key: string, value: SpanAttributeValue): this;
 
   /**
    * Sets attributes to the span.

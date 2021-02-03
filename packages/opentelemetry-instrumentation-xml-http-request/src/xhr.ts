@@ -144,9 +144,12 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   _addFinalSpanAttributes(span: api.Span, xhrMem: XhrMem, spanUrl?: string) {
     if (typeof spanUrl === 'string') {
       const parsedUrl = parseUrl(spanUrl);
-
-      span.setAttribute(HttpAttribute.HTTP_STATUS_CODE, xhrMem.status);
-      span.setAttribute(HttpAttribute.HTTP_STATUS_TEXT, xhrMem.statusText);
+      if (xhrMem.status !== undefined) {
+        span.setAttribute(HttpAttribute.HTTP_STATUS_CODE, xhrMem.status);
+      }
+      if (xhrMem.statusText !== undefined) {
+        span.setAttribute(HttpAttribute.HTTP_STATUS_TEXT, xhrMem.statusText);
+      }
       span.setAttribute(HttpAttribute.HTTP_HOST, parsedUrl.host);
       span.setAttribute(
         HttpAttribute.HTTP_SCHEME,
