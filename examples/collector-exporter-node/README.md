@@ -1,8 +1,8 @@
 # Overview
 
-This example shows how to use [@opentelemetry/exporter-collector](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-collector) to instrument a simple Node.js application.
+This example shows how to use [@opentelemetry/exporter-collector](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-exporter-collector) to instrument a simple Node.js application.
 
-This example will export spans data simultaneously using [Exporter Collector](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-collector) and grpc. It will use [proto format](https://github.com/open-telemetry/opentelemetry-proto).
+This example will export spans data simultaneously using [Exporter Collector](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-exporter-collector) and grpc. It will use [proto format](https://github.com/open-telemetry/opentelemetry-proto).
 
 ## Installation
 
@@ -49,7 +49,7 @@ Note: It may take some time for the application metrics to appear on the Prometh
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For more information on tracing, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing>
+- For more information on tracing, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-tracing>
 
 ## LICENSE
 

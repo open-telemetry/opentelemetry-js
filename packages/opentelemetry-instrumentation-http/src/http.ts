@@ -26,6 +26,7 @@ import {
   TraceFlags,
   ROOT_CONTEXT,
   getSpan,
+  suppressInstrumentation,
 } from '@opentelemetry/api';
 import { NoRecordingSpan } from '@opentelemetry/core';
 import type * as http from 'http';
@@ -223,6 +224,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     return (original: Func<http.ClientRequest>): Func<http.ClientRequest> => {
       const instrumentation = this;
       return function httpsOutgoingRequest(
+        // eslint-disable-next-line node/no-unsupported-features/node-builtins
         options: https.RequestOptions | string | URL,
         ...args: HttpRequestArgs
       ): http.ClientRequest {
@@ -250,6 +252,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   /** Patches HTTPS outgoing get requests */
   private _getPatchHttpsOutgoingGetFunction(
     clientRequest: (
+      // eslint-disable-next-line node/no-unsupported-features/node-builtins
       options: http.RequestOptions | string | URL,
       ...args: HttpRequestArgs
     ) => http.ClientRequest
@@ -257,6 +260,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     return (original: Func<http.ClientRequest>): Func<http.ClientRequest> => {
       const instrumentation = this;
       return function httpsOutgoingRequest(
+        // eslint-disable-next-line node/no-unsupported-features/node-builtins
         options: https.RequestOptions | string | URL,
         ...args: HttpRequestArgs
       ): http.ClientRequest {
@@ -392,7 +396,11 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
             )
         )
       ) {
-        return original.apply(this, [event, ...args]);
+        return context.with(suppressInstrumentation(context.active()), () => {
+          context.bind(request);
+          context.bind(response);
+          return original.apply(this, [event, ...args]);
+        });
       }
 
       const headers = request.headers;

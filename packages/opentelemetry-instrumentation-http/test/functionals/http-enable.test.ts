@@ -67,7 +67,6 @@ const provider = new NodeTracerProvider({
 });
 provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 instrumentation.setTracerProvider(provider);
-propagation.setGlobalPropagator(new DummyPropagation());
 
 function doNock(
   hostname: string,
@@ -103,6 +102,14 @@ export const responseHookFunction = (
 
 describe('HttpInstrumentation', () => {
   let contextManager: ContextManager;
+
+  before(() => {
+    propagation.setGlobalPropagator(new DummyPropagation());
+  });
+
+  after(() => {
+    propagation.disable();
+  });
 
   beforeEach(() => {
     contextManager = new AsyncHooksContextManager().enable();
@@ -202,6 +209,9 @@ describe('HttpInstrumentation', () => {
         });
         instrumentation.enable();
         server = http.createServer((request, response) => {
+          if (request.url?.includes('/ignored')) {
+            provider.getTracer('test').startSpan('some-span').end();
+          }
           response.end('Test Server Response');
         });
 

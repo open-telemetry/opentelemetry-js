@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import * as api from '@opentelemetry/api-metrics';
 import { Logger, NoopLogger } from '@opentelemetry/api';
 import { BatchObserverResult } from './BatchObserverResult';
-import { MetricRecord } from './export/types';
 
 const NOOP_CALLBACK = () => {};
 const MAX_TIMEOUT_UPDATE_MS = 500;
@@ -38,7 +37,7 @@ export class BatchObserver {
     this._callback = callback || NOOP_CALLBACK;
   }
 
-  collect(): Promise<MetricRecord[]> {
+  collect(): Promise<void> {
     this._logger.debug('getMetricRecord - start');
     return new Promise(resolve => {
       const observerResult = new BatchObserverResult();

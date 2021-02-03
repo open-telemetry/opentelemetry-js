@@ -13,26 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as assert from 'assert';
-import * as transform from '../../src/transformMetrics';
 import {
-  mockCounter,
-  mockDoubleCounter,
-  mockObserver,
-  ensureCounterIsCorrect,
-  ensureDoubleCounterIsCorrect,
-  ensureObserverIsCorrect,
-  ensureValueRecorderIsCorrect,
-  mockValueRecorder,
-  mockedResources,
-  mockedInstrumentationLibraries,
-  multiResourceMetricsGet,
-  multiInstrumentationLibraryMetricsGet,
-  mockSumObserver,
-  mockUpDownSumObserver,
-  ensureSumObserverIsCorrect,
-  ensureUpDownSumObserverIsCorrect,
-} from '../helper';
+  Counter,
+  SumObserver,
+  UpDownSumObserver,
+  ValueObserver,
+  ValueRecorder,
+} from '@opentelemetry/api-metrics';
+import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import {
   BoundCounter,
   BoundObserver,
@@ -40,18 +28,36 @@ import {
   Metric,
   SumAggregator,
 } from '@opentelemetry/metrics';
-import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import * as api from '@opentelemetry/api';
+import * as assert from 'assert';
+import * as transform from '../../src/transformMetrics';
+import {
+  ensureCounterIsCorrect,
+  ensureDoubleCounterIsCorrect,
+  ensureObserverIsCorrect,
+  ensureSumObserverIsCorrect,
+  ensureUpDownSumObserverIsCorrect,
+  ensureValueRecorderIsCorrect,
+  mockCounter,
+  mockDoubleCounter,
+  mockedInstrumentationLibraries,
+  mockedResources,
+  mockObserver,
+  mockSumObserver,
+  mockUpDownSumObserver,
+  mockValueRecorder,
+  multiInstrumentationLibraryMetricsGet,
+  multiResourceMetricsGet,
+} from '../helper';
 
 describe('transformMetrics', () => {
   describe('toCollectorMetric', async () => {
-    let counter: Metric<BoundCounter> & api.Counter;
-    let doubleCounter: Metric<BoundCounter> & api.Counter;
-    let observer: Metric<BoundObserver> & api.ValueObserver;
-    let sumObserver: Metric<BoundObserver> & api.SumObserver;
-    let upDownSumObserver: Metric<BoundObserver> & api.UpDownSumObserver;
-    let recorder: Metric<BoundValueRecorder> & api.ValueRecorder;
+    let counter: Metric<BoundCounter> & Counter;
+    let doubleCounter: Metric<BoundCounter> & Counter;
+    let observer: Metric<BoundObserver> & ValueObserver;
+    let sumObserver: Metric<BoundObserver> & SumObserver;
+    let upDownSumObserver: Metric<BoundObserver> & UpDownSumObserver;
+    let recorder: Metric<BoundValueRecorder> & ValueRecorder;
     beforeEach(() => {
       counter = mockCounter();
       doubleCounter = mockDoubleCounter();

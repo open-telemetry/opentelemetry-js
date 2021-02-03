@@ -22,15 +22,6 @@ export * from './context/propagation/TextMapPropagator';
 export * from './context/propagation/NoopTextMapPropagator';
 export * from './baggage/Baggage';
 export * from './baggage/EntryValue';
-export * from './metrics/BatchObserverResult';
-export * from './metrics/BoundInstrument';
-export * from './metrics/Meter';
-export * from './metrics/MeterProvider';
-export * from './metrics/Metric';
-export * from './metrics/NoopMeter';
-export * from './metrics/NoopMeterProvider';
-export * from './metrics/Observation';
-export * from './metrics/ObserverResult';
 export * from './trace/attributes';
 export * from './trace/Event';
 export * from './trace/link_context';
@@ -71,24 +62,22 @@ export {
 } from '@opentelemetry/context-base';
 
 import { ContextAPI } from './api/context';
+export type { ContextAPI } from './api/context';
 /** Entrypoint for context API */
 export const context = ContextAPI.getInstance();
 
 import { TraceAPI } from './api/trace';
+export type { TraceAPI } from './api/trace';
 /** Entrypoint for trace API */
 export const trace = TraceAPI.getInstance();
 
-import { MetricsAPI } from './api/metrics';
-/** Entrypoint for metrics API */
-export const metrics = MetricsAPI.getInstance();
-
 import { PropagationAPI } from './api/propagation';
+export type { PropagationAPI } from './api/propagation';
 /** Entrypoint for propagation API */
 export const propagation = PropagationAPI.getInstance();
 
 export default {
   trace,
-  metrics,
   context,
   propagation,
 };

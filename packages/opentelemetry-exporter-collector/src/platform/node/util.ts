@@ -18,6 +18,8 @@ import * as http from 'http';
 import * as https from 'https';
 import * as collectorTypes from '../../types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
+import { CollectorExporterNodeConfigBase } from '.';
+import { Logger } from '@opentelemetry/api';
 
 /**
  * Sends data using http
@@ -46,16 +48,10 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
       'Content-Type': contentType,
       ...collector.headers,
     },
+    agent: collector.agent,
   };
 
   const request = parsedUrl.protocol === 'http:' ? http.request : https.request;
-  const Agent = parsedUrl.protocol === 'http:' ? http.Agent : https.Agent;
-  if (collector.keepAlive) {
-    options.agent = new Agent({
-      ...collector.httpAgentOptions,
-      keepAlive: true,
-    });
-  }
 
   const req = request(options, (res: http.IncomingMessage) => {
     let data = '';
@@ -80,4 +76,27 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
   });
   req.write(data);
   req.end();
+}
+
+export function createHttpAgent(
+  logger: Logger,
+  config: CollectorExporterNodeConfigBase
+): http.Agent | https.Agent | undefined {
+  if (config.httpAgentOptions && config.keepAlive === false) {
+    logger.warn('httpAgentOptions is used only when keepAlive is true');
+    return undefined;
+  }
+
+  if (config.keepAlive === false || !config.url) return undefined;
+
+  try {
+    const parsedUrl = new url.URL(config.url as string);
+    const Agent = parsedUrl.protocol === 'http:' ? http.Agent : https.Agent;
+    return new Agent({ keepAlive: true, ...config.httpAgentOptions });
+  } catch (err) {
+    logger.error(
+      `collector exporter failed to create http agent. err: ${err.message}`
+    );
+    return undefined;
+  }
 }

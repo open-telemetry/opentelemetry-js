@@ -1,6 +1,5 @@
 # OpenTelemetry Instrumentation for web and node
 
-[![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
 [![devDependencies][devDependencies-image]][devDependencies-url]
@@ -113,6 +112,7 @@ const myPLugin = new MyPlugin();
 myPLugin.setTracerProvider(provider); // this is optional
 myPLugin.setMeterProvider(meterProvider); // this is optional
 myPLugin.enable();
+// or use Auto Loader
 ```
 
 ## Usage in Web
@@ -154,15 +154,126 @@ const myPLugin = new MyPlugin();
 myPLugin.setTracerProvider(provider);
 myPLugin.setMeterProvider(meterProvider);
 myPLugin.enable();
+// or use Auto Loader
+```
+
+## AutoLoader
+
+Successor of loading plugins through TracerProvider "plugins" option.
+It also supersedes PluginLoader for node. The old configurations usually looks like
+
+### NODE - old way using TracerProvider
+
+```javascript
+const { NodeTracerProvider } = require('@opentelemetry/node');
+const { B3Propagator } = require('@opentelemetry/propagator-b3');
+const provider = new NodeTracerProvider({
+  plugins: {
+    http: { enabled: false },
+  },
+});
+provider.register({
+  propagator: new B3Propagator(),
+});
+```
+
+### WEB - old way using TracerProvider
+
+```javascript
+const { WebTracerProvider } = require('@opentelemetry/web');
+const { UserInteractionPlugin } = require('@opentelemetry/plugin-user-interaction');
+const { XMLHttpRequestInstrumentation } = require('@opentelemetry/instrumentation-xml-http-request');
+const { B3Propagator } = require('@opentelemetry/propagator-b3');
+const provider = new WebTracerProvider({
+  plugins: [
+    new UserInteractionPlugin(),
+    new XMLHttpRequestInstrumentation({
+      ignoreUrls: [/localhost/],
+      propagateTraceHeaderCorsUrls: [
+        'http://localhost:8090',
+      ],
+    }),
+  ],
+});
+provider.register({
+  propagator: new B3Propagator(),
+});
+```
+
+After change it will look like this - mixing plugins and instrumentations together
+All plugins will be bound to TracerProvider as well as instrumentations
+
+### NODE - Auto Loader
+
+```javascript
+const { B3Propagator } = require('@opentelemetry/propagator-b3');
+const { registerInstrumentations } = require('@opentelemetry/instrumentation');
+const { GraphQLInstrumentation } = require('@opentelemetry/instrumentation-graphql');
+const { NodeTracerProvider } = require('@opentelemetry/node');
+const tracerProvider = new NodeTracerProvider();
+
+registerInstrumentations({
+  instrumentations: [
+    new UserInteractionPlugin(),
+    new XMLHttpRequestInstrumentation({
+      ignoreUrls: [/localhost/],
+      propagateTraceHeaderCorsUrls: [
+        'http://localhost:8090',
+      ],
+    }),
+  ],
+  meterProvider: meterProvider,
+  tracerProvider: tracerProvider,
+  logger: new ConsoleLogger(), // optional
+});
+
+tracerProvider.register({
+  propagator: new B3Propagator(),
+});
+
+```
+
+### WEB - Auto Loader
+
+```javascript
+const { B3Propagator } = require('@opentelemetry/propagator-b3');
+const { registerInstrumentations } = require('@opentelemetry/instrumentation');
+import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xml-http-request';
+const { UserInteractionPlugin } = require('@opentelemetry/plugin-user-interaction');
+const { WebTracerProvider } = require('@opentelemetry/web');
+const tracerProvider = new WebTracerProvider();
+
+registerInstrumentations({
+  instrumentations: [
+    new GraphQLInstrumentation(),
+    {
+      plugins: {
+        http: { enabled: false },
+      },
+    }
+  ],
+  meterProvider: meterProvider,
+  tracerProvider: tracerProvider,
+  logger: new ConsoleLogger(), // optional
+});
+
+tracerProvider.register({
+  propagator: new B3Propagator(),
+});
+
 ```
 
 ## License
 
 Apache 2.0 - See [LICENSE][license-url] for more information.
 
-[gitter-image]: https://badges.gitter.im/open-telemetry/opentelemetry-js.svg
-[gitter-url]: https://gitter.im/open-telemetry/opentelemetry-node?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
+## Useful links
+
+- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
+- For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
+
+[discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
+[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-instrumentation
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-instrumentation

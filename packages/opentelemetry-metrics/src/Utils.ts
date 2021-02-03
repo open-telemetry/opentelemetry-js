@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Labels } from '@opentelemetry/api';
+import { Labels } from '@opentelemetry/api-metrics';
 
 /**
  * Type guard to remove nulls from arrays

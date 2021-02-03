@@ -74,7 +74,7 @@ export class ZipkinExporter implements SpanExporter {
       );
       return;
     }
-    const promise = new Promise(resolve => {
+    const promise = new Promise<void>(resolve => {
       this._sendSpans(spans, this._serviceName!, result => {
         resolve();
         resultCallback(result);
@@ -109,7 +109,11 @@ export class ZipkinExporter implements SpanExporter {
     const zipkinSpans = spans.map(span =>
       toZipkinSpan(
         span,
-        serviceName,
+        String(
+          span.attributes[SERVICE_RESOURCE.NAME] ||
+            span.resource.attributes[SERVICE_RESOURCE.NAME] ||
+            serviceName
+        ),
         this._statusCodeTagName,
         this._statusDescriptionTagName
       )

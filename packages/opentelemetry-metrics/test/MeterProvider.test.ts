@@ -51,7 +51,7 @@ describe('MeterProvider', () => {
     it('should return the meter with default version without a version option', () => {
       const provider = new MeterProvider();
       const meter1 = provider.getMeter('default');
-      const meter2 = provider.getMeter('default', '*');
+      const meter2 = provider.getMeter('default', undefined);
       assert.deepEqual(meter1, meter2);
     });
 

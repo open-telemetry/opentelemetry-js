@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { ConsoleMetricExporter, MeterProvider, MetricKind } from '../../src';
-import { ValueType } from '@opentelemetry/api';
+import { ValueType } from '@opentelemetry/api-metrics';
 
 describe('ConsoleMetricExporter', () => {
   let consoleExporter: ConsoleMetricExporter;

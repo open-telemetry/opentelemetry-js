@@ -19,7 +19,6 @@ import {
   Link,
   SpanKind,
   Status,
-  StatusCode,
   TimedEvent,
   TraceState,
 } from '@opentelemetry/api';
@@ -193,23 +192,6 @@ export function toCollectorSpan(
 }
 
 /**
- * Converts StatusCode
- * @param code
- */
-export function toCollectorCode(
-  code: StatusCode
-): opentelemetryProto.trace.v1.StatusCode {
-  switch (code) {
-    case StatusCode.OK:
-      return opentelemetryProto.trace.v1.StatusCode.OK;
-    case StatusCode.UNSET:
-      return opentelemetryProto.trace.v1.StatusCode.UNSET;
-    default:
-      return opentelemetryProto.trace.v1.StatusCode.ERROR;
-  }
-}
-
-/**
  * Converts status
  * @param status
  */
@@ -217,7 +199,7 @@ export function toCollectorStatus(
   status: Status
 ): opentelemetryProto.trace.v1.Status {
   const spanStatus: opentelemetryProto.trace.v1.Status = {
-    code: toCollectorCode(status.code),
+    code: status.code,
   };
   if (typeof status.message !== 'undefined') {
     spanStatus.message = status.message;

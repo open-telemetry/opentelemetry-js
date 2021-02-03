@@ -11,6 +11,9 @@
   "references": [
     {
       "path": "../opentelemetry-api"
+    },
+    {
+      "path": "../opentelemetry-api-metrics"
     }
   ]
 }
