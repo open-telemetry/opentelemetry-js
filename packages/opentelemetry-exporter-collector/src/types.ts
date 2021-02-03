@@ -22,6 +22,8 @@ import {
 } from '@opentelemetry/api';
 
 /* eslint-disable @typescript-eslint/no-namespace */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 export namespace opentelemetryProto {
   export namespace collector {
     export namespace trace.v1 {

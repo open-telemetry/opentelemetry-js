@@ -231,9 +231,9 @@ describe('Span', () => {
     span.setAttribute('array<number>', [1, 2]);
     span.setAttribute('array<bool>', [true, false]);
 
-    //@ts-expect-error
+    //@ts-expect-error invalid attribute type object
     span.setAttribute('object', { foo: 'bar' });
-    //@ts-expect-error
+    //@ts-expect-error invalid attribute inhomogenous array
     span.setAttribute('non-homogeneous-array', [0, '']);
 
     assert.deepStrictEqual(span.attributes, {
@@ -279,9 +279,9 @@ describe('Span', () => {
       'array<string>': ['str1', 'str2'],
       'array<number>': [1, 2],
       'array<bool>': [true, false],
-      //@ts-expect-error
+      //@ts-expect-error invalid attribute type object
       object: { foo: 'bar' },
-      //@ts-expect-error
+      //@ts-expect-error invalid attribute inhomogenous array
       'non-homogeneous-array': [0, ''],
     });
 
