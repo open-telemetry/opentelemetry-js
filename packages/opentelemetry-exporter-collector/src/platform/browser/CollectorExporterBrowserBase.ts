@@ -68,7 +68,7 @@ export abstract class CollectorExporterBrowserBase<
     const serviceRequest = this.convert(items);
     const body = JSON.stringify(serviceRequest);
 
-    const promise = new Promise(resolve => {
+    const promise = new Promise<void>(resolve => {
       const _onSuccess = (): void => {
         onSuccess();
         _onFinish();

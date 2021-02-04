@@ -271,7 +271,7 @@ describe('HttpTraceContext', () => {
 
     it('should fail gracefully on bad responses from getter', () => {
       const ctx1 = httpTraceContext.extract(ROOT_CONTEXT, carrier, {
-        // @ts-expect-error
+        // @ts-expect-error verify with number
         get: (c, k) => 1, // not a number
         keys: () => [],
       });

@@ -335,7 +335,7 @@ export class FetchInstrumentation extends InstrumentationBase<
               return original
                 .apply(this, [url, options])
                 .then(
-                  onSuccess.bind(this, span, resolve),
+                  (onSuccess as any).bind(this, span, resolve),
                   onError.bind(this, span, reject)
                 );
             }

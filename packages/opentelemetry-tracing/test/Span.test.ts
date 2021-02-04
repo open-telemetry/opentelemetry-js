@@ -15,7 +15,7 @@
  */
 
 import {
-  StatusCode,
+  SpanStatusCode,
   Exception,
   LinkContext,
   ROOT_CONTEXT,
@@ -231,9 +231,9 @@ describe('Span', () => {
     span.setAttribute('array<number>', [1, 2]);
     span.setAttribute('array<bool>', [true, false]);
 
-    //@ts-expect-error
+    //@ts-expect-error invalid attribute type object
     span.setAttribute('object', { foo: 'bar' });
-    //@ts-expect-error
+    //@ts-expect-error invalid attribute inhomogenous array
     span.setAttribute('non-homogeneous-array', [0, '']);
 
     assert.deepStrictEqual(span.attributes, {
@@ -279,9 +279,9 @@ describe('Span', () => {
       'array<string>': ['str1', 'str2'],
       'array<number>': [1, 2],
       'array<bool>': [true, false],
-      //@ts-expect-error
+      //@ts-expect-error invalid attribute type object
       object: { foo: 'bar' },
-      //@ts-expect-error
+      //@ts-expect-error invalid attribute inhomogenous array
       'non-homogeneous-array': [0, ''],
     });
 
@@ -362,7 +362,7 @@ describe('Span', () => {
       SpanKind.CLIENT
     );
     span.setStatus({
-      code: StatusCode.ERROR,
+      code: SpanStatusCode.ERROR,
       message: 'This is an error',
     });
     span.end();
@@ -384,7 +384,7 @@ describe('Span', () => {
     assert.strictEqual(span.parentSpanId, parentId);
     assert.strictEqual(span.spanContext.traceId, spanContext.traceId);
     assert.deepStrictEqual(span.status, {
-      code: StatusCode.UNSET,
+      code: SpanStatusCode.UNSET,
     });
     assert.deepStrictEqual(span.attributes, {});
     assert.deepStrictEqual(span.links, []);
@@ -496,19 +496,19 @@ describe('Span', () => {
       SpanKind.CLIENT
     );
     span.setStatus({
-      code: StatusCode.ERROR,
+      code: SpanStatusCode.ERROR,
       message: 'This is an error',
     });
-    assert.strictEqual(span.status.code, StatusCode.ERROR);
+    assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
     assert.strictEqual(span.status.message, 'This is an error');
     span.end();
 
     // shouldn't update status
     span.setStatus({
-      code: StatusCode.OK,
+      code: SpanStatusCode.OK,
       message: 'OK',
     });
-    assert.strictEqual(span.status.code, StatusCode.ERROR);
+    assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
   });
 
   it('should only end a span once', () => {
