@@ -224,7 +224,7 @@ describe('transform', () => {
         version: '1',
       });
     });
-    it('should map OpenTelemetry Status.code to a Zipkin tag', () => {
+    it('should map OpenTelemetry SpanStatus.code to a Zipkin tag', () => {
       const span = new Span(
         tracer,
         api.ROOT_CONTEXT,
@@ -233,8 +233,8 @@ describe('transform', () => {
         api.SpanKind.SERVER,
         parentId
       );
-      const status: api.Status = {
-        code: api.StatusCode.ERROR,
+      const status: api.SpanStatus = {
+        code: api.SpanStatusCode.ERROR,
       };
       span.setStatus(status);
       span.setAttributes({
@@ -255,7 +255,7 @@ describe('transform', () => {
         [statusCodeTagName]: 'ERROR',
       });
     });
-    it('should map OpenTelemetry Status.message to a Zipkin tag', () => {
+    it('should map OpenTelemetry SpanStatus.message to a Zipkin tag', () => {
       const span = new Span(
         tracer,
         api.ROOT_CONTEXT,
@@ -264,8 +264,8 @@ describe('transform', () => {
         api.SpanKind.SERVER,
         parentId
       );
-      const status: api.Status = {
-        code: api.StatusCode.ERROR,
+      const status: api.SpanStatus = {
+        code: api.SpanStatusCode.ERROR,
         message: 'my-message',
       };
       span.setStatus(status);

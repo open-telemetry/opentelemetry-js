@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { AttributeValue, Attributes } from '@opentelemetry/api';
+import { SpanAttributeValue, SpanAttributes } from '@opentelemetry/api';
 
-export function sanitizeAttributes(attributes: unknown): Attributes {
-  const out: Attributes = {};
+export function sanitizeAttributes(attributes: unknown): SpanAttributes {
+  const out: SpanAttributes = {};
 
   if (attributes == null || typeof attributes !== 'object') {
     return out;
@@ -35,7 +35,7 @@ export function sanitizeAttributes(attributes: unknown): Attributes {
   return out;
 }
 
-export function isAttributeValue(val: unknown): val is AttributeValue {
+export function isAttributeValue(val: unknown): val is SpanAttributeValue {
   if (val == null) {
     return true;
   }

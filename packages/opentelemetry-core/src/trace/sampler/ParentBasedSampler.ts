@@ -15,7 +15,7 @@
  */
 
 import {
-  Attributes,
+  SpanAttributes,
   Context,
   getSpanContext,
   Link,
@@ -64,7 +64,7 @@ export class ParentBasedSampler implements Sampler {
     traceId: string,
     spanName: string,
     spanKind: SpanKind,
-    attributes: Attributes,
+    attributes: SpanAttributes,
     links: Link[]
   ): SamplingResult {
     const parentContext = getSpanContext(context);
