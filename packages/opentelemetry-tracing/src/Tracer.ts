@@ -68,7 +68,7 @@ export class Tracer implements api.Tracer {
   ): api.Span {
     if (api.isInstrumentationSuppressed(context)) {
       this.logger.debug('Instrumentation suppressed, returning Noop Span');
-      return api.NOOP_SPAN;
+      return new api.NoopSpan();
     }
 
     const parentContext = getParent(options, context);

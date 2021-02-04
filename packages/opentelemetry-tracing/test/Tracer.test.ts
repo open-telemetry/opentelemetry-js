@@ -19,7 +19,6 @@ import {
   NoopSpan,
   Sampler,
   SamplingDecision,
-  NOOP_SPAN,
   TraceFlags,
   ROOT_CONTEXT,
   suppressInstrumentation,
@@ -130,7 +129,7 @@ describe('Tracer', () => {
 
       const span = tracer.startSpan('span3', undefined, context);
 
-      assert.equal(span, NOOP_SPAN);
+      assert.ok(span instanceof NoopSpan);
       span.end();
 
       done();

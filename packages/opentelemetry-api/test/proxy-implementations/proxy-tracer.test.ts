@@ -18,7 +18,6 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
   NoopSpan,
-  NOOP_SPAN,
   ProxyTracerProvider,
   SpanKind,
   TracerProvider,
@@ -52,16 +51,14 @@ describe('ProxyTracer', () => {
     it('startSpan should return Noop Spans', () => {
       const tracer = provider.getTracer('test');
 
-      assert.deepStrictEqual(tracer.startSpan('span-name'), NOOP_SPAN);
-      assert.deepStrictEqual(
-        tracer.startSpan('span-name1', { kind: SpanKind.CLIENT }),
-        NOOP_SPAN
+      assert.ok(tracer.startSpan('span-name') instanceof NoopSpan);
+      assert.ok(
+        tracer.startSpan('span-name1', { kind: SpanKind.CLIENT }) instanceof
+          NoopSpan
       );
-      assert.deepStrictEqual(
-        tracer.startSpan('span-name2', {
-          kind: SpanKind.CLIENT,
-        }),
-        NOOP_SPAN
+      assert.ok(
+        tracer.startSpan('span-name2', { kind: SpanKind.CLIENT }) instanceof
+          NoopSpan
       );
     });
   });
