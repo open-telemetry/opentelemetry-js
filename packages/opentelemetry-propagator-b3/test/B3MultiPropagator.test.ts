@@ -468,7 +468,7 @@ describe('B3MultiPropagator', () => {
 
     it('should fail gracefully on bad responses from getter', () => {
       const ctx1 = b3Propagator.extract(ROOT_CONTEXT, carrier, {
-        // @ts-expect-error
+        // @ts-expect-error verify number is not allowed
         get: (c, k) => 1, // not a number
         keys: defaultTextMapGetter.keys,
       });

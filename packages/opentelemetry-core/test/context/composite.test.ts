@@ -176,7 +176,7 @@ describe('Composite Propagator', () => {
             inject: () => {},
             fields: () => ['p1'],
           },
-          // @ts-expect-error
+          // @ts-expect-error verify missing fields case
           {
             extract: c => c,
             inject: () => {},

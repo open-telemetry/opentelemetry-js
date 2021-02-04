@@ -49,6 +49,6 @@ The current `MetricExporter` interface (`0.2.0`) defines 2 methods:
 
 Please refer to the [Prometheus Exporter][prometheus-exporter] for more comprehensive examples.
 
-[zipkin-exporter]: https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-exporter-zipkin
-[jaeger-exporter]: https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-exporter-jaeger
-[prometheus-exporter]: https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-exporter-prometheus
+[zipkin-exporter]: https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-exporter-zipkin
+[jaeger-exporter]: https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-exporter-jaeger
+[prometheus-exporter]: https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-exporter-prometheus

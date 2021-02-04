@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-export interface Attributes {
-  [attributeKey: string]: AttributeValue | undefined;
+export interface SpanAttributes {
+  [attributeKey: string]: SpanAttributeValue | undefined;
 }
 
 /**
@@ -23,7 +23,7 @@ export interface Attributes {
  *
  * null or undefined attribute values are invalid and will result in undefined behavior.
  */
-export type AttributeValue =
+export type SpanAttributeValue =
   | string
   | number
   | boolean

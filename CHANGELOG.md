@@ -4,6 +4,49 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.16.0
+
+### :boom: Breaking Change
+
+* `opentelemetry-exporter-collector`
+  * [#1863](https://github.com/open-telemetry/opentelemetry-js/pull/1863) fix(exporter-collector): all http export requests should share same a… ([@blumamir](https://github.com/blumamir))
+* `opentelemetry-api`, `opentelemetry-exporter-collector`, `opentelemetry-exporter-jaeger`
+  * [#1860](https://github.com/open-telemetry/opentelemetry-js/pull/1860) chore: fixing status code aligning it with proto ([@obecny](https://github.com/obecny))
+
+### :rocket: (Enhancement)
+
+* `opentelemetry-core`
+  * [#1837](https://github.com/open-telemetry/opentelemetry-js/pull/1837) chore(http-propagation): reduce complexity of traceparent parsing ([@marcbachmann](https://github.com/marcbachmann))
+* `opentelemetry-api`, `opentelemetry-exporter-collector`, `opentelemetry-exporter-jaeger`
+  * [#1860](https://github.com/open-telemetry/opentelemetry-js/pull/1860) chore: fixing status code aligning it with proto ([@obecny](https://github.com/obecny))
+
+### :bug: (Bug Fix)
+
+* `opentelemetry-exporter-collector`
+  * [#1863](https://github.com/open-telemetry/opentelemetry-js/pull/1863) fix(exporter-collector): all http export requests should share same a… ([@blumamir](https://github.com/blumamir))
+
+### :books: (Refine Doc)
+
+* `opentelemetry-api`
+  * [#1864](https://github.com/open-telemetry/opentelemetry-js/pull/1864) chore: export API singleton types ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-api-metrics`, `opentelemetry-api`, `opentelemetry-context-async-hooks`, `opentelemetry-context-base`, `opentelemetry-context-zone-peer-dep`, `opentelemetry-context-zone`, `opentelemetry-core`, `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`, `opentelemetry-exporter-jaeger`, `opentelemetry-exporter-prometheus`, `opentelemetry-exporter-zipkin`, `opentelemetry-grpc-utils`, `opentelemetry-instrumentation-fetch`, `opentelemetry-instrumentation-grpc`, `opentelemetry-instrumentation-http`, `opentelemetry-instrumentation-xml-http-request`, `opentelemetry-instrumentation`, `opentelemetry-metrics`, `opentelemetry-node`, `opentelemetry-plugin-grpc-js`, `opentelemetry-plugin-grpc`, `opentelemetry-plugin-http`, `opentelemetry-plugin-https`, `opentelemetry-propagator-b3`, `opentelemetry-resource-detector-aws`, `opentelemetry-resource-detector-gcp`, `opentelemetry-resources`, `opentelemetry-sdk-node`, `opentelemetry-semantic-conventions`, `opentelemetry-shim-opentracing`, `opentelemetry-tracing`, `opentelemetry-web`
+  * [#1866](https://github.com/open-telemetry/opentelemetry-js/pull/1866) chore: remove all gitter links and replace with dicussions ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-exporter-jaeger`
+  * [#1869](https://github.com/open-telemetry/opentelemetry-js/pull/1869) Add info that the project only works with Node.js ([@JapuDCret](https://github.com/JapuDCret))
+* `opentelemetry-api-metrics`, `opentelemetry-api`, `opentelemetry-context-async-hooks`, `opentelemetry-context-base`, `opentelemetry-context-zone-peer-dep`, `opentelemetry-context-zone`, `opentelemetry-core`, `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`, `opentelemetry-exporter-jaeger`, `opentelemetry-exporter-prometheus`, `opentelemetry-exporter-zipkin`, `opentelemetry-grpc-utils`, `opentelemetry-instrumentation-fetch`, `opentelemetry-instrumentation-grpc`, `opentelemetry-instrumentation-http`, `opentelemetry-instrumentation-xml-http-request`, `opentelemetry-instrumentation`, `opentelemetry-metrics`, `opentelemetry-node`, `opentelemetry-plugin-grpc-js`, `opentelemetry-plugin-grpc`, `opentelemetry-plugin-http`, `opentelemetry-plugin-https`, `opentelemetry-resource-detector-aws`, `opentelemetry-resource-detector-gcp`, `opentelemetry-resources`, `opentelemetry-sdk-node`, `opentelemetry-semantic-conventions`, `opentelemetry-shim-opentracing`, `opentelemetry-tracing`, `opentelemetry-web`
+  * [#1865](https://github.com/open-telemetry/opentelemetry-js/pull/1865) Fix all links to point to main ([@dyladan](https://github.com/dyladan))
+* Other
+  * [#1858](https://github.com/open-telemetry/opentelemetry-js/pull/1858) docs: update contribution documentation ([@drexler](https://github.com/drexler))
+
+### Committers: 6
+
+* Amir Blum ([@blumamir](https://github.com/blumamir))
+* Bartlomiej Obecny ([@obecny](https://github.com/obecny))
+* Daniel Dyla ([@dyladan](https://github.com/dyladan))
+* Marc Bachmann ([@marcbachmann](https://github.com/marcbachmann))
+* [@JapuDCret](https://github.com/JapuDCret)
+* andrew quartey ([@drexler](https://github.com/drexler))
+
 ## 0.15.0
 
 ### :boom: Breaking Change

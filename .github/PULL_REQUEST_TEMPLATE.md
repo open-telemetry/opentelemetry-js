@@ -5,7 +5,7 @@ Before creating a pull request, please make sure:
 - Your PR is solving one problem
 - Please provide enough information so that others can review your pull request
 - You have read the guide for contributing
-  - See https://github.com/open-telemetry/opentelemetry-js/blob/master/CONTRIBUTING.md
+  - See https://github.com/open-telemetry/opentelemetry-js/blob/main/CONTRIBUTING.md
 - You signed all your commits (otherwise we won't be able to merge the PR)
   - See https://github.com/open-telemetry/community/blob/master/CONTRIBUTING.md#sign-the-cla
 - You added unit tests for the new functionality

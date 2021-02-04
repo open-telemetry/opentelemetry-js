@@ -15,7 +15,7 @@
  */
 
 import { Context } from '@opentelemetry/context-base';
-import { Attributes } from './attributes';
+import { SpanAttributes } from './attributes';
 import { Link } from './link';
 import { SamplingResult } from './SamplingResult';
 import { SpanKind } from './span_kind';
@@ -35,7 +35,7 @@ export interface Sampler {
    *     span to be created starts a new trace.
    * @param spanName of the span to be created.
    * @param spanKind of the span to be created.
-   * @param attributes Initial set of Attributes for the Span being constructed.
+   * @param attributes Initial set of SpanAttributes for the Span being constructed.
    * @param links Collection of links that will be associated with the Span to
    *     be created. Typically useful for batch operations.
    * @returns a {@link SamplingResult}.
@@ -45,7 +45,7 @@ export interface Sampler {
     traceId: string,
     spanName: string,
     spanKind: SpanKind,
-    attributes: Attributes,
+    attributes: SpanAttributes,
     links: Link[]
   ): SamplingResult;
 

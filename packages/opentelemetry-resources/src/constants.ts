@@ -28,7 +28,7 @@ export const CLOUD_RESOURCE = {
 };
 
 /**
- * Attributes defining a compute unit (e.g. Container, Process, Lambda
+ * SpanAttributes defining a compute unit (e.g. Container, Process, Lambda
  * Function).
  * */
 export const CONTAINER_RESOURCE = {
@@ -45,7 +45,7 @@ export const CONTAINER_RESOURCE = {
   IMAGE_TAG: 'container.image.tag',
 };
 
-/** Attributes defining a computing instance (e.g. host). */
+/** SpanAttributes defining a computing instance (e.g. host). */
 export const HOST_RESOURCE = {
   /**
    * Unique host id. For Cloud this must be the instance_id assigned by the
@@ -72,7 +72,7 @@ export const HOST_RESOURCE = {
   IMAGE_VERSION: 'host.image.version',
 };
 
-/** Attributes defining a deployment service (e.g. Kubernetes). */
+/** SpanAttributes defining a deployment service (e.g. Kubernetes). */
 export const K8S_RESOURCE = {
   /** The name of the cluster that the pod is running in. */
   CLUSTER_NAME: 'k8s.cluster.name',
@@ -87,7 +87,7 @@ export const K8S_RESOURCE = {
   DEPLOYMENT_NAME: 'k8s.deployment.name',
 };
 
-/** Attributes describing the telemetry library. */
+/** SpanAttributes describing the telemetry library. */
 export const TELEMETRY_SDK_RESOURCE = {
   /** The name of the telemetry library. */
   NAME: 'telemetry.sdk.name',
@@ -99,7 +99,7 @@ export const TELEMETRY_SDK_RESOURCE = {
   VERSION: 'telemetry.sdk.version',
 };
 
-/** Attributes describing a service instance. */
+/** SpanAttributes describing a service instance. */
 export const SERVICE_RESOURCE = {
   /** Logical name of the service.  */
   NAME: 'service.name',
@@ -114,7 +114,7 @@ export const SERVICE_RESOURCE = {
   VERSION: 'service.version',
 };
 
-/** Attributes describing a Process. */
+/** SpanAttributes describing a Process. */
 export const PROCESS_RESOURCE = {
   /** A command which launced this proces.  */
   COMMAND: 'process.command',
