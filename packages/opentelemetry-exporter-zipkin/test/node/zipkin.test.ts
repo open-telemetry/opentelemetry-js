@@ -47,7 +47,7 @@ function getReadableSpan() {
     ended: true,
     duration: [duration, 0],
     status: {
-      code: api.StatusCode.OK,
+      code: api.SpanStatusCode.OK,
     },
     attributes: {},
     links: [],
@@ -146,7 +146,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.StatusCode.OK,
+          code: api.SpanStatusCode.OK,
         },
         attributes: {
           key1: 'value1',
@@ -176,7 +176,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.StatusCode.OK,
+          code: api.SpanStatusCode.OK,
         },
         attributes: {},
         links: [],
@@ -338,7 +338,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.StatusCode.OK,
+          code: api.SpanStatusCode.OK,
         },
         attributes: {
           key1: 'value1',
@@ -368,7 +368,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.StatusCode.OK,
+          code: api.SpanStatusCode.OK,
         },
         attributes: {},
         links: [],
@@ -410,7 +410,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.StatusCode.OK,
+          code: api.SpanStatusCode.OK,
         },
         attributes: {
           key1: 'value1',
@@ -442,7 +442,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.StatusCode.OK,
+          code: api.SpanStatusCode.OK,
         },
         attributes: {},
         links: [],
@@ -513,7 +513,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.StatusCode.OK,
+          code: api.SpanStatusCode.OK,
         },
         attributes: {
           key1: 'value1',
@@ -545,7 +545,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.StatusCode.OK,
+          code: api.SpanStatusCode.OK,
         },
         attributes: {},
         links: [],
@@ -602,7 +602,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.StatusCode.OK,
+          code: api.SpanStatusCode.OK,
         },
         attributes: {
           key1: 'value1',
@@ -633,7 +633,7 @@ describe('Zipkin Exporter - node', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: api.StatusCode.OK,
+          code: api.SpanStatusCode.OK,
         },
         attributes: {
           [SERVICE_RESOURCE.NAME]: span_service_name_prime,

@@ -118,7 +118,7 @@ describe('JaegerExporter', () => {
       endTime: [1566156731, 709],
       ended: true,
       status: {
-        code: api.StatusCode.ERROR,
+        code: api.SpanStatusCode.ERROR,
       },
       attributes: {},
       links: [],

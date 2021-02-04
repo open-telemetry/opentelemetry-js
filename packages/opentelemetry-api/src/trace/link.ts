@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes } from './attributes';
+import { SpanAttributes } from './attributes';
 import { LinkContext } from './link_context';
 
 /**
@@ -35,6 +35,6 @@ import { LinkContext } from './link_context';
 export interface Link {
   /** The {@link LinkContext} of a linked span. */
   context: LinkContext;
-  /** A set of {@link Attributes} on the link. */
-  attributes?: Attributes;
+  /** A set of {@link SpanAttributes} on the link. */
+  attributes?: SpanAttributes;
 }

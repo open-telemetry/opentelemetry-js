@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Link, StatusCode, SpanKind } from '@opentelemetry/api';
+import { Link, SpanStatusCode, SpanKind } from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import {
   hrTimeToMilliseconds,
@@ -51,13 +51,13 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
     (name): Tag => ({ key: name, value: toTagValue(span.attributes[name]) })
   );
   tags.push({ key: 'status.code', value: span.status.code });
-  tags.push({ key: 'status.name', value: StatusCode[span.status.code] });
+  tags.push({ key: 'status.name', value: SpanStatusCode[span.status.code] });
   if (span.status.message) {
     tags.push({ key: 'status.message', value: span.status.message });
   }
-  // Ensure that if Status.Code is ERROR, that we set the "error" tag on the
+  // Ensure that if SpanStatus.Code is ERROR, that we set the "error" tag on the
   // Jaeger span.
-  if (span.status.code === StatusCode.ERROR) {
+  if (span.status.code === SpanStatusCode.ERROR) {
     tags.push({ key: 'error', value: true });
   }
 

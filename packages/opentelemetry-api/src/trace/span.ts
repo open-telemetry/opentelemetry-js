@@ -16,9 +16,9 @@
 
 import { Exception } from '../common/Exception';
 import { TimeInput } from '../common/Time';
-import { Attributes, AttributeValue } from './attributes';
+import { SpanAttributes, SpanAttributeValue } from './attributes';
 import { SpanContext } from './span_context';
-import { Status } from './status';
+import { SpanStatus } from './status';
 
 /**
  * An interface that represents a span. A span represents a single operation
@@ -50,7 +50,7 @@ export interface Span {
    * @param value the value for this attribute. Setting a value null or
    *              undefined is invalid and will result in undefined behavior.
    */
-  setAttribute(key: string, value: AttributeValue): this;
+  setAttribute(key: string, value: SpanAttributeValue): this;
 
   /**
    * Sets attributes to the span.
@@ -59,7 +59,7 @@ export interface Span {
    *                   null or undefined attribute values
    *                   are invalid and will result in undefined behavior.
    */
-  setAttributes(attributes: Attributes): this;
+  setAttributes(attributes: SpanAttributes): this;
 
   /**
    * Adds an event to the Span.
@@ -72,18 +72,18 @@ export interface Span {
    */
   addEvent(
     name: string,
-    attributesOrStartTime?: Attributes | TimeInput,
+    attributesOrStartTime?: SpanAttributes | TimeInput,
     startTime?: TimeInput
   ): this;
 
   /**
    * Sets a status to the span. If used, this will override the default Span
-   * status. Default is {@link StatusCode.UNSET}. SetStatus overrides the value
+   * status. Default is {@link SpanStatusCode.UNSET}. SetStatus overrides the value
    * of previous calls to SetStatus on the Span.
    *
-   * @param status the Status to set.
+   * @param status the SpanStatus to set.
    */
-  setStatus(status: Status): this;
+  setStatus(status: SpanStatus): this;
 
   /**
    * Updates the Span name.

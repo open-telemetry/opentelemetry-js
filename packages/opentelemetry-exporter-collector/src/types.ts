@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { Attributes, Logger, SpanKind, StatusCode } from '@opentelemetry/api';
+import {
+  SpanAttributes,
+  Logger,
+  SpanKind,
+  SpanStatusCode,
+} from '@opentelemetry/api';
 
 /* eslint-disable @typescript-eslint/no-namespace */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -252,12 +257,12 @@ export namespace opentelemetryProto {
       droppedEventsCount: number;
       links?: opentelemetryProto.trace.v1.Span.Link[];
       droppedLinksCount: number;
-      status?: Status;
+      status?: SpanStatus;
     }
 
-    export interface Status {
+    export interface SpanStatus {
       /** The status code of this message. */
-      code: StatusCode;
+      code: SpanStatusCode;
       /** A developer-facing error message. */
       message?: string;
     }
@@ -345,7 +350,7 @@ export interface CollectorExporterConfigBase {
   hostname?: string;
   logger?: Logger;
   serviceName?: string;
-  attributes?: Attributes;
+  attributes?: SpanAttributes;
   url?: string;
   concurrencyLimit?: number;
 }
