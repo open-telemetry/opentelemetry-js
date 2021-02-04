@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { EntryValue } from './EntryValue';
+import { BaggageEntryValue } from './EntryValue';
 
 /**
  * Baggage represents collection of entries. Each key of
@@ -25,5 +25,5 @@ import { EntryValue } from './EntryValue';
  * dimension to the metric or additional contest properties to logs and traces.
  */
 export interface Baggage {
-  [entryKey: string]: EntryValue;
+  [entryKey: string]: BaggageEntryValue;
 }
