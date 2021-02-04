@@ -124,7 +124,7 @@ export function createLogLevelDiagLogger(
   }
 
   if (!logger) {
-    logger = DiagAPI.instance().getLogger();
+    logger = DiagAPI.instance();
   }
 
   function _filterFunc(
