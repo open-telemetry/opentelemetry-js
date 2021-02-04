@@ -20,6 +20,7 @@ import {
   TraceFlags,
   ROOT_CONTEXT,
   NoopLogger,
+  NoopSpan,
   setSpan,
   setSpanContext,
   getSpan,
@@ -27,7 +28,6 @@ import {
 import {
   AlwaysOnSampler,
   AlwaysOffSampler,
-  NoRecordingSpan,
   TraceState,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
@@ -264,7 +264,7 @@ describe('BasicTracerProvider', () => {
         logger: new NoopLogger(),
       }).getTracer('default');
       const span = tracer.startSpan('my-span');
-      assert.ok(span instanceof NoRecordingSpan);
+      assert.ok(span instanceof NoopSpan);
       const context = span.context();
       assert.ok(context.traceId.match(/[a-f0-9]{32}/));
       assert.ok(context.spanId.match(/[a-f0-9]{16}/));
