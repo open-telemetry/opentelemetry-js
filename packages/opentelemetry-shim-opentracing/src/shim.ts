@@ -16,7 +16,7 @@
 
 import * as api from '@opentelemetry/api';
 import * as opentracing from 'opentracing';
-import { Attributes, AttributeValue } from '@opentelemetry/api';
+import { SpanAttributes, SpanAttributeValue } from '@opentelemetry/api';
 
 function translateReferences(references: opentracing.Reference[]): api.Link[] {
   const links: api.Link[] = [];
@@ -275,7 +275,7 @@ export class SpanShim extends opentracing.Span {
    * @param eventName name of the event.
    * @param payload an arbitrary object to be attached to the event.
    */
-  logEvent(eventName: string, payload?: Attributes): void {
+  logEvent(eventName: string, payload?: SpanAttributes): void {
     this._span.addEvent(eventName, payload);
   }
 
@@ -283,7 +283,7 @@ export class SpanShim extends opentracing.Span {
    * Logs a set of key value pairs. Since OpenTelemetry only supports events,
    * the KV pairs are used as attributes on an event named "log".
    */
-  log(keyValuePairs: Attributes, _timestamp?: number): this {
+  log(keyValuePairs: SpanAttributes, _timestamp?: number): this {
     // @todo: Handle timestamp
     this._span.addEvent('log', keyValuePairs);
     return this;
@@ -293,7 +293,7 @@ export class SpanShim extends opentracing.Span {
    * Adds a set of tags to the span.
    * @param keyValueMap set of KV pairs representing tags
    */
-  addTags(keyValueMap: Attributes): this {
+  addTags(keyValueMap: SpanAttributes): this {
     this._span.setAttributes(keyValueMap);
     return this;
   }
@@ -304,12 +304,12 @@ export class SpanShim extends opentracing.Span {
    * @param key key for the tag
    * @param value value for the tag
    */
-  setTag(key: string, value: AttributeValue): this {
+  setTag(key: string, value: SpanAttributeValue): this {
     if (
       key === opentracing.Tags.ERROR &&
       (value === true || value === 'true')
     ) {
-      this._span.setStatus({ code: api.StatusCode.ERROR });
+      this._span.setStatus({ code: api.SpanStatusCode.ERROR });
       return this;
     }
 

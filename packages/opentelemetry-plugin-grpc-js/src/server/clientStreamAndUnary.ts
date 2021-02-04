@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { context, Span, StatusCode } from '@opentelemetry/api';
+import { context, Span, SpanStatusCode } from '@opentelemetry/api';
 import type { ServerCallWithMeta, SendUnaryDataCallback } from '../types';
 import { grpcStatusCodeToOpenTelemetryStatusCode } from '../utils';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
@@ -50,10 +50,10 @@ export function clientStreamAndUnaryHandler<RequestType, ResponseType>(
         [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
       });
     } else {
-      span.setStatus({ code: StatusCode.OK });
+      span.setStatus({ code: SpanStatusCode.OK });
       span.setAttribute(
         RpcAttribute.GRPC_STATUS_CODE,
-        StatusCode.OK.toString()
+        SpanStatusCode.OK.toString()
       );
     }
 

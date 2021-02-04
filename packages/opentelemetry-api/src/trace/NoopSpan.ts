@@ -16,10 +16,10 @@
 
 import { Exception } from '../common/Exception';
 import { TimeInput } from '../common/Time';
-import { Attributes } from './attributes';
+import { SpanAttributes } from './attributes';
 import { Span } from './span';
 import { SpanContext } from './span_context';
-import { Status } from './status';
+import { SpanStatus } from './status';
 import { INVALID_SPAN_CONTEXT } from './spancontext-utils';
 
 /**
@@ -43,17 +43,17 @@ export class NoopSpan implements Span {
   }
 
   // By default does nothing
-  setAttributes(_attributes: Attributes): this {
+  setAttributes(_attributes: SpanAttributes): this {
     return this;
   }
 
   // By default does nothing
-  addEvent(_name: string, _attributes?: Attributes): this {
+  addEvent(_name: string, _attributes?: SpanAttributes): this {
     return this;
   }
 
   // By default does nothing
-  setStatus(_status: Status): this {
+  setStatus(_status: SpanStatus): this {
     return this;
   }
 

@@ -15,10 +15,10 @@
  */
 
 import {
-  Attributes,
+  SpanAttributes,
   Link,
   SpanKind,
-  Status,
+  SpanStatus,
   TimedEvent,
   TraceState,
 } from '@opentelemetry/api';
@@ -37,7 +37,7 @@ import {
  * @param attributes
  */
 export function toCollectorAttributes(
-  attributes: Attributes
+  attributes: SpanAttributes
 ): opentelemetryProto.common.v1.KeyValue[] {
   return Object.keys(attributes).map(key => {
     return toCollectorAttributeKeyValue(key, attributes[key]);
@@ -61,7 +61,7 @@ export function toCollectorArrayValue(
  * @param attributes
  */
 export function toCollectorKeyValueList(
-  attributes: Attributes
+  attributes: SpanAttributes
 ): opentelemetryProto.common.v1.KeyValueList {
   return {
     values: toCollectorAttributes(attributes),
@@ -101,7 +101,7 @@ export function toCollectorAnyValue(
   } else if (Array.isArray(value)) {
     anyValue.arrayValue = toCollectorArrayValue(value);
   } else if (value) {
-    anyValue.kvlistValue = toCollectorKeyValueList(value as Attributes);
+    anyValue.kvlistValue = toCollectorKeyValueList(value as SpanAttributes);
   }
   return anyValue;
 }
@@ -196,9 +196,9 @@ export function toCollectorSpan(
  * @param status
  */
 export function toCollectorStatus(
-  status: Status
-): opentelemetryProto.trace.v1.Status {
-  const spanStatus: opentelemetryProto.trace.v1.Status = {
+  status: SpanStatus
+): opentelemetryProto.trace.v1.SpanStatus {
+  const spanStatus: opentelemetryProto.trace.v1.SpanStatus = {
     code: status.code,
   };
   if (typeof status.message !== 'undefined') {
@@ -343,7 +343,7 @@ function toCollectorInstrumentationLibrarySpans(
  */
 function toCollectorResourceSpans(
   groupedSpans: Map<Resource, Map<core.InstrumentationLibrary, ReadableSpan[]>>,
-  baseAttributes: Attributes,
+  baseAttributes: SpanAttributes,
   useHex?: boolean
 ): opentelemetryProto.trace.v1.ResourceSpans[] {
   return Array.from(groupedSpans, ([resource, libSpans]) => {
