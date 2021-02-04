@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes, HrTime } from '@opentelemetry/api';
+import { SpanAttributes, HrTime } from '@opentelemetry/api';
 import { Labels, ValueType } from '@opentelemetry/api-metrics';
 import * as core from '@opentelemetry/core';
 import {
@@ -267,7 +267,7 @@ function toCollectorResourceMetrics(
     Resource,
     Map<core.InstrumentationLibrary, MetricRecord[]>
   >,
-  baseAttributes: Attributes,
+  baseAttributes: SpanAttributes,
   startTime: number
 ): opentelemetryProto.metrics.v1.ResourceMetrics[] {
   return Array.from(groupedMetrics, ([resource, libMetrics]) => {
