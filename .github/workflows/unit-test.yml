@@ -19,12 +19,36 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-      - name: Install Root Dependencies
+
+      - name: restore lock files
+        uses: actions/cache@master # must use unreleased master to cache multiple paths
+        id: cache
+        with:
+          # must be done before bootstrap to not include node_modules files in the cache paths
+          path: |
+            packages/*/package-lock.json
+            benchmark/*/package-lock.json
+            backwards-compatability/*/package-lock.json
+            metapackages/*/package-lock.json
+            packages/*/package-lock.json
+            integration-tests/*/package-lock.json
+          key: ${{ runner.os }}-unit_test-${{ matrix.container }}-${{ hashFiles('**/package.json') }}
+
+      - name: Install root dependencies
         run: npm ci --ignore-scripts
-      - name: Boostrap Dependencies
-        run: npx lerna bootstrap
-      - name: Build
-        run: npm run compile
+
+      - name: Install and Build (cache miss) 🔧
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          npx lerna bootstrap --no-ci
+          npm run compile
+
+      - name: Install and Build (cache hit) 🔧
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: |
+          npx lerna bootstrap
+          npm run compile
+
       - name: Unit tests
         run: npm run test
       - name: Report Coverage
@@ -41,12 +65,36 @@ jobs:
         uses: actions/checkout@v1
       - name: Permission Setup
         run: sudo chmod -R 777 /github /__w
-      - name: Install Root Dependencies
+
+      - name: restore lock files
+        uses: actions/cache@master # must use unreleased master to cache multiple paths
+        id: cache
+        with:
+          # must be done before bootstrap to not include node_modules files in the cache paths
+          path: |
+            packages/*/package-lock.json
+            benchmark/*/package-lock.json
+            backwards-compatability/*/package-lock.json
+            metapackages/*/package-lock.json
+            packages/*/package-lock.json
+            integration-tests/*/package-lock.json
+          key: ${{ runner.os }}-unit_test-${{ matrix.container }}-${{ hashFiles('**/package.json') }}
+
+      - name: Install root dependencies
         run: npm ci --ignore-scripts
-      - name: Boostrap Dependencies
-        run: npx lerna bootstrap
-      - name: Build
-        run: npm run compile
+
+      - name: Install and Build (cache miss) 🔧
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          npx lerna bootstrap --no-ci
+          npm run compile
+
+      - name: Install and Build (cache hit) 🔧
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: |
+          npx lerna bootstrap
+          npm run compile
+
       - name: Unit tests
         run: npm run test:browser
       - name: Report Coverage
