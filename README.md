@@ -234,7 +234,7 @@ To request automatic tracing support for a module not on this list, please [file
 
 ## Upgrade guidelines
 
-### 0.15.0 to 0.16.0
+### 0.16.0 to 0.17.0
 
 [PR-1874](https://github.com/open-telemetry/opentelemetry-js/pull/1874) More specific API type names
 
@@ -246,6 +246,8 @@ Some types exported from `"@opentelemetry/api"` have been changed to be more spe
 - `EntryValue` renamed to `BaggageEntryValue`
 - `Status` renamed to `SpanStatus`
 - `StatusCode` renamed to `SpanStatusCode`
+
+### 0.15.0 to 0.16.0
 
 [PR-1863](https://github.com/open-telemetry/opentelemetry-js/pull/1863) removed public attributes `keepAlive` and `httpAgentOptions` from nodejs `CollectorTraceExporter` and `CollectorMetricExporter`
 
