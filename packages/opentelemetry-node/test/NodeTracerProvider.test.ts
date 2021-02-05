@@ -31,6 +31,7 @@ import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { Span } from '@opentelemetry/tracing';
 import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import * as path from 'path';
 import { ContextManager, ROOT_CONTEXT } from '@opentelemetry/context-base';
 import { NodeTracerProvider } from '../src/NodeTracerProvider';
@@ -61,7 +62,6 @@ describe('NodeTracerProvider', () => {
   afterEach(() => {
     // clear require cache
     Object.keys(require.cache).forEach(key => delete require.cache[key]);
-    provider.stop();
     contextManager.disable();
     context.disable();
   });
@@ -86,38 +86,18 @@ describe('NodeTracerProvider', () => {
       assert.ok(provider instanceof NodeTracerProvider);
     });
 
-    it('should load a merge of user configured and default plugins and implictly enable non-default plugins', () => {
-      provider = new NodeTracerProvider({
-        logger: new NoopLogger(),
-        plugins: {
-          'simple-module': {
-            path: '@opentelemetry/plugin-simple-module',
-          },
-          'supported-module': {
-            path: '@opentelemetry/plugin-supported-module',
-            enhancedDatabaseReporting: false,
-            ignoreMethods: [],
-            ignoreUrls: [],
-          },
-          'random-module': {
-            enabled: false,
-            path: '@opentelemetry/random-module',
-          },
-          http: {
-            path: '@opentelemetry/plugin-http-module',
-          },
-        },
-      });
-      const plugins = provider['_pluginLoader']['_plugins'];
-      assert.strictEqual(plugins.length, 0);
-      require('simple-module');
-      assert.strictEqual(plugins.length, 1);
-      require('supported-module');
-      assert.strictEqual(plugins.length, 2);
-      require('random-module');
-      assert.strictEqual(plugins.length, 2);
-      require('http');
-      assert.strictEqual(plugins.length, 3);
+    it('should show warning when plugins are defined', () => {
+      const dummyPlugin1 = {};
+      const spyWarn = sinon.spy(console, 'warn');
+
+      const plugins = [dummyPlugin1];
+      const options = { plugins };
+      provider = new NodeTracerProvider(options);
+
+      assert.strictEqual(
+        spyWarn.args[0][0],
+        'plugins options was removed, please use "registerInstrumentations" to load plugins'
+      );
     });
   });
 
@@ -262,54 +242,5 @@ describe('NodeTracerProvider', () => {
       const patchedFn = context.bind(fn, setSpan(context.active(), span));
       return patchedFn();
     });
-  });
-});
-
-describe('mergePlugins', () => {
-  const defaultPlugins = {
-    module1: {
-      enabled: true,
-      path: 'testpath',
-    },
-    module2: {
-      enabled: true,
-      path: 'testpath2',
-    },
-    module3: {
-      enabled: true,
-      path: 'testpath3',
-    },
-  };
-
-  const userPlugins = {
-    module2: {
-      path: 'userpath',
-    },
-    module3: {
-      enabled: false,
-    },
-    nonDefaultModule: {
-      path: 'userpath2',
-    },
-  };
-
-  const provider = new NodeTracerProvider();
-
-  const mergedPlugins = provider['_mergePlugins'](defaultPlugins, userPlugins);
-
-  it('should merge user and default configs', () => {
-    assert.equal(mergedPlugins.module1.enabled, true);
-    assert.equal(mergedPlugins.module1.path, 'testpath');
-    assert.equal(mergedPlugins.module2.enabled, true);
-    assert.equal(mergedPlugins.module2.path, 'userpath');
-    assert.equal(mergedPlugins.module3.enabled, false);
-    assert.equal(mergedPlugins.nonDefaultModule.enabled, true);
-    assert.equal(mergedPlugins.nonDefaultModule.path, 'userpath2');
-  });
-
-  it('should should not mangle default config', () => {
-    assert.equal(defaultPlugins.module2.path, 'testpath2');
-    assert.equal(defaultPlugins.module3.enabled, true);
-    assert.equal(defaultPlugins.module3.path, 'testpath3');
   });
 });

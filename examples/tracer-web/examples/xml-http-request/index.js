@@ -5,9 +5,12 @@ import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xm
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { CollectorTraceExporter } from '@opentelemetry/exporter-collector';
 import { B3Propagator } from '@opentelemetry/propagator-b3';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
-const providerWithZone = new WebTracerProvider({
-  plugins: [
+const providerWithZone = new WebTracerProvider();
+
+registerInstrumentations({
+  instrumentations: [
     new XMLHttpRequestInstrumentation({
       ignoreUrls: [/localhost:8090\/sockjs-node/],
       propagateTraceHeaderCorsUrls: [
@@ -15,6 +18,7 @@ const providerWithZone = new WebTracerProvider({
       ],
     }),
   ],
+  tracerProvider: providerWithZone,
 });
 
 providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));

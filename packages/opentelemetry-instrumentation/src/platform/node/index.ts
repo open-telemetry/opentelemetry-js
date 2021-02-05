@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-export * from './old/autoLoader';
 export * from './instrumentation';
 export * from './instrumentationNodeModuleDefinition';
 export * from './instrumentationNodeModuleFile';
+export * from './old/autoLoader';
 export * from './types';
