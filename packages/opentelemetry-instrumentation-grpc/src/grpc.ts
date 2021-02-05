@@ -15,13 +15,13 @@
  */
 
 import {
-  StatusCode,
+  SpanStatusCode,
   context,
   propagation,
   Span,
   SpanKind,
   SpanOptions,
-  Status,
+  SpanStatus,
   setSpan,
 } from '@opentelemetry/api';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
@@ -294,7 +294,7 @@ export class GrpcInstrumentation extends InstrumentationBase<typeof grpcTypes> {
           [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
         });
       } else {
-        span.setStatus({ code: StatusCode.UNSET });
+        span.setStatus({ code: SpanStatusCode.UNSET });
         span.setAttribute(
           RpcAttribute.GRPC_STATUS_CODE,
           grpcClient.status.OK.toString()
@@ -452,7 +452,7 @@ export class GrpcInstrumentation extends InstrumentationBase<typeof grpcTypes> {
             [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
           });
         } else {
-          span.setStatus({ code: StatusCode.UNSET });
+          span.setStatus({ code: SpanStatusCode.UNSET });
           span.setAttribute(
             RpcAttribute.GRPC_STATUS_CODE,
             grpcClient.status.OK.toString()
@@ -522,8 +522,8 @@ export class GrpcInstrumentation extends InstrumentationBase<typeof grpcTypes> {
 
         ((call as unknown) as events.EventEmitter).on(
           'status',
-          (status: Status) => {
-            span.setStatus({ code: StatusCode.UNSET });
+          (status: SpanStatus) => {
+            span.setStatus({ code: SpanStatusCode.UNSET });
             span.setAttribute(
               RpcAttribute.GRPC_STATUS_CODE,
               status.code.toString()

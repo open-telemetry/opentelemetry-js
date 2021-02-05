@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes } from './attributes';
+import { SpanAttributes } from './attributes';
 
 /**
  * A sampling decision that determines how a {@link Span} will be recorded
@@ -52,5 +52,5 @@ export interface SamplingResult {
    * Caller may call {@link Sampler}.shouldSample any number of times and
    * can safely cache the returned value.
    */
-  attributes?: Readonly<Attributes>;
+  attributes?: Readonly<SpanAttributes>;
 }
