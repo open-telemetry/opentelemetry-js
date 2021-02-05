@@ -1,4 +1,4 @@
-name: Deploy docs on a new release
+name: Deploy API Documentation
 
 on:
   release:
@@ -11,10 +11,30 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v2
 
-      - name: Install Dependencies
-        run: |
-          npm ci --ignore-scripts
-          npx lerna bootstrap --scope @opentelemetry/api --include-dependencies
+      - name: restore lock files
+        uses: actions/cache@master # must use unreleased master to cache multiple paths
+        id: cache
+        with:
+          # must be done before bootstrap to not include node_modules files in the cache paths
+          path: |
+            packages/*/package-lock.json
+            benchmark/*/package-lock.json
+            backwards-compatability/*/package-lock.json
+            metapackages/*/package-lock.json
+            packages/*/package-lock.json
+            integration-tests/*/package-lock.json
+          key: ${{ runner.os }}-docs-${{ hashFiles('**/package.json') }}
+
+      - name: Install root dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Install and Build (cache miss) 🔧
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npx lerna bootstrap --no-ci --scope @opentelemetry/api --include-dependencies
+
+      - name: Install and Build (cache hit) 🔧
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: npx lerna bootstrap --scope @opentelemetry/api --include-dependencies
 
       - name: Build 🔧
         run: |
