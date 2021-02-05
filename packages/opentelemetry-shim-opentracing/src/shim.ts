@@ -16,7 +16,11 @@
 
 import * as api from '@opentelemetry/api';
 import * as opentracing from 'opentracing';
-import { SpanAttributes, SpanAttributeValue } from '@opentelemetry/api';
+import {
+  createBaggage,
+  SpanAttributes,
+  SpanAttributeValue,
+} from '@opentelemetry/api';
 
 function translateReferences(references: opentracing.Reference[]): api.Link[] {
   const links: api.Link[] = [];
@@ -103,13 +107,11 @@ export class SpanContextShim extends opentracing.SpanContext {
   }
 
   getBaggageItem(key: string): string | undefined {
-    return this._baggage[key]?.value;
+    return this._baggage.getEntry(key)?.value;
   }
 
   setBaggageItem(key: string, value: string) {
-    this._baggage = Object.assign({}, this._baggage, {
-      [key]: { value },
-    });
+    this._baggage = this._baggage.setEntry(key, { value });
   }
 }
 
@@ -138,7 +140,7 @@ export class TracerShim extends opentracing.Tracer {
       getContextWithParent(options)
     );
 
-    let baggage: api.Baggage = {};
+    let baggage: api.Baggage = createBaggage();
     if (options.childOf instanceof SpanShim) {
       const shimContext = options.childOf.context() as SpanContextShim;
       baggage = shimContext.getBaggage();
@@ -200,7 +202,7 @@ export class TracerShim extends opentracing.Tracer {
         if (!spanContext) {
           return null;
         }
-        return new SpanContextShim(spanContext, baggage || {});
+        return new SpanContextShim(spanContext, baggage || createBaggage());
       }
       case opentracing.FORMAT_BINARY: {
         // @todo: Implement binary format
