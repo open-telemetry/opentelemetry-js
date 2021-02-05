@@ -28,19 +28,45 @@ jobs:
         with:
           args: "./**/*.md -i ./CHANGELOG.md"
 
-      - name: Bootstrap
+      - name: restore lock files
+        uses: actions/cache@master # must use unreleased master to cache multiple paths
+        id: cache
+        with:
+          # must be done before bootstrap to not include node_modules files in the cache paths
+          path: |
+            packages/*/package-lock.json
+            benchmark/*/package-lock.json
+            backwards-compatability/*/package-lock.json
+            metapackages/*/package-lock.json
+            packages/*/package-lock.json
+            integration-tests/*/package-lock.json
+          key: ${{ runner.os }}-lint-${{ hashFiles('**/package.json') }}
+
+      - name: Install root dependencies
+        run: npm ci --ignore-scripts
+
+      # On a cache hit, use ci to speed up the install process
+      - name: Bootstrap (cache hit)
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: npx lerna bootstrap --ignore-scripts
+
+      # On a cache miss, fall back to a regular install
+      - name: Bootstrap (cache miss)
         if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          npm ci --ignore-scripts
-          npx lerna bootstrap --ignore-scripts
+        run: npx lerna bootstrap --no-ci --ignore-scripts -- --only=dev
 
       - name: Lint
         run: |
           npm run lint
           npm run lint:examples
 
-      - name: Install API Dependencies
+      - name: Install API Dependencies (cache hit)
+        if: steps.cache.outputs.cache-hit == 'true'
         run: npx lerna bootstrap --scope @opentelemetry/api --include-dependencies
+
+      - name: Install API Dependencies (cache miss)
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npx lerna bootstrap --no-ci --scope @opentelemetry/api --include-dependencies
 
       - name: Build 🔧
         run: |

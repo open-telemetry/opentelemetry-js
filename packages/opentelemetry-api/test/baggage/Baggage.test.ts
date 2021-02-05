@@ -141,7 +141,7 @@ describe('Baggage', () => {
     });
 
     it('should return an empty string if input is invalid', () => {
-      //@ts-expect-error
+      //@ts-expect-error only accepts string values
       const meta = baggageEntryMetadataFromString(1);
 
       assert.strictEqual(meta.toString(), '');

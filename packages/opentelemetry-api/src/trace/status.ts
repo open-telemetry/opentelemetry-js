@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface Status {
+export interface SpanStatus {
   /** The status code of this message. */
-  code: StatusCode;
+  code: SpanStatusCode;
   /** A developer-facing error message. */
   message?: string;
 }
@@ -23,7 +23,7 @@ export interface Status {
 /**
  * An enumeration of status codes.
  */
-export enum StatusCode {
+export enum SpanStatusCode {
   /**
    * The default status.
    */

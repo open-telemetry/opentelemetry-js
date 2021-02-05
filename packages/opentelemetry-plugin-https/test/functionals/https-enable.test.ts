@@ -15,7 +15,7 @@
  */
 
 import {
-  StatusCode,
+  SpanStatusCode,
   context,
   propagation,
   Span as ISpan,
@@ -599,7 +599,7 @@ describe('HttpsPlugin', () => {
           const spans = memoryExporter.getFinishedSpans();
           const [span] = spans;
           assert.strictEqual(spans.length, 1);
-          assert.strictEqual(span.status.code, StatusCode.ERROR);
+          assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
           assert.ok(Object.keys(span.attributes).length >= 6);
         }
       });
@@ -637,7 +637,7 @@ describe('HttpsPlugin', () => {
           const spans = memoryExporter.getFinishedSpans();
           const [span] = spans;
           assert.strictEqual(spans.length, 1);
-          assert.strictEqual(span.status.code, StatusCode.ERROR);
+          assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
           assert.ok(Object.keys(span.attributes).length > 7);
         }
       });
@@ -657,7 +657,7 @@ describe('HttpsPlugin', () => {
               span.attributes[HttpAttribute.HTTP_STATUS_CODE],
               404
             );
-            assert.strictEqual(span.status.code, StatusCode.ERROR);
+            assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
             done();
           });
         });
