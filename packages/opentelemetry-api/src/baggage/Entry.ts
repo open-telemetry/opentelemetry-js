@@ -13,28 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface BaggageEntryValue {
-  /** `String` value of the `BaggageEntryValue`. */
+
+import { baggageEntryMetadataSymbol } from './internal/symbol';
+
+export interface BaggageEntry {
+  /** `String` value of the `BaggageEntry`. */
   value: string;
   /**
-   * ttl is an integer that represents number of hops an entry can
-   * propagate.
+   * Metadata is an optional string property defined by the W3C baggage specification.
+   * It currently has no special meaning defined by the specification.
    */
-  ttl?: BaggageEntryTtl;
+  metadata?: BaggageEntryMetadata;
 }
 
 /**
- * BaggageEntryTtl is an integer that represents number of hops an entry can propagate.
- *
- * For now, ONLY special values (0 and -1) are supported.
+ * Serializable Metadata defined by the W3C baggage specification.
+ * It currently has no special meaning defined by the OpenTelemetry or W3C.
  */
-export enum BaggageEntryTtl {
-  /**
-   * NO_PROPAGATION is considered to have local context and is used within the
-   * process it created.
-   */
-  NO_PROPAGATION = 0,
-
-  /** UNLIMITED_PROPAGATION can propagate unlimited hops. */
-  UNLIMITED_PROPAGATION = -1,
-}
+export type BaggageEntryMetadata = { toString(): string } & {
+  __TYPE__: typeof baggageEntryMetadataSymbol;
+};
