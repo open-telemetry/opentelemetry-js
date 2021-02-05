@@ -17,7 +17,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
-  NoopSpan,
   ProxyTracerProvider,
   SpanKind,
   TracerProvider,
@@ -28,6 +27,7 @@ import {
   ROOT_CONTEXT,
   SpanOptions,
 } from '../../src';
+import { NoopSpan } from '../../src/trace/NoopSpan';
 
 describe('ProxyTracer', () => {
   let provider: ProxyTracerProvider;

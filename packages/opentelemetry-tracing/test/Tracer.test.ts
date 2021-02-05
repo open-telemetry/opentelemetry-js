@@ -16,7 +16,6 @@
 
 import * as assert from 'assert';
 import {
-  NoopSpan,
   Sampler,
   SamplingDecision,
   TraceFlags,
@@ -78,7 +77,7 @@ describe('Tracer', () => {
       tracerProvider
     );
     const span = tracer.startSpan('span1');
-    assert.ok(span instanceof NoopSpan);
+    assert.ok(!span.isRecording());
     span.end();
   });
 
@@ -89,7 +88,7 @@ describe('Tracer', () => {
       tracerProvider
     );
     const span = tracer.startSpan('span2');
-    assert.ok(!(span instanceof NoopSpan));
+    assert.ok(span.isRecording());
     span.end();
   });
 
@@ -129,7 +128,7 @@ describe('Tracer', () => {
 
       const span = tracer.startSpan('span3', undefined, context);
 
-      assert.ok(span instanceof NoopSpan);
+      assert.ok(!span.isRecording());
       span.end();
 
       done();

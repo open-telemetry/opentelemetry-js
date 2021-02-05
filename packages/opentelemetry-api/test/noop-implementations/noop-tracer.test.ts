@@ -22,8 +22,8 @@ import {
   TraceFlags,
   context,
   setSpanContext,
-  NoopSpan,
 } from '../../src';
+import { NoopSpan } from '../../src/trace/NoopSpan';
 
 describe('NoopTracer', () => {
   it('should not crash', () => {
