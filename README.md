@@ -233,6 +233,65 @@ To request automatic tracing support for a module not on this list, please [file
 
 ## Upgrade guidelines
 
+### 0.16.0 to 0.17.0
+
+[PR-1855](https://github.com/open-telemetry/opentelemetry-js/pull/1855) Use instrumentation loader to load plugins and instrumentations
+
+- Providers do no load the plugins anymore. Also PluginLoader has been removed from providers, use `registerInstrumentations` instead
+
+```javascript
+//Previously in node
+const provider = new NodeTracerProvider({
+  plugins: {
+    '@grpc/grpc-js': {
+      enabled: true,
+      path: '@opentelemetry/plugin-grpc-js',
+    },
+  }
+});
+
+// Now
+const provider = new NodeTracerProvider();
+const { registerInstrumentations } = require('@opentelemetry/instrumentation');
+registerInstrumentations({
+  instrumentations: [
+    {
+      plugins: {
+        '@grpc/grpc-js': {
+          enabled: true,
+          path: '@opentelemetry/plugin-grpc-js',
+        },
+      }
+    }
+  ],
+  tracerProvider: provider,
+});
+
+// or if you want to load only default instrumentations / plugins
+registerInstrumentations({
+  tracerProvider: provider,
+});
+
+//Previously in browser
+const provider = new WebTracerProvider({
+  plugins: [
+    new DocumentLoad()
+  ]
+});
+// Now
+const { registerInstrumentations } = require('@opentelemetry/instrumentation');
+const provider = new WebTracerProvider();
+registerInstrumentations({
+  instrumentations: [
+    new DocumentLoad(),
+  ],
+});
+```
+
+- `registerInstrumentations` supports loading old plugins and instrumentations together. It also supports setting tracer provider and meter provider on instrumentations
+
+## Upgrade guidelines
+
 ### 0.15.0 to 0.16.0
 
 [PR-1874](https://github.com/open-telemetry/opentelemetry-js/pull/1874) More specific API type names
