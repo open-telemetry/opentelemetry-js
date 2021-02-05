@@ -15,18 +15,19 @@
  */
 
 import {
+  Baggage,
+  BaggageEntry,
+  createBaggage,
   defaultTextMapGetter,
   defaultTextMapSetter,
-  Baggage,
-  setBaggage,
   getBaggage,
+  setBaggage,
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/context-base';
 import * as assert from 'assert';
 import {
-  HttpBaggage,
   BAGGAGE_HEADER,
-  MAX_PER_NAME_VALUE_PAIRS,
+  HttpBaggage,
 } from '../../src/baggage/propagation/HttpBaggage';
 
 describe('HttpBaggage', () => {
@@ -40,11 +41,11 @@ describe('HttpBaggage', () => {
 
   describe('.inject()', () => {
     it('should set baggage header', () => {
-      const baggage: Baggage = {
+      const baggage = createBaggage({
         key1: { value: 'd4cda95b652f4a1592b449d5929fda1b' },
         key3: { value: 'c88815a7-0fa9-4d95-a1f1-cdccce3c5c2a' },
         'with/slash': { value: 'with spaces' },
-      };
+      });
 
       httpTraceContext.inject(
         setBaggage(ROOT_CONTEXT, baggage),
@@ -58,14 +59,10 @@ describe('HttpBaggage', () => {
     });
 
     it('should skip long key-value pairs', () => {
-      const baggage: Baggage = {
+      const baggage = createBaggage({
         key1: { value: 'd4cda95b' },
         key3: { value: 'c88815a7' },
-      };
-
-      // Generate long value 2*MAX_PER_NAME_VALUE_PAIRS
-      const value = '1a'.repeat(MAX_PER_NAME_VALUE_PAIRS);
-      baggage['longPair'] = { value };
+      });
 
       httpTraceContext.inject(
         setBaggage(ROOT_CONTEXT, baggage),
@@ -78,32 +75,104 @@ describe('HttpBaggage', () => {
       );
     });
 
-    it('should skip all keys that surpassed the max limit of the header', () => {
-      const baggage: Baggage = {};
+    it('should skip all entries whose length exceeds the W3C standard limit of 4096 bytes', () => {
+      const longKey = Array(96).fill('k').join('');
+      const shortKey = Array(95).fill('k').join('');
+      const value = Array(4000).fill('v').join('');
 
-      const zeroPad = (num: number, places: number) =>
-        String(num).padStart(places, '0');
-
-      // key=value with same size , 1024 => 8 keys
-      for (let i = 0; i < 9; ++i) {
-        const index = zeroPad(i, 510);
-        baggage[`k${index}`] = { value: `${index}` };
-      }
-
-      // Build expected
-      let expected = '';
-      for (let i = 0; i < 8; ++i) {
-        const index = zeroPad(i, 510);
-        expected += `k${index}=${index},`;
-      }
-      expected = expected.slice(0, -1);
+      let baggage = createBaggage({
+        aa: { value: 'shortvalue' },
+        [shortKey]: { value: value },
+      });
 
       httpTraceContext.inject(
         setBaggage(ROOT_CONTEXT, baggage),
         carrier,
         defaultTextMapSetter
       );
-      assert.deepStrictEqual(carrier[BAGGAGE_HEADER], expected);
+
+      let header = carrier[BAGGAGE_HEADER];
+      assert.ok(typeof header === 'string');
+      assert.deepStrictEqual(header, `aa=shortvalue,${shortKey}=${value}`);
+
+      baggage = createBaggage({
+        aa: { value: 'shortvalue' },
+        [longKey]: { value: value },
+      });
+
+      carrier = {};
+      httpTraceContext.inject(
+        setBaggage(ROOT_CONTEXT, baggage),
+        carrier,
+        defaultTextMapSetter
+      );
+
+      header = carrier[BAGGAGE_HEADER];
+      assert.ok(typeof header === 'string');
+      assert.deepStrictEqual(header, 'aa=shortvalue');
+    });
+
+    it('should not exceed the W3C standard header length limit of 8192 bytes', () => {
+      const longKey0 = Array(48).fill('0').join('');
+      const longKey1 = Array(49).fill('1').join('');
+      const longValue = Array(4000).fill('v').join('');
+
+      let baggage = createBaggage({
+        [longKey0]: { value: longValue },
+        [longKey1]: { value: longValue },
+        aa: { value: Array(88).fill('v').join('') },
+      });
+
+      httpTraceContext.inject(
+        setBaggage(ROOT_CONTEXT, baggage),
+        carrier,
+        defaultTextMapSetter
+      );
+
+      let header = carrier[BAGGAGE_HEADER];
+      assert.ok(typeof header === 'string');
+      assert.deepStrictEqual(header.length, 8192);
+      assert.deepStrictEqual(header.split(',').length, 3);
+
+      baggage = createBaggage({
+        [longKey0]: { value: longValue },
+        [longKey1]: { value: longValue },
+        aa: { value: Array(89).fill('v').join('') },
+      });
+
+      carrier = {};
+      httpTraceContext.inject(
+        setBaggage(ROOT_CONTEXT, baggage),
+        carrier,
+        defaultTextMapSetter
+      );
+
+      header = carrier[BAGGAGE_HEADER];
+      assert.ok(typeof header === 'string');
+      assert.deepStrictEqual(header.length, 8100);
+      assert.deepStrictEqual(header.split(',').length, 2);
+    });
+
+    it('should not exceed the W3C standard header entry limit of 180 entries', () => {
+      const entries: Record<string, BaggageEntry> = {};
+
+      Array(200)
+        .fill(0)
+        .forEach((_, i) => {
+          entries[`${i}`] = { value: 'v' };
+        });
+
+      const baggage = createBaggage(entries);
+
+      httpTraceContext.inject(
+        setBaggage(ROOT_CONTEXT, baggage),
+        carrier,
+        defaultTextMapSetter
+      );
+
+      const header = carrier[BAGGAGE_HEADER];
+      assert.ok(typeof header === 'string');
+      assert.strictEqual(header.split(',').length, 180);
     });
   });
 
@@ -115,12 +184,12 @@ describe('HttpBaggage', () => {
         httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       );
 
-      const expected: Baggage = {
+      const expected = createBaggage({
         key1: { value: 'd4cda95b' },
         key3: { value: 'c88815a7' },
         keyn: { value: 'valn' },
         keym: { value: 'valm' },
-      };
+      });
       assert.deepStrictEqual(extractedBaggage, expected);
     });
   });
@@ -143,15 +212,19 @@ describe('HttpBaggage', () => {
 
   it('returns keys with their properties', () => {
     carrier[BAGGAGE_HEADER] = 'key1=d4cda95b,key3=c88815a7;prop1=value1';
-    const expected: Baggage = {
-      key1: { value: 'd4cda95b' },
-      key3: { value: 'c88815a7;prop1=value1' },
-    };
+    const bag = getBaggage(
+      httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
+    );
+
+    assert.ok(bag);
+    const entries = bag.getAllEntries();
+
+    assert.strictEqual(entries.length, 2);
+    assert.deepStrictEqual(bag.getEntry('key1')!.value, 'd4cda95b');
+    assert.deepStrictEqual(bag.getEntry('key3')!.value, 'c88815a7');
     assert.deepStrictEqual(
-      getBaggage(
-        httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
-      ),
-      expected
+      bag.getEntry('key3')!.metadata?.toString(),
+      'prop1=value1'
     );
   });
 
@@ -181,11 +254,11 @@ describe('HttpBaggage', () => {
       },
       mixInvalidAndValidKeys: {
         header: 'key1==value,key2=value2',
-        baggage: {
+        baggage: createBaggage({
           key2: {
             value: 'value2',
           },
-        },
+        }),
       },
     };
     Object.getOwnPropertyNames(testCases).forEach(testCase => {
