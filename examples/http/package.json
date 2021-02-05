@@ -31,6 +31,7 @@
     "@opentelemetry/api": "^0.16.0",
     "@opentelemetry/exporter-jaeger": "^0.16.0",
     "@opentelemetry/exporter-zipkin": "^0.16.0",
+    "@opentelemetry/instrumentation": "^0.16.0",
     "@opentelemetry/node": "^0.16.0",
     "@opentelemetry/plugin-http": "^0.16.0",
     "@opentelemetry/tracing": "^0.16.0"

@@ -8,9 +8,12 @@ import { WebTracerProvider } from '@opentelemetry/web';
 import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { B3Propagator } from '@opentelemetry/propagator-b3';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
-const provider = new WebTracerProvider({
-  plugins: [
+const provider = new WebTracerProvider();
+
+registerInstrumentations({
+  instrumentations: [
     new FetchInstrumentation({
       ignoreUrls: [/localhost:8090\/sockjs-node/],
       propagateTraceHeaderCorsUrls: [
@@ -20,6 +23,7 @@ const provider = new WebTracerProvider({
       clearTimingResources: true
     }),
   ],
+  tracerProvider: provider,
 });
 
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
