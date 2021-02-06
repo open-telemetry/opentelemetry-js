@@ -15,19 +15,22 @@
  */
 
 import type { ContextManager } from '@opentelemetry/context-base';
-import type { api, core, metrics, node, resources, tracing } from '.';
+import type { api, core, metrics, resources, tracing } from '.';
+import { InstrumentationOption } from '@opentelemetry/instrumentation';
 
 export interface NodeSDKConfiguration {
   autoDetectResources: boolean;
   contextManager: ContextManager;
-  defaultAttributes: api.Attributes;
+  defaultAttributes: api.SpanAttributes;
   textMapPropagator: api.TextMapPropagator;
   logger: api.Logger;
   logLevel: core.LogLevel;
   metricProcessor: metrics.Processor;
   metricExporter: metrics.MetricExporter;
   metricInterval: number;
-  plugins: node.Plugins;
+  /* Deprecated */
+  plugins: InstrumentationOption[];
+  instrumentations: InstrumentationOption[];
   resource: resources.Resource;
   sampler: api.Sampler;
   spanProcessor: tracing.SpanProcessor;

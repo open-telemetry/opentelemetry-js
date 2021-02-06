@@ -15,7 +15,10 @@
  */
 import * as api from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
-import { isWrapped } from '@opentelemetry/instrumentation';
+import {
+  isWrapped,
+  registerInstrumentations,
+} from '@opentelemetry/instrumentation';
 
 import {
   B3Propagator,
@@ -96,6 +99,36 @@ function createMainResource(resource = {}): PerformanceResourceTiming {
   return mainResource;
 }
 
+function createFakePerformanceObs(url: string) {
+  class FakePerfObs implements PerformanceObserver {
+    constructor(private readonly cb: PerformanceObserverCallback) {}
+    observe() {
+      const absoluteUrl = url.startsWith('http') ? url : location.origin + url;
+      const resources: PerformanceObserverEntryList = {
+        getEntries(): PerformanceEntryList {
+          return [
+            createResource({ name: absoluteUrl }) as any,
+            createMainResource({ name: absoluteUrl }) as any,
+          ];
+        },
+        getEntriesByName(): PerformanceEntryList {
+          return [];
+        },
+        getEntriesByType(): PerformanceEntryList {
+          return [];
+        },
+      };
+      this.cb(resources, this);
+    }
+    disconnect() {}
+    takeRecords(): PerformanceEntryList {
+      return [];
+    }
+  }
+
+  return FakePerfObs;
+}
+
 describe('fetch', () => {
   let sandbox: sinon.SinonSandbox;
   let contextManager: ZoneContextManager;
@@ -169,7 +202,12 @@ describe('fetch', () => {
 
     if (disablePerfObserver) {
       sandbox.stub(window, 'PerformanceObserver').value(undefined);
+    } else {
+      sandbox
+        .stub(window, 'PerformanceObserver')
+        .value(createFakePerformanceObs(fileUrl));
     }
+
     if (disableGetEntries) {
       sandbox.stub(performance, 'getEntriesByType').value(undefined);
     } else {
@@ -180,7 +218,10 @@ describe('fetch', () => {
     fetchInstrumentation = new FetchInstrumentation(config);
     webTracerProviderWithZone = new WebTracerProvider({
       logLevel: core.LogLevel.ERROR,
-      plugins: [fetchInstrumentation],
+    });
+    registerInstrumentations({
+      tracerProvider: webTracerProviderWithZone,
+      instrumentations: [fetchInstrumentation],
     });
     webTracerWithZone = webTracerProviderWithZone.getTracer('fetch-test');
     dummySpanExporter = new DummySpanExporter();
@@ -597,6 +638,64 @@ describe('fetch', () => {
     });
   });
 
+  describe('when PerformanceObserver is used by default', () => {
+    beforeEach(done => {
+      // All above tests test it already but just in case
+      // lets explicitly turn getEntriesByType off so we can be sure
+      // that the perf entries come from the observer.
+      prepareData(done, url, {}, undefined, false, true);
+    });
+    afterEach(() => {
+      clearData();
+    });
+    it('should create both spans with network events', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+      const events = span.events;
+
+      assert.strictEqual(
+        exportSpy.args.length,
+        2,
+        `Wrong number of spans: ${exportSpy.args.length}`
+      );
+
+      assert.strictEqual(events.length, 9, 'number of events is wrong');
+
+      assert.strictEqual(
+        events[6].name,
+        PTN.REQUEST_START,
+        `event ${PTN.REQUEST_START} is not defined`
+      );
+    });
+  });
+
+  describe('when fetching with relative url', () => {
+    beforeEach(done => {
+      prepareData(done, '/get', {}, undefined, false, true);
+    });
+    afterEach(() => {
+      clearData();
+    });
+    it('should create spans with network info', () => {
+      // no prefetch span because mock observer uses location.origin as url when relative
+      // and prefetch span finding compares url origins
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+      const events = span.events;
+
+      assert.strictEqual(
+        exportSpy.args.length,
+        1,
+        `Wrong number of spans: ${exportSpy.args.length}`
+      );
+
+      assert.strictEqual(events.length, 9, 'number of events is wrong');
+      assert.strictEqual(
+        events[6].name,
+        PTN.REQUEST_START,
+        `event ${PTN.REQUEST_START} is not defined`
+      );
+    });
+  });
+
   describe('when PerformanceObserver is undefined', () => {
     beforeEach(done => {
       prepareData(done, url, {}, undefined, true, false);
@@ -606,11 +705,20 @@ describe('fetch', () => {
       clearData();
     });
 
-    it('should still create spans', () => {
+    it('should fallback to getEntries', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+      const events = span.events;
+
       assert.strictEqual(
         exportSpy.args.length,
         2,
         `Wrong number of spans: ${exportSpy.args.length}`
+      );
+      assert.strictEqual(events.length, 9, 'number of events is wrong');
+      assert.strictEqual(
+        events[6].name,
+        PTN.REQUEST_START,
+        `event ${PTN.REQUEST_START} is not defined`
       );
     });
   });
@@ -622,7 +730,12 @@ describe('fetch', () => {
     afterEach(() => {
       clearData();
     });
-    it('should capture fetch without preflight', () => {
+    it('should still capture fetch with basic attributes', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+      const events = span.events;
+      const attributes = span.attributes;
+      const keys = Object.keys(attributes);
+
       assert.strictEqual(
         exportSpy.args.length,
         1,
@@ -632,6 +745,15 @@ describe('fetch', () => {
         exportSpy.args[0][0][0].name,
         'HTTP GET',
         'wrong span captured'
+      );
+
+      assert.strictEqual(events.length, 0, 'Should not have any events');
+
+      // should still have basic attributes
+      assert.strictEqual(
+        attributes[keys[3]],
+        200,
+        `Missing basic attribute ${HttpAttribute.HTTP_STATUS_CODE}`
       );
     });
   });

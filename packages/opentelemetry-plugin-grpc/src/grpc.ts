@@ -15,13 +15,13 @@
  */
 
 import {
-  StatusCode,
+  SpanStatusCode,
   context,
   propagation,
   Span,
   SpanKind,
   SpanOptions,
-  Status,
+  SpanStatus,
   ROOT_CONTEXT,
   setSpan,
 } from '@opentelemetry/api';
@@ -274,7 +274,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
           [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
         });
       } else {
-        span.setStatus({ code: StatusCode.OK });
+        span.setStatus({ code: SpanStatusCode.OK });
         span.setAttribute(
           RpcAttribute.GRPC_STATUS_CODE,
           plugin._moduleExports.status.OK.toString()
@@ -439,7 +439,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
             [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
           });
         } else {
-          span.setStatus({ code: StatusCode.OK });
+          span.setStatus({ code: SpanStatusCode.OK });
           span.setAttribute(
             RpcAttribute.GRPC_STATUS_CODE,
             plugin._moduleExports.status.OK.toString()
@@ -509,8 +509,8 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
         ((call as unknown) as events.EventEmitter).on(
           'status',
-          (status: Status) => {
-            span.setStatus({ code: StatusCode.OK });
+          (status: SpanStatus) => {
+            span.setStatus({ code: SpanStatusCode.OK });
             span.setAttribute(
               RpcAttribute.GRPC_STATUS_CODE,
               status.code.toString()

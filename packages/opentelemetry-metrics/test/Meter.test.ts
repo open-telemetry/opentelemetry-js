@@ -68,7 +68,6 @@ if (Number(process.versions.node.match(/^\d+/)) >= 10) {
     // type bigint
     // Preferring BigInt builtin object instead of bigint literal to keep Node.js v8.x working.
     // TODO: should metric instruments support bigint?
-    // @ts-ignore
     BigInt(1) // eslint-disable-line node/no-unsupported-features/es-builtins
   );
 }
@@ -428,7 +427,7 @@ describe('Meter', () => {
 
         await Promise.all(
           nonNumberValues.map(async val => {
-            // @ts-expect-error
+            // @ts-expect-error verify non number types
             boundCounter.add(val);
             await meter.collect();
             const [record1] = meter.getProcessor().checkPointSet();
@@ -446,7 +445,7 @@ describe('Meter', () => {
 
         await Promise.all(
           nonNumberValues.map(async val => {
-            // @ts-expect-error
+            // @ts-expect-error verify non number types
             boundCounter.add(val);
             await meter.collect();
             const [record1] = meter.getProcessor().checkPointSet();
@@ -721,7 +720,7 @@ describe('Meter', () => {
 
         await Promise.all(
           nonNumberValues.map(async val => {
-            // @ts-expect-error
+            // @ts-expect-error verify non number types
             boundValueRecorder.record(val);
             await meter.collect();
             const [record1] = meter.getProcessor().checkPointSet();
@@ -816,7 +815,7 @@ describe('Meter', () => {
         },
         (observerResult: api.ObserverResult) => {
           // simulate async
-          return new Promise(resolve => {
+          return new Promise<void>(resolve => {
             setTimeout(() => {
               observerResult.observe(getValue(), { pid: '123', core: '1' });
               resolve();
@@ -947,7 +946,7 @@ describe('Meter', () => {
         },
         (observerResult: api.ObserverResult) => {
           // simulate async
-          return new Promise(resolve => {
+          return new Promise<void>(resolve => {
             setTimeout(() => {
               observerResult.observe(getCpuUsage(), { pid: '123', core: '1' });
               observerResult.observe(getCpuUsage(), { pid: '123', core: '2' });
@@ -1038,7 +1037,7 @@ describe('Meter', () => {
         },
         (observerResult: api.ObserverResult) => {
           // simulate async
-          return new Promise(resolve => {
+          return new Promise<void>(resolve => {
             setTimeout(() => {
               observerResult.observe(getValue(), { pid: '123', core: '1' });
               resolve();

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes, Logger, NoopLogger } from '@opentelemetry/api';
+import { SpanAttributes, Logger, NoopLogger } from '@opentelemetry/api';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import {
   CollectorExporterError,
@@ -34,7 +34,7 @@ export abstract class CollectorExporterBase<
   public readonly url: string;
   public readonly logger: Logger;
   public readonly hostname: string | undefined;
-  public readonly attributes?: Attributes;
+  public readonly attributes?: SpanAttributes;
   protected _concurrencyLimit: number;
   protected _isShutdown: boolean = false;
   private _shuttingDownPromise: Promise<void> = Promise.resolve();
@@ -97,7 +97,7 @@ export abstract class CollectorExporterBase<
   }
 
   private _export(items: ExportItem[]): Promise<unknown> {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       try {
         this.logger.debug('items to be sent', items);
         this.send(items, resolve, reject);

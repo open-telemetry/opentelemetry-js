@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 import {
-  StatusCode,
+  SpanStatusCode,
   context,
   propagation,
   Span,
   SpanKind,
   SpanOptions,
-  Status,
+  SpanStatus,
   setSpan,
   SpanContext,
   TraceFlags,
@@ -224,6 +224,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     return (original: Func<http.ClientRequest>): Func<http.ClientRequest> => {
       const instrumentation = this;
       return function httpsOutgoingRequest(
+        // eslint-disable-next-line node/no-unsupported-features/node-builtins
         options: https.RequestOptions | string | URL,
         ...args: HttpRequestArgs
       ): http.ClientRequest {
@@ -251,6 +252,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   /** Patches HTTPS outgoing get requests */
   private _getPatchHttpsOutgoingGetFunction(
     clientRequest: (
+      // eslint-disable-next-line node/no-unsupported-features/node-builtins
       options: http.RequestOptions | string | URL,
       ...args: HttpRequestArgs
     ) => http.ClientRequest
@@ -258,6 +260,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     return (original: Func<http.ClientRequest>): Func<http.ClientRequest> => {
       const instrumentation = this;
       return function httpsOutgoingRequest(
+        // eslint-disable-next-line node/no-unsupported-features/node-builtins
         options: https.RequestOptions | string | URL,
         ...args: HttpRequestArgs
       ): http.ClientRequest {
@@ -310,10 +313,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         this._logger.debug('outgoingRequest on response()');
         response.on('end', () => {
           this._logger.debug('outgoingRequest on end()');
-          let status: Status;
+          let status: SpanStatus;
 
           if (response.aborted && !response.complete) {
-            status = { code: StatusCode.ERROR };
+            status = { code: SpanStatusCode.ERROR };
           } else {
             status = utils.parseResponseStatus(response.statusCode!);
           }

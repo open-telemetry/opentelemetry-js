@@ -1,4 +1,4 @@
-name: Run w3c tests on push
+name: W3C Trace Context Integration Test
 
 on:
   push:
@@ -7,16 +7,36 @@ on:
   pull_request:
 
 jobs:
-  build-and-deploy:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v2
 
-      - name: Install
-        run: |
-          npm ci --ignore-scripts
-          npx lerna bootstrap --scope=propagation-validation-server --include-dependencies
+      - name: restore lock files
+        uses: actions/cache@master # must use unreleased master to cache multiple paths
+        id: cache
+        with:
+          # must be done before bootstrap to not include node_modules files in the cache paths
+          path: |
+            packages/*/package-lock.json
+            benchmark/*/package-lock.json
+            backwards-compatability/*/package-lock.json
+            metapackages/*/package-lock.json
+            packages/*/package-lock.json
+            integration-tests/*/package-lock.json
+          key: ${{ runner.os }}-w3c_integration-${{ hashFiles('**/package.json') }}
+
+      - name: Install root dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Install and Build (cache miss) 🔧
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npx lerna bootstrap --no-ci --scope=propagation-validation-server --include-dependencies
+
+      - name: Install and Build (cache hit) 🔧
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: npx lerna bootstrap --scope=propagation-validation-server --include-dependencies
       
       - name: Build 🔧
         run: npm run compile 

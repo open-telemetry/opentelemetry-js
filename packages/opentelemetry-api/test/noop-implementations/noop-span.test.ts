@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import {
-  StatusCode,
+  SpanStatusCode,
   INVALID_SPANID,
   INVALID_TRACEID,
   NoopSpan,
@@ -39,7 +39,7 @@ describe('NoopSpan', () => {
     span.addEvent('sent');
     span.addEvent('sent', { id: '42', key: 'value' });
 
-    span.setStatus({ code: StatusCode.ERROR });
+    span.setStatus({ code: SpanStatusCode.ERROR });
 
     span.updateName('my-span');
 

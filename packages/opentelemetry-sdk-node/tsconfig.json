@@ -25,6 +25,9 @@
       "path": "../opentelemetry-core"
     },
     {
+      "path": "../opentelemetry-instrumentation"
+    },
+    {
       "path": "../opentelemetry-metrics"
     },
     {

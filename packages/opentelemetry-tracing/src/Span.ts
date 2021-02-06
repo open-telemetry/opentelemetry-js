@@ -32,7 +32,7 @@ import { ReadableSpan } from './export/ReadableSpan';
 import { Tracer } from './Tracer';
 import { SpanProcessor } from './SpanProcessor';
 import { TraceParams } from './types';
-import { AttributeValue, Context } from '@opentelemetry/api';
+import { SpanAttributeValue, Context } from '@opentelemetry/api';
 
 /**
  * This class represents a span.
@@ -43,15 +43,15 @@ export class Span implements api.Span, ReadableSpan {
   readonly spanContext: api.SpanContext;
   readonly kind: api.SpanKind;
   readonly parentSpanId?: string;
-  readonly attributes: api.Attributes = {};
+  readonly attributes: api.SpanAttributes = {};
   readonly links: api.Link[] = [];
   readonly events: api.TimedEvent[] = [];
   readonly startTime: api.HrTime;
   readonly resource: Resource;
   readonly instrumentationLibrary: InstrumentationLibrary;
   name: string;
-  status: api.Status = {
-    code: api.StatusCode.UNSET,
+  status: api.SpanStatus = {
+    code: api.SpanStatusCode.UNSET,
   };
   endTime: api.HrTime = [0, 0];
   private _ended = false;
@@ -89,7 +89,7 @@ export class Span implements api.Span, ReadableSpan {
     return this.spanContext;
   }
 
-  setAttribute(key: string, value?: AttributeValue): this;
+  setAttribute(key: string, value?: SpanAttributeValue): this;
   setAttribute(key: string, value: unknown): this {
     if (value == null || this._isSpanEnded()) return this;
     if (key.length === 0) {
@@ -112,7 +112,7 @@ export class Span implements api.Span, ReadableSpan {
     return this;
   }
 
-  setAttributes(attributes: api.Attributes): this {
+  setAttributes(attributes: api.SpanAttributes): this {
     for (const [k, v] of Object.entries(attributes)) {
       this.setAttribute(k, v);
     }
@@ -128,7 +128,7 @@ export class Span implements api.Span, ReadableSpan {
    */
   addEvent(
     name: string,
-    attributesOrStartTime?: api.Attributes | api.TimeInput,
+    attributesOrStartTime?: api.SpanAttributes | api.TimeInput,
     startTime?: api.TimeInput
   ): this {
     if (this._isSpanEnded()) return this;
@@ -147,13 +147,13 @@ export class Span implements api.Span, ReadableSpan {
     }
     this.events.push({
       name,
-      attributes: attributesOrStartTime as api.Attributes,
+      attributes: attributesOrStartTime as api.SpanAttributes,
       time: timeInputToHrTime(startTime),
     });
     return this;
   }
 
-  setStatus(status: api.Status): this {
+  setStatus(status: api.SpanStatus): this {
     if (this._isSpanEnded()) return this;
     this.status = status;
     return this;
@@ -190,7 +190,7 @@ export class Span implements api.Span, ReadableSpan {
   }
 
   recordException(exception: api.Exception, time: api.TimeInput = hrTime()) {
-    const attributes: api.Attributes = {};
+    const attributes: api.SpanAttributes = {};
     if (typeof exception === 'string') {
       attributes[ExceptionAttribute.MESSAGE] = exception;
     } else if (exception) {
@@ -212,7 +212,7 @@ export class Span implements api.Span, ReadableSpan {
       attributes[ExceptionAttribute.TYPE] ||
       attributes[ExceptionAttribute.MESSAGE]
     ) {
-      this.addEvent(ExceptionEventName, attributes as api.Attributes, time);
+      this.addEvent(ExceptionEventName, attributes as api.SpanAttributes, time);
     } else {
       this._logger.warn(`Failed to record an exception ${exception}`);
     }

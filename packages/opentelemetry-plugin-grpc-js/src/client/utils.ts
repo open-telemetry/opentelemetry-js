@@ -19,8 +19,8 @@ import type { GrpcClientFunc, SendUnaryDataCallback } from '../types';
 import {
   SpanKind,
   Span,
-  StatusCode,
-  Status,
+  SpanStatusCode,
+  SpanStatus,
   propagation,
   context,
   setSpan,
@@ -120,10 +120,10 @@ export function makeGrpcClientRemoteCall(
           [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
         });
       } else {
-        span.setStatus({ code: StatusCode.OK });
+        span.setStatus({ code: SpanStatusCode.OK });
         span.setAttribute(
           RpcAttribute.GRPC_STATUS_CODE,
-          StatusCode.OK.toString()
+          SpanStatusCode.OK.toString()
         );
       }
 
@@ -185,7 +185,7 @@ export function makeGrpcClientRemoteCall(
         endSpan();
       });
 
-      call.on('status', (status: Status) => {
+      call.on('status', (status: SpanStatus) => {
         if (call[CALL_SPAN_ENDED]) {
           return;
         }

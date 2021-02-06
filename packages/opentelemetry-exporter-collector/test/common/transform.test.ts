@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes, TimedEvent } from '@opentelemetry/api';
+import { SpanAttributes, TimedEvent } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as transform from '../../src/transform';
 import {
@@ -29,7 +29,7 @@ import { Resource } from '@opentelemetry/resources';
 describe('transform', () => {
   describe('toCollectorAttributes', () => {
     it('should convert attribute string', () => {
-      const attributes: Attributes = {
+      const attributes: SpanAttributes = {
         foo: 'bar',
       };
       assert.deepStrictEqual(transform.toCollectorAttributes(attributes), [
@@ -38,7 +38,7 @@ describe('transform', () => {
     });
 
     it('should convert attribute integer', () => {
-      const attributes: Attributes = {
+      const attributes: SpanAttributes = {
         foo: 13,
       };
       assert.deepStrictEqual(transform.toCollectorAttributes(attributes), [
@@ -47,7 +47,7 @@ describe('transform', () => {
     });
 
     it('should convert attribute boolean', () => {
-      const attributes: Attributes = {
+      const attributes: SpanAttributes = {
         foo: true,
       };
       assert.deepStrictEqual(transform.toCollectorAttributes(attributes), [
@@ -56,7 +56,7 @@ describe('transform', () => {
     });
 
     it('should convert attribute double', () => {
-      const attributes: Attributes = {
+      const attributes: SpanAttributes = {
         foo: 1.34,
       };
       assert.deepStrictEqual(transform.toCollectorAttributes(attributes), [
