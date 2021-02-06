@@ -51,7 +51,10 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
     (name): Tag => ({ key: name, value: toTagValue(span.attributes[name]) })
   );
   if (span.status.code !== SpanStatusCode.UNSET) {
-    tags.push({ key: 'otel.status_code', value: SpanStatusCode[span.status.code] });
+    tags.push({
+      key: 'otel.status_code',
+      value: SpanStatusCode[span.status.code],
+    });
     if (span.status.message) {
       tags.push({ key: 'otel.status_description', value: span.status.message });
     }
@@ -73,8 +76,14 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
   );
 
   if (span.instrumentationLibrary) {
-    tags.push({ key: 'otel.library.name', value: toTagValue(span.instrumentationLibrary.name) });
-    tags.push({ key: 'otel.library.version', value: toTagValue(span.instrumentationLibrary.version) })
+    tags.push({
+      key: 'otel.library.name',
+      value: toTagValue(span.instrumentationLibrary.name),
+    });
+    tags.push({
+      key: 'otel.library.version',
+      value: toTagValue(span.instrumentationLibrary.version),
+    });
   }
 
   const spanTags: ThriftTag[] = ThriftUtils.getThriftTags(tags);
