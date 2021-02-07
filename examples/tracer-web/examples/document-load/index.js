@@ -4,12 +4,15 @@ import { WebTracerProvider } from '@opentelemetry/web';
 import { DocumentLoad } from '@opentelemetry/plugin-document-load';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { CollectorTraceExporter } from '@opentelemetry/exporter-collector';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
-const provider = new WebTracerProvider({
-  plugins: [
-    new DocumentLoad(),
-  ],
+const provider = new WebTracerProvider();
+
+registerInstrumentations({
+  instrumentations: [new DocumentLoad()],
+  tracerProvider: provider,
 });
+
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.addSpanProcessor(new SimpleSpanProcessor(new CollectorTraceExporter()));
 

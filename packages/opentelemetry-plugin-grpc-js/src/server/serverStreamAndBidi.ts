@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { context, Span, StatusCode } from '@opentelemetry/api';
+import { context, Span, SpanStatusCode } from '@opentelemetry/api';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import type * as grpcJs from '@grpc/grpc-js';
 import type { GrpcJsPlugin } from '../grpcJs';
@@ -55,9 +55,12 @@ export function serverStreamAndBidiHandler<RequestType, ResponseType>(
     call[CALL_SPAN_ENDED] = true;
 
     span.setStatus({
-      code: StatusCode.OK,
+      code: SpanStatusCode.OK,
     });
-    span.setAttribute(RpcAttribute.GRPC_STATUS_CODE, StatusCode.OK.toString());
+    span.setAttribute(
+      RpcAttribute.GRPC_STATUS_CODE,
+      SpanStatusCode.OK.toString()
+    );
 
     endSpan();
   });

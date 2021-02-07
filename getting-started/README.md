@@ -78,12 +78,18 @@ Create a file named `tracing.js` and add the following code:
 
 const { LogLevel } = require("@opentelemetry/core");
 const { NodeTracerProvider } = require("@opentelemetry/node");
+const { registerInstrumentations } = require("@opentelemetry/instrumentation");
 
 const provider = new NodeTracerProvider({
   logLevel: LogLevel.ERROR
 });
 
 provider.register();
+
+registerInstrumentations({
+  tracerProvider: provider,
+});
+
 ```
 
 Now, if you run your application with `node -r ./tracing.js app.js`, your application will create and propagate traces over HTTP. If an already instrumented service that supports [Trace Context](https://www.w3.org/TR/trace-context/) headers calls your application using HTTP, and you call another application using HTTP, the Trace Context headers will be correctly propagated.
@@ -116,9 +122,14 @@ const { LogLevel } = require("@opentelemetry/core");
 const { NodeTracerProvider } = require("@opentelemetry/node");
 const { SimpleSpanProcessor } = require("@opentelemetry/tracing");
 const { ZipkinExporter } = require("@opentelemetry/exporter-zipkin");
+const { registerInstrumentations } = require("@opentelemetry/instrumentation");
 
 const provider = new NodeTracerProvider({
   logLevel: LogLevel.ERROR
+});
+
+registerInstrumentations({
+  tracerProvider: provider,
 });
 
 provider.register();

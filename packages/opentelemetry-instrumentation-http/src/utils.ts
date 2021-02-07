@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Attributes, StatusCode, Span, Status } from '@opentelemetry/api';
+import {
+  SpanAttributes,
+  SpanStatusCode,
+  Span,
+  SpanStatus,
+} from '@opentelemetry/api';
 import {
   HttpAttribute,
   GeneralAttribute,
@@ -63,14 +68,14 @@ export const getAbsoluteUrl = (
  */
 export const parseResponseStatus = (
   statusCode: number
-): Omit<Status, 'message'> => {
+): Omit<SpanStatus, 'message'> => {
   // 1xx, 2xx, 3xx are OK
   if (statusCode >= 100 && statusCode < 400) {
-    return { code: StatusCode.OK };
+    return { code: SpanStatusCode.OK };
   }
 
   // All other codes are error
-  return { code: StatusCode.ERROR };
+  return { code: SpanStatusCode.ERROR };
 };
 
 /**
@@ -158,17 +163,17 @@ export const setSpanWithError = (
   });
 
   if (!obj) {
-    span.setStatus({ code: StatusCode.ERROR, message });
+    span.setStatus({ code: SpanStatusCode.ERROR, message });
     return;
   }
 
-  let status: Status;
+  let status: SpanStatus;
   if ((obj as IncomingMessage).statusCode) {
     status = parseResponseStatus((obj as IncomingMessage).statusCode!);
   } else if ((obj as ClientRequest).aborted) {
-    status = { code: StatusCode.ERROR };
+    status = { code: SpanStatusCode.ERROR };
   } else {
-    status = { code: StatusCode.ERROR };
+    status = { code: SpanStatusCode.ERROR };
   }
 
   status.message = message;
@@ -179,11 +184,11 @@ export const setSpanWithError = (
 /**
  * Adds attributes for request content-length and content-encoding HTTP headers
  * @param { IncomingMessage } Request object whose headers will be analyzed
- * @param { Attributes } Attributes object to be modified
+ * @param { SpanAttributes } SpanAttributes object to be modified
  */
 export const setRequestContentLengthAttribute = (
   request: IncomingMessage,
-  attributes: Attributes
+  attributes: SpanAttributes
 ) => {
   const length = getContentLength(request.headers);
   if (length === null) return;
@@ -198,11 +203,11 @@ export const setRequestContentLengthAttribute = (
 /**
  * Adds attributes for response content-length and content-encoding HTTP headers
  * @param { IncomingMessage } Response object whose headers will be analyzed
- * @param { Attributes } Attributes object to be modified
+ * @param { SpanAttributes } SpanAttributes object to be modified
  */
 export const setResponseContentLengthAttribute = (
   response: IncomingMessage,
-  attributes: Attributes
+  attributes: SpanAttributes
 ) => {
   const length = getContentLength(response.headers);
   if (length === null) return;
@@ -325,7 +330,7 @@ export const isValidOptionsType = (options: unknown): boolean => {
 export const getOutgoingRequestAttributes = (
   requestOptions: ParsedRequestOptions,
   options: { component: string; hostname: string }
-): Attributes => {
+): SpanAttributes => {
   const host = requestOptions.host;
   const hostname =
     requestOptions.hostname ||
@@ -335,7 +340,7 @@ export const getOutgoingRequestAttributes = (
   const method = requestMethod ? requestMethod.toUpperCase() : 'GET';
   const headers = requestOptions.headers || {};
   const userAgent = headers['user-agent'];
-  const attributes: Attributes = {
+  const attributes: SpanAttributes = {
     [HttpAttribute.HTTP_URL]: getAbsoluteUrl(
       requestOptions,
       headers,
@@ -356,8 +361,8 @@ export const getOutgoingRequestAttributes = (
  * Returns attributes related to the kind of HTTP protocol used
  * @param {string} [kind] Kind of HTTP protocol used: "1.0", "1.1", "2", "SPDY" or "QUIC".
  */
-export const getAttributesFromHttpKind = (kind?: string): Attributes => {
-  const attributes: Attributes = {};
+export const getAttributesFromHttpKind = (kind?: string): SpanAttributes => {
+  const attributes: SpanAttributes = {};
   if (kind) {
     attributes[HttpAttribute.HTTP_FLAVOR] = kind;
     if (kind.toUpperCase() !== 'QUIC') {
@@ -377,10 +382,10 @@ export const getAttributesFromHttpKind = (kind?: string): Attributes => {
 export const getOutgoingRequestAttributesOnResponse = (
   response: IncomingMessage,
   options: { hostname: string }
-): Attributes => {
+): SpanAttributes => {
   const { statusCode, statusMessage, httpVersion, socket } = response;
   const { remoteAddress, remotePort } = socket;
-  const attributes: Attributes = {
+  const attributes: SpanAttributes = {
     [GeneralAttribute.NET_PEER_IP]: remoteAddress,
     [GeneralAttribute.NET_PEER_PORT]: remotePort,
     [HttpAttribute.HTTP_HOST]: `${options.hostname}:${remotePort}`,
@@ -406,7 +411,7 @@ export const getOutgoingRequestAttributesOnResponse = (
 export const getIncomingRequestAttributes = (
   request: IncomingMessage,
   options: { component: string; serverName?: string }
-): Attributes => {
+): SpanAttributes => {
   const headers = request.headers;
   const userAgent = headers['user-agent'];
   const ips = headers['x-forwarded-for'];
@@ -419,7 +424,7 @@ export const getIncomingRequestAttributes = (
     host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') ||
     'localhost';
   const serverName = options.serverName;
-  const attributes: Attributes = {
+  const attributes: SpanAttributes = {
     [HttpAttribute.HTTP_URL]: getAbsoluteUrl(
       requestUrl,
       headers,
@@ -459,7 +464,7 @@ export const getIncomingRequestAttributes = (
 export const getIncomingRequestAttributesOnResponse = (
   request: IncomingMessage & { __ot_middlewares?: string[] },
   response: ServerResponse & { socket: Socket }
-): Attributes => {
+): SpanAttributes => {
   const { statusCode, statusMessage, socket } = response;
   const { localAddress, localPort, remoteAddress, remotePort } = socket;
   const { __ot_middlewares } = (request as unknown) as {
@@ -474,7 +479,7 @@ export const getIncomingRequestAttributesOnResponse = (
         .join('')
     : undefined;
 
-  const attributes: Attributes = {
+  const attributes: SpanAttributes = {
     [GeneralAttribute.NET_HOST_IP]: localAddress,
     [GeneralAttribute.NET_HOST_PORT]: localPort,
     [GeneralAttribute.NET_PEER_IP]: remoteAddress,

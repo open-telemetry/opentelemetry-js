@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { StatusCode, Status } from '@opentelemetry/api';
+import { SpanStatusCode, SpanStatus } from '@opentelemetry/api';
 import * as grpcTypes from 'grpc'; // For types only
 import { IgnoreMatcher } from './types';
 
@@ -34,19 +34,19 @@ export const findIndex: <T>(args: T[], fn: (arg: T) => boolean) => number = (
 };
 
 /**
- * Convert a grpc status code to an opentelemetry Status code.
+ * Convert a grpc status code to an opentelemetry SpanStatus code.
  * @param status
  */
 export const _grpcStatusCodeToOpenTelemetryStatusCode = (
   status?: grpcTypes.status
-): StatusCode => {
+): SpanStatusCode => {
   if (status !== undefined && status === 0) {
-    return StatusCode.OK;
+    return SpanStatusCode.OK;
   }
-  return StatusCode.ERROR;
+  return SpanStatusCode.ERROR;
 };
 
-export const _grpcStatusCodeToSpanStatus = (status: number): Status => {
+export const _grpcStatusCodeToSpanStatus = (status: number): SpanStatus => {
   return { code: _grpcStatusCodeToOpenTelemetryStatusCode(status) };
 };
 

@@ -16,7 +16,7 @@ This package exposes a class `WebTracerProvider` that will be able to automatica
 
 See the example how to use it.
 
-OpenTelemetry comes with a growing number of instrumentation plugins for well know modules (see [supported modules](https://github.com/open-telemetry/opentelemetry-js#plugins)) and an API to create custom plugins (see [the plugin developer guide](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/plugin-guide.md)).
+OpenTelemetry comes with a growing number of instrumentations for well know modules (see [supported modules](https://github.com/open-telemetry/opentelemetry-js#plugins)) and an API to create custom instrumentations (see [the instrumentation developer guide](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/instrumentation-guide.md)).
 
 Web Tracer currently supports one plugin for document load.
 Unlike Node Tracer (`NodeTracerProvider`), the plugins needs to be initialised and passed in configuration.
@@ -37,27 +37,22 @@ import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing
 import { WebTracerProvider } from '@opentelemetry/web';
 import { DocumentLoad } from '@opentelemetry/plugin-document-load';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
-// Minimum required setup - supports only synchronous operations
-const provider = new WebTracerProvider({
-  plugins: [
-    new DocumentLoad()
-  ]
-});
-
+const provider = new WebTracerProvider();
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-provider.register();
 
-const providerWithZone = new WebTracerProvider({
-  plugins: [
-    new DocumentLoad()
-  ]
-});
-providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-
-// Changing default contextManager to use ZoneContextManager - supports asynchronous operations
-providerWithZone.register({
+provider.register({
+  // Changing default contextManager to use ZoneContextManager - supports asynchronous operations - optional
   contextManager: new ZoneContextManager(),
+});
+
+// Registering instrumentations / plugins
+registerInstrumentations({
+  instrumentations: [
+    new DocumentLoad(),
+  ],
+  tracerProvider: provider,
 });
 
 ```
