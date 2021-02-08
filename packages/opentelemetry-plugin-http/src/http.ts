@@ -21,14 +21,13 @@ import {
   SpanKind,
   SpanOptions,
   SpanStatus,
-  SpanContext,
-  TraceFlags,
   setSpan,
   ROOT_CONTEXT,
   getSpan,
   suppressInstrumentation,
+  NoopSpan,
 } from '@opentelemetry/api';
-import { BasePlugin, NoRecordingSpan } from '@opentelemetry/core';
+import { BasePlugin } from '@opentelemetry/core';
 import type {
   ClientRequest,
   IncomingMessage,
@@ -59,12 +58,6 @@ export class HttpPlugin extends BasePlugin<Http> {
   protected _config!: HttpPluginConfig;
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span>;
-
-  private readonly _emptySpanContext: SpanContext = {
-    traceId: '',
-    spanId: '',
-    traceFlags: TraceFlags.NONE,
-  };
 
   constructor(readonly moduleName: string, readonly version: string) {
     super(`@opentelemetry/plugin-${moduleName}`, VERSION);
@@ -439,7 +432,7 @@ export class HttpPlugin extends BasePlugin<Http> {
 
   private _startHttpSpan(name: string, options: SpanOptions) {
     /*
-     * If a parent is required but not present, we use a `NoRecordingSpan` to still
+     * If a parent is required but not present, we use a `NoopSpan` to still
      * propagate context without recording it.
      */
     const requireParent =
@@ -453,7 +446,7 @@ export class HttpPlugin extends BasePlugin<Http> {
     if (requireParent === true && currentSpan === undefined) {
       // TODO: Refactor this when a solution is found in
       // https://github.com/open-telemetry/opentelemetry-specification/issues/530
-      span = new NoRecordingSpan(plugin._emptySpanContext);
+      span = new NoopSpan();
     } else if (requireParent === true && currentSpan?.context().isRemote) {
       span = currentSpan;
     } else {
