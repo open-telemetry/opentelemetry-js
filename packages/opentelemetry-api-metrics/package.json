@@ -62,6 +62,6 @@
     "karma-webpack": "4.0.2",
     "nyc": "15.1.0",
     "ts-loader": "8.0.14",
-    "webpack": "4.44.2"
+    "webpack": "4.46.0"
   }
 }

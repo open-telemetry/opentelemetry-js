@@ -46,8 +46,6 @@
     "access": "public"
   },
   "devDependencies": {
-    "@babel/core": "7.12.10",
-    "babel-loader": "8.2.2",
     "codecov": "3.8.1",
     "istanbul-instrumenter-loader": "3.0.1",
     "karma": "5.2.3",
@@ -60,9 +58,7 @@
     "nyc": "15.1.0",
     "sinon": "9.2.3",
     "ts-loader": "8.0.14",
-    "webpack": "4.46.0",
-    "webpack-cli": "4.3.1",
-    "webpack-merge": "5.7.3"
+    "webpack": "4.46.0"
   },
   "dependencies": {
     "@opentelemetry/api": "^0.16.0",
