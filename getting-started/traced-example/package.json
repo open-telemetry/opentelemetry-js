@@ -12,6 +12,7 @@
     "@opentelemetry/core": "^0.14.0",
     "@opentelemetry/exporter-zipkin": "^0.14.0",
     "@opentelemetry/node": "^0.14.0",
+    "@opentelemetry/instrumentation": "^0.16.0",
     "@opentelemetry/plugin-express": "^0.12.1",
     "@opentelemetry/plugin-http": "^0.14.0",
     "@opentelemetry/plugin-https": "^0.14.0",

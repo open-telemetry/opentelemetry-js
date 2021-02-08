@@ -44,6 +44,7 @@
     "@opentelemetry/api-metrics": "^0.16.0",
     "@opentelemetry/context-base": "^0.16.0",
     "@opentelemetry/core": "^0.16.0",
+    "@opentelemetry/instrumentation": "^0.16.0",
     "@opentelemetry/metrics": "^0.16.0",
     "@opentelemetry/node": "^0.16.0",
     "@opentelemetry/resource-detector-aws": "^0.16.0",

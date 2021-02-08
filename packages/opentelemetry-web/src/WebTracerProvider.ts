@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import { BasePlugin } from '@opentelemetry/core';
-import { InstrumentationBase } from '@opentelemetry/instrumentation';
 import {
   BasicTracerProvider,
   SDKRegistrationConfig,
@@ -30,7 +28,7 @@ export interface WebTracerConfig extends TracerConfig {
   /**
    * plugins to be used with tracer, they will be enabled automatically
    */
-  plugins?: (BasePlugin<unknown> | InstrumentationBase)[];
+  plugins?: unknown[];
 }
 
 /**
@@ -42,20 +40,13 @@ export class WebTracerProvider extends BasicTracerProvider {
    * @param config Web Tracer config
    */
   constructor(config: WebTracerConfig = {}) {
-    if (typeof config.plugins === 'undefined') {
-      config.plugins = [];
+    if (typeof config.plugins !== 'undefined') {
+      console.warn(
+        'plugins option was removed, please use' +
+          ' "registerInstrumentations" to load plugins'
+      );
     }
     super(config);
-
-    for (const plugin of config.plugins) {
-      const instrumentation = (plugin as unknown) as InstrumentationBase;
-      if (typeof instrumentation.setTracerProvider === 'function') {
-        instrumentation.setTracerProvider(this);
-        instrumentation.enable();
-      } else {
-        plugin.enable([], this, this.logger);
-      }
-    }
 
     if ((config as SDKRegistrationConfig).contextManager) {
       throw (

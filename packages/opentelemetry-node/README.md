@@ -12,17 +12,13 @@ For manual instrumentation see the
 
 ## How auto instrumentation works
 
-This package exposes a `NodeTracerProvider` that will automatically hook into the module loader of Node.js.
+This package exposes a `NodeTracerProvider`.
+For loading plugins / instrumentations please use `registerInstrumentations` function from [opentelemetry-instrumentation](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-instrumentation)
 
-For this to work, please make sure that `NodeTracerProvider` is initialized before any other module of your application, (like `http` or `express`) is loaded.
-
-OpenTelemetry comes with a growing number of instrumentation plugins for well know modules (see [supported modules](https://github.com/open-telemetry/opentelemetry-js#plugins)) and an API to create custom plugins (see [the plugin developer guide](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/plugin-guide.md)).
-
-Whenever a module is loaded `NodeTracerProvider` will check if a matching instrumentation plugin has been installed.
+OpenTelemetry comes with a growing number of instrumentation plugins for well know modules (see [supported modules](https://github.com/open-telemetry/opentelemetry-js#plugins)) and an API to create custom instrumentation (see [the instrumentation developer guide](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/instrumentation-guide.md)).
 
 > **Please note:** This module does *not* bundle any plugins. They need to be installed separately.
 
-If the respective plugin was found, it will be used to patch the original module to add instrumentation code.
 This is done by wrapping all tracing-relevant functions.
 
 This instrumentation code will automatically
@@ -31,8 +27,6 @@ This instrumentation code will automatically
 - make sure that this current trace-context is propagated while the transaction traverses an application (see [@opentelemetry/context-base](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-context-base/README.md) for an in-depth explanation)
 - add this trace-context identifier to outbound requests to allow continuing the distributed trace on the next hop (if applicable)
 - create and end spans
-
-In short, this means that this module will use provided plugins to automatically instrument your application to produce spans and provide end-to-end tracing by just adding a few lines of code.
 
 ## Creating custom spans on top of auto-instrumentation
 
@@ -45,8 +39,9 @@ npm install --save @opentelemetry/api
 npm install --save @opentelemetry/node
 
 # Install instrumentation plugins
-npm install --save @opentelemetry/plugin-http
-npm install --save @opentelemetry/plugin-https
+npm install --save @opentelemetry/instrumentation-http
+# and for example one additional
+npm install --save instrumentation-graphql
 ```
 
 ## Usage
@@ -56,21 +51,28 @@ The following code will configure the `NodeTracerProvider` to instrument `http`
 modules](https://github.com/open-telemetry/opentelemetry-js#plugins))
 using `@opentelemetry/plugin-http`.
 
-```js
+```javascript
+const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 const { NodeTracerProvider } = require('@opentelemetry/node');
 
 // Create and configure NodeTracerProvider
 const provider = new NodeTracerProvider();
 
 // Initialize the provider
-provider.register()
+provider.register();
+
+// register and load instrumentation and old plugins - old plugins will be loaded automatically as previously
+// but instrumentations needs to be added
+registerInstrumentations({
+  tracerProvider: provider,
+});
 
 // Your application code - http will automatically be instrumented if
 // @opentelemetry/plugin-http is present
 const http = require('http');
 ```
 
-## Plugin configuration
+## Instrumentation / Plugin configuration
 
 User supplied plugin configuration is merged with the default plugin
 configuration. Furthermore, custom plugins that are configured are implicitly
@@ -83,22 +85,37 @@ In the following example:
 - the customPlugin is loaded from the user supplied path
 - all default plugins are still loaded if installed.
 
-```js
-const provider = new NodeTracerProvider({
-  plugins: {
-    express: {
-      enabled: false,
-    },
-    http: {
-      requestHook: (span, request) => {
-        span.setAttribute("custom request hook attribute", "request");
+```javascript
+const { GraphQLInstrumentation } = require('@opentelemetry/instrumentation-graphql');
+
+const provider = new NodeTracerProvider();
+
+// register and load instrumentation and old plugins - old plugins will be loaded automatically as previously
+// but instrumentations needs to be added
+registerInstrumentations({
+  tracerProvider: provider,
+  instrumentations: [
+    new GraphQLInstrumentation(),
+    // for older plugins you can just copy paste the old configuration
+    {
+      plugins: {
+        express: {
+          enabled: false,
+        },
+        http: {
+          requestHook: (span, request) => {
+            span.setAttribute("custom request hook attribute", "request");
+          },
+        },
+        customPlugin: {
+          path: "/path/to/custom/module",
+        },
       },
-    },
-    customPlugin: {
-      path: "/path/to/custom/module",
-    },
-  },
+    }
+  ],
 });
+
+
 ```
 
 ### Disable Plugins with Environment Variables
