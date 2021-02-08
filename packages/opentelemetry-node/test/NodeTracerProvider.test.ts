@@ -21,6 +21,7 @@ import {
   setSpan,
   setSpanContext,
   getSpan,
+  NoopSpan,
 } from '@opentelemetry/api';
 import { AlwaysOnSampler, AlwaysOffSampler } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
