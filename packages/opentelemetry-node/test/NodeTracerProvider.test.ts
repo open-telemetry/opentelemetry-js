@@ -21,12 +21,9 @@ import {
   setSpan,
   setSpanContext,
   getSpan,
+  NoopSpan,
 } from '@opentelemetry/api';
-import {
-  AlwaysOnSampler,
-  AlwaysOffSampler,
-  NoRecordingSpan,
-} from '@opentelemetry/core';
+import { AlwaysOnSampler, AlwaysOffSampler } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { Span } from '@opentelemetry/tracing';
 import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
@@ -124,7 +121,7 @@ describe('NodeTracerProvider', () => {
         logger: new NoopLogger(),
       });
       const span = provider.getTracer('default').startSpan('my-span');
-      assert.ok(span instanceof NoRecordingSpan);
+      assert.ok(span instanceof NoopSpan);
       assert.strictEqual(span.context().traceFlags, TraceFlags.NONE);
       assert.strictEqual(span.isRecording(), false);
     });

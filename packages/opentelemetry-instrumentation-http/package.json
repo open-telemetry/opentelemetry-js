@@ -43,6 +43,7 @@
   "devDependencies": {
     "@opentelemetry/context-async-hooks": "^0.16.0",
     "@opentelemetry/context-base": "^0.16.0",
+    "@opentelemetry/core": "^0.16.0",
     "@opentelemetry/node": "^0.16.0",
     "@opentelemetry/tracing": "^0.16.0",
     "@types/got": "9.6.11",
@@ -70,7 +71,6 @@
   },
   "dependencies": {
     "@opentelemetry/api": "^0.16.0",
-    "@opentelemetry/core": "^0.16.0",
     "@opentelemetry/instrumentation": "^0.16.0",
     "@opentelemetry/semantic-conventions": "^0.16.0",
     "semver": "^7.1.3"
