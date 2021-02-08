@@ -53,7 +53,6 @@
     "nyc": "15.1.0",
     "request": "2.88.2",
     "request-promise-native": "1.0.9",
-    "rimraf": "3.0.2",
     "sinon": "9.2.3",
     "superagent": "6.1.0"
   },

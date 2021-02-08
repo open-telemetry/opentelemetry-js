@@ -60,7 +60,6 @@
     "karma-webpack": "4.0.2",
     "node-pre-gyp": "0.17.0",
     "nyc": "15.1.0",
-    "rimraf": "3.0.2",
     "semver": "7.3.4",
     "sinon": "9.2.3",
     "ts-loader": "8.0.14",

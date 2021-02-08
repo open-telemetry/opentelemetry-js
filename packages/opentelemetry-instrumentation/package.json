@@ -73,7 +73,6 @@
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "4.0.2",
     "nyc": "15.1.0",
-    "rimraf": "3.0.2",
     "sinon": "9.2.3",
     "ts-loader": "8.0.14",
     "webpack": "4.46.0",

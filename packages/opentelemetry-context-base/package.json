@@ -43,7 +43,6 @@
   },
   "devDependencies": {
     "codecov": "3.8.1",
-    "nyc": "15.1.0",
-    "rimraf": "3.0.2"
+    "nyc": "15.1.0"
   }
 }
