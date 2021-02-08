@@ -1,6 +1,6 @@
-# Plugin Developer Guide
+# Instrumentation Developer Guide
 
-The `NodeTracerProvider` or `Node-SDK` is driven by a set of plugins that describe how to patch a module to generate trace spans when that module is used. We provide out-of-the-box instrumentation for many popular frameworks and libraries by using a plugin system (see [builtin plugins][builtin-plugins]), and provide a means for developers to create their own.
+We provide out-of-the-box instrumentations for many popular frameworks and libraries by using an instrumentation system (see [builtin instrumentations][builtin-instrumentations]), and provide a means for developers to create their own.
 
 We strongly recommended to create a dedicated package for newly added plugin, example: `@opentelemetry/plugin-xxx`.
 
@@ -45,7 +45,7 @@ We recommend using [`shimmer`][shimmer] to modify function properties on objects
 Please refer to the [HTTP instrumentation][http-plugin] or [gRPC instrumentation][grpc-plugin] for more comprehensive examples.
 
 [shimmer]: https://github.com/othiym23/shimmer
-[builtin-plugins]: https://github.com/open-telemetry/opentelemetry-js#plugins
+[builtin-instrumentations]: https://github.com/open-telemetry/opentelemetry-js#instrumentations&plugins
 [base-plugin]: https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-core/src/platform/node/BasePlugin.ts
 [http-plugin]: https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-plugin-http/src/http.ts#L44
 [grpc-plugin]: https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-plugin-grpc/src/grpc.ts#L52

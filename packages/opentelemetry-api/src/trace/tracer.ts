@@ -19,11 +19,7 @@ import { Span } from './span';
 import { SpanOptions } from './SpanOptions';
 
 /**
- * Tracer provides an interface for creating {@link Span}s and propagating
- * context in-process.
- *
- * Users may choose to use manual or automatic Context propagation. Because of
- * that this class offers APIs to facilitate both usages.
+ * Tracer provides an interface for creating {@link Span}s.
  */
 export interface Tracer {
   /**
