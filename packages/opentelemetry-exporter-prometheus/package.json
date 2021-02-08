@@ -41,7 +41,8 @@
   "devDependencies": {
     "codecov": "3.8.1",
     "nyc": "15.1.0",
-    "rimraf": "3.0.2"
+    "rimraf": "3.0.2",
+    "sinon": "9.2.4"
   },
   "dependencies": {
     "@opentelemetry/api": "^0.16.0",
