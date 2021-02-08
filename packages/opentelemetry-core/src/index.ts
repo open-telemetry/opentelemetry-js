@@ -27,7 +27,6 @@ export * from './context/propagation/HttpTraceContext';
 export * from './context/propagation/types';
 export * from './baggage/propagation/HttpBaggage';
 export * from './platform';
-export * from './trace/NoRecordingSpan';
 export * from './trace/Plugin';
 export * from './trace/sampler/AlwaysOffSampler';
 export * from './trace/sampler/AlwaysOnSampler';

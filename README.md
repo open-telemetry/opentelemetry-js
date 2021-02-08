@@ -290,10 +290,6 @@ registerInstrumentations({
 
 - `registerInstrumentations` supports loading old plugins and instrumentations together. It also supports setting tracer provider and meter provider on instrumentations
 
-## Upgrade guidelines
-
-### 0.15.0 to 0.16.0
-
 [PR-1874](https://github.com/open-telemetry/opentelemetry-js/pull/1874) More specific API type names
 
 Some types exported from `"@opentelemetry/api"` have been changed to be more specific.
@@ -304,6 +300,8 @@ Some types exported from `"@opentelemetry/api"` have been changed to be more spe
 - `EntryValue` renamed to `BaggageEntryValue`
 - `Status` renamed to `SpanStatus`
 - `StatusCode` renamed to `SpanStatusCode`
+
+### 0.15.0 to 0.16.0
 
 [PR-1863](https://github.com/open-telemetry/opentelemetry-js/pull/1863) removed public attributes `keepAlive` and `httpAgentOptions` from nodejs `CollectorTraceExporter` and `CollectorMetricExporter`
 
