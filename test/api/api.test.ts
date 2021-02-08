@@ -41,6 +41,26 @@ describe('API', () => {
     assert.strictEqual(typeof tracer, 'object');
   });
 
+  describe('Context', () => {
+    it('with should forward this, arguments and return value', () => {
+      function fnWithThis(this: string, a: string, b: number): string {
+        assert.strictEqual(this, 'that');
+        assert.strictEqual(arguments.length, 2);
+        assert.strictEqual(a, 'one');
+        assert.strictEqual(b, 2);
+        return 'done';
+      }
+
+      const res = context.with(ROOT_CONTEXT, fnWithThis, 'that', 'one', 2);
+      assert.strictEqual(res, 'done');
+
+      assert.strictEqual(
+        context.with(ROOT_CONTEXT, () => 3.14),
+        3.14
+      );
+    });
+  });
+
   describe('GlobalTracerProvider', () => {
     const spanContext = {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
