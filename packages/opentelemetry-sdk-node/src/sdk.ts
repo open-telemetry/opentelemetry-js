@@ -18,6 +18,10 @@ import { TextMapPropagator } from '@opentelemetry/api';
 import { metrics } from '@opentelemetry/api-metrics';
 import { ContextManager } from '@opentelemetry/context-base';
 import { MeterConfig, MeterProvider } from '@opentelemetry/metrics';
+import {
+  InstrumentationOption,
+  registerInstrumentations,
+} from '@opentelemetry/instrumentation';
 import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/node';
 import { awsEc2Detector } from '@opentelemetry/resource-detector-aws';
 import { gcpDetector } from '@opentelemetry/resource-detector-gcp';
@@ -39,6 +43,7 @@ export class NodeSDK {
     contextManager?: ContextManager;
     textMapPropagator?: TextMapPropagator;
   };
+  private _instrumentations: InstrumentationOption[];
   private _meterProviderConfig?: MeterConfig;
 
   private _resource: Resource;
@@ -64,9 +69,6 @@ export class NodeSDK {
       }
       if (configuration.logger) {
         tracerProviderConfig.logger = configuration.logger;
-      }
-      if (configuration.plugins) {
-        tracerProviderConfig.plugins = configuration.plugins;
       }
       if (configuration.sampler) {
         tracerProviderConfig.sampler = configuration.sampler;
@@ -108,8 +110,16 @@ export class NodeSDK {
 
       this.configureMeterProvider(meterConfig);
     }
-  }
 
+    let instrumentations: InstrumentationOption[] = [];
+    if (configuration.instrumentations) {
+      instrumentations = configuration.instrumentations;
+    } else if (configuration.plugins) {
+      console.error('plugins option is deprecated');
+      instrumentations = configuration.plugins;
+    }
+    this._instrumentations = instrumentations;
+  }
   /** Set configurations required to register a NodeTracerProvider */
   public configureTracerProvider(
     tracerConfig: NodeTracerConfig,
@@ -178,6 +188,12 @@ export class NodeSDK {
 
       metrics.setGlobalMeterProvider(meterProvider);
     }
+
+    registerInstrumentations({
+      instrumentations: this._instrumentations,
+      tracerProvider: this._tracerProvider,
+      meterProvider: this._meterProvider,
+    });
   }
 
   public shutdown(): Promise<void> {

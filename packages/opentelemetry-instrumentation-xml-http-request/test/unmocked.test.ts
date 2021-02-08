@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { Span } from '@opentelemetry/api';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import { HttpAttribute } from '@opentelemetry/semantic-conventions';
 import { ReadableSpan, SpanProcessor } from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
@@ -40,8 +41,10 @@ describe('unmocked xhr', () => {
   let testSpans: TestSpanProcessor;
   let provider: WebTracerProvider;
   beforeEach(() => {
-    provider = new WebTracerProvider({
-      plugins: [new XMLHttpRequestInstrumentation()],
+    provider = new WebTracerProvider();
+    registerInstrumentations({
+      instrumentations: [new XMLHttpRequestInstrumentation()],
+      tracerProvider: provider,
     });
     testSpans = new TestSpanProcessor();
     provider.addSpanProcessor(testSpans);

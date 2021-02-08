@@ -3,7 +3,7 @@
 const http = require('http');
 const opentracing = require('opentracing');
 const utils = require('./utils');
-const shim = require('./shim').shim('http_server_service');
+const shim = require('./shim').shim('http_server_opentracing');
 
 opentracing.initGlobalTracer(shim);
 const tracer = opentracing.globalTracer();
