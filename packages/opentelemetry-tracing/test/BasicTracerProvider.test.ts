@@ -20,7 +20,6 @@ import {
   TraceFlags,
   ROOT_CONTEXT,
   NoopLogger,
-  NoopSpan,
   setSpan,
   setSpanContext,
   getSpan,
