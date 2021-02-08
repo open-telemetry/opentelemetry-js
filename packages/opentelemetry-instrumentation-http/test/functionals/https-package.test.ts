@@ -14,9 +14,14 @@
  * limitations under the License.
  */
 
-import { context, SpanKind, propagation, Span } from '@opentelemetry/api';
+import {
+  context,
+  SpanKind,
+  propagation,
+  NoopLogger,
+  Span,
+} from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
-import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
@@ -63,12 +68,12 @@ describe('Packages', () => {
     });
     provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     instrumentation.setTracerProvider(provider);
-    propagation.setGlobalPropagator(new DummyPropagation());
     beforeEach(() => {
       memoryExporter.reset();
     });
 
     before(() => {
+      propagation.setGlobalPropagator(new DummyPropagation());
       instrumentation.setConfig({
         applyCustomAttributesOnSpan: customAttributeFunction,
       });
@@ -79,6 +84,7 @@ describe('Packages', () => {
       // back to normal
       nock.cleanAll();
       nock.enableNetConnect();
+      propagation.disable();
     });
 
     let resHeaders: http.IncomingHttpHeaders;

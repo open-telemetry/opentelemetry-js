@@ -1,12 +1,11 @@
 # OpenTelemetry Collector Exporter for node with grpc
 
-[![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-This module provides exporter for web and node to be used with [opentelemetry-collector][opentelemetry-collector-url] - last tested with version **0.6.0**.
+This module provides exporter for web and node to be used with [opentelemetry-collector][opentelemetry-collector-url] - last tested with version **0.16.0**.
 
 ## Installation
 
@@ -24,7 +23,7 @@ const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector-g
 
 const collectorOptions = {
   serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>' // url is optional and can be omitted - default is localhost:55680
+  url: '<opentelemetry-collector-url>' // url is optional and can be omitted - default is localhost:4317
 };
 
 const provider = new BasicTracerProvider();
@@ -45,7 +44,7 @@ const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector-g
 
 const collectorOptions = {
   serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is localhost:55680
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is localhost:4317
   credentials: grpc.credentials.createSsl(
     fs.readFileSync('./ca.crt'),
     fs.readFileSync('./client.key'),
@@ -74,7 +73,7 @@ metadata.set('k', 'v');
 
 const collectorOptions = {
   serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is localhost:55680
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is localhost:4317
   metadata, // // an optional grpc.Metadata object to be sent with each request
 };
 
@@ -122,15 +121,14 @@ counter.add(10, { 'key': 'value' });
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
-- For help or feedback on this project, join us on [gitter][gitter-url]
+- For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
 
 ## License
 
 Apache 2.0 - See [LICENSE][license-url] for more information.
 
-[gitter-image]: https://badges.gitter.im/open-telemetry/opentelemetry-js.svg
-[gitter-url]: https://gitter.im/open-telemetry/opentelemetry-node?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
+[discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
+[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-exporter-collector-grpc
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-collector-grpc

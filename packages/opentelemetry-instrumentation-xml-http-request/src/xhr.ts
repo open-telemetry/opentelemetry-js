@@ -125,7 +125,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     span: api.Span,
     corsPreFlightRequest: PerformanceResourceTiming
   ): void {
-    this.tracer.withSpan(span, () => {
+    api.context.with(api.setSpan(api.context.active(), span), () => {
       const childSpan = this.tracer.startSpan('CORS Preflight', {
         startTime: corsPreFlightRequest[PTN.FETCH_START],
       });
@@ -144,9 +144,12 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   _addFinalSpanAttributes(span: api.Span, xhrMem: XhrMem, spanUrl?: string) {
     if (typeof spanUrl === 'string') {
       const parsedUrl = parseUrl(spanUrl);
-
-      span.setAttribute(HttpAttribute.HTTP_STATUS_CODE, xhrMem.status);
-      span.setAttribute(HttpAttribute.HTTP_STATUS_TEXT, xhrMem.statusText);
+      if (xhrMem.status !== undefined) {
+        span.setAttribute(HttpAttribute.HTTP_STATUS_CODE, xhrMem.status);
+      }
+      if (xhrMem.statusText !== undefined) {
+        span.setAttribute(HttpAttribute.HTTP_STATUS_TEXT, xhrMem.statusText);
+      }
       span.setAttribute(HttpAttribute.HTTP_HOST, parsedUrl.host);
       span.setAttribute(
         HttpAttribute.HTTP_SCHEME,
@@ -437,25 +440,28 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         const spanUrl = xhrMem.spanUrl;
 
         if (currentSpan && spanUrl) {
-          plugin.tracer.withSpan(currentSpan, () => {
-            plugin._tasksCount++;
-            xhrMem.sendStartTime = hrTime();
-            currentSpan.addEvent(EventNames.METHOD_SEND);
+          api.context.with(
+            api.setSpan(api.context.active(), currentSpan),
+            () => {
+              plugin._tasksCount++;
+              xhrMem.sendStartTime = hrTime();
+              currentSpan.addEvent(EventNames.METHOD_SEND);
 
-            this.addEventListener('abort', onAbort);
-            this.addEventListener('error', onError);
-            this.addEventListener('load', onLoad);
-            this.addEventListener('timeout', onTimeout);
+              this.addEventListener('abort', onAbort);
+              this.addEventListener('error', onError);
+              this.addEventListener('load', onLoad);
+              this.addEventListener('timeout', onTimeout);
 
-            xhrMem.callbackToRemoveEvents = () => {
-              unregister(this);
-              if (xhrMem.createdResources) {
-                xhrMem.createdResources.observer.disconnect();
-              }
-            };
-            plugin._addHeaders(this, spanUrl);
-            plugin._addResourceObserver(this, spanUrl);
-          });
+              xhrMem.callbackToRemoveEvents = () => {
+                unregister(this);
+                if (xhrMem.createdResources) {
+                  xhrMem.createdResources.observer.disconnect();
+                }
+              };
+              plugin._addHeaders(this, spanUrl);
+              plugin._addResourceObserver(this, spanUrl);
+            }
+          );
         }
         return original.apply(this, args);
       };

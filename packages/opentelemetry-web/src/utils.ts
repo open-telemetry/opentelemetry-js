@@ -56,11 +56,6 @@ export function addSpanNetworkEvent(
     hasKey(entries, performanceName) &&
     typeof entries[performanceName] === 'number'
   ) {
-    // some metrics are available but have value 0 which means they are invalid
-    // for example "secureConnectionStart" is 0 which makes the events to be wrongly interpreted
-    if (entries[performanceName] === 0) {
-      return undefined;
-    }
     span.addEvent(performanceName, entries[performanceName]);
     return span;
   }
@@ -85,10 +80,11 @@ export function addSpanNetworkEvents(
   addSpanNetworkEvent(span, PTN.REQUEST_START, resource);
   addSpanNetworkEvent(span, PTN.RESPONSE_START, resource);
   addSpanNetworkEvent(span, PTN.RESPONSE_END, resource);
-  if (resource[PTN.ENCODED_BODY_SIZE]) {
+  const contentLength = resource[PTN.ENCODED_BODY_SIZE];
+  if (contentLength !== undefined) {
     span.setAttribute(
       HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH,
-      resource[PTN.ENCODED_BODY_SIZE]
+      contentLength
     );
   }
 }

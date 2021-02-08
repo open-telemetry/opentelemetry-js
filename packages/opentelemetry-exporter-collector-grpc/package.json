@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-collector-grpc",
-  "version": "0.14.0",
+  "version": "0.16.0",
   "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -46,21 +46,22 @@
   },
   "devDependencies": {
     "@babel/core": "7.12.10",
+    "@opentelemetry/api-metrics": "^0.16.0",
     "codecov": "3.8.1",
     "cpx": "1.5.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "sinon": "9.2.2",
-    "ts-loader": "8.0.12"
+    "sinon": "9.2.3",
+    "ts-loader": "8.0.14"
   },
   "dependencies": {
     "@grpc/proto-loader": "^0.5.4",
-    "@opentelemetry/api": "^0.14.0",
-    "@opentelemetry/core": "^0.14.0",
-    "@opentelemetry/exporter-collector": "^0.14.0",
-    "@opentelemetry/metrics": "^0.14.0",
-    "@opentelemetry/resources": "^0.14.0",
-    "@opentelemetry/tracing": "^0.14.0",
+    "@opentelemetry/api": "^0.16.0",
+    "@opentelemetry/core": "^0.16.0",
+    "@opentelemetry/exporter-collector": "^0.16.0",
+    "@opentelemetry/metrics": "^0.16.0",
+    "@opentelemetry/resources": "^0.16.0",
+    "@opentelemetry/tracing": "^0.16.0",
     "grpc": "^1.24.2"
   }
 }

@@ -13,6 +13,9 @@
       "path": "../opentelemetry-api"
     },
     {
+      "path": "../opentelemetry-api-metrics"
+    },
+    {
       "path": "../opentelemetry-context-async-hooks"
     },
     {
@@ -20,6 +23,9 @@
     },
     {
       "path": "../opentelemetry-core"
+    },
+    {
+      "path": "../opentelemetry-instrumentation"
     },
     {
       "path": "../opentelemetry-metrics"

@@ -49,7 +49,7 @@ describe('HistogramAggregator', () => {
     });
 
     it('should throw if no boundaries are defined', () => {
-      // @ts-ignore
+      // @ts-expect-error verify use without boundaries
       assert.throws(() => new HistogramAggregator());
       assert.throws(() => new HistogramAggregator([]));
     });

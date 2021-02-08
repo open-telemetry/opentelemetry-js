@@ -17,7 +17,6 @@
 import * as api from '@opentelemetry/api';
 import {
   ExportResult,
-  NoopLogger,
   globalErrorHandler,
   ExportResultCode,
 } from '@opentelemetry/core';
@@ -55,7 +54,7 @@ export class PrometheusExporter implements MetricExporter {
    * @param callback Callback to be called after a server was started
    */
   constructor(config: ExporterConfig = {}, callback?: () => void) {
-    this._logger = config.logger || new NoopLogger();
+    this._logger = config.logger || new api.NoopLogger();
     this._port = config.port || PrometheusExporter.DEFAULT_OPTIONS.port;
     this._prefix = config.prefix || PrometheusExporter.DEFAULT_OPTIONS.prefix;
     this._appendTimestamp =
@@ -156,6 +155,18 @@ export class PrometheusExporter implements MetricExporter {
         resolve();
       });
     });
+  }
+
+  /**
+   * Request handler that responds with the current state of metrics
+   * @param request Incoming HTTP request of server instance
+   * @param response HTTP response objet used to response to request
+   */
+  public getMetricsRequestHandler(
+    _request: IncomingMessage,
+    response: ServerResponse
+  ) {
+    this._exportMetrics(response);
   }
 
   /**

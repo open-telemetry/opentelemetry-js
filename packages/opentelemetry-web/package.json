@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/web",
-  "version": "0.14.0",
+  "version": "0.16.0",
   "description": "OpenTelemetry Web Tracer",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -42,9 +42,9 @@
   },
   "devDependencies": {
     "@babel/core": "7.12.10",
-    "@opentelemetry/context-zone": "^0.14.0",
-    "@opentelemetry/propagator-b3": "^0.14.0",
-    "@opentelemetry/resources": "^0.14.0",
+    "@opentelemetry/context-zone": "^0.16.0",
+    "@opentelemetry/propagator-b3": "^0.16.0",
+    "@opentelemetry/resources": "^0.16.0",
     "babel-loader": "8.2.2",
     "codecov": "3.8.1",
     "istanbul-instrumenter-loader": "3.0.1",
@@ -57,18 +57,17 @@
     "karma-webpack": "4.0.2",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "sinon": "9.2.2",
-    "ts-loader": "8.0.12",
-    "webpack": "4.44.2",
-    "webpack-cli": "4.2.0",
-    "webpack-merge": "5.6.1"
+    "sinon": "9.2.3",
+    "ts-loader": "8.0.14",
+    "webpack": "4.46.0",
+    "webpack-cli": "4.3.1",
+    "webpack-merge": "5.7.3"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.14.0",
-    "@opentelemetry/context-base": "^0.14.0",
-    "@opentelemetry/core": "^0.14.0",
-    "@opentelemetry/instrumentation": "^0.14.0",
-    "@opentelemetry/semantic-conventions": "^0.14.0",
-    "@opentelemetry/tracing": "^0.14.0"
+    "@opentelemetry/api": "^0.16.0",
+    "@opentelemetry/context-base": "^0.16.0",
+    "@opentelemetry/core": "^0.16.0",
+    "@opentelemetry/semantic-conventions": "^0.16.0",
+    "@opentelemetry/tracing": "^0.16.0"
   }
 }

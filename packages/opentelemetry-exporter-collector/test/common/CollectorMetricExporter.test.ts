@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
-import { ExportResultCode, NoopLogger } from '@opentelemetry/core';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { CollectorExporterBase } from '../../src/CollectorExporterBase';
-import { CollectorExporterConfigBase } from '../../src/types';
+import { NoopLogger } from '@opentelemetry/api';
+import { Counter, ValueObserver } from '@opentelemetry/api-metrics';
+import { ExportResultCode } from '@opentelemetry/core';
 import {
   BoundCounter,
   BoundObserver,
   Metric,
   MetricRecord,
 } from '@opentelemetry/metrics';
-import { mockCounter, mockObserver } from '../helper';
+import * as assert from 'assert';
+import * as sinon from 'sinon';
+import { CollectorExporterBase } from '../../src/CollectorExporterBase';
 import * as collectorTypes from '../../src/types';
+import { CollectorExporterConfigBase } from '../../src/types';
+import { mockCounter, mockObserver } from '../helper';
 
 type CollectorExporterConfig = CollectorExporterConfigBase;
 class CollectorMetricExporter extends CollectorExporterBase<
@@ -69,8 +70,8 @@ describe('CollectorMetricExporter - common', () => {
       };
       collectorExporter = new CollectorMetricExporter(collectorExporterConfig);
       metrics = [];
-      const counter: Metric<BoundCounter> & api.Counter = mockCounter();
-      const observer: Metric<BoundObserver> & api.ValueObserver = mockObserver(
+      const counter: Metric<BoundCounter> & Counter = mockCounter();
+      const observer: Metric<BoundObserver> & ValueObserver = mockObserver(
         observerResult => {
           observerResult.observe(3, {});
           observerResult.observe(6, {});

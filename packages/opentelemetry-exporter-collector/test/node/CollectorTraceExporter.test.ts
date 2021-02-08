@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { NoopLogger } from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as http from 'http';
@@ -71,7 +72,7 @@ describe('CollectorTraceExporter - node with json over http', () => {
           foo: 'bar',
         },
         hostname: 'foo',
-        logger: new core.NoopLogger(),
+        logger: new NoopLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
@@ -121,6 +122,19 @@ describe('CollectorTraceExporter - node with json over http', () => {
         const agent = options.agent;
         assert.strictEqual(agent.keepAlive, true);
         assert.strictEqual(agent.options.keepAliveMsecs, 2000);
+        done();
+      });
+    });
+
+    it('different http export requests should use the same agent', done => {
+      collectorExporter.export(spans, () => {});
+      collectorExporter.export(spans, () => {});
+
+      setTimeout(() => {
+        const [firstExportAgent, secondExportAgent] = spyRequest.args.map(
+          a => a[0].agent
+        );
+        assert.strictEqual(firstExportAgent, secondExportAgent);
         done();
       });
     });

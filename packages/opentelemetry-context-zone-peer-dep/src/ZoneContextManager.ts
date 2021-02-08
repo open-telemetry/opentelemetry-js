@@ -28,7 +28,7 @@ const ZONE_CONTEXT_KEY = 'OT_ZONE_CONTEXT';
 /**
  * ZoneContextManager
  * This module provides an easy functionality for tracing action between asynchronous operations in web.
- * It was not possible with standard [StackContextManager]{@link https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-web/src/StackContextManager.ts}.
+ * It was not possible with standard [StackContextManager]{@link https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-web/src/StackContextManager.ts}.
  * It heavily depends on [zone.js]{@link https://www.npmjs.com/package/zone.js}.
  * It stores the information about context in zone. Each Context will have always new Zone;
  * It also supports binding a certain Span to a target that has "addEventListener" and "removeEventListener".
@@ -244,15 +244,19 @@ export class ZoneContextManager implements ContextManager {
    *     The context will be set as active
    * @param context A context (span) to be called with provided callback
    * @param fn Callback function
+   * @param thisArg optional receiver to be used for calling fn
+   * @param args optional arguments forwarded to fn
    */
-  with<T extends (...args: unknown[]) => ReturnType<T>>(
+  with<A extends unknown[], F extends (...args: A) => ReturnType<F>>(
     context: Context | null,
-    fn: () => ReturnType<T>
-  ): ReturnType<T> {
+    fn: F,
+    thisArg?: ThisParameterType<F>,
+    ...args: A
+  ): ReturnType<F> {
     const zoneName = this._createZoneName();
 
     const newZone = this._createZone(zoneName, context);
 
-    return newZone.run(fn, context);
+    return newZone.run(fn, thisArg, args);
   }
 }

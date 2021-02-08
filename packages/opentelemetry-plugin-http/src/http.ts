@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 import {
-  StatusCode,
+  SpanStatusCode,
   context,
   propagation,
   Span,
   SpanKind,
   SpanOptions,
-  Status,
-  SpanContext,
-  TraceFlags,
-  setActiveSpan,
+  SpanStatus,
+  setSpan,
   ROOT_CONTEXT,
+  getSpan,
+  suppressInstrumentation,
+  NoopSpan,
 } from '@opentelemetry/api';
-import { BasePlugin, NoRecordingSpan } from '@opentelemetry/core';
+import { BasePlugin } from '@opentelemetry/core';
 import type {
   ClientRequest,
   IncomingMessage,
@@ -57,12 +58,6 @@ export class HttpPlugin extends BasePlugin<Http> {
   protected _config!: HttpPluginConfig;
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span>;
-
-  private readonly _emptySpanContext: SpanContext = {
-    traceId: '',
-    spanId: '',
-    traceFlags: TraceFlags.NONE,
-  };
 
   constructor(readonly moduleName: string, readonly version: string) {
     super(`@opentelemetry/plugin-${moduleName}`, VERSION);
@@ -214,14 +209,14 @@ export class HttpPlugin extends BasePlugin<Http> {
           this._callResponseHook(span, response);
         }
 
-        this._tracer.bind(response);
+        context.bind(response);
         this._logger.debug('outgoingRequest on response()');
         response.on('end', () => {
           this._logger.debug('outgoingRequest on end()');
-          let status: Status;
+          let status: SpanStatus;
 
           if (response.aborted && !response.complete) {
-            status = { code: StatusCode.ERROR };
+            status = { code: SpanStatusCode.ERROR };
           } else {
             status = utils.parseResponseStatus(response.statusCode!);
           }
@@ -294,7 +289,11 @@ export class HttpPlugin extends BasePlugin<Http> {
             plugin._logger.error('caught ignoreIncomingPaths error: ', e)
         )
       ) {
-        return original.apply(this, [event, ...args]);
+        return context.with(suppressInstrumentation(context.active()), () => {
+          context.bind(request);
+          context.bind(response);
+          return original.apply(this, [event, ...args]);
+        });
       }
 
       const headers = request.headers;
@@ -310,7 +309,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       return context.with(propagation.extract(ROOT_CONTEXT, headers), () => {
         const span = plugin._startHttpSpan(`HTTP ${method}`, spanOptions);
 
-        return plugin._tracer.withSpan(span, () => {
+        return context.with(setSpan(context.active(), span), () => {
           context.bind(request);
           context.bind(response);
 
@@ -415,7 +414,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         optionsParsed.headers = {};
       }
       propagation.inject(
-        setActiveSpan(context.active(), span),
+        setSpan(context.active(), span),
         optionsParsed.headers
       );
 
@@ -426,14 +425,14 @@ export class HttpPlugin extends BasePlugin<Http> {
       );
 
       plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
-      plugin._tracer.bind(request);
+      context.bind(request);
       return plugin._traceClientRequest(request, optionsParsed, span);
     };
   }
 
   private _startHttpSpan(name: string, options: SpanOptions) {
     /*
-     * If a parent is required but not present, we use a `NoRecordingSpan` to still
+     * If a parent is required but not present, we use a `NoopSpan` to still
      * propagate context without recording it.
      */
     const requireParent =
@@ -442,12 +441,12 @@ export class HttpPlugin extends BasePlugin<Http> {
         : this._config.requireParentforIncomingSpans;
 
     let span: Span;
-    const currentSpan = this._tracer.getCurrentSpan();
+    const currentSpan = getSpan(context.active());
 
     if (requireParent === true && currentSpan === undefined) {
       // TODO: Refactor this when a solution is found in
       // https://github.com/open-telemetry/opentelemetry-specification/issues/530
-      span = new NoRecordingSpan(plugin._emptySpanContext);
+      span = new NoopSpan();
     } else if (requireParent === true && currentSpan?.context().isRemote) {
       span = currentSpan;
     } else {

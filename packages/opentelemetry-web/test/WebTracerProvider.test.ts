@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-import { context } from '@opentelemetry/api';
+import { context, NoopLogger, getSpan, setSpan } from '@opentelemetry/api';
 import { ContextManager } from '@opentelemetry/context-base';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
-import { BasePlugin, NoopLogger } from '@opentelemetry/core';
-import { InstrumentationBase } from '@opentelemetry/instrumentation';
 import { B3Propagator } from '@opentelemetry/propagator-b3';
 import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
 import { Span, Tracer } from '@opentelemetry/tracing';
@@ -26,25 +24,6 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { WebTracerConfig } from '../src';
 import { WebTracerProvider } from '../src/WebTracerProvider';
-
-class DummyPlugin extends BasePlugin<unknown> {
-  constructor() {
-    super('dummy');
-  }
-  moduleName = 'dummy';
-
-  patch() {}
-  unpatch() {}
-}
-
-class DummyInstrumentation extends InstrumentationBase<unknown> {
-  constructor() {
-    super('dummy', '1');
-  }
-  enable() {}
-  disable() {}
-  init() {}
-}
 
 describe('WebTracerProvider', () => {
   describe('constructor', () => {
@@ -69,24 +48,19 @@ describe('WebTracerProvider', () => {
       assert.ok(tracer instanceof Tracer);
     });
 
-    it('should enable all plugins', () => {
-      const dummyPlugin1 = new DummyPlugin();
-      const dummyPlugin2 = new DummyPlugin();
-      const dummyPlugin3 = new DummyInstrumentation();
-      const spyEnable1 = sinon.spy(dummyPlugin1, 'enable');
-      const spyEnable2 = sinon.spy(dummyPlugin2, 'enable');
-      const spyEnable3 = sinon.spy(dummyPlugin3, 'enable');
-      const spySetTracerProvider = sinon.spy(dummyPlugin3, 'setTracerProvider');
+    it('should show warning when plugins are defined', () => {
+      const dummyPlugin1 = {};
+      const spyWarn = sinon.spy(window.console, 'warn');
 
-      const plugins = [dummyPlugin1, dummyPlugin2, dummyPlugin3];
+      const plugins = [dummyPlugin1];
 
       const options = { plugins };
       new WebTracerProvider(options);
 
-      assert.ok(spyEnable1.calledOnce === true);
-      assert.ok(spyEnable2.calledOnce === true);
-      assert.ok(spyEnable3.calledOnce === true);
-      assert.ok(spySetTracerProvider.calledOnce === true);
+      assert.strictEqual(
+        spyWarn.args[0][0],
+        'plugins option was removed, please use "registerInstrumentations" to load plugins'
+      );
     });
 
     it('should work without default context manager', () => {
@@ -133,9 +107,9 @@ describe('WebTracerProvider', () => {
 
         const rootSpan = webTracerWithZone.startSpan('rootSpan');
 
-        webTracerWithZone.withSpan(rootSpan, () => {
+        context.with(setSpan(context.active(), rootSpan), () => {
           assert.ok(
-            webTracerWithZone.getCurrentSpan() === rootSpan,
+            getSpan(context.active()) === rootSpan,
             'Current span is rootSpan'
           );
           const concurrentSpan1 = webTracerWithZone.startSpan(
@@ -145,19 +119,19 @@ describe('WebTracerProvider', () => {
             'concurrentSpan2'
           );
 
-          webTracerWithZone.withSpan(concurrentSpan1, () => {
+          context.with(setSpan(context.active(), concurrentSpan1), () => {
             setTimeout(() => {
               assert.ok(
-                webTracerWithZone.getCurrentSpan() === concurrentSpan1,
+                getSpan(context.active()) === concurrentSpan1,
                 'Current span is concurrentSpan1'
               );
             }, 10);
           });
 
-          webTracerWithZone.withSpan(concurrentSpan2, () => {
+          context.with(setSpan(context.active(), concurrentSpan2), () => {
             setTimeout(() => {
               assert.ok(
-                webTracerWithZone.getCurrentSpan() === concurrentSpan2,
+                getSpan(context.active()) === concurrentSpan2,
                 'Current span is concurrentSpan2'
               );
               done();

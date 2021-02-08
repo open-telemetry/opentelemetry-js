@@ -1,6 +1,5 @@
 # OpenTelemetry Web SDK
 
-[![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
 [![devDependencies][devDependencies-image]][devDependencies-url]
@@ -9,7 +8,7 @@
 This module provides *automated instrumentation and tracing* for Web applications.
 
 For manual instrumentation see the
-[@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing) package.
+[@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-tracing) package.
 
 ## How does automatic tracing work
 
@@ -17,7 +16,7 @@ This package exposes a class `WebTracerProvider` that will be able to automatica
 
 See the example how to use it.
 
-OpenTelemetry comes with a growing number of instrumentation plugins for well know modules (see [supported modules](https://github.com/open-telemetry/opentelemetry-js#plugins)) and an API to create custom plugins (see [the plugin developer guide](https://github.com/open-telemetry/opentelemetry-js/blob/master/doc/plugin-guide.md)).
+OpenTelemetry comes with a growing number of instrumentations for well know modules (see [supported modules](https://github.com/open-telemetry/opentelemetry-js#plugins)) and an API to create custom instrumentations (see [the instrumentation developer guide](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/instrumentation-guide.md)).
 
 Web Tracer currently supports one plugin for document load.
 Unlike Node Tracer (`NodeTracerProvider`), the plugins needs to be initialised and passed in configuration.
@@ -38,27 +37,22 @@ import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing
 import { WebTracerProvider } from '@opentelemetry/web';
 import { DocumentLoad } from '@opentelemetry/plugin-document-load';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
-// Minimum required setup - supports only synchronous operations
-const provider = new WebTracerProvider({
-  plugins: [
-    new DocumentLoad()
-  ]
-});
-
+const provider = new WebTracerProvider();
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-provider.register();
 
-const providerWithZone = new WebTracerProvider({
-  plugins: [
-    new DocumentLoad()
-  ]
-});
-providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-
-// Changing default contextManager to use ZoneContextManager - supports asynchronous operations
-providerWithZone.register({
+provider.register({
+  // Changing default contextManager to use ZoneContextManager - supports asynchronous operations - optional
   contextManager: new ZoneContextManager(),
+});
+
+// Registering instrumentations / plugins
+registerInstrumentations({
+  instrumentations: [
+    new DocumentLoad(),
+  ],
+  tracerProvider: provider,
 });
 
 ```
@@ -67,15 +61,14 @@ providerWithZone.register({
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
-- For help or feedback on this project, join us on [gitter][gitter-url]
+- For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
 
 ## License
 
 Apache 2.0 - See [LICENSE][license-url] for more information.
 
-[gitter-image]: https://badges.gitter.im/open-telemetry/opentelemetry-js.svg
-[gitter-url]: https://gitter.im/open-telemetry/opentelemetry-node?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
+[discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
+[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-web
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-web

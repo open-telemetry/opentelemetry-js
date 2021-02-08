@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 import {
-  StatusCode,
+  SpanStatusCode,
   context,
   propagation,
   Span as ISpan,
   SpanKind,
-  getActiveSpan,
+  NoopLogger,
+  getSpan,
+  setSpan,
 } from '@opentelemetry/api';
-import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
@@ -66,7 +67,6 @@ const provider = new NodeTracerProvider({
 });
 provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 instrumentation.setTracerProvider(provider);
-propagation.setGlobalPropagator(new DummyPropagation());
 
 function doNock(
   hostname: string,
@@ -102,6 +102,14 @@ export const responseHookFunction = (
 
 describe('HttpInstrumentation', () => {
   let contextManager: ContextManager;
+
+  before(() => {
+    propagation.setGlobalPropagator(new DummyPropagation());
+  });
+
+  after(() => {
+    propagation.disable();
+  });
 
   beforeEach(() => {
     contextManager = new AsyncHooksContextManager().enable();
@@ -201,6 +209,9 @@ describe('HttpInstrumentation', () => {
         });
         instrumentation.enable();
         server = http.createServer((request, response) => {
+          if (request.url?.includes('/ignored')) {
+            provider.getTracer('test').startSpan('some-span').end();
+          }
           response.end('Test Server Response');
         });
 
@@ -321,7 +332,7 @@ describe('HttpInstrumentation', () => {
         doNock(hostname, testPath, 200, 'Ok');
         const name = 'TestRootSpan';
         const span = provider.getTracer('default').startSpan(name);
-        return provider.getTracer('default').withSpan(span, async () => {
+        return context.with(setSpan(context.active(), span), async () => {
           const result = await httpRequest.get(
             `${protocol}://${hostname}${testPath}`
           );
@@ -364,7 +375,7 @@ describe('HttpInstrumentation', () => {
           );
           const name = 'TestRootSpan';
           const span = provider.getTracer('default').startSpan(name);
-          return provider.getTracer('default').withSpan(span, async () => {
+          return context.with(setSpan(context.active(), span), async () => {
             const result = await httpRequest.get(
               `${protocol}://${hostname}${testPath}`
             );
@@ -403,7 +414,7 @@ describe('HttpInstrumentation', () => {
         doNock(hostname, testPath, 200, 'Ok', num);
         const name = 'TestRootSpan';
         const span = provider.getTracer('default').startSpan(name);
-        await provider.getTracer('default').withSpan(span, async () => {
+        await context.with(setSpan(context.active(), span), async () => {
           for (let i = 0; i < num; i++) {
             await httpRequest.get(`${protocol}://${hostname}${testPath}`);
             const spans = memoryExporter.getFinishedSpans();
@@ -581,7 +592,7 @@ describe('HttpInstrumentation', () => {
           const spans = memoryExporter.getFinishedSpans();
           const [span] = spans;
           assert.strictEqual(spans.length, 1);
-          assert.strictEqual(span.status.code, StatusCode.ERROR);
+          assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
           assert.ok(Object.keys(span.attributes).length >= 6);
         }
       });
@@ -619,7 +630,7 @@ describe('HttpInstrumentation', () => {
           const spans = memoryExporter.getFinishedSpans();
           const [span] = spans;
           assert.strictEqual(spans.length, 1);
-          assert.strictEqual(span.status.code, StatusCode.ERROR);
+          assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
           assert.ok(Object.keys(span.attributes).length > 7);
         }
       });
@@ -653,7 +664,7 @@ describe('HttpInstrumentation', () => {
               span.attributes[HttpAttribute.HTTP_STATUS_CODE],
               404
             );
-            assert.strictEqual(span.status.code, StatusCode.ERROR);
+            assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
             done();
           });
         });
@@ -695,9 +706,9 @@ describe('HttpInstrumentation', () => {
       });
 
       it('should not set span as active in context for outgoing request', done => {
-        assert.deepStrictEqual(getActiveSpan(context.active()), undefined);
+        assert.deepStrictEqual(getSpan(context.active()), undefined);
         http.get(`${protocol}://${hostname}:${serverPort}/test`, res => {
-          assert.deepStrictEqual(getActiveSpan(context.active()), undefined);
+          assert.deepStrictEqual(getSpan(context.active()), undefined);
           done();
         });
       });
@@ -794,7 +805,7 @@ describe('HttpInstrumentation', () => {
         const span = tracer.startSpan('parentSpan', {
           kind: SpanKind.INTERNAL,
         });
-        tracer.withSpan(span, () => {
+        context.with(setSpan(context.active(), span), () => {
           httpRequest
             .get(`${protocol}://${hostname}:${serverPort}${testPath}`)
             .then(result => {

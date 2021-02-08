@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/core",
-  "version": "0.14.0",
+  "version": "0.16.0",
   "description": "OpenTelemetry Core provides default and no-op implementations of the OpenTelemetry types for trace and metrics",
   "main": "build/src/index.js",
   "browser": {
@@ -50,7 +50,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/propagator-b3": "^0.14.0",
+    "@opentelemetry/propagator-b3": "^0.16.0",
     "codecov": "3.8.1",
     "istanbul-instrumenter-loader": "3.0.1",
     "karma": "5.2.3",
@@ -61,13 +61,13 @@
     "karma-webpack": "4.0.2",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "sinon": "9.2.2",
-    "ts-loader": "8.0.12",
-    "webpack": "4.44.2"
+    "sinon": "9.2.3",
+    "ts-loader": "8.0.14",
+    "webpack": "4.46.0"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.14.0",
-    "@opentelemetry/context-base": "^0.14.0",
+    "@opentelemetry/api": "^0.16.0",
+    "@opentelemetry/context-base": "^0.16.0",
     "semver": "^7.1.3"
   }
 }

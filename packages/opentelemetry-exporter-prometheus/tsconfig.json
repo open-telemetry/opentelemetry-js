@@ -13,6 +13,9 @@
       "path": "../opentelemetry-api"
     },
     {
+      "path": "../opentelemetry-api-metrics"
+    },
+    {
       "path": "../opentelemetry-core"
     },
     {

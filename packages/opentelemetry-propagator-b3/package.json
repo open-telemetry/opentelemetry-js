@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/propagator-b3",
-  "version": "0.14.0",
+  "version": "0.16.0",
   "description": "OpenTelemetry B3 propagator provides context propagation for systems that are using the B3 header format",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -39,14 +39,14 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.14.0"
+    "@opentelemetry/api": "^0.16.0"
   },
   "devDependencies": {
-    "@opentelemetry/context-base": "^0.14.0",
+    "@opentelemetry/context-base": "^0.16.0",
     "codecov": "3.8.1",
     "istanbul-instrumenter-loader": "3.0.1",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "ts-loader": "8.0.12"
+    "ts-loader": "8.0.14"
   }
 }

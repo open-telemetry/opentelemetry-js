@@ -15,9 +15,9 @@
  */
 
 import {
-  Attributes,
+  SpanAttributes,
   Context,
-  getParentSpanContext,
+  getSpanContext,
   Link,
   Sampler,
   SamplingResult,
@@ -64,10 +64,10 @@ export class ParentBasedSampler implements Sampler {
     traceId: string,
     spanName: string,
     spanKind: SpanKind,
-    attributes: Attributes,
+    attributes: SpanAttributes,
     links: Link[]
   ): SamplingResult {
-    const parentContext = getParentSpanContext(context);
+    const parentContext = getSpanContext(context);
 
     if (!parentContext) {
       return this._root.shouldSample(

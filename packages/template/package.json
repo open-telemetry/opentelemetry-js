@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/template",
-  "version": "0.14.0",
+  "version": "0.16.0",
   "private": true,
   "publishConfig": {
     "access": "restricted"
@@ -75,6 +75,6 @@
     "webpack": "4.44.2"
   },
   "Add these to devDependencies for linting": {
-    "gts": "2.0.2"
+    "gts": "3.1.0"
   }
 }

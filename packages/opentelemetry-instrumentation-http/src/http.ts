@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 import {
-  StatusCode,
+  SpanStatusCode,
   context,
   propagation,
   Span,
   SpanKind,
   SpanOptions,
-  Status,
-  setActiveSpan,
-  SpanContext,
-  TraceFlags,
+  SpanStatus,
+  setSpan,
   ROOT_CONTEXT,
+  getSpan,
+  suppressInstrumentation,
+  NoopSpan,
 } from '@opentelemetry/api';
-import { NoRecordingSpan } from '@opentelemetry/core';
 import type * as http from 'http';
 import type * as https from 'https';
 import { Socket } from 'net';
@@ -59,11 +59,6 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span> = new WeakSet<Span>();
   private readonly _version = process.versions.node;
-  private readonly _emptySpanContext: SpanContext = {
-    traceId: '',
-    spanId: '',
-    traceFlags: TraceFlags.NONE,
-  };
 
   constructor(config: HttpInstrumentationConfig & InstrumentationConfig = {}) {
     super(
@@ -222,6 +217,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     return (original: Func<http.ClientRequest>): Func<http.ClientRequest> => {
       const instrumentation = this;
       return function httpsOutgoingRequest(
+        // eslint-disable-next-line node/no-unsupported-features/node-builtins
         options: https.RequestOptions | string | URL,
         ...args: HttpRequestArgs
       ): http.ClientRequest {
@@ -249,6 +245,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   /** Patches HTTPS outgoing get requests */
   private _getPatchHttpsOutgoingGetFunction(
     clientRequest: (
+      // eslint-disable-next-line node/no-unsupported-features/node-builtins
       options: http.RequestOptions | string | URL,
       ...args: HttpRequestArgs
     ) => http.ClientRequest
@@ -256,6 +253,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     return (original: Func<http.ClientRequest>): Func<http.ClientRequest> => {
       const instrumentation = this;
       return function httpsOutgoingRequest(
+        // eslint-disable-next-line node/no-unsupported-features/node-builtins
         options: https.RequestOptions | string | URL,
         ...args: HttpRequestArgs
       ): http.ClientRequest {
@@ -304,14 +302,14 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           this._callResponseHook(span, response);
         }
 
-        this.tracer.bind(response);
+        context.bind(response);
         this._logger.debug('outgoingRequest on response()');
         response.on('end', () => {
           this._logger.debug('outgoingRequest on end()');
-          let status: Status;
+          let status: SpanStatus;
 
           if (response.aborted && !response.complete) {
-            status = { code: StatusCode.ERROR };
+            status = { code: SpanStatusCode.ERROR };
           } else {
             status = utils.parseResponseStatus(response.statusCode!);
           }
@@ -391,7 +389,11 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
             )
         )
       ) {
-        return original.apply(this, [event, ...args]);
+        return context.with(suppressInstrumentation(context.active()), () => {
+          context.bind(request);
+          context.bind(response);
+          return original.apply(this, [event, ...args]);
+        });
       }
 
       const headers = request.headers;
@@ -410,7 +412,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           spanOptions
         );
 
-        return instrumentation.tracer.withSpan(span, () => {
+        return context.with(setSpan(context.active(), span), () => {
           context.bind(request);
           context.bind(response);
 
@@ -540,7 +542,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         optionsParsed.headers = {};
       }
       propagation.inject(
-        setActiveSpan(context.active(), span),
+        setSpan(context.active(), span),
         optionsParsed.headers
       );
 
@@ -559,7 +561,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         '%s instrumentation outgoingRequest',
         component
       );
-      instrumentation.tracer.bind(request);
+      context.bind(request);
       return instrumentation._traceClientRequest(
         component,
         request,
@@ -571,7 +573,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
   private _startHttpSpan(name: string, options: SpanOptions) {
     /*
-     * If a parent is required but not present, we use a `NoRecordingSpan` to still
+     * If a parent is required but not present, we use a `NoopSpan` to still
      * propagate context without recording it.
      */
     const requireParent =
@@ -580,12 +582,12 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         : this._getConfig().requireParentforIncomingSpans;
 
     let span: Span;
-    const currentSpan = this.tracer.getCurrentSpan();
+    const currentSpan = getSpan(context.active());
 
     if (requireParent === true && currentSpan === undefined) {
       // TODO: Refactor this when a solution is found in
       // https://github.com/open-telemetry/opentelemetry-specification/issues/530
-      span = new NoRecordingSpan(this._emptySpanContext);
+      span = new NoopSpan();
     } else if (requireParent === true && currentSpan?.context().isRemote) {
       span = currentSpan;
     } else {

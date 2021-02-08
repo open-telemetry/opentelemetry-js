@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
+import { NoopLogger } from '@opentelemetry/api';
+import * as api from '@opentelemetry/api-metrics';
 import * as assert from 'assert';
-import * as api from '@opentelemetry/api';
-import { NoopLogger } from '@opentelemetry/core';
 import { Meter, MeterProvider } from '../src';
 
 describe('Processor', () => {

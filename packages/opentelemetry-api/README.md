@@ -1,6 +1,5 @@
 # OpenTelemetry API for JavaScript
 
-[![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
 [![devDependencies][devDependencies-image]][devDependencies-url]
@@ -10,7 +9,7 @@ This package provides everything needed to interact with the OpenTelemetry API, 
 
 ## Quick Start
 
-To get started you need to install the SDK and plugins, create a TracerProvider and/or MeterProvider, and register it with the API.
+To get started you need to install the SDK and plugins, create a TracerProvider, and register it with the API.
 
 ### Install Dependencies
 
@@ -23,14 +22,9 @@ $ npm install \
     @opentelemetry/tracing \
     @opentelemetry/exporter-jaeger \ # add exporters as needed
     @opentelemetry/plugin-http # add plugins as needed
-
-$ # Install metrics dependencies
-$ npm install \
-    @opentelemetry/metrics \
-    @opentelemetry/exporter-prometheus # add exporters as needed
 ```
 
-> Note: this example is for node.js. See [examples/tracer-web](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/tracer-web) for a browser example.
+> Note: this example is for node.js. See [examples/tracer-web](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/tracer-web) for a browser example.
 
 ### Initialize the SDK
 
@@ -74,27 +68,6 @@ tracerProvider.addSpanProcessor(
 tracerProvider.register();
 ```
 
-#### Metrics
-
-```javascript
-const api = require("@opentelemetry/api");
-const { MeterProvider } = require("@opentelemetry/metrics");
-const { PrometheusExporter } = require("@opentelemetry/exporter-prometheus");
-
-const meterProvider = new MeterProvider({
-  // The Prometheus exporter runs an HTTP server which
-  // the Prometheus backend scrapes to collect metrics.
-  exporter: new PrometheusExporter({ startServer: true }),
-  interval: 1000,
-});
-
-/**
- * Registering the provider with the API allows it to be discovered
- * and used by instrumentation libraries.
- */
-api.metrics.setGlobalMeterProvider(meterProvider);
-```
-
 ## Version Compatibility
 
 Because the npm installer and node module resolution algorithm could potentially allow two or more copies of any given package to exist within the same `node_modules` structure, the OpenTelemetry API takes advantage of a variable on the `global` object to store the global API. When an API method in the API package is called, it checks if this `global` API exists and proxies calls to it if and only if it is a compatible API version. This means if a package has a dependency on an OpenTelemetry API version which is not compatible with the API used by the end user, the package will receive a no-op implementation of the API.
@@ -122,7 +95,6 @@ tracerProvider.register({
 If you are writing an instrumentation library, or prefer to call the API methods directly rather than using the `register` method on the Tracer/Meter Provider, OpenTelemetry provides direct access to the underlying API methods through the `@opentelemetry/api` package. API entry points are defined as global singleton objects `trace`, `metrics`, `propagation`, and `context` which contain methods used to initialize SDK implementations and acquire resources from the API.
 
 - [Trace API Documentation][trace-api-docs]
-- [Metrics API Documentation][metrics-api-docs]
 - [Propagation API Documentation][propagation-api-docs]
 - [Context API Documentation][context-api-docs]
 
@@ -135,13 +107,6 @@ api.trace.setGlobalTracerProvider(tracerProvider);
 api.trace.getTracerProvider();
 /* returns a tracer from the registered global tracer provider (no-op if a working provider has not been initialized) */
 api.trace.getTracer(name, version);
-
-/* Initialize MeterProvider */
-api.metrics.setGlobalMeterProvider(meterProvider);
-/* returns meterProvider (no-op if a working provider has not been initialized) */
-api.metrics.getMeterProvider();
-/* returns a meter from the registered global meter provider (no-op if a working provider has not been initialized) */
-api.metrics.getMeter(name, version);
 
 /* Initialize Propagator */
 api.propagation.setGlobalPropagator(httpTraceContextPropagator);
@@ -160,7 +125,7 @@ const api = require("@opentelemetry/api");
 const tracer = api.trace.getTracer("my-library-name", "0.2.3");
 
 async function doSomething() {
-  const span = tracer.startSpan("doSomething", { parent: tracer.getCurrentSpan() });
+  const span = tracer.startSpan("doSomething");
   try {
     const result = await doSomethingElse();
     span.end();
@@ -168,7 +133,7 @@ async function doSomething() {
   } catch (err) {
     span.setStatus({
       // use an appropriate status code here
-      code: api.StatusCode.ERROR,
+      code: api.SpanStatusCode.ERROR,
       message: err.message,
     });
     span.end();
@@ -181,15 +146,14 @@ async function doSomething() {
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
-- For help or feedback on this project, join us on [gitter][gitter-url]
+- For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
 
 ## License
 
 Apache 2.0 - See [LICENSE][license-url] for more information.
 
-[gitter-image]: https://badges.gitter.im/open-telemetry/opentelemetry-js.svg
-[gitter-url]: https://gitter.im/open-telemetry/opentelemetry-node?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
+[discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
+[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-api
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-api
@@ -203,9 +167,9 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [propagation-api-docs]: https://open-telemetry.github.io/opentelemetry-js/classes/propagationapi.html
 [context-api-docs]: https://open-telemetry.github.io/opentelemetry-js/classes/contextapi.html
 
-[web]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-web
-[tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing
-[node]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node
-[metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-metrics
+[web]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-web
+[tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-tracing
+[node]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-node
+[metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-metrics
 
 [other-tracing-backends]: https://github.com/open-telemetry/opentelemetry-js#trace-exporters

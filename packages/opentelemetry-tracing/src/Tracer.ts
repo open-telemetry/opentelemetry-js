@@ -18,7 +18,6 @@ import * as api from '@opentelemetry/api';
 import {
   ConsoleLogger,
   InstrumentationLibrary,
-  NoRecordingSpan,
   IdGenerator,
   RandomIdGenerator,
   sanitizeAttributes,
@@ -104,7 +103,7 @@ export class Tracer implements api.Tracer {
     const spanContext = { traceId, spanId, traceFlags, traceState };
     if (samplingResult.decision === api.SamplingDecision.NOT_RECORD) {
       this.logger.debug('Recording is off, starting no recording span');
-      return new NoRecordingSpan(spanContext);
+      return new api.NoopSpan(spanContext);
     }
 
     const span = new Span(
@@ -120,40 +119,6 @@ export class Tracer implements api.Tracer {
     // Set default attributes
     span.setAttributes(Object.assign(attributes, samplingResult.attributes));
     return span;
-  }
-
-  /**
-   * Returns the current Span from the current context.
-   *
-   * If there is no Span associated with the current context, undefined is returned.
-   */
-  getCurrentSpan(): api.Span | undefined {
-    const ctx = api.context.active();
-    // Get the current Span from the context or null if none found.
-    return api.getActiveSpan(ctx);
-  }
-
-  /**
-   * Enters the context of code where the given Span is in the current context.
-   */
-  withSpan<T extends (...args: unknown[]) => ReturnType<T>>(
-    span: api.Span,
-    fn: T
-  ): ReturnType<T> {
-    // Set given span to context.
-    return api.context.with(api.setActiveSpan(api.context.active(), span), fn);
-  }
-
-  /**
-   * Bind a span (or the current one) to the target's context
-   */
-  bind<T>(target: T, span?: api.Span): T {
-    return api.context.bind(
-      target,
-      span
-        ? api.setActiveSpan(api.context.active(), span)
-        : api.context.active()
-    );
   }
 
   /** Returns the active {@link TraceParams}. */
@@ -178,5 +143,5 @@ function getParent(
   context: api.Context
 ): api.SpanContext | undefined {
   if (options.root) return undefined;
-  return api.getParentSpanContext(context);
+  return api.getSpanContext(context);
 }

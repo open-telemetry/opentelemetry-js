@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MeterProvider, Meter, CounterMetric } from '../src';
-import { NoopLogger } from '@opentelemetry/core';
+import { NoopLogger } from '@opentelemetry/api';
 
 describe('MeterProvider', () => {
   describe('constructor', () => {
@@ -51,7 +51,7 @@ describe('MeterProvider', () => {
     it('should return the meter with default version without a version option', () => {
       const provider = new MeterProvider();
       const meter1 = provider.getMeter('default');
-      const meter2 = provider.getMeter('default', '*');
+      const meter2 = provider.getMeter('default', undefined);
       assert.deepEqual(meter1, meter2);
     });
 

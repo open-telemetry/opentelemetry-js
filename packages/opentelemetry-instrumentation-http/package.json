@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation-http",
-  "version": "0.14.0",
+  "version": "0.16.0",
   "description": "OpenTelemetry http/https automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -41,11 +41,12 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/context-async-hooks": "^0.14.0",
-    "@opentelemetry/context-base": "^0.14.0",
-    "@opentelemetry/node": "^0.14.0",
-    "@opentelemetry/tracing": "^0.14.0",
-    "axios": "0.21.0",
+    "@opentelemetry/context-async-hooks": "^0.16.0",
+    "@opentelemetry/context-base": "^0.16.0",
+    "@opentelemetry/core": "^0.16.0",
+    "@opentelemetry/node": "^0.16.0",
+    "@opentelemetry/tracing": "^0.16.0",
+    "axios": "0.21.1",
     "codecov": "3.8.1",
     "got": "9.6.0",
     "nock": "12.0.3",
@@ -53,14 +54,13 @@
     "request": "2.88.2",
     "request-promise-native": "1.0.9",
     "rimraf": "3.0.2",
-    "sinon": "9.2.2",
+    "sinon": "9.2.3",
     "superagent": "6.1.0"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.14.0",
-    "@opentelemetry/core": "^0.14.0",
-    "@opentelemetry/instrumentation": "^0.14.0",
-    "@opentelemetry/semantic-conventions": "^0.14.0",
+    "@opentelemetry/api": "^0.16.0",
+    "@opentelemetry/instrumentation": "^0.16.0",
+    "@opentelemetry/semantic-conventions": "^0.16.0",
     "semver": "^7.1.3"
   }
 }

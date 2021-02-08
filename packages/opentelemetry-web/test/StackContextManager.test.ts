@@ -132,6 +132,30 @@ describe('StackContextManager', () => {
       });
       assert.strictEqual(contextManager.active(), window);
     });
+
+    it('should forward this, arguments and return value', () => {
+      function fnWithThis(this: string, a: string, b: number): string {
+        assert.strictEqual(this, 'that');
+        assert.strictEqual(arguments.length, 2);
+        assert.strictEqual(a, 'one');
+        assert.strictEqual(b, 2);
+        return 'done';
+      }
+
+      const res = contextManager.with(
+        ROOT_CONTEXT,
+        fnWithThis,
+        'that',
+        'one',
+        2
+      );
+      assert.strictEqual(res, 'done');
+
+      assert.strictEqual(
+        contextManager.with(ROOT_CONTEXT, () => 3.14),
+        3.14
+      );
+    });
   });
 
   describe('.bind(function)', () => {

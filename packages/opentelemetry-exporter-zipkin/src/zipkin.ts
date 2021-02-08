@@ -15,11 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import {
-  ExportResult,
-  ExportResultCode,
-  NoopLogger,
-} from '@opentelemetry/core';
+import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import { SpanExporter, ReadableSpan } from '@opentelemetry/tracing';
 import { prepareSend } from './platform/index';
 import * as zipkinTypes from './types';
@@ -46,7 +42,7 @@ export class ZipkinExporter implements SpanExporter {
 
   constructor(config: zipkinTypes.ExporterConfig = {}) {
     const urlStr = config.url || ZipkinExporter.DEFAULT_URL;
-    this._logger = config.logger || new NoopLogger();
+    this._logger = config.logger || new api.NoopLogger();
     this._send = prepareSend(this._logger, urlStr, config.headers);
     this._serviceName = config.serviceName;
     this._statusCodeTagName = config.statusCodeTagName || statusCodeTagName;
@@ -78,7 +74,7 @@ export class ZipkinExporter implements SpanExporter {
       );
       return;
     }
-    const promise = new Promise(resolve => {
+    const promise = new Promise<void>(resolve => {
       this._sendSpans(spans, this._serviceName!, result => {
         resolve();
         resultCallback(result);
@@ -113,7 +109,11 @@ export class ZipkinExporter implements SpanExporter {
     const zipkinSpans = spans.map(span =>
       toZipkinSpan(
         span,
-        serviceName,
+        String(
+          span.attributes[SERVICE_RESOURCE.NAME] ||
+            span.resource.attributes[SERVICE_RESOURCE.NAME] ||
+            serviceName
+        ),
         this._statusCodeTagName,
         this._statusDescriptionTagName
       )

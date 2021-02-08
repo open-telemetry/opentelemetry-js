@@ -16,16 +16,13 @@
 
 import { ContextManager } from '@opentelemetry/context-base';
 import { TextMapPropagator } from '../context/propagation/TextMapPropagator';
-import { MeterProvider } from '../metrics/MeterProvider';
 import { TracerProvider } from '../trace/tracer_provider';
 import { _globalThis } from '../platform';
 
 export const GLOBAL_CONTEXT_MANAGER_API_KEY = Symbol.for(
   'io.opentelemetry.js.api.context'
 );
-export const GLOBAL_METRICS_API_KEY = Symbol.for(
-  'io.opentelemetry.js.api.metrics'
-);
+
 export const GLOBAL_PROPAGATION_API_KEY = Symbol.for(
   'io.opentelemetry.js.api.propagation'
 );
@@ -34,7 +31,6 @@ export const GLOBAL_TRACE_API_KEY = Symbol.for('io.opentelemetry.js.api.trace');
 type Get<T> = (version: number) => T;
 type OtelGlobal = Partial<{
   [GLOBAL_CONTEXT_MANAGER_API_KEY]: Get<ContextManager>;
-  [GLOBAL_METRICS_API_KEY]: Get<MeterProvider>;
   [GLOBAL_PROPAGATION_API_KEY]: Get<TextMapPropagator>;
   [GLOBAL_TRACE_API_KEY]: Get<TracerProvider>;
 }>;
@@ -65,4 +61,4 @@ export function makeGetter<T>(
  * version. If the global API is not compatible with the API package
  * attempting to get it, a NOOP API implementation will be returned.
  */
-export const API_BACKWARDS_COMPATIBILITY_VERSION = 2;
+export const API_BACKWARDS_COMPATIBILITY_VERSION = 4;

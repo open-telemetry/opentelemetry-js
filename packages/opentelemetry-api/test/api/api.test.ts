@@ -25,7 +25,6 @@ import api, {
   context,
   trace,
   propagation,
-  metrics,
   TextMapPropagator,
   Context,
   TextMapSetter,
@@ -36,12 +35,30 @@ import api, {
 } from '../../src';
 
 describe('API', () => {
-  const functions = ['getCurrentSpan', 'startSpan', 'withSpan'];
-
   it('should expose a tracer provider via getTracerProvider', () => {
     const tracer = api.trace.getTracerProvider();
     assert.ok(tracer);
     assert.strictEqual(typeof tracer, 'object');
+  });
+
+  describe('Context', () => {
+    it('with should forward this, arguments and return value', () => {
+      function fnWithThis(this: string, a: string, b: number): string {
+        assert.strictEqual(this, 'that');
+        assert.strictEqual(arguments.length, 2);
+        assert.strictEqual(a, 'one');
+        assert.strictEqual(b, 2);
+        return 'done';
+      }
+
+      const res = context.with(ROOT_CONTEXT, fnWithThis, 'that', 'one', 2);
+      assert.strictEqual(res, 'done');
+
+      assert.strictEqual(
+        context.with(ROOT_CONTEXT, () => 3.14),
+        3.14
+      );
+    });
   });
 
   describe('GlobalTracerProvider', () => {
@@ -56,21 +73,6 @@ describe('API', () => {
       context.disable();
       trace.disable();
       propagation.disable();
-      metrics.disable();
-    });
-
-    it('should not crash', () => {
-      functions.forEach(fn => {
-        const tracer = api.trace.getTracerProvider();
-        try {
-          ((tracer as unknown) as { [fn: string]: Function })[fn](); // Try to run the function
-          assert.ok(true, fn);
-        } catch (err) {
-          if (err.message !== 'Method not implemented.') {
-            assert.ok(true, fn);
-          }
-        }
-      });
     });
 
     it('should use the global tracer provider', () => {
@@ -165,6 +167,13 @@ describe('API', () => {
         assert.strictEqual(data.context, ROOT_CONTEXT);
         assert.strictEqual(data.carrier, carrier);
         assert.strictEqual(data.getter, getter);
+      });
+
+      it('fields', () => {
+        api.propagation.setGlobalPropagator(new TestTextMapPropagation());
+
+        const fields = api.propagation.fields();
+        assert.deepStrictEqual(fields, ['TestField']);
       });
     });
   });
