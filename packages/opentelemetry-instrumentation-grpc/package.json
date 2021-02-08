@@ -51,11 +51,20 @@
     "@opentelemetry/tracing": "^0.16.0",
     "codecov": "3.8.1",
     "grpc": "1.24.4",
+    "istanbul-instrumenter-loader": "3.0.1",
+    "karma": "5.2.3",
+    "karma-chrome-launcher": "3.1.0",
+    "karma-coverage-istanbul-reporter": "3.0.3",
+    "karma-mocha": "2.0.1",
+    "karma-spec-reporter": "0.0.32",
+    "karma-webpack": "4.0.2",
     "node-pre-gyp": "0.17.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "semver": "7.3.4",
-    "sinon": "9.2.3"
+    "sinon": "9.2.3",
+    "ts-loader": "8.0.14",
+    "webpack": "4.46.0"
   },
   "dependencies": {
     "@opentelemetry/api": "^0.16.0",
