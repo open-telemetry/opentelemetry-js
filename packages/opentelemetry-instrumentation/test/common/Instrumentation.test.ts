@@ -15,10 +15,9 @@
  */
 
 import * as assert from 'assert';
-import { Instrumentation } from '../../src';
-import { InstrumentationAbstract } from '../../src/instrumentation';
+import { Instrumentation, InstrumentationBase } from '../../src';
 
-class TestInstrumentation extends InstrumentationAbstract {
+class TestInstrumentation extends InstrumentationBase {
   constructor() {
     super('test', '1.0.0');
   }
@@ -34,7 +33,7 @@ describe('BaseInstrumentation', () => {
   });
 
   it('should create an instance', () => {
-    assert.ok(instrumentation instanceof InstrumentationAbstract);
+    assert.ok(instrumentation instanceof InstrumentationBase);
   });
 
   it('should have a name', () => {
@@ -43,5 +42,18 @@ describe('BaseInstrumentation', () => {
 
   it('should have a version', () => {
     assert.deepStrictEqual(instrumentation.instrumentationVersion, '1.0.0');
+  });
+
+  describe('constructor', () => {
+    it('should enable instrumentation by default', () => {
+      let called = false;
+      class TestInstrumentation2 extends TestInstrumentation {
+        enable() {
+          called = true;
+        }
+      }
+      instrumentation = new TestInstrumentation2();
+      assert.strictEqual(called, true);
+    });
   });
 });

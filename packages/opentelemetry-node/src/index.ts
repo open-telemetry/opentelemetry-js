@@ -15,5 +15,4 @@
  */
 
 export { NodeTracerConfig } from './config';
-export { Plugins } from './instrumentation/PluginLoader';
 export * from './NodeTracerProvider';
