@@ -44,6 +44,17 @@
 
 This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a framework for collecting traces and metrics from applications.
 
+## Compatibility Matrix
+
+| Core version | Contrib Version         |
+|--------------|-------------------------|
+| 0.16.x       | 0.14.x not released yet |
+| 0.15.x       | 0.13.x                  |
+| 0.14.x       | 0.12.x                  |
+| 0.13.x       | ------                  |
+| 0.12.x       | 0.11.x                  |
+| 0.11.x       | 0.10.x                  |
+
 ## Quick start
 
 ### Application Owner
