@@ -173,7 +173,7 @@ export class BatchSpanProcessor implements SpanProcessor {
         .catch(e => {
           globalErrorHandler(e);
         })
-        .finally(() => {
+        .then(() => {
           if (this._finishedSpans.length > 0) {
             this._clearTimer();
             this._maybeStartTimer();
