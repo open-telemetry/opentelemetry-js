@@ -14,7 +14,16 @@
  * limitations under the License.
  */
 
-import { AlwaysOnSampler, getEnv } from '@opentelemetry/core';
+import {
+  AlwaysOffSampler,
+  AlwaysOnSampler,
+  getEnv,
+  ParentBasedSampler,
+  TraceIdRatioBasedSampler,
+} from '@opentelemetry/core';
+import { ENVIRONMENT } from '@opentelemetry/core/build/src/utils/environment';
+
+const env = getEnv();
 
 /**
  * Default configuration. For fields with primitive values, any user-provided
@@ -24,10 +33,58 @@ import { AlwaysOnSampler, getEnv } from '@opentelemetry/core';
  */
 export const DEFAULT_CONFIG = {
   logLevel: getEnv().OTEL_LOG_LEVEL,
-  sampler: new AlwaysOnSampler(),
+  sampler: buildSamplerFromEnv(env),
   traceParams: {
-    numberOfAttributesPerSpan: getEnv().OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT,
-    numberOfLinksPerSpan: getEnv().OTEL_SPAN_LINK_COUNT_LIMIT,
-    numberOfEventsPerSpan: getEnv().OTEL_SPAN_EVENT_COUNT_LIMIT,
+    numberOfAttributesPerSpan: env.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT,
+    numberOfLinksPerSpan: env.OTEL_SPAN_LINK_COUNT_LIMIT,
+    numberOfEventsPerSpan: env.OTEL_SPAN_EVENT_COUNT_LIMIT,
   },
 };
+
+/**
+ * Based on environment, builds a sampler, complies with specification.
+ * @param env optional, by default uses getEnv(), but allows passing a value to reuse parsed environment
+ */
+export function buildSamplerFromEnv(env: Required<ENVIRONMENT> = getEnv()) {
+  const probability = getSamplerProbabilityFromEnv(env);
+  switch (env.OTEL_TRACE_SAMPLER) {
+    case 'always_on':
+      return new AlwaysOnSampler();
+    case 'always_off':
+      return new AlwaysOffSampler();
+    case 'traceidratio':
+      return new TraceIdRatioBasedSampler(probability);
+    case 'parentbased_always_on':
+      return new ParentBasedSampler({
+        root: new AlwaysOnSampler(),
+      });
+    case 'parentbased_always_off':
+      return new ParentBasedSampler({
+        root: new AlwaysOffSampler(),
+      });
+    case 'parentbased_traceidratio':
+      return new ParentBasedSampler({
+        root: new TraceIdRatioBasedSampler(probability),
+      });
+    default:
+      // use default AlwaysOnSampler if otelSamplingProbability is 1
+      if (probability < 1) {
+        return new ParentBasedSampler({
+          root: new TraceIdRatioBasedSampler(probability),
+        });
+      }
+      return new AlwaysOnSampler();
+  }
+}
+
+function getSamplerProbabilityFromEnv(env: Required<ENVIRONMENT>) {
+  const valueFromGenericArg =
+    env.OTEL_TRACE_SAMPLER_ARG !== ''
+      ? Number(env.OTEL_TRACE_SAMPLER_ARG)
+      : NaN;
+  if (!isNaN(valueFromGenericArg)) {
+    return valueFromGenericArg;
+  }
+
+  return env.OTEL_SAMPLING_PROBABILITY;
+}

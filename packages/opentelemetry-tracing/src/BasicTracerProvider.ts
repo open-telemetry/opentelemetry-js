@@ -18,8 +18,9 @@ import * as api from '@opentelemetry/api';
 import {
   CompositePropagator,
   ConsoleLogger,
-  HttpBaggage,
   HttpTraceContext,
+  HttpBaggage,
+  getEnv,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { SpanProcessor, Tracer } from '.';
@@ -28,6 +29,17 @@ import { MultiSpanProcessor } from './MultiSpanProcessor';
 import { NoopSpanProcessor } from './NoopSpanProcessor';
 import { SDKRegistrationConfig, TracerConfig } from './types';
 import merge = require('lodash.merge');
+import { TextMapPropagator } from '@opentelemetry/api';
+
+/**
+ * register core propagators on startup
+ */
+api.propagation.registerNamedPropagator(
+  'tracecontext',
+  () => new HttpTraceContext()
+);
+api.propagation.registerNamedPropagator('baggage', () => new HttpBaggage());
+
 /**
  * This class represents a basic tracer provider which platform libraries can extend
  */
@@ -86,8 +98,10 @@ export class BasicTracerProvider implements api.TracerProvider {
   register(config: SDKRegistrationConfig = {}) {
     api.trace.setGlobalTracerProvider(this);
     if (config.propagator === undefined) {
+      const propagators = this._getPropagatorsFromEnv();
+
       config.propagator = new CompositePropagator({
-        propagators: [new HttpBaggage(), new HttpTraceContext()],
+        propagators,
       });
     }
 
@@ -102,5 +116,30 @@ export class BasicTracerProvider implements api.TracerProvider {
 
   shutdown() {
     return this.activeSpanProcessor.shutdown();
+  }
+
+  _getPropagatorsFromEnv() {
+    const result: TextMapPropagator[] = [];
+    getEnv().OTEL_PROPAGATORS.forEach(propagatorName => {
+      const propagator = api.propagation.getRegisteredPropagatorByName(
+        propagatorName
+      );
+      if (propagator) {
+        result.push(propagator);
+      } else if (propagatorName === 'b3' || propagatorName === 'b3multi') {
+        this.logger.warn(
+          'B3 propagators unavailable, please add @opentelemetry/propagator-b3 to dependencies, and register using api.propagation.registerNamedPropagator().'
+        );
+      } else if (propagatorName === 'jaeger') {
+        this.logger.warn(
+          'Jaeger propagator unavailable, please add @opentelemetry/propagator-jaeger to dependencies, and register using api.propagation.registerNamedPropagator().'
+        );
+      } else {
+        this.logger.warn(
+          `Propagator with key "${propagatorName}" was requested, but wasn't registered.`
+        );
+      }
+    });
+    return result;
   }
 }

@@ -177,4 +177,37 @@ describe('API', () => {
       });
     });
   });
+
+  describe('registering named propagators', () => {
+    it('returns an instance of a registered propagator', () => {
+      class DummyPropagator implements TextMapPropagator {
+        inject(
+          context: Context,
+          carrier: any,
+          setter: TextMapSetter<any>
+        ): void {
+          throw new Error('Method not implemented.');
+        }
+        extract(
+          context: Context,
+          carrier: any,
+          getter: TextMapGetter<any>
+        ): Context {
+          throw new Error('Method not implemented.');
+        }
+        fields(): string[] {
+          throw new Error('Method not implemented.');
+        }
+      }
+
+      api.propagation.registerNamedPropagator(
+        'dummy',
+        () => new DummyPropagator()
+      );
+      assert.ok(
+        api.propagation.getRegisteredPropagatorByName('dummy') instanceof
+          DummyPropagator
+      );
+    });
+  });
 });

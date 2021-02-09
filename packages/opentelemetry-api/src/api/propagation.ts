@@ -21,6 +21,7 @@ import {
   defaultTextMapSetter,
   TextMapGetter,
   TextMapPropagator,
+  TextMapPropagatorFactory,
   TextMapSetter,
 } from '../context/propagation/TextMapPropagator';
 import {
@@ -35,6 +36,8 @@ import {
  */
 export class PropagationAPI {
   private static _instance?: PropagationAPI;
+
+  private _namedPropagatorsMap = new Map<string, TextMapPropagatorFactory>();
 
   /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
@@ -106,6 +109,25 @@ export class PropagationAPI {
   /** Remove the global propagator */
   public disable() {
     delete _global[GLOBAL_PROPAGATION_API_KEY];
+  }
+
+  /**
+   * Adds a propagator factory under a unique name
+   */
+  public registerNamedPropagator(
+    name: string,
+    factory: TextMapPropagatorFactory
+  ) {
+    this._namedPropagatorsMap.set(name, factory);
+  }
+
+  /**
+   * Instantiates a propagator using a factory registered under a given name
+   */
+  public getRegisteredPropagatorByName(
+    name: string
+  ): TextMapPropagator | undefined {
+    return this._namedPropagatorsMap.get(name)?.();
   }
 
   private _getGlobalPropagator(): TextMapPropagator {

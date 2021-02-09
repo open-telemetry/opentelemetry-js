@@ -46,8 +46,13 @@ describe('Tracer', () => {
     }
   }
 
+  beforeEach(() => {
+    if (process?.release?.name === 'node') {
+      process.env.OTEL_TRACE_SAMPLER = 'parentbased_traceidratio';
+    }
+  });
   afterEach(() => {
-    if (typeof process !== 'undefined' && process.release.name === 'node') {
+    if (process?.release?.name === 'node') {
       delete process.env.OTEL_SAMPLING_PROBABILITY;
     }
   });
@@ -61,13 +66,20 @@ describe('Tracer', () => {
     assert.ok(tracer instanceof Tracer);
   });
 
-  it('should use an AlwaysOnSampler by default', () => {
+  it('should use an ParentBasedSampler with root AlwaysOnSampler by default', () => {
+    if (process?.release?.name === 'node') {
+      delete process.env.OTEL_TRACE_SAMPLER;
+    }
+
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       {},
       tracerProvider
     );
-    assert.strictEqual(tracer['_sampler'].toString(), 'AlwaysOnSampler');
+    assert.strictEqual(
+      tracer['_sampler'].toString(),
+      'ParentBased{root=AlwaysOnSampler, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}'
+    );
   });
 
   it('should respect NO_RECORD sampling result', () => {
@@ -135,7 +147,7 @@ describe('Tracer', () => {
     });
   });
 
-  if (typeof process !== 'undefined' && process.release.name === 'node') {
+  if (process?.release?.name === 'node') {
     it('should sample a trace when OTEL_SAMPLING_PROBABILITY is invalid', () => {
       process.env.OTEL_SAMPLING_PROBABILITY = 'invalid value';
       const tracer = new Tracer(
@@ -150,7 +162,7 @@ describe('Tracer', () => {
     });
   }
 
-  if (typeof process !== 'undefined' && process.release.name === 'node') {
+  if (process?.release?.name === 'node') {
     it('should sample a trace when OTEL_SAMPLING_PROBABILITY is greater than 1', () => {
       process.env.OTEL_SAMPLING_PROBABILITY = '2';
       const tracer = new Tracer(
@@ -165,7 +177,7 @@ describe('Tracer', () => {
     });
   }
 
-  if (typeof process !== 'undefined' && process.release.name === 'node') {
+  if (process?.release?.name === 'node') {
     it('should not sample a trace when OTEL_SAMPLING_PROBABILITY is 0', () => {
       process.env.OTEL_SAMPLING_PROBABILITY = '0';
       const tracer = new Tracer(
@@ -180,7 +192,7 @@ describe('Tracer', () => {
     });
   }
 
-  if (typeof process !== 'undefined' && process.release.name === 'node') {
+  if (process?.release?.name === 'node') {
     it('should not sample a trace when OTEL_SAMPLING_PROBABILITY is less than 0', () => {
       process.env.OTEL_SAMPLING_PROBABILITY = '-1';
       const tracer = new Tracer(

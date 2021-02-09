@@ -23,6 +23,11 @@ import {
   setSpan,
   setSpanContext,
   getSpan,
+  TextMapPropagator,
+  TextMapSetter,
+  Context,
+  TextMapGetter,
+  propagation,
 } from '@opentelemetry/api';
 import {
   AlwaysOnSampler,
@@ -122,6 +127,93 @@ describe('BasicTracerProvider', () => {
     it('should construct an instance of BasicTracerProvider', () => {
       const tracer = new BasicTracerProvider();
       assert.ok(tracer instanceof BasicTracerProvider);
+    });
+  });
+
+  describe('.register()', () => {
+    describe('propagator', () => {
+      let setGlobalPropagatorStub: sinon.SinonSpy<
+        [TextMapPropagator],
+        TextMapPropagator
+      >;
+      let originalPropagators: string | undefined;
+      beforeEach(() => {
+        setGlobalPropagatorStub = sinon.spy(propagation, 'setGlobalPropagator');
+        originalPropagators = process.env.OTEL_PROPAGATORS;
+      });
+
+      afterEach(() => {
+        setGlobalPropagatorStub.restore();
+        process.env.OTEL_PROPAGATORS = originalPropagators;
+      });
+
+      it('should be set to a given value if it it provided', () => {
+        class DummyPropagator implements TextMapPropagator {
+          inject(
+            context: Context,
+            carrier: any,
+            setter: TextMapSetter<any>
+          ): void {
+            throw new Error('Method not implemented.');
+          }
+          extract(
+            context: Context,
+            carrier: any,
+            getter: TextMapGetter<any>
+          ): Context {
+            throw new Error('Method not implemented.');
+          }
+          fields(): string[] {
+            throw new Error('Method not implemented.');
+          }
+        }
+
+        const provider = new BasicTracerProvider();
+        provider.register({
+          propagator: new DummyPropagator(),
+        });
+        assert.ok(
+          setGlobalPropagatorStub.calledOnceWithExactly(
+            sinon.match.instanceOf(DummyPropagator)
+          )
+        );
+      });
+
+      it('warns if there is no propagator registered with a given name', () => {
+        const logger = new NoopLogger();
+        const warnStub = sinon.spy(logger, 'warn');
+
+        process.env.OTEL_PROPAGATORS = 'missing-propagator';
+        const provider = new BasicTracerProvider({ logger });
+        provider.register();
+
+        assert.ok(
+          warnStub.calledOnceWithExactly(
+            'Propagator with key "missing-propagator" was requested, but wasn\'t registered.'
+          )
+        );
+      });
+      it('prompts to install supported propagators if they are not available', () => {
+        const logger = new NoopLogger();
+        const warnStub = sinon.spy(logger, 'warn');
+
+        process.env.OTEL_PROPAGATORS = 'b3,b3multi,jaeger';
+        const provider = new BasicTracerProvider({ logger });
+        provider.register();
+
+        assert.strictEqual(
+          warnStub.getCalls()[0].args[0],
+          'B3 propagators unavailable, please add @opentelemetry/propagator-b3 to dependencies, and register using api.propagation.registerNamedPropagator().'
+        );
+        assert.strictEqual(
+          warnStub.getCalls()[1].args[0],
+          'B3 propagators unavailable, please add @opentelemetry/propagator-b3 to dependencies, and register using api.propagation.registerNamedPropagator().'
+        );
+        assert.strictEqual(
+          warnStub.getCalls()[2].args[0],
+          'Jaeger propagator unavailable, please add @opentelemetry/propagator-jaeger to dependencies, and register using api.propagation.registerNamedPropagator().'
+        );
+      });
     });
   });
 
@@ -225,7 +317,9 @@ describe('BasicTracerProvider', () => {
     });
 
     it('should start a span with name and with invalid parent span', () => {
-      const tracer = new BasicTracerProvider().getTracer('default');
+      const tracer = new BasicTracerProvider({
+        sampler: new AlwaysOnSampler(),
+      }).getTracer('default');
       const span = tracer.startSpan(
         'my-span',
         {},
@@ -234,7 +328,10 @@ describe('BasicTracerProvider', () => {
           ('invalid-parent' as unknown) as SpanContext
         )
       );
-      assert.ok(span instanceof Span);
+      assert.ok(
+        span instanceof Span,
+        `spans parent is ${span.constructor.toString()} (${tracer.constructor.toString()})`
+      );
       assert.deepStrictEqual((span as Span).parentSpanId, undefined);
     });
 

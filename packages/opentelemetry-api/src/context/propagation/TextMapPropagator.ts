@@ -135,3 +135,5 @@ export const defaultTextMapSetter: TextMapSetter = {
     carrier[key] = value;
   },
 };
+
+export type TextMapPropagatorFactory = () => TextMapPropagator;

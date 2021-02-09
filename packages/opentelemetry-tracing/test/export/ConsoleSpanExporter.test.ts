@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { AlwaysOnSampler } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
@@ -38,48 +39,50 @@ describe('ConsoleSpanExporter', () => {
 
   describe('.export()', () => {
     it('should export information about span', () => {
+      const basicTracerProvider = new BasicTracerProvider({
+        sampler: new AlwaysOnSampler(),
+      });
+      consoleExporter = new ConsoleSpanExporter();
+
+      const spyConsole = sinon.spy(console, 'log');
+      const spyExport = sinon.spy(consoleExporter, 'export');
+
+      basicTracerProvider.addSpanProcessor(
+        new SimpleSpanProcessor(consoleExporter)
+      );
+
       assert.doesNotThrow(() => {
-        const basicTracerProvider = new BasicTracerProvider();
-        consoleExporter = new ConsoleSpanExporter();
-
-        const spyConsole = sinon.spy(console, 'log');
-        const spyExport = sinon.spy(consoleExporter, 'export');
-
-        basicTracerProvider.addSpanProcessor(
-          new SimpleSpanProcessor(consoleExporter)
-        );
-
         const span = basicTracerProvider.getTracer('default').startSpan('foo');
         span.addEvent('foobar');
         span.end();
-
-        const spans = spyExport.args[0];
-        const firstSpan = spans[0][0];
-        const firstEvent = firstSpan.events[0];
-        const consoleArgs = spyConsole.args[0];
-        const consoleSpan = consoleArgs[0];
-        const keys = Object.keys(consoleSpan).sort().join(',');
-
-        const expectedKeys = [
-          'attributes',
-          'duration',
-          'events',
-          'id',
-          'kind',
-          'name',
-          'parentId',
-          'status',
-          'timestamp',
-          'traceId',
-        ].join(',');
-
-        assert.ok(firstSpan.name === 'foo');
-        assert.ok(firstEvent.name === 'foobar');
-        assert.ok(consoleSpan.id === firstSpan.spanContext.spanId);
-        assert.ok(keys === expectedKeys);
-
-        assert.ok(spyExport.calledOnce);
       });
+
+      const spans = spyExport.args[0];
+      const firstSpan = spans[0][0];
+      const firstEvent = firstSpan.events[0];
+      const consoleArgs = spyConsole.args[0];
+      const consoleSpan = consoleArgs[0];
+      const keys = Object.keys(consoleSpan).sort().join(',');
+
+      const expectedKeys = [
+        'attributes',
+        'duration',
+        'events',
+        'id',
+        'kind',
+        'name',
+        'parentId',
+        'status',
+        'timestamp',
+        'traceId',
+      ].join(',');
+
+      assert.strictEqual(firstSpan.name, 'foo');
+      assert.strictEqual(firstEvent.name, 'foobar');
+      assert.strictEqual(consoleSpan.id, firstSpan.spanContext.spanId);
+      assert.strictEqual(keys, expectedKeys);
+
+      assert.ok(spyExport.calledOnce);
     });
   });
 });

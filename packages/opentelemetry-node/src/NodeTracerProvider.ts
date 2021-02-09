@@ -14,16 +14,33 @@
  * limitations under the License.
  */
 
+import * as api from '@opentelemetry/api';
 import {
   AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
+import {
+  B3SinglePropagator,
+  B3MultiPropagator,
+} from '@opentelemetry/propagator-b3';
 import {
   BasicTracerProvider,
   SDKRegistrationConfig,
 } from '@opentelemetry/tracing';
 import * as semver from 'semver';
 import { NodeTracerConfig } from './config';
+
+// TODO: uncomment when new version of @opentelemetry/propagator-jaeger is released
+// import { JaegerHttpTracePropagator } from '@opentelemetry/propagator-jaeger';
+
+api.propagation.registerNamedPropagator('b3', () => new B3SinglePropagator());
+api.propagation.registerNamedPropagator(
+  'b3multi',
+  () => new B3MultiPropagator()
+);
+
+// TODO: uncomment when new version of @opentelemetry/propagator-jaeger is released
+// api.propagation.registerNamedPropagator('jaeger', () => new JaegerHttpTracePropagator);
 
 /**
  * Register this TracerProvider for use with the OpenTelemetry API.
