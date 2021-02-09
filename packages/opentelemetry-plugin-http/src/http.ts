@@ -25,7 +25,6 @@ import {
   ROOT_CONTEXT,
   getSpan,
   suppressInstrumentation,
-  NoopSpan,
 } from '@opentelemetry/api';
 import { BasePlugin } from '@opentelemetry/core';
 import type {
@@ -432,8 +431,8 @@ export class HttpPlugin extends BasePlugin<Http> {
 
   private _startHttpSpan(name: string, options: SpanOptions) {
     /*
-     * If a parent is required but not present, we use a `NoopSpan` to still
-     * propagate context without recording it.
+     * If a parent is required but not present, we suppress instrumentation
+     * and propagate context with a non-recording span.
      */
     const requireParent =
       options.kind === SpanKind.CLIENT
@@ -444,9 +443,11 @@ export class HttpPlugin extends BasePlugin<Http> {
     const currentSpan = getSpan(context.active());
 
     if (requireParent === true && currentSpan === undefined) {
-      // TODO: Refactor this when a solution is found in
-      // https://github.com/open-telemetry/opentelemetry-specification/issues/530
-      span = new NoopSpan();
+      span = this._tracer.startSpan(
+        'ignored',
+        {},
+        suppressInstrumentation(ROOT_CONTEXT)
+      );
     } else if (requireParent === true && currentSpan?.context().isRemote) {
       span = currentSpan;
     } else {
