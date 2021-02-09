@@ -42,7 +42,7 @@ const expectedIncompleteMap: { [n: string]: keyof Console } = {
   info: 'info',
   debug: 'debug',
   verbose: 'debug',
-  forcedInfo: 'info',
+  startupInfo: 'info',
 };
 
 describe('LogLevelFilter DiagLogger', () => {
@@ -54,7 +54,7 @@ describe('LogLevelFilter DiagLogger', () => {
     info: null,
     debug: null,
     verbose: null,
-    forcedInfo: null,
+    startupInfo: null,
   };
 
   let dummyLogger: DiagLogger;
@@ -118,16 +118,31 @@ describe('LogLevelFilter DiagLogger', () => {
       {
         message: 'CRITICAL',
         level: DiagLogLevel.CRITICAL,
-        ignoreFuncs: ['verbose', 'debug', 'info', 'warn', 'error'],
+        ignoreFuncs: [
+          'verbose',
+          'debug',
+          'info',
+          'warn',
+          'error',
+          'startupInfo',
+        ],
       },
       {
         message: 'TERMINAL',
         level: DiagLogLevel.TERMINAL,
-        ignoreFuncs: ['verbose', 'debug', 'info', 'warn', 'error', 'critical'],
+        ignoreFuncs: [
+          'verbose',
+          'debug',
+          'info',
+          'warn',
+          'error',
+          'critical',
+          'startupInfo',
+        ],
       },
       {
         message: 'between TERMINAL and NONE',
-        level: -10,
+        level: 1,
         ignoreFuncs: [
           'verbose',
           'debug',
@@ -136,6 +151,7 @@ describe('LogLevelFilter DiagLogger', () => {
           'error',
           'critical',
           'terminal',
+          'startupInfo',
         ],
       },
       {
@@ -149,7 +165,7 @@ describe('LogLevelFilter DiagLogger', () => {
           'error',
           'critical',
           'terminal',
-          'forcedInfo',
+          'startupInfo',
         ],
       },
       {
@@ -163,7 +179,7 @@ describe('LogLevelFilter DiagLogger', () => {
           'error',
           'critical',
           'terminal',
-          'forcedInfo',
+          'startupInfo',
         ],
       },
     ];

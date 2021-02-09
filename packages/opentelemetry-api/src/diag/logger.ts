@@ -54,6 +54,13 @@ export interface DiagLogger {
   error: DiagLogFunction;
 
   /**
+   * Logs a general informational message that is used for logging component startup and version
+   * information without causing additional general informational messages when the logging level
+   * is set to DiagLogLevel.WARN or lower.
+   */
+  startupInfo: DiagLogFunction;
+
+  /**
    * Log a warning scenario to inform the developer of an issues that should be investigated.
    * The requested operation may or may not have succeeded or completed.
    */
@@ -82,15 +89,6 @@ export interface DiagLogger {
    * in a production environment.
    */
   verbose: DiagLogFunction;
-
-  /**
-   * Log a general informational message that should always be logged regardless of the
-   * current or configured logging level {@Link DiagLogLevel} except when the level is set
-   * to {@Link DiagLogLevel.NONE). This type of logging is useful for logging component
-   * startup and version information without causing additional general informational messages
-   * when the logging level is set to DiagLogLevel.WARN or lower.
-   */
-  forcedInfo: DiagLogFunction;
 }
 
 // DiagLogger implementation
@@ -99,10 +97,10 @@ export const diagLoggerFunctions: Array<keyof DiagLogger> = [
   'debug',
   'info',
   'warn',
+  'startupInfo',
   'error',
   'critical',
   'terminal',
-  'forcedInfo',
 ];
 
 function noopLogFunction() {}

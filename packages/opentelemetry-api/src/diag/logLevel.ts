@@ -24,38 +24,41 @@ import { DiagLogger, DiagLogFunction, createNoopDiagLogger } from './logger';
  * compatibility/migration issues for any implementation that assume the numeric ordering.
  */
 export enum DiagLogLevel {
-  /** DIagnostic Logging level setting to disable all logging (except and forced logs) */
-  NONE = -99,
+  /** Diagnostic Logging level setting to disable all logging (except and forced logs) */
+  NONE = 0,
 
   /**
    * Identifies a terminal situation that would cause the API to completely fail to initialize,
    * if this type of error is logged functionality of the API is not expected to be functional.
    */
-  TERMINAL = -2,
+  TERMINAL = 10,
 
   /**
    * Identifies a critical error that needs to be addressed, functionality of the component
    * that emits this log detail may non-functional.
    */
-  CRITICAL = -1,
+  CRITICAL = 20,
 
   /** Identifies an error scenario */
-  ERROR = 0,
+  ERROR = 30,
+
+  /** Identifies startup and failure (lower) scenarios */
+  STARTUP = 40,
 
   /** Identifies a warning scenario */
-  WARN = 1,
+  WARN = 50,
 
   /** General informational log message */
-  INFO = 2,
+  INFO = 60,
 
   /** General debug log message */
-  DEBUG = 3,
+  DEBUG = 70,
 
   /**
    * Detailed trace level logging should only be used for development, should only be set
    * in a development environment.
    */
-  VERBOSE = 4,
+  VERBOSE = 80,
 
   /** Used to set the logging level to include all logging */
   ALL = 9999,
@@ -79,11 +82,11 @@ const fallbackLoggerFuncMap: { [n: string]: keyof Logger } = {
   info: 'info',
   debug: 'debug',
   verbose: 'debug',
-  forcedInfo: 'info',
+  startupInfo: 'info',
 };
 
 /** Mapping from DiagLogger function name to logging level. */
-const levelMap: { n: keyof DiagLogger; l: DiagLogLevel; f?: boolean }[] = [
+const levelMap: { n: keyof DiagLogger; l: DiagLogLevel }[] = [
   { n: 'terminal', l: DiagLogLevel.TERMINAL },
   { n: 'critical', l: DiagLogLevel.CRITICAL },
   { n: 'error', l: DiagLogLevel.ERROR },
@@ -91,7 +94,7 @@ const levelMap: { n: keyof DiagLogger; l: DiagLogLevel; f?: boolean }[] = [
   { n: 'info', l: DiagLogLevel.INFO },
   { n: 'debug', l: DiagLogLevel.DEBUG },
   { n: 'verbose', l: DiagLogLevel.VERBOSE },
-  { n: 'forcedInfo', l: DiagLogLevel.INFO, f: true },
+  { n: 'startupInfo', l: DiagLogLevel.ERROR },
 ];
 
 /**
@@ -130,10 +133,9 @@ export function createLogLevelDiagLogger(
   function _filterFunc(
     theLogger: DiagLogger,
     funcName: keyof DiagLogger,
-    theLevel: DiagLogLevel,
-    isForced?: boolean
+    theLevel: DiagLogLevel
   ): DiagLogFunction {
-    if (isForced || maxLevel >= theLevel) {
+    if (maxLevel >= theLevel) {
       return function () {
         const orgArguments = arguments as unknown;
         const theFunc =
@@ -152,7 +154,7 @@ export function createLogLevelDiagLogger(
   const newLogger = {} as DiagLogger;
   for (let i = 0; i < levelMap.length; i++) {
     const name = levelMap[i].n;
-    newLogger[name] = _filterFunc(logger, name, levelMap[i].l, levelMap[i].f);
+    newLogger[name] = _filterFunc(logger, name, levelMap[i].l);
   }
 
   return newLogger;

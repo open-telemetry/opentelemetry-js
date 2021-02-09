@@ -31,7 +31,7 @@ describe('DiagLogger functions', () => {
     info: null,
     debug: null,
     verbose: null,
-    forcedInfo: null,
+    startupInfo: null,
   };
 
   let dummyLogger: DiagLogger;

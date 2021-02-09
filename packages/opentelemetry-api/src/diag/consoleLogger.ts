@@ -24,7 +24,7 @@ const consoleMap: { n: keyof DiagLogger; c: keyof Console }[] = [
   { n: 'info', c: 'info' },
   { n: 'debug', c: 'debug' },
   { n: 'verbose', c: 'trace' },
-  { n: 'forcedInfo', c: 'info' },
+  { n: 'startupInfo', c: 'info' },
 ];
 
 /**
@@ -74,6 +74,13 @@ export class DiagConsoleLogger implements DiagLogger {
   public error!: DiagLogFunction;
 
   /**
+   * Logs a general informational message that is used for logging component startup and version
+   * information without causing additional general informational messages when the logging level
+   * is set to DiagLogLevel.WARN or lower.
+   */
+  public startupInfo!: DiagLogFunction;
+
+  /**
    * Log a warning scenario to inform the developer of an issues that should be investigated.
    * The requested operation may or may not have succeeded or completed.
    */
@@ -102,12 +109,4 @@ export class DiagConsoleLogger implements DiagLogger {
    * in a production environment.
    */
   public verbose!: DiagLogFunction;
-
-  /**
-   * Log a general informational message that should always be logged regardless of the
-   * current {@Link DiagLogLevel) and configured filtering level. This type of logging is
-   * useful for logging component startup and version information without causing additional
-   * general informational messages when the logging level is set to DiagLogLevel.WARN or lower.
-   */
-  public forcedInfo!: DiagLogFunction;
 }

@@ -35,7 +35,7 @@ const expectedConsoleMap: { [n: string]: keyof Console } = {
   info: 'info',
   debug: 'debug',
   verbose: 'trace',
-  forcedInfo: 'info',
+  startupInfo: 'info',
 };
 
 describe('DiagConsoleLogger', () => {

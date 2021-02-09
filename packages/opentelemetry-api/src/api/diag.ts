@@ -146,9 +146,8 @@ export class DiagAPI implements DiagLogger {
   public debug!: DiagLogFunction;
   public info!: DiagLogFunction;
   public warn!: DiagLogFunction;
+  public startupInfo!: DiagLogFunction;
   public error!: DiagLogFunction;
   public critical!: DiagLogFunction;
   public terminal!: DiagLogFunction;
-
-  public forcedInfo!: DiagLogFunction;
 }
