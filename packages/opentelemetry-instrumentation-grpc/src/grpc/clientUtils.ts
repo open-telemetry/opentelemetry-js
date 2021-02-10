@@ -21,9 +21,9 @@ import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import {
   context,
   Span,
-  StatusCode,
+  SpanStatusCode,
   SpanKind,
-  Status,
+  SpanStatus,
   propagation,
 } from '@opentelemetry/api';
 import {
@@ -62,7 +62,7 @@ export const makeGrpcClientRemoteCall = function (
           [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
         });
       } else {
-        span.setStatus({ code: StatusCode.UNSET });
+        span.setStatus({ code: SpanStatusCode.UNSET });
         span.setAttribute(
           RpcAttribute.GRPC_STATUS_CODE,
           grpcClient.status.OK.toString()
@@ -132,8 +132,8 @@ export const makeGrpcClientRemoteCall = function (
 
       ((call as unknown) as events.EventEmitter).on(
         'status',
-        (status: Status) => {
-          span.setStatus({ code: StatusCode.UNSET });
+        (status: SpanStatus) => {
+          span.setStatus({ code: SpanStatusCode.UNSET });
           span.setAttribute(
             RpcAttribute.GRPC_STATUS_CODE,
             status.code.toString()

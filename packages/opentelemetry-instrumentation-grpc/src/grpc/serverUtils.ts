@@ -18,7 +18,7 @@ import type * as grpcTypes from 'grpc';
 import { SendUnaryDataCallback, ServerCallWithMeta } from './types';
 import { GrpcNativeInstrumentation } from './';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
-import { context, Span, StatusCode } from '@opentelemetry/api';
+import { context, Span, SpanStatusCode } from '@opentelemetry/api';
 import {
   _grpcStatusCodeToOpenTelemetryStatusCode,
   _grpcStatusCodeToSpanStatus,
@@ -54,7 +54,7 @@ export const clientStreamAndUnaryHandler = function <RequestType, ResponseType>(
         [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
       });
     } else {
-      span.setStatus({ code: StatusCode.UNSET });
+      span.setStatus({ code: SpanStatusCode.UNSET });
       span.setAttribute(
         RpcAttribute.GRPC_STATUS_CODE,
         grpcClient.status.OK.toString()

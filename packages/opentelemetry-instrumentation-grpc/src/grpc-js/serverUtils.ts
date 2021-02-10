@@ -20,7 +20,7 @@
  * error event should be processed.
  */
 
-import { context, Span, StatusCode } from '@opentelemetry/api';
+import { context, Span, SpanStatusCode } from '@opentelemetry/api';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import type * as grpcJs from '@grpc/grpc-js';
 import type {
@@ -67,9 +67,12 @@ function serverStreamAndBidiHandler<RequestType, ResponseType>(
     call[CALL_SPAN_ENDED] = true;
 
     span.setStatus({
-      code: StatusCode.UNSET,
+      code: SpanStatusCode.UNSET,
     });
-    span.setAttribute(RpcAttribute.GRPC_STATUS_CODE, StatusCode.OK.toString());
+    span.setAttribute(
+      RpcAttribute.GRPC_STATUS_CODE,
+      SpanStatusCode.OK.toString()
+    );
 
     endSpan();
   });
@@ -125,10 +128,10 @@ function clientStreamAndUnaryHandler<RequestType, ResponseType>(
         [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
       });
     } else {
-      span.setStatus({ code: StatusCode.UNSET });
+      span.setStatus({ code: SpanStatusCode.UNSET });
       span.setAttribute(
         RpcAttribute.GRPC_STATUS_CODE,
-        StatusCode.OK.toString()
+        SpanStatusCode.OK.toString()
       );
     }
 
