@@ -123,7 +123,7 @@ export class BatchSpanProcessor implements SpanProcessor {
         this._finishedSpans.length / this._maxExportBatchSize
       );
       for (let i = 0, j = count; i < j; i++) {
-        promises.push(this._flush());
+        promises.push(this._flushOneBatch());
       }
       Promise.all(promises)
         .then(() => {
@@ -133,7 +133,7 @@ export class BatchSpanProcessor implements SpanProcessor {
     });
   }
 
-  private _flush(): Promise<void> {
+  private _flushOneBatch(): Promise<void> {
     this._clearTimer();
     if (this._finishedSpans.length === 0) {
       return Promise.resolve();
@@ -169,7 +169,7 @@ export class BatchSpanProcessor implements SpanProcessor {
   private _maybeStartTimer() {
     if (this._timer !== undefined) return;
     this._timer = setTimeout(() => {
-      this._flush()
+      this._flushOneBatch()
         .catch(e => {
           globalErrorHandler(e);
         })
