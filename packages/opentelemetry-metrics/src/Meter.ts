@@ -298,8 +298,8 @@ export class Meter implements api.Meter {
     });
 
     await Promise.all(metrics).then(records => {
-      records.forEach(metrics => {
-        metrics.forEach(metric => this._processor.process(metric));
+      records.forEach(record => {
+        record.forEach(metric => this._processor.process(metric));
       });
     });
   }
