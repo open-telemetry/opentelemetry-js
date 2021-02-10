@@ -17,7 +17,6 @@
 import * as assert from 'assert';
 import api, {
   TraceFlags,
-  NoopSpan,
   NoopTracerProvider,
   NoopTracer,
   SpanOptions,
@@ -33,6 +32,7 @@ import api, {
   defaultTextMapSetter,
   defaultTextMapGetter,
 } from '../../src';
+import { NoopSpan } from '../../src/trace/NoopSpan';
 
 describe('API', () => {
   it('should expose a tracer provider via getTracerProvider', () => {

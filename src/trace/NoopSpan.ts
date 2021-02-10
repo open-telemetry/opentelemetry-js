@@ -73,5 +73,3 @@ export class NoopSpan implements Span {
   // By default does nothing
   recordException(_exception: Exception, _time?: TimeInput): void {}
 }
-
-export const NOOP_SPAN = new NoopSpan();
