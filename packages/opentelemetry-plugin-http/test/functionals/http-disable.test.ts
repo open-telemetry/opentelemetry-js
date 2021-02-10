@@ -51,7 +51,7 @@ describe('HttpPlugin', () => {
     });
 
     beforeEach(() => {
-      NOOP_TRACER.startSpan = sinon.spy();
+      sinon.spy(NOOP_TRACER, 'startSpan');
     });
 
     afterEach(() => {
