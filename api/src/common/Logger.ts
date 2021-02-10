@@ -16,7 +16,10 @@
 
 export type LogFunction = (message: string, ...args: unknown[]) => void;
 
-/** Defines a logger interface. */
+/** Defines a logger interface.
+ * @deprecated This interface will be removed prior to v1.0, use the api.diag
+ * @see {@link DiagLogger} and {@link DiagAPI}
+ */
 export interface Logger {
   error: LogFunction;
   warn: LogFunction;
