@@ -15,7 +15,8 @@
  */
 
 import { Context, createContextKey } from '@opentelemetry/context-base';
-import { Baggage, NoopSpan, Span, SpanContext } from '../';
+import { Baggage, Span, SpanContext } from '../';
+import { NoopSpan } from '../trace/NoopSpan';
 
 /**
  * span key
