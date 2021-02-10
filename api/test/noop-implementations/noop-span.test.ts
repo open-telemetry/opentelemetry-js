@@ -19,9 +19,9 @@ import {
   SpanStatusCode,
   INVALID_SPANID,
   INVALID_TRACEID,
-  NoopSpan,
   TraceFlags,
 } from '../../src';
+import { NoopSpan } from '../../src/trace/NoopSpan';
 
 describe('NoopSpan', () => {
   it('do not crash', () => {
