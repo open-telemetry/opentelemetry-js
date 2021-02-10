@@ -1,7 +1,7 @@
 'use strict';
 
 const { MeterProvider } = require('@opentelemetry/metrics');
-const { ConsoleLogger, LogLevel } = require('@opentelemetry/core');
+const { DiagConsoleLogger, DiagLogLevel, diagLogLevelFilter } = require('@opentelemetry/api');
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 
 const exporter = new PrometheusExporter(
@@ -61,7 +61,7 @@ meter.createBatchObserver((observerBatchResult) => {
     });
   }, {
     maxTimeoutUpdateMS: 500,
-    logger: new ConsoleLogger(LogLevel.DEBUG)
+    logger: diagLogLevelFilter(DiagLogLevel.DEBUG, new DiagConsoleLogger())
   },
 );
 

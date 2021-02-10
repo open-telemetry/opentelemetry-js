@@ -1,15 +1,18 @@
 'use strict';
 
-const { ConsoleLogger, LogLevel } = require('@opentelemetry/core');
+const { DiagConsoleLogger, DiagLogLevel, diag } = require('@opentelemetry/api');
 const { CollectorMetricExporter } = require('@opentelemetry/exporter-collector');
 // const { CollectorMetricExporter } = require('@opentelemetry/exporter-collector-grpc');
 // const { CollectorMetricExporter } = require('@opentelemetry/exporter-collector-proto');
 const { MeterProvider } = require('@opentelemetry/metrics');
 
+diag.setLogger(new DiagConsoleLogger());
+diag.setLogLevel(DiagLogLevel.DEBUG);
+
 const metricExporter = new CollectorMetricExporter({
   serviceName: 'basic-metric-service',
   // url: 'http://localhost:55681/v1/metrics',
-  logger: new ConsoleLogger(LogLevel.DEBUG),
+  logger: diag,
 });
 
 const meter = new MeterProvider({

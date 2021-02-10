@@ -42,6 +42,9 @@ export * from './trace/trace_flags';
 export * from './trace/trace_state';
 export * from './trace/tracer_provider';
 export * from './trace/tracer';
+export * from './diag/consoleLogger';
+export * from './diag/logger';
+export * from './diag/logLevel';
 
 export {
   INVALID_SPANID,
@@ -74,8 +77,20 @@ export type { PropagationAPI } from './api/propagation';
 /** Entrypoint for propagation API */
 export const propagation = PropagationAPI.getInstance();
 
+import { DiagAPI } from './api/diag';
+export type { DiagAPI } from './api/diag';
+
+/**
+ * Entrypoint for Diag API.
+ * Defines Diagnostic handler used for internal diagnostic logging operations.
+ * The default provides a Noop DiagLogger implementation which may be changed via the
+ * diag.setLogger(logger: DiagLogger) function.
+ */
+export const diag = DiagAPI.instance();
+
 export default {
   trace,
   context,
   propagation,
+  diag,
 };
