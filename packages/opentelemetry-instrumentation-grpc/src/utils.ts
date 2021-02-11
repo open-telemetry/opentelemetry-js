@@ -16,6 +16,7 @@
 
 import { SpanStatusCode, SpanStatus } from '@opentelemetry/api';
 import type * as grpcTypes from 'grpc';
+import type * as grpcJsTypes from '@grpc/grpc-js';
 import { IgnoreMatcher } from './types';
 
 // Equivalent to lodash _.findIndex
@@ -38,7 +39,7 @@ export const findIndex: <T>(args: T[], fn: (arg: T) => boolean) => number = (
  * @param status
  */
 export const _grpcStatusCodeToOpenTelemetryStatusCode = (
-  status?: grpcTypes.status
+  status?: grpcTypes.status | grpcJsTypes.status
 ): SpanStatusCode => {
   if (status !== undefined && status === 0) {
     return SpanStatusCode.UNSET;
