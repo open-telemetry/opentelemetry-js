@@ -21,7 +21,7 @@ import {
   TraceFlags,
   ROOT_CONTEXT,
   suppressInstrumentation,
-  NoopLogger,
+  createNoopDiagLogger,
 } from '@opentelemetry/api';
 import { BasicTracerProvider, Tracer, Span } from '../src';
 import {
@@ -32,7 +32,7 @@ import {
 
 describe('Tracer', () => {
   const tracerProvider = new BasicTracerProvider({
-    logger: new NoopLogger(),
+    diagLogger: createNoopDiagLogger(),
   });
 
   class TestSampler implements Sampler {

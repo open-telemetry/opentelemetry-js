@@ -15,7 +15,6 @@
  */
 
 import { DiagAPI } from '../api/diag';
-import { Logger } from '../common/Logger';
 import { DiagLogger, DiagLogFunction, createNoopDiagLogger } from './logger';
 
 /**
@@ -74,7 +73,7 @@ export type DiagLogLevelString = keyof typeof DiagLogLevel;
  * Mapping from DiagLogger function name to Legacy Logger function used if
  * the logger instance doesn't have the DiagLogger function
  */
-const fallbackLoggerFuncMap: { [n: string]: keyof Logger } = {
+const fallbackLoggerFuncMap: { [n: string]: keyof DiagLogger } = {
   terminal: 'error',
   critical: 'error',
   error: 'error',

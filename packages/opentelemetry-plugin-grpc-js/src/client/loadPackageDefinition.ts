@@ -28,7 +28,7 @@ export function patchLoadPackageDefinition(this: GrpcJsPlugin) {
   return (original: typeof grpcJs.loadPackageDefinition) => {
     const plugin = this;
 
-    plugin._logger.debug('patching loadPackageDefinition');
+    plugin._diagLogger.debug('patching loadPackageDefinition');
 
     return function patchedLoadPackageDefinition(
       this: null,

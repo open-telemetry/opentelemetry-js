@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-import { Logger, NoopLogger } from '@opentelemetry/api';
+import { OptionalDiagLogger, diag } from '@opentelemetry/api';
 
 /**
  * Parses headers from config leaving only those that have defined values
  * @param partialHeaders
- * @param logger
+ * @param diagLogger
  */
 export function parseHeaders(
   partialHeaders: Partial<Record<string, unknown>> = {},
-  logger: Logger = new NoopLogger()
+  diagLogger?: OptionalDiagLogger
 ): Record<string, string> {
   const headers: Record<string, string> = {};
   Object.entries(partialHeaders).forEach(([key, value]) => {
     if (typeof value !== 'undefined') {
       headers[key] = String(value);
     } else {
-      logger.warn(`Header "${key}" has wrong value and will be ignored`);
+      (diagLogger || diag).warn(
+        `Header "${key}" has wrong value and will be ignored`
+      );
     }
   });
   return headers;

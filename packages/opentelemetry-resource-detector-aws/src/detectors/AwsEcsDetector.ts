@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
+import { getDiagLoggerFromConfig } from '@opentelemetry/api';
 import {
   Detector,
   Resource,
-  ResourceDetectionConfigWithLogger,
+  ResourceDetectionConfig,
   CONTAINER_RESOURCE,
 } from '@opentelemetry/resources';
 import * as util from 'util';
@@ -35,10 +36,12 @@ export class AwsEcsDetector implements Detector {
   readonly DEFAULT_CGROUP_PATH = '/proc/self/cgroup';
   private static readFileAsync = util.promisify(fs.readFile);
 
-  async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
+  async detect(config?: ResourceDetectionConfig): Promise<Resource> {
     const env = getEnv();
     if (!env.ECS_CONTAINER_METADATA_URI_V4 && !env.ECS_CONTAINER_METADATA_URI) {
-      config.logger.debug('AwsEcsDetector failed: Process is not on ECS');
+      getDiagLoggerFromConfig(config).debug(
+        'AwsEcsDetector failed: Process is not on ECS'
+      );
       return Resource.empty();
     }
 
@@ -61,7 +64,7 @@ export class AwsEcsDetector implements Detector {
    * and then return null string
    */
   private async _getContainerId(
-    config: ResourceDetectionConfigWithLogger
+    config?: ResourceDetectionConfig
   ): Promise<string | undefined> {
     try {
       const rawData = await AwsEcsDetector.readFileAsync(
@@ -75,7 +78,7 @@ export class AwsEcsDetector implements Detector {
         }
       }
     } catch (e) {
-      config.logger.warn(
+      getDiagLoggerFromConfig(config).warn(
         `AwsEcsDetector failed to read container ID: ${e.message}`
       );
     }

@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { context, NoopLogger, getSpan, setSpan } from '@opentelemetry/api';
+import {
+  context,
+  createNoopDiagLogger,
+  getSpan,
+  setSpan,
+} from '@opentelemetry/api';
 import { ContextManager } from '@opentelemetry/context-base';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { B3Propagator } from '@opentelemetry/propagator-b3';
@@ -144,7 +149,7 @@ describe('WebTracerProvider', () => {
     describe('.startSpan()', () => {
       it('should assign resource to span', () => {
         const provider = new WebTracerProvider({
-          logger: new NoopLogger(),
+          diagLogger: createNoopDiagLogger(),
         });
         const span = provider.getTracer('default').startSpan('my-span') as Span;
         assert.ok(span);

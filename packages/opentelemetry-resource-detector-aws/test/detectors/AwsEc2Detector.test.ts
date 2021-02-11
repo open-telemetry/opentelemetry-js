@@ -22,7 +22,7 @@ import {
   assertCloudResource,
   assertHostResource,
 } from '@opentelemetry/resources/test/util/resource-assertions';
-import { NoopLogger } from '@opentelemetry/api';
+import { createNoopDiagLogger } from '@opentelemetry/api';
 
 const AWS_HOST = 'http://' + awsEc2Detector.AWS_IDMS_ENDPOINT;
 const AWS_TOKEN_PATH = awsEc2Detector.AWS_INSTANCE_TOKEN_DOCUMENT_PATH;
@@ -66,7 +66,7 @@ describe('awsEc2Detector', () => {
         .reply(200, () => mockedHostResponse);
 
       const resource: Resource = await awsEc2Detector.detect({
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
       });
 
       scope.done();
@@ -104,7 +104,7 @@ describe('awsEc2Detector', () => {
 
       try {
         await awsEc2Detector.detect({
-          logger: new NoopLogger(),
+          diagLogger: createNoopDiagLogger(),
         });
         assert.ok(false, 'Expected to throw');
       } catch (err) {
@@ -130,7 +130,7 @@ describe('awsEc2Detector', () => {
 
       try {
         await awsEc2Detector.detect({
-          logger: new NoopLogger(),
+          diagLogger: createNoopDiagLogger(),
         });
         assert.ok(false, 'Expected to throw');
       } catch (err) {
@@ -152,7 +152,7 @@ describe('awsEc2Detector', () => {
 
       try {
         await awsEc2Detector.detect({
-          logger: new NoopLogger(),
+          diagLogger: createNoopDiagLogger(),
         });
         assert.ok(false, 'Expected to throw');
       } catch (err) {

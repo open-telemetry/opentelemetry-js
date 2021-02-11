@@ -6,7 +6,7 @@ const { MeterProvider } = require('@opentelemetry/metrics');
 
 const metricExporter = new CollectorMetricExporter({
   serviceName: 'basic-metric-service',
-  logger: diagLogLevelFilter(DiagLogLevel.DEBUG, new DiagConsoleLogger()),
+  diagLogger: diagLogLevelFilter(DiagLogLevel.DEBUG, new DiagConsoleLogger()),
 });
 
 let interval;

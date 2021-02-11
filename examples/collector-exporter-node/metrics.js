@@ -12,7 +12,7 @@ diag.setLogLevel(DiagLogLevel.DEBUG);
 const metricExporter = new CollectorMetricExporter({
   serviceName: 'basic-metric-service',
   // url: 'http://localhost:55681/v1/metrics',
-  logger: diag,
+  diagLogger: diag,
 });
 
 const meter = new MeterProvider({

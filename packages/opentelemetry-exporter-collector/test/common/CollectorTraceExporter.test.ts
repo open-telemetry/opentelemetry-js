@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { NoopLogger } from '@opentelemetry/api';
+import { createNoopDiagLogger, diag } from '@opentelemetry/api';
 import { ExportResultCode } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
@@ -68,7 +68,7 @@ describe('CollectorTraceExporter - common', () => {
       onInitSpy = sinon.stub(CollectorTraceExporter.prototype, 'onInit');
       collectorExporterConfig = {
         hostname: 'foo',
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
@@ -102,7 +102,10 @@ describe('CollectorTraceExporter - common', () => {
       });
 
       it('should set logger', () => {
-        assert.ok(collectorExporter.logger === collectorExporterConfig.logger);
+        assert.deepStrictEqual(
+          collectorExporter.diagLogger,
+          collectorExporterConfig.diagLogger
+        );
       });
     });
 
@@ -116,7 +119,7 @@ describe('CollectorTraceExporter - common', () => {
       });
 
       it('should set default logger', () => {
-        assert.ok(collectorExporter.logger instanceof NoopLogger);
+        assert.deepStrictEqual(collectorExporter.diagLogger, diag);
       });
     });
   });
@@ -233,7 +236,7 @@ describe('CollectorTraceExporter - common', () => {
       );
       collectorExporterConfig = {
         hostname: 'foo',
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',

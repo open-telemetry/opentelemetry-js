@@ -15,7 +15,7 @@
  */
 
 import {
-  Logger,
+  OptionalDiagLogger,
   Exception,
   DiagLogLevel,
   DiagConsoleLogger,
@@ -26,14 +26,16 @@ import { ErrorHandler } from './types';
 /**
  * Returns a function that logs an error using the provided logger, or a
  * console logger if one was not provided.
- * @param {Logger} logger
+ * @param {DiagLogger} diagLogger
  */
-export function loggingErrorHandler(logger?: Logger): ErrorHandler {
-  logger =
-    logger ??
+export function loggingErrorHandler(
+  diagLogger?: OptionalDiagLogger
+): ErrorHandler {
+  diagLogger =
+    diagLogger ||
     createLogLevelDiagLogger(DiagLogLevel.ERROR, new DiagConsoleLogger());
   return (ex: Exception) => {
-    logger!.error(stringifyException(ex));
+    diagLogger!.error(stringifyException(ex));
   };
 }
 

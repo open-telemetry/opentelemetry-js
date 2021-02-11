@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/api';
+import {
+  createLogLevelDiagLogger,
+  createNoopDiagLogger,
+  DiagConsoleLogger,
+  DiagLogLevel,
+} from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as http from 'http';
@@ -50,10 +55,13 @@ describe('CollectorTraceExporter - node with json over http', () => {
   describe('instance', () => {
     it('should warn about metadata when using json', () => {
       const metadata = 'foo';
-      const logger = new core.ConsoleLogger(core.LogLevel.DEBUG);
-      const spyLoggerWarn = sinon.stub(logger, 'warn');
+      const diagLogger = createLogLevelDiagLogger(
+        DiagLogLevel.DEBUG,
+        new DiagConsoleLogger()
+      );
+      const spyLoggerWarn = sinon.stub(diagLogger, 'warn');
       collectorExporter = new CollectorTraceExporter({
-        logger,
+        diagLogger: diagLogger,
         serviceName: 'basic-service',
         metadata,
         url: address,
@@ -72,7 +80,7 @@ describe('CollectorTraceExporter - node with json over http', () => {
           foo: 'bar',
         },
         hostname: 'foo',
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
@@ -161,7 +169,7 @@ describe('CollectorTraceExporter - node with json over http', () => {
     });
 
     it('should log the successful message', done => {
-      const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
+      const spyLoggerError = sinon.stub(collectorExporter.diagLogger, 'error');
       const responseSpy = sinon.spy();
       collectorExporter.export(spans, responseSpy);
 

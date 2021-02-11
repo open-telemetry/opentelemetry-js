@@ -24,7 +24,7 @@ import {
   assertContainerResource,
   assertEmptyResource,
 } from '@opentelemetry/resources/test/util/resource-assertions';
-import { NoopLogger } from '@opentelemetry/api';
+import { createNoopDiagLogger } from '@opentelemetry/api';
 
 const K8S_SVC_URL = awsEksDetector.K8S_SVC_URL;
 const AUTH_CONFIGMAP_PATH = awsEksDetector.AUTH_CONFIGMAP_PATH;
@@ -75,7 +75,7 @@ describe('awsEksDetector', () => {
         .reply(200, () => mockedClusterResponse);
 
       const resource: Resource = await awsEksDetector.detect({
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
       });
 
       scope.done();
@@ -114,7 +114,7 @@ describe('awsEksDetector', () => {
         .reply(200, () => mockedClusterResponse);
 
       const resource: Resource = await awsEksDetector.detect({
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
       });
 
       scope.done();
@@ -145,7 +145,7 @@ describe('awsEksDetector', () => {
         .reply(200, () => '');
 
       const resource: Resource = await awsEksDetector.detect({
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
       });
 
       scope.done();
@@ -177,7 +177,7 @@ describe('awsEksDetector', () => {
         .reply(200, () => mockedClusterResponse);
 
       const resource: Resource = await awsEksDetector.detect({
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
       });
 
       scope.done();
@@ -206,7 +206,7 @@ describe('awsEksDetector', () => {
         .reply(200, () => '');
 
       const resource: Resource = await awsEksDetector.detect({
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
       });
 
       scope.done();
@@ -224,7 +224,7 @@ describe('awsEksDetector', () => {
         .rejects(errorMsg.fileNotFoundError);
 
       const resource: Resource = await awsEksDetector.detect({
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
       });
 
       assert.ok(resource);
@@ -253,7 +253,7 @@ describe('awsEksDetector', () => {
         .reply(200, () => '');
 
       const resource: Resource = await awsEksDetector.detect({
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
       });
 
       scope.isDone();
@@ -284,7 +284,7 @@ describe('awsEksDetector', () => {
 
       try {
         await awsEksDetector.detect({
-          logger: new NoopLogger(),
+          diagLogger: createNoopDiagLogger(),
         });
       } catch (err) {
         assert.deepStrictEqual(err, expectedError);
@@ -312,7 +312,7 @@ describe('awsEksDetector', () => {
 
       try {
         await awsEksDetector.detect({
-          logger: new NoopLogger(),
+          diagLogger: createNoopDiagLogger(),
         });
       } catch (err) {
         assert.deepStrictEqual(err, expectedError);

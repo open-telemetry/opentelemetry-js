@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api-metrics';
-import { Logger, NoopLogger } from '@opentelemetry/api';
+import { DiagLogger, getDiagLoggerFromConfig } from '@opentelemetry/api';
 import { BatchObserverResult } from './BatchObserverResult';
 
 const NOOP_CALLBACK = () => {};
@@ -25,20 +25,20 @@ const MAX_TIMEOUT_UPDATE_MS = 500;
 export class BatchObserver {
   private _callback: (observerResult: api.BatchObserverResult) => void;
   private _maxTimeoutUpdateMS: number;
-  private _logger: Logger;
+  private _diagLogger: DiagLogger;
 
   constructor(
     options: api.BatchObserverOptions,
     callback?: (observerResult: api.BatchObserverResult) => void
   ) {
-    this._logger = options.logger ?? new NoopLogger();
+    this._diagLogger = getDiagLoggerFromConfig(options);
     this._maxTimeoutUpdateMS =
       options.maxTimeoutUpdateMS ?? MAX_TIMEOUT_UPDATE_MS;
     this._callback = callback || NOOP_CALLBACK;
   }
 
   collect(): Promise<void> {
-    this._logger.debug('getMetricRecord - start');
+    this._diagLogger.debug('getMetricRecord - start');
     return new Promise(resolve => {
       const observerResult = new BatchObserverResult();
 
@@ -49,14 +49,14 @@ export class BatchObserver {
         // for any reason the observerBatchResult will be referenced
         observerResult.onObserveCalled();
         resolve();
-        this._logger.debug('getMetricRecord - timeout');
+        this._diagLogger.debug('getMetricRecord - timeout');
       }, this._maxTimeoutUpdateMS);
 
       // sets callback for each "observe" method
       observerResult.onObserveCalled(() => {
         clearTimeout(timer);
         resolve();
-        this._logger.debug('getMetricRecord - end');
+        this._diagLogger.debug('getMetricRecord - end');
       });
 
       // calls the BatchObserverResult callback

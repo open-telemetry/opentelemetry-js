@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-import { Logger } from '../common/Logger';
-
 /**
- * Defines a type which can be used for as a parameter without breaking backward
- * compatibility. The {@link Logger} reference will be removed with the removal
- * of the Logger definition, this can be used as a replacement for functions
- * that are currently passing Logger references during migration to minimize
- * breaks that will occur with the removal of the Logger interface.
+ * Defines a type which can be used as a parameter to take an optional DiagLogger
+ * instance, undefined or null, this can be used as a replacement for functions
+ * that are currently passed DiagLogger references that are not the last non-optional
+ * parameter.
  */
-export type OptionalDiagLogger = Logger | DiagLogger | null | undefined;
+export type OptionalDiagLogger = DiagLogger | null | undefined;
 
 export type DiagLogFunction = (message: string, ...args: unknown[]) => void;
 

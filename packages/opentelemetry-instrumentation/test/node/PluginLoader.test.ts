@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger, NoopTracerProvider } from '@opentelemetry/api';
+import { createNoopDiagLogger, NoopTracerProvider } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as path from 'path';
 import {
@@ -102,7 +102,7 @@ const differentNamePlugins: Plugins = {
 
 describe('PluginLoader', () => {
   const provider = new NoopTracerProvider();
-  const logger = new NoopLogger();
+  const diagLogger = createNoopDiagLogger();
 
   before(() => {
     module.paths.push(INSTALLED_PLUGINS_PATH);
@@ -116,19 +116,19 @@ describe('PluginLoader', () => {
 
   describe('.state()', () => {
     it('returns UNINITIALIZED when first called', () => {
-      const pluginLoader = new PluginLoader(provider, logger);
+      const pluginLoader = new PluginLoader(provider, diagLogger);
       assert.strictEqual(pluginLoader['_hookState'], HookState.UNINITIALIZED);
     });
 
     it('transitions from UNINITIALIZED to ENABLED', () => {
-      const pluginLoader = new PluginLoader(provider, logger);
+      const pluginLoader = new PluginLoader(provider, diagLogger);
       pluginLoader.load(simplePlugins);
       assert.strictEqual(pluginLoader['_hookState'], HookState.ENABLED);
       pluginLoader.unload();
     });
 
     it('transitions from ENABLED to DISABLED', () => {
-      const pluginLoader = new PluginLoader(provider, logger);
+      const pluginLoader = new PluginLoader(provider, diagLogger);
       pluginLoader.load(simplePlugins).unload();
       assert.strictEqual(pluginLoader['_hookState'], HookState.DISABLED);
     });
@@ -159,7 +159,7 @@ describe('PluginLoader', () => {
     it('should not load a plugin on the ignore list environment variable', () => {
       // Set ignore list env var
       process.env[ENV_PLUGIN_DISABLED_LIST] = 'simple-module';
-      const pluginLoader = new PluginLoader(provider, logger);
+      const pluginLoader = new PluginLoader(provider, diagLogger);
       pluginLoader.load({ ...simplePlugins, ...supportedVersionPlugins });
 
       assert.strictEqual(pluginLoader['plugins'].length, 0);
@@ -180,7 +180,7 @@ describe('PluginLoader', () => {
     it('should not load plugins on the ignore list environment variable', () => {
       // Set ignore list env var
       process.env[ENV_PLUGIN_DISABLED_LIST] = 'simple-module,http';
-      const pluginLoader = new PluginLoader(provider, logger);
+      const pluginLoader = new PluginLoader(provider, diagLogger);
       pluginLoader.load({
         ...simplePlugins,
         ...supportedVersionPlugins,
@@ -209,7 +209,7 @@ describe('PluginLoader', () => {
     it('should not load any plugins if ignore list environment variable is set to "*"', () => {
       // Set ignore list env var
       process.env[ENV_PLUGIN_DISABLED_LIST] = '*';
-      const pluginLoader = new PluginLoader(provider, logger);
+      const pluginLoader = new PluginLoader(provider, diagLogger);
       pluginLoader.load({
         ...simplePlugins,
         ...supportedVersionPlugins,
@@ -237,7 +237,7 @@ describe('PluginLoader', () => {
     });
 
     it('should load a plugin and patch the target modules', () => {
-      const pluginLoader = new PluginLoader(provider, logger);
+      const pluginLoader = new PluginLoader(provider, diagLogger);
       assert.strictEqual(pluginLoader['plugins'].length, 0);
       pluginLoader.load(simplePlugins);
       // The hook is only called the first time the module is loaded.
@@ -249,7 +249,7 @@ describe('PluginLoader', () => {
     });
 
     it('should load a plugin and patch the core module', () => {
-      const pluginLoader = new PluginLoader(provider, logger);
+      const pluginLoader = new PluginLoader(provider, diagLogger);
       assert.strictEqual(pluginLoader['plugins'].length, 0);
       pluginLoader.load(httpPlugins);
       // The hook is only called the first time the module is loaded.
@@ -260,7 +260,7 @@ describe('PluginLoader', () => {
     });
     // @TODO: simplify this test once we can load module with custom path
     it('should not load the plugin when supported versions does not match', () => {
-      const pluginLoader = new PluginLoader(provider, logger);
+      const pluginLoader = new PluginLoader(provider, diagLogger);
       assert.strictEqual(pluginLoader['plugins'].length, 0);
       pluginLoader.load(notSupportedVersionPlugins);
       // The hook is only called the first time the module is loaded.
@@ -270,7 +270,7 @@ describe('PluginLoader', () => {
     });
     // @TODO: simplify this test once we can load module with custom path
     it('should load a plugin and patch the target modules when supported versions match', () => {
-      const pluginLoader = new PluginLoader(provider, logger);
+      const pluginLoader = new PluginLoader(provider, diagLogger);
       assert.strictEqual(pluginLoader['plugins'].length, 0);
       pluginLoader.load(supportedVersionPlugins);
       // The hook is only called the first time the module is loaded.
@@ -282,7 +282,7 @@ describe('PluginLoader', () => {
     });
 
     it('should not load a plugin when value is false', () => {
-      const pluginLoader = new PluginLoader(provider, logger);
+      const pluginLoader = new PluginLoader(provider, diagLogger);
       assert.strictEqual(pluginLoader['plugins'].length, 0);
       pluginLoader.load(disablePlugins);
       const simpleModule = require('simple-module');
@@ -293,7 +293,7 @@ describe('PluginLoader', () => {
     });
 
     it('should not load a plugin when value is true but path is missing', () => {
-      const pluginLoader = new PluginLoader(provider, logger);
+      const pluginLoader = new PluginLoader(provider, diagLogger);
       assert.strictEqual(pluginLoader['plugins'].length, 0);
       pluginLoader.load(missingPathPlugins);
       const simpleModule = require('simple-module');
@@ -304,7 +304,7 @@ describe('PluginLoader', () => {
     });
 
     it('should not load a non existing plugin', () => {
-      const pluginLoader = new PluginLoader(provider, logger);
+      const pluginLoader = new PluginLoader(provider, diagLogger);
       assert.strictEqual(pluginLoader['plugins'].length, 0);
       pluginLoader.load(nonexistentPlugins);
       assert.strictEqual(pluginLoader['plugins'].length, 0);
@@ -312,22 +312,18 @@ describe('PluginLoader', () => {
     });
 
     it("doesn't patch modules for which plugins aren't specified", () => {
-      const pluginLoader = new PluginLoader(provider, logger);
+      const pluginLoader = new PluginLoader(provider, diagLogger);
       pluginLoader.load({});
       assert.strictEqual(require('simple-module').value(), 0);
       pluginLoader.unload();
     });
 
     it('should warn when module was already loaded', callback => {
-      const verifyWarnLogger = {
-        error: logger.error,
-        info: logger.info,
-        debug: logger.debug,
-        warn: (message: string, ...args: unknown[]) => {
-          assert(message.match(/were already required when/));
-          assert(message.match(/(already-require-module)/));
-          return callback();
-        },
+      const verifyWarnLogger = Object.assign({}, diagLogger);
+      verifyWarnLogger.warn = (message: string, ...args: unknown[]) => {
+        assert(message.match(/were already required when/));
+        assert(message.match(/(already-require-module)/));
+        return callback();
       };
       require('already-require-module');
       const pluginLoader = new PluginLoader(provider, verifyWarnLogger);
@@ -336,7 +332,7 @@ describe('PluginLoader', () => {
     });
 
     it('should not load a plugin that patches a different module that the one configured', () => {
-      const pluginLoader = new PluginLoader(provider, logger);
+      const pluginLoader = new PluginLoader(provider, diagLogger);
       assert.strictEqual(pluginLoader['plugins'].length, 0);
       pluginLoader.load(differentNamePlugins);
       require('random-module');
@@ -347,7 +343,7 @@ describe('PluginLoader', () => {
 
   describe('.unload()', () => {
     it('should unload the plugins and unpatch the target module when unloads', () => {
-      const pluginLoader = new PluginLoader(provider, logger);
+      const pluginLoader = new PluginLoader(provider, diagLogger);
       assert.strictEqual(pluginLoader['plugins'].length, 0);
       pluginLoader.load(simplePlugins);
       // The hook is only called the first time the module is loaded.

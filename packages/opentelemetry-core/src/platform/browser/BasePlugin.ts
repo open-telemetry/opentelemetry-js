@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { Logger, TracerProvider } from '@opentelemetry/api';
+import {
+  OptionalDiagLogger,
+  TracerProvider,
+  getDiagLoggerFromConfig,
+} from '@opentelemetry/api';
 import { Plugin, PluginConfig } from '../../trace/Plugin';
 import { BaseAbstractPlugin } from '../BaseAbstractPlugin';
 
@@ -25,7 +29,7 @@ export abstract class BasePlugin<T>
   enable(
     moduleExports: T,
     tracerProvider: TracerProvider,
-    logger: Logger,
+    diagLogger?: OptionalDiagLogger,
     config?: PluginConfig
   ): T {
     this._moduleExports = moduleExports;
@@ -33,7 +37,7 @@ export abstract class BasePlugin<T>
       this._tracerName,
       this._tracerVersion
     );
-    this._logger = logger;
+    this._diagLogger = diagLogger || getDiagLoggerFromConfig(config);
     if (config) this._config = config;
     return this.patch();
   }

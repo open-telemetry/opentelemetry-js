@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import { DiagLogger, getDiagLoggerFromConfig } from '@opentelemetry/api';
 import { ExportResult, ExportResultCode, getEnv } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { Socket } from 'dgram';
@@ -25,7 +25,7 @@ import * as jaegerTypes from './types';
  * Format and sends span information to Jaeger Exporter.
  */
 export class JaegerExporter implements SpanExporter {
-  private readonly _logger: api.Logger;
+  private readonly _diagLogger: DiagLogger;
   private readonly _process: jaegerTypes.ThriftProcess;
   private readonly _sender: typeof jaegerTypes.UDPSender;
   private readonly _onShutdownFlushTimeout: number;
@@ -35,7 +35,7 @@ export class JaegerExporter implements SpanExporter {
 
   constructor(config: jaegerTypes.ExporterConfig) {
     const localConfig = Object.assign({}, config);
-    this._logger = localConfig.logger || new api.NoopLogger();
+    this._diagLogger = getDiagLoggerFromConfig(localConfig);
     const tags: jaegerTypes.Tag[] = localConfig.tags || [];
     this._onShutdownFlushTimeout =
       typeof localConfig.flushTimeout === 'number'
@@ -84,7 +84,7 @@ export class JaegerExporter implements SpanExporter {
     if (spans.length === 0) {
       return resultCallback({ code: ExportResultCode.SUCCESS });
     }
-    this._logger.debug('Jaeger exporter export');
+    this._diagLogger.debug('Jaeger exporter export');
     this._sendSpans(spans, resultCallback).catch(error => {
       return resultCallback({ code: ExportResultCode.FAILED, error });
     });
@@ -141,7 +141,7 @@ export class JaegerExporter implements SpanExporter {
         if (done) return done({ code: ExportResultCode.FAILED, error });
       }
     }
-    this._logger.debug('successful append for : %s', thriftSpan.length);
+    this._diagLogger.debug('successful append for : %s', thriftSpan.length);
 
     // Flush all spans on each export. No-op if span buffer is empty
     await this._flush();
@@ -166,7 +166,7 @@ export class JaegerExporter implements SpanExporter {
         if (err) {
           return reject(new Error(err));
         }
-        this._logger.debug('successful flush for %s spans', _count);
+        this._diagLogger.debug('successful flush for %s spans', _count);
         resolve();
       });
     });

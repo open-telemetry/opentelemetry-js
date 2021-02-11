@@ -19,7 +19,7 @@ import {
   propagation,
   Span as ISpan,
   SpanKind,
-  NoopLogger,
+  createNoopDiagLogger,
   getSpan,
   setSpan,
 } from '@opentelemetry/api';
@@ -45,8 +45,8 @@ import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import type { ClientRequest, IncomingMessage, ServerResponse } from 'http';
 import { isWrapped } from '@opentelemetry/instrumentation';
 
-const logger = new NoopLogger();
-const instrumentation = new HttpInstrumentation({ logger });
+const diagLogger = createNoopDiagLogger();
+const instrumentation = new HttpInstrumentation({ diagLogger });
 instrumentation.enable();
 instrumentation.disable();
 
@@ -63,7 +63,7 @@ const pathname = '/test';
 const serverName = 'my.server.name';
 const memoryExporter = new InMemorySpanExporter();
 const provider = new NodeTracerProvider({
-  logger,
+  diagLogger,
 });
 provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 instrumentation.setTracerProvider(provider);

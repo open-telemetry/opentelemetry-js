@@ -15,7 +15,7 @@
  */
 import {
   NoopTracerProvider,
-  NoopLogger,
+  createNoopDiagLogger,
   NOOP_TRACER,
 } from '@opentelemetry/api';
 import * as assert from 'assert';
@@ -31,13 +31,13 @@ describe('HttpPlugin', () => {
   let serverPort = 0;
 
   describe('disable()', () => {
-    const logger = new NoopLogger();
+    const diagLogger = createNoopDiagLogger();
     const provider = new NoopTracerProvider();
     before(() => {
       nock.cleanAll();
       nock.enableNetConnect();
 
-      plugin.enable(http, provider, logger);
+      plugin.enable(http, provider, diagLogger);
       // Ensure that http module is patched.
       assert.strictEqual(http.Server.prototype.emit.__wrapped, true);
       server = http.createServer((request, response) => {

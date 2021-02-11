@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/api';
+import { createNoopDiagLogger } from '@opentelemetry/api';
 import {
   Counter,
   ValueObserver,
@@ -89,7 +89,7 @@ describe('CollectorMetricExporter - web', () => {
     describe('when "sendBeacon" is available', () => {
       beforeEach(() => {
         collectorExporter = new CollectorMetricExporter({
-          logger: new NoopLogger(),
+          diagLogger: createNoopDiagLogger(),
           url: 'http://foo.bar.com',
           serviceName: 'bar',
         });
@@ -167,8 +167,14 @@ describe('CollectorMetricExporter - web', () => {
       });
 
       it('should log the successful message', done => {
-        const spyLoggerDebug = sinon.stub(collectorExporter.logger, 'debug');
-        const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
+        const spyLoggerDebug = sinon.stub(
+          collectorExporter.diagLogger,
+          'debug'
+        );
+        const spyLoggerError = sinon.stub(
+          collectorExporter.diagLogger,
+          'error'
+        );
         spyBeacon.restore();
         spyBeacon = sinon.stub(window.navigator, 'sendBeacon').returns(true);
 
@@ -200,7 +206,7 @@ describe('CollectorMetricExporter - web', () => {
       beforeEach(() => {
         (window.navigator as any).sendBeacon = false;
         collectorExporter = new CollectorMetricExporter({
-          logger: new NoopLogger(),
+          diagLogger: createNoopDiagLogger(),
           url: 'http://foo.bar.com',
           serviceName: 'bar',
         });
@@ -279,8 +285,14 @@ describe('CollectorMetricExporter - web', () => {
       });
 
       it('should log the successful message', done => {
-        const spyLoggerDebug = sinon.stub(collectorExporter.logger, 'debug');
-        const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
+        const spyLoggerDebug = sinon.stub(
+          collectorExporter.diagLogger,
+          'debug'
+        );
+        const spyLoggerError = sinon.stub(
+          collectorExporter.diagLogger,
+          'error'
+        );
 
         collectorExporter.export(metrics, () => {});
 
@@ -334,7 +346,7 @@ describe('CollectorMetricExporter - web', () => {
 
     beforeEach(() => {
       collectorExporterConfig = {
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
         headers: customHeaders,
       };
       server = sinon.fakeServer.create();

@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { SpanAttributes, Logger, NoopLogger } from '@opentelemetry/api';
+import {
+  SpanAttributes,
+  DiagLogger,
+  getDiagLoggerFromConfig,
+} from '@opentelemetry/api';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import {
   CollectorExporterError,
@@ -32,7 +36,7 @@ export abstract class CollectorExporterBase<
 > {
   public readonly serviceName: string;
   public readonly url: string;
-  public readonly logger: Logger;
+  public readonly diagLogger: DiagLogger;
   public readonly hostname: string | undefined;
   public readonly attributes?: SpanAttributes;
   protected _concurrencyLimit: number;
@@ -52,7 +56,7 @@ export abstract class CollectorExporterBase<
 
     this.attributes = config.attributes;
 
-    this.logger = config.logger || new NoopLogger();
+    this.diagLogger = getDiagLoggerFromConfig(config);
 
     this.shutdown = this.shutdown.bind(this);
 
@@ -99,7 +103,7 @@ export abstract class CollectorExporterBase<
   private _export(items: ExportItem[]): Promise<unknown> {
     return new Promise<void>((resolve, reject) => {
       try {
-        this.logger.debug('items to be sent', items);
+        this.diagLogger.debug('items to be sent', items);
         this.send(items, resolve, reject);
       } catch (e) {
         reject(e);
@@ -112,11 +116,11 @@ export abstract class CollectorExporterBase<
    */
   shutdown(): Promise<void> {
     if (this._isShutdown) {
-      this.logger.debug('shutdown already started');
+      this.diagLogger.debug('shutdown already started');
       return this._shuttingDownPromise;
     }
     this._isShutdown = true;
-    this.logger.debug('shutdown started');
+    this.diagLogger.debug('shutdown started');
     this._shuttingDownPromise = new Promise((resolve, reject) => {
       Promise.resolve()
         .then(() => {

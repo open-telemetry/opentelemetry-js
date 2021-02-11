@@ -18,16 +18,16 @@ import {
   Context,
   TextMapGetter,
   TextMapPropagator,
-  Logger,
+  DiagLogger,
   TextMapSetter,
-  NoopLogger,
+  getDiagLoggerFromConfig,
 } from '@opentelemetry/api';
 import { CompositePropagatorConfig } from './types';
 
 /** Combines multiple propagators into a single propagator. */
 export class CompositePropagator implements TextMapPropagator {
   private readonly _propagators: TextMapPropagator[];
-  private readonly _logger: Logger;
+  private readonly _diagLogger: DiagLogger;
   private readonly _fields: string[];
 
   /**
@@ -37,7 +37,8 @@ export class CompositePropagator implements TextMapPropagator {
    */
   constructor(config: CompositePropagatorConfig = {}) {
     this._propagators = config.propagators ?? [];
-    this._logger = config.logger ?? new NoopLogger();
+    this._diagLogger = getDiagLoggerFromConfig(config);
+
     this._fields = Array.from(
       new Set(
         this._propagators
@@ -62,7 +63,7 @@ export class CompositePropagator implements TextMapPropagator {
       try {
         propagator.inject(context, carrier, setter);
       } catch (err) {
-        this._logger.warn(
+        this._diagLogger.warn(
           `Failed to inject with ${propagator.constructor.name}. Err: ${err.message}`
         );
       }
@@ -83,7 +84,7 @@ export class CompositePropagator implements TextMapPropagator {
       try {
         return propagator.extract(ctx, carrier, getter);
       } catch (err) {
-        this._logger.warn(
+        this._diagLogger.warn(
           `Failed to inject with ${propagator.constructor.name}. Err: ${err.message}`
         );
       }

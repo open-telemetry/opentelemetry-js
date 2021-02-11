@@ -15,7 +15,7 @@
  */
 
 import { Resource } from './Resource';
-import { ResourceDetectionConfigWithLogger } from './config';
+import { ResourceDetectionConfig } from './config';
 
 /** Interface for Resource attributes  */
 export interface ResourceAttributes {
@@ -27,5 +27,5 @@ export interface ResourceAttributes {
  * a detector returns a Promise containing a Resource.
  */
 export interface Detector {
-  detect(config: ResourceDetectionConfigWithLogger): Promise<Resource>;
+  detect(config?: ResourceDetectionConfig): Promise<Resource>;
 }

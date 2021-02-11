@@ -16,7 +16,6 @@
 
 import * as assert from 'assert';
 import { diag } from '../../src';
-import { Logger } from '../../src/common/Logger';
 import {
   createNoopDiagLogger,
   DiagLogger,
@@ -27,7 +26,8 @@ import {
   createLogLevelDiagLogger,
 } from '../../src/diag/logLevel';
 
-const incompleteLoggerFuncs: Array<keyof Logger> = [
+// Matches the previous Logger definition
+const incompleteLoggerFuncs: Array<keyof DiagLogger> = [
   'debug',
   'info',
   'warn',

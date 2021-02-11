@@ -71,7 +71,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   protected readonly _basedir = basedir;
 
   protected patch(): typeof grpcTypes {
-    this._logger.debug(
+    this._diagLogger.debug(
       'applying patch to %s@%s',
       this.moduleName,
       this.version
@@ -108,7 +108,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     return this._moduleExports;
   }
   protected unpatch(): void {
-    this._logger.debug(
+    this._diagLogger.debug(
       'removing patch to %s@%s',
       this.moduleName,
       this.version
@@ -134,7 +134,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   private _patchServer() {
     return (originalRegister: typeof grpcTypes.Server.prototype.register) => {
       const plugin = this;
-      plugin._logger.debug('patched gRPC server');
+      plugin._diagLogger.debug('patched gRPC server');
 
       return function register<RequestType, ResponseType>(
         this: grpcTypes.Server & { handlers: any },
@@ -178,7 +178,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
                 kind: SpanKind.SERVER,
               };
 
-              plugin._logger.debug(
+              plugin._diagLogger.debug(
                 'patch func: %s',
                 JSON.stringify(spanOptions)
               );
@@ -340,7 +340,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   private _patchClient() {
     const plugin = this;
     return (original: typeof grpcTypes.makeGenericClientConstructor): never => {
-      plugin._logger.debug('patching client');
+      plugin._diagLogger.debug('patching client');
       return function makeClientConstructor(
         this: typeof grpcTypes.Client,
         methods: { [key: string]: { originalName?: string } },
@@ -385,7 +385,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   private _getPatchedClientMethods() {
     const plugin = this;
     return (original: GrpcClientFunc) => {
-      plugin._logger.debug('patch all client methods');
+      plugin._diagLogger.debug('patch all client methods');
       return function clientMethodTrace(this: grpcTypes.Client) {
         const name = `grpc.${original.path.replace('/', '')}`;
         const args = Array.prototype.slice.call(arguments);

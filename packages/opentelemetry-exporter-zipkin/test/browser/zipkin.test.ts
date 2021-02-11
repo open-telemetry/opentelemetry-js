@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/api';
+import { createNoopDiagLogger } from '@opentelemetry/api';
 import {
   setGlobalErrorHandler,
   loggingErrorHandler,
@@ -110,7 +110,7 @@ describe('Zipkin Exporter - web', () => {
 
     beforeEach(() => {
       zipkinConfig = {
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
         headers: customHeaders,
       };
       server = sinon.fakeServer.create();

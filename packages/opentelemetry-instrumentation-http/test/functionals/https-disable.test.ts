@@ -16,7 +16,7 @@
 
 import {
   NoopTracerProvider,
-  NoopLogger,
+  createNoopDiagLogger,
   NOOP_TRACER,
 } from '@opentelemetry/api';
 import * as assert from 'assert';
@@ -27,8 +27,8 @@ import * as sinon from 'sinon';
 import { HttpInstrumentation } from '../../src';
 import { isWrapped } from '@opentelemetry/instrumentation';
 
-const logger = new NoopLogger();
-const instrumentation = new HttpInstrumentation({ logger });
+const diagLogger = createNoopDiagLogger();
+const instrumentation = new HttpInstrumentation({ diagLogger });
 instrumentation.enable();
 instrumentation.disable();
 

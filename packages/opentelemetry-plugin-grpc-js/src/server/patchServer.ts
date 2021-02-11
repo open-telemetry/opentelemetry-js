@@ -50,7 +50,7 @@ export function patchServer(
     const plugin = this;
     const config = this._config;
 
-    plugin.logger.debug('patched gRPC server');
+    plugin.diagLogger.debug('patched gRPC server');
     return function register<RequestType, ResponseType>(
       this: grpcJs.Server,
       name: string,
@@ -100,7 +100,10 @@ export function patchServer(
               kind: SpanKind.SERVER,
             };
 
-            plugin.logger.debug('patch func: %s', JSON.stringify(spanOptions));
+            plugin.diagLogger.debug(
+              'patch func: %s',
+              JSON.stringify(spanOptions)
+            );
 
             context.with(
               propagation.extract(ROOT_CONTEXT, call.metadata, {

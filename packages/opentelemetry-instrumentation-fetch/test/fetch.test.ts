@@ -217,7 +217,7 @@ describe('fetch', () => {
 
     fetchInstrumentation = new FetchInstrumentation(config);
     webTracerProviderWithZone = new WebTracerProvider({
-      logLevel: core.LogLevel.ERROR,
+      diagLogLevel: api.DiagLogLevel.ERROR,
     });
     registerInstrumentations({
       tracerProvider: webTracerProviderWithZone,

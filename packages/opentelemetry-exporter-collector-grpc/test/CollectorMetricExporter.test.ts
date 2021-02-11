@@ -20,7 +20,11 @@ import {
   ValueObserver,
   ValueRecorder,
 } from '@opentelemetry/api-metrics';
-import { ConsoleLogger, LogLevel } from '@opentelemetry/core';
+import {
+  DiagConsoleLogger,
+  DiagLogLevel,
+  createLogLevelDiagLogger,
+} from '@opentelemetry/api';
 import { collectorTypes } from '@opentelemetry/exporter-collector';
 import * as metrics from '@opentelemetry/metrics';
 import * as assert from 'assert';
@@ -164,10 +168,13 @@ const testCollectorMetricExporter = (params: TestParams) =>
 
     describe('instance', () => {
       it('should warn about headers', () => {
-        const logger = new ConsoleLogger(LogLevel.DEBUG);
-        const spyLoggerWarn = sinon.stub(logger, 'warn');
+        const diagLogger = createLogLevelDiagLogger(
+          DiagLogLevel.DEBUG,
+          new DiagConsoleLogger()
+        );
+        const spyLoggerWarn = sinon.stub(diagLogger, 'warn');
         collectorExporter = new CollectorMetricExporter({
-          logger,
+          diagLogger: diagLogger,
           serviceName: 'basic-service',
           url: address,
           headers: {

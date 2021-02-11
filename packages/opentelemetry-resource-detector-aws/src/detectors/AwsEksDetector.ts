@@ -19,11 +19,12 @@ import {
   Resource,
   CONTAINER_RESOURCE,
   K8S_RESOURCE,
-  ResourceDetectionConfigWithLogger,
+  ResourceDetectionConfig,
 } from '@opentelemetry/resources';
 import * as https from 'https';
 import * as fs from 'fs';
 import * as util from 'util';
+import { getDiagLoggerFromConfig } from '@opentelemetry/api';
 
 /**
  * The AwsEksDetector can be used to detect if a process is running in AWS Elastic
@@ -58,9 +59,9 @@ export class AwsEksDetector implements Detector {
    * populated with instance metadata. Returns a promise containing an
    * empty {@link Resource} if the connection to kubernetes process
    * or aws config maps fails
-   * @param config The resource detection config with a required logger
+   * @param config The resource detection config
    */
-  async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
+  async detect(config?: ResourceDetectionConfig): Promise<Resource> {
     try {
       await AwsEksDetector.fileAccessAsync(this.K8S_TOKEN_PATH);
       const k8scert = await AwsEksDetector.readFileAsync(this.K8S_CERT_PATH);
@@ -79,7 +80,7 @@ export class AwsEksDetector implements Detector {
             [CONTAINER_RESOURCE.ID]: containerId || '',
           });
     } catch (e) {
-      config.logger.warn('Process is not running on K8S', e);
+      getDiagLoggerFromConfig(config).warn('Process is not running on K8S', e);
       return Resource.empty();
     }
   }
@@ -88,10 +89,10 @@ export class AwsEksDetector implements Detector {
    * Attempts to make a connection to AWS Config map which will
    * determine whether the process is running on an EKS
    * process if the config map is empty or not
-   * @param config The resource detection config with a required logger
+   * @param config The resource detection config
    */
   private async _isEks(
-    config: ResourceDetectionConfigWithLogger,
+    config: ResourceDetectionConfig | undefined,
     cert: Buffer
   ): Promise<boolean> {
     const options = {
@@ -110,10 +111,10 @@ export class AwsEksDetector implements Detector {
   /**
    * Attempts to make a connection to Amazon Cloudwatch
    * Config Maps to grab cluster name
-   * @param config The resource detection config with a required logger
+   * @param config The resource detection config
    */
   private async _getClusterName(
-    config: ResourceDetectionConfigWithLogger,
+    config: ResourceDetectionConfig | undefined,
     cert: Buffer
   ): Promise<string | undefined> {
     const options = {
@@ -130,17 +131,17 @@ export class AwsEksDetector implements Detector {
     try {
       return JSON.parse(response).data['cluster.name'];
     } catch (e) {
-      config.logger.warn('Cannot get cluster name on EKS', e);
+      getDiagLoggerFromConfig(config).warn('Cannot get cluster name on EKS', e);
     }
     return '';
   }
   /**
    * Reads the Kubernetes token path and returns kubernetes
    * credential header
-   * @param config The resource detection config with a required logger
+   * @param config The resource detection config
    */
   private async _getK8sCredHeader(
-    config: ResourceDetectionConfigWithLogger
+    config?: ResourceDetectionConfig | undefined
   ): Promise<string> {
     try {
       const content = await AwsEksDetector.readFileAsync(
@@ -149,7 +150,10 @@ export class AwsEksDetector implements Detector {
       );
       return 'Bearer ' + content;
     } catch (e) {
-      config.logger.warn('Unable to read Kubernetes client token.', e);
+      getDiagLoggerFromConfig(config).warn(
+        'Unable to read Kubernetes client token.',
+        e
+      );
     }
     return '';
   }
@@ -172,7 +176,7 @@ export class AwsEksDetector implements Detector {
    * and then return null string
    */
   private async _getContainerId(
-    config: ResourceDetectionConfigWithLogger
+    config?: ResourceDetectionConfig
   ): Promise<string | undefined> {
     try {
       const rawData = await AwsEksDetector.readFileAsync(
@@ -186,7 +190,7 @@ export class AwsEksDetector implements Detector {
         }
       }
     } catch (e) {
-      config.logger.warn(
+      getDiagLoggerFromConfig(config).warn(
         `AwsEksDetector failed to read container ID: ${e.message}`
       );
     }

@@ -16,9 +16,9 @@
 
 import {
   SpanAttributes,
-  Logger,
   SpanKind,
   SpanStatusCode,
+  DiagLoggerConfig,
 } from '@opentelemetry/api';
 
 /* eslint-disable @typescript-eslint/no-namespace */
@@ -345,10 +345,9 @@ export interface ExportServiceError {
 /**
  * Collector Exporter base config
  */
-export interface CollectorExporterConfigBase {
+export interface CollectorExporterConfigBase extends DiagLoggerConfig {
   headers?: Partial<Record<string, unknown>>;
   hostname?: string;
-  logger?: Logger;
   serviceName?: string;
   attributes?: SpanAttributes;
   url?: string;

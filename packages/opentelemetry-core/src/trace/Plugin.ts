@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { Logger, TracerProvider } from '@opentelemetry/api';
+import {
+  OptionalDiagLogger,
+  DiagLoggerConfig,
+  TracerProvider,
+} from '@opentelemetry/api';
 
 /** Interface Plugin to apply patch. */
 export interface Plugin<T = any> {
@@ -36,13 +40,13 @@ export interface Plugin<T = any> {
    * @param moduleExports The value of the `module.exports` property that would
    *     normally be exposed by the required module. ex: `http`, `https` etc.
    * @param TracerProvider a tracer provider.
-   * @param logger a logger instance.
+   * @param diagLogger a diagnostic logger instance.
    * @param [config] an object to configure the plugin.
    */
   enable(
     moduleExports: T,
     TracerProvider: TracerProvider,
-    logger: Logger,
+    diagLogger?: OptionalDiagLogger,
     config?: PluginConfig
   ): T;
 
@@ -50,7 +54,7 @@ export interface Plugin<T = any> {
   disable(): void;
 }
 
-export interface PluginConfig {
+export interface PluginConfig extends DiagLoggerConfig {
   /**
    * Whether to enable the plugin.
    * @default true

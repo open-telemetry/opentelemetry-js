@@ -1,17 +1,17 @@
-import { LogLevel } from '@opentelemetry/core';
+import { DiagLogLevel } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/node';
- 
+
 import { SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 // For Jaeger, use the following line instead:
 // import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
- 
+
 const provider: NodeTracerProvider = new NodeTracerProvider({
-  logLevel: LogLevel.ERROR,
+  diagLogLevel: DiagLogLevel.ERROR,
 });
- 
+
 provider.register();
- 
+
 provider.addSpanProcessor(
   new SimpleSpanProcessor(
     new ZipkinExporter({
@@ -24,5 +24,5 @@ provider.addSpanProcessor(
     }),
   ),
 );
- 
+
 console.log('tracing initialized');

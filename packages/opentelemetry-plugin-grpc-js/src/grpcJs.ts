@@ -20,7 +20,7 @@ import * as shimmer from 'shimmer';
 import { patchClient, patchLoadPackageDefinition } from './client';
 import { patchServer } from './server';
 import { VERSION } from './version';
-import { Tracer, Logger } from '@opentelemetry/api';
+import { DiagLogger, Tracer } from '@opentelemetry/api';
 import { GrpcPluginOptions } from './types';
 
 /**
@@ -49,11 +49,11 @@ export class GrpcJsPlugin extends BasePlugin<typeof grpcJs> {
 
   /**
    * @internal
-   * Public reference to the protected BasePlugin `_logger` instance to be used by this
+   * Public reference to the protected BasePlugin `_diagLogger` instance to be used by this
    * plugin's external helper functions
    */
-  get logger(): Logger {
-    return this._logger;
+  get diagLogger(): DiagLogger {
+    return this._diagLogger;
   }
 
   protected patch(): typeof grpcJs {
@@ -85,7 +85,7 @@ export class GrpcJsPlugin extends BasePlugin<typeof grpcJs> {
   }
 
   protected unpatch(): void {
-    this._logger.debug(
+    this._diagLogger.debug(
       'removing patch to %s@%s',
       this.moduleName,
       this.version

@@ -13,7 +13,7 @@ const setups = [
   },
   {
     name: 'BasicTracerProvider',
-    provider: new BasicTracerProvider({ logger: diagLogger })
+    provider: new BasicTracerProvider({ diagLogger })
   },
   {
     name: 'BasicTracerProvider with SimpleSpanProcessor',
@@ -63,7 +63,7 @@ for (const setup of setups) {
   suite.run({ async: false });
 }
 function getProvider(processor) {
-  const provider = new BasicTracerProvider({ logger: diagLogger });
+  const provider = new BasicTracerProvider({ diagLogger });
   provider.addSpanProcessor(processor);
   return provider;
 }

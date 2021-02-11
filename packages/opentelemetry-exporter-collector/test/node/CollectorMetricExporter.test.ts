@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/api';
+import {
+  createLogLevelDiagLogger,
+  createNoopDiagLogger,
+  DiagConsoleLogger,
+  DiagLogLevel,
+} from '@opentelemetry/api';
 import {
   Counter,
   ValueObserver,
@@ -64,10 +69,13 @@ describe('CollectorMetricExporter - node with json over http', () => {
   describe('instance', () => {
     it('should warn about metadata when using json', () => {
       const metadata = 'foo';
-      const logger = new core.ConsoleLogger(core.LogLevel.DEBUG);
-      const spyLoggerWarn = sinon.stub(logger, 'warn');
+      const diagLogger = createLogLevelDiagLogger(
+        DiagLogLevel.DEBUG,
+        new DiagConsoleLogger()
+      );
+      const spyLoggerWarn = sinon.stub(diagLogger, 'warn');
       collectorExporter = new CollectorMetricExporter({
-        logger,
+        diagLogger: diagLogger,
         serviceName: 'basic-service',
         url: address,
         metadata,
@@ -86,7 +94,7 @@ describe('CollectorMetricExporter - node with json over http', () => {
           foo: 'bar',
         },
         hostname: 'foo',
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
@@ -202,7 +210,7 @@ describe('CollectorMetricExporter - node with json over http', () => {
     });
 
     it('should log the successful message', done => {
-      const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
+      const spyLoggerError = sinon.stub(collectorExporter.diagLogger, 'error');
 
       const responseSpy = sinon.spy();
       collectorExporter.export(metrics, responseSpy);
@@ -227,11 +235,8 @@ describe('CollectorMetricExporter - node with json over http', () => {
     it('should log the error message', done => {
       const spyLoggerError = sinon.spy();
       const handler = core.loggingErrorHandler({
-        debug: sinon.fake(),
-        info: sinon.fake(),
-        warn: sinon.fake(),
         error: spyLoggerError,
-      });
+      } as any);
       core.setGlobalErrorHandler(handler);
 
       const responseSpy = sinon.spy();

@@ -22,7 +22,7 @@ import {
   SpanProcessor,
 } from '../../src';
 import { ExportResult, AlwaysOnSampler } from '@opentelemetry/core';
-import { NoopLogger } from '@opentelemetry/api';
+import { createNoopDiagLogger } from '@opentelemetry/api';
 
 /**
  * A test-only span exporter that naively simulates triggering instrumentation
@@ -36,7 +36,7 @@ export class TestTracingSpanExporter extends InMemorySpanExporter {
     super();
 
     const tracerProvider = new BasicTracerProvider({
-      logger: new NoopLogger(),
+      diagLogger: createNoopDiagLogger(),
     });
 
     const spanProcessor: SpanProcessor = {

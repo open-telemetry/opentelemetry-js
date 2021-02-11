@@ -17,7 +17,7 @@
 import {
   context,
   TraceFlags,
-  NoopLogger,
+  createNoopDiagLogger,
   setSpan,
   setSpanContext,
   getSpan,
@@ -70,7 +70,7 @@ describe('NodeTracerProvider', () => {
 
     it('should construct an instance with logger', () => {
       provider = new NodeTracerProvider({
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
       });
       assert.ok(provider instanceof NodeTracerProvider);
     });
@@ -100,7 +100,7 @@ describe('NodeTracerProvider', () => {
   describe('.startSpan()', () => {
     it('should start a span with name only', () => {
       provider = new NodeTracerProvider({
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
       });
       const span = provider.getTracer('default').startSpan('my-span');
       assert.ok(span);
@@ -108,7 +108,7 @@ describe('NodeTracerProvider', () => {
 
     it('should start a span with name and options', () => {
       provider = new NodeTracerProvider({
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
       });
       const span = provider.getTracer('default').startSpan('my-span', {});
       assert.ok(span);
@@ -117,7 +117,7 @@ describe('NodeTracerProvider', () => {
     it('should return a default span with no sampling (AlwaysOffSampler)', () => {
       provider = new NodeTracerProvider({
         sampler: new AlwaysOffSampler(),
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
       });
       const span = provider.getTracer('default').startSpan('my-span');
       assert.strictEqual(span.context().traceFlags, TraceFlags.NONE);
@@ -127,7 +127,7 @@ describe('NodeTracerProvider', () => {
     it('should start a recording span with always sampling (AlwaysOnSampler)', () => {
       provider = new NodeTracerProvider({
         sampler: new AlwaysOnSampler(),
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
       });
       const span = provider.getTracer('default').startSpan('my-span');
       assert.ok(span instanceof Span);
@@ -138,7 +138,7 @@ describe('NodeTracerProvider', () => {
     it('should sample with AlwaysOnSampler if parent was not sampled', () => {
       provider = new NodeTracerProvider({
         sampler: new AlwaysOnSampler(),
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
       });
 
       const sampledParent = provider.getTracer('default').startSpan(
@@ -167,7 +167,7 @@ describe('NodeTracerProvider', () => {
 
     it('should assign resource to span', () => {
       provider = new NodeTracerProvider({
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
       });
       const span = provider.getTracer('default').startSpan('my-span') as Span;
       assert.ok(span);

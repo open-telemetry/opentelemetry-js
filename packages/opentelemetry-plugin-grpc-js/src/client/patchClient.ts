@@ -30,7 +30,7 @@ export function patchClient(
 ): (original: MakeClientConstructorFunction) => MakeClientConstructorFunction {
   const plugin = this;
   return (original: MakeClientConstructorFunction) => {
-    plugin._logger.debug('patching client');
+    plugin._diagLogger.debug('patching client');
     return function makeClientConstructor(
       this: typeof grpcJs.Client,
       methods: grpcJs.ServiceDefinition,

@@ -61,7 +61,7 @@ meter.createBatchObserver((observerBatchResult) => {
     });
   }, {
     maxTimeoutUpdateMS: 500,
-    logger: diagLogLevelFilter(DiagLogLevel.DEBUG, new DiagConsoleLogger())
+    diagLogger: diagLogLevelFilter(DiagLogLevel.DEBUG, new DiagConsoleLogger())
   },
 );
 

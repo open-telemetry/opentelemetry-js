@@ -19,7 +19,7 @@ import {
   Span,
   context,
   propagation,
-  NoopLogger,
+  createNoopDiagLogger,
 } from '@opentelemetry/api';
 import {
   HttpAttribute,
@@ -37,8 +37,8 @@ import {
 } from '@opentelemetry/tracing';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 
-const logger = new NoopLogger();
-const instrumentation = new HttpInstrumentation({ logger });
+const diagLogger = createNoopDiagLogger();
+const instrumentation = new HttpInstrumentation({ diagLogger });
 instrumentation.enable();
 instrumentation.disable();
 
@@ -128,9 +128,9 @@ describe('HttpInstrumentation Integration tests', () => {
       });
     });
 
-    const logger = new NoopLogger();
+    const diagLogger = createNoopDiagLogger();
     const provider = new NodeTracerProvider({
-      logger,
+      diagLogger,
     });
     provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     instrumentation.setTracerProvider(provider);

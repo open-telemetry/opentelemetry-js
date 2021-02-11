@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Logger } from '@opentelemetry/api';
+import { DiagLogger, OptionalDiagLogger, diag } from '@opentelemetry/api';
 import * as api from '@opentelemetry/api-metrics';
 import { Aggregator } from './export/types';
 
@@ -24,23 +24,23 @@ import { Aggregator } from './export/types';
  */
 export class BaseBoundInstrument {
   protected _labels: api.Labels;
-  protected _logger: Logger;
+  protected _diagLogger: DiagLogger;
 
   constructor(
     labels: api.Labels,
-    logger: Logger,
+    diagLogger: OptionalDiagLogger,
     private readonly _disabled: boolean,
     private readonly _valueType: api.ValueType,
     private readonly _aggregator: Aggregator
   ) {
     this._labels = labels;
-    this._logger = logger;
+    this._diagLogger = diagLogger || diag;
   }
 
   update(value: number): void {
     if (this._disabled) return;
     if (typeof value !== 'number') {
-      this._logger.error(
+      this._diagLogger.error(
         `Metric cannot accept a non-number value for ${Object.values(
           this._labels
         )}.`
@@ -49,7 +49,7 @@ export class BaseBoundInstrument {
     }
 
     if (this._valueType === api.ValueType.INT && !Number.isInteger(value)) {
-      this._logger.warn(
+      this._diagLogger.warn(
         `INT value type cannot accept a floating-point value for ${Object.values(
           this._labels
         )}, ignoring the fractional digits.`
@@ -80,15 +80,15 @@ export class BoundCounter
     labels: api.Labels,
     disabled: boolean,
     valueType: api.ValueType,
-    logger: Logger,
+    diagLogger: OptionalDiagLogger,
     aggregator: Aggregator
   ) {
-    super(labels, logger, disabled, valueType, aggregator);
+    super(labels, diagLogger, disabled, valueType, aggregator);
   }
 
   add(value: number): void {
     if (value < 0) {
-      this._logger.error(
+      this._diagLogger.error(
         `Counter cannot descend for ${Object.values(this._labels)}`
       );
       return;
@@ -110,10 +110,10 @@ export class BoundUpDownCounter
     labels: api.Labels,
     disabled: boolean,
     valueType: api.ValueType,
-    logger: Logger,
+    diagLogger: OptionalDiagLogger,
     aggregator: Aggregator
   ) {
-    super(labels, logger, disabled, valueType, aggregator);
+    super(labels, diagLogger, disabled, valueType, aggregator);
   }
 
   add(value: number): void {
@@ -131,10 +131,10 @@ export class BoundValueRecorder
     labels: api.Labels,
     disabled: boolean,
     valueType: api.ValueType,
-    logger: Logger,
+    diagLogger: OptionalDiagLogger,
     aggregator: Aggregator
   ) {
-    super(labels, logger, disabled, valueType, aggregator);
+    super(labels, diagLogger, disabled, valueType, aggregator);
   }
 
   record(value: number): void {
@@ -152,9 +152,9 @@ export class BoundObserver
     labels: api.Labels,
     disabled: boolean,
     valueType: api.ValueType,
-    logger: Logger,
+    diagLogger: OptionalDiagLogger,
     aggregator: Aggregator
   ) {
-    super(labels, logger, disabled, valueType, aggregator);
+    super(labels, diagLogger, disabled, valueType, aggregator);
   }
 }

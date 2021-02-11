@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/api';
+import { createNoopDiagLogger } from '@opentelemetry/api';
 import { ExportResultCode } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
@@ -59,7 +59,7 @@ describe('CollectorTraceExporter - web', () => {
     beforeEach(() => {
       collectorExporterConfig = {
         hostname: 'foo',
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
@@ -110,11 +110,11 @@ describe('CollectorTraceExporter - web', () => {
 
       it('should log the successful message', done => {
         const spyLoggerDebug = sinon.stub(
-          collectorTraceExporter.logger,
+          collectorTraceExporter.diagLogger,
           'debug'
         );
         const spyLoggerError = sinon.stub(
-          collectorTraceExporter.logger,
+          collectorTraceExporter.diagLogger,
           'error'
         );
         spyBeacon.restore();
@@ -192,11 +192,11 @@ describe('CollectorTraceExporter - web', () => {
 
       it('should log the successful message', done => {
         const spyLoggerDebug = sinon.stub(
-          collectorTraceExporter.logger,
+          collectorTraceExporter.diagLogger,
           'debug'
         );
         const spyLoggerError = sinon.stub(
-          collectorTraceExporter.logger,
+          collectorTraceExporter.diagLogger,
           'error'
         );
 
@@ -251,7 +251,7 @@ describe('CollectorTraceExporter - web', () => {
 
     beforeEach(() => {
       collectorExporterConfig = {
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
         headers: customHeaders,
       };
       server = sinon.fakeServer.create();

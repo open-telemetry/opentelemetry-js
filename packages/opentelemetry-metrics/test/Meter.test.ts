@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/api';
+import { createNoopDiagLogger } from '@opentelemetry/api';
 import * as api from '@opentelemetry/api-metrics';
 import { hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
@@ -80,7 +80,7 @@ describe('Meter', () => {
 
   beforeEach(() => {
     meter = new MeterProvider({
-      logger: new NoopLogger(),
+      diagLogger: createNoopDiagLogger(),
     }).getMeter('test-meter');
   });
 
@@ -778,7 +778,7 @@ describe('Meter', () => {
     });
 
     it('should return noop observer when name is invalid', () => {
-      const spy = sinon.stub(meter['_logger'], 'warn');
+      const spy = sinon.stub(meter['_diagLogger'], 'warn');
       const sumObserver = meter.createSumObserver('na me');
       assert.ok(sumObserver === api.NOOP_SUM_OBSERVER_METRIC);
       const args = spy.args[0];
@@ -919,7 +919,7 @@ describe('Meter', () => {
     });
 
     it('should return noop observer when name is invalid', () => {
-      const spy = sinon.stub(meter['_logger'], 'warn');
+      const spy = sinon.stub(meter['_diagLogger'], 'warn');
       const valueObserver = meter.createValueObserver('na me');
       assert.ok(valueObserver === api.NOOP_VALUE_OBSERVER_METRIC);
       const args = spy.args[0];
@@ -1000,7 +1000,7 @@ describe('Meter', () => {
     });
 
     it('should return noop observer when name is invalid', () => {
-      const spy = sinon.stub(meter['_logger'], 'warn');
+      const spy = sinon.stub(meter['_diagLogger'], 'warn');
       const upDownSumObserver = meter.createUpDownSumObserver('na me');
       assert.ok(upDownSumObserver === api.NOOP_UP_DOWN_SUM_OBSERVER_METRIC);
       const args = spy.args[0];

@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 import * as api from '@opentelemetry/api';
-import {
-  LogLevel,
-  otperformance as performance,
-  isWrapped,
-} from '@opentelemetry/core';
+import { otperformance as performance, isWrapped } from '@opentelemetry/core';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import {
   B3Propagator,
@@ -203,7 +199,7 @@ describe('xhr', () => {
             config
           );
           webTracerProviderWithZone = new WebTracerProvider({
-            logLevel: LogLevel.ERROR,
+            diagLogLevel: api.DiagLogLevel.ERROR,
           });
           registerInstrumentations({
             instrumentations: [xmlHttpRequestInstrumentation],
@@ -733,7 +729,7 @@ describe('xhr', () => {
           spyEntries.withArgs('resource').returns(resources);
 
           webTracerWithZoneProvider = new WebTracerProvider({
-            logLevel: LogLevel.ERROR,
+            diagLogLevel: api.DiagLogLevel.ERROR,
           });
 
           registerInstrumentations({

@@ -40,11 +40,11 @@ export abstract class CollectorExporterNodeBase<
   constructor(config: CollectorExporterNodeConfigBase = {}) {
     super(config);
     if ((config as any).metadata) {
-      this.logger.warn('Metadata cannot be set when using http');
+      this.diagLogger.warn('Metadata cannot be set when using http');
     }
     this.headers =
-      parseHeaders(config.headers, this.logger) || this.DEFAULT_HEADERS;
-    this.agent = createHttpAgent(this.logger, config);
+      parseHeaders(config.headers, this.diagLogger) || this.DEFAULT_HEADERS;
+    this.agent = createHttpAgent(this.diagLogger, config);
   }
 
   onInit(_config: CollectorExporterNodeConfigBase): void {
@@ -57,7 +57,7 @@ export abstract class CollectorExporterNodeBase<
     onError: (error: collectorTypes.CollectorExporterError) => void
   ): void {
     if (this._isShutdown) {
-      this.logger.debug('Shutdown already started. Cannot send objects');
+      this.diagLogger.debug('Shutdown already started. Cannot send objects');
       return;
     }
     const serviceRequest = this.convert(objects);

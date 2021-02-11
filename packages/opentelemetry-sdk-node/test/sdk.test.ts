@@ -364,12 +364,9 @@ describe('Node SDK', () => {
         // This test depends on the env detector to be functioning as intended
         const mockedLoggerMethod = Sinon.fake();
         await sdk.detectResources({
-          logger: {
+          diagLogger: {
             debug: mockedLoggerMethod,
-            info: Sinon.fake(),
-            warn: Sinon.fake(),
-            error: Sinon.fake(),
-          },
+          } as any,
         });
 
         // Test for AWS and GCP Detector failure
@@ -409,12 +406,9 @@ describe('Node SDK', () => {
           });
           const mockedLoggerMethod = Sinon.fake();
           await sdk.detectResources({
-            logger: {
+            diagLogger: {
               debug: mockedLoggerMethod,
-              info: Sinon.fake(),
-              warn: Sinon.fake(),
-              error: Sinon.fake(),
-            },
+            } as any,
           });
 
           assert.ok(
@@ -437,12 +431,9 @@ describe('Node SDK', () => {
           });
           const mockedLoggerMethod = Sinon.fake();
           await sdk.detectResources({
-            logger: {
+            diagLogger: {
               debug: mockedLoggerMethod,
-              info: Sinon.fake(),
-              warn: Sinon.fake(),
-              error: Sinon.fake(),
-            },
+            } as any,
           });
 
           assert.ok(

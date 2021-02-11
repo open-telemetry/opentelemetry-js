@@ -20,7 +20,7 @@ import {
   propagation,
   Span as ISpan,
   SpanKind,
-  NoopLogger,
+  createNoopDiagLogger,
   setSpan,
 } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/node';
@@ -56,9 +56,9 @@ const hostname = 'localhost';
 const serverName = 'my.server.name';
 const pathname = '/test';
 const memoryExporter = new InMemorySpanExporter();
-const logger = new NoopLogger();
+const diagLogger = createNoopDiagLogger();
 const provider = new NodeTracerProvider({
-  logger,
+  diagLogger,
 });
 const tracer = provider.getTracer('test-https');
 provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
@@ -134,7 +134,7 @@ describe('HttpsPlugin', () => {
         pluginWithBadOptions.enable(
           (https as unknown) as Http,
           provider,
-          tracer.logger,
+          tracer.diagLogger,
           config
         );
         server = https.createServer(
@@ -207,7 +207,7 @@ describe('HttpsPlugin', () => {
         plugin.enable(
           (https as unknown) as Http,
           provider,
-          tracer.logger,
+          tracer.diagLogger,
           config
         );
         server = https.createServer(
@@ -239,7 +239,7 @@ describe('HttpsPlugin', () => {
         const httpsNotPatched = new HttpsPlugin(process.versions.node).enable(
           {} as Http,
           provider,
-          tracer.logger,
+          tracer.diagLogger,
           {}
         );
         assert.strictEqual(Object.keys(httpsNotPatched).length, 0);

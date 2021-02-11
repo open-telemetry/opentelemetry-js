@@ -19,7 +19,7 @@ import {
   assertProcessResource,
   assertEmptyResource,
 } from '../util/resource-assertions';
-import { NoopLogger } from '@opentelemetry/api';
+import { createNoopDiagLogger } from '@opentelemetry/api';
 
 describe('processDetector()', () => {
   let sandbox: sinon.SinonSandbox;
@@ -40,7 +40,7 @@ describe('processDetector()', () => {
       .value(['/tmp/node', '/home/ot/test.js', 'arg1', 'arg2']);
 
     const resource: Resource = await processDetector.detect({
-      logger: new NoopLogger(),
+      diagLogger: createNoopDiagLogger(),
     });
     assertProcessResource(resource, {
       pid: 1234,
@@ -54,7 +54,7 @@ describe('processDetector()', () => {
     sandbox.stub(process, 'title').value(undefined);
     sandbox.stub(process, 'argv').value([]);
     const resource: Resource = await processDetector.detect({
-      logger: new NoopLogger(),
+      diagLogger: createNoopDiagLogger(),
     });
     assertEmptyResource(resource);
   });

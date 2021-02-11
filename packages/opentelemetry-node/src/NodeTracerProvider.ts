@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { DiagConsoleLogger, getDiagLoggerFromConfig } from '@opentelemetry/api';
 import {
   AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
@@ -36,7 +37,11 @@ export class NodeTracerProvider extends BasicTracerProvider {
   constructor(config: NodeTracerConfig = {}) {
     super(config);
     if (config.plugins) {
-      console.warn(
+      const diagLogger = getDiagLoggerFromConfig(
+        config,
+        () => new DiagConsoleLogger()
+      );
+      diagLogger.warn(
         'plugins options was removed, please use' +
           ' "registerInstrumentations" to load plugins'
       );

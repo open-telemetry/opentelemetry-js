@@ -73,7 +73,7 @@ export function getPatchedClientMethods(
 ): (original: GrpcClientFunc) => () => EventEmitter {
   const plugin = this;
   return (original: GrpcClientFunc) => {
-    plugin._logger.debug('patch all client methods');
+    plugin._diagLogger.debug('patch all client methods');
     return function clientMethodTrace(this: grpcJs.Client) {
       const name = `grpc.${original.path.replace('/', '')}`;
       const args = [...arguments];

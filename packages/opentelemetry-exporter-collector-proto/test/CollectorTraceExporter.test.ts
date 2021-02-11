@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/api';
+import { createNoopDiagLogger } from '@opentelemetry/api';
 import { ExportResultCode } from '@opentelemetry/core';
 import {
   CollectorExporterNodeConfigBase,
@@ -51,7 +51,7 @@ describe('CollectorTraceExporter - node with proto over http', () => {
           foo: 'bar',
         },
         hostname: 'foo',
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
@@ -124,7 +124,7 @@ describe('CollectorTraceExporter - node with proto over http', () => {
     });
 
     it('should log the successful message', done => {
-      const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
+      const spyLoggerError = sinon.stub(collectorExporter.diagLogger, 'error');
 
       collectorExporter.export(spans, result => {
         assert.strictEqual(result.code, ExportResultCode.SUCCESS);

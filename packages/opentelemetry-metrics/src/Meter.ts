@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
-import { Logger } from '@opentelemetry/api';
+import {
+  DiagLogger,
+  DiagConsoleLogger,
+  getDiagLoggerFromConfig,
+} from '@opentelemetry/api';
 import * as api from '@opentelemetry/api-metrics';
-import { ConsoleLogger, InstrumentationLibrary } from '@opentelemetry/core';
+import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BatchObserver } from './BatchObserver';
 import { BaseBoundInstrument } from './BoundInstrument';
@@ -37,7 +41,7 @@ import merge = require('lodash.merge');
  * Meter is an implementation of the {@link Meter} interface.
  */
 export class Meter implements api.Meter {
-  private readonly _logger: Logger;
+  private readonly _diagLogger: DiagLogger;
   private readonly _batchObservers: BatchObserver[] = [];
   private readonly _metrics = new Map<string, Metric<BaseBoundInstrument>>();
   private readonly _processor: Processor;
@@ -55,7 +59,10 @@ export class Meter implements api.Meter {
     config: MeterConfig = {}
   ) {
     const mergedConfig = merge({}, DEFAULT_CONFIG, config);
-    this._logger = mergedConfig.logger || new ConsoleLogger(config.logLevel);
+    this._diagLogger = getDiagLoggerFromConfig(
+      mergedConfig,
+      () => new DiagConsoleLogger()
+    );
     this._processor = mergedConfig.processor ?? new UngroupedProcessor();
     this._resource =
       mergedConfig.resource || Resource.createTelemetrySDKResource();
@@ -76,13 +83,13 @@ export class Meter implements api.Meter {
     options?: api.MetricOptions
   ): api.ValueRecorder {
     if (!this._isValidName(name)) {
-      this._logger.warn(
+      this._diagLogger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
       return api.NOOP_VALUE_RECORDER_METRIC;
     }
     const opt: api.MetricOptions = {
-      logger: this._logger,
+      diagLogger: this._diagLogger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
@@ -107,13 +114,13 @@ export class Meter implements api.Meter {
    */
   createCounter(name: string, options?: api.MetricOptions): api.Counter {
     if (!this._isValidName(name)) {
-      this._logger.warn(
+      this._diagLogger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
       return api.NOOP_COUNTER_METRIC;
     }
     const opt: api.MetricOptions = {
-      logger: this._logger,
+      diagLogger: this._diagLogger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
@@ -143,14 +150,14 @@ export class Meter implements api.Meter {
     options?: api.MetricOptions
   ): api.UpDownCounter {
     if (!this._isValidName(name)) {
-      this._logger.warn(
+      this._diagLogger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
       return api.NOOP_COUNTER_METRIC;
     }
     const opt: api.MetricOptions = {
       ...DEFAULT_METRIC_OPTIONS,
-      logger: this._logger,
+      diagLogger: this._diagLogger,
       ...options,
     };
     const upDownCounter = new UpDownCounterMetric(
@@ -176,13 +183,13 @@ export class Meter implements api.Meter {
     callback?: (observerResult: api.ObserverResult) => unknown
   ): api.ValueObserver {
     if (!this._isValidName(name)) {
-      this._logger.warn(
+      this._diagLogger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
       return api.NOOP_VALUE_OBSERVER_METRIC;
     }
     const opt: api.MetricOptions = {
-      logger: this._logger,
+      diagLogger: this._diagLogger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
@@ -204,13 +211,13 @@ export class Meter implements api.Meter {
     callback?: (observerResult: api.ObserverResult) => unknown
   ): api.SumObserver {
     if (!this._isValidName(name)) {
-      this._logger.warn(
+      this._diagLogger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
       return api.NOOP_SUM_OBSERVER_METRIC;
     }
     const opt: api.MetricOptions = {
-      logger: this._logger,
+      diagLogger: this._diagLogger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
@@ -238,13 +245,13 @@ export class Meter implements api.Meter {
     callback?: (observerResult: api.ObserverResult) => unknown
   ): api.UpDownSumObserver {
     if (!this._isValidName(name)) {
-      this._logger.warn(
+      this._diagLogger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
       return api.NOOP_UP_DOWN_SUM_OBSERVER_METRIC;
     }
     const opt: api.MetricOptions = {
-      logger: this._logger,
+      diagLogger: this._diagLogger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
@@ -270,7 +277,7 @@ export class Meter implements api.Meter {
     options: api.BatchObserverOptions = {}
   ): BatchObserver {
     const opt: api.BatchObserverOptions = {
-      logger: this._logger,
+      diagLogger: this._diagLogger,
       ...options,
     };
     const batchObserver = new BatchObserver(opt, callback);
@@ -337,7 +344,7 @@ export class Meter implements api.Meter {
     metric: Metric<T>
   ): void {
     if (this._metrics.has(name)) {
-      this._logger.error(
+      this._diagLogger.error(
         `A metric with the name ${name} has already been registered.`
       );
       return;

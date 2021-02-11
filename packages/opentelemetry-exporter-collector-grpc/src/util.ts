@@ -84,10 +84,10 @@ export function send<ExportItem, ServiceRequest>(
       collector.metadata,
       (err: collectorTypes.ExportServiceError) => {
         if (err) {
-          collector.logger.error('Service request', serviceRequest);
+          collector.diagLogger.error('Service request', serviceRequest);
           onError(err);
         } else {
-          collector.logger.debug('Objects sent');
+          collector.diagLogger.debug('Objects sent');
           onSuccess();
         }
       }

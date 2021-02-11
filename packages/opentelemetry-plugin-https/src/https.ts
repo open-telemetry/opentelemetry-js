@@ -34,7 +34,7 @@ export class HttpsPlugin extends HttpPlugin {
    * Patches HTTPS incoming and outcoming request functions.
    */
   protected patch() {
-    this._logger.debug(
+    this._diagLogger.debug(
       'applying patch to %s@%s',
       this.moduleName,
       this.version
@@ -51,7 +51,7 @@ export class HttpsPlugin extends HttpPlugin {
         this._getPatchIncomingRequestFunction()
       );
     } else {
-      this._logger.error(
+      this._diagLogger.error(
         'Could not apply patch to %s.emit. Interface is not as expected.',
         this.moduleName
       );

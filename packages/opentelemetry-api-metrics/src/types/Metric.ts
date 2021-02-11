@@ -19,12 +19,12 @@ import {
   BoundCounter,
   BoundValueRecorder,
 } from './BoundInstrument';
-import { Logger } from '@opentelemetry/api';
+import { DiagLoggerConfig } from '@opentelemetry/api';
 
 /**
  * Options needed for metric creation
  */
-export interface MetricOptions {
+export interface MetricOptions extends DiagLoggerConfig {
   /** The name of the component that reports the Metric. */
   component?: string;
 
@@ -56,26 +56,16 @@ export interface MetricOptions {
   valueType?: ValueType;
 
   /**
-   * User provided logger.
-   */
-  logger?: Logger;
-
-  /**
    * Boundaries optional for histogram
    */
   boundaries?: number[];
 }
 
-export interface BatchObserverOptions {
+export interface BatchObserverOptions extends DiagLoggerConfig {
   /**
    * Indicates how long the batch metric should wait to update before cancel
    */
   maxTimeoutUpdateMS?: number;
-
-  /**
-   * User provided logger.
-   */
-  logger?: Logger;
 }
 
 /** The Type of value. It describes how the data is reported. */

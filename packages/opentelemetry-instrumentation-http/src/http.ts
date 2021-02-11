@@ -85,7 +85,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       'http',
       ['*'],
       moduleExports => {
-        this._logger.debug(`Applying patch for http@${this._version}`);
+        this._diagLogger.debug(`Applying patch for http@${this._version}`);
         if (isWrapped(moduleExports.request)) {
           this._unwrap(moduleExports, 'request');
         }
@@ -114,7 +114,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       },
       moduleExports => {
         if (moduleExports === undefined) return;
-        this._logger.debug(`Removing patch for http@${this._version}`);
+        this._diagLogger.debug(`Removing patch for http@${this._version}`);
 
         this._unwrap(moduleExports, 'request');
         this._unwrap(moduleExports, 'get');
@@ -128,7 +128,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       'https',
       ['*'],
       moduleExports => {
-        this._logger.debug(`Applying patch for https@${this._version}`);
+        this._diagLogger.debug(`Applying patch for https@${this._version}`);
         if (isWrapped(moduleExports.request)) {
           this._unwrap(moduleExports, 'request');
         }
@@ -157,7 +157,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       },
       moduleExports => {
         if (moduleExports === undefined) return;
-        this._logger.debug(`Removing patch for https@${this._version}`);
+        this._diagLogger.debug(`Removing patch for https@${this._version}`);
 
         this._unwrap(moduleExports, 'request');
         this._unwrap(moduleExports, 'get');
@@ -303,9 +303,9 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         }
 
         context.bind(response);
-        this._logger.debug('outgoingRequest on response()');
+        this._diagLogger.debug('outgoingRequest on response()');
         response.on('end', () => {
-          this._logger.debug('outgoingRequest on end()');
+          this._diagLogger.debug('outgoingRequest on end()');
           let status: SpanStatus;
 
           if (response.aborted && !response.complete) {
@@ -347,7 +347,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       this._closeHttpSpan(span);
     });
 
-    this._logger.debug('http.ClientRequest return request');
+    this._diagLogger.debug('http.ClientRequest return request');
     return request;
   }
 
@@ -373,7 +373,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         : '/';
       const method = request.method || 'GET';
 
-      instrumentation._logger.debug(
+      instrumentation._diagLogger.debug(
         '%s instrumentation incomingRequest',
         component
       );
@@ -383,7 +383,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           pathname,
           instrumentation._getConfig().ignoreIncomingPaths,
           (e: Error) =>
-            instrumentation._logger.error(
+            instrumentation._diagLogger.error(
               'caught ignoreIncomingPaths error: ',
               e
             )
@@ -524,7 +524,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           origin + pathname,
           instrumentation._getConfig().ignoreOutgoingUrls,
           (e: Error) =>
-            instrumentation._logger.error(
+            instrumentation._diagLogger.error(
               'caught ignoreOutgoingUrls error: ',
               e
             )
@@ -557,7 +557,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         }
       );
 
-      instrumentation._logger.debug(
+      instrumentation._diagLogger.debug(
         '%s instrumentation outgoingRequest',
         component
       );

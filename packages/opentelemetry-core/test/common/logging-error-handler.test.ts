@@ -24,11 +24,8 @@ describe('loggingErrorHandler', () => {
 
   beforeEach(() => {
     handler = loggingErrorHandler({
-      debug: sinon.fake(),
-      info: sinon.fake(),
-      warn: sinon.fake(),
       error: errorStub,
-    });
+    } as any);
   });
 
   it('logs from string', () => {

@@ -1,12 +1,12 @@
 "use strict";
 
-const { LogLevel } = require("@opentelemetry/core");
+const { DiagLogLevel } = require("@opentelemetry/api");
 const { NodeTracerProvider } = require("@opentelemetry/node");
 const { SimpleSpanProcessor } = require("@opentelemetry/tracing");
 const { ZipkinExporter } = require("@opentelemetry/exporter-zipkin");
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 
-const provider = new NodeTracerProvider({ logLevel: LogLevel.ERROR });
+const provider = new NodeTracerProvider({ diagLogLevel: DiagLogLevel.ERROR });
 
 provider.addSpanProcessor(
   new SimpleSpanProcessor(

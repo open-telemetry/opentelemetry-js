@@ -47,7 +47,7 @@ export abstract class InstrumentationBase<T = any>
     this._modules = (modules as InstrumentationModuleDefinition<T>[]) || [];
 
     if (this._modules.length === 0) {
-      this._logger.warn(
+      this._diagLogger.warn(
         'No modules instrumentation has been defined,' +
           ' nothing will be patched'
       );

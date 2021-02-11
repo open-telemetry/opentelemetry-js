@@ -121,13 +121,13 @@ export class SpanContextShim extends opentracing.SpanContext {
  */
 export class TracerShim extends opentracing.Tracer {
   private readonly _tracer: api.Tracer;
-  private readonly _logger: api.Logger;
+  private readonly _diagLogger: api.DiagLogger;
 
-  constructor(tracer: api.Tracer, logger?: api.Logger) {
+  constructor(tracer: api.Tracer, diagLogger?: api.DiagLogger) {
     super();
 
     this._tracer = tracer;
-    this._logger = logger || new api.NoopLogger();
+    this._diagLogger = diagLogger || api.createNoopDiagLogger();
   }
 
   startSpan(
@@ -178,7 +178,7 @@ export class TracerShim extends opentracing.Tracer {
         return;
       }
       case opentracing.FORMAT_BINARY: {
-        this._logger.warn(
+        this._diagLogger.warn(
           'OpentracingShim.inject() does not support FORMAT_BINARY'
         );
         // @todo: Implement binary formats
@@ -206,7 +206,7 @@ export class TracerShim extends opentracing.Tracer {
       }
       case opentracing.FORMAT_BINARY: {
         // @todo: Implement binary format
-        this._logger.warn(
+        this._diagLogger.warn(
           'OpentracingShim.extract() does not support FORMAT_BINARY'
         );
         return null;

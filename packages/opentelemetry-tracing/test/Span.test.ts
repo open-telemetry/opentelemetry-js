@@ -22,7 +22,7 @@ import {
   SpanContext,
   SpanKind,
   TraceFlags,
-  NoopLogger,
+  createNoopDiagLogger,
 } from '@opentelemetry/api';
 import {
   hrTime,
@@ -38,7 +38,7 @@ const performanceTimeOrigin = hrTime();
 
 describe('Span', () => {
   const tracer = new BasicTracerProvider({
-    logger: new NoopLogger(),
+    diagLogger: createNoopDiagLogger(),
     traceParams: {
       numberOfAttributesPerSpan: 100,
       numberOfEventsPerSpan: 100,
@@ -567,7 +567,7 @@ describe('Span', () => {
       };
 
       const provider = new BasicTracerProvider({
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
       });
 
       provider.addSpanProcessor(processor);
@@ -588,7 +588,7 @@ describe('Span', () => {
       };
 
       const provider = new BasicTracerProvider({
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
       });
 
       provider.addSpanProcessor(processor);
@@ -608,7 +608,7 @@ describe('Span', () => {
       };
 
       const provider = new BasicTracerProvider({
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
       });
 
       provider.addSpanProcessor(processor);

@@ -19,7 +19,7 @@ import {
   assertK8sResource,
   assertEmptyResource,
 } from '../util/resource-assertions';
-import { NoopLogger } from '@opentelemetry/api';
+import { createNoopDiagLogger } from '@opentelemetry/api';
 
 describe('envDetector()', () => {
   describe('with valid env', () => {
@@ -34,7 +34,7 @@ describe('envDetector()', () => {
 
     it('should return resource information from environment variable', async () => {
       const resource: Resource = await envDetector.detect({
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
       });
       assertK8sResource(resource, {
         [K8S_RESOURCE.POD_NAME]: 'pod-xyz-123',
@@ -47,7 +47,7 @@ describe('envDetector()', () => {
   describe('with empty env', () => {
     it('should return empty resource', async () => {
       const resource: Resource = await envDetector.detect({
-        logger: new NoopLogger(),
+        diagLogger: createNoopDiagLogger(),
       });
       assertEmptyResource(resource);
     });
