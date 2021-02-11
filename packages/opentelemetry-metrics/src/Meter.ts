@@ -293,13 +293,13 @@ export class Meter implements api.Meter {
     await Promise.all(observations);
 
     // after this all remaining metrics can be run
-    const metrics = Array.from(this._metrics.values()).map(metric => {
+    const metricsRecords = Array.from(this._metrics.values()).map(metric => {
       return metric.getMetricRecord();
     });
 
-    await Promise.all(metrics).then(records => {
-      records.forEach(record => {
-        record.forEach(metric => this._processor.process(metric));
+    await Promise.all(metricsRecords).then(records => {
+      records.forEach(metrics => {
+        metrics.forEach(metric => this._processor.process(metric));
       });
     });
   }
