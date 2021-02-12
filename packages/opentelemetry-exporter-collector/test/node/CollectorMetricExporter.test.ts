@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  createLogLevelDiagLogger,
-  createNoopDiagLogger,
-  DiagConsoleLogger,
-  DiagLogLevel,
-} from '@opentelemetry/api';
+import { createNoopDiagLogger } from '@opentelemetry/api';
 import {
   Counter,
   ValueObserver,
@@ -69,10 +64,7 @@ describe('CollectorMetricExporter - node with json over http', () => {
   describe('instance', () => {
     it('should warn about metadata when using json', () => {
       const metadata = 'foo';
-      const diagLogger = createLogLevelDiagLogger(
-        DiagLogLevel.DEBUG,
-        new DiagConsoleLogger()
-      );
+      const diagLogger = createNoopDiagLogger();
       const spyLoggerWarn = sinon.stub(diagLogger, 'warn');
       collectorExporter = new CollectorMetricExporter({
         diagLogger: diagLogger,

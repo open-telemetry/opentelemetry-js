@@ -16,6 +16,7 @@
 
 import * as assert from 'assert';
 import { diag } from '../../src';
+import { getDiagLoggerFromConfig } from '../../src/diag/config';
 import {
   createNoopDiagLogger,
   DiagLogger,
@@ -188,6 +189,25 @@ describe('LogLevelFilter DiagLogger', () => {
       diagLoggerFunctions.forEach(fName => {
         it(`should log ${fName} message with ${map.message} level`, () => {
           const testLogger = createLogLevelDiagLogger(map.level, dummyLogger);
+          testLogger[fName](`${fName} called %s`, 'param1');
+          diagLoggerFunctions.forEach(lName => {
+            if (fName === lName && map.ignoreFuncs.indexOf(lName) === -1) {
+              assert.deepStrictEqual(calledArgs[lName], [
+                `${fName} called %s`,
+                'param1',
+              ]);
+            } else {
+              assert.strictEqual(calledArgs[lName], null);
+            }
+          });
+        });
+
+        it(`should log ${fName} message with ${map.message} level via config`, () => {
+          const testConfig = {
+            diagLogger: dummyLogger,
+            diagLogLevel: map.level,
+          };
+          const testLogger = getDiagLoggerFromConfig(testConfig);
           testLogger[fName](`${fName} called %s`, 'param1');
           diagLoggerFunctions.forEach(lName => {
             if (fName === lName && map.ignoreFuncs.indexOf(lName) === -1) {

@@ -244,6 +244,181 @@ To request automatic tracing support for a module not on this list, please [file
 
 ## Upgrade guidelines
 
+### 0.17.0 to ???
+
+[PR-1880](https://github.com/open-telemetry/opentelemetry-js/pull/1880) feat(diag-logger): introduce a new global level api.diag for internal diagnostic logging
+
+[PR-1925](https://github.com/open-telemetry/opentelemetry-js/pull/1925) feat(diag-logger): part 2 - breaking changes - remove api.Logger, api.NoopLogger, core.LogLevel, core.ConsoleLogger
+
+- These PR's remove the previous ```Logger``` and ```LogLevel``` implementations and change the way you should use the replacement ```DiagLogger``` and ```DiagLogLevel```, below are simple examples of how to change your existing usages.
+
+#### New Usage patterns
+
+- **Global Diagnostic Logging with no passed logger**
+
+The new global [```api.diag```](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-api/src/api/diag.ts#L32) not only provides the ability to set a global diagnostic logger ```setLogger()``` and logging level ```setLogLevel()```, it is also a ```DiagLogger``` implementation and can be used directly to log diagnostic messages.
+
+And the helper functions will fallback to this global DiagLogger when no logger is provided or configured.
+
+```javascript
+// Previously (Not supported)
+
+// Now
+import { diag } from "@opentelemetry/api";
+
+diag.debug("...");
+
+// Setting the default Global logger to use the Console
+import { diag, DiagConsoleLogger } from "@opentelemetry/api";
+diag.setLogger(new DiagConsoleLogger())
+
+// Setting the log level limit applied to the global logger
+import { diag, DiagLogLevel } from "@opentelemetry/api";
+diag.setLogLevel(DiagLogLevel.ERROR);
+```
+
+- **Common helper for passing and fetching a diagnostic logger via optional configuration**
+
+```javascript
+// Previously
+import { Logger } from "@opentelemetry/api";
+interface MyConfig {
+  logger: Logger
+}
+
+// and usage
+import { NoopLogger } from "@opentelemetry/api";
+export function myFunction(config: MyConfig) {
+  let logger = config.logger || new NoopLogger();
+}
+
+// Now
+import { DiagLoggerConfig } from "@opentelemetry/api";
+interface MyConfig extends DiagLoggerConfig {
+  // DiagLoggerConfig defines and optional DiagLogger and DiagLogLevel
+  // So you can specify either or both and no need to define within
+  // your own configuration.
+}
+
+// And usage
+import { getDiagLoggerFromConfig } from "@opentelemetry/api";
+export function myFunction(config?: MyConfig) {
+  // Config can be optional and is handled by the helper
+  // Will default to api.diag instance if no logger is defined
+  // and any api.diag logging level will also obeyed
+  let logger = getDiagLoggerFromConfig(config);
+}
+
+// or
+import { getDiagLoggerFromConfig, DiagConsoleLogger } from "@opentelemetry/api";
+export function myFunction(config?: MyConfig) {
+  // Defaults to a Console logger rather than the api.diag if no logger is defined // Will use any defined the logging level - defaults to ALL!
+  let logger = getDiagLoggerFromConfig(config, () => new DiagConsoleLogger());
+}
+
+// if you want to fallback to the default api.diag logger and IGNORE the global
+// logging level you need to provide a fallback function, if no log level is
+// in the config it would default to ALL (So use ONLY during development)
+import { getDiagLoggerFromConfig, diag } from "@opentelemetry/api";
+export function myFunction(config?: MyConfig) {
+  let logger = getDiagLoggerFromConfig(config, () => diag.getLogger());
+}
+```
+
+#### Direct update path for existing code
+
+Without refactoring your existing code to use ```api.diag``` or ```getDiagLoggerFromConfig``` (recommended path), below is how you would directly upgrade to the newer version so you can get compiling and running.
+
+- **api.Logger**
+
+The api.Logger has been renamed for clarity to highlight that this is for internal(OpenTelemetry and supporting components) diagnostic level logging and not for usage by a consuming application to send telemetry out of the executing environment.
+
+The new ```DiagLogger``` provides the same set of functions as the previous Logger interface plus a few more, so direct replacement of the Logger is a simple case of changing to the new (renamed) type which is also exported by api.
+
+```typescript
+// Previously
+import { Logger } from "@opentelemetry/api";
+export function(myLogger: Logger) {
+  myLogger.debug("...");
+  myLogger.info("...");
+  myLogger.warn("...");
+  myLogger.error("...");
+}
+
+// Now
+import { DiagLogger } from "@opentelemetry/api";
+export function(myLogger: DiagLogger) {
+  myLogger.debug("...");
+  myLogger.info("...");
+  myLogger.warn("...");
+  myLogger.error("...");
+
+  // New levels
+  myLogger.verbose("..");
+  myLogger.startup("..");
+  myLogger.critical("..");
+  myLogger.terminal("..");
+}
+```
+
+- **api.NoopLogger**
+
+To support minification the NoopLogger class has been removed in favor of a factory method and generally direct usage should no longer be required as components should use the new ```api.diag``` or ```getDiagLoggerFromConfig```.
+
+```typescript
+// Previous direct creation
+import { NoopLogger } from "@opentelemetry/api";
+let myLogger = new NoopLogger();
+
+// Now
+import { createNoopDiagLogger } from "@opentelemetry/api";
+let myLogger = createNoopDiagLogger();
+```
+
+- **core.LogLevel**
+
+The core.LogLevel enumeration has been moved to the api package and renamed for clarity as with the ```api.DiagLogger``` to highlight its usage for diagnostic logging.
+
+Note: Numeric compatibility of each enum value (DEBUG, INFO, WARN, ERROR) has NOT preserved.
+
+```javascript
+// Previously
+import { LogLevel } from "@opentelemetry/core";
+
+let logLevel = LogLevel.DEBUG;
+LogLevel.ERROR === 0 // true
+LogLevel.WARN === 1 // true
+LogLevel.INFO === 2 // true
+LogLevel.DEBUG === 3 // true
+
+// Now
+import { DiagLogLevel } from "@opentelemetry/api";
+
+let logLevel = DiagLogLevel.DEBUG;
+DiagLogLevel.ERROR !== 0 // true
+DiagLogLevel.WARN !== 1 // true
+DiagLogLevel.INFO !== 2 // true
+DiagLogLevel.DEBUG !== 3 // true
+```
+
+Usage of the ```getEnv().OTEL_LOG_LEVEL``` now returns a ```api.DiagLogLevel``` and not the removed ```core.LogLevel```, the environment setting continues to support conversion from ```string``` case-insensitive values of the new Enum equivalent and but explicitly does not support initializing via a numeric value (or string version i.e. "0").
+
+- **core.ConsoleLogger**
+
+As with the ```core.LogLevel``` this has been moved to the ```api``` package and renamed to ```DiagConsoleLogger```.
+
+Note: The previous version of the ```ConsoleLogger``` supported a LogLevel "limit", this functionality has been extracted into a helper wrapper sink ```createLogLevelDiagLogger()``` so it can be applied to any DiagLogger implementation.
+
+```javascript
+// Previously
+import { ConsoleLogger } from "@opentelemetry/core";
+let myLogger = new ConsoleLogger(LogLevel.ERROR);
+
+// Now
+import { DiagConsoleLogger, createLogLevelDiagLogger } from "@opentelemetry/api";
+let myLogger = createLogLevelDiagLogger(LogLevel.ERROR, new DiagConsoleLogger());
+```
+
 ### 0.16.0 to 0.17.0
 
 [PR-1855](https://github.com/open-telemetry/opentelemetry-js/pull/1855) Use instrumentation loader to load plugins and instrumentations

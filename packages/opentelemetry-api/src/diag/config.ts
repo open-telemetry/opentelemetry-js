@@ -46,18 +46,17 @@ export function getDiagLoggerFromConfig(
   getDefaultLogger?: () => DiagLogger
 ): DiagLogger {
   let theLogger;
+  const theConfig = config || {};
 
-  if (config) {
-    theLogger = config.diagLogger;
-    if (!theLogger && getDefaultLogger) {
-      theLogger = getDefaultLogger();
-    }
+  theLogger = theConfig.diagLogger;
+  if (!theLogger && getDefaultLogger) {
+    theLogger = getDefaultLogger();
+  }
 
-    const theLogLevel = config.diagLogLevel;
-    if (theLogLevel !== undefined && theLogLevel !== null) {
-      // Note: If no existing 'theLogger' is defined the helper will wrap the api.diag.getLogger()
-      theLogger = createLogLevelDiagLogger(theLogLevel, theLogger);
-    }
+  const theLogLevel = theConfig.diagLogLevel;
+  if (theLogLevel !== undefined && theLogLevel !== null) {
+    // Note: If no existing 'theLogger' is defined the helper will wrap the api.diag.getLogger()
+    theLogger = createLogLevelDiagLogger(theLogLevel, theLogger);
   }
 
   if (!theLogger) {

@@ -15,7 +15,7 @@
  */
 
 import {
-  OptionalDiagLogger,
+  DiagLogger,
   Exception,
   DiagLogLevel,
   DiagConsoleLogger,
@@ -28,9 +28,7 @@ import { ErrorHandler } from './types';
  * console logger if one was not provided.
  * @param {DiagLogger} diagLogger
  */
-export function loggingErrorHandler(
-  diagLogger?: OptionalDiagLogger
-): ErrorHandler {
+export function loggingErrorHandler(diagLogger?: DiagLogger): ErrorHandler {
   diagLogger =
     diagLogger ||
     createLogLevelDiagLogger(DiagLogLevel.ERROR, new DiagConsoleLogger());

@@ -179,8 +179,6 @@ function setLogLevelFromEnv(
     if (theLevel != undefined) {
       environment[key] = theLevel;
     }
-  } else if (typeof value === 'number') {
-    environment[key] = value;
   }
 }
 

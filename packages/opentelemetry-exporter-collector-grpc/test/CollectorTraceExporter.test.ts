@@ -16,11 +16,7 @@
 
 import * as protoLoader from '@grpc/proto-loader';
 import { collectorTypes } from '@opentelemetry/exporter-collector';
-import {
-  DiagConsoleLogger,
-  DiagLogLevel,
-  createLogLevelDiagLogger,
-} from '@opentelemetry/api';
+import { createNoopDiagLogger } from '@opentelemetry/api';
 import {
   BasicTracerProvider,
   SimpleSpanProcessor,
@@ -145,10 +141,7 @@ const testCollectorExporter = (params: TestParams) =>
 
     describe('instance', () => {
       it('should warn about headers when using grpc', () => {
-        const diagLogger = createLogLevelDiagLogger(
-          DiagLogLevel.DEBUG,
-          new DiagConsoleLogger()
-        );
+        const diagLogger = createNoopDiagLogger();
         const spyLoggerWarn = sinon.stub(diagLogger, 'warn');
         collectorExporter = new CollectorTraceExporter({
           diagLogger,
