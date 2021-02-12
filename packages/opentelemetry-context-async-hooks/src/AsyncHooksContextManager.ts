@@ -38,13 +38,15 @@ export class AsyncHooksContextManager extends AbstractAsyncHooksContextManager {
     return this._stack[this._stack.length - 1] ?? ROOT_CONTEXT;
   }
 
-  with<T extends (...args: unknown[]) => ReturnType<T>>(
+  with<A extends unknown[], F extends (...args: A) => ReturnType<F>>(
     context: Context,
-    fn: T
-  ): ReturnType<T> {
+    fn: F,
+    thisArg?: ThisParameterType<F>,
+    ...args: A
+  ): ReturnType<F> {
     this._enterContext(context);
     try {
-      return fn();
+      return fn.call(thisArg!, ...args);
     } finally {
       this._exitContext();
     }

@@ -103,16 +103,20 @@ export class StackContextManager implements ContextManager {
    * The context will be set as active
    * @param context
    * @param fn Callback function
+   * @param thisArg optional receiver to be used for calling fn
+   * @param args optional arguments forwarded to fn
    */
-  with<T extends (...args: unknown[]) => ReturnType<T>>(
+  with<A extends unknown[], F extends (...args: A) => ReturnType<F>>(
     context: Context | null,
-    fn: () => ReturnType<T>
-  ): ReturnType<T> {
+    fn: F,
+    thisArg?: ThisParameterType<F>,
+    ...args: A
+  ): ReturnType<F> {
     const previousContext = this._currentContext;
     this._currentContext = context || ROOT_CONTEXT;
 
     try {
-      return fn();
+      return fn.call(thisArg, ...args);
     } finally {
       this._currentContext = previousContext;
     }

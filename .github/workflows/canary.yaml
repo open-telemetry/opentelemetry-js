@@ -53,7 +53,7 @@ jobs:
           npm run compile
 
       - name: Publish
-        run: npx lerna publish --canary --yes
+        run: npx lerna publish --canary --yes --no-verify-access
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
