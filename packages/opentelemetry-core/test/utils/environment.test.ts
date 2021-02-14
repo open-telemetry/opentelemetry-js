@@ -80,8 +80,8 @@ describe('environment', () => {
         HOSTNAME: 'hostname',
         KUBERNETES_SERVICE_HOST: 'https://k8s.host/',
         NAMESPACE: 'namespace',
-        OTEL_BSP_MAX_BATCH_SIZE: 40,
-        OTEL_BSP_SCHEDULE_DELAY_MILLIS: 50,
+        OTEL_BSP_MAX_EXPORT_BATCH_SIZE: 40,
+        OTEL_BSP_SCHEDULE_DELAY: 50,
         OTEL_EXPORTER_JAEGER_AGENT_HOST: 'host.domain.com',
         OTEL_EXPORTER_JAEGER_ENDPOINT: 'https://example.com/endpoint',
         OTEL_EXPORTER_JAEGER_PASSWORD: 'secret',
@@ -121,8 +121,8 @@ describe('environment', () => {
       assert.strictEqual(env.CONTAINER_NAME, 'container-1');
       assert.strictEqual(env.KUBERNETES_SERVICE_HOST, 'https://k8s.host/');
       assert.strictEqual(env.OTEL_RESOURCE_ATTRIBUTES, '<attrs>');
-      assert.strictEqual(env.OTEL_BSP_MAX_BATCH_SIZE, 40);
-      assert.strictEqual(env.OTEL_BSP_SCHEDULE_DELAY_MILLIS, 50);
+      assert.strictEqual(env.OTEL_BSP_MAX_EXPORT_BATCH_SIZE, 40);
+      assert.strictEqual(env.OTEL_BSP_SCHEDULE_DELAY, 50);
     });
 
     it('should match invalid values to closest valid equivalent', () => {
