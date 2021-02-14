@@ -104,17 +104,7 @@ describe('transform', () => {
         Utils.encodeInt64(hrTimeToMicroseconds(readableSpan.startTime))
       );
       assert.strictEqual(thriftSpan.tags.length, 9);
-      const [
-        tag1,
-        tag2,
-        tag3,
-        tag4,
-        tag5,
-        tag6,
-        tag7,
-        tag8,
-        tag9,
-      ] = thriftSpan.tags;
+      const [tag1, tag2, tag3, tag4, tag5, tag6, tag7] = thriftSpan.tags;
       assert.strictEqual(tag1.key, 'testBool');
       assert.strictEqual(tag1.vType, 'BOOL');
       assert.strictEqual(tag1.vBool, true);
@@ -124,31 +114,25 @@ describe('transform', () => {
       assert.strictEqual(tag3.key, 'testNum');
       assert.strictEqual(tag3.vType, 'DOUBLE');
       assert.strictEqual(tag3.vDouble, 3.142);
-      assert.strictEqual(tag4.key, 'status.code');
-      assert.strictEqual(tag4.vType, 'DOUBLE');
-      assert.strictEqual(tag4.vDouble, api.SpanStatusCode.OK);
-      assert.strictEqual(tag5.key, 'status.name');
+      assert.strictEqual(tag4.key, 'otel.status_code');
+      assert.strictEqual(tag4.vType, 'STRING');
+      assert.strictEqual(tag4.vStr, 'OK');
+      assert.strictEqual(tag5.key, 'service');
       assert.strictEqual(tag5.vType, 'STRING');
-      assert.strictEqual(tag5.vStr, 'OK');
-      assert.strictEqual(tag6.key, 'span.kind');
-      assert.strictEqual(tag6.vType, 'STRING');
-      assert.strictEqual(tag6.vStr, 'INTERNAL');
-      assert.strictEqual(tag7.key, 'service');
-      assert.strictEqual(tag7.vType, 'STRING');
-      assert.strictEqual(tag7.vStr, 'ui');
-      assert.strictEqual(tag8.key, 'version');
-      assert.strictEqual(tag8.vType, 'DOUBLE');
-      assert.strictEqual(tag8.vDouble, 1);
-      assert.strictEqual(tag9.key, 'cost');
-      assert.strictEqual(tag9.vType, 'DOUBLE');
-      assert.strictEqual(tag9.vDouble, 112.12);
+      assert.strictEqual(tag5.vStr, 'ui');
+      assert.strictEqual(tag6.key, 'version');
+      assert.strictEqual(tag6.vType, 'DOUBLE');
+      assert.strictEqual(tag6.vDouble, 1);
+      assert.strictEqual(tag7.key, 'cost');
+      assert.strictEqual(tag7.vType, 'DOUBLE');
+      assert.strictEqual(tag7.vDouble, 112.12);
       assert.strictEqual(thriftSpan.references.length, 0);
 
       assert.strictEqual(thriftSpan.logs.length, 1);
       const [log1] = thriftSpan.logs;
       assert.strictEqual(log1.fields.length, 2);
       const [field1, field2] = log1.fields;
-      assert.strictEqual(field1.key, 'message.id');
+      assert.strictEqual(field1.key, 'event');
       assert.strictEqual(field1.vType, 'STRING');
       assert.strictEqual(field1.vStr, 'something happened');
       assert.strictEqual(field2.key, 'error');
@@ -198,23 +182,20 @@ describe('transform', () => {
       assert.deepStrictEqual(thriftSpan.parentSpanId, ThriftUtils.emptyBuffer);
       assert.deepStrictEqual(thriftSpan.flags, 1);
       assert.strictEqual(thriftSpan.references.length, 0);
-      assert.strictEqual(thriftSpan.tags.length, 5);
-      const [tag1, tag2, tag3, tag4, tag5] = thriftSpan.tags;
-      assert.strictEqual(tag1.key, 'status.code');
-      assert.strictEqual(tag1.vType, 'DOUBLE');
-      assert.strictEqual(tag1.vDouble, 2);
-      assert.strictEqual(tag2.key, 'status.name');
+      assert.strictEqual(thriftSpan.tags.length, 6);
+      const [tag1, tag2, tag3, tag4] = thriftSpan.tags;
+      assert.strictEqual(tag1.key, 'otel.status_code');
+      assert.strictEqual(tag1.vType, 'STRING');
+      assert.strictEqual(tag1.vStr, 'ERROR');
+      assert.strictEqual(tag2.key, 'otel.status_description');
       assert.strictEqual(tag2.vType, 'STRING');
-      assert.strictEqual(tag2.vStr, 'ERROR');
-      assert.strictEqual(tag3.key, 'status.message');
-      assert.strictEqual(tag3.vType, 'STRING');
-      assert.strictEqual(tag3.vStr, 'data loss');
-      assert.strictEqual(tag4.key, 'error');
-      assert.strictEqual(tag4.vType, 'BOOL');
-      assert.strictEqual(tag4.vBool, true);
-      assert.strictEqual(tag5.key, 'span.kind');
-      assert.strictEqual(tag5.vType, 'STRING');
-      assert.strictEqual(tag5.vStr, 'CLIENT');
+      assert.strictEqual(tag2.vStr, 'data loss');
+      assert.strictEqual(tag3.key, 'error');
+      assert.strictEqual(tag3.vType, 'BOOL');
+      assert.strictEqual(tag3.vBool, true);
+      assert.strictEqual(tag4.key, 'span.kind');
+      assert.strictEqual(tag4.vType, 'STRING');
+      assert.strictEqual(tag4.vStr, 'client');
       assert.strictEqual(thriftSpan.logs.length, 0);
     });
 
@@ -261,7 +242,7 @@ describe('transform', () => {
       assert.strictEqual(ref1.traceIdLow.toString('hex'), '92b449d5929fda1b');
       assert.strictEqual(ref1.traceIdHigh.toString('hex'), 'a4cda95b652f4a15');
       assert.strictEqual(ref1.spanId.toString('hex'), '3e0c63257de34c92');
-      assert.strictEqual(ref1.refType, ThriftReferenceType.CHILD_OF);
+      assert.strictEqual(ref1.refType, ThriftReferenceType.FOLLOWS_FROM);
     });
 
     it('should left pad trace ids', () => {
