@@ -50,10 +50,14 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
   const tags = Object.keys(span.attributes).map(
     (name): Tag => ({ key: name, value: toTagValue(span.attributes[name]) })
   );
-  tags.push({ key: 'status.code', value: span.status.code });
-  tags.push({ key: 'status.name', value: SpanStatusCode[span.status.code] });
-  if (span.status.message) {
-    tags.push({ key: 'status.message', value: span.status.message });
+  if (span.status.code !== SpanStatusCode.UNSET) {
+    tags.push({
+      key: 'otel.status_code',
+      value: SpanStatusCode[span.status.code],
+    });
+    if (span.status.message) {
+      tags.push({ key: 'otel.status_description', value: span.status.message });
+    }
   }
   // Ensure that if SpanStatus.Code is ERROR, that we set the "error" tag on the
   // Jaeger span.
@@ -61,8 +65,8 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
     tags.push({ key: 'error', value: true });
   }
 
-  if (span.kind !== undefined) {
-    tags.push({ key: 'span.kind', value: SpanKind[span.kind] });
+  if (span.kind !== undefined && span.kind !== SpanKind.INTERNAL) {
+    tags.push({ key: 'span.kind', value: SpanKind[span.kind].toLowerCase() });
   }
   Object.keys(span.resource.attributes).forEach(name =>
     tags.push({
@@ -71,11 +75,22 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
     })
   );
 
+  if (span.instrumentationLibrary) {
+    tags.push({
+      key: 'otel.library.name',
+      value: toTagValue(span.instrumentationLibrary.name),
+    });
+    tags.push({
+      key: 'otel.library.version',
+      value: toTagValue(span.instrumentationLibrary.version),
+    });
+  }
+
   const spanTags: ThriftTag[] = ThriftUtils.getThriftTags(tags);
 
   const logs = span.events.map(
     (event): Log => {
-      const fields: Tag[] = [{ key: 'message.id', value: event.name }];
+      const fields: Tag[] = [{ key: 'event', value: event.name }];
       const attrs = event.attributes;
       if (attrs) {
         Object.keys(attrs).forEach(attr =>
@@ -110,7 +125,7 @@ function spanLinksToThriftRefs(
   return links
     .map((link): ThriftReference | null => {
       if (link.context.spanId === parentSpanId) {
-        const refType = ThriftReferenceType.CHILD_OF;
+        const refType = ThriftReferenceType.FOLLOWS_FROM;
         const traceId = link.context.traceId;
         const traceIdHigh = Utils.encodeInt64(traceId.slice(0, 16));
         const traceIdLow = Utils.encodeInt64(traceId.slice(16));
