@@ -20,7 +20,6 @@ import {
   TraceFlags,
   ROOT_CONTEXT,
   NoopLogger,
-  NoopSpan,
   setSpan,
   setSpanContext,
   getSpan,
@@ -258,13 +257,13 @@ describe('BasicTracerProvider', () => {
       assert.deepStrictEqual(context.traceState, undefined);
     });
 
-    it('should return a no recording span when never sampling', () => {
+    it('should return a non recording span when never sampling', () => {
       const tracer = new BasicTracerProvider({
         sampler: new AlwaysOffSampler(),
         logger: new NoopLogger(),
       }).getTracer('default');
       const span = tracer.startSpan('my-span');
-      assert.ok(span instanceof NoopSpan);
+      assert.ok(!span.isRecording());
       const context = span.context();
       assert.ok(context.traceId.match(/[a-f0-9]{32}/));
       assert.ok(context.spanId.match(/[a-f0-9]{16}/));

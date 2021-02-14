@@ -14,18 +14,9 @@
  * limitations under the License.
  */
 
-import type * as grpcTypes from 'grpc';
-import * as events from 'events';
 import { InstrumentationConfig } from '@opentelemetry/instrumentation';
 
 export type IgnoreMatcher = string | RegExp | ((str: string) => boolean);
-
-export type SendUnaryDataCallback = (
-  error: grpcTypes.ServiceError | null,
-  value?: any,
-  trailer?: grpcTypes.Metadata,
-  flags?: grpcTypes.writeFlags
-) => void;
 
 export interface GrpcInstrumentationConfig extends InstrumentationConfig {
   /* Omits tracing on any gRPC methods that match any of
@@ -33,31 +24,3 @@ export interface GrpcInstrumentationConfig extends InstrumentationConfig {
    */
   ignoreGrpcMethods?: IgnoreMatcher[];
 }
-
-interface GrpcStatus {
-  code: number;
-  details: string;
-  metadata: grpcTypes.Metadata;
-}
-
-export type ServerCall =
-  | typeof grpcTypes.ServerUnaryCall
-  | typeof grpcTypes.ServerReadableStream
-  | typeof grpcTypes.ServerWritableStream
-  | typeof grpcTypes.ServerDuplexStream;
-
-export type ServerCallWithMeta = ServerCall & {
-  metadata: grpcTypes.Metadata;
-  status: GrpcStatus;
-  request?: unknown;
-} & events.EventEmitter;
-
-export type GrpcClientFunc = typeof Function & {
-  path: string;
-  requestStream: boolean;
-  responseStream: boolean;
-};
-
-export type GrpcInternalClientTypes = {
-  makeClientConstructor: typeof grpcTypes.makeGenericClientConstructor;
-};

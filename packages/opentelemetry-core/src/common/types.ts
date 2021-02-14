@@ -16,6 +16,9 @@
 
 import { Exception } from '@opentelemetry/api';
 
+/** @deprecated This enum will be removed prior to v1.0, use the {@link DiagLogLevel}
+ * @see {@link DiagLogLevel} from the api
+ */
 export enum LogLevel {
   ERROR,
   WARN,

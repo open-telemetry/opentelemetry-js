@@ -1,15 +1,16 @@
 'use strict';
 
 const opentelemetry = require('@opentelemetry/api');
-// const { ConsoleLogger,  LogLevel} = require('@opentelemetry/core');
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector');
 // const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector-grpc');
 // const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector-proto');
 
+// opentelemetry.diag.setLogger(new opentelemetry.DiagConsoleLogger());
+// opentelemetry.diag.setLogLevel(opentelemetry.DiagLogLevel.DEBUG);
+
 const exporter = new CollectorTraceExporter({
   serviceName: 'basic-service',
-  // logger: new ConsoleLogger(LogLevel.DEBUG),
   // headers: {
   //   foo: 'bar'
   // },
