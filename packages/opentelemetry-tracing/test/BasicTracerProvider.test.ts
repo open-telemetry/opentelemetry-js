@@ -22,6 +22,12 @@ import {
   setSpan,
   setSpanContext,
   getSpan,
+  TextMapPropagator,
+  TextMapSetter,
+  Context,
+  TextMapGetter,
+  propagation,
+  diag,
 } from '@opentelemetry/api';
 import {
   AlwaysOnSampler,
@@ -112,6 +118,94 @@ describe('BasicTracerProvider', () => {
     it('should construct an instance of BasicTracerProvider', () => {
       const tracer = new BasicTracerProvider();
       assert.ok(tracer instanceof BasicTracerProvider);
+    });
+  });
+
+  describe('.register()', () => {
+    describe('propagator', () => {
+      class DummyPropagator implements TextMapPropagator {
+        inject(
+          context: Context,
+          carrier: any,
+          setter: TextMapSetter<any>
+        ): void {
+          throw new Error('Method not implemented.');
+        }
+        extract(
+          context: Context,
+          carrier: any,
+          getter: TextMapGetter<any>
+        ): Context {
+          throw new Error('Method not implemented.');
+        }
+        fields(): string[] {
+          throw new Error('Method not implemented.');
+        }
+      }
+
+      let setGlobalPropagatorStub: sinon.SinonSpy<
+        [TextMapPropagator],
+        TextMapPropagator
+      >;
+      let originalPropagators: string | undefined;
+      beforeEach(() => {
+        setGlobalPropagatorStub = sinon.spy(propagation, 'setGlobalPropagator');
+        originalPropagators = process.env.OTEL_PROPAGATORS;
+      });
+
+      afterEach(() => {
+        setGlobalPropagatorStub.restore();
+        process.env.OTEL_PROPAGATORS = originalPropagators;
+      });
+
+      it('should be set to a given value if it it provided', () => {
+        const provider = new BasicTracerProvider();
+        provider.register({
+          propagator: new DummyPropagator(),
+        });
+        assert.ok(
+          setGlobalPropagatorStub.calledOnceWithExactly(
+            sinon.match.instanceOf(DummyPropagator)
+          )
+        );
+      });
+
+      it('should be set to a given value if it it provided in an environment variable', () => {
+        process.env.OTEL_PROPAGATORS = 'dummy';
+        BasicTracerProvider.registerPropagator(
+          'dummy',
+          () => new DummyPropagator()
+        );
+
+        const provider = new BasicTracerProvider();
+        provider.register();
+
+        assert.ok(
+          setGlobalPropagatorStub.calledOnceWithExactly(
+            sinon.match.instanceOf(DummyPropagator)
+          )
+        );
+      });
+
+      it(
+        'should be composite if more than 2 propagators provided in an environment variable'
+      );
+
+      it('warns if there is no propagator registered with a given name', () => {
+        const warnStub = sinon.spy(diag, 'warn');
+
+        process.env.OTEL_PROPAGATORS = 'missing-propagator';
+        const provider = new BasicTracerProvider({});
+        provider.register();
+
+        assert.ok(
+          warnStub.calledOnceWithExactly(
+            'Propagator "missing-propagator" requested through environment variable is unavailable.'
+          )
+        );
+
+        warnStub.restore();
+      });
     });
   });
 
