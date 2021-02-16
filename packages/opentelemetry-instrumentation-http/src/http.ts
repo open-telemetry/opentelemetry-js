@@ -25,7 +25,7 @@ import {
   ROOT_CONTEXT,
   getSpan,
   suppressInstrumentation,
-  NoopSpan,
+  NOOP_TRACER,
 } from '@opentelemetry/api';
 import type * as http from 'http';
 import type * as https from 'https';
@@ -587,7 +587,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     if (requireParent === true && currentSpan === undefined) {
       // TODO: Refactor this when a solution is found in
       // https://github.com/open-telemetry/opentelemetry-specification/issues/530
-      span = new NoopSpan();
+      span = NOOP_TRACER.startSpan(name, options);
     } else if (requireParent === true && currentSpan?.context().isRemote) {
       span = currentSpan;
     } else {

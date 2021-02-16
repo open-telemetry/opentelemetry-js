@@ -35,6 +35,11 @@ describe('PrometheusExporter', () => {
   mockAggregator(LastValueAggregator);
   mockAggregator(HistogramAggregator);
 
+  afterEach(() => {
+    delete process.env.OTEL_EXPORTER_PROMETHEUS_HOST;
+    delete process.env.OTEL_EXPORTER_PROMETHEUS_PORT;
+  });
+
   describe('constructor', () => {
     it('should construct an exporter', done => {
       const exporter = new PrometheusExporter();
@@ -64,7 +69,7 @@ describe('PrometheusExporter', () => {
   });
 
   describe('server', () => {
-    it('it should start on startServer() and call the callback', done => {
+    it('should start on startServer() and call the callback', done => {
       const exporter = new PrometheusExporter({
         port: 9722,
         preventServerStart: true,
@@ -76,7 +81,7 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('it should listen on the default port and default endpoint', done => {
+    it('should listen on the default port and default endpoint', done => {
       const port = PrometheusExporter.DEFAULT_OPTIONS.port;
       const endpoint = PrometheusExporter.DEFAULT_OPTIONS.endpoint;
       const exporter = new PrometheusExporter({}, () => {
@@ -90,7 +95,7 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('it should listen on a custom port and endpoint if provided', done => {
+    it('should listen on a custom port and endpoint if provided', done => {
       const port = 9991;
       const endpoint = '/metric';
 
@@ -111,7 +116,17 @@ describe('PrometheusExporter', () => {
       );
     });
 
-    it('it should not require endpoints to start with a slash', done => {
+    it('should listen on environmentally set host and port', () => {
+      process.env.OTEL_EXPORTER_PROMETHEUS_HOST = '127.0.0.1';
+      process.env.OTEL_EXPORTER_PROMETHEUS_PORT = '1234';
+      const exporter = new PrometheusExporter({}, async () => {
+        await exporter.shutdown();
+      });
+      assert.strictEqual(exporter['_host'], '127.0.0.1');
+      assert.strictEqual(exporter['_port'], 1234);
+    });
+
+    it('should not require endpoints to start with a slash', done => {
       const port = 9991;
       const endpoint = 'metric';
 
@@ -146,7 +161,7 @@ describe('PrometheusExporter', () => {
       );
     });
 
-    it('it should return a HTTP status 404 if the endpoint does not match', done => {
+    it('should return a HTTP status 404 if the endpoint does not match', done => {
       const port = 9912;
       const endpoint = '/metrics';
       const exporter = new PrometheusExporter(

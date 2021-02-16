@@ -14,4 +14,15 @@
  * limitations under the License.
  */
 
-export * from './instrumentation';
+import { runTests } from './helper';
+import { GrpcInstrumentation } from '../src/instrumentation';
+
+const instrumentation = new GrpcInstrumentation();
+instrumentation.enable();
+instrumentation.disable();
+
+import * as grpcJs from '@grpc/grpc-js';
+
+describe('#grpc-js', () => {
+  runTests(instrumentation, 'grpc', grpcJs, 12346);
+});
