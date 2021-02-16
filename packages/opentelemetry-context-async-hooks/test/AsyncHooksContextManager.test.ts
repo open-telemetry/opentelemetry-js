@@ -31,6 +31,9 @@ for (const contextManagerClass of [
       | AsyncHooksContextManager
       | AsyncLocalStorageContextManager;
     const key1 = createContextKey('test key 1');
+    let otherContextManager:
+      | AsyncHooksContextManager
+      | AsyncLocalStorageContextManager;
 
     before(function () {
       if (
@@ -49,6 +52,7 @@ for (const contextManagerClass of [
 
     afterEach(() => {
       contextManager.disable();
+      otherContextManager?.disable();
     });
 
     describe('.enable()', () => {
@@ -414,6 +418,26 @@ for (const contextManagerClass of [
         };
         patchedEe.on('test', handler);
         assert.strictEqual(patchedEe.listeners('test').length, 1);
+        patchedEe.emit('test');
+      });
+
+      it('should not influence other instances', () => {
+        const ee = new EventEmitter();
+        otherContextManager = new contextManagerClass();
+        otherContextManager.enable();
+
+        const context = ROOT_CONTEXT.setValue(key1, 2);
+        const otherContext = ROOT_CONTEXT.setValue(key1, 3);
+        const patchedEe = otherContextManager.bind(
+          contextManager.bind(ee, context),
+          otherContext
+        );
+        const handler = () => {
+          assert.deepStrictEqual(contextManager.active(), context);
+          assert.strictEqual(otherContextManager.active(), otherContext);
+        };
+
+        patchedEe.on('test', handler);
         patchedEe.emit('test');
       });
     });
