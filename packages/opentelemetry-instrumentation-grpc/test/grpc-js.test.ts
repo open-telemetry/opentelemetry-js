@@ -14,26 +14,15 @@
  * limitations under the License.
  */
 
-import {
-  SpanContext,
-  NoopSpan,
-  INVALID_SPAN_CONTEXT,
-} from '@opentelemetry/api';
+import { runTests } from './helper';
+import { GrpcInstrumentation } from '../src/instrumentation';
 
-/**
- * The NoRecordingSpan extends the {@link NoopSpan}, making all operations no-op
- * except context propagation.
- */
-export class NoRecordingSpan extends NoopSpan {
-  private readonly _context: SpanContext;
+const instrumentation = new GrpcInstrumentation();
+instrumentation.enable();
+instrumentation.disable();
 
-  constructor(spanContext: SpanContext) {
-    super(spanContext);
-    this._context = spanContext || INVALID_SPAN_CONTEXT;
-  }
+import * as grpcJs from '@grpc/grpc-js';
 
-  // Returns a SpanContext.
-  context(): SpanContext {
-    return this._context;
-  }
-}
+describe('#grpc-js', () => {
+  runTests(instrumentation, 'grpc', grpcJs, 12346);
+});

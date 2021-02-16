@@ -17,28 +17,26 @@
 import * as assert from 'assert';
 import {
   NoopTracer,
-  NOOP_SPAN,
   SpanContext,
   SpanKind,
   TraceFlags,
   context,
   setSpanContext,
 } from '../../src';
+import { NoopSpan } from '../../src/trace/NoopSpan';
 
 describe('NoopTracer', () => {
   it('should not crash', () => {
     const tracer = new NoopTracer();
 
-    assert.deepStrictEqual(tracer.startSpan('span-name'), NOOP_SPAN);
-    assert.deepStrictEqual(
-      tracer.startSpan('span-name1', { kind: SpanKind.CLIENT }),
-      NOOP_SPAN
+    assert.ok(tracer.startSpan('span-name') instanceof NoopSpan);
+    assert.ok(
+      tracer.startSpan('span-name1', { kind: SpanKind.CLIENT }) instanceof
+        NoopSpan
     );
-    assert.deepStrictEqual(
-      tracer.startSpan('span-name2', {
-        kind: SpanKind.CLIENT,
-      }),
-      NOOP_SPAN
+    assert.ok(
+      tracer.startSpan('span-name2', { kind: SpanKind.CLIENT }) instanceof
+        NoopSpan
     );
   });
 

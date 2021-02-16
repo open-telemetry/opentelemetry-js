@@ -18,6 +18,10 @@ import { Logger } from '@opentelemetry/api';
 import { LogLevel } from './types';
 import { getEnv } from '../platform';
 
+/**
+ * @deprecated This class will be removed prior to v1.0, use {@link DiagConsoleLogger} from the api.
+ * @see {@link DiagLogLevel} {@link diagLogLevelFilter} {@link DiagConsoleLogger} from the api
+ */
 export class ConsoleLogger implements Logger {
   constructor(level: LogLevel = getEnv().OTEL_LOG_LEVEL) {
     if (level >= LogLevel.DEBUG) {

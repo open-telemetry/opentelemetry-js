@@ -18,6 +18,7 @@ import { ContextManager } from '@opentelemetry/context-base';
 import { TextMapPropagator } from '../context/propagation/TextMapPropagator';
 import { TracerProvider } from '../trace/tracer_provider';
 import { _globalThis } from '../platform';
+import { DiagAPI } from '../api/diag';
 
 export const GLOBAL_CONTEXT_MANAGER_API_KEY = Symbol.for(
   'io.opentelemetry.js.api.context'
@@ -28,11 +29,16 @@ export const GLOBAL_PROPAGATION_API_KEY = Symbol.for(
 );
 export const GLOBAL_TRACE_API_KEY = Symbol.for('io.opentelemetry.js.api.trace');
 
+export const GLOBAL_DIAG_LOGGER_API_KEY = Symbol.for(
+  'io.opentelemetry.js.api.diag'
+);
+
 type Get<T> = (version: number) => T;
 type OtelGlobal = Partial<{
   [GLOBAL_CONTEXT_MANAGER_API_KEY]: Get<ContextManager>;
   [GLOBAL_PROPAGATION_API_KEY]: Get<TextMapPropagator>;
   [GLOBAL_TRACE_API_KEY]: Get<TracerProvider>;
+  [GLOBAL_DIAG_LOGGER_API_KEY]: Get<DiagAPI>;
 }>;
 
 export const _global = _globalThis as OtelGlobal;

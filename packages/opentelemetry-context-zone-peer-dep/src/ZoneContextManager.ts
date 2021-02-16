@@ -244,15 +244,19 @@ export class ZoneContextManager implements ContextManager {
    *     The context will be set as active
    * @param context A context (span) to be called with provided callback
    * @param fn Callback function
+   * @param thisArg optional receiver to be used for calling fn
+   * @param args optional arguments forwarded to fn
    */
-  with<T extends (...args: unknown[]) => ReturnType<T>>(
+  with<A extends unknown[], F extends (...args: A) => ReturnType<F>>(
     context: Context | null,
-    fn: () => ReturnType<T>
-  ): ReturnType<T> {
+    fn: F,
+    thisArg?: ThisParameterType<F>,
+    ...args: A
+  ): ReturnType<F> {
     const zoneName = this._createZoneName();
 
     const newZone = this._createZone(zoneName, context);
 
-    return newZone.run(fn, context);
+    return newZone.run(fn, thisArg, args);
   }
 }
