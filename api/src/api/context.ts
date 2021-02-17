@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  Context,
-  ContextManager,
-  NoopContextManager,
-} from '@opentelemetry/context-base';
+import { Context, ContextManager, NoopContextManager } from '../context-base';
 import {
   API_BACKWARDS_COMPATIBILITY_VERSION,
   GLOBAL_CONTEXT_MANAGER_API_KEY,

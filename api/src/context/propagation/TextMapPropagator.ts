@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/context-base';
+import { Context } from '../../context-base';
 
 /**
  * Injects `Context` into and extracts it from carriers that travel
