@@ -187,7 +187,7 @@
 <span style="color: #000000">  } </span><span style="color: #AF00DB">catch</span><span style="color: #000000"> (</span><span style="color: #001080">err</span><span style="color: #000000">) {</span>
 <span style="color: #000000">    </span><span style="color: #001080">span</span><span style="color: #000000">.</span><span style="color: #795E26">setStatus</span><span style="color: #000000">({</span>
 <span style="color: #000000">      </span><span style="color: #008000">// use an appropriate status code here</span>
-<span style="color: #000000">      </span><span style="color: #001080">code:</span><span style="color: #000000"> </span><span style="color: #001080">api</span><span style="color: #000000">.</span><span style="color: #001080">StatusCode</span><span style="color: #000000">.</span><span style="color: #0070C1">ERROR</span><span style="color: #000000">,</span>
+<span style="color: #000000">      </span><span style="color: #001080">code:</span><span style="color: #000000"> </span><span style="color: #001080">api</span><span style="color: #000000">.</span><span style="color: #001080">SpanStatusCode</span><span style="color: #000000">.</span><span style="color: #0070C1">ERROR</span><span style="color: #000000">,</span>
 <span style="color: #000000">      </span><span style="color: #001080">message:</span><span style="color: #000000"> </span><span style="color: #001080">err</span><span style="color: #000000">.</span><span style="color: #001080">message</span><span style="color: #000000">,</span>
 <span style="color: #000000">    });</span>
 <span style="color: #000000">    </span><span style="color: #001080">span</span><span style="color: #000000">.</span><span style="color: #795E26">end</span><span style="color: #000000">();</span>
@@ -220,7 +220,7 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-enum">
-						<a href="enums/entryttl.html" class="tsd-kind-icon">Entry<wbr>Ttl</a>
+						<a href="enums/diagloglevel.html" class="tsd-kind-icon">Diag<wbr>Log<wbr>Level</a>
 					</li>
 					<li class=" tsd-kind-enum">
 						<a href="enums/samplingdecision.html" class="tsd-kind-icon">Sampling<wbr>Decision</a>
@@ -229,7 +229,7 @@
 						<a href="enums/spankind.html" class="tsd-kind-icon">Span<wbr>Kind</a>
 					</li>
 					<li class=" tsd-kind-enum">
-						<a href="enums/statuscode.html" class="tsd-kind-icon">Status<wbr>Code</a>
+						<a href="enums/spanstatuscode.html" class="tsd-kind-icon">Span<wbr>Status<wbr>Code</a>
 					</li>
 					<li class=" tsd-kind-enum">
 						<a href="enums/traceflags.html" class="tsd-kind-icon">Trace<wbr>Flags</a>
@@ -238,10 +238,10 @@
 						<a href="classes/contextapi.html" class="tsd-kind-icon">ContextAPI</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="classes/nooplogger.html" class="tsd-kind-icon">Noop<wbr>Logger</a>
+						<a href="classes/diagapi.html" class="tsd-kind-icon">DiagAPI</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="classes/noopspan.html" class="tsd-kind-icon">Noop<wbr>Span</a>
+						<a href="classes/diagconsolelogger.html" class="tsd-kind-icon">Diag<wbr>Console<wbr>Logger</a>
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/nooptextmappropagator.html" class="tsd-kind-icon">Noop<wbr>Text<wbr>Map<wbr>Propagator</a>
@@ -265,10 +265,10 @@
 						<a href="classes/traceapi.html" class="tsd-kind-icon">TraceAPI</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/attributes.html" class="tsd-kind-icon">Attributes</a>
+						<a href="interfaces/baggage.html" class="tsd-kind-icon">Baggage</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/baggage.html" class="tsd-kind-icon">Baggage</a>
+						<a href="interfaces/baggageentry.html" class="tsd-kind-icon">Baggage<wbr>Entry</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/context.html" class="tsd-kind-icon">Context</a>
@@ -277,16 +277,13 @@
 						<a href="interfaces/contextmanager.html" class="tsd-kind-icon">Context<wbr>Manager</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/entryvalue.html" class="tsd-kind-icon">Entry<wbr>Value</a>
+						<a href="interfaces/diaglogger.html" class="tsd-kind-icon">Diag<wbr>Logger</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/event.html" class="tsd-kind-icon">Event</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/link.html" class="tsd-kind-icon">Link</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/logger.html" class="tsd-kind-icon">Logger</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/sampler.html" class="tsd-kind-icon">Sampler</a>
@@ -298,13 +295,16 @@
 						<a href="interfaces/span.html" class="tsd-kind-icon">Span</a>
 					</li>
 					<li class=" tsd-kind-interface">
+						<a href="interfaces/spanattributes.html" class="tsd-kind-icon">Span<wbr>Attributes</a>
+					</li>
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/spancontext.html" class="tsd-kind-icon">Span<wbr>Context</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/spanoptions.html" class="tsd-kind-icon">Span<wbr>Options</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/status.html" class="tsd-kind-icon">Status</a>
+						<a href="interfaces/spanstatus.html" class="tsd-kind-icon">Span<wbr>Status</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/textmapgetter.html" class="tsd-kind-icon">Text<wbr>Map<wbr>Getter</a>
@@ -328,7 +328,13 @@
 						<a href="interfaces/tracerprovider.html" class="tsd-kind-icon">Tracer<wbr>Provider</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
-						<a href="modules.html#attributevalue" class="tsd-kind-icon">Attribute<wbr>Value</a>
+						<a href="modules.html#baggageentrymetadata" class="tsd-kind-icon">Baggage<wbr>Entry<wbr>Metadata</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#diaglogfunction" class="tsd-kind-icon">Diag<wbr>Log<wbr>Function</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="modules.html#diagloglevelstring" class="tsd-kind-icon">Diag<wbr>Log<wbr>Level<wbr>String</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="modules.html#exception" class="tsd-kind-icon">Exception</a>
@@ -340,7 +346,7 @@
 						<a href="modules.html#linkcontext" class="tsd-kind-icon">Link<wbr>Context</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
-						<a href="modules.html#logfunction" class="tsd-kind-icon">Log<wbr>Function</a>
+						<a href="modules.html#spanattributevalue" class="tsd-kind-icon">Span<wbr>Attribute<wbr>Value</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="modules.html#timeinput" class="tsd-kind-icon">Time<wbr>Input</a>
@@ -356,9 +362,6 @@
 					</li>
 					<li class=" tsd-kind-variable">
 						<a href="modules.html#invalid_traceid" class="tsd-kind-icon">INVALID_<wbr>TRACEID</a>
-					</li>
-					<li class=" tsd-kind-variable">
-						<a href="modules.html#noop_span" class="tsd-kind-icon">NOOP_<wbr>SPAN</a>
 					</li>
 					<li class=" tsd-kind-variable">
 						<a href="modules.html#noop_text_map_propagator" class="tsd-kind-icon">NOOP_<wbr>TEXT_<wbr>MAP_<wbr>PROPAGATOR</a>
@@ -382,13 +385,31 @@
 						<a href="modules.html#defaulttextmapsetter" class="tsd-kind-icon">default<wbr>Text<wbr>Map<wbr>Setter</a>
 					</li>
 					<li class=" tsd-kind-variable">
+						<a href="modules.html#diag" class="tsd-kind-icon">diag</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="modules.html#diagloggerfunctions" class="tsd-kind-icon">diag<wbr>Logger<wbr>Functions</a>
+					</li>
+					<li class=" tsd-kind-variable">
 						<a href="modules.html#propagation" class="tsd-kind-icon">propagation</a>
 					</li>
 					<li class=" tsd-kind-variable">
 						<a href="modules.html#trace" class="tsd-kind-icon">trace</a>
 					</li>
 					<li class=" tsd-kind-function">
+						<a href="modules.html#baggageentrymetadatafromstring" class="tsd-kind-icon">baggage<wbr>Entry<wbr>Metadata<wbr>From<wbr>String</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#createbaggage" class="tsd-kind-icon">create<wbr>Baggage</a>
+					</li>
+					<li class=" tsd-kind-function">
 						<a href="modules.html#createcontextkey" class="tsd-kind-icon">create<wbr>Context<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#createlogleveldiaglogger" class="tsd-kind-icon">create<wbr>Log<wbr>Level<wbr>Diag<wbr>Logger</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#createnoopdiaglogger" class="tsd-kind-icon">create<wbr>Noop<wbr>Diag<wbr>Logger</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="modules.html#getbaggage" class="tsd-kind-icon">get<wbr>Baggage</a>

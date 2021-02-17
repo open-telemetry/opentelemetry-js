@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>SpanKind | OpenTelemetry API for JavaScript</title>
+	<title>DiagLogLevel | OpenTelemetry API for JavaScript</title>
 	<meta name="description" content="Documentation for OpenTelemetry API for JavaScript">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,16 +55,25 @@
 					<a href="../modules.html">OpenTelemetry API for JavaScript</a>
 				</li>
 				<li>
-					<a href="spankind.html">SpanKind</a>
+					<a href="diagloglevel.html">DiagLogLevel</a>
 				</li>
 			</ul>
-			<h1>Enumeration SpanKind</h1>
+			<h1>Enumeration DiagLogLevel</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Defines the available internal logging levels for the diagnostic logger, the numeric values
+							of the levels are defined to match the original values from the initial LogLevel to avoid
+						compatibility/migration issues for any implementation that assume the numeric ordering.</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
@@ -72,11 +81,13 @@
 						<section class="tsd-index-section ">
 							<h3>Enumeration members</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="spankind.html#client" class="tsd-kind-icon">CLIENT</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="spankind.html#consumer" class="tsd-kind-icon">CONSUMER</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="spankind.html#internal" class="tsd-kind-icon">INTERNAL</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="spankind.html#producer" class="tsd-kind-icon">PRODUCER</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="spankind.html#server" class="tsd-kind-icon">SERVER</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="diagloglevel.html#all" class="tsd-kind-icon">ALL</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="diagloglevel.html#debug" class="tsd-kind-icon">DEBUG</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="diagloglevel.html#error" class="tsd-kind-icon">ERROR</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="diagloglevel.html#info" class="tsd-kind-icon">INFO</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="diagloglevel.html#none" class="tsd-kind-icon">NONE</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="diagloglevel.html#verbose" class="tsd-kind-icon">VERBOSE</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="diagloglevel.html#warn" class="tsd-kind-icon">WARN</a></li>
 							</ul>
 						</section>
 					</div>
@@ -85,83 +96,108 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Enumeration members</h2>
 				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="client" class="tsd-anchor"></a>
-					<h3>CLIENT</h3>
-					<div class="tsd-signature tsd-kind-icon">CLIENT<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 2</span></div>
+					<a name="all" class="tsd-anchor"></a>
+					<h3>ALL</h3>
+					<div class="tsd-signature tsd-kind-icon">ALL<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 9999</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/a91ea76/packages/opentelemetry-api/src/trace/span_kind.ts#L30">opentelemetry-api/src/trace/span_kind.ts:30</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/a91ea76/packages/opentelemetry-api/src/diag/logLevel.ts#L48">opentelemetry-api/src/diag/logLevel.ts:48</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Indicates that the span covers the client-side wrapper around an RPC or
-							other remote request.</p>
+							<p>Used to set the logging level to include all logging</p>
 						</div>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="consumer" class="tsd-anchor"></a>
-					<h3>CONSUMER</h3>
-					<div class="tsd-signature tsd-kind-icon">CONSUMER<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 4</span></div>
+					<a name="debug" class="tsd-anchor"></a>
+					<h3>DEBUG</h3>
+					<div class="tsd-signature tsd-kind-icon">DEBUG<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 70</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/a91ea76/packages/opentelemetry-api/src/trace/span_kind.ts#L44">opentelemetry-api/src/trace/span_kind.ts:44</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/a91ea76/packages/opentelemetry-api/src/diag/logLevel.ts#L39">opentelemetry-api/src/diag/logLevel.ts:39</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Indicates that the span describes consumer receiving a message from a
-								broker. Unlike client and server, there is no direct critical path latency
-							relationship between producer and consumer spans.</p>
+							<p>General debug log message</p>
 						</div>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="internal" class="tsd-anchor"></a>
-					<h3>INTERNAL</h3>
-					<div class="tsd-signature tsd-kind-icon">INTERNAL<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 0</span></div>
+					<a name="error" class="tsd-anchor"></a>
+					<h3>ERROR</h3>
+					<div class="tsd-signature tsd-kind-icon">ERROR<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 30</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/a91ea76/packages/opentelemetry-api/src/trace/span_kind.ts#L18">opentelemetry-api/src/trace/span_kind.ts:18</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/a91ea76/packages/opentelemetry-api/src/diag/logLevel.ts#L30">opentelemetry-api/src/diag/logLevel.ts:30</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Default value. Indicates that the span is used internally.</p>
+							<p>Identifies an error scenario</p>
 						</div>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="producer" class="tsd-anchor"></a>
-					<h3>PRODUCER</h3>
-					<div class="tsd-signature tsd-kind-icon">PRODUCER<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 3</span></div>
+					<a name="info" class="tsd-anchor"></a>
+					<h3>INFO</h3>
+					<div class="tsd-signature tsd-kind-icon">INFO<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 60</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/a91ea76/packages/opentelemetry-api/src/trace/span_kind.ts#L37">opentelemetry-api/src/trace/span_kind.ts:37</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/a91ea76/packages/opentelemetry-api/src/diag/logLevel.ts#L36">opentelemetry-api/src/diag/logLevel.ts:36</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Indicates that the span describes producer sending a message to a
-								broker. Unlike client and server, there is no direct critical path latency
-							relationship between producer and consumer spans.</p>
+							<p>General informational log message</p>
 						</div>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="server" class="tsd-anchor"></a>
-					<h3>SERVER</h3>
-					<div class="tsd-signature tsd-kind-icon">SERVER<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 1</span></div>
+					<a name="none" class="tsd-anchor"></a>
+					<h3>NONE</h3>
+					<div class="tsd-signature tsd-kind-icon">NONE<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 0</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/a91ea76/packages/opentelemetry-api/src/trace/span_kind.ts#L24">opentelemetry-api/src/trace/span_kind.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/a91ea76/packages/opentelemetry-api/src/diag/logLevel.ts#L27">opentelemetry-api/src/diag/logLevel.ts:27</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Indicates that the span covers server-side handling of an RPC or other
-							remote request.</p>
+							<p>Diagnostic Logging level setting to disable all logging (except and forced logs)</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="verbose" class="tsd-anchor"></a>
+					<h3>VERBOSE</h3>
+					<div class="tsd-signature tsd-kind-icon">VERBOSE<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 80</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/a91ea76/packages/opentelemetry-api/src/diag/logLevel.ts#L45">opentelemetry-api/src/diag/logLevel.ts:45</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Detailed trace level logging should only be used for development, should only be set
+							in a development environment.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="warn" class="tsd-anchor"></a>
+					<h3>WARN</h3>
+					<div class="tsd-signature tsd-kind-icon">WARN<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 50</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/a91ea76/packages/opentelemetry-api/src/diag/logLevel.ts#L33">opentelemetry-api/src/diag/logLevel.ts:33</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Identifies a warning scenario</p>
 						</div>
 					</div>
 				</section>
@@ -180,22 +216,28 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-enum">
-						<a href="spankind.html" class="tsd-kind-icon">Span<wbr>Kind</a>
+						<a href="diagloglevel.html" class="tsd-kind-icon">Diag<wbr>Log<wbr>Level</a>
 						<ul>
 							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="spankind.html#client" class="tsd-kind-icon">CLIENT</a>
+								<a href="diagloglevel.html#all" class="tsd-kind-icon">ALL</a>
 							</li>
 							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="spankind.html#consumer" class="tsd-kind-icon">CONSUMER</a>
+								<a href="diagloglevel.html#debug" class="tsd-kind-icon">DEBUG</a>
 							</li>
 							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="spankind.html#internal" class="tsd-kind-icon">INTERNAL</a>
+								<a href="diagloglevel.html#error" class="tsd-kind-icon">ERROR</a>
 							</li>
 							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="spankind.html#producer" class="tsd-kind-icon">PRODUCER</a>
+								<a href="diagloglevel.html#info" class="tsd-kind-icon">INFO</a>
 							</li>
 							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="spankind.html#server" class="tsd-kind-icon">SERVER</a>
+								<a href="diagloglevel.html#none" class="tsd-kind-icon">NONE</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="diagloglevel.html#verbose" class="tsd-kind-icon">VERBOSE</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="diagloglevel.html#warn" class="tsd-kind-icon">WARN</a>
 							</li>
 						</ul>
 					</li>
