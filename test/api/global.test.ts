@@ -15,11 +15,11 @@
  */
 
 import * as assert from 'assert';
-import { NoopContextManager } from '@opentelemetry/context-base';
 import {
-  _global,
   GLOBAL_CONTEXT_MANAGER_API_KEY,
+  _global,
 } from '../../src/api/global-utils';
+import { NoopContextManager } from '../../src/context-base';
 
 const api1 = require('../../src') as typeof import('../../src');
 

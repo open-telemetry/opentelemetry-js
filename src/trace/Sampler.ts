@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/context-base';
+import { Context } from '../context-base';
 import { SpanAttributes } from './attributes';
 import { Link } from './link';
 import { SamplingResult } from './SamplingResult';

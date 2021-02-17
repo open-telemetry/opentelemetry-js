@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/context-base';
+import { Context } from '../context-base';
 import { Span, SpanOptions, Tracer } from '..';
 import { NOOP_TRACER } from './NoopTracer';
 import { ProxyTracerProvider } from './ProxyTracerProvider';

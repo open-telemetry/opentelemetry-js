@@ -15,11 +15,11 @@
  */
 
 import * as assert from 'assert';
-import { ROOT_CONTEXT, createContextKey } from '@opentelemetry/context-base';
+import { createContextKey, ROOT_CONTEXT } from '../../src/context-base';
 import {
+  isInstrumentationSuppressed,
   suppressInstrumentation,
   unsuppressInstrumentation,
-  isInstrumentationSuppressed,
 } from '../../src/context/context';
 
 const SUPPRESS_INSTRUMENTATION_KEY = createContextKey(

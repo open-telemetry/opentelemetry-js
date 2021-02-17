@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context, createContextKey } from '@opentelemetry/context-base';
+import { Context, createContextKey } from '../context-base';
 import { Baggage, Span, SpanContext } from '../';
 import { NoopSpan } from '../trace/NoopSpan';
 

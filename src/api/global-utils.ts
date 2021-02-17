@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ContextManager } from '@opentelemetry/context-base';
+import { ContextManager } from '../context-base';
 import { TextMapPropagator } from '../context/propagation/TextMapPropagator';
 import { TracerProvider } from '../trace/tracer_provider';
 import { _globalThis } from '../platform';

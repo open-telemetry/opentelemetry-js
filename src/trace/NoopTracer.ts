@@ -15,7 +15,7 @@
  */
 
 import { Span, SpanOptions, Tracer, SpanContext } from '..';
-import { Context } from '@opentelemetry/context-base';
+import { Context } from '../context-base';
 import { NoopSpan } from './NoopSpan';
 import { isSpanContextValid } from './spancontext-utils';
 import { getSpanContext } from '../context/context';

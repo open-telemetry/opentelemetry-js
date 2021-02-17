@@ -58,7 +58,7 @@ export {
   ROOT_CONTEXT,
   createContextKey,
   ContextManager,
-} from '@opentelemetry/context-base';
+} from './context-base';
 
 import { ContextAPI } from './api/context';
 export type { ContextAPI } from './api/context';
