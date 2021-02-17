@@ -24,14 +24,11 @@ import {
 
 describe('DiagLogger functions', () => {
   const calledArgs: any = {
-    terminal: null,
-    critical: null,
     error: null,
     warn: null,
     info: null,
     debug: null,
     verbose: null,
-    startupInfo: null,
   };
 
   let dummyLogger: DiagLogger;
