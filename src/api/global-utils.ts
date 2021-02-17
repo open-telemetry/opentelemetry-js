@@ -67,4 +67,4 @@ export function makeGetter<T>(
  * version. If the global API is not compatible with the API package
  * attempting to get it, a NOOP API implementation will be returned.
  */
-export const API_BACKWARDS_COMPATIBILITY_VERSION = 4;
+export const API_BACKWARDS_COMPATIBILITY_VERSION = 5;
