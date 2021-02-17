@@ -32,6 +32,9 @@ import {
   CollectorExporterConfigBase,
 } from './types';
 
+const MAX_INTEGER_VALUE = 2147483647;
+const MIN_INTEGER_VALUE = -2147483648;
+
 /**
  * Converts attributes to KeyValue array
  * @param attributes
@@ -95,8 +98,14 @@ export function toCollectorAnyValue(
     anyValue.stringValue = value;
   } else if (typeof value === 'boolean') {
     anyValue.boolValue = value;
+  } else if (
+    typeof value === 'number' &&
+    value <= MAX_INTEGER_VALUE &&
+    value >= MIN_INTEGER_VALUE &&
+    Number.isInteger(value)
+  ) {
+    anyValue.intValue = value;
   } else if (typeof value === 'number') {
-    // all numbers will be treated as double
     anyValue.doubleValue = value;
   } else if (Array.isArray(value)) {
     anyValue.arrayValue = toCollectorArrayValue(value);
