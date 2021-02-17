@@ -16,7 +16,7 @@
 
 import * as protoLoader from '@grpc/proto-loader';
 import { collectorTypes } from '@opentelemetry/exporter-collector';
-import { ConsoleLogger, LogLevel } from '@opentelemetry/core';
+import { diag } from '@opentelemetry/api';
 import {
   BasicTracerProvider,
   SimpleSpanProcessor,
@@ -115,6 +115,8 @@ const testCollectorExporter = (params: TestParams) =>
     });
 
     beforeEach(done => {
+      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
+      diag.setLogger();
       const credentials = params.useTLS
         ? grpc.credentials.createSsl(
             fs.readFileSync('./test/certs/ca.crt'),
@@ -141,10 +143,9 @@ const testCollectorExporter = (params: TestParams) =>
 
     describe('instance', () => {
       it('should warn about headers when using grpc', () => {
-        const logger = new ConsoleLogger(LogLevel.DEBUG);
-        const spyLoggerWarn = sinon.stub(logger, 'warn');
+        // Need to stub/spy on the underlying logger as the "diag" instance is global
+        const spyLoggerWarn = sinon.stub(diag.getLogger(), 'warn');
         collectorExporter = new CollectorTraceExporter({
-          logger,
           serviceName: 'basic-service',
           url: address,
           headers: {

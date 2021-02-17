@@ -20,7 +20,7 @@ import {
   ValueObserver,
   ValueRecorder,
 } from '@opentelemetry/api-metrics';
-import { ConsoleLogger, LogLevel } from '@opentelemetry/core';
+import { diag } from '@opentelemetry/api';
 import { collectorTypes } from '@opentelemetry/exporter-collector';
 import * as metrics from '@opentelemetry/metrics';
 import * as assert from 'assert';
@@ -120,6 +120,8 @@ const testCollectorMetricExporter = (params: TestParams) =>
     });
 
     beforeEach(async () => {
+      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
+      diag.setLogger();
       const credentials = params.useTLS
         ? grpc.credentials.createSsl(
             fs.readFileSync('./test/certs/ca.crt'),
@@ -164,10 +166,9 @@ const testCollectorMetricExporter = (params: TestParams) =>
 
     describe('instance', () => {
       it('should warn about headers', () => {
-        const logger = new ConsoleLogger(LogLevel.DEBUG);
-        const spyLoggerWarn = sinon.stub(logger, 'warn');
+        // Need to stub/spy on the underlying logger as the "diag" instance is global
+        const spyLoggerWarn = sinon.stub(diag.getLogger(), 'warn');
         collectorExporter = new CollectorMetricExporter({
-          logger,
           serviceName: 'basic-service',
           url: address,
           headers: {

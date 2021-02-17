@@ -1,6 +1,6 @@
 {
     "name": "@opentelemetry/plugins-web-core",
-    "version": "0.16.0",
+    "version": "0.17.0",
     "description": "Metapackage which bundles all opentelemetry web core plugins",
     "author": "OpenTelemetry Authors",
     "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
@@ -16,6 +16,6 @@
         "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
     },
     "dependencies": {
-        "@opentelemetry/instrumentation-xml-http-request": "^0.16.0"
+        "@opentelemetry/instrumentation-xml-http-request": "^0.17.0"
     }
 }

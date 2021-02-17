@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-import { NoopTracerProvider, NoopLogger } from '@opentelemetry/api';
+import { NoopTracerProvider } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as path from 'path';
 import { BasePlugin } from '../../src';
 import * as types from '../trace/fixtures/test-package/foo/bar/internal';
 
 const provider = new NoopTracerProvider();
-const logger = new NoopLogger();
 describe('BasePlugin', () => {
   describe('internalFilesLoader', () => {
     it('should load internally exported files', () => {
       const testPackage = require('../trace/fixtures/test-package');
       const plugin = new TestPlugin();
       assert.doesNotThrow(() => {
-        plugin.enable(testPackage, provider, logger);
+        plugin.enable(testPackage, provider);
       });
 
       // @TODO: https://github.com/open-telemetry/opentelemetry-js/issues/285

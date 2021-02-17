@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { diag } from '@opentelemetry/api';
 import { GrpcJsPlugin } from '../grpcJs';
 import type * as grpcJs from '@grpc/grpc-js';
 import * as shimmer from 'shimmer';
@@ -30,7 +31,7 @@ export function patchClient(
 ): (original: MakeClientConstructorFunction) => MakeClientConstructorFunction {
   const plugin = this;
   return (original: MakeClientConstructorFunction) => {
-    plugin._logger.debug('patching client');
+    diag.debug('patching client');
     return function makeClientConstructor(
       this: typeof grpcJs.Client,
       methods: grpcJs.ServiceDefinition,

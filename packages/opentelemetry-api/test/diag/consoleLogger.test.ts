@@ -28,14 +28,11 @@ const consoleFuncs: Array<keyof Console> = [
 ];
 
 const expectedConsoleMap: { [n: string]: keyof Console } = {
-  terminal: 'error',
-  critical: 'error',
   error: 'error',
   warn: 'warn',
   info: 'info',
   debug: 'debug',
   verbose: 'trace',
-  startupInfo: 'info',
 };
 
 describe('DiagConsoleLogger', () => {

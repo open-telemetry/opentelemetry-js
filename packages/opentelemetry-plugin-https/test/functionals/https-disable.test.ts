@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/api';
 import { Http } from '@opentelemetry/plugin-http';
 import * as assert from 'assert';
 import * as fs from 'fs';
@@ -32,17 +31,14 @@ describe('HttpsPlugin', () => {
   let serverPort = 0;
 
   describe('disable()', () => {
-    const logger = new NoopLogger();
-    const provider = new NodeTracerProvider({
-      logger,
-    });
+    const provider = new NodeTracerProvider();
     // const tracer = provider.getTracer('test-https')
     let tracer: api.Tracer;
     before(() => {
       nock.cleanAll();
       nock.enableNetConnect();
 
-      plugin.enable((https as unknown) as Http, provider, provider.logger);
+      plugin.enable((https as unknown) as Http, provider);
       tracer = plugin['_tracer'];
       // Ensure that https module is patched.
       assert.strictEqual(https.Server.prototype.emit.__wrapped, true);

@@ -21,7 +21,6 @@ import {
   assertEmptyResource,
   assertServiceResource,
 } from '@opentelemetry/resources/test/util/resource-assertions';
-import { NoopLogger } from '@opentelemetry/api';
 
 describe('BeanstalkResourceDetector', () => {
   const err = new Error('failed to read config file');
@@ -57,9 +56,7 @@ describe('BeanstalkResourceDetector', () => {
       .resolves(JSON.stringify(data));
     sandbox.stub(JSON, 'parse').returns(data);
 
-    const resource = await awsBeanstalkDetector.detect({
-      logger: new NoopLogger(),
-    });
+    const resource = await awsBeanstalkDetector.detect();
 
     sandbox.assert.calledOnce(fileStub);
     sandbox.assert.calledOnce(readStub);
@@ -81,9 +78,7 @@ describe('BeanstalkResourceDetector', () => {
       .resolves(JSON.stringify(noisyData));
     sandbox.stub(JSON, 'parse').returns(noisyData);
 
-    const resource = await awsBeanstalkDetector.detect({
-      logger: new NoopLogger(),
-    });
+    const resource = await awsBeanstalkDetector.detect();
 
     sandbox.assert.calledOnce(fileStub);
     sandbox.assert.calledOnce(readStub);
@@ -104,9 +99,7 @@ describe('BeanstalkResourceDetector', () => {
       .stub(AwsBeanstalkDetector, 'readFileAsync' as any)
       .rejects(err);
 
-    const resource = await awsBeanstalkDetector.detect({
-      logger: new NoopLogger(),
-    });
+    const resource = await awsBeanstalkDetector.detect();
 
     sandbox.assert.calledOnce(fileStub);
     sandbox.assert.calledOnce(readStub);
@@ -122,9 +115,7 @@ describe('BeanstalkResourceDetector', () => {
       .stub(AwsBeanstalkDetector, 'readFileAsync' as any)
       .resolves(JSON.stringify(data));
 
-    const resource = await awsBeanstalkDetector.detect({
-      logger: new NoopLogger(),
-    });
+    const resource = await awsBeanstalkDetector.detect();
 
     sandbox.assert.calledOnce(fileStub);
     sandbox.assert.notCalled(readStub);

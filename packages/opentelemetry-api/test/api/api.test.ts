@@ -31,7 +31,11 @@ import api, {
   ROOT_CONTEXT,
   defaultTextMapSetter,
   defaultTextMapGetter,
+  diag,
+  diagLoggerFunctions,
 } from '../../src';
+import { DiagAPI } from '../../src/api/diag';
+import { _global } from '../../src/api/global-utils';
 import { NoopSpan } from '../../src/trace/NoopSpan';
 
 describe('API', () => {
@@ -174,6 +178,44 @@ describe('API', () => {
 
         const fields = api.propagation.fields();
         assert.deepStrictEqual(fields, ['TestField']);
+      });
+    });
+  });
+
+  describe('Global diag', () => {
+    it('initialization', () => {
+      const inst = DiagAPI.instance();
+
+      assert.deepStrictEqual(diag, inst);
+    });
+
+    diagLoggerFunctions.forEach(fName => {
+      it(`no argument logger ${fName} message doesn't throw`, () => {
+        diag.setLogger();
+        assert.doesNotThrow(() => {
+          diag[fName](`${fName} message`);
+        });
+      });
+
+      it(`null logger ${fName} message doesn't throw`, () => {
+        diag.setLogger(null as any);
+        assert.doesNotThrow(() => {
+          diag[fName](`${fName} message`);
+        });
+      });
+
+      it(`undefined logger ${fName} message doesn't throw`, () => {
+        diag.setLogger(undefined as any);
+        assert.doesNotThrow(() => {
+          diag[fName](`${fName} message`);
+        });
+      });
+
+      it(`empty logger ${fName} message doesn't throw`, () => {
+        diag.setLogger({} as any);
+        assert.doesNotThrow(() => {
+          diag[fName](`${fName} message`);
+        });
       });
     });
   });

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import { SpanExporter, ReadableSpan } from '@opentelemetry/tracing';
 import { prepareSend } from './platform/index';
@@ -32,7 +32,6 @@ import { SERVICE_RESOURCE } from '@opentelemetry/resources';
 export class ZipkinExporter implements SpanExporter {
   static readonly DEFAULT_URL = 'http://localhost:9411/api/v2/spans';
   private readonly DEFAULT_SERVICE_NAME = 'OpenTelemetry Service';
-  private readonly _logger: api.Logger;
   private readonly _statusCodeTagName: string;
   private readonly _statusDescriptionTagName: string;
   private _send: zipkinTypes.SendFunction;
@@ -42,8 +41,7 @@ export class ZipkinExporter implements SpanExporter {
 
   constructor(config: zipkinTypes.ExporterConfig = {}) {
     const urlStr = config.url || ZipkinExporter.DEFAULT_URL;
-    this._logger = config.logger || new api.NoopLogger();
-    this._send = prepareSend(this._logger, urlStr, config.headers);
+    this._send = prepareSend(urlStr, config.headers);
     this._serviceName = config.serviceName;
     this._statusCodeTagName = config.statusCodeTagName || statusCodeTagName;
     this._statusDescriptionTagName =
@@ -64,7 +62,7 @@ export class ZipkinExporter implements SpanExporter {
           this.DEFAULT_SERVICE_NAME
       );
     }
-    this._logger.debug('Zipkin exporter export');
+    diag.debug('Zipkin exporter export');
     if (this._isShutdown) {
       setTimeout(() =>
         resultCallback({
@@ -89,7 +87,7 @@ export class ZipkinExporter implements SpanExporter {
    * Shutdown exporter. Noop operation in this exporter.
    */
   shutdown(): Promise<void> {
-    this._logger.debug('Zipkin exporter shutdown');
+    diag.debug('Zipkin exporter shutdown');
     this._isShutdown = true;
     return new Promise((resolve, reject) => {
       Promise.all(this._sendingPromises).then(() => {

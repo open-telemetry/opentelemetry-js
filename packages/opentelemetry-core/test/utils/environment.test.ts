@@ -22,7 +22,7 @@ import {
 } from '../../src/utils/environment';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { LogLevel } from '../../src';
+import { DiagLogLevel } from '@opentelemetry/api';
 
 let lastMock: RAW_ENVIRONMENT = {};
 
@@ -96,7 +96,7 @@ describe('environment', () => {
       });
       const env = getEnv();
       assert.deepStrictEqual(env.OTEL_NO_PATCH_MODULES, ['a', 'b', 'c']);
-      assert.strictEqual(env.OTEL_LOG_LEVEL, LogLevel.ERROR);
+      assert.strictEqual(env.OTEL_LOG_LEVEL, DiagLogLevel.ERROR);
       assert.strictEqual(env.OTEL_SAMPLING_PROBABILITY, 0.5);
       assert.strictEqual(env.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT, 10);
       assert.strictEqual(env.OTEL_SPAN_EVENT_COUNT_LIMIT, 20);
@@ -144,7 +144,7 @@ describe('environment', () => {
         OTEL_LOG_LEVEL: 'waRn',
       });
       const env = getEnv();
-      assert.strictEqual(env.OTEL_LOG_LEVEL, LogLevel.WARN);
+      assert.strictEqual(env.OTEL_LOG_LEVEL, DiagLogLevel.WARN);
     });
 
     it('should parse environment variables and use defaults', () => {
@@ -168,7 +168,7 @@ describe('environment', () => {
       });
       removeMockEnvironment();
       const env = getEnv();
-      assert.strictEqual(env.OTEL_LOG_LEVEL, LogLevel.INFO);
+      assert.strictEqual(env.OTEL_LOG_LEVEL, DiagLogLevel.INFO);
       assert.strictEqual(env.OTEL_SAMPLING_PROBABILITY, 1);
     });
   });

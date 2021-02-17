@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { TextMapPropagator, Logger } from '@opentelemetry/api';
+import { TextMapPropagator } from '@opentelemetry/api';
 
 /** Configuration object for composite propagator */
 export interface CompositePropagatorConfig {
@@ -24,7 +24,4 @@ export interface CompositePropagatorConfig {
    * key as a propagator earlier in the list, the later on will "win".
    */
   propagators?: TextMapPropagator[];
-
-  /** Instance of logger */
-  logger?: Logger;
 }
