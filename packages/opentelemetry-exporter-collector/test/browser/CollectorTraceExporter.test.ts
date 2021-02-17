@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
+import { diag, DiagLogLevel } from '@opentelemetry/api';
 import { ExportResultCode } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
@@ -59,6 +59,7 @@ describe('CollectorTraceExporter - web', () => {
     beforeEach(() => {
       // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
       diag.setLogger(null as any);
+      diag.setLogLevel(DiagLogLevel.VERBOSE);
       collectorExporterConfig = {
         hostname: 'foo',
         serviceName: 'bar',
@@ -243,6 +244,7 @@ describe('CollectorTraceExporter - web', () => {
     beforeEach(() => {
       // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
       diag.setLogger(null as any);
+      diag.setLogLevel(DiagLogLevel.VERBOSE);
       collectorExporterConfig = {
         headers: customHeaders,
       };
