@@ -20,9 +20,9 @@ import { EventEmitter } from 'events';
 type Func<T> = (...args: unknown[]) => T;
 
 /**
- * Store a map for each event of all original listener and their "patched"
- * version so when the listener is removed by the user, we remove the
- * corresponding "patched" function.
+ * Store a map for each event of all original listeners and their "patched"
+ * version. So when a listener is removed by the user, the corresponding
+ * patched function will be also removed.
  */
 interface PatchMap {
   [name: string]: WeakMap<Func<void>, Func<void>>;
@@ -85,7 +85,7 @@ export abstract class AbstractAsyncHooksContextManager
    * By default, EventEmitter call their callback with their context, which we do
    * not want, instead we will bind a specific context to all callbacks that
    * go through it.
-   * @param target EventEmitter a instance of EventEmitter to patch
+   * @param ee EventEmitter an instance of EventEmitter to patch
    * @param context the context we want to bind
    */
   private _bindEventEmitter<T extends EventEmitter>(
