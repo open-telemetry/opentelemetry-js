@@ -24,7 +24,6 @@ import {
   assertEmptyResource,
   assertContainerResource,
 } from '@opentelemetry/resources/test/util/resource-assertions';
-import { NoopLogger } from '@opentelemetry/api';
 import * as os from 'os';
 
 describe('BeanstalkResourceDetector', () => {
@@ -60,9 +59,7 @@ describe('BeanstalkResourceDetector', () => {
       .stub(AwsEcsDetector, 'readFileAsync' as any)
       .resolves(correctCgroupData);
 
-    const resource = await awsEcsDetector.detect({
-      logger: new NoopLogger(),
-    });
+    const resource = await awsEcsDetector.detect();
 
     sandbox.assert.calledOnce(readStub);
     assert.ok(resource);
@@ -79,9 +76,7 @@ describe('BeanstalkResourceDetector', () => {
       .stub(AwsEcsDetector, 'readFileAsync' as any)
       .resolves(noisyCgroupData);
 
-    const resource = await awsEcsDetector.detect({
-      logger: new NoopLogger(),
-    });
+    const resource = await awsEcsDetector.detect();
 
     sandbox.assert.calledOnce(readStub);
     assert.ok(resource);
@@ -98,9 +93,7 @@ describe('BeanstalkResourceDetector', () => {
       .stub(AwsEcsDetector, 'readFileAsync' as any)
       .resolves(multiValidCgroupData);
 
-    const resource = await awsEcsDetector.detect({
-      logger: new NoopLogger(),
-    });
+    const resource = await awsEcsDetector.detect();
 
     sandbox.assert.calledOnce(readStub);
     assert.ok(resource);
@@ -116,9 +109,7 @@ describe('BeanstalkResourceDetector', () => {
       .stub(AwsEcsDetector, 'readFileAsync' as any)
       .resolves(correctCgroupData);
 
-    const resource = await awsEcsDetector.detect({
-      logger: new NoopLogger(),
-    });
+    const resource = await awsEcsDetector.detect();
 
     sandbox.assert.notCalled(readStub);
     assert.ok(resource);
@@ -132,9 +123,7 @@ describe('BeanstalkResourceDetector', () => {
       .stub(AwsEcsDetector, 'readFileAsync' as any)
       .rejects(errorMsg.fileNotFoundError);
 
-    const resource = await awsEcsDetector.detect({
-      logger: new NoopLogger(),
-    });
+    const resource = await awsEcsDetector.detect();
 
     sandbox.assert.calledOnce(readStub);
     assert.ok(resource);
@@ -150,9 +139,7 @@ describe('BeanstalkResourceDetector', () => {
       .stub(AwsEcsDetector, 'readFileAsync' as any)
       .resolves('');
 
-    const resource = await awsEcsDetector.detect({
-      logger: new NoopLogger(),
-    });
+    const resource = await awsEcsDetector.detect();
 
     sandbox.assert.calledOnce(readStub);
     assert.ok(resource);
@@ -168,9 +155,7 @@ describe('BeanstalkResourceDetector', () => {
       .stub(AwsEcsDetector, 'readFileAsync' as any)
       .resolves(correctCgroupData);
 
-    const resource = await awsEcsDetector.detect({
-      logger: new NoopLogger(),
-    });
+    const resource = await awsEcsDetector.detect();
 
     sandbox.assert.calledOnce(readStub);
     assert.ok(resource);
@@ -186,9 +171,7 @@ describe('BeanstalkResourceDetector', () => {
       .stub(AwsEcsDetector, 'readFileAsync' as any)
       .rejects(errorMsg.fileNotFoundError);
 
-    const resource = await awsEcsDetector.detect({
-      logger: new NoopLogger(),
-    });
+    const resource = await awsEcsDetector.detect();
 
     sandbox.assert.calledOnce(readStub);
     assert.ok(resource);

@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { diag } from '@opentelemetry/api';
 import * as collectorTypes from '../../types';
-import { Logger } from '@opentelemetry/api';
 
 /**
  * Send metrics/spans using browser navigator.sendBeacon
@@ -25,12 +25,11 @@ import { Logger } from '@opentelemetry/api';
 export function sendWithBeacon(
   body: string,
   url: string,
-  logger: Logger,
   onSuccess: () => void,
   onError: (error: collectorTypes.CollectorExporterError) => void
 ) {
   if (navigator.sendBeacon(url, body)) {
-    logger.debug('sendBeacon - can send', body);
+    diag.debug('sendBeacon - can send', body);
     onSuccess();
   } else {
     const error = new collectorTypes.CollectorExporterError(
@@ -51,7 +50,6 @@ export function sendWithXhr(
   body: string,
   url: string,
   headers: { [key: string]: string },
-  logger: Logger,
   onSuccess: () => void,
   onError: (error: collectorTypes.CollectorExporterError) => void
 ) {
@@ -68,7 +66,7 @@ export function sendWithXhr(
   xhr.onreadystatechange = () => {
     if (xhr.readyState === XMLHttpRequest.DONE) {
       if (xhr.status >= 200 && xhr.status <= 299) {
-        logger.debug('xhr success', body);
+        diag.debug('xhr success', body);
         onSuccess();
       } else {
         const error = new collectorTypes.CollectorExporterError(

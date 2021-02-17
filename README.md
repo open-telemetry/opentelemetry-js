@@ -244,6 +244,53 @@ To request automatic tracing support for a module not on this list, please [file
 
 ## Upgrade guidelines
 
+### 0.17.0 to ???
+
+[PR-1880](https://github.com/open-telemetry/opentelemetry-js/pull/1880) feat(diag-logger): introduce a new global level api.diag for internal diagnostic logging
+
+[PR-1925](https://github.com/open-telemetry/opentelemetry-js/pull/1925) feat(diag-logger): part 2 - breaking changes - remove api.Logger, api.NoopLogger, core.LogLevel, core.ConsoleLogger
+
+- These PR's remove the previous ```Logger``` and ```LogLevel``` implementations and change the way you should use the replacement ```DiagLogger``` and ```DiagLogLevel```, below are simple examples of how to change your existing usages.
+
+#### Setting the global diagnostic logger
+
+The new global [```api.diag```](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-api/src/api/diag.ts#L32) provides the ability to set the global diagnostic logger ```setLogger()``` and logging level ```setLogLevel()```, it is also a ```DiagLogger``` implementation and should be directly to log diagnostic messages.
+
+All included logger references have been removed in preference to using the global ```api.diag``` directly, so you no longer need to pass around the logger instance via function parameters or included as part of the configuration for a component.
+
+```javascript
+// Setting the default Global logger to use the Console
+import { diag, DiagConsoleLogger, DiagLogLevel } from "@opentelemetry/api";
+diag.setLogger(new DiagConsoleLogger())
+
+// And optionally change the logging level (Defaults to INFO)
+diag.setLogLevel(DiagLogLevel.ERROR);
+```
+
+#### Using the logger anywhere in the code
+
+```typescript
+import { diag } from "@opentelemetry/api";
+
+// Remove or make optional the parameter and don't use it.
+export function MyFunction() {
+  diag.debug("...");
+  diag.info("...");
+  diag.warn("...");
+  diag.error("...");
+  diag.verbose("..");
+}
+
+```
+
+#### Setting the logger back to a noop
+
+```typescript
+import { diag } from "@opentelemetry/api";
+diag.setLogger();
+
+```
+
 ### 0.16.0 to 0.17.0
 
 [PR-1855](https://github.com/open-telemetry/opentelemetry-js/pull/1855) Use instrumentation loader to load plugins and instrumentations

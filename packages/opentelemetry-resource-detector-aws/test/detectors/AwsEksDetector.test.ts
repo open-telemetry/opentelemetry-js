@@ -24,7 +24,6 @@ import {
   assertContainerResource,
   assertEmptyResource,
 } from '@opentelemetry/resources/test/util/resource-assertions';
-import { NoopLogger } from '@opentelemetry/api';
 
 const K8S_SVC_URL = awsEksDetector.K8S_SVC_URL;
 const AUTH_CONFIGMAP_PATH = awsEksDetector.AUTH_CONFIGMAP_PATH;
@@ -74,9 +73,7 @@ describe('awsEksDetector', () => {
         .matchHeader('Authorization', k8s_token)
         .reply(200, () => mockedClusterResponse);
 
-      const resource: Resource = await awsEksDetector.detect({
-        logger: new NoopLogger(),
-      });
+      const resource: Resource = await awsEksDetector.detect();
 
       scope.done();
 
@@ -113,9 +110,7 @@ describe('awsEksDetector', () => {
         .matchHeader('Authorization', k8s_token)
         .reply(200, () => mockedClusterResponse);
 
-      const resource: Resource = await awsEksDetector.detect({
-        logger: new NoopLogger(),
-      });
+      const resource: Resource = await awsEksDetector.detect();
 
       scope.done();
 
@@ -144,9 +139,7 @@ describe('awsEksDetector', () => {
         .matchHeader('Authorization', k8s_token)
         .reply(200, () => '');
 
-      const resource: Resource = await awsEksDetector.detect({
-        logger: new NoopLogger(),
-      });
+      const resource: Resource = await awsEksDetector.detect();
 
       scope.done();
 
@@ -176,9 +169,7 @@ describe('awsEksDetector', () => {
         .matchHeader('Authorization', k8s_token)
         .reply(200, () => mockedClusterResponse);
 
-      const resource: Resource = await awsEksDetector.detect({
-        logger: new NoopLogger(),
-      });
+      const resource: Resource = await awsEksDetector.detect();
 
       scope.done();
 
@@ -205,9 +196,7 @@ describe('awsEksDetector', () => {
         .matchHeader('Authorization', k8s_token)
         .reply(200, () => '');
 
-      const resource: Resource = await awsEksDetector.detect({
-        logger: new NoopLogger(),
-      });
+      const resource: Resource = await awsEksDetector.detect();
 
       scope.done();
 
@@ -223,9 +212,7 @@ describe('awsEksDetector', () => {
         .stub(AwsEksDetector, 'fileAccessAsync' as any)
         .rejects(errorMsg.fileNotFoundError);
 
-      const resource: Resource = await awsEksDetector.detect({
-        logger: new NoopLogger(),
-      });
+      const resource: Resource = await awsEksDetector.detect();
 
       assert.ok(resource);
       assertEmptyResource(resource);
@@ -252,9 +239,7 @@ describe('awsEksDetector', () => {
         .matchHeader('Authorization', k8s_token)
         .reply(200, () => '');
 
-      const resource: Resource = await awsEksDetector.detect({
-        logger: new NoopLogger(),
-      });
+      const resource: Resource = await awsEksDetector.detect();
 
       scope.isDone();
 
@@ -283,9 +268,7 @@ describe('awsEksDetector', () => {
         .reply(200, () => mockedAwsAuth);
 
       try {
-        await awsEksDetector.detect({
-          logger: new NoopLogger(),
-        });
+        await awsEksDetector.detect();
       } catch (err) {
         assert.deepStrictEqual(err, expectedError);
       }
@@ -311,9 +294,7 @@ describe('awsEksDetector', () => {
         .reply(404, () => new Error());
 
       try {
-        await awsEksDetector.detect({
-          logger: new NoopLogger(),
-        });
+        await awsEksDetector.detect();
       } catch (err) {
         assert.deepStrictEqual(err, expectedError);
       }

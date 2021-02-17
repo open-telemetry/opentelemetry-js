@@ -292,7 +292,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     method: string
   ): api.Span | undefined {
     if (isUrlIgnored(url, this._getConfig().ignoreUrls)) {
-      this._logger.debug('ignoring span as url matches ignored url');
+      api.diag.debug('ignoring span as url matches ignored url');
       return;
     }
     const spanName = `HTTP ${method.toUpperCase()}`;
@@ -472,16 +472,16 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * implements enable function
    */
   enable() {
-    this._logger.debug('applying patch to', this.moduleName, this.version);
+    api.diag.debug('applying patch to', this.moduleName, this.version);
 
     if (isWrapped(XMLHttpRequest.prototype.open)) {
       this._unwrap(XMLHttpRequest.prototype, 'open');
-      this._logger.debug('removing previous patch from method open');
+      api.diag.debug('removing previous patch from method open');
     }
 
     if (isWrapped(XMLHttpRequest.prototype.send)) {
       this._unwrap(XMLHttpRequest.prototype, 'send');
-      this._logger.debug('removing previous patch from method send');
+      api.diag.debug('removing previous patch from method send');
     }
 
     this._wrap(XMLHttpRequest.prototype, 'open', this._patchOpen());
@@ -492,7 +492,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * implements disable function
    */
   disable() {
-    this._logger.debug('removing patch from', this.moduleName, this.version);
+    api.diag.debug('removing patch from', this.moduleName, this.version);
 
     this._unwrap(XMLHttpRequest.prototype, 'open');
     this._unwrap(XMLHttpRequest.prototype, 'send');

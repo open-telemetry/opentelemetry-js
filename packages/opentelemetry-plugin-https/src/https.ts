@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { diag } from '@opentelemetry/api';
 import { HttpPlugin, Func, HttpRequestArgs } from '@opentelemetry/plugin-http';
 import type * as http from 'http';
 import type * as https from 'https';
@@ -34,11 +35,7 @@ export class HttpsPlugin extends HttpPlugin {
    * Patches HTTPS incoming and outcoming request functions.
    */
   protected patch() {
-    this._logger.debug(
-      'applying patch to %s@%s',
-      this.moduleName,
-      this.version
-    );
+    diag.debug('applying patch to %s@%s', this.moduleName, this.version);
 
     if (
       this._moduleExports &&
@@ -51,7 +48,7 @@ export class HttpsPlugin extends HttpPlugin {
         this._getPatchIncomingRequestFunction()
       );
     } else {
-      this._logger.error(
+      diag.error(
         'Could not apply patch to %s.emit. Interface is not as expected.',
         this.moduleName
       );

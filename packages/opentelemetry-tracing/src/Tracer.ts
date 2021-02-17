@@ -16,7 +16,6 @@
 
 import * as api from '@opentelemetry/api';
 import {
-  ConsoleLogger,
   InstrumentationLibrary,
   IdGenerator,
   RandomIdGenerator,
@@ -37,7 +36,6 @@ export class Tracer implements api.Tracer {
   private readonly _idGenerator: IdGenerator;
   readonly resource: Resource;
   readonly instrumentationLibrary: InstrumentationLibrary;
-  readonly logger: api.Logger;
 
   /**
    * Constructs a new Tracer instance.
@@ -53,7 +51,6 @@ export class Tracer implements api.Tracer {
     this._idGenerator = config.idGenerator || new RandomIdGenerator();
     this.resource = _tracerProvider.resource;
     this.instrumentationLibrary = instrumentationLibrary;
-    this.logger = config.logger || new ConsoleLogger(config.logLevel);
   }
 
   /**
@@ -66,7 +63,7 @@ export class Tracer implements api.Tracer {
     context = api.context.active()
   ): api.Span {
     if (api.isInstrumentationSuppressed(context)) {
-      this.logger.debug('Instrumentation suppressed, returning Noop Span');
+      api.diag.debug('Instrumentation suppressed, returning Noop Span');
       return api.NOOP_TRACER.startSpan(name, options, context);
     }
 
@@ -102,7 +99,7 @@ export class Tracer implements api.Tracer {
         : api.TraceFlags.NONE;
     const spanContext = { traceId, spanId, traceFlags, traceState };
     if (samplingResult.decision === api.SamplingDecision.NOT_RECORD) {
-      this.logger.debug('Recording is off, starting no recording span');
+      api.diag.debug('Recording is off, starting no recording span');
       return api.NOOP_TRACER.startSpan(
         name,
         options,

@@ -19,7 +19,7 @@ import {
   Resource,
   CLOUD_RESOURCE,
   HOST_RESOURCE,
-  ResourceDetectionConfigWithLogger,
+  ResourceDetectionConfig,
 } from '@opentelemetry/resources';
 import * as http from 'http';
 
@@ -50,9 +50,9 @@ class AwsEc2Detector implements Detector {
    * empty {@link Resource} if the connection or parsing of the identity
    * document fails.
    *
-   * @param config (unused) The resource detection config with a required logger
+   * @param config (unused) The resource detection config
    */
-  async detect(_config: ResourceDetectionConfigWithLogger): Promise<Resource> {
+  async detect(_config?: ResourceDetectionConfig): Promise<Resource> {
     const token = await this._fetchToken();
     const {
       accountId,

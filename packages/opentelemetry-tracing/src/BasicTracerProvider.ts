@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import {
+  TracerProvider,
+  trace,
+  context,
+  propagation,
+} from '@opentelemetry/api';
 import {
   CompositePropagator,
-  ConsoleLogger,
   HttpBaggage,
   HttpTraceContext,
 } from '@opentelemetry/core';
@@ -31,23 +35,19 @@ import merge = require('lodash.merge');
 /**
  * This class represents a basic tracer provider which platform libraries can extend
  */
-export class BasicTracerProvider implements api.TracerProvider {
+export class BasicTracerProvider implements TracerProvider {
   private readonly _config: TracerConfig;
   private readonly _registeredSpanProcessors: SpanProcessor[] = [];
   private readonly _tracers: Map<string, Tracer> = new Map();
 
   activeSpanProcessor: SpanProcessor = new NoopSpanProcessor();
-  readonly logger: api.Logger;
   readonly resource: Resource;
 
   constructor(config: TracerConfig = {}) {
     const mergedConfig = merge({}, DEFAULT_CONFIG, config);
-    this.logger =
-      mergedConfig.logger ?? new ConsoleLogger(mergedConfig.logLevel);
     this.resource =
       mergedConfig.resource ?? Resource.createTelemetrySDKResource();
     this._config = Object.assign({}, mergedConfig, {
-      logger: this.logger,
       resource: this.resource,
     });
   }
@@ -84,7 +84,7 @@ export class BasicTracerProvider implements api.TracerProvider {
    * @param config Configuration object for SDK registration
    */
   register(config: SDKRegistrationConfig = {}) {
-    api.trace.setGlobalTracerProvider(this);
+    trace.setGlobalTracerProvider(this);
     if (config.propagator === undefined) {
       config.propagator = new CompositePropagator({
         propagators: [new HttpBaggage(), new HttpTraceContext()],
@@ -92,11 +92,11 @@ export class BasicTracerProvider implements api.TracerProvider {
     }
 
     if (config.contextManager) {
-      api.context.setGlobalContextManager(config.contextManager);
+      context.setGlobalContextManager(config.contextManager);
     }
 
     if (config.propagator) {
-      api.propagation.setGlobalPropagator(config.propagator);
+      propagation.setGlobalPropagator(config.propagator);
     }
   }
 

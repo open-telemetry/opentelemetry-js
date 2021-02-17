@@ -19,7 +19,6 @@ import {
   SpanContext,
   TraceFlags,
   ROOT_CONTEXT,
-  NoopLogger,
   setSpan,
   setSpanContext,
   getSpan,
@@ -54,13 +53,6 @@ describe('BasicTracerProvider', () => {
   describe('constructor', () => {
     it('should construct an instance without any options', () => {
       const provider = new BasicTracerProvider();
-      assert.ok(provider instanceof BasicTracerProvider);
-    });
-
-    it('should construct an instance with logger', () => {
-      const provider = new BasicTracerProvider({
-        logger: new NoopLogger(),
-      });
       assert.ok(provider instanceof BasicTracerProvider);
     });
 
@@ -260,7 +252,6 @@ describe('BasicTracerProvider', () => {
     it('should return a non recording span when never sampling', () => {
       const tracer = new BasicTracerProvider({
         sampler: new AlwaysOffSampler(),
-        logger: new NoopLogger(),
       }).getTracer('default');
       const span = tracer.startSpan('my-span');
       assert.ok(!span.isRecording());

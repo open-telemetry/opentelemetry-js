@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import { trace } from '@opentelemetry/api';
 import { metrics } from '@opentelemetry/api-metrics';
 import {
   disableInstrumentations,
@@ -38,28 +38,12 @@ export function registerInstrumentations(
     pluginsNode,
     pluginsWeb,
   } = parseInstrumentationOptions(options.instrumentations);
-  const tracerWithLogger = (options.tracerProvider as unknown) as {
-    logger: api.Logger;
-  };
-  const tracerProvider =
-    options.tracerProvider || api.trace.getTracerProvider();
+  const tracerProvider = options.tracerProvider || trace.getTracerProvider();
   const meterProvider = options.meterProvider || metrics.getMeterProvider();
-  const logger =
-    options.logger || tracerWithLogger?.logger || new api.NoopLogger();
 
-  enableInstrumentations(
-    instrumentations,
-    logger,
-    tracerProvider,
-    meterProvider
-  );
+  enableInstrumentations(instrumentations, tracerProvider, meterProvider);
 
-  const unload = loadOldPlugins(
-    pluginsNode,
-    pluginsWeb,
-    logger,
-    tracerProvider
-  );
+  const unload = loadOldPlugins(pluginsNode, pluginsWeb, tracerProvider);
 
   return () => {
     unload();

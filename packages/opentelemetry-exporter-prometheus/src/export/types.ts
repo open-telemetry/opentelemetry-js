@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
-
 /**
  * Configuration interface for prometheus exporter
  */
@@ -40,6 +38,11 @@ export interface ExporterConfig {
   endpoint?: string;
 
   /**
+   * @default undefined (all interfaces)
+   */
+  host?: string;
+
+  /**
    * Port number for Prometheus exporter server
    *
    * Default registered port is 9464:
@@ -53,7 +56,4 @@ export interface ExporterConfig {
    * @default false
    */
   preventServerStart?: boolean;
-
-  /** Standard logging interface */
-  logger?: api.Logger;
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import {
   Counter,
   ValueObserver,
@@ -64,10 +64,9 @@ describe('CollectorMetricExporter - node with json over http', () => {
   describe('instance', () => {
     it('should warn about metadata when using json', () => {
       const metadata = 'foo';
-      const logger = new core.ConsoleLogger(core.LogLevel.DEBUG);
-      const spyLoggerWarn = sinon.stub(logger, 'warn');
+      // Need to stub/spy on the underlying logger as the "diag" instance is global
+      const spyLoggerWarn = sinon.stub(diag.getLogger(), 'warn');
       collectorExporter = new CollectorMetricExporter({
-        logger,
         serviceName: 'basic-service',
         url: address,
         metadata,
@@ -79,6 +78,8 @@ describe('CollectorMetricExporter - node with json over http', () => {
 
   describe('export', () => {
     beforeEach(async () => {
+      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
+      diag.setLogger();
       spyRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
       spyWrite = sinon.stub(fakeRequest, 'write');
       collectorExporterConfig = {
@@ -86,7 +87,6 @@ describe('CollectorMetricExporter - node with json over http', () => {
           foo: 'bar',
         },
         hostname: 'foo',
-        logger: new NoopLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
@@ -202,7 +202,8 @@ describe('CollectorMetricExporter - node with json over http', () => {
     });
 
     it('should log the successful message', done => {
-      const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
+      // Need to stub/spy on the underlying logger as the "diag" instance is global
+      const spyLoggerError = sinon.stub(diag.getLogger(), 'error');
 
       const responseSpy = sinon.spy();
       collectorExporter.export(metrics, responseSpy);
@@ -226,12 +227,8 @@ describe('CollectorMetricExporter - node with json over http', () => {
 
     it('should log the error message', done => {
       const spyLoggerError = sinon.spy();
-      const handler = core.loggingErrorHandler({
-        debug: sinon.fake(),
-        info: sinon.fake(),
-        warn: sinon.fake(),
-        error: spyLoggerError,
-      });
+      diag.error = spyLoggerError;
+      const handler = core.loggingErrorHandler();
       core.setGlobalErrorHandler(handler);
 
       const responseSpy = sinon.spy();

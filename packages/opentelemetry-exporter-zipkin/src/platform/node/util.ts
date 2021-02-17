@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import * as http from 'http';
 import * as https from 'https';
@@ -24,11 +24,7 @@ import * as zipkinTypes from '../../types';
 /**
  * Prepares send function that will send spans to the remote Zipkin service.
  */
-export function prepareSend(
-  logger: api.Logger,
-  urlStr: string,
-  headers?: Record<string, string>
-) {
+export function prepareSend(urlStr: string, headers?: Record<string, string>) {
   const urlOpts = url.parse(urlStr);
 
   const reqOpts: http.RequestOptions = Object.assign(
@@ -50,7 +46,7 @@ export function prepareSend(
     done: (result: ExportResult) => void
   ) {
     if (zipkinSpans.length === 0) {
-      logger.debug('Zipkin send with empty spans');
+      diag.debug('Zipkin send with empty spans');
       return done({ code: ExportResultCode.SUCCESS });
     }
 
@@ -62,7 +58,7 @@ export function prepareSend(
       });
       res.on('end', () => {
         const statusCode = res.statusCode || 0;
-        logger.debug(
+        diag.debug(
           'Zipkin response status code: %d, body: %s',
           statusCode,
           rawData
@@ -92,7 +88,7 @@ export function prepareSend(
 
     // Issue request to remote service
     const payload = JSON.stringify(zipkinSpans);
-    logger.debug('Zipkin request payload: %s', payload);
+    diag.debug('Zipkin request payload: %s', payload);
     req.write(payload, 'utf8');
     req.end();
   };

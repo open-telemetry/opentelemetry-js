@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { TextMapPropagator, Logger, Sampler } from '@opentelemetry/api';
-import { LogLevel, IdGenerator } from '@opentelemetry/core';
+import { TextMapPropagator, Sampler } from '@opentelemetry/api';
+import { IdGenerator } from '@opentelemetry/core';
 
 import { ContextManager } from '@opentelemetry/context-base';
 import { Resource } from '@opentelemetry/resources';
@@ -24,14 +24,6 @@ import { Resource } from '@opentelemetry/resources';
  * TracerConfig provides an interface for configuring a Basic Tracer.
  */
 export interface TracerConfig {
-  /**
-   * User provided logger.
-   */
-  logger?: Logger;
-
-  /** level of logger.  */
-  logLevel?: LogLevel;
-
   /**
    * Sampler determines if a span should be recorded or should be a NoopSpan.
    */
@@ -75,8 +67,19 @@ export interface TraceParams {
 
 /** Interface configuration for a buffer. */
 export interface BufferConfig {
-  /** Maximum size of a buffer. */
-  bufferSize?: number;
-  /** Max time for a buffer can wait before being sent */
-  bufferTimeout?: number;
+  /** The maximum batch size of every export. It must be smaller or equal to
+   * maxQueueSize. The default value is 512. */
+  maxExportBatchSize?: number;
+
+  /** The delay interval in milliseconds between two consecutive exports.
+   *  The default value is 5000ms. */
+  scheduledDelayMillis?: number;
+
+  /** How long the export can run before it is cancelled.
+   * The default value is 30000ms */
+  exportTimeoutMillis?: number;
+
+  /** The maximum queue size. After the size is reached spans are dropped.
+   * The default value is 2048. */
+  maxQueueSize?: number;
 }

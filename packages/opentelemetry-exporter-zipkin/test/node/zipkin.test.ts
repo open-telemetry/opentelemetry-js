@@ -76,7 +76,6 @@ describe('Zipkin Exporter - node', () => {
     it('should construct an exporter with logger', () => {
       const exporter = new ZipkinExporter({
         serviceName: 'my-service',
-        logger: new api.NoopLogger(),
       });
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
@@ -111,7 +110,6 @@ describe('Zipkin Exporter - node', () => {
     it('should skip send with empty array', () => {
       const exporter = new ZipkinExporter({
         serviceName: 'my-service',
-        logger: new api.NoopLogger(),
       });
 
       exporter.export([], (result: ExportResult) => {
@@ -187,7 +185,6 @@ describe('Zipkin Exporter - node', () => {
 
       const exporter = new ZipkinExporter({
         serviceName: 'my-service',
-        logger: new api.NoopLogger(),
       });
 
       exporter.export([span1, span2], (result: ExportResult) => {
@@ -243,7 +240,6 @@ describe('Zipkin Exporter - node', () => {
 
       const exporter = new ZipkinExporter({
         serviceName: 'my-service',
-        logger: new api.NoopLogger(),
         url: 'https://localhost:9411/api/v2/spans',
       });
 
@@ -260,7 +256,6 @@ describe('Zipkin Exporter - node', () => {
 
       const exporter = new ZipkinExporter({
         serviceName: 'my-service',
-        logger: new api.NoopLogger(),
       });
 
       exporter.export([getReadableSpan()], (result: ExportResult) => {
@@ -276,7 +271,6 @@ describe('Zipkin Exporter - node', () => {
 
       const exporter = new ZipkinExporter({
         serviceName: 'my-service',
-        logger: new api.NoopLogger(),
       });
 
       exporter.export([getReadableSpan()], (result: ExportResult) => {
@@ -292,7 +286,6 @@ describe('Zipkin Exporter - node', () => {
 
       const exporter = new ZipkinExporter({
         serviceName: 'my-service',
-        logger: new api.NoopLogger(),
       });
 
       exporter.export([getReadableSpan()], (result: ExportResult) => {
@@ -304,7 +297,6 @@ describe('Zipkin Exporter - node', () => {
     it('should return failed result after shutdown', done => {
       const exporter = new ZipkinExporter({
         serviceName: 'my-service',
-        logger: new api.NoopLogger(),
       });
 
       exporter.shutdown();
@@ -472,7 +464,6 @@ describe('Zipkin Exporter - node', () => {
 
         const exporter = new ZipkinExporter({
           serviceName: 'my-service',
-          logger: new api.NoopLogger(),
         });
 
         exporter.export([getReadableSpan()], (result: ExportResult) => {

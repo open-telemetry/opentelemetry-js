@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
+import { diag } from '@opentelemetry/api';
 import {
   Detector,
   Resource,
   PROCESS_RESOURCE,
-  ResourceDetectionConfigWithLogger,
+  ResourceDetectionConfig,
 } from '../../../';
 import { ResourceAttributes } from '../../../types';
 
 /**
- * ProcessDetector will be used to detect the resoureces related current process running
- * and being instumented from the NodeJS Process module.
+ * ProcessDetector will be used to detect the resources related current process running
+ * and being instrumented from the NodeJS Process module.
  */
 class ProcessDetector implements Detector {
-  async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
+  async detect(config?: ResourceDetectionConfig): Promise<Resource> {
     const processResource: ResourceAttributes = {
       [PROCESS_RESOURCE.PID]: process.pid,
       [PROCESS_RESOURCE.NAME]: process.title || '',
@@ -45,7 +46,7 @@ class ProcessDetector implements Detector {
    */
   private _getResourceAttributes(
     processResource: ResourceAttributes,
-    config: ResourceDetectionConfigWithLogger
+    _config?: ResourceDetectionConfig
   ) {
     if (
       processResource[PROCESS_RESOURCE.NAME] === '' ||
@@ -53,7 +54,7 @@ class ProcessDetector implements Detector {
       processResource[PROCESS_RESOURCE.COMMAND] === '' ||
       processResource[PROCESS_RESOURCE.COMMAND_LINE] === ''
     ) {
-      config.logger.debug(
+      diag.debug(
         'ProcessDetector failed: Unable to find required process resources. '
       );
       return Resource.empty();

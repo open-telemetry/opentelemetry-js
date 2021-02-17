@@ -16,25 +16,23 @@
 
 // This should be removed after plugins are gone
 
-import * as api from '@opentelemetry/api';
+import { TracerProvider } from '@opentelemetry/api';
 import { NodePlugins, OldClassPlugin } from '../../../types_plugin_only';
 
 /**
  * Loads provided web plugins
  * @param pluginsNode
  * @param pluginsWeb
- * @param logger
  * @param tracerProvider
  * @return returns function to disable all plugins
  */
 export function loadOldPlugins(
   pluginsNode: NodePlugins,
   pluginsWeb: OldClassPlugin[],
-  logger: api.Logger,
-  tracerProvider: api.TracerProvider
+  tracerProvider: TracerProvider
 ): () => void {
   pluginsWeb.forEach(plugin => {
-    plugin.enable([], tracerProvider, logger);
+    plugin.enable([], tracerProvider);
   });
   return () => {
     pluginsWeb.forEach(plugin => {

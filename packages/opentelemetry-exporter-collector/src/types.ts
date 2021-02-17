@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  SpanAttributes,
-  Logger,
-  SpanKind,
-  SpanStatusCode,
-} from '@opentelemetry/api';
+import { SpanAttributes, SpanKind, SpanStatusCode } from '@opentelemetry/api';
 
 /* eslint-disable @typescript-eslint/no-namespace */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -348,7 +343,6 @@ export interface ExportServiceError {
 export interface CollectorExporterConfigBase {
   headers?: Partial<Record<string, unknown>>;
   hostname?: string;
-  logger?: Logger;
   serviceName?: string;
   attributes?: SpanAttributes;
   url?: string;

@@ -91,14 +91,6 @@ Use a custom context manager. Default: [AsyncHooksContextManager](../opentelemet
 
 Use a custom propagator. Default: [CompositePropagator](../opentelemetry-core/src/context/propagation/composite.ts) using [W3C Trace Context](../opentelemetry-core/README.md#httptracecontext-propagator) and [Baggage](../opentelemetry-core/README.md#baggage-propagator)
 
-### logger
-
-Use a custom logger. Default: Logging disabled
-
-### logLevel
-
-Default: [INFO](../opentelemetry-core/src/common/types.ts#L19)
-
 ### metricProcessor
 
 Use a custom processor for metrics. Default: [UngroupedProcessor](../opentelemetry-metrics/src/export/Processor.ts#L50)
