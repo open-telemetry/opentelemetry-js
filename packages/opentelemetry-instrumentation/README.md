@@ -206,7 +206,6 @@ All plugins will be bound to TracerProvider as well as instrumentations
 ### NODE - Auto Loader
 
 ```javascript
-const { DiagConsoleLogger } = require('@opentelemetry/api');
 const { B3Propagator } = require('@opentelemetry/propagator-b3');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 const { GraphQLInstrumentation } = require('@opentelemetry/instrumentation-graphql');
@@ -225,7 +224,6 @@ registerInstrumentations({
   ],
   meterProvider: meterProvider,
   tracerProvider: tracerProvider,
-  diagLogger: new DiagConsoleLogger(), // optional
 });
 
 tracerProvider.register({
@@ -237,7 +235,6 @@ tracerProvider.register({
 ### WEB - Auto Loader
 
 ```javascript
-const { DiagConsoleLogger } = require('@opentelemetry/api');
 const { B3Propagator } = require('@opentelemetry/propagator-b3');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xml-http-request';
@@ -256,7 +253,6 @@ registerInstrumentations({
   ],
   meterProvider: meterProvider,
   tracerProvider: tracerProvider,
-  diagLogger: new DiagConsoleLogger(), // optional
 });
 
 tracerProvider.register({

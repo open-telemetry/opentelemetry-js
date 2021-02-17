@@ -16,7 +16,7 @@
 
 import * as semver from 'semver';
 import * as gcpMetadata from 'gcp-metadata';
-import { getDiagLoggerFromConfig } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import {
   Detector,
   ResourceDetectionConfig,
@@ -43,14 +43,12 @@ class GcpDetector implements Detector {
    *
    * @param config The resource detection config
    */
-  async detect(config?: ResourceDetectionConfig): Promise<Resource> {
+  async detect(_config?: ResourceDetectionConfig): Promise<Resource> {
     if (
       !semver.satisfies(process.version, '>=10') ||
       !(await gcpMetadata.isAvailable())
     ) {
-      getDiagLoggerFromConfig(config).debug(
-        'GcpDetector failed: GCP Metadata unavailable.'
-      );
+      diag.debug('GcpDetector failed: GCP Metadata unavailable.');
       return Resource.empty();
     }
 

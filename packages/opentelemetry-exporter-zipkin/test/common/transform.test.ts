@@ -31,9 +31,7 @@ import {
   _toZipkinTags,
 } from '../../src/transform';
 import * as zipkinTypes from '../../src/types';
-const tracer = new BasicTracerProvider({
-  diagLogger: api.createNoopDiagLogger(),
-}).getTracer('default');
+const tracer = new BasicTracerProvider().getTracer('default');
 
 const language = tracer.resource.attributes[TELEMETRY_SDK_RESOURCE.LANGUAGE];
 

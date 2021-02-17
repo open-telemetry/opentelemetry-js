@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { getDiagLoggerFromConfig } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import {
   Detector,
   Resource,
@@ -51,7 +51,7 @@ export class AwsBeanstalkDetector implements Detector {
     }
   }
 
-  async detect(config?: ResourceDetectionConfig): Promise<Resource> {
+  async detect(_config?: ResourceDetectionConfig): Promise<Resource> {
     try {
       await AwsBeanstalkDetector.fileAccessAsync(
         this.BEANSTALK_CONF_PATH,
@@ -71,9 +71,7 @@ export class AwsBeanstalkDetector implements Detector {
         [SERVICE_RESOURCE.INSTANCE_ID]: parsedData.deployment_id,
       });
     } catch (e) {
-      getDiagLoggerFromConfig(config).debug(
-        `AwsBeanstalkDetector failed: ${e.message}`
-      );
+      diag.debug(`AwsBeanstalkDetector failed: ${e.message}`);
       return Resource.empty();
     }
   }

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { TextMapPropagator, DiagLoggerConfig } from '@opentelemetry/api';
+import { TextMapPropagator } from '@opentelemetry/api';
 
 /** Configuration object for composite propagator */
-export interface CompositePropagatorConfig extends DiagLoggerConfig {
+export interface CompositePropagatorConfig {
   /**
    * List of propagators to run. Propagators run in the
    * list order. If a propagator later in the list writes the same context

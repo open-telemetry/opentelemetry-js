@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-import { DiagLoggerConfig } from '@opentelemetry/api';
-
 /**
  * Configuration interface for prometheus exporter
  */
-export interface ExporterConfig extends DiagLoggerConfig {
+export interface ExporterConfig {
   /**
    * App prefix for metrics, if needed
    *

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { OptionalDiagLogger, diag } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import {
   ExportResult,
   ExportResultCode,
@@ -25,12 +25,7 @@ import * as zipkinTypes from '../../types';
 /**
  * Prepares send function that will send spans to the remote Zipkin service.
  */
-export function prepareSend(
-  diagLogger: OptionalDiagLogger,
-  urlStr: string,
-  headers?: Record<string, string>
-) {
-  const theLogger = diagLogger || diag;
+export function prepareSend(urlStr: string, headers?: Record<string, string>) {
   let xhrHeaders: Record<string, string>;
   const useBeacon = navigator.sendBeacon && !headers;
   if (headers) {
@@ -49,14 +44,14 @@ export function prepareSend(
     done: (result: ExportResult) => void
   ) {
     if (zipkinSpans.length === 0) {
-      theLogger.debug('Zipkin send with empty spans');
+      diag.debug('Zipkin send with empty spans');
       return done({ code: ExportResultCode.SUCCESS });
     }
     const payload = JSON.stringify(zipkinSpans);
     if (useBeacon) {
-      sendWithBeacon(payload, done, urlStr, theLogger);
+      sendWithBeacon(payload, done, urlStr);
     } else {
-      sendWithXhr(payload, done, urlStr, theLogger, xhrHeaders);
+      sendWithXhr(payload, done, urlStr, xhrHeaders);
     }
   };
 }
@@ -66,16 +61,14 @@ export function prepareSend(
  * @param data
  * @param done
  * @param urlStr
- * @param diagLogger
  */
 function sendWithBeacon(
   data: string,
   done: (result: ExportResult) => void,
-  urlStr: string,
-  diagLogger?: OptionalDiagLogger
+  urlStr: string
 ) {
   if (navigator.sendBeacon(urlStr, data)) {
-    (diagLogger || diag).debug('sendBeacon - can send', data);
+    diag.debug('sendBeacon - can send', data);
     done({ code: ExportResultCode.SUCCESS });
   } else {
     done({
@@ -90,17 +83,14 @@ function sendWithBeacon(
  * @param data
  * @param done
  * @param urlStr
- * @param diagLogger
  * @param xhrHeaders
  */
 function sendWithXhr(
   data: string,
   done: (result: ExportResult) => void,
   urlStr: string,
-  diagLogger: OptionalDiagLogger,
   xhrHeaders: Record<string, string> = {}
 ) {
-  const theLogger = diagLogger || diag;
   const xhr = new window.XMLHttpRequest();
   xhr.open('POST', urlStr);
   Object.entries(xhrHeaders).forEach(([k, v]) => {
@@ -110,11 +100,7 @@ function sendWithXhr(
   xhr.onreadystatechange = () => {
     if (xhr.readyState === XMLHttpRequest.DONE) {
       const statusCode = xhr.status || 0;
-      theLogger.debug(
-        'Zipkin response status code: %d, body: %s',
-        statusCode,
-        data
-      );
+      diag.debug('Zipkin response status code: %d, body: %s', statusCode, data);
 
       if (xhr.status >= 200 && xhr.status < 400) {
         return done({ code: ExportResultCode.SUCCESS });
@@ -135,6 +121,6 @@ function sendWithXhr(
   };
 
   // Issue request to remote service
-  theLogger.debug('Zipkin request payload: %s', data);
+  diag.debug('Zipkin request payload: %s', data);
   xhr.send(data);
 }

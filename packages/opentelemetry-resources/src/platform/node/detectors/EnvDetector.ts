@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { getDiagLoggerFromConfig } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import { getEnv } from '@opentelemetry/core';
 import {
   Detector,
@@ -54,11 +54,11 @@ class EnvDetector implements Detector {
    *
    * @param config The resource detection config
    */
-  async detect(config?: ResourceDetectionConfig): Promise<Resource> {
+  async detect(_config?: ResourceDetectionConfig): Promise<Resource> {
     try {
       const rawAttributes = getEnv().OTEL_RESOURCE_ATTRIBUTES;
       if (!rawAttributes) {
-        getDiagLoggerFromConfig(config).debug(
+        diag.debug(
           'EnvDetector failed: Environment variable "OTEL_RESOURCE_ATTRIBUTES" is missing.'
         );
         return Resource.empty();
@@ -66,7 +66,7 @@ class EnvDetector implements Detector {
       const attributes = this._parseResourceAttributes(rawAttributes);
       return new Resource(attributes);
     } catch (e) {
-      getDiagLoggerFromConfig(config).debug(`EnvDetector failed: ${e.message}`);
+      diag.debug(`EnvDetector failed: ${e.message}`);
       return Resource.empty();
     }
   }

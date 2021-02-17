@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-import { DiagLoggerConfig } from '@opentelemetry/api';
 import type { Detector } from './types';
 
 /**
  * ResourceDetectionConfig provides an interface for configuring resource auto-detection.
  */
-export interface ResourceDetectionConfig extends DiagLoggerConfig {
+export interface ResourceDetectionConfig {
   detectors?: Array<Detector>;
 }

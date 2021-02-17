@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { DiagLoggerConfig, TracerProvider } from '@opentelemetry/api';
+import { TracerProvider } from '@opentelemetry/api';
 import { MeterProvider } from '@opentelemetry/api-metrics';
 
 /** Interface Instrumentation to apply patch. */
@@ -53,7 +53,7 @@ export interface Instrumentation {
   supportedVersions?: string[];
 }
 
-export interface InstrumentationConfig extends DiagLoggerConfig {
+export interface InstrumentationConfig {
   /**
    * Whether to enable the plugin.
    * @default true

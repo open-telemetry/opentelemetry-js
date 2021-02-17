@@ -40,7 +40,6 @@ export * from './trace/trace_flags';
 export * from './trace/trace_state';
 export * from './trace/tracer_provider';
 export * from './trace/tracer';
-export * from './diag/config';
 export * from './diag/consoleLogger';
 export * from './diag/logger';
 export * from './diag/logLevel';

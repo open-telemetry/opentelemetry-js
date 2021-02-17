@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { OptionalDiagLogger, TracerProvider } from '@opentelemetry/api';
+import { TracerProvider } from '@opentelemetry/api';
 
 export interface NodePlugins {
   [pluginName: string]: OldPluginConfig;
@@ -44,13 +44,11 @@ export interface OldClassPlugin<T = any> {
    * @param moduleExports The value of the `module.exports` property that would
    *     normally be exposed by the required module. ex: `http`, `https` etc.
    * @param TracerProvider a tracer provider.
-   * @param diagLogger an optional diagnostic logger instance.
    * @param [config] an object to configure the plugin.
    */
   enable(
     moduleExports: T,
     TracerProvider: TracerProvider,
-    diagLogger?: OptionalDiagLogger,
     config?: OldPluginConfig
   ): T;
 

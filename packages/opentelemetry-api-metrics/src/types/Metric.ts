@@ -19,12 +19,11 @@ import {
   BoundCounter,
   BoundValueRecorder,
 } from './BoundInstrument';
-import { DiagLoggerConfig } from '@opentelemetry/api';
 
 /**
  * Options needed for metric creation
  */
-export interface MetricOptions extends DiagLoggerConfig {
+export interface MetricOptions {
   /** The name of the component that reports the Metric. */
   component?: string;
 
@@ -61,7 +60,7 @@ export interface MetricOptions extends DiagLoggerConfig {
   boundaries?: number[];
 }
 
-export interface BatchObserverOptions extends DiagLoggerConfig {
+export interface BatchObserverOptions {
   /**
    * Indicates how long the batch metric should wait to update before cancel
    */

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { DiagLoggerConfig, TracerProvider } from '@opentelemetry/api';
+import { TracerProvider } from '@opentelemetry/api';
 import { MeterProvider } from '@opentelemetry/api-metrics';
 import { InstrumentationBase } from './platform';
 import { Instrumentation } from './types';
@@ -39,7 +39,7 @@ export interface AutoLoaderResult {
   pluginsWeb: OldClassPlugin[];
 }
 
-export interface AutoLoaderOptions extends DiagLoggerConfig {
+export interface AutoLoaderOptions {
   instrumentations?: InstrumentationOption[];
   tracerProvider?: TracerProvider;
   meterProvider?: MeterProvider;

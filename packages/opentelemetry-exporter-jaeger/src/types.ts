@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-import { DiagLoggerConfig } from '@opentelemetry/api';
-
 /**
  * Options for Jaeger configuration
  */
-export interface ExporterConfig extends DiagLoggerConfig {
+export interface ExporterConfig {
   serviceName: string;
   tags?: Tag[];
   host?: string; // default: 'localhost'

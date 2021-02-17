@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-import { DiagLoggerConfig } from '@opentelemetry/api';
 import { ExportResult } from '@opentelemetry/core';
 
 /**
  * Exporter config
  */
-export interface ExporterConfig extends DiagLoggerConfig {
+export interface ExporterConfig {
   headers?: { [key: string]: string };
   serviceName?: string;
   url?: string;

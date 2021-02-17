@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  DiagLoggerConfig,
-  SpanAttributes,
-  TextMapPropagator,
-  Sampler,
-} from '@opentelemetry/api';
+import { SpanAttributes, TextMapPropagator, Sampler } from '@opentelemetry/api';
 import type { ContextManager } from '@opentelemetry/context-base';
 import { InstrumentationOption } from '@opentelemetry/instrumentation';
 import { MetricExporter, Processor } from '@opentelemetry/metrics';
@@ -30,7 +25,7 @@ import {
   TraceParams,
 } from '@opentelemetry/tracing';
 
-export interface NodeSDKConfiguration extends DiagLoggerConfig {
+export interface NodeSDKConfiguration {
   autoDetectResources: boolean;
   contextManager: ContextManager;
   defaultAttributes: SpanAttributes;

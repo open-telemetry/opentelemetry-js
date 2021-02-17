@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { diag } from '@opentelemetry/api';
 import * as collectorTypes from '../../types';
-import { OptionalDiagLogger } from '@opentelemetry/api';
 
 /**
  * Send metrics/spans using browser navigator.sendBeacon
  * @param body
- * @param diagLogger
  * @param onSuccess
  * @param onError
  */
 export function sendWithBeacon(
   body: string,
   url: string,
-  diagLogger: OptionalDiagLogger,
   onSuccess: () => void,
   onError: (error: collectorTypes.CollectorExporterError) => void
 ) {
   if (navigator.sendBeacon(url, body)) {
-    diagLogger && diagLogger.debug('sendBeacon - can send', body);
+    diag.debug('sendBeacon - can send', body);
     onSuccess();
   } else {
     const error = new collectorTypes.CollectorExporterError(
@@ -45,7 +43,6 @@ export function sendWithBeacon(
  * function to send metrics/spans using browser XMLHttpRequest
  *     used when navigator.sendBeacon is not available
  * @param body
- * @param diagLogger
  * @param onSuccess
  * @param onError
  */
@@ -53,7 +50,6 @@ export function sendWithXhr(
   body: string,
   url: string,
   headers: { [key: string]: string },
-  diagLogger: OptionalDiagLogger,
   onSuccess: () => void,
   onError: (error: collectorTypes.CollectorExporterError) => void
 ) {
@@ -70,7 +66,7 @@ export function sendWithXhr(
   xhr.onreadystatechange = () => {
     if (xhr.readyState === XMLHttpRequest.DONE) {
       if (xhr.status >= 200 && xhr.status <= 299) {
-        diagLogger && diagLogger.debug('xhr success', body);
+        diag.debug('xhr success', body);
         onSuccess();
       } else {
         const error = new collectorTypes.CollectorExporterError(

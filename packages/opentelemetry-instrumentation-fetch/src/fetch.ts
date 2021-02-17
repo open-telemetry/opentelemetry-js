@@ -172,7 +172,7 @@ export class FetchInstrumentation extends InstrumentationBase<
     options: Partial<Request | RequestInit> = {}
   ): api.Span | undefined {
     if (core.isUrlIgnored(url, this._getConfig().ignoreUrls)) {
-      this._diagLogger.debug('ignoring span as url matches ignored url');
+      api.diag.debug('ignoring span as url matches ignored url');
       return;
     }
     const method = (options.method || 'GET').toUpperCase();
@@ -381,7 +381,7 @@ export class FetchInstrumentation extends InstrumentationBase<
   enable() {
     if (isWrapped(window.fetch)) {
       this._unwrap(window, 'fetch');
-      this._diagLogger.debug('removing previous patch for constructor');
+      api.diag.debug('removing previous patch for constructor');
     }
     this._wrap(window, 'fetch', this._patchConstructor());
   }

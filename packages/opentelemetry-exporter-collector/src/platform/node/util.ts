@@ -19,10 +19,7 @@ import * as https from 'https';
 import * as collectorTypes from '../../types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { CollectorExporterNodeConfigBase } from '.';
-import {
-  OptionalDiagLogger,
-  getDiagLoggerFromConfig,
-} from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 
 /**
  * Sends data using http
@@ -61,7 +58,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
     res.on('data', chunk => (data += chunk));
     res.on('end', () => {
       if (res.statusCode && res.statusCode < 299) {
-        collector.diagLogger.debug(`statusCode: ${res.statusCode}`, data);
+        diag.debug(`statusCode: ${res.statusCode}`, data);
         onSuccess();
       } else {
         const error = new collectorTypes.CollectorExporterError(
@@ -82,12 +79,10 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
 }
 
 export function createHttpAgent(
-  diagLogger: OptionalDiagLogger,
   config: CollectorExporterNodeConfigBase
 ): http.Agent | https.Agent | undefined {
-  const theLogger = diagLogger || getDiagLoggerFromConfig(config);
   if (config.httpAgentOptions && config.keepAlive === false) {
-    theLogger.warn('httpAgentOptions is used only when keepAlive is true');
+    diag.warn('httpAgentOptions is used only when keepAlive is true');
     return undefined;
   }
 
@@ -98,7 +93,7 @@ export function createHttpAgent(
     const Agent = parsedUrl.protocol === 'http:' ? http.Agent : https.Agent;
     return new Agent({ keepAlive: true, ...config.httpAgentOptions });
   } catch (err) {
-    theLogger.error(
+    diag.error(
       `collector exporter failed to create http agent. err: ${err.message}`
     );
     return undefined;

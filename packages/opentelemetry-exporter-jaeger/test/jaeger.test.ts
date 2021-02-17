@@ -44,7 +44,6 @@ describe('JaegerExporter', () => {
         serviceName: 'opentelemetry',
         host: 'remotehost',
         port: 8080,
-        diagLogger: api.createNoopDiagLogger(),
         tags: [{ key: 'opentelemetry-exporter-jaeger', value: '0.1.0' }],
       });
       assert.ok(typeof exporter.export === 'function');

@@ -14,13 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  SpanKind,
-  Span,
-  context,
-  propagation,
-  createNoopDiagLogger,
-} from '@opentelemetry/api';
+import { SpanKind, Span, context, propagation } from '@opentelemetry/api';
 import {
   HttpAttribute,
   GeneralAttribute,
@@ -37,8 +31,7 @@ import {
 } from '@opentelemetry/tracing';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 
-const diagLogger = createNoopDiagLogger();
-const instrumentation = new HttpInstrumentation({ diagLogger });
+const instrumentation = new HttpInstrumentation();
 instrumentation.enable();
 instrumentation.disable();
 
@@ -128,10 +121,7 @@ describe('HttpInstrumentation Integration tests', () => {
       });
     });
 
-    const diagLogger = createNoopDiagLogger();
-    const provider = new NodeTracerProvider({
-      diagLogger,
-    });
+    const provider = new NodeTracerProvider();
     provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     instrumentation.setTracerProvider(provider);
     beforeEach(() => {

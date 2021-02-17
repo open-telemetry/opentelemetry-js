@@ -38,7 +38,6 @@ export class CounterMetric extends Metric<BoundCounter> implements api.Counter {
       labels,
       this._disabled,
       this._valueType,
-      this._diagLogger,
       this._processor.aggregatorFor(this._descriptor)
     );
   }

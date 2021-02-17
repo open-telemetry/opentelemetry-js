@@ -101,7 +101,7 @@ export class DiagAPI implements DiagLogger {
 
     self.setLogger = (logger: DiagLogger): DiagLogger => {
       const prevLogger = _logger;
-      if (prevLogger !== logger && logger !== self) {
+      if (!logger || logger !== self) {
         // Simple special case to avoid any possible infinite recursion on the logging functions
         _logger = logger || createNoopDiagLogger();
         _filteredLogger = createLogLevelDiagLogger(_logLevel, _logger);
@@ -146,8 +146,5 @@ export class DiagAPI implements DiagLogger {
   public debug!: DiagLogFunction;
   public info!: DiagLogFunction;
   public warn!: DiagLogFunction;
-  public startupInfo!: DiagLogFunction;
   public error!: DiagLogFunction;
-  public critical!: DiagLogFunction;
-  public terminal!: DiagLogFunction;
 }

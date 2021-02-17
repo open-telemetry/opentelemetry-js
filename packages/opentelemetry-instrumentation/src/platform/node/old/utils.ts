@@ -16,34 +16,29 @@
 
 // This is copy from previous version, should be removed after plugins are gone
 
-import { OptionalDiagLogger, diag } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import * as path from 'path';
 import * as semver from 'semver';
 
 /**
  * Gets the package version.
- * @param diagLogger An optional diagnostic logger to use.
  * @param basedir The base directory.
  */
-export function getPackageVersion(
-  diagLogger: OptionalDiagLogger,
-  basedir: string
-): string | null {
-  const theLogger = diagLogger || diag;
+export function getPackageVersion(basedir: string): string | null {
   const pjsonPath = path.join(basedir, 'package.json');
   try {
     const version = require(pjsonPath).version;
     // Attempt to parse a string as a semantic version, returning either a
     // SemVer object or null.
     if (!semver.parse(version)) {
-      theLogger.error(
+      diag.error(
         `getPackageVersion: [${pjsonPath}|${version}] Version string could not be parsed.`
       );
       return null;
     }
     return version;
   } catch (e) {
-    theLogger.error(
+    diag.error(
       `getPackageVersion: [${pjsonPath}] An error occurred while retrieving version string. ${e.message}`
     );
     return null;

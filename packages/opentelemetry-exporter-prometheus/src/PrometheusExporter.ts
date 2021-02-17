@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { DiagLogger, getDiagLoggerFromConfig } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import {
   ExportResult,
   globalErrorHandler,
@@ -81,7 +81,7 @@ export class PrometheusExporter implements MetricExporter {
     if (config.preventServerStart !== true) {
       this.startServer()
         .then(callback)
-        .catch(err => this._logger.error(err));
+        .catch(err => diag.error(err));
     } else if (callback) {
       callback();
     }
@@ -108,7 +108,7 @@ export class PrometheusExporter implements MetricExporter {
       return;
     }
 
-    this._diagLogger.debug('Prometheus exporter export');
+    diag.debug('Prometheus exporter export');
 
     for (const record of records) {
       this._batcher.process(record);
@@ -129,7 +129,7 @@ export class PrometheusExporter implements MetricExporter {
    */
   stopServer(): Promise<void> {
     if (!this._server) {
-      this._diagLogger.debug(
+      diag.debug(
         'Prometheus stopServer() was called but server was never started.'
       );
       return Promise.resolve();
@@ -137,7 +137,7 @@ export class PrometheusExporter implements MetricExporter {
       return new Promise(resolve => {
         this._server.close(err => {
           if (!err) {
-            this._diagLogger.debug('Prometheus exporter was stopped');
+            diag.debug('Prometheus exporter was stopped');
           } else {
             if (
               ((err as unknown) as { code: string }).code !==

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { getDiagLoggerFromConfig, trace } from '@opentelemetry/api';
+import { trace } from '@opentelemetry/api';
 import { metrics } from '@opentelemetry/api-metrics';
 import {
   disableInstrumentations,
@@ -40,21 +40,10 @@ export function registerInstrumentations(
   } = parseInstrumentationOptions(options.instrumentations);
   const tracerProvider = options.tracerProvider || trace.getTracerProvider();
   const meterProvider = options.meterProvider || metrics.getMeterProvider();
-  const diagLogger = getDiagLoggerFromConfig(options);
 
-  enableInstrumentations(
-    instrumentations,
-    diagLogger,
-    tracerProvider,
-    meterProvider
-  );
+  enableInstrumentations(instrumentations, tracerProvider, meterProvider);
 
-  const unload = loadOldPlugins(
-    pluginsNode,
-    pluginsWeb,
-    diagLogger,
-    tracerProvider
-  );
+  const unload = loadOldPlugins(pluginsNode, pluginsWeb, tracerProvider);
 
   return () => {
     unload();

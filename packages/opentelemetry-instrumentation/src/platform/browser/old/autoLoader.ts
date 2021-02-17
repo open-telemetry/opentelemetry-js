@@ -16,25 +16,23 @@
 
 // This should be removed after plugins are gone
 
-import { OptionalDiagLogger, TracerProvider } from '@opentelemetry/api';
+import { TracerProvider } from '@opentelemetry/api';
 import { NodePlugins, OldClassPlugin } from '../../../types_plugin_only';
 
 /**
  * Loads provided web plugins
  * @param pluginsNode
  * @param pluginsWeb
- * @param diagLogger
  * @param tracerProvider
  * @return returns function to disable all plugins
  */
 export function loadOldPlugins(
   pluginsNode: NodePlugins,
   pluginsWeb: OldClassPlugin[],
-  diagLogger: OptionalDiagLogger,
   tracerProvider: TracerProvider
 ): () => void {
   pluginsWeb.forEach(plugin => {
-    plugin.enable([], tracerProvider, diagLogger);
+    plugin.enable([], tracerProvider);
   });
   return () => {
     pluginsWeb.forEach(plugin => {

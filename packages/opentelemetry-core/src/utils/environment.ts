@@ -156,9 +156,6 @@ const logLevelMap: { [key: string]: DiagLogLevel } = {
   INFO: DiagLogLevel.INFO,
   WARN: DiagLogLevel.WARN,
   ERROR: DiagLogLevel.ERROR,
-  STARTUP: DiagLogLevel.STARTUP,
-  CRITICAL: DiagLogLevel.CRITICAL,
-  TERMINAL: DiagLogLevel.TERMINAL,
   NONE: DiagLogLevel.NONE,
 };
 

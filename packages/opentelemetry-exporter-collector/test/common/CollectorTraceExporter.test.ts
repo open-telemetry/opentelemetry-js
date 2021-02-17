@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { createNoopDiagLogger, diag } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import { ExportResultCode } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
@@ -65,10 +65,11 @@ describe('CollectorTraceExporter - common', () => {
     let onInitSpy: any;
 
     beforeEach(() => {
+      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
+      diag.setLogger(null as any);
       onInitSpy = sinon.stub(CollectorTraceExporter.prototype, 'onInit');
       collectorExporterConfig = {
         hostname: 'foo',
-        diagLogger: createNoopDiagLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
@@ -100,13 +101,6 @@ describe('CollectorTraceExporter - common', () => {
       it('should set url', () => {
         assert.strictEqual(collectorExporter.url, 'http://foo.bar.com');
       });
-
-      it('should set logger', () => {
-        assert.deepStrictEqual(
-          collectorExporter.diagLogger,
-          collectorExporterConfig.diagLogger
-        );
-      });
     });
 
     describe('when config is missing certain params', () => {
@@ -116,10 +110,6 @@ describe('CollectorTraceExporter - common', () => {
 
       it('should set default serviceName', () => {
         assert.strictEqual(collectorExporter.serviceName, 'collector-exporter');
-      });
-
-      it('should set default logger', () => {
-        assert.deepStrictEqual(collectorExporter.diagLogger, diag);
       });
     });
   });
@@ -230,13 +220,14 @@ describe('CollectorTraceExporter - common', () => {
   describe('shutdown', () => {
     let onShutdownSpy: any;
     beforeEach(() => {
+      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
+      diag.setLogger(null as any);
       onShutdownSpy = sinon.stub(
         CollectorTraceExporter.prototype,
         'onShutdown'
       );
       collectorExporterConfig = {
         hostname: 'foo',
-        diagLogger: createNoopDiagLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',

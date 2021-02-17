@@ -46,7 +46,6 @@ export class UpDownCounterMetric
       labels,
       this._disabled,
       this._valueType,
-      this._diagLogger,
       this._processor.aggregatorFor(this._descriptor)
     );
   }

@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 
-import {
-  DiagConsoleLogger,
-  DiagLogger,
-  getDiagLoggerFromConfig,
-} from '@opentelemetry/api';
 import * as api from '@opentelemetry/api-metrics';
 import { Resource } from '@opentelemetry/resources';
 import { Meter } from '.';
@@ -34,18 +29,12 @@ export class MeterProvider implements api.MeterProvider {
   private _shuttingDownPromise: Promise<void> = Promise.resolve();
   private _isShutdown = false;
   readonly resource: Resource;
-  readonly diagLogger: DiagLogger;
 
   constructor(config: MeterConfig = {}) {
     const mergedConfig = merge({}, DEFAULT_CONFIG, config);
-    this.diagLogger = getDiagLoggerFromConfig(
-      mergedConfig,
-      () => new DiagConsoleLogger()
-    );
     this.resource =
       mergedConfig.resource ?? Resource.createTelemetrySDKResource();
     this._config = Object.assign({}, mergedConfig, {
-      diagLogger: this.diagLogger,
       resource: this.resource,
     });
   }

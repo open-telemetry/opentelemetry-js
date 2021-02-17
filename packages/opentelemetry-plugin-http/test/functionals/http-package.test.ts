@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { context, SpanKind, createNoopDiagLogger } from '@opentelemetry/api';
+import { context, SpanKind } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
@@ -90,10 +90,7 @@ describe('Packages', () => {
     context.disable();
   });
   describe('get', () => {
-    const diagLogger = createNoopDiagLogger();
-    const provider = new NodeTracerProvider({
-      diagLogger,
-    });
+    const provider = new NodeTracerProvider();
     provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
       memoryExporter.reset();
@@ -103,7 +100,7 @@ describe('Packages', () => {
       const config: HttpPluginConfig = {
         applyCustomAttributesOnSpan: customAttributeFunction,
       };
-      plugin.enable(http, provider, provider.diagLogger, config);
+      plugin.enable(http, provider, config);
     });
 
     after(() => {

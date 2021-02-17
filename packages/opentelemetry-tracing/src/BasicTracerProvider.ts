@@ -19,9 +19,6 @@ import {
   trace,
   context,
   propagation,
-  DiagLogger,
-  DiagConsoleLogger,
-  getDiagLoggerFromConfig,
 } from '@opentelemetry/api';
 import {
   CompositePropagator,
@@ -44,19 +41,13 @@ export class BasicTracerProvider implements TracerProvider {
   private readonly _tracers: Map<string, Tracer> = new Map();
 
   activeSpanProcessor: SpanProcessor = new NoopSpanProcessor();
-  readonly diagLogger: DiagLogger;
   readonly resource: Resource;
 
   constructor(config: TracerConfig = {}) {
     const mergedConfig = merge({}, DEFAULT_CONFIG, config);
-    this.diagLogger = getDiagLoggerFromConfig(
-      mergedConfig,
-      () => new DiagConsoleLogger()
-    );
     this.resource =
       mergedConfig.resource ?? Resource.createTelemetrySDKResource();
     this._config = Object.assign({}, mergedConfig, {
-      diagLogger: this.diagLogger,
       resource: this.resource,
     });
   }

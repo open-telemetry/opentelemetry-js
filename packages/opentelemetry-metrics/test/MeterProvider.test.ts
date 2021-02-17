@@ -17,7 +17,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MeterProvider, Meter, CounterMetric } from '../src';
-import { createNoopDiagLogger } from '@opentelemetry/api';
 
 describe('MeterProvider', () => {
   describe('constructor', () => {
@@ -27,9 +26,7 @@ describe('MeterProvider', () => {
     });
 
     it('should construct an instance with logger', () => {
-      const provider = new MeterProvider({
-        diagLogger: createNoopDiagLogger(),
-      });
+      const provider = new MeterProvider();
       assert.ok(provider instanceof MeterProvider);
     });
   });

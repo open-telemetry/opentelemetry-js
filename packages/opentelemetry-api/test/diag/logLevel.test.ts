@@ -16,7 +16,6 @@
 
 import * as assert from 'assert';
 import { diag } from '../../src';
-import { getDiagLoggerFromConfig } from '../../src/diag/config';
 import {
   createNoopDiagLogger,
   DiagLogger,
@@ -35,27 +34,13 @@ const incompleteLoggerFuncs: Array<keyof DiagLogger> = [
   'error',
 ];
 
-const expectedIncompleteMap: { [n: string]: keyof Console } = {
-  terminal: 'error',
-  critical: 'error',
-  error: 'error',
-  warn: 'warn',
-  info: 'info',
-  debug: 'debug',
-  verbose: 'debug',
-  startupInfo: 'info',
-};
-
 describe('LogLevelFilter DiagLogger', () => {
   const calledArgs: any = {
-    terminal: null,
-    critical: null,
     error: null,
     warn: null,
     info: null,
     debug: null,
     verbose: null,
-    startupInfo: null,
   };
 
   let dummyLogger: DiagLogger;
@@ -64,7 +49,7 @@ describe('LogLevelFilter DiagLogger', () => {
   let incompleteLogger: DiagLogger;
 
   beforeEach(() => {
-    // set no logger
+    // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
     diag.setLogger(null as any);
     diag.setLogLevel(DiagLogLevel.INFO);
 
@@ -117,71 +102,19 @@ describe('LogLevelFilter DiagLogger', () => {
         ignoreFuncs: ['verbose', 'debug', 'info', 'warn'],
       },
       {
-        message: 'CRITICAL',
-        level: DiagLogLevel.CRITICAL,
-        ignoreFuncs: [
-          'verbose',
-          'debug',
-          'info',
-          'warn',
-          'error',
-          'startupInfo',
-        ],
-      },
-      {
-        message: 'TERMINAL',
-        level: DiagLogLevel.TERMINAL,
-        ignoreFuncs: [
-          'verbose',
-          'debug',
-          'info',
-          'warn',
-          'error',
-          'critical',
-          'startupInfo',
-        ],
-      },
-      {
-        message: 'between TERMINAL and NONE',
+        message: 'between ERROR and NONE',
         level: 1,
-        ignoreFuncs: [
-          'verbose',
-          'debug',
-          'info',
-          'warn',
-          'error',
-          'critical',
-          'terminal',
-          'startupInfo',
-        ],
+        ignoreFuncs: ['verbose', 'debug', 'info', 'warn', 'error'],
       },
       {
         message: 'NONE',
         level: DiagLogLevel.NONE,
-        ignoreFuncs: [
-          'verbose',
-          'debug',
-          'info',
-          'warn',
-          'error',
-          'critical',
-          'terminal',
-          'startupInfo',
-        ],
+        ignoreFuncs: ['verbose', 'debug', 'info', 'warn', 'error'],
       },
       {
         message: 'less than NONE',
         level: -1000,
-        ignoreFuncs: [
-          'verbose',
-          'debug',
-          'info',
-          'warn',
-          'error',
-          'critical',
-          'terminal',
-          'startupInfo',
-        ],
+        ignoreFuncs: ['verbose', 'debug', 'info', 'warn', 'error'],
       },
     ];
 
@@ -189,25 +122,6 @@ describe('LogLevelFilter DiagLogger', () => {
       diagLoggerFunctions.forEach(fName => {
         it(`should log ${fName} message with ${map.message} level`, () => {
           const testLogger = createLogLevelDiagLogger(map.level, dummyLogger);
-          testLogger[fName](`${fName} called %s`, 'param1');
-          diagLoggerFunctions.forEach(lName => {
-            if (fName === lName && map.ignoreFuncs.indexOf(lName) === -1) {
-              assert.deepStrictEqual(calledArgs[lName], [
-                `${fName} called %s`,
-                'param1',
-              ]);
-            } else {
-              assert.strictEqual(calledArgs[lName], null);
-            }
-          });
-        });
-
-        it(`should log ${fName} message with ${map.message} level via config`, () => {
-          const testConfig = {
-            diagLogger: dummyLogger,
-            diagLogLevel: map.level,
-          };
-          const testLogger = getDiagLoggerFromConfig(testConfig);
           testLogger[fName](`${fName} called %s`, 'param1');
           diagLoggerFunctions.forEach(lName => {
             if (fName === lName && map.ignoreFuncs.indexOf(lName) === -1) {
@@ -278,23 +192,6 @@ describe('LogLevelFilter DiagLogger', () => {
               ]);
             } else {
               assert.strictEqual(calledArgs[lName], null);
-            }
-          });
-        });
-
-        it(`incomplete (legacy) logger should log ${fName} message to ${expectedIncompleteMap[fName]} with ${map.message} level`, () => {
-          const testLogger = createLogLevelDiagLogger(
-            map.level,
-            incompleteLogger
-          );
-          testLogger[fName](`${fName} called %s`, 'param1');
-          diagLoggerFunctions.forEach(lName => {
-            const expectedLog = expectedIncompleteMap[lName];
-            if (fName === lName && map.ignoreFuncs.indexOf(lName) === -1) {
-              assert.deepStrictEqual(calledArgs[expectedLog], [
-                `${fName} called %s`,
-                'param1',
-              ]);
             }
           });
         });

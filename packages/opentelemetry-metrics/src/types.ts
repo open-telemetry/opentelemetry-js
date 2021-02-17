@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { DiagLoggerConfig } from '@opentelemetry/api';
 import * as api from '@opentelemetry/api-metrics';
 import { getEnv } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
@@ -22,7 +21,7 @@ import { Processor } from './export/Processor';
 import { MetricExporter } from './export/types';
 
 /** MeterConfig provides an interface for configuring a Meter. */
-export interface MeterConfig extends DiagLoggerConfig {
+export interface MeterConfig {
   /** Metric exporter. */
   exporter?: MetricExporter;
 

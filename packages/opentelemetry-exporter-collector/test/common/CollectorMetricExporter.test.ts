@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { createNoopDiagLogger, diag } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import { Counter, ValueObserver } from '@opentelemetry/api-metrics';
 import { ExportResultCode } from '@opentelemetry/core';
 import {
@@ -60,10 +60,11 @@ describe('CollectorMetricExporter - common', () => {
     let onInitSpy: any;
 
     beforeEach(async () => {
+      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
+      diag.setLogger(null as any);
       onInitSpy = sinon.stub(CollectorMetricExporter.prototype, 'onInit');
       collectorExporterConfig = {
         hostname: 'foo',
-        diagLogger: createNoopDiagLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
@@ -108,12 +109,6 @@ describe('CollectorMetricExporter - common', () => {
       it('should set url', () => {
         assert.strictEqual(collectorExporter.url, 'http://foo.bar.com');
       });
-
-      it('should set logger', () => {
-        assert.ok(
-          collectorExporter.diagLogger === collectorExporterConfig.diagLogger
-        );
-      });
     });
 
     describe('when config is missing certain params', () => {
@@ -126,10 +121,6 @@ describe('CollectorMetricExporter - common', () => {
           collectorExporter.serviceName,
           'collector-metric-exporter'
         );
-      });
-
-      it('should set default logger', () => {
-        assert.deepStrictEqual(collectorExporter.diagLogger, diag);
       });
     });
   });
@@ -209,13 +200,14 @@ describe('CollectorMetricExporter - common', () => {
   describe('shutdown', () => {
     let onShutdownSpy: any;
     beforeEach(() => {
+      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
+      diag.setLogger(null as any);
       onShutdownSpy = sinon.stub(
         CollectorMetricExporter.prototype,
         'onShutdown'
       );
       collectorExporterConfig = {
         hostname: 'foo',
-        diagLogger: createNoopDiagLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',

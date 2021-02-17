@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { getDiagLoggerFromConfig } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import {
   Detector,
   Resource,
@@ -46,7 +46,7 @@ class ProcessDetector implements Detector {
    */
   private _getResourceAttributes(
     processResource: ResourceAttributes,
-    config?: ResourceDetectionConfig
+    _config?: ResourceDetectionConfig
   ) {
     if (
       processResource[PROCESS_RESOURCE.NAME] === '' ||
@@ -54,7 +54,7 @@ class ProcessDetector implements Detector {
       processResource[PROCESS_RESOURCE.COMMAND] === '' ||
       processResource[PROCESS_RESOURCE.COMMAND_LINE] === ''
     ) {
-      getDiagLoggerFromConfig(config).debug(
+      diag.debug(
         'ProcessDetector failed: Unable to find required process resources. '
       );
       return Resource.empty();

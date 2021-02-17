@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  TextMapPropagator,
-  Sampler,
-  DiagLoggerConfig,
-} from '@opentelemetry/api';
+import { TextMapPropagator, Sampler } from '@opentelemetry/api';
 import { IdGenerator } from '@opentelemetry/core';
 
 import { ContextManager } from '@opentelemetry/context-base';
@@ -27,7 +23,7 @@ import { Resource } from '@opentelemetry/resources';
 /**
  * TracerConfig provides an interface for configuring a Basic Tracer.
  */
-export interface TracerConfig extends DiagLoggerConfig {
+export interface TracerConfig {
   /**
    * Sampler determines if a span should be recorded or should be a NoopSpan.
    */

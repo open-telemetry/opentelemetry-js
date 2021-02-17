@@ -198,9 +198,7 @@ describe('xhr', () => {
           xmlHttpRequestInstrumentation = new XMLHttpRequestInstrumentation(
             config
           );
-          webTracerProviderWithZone = new WebTracerProvider({
-            diagLogLevel: api.DiagLogLevel.ERROR,
-          });
+          webTracerProviderWithZone = new WebTracerProvider();
           registerInstrumentations({
             instrumentations: [xmlHttpRequestInstrumentation],
             tracerProvider: webTracerProviderWithZone,
@@ -728,9 +726,7 @@ describe('xhr', () => {
           );
           spyEntries.withArgs('resource').returns(resources);
 
-          webTracerWithZoneProvider = new WebTracerProvider({
-            diagLogLevel: api.DiagLogLevel.ERROR,
-          });
+          webTracerWithZoneProvider = new WebTracerProvider();
 
           registerInstrumentations({
             instrumentations: [new XMLHttpRequestInstrumentation()],

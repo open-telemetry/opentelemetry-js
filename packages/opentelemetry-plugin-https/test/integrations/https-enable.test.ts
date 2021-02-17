@@ -15,12 +15,7 @@
  */
 
 import { HttpPluginConfig, Http } from '@opentelemetry/plugin-http';
-import {
-  SpanKind,
-  Span,
-  context,
-  createNoopDiagLogger,
-} from '@opentelemetry/api';
+import { SpanKind, Span, context } from '@opentelemetry/api';
 import {
   HttpAttribute,
   GeneralAttribute,
@@ -130,10 +125,7 @@ describe('HttpsPlugin Integration tests', () => {
         done();
       });
     });
-    const diagLogger = createNoopDiagLogger();
-    const provider = new NodeTracerProvider({
-      diagLogger,
-    });
+    const provider = new NodeTracerProvider();
     provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
       memoryExporter.reset();
@@ -153,12 +145,7 @@ describe('HttpsPlugin Integration tests', () => {
       try {
         plugin.disable();
       } catch (e) {}
-      plugin.enable(
-        (https as unknown) as Http,
-        provider,
-        provider.diagLogger,
-        config
-      );
+      plugin.enable((https as unknown) as Http, provider, config);
     });
 
     after(() => {

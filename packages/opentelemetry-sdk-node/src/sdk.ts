@@ -64,12 +64,6 @@ export class NodeSDK {
     if (configuration.spanProcessor || configuration.traceExporter) {
       const tracerProviderConfig: NodeTracerConfig = {};
 
-      if (typeof configuration.diagLogLevel === 'number') {
-        tracerProviderConfig.diagLogLevel = configuration.diagLogLevel;
-      }
-      if (configuration.diagLogger) {
-        tracerProviderConfig.diagLogger = configuration.diagLogger;
-      }
       if (configuration.sampler) {
         tracerProviderConfig.sampler = configuration.sampler;
       }
@@ -100,12 +94,6 @@ export class NodeSDK {
       }
       if (typeof configuration.metricInterval === 'number') {
         meterConfig.interval = configuration.metricInterval;
-      }
-      if (typeof configuration.diagLogLevel === 'number') {
-        meterConfig.diagLogLevel = configuration.diagLogLevel;
-      }
-      if (configuration.diagLogger) {
-        meterConfig.diagLogger = configuration.diagLogger;
       }
 
       this.configureMeterProvider(meterConfig);

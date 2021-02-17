@@ -16,20 +16,25 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { createNoopDiagLogger } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import { parseHeaders } from '../../src/util';
 
 describe('utils', () => {
   describe('parseHeaders', () => {
+    beforeEach(() => {
+      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
+      diag.setLogger(null as any);
+    });
+
     it('should ignore undefined headers', () => {
-      const diagLogger = createNoopDiagLogger();
-      const spyWarn = sinon.stub(diagLogger, 'warn');
+      // Need to stub/spy on the underlying logger as the "diag" instance is global
+      const spyWarn = sinon.stub(diag.getLogger(), 'warn');
       const headers: Partial<Record<string, unknown>> = {
         foo1: undefined,
         foo2: 'bar',
         foo3: 1,
       };
-      const result = parseHeaders(headers, diagLogger);
+      const result = parseHeaders(headers);
       assert.deepStrictEqual(result, {
         foo2: 'bar',
         foo3: '1',

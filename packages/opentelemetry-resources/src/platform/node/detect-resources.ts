@@ -16,7 +16,7 @@
 
 import { Resource } from '../../Resource';
 import { ResourceDetectionConfig } from '../../config';
-import { DiagLogger, getDiagLoggerFromConfig } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import * as util from 'util';
 
 /**
@@ -30,23 +30,22 @@ export const detectResources = async (
 ): Promise<Resource> => {
   const internalConfig: ResourceDetectionConfig = Object.assign(config);
 
-  const theLogger = getDiagLoggerFromConfig(config);
   const resources: Array<Resource> = await Promise.all(
     (internalConfig.detectors || []).map(async d => {
       try {
         const resource = await d.detect(internalConfig);
-        theLogger.debug(`${d.constructor.name} found resource.`, resource);
+        diag.debug(`${d.constructor.name} found resource.`, resource);
         return resource;
       } catch (e) {
-        theLogger.debug(`${d.constructor.name} failed: ${e.message}`);
+        diag.debug(`${d.constructor.name} failed: ${e.message}`);
         return Resource.empty();
       }
     })
   );
-  // Log Resources only if there is a user-provided logger
-  if (config.diagLogger) {
-    logResources(config.diagLogger, resources);
-  }
+
+  // Future check if verbose logging is enabled issue #1903
+  logResources(resources);
+
   return resources.reduce(
     (acc, resource) => acc.merge(resource),
     Resource.createTelemetrySDKResource()
@@ -56,10 +55,9 @@ export const detectResources = async (
 /**
  * Writes debug information about the detected resources to the logger defined in the resource detection config, if one is provided.
  *
- * @param diagLogger The {@link DiagLogger} to write the debug information to.
  * @param resources The array of {@link Resource} that should be logged. Empty entried will be ignored.
  */
-const logResources = (diagLogger: DiagLogger, resources: Array<Resource>) => {
+const logResources = (resources: Array<Resource>) => {
   resources.forEach(resource => {
     // Print only populated resources
     if (Object.keys(resource.attributes).length > 0) {
@@ -69,7 +67,7 @@ const logResources = (diagLogger: DiagLogger, resources: Array<Resource>) => {
         sorted: true,
         compact: false,
       });
-      diagLogger.debug(resourceDebugString);
+      diag.verbose(resourceDebugString);
     }
   });
 };

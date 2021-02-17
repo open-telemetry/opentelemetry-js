@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { diag } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { ErrorHandler, loggingErrorHandler } from '../../src';
@@ -23,7 +24,8 @@ describe('loggingErrorHandler', () => {
   const errorStub = sinon.fake();
 
   beforeEach(() => {
-    handler = loggingErrorHandler({
+    handler = loggingErrorHandler();
+    diag.setLogger({
       error: errorStub,
     } as any);
   });
