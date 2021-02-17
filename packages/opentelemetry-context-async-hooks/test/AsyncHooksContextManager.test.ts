@@ -278,6 +278,22 @@ for (const contextManagerClass of [
           countDown();
         }, time2);
       });
+
+      it('should not influence other instances', () => {
+        otherContextManager = new contextManagerClass();
+        otherContextManager.enable();
+
+        const context = ROOT_CONTEXT.setValue(key1, 2);
+        const otherContext = ROOT_CONTEXT.setValue(key1, 3);
+        contextManager.with(context, () => {
+          assert.strictEqual(contextManager.active(), context);
+          assert.strictEqual(otherContextManager.active(), ROOT_CONTEXT);
+          otherContextManager.with(otherContext, () => {
+            assert.strictEqual(contextManager.active(), context);
+            assert.strictEqual(otherContextManager.active(), otherContext);
+          });
+        });
+      });
     });
 
     describe('.bind(function)', () => {
@@ -337,6 +353,22 @@ for (const contextManagerClass of [
             return done();
           }, 100);
         }, context);
+        fn();
+      });
+
+      it('should not influence other instances', () => {
+        otherContextManager = new contextManagerClass();
+        otherContextManager.enable();
+
+        const context = ROOT_CONTEXT.setValue(key1, 2);
+        const otherContext = ROOT_CONTEXT.setValue(key1, 3);
+        const fn = otherContextManager.bind(
+          contextManager.bind(() => {
+            assert.strictEqual(contextManager.active(), context);
+            assert.strictEqual(otherContextManager.active(), otherContext);
+          }, context),
+          otherContext
+        );
         fn();
       });
     });
@@ -433,7 +465,7 @@ for (const contextManagerClass of [
           otherContext
         );
         const handler = () => {
-          assert.deepStrictEqual(contextManager.active(), context);
+          assert.strictEqual(contextManager.active(), context);
           assert.strictEqual(otherContextManager.active(), otherContext);
         };
 
