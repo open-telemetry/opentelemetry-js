@@ -54,7 +54,7 @@ describe('NodeTracerProvider', () => {
     contextManager = new AsyncHooksContextManager();
     context.setGlobalContextManager(contextManager.enable());
     // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap warn which is already wrapped
-    diag.setLogger(null as any);
+    diag.setLogger();
   });
 
   afterEach(() => {
@@ -67,7 +67,7 @@ describe('NodeTracerProvider', () => {
   describe('constructor', () => {
     beforeEach(() => {
       // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap warn which is already wrapped
-      diag.setLogger(null as any);
+      diag.setLogger();
     });
 
     it('should construct an instance with required only options', () => {

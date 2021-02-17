@@ -61,7 +61,7 @@ describe('CollectorMetricExporter - common', () => {
 
     beforeEach(async () => {
       // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger(null as any);
+      diag.setLogger();
       onInitSpy = sinon.stub(CollectorMetricExporter.prototype, 'onInit');
       collectorExporterConfig = {
         hostname: 'foo',
@@ -201,7 +201,7 @@ describe('CollectorMetricExporter - common', () => {
     let onShutdownSpy: any;
     beforeEach(() => {
       // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger(null as any);
+      diag.setLogger();
       onShutdownSpy = sinon.stub(
         CollectorMetricExporter.prototype,
         'onShutdown'

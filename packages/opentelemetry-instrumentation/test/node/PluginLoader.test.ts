@@ -136,7 +136,7 @@ describe('PluginLoader', () => {
   describe('.load()', () => {
     beforeEach(() => {
       // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger(null as any);
+      diag.setLogger();
     });
     afterEach(() => {
       delete process.env[ENV_PLUGIN_DISABLED_LIST];

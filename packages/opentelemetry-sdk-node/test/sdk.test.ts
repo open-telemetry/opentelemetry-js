@@ -361,7 +361,7 @@ describe('Node SDK', () => {
 
       beforeEach(() => {
         diag.setLogLevel(DiagLogLevel.VERBOSE);
-        diag.setLogger(null as any);
+        diag.setLogger();
       });
 
       it('prints detected resources and debug messages to the logger', async () => {
@@ -409,7 +409,7 @@ describe('Node SDK', () => {
         beforeEach(() => {
           delete process.env.OTEL_RESOURCE_ATTRIBUTES;
           diag.setLogLevel(DiagLogLevel.DEBUG);
-          diag.setLogger(null as any);
+          diag.setLogger();
         });
 
         it('prints correct error messages when EnvDetector has no env variable', async () => {
@@ -436,7 +436,7 @@ describe('Node SDK', () => {
         beforeEach(() => {
           process.env.OTEL_RESOURCE_ATTRIBUTES = 'bad=~attribute';
           diag.setLogLevel(DiagLogLevel.DEBUG);
-          diag.setLogger(null as any);
+          diag.setLogger();
         });
 
         it('prints correct error messages when EnvDetector has an invalid variable', async () => {

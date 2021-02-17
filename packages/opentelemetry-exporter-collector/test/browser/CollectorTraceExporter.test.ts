@@ -58,7 +58,7 @@ describe('CollectorTraceExporter - web', () => {
   describe('export', () => {
     beforeEach(() => {
       // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger(null as any);
+      diag.setLogger();
       diag.setLogLevel(DiagLogLevel.VERBOSE);
       collectorExporterConfig = {
         hostname: 'foo',
@@ -243,7 +243,7 @@ describe('CollectorTraceExporter - web', () => {
 
     beforeEach(() => {
       // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger(null as any);
+      diag.setLogger();
       diag.setLogLevel(DiagLogLevel.VERBOSE);
       collectorExporterConfig = {
         headers: customHeaders,

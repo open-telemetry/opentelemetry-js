@@ -50,7 +50,7 @@ describe('CollectorTraceExporter - node with json over http', () => {
   describe('instance', () => {
     beforeEach(() => {
       // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger(null as any);
+      diag.setLogger();
     });
     it('should warn about metadata when using json', () => {
       const metadata = 'foo';
@@ -69,7 +69,7 @@ describe('CollectorTraceExporter - node with json over http', () => {
   describe('export', () => {
     beforeEach(() => {
       // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger(null as any);
+      diag.setLogger();
       spyRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
       spyWrite = sinon.stub(fakeRequest, 'write');
       collectorExporterConfig = {

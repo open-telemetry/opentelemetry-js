@@ -79,7 +79,7 @@ describe('CollectorMetricExporter - node with json over http', () => {
   describe('export', () => {
     beforeEach(async () => {
       // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger(null as any);
+      diag.setLogger();
       spyRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
       spyWrite = sinon.stub(fakeRequest, 'write');
       collectorExporterConfig = {

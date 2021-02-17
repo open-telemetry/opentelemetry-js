@@ -190,6 +190,13 @@ describe('API', () => {
     });
 
     diagLoggerFunctions.forEach(fName => {
+      it(`no argument logger ${fName} message doesn't throw`, () => {
+        diag.setLogger();
+        assert.doesNotThrow(() => {
+          diag[fName](`${fName} message`);
+        });
+      });
+
       it(`null logger ${fName} message doesn't throw`, () => {
         diag.setLogger(null as any);
         assert.doesNotThrow(() => {

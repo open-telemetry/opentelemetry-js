@@ -99,7 +99,7 @@ export class DiagAPI implements DiagLogger {
       return _logger;
     };
 
-    self.setLogger = (logger: DiagLogger): DiagLogger => {
+    self.setLogger = (logger?: DiagLogger): DiagLogger => {
       const prevLogger = _logger;
       if (!logger || logger !== self) {
         // Simple special case to avoid any possible infinite recursion on the logging functions
@@ -133,10 +133,10 @@ export class DiagAPI implements DiagLogger {
 
   /**
    * Set the DiagLogger instance
-   * @param logger - The DiagLogger instance to set as the default logger
+   * @param logger - [Optional] The DiagLogger instance to set as the default logger, if not provided it will set it back as a noop
    * @returns The previously registered DiagLogger
    */
-  public setLogger!: (logger: DiagLogger) => DiagLogger;
+  public setLogger!: (logger?: DiagLogger) => DiagLogger;
 
   /** Set the default maximum diagnostic logging level */
   public setLogLevel!: (maxLogLevel: DiagLogLevel) => void;

@@ -23,7 +23,7 @@ describe('utils', () => {
   describe('parseHeaders', () => {
     beforeEach(() => {
       // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger(null as any);
+      diag.setLogger();
     });
 
     it('should ignore undefined headers', () => {

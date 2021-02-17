@@ -89,7 +89,7 @@ describe('CollectorMetricExporter - web', () => {
     describe('when "sendBeacon" is available', () => {
       beforeEach(() => {
         // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-        diag.setLogger(null as any);
+        diag.setLogger();
         diag.setLogLevel(DiagLogLevel.VERBOSE);
         collectorExporter = new CollectorMetricExporter({
           url: 'http://foo.bar.com',
@@ -202,7 +202,7 @@ describe('CollectorMetricExporter - web', () => {
       let server: any;
       beforeEach(() => {
         // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-        diag.setLogger(null as any);
+        diag.setLogger();
         diag.setLogLevel(DiagLogLevel.VERBOSE);
         (window.navigator as any).sendBeacon = false;
         collectorExporter = new CollectorMetricExporter({
@@ -340,7 +340,7 @@ describe('CollectorMetricExporter - web', () => {
 
     beforeEach(() => {
       // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger(null as any);
+      diag.setLogger();
       diag.setLogLevel(DiagLogLevel.VERBOSE);
       collectorExporterConfig = {
         headers: customHeaders,

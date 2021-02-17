@@ -121,7 +121,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
 
     beforeEach(async () => {
       // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger(null as any);
+      diag.setLogger();
       const credentials = params.useTLS
         ? grpc.credentials.createSsl(
             fs.readFileSync('./test/certs/ca.crt'),

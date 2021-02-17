@@ -56,7 +56,7 @@ describe('CollectorMetricExporter - node with proto over http', () => {
   describe('export', () => {
     beforeEach(async () => {
       // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger(null as any);
+      diag.setLogger();
       collectorExporterConfig = {
         headers: {
           foo: 'bar',

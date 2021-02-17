@@ -5,7 +5,7 @@ const opentelemetry = require('../packages/opentelemetry-api');
 const { BasicTracerProvider, BatchSpanProcessor, InMemorySpanExporter, SimpleSpanProcessor } = require('../packages/opentelemetry-tracing');
 
 // Clear any previous global logger
-opentelemetry.diag.setLogger(null);
+opentelemetry.diag.setLogger();
 
 const setups = [
   {

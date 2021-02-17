@@ -15,7 +15,6 @@
  */
 
 import * as api from '@opentelemetry/api-metrics';
-import { getEnv } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { Processor } from './export/Processor';
 import { MetricExporter } from './export/types';
@@ -36,9 +35,7 @@ export interface MeterConfig {
 }
 
 /** Default Meter configuration. */
-export const DEFAULT_CONFIG = {
-  diagLogLevel: getEnv().OTEL_LOG_LEVEL,
-};
+export const DEFAULT_CONFIG = {};
 
 /** The default metric creation options value. */
 export const DEFAULT_METRIC_OPTIONS = {

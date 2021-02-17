@@ -80,7 +80,7 @@ describe('Meter', () => {
 
   beforeEach(() => {
     // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap warn which is already wrapped
-    diag.setLogger(null as any);
+    diag.setLogger();
     meter = new MeterProvider().getMeter('test-meter');
   });
 
@@ -774,7 +774,7 @@ describe('Meter', () => {
   describe('#SumObserverMetric', () => {
     beforeEach(() => {
       // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger(null as any);
+      diag.setLogger();
     });
 
     it('should create an Sum observer', () => {
@@ -919,7 +919,7 @@ describe('Meter', () => {
   describe('#ValueObserver', () => {
     beforeEach(() => {
       // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger(null as any);
+      diag.setLogger();
     });
 
     it('should create a value observer', () => {
@@ -1006,7 +1006,7 @@ describe('Meter', () => {
   describe('#UpDownSumObserverMetric', () => {
     beforeEach(() => {
       // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger(null as any);
+      diag.setLogger();
     });
 
     it('should create an UpDownSum observer', () => {
