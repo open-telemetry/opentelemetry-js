@@ -540,7 +540,7 @@ export function ensureWebResourceIsCorrect(
       {
         key: 'version',
         value: {
-          doubleValue: 1,
+          intValue: 1,
         },
       },
       {
