@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ### :boom: Breaking Change
 
+* `opentelemetry-api-metrics`, `opentelemetry-api`, `opentelemetry-core`, `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`, `opentelemetry-exporter-jaeger`, `opentelemetry-exporter-prometheus`, `opentelemetry-exporter-zipkin`, `opentelemetry-grpc-utils`, `opentelemetry-instrumentation-fetch`, `opentelemetry-instrumentation-grpc`, `opentelemetry-instrumentation-http`, `opentelemetry-instrumentation-xml-http-request`, `opentelemetry-instrumentation`, `opentelemetry-metrics`, `opentelemetry-node`, `opentelemetry-plugin-grpc-js`, `opentelemetry-plugin-grpc`, `opentelemetry-plugin-http`, `opentelemetry-plugin-https`, `opentelemetry-resource-detector-aws`, `opentelemetry-resource-detector-gcp`, `opentelemetry-resources`, `opentelemetry-sdk-node`, `opentelemetry-shim-opentracing`, `opentelemetry-tracing`, `opentelemetry-web`
+  * [#1925](https://github.com/open-telemetry/opentelemetry-js/pull/1925) feat(diag-logger): replace logger with diag logger ([@MSNev](https://github.com/MSNev))
 * `opentelemetry-api`, `opentelemetry-instrumentation-http`, `opentelemetry-node`, `opentelemetry-plugin-http`, `opentelemetry-tracing`
   * [#1899](https://github.com/open-telemetry/opentelemetry-js/pull/1899) chore: create NoopSpan instead reusing NOOP_SPAN ([@Flarna](https://github.com/Flarna))
 * `opentelemetry-tracing`
@@ -23,6 +25,11 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* `opentelemetry-exporter-prometheus`
+  * [#1857](https://github.com/open-telemetry/opentelemetry-js/pull/1857) feat: add prometheus exporter host and port env vars ([@naseemkullah](https://github.com/naseemkullah))
+  * [#1879](https://github.com/open-telemetry/opentelemetry-js/pull/1879) feat(prometheus): add `getMetricsRequestHandler`-method to Prometheus ([@weyert](https://github.com/weyert))
+* `opentelemetry-core`, `opentelemetry-tracing`
+  * [#1918](https://github.com/open-telemetry/opentelemetry-js/pull/1918) chore: batch processor, aligning with latest spec changes for environments variables ([@obecny](https://github.com/obecny))
 * `opentelemetry-instrumentation-grpc`
   * [#1806](https://github.com/open-telemetry/opentelemetry-js/pull/1806) feat: merge grpc-js into grpc instrumentation #1657 ([@vmarchaud](https://github.com/vmarchaud))
 * `opentelemetry-api`, `opentelemetry-core`
@@ -31,8 +38,6 @@ All notable changes to this project will be documented in this file.
   * [#1920](https://github.com/open-telemetry/opentelemetry-js/pull/1920) chore: adding compatibility matrix for core and contrib versions ([@obecny](https://github.com/obecny))
 * `opentelemetry-api`, `opentelemetry-context-async-hooks`, `opentelemetry-context-base`, `opentelemetry-context-zone-peer-dep`, `opentelemetry-tracing`, `opentelemetry-web`
   * [#1883](https://github.com/open-telemetry/opentelemetry-js/pull/1883) feat: add support to forward args in context.with ([@Flarna](https://github.com/Flarna))
-* `opentelemetry-exporter-prometheus`
-  * [#1879](https://github.com/open-telemetry/opentelemetry-js/pull/1879) feat(prometheus): add `getMetricsRequestHandler`-method to Prometheus ([@weyert](https://github.com/weyert))
 * `opentelemetry-api`, `opentelemetry-core`, `opentelemetry-shim-opentracing`
   * [#1876](https://github.com/open-telemetry/opentelemetry-js/pull/1876) refactor!: specification compliant baggage ([@dyladan](https://github.com/dyladan))
 
@@ -43,12 +48,14 @@ All notable changes to this project will be documented in this file.
 * `opentelemetry-api`
   * [#1901](https://github.com/open-telemetry/opentelemetry-js/pull/1901) doc: correct tracer docs ([@Flarna](https://github.com/Flarna))
 
-### Committers: 6
+### Committers: 8
 
 * Bartlomiej Obecny ([@obecny](https://github.com/obecny))
 * Daniel Dyla ([@dyladan](https://github.com/dyladan))
 * Gerhard Stöbich ([@Flarna](https://github.com/Flarna))
+* Naseem ([@naseemkullah](https://github.com/naseemkullah))
 * Nev ([@MSNev](https://github.com/MSNev))
+* Srikanth Chekuri ([@lonewolf3739](https://github.com/lonewolf3739))
 * Valentin Marchaud ([@vmarchaud](https://github.com/vmarchaud))
 * Weyert de Boer ([@weyert](https://github.com/weyert))
 
