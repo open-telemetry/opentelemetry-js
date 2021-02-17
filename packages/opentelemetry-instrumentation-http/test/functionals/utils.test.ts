@@ -291,6 +291,7 @@ describe('Utility', () => {
     it('should correctly parse the middleware stack if present', () => {
       const request = {
         __ot_middlewares: ['/test', '/toto', '/'],
+        socket: {},
       } as IncomingMessage & { __ot_middlewares?: string[] };
 
       const attributes = utils.getIncomingRequestAttributesOnResponse(request, {
@@ -300,7 +301,9 @@ describe('Utility', () => {
     });
 
     it('should succesfully process without middleware stack', () => {
-      const request = {} as IncomingMessage;
+      const request = {
+        socket: {},
+      } as IncomingMessage;
       const attributes = utils.getIncomingRequestAttributesOnResponse(request, {
         socket: {},
       } as ServerResponse & { socket: Socket });
