@@ -19,7 +19,6 @@ import {
   NoopTracerProvider,
   SpanKind,
   propagation,
-  NoopLogger,
   getSpan,
   setSpan,
 } from '@opentelemetry/api';
@@ -416,7 +415,7 @@ export const runTests = (
       });
 
       it('should patch client constructor makeClientConstructor() and makeGenericClientConstructor()', () => {
-        plugin.enable(grpc, new NoopTracerProvider(), new NoopLogger());
+        plugin.enable(grpc, new NoopTracerProvider());
         (plugin['_moduleExports'] as any).makeGenericClientConstructor({});
         assert.ok(
           plugin['_moduleExports'].makeGenericClientConstructor.__wrapped
@@ -666,8 +665,7 @@ export const runTests = (
     };
 
     describe('enable()', () => {
-      const logger = new NoopLogger();
-      const provider = new NodeTracerProvider({ logger });
+      const provider = new NodeTracerProvider();
       provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
       beforeEach(() => {
         memoryExporter.reset();
@@ -677,7 +675,7 @@ export const runTests = (
         const config = {
           // TODO: add plugin options here once supported
         };
-        const patchedGrpc = plugin.enable(grpc, provider, logger, config);
+        const patchedGrpc = plugin.enable(grpc, provider, config);
 
         const packageDefinition = await protoLoader.load(PROTO_PATH, options);
         const proto = patchedGrpc.loadPackageDefinition(packageDefinition)
@@ -714,15 +712,14 @@ export const runTests = (
     });
 
     describe('disable()', () => {
-      const logger = new NoopLogger();
-      const provider = new NodeTracerProvider({ logger });
+      const provider = new NodeTracerProvider();
       provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
       beforeEach(() => {
         memoryExporter.reset();
       });
 
       before(async () => {
-        plugin.enable(grpc, provider, logger);
+        plugin.enable(grpc, provider);
         plugin.disable();
 
         const packageDefinition = await protoLoader.load(PROTO_PATH, options);
@@ -747,8 +744,7 @@ export const runTests = (
     });
 
     describe('Test filtering requests using metadata', () => {
-      const logger = new NoopLogger();
-      const provider = new NodeTracerProvider({ logger });
+      const provider = new NodeTracerProvider();
       provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
       beforeEach(() => {
         memoryExporter.reset();
@@ -758,7 +754,7 @@ export const runTests = (
         const config = {
           // TODO: add plugin options here once supported
         };
-        const patchedGrpc = plugin.enable(grpc, provider, logger, config);
+        const patchedGrpc = plugin.enable(grpc, provider, config);
 
         const packageDefinition = await protoLoader.load(PROTO_PATH, options);
         const proto = patchedGrpc.loadPackageDefinition(packageDefinition)
@@ -778,8 +774,7 @@ export const runTests = (
     });
 
     describe('Test filtering requests using options', () => {
-      const logger = new NoopLogger();
-      const provider = new NodeTracerProvider({ logger });
+      const provider = new NodeTracerProvider();
       const checkSpans: { [key: string]: boolean } = {
         unaryMethod: false,
         UnaryMethod: false,
@@ -804,7 +799,6 @@ export const runTests = (
         const patchedGrpc = plugin.enable(
           grpc,
           provider,
-          logger,
           config as PluginConfig
         );
 

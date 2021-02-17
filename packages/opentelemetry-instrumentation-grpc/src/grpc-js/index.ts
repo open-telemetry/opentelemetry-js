@@ -40,6 +40,7 @@ import {
   propagation,
   ROOT_CONTEXT,
   setSpan,
+  diag,
 } from '@opentelemetry/api';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import {
@@ -75,7 +76,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
         '@grpc/grpc-js',
         ['1.*'],
         (moduleExports, version) => {
-          this._logger.debug(`Applying patch for @grpc/grpc-js@${version}`);
+          diag.debug(`Applying patch for @grpc/grpc-js@${version}`);
           if (isWrapped(moduleExports.Server.prototype.register)) {
             this._unwrap(moduleExports.Server.prototype, 'register');
           }
@@ -114,7 +115,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
         },
         (moduleExports, version) => {
           if (moduleExports === undefined) return;
-          this._logger.debug(`Removing patch for @grpc/grpc-js@${version}`);
+          diag.debug(`Removing patch for @grpc/grpc-js@${version}`);
 
           this._unwrap(moduleExports.Server.prototype, 'register');
           this._unwrap(moduleExports, 'makeClientConstructor');
@@ -135,7 +136,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
     const instrumentation = this;
     return (originalRegister: ServerRegisterFunction) => {
       const config = this._config;
-      instrumentation._logger.debug('patched gRPC server');
+      diag.debug('patched gRPC server');
       return function register<RequestType, ResponseType>(
         this: grpcJs.Server,
         name: string,
@@ -185,10 +186,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
                 kind: SpanKind.SERVER,
               };
 
-              instrumentation._logger.debug(
-                'patch func: %s',
-                JSON.stringify(spanOptions)
-              );
+              diag.debug('patch func: %s', JSON.stringify(spanOptions));
 
               context.with(
                 propagation.extract(ROOT_CONTEXT, call.metadata, {
@@ -233,7 +231,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
   ) => MakeClientConstructorFunction {
     const instrumentation = this;
     return (original: MakeClientConstructorFunction) => {
-      instrumentation._logger.debug('patching client');
+      diag.debug('patching client');
       return function makeClientConstructor(
         this: typeof grpcJs.Client,
         methods: grpcJs.ServiceDefinition,
@@ -257,7 +255,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
    */
   private _patchLoadPackageDefinition(grpcClient: typeof grpcJs) {
     const instrumentation = this;
-    instrumentation._logger.debug('patching loadPackageDefinition');
+    diag.debug('patching loadPackageDefinition');
     return (original: typeof grpcJs.loadPackageDefinition) => {
       return function patchedLoadPackageDefinition(
         this: null,
@@ -281,7 +279,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
   ): (original: GrpcClientFunc) => () => EventEmitter {
     const instrumentation = this;
     return (original: GrpcClientFunc) => {
-      instrumentation._logger.debug('patch all client methods');
+      diag.debug('patch all client methods');
       return function clientMethodTrace(this: grpcJs.Client) {
         const name = `grpc.${original.path.replace('/', '')}`;
         const args = [...arguments];

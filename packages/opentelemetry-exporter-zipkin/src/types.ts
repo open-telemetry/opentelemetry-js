@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
 import { ExportResult } from '@opentelemetry/core';
 
 /**
@@ -22,7 +21,6 @@ import { ExportResult } from '@opentelemetry/core';
  */
 export interface ExporterConfig {
   headers?: { [key: string]: string };
-  logger?: api.Logger;
   serviceName?: string;
   url?: string;
   // Optional mapping overrides for OpenTelemetry status code and description.

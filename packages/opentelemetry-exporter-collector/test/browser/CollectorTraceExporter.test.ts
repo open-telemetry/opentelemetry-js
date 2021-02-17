@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/api';
+import { diag, DiagLogLevel } from '@opentelemetry/api';
 import { ExportResultCode } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
@@ -57,9 +57,11 @@ describe('CollectorTraceExporter - web', () => {
 
   describe('export', () => {
     beforeEach(() => {
+      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
+      diag.setLogger();
+      diag.setLogLevel(DiagLogLevel.VERBOSE);
       collectorExporterConfig = {
         hostname: 'foo',
-        logger: new NoopLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
@@ -109,14 +111,9 @@ describe('CollectorTraceExporter - web', () => {
       });
 
       it('should log the successful message', done => {
-        const spyLoggerDebug = sinon.stub(
-          collectorTraceExporter.logger,
-          'debug'
-        );
-        const spyLoggerError = sinon.stub(
-          collectorTraceExporter.logger,
-          'error'
-        );
+        // Need to stub/spy on the underlying logger as the "diag" instance is global
+        const spyLoggerDebug = sinon.stub(diag.getLogger(), 'debug');
+        const spyLoggerError = sinon.stub(diag.getLogger(), 'error');
         spyBeacon.restore();
         spyBeacon = sinon.stub(window.navigator, 'sendBeacon').returns(true);
 
@@ -191,14 +188,9 @@ describe('CollectorTraceExporter - web', () => {
       });
 
       it('should log the successful message', done => {
-        const spyLoggerDebug = sinon.stub(
-          collectorTraceExporter.logger,
-          'debug'
-        );
-        const spyLoggerError = sinon.stub(
-          collectorTraceExporter.logger,
-          'error'
-        );
+        // Need to stub/spy on the underlying logger as the "diag" instance is global
+        const spyLoggerDebug = sinon.stub(diag.getLogger(), 'debug');
+        const spyLoggerError = sinon.stub(diag.getLogger(), 'error');
 
         collectorTraceExporter.export(spans, () => {});
 
@@ -250,8 +242,10 @@ describe('CollectorTraceExporter - web', () => {
     };
 
     beforeEach(() => {
+      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
+      diag.setLogger();
+      diag.setLogLevel(DiagLogLevel.VERBOSE);
       collectorExporterConfig = {
-        logger: new NoopLogger(),
         headers: customHeaders,
       };
       server = sinon.fakeServer.create();

@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  NoopTracerProvider,
-  NoopLogger,
-  NOOP_TRACER,
-} from '@opentelemetry/api';
+import { NoopTracerProvider, NOOP_TRACER } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import type { AddressInfo } from 'net';
@@ -27,8 +23,7 @@ import * as sinon from 'sinon';
 import { HttpInstrumentation } from '../../src';
 import { isWrapped } from '@opentelemetry/instrumentation';
 
-const logger = new NoopLogger();
-const instrumentation = new HttpInstrumentation({ logger });
+const instrumentation = new HttpInstrumentation();
 instrumentation.enable();
 instrumentation.disable();
 

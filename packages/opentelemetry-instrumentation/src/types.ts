@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Logger, TracerProvider } from '@opentelemetry/api';
+import { TracerProvider } from '@opentelemetry/api';
 import { MeterProvider } from '@opentelemetry/api-metrics';
 
 /** Interface Instrumentation to apply patch. */
@@ -59,8 +59,6 @@ export interface InstrumentationConfig {
    * @default true
    */
   enabled?: boolean;
-
-  logger?: Logger;
 
   /**
    * Path of the trace plugin to load.

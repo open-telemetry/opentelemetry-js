@@ -21,6 +21,8 @@ import {
   propagation,
   ProxyTracerProvider,
   trace,
+  diag,
+  DiagLogLevel,
 } from '@opentelemetry/api';
 import { metrics, NoopMeterProvider } from '@opentelemetry/api-metrics';
 import {
@@ -353,24 +355,29 @@ describe('Node SDK', () => {
         regex: RegExp
       ): boolean => {
         return mockedFunction.getCalls().some(call => {
-          return regex.test(call.args.toString());
+          return call.args.some(callArgs => regex.test(callArgs.toString()));
         });
       };
+
+      beforeEach(() => {
+        diag.setLogLevel(DiagLogLevel.VERBOSE);
+        diag.setLogger();
+      });
 
       it('prints detected resources and debug messages to the logger', async () => {
         const sdk = new NodeSDK({
           autoDetectResources: true,
         });
+
         // This test depends on the env detector to be functioning as intended
         const mockedLoggerMethod = Sinon.fake();
-        await sdk.detectResources({
-          logger: {
-            debug: mockedLoggerMethod,
-            info: Sinon.fake(),
-            warn: Sinon.fake(),
-            error: Sinon.fake(),
-          },
-        });
+        const mockedVerboseLoggerMethod = Sinon.fake();
+        diag.setLogger({
+          debug: mockedLoggerMethod,
+          verbose: mockedVerboseLoggerMethod,
+        } as any);
+
+        await sdk.detectResources();
 
         // Test for AWS and GCP Detector failure
         assert.ok(
@@ -392,7 +399,7 @@ describe('Node SDK', () => {
         // Regex formatting accounts for whitespace variations in util.inspect output over different node versions
         assert.ok(
           callArgsMatches(
-            mockedLoggerMethod,
+            mockedVerboseLoggerMethod,
             /{\s+'service\.instance\.id':\s+'627cc493',\s+'service\.name':\s+'my-service',\s+'service\.namespace':\s+'default',\s+'service\.version':\s+'0\.0\.1'\s+}\s*/
           )
         );
@@ -401,6 +408,8 @@ describe('Node SDK', () => {
       describe('with missing environment variable', () => {
         beforeEach(() => {
           delete process.env.OTEL_RESOURCE_ATTRIBUTES;
+          diag.setLogLevel(DiagLogLevel.DEBUG);
+          diag.setLogger();
         });
 
         it('prints correct error messages when EnvDetector has no env variable', async () => {
@@ -408,14 +417,11 @@ describe('Node SDK', () => {
             autoDetectResources: true,
           });
           const mockedLoggerMethod = Sinon.fake();
-          await sdk.detectResources({
-            logger: {
-              debug: mockedLoggerMethod,
-              info: Sinon.fake(),
-              warn: Sinon.fake(),
-              error: Sinon.fake(),
-            },
-          });
+          diag.setLogger({
+            debug: mockedLoggerMethod,
+          } as any);
+
+          await sdk.detectResources();
 
           assert.ok(
             callArgsContains(
@@ -429,6 +435,8 @@ describe('Node SDK', () => {
       describe('with a faulty environment variable', () => {
         beforeEach(() => {
           process.env.OTEL_RESOURCE_ATTRIBUTES = 'bad=~attribute';
+          diag.setLogLevel(DiagLogLevel.DEBUG);
+          diag.setLogger();
         });
 
         it('prints correct error messages when EnvDetector has an invalid variable', async () => {
@@ -436,14 +444,11 @@ describe('Node SDK', () => {
             autoDetectResources: true,
           });
           const mockedLoggerMethod = Sinon.fake();
-          await sdk.detectResources({
-            logger: {
-              debug: mockedLoggerMethod,
-              info: Sinon.fake(),
-              warn: Sinon.fake(),
-              error: Sinon.fake(),
-            },
-          });
+          diag.setLogger({
+            debug: mockedLoggerMethod,
+          } as any);
+
+          await sdk.detectResources();
 
           assert.ok(
             callArgsContains(

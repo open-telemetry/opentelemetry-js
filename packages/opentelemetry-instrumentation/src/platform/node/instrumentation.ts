@@ -20,6 +20,7 @@ import * as RequireInTheMiddle from 'require-in-the-middle';
 import * as semver from 'semver';
 import { InstrumentationAbstract } from '../../instrumentation';
 import { InstrumentationModuleDefinition } from './types';
+import { diag } from '@opentelemetry/api';
 
 /**
  * Base abstract class for instrumenting node plugins
@@ -47,7 +48,7 @@ export abstract class InstrumentationBase<T = any>
     this._modules = (modules as InstrumentationModuleDefinition<T>[]) || [];
 
     if (this._modules.length === 0) {
-      this._logger.warn(
+      diag.warn(
         'No modules instrumentation has been defined,' +
           ' nothing will be patched'
       );

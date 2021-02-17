@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Tracer, Logger, TracerProvider } from '@opentelemetry/api';
+import { Tracer, TracerProvider } from '@opentelemetry/api';
 import { Plugin, PluginConfig, PluginInternalFiles } from '../trace/Plugin';
 
 /** This class represent the base to patch plugin. */
@@ -27,7 +27,6 @@ export abstract class BaseAbstractPlugin<T> implements Plugin<T> {
   protected _config!: PluginConfig;
   protected _internalFilesExports!: { [module: string]: unknown }; // output for internalFilesExports
   protected readonly _internalFilesList?: PluginInternalFiles; // required for internalFilesExports
-  protected _logger!: Logger;
   protected _moduleExports!: T;
   protected _tracer!: Tracer;
 
@@ -43,7 +42,6 @@ export abstract class BaseAbstractPlugin<T> implements Plugin<T> {
   abstract enable(
     moduleExports: T,
     tracerProvider: TracerProvider,
-    logger: Logger,
     config?: PluginConfig
   ): T;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Logger, TracerProvider } from '@opentelemetry/api';
+import { TracerProvider, diag } from '@opentelemetry/api';
 import {
   Plugin,
   PluginConfig,
@@ -32,7 +32,6 @@ export abstract class BasePlugin<T>
   enable(
     moduleExports: T,
     tracerProvider: TracerProvider,
-    logger: Logger,
     config?: PluginConfig
   ): T {
     this._moduleExports = moduleExports;
@@ -40,7 +39,6 @@ export abstract class BasePlugin<T>
       this._tracerName,
       this._tracerVersion
     );
-    this._logger = logger;
     this._internalFilesExports = this._loadInternalFilesExports();
     if (config) this._config = config;
     return this.patch();
@@ -61,7 +59,7 @@ export abstract class BasePlugin<T>
     if (!this.version || !this.moduleName || !this._basedir) {
       // log here because internalFilesList was provided, so internal file loading
       // was expected to be working
-      this._logger.debug(
+      diag.debug(
         'loadInternalFiles failed because one of the required fields was missing: moduleName=%s, version=%s, basedir=%s',
         this.moduleName,
         this.version,
@@ -70,12 +68,12 @@ export abstract class BasePlugin<T>
       return {};
     }
     const extraModules: PluginInternalFiles = {};
-    this._logger.debug('loadInternalFiles %o', this._internalFilesList);
+    diag.debug('loadInternalFiles %o', this._internalFilesList);
     Object.keys(this._internalFilesList).forEach(versionRange => {
       this._loadInternalModule(versionRange, extraModules);
     });
     if (Object.keys(extraModules).length === 0) {
-      this._logger.debug(
+      diag.debug(
         'No internal files could be loaded for %s@%s',
         this.moduleName,
         this.version
@@ -90,7 +88,7 @@ export abstract class BasePlugin<T>
   ): void {
     if (semver.satisfies(this.version!, versionRange)) {
       if (Object.keys(outExtraModules).length > 0) {
-        this._logger.warn(
+        diag.warn(
           'Plugin for %s@%s, has overlap version range (%s) for internal files: %o',
           this.moduleName,
           this.version,
@@ -114,13 +112,13 @@ export abstract class BasePlugin<T>
     if (!extraModulesList) return;
     Object.keys(extraModulesList).forEach(moduleName => {
       try {
-        this._logger.debug('loading File %s', extraModulesList[moduleName]);
+        diag.debug('loading File %s', extraModulesList[moduleName]);
         outExtraModules[moduleName] = require(path.join(
           basedir,
           extraModulesList[moduleName]
         ));
       } catch (e) {
-        this._logger.error(
+        diag.error(
           'Could not load internal file %s of module %s. Error: %s',
           path.join(basedir, extraModulesList[moduleName]),
           this.moduleName,

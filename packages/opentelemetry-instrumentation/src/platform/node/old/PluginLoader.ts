@@ -16,7 +16,7 @@
 
 // This is copy from previous version, should be removed after plugins are gone
 
-import { Logger, TracerProvider } from '@opentelemetry/api';
+import { TracerProvider, diag } from '@opentelemetry/api';
 import * as RequireInTheMiddle from 'require-in-the-middle';
 import { OldClassPlugin, OldPluginConfig } from '../../../types_plugin_only';
 import * as utils from './utils';
@@ -83,7 +83,7 @@ export class PluginLoader {
   private _hookState = HookState.UNINITIALIZED;
 
   /** Constructs a new PluginLoader instance. */
-  constructor(readonly provider: TracerProvider, readonly logger: Logger) {}
+  constructor(readonly provider: TracerProvider) {}
 
   /**
    * Loads a list of plugins. Each plugin module should implement the core
@@ -116,7 +116,7 @@ export class PluginLoader {
         }
       });
       if (requiredModulesToHook.length > 0) {
-        this.logger.warn(
+        diag.warn(
           `Some modules (${requiredModulesToHook.join(
             ', '
           )}) were already required when their respective plugin was loaded, some plugins might not work. Make sure the SDK is setup before you require in other modules.`
@@ -138,31 +138,29 @@ export class PluginLoader {
           version = process.versions.node;
         } else {
           // Get the module version.
-          version = utils.getPackageVersion(this.logger, baseDir);
+          version = utils.getPackageVersion(baseDir);
         }
 
         // Skip loading of all modules if '*' is provided
         if (modulesToIgnore === DISABLE_ALL_PLUGINS) {
-          this.logger.info(
+          diag.info(
             `PluginLoader#load: skipped patching module ${name} because all plugins are disabled (${ENV_PLUGIN_DISABLED_LIST})`
           );
           return exports;
         }
 
         if (modulesToIgnore.includes(name)) {
-          this.logger.info(
+          diag.info(
             `PluginLoader#load: skipped patching module ${name} because it was on the ignore list (${ENV_PLUGIN_DISABLED_LIST})`
           );
           return exports;
         }
 
-        this.logger.info(
-          `PluginLoader#load: trying to load ${name}@${version}`
-        );
+        diag.info(`PluginLoader#load: trying to load ${name}@${version}`);
 
         if (!version) return exports;
 
-        this.logger.debug(
+        diag.debug(
           `PluginLoader#load: applying patch to ${name}@${version} using ${modulePath} module`
         );
 
@@ -171,13 +169,13 @@ export class PluginLoader {
           const plugin: OldClassPlugin =
             modulePlugin ?? require(modulePath).plugin;
           if (!utils.isSupportedVersion(version, plugin.supportedVersions)) {
-            this.logger.warn(
+            diag.warn(
               `PluginLoader#load: Plugin ${name} only supports module ${plugin.moduleName} with the versions: ${plugin.supportedVersions}`
             );
             return exports;
           }
           if (plugin.moduleName !== name) {
-            this.logger.error(
+            diag.error(
               `PluginLoader#load: Entry ${name} use a plugin that instruments ${plugin.moduleName}`
             );
             return exports;
@@ -185,9 +183,9 @@ export class PluginLoader {
 
           this.plugins.push(plugin);
           // Enable each supported plugin.
-          return plugin.enable(exports, this.provider, this.logger, config);
+          return plugin.enable(exports, this.provider, config);
         } catch (e) {
-          this.logger.error(
+          diag.error(
             `PluginLoader#load: could not load plugin ${modulePath} of module ${name}. Error: ${e.message}`
           );
           return exports;
@@ -195,11 +193,11 @@ export class PluginLoader {
       });
       this._hookState = HookState.ENABLED;
     } else if (this._hookState === HookState.DISABLED) {
-      this.logger.error(
+      diag.error(
         'PluginLoader#load: Currently cannot re-enable plugin loader.'
       );
     } else {
-      this.logger.error('PluginLoader#load: Plugin loader already enabled.');
+      diag.error('PluginLoader#load: Plugin loader already enabled.');
     }
     return this;
   }
