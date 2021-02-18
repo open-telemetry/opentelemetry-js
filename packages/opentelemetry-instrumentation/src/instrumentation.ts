@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import { TracerProvider, Tracer, trace } from '@opentelemetry/api';
 import { Meter, MeterProvider, metrics } from '@opentelemetry/api-metrics';
 import * as shimmer from 'shimmer';
 import { InstrumentationModuleDefinition } from './platform/node';
@@ -27,9 +27,8 @@ export abstract class InstrumentationAbstract<T = any>
   implements types.Instrumentation {
   protected _config: types.InstrumentationConfig;
 
-  private _tracer: api.Tracer;
+  private _tracer: Tracer;
   private _meter: Meter;
-  protected _logger: api.Logger;
 
   constructor(
     public readonly instrumentationName: string,
@@ -40,12 +39,8 @@ export abstract class InstrumentationAbstract<T = any>
       enabled: true,
       ...config,
     };
-    this._logger = this._config.logger || new api.NoopLogger();
 
-    this._tracer = api.trace.getTracer(
-      instrumentationName,
-      instrumentationVersion
-    );
+    this._tracer = trace.getTracer(instrumentationName, instrumentationVersion);
 
     this._meter = metrics.getMeter(instrumentationName, instrumentationVersion);
   }
@@ -79,7 +74,7 @@ export abstract class InstrumentationAbstract<T = any>
    * Sets TraceProvider to this plugin
    * @param tracerProvider
    */
-  public setTracerProvider(tracerProvider: api.TracerProvider) {
+  public setTracerProvider(tracerProvider: TracerProvider) {
     this._tracer = tracerProvider.getTracer(
       this.instrumentationName,
       this.instrumentationVersion
@@ -87,7 +82,7 @@ export abstract class InstrumentationAbstract<T = any>
   }
 
   /* Returns tracer */
-  protected get tracer(): api.Tracer {
+  protected get tracer(): Tracer {
     return this._tracer;
   }
 

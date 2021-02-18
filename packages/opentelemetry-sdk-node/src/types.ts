@@ -14,26 +14,31 @@
  * limitations under the License.
  */
 
+import { SpanAttributes, TextMapPropagator, Sampler } from '@opentelemetry/api';
 import type { ContextManager } from '@opentelemetry/context-base';
-import type { api, core, metrics, resources, tracing } from '.';
 import { InstrumentationOption } from '@opentelemetry/instrumentation';
+import { MetricExporter, Processor } from '@opentelemetry/metrics';
+import { Resource } from '@opentelemetry/resources';
+import {
+  SpanExporter,
+  SpanProcessor,
+  TraceParams,
+} from '@opentelemetry/tracing';
 
 export interface NodeSDKConfiguration {
   autoDetectResources: boolean;
   contextManager: ContextManager;
-  defaultAttributes: api.SpanAttributes;
-  textMapPropagator: api.TextMapPropagator;
-  logger: api.Logger;
-  logLevel: core.LogLevel;
-  metricProcessor: metrics.Processor;
-  metricExporter: metrics.MetricExporter;
+  defaultAttributes: SpanAttributes;
+  textMapPropagator: TextMapPropagator;
+  metricProcessor: Processor;
+  metricExporter: MetricExporter;
   metricInterval: number;
   /* Deprecated */
   plugins: InstrumentationOption[];
   instrumentations: InstrumentationOption[];
-  resource: resources.Resource;
-  sampler: api.Sampler;
-  spanProcessor: tracing.SpanProcessor;
-  traceExporter: tracing.SpanExporter;
-  traceParams: tracing.TraceParams;
+  resource: Resource;
+  sampler: Sampler;
+  spanProcessor: SpanProcessor;
+  traceExporter: SpanExporter;
+  traceParams: TraceParams;
 }

@@ -47,7 +47,6 @@ export class ValueRecorderMetric
       labels,
       this._disabled,
       this._valueType,
-      this._logger,
       this._processor.aggregatorFor(this._descriptor)
     );
   }

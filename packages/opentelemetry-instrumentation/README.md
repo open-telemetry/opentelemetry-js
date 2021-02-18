@@ -224,7 +224,6 @@ registerInstrumentations({
   ],
   meterProvider: meterProvider,
   tracerProvider: tracerProvider,
-  logger: new ConsoleLogger(), // optional
 });
 
 tracerProvider.register({
@@ -254,7 +253,6 @@ registerInstrumentations({
   ],
   meterProvider: meterProvider,
   tracerProvider: tracerProvider,
-  logger: new ConsoleLogger(), // optional
 });
 
 tracerProvider.register({

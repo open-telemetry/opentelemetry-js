@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import {
   Counter,
   ValueObserver,
@@ -55,12 +55,13 @@ describe('CollectorMetricExporter - node with proto over http', () => {
 
   describe('export', () => {
     beforeEach(async () => {
+      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
+      diag.setLogger();
       collectorExporterConfig = {
         headers: {
           foo: 'bar',
         },
         hostname: 'foo',
-        logger: new NoopLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
@@ -175,7 +176,8 @@ describe('CollectorMetricExporter - node with proto over http', () => {
     });
 
     it('should log the successful message', done => {
-      const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
+      // Need to stub/spy on the underlying logger as the "diag" instance is global
+      const spyLoggerError = sinon.stub(diag.getLogger(), 'error');
 
       collectorExporter.export(metrics, result => {
         assert.strictEqual(result.code, ExportResultCode.SUCCESS);

@@ -17,20 +17,17 @@
 import { DiagLogger, DiagLogFunction } from './logger';
 
 const consoleMap: { n: keyof DiagLogger; c: keyof Console }[] = [
-  { n: 'terminal', c: 'error' },
-  { n: 'critical', c: 'error' },
   { n: 'error', c: 'error' },
   { n: 'warn', c: 'warn' },
   { n: 'info', c: 'info' },
   { n: 'debug', c: 'debug' },
   { n: 'verbose', c: 'trace' },
-  { n: 'startupInfo', c: 'info' },
 ];
 
 /**
  * A simple Immutable Console based diagnostic logger which will output any messages to the Console.
  * If you want to limit the amount of logging to a specific level or lower use the
- * {@link diagLogLevelFilter}
+ * {@link createLogLevelDiagLogger}
  */
 export class DiagConsoleLogger implements DiagLogger {
   constructor() {
@@ -58,27 +55,8 @@ export class DiagConsoleLogger implements DiagLogger {
     }
   }
 
-  /**
-   * Log a terminal situation that would cause the API to completely fail to initialize,
-   * if this type of message is logged functionality of the API is not expected to be functional.
-   */
-  public terminal!: DiagLogFunction;
-
-  /**
-   * Log a critical error that NEEDS to be addressed, functionality of the component that emits
-   * this log detail may non-functional. While the overall API may be.
-   */
-  public critical!: DiagLogFunction;
-
   /** Log an error scenario that was not expected and caused the requested operation to fail. */
   public error!: DiagLogFunction;
-
-  /**
-   * Logs a general informational message that is used for logging component startup and version
-   * information without causing additional general informational messages when the logging level
-   * is set to DiagLogLevel.WARN or lower.
-   */
-  public startupInfo!: DiagLogFunction;
 
   /**
    * Log a warning scenario to inform the developer of an issues that should be investigated.

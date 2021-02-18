@@ -19,7 +19,6 @@ import {
   ROOT_CONTEXT,
   SpanKind,
   TraceFlags,
-  NoopLogger,
 } from '@opentelemetry/api';
 import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
 import { HttpAttribute } from '@opentelemetry/semantic-conventions';
@@ -170,9 +169,8 @@ describe('Utility', () => {
 
     it('should not re-throw when function throws an exception', () => {
       satisfiesPatternStub.restore();
-      const log = new NoopLogger();
       const onException = (e: Error) => {
-        log.error('error', e);
+        // Do nothing
       };
       for (const callback of [undefined, onException]) {
         assert.doesNotThrow(() =>

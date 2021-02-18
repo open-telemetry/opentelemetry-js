@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import {
   setGlobalErrorHandler,
   loggingErrorHandler,
@@ -109,8 +109,9 @@ describe('Zipkin Exporter - web', () => {
     };
 
     beforeEach(() => {
+      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
+      diag.setLogger();
       zipkinConfig = {
-        logger: new NoopLogger(),
         headers: customHeaders,
       };
       server = sinon.fakeServer.create();

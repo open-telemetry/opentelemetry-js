@@ -31,6 +31,7 @@ import {
   Span,
   ROOT_CONTEXT,
   setSpan,
+  diag,
 } from '@opentelemetry/api';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import { clientStreamAndUnaryHandler } from './clientStreamAndUnary';
@@ -50,7 +51,7 @@ export function patchServer(
     const plugin = this;
     const config = this._config;
 
-    plugin.logger.debug('patched gRPC server');
+    diag.debug('patched gRPC server');
     return function register<RequestType, ResponseType>(
       this: grpcJs.Server,
       name: string,
@@ -100,7 +101,7 @@ export function patchServer(
               kind: SpanKind.SERVER,
             };
 
-            plugin.logger.debug('patch func: %s', JSON.stringify(spanOptions));
+            diag.debug('patch func: %s', JSON.stringify(spanOptions));
 
             context.with(
               propagation.extract(ROOT_CONTEXT, call.metadata, {

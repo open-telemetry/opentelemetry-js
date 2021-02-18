@@ -24,6 +24,7 @@ import {
   SpanStatus,
   ROOT_CONTEXT,
   setSpan,
+  diag,
 } from '@opentelemetry/api';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import { BasePlugin } from '@opentelemetry/core';
@@ -71,11 +72,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   protected readonly _basedir = basedir;
 
   protected patch(): typeof grpcTypes {
-    this._logger.debug(
-      'applying patch to %s@%s',
-      this.moduleName,
-      this.version
-    );
+    diag.debug('applying patch to %s@%s', this.moduleName, this.version);
 
     if (this._moduleExports.Server) {
       shimmer.wrap(
@@ -108,11 +105,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     return this._moduleExports;
   }
   protected unpatch(): void {
-    this._logger.debug(
-      'removing patch to %s@%s',
-      this.moduleName,
-      this.version
-    );
+    diag.debug('removing patch to %s@%s', this.moduleName, this.version);
 
     if (this._moduleExports.Server) {
       shimmer.unwrap(this._moduleExports.Server.prototype, 'register');
@@ -134,7 +127,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   private _patchServer() {
     return (originalRegister: typeof grpcTypes.Server.prototype.register) => {
       const plugin = this;
-      plugin._logger.debug('patched gRPC server');
+      diag.debug('patched gRPC server');
 
       return function register<RequestType, ResponseType>(
         this: grpcTypes.Server & { handlers: any },
@@ -178,10 +171,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
                 kind: SpanKind.SERVER,
               };
 
-              plugin._logger.debug(
-                'patch func: %s',
-                JSON.stringify(spanOptions)
-              );
+              diag.debug('patch func: %s', JSON.stringify(spanOptions));
 
               context.with(
                 propagation.extract(ROOT_CONTEXT, call.metadata, {
@@ -340,7 +330,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   private _patchClient() {
     const plugin = this;
     return (original: typeof grpcTypes.makeGenericClientConstructor): never => {
-      plugin._logger.debug('patching client');
+      diag.debug('patching client');
       return function makeClientConstructor(
         this: typeof grpcTypes.Client,
         methods: { [key: string]: { originalName?: string } },
@@ -385,7 +375,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   private _getPatchedClientMethods() {
     const plugin = this;
     return (original: GrpcClientFunc) => {
-      plugin._logger.debug('patch all client methods');
+      diag.debug('patch all client methods');
       return function clientMethodTrace(this: grpcTypes.Client) {
         const name = `grpc.${original.path.replace('/', '')}`;
         const args = Array.prototype.slice.call(arguments);

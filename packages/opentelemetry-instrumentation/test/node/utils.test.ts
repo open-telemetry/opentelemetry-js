@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as path from 'path';
 import * as utils from '../../src/platform/node/old/utils';
@@ -36,8 +35,6 @@ const TEST_MODULES: Array<{ name: string; version: string | null }> = [
 ];
 
 describe('Instrumentation#utils', () => {
-  const logger = new NoopLogger();
-
   before(() => {
     utils.searchPathForTest(INSTALLED_PLUGINS_PATH);
   });
@@ -46,7 +43,7 @@ describe('Instrumentation#utils', () => {
     TEST_MODULES.forEach(testCase => {
       it(`should return ${testCase.version} for ${testCase.name}`, () => {
         assert.strictEqual(
-          utils.getPackageVersion(logger, testCase.name),
+          utils.getPackageVersion(testCase.name),
           testCase.version
         );
       });

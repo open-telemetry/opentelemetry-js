@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { diag } from '@opentelemetry/api';
 import { GrpcJsPlugin } from '../grpcJs';
 import type * as grpcJs from '@grpc/grpc-js';
 import type { PackageDefinition } from '@grpc/grpc-js/build/src/make-client';
@@ -28,7 +29,7 @@ export function patchLoadPackageDefinition(this: GrpcJsPlugin) {
   return (original: typeof grpcJs.loadPackageDefinition) => {
     const plugin = this;
 
-    plugin._logger.debug('patching loadPackageDefinition');
+    diag.debug('patching loadPackageDefinition');
 
     return function patchedLoadPackageDefinition(
       this: null,

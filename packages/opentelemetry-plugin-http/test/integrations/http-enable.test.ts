@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanKind, Span, context, NoopLogger } from '@opentelemetry/api';
+import { SpanKind, Span, context } from '@opentelemetry/api';
 import {
   HttpAttribute,
   GeneralAttribute,
@@ -111,10 +111,7 @@ describe('HttpPlugin Integration tests', () => {
       });
     });
 
-    const logger = new NoopLogger();
-    const provider = new NodeTracerProvider({
-      logger,
-    });
+    const provider = new NodeTracerProvider();
     provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
       memoryExporter.reset();
@@ -134,7 +131,7 @@ describe('HttpPlugin Integration tests', () => {
       try {
         plugin.disable();
       } catch (e) {}
-      plugin.enable(http, provider, provider.logger, config);
+      plugin.enable(http, provider, config);
     });
 
     after(() => {

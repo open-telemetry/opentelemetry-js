@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { context, Span, SpanKind, NoopLogger } from '@opentelemetry/api';
+import { context, Span, SpanKind } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import { Http } from '@opentelemetry/plugin-http';
@@ -105,18 +105,14 @@ describe('Packages', () => {
     context.disable();
   });
   describe('get', () => {
-    const logger = new NoopLogger();
-
-    const provider = new NodeTracerProvider({
-      logger,
-    });
+    const provider = new NodeTracerProvider();
     provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
       memoryExporter.reset();
     });
 
     before(() => {
-      plugin.enable((https as unknown) as Http, provider, provider.logger);
+      plugin.enable((https as unknown) as Http, provider);
     });
 
     after(() => {

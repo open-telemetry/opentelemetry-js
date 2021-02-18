@@ -6,13 +6,13 @@ const { CollectorMetricExporter } = require('@opentelemetry/exporter-collector')
 // const { CollectorMetricExporter } = require('@opentelemetry/exporter-collector-proto');
 const { MeterProvider } = require('@opentelemetry/metrics');
 
+// Optional and only needed to see the internal diagnostic logging (during development)
 diag.setLogger(new DiagConsoleLogger());
 diag.setLogLevel(DiagLogLevel.DEBUG);
 
 const metricExporter = new CollectorMetricExporter({
   serviceName: 'basic-metric-service',
   // url: 'http://localhost:55681/v1/metrics',
-  logger: diag,
 });
 
 const meter = new MeterProvider({
