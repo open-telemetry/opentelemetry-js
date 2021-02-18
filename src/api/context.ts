@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { Context, ContextManager, NoopContextManager } from '../context-base';
+import { NoopContextManager } from '../context/NoopContextManager';
+import { Context, ContextManager } from '../context/types';
 import {
   API_BACKWARDS_COMPATIBILITY_VERSION,
   GLOBAL_CONTEXT_MANAGER_API_KEY,

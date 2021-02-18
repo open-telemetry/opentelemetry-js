@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import { Context } from '../context-base';
-import { NOOP_TEXT_MAP_PROPAGATOR } from '../context/propagation/NoopTextMapPropagator';
+import { Context } from '../context/types';
+import { NOOP_TEXT_MAP_PROPAGATOR } from '../propagation/NoopTextMapPropagator';
 import {
   defaultTextMapGetter,
   defaultTextMapSetter,
   TextMapGetter,
   TextMapPropagator,
   TextMapSetter,
-} from '../context/propagation/TextMapPropagator';
+} from '../propagation/TextMapPropagator';
 import {
   API_BACKWARDS_COMPATIBILITY_VERSION,
   GLOBAL_PROPAGATION_API_KEY,

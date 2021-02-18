@@ -14,6 +14,22 @@
  * limitations under the License.
  */
 
-export { createContextKey, ROOT_CONTEXT } from './context';
-export * from './NoopContextManager';
-export * from './types';
+import { Context } from '../context/types';
+import { TextMapPropagator } from './TextMapPropagator';
+
+/**
+ * No-op implementations of {@link TextMapPropagator}.
+ */
+export class NoopTextMapPropagator implements TextMapPropagator {
+  /** Noop inject function does nothing */
+  inject(_context: Context, _carrier: unknown): void {}
+  /** Noop extract function does nothing and returns the input context */
+  extract(context: Context, _carrier: unknown): Context {
+    return context;
+  }
+  fields(): string[] {
+    return [];
+  }
+}
+
+export const NOOP_TEXT_MAP_PROPAGATOR = new NoopTextMapPropagator();
