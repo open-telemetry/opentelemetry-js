@@ -388,31 +388,31 @@ for (const contextManagerClass of [
       it('should return current context and removeListener (when enabled)', done => {
         const ee = new EventEmitter();
         const context = ROOT_CONTEXT.setValue(key1, 1);
-        const patchedEe = contextManager.bind(ee, context);
+        const patchedEE = contextManager.bind(ee, context);
         const handler = () => {
           assert.deepStrictEqual(contextManager.active(), context);
-          patchedEe.removeListener('test', handler);
-          assert.strictEqual(patchedEe.listeners('test').length, 0);
+          patchedEE.removeListener('test', handler);
+          assert.strictEqual(patchedEE.listeners('test').length, 0);
           return done();
         };
-        patchedEe.on('test', handler);
-        assert.strictEqual(patchedEe.listeners('test').length, 1);
-        patchedEe.emit('test');
+        patchedEE.on('test', handler);
+        assert.strictEqual(patchedEE.listeners('test').length, 1);
+        patchedEE.emit('test');
       });
 
       it('should return current context and removeAllListener (when enabled)', done => {
         const ee = new EventEmitter();
         const context = ROOT_CONTEXT.setValue(key1, 1);
-        const patchedEe = contextManager.bind(ee, context);
+        const patchedEE = contextManager.bind(ee, context);
         const handler = () => {
           assert.deepStrictEqual(contextManager.active(), context);
-          patchedEe.removeAllListeners('test');
-          assert.strictEqual(patchedEe.listeners('test').length, 0);
+          patchedEE.removeAllListeners('test');
+          assert.strictEqual(patchedEE.listeners('test').length, 0);
           return done();
         };
-        patchedEe.on('test', handler);
-        assert.strictEqual(patchedEe.listeners('test').length, 1);
-        patchedEe.emit('test');
+        patchedEE.on('test', handler);
+        assert.strictEqual(patchedEE.listeners('test').length, 1);
+        patchedEE.emit('test');
       });
 
       /**
@@ -423,34 +423,34 @@ for (const contextManagerClass of [
         contextManager.disable();
         const ee = new EventEmitter();
         const context = ROOT_CONTEXT.setValue(key1, 1);
-        const patchedEe = contextManager.bind(ee, context);
+        const patchedEE = contextManager.bind(ee, context);
         const handler = () => {
           assert.deepStrictEqual(contextManager.active(), context);
-          patchedEe.removeListener('test', handler);
-          assert.strictEqual(patchedEe.listeners('test').length, 0);
+          patchedEE.removeListener('test', handler);
+          assert.strictEqual(patchedEE.listeners('test').length, 0);
           return done();
         };
-        patchedEe.on('test', handler);
-        assert.strictEqual(patchedEe.listeners('test').length, 1);
-        patchedEe.emit('test');
+        patchedEE.on('test', handler);
+        assert.strictEqual(patchedEE.listeners('test').length, 1);
+        patchedEE.emit('test');
       });
 
       it('should not return current context with async op', done => {
         const ee = new EventEmitter();
         const context = ROOT_CONTEXT.setValue(key1, 1);
-        const patchedEe = contextManager.bind(ee, context);
+        const patchedEE = contextManager.bind(ee, context);
         const handler = () => {
           assert.deepStrictEqual(contextManager.active(), context);
           setImmediate(() => {
             assert.deepStrictEqual(contextManager.active(), context);
-            patchedEe.removeAllListeners('test');
-            assert.strictEqual(patchedEe.listeners('test').length, 0);
+            patchedEE.removeAllListeners('test');
+            assert.strictEqual(patchedEE.listeners('test').length, 0);
             return done();
           });
         };
-        patchedEe.on('test', handler);
-        assert.strictEqual(patchedEe.listeners('test').length, 1);
-        patchedEe.emit('test');
+        patchedEE.on('test', handler);
+        assert.strictEqual(patchedEE.listeners('test').length, 1);
+        patchedEE.emit('test');
       });
 
       it('should not influence other instances', () => {
@@ -460,7 +460,7 @@ for (const contextManagerClass of [
 
         const context = ROOT_CONTEXT.setValue(key1, 2);
         const otherContext = ROOT_CONTEXT.setValue(key1, 3);
-        const patchedEe = otherContextManager.bind(
+        const patchedEE = otherContextManager.bind(
           contextManager.bind(ee, context),
           otherContext
         );
@@ -469,8 +469,8 @@ for (const contextManagerClass of [
           assert.strictEqual(otherContextManager.active(), otherContext);
         };
 
-        patchedEe.on('test', handler);
-        patchedEe.emit('test');
+        patchedEE.on('test', handler);
+        patchedEE.emit('test');
       });
     });
   });
