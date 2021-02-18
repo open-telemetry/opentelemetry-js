@@ -68,3 +68,6 @@ packages/**/package-lock.json
 docs
 
 .nyc_output
+
+#lerna
+.changelog
