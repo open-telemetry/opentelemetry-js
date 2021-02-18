@@ -18,7 +18,6 @@ import { Logger } from '../../common/Logger';
 import { TracerProvider } from '../tracer_provider';
 
 /** Interface Plugin to apply patch. */
-// tslint:disable-next-line:no-any
 export interface Plugin<T = any> {
   /**
    * Contains all supported versions.
