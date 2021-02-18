@@ -244,7 +244,7 @@ To request automatic tracing support for a module not on this list, please [file
 
 ## Upgrade guidelines
 
-### 0.17.0 to ???
+### 0.16.0 to 0.17.0
 
 [PR-1880](https://github.com/open-telemetry/opentelemetry-js/pull/1880) feat(diag-logger): introduce a new global level api.diag for internal diagnostic logging
 
@@ -290,8 +290,6 @@ import { diag } from "@opentelemetry/api";
 diag.setLogger();
 
 ```
-
-### 0.16.0 to 0.17.0
 
 [PR-1855](https://github.com/open-telemetry/opentelemetry-js/pull/1855) Use instrumentation loader to load plugins and instrumentations
 
