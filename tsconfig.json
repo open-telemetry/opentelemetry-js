@@ -15,13 +15,7 @@
       "path": "packages/opentelemetry-api-metrics"
     },
     {
-      "path": "packages/opentelemetry-api"
-    },
-    {
       "path": "packages/opentelemetry-context-async-hooks"
-    },
-    {
-      "path": "packages/opentelemetry-context-base"
     },
     {
       "path": "packages/opentelemetry-context-zone-peer-dep"
