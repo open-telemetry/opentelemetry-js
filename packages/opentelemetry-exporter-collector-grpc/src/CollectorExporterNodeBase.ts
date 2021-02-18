@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { diag } from '@opentelemetry/api';
 import {
   CollectorExporterBase,
   collectorTypes,
@@ -45,7 +46,7 @@ export abstract class CollectorExporterNodeBase<
   constructor(config: CollectorExporterConfigNode = {}) {
     super(config);
     if (config.headers) {
-      this.logger.warn('Headers cannot be set when using grpc');
+      diag.warn('Headers cannot be set when using grpc');
     }
     this.metadata = config.metadata;
   }
@@ -92,7 +93,7 @@ export abstract class CollectorExporterNodeBase<
     onError: (error: collectorTypes.CollectorExporterError) => void
   ): void {
     if (this._isShutdown) {
-      this.logger.debug('Shutdown already started. Cannot send objects');
+      diag.debug('Shutdown already started. Cannot send objects');
       return;
     }
     if (!this._send) {

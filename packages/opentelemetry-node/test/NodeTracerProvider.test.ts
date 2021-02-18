@@ -17,10 +17,10 @@
 import {
   context,
   TraceFlags,
-  NoopLogger,
   setSpan,
   setSpanContext,
   getSpan,
+  diag,
 } from '@opentelemetry/api';
 import { AlwaysOnSampler, AlwaysOffSampler } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
@@ -53,6 +53,8 @@ describe('NodeTracerProvider', () => {
   beforeEach(() => {
     contextManager = new AsyncHooksContextManager();
     context.setGlobalContextManager(contextManager.enable());
+    // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap warn which is already wrapped
+    diag.setLogger();
   });
 
   afterEach(() => {
@@ -63,15 +65,18 @@ describe('NodeTracerProvider', () => {
   });
 
   describe('constructor', () => {
+    beforeEach(() => {
+      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap warn which is already wrapped
+      diag.setLogger();
+    });
+
     it('should construct an instance with required only options', () => {
       provider = new NodeTracerProvider();
       assert.ok(provider instanceof NodeTracerProvider);
     });
 
     it('should construct an instance with logger', () => {
-      provider = new NodeTracerProvider({
-        logger: new NoopLogger(),
-      });
+      provider = new NodeTracerProvider();
       assert.ok(provider instanceof NodeTracerProvider);
     });
 
@@ -84,7 +89,7 @@ describe('NodeTracerProvider', () => {
 
     it('should show warning when plugins are defined', () => {
       const dummyPlugin1 = {};
-      const spyWarn = sinon.spy(console, 'warn');
+      const spyWarn = sinon.spy(diag.getLogger(), 'warn');
 
       const plugins = [dummyPlugin1];
       const options = { plugins };
@@ -99,17 +104,13 @@ describe('NodeTracerProvider', () => {
 
   describe('.startSpan()', () => {
     it('should start a span with name only', () => {
-      provider = new NodeTracerProvider({
-        logger: new NoopLogger(),
-      });
+      provider = new NodeTracerProvider();
       const span = provider.getTracer('default').startSpan('my-span');
       assert.ok(span);
     });
 
     it('should start a span with name and options', () => {
-      provider = new NodeTracerProvider({
-        logger: new NoopLogger(),
-      });
+      provider = new NodeTracerProvider();
       const span = provider.getTracer('default').startSpan('my-span', {});
       assert.ok(span);
     });
@@ -117,7 +118,6 @@ describe('NodeTracerProvider', () => {
     it('should return a default span with no sampling (AlwaysOffSampler)', () => {
       provider = new NodeTracerProvider({
         sampler: new AlwaysOffSampler(),
-        logger: new NoopLogger(),
       });
       const span = provider.getTracer('default').startSpan('my-span');
       assert.strictEqual(span.context().traceFlags, TraceFlags.NONE);
@@ -127,7 +127,6 @@ describe('NodeTracerProvider', () => {
     it('should start a recording span with always sampling (AlwaysOnSampler)', () => {
       provider = new NodeTracerProvider({
         sampler: new AlwaysOnSampler(),
-        logger: new NoopLogger(),
       });
       const span = provider.getTracer('default').startSpan('my-span');
       assert.ok(span instanceof Span);
@@ -138,7 +137,6 @@ describe('NodeTracerProvider', () => {
     it('should sample with AlwaysOnSampler if parent was not sampled', () => {
       provider = new NodeTracerProvider({
         sampler: new AlwaysOnSampler(),
-        logger: new NoopLogger(),
       });
 
       const sampledParent = provider.getTracer('default').startSpan(
@@ -166,9 +164,7 @@ describe('NodeTracerProvider', () => {
     });
 
     it('should assign resource to span', () => {
-      provider = new NodeTracerProvider({
-        logger: new NoopLogger(),
-      });
+      provider = new NodeTracerProvider();
       const span = provider.getTracer('default').startSpan('my-span') as Span;
       assert.ok(span);
       assert.ok(span.resource instanceof Resource);

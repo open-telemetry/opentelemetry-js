@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as http from 'http';
@@ -48,12 +48,15 @@ describe('CollectorTraceExporter - node with json over http', () => {
   let spyWrite: sinon.SinonSpy;
   let spans: ReadableSpan[];
   describe('instance', () => {
+    beforeEach(() => {
+      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
+      diag.setLogger();
+    });
     it('should warn about metadata when using json', () => {
       const metadata = 'foo';
-      const logger = new core.ConsoleLogger(core.LogLevel.DEBUG);
-      const spyLoggerWarn = sinon.stub(logger, 'warn');
+      // Need to stub/spy on the underlying logger as the "diag" instance is global
+      const spyLoggerWarn = sinon.stub(diag.getLogger(), 'warn');
       collectorExporter = new CollectorTraceExporter({
-        logger,
         serviceName: 'basic-service',
         metadata,
         url: address,
@@ -65,6 +68,8 @@ describe('CollectorTraceExporter - node with json over http', () => {
 
   describe('export', () => {
     beforeEach(() => {
+      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
+      diag.setLogger();
       spyRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
       spyWrite = sinon.stub(fakeRequest, 'write');
       collectorExporterConfig = {
@@ -72,7 +77,6 @@ describe('CollectorTraceExporter - node with json over http', () => {
           foo: 'bar',
         },
         hostname: 'foo',
-        logger: new NoopLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
@@ -161,7 +165,8 @@ describe('CollectorTraceExporter - node with json over http', () => {
     });
 
     it('should log the successful message', done => {
-      const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
+      // Need to stub/spy on the underlying logger as the "diag" instance is global
+      const spyLoggerError = sinon.stub(diag.getLogger(), 'error');
       const responseSpy = sinon.spy();
       collectorExporter.export(spans, responseSpy);
 

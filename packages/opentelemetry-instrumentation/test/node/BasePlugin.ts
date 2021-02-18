@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Logger, TracerProvider } from '@opentelemetry/api';
+import { TracerProvider } from '@opentelemetry/api';
 import { OldClassPlugin, OldPluginConfig } from '../../src/types_plugin_only';
 
 /** This class represent the base to patch plugin. */
@@ -29,7 +29,6 @@ export abstract class BasePlugin<T> implements OldClassPlugin<T> {
   enable(
     moduleExports: T,
     tracerProvider: TracerProvider,
-    logger: Logger,
     config?: OldPluginConfig
   ): T {
     this._moduleExports = moduleExports;

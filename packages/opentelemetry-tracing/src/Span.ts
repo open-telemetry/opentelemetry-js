@@ -56,7 +56,6 @@ export class Span implements api.Span, ReadableSpan {
   endTime: api.HrTime = [0, 0];
   private _ended = false;
   private _duration: api.HrTime = [-1, -1];
-  private readonly _logger: api.Logger;
   private readonly _spanProcessor: SpanProcessor;
   private readonly _traceParams: TraceParams;
 
@@ -79,7 +78,6 @@ export class Span implements api.Span, ReadableSpan {
     this.startTime = timeInputToHrTime(startTime);
     this.resource = parentTracer.resource;
     this.instrumentationLibrary = parentTracer.instrumentationLibrary;
-    this._logger = parentTracer.logger;
     this._traceParams = parentTracer.getActiveTraceParams();
     this._spanProcessor = parentTracer.getActiveSpanProcessor();
     this._spanProcessor.onStart(this, context);
@@ -93,11 +91,11 @@ export class Span implements api.Span, ReadableSpan {
   setAttribute(key: string, value: unknown): this {
     if (value == null || this._isSpanEnded()) return this;
     if (key.length === 0) {
-      this._logger.warn(`Invalid attribute key: ${key}`);
+      api.diag.warn(`Invalid attribute key: ${key}`);
       return this;
     }
     if (!isAttributeValue(value)) {
-      this._logger.warn(`Invalid attribute value set for key: ${key}`);
+      api.diag.warn(`Invalid attribute value set for key: ${key}`);
       return this;
     }
 
@@ -133,7 +131,7 @@ export class Span implements api.Span, ReadableSpan {
   ): this {
     if (this._isSpanEnded()) return this;
     if (this.events.length >= this._traceParams.numberOfEventsPerSpan!) {
-      this._logger.warn('Dropping extra events.');
+      api.diag.warn('Dropping extra events.');
       this.events.shift();
     }
     if (isTimeInput(attributesOrStartTime)) {
@@ -167,7 +165,7 @@ export class Span implements api.Span, ReadableSpan {
 
   end(endTime: api.TimeInput = hrTime()): void {
     if (this._isSpanEnded()) {
-      this._logger.error('You can only call end() on a span once.');
+      api.diag.error('You can only call end() on a span once.');
       return;
     }
     this._ended = true;
@@ -175,7 +173,7 @@ export class Span implements api.Span, ReadableSpan {
 
     this._duration = hrTimeDuration(this.startTime, this.endTime);
     if (this._duration[0] < 0) {
-      this._logger.warn(
+      api.diag.warn(
         'Inconsistent start and end time, startTime > endTime',
         this.startTime,
         this.endTime
@@ -214,7 +212,7 @@ export class Span implements api.Span, ReadableSpan {
     ) {
       this.addEvent(ExceptionEventName, attributes as api.SpanAttributes, time);
     } else {
-      this._logger.warn(`Failed to record an exception ${exception}`);
+      api.diag.warn(`Failed to record an exception ${exception}`);
     }
   }
 
@@ -228,7 +226,7 @@ export class Span implements api.Span, ReadableSpan {
 
   private _isSpanEnded(): boolean {
     if (this._ended) {
-      this._logger.warn(
+      api.diag.warn(
         'Can not execute the operation on ended Span {traceId: %s, spanId: %s}',
         this.spanContext.traceId,
         this.spanContext.spanId

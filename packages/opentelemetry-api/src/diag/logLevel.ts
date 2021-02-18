@@ -15,7 +15,6 @@
  */
 
 import { DiagAPI } from '../api/diag';
-import { Logger } from '../common/Logger';
 import { DiagLogger, DiagLogFunction, createNoopDiagLogger } from './logger';
 
 /**
@@ -27,23 +26,8 @@ export enum DiagLogLevel {
   /** Diagnostic Logging level setting to disable all logging (except and forced logs) */
   NONE = 0,
 
-  /**
-   * Identifies a terminal situation that would cause the API to completely fail to initialize,
-   * if this type of error is logged functionality of the API is not expected to be functional.
-   */
-  TERMINAL = 10,
-
-  /**
-   * Identifies a critical error that needs to be addressed, functionality of the component
-   * that emits this log detail may non-functional.
-   */
-  CRITICAL = 20,
-
   /** Identifies an error scenario */
   ERROR = 30,
-
-  /** Identifies startup and failure (lower) scenarios */
-  STARTUP = 40,
 
   /** Identifies a warning scenario */
   WARN = 50,
@@ -66,35 +50,17 @@ export enum DiagLogLevel {
 
 /**
  * This is equivalent to:
- * type LogLevelString = 'NONE' | TERMINAL' | 'CRITICAL' | 'ERROR' | 'WARN' | 'INFO' | 'DEBUG' | 'VERBOSE' | 'ALL';
+ * type LogLevelString = 'NONE' | 'ERROR' | 'WARN' | 'INFO' | 'DEBUG' | 'VERBOSE' | 'ALL';
  */
 export type DiagLogLevelString = keyof typeof DiagLogLevel;
 
-/**
- * Mapping from DiagLogger function name to Legacy Logger function used if
- * the logger instance doesn't have the DiagLogger function
- */
-const fallbackLoggerFuncMap: { [n: string]: keyof Logger } = {
-  terminal: 'error',
-  critical: 'error',
-  error: 'error',
-  warn: 'warn',
-  info: 'info',
-  debug: 'debug',
-  verbose: 'debug',
-  startupInfo: 'info',
-};
-
 /** Mapping from DiagLogger function name to logging level. */
 const levelMap: { n: keyof DiagLogger; l: DiagLogLevel }[] = [
-  { n: 'terminal', l: DiagLogLevel.TERMINAL },
-  { n: 'critical', l: DiagLogLevel.CRITICAL },
   { n: 'error', l: DiagLogLevel.ERROR },
   { n: 'warn', l: DiagLogLevel.WARN },
   { n: 'info', l: DiagLogLevel.INFO },
   { n: 'debug', l: DiagLogLevel.DEBUG },
   { n: 'verbose', l: DiagLogLevel.VERBOSE },
-  { n: 'startupInfo', l: DiagLogLevel.ERROR },
 ];
 
 /**
@@ -138,8 +104,7 @@ export function createLogLevelDiagLogger(
     if (maxLevel >= theLevel) {
       return function () {
         const orgArguments = arguments as unknown;
-        const theFunc =
-          theLogger[funcName] || theLogger[fallbackLoggerFuncMap[funcName]];
+        const theFunc = theLogger[funcName];
         if (theFunc && typeof theFunc === 'function') {
           return theFunc.apply(
             logger,

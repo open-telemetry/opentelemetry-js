@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import {
   ExportResult,
   globalErrorHandler,
@@ -36,7 +36,6 @@ export class PrometheusExporter implements MetricExporter {
     appendTimestamp: true,
   };
 
-  private readonly _logger: api.Logger;
   private readonly _host?: string;
   private readonly _port: number;
   private readonly _endpoint: string;
@@ -56,7 +55,6 @@ export class PrometheusExporter implements MetricExporter {
    * @param callback Callback to be called after a server was started
    */
   constructor(config: ExporterConfig = {}, callback?: () => void) {
-    this._logger = config.logger || new api.NoopLogger();
     this._host =
       config.host ||
       process.env.OTEL_EXPORTER_PROMETHEUS_HOST ||
@@ -83,7 +81,7 @@ export class PrometheusExporter implements MetricExporter {
     if (config.preventServerStart !== true) {
       this.startServer()
         .then(callback)
-        .catch(err => this._logger.error(err));
+        .catch(err => diag.error(err));
     } else if (callback) {
       callback();
     }
@@ -110,7 +108,7 @@ export class PrometheusExporter implements MetricExporter {
       return;
     }
 
-    this._logger.debug('Prometheus exporter export');
+    diag.debug('Prometheus exporter export');
 
     for (const record of records) {
       this._batcher.process(record);
@@ -131,7 +129,7 @@ export class PrometheusExporter implements MetricExporter {
    */
   stopServer(): Promise<void> {
     if (!this._server) {
-      this._logger.debug(
+      diag.debug(
         'Prometheus stopServer() was called but server was never started.'
       );
       return Promise.resolve();
@@ -139,7 +137,7 @@ export class PrometheusExporter implements MetricExporter {
       return new Promise(resolve => {
         this._server.close(err => {
           if (!err) {
-            this._logger.debug('Prometheus exporter was stopped');
+            diag.debug('Prometheus exporter was stopped');
           } else {
             if (
               ((err as unknown) as { code: string }).code !==
@@ -165,7 +163,7 @@ export class PrometheusExporter implements MetricExporter {
           host: this._host,
         },
         () => {
-          this._logger.debug(
+          diag.debug(
             `Prometheus exporter server started: ${this._host}:${this._port}/${this._endpoint}`
           );
           resolve();

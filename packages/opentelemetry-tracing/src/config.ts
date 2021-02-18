@@ -23,7 +23,6 @@ import { AlwaysOnSampler, getEnv } from '@opentelemetry/core';
  * used to extend the default value.
  */
 export const DEFAULT_CONFIG = {
-  logLevel: getEnv().OTEL_LOG_LEVEL,
   sampler: new AlwaysOnSampler(),
   traceParams: {
     numberOfAttributesPerSpan: getEnv().OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT,

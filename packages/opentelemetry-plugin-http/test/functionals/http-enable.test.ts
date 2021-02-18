@@ -19,7 +19,6 @@ import {
   propagation,
   Span as ISpan,
   SpanKind,
-  NoopLogger,
   getSpan,
   setSpan,
 } from '@opentelemetry/api';
@@ -55,10 +54,7 @@ const hostname = 'localhost';
 const pathname = '/test';
 const serverName = 'my.server.name';
 const memoryExporter = new InMemorySpanExporter();
-const logger = new NoopLogger();
-const provider = new NodeTracerProvider({
-  logger,
-});
+const provider = new NodeTracerProvider();
 provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 propagation.setGlobalPropagator(new DummyPropagation());
 
@@ -145,7 +141,7 @@ describe('HttpPlugin', () => {
           plugin.component,
           process.versions.node
         );
-        pluginWithBadOptions.enable(http, provider, provider.logger, config);
+        pluginWithBadOptions.enable(http, provider, config);
         server = http.createServer((request, response) => {
           response.end('Test Server Response');
         });
@@ -209,7 +205,7 @@ describe('HttpPlugin', () => {
           responseHook: responseHookFunction,
           serverName,
         };
-        plugin.enable(http, provider, provider.logger, config);
+        plugin.enable(http, provider, config);
         server = http.createServer((request, response) => {
           if (request.url?.includes('/ignored')) {
             provider.getTracer('test').startSpan('some-span').end();
@@ -233,7 +229,7 @@ describe('HttpPlugin', () => {
         const httpNotPatched = new HttpPlugin(
           plugin.component,
           process.versions.node
-        ).enable({} as Http, provider, provider.logger, {});
+        ).enable({} as Http, provider, {});
         assert.strictEqual(Object.keys(httpNotPatched).length, 0);
       });
 
@@ -727,7 +723,7 @@ describe('HttpPlugin', () => {
     describe('with require parent span', () => {
       beforeEach(done => {
         memoryExporter.reset();
-        plugin.enable(http, provider, provider.logger, {});
+        plugin.enable(http, provider, {});
         server = http.createServer((request, response) => {
           response.end('Test Server Response');
         });
@@ -745,7 +741,7 @@ describe('HttpPlugin', () => {
           requireParentforIncomingSpans: true,
           requireParentforOutgoingSpans: true,
         };
-        plugin.enable(http, provider, provider.logger, config);
+        plugin.enable(http, provider, config);
         const testPath = '/test/test';
         await httpRequest.get(
           `${protocol}://${hostname}:${serverPort}${testPath}`
@@ -759,7 +755,7 @@ describe('HttpPlugin', () => {
         const config: HttpPluginConfig = {
           requireParentforOutgoingSpans: true,
         };
-        plugin.enable(http, provider, provider.logger, config);
+        plugin.enable(http, provider, config);
         const testPath = '/test/test';
         const result = await httpRequest.get(
           `${protocol}://${hostname}:${serverPort}${testPath}`
@@ -783,7 +779,7 @@ describe('HttpPlugin', () => {
         const config: HttpPluginConfig = {
           requireParentforIncomingSpans: true,
         };
-        plugin.enable(http, provider, provider.logger, config);
+        plugin.enable(http, provider, config);
         const testPath = '/test/test';
         const result = await httpRequest.get(
           `${protocol}://${hostname}:${serverPort}${testPath}`
@@ -808,7 +804,7 @@ describe('HttpPlugin', () => {
           requireParentforIncomingSpans: true,
           requireParentforOutgoingSpans: true,
         };
-        plugin.enable(http, provider, provider.logger, config);
+        plugin.enable(http, provider, config);
         const testPath = '/test/test';
         const tracer = provider.getTracer('default');
         const span = tracer.startSpan('parentSpan', {

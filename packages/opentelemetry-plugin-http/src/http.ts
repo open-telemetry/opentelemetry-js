@@ -26,6 +26,7 @@ import {
   getSpan,
   suppressInstrumentation,
   NOOP_TRACER,
+  diag,
 } from '@opentelemetry/api';
 import { BasePlugin } from '@opentelemetry/core';
 import type {
@@ -69,11 +70,7 @@ export class HttpPlugin extends BasePlugin<Http> {
 
   /** Patches HTTP incoming and outcoming request functions. */
   protected patch() {
-    this._logger.debug(
-      'applying patch to %s@%s',
-      this.moduleName,
-      this.version
-    );
+    diag.debug('applying patch to %s@%s', this.moduleName, this.version);
 
     shimmer.wrap(
       this._moduleExports,
@@ -102,7 +99,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         this._getPatchIncomingRequestFunction()
       );
     } else {
-      this._logger.error(
+      diag.error(
         'Could not apply patch to %s.emit. Interface is not as expected.',
         this.moduleName
       );
@@ -210,9 +207,9 @@ export class HttpPlugin extends BasePlugin<Http> {
         }
 
         context.bind(response);
-        this._logger.debug('outgoingRequest on response()');
+        diag.debug('outgoingRequest on response()');
         response.on('end', () => {
-          this._logger.debug('outgoingRequest on end()');
+          diag.debug('outgoingRequest on end()');
           let status: SpanStatus;
 
           if (response.aborted && !response.complete) {
@@ -254,7 +251,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       this._closeHttpSpan(span);
     });
 
-    this._logger.debug('_traceClientRequest return request');
+    diag.debug('_traceClientRequest return request');
     return request;
   }
 
@@ -279,14 +276,13 @@ export class HttpPlugin extends BasePlugin<Http> {
         : '/';
       const method = request.method || 'GET';
 
-      plugin._logger.debug('%s plugin incomingRequest', plugin.moduleName);
+      diag.debug('%s plugin incomingRequest', plugin.moduleName);
 
       if (
         utils.isIgnored(
           pathname,
           plugin._config.ignoreIncomingPaths,
-          (e: Error) =>
-            plugin._logger.error('caught ignoreIncomingPaths error: ', e)
+          (e: Error) => diag.error('caught ignoreIncomingPaths error: ', e)
         )
       ) {
         return context.with(suppressInstrumentation(context.active()), () => {
@@ -398,8 +394,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         utils.isIgnored(
           origin + pathname,
           plugin._config.ignoreOutgoingUrls,
-          (e: Error) =>
-            plugin._logger.error('caught ignoreOutgoingUrls error: ', e)
+          (e: Error) => diag.error('caught ignoreOutgoingUrls error: ', e)
         )
       ) {
         return original.apply(this, [optionsParsed, ...args]);
@@ -424,7 +419,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         true
       );
 
-      plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
+      diag.debug('%s plugin outgoingRequest', plugin.moduleName);
       context.bind(request);
       return plugin._traceClientRequest(request, optionsParsed, span);
     };
@@ -508,7 +503,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         this._closeHttpSpan(span);
         throw error;
       }
-      this._logger.error('caught error ', error);
+      diag.error('caught error ', error);
     }
   }
 }

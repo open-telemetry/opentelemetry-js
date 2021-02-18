@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Logger, TracerProvider } from '@opentelemetry/api';
+import { TracerProvider } from '@opentelemetry/api';
 import { MeterProvider } from '@opentelemetry/api-metrics';
 import { Instrumentation } from './types';
 import { AutoLoaderResult, InstrumentationOption } from './types_internal';
@@ -63,13 +63,11 @@ export function parseInstrumentationOptions(
 /**
  * Enable instrumentations
  * @param instrumentations
- * @param logger
  * @param tracerProvider
  * @param meterProvider
  */
 export function enableInstrumentations(
   instrumentations: Instrumentation[],
-  logger: Logger,
   tracerProvider?: TracerProvider,
   meterProvider?: MeterProvider
 ) {

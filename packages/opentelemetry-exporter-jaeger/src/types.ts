@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
-
 /**
  * Options for Jaeger configuration
  */
 export interface ExporterConfig {
-  logger?: api.Logger;
   serviceName: string;
   tags?: Tag[];
   host?: string; // default: 'localhost'

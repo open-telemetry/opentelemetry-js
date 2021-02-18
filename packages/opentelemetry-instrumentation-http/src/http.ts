@@ -26,6 +26,7 @@ import {
   getSpan,
   suppressInstrumentation,
   NOOP_TRACER,
+  diag,
 } from '@opentelemetry/api';
 import type * as http from 'http';
 import type * as https from 'https';
@@ -85,7 +86,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       'http',
       ['*'],
       moduleExports => {
-        this._logger.debug(`Applying patch for http@${this._version}`);
+        diag.debug(`Applying patch for http@${this._version}`);
         if (isWrapped(moduleExports.request)) {
           this._unwrap(moduleExports, 'request');
         }
@@ -114,7 +115,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       },
       moduleExports => {
         if (moduleExports === undefined) return;
-        this._logger.debug(`Removing patch for http@${this._version}`);
+        diag.debug(`Removing patch for http@${this._version}`);
 
         this._unwrap(moduleExports, 'request');
         this._unwrap(moduleExports, 'get');
@@ -128,7 +129,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       'https',
       ['*'],
       moduleExports => {
-        this._logger.debug(`Applying patch for https@${this._version}`);
+        diag.debug(`Applying patch for https@${this._version}`);
         if (isWrapped(moduleExports.request)) {
           this._unwrap(moduleExports, 'request');
         }
@@ -157,7 +158,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       },
       moduleExports => {
         if (moduleExports === undefined) return;
-        this._logger.debug(`Removing patch for https@${this._version}`);
+        diag.debug(`Removing patch for https@${this._version}`);
 
         this._unwrap(moduleExports, 'request');
         this._unwrap(moduleExports, 'get');
@@ -303,9 +304,9 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         }
 
         context.bind(response);
-        this._logger.debug('outgoingRequest on response()');
+        diag.debug('outgoingRequest on response()');
         response.on('end', () => {
-          this._logger.debug('outgoingRequest on end()');
+          diag.debug('outgoingRequest on end()');
           let status: SpanStatus;
 
           if (response.aborted && !response.complete) {
@@ -347,7 +348,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       this._closeHttpSpan(span);
     });
 
-    this._logger.debug('http.ClientRequest return request');
+    diag.debug('http.ClientRequest return request');
     return request;
   }
 
@@ -373,20 +374,13 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         : '/';
       const method = request.method || 'GET';
 
-      instrumentation._logger.debug(
-        '%s instrumentation incomingRequest',
-        component
-      );
+      diag.debug('%s instrumentation incomingRequest', component);
 
       if (
         utils.isIgnored(
           pathname,
           instrumentation._getConfig().ignoreIncomingPaths,
-          (e: Error) =>
-            instrumentation._logger.error(
-              'caught ignoreIncomingPaths error: ',
-              e
-            )
+          (e: Error) => diag.error('caught ignoreIncomingPaths error: ', e)
         )
       ) {
         return context.with(suppressInstrumentation(context.active()), () => {
@@ -523,11 +517,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         utils.isIgnored(
           origin + pathname,
           instrumentation._getConfig().ignoreOutgoingUrls,
-          (e: Error) =>
-            instrumentation._logger.error(
-              'caught ignoreOutgoingUrls error: ',
-              e
-            )
+          (e: Error) => diag.error('caught ignoreOutgoingUrls error: ', e)
         )
       ) {
         return original.apply(this, [optionsParsed, ...args]);
@@ -557,10 +547,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         }
       );
 
-      instrumentation._logger.debug(
-        '%s instrumentation outgoingRequest',
-        component
-      );
+      diag.debug('%s instrumentation outgoingRequest', component);
       context.bind(request);
       return instrumentation._traceClientRequest(
         component,

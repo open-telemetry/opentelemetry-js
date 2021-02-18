@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { diag } from '@opentelemetry/api';
 import * as protoLoader from '@grpc/proto-loader';
 import { collectorTypes } from '@opentelemetry/exporter-collector';
 import * as grpc from 'grpc';
@@ -84,10 +85,10 @@ export function send<ExportItem, ServiceRequest>(
       collector.metadata,
       (err: collectorTypes.ExportServiceError) => {
         if (err) {
-          collector.logger.error('Service request', serviceRequest);
+          diag.error('Service request', serviceRequest);
           onError(err);
         } else {
-          collector.logger.debug('Objects sent');
+          diag.debug('Objects sent');
           onSuccess();
         }
       }
