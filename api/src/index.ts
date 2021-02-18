@@ -16,9 +16,8 @@
 
 export * from './common/Exception';
 export * from './common/Time';
-export * from './context/context';
-export * from './context/propagation/TextMapPropagator';
-export * from './context/propagation/NoopTextMapPropagator';
+export * from './propagation/TextMapPropagator';
+export * from './propagation/NoopTextMapPropagator';
 export * from './baggage';
 export * from './trace/attributes';
 export * from './trace/Event';
@@ -53,12 +52,9 @@ export {
   isValidSpanId,
 } from './trace/spancontext-utils';
 
-export {
-  Context,
-  ROOT_CONTEXT,
-  createContextKey,
-  ContextManager,
-} from './context-base';
+export * from './context/context';
+export * from './context/NoopContextManager';
+export * from './context/types';
 
 import { ContextAPI } from './api/context';
 export type { ContextAPI } from './api/context';

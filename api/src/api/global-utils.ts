@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { ContextManager } from '../context-base';
-import { TextMapPropagator } from '../context/propagation/TextMapPropagator';
-import { TracerProvider } from '../trace/tracer_provider';
-import { _globalThis } from '../platform';
 import { DiagAPI } from '../api/diag';
+import { ContextManager } from '../context/types';
+import { _globalThis } from '../platform';
+import { TextMapPropagator } from '../propagation/TextMapPropagator';
+import { TracerProvider } from '../trace/tracer_provider';
 
 export const GLOBAL_CONTEXT_MANAGER_API_KEY = Symbol.for(
   'io.opentelemetry.js.api.context'

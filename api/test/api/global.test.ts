@@ -19,7 +19,7 @@ import {
   GLOBAL_CONTEXT_MANAGER_API_KEY,
   _global,
 } from '../../src/api/global-utils';
-import { NoopContextManager } from '../../src/context-base';
+import { NoopContextManager } from '../../src/context/NoopContextManager';
 
 const api1 = require('../../src') as typeof import('../../src');
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context } from '../context-base';
+import { Context } from '../context/types';
 import { SpanAttributes } from './attributes';
 import { Link } from './link';
 import { SamplingResult } from './SamplingResult';

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context } from '../context-base';
+import { Context } from '../context/types';
 import { Span } from './span';
 import { SpanOptions } from './SpanOptions';
 

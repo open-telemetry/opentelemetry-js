@@ -15,9 +15,10 @@
  */
 
 import * as assert from 'assert';
-import { createContextKey, ROOT_CONTEXT } from '../../src/context-base';
 import {
+  createContextKey,
   isInstrumentationSuppressed,
+  ROOT_CONTEXT,
   suppressInstrumentation,
   unsuppressInstrumentation,
 } from '../../src/context/context';
