@@ -57,7 +57,6 @@
     "@typescript-eslint/parser": "^4.15.1",
     "codecov": "3.8.1",
     "eslint": "^7.20.0",
-    "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-header": "^3.1.1",
     "eslint-plugin-import": "^2.22.1",
     "gh-pages": "^3.1.0",
