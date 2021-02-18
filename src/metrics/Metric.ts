@@ -110,14 +110,14 @@ export interface Counter extends UnboundMetric<BoundCounter> {
   /**
    * Adds the given value to the current value. Values cannot be negative.
    */
-  add(value: number, labels: Labels): void;
+  add(value: number, labels?: Labels): void;
 }
 
 export interface Measure extends UnboundMetric<BoundMeasure> {
   /**
    * Records the given value to this measure.
    */
-  record(value: number, labels: Labels): void;
+  record(value: number, labels?: Labels): void;
 
   record(
     value: number,
