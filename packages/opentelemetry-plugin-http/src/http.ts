@@ -197,11 +197,11 @@ export class HttpPlugin extends BasePlugin<Http> {
     request.on(
       'response',
       (response: IncomingMessage & { aborted?: boolean }) => {
-        const attributes = utils.getOutgoingRequestAttributesOnResponse(
+        const responseAttributes = utils.getOutgoingRequestAttributesOnResponse(
           response,
           { hostname }
         );
-        span.setAttributes(attributes);
+        span.setAttributes(responseAttributes);
         if (this._config.responseHook) {
           this._callResponseHook(span, response);
         }

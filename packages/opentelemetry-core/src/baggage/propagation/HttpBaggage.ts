@@ -88,11 +88,11 @@ export class HttpBaggage implements TextMapPropagator {
     pairs.forEach(entry => {
       const keyPair = this._parsePairKeyValue(entry);
       if (keyPair) {
-        const entry: BaggageEntry = { value: keyPair.value };
+        const baggageEntry: BaggageEntry = { value: keyPair.value };
         if (keyPair.metadata) {
-          entry.metadata = keyPair.metadata;
+          baggageEntry.metadata = keyPair.metadata;
         }
-        baggage[keyPair.key] = entry;
+        baggage[keyPair.key] = baggageEntry;
       }
     });
     if (Object.entries(baggage).length === 0) {
