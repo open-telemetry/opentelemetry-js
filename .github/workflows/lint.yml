@@ -59,19 +59,3 @@ jobs:
         run: |
           npm run lint
           npm run lint:examples
-
-      - name: Install API Dependencies (cache hit)
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: npx lerna bootstrap --scope @opentelemetry/api --include-dependencies
-
-      - name: Install API Dependencies (cache miss)
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: npx lerna bootstrap --no-ci --scope @opentelemetry/api --include-dependencies
-
-      - name: Build 🔧
-        run: |
-          npx lerna run compile --scope @opentelemetry/api
-          npx lerna run docs
-
-      - name: Test Docs
-        run: npm run docs-test
