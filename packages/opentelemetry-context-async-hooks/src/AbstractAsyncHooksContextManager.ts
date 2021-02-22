@@ -17,18 +17,16 @@
 import { ContextManager, Context } from '@opentelemetry/context-base';
 import { EventEmitter } from 'events';
 
-const kOtListeners = Symbol('OtListeners');
-
 type Func<T> = (...args: unknown[]) => T;
 
-type PatchedEventEmitter = {
-  /**
-   * Store a map for each event of all original listener and their "patched"
-   * version so when the listener is removed by the user, we remove the
-   * corresponding "patched" function.
-   */
-  [kOtListeners]?: { [name: string]: WeakMap<Func<void>, Func<void>> };
-} & EventEmitter;
+/**
+ * Store a map for each event of all original listeners and their "patched"
+ * version. So when a listener is removed by the user, the corresponding
+ * patched function will be also removed.
+ */
+interface PatchMap {
+  [name: string]: WeakMap<Func<void>, Func<void>>;
+}
 
 const ADD_LISTENER_METHODS = [
   'addListener' as const,
@@ -66,7 +64,7 @@ export abstract class AbstractAsyncHooksContextManager
 
   private _bindFunction<T extends Function>(target: T, context: Context): T {
     const manager = this;
-    const contextWrapper = function (this: {}, ...args: unknown[]) {
+    const contextWrapper = function (this: never, ...args: unknown[]) {
       return manager.with(context, () => target.apply(this, args));
     };
     Object.defineProperty(contextWrapper, 'length', {
@@ -87,16 +85,16 @@ export abstract class AbstractAsyncHooksContextManager
    * By default, EventEmitter call their callback with their context, which we do
    * not want, instead we will bind a specific context to all callbacks that
    * go through it.
-   * @param target EventEmitter a instance of EventEmitter to patch
+   * @param ee EventEmitter an instance of EventEmitter to patch
    * @param context the context we want to bind
    */
   private _bindEventEmitter<T extends EventEmitter>(
-    target: T,
+    ee: T,
     context: Context
   ): T {
-    const ee = (target as unknown) as PatchedEventEmitter;
-    if (ee[kOtListeners] !== undefined) return target;
-    ee[kOtListeners] = {};
+    const map = this._getPatchMap(ee);
+    if (map !== undefined) return ee;
+    this._createPatchMap(ee);
 
     // patch methods that add a listener to propagate context
     ADD_LISTENER_METHODS.forEach(methodName => {
@@ -117,7 +115,7 @@ export abstract class AbstractAsyncHooksContextManager
         ee.removeAllListeners
       );
     }
-    return target;
+    return ee;
   }
 
   /**
@@ -126,9 +124,10 @@ export abstract class AbstractAsyncHooksContextManager
    * @param ee EventEmitter instance
    * @param original reference to the patched method
    */
-  private _patchRemoveListener(ee: PatchedEventEmitter, original: Function) {
-    return function (this: {}, event: string, listener: Func<void>) {
-      const events = ee[kOtListeners]?.[event];
+  private _patchRemoveListener(ee: EventEmitter, original: Function) {
+    const contextManager = this;
+    return function (this: never, event: string, listener: Func<void>) {
+      const events = contextManager._getPatchMap(ee)?.[event];
       if (events === undefined) {
         return original.call(this, event, listener);
       }
@@ -143,13 +142,12 @@ export abstract class AbstractAsyncHooksContextManager
    * @param ee EventEmitter instance
    * @param original reference to the patched method
    */
-  private _patchRemoveAllListeners(
-    ee: PatchedEventEmitter,
-    original: Function
-  ) {
-    return function (this: {}, event: string) {
-      if (ee[kOtListeners]?.[event] !== undefined) {
-        delete ee[kOtListeners]![event];
+  private _patchRemoveAllListeners(ee: EventEmitter, original: Function) {
+    const contextManager = this;
+    return function (this: never, event: string) {
+      const map = contextManager._getPatchMap(ee);
+      if (map?.[event] !== undefined) {
+        delete map[event];
       }
       return original.call(this, event);
     };
@@ -163,17 +161,20 @@ export abstract class AbstractAsyncHooksContextManager
    * @param [context] context to propagate when calling listeners
    */
   private _patchAddListener(
-    ee: PatchedEventEmitter,
+    ee: EventEmitter,
     original: Function,
     context: Context
   ) {
     const contextManager = this;
-    return function (this: {}, event: string, listener: Func<void>) {
-      if (ee[kOtListeners] === undefined) ee[kOtListeners] = {};
-      let listeners = ee[kOtListeners]![event];
+    return function (this: never, event: string, listener: Func<void>) {
+      let map = contextManager._getPatchMap(ee);
+      if (map === undefined) {
+        map = contextManager._createPatchMap(ee);
+      }
+      let listeners = map[event];
       if (listeners === undefined) {
         listeners = new WeakMap();
-        ee[kOtListeners]![event] = listeners;
+        map[event] = listeners;
       }
       const patchedListener = contextManager.bind(listener, context);
       // store a weak reference of the user listener to ours
@@ -181,4 +182,16 @@ export abstract class AbstractAsyncHooksContextManager
       return original.call(this, event, patchedListener);
     };
   }
+
+  private _createPatchMap(ee: EventEmitter): PatchMap {
+    const map = {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (ee as any)[this._kOtListeners] = map;
+    return map;
+  }
+  private _getPatchMap(ee: EventEmitter): PatchMap | undefined {
+    return (ee as never)[this._kOtListeners];
+  }
+
+  private readonly _kOtListeners = Symbol('OtListeners');
 }

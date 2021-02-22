@@ -54,17 +54,17 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
   const request = parsedUrl.protocol === 'http:' ? http.request : https.request;
 
   const req = request(options, (res: http.IncomingMessage) => {
-    let data = '';
-    res.on('data', chunk => (data += chunk));
+    let responseData = '';
+    res.on('data', chunk => (responseData += chunk));
     res.on('end', () => {
       if (res.statusCode && res.statusCode < 299) {
-        diag.debug(`statusCode: ${res.statusCode}`, data);
+        diag.debug(`statusCode: ${res.statusCode}`, responseData);
         onSuccess();
       } else {
         const error = new collectorTypes.CollectorExporterError(
           res.statusMessage,
           res.statusCode,
-          data
+          responseData
         );
         onError(error);
       }
