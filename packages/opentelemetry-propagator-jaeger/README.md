@@ -1,4 +1,5 @@
 # OpenTelemetry Propagator Jaeger
+
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -11,19 +12,20 @@ Format:
 {trace-id}:{span-id}:{parent-span-id}:{flags}
 
 * {trace-id}
-    * 64-bit or 128-bit random number in base16 format.
-    * Can be variable length, shorter values are 0-padded on the left.
-    * Value of 0 is invalid.
+  * 64-bit or 128-bit random number in base16 format.
+  * Can be variable length, shorter values are 0-padded on the left.
+  * Value of 0 is invalid.
 
 * {span-id}
-    * 64-bit random number in base16 format.
+  * 64-bit random number in base16 format.
 
 * {parent-span-id}
-    * Set to 0 because this field is deprecated.
+  * Set to 0 because this field is deprecated.
 * {flags}
-    * One byte bitmap, as two hex digits.
+  * One byte bitmap, as two hex digits.
 
 Example of usage:
+
 ```javascript
 const { NodeTracerProvider } = require('@opentelemetry/node');
 const { JaegerHttpTracePropagator } = require('@opentelemetry/propagator-jaeger');
@@ -40,9 +42,10 @@ provider.register({
 ![example image](jaeger-tracing.png)
 
 ## Useful links
-- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
-- For help or feedback on this project, join us on [gitter][gitter-url]
+
+* For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
+* For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
+* For help or feedback on this project, join us on [gitter][gitter-url]
 
 ## License
 
