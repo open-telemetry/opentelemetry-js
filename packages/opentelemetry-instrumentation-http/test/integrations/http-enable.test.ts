@@ -39,6 +39,7 @@ import * as http from 'http';
 import { httpRequest } from '../utils/httpRequest';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { Socket } from 'net';
+import { sendRequestTwice } from '../utils/rawRequest';
 
 const protocol = 'http';
 const serverPort = 32345;
@@ -345,5 +346,14 @@ describe('HttpInstrumentation Integration tests', () => {
         });
       });
     }
+
+    it('should work for multiple active requests in keep-alive mode', async () => {
+      await sendRequestTwice(hostname, mockServerPort);
+      const spans = memoryExporter.getFinishedSpans();
+      const span = spans.find((s: any) => s.kind === SpanKind.SERVER);
+      assert.ok(span);
+      assert.strictEqual(spans.length, 2);
+      assert.strictEqual(span.name, 'HTTP GET');
+    });
   });
 });
