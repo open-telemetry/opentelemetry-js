@@ -25,7 +25,6 @@ import { HttpAttribute } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as http from 'http';
 import { IncomingMessage, ServerResponse } from 'http';
-import { Socket } from 'net';
 import * as sinon from 'sinon';
 import * as url from 'url';
 import { IgnoreMatcher } from '../../src/types';
@@ -291,19 +290,23 @@ describe('Utility', () => {
     it('should correctly parse the middleware stack if present', () => {
       const request = {
         __ot_middlewares: ['/test', '/toto', '/'],
-      } as IncomingMessage & { __ot_middlewares?: string[] };
-
-      const attributes = utils.getIncomingRequestAttributesOnResponse(request, {
         socket: {},
-      } as ServerResponse & { socket: Socket });
+      } as IncomingMessage & { __ot_middlewares?: string[] };
+      const response = {} as ServerResponse;
+      const attributes = utils.getIncomingRequestAttributesOnResponse(
+        request,
+        response
+      );
       assert.deepEqual(attributes[HttpAttribute.HTTP_ROUTE], '/test/toto');
     });
 
     it('should succesfully process without middleware stack', () => {
-      const request = {} as IncomingMessage;
-      const attributes = utils.getIncomingRequestAttributesOnResponse(request, {
-        socket: {},
-      } as ServerResponse & { socket: Socket });
+      const request = { socket: {} } as IncomingMessage;
+      const response = {} as ServerResponse;
+      const attributes = utils.getIncomingRequestAttributesOnResponse(
+        request,
+        response
+      );
       assert.deepEqual(attributes[HttpAttribute.HTTP_ROUTE], undefined);
     });
   });
