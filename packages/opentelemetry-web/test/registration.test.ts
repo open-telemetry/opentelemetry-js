@@ -41,8 +41,7 @@ describe('API registration', () => {
     assert.ok(
       propagation['_getGlobalPropagator']() instanceof CompositePropagator
     );
-    const apiTracerProvider = trace.getTracerProvider();
-    assert.ok(apiTracerProvider instanceof ProxyTracerProvider);
+    const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
     assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
   });
 
@@ -60,8 +59,7 @@ describe('API registration', () => {
     assert.ok(context['_getContextManager']() === contextManager);
     assert.ok(propagation['_getGlobalPropagator']() === propagator);
 
-    const apiTracerProvider = trace.getTracerProvider();
-    assert.ok(apiTracerProvider instanceof ProxyTracerProvider);
+    const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
     assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
   });
 
@@ -76,8 +74,7 @@ describe('API registration', () => {
     assert.ok(
       propagation['_getGlobalPropagator']() instanceof CompositePropagator
     );
-    const apiTracerProvider = trace.getTracerProvider();
-    assert.ok(apiTracerProvider instanceof ProxyTracerProvider);
+    const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
     assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
   });
 
@@ -92,8 +89,7 @@ describe('API registration', () => {
     );
 
     assert.ok(context['_getContextManager']() instanceof StackContextManager);
-    const apiTracerProvider = trace.getTracerProvider();
-    assert.ok(apiTracerProvider instanceof ProxyTracerProvider);
+    const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
     assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
   });
 });

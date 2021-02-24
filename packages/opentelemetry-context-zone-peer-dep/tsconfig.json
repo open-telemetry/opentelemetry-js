@@ -11,10 +11,5 @@
   "include": [
     "src/**/*.ts",
     "test/**/*.ts"
-  ],
-  "references": [
-    {
-      "path": "../opentelemetry-context-base"
-    }
   ]
 }
