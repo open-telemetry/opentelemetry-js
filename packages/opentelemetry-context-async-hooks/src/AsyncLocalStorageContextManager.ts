@@ -37,7 +37,7 @@ export class AsyncLocalStorageContextManager extends AbstractAsyncHooksContextMa
     ...args: A
   ): ReturnType<F> {
     const cb = thisArg == null ? fn : fn.bind(thisArg);
-    return this._asyncLocalStorage.run(context, cb as any, ...args);
+    return this._asyncLocalStorage.run(context, cb as never, ...args);
   }
 
   enable(): this {

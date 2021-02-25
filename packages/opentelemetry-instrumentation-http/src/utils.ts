@@ -465,7 +465,10 @@ export const getIncomingRequestAttributesOnResponse = (
   request: IncomingMessage & { __ot_middlewares?: string[] },
   response: ServerResponse & { socket: Socket }
 ): SpanAttributes => {
-  const { statusCode, statusMessage, socket } = response;
+  // take socket from the request,
+  // since it may be detached from the response object in keep-alive mode
+  const { socket } = request;
+  const { statusCode, statusMessage } = response;
   const { localAddress, localPort, remoteAddress, remotePort } = socket;
   const { __ot_middlewares } = (request as unknown) as {
     [key: string]: unknown;

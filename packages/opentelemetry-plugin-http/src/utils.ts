@@ -31,7 +31,6 @@ import {
   RequestOptions,
   ServerResponse,
 } from 'http';
-import { Socket } from 'net';
 import * as url from 'url';
 import { Err, IgnoreMatcher, ParsedRequestOptions } from './types';
 
@@ -463,9 +462,12 @@ export const getIncomingRequestAttributes = (
  */
 export const getIncomingRequestAttributesOnResponse = (
   request: IncomingMessage & { __ot_middlewares?: string[] },
-  response: ServerResponse & { socket: Socket }
+  response: ServerResponse
 ): SpanAttributes => {
-  const { statusCode, statusMessage, socket } = response;
+  // use socket from the request,
+  // since it may be detached from the response object in keep-alive mode
+  const { socket } = request;
+  const { statusCode, statusMessage } = response;
   const { localAddress, localPort, remoteAddress, remotePort } = socket;
   const { __ot_middlewares } = (request as unknown) as {
     [key: string]: unknown;

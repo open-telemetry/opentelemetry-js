@@ -48,7 +48,8 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 
 | Core version | Contrib Version         |
 |--------------|-------------------------|
-| 0.16.x       | 0.14.x not released yet |
+| 0.17.x       | 0.14.x not released yet |
+| 0.16.x       | ------                  |
 | 0.15.x       | 0.13.x                  |
 | 0.14.x       | 0.12.x                  |
 | 0.13.x       | ------                  |
@@ -244,7 +245,7 @@ To request automatic tracing support for a module not on this list, please [file
 
 ## Upgrade guidelines
 
-### 0.17.0 to ???
+### 0.16.0 to 0.17.0
 
 [PR-1880](https://github.com/open-telemetry/opentelemetry-js/pull/1880) feat(diag-logger): introduce a new global level api.diag for internal diagnostic logging
 
@@ -290,8 +291,6 @@ import { diag } from "@opentelemetry/api";
 diag.setLogger();
 
 ```
-
-### 0.16.0 to 0.17.0
 
 [PR-1855](https://github.com/open-telemetry/opentelemetry-js/pull/1855) Use instrumentation loader to load plugins and instrumentations
 

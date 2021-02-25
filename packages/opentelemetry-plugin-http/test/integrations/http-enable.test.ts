@@ -35,6 +35,7 @@ import {
 import { HttpPluginConfig } from '../../src/types';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { Socket } from 'net';
+import { sendRequestTwice } from '../utils/rawRequest';
 const protocol = 'http';
 const serverPort = 32345;
 const hostname = 'localhost';
@@ -337,5 +338,14 @@ describe('HttpPlugin Integration tests', () => {
         });
       });
     }
+
+    it('should work for multiple active requests in keep-alive mode', async () => {
+      await sendRequestTwice(hostname, mockServerPort);
+      const spans = memoryExporter.getFinishedSpans();
+      const span = spans.find((s: any) => s.kind === SpanKind.SERVER);
+      assert.ok(span);
+      assert.strictEqual(spans.length, 2);
+      assert.strictEqual(span.name, 'HTTP GET');
+    });
   });
 });
