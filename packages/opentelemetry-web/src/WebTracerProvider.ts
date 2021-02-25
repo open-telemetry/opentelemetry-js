@@ -28,7 +28,7 @@ export interface WebTracerConfig extends TracerConfig {
   /**
    * plugins to be used with tracer, they will be enabled automatically
    */
-  plugins?: unknown[];
+  plugins?: Record<string, unknown>;
 }
 
 /**

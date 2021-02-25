@@ -91,7 +91,7 @@ describe('NodeTracerProvider', () => {
       const dummyPlugin1 = {};
       const spyWarn = sinon.spy(diag.getLogger(), 'warn');
 
-      const plugins = [dummyPlugin1];
+      const plugins = { dummy: dummyPlugin1 };
       const options = { plugins };
       provider = new NodeTracerProvider(options);
 

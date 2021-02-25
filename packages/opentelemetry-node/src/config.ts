@@ -21,5 +21,5 @@ import { TracerConfig } from '@opentelemetry/tracing';
  */
 export interface NodeTracerConfig extends TracerConfig {
   /** Plugins options deprecated */
-  plugins?: unknown[];
+  plugins?: Record<string, unknown>;
 }

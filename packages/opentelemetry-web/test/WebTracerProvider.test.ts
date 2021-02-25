@@ -52,7 +52,7 @@ describe('WebTracerProvider', () => {
       const dummyPlugin1 = {};
       const spyWarn = sinon.spy(window.console, 'warn');
 
-      const plugins = [dummyPlugin1];
+      const plugins = { dummy: dummyPlugin1 };
 
       const options = { plugins };
       new WebTracerProvider(options);
