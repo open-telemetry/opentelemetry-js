@@ -16,7 +16,7 @@
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p .",
     "compile": "tsc --build",
     "docs-test": "linkinator docs/out --silent --skip david-dm.org",
-    "docs": "typedoc --tsconfig tsconfig.docs.json",
+    "docs": "typedoc",
     "lint:fix": "eslint src test --ext .ts --fix",
     "lint": "eslint src test --ext .ts",
     "test:browser": "nyc karma start --single-run",

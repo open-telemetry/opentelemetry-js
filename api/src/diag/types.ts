@@ -59,28 +59,33 @@ export interface DiagLogger {
   verbose: DiagLogFunction;
 }
 
-// DiagLogger implementation
-export const diagLoggerFunctions: Array<keyof DiagLogger> = [
-  'verbose',
-  'debug',
-  'info',
-  'warn',
-  'error',
-];
-
-function noopLogFunction() {}
-
 /**
- * Returns a No-Op Diagnostic logger where all messages do nothing.
- * @implements {@link DiagLogger}
- * @returns {DiagLogger}
+ * Defines the available internal logging levels for the diagnostic logger, the numeric values
+ * of the levels are defined to match the original values from the initial LogLevel to avoid
+ * compatibility/migration issues for any implementation that assume the numeric ordering.
  */
-export function createNoopDiagLogger(): DiagLogger {
-  const diagLogger = {} as DiagLogger;
+export enum DiagLogLevel {
+  /** Diagnostic Logging level setting to disable all logging (except and forced logs) */
+  NONE = 0,
 
-  for (let i = 0; i < diagLoggerFunctions.length; i++) {
-    diagLogger[diagLoggerFunctions[i]] = noopLogFunction;
-  }
+  /** Identifies an error scenario */
+  ERROR = 30,
 
-  return diagLogger;
+  /** Identifies a warning scenario */
+  WARN = 50,
+
+  /** General informational log message */
+  INFO = 60,
+
+  /** General debug log message */
+  DEBUG = 70,
+
+  /**
+   * Detailed trace level logging should only be used for development, should only be set
+   * in a development environment.
+   */
+  VERBOSE = 80,
+
+  /** Used to set the logging level to include all logging */
+  ALL = 9999,
 }

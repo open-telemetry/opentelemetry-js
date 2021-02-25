@@ -16,7 +16,14 @@
 
 import * as assert from 'assert';
 import { DiagConsoleLogger } from '../../src/diag/consoleLogger';
-import { diagLoggerFunctions } from '../../src/diag/logger';
+
+export const diagLoggerFunctions = [
+  'verbose',
+  'debug',
+  'info',
+  'warn',
+  'error',
+] as const;
 
 const consoleFuncs: Array<keyof Console> = [
   'debug',
