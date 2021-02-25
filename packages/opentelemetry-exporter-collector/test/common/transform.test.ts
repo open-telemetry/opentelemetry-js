@@ -37,12 +37,21 @@ describe('transform', () => {
       ]);
     });
 
-    it('should convert attribute integer', () => {
+    it('should convert attribute integer to integer', () => {
       const attributes: SpanAttributes = {
         foo: 13,
       };
       assert.deepStrictEqual(transform.toCollectorAttributes(attributes), [
-        { key: 'foo', value: { doubleValue: 13 } },
+        { key: 'foo', value: { intValue: 13 } },
+      ]);
+    });
+
+    it('should convert attribute integer to double', () => {
+      const attributes: SpanAttributes = {
+        foo: 2247483647,
+      };
+      assert.deepStrictEqual(transform.toCollectorAttributes(attributes), [
+        { key: 'foo', value: { doubleValue: 2247483647 } },
       ]);
     });
 
@@ -118,7 +127,7 @@ describe('transform', () => {
           },
           {
             key: 'version',
-            value: { doubleValue: 1 },
+            value: { intValue: 1 },
           },
           { key: 'success', value: { boolValue: true } },
         ],

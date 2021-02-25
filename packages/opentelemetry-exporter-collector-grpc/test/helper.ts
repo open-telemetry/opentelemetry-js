@@ -422,8 +422,8 @@ export function ensureResourceIsCorrect(
       {
         key: 'version',
         value: {
-          doubleValue: 1,
-          value: 'doubleValue',
+          intValue: '1',
+          value: 'intValue',
         },
       },
       {
