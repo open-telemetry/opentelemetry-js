@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
+export * from './baggage';
 export * from './common/Exception';
 export * from './common/Time';
-export * from './propagation/TextMapPropagator';
+export * from './diag';
 export * from './propagation/NoopTextMapPropagator';
-export * from './baggage';
+export * from './propagation/TextMapPropagator';
 export * from './trace/attributes';
 export * from './trace/Event';
 export * from './trace/link_context';
@@ -39,9 +40,6 @@ export * from './trace/trace_flags';
 export * from './trace/trace_state';
 export * from './trace/tracer_provider';
 export * from './trace/tracer';
-export * from './diag/consoleLogger';
-export * from './diag/logger';
-export * from './diag/logLevel';
 
 export {
   INVALID_SPANID,

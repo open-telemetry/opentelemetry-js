@@ -32,11 +32,19 @@ import api, {
   defaultTextMapSetter,
   defaultTextMapGetter,
   diag,
-  diagLoggerFunctions,
 } from '../../src';
 import { DiagAPI } from '../../src/api/diag';
 import { _global } from '../../src/api/global-utils';
 import { NoopSpan } from '../../src/trace/NoopSpan';
+
+// DiagLogger implementation
+const diagLoggerFunctions = [
+  'verbose',
+  'debug',
+  'info',
+  'warn',
+  'error',
+] as const;
 
 describe('API', () => {
   it('should expose a tracer provider via getTracerProvider', () => {
@@ -191,6 +199,7 @@ describe('API', () => {
 
     diagLoggerFunctions.forEach(fName => {
       it(`no argument logger ${fName} message doesn't throw`, () => {
+        //@ts-expect-error an undefined logger is not allowed
         diag.setLogger();
         assert.doesNotThrow(() => {
           diag[fName](`${fName} message`);
