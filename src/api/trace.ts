@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import { NOOP_TRACER_PROVIDER } from '../trace/NoopTracerProvider';
 import { ProxyTracerProvider } from '../trace/ProxyTracerProvider';
 import { Tracer } from '../trace/tracer';
 import { TracerProvider } from '../trace/tracer_provider';
 import { isSpanContextValid } from '../trace/spancontext-utils';
 import {
-  API_BACKWARDS_COMPATIBILITY_VERSION,
-  GLOBAL_TRACE_API_KEY,
-  makeGetter,
-  _global,
-} from './global-utils';
+  getGlobal,
+  registerGlobal,
+  unregisterGlobal,
+} from '../internal/global-utils';
+
+const API_NAME = 'trace';
 
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Tracing API
@@ -50,30 +50,16 @@ export class TraceAPI {
    * Set the current global tracer. Returns the initialized global tracer provider
    */
   public setGlobalTracerProvider(provider: TracerProvider): TracerProvider {
-    if (_global[GLOBAL_TRACE_API_KEY]) {
-      // global tracer provider has already been set
-      return this.getTracerProvider();
-    }
-
     this._proxyTracerProvider.setDelegate(provider);
-
-    _global[GLOBAL_TRACE_API_KEY] = makeGetter(
-      API_BACKWARDS_COMPATIBILITY_VERSION,
-      this._proxyTracerProvider,
-      NOOP_TRACER_PROVIDER
-    );
-
-    return this.getTracerProvider();
+    registerGlobal(API_NAME, this._proxyTracerProvider);
+    return this._proxyTracerProvider;
   }
 
   /**
    * Returns the global tracer provider.
    */
   public getTracerProvider(): TracerProvider {
-    return (
-      _global[GLOBAL_TRACE_API_KEY]?.(API_BACKWARDS_COMPATIBILITY_VERSION) ??
-      this._proxyTracerProvider
-    );
+    return getGlobal(API_NAME) || this._proxyTracerProvider;
   }
 
   /**
@@ -85,7 +71,7 @@ export class TraceAPI {
 
   /** Remove the global tracer provider */
   public disable() {
-    delete _global[GLOBAL_TRACE_API_KEY];
+    unregisterGlobal(API_NAME);
     this._proxyTracerProvider = new ProxyTracerProvider();
   }
 

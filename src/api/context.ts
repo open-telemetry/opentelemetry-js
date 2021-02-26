@@ -17,12 +17,12 @@
 import { NoopContextManager } from '../context/NoopContextManager';
 import { Context, ContextManager } from '../context/types';
 import {
-  API_BACKWARDS_COMPATIBILITY_VERSION,
-  GLOBAL_CONTEXT_MANAGER_API_KEY,
-  makeGetter,
-  _global,
-} from './global-utils';
+  getGlobal,
+  registerGlobal,
+  unregisterGlobal,
+} from '../internal/global-utils';
 
+const API_NAME = 'context';
 const NOOP_CONTEXT_MANAGER = new NoopContextManager();
 
 /**
@@ -49,17 +49,7 @@ export class ContextAPI {
   public setGlobalContextManager(
     contextManager: ContextManager
   ): ContextManager {
-    if (_global[GLOBAL_CONTEXT_MANAGER_API_KEY]) {
-      // global context manager has already been set
-      return this._getContextManager();
-    }
-
-    _global[GLOBAL_CONTEXT_MANAGER_API_KEY] = makeGetter(
-      API_BACKWARDS_COMPATIBILITY_VERSION,
-      contextManager,
-      NOOP_CONTEXT_MANAGER
-    );
-
+    registerGlobal(API_NAME, contextManager);
     return contextManager;
   }
 
@@ -98,16 +88,12 @@ export class ContextAPI {
   }
 
   private _getContextManager(): ContextManager {
-    return (
-      _global[GLOBAL_CONTEXT_MANAGER_API_KEY]?.(
-        API_BACKWARDS_COMPATIBILITY_VERSION
-      ) ?? NOOP_CONTEXT_MANAGER
-    );
+    return getGlobal(API_NAME) || NOOP_CONTEXT_MANAGER;
   }
 
   /** Disable and remove the global context manager */
   public disable() {
     this._getContextManager().disable();
-    delete _global[GLOBAL_CONTEXT_MANAGER_API_KEY];
+    unregisterGlobal(API_NAME);
   }
 }
