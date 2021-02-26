@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/api",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "description": "Public API for OpenTelemetry",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -8,7 +8,7 @@
     "./src/platform/index.ts": "./src/platform/browser/index.ts",
     "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
   },
-  "repository": "open-telemetry/opentelemetry-js-api",
+  "repository": "https://github.com/open-telemetry/opentelemetry-js-api.git",
   "scripts": {
     "build": "npm run compile",
     "clean": "tsc --build --clean",
@@ -68,6 +68,7 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "4.0.2",
+    "lerna-changelog": "^1.0.1",
     "linkinator": "2.13.5",
     "mocha": "7.2.0",
     "nyc": "15.1.0",
