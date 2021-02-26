@@ -72,10 +72,10 @@ describe('Global Utils', () => {
   });
 
   it('should return the module NoOp implementation if the version is a mismatch', () => {
-    const original = api1.context['_getContextManager']();
+    const fallback = new NoopContextManager();
     api1.context.setGlobalContextManager(new NoopContextManager());
-    const afterSet = _global[GLOBAL_CONTEXT_MANAGER_API_KEY]!(-1);
+    const afterSet = _global[GLOBAL_CONTEXT_MANAGER_API_KEY]!(-1, fallback);
 
-    assert.strictEqual(original, afterSet);
+    assert.strictEqual(fallback, afterSet);
   });
 });

@@ -17,8 +17,8 @@
 import { ContextManager } from '@opentelemetry/context-base';
 import { TextMapPropagator } from '../context/propagation/TextMapPropagator';
 import { MeterProvider } from '../metrics/MeterProvider';
-import { TracerProvider } from '../trace/tracer_provider';
 import { _globalThis } from '../platform';
+import { ProxyTracerProvider } from '../trace/ProxyTracerProvider';
 
 export const GLOBAL_CONTEXT_MANAGER_API_KEY = Symbol.for(
   'io.opentelemetry.js.api.context'
@@ -31,12 +31,12 @@ export const GLOBAL_PROPAGATION_API_KEY = Symbol.for(
 );
 export const GLOBAL_TRACE_API_KEY = Symbol.for('io.opentelemetry.js.api.trace');
 
-type Get<T> = (version: number) => T;
+type Get<T> = (version: number, fallback: T) => T;
 type OtelGlobal = Partial<{
   [GLOBAL_CONTEXT_MANAGER_API_KEY]: Get<ContextManager>;
   [GLOBAL_METRICS_API_KEY]: Get<MeterProvider>;
   [GLOBAL_PROPAGATION_API_KEY]: Get<TextMapPropagator>;
-  [GLOBAL_TRACE_API_KEY]: Get<TracerProvider>;
+  [GLOBAL_TRACE_API_KEY]: Get<ProxyTracerProvider>;
 }>;
 
 export const _global = _globalThis as OtelGlobal;
@@ -51,10 +51,9 @@ export const _global = _globalThis as OtelGlobal;
  */
 export function makeGetter<T>(
   requiredVersion: number,
-  instance: T,
-  fallback: T
+  instance: T
 ): Get<T> {
-  return (version: number): T =>
+  return (version: number, fallback: T): T => 
     version === requiredVersion ? instance : fallback;
 }
 
