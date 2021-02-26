@@ -24,11 +24,12 @@ import {
   TextMapSetter,
 } from '../propagation/TextMapPropagator';
 import {
-  API_BACKWARDS_COMPATIBILITY_VERSION,
-  GLOBAL_PROPAGATION_API_KEY,
-  makeGetter,
-  _global,
-} from './global-utils';
+  getGlobal,
+  registerGlobal,
+  unregisterGlobal,
+} from '../internal/global-utils';
+
+const API_NAME = 'propagation';
 
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Propagation API
@@ -52,17 +53,7 @@ export class PropagationAPI {
    * Set the current propagator. Returns the initialized propagator
    */
   public setGlobalPropagator(propagator: TextMapPropagator): TextMapPropagator {
-    if (_global[GLOBAL_PROPAGATION_API_KEY]) {
-      // global propagator has already been set
-      return this._getGlobalPropagator();
-    }
-
-    _global[GLOBAL_PROPAGATION_API_KEY] = makeGetter(
-      API_BACKWARDS_COMPATIBILITY_VERSION,
-      propagator,
-      NOOP_TEXT_MAP_PROPAGATOR
-    );
-
+    registerGlobal(API_NAME, propagator);
     return propagator;
   }
 
@@ -105,14 +96,10 @@ export class PropagationAPI {
 
   /** Remove the global propagator */
   public disable() {
-    delete _global[GLOBAL_PROPAGATION_API_KEY];
+    unregisterGlobal(API_NAME);
   }
 
   private _getGlobalPropagator(): TextMapPropagator {
-    return (
-      _global[GLOBAL_PROPAGATION_API_KEY]?.(
-        API_BACKWARDS_COMPATIBILITY_VERSION
-      ) ?? NOOP_TEXT_MAP_PROPAGATOR
-    );
+    return getGlobal(API_NAME) || NOOP_TEXT_MAP_PROPAGATOR;
   }
 }

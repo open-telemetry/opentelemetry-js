@@ -34,7 +34,6 @@ import api, {
   diag,
 } from '../../src';
 import { DiagAPI } from '../../src/api/diag';
-import { _global } from '../../src/api/global-utils';
 import { NoopSpan } from '../../src/trace/NoopSpan';
 
 // DiagLogger implementation

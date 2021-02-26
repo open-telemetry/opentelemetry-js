@@ -15,50 +15,29 @@
  */
 
 import { createLogLevelDiagLogger } from '../diag/internal/logLevelLogger';
-import { createNoopDiagLogger } from '../diag/internal/noopLogger';
 import { DiagLogFunction, DiagLogger, DiagLogLevel } from '../diag/types';
 import {
-  API_BACKWARDS_COMPATIBILITY_VERSION,
-  GLOBAL_DIAG_LOGGER_API_KEY,
-  makeGetter,
-  _global,
-} from './global-utils';
+  getGlobal,
+  registerGlobal,
+  unregisterGlobal,
+} from '../internal/global-utils';
 
-function nop() {}
-
-/** Internal simple Noop Diag API that returns a noop logger and does not allow any changes */
-function noopDiagApi(): DiagAPI {
-  return Object.assign(
-    { disable: nop, setLogger: nop },
-    createNoopDiagLogger()
-  );
-}
+const API_NAME = 'diag';
 
 /**
  * Singleton object which represents the entry point to the OpenTelemetry internal
  * diagnostic API
  */
 export class DiagAPI implements DiagLogger {
+  private static _instance?: DiagAPI;
+
   /** Get the singleton instance of the DiagAPI API */
   public static instance(): DiagAPI {
-    let theInst = null;
-    if (_global[GLOBAL_DIAG_LOGGER_API_KEY]) {
-      // Looks like a previous instance was set, so try and fetch it
-      theInst = _global[GLOBAL_DIAG_LOGGER_API_KEY]?.(
-        API_BACKWARDS_COMPATIBILITY_VERSION
-      ) as DiagAPI;
+    if (!this._instance) {
+      this._instance = new DiagAPI();
     }
 
-    if (!theInst) {
-      theInst = new DiagAPI();
-      _global[GLOBAL_DIAG_LOGGER_API_KEY] = makeGetter(
-        API_BACKWARDS_COMPATIBILITY_VERSION,
-        theInst,
-        noopDiagApi()
-      );
-    }
-
-    return theInst;
+    return this._instance;
   }
 
   /**
@@ -66,14 +45,13 @@ export class DiagAPI implements DiagLogger {
    * @private
    */
   private constructor() {
-    let _filteredLogger: DiagLogger | undefined;
-
     function _logProxy(funcName: keyof DiagLogger): DiagLogFunction {
       return function () {
+        const logger = getGlobal('diag');
         // shortcut if logger not set
-        if (!_filteredLogger) return;
-        return _filteredLogger[funcName].apply(
-          _filteredLogger,
+        if (!logger) return;
+        return logger[funcName].apply(
+          logger,
           // work around Function.prototype.apply types
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           arguments as any
@@ -91,24 +69,21 @@ export class DiagAPI implements DiagLogger {
       logLevel: DiagLogLevel = DiagLogLevel.INFO
     ) => {
       if (logger === self) {
-        if (_filteredLogger) {
-          const err = new Error(
-            'Cannot use diag as the logger for itself. Please use a DiagLogger implementation like ConsoleDiagLogger or a custom implementation'
-          );
-          _filteredLogger.error(err.stack ?? err.message);
-          logger = _filteredLogger;
-        } else {
-          // There isn't much we can do here.
-          // Logging to the console might break the user application.
-          return;
-        }
+        // There isn't much we can do here.
+        // Logging to the console might break the user application.
+        // Try to log to self. If a logger was previously registered it will receive the log.
+        const err = new Error(
+          'Cannot use diag as the logger for itself. Please use a DiagLogger implementation like ConsoleDiagLogger or a custom implementation'
+        );
+        self.error(err.stack ?? err.message);
+        return;
       }
 
-      _filteredLogger = createLogLevelDiagLogger(logLevel, logger);
+      registerGlobal('diag', createLogLevelDiagLogger(logLevel, logger), true);
     };
 
     self.disable = () => {
-      _filteredLogger = undefined;
+      unregisterGlobal(API_NAME);
     };
 
     self.verbose = _logProxy('verbose');
