@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { NOOP_TRACER_PROVIDER } from '../trace/NoopTracerProvider';
 import { ProxyTracerProvider } from '../trace/ProxyTracerProvider';
 import { Tracer } from '../trace/tracer';
 import { TracerProvider } from '../trace/tracer_provider';
@@ -59,8 +58,7 @@ export class TraceAPI {
 
     _global[GLOBAL_TRACE_API_KEY] = makeGetter(
       API_BACKWARDS_COMPATIBILITY_VERSION,
-      this._proxyTracerProvider,
-      NOOP_TRACER_PROVIDER
+      this._proxyTracerProvider
     );
 
     return this.getTracerProvider();
@@ -71,8 +69,10 @@ export class TraceAPI {
    */
   public getTracerProvider(): TracerProvider {
     return (
-      _global[GLOBAL_TRACE_API_KEY]?.(API_BACKWARDS_COMPATIBILITY_VERSION) ??
-      this._proxyTracerProvider
+      _global[GLOBAL_TRACE_API_KEY]?.(
+        API_BACKWARDS_COMPATIBILITY_VERSION,
+        this._proxyTracerProvider
+      ) ?? this._proxyTracerProvider
     );
   }
 

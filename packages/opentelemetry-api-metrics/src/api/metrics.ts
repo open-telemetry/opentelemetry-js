@@ -53,8 +53,7 @@ export class MetricsAPI {
 
     _global[GLOBAL_METRICS_API_KEY] = makeGetter(
       API_BACKWARDS_COMPATIBILITY_VERSION,
-      provider,
-      NOOP_METER_PROVIDER
+      provider
     );
 
     return provider;
@@ -65,8 +64,10 @@ export class MetricsAPI {
    */
   public getMeterProvider(): MeterProvider {
     return (
-      _global[GLOBAL_METRICS_API_KEY]?.(API_BACKWARDS_COMPATIBILITY_VERSION) ??
-      NOOP_METER_PROVIDER
+      _global[GLOBAL_METRICS_API_KEY]?.(
+        API_BACKWARDS_COMPATIBILITY_VERSION,
+        NOOP_METER_PROVIDER
+      ) ?? NOOP_METER_PROVIDER
     );
   }
 

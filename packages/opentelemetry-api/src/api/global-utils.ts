@@ -15,10 +15,10 @@
  */
 
 import { ContextManager } from '@opentelemetry/context-base';
-import { TextMapPropagator } from '../context/propagation/TextMapPropagator';
-import { TracerProvider } from '../trace/tracer_provider';
-import { _globalThis } from '../platform';
 import { DiagAPI } from '../api/diag';
+import { TextMapPropagator } from '../context/propagation/TextMapPropagator';
+import { _globalThis } from '../platform';
+import { ProxyTracerProvider } from '../trace/ProxyTracerProvider';
 
 export const GLOBAL_CONTEXT_MANAGER_API_KEY = Symbol.for(
   'io.opentelemetry.js.api.context'
@@ -33,12 +33,12 @@ export const GLOBAL_DIAG_LOGGER_API_KEY = Symbol.for(
   'io.opentelemetry.js.api.diag'
 );
 
-type Get<T> = (version: number) => T;
+type Get<T> = (version: number, fallback: T) => T;
 type OtelGlobal = Partial<{
   [GLOBAL_CONTEXT_MANAGER_API_KEY]: Get<ContextManager>;
   [GLOBAL_PROPAGATION_API_KEY]: Get<TextMapPropagator>;
-  [GLOBAL_TRACE_API_KEY]: Get<TracerProvider>;
   [GLOBAL_DIAG_LOGGER_API_KEY]: Get<DiagAPI>;
+  [GLOBAL_TRACE_API_KEY]: Get<ProxyTracerProvider>;
 }>;
 
 export const _global = _globalThis as OtelGlobal;
@@ -51,12 +51,8 @@ export const _global = _globalThis as OtelGlobal;
  * @param instance Instance which should be returned if the required version is compatible
  * @param fallback Fallback instance, usually NOOP, which will be returned if the required version is not compatible
  */
-export function makeGetter<T>(
-  requiredVersion: number,
-  instance: T,
-  fallback: T
-): Get<T> {
-  return (version: number): T =>
+export function makeGetter<T>(requiredVersion: number, instance: T): Get<T> {
+  return (version: number, fallback: T): T =>
     version === requiredVersion ? instance : fallback;
 }
 

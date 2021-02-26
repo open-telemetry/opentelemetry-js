@@ -50,7 +50,8 @@ export class DiagAPI implements DiagLogger {
     if (_global[GLOBAL_DIAG_LOGGER_API_KEY]) {
       // Looks like a previous instance was set, so try and fetch it
       theInst = _global[GLOBAL_DIAG_LOGGER_API_KEY]?.(
-        API_BACKWARDS_COMPATIBILITY_VERSION
+        API_BACKWARDS_COMPATIBILITY_VERSION,
+        noopDiagApi()
       ) as DiagAPI;
     }
 
@@ -58,8 +59,7 @@ export class DiagAPI implements DiagLogger {
       theInst = new DiagAPI();
       _global[GLOBAL_DIAG_LOGGER_API_KEY] = makeGetter(
         API_BACKWARDS_COMPATIBILITY_VERSION,
-        theInst,
-        noopDiagApi()
+        theInst
       );
     }
 
