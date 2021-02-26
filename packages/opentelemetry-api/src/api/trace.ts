@@ -31,7 +31,7 @@ export class TraceAPI {
   private static _instance?: TraceAPI;
 
   /** Empty private constructor prevents end users from constructing a new instance of the API */
-  private constructor() {}
+  private constructor() { }
 
   /** Get the singleton instance of the Trace API */
   public static getInstance(): TraceAPI {
@@ -53,8 +53,7 @@ export class TraceAPI {
 
     _global[GLOBAL_TRACE_API_KEY] = makeGetter(
       API_BACKWARDS_COMPATIBILITY_VERSION,
-      provider,
-      NOOP_TRACER_PROVIDER
+      provider
     );
 
     return this.getTracerProvider();
@@ -65,8 +64,10 @@ export class TraceAPI {
    */
   public getTracerProvider(): TracerProvider {
     return (
-      _global[GLOBAL_TRACE_API_KEY]?.(API_BACKWARDS_COMPATIBILITY_VERSION) ??
-      NOOP_TRACER_PROVIDER
+      _global[GLOBAL_TRACE_API_KEY]?.(
+        API_BACKWARDS_COMPATIBILITY_VERSION,
+        NOOP_TRACER_PROVIDER
+      ) ?? NOOP_TRACER_PROVIDER
     );
   }
 

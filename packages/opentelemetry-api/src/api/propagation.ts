@@ -60,8 +60,7 @@ export class PropagationAPI {
 
     _global[GLOBAL_PROPAGATION_API_KEY] = makeGetter(
       API_BACKWARDS_COMPATIBILITY_VERSION,
-      propagator,
-      NOOP_HTTP_TEXT_PROPAGATOR
+      propagator
     );
 
     return propagator;
@@ -105,7 +104,8 @@ export class PropagationAPI {
   private _getGlobalPropagator(): HttpTextPropagator {
     return (
       _global[GLOBAL_PROPAGATION_API_KEY]?.(
-        API_BACKWARDS_COMPATIBILITY_VERSION
+        API_BACKWARDS_COMPATIBILITY_VERSION,
+        NOOP_HTTP_TEXT_PROPAGATOR
       ) ?? NOOP_HTTP_TEXT_PROPAGATOR
     );
   }
