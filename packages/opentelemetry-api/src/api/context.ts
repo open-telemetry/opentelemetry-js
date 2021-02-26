@@ -59,8 +59,7 @@ export class ContextAPI {
 
     _global[GLOBAL_CONTEXT_MANAGER_API_KEY] = makeGetter(
       API_BACKWARDS_COMPATIBILITY_VERSION,
-      contextManager,
-      NOOP_CONTEXT_MANAGER
+      contextManager
     );
 
     return contextManager;
@@ -99,7 +98,8 @@ export class ContextAPI {
   private _getContextManager(): ContextManager {
     return (
       _global[GLOBAL_CONTEXT_MANAGER_API_KEY]?.(
-        API_BACKWARDS_COMPATIBILITY_VERSION
+        API_BACKWARDS_COMPATIBILITY_VERSION,
+        NOOP_CONTEXT_MANAGER
       ) ?? NOOP_CONTEXT_MANAGER
     );
   }

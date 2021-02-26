@@ -31,7 +31,7 @@ export class MetricsAPI {
   private static _instance?: MetricsAPI;
 
   /** Empty private constructor prevents end users from constructing a new instance of the API */
-  private constructor() {}
+  private constructor() { }
 
   /** Get the singleton instance of the Metrics API */
   public static getInstance(): MetricsAPI {
@@ -53,8 +53,7 @@ export class MetricsAPI {
 
     _global[GLOBAL_METRICS_API_KEY] = makeGetter(
       API_BACKWARDS_COMPATIBILITY_VERSION,
-      provider,
-      NOOP_METER_PROVIDER
+      provider
     );
 
     return provider;
@@ -65,8 +64,10 @@ export class MetricsAPI {
    */
   public getMeterProvider(): MeterProvider {
     return (
-      _global[GLOBAL_METRICS_API_KEY]?.(API_BACKWARDS_COMPATIBILITY_VERSION) ??
-      NOOP_METER_PROVIDER
+      _global[GLOBAL_METRICS_API_KEY]?.(
+        API_BACKWARDS_COMPATIBILITY_VERSION,
+        NOOP_METER_PROVIDER
+      ) ?? NOOP_METER_PROVIDER
     );
   }
 
