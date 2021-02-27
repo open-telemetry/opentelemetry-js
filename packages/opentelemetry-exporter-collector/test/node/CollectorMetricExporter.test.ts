@@ -61,11 +61,16 @@ describe('CollectorMetricExporter - node with json over http', () => {
   let spyRequest: sinon.SinonSpy;
   let spyWrite: sinon.SinonSpy;
   let metrics: MetricRecord[];
+
+  afterEach(() => {
+    sinon.restore();
+  });
+
   describe('instance', () => {
     it('should warn about metadata when using json', () => {
       const metadata = 'foo';
       // Need to stub/spy on the underlying logger as the "diag" instance is global
-      const spyLoggerWarn = sinon.stub(diag.getLogger(), 'warn');
+      const spyLoggerWarn = sinon.stub(diag, 'warn');
       collectorExporter = new CollectorMetricExporter({
         serviceName: 'basic-service',
         url: address,
@@ -78,8 +83,6 @@ describe('CollectorMetricExporter - node with json over http', () => {
 
   describe('export', () => {
     beforeEach(async () => {
-      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger();
       spyRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
       spyWrite = sinon.stub(fakeRequest, 'write');
       collectorExporterConfig = {
@@ -115,11 +118,6 @@ describe('CollectorMetricExporter - node with json over http', () => {
       metrics.push((await counter.getMetricRecord())[0]);
       metrics.push((await observer.getMetricRecord())[0]);
       metrics.push((await recorder.getMetricRecord())[0]);
-    });
-
-    afterEach(() => {
-      spyRequest.restore();
-      spyWrite.restore();
     });
 
     it('should open the connection', done => {
@@ -203,7 +201,7 @@ describe('CollectorMetricExporter - node with json over http', () => {
 
     it('should log the successful message', done => {
       // Need to stub/spy on the underlying logger as the "diag" instance is global
-      const spyLoggerError = sinon.stub(diag.getLogger(), 'error');
+      const spyLoggerError = sinon.stub(diag, 'error');
 
       const responseSpy = sinon.spy();
       collectorExporter.export(metrics, responseSpy);
@@ -226,8 +224,6 @@ describe('CollectorMetricExporter - node with json over http', () => {
     });
 
     it('should log the error message', done => {
-      const spyLoggerError = sinon.spy();
-      diag.error = spyLoggerError;
       const handler = core.loggingErrorHandler();
       core.setGlobalErrorHandler(handler);
 

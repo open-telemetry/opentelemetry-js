@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { diag, DiagLogLevel } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import {
   Counter,
   ValueObserver,
@@ -50,13 +50,12 @@ const sendBeacon = navigator.sendBeacon;
 describe('CollectorMetricExporter - web', () => {
   let collectorExporter: CollectorMetricExporter;
   let spyOpen: any;
-  let spySend: any;
   let spyBeacon: any;
   let metrics: MetricRecord[];
 
   beforeEach(async () => {
     spyOpen = sinon.stub(XMLHttpRequest.prototype, 'open');
-    spySend = sinon.stub(XMLHttpRequest.prototype, 'send');
+    sinon.stub(XMLHttpRequest.prototype, 'send');
     spyBeacon = sinon.stub(navigator, 'sendBeacon');
     metrics = [];
     const counter: Metric<BoundCounter> & Counter = mockCounter();
@@ -80,17 +79,12 @@ describe('CollectorMetricExporter - web', () => {
 
   afterEach(() => {
     navigator.sendBeacon = sendBeacon;
-    spyOpen.restore();
-    spySend.restore();
-    spyBeacon.restore();
+    sinon.restore();
   });
 
   describe('export', () => {
     describe('when "sendBeacon" is available', () => {
       beforeEach(() => {
-        // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-        diag.setLogger();
-        diag.setLogLevel(DiagLogLevel.VERBOSE);
         collectorExporter = new CollectorMetricExporter({
           url: 'http://foo.bar.com',
           serviceName: 'bar',
@@ -170,9 +164,8 @@ describe('CollectorMetricExporter - web', () => {
 
       it('should log the successful message', done => {
         // Need to stub/spy on the underlying logger as the "diag" instance is global
-        const spyLoggerDebug = sinon.stub(diag.getLogger(), 'debug');
-        const spyLoggerError = sinon.stub(diag.getLogger(), 'error');
-        spyBeacon.restore();
+        const spyLoggerDebug = sinon.stub(diag, 'debug');
+        const spyLoggerError = sinon.stub(diag, 'error');
         spyBeacon = sinon.stub(window.navigator, 'sendBeacon').returns(true);
 
         collectorExporter.export(metrics, () => {});
@@ -187,7 +180,6 @@ describe('CollectorMetricExporter - web', () => {
       });
 
       it('should log the error message', done => {
-        spyBeacon.restore();
         spyBeacon = sinon.stub(window.navigator, 'sendBeacon').returns(false);
 
         collectorExporter.export(metrics, result => {
@@ -201,9 +193,6 @@ describe('CollectorMetricExporter - web', () => {
     describe('when "sendBeacon" is NOT available', () => {
       let server: any;
       beforeEach(() => {
-        // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-        diag.setLogger();
-        diag.setLogLevel(DiagLogLevel.VERBOSE);
         (window.navigator as any).sendBeacon = false;
         collectorExporter = new CollectorMetricExporter({
           url: 'http://foo.bar.com',
@@ -285,8 +274,8 @@ describe('CollectorMetricExporter - web', () => {
 
       it('should log the successful message', done => {
         // Need to stub/spy on the underlying logger as the "diag" instance is global
-        const spyLoggerDebug = sinon.stub(diag.getLogger(), 'debug');
-        const spyLoggerError = sinon.stub(diag.getLogger(), 'error');
+        const spyLoggerDebug = sinon.stub(diag, 'debug');
+        const spyLoggerError = sinon.stub(diag, 'error');
 
         collectorExporter.export(metrics, () => {});
 
@@ -339,9 +328,6 @@ describe('CollectorMetricExporter - web', () => {
     let collectorExporterConfig: CollectorExporterConfigBase;
 
     beforeEach(() => {
-      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger();
-      diag.setLogLevel(DiagLogLevel.VERBOSE);
       collectorExporterConfig = {
         headers: customHeaders,
       };

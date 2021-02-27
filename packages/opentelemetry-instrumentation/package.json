@@ -54,7 +54,7 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.17.0",
+    "@opentelemetry/api": "^0.18.0",
     "@opentelemetry/api-metrics": "^0.17.0",
     "require-in-the-middle": "^5.0.3",
     "semver": "^7.3.2",

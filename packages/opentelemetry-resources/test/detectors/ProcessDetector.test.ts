@@ -21,20 +21,14 @@ import {
 } from '../util/resource-assertions';
 
 describe('processDetector()', () => {
-  let sandbox: sinon.SinonSandbox;
-
-  beforeEach(() => {
-    sandbox = sinon.createSandbox();
-  });
-
   afterEach(() => {
-    sandbox.restore();
+    sinon.restore();
   });
 
   it('should return resource information from process', async () => {
-    sandbox.stub(process, 'pid').value(1234);
-    sandbox.stub(process, 'title').value('otProcess');
-    sandbox
+    sinon.stub(process, 'pid').value(1234);
+    sinon.stub(process, 'title').value('otProcess');
+    sinon
       .stub(process, 'argv')
       .value(['/tmp/node', '/home/ot/test.js', 'arg1', 'arg2']);
 
@@ -47,9 +41,9 @@ describe('processDetector()', () => {
     });
   });
   it('should return empty resources if title, command and commondLine is missing', async () => {
-    sandbox.stub(process, 'pid').value(1234);
-    sandbox.stub(process, 'title').value(undefined);
-    sandbox.stub(process, 'argv').value([]);
+    sinon.stub(process, 'pid').value(1234);
+    sinon.stub(process, 'title').value(undefined);
+    sinon.stub(process, 'argv').value([]);
     const resource: Resource = await processDetector.detect();
     assertEmptyResource(resource);
   });

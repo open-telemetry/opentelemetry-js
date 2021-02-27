@@ -130,7 +130,6 @@ function createFakePerformanceObs(url: string) {
 }
 
 describe('fetch', () => {
-  let sandbox: sinon.SinonSandbox;
   let contextManager: ZoneContextManager;
   let lastResponse: any | undefined;
   let webTracerWithZone: api.Tracer;
@@ -146,7 +145,7 @@ describe('fetch', () => {
   const badUrl = 'http://foo.bar.com/get';
 
   const clearData = () => {
-    sandbox.restore();
+    sinon.restore();
     lastResponse = undefined;
   };
 
@@ -158,11 +157,10 @@ describe('fetch', () => {
     disablePerfObserver?: boolean,
     disableGetEntries?: boolean
   ) => {
-    sandbox = sinon.createSandbox();
-    sandbox.useFakeTimers();
+    sinon.useFakeTimers();
 
-    sandbox.stub(core.otperformance, 'timeOrigin').value(0);
-    sandbox.stub(core.otperformance, 'now').callsFake(() => fakeNow);
+    sinon.stub(core.otperformance, 'timeOrigin').value(0);
+    sinon.stub(core.otperformance, 'now').callsFake(() => fakeNow);
 
     function fakeFetch(input: RequestInfo | Request, init: RequestInit = {}) {
       return new Promise((resolve, reject) => {
@@ -188,7 +186,7 @@ describe('fetch', () => {
       });
     }
 
-    sandbox.stub(window, 'fetch').callsFake(fakeFetch as any);
+    sinon.stub(window, 'fetch').callsFake(fakeFetch as any);
 
     const resources: PerformanceResourceTiming[] = [];
     resources.push(
@@ -201,17 +199,17 @@ describe('fetch', () => {
     );
 
     if (disablePerfObserver) {
-      sandbox.stub(window, 'PerformanceObserver').value(undefined);
+      sinon.stub(window, 'PerformanceObserver').value(undefined);
     } else {
-      sandbox
+      sinon
         .stub(window, 'PerformanceObserver')
         .value(createFakePerformanceObs(fileUrl));
     }
 
     if (disableGetEntries) {
-      sandbox.stub(performance, 'getEntriesByType').value(undefined);
+      sinon.stub(performance, 'getEntriesByType').value(undefined);
     } else {
-      const spyEntries = sandbox.stub(performance, 'getEntriesByType');
+      const spyEntries = sinon.stub(performance, 'getEntriesByType');
       spyEntries.withArgs('resource').returns(resources);
     }
 
@@ -223,8 +221,8 @@ describe('fetch', () => {
     });
     webTracerWithZone = webTracerProviderWithZone.getTracer('fetch-test');
     dummySpanExporter = new DummySpanExporter();
-    exportSpy = sandbox.stub(dummySpanExporter, 'export');
-    clearResourceTimingsSpy = sandbox.stub(performance, 'clearResourceTimings');
+    exportSpy = sinon.stub(dummySpanExporter, 'export');
+    clearResourceTimingsSpy = sinon.stub(performance, 'clearResourceTimings');
     webTracerProviderWithZone.addSpanProcessor(
       new tracing.SimpleSpanProcessor(dummySpanExporter)
     );
@@ -245,13 +243,13 @@ describe('fetch', () => {
               });
               lastResponse.headers = headers;
               // OBSERVER_WAIT_TIME_MS
-              sandbox.clock.tick(300);
+              sinon.clock.tick(300);
               done();
             },
             () => {
               lastResponse = undefined;
               // OBSERVER_WAIT_TIME_MS
-              sandbox.clock.tick(300);
+              sinon.clock.tick(300);
               done();
             }
           );
@@ -259,7 +257,7 @@ describe('fetch', () => {
         () => {
           lastResponse = undefined;
           // OBSERVER_WAIT_TIME_MS
-          sandbox.clock.tick(300);
+          sinon.clock.tick(300);
           done();
         }
       );

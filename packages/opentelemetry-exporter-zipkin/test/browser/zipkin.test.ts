@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
 import {
   setGlobalErrorHandler,
   loggingErrorHandler,
@@ -38,18 +37,16 @@ describe('Zipkin Exporter - web', () => {
   let spySend: sinon.SinonSpy;
   let spyBeacon: sinon.SinonSpy;
   let spans: ReadableSpan[];
-  let sandbox: sinon.SinonSandbox;
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox();
-    spySend = sandbox.stub(XMLHttpRequest.prototype, 'send');
-    spyBeacon = sandbox.stub(navigator, 'sendBeacon');
+    spySend = sinon.stub(XMLHttpRequest.prototype, 'send');
+    spyBeacon = sinon.stub(navigator, 'sendBeacon');
     spans = [];
     spans.push(Object.assign({}, mockedReadableSpan));
   });
 
   afterEach(() => {
-    sandbox.restore();
+    sinon.restore();
     navigator.sendBeacon = sendBeacon;
   });
 
@@ -109,8 +106,6 @@ describe('Zipkin Exporter - web', () => {
     };
 
     beforeEach(() => {
-      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger();
       zipkinConfig = {
         headers: customHeaders,
       };

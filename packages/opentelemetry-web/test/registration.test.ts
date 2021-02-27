@@ -16,12 +16,12 @@
 
 import {
   context,
+  NoopContextManager,
   NoopTextMapPropagator,
   propagation,
   trace,
   ProxyTracerProvider,
 } from '@opentelemetry/api';
-import { NoopContextManager } from '@opentelemetry/context-base';
 import { CompositePropagator } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { StackContextManager, WebTracerProvider } from '../src';

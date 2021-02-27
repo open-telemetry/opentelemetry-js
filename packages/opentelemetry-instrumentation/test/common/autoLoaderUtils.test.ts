@@ -15,7 +15,6 @@
  */
 
 import * as assert from 'assert';
-import * as sinon from 'sinon';
 import { InstrumentationBase } from '../../src';
 import { parseInstrumentationOptions } from '../../src/autoLoaderUtils';
 import { InstrumentationOption } from '../../src/types_internal';
@@ -46,14 +45,6 @@ class FooWebPlugin implements OldClassPlugin {
 // const fooInstrumentation = new FooInstrumentation();
 
 describe('autoLoaderUtils', () => {
-  let sandbox: sinon.SinonSandbox;
-  beforeEach(() => {
-    sandbox = sinon.createSandbox();
-  });
-  afterEach(() => {
-    sandbox.restore();
-  });
-
   describe('parseInstrumentationOptions', () => {
     it('should create a new instrumentation from class', () => {
       const { instrumentations } = parseInstrumentationOptions([

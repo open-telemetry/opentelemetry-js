@@ -29,13 +29,10 @@ class FooInstrumentation extends InstrumentationBase {
 }
 
 describe('autoLoader', () => {
-  let sandbox: sinon.SinonSandbox;
   let unload: Function | undefined;
-  beforeEach(() => {
-    sandbox = sinon.createSandbox();
-  });
+
   afterEach(() => {
-    sandbox.restore();
+    sinon.restore();
     if (typeof unload === 'function') {
       unload();
       unload = undefined;
@@ -52,12 +49,9 @@ describe('autoLoader', () => {
       const meterProvider = NOOP_METER_PROVIDER;
       beforeEach(() => {
         instrumentation = new FooInstrumentation('foo', '1', {});
-        enableSpy = sandbox.spy(instrumentation, 'enable');
-        setTracerProviderSpy = sandbox.stub(
-          instrumentation,
-          'setTracerProvider'
-        );
-        setsetMeterProvider = sandbox.stub(instrumentation, 'setMeterProvider');
+        enableSpy = sinon.spy(instrumentation, 'enable');
+        setTracerProviderSpy = sinon.stub(instrumentation, 'setTracerProvider');
+        setsetMeterProvider = sinon.stub(instrumentation, 'setMeterProvider');
         unload = registerInstrumentations({
           instrumentations: [instrumentation],
           tracerProvider,
