@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/api';
-import { ContextManager, ROOT_CONTEXT } from '@opentelemetry/context-base';
+import { Context, ContextManager, ROOT_CONTEXT } from '@opentelemetry/api';
 
 /**
  * Stack Context Manager for managing the state in web

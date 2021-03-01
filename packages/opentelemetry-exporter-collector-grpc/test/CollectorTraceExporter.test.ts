@@ -115,8 +115,6 @@ const testCollectorExporter = (params: TestParams) =>
     });
 
     beforeEach(done => {
-      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger();
       const credentials = params.useTLS
         ? grpc.credentials.createSsl(
             fs.readFileSync('./test/certs/ca.crt'),
@@ -139,12 +137,13 @@ const testCollectorExporter = (params: TestParams) =>
     afterEach(() => {
       exportedData = undefined;
       reqMetadata = undefined;
+      sinon.restore();
     });
 
     describe('instance', () => {
       it('should warn about headers when using grpc', () => {
         // Need to stub/spy on the underlying logger as the "diag" instance is global
-        const spyLoggerWarn = sinon.stub(diag.getLogger(), 'warn');
+        const spyLoggerWarn = sinon.stub(diag, 'warn');
         collectorExporter = new CollectorTraceExporter({
           serviceName: 'basic-service',
           url: address,

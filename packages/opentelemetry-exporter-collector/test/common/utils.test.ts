@@ -20,15 +20,14 @@ import { diag } from '@opentelemetry/api';
 import { parseHeaders } from '../../src/util';
 
 describe('utils', () => {
-  describe('parseHeaders', () => {
-    beforeEach(() => {
-      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger();
-    });
+  afterEach(() => {
+    sinon.restore();
+  });
 
+  describe('parseHeaders', () => {
     it('should ignore undefined headers', () => {
       // Need to stub/spy on the underlying logger as the "diag" instance is global
-      const spyWarn = sinon.stub(diag.getLogger(), 'warn');
+      const spyWarn = sinon.stub(diag, 'warn');
       const headers: Partial<Record<string, unknown>> = {
         foo1: undefined,
         foo2: 'bar',
@@ -45,6 +44,7 @@ describe('utils', () => {
         'Header "foo1" has wrong value and will be ignored'
       );
     });
+
     it('should parse undefined', () => {
       const result = parseHeaders(undefined);
       assert.deepStrictEqual(result, {});

@@ -28,13 +28,9 @@ class WebPlugin implements OldClassPlugin {
 }
 
 describe('autoLoader', () => {
-  let sandbox: sinon.SinonSandbox;
   let unload: Function | undefined;
-  beforeEach(() => {
-    sandbox = sinon.createSandbox();
-  });
   afterEach(() => {
-    sandbox.restore();
+    sinon.restore();
     if (typeof unload === 'function') {
       unload();
       unload = undefined;
@@ -49,7 +45,7 @@ describe('autoLoader', () => {
       let webPlugin: WebPlugin;
       beforeEach(() => {
         webPlugin = new WebPlugin();
-        enableSpy = sandbox.spy(webPlugin, 'enable');
+        enableSpy = sinon.spy(webPlugin, 'enable');
         unload = registerInstrumentations({
           instrumentations: [webPlugin],
           tracerProvider,

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { diag } from '@opentelemetry/api';
+
 import { ExportResultCode } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
@@ -61,12 +61,14 @@ describe('CollectorTraceExporter - common', () => {
   let collectorExporter: CollectorTraceExporter;
   let collectorExporterConfig: CollectorExporterConfig;
 
+  afterEach(() => {
+    sinon.restore();
+  });
+
   describe('constructor', () => {
     let onInitSpy: any;
 
     beforeEach(() => {
-      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger();
       onInitSpy = sinon.stub(CollectorTraceExporter.prototype, 'onInit');
       collectorExporterConfig = {
         hostname: 'foo',
@@ -75,10 +77,6 @@ describe('CollectorTraceExporter - common', () => {
         url: 'http://foo.bar.com',
       };
       collectorExporter = new CollectorTraceExporter(collectorExporterConfig);
-    });
-
-    afterEach(() => {
-      onInitSpy.restore();
     });
 
     it('should create an instance', () => {
@@ -119,9 +117,6 @@ describe('CollectorTraceExporter - common', () => {
     beforeEach(() => {
       spySend = sinon.stub(CollectorTraceExporter.prototype, 'send');
       collectorExporter = new CollectorTraceExporter(collectorExporterConfig);
-    });
-    afterEach(() => {
-      spySend.restore();
     });
 
     it('should export spans as collectorTypes.Spans', done => {
@@ -220,8 +215,6 @@ describe('CollectorTraceExporter - common', () => {
   describe('shutdown', () => {
     let onShutdownSpy: any;
     beforeEach(() => {
-      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger();
       onShutdownSpy = sinon.stub(
         CollectorTraceExporter.prototype,
         'onShutdown'
@@ -233,9 +226,6 @@ describe('CollectorTraceExporter - common', () => {
         url: 'http://foo.bar.com',
       };
       collectorExporter = new CollectorTraceExporter(collectorExporterConfig);
-    });
-    afterEach(() => {
-      onShutdownSpy.restore();
     });
 
     it('should call onShutdown', async () => {
