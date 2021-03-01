@@ -39,7 +39,7 @@ import { HttpInstrumentationConfig } from '../../src/types';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
-import { ContextManager } from '@opentelemetry/context-base';
+import { ContextManager } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import type { ClientRequest, IncomingMessage, ServerResponse } from 'http';
 import { isWrapped } from '@opentelemetry/instrumentation';

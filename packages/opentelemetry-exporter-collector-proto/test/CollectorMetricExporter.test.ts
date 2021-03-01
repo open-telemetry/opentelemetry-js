@@ -55,8 +55,6 @@ describe('CollectorMetricExporter - node with proto over http', () => {
 
   describe('export', () => {
     beforeEach(async () => {
-      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger();
       collectorExporterConfig = {
         headers: {
           foo: 'bar',
@@ -177,7 +175,7 @@ describe('CollectorMetricExporter - node with proto over http', () => {
 
     it('should log the successful message', done => {
       // Need to stub/spy on the underlying logger as the "diag" instance is global
-      const spyLoggerError = sinon.stub(diag.getLogger(), 'error');
+      const spyLoggerError = sinon.stub(diag, 'error');
 
       collectorExporter.export(metrics, result => {
         assert.strictEqual(result.code, ExportResultCode.SUCCESS);

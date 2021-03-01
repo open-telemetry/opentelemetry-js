@@ -22,7 +22,7 @@ import {
   getSpanContext,
   setSpanContext,
 } from '@opentelemetry/api';
-import { ROOT_CONTEXT } from '@opentelemetry/context-base';
+import { ROOT_CONTEXT } from '@opentelemetry/api';
 import * as assert from 'assert';
 import {
   HttpTraceContext,

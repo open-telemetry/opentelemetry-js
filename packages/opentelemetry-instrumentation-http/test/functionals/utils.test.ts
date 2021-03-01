@@ -141,13 +141,12 @@ describe('Utility', () => {
   });
 
   describe('isIgnored()', () => {
-    let satisfiesPatternStub: sinon.SinonSpy<[string, IgnoreMatcher], boolean>;
     beforeEach(() => {
-      satisfiesPatternStub = sinon.spy(utils, 'satisfiesPattern');
+      sinon.spy(utils, 'satisfiesPattern');
     });
 
     afterEach(() => {
-      satisfiesPatternStub.restore();
+      sinon.restore();
     });
 
     it('should call isSatisfyPattern, n match', () => {
@@ -160,7 +159,6 @@ describe('Utility', () => {
     });
 
     it('should call isSatisfyPattern, match for function', () => {
-      satisfiesPatternStub.restore();
       const answer1 = utils.isIgnored('/test/1', [
         url => url.endsWith('/test/1'),
       ]);
@@ -168,7 +166,6 @@ describe('Utility', () => {
     });
 
     it('should not re-throw when function throws an exception', () => {
-      satisfiesPatternStub.restore();
       const onException = (e: Error) => {
         // Do nothing
       };
@@ -188,7 +185,6 @@ describe('Utility', () => {
     });
 
     it('should call onException when function throws an exception', () => {
-      satisfiesPatternStub.restore();
       const onException = sinon.spy();
       assert.doesNotThrow(() =>
         utils.isIgnored(

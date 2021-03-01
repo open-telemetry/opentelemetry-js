@@ -16,7 +16,7 @@
 
 import { TextMapPropagator } from '@opentelemetry/api';
 import { metrics } from '@opentelemetry/api-metrics';
-import { ContextManager } from '@opentelemetry/context-base';
+import { ContextManager } from '@opentelemetry/api';
 import { MeterConfig, MeterProvider } from '@opentelemetry/metrics';
 import {
   InstrumentationOption,

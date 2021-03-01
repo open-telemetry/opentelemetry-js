@@ -15,7 +15,7 @@
  */
 
 import { SpanAttributes, TextMapPropagator, Sampler } from '@opentelemetry/api';
-import type { ContextManager } from '@opentelemetry/context-base';
+import type { ContextManager } from '@opentelemetry/api';
 import { InstrumentationOption } from '@opentelemetry/instrumentation';
 import { MetricExporter, Processor } from '@opentelemetry/metrics';
 import { Resource } from '@opentelemetry/resources';

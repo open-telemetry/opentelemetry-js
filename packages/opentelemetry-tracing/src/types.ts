@@ -17,7 +17,7 @@
 import { TextMapPropagator, Sampler } from '@opentelemetry/api';
 import { IdGenerator } from '@opentelemetry/core';
 
-import { ContextManager } from '@opentelemetry/context-base';
+import { ContextManager } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 
 /**

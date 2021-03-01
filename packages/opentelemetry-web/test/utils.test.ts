@@ -124,14 +124,8 @@ function createResource(
 }
 
 describe('utils', () => {
-  let sandbox: sinon.SinonSandbox;
-
-  beforeEach(() => {
-    sandbox = sinon.createSandbox();
-  });
-
   afterEach(() => {
-    sandbox.restore();
+    sinon.restore();
   });
 
   describe('addSpanNetworkEvents', () => {
@@ -232,18 +226,12 @@ describe('utils', () => {
   });
   describe('getResource', () => {
     const startTime = [0, 123123123] as HrTime;
-    let spyHrTime: any;
     beforeEach(() => {
       const time = createHrTime(startTime, 500);
-      sandbox.stub(performance, 'timeOrigin').value(0);
-      sandbox
-        .stub(performance, 'now')
-        .callsFake(() => hrTimeToNanoseconds(time));
+      sinon.stub(performance, 'timeOrigin').value(0);
+      sinon.stub(performance, 'now').callsFake(() => hrTimeToNanoseconds(time));
 
-      spyHrTime = sinon.stub(core, 'hrTime').returns(time);
-    });
-    afterEach(() => {
-      spyHrTime.restore();
+      sinon.stub(core, 'hrTime').returns(time);
     });
 
     describe('when resources are empty', () => {

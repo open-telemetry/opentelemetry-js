@@ -25,7 +25,7 @@ import {
 import { NodeTracerProvider } from '@opentelemetry/node';
 import { Http, HttpPluginConfig } from '@opentelemetry/plugin-http';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
-import { ContextManager } from '@opentelemetry/context-base';
+import { ContextManager } from '@opentelemetry/api';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,

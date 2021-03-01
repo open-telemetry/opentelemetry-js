@@ -19,6 +19,10 @@ import * as sinon from 'sinon';
 import { MeterProvider, Meter, CounterMetric } from '../src';
 
 describe('MeterProvider', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
   describe('constructor', () => {
     it('should construct an instance without any options', () => {
       const provider = new MeterProvider();
@@ -77,12 +81,11 @@ describe('MeterProvider', () => {
       const meterProvider = new MeterProvider({
         interval: Math.pow(2, 31) - 1,
       });
-      const sandbox = sinon.createSandbox();
-      const shutdownStub1 = sandbox.stub(
+      const shutdownStub1 = sinon.stub(
         meterProvider.getMeter('meter1'),
         'shutdown'
       );
-      const shutdownStub2 = sandbox.stub(
+      const shutdownStub2 = sinon.stub(
         meterProvider.getMeter('meter2'),
         'shutdown'
       );
