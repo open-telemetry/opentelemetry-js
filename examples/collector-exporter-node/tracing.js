@@ -6,8 +6,10 @@ const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector');
 // const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector-grpc');
 // const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector-proto');
 
-// opentelemetry.diag.setLogger(new opentelemetry.DiagConsoleLogger());
-// opentelemetry.diag.setLogLevel(opentelemetry.DiagLogLevel.DEBUG);
+// opentelemetry.diag.setLogger(
+//   new opentelemetry.DiagConsoleLogger(),
+//   opentelemetry.DiagLogLevel.DEBUG,
+// );
 
 const exporter = new CollectorTraceExporter({
   serviceName: 'basic-service',

@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.18.0
+
+#### :bug: (Bug Fix)
+* `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector`
+  * [#1938](https://github.com/open-telemetry/opentelemetry-js/pull/1938) fix(exporter-collector): wrong data type for numbers ([@kudlatyamroth](https://github.com/kudlatyamroth))
+* `opentelemetry-context-async-hooks`
+  * [#1937](https://github.com/open-telemetry/opentelemetry-js/pull/1937) fix: isolate binding EventEmitter ([@Flarna](https://github.com/Flarna))
+
+#### Committers: 7
+- Bartlomiej Obecny ([@obecny](https://github.com/obecny))
+- Daniel Dyla ([@dyladan](https://github.com/dyladan))
+- Gerhard Stöbich ([@Flarna](https://github.com/Flarna))
+- John Bley ([@johnbley](https://github.com/johnbley))
+- Karol Fuksiewicz ([@kudlatyamroth](https://github.com/kudlatyamroth))
+- Marian Zagoruiko ([@mzahor](https://github.com/mzahor))
+- Nev ([@MSNev](https://github.com/MSNev))
+
+
 ## 0.17.0
 
 ### :boom: Breaking Change

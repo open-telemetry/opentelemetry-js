@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/metrics",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "description": "OpenTelemetry metrics SDK",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -56,9 +56,9 @@
   },
   "dependencies": {
     "@opentelemetry/api": "^0.18.0",
-    "@opentelemetry/api-metrics": "^0.17.0",
-    "@opentelemetry/core": "^0.17.0",
-    "@opentelemetry/resources": "^0.17.0",
+    "@opentelemetry/api-metrics": "^0.18.0",
+    "@opentelemetry/core": "^0.18.0",
+    "@opentelemetry/resources": "^0.18.0",
     "lodash.merge": "^4.6.2"
   }
 }

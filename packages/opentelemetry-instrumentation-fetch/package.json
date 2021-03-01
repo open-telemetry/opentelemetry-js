@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation-fetch",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "description": "OpenTelemetry fetch automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -43,9 +43,9 @@
   },
   "devDependencies": {
     "@babel/core": "7.12.10",
-    "@opentelemetry/context-zone": "^0.17.0",
-    "@opentelemetry/propagator-b3": "^0.17.0",
-    "@opentelemetry/tracing": "^0.17.0",
+    "@opentelemetry/context-zone": "^0.18.0",
+    "@opentelemetry/propagator-b3": "^0.18.0",
+    "@opentelemetry/tracing": "^0.18.0",
     "@types/mocha": "8.2.0",
     "@types/node": "14.14.20",
     "@types/shimmer": "1.0.1",
@@ -75,9 +75,9 @@
   },
   "dependencies": {
     "@opentelemetry/api": "^0.18.0",
-    "@opentelemetry/core": "^0.17.0",
-    "@opentelemetry/instrumentation": "^0.17.0",
-    "@opentelemetry/semantic-conventions": "^0.17.0",
-    "@opentelemetry/web": "^0.17.0"
+    "@opentelemetry/core": "^0.18.0",
+    "@opentelemetry/instrumentation": "^0.18.0",
+    "@opentelemetry/semantic-conventions": "^0.18.0",
+    "@opentelemetry/web": "^0.18.0"
   }
 }
