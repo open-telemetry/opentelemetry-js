@@ -248,6 +248,7 @@ To request automatic tracing support for a module not on this list, please [file
 ### 0.17.0 to 0.18.0
 
 [PR-1975](https://github.com/open-telemetry/opentelemetry-js/pull/1975)
+
 - Breaking change - Update resource key collision precedence
 
 ### 0.16.0 to 0.17.0
