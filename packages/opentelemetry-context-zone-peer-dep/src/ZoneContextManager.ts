@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  Context,
-  ContextManager,
-  ROOT_CONTEXT,
-} from '@opentelemetry/context-base';
+import { Context, ContextManager, ROOT_CONTEXT } from '@opentelemetry/api';
 import { Func, TargetWithEvents } from './types';
 import { isListenerObject } from './util';
 

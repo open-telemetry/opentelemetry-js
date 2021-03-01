@@ -25,7 +25,7 @@ import {
   AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
-import { NoopContextManager } from '@opentelemetry/context-base';
+import { NoopContextManager } from '@opentelemetry/api';
 import { CompositePropagator } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { NodeTracerProvider } from '../src';

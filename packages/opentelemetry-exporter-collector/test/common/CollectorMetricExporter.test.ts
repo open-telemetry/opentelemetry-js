@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
 import { Counter, ValueObserver } from '@opentelemetry/api-metrics';
 import { ExportResultCode } from '@opentelemetry/core';
 import {
@@ -56,12 +55,15 @@ describe('CollectorMetricExporter - common', () => {
   let collectorExporter: CollectorMetricExporter;
   let collectorExporterConfig: CollectorExporterConfig;
   let metrics: MetricRecord[];
+
+  afterEach(() => {
+    sinon.restore();
+  });
+
   describe('constructor', () => {
     let onInitSpy: any;
 
     beforeEach(async () => {
-      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger();
       onInitSpy = sinon.stub(CollectorMetricExporter.prototype, 'onInit');
       collectorExporterConfig = {
         hostname: 'foo',
@@ -83,10 +85,6 @@ describe('CollectorMetricExporter - common', () => {
 
       metrics.push((await counter.getMetricRecord())[0]);
       metrics.push((await observer.getMetricRecord())[0]);
-    });
-
-    afterEach(() => {
-      onInitSpy.restore();
     });
 
     it('should create an instance', () => {
@@ -130,9 +128,6 @@ describe('CollectorMetricExporter - common', () => {
     beforeEach(() => {
       spySend = sinon.stub(CollectorMetricExporter.prototype, 'send');
       collectorExporter = new CollectorMetricExporter(collectorExporterConfig);
-    });
-    afterEach(() => {
-      spySend.restore();
     });
 
     it('should export metrics as collectorTypes.Metrics', done => {
@@ -200,8 +195,6 @@ describe('CollectorMetricExporter - common', () => {
   describe('shutdown', () => {
     let onShutdownSpy: any;
     beforeEach(() => {
-      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger();
       onShutdownSpy = sinon.stub(
         CollectorMetricExporter.prototype,
         'onShutdown'
@@ -213,9 +206,6 @@ describe('CollectorMetricExporter - common', () => {
         url: 'http://foo.bar.com',
       };
       collectorExporter = new CollectorMetricExporter(collectorExporterConfig);
-    });
-    afterEach(() => {
-      onShutdownSpy.restore();
     });
 
     it('should call onShutdown', async () => {

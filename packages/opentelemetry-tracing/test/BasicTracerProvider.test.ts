@@ -34,16 +34,14 @@ import * as sinon from 'sinon';
 import { BasicTracerProvider, Span } from '../src';
 
 describe('BasicTracerProvider', () => {
-  let sandbox: sinon.SinonSandbox;
   let removeEvent: Function | undefined;
 
   beforeEach(() => {
     context.disable();
-    sandbox = sinon.createSandbox();
   });
 
   afterEach(() => {
-    sandbox.restore();
+    sinon.restore();
     if (removeEvent) {
       removeEvent();
       removeEvent = undefined;
@@ -315,7 +313,7 @@ describe('BasicTracerProvider', () => {
   describe('.shutdown()', () => {
     it('should trigger shutdown when manually invoked', () => {
       const tracerProvider = new BasicTracerProvider();
-      const shutdownStub = sandbox.stub(
+      const shutdownStub = sinon.stub(
         tracerProvider.getActiveSpanProcessor(),
         'shutdown'
       );

@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  ContextManager,
-  Context,
-  ROOT_CONTEXT,
-} from '@opentelemetry/context-base';
+import { ContextManager, Context, ROOT_CONTEXT } from '@opentelemetry/api';
 
 /**
  * A test-only ContextManager that uses an in-memory stack to keep track of

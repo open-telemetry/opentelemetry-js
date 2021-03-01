@@ -37,29 +37,24 @@ describe('BeanstalkResourceDetector', () => {
   };
 
   let readStub, fileStub;
-  let sandbox: sinon.SinonSandbox;
-
-  beforeEach(() => {
-    sandbox = sinon.createSandbox();
-  });
 
   afterEach(() => {
-    sandbox.restore();
+    sinon.restore();
   });
 
   it('should successfully return resource data', async () => {
-    fileStub = sandbox
+    fileStub = sinon
       .stub(AwsBeanstalkDetector, 'fileAccessAsync' as any)
       .resolves();
-    readStub = sandbox
+    readStub = sinon
       .stub(AwsBeanstalkDetector, 'readFileAsync' as any)
       .resolves(JSON.stringify(data));
-    sandbox.stub(JSON, 'parse').returns(data);
+    sinon.stub(JSON, 'parse').returns(data);
 
     const resource = await awsBeanstalkDetector.detect();
 
-    sandbox.assert.calledOnce(fileStub);
-    sandbox.assert.calledOnce(readStub);
+    sinon.assert.calledOnce(fileStub);
+    sinon.assert.calledOnce(readStub);
     assert.ok(resource);
     assertServiceResource(resource, {
       name: 'elastic_beanstalk',
@@ -70,18 +65,18 @@ describe('BeanstalkResourceDetector', () => {
   });
 
   it('should successfully return resource data with noise', async () => {
-    fileStub = sandbox
+    fileStub = sinon
       .stub(AwsBeanstalkDetector, 'fileAccessAsync' as any)
       .resolves();
-    readStub = sandbox
+    readStub = sinon
       .stub(AwsBeanstalkDetector, 'readFileAsync' as any)
       .resolves(JSON.stringify(noisyData));
-    sandbox.stub(JSON, 'parse').returns(noisyData);
+    sinon.stub(JSON, 'parse').returns(noisyData);
 
     const resource = await awsBeanstalkDetector.detect();
 
-    sandbox.assert.calledOnce(fileStub);
-    sandbox.assert.calledOnce(readStub);
+    sinon.assert.calledOnce(fileStub);
+    sinon.assert.calledOnce(readStub);
     assert.ok(resource);
     assertServiceResource(resource, {
       name: 'elastic_beanstalk',
@@ -92,33 +87,33 @@ describe('BeanstalkResourceDetector', () => {
   });
 
   it('should return empty resource when failing to read file', async () => {
-    fileStub = sandbox
+    fileStub = sinon
       .stub(AwsBeanstalkDetector, 'fileAccessAsync' as any)
       .resolves();
-    readStub = sandbox
+    readStub = sinon
       .stub(AwsBeanstalkDetector, 'readFileAsync' as any)
       .rejects(err);
 
     const resource = await awsBeanstalkDetector.detect();
 
-    sandbox.assert.calledOnce(fileStub);
-    sandbox.assert.calledOnce(readStub);
+    sinon.assert.calledOnce(fileStub);
+    sinon.assert.calledOnce(readStub);
     assert.ok(resource);
     assertEmptyResource(resource);
   });
 
   it('should return empty resource when config file does not exist', async () => {
-    fileStub = sandbox
+    fileStub = sinon
       .stub(AwsBeanstalkDetector, 'fileAccessAsync' as any)
       .rejects(err);
-    readStub = sandbox
+    readStub = sinon
       .stub(AwsBeanstalkDetector, 'readFileAsync' as any)
       .resolves(JSON.stringify(data));
 
     const resource = await awsBeanstalkDetector.detect();
 
-    sandbox.assert.calledOnce(fileStub);
-    sandbox.assert.notCalled(readStub);
+    sinon.assert.calledOnce(fileStub);
+    sinon.assert.notCalled(readStub);
     assert.ok(resource);
     assertEmptyResource(resource);
   });

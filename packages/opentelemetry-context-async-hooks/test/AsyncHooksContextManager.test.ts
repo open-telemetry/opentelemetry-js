@@ -20,7 +20,7 @@ import {
   AsyncLocalStorageContextManager,
 } from '../src';
 import { EventEmitter } from 'events';
-import { createContextKey, ROOT_CONTEXT } from '@opentelemetry/context-base';
+import { createContextKey, ROOT_CONTEXT } from '@opentelemetry/api';
 
 for (const contextManagerClass of [
   AsyncHooksContextManager,
