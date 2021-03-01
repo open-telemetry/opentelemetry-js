@@ -59,15 +59,9 @@ export function removeMockEnvironment() {
 }
 
 describe('environment', () => {
-  let sandbox: sinon.SinonSandbox;
-
-  beforeEach(() => {
-    sandbox = sinon.createSandbox();
-  });
-
   afterEach(() => {
     removeMockEnvironment();
-    sandbox.restore();
+    sinon.restore();
   });
 
   describe('parseEnvironment', () => {

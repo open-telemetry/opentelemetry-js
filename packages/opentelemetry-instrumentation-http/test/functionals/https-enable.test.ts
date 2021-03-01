@@ -23,7 +23,7 @@ import {
   setSpan,
 } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
-import { ContextManager } from '@opentelemetry/context-base';
+import { ContextManager } from '@opentelemetry/api';
 import {
   BasicTracerProvider,
   InMemorySpanExporter,

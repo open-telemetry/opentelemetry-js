@@ -126,7 +126,6 @@ describe('xhr', () => {
   asyncTests.forEach(test => {
     const testAsync = test.async;
     describe(`when async='${testAsync}'`, () => {
-      let sandbox: sinon.SinonSandbox;
       let requests: any[] = [];
       let prepareData: any;
       let clearData: any;
@@ -165,20 +164,18 @@ describe('xhr', () => {
 
         clearData = () => {
           requests = [];
-          sandbox.restore();
-          spyEntries.restore();
+          sinon.restore();
         };
 
         prepareData = (done: any, fileUrl: string, config?: any) => {
-          sandbox = sinon.createSandbox();
-          const fakeXhr = sandbox.useFakeXMLHttpRequest();
+          const fakeXhr = sinon.useFakeXMLHttpRequest();
           fakeXhr.onCreate = function (xhr: any) {
             requests.push(xhr);
           };
-          sandbox.useFakeTimers();
+          sinon.useFakeTimers();
 
-          sandbox.stub(performance, 'timeOrigin').value(0);
-          sandbox.stub(performance, 'now').callsFake(() => fakeNow);
+          sinon.stub(performance, 'timeOrigin').value(0);
+          sinon.stub(performance, 'now').callsFake(() => fakeNow);
 
           const resources: PerformanceResourceTiming[] = [];
           resources.push(
@@ -190,7 +187,7 @@ describe('xhr', () => {
             })
           );
 
-          spyEntries = sandbox.stub(
+          spyEntries = sinon.stub(
             (performance as unknown) as Performance,
             'getEntriesByType'
           );
@@ -206,7 +203,7 @@ describe('xhr', () => {
           webTracerWithZone = webTracerProviderWithZone.getTracer('xhr-test');
           dummySpanExporter = new DummySpanExporter();
           exportSpy = sinon.stub(dummySpanExporter, 'export');
-          clearResourceTimingsSpy = sandbox.stub(
+          clearResourceTimingsSpy = sinon.stub(
             (performance as unknown) as Performance,
             'clearResourceTimings'
           );
@@ -225,7 +222,7 @@ describe('xhr', () => {
               testAsync
             ).then(() => {
               fakeNow = 0;
-              sandbox.clock.tick(1000);
+              sinon.clock.tick(1000);
               done();
             });
             assert.strictEqual(requests.length, 1, 'request not called');
@@ -640,7 +637,7 @@ describe('xhr', () => {
                   testAsync
                 ).then(() => {
                   fakeNow = 0;
-                  sandbox.clock.tick(1000);
+                  sinon.clock.tick(1000);
                 });
               }
             );
@@ -657,7 +654,7 @@ describe('xhr', () => {
                   testAsync
                 ).then(() => {
                   fakeNow = 0;
-                  sandbox.clock.tick(1000);
+                  sinon.clock.tick(1000);
                   done();
                 });
 
@@ -702,16 +699,15 @@ describe('xhr', () => {
         let fakeNow = 0;
 
         beforeEach(() => {
-          sandbox = sinon.createSandbox();
-          const fakeXhr = sandbox.useFakeXMLHttpRequest();
+          const fakeXhr = sinon.useFakeXMLHttpRequest();
           fakeXhr.onCreate = function (xhr: any) {
             requests.push(xhr);
           };
 
-          sandbox.useFakeTimers();
+          sinon.useFakeTimers();
 
-          sandbox.stub(performance, 'timeOrigin').value(0);
-          sandbox.stub(performance, 'now').callsFake(() => fakeNow);
+          sinon.stub(performance, 'timeOrigin').value(0);
+          sinon.stub(performance, 'now').callsFake(() => fakeNow);
 
           const resources: PerformanceResourceTiming[] = [];
           resources.push(
@@ -720,7 +716,7 @@ describe('xhr', () => {
             })
           );
 
-          spyEntries = sandbox.stub(
+          spyEntries = sinon.stub(
             (performance as unknown) as Performance,
             'getEntriesByType'
           );
@@ -761,7 +757,7 @@ describe('xhr', () => {
                   testAsync
                 ).then(() => {
                   fakeNow = 0;
-                  sandbox.clock.tick(1000);
+                  sinon.clock.tick(1000);
                   done();
                 });
                 assert.strictEqual(requests.length, 1, 'request not called');
@@ -897,7 +893,7 @@ describe('xhr', () => {
                 getData(new XMLHttpRequest(), url, () => {}, testAsync).then(
                   () => {
                     fakeNow = 0;
-                    sandbox.clock.tick(1000);
+                    sinon.clock.tick(1000);
                     done();
                   }
                 );
@@ -989,7 +985,7 @@ describe('xhr', () => {
                 getData(new XMLHttpRequest(), url, () => {}, testAsync).then(
                   () => {
                     fakeNow = 0;
-                    sandbox.clock.tick(1000);
+                    sinon.clock.tick(1000);
                     done();
                   }
                 );
@@ -1082,12 +1078,12 @@ describe('xhr', () => {
                   new XMLHttpRequest(),
                   url,
                   () => {
-                    sandbox.clock.tick(XHR_TIMEOUT);
+                    sinon.clock.tick(XHR_TIMEOUT);
                   },
                   testAsync
                 ).then(() => {
                   fakeNow = 0;
-                  sandbox.clock.tick(1000);
+                  sinon.clock.tick(1000);
                   done();
                 });
               }

@@ -37,18 +37,14 @@ const httpPlugin: Plugins = {
 };
 
 describe('autoLoader', () => {
-  let sandbox: sinon.SinonSandbox;
   let unload: Function | undefined;
   before(() => {
     module.paths.push(INSTALLED_PLUGINS_PATH);
     searchPathForTest(INSTALLED_PLUGINS_PATH);
   });
 
-  beforeEach(() => {
-    sandbox = sinon.createSandbox();
-  });
   afterEach(() => {
-    sandbox.restore();
+    sinon.restore();
     Object.keys(require.cache).forEach(key => delete require.cache[key]);
     if (typeof unload === 'function') {
       unload();
@@ -65,7 +61,7 @@ describe('autoLoader', () => {
         // eslint-disable-next-line node/no-extraneous-require
         const simpleModule = require('@opentelemetry/plugin-simple-module')
           .plugin;
-        enableSpy = sandbox.spy(simpleModule, 'enable');
+        enableSpy = sinon.spy(simpleModule, 'enable');
         unload = registerInstrumentations({
           instrumentations: [
             {

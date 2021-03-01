@@ -79,9 +79,11 @@ describe('Meter', () => {
   const labels: api.Labels = { [keyb]: 'value2', [keya]: 'value1' };
 
   beforeEach(() => {
-    // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap warn which is already wrapped
-    diag.setLogger();
     meter = new MeterProvider().getMeter('test-meter');
+  });
+
+  afterEach(() => {
+    sinon.restore();
   });
 
   describe('#counter', () => {
@@ -772,11 +774,6 @@ describe('Meter', () => {
   });
 
   describe('#SumObserverMetric', () => {
-    beforeEach(() => {
-      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger();
-    });
-
     it('should create an Sum observer', () => {
       const sumObserver = meter.createSumObserver('name') as SumObserverMetric;
       assert.ok(sumObserver instanceof Metric);
@@ -784,7 +781,7 @@ describe('Meter', () => {
 
     it('should return noop observer when name is invalid', () => {
       // Need to stub/spy on the underlying logger as the "diag" instance is global
-      const spy = sinon.stub(diag.getLogger(), 'warn');
+      const spy = sinon.stub(diag, 'warn');
       const sumObserver = meter.createSumObserver('na me');
       assert.ok(sumObserver === api.NOOP_SUM_OBSERVER_METRIC);
       const args = spy.args[0];
@@ -917,11 +914,6 @@ describe('Meter', () => {
   });
 
   describe('#ValueObserver', () => {
-    beforeEach(() => {
-      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger();
-    });
-
     it('should create a value observer', () => {
       const valueObserver = meter.createValueObserver(
         'name'
@@ -931,7 +923,7 @@ describe('Meter', () => {
 
     it('should return noop observer when name is invalid', () => {
       // Need to stub/spy on the underlying logger as the "diag" instance is global
-      const spy = sinon.stub(diag.getLogger(), 'warn');
+      const spy = sinon.stub(diag, 'warn');
       const valueObserver = meter.createValueObserver('na me');
       assert.ok(valueObserver === api.NOOP_VALUE_OBSERVER_METRIC);
       const args = spy.args[0];
@@ -1004,11 +996,6 @@ describe('Meter', () => {
   });
 
   describe('#UpDownSumObserverMetric', () => {
-    beforeEach(() => {
-      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger();
-    });
-
     it('should create an UpDownSum observer', () => {
       const upDownSumObserver = meter.createUpDownSumObserver(
         'name'
@@ -1018,7 +1005,7 @@ describe('Meter', () => {
 
     it('should return noop observer when name is invalid', () => {
       // Need to stub/spy on the underlying logger as the "diag" instance is global
-      const spy = sinon.stub(diag.getLogger(), 'warn');
+      const spy = sinon.stub(diag, 'warn');
       const upDownSumObserver = meter.createUpDownSumObserver('na me');
       assert.ok(upDownSumObserver === api.NOOP_UP_DOWN_SUM_OBSERVER_METRIC);
       const args = spy.args[0];
