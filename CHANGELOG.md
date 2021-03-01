@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 
 ### :books: (Refine Doc)
 
+* [#1973](https://github.com/open-telemetry/opentelemetry-js/pull/1973) docs(readme): fix @opentelemetry/instrumentation-http link ([@Hongbo-Miao](https://github.com/Hongbo-Miao))
 * [#1941](https://github.com/open-telemetry/opentelemetry-js/pull/1941) fix: update readme upgrade guidelines version setting ([@MSNev](https://github.com/MSNev))
 
 ### :house: (Internal)
@@ -30,11 +31,12 @@ All notable changes to this project will be documented in this file.
 * `opentelemetry-core`, `opentelemetry-exporter-collector`, `opentelemetry-instrumentation-http`, `opentelemetry-metrics`, `opentelemetry-plugin-http`
   * [#1922](https://github.com/open-telemetry/opentelemetry-js/pull/1922) chore: lint on shadowing in non-test sources, fix a few of them ([@johnbley](https://github.com/johnbley))
 
-### Committers: 7
+### Committers: 8
 
 * Bartlomiej Obecny ([@obecny](https://github.com/obecny))
 * Daniel Dyla ([@dyladan](https://github.com/dyladan))
 * Gerhard Stöbich ([@Flarna](https://github.com/Flarna))
+* Hongbo Miao ([@Hongbo-Miao](https://github.com/Hongbo-Miao))
 * John Bley ([@johnbley](https://github.com/johnbley))
 * Karol Fuksiewicz ([@kudlatyamroth](https://github.com/kudlatyamroth))
 * Marian Zagoruiko ([@mzahor](https://github.com/mzahor))
