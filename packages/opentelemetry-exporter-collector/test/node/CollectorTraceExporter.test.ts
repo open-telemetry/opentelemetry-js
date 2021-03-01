@@ -44,8 +44,8 @@ const address = 'localhost:1501';
 describe('CollectorTraceExporter - node with json over http', () => {
   let collectorExporter: CollectorTraceExporter;
   let collectorExporterConfig: CollectorExporterNodeConfigBase;
-  let spyRequest: sinon.SinonSpy;
-  let spyWrite: sinon.SinonSpy;
+  let stubRequest: sinon.SinonStub;
+  let stubWrite: sinon.SinonStub;
   let spans: ReadableSpan[];
 
   afterEach(() => {
@@ -69,8 +69,8 @@ describe('CollectorTraceExporter - node with json over http', () => {
 
   describe('export', () => {
     beforeEach(() => {
-      spyRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
-      spyWrite = sinon.stub(fakeRequest, 'write');
+      stubRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
+      stubWrite = sinon.stub(fakeRequest, 'write');
       collectorExporterConfig = {
         headers: {
           foo: 'bar',
@@ -91,7 +91,7 @@ describe('CollectorTraceExporter - node with json over http', () => {
       collectorExporter.export(spans, () => {});
 
       setTimeout(() => {
-        const args = spyRequest.args[0];
+        const args = stubRequest.args[0];
         const options = args[0];
 
         assert.strictEqual(options.hostname, 'foo.bar.com');
@@ -105,7 +105,7 @@ describe('CollectorTraceExporter - node with json over http', () => {
       collectorExporter.export(spans, () => {});
 
       setTimeout(() => {
-        const args = spyRequest.args[0];
+        const args = stubRequest.args[0];
         const options = args[0];
         assert.strictEqual(options.headers['foo'], 'bar');
         done();
@@ -116,7 +116,7 @@ describe('CollectorTraceExporter - node with json over http', () => {
       collectorExporter.export(spans, () => {});
 
       setTimeout(() => {
-        const args = spyRequest.args[0];
+        const args = stubRequest.args[0];
         const options = args[0];
         const agent = options.agent;
         assert.strictEqual(agent.keepAlive, true);
@@ -130,7 +130,7 @@ describe('CollectorTraceExporter - node with json over http', () => {
       collectorExporter.export(spans, () => {});
 
       setTimeout(() => {
-        const [firstExportAgent, secondExportAgent] = spyRequest.args.map(
+        const [firstExportAgent, secondExportAgent] = stubRequest.args.map(
           a => a[0].agent
         );
         assert.strictEqual(firstExportAgent, secondExportAgent);
@@ -142,7 +142,7 @@ describe('CollectorTraceExporter - node with json over http', () => {
       collectorExporter.export(spans, () => {});
 
       setTimeout(() => {
-        const writeArgs = spyWrite.args[0];
+        const writeArgs = stubWrite.args[0];
         const json = JSON.parse(
           writeArgs[0]
         ) as collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
@@ -161,18 +161,18 @@ describe('CollectorTraceExporter - node with json over http', () => {
 
     it('should log the successful message', done => {
       // Need to stub/spy on the underlying logger as the "diag" instance is global
-      const spyLoggerError = sinon.stub(diag, 'error');
+      const stubLoggerError = sinon.stub(diag, 'error');
       const responseSpy = sinon.spy();
       collectorExporter.export(spans, responseSpy);
 
       setTimeout(() => {
         const mockRes = new MockedResponse(200);
-        const args = spyRequest.args[0];
+        const args = stubRequest.args[0];
         const callback = args[1];
         callback(mockRes);
         mockRes.send('success');
         setTimeout(() => {
-          assert.strictEqual(spyLoggerError.args.length, 0);
+          assert.strictEqual(stubLoggerError.args.length, 0);
           assert.strictEqual(
             responseSpy.args[0][0].code,
             core.ExportResultCode.SUCCESS
@@ -188,7 +188,7 @@ describe('CollectorTraceExporter - node with json over http', () => {
 
       setTimeout(() => {
         const mockResError = new MockedResponse(400);
-        const args = spyRequest.args[0];
+        const args = stubRequest.args[0];
         const callback = args[1];
         callback(mockResError);
         mockResError.send('failed');

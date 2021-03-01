@@ -58,8 +58,8 @@ const address = 'localhost:1501';
 describe('CollectorMetricExporter - node with json over http', () => {
   let collectorExporter: CollectorMetricExporter;
   let collectorExporterConfig: CollectorExporterNodeConfigBase;
-  let spyRequest: sinon.SinonSpy;
-  let spyWrite: sinon.SinonSpy;
+  let stubRequest: sinon.SinonStub;
+  let stubWrite: sinon.SinonStub;
   let metrics: MetricRecord[];
 
   afterEach(() => {
@@ -83,8 +83,8 @@ describe('CollectorMetricExporter - node with json over http', () => {
 
   describe('export', () => {
     beforeEach(async () => {
-      spyRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
-      spyWrite = sinon.stub(fakeRequest, 'write');
+      stubRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
+      stubWrite = sinon.stub(fakeRequest, 'write');
       collectorExporterConfig = {
         headers: {
           foo: 'bar',
@@ -124,7 +124,7 @@ describe('CollectorMetricExporter - node with json over http', () => {
       collectorExporter.export(metrics, () => {});
 
       setTimeout(() => {
-        const args = spyRequest.args[0];
+        const args = stubRequest.args[0];
         const options = args[0];
 
         assert.strictEqual(options.hostname, 'foo.bar.com');
@@ -138,7 +138,7 @@ describe('CollectorMetricExporter - node with json over http', () => {
       collectorExporter.export(metrics, () => {});
 
       setTimeout(() => {
-        const args = spyRequest.args[0];
+        const args = stubRequest.args[0];
         const options = args[0];
         assert.strictEqual(options.headers['foo'], 'bar');
         done();
@@ -149,7 +149,7 @@ describe('CollectorMetricExporter - node with json over http', () => {
       collectorExporter.export(metrics, () => {});
 
       setTimeout(() => {
-        const args = spyRequest.args[0];
+        const args = stubRequest.args[0];
         const options = args[0];
         const agent = options.agent;
         assert.strictEqual(agent.keepAlive, true);
@@ -162,7 +162,7 @@ describe('CollectorMetricExporter - node with json over http', () => {
       collectorExporter.export(metrics, () => {});
 
       setTimeout(() => {
-        const writeArgs = spyWrite.args[0];
+        const writeArgs = stubWrite.args[0];
         const json = JSON.parse(
           writeArgs[0]
         ) as collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
@@ -201,19 +201,19 @@ describe('CollectorMetricExporter - node with json over http', () => {
 
     it('should log the successful message', done => {
       // Need to stub/spy on the underlying logger as the "diag" instance is global
-      const spyLoggerError = sinon.stub(diag, 'error');
+      const stubLoggerError = sinon.stub(diag, 'error');
 
       const responseSpy = sinon.spy();
       collectorExporter.export(metrics, responseSpy);
 
       setTimeout(() => {
         const mockRes = new MockedResponse(200);
-        const args = spyRequest.args[0];
+        const args = stubRequest.args[0];
         const callback = args[1];
         callback(mockRes);
         mockRes.send('success');
         setTimeout(() => {
-          assert.strictEqual(spyLoggerError.args.length, 0);
+          assert.strictEqual(stubLoggerError.args.length, 0);
           assert.strictEqual(
             responseSpy.args[0][0].code,
             core.ExportResultCode.SUCCESS
@@ -232,7 +232,7 @@ describe('CollectorMetricExporter - node with json over http', () => {
 
       setTimeout(() => {
         const mockRes = new MockedResponse(400);
-        const args = spyRequest.args[0];
+        const args = stubRequest.args[0];
         const callback = args[1];
         callback(mockRes);
         mockRes.send('failed');

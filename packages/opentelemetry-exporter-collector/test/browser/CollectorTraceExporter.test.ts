@@ -30,25 +30,23 @@ import {
   ensureHeadersContain,
   mockedReadableSpan,
 } from '../helper';
-const sendBeacon = navigator.sendBeacon;
 
 describe('CollectorTraceExporter - web', () => {
   let collectorTraceExporter: CollectorTraceExporter;
   let collectorExporterConfig: CollectorExporterConfigBase;
-  let spyOpen: sinon.SinonSpy;
-  let spyBeacon: sinon.SinonSpy;
+  let stubOpen: sinon.SinonStub;
+  let stubBeacon: sinon.SinonStub;
   let spans: ReadableSpan[];
 
   beforeEach(() => {
-    spyOpen = sinon.stub(XMLHttpRequest.prototype, 'open');
+    stubOpen = sinon.stub(XMLHttpRequest.prototype, 'open');
     sinon.stub(XMLHttpRequest.prototype, 'send');
-    spyBeacon = sinon.stub(navigator, 'sendBeacon');
+    stubBeacon = sinon.stub(navigator, 'sendBeacon');
     spans = [];
     spans.push(Object.assign({}, mockedReadableSpan));
   });
 
   afterEach(() => {
-    navigator.sendBeacon = sendBeacon;
     sinon.restore();
   });
 
@@ -73,7 +71,7 @@ describe('CollectorTraceExporter - web', () => {
         collectorTraceExporter.export(spans, () => {});
 
         setTimeout(() => {
-          const args = spyBeacon.args[0];
+          const args = stubBeacon.args[0];
           const url = args[0];
           const body = args[1];
           const json = JSON.parse(
@@ -94,9 +92,9 @@ describe('CollectorTraceExporter - web', () => {
           }
 
           assert.strictEqual(url, 'http://foo.bar.com');
-          assert.strictEqual(spyBeacon.callCount, 1);
+          assert.strictEqual(stubBeacon.callCount, 1);
 
-          assert.strictEqual(spyOpen.callCount, 0);
+          assert.strictEqual(stubOpen.callCount, 0);
 
           ensureExportTraceServiceRequestIsSet(json);
 
@@ -108,7 +106,7 @@ describe('CollectorTraceExporter - web', () => {
         // Need to stub/spy on the underlying logger as the "diag" instance is global
         const spyLoggerDebug = sinon.stub(diag, 'debug');
         const spyLoggerError = sinon.stub(diag, 'error');
-        spyBeacon = sinon.stub(window.navigator, 'sendBeacon').returns(true);
+        stubBeacon.returns(true);
 
         collectorTraceExporter.export(spans, () => {});
 
@@ -122,7 +120,7 @@ describe('CollectorTraceExporter - web', () => {
       });
 
       it('should log the error message', done => {
-        spyBeacon = sinon.stub(window.navigator, 'sendBeacon').returns(false);
+        stubBeacon.returns(false);
 
         collectorTraceExporter.export(spans, result => {
           assert.deepStrictEqual(result.code, ExportResultCode.FAILED);
@@ -171,7 +169,7 @@ describe('CollectorTraceExporter - web', () => {
             ensureWebResourceIsCorrect(resource);
           }
 
-          assert.strictEqual(spyBeacon.callCount, 0);
+          assert.strictEqual(stubBeacon.callCount, 0);
 
           ensureExportTraceServiceRequestIsSet(json);
 
@@ -194,7 +192,7 @@ describe('CollectorTraceExporter - web', () => {
           assert.strictEqual(response, 'xhr success');
           assert.strictEqual(spyLoggerError.args.length, 0);
 
-          assert.strictEqual(spyBeacon.callCount, 0);
+          assert.strictEqual(stubBeacon.callCount, 0);
           done();
         });
       });
@@ -219,7 +217,7 @@ describe('CollectorTraceExporter - web', () => {
           const request = server.requests[0];
           request.respond(200);
 
-          assert.strictEqual(spyBeacon.callCount, 0);
+          assert.strictEqual(stubBeacon.callCount, 0);
           done();
         });
       });
@@ -257,8 +255,8 @@ describe('CollectorTraceExporter - web', () => {
           const [{ requestHeaders }] = server.requests;
 
           ensureHeadersContain(requestHeaders, customHeaders);
-          assert.strictEqual(spyBeacon.callCount, 0);
-          assert.strictEqual(spyOpen.callCount, 0);
+          assert.strictEqual(stubBeacon.callCount, 0);
+          assert.strictEqual(stubOpen.callCount, 0);
 
           done();
         });
@@ -280,8 +278,8 @@ describe('CollectorTraceExporter - web', () => {
           const [{ requestHeaders }] = server.requests;
 
           ensureHeadersContain(requestHeaders, customHeaders);
-          assert.strictEqual(spyBeacon.callCount, 0);
-          assert.strictEqual(spyOpen.callCount, 0);
+          assert.strictEqual(stubBeacon.callCount, 0);
+          assert.strictEqual(stubOpen.callCount, 0);
 
           done();
         });
