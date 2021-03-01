@@ -63,7 +63,7 @@ describe('HttpPlugin Integration tests', () => {
 
     mockServer.listen(0, () => {
       const addr = mockServer.address();
-      if (addr == null) {
+      if (addr === null || addr === undefined) {
         done(new Error('unexpected addr null'));
         return;
       }
