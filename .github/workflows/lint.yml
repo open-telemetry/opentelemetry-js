@@ -34,6 +34,7 @@ jobs:
         with:
           # must be done before bootstrap to not include node_modules files in the cache paths
           path: |
+            package-lock.json
             packages/*/package-lock.json
             benchmark/*/package-lock.json
             backwards-compatability/*/package-lock.json
@@ -42,18 +43,19 @@ jobs:
             integration-tests/*/package-lock.json
           key: ${{ runner.os }}-lint-${{ hashFiles('**/package.json') }}
 
-      - name: Install root dependencies
-        run: npm ci --ignore-scripts
-
       # On a cache hit, use ci to speed up the install process
       - name: Bootstrap (cache hit)
         if: steps.cache.outputs.cache-hit == 'true'
-        run: npx lerna bootstrap --ignore-scripts
+        run: |
+          npm ci --ignore-scripts
+          npx lerna bootstrap --ignore-scripts
 
       # On a cache miss, fall back to a regular install
       - name: Bootstrap (cache miss)
         if: steps.cache.outputs.cache-hit != 'true'
-        run: npx lerna bootstrap --no-ci --ignore-scripts -- --only=dev
+        run: |
+          npm install --ignore-scripts
+          npx lerna bootstrap --no-ci --ignore-scripts -- --only=dev
 
       - name: Lint
         run: |

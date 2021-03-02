@@ -29,6 +29,7 @@ jobs:
         with:
           # must be done before bootstrap to not include node_modules files in the cache paths
           path: |
+            package-lock.json
             packages/*/package-lock.json
             benchmark/*/package-lock.json
             backwards-compatability/*/package-lock.json
@@ -37,18 +38,17 @@ jobs:
             integration-tests/*/package-lock.json
           key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
 
-      - name: Install root dependencies
-        run: npm ci --ignore-scripts
-
       - name: Install and Build (cache miss) 🔧
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
+          npm install --ignore-scripts
           npx lerna bootstrap --no-ci
           npm run compile
 
       - name: Install and Build (cache hit) 🔧
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
+          npm ci --ignore-scripts
           npx lerna bootstrap
           npm run compile
 
