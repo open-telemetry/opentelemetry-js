@@ -37,7 +37,7 @@ const SAMPLED_VALUES = new Set(['d', '1']);
 const DEBUG_STATE = 'd';
 
 function convertToTraceId128(traceId: string): string {
-  return traceId.length == 32 ? traceId : `${PADDING}${traceId}`;
+  return traceId.length === 32 ? traceId : `${PADDING}${traceId}`;
 }
 
 function convertToTraceFlags(samplingState: string | undefined): TraceFlags {

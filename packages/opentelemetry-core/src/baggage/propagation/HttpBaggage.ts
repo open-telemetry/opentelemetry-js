@@ -63,7 +63,9 @@ export class HttpBaggage implements TextMapPropagator {
 
   private _serializeKeyPairs(keyPairs: string[]) {
     return keyPairs.reduce((hValue: string, current: string) => {
-      const value = `${hValue}${hValue != '' ? ITEMS_SEPARATOR : ''}${current}`;
+      const value = `${hValue}${
+        hValue !== '' ? ITEMS_SEPARATOR : ''
+      }${current}`;
       return value.length > MAX_TOTAL_LENGTH ? hValue : value;
     }, '');
   }
@@ -81,7 +83,7 @@ export class HttpBaggage implements TextMapPropagator {
     const headerValue: string = getter.get(carrier, BAGGAGE_HEADER) as string;
     if (!headerValue) return context;
     const baggage: Record<string, BaggageEntry> = {};
-    if (headerValue.length == 0) {
+    if (headerValue.length === 0) {
       return context;
     }
     const pairs = headerValue.split(ITEMS_SEPARATOR);
@@ -107,7 +109,7 @@ export class HttpBaggage implements TextMapPropagator {
     const keyPairPart = valueProps.shift();
     if (!keyPairPart) return;
     const keyPair = keyPairPart.split(KEY_PAIR_SEPARATOR);
-    if (keyPair.length != 2) return;
+    if (keyPair.length !== 2) return;
     const key = decodeURIComponent(keyPair[0].trim());
     const value = decodeURIComponent(keyPair[1].trim());
     let metadata;

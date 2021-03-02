@@ -805,7 +805,7 @@ describe('Meter', () => {
 
       function getValue() {
         console.log('getting value, counter:', counter);
-        if (++counter % 2 == 0) {
+        if (++counter % 2 === 0) {
           return 3;
         }
         return -1;
