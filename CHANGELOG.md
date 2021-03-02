@@ -6,6 +6,16 @@ All notable changes to this project will be documented in this file.
 
 ## 0.18.0
 
+### :boom: Breaking Change
+
+* `opentelemetry-resources`
+  * [#1975](https://github.com/open-telemetry/opentelemetry-js/pull/1975) fix: specification compliant resource collision precedence ([@lonewolf3739](https://github.com/lonewolf3739))
+
+### :rocket: (Enhancement)
+
+* `opentelemetry-semantic-conventions`
+  * [#1976](https://github.com/open-telemetry/opentelemetry-js/pull/1976) feat(semantic-conventions): add missing RpcAttributes from spec ([@blumamir](https://github.com/blumamir))
+
 ### :bug: (Bug Fix)
 
 * `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector`
@@ -31,8 +41,9 @@ All notable changes to this project will be documented in this file.
 * `opentelemetry-core`, `opentelemetry-exporter-collector`, `opentelemetry-instrumentation-http`, `opentelemetry-metrics`, `opentelemetry-plugin-http`
   * [#1922](https://github.com/open-telemetry/opentelemetry-js/pull/1922) chore: lint on shadowing in non-test sources, fix a few of them ([@johnbley](https://github.com/johnbley))
 
-### Committers: 8
+### Committers: 10
 
+* Amir Blum ([@blumamir](https://github.com/blumamir))
 * Bartlomiej Obecny ([@obecny](https://github.com/obecny))
 * Daniel Dyla ([@dyladan](https://github.com/dyladan))
 * Gerhard Stöbich ([@Flarna](https://github.com/Flarna))
@@ -41,6 +52,7 @@ All notable changes to this project will be documented in this file.
 * Karol Fuksiewicz ([@kudlatyamroth](https://github.com/kudlatyamroth))
 * Marian Zagoruiko ([@mzahor](https://github.com/mzahor))
 * Nev ([@MSNev](https://github.com/MSNev))
+* Srikanth Chekuri ([@lonewolf3739](https://github.com/lonewolf3739))
 
 ## 0.17.0
 
