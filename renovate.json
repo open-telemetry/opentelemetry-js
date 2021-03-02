@@ -3,8 +3,8 @@
   "packageRules": [
     {
       "groupName": "all non-major dependencies",
-      "updateTypes": ["patch", "minor"],
-      "groupSlug": "all-minor-patch"
+      "groupSlug": "all-minor-patch",
+      "matchUpdateTypes": ["patch", "minor"]
     },
     {
       "matchPackageNames": ["@opentelemetry/api"],
