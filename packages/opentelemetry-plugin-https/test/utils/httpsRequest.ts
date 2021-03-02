@@ -57,7 +57,7 @@ function get(input: any, options?: any): GetResult {
       });
     }
     req =
-      options !== null && options !== undefined
+      options != null
         ? https.get(input, options, onGetResponseCb)
         : https.get(input, onGetResponseCb);
     req.on('error', err => {

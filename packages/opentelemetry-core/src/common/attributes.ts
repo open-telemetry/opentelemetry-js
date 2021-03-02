@@ -18,7 +18,7 @@ import { SpanAttributeValue, SpanAttributes } from '@opentelemetry/api';
 export function sanitizeAttributes(attributes: unknown): SpanAttributes {
   const out: SpanAttributes = {};
 
-  if (attributes === null || typeof attributes !== 'object') {
+  if (attributes == null || typeof attributes !== 'object') {
     return out;
   }
 
@@ -36,7 +36,7 @@ export function sanitizeAttributes(attributes: unknown): SpanAttributes {
 }
 
 export function isAttributeValue(val: unknown): val is SpanAttributeValue {
-  if (val === null || val === undefined) {
+  if (val == null) {
     return true;
   }
 
@@ -52,7 +52,7 @@ function isHomogeneousAttributeValueArray(arr: unknown[]): boolean {
 
   for (const element of arr) {
     // null/undefined elements are allowed
-    if (element === null || element === undefined) continue;
+    if (element == null) continue;
 
     if (!type) {
       if (isValidPrimitiveAttributeValue(element)) {

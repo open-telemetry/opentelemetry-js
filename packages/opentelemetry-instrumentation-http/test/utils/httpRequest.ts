@@ -53,7 +53,7 @@ function get(input: any, options?: any): GetResult {
       });
     }
     req =
-      options !== null && options !== undefined
+      options != null
         ? http.get(input, options, onGetResponseCb)
         : http.get(input, onGetResponseCb);
     req.on('error', err => {

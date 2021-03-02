@@ -72,7 +72,7 @@ describe('Packages', () => {
 
     mockServer.listen(0, () => {
       const addr = mockServer.address();
-      if (addr === null || addr === undefined) {
+      if (addr == null) {
         done(new Error('unexpected addr null'));
         return;
       }
