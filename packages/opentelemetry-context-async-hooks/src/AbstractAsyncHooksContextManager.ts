@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ContextManager, Context } from '@opentelemetry/context-base';
+import { ContextManager, Context } from '@opentelemetry/api';
 import { EventEmitter } from 'events';
 
 type Func<T> = (...args: unknown[]) => T;

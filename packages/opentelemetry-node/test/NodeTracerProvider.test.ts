@@ -29,7 +29,7 @@ import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as path from 'path';
-import { ContextManager, ROOT_CONTEXT } from '@opentelemetry/context-base';
+import { ContextManager, ROOT_CONTEXT } from '@opentelemetry/api';
 import { NodeTracerProvider } from '../src/NodeTracerProvider';
 
 const sleep = (time: number) =>
@@ -53,8 +53,6 @@ describe('NodeTracerProvider', () => {
   beforeEach(() => {
     contextManager = new AsyncHooksContextManager();
     context.setGlobalContextManager(contextManager.enable());
-    // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap warn which is already wrapped
-    diag.setLogger();
   });
 
   afterEach(() => {
@@ -65,11 +63,6 @@ describe('NodeTracerProvider', () => {
   });
 
   describe('constructor', () => {
-    beforeEach(() => {
-      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap warn which is already wrapped
-      diag.setLogger();
-    });
-
     it('should construct an instance with required only options', () => {
       provider = new NodeTracerProvider();
       assert.ok(provider instanceof NodeTracerProvider);
@@ -89,7 +82,7 @@ describe('NodeTracerProvider', () => {
 
     it('should show warning when plugins are defined', () => {
       const dummyPlugin1 = {};
-      const spyWarn = sinon.spy(diag.getLogger(), 'warn');
+      const spyWarn = sinon.spy(diag, 'warn');
 
       const plugins = [dummyPlugin1];
       const options = { plugins };

@@ -17,6 +17,7 @@
 import { NoopTracerProvider, diag } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as path from 'path';
+import sinon = require('sinon');
 import {
   HookState,
   PluginLoader,
@@ -111,6 +112,7 @@ describe('PluginLoader', () => {
   afterEach(() => {
     // clear require cache
     Object.keys(require.cache).forEach(key => delete require.cache[key]);
+    sinon.restore();
   });
 
   describe('.state()', () => {
@@ -134,10 +136,6 @@ describe('PluginLoader', () => {
   });
 
   describe('.load()', () => {
-    beforeEach(() => {
-      // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
-      diag.setLogger();
-    });
     afterEach(() => {
       delete process.env[ENV_PLUGIN_DISABLED_LIST];
     });
@@ -321,18 +319,16 @@ describe('PluginLoader', () => {
       pluginLoader.unload();
     });
 
-    it('should warn when module was already loaded', callback => {
-      const verifyWarnLogger = Object.assign({}, diag);
-      verifyWarnLogger.warn = (message: string, ...args: unknown[]) => {
-        assert(message.match(/were already required when/));
-        assert(message.match(/(already-require-module)/));
-        return callback();
-      };
-      diag.setLogger(verifyWarnLogger);
+    it('should warn when module was already loaded', () => {
+      const warnStub = sinon.stub(diag, 'warn');
       require('already-require-module');
       const pluginLoader = new PluginLoader(provider);
       pluginLoader.load(alreadyRequiredPlugins);
       pluginLoader.unload();
+      sinon.assert.calledOnce(warnStub);
+      const message = warnStub.firstCall.args[0];
+      assert.ok(message.match(/were already required when/));
+      assert.ok(message.match(/(already-require-module)/));
     });
 
     it('should not load a plugin that patches a different module that the one configured', () => {

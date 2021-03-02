@@ -64,7 +64,7 @@
   },
   "dependencies": {
     "@grpc/proto-loader": "^0.5.4",
-    "@opentelemetry/api": "^0.17.0",
+    "@opentelemetry/api": "^0.18.0",
     "@opentelemetry/core": "^0.17.0",
     "@opentelemetry/exporter-collector": "^0.17.0",
     "@opentelemetry/metrics": "^0.17.0",

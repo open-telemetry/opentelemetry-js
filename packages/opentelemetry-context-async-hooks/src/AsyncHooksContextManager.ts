@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context, ROOT_CONTEXT } from '@opentelemetry/context-base';
+import { Context, ROOT_CONTEXT } from '@opentelemetry/api';
 import * as asyncHooks from 'async_hooks';
 import { AbstractAsyncHooksContextManager } from './AbstractAsyncHooksContextManager';
 

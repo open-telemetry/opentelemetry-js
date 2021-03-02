@@ -101,10 +101,10 @@ describe('safeExecuteInTheMiddleAsync', () => {
       true
     );
   });
-  it('should throw error', () => {
+  it('should throw error', async () => {
     const error = new Error('test');
     try {
-      safeExecuteInTheMiddleAsync(
+      await safeExecuteInTheMiddleAsync(
         async () => {
           await setTimeout(() => {}, 1);
           throw error;

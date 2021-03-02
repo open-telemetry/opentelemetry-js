@@ -74,7 +74,7 @@
     "webpack-merge": "5.7.3"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.17.0",
+    "@opentelemetry/api": "^0.18.0",
     "@opentelemetry/core": "^0.17.0",
     "@opentelemetry/instrumentation": "^0.17.0",
     "@opentelemetry/semantic-conventions": "^0.17.0",
