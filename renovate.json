@@ -12,7 +12,7 @@
     }
   ],
   "ignoreDeps": ["gcp-metadata", "got", "mocha"],
-  "assignees": ["@dyladan", "@mayurkale22", "@obecny"],
+  "assignees": ["@dyladan", "@obecny", "@vmarchaud"],
   "schedule": ["before 3am on Friday"],
   "labels": ["dependencies"]
 }
