@@ -8,7 +8,7 @@
     "packages/*",
     "integration-tests/*"
   ],
-  "version": "0.17.0",
+  "version": "0.18.0",
   "changelog": {
     "repo": "open-telemetry/opentelemetry-js",
     "labels": {
@@ -17,7 +17,8 @@
       "bug": ":bug: (Bug Fix)",
       "core": ":wrench: Core",
       "document": ":books: (Refine Doc)",
-      "feature-request": ":sparkles: (Feature)"
+      "feature-request": ":sparkles: (Feature)",
+      "internal": ":house: (Internal)"
     },
     "cacheDir": ".changelog"
   }

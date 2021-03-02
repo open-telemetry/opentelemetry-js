@@ -5,8 +5,7 @@ const { DiagConsoleLogger, DiagLogLevel, diag } = require('@opentelemetry/api');
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 
 // Optional and only needed to see the internal diagnostic logging (during development)
-diag.setLogger(new DiagConsoleLogger());
-diag.setLogLevel(DiagLogLevel.DEBUG);
+diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
 
 const exporter = new PrometheusExporter(
   {

@@ -46,15 +46,16 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 
 ## Compatibility Matrix
 
-| Core version | Contrib Version         |
-|--------------|-------------------------|
-| 0.17.x       | 0.14.x not released yet |
-| 0.16.x       | ------                  |
-| 0.15.x       | 0.13.x                  |
-| 0.14.x       | 0.12.x                  |
-| 0.13.x       | ------                  |
-| 0.12.x       | 0.11.x                  |
-| 0.11.x       | 0.10.x                  |
+| API Version | Core version | Contrib Version         |
+| ----------- |--------------|-------------------------|
+| 0.18.x      | 0.18.x       | 0.14.x not released yet |
+|             | 0.17.x       | ------                  |
+|             | 0.16.x       | ------                  |
+|             | 0.15.x       | 0.13.x                  |
+|             | 0.14.x       | 0.12.x                  |
+|             | 0.13.x       | ------                  |
+|             | 0.12.x       | 0.11.x                  |
+|             | 0.11.x       | 0.10.x                  |
 
 ## Quick start
 
@@ -247,6 +248,8 @@ To request automatic tracing support for a module not on this list, please [file
 
 ### 0.17.0 to 0.18.0
 
+- `diag.setLogLevel` is removed and LogLevel can be set by an optional second parameter to `setLogger`
+
 [PR-1975](https://github.com/open-telemetry/opentelemetry-js/pull/1975)
 
 - Breaking change - The resulting resource MUST have all attributes that are on any of the two input resources. If a key exists on both the old and updating resource, the value of the updating resource MUST be picked - previously it was opposite.
@@ -266,12 +269,10 @@ The new global [```api.diag```](https://github.com/open-telemetry/opentelemetry-
 All included logger references have been removed in preference to using the global ```api.diag``` directly, so you no longer need to pass around the logger instance via function parameters or included as part of the configuration for a component.
 
 ```javascript
-// Setting the default Global logger to use the Console
 import { diag, DiagConsoleLogger, DiagLogLevel } from "@opentelemetry/api";
-diag.setLogger(new DiagConsoleLogger())
-
+// Setting the default Global logger to use the Console
 // And optionally change the logging level (Defaults to INFO)
-diag.setLogLevel(DiagLogLevel.ERROR);
+diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ERROR)
 ```
 
 #### Using the logger anywhere in the code
