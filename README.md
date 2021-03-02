@@ -249,7 +249,7 @@ To request automatic tracing support for a module not on this list, please [file
 
 [PR-1975](https://github.com/open-telemetry/opentelemetry-js/pull/1975)
 
-- Breaking change - Update resource key collision precedence
+- Breaking change - The resulting resource MUST have all attributes that are on any of the two input resources. If a key exists on both the old and updating resource, the value of the updating resource MUST be picked - previously it was opposite.
 
 ### 0.16.0 to 0.17.0
 
