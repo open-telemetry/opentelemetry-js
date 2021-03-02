@@ -54,7 +54,7 @@ export class Resource {
 
   /**
    * Returns a new, merged {@link Resource} by merging the current Resource
-   * with the other Resource. In case of a collision, current Resource takes
+   * with the other Resource. In case of a collision, other Resource takes
    * precedence.
    *
    * @param other the Resource that will be merged with this.
@@ -66,8 +66,8 @@ export class Resource {
     // SpanAttributes from resource overwrite attributes from other resource.
     const mergedAttributes = Object.assign(
       {},
-      other.attributes,
-      this.attributes
+      this.attributes,
+      other.attributes
     );
     return new Resource(mergedAttributes);
   }

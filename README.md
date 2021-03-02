@@ -204,7 +204,7 @@ OpenTelemetry can collect tracing data automatically using instrumentations. Ven
 
 - [@opentelemetry/instrumentation-grpc][otel-instrumentation-grpc] previous [@opentelemetry/plugin-grpc][otel-plugin-grpc]
 - [@opentelemetry/plugin-grpc-js][otel-plugin-grpc-js]
-- [@opentelemetry/instrumentation-http][otel-plugin-http] previous [@opentelemetry/plugin-http][otel-plugin-http] and [@opentelemetry/plugin-https][otel-plugin-https]
+- [@opentelemetry/instrumentation-http][otel-instrumentation-http] previous [@opentelemetry/plugin-http][otel-plugin-http] and [@opentelemetry/plugin-https][otel-plugin-https]
 
 ##### Contrib
 
@@ -244,6 +244,12 @@ To request automatic tracing support for a module not on this list, please [file
 | [@opentelemetry/shim-opentracing][otel-shim-opentracing] | OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry |
 
 ## Upgrade guidelines
+
+### 0.17.0 to 0.18.0
+
+[PR-1975](https://github.com/open-telemetry/opentelemetry-js/pull/1975)
+
+- Breaking change - The resulting resource MUST have all attributes that are on any of the two input resources. If a key exists on both the old and updating resource, the value of the updating resource MUST be picked - previously it was opposite.
 
 ### 0.16.0 to 0.17.0
 
@@ -411,7 +417,6 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-instrumentation-fetch]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-fetch
 [otel-instrumentation-grpc]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-grpc
 [otel-instrumentation-http]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-http
-[otel-instrumentation-https]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-https
 [otel-instrumentation-xml-http-request]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-xml-http-request
 
 [otel-shim-opentracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-shim-opentracing

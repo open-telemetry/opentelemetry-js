@@ -14,7 +14,29 @@
  * limitations under the License.
  */
 export const RpcAttribute = {
+  /**
+   * 	A string identifying the remoting system.
+   *
+   * @remarks
+   * Required
+   */
+  RPC_SYSTEM: 'rpc.system',
+
+  /**
+   * The full name of the service being called, including its package name, if applicable.
+   *
+   * @remarks
+   * Not required, but recommended
+   */
   RPC_SERVICE: 'rpc.service',
+
+  /**
+   * The name of the method being called, must be equal to the $method part in the span name.
+   *
+   * @remarks
+   * Not required, but recommended
+   */
+  RPC_METHOD: 'rpc.method',
 
   // GRPC (no spec)
   GRPC_KIND: 'grpc.kind', // SERVER or CLIENT
