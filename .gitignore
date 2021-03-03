@@ -60,8 +60,7 @@ typings/
 
 # lock files
 yarn.lock
-packages/**/yarn.lock
-*/**/package-lock.json
+package-lock.json
 
 # docs files
 docs
