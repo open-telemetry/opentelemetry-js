@@ -66,8 +66,8 @@ export function registerGlobal<Type extends keyof OTelGlobalAPI>(
 export function getGlobal<Type extends keyof OTelGlobalAPI>(
   type: Type
 ): OTelGlobalAPI[Type] | undefined {
-  const version = _global[GLOBAL_OPENTELEMETRY_API_KEY]?.version;
-  if (!version || !isCompatible(version)) {
+  const globalVersion = _global[GLOBAL_OPENTELEMETRY_API_KEY]?.version;
+  if (!globalVersion || !isCompatible(globalVersion)) {
     return;
   }
   return _global[GLOBAL_OPENTELEMETRY_API_KEY]?.[type];
