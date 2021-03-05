@@ -21,81 +21,113 @@ import {
 } from '../../src/internal/semver';
 import { VERSION } from '../../src/version';
 
-describe('Version Compatibility', () => {
+describe('semver', () => {
   it('should be compatible if versions are equal', () => {
     assert.ok(isCompatible(VERSION));
   });
 
-  describe('throws if own version cannot be parsed', () => {
-    assert.throws(() => {
-      _makeCompatibilityCheck('this is not semver');
-    });
+  it('returns false if own version cannot be parsed', () => {
+    const check = _makeCompatibilityCheck('this is not semver');
+    assert.ok(!check('1.0.0'));
   });
 
-  describe('incompatible if other version cannot be parsed', () => {
+  it('incompatible if other version cannot be parsed', () => {
     const check = _makeCompatibilityCheck('0.1.2');
     assert.ok(!check('this is not semver'));
   });
 
-  describe('>= 1.x', () => {
-    it('should be compatible if major and minor versions are equal', () => {
-      const check = _makeCompatibilityCheck('1.2.3');
-      assert.ok(check('1.2.2'));
-      assert.ok(check('1.2.2-alpha'));
-      assert.ok(check('1.2.4'));
-      assert.ok(check('1.2.4-alpha'));
-    });
+  describe('>= 1.0.0', () => {
+    const globalVersion = '5.5.5';
+    const vers: [string, boolean][] = [
+      // same major/minor run should be compatible
+      ['5.5.5', true],
+      ['5.5.6', true],
+      ['5.5.4', true],
 
-    it('should be compatible if major versions are equal and minor version is lesser', () => {
-      const check = _makeCompatibilityCheck('1.2.3');
-      assert.ok(check('1.1.2'));
-      assert.ok(check('1.1.2-alpha'));
-      assert.ok(check('1.1.4'));
-      assert.ok(check('1.1.4-alpha'));
-    });
+      // if our version has a minor version increase, we may try to call methods which don't exist on the global
+      ['5.6.5', false],
+      ['5.6.6', false],
+      ['5.6.4', false],
 
-    it('should be incompatible if major versions do not match', () => {
-      const check = _makeCompatibilityCheck('3.3.3');
-      assert.ok(!check('0.3.3'));
-      assert.ok(!check('0.3.3'));
-    });
+      // if the global version is ahead of us by a minor revision, it has at least the methods we know about
+      ['5.4.5', true],
+      ['5.4.6', true],
+      ['5.4.4', true],
 
-    it('should be incompatible if major versions match but other minor version is greater than our minor version', () => {
-      const check = _makeCompatibilityCheck('1.2.3');
-      assert.ok(!check('1.3.3-alpha'));
-      assert.ok(!check('1.3.3'));
-    });
+      // major version mismatch is always incompatible
+      ['6.5.5', false],
+      ['6.5.6', false],
+      ['6.5.4', false],
+      ['6.6.5', false],
+      ['6.6.6', false],
+      ['6.6.4', false],
+      ['6.4.5', false],
+      ['6.4.6', false],
+      ['6.4.4', false],
+      ['4.5.5', false],
+      ['4.5.6', false],
+      ['4.5.4', false],
+      ['4.6.5', false],
+      ['4.6.6', false],
+      ['4.6.4', false],
+      ['4.4.5', false],
+      ['4.4.6', false],
+      ['4.4.4', false],
+    ];
+
+    test(globalVersion, vers);
   });
 
-  describe('0.x', () => {
-    it('should be compatible if minor and patch versions are equal', () => {
-      const check = _makeCompatibilityCheck('0.1.2');
-      assert.ok(check('0.1.2'));
-      assert.ok(check('0.1.2-alpha'));
-    });
+  describe('< 1.0.0', () => {
+    const globalVersion = '0.5.5';
+    const vers: [string, boolean][] = [
+      // same minor/patch should be compatible
+      ['0.5.5', true],
 
-    it('should be compatible if minor versions are equal and patch version is lesser', () => {
-      const check = _makeCompatibilityCheck('0.1.2');
-      assert.ok(check('0.1.1'));
-      assert.ok(check('0.1.1-alpha'));
-    });
+      // if our version has a patch version increase, we may try to call methods which don't exist on the global
+      ['0.5.6', false],
 
-    it('should be incompatible if minor versions do not match', () => {
-      const check = _makeCompatibilityCheck('0.3.3');
-      assert.ok(!check('0.2.3'));
-      assert.ok(!check('0.4.3'));
-    });
+      // if the global version is ahead of us by a patch revision, it has at least the methods we know about
+      ['0.5.4', true],
 
-    it('should be incompatible if minor versions do not match', () => {
-      const check = _makeCompatibilityCheck('0.3.3');
-      assert.ok(!check('0.2.3'));
-      assert.ok(!check('0.4.3'));
-    });
+      // minor version mismatch is always incompatible
+      ['0.6.5', false],
+      ['0.6.6', false],
+      ['0.6.4', false],
+      ['0.4.5', false],
+      ['0.4.6', false],
+      ['0.4.4', false],
 
-    it('should be incompatible if minor versions match but other patch version is greater than our patch version', () => {
-      const check = _makeCompatibilityCheck('0.3.3');
-      assert.ok(!check('0.3.4-alpha'));
-      assert.ok(!check('0.3.4'));
-    });
+      // major version mismatch is always incompatible
+      ['1.5.5', false],
+      ['1.5.6', false],
+      ['1.5.4', false],
+      ['1.6.5', false],
+      ['1.6.6', false],
+      ['1.6.4', false],
+      ['1.4.5', false],
+      ['1.4.6', false],
+      ['1.4.4', false],
+    ];
+
+    test(globalVersion, vers);
   });
 });
+
+function test(globalVersion: string, vers: [string, boolean][]) {
+  describe(`global version is ${globalVersion}`, () => {
+    for (const [version, compatible] of vers) {
+      const alphaVersion = `${version}-alpha.1`;
+      it(`API version ${version} ${
+        compatible ? 'should' : 'should not'
+      } be able to access global`, () => {
+        const check = _makeCompatibilityCheck(version);
+        assert.strictEqual(check(globalVersion), compatible);
+
+        // alpha tag should have no effect different than the regular version
+        const alphaCheck = _makeCompatibilityCheck(alphaVersion);
+        assert.strictEqual(alphaCheck(globalVersion), compatible);
+      });
+    }
+  });
+}

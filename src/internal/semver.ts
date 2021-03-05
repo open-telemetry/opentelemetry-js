@@ -23,21 +23,27 @@ const re = /^(\d+)\.(\d+)\.(\d+)(?:-(.*))?$/;
  *
  * The returned function has the following semantics:
  * - Exact match is always compatible
- * - Major versions must always match
- * - The minor version of the API module requesting access to the global API must be greater or equal to the minor version of this API
+ * - Major versions must match exactly
+ *    - 1.x package cannot use global 2.x package
+ *    - 2.x package cannot use global 1.x package
+ * - The minor version of the API module requesting access to the global API must be less than or equal to the minor version of this API
+ *    - 1.3 package may use 1.4 global because the later global contains all functions 1.3 expects
+ *    - 1.4 package may NOT use 1.3 global because it may try to call functions which don't exist on 1.3
+ * - If the major version is 0, the minor version is treated as the major and the patch is treated as the minor
  * - Patch and build tag differences are not considered at this time
  *
  * @param ownVersion version which should be checked against
  */
 export function _makeCompatibilityCheck(
   ownVersion: string
-): (version: string) => boolean {
+): (globalVersion: string) => boolean {
   const acceptedVersions = new Set<string>([ownVersion]);
   const rejectedVersions = new Set<string>();
 
   const myVersionMatch = ownVersion.match(re);
   if (!myVersionMatch) {
-    throw new Error('Cannot parse own version');
+    // we cannot guarantee compatibility so we always return noop
+    return () => false;
   }
 
   const ownVersionParsed = {
@@ -46,57 +52,59 @@ export function _makeCompatibilityCheck(
     patch: +myVersionMatch[3],
   };
 
-  return function isCompatible(version: string): boolean {
-    if (acceptedVersions.has(version)) {
+  function _reject(v: string) {
+    rejectedVersions.add(v);
+    return false;
+  }
+
+  function _accept(v: string) {
+    acceptedVersions.add(v);
+    return true;
+  }
+
+  return function isCompatible(globalVersion: string): boolean {
+    if (acceptedVersions.has(globalVersion)) {
       return true;
     }
 
-    if (rejectedVersions.has(version)) {
+    if (rejectedVersions.has(globalVersion)) {
       return false;
     }
 
-    const m = version.match(re);
-    if (!m) {
+    const globalVersionMatch = globalVersion.match(re);
+    if (!globalVersionMatch) {
       // cannot parse other version
-      rejectedVersions.add(version);
-      return false;
+      // we cannot guarantee compatibility so we always noop
+      return _reject(globalVersion);
     }
 
-    const otherVersionParsed = {
-      major: +m[1],
-      minor: +m[2],
-      patch: +m[3],
+    const globalVersionParsed = {
+      major: +globalVersionMatch[1],
+      minor: +globalVersionMatch[2],
+      patch: +globalVersionMatch[3],
     };
 
     // major versions must match
-    if (ownVersionParsed.major !== otherVersionParsed.major) {
-      rejectedVersions.add(version);
-      return false;
+    if (ownVersionParsed.major !== globalVersionParsed.major) {
+      return _reject(globalVersion);
     }
 
-    // if major version is 0, minor is treated like major and patch is treated like minor
     if (ownVersionParsed.major === 0) {
-      if (ownVersionParsed.minor !== otherVersionParsed.minor) {
-        rejectedVersions.add(version);
-        return false;
+      if (
+        ownVersionParsed.minor === globalVersionParsed.minor &&
+        ownVersionParsed.patch <= globalVersionParsed.patch
+      ) {
+        return _accept(globalVersion);
       }
 
-      if (ownVersionParsed.patch < otherVersionParsed.patch) {
-        rejectedVersions.add(version);
-        return false;
-      }
-
-      acceptedVersions.add(version);
-      return true;
+      return _reject(globalVersion);
     }
 
-    if (ownVersionParsed.minor < otherVersionParsed.minor) {
-      rejectedVersions.add(version);
-      return false;
+    if (ownVersionParsed.minor <= globalVersionParsed.minor) {
+      return _accept(globalVersion);
     }
 
-    acceptedVersions.add(version);
-    return true;
+    return _reject(globalVersion);
   };
 }
 
@@ -104,8 +112,13 @@ export function _makeCompatibilityCheck(
  * Test an API version to see if it is compatible with this API.
  *
  * - Exact match is always compatible
- * - Major versions must always match
- * - The minor version of the API module requesting access to the global API must be greater or equal to the minor version of this API
+ * - Major versions must match exactly
+ *    - 1.x package cannot use global 2.x package
+ *    - 2.x package cannot use global 1.x package
+ * - The minor version of the API module requesting access to the global API must be less than or equal to the minor version of this API
+ *    - 1.3 package may use 1.4 global because the later global contains all functions 1.3 expects
+ *    - 1.4 package may NOT use 1.3 global because it may try to call functions which don't exist on 1.3
+ * - If the major version is 0, the minor version is treated as the major and the patch is treated as the minor
  * - Patch and build tag differences are not considered at this time
  *
  * @param version version of the API requesting an instance of the global API
