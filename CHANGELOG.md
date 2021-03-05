@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.18.1
+
+### :bug: Bug Fix
+
+* [#16](https://github.com/open-telemetry/opentelemetry-js-api/pull/16) fix: Reverse the direction of the semver check ([@dyladan](https://github.com/dyladan))
+
+### Committers: 1
+
+* Daniel Dyla ([@dyladan](https://github.com/dyladan))
+
 ## v0.18.0
 
 ### :boom: Breaking Change

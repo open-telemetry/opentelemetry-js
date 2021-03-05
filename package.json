@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/api",
-  "version": "0.18.0",
+  "version": "0.18.1",
   "description": "Public API for OpenTelemetry",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
