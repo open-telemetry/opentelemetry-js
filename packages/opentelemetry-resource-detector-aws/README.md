@@ -17,7 +17,17 @@ npm install --save @opentelemetry/resource-detector-aws
 
 ## Usage
 
-> TODO
+```
+import { detectResources } from '@opentelemetry/resources';
+import { awsBeanstalkDetector } from '@opentelemetry/resource-detector-aws'
+const resource = await detectResources({
+   detectors: [awsEc2Detector],
+})
+
+const tracerProvider = new NodeTracerProvider({ resource });
+```
+
+**Note**: Besides `awsEc2Detector` there also the following detectors available: `awsBeanstalkDetector`, `awsEc2Detector`, `awsEksDetector` and `awsEcsDetector`
 
 ## Useful links
 
