@@ -27,7 +27,7 @@ const resource = await detectResources({
 const tracerProvider = new NodeTracerProvider({ resource });
 ```
 
-**Note**: Besides `awsEc2Detector` there are also the following detectors available: `awsBeanstalkDetector`, `awsEc2Detector`, `awsEksDetector` and `awsEcsDetector`
+**Note**: Besides `awsEc2Detector` there are also the following detectors available: `awsBeanstalkDetector`, `awsEksDetector` and `awsEcsDetector`
 
 ## Useful links
 
