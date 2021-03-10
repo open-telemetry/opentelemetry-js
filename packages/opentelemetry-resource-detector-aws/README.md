@@ -17,7 +17,7 @@ npm install --save @opentelemetry/resource-detector-aws
 
 ## Usage
 
-```
+```typescript
 import { detectResources } from '@opentelemetry/resources';
 import { awsBeanstalkDetector } from '@opentelemetry/resource-detector-aws'
 const resource = await detectResources({
