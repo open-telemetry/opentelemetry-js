@@ -66,7 +66,7 @@ describe('transformMetrics', () => {
       let count3 = 0;
 
       function getValue(count: number) {
-        if (count % 2 == 0) {
+        if (count % 2 === 0) {
           return 3;
         }
         return -1;
