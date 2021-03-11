@@ -37,4 +37,4 @@ jobs:
         run: npm run docs
 
       - name: Test Docs
-        run: npm run docs-test
+        run: npm run docs:test
