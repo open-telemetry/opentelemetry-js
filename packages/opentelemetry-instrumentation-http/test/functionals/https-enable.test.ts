@@ -527,15 +527,12 @@ describe('HttpsInstrumentation', () => {
         doNock(hostname, testPath, 200, 'Ok');
 
         const promiseRequest = new Promise((resolve, _reject) => {
-          const req = https.request(
-            options,
-            (resp: http.IncomingMessage) => {
-              resp.on('data', () => {});
-              resp.on('end', () => {
-                resolve({});
-              });
-            }
-          );
+          const req = https.request(options, (resp: http.IncomingMessage) => {
+            resp.on('data', () => {});
+            resp.on('end', () => {
+              resolve({});
+            });
+          });
           return req.end();
         });
 
