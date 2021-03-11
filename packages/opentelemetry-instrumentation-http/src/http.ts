@@ -226,7 +226,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         if (
           component === 'https' &&
           typeof options === 'object' &&
-          options?.constructor.name !== 'URL'
+          options?.constructor?.name !== 'URL'
         ) {
           options = Object.assign({}, options);
           instrumentation._setDefaultOptions(options);
