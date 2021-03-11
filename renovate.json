@@ -1,34 +1,18 @@
 {
-  "extends": [
-    "config:base"
-  ],
+  "extends": ["config:base"],
   "packageRules": [
     {
       "groupName": "all non-major dependencies",
-      "updateTypes": ["patch", "minor"],
-      "groupSlug": "all-minor-patch"
+      "groupSlug": "all-minor-patch",
+      "matchUpdateTypes": ["patch", "minor"]
     },
     {
-      "packageRules": [
-        {
-          "matchPackageNames": ["@opentelemetry/api"],
-          "rangeStrategy": "bump"
-        }
-      ]
+      "matchPackageNames": ["@opentelemetry/api"],
+      "rangeStrategy": "bump"
     }
   ],
-  "ignoreDeps": [
-    "gcp-metadata",
-    "got",
-    "mocha"
-  ],
-  "assignees": [
-    "@dyladan",
-    "@mayurkale22",
-    "@obecny"
-  ],
-  "schedule": [
-    "before 3am on Friday"
-  ],
+  "ignoreDeps": ["gcp-metadata", "got", "mocha"],
+  "assignees": ["@dyladan", "@obecny", "@vmarchaud"],
+  "schedule": ["before 3am on Friday"],
   "labels": ["dependencies"]
 }
