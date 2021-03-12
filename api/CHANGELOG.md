@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.0.0-rc.0
+
+### :memo: Documentation
+
+* [#20](https://github.com/open-telemetry/opentelemetry-js-api/pull/20) docs: document latest manual tracing ([@dyladan](https://github.com/dyladan))
+* [#18](https://github.com/open-telemetry/opentelemetry-js-api/pull/18) chore: deploy docs on a release ([@dyladan](https://github.com/dyladan))
+* [#19](https://github.com/open-telemetry/opentelemetry-js-api/pull/19) docs: fix readme links ([@dyladan](https://github.com/dyladan))
+
+### Committers: 1
+
+* Daniel Dyla ([@dyladan](https://github.com/dyladan))
+
 ## 0.18.1
 
 ### :bug: Bug Fix
