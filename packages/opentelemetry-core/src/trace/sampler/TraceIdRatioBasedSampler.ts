@@ -16,21 +16,22 @@
 
 import { Sampler, SamplingDecision, SamplingResult } from '@opentelemetry/api';
 
+const SAMPLE_HEX_LEN = 8;
+
 /** Sampler that samples a given fraction of traces based of trace id deterministically. */
 export class TraceIdRatioBasedSampler implements Sampler {
+  private _upperBound: number;
+
   constructor(private readonly _ratio: number = 0) {
     this._ratio = this._normalize(_ratio);
+    this._upperBound = Math.floor(this._ratio * 16 ** SAMPLE_HEX_LEN);
   }
 
   shouldSample(context: unknown, traceId: string): SamplingResult {
-    let accumulation = 0;
-    for (let idx = 0; idx < traceId.length; idx++) {
-      accumulation += traceId.charCodeAt(idx);
-    }
-    const cmp = (accumulation % 100) / 100;
+    const value = parseInt(traceId.slice(0, SAMPLE_HEX_LEN), 16);
     return {
       decision:
-        cmp < this._ratio
+        value < this._upperBound
           ? SamplingDecision.RECORD_AND_SAMPLED
           : SamplingDecision.NOT_RECORD,
     };

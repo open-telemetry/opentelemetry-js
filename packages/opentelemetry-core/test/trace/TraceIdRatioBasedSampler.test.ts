@@ -105,11 +105,28 @@ describe('TraceIdRatioBasedSampler', () => {
 
   it('should sample based on trace id', () => {
     const sampler = new TraceIdRatioBasedSampler(0.2);
-    assert.deepStrictEqual(sampler.shouldSample(spanContext('\x00'), '\x00'), {
-      decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+    assert.deepStrictEqual(
+      sampler.shouldSample(spanContext('00000000'), '00000000'),
+      {
+        decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+      }
+    );
+
+    assert.deepStrictEqual(
+      sampler.shouldSample(spanContext('33333333'), '33333333'),
+      {
+        decision: api.SamplingDecision.NOT_RECORD,
+      }
+    );
+  });
+
+  it('should not sample with not hex id', () => {
+    const sampler = new TraceIdRatioBasedSampler(1);
+    assert.deepStrictEqual(sampler.shouldSample(spanContext(''), ''), {
+      decision: api.SamplingDecision.NOT_RECORD,
     });
 
-    assert.deepStrictEqual(sampler.shouldSample(spanContext('\x15'), '\x15'), {
+    assert.deepStrictEqual(sampler.shouldSample(spanContext('g'), 'g'), {
       decision: api.SamplingDecision.NOT_RECORD,
     });
   });
@@ -117,29 +134,34 @@ describe('TraceIdRatioBasedSampler', () => {
   it('should sample traces that a lower sampling ratio would sample', () => {
     const sampler10 = new TraceIdRatioBasedSampler(0.1);
     const sampler20 = new TraceIdRatioBasedSampler(0.2);
-    assert.deepStrictEqual(
-      sampler10.shouldSample(spanContext('\x00'), '\x00'),
-      {
-        decision: api.SamplingDecision.RECORD_AND_SAMPLED,
-      }
-    );
-    assert.deepStrictEqual(
-      sampler20.shouldSample(spanContext('\x00'), '\x00'),
-      {
-        decision: api.SamplingDecision.RECORD_AND_SAMPLED,
-      }
-    );
 
+    const id1 = (0xffffffff * 0.1 - 1).toString(16);
+    assert.deepStrictEqual(sampler10.shouldSample(spanContext(id1), id1), {
+      decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+    });
+    assert.deepStrictEqual(sampler20.shouldSample(spanContext(id1), id1), {
+      decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+    });
+
+    const id2 = (0xffffffff * 0.2 - 1).toString(16);
+    assert.deepStrictEqual(sampler10.shouldSample(spanContext(id2), id2), {
+      decision: api.SamplingDecision.NOT_RECORD,
+    });
+    assert.deepStrictEqual(sampler20.shouldSample(spanContext(id2), id2), {
+      decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+    });
+
+    const id2delta = (0xffffffff * 0.2).toString(16);
     assert.deepStrictEqual(
-      sampler10.shouldSample(spanContext('\x0a'), '\x0a'),
+      sampler10.shouldSample(spanContext(id2delta), id2delta),
       {
         decision: api.SamplingDecision.NOT_RECORD,
       }
     );
     assert.deepStrictEqual(
-      sampler20.shouldSample(spanContext('\x0a'), '\x0a'),
+      sampler20.shouldSample(spanContext(id2delta), id2delta),
       {
-        decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+        decision: api.SamplingDecision.NOT_RECORD,
       }
     );
   });
