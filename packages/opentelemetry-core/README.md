@@ -16,9 +16,10 @@ This package provides default implementations of the OpenTelemetry API for trace
       - [Composite Propagator](#composite-propagator)
       - [Baggage Propagator](#baggage-propagator)
     - [Built-in Sampler](#built-in-sampler)
-      - [Always Sampler](#always-sampler)
-      - [Never Sampler](#never-sampler)
-      - [Probability Sampler](#probability-sampler)
+      - [AlwaysOn Sampler](#alwayson-sampler)
+      - [AlwaysOff Sampler](#alwaysoff-sampler)
+      - [TraceIdRatioBased Sampler](#traceidratiobased-sampler)
+      - [ParentBased Sampler](#parentbased-sampler)
   - [Useful links](#useful-links)
   - [License](#license)
 
@@ -66,7 +67,7 @@ api.propagation.setGlobalPropagator(new HttpBaggage());
 
 Sampler is used to make decisions on `Span` sampling.
 
-#### AlwaysOn
+#### AlwaysOn Sampler
 
 Samples every trace regardless of upstream sampling decisions.
 
@@ -81,7 +82,7 @@ const tracerProvider = new NodeTracerProvider({
 });
 ```
 
-#### AlwaysOff
+#### AlwaysOff Sampler
 
 Doesn't sample any trace, regardless of upstream sampling decisions.
 
@@ -94,7 +95,7 @@ const tracerProvider = new NodeTracerProvider({
 });
 ```
 
-#### TraceIdRatioBased
+#### TraceIdRatioBased Sampler
 
 Samples some percentage of traces, calculated deterministically using the trace ID.
 Any trace that would be sampled at a given percentage will also be sampled at any higher percentage.
@@ -116,7 +117,7 @@ const tracerProvider = new NodeTracerProvider({
 });
 ```
 
-#### ParentBasedSampler
+#### ParentBased Sampler
 
 - This is a composite sampler. `ParentBased` helps distinguished between the
 following cases:
