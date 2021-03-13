@@ -515,6 +515,32 @@ describe('HttpsInstrumentation', () => {
         }
       });
 
+      it('should have 2 ended spans when provided "options" are an object without a constructor', async () => {
+        // Related issue: https://github.com/open-telemetry/opentelemetry-js/issues/2008
+        const testPath = '/outgoing/test';
+        const options = Object.create(null);
+        options.hostname = hostname;
+        options.port = serverPort;
+        options.path = pathname;
+        options.method = 'GET';
+
+        doNock(hostname, testPath, 200, 'Ok');
+
+        const promiseRequest = new Promise((resolve, _reject) => {
+          const req = https.request(options, (resp: http.IncomingMessage) => {
+            resp.on('data', () => {});
+            resp.on('end', () => {
+              resolve({});
+            });
+          });
+          return req.end();
+        });
+
+        await promiseRequest;
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 2);
+      });
+
       it('should have 1 ended span when response.end throw an exception', async () => {
         const testPath = '/outgoing/rootSpan/childs/1';
         doNock(hostname, testPath, 400, 'Not Ok');
