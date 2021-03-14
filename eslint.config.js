@@ -26,6 +26,7 @@ module.exports = {
           "leadingUnderscore": "require"
         }
     ],
+    "no-console": "error",
     "no-shadow": "off",
     "@typescript-eslint/no-shadow": ["warn"],
     "@typescript-eslint/no-unused-vars": ["error", {"argsIgnorePattern": "^_", "args": "after-used"}],

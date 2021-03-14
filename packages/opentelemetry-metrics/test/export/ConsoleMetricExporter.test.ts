@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { diag } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { ConsoleMetricExporter, MeterProvider, MetricKind } from '../../src';
@@ -21,21 +22,21 @@ import { ValueType } from '@opentelemetry/api-metrics';
 
 describe('ConsoleMetricExporter', () => {
   let consoleExporter: ConsoleMetricExporter;
-  let previousConsoleLog: any;
+  let previousDiagInfo: any;
 
   beforeEach(() => {
-    previousConsoleLog = console.log;
-    console.log = () => {};
+    previousDiagInfo = diag.info;
+    diag.info = () => {};
     consoleExporter = new ConsoleMetricExporter();
   });
 
   afterEach(() => {
-    console.log = previousConsoleLog;
+    diag.info = previousDiagInfo;
   });
 
   describe('.export()', () => {
     it('should export information about metrics', async () => {
-      const spyConsole = sinon.spy(console, 'log');
+      const spyDiag = sinon.spy(diag, 'info');
 
       const meter = new MeterProvider().getMeter(
         'test-console-metric-exporter'
@@ -51,24 +52,20 @@ describe('ConsoleMetricExporter', () => {
 
       await meter.collect();
       consoleExporter.export(meter.getProcessor().checkPointSet(), () => {});
-      assert.strictEqual(spyConsole.args.length, 3);
-      const [descriptor, labels, value] = spyConsole.args;
-      assert.deepStrictEqual(descriptor, [
-        {
-          description: 'a test description',
-          metricKind: MetricKind.COUNTER,
-          name: 'counter',
-          unit: '1',
-          valueType: ValueType.DOUBLE,
-        },
-      ]);
-      assert.deepStrictEqual(labels, [
-        {
-          key1: 'labelValue1',
-          key2: 'labelValue2',
-        },
-      ]);
-      assert.deepStrictEqual(value[0], 'value: 10');
+      assert.strictEqual(spyDiag.args.length, 3);
+      const [descriptor, labels, value] = spyDiag.args;
+      assert.deepStrictEqual(descriptor[1], {
+        description: 'a test description',
+        metricKind: MetricKind.COUNTER,
+        name: 'counter',
+        unit: '1',
+        valueType: ValueType.DOUBLE,
+      });
+      assert.deepStrictEqual(labels[1], {
+        key1: 'labelValue1',
+        key2: 'labelValue2',
+      });
+      assert.deepStrictEqual(value[1], 10);
     });
   });
 });
