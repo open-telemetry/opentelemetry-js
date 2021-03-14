@@ -22,21 +22,21 @@ import { ValueType } from '@opentelemetry/api-metrics';
 
 describe('ConsoleMetricExporter', () => {
   let consoleExporter: ConsoleMetricExporter;
-  let previousDiagInfo: any;
+  let previousInfo: any;
 
   beforeEach(() => {
-    previousDiagInfo = diag.info;
+    previousInfo = diag.info;
     diag.info = () => {};
     consoleExporter = new ConsoleMetricExporter();
   });
 
   afterEach(() => {
-    diag.info = previousDiagInfo;
+    diag.info = previousInfo;
   });
 
   describe('.export()', () => {
     it('should export information about metrics', async () => {
-      const spyDiag = sinon.spy(diag, 'info');
+      const spyInfo = sinon.spy(diag, 'info');
 
       const meter = new MeterProvider().getMeter(
         'test-console-metric-exporter'
@@ -52,8 +52,8 @@ describe('ConsoleMetricExporter', () => {
 
       await meter.collect();
       consoleExporter.export(meter.getProcessor().checkPointSet(), () => {});
-      assert.strictEqual(spyDiag.args.length, 3);
-      const [descriptor, labels, value] = spyDiag.args;
+      assert.strictEqual(spyInfo.args.length, 3);
+      const [descriptor, labels, value] = spyInfo.args;
       assert.deepStrictEqual(descriptor[1], {
         description: 'a test description',
         metricKind: MetricKind.COUNTER,

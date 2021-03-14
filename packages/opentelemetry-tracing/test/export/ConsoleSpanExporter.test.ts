@@ -26,16 +26,16 @@ import {
 
 describe('ConsoleSpanExporter', () => {
   let consoleExporter: ConsoleSpanExporter;
-  let previousDiagInfo: any;
+  let previousInfo: any;
 
   beforeEach(() => {
-    previousDiagInfo = diag.info;
+    previousInfo = diag.info;
     diag.info = () => {};
     consoleExporter = new ConsoleSpanExporter();
   });
 
   afterEach(() => {
-    diag.info = previousDiagInfo;
+    diag.info = previousInfo;
   });
 
   describe('.export()', () => {
@@ -44,7 +44,7 @@ describe('ConsoleSpanExporter', () => {
         const basicTracerProvider = new BasicTracerProvider();
         consoleExporter = new ConsoleSpanExporter();
 
-        const spyDiag = sinon.spy(diag, 'info');
+        const spyInfo = sinon.spy(diag, 'info');
         const spyExport = sinon.spy(consoleExporter, 'export');
 
         basicTracerProvider.addSpanProcessor(
@@ -58,8 +58,8 @@ describe('ConsoleSpanExporter', () => {
         const spans = spyExport.args[0];
         const firstSpan = spans[0][0];
         const firstEvent = firstSpan.events[0];
-        const diagArgs = spyDiag.args[0];
-        const loggedSpan = diagArgs[1] as LoggedSpan;
+        const infoArgs = spyInfo.args[0];
+        const loggedSpan = infoArgs[1] as LoggedSpan;
         const keys = Object.keys(loggedSpan).sort().join(',');
 
         const expectedKeys = [
