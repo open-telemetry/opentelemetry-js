@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-import { InstrumentationModuleFile } from './types';
+import * as assert from 'assert';
 import { normalize } from 'path';
+import { InstrumentationNodeModuleFile } from '../../src';
 
-export class InstrumentationNodeModuleFile<T>
-  implements InstrumentationModuleFile<T> {
-  public name: string;
-  constructor(
-    name: string,
-    public supportedVersions: string[],
-    public patch: (moduleExports: T, moduleVersion?: string) => T,
-    public unpatch: (moduleExports?: T, moduleVersion?: string) => void
-  ) {
-    this.name = normalize(name);
-  }
-}
+describe('InstrumentationNodeModuleFile', () => {
+  it('should convert path', () => {
+    const tests = ['c:\\\\foo\\\\bar\\aa', '///home//foo/bar///aa'];
+    tests.forEach(name => {
+      const instrumentationNodeModuleFile = new InstrumentationNodeModuleFile(
+        name,
+        [],
+        () => {},
+        () => {}
+      );
+      assert.strictEqual(instrumentationNodeModuleFile.name, normalize(name));
+    });
+  });
+});
