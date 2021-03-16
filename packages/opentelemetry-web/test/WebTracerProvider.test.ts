@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { context, getSpan, setSpan } from '@opentelemetry/api';
-import { ContextManager } from '@opentelemetry/context-base';
+import { context, getSpan, setSpan, ContextManager } from '@opentelemetry/api';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { B3Propagator } from '@opentelemetry/propagator-b3';
 import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';

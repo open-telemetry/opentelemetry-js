@@ -23,7 +23,7 @@ import {
   setSpan,
 } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
-import { ContextManager } from '@opentelemetry/context-base';
+import { ContextManager } from '@opentelemetry/api';
 import {
   BasicTracerProvider,
   InMemorySpanExporter,
@@ -513,6 +513,32 @@ describe('HttpsInstrumentation', () => {
             semver.gt(process.version, '9.0.0') ? 1 : 2
           );
         }
+      });
+
+      it('should have 2 ended spans when provided "options" are an object without a constructor', async () => {
+        // Related issue: https://github.com/open-telemetry/opentelemetry-js/issues/2008
+        const testPath = '/outgoing/test';
+        const options = Object.create(null);
+        options.hostname = hostname;
+        options.port = serverPort;
+        options.path = pathname;
+        options.method = 'GET';
+
+        doNock(hostname, testPath, 200, 'Ok');
+
+        const promiseRequest = new Promise((resolve, _reject) => {
+          const req = https.request(options, (resp: http.IncomingMessage) => {
+            resp.on('data', () => {});
+            resp.on('end', () => {
+              resolve({});
+            });
+          });
+          return req.end();
+        });
+
+        await promiseRequest;
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 2);
       });
 
       it('should have 1 ended span when response.end throw an exception', async () => {

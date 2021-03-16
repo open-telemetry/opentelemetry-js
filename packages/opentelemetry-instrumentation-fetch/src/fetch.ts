@@ -112,7 +112,7 @@ export class FetchInstrumentation extends InstrumentationBase<
   ): void {
     const parsedUrl = web.parseUrl(response.url);
     span.setAttribute(HttpAttribute.HTTP_STATUS_CODE, response.status);
-    if (response.statusText != undefined) {
+    if (response.statusText != null) {
       span.setAttribute(HttpAttribute.HTTP_STATUS_TEXT, response.statusText);
     }
     span.setAttribute(HttpAttribute.HTTP_HOST, parsedUrl.host);

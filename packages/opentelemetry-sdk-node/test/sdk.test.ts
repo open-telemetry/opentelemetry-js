@@ -29,7 +29,7 @@ import {
   AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
-import { NoopContextManager } from '@opentelemetry/context-base';
+import { NoopContextManager } from '@opentelemetry/api';
 import { CompositePropagator } from '@opentelemetry/core';
 import { ConsoleMetricExporter, MeterProvider } from '@opentelemetry/metrics';
 import { NodeTracerProvider } from '@opentelemetry/node';
@@ -41,7 +41,7 @@ import {
   assertCloudResource,
   assertHostResource,
   assertServiceResource,
-} from '@opentelemetry/resources/test/util/resource-assertions';
+} from '@opentelemetry/resources/build/test/util/resource-assertions';
 import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,
@@ -354,11 +354,6 @@ describe('Node SDK', () => {
         });
       };
 
-      beforeEach(() => {
-        diag.setLogLevel(DiagLogLevel.VERBOSE);
-        diag.setLogger();
-      });
-
       it('prints detected resources and debug messages to the logger', async () => {
         const sdk = new NodeSDK({
           autoDetectResources: true,
@@ -367,10 +362,13 @@ describe('Node SDK', () => {
         // This test depends on the env detector to be functioning as intended
         const mockedLoggerMethod = Sinon.fake();
         const mockedVerboseLoggerMethod = Sinon.fake();
-        diag.setLogger({
-          debug: mockedLoggerMethod,
-          verbose: mockedVerboseLoggerMethod,
-        } as any);
+        diag.setLogger(
+          {
+            debug: mockedLoggerMethod,
+            verbose: mockedVerboseLoggerMethod,
+          } as any,
+          DiagLogLevel.VERBOSE
+        );
 
         await sdk.detectResources();
 
@@ -403,8 +401,6 @@ describe('Node SDK', () => {
       describe('with missing environment variable', () => {
         beforeEach(() => {
           delete process.env.OTEL_RESOURCE_ATTRIBUTES;
-          diag.setLogLevel(DiagLogLevel.DEBUG);
-          diag.setLogger();
         });
 
         it('prints correct error messages when EnvDetector has no env variable', async () => {
@@ -412,9 +408,12 @@ describe('Node SDK', () => {
             autoDetectResources: true,
           });
           const mockedLoggerMethod = Sinon.fake();
-          diag.setLogger({
-            debug: mockedLoggerMethod,
-          } as any);
+          diag.setLogger(
+            {
+              debug: mockedLoggerMethod,
+            } as any,
+            DiagLogLevel.DEBUG
+          );
 
           await sdk.detectResources();
 
@@ -430,8 +429,6 @@ describe('Node SDK', () => {
       describe('with a faulty environment variable', () => {
         beforeEach(() => {
           process.env.OTEL_RESOURCE_ATTRIBUTES = 'bad=~attribute';
-          diag.setLogLevel(DiagLogLevel.DEBUG);
-          diag.setLogger();
         });
 
         it('prints correct error messages when EnvDetector has an invalid variable', async () => {
@@ -439,9 +436,12 @@ describe('Node SDK', () => {
             autoDetectResources: true,
           });
           const mockedLoggerMethod = Sinon.fake();
-          diag.setLogger({
-            debug: mockedLoggerMethod,
-          } as any);
+          diag.setLogger(
+            {
+              debug: mockedLoggerMethod,
+            } as any,
+            DiagLogLevel.DEBUG
+          );
 
           await sdk.detectResources();
 

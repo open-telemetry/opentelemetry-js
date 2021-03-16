@@ -173,7 +173,7 @@ function setLogLevelFromEnv(
   const value = values[key];
   if (typeof value === 'string') {
     const theLevel = logLevelMap[value.toUpperCase()];
-    if (theLevel != undefined) {
+    if (theLevel != null) {
       environment[key] = theLevel;
     }
   }

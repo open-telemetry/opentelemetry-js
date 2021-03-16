@@ -1,6 +1,6 @@
 {
   "name": "prometheus-example",
-  "version": "0.17.0",
+  "version": "0.18.0",
   "description": "Example of using @opentelemetry/metrics and  @opentelemetry/exporter-prometheus",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,7 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "dependencies": {
-    "@opentelemetry/exporter-prometheus": "^0.17.0",
-    "@opentelemetry/metrics": "^0.17.0"
+    "@opentelemetry/exporter-prometheus": "^0.18.0",
+    "@opentelemetry/metrics": "^0.18.0"
   }
 }

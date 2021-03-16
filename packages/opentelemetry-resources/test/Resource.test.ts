@@ -50,7 +50,7 @@ describe('Resource', () => {
 
   it('should return merged resource when collision in attributes', () => {
     const expectedResource = new Resource({
-      'k8s.io/container/name': 'c1',
+      'k8s.io/container/name': 'c2',
       'k8s.io/namespace/name': 'default',
       'k8s.io/pod/name': 'pod-xyz-123',
       'k8s.io/location': 'location1',
