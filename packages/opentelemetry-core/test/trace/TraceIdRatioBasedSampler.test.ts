@@ -120,22 +120,11 @@ describe('TraceIdRatioBasedSampler', () => {
     );
   });
 
-  it('should not sample with not hex id', () => {
-    const sampler = new TraceIdRatioBasedSampler(1);
-    assert.deepStrictEqual(sampler.shouldSample(spanContext(''), ''), {
-      decision: api.SamplingDecision.NOT_RECORD,
-    });
-
-    assert.deepStrictEqual(sampler.shouldSample(spanContext('g'), 'g'), {
-      decision: api.SamplingDecision.NOT_RECORD,
-    });
-  });
-
   it('should sample traces that a lower sampling ratio would sample', () => {
     const sampler10 = new TraceIdRatioBasedSampler(0.1);
     const sampler20 = new TraceIdRatioBasedSampler(0.2);
 
-    const id1 = (0xffffffff * 0.1 - 1).toString(16);
+    const id1 = (Math.floor(0xffffffff * 0.1) - 1).toString(16);
     assert.deepStrictEqual(sampler10.shouldSample(spanContext(id1), id1), {
       decision: api.SamplingDecision.RECORD_AND_SAMPLED,
     });
@@ -143,7 +132,7 @@ describe('TraceIdRatioBasedSampler', () => {
       decision: api.SamplingDecision.RECORD_AND_SAMPLED,
     });
 
-    const id2 = (0xffffffff * 0.2 - 1).toString(16);
+    const id2 = (Math.floor(0xffffffff * 0.2) - 1).toString(16);
     assert.deepStrictEqual(sampler10.shouldSample(spanContext(id2), id2), {
       decision: api.SamplingDecision.NOT_RECORD,
     });
@@ -151,7 +140,7 @@ describe('TraceIdRatioBasedSampler', () => {
       decision: api.SamplingDecision.RECORD_AND_SAMPLED,
     });
 
-    const id2delta = (0xffffffff * 0.2).toString(16);
+    const id2delta = Math.floor(0xffffffff * 0.2).toString(16);
     assert.deepStrictEqual(
       sampler10.shouldSample(spanContext(id2delta), id2delta),
       {
