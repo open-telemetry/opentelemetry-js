@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { Sampler, SamplingDecision, SamplingResult } from '@opentelemetry/api';
+import {
+  Sampler,
+  SamplingDecision,
+  SamplingResult,
+  isValidTraceId,
+} from '@opentelemetry/api';
 
 /** Sampler that samples a given fraction of traces based of trace id deterministically. */
 export class TraceIdRatioBasedSampler implements Sampler {
@@ -28,7 +33,7 @@ export class TraceIdRatioBasedSampler implements Sampler {
   shouldSample(context: unknown, traceId: string): SamplingResult {
     return {
       decision:
-        this._accumulate(traceId) < this._upperBound
+        isValidTraceId(traceId) && this._accumulate(traceId) < this._upperBound
           ? SamplingDecision.RECORD_AND_SAMPLED
           : SamplingDecision.NOT_RECORD,
     };
