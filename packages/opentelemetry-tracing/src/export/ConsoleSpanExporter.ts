@@ -14,13 +14,6 @@
  * limitations under the License.
  */
 
-import {
-  diag,
-  SpanAttributes,
-  SpanKind,
-  SpanStatus,
-  TimedEvent,
-} from '@opentelemetry/api';
 import { SpanExporter } from './SpanExporter';
 import { ReadableSpan } from './ReadableSpan';
 import {
@@ -33,6 +26,8 @@ import {
  * This is implementation of {@link SpanExporter} that prints spans to the
  * console. This class can be used for diagnostic purposes.
  */
+
+/* eslint-disable no-console */
 export class ConsoleSpanExporter implements SpanExporter {
   /**
    * Export spans.
@@ -58,7 +53,7 @@ export class ConsoleSpanExporter implements SpanExporter {
    * converts span info into more readable format
    * @param span
    */
-  private _exportInfo(span: ReadableSpan): LoggedSpan {
+  private _exportInfo(span: ReadableSpan) {
     return {
       traceId: span.spanContext.traceId,
       parentId: span.parentSpanId,
@@ -83,23 +78,10 @@ export class ConsoleSpanExporter implements SpanExporter {
     done?: (result: ExportResult) => void
   ): void {
     for (const span of spans) {
-      diag.info('span', this._exportInfo(span));
+      console.log(this._exportInfo(span));
     }
     if (done) {
       return done({ code: ExportResultCode.SUCCESS });
     }
   }
-}
-
-export interface LoggedSpan {
-  traceId: string;
-  parentId: string | undefined;
-  name: string;
-  id: string;
-  kind: SpanKind;
-  timestamp: number;
-  duration: number;
-  attributes: SpanAttributes;
-  status: SpanStatus;
-  events: TimedEvent[];
 }

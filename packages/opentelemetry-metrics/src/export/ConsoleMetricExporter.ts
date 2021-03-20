@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
 import { MetricExporter, MetricRecord, Histogram } from './types';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 
@@ -22,24 +21,26 @@ import { ExportResult, ExportResultCode } from '@opentelemetry/core';
  * This is implementation of {@link MetricExporter} that prints metrics data to
  * the console. This class can be used for diagnostic purposes.
  */
+
+/* eslint-disable no-console */
 export class ConsoleMetricExporter implements MetricExporter {
   export(
     metrics: MetricRecord[],
     resultCallback: (result: ExportResult) => void
   ): void {
     for (const metric of metrics) {
-      diag.info('Descriptor', metric.descriptor);
-      diag.info('Labels', metric.labels);
+      console.log(metric.descriptor);
+      console.log(metric.labels);
       const point = metric.aggregator.toPoint();
       if (typeof point.value === 'number') {
-        diag.info('value: ', point.value);
+        console.log('value: ' + point.value);
       } else if (typeof (point.value as Histogram).buckets === 'object') {
         const histogram = point.value as Histogram;
-        diag.info(
+        console.log(
           `count: ${histogram.count}, sum: ${histogram.sum}, buckets: ${histogram.buckets}`
         );
       } else {
-        diag.info('value: ', point.value);
+        console.log(point.value);
       }
     }
     return resultCallback({ code: ExportResultCode.SUCCESS });

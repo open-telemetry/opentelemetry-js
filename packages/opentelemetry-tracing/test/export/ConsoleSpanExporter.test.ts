@@ -14,28 +14,27 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
   BasicTracerProvider,
   ConsoleSpanExporter,
-  LoggedSpan,
   SimpleSpanProcessor,
 } from '../../src';
 
+/* eslint-disable no-console */
 describe('ConsoleSpanExporter', () => {
   let consoleExporter: ConsoleSpanExporter;
-  let previousInfo: any;
+  let previousConsoleLog: any;
 
   beforeEach(() => {
-    previousInfo = diag.info;
-    diag.info = () => {};
+    previousConsoleLog = console.log;
+    console.log = () => {};
     consoleExporter = new ConsoleSpanExporter();
   });
 
   afterEach(() => {
-    diag.info = previousInfo;
+    console.log = previousConsoleLog;
   });
 
   describe('.export()', () => {
@@ -44,7 +43,7 @@ describe('ConsoleSpanExporter', () => {
         const basicTracerProvider = new BasicTracerProvider();
         consoleExporter = new ConsoleSpanExporter();
 
-        const spyInfo = sinon.spy(diag, 'info');
+        const spyConsole = sinon.spy(console, 'log');
         const spyExport = sinon.spy(consoleExporter, 'export');
 
         basicTracerProvider.addSpanProcessor(
@@ -58,9 +57,9 @@ describe('ConsoleSpanExporter', () => {
         const spans = spyExport.args[0];
         const firstSpan = spans[0][0];
         const firstEvent = firstSpan.events[0];
-        const infoArgs = spyInfo.args[0];
-        const loggedSpan = infoArgs[1] as LoggedSpan;
-        const keys = Object.keys(loggedSpan).sort().join(',');
+        const consoleArgs = spyConsole.args[0];
+        const consoleSpan = consoleArgs[0];
+        const keys = Object.keys(consoleSpan).sort().join(',');
 
         const expectedKeys = [
           'attributes',
@@ -77,7 +76,7 @@ describe('ConsoleSpanExporter', () => {
 
         assert.ok(firstSpan.name === 'foo');
         assert.ok(firstEvent.name === 'foobar');
-        assert.ok(loggedSpan.id === firstSpan.spanContext.spanId);
+        assert.ok(consoleSpan.id === firstSpan.spanContext.spanId);
         assert.ok(keys === expectedKeys);
 
         assert.ok(spyExport.calledOnce);
