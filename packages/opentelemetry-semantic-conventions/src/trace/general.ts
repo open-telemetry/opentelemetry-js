@@ -36,4 +36,6 @@ export const GeneralAttribute = {
   IP_TCP: 'IP.TCP',
   IP_UDP: 'IP.UDP',
   INPROC: 'inproc',
+  PIPE: 'pipe',
+  UNIX: 'Unix',
 };
