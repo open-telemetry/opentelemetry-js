@@ -19,6 +19,7 @@ import * as sinon from 'sinon';
 import { ConsoleMetricExporter, MeterProvider, MetricKind } from '../../src';
 import { ValueType } from '@opentelemetry/api-metrics';
 
+/* eslint-disable no-console */
 describe('ConsoleMetricExporter', () => {
   let consoleExporter: ConsoleMetricExporter;
   let previousConsoleLog: any;
