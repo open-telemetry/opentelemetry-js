@@ -29,7 +29,14 @@ import {
 import { HttpAttribute } from '@opentelemetry/semantic-conventions';
 
 // Used to normalize relative URLs
-const urlNormalizingA = document.createElement('a');
+let a: HTMLAnchorElement | undefined;
+const getUrlNormalizingAnchor = () => {
+  if (!a) {
+    a = document.createElement('a');
+  }
+
+  return a;
+};
 
 /**
  * Helper function to be able to use enum as typed key in type and in interface when using forEach
@@ -125,8 +132,9 @@ export function getResource(
   initiatorType?: string
 ): PerformanceResourceTimingInfo {
   // de-relativize the URL before usage (does no harm to absolute URLs)
-  urlNormalizingA.href = spanUrl;
-  spanUrl = urlNormalizingA.href;
+  const urlNormalizingAnchor = getUrlNormalizingAnchor();
+  urlNormalizingAnchor.href = spanUrl;
+  spanUrl = urlNormalizingAnchor.href;
 
   const filteredResources = filterResourcesForSpan(
     spanUrl,
