@@ -19,7 +19,6 @@ import { bindEmitter } from '../../src/patch';
 import {
   context,
   ContextManager,
-  getSpan,
   getSpanContext,
   ROOT_CONTEXT,
   setSpan,
@@ -56,7 +55,7 @@ describe('EventEmitter binding', () => {
       return boundContext;
     });
 
-    const handledEvents = [];
+    const handledEvents: string[] = [];
 
     const check = (event: string) => () => {
       assert.deepStrictEqual(getSpanContext(context.active()), span.context());
