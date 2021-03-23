@@ -16,6 +16,7 @@
 import {
   SpanStatusCode,
   context,
+  Context,
   propagation,
   Span,
   SpanKind,
@@ -43,6 +44,7 @@ import {
   ParsedRequestOptions,
   ResponseEndArgs,
 } from './types';
+import { bindEmitter } from './patch';
 import * as utils from './utils';
 import { VERSION } from './version';
 import {
@@ -276,7 +278,9 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     component: 'http' | 'https',
     request: http.ClientRequest,
     options: ParsedRequestOptions,
-    span: Span
+    span: Span,
+    requestContext: Context,
+    parentContext: Context
   ): http.ClientRequest {
     const hostname =
       options.hostname ||
@@ -291,7 +295,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       this._callRequestHook(span, request);
     }
 
-    request.on(
+    request.prependListener(
       'response',
       (response: http.IncomingMessage & { aborted?: boolean }) => {
         const responseAttributes = utils.getOutgoingRequestAttributesOnResponse(
@@ -303,7 +307,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           this._callResponseHook(span, response);
         }
 
-        context.bind(response);
+        bindEmitter(response, event =>
+          event === 'data' ? requestContext : parentContext
+        );
+
         diag.debug('outgoingRequest on response()');
         response.on('end', () => {
           diag.debug('outgoingRequest on end()');
@@ -427,6 +434,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
             response.end = originalEnd;
             // Cannot pass args of type ResponseEndArgs,
             const returned = safeExecuteInTheMiddle(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               () => response.end.apply(this, arguments as any),
               error => {
                 if (error) {
@@ -527,34 +535,46 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       const spanOptions: SpanOptions = {
         kind: SpanKind.CLIENT,
       };
+
       const span = instrumentation._startHttpSpan(operationName, spanOptions);
+
+      const parentContext = context.active();
+      const requestContext = setSpan(parentContext, span);
+
       if (!optionsParsed.headers) {
         optionsParsed.headers = {};
       }
-      propagation.inject(
-        setSpan(context.active(), span),
-        optionsParsed.headers
-      );
+      propagation.inject(requestContext, optionsParsed.headers);
 
-      const request: http.ClientRequest = safeExecuteInTheMiddle(
-        () => original.apply(this, [optionsParsed, ...args]),
-        error => {
-          if (error) {
-            utils.setSpanWithError(span, error);
-            instrumentation._closeHttpSpan(span);
-            throw error;
-          }
+      return context.with(requestContext, () => {
+        const cb = args[args.length - 1];
+        if (typeof cb === 'function') {
+          args[args.length - 1] = context.bind(cb);
         }
-      );
 
-      diag.debug('%s instrumentation outgoingRequest', component);
-      context.bind(request);
-      return instrumentation._traceClientRequest(
-        component,
-        request,
-        optionsParsed,
-        span
-      );
+        const request: http.ClientRequest = safeExecuteInTheMiddle(
+          () => original.apply(this, [optionsParsed, ...args]),
+          error => {
+            if (error) {
+              utils.setSpanWithError(span, error);
+              instrumentation._closeHttpSpan(span);
+              throw error;
+            }
+          }
+        );
+
+        context.bind(request);
+
+        diag.debug('%s instrumentation outgoingRequest', component);
+        return instrumentation._traceClientRequest(
+          component,
+          request,
+          optionsParsed,
+          span,
+          requestContext,
+          parentContext
+        );
+      });
     };
   }
 

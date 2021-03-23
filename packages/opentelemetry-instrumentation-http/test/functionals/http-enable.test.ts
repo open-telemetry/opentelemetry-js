@@ -19,7 +19,7 @@ import {
   propagation,
   Span as ISpan,
   SpanKind,
-  getSpan,
+  getSpanContext,
   setSpan,
 } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/node';
@@ -181,6 +181,7 @@ describe('HttpInstrumentation', () => {
         );
       });
     });
+
     describe('with good instrumentation options', () => {
       beforeEach(() => {
         memoryExporter.reset();
@@ -701,11 +702,31 @@ describe('HttpInstrumentation', () => {
         );
       });
 
-      it('should not set span as active in context for outgoing request', done => {
-        assert.deepStrictEqual(getSpan(context.active()), undefined);
-        http.get(`${protocol}://${hostname}:${serverPort}/test`, res => {
-          assert.deepStrictEqual(getSpan(context.active()), undefined);
-          done();
+      it('should set span as active when receiving response or data callbacks', done => {
+        const tracer = provider.getTracer('test');
+        const span = tracer.startSpan('parentSpan');
+        const parentSpanId = span.context().spanId;
+        assert.notEqual(parentSpanId, undefined);
+
+        context.with(setSpan(context.active(), span), () => {
+          http.get(`${protocol}://${hostname}:${serverPort}/test`, res => {
+            const requestSpanId = getSpanContext(context.active())?.spanId;
+            assert.notEqual(requestSpanId, parentSpanId);
+
+            res.on('data', chunk => {
+              const dataSpanId = getSpanContext(context.active())?.spanId;
+              assert.notEqual(dataSpanId, parentSpanId);
+              assert.equal(dataSpanId, requestSpanId);
+            });
+
+            res.on('end', () => {
+              assert.equal(
+                getSpanContext(context.active())?.spanId,
+                parentSpanId
+              );
+              done();
+            });
+          });
         });
       });
     });
