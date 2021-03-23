@@ -702,9 +702,8 @@ describe('HttpInstrumentation', () => {
         );
       });
 
-      it('should set span as active when receiving response or data callbacks', done => {
-        const tracer = provider.getTracer('test');
-        const span = tracer.startSpan('parentSpan');
+      it('should set span as active when receiving response or data callbacks when using .get', done => {
+        const span = provider.getTracer('test').startSpan('parentSpan');
         const parentSpanId = span.context().spanId;
         assert.notEqual(parentSpanId, undefined);
 
@@ -727,6 +726,38 @@ describe('HttpInstrumentation', () => {
               done();
             });
           });
+        });
+      });
+
+      it('should set span as active when receiving response or data callbacks when using .request', done => {
+        const span = provider.getTracer('test').startSpan('parentSpan');
+        const parentSpanId = span.context().spanId;
+        assert.notEqual(parentSpanId, undefined);
+
+        context.with(setSpan(context.active(), span), () => {
+          http
+            .request(
+              { host: hostname, port: serverPort, path: '/test' },
+              res => {
+                const requestSpanId = getSpanContext(context.active())?.spanId;
+                assert.notEqual(requestSpanId, parentSpanId);
+
+                res.on('data', chunk => {
+                  const dataSpanId = getSpanContext(context.active())?.spanId;
+                  assert.notEqual(dataSpanId, parentSpanId);
+                  assert.equal(dataSpanId, requestSpanId);
+                });
+
+                res.on('end', () => {
+                  assert.equal(
+                    getSpanContext(context.active())?.spanId,
+                    parentSpanId
+                  );
+                  done();
+                });
+              }
+            )
+            .end();
         });
       });
     });
