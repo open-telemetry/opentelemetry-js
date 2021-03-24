@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { diag } from '@opentelemetry/api';
 import {
   BasicTracerProvider,
   SDKRegistrationConfig,
@@ -41,7 +42,7 @@ export class WebTracerProvider extends BasicTracerProvider {
    */
   constructor(config: WebTracerConfig = {}) {
     if (typeof config.plugins !== 'undefined') {
-      console.warn(
+      diag.warn(
         'plugins option was removed, please use' +
           ' "registerInstrumentations" to load plugins'
       );
