@@ -27,7 +27,7 @@ import * as zipkinTypes from '../../types';
  */
 export function prepareSend(urlStr: string, headers?: Record<string, string>) {
   let xhrHeaders: Record<string, string>;
-  const useBeacon = navigator.sendBeacon && !headers;
+  const useBeacon = typeof navigator.sendBeacon === 'function' && !headers;
   if (headers) {
     xhrHeaders = {
       Accept: 'application/json',
