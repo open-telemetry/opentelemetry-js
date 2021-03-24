@@ -32,7 +32,17 @@ import { VERSION } from './version';
 // hard to say how long it should really wait, seems like 300ms is
 // safe enough
 const OBSERVER_WAIT_TIME_MS = 300;
-const urlNormalizingA = document.createElement('a');
+
+// Used to normalize relative URLs
+let a: HTMLAnchorElement | undefined;
+const getUrlNormalizingAnchor = () => {
+  if (!a) {
+    a = document.createElement('a');
+  }
+
+  return a;
+};
+
 /**
  * FetchPlugin Config
  */
@@ -359,11 +369,12 @@ export class FetchInstrumentation extends InstrumentationBase<
 
     const observer: PerformanceObserver = new PerformanceObserver(list => {
       const perfObsEntries = list.getEntries() as PerformanceResourceTiming[];
-      urlNormalizingA.href = spanUrl;
+      const urlNormalizingAnchor = getUrlNormalizingAnchor();
+      urlNormalizingAnchor.href = spanUrl;
       perfObsEntries.forEach(entry => {
         if (
           entry.initiatorType === 'fetch' &&
-          entry.name === urlNormalizingA.href
+          entry.name === urlNormalizingAnchor.href
         ) {
           entries.push(entry);
         }
