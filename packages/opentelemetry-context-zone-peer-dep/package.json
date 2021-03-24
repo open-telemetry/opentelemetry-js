@@ -70,7 +70,7 @@
     "zone.js": "0.11.4"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.18.1"
+    "@opentelemetry/api": "^1.0.0-rc.0"
   },
   "peerDependencies": {
     "zone.js": "^0.10.2 || ^0.11.0"
