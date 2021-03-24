@@ -26,6 +26,8 @@ import {
  * This is implementation of {@link SpanExporter} that prints spans to the
  * console. This class can be used for diagnostic purposes.
  */
+
+/* eslint-disable no-console */
 export class ConsoleSpanExporter implements SpanExporter {
   /**
    * Export spans.
