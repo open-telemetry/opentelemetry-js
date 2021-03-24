@@ -17,7 +17,18 @@ npm install --save @opentelemetry/resources
 
 ## Usage
 
-> TODO
+```typescript
+import { Resource, SERVICE_RESOURCE } from '@opentelemetry/resources';
+const resource = new Resource({
+    [SERVICE_RESOURCE.NAME]: 'api-service',
+});
+
+const another_resource = new Resource({
+    'service.version': 2.0.0,
+    'service.group': 'instrumentation-group'
+});
+const merged_resource = resource.merge(another_resource);
+```
 
 ## Useful links
 
