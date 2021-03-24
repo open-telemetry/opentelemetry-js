@@ -19,7 +19,15 @@ npm install --save @opentelemetry/resource-detector-gcp
 
 ## Usage
 
-> TODO
+```typescript
+import { detectResources } from '@opentelemetry/resources';
+import { gcpDetector } from '@opentelemetry/resource-detector-gcp'
+const resource = await detectResources({
+   detectors: [gcpDetector],
+})
+
+const tracerProvider = new NodeTracerProvider({ resource });
+```
 
 ## Useful links
 
