@@ -220,8 +220,8 @@ These plugins are hosted at <https://github.com/open-telemetry/opentelemetry-js-
 - [@opentelemetry/plugin-ioredis][otel-contrib-plugin-ioredis]
 - [@opentelemetry/plugin-express][otel-contrib-plugin-express]
 - [@opentelemetry/plugin-dns][otel-contrib-plugin-dns]
-- [@opentelemetry/hapi-instrumentation][otel-contrib-hapi-instrumentation]
-- [@opentelemetry/koa-instrumentation][otel-contrib-koa-instrumentation]
+- [@opentelemetry/instrumentation-hapi][otel-contrib-instrumentation-hapi]
+- [@opentelemetry/instrumentation-koa][otel-contrib-instrumentation-koa]
 
 #### Web Plugins
 
@@ -234,8 +234,8 @@ These plugins are hosted at <https://github.com/open-telemetry/opentelemetry-js-
 
 These plugins are hosted at <https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web>
 
-- [@opentelemetry/plugin-document-load][otel-contrib-plugin-document-load]
-- [@opentelemetry/plugin-user-interaction][otel-contrib-plugin-user-interaction]
+- [@opentelemetry/instrumentation-document-load][otel-contrib-instrumentation-document-load]
+- [@opentelemetry/instrumentation-user-interaction][otel-contrib-instrumentation-user-interaction]
 
 To request automatic tracing support for a module not on this list, please [file an issue](https://github.com/open-telemetry/opentelemetry-js/issues). Alternatively, you can [write an instrumentation yourself](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/instrumentation-guide.md).
 
@@ -436,7 +436,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-contrib-plugin-pg]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-plugin-pg
 [otel-contrib-plugin-redis]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-plugin-redis
 [otel-contrib-plugin-express]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-plugin-express
-[otel-contrib-plugin-user-interaction]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web/opentelemetry-plugin-user-interaction
-[otel-contrib-plugin-document-load]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web/opentelemetry-plugin-document-load
-[otel-contrib-hapi-instrumentation]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-hapi-instrumentation
-[otel-contrib-koa-instrumentation]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-koa-instrumentation
+[otel-contrib-instrumentation-user-interaction]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web/opentelemetry-instrumentation-user-interaction
+[otel-contrib-instrumentation-document-load]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web/opentelemetry-instrumentation-document-load
+[otel-contrib-instrumentation-hapi]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-hapi
+[otel-contrib-instrumentation-koa]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-koa
