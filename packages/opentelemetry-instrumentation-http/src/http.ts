@@ -309,7 +309,6 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         }
 
         context.bind(response);
-
         diag.debug('outgoingRequest on response()');
         response.on('end', () => {
           diag.debug('outgoingRequest on end()');
@@ -534,7 +533,6 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       const spanOptions: SpanOptions = {
         kind: SpanKind.CLIENT,
       };
-
       const span = instrumentation._startHttpSpan(operationName, spanOptions);
 
       const parentContext = context.active();
@@ -566,9 +564,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           }
         );
 
-        context.bind(request, parentContext);
-
         diag.debug('%s instrumentation outgoingRequest', component);
+        context.bind(request, parentContext);
         return instrumentation._traceClientRequest(
           component,
           request,
