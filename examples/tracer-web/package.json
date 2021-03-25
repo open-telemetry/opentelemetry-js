@@ -43,8 +43,6 @@
     "@opentelemetry/instrumentation-fetch": "^0.18.0",
     "@opentelemetry/instrumentation-xml-http-request": "^0.18.0",
     "@opentelemetry/metrics": "^0.18.0",
-    "@opentelemetry/plugin-document-load": "^0.12.0",
-    "@opentelemetry/plugin-user-interaction": "^0.12.0",
     "@opentelemetry/propagator-b3": "^0.18.0",
     "@opentelemetry/tracing": "^0.18.0",
     "@opentelemetry/web": "^0.18.0"
