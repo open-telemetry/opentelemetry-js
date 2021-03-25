@@ -12,8 +12,8 @@
     "@opentelemetry/tracing": "^0.18.0"
   },
   "devDependencies": {
-    "@types/node": "10.17.50",
-    "typescript": "4.1.3"
+    "@types/node": "10.17.55",
+    "typescript": "4.2.3"
   },
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0"
