@@ -16,7 +16,6 @@
 import {
   SpanStatusCode,
   context,
-  Context,
   propagation,
   Span,
   SpanKind,
@@ -44,7 +43,6 @@ import {
   ParsedRequestOptions,
   ResponseEndArgs,
 } from './types';
-import { bindEmitter } from './patch';
 import * as utils from './utils';
 import { VERSION } from './version';
 import {
@@ -278,9 +276,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     component: 'http' | 'https',
     request: http.ClientRequest,
     options: ParsedRequestOptions,
-    span: Span,
-    requestContext: Context,
-    parentContext: Context
+    span: Span
   ): http.ClientRequest {
     const hostname =
       options.hostname ||
@@ -295,6 +291,11 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       this._callRequestHook(span, request);
     }
 
+    /*
+     * User 'response' event listeners can be added before our listener,
+     * force our listener to be the first, so response emitter is bound
+     * before any user listeners are added to it.
+     */
     request.prependListener(
       'response',
       (response: http.IncomingMessage & { aborted?: boolean }) => {
@@ -307,9 +308,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           this._callResponseHook(span, response);
         }
 
-        bindEmitter(response, event =>
-          event === 'data' ? requestContext : parentContext
-        );
+        context.bind(response);
 
         diag.debug('outgoingRequest on response()');
         response.on('end', () => {
@@ -547,9 +546,13 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       propagation.inject(requestContext, optionsParsed.headers);
 
       return context.with(requestContext, () => {
+        /*
+         * The response callback is registered before ClientRequest is bound,
+         * thus it is needed to bind it before the function call.
+         */
         const cb = args[args.length - 1];
         if (typeof cb === 'function') {
-          args[args.length - 1] = context.bind(cb);
+          args[args.length - 1] = context.bind(cb, parentContext);
         }
 
         const request: http.ClientRequest = safeExecuteInTheMiddle(
@@ -563,16 +566,14 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           }
         );
 
-        context.bind(request);
+        context.bind(request, parentContext);
 
         diag.debug('%s instrumentation outgoingRequest', component);
         return instrumentation._traceClientRequest(
           component,
           request,
           optionsParsed,
-          span,
-          requestContext,
-          parentContext
+          span
         );
       });
     };

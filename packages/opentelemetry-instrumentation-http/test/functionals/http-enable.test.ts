@@ -19,7 +19,7 @@ import {
   propagation,
   Span as ISpan,
   SpanKind,
-  getSpanContext,
+  getSpan,
   setSpan,
 } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/node';
@@ -702,62 +702,19 @@ describe('HttpInstrumentation', () => {
         );
       });
 
-      it('should set span as active when receiving response or data callbacks when using .get', done => {
-        const span = provider.getTracer('test').startSpan('parentSpan');
-        const parentSpanId = span.context().spanId;
-        assert.notEqual(parentSpanId, undefined);
+      it('should not set span as active in context for outgoing request', done => {
+        assert.deepStrictEqual(getSpan(context.active()), undefined);
+        http.get(`${protocol}://${hostname}:${serverPort}/test`, res => {
+          assert.deepStrictEqual(getSpan(context.active()), undefined);
 
-        context.with(setSpan(context.active(), span), () => {
-          http.get(`${protocol}://${hostname}:${serverPort}/test`, res => {
-            const requestSpanId = getSpanContext(context.active())?.spanId;
-            assert.notEqual(requestSpanId, parentSpanId);
-
-            res.on('data', chunk => {
-              const dataSpanId = getSpanContext(context.active())?.spanId;
-              assert.notEqual(dataSpanId, parentSpanId);
-              assert.equal(dataSpanId, requestSpanId);
-            });
-
-            res.on('end', () => {
-              assert.equal(
-                getSpanContext(context.active())?.spanId,
-                parentSpanId
-              );
-              done();
-            });
+          res.on('data', () => {
+            assert.deepStrictEqual(getSpan(context.active()), undefined);
           });
-        });
-      });
 
-      it('should set span as active when receiving response or data callbacks when using .request', done => {
-        const span = provider.getTracer('test').startSpan('parentSpan');
-        const parentSpanId = span.context().spanId;
-        assert.notEqual(parentSpanId, undefined);
-
-        context.with(setSpan(context.active(), span), () => {
-          http
-            .request(
-              { host: hostname, port: serverPort, path: '/test' },
-              res => {
-                const requestSpanId = getSpanContext(context.active())?.spanId;
-                assert.notEqual(requestSpanId, parentSpanId);
-
-                res.on('data', chunk => {
-                  const dataSpanId = getSpanContext(context.active())?.spanId;
-                  assert.notEqual(dataSpanId, parentSpanId);
-                  assert.equal(dataSpanId, requestSpanId);
-                });
-
-                res.on('end', () => {
-                  assert.equal(
-                    getSpanContext(context.active())?.spanId,
-                    parentSpanId
-                  );
-                  done();
-                });
-              }
-            )
-            .end();
+          res.on('end', () => {
+            assert.deepStrictEqual(getSpan(context.active()), undefined);
+            done();
+          });
         });
       });
     });
