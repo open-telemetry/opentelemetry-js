@@ -22,6 +22,7 @@ import {
   SimpleSpanProcessor,
 } from '../../src';
 
+/* eslint-disable no-console */
 describe('ConsoleSpanExporter', () => {
   let consoleExporter: ConsoleSpanExporter;
   let previousConsoleLog: any;

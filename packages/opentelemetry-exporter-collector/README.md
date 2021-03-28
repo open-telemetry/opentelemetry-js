@@ -31,10 +31,14 @@ const collectorOptions = {
 const provider = new WebTracerProvider();
 const exporter = new CollectorTraceExporter(collectorOptions);
 provider.addSpanProcessor(new BatchSpanProcessor(exporter, {
-  // send spans as soon as we have this many
-  bufferSize: 10,
-  // send spans if we have buffered spans older than this
-  bufferTimeout: 500,
+  // The maximum queue size. After the size is reached spans are dropped.
+  maxQueueSize: 100,
+  // The maximum batch size of every export. It must be smaller or equal to maxQueueSize.
+  maxExportBatchSize: 10,
+  // The interval between two consecutive exports
+  scheduledDelayMillis: 500,
+  // How long the export can run before it is cancelled
+  exportTimeoutMillis: 30000,
 }));
 
 provider.register();
@@ -85,10 +89,10 @@ const collectorOptions = {
 const provider = new BasicTracerProvider();
 const exporter = new CollectorTraceExporter(collectorOptions);
 provider.addSpanProcessor(new BatchSpanProcessor(exporter, {
-  // send spans as soon as we have this many
-  bufferSize: 1000,
-  // send spans if we have buffered spans older than this
-  bufferTimeout: 30000,
+  // The maximum queue size. After the size is reached spans are dropped.
+  maxQueueSize: 1000,
+  // The interval between two consecutive exports
+  scheduledDelayMillis: 30000,
 }));
 
 provider.register();
@@ -146,9 +150,9 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-exporter-collector
+[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-collector
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-collector
-[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-exporter-collector
+[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-collector&type=dev
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-collector&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-collector
 [npm-url-grpc]: https://www.npmjs.com/package/@opentelemetry/exporter-collector-grpc

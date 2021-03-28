@@ -14,5 +14,21 @@
  * limitations under the License.
  */
 
-export * from './instrumentation';
-export { GrpcInstrumentationConfig } from './types';
+import * as assert from 'assert';
+import { normalize } from 'path';
+import { InstrumentationNodeModuleFile } from '../../src';
+
+describe('InstrumentationNodeModuleFile', () => {
+  it('should convert path', () => {
+    const tests = ['c:\\\\foo\\\\bar\\aa', '///home//foo/bar///aa'];
+    tests.forEach(name => {
+      const instrumentationNodeModuleFile = new InstrumentationNodeModuleFile(
+        name,
+        [],
+        () => {},
+        () => {}
+      );
+      assert.strictEqual(instrumentationNodeModuleFile.name, normalize(name));
+    });
+  });
+});

@@ -16,9 +16,10 @@ This package provides default implementations of the OpenTelemetry API for trace
       - [Composite Propagator](#composite-propagator)
       - [Baggage Propagator](#baggage-propagator)
     - [Built-in Sampler](#built-in-sampler)
-      - [Always Sampler](#always-sampler)
-      - [Never Sampler](#never-sampler)
-      - [Probability Sampler](#probability-sampler)
+      - [AlwaysOn Sampler](#alwayson-sampler)
+      - [AlwaysOff Sampler](#alwaysoff-sampler)
+      - [TraceIdRatioBased Sampler](#traceidratiobased-sampler)
+      - [ParentBased Sampler](#parentbased-sampler)
   - [Useful links](#useful-links)
   - [License](#license)
 
@@ -66,7 +67,7 @@ api.propagation.setGlobalPropagator(new HttpBaggage());
 
 Sampler is used to make decisions on `Span` sampling.
 
-#### AlwaysOn
+#### AlwaysOn Sampler
 
 Samples every trace regardless of upstream sampling decisions.
 
@@ -81,7 +82,7 @@ const tracerProvider = new NodeTracerProvider({
 });
 ```
 
-#### AlwaysOff
+#### AlwaysOff Sampler
 
 Doesn't sample any trace, regardless of upstream sampling decisions.
 
@@ -94,7 +95,7 @@ const tracerProvider = new NodeTracerProvider({
 });
 ```
 
-#### TraceIdRatioBased
+#### TraceIdRatioBased Sampler
 
 Samples some percentage of traces, calculated deterministically using the trace ID.
 Any trace that would be sampled at a given percentage will also be sampled at any higher percentage.
@@ -116,7 +117,7 @@ const tracerProvider = new NodeTracerProvider({
 });
 ```
 
-#### ParentBasedSampler
+#### ParentBased Sampler
 
 - This is a composite sampler. `ParentBased` helps distinguished between the
 following cases:
@@ -176,9 +177,9 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-core
+[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-core
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-core
-[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-core
+[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-core&type=dev
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-core&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/core
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fcore.svg

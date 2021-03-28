@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { diag } from '@opentelemetry/api';
 import {
   AlwaysOnSampler,
   ExportResultCode,
@@ -237,7 +238,10 @@ describe('BatchSpanProcessor', () => {
             clock.tick(defaultBufferConfig.scheduledDelayMillis + 10);
             clock.restore();
 
-            console.log(exporter.getFinishedSpans().length);
+            diag.info(
+              'finished spans count',
+              exporter.getFinishedSpans().length
+            );
             assert.strictEqual(
               exporter.getFinishedSpans().length,
               totalSpans + 1

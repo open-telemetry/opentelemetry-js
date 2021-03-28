@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { diag } from '@opentelemetry/api';
 import { context, getSpan, setSpan, ContextManager } from '@opentelemetry/api';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { B3Propagator } from '@opentelemetry/propagator-b3';
@@ -49,7 +50,7 @@ describe('WebTracerProvider', () => {
 
     it('should show warning when plugins are defined', () => {
       const dummyPlugin1 = {};
-      const spyWarn = sinon.spy(window.console, 'warn');
+      const spyWarn = sinon.spy(diag, 'warn');
 
       const plugins = [dummyPlugin1];
 

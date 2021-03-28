@@ -21,6 +21,8 @@ import { ExportResult, ExportResultCode } from '@opentelemetry/core';
  * This is implementation of {@link MetricExporter} that prints metrics data to
  * the console. This class can be used for diagnostic purposes.
  */
+
+/* eslint-disable no-console */
 export class ConsoleMetricExporter implements MetricExporter {
   export(
     metrics: MetricRecord[],
