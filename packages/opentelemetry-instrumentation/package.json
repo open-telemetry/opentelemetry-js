@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation",
-  "version": "0.18.0",
+  "version": "0.18.1",
   "description": "Base class for node which OpenTelemetry instrumentation modules extend",
   "author": "OpenTelemetry Authors",
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
@@ -55,7 +55,7 @@
   },
   "dependencies": {
     "@opentelemetry/api": "^1.0.0-rc.0",
-    "@opentelemetry/api-metrics": "^0.18.0",
+    "@opentelemetry/api-metrics": "^0.18.1",
     "require-in-the-middle": "^5.0.3",
     "semver": "^7.3.2",
     "shimmer": "^1.2.1"

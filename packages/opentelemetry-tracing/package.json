@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/tracing",
-  "version": "0.18.0",
+  "version": "0.18.1",
   "description": "OpenTelemetry Tracing",
   "main": "build/src/index.js",
   "browser": {
@@ -74,9 +74,9 @@
   },
   "dependencies": {
     "@opentelemetry/api": "^1.0.0-rc.0",
-    "@opentelemetry/core": "^0.18.0",
-    "@opentelemetry/resources": "^0.18.0",
-    "@opentelemetry/semantic-conventions": "^0.18.0",
+    "@opentelemetry/core": "^0.18.1",
+    "@opentelemetry/resources": "^0.18.1",
+    "@opentelemetry/semantic-conventions": "^0.18.1",
     "lodash.merge": "^4.6.2"
   }
 }

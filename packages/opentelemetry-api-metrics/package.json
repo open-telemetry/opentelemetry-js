@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/api-metrics",
-  "version": "0.18.0",
+  "version": "0.18.1",
   "description": "Public metrics API for OpenTelemetry",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",

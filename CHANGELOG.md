@@ -4,6 +4,69 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.18.1
+
+### :rocket: (Enhancement)
+
+* `opentelemetry-instrumentation-fetch`, `opentelemetry-web`
+  * [#2010](https://github.com/open-telemetry/opentelemetry-js/pull/2010) Server side rendering support ([@ryhinchey](https://github.com/ryhinchey))
+* `opentelemetry-semantic-conventions`
+  * [#2026](https://github.com/open-telemetry/opentelemetry-js/pull/2026) feat: add NET_TRANSPORT IPC attributes ([@seemk](https://github.com/seemk))
+* `opentelemetry-instrumentation`
+  * [#1999](https://github.com/open-telemetry/opentelemetry-js/pull/1999) chore: fixing path of instrumentation file for different systems ([@obecny](https://github.com/obecny))
+* `opentelemetry-instrumentation-grpc`
+  * [#2005](https://github.com/open-telemetry/opentelemetry-js/pull/2005) chore: exporting grpc instrumentation config ([@obecny](https://github.com/obecny))
+
+### :bug: (Bug Fix)
+
+* `opentelemetry-sdk-node`
+  * [#2006](https://github.com/open-telemetry/opentelemetry-js/pull/2006) chore: replacing console with diag ([@obecny](https://github.com/obecny))
+
+### :books: (Refine Doc)
+
+* `opentelemetry-resource-detector-gcp`
+  * [#2002](https://github.com/open-telemetry/opentelemetry-js/pull/2002) doc: add usage to README.md of gcp detector ([@weyert](https://github.com/weyert))
+* `opentelemetry-api-metrics`, `opentelemetry-context-async-hooks`, `opentelemetry-context-zone-peer-dep`, `opentelemetry-context-zone`, `opentelemetry-core`, `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`, `opentelemetry-exporter-jaeger`, `opentelemetry-exporter-prometheus`, `opentelemetry-exporter-zipkin`, `opentelemetry-grpc-utils`, `opentelemetry-instrumentation-fetch`, `opentelemetry-instrumentation-grpc`, `opentelemetry-instrumentation-http`, `opentelemetry-instrumentation-xml-http-request`, `opentelemetry-instrumentation`, `opentelemetry-metrics`, `opentelemetry-node`, `opentelemetry-plugin-grpc-js`, `opentelemetry-plugin-grpc`, `opentelemetry-plugin-http`, `opentelemetry-plugin-https`, `opentelemetry-propagator-b3`, `opentelemetry-resource-detector-aws`, `opentelemetry-resource-detector-gcp`, `opentelemetry-resources`, `opentelemetry-sdk-node`, `opentelemetry-semantic-conventions`, `opentelemetry-shim-opentracing`, `opentelemetry-tracing`, `opentelemetry-web`
+  * [#2040](https://github.com/open-telemetry/opentelemetry-js/pull/2040) chore: fixing broken links, updating to correct base url ([@obecny](https://github.com/obecny))
+* `opentelemetry-resources`
+  * [#2031](https://github.com/open-telemetry/opentelemetry-js/pull/2031) chore: add resource example ([@vknelluri](https://github.com/vknelluri))
+* Other
+  * [#2021](https://github.com/open-telemetry/opentelemetry-js/pull/2021) chore: updating compatibility matrix ([@obecny](https://github.com/obecny))
+* `opentelemetry-core`
+  * [#2011](https://github.com/open-telemetry/opentelemetry-js/pull/2011) docs: fix links & headings about built-in samplers ([@pokutuna](https://github.com/pokutuna))
+
+### :house: (Internal)
+
+* Other
+  * [#2028](https://github.com/open-telemetry/opentelemetry-js/pull/2028) chore: removing examples of packages that are part of contrib repo ([@obecny](https://github.com/obecny))
+  * [#2033](https://github.com/open-telemetry/opentelemetry-js/pull/2033) chore: add husky to renovate ignore ([@dyladan](https://github.com/dyladan))
+  * [#1985](https://github.com/open-telemetry/opentelemetry-js/pull/1985) chore: fix renovate config ([@dyladan](https://github.com/dyladan))
+  * [#1992](https://github.com/open-telemetry/opentelemetry-js/pull/1992) chore: update eslint ([@Flarna](https://github.com/Flarna))
+  * [#1981](https://github.com/open-telemetry/opentelemetry-js/pull/1981) chore: do not pin the api package ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-api-metrics`, `opentelemetry-context-async-hooks`, `opentelemetry-context-zone-peer-dep`, `opentelemetry-core`, `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`, `opentelemetry-exporter-jaeger`, `opentelemetry-exporter-prometheus`, `opentelemetry-exporter-zipkin`, `opentelemetry-grpc-utils`, `opentelemetry-instrumentation-fetch`, `opentelemetry-instrumentation-grpc`, `opentelemetry-instrumentation-http`, `opentelemetry-instrumentation-xml-http-request`, `opentelemetry-instrumentation`, `opentelemetry-metrics`, `opentelemetry-node`, `opentelemetry-plugin-grpc-js`, `opentelemetry-plugin-grpc`, `opentelemetry-plugin-http`, `opentelemetry-plugin-https`, `opentelemetry-propagator-b3`, `opentelemetry-resource-detector-aws`, `opentelemetry-resource-detector-gcp`, `opentelemetry-resources`, `opentelemetry-sdk-node`, `opentelemetry-shim-opentracing`, `opentelemetry-tracing`, `opentelemetry-web`
+  * [#2038](https://github.com/open-telemetry/opentelemetry-js/pull/2038) chore: use api release candidate ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-exporter-zipkin`
+  * [#2039](https://github.com/open-telemetry/opentelemetry-js/pull/2039) Check type of navigator.sendBeacon ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-core`, `opentelemetry-exporter-collector`, `opentelemetry-instrumentation-fetch`, `opentelemetry-metrics`, `opentelemetry-propagator-b3`
+  * [#1978](https://github.com/open-telemetry/opentelemetry-js/pull/1978) chore: don't disable rule eqeqeq ([@Flarna](https://github.com/Flarna))
+* `opentelemetry-propagator-jaeger`
+  * [#1931](https://github.com/open-telemetry/opentelemetry-js/pull/1931) adopt opentelemetry-propagator-jaeger ([@jtmalinowski](https://github.com/jtmalinowski))
+
+### Committers: 12
+
+* Bartlomiej Obecny ([@obecny](https://github.com/obecny))
+* Daniel Dyla ([@dyladan](https://github.com/dyladan))
+* Gerhard Stöbich ([@Flarna](https://github.com/Flarna))
+* Jakub Malinowski ([@jtmalinowski](https://github.com/jtmalinowski))
+* Neil Fordyce ([@neilfordyce](https://github.com/neilfordyce))
+* Nir Hadassi ([@nirsky](https://github.com/nirsky))
+* Ryan Hinchey ([@ryhinchey](https://github.com/ryhinchey))
+* SJ ([@skjindal93](https://github.com/skjindal93))
+* Siim Kallas ([@seemk](https://github.com/seemk))
+* Weyert de Boer ([@weyert](https://github.com/weyert))
+* [@vknelluri](https://github.com/vknelluri)
+* pokutuna ([@pokutuna](https://github.com/pokutuna))
+
 ## 0.18.0
 
 ### :boom: Breaking Change
