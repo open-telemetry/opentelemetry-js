@@ -49,12 +49,15 @@ All notable changes to this project will be documented in this file.
   * [#2039](https://github.com/open-telemetry/opentelemetry-js/pull/2039) Check type of navigator.sendBeacon ([@dyladan](https://github.com/dyladan))
 * `opentelemetry-core`, `opentelemetry-exporter-collector`, `opentelemetry-instrumentation-fetch`, `opentelemetry-metrics`, `opentelemetry-propagator-b3`
   * [#1978](https://github.com/open-telemetry/opentelemetry-js/pull/1978) chore: don't disable rule eqeqeq ([@Flarna](https://github.com/Flarna))
+* `opentelemetry-propagator-jaeger`
+  * [#1931](https://github.com/open-telemetry/opentelemetry-js/pull/1931) adopt opentelemetry-propagator-jaeger ([@jtmalinowski](https://github.com/jtmalinowski))
 
-### Committers: 11
+### Committers: 12
 
 * Bartlomiej Obecny ([@obecny](https://github.com/obecny))
 * Daniel Dyla ([@dyladan](https://github.com/dyladan))
 * Gerhard Stöbich ([@Flarna](https://github.com/Flarna))
+* Jakub Malinowski ([@jtmalinowski](https://github.com/jtmalinowski))
 * Neil Fordyce ([@neilfordyce](https://github.com/neilfordyce))
 * Nir Hadassi ([@nirsky](https://github.com/nirsky))
 * Ryan Hinchey ([@ryhinchey](https://github.com/ryhinchey))
