@@ -69,7 +69,7 @@
     "typescript": "4.2.3"
   },
   "dependencies": {
-    "@opentelemetry/api": "^1.0.0-rc.0",
+    "@opentelemetry/api": "^0.18.1",
     "@opentelemetry/core": "^0.18.1",
     "@opentelemetry/semantic-conventions": "^0.18.1",
     "semver": "^7.1.3",
