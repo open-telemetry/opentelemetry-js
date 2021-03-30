@@ -26,14 +26,14 @@ import {
   TextMapSetter,
   TraceFlags,
 } from '@opentelemetry/api';
+import {
+  X_B3_TRACE_ID,
+  X_B3_SPAN_ID,
+  X_B3_SAMPLED,
+  X_B3_PARENT_SPAN_ID,
+  X_B3_FLAGS,
+} from './constants';
 import { B3_DEBUG_FLAG_KEY } from './common';
-
-/* b3 multi-header keys */
-export const X_B3_TRACE_ID = 'x-b3-traceid';
-export const X_B3_SPAN_ID = 'x-b3-spanid';
-export const X_B3_SAMPLED = 'x-b3-sampled';
-export const X_B3_PARENT_SPAN_ID = 'x-b3-parentspanid';
-export const X_B3_FLAGS = 'x-b3-flags';
 
 const VALID_SAMPLED_VALUES = new Set([true, 'true', 'True', '1', 1]);
 const VALID_UNSAMPLED_VALUES = new Set([false, 'false', 'False', '0', 0]);

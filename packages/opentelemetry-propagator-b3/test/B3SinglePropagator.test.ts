@@ -26,10 +26,8 @@ import {
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
 import * as assert from 'assert';
-import {
-  B3SinglePropagator,
-  B3_CONTEXT_HEADER,
-} from '../src/B3SinglePropagator';
+import { B3SinglePropagator } from '../src/B3SinglePropagator';
+import { B3_CONTEXT_HEADER } from '../src/constants';
 import { B3_DEBUG_FLAG_KEY } from '../src/common';
 
 describe('B3SinglePropagator', () => {
