@@ -93,6 +93,25 @@ api.propagation.setGlobalPropagator(
 );
 ```
 
+### B3 Single and Multi-Header Configuration
+
+The B3Propagator always extracts both the single and multi-header b3 encodings.
+If you need to inject both encoding this can accomplished using a composite
+propagator.
+
+```javascript
+const api = require('@opentelemetry/api');
+const { B3Propagator } = require('@opentelemetry/propagator-b3');
+api.propagation.setGlobalPropagator(
+  new CompositePropagator({
+    propagators: [
+      new B3Propagator(),
+      new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
+    ],
+  })
+);
+```
+
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
