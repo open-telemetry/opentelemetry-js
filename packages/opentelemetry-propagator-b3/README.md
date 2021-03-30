@@ -96,7 +96,7 @@ api.propagation.setGlobalPropagator(
 ### B3 Single and Multi-Header Configuration
 
 The B3Propagator always extracts both the single and multi-header b3 encodings.
-If you need to inject both encoding this can accomplished using a composite
+If you need to inject both encodings this can accomplished using a composite
 propagator.
 
 ```javascript
