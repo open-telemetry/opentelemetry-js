@@ -549,7 +549,12 @@ describe('xhr', () => {
           'AND origin does NOT match window.location And does NOT match' +
             ' with propagateTraceHeaderCorsUrls',
           () => {
+            let spyDebug: sinon.SinonSpy;
             beforeEach(done => {
+              const diagLogger = new api.DiagConsoleLogger();
+              spyDebug = sinon.spy();
+              diagLogger.debug = spyDebug;
+              api.diag.setLogger(diagLogger, api.DiagLogLevel.ALL);
               clearData();
               prepareData(
                 done,
@@ -571,6 +576,13 @@ describe('xhr', () => {
                 requests[0].requestHeaders[X_B3_SAMPLED],
                 undefined,
                 `trace header '${X_B3_SAMPLED}' should not be set`
+              );
+            });
+
+            it('should debug info that injecting headers was skipped', () => {
+              assert.strictEqual(
+                spyDebug.lastCall.args[0],
+                'headers inject skipped due to CORS policy'
               );
             });
           }
