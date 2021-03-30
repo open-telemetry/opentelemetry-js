@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/getting-started-traced-ts-example",
-  "version": "0.18.1",
+  "version": "0.18.2",
   "description": "This repository provides everything required to follow the OpenTelemetry Getting Started Guide",
   "main": "app.ts",
   "scripts": {
@@ -14,13 +14,13 @@
     "ts-node": "9.1.1"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.18.1",
-    "@opentelemetry/exporter-zipkin": "^0.18.1",
-    "@opentelemetry/node": "^0.18.1",
+    "@opentelemetry/core": "^0.18.2",
+    "@opentelemetry/exporter-zipkin": "^0.18.2",
+    "@opentelemetry/node": "^0.18.2",
     "@opentelemetry/plugin-express": "^0.14.0",
-    "@opentelemetry/plugin-http": "^0.18.1",
-    "@opentelemetry/plugin-https": "^0.18.1",
-    "@opentelemetry/tracing": "^0.18.1",
+    "@opentelemetry/plugin-http": "^0.18.2",
+    "@opentelemetry/plugin-https": "^0.18.2",
+    "@opentelemetry/tracing": "^0.18.2",
     "axios": "^0.21.0",
     "express": "^4.17.1"
   }

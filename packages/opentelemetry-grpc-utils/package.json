@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/grpc-utils",
-  "version": "0.18.1",
+  "version": "0.18.2",
   "private": true,
   "description": "OpenTelemetry grpc plugin utility functions.",
   "main": "build/src/index.js",
@@ -42,9 +42,9 @@
   "devDependencies": {
     "@grpc/grpc-js": "1.2.12",
     "@grpc/proto-loader": "0.5.6",
-    "@opentelemetry/context-async-hooks": "^0.18.1",
-    "@opentelemetry/node": "^0.18.1",
-    "@opentelemetry/tracing": "^0.18.1",
+    "@opentelemetry/context-async-hooks": "^0.18.2",
+    "@opentelemetry/node": "^0.18.2",
+    "@opentelemetry/tracing": "^0.18.2",
     "@types/mocha": "8.2.2",
     "@types/node": "14.14.35",
     "@types/semver": "7.3.4",
@@ -65,8 +65,8 @@
   },
   "dependencies": {
     "@opentelemetry/api": "^0.18.1",
-    "@opentelemetry/core": "^0.18.1",
-    "@opentelemetry/semantic-conventions": "^0.18.1",
+    "@opentelemetry/core": "^0.18.2",
+    "@opentelemetry/semantic-conventions": "^0.18.2",
     "shimmer": "1.2.1"
   }
 }

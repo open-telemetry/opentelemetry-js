@@ -1,7 +1,7 @@
 {
   "name": "opentracing-shim",
   "private": true,
-  "version": "0.18.1",
+  "version": "0.18.2",
   "description": "Example of using @opentelemetry/shim-opentracing in Node.js",
   "main": "index.js",
   "scripts": {
@@ -29,12 +29,12 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/exporter-jaeger": "^0.18.1",
-    "@opentelemetry/exporter-zipkin": "^0.18.1",
-    "@opentelemetry/instrumentation": "^0.18.1",
-    "@opentelemetry/node": "^0.18.1",
-    "@opentelemetry/shim-opentracing": "^0.18.1",
-    "@opentelemetry/tracing": "^0.18.1",
+    "@opentelemetry/exporter-jaeger": "^0.18.2",
+    "@opentelemetry/exporter-zipkin": "^0.18.2",
+    "@opentelemetry/instrumentation": "^0.18.2",
+    "@opentelemetry/node": "^0.18.2",
+    "@opentelemetry/shim-opentracing": "^0.18.2",
+    "@opentelemetry/tracing": "^0.18.2",
     "opentracing": "^0.14.4"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
