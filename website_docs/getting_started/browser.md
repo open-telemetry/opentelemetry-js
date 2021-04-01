@@ -38,7 +38,7 @@ Copy the following file into an empty directory and call it `index.html`.
 </html>
 ```
 
-# Installation
+## Installation
 
 To create traces in the browser, you will need `@opentelemetry/web`, and the plugin `@opentelemetry/plugin-document-load`:
 
@@ -52,7 +52,7 @@ In the following we will use parcel as web application bundler, but you can of c
 npm install -g parcel
 ```
 
-# Initialization and Configuration
+## Initialization and Configuration
 
 Create a empty file called `document-load.js` and add the following code to your html right before the body end tag:
 
@@ -61,7 +61,6 @@ Create a empty file called `document-load.js` and add the following code to your
 ```
 
 We will add some code that will trace the document load timings and output those as OpenTelemetry Spans.
-
 
 ## Creating a Tracer Provider
 
@@ -83,7 +82,7 @@ const provider = new WebTracerProvider({
 provider.register();
 ```
 
-Run `parcel index.html` and open the development webserver (e.g. at http://localhost:1234) to see if your code works.
+Run `parcel index.html` and open the development webserver (e.g. at `http://localhost:1234`) to see if your code works.
 
 There will be no output of traces yet, for this we need to add an exporter
 
