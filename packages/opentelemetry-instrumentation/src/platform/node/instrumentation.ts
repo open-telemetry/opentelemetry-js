@@ -91,9 +91,9 @@ export abstract class InstrumentationBase<T = any>
 
     const version = require(path.join(baseDir, 'package.json')).version;
     module.moduleVersion = version;
-    if (module.name === name) {
+    if (!module.files || module.files.length === 0) {
       // main module
-      if (typeof version === 'string' && this._isSupported(name, version)) {
+      if (this._isSupported(module.name, version)) {
         if (typeof module.patch === 'function') {
           module.moduleExports = exports;
           if (this._enabled) {
@@ -103,7 +103,7 @@ export abstract class InstrumentationBase<T = any>
       }
     } else {
       // internal file
-      const files = module.files ?? [];
+      const files = module.files;
       const file = files.find(file => file.name === name);
       if (
         file &&
