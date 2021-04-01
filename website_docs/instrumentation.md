@@ -22,7 +22,7 @@ function doWork() {
 }
 ```
 
-# Creating Spans
+## Creating Spans
 
 As you have learned in the previous [Getting Started](../getting_started/) guide you need a TracerProvider and an Exporter. Install the dependencies and add them to head of your application code to get started:
 
@@ -141,7 +141,7 @@ There are semantic conventions for spans representing operations in well-known p
 ```javascript
 function doWork(parent) {
   const span = tracer.startSpan('doWork', {
-    parent, attributes: { 'code.function'	 : 'doWork' }
+    parent, attributes: { 'code.function' : 'doWork' }
   });
   for (let i = 0; i <= Math.floor(Math.random() * 40000000); i += 1) {
     // empty
