@@ -44,7 +44,7 @@ export type ParsedRequestOptions =
   | http.RequestOptions;
 export type Http = typeof http;
 export type Https = typeof https;
-/* tslint:disable-next-line:no-any */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Func<T> = (...args: any[]) => T;
 export type ResponseEndArgs =
   | [((() => void) | undefined)?]

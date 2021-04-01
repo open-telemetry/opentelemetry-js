@@ -181,6 +181,7 @@ describe('HttpInstrumentation', () => {
         );
       });
     });
+
     describe('with good instrumentation options', () => {
       beforeEach(() => {
         memoryExporter.reset();
@@ -705,7 +706,15 @@ describe('HttpInstrumentation', () => {
         assert.deepStrictEqual(getSpan(context.active()), undefined);
         http.get(`${protocol}://${hostname}:${serverPort}/test`, res => {
           assert.deepStrictEqual(getSpan(context.active()), undefined);
-          done();
+
+          res.on('data', () => {
+            assert.deepStrictEqual(getSpan(context.active()), undefined);
+          });
+
+          res.on('end', () => {
+            assert.deepStrictEqual(getSpan(context.active()), undefined);
+            done();
+          });
         });
       });
     });

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/semantic-conventions",
-  "version": "0.18.0",
+  "version": "0.18.2",
   "description": "OpenTelemetry semantic conventions",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@types/mocha": "8.2.2",
-    "@types/node": "14.14.35",
+    "@types/node": "14.14.37",
     "@types/sinon": "9.0.11",
     "codecov": "3.8.1",
     "gts": "3.1.0",

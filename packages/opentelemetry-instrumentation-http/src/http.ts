@@ -291,7 +291,12 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       this._callRequestHook(span, request);
     }
 
-    request.on(
+    /*
+     * User 'response' event listeners can be added before our listener,
+     * force our listener to be the first, so response emitter is bound
+     * before any user listeners are added to it.
+     */
+    request.prependListener(
       'response',
       (response: http.IncomingMessage & { aborted?: boolean }) => {
         const responseAttributes = utils.getOutgoingRequestAttributesOnResponse(
@@ -427,6 +432,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
             response.end = originalEnd;
             // Cannot pass args of type ResponseEndArgs,
             const returned = safeExecuteInTheMiddle(
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               () => response.end.apply(this, arguments as any),
               error => {
                 if (error) {
@@ -528,33 +534,45 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         kind: SpanKind.CLIENT,
       };
       const span = instrumentation._startHttpSpan(operationName, spanOptions);
+
+      const parentContext = context.active();
+      const requestContext = setSpan(parentContext, span);
+
       if (!optionsParsed.headers) {
         optionsParsed.headers = {};
       }
-      propagation.inject(
-        setSpan(context.active(), span),
-        optionsParsed.headers
-      );
+      propagation.inject(requestContext, optionsParsed.headers);
 
-      const request: http.ClientRequest = safeExecuteInTheMiddle(
-        () => original.apply(this, [optionsParsed, ...args]),
-        error => {
-          if (error) {
-            utils.setSpanWithError(span, error);
-            instrumentation._closeHttpSpan(span);
-            throw error;
-          }
+      return context.with(requestContext, () => {
+        /*
+         * The response callback is registered before ClientRequest is bound,
+         * thus it is needed to bind it before the function call.
+         */
+        const cb = args[args.length - 1];
+        if (typeof cb === 'function') {
+          args[args.length - 1] = context.bind(cb, parentContext);
         }
-      );
 
-      diag.debug('%s instrumentation outgoingRequest', component);
-      context.bind(request);
-      return instrumentation._traceClientRequest(
-        component,
-        request,
-        optionsParsed,
-        span
-      );
+        const request: http.ClientRequest = safeExecuteInTheMiddle(
+          () => original.apply(this, [optionsParsed, ...args]),
+          error => {
+            if (error) {
+              utils.setSpanWithError(span, error);
+              instrumentation._closeHttpSpan(span);
+              throw error;
+            }
+          }
+        );
+
+        diag.debug('%s instrumentation outgoingRequest', component);
+        context.bind(request, parentContext);
+        return instrumentation._traceClientRequest(
+          component,
+          request,
+          optionsParsed,
+          span
+        );
+      });
     };
   }
 
