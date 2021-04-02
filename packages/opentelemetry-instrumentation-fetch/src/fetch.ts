@@ -19,6 +19,7 @@ import {
   isWrapped,
   InstrumentationBase,
   InstrumentationConfig,
+  safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import * as core from '@opentelemetry/core';
 import * as web from '@opentelemetry/web';
@@ -43,6 +44,14 @@ const getUrlNormalizingAnchor = () => {
   return a;
 };
 
+export interface FetchCustomAttributeFunction {
+  (
+    span: api.Span,
+    request: Request | RequestInit,
+    result: Response | FetchError
+  ): void;
+}
+
 /**
  * FetchPlugin Config
  */
@@ -61,6 +70,8 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
    * also not be traced.
    */
   ignoreUrls?: Array<string | RegExp>;
+  /** Function for adding custom attributes on the span */
+  applyCustomAttributesOnSpan?: FetchCustomAttributeFunction;
 }
 
 /**
@@ -192,7 +203,7 @@ export class FetchInstrumentation extends InstrumentationBase<
     }
     const method = (options.method || 'GET').toUpperCase();
     const spanName = `HTTP ${method}`;
-    return this.tracer.startSpan(spanName, {
+    const span = this.tracer.startSpan(spanName, {
       kind: api.SpanKind.CLIENT,
       attributes: {
         [AttributeNames.COMPONENT]: this.moduleName,
@@ -200,6 +211,8 @@ export class FetchInstrumentation extends InstrumentationBase<
         [SemanticAttributes.HTTP_URL]: url,
       },
     });
+
+    return span;
   }
 
   /**
@@ -311,6 +324,8 @@ export class FetchInstrumentation extends InstrumentationBase<
           response: Response
         ) {
           try {
+            plugin._applyAttributesAfterFetch(span, options, response);
+
             if (response.status >= 200 && response.status < 400) {
               plugin._endSpan(span, spanData, response);
             } else {
@@ -331,6 +346,7 @@ export class FetchInstrumentation extends InstrumentationBase<
           error: FetchError
         ) {
           try {
+            plugin._applyAttributesAfterFetch(span, options, error);
             plugin._endSpan(span, spanData, {
               status: error.status || 0,
               statusText: error.message,
@@ -358,6 +374,21 @@ export class FetchInstrumentation extends InstrumentationBase<
         });
       };
     };
+  }
+
+  private _applyAttributesAfterFetch(
+    span: api.Span,
+    request: Request | RequestInit,
+    result: Response | FetchError
+  ) {
+    if (this._getConfig().applyCustomAttributesOnSpan) {
+      safeExecuteInTheMiddle(
+        () =>
+          this._getConfig().applyCustomAttributesOnSpan!(span, request, result),
+        () => {},
+        true
+      );
+    }
   }
 
   /**

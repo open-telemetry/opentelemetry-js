@@ -57,6 +57,11 @@ const getData = (url: string, method?: string) =>
     },
   });
 
+const customAttributeFunction = (span: api.Span): void => {
+  span.setAttribute('span kind', api.SpanKind.CLIENT);
+  span.setAttribute('custom', 'custom-attribute-value');
+};
+
 const defaultResource = {
   connectEnd: 15,
   connectStart: 13,
@@ -285,7 +290,10 @@ describe('fetch', () => {
   describe('when request is successful', () => {
     beforeEach(done => {
       const propagateTraceHeaderCorsUrls = [url];
-      prepareData(done, url, { propagateTraceHeaderCorsUrls });
+      prepareData(done, url, {
+        propagateTraceHeaderCorsUrls,
+        applyCustomAttributesOnSpan: customAttributeFunction,
+      });
     });
 
     afterEach(() => {
@@ -367,6 +375,8 @@ describe('fetch', () => {
         (attributes[keys[8]] as number) > 0,
         `attributes ${SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
       );
+
+      assert.strictEqual(attributes['span kind'], api.SpanKind.CLIENT);
 
       assert.strictEqual(keys.length, 9, 'number of attributes is wrong');
     });
