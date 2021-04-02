@@ -59,7 +59,6 @@ const getData = (url: string, method?: string) =>
 
 const customAttributeFunction = (span: api.Span): void => {
   span.setAttribute('span kind', api.SpanKind.CLIENT);
-  span.setAttribute('custom', 'custom-attribute-value');
 };
 
 const defaultResource = {
@@ -337,21 +336,21 @@ describe('fetch', () => {
       const keys = Object.keys(attributes);
 
       assert.ok(
-        attributes[keys[0]] !== '',
+        attributes[AttributeNames.COMPONENT] !== '',
         `attributes ${AttributeNames.COMPONENT} is not defined`
       );
       assert.strictEqual(
-        attributes[keys[1]],
+        attributes[HttpAttribute.HTTP_METHOD],
         'GET',
         `attributes ${SemanticAttributes.HTTP_METHOD} is wrong`
       );
       assert.strictEqual(
-        attributes[keys[2]],
+        attributes[HttpAttribute.HTTP_URL],
         url,
         `attributes ${SemanticAttributes.HTTP_URL} is wrong`
       );
       assert.strictEqual(
-        attributes[keys[3]],
+        attributes[HttpAttribute.HTTP_STATUS_CODE],
         200,
         `attributes ${SemanticAttributes.HTTP_STATUS_CODE} is wrong`
       );
@@ -378,7 +377,7 @@ describe('fetch', () => {
 
       assert.strictEqual(attributes['span kind'], api.SpanKind.CLIENT);
 
-      assert.strictEqual(keys.length, 9, 'number of attributes is wrong');
+      assert.strictEqual(keys.length, 10, 'number of attributes is wrong');
     });
 
     it('span should have correct events', () => {
@@ -625,17 +624,32 @@ describe('fetch', () => {
   describe('when request is NOT successful (wrong url)', () => {
     beforeEach(done => {
       const propagateTraceHeaderCorsUrls = badUrl;
-      prepareData(done, badUrl, { propagateTraceHeaderCorsUrls });
+      prepareData(done, badUrl, {
+        propagateTraceHeaderCorsUrls,
+        applyCustomAttributesOnSpan: customAttributeFunction,
+      });
     });
     afterEach(() => {
       clearData();
     });
+
     it('should create a span with correct root span', () => {
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
       assert.strictEqual(
         span.parentSpanId,
         rootSpan.context().spanId,
         'parent span is not root span'
+      );
+    });
+
+    it('should apply custom attributes', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      const attributes = span.attributes;
+
+      assert.strictEqual(
+        attributes['span kind'],
+        api.SpanKind.CLIENT,
+        'Custom attribute was not applied'
       );
     });
   });

@@ -203,7 +203,7 @@ export class FetchInstrumentation extends InstrumentationBase<
     }
     const method = (options.method || 'GET').toUpperCase();
     const spanName = `HTTP ${method}`;
-    const span = this.tracer.startSpan(spanName, {
+    return this.tracer.startSpan(spanName, {
       kind: api.SpanKind.CLIENT,
       attributes: {
         [AttributeNames.COMPONENT]: this.moduleName,
@@ -211,8 +211,6 @@ export class FetchInstrumentation extends InstrumentationBase<
         [SemanticAttributes.HTTP_URL]: url,
       },
     });
-
-    return span;
   }
 
   /**
@@ -325,7 +323,6 @@ export class FetchInstrumentation extends InstrumentationBase<
         ) {
           try {
             plugin._applyAttributesAfterFetch(span, options, response);
-
             if (response.status >= 200 && response.status < 400) {
               plugin._endSpan(span, spanData, response);
             } else {
