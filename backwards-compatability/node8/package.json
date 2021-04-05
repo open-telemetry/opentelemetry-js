@@ -8,8 +8,8 @@
     "test:backcompat": "tsc --noEmit index.ts"
   },
   "dependencies": {
-    "@opentelemetry/sdk-node": "^0.18.2",
-    "@opentelemetry/tracing": "^0.18.2"
+    "@opentelemetry/sdk-node": "0.18.2",
+    "@opentelemetry/tracing": "0.18.2"
   },
   "devDependencies": {
     "@types/node": "8.10.66",

@@ -54,8 +54,8 @@
   },
   "dependencies": {
     "@opentelemetry/api": "^0.18.1",
-    "@opentelemetry/api-metrics": "^0.18.2",
-    "@opentelemetry/core": "^0.18.2",
-    "@opentelemetry/metrics": "^0.18.2"
+    "@opentelemetry/api-metrics": "0.18.2",
+    "@opentelemetry/core": "0.18.2",
+    "@opentelemetry/metrics": "0.18.2"
   }
 }

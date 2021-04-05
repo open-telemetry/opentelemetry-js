@@ -56,9 +56,9 @@
   },
   "dependencies": {
     "@opentelemetry/api": "^0.18.1",
-    "@opentelemetry/api-metrics": "^0.18.2",
-    "@opentelemetry/core": "^0.18.2",
-    "@opentelemetry/resources": "^0.18.2",
+    "@opentelemetry/api-metrics": "0.18.2",
+    "@opentelemetry/core": "0.18.2",
+    "@opentelemetry/resources": "0.18.2",
     "lodash.merge": "^4.6.2"
   }
 }

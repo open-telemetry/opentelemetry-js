@@ -39,7 +39,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/core": "^0.18.2",
+    "@opentelemetry/core": "0.18.2",
     "@types/mocha": "8.2.2",
     "@types/node": "14.14.37",
     "@types/semver": "7.3.4",
@@ -55,7 +55,7 @@
   },
   "dependencies": {
     "@opentelemetry/api": "^0.18.1",
-    "@opentelemetry/resources": "^0.18.2",
+    "@opentelemetry/resources": "0.18.2",
     "gcp-metadata": "^4.1.4",
     "semver": "7.3.5"
   }
