@@ -43,6 +43,7 @@
   "devDependencies": {
     "@grpc/grpc-js": "1.2.12",
     "@grpc/proto-loader": "0.5.6",
+    "@opentelemetry/api": "^1.0.0-rc.0",
     "@opentelemetry/context-async-hooks": "^0.18.2",
     "@opentelemetry/core": "^0.18.2",
     "@opentelemetry/node": "^0.18.2",
@@ -65,8 +66,10 @@
     "ts-node": "9.1.1",
     "typescript": "4.2.3"
   },
+  "peerDependencies": {
+    "@opentelemetry/api": "^1.0.0-rc.0"
+  },
   "dependencies": {
-    "@opentelemetry/api": "^1.0.0-rc.0",
     "@opentelemetry/api-metrics": "^0.18.2",
     "@opentelemetry/instrumentation": "^0.18.2",
     "@opentelemetry/semantic-conventions": "^0.18.2"
