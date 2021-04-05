@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/api';
+import { Context, Span } from '@opentelemetry/api';
 import { ReadableSpan } from './export/ReadableSpan';
-import { Span } from './Span';
 
 /**
  * SpanProcessor is the interface Tracer SDK uses to allow synchronous hooks
