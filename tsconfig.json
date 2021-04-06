@@ -45,9 +45,6 @@
       "path": "packages/opentelemetry-exporter-zipkin"
     },
     {
-      "path": "packages/opentelemetry-grpc-utils"
-    },
-    {
       "path": "packages/opentelemetry-instrumentation-fetch"
     },
     {
