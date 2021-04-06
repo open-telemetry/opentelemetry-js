@@ -3,18 +3,20 @@
   "version": "1.0.0-rc.0",
   "description": "Public API for OpenTelemetry",
   "main": "build/src/index.js",
+  "module": "build/esm/index.js",
   "types": "build/src/index.d.ts",
   "browser": {
     "./src/platform/index.ts": "./src/platform/browser/index.ts",
+    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
     "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
   },
   "repository": "https://github.com/open-telemetry/opentelemetry-js-api.git",
   "scripts": {
     "build": "npm run compile",
-    "clean": "tsc --build --clean",
+    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p .",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p .",
-    "compile": "tsc --build",
+    "compile": "tsc --build tsconfig.json tsconfig.esm.json",
     "docs": "typedoc",
     "docs:deploy": "gh-pages --dist docs/out",
     "docs:test": "linkinator docs/out --silent --skip david-dm.org",
@@ -40,6 +42,9 @@
     "node": ">=8.0.0"
   },
   "files": [
+    "build/esm/**/*.js",
+    "build/esm/**/*.js.map",
+    "build/esm/**/*.d.ts",
     "build/src/**/*.js",
     "build/src/**/*.js.map",
     "build/src/**/*.d.ts",
