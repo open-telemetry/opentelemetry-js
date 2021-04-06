@@ -4,6 +4,8 @@ const { NodeTracerProvider } = require("@opentelemetry/node");
 const { SimpleSpanProcessor } = require("@opentelemetry/tracing");
 const { ZipkinExporter } = require("@opentelemetry/exporter-zipkin");
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
+const { ExpressInstrumentation } = require('@opentelemetry/instrumentation-express');
+const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
 
 const provider = new NodeTracerProvider();
 
@@ -23,6 +25,10 @@ provider.register();
 // load old default plugins
 registerInstrumentations({
   tracerProvider: provider,
+  instrumentations: [
+    new ExpressInstrumentation(),
+    new HttpInstrumentation(),
+  ],
 });
 
 console.log("tracing initialized");
