@@ -21,7 +21,8 @@ import {
   TextMapSetter,
 } from '@opentelemetry/api';
 import { B3MultiPropagator } from './B3MultiPropagator';
-import { B3SinglePropagator, B3_CONTEXT_HEADER } from './B3SinglePropagator';
+import { B3SinglePropagator } from './B3SinglePropagator';
+import { B3_CONTEXT_HEADER } from './constants';
 import { B3InjectEncoding, B3PropagatorConfig } from './types';
 
 /**

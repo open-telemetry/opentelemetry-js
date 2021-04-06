@@ -247,6 +247,10 @@ To request automatic tracing support for a module not on this list, please [file
 
 ## Upgrade guidelines
 
+### 0.18.0 to 0.19.0
+
+- The `@opentelemetry/propagator-b3` package previously exported three propagators: `B3Propagator`,`B3SinglePropagator`, and `B3MultiPropagator`, but now only exports the `B3Propagator`. It extracts b3 context in single and multi-header encodings, and injects context using the single-header encoding by default, but can be configured to inject context using the multi-header endcoding during construction: `new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER })`. If you were previously using the `B3SinglePropagator` or `B3MultiPropagator` directly, you should update your code to use the `B3Propagator` with the appropriate configuration. See the [readme](./packages/opentelemetry-propagator-b3/readme.md) for full details and usage.
+
 ### 0.17.0 to 0.18.0
 
 - `diag.setLogLevel` is removed and LogLevel can be set by an optional second parameter to `setLogger`

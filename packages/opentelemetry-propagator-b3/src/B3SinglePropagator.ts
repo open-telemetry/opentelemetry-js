@@ -26,10 +26,8 @@ import {
   TextMapSetter,
   TraceFlags,
 } from '@opentelemetry/api';
+import { B3_CONTEXT_HEADER } from './constants';
 import { B3_DEBUG_FLAG_KEY } from './common';
-
-/** B3 single-header name */
-export const B3_CONTEXT_HEADER = 'b3';
 
 const B3_CONTEXT_REGEX = /((?:[0-9a-f]{16}){1,2})-([0-9a-f]{16})(?:-([01d](?![0-9a-f])))?(?:-([0-9a-f]{16}))?/;
 const PADDING = '0'.repeat(16);

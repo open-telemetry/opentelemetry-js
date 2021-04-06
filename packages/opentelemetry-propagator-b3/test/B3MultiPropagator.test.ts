@@ -24,14 +24,14 @@ import {
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
 import * as assert from 'assert';
+import { B3MultiPropagator } from '../src/B3MultiPropagator';
 import {
-  B3MultiPropagator,
   X_B3_FLAGS,
   X_B3_PARENT_SPAN_ID,
   X_B3_SAMPLED,
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
-} from '../src/B3MultiPropagator';
+} from '../src/constants';
 import { B3_DEBUG_FLAG_KEY } from '../src/common';
 
 describe('B3MultiPropagator', () => {

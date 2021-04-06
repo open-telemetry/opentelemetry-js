@@ -26,14 +26,14 @@ import {
 } from '@opentelemetry/api';
 import { B3Propagator } from '../src/B3Propagator';
 import { B3InjectEncoding } from '../src/types';
-import { B3_CONTEXT_HEADER } from '../src/B3SinglePropagator';
 import {
+  B3_CONTEXT_HEADER,
   X_B3_FLAGS,
   X_B3_PARENT_SPAN_ID,
   X_B3_SAMPLED,
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
-} from '../src/B3MultiPropagator';
+} from '../src/constants';
 
 describe('B3Propagator', () => {
   let propagator: B3Propagator;
