@@ -17,8 +17,6 @@
 import * as assert from 'assert';
 import { InstrumentationBase } from '../../src';
 import { parseInstrumentationOptions } from '../../src/autoLoaderUtils';
-import { InstrumentationOption } from '../../src/types_internal';
-import { OldClassPlugin } from '../../src/types_plugin_only';
 
 class FooInstrumentation extends InstrumentationBase {
   constructor() {
@@ -28,14 +26,6 @@ class FooInstrumentation extends InstrumentationBase {
   init() {
     return [];
   }
-
-  enable() {}
-
-  disable() {}
-}
-
-class FooWebPlugin implements OldClassPlugin {
-  moduleName = 'foo';
 
   enable() {}
 
@@ -62,47 +52,6 @@ describe('autoLoaderUtils', () => {
       assert.strictEqual(instrumentations.length, 1);
       const instrumentation = instrumentations[0];
       assert.ok(instrumentation instanceof InstrumentationBase);
-    });
-
-    it('should return node old plugin', () => {
-      const { pluginsNode } = parseInstrumentationOptions([
-        {
-          plugins: {
-            http: { enabled: false },
-          },
-        },
-      ]);
-      assert.strictEqual(Object.keys(pluginsNode).length, 1);
-    });
-
-    it('should return web old plugin', () => {
-      const { pluginsWeb } = parseInstrumentationOptions([new FooWebPlugin()]);
-      assert.strictEqual(pluginsWeb.length, 1);
-    });
-
-    it('should handle mix of plugins and instrumentations', () => {
-      const nodePlugins = {
-        plugins: {
-          http: { enabled: false },
-          https: { enabled: false },
-        },
-      };
-      const options: InstrumentationOption[] = [];
-
-      options.push(new FooWebPlugin());
-      options.push(nodePlugins);
-      options.push([new FooInstrumentation(), new FooInstrumentation()]);
-      options.push([new FooWebPlugin(), new FooWebPlugin()]);
-
-      const {
-        pluginsWeb,
-        pluginsNode,
-        instrumentations,
-      } = parseInstrumentationOptions(options);
-
-      assert.strictEqual(pluginsWeb.length, 3);
-      assert.strictEqual(Object.keys(pluginsNode).length, 2);
-      assert.strictEqual(instrumentations.length, 2);
     });
   });
 });
