@@ -185,7 +185,7 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 
 | Package                                | Description                                                                                                                                                                                                                                                  |
 |----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [@opentelemetry/tracing][otel-tracing] | This module provides a full control over instrumentation and span creation. It doesn't load [`async_hooks`](https://nodejs.org/api/async_hooks.html) or any instrumentation plugin by default. It is intended for use both on the server and in the browser. |
+| [@opentelemetry/tracing][otel-tracing] | This module provides a full control over instrumentation and span creation. It doesn't load [`async_hooks`](https://nodejs.org/api/async_hooks.html) or any instrumentation by default. It is intended for use both on the server and in the browser.        |
 | [@opentelemetry/metrics][otel-metrics] | This module provides instruments and meters for reporting of time series data.                                                                                                                                                                               |
 | [@opentelemetry/node][otel-node]       | This module provides automatic tracing for Node.js applications. It is intended for use on the server only.                                                                                                                                                  |
 | [@opentelemetry/web][otel-web]         | This module provides automated instrumentation and tracing for Web applications. It is intended for use in the browser only.                                                                                                                                 |
@@ -196,11 +196,11 @@ OpenTelemetry is vendor-agnostic and can upload data to any backend with various
 
 See the [OpenTelemetry registry](https://opentelemetry.io/registry/?s=node.js) for a list of exporters available.
 
-### Instrumentations & Plugins
+### Instrumentations
 
 OpenTelemetry can collect tracing data automatically using instrumentations. Vendors/Users can also create and use their own. Currently, OpenTelemetry supports automatic tracing for:
 
-#### Node Instrumentations & Plugins
+#### Node Instrumentations
 
 ##### Core
 
@@ -221,7 +221,7 @@ These plugins are hosted at <https://github.com/open-telemetry/opentelemetry-js-
 - [@opentelemetry/instrumentation-hapi][otel-contrib-instrumentation-hapi]
 - [@opentelemetry/instrumentation-koa][otel-contrib-instrumentation-koa]
 
-#### Web Plugins
+#### Web Instrumentations
 
 ##### Core
 
@@ -230,7 +230,7 @@ These plugins are hosted at <https://github.com/open-telemetry/opentelemetry-js-
 
 ##### Contrib
 
-These plugins are hosted at <https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web>
+These instrumentations are hosted at <https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web>
 
 - [@opentelemetry/instrumentation-document-load][otel-contrib-instrumentation-document-load]
 - [@opentelemetry/instrumentation-user-interaction][otel-contrib-instrumentation-user-interaction]
@@ -244,6 +244,14 @@ To request automatic tracing support for a module not on this list, please [file
 | [@opentelemetry/shim-opentracing][otel-shim-opentracing] | OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry |
 
 ## Upgrade guidelines
+\
+### 0.19.0 to 1.0.0-rc.0
+
+- All plugins have been removed use instrumentations.
+```javascript
+
+```
+
 
 ### 0.18.0 to 0.19.0
 

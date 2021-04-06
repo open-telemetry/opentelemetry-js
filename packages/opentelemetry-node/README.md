@@ -87,6 +87,8 @@ In the following example:
 
 ```javascript
 const { GraphQLInstrumentation } = require('@opentelemetry/instrumentation-graphql');
+const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
+const { ExpressInstrumentation } = require('@opentelemetry/instrumentation-express');
 
 const provider = new NodeTracerProvider();
 
@@ -96,35 +98,16 @@ registerInstrumentations({
   tracerProvider: provider,
   instrumentations: [
     new GraphQLInstrumentation(),
-    // for older plugins you can just copy paste the old configuration
-    {
-      plugins: {
-        express: {
-          enabled: false,
+    new HttpInstrumentation({
+        requestHook: (span, request) => {
+          span.setAttribute("custom request hook attribute", "request");
         },
-        http: {
-          requestHook: (span, request) => {
-            span.setAttribute("custom request hook attribute", "request");
-          },
-        },
-        customPlugin: {
-          path: "/path/to/custom/module",
-        },
-      },
-    }
+    }),
   ],
 });
 
 
 ```
-
-### Disable Plugins with Environment Variables
-
-Plugins can be disabled without modifying and redeploying code.
-`OTEL_NO_PATCH_MODULES` accepts a
-comma separated list of module names to disabled specific plugins.
-The names should match what you use to `require` the module into your application.
-For example, `OTEL_NO_PATCH_MODULES=pg,https` will disable the postgres plugin and the https plugin. To disable **all** plugins, set the environment variable to `*`.
 
 ## Examples
 

@@ -162,7 +162,7 @@ myPLugin.enable();
 Successor of loading plugins through TracerProvider "plugins" option.
 It also supersedes PluginLoader for node. The old configurations usually looks like
 
-### NODE - old way using TracerProvider
+### NODE - old way using TracerProvider - not available anymore
 
 ```javascript
 const { NodeTracerProvider } = require('@opentelemetry/node');
@@ -177,7 +177,7 @@ provider.register({
 });
 ```
 
-### WEB - old way using TracerProvider
+### WEB - old way using TracerProvider - not available anymore
 
 ```javascript
 const { WebTracerProvider } = require('@opentelemetry/web');
