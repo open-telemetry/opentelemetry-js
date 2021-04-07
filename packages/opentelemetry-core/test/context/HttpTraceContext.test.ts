@@ -93,8 +93,8 @@ describe('HttpTraceContext', () => {
         carrier,
         defaultTextMapSetter
       );
-      assert.deepStrictEqual(carrier[TRACE_PARENT_HEADER], undefined);
-      assert.deepStrictEqual(carrier[TRACE_STATE_HEADER], undefined);
+      assert.strictEqual(carrier[TRACE_PARENT_HEADER], undefined);
+      assert.strictEqual(carrier[TRACE_STATE_HEADER], undefined);
     });
   });
 

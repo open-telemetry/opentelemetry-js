@@ -92,7 +92,7 @@ describe('JaegerHttpTracePropagator', () => {
         carrier,
         defaultTextMapSetter
       );
-      assert.deepStrictEqual(carrier[UBER_TRACE_ID_HEADER], undefined);
+      assert.strictEqual(carrier[UBER_TRACE_ID_HEADER], undefined);
     });
   });
 

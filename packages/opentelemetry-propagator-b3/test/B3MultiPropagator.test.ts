@@ -151,10 +151,10 @@ describe('B3MultiPropagator', () => {
         carrier,
         defaultTextMapSetter
       );
-      assert.deepStrictEqual(carrier[X_B3_TRACE_ID], undefined);
-      assert.deepStrictEqual(carrier[X_B3_SPAN_ID], undefined);
-      assert.deepStrictEqual(carrier[X_B3_FLAGS], undefined);
-      assert.deepStrictEqual(carrier[X_B3_PARENT_SPAN_ID], undefined);
+      assert.strictEqual(carrier[X_B3_TRACE_ID], undefined);
+      assert.strictEqual(carrier[X_B3_SPAN_ID], undefined);
+      assert.strictEqual(carrier[X_B3_FLAGS], undefined);
+      assert.strictEqual(carrier[X_B3_PARENT_SPAN_ID], undefined);
     });
   });
 
