@@ -113,7 +113,7 @@ describe('JaegerHttpTracePropagator', () => {
 
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: '45fd2a9709dadcf1',
-        traceId: '9c41e35aeb6d1272',
+        traceId: '00000000000000009c41e35aeb6d1272',
         isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });
@@ -132,7 +132,7 @@ describe('JaegerHttpTracePropagator', () => {
 
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: '5ac292c4a11a163e',
-        traceId: 'ac1f3dc3c2c0b06e',
+        traceId: '0000000000000000ac1f3dc3c2c0b06e',
         isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });
