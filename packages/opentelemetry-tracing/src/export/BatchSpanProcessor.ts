@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-import { context, suppressInstrumentation } from '@opentelemetry/api';
+import { context, Span, suppressInstrumentation } from '@opentelemetry/api';
 import {
   ExportResultCode,
   globalErrorHandler,
   unrefTimer,
   getEnv,
 } from '@opentelemetry/core';
-import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
 import { BufferConfig } from '../types';
 import { ReadableSpan } from './ReadableSpan';

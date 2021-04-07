@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/api';
+import { Context, Span } from '@opentelemetry/api';
 import { ReadableSpan } from './export/ReadableSpan';
-import { Span } from './Span';
 import { SpanProcessor } from './SpanProcessor';
 
 /** No-op implementation of SpanProcessor */
