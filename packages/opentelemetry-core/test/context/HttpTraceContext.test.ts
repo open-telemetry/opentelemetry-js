@@ -78,6 +78,23 @@ describe('HttpTraceContext', () => {
       );
       assert.deepStrictEqual(carrier[TRACE_STATE_HEADER], 'foo=bar,baz=qux');
     });
+
+    it('should ignore invalid span context', () => {
+      const spanContext: SpanContext = {
+        traceId: '00000000000000000000000000000000',
+        spanId: '0000000000000000',
+        traceFlags: TraceFlags.NONE,
+        traceState: new TraceState('foo=bar,baz=qux'),
+      };
+
+      httpTraceContext.inject(
+        setSpanContext(ROOT_CONTEXT, spanContext),
+        carrier,
+        defaultTextMapSetter
+      );
+      assert.deepStrictEqual(carrier[TRACE_PARENT_HEADER], undefined);
+      assert.deepStrictEqual(carrier[TRACE_STATE_HEADER], undefined);
+    });
   });
 
   describe('.extract()', () => {
