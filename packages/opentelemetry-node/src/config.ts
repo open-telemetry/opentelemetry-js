@@ -19,7 +19,4 @@ import { TracerConfig } from '@opentelemetry/tracing';
 /**
  * NodeTracerConfig provides an interface for configuring a Node Tracer.
  */
-export interface NodeTracerConfig extends TracerConfig {
-  /** Plugins options deprecated */
-  plugins?: unknown[];
-}
+export type NodeTracerConfig = TracerConfig;
