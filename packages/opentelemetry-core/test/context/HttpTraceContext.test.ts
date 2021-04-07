@@ -21,6 +21,7 @@ import {
   TraceFlags,
   getSpanContext,
   setSpanContext,
+  suppressInstrumentation,
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
 import * as assert from 'assert';
@@ -77,6 +78,23 @@ describe('HttpTraceContext', () => {
         '00-d4cda95b652f4a1592b449d5929fda1b-6e0c63257de34c92-01'
       );
       assert.deepStrictEqual(carrier[TRACE_STATE_HEADER], 'foo=bar,baz=qux');
+    });
+
+    it('should not set traceparent and tracestate header if instrumentation is suppressed', () => {
+      const spanContext: SpanContext = {
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: '6e0c63257de34c92',
+        traceFlags: TraceFlags.SAMPLED,
+        traceState: new TraceState('foo=bar,baz=qux'),
+      };
+
+      httpTraceContext.inject(
+        suppressInstrumentation(setSpanContext(ROOT_CONTEXT, spanContext)),
+        carrier,
+        defaultTextMapSetter
+      );
+      assert.deepStrictEqual(carrier[TRACE_PARENT_HEADER], undefined);
+      assert.deepStrictEqual(carrier[TRACE_STATE_HEADER], undefined);
     });
   });
 
