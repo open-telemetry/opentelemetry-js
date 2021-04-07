@@ -34,6 +34,7 @@ import {
   AlwaysOffSampler,
   TraceState,
 } from '@opentelemetry/core';
+import { RAW_ENVIRONMENT } from '@opentelemetry/core/src/utils/environment';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -122,6 +123,10 @@ describe('BasicTracerProvider', () => {
   });
 
   describe('.register()', () => {
+    const envSource = (typeof window !== 'undefined'
+      ? window
+      : process.env) as RAW_ENVIRONMENT;
+
     describe('propagator', () => {
       class DummyPropagator implements TextMapPropagator {
         inject(
@@ -147,15 +152,15 @@ describe('BasicTracerProvider', () => {
         [TextMapPropagator],
         TextMapPropagator
       >;
-      let originalPropagators: string | undefined;
+      let originalPropagators: RAW_ENVIRONMENT['OTEL_PROPAGATORS'];
       beforeEach(() => {
         setGlobalPropagatorStub = sinon.spy(propagation, 'setGlobalPropagator');
-        originalPropagators = process.env.OTEL_PROPAGATORS;
+        originalPropagators = envSource.OTEL_PROPAGATORS;
       });
 
       afterEach(() => {
         setGlobalPropagatorStub.restore();
-        process.env.OTEL_PROPAGATORS = originalPropagators;
+        envSource.OTEL_PROPAGATORS = originalPropagators;
       });
 
       it('should be set to a given value if it it provided', () => {
@@ -171,7 +176,7 @@ describe('BasicTracerProvider', () => {
       });
 
       it('should be set to a given value if it it provided in an environment variable', () => {
-        process.env.OTEL_PROPAGATORS = 'dummy';
+        envSource.OTEL_PROPAGATORS = 'dummy';
         BasicTracerProvider.registerPropagator(
           'dummy',
           () => new DummyPropagator()
@@ -194,7 +199,7 @@ describe('BasicTracerProvider', () => {
       it('warns if there is no propagator registered with a given name', () => {
         const warnStub = sinon.spy(diag, 'warn');
 
-        process.env.OTEL_PROPAGATORS = 'missing-propagator';
+        envSource.OTEL_PROPAGATORS = 'missing-propagator';
         const provider = new BasicTracerProvider({});
         provider.register();
 
