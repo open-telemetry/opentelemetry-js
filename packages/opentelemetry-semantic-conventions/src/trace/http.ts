@@ -36,4 +36,5 @@ export const HttpAttribute = {
   HTTP_ERROR_NAME: 'http.error_name',
   HTTP_ERROR_MESSAGE: 'http.error_message',
   HTTP_USER_AGENT: 'http.user_agent',
+  HTTP_PAGE_TITLE: 'http.page_title',
 };
