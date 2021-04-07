@@ -9,7 +9,7 @@ This package provides the full OpenTelemetry SDK for Node.js including tracing a
 
 ## Quick Start
 
-To get started you need to install `@opentelemetry/sdk-node`, a metrics and/or tracing exporter, and any appropriate plugins for the node modules used by your application.
+To get started you need to install `@opentelemetry/sdk-node`, a metrics and/or tracing exporter, and any appropriate instrumentation for the node modules used by your application.
 
 ### Installation
 

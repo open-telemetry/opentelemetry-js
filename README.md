@@ -244,10 +244,10 @@ To request automatic tracing support for a module not on this list, please [file
 | [@opentelemetry/shim-opentracing][otel-shim-opentracing] | OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry |
 
 ## Upgrade guidelines
-\
+
 ### 0.19.0 to 1.0.0-rc.0
 
-- All plugins have been removed use instrumentations.
+- All plugins have been removed in favor of instrumentations.
 ```javascript
 
 ```
