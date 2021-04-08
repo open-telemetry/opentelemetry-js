@@ -146,7 +146,7 @@ export abstract class AbstractAsyncHooksContextManager
     const contextManager = this;
     return function (this: never, event: string) {
       const map = contextManager._getPatchMap(ee);
-      if (map != null) {
+      if (map !== undefined) {
         if (arguments.length === 0) {
           contextManager._createPatchMap(ee);
         } else if (map[event] !== undefined) {
@@ -188,7 +188,7 @@ export abstract class AbstractAsyncHooksContextManager
   }
 
   private _createPatchMap(ee: EventEmitter): PatchMap {
-    const map = {};
+    const map = Object.create(null);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (ee as any)[this._kOtListeners] = map;
     return map;
