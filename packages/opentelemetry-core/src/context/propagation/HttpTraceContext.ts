@@ -18,6 +18,7 @@ import {
   Context,
   getSpanContext,
   isInstrumentationSuppressed,
+  isSpanContextValid,
   setSpanContext,
   SpanContext,
   TextMapGetter,
@@ -74,7 +75,12 @@ export function parseTraceParent(traceParent: string): SpanContext | null {
 export class HttpTraceContext implements TextMapPropagator {
   inject(context: Context, carrier: unknown, setter: TextMapSetter) {
     const spanContext = getSpanContext(context);
-    if (!spanContext || isInstrumentationSuppressed(context)) return;
+    if (
+      !spanContext ||
+      isInstrumentationSuppressed(context) ||
+      !isSpanContextValid(spanContext)
+    )
+      return;
 
     const traceParent = `${VERSION}-${spanContext.traceId}-${
       spanContext.spanId

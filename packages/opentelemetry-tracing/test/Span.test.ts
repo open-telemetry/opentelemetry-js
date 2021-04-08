@@ -719,5 +719,23 @@ describe('Span', () => {
         assert.deepStrictEqual(event.time, [0, 123]);
       });
     });
+
+    describe('when exception code is numeric', () => {
+      it('should record an exception with string value', () => {
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
+        assert.strictEqual(span.events.length, 0);
+        span.recordException({ code: 12 });
+        const event = span.events[0];
+        assert.deepStrictEqual(event.attributes, {
+          [ExceptionAttribute.TYPE]: '12',
+        });
+      });
+    });
   });
 });
