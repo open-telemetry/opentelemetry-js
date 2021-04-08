@@ -14,4 +14,6 @@
  * limitations under the License.
  */
 
-export * from './trace';
+export * from "./trace";
+export * from "./resource";
+export * from "./events";

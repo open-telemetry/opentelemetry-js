@@ -14,10 +14,5 @@
  * limitations under the License.
  */
 
-export const ExceptionAttribute = {
-  MESSAGE: 'exception.message',
-  STACKTRACE: 'exception.stacktrace',
-  TYPE: 'exception.type',
-};
-
-export const ExceptionEventName = 'exception';
+// Event name definitions
+export const ExceptionEventName = "exception";
