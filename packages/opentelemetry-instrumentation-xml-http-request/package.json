@@ -43,6 +43,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.13.14",
+    "@opentelemetry/api": "^1.0.0-rc.0",
     "@opentelemetry/context-zone": "^0.18.2",
     "@opentelemetry/propagator-b3": "^0.18.2",
     "@opentelemetry/tracing": "^0.18.2",
@@ -59,7 +60,7 @@
     "karma-coverage-istanbul-reporter": "3.0.3",
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.32",
-    "karma-webpack": "4.0.2",
+    "karma-webpack": "5.0.0",
     "mocha": "7.2.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
@@ -72,8 +73,10 @@
     "webpack-cli": "4.6.0",
     "webpack-merge": "5.7.3"
   },
+  "peerDependencies": {
+    "@opentelemetry/api": "^1.0.0-rc.0"
+  },
   "dependencies": {
-    "@opentelemetry/api": "^0.18.1",
     "@opentelemetry/core": "^0.18.2",
     "@opentelemetry/instrumentation": "^0.18.2",
     "@opentelemetry/semantic-conventions": "^0.18.2",
