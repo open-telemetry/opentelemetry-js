@@ -76,10 +76,14 @@ export class DiagAPI implements DiagLogger {
           'Cannot use diag as the logger for itself. Please use a DiagLogger implementation like ConsoleDiagLogger or a custom implementation'
         );
         self.error(err.stack ?? err.message);
-        return;
+        return false;
       }
 
-      registerGlobal('diag', createLogLevelDiagLogger(logLevel, logger), true);
+      return registerGlobal(
+        'diag',
+        createLogLevelDiagLogger(logLevel, logger),
+        true
+      );
     };
 
     self.disable = () => {
@@ -99,9 +103,9 @@ export class DiagAPI implements DiagLogger {
    *
    * @param logger - [Optional] The DiagLogger instance to set as the default logger.
    * @param logLevel - [Optional] The DiagLogLevel used to filter logs sent to the logger. If not provided it will default to INFO.
-   * @returns The previously registered DiagLogger
+   * @returns true if the logger was successfully registered, else false
    */
-  public setLogger!: (logger: DiagLogger, logLevel?: DiagLogLevel) => void;
+  public setLogger!: (logger: DiagLogger, logLevel?: DiagLogLevel) => boolean;
 
   // DiagLogger implementation
   public verbose!: DiagLogFunction;

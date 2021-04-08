@@ -47,12 +47,13 @@ export class TraceAPI {
   }
 
   /**
-   * Set the current global tracer. Returns the initialized global tracer provider
+   * Set the current global tracer.
+   *
+   * @returns true if the tracer provider was successfully registered, else false
    */
-  public setGlobalTracerProvider(provider: TracerProvider): TracerProvider {
+  public setGlobalTracerProvider(provider: TracerProvider): boolean {
     this._proxyTracerProvider.setDelegate(provider);
-    registerGlobal(API_NAME, this._proxyTracerProvider);
-    return this._proxyTracerProvider;
+    return registerGlobal(API_NAME, this._proxyTracerProvider);
   }
 
   /**

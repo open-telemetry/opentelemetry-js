@@ -44,13 +44,12 @@ export class ContextAPI {
   }
 
   /**
-   * Set the current context manager. Returns the initialized context manager
+   * Set the current context manager.
+   *
+   * @returns true if the context manager was successfully registered, else false
    */
-  public setGlobalContextManager(
-    contextManager: ContextManager
-  ): ContextManager {
-    registerGlobal(API_NAME, contextManager);
-    return contextManager;
+  public setGlobalContextManager(contextManager: ContextManager): boolean {
+    return registerGlobal(API_NAME, contextManager);
   }
 
   /**

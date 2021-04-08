@@ -34,7 +34,7 @@ export function registerGlobal<Type extends keyof OTelGlobalAPI>(
   type: Type,
   instance: OTelGlobalAPI[Type],
   allowOverride = false
-): void {
+): boolean {
   _global[GLOBAL_OPENTELEMETRY_API_KEY] = _global[
     GLOBAL_OPENTELEMETRY_API_KEY
   ] ?? {
@@ -48,7 +48,7 @@ export function registerGlobal<Type extends keyof OTelGlobalAPI>(
       `@opentelemetry/api: Attempted duplicate registration of API: ${type}`
     );
     diag.error(err.stack || err.message);
-    return;
+    return false;
   }
 
   if (api.version !== VERSION) {
@@ -57,10 +57,11 @@ export function registerGlobal<Type extends keyof OTelGlobalAPI>(
       '@opentelemetry/api: All API registration versions must match'
     );
     diag.error(err.stack || err.message);
-    return;
+    return false;
   }
 
   api[type] = instance;
+  return true;
 }
 
 export function getGlobal<Type extends keyof OTelGlobalAPI>(

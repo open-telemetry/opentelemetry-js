@@ -50,11 +50,12 @@ export class PropagationAPI {
   }
 
   /**
-   * Set the current propagator. Returns the initialized propagator
+   * Set the current propagator.
+   *
+   * @returns true if the propagator was successfully registered, else false
    */
-  public setGlobalPropagator(propagator: TextMapPropagator): TextMapPropagator {
-    registerGlobal(API_NAME, propagator);
-    return propagator;
+  public setGlobalPropagator(propagator: TextMapPropagator): boolean {
+    return registerGlobal(API_NAME, propagator);
   }
 
   /**
