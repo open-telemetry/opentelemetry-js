@@ -146,10 +146,14 @@ export abstract class AbstractAsyncHooksContextManager
     const contextManager = this;
     return function (this: never, event: string) {
       const map = contextManager._getPatchMap(ee);
-      if (map?.[event] !== undefined) {
-        delete map[event];
+      if (map != null) {
+        if (arguments.length === 0) {
+          contextManager._createPatchMap(ee);
+        } else if (map[event] !== undefined) {
+          delete map[event];
+        }
       }
-      return original.call(this, event);
+      return original.apply(this, arguments);
     };
   }
 
