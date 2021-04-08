@@ -36,6 +36,11 @@ docker run --rm \
   -f /source code \
   --template /templates/SemanticAttributes.ts.j2 \
   --output /output/ResourceAttribute.ts \
-  -Dclass=ResourceAttributes
+  -Dclass=ResourceAttribute
+
+# Run the automatic linting fixing task to ensure it will pass eslint
+cd "$ROOT_DIR/packages/opentelemetry-semantic-conventions"
+
+npm run lint:fix
 
 cd "$ROOT_DIR"
