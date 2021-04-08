@@ -23,7 +23,8 @@ docker run --rm \
   -v ${SCRIPT_DIR}/templates:/templates \
   -v ${ROOT_DIR}/packages/opentelemetry-semantic-conventions/src/trace/:/output \
   otel/semconvgen \
-  -f /source code \
+  -f /source \
+  code \
   --template /templates/SemanticAttributes.ts.j2 \
   --output /output/SemanticAttribute.ts \
   -Dclass=SemanticAttribute
@@ -33,7 +34,8 @@ docker run --rm \
   -v ${SCRIPT_DIR}/templates:/templates \
   -v ${ROOT_DIR}/packages/opentelemetry-semantic-conventions/src/resource/:/output \
   otel/semconvgen \
-  -f /source code \
+  -f /source \
+  code \
   --template /templates/SemanticAttributes.ts.j2 \
   --output /output/ResourceAttribute.ts \
   -Dclass=ResourceAttribute
