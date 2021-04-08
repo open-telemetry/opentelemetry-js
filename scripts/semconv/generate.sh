@@ -4,7 +4,8 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT_DIR="${SCRIPT_DIR}/../../"
 
 # freeze the spec version to make SemanticAttributes generation reproducible
-SPEC_VERSION=main
+SPEC_VERSION=v1.1.0
+GENERATOR_VERSION=0.2.1
 
 cd ${SCRIPT_DIR}
 
@@ -22,7 +23,7 @@ docker run --rm \
   -v ${SCRIPT_DIR}/opentelemetry-specification/semantic_conventions/trace:/source \
   -v ${SCRIPT_DIR}/templates:/templates \
   -v ${ROOT_DIR}/packages/opentelemetry-semantic-conventions/src/trace/:/output \
-  otel/semconvgen \
+  otel/semconvgen:${GENERATOR_VERSION} \
   -f /source \
   code \
   --template /templates/SemanticAttributes.ts.j2 \
@@ -33,7 +34,7 @@ docker run --rm \
   -v ${SCRIPT_DIR}/opentelemetry-specification/semantic_conventions/resource:/source \
   -v ${SCRIPT_DIR}/templates:/templates \
   -v ${ROOT_DIR}/packages/opentelemetry-semantic-conventions/src/resource/:/output \
-  otel/semconvgen \
+  otel/semconvgen:${GENERATOR_VERSION} \
   -f /source \
   code \
   --template /templates/SemanticAttributes.ts.j2 \

@@ -39,11 +39,11 @@ export const ResourceAttribute = {
   CLOUD_AVAILABILITY_ZONE: 'cloud.availability_zone',
 
   /**
-   * The cloud platform in use.
+   * The cloud infrastructure resource in use.
    *
    * Note: The prefix of the service SHOULD match the one specified in `cloud.provider`.
    */
-  CLOUD_PLATFORM: 'cloud.platform',
+  CLOUD_INFRASTRUCTURE_SERVICE: 'cloud.infrastructure_service',
 
   /**
    * The Amazon Resource Name (ARN) of an [ECS container instance](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ECS_instances.html).
@@ -69,11 +69,6 @@ export const ResourceAttribute = {
    * The task definition family this task definition is a member of.
    */
   AWS_ECS_TASK_FAMILY: 'aws.ecs.task.family',
-
-  /**
-   * The revision for this task definition.
-   */
-  AWS_ECS_TASK_REVISION: 'aws.ecs.task.revision',
 
   /**
    * The ARN of an EKS cluster.
@@ -400,21 +395,6 @@ export const ResourceAttribute = {
    * The version string of the auto instrumentation agent, if used.
    */
   TELEMETRY_AUTO_VERSION: 'telemetry.auto.version',
-
-  /**
-   * The name of the web engine.
-   */
-  WEBENGINE_NAME: 'webengine.name',
-
-  /**
-   * The version of the web engine.
-   */
-  WEBENGINE_VERSION: 'webengine.version',
-
-  /**
-   * Additional description of the web engine (e.g. detailed version and edition information).
-   */
-  WEBENGINE_DESCRIPTION: 'webengine.description',
 };
 
 // Enum definitions
@@ -428,7 +408,7 @@ export enum CloudProviderValues {
   GCP = 'gcp',
 }
 
-export enum CloudPlatformValues {
+export enum CloudInfrastructureServiceValues {
   /** AWS Elastic Compute Cloud. */
   AWS_EC2 = 'aws_ec2',
   /** AWS Elastic Container Service. */
