@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-import { SpanKind } from '@opentelemetry/api';
-import { hrTimeToNanoseconds } from '@opentelemetry/core';
-import { SemanticAttribute } from '@opentelemetry/semantic-conventions';
-import * as assert from 'assert';
-import * as http from 'http';
-import { DummyPropagation } from './DummyPropagation';
-import { ReadableSpan } from '@opentelemetry/tracing';
-import { parseResponseStatus } from '@opentelemetry/plugin-http';
+import { SpanKind } from "@opentelemetry/api";
+import { hrTimeToNanoseconds } from "@opentelemetry/core";
+import { SemanticAttributes } from "@opentelemetry/semantic-conventions";
+import * as assert from "assert";
+import * as http from "http";
+import { DummyPropagation } from "./DummyPropagation";
+import { ReadableSpan } from "@opentelemetry/tracing";
+import { parseResponseStatus } from "@opentelemetry/plugin-http";
+import { AttributeNames } from "../../src/enums";
 
 export const assertSpan = (
   span: ReadableSpan,
@@ -43,19 +44,19 @@ export const assertSpan = (
   assert.strictEqual(span.kind, kind);
   assert.strictEqual(span.name, `HTTP ${validations.httpMethod}`);
   assert.strictEqual(
-    span.attributes[SemanticAttribute.HTTP_ERROR_MESSAGE],
+    span.attributes[AttributeNames.HTTP_ERROR_MESSAGE],
     span.status.message
   );
   assert.strictEqual(
-    span.attributes[SemanticAttribute.HTTP_METHOD],
+    span.attributes[SemanticAttributes.HTTP_METHOD],
     validations.httpMethod
   );
   assert.strictEqual(
-    span.attributes[SemanticAttribute.HTTP_TARGET],
+    span.attributes[SemanticAttributes.HTTP_TARGET],
     validations.path || validations.pathname
   );
   assert.strictEqual(
-    span.attributes[SemanticAttribute.HTTP_STATUS_CODE],
+    span.attributes[SemanticAttributes.HTTP_STATUS_CODE],
     validations.httpStatusCode
   );
   assert.ok(span.endTime);
@@ -66,54 +67,54 @@ export const assertSpan = (
     parseResponseStatus(validations.httpStatusCode)
   );
 
-  assert.ok(span.endTime, 'must be finished');
-  assert.ok(hrTimeToNanoseconds(span.duration), 'must have positive duration');
+  assert.ok(span.endTime, "must be finished");
+  assert.ok(hrTimeToNanoseconds(span.duration), "must have positive duration");
 
   if (validations.reqHeaders) {
-    const userAgent = validations.reqHeaders['user-agent'];
+    const userAgent = validations.reqHeaders["user-agent"];
     if (userAgent) {
       assert.strictEqual(
-        span.attributes[SemanticAttribute.HTTP_USER_AGENT],
+        span.attributes[SemanticAttributes.HTTP_USER_AGENT],
         userAgent
       );
     }
   }
   if (span.kind === SpanKind.CLIENT) {
     assert.strictEqual(
-      span.attributes[SemanticAttribute.NET_PEER_NAME],
+      span.attributes[SemanticAttributes.NET_PEER_NAME],
       validations.hostname,
-      'must be consistent (PEER_NAME and hostname)'
+      "must be consistent (PEER_NAME and hostname)"
     );
     assert.ok(
-      span.attributes[SemanticAttribute.NET_PEER_IP],
-      'must have PEER_IP'
+      span.attributes[SemanticAttributes.NET_PEER_IP],
+      "must have PEER_IP"
     );
     assert.ok(
-      span.attributes[SemanticAttribute.NET_PEER_PORT],
-      'must have PEER_PORT'
+      span.attributes[SemanticAttributes.NET_PEER_PORT],
+      "must have PEER_PORT"
     );
     assert.ok(
-      (span.attributes[SemanticAttribute.HTTP_URL] as string).indexOf(
-        span.attributes[SemanticAttribute.NET_PEER_NAME] as string
+      (span.attributes[SemanticAttributes.HTTP_URL] as string).indexOf(
+        span.attributes[SemanticAttributes.NET_PEER_NAME] as string
       ) > -1,
-      'must be consistent'
+      "must be consistent"
     );
   }
   if (span.kind === SpanKind.SERVER) {
     if (validations.serverName) {
       assert.strictEqual(
-        span.attributes[SemanticAttribute.HTTP_SERVER_NAME],
+        span.attributes[SemanticAttributes.HTTP_SERVER_NAME],
         validations.serverName,
-        ' must have serverName attribute'
+        " must have serverName attribute"
       );
     }
     assert.ok(
-      span.attributes[SemanticAttribute.NET_HOST_PORT],
-      'must have HOST_PORT'
+      span.attributes[SemanticAttributes.NET_HOST_PORT],
+      "must have HOST_PORT"
     );
     assert.ok(
-      span.attributes[SemanticAttribute.NET_HOST_IP],
-      'must have HOST_IP'
+      span.attributes[SemanticAttributes.NET_HOST_IP],
+      "must have HOST_IP"
     );
     assert.strictEqual(span.parentSpanId, DummyPropagation.SPAN_CONTEXT_KEY);
   } else if (validations.reqHeaders) {

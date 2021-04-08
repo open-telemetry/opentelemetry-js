@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as api from '@opentelemetry/api';
-import * as core from '@opentelemetry/core';
+import * as api from "@opentelemetry/api";
+import * as core from "@opentelemetry/core";
 import {
   isWrapped,
   registerInstrumentations,
-} from '@opentelemetry/instrumentation';
+} from "@opentelemetry/instrumentation";
 
 import {
   B3Propagator,
@@ -26,18 +26,18 @@ import {
   X_B3_TRACE_ID,
   X_B3_SPAN_ID,
   X_B3_SAMPLED,
-} from '@opentelemetry/propagator-b3';
-import { ZoneContextManager } from '@opentelemetry/context-zone';
-import * as tracing from '@opentelemetry/tracing';
+} from "@opentelemetry/propagator-b3";
+import { ZoneContextManager } from "@opentelemetry/context-zone";
+import * as tracing from "@opentelemetry/tracing";
 import {
   PerformanceTimingNames as PTN,
   WebTracerProvider,
-} from '@opentelemetry/web';
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { FetchInstrumentation, FetchInstrumentationConfig } from '../src';
-import { AttributeNames } from '../src/enums/AttributeNames';
-import { SemanticAttribute } from '@opentelemetry/semantic-conventions';
+} from "@opentelemetry/web";
+import * as assert from "assert";
+import * as sinon from "sinon";
+import { FetchInstrumentation, FetchInstrumentationConfig } from "../src";
+import { AttributeNames } from "../src/enums/AttributeNames";
+import { SemanticAttributes } from "@opentelemetry/semantic-conventions";
 
 class DummySpanExporter implements tracing.SpanExporter {
   export(spans: any) {}
@@ -49,11 +49,11 @@ class DummySpanExporter implements tracing.SpanExporter {
 
 const getData = (url: string, method?: string) =>
   fetch(url, {
-    method: method || 'GET',
+    method: method || "GET",
     headers: {
-      foo: 'bar',
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
+      foo: "bar",
+      Accept: "application/json",
+      "Content-Type": "application/json",
     },
   });
 
@@ -65,8 +65,8 @@ const defaultResource = {
   domainLookupStart: 11,
   encodedBodySize: 0,
   fetchStart: 10.1,
-  initiatorType: 'fetch',
-  nextHopProtocol: '',
+  initiatorType: "fetch",
+  nextHopProtocol: "",
   redirectEnd: 0,
   redirectStart: 0,
   requestStart: 16,
@@ -76,8 +76,8 @@ const defaultResource = {
   transferSize: 0,
   workerStart: 0,
   duration: 0,
-  entryType: '',
-  name: '',
+  entryType: "",
+  name: "",
   startTime: 0,
 };
 
@@ -92,7 +92,7 @@ function createResource(resource = {}): PerformanceResourceTiming {
 function createMainResource(resource = {}): PerformanceResourceTiming {
   const mainResource: any = createResource(resource);
   Object.keys(mainResource).forEach((key: string) => {
-    if (typeof mainResource[key] === 'number') {
+    if (typeof mainResource[key] === "number") {
       mainResource[key] = mainResource[key] + 30;
     }
   });
@@ -103,7 +103,7 @@ function createFakePerformanceObs(url: string) {
   class FakePerfObs implements PerformanceObserver {
     constructor(private readonly cb: PerformanceObserverCallback) {}
     observe() {
-      const absoluteUrl = url.startsWith('http') ? url : location.origin + url;
+      const absoluteUrl = url.startsWith("http") ? url : location.origin + url;
       const resources: PerformanceObserverEntryList = {
         getEntries(): PerformanceEntryList {
           return [
@@ -129,7 +129,7 @@ function createFakePerformanceObs(url: string) {
   return FakePerfObs;
 }
 
-describe('fetch', () => {
+describe("fetch", () => {
   let contextManager: ZoneContextManager;
   let lastResponse: any | undefined;
   let webTracerWithZone: api.Tracer;
@@ -141,8 +141,8 @@ describe('fetch', () => {
   let fakeNow = 0;
   let fetchInstrumentation: FetchInstrumentation;
 
-  const url = 'http://localhost:8090/get';
-  const badUrl = 'http://foo.bar.com/get';
+  const url = "http://localhost:8090/get";
+  const badUrl = "http://foo.bar.com/get";
 
   const clearData = () => {
     sinon.restore();
@@ -159,8 +159,8 @@ describe('fetch', () => {
   ) => {
     sinon.useFakeTimers();
 
-    sinon.stub(core.otperformance, 'timeOrigin').value(0);
-    sinon.stub(core.otperformance, 'now').callsFake(() => fakeNow);
+    sinon.stub(core.otperformance, "timeOrigin").value(0);
+    sinon.stub(core.otperformance, "now").callsFake(() => fakeNow);
 
     function fakeFetch(input: RequestInfo | Request, init: RequestInit = {}) {
       return new Promise((resolve, reject) => {
@@ -170,23 +170,23 @@ describe('fetch', () => {
         };
         response.headers = Object.assign({}, init.headers);
 
-        if (init.method === 'DELETE') {
+        if (init.method === "DELETE") {
           response.status = 405;
-          response.statusText = 'OK';
-          resolve(new window.Response('foo', response));
+          response.statusText = "OK";
+          resolve(new window.Response("foo", response));
         } else if (input === url) {
           response.status = 200;
-          response.statusText = 'OK';
+          response.statusText = "OK";
           resolve(new window.Response(JSON.stringify(response), response));
         } else {
           response.status = 404;
-          response.statusText = 'Bad request';
+          response.statusText = "Bad request";
           reject(new window.Response(JSON.stringify(response), response));
         }
       });
     }
 
-    sinon.stub(window, 'fetch').callsFake(fakeFetch as any);
+    sinon.stub(window, "fetch").callsFake(fakeFetch as any);
 
     const resources: PerformanceResourceTiming[] = [];
     resources.push(
@@ -199,18 +199,18 @@ describe('fetch', () => {
     );
 
     if (disablePerfObserver) {
-      sinon.stub(window, 'PerformanceObserver').value(undefined);
+      sinon.stub(window, "PerformanceObserver").value(undefined);
     } else {
       sinon
-        .stub(window, 'PerformanceObserver')
+        .stub(window, "PerformanceObserver")
         .value(createFakePerformanceObs(fileUrl));
     }
 
     if (disableGetEntries) {
-      sinon.stub(performance, 'getEntriesByType').value(undefined);
+      sinon.stub(performance, "getEntriesByType").value(undefined);
     } else {
-      const spyEntries = sinon.stub(performance, 'getEntriesByType');
-      spyEntries.withArgs('resource').returns(resources);
+      const spyEntries = sinon.stub(performance, "getEntriesByType");
+      spyEntries.withArgs("resource").returns(resources);
     }
 
     fetchInstrumentation = new FetchInstrumentation(config);
@@ -219,26 +219,26 @@ describe('fetch', () => {
       tracerProvider: webTracerProviderWithZone,
       instrumentations: [fetchInstrumentation],
     });
-    webTracerWithZone = webTracerProviderWithZone.getTracer('fetch-test');
+    webTracerWithZone = webTracerProviderWithZone.getTracer("fetch-test");
     dummySpanExporter = new DummySpanExporter();
-    exportSpy = sinon.stub(dummySpanExporter, 'export');
-    clearResourceTimingsSpy = sinon.stub(performance, 'clearResourceTimings');
+    exportSpy = sinon.stub(dummySpanExporter, "export");
+    clearResourceTimingsSpy = sinon.stub(performance, "clearResourceTimings");
     webTracerProviderWithZone.addSpanProcessor(
       new tracing.SimpleSpanProcessor(dummySpanExporter)
     );
 
-    rootSpan = webTracerWithZone.startSpan('root');
+    rootSpan = webTracerWithZone.startSpan("root");
     api.context.with(api.setSpan(api.context.active(), rootSpan), () => {
       fakeNow = 0;
       getData(fileUrl, method).then(
-        response => {
+        (response) => {
           // this is a bit tricky as the only way to get all request headers from
           // fetch is to use json()
           response.json().then(
-            json => {
+            (json) => {
               lastResponse = json;
               const headers: { [key: string]: string } = {};
-              Object.keys(lastResponse.headers).forEach(key => {
+              Object.keys(lastResponse.headers).forEach((key) => {
                 headers[key.toLowerCase()] = lastResponse.headers[key];
               });
               lastResponse.headers = headers;
@@ -282,8 +282,8 @@ describe('fetch', () => {
     );
   });
 
-  describe('when request is successful', () => {
-    beforeEach(done => {
+  describe("when request is successful", () => {
+    beforeEach((done) => {
       const propagateTraceHeaderCorsUrls = [url];
       prepareData(done, url, { propagateTraceHeaderCorsUrls });
     });
@@ -292,89 +292,89 @@ describe('fetch', () => {
       clearData();
     });
 
-    it('should wrap methods', () => {
+    it("should wrap methods", () => {
       assert.ok(isWrapped(window.fetch));
       fetchInstrumentation.enable();
       assert.ok(isWrapped(window.fetch));
     });
 
-    it('should unwrap methods', () => {
+    it("should unwrap methods", () => {
       assert.ok(isWrapped(window.fetch));
       fetchInstrumentation.disable();
       assert.ok(!isWrapped(window.fetch));
     });
 
-    it('should create a span with correct root span', () => {
+    it("should create a span with correct root span", () => {
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
       assert.strictEqual(
         span.parentSpanId,
         rootSpan.context().spanId,
-        'parent span is not root span'
+        "parent span is not root span"
       );
     });
 
-    it('span should have correct name', () => {
+    it("span should have correct name", () => {
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-      assert.strictEqual(span.name, 'HTTP GET', 'span has wrong name');
+      assert.strictEqual(span.name, "HTTP GET", "span has wrong name");
     });
 
-    it('span should have correct kind', () => {
+    it("span should have correct kind", () => {
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-      assert.strictEqual(span.kind, api.SpanKind.CLIENT, 'span has wrong kind');
+      assert.strictEqual(span.kind, api.SpanKind.CLIENT, "span has wrong kind");
     });
 
-    it('span should have correct attributes', () => {
+    it("span should have correct attributes", () => {
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
       const attributes = span.attributes;
       const keys = Object.keys(attributes);
 
       assert.ok(
-        attributes[keys[0]] !== '',
+        attributes[keys[0]] !== "",
         `attributes ${AttributeNames.COMPONENT} is not defined`
       );
       assert.strictEqual(
         attributes[keys[1]],
-        'GET',
-        `attributes ${SemanticAttribute.HTTP_METHOD} is wrong`
+        "GET",
+        `attributes ${SemanticAttributes.HTTP_METHOD} is wrong`
       );
       assert.strictEqual(
         attributes[keys[2]],
         url,
-        `attributes ${SemanticAttribute.HTTP_URL} is wrong`
+        `attributes ${SemanticAttributes.HTTP_URL} is wrong`
       );
       assert.strictEqual(
         attributes[keys[3]],
         200,
-        `attributes ${SemanticAttribute.HTTP_STATUS_CODE} is wrong`
+        `attributes ${SemanticAttributes.HTTP_STATUS_CODE} is wrong`
       );
       assert.ok(
-        attributes[keys[4]] === 'OK' || attributes[keys[4]] === '',
-        `attributes ${SemanticAttribute.HTTP_STATUS_TEXT} is wrong`
+        attributes[keys[4]] === "OK" || attributes[keys[4]] === "",
+        `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
       );
       assert.ok(
-        (attributes[keys[5]] as string).indexOf('localhost') === 0,
-        `attributes ${SemanticAttribute.HTTP_HOST} is wrong`
+        (attributes[keys[5]] as string).indexOf("localhost") === 0,
+        `attributes ${SemanticAttributes.HTTP_HOST} is wrong`
       );
       assert.ok(
-        attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
-        `attributes ${SemanticAttribute.HTTP_SCHEME} is wrong`
+        attributes[keys[6]] === "http" || attributes[keys[6]] === "https",
+        `attributes ${SemanticAttributes.HTTP_SCHEME} is wrong`
       );
       assert.ok(
-        attributes[keys[7]] !== '',
-        `attributes ${SemanticAttribute.HTTP_USER_AGENT} is not defined`
+        attributes[keys[7]] !== "",
+        `attributes ${SemanticAttributes.HTTP_USER_AGENT} is not defined`
       );
       assert.ok(
         (attributes[keys[8]] as number) > 0,
-        `attributes ${SemanticAttribute.HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
+        `attributes ${SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
       );
 
-      assert.strictEqual(keys.length, 9, 'number of attributes is wrong');
+      assert.strictEqual(keys.length, 9, "number of attributes is wrong");
     });
 
-    it('span should have correct events', () => {
+    it("span should have correct events", () => {
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
       const events = span.events;
-      assert.strictEqual(events.length, 9, 'number of events is wrong');
+      assert.strictEqual(events.length, 9, "number of events is wrong");
 
       assert.strictEqual(
         events[0].name,
@@ -423,38 +423,38 @@ describe('fetch', () => {
       );
     });
 
-    it('should create a span for preflight request', () => {
+    it("should create a span for preflight request", () => {
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const parentSpan: tracing.ReadableSpan = exportSpy.args[1][0][0];
       assert.strictEqual(
         span.parentSpanId,
         parentSpan.spanContext.spanId,
-        'parent span is not root span'
+        "parent span is not root span"
       );
     });
 
-    it('preflight request span should have correct name', () => {
+    it("preflight request span should have correct name", () => {
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       assert.strictEqual(
         span.name,
-        'CORS Preflight',
-        'preflight request span has wrong name'
+        "CORS Preflight",
+        "preflight request span has wrong name"
       );
     });
 
-    it('preflight request span should have correct kind', () => {
+    it("preflight request span should have correct kind", () => {
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       assert.strictEqual(
         span.kind,
         api.SpanKind.INTERNAL,
-        'span has wrong kind'
+        "span has wrong kind"
       );
     });
 
-    it('preflight request span should have correct events', () => {
+    it("preflight request span should have correct events", () => {
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const events = span.events;
-      assert.strictEqual(events.length, 9, 'number of events is wrong');
+      assert.strictEqual(events.length, 9, "number of events is wrong");
 
       assert.strictEqual(
         events[0].name,
@@ -503,7 +503,7 @@ describe('fetch', () => {
       );
     });
 
-    it('should set trace headers', () => {
+    it("should set trace headers", () => {
       const span: api.Span = exportSpy.args[1][0][0];
       assert.strictEqual(
         lastResponse.headers[X_B3_TRACE_ID],
@@ -522,26 +522,26 @@ describe('fetch', () => {
       );
     });
 
-    it('should set trace headers with a request object', () => {
-      const r = new Request('url');
+    it("should set trace headers with a request object", () => {
+      const r = new Request("url");
       window.fetch(r);
-      assert.ok(typeof r.headers.get(X_B3_TRACE_ID) === 'string');
+      assert.ok(typeof r.headers.get(X_B3_TRACE_ID) === "string");
     });
 
-    it('should NOT clear the resources', () => {
+    it("should NOT clear the resources", () => {
       assert.strictEqual(
         clearResourceTimingsSpy.args.length,
         0,
-        'resources have been cleared'
+        "resources have been cleared"
       );
     });
 
-    describe('when propagateTraceHeaderCorsUrls does NOT MATCH', () => {
-      beforeEach(done => {
+    describe("when propagateTraceHeaderCorsUrls does NOT MATCH", () => {
+      beforeEach((done) => {
         clearData();
         prepareData(done, url, {});
       });
-      it('should NOT set trace headers', () => {
+      it("should NOT set trace headers", () => {
         assert.strictEqual(
           lastResponse.headers[X_B3_TRACE_ID],
           undefined,
@@ -561,8 +561,8 @@ describe('fetch', () => {
     });
   });
 
-  describe('when url is ignored', () => {
-    beforeEach(done => {
+  describe("when url is ignored", () => {
+    beforeEach((done) => {
       const propagateTraceHeaderCorsUrls = url;
       prepareData(done, url, {
         propagateTraceHeaderCorsUrls,
@@ -572,13 +572,13 @@ describe('fetch', () => {
     afterEach(() => {
       clearData();
     });
-    it('should NOT create any span', () => {
+    it("should NOT create any span", () => {
       assert.strictEqual(exportSpy.args.length, 0, "span shouldn't b exported");
     });
   });
 
-  describe('when clearTimingResources is TRUE', () => {
-    beforeEach(done => {
+  describe("when clearTimingResources is TRUE", () => {
+    beforeEach((done) => {
       const propagateTraceHeaderCorsUrls = url;
       prepareData(done, url, {
         propagateTraceHeaderCorsUrls,
@@ -588,7 +588,7 @@ describe('fetch', () => {
     afterEach(() => {
       clearData();
     });
-    it('should clear the resources', () => {
+    it("should clear the resources", () => {
       assert.strictEqual(
         clearResourceTimingsSpy.args.length,
         1,
@@ -597,45 +597,45 @@ describe('fetch', () => {
     });
   });
 
-  describe('when request is NOT successful (wrong url)', () => {
-    beforeEach(done => {
+  describe("when request is NOT successful (wrong url)", () => {
+    beforeEach((done) => {
       const propagateTraceHeaderCorsUrls = badUrl;
       prepareData(done, badUrl, { propagateTraceHeaderCorsUrls });
     });
     afterEach(() => {
       clearData();
     });
-    it('should create a span with correct root span', () => {
+    it("should create a span with correct root span", () => {
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
       assert.strictEqual(
         span.parentSpanId,
         rootSpan.context().spanId,
-        'parent span is not root span'
+        "parent span is not root span"
       );
     });
   });
 
-  describe('when request is NOT successful (405)', () => {
-    beforeEach(done => {
+  describe("when request is NOT successful (405)", () => {
+    beforeEach((done) => {
       const propagateTraceHeaderCorsUrls = url;
-      prepareData(done, url, { propagateTraceHeaderCorsUrls }, 'DELETE');
+      prepareData(done, url, { propagateTraceHeaderCorsUrls }, "DELETE");
     });
     afterEach(() => {
       clearData();
     });
 
-    it('should create a span with correct root span', () => {
+    it("should create a span with correct root span", () => {
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
       assert.strictEqual(
         span.parentSpanId,
         rootSpan.context().spanId,
-        'parent span is not root span'
+        "parent span is not root span"
       );
     });
   });
 
-  describe('when PerformanceObserver is used by default', () => {
-    beforeEach(done => {
+  describe("when PerformanceObserver is used by default", () => {
+    beforeEach((done) => {
       // All above tests test it already but just in case
       // lets explicitly turn getEntriesByType off so we can be sure
       // that the perf entries come from the observer.
@@ -644,7 +644,7 @@ describe('fetch', () => {
     afterEach(() => {
       clearData();
     });
-    it('should create both spans with network events', () => {
+    it("should create both spans with network events", () => {
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const events = span.events;
 
@@ -654,7 +654,7 @@ describe('fetch', () => {
         `Wrong number of spans: ${exportSpy.args.length}`
       );
 
-      assert.strictEqual(events.length, 9, 'number of events is wrong');
+      assert.strictEqual(events.length, 9, "number of events is wrong");
 
       assert.strictEqual(
         events[6].name,
@@ -664,14 +664,14 @@ describe('fetch', () => {
     });
   });
 
-  describe('when fetching with relative url', () => {
-    beforeEach(done => {
-      prepareData(done, '/get', {}, undefined, false, true);
+  describe("when fetching with relative url", () => {
+    beforeEach((done) => {
+      prepareData(done, "/get", {}, undefined, false, true);
     });
     afterEach(() => {
       clearData();
     });
-    it('should create spans with network info', () => {
+    it("should create spans with network info", () => {
       // no prefetch span because mock observer uses location.origin as url when relative
       // and prefetch span finding compares url origins
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
@@ -683,7 +683,7 @@ describe('fetch', () => {
         `Wrong number of spans: ${exportSpy.args.length}`
       );
 
-      assert.strictEqual(events.length, 9, 'number of events is wrong');
+      assert.strictEqual(events.length, 9, "number of events is wrong");
       assert.strictEqual(
         events[6].name,
         PTN.REQUEST_START,
@@ -692,8 +692,8 @@ describe('fetch', () => {
     });
   });
 
-  describe('when PerformanceObserver is undefined', () => {
-    beforeEach(done => {
+  describe("when PerformanceObserver is undefined", () => {
+    beforeEach((done) => {
       prepareData(done, url, {}, undefined, true, false);
     });
 
@@ -701,7 +701,7 @@ describe('fetch', () => {
       clearData();
     });
 
-    it('should fallback to getEntries', () => {
+    it("should fallback to getEntries", () => {
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const events = span.events;
 
@@ -710,7 +710,7 @@ describe('fetch', () => {
         2,
         `Wrong number of spans: ${exportSpy.args.length}`
       );
-      assert.strictEqual(events.length, 9, 'number of events is wrong');
+      assert.strictEqual(events.length, 9, "number of events is wrong");
       assert.strictEqual(
         events[6].name,
         PTN.REQUEST_START,
@@ -719,14 +719,14 @@ describe('fetch', () => {
     });
   });
 
-  describe('when PerformanceObserver and performance.getEntriesByType are undefined', () => {
-    beforeEach(done => {
+  describe("when PerformanceObserver and performance.getEntriesByType are undefined", () => {
+    beforeEach((done) => {
       prepareData(done, url, {}, undefined, true, true);
     });
     afterEach(() => {
       clearData();
     });
-    it('should still capture fetch with basic attributes', () => {
+    it("should still capture fetch with basic attributes", () => {
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const events = span.events;
       const attributes = span.attributes;
@@ -739,17 +739,17 @@ describe('fetch', () => {
       );
       assert.strictEqual(
         exportSpy.args[0][0][0].name,
-        'HTTP GET',
-        'wrong span captured'
+        "HTTP GET",
+        "wrong span captured"
       );
 
-      assert.strictEqual(events.length, 0, 'Should not have any events');
+      assert.strictEqual(events.length, 0, "Should not have any events");
 
       // should still have basic attributes
       assert.strictEqual(
         attributes[keys[3]],
         200,
-        `Missing basic attribute ${SemanticAttribute.HTTP_STATUS_CODE}`
+        `Missing basic attribute ${SemanticAttributes.HTTP_STATUS_CODE}`
       );
     });
   });

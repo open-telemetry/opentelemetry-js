@@ -14,51 +14,51 @@
  * limitations under the License.
  */
 
-import { SpanKind, Span, context, propagation } from '@opentelemetry/api';
+import { SpanKind, Span, context, propagation } from "@opentelemetry/api";
 import {
   HttpFlavorValues,
   NetTransportValues,
-  SemanticAttribute,
-} from '@opentelemetry/semantic-conventions';
-import * as assert from 'assert';
-import * as url from 'url';
-import { HttpInstrumentation } from '../../src/http';
-import { assertSpan } from '../utils/assertSpan';
-import * as utils from '../utils/utils';
-import { NodeTracerProvider } from '@opentelemetry/node';
+  SemanticAttributes,
+} from "@opentelemetry/semantic-conventions";
+import * as assert from "assert";
+import * as url from "url";
+import { HttpInstrumentation } from "../../src/http";
+import { assertSpan } from "../utils/assertSpan";
+import * as utils from "../utils/utils";
+import { NodeTracerProvider } from "@opentelemetry/node";
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/tracing';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+} from "@opentelemetry/tracing";
+import { AsyncHooksContextManager } from "@opentelemetry/context-async-hooks";
 
 const instrumentation = new HttpInstrumentation();
 instrumentation.enable();
 instrumentation.disable();
 
-import * as http from 'http';
-import { httpRequest } from '../utils/httpRequest';
-import { DummyPropagation } from '../utils/DummyPropagation';
-import { Socket } from 'net';
-import { sendRequestTwice } from '../utils/rawRequest';
+import * as http from "http";
+import { httpRequest } from "../utils/httpRequest";
+import { DummyPropagation } from "../utils/DummyPropagation";
+import { Socket } from "net";
+import { sendRequestTwice } from "../utils/rawRequest";
 
-const protocol = 'http';
+const protocol = "http";
 const serverPort = 32345;
-const hostname = 'localhost';
+const hostname = "localhost";
 const memoryExporter = new InMemorySpanExporter();
 
 const customAttributeFunction = (span: Span): void => {
-  span.setAttribute('span kind', SpanKind.CLIENT);
+  span.setAttribute("span kind", SpanKind.CLIENT);
 };
 
-describe('HttpInstrumentation Integration tests', () => {
+describe("HttpInstrumentation Integration tests", () => {
   let mockServerPort = 0;
   let mockServer: http.Server;
   const sockets: Array<Socket> = [];
-  before(done => {
+  before((done) => {
     mockServer = http.createServer((req, res) => {
       res.statusCode = 200;
-      res.setHeader('content-type', 'application/json');
+      res.setHeader("content-type", "application/json");
       res.write(
         JSON.stringify({
           success: true,
@@ -70,17 +70,17 @@ describe('HttpInstrumentation Integration tests', () => {
     mockServer.listen(0, () => {
       const addr = mockServer.address();
       if (addr == null) {
-        done(new Error('unexpected addr null'));
+        done(new Error("unexpected addr null"));
         return;
       }
 
-      if (typeof addr === 'string') {
+      if (typeof addr === "string") {
         done(new Error(`unexpected addr ${addr}`));
         return;
       }
 
       if (addr.port <= 0) {
-        done(new Error('Could not get port'));
+        done(new Error("Could not get port"));
         return;
       }
       mockServerPort = addr.port;
@@ -88,8 +88,8 @@ describe('HttpInstrumentation Integration tests', () => {
     });
   });
 
-  after(done => {
-    sockets.forEach(s => s.destroy());
+  after((done) => {
+    sockets.forEach((s) => s.destroy());
     mockServer.close(done);
   });
 
@@ -106,7 +106,7 @@ describe('HttpInstrumentation Integration tests', () => {
     context.disable();
     propagation.disable();
   });
-  describe('enable()', () => {
+  describe("enable()", () => {
     before(function (done) {
       // mandatory
       if (process.env.CI) {
@@ -114,7 +114,7 @@ describe('HttpInstrumentation Integration tests', () => {
         return;
       }
 
-      utils.checkInternet(isConnected => {
+      utils.checkInternet((isConnected) => {
         if (!isConnected) {
           this.skip();
           // don't disturb people
@@ -134,7 +134,7 @@ describe('HttpInstrumentation Integration tests', () => {
       const ignoreConfig = [
         `${protocol}://${hostname}:${serverPort}/ignored/string`,
         /\/ignored\/regexp$/i,
-        (url: string) => url.endsWith('/ignored/function'),
+        (url: string) => url.endsWith("/ignored/function"),
       ];
       instrumentation.setConfig({
         ignoreIncomingPaths: ignoreConfig,
@@ -148,7 +148,7 @@ describe('HttpInstrumentation Integration tests', () => {
       instrumentation.disable();
     });
 
-    it('should create a rootSpan for GET requests and add propagation headers', async () => {
+    it("should create a rootSpan for GET requests and add propagation headers", async () => {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
 
@@ -157,25 +157,25 @@ describe('HttpInstrumentation Integration tests', () => {
       );
 
       spans = memoryExporter.getFinishedSpans();
-      const span = spans.find(s => s.kind === SpanKind.CLIENT);
+      const span = spans.find((s) => s.kind === SpanKind.CLIENT);
       assert.ok(span);
       const validations = {
-        hostname: 'localhost',
+        hostname: "localhost",
         httpStatusCode: result.statusCode!,
-        httpMethod: 'GET',
-        pathname: '/',
-        path: '/?query=test',
+        httpMethod: "GET",
+        pathname: "/",
+        path: "/?query=test",
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
-        component: 'http',
+        component: "http",
       };
 
       assert.strictEqual(spans.length, 2);
-      assert.strictEqual(span.name, 'HTTP GET');
+      assert.strictEqual(span.name, "HTTP GET");
       assertSpan(span, SpanKind.CLIENT, validations);
     });
 
-    it('should create a rootSpan for GET requests and add propagation headers if URL is used', async () => {
+    it("should create a rootSpan for GET requests and add propagation headers if URL is used", async () => {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
 
@@ -184,119 +184,119 @@ describe('HttpInstrumentation Integration tests', () => {
       );
 
       spans = memoryExporter.getFinishedSpans();
-      const span = spans.find(s => s.kind === SpanKind.CLIENT);
+      const span = spans.find((s) => s.kind === SpanKind.CLIENT);
       assert.ok(span);
       const validations = {
-        hostname: 'localhost',
+        hostname: "localhost",
         httpStatusCode: result.statusCode!,
-        httpMethod: 'GET',
-        pathname: '/',
-        path: '/?query=test',
+        httpMethod: "GET",
+        pathname: "/",
+        path: "/?query=test",
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
-        component: 'http',
+        component: "http",
       };
 
       assert.strictEqual(spans.length, 2);
-      assert.strictEqual(span.name, 'HTTP GET');
+      assert.strictEqual(span.name, "HTTP GET");
       assertSpan(span, SpanKind.CLIENT, validations);
     });
 
-    it('should create a valid rootSpan with propagation headers for GET requests if URL and options are used', async () => {
+    it("should create a valid rootSpan with propagation headers for GET requests if URL and options are used", async () => {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
 
       const result = await httpRequest.get(
         new url.URL(`${protocol}://localhost:${mockServerPort}/?query=test`),
         {
-          headers: { 'x-foo': 'foo' },
+          headers: { "x-foo": "foo" },
         }
       );
 
       spans = memoryExporter.getFinishedSpans();
-      const span = spans.find(s => s.kind === SpanKind.CLIENT);
+      const span = spans.find((s) => s.kind === SpanKind.CLIENT);
       assert.ok(span);
       const validations = {
-        hostname: 'localhost',
+        hostname: "localhost",
         httpStatusCode: result.statusCode!,
-        httpMethod: 'GET',
-        pathname: '/',
-        path: '/?query=test',
+        httpMethod: "GET",
+        pathname: "/",
+        path: "/?query=test",
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
-        component: 'http',
+        component: "http",
       };
 
       assert.strictEqual(spans.length, 2);
-      assert.strictEqual(span.name, 'HTTP GET');
-      assert.strictEqual(result.reqHeaders['x-foo'], 'foo');
+      assert.strictEqual(span.name, "HTTP GET");
+      assert.strictEqual(result.reqHeaders["x-foo"], "foo");
       assert.strictEqual(
-        span.attributes[SemanticAttribute.HTTP_FLAVOR],
+        span.attributes[SemanticAttributes.HTTP_FLAVOR],
         HttpFlavorValues.HTTP_1_1
       );
       assert.strictEqual(
-        span.attributes[SemanticAttribute.NET_TRANSPORT],
+        span.attributes[SemanticAttributes.NET_TRANSPORT],
         NetTransportValues.IP_TCP
       );
       assertSpan(span, SpanKind.CLIENT, validations);
     });
 
-    it('custom attributes should show up on client spans', async () => {
+    it("custom attributes should show up on client spans", async () => {
       const result = await httpRequest.get(
         `${protocol}://localhost:${mockServerPort}/`
       );
       const spans = memoryExporter.getFinishedSpans();
-      const span = spans.find(s => s.kind === SpanKind.CLIENT);
+      const span = spans.find((s) => s.kind === SpanKind.CLIENT);
       assert.ok(span);
       const validations = {
-        hostname: 'localhost',
+        hostname: "localhost",
         httpStatusCode: result.statusCode!,
-        httpMethod: 'GET',
-        pathname: '/',
+        httpMethod: "GET",
+        pathname: "/",
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
-        component: 'http',
+        component: "http",
       };
 
       assert.strictEqual(spans.length, 2);
-      assert.strictEqual(span.name, 'HTTP GET');
-      assert.strictEqual(span.attributes['span kind'], SpanKind.CLIENT);
+      assert.strictEqual(span.name, "HTTP GET");
+      assert.strictEqual(span.attributes["span kind"], SpanKind.CLIENT);
       assertSpan(span, SpanKind.CLIENT, validations);
     });
 
-    it('should create a span for GET requests and add propagation headers with Expect headers', async () => {
+    it("should create a span for GET requests and add propagation headers with Expect headers", async () => {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
       const options = Object.assign(
-        { headers: { Expect: '100-continue' } },
+        { headers: { Expect: "100-continue" } },
         url.parse(`${protocol}://localhost:${mockServerPort}/`)
       );
 
       const result = await httpRequest.get(options);
       spans = memoryExporter.getFinishedSpans();
-      const span = spans.find(s => s.kind === SpanKind.CLIENT);
+      const span = spans.find((s) => s.kind === SpanKind.CLIENT);
       assert.ok(span);
       const validations = {
-        hostname: 'localhost',
+        hostname: "localhost",
         httpStatusCode: 200,
-        httpMethod: 'GET',
-        pathname: '/',
+        httpMethod: "GET",
+        pathname: "/",
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
-        component: 'http',
+        component: "http",
       };
 
       assert.strictEqual(spans.length, 2);
-      assert.strictEqual(span.name, 'HTTP GET');
+      assert.strictEqual(span.name, "HTTP GET");
       assertSpan(span, SpanKind.CLIENT, validations);
     });
     for (const headers of [
-      { Expect: '100-continue', 'user-agent': 'http-plugin-test' },
-      { 'user-agent': 'http-plugin-test' },
+      { Expect: "100-continue", "user-agent": "http-plugin-test" },
+      { "user-agent": "http-plugin-test" },
     ]) {
       it(`should create a span for GET requests and add propagation when using the following signature: get(url, options, callback) and following headers: ${JSON.stringify(
         headers
-      )}`, done => {
+      )}`, (done) => {
         let validations: {
           hostname: string;
           httpStatusCode: number;
@@ -305,7 +305,7 @@ describe('HttpInstrumentation Integration tests', () => {
           reqHeaders: http.OutgoingHttpHeaders;
           resHeaders: http.IncomingHttpHeaders;
         };
-        let data = '';
+        let data = "";
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(spans.length, 0);
         const options = { headers };
@@ -317,15 +317,15 @@ describe('HttpInstrumentation Integration tests', () => {
               req: http.IncomingMessage;
             };
 
-            resp.on('data', chunk => {
+            resp.on("data", (chunk) => {
               data += chunk;
             });
-            resp.on('end', () => {
+            resp.on("end", () => {
               validations = {
-                hostname: 'localhost',
+                hostname: "localhost",
                 httpStatusCode: 301,
-                httpMethod: 'GET',
-                pathname: '/',
+                httpMethod: "GET",
+                pathname: "/",
                 resHeaders: resp.headers,
                 /* tslint:disable:no-any */
                 reqHeaders: (res.req as any).getHeaders
@@ -337,12 +337,12 @@ describe('HttpInstrumentation Integration tests', () => {
           }
         );
 
-        req.on('close', () => {
+        req.on("close", () => {
           const spans = memoryExporter.getFinishedSpans();
-          const span = spans.find(s => s.kind === SpanKind.CLIENT);
+          const span = spans.find((s) => s.kind === SpanKind.CLIENT);
           assert.ok(span);
           assert.strictEqual(spans.length, 2);
-          assert.strictEqual(span.name, 'HTTP GET');
+          assert.strictEqual(span.name, "HTTP GET");
           assert.ok(data);
           assert.ok(validations.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);
           assert.ok(validations.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]);
@@ -351,13 +351,13 @@ describe('HttpInstrumentation Integration tests', () => {
       });
     }
 
-    it('should work for multiple active requests in keep-alive mode', async () => {
+    it("should work for multiple active requests in keep-alive mode", async () => {
       await sendRequestTwice(hostname, mockServerPort);
       const spans = memoryExporter.getFinishedSpans();
       const span = spans.find((s: any) => s.kind === SpanKind.SERVER);
       assert.ok(span);
       assert.strictEqual(spans.length, 2);
-      assert.strictEqual(span.name, 'HTTP GET');
+      assert.strictEqual(span.name, "HTTP GET");
     });
   });
 });

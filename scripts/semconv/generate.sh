@@ -3,7 +3,7 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT_DIR="${SCRIPT_DIR}/../../"
 
-# freeze the spec version to make SemanticAttributes generation reproducible
+# freeze the spec version to make SpanAttributess generation reproducible
 SPEC_VERSION=v1.1.0
 GENERATOR_VERSION=0.2.1
 
@@ -27,8 +27,8 @@ docker run --rm \
   -f /source \
   code \
   --template /templates/SemanticAttributes.ts.j2 \
-  --output /output/SemanticAttribute.ts \
-  -Dclass=SemanticAttribute
+  --output /output/SemanticAttributes.ts \
+  -Dclass=SemanticAttributes
 
 docker run --rm \
   -v ${SCRIPT_DIR}/opentelemetry-specification/semantic_conventions/resource:/source \
@@ -38,8 +38,8 @@ docker run --rm \
   -f /source \
   code \
   --template /templates/SemanticAttributes.ts.j2 \
-  --output /output/ResourceAttribute.ts \
-  -Dclass=ResourceAttribute
+  --output /output/ResourceAttributes.ts \
+  -Dclass=ResourceAttributes
 
 # Run the automatic linting fixing task to ensure it will pass eslint
 cd "$ROOT_DIR/packages/opentelemetry-semantic-conventions"

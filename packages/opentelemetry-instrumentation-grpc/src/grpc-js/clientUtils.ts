@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { GrpcJsInstrumentation } from './';
-import type { GrpcClientFunc, SendUnaryDataCallback } from './types';
+import { GrpcJsInstrumentation } from "./";
+import type { GrpcClientFunc, SendUnaryDataCallback } from "./types";
 import {
   SpanKind,
   Span,
@@ -23,16 +23,16 @@ import {
   SpanStatus,
   propagation,
   context,
-} from '@opentelemetry/api';
-import { SemanticAttribute } from '@opentelemetry/semantic-conventions';
-import type * as grpcJs from '@grpc/grpc-js';
+} from "@opentelemetry/api";
+import type * as grpcJs from "@grpc/grpc-js";
 import {
   _grpcStatusCodeToSpanStatus,
   _grpcStatusCodeToOpenTelemetryStatusCode,
   _methodIsIgnored,
-} from '../utils';
-import { CALL_SPAN_ENDED } from './serverUtils';
-import { EventEmitter } from 'events';
+} from "../utils";
+import { CALL_SPAN_ENDED } from "./serverUtils";
+import { EventEmitter } from "events";
+import { AttributeNames } from "../enums";
 
 /**
  * Parse a package method list and return a list of methods to patch
@@ -90,18 +90,18 @@ export function makeGrpcClientRemoteCall(
         if (err.code) {
           span.setStatus(_grpcStatusCodeToSpanStatus(err.code));
           span.setAttribute(
-            SemanticAttribute.GRPC_STATUS_CODE,
+            AttributeNames.GRPC_STATUS_CODE,
             err.code.toString()
           );
         }
         span.setAttributes({
-          [SemanticAttribute.GRPC_ERROR_NAME]: err.name,
-          [SemanticAttribute.GRPC_ERROR_MESSAGE]: err.message,
+          [AttributeNames.GRPC_ERROR_NAME]: err.name,
+          [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
         });
       } else {
         span.setStatus({ code: SpanStatusCode.UNSET });
         span.setAttribute(
-          SemanticAttribute.GRPC_STATUS_CODE,
+          AttributeNames.GRPC_STATUS_CODE,
           SpanStatusCode.UNSET.toString()
         );
       }
@@ -115,8 +115,8 @@ export function makeGrpcClientRemoteCall(
   return (span: Span) => {
     // if unary or clientStream
     if (!original.responseStream) {
-      const callbackFuncIndex = args.findIndex(arg => {
-        return typeof arg === 'function';
+      const callbackFuncIndex = args.findIndex((arg) => {
+        return typeof arg === "function";
       });
       if (callbackFuncIndex !== -1) {
         args[callbackFuncIndex] = patchedCallback(
@@ -127,8 +127,8 @@ export function makeGrpcClientRemoteCall(
     }
 
     span.setAttributes({
-      [SemanticAttribute.GRPC_METHOD]: original.path,
-      [SemanticAttribute.GRPC_KIND]: SpanKind.CLIENT,
+      [AttributeNames.GRPC_METHOD]: original.path,
+      [AttributeNames.GRPC_KIND]: SpanKind.CLIENT,
     });
 
     setSpanContext(metadata);
@@ -146,7 +146,7 @@ export function makeGrpcClientRemoteCall(
         }
       };
       context.bind(call);
-      call.on('error', (err: grpcJs.ServiceError) => {
+      call.on("error", (err: grpcJs.ServiceError) => {
         if (call[CALL_SPAN_ENDED]) {
           return;
         }
@@ -157,14 +157,14 @@ export function makeGrpcClientRemoteCall(
           message: err.message,
         });
         span.setAttributes({
-          [SemanticAttribute.GRPC_ERROR_NAME]: err.name,
-          [SemanticAttribute.GRPC_ERROR_MESSAGE]: err.message,
+          [AttributeNames.GRPC_ERROR_NAME]: err.name,
+          [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
         });
 
         endSpan();
       });
 
-      call.on('status', (status: SpanStatus) => {
+      call.on("status", (status: SpanStatus) => {
         if (call[CALL_SPAN_ENDED]) {
           return;
         }
@@ -197,9 +197,9 @@ export function getMetadata(
   let metadataIndex = args.findIndex((arg: unknown | grpcJs.Metadata) => {
     return (
       arg &&
-      typeof arg === 'object' &&
-      (arg as grpcJs.Metadata)['internalRepr'] && // changed from _internal_repr in grpc --> @grpc/grpc-js https://github.com/grpc/grpc-node/blob/95289edcaf36979cccf12797cc27335da8d01f03/packages/grpc-js/src/metadata.ts#L88
-      typeof (arg as grpcJs.Metadata).getMap === 'function'
+      typeof arg === "object" &&
+      (arg as grpcJs.Metadata)["internalRepr"] && // changed from _internal_repr in grpc --> @grpc/grpc-js https://github.com/grpc/grpc-node/blob/95289edcaf36979cccf12797cc27335da8d01f03/packages/grpc-js/src/metadata.ts#L88
+      typeof (arg as grpcJs.Metadata).getMap === "function"
     );
   });
   if (metadataIndex === -1) {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import * as api from "@opentelemetry/api";
 import {
   isAttributeValue,
   hrTime,
@@ -22,17 +22,15 @@ import {
   InstrumentationLibrary,
   isTimeInput,
   timeInputToHrTime,
-} from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
-import {
-  ExceptionEventName,
-  SemanticAttribute,
-} from '@opentelemetry/semantic-conventions';
-import { ReadableSpan } from './export/ReadableSpan';
-import { Tracer } from './Tracer';
-import { SpanProcessor } from './SpanProcessor';
-import { TraceParams } from './types';
-import { SpanAttributeValue, Context } from '@opentelemetry/api';
+} from "@opentelemetry/core";
+import { Resource } from "@opentelemetry/resources";
+import { SemanticAttributes } from "@opentelemetry/semantic-conventions";
+import { ReadableSpan } from "./export/ReadableSpan";
+import { Tracer } from "./Tracer";
+import { SpanProcessor } from "./SpanProcessor";
+import { TraceParams } from "./types";
+import { SpanAttributeValue, Context } from "@opentelemetry/api";
+import { ExceptionEventName } from "./enums";
 
 /**
  * This class represents a span.
@@ -131,16 +129,16 @@ export class Span implements api.Span, ReadableSpan {
   ): this {
     if (this._isSpanEnded()) return this;
     if (this.events.length >= this._traceParams.numberOfEventsPerSpan!) {
-      api.diag.warn('Dropping extra events.');
+      api.diag.warn("Dropping extra events.");
       this.events.shift();
     }
     if (isTimeInput(attributesOrStartTime)) {
-      if (typeof startTime === 'undefined') {
+      if (typeof startTime === "undefined") {
         startTime = attributesOrStartTime as api.TimeInput;
       }
       attributesOrStartTime = undefined;
     }
-    if (typeof startTime === 'undefined') {
+    if (typeof startTime === "undefined") {
       startTime = hrTime();
     }
     this.events.push({
@@ -165,7 +163,7 @@ export class Span implements api.Span, ReadableSpan {
 
   end(endTime: api.TimeInput = hrTime()): void {
     if (this._isSpanEnded()) {
-      api.diag.error('You can only call end() on a span once.');
+      api.diag.error("You can only call end() on a span once.");
       return;
     }
     this._ended = true;
@@ -174,7 +172,7 @@ export class Span implements api.Span, ReadableSpan {
     this._duration = hrTimeDuration(this.startTime, this.endTime);
     if (this._duration[0] < 0) {
       api.diag.warn(
-        'Inconsistent start and end time, startTime > endTime',
+        "Inconsistent start and end time, startTime > endTime",
         this.startTime,
         this.endTime
       );
@@ -189,26 +187,26 @@ export class Span implements api.Span, ReadableSpan {
 
   recordException(exception: api.Exception, time: api.TimeInput = hrTime()) {
     const attributes: api.SpanAttributes = {};
-    if (typeof exception === 'string') {
-      attributes[SemanticAttribute.EXCEPTION_MESSAGE] = exception;
+    if (typeof exception === "string") {
+      attributes[SemanticAttributes.EXCEPTION_MESSAGE] = exception;
     } else if (exception) {
       if (exception.code) {
-        attributes[SemanticAttribute.EXCEPTION_TYPE] = exception.code;
+        attributes[SemanticAttributes.EXCEPTION_TYPE] = exception.code;
       } else if (exception.name) {
-        attributes[SemanticAttribute.EXCEPTION_TYPE] = exception.name;
+        attributes[SemanticAttributes.EXCEPTION_TYPE] = exception.name;
       }
       if (exception.message) {
-        attributes[SemanticAttribute.EXCEPTION_MESSAGE] = exception.message;
+        attributes[SemanticAttributes.EXCEPTION_MESSAGE] = exception.message;
       }
       if (exception.stack) {
-        attributes[SemanticAttribute.EXCEPTION_STACKTRACE] = exception.stack;
+        attributes[SemanticAttributes.EXCEPTION_STACKTRACE] = exception.stack;
       }
     }
 
     // these are minimum requirements from spec
     if (
-      attributes[SemanticAttribute.EXCEPTION_TYPE] ||
-      attributes[SemanticAttribute.EXCEPTION_MESSAGE]
+      attributes[SemanticAttributes.EXCEPTION_TYPE] ||
+      attributes[SemanticAttributes.EXCEPTION_MESSAGE]
     ) {
       this.addEvent(ExceptionEventName, attributes as api.SpanAttributes, time);
     } else {
@@ -227,7 +225,7 @@ export class Span implements api.Span, ReadableSpan {
   private _isSpanEnded(): boolean {
     if (this._ended) {
       api.diag.warn(
-        'Can not execute the operation on ended Span {traceId: %s, spanId: %s}',
+        "Can not execute the operation on ended Span {traceId: %s, spanId: %s}",
         this.spanContext.traceId,
         this.spanContext.spanId
       );

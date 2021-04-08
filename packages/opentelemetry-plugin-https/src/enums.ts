@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-export * from "./Tracer";
-export * from "./BasicTracerProvider";
-export * from "./export/ConsoleSpanExporter";
-export * from "./export/BatchSpanProcessor";
-export * from "./export/InMemorySpanExporter";
-export * from "./export/ReadableSpan";
-export * from "./export/SimpleSpanProcessor";
-export * from "./export/SpanExporter";
-export * from "./Span";
-export * from "./SpanProcessor";
-export * from "./types";
+/**
+ * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/http.md
+ */
+export enum AttributeNames {
+  HTTP_ERROR_MESSAGE = "http.error_message",
+}

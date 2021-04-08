@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Span } from '@opentelemetry/api';
-import { registerInstrumentations } from '@opentelemetry/instrumentation';
-import { SemanticAttribute } from '@opentelemetry/semantic-conventions';
-import { ReadableSpan, SpanProcessor } from '@opentelemetry/tracing';
-import { WebTracerProvider } from '@opentelemetry/web';
-import { XMLHttpRequestInstrumentation } from '../src';
-import assert = require('assert');
+import { Span } from "@opentelemetry/api";
+import { registerInstrumentations } from "@opentelemetry/instrumentation";
+import { SemanticAttributes } from "@opentelemetry/semantic-conventions";
+import { ReadableSpan, SpanProcessor } from "@opentelemetry/tracing";
+import { WebTracerProvider } from "@opentelemetry/web";
+import { XMLHttpRequestInstrumentation } from "../src";
+import assert = require("assert");
 
 class TestSpanProcessor implements SpanProcessor {
   spans: ReadableSpan[] = [];
@@ -37,7 +37,7 @@ class TestSpanProcessor implements SpanProcessor {
   }
 }
 
-describe('unmocked xhr', () => {
+describe("unmocked xhr", () => {
   let testSpans: TestSpanProcessor;
   let provider: WebTracerProvider;
   beforeEach(() => {
@@ -53,12 +53,12 @@ describe('unmocked xhr', () => {
     // nop
   });
 
-  it('should find resource with a relative url', done => {
+  it("should find resource with a relative url", (done) => {
     const xhr = new XMLHttpRequest();
     let path = location.pathname;
-    path = path.substring(path.lastIndexOf('/') + 1);
-    xhr.open('GET', path);
-    xhr.addEventListener('loadend', () => {
+    path = path.substring(path.lastIndexOf("/") + 1);
+    xhr.open("GET", path);
+    xhr.addEventListener("loadend", () => {
       setTimeout(() => {
         assert.strictEqual(testSpans.spans.length, 1);
         const span = testSpans.spans[0];
@@ -66,7 +66,7 @@ describe('unmocked xhr', () => {
         // matching logic found the right one
         assert.ok(
           (span.attributes[
-            SemanticAttribute.HTTP_RESPONSE_CONTENT_LENGTH
+            SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH
           ] as any) > 0
         );
         done();

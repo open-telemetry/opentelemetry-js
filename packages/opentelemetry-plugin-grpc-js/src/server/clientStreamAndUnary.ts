@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { context, Span, SpanStatusCode } from '@opentelemetry/api';
-import type { ServerCallWithMeta, SendUnaryDataCallback } from '../types';
-import { grpcStatusCodeToOpenTelemetryStatusCode } from '../utils';
-import { SemanticAttribute } from '@opentelemetry/semantic-conventions';
-import type { GrpcJsPlugin } from '../grpcJs';
-import type * as grpcJs from '@grpc/grpc-js';
+import { context, Span, SpanStatusCode } from "@opentelemetry/api";
+import type { ServerCallWithMeta, SendUnaryDataCallback } from "../types";
+import { grpcStatusCodeToOpenTelemetryStatusCode } from "../utils";
+import type { GrpcJsPlugin } from "../grpcJs";
+import type * as grpcJs from "@grpc/grpc-js";
+import { AttributeNames } from "../enums";
 
 /**
  * Handle patching for clientStream and unary type server handlers
@@ -43,19 +43,16 @@ export function clientStreamAndUnaryHandler<RequestType, ResponseType>(
           code: grpcStatusCodeToOpenTelemetryStatusCode(err.code),
           message: err.message,
         });
-        span.setAttribute(
-          SemanticAttribute.GRPC_STATUS_CODE,
-          err.code.toString()
-        );
+        span.setAttribute(AttributeNames.GRPC_STATUS_CODE, err.code.toString());
       }
       span.setAttributes({
-        [SemanticAttribute.GRPC_ERROR_NAME]: err.name,
-        [SemanticAttribute.GRPC_ERROR_MESSAGE]: err.message,
+        [AttributeNames.GRPC_ERROR_NAME]: err.name,
+        [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
       });
     } else {
       span.setStatus({ code: SpanStatusCode.OK });
       span.setAttribute(
-        SemanticAttribute.GRPC_STATUS_CODE,
+        AttributeNames.GRPC_STATUS_CODE,
         SpanStatusCode.OK.toString()
       );
     }

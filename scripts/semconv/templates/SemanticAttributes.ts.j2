@@ -27,7 +27,7 @@
 
 // DO NOT EDIT, this is an Auto-generated file from scripts/semconv/templates/{{template}}
 export const {{class}} = {
-  {%- for attribute in attributes | unique(attribute="fqn") %}
+  {%- for attribute in attributes if attribute.is_local and not attribute.ref %}
 
   /**
   * {% filter escape %}{{attribute.brief | to_doc_brief}}.{% endfilter %}
@@ -45,33 +45,16 @@ export const {{class}} = {
     {%- endif %}
   {{attribute.fqn | to_const_name}}: '{{attribute.fqn}}',
   {%- endfor %}
-
-  {%- if class == "SemanticAttribute" %}
-
-  // Manually defined and not YET in the YAML
-
-  // HTTP
-  HTTP_ERROR_NAME: 'http.error_name',
-  HTTP_ERROR_MESSAGE: 'http.error_message',
-  HTTP_STATUS_TEXT: 'http.status_text',
-
-  // GRPC
-  GRPC_KIND: 'grpc.kind', // SERVER or CLIENT
-  GRPC_METHOD: 'grpc.method',
-  GRPC_STATUS_CODE: 'grpc.status_code',
-  GRPC_ERROR_NAME: 'grpc.error_name',
-  GRPC_ERROR_MESSAGE: 'grpc.error_message',
-  {%- endif %}
 }
 
 // Enum definitions
-{%- for attribute in attributes | unique(attribute="fqn") %}
+{%- for attribute in attributes if attribute.is_local %}
 {%- if attribute.is_enum %}
 {%- set class_name = attribute.fqn | to_camelcase(True) ~ "Values" %}
 {%- set type = attribute.attr_type.enum_type %}
 
 export enum {{class_name}} {
-  {%- for member in attribute.attr_type.members %}
+  {%- for member in attribute.attr_type.members if attribute.is_local and not attribute.ref %}
   /** {% filter escape %}{{member.brief | to_doc_brief}}.{% endfilter %} */
   {{ member.member_id | to_const_name }} = {{ print_value(type, member.value) }},
   {%- endfor %}

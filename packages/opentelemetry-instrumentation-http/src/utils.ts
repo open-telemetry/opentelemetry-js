@@ -18,11 +18,11 @@ import {
   SpanStatusCode,
   Span,
   SpanStatus,
-} from '@opentelemetry/api';
+} from "@opentelemetry/api";
 import {
   NetTransportValues,
-  SemanticAttribute,
-} from '@opentelemetry/semantic-conventions';
+  SemanticAttributes,
+} from "@opentelemetry/semantic-conventions";
 import {
   ClientRequest,
   IncomingHttpHeaders,
@@ -30,10 +30,11 @@ import {
   OutgoingHttpHeaders,
   RequestOptions,
   ServerResponse,
-} from 'http';
-import { Socket } from 'net';
-import * as url from 'url';
-import { Err, IgnoreMatcher, ParsedRequestOptions } from './types';
+} from "http";
+import { Socket } from "net";
+import * as url from "url";
+import { AttributeNames } from "./enums";
+import { Err, IgnoreMatcher, ParsedRequestOptions } from "./types";
 
 /**
  * Get an absolute url
@@ -41,22 +42,22 @@ import { Err, IgnoreMatcher, ParsedRequestOptions } from './types';
 export const getAbsoluteUrl = (
   requestUrl: ParsedRequestOptions | null,
   headers: IncomingHttpHeaders | OutgoingHttpHeaders,
-  fallbackProtocol = 'http:'
+  fallbackProtocol = "http:"
 ): string => {
   const reqUrlObject = requestUrl || {};
   const protocol = reqUrlObject.protocol || fallbackProtocol;
-  const port = (reqUrlObject.port || '').toString();
-  const path = reqUrlObject.path || '/';
+  const port = (reqUrlObject.port || "").toString();
+  const path = reqUrlObject.path || "/";
   let host =
-    reqUrlObject.host || reqUrlObject.hostname || headers.host || 'localhost';
+    reqUrlObject.host || reqUrlObject.hostname || headers.host || "localhost";
 
   // if there is no port in host and there is a port
   // it should be displayed if it's not 80 and 443 (default ports)
   if (
-    (host as string).indexOf(':') === -1 &&
+    (host as string).indexOf(":") === -1 &&
     port &&
-    port !== '80' &&
-    port !== '443'
+    port !== "80" &&
+    port !== "443"
   ) {
     host += `:${port}`;
   }
@@ -68,7 +69,7 @@ export const getAbsoluteUrl = (
  */
 export const parseResponseStatus = (
   statusCode: number
-): Omit<SpanStatus, 'message'> => {
+): Omit<SpanStatus, "message"> => {
   // 1xx, 2xx, 3xx are OK
   if (statusCode >= 100 && statusCode < 400) {
     return { code: SpanStatusCode.OK };
@@ -88,7 +89,7 @@ export const hasExpectHeader = (options: RequestOptions): boolean => {
   }
 
   const keys = Object.keys(options.headers);
-  return !!keys.find(key => key.toLowerCase() === 'expect');
+  return !!keys.find((key) => key.toLowerCase() === "expect");
 };
 
 /**
@@ -100,14 +101,14 @@ export const satisfiesPattern = (
   constant: string,
   pattern: IgnoreMatcher
 ): boolean => {
-  if (typeof pattern === 'string') {
+  if (typeof pattern === "string") {
     return pattern === constant;
   } else if (pattern instanceof RegExp) {
     return pattern.test(constant);
-  } else if (typeof pattern === 'function') {
+  } else if (typeof pattern === "function") {
     return pattern(constant);
   } else {
-    throw new TypeError('Pattern is in unsupported datatype');
+    throw new TypeError("Pattern is in unsupported datatype");
   }
 };
 
@@ -158,8 +159,8 @@ export const setSpanWithError = (
   const message = error.message;
 
   span.setAttributes({
-    [SemanticAttribute.HTTP_ERROR_NAME]: error.name,
-    [SemanticAttribute.HTTP_ERROR_MESSAGE]: message,
+    [AttributeNames.HTTP_ERROR_NAME]: error.name,
+    [AttributeNames.HTTP_ERROR_MESSAGE]: message,
   });
 
   if (!obj) {
@@ -194,10 +195,10 @@ export const setRequestContentLengthAttribute = (
   if (length === null) return;
 
   if (isCompressed(request.headers)) {
-    attributes[SemanticAttribute.HTTP_REQUEST_CONTENT_LENGTH] = length;
+    attributes[SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH] = length;
   } else {
     attributes[
-      SemanticAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
+      SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
     ] = length;
   }
 };
@@ -215,10 +216,10 @@ export const setResponseContentLengthAttribute = (
   if (length === null) return;
 
   if (isCompressed(response.headers)) {
-    attributes[SemanticAttribute.HTTP_RESPONSE_CONTENT_LENGTH] = length;
+    attributes[SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH] = length;
   } else {
     attributes[
-      SemanticAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED
+      SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED
     ] = length;
   }
 };
@@ -226,7 +227,7 @@ export const setResponseContentLengthAttribute = (
 function getContentLength(
   headers: OutgoingHttpHeaders | IncomingHttpHeaders
 ): number | null {
-  const contentLengthHeader = headers['content-length'];
+  const contentLengthHeader = headers["content-length"];
   if (contentLengthHeader === undefined) return null;
 
   const contentLength = parseInt(contentLengthHeader as string, 10);
@@ -238,9 +239,9 @@ function getContentLength(
 export const isCompressed = (
   headers: OutgoingHttpHeaders | IncomingHttpHeaders
 ): boolean => {
-  const encoding = headers['content-encoding'];
+  const encoding = headers["content-encoding"];
 
-  return !!encoding && encoding !== 'identity';
+  return !!encoding && encoding !== "identity";
 };
 
 /**
@@ -253,13 +254,13 @@ export const getRequestInfo = (
   options: url.URL | RequestOptions | string,
   extraOptions?: RequestOptions
 ) => {
-  let pathname = '/';
-  let origin = '';
+  let pathname = "/";
+  let origin = "";
   let optionsParsed: RequestOptions;
-  if (typeof options === 'string') {
+  if (typeof options === "string") {
     optionsParsed = url.parse(options);
-    pathname = (optionsParsed as url.UrlWithStringQuery).pathname || '/';
-    origin = `${optionsParsed.protocol || 'http:'}//${optionsParsed.host}`;
+    pathname = (optionsParsed as url.UrlWithStringQuery).pathname || "/";
+    origin = `${optionsParsed.protocol || "http:"}//${optionsParsed.host}`;
     if (extraOptions !== undefined) {
       Object.assign(optionsParsed, extraOptions);
     }
@@ -267,12 +268,12 @@ export const getRequestInfo = (
     optionsParsed = {
       protocol: options.protocol,
       hostname:
-        typeof options.hostname === 'string' && options.hostname.startsWith('[')
+        typeof options.hostname === "string" && options.hostname.startsWith("[")
           ? options.hostname.slice(1, -1)
           : options.hostname,
-      path: `${options.pathname || ''}${options.search || ''}`,
+      path: `${options.pathname || ""}${options.search || ""}`,
     };
-    if (options.port !== '') {
+    if (options.port !== "") {
       optionsParsed.port = Number(options.port);
     }
     if (options.username || options.password) {
@@ -285,14 +286,14 @@ export const getRequestInfo = (
     }
   } else {
     optionsParsed = Object.assign(
-      { protocol: options.host ? 'http:' : undefined },
+      { protocol: options.host ? "http:" : undefined },
       options
     );
     pathname = (options as url.URL).pathname;
     if (!pathname && optionsParsed.path) {
-      pathname = url.parse(optionsParsed.path).pathname || '/';
+      pathname = url.parse(optionsParsed.path).pathname || "/";
     }
-    origin = `${optionsParsed.protocol || 'http:'}//${
+    origin = `${optionsParsed.protocol || "http:"}//${
       optionsParsed.host || `${optionsParsed.hostname}:${optionsParsed.port}`
     }`;
   }
@@ -306,7 +307,7 @@ export const getRequestInfo = (
   // ensure upperCase for consistency
   const method = optionsParsed.method
     ? optionsParsed.method.toUpperCase()
-    : 'GET';
+    : "GET";
 
   return { origin, pathname, method, optionsParsed };
 };
@@ -321,7 +322,7 @@ export const isValidOptionsType = (options: unknown): boolean => {
   }
 
   const type = typeof options;
-  return type === 'string' || (type === 'object' && !Array.isArray(options));
+  return type === "string" || (type === "object" && !Array.isArray(options));
 };
 
 /**
@@ -336,25 +337,25 @@ export const getOutgoingRequestAttributes = (
   const host = requestOptions.host;
   const hostname =
     requestOptions.hostname ||
-    host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') ||
-    'localhost';
+    host?.replace(/^(.*)(:[0-9]{1,5})/, "$1") ||
+    "localhost";
   const requestMethod = requestOptions.method;
-  const method = requestMethod ? requestMethod.toUpperCase() : 'GET';
+  const method = requestMethod ? requestMethod.toUpperCase() : "GET";
   const headers = requestOptions.headers || {};
-  const userAgent = headers['user-agent'];
+  const userAgent = headers["user-agent"];
   const attributes: SpanAttributes = {
-    [SemanticAttribute.HTTP_URL]: getAbsoluteUrl(
+    [SemanticAttributes.HTTP_URL]: getAbsoluteUrl(
       requestOptions,
       headers,
       `${options.component}:`
     ),
-    [SemanticAttribute.HTTP_METHOD]: method,
-    [SemanticAttribute.HTTP_TARGET]: requestOptions.path || '/',
-    [SemanticAttribute.NET_PEER_NAME]: hostname,
+    [SemanticAttributes.HTTP_METHOD]: method,
+    [SemanticAttributes.HTTP_TARGET]: requestOptions.path || "/",
+    [SemanticAttributes.NET_PEER_NAME]: hostname,
   };
 
   if (userAgent !== undefined) {
-    attributes[SemanticAttribute.HTTP_USER_AGENT] = userAgent;
+    attributes[SemanticAttributes.HTTP_USER_AGENT] = userAgent;
   }
   return attributes;
 };
@@ -366,11 +367,11 @@ export const getOutgoingRequestAttributes = (
 export const getAttributesFromHttpKind = (kind?: string): SpanAttributes => {
   const attributes: SpanAttributes = {};
   if (kind) {
-    attributes[SemanticAttribute.HTTP_FLAVOR] = kind;
-    if (kind.toUpperCase() !== 'QUIC') {
-      attributes[SemanticAttribute.NET_TRANSPORT] = NetTransportValues.IP_TCP;
+    attributes[SemanticAttributes.HTTP_FLAVOR] = kind;
+    if (kind.toUpperCase() !== "QUIC") {
+      attributes[SemanticAttributes.NET_TRANSPORT] = NetTransportValues.IP_TCP;
     } else {
-      attributes[SemanticAttribute.NET_TRANSPORT] = NetTransportValues.IP_UDP;
+      attributes[SemanticAttributes.NET_TRANSPORT] = NetTransportValues.IP_UDP;
     }
   }
   return attributes;
@@ -388,16 +389,16 @@ export const getOutgoingRequestAttributesOnResponse = (
   const { statusCode, statusMessage, httpVersion, socket } = response;
   const { remoteAddress, remotePort } = socket;
   const attributes: SpanAttributes = {
-    [SemanticAttribute.NET_PEER_IP]: remoteAddress,
-    [SemanticAttribute.NET_PEER_PORT]: remotePort,
-    [SemanticAttribute.HTTP_HOST]: `${options.hostname}:${remotePort}`,
+    [SemanticAttributes.NET_PEER_IP]: remoteAddress,
+    [SemanticAttributes.NET_PEER_PORT]: remotePort,
+    [SemanticAttributes.HTTP_HOST]: `${options.hostname}:${remotePort}`,
   };
   setResponseContentLengthAttribute(response, attributes);
 
   if (statusCode) {
-    attributes[SemanticAttribute.HTTP_STATUS_CODE] = statusCode;
-    attributes[SemanticAttribute.HTTP_STATUS_TEXT] = (
-      statusMessage || ''
+    attributes[SemanticAttributes.HTTP_STATUS_CODE] = statusCode;
+    attributes[AttributeNames.HTTP_STATUS_TEXT] = (
+      statusMessage || ""
     ).toUpperCase();
   }
 
@@ -415,43 +416,43 @@ export const getIncomingRequestAttributes = (
   options: { component: string; serverName?: string }
 ): SpanAttributes => {
   const headers = request.headers;
-  const userAgent = headers['user-agent'];
-  const ips = headers['x-forwarded-for'];
-  const method = request.method || 'GET';
+  const userAgent = headers["user-agent"];
+  const ips = headers["x-forwarded-for"];
+  const method = request.method || "GET";
   const httpVersion = request.httpVersion;
   const requestUrl = request.url ? url.parse(request.url) : null;
   const host = requestUrl?.host || headers.host;
   const hostname =
     requestUrl?.hostname ||
-    host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') ||
-    'localhost';
+    host?.replace(/^(.*)(:[0-9]{1,5})/, "$1") ||
+    "localhost";
   const serverName = options.serverName;
   const attributes: SpanAttributes = {
-    [SemanticAttribute.HTTP_URL]: getAbsoluteUrl(
+    [SemanticAttributes.HTTP_URL]: getAbsoluteUrl(
       requestUrl,
       headers,
       `${options.component}:`
     ),
-    [SemanticAttribute.HTTP_HOST]: host,
-    [SemanticAttribute.NET_HOST_NAME]: hostname,
-    [SemanticAttribute.HTTP_METHOD]: method,
+    [SemanticAttributes.HTTP_HOST]: host,
+    [SemanticAttributes.NET_HOST_NAME]: hostname,
+    [SemanticAttributes.HTTP_METHOD]: method,
   };
 
-  if (typeof ips === 'string') {
-    attributes[SemanticAttribute.HTTP_CLIENT_IP] = ips.split(',')[0];
+  if (typeof ips === "string") {
+    attributes[SemanticAttributes.HTTP_CLIENT_IP] = ips.split(",")[0];
   }
 
-  if (typeof serverName === 'string') {
-    attributes[SemanticAttribute.HTTP_SERVER_NAME] = serverName;
+  if (typeof serverName === "string") {
+    attributes[SemanticAttributes.HTTP_SERVER_NAME] = serverName;
   }
 
   if (requestUrl) {
-    attributes[SemanticAttribute.HTTP_ROUTE] = requestUrl.pathname || '/';
-    attributes[SemanticAttribute.HTTP_TARGET] = requestUrl.pathname || '/';
+    attributes[SemanticAttributes.HTTP_ROUTE] = requestUrl.pathname || "/";
+    attributes[SemanticAttributes.HTTP_TARGET] = requestUrl.pathname || "/";
   }
 
   if (userAgent !== undefined) {
-    attributes[SemanticAttribute.HTTP_USER_AGENT] = userAgent;
+    attributes[SemanticAttributes.HTTP_USER_AGENT] = userAgent;
   }
   setRequestContentLengthAttribute(request, attributes);
 
@@ -477,24 +478,24 @@ export const getIncomingRequestAttributesOnResponse = (
   };
   const route = Array.isArray(__ot_middlewares)
     ? __ot_middlewares
-        .filter(path => path !== '/')
-        .map(path => {
-          return path[0] === '/' ? path : '/' + path;
+        .filter((path) => path !== "/")
+        .map((path) => {
+          return path[0] === "/" ? path : "/" + path;
         })
-        .join('')
+        .join("")
     : undefined;
 
   const attributes: SpanAttributes = {
-    [SemanticAttribute.NET_HOST_IP]: localAddress,
-    [SemanticAttribute.NET_HOST_PORT]: localPort,
-    [SemanticAttribute.NET_PEER_IP]: remoteAddress,
-    [SemanticAttribute.NET_PEER_PORT]: remotePort,
-    [SemanticAttribute.HTTP_STATUS_CODE]: statusCode,
-    [SemanticAttribute.HTTP_STATUS_TEXT]: (statusMessage || '').toUpperCase(),
+    [SemanticAttributes.NET_HOST_IP]: localAddress,
+    [SemanticAttributes.NET_HOST_PORT]: localPort,
+    [SemanticAttributes.NET_PEER_IP]: remoteAddress,
+    [SemanticAttributes.NET_PEER_PORT]: remotePort,
+    [SemanticAttributes.HTTP_STATUS_CODE]: statusCode,
+    [AttributeNames.HTTP_STATUS_TEXT]: (statusMessage || "").toUpperCase(),
   };
 
   if (route !== undefined) {
-    attributes[SemanticAttribute.HTTP_ROUTE] = route;
+    attributes[SemanticAttributes.HTTP_ROUTE] = route;
   }
   return attributes;
 };

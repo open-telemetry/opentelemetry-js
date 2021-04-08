@@ -16,4 +16,3 @@
 
 export * from './trace';
 export * from './resource';
-export * from './events';

@@ -15,7 +15,7 @@
  */
 
 // DO NOT EDIT, this is an Auto-generated file from scripts/semconv/templates//templates/SemanticAttributes.ts.j2
-export const SemanticAttribute = {
+export const SemanticAttributes = {
   /**
    * An identifier for the database management system (DBMS) product being used. See below for a list of well-known identifiers.
    */
@@ -56,26 +56,6 @@ export const SemanticAttribute = {
    * Note: When setting this to an SQL keyword, it is not recommended to attempt any client-side parsing of `db.statement` just to get this property, but it should be set if the operation name is provided by the library being instrumented. If the SQL statement has an ambiguous operation, or performs more than one operation, this value may be omitted.
    */
   DB_OPERATION: 'db.operation',
-
-  /**
-   * Remote hostname or similar, see note below.
-   */
-  NET_PEER_NAME: 'net.peer.name',
-
-  /**
-   * Remote address of the peer (dotted decimal for IPv4 or [RFC5952](https://tools.ietf.org/html/rfc5952) for IPv6).
-   */
-  NET_PEER_IP: 'net.peer.ip',
-
-  /**
-   * Remote port number.
-   */
-  NET_PEER_PORT: 'net.peer.port',
-
-  /**
-   * Transport protocol used. See note below.
-   */
-  NET_TRANSPORT: 'net.transport',
 
   /**
    * The Microsoft SQL Server [instance name](https://docs.microsoft.com/en-us/sql/connect/jdbc/building-the-connection-url?view=sql-server-ver15) connecting to. This name is used to determine the port of a named instance.
@@ -217,6 +197,127 @@ clear whether the exception will escape.
   FAAS_DOCUMENT_NAME: 'faas.document.name',
 
   /**
+   * A string containing the function invocation time in the [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format expressed in [UTC](https://www.w3.org/TR/NOTE-datetime).
+   */
+  FAAS_TIME: 'faas.time',
+
+  /**
+   * A string containing the schedule period as [Cron Expression](https://docs.oracle.com/cd/E12058_01/doc/doc.1014/e12030/cron_expressions.htm).
+   */
+  FAAS_CRON: 'faas.cron',
+
+  /**
+   * A boolean that is true if the serverless function is executed for the first time (aka cold-start).
+   */
+  FAAS_COLDSTART: 'faas.coldstart',
+
+  /**
+   * The name of the invoked function.
+   *
+   * Note: SHOULD be equal to the `faas.name` resource attribute of the invoked function.
+   */
+  FAAS_INVOKED_NAME: 'faas.invoked_name',
+
+  /**
+   * The cloud provider of the invoked function.
+   *
+   * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
+   */
+  FAAS_INVOKED_PROVIDER: 'faas.invoked_provider',
+
+  /**
+   * The cloud region of the invoked function.
+   *
+   * Note: SHOULD be equal to the `cloud.region` resource attribute of the invoked function.
+   */
+  FAAS_INVOKED_REGION: 'faas.invoked_region',
+
+  /**
+   * Transport protocol used. See note below.
+   */
+  NET_TRANSPORT: 'net.transport',
+
+  /**
+   * Remote address of the peer (dotted decimal for IPv4 or [RFC5952](https://tools.ietf.org/html/rfc5952) for IPv6).
+   */
+  NET_PEER_IP: 'net.peer.ip',
+
+  /**
+   * Remote port number.
+   */
+  NET_PEER_PORT: 'net.peer.port',
+
+  /**
+   * Remote hostname or similar, see note below.
+   */
+  NET_PEER_NAME: 'net.peer.name',
+
+  /**
+   * Like `net.peer.ip` but for the host IP. Useful in case of a multi-IP host.
+   */
+  NET_HOST_IP: 'net.host.ip',
+
+  /**
+   * Like `net.peer.port` but for the host port.
+   */
+  NET_HOST_PORT: 'net.host.port',
+
+  /**
+   * Local hostname or similar, see note below.
+   */
+  NET_HOST_NAME: 'net.host.name',
+
+  /**
+   * The [`service.name`](../../resource/semantic_conventions/README.md#service) of the remote service. SHOULD be equal to the actual `service.name` resource attribute of the remote service if any.
+   */
+  PEER_SERVICE: 'peer.service',
+
+  /**
+   * Username or client_id extracted from the access token or [Authorization](https://tools.ietf.org/html/rfc7235#section-4.2) header in the inbound request from outside the system.
+   */
+  ENDUSER_ID: 'enduser.id',
+
+  /**
+   * Actual/assumed role the client is making the request under extracted from token or application security context.
+   */
+  ENDUSER_ROLE: 'enduser.role',
+
+  /**
+   * Scopes or granted authorities the client currently possesses extracted from token or application security context. The value would come from the scope associated with an [OAuth 2.0 Access Token](https://tools.ietf.org/html/rfc6749#section-3.3) or an attribute value in a [SAML 2.0 Assertion](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html).
+   */
+  ENDUSER_SCOPE: 'enduser.scope',
+
+  /**
+   * Current &#34;managed&#34; thread ID (as opposed to OS thread ID).
+   */
+  THREAD_ID: 'thread.id',
+
+  /**
+   * Current thread name.
+   */
+  THREAD_NAME: 'thread.name',
+
+  /**
+   * The method or function name, or equivalent (usually rightmost part of the code unit&#39;s name).
+   */
+  CODE_FUNCTION: 'code.function',
+
+  /**
+   * The &#34;namespace&#34; within which `code.function` is defined. Usually the qualified class or module name, such that `code.namespace` + some separator + `code.function` form a unique identifier for the code unit.
+   */
+  CODE_NAMESPACE: 'code.namespace',
+
+  /**
+   * The source code file name that identifies the code unit as uniquely as possible (preferably an absolute file path).
+   */
+  CODE_FILEPATH: 'code.filepath',
+
+  /**
+   * The line number in `code.filepath` best representing the operation. It SHOULD point within the code unit named in `code.function`.
+   */
+  CODE_LINENO: 'code.lineno',
+
+  /**
    * HTTP request method.
    */
   HTTP_METHOD: 'http.method',
@@ -302,21 +403,6 @@ clear whether the exception will escape.
   HTTP_CLIENT_IP: 'http.client_ip',
 
   /**
-   * Like `net.peer.ip` but for the host IP. Useful in case of a multi-IP host.
-   */
-  NET_HOST_IP: 'net.host.ip',
-
-  /**
-   * Like `net.peer.port` but for the host port.
-   */
-  NET_HOST_PORT: 'net.host.port',
-
-  /**
-   * Local hostname or similar, see note below.
-   */
-  NET_HOST_NAME: 'net.host.name',
-
-  /**
    * A string identifying the messaging system.
    */
   MESSAGING_SYSTEM: 'messaging.system',
@@ -373,92 +459,6 @@ clear whether the exception will escape.
     'messaging.message_payload_compressed_size_bytes',
 
   /**
-   * A string containing the function invocation time in the [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) format expressed in [UTC](https://www.w3.org/TR/NOTE-datetime).
-   */
-  FAAS_TIME: 'faas.time',
-
-  /**
-   * A string containing the schedule period as [Cron Expression](https://docs.oracle.com/cd/E12058_01/doc/doc.1014/e12030/cron_expressions.htm).
-   */
-  FAAS_CRON: 'faas.cron',
-
-  /**
-   * A boolean that is true if the serverless function is executed for the first time (aka cold-start).
-   */
-  FAAS_COLDSTART: 'faas.coldstart',
-
-  /**
-   * The name of the invoked function.
-   *
-   * Note: SHOULD be equal to the `faas.name` resource attribute of the invoked function.
-   */
-  FAAS_INVOKED_NAME: 'faas.invoked_name',
-
-  /**
-   * The cloud provider of the invoked function.
-   *
-   * Note: SHOULD be equal to the `cloud.provider` resource attribute of the invoked function.
-   */
-  FAAS_INVOKED_PROVIDER: 'faas.invoked_provider',
-
-  /**
-   * The cloud region of the invoked function.
-   *
-   * Note: SHOULD be equal to the `cloud.region` resource attribute of the invoked function.
-   */
-  FAAS_INVOKED_REGION: 'faas.invoked_region',
-
-  /**
-   * The [`service.name`](../../resource/semantic_conventions/README.md#service) of the remote service. SHOULD be equal to the actual `service.name` resource attribute of the remote service if any.
-   */
-  PEER_SERVICE: 'peer.service',
-
-  /**
-   * Username or client_id extracted from the access token or [Authorization](https://tools.ietf.org/html/rfc7235#section-4.2) header in the inbound request from outside the system.
-   */
-  ENDUSER_ID: 'enduser.id',
-
-  /**
-   * Actual/assumed role the client is making the request under extracted from token or application security context.
-   */
-  ENDUSER_ROLE: 'enduser.role',
-
-  /**
-   * Scopes or granted authorities the client currently possesses extracted from token or application security context. The value would come from the scope associated with an [OAuth 2.0 Access Token](https://tools.ietf.org/html/rfc6749#section-3.3) or an attribute value in a [SAML 2.0 Assertion](http://docs.oasis-open.org/security/saml/Post2.0/sstc-saml-tech-overview-2.0.html).
-   */
-  ENDUSER_SCOPE: 'enduser.scope',
-
-  /**
-   * Current &#34;managed&#34; thread ID (as opposed to OS thread ID).
-   */
-  THREAD_ID: 'thread.id',
-
-  /**
-   * Current thread name.
-   */
-  THREAD_NAME: 'thread.name',
-
-  /**
-   * The method or function name, or equivalent (usually rightmost part of the code unit&#39;s name).
-   */
-  CODE_FUNCTION: 'code.function',
-
-  /**
-   * The &#34;namespace&#34; within which `code.function` is defined. Usually the qualified class or module name, such that `code.namespace` + some separator + `code.function` form a unique identifier for the code unit.
-   */
-  CODE_NAMESPACE: 'code.namespace',
-
-  /**
-   * The source code file name that identifies the code unit as uniquely as possible (preferably an absolute file path).
-   */
-  CODE_FILEPATH: 'code.filepath',
-
-  /**
-   * The line number in `code.filepath` best representing the operation. It SHOULD point within the code unit named in `code.function`.
-   */
-  CODE_LINENO: 'code.lineno',
-
-  /**
    * A string identifying the kind of message consumption as defined in the [Operation names](#operation-names) section above. If the operation is &#34;send&#34;, this attribute MUST NOT be set, since the operation can be inferred from the span kind in that case.
    */
   MESSAGING_OPERATION: 'messaging.operation',
@@ -509,20 +509,6 @@ clear whether the exception will escape.
    * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
    */
   RPC_GRPC_STATUS_CODE: 'rpc.grpc.status_code',
-
-  // Manually defined and not YET in the YAML
-
-  // HTTP
-  HTTP_ERROR_NAME: 'http.error_name',
-  HTTP_ERROR_MESSAGE: 'http.error_message',
-  HTTP_STATUS_TEXT: 'http.status_text',
-
-  // GRPC
-  GRPC_KIND: 'grpc.kind', // SERVER or CLIENT
-  GRPC_METHOD: 'grpc.method',
-  GRPC_STATUS_CODE: 'grpc.status_code',
-  GRPC_ERROR_NAME: 'grpc.error_name',
-  GRPC_ERROR_MESSAGE: 'grpc.error_message',
 };
 
 // Enum definitions
@@ -620,22 +606,7 @@ export enum DbSystemValues {
   ELASTICSEARCH = 'elasticsearch',
 }
 
-export enum NetTransportValues {
-  /** IP.TCP. */
-  IP_TCP = 'IP.TCP',
-  /** IP.UDP. */
-  IP_UDP = 'IP.UDP',
-  /** Another IP-based protocol. */
-  IP = 'IP',
-  /** Unix Domain socket. See below. */
-  UNIX = 'Unix',
-  /** Named or anonymous pipe. See note below. */
-  PIPE = 'pipe',
-  /** In-process communication. */
-  INPROC = 'inproc',
-  /** Something else (non IP-based). */
-  OTHER = 'other',
-}
+export enum NetTransportValues {}
 
 export enum DbCassandraConsistencyLevelValues {
   /** ALL. */
@@ -684,6 +655,32 @@ export enum FaasDocumentOperationValues {
   DELETE = 'delete',
 }
 
+export enum FaasInvokedProviderValues {
+  /** Amazon Web Services. */
+  AWS = 'aws',
+  /** Amazon Web Services. */
+  AZURE = 'azure',
+  /** Google Cloud Platform. */
+  GCP = 'gcp',
+}
+
+export enum NetTransportValues {
+  /** IP.TCP. */
+  IP_TCP = 'IP.TCP',
+  /** IP.UDP. */
+  IP_UDP = 'IP.UDP',
+  /** Another IP-based protocol. */
+  IP = 'IP',
+  /** Unix Domain socket. See below. */
+  UNIX = 'Unix',
+  /** Named or anonymous pipe. See note below. */
+  PIPE = 'pipe',
+  /** In-process communication. */
+  INPROC = 'inproc',
+  /** Something else (non IP-based). */
+  OTHER = 'other',
+}
+
 export enum HttpFlavorValues {
   /** HTTP 1.0. */
   HTTP_1_0 = '1.0',
@@ -704,21 +701,14 @@ export enum MessagingDestinationKindValues {
   TOPIC = 'topic',
 }
 
-export enum FaasInvokedProviderValues {
-  /** Amazon Web Services. */
-  AWS = 'aws',
-  /** Amazon Web Services. */
-  AZURE = 'azure',
-  /** Google Cloud Platform. */
-  GCP = 'gcp',
-}
-
 export enum MessagingOperationValues {
   /** receive. */
   RECEIVE = 'receive',
   /** process. */
   PROCESS = 'process',
 }
+
+export enum NetTransportValues {}
 
 export enum RpcGrpcStatusCodeValues {
   /** OK. */

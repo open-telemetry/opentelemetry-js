@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import type * as grpcTypes from 'grpc';
-import type * as events from 'events';
-import { SendUnaryDataCallback, GrpcClientFunc } from './types';
-import { SemanticAttribute } from '@opentelemetry/semantic-conventions';
+import type * as grpcTypes from "grpc";
+import type * as events from "events";
+import { SendUnaryDataCallback, GrpcClientFunc } from "./types";
+import { SemanticAttributes } from "@opentelemetry/semantic-conventions";
 import {
   context,
   Span,
@@ -25,12 +25,13 @@ import {
   SpanKind,
   SpanStatus,
   propagation,
-} from '@opentelemetry/api';
+} from "@opentelemetry/api";
 import {
   _grpcStatusCodeToSpanStatus,
   _grpcStatusCodeToOpenTelemetryStatusCode,
   findIndex,
-} from '../utils';
+} from "../utils";
+import { AttributeNames } from "../enums";
 
 /**
  * This method handles the client remote call
@@ -56,18 +57,18 @@ export const makeGrpcClientRemoteCall = function (
         if (err.code) {
           span.setStatus(_grpcStatusCodeToSpanStatus(err.code));
           span.setAttribute(
-            SemanticAttribute.RPC_GRPC_STATUS_CODE,
+            SemanticAttributes.RPC_GRPC_STATUS_CODE,
             err.code.toString()
           );
         }
         span.setAttributes({
-          [SemanticAttribute.GRPC_ERROR_NAME]: err.name,
-          [SemanticAttribute.GRPC_ERROR_MESSAGE]: err.message,
+          [AttributeNames.GRPC_ERROR_NAME]: err.name,
+          [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
         });
       } else {
         span.setStatus({ code: SpanStatusCode.UNSET });
         span.setAttribute(
-          SemanticAttribute.RPC_GRPC_STATUS_CODE,
+          SemanticAttributes.RPC_GRPC_STATUS_CODE,
           grpcClient.status.OK.toString()
         );
       }
@@ -85,8 +86,8 @@ export const makeGrpcClientRemoteCall = function (
 
     // if unary or clientStream
     if (!original.responseStream) {
-      const callbackFuncIndex = findIndex(args, arg => {
-        return typeof arg === 'function';
+      const callbackFuncIndex = findIndex(args, (arg) => {
+        return typeof arg === "function";
       });
       if (callbackFuncIndex !== -1) {
         args[callbackFuncIndex] = patchedCallback(
@@ -97,10 +98,10 @@ export const makeGrpcClientRemoteCall = function (
       }
     }
 
-    span.addEvent('sent');
+    span.addEvent("sent");
     span.setAttributes({
-      [SemanticAttribute.GRPC_METHOD]: original.path,
-      [SemanticAttribute.GRPC_KIND]: SpanKind.CLIENT,
+      [AttributeNames.GRPC_METHOD]: original.path,
+      [AttributeNames.GRPC_KIND]: SpanKind.CLIENT,
     });
 
     setSpanContext(metadata);
@@ -119,26 +120,26 @@ export const makeGrpcClientRemoteCall = function (
       };
       context.bind(call);
       ((call as unknown) as events.EventEmitter).on(
-        'error',
+        "error",
         (err: grpcTypes.ServiceError) => {
           span.setStatus({
             code: _grpcStatusCodeToOpenTelemetryStatusCode(err.code),
             message: err.message,
           });
           span.setAttributes({
-            [SemanticAttribute.GRPC_ERROR_NAME]: err.name,
-            [SemanticAttribute.GRPC_ERROR_MESSAGE]: err.message,
+            [AttributeNames.GRPC_ERROR_NAME]: err.name,
+            [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
           });
           endSpan();
         }
       );
 
       ((call as unknown) as events.EventEmitter).on(
-        'status',
+        "status",
         (status: SpanStatus) => {
           span.setStatus({ code: SpanStatusCode.UNSET });
           span.setAttribute(
-            SemanticAttribute.GRPC_STATUS_CODE,
+            SemanticAttributes.RPC_GRPC_STATUS_CODE,
             status.code.toString()
           );
           endSpan();
@@ -163,9 +164,9 @@ export const getMetadata = function (
   let metadataIndex = findIndex(args, (arg: any) => {
     return (
       arg &&
-      typeof arg === 'object' &&
+      typeof arg === "object" &&
       arg._internal_repr &&
-      typeof arg.getMap === 'function'
+      typeof arg.getMap === "function"
     );
   });
   if (metadataIndex === -1) {

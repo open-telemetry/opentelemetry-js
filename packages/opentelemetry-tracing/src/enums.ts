@@ -15,4 +15,4 @@
  */
 
 // Event name definitions
-export const ExceptionEventName = 'exception';
+export const ExceptionEventName = "exception";

@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import type * as grpcJs from '@grpc/grpc-js';
+import type * as grpcJs from "@grpc/grpc-js";
 import {
   InstrumentationNodeModuleDefinition,
   isWrapped,
-} from '@opentelemetry/instrumentation';
+} from "@opentelemetry/instrumentation";
 import {
   InstrumentationBase,
   InstrumentationConfig,
-} from '@opentelemetry/instrumentation';
-import { GrpcInstrumentationConfig } from '../types';
+} from "@opentelemetry/instrumentation";
+import { GrpcInstrumentationConfig } from "../types";
 import {
   ServerCallWithMeta,
   SendUnaryDataCallback,
@@ -32,7 +32,7 @@ import {
   MakeClientConstructorFunction,
   PackageDefinition,
   GrpcClientFunc,
-} from './types';
+} from "./types";
 import {
   context,
   SpanOptions,
@@ -41,19 +41,19 @@ import {
   ROOT_CONTEXT,
   setSpan,
   diag,
-} from '@opentelemetry/api';
-import { SemanticAttribute } from '@opentelemetry/semantic-conventions';
+} from "@opentelemetry/api";
 import {
   shouldNotTraceServerCall,
   handleServerFunction,
   handleUntracedServerFunction,
-} from './serverUtils';
+} from "./serverUtils";
 import {
   getMethodsToWrap,
   makeGrpcClientRemoteCall,
   getMetadata,
-} from './clientUtils';
-import { EventEmitter } from 'events';
+} from "./clientUtils";
+import { EventEmitter } from "events";
+import { AttributeNames } from "../enums";
 
 export class GrpcJsInstrumentation extends InstrumentationBase {
   constructor(
@@ -73,42 +73,42 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
   init() {
     return [
       new InstrumentationNodeModuleDefinition<typeof grpcJs>(
-        '@grpc/grpc-js',
-        ['1.*'],
+        "@grpc/grpc-js",
+        ["1.*"],
         (moduleExports, version) => {
           diag.debug(`Applying patch for @grpc/grpc-js@${version}`);
           if (isWrapped(moduleExports.Server.prototype.register)) {
-            this._unwrap(moduleExports.Server.prototype, 'register');
+            this._unwrap(moduleExports.Server.prototype, "register");
           }
           // Patch Server methods
           this._wrap(
             moduleExports.Server.prototype,
-            'register',
+            "register",
             this._patchServer() as any
           );
           // Patch Client methods
           if (isWrapped(moduleExports.makeGenericClientConstructor)) {
-            this._unwrap(moduleExports, 'makeGenericClientConstructor');
+            this._unwrap(moduleExports, "makeGenericClientConstructor");
           }
           this._wrap(
             moduleExports,
-            'makeGenericClientConstructor',
+            "makeGenericClientConstructor",
             this._patchClient(moduleExports)
           );
           if (isWrapped(moduleExports.makeClientConstructor)) {
-            this._unwrap(moduleExports, 'makeClientConstructor');
+            this._unwrap(moduleExports, "makeClientConstructor");
           }
           this._wrap(
             moduleExports,
-            'makeClientConstructor',
+            "makeClientConstructor",
             this._patchClient(moduleExports)
           );
           if (isWrapped(moduleExports.loadPackageDefinition)) {
-            this._unwrap(moduleExports, 'loadPackageDefinition');
+            this._unwrap(moduleExports, "loadPackageDefinition");
           }
           this._wrap(
             moduleExports,
-            'loadPackageDefinition',
+            "loadPackageDefinition",
             this._patchLoadPackageDefinition(moduleExports)
           );
           return moduleExports;
@@ -117,10 +117,10 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
           if (moduleExports === undefined) return;
           diag.debug(`Removing patch for @grpc/grpc-js@${version}`);
 
-          this._unwrap(moduleExports.Server.prototype, 'register');
-          this._unwrap(moduleExports, 'makeClientConstructor');
-          this._unwrap(moduleExports, 'makeGenericClientConstructor');
-          this._unwrap(moduleExports, 'loadPackageDefinition');
+          this._unwrap(moduleExports.Server.prototype, "register");
+          this._unwrap(moduleExports, "makeClientConstructor");
+          this._unwrap(moduleExports, "makeGenericClientConstructor");
+          this._unwrap(moduleExports, "loadPackageDefinition");
         }
       ),
     ];
@@ -136,7 +136,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
     const instrumentation = this;
     return (originalRegister: ServerRegisterFunction) => {
       const config = this._config;
-      diag.debug('patched gRPC server');
+      diag.debug("patched gRPC server");
       return function register<RequestType, ResponseType>(
         this: grpcJs.Server,
         name: string,
@@ -153,11 +153,11 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
           deserialize,
           type
         );
-        const handlerSet = this['handlers'].get(name);
+        const handlerSet = this["handlers"].get(name);
 
         instrumentation._wrap(
           handlerSet,
-          'func',
+          "func",
           (originalFunc: HandleCall<unknown, unknown>) => {
             return function func(
               this: typeof handlerSet,
@@ -181,23 +181,23 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
                 );
               }
 
-              const spanName = `grpc.${name.replace('/', '')}`;
+              const spanName = `grpc.${name.replace("/", "")}`;
               const spanOptions: SpanOptions = {
                 kind: SpanKind.SERVER,
               };
 
-              diag.debug('patch func: %s', JSON.stringify(spanOptions));
+              diag.debug("patch func: %s", JSON.stringify(spanOptions));
 
               context.with(
                 propagation.extract(ROOT_CONTEXT, call.metadata, {
                   get: (carrier, key) => carrier.get(key).map(String),
-                  keys: carrier => Object.keys(carrier.getMap()),
+                  keys: (carrier) => Object.keys(carrier.getMap()),
                 }),
                 () => {
                   const span = instrumentation.tracer
                     .startSpan(spanName, spanOptions)
                     .setAttributes({
-                      [SemanticAttribute.GRPC_KIND]: spanOptions.kind,
+                      [AttributeNames.GRPC_KIND]: spanOptions.kind,
                     });
 
                   context.with(setSpan(context.active(), span), () => {
@@ -231,7 +231,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
   ) => MakeClientConstructorFunction {
     const instrumentation = this;
     return (original: MakeClientConstructorFunction) => {
-      diag.debug('patching client');
+      diag.debug("patching client");
       return function makeClientConstructor(
         this: typeof grpcJs.Client,
         methods: grpcJs.ServiceDefinition,
@@ -255,7 +255,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
    */
   private _patchLoadPackageDefinition(grpcClient: typeof grpcJs) {
     const instrumentation = this;
-    diag.debug('patching loadPackageDefinition');
+    diag.debug("patching loadPackageDefinition");
     return (original: typeof grpcJs.loadPackageDefinition) => {
       return function patchedLoadPackageDefinition(
         this: null,
@@ -279,9 +279,9 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
   ): (original: GrpcClientFunc) => () => EventEmitter {
     const instrumentation = this;
     return (original: GrpcClientFunc) => {
-      diag.debug('patch all client methods');
+      diag.debug("patch all client methods");
       return function clientMethodTrace(this: grpcJs.Client) {
-        const name = `grpc.${original.path.replace('/', '')}`;
+        const name = `grpc.${original.path.replace("/", "")}`;
         const args = [...arguments];
         const metadata = getMetadata.call(
           instrumentation,
@@ -309,14 +309,14 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
     grpcClient: typeof grpcJs,
     result: grpcJs.GrpcObject
   ): void {
-    Object.values(result).forEach(service => {
-      if (typeof service === 'function') {
+    Object.values(result).forEach((service) => {
+      if (typeof service === "function") {
         this._massWrap<typeof service.prototype, string>(
           service.prototype,
           getMethodsToWrap.call(this, service, service.service),
           this._getPatchedClientMethods.call(this, grpcClient)
         );
-      } else if (typeof service.format !== 'string') {
+      } else if (typeof service.format !== "string") {
         // GrpcObject
         this._patchLoadedPackage.call(
           this,

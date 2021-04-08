@@ -15,7 +15,7 @@
  */
 
 // DO NOT EDIT, this is an Auto-generated file from scripts/semconv/templates//templates/SemanticAttributes.ts.j2
-export const ResourceAttribute = {
+export const ResourceAttributes = {
   /**
    * Name of the cloud provider.
    */
