@@ -43,7 +43,7 @@ export const {{class}} = {
     {%- if attribute.deprecated %}
   @Deprecated
     {%- endif %}
-  {{attribute.fqn | to_const_name}}: "{{attribute.fqn}}",
+  {{attribute.fqn | to_const_name}}: '{{attribute.fqn}}',
   {%- endfor %}
 
   {%- if class == "SemanticAttribute" %}
@@ -72,8 +72,8 @@ export const {{class}} = {
 
 export enum {{class_name}} {
   {%- for member in attribute.attr_type.members %}
-    /** {% filter escape %}{{member.brief | to_doc_brief}}.{% endfilter %} */
-    {{ member.member_id | to_const_name }} = {{ print_value(type, member.value) }},
+  /** {% filter escape %}{{member.brief | to_doc_brief}}.{% endfilter %} */
+  {{ member.member_id | to_const_name }} = {{ print_value(type, member.value) }},
   {%- endfor %}
 }
 {% endif %}
