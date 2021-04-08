@@ -25,7 +25,7 @@ import {
 } from '@opentelemetry/propagator-b3';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import * as tracing from '@opentelemetry/tracing';
-import { HttpAttribute } from '@opentelemetry/semantic-conventions';
+import { SemanticAttribute } from '@opentelemetry/semantic-conventions';
 import {
   PerformanceTimingNames as PTN,
   WebTracerProvider,
@@ -289,39 +289,39 @@ describe('xhr', () => {
           assert.strictEqual(
             attributes[keys[0]],
             'GET',
-            `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
+            `attributes ${SemanticAttribute.HTTP_METHOD} is wrong`
           );
           assert.strictEqual(
             attributes[keys[1]],
             url,
-            `attributes ${HttpAttribute.HTTP_URL} is wrong`
+            `attributes ${SemanticAttribute.HTTP_URL} is wrong`
           );
           assert.ok(
             (attributes[keys[2]] as number) > 0,
-            'attributes ${HttpAttributes.HTTP_RESPONSE_CONTENT_SIZE} <= 0'
+            'attributes ${SemanticAttributes.HTTP_RESPONSE_CONTENT_SIZE} <= 0'
           );
           assert.strictEqual(
             attributes[keys[3]],
             200,
-            `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
+            `attributes ${SemanticAttribute.HTTP_STATUS_CODE} is wrong`
           );
           assert.strictEqual(
             attributes[keys[4]],
             'OK',
-            `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
+            `attributes ${SemanticAttribute.HTTP_STATUS_TEXT} is wrong`
           );
           assert.strictEqual(
             attributes[keys[5]],
             parseUrl(url).host,
-            `attributes ${HttpAttribute.HTTP_HOST} is wrong`
+            `attributes ${SemanticAttribute.HTTP_HOST} is wrong`
           );
           assert.ok(
             attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
-            `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
+            `attributes ${SemanticAttribute.HTTP_SCHEME} is wrong`
           );
           assert.ok(
             attributes[keys[7]] !== '',
-            `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
+            `attributes ${SemanticAttribute.HTTP_USER_AGENT} is not defined`
           );
 
           assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
@@ -681,7 +681,7 @@ describe('xhr', () => {
             assert.strictEqual(
               attributes[keys[1]],
               secondUrl,
-              `attribute ${HttpAttribute.HTTP_URL} is wrong`
+              `attribute ${SemanticAttribute.HTTP_URL} is wrong`
             );
           });
         });
@@ -777,40 +777,40 @@ describe('xhr', () => {
             assert.strictEqual(
               attributes[keys[0]],
               'GET',
-              `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
+              `attributes ${SemanticAttribute.HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
               attributes[keys[1]],
               url,
-              `attributes ${HttpAttribute.HTTP_URL} is wrong`
+              `attributes ${SemanticAttribute.HTTP_URL} is wrong`
             );
             assert.strictEqual(
               attributes[keys[2]],
               0,
-              `attributes ${HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH} is wrong`
+              `attributes ${SemanticAttribute.HTTP_REQUEST_CONTENT_LENGTH} is wrong`
             );
             assert.strictEqual(
               attributes[keys[3]],
               400,
-              `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
+              `attributes ${SemanticAttribute.HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
               attributes[keys[4]],
               'Bad Request',
-              `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
+              `attributes ${SemanticAttribute.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
               attributes[keys[5]],
               'raw.githubusercontent.com',
-              `attributes ${HttpAttribute.HTTP_HOST} is wrong`
+              `attributes ${SemanticAttribute.HTTP_HOST} is wrong`
             );
             assert.ok(
               attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
-              `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
+              `attributes ${SemanticAttribute.HTTP_SCHEME} is wrong`
             );
             assert.ok(
               attributes[keys[7]] !== '',
-              `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
+              `attributes ${SemanticAttribute.HTTP_USER_AGENT} is not defined`
             );
 
             assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
@@ -912,35 +912,35 @@ describe('xhr', () => {
             assert.strictEqual(
               attributes[keys[0]],
               'GET',
-              `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
+              `attributes ${SemanticAttribute.HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
               attributes[keys[1]],
               url,
-              `attributes ${HttpAttribute.HTTP_URL} is wrong`
+              `attributes ${SemanticAttribute.HTTP_URL} is wrong`
             );
             assert.strictEqual(
               attributes[keys[2]],
               0,
-              `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
+              `attributes ${SemanticAttribute.HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
               attributes[keys[3]],
               '',
-              `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
+              `attributes ${SemanticAttribute.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
               attributes[keys[4]],
               'raw.githubusercontent.com',
-              `attributes ${HttpAttribute.HTTP_HOST} is wrong`
+              `attributes ${SemanticAttribute.HTTP_HOST} is wrong`
             );
             assert.ok(
               attributes[keys[5]] === 'http' || attributes[keys[5]] === 'https',
-              `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
+              `attributes ${SemanticAttribute.HTTP_SCHEME} is wrong`
             );
             assert.ok(
               attributes[keys[6]] !== '',
-              `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
+              `attributes ${SemanticAttribute.HTTP_USER_AGENT} is not defined`
             );
 
             assert.strictEqual(keys.length, 7, 'number of attributes is wrong');
@@ -1004,35 +1004,35 @@ describe('xhr', () => {
             assert.strictEqual(
               attributes[keys[0]],
               'GET',
-              `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
+              `attributes ${SemanticAttribute.HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
               attributes[keys[1]],
               url,
-              `attributes ${HttpAttribute.HTTP_URL} is wrong`
+              `attributes ${SemanticAttribute.HTTP_URL} is wrong`
             );
             assert.strictEqual(
               attributes[keys[2]],
               0,
-              `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
+              `attributes ${SemanticAttribute.HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
               attributes[keys[3]],
               '',
-              `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
+              `attributes ${SemanticAttribute.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
               attributes[keys[4]],
               'raw.githubusercontent.com',
-              `attributes ${HttpAttribute.HTTP_HOST} is wrong`
+              `attributes ${SemanticAttribute.HTTP_HOST} is wrong`
             );
             assert.ok(
               attributes[keys[5]] === 'http' || attributes[keys[5]] === 'https',
-              `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
+              `attributes ${SemanticAttribute.HTTP_SCHEME} is wrong`
             );
             assert.ok(
               attributes[keys[6]] !== '',
-              `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
+              `attributes ${SemanticAttribute.HTTP_USER_AGENT} is not defined`
             );
 
             assert.strictEqual(keys.length, 7, 'number of attributes is wrong');
@@ -1098,35 +1098,35 @@ describe('xhr', () => {
             assert.strictEqual(
               attributes[keys[0]],
               'GET',
-              `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
+              `attributes ${SemanticAttribute.HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
               attributes[keys[1]],
               url,
-              `attributes ${HttpAttribute.HTTP_URL} is wrong`
+              `attributes ${SemanticAttribute.HTTP_URL} is wrong`
             );
             assert.strictEqual(
               attributes[keys[2]],
               0,
-              `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
+              `attributes ${SemanticAttribute.HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
               attributes[keys[3]],
               '',
-              `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
+              `attributes ${SemanticAttribute.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
               attributes[keys[4]],
               'raw.githubusercontent.com',
-              `attributes ${HttpAttribute.HTTP_HOST} is wrong`
+              `attributes ${SemanticAttribute.HTTP_HOST} is wrong`
             );
             assert.ok(
               attributes[keys[5]] === 'http' || attributes[keys[5]] === 'https',
-              `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
+              `attributes ${SemanticAttribute.HTTP_SCHEME} is wrong`
             );
             assert.ok(
               attributes[keys[6]] !== '',
-              `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
+              `attributes ${SemanticAttribute.HTTP_USER_AGENT} is not defined`
             );
 
             assert.strictEqual(keys.length, 7, 'number of attributes is wrong');

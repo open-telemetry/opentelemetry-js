@@ -21,7 +21,7 @@ import {
   InstrumentationConfig,
 } from '@opentelemetry/instrumentation';
 import { hrTime, isUrlIgnored, otperformance } from '@opentelemetry/core';
-import { HttpAttribute } from '@opentelemetry/semantic-conventions';
+import { SemanticAttribute } from '@opentelemetry/semantic-conventions';
 import {
   addSpanNetworkEvents,
   getResource,
@@ -145,20 +145,23 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     if (typeof spanUrl === 'string') {
       const parsedUrl = parseUrl(spanUrl);
       if (xhrMem.status !== undefined) {
-        span.setAttribute(HttpAttribute.HTTP_STATUS_CODE, xhrMem.status);
+        span.setAttribute(SemanticAttribute.HTTP_STATUS_CODE, xhrMem.status);
       }
       if (xhrMem.statusText !== undefined) {
-        span.setAttribute(HttpAttribute.HTTP_STATUS_TEXT, xhrMem.statusText);
+        span.setAttribute(
+          SemanticAttribute.HTTP_STATUS_TEXT,
+          xhrMem.statusText
+        );
       }
-      span.setAttribute(HttpAttribute.HTTP_HOST, parsedUrl.host);
+      span.setAttribute(SemanticAttribute.HTTP_HOST, parsedUrl.host);
       span.setAttribute(
-        HttpAttribute.HTTP_SCHEME,
+        SemanticAttribute.HTTP_SCHEME,
         parsedUrl.protocol.replace(':', '')
       );
 
       // @TODO do we want to collect this or it will be collected earlier once only or
       //    maybe when parent span is not available ?
-      span.setAttribute(HttpAttribute.HTTP_USER_AGENT, navigator.userAgent);
+      span.setAttribute(SemanticAttribute.HTTP_USER_AGENT, navigator.userAgent);
     }
   }
 
@@ -300,8 +303,8 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     const currentSpan = this.tracer.startSpan(spanName, {
       kind: api.SpanKind.CLIENT,
       attributes: {
-        [HttpAttribute.HTTP_METHOD]: method,
-        [HttpAttribute.HTTP_URL]: url,
+        [SemanticAttribute.HTTP_METHOD]: method,
+        [SemanticAttribute.HTTP_URL]: url,
       },
     });
 

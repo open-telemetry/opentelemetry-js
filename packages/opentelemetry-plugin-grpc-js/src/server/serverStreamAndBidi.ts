@@ -15,7 +15,7 @@
  */
 
 import { context, Span, SpanStatusCode } from '@opentelemetry/api';
-import { RpcAttribute } from '@opentelemetry/semantic-conventions';
+import { SemanticAttribute } from '@opentelemetry/semantic-conventions';
 import type * as grpcJs from '@grpc/grpc-js';
 import type { GrpcJsPlugin } from '../grpcJs';
 import { GrpcEmitter } from '../types';
@@ -58,7 +58,7 @@ export function serverStreamAndBidiHandler<RequestType, ResponseType>(
       code: SpanStatusCode.OK,
     });
     span.setAttribute(
-      RpcAttribute.GRPC_STATUS_CODE,
+      SemanticAttribute.GRPC_STATUS_CODE,
       SpanStatusCode.OK.toString()
     );
 
@@ -78,8 +78,8 @@ export function serverStreamAndBidiHandler<RequestType, ResponseType>(
       message: err.message,
     });
     span.setAttributes({
-      [RpcAttribute.GRPC_ERROR_NAME]: err.name,
-      [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
+      [SemanticAttribute.GRPC_ERROR_NAME]: err.name,
+      [SemanticAttribute.GRPC_ERROR_MESSAGE]: err.message,
     });
     endSpan();
   });

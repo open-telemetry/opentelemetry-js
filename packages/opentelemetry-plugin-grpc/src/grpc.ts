@@ -26,7 +26,7 @@ import {
   setSpan,
   diag,
 } from '@opentelemetry/api';
-import { RpcAttribute } from '@opentelemetry/semantic-conventions';
+import { SemanticAttribute } from '@opentelemetry/semantic-conventions';
 import { BasePlugin } from '@opentelemetry/core';
 import * as events from 'events';
 import * as grpcTypes from 'grpc';
@@ -182,7 +182,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
                   const span = plugin._tracer
                     .startSpan(spanName, spanOptions)
                     .setAttributes({
-                      [RpcAttribute.GRPC_KIND]: spanOptions.kind,
+                      [SemanticAttribute.GRPC_KIND]: spanOptions.kind,
                     });
 
                   context.with(setSpan(context.active(), span), () => {
@@ -257,16 +257,19 @@ export class GrpcPlugin extends BasePlugin<grpc> {
             code: _grpcStatusCodeToOpenTelemetryStatusCode(err.code),
             message: err.message,
           });
-          span.setAttribute(RpcAttribute.GRPC_STATUS_CODE, err.code.toString());
+          span.setAttribute(
+            SemanticAttribute.GRPC_STATUS_CODE,
+            err.code.toString()
+          );
         }
         span.setAttributes({
-          [RpcAttribute.GRPC_ERROR_NAME]: err.name,
-          [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
+          [SemanticAttribute.GRPC_ERROR_NAME]: err.name,
+          [SemanticAttribute.GRPC_ERROR_MESSAGE]: err.message,
         });
       } else {
         span.setStatus({ code: SpanStatusCode.OK });
         span.setAttribute(
-          RpcAttribute.GRPC_STATUS_CODE,
+          SemanticAttribute.GRPC_STATUS_CODE,
           plugin._moduleExports.status.OK.toString()
         );
       }
@@ -300,7 +303,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     call.on('finish', () => {
       span.setStatus(_grpcStatusCodeToSpanStatus(call.status.code));
       span.setAttribute(
-        RpcAttribute.GRPC_STATUS_CODE,
+        SemanticAttribute.GRPC_STATUS_CODE,
         call.status.code.toString()
       );
 
@@ -318,8 +321,8 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       });
       span.addEvent('finished with error');
       span.setAttributes({
-        [RpcAttribute.GRPC_ERROR_NAME]: err.name,
-        [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
+        [SemanticAttribute.GRPC_ERROR_NAME]: err.name,
+        [SemanticAttribute.GRPC_ERROR_MESSAGE]: err.message,
       });
       endSpan();
     });
@@ -420,18 +423,18 @@ export class GrpcPlugin extends BasePlugin<grpc> {
           if (err.code) {
             span.setStatus(_grpcStatusCodeToSpanStatus(err.code));
             span.setAttribute(
-              RpcAttribute.GRPC_STATUS_CODE,
+              SemanticAttribute.GRPC_STATUS_CODE,
               err.code.toString()
             );
           }
           span.setAttributes({
-            [RpcAttribute.GRPC_ERROR_NAME]: err.name,
-            [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
+            [SemanticAttribute.GRPC_ERROR_NAME]: err.name,
+            [SemanticAttribute.GRPC_ERROR_MESSAGE]: err.message,
           });
         } else {
           span.setStatus({ code: SpanStatusCode.OK });
           span.setAttribute(
-            RpcAttribute.GRPC_STATUS_CODE,
+            SemanticAttribute.GRPC_STATUS_CODE,
             plugin._moduleExports.status.OK.toString()
           );
         }
@@ -463,8 +466,8 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
       span.addEvent('sent');
       span.setAttributes({
-        [RpcAttribute.GRPC_METHOD]: original.path,
-        [RpcAttribute.GRPC_KIND]: SpanKind.CLIENT,
+        [SemanticAttribute.GRPC_METHOD]: original.path,
+        [SemanticAttribute.GRPC_KIND]: SpanKind.CLIENT,
       });
 
       this._setSpanContext(metadata);
@@ -490,8 +493,8 @@ export class GrpcPlugin extends BasePlugin<grpc> {
               message: err.message,
             });
             span.setAttributes({
-              [RpcAttribute.GRPC_ERROR_NAME]: err.name,
-              [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
+              [SemanticAttribute.GRPC_ERROR_NAME]: err.name,
+              [SemanticAttribute.GRPC_ERROR_MESSAGE]: err.message,
             });
             endSpan();
           }
@@ -502,7 +505,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
           (status: SpanStatus) => {
             span.setStatus({ code: SpanStatusCode.OK });
             span.setAttribute(
-              RpcAttribute.GRPC_STATUS_CODE,
+              SemanticAttribute.GRPC_STATUS_CODE,
               status.code.toString()
             );
             endSpan();

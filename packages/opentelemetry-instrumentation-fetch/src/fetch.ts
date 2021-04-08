@@ -23,7 +23,7 @@ import {
 import * as core from '@opentelemetry/core';
 import * as web from '@opentelemetry/web';
 import { AttributeNames } from './enums/AttributeNames';
-import { HttpAttribute } from '@opentelemetry/semantic-conventions';
+import { SemanticAttribute } from '@opentelemetry/semantic-conventions';
 import { FetchError, FetchResponse, SpanData } from './types';
 import { VERSION } from './version';
 
@@ -121,16 +121,19 @@ export class FetchInstrumentation extends InstrumentationBase<
     response: FetchResponse
   ): void {
     const parsedUrl = web.parseUrl(response.url);
-    span.setAttribute(HttpAttribute.HTTP_STATUS_CODE, response.status);
+    span.setAttribute(SemanticAttribute.HTTP_STATUS_CODE, response.status);
     if (response.statusText != null) {
-      span.setAttribute(HttpAttribute.HTTP_STATUS_TEXT, response.statusText);
+      span.setAttribute(
+        SemanticAttribute.HTTP_STATUS_TEXT,
+        response.statusText
+      );
     }
-    span.setAttribute(HttpAttribute.HTTP_HOST, parsedUrl.host);
+    span.setAttribute(SemanticAttribute.HTTP_HOST, parsedUrl.host);
     span.setAttribute(
-      HttpAttribute.HTTP_SCHEME,
+      SemanticAttribute.HTTP_SCHEME,
       parsedUrl.protocol.replace(':', '')
     );
-    span.setAttribute(HttpAttribute.HTTP_USER_AGENT, navigator.userAgent);
+    span.setAttribute(SemanticAttribute.HTTP_USER_AGENT, navigator.userAgent);
   }
 
   /**
@@ -191,8 +194,8 @@ export class FetchInstrumentation extends InstrumentationBase<
       kind: api.SpanKind.CLIENT,
       attributes: {
         [AttributeNames.COMPONENT]: this.moduleName,
-        [HttpAttribute.HTTP_METHOD]: method,
-        [HttpAttribute.HTTP_URL]: url,
+        [SemanticAttribute.HTTP_METHOD]: method,
+        [SemanticAttribute.HTTP_URL]: url,
       },
     });
   }

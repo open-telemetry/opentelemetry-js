@@ -29,7 +29,7 @@ import {
   GrpcClientFunc,
 } from './types';
 import { GrpcInstrumentationConfig } from '../types';
-import { RpcAttribute } from '@opentelemetry/semantic-conventions';
+import { SemanticAttribute } from '@opentelemetry/semantic-conventions';
 import {
   context,
   propagation,
@@ -205,7 +205,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
                   const span = instrumentation.tracer
                     .startSpan(spanName, spanOptions)
                     .setAttributes({
-                      [RpcAttribute.GRPC_KIND]: spanOptions.kind,
+                      [SemanticAttribute.GRPC_KIND]: spanOptions.kind,
                     });
 
                   context.with(setSpan(context.active(), span), () => {

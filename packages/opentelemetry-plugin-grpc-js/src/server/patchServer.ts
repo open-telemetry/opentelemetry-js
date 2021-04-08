@@ -33,7 +33,7 @@ import {
   setSpan,
   diag,
 } from '@opentelemetry/api';
-import { RpcAttribute } from '@opentelemetry/semantic-conventions';
+import { SemanticAttribute } from '@opentelemetry/semantic-conventions';
 import { clientStreamAndUnaryHandler } from './clientStreamAndUnary';
 import { serverStreamAndBidiHandler } from './serverStreamAndBidi';
 import { methodIsIgnored } from '../utils';
@@ -112,7 +112,7 @@ export function patchServer(
                 const span = plugin.tracer
                   .startSpan(spanName, spanOptions)
                   .setAttributes({
-                    [RpcAttribute.GRPC_KIND]: spanOptions.kind,
+                    [SemanticAttribute.GRPC_KIND]: spanOptions.kind,
                   });
 
                 context.with(setSpan(context.active(), span), () => {

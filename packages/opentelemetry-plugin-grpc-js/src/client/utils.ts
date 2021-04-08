@@ -26,7 +26,7 @@ import {
   setSpan,
   diag,
 } from '@opentelemetry/api';
-import { RpcAttribute } from '@opentelemetry/semantic-conventions';
+import { SemanticAttribute } from '@opentelemetry/semantic-conventions';
 import type * as grpcJs from '@grpc/grpc-js';
 import {
   grpcStatusCodeToSpanStatus,
@@ -114,16 +114,19 @@ export function makeGrpcClientRemoteCall(
       if (err) {
         if (err.code) {
           span.setStatus(grpcStatusCodeToSpanStatus(err.code));
-          span.setAttribute(RpcAttribute.GRPC_STATUS_CODE, err.code.toString());
+          span.setAttribute(
+            SemanticAttribute.GRPC_STATUS_CODE,
+            err.code.toString()
+          );
         }
         span.setAttributes({
-          [RpcAttribute.GRPC_ERROR_NAME]: err.name,
-          [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
+          [SemanticAttribute.GRPC_ERROR_NAME]: err.name,
+          [SemanticAttribute.GRPC_ERROR_MESSAGE]: err.message,
         });
       } else {
         span.setStatus({ code: SpanStatusCode.OK });
         span.setAttribute(
-          RpcAttribute.GRPC_STATUS_CODE,
+          SemanticAttribute.GRPC_STATUS_CODE,
           SpanStatusCode.OK.toString()
         );
       }
@@ -149,8 +152,8 @@ export function makeGrpcClientRemoteCall(
     }
 
     span.setAttributes({
-      [RpcAttribute.GRPC_METHOD]: original.path,
-      [RpcAttribute.GRPC_KIND]: SpanKind.CLIENT,
+      [SemanticAttribute.GRPC_METHOD]: original.path,
+      [SemanticAttribute.GRPC_KIND]: SpanKind.CLIENT,
     });
 
     setSpanContext(metadata);
@@ -179,8 +182,8 @@ export function makeGrpcClientRemoteCall(
           message: err.message,
         });
         span.setAttributes({
-          [RpcAttribute.GRPC_ERROR_NAME]: err.name,
-          [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
+          [SemanticAttribute.GRPC_ERROR_NAME]: err.name,
+          [SemanticAttribute.GRPC_ERROR_MESSAGE]: err.message,
         });
 
         endSpan();

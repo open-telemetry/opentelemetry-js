@@ -21,7 +21,7 @@ import {
   TraceFlags,
 } from '@opentelemetry/api';
 import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
-import { HttpAttribute } from '@opentelemetry/semantic-conventions';
+import { SemanticAttribute } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as http from 'http';
 import { IncomingMessage, ServerResponse } from 'http';
@@ -257,10 +257,10 @@ describe('Utility', () => {
         utils.setSpanWithError(span, new Error(errorMessage), obj as any);
         const attributes = span.attributes;
         assert.strictEqual(
-          attributes[HttpAttribute.HTTP_ERROR_MESSAGE],
+          attributes[SemanticAttribute.HTTP_ERROR_MESSAGE],
           errorMessage
         );
-        assert.ok(attributes[HttpAttribute.HTTP_ERROR_NAME]);
+        assert.ok(attributes[SemanticAttribute.HTTP_ERROR_NAME]);
       }
     });
   });
@@ -293,7 +293,7 @@ describe('Utility', () => {
         request,
         response
       );
-      assert.deepEqual(attributes[HttpAttribute.HTTP_ROUTE], '/test/toto');
+      assert.deepEqual(attributes[SemanticAttribute.HTTP_ROUTE], '/test/toto');
     });
 
     it('should succesfully process without middleware stack', () => {
@@ -303,7 +303,7 @@ describe('Utility', () => {
         request,
         response
       );
-      assert.deepEqual(attributes[HttpAttribute.HTTP_ROUTE], undefined);
+      assert.deepEqual(attributes[SemanticAttribute.HTTP_ROUTE], undefined);
     });
   });
 
@@ -314,14 +314,14 @@ describe('Utility', () => {
     key: string | undefined,
     value: number
   ) {
-    const httpAttributes = [
-      HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
-      HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH,
-      HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
-      HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH,
+    const SemanticAttributes = [
+      SemanticAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+      SemanticAttribute.HTTP_RESPONSE_CONTENT_LENGTH,
+      SemanticAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+      SemanticAttribute.HTTP_REQUEST_CONTENT_LENGTH,
     ];
 
-    for (const attr of httpAttributes) {
+    for (const attr of SemanticAttributes) {
       if (attr === key) {
         assert.strictEqual(attributes[attr], value);
       } else {
@@ -342,7 +342,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+        SemanticAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
         1200
       );
     });
@@ -358,7 +358,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
+        SemanticAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED,
         1200
       );
     });
@@ -374,7 +374,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH,
+        SemanticAttribute.HTTP_REQUEST_CONTENT_LENGTH,
         1200
       );
     });
@@ -393,7 +393,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+        SemanticAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
         1200
       );
     });
@@ -412,7 +412,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+        SemanticAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
         1200
       );
     });
@@ -431,7 +431,7 @@ describe('Utility', () => {
 
       verifyValueInAttributes(
         attributes,
-        HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH,
+        SemanticAttribute.HTTP_RESPONSE_CONTENT_LENGTH,
         1200
       );
     });

@@ -28,8 +28,8 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
 import {
-  HttpAttribute,
-  GeneralAttribute,
+  NetTransportValues,
+  SemanticAttribute,
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as http from 'http';
@@ -174,11 +174,11 @@ describe('HttpPlugin', () => {
         assertSpan(incomingSpan, SpanKind.SERVER, validations);
         assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
         assert.strictEqual(
-          incomingSpan.attributes[GeneralAttribute.NET_HOST_PORT],
+          incomingSpan.attributes[SemanticAttribute.NET_HOST_PORT],
           serverPort
         );
         assert.strictEqual(
-          outgoingSpan.attributes[GeneralAttribute.NET_PEER_PORT],
+          outgoingSpan.attributes[SemanticAttribute.NET_PEER_PORT],
           serverPort
         );
       });
@@ -258,25 +258,28 @@ describe('HttpPlugin', () => {
 
         assert.strictEqual(spans.length, 2);
         assert.strictEqual(
-          incomingSpan.attributes[HttpAttribute.HTTP_CLIENT_IP],
+          incomingSpan.attributes[SemanticAttribute.HTTP_CLIENT_IP],
           '<client>'
         );
         assert.strictEqual(
-          incomingSpan.attributes[GeneralAttribute.NET_HOST_PORT],
+          incomingSpan.attributes[SemanticAttribute.NET_HOST_PORT],
           serverPort
         );
         assert.strictEqual(
-          outgoingSpan.attributes[GeneralAttribute.NET_PEER_PORT],
+          outgoingSpan.attributes[SemanticAttribute.NET_PEER_PORT],
           serverPort
         );
         [
           { span: incomingSpan, kind: SpanKind.SERVER },
           { span: outgoingSpan, kind: SpanKind.CLIENT },
         ].forEach(({ span, kind }) => {
-          assert.strictEqual(span.attributes[HttpAttribute.HTTP_FLAVOR], '1.1');
           assert.strictEqual(
-            span.attributes[GeneralAttribute.NET_TRANSPORT],
-            GeneralAttribute.IP_TCP
+            span.attributes[SemanticAttribute.HTTP_FLAVOR],
+            '1.1'
+          );
+          assert.strictEqual(
+            span.attributes[SemanticAttribute.NET_TRANSPORT],
+            NetTransportValues.IP_TCP
           );
           assertSpan(span, kind, validations);
         });
@@ -667,7 +670,7 @@ describe('HttpPlugin', () => {
             assert.strictEqual(spans.length, 1);
             assert.ok(Object.keys(span.attributes).length > 6);
             assert.strictEqual(
-              span.attributes[HttpAttribute.HTTP_STATUS_CODE],
+              span.attributes[SemanticAttribute.HTTP_STATUS_CODE],
               404
             );
             assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
