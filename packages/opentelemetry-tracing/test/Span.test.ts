@@ -732,7 +732,9 @@ describe('Span', () => {
         assert.strictEqual(span.events.length, 0);
         span.recordException({ code: 12 });
         const event = span.events[0];
-        assert.strictEqual(event.attributes[ExceptionAttribute.TYPE], '12');
+        assert.deepStrictEqual(event.attributes, {
+          [ExceptionAttribute.TYPE]: '12',
+        });
       });
     });
   });
