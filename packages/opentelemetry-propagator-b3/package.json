@@ -38,10 +38,11 @@
   "publishConfig": {
     "access": "public"
   },
-  "dependencies": {
+  "peerDependencies": {
     "@opentelemetry/api": "^1.0.0-rc.0"
   },
   "devDependencies": {
+    "@opentelemetry/api": "^1.0.0-rc.0",
     "@types/mocha": "8.2.2",
     "@types/node": "14.14.37",
     "codecov": "3.8.1",
