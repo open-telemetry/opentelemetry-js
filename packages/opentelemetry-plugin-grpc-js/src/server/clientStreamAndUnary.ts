@@ -20,6 +20,7 @@ import { grpcStatusCodeToOpenTelemetryStatusCode } from '../utils';
 import type { GrpcJsPlugin } from '../grpcJs';
 import type * as grpcJs from '@grpc/grpc-js';
 import { AttributeNames } from '../enums';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 /**
  * Handle patching for clientStream and unary type server handlers
@@ -43,7 +44,10 @@ export function clientStreamAndUnaryHandler<RequestType, ResponseType>(
           code: grpcStatusCodeToOpenTelemetryStatusCode(err.code),
           message: err.message,
         });
-        span.setAttribute(AttributeNames.GRPC_STATUS_CODE, err.code.toString());
+        span.setAttribute(
+          SemanticAttributes.RPC_GRPC_STATUS_CODE,
+          err.code.toString()
+        );
       }
       span.setAttributes({
         [AttributeNames.GRPC_ERROR_NAME]: err.name,
@@ -52,7 +56,7 @@ export function clientStreamAndUnaryHandler<RequestType, ResponseType>(
     } else {
       span.setStatus({ code: SpanStatusCode.OK });
       span.setAttribute(
-        AttributeNames.GRPC_STATUS_CODE,
+        SemanticAttributes.RPC_GRPC_STATUS_CODE,
         SpanStatusCode.OK.toString()
       );
     }

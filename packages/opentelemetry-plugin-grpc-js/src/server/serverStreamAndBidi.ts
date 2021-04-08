@@ -23,6 +23,7 @@ import {
   grpcStatusCodeToOpenTelemetryStatusCode,
 } from '../utils';
 import { AttributeNames } from '../enums';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 /**
  * Handle patching for serverStream and Bidi type server handlers
@@ -58,7 +59,7 @@ export function serverStreamAndBidiHandler<RequestType, ResponseType>(
       code: SpanStatusCode.OK,
     });
     span.setAttribute(
-      AttributeNames.GRPC_STATUS_CODE,
+      SemanticAttributes.RPC_GRPC_STATUS_CODE,
       SpanStatusCode.OK.toString()
     );
 

@@ -34,6 +34,7 @@ import {
 } from '../utils';
 import { IgnoreMatcher } from '../types';
 import { AttributeNames } from '../enums';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 export const CALL_SPAN_ENDED = Symbol('opentelemetry call span ended');
 
@@ -70,7 +71,7 @@ function serverStreamAndBidiHandler<RequestType, ResponseType>(
       code: SpanStatusCode.UNSET,
     });
     span.setAttribute(
-      AttributeNames.GRPC_STATUS_CODE,
+      SemanticAttributes.RPC_GRPC_STATUS_CODE,
       SpanStatusCode.OK.toString()
     );
 
@@ -121,7 +122,10 @@ function clientStreamAndUnaryHandler<RequestType, ResponseType>(
           code: _grpcStatusCodeToOpenTelemetryStatusCode(err.code),
           message: err.message,
         });
-        span.setAttribute(AttributeNames.GRPC_STATUS_CODE, err.code.toString());
+        span.setAttribute(
+          SemanticAttributes.RPC_GRPC_STATUS_CODE,
+          err.code.toString()
+        );
       }
       span.setAttributes({
         [AttributeNames.GRPC_ERROR_NAME]: err.name,
@@ -130,7 +134,7 @@ function clientStreamAndUnaryHandler<RequestType, ResponseType>(
     } else {
       span.setStatus({ code: SpanStatusCode.UNSET });
       span.setAttribute(
-        AttributeNames.GRPC_STATUS_CODE,
+        SemanticAttributes.RPC_GRPC_STATUS_CODE,
         SpanStatusCode.OK.toString()
       );
     }

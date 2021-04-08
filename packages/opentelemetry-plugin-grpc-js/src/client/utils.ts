@@ -35,6 +35,7 @@ import {
 } from '../utils';
 import { EventEmitter } from 'events';
 import { AttributeNames } from '../enums';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 /**
  * Parse a package method list and return a list of methods to patch
@@ -115,7 +116,7 @@ export function makeGrpcClientRemoteCall(
         if (err.code) {
           span.setStatus(grpcStatusCodeToSpanStatus(err.code));
           span.setAttribute(
-            AttributeNames.GRPC_STATUS_CODE,
+            SemanticAttributes.RPC_GRPC_STATUS_CODE,
             err.code.toString()
           );
         }
@@ -126,7 +127,7 @@ export function makeGrpcClientRemoteCall(
       } else {
         span.setStatus({ code: SpanStatusCode.OK });
         span.setAttribute(
-          AttributeNames.GRPC_STATUS_CODE,
+          SemanticAttributes.RPC_GRPC_STATUS_CODE,
           SpanStatusCode.OK.toString()
         );
       }

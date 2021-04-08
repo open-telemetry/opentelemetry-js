@@ -48,6 +48,7 @@ import {
 } from './utils';
 import { VERSION } from './version';
 import { AttributeNames } from './enums';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 /** The metadata key under which span context is stored as a binary value. */
 export const GRPC_TRACE_KEY = 'grpc-trace-bin';
@@ -258,7 +259,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
             message: err.message,
           });
           span.setAttribute(
-            AttributeNames.GRPC_STATUS_CODE,
+            SemanticAttributes.RPC_GRPC_STATUS_CODE,
             err.code.toString()
           );
         }
@@ -269,7 +270,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       } else {
         span.setStatus({ code: SpanStatusCode.OK });
         span.setAttribute(
-          AttributeNames.GRPC_STATUS_CODE,
+          SemanticAttributes.RPC_GRPC_STATUS_CODE,
           plugin._moduleExports.status.OK.toString()
         );
       }
@@ -303,7 +304,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     call.on('finish', () => {
       span.setStatus(_grpcStatusCodeToSpanStatus(call.status.code));
       span.setAttribute(
-        AttributeNames.GRPC_STATUS_CODE,
+        SemanticAttributes.RPC_GRPC_STATUS_CODE,
         call.status.code.toString()
       );
 
@@ -423,7 +424,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
           if (err.code) {
             span.setStatus(_grpcStatusCodeToSpanStatus(err.code));
             span.setAttribute(
-              AttributeNames.GRPC_STATUS_CODE,
+              SemanticAttributes.RPC_GRPC_STATUS_CODE,
               err.code.toString()
             );
           }
@@ -434,7 +435,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         } else {
           span.setStatus({ code: SpanStatusCode.OK });
           span.setAttribute(
-            AttributeNames.GRPC_STATUS_CODE,
+            SemanticAttributes.RPC_GRPC_STATUS_CODE,
             plugin._moduleExports.status.OK.toString()
           );
         }
@@ -505,7 +506,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
           (status: SpanStatus) => {
             span.setStatus({ code: SpanStatusCode.OK });
             span.setAttribute(
-              AttributeNames.GRPC_STATUS_CODE,
+              SemanticAttributes.RPC_GRPC_STATUS_CODE,
               status.code.toString()
             );
             endSpan();
