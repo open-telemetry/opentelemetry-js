@@ -378,10 +378,11 @@ export class FetchInstrumentation extends InstrumentationBase<
     request: Request | RequestInit,
     result: Response | FetchError
   ) {
-    if (this._getConfig().applyCustomAttributesOnSpan) {
+    const applyCustomAttributesOnSpan = this._getConfig()
+      .applyCustomAttributesOnSpan;
+    if (applyCustomAttributesOnSpan) {
       safeExecuteInTheMiddle(
-        () =>
-          this._getConfig().applyCustomAttributesOnSpan!(span, request, result),
+        () => applyCustomAttributesOnSpan(span, request, result),
         () => {},
         true
       );

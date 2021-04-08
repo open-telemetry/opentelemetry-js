@@ -57,8 +57,10 @@ const getData = (url: string, method?: string) =>
     },
   });
 
+const CUSTOM_ATTRIBUTE_KEY = 'span kind';
+
 const customAttributeFunction = (span: api.Span): void => {
-  span.setAttribute('span kind', api.SpanKind.CLIENT);
+  span.setAttribute(CUSTOM_ATTRIBUTE_KEY, api.SpanKind.CLIENT);
 };
 
 const defaultResource = {
@@ -375,7 +377,19 @@ describe('fetch', () => {
         `attributes ${SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
       );
 
-      assert.strictEqual(attributes['span kind'], api.SpanKind.CLIENT);
+      delete attributes[HttpAttribute.HTTP_USER_AGENT];
+      delete attributes[HttpAttribute.HTTP_HOST];
+
+      assert.deepStrictEqual(attributes, {
+        [AttributeNames.COMPONENT]: 'fetch',
+        [HttpAttribute.HTTP_METHOD]: 'GET',
+        [HttpAttribute.HTTP_URL]: url,
+        [HttpAttribute.HTTP_STATUS_CODE]: 200,
+        [HttpAttribute.HTTP_STATUS_TEXT]: 'OK',
+        [HttpAttribute.HTTP_SCHEME]: 'http',
+        [HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH]: 30,
+        [CUSTOM_ATTRIBUTE_KEY]: api.SpanKind.CLIENT,
+      });
 
       assert.strictEqual(keys.length, 10, 'number of attributes is wrong');
     });
@@ -647,7 +661,7 @@ describe('fetch', () => {
       const attributes = span.attributes;
 
       assert.strictEqual(
-        attributes['span kind'],
+        attributes[CUSTOM_ATTRIBUTE_KEY],
         api.SpanKind.CLIENT,
         'Custom attribute was not applied'
       );
