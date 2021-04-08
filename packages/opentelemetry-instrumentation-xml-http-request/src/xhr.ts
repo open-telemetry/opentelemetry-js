@@ -14,30 +14,30 @@
  * limitations under the License.
  */
 
-import * as api from "@opentelemetry/api";
+import * as api from '@opentelemetry/api';
 import {
   isWrapped,
   InstrumentationBase,
   InstrumentationConfig,
-} from "@opentelemetry/instrumentation";
-import { hrTime, isUrlIgnored, otperformance } from "@opentelemetry/core";
-import { SemanticAttributes } from "@opentelemetry/semantic-conventions";
+} from '@opentelemetry/instrumentation';
+import { hrTime, isUrlIgnored, otperformance } from '@opentelemetry/core';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import {
   addSpanNetworkEvents,
   getResource,
   parseUrl,
   PerformanceTimingNames as PTN,
   shouldPropagateTraceHeaders,
-} from "@opentelemetry/web";
-import { EventNames } from "./enums/EventNames";
+} from '@opentelemetry/web';
+import { EventNames } from './enums/EventNames';
 import {
   OpenFunction,
   PropagateTraceHeaderCorsUrls,
   SendFunction,
   XhrMem,
-} from "./types";
-import { VERSION } from "./version";
-import { AttributeNames } from "./enums/AttributeNames";
+} from './types';
+import { VERSION } from './version';
+import { AttributeNames } from './enums/AttributeNames';
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
@@ -70,7 +70,7 @@ export interface XMLHttpRequestInstrumentationConfig
  * This class represents a XMLHttpRequest plugin for auto instrumentation
  */
 export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRequest> {
-  readonly component: string = "xml-http-request";
+  readonly component: string = 'xml-http-request';
   readonly version: string = VERSION;
   moduleName = this.component;
 
@@ -82,7 +82,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     config: XMLHttpRequestInstrumentationConfig & InstrumentationConfig = {}
   ) {
     super(
-      "@opentelemetry/instrumentation-xml-http-request",
+      '@opentelemetry/instrumentation-xml-http-request',
       VERSION,
       Object.assign({}, config)
     );
@@ -111,7 +111,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     }
     const headers: { [key: string]: unknown } = {};
     api.propagation.inject(api.context.active(), headers);
-    Object.keys(headers).forEach((key) => {
+    Object.keys(headers).forEach(key => {
       xhr.setRequestHeader(key, String(headers[key]));
     });
   }
@@ -127,7 +127,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     corsPreFlightRequest: PerformanceResourceTiming
   ): void {
     api.context.with(api.setSpan(api.context.active(), span), () => {
-      const childSpan = this.tracer.startSpan("CORS Preflight", {
+      const childSpan = this.tracer.startSpan('CORS Preflight', {
         startTime: corsPreFlightRequest[PTN.FETCH_START],
       });
       addSpanNetworkEvents(childSpan, corsPreFlightRequest);
@@ -143,7 +143,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * @private
    */
   _addFinalSpanAttributes(span: api.Span, xhrMem: XhrMem, spanUrl?: string) {
-    if (typeof spanUrl === "string") {
+    if (typeof spanUrl === 'string') {
       const parsedUrl = parseUrl(spanUrl);
       if (xhrMem.status !== undefined) {
         span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, xhrMem.status);
@@ -154,7 +154,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       span.setAttribute(SemanticAttributes.HTTP_HOST, parsedUrl.host);
       span.setAttribute(
         SemanticAttributes.HTTP_SCHEME,
-        parsedUrl.protocol.replace(":", "")
+        parsedUrl.protocol.replace(':', '')
       );
 
       // @TODO do we want to collect this or it will be collected earlier once only or
@@ -177,17 +177,17 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     const xhrMem = this._xhrMem.get(xhr);
     if (
       !xhrMem ||
-      typeof window.PerformanceObserver === "undefined" ||
-      typeof window.PerformanceResourceTiming === "undefined"
+      typeof window.PerformanceObserver === 'undefined' ||
+      typeof window.PerformanceResourceTiming === 'undefined'
     ) {
       return;
     }
     xhrMem.createdResources = {
-      observer: new PerformanceObserver((list) => {
+      observer: new PerformanceObserver(list => {
         const entries = list.getEntries() as PerformanceResourceTiming[];
-        entries.forEach((entry) => {
+        entries.forEach(entry => {
           if (
-            entry.initiatorType === "xmlhttprequest" &&
+            entry.initiatorType === 'xmlhttprequest' &&
             entry.name === spanUrl
           ) {
             if (xhrMem.createdResources) {
@@ -199,7 +199,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       entries: [],
     };
     xhrMem.createdResources.observer.observe({
-      entryTypes: ["resource"],
+      entryTypes: ['resource'],
     });
   }
 
@@ -241,7 +241,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       // information
       // ts thinks this is the perf_hooks module, but it is the browser performance api
       resources = ((otperformance as unknown) as Performance).getEntriesByType(
-        "resource"
+        'resource'
       ) as PerformanceResourceTiming[];
     }
 
@@ -296,7 +296,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     method: string
   ): api.Span | undefined {
     if (isUrlIgnored(url, this._getConfig().ignoreUrls)) {
-      api.diag.debug("ignoring span as url matches ignored url");
+      api.diag.debug('ignoring span as url matches ignored url');
       return;
     }
     const spanName = `HTTP ${method.toUpperCase()}`;
@@ -363,7 +363,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     ) {
       const callbackToRemoveEvents = xhrMem.callbackToRemoveEvents;
 
-      if (typeof callbackToRemoveEvents === "function") {
+      if (typeof callbackToRemoveEvents === 'function') {
         callbackToRemoveEvents();
       }
 
@@ -424,10 +424,10 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     }
 
     function unregister(xhr: XMLHttpRequest) {
-      xhr.removeEventListener("abort", onAbort);
-      xhr.removeEventListener("error", onError);
-      xhr.removeEventListener("load", onLoad);
-      xhr.removeEventListener("timeout", onTimeout);
+      xhr.removeEventListener('abort', onAbort);
+      xhr.removeEventListener('error', onError);
+      xhr.removeEventListener('load', onLoad);
+      xhr.removeEventListener('timeout', onTimeout);
       const xhrMem = plugin._xhrMem.get(xhr);
       if (xhrMem) {
         xhrMem.callbackToRemoveEvents = undefined;
@@ -451,10 +451,10 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
               xhrMem.sendStartTime = hrTime();
               currentSpan.addEvent(EventNames.METHOD_SEND);
 
-              this.addEventListener("abort", onAbort);
-              this.addEventListener("error", onError);
-              this.addEventListener("load", onLoad);
-              this.addEventListener("timeout", onTimeout);
+              this.addEventListener('abort', onAbort);
+              this.addEventListener('error', onError);
+              this.addEventListener('load', onLoad);
+              this.addEventListener('timeout', onTimeout);
 
               xhrMem.callbackToRemoveEvents = () => {
                 unregister(this);
@@ -476,30 +476,30 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * implements enable function
    */
   enable() {
-    api.diag.debug("applying patch to", this.moduleName, this.version);
+    api.diag.debug('applying patch to', this.moduleName, this.version);
 
     if (isWrapped(XMLHttpRequest.prototype.open)) {
-      this._unwrap(XMLHttpRequest.prototype, "open");
-      api.diag.debug("removing previous patch from method open");
+      this._unwrap(XMLHttpRequest.prototype, 'open');
+      api.diag.debug('removing previous patch from method open');
     }
 
     if (isWrapped(XMLHttpRequest.prototype.send)) {
-      this._unwrap(XMLHttpRequest.prototype, "send");
-      api.diag.debug("removing previous patch from method send");
+      this._unwrap(XMLHttpRequest.prototype, 'send');
+      api.diag.debug('removing previous patch from method send');
     }
 
-    this._wrap(XMLHttpRequest.prototype, "open", this._patchOpen());
-    this._wrap(XMLHttpRequest.prototype, "send", this._patchSend());
+    this._wrap(XMLHttpRequest.prototype, 'open', this._patchOpen());
+    this._wrap(XMLHttpRequest.prototype, 'send', this._patchSend());
   }
 
   /**
    * implements disable function
    */
   disable() {
-    api.diag.debug("removing patch from", this.moduleName, this.version);
+    api.diag.debug('removing patch from', this.moduleName, this.version);
 
-    this._unwrap(XMLHttpRequest.prototype, "open");
-    this._unwrap(XMLHttpRequest.prototype, "send");
+    this._unwrap(XMLHttpRequest.prototype, 'open');
+    this._unwrap(XMLHttpRequest.prototype, 'send');
 
     this._tasksCount = 0;
     this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();

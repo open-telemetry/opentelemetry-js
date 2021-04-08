@@ -20,22 +20,22 @@
  * error event should be processed.
  */
 
-import { context, Span, SpanStatusCode } from "@opentelemetry/api";
-import type * as grpcJs from "@grpc/grpc-js";
+import { context, Span, SpanStatusCode } from '@opentelemetry/api';
+import type * as grpcJs from '@grpc/grpc-js';
 import type {
   ServerCallWithMeta,
   SendUnaryDataCallback,
   GrpcEmitter,
   HandleCall,
-} from "./types";
+} from './types';
 import {
   _grpcStatusCodeToOpenTelemetryStatusCode,
   _methodIsIgnored,
-} from "../utils";
-import { IgnoreMatcher } from "../types";
-import { AttributeNames } from "../enums";
+} from '../utils';
+import { IgnoreMatcher } from '../types';
+import { AttributeNames } from '../enums';
 
-export const CALL_SPAN_ENDED = Symbol("opentelemetry call span ended");
+export const CALL_SPAN_ENDED = Symbol('opentelemetry call span ended');
 
 /**
  * Handle patching for serverStream and Bidi type server handlers
@@ -56,7 +56,7 @@ function serverStreamAndBidiHandler<RequestType, ResponseType>(
   };
 
   context.bind(call);
-  call.on("finish", () => {
+  call.on('finish', () => {
     // @grpc/js does not expose a way to check if this call also emitted an error,
     // e.g. call.status.code !== 0
     if (call[CALL_SPAN_ENDED]) {
@@ -77,7 +77,7 @@ function serverStreamAndBidiHandler<RequestType, ResponseType>(
     endSpan();
   });
 
-  call.on("error", (err: grpcJs.ServiceError) => {
+  call.on('error', (err: grpcJs.ServiceError) => {
     if (call[CALL_SPAN_ENDED]) {
       return;
     }
@@ -155,9 +155,9 @@ export function handleServerFunction<RequestType, ResponseType>(
   callback: SendUnaryDataCallback<unknown>
 ): void {
   switch (type) {
-    case "unary":
-    case "clientStream":
-    case "client_stream":
+    case 'unary':
+    case 'clientStream':
+    case 'client_stream':
       return clientStreamAndUnaryHandler(
         span,
         call,
@@ -166,9 +166,9 @@ export function handleServerFunction<RequestType, ResponseType>(
           | grpcJs.handleUnaryCall<RequestType, ResponseType>
           | grpcJs.ClientReadableStream<RequestType>
       );
-    case "serverStream":
-    case "server_stream":
-    case "bidi":
+    case 'serverStream':
+    case 'server_stream':
+    case 'bidi':
       return serverStreamAndBidiHandler(
         span,
         call,
@@ -192,13 +192,13 @@ export function handleUntracedServerFunction<RequestType, ResponseType>(
   callback: SendUnaryDataCallback<unknown>
 ): void {
   switch (type) {
-    case "unary":
-    case "clientStream":
-    case "client_stream":
+    case 'unary':
+    case 'clientStream':
+    case 'client_stream':
       return (originalFunc as Function).call({}, call, callback);
-    case "serverStream":
-    case "server_stream":
-    case "bidi":
+    case 'serverStream':
+    case 'server_stream':
+    case 'bidi':
       return (originalFunc as Function).call({}, call);
     default:
       break;
@@ -213,7 +213,7 @@ export function shouldNotTraceServerCall(
   methodName: string,
   ignoreGrpcMethods?: IgnoreMatcher[]
 ): boolean {
-  const parsedName = methodName.split("/");
+  const parsedName = methodName.split('/');
   return _methodIsIgnored(
     parsedName[parsedName.length - 1] || methodName,
     ignoreGrpcMethods

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import { context, Span, SpanStatusCode } from "@opentelemetry/api";
-import type * as grpcJs from "@grpc/grpc-js";
-import type { GrpcJsPlugin } from "../grpcJs";
-import { GrpcEmitter } from "../types";
+import { context, Span, SpanStatusCode } from '@opentelemetry/api';
+import type * as grpcJs from '@grpc/grpc-js';
+import type { GrpcJsPlugin } from '../grpcJs';
+import { GrpcEmitter } from '../types';
 import {
   CALL_SPAN_ENDED,
   grpcStatusCodeToOpenTelemetryStatusCode,
-} from "../utils";
-import { AttributeNames } from "../enums";
+} from '../utils';
+import { AttributeNames } from '../enums';
 
 /**
  * Handle patching for serverStream and Bidi type server handlers
@@ -44,7 +44,7 @@ export function serverStreamAndBidiHandler<RequestType, ResponseType>(
   };
 
   context.bind(call);
-  call.on("finish", () => {
+  call.on('finish', () => {
     // @grpc/js does not expose a way to check if this call also emitted an error,
     // e.g. call.status.code !== 0
     if (call[CALL_SPAN_ENDED]) {
@@ -65,7 +65,7 @@ export function serverStreamAndBidiHandler<RequestType, ResponseType>(
     endSpan();
   });
 
-  call.on("error", (err: grpcJs.ServiceError) => {
+  call.on('error', (err: grpcJs.ServiceError) => {
     if (call[CALL_SPAN_ENDED]) {
       return;
     }

@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-import * as api from "@opentelemetry/api";
+import * as api from '@opentelemetry/api';
 import {
   isWrapped,
   InstrumentationBase,
   InstrumentationConfig,
-} from "@opentelemetry/instrumentation";
-import * as core from "@opentelemetry/core";
-import * as web from "@opentelemetry/web";
-import { AttributeNames } from "./enums/AttributeNames";
-import { SemanticAttributes } from "@opentelemetry/semantic-conventions";
-import { FetchError, FetchResponse, SpanData } from "./types";
-import { VERSION } from "./version";
+} from '@opentelemetry/instrumentation';
+import * as core from '@opentelemetry/core';
+import * as web from '@opentelemetry/web';
+import { AttributeNames } from './enums/AttributeNames';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import { FetchError, FetchResponse, SpanData } from './types';
+import { VERSION } from './version';
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
@@ -37,7 +37,7 @@ const OBSERVER_WAIT_TIME_MS = 300;
 let a: HTMLAnchorElement | undefined;
 const getUrlNormalizingAnchor = () => {
   if (!a) {
-    a = document.createElement("a");
+    a = document.createElement('a');
   }
 
   return a;
@@ -69,7 +69,7 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
 export class FetchInstrumentation extends InstrumentationBase<
   Promise<Response>
 > {
-  readonly component: string = "fetch";
+  readonly component: string = 'fetch';
   readonly version: string = VERSION;
   moduleName = this.component;
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
@@ -77,7 +77,7 @@ export class FetchInstrumentation extends InstrumentationBase<
 
   constructor(config: FetchInstrumentationConfig = {}) {
     super(
-      "@opentelemetry/instrumentation-fetch",
+      '@opentelemetry/instrumentation-fetch',
       VERSION,
       Object.assign({}, config)
     );
@@ -99,7 +99,7 @@ export class FetchInstrumentation extends InstrumentationBase<
     corsPreFlightRequest: PerformanceResourceTiming
   ): void {
     const childSpan = this.tracer.startSpan(
-      "CORS Preflight",
+      'CORS Preflight',
       {
         startTime: corsPreFlightRequest[web.PerformanceTimingNames.FETCH_START],
       },
@@ -128,7 +128,7 @@ export class FetchInstrumentation extends InstrumentationBase<
     span.setAttribute(SemanticAttributes.HTTP_HOST, parsedUrl.host);
     span.setAttribute(
       SemanticAttributes.HTTP_SCHEME,
-      parsedUrl.protocol.replace(":", "")
+      parsedUrl.protocol.replace(':', '')
     );
     span.setAttribute(SemanticAttributes.HTTP_USER_AGENT, navigator.userAgent);
   }
@@ -150,7 +150,7 @@ export class FetchInstrumentation extends InstrumentationBase<
 
     if (options instanceof Request) {
       api.propagation.inject(api.context.active(), options.headers, {
-        set: (h, k, v) => h.set(k, typeof v === "string" ? v : String(v)),
+        set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
       });
     } else {
       const headers: Partial<Record<string, unknown>> = {};
@@ -182,10 +182,10 @@ export class FetchInstrumentation extends InstrumentationBase<
     options: Partial<Request | RequestInit> = {}
   ): api.Span | undefined {
     if (core.isUrlIgnored(url, this._getConfig().ignoreUrls)) {
-      api.diag.debug("ignoring span as url matches ignored url");
+      api.diag.debug('ignoring span as url matches ignored url');
       return;
     }
-    const method = (options.method || "GET").toUpperCase();
+    const method = (options.method || 'GET').toUpperCase();
     const spanName = `HTTP ${method}`;
     return this.tracer.startSpan(spanName, {
       kind: api.SpanKind.CLIENT,
@@ -217,7 +217,7 @@ export class FetchInstrumentation extends InstrumentationBase<
       // then OBSERVER_WAIT_TIME_MS and observer didn't collect enough
       // information
       resources = performance.getEntriesByType(
-        "resource"
+        'resource'
       ) as PerformanceResourceTiming[];
     }
     const resource = web.getResource(
@@ -226,7 +226,7 @@ export class FetchInstrumentation extends InstrumentationBase<
       endTime,
       resources,
       this._usedResources,
-      "fetch"
+      'fetch'
     );
 
     if (resource.mainRequest) {
@@ -363,17 +363,17 @@ export class FetchInstrumentation extends InstrumentationBase<
   private _prepareSpanData(spanUrl: string): SpanData {
     const startTime = core.hrTime();
     const entries: PerformanceResourceTiming[] = [];
-    if (typeof window.PerformanceObserver === "undefined") {
+    if (typeof window.PerformanceObserver === 'undefined') {
       return { entries, startTime, spanUrl };
     }
 
-    const observer: PerformanceObserver = new PerformanceObserver((list) => {
+    const observer: PerformanceObserver = new PerformanceObserver(list => {
       const perfObsEntries = list.getEntries() as PerformanceResourceTiming[];
       const urlNormalizingAnchor = getUrlNormalizingAnchor();
       urlNormalizingAnchor.href = spanUrl;
-      perfObsEntries.forEach((entry) => {
+      perfObsEntries.forEach(entry => {
         if (
-          entry.initiatorType === "fetch" &&
+          entry.initiatorType === 'fetch' &&
           entry.name === urlNormalizingAnchor.href
         ) {
           entries.push(entry);
@@ -381,7 +381,7 @@ export class FetchInstrumentation extends InstrumentationBase<
       });
     });
     observer.observe({
-      entryTypes: ["resource"],
+      entryTypes: ['resource'],
     });
     return { entries, observer, startTime, spanUrl };
   }
@@ -391,17 +391,17 @@ export class FetchInstrumentation extends InstrumentationBase<
    */
   enable() {
     if (isWrapped(window.fetch)) {
-      this._unwrap(window, "fetch");
-      api.diag.debug("removing previous patch for constructor");
+      this._unwrap(window, 'fetch');
+      api.diag.debug('removing previous patch for constructor');
     }
-    this._wrap(window, "fetch", this._patchConstructor());
+    this._wrap(window, 'fetch', this._patchConstructor());
   }
 
   /**
    * implements unpatch function
    */
   disable() {
-    this._unwrap(window, "fetch");
+    this._unwrap(window, 'fetch');
     this._usedResources = new WeakSet<PerformanceResourceTiming>();
   }
 }

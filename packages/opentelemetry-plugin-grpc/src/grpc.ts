@@ -25,12 +25,12 @@ import {
   ROOT_CONTEXT,
   setSpan,
   diag,
-} from "@opentelemetry/api";
-import { BasePlugin } from "@opentelemetry/core";
-import * as events from "events";
-import * as grpcTypes from "grpc";
-import * as path from "path";
-import * as shimmer from "shimmer";
+} from '@opentelemetry/api';
+import { BasePlugin } from '@opentelemetry/core';
+import * as events from 'events';
+import * as grpcTypes from 'grpc';
+import * as path from 'path';
+import * as shimmer from 'shimmer';
 import {
   grpc,
   GrpcClientFunc,
@@ -39,45 +39,45 @@ import {
   ModuleExportsMapping,
   SendUnaryDataCallback,
   ServerCallWithMeta,
-} from "./types";
+} from './types';
 import {
   findIndex,
   _grpcStatusCodeToOpenTelemetryStatusCode,
   _grpcStatusCodeToSpanStatus,
   _methodIsIgnored,
-} from "./utils";
-import { VERSION } from "./version";
-import { AttributeNames } from "./enums";
+} from './utils';
+import { VERSION } from './version';
+import { AttributeNames } from './enums';
 
 /** The metadata key under which span context is stored as a binary value. */
-export const GRPC_TRACE_KEY = "grpc-trace-bin";
+export const GRPC_TRACE_KEY = 'grpc-trace-bin';
 
 let grpcClientModule: GrpcInternalClientTypes;
 
 export class GrpcPlugin extends BasePlugin<grpc> {
-  static readonly component = "grpc";
-  readonly supportedVersions = ["1.*"];
+  static readonly component = 'grpc';
+  readonly supportedVersions = ['1.*'];
 
   protected _config!: GrpcPluginOptions;
 
   constructor(readonly moduleName: string, readonly version: string) {
-    super("@opentelemetry/plugin-grpc", VERSION);
+    super('@opentelemetry/plugin-grpc', VERSION);
     this._config = {};
   }
 
   protected readonly _internalFilesList: ModuleExportsMapping = {
-    "0.13 - 1.6": { client: "src/node/src/client.js" },
-    "^1.7": { client: "src/client.js" },
+    '0.13 - 1.6': { client: 'src/node/src/client.js' },
+    '^1.7': { client: 'src/client.js' },
   };
   protected readonly _basedir = basedir;
 
   protected patch(): typeof grpcTypes {
-    diag.debug("applying patch to %s@%s", this.moduleName, this.version);
+    diag.debug('applying patch to %s@%s', this.moduleName, this.version);
 
     if (this._moduleExports.Server) {
       shimmer.wrap(
         this._moduleExports.Server.prototype,
-        "register",
+        'register',
         this._patchServer() as any
       );
     }
@@ -85,19 +85,19 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     // Wrap the externally exported client constructor
     shimmer.wrap(
       this._moduleExports,
-      "makeGenericClientConstructor",
+      'makeGenericClientConstructor',
       this._patchClient()
     );
 
-    if (this._internalFilesExports["client"]) {
+    if (this._internalFilesExports['client']) {
       grpcClientModule = this._internalFilesExports[
-        "client"
+        'client'
       ] as GrpcInternalClientTypes;
 
       // Wrap the internally used client constructor
       shimmer.wrap(
         grpcClientModule,
-        "makeClientConstructor",
+        'makeClientConstructor',
         this._patchClient()
       );
     }
@@ -105,16 +105,16 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     return this._moduleExports;
   }
   protected unpatch(): void {
-    diag.debug("removing patch to %s@%s", this.moduleName, this.version);
+    diag.debug('removing patch to %s@%s', this.moduleName, this.version);
 
     if (this._moduleExports.Server) {
-      shimmer.unwrap(this._moduleExports.Server.prototype, "register");
+      shimmer.unwrap(this._moduleExports.Server.prototype, 'register');
     }
 
-    shimmer.unwrap(this._moduleExports, "makeGenericClientConstructor");
+    shimmer.unwrap(this._moduleExports, 'makeGenericClientConstructor');
 
     if (grpcClientModule) {
-      shimmer.unwrap(grpcClientModule, "makeClientConstructor");
+      shimmer.unwrap(grpcClientModule, 'makeClientConstructor');
     }
   }
 
@@ -127,7 +127,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   private _patchServer() {
     return (originalRegister: typeof grpcTypes.Server.prototype.register) => {
       const plugin = this;
-      diag.debug("patched gRPC server");
+      diag.debug('patched gRPC server');
 
       return function register<RequestType, ResponseType>(
         this: grpcTypes.Server & { handlers: any },
@@ -142,7 +142,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
         shimmer.wrap(
           handlerSet,
-          "func",
+          'func',
           (originalFunc: grpcTypes.handleCall<RequestType, ResponseType>) => {
             return function func(
               this: typeof handlerSet,
@@ -152,31 +152,31 @@ export class GrpcPlugin extends BasePlugin<grpc> {
               const self = this;
               if (plugin._shouldNotTraceServerCall(call, name)) {
                 switch (type) {
-                  case "unary":
-                  case "client_stream":
+                  case 'unary':
+                  case 'client_stream':
                     return (originalFunc as Function).call(
                       self,
                       call,
                       callback
                     );
-                  case "server_stream":
-                  case "bidi":
+                  case 'server_stream':
+                  case 'bidi':
                     return (originalFunc as Function).call(self, call);
                   default:
                     return originalResult;
                 }
               }
-              const spanName = `grpc.${name.replace("/", "")}`;
+              const spanName = `grpc.${name.replace('/', '')}`;
               const spanOptions: SpanOptions = {
                 kind: SpanKind.SERVER,
               };
 
-              diag.debug("patch func: %s", JSON.stringify(spanOptions));
+              diag.debug('patch func: %s', JSON.stringify(spanOptions));
 
               context.with(
                 propagation.extract(ROOT_CONTEXT, call.metadata, {
                   get: (metadata, key) => metadata.get(key).map(String),
-                  keys: (metadata) => Object.keys(metadata.getMap()),
+                  keys: metadata => Object.keys(metadata.getMap()),
                 }),
                 () => {
                   const span = plugin._tracer
@@ -187,8 +187,8 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
                   context.with(setSpan(context.active(), span), () => {
                     switch (type) {
-                      case "unary":
-                      case "client_stream":
+                      case 'unary':
+                      case 'client_stream':
                         return plugin._clientStreamAndUnaryHandler(
                           plugin,
                           span,
@@ -197,8 +197,8 @@ export class GrpcPlugin extends BasePlugin<grpc> {
                           originalFunc,
                           self
                         );
-                      case "server_stream":
-                      case "bidi":
+                      case 'server_stream':
+                      case 'bidi':
                         return plugin._serverStreamAndBidiHandler(
                           plugin,
                           span,
@@ -228,7 +228,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     call: ServerCallWithMeta,
     name: string
   ): boolean {
-    const parsedName = name.split("/");
+    const parsedName = name.split('/');
     return _methodIsIgnored(
       parsedName[parsedName.length - 1] || name,
       this._config.ignoreGrpcMethods
@@ -273,7 +273,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
           plugin._moduleExports.status.OK.toString()
         );
       }
-      span.addEvent("received");
+      span.addEvent('received');
 
       // end the span
       span.end();
@@ -300,7 +300,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     };
 
     context.bind(call);
-    call.on("finish", () => {
+    call.on('finish', () => {
       span.setStatus(_grpcStatusCodeToSpanStatus(call.status.code));
       span.setAttribute(
         AttributeNames.GRPC_STATUS_CODE,
@@ -309,17 +309,17 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
       // if there is an error, span will be ended on error event, otherwise end it here
       if (call.status.code === 0) {
-        span.addEvent("finished");
+        span.addEvent('finished');
         endSpan();
       }
     });
 
-    call.on("error", (err: grpcTypes.ServiceError) => {
+    call.on('error', (err: grpcTypes.ServiceError) => {
       span.setStatus({
         code: _grpcStatusCodeToOpenTelemetryStatusCode(err.code),
         message: err.message,
       });
-      span.addEvent("finished with error");
+      span.addEvent('finished with error');
       span.setAttributes({
         [AttributeNames.GRPC_ERROR_NAME]: err.name,
         [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
@@ -333,7 +333,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   private _patchClient() {
     const plugin = this;
     return (original: typeof grpcTypes.makeGenericClientConstructor): never => {
-      diag.debug("patching client");
+      diag.debug('patching client');
       return function makeClientConstructor(
         this: typeof grpcTypes.Client,
         methods: { [key: string]: { originalName?: string } },
@@ -378,9 +378,9 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   private _getPatchedClientMethods() {
     const plugin = this;
     return (original: GrpcClientFunc) => {
-      diag.debug("patch all client methods");
+      diag.debug('patch all client methods');
       return function clientMethodTrace(this: grpcTypes.Client) {
-        const name = `grpc.${original.path.replace("/", "")}`;
+        const name = `grpc.${original.path.replace('/', '')}`;
         const args = Array.prototype.slice.call(arguments);
         const metadata = plugin._getMetadata(original, args);
         const span = plugin._tracer.startSpan(name, {
@@ -452,8 +452,8 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
       // if unary or clientStream
       if (!original.responseStream) {
-        const callbackFuncIndex = findIndex(args, (arg) => {
-          return typeof arg === "function";
+        const callbackFuncIndex = findIndex(args, arg => {
+          return typeof arg === 'function';
         });
         if (callbackFuncIndex !== -1) {
           args[callbackFuncIndex] = patchedCallback(
@@ -464,7 +464,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         }
       }
 
-      span.addEvent("sent");
+      span.addEvent('sent');
       span.setAttributes({
         [AttributeNames.GRPC_METHOD]: original.path,
         [AttributeNames.GRPC_KIND]: SpanKind.CLIENT,
@@ -486,7 +486,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         };
         context.bind(call);
         ((call as unknown) as events.EventEmitter).on(
-          "error",
+          'error',
           (err: grpcTypes.ServiceError) => {
             span.setStatus({
               code: _grpcStatusCodeToOpenTelemetryStatusCode(err.code),
@@ -501,7 +501,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         );
 
         ((call as unknown) as events.EventEmitter).on(
-          "status",
+          'status',
           (status: SpanStatus) => {
             span.setStatus({ code: SpanStatusCode.OK });
             span.setAttribute(
@@ -529,9 +529,9 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     let metadataIndex = findIndex(args, (arg: any) => {
       return (
         arg &&
-        typeof arg === "object" &&
+        typeof arg === 'object' &&
         arg._internal_repr &&
-        typeof arg.getMap === "function"
+        typeof arg.getMap === 'function'
       );
     });
     if (metadataIndex === -1) {
@@ -560,6 +560,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   }
 }
 
-const basedir = path.dirname(require.resolve("grpc"));
-const version = require(path.join(basedir, "package.json")).version;
+const basedir = path.dirname(require.resolve('grpc'));
+const version = require(path.join(basedir, 'package.json')).version;
 export const plugin = new GrpcPlugin(GrpcPlugin.component, version);

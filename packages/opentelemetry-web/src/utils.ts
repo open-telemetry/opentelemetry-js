@@ -18,21 +18,21 @@ import {
   PerformanceEntries,
   PerformanceResourceTimingInfo,
   PropagateTraceHeaderCorsUrls,
-} from "./types";
-import { PerformanceTimingNames as PTN } from "./enums/PerformanceTimingNames";
-import * as api from "@opentelemetry/api";
+} from './types';
+import { PerformanceTimingNames as PTN } from './enums/PerformanceTimingNames';
+import * as api from '@opentelemetry/api';
 import {
   hrTimeToNanoseconds,
   timeInputToHrTime,
   urlMatches,
-} from "@opentelemetry/core";
-import { SemanticAttributes } from "@opentelemetry/semantic-conventions";
+} from '@opentelemetry/core';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 // Used to normalize relative URLs
 let a: HTMLAnchorElement | undefined;
 const getUrlNormalizingAnchor = () => {
   if (!a) {
-    a = document.createElement("a");
+    a = document.createElement('a');
   }
 
   return a;
@@ -61,7 +61,7 @@ export function addSpanNetworkEvent(
 ): api.Span | undefined {
   if (
     hasKey(entries, performanceName) &&
-    typeof entries[performanceName] === "number"
+    typeof entries[performanceName] === 'number'
   ) {
     span.addEvent(performanceName, entries[performanceName]);
     return span;
@@ -245,7 +245,7 @@ function filterResourcesForSpan(
 ) {
   const startTime = hrTimeToNanoseconds(startTimeHR);
   const endTime = hrTimeToNanoseconds(endTimeHR);
-  let filteredResources = resources.filter((resource) => {
+  let filteredResources = resources.filter(resource => {
     const resourceStartTime = hrTimeToNanoseconds(
       timeInputToHrTime(resource[PTN.FETCH_START])
     );
@@ -255,7 +255,7 @@ function filterResourcesForSpan(
 
     return (
       resource.initiatorType.toLowerCase() ===
-        (initiatorType || "xmlhttprequest") &&
+        (initiatorType || 'xmlhttprequest') &&
       resource.name === spanUrl &&
       resourceStartTime >= startTime &&
       resourceEndTime <= endTime
@@ -263,7 +263,7 @@ function filterResourcesForSpan(
   });
 
   if (filteredResources.length > 0) {
-    filteredResources = filteredResources.filter((resource) => {
+    filteredResources = filteredResources.filter(resource => {
       return !ignoredResources.has(resource);
     });
   }
@@ -276,7 +276,7 @@ function filterResourcesForSpan(
  * @param url
  */
 export function parseUrl(url: string): HTMLAnchorElement {
-  const a = document.createElement("a");
+  const a = document.createElement('a');
   a.href = url;
   return a;
 }
@@ -290,13 +290,13 @@ export function parseUrl(url: string): HTMLAnchorElement {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getElementXPath(target: any, optimised?: boolean) {
   if (target.nodeType === Node.DOCUMENT_NODE) {
-    return "/";
+    return '/';
   }
   const targetValue = getNodeValue(target, optimised);
-  if (optimised && targetValue.indexOf("@id") > 0) {
+  if (optimised && targetValue.indexOf('@id') > 0) {
     return targetValue;
   }
-  let xpath = "";
+  let xpath = '';
   if (target.parentNode) {
     xpath += getElementXPath(target.parentNode, false);
   }
@@ -340,9 +340,9 @@ function getNodeIndex(target: HTMLElement): number {
 function getNodeValue(target: HTMLElement, optimised?: boolean): string {
   const nodeType = target.nodeType;
   const index = getNodeIndex(target);
-  let nodeValue = "";
+  let nodeValue = '';
   if (nodeType === Node.ELEMENT_NODE) {
-    const id = target.getAttribute("id");
+    const id = target.getAttribute('id');
     if (optimised && id) {
       return `//*[@id="${id}"]`;
     }
@@ -351,11 +351,11 @@ function getNodeValue(target: HTMLElement, optimised?: boolean): string {
     nodeType === Node.TEXT_NODE ||
     nodeType === Node.CDATA_SECTION_NODE
   ) {
-    nodeValue = "text()";
+    nodeValue = 'text()';
   } else if (nodeType === Node.COMMENT_NODE) {
-    nodeValue = "comment()";
+    nodeValue = 'comment()';
   } else {
-    return "";
+    return '';
   }
   // if index is 1 it can be omitted in xpath
   if (nodeValue && index > 1) {
@@ -375,7 +375,7 @@ export function shouldPropagateTraceHeaders(
 ) {
   let propagateTraceHeaderUrls = propagateTraceHeaderCorsUrls || [];
   if (
-    typeof propagateTraceHeaderUrls === "string" ||
+    typeof propagateTraceHeaderUrls === 'string' ||
     propagateTraceHeaderUrls instanceof RegExp
   ) {
     propagateTraceHeaderUrls = [propagateTraceHeaderUrls];
@@ -385,7 +385,7 @@ export function shouldPropagateTraceHeaders(
   if (parsedSpanUrl.origin === window.location.origin) {
     return true;
   } else {
-    return propagateTraceHeaderUrls.some((propagateTraceHeaderUrl) =>
+    return propagateTraceHeaderUrls.some(propagateTraceHeaderUrl =>
       urlMatches(spanUrl, propagateTraceHeaderUrl)
     );
   }

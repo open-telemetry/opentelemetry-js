@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-import type * as grpcTypes from "grpc";
+import type * as grpcTypes from 'grpc';
 import {
   InstrumentationNodeModuleDefinition,
   InstrumentationNodeModuleFile,
   InstrumentationBase,
   InstrumentationConfig,
   isWrapped,
-} from "@opentelemetry/instrumentation";
+} from '@opentelemetry/instrumentation';
 import {
   GrpcInternalClientTypes,
   ServerCallWithMeta,
   SendUnaryDataCallback,
   GrpcClientFunc,
-} from "./types";
-import { GrpcInstrumentationConfig } from "../types";
+} from './types';
+import { GrpcInstrumentationConfig } from '../types';
 import {
   context,
   propagation,
@@ -36,15 +36,15 @@ import {
   SpanKind,
   setSpan,
   diag,
-} from "@opentelemetry/api";
+} from '@opentelemetry/api';
 import {
   clientStreamAndUnaryHandler,
   shouldNotTraceServerCall,
   serverStreamAndBidiHandler,
-} from "./serverUtils";
-import { makeGrpcClientRemoteCall, getMetadata } from "./clientUtils";
-import { _methodIsIgnored } from "../utils";
-import { AttributeNames } from "../enums";
+} from './serverUtils';
+import { makeGrpcClientRemoteCall, getMetadata } from './clientUtils';
+import { _methodIsIgnored } from '../utils';
+import { AttributeNames } from '../enums';
 
 /**
  * Holding reference to grpc module here to access constant of grpc modules
@@ -72,26 +72,26 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
   init() {
     return [
       new InstrumentationNodeModuleDefinition<typeof grpcTypes>(
-        "grpc",
-        ["1.*"],
+        'grpc',
+        ['1.*'],
         (moduleExports, version) => {
           diag.debug(`Applying patch for grpc@${version}`);
           if (isWrapped(moduleExports.Server.prototype.register)) {
-            this._unwrap(moduleExports.Server.prototype, "register");
+            this._unwrap(moduleExports.Server.prototype, 'register');
           }
           grpcClient = moduleExports;
           this._wrap(
             moduleExports.Server.prototype,
-            "register",
+            'register',
             this._patchServer(moduleExports) as any
           );
           // Wrap the externally exported client constructor
           if (isWrapped(moduleExports.makeGenericClientConstructor)) {
-            this._unwrap(moduleExports, "makeGenericClientConstructor");
+            this._unwrap(moduleExports, 'makeGenericClientConstructor');
           }
           this._wrap(
             moduleExports,
-            "makeGenericClientConstructor",
+            'makeGenericClientConstructor',
             this._patchClient(moduleExports)
           );
           return moduleExports;
@@ -100,7 +100,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
           if (moduleExports === undefined) return;
           diag.debug(`Removing patch for grpc@${version}`);
 
-          this._unwrap(moduleExports.Server.prototype, "register");
+          this._unwrap(moduleExports.Server.prototype, 'register');
         },
         this._getInternalPatchs()
       ),
@@ -114,11 +114,11 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
     ) => {
       diag.debug(`Applying internal patch for grpc@${version}`);
       if (isWrapped(moduleExports.makeClientConstructor)) {
-        this._unwrap(moduleExports, "makeClientConstructor");
+        this._unwrap(moduleExports, 'makeClientConstructor');
       }
       this._wrap(
         moduleExports,
-        "makeClientConstructor",
+        'makeClientConstructor',
         this._patchClient(grpcClient)
       );
       return moduleExports;
@@ -129,18 +129,18 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
     ) => {
       if (moduleExports === undefined) return;
       diag.debug(`Removing internal patch for grpc@${version}`);
-      this._unwrap(moduleExports, "makeClientConstructor");
+      this._unwrap(moduleExports, 'makeClientConstructor');
     };
     return [
       new InstrumentationNodeModuleFile<GrpcInternalClientTypes>(
-        "grpc/src/node/src/client.js",
-        ["0.13 - 1.6"],
+        'grpc/src/node/src/client.js',
+        ['0.13 - 1.6'],
         onPatch,
         onUnPatch
       ),
       new InstrumentationNodeModuleFile<GrpcInternalClientTypes>(
-        "grpc/src/client.js",
-        ["^1.7"],
+        'grpc/src/client.js',
+        ['^1.7'],
         onPatch,
         onUnPatch
       ),
@@ -150,7 +150,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
   private _patchServer(grpcModule: typeof grpcTypes) {
     const instrumentation = this;
     return (originalRegister: typeof grpcTypes.Server.prototype.register) => {
-      diag.debug("patched gRPC server");
+      diag.debug('patched gRPC server');
 
       return function register<RequestType, ResponseType>(
         this: grpcTypes.Server & { handlers: any },
@@ -165,7 +165,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
 
         instrumentation._wrap(
           handlerSet,
-          "func",
+          'func',
           (originalFunc: grpcTypes.handleCall<RequestType, ResponseType>) => {
             return function func(
               this: typeof handlerSet,
@@ -175,31 +175,31 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
               const self = this;
               if (shouldNotTraceServerCall.call(instrumentation, call, name)) {
                 switch (type) {
-                  case "unary":
-                  case "client_stream":
+                  case 'unary':
+                  case 'client_stream':
                     return (originalFunc as Function).call(
                       self,
                       call,
                       callback
                     );
-                  case "server_stream":
-                  case "bidi":
+                  case 'server_stream':
+                  case 'bidi':
                     return (originalFunc as Function).call(self, call);
                   default:
                     return originalResult;
                 }
               }
-              const spanName = `grpc.${name.replace("/", "")}`;
+              const spanName = `grpc.${name.replace('/', '')}`;
               const spanOptions: SpanOptions = {
                 kind: SpanKind.SERVER,
               };
 
-              diag.debug("patch func: %s", JSON.stringify(spanOptions));
+              diag.debug('patch func: %s', JSON.stringify(spanOptions));
 
               context.with(
                 propagation.extract(context.active(), call.metadata, {
                   get: (metadata, key) => metadata.get(key).map(String),
-                  keys: (metadata) => Object.keys(metadata.getMap()),
+                  keys: metadata => Object.keys(metadata.getMap()),
                 }),
                 () => {
                   const span = instrumentation.tracer
@@ -210,8 +210,8 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
 
                   context.with(setSpan(context.active(), span), () => {
                     switch (type) {
-                      case "unary":
-                      case "client_stream":
+                      case 'unary':
+                      case 'client_stream':
                         return clientStreamAndUnaryHandler(
                           grpcModule,
                           span,
@@ -220,8 +220,8 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
                           originalFunc,
                           self
                         );
-                      case "server_stream":
-                      case "bidi":
+                      case 'server_stream':
+                      case 'bidi':
                         return serverStreamAndBidiHandler(
                           span,
                           call,
@@ -246,7 +246,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
   private _patchClient(grpcClient: typeof grpcTypes) {
     const instrumentation = this;
     return (original: typeof grpcTypes.makeGenericClientConstructor): never => {
-      diag.debug("patching client");
+      diag.debug('patching client');
       return function makeClientConstructor(
         this: typeof grpcTypes.Client,
         methods: { [key: string]: { originalName?: string } },
@@ -291,9 +291,9 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
   private _getPatchedClientMethods(grpcClient: typeof grpcTypes) {
     const instrumentation = this;
     return (original: GrpcClientFunc) => {
-      diag.debug("patch all client methods");
+      diag.debug('patch all client methods');
       return function clientMethodTrace(this: grpcTypes.Client) {
-        const name = `grpc.${original.path.replace("/", "")}`;
+        const name = `grpc.${original.path.replace('/', '')}`;
         const args = Array.prototype.slice.call(arguments);
         const metadata = getMetadata(grpcClient, original, args);
         const span = instrumentation.tracer.startSpan(name, {

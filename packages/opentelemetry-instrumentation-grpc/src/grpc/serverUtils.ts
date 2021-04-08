@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import type * as grpcTypes from "grpc";
-import { SendUnaryDataCallback, ServerCallWithMeta } from "./types";
-import { GrpcNativeInstrumentation } from "./";
-import { context, Span, SpanStatusCode } from "@opentelemetry/api";
+import type * as grpcTypes from 'grpc';
+import { SendUnaryDataCallback, ServerCallWithMeta } from './types';
+import { GrpcNativeInstrumentation } from './';
+import { context, Span, SpanStatusCode } from '@opentelemetry/api';
 import {
   _grpcStatusCodeToOpenTelemetryStatusCode,
   _grpcStatusCodeToSpanStatus,
   _methodIsIgnored,
-} from "../utils";
-import { AttributeNames } from "../enums";
+} from '../utils';
+import { AttributeNames } from '../enums';
 
 export const clientStreamAndUnaryHandler = function <RequestType, ResponseType>(
   grpcClient: typeof grpcTypes,
@@ -60,7 +60,7 @@ export const clientStreamAndUnaryHandler = function <RequestType, ResponseType>(
         grpcClient.status.OK.toString()
       );
     }
-    span.addEvent("received");
+    span.addEvent('received');
 
     // end the span
     span.end();
@@ -86,7 +86,7 @@ export const serverStreamAndBidiHandler = function <RequestType, ResponseType>(
   };
 
   context.bind(call);
-  call.on("finish", () => {
+  call.on('finish', () => {
     span.setStatus(_grpcStatusCodeToSpanStatus(call.status.code));
     span.setAttribute(
       AttributeNames.GRPC_STATUS_CODE,
@@ -95,17 +95,17 @@ export const serverStreamAndBidiHandler = function <RequestType, ResponseType>(
 
     // if there is an error, span will be ended on error event, otherwise end it here
     if (call.status.code === 0) {
-      span.addEvent("finished");
+      span.addEvent('finished');
       endSpan();
     }
   });
 
-  call.on("error", (err: grpcTypes.ServiceError) => {
+  call.on('error', (err: grpcTypes.ServiceError) => {
     span.setStatus({
       code: _grpcStatusCodeToOpenTelemetryStatusCode(err.code),
       message: err.message,
     });
-    span.addEvent("finished with error");
+    span.addEvent('finished with error');
     span.setAttributes({
       [AttributeNames.GRPC_ERROR_NAME]: err.name,
       [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
@@ -124,7 +124,7 @@ export const shouldNotTraceServerCall = function (
   call: ServerCallWithMeta,
   name: string
 ): boolean {
-  const parsedName = name.split("/");
+  const parsedName = name.split('/');
   return _methodIsIgnored(
     parsedName[parsedName.length - 1] || name,
     this._config.ignoreGrpcMethods

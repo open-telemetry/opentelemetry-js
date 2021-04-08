@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import type * as grpcJs from "@grpc/grpc-js";
-import type { HandleCall } from "@grpc/grpc-js/build/src/server-call";
-import { GrpcJsPlugin } from "../grpcJs";
-import * as shimmer from "shimmer";
+import type * as grpcJs from '@grpc/grpc-js';
+import type { HandleCall } from '@grpc/grpc-js/build/src/server-call';
+import { GrpcJsPlugin } from '../grpcJs';
+import * as shimmer from 'shimmer';
 import {
   ServerCallWithMeta,
   SendUnaryDataCallback,
   IgnoreMatcher,
-} from "../types";
+} from '../types';
 import {
   context,
   SpanOptions,
@@ -32,11 +32,11 @@ import {
   ROOT_CONTEXT,
   setSpan,
   diag,
-} from "@opentelemetry/api";
-import { clientStreamAndUnaryHandler } from "./clientStreamAndUnary";
-import { serverStreamAndBidiHandler } from "./serverStreamAndBidi";
-import { methodIsIgnored } from "../utils";
-import { AttributeNames } from "../enums";
+} from '@opentelemetry/api';
+import { clientStreamAndUnaryHandler } from './clientStreamAndUnary';
+import { serverStreamAndBidiHandler } from './serverStreamAndBidi';
+import { methodIsIgnored } from '../utils';
+import { AttributeNames } from '../enums';
 
 type ServerRegisterFunction = typeof grpcJs.Server.prototype.register;
 
@@ -51,7 +51,7 @@ export function patchServer(
     const plugin = this;
     const config = this._config;
 
-    diag.debug("patched gRPC server");
+    diag.debug('patched gRPC server');
     return function register<RequestType, ResponseType>(
       this: grpcJs.Server,
       name: string,
@@ -68,11 +68,11 @@ export function patchServer(
         deserialize,
         type
       );
-      const handlerSet = this["handlers"].get(name);
+      const handlerSet = this['handlers'].get(name);
 
       shimmer.wrap(
         handlerSet,
-        "func",
+        'func',
         (originalFunc: HandleCall<unknown, unknown>) => {
           return function func(
             this: typeof handlerSet,
@@ -96,17 +96,17 @@ export function patchServer(
               );
             }
 
-            const spanName = `grpc.${name.replace("/", "")}`;
+            const spanName = `grpc.${name.replace('/', '')}`;
             const spanOptions: SpanOptions = {
               kind: SpanKind.SERVER,
             };
 
-            diag.debug("patch func: %s", JSON.stringify(spanOptions));
+            diag.debug('patch func: %s', JSON.stringify(spanOptions));
 
             context.with(
               propagation.extract(ROOT_CONTEXT, call.metadata, {
                 get: (carrier, key) => carrier.get(key).map(String),
-                keys: (carrier) => Object.keys(carrier.getMap()),
+                keys: carrier => Object.keys(carrier.getMap()),
               }),
               () => {
                 const span = plugin.tracer
@@ -144,7 +144,7 @@ function shouldNotTraceServerCall(
   methodName: string,
   ignoreGrpcMethods?: IgnoreMatcher[]
 ): boolean {
-  const parsedName = methodName.split("/");
+  const parsedName = methodName.split('/');
   return methodIsIgnored(
     parsedName[parsedName.length - 1] || methodName,
     ignoreGrpcMethods
@@ -165,9 +165,9 @@ function handleServerFunction<RequestType, ResponseType>(
   callback: SendUnaryDataCallback<unknown>
 ): void {
   switch (type) {
-    case "unary":
-    case "clientStream":
-    case "client_stream":
+    case 'unary':
+    case 'clientStream':
+    case 'client_stream':
       return clientStreamAndUnaryHandler(
         plugin,
         span,
@@ -177,9 +177,9 @@ function handleServerFunction<RequestType, ResponseType>(
           | grpcJs.handleUnaryCall<RequestType, ResponseType>
           | grpcJs.ClientReadableStream<RequestType>
       );
-    case "serverStream":
-    case "server_stream":
-    case "bidi":
+    case 'serverStream':
+    case 'server_stream':
+    case 'bidi':
       return serverStreamAndBidiHandler(
         plugin,
         span,
@@ -204,13 +204,13 @@ function handleUntracedServerFunction<RequestType, ResponseType>(
   callback: SendUnaryDataCallback<unknown>
 ): void {
   switch (type) {
-    case "unary":
-    case "clientStream":
-    case "client_stream":
+    case 'unary':
+    case 'clientStream':
+    case 'client_stream':
       return (originalFunc as Function).call({}, call, callback);
-    case "serverStream":
-    case "server_stream":
-    case "bidi":
+    case 'serverStream':
+    case 'server_stream':
+    case 'bidi':
       return (originalFunc as Function).call({}, call);
     default:
       break;

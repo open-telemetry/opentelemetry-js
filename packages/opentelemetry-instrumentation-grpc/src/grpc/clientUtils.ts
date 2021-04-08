@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import type * as grpcTypes from "grpc";
-import type * as events from "events";
-import { SendUnaryDataCallback, GrpcClientFunc } from "./types";
-import { SemanticAttributes } from "@opentelemetry/semantic-conventions";
+import type * as grpcTypes from 'grpc';
+import type * as events from 'events';
+import { SendUnaryDataCallback, GrpcClientFunc } from './types';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import {
   context,
   Span,
@@ -25,13 +25,13 @@ import {
   SpanKind,
   SpanStatus,
   propagation,
-} from "@opentelemetry/api";
+} from '@opentelemetry/api';
 import {
   _grpcStatusCodeToSpanStatus,
   _grpcStatusCodeToOpenTelemetryStatusCode,
   findIndex,
-} from "../utils";
-import { AttributeNames } from "../enums";
+} from '../utils';
+import { AttributeNames } from '../enums';
 
 /**
  * This method handles the client remote call
@@ -86,8 +86,8 @@ export const makeGrpcClientRemoteCall = function (
 
     // if unary or clientStream
     if (!original.responseStream) {
-      const callbackFuncIndex = findIndex(args, (arg) => {
-        return typeof arg === "function";
+      const callbackFuncIndex = findIndex(args, arg => {
+        return typeof arg === 'function';
       });
       if (callbackFuncIndex !== -1) {
         args[callbackFuncIndex] = patchedCallback(
@@ -98,7 +98,7 @@ export const makeGrpcClientRemoteCall = function (
       }
     }
 
-    span.addEvent("sent");
+    span.addEvent('sent');
     span.setAttributes({
       [AttributeNames.GRPC_METHOD]: original.path,
       [AttributeNames.GRPC_KIND]: SpanKind.CLIENT,
@@ -120,7 +120,7 @@ export const makeGrpcClientRemoteCall = function (
       };
       context.bind(call);
       ((call as unknown) as events.EventEmitter).on(
-        "error",
+        'error',
         (err: grpcTypes.ServiceError) => {
           span.setStatus({
             code: _grpcStatusCodeToOpenTelemetryStatusCode(err.code),
@@ -135,7 +135,7 @@ export const makeGrpcClientRemoteCall = function (
       );
 
       ((call as unknown) as events.EventEmitter).on(
-        "status",
+        'status',
         (status: SpanStatus) => {
           span.setStatus({ code: SpanStatusCode.UNSET });
           span.setAttribute(
@@ -164,9 +164,9 @@ export const getMetadata = function (
   let metadataIndex = findIndex(args, (arg: any) => {
     return (
       arg &&
-      typeof arg === "object" &&
+      typeof arg === 'object' &&
       arg._internal_repr &&
-      typeof arg.getMap === "function"
+      typeof arg.getMap === 'function'
     );
   });
   if (metadataIndex === -1) {

@@ -18,5 +18,5 @@
  * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/http.md
  */
 export enum AttributeNames {
-  HTTP_ERROR_MESSAGE = "http.error_message",
+  HTTP_ERROR_MESSAGE = 'http.error_message',
 }

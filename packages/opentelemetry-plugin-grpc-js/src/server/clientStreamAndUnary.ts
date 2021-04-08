@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { context, Span, SpanStatusCode } from "@opentelemetry/api";
-import type { ServerCallWithMeta, SendUnaryDataCallback } from "../types";
-import { grpcStatusCodeToOpenTelemetryStatusCode } from "../utils";
-import type { GrpcJsPlugin } from "../grpcJs";
-import type * as grpcJs from "@grpc/grpc-js";
-import { AttributeNames } from "../enums";
+import { context, Span, SpanStatusCode } from '@opentelemetry/api';
+import type { ServerCallWithMeta, SendUnaryDataCallback } from '../types';
+import { grpcStatusCodeToOpenTelemetryStatusCode } from '../utils';
+import type { GrpcJsPlugin } from '../grpcJs';
+import type * as grpcJs from '@grpc/grpc-js';
+import { AttributeNames } from '../enums';
 
 /**
  * Handle patching for clientStream and unary type server handlers
