@@ -25,6 +25,7 @@ import {
   TextMapSetter,
   createBaggage,
   baggageEntryMetadataFromString,
+  isInstrumentationSuppressed,
 } from '@opentelemetry/api';
 
 const KEY_PAIR_SEPARATOR = '=';
@@ -49,7 +50,7 @@ export const MAX_TOTAL_LENGTH = 8192;
 export class HttpBaggage implements TextMapPropagator {
   inject(context: Context, carrier: unknown, setter: TextMapSetter) {
     const baggage = getBaggage(context);
-    if (!baggage) return;
+    if (!baggage || isInstrumentationSuppressed(context)) return;
     const keyPairs = this._getKeyPairs(baggage)
       .filter((pair: string) => {
         return pair.length <= MAX_PER_NAME_VALUE_PAIRS;
