@@ -76,8 +76,8 @@ const http = require('http');
 
 In the following example:
 
-- the express plugin is enabled
-- the http plugin has a custom config for a `requestHook`
+- the express instrumentation is enabled
+- the http instrumentation has a custom config for a `requestHook`
 
 ```javascript
 const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
