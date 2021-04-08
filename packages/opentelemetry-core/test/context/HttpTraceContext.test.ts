@@ -21,6 +21,8 @@ import {
   TraceFlags,
   getSpanContext,
   setSpanContext,
+  INVALID_TRACEID,
+  INVALID_SPANID,
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
 import * as assert from 'assert';
@@ -77,6 +79,23 @@ describe('HttpTraceContext', () => {
         '00-d4cda95b652f4a1592b449d5929fda1b-6e0c63257de34c92-01'
       );
       assert.deepStrictEqual(carrier[TRACE_STATE_HEADER], 'foo=bar,baz=qux');
+    });
+
+    it('should ignore invalid span context', () => {
+      const spanContext: SpanContext = {
+        traceId: INVALID_TRACEID,
+        spanId: INVALID_SPANID,
+        traceFlags: TraceFlags.NONE,
+        traceState: new TraceState('foo=bar,baz=qux'),
+      };
+
+      httpTraceContext.inject(
+        setSpanContext(ROOT_CONTEXT, spanContext),
+        carrier,
+        defaultTextMapSetter
+      );
+      assert.strictEqual(carrier[TRACE_PARENT_HEADER], undefined);
+      assert.strictEqual(carrier[TRACE_STATE_HEADER], undefined);
     });
   });
 
