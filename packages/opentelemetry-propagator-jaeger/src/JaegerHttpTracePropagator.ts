@@ -23,6 +23,7 @@ import {
   TextMapGetter,
   TextMapPropagator,
   TextMapSetter,
+  isInstrumentationSuppressed,
 } from '@opentelemetry/api';
 
 export const UBER_TRACE_ID_HEADER = 'uber-trace-id';
@@ -54,7 +55,7 @@ export class JaegerHttpTracePropagator implements TextMapPropagator {
 
   inject(context: Context, carrier: unknown, setter: TextMapSetter) {
     const spanContext = getSpanContext(context);
-    if (!spanContext) return;
+    if (!spanContext || isInstrumentationSuppressed(context)) return;
 
     const traceFlags = `0${(spanContext.traceFlags || TraceFlags.NONE).toString(
       16

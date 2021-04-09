@@ -23,6 +23,7 @@ import {
   setSpanContext,
   SpanContext,
   TraceFlags,
+  suppressInstrumentation,
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
 import * as assert from 'assert';
@@ -117,6 +118,22 @@ describe('B3SinglePropagator', () => {
 
       propagator.inject(
         setSpanContext(ROOT_CONTEXT, spanContext),
+        carrier,
+        defaultTextMapSetter
+      );
+
+      assert.strictEqual(carrier[B3_CONTEXT_HEADER], undefined);
+    });
+
+    it('does not inject if instrumentation is suppressed', () => {
+      const spanContext: SpanContext = {
+        traceId: '80f198ee56343ba864fe8b2a57d3eff7',
+        spanId: 'e457b5a2e4d86bd1',
+        traceFlags: TraceFlags.SAMPLED,
+      };
+
+      propagator.inject(
+        suppressInstrumentation(setSpanContext(ROOT_CONTEXT, spanContext)),
         carrier,
         defaultTextMapSetter
       );
