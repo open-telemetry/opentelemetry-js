@@ -129,4 +129,28 @@ describe('ParentBasedSampler', () => {
       }
     );
   });
+
+  it('should not sample if a remote parent does not sample', () => {
+    const sampler = new ParentBasedSampler({ root: new TraceIdRatioBasedSampler(0.5) });
+
+    const spanContext = {
+      traceId,
+      spanId,
+      traceFlags: TraceFlags.NONE,
+      isRemote: true,
+    };
+    assert.deepStrictEqual(
+      sampler.shouldSample(
+        setSpanContext(api.ROOT_CONTEXT, spanContext),
+        traceId,
+        spanName,
+        SpanKind.CLIENT,
+        {},
+        []
+      ),
+      {
+        decision: api.SamplingDecision.NOT_RECORD,
+      }
+    );
+  });
 });
