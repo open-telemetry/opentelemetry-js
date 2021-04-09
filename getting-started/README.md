@@ -54,15 +54,14 @@ This guide uses the example application provided in the [example directory](exam
 
 ([link to TypeScript version](ts-example/README.md#install-the-required-opentelemetry-libraries))
 
-To create traces on NodeJS, you need `@opentelemetry/node`, `@opentelemetry/core`, and any plugins required by your application such as gRPC or HTTP. If you're using the example application, you need to install `@opentelemetry/plugin-http`, `@opentelemetry/plugin-https`, and `@opentelemetry/plugin-express`.
+To create traces on NodeJS, you need `@opentelemetry/node`, `@opentelemetry/core`, and any instrumentation required by your application such as gRPC or HTTP. If you're using the example application, you need to install `@opentelemetry/instrumentation-http` and `@opentelemetry/instrumentation-express`.
 
 ```sh
 $ npm install \
   @opentelemetry/core \
   @opentelemetry/node \
-  @opentelemetry/plugin-http \
-  @opentelemetry/plugin-https \
-  @opentelemetry/plugin-express
+  @opentelemetry/instrumentation-http \
+  @opentelemetry/instrumentation-express
 ```
 
 #### Initialize a global tracer
@@ -76,17 +75,23 @@ Create a file named `tracing.js` and add the following code:
 ```javascript
 'use strict';
 
-const { LogLevel } = require("@opentelemetry/core");
+const { diag, DiagConsoleLogger, DiagLogLevel } = require("@opentelemetry/api");
 const { NodeTracerProvider } = require("@opentelemetry/node");
 const { registerInstrumentations } = require("@opentelemetry/instrumentation");
+const { HttpInstrumentation } = require("@opentelemetry/instrumentation-http");
+const { GrpcInstrumentation } = require("@opentelemetry/instrumentation-grpc");
 
-const provider = new NodeTracerProvider({
-  logLevel: LogLevel.ERROR
-});
+const provider = new NodeTracerProvider();
+
+diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ALL);
 
 provider.register();
 
 registerInstrumentations({
+  instrumentations: [
+    new HttpInstrumentation(),
+    new GrpcInstrumentation(),
+  ],
   tracerProvider: provider,
 });
 
@@ -118,21 +123,17 @@ After you install these dependencies, initialize and register them. Modify `trac
 ```javascript
 'use strict';
 
-const { LogLevel } = require("@opentelemetry/core");
+const { diag, DiagConsoleLogger, DiagLogLevel } = require("@opentelemetry/api");
 const { NodeTracerProvider } = require("@opentelemetry/node");
 const { SimpleSpanProcessor } = require("@opentelemetry/tracing");
 const { ZipkinExporter } = require("@opentelemetry/exporter-zipkin");
 const { registerInstrumentations } = require("@opentelemetry/instrumentation");
+const { HttpInstrumentation } = require("@opentelemetry/instrumentation-http");
+const { GrpcInstrumentation } = require("@opentelemetry/instrumentation-grpc");
 
-const provider = new NodeTracerProvider({
-  logLevel: LogLevel.ERROR
-});
+const provider = new NodeTracerProvider();
 
-registerInstrumentations({
-  tracerProvider: provider,
-});
-
-provider.register();
+diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ALL);
 
 provider.addSpanProcessor(
   new SimpleSpanProcessor(
@@ -144,6 +145,16 @@ provider.addSpanProcessor(
     })
   )
 );
+
+provider.register();
+
+registerInstrumentations({
+  instrumentations: [
+    new HttpInstrumentation(),
+    new GrpcInstrumentation(),
+  ],
+  tracerProvider: provider,
+});
 
 console.log("tracing initialized");
 ```
