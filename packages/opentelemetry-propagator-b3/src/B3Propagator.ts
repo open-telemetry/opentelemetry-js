@@ -16,6 +16,7 @@
 
 import {
   Context,
+  isInstrumentationSuppressed,
   TextMapGetter,
   TextMapPropagator,
   TextMapSetter,
@@ -53,6 +54,9 @@ export class B3Propagator implements TextMapPropagator {
   }
 
   inject(context: Context, carrier: unknown, setter: TextMapSetter) {
+    if (isInstrumentationSuppressed(context)) {
+      return;
+    }
     this._inject(context, carrier, setter);
   }
 
