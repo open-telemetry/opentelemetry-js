@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
 import {
   AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
@@ -36,12 +35,6 @@ import { NodeTracerConfig } from './config';
 export class NodeTracerProvider extends BasicTracerProvider {
   constructor(config: NodeTracerConfig = {}) {
     super(config);
-    if (config.plugins) {
-      diag.warn(
-        'plugins options was removed, please use' +
-          ' "registerInstrumentations" to load plugins'
-      );
-    }
   }
 
   register(config: SDKRegistrationConfig = {}) {

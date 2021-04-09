@@ -32,8 +32,8 @@
     "@opentelemetry/exporter-jaeger": "^0.18.2",
     "@opentelemetry/exporter-zipkin": "^0.18.2",
     "@opentelemetry/instrumentation": "^0.18.2",
+    "@opentelemetry/instrumentation-http": "^0.18.2",
     "@opentelemetry/node": "^0.18.2",
-    "@opentelemetry/plugin-http": "^0.18.2",
     "@opentelemetry/tracing": "^0.18.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",

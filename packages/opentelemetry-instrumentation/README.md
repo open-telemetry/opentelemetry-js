@@ -162,7 +162,7 @@ myPLugin.enable();
 Successor of loading plugins through TracerProvider "plugins" option.
 It also supersedes PluginLoader for node. The old configurations usually looks like
 
-### NODE - old way using TracerProvider
+### NODE - old way using TracerProvider - not available anymore
 
 ```javascript
 const { NodeTracerProvider } = require('@opentelemetry/node');
@@ -177,7 +177,7 @@ provider.register({
 });
 ```
 
-### WEB - old way using TracerProvider
+### WEB - old way using TracerProvider - not available anymore
 
 ```javascript
 const { WebTracerProvider } = require('@opentelemetry/web');
@@ -208,26 +208,20 @@ All plugins will be bound to TracerProvider as well as instrumentations
 ```javascript
 const { B3Propagator } = require('@opentelemetry/propagator-b3');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
-const { GraphQLInstrumentation } = require('@opentelemetry/instrumentation-graphql');
+const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
 const { NodeTracerProvider } = require('@opentelemetry/node');
-const tracerProvider = new NodeTracerProvider();
 
-registerInstrumentations({
-  instrumentations: [
-    new UserInteractionPlugin(),
-    new XMLHttpRequestInstrumentation({
-      ignoreUrls: [/localhost/],
-      propagateTraceHeaderCorsUrls: [
-        'http://localhost:8090',
-      ],
-    }),
-  ],
-  meterProvider: meterProvider,
-  tracerProvider: tracerProvider,
-});
+const tracerProvider = new NodeTracerProvider();
 
 tracerProvider.register({
   propagator: new B3Propagator(),
+});
+
+registerInstrumentations({
+  instrumentations: [
+    new HttpInstrumentation(),
+  ],
+  tracerProvider: tracerProvider,
 });
 
 ```
@@ -237,28 +231,26 @@ tracerProvider.register({
 ```javascript
 const { B3Propagator } = require('@opentelemetry/propagator-b3');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
-import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xml-http-request';
-const { UserInteractionPlugin } = require('@opentelemetry/plugin-user-interaction');
+const { XMLHttpRequestInstrumentation } = require('@opentelemetry/instrumentation-xml-http-request');
 const { WebTracerProvider } = require('@opentelemetry/web');
-const tracerProvider = new WebTracerProvider();
 
-registerInstrumentations({
-  instrumentations: [
-    new GraphQLInstrumentation(),
-    {
-      plugins: {
-        http: { enabled: false },
-      },
-    }
-  ],
-  meterProvider: meterProvider,
-  tracerProvider: tracerProvider,
-});
+const tracerProvider = new WebTracerProvider();
 
 tracerProvider.register({
   propagator: new B3Propagator(),
 });
 
+registerInstrumentations({
+  instrumentations: [
+    new XMLHttpRequestInstrumentation({
+      ignoreUrls: [/localhost/],
+      propagateTraceHeaderCorsUrls: [
+        'http://localhost:8090',
+      ],
+    }),
+  ],
+  tracerProvider: tracerProvider,
+});
 ```
 
 ## License

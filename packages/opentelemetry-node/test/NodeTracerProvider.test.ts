@@ -20,14 +20,12 @@ import {
   setSpan,
   setSpanContext,
   getSpan,
-  diag,
 } from '@opentelemetry/api';
 import { AlwaysOnSampler, AlwaysOffSampler } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { Span } from '@opentelemetry/tracing';
 import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
 import * as assert from 'assert';
-import * as sinon from 'sinon';
 import * as path from 'path';
 import { ContextManager, ROOT_CONTEXT } from '@opentelemetry/api';
 import { NodeTracerProvider } from '../src/NodeTracerProvider';
@@ -78,20 +76,6 @@ describe('NodeTracerProvider', () => {
         sampler: new AlwaysOnSampler(),
       });
       assert.ok(provider instanceof NodeTracerProvider);
-    });
-
-    it('should show warning when plugins are defined', () => {
-      const dummyPlugin1 = {};
-      const spyWarn = sinon.spy(diag, 'warn');
-
-      const plugins = [dummyPlugin1];
-      const options = { plugins };
-      provider = new NodeTracerProvider(options);
-
-      assert.strictEqual(
-        spyWarn.args[0][0],
-        'plugins options was removed, please use "registerInstrumentations" to load plugins'
-      );
     });
   });
 

@@ -18,11 +18,6 @@ import { TracerProvider } from '@opentelemetry/api';
 import { MeterProvider } from '@opentelemetry/api-metrics';
 import { Instrumentation } from './types';
 import { AutoLoaderResult, InstrumentationOption } from './types_internal';
-import {
-  NodePlugins,
-  NodePluginsTracerConfiguration,
-  OldClassPlugin,
-} from './types_plugin_only';
 
 /**
  * Parses the options and returns instrumentations, node plugins and
@@ -33,31 +28,19 @@ export function parseInstrumentationOptions(
   options: InstrumentationOption[] = []
 ): AutoLoaderResult {
   let instrumentations: Instrumentation[] = [];
-  let pluginsNode: NodePlugins = {};
-  let pluginsWeb: OldClassPlugin[] = [];
   for (let i = 0, j = options.length; i < j; i++) {
     const option = options[i] as any;
     if (Array.isArray(option)) {
       const results = parseInstrumentationOptions(option);
       instrumentations = instrumentations.concat(results.instrumentations);
-      pluginsWeb = pluginsWeb.concat(results.pluginsWeb);
-      pluginsNode = Object.assign({}, pluginsNode, results.pluginsNode);
-    } else if ((option as NodePluginsTracerConfiguration).plugins) {
-      pluginsNode = Object.assign(
-        {},
-        pluginsNode,
-        (option as NodePluginsTracerConfiguration).plugins
-      );
     } else if (typeof option === 'function') {
       instrumentations.push(new option());
     } else if ((option as Instrumentation).instrumentationName) {
       instrumentations.push(option);
-    } else if ((option as OldClassPlugin).moduleName) {
-      pluginsWeb.push(option as OldClassPlugin);
     }
   }
 
-  return { instrumentations, pluginsNode, pluginsWeb };
+  return { instrumentations };
 }
 
 /**

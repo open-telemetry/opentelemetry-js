@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 const testsContextCommon = require.context('.', true, /test$/);
-testsContextCommon.keys().forEach(key => {
-  if (key.indexOf('./platform/BasePlugin.test') >= 0) {
-    return function () {};
-  }
-  return testsContextCommon(key);
-});
+testsContextCommon.keys().forEach(testsContextCommon);
 
 const srcContext = require.context('.', true, /src$/);
 srcContext.keys().forEach(srcContext);
