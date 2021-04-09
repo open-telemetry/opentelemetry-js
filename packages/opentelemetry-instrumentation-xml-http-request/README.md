@@ -20,19 +20,27 @@ import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing
 import { WebTracerProvider } from '@opentelemetry/web';
 import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xml-http-request';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
-// this is still possible
-const providerWithZone = new WebTracerProvider({
-  plugins: [
-    new XMLHttpRequestInstrumentation({
-      propagateTraceHeaderCorsUrls: ['http://localhost:8090']
-    })
-  ]
-});
+const providerWithZone = new WebTracerProvider();
+providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+
 providerWithZone.register({
   contextManager: new ZoneContextManager(),
 });
+
+registerInstrumentations({
+  instrumentations: [
+    new XMLHttpRequestInstrumentation({
+      propagateTraceHeaderCorsUrls: ['http://localhost:8090']
+    }),
+  ],
+  tracerProvider: provider,
+});
+
+
 const webTracerWithZone = providerWithZone.getTracer('default');
+
 /////////////////////////////////////////
 
 // or plugin can be also initialised separately and then set the tracer provider or meter provider
@@ -46,7 +54,6 @@ providerWithZone.register({
 xmlHttpRequestInstrumentation.setTracerProvider(providerWithZone);
 /////////////////////////////////////////
 
-providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
 // and some test
 const req = new XMLHttpRequest();

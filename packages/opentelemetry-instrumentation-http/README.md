@@ -24,25 +24,20 @@ To load a specific instrumentation (HTTP in this case), specify it in the Node T
 
 ```js
 const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
-
 const { ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { NodeTracerProvider } = require('@opentelemetry/node');
+const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 
-const provider = new NodeTracerProvider({
-  // be sure to disable old plugins
-  plugins: {
-    http: { enabled: false, path: '@opentelemetry/plugin-http' },
-    https: { enabled: false, path: '@opentelemetry/plugin-https' }
-  },
-});
-
-const httpInstrumentation = new HttpInstrumentation({
-  // see under for available configuration
-});
-httpInstrumentation.enable();
+const provider = new NodeTracerProvider();
 
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.register();
+
+registerInstrumentations({
+  instrumentations: [new HttpInstrumentation()],
+  tracerProvider: provider,
+});
+
 ```
 
 See [examples/http](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/http) for a short example.

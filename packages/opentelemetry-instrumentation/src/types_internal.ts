@@ -18,25 +18,15 @@ import { TracerProvider } from '@opentelemetry/api';
 import { MeterProvider } from '@opentelemetry/api-metrics';
 import { InstrumentationBase } from './platform';
 import { Instrumentation } from './types';
-import {
-  NodePlugins,
-  NodePluginsTracerConfiguration,
-  OldClassPlugin,
-} from './types_plugin_only';
 
 export type InstrumentationOption =
   | typeof InstrumentationBase
   | typeof InstrumentationBase[]
   | Instrumentation
-  | Instrumentation[]
-  | NodePluginsTracerConfiguration
-  | OldClassPlugin
-  | OldClassPlugin[];
+  | Instrumentation[];
 
 export interface AutoLoaderResult {
   instrumentations: Instrumentation[];
-  pluginsNode: NodePlugins;
-  pluginsWeb: OldClassPlugin[];
 }
 
 export interface AutoLoaderOptions {

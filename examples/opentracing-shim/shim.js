@@ -11,17 +11,6 @@ function shim(serviceName) {
   const provider = new NodeTracerProvider();
   registerInstrumentations({
     tracerProvider: provider,
-    // // when boostraping with lerna for testing purposes
-    // instrumentations: [
-    //   {
-    //     plugins: {
-    //       'opentracing': {
-    //         enabled: true,
-    //         path: `${__dirname}/../../packages/opentelemetry-shim-opentracing/build/src`
-    //       }
-    //     }
-    //   }
-    // ],
   });
 
   provider.addSpanProcessor(new SimpleSpanProcessor(getExporter(serviceName)));

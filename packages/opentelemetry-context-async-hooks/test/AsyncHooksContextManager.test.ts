@@ -415,6 +415,24 @@ for (const contextManagerClass of [
         patchedEE.emit('test');
       });
 
+      it('should return current context and removeAllListeners (when enabled)', done => {
+        const ee = new EventEmitter();
+        const context = ROOT_CONTEXT.setValue(key1, 1);
+        const patchedEE = contextManager.bind(ee, context);
+        const handler = () => {
+          assert.deepStrictEqual(contextManager.active(), context);
+          patchedEE.removeAllListeners();
+          assert.strictEqual(patchedEE.listeners('test').length, 0);
+          assert.strictEqual(patchedEE.listeners('test1').length, 0);
+          return done();
+        };
+        patchedEE.on('test', handler);
+        patchedEE.on('test1', handler);
+        assert.strictEqual(patchedEE.listeners('test').length, 1);
+        assert.strictEqual(patchedEE.listeners('test1').length, 1);
+        patchedEE.emit('test');
+      });
+
       /**
        * Even if asynchooks is disabled, the context propagation will
        * still works but it might be lost after any async op.
