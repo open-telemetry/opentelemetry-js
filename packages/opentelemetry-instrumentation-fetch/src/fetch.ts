@@ -145,6 +145,11 @@ export class FetchInstrumentation extends InstrumentationBase<
         this._getConfig().propagateTraceHeaderCorsUrls
       )
     ) {
+      const headers: Partial<Record<string, unknown>> = {};
+      api.propagation.inject(api.context.active(), headers);
+      if (Object.keys(headers).length > 0) {
+        api.diag.debug('headers inject skipped due to CORS policy');
+      }
       return;
     }
 
@@ -292,8 +297,8 @@ export class FetchInstrumentation extends InstrumentationBase<
       ): Promise<Response> {
         const url = input instanceof Request ? input.url : input;
         const options = input instanceof Request ? input : init || {};
-        const span = plugin._createSpan(url, options);
-        if (!span) {
+        const createdSpan = plugin._createSpan(url, options);
+        if (!createdSpan) {
           return original.apply(this, [url, options]);
         }
         const spanData = plugin._prepareSpanData(url);
@@ -338,15 +343,15 @@ export class FetchInstrumentation extends InstrumentationBase<
 
         return new Promise((resolve, reject) => {
           return api.context.with(
-            api.setSpan(api.context.active(), span),
+            api.setSpan(api.context.active(), createdSpan),
             () => {
               plugin._addHeaders(options, url);
               plugin._tasksCount++;
               return original
                 .apply(this, [url, options])
                 .then(
-                  (onSuccess as any).bind(this, span, resolve),
-                  onError.bind(this, span, reject)
+                  (onSuccess as any).bind(this, createdSpan, resolve),
+                  onError.bind(this, createdSpan, reject)
                 );
             }
           );

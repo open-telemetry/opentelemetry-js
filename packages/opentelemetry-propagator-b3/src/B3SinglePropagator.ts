@@ -17,6 +17,7 @@
 import {
   Context,
   getSpanContext,
+  isInstrumentationSuppressed,
   isSpanContextValid,
   isValidSpanId,
   isValidTraceId,
@@ -52,7 +53,12 @@ function convertToTraceFlags(samplingState: string | undefined): TraceFlags {
 export class B3SinglePropagator implements TextMapPropagator {
   inject(context: Context, carrier: unknown, setter: TextMapSetter) {
     const spanContext = getSpanContext(context);
-    if (!spanContext || !isSpanContextValid(spanContext)) return;
+    if (
+      !spanContext ||
+      !isSpanContextValid(spanContext) ||
+      isInstrumentationSuppressed(context)
+    )
+      return;
 
     const samplingState =
       context.getValue(B3_DEBUG_FLAG_KEY) || spanContext.traceFlags & 0x1;

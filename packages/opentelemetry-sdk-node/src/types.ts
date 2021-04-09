@@ -33,8 +33,6 @@ export interface NodeSDKConfiguration {
   metricProcessor: Processor;
   metricExporter: MetricExporter;
   metricInterval: number;
-  /* Deprecated */
-  plugins: InstrumentationOption[];
   instrumentations: InstrumentationOption[];
   resource: Resource;
   sampler: Sampler;

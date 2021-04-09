@@ -21,17 +21,19 @@ import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing
 import { WebTracerProvider } from '@opentelemetry/web';
 import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
-const provider = new WebTracerProvider({
-  plugins: [
-    new FetchInstrumentation(),
-  ],
-});
+const provider = new WebTracerProvider();
 
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
 provider.register({
   contextManager: new ZoneContextManager(),
+});
+
+registerInstrumentations({
+  instrumentations: [new FetchInstrumentation()],
+  tracerProvider: provider,
 });
 
 // or plugin can be also initialised separately and then set the tracer provider or meter provider

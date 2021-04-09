@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { diag, TextMapPropagator } from '@opentelemetry/api';
+import { TextMapPropagator } from '@opentelemetry/api';
 import { metrics } from '@opentelemetry/api-metrics';
 import { ContextManager } from '@opentelemetry/api';
 import { MeterConfig, MeterProvider } from '@opentelemetry/metrics';
@@ -102,9 +102,6 @@ export class NodeSDK {
     let instrumentations: InstrumentationOption[] = [];
     if (configuration.instrumentations) {
       instrumentations = configuration.instrumentations;
-    } else if (configuration.plugins) {
-      diag.error('plugins option is deprecated');
-      instrumentations = configuration.plugins;
     }
     this._instrumentations = instrumentations;
   }

@@ -45,9 +45,6 @@
       "path": "packages/opentelemetry-exporter-zipkin"
     },
     {
-      "path": "packages/opentelemetry-grpc-utils"
-    },
-    {
       "path": "packages/opentelemetry-instrumentation-fetch"
     },
     {
@@ -67,18 +64,6 @@
     },
     {
       "path": "packages/opentelemetry-node"
-    },
-    {
-      "path": "packages/opentelemetry-plugin-grpc-js"
-    },
-    {
-      "path": "packages/opentelemetry-plugin-grpc"
-    },
-    {
-      "path": "packages/opentelemetry-plugin-http"
-    },
-    {
-      "path": "packages/opentelemetry-plugin-https"
     },
     {
       "path": "packages/opentelemetry-propagator-b3"
