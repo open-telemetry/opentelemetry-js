@@ -537,10 +537,19 @@ describe('fetch', () => {
     });
 
     describe('when propagateTraceHeaderCorsUrls does NOT MATCH', () => {
+      let spyDebug: sinon.SinonSpy;
       beforeEach(done => {
+        const diagLogger = new api.DiagConsoleLogger();
+        spyDebug = sinon.spy();
+        diagLogger.debug = spyDebug;
+        api.diag.setLogger(diagLogger, api.DiagLogLevel.ALL);
         clearData();
         prepareData(done, url, {});
       });
+      afterEach(() => {
+        sinon.restore();
+      });
+
       it('should NOT set trace headers', () => {
         assert.strictEqual(
           lastResponse.headers[X_B3_TRACE_ID],
@@ -556,6 +565,12 @@ describe('fetch', () => {
           lastResponse.headers[X_B3_SAMPLED],
           undefined,
           `trace header '${X_B3_SAMPLED}' should not be set`
+        );
+      });
+      it('should debug info that injecting headers was skipped', () => {
+        assert.strictEqual(
+          spyDebug.lastCall.args[0],
+          'headers inject skipped due to CORS policy'
         );
       });
     });
