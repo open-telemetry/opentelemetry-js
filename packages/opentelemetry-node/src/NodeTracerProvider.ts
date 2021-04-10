@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { diag, TextMapPropagator } from '@opentelemetry/api';
+import { TextMapPropagator } from '@opentelemetry/api';
 import {
   AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
@@ -55,12 +54,6 @@ export class NodeTracerProvider extends BasicTracerProvider {
 
   constructor(config: NodeTracerConfig = {}) {
     super(config);
-    if (config.plugins) {
-      diag.warn(
-        'plugins options was removed, please use' +
-          ' "registerInstrumentations" to load plugins'
-      );
-    }
   }
 
   register(config: SDKRegistrationConfig = {}) {

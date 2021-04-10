@@ -23,6 +23,7 @@ import {
   getSpanContext,
   setSpanContext,
   ROOT_CONTEXT,
+  suppressInstrumentation,
 } from '@opentelemetry/api';
 import { B3Propagator } from '../src/B3Propagator';
 import { B3InjectEncoding } from '../src/types';
@@ -87,6 +88,24 @@ describe('B3Propagator', () => {
       );
       assert.strictEqual(carrier[X_B3_SPAN_ID], 'e457b5a2e4d86bd1');
       assert.strictEqual(carrier[X_B3_SAMPLED], '1');
+    });
+
+    it('should not inject if instrumentation suppressed', () => {
+      propagator = new B3Propagator();
+
+      const spanContext: SpanContext = {
+        traceId: '80f198ee56343ba864fe8b2a57d3eff7',
+        spanId: 'e457b5a2e4d86bd1',
+        traceFlags: TraceFlags.SAMPLED,
+      };
+
+      propagator.inject(
+        suppressInstrumentation(setSpanContext(ROOT_CONTEXT, spanContext)),
+        carrier,
+        defaultTextMapSetter
+      );
+
+      assert.strictEqual(carrier[B3_CONTEXT_HEADER], undefined);
     });
   });
 

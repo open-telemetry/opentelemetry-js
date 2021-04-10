@@ -21,6 +21,7 @@ import {
   ROOT_CONTEXT,
   setSpanContext,
   SpanContext,
+  suppressInstrumentation,
   TextMapGetter,
   TraceFlags,
 } from '@opentelemetry/api';
@@ -77,6 +78,21 @@ describe('JaegerHttpTracePropagator', () => {
         carrier[customHeader],
         'd4cda95b652f4a1592b449d5929fda1b:6e0c63257de34c92:0:01'
       );
+    });
+
+    it('should not set uber trace id header if instrumentation suppressed', () => {
+      const spanContext: SpanContext = {
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: '6e0c63257de34c92',
+        traceFlags: TraceFlags.SAMPLED,
+      };
+
+      jaegerHttpTracePropagator.inject(
+        suppressInstrumentation(setSpanContext(ROOT_CONTEXT, spanContext)),
+        carrier,
+        defaultTextMapSetter
+      );
+      assert.strictEqual(carrier[UBER_TRACE_ID_HEADER], undefined);
     });
   });
 

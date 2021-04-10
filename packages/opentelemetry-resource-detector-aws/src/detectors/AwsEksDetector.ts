@@ -66,7 +66,7 @@ export class AwsEksDetector implements Detector {
       await AwsEksDetector.fileAccessAsync(this.K8S_TOKEN_PATH);
       const k8scert = await AwsEksDetector.readFileAsync(this.K8S_CERT_PATH);
 
-      if (!this._isEks(k8scert)) {
+      if (!(await this._isEks(k8scert))) {
         return Resource.empty();
       }
 
