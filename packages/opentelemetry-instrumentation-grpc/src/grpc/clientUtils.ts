@@ -17,7 +17,7 @@
 import type * as grpcTypes from 'grpc';
 import type * as events from 'events';
 import { SendUnaryDataCallback, GrpcClientFunc } from './types';
-import { RpcAttribute } from '@opentelemetry/semantic-conventions';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import {
   context,
   Span,
@@ -31,6 +31,7 @@ import {
   _grpcStatusCodeToOpenTelemetryStatusCode,
   findIndex,
 } from '../utils';
+import { AttributeNames } from '../enums';
 
 /**
  * This method handles the client remote call
@@ -55,16 +56,19 @@ export const makeGrpcClientRemoteCall = function (
       if (err) {
         if (err.code) {
           span.setStatus(_grpcStatusCodeToSpanStatus(err.code));
-          span.setAttribute(RpcAttribute.GRPC_STATUS_CODE, err.code.toString());
+          span.setAttribute(
+            SemanticAttributes.RPC_GRPC_STATUS_CODE,
+            err.code.toString()
+          );
         }
         span.setAttributes({
-          [RpcAttribute.GRPC_ERROR_NAME]: err.name,
-          [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
+          [AttributeNames.GRPC_ERROR_NAME]: err.name,
+          [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
         });
       } else {
         span.setStatus({ code: SpanStatusCode.UNSET });
         span.setAttribute(
-          RpcAttribute.GRPC_STATUS_CODE,
+          SemanticAttributes.RPC_GRPC_STATUS_CODE,
           grpcClient.status.OK.toString()
         );
       }
@@ -96,8 +100,8 @@ export const makeGrpcClientRemoteCall = function (
 
     span.addEvent('sent');
     span.setAttributes({
-      [RpcAttribute.GRPC_METHOD]: original.path,
-      [RpcAttribute.GRPC_KIND]: SpanKind.CLIENT,
+      [AttributeNames.GRPC_METHOD]: original.path,
+      [AttributeNames.GRPC_KIND]: SpanKind.CLIENT,
     });
 
     setSpanContext(metadata);
@@ -123,8 +127,8 @@ export const makeGrpcClientRemoteCall = function (
             message: err.message,
           });
           span.setAttributes({
-            [RpcAttribute.GRPC_ERROR_NAME]: err.name,
-            [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
+            [AttributeNames.GRPC_ERROR_NAME]: err.name,
+            [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
           });
           endSpan();
         }
@@ -135,7 +139,7 @@ export const makeGrpcClientRemoteCall = function (
         (status: SpanStatus) => {
           span.setStatus({ code: SpanStatusCode.UNSET });
           span.setAttribute(
-            RpcAttribute.GRPC_STATUS_CODE,
+            SemanticAttributes.RPC_GRPC_STATUS_CODE,
             status.code.toString()
           );
           endSpan();

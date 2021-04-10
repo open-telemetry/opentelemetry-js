@@ -14,5 +14,5 @@
  * limitations under the License.
  */
 
-export * from './trace';
-export * from './resource';
+// Event name definitions
+export const ExceptionEventName = 'exception';

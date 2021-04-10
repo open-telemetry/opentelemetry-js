@@ -21,7 +21,7 @@ import {
   InstrumentationConfig,
 } from '@opentelemetry/instrumentation';
 import { hrTime, isUrlIgnored, otperformance } from '@opentelemetry/core';
-import { HttpAttribute } from '@opentelemetry/semantic-conventions';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import {
   addSpanNetworkEvents,
   getResource,
@@ -37,6 +37,7 @@ import {
   XhrMem,
 } from './types';
 import { VERSION } from './version';
+import { AttributeNames } from './enums/AttributeNames';
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
@@ -150,20 +151,23 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     if (typeof spanUrl === 'string') {
       const parsedUrl = parseUrl(spanUrl);
       if (xhrMem.status !== undefined) {
-        span.setAttribute(HttpAttribute.HTTP_STATUS_CODE, xhrMem.status);
+        span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, xhrMem.status);
       }
       if (xhrMem.statusText !== undefined) {
-        span.setAttribute(HttpAttribute.HTTP_STATUS_TEXT, xhrMem.statusText);
+        span.setAttribute(AttributeNames.HTTP_STATUS_TEXT, xhrMem.statusText);
       }
-      span.setAttribute(HttpAttribute.HTTP_HOST, parsedUrl.host);
+      span.setAttribute(SemanticAttributes.HTTP_HOST, parsedUrl.host);
       span.setAttribute(
-        HttpAttribute.HTTP_SCHEME,
+        SemanticAttributes.HTTP_SCHEME,
         parsedUrl.protocol.replace(':', '')
       );
 
       // @TODO do we want to collect this or it will be collected earlier once only or
       //    maybe when parent span is not available ?
-      span.setAttribute(HttpAttribute.HTTP_USER_AGENT, navigator.userAgent);
+      span.setAttribute(
+        SemanticAttributes.HTTP_USER_AGENT,
+        navigator.userAgent
+      );
     }
   }
 
@@ -305,8 +309,8 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     const currentSpan = this.tracer.startSpan(spanName, {
       kind: api.SpanKind.CLIENT,
       attributes: {
-        [HttpAttribute.HTTP_METHOD]: method,
-        [HttpAttribute.HTTP_URL]: url,
+        [SemanticAttributes.HTTP_METHOD]: method,
+        [SemanticAttributes.HTTP_URL]: url,
       },
     });
 
