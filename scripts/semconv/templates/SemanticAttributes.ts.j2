@@ -40,9 +40,6 @@ export const {{class}} = {
   * @deprecated {{attribute.deprecated | to_doc_brief}}.
     {%- endif %}
   */
-    {%- if attribute.deprecated %}
-  @Deprecated
-    {%- endif %}
   {{attribute.fqn | to_const_name}}: '{{attribute.fqn}}',
   {%- endfor %}
 }
