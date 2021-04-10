@@ -50,10 +50,6 @@ export class BasicTracerProvider implements TracerProvider {
     ['baggage', () => new HttpBaggage()],
   ]);
 
-  static registerPropagator(name: string, factory: PROPAGATOR_FACTORY): void {
-    this._registeredPropagators.set(name, factory);
-  }
-
   private readonly _config: TracerConfig;
   private readonly _registeredSpanProcessors: SpanProcessor[] = [];
   private readonly _tracers: Map<string, Tracer> = new Map();
@@ -125,6 +121,7 @@ export class BasicTracerProvider implements TracerProvider {
   }
 
   protected _buildPropagatorFromEnv(): TextMapPropagator | undefined {
+    // per spec, propagators from env must be deduplicated
     const uniquePropagatorNames = [...new Set(getEnv().OTEL_PROPAGATORS)];
 
     const propagators = uniquePropagatorNames.map(name => {

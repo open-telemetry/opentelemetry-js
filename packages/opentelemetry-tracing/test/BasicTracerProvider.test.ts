@@ -29,12 +29,12 @@ import {
   propagation,
   diag,
 } from '@opentelemetry/api';
+import { CompositePropagator } from '@opentelemetry/core';
 import {
   AlwaysOnSampler,
   AlwaysOffSampler,
   TraceState,
 } from '@opentelemetry/core';
-import { RAW_ENVIRONMENT } from '@opentelemetry/core/src/utils/environment';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -125,7 +125,7 @@ describe('BasicTracerProvider', () => {
   describe('.register()', () => {
     const envSource = (typeof window !== 'undefined'
       ? window
-      : process.env) as RAW_ENVIRONMENT;
+      : process.env) as any;
 
     describe('propagator', () => {
       class DummyPropagator implements TextMapPropagator {
@@ -152,7 +152,7 @@ describe('BasicTracerProvider', () => {
         [TextMapPropagator],
         TextMapPropagator
       >;
-      let originalPropagators: RAW_ENVIRONMENT['OTEL_PROPAGATORS'];
+      let originalPropagators: string | number | undefined | string[];
       beforeEach(() => {
         setGlobalPropagatorStub = sinon.spy(propagation, 'setGlobalPropagator');
         originalPropagators = envSource.OTEL_PROPAGATORS;
@@ -160,7 +160,13 @@ describe('BasicTracerProvider', () => {
 
       afterEach(() => {
         setGlobalPropagatorStub.restore();
-        envSource.OTEL_PROPAGATORS = originalPropagators;
+
+        // otherwise we may assign 'undefined' (a string)
+        if (originalPropagators !== undefined) {
+          envSource.OTEL_PROPAGATORS = originalPropagators;
+        } else {
+          delete envSource.OTEL_PROPAGATORS;
+        }
       });
 
       it('should be set to a given value if it it provided', () => {
@@ -175,26 +181,21 @@ describe('BasicTracerProvider', () => {
         );
       });
 
-      it('should be set to a given value if it it provided in an environment variable', () => {
-        envSource.OTEL_PROPAGATORS = 'dummy';
-        BasicTracerProvider.registerPropagator(
-          'dummy',
-          () => new DummyPropagator()
-        );
-
+      it('should be composite if 2 or more propagators provided in an environment variable', () => {
         const provider = new BasicTracerProvider();
         provider.register();
 
         assert.ok(
           setGlobalPropagatorStub.calledOnceWithExactly(
-            sinon.match.instanceOf(DummyPropagator)
+            sinon.match.instanceOf(CompositePropagator)
           )
         );
+        assert.deepStrictEqual(setGlobalPropagatorStub.args[0][0].fields(), [
+          'traceparent',
+          'tracestate',
+          'baggage',
+        ]);
       });
-
-      it(
-        'should be composite if more than 2 propagators provided in an environment variable'
-      );
 
       it('warns if there is no propagator registered with a given name', () => {
         const warnStub = sinon.spy(diag, 'warn');
