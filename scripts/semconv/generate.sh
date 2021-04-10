@@ -15,7 +15,7 @@ cd opentelemetry-specification
 
 git init
 git remote add origin https://github.com/open-telemetry/opentelemetry-specification.git
-git fetch origin "$SPEC_VERSION"
+git fetch origin "$SPEC_VERSION" --depth=1
 git reset --hard FETCH_HEAD
 cd ${SCRIPT_DIR}
 
