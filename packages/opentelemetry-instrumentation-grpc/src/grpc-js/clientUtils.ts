@@ -24,7 +24,6 @@ import {
   propagation,
   context,
 } from '@opentelemetry/api';
-import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import type * as grpcJs from '@grpc/grpc-js';
 import {
   _grpcStatusCodeToSpanStatus,
@@ -33,6 +32,8 @@ import {
 } from '../utils';
 import { CALL_SPAN_ENDED } from './serverUtils';
 import { EventEmitter } from 'events';
+import { AttributeNames } from '../enums';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 /**
  * Parse a package method list and return a list of methods to patch
@@ -89,16 +90,19 @@ export function makeGrpcClientRemoteCall(
       if (err) {
         if (err.code) {
           span.setStatus(_grpcStatusCodeToSpanStatus(err.code));
-          span.setAttribute(RpcAttribute.GRPC_STATUS_CODE, err.code.toString());
+          span.setAttribute(
+            SemanticAttributes.RPC_GRPC_STATUS_CODE,
+            err.code.toString()
+          );
         }
         span.setAttributes({
-          [RpcAttribute.GRPC_ERROR_NAME]: err.name,
-          [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
+          [AttributeNames.GRPC_ERROR_NAME]: err.name,
+          [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
         });
       } else {
         span.setStatus({ code: SpanStatusCode.UNSET });
         span.setAttribute(
-          RpcAttribute.GRPC_STATUS_CODE,
+          SemanticAttributes.RPC_GRPC_STATUS_CODE,
           SpanStatusCode.UNSET.toString()
         );
       }
@@ -124,8 +128,8 @@ export function makeGrpcClientRemoteCall(
     }
 
     span.setAttributes({
-      [RpcAttribute.GRPC_METHOD]: original.path,
-      [RpcAttribute.GRPC_KIND]: SpanKind.CLIENT,
+      [AttributeNames.GRPC_METHOD]: original.path,
+      [AttributeNames.GRPC_KIND]: SpanKind.CLIENT,
     });
 
     setSpanContext(metadata);
@@ -154,8 +158,8 @@ export function makeGrpcClientRemoteCall(
           message: err.message,
         });
         span.setAttributes({
-          [RpcAttribute.GRPC_ERROR_NAME]: err.name,
-          [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
+          [AttributeNames.GRPC_ERROR_NAME]: err.name,
+          [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
         });
 
         endSpan();

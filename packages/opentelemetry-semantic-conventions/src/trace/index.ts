@@ -13,12 +13,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-export * from './database';
-export * from './exception';
-export * from './general';
-export * from './http';
-export * from './os';
-export * from './rpc';
-export * from './faas';
-export * from './messaging';
+export * from './SemanticAttributes';

@@ -1,0 +1,60 @@
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+{%- macro print_value(type, value) -%}
+  {{ "\"" if type == "string"}}{{value}}{{ "\"" if type == "string"}}
+{%- endmacro %}
+{%- macro upFirst(text) -%}
+  {{ text[0]|upper}}{{text[1:] }}
+{%- endmacro %}
+{%- macro lowerFirst(text) -%}
+  {{ text[0]|lower}}{{text[1:] }}
+{%- endmacro %}
+
+// DO NOT EDIT, this is an Auto-generated file from scripts/semconv/templates/{{template}}
+export const {{class}} = {
+  {%- for attribute in attributes if attribute.is_local and not attribute.ref %}
+
+  /**
+  * {% filter escape %}{{attribute.brief | to_doc_brief}}.{% endfilter %}
+    {%- if attribute.note %}
+  *
+  * Note: {% filter escape %}{{attribute.note | to_doc_brief}}.{% endfilter %}
+    {%- endif %}
+    {%- if attribute.deprecated %}
+  *
+  * @deprecated {{attribute.deprecated | to_doc_brief}}.
+    {%- endif %}
+  */
+  {{attribute.fqn | to_const_name}}: '{{attribute.fqn}}',
+  {%- endfor %}
+}
+
+// Enum definitions
+{%- for attribute in attributes if attribute.is_local %}
+{%- if attribute.is_enum %}
+{%- set class_name = attribute.fqn | to_camelcase(True) ~ "Values" %}
+{%- set type = attribute.attr_type.enum_type %}
+
+export enum {{class_name}} {
+  {%- for member in attribute.attr_type.members if attribute.is_local and not attribute.ref %}
+  /** {% filter escape %}{{member.brief | to_doc_brief}}.{% endfilter %} */
+  {{ member.member_id | to_const_name }} = {{ print_value(type, member.value) }},
+  {%- endfor %}
+}
+{% endif %}
+{%- endfor %}

@@ -22,7 +22,14 @@ import {
   setSpan,
   setSpanContext,
   getSpan,
+  TextMapPropagator,
+  TextMapSetter,
+  Context,
+  TextMapGetter,
+  propagation,
+  diag,
 } from '@opentelemetry/api';
+import { CompositePropagator } from '@opentelemetry/core';
 import {
   AlwaysOnSampler,
   AlwaysOffSampler,
@@ -112,6 +119,99 @@ describe('BasicTracerProvider', () => {
     it('should construct an instance of BasicTracerProvider', () => {
       const tracer = new BasicTracerProvider();
       assert.ok(tracer instanceof BasicTracerProvider);
+    });
+  });
+
+  describe('.register()', () => {
+    const envSource = (typeof window !== 'undefined'
+      ? window
+      : process.env) as any;
+
+    describe('propagator', () => {
+      class DummyPropagator implements TextMapPropagator {
+        inject(
+          context: Context,
+          carrier: any,
+          setter: TextMapSetter<any>
+        ): void {
+          throw new Error('Method not implemented.');
+        }
+        extract(
+          context: Context,
+          carrier: any,
+          getter: TextMapGetter<any>
+        ): Context {
+          throw new Error('Method not implemented.');
+        }
+        fields(): string[] {
+          throw new Error('Method not implemented.');
+        }
+      }
+
+      let setGlobalPropagatorStub: sinon.SinonSpy<
+        [TextMapPropagator],
+        TextMapPropagator
+      >;
+      let originalPropagators: string | number | undefined | string[];
+      beforeEach(() => {
+        setGlobalPropagatorStub = sinon.spy(propagation, 'setGlobalPropagator');
+        originalPropagators = envSource.OTEL_PROPAGATORS;
+      });
+
+      afterEach(() => {
+        setGlobalPropagatorStub.restore();
+
+        // otherwise we may assign 'undefined' (a string)
+        if (originalPropagators !== undefined) {
+          envSource.OTEL_PROPAGATORS = originalPropagators;
+        } else {
+          delete envSource.OTEL_PROPAGATORS;
+        }
+      });
+
+      it('should be set to a given value if it it provided', () => {
+        const provider = new BasicTracerProvider();
+        provider.register({
+          propagator: new DummyPropagator(),
+        });
+        assert.ok(
+          setGlobalPropagatorStub.calledOnceWithExactly(
+            sinon.match.instanceOf(DummyPropagator)
+          )
+        );
+      });
+
+      it('should be composite if 2 or more propagators provided in an environment variable', () => {
+        const provider = new BasicTracerProvider();
+        provider.register();
+
+        assert.ok(
+          setGlobalPropagatorStub.calledOnceWithExactly(
+            sinon.match.instanceOf(CompositePropagator)
+          )
+        );
+        assert.deepStrictEqual(setGlobalPropagatorStub.args[0][0].fields(), [
+          'traceparent',
+          'tracestate',
+          'baggage',
+        ]);
+      });
+
+      it('warns if there is no propagator registered with a given name', () => {
+        const warnStub = sinon.spy(diag, 'warn');
+
+        envSource.OTEL_PROPAGATORS = 'missing-propagator';
+        const provider = new BasicTracerProvider({});
+        provider.register();
+
+        assert.ok(
+          warnStub.calledOnceWithExactly(
+            'Propagator "missing-propagator" requested through environment variable is unavailable.'
+          )
+        );
+
+        warnStub.restore();
+      });
     });
   });
 
