@@ -35,7 +35,11 @@ import {
 } from '@opentelemetry/web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { FetchInstrumentation, FetchInstrumentationConfig } from '../src';
+import {
+  FetchInstrumentation,
+  FetchInstrumentationConfig,
+  FetchCustomAttributeFunction,
+} from '../src';
 import { AttributeNames } from '../src/enums/AttributeNames';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
@@ -58,11 +62,6 @@ const getData = (url: string, method?: string) =>
   });
 
 const CUSTOM_ATTRIBUTE_KEY = 'span kind';
-
-const customAttributeFunction = (span: api.Span): void => {
-  span.setAttribute(CUSTOM_ATTRIBUTE_KEY, api.SpanKind.CLIENT);
-};
-
 const defaultResource = {
   connectEnd: 15,
   connectStart: 13,
@@ -291,10 +290,7 @@ describe('fetch', () => {
   describe('when request is successful', () => {
     beforeEach(done => {
       const propagateTraceHeaderCorsUrls = [url];
-      prepareData(done, url, {
-        propagateTraceHeaderCorsUrls,
-        applyCustomAttributesOnSpan: customAttributeFunction,
-      });
+      prepareData(done, url, { propagateTraceHeaderCorsUrls });
     });
 
     afterEach(() => {
@@ -338,21 +334,21 @@ describe('fetch', () => {
       const keys = Object.keys(attributes);
 
       assert.ok(
-        attributes[AttributeNames.COMPONENT] !== '',
+        attributes[keys[0]] !== '',
         `attributes ${AttributeNames.COMPONENT} is not defined`
       );
       assert.strictEqual(
-        attributes[HttpAttribute.HTTP_METHOD],
+        attributes[keys[1]],
         'GET',
         `attributes ${SemanticAttributes.HTTP_METHOD} is wrong`
       );
       assert.strictEqual(
-        attributes[HttpAttribute.HTTP_URL],
+        attributes[keys[2]],
         url,
         `attributes ${SemanticAttributes.HTTP_URL} is wrong`
       );
       assert.strictEqual(
-        attributes[HttpAttribute.HTTP_STATUS_CODE],
+        attributes[keys[3]],
         200,
         `attributes ${SemanticAttributes.HTTP_STATUS_CODE} is wrong`
       );
@@ -377,21 +373,7 @@ describe('fetch', () => {
         `attributes ${SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
       );
 
-      delete attributes[HttpAttribute.HTTP_USER_AGENT];
-      delete attributes[HttpAttribute.HTTP_HOST];
-
-      assert.deepStrictEqual(attributes, {
-        [AttributeNames.COMPONENT]: 'fetch',
-        [HttpAttribute.HTTP_METHOD]: 'GET',
-        [HttpAttribute.HTTP_URL]: url,
-        [HttpAttribute.HTTP_STATUS_CODE]: 200,
-        [HttpAttribute.HTTP_STATUS_TEXT]: 'OK',
-        [HttpAttribute.HTTP_SCHEME]: 'http',
-        [HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH]: 30,
-        [CUSTOM_ATTRIBUTE_KEY]: api.SpanKind.CLIENT,
-      });
-
-      assert.strictEqual(keys.length, 10, 'number of attributes is wrong');
+      assert.strictEqual(keys.length, 9, 'number of attributes is wrong');
     });
 
     it('span should have correct events', () => {
@@ -599,6 +581,73 @@ describe('fetch', () => {
     });
   });
 
+  describe('applyCustomAttributesOnSpan option', () => {
+    const noop = () => {};
+    const prepare = (
+      url: string,
+      applyCustomAttributesOnSpan: FetchCustomAttributeFunction,
+      cb: VoidFunction = noop
+    ) => {
+      const propagateTraceHeaderCorsUrls = [url];
+
+      prepareData(cb, url, {
+        propagateTraceHeaderCorsUrls,
+        applyCustomAttributesOnSpan,
+      });
+    };
+
+    afterEach(() => {
+      clearData();
+    });
+
+    it('applies attributes when the request is succesful', done => {
+      prepare(
+        url,
+        span => {
+          span.setAttribute(CUSTOM_ATTRIBUTE_KEY, 'custom value');
+        },
+        () => {
+          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+          const attributes = span.attributes;
+
+          assert.ok(attributes[CUSTOM_ATTRIBUTE_KEY] === 'custom value');
+          done();
+        }
+      );
+    });
+
+    it('applies custom attributes when the request fails', done => {
+      prepare(
+        badUrl,
+        span => {
+          span.setAttribute(CUSTOM_ATTRIBUTE_KEY, 'custom value');
+        },
+        () => {
+          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+          const attributes = span.attributes;
+
+          assert.ok(attributes[CUSTOM_ATTRIBUTE_KEY] === 'custom value');
+          done();
+        }
+      );
+    });
+
+    it('has request and response objects in callback arguments', done => {
+      const applyCustomAttributes: FetchCustomAttributeFunction = (
+        span,
+        request,
+        response
+      ) => {
+        assert.ok(request.method === 'GET');
+        assert.ok(response.status === 200);
+
+        done();
+      };
+
+      prepare(url, applyCustomAttributes);
+    });
+  });
+
   describe('when url is ignored', () => {
     beforeEach(done => {
       const propagateTraceHeaderCorsUrls = url;
@@ -638,32 +687,17 @@ describe('fetch', () => {
   describe('when request is NOT successful (wrong url)', () => {
     beforeEach(done => {
       const propagateTraceHeaderCorsUrls = badUrl;
-      prepareData(done, badUrl, {
-        propagateTraceHeaderCorsUrls,
-        applyCustomAttributesOnSpan: customAttributeFunction,
-      });
+      prepareData(done, badUrl, { propagateTraceHeaderCorsUrls });
     });
     afterEach(() => {
       clearData();
     });
-
     it('should create a span with correct root span', () => {
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
       assert.strictEqual(
         span.parentSpanId,
         rootSpan.context().spanId,
         'parent span is not root span'
-      );
-    });
-
-    it('should apply custom attributes', () => {
-      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-      const attributes = span.attributes;
-
-      assert.strictEqual(
-        attributes[CUSTOM_ATTRIBUTE_KEY],
-        api.SpanKind.CLIENT,
-        'Custom attribute was not applied'
       );
     });
   });
