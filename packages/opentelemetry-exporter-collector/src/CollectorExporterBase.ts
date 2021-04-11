@@ -15,12 +15,18 @@
  */
 
 import { SpanAttributes, diag } from '@opentelemetry/api';
-import { ExportResult, ExportResultCode } from '@opentelemetry/core';
+import {
+  ExportResult,
+  ExportResultCode,
+  getEnv,
+  baggageUtils,
+} from '@opentelemetry/core';
 import {
   CollectorExporterError,
   CollectorExporterConfigBase,
   ExportServiceError,
 } from './types';
+import { parseHeaders } from './util';
 
 /**
  * Collector Exporter abstract base class
@@ -34,17 +40,22 @@ export abstract class CollectorExporterBase<
   public readonly url: string;
   public readonly hostname: string | undefined;
   public readonly attributes?: SpanAttributes;
+  public readonly headers: Record<string, string>;
   protected _concurrencyLimit: number;
   protected _isShutdown: boolean = false;
   private _shuttingDownPromise: Promise<void> = Promise.resolve();
   protected _sendingPromises: Promise<unknown>[] = [];
 
+  private _defaultEndpoint = 'localhost:4317';
+
   /**
    * @param config
    */
   constructor(config: T = {} as T) {
-    this.serviceName = this.getDefaultServiceName(config);
-    this.url = this.getDefaultUrl(config);
+    this.serviceName = this._getDefaultServiceName(config);
+    this.url = this._getUrl(config);
+    this.headers = this._getHeaders(config);
+
     if (typeof config.hostname === 'string') {
       this.hostname = config.hostname;
     }
@@ -132,6 +143,98 @@ export abstract class CollectorExporterBase<
     return this._shuttingDownPromise;
   }
 
+  private _getUrl(config: T): string {
+    // if given, use url defined in config
+    if (typeof config.url !== 'undefined') {
+      return config.url;
+    }
+    const endpointFromEnv = getEnv().OTEL_EXPORTER_OTLP_ENDPOINT;
+    const defaultEndpoint = this.getProtocol().includes('http')
+      ? `http://${this._defaultEndpoint}/v1/${this.getExporterType()}s`
+      : this._defaultEndpoint;
+    console.log(this.getExporterType(), this.getProtocol(), defaultEndpoint)
+    switch (this.getExporterType()) {
+      case 'metric': {
+        const url = getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT;
+        return url && url.length > 0
+          ? url
+          : endpointFromEnv && endpointFromEnv.length > 0
+          ? endpointFromEnv
+          : defaultEndpoint;
+      }
+      case 'trace': {
+        const url = getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT;
+        return url && url.length > 0
+          ? url
+          : endpointFromEnv && endpointFromEnv.length > 0
+          ? endpointFromEnv
+          : defaultEndpoint;
+      }
+      default: {
+        return getEnv().OTEL_EXPORTER_OTLP_ENDPOINT;
+      }
+    }
+  }
+
+  private _getDefaultServiceName(config: T): string {
+    // if given, use url defined in config
+    if (typeof config.serviceName !== 'undefined') {
+      return config.serviceName;
+    }
+    switch (this.getExporterType()) {
+      case 'metric':
+        return 'collector-metric-exporter';
+      case 'trace':
+        return 'collector-trace-exporter';
+      default:
+        return 'collector-exporter';
+    }
+  }
+
+  private _getHeaders(config: T): Record<string, string> {
+    const configuredHeaders = parseHeaders(config.headers ?? {});
+    switch (this.getExporterType()) {
+      case 'metric': {
+        return Object.assign(
+          configuredHeaders,
+          this._parseHeadersFromEnv(getEnv().OTEL_EXPORTER_OTLP_HEADERS),
+          this._parseHeadersFromEnv(getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS)
+        );
+      }
+      case 'trace': {
+        return Object.assign(
+          configuredHeaders,
+          this._parseHeadersFromEnv(getEnv().OTEL_EXPORTER_OTLP_HEADERS),
+          this._parseHeadersFromEnv(getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS)
+        );
+      }
+      default: {
+        return Object.assign(
+          configuredHeaders,
+          this._parseHeadersFromEnv(getEnv().OTEL_EXPORTER_OTLP_HEADERS)
+        );
+      }
+    }
+  }
+
+  /**
+   * Parse headers from environment variable in the baggage HTTP Format:
+   * https://github.com/w3c/baggage/blob/master/baggage/HTTP_HEADER_FORMAT.md
+   */
+  private _parseHeadersFromEnv(envValue?: string) {
+    if (typeof envValue !== 'string' || envValue.length === 0) return {};
+    return envValue
+      .split(baggageUtils.ITEMS_SEPARATOR)
+      .map(entry => {
+        return baggageUtils.parsePairKeyValue(entry);
+      })
+      .filter(keyPair => keyPair !== undefined && keyPair.value.length > 0)
+      .reduce((headers, keyPair) => {
+        headers[keyPair!.key] = keyPair!.value;
+        return headers;
+      }, {} as Record<string, string>);
+  }
+
   abstract onShutdown(): void;
   abstract onInit(config: T): void;
   abstract send(
@@ -139,7 +242,7 @@ export abstract class CollectorExporterBase<
     onSuccess: () => void,
     onError: (error: CollectorExporterError) => void
   ): void;
-  abstract getDefaultUrl(config: T): string;
-  abstract getDefaultServiceName(config: T): string;
   abstract convert(objects: ExportItem[]): ServiceRequest;
+  public abstract getExporterType(): 'trace' | 'metric';
+  public abstract getProtocol(): 'http/json' | 'grpc' | 'http/protobuf';
 }

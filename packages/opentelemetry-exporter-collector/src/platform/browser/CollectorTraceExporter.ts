@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-import { CollectorExporterConfigBase } from '../../types';
 import { CollectorExporterBrowserBase } from './CollectorExporterBrowserBase';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
 import * as collectorTypes from '../../types';
-
-const DEFAULT_SERVICE_NAME = 'collector-trace-exporter';
-const DEFAULT_COLLECTOR_URL = 'http://localhost:55681/v1/trace';
 
 /**
  * Collector Trace Exporter for Web
@@ -38,11 +34,11 @@ export class CollectorTraceExporter
     return toCollectorExportTraceServiceRequest(spans, this, true);
   }
 
-  getDefaultUrl(config: CollectorExporterConfigBase) {
-    return config.url || DEFAULT_COLLECTOR_URL;
+  getExporterType() {
+    return 'trace' as const;
   }
 
-  getDefaultServiceName(config: CollectorExporterConfigBase): string {
-    return config.serviceName || DEFAULT_SERVICE_NAME;
+  getProtocol() {
+    return 'http/json' as const;
   }
 }

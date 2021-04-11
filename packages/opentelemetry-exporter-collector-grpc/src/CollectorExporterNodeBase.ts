@@ -20,11 +20,7 @@ import {
   collectorTypes,
 } from '@opentelemetry/exporter-collector';
 import type { Metadata } from 'grpc';
-import {
-  CollectorExporterConfigNode,
-  GRPCQueueItem,
-  ServiceClientType,
-} from './types';
+import { CollectorExporterConfigNode, GRPCQueueItem } from './types';
 import { ServiceClient } from './types';
 
 /**
@@ -119,5 +115,4 @@ export abstract class CollectorExporterNodeBase<
   }
 
   abstract getServiceProtoPath(): string;
-  abstract getServiceClientType(): ServiceClientType;
 }

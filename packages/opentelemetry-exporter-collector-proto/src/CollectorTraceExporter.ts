@@ -19,12 +19,7 @@ import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import {
   collectorTypes,
   toCollectorExportTraceServiceRequest,
-  CollectorExporterNodeConfigBase,
 } from '@opentelemetry/exporter-collector';
-import { ServiceClientType } from './types';
-
-const DEFAULT_SERVICE_NAME = 'collector-trace-exporter';
-const DEFAULT_COLLECTOR_URL = 'http://localhost:55681/v1/trace';
 
 /**
  * Collector Trace Exporter for Node with protobuf
@@ -41,18 +36,11 @@ export class CollectorTraceExporter
     return toCollectorExportTraceServiceRequest(spans, this);
   }
 
-  getDefaultUrl(config: CollectorExporterNodeConfigBase): string {
-    if (!config.url) {
-      return DEFAULT_COLLECTOR_URL;
-    }
-    return config.url;
+  public getExporterType() {
+    return 'trace' as const;
   }
 
-  getDefaultServiceName(config: CollectorExporterNodeConfigBase): string {
-    return config.serviceName || DEFAULT_SERVICE_NAME;
-  }
-
-  getServiceClientType() {
-    return ServiceClientType.SPANS;
+  getProtocol() {
+    return 'http/protobuf' as const;
   }
 }

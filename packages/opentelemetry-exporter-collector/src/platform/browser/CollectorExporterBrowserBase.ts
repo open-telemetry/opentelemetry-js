@@ -17,7 +17,6 @@
 import { CollectorExporterBase } from '../../CollectorExporterBase';
 import { CollectorExporterConfigBase } from '../../types';
 import * as collectorTypes from '../../types';
-import { parseHeaders } from '../../util';
 import { sendWithBeacon, sendWithXhr } from './util';
 import { diag } from '@opentelemetry/api';
 
@@ -32,7 +31,6 @@ export abstract class CollectorExporterBrowserBase<
   ExportItem,
   ServiceRequest
 > {
-  private _headers: Record<string, string>;
   private _useXHR: boolean = false;
 
   /**
@@ -42,11 +40,6 @@ export abstract class CollectorExporterBrowserBase<
     super(config);
     this._useXHR =
       !!config.headers || typeof navigator.sendBeacon !== 'function';
-    if (this._useXHR) {
-      this._headers = parseHeaders(config.headers);
-    } else {
-      this._headers = {};
-    }
   }
 
   onInit(): void {
@@ -85,7 +78,7 @@ export abstract class CollectorExporterBrowserBase<
       };
 
       if (this._useXHR) {
-        sendWithXhr(body, this.url, this._headers, _onSuccess, _onError);
+        sendWithXhr(body, this.url, this.headers, _onSuccess, _onError);
       } else {
         sendWithBeacon(body, this.url, _onSuccess, _onError);
       }

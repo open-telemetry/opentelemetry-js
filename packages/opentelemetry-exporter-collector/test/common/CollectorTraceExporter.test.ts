@@ -43,17 +43,17 @@ class CollectorTraceExporter extends CollectorExporterBase<
       )
     );
   }
-  getDefaultUrl(config: CollectorExporterConfig): string {
-    return config.url || '';
-  }
-  getDefaultServiceName(config: CollectorExporterConfig): string {
-    return config.serviceName || 'collector-exporter';
-  }
 
   convert(
     spans: ReadableSpan[]
   ): collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
     return { resourceSpans: [] };
+  }
+  getExporterType() {
+    return 'trace' as const;
+  }
+  getProtocol() {
+    return 'http/json' as const;
   }
 }
 
@@ -107,7 +107,50 @@ describe('CollectorTraceExporter - common', () => {
       });
 
       it('should set default serviceName', () => {
-        assert.strictEqual(collectorExporter.serviceName, 'collector-exporter');
+        assert.strictEqual(
+          collectorExporter.serviceName,
+          'collector-trace-exporter'
+        );
+      });
+    });
+
+    describe('when configuring via environment', () => {
+      const envSource = (typeof window !== 'undefined'
+        ? window
+        : process.env) as any;
+      it('should use url defined in env', () => {
+        envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+        const collectorExporter = new CollectorTraceExporter();
+        assert.strictEqual(
+          collectorExporter.url,
+          envSource.OTEL_EXPORTER_OTLP_ENDPOINT
+        );
+        envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+      });
+      it('should override global exporter url with signal url defined in env', () => {
+        envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+        envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.traces';
+        const collectorExporter = new CollectorTraceExporter();
+        assert.strictEqual(
+          collectorExporter.url,
+          envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+        );
+        envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+        envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
+      });
+      it('should use headers defined via env', () => {
+        envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
+        const collectorExporter = new CollectorTraceExporter();
+        assert.strictEqual(collectorExporter.headers.foo, 'bar');
+        envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
+      });
+      it('should override global headers config with signal headers defined via env', () => {
+        envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
+        envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = 'foo=boo';
+        const collectorExporter = new CollectorTraceExporter();
+        assert.strictEqual(collectorExporter.headers.foo, 'boo');
+        assert.strictEqual(collectorExporter.headers.bar, 'foo');
+        envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = '';
       });
     });
   });

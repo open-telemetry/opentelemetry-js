@@ -20,11 +20,7 @@ import { collectorTypes } from '@opentelemetry/exporter-collector';
 import * as grpc from 'grpc';
 import * as path from 'path';
 
-import {
-  CollectorExporterConfigNode,
-  GRPCQueueItem,
-  ServiceClientType,
-} from './types';
+import { CollectorExporterConfigNode, GRPCQueueItem } from './types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 
 export function onInit<ExportItem, ServiceRequest>(
@@ -50,12 +46,12 @@ export function onInit<ExportItem, ServiceRequest>(
     .then(packageDefinition => {
       const packageObject: any = grpc.loadPackageDefinition(packageDefinition);
 
-      if (collector.getServiceClientType() === ServiceClientType.SPANS) {
+      if (collector.getExporterType() === 'trace') {
         collector.serviceClient = new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(
           serverAddress,
           credentials
         );
-      } else {
+      } else if (collector.getExporterType() === 'metric') {
         collector.serviceClient = new packageObject.opentelemetry.proto.collector.metrics.v1.MetricsService(
           serverAddress,
           credentials

@@ -17,14 +17,9 @@
 import {
   collectorTypes,
   toCollectorExportMetricServiceRequest,
-  CollectorExporterNodeConfigBase,
 } from '@opentelemetry/exporter-collector';
 import { MetricRecord, MetricExporter } from '@opentelemetry/metrics';
-import { ServiceClientType } from './types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
-
-const DEFAULT_SERVICE_NAME = 'collector-metric-exporter';
-const DEFAULT_COLLECTOR_URL = 'http://localhost:55681/v1/metrics';
 
 /**
  * Collector Metric Exporter for Node with protobuf
@@ -48,18 +43,11 @@ export class CollectorMetricExporter
     );
   }
 
-  getDefaultUrl(config: CollectorExporterNodeConfigBase): string {
-    if (!config.url) {
-      return DEFAULT_COLLECTOR_URL;
-    }
-    return config.url;
+  public getExporterType() {
+    return 'metric' as const;
   }
 
-  getDefaultServiceName(config: CollectorExporterNodeConfigBase): string {
-    return config.serviceName || DEFAULT_SERVICE_NAME;
-  }
-
-  getServiceClientType() {
-    return ServiceClientType.METRICS;
+  getProtocol() {
+    return 'http/protobuf' as const;
   }
 }

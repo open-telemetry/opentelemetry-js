@@ -341,7 +341,7 @@ export interface ExportServiceError {
  * Collector Exporter base config
  */
 export interface CollectorExporterConfigBase {
-  headers?: Partial<Record<string, unknown>>;
+  headers?: Record<string, string>;
   hostname?: string;
   serviceName?: string;
   attributes?: SpanAttributes;

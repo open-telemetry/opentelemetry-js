@@ -25,6 +25,7 @@ export * from './context/propagation/composite';
 export * from './context/propagation/HttpTraceContext';
 export * from './context/propagation/types';
 export * from './baggage/propagation/HttpBaggage';
+export * as baggageUtils from './baggage/utils';
 export * from './platform';
 export * from './trace/sampler/AlwaysOffSampler';
 export * from './trace/sampler/AlwaysOnSampler';

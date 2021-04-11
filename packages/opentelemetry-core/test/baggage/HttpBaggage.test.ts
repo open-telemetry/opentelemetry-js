@@ -25,10 +25,7 @@ import {
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
 import * as assert from 'assert';
-import {
-  BAGGAGE_HEADER,
-  HttpBaggage,
-} from '../../src/baggage/propagation/HttpBaggage';
+import { baggageUtils, HttpBaggage } from '../../src/';
 
 describe('HttpBaggage', () => {
   const httpTraceContext = new HttpBaggage();
@@ -53,7 +50,7 @@ describe('HttpBaggage', () => {
         defaultTextMapSetter
       );
       assert.deepStrictEqual(
-        carrier[BAGGAGE_HEADER],
+        carrier[baggageUtils.BAGGAGE_HEADER],
         'key1=d4cda95b652f4a1592b449d5929fda1b,key3=c88815a7-0fa9-4d95-a1f1-cdccce3c5c2a,with%2Fslash=with%20spaces'
       );
     });
@@ -70,7 +67,7 @@ describe('HttpBaggage', () => {
         defaultTextMapSetter
       );
       assert.deepStrictEqual(
-        carrier[BAGGAGE_HEADER],
+        carrier[baggageUtils.BAGGAGE_HEADER],
         'key1=d4cda95b,key3=c88815a7'
       );
     });
@@ -91,7 +88,7 @@ describe('HttpBaggage', () => {
         defaultTextMapSetter
       );
 
-      let header = carrier[BAGGAGE_HEADER];
+      let header = carrier[baggageUtils.BAGGAGE_HEADER];
       assert.ok(typeof header === 'string');
       assert.deepStrictEqual(header, `aa=shortvalue,${shortKey}=${value}`);
 
@@ -107,7 +104,7 @@ describe('HttpBaggage', () => {
         defaultTextMapSetter
       );
 
-      header = carrier[BAGGAGE_HEADER];
+      header = carrier[baggageUtils.BAGGAGE_HEADER];
       assert.ok(typeof header === 'string');
       assert.deepStrictEqual(header, 'aa=shortvalue');
     });
@@ -129,7 +126,7 @@ describe('HttpBaggage', () => {
         defaultTextMapSetter
       );
 
-      let header = carrier[BAGGAGE_HEADER];
+      let header = carrier[baggageUtils.BAGGAGE_HEADER];
       assert.ok(typeof header === 'string');
       assert.deepStrictEqual(header.length, 8192);
       assert.deepStrictEqual(header.split(',').length, 3);
@@ -147,7 +144,7 @@ describe('HttpBaggage', () => {
         defaultTextMapSetter
       );
 
-      header = carrier[BAGGAGE_HEADER];
+      header = carrier[baggageUtils.BAGGAGE_HEADER];
       assert.ok(typeof header === 'string');
       assert.deepStrictEqual(header.length, 8100);
       assert.deepStrictEqual(header.split(',').length, 2);
@@ -170,7 +167,7 @@ describe('HttpBaggage', () => {
         defaultTextMapSetter
       );
 
-      const header = carrier[BAGGAGE_HEADER];
+      const header = carrier[baggageUtils.BAGGAGE_HEADER];
       assert.ok(typeof header === 'string');
       assert.strictEqual(header.split(',').length, 180);
     });
@@ -178,7 +175,7 @@ describe('HttpBaggage', () => {
 
   describe('.extract()', () => {
     it('should extract context of a sampled span from carrier', () => {
-      carrier[BAGGAGE_HEADER] =
+      carrier[baggageUtils.BAGGAGE_HEADER] =
         'key1=d4cda95b,key3=c88815a7, keyn   = valn, keym =valm';
       const extractedBaggage = getBaggage(
         httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
@@ -197,7 +194,9 @@ describe('HttpBaggage', () => {
   describe('fields()', () => {
     it('returns the fields used by the baggage spec', () => {
       const propagator = new HttpBaggage();
-      assert.deepStrictEqual(propagator.fields(), [BAGGAGE_HEADER]);
+      assert.deepStrictEqual(propagator.fields(), [
+        baggageUtils.BAGGAGE_HEADER,
+      ]);
     });
   });
 
@@ -211,7 +210,8 @@ describe('HttpBaggage', () => {
   });
 
   it('returns keys with their properties', () => {
-    carrier[BAGGAGE_HEADER] = 'key1=d4cda95b,key3=c88815a7;prop1=value1';
+    carrier[baggageUtils.BAGGAGE_HEADER] =
+      'key1=d4cda95b,key3=c88815a7;prop1=value1';
     const bag = getBaggage(
       httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
     );
@@ -262,7 +262,7 @@ describe('HttpBaggage', () => {
       },
     };
     Object.getOwnPropertyNames(testCases).forEach(testCase => {
-      carrier[BAGGAGE_HEADER] = testCases[testCase].header;
+      carrier[baggageUtils.BAGGAGE_HEADER] = testCases[testCase].header;
 
       const extractedSpanContext = getBaggage(
         httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)

@@ -46,8 +46,3 @@ export interface CollectorExporterConfigNode
   credentials?: grpc.ChannelCredentials;
   metadata?: grpc.Metadata;
 }
-
-export enum ServiceClientType {
-  SPANS,
-  METRICS,
-}

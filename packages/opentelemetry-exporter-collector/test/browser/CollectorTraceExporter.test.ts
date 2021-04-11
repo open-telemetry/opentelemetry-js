@@ -294,7 +294,7 @@ describe('CollectorTraceExporter - browser (getDefaultUrl)', () => {
     setTimeout(() => {
       assert.strictEqual(
         collectorExporter['url'],
-        'http://localhost:55681/v1/trace'
+        'http://localhost:4317/v1/traces'
       );
       done();
     });

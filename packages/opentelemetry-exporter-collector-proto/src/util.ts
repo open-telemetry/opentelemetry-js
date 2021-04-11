@@ -21,7 +21,6 @@ import {
 } from '@opentelemetry/exporter-collector';
 import * as path from 'path';
 
-import { ServiceClientType } from './types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import type { Type } from 'protobufjs';
 import * as protobufjs from 'protobufjs';
@@ -41,7 +40,7 @@ export function onInit<ExportItem, ServiceRequest>(
   root.resolvePath = function (origin, target) {
     return `${dir}/${target}`;
   };
-  if (collector.getServiceClientType() === ServiceClientType.SPANS) {
+  if (collector.getExporterType() === 'trace') {
     const proto = root.loadSync([
       'opentelemetry/proto/common/v1/common.proto',
       'opentelemetry/proto/resource/v1/resource.proto',
@@ -49,7 +48,7 @@ export function onInit<ExportItem, ServiceRequest>(
       'opentelemetry/proto/collector/trace/v1/trace_service.proto',
     ]);
     ExportRequestProto = proto?.lookupType('ExportTraceServiceRequest');
-  } else {
+  } else if (collector.getExporterType() === 'metric') {
     const proto = root.loadSync([
       'opentelemetry/proto/common/v1/common.proto',
       'opentelemetry/proto/resource/v1/resource.proto',

@@ -16,12 +16,8 @@
 
 import { MetricRecord, MetricExporter } from '@opentelemetry/metrics';
 import * as collectorTypes from '../../types';
-import { CollectorExporterNodeConfigBase } from './types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { toCollectorExportMetricServiceRequest } from '../../transformMetrics';
-
-const DEFAULT_SERVICE_NAME = 'collector-metric-exporter';
-const DEFAULT_COLLECTOR_URL = 'http://localhost:55681/v1/metrics';
 
 /**
  * Collector Metric Exporter for Node
@@ -45,14 +41,11 @@ export class CollectorMetricExporter
     );
   }
 
-  getDefaultUrl(config: CollectorExporterNodeConfigBase): string {
-    if (!config.url) {
-      return DEFAULT_COLLECTOR_URL;
-    }
-    return config.url;
+  getExporterType() {
+    return 'metric' as const;
   }
 
-  getDefaultServiceName(config: CollectorExporterNodeConfigBase): string {
-    return config.serviceName || DEFAULT_SERVICE_NAME;
+  getProtocol() {
+    return 'http/json' as const;
   }
 }

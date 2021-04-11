@@ -20,10 +20,6 @@ import {
   collectorTypes,
   toCollectorExportTraceServiceRequest,
 } from '@opentelemetry/exporter-collector';
-import { CollectorExporterConfigNode, ServiceClientType } from './types';
-
-const DEFAULT_SERVICE_NAME = 'collector-trace-exporter';
-const DEFAULT_COLLECTOR_URL = 'localhost:4317';
 
 /**
  * Collector Trace Exporter for Node
@@ -40,22 +36,15 @@ export class CollectorTraceExporter
     return toCollectorExportTraceServiceRequest(spans, this);
   }
 
-  getDefaultUrl(config: CollectorExporterConfigNode): string {
-    if (!config.url) {
-      return DEFAULT_COLLECTOR_URL;
-    }
-    return config.url;
-  }
-
-  getDefaultServiceName(config: CollectorExporterConfigNode): string {
-    return config.serviceName || DEFAULT_SERVICE_NAME;
-  }
-
-  getServiceClientType() {
-    return ServiceClientType.SPANS;
-  }
-
   getServiceProtoPath(): string {
     return 'opentelemetry/proto/collector/trace/v1/trace_service.proto';
+  }
+
+  getExporterType() {
+    return 'trace' as const;
+  }
+
+  getProtocol() {
+    return 'grpc' as const;
   }
 }

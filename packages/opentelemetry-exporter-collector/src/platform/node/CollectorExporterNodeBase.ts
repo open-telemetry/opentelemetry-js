@@ -20,7 +20,6 @@ import type * as https from 'https';
 import { CollectorExporterBase } from '../../CollectorExporterBase';
 import { CollectorExporterNodeConfigBase } from './types';
 import * as collectorTypes from '../../types';
-import { parseHeaders } from '../../util';
 import { createHttpAgent, sendWithHttp } from './util';
 import { diag } from '@opentelemetry/api';
 
@@ -35,15 +34,12 @@ export abstract class CollectorExporterNodeBase<
   ExportItem,
   ServiceRequest
 > {
-  DEFAULT_HEADERS: Record<string, string> = {};
-  headers: Record<string, string>;
   agent: http.Agent | https.Agent | undefined;
   constructor(config: CollectorExporterNodeConfigBase = {}) {
     super(config);
     if ((config as any).metadata) {
       diag.warn('Metadata cannot be set when using http');
     }
-    this.headers = parseHeaders(config.headers) || this.DEFAULT_HEADERS;
     this.agent = createHttpAgent(config);
   }
 

@@ -19,11 +19,7 @@ import {
   toCollectorExportMetricServiceRequest,
 } from '@opentelemetry/exporter-collector';
 import { MetricRecord, MetricExporter } from '@opentelemetry/metrics';
-import { CollectorExporterConfigNode, ServiceClientType } from './types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
-
-const DEFAULT_SERVICE_NAME = 'collector-metric-exporter';
-const DEFAULT_COLLECTOR_URL = 'localhost:4317';
 
 /**
  * Collector Metric Exporter for Node
@@ -47,22 +43,15 @@ export class CollectorMetricExporter
     );
   }
 
-  getDefaultUrl(config: CollectorExporterConfigNode): string {
-    if (!config.url) {
-      return DEFAULT_COLLECTOR_URL;
-    }
-    return config.url;
-  }
-
-  getDefaultServiceName(config: CollectorExporterConfigNode): string {
-    return config.serviceName || DEFAULT_SERVICE_NAME;
-  }
-
-  getServiceClientType() {
-    return ServiceClientType.METRICS;
-  }
-
   getServiceProtoPath(): string {
     return 'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
+  }
+
+  getExporterType() {
+    return 'trace' as const;
+  }
+
+  getProtocol() {
+    return 'grpc' as const;
   }
 }

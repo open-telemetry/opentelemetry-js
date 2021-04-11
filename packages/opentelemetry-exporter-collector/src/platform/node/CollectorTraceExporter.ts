@@ -16,12 +16,8 @@
 
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
-import { CollectorExporterNodeConfigBase } from './types';
 import * as collectorTypes from '../../types';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
-
-const DEFAULT_SERVICE_NAME = 'collector-trace-exporter';
-const DEFAULT_COLLECTOR_URL = 'http://localhost:55681/v1/trace';
 
 /**
  * Collector Trace Exporter for Node
@@ -32,20 +28,19 @@ export class CollectorTraceExporter
     collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
   >
   implements SpanExporter {
+  protected _signal = 'trace' as const;
+
   convert(
     spans: ReadableSpan[]
   ): collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
     return toCollectorExportTraceServiceRequest(spans, this, true);
   }
 
-  getDefaultUrl(config: CollectorExporterNodeConfigBase): string {
-    if (!config.url) {
-      return DEFAULT_COLLECTOR_URL;
-    }
-    return config.url;
+  getExporterType() {
+    return 'trace' as const;
   }
 
-  getDefaultServiceName(config: CollectorExporterNodeConfigBase): string {
-    return config.serviceName || DEFAULT_SERVICE_NAME;
+  getProtocol() {
+    return 'http/json' as const;
   }
 }

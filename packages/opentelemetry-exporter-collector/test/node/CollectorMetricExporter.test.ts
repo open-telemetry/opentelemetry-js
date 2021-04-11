@@ -254,7 +254,7 @@ describe('CollectorMetricExporter - node with json over http', () => {
       setTimeout(() => {
         assert.strictEqual(
           collectorExporter['url'],
-          'http://localhost:55681/v1/metrics'
+          'http://localhost:4317/v1/metrics'
         );
         done();
       });
