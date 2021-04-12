@@ -15,6 +15,5 @@
  */
 
 export * from './B3Propagator';
-export * from './B3SinglePropagator';
-export * from './B3MultiPropagator';
+export * from './constants';
 export * from './types';

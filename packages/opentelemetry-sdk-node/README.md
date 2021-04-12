@@ -9,7 +9,7 @@ This package provides the full OpenTelemetry SDK for Node.js including tracing a
 
 ## Quick Start
 
-To get started you need to install `@opentelemetry/sdk-node`, a metrics and/or tracing exporter, and any appropriate plugins for the node modules used by your application.
+To get started you need to install `@opentelemetry/sdk-node`, a metrics and/or tracing exporter, and any appropriate instrumentation for the node modules used by your application.
 
 ### Installation
 
@@ -21,10 +21,11 @@ $ # Install exporters and plugins
 $ npm install \
     @opentelemetry/exporter-jaeger \ # add tracing exporters as needed
     @opentelemetry/exporter-prometheus # add metrics exporters as needed
-    @opentelemetry/plugin-http # add plugins as needed
+    @opentelemetry/instrumentation-http # add instrumentations as needed
 
 $ # or install all officially supported core and contrib plugins
-$ npm install @opentelemetry/plugins-node-core-and-contrib
+$ npm install @opentelemetry/auto-instrumentations-node
+
 ```
 
 > Note: this example is for Node.js. See [examples/tracer-web](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/tracer-web) for a browser example.
@@ -39,6 +40,7 @@ This example uses Jaeger and Prometheus, but exporters exist for [other tracing 
 const opentelemetry = require("@opentelemetry/sdk-node");
 const { JaegerExporter } = require("@opentelemetry/exporter-jaeger");
 const { PrometheusExporter } = require("@opentelemetry/exporter-prometheus");
+const { getNodeAutoInstrumentations } = require("@opentelemetry/auto-instrumentations-node");
 
 const jaegerExporter = new JaegerExporter({
   serviceName: 'my-service',
@@ -50,7 +52,8 @@ const sdk = new opentelemetry.NodeSDK({
   traceExporter: jaegerExporter,
   // Optional - If omitted, the metrics SDK will not be initialized
   metricExporter: prometheusExporter,
-
+  // Optional - you can use the metapackage or load each instrumentation individually
+  instrumentations: [getNodeAutoInstrumentations()],
   // See the Configuration section below for additional  configuration options
 });
 
@@ -103,9 +106,11 @@ Configure a metric exporter. If an exporter is not configured, the metrics SDK w
 
 Configure an interval for metrics export in ms. Default: 60,000 (60 seconds)
 
-### plugins
+### instrumentations
 
-Configure plugins. By default, all plugins which are installed and in the [Default Plugins List](../opentelemetry-node/src/config.ts#L29) will be enabled.
+Configure instrumentations. By default none of the instrumentation is enabled,
+if you want to enable them you can use either [metapackage](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/metapackages/auto-instrumentations-node)
+or configure each instrumentation individually.
 
 ### resource
 

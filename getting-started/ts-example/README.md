@@ -60,9 +60,9 @@ To create traces on NodeJS, you will need `@opentelemetry/node`, `@opentelemetry
 $ npm install \
   @opentelemetry/core \
   @opentelemetry/node \
-  @opentelemetry/plugin-http \
-  @opentelemetry/plugin-https \
-  @opentelemetry/plugin-express
+  @opentelemetry/instrumentation \
+  @opentelemetry/instrumentation-http \
+  @opentelemetry/instrumentation-express
 ```
 
 #### Initialize a global tracer
@@ -76,12 +76,25 @@ Create a file named `tracing.ts` and add the following code:
 ```typescript
 import { LogLevel } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
+import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express';
+import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
+
 
 const provider: NodeTracerProvider = new NodeTracerProvider({
   logLevel: LogLevel.ERROR,
 });
 
 provider.register();
+
+registerInstrumentations({
+  tracerProvider: provider,
+  instrumentations: [
+    new ExpressInstrumentation(),
+    new HttpInstrumentation(),
+  ],
+});
+
 ```
 
 If you run your application now with `ts-node -r ./tracing.ts app.ts`, your application will create and propagate traces over HTTP. If an already instrumented service that supports [Trace Context](https://www.w3.org/TR/trace-context/) headers calls your application using HTTP, and you call another application using HTTP, the Trace Context headers will be correctly propagated.
@@ -116,6 +129,10 @@ import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 // For Jaeger, use the following line instead:
 // import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
+import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express';
+import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
+
 const provider: NodeTracerProvider = new NodeTracerProvider({
   logLevel: LogLevel.ERROR,
 });
@@ -134,6 +151,15 @@ provider.addSpanProcessor(
     }),
   ),
 );
+
+registerInstrumentations({
+  tracerProvider: provider,
+  instrumentations: [
+    new ExpressInstrumentation(),
+    new HttpInstrumentation(),
+  ],
+});
+
 
 console.log('tracing initialized');
 ```

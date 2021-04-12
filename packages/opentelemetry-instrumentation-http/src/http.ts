@@ -291,7 +291,12 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       this._callRequestHook(span, request);
     }
 
-    request.on(
+    /*
+     * User 'response' event listeners can be added before our listener,
+     * force our listener to be the first, so response emitter is bound
+     * before any user listeners are added to it.
+     */
+    request.prependListener(
       'response',
       (response: http.IncomingMessage & { aborted?: boolean }) => {
         const responseAttributes = utils.getOutgoingRequestAttributesOnResponse(
@@ -400,71 +405,35 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         }),
       };
 
-      return context.with(propagation.extract(ROOT_CONTEXT, headers), () => {
-        const span = instrumentation._startHttpSpan(
-          `${component.toLocaleUpperCase()} ${method}`,
-          spanOptions
-        );
+      const ctx = propagation.extract(ROOT_CONTEXT, headers);
+      const span = instrumentation._startHttpSpan(
+        `${component.toLocaleUpperCase()} ${method}`,
+        spanOptions,
+        ctx
+      );
 
-        return context.with(setSpan(context.active(), span), () => {
-          context.bind(request);
-          context.bind(response);
+      return context.with(setSpan(ctx, span), () => {
+        context.bind(request);
+        context.bind(response);
 
-          if (instrumentation._getConfig().requestHook) {
-            instrumentation._callRequestHook(span, request);
-          }
-          if (instrumentation._getConfig().responseHook) {
-            instrumentation._callResponseHook(span, response);
-          }
+        if (instrumentation._getConfig().requestHook) {
+          instrumentation._callRequestHook(span, request);
+        }
+        if (instrumentation._getConfig().responseHook) {
+          instrumentation._callResponseHook(span, response);
+        }
 
-          // Wraps end (inspired by:
-          // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/instrumentations/instrumentation-connect.ts#L75)
-          const originalEnd = response.end;
-          response.end = function (
-            this: http.ServerResponse,
-            ..._args: ResponseEndArgs
-          ) {
-            response.end = originalEnd;
-            // Cannot pass args of type ResponseEndArgs,
-            const returned = safeExecuteInTheMiddle(
-              () => response.end.apply(this, arguments as any),
-              error => {
-                if (error) {
-                  utils.setSpanWithError(span, error);
-                  instrumentation._closeHttpSpan(span);
-                  throw error;
-                }
-              }
-            );
-
-            const attributes = utils.getIncomingRequestAttributesOnResponse(
-              request,
-              response
-            );
-
-            span
-              .setAttributes(attributes)
-              .setStatus(utils.parseResponseStatus(response.statusCode));
-
-            if (instrumentation._getConfig().applyCustomAttributesOnSpan) {
-              safeExecuteInTheMiddle(
-                () =>
-                  instrumentation._getConfig().applyCustomAttributesOnSpan!(
-                    span,
-                    request,
-                    response
-                  ),
-                () => {},
-                true
-              );
-            }
-
-            instrumentation._closeHttpSpan(span);
-            return returned;
-          };
-
-          return safeExecuteInTheMiddle(
-            () => original.apply(this, [event, ...args]),
+        // Wraps end (inspired by:
+        // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/instrumentations/instrumentation-connect.ts#L75)
+        const originalEnd = response.end;
+        response.end = function (
+          this: http.ServerResponse,
+          ..._args: ResponseEndArgs
+        ) {
+          response.end = originalEnd;
+          // Cannot pass args of type ResponseEndArgs,
+          const returned = safeExecuteInTheMiddle(
+            () => response.end.apply(this, arguments as never),
             error => {
               if (error) {
                 utils.setSpanWithError(span, error);
@@ -473,7 +442,43 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
               }
             }
           );
-        });
+
+          const attributes = utils.getIncomingRequestAttributesOnResponse(
+            request,
+            response
+          );
+
+          span
+            .setAttributes(attributes)
+            .setStatus(utils.parseResponseStatus(response.statusCode));
+
+          if (instrumentation._getConfig().applyCustomAttributesOnSpan) {
+            safeExecuteInTheMiddle(
+              () =>
+                instrumentation._getConfig().applyCustomAttributesOnSpan!(
+                  span,
+                  request,
+                  response
+                ),
+              () => {},
+              true
+            );
+          }
+
+          instrumentation._closeHttpSpan(span);
+          return returned;
+        };
+
+        return safeExecuteInTheMiddle(
+          () => original.apply(this, [event, ...args]),
+          error => {
+            if (error) {
+              utils.setSpanWithError(span, error);
+              instrumentation._closeHttpSpan(span);
+              throw error;
+            }
+          }
+        );
       });
     };
   }
@@ -528,37 +533,53 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         kind: SpanKind.CLIENT,
       };
       const span = instrumentation._startHttpSpan(operationName, spanOptions);
+
+      const parentContext = context.active();
+      const requestContext = setSpan(parentContext, span);
+
       if (!optionsParsed.headers) {
         optionsParsed.headers = {};
       }
-      propagation.inject(
-        setSpan(context.active(), span),
-        optionsParsed.headers
-      );
+      propagation.inject(requestContext, optionsParsed.headers);
 
-      const request: http.ClientRequest = safeExecuteInTheMiddle(
-        () => original.apply(this, [optionsParsed, ...args]),
-        error => {
-          if (error) {
-            utils.setSpanWithError(span, error);
-            instrumentation._closeHttpSpan(span);
-            throw error;
-          }
+      return context.with(requestContext, () => {
+        /*
+         * The response callback is registered before ClientRequest is bound,
+         * thus it is needed to bind it before the function call.
+         */
+        const cb = args[args.length - 1];
+        if (typeof cb === 'function') {
+          args[args.length - 1] = context.bind(cb, parentContext);
         }
-      );
 
-      diag.debug('%s instrumentation outgoingRequest', component);
-      context.bind(request);
-      return instrumentation._traceClientRequest(
-        component,
-        request,
-        optionsParsed,
-        span
-      );
+        const request: http.ClientRequest = safeExecuteInTheMiddle(
+          () => original.apply(this, [optionsParsed, ...args]),
+          error => {
+            if (error) {
+              utils.setSpanWithError(span, error);
+              instrumentation._closeHttpSpan(span);
+              throw error;
+            }
+          }
+        );
+
+        diag.debug('%s instrumentation outgoingRequest', component);
+        context.bind(request, parentContext);
+        return instrumentation._traceClientRequest(
+          component,
+          request,
+          optionsParsed,
+          span
+        );
+      });
     };
   }
 
-  private _startHttpSpan(name: string, options: SpanOptions) {
+  private _startHttpSpan(
+    name: string,
+    options: SpanOptions,
+    ctx = context.active()
+  ) {
     /*
      * If a parent is required but not present, we use a `NoopSpan` to still
      * propagate context without recording it.
@@ -569,16 +590,16 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         : this._getConfig().requireParentforIncomingSpans;
 
     let span: Span;
-    const currentSpan = getSpan(context.active());
+    const currentSpan = getSpan(ctx);
 
     if (requireParent === true && currentSpan === undefined) {
       // TODO: Refactor this when a solution is found in
       // https://github.com/open-telemetry/opentelemetry-specification/issues/530
-      span = NOOP_TRACER.startSpan(name, options);
+      span = NOOP_TRACER.startSpan(name, options, ctx);
     } else if (requireParent === true && currentSpan?.context().isRemote) {
       span = currentSpan;
     } else {
-      span = this.tracer.startSpan(name, options);
+      span = this.tracer.startSpan(name, options, ctx);
     }
     this._spanNotEnded.add(span);
     return span;

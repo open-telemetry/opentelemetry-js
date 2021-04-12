@@ -1,0 +1,76 @@
+{
+  "name": "@opentelemetry/propagator-jaeger",
+  "version": "0.18.2",
+  "description": "OpenTelemetry Jaeger propagator provides HTTP header propagation for systems that are using Jaeger HTTP header format.",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "repository": "open-telemetry/opentelemetry-js",
+  "scripts": {
+    "compile": "tsc --build",
+    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/index-webpack.ts'",
+    "test:browser": "nyc karma start --single-run",
+    "tdd": "npm run tdd:node",
+    "tdd:node": "npm run test -- --watch-extensions ts --watch",
+    "tdd:browser": "karma start",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "clean": "tsc --build --clean",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "version": "node ../../scripts/version-update.js",
+    "watch": "tsc --build --watch"
+  },
+  "keywords": [
+    "opentelemetry",
+    "nodejs",
+    "tracing",
+    "profiling",
+    "jaeger"
+  ],
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=8.5.0"
+  },
+  "files": [
+    "build/src/**/*.js",
+    "build/src/**/*.js.map",
+    "build/src/**/*.d.ts",
+    "doc",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@opentelemetry/api": "^1.0.0-rc.0",
+    "@types/mocha": "8.2.2",
+    "@types/node": "14.14.37",
+    "@types/sinon": "9.0.11",
+    "@types/webpack-env": "1.16.0",
+    "codecov": "3.8.1",
+    "gts": "3.1.0",
+    "istanbul-instrumenter-loader": "3.0.1",
+    "karma": "5.2.3",
+    "karma-chrome-launcher": "3.1.0",
+    "karma-coverage-istanbul-reporter": "3.0.3",
+    "karma-mocha": "2.0.1",
+    "karma-spec-reporter": "0.0.32",
+    "karma-webpack": "5.0.0",
+    "mocha": "7.2.0",
+    "nyc": "15.1.0",
+    "rimraf": "3.0.2",
+    "sinon": "10.0.0",
+    "ts-loader": "8.1.0",
+    "ts-mocha": "8.0.0",
+    "ts-node": "9.1.1",
+    "typescript": "4.2.4",
+    "webpack": "4.46.0"
+  },
+  "peerDependencies": {
+    "@opentelemetry/api": "^1.0.0-rc.0"
+  },
+  "dependencies": {
+    "@opentelemetry/core": "0.18.2"
+  }
+}
