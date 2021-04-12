@@ -66,6 +66,8 @@
     "@opentelemetry/context-async-hooks": "^0.18.2",
     "@opentelemetry/core": "^0.18.2",
     "@opentelemetry/tracing": "^0.18.2",
+    "@opentelemetry/propagator-b3": "^0.18.0",
+    "@opentelemetry/propagator-jaeger": "^0.18.0",
     "semver": "^7.1.3"
   }
 }

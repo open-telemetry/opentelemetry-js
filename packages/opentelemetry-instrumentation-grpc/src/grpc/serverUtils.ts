@@ -17,13 +17,14 @@
 import type * as grpcTypes from 'grpc';
 import { SendUnaryDataCallback, ServerCallWithMeta } from './types';
 import { GrpcNativeInstrumentation } from './';
-import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import { context, Span, SpanStatusCode } from '@opentelemetry/api';
 import {
   _grpcStatusCodeToOpenTelemetryStatusCode,
   _grpcStatusCodeToSpanStatus,
   _methodIsIgnored,
 } from '../utils';
+import { AttributeNames } from '../enums';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 export const clientStreamAndUnaryHandler = function <RequestType, ResponseType>(
   grpcClient: typeof grpcTypes,
@@ -47,16 +48,19 @@ export const clientStreamAndUnaryHandler = function <RequestType, ResponseType>(
           code: _grpcStatusCodeToOpenTelemetryStatusCode(err.code),
           message: err.message,
         });
-        span.setAttribute(RpcAttribute.GRPC_STATUS_CODE, err.code.toString());
+        span.setAttribute(
+          SemanticAttributes.RPC_GRPC_STATUS_CODE,
+          err.code.toString()
+        );
       }
       span.setAttributes({
-        [RpcAttribute.GRPC_ERROR_NAME]: err.name,
-        [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
+        [AttributeNames.GRPC_ERROR_NAME]: err.name,
+        [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
       });
     } else {
       span.setStatus({ code: SpanStatusCode.UNSET });
       span.setAttribute(
-        RpcAttribute.GRPC_STATUS_CODE,
+        SemanticAttributes.RPC_GRPC_STATUS_CODE,
         grpcClient.status.OK.toString()
       );
     }
@@ -89,7 +93,7 @@ export const serverStreamAndBidiHandler = function <RequestType, ResponseType>(
   call.on('finish', () => {
     span.setStatus(_grpcStatusCodeToSpanStatus(call.status.code));
     span.setAttribute(
-      RpcAttribute.GRPC_STATUS_CODE,
+      SemanticAttributes.RPC_GRPC_STATUS_CODE,
       call.status.code.toString()
     );
 
@@ -107,8 +111,8 @@ export const serverStreamAndBidiHandler = function <RequestType, ResponseType>(
     });
     span.addEvent('finished with error');
     span.setAttributes({
-      [RpcAttribute.GRPC_ERROR_NAME]: err.name,
-      [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
+      [AttributeNames.GRPC_ERROR_NAME]: err.name,
+      [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
     });
     endSpan();
   });

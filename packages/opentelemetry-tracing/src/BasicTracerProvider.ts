@@ -19,11 +19,14 @@ import {
   trace,
   context,
   propagation,
+  TextMapPropagator,
+  diag,
 } from '@opentelemetry/api';
 import {
   CompositePropagator,
-  HttpBaggage,
   HttpTraceContext,
+  HttpBaggage,
+  getEnv,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { SpanProcessor, Tracer } from '.';
@@ -32,10 +35,21 @@ import { MultiSpanProcessor } from './MultiSpanProcessor';
 import { NoopSpanProcessor } from './NoopSpanProcessor';
 import { SDKRegistrationConfig, TracerConfig } from './types';
 import merge = require('lodash.merge');
+
+export type PROPAGATOR_FACTORY = () => TextMapPropagator;
+
 /**
  * This class represents a basic tracer provider which platform libraries can extend
  */
 export class BasicTracerProvider implements TracerProvider {
+  protected static readonly _registeredPropagators = new Map<
+    string,
+    PROPAGATOR_FACTORY
+  >([
+    ['tracecontext', () => new HttpTraceContext()],
+    ['baggage', () => new HttpBaggage()],
+  ]);
+
   private readonly _config: TracerConfig;
   private readonly _registeredSpanProcessors: SpanProcessor[] = [];
   private readonly _tracers: Map<string, Tracer> = new Map();
@@ -86,9 +100,7 @@ export class BasicTracerProvider implements TracerProvider {
   register(config: SDKRegistrationConfig = {}) {
     trace.setGlobalTracerProvider(this);
     if (config.propagator === undefined) {
-      config.propagator = new CompositePropagator({
-        propagators: [new HttpBaggage(), new HttpTraceContext()],
-      });
+      config.propagator = this._buildPropagatorFromEnv();
     }
 
     if (config.contextManager) {
@@ -102,5 +114,44 @@ export class BasicTracerProvider implements TracerProvider {
 
   shutdown() {
     return this.activeSpanProcessor.shutdown();
+  }
+
+  protected _getPropagator(name: string): TextMapPropagator | undefined {
+    return BasicTracerProvider._registeredPropagators.get(name)?.();
+  }
+
+  protected _buildPropagatorFromEnv(): TextMapPropagator | undefined {
+    // per spec, propagators from env must be deduplicated
+    const uniquePropagatorNames = [...new Set(getEnv().OTEL_PROPAGATORS)];
+
+    const propagators = uniquePropagatorNames.map(name => {
+      const propagator = this._getPropagator(name);
+      if (!propagator) {
+        diag.warn(
+          `Propagator "${name}" requested through environment variable is unavailable.`
+        );
+      }
+
+      return propagator;
+    });
+    const validPropagators = propagators.reduce<TextMapPropagator[]>(
+      (list, item) => {
+        if (item) {
+          list.push(item);
+        }
+        return list;
+      },
+      []
+    );
+
+    if (validPropagators.length === 0) {
+      return;
+    } else if (uniquePropagatorNames.length === 1) {
+      return validPropagators[0];
+    } else {
+      return new CompositePropagator({
+        propagators: validPropagators,
+      });
+    }
   }
 }

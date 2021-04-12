@@ -21,7 +21,6 @@
  */
 
 import { context, Span, SpanStatusCode } from '@opentelemetry/api';
-import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import type * as grpcJs from '@grpc/grpc-js';
 import type {
   ServerCallWithMeta,
@@ -34,6 +33,8 @@ import {
   _methodIsIgnored,
 } from '../utils';
 import { IgnoreMatcher } from '../types';
+import { AttributeNames } from '../enums';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 export const CALL_SPAN_ENDED = Symbol('opentelemetry call span ended');
 
@@ -70,7 +71,7 @@ function serverStreamAndBidiHandler<RequestType, ResponseType>(
       code: SpanStatusCode.UNSET,
     });
     span.setAttribute(
-      RpcAttribute.GRPC_STATUS_CODE,
+      SemanticAttributes.RPC_GRPC_STATUS_CODE,
       SpanStatusCode.OK.toString()
     );
 
@@ -90,8 +91,8 @@ function serverStreamAndBidiHandler<RequestType, ResponseType>(
       message: err.message,
     });
     span.setAttributes({
-      [RpcAttribute.GRPC_ERROR_NAME]: err.name,
-      [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
+      [AttributeNames.GRPC_ERROR_NAME]: err.name,
+      [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
     });
     endSpan();
   });
@@ -121,16 +122,19 @@ function clientStreamAndUnaryHandler<RequestType, ResponseType>(
           code: _grpcStatusCodeToOpenTelemetryStatusCode(err.code),
           message: err.message,
         });
-        span.setAttribute(RpcAttribute.GRPC_STATUS_CODE, err.code.toString());
+        span.setAttribute(
+          SemanticAttributes.RPC_GRPC_STATUS_CODE,
+          err.code.toString()
+        );
       }
       span.setAttributes({
-        [RpcAttribute.GRPC_ERROR_NAME]: err.name,
-        [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
+        [AttributeNames.GRPC_ERROR_NAME]: err.name,
+        [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
       });
     } else {
       span.setStatus({ code: SpanStatusCode.UNSET });
       span.setAttribute(
-        RpcAttribute.GRPC_STATUS_CODE,
+        SemanticAttributes.RPC_GRPC_STATUS_CODE,
         SpanStatusCode.OK.toString()
       );
     }
