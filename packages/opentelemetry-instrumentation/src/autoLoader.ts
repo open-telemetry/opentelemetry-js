@@ -21,7 +21,6 @@ import {
   enableInstrumentations,
   parseInstrumentationOptions,
 } from './autoLoaderUtils';
-import { loadOldPlugins } from './platform';
 import { AutoLoaderOptions } from './types_internal';
 
 /**
@@ -33,20 +32,15 @@ import { AutoLoaderOptions } from './types_internal';
 export function registerInstrumentations(
   options: AutoLoaderOptions
 ): () => void {
-  const {
-    instrumentations,
-    pluginsNode,
-    pluginsWeb,
-  } = parseInstrumentationOptions(options.instrumentations);
+  const { instrumentations } = parseInstrumentationOptions(
+    options.instrumentations
+  );
   const tracerProvider = options.tracerProvider || trace.getTracerProvider();
   const meterProvider = options.meterProvider || metrics.getMeterProvider();
 
   enableInstrumentations(instrumentations, tracerProvider, meterProvider);
 
-  const unload = loadOldPlugins(pluginsNode, pluginsWeb, tracerProvider);
-
   return () => {
-    unload();
     disableInstrumentations(instrumentations);
   };
 }
