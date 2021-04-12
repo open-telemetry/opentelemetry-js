@@ -383,7 +383,13 @@ export class FetchInstrumentation extends InstrumentationBase<
     if (applyCustomAttributesOnSpan) {
       safeExecuteInTheMiddle(
         () => applyCustomAttributesOnSpan(span, request, result),
-        () => {},
+        error => {
+          if (!error) {
+            return;
+          }
+
+          api.diag.error('applyCustomAttributesOnSpan', error);
+        },
         true
       );
     }
