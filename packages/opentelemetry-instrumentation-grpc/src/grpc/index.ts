@@ -29,7 +29,6 @@ import {
   GrpcClientFunc,
 } from './types';
 import { GrpcInstrumentationConfig } from '../types';
-import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import {
   context,
   propagation,
@@ -45,6 +44,7 @@ import {
 } from './serverUtils';
 import { makeGrpcClientRemoteCall, getMetadata } from './clientUtils';
 import { _methodIsIgnored } from '../utils';
+import { AttributeNames } from '../enums';
 
 /**
  * Holding reference to grpc module here to access constant of grpc modules
@@ -205,7 +205,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
                   const span = instrumentation.tracer
                     .startSpan(spanName, spanOptions)
                     .setAttributes({
-                      [RpcAttribute.GRPC_KIND]: spanOptions.kind,
+                      [AttributeNames.GRPC_KIND]: spanOptions.kind,
                     });
 
                   context.with(setSpan(context.active(), span), () => {

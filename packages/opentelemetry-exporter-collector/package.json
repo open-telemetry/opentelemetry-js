@@ -68,7 +68,7 @@
     "mocha": "7.2.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "sinon": "9.2.4",
+    "sinon": "10.0.0",
     "ts-loader": "8.1.0",
     "ts-mocha": "8.0.0",
     "ts-node": "9.1.1",
@@ -81,10 +81,10 @@
     "@opentelemetry/api": "^1.0.0-rc.0"
   },
   "dependencies": {
-    "@opentelemetry/api-metrics": "^0.18.2",
-    "@opentelemetry/core": "^0.18.2",
-    "@opentelemetry/metrics": "^0.18.2",
-    "@opentelemetry/resources": "^0.18.2",
-    "@opentelemetry/tracing": "^0.18.2"
+    "@opentelemetry/api-metrics": "0.18.2",
+    "@opentelemetry/core": "0.18.2",
+    "@opentelemetry/metrics": "0.18.2",
+    "@opentelemetry/resources": "0.18.2",
+    "@opentelemetry/tracing": "0.18.2"
   }
 }

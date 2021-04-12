@@ -20,8 +20,8 @@ import {
   SpanStatus,
 } from '@opentelemetry/api';
 import {
-  HttpAttribute,
-  GeneralAttribute,
+  NetTransportValues,
+  SemanticAttributes,
 } from '@opentelemetry/semantic-conventions';
 import {
   ClientRequest,
@@ -33,6 +33,7 @@ import {
 } from 'http';
 import { Socket } from 'net';
 import * as url from 'url';
+import { AttributeNames } from './enums';
 import { Err, IgnoreMatcher, ParsedRequestOptions } from './types';
 
 /**
@@ -158,8 +159,8 @@ export const setSpanWithError = (
   const message = error.message;
 
   span.setAttributes({
-    [HttpAttribute.HTTP_ERROR_NAME]: error.name,
-    [HttpAttribute.HTTP_ERROR_MESSAGE]: message,
+    [AttributeNames.HTTP_ERROR_NAME]: error.name,
+    [AttributeNames.HTTP_ERROR_MESSAGE]: message,
   });
 
   if (!obj) {
@@ -194,9 +195,11 @@ export const setRequestContentLengthAttribute = (
   if (length === null) return;
 
   if (isCompressed(request.headers)) {
-    attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH] = length;
+    attributes[SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH] = length;
   } else {
-    attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED] = length;
+    attributes[
+      SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
+    ] = length;
   }
 };
 
@@ -213,10 +216,10 @@ export const setResponseContentLengthAttribute = (
   if (length === null) return;
 
   if (isCompressed(response.headers)) {
-    attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH] = length;
+    attributes[SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH] = length;
   } else {
     attributes[
-      HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED
+      SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED
     ] = length;
   }
 };
@@ -341,18 +344,18 @@ export const getOutgoingRequestAttributes = (
   const headers = requestOptions.headers || {};
   const userAgent = headers['user-agent'];
   const attributes: SpanAttributes = {
-    [HttpAttribute.HTTP_URL]: getAbsoluteUrl(
+    [SemanticAttributes.HTTP_URL]: getAbsoluteUrl(
       requestOptions,
       headers,
       `${options.component}:`
     ),
-    [HttpAttribute.HTTP_METHOD]: method,
-    [HttpAttribute.HTTP_TARGET]: requestOptions.path || '/',
-    [GeneralAttribute.NET_PEER_NAME]: hostname,
+    [SemanticAttributes.HTTP_METHOD]: method,
+    [SemanticAttributes.HTTP_TARGET]: requestOptions.path || '/',
+    [SemanticAttributes.NET_PEER_NAME]: hostname,
   };
 
   if (userAgent !== undefined) {
-    attributes[HttpAttribute.HTTP_USER_AGENT] = userAgent;
+    attributes[SemanticAttributes.HTTP_USER_AGENT] = userAgent;
   }
   return attributes;
 };
@@ -364,11 +367,11 @@ export const getOutgoingRequestAttributes = (
 export const getAttributesFromHttpKind = (kind?: string): SpanAttributes => {
   const attributes: SpanAttributes = {};
   if (kind) {
-    attributes[HttpAttribute.HTTP_FLAVOR] = kind;
+    attributes[SemanticAttributes.HTTP_FLAVOR] = kind;
     if (kind.toUpperCase() !== 'QUIC') {
-      attributes[GeneralAttribute.NET_TRANSPORT] = GeneralAttribute.IP_TCP;
+      attributes[SemanticAttributes.NET_TRANSPORT] = NetTransportValues.IP_TCP;
     } else {
-      attributes[GeneralAttribute.NET_TRANSPORT] = GeneralAttribute.IP_UDP;
+      attributes[SemanticAttributes.NET_TRANSPORT] = NetTransportValues.IP_UDP;
     }
   }
   return attributes;
@@ -386,15 +389,15 @@ export const getOutgoingRequestAttributesOnResponse = (
   const { statusCode, statusMessage, httpVersion, socket } = response;
   const { remoteAddress, remotePort } = socket;
   const attributes: SpanAttributes = {
-    [GeneralAttribute.NET_PEER_IP]: remoteAddress,
-    [GeneralAttribute.NET_PEER_PORT]: remotePort,
-    [HttpAttribute.HTTP_HOST]: `${options.hostname}:${remotePort}`,
+    [SemanticAttributes.NET_PEER_IP]: remoteAddress,
+    [SemanticAttributes.NET_PEER_PORT]: remotePort,
+    [SemanticAttributes.HTTP_HOST]: `${options.hostname}:${remotePort}`,
   };
   setResponseContentLengthAttribute(response, attributes);
 
   if (statusCode) {
-    attributes[HttpAttribute.HTTP_STATUS_CODE] = statusCode;
-    attributes[HttpAttribute.HTTP_STATUS_TEXT] = (
+    attributes[SemanticAttributes.HTTP_STATUS_CODE] = statusCode;
+    attributes[AttributeNames.HTTP_STATUS_TEXT] = (
       statusMessage || ''
     ).toUpperCase();
   }
@@ -425,31 +428,31 @@ export const getIncomingRequestAttributes = (
     'localhost';
   const serverName = options.serverName;
   const attributes: SpanAttributes = {
-    [HttpAttribute.HTTP_URL]: getAbsoluteUrl(
+    [SemanticAttributes.HTTP_URL]: getAbsoluteUrl(
       requestUrl,
       headers,
       `${options.component}:`
     ),
-    [HttpAttribute.HTTP_HOST]: host,
-    [GeneralAttribute.NET_HOST_NAME]: hostname,
-    [HttpAttribute.HTTP_METHOD]: method,
+    [SemanticAttributes.HTTP_HOST]: host,
+    [SemanticAttributes.NET_HOST_NAME]: hostname,
+    [SemanticAttributes.HTTP_METHOD]: method,
   };
 
   if (typeof ips === 'string') {
-    attributes[HttpAttribute.HTTP_CLIENT_IP] = ips.split(',')[0];
+    attributes[SemanticAttributes.HTTP_CLIENT_IP] = ips.split(',')[0];
   }
 
   if (typeof serverName === 'string') {
-    attributes[HttpAttribute.HTTP_SERVER_NAME] = serverName;
+    attributes[SemanticAttributes.HTTP_SERVER_NAME] = serverName;
   }
 
   if (requestUrl) {
-    attributes[HttpAttribute.HTTP_ROUTE] = requestUrl.pathname || '/';
-    attributes[HttpAttribute.HTTP_TARGET] = requestUrl.pathname || '/';
+    attributes[SemanticAttributes.HTTP_ROUTE] = requestUrl.pathname || '/';
+    attributes[SemanticAttributes.HTTP_TARGET] = requestUrl.pathname || '/';
   }
 
   if (userAgent !== undefined) {
-    attributes[HttpAttribute.HTTP_USER_AGENT] = userAgent;
+    attributes[SemanticAttributes.HTTP_USER_AGENT] = userAgent;
   }
   setRequestContentLengthAttribute(request, attributes);
 
@@ -483,16 +486,16 @@ export const getIncomingRequestAttributesOnResponse = (
     : undefined;
 
   const attributes: SpanAttributes = {
-    [GeneralAttribute.NET_HOST_IP]: localAddress,
-    [GeneralAttribute.NET_HOST_PORT]: localPort,
-    [GeneralAttribute.NET_PEER_IP]: remoteAddress,
-    [GeneralAttribute.NET_PEER_PORT]: remotePort,
-    [HttpAttribute.HTTP_STATUS_CODE]: statusCode,
-    [HttpAttribute.HTTP_STATUS_TEXT]: (statusMessage || '').toUpperCase(),
+    [SemanticAttributes.NET_HOST_IP]: localAddress,
+    [SemanticAttributes.NET_HOST_PORT]: localPort,
+    [SemanticAttributes.NET_PEER_IP]: remoteAddress,
+    [SemanticAttributes.NET_PEER_PORT]: remotePort,
+    [SemanticAttributes.HTTP_STATUS_CODE]: statusCode,
+    [AttributeNames.HTTP_STATUS_TEXT]: (statusMessage || '').toUpperCase(),
   };
 
   if (route !== undefined) {
-    attributes[HttpAttribute.HTTP_ROUTE] = route;
+    attributes[SemanticAttributes.HTTP_ROUTE] = route;
   }
   return attributes;
 };

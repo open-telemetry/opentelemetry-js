@@ -13,17 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { TextMapPropagator } from '@opentelemetry/api';
 import {
   AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
+import { B3Propagator, B3InjectEncoding } from '@opentelemetry/propagator-b3';
 import {
   BasicTracerProvider,
+  PROPAGATOR_FACTORY,
   SDKRegistrationConfig,
 } from '@opentelemetry/tracing';
 import * as semver from 'semver';
 import { NodeTracerConfig } from './config';
+import { JaegerHttpTracePropagator } from '@opentelemetry/propagator-jaeger';
 
 /**
  * Register this TracerProvider for use with the OpenTelemetry API.
@@ -33,6 +36,22 @@ import { NodeTracerConfig } from './config';
  * @param config Configuration object for SDK registration
  */
 export class NodeTracerProvider extends BasicTracerProvider {
+  protected static readonly _registeredPropagators = new Map<
+    string,
+    PROPAGATOR_FACTORY
+  >([
+    [
+      'b3',
+      () =>
+        new B3Propagator({ injectEncoding: B3InjectEncoding.SINGLE_HEADER }),
+    ],
+    [
+      'b3multi',
+      () => new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
+    ],
+    ['jaeger', () => new JaegerHttpTracePropagator()],
+  ]);
+
   constructor(config: NodeTracerConfig = {}) {
     super(config);
   }
@@ -47,5 +66,12 @@ export class NodeTracerProvider extends BasicTracerProvider {
     }
 
     super.register(config);
+  }
+
+  protected _getPropagator(name: string): TextMapPropagator | undefined {
+    return (
+      super._getPropagator(name) ||
+      NodeTracerProvider._registeredPropagators.get(name)?.()
+    );
   }
 }
