@@ -170,14 +170,14 @@ export class BatchSpanProcessor implements SpanProcessor {
     if (this._timer !== undefined) return;
     this._timer = setTimeout(() => {
       this._flushOneBatch()
-        .catch(e => {
-          globalErrorHandler(e);
-        })
         .then(() => {
           if (this._finishedSpans.length > 0) {
             this._clearTimer();
             this._maybeStartTimer();
           }
+        })
+        .catch(e => {
+          globalErrorHandler(e);
         });
     }, this._scheduledDelayMillis);
     unrefTimer(this._timer);
