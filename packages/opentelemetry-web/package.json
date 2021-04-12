@@ -43,9 +43,9 @@
   "devDependencies": {
     "@babel/core": "7.13.14",
     "@opentelemetry/api": "^1.0.0-rc.0",
-    "@opentelemetry/context-zone": "^0.18.2",
-    "@opentelemetry/propagator-b3": "^0.18.2",
-    "@opentelemetry/resources": "^0.18.2",
+    "@opentelemetry/context-zone": "0.18.2",
+    "@opentelemetry/propagator-b3": "0.18.2",
+    "@opentelemetry/resources": "0.18.2",
     "@types/jquery": "3.5.5",
     "@types/mocha": "8.2.2",
     "@types/node": "14.14.37",
@@ -78,8 +78,8 @@
     "@opentelemetry/api": "^1.0.0-rc.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.18.2",
-    "@opentelemetry/semantic-conventions": "^0.18.2",
-    "@opentelemetry/tracing": "^0.18.2"
+    "@opentelemetry/core": "0.18.2",
+    "@opentelemetry/semantic-conventions": "0.18.2",
+    "@opentelemetry/tracing": "0.18.2"
   }
 }
