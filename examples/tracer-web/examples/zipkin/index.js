@@ -6,7 +6,7 @@ const provider = new WebTracerProvider();
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.addSpanProcessor(new SimpleSpanProcessor(new ZipkinExporter({
   // testing interceptor
-  // getHeadersBeforeSend: ()=> {
+  // getExportRequestHeaders: ()=> {
   //   return {
   //     foo: 'bar',
   //   }

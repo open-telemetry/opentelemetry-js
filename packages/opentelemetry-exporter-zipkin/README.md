@@ -32,7 +32,7 @@ const options = {
   url: 'your-zipkin-url',
   serviceName: 'your-application-name',
   // optional interceptor
-  getHeadersBeforeSend: () => {
+  getExportRequestHeaders: () => {
     return {
       'my-header': 'header-value',
     }
@@ -54,7 +54,7 @@ You can use built-in `SimpleSpanProcessor` or `BatchSpanProcessor` or write your
 
 ### Options
 
-- **getHeadersBeforeSend** - optional interceptor that allows adding new headers everytime time the exporter is going to send spans.
+- **getExportRequestHeaders** - optional interceptor that allows adding new headers everytime time the exporter is going to send spans.
 This is optional and can be used if headers are changing over time. This is a sync callback.
 
 ## Viewing your traces

@@ -20,18 +20,18 @@ import * as sinon from 'sinon';
 import { mockedReadableSpan } from '../helper';
 
 describe('zipkin - header interceptor', () => {
-  describe('getHeadersBeforeSend', () => {
+  describe('getExportRequestHeaders', () => {
     describe('when callback is defined', () => {
       it('should call callback before sending', () => {
-        const getHeadersBeforeSend = sinon.spy();
+        const getExportRequestHeaders = sinon.spy();
         const span = Object.assign({}, mockedReadableSpan);
         const exporter = new ZipkinExporter({
-          getHeadersBeforeSend,
+          getExportRequestHeaders,
         });
         const oldFunction = exporter['_send'];
         exporter.export([span], () => {});
 
-        assert.strictEqual(getHeadersBeforeSend.callCount, 1);
+        assert.strictEqual(getExportRequestHeaders.callCount, 1);
         assert.notStrictEqual(exporter['_getHeaders'], undefined);
         assert.notStrictEqual(oldFunction, exporter['_send']);
       });

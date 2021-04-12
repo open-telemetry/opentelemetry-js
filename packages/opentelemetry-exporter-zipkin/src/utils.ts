@@ -16,9 +16,9 @@
 import { GetHeaders } from './types';
 
 export function prepareGetHeaders(
-  getHeadersBeforeSend: GetHeaders
+  getExportRequestHeaders: GetHeaders
 ): () => Record<string, string> | undefined {
   return function () {
-    return getHeadersBeforeSend();
+    return getExportRequestHeaders();
   };
 }

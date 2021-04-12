@@ -50,8 +50,8 @@ export class ZipkinExporter implements SpanExporter {
     this._statusDescriptionTagName =
       config.statusDescriptionTagName || statusDescriptionTagName;
     this._isShutdown = false;
-    if (typeof config.getHeadersBeforeSend === 'function') {
-      this._getHeaders = prepareGetHeaders(config.getHeadersBeforeSend);
+    if (typeof config.getExportRequestHeaders === 'function') {
+      this._getHeaders = prepareGetHeaders(config.getExportRequestHeaders);
     } else {
       // noop
       this._beforeSend = function () {};
@@ -106,7 +106,7 @@ export class ZipkinExporter implements SpanExporter {
   }
 
   /**
-   * if user defines getHeadersBeforeSend in config then this will be called
+   * if user defines getExportRequestHeaders in config then this will be called
    * everytime before send, otherwise it will be replaced with noop in
    * constructor
    * @default noop

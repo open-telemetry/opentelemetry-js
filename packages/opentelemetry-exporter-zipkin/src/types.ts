@@ -26,7 +26,7 @@ export interface ExporterConfig {
   // Optional mapping overrides for OpenTelemetry status code and description.
   statusCodeTagName?: string;
   statusDescriptionTagName?: string;
-  getHeadersBeforeSend?: () => Record<string, string> | undefined;
+  getExportRequestHeaders?: () => Record<string, string> | undefined;
 }
 
 /**

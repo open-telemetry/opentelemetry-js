@@ -97,7 +97,7 @@ describe('Zipkin Exporter - web', () => {
       });
     });
   });
-  describe('when getHeadersBeforeSend is defined', () => {
+  describe('when getExportRequestHeaders is defined', () => {
     let server: any;
     beforeEach(() => {
       server = sinon.fakeServer.create();
@@ -110,7 +110,7 @@ describe('Zipkin Exporter - web', () => {
 
     it('should add headers from callback', done => {
       zipkinExporter = new ZipkinExporter({
-        getHeadersBeforeSend: () => {
+        getExportRequestHeaders: () => {
           return {
             foo1: 'bar1',
             foo2: 'bar2',
