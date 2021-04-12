@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@grpc/grpc-js": "1.2.12",
-    "@grpc/proto-loader": "0.5.6",
+    "@grpc/proto-loader": "0.6.0",
     "@opentelemetry/api": "^1.0.0-rc.0",
     "@opentelemetry/context-async-hooks": "0.18.2",
     "@opentelemetry/core": "0.18.2",
@@ -64,7 +64,7 @@
     "sinon": "10.0.0",
     "ts-mocha": "8.0.0",
     "ts-node": "9.1.1",
-    "typescript": "4.2.3"
+    "typescript": "4.2.4"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.0.0-rc.0"
