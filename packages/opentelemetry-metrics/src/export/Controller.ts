@@ -37,8 +37,9 @@ export class PushController extends Controller {
   ) {
     super();
     this._timer = setInterval(() => {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      this._collect();
+      this._collect().catch(err => {
+        globalErrorHandler(err);
+      });
     }, interval);
     unrefTimer(this._timer);
   }
