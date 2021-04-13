@@ -19,6 +19,7 @@ import {
   isWrapped,
   InstrumentationBase,
   InstrumentationConfig,
+  safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import * as core from '@opentelemetry/core';
 import * as web from '@opentelemetry/web';
@@ -43,6 +44,14 @@ const getUrlNormalizingAnchor = () => {
   return a;
 };
 
+export interface FetchCustomAttributeFunction {
+  (
+    span: api.Span,
+    request: Request | RequestInit,
+    result: Response | FetchError
+  ): void;
+}
+
 /**
  * FetchPlugin Config
  */
@@ -61,6 +70,8 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
    * also not be traced.
    */
   ignoreUrls?: Array<string | RegExp>;
+  /** Function for adding custom attributes on the span */
+  applyCustomAttributesOnSpan?: FetchCustomAttributeFunction;
 }
 
 /**
@@ -311,6 +322,7 @@ export class FetchInstrumentation extends InstrumentationBase<
           response: Response
         ) {
           try {
+            plugin._applyAttributesAfterFetch(span, options, response);
             if (response.status >= 200 && response.status < 400) {
               plugin._endSpan(span, spanData, response);
             } else {
@@ -331,6 +343,7 @@ export class FetchInstrumentation extends InstrumentationBase<
           error: FetchError
         ) {
           try {
+            plugin._applyAttributesAfterFetch(span, options, error);
             plugin._endSpan(span, spanData, {
               status: error.status || 0,
               statusText: error.message,
@@ -358,6 +371,28 @@ export class FetchInstrumentation extends InstrumentationBase<
         });
       };
     };
+  }
+
+  private _applyAttributesAfterFetch(
+    span: api.Span,
+    request: Request | RequestInit,
+    result: Response | FetchError
+  ) {
+    const applyCustomAttributesOnSpan = this._getConfig()
+      .applyCustomAttributesOnSpan;
+    if (applyCustomAttributesOnSpan) {
+      safeExecuteInTheMiddle(
+        () => applyCustomAttributesOnSpan(span, request, result),
+        error => {
+          if (!error) {
+            return;
+          }
+
+          api.diag.error('applyCustomAttributesOnSpan', error);
+        },
+        true
+      );
+    }
   }
 
   /**

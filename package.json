@@ -45,13 +45,13 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@commitlint/cli": "12.0.1",
-    "@commitlint/config-conventional": "12.0.1",
-    "@typescript-eslint/eslint-plugin": "4.20.0",
-    "@typescript-eslint/parser": "4.20.0",
+    "@commitlint/cli": "12.1.1",
+    "@commitlint/config-conventional": "12.1.1",
+    "@typescript-eslint/eslint-plugin": "4.22.0",
+    "@typescript-eslint/parser": "4.22.0",
     "beautify-benchmark": "0.2.4",
     "benchmark": "2.1.4",
-    "eslint": "7.23.0",
+    "eslint": "7.24.0",
     "eslint-config-airbnb-base": "14.2.1",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-import": "2.22.1",
@@ -61,8 +61,8 @@
     "lerna": "3.22.1",
     "lerna-changelog": "1.0.1",
     "markdownlint-cli": "0.27.1",
-    "typescript": "4.2.3",
-    "update-ts-references": "2.0.0"
+    "typescript": "4.2.4",
+    "update-ts-references": "2.3.0"
   },
   "husky": {
     "hooks": {

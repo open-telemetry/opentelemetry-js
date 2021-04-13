@@ -37,7 +37,9 @@ export class PushController extends Controller {
   ) {
     super();
     this._timer = setInterval(() => {
-      this._collect();
+      this._collect().catch(err => {
+        globalErrorHandler(err);
+      });
     }, interval);
     unrefTimer(this._timer);
   }

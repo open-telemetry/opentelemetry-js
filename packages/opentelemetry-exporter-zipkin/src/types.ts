@@ -20,12 +20,13 @@ import { ExportResult } from '@opentelemetry/core';
  * Exporter config
  */
 export interface ExporterConfig {
-  headers?: { [key: string]: string };
+  headers?: Record<string, string>;
   serviceName?: string;
   url?: string;
   // Optional mapping overrides for OpenTelemetry status code and description.
   statusCodeTagName?: string;
   statusDescriptionTagName?: string;
+  getExportRequestHeaders?: () => Record<string, string> | undefined;
 }
 
 /**
@@ -184,3 +185,5 @@ export type SendFunction = (
   zipkinSpans: Span[],
   done: (result: ExportResult) => void
 ) => void;
+
+export type GetHeaders = () => Record<string, string> | undefined;
