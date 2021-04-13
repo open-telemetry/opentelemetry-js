@@ -25,6 +25,7 @@ import {
   statusDescriptionTagName,
 } from './transform';
 import { SERVICE_RESOURCE } from '@opentelemetry/resources';
+import { prepareGetHeaders } from './utils';
 
 /**
  * Zipkin Exporter
@@ -34,19 +35,27 @@ export class ZipkinExporter implements SpanExporter {
   private readonly DEFAULT_SERVICE_NAME = 'OpenTelemetry Service';
   private readonly _statusCodeTagName: string;
   private readonly _statusDescriptionTagName: string;
+  private _urlStr: string;
   private _send: zipkinTypes.SendFunction;
+  private _getHeaders: zipkinTypes.GetHeaders | undefined;
   private _serviceName?: string;
   private _isShutdown: boolean;
   private _sendingPromises: Promise<unknown>[] = [];
 
   constructor(config: zipkinTypes.ExporterConfig = {}) {
-    const urlStr = config.url || ZipkinExporter.DEFAULT_URL;
-    this._send = prepareSend(urlStr, config.headers);
+    this._urlStr = config.url || ZipkinExporter.DEFAULT_URL;
+    this._send = prepareSend(this._urlStr, config.headers);
     this._serviceName = config.serviceName;
     this._statusCodeTagName = config.statusCodeTagName || statusCodeTagName;
     this._statusDescriptionTagName =
       config.statusDescriptionTagName || statusDescriptionTagName;
     this._isShutdown = false;
+    if (typeof config.getExportRequestHeaders === 'function') {
+      this._getHeaders = prepareGetHeaders(config.getExportRequestHeaders);
+    } else {
+      // noop
+      this._beforeSend = function () {};
+    }
   }
 
   /**
@@ -97,6 +106,18 @@ export class ZipkinExporter implements SpanExporter {
   }
 
   /**
+   * if user defines getExportRequestHeaders in config then this will be called
+   * everytime before send, otherwise it will be replaced with noop in
+   * constructor
+   * @default noop
+   */
+  private _beforeSend() {
+    if (this._getHeaders) {
+      this._send = prepareSend(this._urlStr, this._getHeaders());
+    }
+  }
+
+  /**
    * Transform spans and sends to Zipkin service.
    */
   private _sendSpans(
@@ -116,6 +137,7 @@ export class ZipkinExporter implements SpanExporter {
         this._statusDescriptionTagName
       )
     );
+    this._beforeSend();
     return this._send(zipkinSpans, (result: ExportResult) => {
       if (done) {
         return done(result);
