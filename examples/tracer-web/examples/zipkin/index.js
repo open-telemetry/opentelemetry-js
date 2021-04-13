@@ -4,7 +4,14 @@ import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 
 const provider = new WebTracerProvider();
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-provider.addSpanProcessor(new SimpleSpanProcessor(new ZipkinExporter()));
+provider.addSpanProcessor(new SimpleSpanProcessor(new ZipkinExporter({
+  // testing interceptor
+  // getExportRequestHeaders: ()=> {
+  //   return {
+  //     foo: 'bar',
+  //   }
+  // }
+})));
 
 provider.register();
 
