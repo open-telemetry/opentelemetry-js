@@ -25,8 +25,8 @@
   },
   "dependencies": {
     "@opentelemetry/api": "^1.0.0-rc.0",
-    "@opentelemetry/exporter-jaeger": "^0.19.0",
-    "@opentelemetry/tracing": "^0.19.0"
+    "@opentelemetry/exporter-jaeger": "0.19.0",
+    "@opentelemetry/tracing": "0.19.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme"
 }
