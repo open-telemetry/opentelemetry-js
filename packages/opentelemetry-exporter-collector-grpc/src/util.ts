@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
-import * as protoLoader from '@grpc/proto-loader';
-import { collectorTypes } from '@opentelemetry/exporter-collector';
 import * as grpc from '@grpc/grpc-js';
+import * as protoLoader from '@grpc/proto-loader';
+import { diag } from '@opentelemetry/api';
+import { globalErrorHandler } from '@opentelemetry/core';
+import { collectorTypes } from '@opentelemetry/exporter-collector';
 import * as path from 'path';
-
+import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import {
   CollectorExporterConfigNode,
   GRPCQueueItem,
   ServiceClientType,
 } from './types';
-import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 
 export function onInit<ExportItem, ServiceRequest>(
   collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
@@ -68,6 +68,9 @@ export function onInit<ExportItem, ServiceRequest>(
           collector.send(item.objects, item.onSuccess, item.onError);
         });
       }
+    })
+    .catch(err => {
+      globalErrorHandler(err);
     });
 }
 
