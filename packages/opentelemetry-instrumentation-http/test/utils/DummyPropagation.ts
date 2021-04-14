@@ -28,7 +28,7 @@ export class DummyPropagation implements TextMapPropagator {
   extract(context: Context, carrier: http.OutgoingHttpHeaders) {
     const extractedSpanContext = {
       traceId: carrier[DummyPropagation.TRACE_CONTEXT_KEY] as string,
-      spanId: DummyPropagation.SPAN_CONTEXT_KEY,
+      spanId: carrier[DummyPropagation.SPAN_CONTEXT_KEY] as string,
       traceFlags: TraceFlags.SAMPLED,
       isRemote: true,
     };

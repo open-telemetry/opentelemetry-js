@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { SpanKind, SpanStatus } from '@opentelemetry/api';
+import { isValidSpanId, SpanKind, SpanStatus } from '@opentelemetry/api';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
@@ -161,7 +161,8 @@ export const assertSpan = (
         'must have HOST_IP'
       );
     }
-    assert.strictEqual(span.parentSpanId, DummyPropagation.SPAN_CONTEXT_KEY);
+    assert.ok(typeof span.parentSpanId === 'string');
+    assert.ok(isValidSpanId(span.parentSpanId));
   } else if (validations.reqHeaders) {
     assert.ok(validations.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);
     assert.ok(validations.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]);
