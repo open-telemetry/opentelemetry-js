@@ -35,7 +35,11 @@ import {
 } from '@opentelemetry/web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { FetchInstrumentation, FetchInstrumentationConfig } from '../src';
+import {
+  FetchInstrumentation,
+  FetchInstrumentationConfig,
+  FetchCustomAttributeFunction,
+} from '../src';
 import { AttributeNames } from '../src/enums/AttributeNames';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
@@ -57,6 +61,7 @@ const getData = (url: string, method?: string) =>
     },
   });
 
+const CUSTOM_ATTRIBUTE_KEY = 'span kind';
 const defaultResource = {
   connectEnd: 15,
   connectStart: 13,
@@ -573,6 +578,73 @@ describe('fetch', () => {
           'headers inject skipped due to CORS policy'
         );
       });
+    });
+  });
+
+  describe('applyCustomAttributesOnSpan option', () => {
+    const noop = () => {};
+    const prepare = (
+      url: string,
+      applyCustomAttributesOnSpan: FetchCustomAttributeFunction,
+      cb: VoidFunction = noop
+    ) => {
+      const propagateTraceHeaderCorsUrls = [url];
+
+      prepareData(cb, url, {
+        propagateTraceHeaderCorsUrls,
+        applyCustomAttributesOnSpan,
+      });
+    };
+
+    afterEach(() => {
+      clearData();
+    });
+
+    it('applies attributes when the request is succesful', done => {
+      prepare(
+        url,
+        span => {
+          span.setAttribute(CUSTOM_ATTRIBUTE_KEY, 'custom value');
+        },
+        () => {
+          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+          const attributes = span.attributes;
+
+          assert.ok(attributes[CUSTOM_ATTRIBUTE_KEY] === 'custom value');
+          done();
+        }
+      );
+    });
+
+    it('applies custom attributes when the request fails', done => {
+      prepare(
+        badUrl,
+        span => {
+          span.setAttribute(CUSTOM_ATTRIBUTE_KEY, 'custom value');
+        },
+        () => {
+          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+          const attributes = span.attributes;
+
+          assert.ok(attributes[CUSTOM_ATTRIBUTE_KEY] === 'custom value');
+          done();
+        }
+      );
+    });
+
+    it('has request and response objects in callback arguments', done => {
+      const applyCustomAttributes: FetchCustomAttributeFunction = (
+        span,
+        request,
+        response
+      ) => {
+        assert.ok(request.method === 'GET');
+        assert.ok(response.status === 200);
+
+        done();
+      };
+
+      prepare(url, applyCustomAttributes);
     });
   });
 

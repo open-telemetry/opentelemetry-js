@@ -71,9 +71,9 @@ describe('BasicTracerProvider', () => {
     it('should construct an instance with default trace params', () => {
       const tracer = new BasicTracerProvider({}).getTracer('default');
       assert.deepStrictEqual(tracer.getActiveTraceParams(), {
-        numberOfAttributesPerSpan: 1000,
-        numberOfEventsPerSpan: 1000,
-        numberOfLinksPerSpan: 1000,
+        numberOfAttributesPerSpan: 128,
+        numberOfEventsPerSpan: 128,
+        numberOfLinksPerSpan: 128,
       });
     });
 
@@ -85,8 +85,8 @@ describe('BasicTracerProvider', () => {
       }).getTracer('default');
       assert.deepStrictEqual(tracer.getActiveTraceParams(), {
         numberOfAttributesPerSpan: 100,
-        numberOfEventsPerSpan: 1000,
-        numberOfLinksPerSpan: 1000,
+        numberOfEventsPerSpan: 128,
+        numberOfLinksPerSpan: 128,
       });
     });
 
@@ -97,9 +97,9 @@ describe('BasicTracerProvider', () => {
         },
       }).getTracer('default');
       assert.deepStrictEqual(tracer.getActiveTraceParams(), {
-        numberOfAttributesPerSpan: 1000,
+        numberOfAttributesPerSpan: 128,
         numberOfEventsPerSpan: 300,
-        numberOfLinksPerSpan: 1000,
+        numberOfLinksPerSpan: 128,
       });
     });
 
@@ -110,8 +110,8 @@ describe('BasicTracerProvider', () => {
         },
       }).getTracer('default');
       assert.deepStrictEqual(tracer.getActiveTraceParams(), {
-        numberOfAttributesPerSpan: 1000,
-        numberOfEventsPerSpan: 1000,
+        numberOfAttributesPerSpan: 128,
+        numberOfEventsPerSpan: 128,
         numberOfLinksPerSpan: 10,
       });
     });
