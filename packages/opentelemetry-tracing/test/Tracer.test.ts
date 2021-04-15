@@ -21,6 +21,9 @@ import {
   TraceFlags,
   ROOT_CONTEXT,
   suppressInstrumentation,
+  SpanContext,
+  INVALID_TRACEID,
+  setSpanContext,
 } from '@opentelemetry/api';
 import { BasicTracerProvider, Tracer, Span } from '../src';
 import {
@@ -130,6 +133,45 @@ describe('Tracer', () => {
 
       done();
     });
+  });
+
+  it('should use traceId and spanId from parent', () => {
+    const parent: SpanContext = {
+      traceId: '00112233445566778899001122334455',
+      spanId: '0011223344556677',
+      traceFlags: TraceFlags.SAMPLED,
+    };
+    const tracer = new Tracer(
+      { name: 'default', version: '0.0.1' },
+      {},
+      tracerProvider
+    );
+    const span = tracer.startSpan(
+      'aSpan',
+      undefined,
+      setSpanContext(ROOT_CONTEXT, parent)
+    );
+    assert.strictEqual((span as Span).parentSpanId, parent.spanId);
+    assert.strictEqual(span.context().traceId, parent.traceId);
+  });
+
+  it('should not use spanId from invalid parent', () => {
+    const parent: SpanContext = {
+      traceId: INVALID_TRACEID,
+      spanId: '0011223344556677',
+      traceFlags: TraceFlags.SAMPLED,
+    };
+    const tracer = new Tracer(
+      { name: 'default', version: '0.0.1' },
+      {},
+      tracerProvider
+    );
+    const span = tracer.startSpan(
+      'aSpan',
+      undefined,
+      setSpanContext(ROOT_CONTEXT, parent)
+    );
+    assert.strictEqual((span as Span).parentSpanId, undefined);
   });
 
   if (typeof process !== 'undefined' && process.release.name === 'node') {

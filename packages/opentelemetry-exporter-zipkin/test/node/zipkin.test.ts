@@ -650,6 +650,20 @@ describe('Zipkin Exporter - node', () => {
         );
       });
     });
+
+    it('should support setting url via env', () => {
+      process.env.OTEL_EXPORTER_ZIPKIN_ENDPOINT = 'http://localhost:9412';
+      const scope = nock('http://localhost:9412').post('/').reply(200);
+
+      const exporter = new ZipkinExporter({
+        serviceName: 'my-service',
+      });
+
+      exporter.export([getReadableSpan()], (result: ExportResult) => {
+        scope.done();
+        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
+      });
+    });
   });
 
   describe('shutdown', () => {
