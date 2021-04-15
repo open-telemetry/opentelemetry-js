@@ -203,7 +203,7 @@ describe('Tracer', () => {
     );
     const span = tracer.startSpan('my-span');
     const context = span.context();
-    assert.strictEqual(context.traceFlags, TraceFlags.NONE);
+    assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
     span.end();
   });
 
