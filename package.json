@@ -5,9 +5,9 @@
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "scripts": {
-    "compile": "tsc --build",
-    "watch": "tsc --build --watch",
-    "clean": "tsc --build --clean",
+    "compile": "tsc --build tsconfig.json tsconfig.esm.json",
+    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json",
+    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json",
     "bench": "node benchmark",
     "postinstall": "update-ts-references && npm run bootstrap",
     "postcompile": "npm run submodule && npm run protos:copy",
