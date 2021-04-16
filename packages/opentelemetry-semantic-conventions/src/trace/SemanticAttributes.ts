@@ -720,23 +720,6 @@ export enum DbSystemValues {
   ELASTICSEARCH = 'elasticsearch',
 }
 
-export enum NetTransportValues {
-  /** IP.TCP. */
-  IP_TCP = 'IP.TCP',
-  /** IP.UDP. */
-  IP_UDP = 'IP.UDP',
-  /** Another IP-based protocol. */
-  IP = 'IP',
-  /** Unix Domain socket. See below. */
-  UNIX = 'Unix',
-  /** Named or anonymous pipe. See note below. */
-  PIPE = 'pipe',
-  /** In-process communication. */
-  INPROC = 'inproc',
-  /** Something else (non IP-based). */
-  OTHER = 'other',
-}
-
 export enum DbCassandraConsistencyLevelValues {
   /** ALL. */
   ALL = 'ALL',
@@ -823,99 +806,6 @@ export enum HttpFlavorValues {
   QUIC = 'QUIC',
 }
 
-export enum DbSystemValues {
-  /** Some other SQL database. Fallback only. See notes. */
-  OTHER_SQL = 'other_sql',
-  /** Microsoft SQL Server. */
-  MSSQL = 'mssql',
-  /** MySQL. */
-  MYSQL = 'mysql',
-  /** Oracle Database. */
-  ORACLE = 'oracle',
-  /** IBM Db2. */
-  DB2 = 'db2',
-  /** PostgreSQL. */
-  POSTGRESQL = 'postgresql',
-  /** Amazon Redshift. */
-  REDSHIFT = 'redshift',
-  /** Apache Hive. */
-  HIVE = 'hive',
-  /** Cloudscape. */
-  CLOUDSCAPE = 'cloudscape',
-  /** HyperSQL DataBase. */
-  HSQLDB = 'hsqldb',
-  /** Progress Database. */
-  PROGRESS = 'progress',
-  /** SAP MaxDB. */
-  MAXDB = 'maxdb',
-  /** SAP HANA. */
-  HANADB = 'hanadb',
-  /** Ingres. */
-  INGRES = 'ingres',
-  /** FirstSQL. */
-  FIRSTSQL = 'firstsql',
-  /** EnterpriseDB. */
-  EDB = 'edb',
-  /** InterSystems Caché. */
-  CACHE = 'cache',
-  /** Adabas (Adaptable Database System). */
-  ADABAS = 'adabas',
-  /** Firebird. */
-  FIREBIRD = 'firebird',
-  /** Apache Derby. */
-  DERBY = 'derby',
-  /** FileMaker. */
-  FILEMAKER = 'filemaker',
-  /** Informix. */
-  INFORMIX = 'informix',
-  /** InstantDB. */
-  INSTANTDB = 'instantdb',
-  /** InterBase. */
-  INTERBASE = 'interbase',
-  /** MariaDB. */
-  MARIADB = 'mariadb',
-  /** Netezza. */
-  NETEZZA = 'netezza',
-  /** Pervasive PSQL. */
-  PERVASIVE = 'pervasive',
-  /** PointBase. */
-  POINTBASE = 'pointbase',
-  /** SQLite. */
-  SQLITE = 'sqlite',
-  /** Sybase. */
-  SYBASE = 'sybase',
-  /** Teradata. */
-  TERADATA = 'teradata',
-  /** Vertica. */
-  VERTICA = 'vertica',
-  /** H2. */
-  H2 = 'h2',
-  /** ColdFusion IMQ. */
-  COLDFUSION = 'coldfusion',
-  /** Apache Cassandra. */
-  CASSANDRA = 'cassandra',
-  /** Apache HBase. */
-  HBASE = 'hbase',
-  /** MongoDB. */
-  MONGODB = 'mongodb',
-  /** Redis. */
-  REDIS = 'redis',
-  /** Couchbase. */
-  COUCHBASE = 'couchbase',
-  /** CouchDB. */
-  COUCHDB = 'couchdb',
-  /** Microsoft Azure Cosmos DB. */
-  COSMOSDB = 'cosmosdb',
-  /** Amazon DynamoDB. */
-  DYNAMODB = 'dynamodb',
-  /** Neo4j. */
-  NEO4J = 'neo4j',
-  /** Apache Geode. */
-  GEODE = 'geode',
-  /** Elasticsearch. */
-  ELASTICSEARCH = 'elasticsearch',
-}
-
 export enum MessagingDestinationKindValues {
   /** A message sent to a queue. */
   QUEUE = 'queue',
@@ -928,23 +818,6 @@ export enum MessagingOperationValues {
   RECEIVE = 'receive',
   /** process. */
   PROCESS = 'process',
-}
-
-export enum NetTransportValues {
-  /** IP.TCP. */
-  IP_TCP = 'IP.TCP',
-  /** IP.UDP. */
-  IP_UDP = 'IP.UDP',
-  /** Another IP-based protocol. */
-  IP = 'IP',
-  /** Unix Domain socket. See below. */
-  UNIX = 'Unix',
-  /** Named or anonymous pipe. See note below. */
-  PIPE = 'pipe',
-  /** In-process communication. */
-  INPROC = 'inproc',
-  /** Something else (non IP-based). */
-  OTHER = 'other',
 }
 
 export enum RpcGrpcStatusCodeValues {
