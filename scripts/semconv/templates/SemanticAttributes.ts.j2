@@ -50,11 +50,15 @@ export const {{class}} = {
 {%- set class_name = attribute.fqn | to_camelcase(True) ~ "Values" %}
 {%- set type = attribute.attr_type.enum_type %}
 
+{% if attribute.attr_type.members is defined and attribute.attr_type.members|length > 0 %}
+
 export enum {{class_name}} {
-  {%- for member in attribute.attr_type.members if attribute.is_local and not attribute.ref %}
+  {%- for member in attribute.attr_type.members %}
   /** {% filter escape %}{{member.brief | to_doc_brief}}.{% endfilter %} */
   {{ member.member_id | to_const_name }} = {{ print_value(type, member.value) }},
   {%- endfor %}
 }
 {% endif %}
+{% endif %}
+
 {%- endfor %}
