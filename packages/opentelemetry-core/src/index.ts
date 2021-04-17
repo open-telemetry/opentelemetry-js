@@ -21,6 +21,8 @@ export * from './common/logging-error-handler';
 export * from './common/time';
 export * from './common/types';
 export * from './ExportResult';
+export * from './version';
+export * as baggageUtils from './baggage/utils';
 export * from './platform';
 export * from './propagation/composite';
 export * from './trace/HttpTraceContextPropagator';
