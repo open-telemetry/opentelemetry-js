@@ -21,6 +21,7 @@ import {
 import { PrometheusCheckpoint } from './types';
 import { Labels } from '@opentelemetry/api-metrics';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
+import { diag } from '@opentelemetry/api';
 
 type PrometheusDataTypeLiteral =
   | 'counter'
@@ -177,6 +178,16 @@ export class PrometheusSerializer {
 
   serializeRecord(name: string, record: MetricRecord): string {
     let results = '';
+
+    if (
+      record.descriptor.metricKind === MetricKind.COUNTER &&
+      !name.endsWith('_total')
+    ) {
+      diag.debug(
+        `The metric ${name} of kind Counter is missing the mandatory _total as suffix`
+      );
+    }
+
     switch (record.aggregator.kind) {
       case AggregatorKind.SUM:
       case AggregatorKind.LAST_VALUE: {
