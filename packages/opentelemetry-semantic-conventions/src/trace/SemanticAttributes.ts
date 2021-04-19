@@ -403,6 +403,120 @@ clear whether the exception will escape.
   HTTP_CLIENT_IP: 'http.client_ip',
 
   /**
+   * The keys in the `RequestItems` object field.
+   */
+  AWS_DYNAMODB_TABLE_NAMES: 'aws.dynamodb.table_names',
+
+  /**
+   * The JSON-serialized value of each item in the `ConsumedCapacity` response field.
+   */
+  AWS_DYNAMODB_CONSUMED_CAPACITY: 'aws.dynamodb.consumed_capacity',
+
+  /**
+   * The JSON-serialized value of the `ItemCollectionMetrics` response field.
+   */
+  AWS_DYNAMODB_ITEM_COLLECTION_METRICS: 'aws.dynamodb.item_collection_metrics',
+
+  /**
+   * The value of the `ProvisionedThroughput.ReadCapacityUnits` request parameter.
+   */
+  AWS_DYNAMODB_PROVISIONED_READ_CAPACITY:
+    'aws.dynamodb.provisioned_read_capacity',
+
+  /**
+   * The value of the `ProvisionedThroughput.WriteCapacityUnits` request parameter.
+   */
+  AWS_DYNAMODB_PROVISIONED_WRITE_CAPACITY:
+    'aws.dynamodb.provisioned_write_capacity',
+
+  /**
+   * The value of the `ConsistentRead` request parameter.
+   */
+  AWS_DYNAMODB_CONSISTENT_READ: 'aws.dynamodb.consistent_read',
+
+  /**
+   * The value of the `ProjectionExpression` request parameter.
+   */
+  AWS_DYNAMODB_PROJECTION: 'aws.dynamodb.projection',
+
+  /**
+   * The value of the `Limit` request parameter.
+   */
+  AWS_DYNAMODB_LIMIT: 'aws.dynamodb.limit',
+
+  /**
+   * The value of the `AttributesToGet` request parameter.
+   */
+  AWS_DYNAMODB_ATTRIBUTES_TO_GET: 'aws.dynamodb.attributes_to_get',
+
+  /**
+   * The value of the `IndexName` request parameter.
+   */
+  AWS_DYNAMODB_INDEX_NAME: 'aws.dynamodb.index_name',
+
+  /**
+   * The value of the `Select` request parameter.
+   */
+  AWS_DYNAMODB_SELECT: 'aws.dynamodb.select',
+
+  /**
+   * The JSON-serialized value of each item of the `GlobalSecondaryIndexes` request field.
+   */
+  AWS_DYNAMODB_GLOBAL_SECONDARY_INDEXES:
+    'aws.dynamodb.global_secondary_indexes',
+
+  /**
+   * The JSON-serialized value of each item of the `LocalSecondaryIndexes` request field.
+   */
+  AWS_DYNAMODB_LOCAL_SECONDARY_INDEXES: 'aws.dynamodb.local_secondary_indexes',
+
+  /**
+   * The value of the `ExclusiveStartTableName` request parameter.
+   */
+  AWS_DYNAMODB_EXCLUSIVE_START_TABLE: 'aws.dynamodb.exclusive_start_table',
+
+  /**
+   * The the number of items in the `TableNames` response parameter.
+   */
+  AWS_DYNAMODB_TABLE_COUNT: 'aws.dynamodb.table_count',
+
+  /**
+   * The value of the `ScanIndexForward` request parameter.
+   */
+  AWS_DYNAMODB_SCAN_FORWARD: 'aws.dynamodb.scan_forward',
+
+  /**
+   * The value of the `Segment` request parameter.
+   */
+  AWS_DYNAMODB_SEGMENT: 'aws.dynamodb.segment',
+
+  /**
+   * The value of the `TotalSegments` request parameter.
+   */
+  AWS_DYNAMODB_TOTAL_SEGMENTS: 'aws.dynamodb.total_segments',
+
+  /**
+   * The value of the `Count` response parameter.
+   */
+  AWS_DYNAMODB_COUNT: 'aws.dynamodb.count',
+
+  /**
+   * The value of the `ScannedCount` response parameter.
+   */
+  AWS_DYNAMODB_SCANNED_COUNT: 'aws.dynamodb.scanned_count',
+
+  /**
+   * The JSON-serialized value of each item in the `AttributeDefinitions` request field.
+   */
+  AWS_DYNAMODB_ATTRIBUTE_DEFINITIONS: 'aws.dynamodb.attribute_definitions',
+
+  /**
+   * The JSON-serialized value of each item in the the `GlobalSecondaryIndexUpdates` request field.
+   */
+  AWS_DYNAMODB_GLOBAL_SECONDARY_INDEX_UPDATES:
+    'aws.dynamodb.global_secondary_index_updates',
+
+  /**
    * A string identifying the messaging system.
    */
   MESSAGING_SYSTEM: 'messaging.system',
@@ -606,8 +720,6 @@ export enum DbSystemValues {
   ELASTICSEARCH = 'elasticsearch',
 }
 
-export enum NetTransportValues {}
-
 export enum DbCassandraConsistencyLevelValues {
   /** ALL. */
   ALL = 'ALL',
@@ -658,7 +770,7 @@ export enum FaasDocumentOperationValues {
 export enum FaasInvokedProviderValues {
   /** Amazon Web Services. */
   AWS = 'aws',
-  /** Amazon Web Services. */
+  /** Microsoft Azure. */
   AZURE = 'azure',
   /** Google Cloud Platform. */
   GCP = 'gcp',
@@ -707,8 +819,6 @@ export enum MessagingOperationValues {
   /** process. */
   PROCESS = 'process',
 }
-
-export enum NetTransportValues {}
 
 export enum RpcGrpcStatusCodeValues {
   /** OK. */
