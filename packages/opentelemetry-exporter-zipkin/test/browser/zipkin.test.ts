@@ -96,6 +96,34 @@ describe('Zipkin Exporter - web', () => {
         });
       });
     });
+
+    describe('should use url defined in environment', () => {
+      let server: any;
+      const endpointUrl = 'http://localhost:9412';
+      beforeEach(() => {
+        (window.navigator as any).sendBeacon = false;
+        (window as any).OTEL_EXPORTER_ZIPKIN_ENDPOINT = endpointUrl;
+        zipkinExporter = new ZipkinExporter(zipkinConfig);
+        server = sinon.fakeServer.create();
+      });
+      afterEach(() => {
+        server.restore();
+      });
+
+      it('should successfully send the spans using XMLHttpRequest', done => {
+        zipkinExporter.export(spans, () => {});
+
+        setTimeout(() => {
+          const request = server.requests[0];
+          assert(request.url, endpointUrl);
+          const body = request.requestBody;
+          const json = JSON.parse(body) as any;
+          ensureSpanIsCorrect(json[0]);
+
+          done();
+        });
+      });
+    });
   });
   describe('when getExportRequestHeaders is defined', () => {
     let server: any;
