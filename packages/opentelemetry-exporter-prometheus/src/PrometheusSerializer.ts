@@ -111,7 +111,7 @@ function stringify(
   let labelsStr = '';
 
   for (const [key, val] of Object.entries(labels)) {
-    const santisedLabelName = sanitizePrometheusMetricName(key);
+    const sanitisedLabelName = sanitisePrometheusMetricName(key);
     hasLabel = true;
     labelsStr += `${
       labelsStr.length > 0 ? ',' : ''
