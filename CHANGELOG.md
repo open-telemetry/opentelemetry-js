@@ -22,6 +22,8 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* `opentelemetry-core`, `opentelemetry-exporter-zipkin`
+  * [#2097](https://github.com/open-telemetry/opentelemetry-js/pull/2097) feat(zipkin): allow to configure url via environment #1675 ([@vmarchaud](https://github.com/vmarchaud))
 * `opentelemetry-exporter-zipkin`
   * [#2050](https://github.com/open-telemetry/opentelemetry-js/pull/2050) chore: adding interceptor for getting headers before each request ([@obecny](https://github.com/obecny))
 * `opentelemetry-exporter-collector-grpc`
@@ -33,6 +35,8 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: (Bug Fix)
 
+* `opentelemetry-instrumentation-http`, `opentelemetry-tracing`
+  * [#2105](https://github.com/open-telemetry/opentelemetry-js/pull/2105) fix: don't use spanId from invalid parent ([@Flarna](https://github.com/Flarna))
 * `opentelemetry-context-async-hooks`
   * [#2088](https://github.com/open-telemetry/opentelemetry-js/pull/2088) fix: correct removeAllListeners in case no event is passed ([@Flarna](https://github.com/Flarna))
 * `opentelemetry-resource-detector-aws`
@@ -53,10 +57,12 @@ All notable changes to this project will be documented in this file.
 
 ### :house: (Internal)
 
+* `opentelemetry-exporter-collector-grpc`, `opentelemetry-metrics`, `opentelemetry-tracing`
+  * [#1780](https://github.com/open-telemetry/opentelemetry-js/pull/1780) chore: no-floating-promises ([@naseemkullah](https://github.com/naseemkullah))
 * `opentelemetry-context-zone`, `opentelemetry-core`, `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`, `opentelemetry-exporter-jaeger`, `opentelemetry-exporter-prometheus`, `opentelemetry-exporter-zipkin`, `opentelemetry-instrumentation-fetch`, `opentelemetry-instrumentation-grpc`, `opentelemetry-instrumentation-http`, `opentelemetry-instrumentation-xml-http-request`, `opentelemetry-instrumentation`, `opentelemetry-metrics`, `opentelemetry-node`, `opentelemetry-propagator-jaeger`, `opentelemetry-resource-detector-aws`, `opentelemetry-resource-detector-gcp`, `opentelemetry-resources`, `opentelemetry-sdk-node`, `opentelemetry-shim-opentracing`, `opentelemetry-tracing`, `opentelemetry-web`
   * [#2073](https://github.com/open-telemetry/opentelemetry-js/pull/2073) chore: pin own deps ([@dyladan](https://github.com/dyladan))
 
-### Committers: 12
+### Committers: 13
 
 * Austin Parker ([@austinlparker](https://github.com/austinlparker))
 * Bartlomiej Obecny ([@obecny](https://github.com/obecny))
@@ -64,6 +70,7 @@ All notable changes to this project will be documented in this file.
 * Gerhard Stöbich ([@Flarna](https://github.com/Flarna))
 * Jakub Malinowski ([@jtmalinowski](https://github.com/jtmalinowski))
 * Matthew Wear ([@mwear](https://github.com/mwear))
+* Naseem ([@naseemkullah](https://github.com/naseemkullah))
 * Niek Kruse ([@niekert](https://github.com/niekert))
 * Siddhesh Mhadnak ([@sid-maddy](https://github.com/sid-maddy))
 * Valentin Marchaud ([@vmarchaud](https://github.com/vmarchaud))
