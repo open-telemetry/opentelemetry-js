@@ -23,6 +23,7 @@ import {
   UpDownCounterMetric,
   ValueObserverMetric,
 } from '@opentelemetry/metrics';
+import { diag, DiagLogLevel } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { Labels } from '@opentelemetry/api-metrics';
 import { PrometheusSerializer } from '../src/PrometheusSerializer';
@@ -367,6 +368,70 @@ describe('PrometheusSerializer', () => {
             `test_bucket{val="2",le="+Inf"} 1 ${mockedHrTimeMs}\n`
         );
       });
+    });
+  });
+
+  describe('validate against metric conventions', () => {
+    mockAggregator(SumAggregator);
+
+    it('should warn for counter metrics with wrong name', async () => {
+      let calledArgs: any[] = [];
+      const dummyLogger = {
+        verbose: () => {},
+        debug: (...args: any[]) => {
+          calledArgs = args;
+        },
+        info: () => {},
+        warn: () => {},
+        error: () => {},
+      };
+      diag.setLogger(dummyLogger, DiagLogLevel.ALL);
+      const serializer = new PrometheusSerializer();
+
+      const meter = new MeterProvider({
+        processor: new ExactProcessor(SumAggregator),
+      }).getMeter('test');
+      const counter = meter.createCounter('test') as CounterMetric;
+      counter.bind({}).add(1);
+
+      const records = await counter.getMetricRecord();
+      const record = records[0];
+
+      const result = serializer.serializeRecord(record.descriptor.name, record);
+      assert.strictEqual(result, `test 1 ${mockedHrTimeMs}\n`);
+      assert.ok(
+        calledArgs.includes(
+          'Counter test is missing the mandatory _total suffix'
+        )
+      );
+    });
+
+    it('should not warn for counter metrics with correct name', async () => {
+      let calledArgs: any[] = [];
+      const dummyLogger = {
+        verbose: () => {},
+        debug: (...args: any[]) => {
+          calledArgs = args;
+        },
+        info: () => {},
+        warn: () => {},
+        error: () => {},
+      };
+      diag.setLogger(dummyLogger, DiagLogLevel.ALL);
+      const serializer = new PrometheusSerializer();
+
+      const meter = new MeterProvider({
+        processor: new ExactProcessor(SumAggregator),
+      }).getMeter('test');
+      const counter = meter.createCounter('test_total') as CounterMetric;
+      counter.bind({}).add(1);
+
+      const records = await counter.getMetricRecord();
+      const record = records[0];
+
+      const result = serializer.serializeRecord(record.descriptor.name, record);
+      assert.strictEqual(result, `test_total 1 ${mockedHrTimeMs}\n`);
+      assert.ok(calledArgs.length === 0);
     });
   });
 

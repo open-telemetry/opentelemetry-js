@@ -183,9 +183,7 @@ export class PrometheusSerializer {
       record.descriptor.metricKind === MetricKind.COUNTER &&
       !name.endsWith('_total')
     ) {
-      diag.debug(
-        `The metric ${name} of kind Counter is missing the mandatory _total as suffix`
-      );
+      diag.debug(`Counter ${name} is missing the mandatory _total suffix`);
     }
 
     switch (record.aggregator.kind) {
