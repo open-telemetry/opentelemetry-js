@@ -375,13 +375,13 @@ describe('PrometheusSerializer', () => {
   describe('validate against metric conventions', () => {
     mockAggregator(SumAggregator);
 
-    it('should rename metric of type counter when name misses _counter suffix', async () => {
+    it('should rename metric of type counter when name misses _total suffix', async () => {
       const serializer = new PrometheusSerializer();
 
       const meter = new MeterProvider({
         processor: new ExactProcessor(SumAggregator),
       }).getMeter('test');
-      const counter = meter.createCounter('test_total') as CounterMetric;
+      const counter = meter.createCounter('test') as CounterMetric;
       counter.bind({}).add(1);
 
       const records = await counter.getMetricRecord();
