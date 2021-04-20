@@ -19,6 +19,7 @@ import {
   AlwaysOffSampler,
   AlwaysOnSampler,
   getEnv,
+  TracesSamplerValues,
   ParentBasedSampler,
   TraceIdRatioBasedSampler,
 } from '@opentelemetry/core';
@@ -41,6 +42,8 @@ export const DEFAULT_CONFIG = {
   },
 };
 
+const FALLBACK_OTEL_TRACES_SAMPLER = TracesSamplerValues.AlwaysOn;
+
 /**
  * Based on environment, builds a sampler, complies with specification.
  * @param env optional, by default uses getEnv(), but allows passing a value to reuse parsed environment
@@ -49,27 +52,27 @@ export function buildSamplerFromEnv(
   env: Required<ENVIRONMENT> = getEnv()
 ): Sampler {
   switch (env.OTEL_TRACES_SAMPLER) {
-    case 'always_on':
+    case TracesSamplerValues.AlwaysOn:
       return new AlwaysOnSampler();
-    case 'always_off':
+    case TracesSamplerValues.AlwaysOff:
       return new AlwaysOffSampler();
-    case 'parentbased_always_on':
+    case TracesSamplerValues.ParentBasedAlwaysOn:
       return new ParentBasedSampler({
         root: new AlwaysOnSampler(),
       });
-    case 'parentbased_always_off':
+    case TracesSamplerValues.ParentBasedAlwaysOff:
       return new ParentBasedSampler({
         root: new AlwaysOffSampler(),
       });
-    case 'traceidratio':
+    case TracesSamplerValues.TraceIdRatio:
       return new TraceIdRatioBasedSampler(getSamplerProbabilityFromEnv(env));
-    case 'parentbased_traceidratio':
+    case TracesSamplerValues.ParentBasedTraceIdRatio:
       return new ParentBasedSampler({
         root: new TraceIdRatioBasedSampler(getSamplerProbabilityFromEnv(env)),
       });
     default:
       diag.error(
-        `OTEL_TRACES_SAMPLER value "${env.OTEL_TRACES_SAMPLER} invalid, defaulting to always_on".`
+        `OTEL_TRACES_SAMPLER value "${env.OTEL_TRACES_SAMPLER} invalid, defaulting to ${FALLBACK_OTEL_TRACES_SAMPLER}".`
       );
       return new AlwaysOnSampler();
   }
