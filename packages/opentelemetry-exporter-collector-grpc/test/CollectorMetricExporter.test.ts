@@ -129,7 +129,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
           )
         : undefined;
       collectorExporter = new CollectorMetricExporter({
-        url: address,
+        url: 'grpcs://' + address,
         credentials,
         serviceName: 'basic-service',
         metadata: params.metadata,

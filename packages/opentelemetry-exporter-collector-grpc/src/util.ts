@@ -32,10 +32,10 @@ export function onInit<ExportItem, ServiceRequest>(
   config: CollectorExporterConfigNode
 ): void {
   collector.grpcQueue = [];
+  const serverAddress = removeProtocol(collector.url);
   if (collector.url.includes('/')) {
     diag.warn('URL path cannot be set when using grpc');
   }
-  const serverAddress = removeProtocol(collector.url);
   const credentials: grpc.ChannelCredentials =
     config.credentials || grpc.credentials.createInsecure();
 
@@ -109,5 +109,5 @@ export function send<ExportItem, ServiceRequest>(
 }
 
 function removeProtocol(url: string): string {
-  return url.replace(/^https?:\/\//, '');
+  return url.replace(/^(http|grpc)s?:\/\//, '');
 }

@@ -125,7 +125,7 @@ const testCollectorExporter = (params: TestParams) =>
         : undefined;
       collectorExporter = new CollectorTraceExporter({
         serviceName: 'basic-service',
-        url: address,
+        url: 'grpcs://' + address,
         credentials,
         metadata: params.metadata,
       });
