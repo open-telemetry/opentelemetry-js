@@ -23,6 +23,7 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { DiagLogLevel } from '@opentelemetry/api';
+import { TracesSamplerValues } from '../../src';
 
 let lastMock: RAW_ENVIRONMENT = {};
 
@@ -83,15 +84,15 @@ describe('environment', () => {
         OTEL_LOG_LEVEL: 'ERROR',
         OTEL_NO_PATCH_MODULES: 'a,b,c',
         OTEL_RESOURCE_ATTRIBUTES: '<attrs>',
-        OTEL_SAMPLING_PROBABILITY: '0.5',
         OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT: 10,
         OTEL_SPAN_EVENT_COUNT_LIMIT: 20,
         OTEL_SPAN_LINK_COUNT_LIMIT: 30,
+        OTEL_TRACES_SAMPLER: 'always_on',
+        OTEL_TRACES_SAMPLER_ARG: '0.5',
       });
       const env = getEnv();
       assert.deepStrictEqual(env.OTEL_NO_PATCH_MODULES, ['a', 'b', 'c']);
       assert.strictEqual(env.OTEL_LOG_LEVEL, DiagLogLevel.ERROR);
-      assert.strictEqual(env.OTEL_SAMPLING_PROBABILITY, 0.5);
       assert.strictEqual(env.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT, 10);
       assert.strictEqual(env.OTEL_SPAN_EVENT_COUNT_LIMIT, 20);
       assert.strictEqual(env.OTEL_SPAN_LINK_COUNT_LIMIT, 30);
@@ -117,20 +118,8 @@ describe('environment', () => {
       assert.strictEqual(env.OTEL_RESOURCE_ATTRIBUTES, '<attrs>');
       assert.strictEqual(env.OTEL_BSP_MAX_EXPORT_BATCH_SIZE, 40);
       assert.strictEqual(env.OTEL_BSP_SCHEDULE_DELAY, 50);
-    });
-
-    it('should match invalid values to closest valid equivalent', () => {
-      mockEnvironment({
-        OTEL_SAMPLING_PROBABILITY: '-0.1',
-      });
-      const minEnv = getEnv();
-      assert.strictEqual(minEnv.OTEL_SAMPLING_PROBABILITY, 0);
-
-      mockEnvironment({
-        OTEL_SAMPLING_PROBABILITY: '1.1',
-      });
-      const maxEnv = getEnv();
-      assert.strictEqual(maxEnv.OTEL_SAMPLING_PROBABILITY, 1);
+      assert.strictEqual(env.OTEL_TRACES_SAMPLER, 'always_on');
+      assert.strictEqual(env.OTEL_TRACES_SAMPLER_ARG, '0.5');
     });
 
     it('should parse OTEL_LOG_LEVEL despite casing', () => {
@@ -158,12 +147,15 @@ describe('environment', () => {
     it('should remove a mock environment', () => {
       mockEnvironment({
         OTEL_LOG_LEVEL: 'DEBUG',
-        OTEL_SAMPLING_PROBABILITY: 0.5,
+        OTEL_TRACES_SAMPLER: TracesSamplerValues.AlwaysOff,
       });
       removeMockEnvironment();
       const env = getEnv();
       assert.strictEqual(env.OTEL_LOG_LEVEL, DiagLogLevel.INFO);
-      assert.strictEqual(env.OTEL_SAMPLING_PROBABILITY, 1);
+      assert.strictEqual(
+        env.OTEL_TRACES_SAMPLER,
+        TracesSamplerValues.ParentBasedAlwaysOn
+      );
     });
   });
 });
