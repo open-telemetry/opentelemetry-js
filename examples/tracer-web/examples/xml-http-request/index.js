@@ -18,7 +18,6 @@ registerInstrumentations({
       ],
     }),
   ],
-  tracerProvider: providerWithZone,
 });
 
 providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));

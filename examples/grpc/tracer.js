@@ -13,7 +13,6 @@ const EXPORTER = process.env.EXPORTER || '';
 module.exports = (serviceName) => {
   const provider = new NodeTracerProvider();
   registerInstrumentations({
-    tracerProvider: provider,
     instrumentations: [
       new GrpcInstrumentation(),
     ],

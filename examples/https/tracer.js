@@ -15,7 +15,6 @@ module.exports = (serviceName) => {
   let exporter;
   const provider = new NodeTracerProvider();
   registerInstrumentations({
-    tracerProvider: provider,
     instrumentations: [
       new HttpInstrumentation(),
     ],

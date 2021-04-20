@@ -88,7 +88,6 @@ const provider: NodeTracerProvider = new NodeTracerProvider({
 provider.register();
 
 registerInstrumentations({
-  tracerProvider: provider,
   instrumentations: [
     new ExpressInstrumentation(),
     new HttpInstrumentation(),
@@ -153,7 +152,6 @@ provider.addSpanProcessor(
 );
 
 registerInstrumentations({
-  tracerProvider: provider,
   instrumentations: [
     new ExpressInstrumentation(),
     new HttpInstrumentation(),

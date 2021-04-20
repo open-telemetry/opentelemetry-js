@@ -16,7 +16,6 @@ module.exports = (serviceName) => {
     instrumentations: [
       new GrpcInstrumentation(),
     ],
-    tracerProvider: provider,
   });
 
   let exporter;

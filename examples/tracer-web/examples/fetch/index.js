@@ -20,10 +20,9 @@ registerInstrumentations({
         'https://cors-test.appspot.com/test',
         'https://httpbin.org/get',
       ],
-      clearTimingResources: true
+      clearTimingResources: true,
     }),
   ],
-  tracerProvider: provider,
 });
 
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));

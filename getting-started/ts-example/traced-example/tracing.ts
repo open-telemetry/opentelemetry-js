@@ -27,7 +27,6 @@ provider.addSpanProcessor(
 );
 
 registerInstrumentations({
-  tracerProvider: provider,
   instrumentations: [
     new ExpressInstrumentation(),
     new HttpInstrumentation(),

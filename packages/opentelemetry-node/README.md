@@ -64,7 +64,6 @@ provider.register();
 // register and load instrumentation and old plugins - old plugins will be loaded automatically as previously
 // but instrumentations needs to be added
 registerInstrumentations({
-  tracerProvider: provider,
 });
 
 // Your application code - http will automatically be instrumented if
@@ -88,7 +87,6 @@ const provider = new NodeTracerProvider();
 // register and load instrumentation and old plugins - old plugins will be loaded automatically as previously
 // but instrumentations needs to be added
 registerInstrumentations({
-  tracerProvider: provider,
   instrumentations: [
     new ExpressInstrumentation(),
     new HttpInstrumentation({
