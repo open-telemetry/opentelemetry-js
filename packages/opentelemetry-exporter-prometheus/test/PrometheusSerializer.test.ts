@@ -488,7 +488,7 @@ describe('PrometheusSerializer', () => {
         );
       });
 
-      it('should sanitise label names', async () => {
+      it('should sanitize label names', async () => {
         const serializer = new PrometheusSerializer();
 
         const meter = new MeterProvider({
