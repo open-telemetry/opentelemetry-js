@@ -32,10 +32,6 @@ export function onInit<ExportItem, ServiceRequest>(
   config: CollectorExporterConfigNode
 ): void {
   collector.grpcQueue = [];
-  const serverAddress = removeProtocol(collector.url);
-  if (collector.url.includes('/')) {
-    diag.warn('URL path cannot be set when using grpc');
-  }
   const credentials: grpc.ChannelCredentials =
     config.credentials || grpc.credentials.createInsecure();
 
@@ -55,12 +51,12 @@ export function onInit<ExportItem, ServiceRequest>(
 
       if (collector.getServiceClientType() === ServiceClientType.SPANS) {
         collector.serviceClient = new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(
-          serverAddress,
+          collector.serverAddress,
           credentials
         );
       } else {
         collector.serviceClient = new packageObject.opentelemetry.proto.collector.metrics.v1.MetricsService(
-          serverAddress,
+          collector.serverAddress,
           credentials
         );
       }
@@ -108,6 +104,10 @@ export function send<ExportItem, ServiceRequest>(
   }
 }
 
-function removeProtocol(url: string): string {
-  return url.replace(/^(http|grpc)s?:\/\//, '');
+export function fixUrl(url: string): string {
+  const serverAddress = url.replace(/^(http|grpc)s?:\/\//, '');
+  if (serverAddress.includes('/')) {
+    diag.warn('URL path cannot be set when using grpc');
+  }
+  return serverAddress;
 }
