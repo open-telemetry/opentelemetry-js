@@ -23,7 +23,7 @@ const urlNotIgnored = 'url should NOT be ignored';
 
 const urlToTest = 'http://myaddress.com/somepath';
 
-describe('BasePlugin - Utils', () => {
+describe('Core - Utils - url', () => {
   describe('isUrlIgnored', () => {
     describe('when ignored urls are undefined', () => {
       it('should return false', () => {

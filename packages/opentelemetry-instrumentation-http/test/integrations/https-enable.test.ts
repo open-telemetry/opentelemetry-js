@@ -16,8 +16,9 @@
 
 import { SpanKind, Span, context, propagation } from '@opentelemetry/api';
 import {
-  HttpAttribute,
-  GeneralAttribute,
+  HttpFlavorValues,
+  NetTransportValues,
+  SemanticAttributes,
 } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as http from 'http';
@@ -238,10 +239,13 @@ describe('HttpsInstrumentation Integration tests', () => {
       assert.strictEqual(spans.length, 2);
       assert.strictEqual(span.name, 'HTTPS GET');
       assert.strictEqual(result.reqHeaders['x-foo'], 'foo');
-      assert.strictEqual(span.attributes[HttpAttribute.HTTP_FLAVOR], '1.1');
       assert.strictEqual(
-        span.attributes[GeneralAttribute.NET_TRANSPORT],
-        GeneralAttribute.IP_TCP
+        span.attributes[SemanticAttributes.HTTP_FLAVOR],
+        HttpFlavorValues.HTTP_1_1
+      );
+      assert.strictEqual(
+        span.attributes[SemanticAttributes.NET_TRANSPORT],
+        NetTransportValues.IP_TCP
       );
       assertSpan(span, SpanKind.CLIENT, validations);
     });

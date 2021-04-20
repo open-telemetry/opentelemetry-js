@@ -6,6 +6,7 @@ const { NodeTracerProvider } = require('@opentelemetry/node');
 const { SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
+const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
 
 const EXPORTER = process.env.EXPORTER || '';
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -15,17 +16,9 @@ module.exports = (serviceName) => {
   const provider = new NodeTracerProvider();
   registerInstrumentations({
     tracerProvider: provider,
-    // when boostraping with lerna for testing purposes
-    // instrumentations: [
-    //   {
-    //     plugins: {
-    //       https: {
-    //         enabled: true,
-    //         path: `${__dirname}/../../packages/opentelemetry-plugin-https/build/src`
-    //       }
-    //     }
-    //   }
-    // ],
+    instrumentations: [
+      new HttpInstrumentation(),
+    ],
   });
 
   if (EXPORTER.toLowerCase().startsWith('z')) {

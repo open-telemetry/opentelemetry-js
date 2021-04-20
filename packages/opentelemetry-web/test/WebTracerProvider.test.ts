@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
 import { context, getSpan, setSpan, ContextManager } from '@opentelemetry/api';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { B3Propagator } from '@opentelemetry/propagator-b3';
 import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
 import { Span, Tracer } from '@opentelemetry/tracing';
 import * as assert from 'assert';
-import * as sinon from 'sinon';
 import { WebTracerConfig } from '../src';
 import { WebTracerProvider } from '../src/WebTracerProvider';
 
@@ -46,21 +44,6 @@ describe('WebTracerProvider', () => {
         Object.assign({}, defaultOptions)
       ).getTracer('default');
       assert.ok(tracer instanceof Tracer);
-    });
-
-    it('should show warning when plugins are defined', () => {
-      const dummyPlugin1 = {};
-      const spyWarn = sinon.spy(diag, 'warn');
-
-      const plugins = [dummyPlugin1];
-
-      const options = { plugins };
-      new WebTracerProvider(options);
-
-      assert.strictEqual(
-        spyWarn.args[0][0],
-        'plugins option was removed, please use "registerInstrumentations" to load plugins'
-      );
     });
 
     it('should work without default context manager', () => {

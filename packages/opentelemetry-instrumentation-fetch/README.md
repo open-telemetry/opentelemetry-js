@@ -21,17 +21,19 @@ import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing
 import { WebTracerProvider } from '@opentelemetry/web';
 import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
-const provider = new WebTracerProvider({
-  plugins: [
-    new FetchInstrumentation(),
-  ],
-});
+const provider = new WebTracerProvider();
 
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
 provider.register({
   contextManager: new ZoneContextManager(),
+});
+
+registerInstrumentations({
+  instrumentations: [new FetchInstrumentation()],
+  tracerProvider: provider,
 });
 
 // or plugin can be also initialised separately and then set the tracer provider or meter provider
@@ -58,6 +60,14 @@ fetch('http://localhost:8090/fetch.js');
 ![Screenshot of the running example](images/trace3.png)
 
 See [examples/tracer-web/fetch](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/tracer-web) for a short example.
+
+### Fetch Instrumentation options
+
+Fetch instrumentation plugin has few options available to choose from. You can set the following:
+
+| Options                                                                                                                                           | Type                          | Description                           |
+| ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | ------------------------------------- |
+| [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L47) | `HttpCustomAttributeFunction` | Function for adding custom attributes |
 
 ## Useful links
 

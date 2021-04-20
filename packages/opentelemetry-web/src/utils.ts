@@ -26,7 +26,7 @@ import {
   timeInputToHrTime,
   urlMatches,
 } from '@opentelemetry/core';
-import { HttpAttribute } from '@opentelemetry/semantic-conventions';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 // Used to normalize relative URLs
 let a: HTMLAnchorElement | undefined;
@@ -90,7 +90,7 @@ export function addSpanNetworkEvents(
   const contentLength = resource[PTN.ENCODED_BODY_SIZE];
   if (contentLength !== undefined) {
     span.setAttribute(
-      HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH,
+      SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH,
       contentLength
     );
   }

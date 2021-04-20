@@ -5,6 +5,10 @@ import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 // For Jaeger, use the following line instead:
 // import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 
+const { registerInstrumentations } = require('@opentelemetry/instrumentation');
+const { ExpressInstrumentation } = require('@opentelemetry/instrumentation-express');
+const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
+
 const provider: NodeTracerProvider = new NodeTracerProvider();
 
 provider.register();
@@ -21,5 +25,14 @@ provider.addSpanProcessor(
     }),
   ),
 );
+
+registerInstrumentations({
+  tracerProvider: provider,
+  instrumentations: [
+    new ExpressInstrumentation(),
+    new HttpInstrumentation(),
+  ],
+});
+
 
 console.log('tracing initialized');

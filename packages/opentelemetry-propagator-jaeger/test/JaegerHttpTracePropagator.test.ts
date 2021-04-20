@@ -21,6 +21,7 @@ import {
   ROOT_CONTEXT,
   setSpanContext,
   SpanContext,
+  suppressInstrumentation,
   TextMapGetter,
   TraceFlags,
 } from '@opentelemetry/api';
@@ -78,6 +79,21 @@ describe('JaegerHttpTracePropagator', () => {
         'd4cda95b652f4a1592b449d5929fda1b:6e0c63257de34c92:0:01'
       );
     });
+
+    it('should not set uber trace id header if instrumentation suppressed', () => {
+      const spanContext: SpanContext = {
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: '6e0c63257de34c92',
+        traceFlags: TraceFlags.SAMPLED,
+      };
+
+      jaegerHttpTracePropagator.inject(
+        suppressInstrumentation(setSpanContext(ROOT_CONTEXT, spanContext)),
+        carrier,
+        defaultTextMapSetter
+      );
+      assert.strictEqual(carrier[UBER_TRACE_ID_HEADER], undefined);
+    });
   });
 
   describe('.extract()', () => {
@@ -113,7 +129,7 @@ describe('JaegerHttpTracePropagator', () => {
 
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: '45fd2a9709dadcf1',
-        traceId: '9c41e35aeb6d1272',
+        traceId: '00000000000000009c41e35aeb6d1272',
         isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });
@@ -132,7 +148,7 @@ describe('JaegerHttpTracePropagator', () => {
 
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: '5ac292c4a11a163e',
-        traceId: 'ac1f3dc3c2c0b06e',
+        traceId: '0000000000000000ac1f3dc3c2c0b06e',
         isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });

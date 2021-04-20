@@ -1,0 +1,22 @@
+name: Ensure API Peer Dependency
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  peer-api-check:
+    runs-on: ubuntu-latest
+    container:
+      image: node:14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Install lerna
+        run: npm install -g lerna
+
+      - name: Check API dependency semantics
+        run: lerna exec "node ../../scripts/peer-api-check.js"
