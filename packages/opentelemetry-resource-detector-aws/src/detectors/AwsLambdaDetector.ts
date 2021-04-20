@@ -43,7 +43,7 @@ export class AwsLambdaDetector implements Detector {
       attributes[CLOUD_RESOURCE.REGION] = region;
     }
 
-    // TODO(anuraaga): Migrate to FAAS_RESOURCE when defined.
+    // TODO(https://github.com/open-telemetry/opentelemetry-js/issues/2123): Migrate to FAAS_RESOURCE when defined.
     if (functionName) {
       attributes['faas.name'] = functionName;
     }
