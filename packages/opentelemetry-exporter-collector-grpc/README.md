@@ -18,12 +18,15 @@ npm install --save @opentelemetry/exporter-collector-grpc
 The CollectorTraceExporter in Node expects the URL to only be the hostname. It will not work with `/v1/trace`.
 
 ```js
+const Graceful = require('node-graceful');
+
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector-grpc');
 
 const collectorOptions = {
   serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>' // url is optional and can be omitted - default is localhost:4317
+  // url is optional and can be omitted - default is localhost:4317
+  url: '<collector-hostname>:<port>',
 };
 
 const provider = new BasicTracerProvider();
@@ -32,24 +35,27 @@ provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 provider.register();
 
+Graceful.on("exit", async () => {
+  await provider.shutdown();
+});
 ```
 
 By default, plaintext connection is used. In order to use TLS in Node.js, provide `credentials` option like so:
 
 ```js
 const fs = require('fs');
+// Must be 'grpc', _not_ '@grpc/grpc-js'
 const grpc = require('grpc');
+const Graceful = require('node-graceful');
+
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector-grpc');
 
 const collectorOptions = {
   serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is localhost:4317
-  credentials: grpc.credentials.createSsl(
-    fs.readFileSync('./ca.crt'),
-    fs.readFileSync('./client.key'),
-    fs.readFileSync('./client.crt')
-  )
+  // url is optional and can be omitted - default is localhost:4317
+  url: '<collector-hostname>:<port>',
+  credentials: grpc.credentials.createSsl(),
 };
 
 const provider = new BasicTracerProvider();
@@ -57,23 +63,42 @@ const exporter = new CollectorTraceExporter(collectorOptions);
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 provider.register();
+
+Graceful.on("exit", async () => {
+  await provider.shutdown();
+});
 ```
 
-To see how to generate credentials, you can refer to the script used to generate certificates for tests [here](./test/certs/regenerate.sh)
+To use mutual authentication, pass to the `createSsl()` constructor:
+
+```js
+  credentials: grpc.credentials.createSsl(
+    fs.readFileSync('./ca.crt'),
+    fs.readFileSync('./client.key'),
+    fs.readFileSync('./client.crt')
+  ),
+```
+
+To generate credentials for mutual authentication, you can refer to the script used to generate certificates for tests [here](./test/certs/regenerate.sh)
 
 The exporter can be configured to send custom metadata with each request as in the example below:
 
 ```js
+// Must be 'grpc', _not_ '@grpc/grpc-js'
 const grpc = require('grpc');
+const Graceful = require('node-graceful');
+
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector-grpc');
 
 const metadata = new grpc.Metadata();
+// For instance, an API key or access token might go here.
 metadata.set('k', 'v');
 
 const collectorOptions = {
   serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is localhost:4317
+  // url is optional and can be omitted - default is localhost:4317
+  url: '<collector-hostname>:<port>',
   metadata, // // an optional grpc.Metadata object to be sent with each request
 };
 
@@ -82,6 +107,10 @@ const exporter = new CollectorTraceExporter(collectorOptions);
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 provider.register();
+
+Graceful.on("exit", async () => {
+  await provider.shutdown();
+});
 ```
 
 Note, that this will only work if TLS is also configured on the server.
@@ -95,7 +124,8 @@ const { MeterProvider } = require('@opentelemetry/metrics');
 const { CollectorMetricExporter } =  require('@opentelemetry/exporter-collector-grpc');
 const collectorOptions = {
   serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is localhost:55681
+  // url is optional and can be omitted - default is localhost:4317
+  url: '<collector-hostname>:<port>',
 };
 const exporter = new CollectorMetricExporter(collectorOptions);
 

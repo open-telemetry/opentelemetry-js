@@ -178,6 +178,15 @@ const testCollectorMetricExporter = (params: TestParams) =>
         const args = spyLoggerWarn.args[0];
         assert.strictEqual(args[0], 'Headers cannot be set when using grpc');
       });
+      it('should warn about path in url', () => {
+        const spyLoggerWarn = sinon.stub(diag, 'warn');
+        collectorExporter = new CollectorMetricExporter({
+          serviceName: 'basic-service',
+          url: address + '/v1/metrics',
+        });
+        const args = spyLoggerWarn.args[0];
+        assert.strictEqual(args[0], 'URL path cannot be set when using grpc');
+      });
     });
 
     describe('export', () => {
