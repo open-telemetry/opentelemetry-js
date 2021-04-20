@@ -229,7 +229,7 @@ describe('PrometheusExporter', () => {
     });
 
     it('should export a count aggregation', done => {
-      const counter = meter.createCounter('counter', {
+      const counter = meter.createCounter('counter_total', {
         description: 'a test description',
       });
 
@@ -251,13 +251,13 @@ describe('PrometheusExporter', () => {
 
                   assert.strictEqual(
                     lines[0],
-                    '# HELP counter a test description'
+                    '# HELP counter_total a test description'
                   );
 
                   assert.deepStrictEqual(lines, [
-                    '# HELP counter a test description',
-                    '# TYPE counter counter',
-                    `counter{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
+                    '# HELP counter_total a test description',
+                    '# TYPE counter_total counter',
+                    `counter_total{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
                     '',
                   ]);
 
@@ -650,9 +650,9 @@ describe('PrometheusExporter', () => {
                   const lines = body.split('\n');
 
                   assert.deepStrictEqual(lines, [
-                    '# HELP counter description missing',
-                    '# TYPE counter counter',
-                    `counter{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
+                    '# HELP counter_total description missing',
+                    '# TYPE counter_total counter',
+                    `counter_total{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
                     '',
                   ]);
 
@@ -680,9 +680,9 @@ describe('PrometheusExporter', () => {
                   const lines = body.split('\n');
 
                   assert.deepStrictEqual(lines, [
-                    '# HELP counter description missing',
-                    '# TYPE counter counter',
-                    `counter{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
+                    '# HELP counter_total description missing',
+                    '# TYPE counter_total counter',
+                    `counter_total{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
                     '',
                   ]);
 
@@ -710,9 +710,9 @@ describe('PrometheusExporter', () => {
                   const lines = body.split('\n');
 
                   assert.deepStrictEqual(lines, [
-                    '# HELP counter description missing',
-                    '# TYPE counter counter',
-                    'counter{key1="labelValue1"} 10',
+                    '# HELP counter_total description missing',
+                    '# TYPE counter_total counter',
+                    'counter_total{key1="labelValue1"} 10',
                     '',
                   ]);
 

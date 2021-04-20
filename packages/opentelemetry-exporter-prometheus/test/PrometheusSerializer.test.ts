@@ -54,7 +54,7 @@ describe('PrometheusSerializer', () => {
         const meter = new MeterProvider({
           processor: new ExactProcessor(SumAggregator),
         }).getMeter('test');
-        const counter = meter.createCounter('test') as CounterMetric;
+        const counter = meter.createCounter('test_total') as CounterMetric;
         counter.bind(labels).add(1);
 
         const records = await counter.getMetricRecord();
@@ -66,7 +66,7 @@ describe('PrometheusSerializer', () => {
         );
         assert.strictEqual(
           result,
-          `test{foo1="bar1",foo2="bar2"} 1 ${mockedHrTimeMs}\n`
+          `test_total{foo1="bar1",foo2="bar2"} 1 ${mockedHrTimeMs}\n`
         );
       });
 
@@ -76,7 +76,7 @@ describe('PrometheusSerializer', () => {
         const meter = new MeterProvider({
           processor: new ExactProcessor(SumAggregator),
         }).getMeter('test');
-        const counter = meter.createCounter('test') as CounterMetric;
+        const counter = meter.createCounter('test_total') as CounterMetric;
         counter.bind(labels).add(1);
 
         const records = await counter.getMetricRecord();
@@ -86,7 +86,7 @@ describe('PrometheusSerializer', () => {
           record.descriptor.name,
           record
         );
-        assert.strictEqual(result, 'test{foo1="bar1",foo2="bar2"} 1\n');
+        assert.strictEqual(result, 'test_total{foo1="bar1",foo2="bar2"} 1\n');
       });
     });
 
@@ -156,6 +156,7 @@ describe('PrometheusSerializer', () => {
         const recorder = meter.createValueRecorder('test', {
           description: 'foobar',
         }) as ValueRecorderMetric;
+
         recorder.bind(labels).record(5);
 
         const records = await recorder.getMetricRecord();
@@ -245,7 +246,7 @@ describe('PrometheusSerializer', () => {
           processor: new ExactProcessor(SumAggregator),
         }).getMeter('test');
         const processor = new PrometheusLabelsBatcher();
-        const counter = meter.createCounter('test', {
+        const counter = meter.createCounter('test_total', {
           description: 'foobar',
         }) as CounterMetric;
         counter.bind({ val: '1' }).add(1);
@@ -258,10 +259,10 @@ describe('PrometheusSerializer', () => {
         const result = serializer.serialize(checkPointSet);
         assert.strictEqual(
           result,
-          '# HELP test foobar\n' +
-            '# TYPE test counter\n' +
-            `test{val="1"} 1 ${mockedHrTimeMs}\n` +
-            `test{val="2"} 1 ${mockedHrTimeMs}\n`
+          '# HELP test_total foobar\n' +
+            '# TYPE test_total counter\n' +
+            `test_total{val="1"} 1 ${mockedHrTimeMs}\n` +
+            `test_total{val="2"} 1 ${mockedHrTimeMs}\n`
         );
       });
 
@@ -272,7 +273,7 @@ describe('PrometheusSerializer', () => {
           processor: new ExactProcessor(SumAggregator),
         }).getMeter('test');
         const processor = new PrometheusLabelsBatcher();
-        const counter = meter.createCounter('test', {
+        const counter = meter.createCounter('test_total', {
           description: 'foobar',
         }) as CounterMetric;
         counter.bind({ val: '1' }).add(1);
@@ -285,10 +286,10 @@ describe('PrometheusSerializer', () => {
         const result = serializer.serialize(checkPointSet);
         assert.strictEqual(
           result,
-          '# HELP test foobar\n' +
-            '# TYPE test counter\n' +
-            'test{val="1"} 1\n' +
-            'test{val="2"} 1\n'
+          '# HELP test_total foobar\n' +
+            '# TYPE test_total counter\n' +
+            'test_total{val="1"} 1\n' +
+            'test_total{val="2"} 1\n'
         );
       });
     });
@@ -374,36 +375,20 @@ describe('PrometheusSerializer', () => {
   describe('validate against metric conventions', () => {
     mockAggregator(SumAggregator);
 
-    it('should warn for counter metrics with wrong name', async () => {
-      let calledArgs: any[] = [];
-      const dummyLogger = {
-        verbose: () => {},
-        debug: (...args: any[]) => {
-          calledArgs = args;
-        },
-        info: () => {},
-        warn: () => {},
-        error: () => {},
-      };
-      diag.setLogger(dummyLogger, DiagLogLevel.ALL);
+    it('should rename metric of type counter when name misses _counter suffix', async () => {
       const serializer = new PrometheusSerializer();
 
       const meter = new MeterProvider({
         processor: new ExactProcessor(SumAggregator),
       }).getMeter('test');
-      const counter = meter.createCounter('test') as CounterMetric;
+      const counter = meter.createCounter('test_total') as CounterMetric;
       counter.bind({}).add(1);
 
       const records = await counter.getMetricRecord();
       const record = records[0];
 
       const result = serializer.serializeRecord(record.descriptor.name, record);
-      assert.strictEqual(result, `test 1 ${mockedHrTimeMs}\n`);
-      assert.ok(
-        calledArgs.includes(
-          'Counter test is missing the mandatory _total suffix'
-        )
-      );
+      assert.strictEqual(result, `test_total 1 ${mockedHrTimeMs}\n`);
     });
 
     it('should not warn for counter metrics with correct name', async () => {
@@ -445,7 +430,7 @@ describe('PrometheusSerializer', () => {
         const meter = new MeterProvider({
           processor: new ExactProcessor(SumAggregator),
         }).getMeter('test');
-        const counter = meter.createCounter('test') as CounterMetric;
+        const counter = meter.createCounter('test_total') as CounterMetric;
         counter.bind({}).add(1);
 
         const records = await counter.getMetricRecord();
@@ -455,7 +440,7 @@ describe('PrometheusSerializer', () => {
           record.descriptor.name,
           record
         );
-        assert.strictEqual(result, `test 1 ${mockedHrTimeMs}\n`);
+        assert.strictEqual(result, `test_total 1 ${mockedHrTimeMs}\n`);
       });
 
       it('should serialize non-string label values', async () => {
@@ -464,7 +449,7 @@ describe('PrometheusSerializer', () => {
         const meter = new MeterProvider({
           processor: new ExactProcessor(SumAggregator),
         }).getMeter('test');
-        const counter = meter.createCounter('test') as CounterMetric;
+        const counter = meter.createCounter('test_total') as CounterMetric;
         counter
           .bind(({
             object: {},
@@ -482,7 +467,7 @@ describe('PrometheusSerializer', () => {
         );
         assert.strictEqual(
           result,
-          `test{object="[object Object]",NaN="NaN",null="null",undefined="undefined"} 1 ${mockedHrTimeMs}\n`
+          `test_total{object="[object Object]",NaN="NaN",null="null",undefined="undefined"} 1 ${mockedHrTimeMs}\n`
         );
       });
 
@@ -522,7 +507,7 @@ describe('PrometheusSerializer', () => {
         const meter = new MeterProvider({
           processor: new ExactProcessor(SumAggregator),
         }).getMeter('test');
-        const counter = meter.createCounter('test') as CounterMetric;
+        const counter = meter.createCounter('test_total') as CounterMetric;
         counter
           .bind(({
             backslash: '\u005c', // \ => \\ (\u005c\u005c)
@@ -542,7 +527,7 @@ describe('PrometheusSerializer', () => {
         );
         assert.strictEqual(
           result,
-          'test{' +
+          'test_total{' +
             'backslash="\u005c\u005c",' +
             'doubleQuote="\u005c\u0022",' +
             'lineFeed="\u005c\u006e",' +

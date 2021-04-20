@@ -21,7 +21,6 @@ import {
 import { PrometheusCheckpoint } from './types';
 import { Labels } from '@opentelemetry/api-metrics';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
-import { diag } from '@opentelemetry/api';
 
 type PrometheusDataTypeLiteral =
   | 'counter'
@@ -161,6 +160,14 @@ export class PrometheusSerializer {
     if (this._prefix) {
       name = `${this._prefix}${name}`;
     }
+
+    if (
+      !name.endsWith('_total') &&
+      checkpoint.descriptor.metricKind === MetricKind.COUNTER
+    ) {
+      name = name + '_total';
+    }
+
     const help = `# HELP ${name} ${escapeString(
       checkpoint.descriptor.description || 'description missing'
     )}`;
@@ -183,7 +190,7 @@ export class PrometheusSerializer {
       record.descriptor.metricKind === MetricKind.COUNTER &&
       !name.endsWith('_total')
     ) {
-      diag.debug(`Counter ${name} is missing the mandatory _total suffix`);
+      name = name + '_total';
     }
 
     switch (record.aggregator.kind) {
