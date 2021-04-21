@@ -34,3 +34,4 @@ export * from './trace/TraceState';
 export * from './trace/IdGenerator';
 export * from './utils/url';
 export * from './utils/wrap';
+export * from './utils/sampling';

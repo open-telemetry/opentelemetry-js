@@ -14,32 +14,22 @@
  * limitations under the License.
  */
 
-import { DEFAULT_CONFIG } from './config';
+import { buildSamplerFromEnv, DEFAULT_CONFIG } from './config';
 import { TracerConfig } from './types';
-import {
-  ParentBasedSampler,
-  TraceIdRatioBasedSampler,
-  getEnv,
-} from '@opentelemetry/core';
 
 /**
  * Function to merge Default configuration (as specified in './config') with
  * user provided configurations.
  */
 export function mergeConfig(userConfig: TracerConfig) {
-  const otelSamplingProbability = getEnv().OTEL_SAMPLING_PROBABILITY;
+  const perInstanceDefaults: Partial<TracerConfig> = {
+    sampler: buildSamplerFromEnv(),
+  };
 
   const target = Object.assign(
     {},
     DEFAULT_CONFIG,
-    // use default AlwaysOnSampler if otelSamplingProbability is 1
-    otelSamplingProbability !== undefined && otelSamplingProbability < 1
-      ? {
-          sampler: new ParentBasedSampler({
-            root: new TraceIdRatioBasedSampler(otelSamplingProbability),
-          }),
-        }
-      : {},
+    perInstanceDefaults,
     userConfig
   );
 
