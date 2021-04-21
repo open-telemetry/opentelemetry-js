@@ -179,7 +179,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   private _applyAttributesAfterXHR(span: api.Span, xhr: XMLHttpRequest) {
     const applyCustomAttributesOnSpan = this._getConfig()
       .applyCustomAttributesOnSpan;
-    if (applyCustomAttributesOnSpan) {
+    if (typeof applyCustomAttributesOnSpan === 'function') {
       safeExecuteInTheMiddle(
         () => applyCustomAttributesOnSpan(span, xhr),
         error => {
