@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 ### :boom: Breaking Change
 
 * `opentelemetry-core`, `opentelemetry-tracing`
+  * [#2111](https://github.com/open-telemetry/opentelemetry-js/pull/2111) feat: handle OTEL_TRACES_SAMPLER env var ([@jtmalinowski](https://github.com/jtmalinowski))
   * [#2098](https://github.com/open-telemetry/opentelemetry-js/pull/2098) chore(env): update default value for span's attributes/links/events count #1675 ([@vmarchaud](https://github.com/vmarchaud))
 * `opentelemetry-instrumentation-fetch`, `opentelemetry-instrumentation-grpc`, `opentelemetry-instrumentation-http`, `opentelemetry-instrumentation-xml-http-request`, `opentelemetry-semantic-conventions`, `opentelemetry-tracing`, `opentelemetry-web`
   * [#2083](https://github.com/open-telemetry/opentelemetry-js/pull/2083) feat: add semconv generator for `semantic-conventions`-package ([@weyert](https://github.com/weyert))
@@ -22,6 +23,8 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* `opentelemetry-semantic-conventions`
+  * [#2115](https://github.com/open-telemetry/opentelemetry-js/pull/2115) feat: upgrade semantic conventions to v1.2.0 of spec ([@weyert](https://github.com/weyert))
 * `opentelemetry-core`, `opentelemetry-exporter-zipkin`
   * [#2097](https://github.com/open-telemetry/opentelemetry-js/pull/2097) feat(zipkin): allow to configure url via environment #1675 ([@vmarchaud](https://github.com/vmarchaud))
 * `opentelemetry-exporter-zipkin`
@@ -35,6 +38,8 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: (Bug Fix)
 
+* `opentelemetry-instrumentation`
+  * [#2120](https://github.com/open-telemetry/opentelemetry-js/pull/2120) fix(instrumentation): support multiple module definitions with different versions ([@seemk](https://github.com/seemk))
 * `opentelemetry-instrumentation-http`, `opentelemetry-tracing`
   * [#2105](https://github.com/open-telemetry/opentelemetry-js/pull/2105) fix: don't use spanId from invalid parent ([@Flarna](https://github.com/Flarna))
 * `opentelemetry-context-async-hooks`
@@ -62,8 +67,9 @@ All notable changes to this project will be documented in this file.
 * `opentelemetry-context-zone`, `opentelemetry-core`, `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`, `opentelemetry-exporter-jaeger`, `opentelemetry-exporter-prometheus`, `opentelemetry-exporter-zipkin`, `opentelemetry-instrumentation-fetch`, `opentelemetry-instrumentation-grpc`, `opentelemetry-instrumentation-http`, `opentelemetry-instrumentation-xml-http-request`, `opentelemetry-instrumentation`, `opentelemetry-metrics`, `opentelemetry-node`, `opentelemetry-propagator-jaeger`, `opentelemetry-resource-detector-aws`, `opentelemetry-resource-detector-gcp`, `opentelemetry-resources`, `opentelemetry-sdk-node`, `opentelemetry-shim-opentracing`, `opentelemetry-tracing`, `opentelemetry-web`
   * [#2073](https://github.com/open-telemetry/opentelemetry-js/pull/2073) chore: pin own deps ([@dyladan](https://github.com/dyladan))
 
-### Committers: 13
+### Committers: 15
 
+* Anuraag Agrawal ([@anuraaga](https://github.com/anuraaga))
 * Austin Parker ([@austinlparker](https://github.com/austinlparker))
 * Bartlomiej Obecny ([@obecny](https://github.com/obecny))
 * Daniel Dyla ([@dyladan](https://github.com/dyladan))
@@ -73,6 +79,7 @@ All notable changes to this project will be documented in this file.
 * Naseem ([@naseemkullah](https://github.com/naseemkullah))
 * Niek Kruse ([@niekert](https://github.com/niekert))
 * Siddhesh Mhadnak ([@sid-maddy](https://github.com/sid-maddy))
+* Siim Kallas ([@seemk](https://github.com/seemk))
 * Valentin Marchaud ([@vmarchaud](https://github.com/vmarchaud))
 * Vera Reynolds ([@vreynolds](https://github.com/vreynolds))
 * Weyert de Boer ([@weyert](https://github.com/weyert))
