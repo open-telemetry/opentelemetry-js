@@ -315,7 +315,9 @@ describe('BasicTracerProvider', () => {
     });
 
     it('should start a span with name and with invalid parent span', () => {
-      const tracer = new BasicTracerProvider().getTracer('default');
+      const tracer = new BasicTracerProvider({
+        sampler: new AlwaysOnSampler(),
+      }).getTracer('default');
       const span = tracer.startSpan(
         'my-span',
         {},
