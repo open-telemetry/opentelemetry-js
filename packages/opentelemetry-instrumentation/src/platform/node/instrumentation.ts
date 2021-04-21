@@ -30,7 +30,7 @@ export abstract class InstrumentationBase<T = any>
   implements types.Instrumentation {
   private _modules: InstrumentationModuleDefinition<T>[];
   private _hooks: RequireInTheMiddle.Hooked[] = [];
-  private _enabled = false;
+  protected _enabled = false;
 
   constructor(
     instrumentationName: string,
