@@ -23,6 +23,8 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* `opentelemetry-instrumentation`
+  * [#2135](https://github.com/open-telemetry/opentelemetry-js/pull/2135) fix: add isEnabled to InstrumentationBase ([@seemk](https://github.com/seemk))
 * `opentelemetry-semantic-conventions`
   * [#2115](https://github.com/open-telemetry/opentelemetry-js/pull/2115) feat: upgrade semantic conventions to v1.2.0 of spec ([@weyert](https://github.com/weyert))
 * `opentelemetry-core`, `opentelemetry-exporter-zipkin`
@@ -38,6 +40,8 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: (Bug Fix)
 
+* `opentelemetry-exporter-prometheus`
+  * [#2121](https://github.com/open-telemetry/opentelemetry-js/pull/2121) fix: ensure the label names are sanitised ([@weyert](https://github.com/weyert))
 * `opentelemetry-instrumentation`
   * [#2120](https://github.com/open-telemetry/opentelemetry-js/pull/2120) fix(instrumentation): support multiple module definitions with different versions ([@seemk](https://github.com/seemk))
 * `opentelemetry-instrumentation-http`, `opentelemetry-tracing`
