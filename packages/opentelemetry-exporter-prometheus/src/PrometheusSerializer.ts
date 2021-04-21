@@ -111,19 +111,19 @@ function stringify(
   let labelsStr = '';
 
   for (const [key, val] of Object.entries(labels)) {
-    const santizedLabelName = sanitizePrometheusMetricName(key);
+    const sanitizedLabelName = sanitizePrometheusMetricName(key);
     hasLabel = true;
     labelsStr += `${
       labelsStr.length > 0 ? ',' : ''
-    }${santizedLabelName}="${escapeLabelValue(val)}"`;
+    }${sanitizedLabelName}="${escapeLabelValue(val)}"`;
   }
   if (additionalLabels) {
     for (const [key, val] of Object.entries(additionalLabels)) {
-      const santizedLabelName = sanitizePrometheusMetricName(key);
+      const sanitizedLabelName = sanitizePrometheusMetricName(key);
       hasLabel = true;
       labelsStr += `${
         labelsStr.length > 0 ? ',' : ''
-      }${santizedLabelName}="${escapeLabelValue(val)}"`;
+      }${sanitizedLabelName}="${escapeLabelValue(val)}"`;
     }
   }
 
