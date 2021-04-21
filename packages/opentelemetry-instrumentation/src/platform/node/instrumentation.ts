@@ -59,22 +59,6 @@ export abstract class InstrumentationBase<T = any>
     }
   }
 
-  private _isSupported(name: string, version: string): boolean {
-    for (const module of this._modules) {
-      if (module.name === name) {
-        if (!module.supportedVersions) {
-          return true;
-        }
-
-        return module.supportedVersions.some(supportedVersion => {
-          return semver.satisfies(version, supportedVersion);
-        });
-      }
-    }
-
-    return false;
-  }
-
   private _onRequire<T>(
     module: InstrumentationModuleDefinition<T>,
     exports: T,
@@ -93,7 +77,10 @@ export abstract class InstrumentationBase<T = any>
     module.moduleVersion = version;
     if (module.name === name) {
       // main module
-      if (typeof version === 'string' && this._isSupported(name, version)) {
+      if (
+        typeof version === 'string' &&
+        isSupported(module.supportedVersions, version)
+      ) {
         if (typeof module.patch === 'function') {
           module.moduleExports = exports;
           if (this._enabled) {
@@ -105,12 +92,7 @@ export abstract class InstrumentationBase<T = any>
       // internal file
       const files = module.files ?? [];
       const file = files.find(file => file.name === name);
-      if (
-        file &&
-        file.supportedVersions.some(supportedVersion =>
-          semver.satisfies(version, supportedVersion)
-        )
-      ) {
+      if (file && isSupported(file.supportedVersions, version)) {
         file.moduleExports = exports;
         if (this._enabled) {
           return file.patch(exports, module.moduleVersion);
@@ -178,4 +160,10 @@ export abstract class InstrumentationBase<T = any>
       }
     }
   }
+}
+
+function isSupported(supportedVersions: string[], version: string): boolean {
+  return supportedVersions.some(supportedVersion => {
+    return semver.satisfies(version, supportedVersion);
+  });
 }
