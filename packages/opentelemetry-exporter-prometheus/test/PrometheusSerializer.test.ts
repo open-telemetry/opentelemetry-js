@@ -543,7 +543,7 @@ describe('PrometheusSerializer', () => {
 
         const meter = new MeterProvider({
           processor: new ExactProcessor(SumAggregator),
-        }).getMeter('test');
+        }).getMeter('test_total');
         const counter = meter.createCounter('test') as CounterMetric;
         // if you try to use a label name like account-id prometheus will complain
         // with an error like:
@@ -562,7 +562,7 @@ describe('PrometheusSerializer', () => {
         );
         assert.strictEqual(
           result,
-          `test{account_id="123456"} 1 ${mockedHrTimeMs}\n`
+          `test_total{account_id="123456"} 1 ${mockedHrTimeMs}\n`
         );
       });
     });
