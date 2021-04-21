@@ -46,7 +46,10 @@ import { AttributeNames } from './enums/AttributeNames';
 // safe enough
 const OBSERVER_WAIT_TIME_MS = 300;
 
-export type XHRCustomAttributeFunction = (span: api.Span, xhr: XMLHttpRequest) => void;
+export type XHRCustomAttributeFunction = (
+  span: api.Span,
+  xhr: XMLHttpRequest
+) => void;
 
 /**
  * XMLHttpRequest config
