@@ -44,8 +44,7 @@ By default, plaintext connection is used. In order to use TLS in Node.js, provid
 
 ```js
 const fs = require('fs');
-// Must be 'grpc', _not_ '@grpc/grpc-js'
-const grpc = require('grpc');
+const grpc = require('@grpc/grpc-js');
 const Graceful = require('node-graceful');
 
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
@@ -84,8 +83,7 @@ To generate credentials for mutual authentication, you can refer to the script u
 The exporter can be configured to send custom metadata with each request as in the example below:
 
 ```js
-// Must be 'grpc', _not_ '@grpc/grpc-js'
-const grpc = require('grpc');
+const grpc = require('@grpc/grpc-js');
 const Graceful = require('node-graceful');
 
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
