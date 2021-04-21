@@ -19,6 +19,7 @@ import * as opentracing from 'opentracing';
 import {
   SpanAttributes,
   SpanAttributeValue,
+  SpanStatusCode,
   TextMapPropagator,
 } from '@opentelemetry/api';
 
@@ -309,12 +310,12 @@ export class SpanShim extends opentracing.Span {
    * @param value value for the tag
    */
   setTag(key: string, value: SpanAttributeValue): this {
-    if (
-      key === opentracing.Tags.ERROR &&
-      (value === true || value === 'true')
-    ) {
-      this._span.setStatus({ code: api.SpanStatusCode.ERROR });
-      return this;
+    if (key === opentracing.Tags.ERROR) {
+      const statusCode = SpanShim._mapErrorTag(value);
+      if (statusCode !== undefined) {
+        this._span.setStatus({ code: statusCode });
+        return this;
+      }
     }
 
     this._span.setAttribute(key, value);
@@ -330,12 +331,27 @@ export class SpanShim extends opentracing.Span {
     return this;
   }
 
-  /*
-   * Returns the underlying {@link types.Span} that the shim
+  /**
+   * Returns the underlying {@link api.Span} that the shim
    * is wrapping.
    */
   getSpan(): api.Span {
     return this._span;
+  }
+
+  private static _mapErrorTag(
+    value: SpanAttributeValue
+  ): SpanStatusCode | undefined {
+    switch (value) {
+      case true:
+      case 'true':
+        return SpanStatusCode.ERROR;
+      case false:
+      case 'false':
+        return SpanStatusCode.OK;
+      default:
+        return;
+    }
   }
 }
 

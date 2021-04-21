@@ -30,6 +30,7 @@ import {
   INVALID_SPAN_CONTEXT,
   propagation,
   ROOT_CONTEXT,
+  SpanStatusCode,
   trace,
 } from '@opentelemetry/api';
 import { performance } from 'perf_hooks';
@@ -291,13 +292,38 @@ describe('OpenTracing Shim', () => {
       otSpan = (span as SpanShim).getSpan() as Span;
     });
 
-    it('sets tags', () => {
-      span.setTag('hello', 'world');
-      assert.strictEqual(otSpan.attributes.hello, 'world');
+    describe('tags', () => {
+      it('sets tags', () => {
+        span.setTag('hello', 'world');
+        assert.strictEqual(otSpan.attributes.hello, 'world');
 
-      span.addTags({ hello: 'stars', from: 'earth' });
-      assert.strictEqual(otSpan.attributes.hello, 'stars');
-      assert.strictEqual(otSpan.attributes.from, 'earth');
+        span.addTags({ hello: 'stars', from: 'earth' });
+        assert.strictEqual(otSpan.attributes.hello, 'stars');
+        assert.strictEqual(otSpan.attributes.from, 'earth');
+      });
+
+      it('maps error tag to status code', () => {
+        span.setTag('error', '');
+        assert.strictEqual(otSpan.status.code, SpanStatusCode.UNSET);
+
+        span.setTag('error', true);
+        assert.strictEqual(otSpan.status.code, SpanStatusCode.ERROR);
+
+        span.setTag('error', false);
+        assert.strictEqual(otSpan.status.code, SpanStatusCode.OK);
+
+        span.setTag('error', 'true');
+        assert.strictEqual(otSpan.status.code, SpanStatusCode.ERROR);
+
+        span.setTag('error', 'false');
+        assert.strictEqual(otSpan.status.code, SpanStatusCode.OK);
+      });
+
+      it('sets unknown error tag as attribute', () => {
+        span.setTag('error', 'whoopsie');
+        assert.strictEqual(otSpan.status.code, SpanStatusCode.UNSET);
+        assert.strictEqual(otSpan.attributes.error, 'whoopsie');
+      });
     });
 
     it('logs KV pairs', () => {
