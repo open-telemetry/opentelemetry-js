@@ -487,6 +487,34 @@ describe('PrometheusSerializer', () => {
             `} 1 ${mockedHrTimeMs}\n`
         );
       });
+
+      it('should sanitize label names', async () => {
+        const serializer = new PrometheusSerializer();
+
+        const meter = new MeterProvider({
+          processor: new ExactProcessor(SumAggregator),
+        }).getMeter('test');
+        const counter = meter.createCounter('test') as CounterMetric;
+        // if you try to use a label name like account-id prometheus will complain
+        // with an error like:
+        // error while linting: text format parsing error in line 282: expected '=' after label name, found '-'
+        counter
+          .bind(({
+            'account-id': '123456',
+          } as unknown) as Labels)
+          .add(1);
+        const records = await counter.getMetricRecord();
+        const record = records[0];
+
+        const result = serializer.serializeRecord(
+          record.descriptor.name,
+          record
+        );
+        assert.strictEqual(
+          result,
+          `test{account_id="123456"} 1 ${mockedHrTimeMs}\n`
+        );
+      });
     });
   });
 });
