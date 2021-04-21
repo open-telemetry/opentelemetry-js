@@ -42,7 +42,7 @@ export abstract class CollectorExporterNodeBase<
   grpcQueue: GRPCQueueItem<ExportItem>[] = [];
   metadata?: Metadata;
   serviceClient?: ServiceClient = undefined;
-  serverAddress!: string;
+  serverAddress: string;
   private _send!: Function;
 
   constructor(config: CollectorExporterConfigNode = {}) {
