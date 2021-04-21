@@ -30,7 +30,7 @@ export abstract class InstrumentationBase<T = any>
   implements types.Instrumentation {
   private _modules: InstrumentationModuleDefinition<T>[];
   private _hooks: RequireInTheMiddle.Hooked[] = [];
-  protected _enabled = false;
+  private _enabled = false;
 
   constructor(
     instrumentationName: string,
@@ -159,6 +159,10 @@ export abstract class InstrumentationBase<T = any>
         }
       }
     }
+  }
+
+  public isEnabled() {
+    return this._enabled;
   }
 }
 
