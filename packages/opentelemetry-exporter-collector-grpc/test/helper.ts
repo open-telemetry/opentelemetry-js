@@ -27,7 +27,7 @@ import * as metrics from '@opentelemetry/metrics';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
-import * as grpc from 'grpc';
+import * as grpc from '@grpc/grpc-js';
 
 const meterProvider = new metrics.MeterProvider({
   interval: 30000,

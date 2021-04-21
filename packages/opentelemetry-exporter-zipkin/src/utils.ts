@@ -13,31 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { GetHeaders } from './types';
 
-import { buildSamplerFromEnv, DEFAULT_CONFIG } from './config';
-import { TracerConfig } from './types';
-
-/**
- * Function to merge Default configuration (as specified in './config') with
- * user provided configurations.
- */
-export function mergeConfig(userConfig: TracerConfig) {
-  const perInstanceDefaults: Partial<TracerConfig> = {
-    sampler: buildSamplerFromEnv(),
+export function prepareGetHeaders(
+  getExportRequestHeaders: GetHeaders
+): () => Record<string, string> | undefined {
+  return function () {
+    return getExportRequestHeaders();
   };
-
-  const target = Object.assign(
-    {},
-    DEFAULT_CONFIG,
-    perInstanceDefaults,
-    userConfig
-  );
-
-  target.traceParams = Object.assign(
-    {},
-    DEFAULT_CONFIG.traceParams,
-    userConfig.traceParams || {}
-  );
-
-  return target;
 }

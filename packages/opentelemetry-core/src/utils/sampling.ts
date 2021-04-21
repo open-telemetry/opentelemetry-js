@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-export * from './AwsEc2Detector';
-export * from './AwsBeanstalkDetector';
-export * from './AwsEcsDetector';
-export * from './AwsEksDetector';
-export * from './AwsLambdaDetector';
+export enum TracesSamplerValues {
+  AlwaysOff = 'always_off',
+  AlwaysOn = 'always_on',
+  ParentBasedAlwaysOff = 'parentbased_always_off',
+  ParentBasedAlwaysOn = 'parentbased_always_on',
+  ParentBasedTraceIdRatio = 'parentbased_traceidratio',
+  TraceIdRatio = 'traceidratio',
+}

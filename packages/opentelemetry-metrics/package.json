@@ -57,15 +57,15 @@
     "sinon": "10.0.0",
     "ts-mocha": "8.0.0",
     "ts-node": "9.1.1",
-    "typescript": "4.2.3"
+    "typescript": "4.2.4"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.0.0-rc.0"
   },
   "dependencies": {
-    "@opentelemetry/api-metrics": "^0.18.2",
-    "@opentelemetry/core": "^0.18.2",
-    "@opentelemetry/resources": "^0.18.2",
+    "@opentelemetry/api-metrics": "0.18.2",
+    "@opentelemetry/core": "0.18.2",
+    "@opentelemetry/resources": "0.18.2",
     "lodash.merge": "^4.6.2"
   }
 }
