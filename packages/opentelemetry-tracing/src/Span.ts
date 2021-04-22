@@ -24,15 +24,13 @@ import {
   timeInputToHrTime,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import {
-  ExceptionAttribute,
-  ExceptionEventName,
-} from '@opentelemetry/semantic-conventions';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { ReadableSpan } from './export/ReadableSpan';
 import { Tracer } from './Tracer';
 import { SpanProcessor } from './SpanProcessor';
 import { TraceParams } from './types';
 import { SpanAttributeValue, Context } from '@opentelemetry/api';
+import { ExceptionEventName } from './enums';
 
 /**
  * This class represents a span.
@@ -190,25 +188,27 @@ export class Span implements api.Span, ReadableSpan {
   recordException(exception: api.Exception, time: api.TimeInput = hrTime()) {
     const attributes: api.SpanAttributes = {};
     if (typeof exception === 'string') {
-      attributes[ExceptionAttribute.MESSAGE] = exception;
+      attributes[SemanticAttributes.EXCEPTION_MESSAGE] = exception;
     } else if (exception) {
       if (exception.code) {
-        attributes[ExceptionAttribute.TYPE] = exception.code.toString();
+        attributes[
+          SemanticAttributes.EXCEPTION_TYPE
+        ] = exception.code.toString();
       } else if (exception.name) {
-        attributes[ExceptionAttribute.TYPE] = exception.name;
+        attributes[SemanticAttributes.EXCEPTION_TYPE] = exception.name;
       }
       if (exception.message) {
-        attributes[ExceptionAttribute.MESSAGE] = exception.message;
+        attributes[SemanticAttributes.EXCEPTION_MESSAGE] = exception.message;
       }
       if (exception.stack) {
-        attributes[ExceptionAttribute.STACKTRACE] = exception.stack;
+        attributes[SemanticAttributes.EXCEPTION_STACKTRACE] = exception.stack;
       }
     }
 
     // these are minimum requirements from spec
     if (
-      attributes[ExceptionAttribute.TYPE] ||
-      attributes[ExceptionAttribute.MESSAGE]
+      attributes[SemanticAttributes.EXCEPTION_TYPE] ||
+      attributes[SemanticAttributes.EXCEPTION_MESSAGE]
     ) {
       this.addEvent(ExceptionEventName, attributes as api.SpanAttributes, time);
     } else {

@@ -18,7 +18,7 @@ import * as api from '@opentelemetry/api-metrics';
 import { Resource } from '@opentelemetry/resources';
 import { Meter } from '.';
 import { DEFAULT_CONFIG, MeterConfig } from './types';
-import merge = require('lodash.merge');
+const merge = require('lodash.merge');
 
 /**
  * This class represents a meter provider which platform libraries can extend

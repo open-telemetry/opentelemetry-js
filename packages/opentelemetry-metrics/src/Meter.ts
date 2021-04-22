@@ -31,7 +31,7 @@ import { UpDownCounterMetric } from './UpDownCounterMetric';
 import { UpDownSumObserverMetric } from './UpDownSumObserverMetric';
 import { ValueObserverMetric } from './ValueObserverMetric';
 import { ValueRecorderMetric } from './ValueRecorderMetric';
-import merge = require('lodash.merge');
+const merge = require('lodash.merge');
 
 /**
  * Meter is an implementation of the {@link Meter} interface.

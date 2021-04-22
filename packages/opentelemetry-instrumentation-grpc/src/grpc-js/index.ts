@@ -42,7 +42,6 @@ import {
   setSpan,
   diag,
 } from '@opentelemetry/api';
-import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import {
   shouldNotTraceServerCall,
   handleServerFunction,
@@ -54,6 +53,7 @@ import {
   getMetadata,
 } from './clientUtils';
 import { EventEmitter } from 'events';
+import { AttributeNames } from '../enums';
 
 export class GrpcJsInstrumentation extends InstrumentationBase {
   constructor(
@@ -197,7 +197,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
                   const span = instrumentation.tracer
                     .startSpan(spanName, spanOptions)
                     .setAttributes({
-                      [RpcAttribute.GRPC_KIND]: spanOptions.kind,
+                      [AttributeNames.GRPC_KIND]: spanOptions.kind,
                     });
 
                   context.with(setSpan(context.active(), span), () => {

@@ -61,6 +61,14 @@ fetch('http://localhost:8090/fetch.js');
 
 See [examples/tracer-web/fetch](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/tracer-web) for a short example.
 
+### Fetch Instrumentation options
+
+Fetch instrumentation plugin has few options available to choose from. You can set the following:
+
+| Options                                                                                                                                           | Type                          | Description                           |
+| ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | ------------------------------------- |
+| [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L47) | `HttpCustomAttributeFunction` | Function for adding custom attributes |
+
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

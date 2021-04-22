@@ -41,7 +41,7 @@ export class CompositePropagator implements TextMapPropagator {
         this._propagators
           // older propagators may not have fields function, null check to be sure
           .map(p => (typeof p.fields === 'function' ? p.fields() : []))
-          .reduce((x, y) => x.concat(y))
+          .reduce((x, y) => x.concat(y), [])
       )
     );
   }
