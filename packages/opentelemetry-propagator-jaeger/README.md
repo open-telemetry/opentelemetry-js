@@ -27,12 +27,12 @@ Example of usage:
 
 ```javascript
 const { NodeTracerProvider } = require('@opentelemetry/node');
-const { JaegerHttpTracePropagator } = require('@opentelemetry/propagator-jaeger');
+const { JaegerPropagator } = require('@opentelemetry/propagator-jaeger');
 
 const provider = new NodeTracerProvider();
 provider.register({
-  // Use Jaeger propagator
-  propagator: new JaegerHttpTracePropagator()
+  // Use Jaeger Propagator
+  propagator: new JaegerPropagator()
 });
 ```
 
