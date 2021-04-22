@@ -20,6 +20,7 @@ import {
   setSpan,
   setSpanContext,
   getSpan,
+  propagation,
 } from '@opentelemetry/api';
 import { AlwaysOnSampler, AlwaysOffSampler } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
@@ -209,6 +210,39 @@ describe('NodeTracerProvider', () => {
       };
       const patchedFn = context.bind(fn, setSpan(context.active(), span));
       return patchedFn();
+    });
+  });
+
+  describe('.register()', () => {
+    let originalPropagators: string | number | undefined | string[];
+    beforeEach(() => {
+      originalPropagators = process.env.OTEL_PROPAGATORS;
+    });
+
+    afterEach(() => {
+      // otherwise we may assign 'undefined' (a string)
+      if (originalPropagators !== undefined) {
+        (process.env as any).OTEL_PROPAGATORS = originalPropagators;
+      } else {
+        delete (process.env as any).OTEL_PROPAGATORS;
+      }
+    });
+
+    it('should allow propagators as per the specification', () => {
+      (process.env as any).OTEL_PROPAGATORS = 'b3,b3multi,jaeger';
+
+      const provider = new NodeTracerProvider();
+      provider.register();
+
+      assert.deepStrictEqual(propagation.fields(), [
+        'b3',
+        'x-b3-traceid',
+        'x-b3-spanid',
+        'x-b3-flags',
+        'x-b3-sampled',
+        'x-b3-parentspanid',
+        'uber-trace-id',
+      ]);
     });
   });
 });

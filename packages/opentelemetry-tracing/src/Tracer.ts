@@ -71,6 +71,7 @@ export class Tracer implements api.Tracer {
     const spanId = this._idGenerator.generateSpanId();
     let traceId;
     let traceState;
+    let parentSpanId;
     if (!parentContext || !api.trace.isSpanContextValid(parentContext)) {
       // New root span.
       traceId = this._idGenerator.generateTraceId();
@@ -78,6 +79,7 @@ export class Tracer implements api.Tracer {
       // New child span.
       traceId = parentContext.traceId;
       traceState = parentContext.traceState;
+      parentSpanId = parentContext.spanId;
     }
 
     const spanKind = options.kind ?? api.SpanKind.INTERNAL;
@@ -113,7 +115,7 @@ export class Tracer implements api.Tracer {
       name,
       spanContext,
       spanKind,
-      parentContext ? parentContext.spanId : undefined,
+      parentSpanId,
       links,
       options.startTime
     );

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/resource-detector-gcp",
-  "version": "0.18.2",
+  "version": "0.19.0",
   "description": "OpenTelemetry SDK resource detector for GCP",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -40,9 +40,9 @@
   },
   "devDependencies": {
     "@opentelemetry/api": "^1.0.0-rc.0",
-    "@opentelemetry/core": "^0.18.2",
+    "@opentelemetry/core": "0.19.0",
     "@types/mocha": "8.2.2",
-    "@types/node": "14.14.37",
+    "@types/node": "14.14.41",
     "@types/semver": "7.3.4",
     "codecov": "3.8.1",
     "gts": "3.1.0",
@@ -52,13 +52,13 @@
     "rimraf": "3.0.2",
     "ts-mocha": "8.0.0",
     "ts-node": "9.1.1",
-    "typescript": "4.2.3"
+    "typescript": "4.2.4"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.0.0-rc.0"
   },
   "dependencies": {
-    "@opentelemetry/resources": "^0.18.2",
+    "@opentelemetry/resources": "0.19.0",
     "gcp-metadata": "^4.1.4",
     "semver": "7.3.5"
   }
