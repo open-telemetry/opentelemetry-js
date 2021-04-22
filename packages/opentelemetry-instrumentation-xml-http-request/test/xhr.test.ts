@@ -1246,7 +1246,7 @@ describe('xhr', () => {
             });
           });
 
-          describe('when request is aborted', () => {
+          describe('AND request is aborted', () => {
             before(function () {
               // Can only abort Async requests
               if (!testAsync) {
