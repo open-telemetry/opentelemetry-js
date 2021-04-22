@@ -47,7 +47,7 @@ export const MAX_TOTAL_LENGTH = 8192;
  * Based on the Baggage specification:
  * https://w3c.github.io/baggage/
  */
-export class HttpBaggage implements TextMapPropagator {
+export class HttpBaggagePropagator implements TextMapPropagator {
   inject(context: Context, carrier: unknown, setter: TextMapSetter) {
     const baggage = getBaggage(context);
     if (!baggage || isInstrumentationSuppressed(context)) return;

@@ -248,6 +248,8 @@ To request automatic tracing support for a module not on this list, please [file
 ### 0.19.0 to 1.0.0-rc.0
 
 - All plugins have been removed in favor of instrumentations.
+- `HttpBaggage` renamed to `HttpBaggagePropagator`
+- `HttpTraceContext` renamed to `HttpTraceContextPropagator`
 
 ### 0.18.0 to 0.19.0
 
