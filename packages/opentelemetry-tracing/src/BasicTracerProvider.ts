@@ -34,7 +34,7 @@ import { DEFAULT_CONFIG } from './config';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
 import { NoopSpanProcessor } from './NoopSpanProcessor';
 import { SDKRegistrationConfig, TracerConfig } from './types';
-import merge = require('lodash.merge');
+const merge = require('lodash.merge');
 
 export type PROPAGATOR_FACTORY = () => TextMapPropagator;
 
@@ -122,7 +122,9 @@ export class BasicTracerProvider implements TracerProvider {
 
   protected _buildPropagatorFromEnv(): TextMapPropagator | undefined {
     // per spec, propagators from env must be deduplicated
-    const uniquePropagatorNames = [...new Set(getEnv().OTEL_PROPAGATORS)];
+    const uniquePropagatorNames = Array.from(
+      new Set(getEnv().OTEL_PROPAGATORS)
+    );
 
     const propagators = uniquePropagatorNames.map(name => {
       const propagator = this._getPropagator(name);
