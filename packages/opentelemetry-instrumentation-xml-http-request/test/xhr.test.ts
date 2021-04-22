@@ -1210,7 +1210,7 @@ describe('xhr', () => {
         });
 
         describe('when applyCustomAttributesOnSpan hook is present', () => {
-          describe('when request loads and receives an error code', () => {
+          describe('AND request loads and receives an error code', () => {
             beforeEach(done => {
               clearData();
               prepareData({
