@@ -1,0 +1,54 @@
+{
+  "extends": "./tsconfig.base.esm.json",
+  "files": [],
+  "references": [
+    {
+      "path": "packages/opentelemetry-api-metrics/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/opentelemetry-context-zone-peer-dep/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/opentelemetry-context-zone/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/opentelemetry-core/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/opentelemetry-exporter-collector/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/opentelemetry-exporter-zipkin/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/opentelemetry-instrumentation-fetch/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/opentelemetry-instrumentation-xml-http-request/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/opentelemetry-instrumentation/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/opentelemetry-metrics/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/opentelemetry-propagator-b3/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/opentelemetry-propagator-jaeger/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/opentelemetry-resources/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/opentelemetry-semantic-conventions/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/opentelemetry-tracing/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/opentelemetry-web/tsconfig.esm.json"
+    }
+  ]
+}

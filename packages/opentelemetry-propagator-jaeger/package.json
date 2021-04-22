@@ -3,21 +3,22 @@
   "version": "0.19.0",
   "description": "OpenTelemetry Jaeger propagator provides HTTP header propagation for systems that are using Jaeger HTTP header format.",
   "main": "build/src/index.js",
+  "module": "build/esm/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
-    "compile": "tsc --build",
+    "compile": "tsc --build tsconfig.json tsconfig.esm.json",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/index-webpack.ts'",
     "test:browser": "nyc karma start --single-run",
     "tdd": "npm run tdd:node",
     "tdd:node": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
-    "clean": "tsc --build --clean",
+    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../scripts/version-update.js",
-    "watch": "tsc --build --watch"
+    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json"
   },
   "keywords": [
     "opentelemetry",
@@ -32,6 +33,9 @@
     "node": ">=8.5.0"
   },
   "files": [
+    "build/esm/**/*.js",
+    "build/esm/**/*.js.map",
+    "build/esm/**/*.d.ts",
     "build/src/**/*.js",
     "build/src/**/*.js.map",
     "build/src/**/*.d.ts",

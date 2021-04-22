@@ -6,6 +6,7 @@
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
   "license": "Apache-2.0",
   "main": "build/src/index.js",
+  "module": "build/esm/index.js",
   "types": "build/src/index.d.ts",
   "publishConfig": {
     "access": "public"
@@ -16,9 +17,13 @@
   },
   "browser": {
     "./src/platform/index.ts": "./src/platform/browser/index.ts",
+    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
     "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
   },
   "files": [
+    "build/esm/**/*.js",
+    "build/esm/**/*.js.map",
+    "build/esm/**/*.d.ts",
     "build/src/**/*.js",
     "build/src/**/*.js.map",
     "build/src/**/*.d.ts",
@@ -27,8 +32,8 @@
     "README.md"
   ],
   "scripts": {
-    "compile": "tsc --build",
-    "clean": "tsc --build --clean",
+    "compile": "tsc --build tsconfig.json tsconfig.esm.json",
+    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "lint": "eslint . --ext .ts",
@@ -39,7 +44,7 @@
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "nyc karma start --single-run",
     "version": "node ../../scripts/version-update.js",
-    "watch": "tsc --build --watch"
+    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json"
   },
   "keywords": [
     "opentelemetry",

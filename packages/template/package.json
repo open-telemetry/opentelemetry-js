@@ -35,9 +35,12 @@
     "version": "node ../../scripts/version-update.js",
     "watch": "tsc --build --watch"
   },
-  "Add these to scripts if browser is supported": {
+  "Add/change these to scripts if browser is supported": {
+    "compile": "tsc --build tsconfig.json tsconfig.esm.json",
+    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json",
     "test:browser": "nyc karma start --single-run",
-    "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../"
+    "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json"
   },
   "keywords": [
     "opentelemetry",
@@ -55,6 +58,11 @@
     "build/src/**/*.d.ts",
     "LICENSE",
     "README.md"
+  ],
+  "Add these to files if browser is supported": [
+    "build/esm/**/*.js",
+    "build/esm/**/*.js.map",
+    "build/esm/**/*.d.ts"
   ],
   "devDependencies": {
     "@types/node": "14.14.41",
