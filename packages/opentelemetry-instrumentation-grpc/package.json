@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation-grpc",
-  "version": "0.18.2",
+  "version": "0.19.0",
   "description": "OpenTelemetry grpc automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -44,10 +44,10 @@
     "@grpc/grpc-js": "1.2.12",
     "@grpc/proto-loader": "0.6.0",
     "@opentelemetry/api": "^1.0.0-rc.0",
-    "@opentelemetry/context-async-hooks": "0.18.2",
-    "@opentelemetry/core": "0.18.2",
-    "@opentelemetry/node": "0.18.2",
-    "@opentelemetry/tracing": "0.18.2",
+    "@opentelemetry/context-async-hooks": "0.19.0",
+    "@opentelemetry/core": "0.19.0",
+    "@opentelemetry/node": "0.19.0",
+    "@opentelemetry/tracing": "0.19.0",
     "@types/mocha": "8.2.2",
     "@types/node": "14.14.37",
     "@types/semver": "7.3.4",
@@ -70,8 +70,8 @@
     "@opentelemetry/api": "^1.0.0-rc.0"
   },
   "dependencies": {
-    "@opentelemetry/api-metrics": "0.18.2",
-    "@opentelemetry/instrumentation": "0.18.2",
-    "@opentelemetry/semantic-conventions": "0.18.2"
+    "@opentelemetry/api-metrics": "0.19.0",
+    "@opentelemetry/instrumentation": "0.19.0",
+    "@opentelemetry/semantic-conventions": "0.19.0"
   }
 }
