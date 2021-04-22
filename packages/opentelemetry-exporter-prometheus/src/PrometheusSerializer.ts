@@ -76,8 +76,7 @@ function enforcePrometheusNamingConvention(
   name: string,
   kind: MetricKind
 ): string {
-  // If the metric kind is Counter if so ensure that the name has the suffix
-  // _total or add it when missing
+  // Prometheus requires that metrics of the Counter kind have "_total" suffix
   if (!name.endsWith('_total') && kind === MetricKind.COUNTER) {
     name = name + '_total';
   }
@@ -185,7 +184,6 @@ export class PrometheusSerializer {
       name = `${this._prefix}${name}`;
     }
 
-    // Prometheus requires that metrics of the Counter kind have _total suffix
     name = enforcePrometheusNamingConvention(
       name,
       checkpoint.descriptor.metricKind
@@ -209,7 +207,6 @@ export class PrometheusSerializer {
   serializeRecord(name: string, record: MetricRecord): string {
     let results = '';
 
-    // Prometheus requires that metrics of the Counter kind have _total suffix
     name = enforcePrometheusNamingConvention(
       name,
       record.descriptor.metricKind
