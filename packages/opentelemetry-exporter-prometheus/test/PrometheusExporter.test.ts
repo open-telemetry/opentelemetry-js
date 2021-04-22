@@ -313,7 +313,7 @@ describe('PrometheusExporter', () => {
     });
 
     it('should export multiple labels', done => {
-      const counter = meter.createCounter('counter', {
+      const counter = meter.createCounter('counter_total', {
         description: 'a test description',
       }) as CounterMetric;
 
@@ -328,10 +328,10 @@ describe('PrometheusExporter', () => {
                 const lines = body.split('\n');
 
                 assert.deepStrictEqual(lines, [
-                  '# HELP counter a test description',
-                  '# TYPE counter counter',
-                  `counter{counterKey1="labelValue1"} 10 ${mockedHrTimeMs}`,
-                  `counter{counterKey1="labelValue2"} 20 ${mockedHrTimeMs}`,
+                  '# HELP counter_total a test description',
+                  '# TYPE counter_total counter',
+                  `counter_total{counterKey1="labelValue1"} 10 ${mockedHrTimeMs}`,
+                  `counter_total{counterKey1="labelValue2"} 20 ${mockedHrTimeMs}`,
                   '',
                 ]);
 
@@ -344,7 +344,7 @@ describe('PrometheusExporter', () => {
     });
 
     it('should export multiple labels on manual shutdown', done => {
-      const counter = meter.createCounter('counter', {
+      const counter = meter.createCounter('counter_total', {
         description: 'a test description',
       }) as CounterMetric;
 
@@ -359,11 +359,11 @@ describe('PrometheusExporter', () => {
               const lines = body.split('\n');
 
               assert.deepStrictEqual(lines, [
-                '# HELP counter a test description',
-                '# TYPE counter counter',
-                `counter{counterKey1="labelValue1"} 10 ${mockedHrTimeMs}`,
-                `counter{counterKey1="labelValue2"} 20 ${mockedHrTimeMs}`,
-                `counter{counterKey1="labelValue3"} 30 ${mockedHrTimeMs}`,
+                '# HELP counter_total a test description',
+                '# TYPE counter_total counter',
+                `counter_total{counterKey1="labelValue1"} 10 ${mockedHrTimeMs}`,
+                `counter_total{counterKey1="labelValue2"} 20 ${mockedHrTimeMs}`,
+                `counter_total{counterKey1="labelValue3"} 30 ${mockedHrTimeMs}`,
                 '',
               ]);
 
@@ -392,7 +392,7 @@ describe('PrometheusExporter', () => {
     });
 
     it('should add a description if missing', done => {
-      const counter = meter.createCounter('counter');
+      const counter = meter.createCounter('counter_total');
 
       const boundCounter = counter.bind({ key1: 'labelValue1' });
       boundCounter.add(10);
@@ -405,9 +405,9 @@ describe('PrometheusExporter', () => {
                 const lines = body.split('\n');
 
                 assert.deepStrictEqual(lines, [
-                  '# HELP counter description missing',
-                  '# TYPE counter counter',
-                  `counter{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
+                  '# HELP counter_total description missing',
+                  '# TYPE counter_total counter',
+                  `counter_total{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
                   '',
                 ]);
 
@@ -432,9 +432,9 @@ describe('PrometheusExporter', () => {
                 const lines = body.split('\n');
 
                 assert.deepStrictEqual(lines, [
-                  '# HELP counter_bad_name description missing',
-                  '# TYPE counter_bad_name counter',
-                  `counter_bad_name{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
+                  '# HELP counter_bad_name_total description missing',
+                  '# TYPE counter_bad_name_total counter',
+                  `counter_bad_name_total{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
                   '',
                 ]);
 
@@ -620,9 +620,9 @@ describe('PrometheusExporter', () => {
                   const lines = body.split('\n');
 
                   assert.deepStrictEqual(lines, [
-                    '# HELP test_prefix_counter description missing',
-                    '# TYPE test_prefix_counter counter',
-                    `test_prefix_counter{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
+                    '# HELP test_prefix_counter_total description missing',
+                    '# TYPE test_prefix_counter_total counter',
+                    `test_prefix_counter_total{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
                     '',
                   ]);
 
