@@ -48,7 +48,7 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 
 | API Version | Core version | Contrib Version         |
 | ----------- |--------------|-------------------------|
-| v1.0.0-rc.0 | ------       | ------                  |
+| v1.0.0-rc.0 | 0.19.x       | ------                  |
 | 0.18.x      | 0.18.x       | 0.14.x                  |
 |             | 0.17.x       | ------                  |
 |             | 0.16.x       | ------                  |
@@ -246,6 +246,8 @@ To request automatic tracing support for a module not on this list, please [file
 ## Upgrade guidelines
 
 ### 0.18.x to 0.19.0
+
+- API is now a peer dependency. This means that users will need to include `@opentelemetry/api` as a dependency of their project in order to use the SDK. NPM version 7+ (Node 15+) should do this automatically.
 
 - All plugins have been removed in favor of instrumentations.
 
