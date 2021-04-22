@@ -1271,7 +1271,7 @@ describe('xhr', () => {
             });
           });
 
-          describe('when request times out', () => {
+          describe('AND request times out', () => {
             before(function () {
               // Can only set timeout for Async requests
               if (!testAsync) {
