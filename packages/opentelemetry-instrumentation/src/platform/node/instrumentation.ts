@@ -160,6 +160,10 @@ export abstract class InstrumentationBase<T = any>
       }
     }
   }
+
+  public isEnabled() {
+    return this._enabled;
+  }
 }
 
 function isSupported(supportedVersions: string[], version: string): boolean {
