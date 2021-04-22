@@ -12,12 +12,6 @@ const EXPORTER = process.env.EXPORTER || '';
 
 module.exports = (serviceName) => {
   const provider = new NodeTracerProvider();
-  registerInstrumentations({
-    // // when boostraping with lerna for testing purposes
-    instrumentations: [
-      new HttpInstrumentation(),
-    ],
-  });
 
   let exporter;
   if (EXPORTER.toLowerCase().startsWith('z')) {
@@ -34,6 +28,13 @@ module.exports = (serviceName) => {
 
   // Initialize the OpenTelemetry APIs to use the NodeTracerProvider bindings
   provider.register();
+
+  registerInstrumentations({
+    // // when boostraping with lerna for testing purposes
+    instrumentations: [
+      new HttpInstrumentation(),
+    ],
+  });
 
   return opentelemetry.trace.getTracer('http-example');
 };

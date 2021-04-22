@@ -136,8 +136,6 @@ const provider: NodeTracerProvider = new NodeTracerProvider({
   logLevel: LogLevel.ERROR,
 });
 
-provider.register();
-
 provider.addSpanProcessor(
   new SimpleSpanProcessor(
     new ZipkinExporter({
@@ -150,6 +148,8 @@ provider.addSpanProcessor(
     }),
   ),
 );
+
+provider.register();
 
 registerInstrumentations({
   instrumentations: [
