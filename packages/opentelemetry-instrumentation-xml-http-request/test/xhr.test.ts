@@ -1228,7 +1228,7 @@ describe('xhr', () => {
             });
           });
 
-          describe('when request encounters a network error', () => {
+          describe('AND request encounters a network error', () => {
             beforeEach(done => {
               clearData();
               prepareData({
