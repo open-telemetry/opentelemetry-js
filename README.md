@@ -245,15 +245,17 @@ To request automatic tracing support for a module not on this list, please [file
 
 ## Upgrade guidelines
 
+### 0.19.x to x
+
+- `HttpBaggage` renamed to `HttpBaggagePropagator`
+
+- `HttpTraceContext` renamed to `HttpTraceContextPropagator`
+
 ### 0.18.x to 0.19.0
 
 - API is now a peer dependency. This means that users will need to include `@opentelemetry/api` as a dependency of their project in order to use the SDK. NPM version 7+ (Node 15+) should do this automatically.
 
 - All plugins have been removed in favor of instrumentations.
-
-- `HttpBaggage` renamed to `HttpBaggagePropagator`
-
-- `HttpTraceContext` renamed to `HttpTraceContextPropagator`
 
 - The `@opentelemetry/propagator-b3` package previously exported three propagators: `B3Propagator`,`B3SinglePropagator`, and `B3MultiPropagator`, but now only exports the `B3Propagator`. It extracts b3 context in single and multi-header encodings, and injects context using the single-header encoding by default, but can be configured to inject context using the multi-header endcoding during construction: `new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER })`. If you were previously using the `B3SinglePropagator` or `B3MultiPropagator` directly, you should update your code to use the `B3Propagator` with the appropriate configuration. See the [readme](./packages/opentelemetry-propagator-b3/readme.md) for full details and usage.
 
