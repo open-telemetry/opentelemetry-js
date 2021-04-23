@@ -3,15 +3,17 @@
   "version": "0.19.0",
   "description": "OpenTelemetry Core provides default and no-op implementations of the OpenTelemetry types for trace and metrics",
   "main": "build/src/index.js",
+  "module": "build/esm/index.js",
   "browser": {
     "./src/platform/index.ts": "./src/platform/browser/index.ts",
+    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
     "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
   },
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
-    "compile": "tsc --build",
-    "clean": "tsc --build --clean",
+    "compile": "tsc --build tsconfig.json tsconfig.esm.json",
+    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json",
     "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts --exclude 'test/platform/browser/**/*.ts'",
     "test:browser": "nyc karma start --single-run",
     "tdd": "npm run tdd:node",
@@ -22,7 +24,7 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../scripts/version-update.js",
-    "watch": "tsc --build --watch"
+    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json"
   },
   "keywords": [
     "opentelemetry",
@@ -39,6 +41,9 @@
     "node": ">=8.5.0"
   },
   "files": [
+    "build/esm/**/*.js",
+    "build/esm/**/*.js.map",
+    "build/esm/**/*.d.ts",
     "build/src/**/*.js",
     "build/src/**/*.js.map",
     "build/src/**/*.d.ts",
@@ -53,7 +58,7 @@
     "@opentelemetry/api": "^1.0.0-rc.0",
     "@opentelemetry/propagator-b3": "0.19.0",
     "@types/mocha": "8.2.2",
-    "@types/node": "14.14.37",
+    "@types/node": "14.14.41",
     "@types/semver": "7.3.4",
     "@types/sinon": "9.0.11",
     "@types/webpack-env": "1.16.0",

@@ -63,6 +63,27 @@ function sanitizePrometheusMetricName(name: string): string {
   return name.replace(invalidCharacterRegex, '_'); // replace all invalid characters with '_'
 }
 
+/**
+ * @private
+ *
+ * Helper method which assists in enforcing the naming conventions for metric
+ * names in Prometheus
+ * @param name the name of the metric
+ * @param kind the kind of metric
+ * @returns string
+ */
+function enforcePrometheusNamingConvention(
+  name: string,
+  kind: MetricKind
+): string {
+  // Prometheus requires that metrics of the Counter kind have "_total" suffix
+  if (!name.endsWith('_total') && kind === MetricKind.COUNTER) {
+    name = name + '_total';
+  }
+
+  return name;
+}
+
 function valueString(value: number) {
   if (Number.isNaN(value)) {
     return 'Nan';
@@ -162,6 +183,12 @@ export class PrometheusSerializer {
     if (this._prefix) {
       name = `${this._prefix}${name}`;
     }
+
+    name = enforcePrometheusNamingConvention(
+      name,
+      checkpoint.descriptor.metricKind
+    );
+
     const help = `# HELP ${name} ${escapeString(
       checkpoint.descriptor.description || 'description missing'
     )}`;
@@ -179,6 +206,12 @@ export class PrometheusSerializer {
 
   serializeRecord(name: string, record: MetricRecord): string {
     let results = '';
+
+    name = enforcePrometheusNamingConvention(
+      name,
+      record.descriptor.metricKind
+    );
+
     switch (record.aggregator.kind) {
       case AggregatorKind.SUM:
       case AggregatorKind.LAST_VALUE: {
