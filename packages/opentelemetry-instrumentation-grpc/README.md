@@ -34,7 +34,6 @@ provider.register();
 
 registerInstrumentations({
   instrumentations: [new GrpcInstrumentation()]
-  tracerProvider: provider,
 });
 
 ```

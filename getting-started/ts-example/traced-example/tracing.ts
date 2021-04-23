@@ -10,9 +10,6 @@ const { ExpressInstrumentation } = require('@opentelemetry/instrumentation-expre
 const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
 
 const provider: NodeTracerProvider = new NodeTracerProvider();
-
-provider.register();
-
 provider.addSpanProcessor(
   new SimpleSpanProcessor(
     new ZipkinExporter({
@@ -25,9 +22,9 @@ provider.addSpanProcessor(
     }),
   ),
 );
+provider.register();
 
 registerInstrumentations({
-  tracerProvider: provider,
   instrumentations: [
     new ExpressInstrumentation(),
     new HttpInstrumentation(),

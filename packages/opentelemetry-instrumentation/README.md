@@ -109,7 +109,7 @@ export class MyPlugin extends InstrumentationBase {
 // Later
 
 const myPLugin = new MyPlugin();
-myPLugin.setTracerProvider(provider); // this is optional
+myPLugin.setTracerProvider(provider); // this is optional, only if global TracerProvider shouldn't be used
 myPLugin.setMeterProvider(meterProvider); // this is optional
 myPLugin.enable();
 // or use Auto Loader
@@ -151,8 +151,8 @@ export class MyPlugin extends InstrumentationBase {
 // Later
 
 const myPLugin = new MyPlugin();
-myPLugin.setTracerProvider(provider);
-myPLugin.setMeterProvider(meterProvider);
+myPLugin.setTracerProvider(provider); // this is optional, only if global TracerProvider shouldn't be used
+myPLugin.setMeterProvider(meterProvider); // this is optional, only if global MeterProvider shouldn't be used
 myPLugin.enable();
 // or use Auto Loader
 ```
@@ -221,7 +221,8 @@ registerInstrumentations({
   instrumentations: [
     new HttpInstrumentation(),
   ],
-  tracerProvider: tracerProvider,
+  //tracerProvider: tracerProvider, // optional, only if global TracerProvider shouldn't be used
+  //meterProvider: meterProvider, // optional, only if global MeterProvider shouldn't be used
 });
 
 ```
@@ -249,9 +250,18 @@ registerInstrumentations({
       ],
     }),
   ],
-  tracerProvider: tracerProvider,
+  //tracerProvider: tracerProvider, // optional, only if global TracerProvider shouldn't be used
+  //meterProvider: meterProvider, // optional, only if global MeterProvider shouldn't be used
 });
 ```
+
+## Selection of the used TracerProvider/MeterProvider
+
+The `registerInstrumentations()` API allows to specify which `TracerProvider` and/or `MeterProvider` to use by the given options object.
+If nothing is specified the global registered provider is used. Usually this is what most users want therefore it's recommended to keep this default.
+
+There might be usecase where someone has the need for more providers within an application. Please note that special care must be takes in such setups
+to avoid leaking information from one provider to the other because there are a lot places where e.g. the global `ContextManager` or `Propagator` is used.
 
 ## License
 
