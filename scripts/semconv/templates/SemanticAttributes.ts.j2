@@ -45,11 +45,12 @@ export const {{class}} = {
 }
 
 // Enum definitions
-{%- for attribute in attributes if attribute.is_local %}
+{%- for attribute in attributes if attribute.is_local and not attribute.ref %}
 {%- if attribute.is_enum %}
 {%- set class_name = attribute.fqn | to_camelcase(True) ~ "Values" %}
 {%- set type = attribute.attr_type.enum_type %}
 
+{% if attribute.attr_type.members is defined and attribute.attr_type.members|length > 0 %}
 export enum {{class_name}} {
   {%- for member in attribute.attr_type.members if attribute.is_local and not attribute.ref %}
   /** {% filter escape %}{{member.brief | to_doc_brief}}.{% endfilter %} */
@@ -57,4 +58,6 @@ export enum {{class_name}} {
   {%- endfor %}
 }
 {% endif %}
+{% endif %}
+
 {%- endfor %}
