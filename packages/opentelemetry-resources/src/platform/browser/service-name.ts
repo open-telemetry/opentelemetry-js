@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-export * from './detect-resources';
-export * from './detectors';
-export * from './service-name';
+export function serviceName(): string {
+  return window.location.host;
+}

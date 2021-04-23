@@ -16,6 +16,7 @@
 
 import { SDK_INFO } from '@opentelemetry/core';
 import { TELEMETRY_SDK_RESOURCE } from './constants';
+import { serviceName } from './platform';
 import { ResourceAttributes } from './types';
 
 /**
@@ -50,7 +51,12 @@ export class Resource {
      * TODO: Consider to add check/validation on attributes.
      */
     readonly attributes: ResourceAttributes
-  ) {}
+  ) {
+    // service.name is a required attribute
+    if (!attributes['service.name']) {
+      attributes['service.name'] = serviceName();
+    }
+  }
 
   /**
    * Returns a new, merged {@link Resource} by merging the current Resource

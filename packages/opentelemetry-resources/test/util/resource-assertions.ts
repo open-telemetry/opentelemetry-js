@@ -307,7 +307,7 @@ export const assertProcessResource = (
  * @param resource the Resource to validate
  */
 export const assertEmptyResource = (resource: Resource) => {
-  assert.strictEqual(Object.keys(resource.attributes).length, 0);
+  assert.strictEqual(Object.keys(resource.attributes).length, 1);
 };
 
 const assertHasOneLabel = (

@@ -44,7 +44,7 @@ describe('Resource', () => {
       'k8s.io/location': 'location',
     });
     const actualResource = resource1.merge(resource2);
-    assert.strictEqual(Object.keys(actualResource.attributes).length, 5);
+    assert.strictEqual(Object.keys(actualResource.attributes).length, 6);
     assert.deepStrictEqual(actualResource, expectedResource);
   });
 
@@ -56,25 +56,25 @@ describe('Resource', () => {
       'k8s.io/location': 'location1',
     });
     const actualResource = resource1.merge(resource3);
-    assert.strictEqual(Object.keys(actualResource.attributes).length, 4);
+    assert.strictEqual(Object.keys(actualResource.attributes).length, 5);
     assert.deepStrictEqual(actualResource, expectedResource);
   });
 
   it('should return merged resource when first resource is empty', () => {
     const actualResource = emptyResource.merge(resource2);
-    assert.strictEqual(Object.keys(actualResource.attributes).length, 2);
+    assert.strictEqual(Object.keys(actualResource.attributes).length, 3);
     assert.deepStrictEqual(actualResource, resource2);
   });
 
   it('should return merged resource when other resource is empty', () => {
     const actualResource = resource1.merge(emptyResource);
-    assert.strictEqual(Object.keys(actualResource.attributes).length, 3);
+    assert.strictEqual(Object.keys(actualResource.attributes).length, 4);
     assert.deepStrictEqual(actualResource, resource1);
   });
 
   it('should return merged resource when other resource is null', () => {
     const actualResource = resource1.merge(null);
-    assert.strictEqual(Object.keys(actualResource.attributes).length, 3);
+    assert.strictEqual(Object.keys(actualResource.attributes).length, 4);
     assert.deepStrictEqual(actualResource, resource1);
   });
 
@@ -84,15 +84,17 @@ describe('Resource', () => {
       'custom.number': 42,
       'custom.boolean': true,
     });
-    assert.equal(resource.attributes['custom.string'], 'strvalue');
-    assert.equal(resource.attributes['custom.number'], 42);
-    assert.equal(resource.attributes['custom.boolean'], true);
+    assert.strictEqual(resource.attributes['custom.string'], 'strvalue');
+    assert.strictEqual(resource.attributes['custom.number'], 42);
+    assert.strictEqual(resource.attributes['custom.boolean'], true);
   });
 
   describe('.empty()', () => {
-    it('should return an empty resource', () => {
+    it('should return an empty resource (except required service.name)', () => {
       const resource = Resource.empty();
-      assert.equal(Object.entries(resource.attributes), 0);
+      assert.deepStrictEqual(Object.keys(resource.attributes), [
+        'service.name',
+      ]);
     });
 
     it('should return the same empty resource', () => {
