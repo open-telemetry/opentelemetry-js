@@ -245,9 +245,11 @@ To request automatic tracing support for a module not on this list, please [file
 
 ## Upgrade guidelines
 
-### 0.18.x to 0.19.0
+### 0.19.x to x
 
 - `JaegerHttpTracePropagator` renamed to `JaegerPropagator`
+
+### 0.18.x to 0.19.0
 
 - API is now a peer dependency. This means that users will need to include `@opentelemetry/api` as a dependency of their project in order to use the SDK. NPM version 7+ (Node 15+) should do this automatically.
 

@@ -31,7 +31,6 @@ const { JaegerPropagator } = require('@opentelemetry/propagator-jaeger');
 
 const provider = new NodeTracerProvider();
 provider.register({
-  // Use Jaeger Propagator
   propagator: new JaegerPropagator()
 });
 ```
