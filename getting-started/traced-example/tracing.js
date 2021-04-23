@@ -24,7 +24,6 @@ provider.register();
 
 // load old default plugins
 registerInstrumentations({
-  tracerProvider: provider,
   instrumentations: [
     new ExpressInstrumentation(),
     new HttpInstrumentation(),

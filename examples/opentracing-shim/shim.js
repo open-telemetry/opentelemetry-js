@@ -9,13 +9,13 @@ const { TracerShim } = require('@opentelemetry/shim-opentracing');
 
 function shim(serviceName) {
   const provider = new NodeTracerProvider();
-  registerInstrumentations({
-    tracerProvider: provider,
-  });
 
   provider.addSpanProcessor(new SimpleSpanProcessor(getExporter(serviceName)));
   // Initialize the OpenTelemetry APIs to use the NodeTracerProvider bindings
   provider.register();
+
+  registerInstrumentations({
+  });
 
   return new TracerShim(provider.getTracer('opentracing-shim'));
 }

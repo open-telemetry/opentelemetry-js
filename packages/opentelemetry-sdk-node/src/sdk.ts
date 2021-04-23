@@ -176,8 +176,6 @@ export class NodeSDK {
 
     registerInstrumentations({
       instrumentations: this._instrumentations,
-      tracerProvider: this._tracerProvider,
-      meterProvider: this._meterProvider,
     });
   }
 
