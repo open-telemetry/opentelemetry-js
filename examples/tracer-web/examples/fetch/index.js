@@ -11,6 +11,12 @@ import { B3Propagator } from '@opentelemetry/propagator-b3';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
 const provider = new WebTracerProvider();
+provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+provider.addSpanProcessor(new SimpleSpanProcessor(new CollectorTraceExporter()));
+provider.register({
+  contextManager: new ZoneContextManager(),
+  propagator: new B3Propagator(),
+});
 
 registerInstrumentations({
   instrumentations: [
@@ -20,17 +26,9 @@ registerInstrumentations({
         'https://cors-test.appspot.com/test',
         'https://httpbin.org/get',
       ],
-      clearTimingResources: true
+      clearTimingResources: true,
     }),
   ],
-  tracerProvider: provider,
-});
-
-provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-provider.addSpanProcessor(new SimpleSpanProcessor(new CollectorTraceExporter()));
-provider.register({
-  contextManager: new ZoneContextManager(),
-  propagator: new B3Propagator(),
 });
 
 const webTracerWithZone = provider.getTracer('example-tracer-web');
