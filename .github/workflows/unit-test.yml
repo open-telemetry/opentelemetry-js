@@ -18,7 +18,7 @@ jobs:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: restore lock files
         uses: actions/cache@master # must use unreleased master to cache multiple paths
@@ -62,7 +62,7 @@ jobs:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
       - name: Permission Setup
         run: sudo chmod -R 777 /github /__w
 
