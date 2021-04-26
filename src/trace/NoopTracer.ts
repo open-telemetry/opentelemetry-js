@@ -16,7 +16,7 @@
 
 import { getSpanContext } from '../context/context';
 import { Context } from '../context/types';
-import { NoopSpan } from './NoopSpan';
+import { NonRecordingSpan } from './NonRecordingSpan';
 import { Span } from './span';
 import { isSpanContextValid } from './spancontext-utils';
 import { SpanOptions } from './SpanOptions';
@@ -31,7 +31,7 @@ export class NoopTracer implements Tracer {
   startSpan(name: string, options?: SpanOptions, context?: Context): Span {
     const root = Boolean(options?.root);
     if (root) {
-      return new NoopSpan();
+      return new NonRecordingSpan();
     }
 
     const parentFromContext = context && getSpanContext(context);
@@ -40,9 +40,9 @@ export class NoopTracer implements Tracer {
       isSpanContext(parentFromContext) &&
       isSpanContextValid(parentFromContext)
     ) {
-      return new NoopSpan(parentFromContext);
+      return new NonRecordingSpan(parentFromContext);
     } else {
-      return new NoopSpan();
+      return new NonRecordingSpan();
     }
   }
 }

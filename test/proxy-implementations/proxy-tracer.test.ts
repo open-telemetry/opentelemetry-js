@@ -27,7 +27,7 @@ import {
   ROOT_CONTEXT,
   SpanOptions,
 } from '../../src';
-import { NoopSpan } from '../../src/trace/NoopSpan';
+import { NonRecordingSpan } from '../../src/trace/NonRecordingSpan';
 
 describe('ProxyTracer', () => {
   let provider: ProxyTracerProvider;
@@ -51,14 +51,14 @@ describe('ProxyTracer', () => {
     it('startSpan should return Noop Spans', () => {
       const tracer = provider.getTracer('test');
 
-      assert.ok(tracer.startSpan('span-name') instanceof NoopSpan);
+      assert.ok(tracer.startSpan('span-name') instanceof NonRecordingSpan);
       assert.ok(
         tracer.startSpan('span-name1', { kind: SpanKind.CLIENT }) instanceof
-          NoopSpan
+          NonRecordingSpan
       );
       assert.ok(
         tracer.startSpan('span-name2', { kind: SpanKind.CLIENT }) instanceof
-          NoopSpan
+          NonRecordingSpan
       );
     });
   });
@@ -91,7 +91,7 @@ describe('ProxyTracer', () => {
     let delegateTracer: Tracer;
 
     beforeEach(() => {
-      delegateSpan = new NoopSpan();
+      delegateSpan = new NonRecordingSpan();
       delegateTracer = {
         startSpan() {
           return delegateSpan;

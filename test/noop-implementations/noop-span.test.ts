@@ -21,11 +21,11 @@ import {
   INVALID_TRACEID,
   TraceFlags,
 } from '../../src';
-import { NoopSpan } from '../../src/trace/NoopSpan';
+import { NonRecordingSpan } from '../../src/trace/NonRecordingSpan';
 
-describe('NoopSpan', () => {
+describe('NonRecordingSpan', () => {
   it('do not crash', () => {
-    const span = new NoopSpan();
+    const span = new NonRecordingSpan();
     span.setAttribute('my_string_attribute', 'foo');
     span.setAttribute('my_number_attribute', 123);
     span.setAttribute('my_boolean_attribute', false);

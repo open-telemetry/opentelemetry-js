@@ -23,20 +23,20 @@ import {
   context,
   setSpanContext,
 } from '../../src';
-import { NoopSpan } from '../../src/trace/NoopSpan';
+import { NonRecordingSpan } from '../../src/trace/NonRecordingSpan';
 
 describe('NoopTracer', () => {
   it('should not crash', () => {
     const tracer = new NoopTracer();
 
-    assert.ok(tracer.startSpan('span-name') instanceof NoopSpan);
+    assert.ok(tracer.startSpan('span-name') instanceof NonRecordingSpan);
     assert.ok(
       tracer.startSpan('span-name1', { kind: SpanKind.CLIENT }) instanceof
-        NoopSpan
+        NonRecordingSpan
     );
     assert.ok(
       tracer.startSpan('span-name2', { kind: SpanKind.CLIENT }) instanceof
-        NoopSpan
+        NonRecordingSpan
     );
   });
 
