@@ -211,17 +211,9 @@ export class TracerShim extends opentracing.Tracer {
   private _getPropagator(format: string): TextMapPropagator | undefined {
     switch (format) {
       case opentracing.FORMAT_TEXT_MAP:
-        if (this._propagators?.textMapPropagator !== undefined) {
-          return this._propagators.textMapPropagator;
-        } else {
-          return api.propagation;
-        }
+        return this._propagators?.textMapPropagator ?? api.propagation;
       case opentracing.FORMAT_HTTP_HEADERS:
-        if (this._propagators?.httpHeadersPropagator !== undefined) {
-          return this._propagators.httpHeadersPropagator;
-        } else {
-          return api.propagation;
-        }
+        return this._propagators?.httpHeadersPropagator ?? api.propagation;
       default:
         return;
     }
