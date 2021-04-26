@@ -34,7 +34,7 @@ import api, {
   diag,
 } from '../../src';
 import { DiagAPI } from '../../src/api/diag';
-import { NoopSpan } from '../../src/trace/NoopSpan';
+import { NonRecordingSpan } from '../../src/trace/NonRecordingSpan';
 
 // DiagLogger implementation
 const diagLoggerFunctions = [
@@ -78,7 +78,7 @@ describe('API', () => {
       spanId: '6e0c63257de34c92',
       traceFlags: TraceFlags.NONE,
     };
-    const dummySpan = new NoopSpan(spanContext);
+    const dummySpan = new NonRecordingSpan(spanContext);
 
     beforeEach(() => {
       context.disable();

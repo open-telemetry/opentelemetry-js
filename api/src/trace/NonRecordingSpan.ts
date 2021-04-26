@@ -23,11 +23,11 @@ import { SpanStatus } from './status';
 import { INVALID_SPAN_CONTEXT } from './spancontext-utils';
 
 /**
- * The NoopSpan is the default {@link Span} that is used when no Span
+ * The NonRecordingSpan is the default {@link Span} that is used when no Span
  * implementation is available. All operations are no-op including context
  * propagation.
  */
-export class NoopSpan implements Span {
+export class NonRecordingSpan implements Span {
   constructor(
     private readonly _spanContext: SpanContext = INVALID_SPAN_CONTEXT
   ) {}
@@ -65,7 +65,7 @@ export class NoopSpan implements Span {
   // By default does nothing
   end(_endTime?: TimeInput): void {}
 
-  // isRecording always returns false for noopSpan.
+  // isRecording always returns false for NonRecordingSpan.
   isRecording(): boolean {
     return false;
   }
