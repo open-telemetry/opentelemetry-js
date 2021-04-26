@@ -39,7 +39,7 @@ export interface Span {
    *
    * @returns the SpanContext object associated with this Span.
    */
-  context(): SpanContext;
+  spanContext(): SpanContext;
 
   /**
    * Sets an attribute to the span.

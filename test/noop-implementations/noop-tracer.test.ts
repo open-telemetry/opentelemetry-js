@@ -52,8 +52,8 @@ describe('NoopTracer', () => {
       {},
       setSpanContext(context.active(), parent)
     );
-    assert(span.context().traceId === parent.traceId);
-    assert(span.context().spanId === parent.spanId);
-    assert(span.context().traceFlags === parent.traceFlags);
+    assert(span.spanContext().traceId === parent.traceId);
+    assert(span.spanContext().spanId === parent.spanId);
+    assert(span.spanContext().traceFlags === parent.traceFlags);
   });
 });

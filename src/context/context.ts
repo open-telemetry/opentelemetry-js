@@ -75,7 +75,7 @@ export function setSpanContext(
  * @param context context to get values from
  */
 export function getSpanContext(context: Context): SpanContext | undefined {
-  return getSpan(context)?.context();
+  return getSpan(context)?.spanContext();
 }
 
 /**
