@@ -33,7 +33,7 @@ export class NonRecordingSpan implements Span {
   ) {}
 
   // Returns a SpanContext.
-  context(): SpanContext {
+  spanContext(): SpanContext {
     return this._spanContext;
   }
 
