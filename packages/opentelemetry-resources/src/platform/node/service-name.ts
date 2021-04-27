@@ -31,8 +31,7 @@ function getPJsonName(): string | undefined {
   try {
     const pJsonPath = join(cwd(), 'package.json');
     if (existsSync(pJsonPath)) {
-      const pJsonBuf = readFileSync(pJsonPath);
-      const pJson = JSON.parse(pJsonBuf.toString('utf-8'));
+      const pJson = JSON.parse(readFileSync(pJsonPath, { encoding: 'utf8' }));
       const name = pJson.name;
       if (typeof name == 'string') {
         return name;
