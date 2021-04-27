@@ -114,7 +114,7 @@ describe('transform', () => {
     it('should convert resource', () => {
       const resource = transform.toCollectorResource(
         new Resource({
-          service: 'ui',
+          'service.name': 'ui',
           version: 1.0,
           success: true,
         })
@@ -122,7 +122,7 @@ describe('transform', () => {
       assert.deepStrictEqual(resource, {
         attributes: [
           {
-            key: 'service',
+            key: 'service.name',
             value: { stringValue: 'ui' },
           },
           {
