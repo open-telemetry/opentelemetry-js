@@ -71,7 +71,7 @@ describe('transform', () => {
         ],
         duration: [32, 800000000],
         resource: new Resource({
-          service: 'ui',
+          ['service.name']: 'ui',
           version: 1,
           cost: 112.12,
         }),
@@ -117,7 +117,7 @@ describe('transform', () => {
       assert.strictEqual(tag4.key, 'otel.status_code');
       assert.strictEqual(tag4.vType, 'STRING');
       assert.strictEqual(tag4.vStr, 'OK');
-      assert.strictEqual(tag5.key, 'service');
+      assert.strictEqual(tag5.key, 'service.name');
       assert.strictEqual(tag5.vType, 'STRING');
       assert.strictEqual(tag5.vStr, 'ui');
       assert.strictEqual(tag6.key, 'version');
@@ -156,7 +156,9 @@ describe('transform', () => {
         links: [],
         events: [],
         duration: [32, 800000000],
-        resource: Resource.empty(),
+        resource: new Resource({
+          ['service.name']: 'ui',
+        }),
         instrumentationLibrary: {
           name: 'default',
           version: '0.0.1',
@@ -182,7 +184,7 @@ describe('transform', () => {
       assert.deepStrictEqual(thriftSpan.parentSpanId, ThriftUtils.emptyBuffer);
       assert.deepStrictEqual(thriftSpan.flags, 1);
       assert.strictEqual(thriftSpan.references.length, 0);
-      assert.strictEqual(thriftSpan.tags.length, 6);
+      assert.strictEqual(thriftSpan.tags.length, 7);
       const [tag1, tag2, tag3, tag4] = thriftSpan.tags;
       assert.strictEqual(tag1.key, 'otel.status_code');
       assert.strictEqual(tag1.vType, 'STRING');
