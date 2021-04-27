@@ -19,12 +19,7 @@ import { join } from 'path';
 import { cwd } from 'process';
 
 export function serviceName(): string {
-  const pJsonName = getPJsonName();
-  if (pJsonName) {
-    return pJsonName;
-  }
-
-  return getExecPathName();
+  return getPJsonName() ?? getExecPathName();
 }
 
 function getPJsonName(): string | undefined {
