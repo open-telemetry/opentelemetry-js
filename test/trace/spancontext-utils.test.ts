@@ -54,4 +54,17 @@ describe('spancontext-utils', () => {
     };
     assert.ok(!context.isSpanContextValid(spanContext));
   });
+
+  it('should wrap a SpanContext in a non-recording span', () => {
+    const spanContext = {
+      traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+      spanId: '6e0c63257de34c92',
+      traceFlags: TraceFlags.NONE,
+    };
+
+    const span = context.wrapSpanContext(spanContext);
+
+    assert.deepStrictEqual(span.spanContext(), spanContext);
+    assert.strictEqual(span.isRecording(), false);
+  });
 });
