@@ -64,7 +64,6 @@ provider.register();
 // register and load instrumentation and old plugins - old plugins will be loaded automatically as previously
 // but instrumentations needs to be added
 registerInstrumentations({
-  tracerProvider: provider,
 });
 
 // Your application code - http will automatically be instrumented if
@@ -80,15 +79,16 @@ In the following example:
 - the http instrumentation has a custom config for a `requestHook`
 
 ```javascript
+const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
 const { ExpressInstrumentation } = require('@opentelemetry/instrumentation-express');
 
 const provider = new NodeTracerProvider();
+provider.register();
 
 // register and load instrumentation and old plugins - old plugins will be loaded automatically as previously
 // but instrumentations needs to be added
 registerInstrumentations({
-  tracerProvider: provider,
   instrumentations: [
     new ExpressInstrumentation(),
     new HttpInstrumentation({

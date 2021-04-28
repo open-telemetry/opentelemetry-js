@@ -35,7 +35,6 @@ provider.register();
 
 registerInstrumentations({
   instrumentations: [new HttpInstrumentation()],
-  tracerProvider: provider,
 });
 
 ```
