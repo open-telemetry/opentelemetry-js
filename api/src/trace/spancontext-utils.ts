@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { NonRecordingSpan } from './NonRecordingSpan';
+import { Span } from './span';
 import { SpanContext } from './span_context';
 import { TraceFlags } from './trace_flags';
 
@@ -42,4 +44,14 @@ export function isSpanContextValid(spanContext: SpanContext): boolean {
   return (
     isValidTraceId(spanContext.traceId) && isValidSpanId(spanContext.spanId)
   );
+}
+
+/**
+ * Wrap the given {@link SpanContext} in a new non-recording {@link Span}
+ *
+ * @param spanContext span context to be wrapped
+ * @returns a new non-recording {@link Span} with the provided context
+ */
+export function wrapSpanContext(spanContext: SpanContext): Span {
+  return new NonRecordingSpan(spanContext);
 }
