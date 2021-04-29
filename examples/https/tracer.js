@@ -14,12 +14,6 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 module.exports = (serviceName) => {
   let exporter;
   const provider = new NodeTracerProvider();
-  registerInstrumentations({
-    tracerProvider: provider,
-    instrumentations: [
-      new HttpInstrumentation(),
-    ],
-  });
 
   if (EXPORTER.toLowerCase().startsWith('z')) {
     exporter = new ZipkinExporter({
@@ -35,6 +29,12 @@ module.exports = (serviceName) => {
 
   // Initialize the OpenTelemetry APIs to use the NodeTracerProvider bindings
   provider.register();
+
+  registerInstrumentations({
+    instrumentations: [
+      new HttpInstrumentation(),
+    ],
+  });
 
   return opentelemetry.trace.getTracer('https-example');
 };

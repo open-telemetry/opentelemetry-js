@@ -33,7 +33,6 @@ provider.register({
 
 registerInstrumentations({
   instrumentations: [new FetchInstrumentation()],
-  tracerProvider: provider,
 });
 
 // or plugin can be also initialised separately and then set the tracer provider or meter provider
