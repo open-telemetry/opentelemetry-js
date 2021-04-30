@@ -18,8 +18,6 @@ npm install --save @opentelemetry/exporter-collector-grpc
 The CollectorTraceExporter in Node expects the URL to only be the hostname. It will not work with `/v1/trace`.
 
 ```js
-const Graceful = require('node-graceful');
-
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector-grpc');
 
@@ -34,9 +32,8 @@ const exporter = new CollectorTraceExporter(collectorOptions);
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 provider.register();
-
-Graceful.on("exit", async () => {
-  await provider.shutdown();
+['SIGINT', 'SIGTERM'].forEach(signal => {
+  process.on(signal, () => provider.shutdown().catch(console.error));
 });
 ```
 
@@ -45,7 +42,6 @@ By default, plaintext connection is used. In order to use TLS in Node.js, provid
 ```js
 const fs = require('fs');
 const grpc = require('@grpc/grpc-js');
-const Graceful = require('node-graceful');
 
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector-grpc');
@@ -62,9 +58,8 @@ const exporter = new CollectorTraceExporter(collectorOptions);
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 provider.register();
-
-Graceful.on("exit", async () => {
-  await provider.shutdown();
+['SIGINT', 'SIGTERM'].forEach(signal => {
+  process.on(signal, () => provider.shutdown().catch(console.error));
 });
 ```
 
@@ -84,7 +79,6 @@ The exporter can be configured to send custom metadata with each request as in t
 
 ```js
 const grpc = require('@grpc/grpc-js');
-const Graceful = require('node-graceful');
 
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector-grpc');
@@ -105,9 +99,8 @@ const exporter = new CollectorTraceExporter(collectorOptions);
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 provider.register();
-
-Graceful.on("exit", async () => {
-  await provider.shutdown();
+['SIGINT', 'SIGTERM'].forEach(signal => {
+  process.on(signal, () => provider.shutdown().catch(console.error));
 });
 ```
 
@@ -128,15 +121,18 @@ const collectorOptions = {
 const exporter = new CollectorMetricExporter(collectorOptions);
 
 // Register the exporter
-const meter = new MeterProvider({
+const provider = new MeterProvider({
   exporter,
   interval: 60000,
-}).getMeter('example-meter');
+})
+['SIGINT', 'SIGTERM'].forEach(signal => {
+  process.on(signal, () => provider.shutdown().catch(console.error));
+});
 
 // Now, start recording data
+const meter = provider.getMeter('example-meter');
 const counter = meter.createCounter('metric_name');
 counter.add(10, { 'key': 'value' });
-
 ```
 
 ## Running opentelemetry-collector locally to see the traces

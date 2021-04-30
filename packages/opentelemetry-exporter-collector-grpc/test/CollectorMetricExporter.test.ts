@@ -185,7 +185,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
           url: address + '/v1/metrics',
         });
         const args = spyLoggerWarn.args[0];
-        assert.strictEqual(args[0], 'URL path cannot be set when using grpc');
+        assert.strictEqual(args[0], 'URL path should not be set when using grpc, ignoring.');
       });
     });
 

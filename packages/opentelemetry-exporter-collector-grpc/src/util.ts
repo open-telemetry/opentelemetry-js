@@ -21,6 +21,7 @@ import { globalErrorHandler } from '@opentelemetry/core';
 import { collectorTypes } from '@opentelemetry/exporter-collector';
 import * as path from 'path';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
+import { parse } from 'url';
 import {
   CollectorExporterConfigNode,
   GRPCQueueItem,
@@ -105,9 +106,12 @@ export function send<ExportItem, ServiceRequest>(
 }
 
 export function fixUrl(url: string): string {
-  const serverAddress = url.replace(/^(http|grpc)s?:\/\//, '');
-  if (serverAddress.includes('/')) {
-    diag.warn('URL path cannot be set when using grpc');
+  const target = parse(url);
+  if (target.pathname !== '/') {
+    diag.warn('URL path should not be set when using grpc, ignoring.');
   }
-  return serverAddress;
+  if (target.protocol !== '' && !target.protocol.match(/(http|grpc)s?/)) {
+    diag.warn('URL protocol should match (http|grpc)s?, ignoring.');
+  }
+  return target.host;
 }
