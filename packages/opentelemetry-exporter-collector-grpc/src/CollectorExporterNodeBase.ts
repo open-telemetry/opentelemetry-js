@@ -26,7 +26,7 @@ import {
   ServiceClientType,
 } from './types';
 import { ServiceClient } from './types';
-import { fixUrl } from './util';
+import { validateAndNormalizeUrl } from './util';
 
 /**
  * Collector Metric Exporter abstract base class
@@ -51,7 +51,7 @@ export abstract class CollectorExporterNodeBase<
       diag.warn('Headers cannot be set when using grpc');
     }
 
-    this.serverAddress = fixUrl(this.url);
+    this.serverAddress = validateAndNormalizeUrl(this.url);
     this.metadata = config.metadata;
   }
   private _sendPromise(

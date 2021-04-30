@@ -105,13 +105,17 @@ export function send<ExportItem, ServiceRequest>(
   }
 }
 
-export function fixUrl(url: string): string {
+export function validateAndNormalizeUrl(url: string): string {
   const target = new URL(url);
   if (target.pathname !== '/') {
-    diag.warn('URL path should not be set when using grpc, the path part of the URL will be ignored.');
+    diag.warn(
+      'URL path should not be set when using grpc, the path part of the URL will be ignored.'
+    );
   }
   if (target.protocol !== '' && !target.protocol?.match(/(http|grpc)s?/)) {
-    diag.warn('URL protocol should be http(s):// or grpc(s)://. Using grpc://.');
+    diag.warn(
+      'URL protocol should be http(s):// or grpc(s)://. Using grpc://.'
+    );
   }
   return target.host;
 }
