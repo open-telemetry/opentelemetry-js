@@ -343,7 +343,7 @@ export function ensureExportedCounterIsCorrect(
         },
       ],
       isMonotonic: true,
-      aggregationTemporality: 'AGGREGATION_TEMPORALITY_CUMULATIVE',
+      aggregationTemporality: 'AGGREGATION_TEMPORALITY_DELTA',
     },
   });
 }
@@ -395,7 +395,7 @@ export function ensureExportedValueRecorderIsCorrect(
           explicitBounds,
         },
       ],
-      aggregationTemporality: 'AGGREGATION_TEMPORALITY_CUMULATIVE',
+      aggregationTemporality: 'AGGREGATION_TEMPORALITY_DELTA',
     },
   });
 }
