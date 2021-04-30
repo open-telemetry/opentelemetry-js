@@ -106,7 +106,7 @@ export function send<ExportItem, ServiceRequest>(
 }
 
 export function fixUrl(url: string): string {
-  const target = URL(url);
+  const target = new URL(url);
   if (target.pathname !== '/') {
     diag.warn('URL path should not be set when using grpc, ignoring.');
   }

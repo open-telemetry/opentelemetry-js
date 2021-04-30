@@ -177,7 +177,7 @@ const testCollectorExporter = (params: TestParams) =>
         setTimeout(() => {
           assert.ok(
             typeof exportedData !== 'undefined',
-            'resource' + ' doesn't exist'
+            'resource' + " doesn't exist"
           );
           let spans;
           let resource;
@@ -188,7 +188,7 @@ const testCollectorExporter = (params: TestParams) =>
 
             assert.ok(
               typeof resource !== 'undefined',
-              'resource doesn't exist'
+              "resource doesn't exist"
             );
             if (resource) {
               ensureResourceIsCorrect(resource);
