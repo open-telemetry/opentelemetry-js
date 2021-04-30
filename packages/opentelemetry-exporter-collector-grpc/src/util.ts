@@ -21,7 +21,7 @@ import { globalErrorHandler } from '@opentelemetry/core';
 import { collectorTypes } from '@opentelemetry/exporter-collector';
 import * as path from 'path';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
-import { parse } from 'url';
+import { URL } from 'url';
 import {
   CollectorExporterConfigNode,
   GRPCQueueItem,
@@ -47,7 +47,7 @@ export function onInit<ExportItem, ServiceRequest>(
       oneofs: true,
       includeDirs,
     })
-    .then(packageDefinition => {
+    .then((packageDefinition) => {
       const packageObject: any = grpc.loadPackageDefinition(packageDefinition);
 
       if (collector.getServiceClientType() === ServiceClientType.SPANS) {
@@ -69,7 +69,7 @@ export function onInit<ExportItem, ServiceRequest>(
         });
       }
     })
-    .catch(err => {
+    .catch((err) => {
       globalErrorHandler(err);
     });
 }
@@ -106,11 +106,11 @@ export function send<ExportItem, ServiceRequest>(
 }
 
 export function fixUrl(url: string): string {
-  const target = parse(url);
+  const target = URL(url);
   if (target.pathname !== '/') {
     diag.warn('URL path should not be set when using grpc, ignoring.');
   }
-  if (target.protocol !== '' && !target.protocol.match(/(http|grpc)s?/)) {
+  if (target.protocol !== '' && !target.protocol?.match(/(http|grpc)s?/)) {
     diag.warn('URL protocol should match (http|grpc)s?, ignoring.');
   }
   return target.host;

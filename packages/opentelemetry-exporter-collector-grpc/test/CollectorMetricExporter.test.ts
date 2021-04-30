@@ -66,7 +66,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
     let metrics: metrics.MetricRecord[];
     let reqMetadata: grpc.Metadata | undefined;
 
-    before(done => {
+    before((done) => {
       server = new grpc.Server();
       protoLoader
         .load(metricsServiceProtoPath, {
@@ -142,7 +142,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
       const counter: metrics.Metric<metrics.BoundCounter> &
         Counter = mockCounter();
       const observer: metrics.Metric<metrics.BoundObserver> &
-        ValueObserver = mockObserver(observerResult => {
+        ValueObserver = mockObserver((observerResult) => {
         observerResult.observe(3, {});
         observerResult.observe(6, {});
       });
@@ -166,7 +166,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
 
     describe('instance', () => {
       it('should warn about headers', () => {
-        // Need to stub/spy on the underlying logger as the "diag" instance is global
+        // Need to stub/spy on the underlying logger as the 'diag' instance is global
         const spyLoggerWarn = sinon.stub(diag, 'warn');
         collectorExporter = new CollectorMetricExporter({
           serviceName: 'basic-service',
@@ -185,18 +185,21 @@ const testCollectorMetricExporter = (params: TestParams) =>
           url: address + '/v1/metrics',
         });
         const args = spyLoggerWarn.args[0];
-        assert.strictEqual(args[0], 'URL path should not be set when using grpc, ignoring.');
+        assert.strictEqual(
+          args[0],
+          'URL path should not be set when using grpc, ignoring.'
+        );
       });
     });
 
     describe('export', () => {
-      it('should export metrics', done => {
+      it('should export metrics', (done) => {
         const responseSpy = sinon.spy();
         collectorExporter.export(metrics, responseSpy);
         setTimeout(() => {
           assert.ok(
             typeof exportedData !== 'undefined',
-            'resource' + " doesn't exist"
+            'resource' + ' doesn't exist'
           );
           let resource;
           if (exportedData) {
@@ -223,7 +226,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
             );
             assert.ok(
               typeof resource !== 'undefined',
-              "resource doesn't exist"
+              'resource doesn't exist'
             );
             if (resource) {
               ensureResourceIsCorrect(resource);
@@ -239,14 +242,14 @@ const testCollectorMetricExporter = (params: TestParams) =>
   });
 
 describe('CollectorMetricExporter - node (getDefaultUrl)', () => {
-  it('should default to localhost', done => {
+  it('should default to localhost', (done) => {
     const collectorExporter = new CollectorMetricExporter({});
     setTimeout(() => {
       assert.strictEqual(collectorExporter['url'], 'localhost:4317');
       done();
     });
   });
-  it('should keep the URL if included', done => {
+  it('should keep the URL if included', (done) => {
     const url = 'http://foo.bar.com';
     const collectorExporter = new CollectorMetricExporter({ url });
     setTimeout(() => {
