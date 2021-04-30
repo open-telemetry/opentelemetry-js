@@ -19,8 +19,8 @@ import {
   Detector,
   Resource,
   ResourceDetectionConfig,
-  CONTAINER_RESOURCE,
 } from '@opentelemetry/resources';
+import { ResourceAttributes } from '@opentelemetry/semantic-conventions';
 import * as util from 'util';
 import * as fs from 'fs';
 import * as os from 'os';
@@ -49,8 +49,8 @@ export class AwsEcsDetector implements Detector {
     return !hostName && !containerId
       ? Resource.empty()
       : new Resource({
-          [CONTAINER_RESOURCE.NAME]: hostName || '',
-          [CONTAINER_RESOURCE.ID]: containerId || '',
+          [ResourceAttributes.CONTAINER_NAME]: hostName || '',
+          [ResourceAttributes.CONTAINER_ID]: containerId || '',
         });
   }
 
