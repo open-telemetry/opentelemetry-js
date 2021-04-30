@@ -8,6 +8,13 @@ import { B3Propagator } from '@opentelemetry/propagator-b3';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
 const providerWithZone = new WebTracerProvider();
+providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorTraceExporter()));
+
+providerWithZone.register({
+  contextManager: new ZoneContextManager(),
+  propagator: new B3Propagator(),
+});
 
 registerInstrumentations({
   instrumentations: [
@@ -18,15 +25,6 @@ registerInstrumentations({
       ],
     }),
   ],
-  tracerProvider: providerWithZone,
-});
-
-providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorTraceExporter()));
-
-providerWithZone.register({
-  contextManager: new ZoneContextManager(),
-  propagator: new B3Propagator(),
 });
 
 const webTracerWithZone = providerWithZone.getTracer('example-tracer-web');

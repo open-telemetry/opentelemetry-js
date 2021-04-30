@@ -26,7 +26,7 @@ import {
   TextMapSetter,
   TraceFlags,
 } from '@opentelemetry/api';
-import { TraceState } from '../../trace/TraceState';
+import { TraceState } from './TraceState';
 
 export const TRACE_PARENT_HEADER = 'traceparent';
 export const TRACE_STATE_HEADER = 'tracestate';

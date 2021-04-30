@@ -35,7 +35,6 @@ registerInstrumentations({
       propagateTraceHeaderCorsUrls: ['http://localhost:8090']
     }),
   ],
-  tracerProvider: provider,
 });
 
 

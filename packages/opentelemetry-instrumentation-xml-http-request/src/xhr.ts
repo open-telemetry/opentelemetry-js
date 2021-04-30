@@ -19,6 +19,7 @@ import {
   isWrapped,
   InstrumentationBase,
   InstrumentationConfig,
+  safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import { hrTime, isUrlIgnored, otperformance } from '@opentelemetry/core';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
@@ -45,6 +46,11 @@ import { AttributeNames } from './enums/AttributeNames';
 // safe enough
 const OBSERVER_WAIT_TIME_MS = 300;
 
+export type XHRCustomAttributeFunction = (
+  span: api.Span,
+  xhr: XMLHttpRequest
+) => void;
+
 /**
  * XMLHttpRequest config
  */
@@ -64,6 +70,8 @@ export interface XMLHttpRequestInstrumentationConfig
    * also not be traced.
    */
   ignoreUrls?: Array<string | RegExp>;
+  /** Function for adding custom attributes on the span */
+  applyCustomAttributesOnSpan?: XHRCustomAttributeFunction;
 }
 
 /**
@@ -167,6 +175,24 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       span.setAttribute(
         SemanticAttributes.HTTP_USER_AGENT,
         navigator.userAgent
+      );
+    }
+  }
+
+  private _applyAttributesAfterXHR(span: api.Span, xhr: XMLHttpRequest) {
+    const applyCustomAttributesOnSpan = this._getConfig()
+      .applyCustomAttributesOnSpan;
+    if (typeof applyCustomAttributesOnSpan === 'function') {
+      safeExecuteInTheMiddle(
+        () => applyCustomAttributesOnSpan(span, xhr),
+        error => {
+          if (!error) {
+            return;
+          }
+
+          api.diag.error('applyCustomAttributesOnSpan', error);
+        },
+        true
       );
     }
   }
@@ -398,6 +424,10 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       xhrMem.status = xhr.status;
       xhrMem.statusText = xhr.statusText;
       plugin._xhrMem.delete(xhr);
+
+      if (xhrMem.span) {
+        plugin._applyAttributesAfterXHR(xhrMem.span, xhr);
+      }
       const endTime = hrTime();
 
       // the timeout is needed as observer doesn't have yet information

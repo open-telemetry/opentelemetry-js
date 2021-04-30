@@ -4,8 +4,8 @@ This guide walks you through the setup and configuration process for a tracing b
 
 - [Getting started with OpenTelemetry JS](#getting-started-with-opentelemetry-js)
   - [Trace your application with OpenTelemetry](#trace-your-application-with-opentelemetry)
-    - [Set up a Tracing Backend](#set-up-a-tracing-backend)
-    - [Trace Your NodeJS Application](#trace-your-nodejs-application)
+    - [Set up a tracing backend](#set-up-a-tracing-backend)
+    - [Trace your NodeJS application](#trace-your-nodejs-application)
       - [Install the required OpenTelemetry libraries](#install-the-required-opentelemetry-libraries)
       - [Initialize a global tracer](#initialize-a-global-tracer)
       - [Initialize and register a trace exporter](#initialize-and-register-a-trace-exporter)
@@ -92,7 +92,6 @@ registerInstrumentations({
     new HttpInstrumentation(),
     new GrpcInstrumentation(),
   ],
-  tracerProvider: provider,
 });
 
 ```
@@ -153,7 +152,6 @@ registerInstrumentations({
     new HttpInstrumentation(),
     new GrpcInstrumentation(),
   ],
-  tracerProvider: provider,
 });
 
 console.log("tracing initialized");

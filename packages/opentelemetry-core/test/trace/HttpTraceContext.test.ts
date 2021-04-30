@@ -31,7 +31,7 @@ import {
   HttpTraceContextPropagator,
   TRACE_PARENT_HEADER,
   TRACE_STATE_HEADER,
-} from '../../src/context/propagation/HttpTraceContextPropagator';
+} from '../../src/trace/HttpTraceContextPropagator';
 import { TraceState } from '../../src/trace/TraceState';
 
 describe('HttpTraceContextPropagator', () => {
