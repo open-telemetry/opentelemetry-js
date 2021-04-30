@@ -61,7 +61,7 @@ const testCollectorExporter = (params: TestParams) =>
       | undefined;
     let reqMetadata: grpc.Metadata | undefined;
 
-    before((done) => {
+    before(done => {
       server = new grpc.Server();
       protoLoader
         .load(traceServiceProtoPath, {
@@ -115,7 +115,7 @@ const testCollectorExporter = (params: TestParams) =>
       server.forceShutdown();
     });
 
-    beforeEach((done) => {
+    beforeEach(done => {
       const credentials = params.useTLS
         ? grpc.credentials.createSsl(
             fs.readFileSync('./test/certs/ca.crt'),
@@ -170,7 +170,7 @@ const testCollectorExporter = (params: TestParams) =>
     });
 
     describe('export', () => {
-      it('should export spans', (done) => {
+      it('should export spans', done => {
         const responseSpy = sinon.spy();
         const spans = [Object.assign({}, mockedReadableSpan)];
         collectorExporter.export(spans, responseSpy);
@@ -204,14 +204,14 @@ const testCollectorExporter = (params: TestParams) =>
   });
 
 describe('CollectorTraceExporter - node (getDefaultUrl)', () => {
-  it('should default to localhost', (done) => {
+  it('should default to localhost', done => {
     const collectorExporter = new CollectorTraceExporter({});
     setTimeout(() => {
       assert.strictEqual(collectorExporter['url'], 'localhost:4317');
       done();
     });
   });
-  it('should keep the URL if included', (done) => {
+  it('should keep the URL if included', done => {
     const url = 'http://foo.bar.com';
     const collectorExporter = new CollectorTraceExporter({ url });
     setTimeout(() => {

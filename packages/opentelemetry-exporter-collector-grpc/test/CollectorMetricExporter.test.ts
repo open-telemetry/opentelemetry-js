@@ -66,7 +66,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
     let metrics: metrics.MetricRecord[];
     let reqMetadata: grpc.Metadata | undefined;
 
-    before((done) => {
+    before(done => {
       server = new grpc.Server();
       protoLoader
         .load(metricsServiceProtoPath, {
@@ -142,7 +142,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
       const counter: metrics.Metric<metrics.BoundCounter> &
         Counter = mockCounter();
       const observer: metrics.Metric<metrics.BoundObserver> &
-        ValueObserver = mockObserver((observerResult) => {
+        ValueObserver = mockObserver(observerResult => {
         observerResult.observe(3, {});
         observerResult.observe(6, {});
       });
@@ -193,7 +193,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
     });
 
     describe('export', () => {
-      it('should export metrics', (done) => {
+      it('should export metrics', done => {
         const responseSpy = sinon.spy();
         collectorExporter.export(metrics, responseSpy);
         setTimeout(() => {
@@ -242,14 +242,14 @@ const testCollectorMetricExporter = (params: TestParams) =>
   });
 
 describe('CollectorMetricExporter - node (getDefaultUrl)', () => {
-  it('should default to localhost', (done) => {
+  it('should default to localhost', done => {
     const collectorExporter = new CollectorMetricExporter({});
     setTimeout(() => {
       assert.strictEqual(collectorExporter['url'], 'localhost:4317');
       done();
     });
   });
-  it('should keep the URL if included', (done) => {
+  it('should keep the URL if included', done => {
     const url = 'http://foo.bar.com';
     const collectorExporter = new CollectorMetricExporter({ url });
     setTimeout(() => {

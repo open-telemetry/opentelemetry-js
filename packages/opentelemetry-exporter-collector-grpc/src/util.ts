@@ -47,7 +47,7 @@ export function onInit<ExportItem, ServiceRequest>(
       oneofs: true,
       includeDirs,
     })
-    .then((packageDefinition) => {
+    .then(packageDefinition => {
       const packageObject: any = grpc.loadPackageDefinition(packageDefinition);
 
       if (collector.getServiceClientType() === ServiceClientType.SPANS) {
@@ -69,7 +69,7 @@ export function onInit<ExportItem, ServiceRequest>(
         });
       }
     })
-    .catch((err) => {
+    .catch(err => {
       globalErrorHandler(err);
     });
 }
