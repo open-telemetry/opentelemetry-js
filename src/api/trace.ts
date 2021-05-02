@@ -26,6 +26,12 @@ import {
 } from '../trace/spancontext-utils';
 import { Tracer } from '../trace/tracer';
 import { TracerProvider } from '../trace/tracer_provider';
+import {
+  getSpan,
+  getSpanContext,
+  setSpan,
+  setSpanContext,
+} from '../trace/context-utils';
 
 const API_NAME = 'trace';
 
@@ -82,4 +88,12 @@ export class TraceAPI {
   public wrapSpanContext = wrapSpanContext;
 
   public isSpanContextValid = isSpanContextValid;
+
+  public getSpan = getSpan;
+
+  public getSpanContext = getSpanContext;
+
+  public setSpan = setSpan;
+
+  public setSpanContext = setSpanContext;
 }

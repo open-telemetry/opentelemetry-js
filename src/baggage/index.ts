@@ -18,9 +18,16 @@ import { Baggage } from './Baggage';
 import { BaggageEntry, BaggageEntryMetadata } from './Entry';
 import { BaggageImpl } from './internal/baggage';
 import { baggageEntryMetadataSymbol } from './internal/symbol';
+import { Context } from '../context/types';
+import { createContextKey } from '../context/context';
 
 export * from './Baggage';
 export * from './Entry';
+
+/**
+ * Baggage key
+ */
+const BAGGAGE_KEY = createContextKey('OpenTelemetry Baggage Key');
 
 /**
  * Create a new Baggage with optional entries
@@ -31,6 +38,22 @@ export function createBaggage(
   entries: Record<string, BaggageEntry> = {}
 ): Baggage {
   return new BaggageImpl(new Map(Object.entries(entries)));
+}
+
+/**
+ * @param {Context} Context that manage all context values
+ * @returns {Baggage} Extracted baggage from the context
+ */
+export function getBaggage(context: Context): Baggage | undefined {
+  return (context.getValue(BAGGAGE_KEY) as Baggage) || undefined;
+}
+
+/**
+ * @param {Context} Context that manage all context values
+ * @param {Baggage} baggage that will be set in the actual context
+ */
+export function setBaggage(context: Context, baggage: Baggage): Context {
+  return context.setValue(BAGGAGE_KEY, baggage);
 }
 
 /**

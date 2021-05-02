@@ -109,6 +109,7 @@ Because the npm installer and node module resolution algorithm could potentially
 
 - `HttpBaggage` renamed to `HttpBaggagePropagator`
 - [#45](https://github.com/open-telemetry/opentelemetry-js-api/pull/45) `Span#context` renamed to `Span#spanContext`
+- [#47](https://github.com/open-telemetry/opentelemetry-js-api/pull/47) `getSpan`/`setSpan`/`getSpanContext`/`setSpanContext` moved to `trace` namespace
 
 ## Useful links
 
