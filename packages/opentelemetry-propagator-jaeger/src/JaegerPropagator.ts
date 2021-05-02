@@ -90,11 +90,11 @@ export class JaegerPropagator implements TextMapPropagator {
       : uberTraceIdHeader;
     const baggageValues = getter
       .keys(carrier)
-      .filter(key => key.includes(UBER_BAGGAGE_HEADER_PREFIX))
+      .filter(key => /^uberctx-(.+)/i.test(key))
       .map(key => {
         const value = getter.get(carrier, key);
         return {
-          key: key.replace(`${UBER_BAGGAGE_HEADER_PREFIX}-`, ''),
+          key: key.substring(UBER_BAGGAGE_HEADER_PREFIX.length + 1),
           value: Array.isArray(value) ? value[0] : value,
         };
       });
