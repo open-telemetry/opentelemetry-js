@@ -23,7 +23,6 @@ import {
   ParentBasedSampler,
   TraceIdRatioBasedSampler,
 } from '@opentelemetry/core';
-import { ENVIRONMENT } from '@opentelemetry/core/src/utils/environment';
 
 const env = getEnv();
 const FALLBACK_OTEL_TRACES_SAMPLER = TracesSamplerValues.AlwaysOn;
@@ -48,7 +47,7 @@ export const DEFAULT_CONFIG = {
  * @param env optional, by default uses getEnv(), but allows passing a value to reuse parsed environment
  */
 export function buildSamplerFromEnv(
-  env: Required<ENVIRONMENT> = getEnv()
+  env: ReturnType<typeof getEnv> = getEnv()
 ): Sampler {
   switch (env.OTEL_TRACES_SAMPLER) {
     case TracesSamplerValues.AlwaysOn:
@@ -80,7 +79,7 @@ export function buildSamplerFromEnv(
 const DEFAULT_RATIO = 1;
 
 function getSamplerProbabilityFromEnv(
-  env: Required<ENVIRONMENT>
+  env: ReturnType<typeof getEnv>
 ): number | undefined {
   if (
     env.OTEL_TRACES_SAMPLER_ARG === undefined ||
