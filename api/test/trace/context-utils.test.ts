@@ -16,12 +16,11 @@
 
 import * as assert from 'assert';
 import {
-  createContextKey,
   isInstrumentationSuppressed,
-  ROOT_CONTEXT,
   suppressInstrumentation,
   unsuppressInstrumentation,
-} from '../../src/context/context';
+} from '../../src/trace/context-utils';
+import { createContextKey, ROOT_CONTEXT } from '../../src/context/context';
 
 const SUPPRESS_INSTRUMENTATION_KEY = createContextKey(
   'OpenTelemetry Context Key SUPPRESS_INSTRUMENTATION'

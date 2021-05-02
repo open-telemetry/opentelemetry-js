@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { getSpanContext } from '../context/context';
+import { getSpanContext } from '../trace/context-utils';
 import { Context } from '../context/types';
 import { NonRecordingSpan } from './NonRecordingSpan';
 import { Span } from './span';
