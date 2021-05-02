@@ -38,10 +38,13 @@ import {
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { BasicTracerProvider, Span } from '../src';
+import { BasicTracerProvider, NoopSpanProcessor, Span } from '../src';
 
 describe('BasicTracerProvider', () => {
   let removeEvent: Function | undefined;
+  const envSource = (typeof window !== 'undefined'
+    ? window
+    : process.env) as any;
 
   beforeEach(() => {
     context.disable();
@@ -120,13 +123,30 @@ describe('BasicTracerProvider', () => {
       const tracer = new BasicTracerProvider();
       assert.ok(tracer instanceof BasicTracerProvider);
     });
+
+    it('should use noop span processor by default', () => {
+      const tracer = new BasicTracerProvider();
+      assert.ok(tracer.activeSpanProcessor instanceof NoopSpanProcessor);
+    });
+
+    it('warns if there is no exporter registered with a given name', () => {
+      const warnStub = sinon.spy(diag, 'warn');
+
+      envSource.OTEL_TRACES_EXPORTER = 'missing-exporter';
+      const provider = new BasicTracerProvider({});
+      provider.register();
+
+      assert.ok(
+        warnStub.calledOnceWithExactly(
+          'Exporter "missing-exporter" requested through environment variable is unavailable.'
+        )
+      );
+      warnStub.restore();
+      envSource.OTEL_TRACES_EXPORTER = 'none';
+    });
   });
 
   describe('.register()', () => {
-    const envSource = (typeof window !== 'undefined'
-      ? window
-      : process.env) as any;
-
     describe('propagator', () => {
       class DummyPropagator implements TextMapPropagator {
         inject(
