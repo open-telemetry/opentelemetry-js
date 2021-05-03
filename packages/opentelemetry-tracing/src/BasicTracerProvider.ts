@@ -24,8 +24,8 @@ import {
 } from '@opentelemetry/api';
 import {
   CompositePropagator,
-  HttpTraceContext,
-  HttpBaggage,
+  HttpBaggagePropagator,
+  HttpTraceContextPropagator,
   getEnv,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
@@ -46,8 +46,8 @@ export class BasicTracerProvider implements TracerProvider {
     string,
     PROPAGATOR_FACTORY
   >([
-    ['tracecontext', () => new HttpTraceContext()],
-    ['baggage', () => new HttpBaggage()],
+    ['tracecontext', () => new HttpTraceContextPropagator()],
+    ['baggage', () => new HttpBaggagePropagator()],
   ]);
 
   private readonly _config: TracerConfig;

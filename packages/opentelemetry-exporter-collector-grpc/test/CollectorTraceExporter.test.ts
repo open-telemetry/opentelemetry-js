@@ -125,7 +125,7 @@ const testCollectorExporter = (params: TestParams) =>
         : undefined;
       collectorExporter = new CollectorTraceExporter({
         serviceName: 'basic-service',
-        url: address,
+        url: 'grpcs://' + address,
         credentials,
         metadata: params.metadata,
       });
@@ -143,7 +143,7 @@ const testCollectorExporter = (params: TestParams) =>
 
     describe('instance', () => {
       it('should warn about headers when using grpc', () => {
-        // Need to stub/spy on the underlying logger as the "diag" instance is global
+        // Need to stub/spy on the underlying logger as the 'diag' instance is global
         const spyLoggerWarn = sinon.stub(diag, 'warn');
         collectorExporter = new CollectorTraceExporter({
           serviceName: 'basic-service',
@@ -154,6 +154,18 @@ const testCollectorExporter = (params: TestParams) =>
         });
         const args = spyLoggerWarn.args[0];
         assert.strictEqual(args[0], 'Headers cannot be set when using grpc');
+      });
+      it('should warn about path in url', () => {
+        const spyLoggerWarn = sinon.stub(diag, 'warn');
+        collectorExporter = new CollectorTraceExporter({
+          serviceName: 'basic-service',
+          url: address + '/v1/trace',
+        });
+        const args = spyLoggerWarn.args[0];
+        assert.strictEqual(
+          args[0],
+          'URL path should not be set when using grpc, the path part of the URL will be ignored.'
+        );
       });
     });
 
