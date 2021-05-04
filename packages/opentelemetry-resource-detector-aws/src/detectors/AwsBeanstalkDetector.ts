@@ -20,7 +20,11 @@ import {
   Resource,
   ResourceDetectionConfig,
 } from '@opentelemetry/resources';
-import { ResourceAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  CloudProviderValues,
+  CloudPlatformValues,
+  ResourceAttributes,
+} from '@opentelemetry/semantic-conventions';
 import * as fs from 'fs';
 import * as util from 'util';
 
@@ -65,7 +69,11 @@ export class AwsBeanstalkDetector implements Detector {
       const parsedData = JSON.parse(rawData);
 
       return new Resource({
-        [ResourceAttributes.SERVICE_NAME]: 'elastic_beanstalk',
+        [ResourceAttributes.CLOUD_PROVIDER]: CloudProviderValues.AWS,
+        [ResourceAttributes.CLOUD_PLATFORM]:
+          CloudPlatformValues.AWS_ELASTICBEANSTALK,
+        [ResourceAttributes.SERVICE_NAME]:
+          CloudPlatformValues.AWS_ELASTICBEANSTALK,
         [ResourceAttributes.SERVICE_NAMESPACE]: parsedData.environment_name,
         [ResourceAttributes.SERVICE_VERSION]: parsedData.version_label,
         [ResourceAttributes.SERVICE_INSTANCE_ID]: parsedData.deployment_id,

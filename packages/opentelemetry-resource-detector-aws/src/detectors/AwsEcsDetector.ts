@@ -20,7 +20,11 @@ import {
   Resource,
   ResourceDetectionConfig,
 } from '@opentelemetry/resources';
-import { ResourceAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  CloudProviderValues,
+  CloudPlatformValues,
+  ResourceAttributes,
+} from '@opentelemetry/semantic-conventions';
 import * as util from 'util';
 import * as fs from 'fs';
 import * as os from 'os';
@@ -49,6 +53,8 @@ export class AwsEcsDetector implements Detector {
     return !hostName && !containerId
       ? Resource.empty()
       : new Resource({
+          [ResourceAttributes.CLOUD_PROVIDER]: CloudProviderValues.AWS,
+          [ResourceAttributes.CLOUD_PLATFORM]: CloudPlatformValues.AWS_ECS,
           [ResourceAttributes.CONTAINER_NAME]: hostName || '',
           [ResourceAttributes.CONTAINER_ID]: containerId || '',
         });

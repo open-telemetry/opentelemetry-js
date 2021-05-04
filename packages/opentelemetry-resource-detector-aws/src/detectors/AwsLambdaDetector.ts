@@ -20,8 +20,8 @@ import {
   ResourceDetectionConfig,
 } from '@opentelemetry/resources';
 import {
+  CloudProviderValues,
   ResourceAttributes,
-  FaasInvokedProviderValues,
 } from '@opentelemetry/semantic-conventions';
 
 /**
@@ -40,9 +40,7 @@ export class AwsLambdaDetector implements Detector {
     const region = process.env.AWS_REGION;
 
     const attributes = {
-      [ResourceAttributes.CLOUD_PROVIDER]: String(
-        FaasInvokedProviderValues.AWS
-      ),
+      [ResourceAttributes.CLOUD_PROVIDER]: String(CloudProviderValues.AWS),
     };
     if (region) {
       attributes[ResourceAttributes.CLOUD_REGION] = region;

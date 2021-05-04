@@ -19,7 +19,11 @@ import {
   Resource,
   ResourceDetectionConfig,
 } from '@opentelemetry/resources';
-import { ResourceAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  CloudProviderValues,
+  CloudPlatformValues,
+  ResourceAttributes,
+} from '@opentelemetry/semantic-conventions';
 import * as http from 'http';
 
 /**
@@ -63,7 +67,8 @@ class AwsEc2Detector implements Detector {
     const hostname = await this._fetchHost(token);
 
     return new Resource({
-      [ResourceAttributes.CLOUD_PROVIDER]: 'aws',
+      [ResourceAttributes.CLOUD_PROVIDER]: CloudProviderValues.AWS,
+      [ResourceAttributes.CLOUD_PLATFORM]: CloudPlatformValues.AWS_EC2,
       [ResourceAttributes.CLOUD_ACCOUNT_ID]: accountId,
       [ResourceAttributes.CLOUD_REGION]: region,
       [ResourceAttributes.CLOUD_AVAILABILITY_ZONE]: availabilityZone,

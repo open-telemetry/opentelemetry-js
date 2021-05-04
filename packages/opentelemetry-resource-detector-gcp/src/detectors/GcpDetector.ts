@@ -24,7 +24,10 @@ import {
   ResourceAttributes,
 } from '@opentelemetry/resources';
 import { getEnv } from '@opentelemetry/core';
-import { ResourceAttributes as SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import {
+  CloudProviderValues,
+  ResourceAttributes as SemanticResourceAttributes,
+} from '@opentelemetry/semantic-conventions';
 
 /**
  * The GcpDetector can be used to detect if a process is running in the Google
@@ -60,7 +63,8 @@ class GcpDetector implements Detector {
     attributes[SemanticResourceAttributes.CLOUD_ACCOUNT_ID] = projectId;
     attributes[SemanticResourceAttributes.HOST_ID] = instanceId;
     attributes[SemanticResourceAttributes.CLOUD_AVAILABILITY_ZONE] = zoneId;
-    attributes[SemanticResourceAttributes.CLOUD_PROVIDER] = 'gcp';
+    attributes[SemanticResourceAttributes.CLOUD_PROVIDER] =
+      CloudProviderValues.GCP;
 
     if (getEnv().KUBERNETES_SERVICE_HOST)
       this._addK8sAttributes(attributes, clusterName);
