@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { HrTime, SpanAttributes } from '@opentelemetry/api';
 import { ExportResult } from '@opentelemetry/core';
 
 /**
@@ -187,3 +188,15 @@ export type SendFunction = (
 ) => void;
 
 export type GetHeaders = () => Record<string, string> | undefined;
+
+/**
+ * Represents a timed event.
+ * A timed event is an event with a timestamp.
+ */
+export interface TimedEvent {
+  time: HrTime;
+  /** The name of the event. */
+  name: string;
+  /** The attributes of the event. */
+  attributes?: SpanAttributes;
+}

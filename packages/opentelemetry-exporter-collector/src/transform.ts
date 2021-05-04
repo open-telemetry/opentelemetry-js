@@ -19,7 +19,6 @@ import {
   Link,
   SpanKind,
   SpanStatus,
-  TimedEvent,
   TraceState,
 } from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
@@ -30,6 +29,7 @@ import {
   COLLECTOR_SPAN_KIND_MAPPING,
   opentelemetryProto,
   CollectorExporterConfigBase,
+  TimedEvent,
 } from './types';
 
 const MAX_INTEGER_VALUE = 2147483647;

@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { SpanAttributes, SpanKind, SpanStatusCode } from '@opentelemetry/api';
+import {
+  HrTime,
+  SpanAttributes,
+  SpanKind,
+  SpanStatusCode,
+} from '@opentelemetry/api';
 
 /* eslint-disable @typescript-eslint/no-namespace */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -362,3 +367,15 @@ export const COLLECTOR_SPAN_KIND_MAPPING = {
   [SpanKind.CONSUMER]:
     opentelemetryProto.trace.v1.Span.SpanKind.SPAN_KIND_CONSUMER,
 };
+
+/**
+ * Represents a timed event.
+ * A timed event is an event with a timestamp.
+ */
+export interface TimedEvent {
+  time: HrTime;
+  /** The name of the event. */
+  name: string;
+  /** The attributes of the event. */
+  attributes?: SpanAttributes;
+}

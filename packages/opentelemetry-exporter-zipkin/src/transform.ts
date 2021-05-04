@@ -17,6 +17,7 @@
 import * as api from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { hrTimeToMicroseconds } from '@opentelemetry/core';
+import { TimedEvent } from './types';
 import * as zipkinTypes from './types';
 import { Resource } from '@opentelemetry/resources';
 
@@ -94,7 +95,7 @@ export function _toZipkinTags(
  * Converts OpenTelemetry Events to Zipkin Annotations format.
  */
 export function _toZipkinAnnotations(
-  events: api.TimedEvent[]
+  events: TimedEvent[]
 ): zipkinTypes.Annotation[] {
   return events.map(event => ({
     timestamp: hrTimeToMicroseconds(event.time),
