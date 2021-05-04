@@ -20,8 +20,8 @@ import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
 import { SpanContextShim, SpanShim, TracerShim } from '../src/shim';
 import {
   CompositePropagator,
-  HttpBaggage,
-  HttpTraceContext,
+  HttpBaggagePropagator,
+  HttpTraceContextPropagator,
   timeInputToHrTime,
 } from '@opentelemetry/core';
 import {
@@ -40,7 +40,10 @@ import { JaegerHttpTracePropagator } from '@opentelemetry/propagator-jaeger';
 
 describe('OpenTracing Shim', () => {
   const compositePropagator = new CompositePropagator({
-    propagators: [new HttpTraceContext(), new HttpBaggage()],
+    propagators: [
+      new HttpTraceContextPropagator(),
+      new HttpBaggagePropagator(),
+    ],
   });
 
   propagation.setGlobalPropagator(compositePropagator);
