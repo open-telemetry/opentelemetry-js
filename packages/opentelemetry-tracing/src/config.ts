@@ -26,6 +26,7 @@ import {
 import { ENVIRONMENT } from '@opentelemetry/core/src/utils/environment';
 
 const env = getEnv();
+const FALLBACK_OTEL_TRACES_SAMPLER = TracesSamplerValues.AlwaysOn;
 
 /**
  * Default configuration. For fields with primitive values, any user-provided
@@ -41,8 +42,6 @@ export const DEFAULT_CONFIG = {
     numberOfEventsPerSpan: getEnv().OTEL_SPAN_EVENT_COUNT_LIMIT,
   },
 };
-
-const FALLBACK_OTEL_TRACES_SAMPLER = TracesSamplerValues.AlwaysOn;
 
 /**
  * Based on environment, builds a sampler, complies with specification.
