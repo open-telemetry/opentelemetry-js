@@ -31,6 +31,7 @@ import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as collectorTypes from '../src/types';
 import { opentelemetryProto } from '../src/types';
+import { ResourceAttributes } from '@opentelemetry/semantic-conventions';
 
 const meterProvider = new metrics.MeterProvider({
   interval: 30000,
@@ -526,7 +527,7 @@ export function ensureWebResourceIsCorrect(
   assert.deepStrictEqual(resource, {
     attributes: [
       {
-        key: 'service.name',
+        key: ResourceAttributes.SERVICE_NAME,
         value: {
           stringValue: 'bar',
         },

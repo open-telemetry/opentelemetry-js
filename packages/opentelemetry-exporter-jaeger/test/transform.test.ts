@@ -22,6 +22,7 @@ import * as api from '@opentelemetry/api';
 import { ThriftUtils, Utils, ThriftReferenceType } from '../src/types';
 import { hrTimeToMicroseconds } from '@opentelemetry/core';
 import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
+import { ResourceAttributes } from '@opentelemetry/semantic-conventions';
 
 describe('transform', () => {
   const spanContext = {
@@ -71,7 +72,7 @@ describe('transform', () => {
         ],
         duration: [32, 800000000],
         resource: new Resource({
-          ['service.name']: 'ui',
+          [ResourceAttributes.SERVICE_NAME]: 'ui',
           version: 1,
           cost: 112.12,
         }),
@@ -117,7 +118,7 @@ describe('transform', () => {
       assert.strictEqual(tag4.key, 'otel.status_code');
       assert.strictEqual(tag4.vType, 'STRING');
       assert.strictEqual(tag4.vStr, 'OK');
-      assert.strictEqual(tag5.key, 'service.name');
+      assert.strictEqual(tag5.key, ResourceAttributes.SERVICE_NAME);
       assert.strictEqual(tag5.vType, 'STRING');
       assert.strictEqual(tag5.vStr, 'ui');
       assert.strictEqual(tag6.key, 'version');
@@ -157,7 +158,7 @@ describe('transform', () => {
         events: [],
         duration: [32, 800000000],
         resource: new Resource({
-          ['service.name']: 'ui',
+          [ResourceAttributes.SERVICE_NAME]: 'ui',
         }),
         instrumentationLibrary: {
           name: 'default',

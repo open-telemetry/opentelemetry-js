@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import { SDK_INFO } from '@opentelemetry/core';
-import { Resource } from '../src';
+import { Resource, SERVICE_RESOURCE } from '../src';
 import { assertTelemetrySDKResource } from './util/resource-assertions';
 
 describe('Resource', () => {
@@ -90,10 +90,10 @@ describe('Resource', () => {
   });
 
   describe('.empty()', () => {
-    it('should return an empty resource (except required service.name)', () => {
+    it('should return an empty resource (except required service name)', () => {
       const resource = Resource.empty();
       assert.deepStrictEqual(Object.keys(resource.attributes), [
-        'service.name',
+        SERVICE_RESOURCE.NAME,
       ]);
     });
 

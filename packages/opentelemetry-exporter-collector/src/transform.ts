@@ -25,6 +25,7 @@ import {
 import * as core from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/tracing';
+import { ResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { CollectorExporterBase } from './CollectorExporterBase';
 import {
   COLLECTOR_SPAN_KIND_MAPPING,
@@ -288,7 +289,7 @@ export function toCollectorExportTraceServiceRequest<
     {},
     collectorTraceExporterBase.attributes,
     {
-      'service.name': collectorTraceExporterBase.serviceName,
+      [ResourceAttributes.SERVICE_NAME]: collectorTraceExporterBase.serviceName,
     }
   );
 

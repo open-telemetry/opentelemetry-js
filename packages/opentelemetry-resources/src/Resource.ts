@@ -15,7 +15,7 @@
  */
 
 import { SDK_INFO } from '@opentelemetry/core';
-import { TELEMETRY_SDK_RESOURCE } from './constants';
+import { SERVICE_RESOURCE, TELEMETRY_SDK_RESOURCE } from './constants';
 import { serviceName } from './platform';
 import { ResourceAttributes } from './types';
 
@@ -52,9 +52,9 @@ export class Resource {
      */
     readonly attributes: ResourceAttributes
   ) {
-    // service.name is a required attribute
-    if (!attributes['service.name']) {
-      attributes['service.name'] = serviceName();
+    // service name is a required attribute
+    if (!attributes[SERVICE_RESOURCE.NAME]) {
+      attributes[SERVICE_RESOURCE.NAME] = serviceName();
     }
   }
 

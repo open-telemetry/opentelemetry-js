@@ -26,6 +26,8 @@ import {
   multiInstrumentationLibraryTrace,
 } from '../helper';
 import { Resource } from '@opentelemetry/resources';
+import { ResourceAttributes } from '@opentelemetry/semantic-conventions';
+
 describe('transform', () => {
   describe('toCollectorAttributes', () => {
     it('should convert attribute string', () => {
@@ -114,7 +116,7 @@ describe('transform', () => {
     it('should convert resource', () => {
       const resource = transform.toCollectorResource(
         new Resource({
-          'service.name': 'ui',
+          [ResourceAttributes.SERVICE_NAME]: 'ui',
           version: 1.0,
           success: true,
         })
@@ -122,7 +124,7 @@ describe('transform', () => {
       assert.deepStrictEqual(resource, {
         attributes: [
           {
-            key: 'service.name',
+            key: ResourceAttributes.SERVICE_NAME,
             value: { stringValue: 'ui' },
           },
           {

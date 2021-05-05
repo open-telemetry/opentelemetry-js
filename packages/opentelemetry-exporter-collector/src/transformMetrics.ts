@@ -27,6 +27,7 @@ import { Resource } from '@opentelemetry/resources';
 import { CollectorExporterBase } from './CollectorExporterBase';
 import { toCollectorResource } from './transform';
 import { CollectorExporterConfigBase, opentelemetryProto } from './types';
+import { ResourceAttributes } from '@opentelemetry/semantic-conventions';
 
 /**
  * Converts labels
@@ -179,7 +180,7 @@ export function toCollectorExportMetricServiceRequest<
     {},
     collectorExporterBase.attributes,
     {
-      'service.name': collectorExporterBase.serviceName,
+      [ResourceAttributes.SERVICE_NAME]: collectorExporterBase.serviceName,
     }
   );
   return {

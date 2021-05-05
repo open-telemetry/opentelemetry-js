@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+/** only globals that common to node and browsers are allowed */
+// eslint-disable-next-line node/no-unsupported-features/es-builtins, no-undef
+const _globalThis = typeof globalThis === 'object' ? globalThis : window;
+
 export function serviceName(): string {
-  return window.location.host;
+  return _globalThis.location.host;
 }

@@ -28,6 +28,7 @@ import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as grpc from '@grpc/grpc-js';
+import { ResourceAttributes } from '@opentelemetry/semantic-conventions';
 
 const meterProvider = new metrics.MeterProvider({
   interval: 30000,
@@ -406,7 +407,7 @@ export function ensureResourceIsCorrect(
   assert.deepStrictEqual(resource, {
     attributes: [
       {
-        key: 'service.name',
+        key: ResourceAttributes.SERVICE_NAME,
         value: {
           stringValue: 'basic-service',
           value: 'stringValue',
