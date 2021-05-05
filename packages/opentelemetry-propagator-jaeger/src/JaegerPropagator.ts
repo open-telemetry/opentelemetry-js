@@ -43,7 +43,7 @@ export const UBER_TRACE_ID_HEADER = 'uber-trace-id';
  * One byte bitmap, as two hex digits.
  * Inspired by jaeger-client-node project.
  */
-export class JaegerHttpTracePropagator implements TextMapPropagator {
+export class JaegerPropagator implements TextMapPropagator {
   private readonly _jaegerTraceHeader: string;
 
   /**
