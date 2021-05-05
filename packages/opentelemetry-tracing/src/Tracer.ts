@@ -16,8 +16,8 @@
 
 import * as api from '@opentelemetry/api';
 import {
-  InstrumentationLibrary,
   IdGenerator,
+  InstrumentationLibrary,
   RandomIdGenerator,
   sanitizeAttributes,
 } from '@opentelemetry/core';
@@ -87,7 +87,9 @@ export class Tracer implements api.Tracer {
     const attributes = sanitizeAttributes(options.attributes);
     // make sampling decision
     const samplingResult = this._sampler.shouldSample(
-      context,
+      options.root
+        ? api.setSpanContext(context, api.INVALID_SPAN_CONTEXT)
+        : context,
       traceId,
       name,
       spanKind,
