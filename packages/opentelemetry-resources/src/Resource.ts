@@ -37,9 +37,12 @@ export class Resource {
    */
   static createTelemetrySDKResource(): Resource {
     return new Resource({
-      [SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]: SDK_INFO.LANGUAGE,
-      [SemanticResourceAttributes.TELEMETRY_SDK_NAME]: SDK_INFO.NAME,
-      [SemanticResourceAttributes.TELEMETRY_SDK_VERSION]: SDK_INFO.VERSION,
+      [SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]:
+        SDK_INFO[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE],
+      [SemanticResourceAttributes.TELEMETRY_SDK_NAME]:
+        SDK_INFO[SemanticResourceAttributes.TELEMETRY_SDK_NAME],
+      [SemanticResourceAttributes.TELEMETRY_SDK_VERSION]:
+        SDK_INFO[SemanticResourceAttributes.TELEMETRY_SDK_VERSION],
     });
   }
 

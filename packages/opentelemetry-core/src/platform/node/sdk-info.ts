@@ -24,6 +24,7 @@ import {
 export const SDK_INFO = {
   [ResourceAttributes.TELEMETRY_SDK_NAME]: 'opentelemetry',
   [ResourceAttributes.PROCESS_RUNTIME_NAME]: 'node',
-  [ResourceAttributes.TELEMETRY_SDK_LANGUAGE]: TelemetrySdkLanguageValues.WEBJS,
+  [ResourceAttributes.TELEMETRY_SDK_LANGUAGE]:
+    TelemetrySdkLanguageValues.NODEJS,
   [ResourceAttributes.TELEMETRY_SDK_VERSION]: VERSION,
 };
