@@ -36,7 +36,7 @@ import {
 } from '@opentelemetry/api';
 import { performance } from 'perf_hooks';
 import { B3Propagator } from '@opentelemetry/propagator-b3';
-import { JaegerHttpTracePropagator } from '@opentelemetry/propagator-jaeger';
+import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
 
 describe('OpenTracing Shim', () => {
   const compositePropagator = new CompositePropagator({
@@ -129,13 +129,13 @@ describe('OpenTracing Shim', () => {
     });
 
     describe('propagation using configured propagators', () => {
-      const jaegerHttpTracePropagator = new JaegerHttpTracePropagator();
+      const jaegerPropagator = new JaegerPropagator();
       const b3Propagator = new B3Propagator();
       before(() => {
         const provider = new BasicTracerProvider();
         shimTracer = new TracerShim(provider.getTracer('default'), {
           textMapPropagator: b3Propagator,
-          httpHeadersPropagator: jaegerHttpTracePropagator,
+          httpHeadersPropagator: jaegerPropagator,
         });
         opentracing.initGlobalTracer(shimTracer);
       });
@@ -149,11 +149,7 @@ describe('OpenTracing Shim', () => {
         const carrier: { [key: string]: unknown } = {};
         shimTracer.inject(context, opentracing.FORMAT_HTTP_HEADERS, carrier);
         const extractedContext = getSpanContext(
-          jaegerHttpTracePropagator.extract(
-            ROOT_CONTEXT,
-            carrier,
-            defaultTextMapGetter
-          )
+          jaegerPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
         );
         assert.ok(extractedContext !== null);
         assert.strictEqual(extractedContext?.traceId, context.toTraceId());
@@ -162,7 +158,7 @@ describe('OpenTracing Shim', () => {
 
       it('extracts HTTP carriers', () => {
         const carrier: { [key: string]: unknown } = {};
-        jaegerHttpTracePropagator.inject(
+        jaegerPropagator.inject(
           setSpanContext(
             ROOT_CONTEXT,
             (context as SpanContextShim).getSpanContext()

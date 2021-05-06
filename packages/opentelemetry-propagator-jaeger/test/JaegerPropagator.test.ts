@@ -27,16 +27,14 @@ import {
 } from '@opentelemetry/api';
 import * as assert from 'assert';
 import {
-  JaegerHttpTracePropagator,
+  JaegerPropagator,
   UBER_TRACE_ID_HEADER,
-} from '../src/JaegerHttpTracePropagator';
+} from '../src/JaegerPropagator';
 
-describe('JaegerHttpTracePropagator', () => {
-  const jaegerHttpTracePropagator = new JaegerHttpTracePropagator();
+describe('JaegerPropagator', () => {
+  const jaegerPropagator = new JaegerPropagator();
   const customHeader = 'new-header';
-  const customJaegerHttpTracePropagator = new JaegerHttpTracePropagator(
-    customHeader
-  );
+  const customJaegerPropagator = new JaegerPropagator(customHeader);
   let carrier: { [key: string]: unknown };
 
   beforeEach(() => {
@@ -51,7 +49,7 @@ describe('JaegerHttpTracePropagator', () => {
         traceFlags: TraceFlags.SAMPLED,
       };
 
-      jaegerHttpTracePropagator.inject(
+      jaegerPropagator.inject(
         setSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
         defaultTextMapSetter
@@ -69,7 +67,7 @@ describe('JaegerHttpTracePropagator', () => {
         traceFlags: TraceFlags.SAMPLED,
       };
 
-      customJaegerHttpTracePropagator.inject(
+      customJaegerPropagator.inject(
         setSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
         defaultTextMapSetter
@@ -87,7 +85,7 @@ describe('JaegerHttpTracePropagator', () => {
         traceFlags: TraceFlags.SAMPLED,
       };
 
-      jaegerHttpTracePropagator.inject(
+      jaegerPropagator.inject(
         suppressInstrumentation(setSpanContext(ROOT_CONTEXT, spanContext)),
         carrier,
         defaultTextMapSetter
@@ -101,11 +99,7 @@ describe('JaegerHttpTracePropagator', () => {
       carrier[UBER_TRACE_ID_HEADER] =
         'd4cda95b652f4a1592b449d5929fda1b:6e0c63257de34c92:0:01';
       const extractedSpanContext = getSpanContext(
-        jaegerHttpTracePropagator.extract(
-          ROOT_CONTEXT,
-          carrier,
-          defaultTextMapGetter
-        )
+        jaegerPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       );
 
       assert.deepStrictEqual(extractedSpanContext, {
@@ -120,11 +114,7 @@ describe('JaegerHttpTracePropagator', () => {
       carrier[UBER_TRACE_ID_HEADER] =
         '9c41e35aeb6d1272:45fd2a9709dadcf1:a13699e3fb724f40:1';
       const extractedSpanContext = getSpanContext(
-        jaegerHttpTracePropagator.extract(
-          ROOT_CONTEXT,
-          carrier,
-          defaultTextMapGetter
-        )
+        jaegerPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       );
 
       assert.deepStrictEqual(extractedSpanContext, {
@@ -139,11 +129,7 @@ describe('JaegerHttpTracePropagator', () => {
       carrier[UBER_TRACE_ID_HEADER] =
         'ac1f3dc3c2c0b06e%3A5ac292c4a11a163e%3Ac086aaa825821068%3A1';
       const extractedSpanContext = getSpanContext(
-        jaegerHttpTracePropagator.extract(
-          ROOT_CONTEXT,
-          carrier,
-          defaultTextMapGetter
-        )
+        jaegerPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       );
 
       assert.deepStrictEqual(extractedSpanContext, {
@@ -158,7 +144,7 @@ describe('JaegerHttpTracePropagator', () => {
       carrier[customHeader] =
         'd4cda95b652f4a1592b449d5929fda1b:6e0c63257de34c92:0:01';
       const extractedSpanContext = getSpanContext(
-        customJaegerHttpTracePropagator.extract(
+        customJaegerPropagator.extract(
           ROOT_CONTEXT,
           carrier,
           defaultTextMapGetter
@@ -176,11 +162,7 @@ describe('JaegerHttpTracePropagator', () => {
     it('returns undefined if UBER_TRACE_ID_HEADER header is missing', () => {
       assert.deepStrictEqual(
         getSpanContext(
-          jaegerHttpTracePropagator.extract(
-            ROOT_CONTEXT,
-            carrier,
-            defaultTextMapGetter
-          )
+          jaegerPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
         ),
         undefined
       );
@@ -190,11 +172,7 @@ describe('JaegerHttpTracePropagator', () => {
       carrier[UBER_TRACE_ID_HEADER] = 'invalid!';
       assert.deepStrictEqual(
         getSpanContext(
-          jaegerHttpTracePropagator.extract(
-            ROOT_CONTEXT,
-            carrier,
-            defaultTextMapGetter
-          )
+          jaegerPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
         ),
         undefined
       );
@@ -203,29 +181,25 @@ describe('JaegerHttpTracePropagator', () => {
 
   describe('.fields()', () => {
     it('returns the default header if not customized', () => {
-      assert.deepStrictEqual(jaegerHttpTracePropagator.fields(), [
-        'uber-trace-id',
-      ]);
+      assert.deepStrictEqual(jaegerPropagator.fields(), ['uber-trace-id']);
     });
     it('returns the customized header if customized', () => {
-      assert.deepStrictEqual(customJaegerHttpTracePropagator.fields(), [
-        customHeader,
-      ]);
+      assert.deepStrictEqual(customJaegerPropagator.fields(), [customHeader]);
     });
   });
 
   it('should fail gracefully on bad responses from getter', () => {
-    const ctx1 = jaegerHttpTracePropagator.extract(
+    const ctx1 = jaegerPropagator.extract(
       ROOT_CONTEXT,
       carrier,
       makeGetter(1) // not a number
     );
-    const ctx2 = jaegerHttpTracePropagator.extract(
+    const ctx2 = jaegerPropagator.extract(
       ROOT_CONTEXT,
       carrier,
       makeGetter([]) // empty array
     );
-    const ctx3 = jaegerHttpTracePropagator.extract(
+    const ctx3 = jaegerPropagator.extract(
       ROOT_CONTEXT,
       carrier,
       makeGetter(undefined) // missing value
