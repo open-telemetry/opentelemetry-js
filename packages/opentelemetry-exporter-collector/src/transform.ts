@@ -23,13 +23,12 @@ import {
 } from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { ReadableSpan } from '@opentelemetry/tracing';
+import { ReadableSpan, TimedEvent } from '@opentelemetry/tracing';
 import { CollectorExporterBase } from './CollectorExporterBase';
 import {
   COLLECTOR_SPAN_KIND_MAPPING,
   opentelemetryProto,
   CollectorExporterConfigBase,
-  TimedEvent,
 } from './types';
 
 const MAX_INTEGER_VALUE = 2147483647;
