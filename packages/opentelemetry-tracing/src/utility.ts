@@ -35,7 +35,7 @@ export function mergeConfig(userConfig: TracerConfig) {
 
   target.spanLimits = Object.assign(
     {},
-    DEFAULT_CONFIG.traceParams,
+    DEFAULT_CONFIG.spanLimits,
     userConfig.spanLimits || {}
   );
 
