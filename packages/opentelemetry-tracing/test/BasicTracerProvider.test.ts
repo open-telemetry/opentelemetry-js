@@ -39,6 +39,7 @@ import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { BasicTracerProvider, Span } from '../src';
+import { NoopSpanProcessor } from '../src/NoopSpanProcessor';
 
 describe('BasicTracerProvider', () => {
   let removeEvent: Function | undefined;
@@ -389,6 +390,30 @@ describe('BasicTracerProvider', () => {
         assert.deepStrictEqual(getSpan(context.active()), undefined);
         return done();
       });
+    });
+  });
+
+  describe('.forceFlush()', () => {
+    it('should call forceFlush on all registered span processors', done => {
+      const tracerProvider = new BasicTracerProvider();
+      const spanProcessorOne = new NoopSpanProcessor();
+      const spyOne = sinon.spy(spanProcessorOne, 'forceFlush');
+      const spanProcessorTwo = new NoopSpanProcessor();
+      const spyTwo = sinon.spy(spanProcessorTwo, 'forceFlush');
+
+      tracerProvider.addSpanProcessor(spanProcessorOne);
+      tracerProvider.addSpanProcessor(spanProcessorTwo);
+
+      tracerProvider
+        .forceFlush()
+        .then(() => {
+          assert(spyOne.calledOnce);
+          assert(spyTwo.calledOnce);
+          done();
+        })
+        .catch(error => {
+          done(error);
+        });
     });
   });
 
