@@ -28,7 +28,7 @@ import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { ReadableSpan } from './export/ReadableSpan';
 import { Tracer } from './Tracer';
 import { SpanProcessor } from './SpanProcessor';
-import { TraceParams } from './types';
+import { SpanLimits } from './types';
 import { SpanAttributeValue, Context } from '@opentelemetry/api';
 import { ExceptionEventName } from './enums';
 
@@ -55,7 +55,7 @@ export class Span implements api.Span, ReadableSpan {
   private _ended = false;
   private _duration: api.HrTime = [-1, -1];
   private readonly _spanProcessor: SpanProcessor;
-  private readonly _traceParams: TraceParams;
+  private readonly _traceParams: SpanLimits;
 
   /** Constructs a new Span instance. */
   constructor(
@@ -76,7 +76,7 @@ export class Span implements api.Span, ReadableSpan {
     this.startTime = timeInputToHrTime(startTime);
     this.resource = parentTracer.resource;
     this.instrumentationLibrary = parentTracer.instrumentationLibrary;
-    this._traceParams = parentTracer.getActiveTraceParams();
+    this._traceParams = parentTracer.getSpanLimits();
     this._spanProcessor = parentTracer.getActiveSpanProcessor();
     this._spanProcessor.onStart(this, context);
   }
@@ -128,7 +128,7 @@ export class Span implements api.Span, ReadableSpan {
     startTime?: api.TimeInput
   ): this {
     if (this._isSpanEnded()) return this;
-    if (this.events.length >= this._traceParams.numberOfEventsPerSpan!) {
+    if (this.events.length >= this._traceParams.eventCountLimit!) {
       api.diag.warn('Dropping extra events.');
       this.events.shift();
     }

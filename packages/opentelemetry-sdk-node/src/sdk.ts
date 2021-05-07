@@ -68,7 +68,7 @@ export class NodeSDK {
         tracerProviderConfig.sampler = configuration.sampler;
       }
       if (configuration.traceParams) {
-        tracerProviderConfig.traceParams = configuration.traceParams;
+        tracerProviderConfig.spanLimits = configuration.traceParams;
       }
 
       const spanProcessor =

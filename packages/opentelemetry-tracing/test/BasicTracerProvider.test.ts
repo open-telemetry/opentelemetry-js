@@ -70,49 +70,49 @@ describe('BasicTracerProvider', () => {
 
     it('should construct an instance with default trace params', () => {
       const tracer = new BasicTracerProvider({}).getTracer('default');
-      assert.deepStrictEqual(tracer.getActiveTraceParams(), {
-        numberOfAttributesPerSpan: 128,
-        numberOfEventsPerSpan: 128,
-        numberOfLinksPerSpan: 128,
+      assert.deepStrictEqual(tracer.getSpanLimits(), {
+        attributeCountLimit: 128,
+        eventCountLimit: 128,
+        linkCountLimit: 128,
       });
     });
 
-    it('should construct an instance with customized numberOfAttributesPerSpan trace params', () => {
+    it('should construct an instance with customized attributeCountLimit trace params', () => {
       const tracer = new BasicTracerProvider({
-        traceParams: {
-          numberOfAttributesPerSpan: 100,
+        spanLimits: {
+          attributeCountLimit: 100,
         },
       }).getTracer('default');
-      assert.deepStrictEqual(tracer.getActiveTraceParams(), {
-        numberOfAttributesPerSpan: 100,
-        numberOfEventsPerSpan: 128,
-        numberOfLinksPerSpan: 128,
+      assert.deepStrictEqual(tracer.getSpanLimits(), {
+        attributeCountLimit: 100,
+        eventCountLimit: 128,
+        linksCountLimit: 128,
       });
     });
 
-    it('should construct an instance with customized numberOfEventsPerSpan trace params', () => {
+    it('should construct an instance with customized eventCountLimit trace params', () => {
       const tracer = new BasicTracerProvider({
-        traceParams: {
-          numberOfEventsPerSpan: 300,
+        spanLimits: {
+          eventCountLimit: 300,
         },
       }).getTracer('default');
-      assert.deepStrictEqual(tracer.getActiveTraceParams(), {
-        numberOfAttributesPerSpan: 128,
-        numberOfEventsPerSpan: 300,
-        numberOfLinksPerSpan: 128,
+      assert.deepStrictEqual(tracer.getSpanLimits(), {
+        attributeCountLimit: 128,
+        eventCountLimit: 300,
+        linkCountLimit: 128,
       });
     });
 
-    it('should construct an instance with customized numberOfLinksPerSpan trace params', () => {
+    it('should construct an instance with customized linkCountLimit trace params', () => {
       const tracer = new BasicTracerProvider({
-        traceParams: {
-          numberOfLinksPerSpan: 10,
+        spanLimits: {
+          linkCountLimit: 10,
         },
       }).getTracer('default');
-      assert.deepStrictEqual(tracer.getActiveTraceParams(), {
-        numberOfAttributesPerSpan: 128,
-        numberOfEventsPerSpan: 128,
-        numberOfLinksPerSpan: 10,
+      assert.deepStrictEqual(tracer.getSpanLimits(), {
+        attributeCountLimit: 128,
+        eventCountLimit: 128,
+        linkCountLimit: 10,
       });
     });
 
