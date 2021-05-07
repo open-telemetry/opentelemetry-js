@@ -68,7 +68,7 @@ describe('BasicTracerProvider', () => {
       assert.ok(provider instanceof BasicTracerProvider);
     });
 
-    it('should construct an instance with default trace params', () => {
+    it('should construct an instance with default span limits', () => {
       const tracer = new BasicTracerProvider({}).getTracer('default');
       assert.deepStrictEqual(tracer.getSpanLimits(), {
         attributeCountLimit: 128,
@@ -77,7 +77,7 @@ describe('BasicTracerProvider', () => {
       });
     });
 
-    it('should construct an instance with customized attributeCountLimit trace params', () => {
+    it('should construct an instance with customized attributeCountLimit span limits', () => {
       const tracer = new BasicTracerProvider({
         spanLimits: {
           attributeCountLimit: 100,
@@ -86,11 +86,11 @@ describe('BasicTracerProvider', () => {
       assert.deepStrictEqual(tracer.getSpanLimits(), {
         attributeCountLimit: 100,
         eventCountLimit: 128,
-        linksCountLimit: 128,
+        linkCountLimit: 128,
       });
     });
 
-    it('should construct an instance with customized eventCountLimit trace params', () => {
+    it('should construct an instance with customized eventCountLimit span limits', () => {
       const tracer = new BasicTracerProvider({
         spanLimits: {
           eventCountLimit: 300,
@@ -103,7 +103,7 @@ describe('BasicTracerProvider', () => {
       });
     });
 
-    it('should construct an instance with customized linkCountLimit trace params', () => {
+    it('should construct an instance with customized linkCountLimit span limits', () => {
       const tracer = new BasicTracerProvider({
         spanLimits: {
           linkCountLimit: 10,
