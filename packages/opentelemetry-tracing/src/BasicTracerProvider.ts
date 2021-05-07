@@ -112,6 +112,22 @@ export class BasicTracerProvider implements TracerProvider {
     }
   }
 
+  forceFlush(): Promise<void> {
+    const promises = this._registeredSpanProcessors.map(
+      (spanProcessor: SpanProcessor) => {
+        return spanProcessor.forceFlush();
+      }
+    );
+
+    return Promise.all(promises)
+      .then(() => {
+        return void 0;
+      })
+      .catch(error => {
+        throw error;
+      });
+  }
+
   shutdown() {
     return this.activeSpanProcessor.shutdown();
   }
