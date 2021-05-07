@@ -24,8 +24,8 @@ import {
   statusCodeTagName,
   statusDescriptionTagName,
 } from './transform';
-import { SERVICE_RESOURCE } from '@opentelemetry/resources';
 import { prepareGetHeaders } from './utils';
+import { ResourceAttributes } from '../../opentelemetry-tracing/node_modules/@opentelemetry/semantic-conventions/src';
 
 /**
  * Zipkin Exporter
@@ -64,12 +64,12 @@ export class ZipkinExporter implements SpanExporter {
     spans: ReadableSpan[],
     resultCallback: (result: ExportResult) => void
   ) {
-    if (typeof this._serviceName !== 'string') {
-      this._serviceName = String(
-        spans[0].resource.attributes[SERVICE_RESOURCE.NAME] ||
-          this.DEFAULT_SERVICE_NAME
-      );
-    }
+    const serviceName = String(
+      this._serviceName ||
+        spans[0].resource.attributes[ResourceAttributes.SERVICE_NAME] ||
+        this.DEFAULT_SERVICE_NAME
+    );
+
     diag.debug('Zipkin exporter export');
     if (this._isShutdown) {
       setTimeout(() =>
@@ -81,7 +81,7 @@ export class ZipkinExporter implements SpanExporter {
       return;
     }
     const promise = new Promise<void>(resolve => {
-      this._sendSpans(spans, this._serviceName!, result => {
+      this._sendSpans(spans, serviceName, result => {
         resolve();
         resultCallback(result);
         const index = this._sendingPromises.indexOf(promise);
@@ -127,11 +127,7 @@ export class ZipkinExporter implements SpanExporter {
     const zipkinSpans = spans.map(span =>
       toZipkinSpan(
         span,
-        String(
-          span.attributes[SERVICE_RESOURCE.NAME] ||
-            span.resource.attributes[SERVICE_RESOURCE.NAME] ||
-            serviceName
-        ),
+        serviceName,
         this._statusCodeTagName,
         this._statusDescriptionTagName
       )
