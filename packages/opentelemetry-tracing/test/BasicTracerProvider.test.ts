@@ -415,6 +415,31 @@ describe('BasicTracerProvider', () => {
           done(error);
         });
     });
+
+    it('should throw error when calling forceFlush on all registered span processors fails', done => {
+      const forceFlushStub = sinon.stub(
+        NoopSpanProcessor.prototype,
+        'forceFlush'
+      );
+      forceFlushStub.returns(Promise.reject('Error'));
+
+      const tracerProvider = new BasicTracerProvider();
+      const spanProcessorOne = new NoopSpanProcessor();
+      const spanProcessorTwo = new NoopSpanProcessor();
+      tracerProvider.addSpanProcessor(spanProcessorOne);
+      tracerProvider.addSpanProcessor(spanProcessorTwo);
+
+      tracerProvider
+        .forceFlush()
+        .then(() => {
+          done(new Error('Successful forceFlush not expected'));
+        })
+        .catch(_error => {
+          forceFlushStub.restore();
+          sinon.assert.calledTwice(forceFlushStub);
+          done();
+        });
+    });
   });
 
   describe('.bind()', () => {
