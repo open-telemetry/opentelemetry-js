@@ -31,6 +31,7 @@ import {
 
 export const UBER_TRACE_ID_HEADER = 'uber-trace-id';
 export const UBER_BAGGAGE_HEADER_PREFIX = 'uberctx';
+const UBER_BAGGAGE_HEADER_REGEX = /^uberctx-(.+)/i;
 
 /**
  * Propagates {@link SpanContext} through Trace Context format propagation.
@@ -90,7 +91,7 @@ export class JaegerPropagator implements TextMapPropagator {
       : uberTraceIdHeader;
     const baggageValues = getter
       .keys(carrier)
-      .filter(key => /^uberctx-(.+)/i.test(key))
+      .filter(key => UBER_BAGGAGE_HEADER_REGEX.test(key))
       .map(key => {
         const value = getter.get(carrier, key);
         return {
