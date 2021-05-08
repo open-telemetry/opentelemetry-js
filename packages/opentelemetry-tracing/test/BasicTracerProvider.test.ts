@@ -38,7 +38,14 @@ import {
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { BasicTracerProvider, NoopSpanProcessor, Span } from '../src';
+import {
+  BasicTracerProvider,
+  NoopSpanProcessor,
+  Span,
+  InMemorySpanExporter,
+  SpanExporter,
+  BatchSpanProcessor,
+} from '../src';
 
 describe('BasicTracerProvider', () => {
   let removeEvent: Function | undefined;
@@ -128,22 +135,6 @@ describe('BasicTracerProvider', () => {
       const tracer = new BasicTracerProvider();
       assert.ok(tracer.activeSpanProcessor instanceof NoopSpanProcessor);
     });
-
-    it('warns if there is no exporter registered with a given name', () => {
-      const warnStub = sinon.spy(diag, 'warn');
-
-      envSource.OTEL_TRACES_EXPORTER = 'missing-exporter';
-      const provider = new BasicTracerProvider({});
-      provider.register();
-
-      assert.ok(
-        warnStub.calledOnceWithExactly(
-          'Exporter "missing-exporter" requested through environment variable is unavailable.'
-        )
-      );
-      warnStub.restore();
-      envSource.OTEL_TRACES_EXPORTER = 'none';
-    });
   });
 
   describe('.register()', () => {
@@ -231,6 +222,46 @@ describe('BasicTracerProvider', () => {
         );
 
         warnStub.restore();
+      });
+    });
+
+    describe('exporter', () => {
+      class CustomTracerProvider extends BasicTracerProvider {
+        protected _getSpanExporter(name: string): SpanExporter | undefined {
+          return name === 'memory'
+            ? new InMemorySpanExporter()
+            : BasicTracerProvider._registeredExporters.get(name)?.();
+        }
+      }
+
+      afterEach(() => {
+        delete envSource.OTEL_TRACES_EXPORTER;
+      });
+
+      it('warns if there is no exporter registered with a given name', () => {
+        const warnStub = sinon.spy(diag, 'warn');
+
+        envSource.OTEL_TRACES_EXPORTER = 'missing-exporter';
+        const provider = new BasicTracerProvider({});
+        provider.register();
+
+        assert.ok(
+          warnStub.calledOnceWithExactly(
+            'Exporter "missing-exporter" requested through environment variable is unavailable.'
+          )
+        );
+        warnStub.restore();
+      });
+
+      it('register register correct trace exporter', () => {
+        envSource.OTEL_TRACES_EXPORTER = 'memory';
+        const provider = new CustomTracerProvider({});
+        provider.register();
+        const processor = provider.getActiveSpanProcessor();
+        assert(processor instanceof BatchSpanProcessor);
+        // @ts-expect-error access configured to verify its the correct one
+        const exporter = processor._exporter;
+        assert(exporter instanceof InMemorySpanExporter);
       });
     });
   });
