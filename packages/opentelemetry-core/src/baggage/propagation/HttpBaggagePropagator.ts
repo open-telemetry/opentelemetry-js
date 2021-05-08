@@ -27,10 +27,10 @@ import {
 } from '@opentelemetry/api';
 import { getKeyPairs, serializeKeyPairs, parsePairKeyValue } from '../utils';
 import {
-  MAX_NAME_VALUE_PAIRS,
-  ITEMS_SEPARATOR,
+  BAGGAGE_MAX_NAME_VALUE_PAIRS,
+  BAGGAGE_ITEMS_SEPARATOR,
   BAGGAGE_HEADER,
-  MAX_PER_NAME_VALUE_PAIRS,
+  BAGGAGE_MAX_PER_NAME_VALUE_PAIRS,
 } from '../constants';
 
 /**
@@ -45,9 +45,9 @@ export class HttpBaggagePropagator implements TextMapPropagator {
     if (!baggage || isInstrumentationSuppressed(context)) return;
     const keyPairs = getKeyPairs(baggage)
       .filter((pair: string) => {
-        return pair.length <= MAX_PER_NAME_VALUE_PAIRS;
+        return pair.length <= BAGGAGE_MAX_PER_NAME_VALUE_PAIRS;
       })
-      .slice(0, MAX_NAME_VALUE_PAIRS);
+      .slice(0, BAGGAGE_MAX_NAME_VALUE_PAIRS);
     const headerValue = serializeKeyPairs(keyPairs);
     if (headerValue.length > 0) {
       setter.set(carrier, BAGGAGE_HEADER, headerValue);
@@ -61,7 +61,7 @@ export class HttpBaggagePropagator implements TextMapPropagator {
     if (headerValue.length === 0) {
       return context;
     }
-    const pairs = headerValue.split(ITEMS_SEPARATOR);
+    const pairs = headerValue.split(BAGGAGE_ITEMS_SEPARATOR);
     pairs.forEach(entry => {
       const keyPair = parsePairKeyValue(entry);
       if (keyPair) {

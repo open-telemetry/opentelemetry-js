@@ -15,16 +15,18 @@
  */
 import { Baggage, baggageEntryMetadataFromString } from '@opentelemetry/api';
 import {
-  ITEMS_SEPARATOR,
-  PROPERTIES_SEPARATOR,
-  KEY_PAIR_SEPARATOR,
-  MAX_TOTAL_LENGTH,
+  BAGGAGE_ITEMS_SEPARATOR,
+  BAGGAGE_PROPERTIES_SEPARATOR,
+  BAGGAGE_KEY_PAIR_SEPARATOR,
+  BAGGAGE_MAX_TOTAL_LENGTH,
 } from './constants';
 
 export const serializeKeyPairs = (keyPairs: string[]) => {
   return keyPairs.reduce((hValue: string, current: string) => {
-    const value = `${hValue}${hValue !== '' ? ITEMS_SEPARATOR : ''}${current}`;
-    return value.length > MAX_TOTAL_LENGTH ? hValue : value;
+    const value = `${hValue}${
+      hValue !== '' ? BAGGAGE_ITEMS_SEPARATOR : ''
+    }${current}`;
+    return value.length > BAGGAGE_MAX_TOTAL_LENGTH ? hValue : value;
   }, '');
 };
 
@@ -38,18 +40,18 @@ export const getKeyPairs = (baggage: Baggage): string[] => {
 };
 
 export const parsePairKeyValue = (entry: string) => {
-  const valueProps = entry.split(PROPERTIES_SEPARATOR);
+  const valueProps = entry.split(BAGGAGE_PROPERTIES_SEPARATOR);
   if (valueProps.length <= 0) return;
   const keyPairPart = valueProps.shift();
   if (!keyPairPart) return;
-  const keyPair = keyPairPart.split(KEY_PAIR_SEPARATOR);
+  const keyPair = keyPairPart.split(BAGGAGE_KEY_PAIR_SEPARATOR);
   if (keyPair.length !== 2) return;
   const key = decodeURIComponent(keyPair[0].trim());
   const value = decodeURIComponent(keyPair[1].trim());
   let metadata;
   if (valueProps.length > 0) {
     metadata = baggageEntryMetadataFromString(
-      valueProps.join(PROPERTIES_SEPARATOR)
+      valueProps.join(BAGGAGE_PROPERTIES_SEPARATOR)
     );
   }
   return { key, value, metadata };
@@ -62,7 +64,7 @@ export const parsePairKeyValue = (entry: string) => {
 export const parseKeyPairsIntoRecord = (value?: string) => {
   if (typeof value !== 'string' || value.length === 0) return {};
   return value
-    .split(ITEMS_SEPARATOR)
+    .split(BAGGAGE_ITEMS_SEPARATOR)
     .map(entry => {
       return parsePairKeyValue(entry);
     })
