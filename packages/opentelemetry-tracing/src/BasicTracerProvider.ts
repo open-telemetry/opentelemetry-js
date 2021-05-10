@@ -113,19 +113,51 @@ export class BasicTracerProvider implements TracerProvider {
   }
 
   forceFlush(): Promise<void> {
+    const timeout = 30000;
     const promises = this._registeredSpanProcessors.map(
       (spanProcessor: SpanProcessor) => {
-        return spanProcessor.forceFlush();
+        return new Promise(resolve => {
+          let state: 'resolved' | 'timeout' | 'error' | 'unresolved' =
+            'unresolved';
+          const timeoutInterval = setTimeout(() => {
+            resolve(
+              new Error(
+                `Span processor did not completed within timeout period of ${timeout} ms`
+              )
+            );
+            state = 'timeout';
+          }, timeout);
+
+          spanProcessor
+            .forceFlush()
+            .then(() => {
+              clearTimeout(timeoutInterval);
+              if (state !== 'timeout') {
+                state = 'resolved';
+                resolve(state);
+              }
+            })
+            .catch(error => {
+              clearTimeout(timeoutInterval);
+              state = 'error';
+              resolve(error);
+            });
+        });
       }
     );
 
-    return Promise.all(promises)
-      .then(() => {
-        return void 0;
-      })
-      .catch(error => {
-        throw error;
-      });
+    return new Promise<void>((resolve, reject) => {
+      Promise.all(promises)
+        .then(results => {
+          const errors = results.filter(result => result !== 'resolved');
+          if (errors.length > 0) {
+            reject(errors);
+          } else {
+            resolve();
+          }
+        })
+        .catch(error => reject([error]));
+    });
   }
 
   shutdown() {
