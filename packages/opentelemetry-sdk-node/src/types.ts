@@ -38,5 +38,5 @@ export interface NodeSDKConfiguration {
   sampler: Sampler;
   spanProcessor: SpanProcessor;
   traceExporter: SpanExporter;
-  traceParams: SpanLimits;
+  spanLimits: SpanLimits;
 }
