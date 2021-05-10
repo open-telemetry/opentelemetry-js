@@ -194,7 +194,7 @@ export class BasicTracerProvider implements TracerProvider {
     if (exporterName === 'none') return;
     const exporter = this._getSpanExporter(exporterName);
     if (!exporter) {
-      diag.warn(
+      diag.error(
         `Exporter "${exporterName}" requested through environment variable is unavailable.`
       );
     }
