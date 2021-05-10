@@ -253,7 +253,7 @@ describe('BasicTracerProvider', () => {
         warnStub.restore();
       });
 
-      it('register register correct trace exporter', () => {
+      it('registers trace exporter from environment variable', () => {
         envSource.OTEL_TRACES_EXPORTER = 'memory';
         const provider = new CustomTracerProvider({});
         provider.register();
