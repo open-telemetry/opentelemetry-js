@@ -113,7 +113,7 @@ export class BasicTracerProvider implements TracerProvider {
   }
 
   forceFlush(): Promise<void> {
-    const timeout = 30000;
+    const timeout = this._config.forceFlushTimeoutMillis;
     const promises = this._registeredSpanProcessors.map(
       (spanProcessor: SpanProcessor) => {
         return new Promise(resolve => {

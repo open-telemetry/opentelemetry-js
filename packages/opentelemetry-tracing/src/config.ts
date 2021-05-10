@@ -36,6 +36,7 @@ const FALLBACK_OTEL_TRACES_SAMPLER = TracesSamplerValues.AlwaysOn;
  */
 export const DEFAULT_CONFIG = {
   sampler: buildSamplerFromEnv(env),
+  forceFlushTimeoutMillis: 30000,
   traceParams: {
     numberOfAttributesPerSpan: getEnv().OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT,
     numberOfLinksPerSpan: getEnv().OTEL_SPAN_LINK_COUNT_LIMIT,
