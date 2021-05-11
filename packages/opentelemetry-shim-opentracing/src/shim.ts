@@ -300,7 +300,7 @@ export class SpanShim extends opentracing.Span {
    */
   addTags(keyValueMap: SpanAttributes): this {
     for (const [key, value] of Object.entries(keyValueMap)) {
-      if (this._setSpanStatusCode(key, value)) {
+      if (this._setErrorAsSpanStatusCode(key, value)) {
         continue;
       }
       if (value !== undefined) {
@@ -317,7 +317,7 @@ export class SpanShim extends opentracing.Span {
    * @param value value for the tag
    */
   setTag(key: string, value: SpanAttributeValue): this {
-    if (this._setSpanStatusCode(key, value)) {
+    if (this._setErrorAsSpanStatusCode(key, value)) {
       return this;
     }
 
@@ -342,7 +342,7 @@ export class SpanShim extends opentracing.Span {
     return this._span;
   }
 
-  private _setSpanStatusCode(
+  private _setErrorAsSpanStatusCode(
     key: string,
     value: SpanAttributeValue | undefined
   ): boolean {
