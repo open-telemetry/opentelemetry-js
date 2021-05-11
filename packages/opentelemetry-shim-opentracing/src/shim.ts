@@ -299,7 +299,14 @@ export class SpanShim extends opentracing.Span {
    * @param keyValueMap set of KV pairs representing tags
    */
   addTags(keyValueMap: SpanAttributes): this {
-    this._span.setAttributes(keyValueMap);
+    for (const [key, value] of Object.entries(keyValueMap)) {
+      if (this._setSpanStatusCode(key, value)) {
+        continue;
+      }
+      if (value !== undefined) {
+        this._span.setAttribute(key, value);
+      }
+    }
     return this;
   }
 
@@ -310,12 +317,8 @@ export class SpanShim extends opentracing.Span {
    * @param value value for the tag
    */
   setTag(key: string, value: SpanAttributeValue): this {
-    if (key === opentracing.Tags.ERROR) {
-      const statusCode = SpanShim._mapErrorTag(value);
-      this._span.setStatus({ code: statusCode });
-      if (statusCode !== SpanStatusCode.UNSET) {
-        return this;
-      }
+    if (this._setSpanStatusCode(key, value)) {
+      return this;
     }
 
     this._span.setAttribute(key, value);
@@ -339,7 +342,21 @@ export class SpanShim extends opentracing.Span {
     return this._span;
   }
 
-  private static _mapErrorTag(value: SpanAttributeValue): SpanStatusCode {
+  private _setSpanStatusCode(
+    key: string,
+    value: SpanAttributeValue | undefined
+  ): boolean {
+    if (key === opentracing.Tags.ERROR) {
+      const statusCode = SpanShim._mapErrorTag(value);
+      this._span.setStatus({ code: statusCode });
+      return statusCode !== SpanStatusCode.UNSET;
+    }
+    return false;
+  }
+
+  private static _mapErrorTag(
+    value: SpanAttributeValue | undefined
+  ): SpanStatusCode {
     switch (value) {
       case true:
       case 'true':

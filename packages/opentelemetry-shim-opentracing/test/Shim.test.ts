@@ -302,6 +302,11 @@ describe('OpenTracing Shim', () => {
         assert.strictEqual(otSpan.attributes.from, 'earth');
       });
 
+      it('ignores undefined tags', () => {
+        span.addTags({ hello: 'stars', from: undefined });
+        assert.deepStrictEqual(otSpan.attributes, { hello: 'stars' });
+      });
+
       it('maps error tag to status code', () => {
         span.setTag('error', '');
         assert.strictEqual(otSpan.status.code, SpanStatusCode.UNSET);
@@ -322,6 +327,30 @@ describe('OpenTracing Shim', () => {
       it('sets unknown error tag as attribute', () => {
         span.setTag('error', 'whoopsie');
         assert.strictEqual(otSpan.status.code, SpanStatusCode.UNSET);
+        assert.strictEqual(otSpan.attributes.error, 'whoopsie');
+      });
+
+      it('maps error tag to status code when adding multiple tags', () => {
+        span.addTags({ hello: 'stars', error: '' });
+        assert.strictEqual(otSpan.status.code, SpanStatusCode.UNSET);
+
+        span.addTags({ hello: 'stars', error: true });
+        assert.strictEqual(otSpan.status.code, SpanStatusCode.ERROR);
+
+        span.addTags({ hello: 'stars', error: false });
+        assert.strictEqual(otSpan.status.code, SpanStatusCode.OK);
+
+        span.addTags({ hello: 'stars', error: 'true' });
+        assert.strictEqual(otSpan.status.code, SpanStatusCode.ERROR);
+
+        span.addTags({ hello: 'stars', error: 'false' });
+        assert.strictEqual(otSpan.status.code, SpanStatusCode.OK);
+      });
+
+      it('sets unknown error tag as attribute when adding multiple tags', () => {
+        span.addTags({ hello: 'stars', error: 'whoopsie' });
+        assert.strictEqual(otSpan.status.code, SpanStatusCode.UNSET);
+        assert.strictEqual(otSpan.attributes.hello, 'stars');
         assert.strictEqual(otSpan.attributes.error, 'whoopsie');
       });
     });
