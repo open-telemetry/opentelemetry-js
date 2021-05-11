@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-export * from './Tracer';
-export * from './BasicTracerProvider';
-export * from './export/ConsoleSpanExporter';
-export * from './export/BatchSpanProcessor';
-export * from './export/InMemorySpanExporter';
-export * from './export/ReadableSpan';
-export * from './export/SimpleSpanProcessor';
-export * from './export/SpanExporter';
-export * from './Span';
-export * from './SpanProcessor';
-export * from './TimedEvent';
-export * from './types';
+import { HrTime, SpanAttributes } from '@opentelemetry/api';
+
+/**
+ * Represents a timed event.
+ * A timed event is an event with a timestamp.
+ */
+export interface TimedEvent {
+  time: HrTime;
+  /** The name of the event. */
+  name: string;
+  /** The attributes of the event. */
+  attributes?: SpanAttributes;
+}

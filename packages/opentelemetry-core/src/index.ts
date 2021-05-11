@@ -30,6 +30,7 @@ export * from './trace/sampler/AlwaysOnSampler';
 export * from './trace/sampler/ParentBasedSampler';
 export * from './trace/sampler/TraceIdRatioBasedSampler';
 export * from './trace/TraceState';
+export * from './utils/environment';
 export * from './utils/sampling';
 export * from './utils/url';
 export * from './utils/wrap';
