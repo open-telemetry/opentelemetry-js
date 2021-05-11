@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/http.md
  */
 export enum AttributeNames {
-  GRPC_KIND = 'grpc.kind',
+  GRPC_KIND = 'grpc.kind', // SERVER or CLIENT
   GRPC_METHOD = 'grpc.method',
   GRPC_ERROR_NAME = 'grpc.error_name',
   GRPC_ERROR_MESSAGE = 'grpc.error_message',
