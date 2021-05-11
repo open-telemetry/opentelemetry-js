@@ -312,8 +312,8 @@ export class SpanShim extends opentracing.Span {
   setTag(key: string, value: SpanAttributeValue): this {
     if (key === opentracing.Tags.ERROR) {
       const statusCode = SpanShim._mapErrorTag(value);
-      if (statusCode !== undefined) {
-        this._span.setStatus({ code: statusCode });
+      this._span.setStatus({ code: statusCode });
+      if (statusCode !== SpanStatusCode.UNSET) {
         return this;
       }
     }
@@ -339,9 +339,7 @@ export class SpanShim extends opentracing.Span {
     return this._span;
   }
 
-  private static _mapErrorTag(
-    value: SpanAttributeValue
-  ): SpanStatusCode | undefined {
+  private static _mapErrorTag(value: SpanAttributeValue): SpanStatusCode {
     switch (value) {
       case true:
       case 'true':
@@ -350,7 +348,7 @@ export class SpanShim extends opentracing.Span {
       case 'false':
         return SpanStatusCode.OK;
       default:
-        return;
+        return SpanStatusCode.UNSET;
     }
   }
 }
