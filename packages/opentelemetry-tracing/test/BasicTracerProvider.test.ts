@@ -238,19 +238,17 @@ describe('BasicTracerProvider', () => {
         delete envSource.OTEL_TRACES_EXPORTER;
       });
 
-      it('warns if there is no exporter registered with a given name', () => {
-        const warnStub = sinon.spy(diag, 'warn');
+      it('logs error if there is no exporter registered with a given name', () => {
+        const errorStub = sinon.spy(diag, 'error');
 
         envSource.OTEL_TRACES_EXPORTER = 'missing-exporter';
         const provider = new BasicTracerProvider({});
         provider.register();
-
         assert.ok(
-          warnStub.calledOnceWithExactly(
+          errorStub.getCall(0).args[0] ===
             'Exporter "missing-exporter" requested through environment variable is unavailable.'
-          )
         );
-        warnStub.restore();
+        errorStub.restore();
       });
 
       it('registers trace exporter from environment variable', () => {
