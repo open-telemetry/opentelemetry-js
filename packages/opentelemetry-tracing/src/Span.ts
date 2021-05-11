@@ -26,6 +26,7 @@ import {
 import { Resource } from '@opentelemetry/resources';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { ReadableSpan } from './export/ReadableSpan';
+import { TimedEvent } from './TimedEvent';
 import { Tracer } from './Tracer';
 import { SpanProcessor } from './SpanProcessor';
 import { TraceParams } from './types';
@@ -43,7 +44,7 @@ export class Span implements api.Span, ReadableSpan {
   readonly parentSpanId?: string;
   readonly attributes: api.SpanAttributes = {};
   readonly links: api.Link[] = [];
-  readonly events: api.TimedEvent[] = [];
+  readonly events: TimedEvent[] = [];
   readonly startTime: api.HrTime;
   readonly resource: Resource;
   readonly instrumentationLibrary: InstrumentationLibrary;
