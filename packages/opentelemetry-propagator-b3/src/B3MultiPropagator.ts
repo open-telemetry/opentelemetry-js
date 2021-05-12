@@ -17,7 +17,6 @@
 import {
   Context,
   getSpanContext,
-  isInstrumentationSuppressed,
   isSpanContextValid,
   isValidSpanId,
   isValidTraceId,
@@ -27,14 +26,15 @@ import {
   TextMapSetter,
   TraceFlags,
 } from '@opentelemetry/api';
-import {
-  X_B3_TRACE_ID,
-  X_B3_SPAN_ID,
-  X_B3_SAMPLED,
-  X_B3_PARENT_SPAN_ID,
-  X_B3_FLAGS,
-} from './constants';
+import { isTracingSuppressed } from '@opentelemetry/core';
 import { B3_DEBUG_FLAG_KEY } from './common';
+import {
+  X_B3_FLAGS,
+  X_B3_PARENT_SPAN_ID,
+  X_B3_SAMPLED,
+  X_B3_SPAN_ID,
+  X_B3_TRACE_ID,
+} from './constants';
 
 const VALID_SAMPLED_VALUES = new Set([true, 'true', 'True', '1', 1]);
 const VALID_UNSAMPLED_VALUES = new Set([false, 'false', 'False', '0', 0]);
@@ -99,7 +99,7 @@ export class B3MultiPropagator implements TextMapPropagator {
     if (
       !spanContext ||
       !isSpanContextValid(spanContext) ||
-      isInstrumentationSuppressed(context)
+      isTracingSuppressed(context)
     )
       return;
 

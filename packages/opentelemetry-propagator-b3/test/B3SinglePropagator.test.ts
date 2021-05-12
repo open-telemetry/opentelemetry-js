@@ -17,19 +17,19 @@
 import {
   defaultTextMapGetter,
   defaultTextMapSetter,
+  getSpanContext,
   INVALID_SPANID,
   INVALID_TRACEID,
-  getSpanContext,
+  ROOT_CONTEXT,
   setSpanContext,
   SpanContext,
   TraceFlags,
-  suppressInstrumentation,
 } from '@opentelemetry/api';
-import { ROOT_CONTEXT } from '@opentelemetry/api';
+import { suppressTracing } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { B3SinglePropagator } from '../src/B3SinglePropagator';
-import { B3_CONTEXT_HEADER } from '../src/constants';
 import { B3_DEBUG_FLAG_KEY } from '../src/common';
+import { B3_CONTEXT_HEADER } from '../src/constants';
 
 describe('B3SinglePropagator', () => {
   const propagator = new B3SinglePropagator();
@@ -133,7 +133,7 @@ describe('B3SinglePropagator', () => {
       };
 
       propagator.inject(
-        suppressInstrumentation(setSpanContext(ROOT_CONTEXT, spanContext)),
+        suppressTracing(setSpanContext(ROOT_CONTEXT, spanContext)),
         carrier,
         defaultTextMapSetter
       );

@@ -56,7 +56,6 @@
   },
   "devDependencies": {
     "@opentelemetry/api": "^1.0.0-rc.0",
-    "@opentelemetry/propagator-b3": "0.19.0",
     "@types/mocha": "8.2.2",
     "@types/node": "14.14.43",
     "@types/semver": "7.3.5",

@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
 import {
   defaultTextMapGetter,
   defaultTextMapSetter,
+  getSpanContext,
+  ROOT_CONTEXT,
+  setSpanContext,
   SpanContext,
   TraceFlags,
-  getSpanContext,
-  setSpanContext,
-  ROOT_CONTEXT,
-  suppressInstrumentation,
 } from '@opentelemetry/api';
+import { suppressTracing } from '@opentelemetry/core';
+import * as assert from 'assert';
 import { B3Propagator } from '../src/B3Propagator';
-import { B3InjectEncoding } from '../src/types';
 import {
   B3_CONTEXT_HEADER,
   X_B3_FLAGS,
@@ -35,6 +34,7 @@ import {
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
 } from '../src/constants';
+import { B3InjectEncoding } from '../src/types';
 
 describe('B3Propagator', () => {
   let propagator: B3Propagator;
@@ -100,7 +100,7 @@ describe('B3Propagator', () => {
       };
 
       propagator.inject(
-        suppressInstrumentation(setSpanContext(ROOT_CONTEXT, spanContext)),
+        suppressTracing(setSpanContext(ROOT_CONTEXT, spanContext)),
         carrier,
         defaultTextMapSetter
       );

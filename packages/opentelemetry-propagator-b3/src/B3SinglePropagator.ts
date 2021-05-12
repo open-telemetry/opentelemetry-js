@@ -17,7 +17,6 @@
 import {
   Context,
   getSpanContext,
-  isInstrumentationSuppressed,
   isSpanContextValid,
   isValidSpanId,
   isValidTraceId,
@@ -27,8 +26,9 @@ import {
   TextMapSetter,
   TraceFlags,
 } from '@opentelemetry/api';
-import { B3_CONTEXT_HEADER } from './constants';
+import { isTracingSuppressed } from '@opentelemetry/core';
 import { B3_DEBUG_FLAG_KEY } from './common';
+import { B3_CONTEXT_HEADER } from './constants';
 
 const B3_CONTEXT_REGEX = /((?:[0-9a-f]{16}){1,2})-([0-9a-f]{16})(?:-([01d](?![0-9a-f])))?(?:-([0-9a-f]{16}))?/;
 const PADDING = '0'.repeat(16);
@@ -56,7 +56,7 @@ export class B3SinglePropagator implements TextMapPropagator {
     if (
       !spanContext ||
       !isSpanContextValid(spanContext) ||
-      isInstrumentationSuppressed(context)
+      isTracingSuppressed(context)
     )
       return;
 

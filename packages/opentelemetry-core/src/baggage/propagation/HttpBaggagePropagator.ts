@@ -15,23 +15,33 @@
  */
 
 import {
-  Context,
-  BaggageEntry,
+  BaggageEntry, Context,
+
+
+
+
+  createBaggage,
   getBaggage,
   setBaggage,
   TextMapGetter,
   TextMapPropagator,
-  TextMapSetter,
-  createBaggage,
-  isInstrumentationSuppressed,
+  TextMapSetter
 } from '@opentelemetry/api';
-import { getKeyPairs, serializeKeyPairs, parsePairKeyValue } from '../utils';
+import { isTracingSuppressed } from '../../trace/suppress-tracing';
 import {
-  BAGGAGE_MAX_NAME_VALUE_PAIRS,
-  BAGGAGE_ITEMS_SEPARATOR,
-  BAGGAGE_HEADER,
-  BAGGAGE_MAX_PER_NAME_VALUE_PAIRS,
+  BAGGAGE_HEADER, BAGGAGE_ITEMS_SEPARATOR, BAGGAGE_MAX_NAME_VALUE_PAIRS,
+
+
+  BAGGAGE_MAX_PER_NAME_VALUE_PAIRS
 } from '../constants';
+import { getKeyPairs, parsePairKeyValue, serializeKeyPairs } from '../utils';
+
+// Maximum number of name-value pairs allowed by w3c spec
+export const MAX_NAME_VALUE_PAIRS = 180;
+// Maximum number of bytes per a single name-value pair allowed by w3c spec
+export const MAX_PER_NAME_VALUE_PAIRS = 4096;
+// Maximum total length of all name-value pairs allowed by w3c spec
+export const MAX_TOTAL_LENGTH = 8192;
 
 /**
  * Propagates {@link Baggage} through Context format propagation.
@@ -42,7 +52,7 @@ import {
 export class HttpBaggagePropagator implements TextMapPropagator {
   inject(context: Context, carrier: unknown, setter: TextMapSetter) {
     const baggage = getBaggage(context);
-    if (!baggage || isInstrumentationSuppressed(context)) return;
+    if (!baggage || isTracingSuppressed(context)) return;
     const keyPairs = getKeyPairs(baggage)
       .filter((pair: string) => {
         return pair.length <= BAGGAGE_MAX_PER_NAME_VALUE_PAIRS;

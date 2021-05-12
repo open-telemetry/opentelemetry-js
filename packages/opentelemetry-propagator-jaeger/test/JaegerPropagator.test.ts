@@ -24,10 +24,10 @@ import {
   setBaggage,
   setSpanContext,
   SpanContext,
-  suppressInstrumentation,
   TextMapGetter,
   TraceFlags,
 } from '@opentelemetry/api';
+import { suppressTracing } from '@opentelemetry/core';
 import * as assert from 'assert';
 import {
   JaegerPropagator,
@@ -90,7 +90,7 @@ describe('JaegerPropagator', () => {
       };
 
       jaegerPropagator.inject(
-        suppressInstrumentation(setSpanContext(ROOT_CONTEXT, spanContext)),
+        suppressTracing(setSpanContext(ROOT_CONTEXT, spanContext)),
         carrier,
         defaultTextMapSetter
       );
