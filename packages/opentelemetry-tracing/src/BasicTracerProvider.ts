@@ -38,6 +38,13 @@ const merge = require('lodash.merge');
 
 export type PROPAGATOR_FACTORY = () => TextMapPropagator;
 
+export enum ForceFlushState {
+  'resolved',
+  'timeout',
+  'error',
+  'unresolved',
+}
+
 /**
  * This class represents a basic tracer provider which platform libraries can extend
  */
@@ -117,29 +124,28 @@ export class BasicTracerProvider implements TracerProvider {
     const promises = this._registeredSpanProcessors.map(
       (spanProcessor: SpanProcessor) => {
         return new Promise(resolve => {
-          let state: 'resolved' | 'timeout' | 'error' | 'unresolved' =
-            'unresolved';
+          let state: ForceFlushState;
           const timeoutInterval = setTimeout(() => {
             resolve(
               new Error(
                 `Span processor did not completed within timeout period of ${timeout} ms`
               )
             );
-            state = 'timeout';
+            state = ForceFlushState.timeout;
           }, timeout);
 
           spanProcessor
             .forceFlush()
             .then(() => {
               clearTimeout(timeoutInterval);
-              if (state !== 'timeout') {
-                state = 'resolved';
+              if (state !== ForceFlushState.timeout) {
+                state = ForceFlushState.resolved;
                 resolve(state);
               }
             })
             .catch(error => {
               clearTimeout(timeoutInterval);
-              state = 'error';
+              state = ForceFlushState.error;
               resolve(error);
             });
         });
