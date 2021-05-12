@@ -183,7 +183,9 @@ export class BasicTracerProvider implements TracerProvider {
     return new Promise<void>((resolve, reject) => {
       Promise.all(promises)
         .then(results => {
-          const errors = results.filter(result => result !== 'resolved');
+          const errors = results.filter(
+            result => result !== ForceFlushState.resolved
+          );
           if (errors.length > 0) {
             reject(errors);
           } else {
