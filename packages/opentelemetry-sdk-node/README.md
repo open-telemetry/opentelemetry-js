@@ -45,7 +45,7 @@ const {
 } = require("@opentelemetry/auto-instrumentations-node");
 
 const jaegerExporter = new JaegerExporter({
-  serviceName: "my-service",
+  serviceName: 'my-service',
 });
 const prometheusExporter = new PrometheusExporter({ startServer: true });
 
