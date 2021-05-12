@@ -44,7 +44,7 @@ import {
 } from './serverUtils';
 import { makeGrpcClientRemoteCall, getMetadata } from './clientUtils';
 import { _methodIsIgnored } from '../utils';
-import { AttributeNames } from '../enums';
+import { AttributeNames } from '../enums/AttributeNames';
 
 /**
  * Holding reference to grpc module here to access constant of grpc modules
