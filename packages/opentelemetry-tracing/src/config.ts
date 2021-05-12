@@ -21,9 +21,9 @@ import {
   getEnv,
   TracesSamplerValues,
   ParentBasedSampler,
+  ENVIRONMENT,
   TraceIdRatioBasedSampler,
 } from '@opentelemetry/core';
-import { ENVIRONMENT } from '@opentelemetry/core/src/utils/environment';
 
 const env = getEnv();
 const FALLBACK_OTEL_TRACES_SAMPLER = TracesSamplerValues.AlwaysOn;
