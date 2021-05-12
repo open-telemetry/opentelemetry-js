@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import { VERSION } from '../../version';
-import {
-  TelemetrySdkLanguageValues,
-  ResourceAttributes,
-} from '@opentelemetry/semantic-conventions';
+import { HrTime, SpanAttributes } from '@opentelemetry/api';
 
-/** Constants describing the SDK in use */
-export const SDK_INFO = {
-  [ResourceAttributes.TELEMETRY_SDK_NAME]: 'opentelemetry',
-  [ResourceAttributes.PROCESS_RUNTIME_NAME]: 'browser',
-  [ResourceAttributes.TELEMETRY_SDK_LANGUAGE]: TelemetrySdkLanguageValues.WEBJS,
-  [ResourceAttributes.TELEMETRY_SDK_VERSION]: VERSION,
-};
+/**
+ * Represents a timed event.
+ * A timed event is an event with a timestamp.
+ */
+export interface TimedEvent {
+  time: HrTime;
+  /** The name of the event. */
+  name: string;
+  /** The attributes of the event. */
+  attributes?: SpanAttributes;
+}
