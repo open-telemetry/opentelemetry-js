@@ -69,7 +69,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     );
   }
 
-  private _getConfig(): HttpInstrumentationConfig {
+  getConfig(): HttpInstrumentationConfig {
     return this._config;
   }
 
@@ -287,7 +287,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       hostname,
     });
     span.setAttributes(attributes);
-    if (this._getConfig().requestHook) {
+    if (this.getConfig().requestHook) {
       this._callRequestHook(span, request);
     }
 
@@ -304,7 +304,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           { hostname }
         );
         span.setAttributes(responseAttributes);
-        if (this._getConfig().responseHook) {
+        if (this.getConfig().responseHook) {
           this._callResponseHook(span, response);
         }
 
@@ -322,10 +322,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
           span.setStatus(status);
 
-          if (this._getConfig().applyCustomAttributesOnSpan) {
+          if (this.getConfig().applyCustomAttributesOnSpan) {
             safeExecuteInTheMiddle(
               () =>
-                this._getConfig().applyCustomAttributesOnSpan!(
+                this.getConfig().applyCustomAttributesOnSpan!(
                   span,
                   request,
                   response
@@ -384,7 +384,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       if (
         utils.isIgnored(
           pathname,
-          instrumentation._getConfig().ignoreIncomingPaths,
+          instrumentation.getConfig().ignoreIncomingPaths,
           (e: Error) => diag.error('caught ignoreIncomingPaths error: ', e)
         )
       ) {
@@ -401,7 +401,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         kind: SpanKind.SERVER,
         attributes: utils.getIncomingRequestAttributes(request, {
           component: component,
-          serverName: instrumentation._getConfig().serverName,
+          serverName: instrumentation.getConfig().serverName,
         }),
       };
 
@@ -416,10 +416,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         context.bind(request);
         context.bind(response);
 
-        if (instrumentation._getConfig().requestHook) {
+        if (instrumentation.getConfig().requestHook) {
           instrumentation._callRequestHook(span, request);
         }
-        if (instrumentation._getConfig().responseHook) {
+        if (instrumentation.getConfig().responseHook) {
           instrumentation._callResponseHook(span, response);
         }
 
@@ -452,10 +452,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
             .setAttributes(attributes)
             .setStatus(utils.parseResponseStatus(response.statusCode));
 
-          if (instrumentation._getConfig().applyCustomAttributesOnSpan) {
+          if (instrumentation.getConfig().applyCustomAttributesOnSpan) {
             safeExecuteInTheMiddle(
               () =>
-                instrumentation._getConfig().applyCustomAttributesOnSpan!(
+                instrumentation.getConfig().applyCustomAttributesOnSpan!(
                   span,
                   request,
                   response
@@ -521,7 +521,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       if (
         utils.isIgnored(
           origin + pathname,
-          instrumentation._getConfig().ignoreOutgoingUrls,
+          instrumentation.getConfig().ignoreOutgoingUrls,
           (e: Error) => diag.error('caught ignoreOutgoingUrls error: ', e)
         )
       ) {
@@ -586,8 +586,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
      */
     const requireParent =
       options.kind === SpanKind.CLIENT
-        ? this._getConfig().requireParentforOutgoingSpans
-        : this._getConfig().requireParentforIncomingSpans;
+        ? this.getConfig().requireParentforOutgoingSpans
+        : this.getConfig().requireParentforIncomingSpans;
 
     let span: Span;
     const currentSpan = getSpan(ctx);
@@ -619,7 +619,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     response: http.IncomingMessage | http.ServerResponse
   ) {
     safeExecuteInTheMiddle(
-      () => this._getConfig().responseHook!(span, response),
+      () => this.getConfig().responseHook!(span, response),
       () => {},
       true
     );
@@ -630,7 +630,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     request: http.ClientRequest | http.IncomingMessage
   ) {
     safeExecuteInTheMiddle(
-      () => this._getConfig().requestHook!(span, request),
+      () => this.getConfig().requestHook!(span, request),
       () => {},
       true
     );
