@@ -18,6 +18,12 @@ import { Context } from './types';
 
 /** Get a key to uniquely identify a context value */
 export function createContextKey(description: string) {
+  // The specification states that for the same input, multiple calls should
+  // return different keys. Due to the nature of the JS dependency management
+  // system, this creates problems where multiple versions of some package
+  // could hold different keys for the same property.
+  //
+  // Therefore, we use Symbol.for which returns the same key for the same input.
   return Symbol.for(description);
 }
 
