@@ -221,6 +221,30 @@ describe('CollectorTraceExporter - node (getDefaultUrl)', () => {
   });
 });
 
+describe('when configuring via environment', () => {
+  const envSource = process.env;
+  it('should use url defined in env', () => {
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+    const collectorExporter = new CollectorTraceExporter();
+    assert.strictEqual(
+      collectorExporter.url,
+      envSource.OTEL_EXPORTER_OTLP_ENDPOINT
+    );
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+  });
+  it('should override global exporter url with signal url defined in env', () => {
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.traces';
+    const collectorExporter = new CollectorTraceExporter();
+    assert.strictEqual(
+      collectorExporter.url,
+      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+    );
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
+  });
+});
+
 testCollectorExporter({ useTLS: true });
 testCollectorExporter({ useTLS: false });
 testCollectorExporter({ metadata });
