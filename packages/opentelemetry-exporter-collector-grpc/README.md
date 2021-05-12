@@ -5,7 +5,7 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-This module provides exporter for web and node to be used with [opentelemetry-collector][opentelemetry-collector-url] - last tested with version **0.16.0**.
+This module provides exporter for web and node to be used with [opentelemetry-collector][opentelemetry-collector-url] - last tested with version **0.25.0**.
 
 ## Installation
 
@@ -15,7 +15,7 @@ npm install --save @opentelemetry/exporter-collector-grpc
 
 ## Traces in Node - GRPC
 
-The CollectorTraceExporter in Node expects the URL to only be the hostname. It will not work with `/v1/trace`.
+The CollectorTraceExporter in Node expects the URL to only be the hostname. It will not work with `/v1/traces`.
 
 ```js
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');

@@ -32,11 +32,14 @@ import { Resource } from '@opentelemetry/resources';
 import { SpanProcessor, Tracer } from '.';
 import { DEFAULT_CONFIG } from './config';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
-import { NoopSpanProcessor } from './NoopSpanProcessor';
+import { NoopSpanProcessor } from './export/NoopSpanProcessor';
 import { SDKRegistrationConfig, TracerConfig } from './types';
 const merge = require('lodash.merge');
+import { SpanExporter } from './export/SpanExporter';
+import { BatchSpanProcessor } from './export/BatchSpanProcessor';
 
 export type PROPAGATOR_FACTORY = () => TextMapPropagator;
+export type EXPORTER_FACTORY = () => SpanExporter;
 
 /**
  * This class represents a basic tracer provider which platform libraries can extend
@@ -50,11 +53,16 @@ export class BasicTracerProvider implements TracerProvider {
     ['baggage', () => new HttpBaggagePropagator()],
   ]);
 
+  protected static readonly _registeredExporters = new Map<
+    string,
+    EXPORTER_FACTORY
+  >();
+
   private readonly _config: TracerConfig;
   private readonly _registeredSpanProcessors: SpanProcessor[] = [];
   private readonly _tracers: Map<string, Tracer> = new Map();
 
-  activeSpanProcessor: SpanProcessor = new NoopSpanProcessor();
+  activeSpanProcessor: SpanProcessor;
   readonly resource: Resource;
 
   constructor(config: TracerConfig = {}) {
@@ -64,6 +72,14 @@ export class BasicTracerProvider implements TracerProvider {
     this._config = Object.assign({}, mergedConfig, {
       resource: this.resource,
     });
+
+    const defaultExporter = this._buildExporterFromEnv();
+    if (defaultExporter !== undefined) {
+      const batchProcessor = new BatchSpanProcessor(defaultExporter);
+      this.activeSpanProcessor = batchProcessor;
+    } else {
+      this.activeSpanProcessor = new NoopSpanProcessor();
+    }
   }
 
   getTracer(name: string, version?: string): Tracer {
@@ -80,6 +96,18 @@ export class BasicTracerProvider implements TracerProvider {
    * @param spanProcessor the new SpanProcessor to be added.
    */
   addSpanProcessor(spanProcessor: SpanProcessor): void {
+    if (this._registeredSpanProcessors.length === 0) {
+      // since we might have enabled by default a batchProcessor, we disable it
+      // before adding the new one
+      this.activeSpanProcessor
+        .shutdown()
+        .catch(err =>
+          diag.error(
+            'Error while trying to shutdown current span processor',
+            err
+          )
+        );
+    }
     this._registeredSpanProcessors.push(spanProcessor);
     this.activeSpanProcessor = new MultiSpanProcessor(
       this._registeredSpanProcessors
@@ -120,6 +148,10 @@ export class BasicTracerProvider implements TracerProvider {
     return BasicTracerProvider._registeredPropagators.get(name)?.();
   }
 
+  protected _getSpanExporter(name: string): SpanExporter | undefined {
+    return BasicTracerProvider._registeredExporters.get(name)?.();
+  }
+
   protected _buildPropagatorFromEnv(): TextMapPropagator | undefined {
     // per spec, propagators from env must be deduplicated
     const uniquePropagatorNames = Array.from(
@@ -155,5 +187,17 @@ export class BasicTracerProvider implements TracerProvider {
         propagators: validPropagators,
       });
     }
+  }
+
+  protected _buildExporterFromEnv(): SpanExporter | undefined {
+    const exporterName = getEnv().OTEL_TRACES_EXPORTER;
+    if (exporterName === 'none') return;
+    const exporter = this._getSpanExporter(exporterName);
+    if (!exporter) {
+      diag.error(
+        `Exporter "${exporterName}" requested through environment variable is unavailable.`
+      );
+    }
+    return exporter;
   }
 }
