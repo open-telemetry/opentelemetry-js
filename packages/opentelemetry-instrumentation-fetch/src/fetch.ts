@@ -323,6 +323,18 @@ export class FetchInstrumentation extends InstrumentationBase<
           });
         }
 
+        function endSpanSuccessfully(span: api.Span, response: Response) {
+          plugin._applyAttributesAfterFetch(span, options, response);
+          if (response.status >= 200 && response.status < 400) {
+            plugin._endSpan(span, spanData, response);
+          } else {
+            plugin._endSpan(span, spanData, {
+              status: response.status,
+              statusText: response.statusText,
+              url,
+            });
+          }
+        }
         function onSuccess(
           span: api.Span,
           resolve: (
@@ -339,20 +351,7 @@ export class FetchInstrumentation extends InstrumentationBase<
                 reader.read().then(
                   ({ done }) => {
                     if (done) {
-                      plugin._applyAttributesAfterFetch(
-                        span,
-                        options,
-                        response
-                      );
-                      if (response.status >= 200 && response.status < 400) {
-                        plugin._endSpan(span, spanData, response);
-                      } else {
-                        plugin._endSpan(span, spanData, {
-                          status: response.status,
-                          statusText: response.statusText,
-                          url,
-                        });
-                      }
+                      endSpanSuccessfully(span, response);
                     } else {
                       read();
                     }
@@ -363,6 +362,9 @@ export class FetchInstrumentation extends InstrumentationBase<
                 );
               };
               read();
+            } else {
+              // some older browsers don't have .body implemented
+              endSpanSuccessfully(span, response);
             }
           } finally {
             resolve(response);
