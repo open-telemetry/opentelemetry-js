@@ -73,9 +73,8 @@ const testCollectorExporter = (params: TestParams) =>
           includeDirs,
         })
         .then((packageDefinition: protoLoader.PackageDefinition) => {
-          const packageObject: any = grpc.loadPackageDefinition(
-            packageDefinition
-          );
+          const packageObject: any =
+            grpc.loadPackageDefinition(packageDefinition);
           server.addService(
             packageObject.opentelemetry.proto.collector.trace.v1.TraceService
               .service,

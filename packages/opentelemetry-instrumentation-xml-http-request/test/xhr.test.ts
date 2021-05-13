@@ -196,7 +196,7 @@ describe('xhr', () => {
           );
 
           spyEntries = sinon.stub(
-            (performance as unknown) as Performance,
+            performance as unknown as Performance,
             'getEntriesByType'
           );
           spyEntries.withArgs('resource').returns(resources);
@@ -212,7 +212,7 @@ describe('xhr', () => {
           dummySpanExporter = new DummySpanExporter();
           exportSpy = sinon.stub(dummySpanExporter, 'export');
           clearResourceTimingsSpy = sinon.stub(
-            (performance as unknown) as Performance,
+            performance as unknown as Performance,
             'clearResourceTimings'
           );
           webTracerProviderWithZone.addSpanProcessor(
@@ -762,7 +762,7 @@ describe('xhr', () => {
           );
 
           spyEntries = sinon.stub(
-            (performance as unknown) as Performance,
+            performance as unknown as Performance,
             'getEntriesByType'
           );
           spyEntries.withArgs('resource').returns(resources);

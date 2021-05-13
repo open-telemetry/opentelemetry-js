@@ -90,24 +90,27 @@ interface TestGrpcCall {
 }
 
 // Compare two arrays using an equal function f
-const arrayIsEqual = (f: any) => ([x, ...xs]: any) => ([y, ...ys]: any): any =>
-  x === undefined && y === undefined
-    ? true
-    : Boolean(f(x)(y)) && arrayIsEqual(f)(xs)(ys);
+const arrayIsEqual =
+  (f: any) =>
+  ([x, ...xs]: any) =>
+  ([y, ...ys]: any): any =>
+    x === undefined && y === undefined
+      ? true
+      : Boolean(f(x)(y)) && arrayIsEqual(f)(xs)(ys);
 
 // Return true if two requests has the same num value
 const requestEqual = (x: TestRequestResponse) => (y: TestRequestResponse) =>
   x.num !== undefined && x.num === y.num;
 
 // Check if its equal requests or array of requests
-const checkEqual = (x: TestRequestResponse | TestRequestResponse[]) => (
-  y: TestRequestResponse | TestRequestResponse[]
-) =>
-  x instanceof Array && y instanceof Array
-    ? arrayIsEqual(requestEqual)(x as any)(y as any)
-    : !(x instanceof Array) && !(y instanceof Array)
-    ? requestEqual(x)(y)
-    : false;
+const checkEqual =
+  (x: TestRequestResponse | TestRequestResponse[]) =>
+  (y: TestRequestResponse | TestRequestResponse[]) =>
+    x instanceof Array && y instanceof Array
+      ? arrayIsEqual(requestEqual)(x as any)(y as any)
+      : !(x instanceof Array) && !(y instanceof Array)
+      ? requestEqual(x)(y)
+      : false;
 
 export const runTests = (
   plugin: GrpcInstrumentation,
@@ -563,10 +566,10 @@ export const runTests = (
       });
     };
 
-    const insertError = (
-      request: TestRequestResponse | TestRequestResponse[]
-    ) => (code: number) =>
-      request instanceof Array ? [{ num: code }, ...request] : { num: code };
+    const insertError =
+      (request: TestRequestResponse | TestRequestResponse[]) =>
+      (code: number) =>
+        request instanceof Array ? [{ num: code }, ...request] : { num: code };
 
     const runErrorTest = (
       method: typeof methodList[0],

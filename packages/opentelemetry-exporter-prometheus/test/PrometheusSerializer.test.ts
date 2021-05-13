@@ -451,12 +451,12 @@ describe('PrometheusSerializer', () => {
         }).getMeter('test');
         const counter = meter.createCounter('test_total') as CounterMetric;
         counter
-          .bind(({
+          .bind({
             object: {},
             NaN: NaN,
             null: null,
             undefined: undefined,
-          } as unknown) as Labels)
+          } as unknown as Labels)
           .add(1);
         const records = await counter.getMetricRecord();
         const record = records[0];
@@ -509,14 +509,14 @@ describe('PrometheusSerializer', () => {
         }).getMeter('test');
         const counter = meter.createCounter('test_total') as CounterMetric;
         counter
-          .bind(({
+          .bind({
             backslash: '\u005c', // \ => \\ (\u005c\u005c)
             doubleQuote: '\u0022', // " => \" (\u005c\u0022)
             lineFeed: '\u000a', // ↵ => \n (\u005c\u006e)
             backslashN: '\u005c\u006e', // \n => \\n (\u005c\u005c\u006e)
             backslashDoubleQuote: '\u005c\u0022', // \" => \\\" (\u005c\u005c\u005c\u0022)
             backslashLineFeed: '\u005c\u000a', // \↵ => \\\n (\u005c\u005c\u005c\u006e)
-          } as unknown) as Labels)
+          } as unknown as Labels)
           .add(1);
         const records = await counter.getMetricRecord();
         const record = records[0];
@@ -549,9 +549,9 @@ describe('PrometheusSerializer', () => {
         // with an error like:
         // error while linting: text format parsing error in line 282: expected '=' after label name, found '-'
         counter
-          .bind(({
+          .bind({
             'account-id': '123456',
-          } as unknown) as Labels)
+          } as unknown as Labels)
           .add(1);
         const records = await counter.getMetricRecord();
         const record = records[0];

@@ -64,8 +64,8 @@ describe('CollectorMetricExporter - web', () => {
       },
       'double-observer2'
     );
-    const recorder: Metric<BoundValueRecorder> &
-      ValueRecorder = mockValueRecorder();
+    const recorder: Metric<BoundValueRecorder> & ValueRecorder =
+      mockValueRecorder();
     counter.add(1);
     recorder.record(7);
     recorder.record(14);

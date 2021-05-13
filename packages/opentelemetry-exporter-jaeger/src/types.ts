@@ -37,13 +37,13 @@ export interface ExporterConfig {
 // Below require is needed as jaeger-client types does not expose the thrift,
 // udp_sender, util etc. modules.
 
-export const UDPSender = require('jaeger-client/dist/src/reporters/udp_sender')
-  .default;
+export const UDPSender =
+  require('jaeger-client/dist/src/reporters/udp_sender').default;
 export const Utils = require('jaeger-client/dist/src/util').default;
 export const ThriftUtils = require('jaeger-client/dist/src/thrift').default;
 
-export const HTTPSender = require('jaeger-client/dist/src/reporters/http_sender')
-  .default;
+export const HTTPSender =
+  require('jaeger-client/dist/src/reporters/http_sender').default;
 
 export type TagValue = string | number | boolean;
 

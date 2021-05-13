@@ -35,9 +35,7 @@ import { AttributeNames } from '../../src/enums/AttributeNames';
 describe('Utility', () => {
   describe('parseResponseStatus()', () => {
     it('should return ERROR code by default', () => {
-      const status = utils.parseResponseStatus(
-        (undefined as unknown) as number
-      );
+      const status = utils.parseResponseStatus(undefined as unknown as number);
       assert.deepStrictEqual(status, { code: SpanStatusCode.ERROR });
     });
 
@@ -120,7 +118,7 @@ describe('Utility', () => {
 
     it('should throw if type is unknown', () => {
       try {
-        utils.satisfiesPattern('/TeSt/1', (true as unknown) as IgnoreMatcher);
+        utils.satisfiesPattern('/TeSt/1', true as unknown as IgnoreMatcher);
         assert.fail();
       } catch (error) {
         assert.strictEqual(error instanceof TypeError, true);

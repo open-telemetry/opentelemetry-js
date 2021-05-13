@@ -34,7 +34,8 @@ export class CollectorTraceExporter
     ReadableSpan,
     collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
   >
-  implements SpanExporter {
+  implements SpanExporter
+{
   convert(
     spans: ReadableSpan[]
   ): collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {

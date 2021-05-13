@@ -24,7 +24,8 @@ import * as types from './types';
  * Base abstract internal class for instrumenting node and web plugins
  */
 export abstract class InstrumentationAbstract<T = any>
-  implements types.Instrumentation {
+  implements types.Instrumentation
+{
   protected _config: types.InstrumentationConfig;
 
   private _tracer: Tracer;

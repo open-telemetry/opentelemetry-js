@@ -25,7 +25,8 @@ import { Metric } from './Metric';
 /** This is a SDK implementation of UpDownCounter Metric. */
 export class UpDownCounterMetric
   extends Metric<BoundUpDownCounter>
-  implements api.UpDownCounter {
+  implements api.UpDownCounter
+{
   constructor(
     name: string,
     options: api.MetricOptions,

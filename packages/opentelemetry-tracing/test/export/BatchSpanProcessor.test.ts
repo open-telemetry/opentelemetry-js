@@ -84,7 +84,7 @@ describe('BatchSpanProcessor', () => {
 
       let env: Record<string, any>;
       if (typeof process === 'undefined') {
-        env = (window as unknown) as Record<string, any>;
+        env = window as unknown as Record<string, any>;
       } else {
         env = process.env as Record<string, any>;
       }
@@ -362,7 +362,8 @@ describe('BatchSpanProcessor', () => {
         processor.onEnd(span);
 
         processor.forceFlush().then(() => {
-          const exporterCreatedSpans = testTracingExporter.getExporterCreatedSpans();
+          const exporterCreatedSpans =
+            testTracingExporter.getExporterCreatedSpans();
           assert.equal(exporterCreatedSpans.length, 0);
 
           done();

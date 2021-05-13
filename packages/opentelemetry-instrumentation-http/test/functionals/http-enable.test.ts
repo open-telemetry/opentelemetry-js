@@ -277,17 +277,7 @@ describe('HttpInstrumentation', () => {
       });
 
       const httpErrorCodes = [
-        400,
-        401,
-        403,
-        404,
-        429,
-        501,
-        503,
-        504,
-        500,
-        505,
-        597,
+        400, 401, 403, 404, 429, 501, 503, 504, 500, 505, 597,
       ];
 
       for (let i = 0; i < httpErrorCodes.length; i++) {
