@@ -17,7 +17,7 @@
 import { Context, createContextKey } from '@opentelemetry/api';
 
 const SUPPRESS_TRACING_KEY = createContextKey(
-  '@opentelemetry/core suppress.tracing'
+  'OpenTelemetry SDK Context Key SUPPRESS_TRACING'
 );
 
 export function suppressTracing(context: Context): Context {
