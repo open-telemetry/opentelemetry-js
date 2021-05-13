@@ -15,7 +15,8 @@
  */
 
 import * as assert from 'assert';
-import { Instrumentation, InstrumentationBase } from '../../src';
+import sinon = require('sinon');
+import { Instrumentation, InstrumentationBase, InstrumentationModuleDefinition } from '../../src';
 
 class TestInstrumentation extends InstrumentationBase {
   constructor() {
@@ -24,6 +25,23 @@ class TestInstrumentation extends InstrumentationBase {
   enable() {}
   disable() {}
   init() {}
+  _onRequire<T>(
+    module: InstrumentationModuleDefinition<T>,
+    exports: T,
+    name: string,
+    baseDir?: string
+  ): T {
+    return super._onRequire(module, exports, name, baseDir)
+  }
+  getModuleVersion(directory: string): string {
+    return super.getModuleVersion(directory)
+  }
+  findModulePackage(directory: string): any {
+    return super.findModulePackage(directory)
+  }
+  loadModulePackage(directory: string): any {
+    return super.loadModulePackage(directory)
+  }
 }
 
 describe('BaseInstrumentation', () => {
@@ -56,4 +74,54 @@ describe('BaseInstrumentation', () => {
       assert.strictEqual(called, true);
     });
   });
+
+  describe('_onRequire', () => {
+    it('loads package.json recursively returning 0.0.0 when undiscovered', () => {
+      const instrumentation = new TestInstrumentation()
+      const versionSpy = sinon.spy(instrumentation, 'getModuleVersion');
+      const findSpy = sinon.spy(instrumentation, 'findModulePackage');
+      const loadSpy = sinon.spy(instrumentation, 'loadModulePackage')
+
+      const moduleDefinition = {} as InstrumentationModuleDefinition<unknown>
+      instrumentation._onRequire<unknown>(
+        moduleDefinition,
+        {} as unknown,
+        'test-module',
+        '/foo/bar/baz'
+      )
+
+      sinon.assert.calledOnceWithExactly(versionSpy, '/foo/bar/baz')
+      sinon.assert.calledWith(findSpy, '/foo/bar/baz')
+      sinon.assert.calledWith(findSpy, '/foo/bar')
+      sinon.assert.calledWith(findSpy, '/foo')
+      sinon.assert.calledThrice(loadSpy)
+      assert.strictEqual(moduleDefinition.moduleVersion, '0.0.0')
+    })
+
+    it('loads package.json recursively returning version when discovered', () => {
+      const instrumentation = new TestInstrumentation()
+      const versionSpy = sinon.spy(instrumentation, 'getModuleVersion');
+      const findSpy = sinon.spy(instrumentation, 'findModulePackage');
+      const loadStub = sinon.stub(instrumentation, 'loadModulePackage')
+
+      loadStub.withArgs('/foo/bar').returns({
+        name: 'Test Package',
+        version: '1.0.2'
+      })
+
+      const moduleDefinition = {} as InstrumentationModuleDefinition<unknown>
+      instrumentation._onRequire<unknown>(
+        moduleDefinition,
+        {} as unknown,
+        'test-module',
+        '/foo/bar/baz'
+      )
+
+      sinon.assert.calledOnceWithExactly(versionSpy, '/foo/bar/baz')
+      sinon.assert.calledWith(findSpy, '/foo/bar/baz')
+      sinon.assert.calledWith(findSpy, '/foo/bar')
+      sinon.assert.calledTwice(loadStub)
+      assert.strictEqual(moduleDefinition.moduleVersion, '1.0.2')
+    })
+  })
 });
