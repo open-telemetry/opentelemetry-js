@@ -59,7 +59,7 @@ export abstract class InstrumentationBase<T = any>
     }
   }
 
-  protected _onRequire<T>(
+  private _onRequire<T>(
     module: InstrumentationModuleDefinition<T>,
     exports: T,
     name: string,
@@ -102,7 +102,7 @@ export abstract class InstrumentationBase<T = any>
     return exports;
   }
 
-  protected getModuleVersion(directory: string): string {
+  private getModuleVersion(directory: string): string {
     const modulePackage = this.findModulePackage(directory);
     if (!modulePackage) {
       return '0.0.0';
@@ -110,7 +110,7 @@ export abstract class InstrumentationBase<T = any>
     return modulePackage.version;
   }
 
-  protected findModulePackage(directory: string): any {
+  private findModulePackage(directory: string): unknown {
     const parentDirectory = path.dirname(directory)
     if (directory === parentDirectory) { return; }
     let contents = null
@@ -122,7 +122,7 @@ export abstract class InstrumentationBase<T = any>
     return this.findModulePackage(parentDirectory)
   }
 
-  protected loadModulePackage(directory: string): any {
+  private loadModulePackage(directory: string): unknown {
     return require(path.join(directory, 'package.json'))
   }
 

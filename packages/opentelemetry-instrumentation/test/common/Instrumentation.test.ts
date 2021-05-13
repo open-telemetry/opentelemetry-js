@@ -25,23 +25,6 @@ class TestInstrumentation extends InstrumentationBase {
   enable() {}
   disable() {}
   init() {}
-  _onRequire<T>(
-    module: InstrumentationModuleDefinition<T>,
-    exports: T,
-    name: string,
-    baseDir?: string
-  ): T {
-    return super._onRequire(module, exports, name, baseDir)
-  }
-  getModuleVersion(directory: string): string {
-    return super.getModuleVersion(directory)
-  }
-  findModulePackage(directory: string): any {
-    return super.findModulePackage(directory)
-  }
-  loadModulePackage(directory: string): any {
-    return super.loadModulePackage(directory)
-  }
 }
 
 describe('BaseInstrumentation', () => {
@@ -78,11 +61,15 @@ describe('BaseInstrumentation', () => {
   describe('_onRequire', () => {
     it('loads package.json recursively returning 0.0.0 when undiscovered', () => {
       const instrumentation = new TestInstrumentation()
+      // @ts-expect-error access internal property for testing
       const versionSpy = sinon.spy(instrumentation, 'getModuleVersion');
+      // @ts-expect-error access internal property for testing
       const findSpy = sinon.spy(instrumentation, 'findModulePackage');
+      // @ts-expect-error access internal property for testing
       const loadSpy = sinon.spy(instrumentation, 'loadModulePackage')
 
       const moduleDefinition = {} as InstrumentationModuleDefinition<unknown>
+      // @ts-expect-error access internal property for testing
       instrumentation._onRequire<unknown>(
         moduleDefinition,
         {} as unknown,
@@ -100,8 +87,11 @@ describe('BaseInstrumentation', () => {
 
     it('loads package.json recursively returning version when discovered', () => {
       const instrumentation = new TestInstrumentation()
+      // @ts-expect-error access internal property for testing
       const versionSpy = sinon.spy(instrumentation, 'getModuleVersion');
+      // @ts-expect-error access internal property for testing
       const findSpy = sinon.spy(instrumentation, 'findModulePackage');
+      // @ts-expect-error access internal property for testing
       const loadStub = sinon.stub(instrumentation, 'loadModulePackage')
 
       loadStub.withArgs('/foo/bar').returns({
@@ -110,6 +100,7 @@ describe('BaseInstrumentation', () => {
       })
 
       const moduleDefinition = {} as InstrumentationModuleDefinition<unknown>
+      // @ts-expect-error access internal property for testing
       instrumentation._onRequire<unknown>(
         moduleDefinition,
         {} as unknown,
