@@ -34,6 +34,7 @@ $ npm install @opentelemetry/auto-instrumentations-node
 
 Before any other module in your application is loaded, you must initialize the SDK.
 If you fail to initialize the SDK or initialize it too late, no-op implementations will be provided to any library which acquires a tracer or meter from the API.
+
 This example uses Jaeger and Prometheus, but exporters exist for [other tracing backends][other-tracing-backends].
 
 ```javascript
