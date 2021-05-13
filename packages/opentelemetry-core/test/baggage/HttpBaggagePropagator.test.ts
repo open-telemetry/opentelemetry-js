@@ -25,10 +25,8 @@ import {
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
 import * as assert from 'assert';
-import {
-  BAGGAGE_HEADER,
-  HttpBaggagePropagator,
-} from '../../src/baggage/propagation/HttpBaggagePropagator';
+import { HttpBaggagePropagator } from '../../src/baggage/propagation/HttpBaggagePropagator';
+import { BAGGAGE_HEADER } from '../../src/baggage/constants';
 
 describe('HttpBaggagePropagator', () => {
   const httpBaggagePropagator = new HttpBaggagePropagator();
