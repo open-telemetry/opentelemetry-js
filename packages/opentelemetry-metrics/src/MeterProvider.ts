@@ -18,6 +18,7 @@ import * as api from '@opentelemetry/api-metrics';
 import { Resource } from '@opentelemetry/resources';
 import { Meter } from '.';
 import { DEFAULT_CONFIG, MeterConfig } from './types';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const merge = require('lodash.merge');
 
 /**

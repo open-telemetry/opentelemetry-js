@@ -56,7 +56,6 @@
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-import": "2.22.1",
     "gh-pages": "3.1.0",
-    "gts": "3.1.0",
     "husky": "4.3.8",
     "lerna": "3.22.1",
     "lerna-changelog": "1.0.1",
@@ -69,5 +68,8 @@
       "pre-commit": "npm run lint:changed",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
+  },
+  "dependencies": {
+    "eslint-plugin-node": "^11.1.0"
   }
 }
