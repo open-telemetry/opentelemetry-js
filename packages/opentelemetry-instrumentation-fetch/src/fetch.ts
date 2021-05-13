@@ -314,6 +314,15 @@ export class FetchInstrumentation extends InstrumentationBase<
         }
         const spanData = plugin._prepareSpanData(url);
 
+        function endSpanWithError(span: api.Span, error: FetchError) {
+          plugin._applyAttributesAfterFetch(span, options, error);
+          plugin._endSpan(span, spanData, {
+            status: error.status || 0,
+            statusText: error.message,
+            url,
+          });
+        }
+
         function onSuccess(
           span: api.Span,
           resolve: (
@@ -322,15 +331,38 @@ export class FetchInstrumentation extends InstrumentationBase<
           response: Response
         ) {
           try {
-            plugin._applyAttributesAfterFetch(span, options, response);
-            if (response.status >= 200 && response.status < 400) {
-              plugin._endSpan(span, spanData, response);
-            } else {
-              plugin._endSpan(span, spanData, {
-                status: response.status,
-                statusText: response.statusText,
-                url,
-              });
+            const resClone = response.clone();
+            const body = resClone.body;
+            if (body) {
+              const reader = body.getReader();
+              const read = (): void => {
+                reader.read().then(
+                  ({ done }) => {
+                    if (done) {
+                      plugin._applyAttributesAfterFetch(
+                        span,
+                        options,
+                        response
+                      );
+                      if (response.status >= 200 && response.status < 400) {
+                        plugin._endSpan(span, spanData, response);
+                      } else {
+                        plugin._endSpan(span, spanData, {
+                          status: response.status,
+                          statusText: response.statusText,
+                          url,
+                        });
+                      }
+                    } else {
+                      read();
+                    }
+                  },
+                  error => {
+                    endSpanWithError(span, error);
+                  }
+                );
+              };
+              read();
             }
           } finally {
             resolve(response);
@@ -343,12 +375,7 @@ export class FetchInstrumentation extends InstrumentationBase<
           error: FetchError
         ) {
           try {
-            plugin._applyAttributesAfterFetch(span, options, error);
-            plugin._endSpan(span, spanData, {
-              status: error.status || 0,
-              statusText: error.message,
-              url,
-            });
+            endSpanWithError(span, error);
           } finally {
             reject(error);
           }
