@@ -40,6 +40,12 @@ export interface TracerConfig {
    * The default idGenerator generates random ids
    */
   idGenerator?: IdGenerator;
+
+  /**
+   * How long the forceFlush can run before it is cancelled.
+   * The default value is 30000ms
+   */
+  forceFlushTimeoutMillis?: number;
 }
 
 /**
