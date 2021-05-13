@@ -50,7 +50,7 @@ export class StackContextManager implements ContextManager {
       writable: false,
       value: target.length,
     });
-    return (contextWrapper as unknown) as T;
+    return contextWrapper as unknown as T;
   }
 
   /**

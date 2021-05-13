@@ -96,12 +96,10 @@ describe('WebTracerProvider', () => {
             getSpan(context.active()) === rootSpan,
             'Current span is rootSpan'
           );
-          const concurrentSpan1 = webTracerWithZone.startSpan(
-            'concurrentSpan1'
-          );
-          const concurrentSpan2 = webTracerWithZone.startSpan(
-            'concurrentSpan2'
-          );
+          const concurrentSpan1 =
+            webTracerWithZone.startSpan('concurrentSpan1');
+          const concurrentSpan2 =
+            webTracerWithZone.startSpan('concurrentSpan2');
 
           context.with(setSpan(context.active(), concurrentSpan1), () => {
             setTimeout(() => {

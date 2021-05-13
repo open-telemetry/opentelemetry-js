@@ -22,7 +22,8 @@ import * as types from '../../types';
  */
 export abstract class InstrumentationBase
   extends InstrumentationAbstract
-  implements types.Instrumentation {
+  implements types.Instrumentation
+{
   constructor(
     readonly instrumentationName: string,
     readonly instrumentationVersion: string,

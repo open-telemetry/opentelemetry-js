@@ -140,7 +140,7 @@ export class PrometheusExporter implements MetricExporter {
             diag.debug('Prometheus exporter was stopped');
           } else {
             if (
-              ((err as unknown) as { code: string }).code !==
+              (err as unknown as { code: string }).code !==
               'ERR_SERVER_NOT_RUNNING'
             ) {
               globalErrorHandler(err);

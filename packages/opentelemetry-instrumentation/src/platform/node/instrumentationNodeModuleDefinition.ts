@@ -20,7 +20,8 @@ import {
 } from './types';
 
 export class InstrumentationNodeModuleDefinition<T>
-  implements InstrumentationModuleDefinition<T> {
+  implements InstrumentationModuleDefinition<T>
+{
   files: InstrumentationModuleFile<T>[];
   constructor(
     public name: string,

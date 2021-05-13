@@ -111,13 +111,13 @@ describe('CollectorMetricExporter - node with proto over http', () => {
         value: 1592602232694000000,
       });
       metrics = [];
-      const counter: metrics.Metric<metrics.BoundCounter> &
-        Counter = mockCounter();
-      const observer: metrics.Metric<metrics.BoundObserver> &
-        ValueObserver = mockObserver(observerResult => {
-        observerResult.observe(3, {});
-        observerResult.observe(6, {});
-      });
+      const counter: metrics.Metric<metrics.BoundCounter> & Counter =
+        mockCounter();
+      const observer: metrics.Metric<metrics.BoundObserver> & ValueObserver =
+        mockObserver(observerResult => {
+          observerResult.observe(3, {});
+          observerResult.observe(6, {});
+        });
       const recorder: metrics.Metric<metrics.BoundValueRecorder> &
         ValueRecorder = mockValueRecorder();
 
@@ -175,7 +175,8 @@ describe('CollectorMetricExporter - node with proto over http', () => {
         write: (...writeArgs: any[]) => {
           const ExportTraceServiceRequestProto = getExportRequestProto();
           const data = ExportTraceServiceRequestProto?.decode(writeArgs[0]);
-          const json = data?.toJSON() as collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
+          const json =
+            data?.toJSON() as collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
 
           const metric1 =
             json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];

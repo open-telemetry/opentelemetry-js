@@ -88,18 +88,16 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
 
   const spanTags: ThriftTag[] = ThriftUtils.getThriftTags(tags);
 
-  const logs = span.events.map(
-    (event): Log => {
-      const fields: Tag[] = [{ key: 'event', value: event.name }];
-      const attrs = event.attributes;
-      if (attrs) {
-        Object.keys(attrs).forEach(attr =>
-          fields.push({ key: attr, value: toTagValue(attrs[attr]) })
-        );
-      }
-      return { timestamp: hrTimeToMilliseconds(event.time), fields };
+  const logs = span.events.map((event): Log => {
+    const fields: Tag[] = [{ key: 'event', value: event.name }];
+    const attrs = event.attributes;
+    if (attrs) {
+      Object.keys(attrs).forEach(attr =>
+        fields.push({ key: attr, value: toTagValue(attrs[attr]) })
+      );
     }
-  );
+    return { timestamp: hrTimeToMilliseconds(event.time), fields };
+  });
   const spanLogs: ThriftLog[] = ThriftUtils.getThriftLogs(logs);
 
   return {

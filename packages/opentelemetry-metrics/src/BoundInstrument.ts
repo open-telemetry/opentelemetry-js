@@ -72,7 +72,8 @@ export class BaseBoundInstrument {
  */
 export class BoundCounter
   extends BaseBoundInstrument
-  implements api.BoundCounter {
+  implements api.BoundCounter
+{
   constructor(
     labels: api.Labels,
     disabled: boolean,
@@ -99,7 +100,8 @@ export class BoundCounter
  */
 export class BoundUpDownCounter
   extends BaseBoundInstrument
-  implements api.BoundCounter {
+  implements api.BoundCounter
+{
   constructor(
     labels: api.Labels,
     disabled: boolean,
@@ -119,7 +121,8 @@ export class BoundUpDownCounter
  */
 export class BoundValueRecorder
   extends BaseBoundInstrument
-  implements api.BoundValueRecorder {
+  implements api.BoundValueRecorder
+{
   constructor(
     labels: api.Labels,
     disabled: boolean,
@@ -139,7 +142,8 @@ export class BoundValueRecorder
  */
 export class BoundObserver
   extends BaseBoundInstrument
-  implements api.BoundBaseObserver {
+  implements api.BoundBaseObserver
+{
   constructor(
     labels: api.Labels,
     disabled: boolean,

@@ -966,7 +966,8 @@ describe('Meter', () => {
         return Math.random();
       }
 
-      const metricRecords: MetricRecord[] = await valueObserver.getMetricRecord();
+      const metricRecords: MetricRecord[] =
+        await valueObserver.getMetricRecord();
       assert.strictEqual(metricRecords.length, 4);
 
       const metric1 = metricRecords[0];
@@ -1200,7 +1201,7 @@ describe('Meter', () => {
             setTimeout(resolve, 1);
           }),
         ]).then((stats: unknown[]) => {
-          const apps = (stats[0] as unknown) as Stat[];
+          const apps = stats[0] as unknown as Stat[];
           apps.forEach(app => {
             observerBatchResult.observe({ app: app.name, core: '1' }, [
               tempMetric.observation(app.core1.temp),
@@ -1269,7 +1270,8 @@ describe('Meter', () => {
             // simulate some waiting
             await setTimeout(() => {}, 5);
 
-            const cpuUsageMetricRecords: MetricRecord[] = await cpuUsageMetric.getMetricRecord();
+            const cpuUsageMetricRecords: MetricRecord[] =
+              await cpuUsageMetric.getMetricRecord();
             const value = cpuUsageMetric
               .bind({ foo: 'bar' })
               .getAggregator()

@@ -23,7 +23,8 @@ import { MetricKind } from './export/types';
 /** This is a SDK implementation of Value Observer Metric. */
 export class ValueObserverMetric
   extends BaseObserverMetric
-  implements api.ValueObserver {
+  implements api.ValueObserver
+{
   constructor(
     name: string,
     options: api.MetricOptions,

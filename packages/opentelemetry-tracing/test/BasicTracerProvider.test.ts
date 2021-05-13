@@ -49,9 +49,9 @@ import {
 
 describe('BasicTracerProvider', () => {
   let removeEvent: Function | undefined;
-  const envSource = (typeof window !== 'undefined'
-    ? window
-    : process.env) as any;
+  const envSource = (
+    typeof window !== 'undefined' ? window : process.env
+  ) as any;
 
   beforeEach(() => {
     context.disable();
@@ -370,10 +370,7 @@ describe('BasicTracerProvider', () => {
       const span = tracer.startSpan(
         'my-span',
         {},
-        setSpanContext(
-          ROOT_CONTEXT,
-          ('invalid-parent' as unknown) as SpanContext
-        )
+        setSpanContext(ROOT_CONTEXT, 'invalid-parent' as unknown as SpanContext)
       );
       assert.ok(span instanceof Span);
       assert.deepStrictEqual((span as Span).parentSpanId, undefined);

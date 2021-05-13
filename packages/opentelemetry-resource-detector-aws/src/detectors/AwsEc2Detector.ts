@@ -57,13 +57,8 @@ class AwsEc2Detector implements Detector {
    */
   async detect(_config?: ResourceDetectionConfig): Promise<Resource> {
     const token = await this._fetchToken();
-    const {
-      accountId,
-      instanceId,
-      instanceType,
-      region,
-      availabilityZone,
-    } = await this._fetchIdentity(token);
+    const { accountId, instanceId, instanceType, region, availabilityZone } =
+      await this._fetchIdentity(token);
     const hostname = await this._fetchHost(token);
 
     return new Resource({
