@@ -441,6 +441,64 @@ describe('BasicTracerProvider', () => {
     });
   });
 
+  describe('.forceFlush()', () => {
+    it('should call forceFlush on all registered span processors', done => {
+      sinon.restore();
+      const forceFlushStub = sinon.stub(
+        NoopSpanProcessor.prototype,
+        'forceFlush'
+      );
+      forceFlushStub.resolves();
+
+      const tracerProvider = new BasicTracerProvider();
+      const spanProcessorOne = new NoopSpanProcessor();
+      const spanProcessorTwo = new NoopSpanProcessor();
+
+      tracerProvider.addSpanProcessor(spanProcessorOne);
+      tracerProvider.addSpanProcessor(spanProcessorTwo);
+
+      tracerProvider
+        .forceFlush()
+        .then(() => {
+          sinon.restore();
+          assert(forceFlushStub.calledTwice);
+          done();
+        })
+        .catch(error => {
+          sinon.restore();
+          done(error);
+        });
+    });
+
+    it('should throw error when calling forceFlush on all registered span processors fails', done => {
+      sinon.restore();
+
+      const forceFlushStub = sinon.stub(
+        NoopSpanProcessor.prototype,
+        'forceFlush'
+      );
+      forceFlushStub.returns(Promise.reject('Error'));
+
+      const tracerProvider = new BasicTracerProvider();
+      const spanProcessorOne = new NoopSpanProcessor();
+      const spanProcessorTwo = new NoopSpanProcessor();
+      tracerProvider.addSpanProcessor(spanProcessorOne);
+      tracerProvider.addSpanProcessor(spanProcessorTwo);
+
+      tracerProvider
+        .forceFlush()
+        .then(() => {
+          sinon.restore();
+          done(new Error('Successful forceFlush not expected'));
+        })
+        .catch(_error => {
+          sinon.restore();
+          sinon.assert.calledTwice(forceFlushStub);
+          done();
+        });
+    });
+  });
+
   describe('.bind()', () => {
     it('should bind context with NoopContextManager context manager', done => {
       const tracer = new BasicTracerProvider().getTracer('default');
