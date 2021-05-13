@@ -29,8 +29,8 @@ export interface TracerConfig {
    */
   sampler?: Sampler;
 
-  /** Trace Parameters */
-  traceParams?: TraceParams;
+  /** Span Limits */
+  spanLimits?: SpanLimits;
 
   /** Resource associated with trace telemetry  */
   resource?: Resource;
@@ -62,13 +62,13 @@ export interface SDKRegistrationConfig {
 }
 
 /** Global configuration of trace service */
-export interface TraceParams {
-  /** numberOfAttributesPerSpan is number of attributes per span */
-  numberOfAttributesPerSpan?: number;
-  /** numberOfLinksPerSpan is number of links per span */
-  numberOfLinksPerSpan?: number;
-  /** numberOfEventsPerSpan is number of message events per span */
-  numberOfEventsPerSpan?: number;
+export interface SpanLimits {
+  /** attributeCountLimit is number of attributes per span */
+  attributeCountLimit?: number;
+  /** linkCountLimit is number of links per span */
+  linkCountLimit?: number;
+  /** eventCountLimit is number of message events per span */
+  eventCountLimit?: number;
 }
 
 /** Interface configuration for a buffer. */
