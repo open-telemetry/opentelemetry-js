@@ -26,14 +26,6 @@ import { NonRecordingSpan } from './NonRecordingSpan';
 const SPAN_KEY = createContextKey('OpenTelemetry Context Key SPAN');
 
 /**
- * Shared key for indicating if instrumentation should be suppressed beyond
- * this current scope.
- */
-const SUPPRESS_INSTRUMENTATION_KEY = createContextKey(
-  'OpenTelemetry Context Key SUPPRESS_INSTRUMENTATION'
-);
-
-/**
  * Return the span if one exists
  *
  * @param context context to get span from
@@ -73,34 +65,4 @@ export function setSpanContext(
  */
 export function getSpanContext(context: Context): SpanContext | undefined {
   return getSpan(context)?.spanContext();
-}
-
-/**
- * Sets value on context to indicate that instrumentation should
- * be suppressed beyond this current scope.
- *
- * @param context context to set the suppress instrumentation value on.
- */
-export function suppressInstrumentation(context: Context): Context {
-  return context.setValue(SUPPRESS_INSTRUMENTATION_KEY, true);
-}
-
-/**
- * Sets value on context to indicate that instrumentation should
- * no-longer be suppressed beyond this current scope.
- *
- * @param context context to set the suppress instrumentation value on.
- */
-export function unsuppressInstrumentation(context: Context): Context {
-  return context.setValue(SUPPRESS_INSTRUMENTATION_KEY, false);
-}
-
-/**
- * Return current suppress instrumentation value for the given context,
- * if it exists.
- *
- * @param context context check for the suppress instrumentation value.
- */
-export function isInstrumentationSuppressed(context: Context): boolean {
-  return Boolean(context.getValue(SUPPRESS_INSTRUMENTATION_KEY));
 }
