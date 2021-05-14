@@ -28,6 +28,7 @@ import {
   registerGlobal,
   unregisterGlobal,
 } from '../internal/global-utils';
+import { getBaggage, createBaggage, setBaggage } from '../baggage/index';
 
 const API_NAME = 'propagation';
 
@@ -99,6 +100,12 @@ export class PropagationAPI {
   public disable() {
     unregisterGlobal(API_NAME);
   }
+
+  public createBaggage = createBaggage;
+
+  public getBaggage = getBaggage;
+
+  public setBaggage = setBaggage;
 
   private _getGlobalPropagator(): TextMapPropagator {
     return getGlobal(API_NAME) || NOOP_TEXT_MAP_PROPAGATOR;
