@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export * from './baggage';
+export { baggageEntryMetadataFromString } from './baggage';
 export * from './common/Exception';
 export * from './common/Time';
 export * from './diag';

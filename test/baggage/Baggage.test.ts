@@ -16,24 +16,22 @@
 
 import * as assert from 'assert';
 import {
-  createBaggage,
-  setBaggage,
-  getBaggage,
   ROOT_CONTEXT,
+  propagation,
   baggageEntryMetadataFromString,
 } from '../../src';
 
 describe('Baggage', () => {
   describe('create', () => {
     it('should create an empty bag', () => {
-      const bag = createBaggage();
+      const bag = propagation.createBaggage();
 
       assert.deepStrictEqual(bag.getAllEntries(), []);
     });
 
     it('should create a bag with entries', () => {
       const meta = baggageEntryMetadataFromString('opaque string');
-      const bag = createBaggage({
+      const bag = propagation.createBaggage({
         key1: { value: 'value1' },
         key2: { value: 'value2', metadata: meta },
       });
@@ -47,7 +45,9 @@ describe('Baggage', () => {
 
   describe('get', () => {
     it('should not allow modification of returned entries', () => {
-      const bag = createBaggage().setEntry('key', { value: 'value' });
+      const bag = propagation
+        .createBaggage()
+        .setEntry('key', { value: 'value' });
 
       const entry = bag.getEntry('key');
       assert.ok(entry);
@@ -59,7 +59,7 @@ describe('Baggage', () => {
 
   describe('set', () => {
     it('should create a new bag when an entry is added', () => {
-      const bag = createBaggage();
+      const bag = propagation.createBaggage();
 
       const bag2 = bag.setEntry('key', { value: 'value' });
 
@@ -73,7 +73,7 @@ describe('Baggage', () => {
 
   describe('remove', () => {
     it('should create a new bag when an entry is removed', () => {
-      const bag = createBaggage({
+      const bag = propagation.createBaggage({
         key: { value: 'value' },
       });
 
@@ -87,7 +87,7 @@ describe('Baggage', () => {
     });
 
     it('should create an empty bag multiple keys are removed', () => {
-      const bag = createBaggage({
+      const bag = propagation.createBaggage({
         key: { value: 'value' },
         key1: { value: 'value1' },
         key2: { value: 'value2' },
@@ -107,7 +107,7 @@ describe('Baggage', () => {
     });
 
     it('should create an empty bag when it cleared', () => {
-      const bag = createBaggage({
+      const bag = propagation.createBaggage({
         key: { value: 'value' },
         key1: { value: 'value1' },
       });
@@ -125,11 +125,11 @@ describe('Baggage', () => {
 
   describe('context', () => {
     it('should set and get a baggage from a context', () => {
-      const bag = createBaggage();
+      const bag = propagation.createBaggage();
 
-      const ctx = setBaggage(ROOT_CONTEXT, bag);
+      const ctx = propagation.setBaggage(ROOT_CONTEXT, bag);
 
-      assert.strictEqual(bag, getBaggage(ctx));
+      assert.strictEqual(bag, propagation.getBaggage(ctx));
     });
   });
 
@@ -148,7 +148,7 @@ describe('Baggage', () => {
     });
 
     it('should retain metadata', () => {
-      const bag = createBaggage({
+      const bag = propagation.createBaggage({
         key: {
           value: 'value',
           metadata: baggageEntryMetadataFromString('meta'),
