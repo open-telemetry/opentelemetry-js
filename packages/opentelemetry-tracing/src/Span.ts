@@ -116,6 +116,14 @@ export class Span implements api.Span, ReadableSpan {
     return this;
   }
 
+  getAttribute(key: string): api.SpanAttributes {
+    return this.attributes[key];
+  }
+
+  getAttributes(): api.SpanAttributes {
+    return this.attributes;
+  }
+
   /**
    *
    * @param name Span Name
