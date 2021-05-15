@@ -314,7 +314,7 @@ export class FetchInstrumentation extends InstrumentationBase<
         }
         const spanData = plugin._prepareSpanData(url);
 
-        function endSpanWithError(span: api.Span, error: FetchError) {
+        function endSpanOnError(span: api.Span, error: FetchError) {
           plugin._applyAttributesAfterFetch(span, options, error);
           plugin._endSpan(span, spanData, {
             status: error.status || 0,
@@ -323,7 +323,7 @@ export class FetchInstrumentation extends InstrumentationBase<
           });
         }
 
-        function endSpanSuccessfully(span: api.Span, response: Response) {
+        function endSpanOnSuccess(span: api.Span, response: Response) {
           plugin._applyAttributesAfterFetch(span, options, response);
           if (response.status >= 200 && response.status < 400) {
             plugin._endSpan(span, spanData, response);
@@ -351,20 +351,20 @@ export class FetchInstrumentation extends InstrumentationBase<
                 reader.read().then(
                   ({ done }) => {
                     if (done) {
-                      endSpanSuccessfully(span, response);
+                      endSpanOnSuccess(span, response);
                     } else {
                       read();
                     }
                   },
                   error => {
-                    endSpanWithError(span, error);
+                    endSpanOnError(span, error);
                   }
                 );
               };
               read();
             } else {
               // some older browsers don't have .body implemented
-              endSpanSuccessfully(span, response);
+              endSpanOnSuccess(span, response);
             }
           } finally {
             resolve(response);
@@ -377,7 +377,7 @@ export class FetchInstrumentation extends InstrumentationBase<
           error: FetchError
         ) {
           try {
-            endSpanWithError(span, error);
+            endSpanOnError(span, error);
           } finally {
             reject(error);
           }
