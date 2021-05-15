@@ -50,6 +50,7 @@ import {
   isWrapped,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
+import { RPCMetadata, RPCType, setRPCMetadata } from '@opentelemetry/core';
 
 /**
  * Http instrumentation instrumentation for Opentelemetry
@@ -409,29 +410,72 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         spanOptions,
         ctx
       );
+      const rpcMetadata: RPCMetadata = {
+        type: RPCType.HTTP,
+        span,
+      };
 
-      return context.with(trace.setSpan(ctx, span), () => {
-        context.bind(request);
-        context.bind(response);
+      return context.with(
+        setRPCMetadata(trace.setSpan(ctx, span), rpcMetadata),
+        () => {
+          context.bind(request);
+          context.bind(response);
 
-        if (instrumentation._getConfig().requestHook) {
-          instrumentation._callRequestHook(span, request);
-        }
-        if (instrumentation._getConfig().responseHook) {
-          instrumentation._callResponseHook(span, response);
-        }
+          if (instrumentation._getConfig().requestHook) {
+            instrumentation._callRequestHook(span, request);
+          }
+          if (instrumentation._getConfig().responseHook) {
+            instrumentation._callResponseHook(span, response);
+          }
 
-        // Wraps end (inspired by:
-        // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/instrumentations/instrumentation-connect.ts#L75)
-        const originalEnd = response.end;
-        response.end = function (
-          this: http.ServerResponse,
-          ..._args: ResponseEndArgs
-        ) {
-          response.end = originalEnd;
-          // Cannot pass args of type ResponseEndArgs,
-          const returned = safeExecuteInTheMiddle(
-            () => response.end.apply(this, arguments as never),
+          // Wraps end (inspired by:
+          // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/instrumentations/instrumentation-connect.ts#L75)
+          const originalEnd = response.end;
+          response.end = function (
+            this: http.ServerResponse,
+            ..._args: ResponseEndArgs
+          ) {
+            response.end = originalEnd;
+            // Cannot pass args of type ResponseEndArgs,
+            const returned = safeExecuteInTheMiddle(
+              () => response.end.apply(this, arguments as never),
+              error => {
+                if (error) {
+                  utils.setSpanWithError(span, error);
+                  instrumentation._closeHttpSpan(span);
+                  throw error;
+                }
+              }
+            );
+
+            const attributes = utils.getIncomingRequestAttributesOnResponse(
+              request,
+              response
+            );
+
+            span
+              .setAttributes(attributes)
+              .setStatus(utils.parseResponseStatus(response.statusCode));
+
+            if (instrumentation._getConfig().applyCustomAttributesOnSpan) {
+              safeExecuteInTheMiddle(
+                () =>
+                  instrumentation._getConfig().applyCustomAttributesOnSpan!(
+                    span,
+                    request,
+                    response
+                  ),
+                () => {},
+                true
+              );
+            }
+
+            instrumentation._closeHttpSpan(span);
+            return returned;
+          };
+
+          return safeExecuteInTheMiddle(
+            () => original.apply(this, [event, ...args]),
             error => {
               if (error) {
                 utils.setSpanWithError(span, error);
@@ -440,44 +484,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
               }
             }
           );
-
-          const attributes = utils.getIncomingRequestAttributesOnResponse(
-            request,
-            response
-          );
-
-          span
-            .setAttributes(attributes)
-            .setStatus(utils.parseResponseStatus(response.statusCode));
-
-          if (instrumentation._getConfig().applyCustomAttributesOnSpan) {
-            safeExecuteInTheMiddle(
-              () =>
-                instrumentation._getConfig().applyCustomAttributesOnSpan!(
-                  span,
-                  request,
-                  response
-                ),
-              () => {},
-              true
-            );
-          }
-
-          instrumentation._closeHttpSpan(span);
-          return returned;
-        };
-
-        return safeExecuteInTheMiddle(
-          () => original.apply(this, [event, ...args]),
-          error => {
-            if (error) {
-              utils.setSpanWithError(span, error);
-              instrumentation._closeHttpSpan(span);
-              throw error;
-            }
-          }
-        );
-      });
+        }
+      );
     };
   }
 
