@@ -25,21 +25,17 @@ To load a specific instrumentation (**gRPC** in this case), specify it in the No
 ```javascript
 const { NodeTracerProvider } = require('@opentelemetry/node');
 const { GrpcInstrumentation } = require('@opentelemetry/instrumentation-grpc');
+const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 
-const provider = new NodeTracerProvider({
-  // be sure to disable old plugin
-  plugins: {
-    grpc: { enabled: false, path: '@opentelemetry/plugin-groc' }
-  },
-});
-
-const grpcInstrumentation = new GrpcInstrumentation({
-  // see under for available configuration
-});
-grpcInstrumentation.enable();
+const provider = new NodeTracerProvider();
 
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.register();
+
+registerInstrumentations({
+  instrumentations: [new GrpcInstrumentation()]
+});
+
 ```
 
 See [examples/grpc](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/grpc) or [examples/grpc-js](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/grpc-js) for examples.
@@ -65,9 +61,9 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-instrumentation-grpc
+[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-instrumentation-grpc
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-instrumentation-grpc
-[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-instrumentation-grpc
+[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-instrumentation-grpc&type=dev
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-instrumentation-grpc&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/instrumentation-grpc
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Finstrumentation-grpc.svg

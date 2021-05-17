@@ -24,10 +24,13 @@ import * as zipkinTypes from '../../types';
 
 /**
  * Prepares send function that will send spans to the remote Zipkin service.
+ * @param urlStr - url to send spans
+ * @param headers - headers
+ * send
  */
 export function prepareSend(urlStr: string, headers?: Record<string, string>) {
   let xhrHeaders: Record<string, string>;
-  const useBeacon = navigator.sendBeacon && !headers;
+  const useBeacon = typeof navigator.sendBeacon === 'function' && !headers;
   if (headers) {
     xhrHeaders = {
       Accept: 'application/json',

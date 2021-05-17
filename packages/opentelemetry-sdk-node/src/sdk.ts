@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { diag, TextMapPropagator } from '@opentelemetry/api';
+import { TextMapPropagator } from '@opentelemetry/api';
 import { metrics } from '@opentelemetry/api-metrics';
 import { ContextManager } from '@opentelemetry/api';
 import { MeterConfig, MeterProvider } from '@opentelemetry/metrics';
@@ -67,8 +67,8 @@ export class NodeSDK {
       if (configuration.sampler) {
         tracerProviderConfig.sampler = configuration.sampler;
       }
-      if (configuration.traceParams) {
-        tracerProviderConfig.traceParams = configuration.traceParams;
+      if (configuration.spanLimits) {
+        tracerProviderConfig.spanLimits = configuration.spanLimits;
       }
 
       const spanProcessor =
@@ -102,9 +102,6 @@ export class NodeSDK {
     let instrumentations: InstrumentationOption[] = [];
     if (configuration.instrumentations) {
       instrumentations = configuration.instrumentations;
-    } else if (configuration.plugins) {
-      diag.error('plugins option is deprecated');
-      instrumentations = configuration.plugins;
     }
     this._instrumentations = instrumentations;
   }
@@ -179,8 +176,6 @@ export class NodeSDK {
 
     registerInstrumentations({
       instrumentations: this._instrumentations,
-      tracerProvider: this._tracerProvider,
-      meterProvider: this._meterProvider,
     });
   }
 

@@ -46,8 +46,7 @@ span.end();
 
 Tracing configuration is a merge of user supplied configuration with both the default
 configuration as specified in [config.ts](./src/config.ts) and an
-environmentally configurable (via `OTEL_SAMPLING_PROBABILITY`) probability
-sampler delegate of a [ParentBased](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/sdk.md#parentbased) sampler.
+environmentally configurable sampling (via `OTEL_TRACES_SAMPLER` and `OTEL_TRACES_SAMPLER_ARG`).
 
 ## Example
 
@@ -66,9 +65,9 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-tracing
+[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-tracing
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-tracing
-[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-tracing
+[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-tracing&type=dev
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-tracing&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/tracing
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Ftracing.svg

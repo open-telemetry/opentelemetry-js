@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { AlwaysOnSampler } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
@@ -22,6 +23,7 @@ import {
   SimpleSpanProcessor,
 } from '../../src';
 
+/* eslint-disable no-console */
 describe('ConsoleSpanExporter', () => {
   let consoleExporter: ConsoleSpanExporter;
   let previousConsoleLog: any;
@@ -39,7 +41,9 @@ describe('ConsoleSpanExporter', () => {
   describe('.export()', () => {
     it('should export information about span', () => {
       assert.doesNotThrow(() => {
-        const basicTracerProvider = new BasicTracerProvider();
+        const basicTracerProvider = new BasicTracerProvider({
+          sampler: new AlwaysOnSampler(),
+        });
         consoleExporter = new ConsoleSpanExporter();
 
         const spyConsole = sinon.spy(console, 'log');

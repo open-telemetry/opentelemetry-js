@@ -22,7 +22,7 @@ import { Resource } from '@opentelemetry/resources';
 import {
   SpanExporter,
   SpanProcessor,
-  TraceParams,
+  SpanLimits,
 } from '@opentelemetry/tracing';
 
 export interface NodeSDKConfiguration {
@@ -33,12 +33,10 @@ export interface NodeSDKConfiguration {
   metricProcessor: Processor;
   metricExporter: MetricExporter;
   metricInterval: number;
-  /* Deprecated */
-  plugins: InstrumentationOption[];
   instrumentations: InstrumentationOption[];
   resource: Resource;
   sampler: Sampler;
   spanProcessor: SpanProcessor;
   traceExporter: SpanExporter;
-  traceParams: TraceParams;
+  spanLimits: SpanLimits;
 }

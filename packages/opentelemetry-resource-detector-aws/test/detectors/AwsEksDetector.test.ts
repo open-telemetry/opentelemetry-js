@@ -247,8 +247,7 @@ describe('awsEksDetector', () => {
   });
 
   describe('on unsuccesful request', () => {
-    it('should throw when receiving error response code', async () => {
-      const expectedError = new Error('EKS metadata api request timed out.');
+    it('should return an empty resource when timed out', async () => {
       fileStub = sinon
         .stub(AwsEksDetector, 'fileAccessAsync' as any)
         .resolves();
@@ -265,17 +264,14 @@ describe('awsEksDetector', () => {
         .delayConnection(2500)
         .reply(200, () => mockedAwsAuth);
 
-      try {
-        await awsEksDetector.detect();
-      } catch (err) {
-        assert.deepStrictEqual(err, expectedError);
-      }
-
+      const resource: Resource = await awsEksDetector.detect();
       scope.done();
-    });
 
-    it('should return an empty resource when timed out', async () => {
-      const expectedError = new Error('Failed to load page, status code: 404');
+      assert.ok(resource);
+      assertEmptyResource(resource);
+    }).timeout(awsEksDetector.TIMEOUT_MS + 100);
+
+    it('should return an empty resource when receiving error response code', async () => {
       fileStub = sinon
         .stub(AwsEksDetector, 'fileAccessAsync' as any)
         .resolves();
@@ -291,13 +287,11 @@ describe('awsEksDetector', () => {
         .matchHeader('Authorization', k8s_token)
         .reply(404, () => new Error());
 
-      try {
-        await awsEksDetector.detect();
-      } catch (err) {
-        assert.deepStrictEqual(err, expectedError);
-      }
-
+      const resource: Resource = await awsEksDetector.detect();
       scope.done();
+
+      assert.ok(resource);
+      assertEmptyResource(resource);
     });
   });
 });

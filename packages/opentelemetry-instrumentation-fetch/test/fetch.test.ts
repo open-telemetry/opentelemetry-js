@@ -35,9 +35,13 @@ import {
 } from '@opentelemetry/web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { FetchInstrumentation, FetchInstrumentationConfig } from '../src';
+import {
+  FetchInstrumentation,
+  FetchInstrumentationConfig,
+  FetchCustomAttributeFunction,
+} from '../src';
 import { AttributeNames } from '../src/enums/AttributeNames';
-import { HttpAttribute } from '@opentelemetry/semantic-conventions';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 class DummySpanExporter implements tracing.SpanExporter {
   export(spans: any) {}
@@ -57,6 +61,7 @@ const getData = (url: string, method?: string) =>
     },
   });
 
+const CUSTOM_ATTRIBUTE_KEY = 'span kind';
 const defaultResource = {
   connectEnd: 15,
   connectStart: 13,
@@ -335,37 +340,37 @@ describe('fetch', () => {
       assert.strictEqual(
         attributes[keys[1]],
         'GET',
-        `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
+        `attributes ${SemanticAttributes.HTTP_METHOD} is wrong`
       );
       assert.strictEqual(
         attributes[keys[2]],
         url,
-        `attributes ${HttpAttribute.HTTP_URL} is wrong`
+        `attributes ${SemanticAttributes.HTTP_URL} is wrong`
       );
       assert.strictEqual(
         attributes[keys[3]],
         200,
-        `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
+        `attributes ${SemanticAttributes.HTTP_STATUS_CODE} is wrong`
       );
       assert.ok(
         attributes[keys[4]] === 'OK' || attributes[keys[4]] === '',
-        `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
+        `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
       );
       assert.ok(
         (attributes[keys[5]] as string).indexOf('localhost') === 0,
-        `attributes ${HttpAttribute.HTTP_HOST} is wrong`
+        `attributes ${SemanticAttributes.HTTP_HOST} is wrong`
       );
       assert.ok(
         attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
-        `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
+        `attributes ${SemanticAttributes.HTTP_SCHEME} is wrong`
       );
       assert.ok(
         attributes[keys[7]] !== '',
-        `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
+        `attributes ${SemanticAttributes.HTTP_USER_AGENT} is not defined`
       );
       assert.ok(
         (attributes[keys[8]] as number) > 0,
-        `attributes ${HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
+        `attributes ${SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
       );
 
       assert.strictEqual(keys.length, 9, 'number of attributes is wrong');
@@ -537,10 +542,19 @@ describe('fetch', () => {
     });
 
     describe('when propagateTraceHeaderCorsUrls does NOT MATCH', () => {
+      let spyDebug: sinon.SinonSpy;
       beforeEach(done => {
+        const diagLogger = new api.DiagConsoleLogger();
+        spyDebug = sinon.spy();
+        diagLogger.debug = spyDebug;
+        api.diag.setLogger(diagLogger, api.DiagLogLevel.ALL);
         clearData();
         prepareData(done, url, {});
       });
+      afterEach(() => {
+        sinon.restore();
+      });
+
       it('should NOT set trace headers', () => {
         assert.strictEqual(
           lastResponse.headers[X_B3_TRACE_ID],
@@ -558,6 +572,79 @@ describe('fetch', () => {
           `trace header '${X_B3_SAMPLED}' should not be set`
         );
       });
+      it('should debug info that injecting headers was skipped', () => {
+        assert.strictEqual(
+          spyDebug.lastCall.args[0],
+          'headers inject skipped due to CORS policy'
+        );
+      });
+    });
+  });
+
+  describe('applyCustomAttributesOnSpan option', () => {
+    const noop = () => {};
+    const prepare = (
+      url: string,
+      applyCustomAttributesOnSpan: FetchCustomAttributeFunction,
+      cb: VoidFunction = noop
+    ) => {
+      const propagateTraceHeaderCorsUrls = [url];
+
+      prepareData(cb, url, {
+        propagateTraceHeaderCorsUrls,
+        applyCustomAttributesOnSpan,
+      });
+    };
+
+    afterEach(() => {
+      clearData();
+    });
+
+    it('applies attributes when the request is succesful', done => {
+      prepare(
+        url,
+        span => {
+          span.setAttribute(CUSTOM_ATTRIBUTE_KEY, 'custom value');
+        },
+        () => {
+          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+          const attributes = span.attributes;
+
+          assert.ok(attributes[CUSTOM_ATTRIBUTE_KEY] === 'custom value');
+          done();
+        }
+      );
+    });
+
+    it('applies custom attributes when the request fails', done => {
+      prepare(
+        badUrl,
+        span => {
+          span.setAttribute(CUSTOM_ATTRIBUTE_KEY, 'custom value');
+        },
+        () => {
+          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+          const attributes = span.attributes;
+
+          assert.ok(attributes[CUSTOM_ATTRIBUTE_KEY] === 'custom value');
+          done();
+        }
+      );
+    });
+
+    it('has request and response objects in callback arguments', done => {
+      const applyCustomAttributes: FetchCustomAttributeFunction = (
+        span,
+        request,
+        response
+      ) => {
+        assert.ok(request.method === 'GET');
+        assert.ok(response.status === 200);
+
+        done();
+      };
+
+      prepare(url, applyCustomAttributes);
     });
   });
 
@@ -749,7 +836,7 @@ describe('fetch', () => {
       assert.strictEqual(
         attributes[keys[3]],
         200,
-        `Missing basic attribute ${HttpAttribute.HTTP_STATUS_CODE}`
+        `Missing basic attribute ${SemanticAttributes.HTTP_STATUS_CODE}`
       );
     });
   });

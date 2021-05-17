@@ -30,7 +30,13 @@ const options = {
     'my-header': 'header-value',
   },
   url: 'your-zipkin-url',
-  serviceName: 'your-application-name'
+  serviceName: 'your-application-name',
+  // optional interceptor
+  getExportRequestHeaders: () => {
+    return {
+      'my-header': 'header-value',
+    }
+  }
 }
 const exporter = new ZipkinExporter(options);
 ```
@@ -45,6 +51,11 @@ You can use built-in `SimpleSpanProcessor` or `BatchSpanProcessor` or write your
 
 - [SimpleSpanProcessor](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/sdk.md#simple-processor): The implementation of `SpanProcessor` that passes ended span directly to the configured `SpanExporter`.
 - [BatchSpanProcessor](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/sdk.md#batching-processor): The implementation of the `SpanProcessor` that batches ended spans and pushes them to the configured `SpanExporter`. It is recommended to use this `SpanProcessor` for better performance and optimization.
+
+### Options
+
+- **getExportRequestHeaders** - optional interceptor that allows adding new headers everytime time the exporter is going to send spans.
+This is optional and can be used if headers are changing over time. This is a sync callback.
 
 ## Viewing your traces
 
@@ -64,9 +75,9 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-exporter-zipkin
+[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-zipkin
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-zipkin
-[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-exporter-zipkin
+[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-zipkin&type=dev
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-zipkin&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-zipkin
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-zipkin.svg

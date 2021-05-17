@@ -16,5 +16,4 @@
 export * from './instrumentation';
 export * from './instrumentationNodeModuleDefinition';
 export * from './instrumentationNodeModuleFile';
-export * from './old/autoLoader';
 export * from './types';

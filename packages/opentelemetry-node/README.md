@@ -13,9 +13,9 @@ For manual instrumentation see the
 ## How auto instrumentation works
 
 This package exposes a `NodeTracerProvider`.
-For loading plugins / instrumentations please use `registerInstrumentations` function from [opentelemetry-instrumentation](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-instrumentation)
+For loading instrumentations please use `registerInstrumentations` function from [opentelemetry-instrumentation](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-instrumentation)
 
-OpenTelemetry comes with a growing number of instrumentation plugins for well know modules (see [supported modules](https://github.com/open-telemetry/opentelemetry-js#plugins)) and an API to create custom instrumentation (see [the instrumentation developer guide](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/instrumentation-guide.md)).
+OpenTelemetry comes with a growing number of instrumentation plugins for well known modules (see [supported modules](https://github.com/open-telemetry/opentelemetry-js#instrumentations)) and an API to create custom instrumentation (see [the instrumentation developer guide](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/instrumentation-guide.md)).
 
 > **Please note:** This module does *not* bundle any plugins. They need to be installed separately.
 
@@ -64,7 +64,6 @@ provider.register();
 // register and load instrumentation and old plugins - old plugins will be loaded automatically as previously
 // but instrumentations needs to be added
 registerInstrumentations({
-  tracerProvider: provider,
 });
 
 // Your application code - http will automatically be instrumented if
@@ -72,59 +71,36 @@ registerInstrumentations({
 const http = require('http');
 ```
 
-## Instrumentation / Plugin configuration
-
-User supplied plugin configuration is merged with the default plugin
-configuration. Furthermore, custom plugins that are configured are implicitly
-enabled just as default plugins are.
+## Instrumentation configuration
 
 In the following example:
 
-- the default express plugin is disabled
-- the http plugin has a custom config for a `requestHook`
-- the customPlugin is loaded from the user supplied path
-- all default plugins are still loaded if installed.
+- the express instrumentation is enabled
+- the http instrumentation has a custom config for a `requestHook`
 
 ```javascript
-const { GraphQLInstrumentation } = require('@opentelemetry/instrumentation-graphql');
+const { registerInstrumentations } = require('@opentelemetry/instrumentation');
+const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
+const { ExpressInstrumentation } = require('@opentelemetry/instrumentation-express');
 
 const provider = new NodeTracerProvider();
+provider.register();
 
 // register and load instrumentation and old plugins - old plugins will be loaded automatically as previously
 // but instrumentations needs to be added
 registerInstrumentations({
-  tracerProvider: provider,
   instrumentations: [
-    new GraphQLInstrumentation(),
-    // for older plugins you can just copy paste the old configuration
-    {
-      plugins: {
-        express: {
-          enabled: false,
+    new ExpressInstrumentation(),
+    new HttpInstrumentation({
+        requestHook: (span, request) => {
+          span.setAttribute("custom request hook attribute", "request");
         },
-        http: {
-          requestHook: (span, request) => {
-            span.setAttribute("custom request hook attribute", "request");
-          },
-        },
-        customPlugin: {
-          path: "/path/to/custom/module",
-        },
-      },
-    }
+    }),
   ],
 });
 
 
 ```
-
-### Disable Plugins with Environment Variables
-
-Plugins can be disabled without modifying and redeploying code.
-`OTEL_NO_PATCH_MODULES` accepts a
-comma separated list of module names to disabled specific plugins.
-The names should match what you use to `require` the module into your application.
-For example, `OTEL_NO_PATCH_MODULES=pg,https` will disable the postgres plugin and the https plugin. To disable **all** plugins, set the environment variable to `*`.
 
 ## Examples
 
@@ -143,9 +119,9 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-node
+[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-node
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-node
-[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-node
+[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-node&type=dev
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-node&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/node
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fnode.svg

@@ -25,7 +25,7 @@ import {
 } from '@opentelemetry/propagator-b3';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import * as tracing from '@opentelemetry/tracing';
-import { HttpAttribute } from '@opentelemetry/semantic-conventions';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import {
   PerformanceTimingNames as PTN,
   WebTracerProvider,
@@ -34,7 +34,11 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { EventNames } from '../src/enums/EventNames';
-import { XMLHttpRequestInstrumentation } from '../src/xhr';
+import {
+  XMLHttpRequestInstrumentation,
+  XMLHttpRequestInstrumentationConfig,
+} from '../src/xhr';
+import { AttributeNames } from '../src/enums/AttributeNames';
 
 class DummySpanExporter implements tracing.SpanExporter {
   export(spans: any) {}
@@ -167,7 +171,11 @@ describe('xhr', () => {
           sinon.restore();
         };
 
-        prepareData = (done: any, fileUrl: string, config?: any) => {
+        prepareData = (
+          done: any,
+          fileUrl: string,
+          config?: XMLHttpRequestInstrumentationConfig
+        ) => {
           const fakeXhr = sinon.useFakeXMLHttpRequest();
           fakeXhr.onCreate = function (xhr: any) {
             requests.push(xhr);
@@ -289,39 +297,39 @@ describe('xhr', () => {
           assert.strictEqual(
             attributes[keys[0]],
             'GET',
-            `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
+            `attributes ${SemanticAttributes.HTTP_METHOD} is wrong`
           );
           assert.strictEqual(
             attributes[keys[1]],
             url,
-            `attributes ${HttpAttribute.HTTP_URL} is wrong`
+            `attributes ${SemanticAttributes.HTTP_URL} is wrong`
           );
           assert.ok(
             (attributes[keys[2]] as number) > 0,
-            'attributes ${HttpAttributes.HTTP_RESPONSE_CONTENT_SIZE} <= 0'
+            'attributes ${SemanticAttributess.HTTP_RESPONSE_CONTENT_SIZE} <= 0'
           );
           assert.strictEqual(
             attributes[keys[3]],
             200,
-            `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
+            `attributes ${SemanticAttributes.HTTP_STATUS_CODE} is wrong`
           );
           assert.strictEqual(
             attributes[keys[4]],
             'OK',
-            `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
+            `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
           );
           assert.strictEqual(
             attributes[keys[5]],
             parseUrl(url).host,
-            `attributes ${HttpAttribute.HTTP_HOST} is wrong`
+            `attributes ${SemanticAttributes.HTTP_HOST} is wrong`
           );
           assert.ok(
             attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
-            `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
+            `attributes ${SemanticAttributes.HTTP_SCHEME} is wrong`
           );
           assert.ok(
             attributes[keys[7]] !== '',
-            `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
+            `attributes ${SemanticAttributes.HTTP_USER_AGENT} is not defined`
           );
 
           assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
@@ -549,7 +557,12 @@ describe('xhr', () => {
           'AND origin does NOT match window.location And does NOT match' +
             ' with propagateTraceHeaderCorsUrls',
           () => {
+            let spyDebug: sinon.SinonSpy;
             beforeEach(done => {
+              const diagLogger = new api.DiagConsoleLogger();
+              spyDebug = sinon.spy();
+              diagLogger.debug = spyDebug;
+              api.diag.setLogger(diagLogger, api.DiagLogLevel.ALL);
               clearData();
               prepareData(
                 done,
@@ -571,6 +584,13 @@ describe('xhr', () => {
                 requests[0].requestHeaders[X_B3_SAMPLED],
                 undefined,
                 `trace header '${X_B3_SAMPLED}' should not be set`
+              );
+            });
+
+            it('should debug info that injecting headers was skipped', () => {
+              assert.strictEqual(
+                spyDebug.lastCall.args[0],
+                'headers inject skipped due to CORS policy'
               );
             });
           }
@@ -681,8 +701,31 @@ describe('xhr', () => {
             assert.strictEqual(
               attributes[keys[1]],
               secondUrl,
-              `attribute ${HttpAttribute.HTTP_URL} is wrong`
+              `attribute ${SemanticAttributes.HTTP_URL} is wrong`
             );
+          });
+        });
+
+        describe('and applyCustomAttributesOnSpan hook is configured', () => {
+          beforeEach(done => {
+            clearData();
+            const propagateTraceHeaderCorsUrls = [url];
+            prepareData(done, url, {
+              propagateTraceHeaderCorsUrls,
+              applyCustomAttributesOnSpan: function (
+                span: api.Span,
+                xhr: XMLHttpRequest
+              ) {
+                const res = JSON.parse(xhr.response);
+                span.setAttribute('xhr-custom-attribute', res.foo);
+              },
+            });
+          });
+
+          it('span should have custom attribute', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+            const attributes = span.attributes;
+            assert.ok(attributes['xhr-custom-attribute'] === 'bar');
           });
         });
       });
@@ -698,7 +741,9 @@ describe('xhr', () => {
           'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json';
         let fakeNow = 0;
 
-        beforeEach(() => {
+        const prepareData = function (
+          config: XMLHttpRequestInstrumentationConfig = {}
+        ) {
           const fakeXhr = sinon.useFakeXMLHttpRequest();
           fakeXhr.onCreate = function (xhr: any) {
             requests.push(xhr);
@@ -725,7 +770,7 @@ describe('xhr', () => {
           webTracerWithZoneProvider = new WebTracerProvider();
 
           registerInstrumentations({
-            instrumentations: [new XMLHttpRequestInstrumentation()],
+            instrumentations: [new XMLHttpRequestInstrumentation(config)],
             tracerProvider: webTracerWithZoneProvider,
           });
 
@@ -737,37 +782,89 @@ describe('xhr', () => {
           webTracerWithZone = webTracerWithZoneProvider.getTracer('xhr-test');
 
           rootSpan = webTracerWithZone.startSpan('root');
+        };
+
+        beforeEach(() => {
+          prepareData();
         });
 
         afterEach(() => {
           clearData();
         });
 
-        describe('when request loads and receives an error code', () => {
-          beforeEach(done => {
-            api.context.with(
-              api.setSpan(api.context.active(), rootSpan),
+        function timedOutRequest(done: any) {
+          api.context.with(api.setSpan(api.context.active(), rootSpan), () => {
+            void getData(
+              new XMLHttpRequest(),
+              url,
               () => {
-                getData(
-                  new XMLHttpRequest(),
-                  url,
-                  () => {
-                    fakeNow = 100;
-                  },
-                  testAsync
-                ).then(() => {
-                  fakeNow = 0;
-                  sinon.clock.tick(1000);
-                  done();
-                });
-                assert.strictEqual(requests.length, 1, 'request not called');
-                requests[0].respond(
-                  400,
-                  { 'Content-Type': 'text/plain' },
-                  'Bad Request'
-                );
+                sinon.clock.tick(XHR_TIMEOUT);
+              },
+              testAsync
+            ).then(() => {
+              fakeNow = 0;
+              sinon.clock.tick(1000);
+              done();
+            });
+          });
+        }
+
+        function abortedRequest(done: any) {
+          api.context.with(api.setSpan(api.context.active(), rootSpan), () => {
+            void getData(new XMLHttpRequest(), url, () => {}, testAsync).then(
+              () => {
+                fakeNow = 0;
+                sinon.clock.tick(1000);
+                done();
               }
             );
+
+            assert.strictEqual(requests.length, 1, 'request not called');
+            requests[0].abort();
+          });
+        }
+
+        function erroredRequest(done: any) {
+          api.context.with(api.setSpan(api.context.active(), rootSpan), () => {
+            void getData(
+              new XMLHttpRequest(),
+              url,
+              () => {
+                fakeNow = 100;
+              },
+              testAsync
+            ).then(() => {
+              fakeNow = 0;
+              sinon.clock.tick(1000);
+              done();
+            });
+            assert.strictEqual(requests.length, 1, 'request not called');
+            requests[0].respond(
+              400,
+              { 'Content-Type': 'text/plain' },
+              'Bad Request'
+            );
+          });
+        }
+
+        function networkErrorRequest(done: any) {
+          api.context.with(api.setSpan(api.context.active(), rootSpan), () => {
+            void getData(new XMLHttpRequest(), url, () => {}, testAsync).then(
+              () => {
+                fakeNow = 0;
+                sinon.clock.tick(1000);
+                done();
+              }
+            );
+
+            assert.strictEqual(requests.length, 1, 'request not called');
+            requests[0].error();
+          });
+        }
+
+        describe('when request loads and receives an error code', () => {
+          beforeEach(done => {
+            erroredRequest(done);
           });
           it('span should have correct attributes', () => {
             const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
@@ -777,40 +874,40 @@ describe('xhr', () => {
             assert.strictEqual(
               attributes[keys[0]],
               'GET',
-              `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
+              `attributes ${SemanticAttributes.HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
               attributes[keys[1]],
               url,
-              `attributes ${HttpAttribute.HTTP_URL} is wrong`
+              `attributes ${SemanticAttributes.HTTP_URL} is wrong`
             );
             assert.strictEqual(
               attributes[keys[2]],
               0,
-              `attributes ${HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH} is wrong`
+              `attributes ${SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH} is wrong`
             );
             assert.strictEqual(
               attributes[keys[3]],
               400,
-              `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
+              `attributes ${SemanticAttributes.HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
               attributes[keys[4]],
               'Bad Request',
-              `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
+              `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
               attributes[keys[5]],
               'raw.githubusercontent.com',
-              `attributes ${HttpAttribute.HTTP_HOST} is wrong`
+              `attributes ${SemanticAttributes.HTTP_HOST} is wrong`
             );
             assert.ok(
               attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
-              `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
+              `attributes ${SemanticAttributes.HTTP_SCHEME} is wrong`
             );
             assert.ok(
               attributes[keys[7]] !== '',
-              `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
+              `attributes ${SemanticAttributes.HTTP_USER_AGENT} is not defined`
             );
 
             assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
@@ -887,21 +984,7 @@ describe('xhr', () => {
 
         describe('when request encounters a network error', () => {
           beforeEach(done => {
-            api.context.with(
-              api.setSpan(api.context.active(), rootSpan),
-              () => {
-                getData(new XMLHttpRequest(), url, () => {}, testAsync).then(
-                  () => {
-                    fakeNow = 0;
-                    sinon.clock.tick(1000);
-                    done();
-                  }
-                );
-
-                assert.strictEqual(requests.length, 1, 'request not called');
-                requests[0].error();
-              }
-            );
+            networkErrorRequest(done);
           });
 
           it('span should have correct attributes', () => {
@@ -912,35 +995,35 @@ describe('xhr', () => {
             assert.strictEqual(
               attributes[keys[0]],
               'GET',
-              `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
+              `attributes ${SemanticAttributes.HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
               attributes[keys[1]],
               url,
-              `attributes ${HttpAttribute.HTTP_URL} is wrong`
+              `attributes ${SemanticAttributes.HTTP_URL} is wrong`
             );
             assert.strictEqual(
               attributes[keys[2]],
               0,
-              `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
+              `attributes ${SemanticAttributes.HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
               attributes[keys[3]],
               '',
-              `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
+              `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
               attributes[keys[4]],
               'raw.githubusercontent.com',
-              `attributes ${HttpAttribute.HTTP_HOST} is wrong`
+              `attributes ${SemanticAttributes.HTTP_HOST} is wrong`
             );
             assert.ok(
               attributes[keys[5]] === 'http' || attributes[keys[5]] === 'https',
-              `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
+              `attributes ${SemanticAttributes.HTTP_SCHEME} is wrong`
             );
             assert.ok(
               attributes[keys[6]] !== '',
-              `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
+              `attributes ${SemanticAttributes.HTTP_USER_AGENT} is not defined`
             );
 
             assert.strictEqual(keys.length, 7, 'number of attributes is wrong');
@@ -979,21 +1062,7 @@ describe('xhr', () => {
           });
 
           beforeEach(done => {
-            api.context.with(
-              api.setSpan(api.context.active(), rootSpan),
-              () => {
-                getData(new XMLHttpRequest(), url, () => {}, testAsync).then(
-                  () => {
-                    fakeNow = 0;
-                    sinon.clock.tick(1000);
-                    done();
-                  }
-                );
-
-                assert.strictEqual(requests.length, 1, 'request not called');
-                requests[0].abort();
-              }
-            );
+            abortedRequest(done);
           });
 
           it('span should have correct attributes', () => {
@@ -1004,35 +1073,35 @@ describe('xhr', () => {
             assert.strictEqual(
               attributes[keys[0]],
               'GET',
-              `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
+              `attributes ${SemanticAttributes.HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
               attributes[keys[1]],
               url,
-              `attributes ${HttpAttribute.HTTP_URL} is wrong`
+              `attributes ${SemanticAttributes.HTTP_URL} is wrong`
             );
             assert.strictEqual(
               attributes[keys[2]],
               0,
-              `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
+              `attributes ${SemanticAttributes.HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
               attributes[keys[3]],
               '',
-              `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
+              `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
               attributes[keys[4]],
               'raw.githubusercontent.com',
-              `attributes ${HttpAttribute.HTTP_HOST} is wrong`
+              `attributes ${SemanticAttributes.HTTP_HOST} is wrong`
             );
             assert.ok(
               attributes[keys[5]] === 'http' || attributes[keys[5]] === 'https',
-              `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
+              `attributes ${SemanticAttributes.HTTP_SCHEME} is wrong`
             );
             assert.ok(
               attributes[keys[6]] !== '',
-              `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
+              `attributes ${SemanticAttributes.HTTP_USER_AGENT} is not defined`
             );
 
             assert.strictEqual(keys.length, 7, 'number of attributes is wrong');
@@ -1071,23 +1140,7 @@ describe('xhr', () => {
           });
 
           beforeEach(done => {
-            api.context.with(
-              api.setSpan(api.context.active(), rootSpan),
-              () => {
-                getData(
-                  new XMLHttpRequest(),
-                  url,
-                  () => {
-                    sinon.clock.tick(XHR_TIMEOUT);
-                  },
-                  testAsync
-                ).then(() => {
-                  fakeNow = 0;
-                  sinon.clock.tick(1000);
-                  done();
-                });
-              }
-            );
+            timedOutRequest(done);
           });
 
           it('span should have correct attributes', () => {
@@ -1098,35 +1151,35 @@ describe('xhr', () => {
             assert.strictEqual(
               attributes[keys[0]],
               'GET',
-              `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
+              `attributes ${SemanticAttributes.HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
               attributes[keys[1]],
               url,
-              `attributes ${HttpAttribute.HTTP_URL} is wrong`
+              `attributes ${SemanticAttributes.HTTP_URL} is wrong`
             );
             assert.strictEqual(
               attributes[keys[2]],
               0,
-              `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
+              `attributes ${SemanticAttributes.HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
               attributes[keys[3]],
               '',
-              `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
+              `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
               attributes[keys[4]],
               'raw.githubusercontent.com',
-              `attributes ${HttpAttribute.HTTP_HOST} is wrong`
+              `attributes ${SemanticAttributes.HTTP_HOST} is wrong`
             );
             assert.ok(
               attributes[keys[5]] === 'http' || attributes[keys[5]] === 'https',
-              `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
+              `attributes ${SemanticAttributes.HTTP_SCHEME} is wrong`
             );
             assert.ok(
               attributes[keys[6]] !== '',
-              `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
+              `attributes ${SemanticAttributes.HTTP_USER_AGENT} is not defined`
             );
 
             assert.strictEqual(keys.length, 7, 'number of attributes is wrong');
@@ -1153,6 +1206,94 @@ describe('xhr', () => {
             );
 
             assert.strictEqual(events.length, 3, 'number of events is wrong');
+          });
+        });
+
+        describe('when applyCustomAttributesOnSpan hook is present', () => {
+          describe('AND request loads and receives an error code', () => {
+            beforeEach(done => {
+              clearData();
+              prepareData({
+                applyCustomAttributesOnSpan: function (span, xhr) {
+                  span.setAttribute('xhr-custom-error-code', xhr.status);
+                },
+              });
+              erroredRequest(done);
+            });
+
+            it('span should have custom attribute', () => {
+              const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+              const attributes = span.attributes;
+              assert.ok(attributes['xhr-custom-error-code'] === 400);
+            });
+          });
+
+          describe('AND request encounters a network error', () => {
+            beforeEach(done => {
+              clearData();
+              prepareData({
+                applyCustomAttributesOnSpan: function (span, xhr) {
+                  span.setAttribute('xhr-custom-error-code', xhr.status);
+                },
+              });
+              networkErrorRequest(done);
+            });
+
+            it('span should have custom attribute', () => {
+              const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+              const attributes = span.attributes;
+              assert.ok(attributes['xhr-custom-error-code'] === 0);
+            });
+          });
+
+          describe('AND request is aborted', () => {
+            before(function () {
+              // Can only abort Async requests
+              if (!testAsync) {
+                this.skip();
+              }
+            });
+
+            beforeEach(done => {
+              clearData();
+              prepareData({
+                applyCustomAttributesOnSpan: function (span, xhr) {
+                  span.setAttribute('xhr-custom-error-code', xhr.status);
+                },
+              });
+              abortedRequest(done);
+            });
+
+            it('span should have custom attribute', () => {
+              const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+              const attributes = span.attributes;
+              assert.ok(attributes['xhr-custom-error-code'] === 0);
+            });
+          });
+
+          describe('AND request times out', () => {
+            before(function () {
+              // Can only set timeout for Async requests
+              if (!testAsync) {
+                this.skip();
+              }
+            });
+
+            beforeEach(done => {
+              clearData();
+              prepareData({
+                applyCustomAttributesOnSpan: function (span, xhr) {
+                  span.setAttribute('xhr-custom-error-code', xhr.status);
+                },
+              });
+              timedOutRequest(done);
+            });
+
+            it('span should have custom attribute', () => {
+              const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+              const attributes = span.attributes;
+              assert.ok(attributes['xhr-custom-error-code'] === 0);
+            });
           });
         });
       });

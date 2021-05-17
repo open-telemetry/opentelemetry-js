@@ -5,7 +5,7 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-This module provides exporter for web and node to be used with [opentelemetry-collector][opentelemetry-collector-url] - last tested with version **0.16.0**.
+This module provides exporter for web and node to be used with [opentelemetry-collector][opentelemetry-collector-url] - last tested with version **0.25.0**.
 
 ## Installation
 
@@ -15,7 +15,7 @@ npm install --save @opentelemetry/exporter-collector-grpc
 
 ## Traces in Node - GRPC
 
-The CollectorTraceExporter in Node expects the URL to only be the hostname. It will not work with `/v1/trace`.
+The CollectorTraceExporter in Node expects the URL to only be the hostname. It will not work with `/v1/traces`.
 
 ```js
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
@@ -23,7 +23,8 @@ const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector-g
 
 const collectorOptions = {
   serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>' // url is optional and can be omitted - default is localhost:4317
+  // url is optional and can be omitted - default is localhost:4317
+  url: '<collector-hostname>:<port>',
 };
 
 const provider = new BasicTracerProvider();
@@ -31,25 +32,25 @@ const exporter = new CollectorTraceExporter(collectorOptions);
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 provider.register();
-
+['SIGINT', 'SIGTERM'].forEach(signal => {
+  process.on(signal, () => provider.shutdown().catch(console.error));
+});
 ```
 
 By default, plaintext connection is used. In order to use TLS in Node.js, provide `credentials` option like so:
 
 ```js
 const fs = require('fs');
-const grpc = require('grpc');
+const grpc = require('@grpc/grpc-js');
+
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector-grpc');
 
 const collectorOptions = {
   serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is localhost:4317
-  credentials: grpc.credentials.createSsl(
-    fs.readFileSync('./ca.crt'),
-    fs.readFileSync('./client.key'),
-    fs.readFileSync('./client.crt')
-  )
+  // url is optional and can be omitted - default is localhost:4317
+  url: '<collector-hostname>:<port>',
+  credentials: grpc.credentials.createSsl(),
 };
 
 const provider = new BasicTracerProvider();
@@ -57,23 +58,39 @@ const exporter = new CollectorTraceExporter(collectorOptions);
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 provider.register();
+['SIGINT', 'SIGTERM'].forEach(signal => {
+  process.on(signal, () => provider.shutdown().catch(console.error));
+});
 ```
 
-To see how to generate credentials, you can refer to the script used to generate certificates for tests [here](./test/certs/regenerate.sh)
+To use mutual authentication, pass to the `createSsl()` constructor:
+
+```js
+  credentials: grpc.credentials.createSsl(
+    fs.readFileSync('./ca.crt'),
+    fs.readFileSync('./client.key'),
+    fs.readFileSync('./client.crt')
+  ),
+```
+
+To generate credentials for mutual authentication, you can refer to the script used to generate certificates for tests [here](./test/certs/regenerate.sh)
 
 The exporter can be configured to send custom metadata with each request as in the example below:
 
 ```js
-const grpc = require('grpc');
+const grpc = require('@grpc/grpc-js');
+
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector-grpc');
 
 const metadata = new grpc.Metadata();
+// For instance, an API key or access token might go here.
 metadata.set('k', 'v');
 
 const collectorOptions = {
   serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is localhost:4317
+  // url is optional and can be omitted - default is localhost:4317
+  url: '<collector-hostname>:<port>',
   metadata, // // an optional grpc.Metadata object to be sent with each request
 };
 
@@ -82,6 +99,9 @@ const exporter = new CollectorTraceExporter(collectorOptions);
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 provider.register();
+['SIGINT', 'SIGTERM'].forEach(signal => {
+  process.on(signal, () => provider.shutdown().catch(console.error));
+});
 ```
 
 Note, that this will only work if TLS is also configured on the server.
@@ -95,20 +115,24 @@ const { MeterProvider } = require('@opentelemetry/metrics');
 const { CollectorMetricExporter } =  require('@opentelemetry/exporter-collector-grpc');
 const collectorOptions = {
   serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is localhost:55681
+  // url is optional and can be omitted - default is localhost:4317
+  url: '<collector-hostname>:<port>',
 };
 const exporter = new CollectorMetricExporter(collectorOptions);
 
 // Register the exporter
-const meter = new MeterProvider({
+const provider = new MeterProvider({
   exporter,
   interval: 60000,
-}).getMeter('example-meter');
+})
+['SIGINT', 'SIGTERM'].forEach(signal => {
+  process.on(signal, () => provider.shutdown().catch(console.error));
+});
 
 // Now, start recording data
+const meter = provider.getMeter('example-meter');
 const counter = meter.createCounter('metric_name');
 counter.add(10, { 'key': 'value' });
-
 ```
 
 ## Running opentelemetry-collector locally to see the traces
@@ -130,9 +154,9 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-exporter-collector-grpc
+[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-collector-grpc
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-collector-grpc
-[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-exporter-collector-grpc
+[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-collector-grpc&type=dev
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-collector-grpc&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-collector-grpc
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-collector-grpc.svg

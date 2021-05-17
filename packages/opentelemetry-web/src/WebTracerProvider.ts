@@ -24,12 +24,7 @@ import { StackContextManager } from './StackContextManager';
 /**
  * WebTracerConfig provides an interface for configuring a Web Tracer.
  */
-export interface WebTracerConfig extends TracerConfig {
-  /**
-   * plugins to be used with tracer, they will be enabled automatically
-   */
-  plugins?: unknown[];
-}
+export type WebTracerConfig = TracerConfig;
 
 /**
  * This class represents a web tracer with {@link StackContextManager}
@@ -40,12 +35,6 @@ export class WebTracerProvider extends BasicTracerProvider {
    * @param config Web Tracer config
    */
   constructor(config: WebTracerConfig = {}) {
-    if (typeof config.plugins !== 'undefined') {
-      console.warn(
-        'plugins option was removed, please use' +
-          ' "registerInstrumentations" to load plugins'
-      );
-    }
     super(config);
 
     if ((config as SDKRegistrationConfig).contextManager) {

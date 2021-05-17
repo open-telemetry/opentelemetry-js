@@ -109,7 +109,7 @@ export class MyPlugin extends InstrumentationBase {
 // Later
 
 const myPLugin = new MyPlugin();
-myPLugin.setTracerProvider(provider); // this is optional
+myPLugin.setTracerProvider(provider); // this is optional, only if global TracerProvider shouldn't be used
 myPLugin.setMeterProvider(meterProvider); // this is optional
 myPLugin.enable();
 // or use Auto Loader
@@ -151,8 +151,8 @@ export class MyPlugin extends InstrumentationBase {
 // Later
 
 const myPLugin = new MyPlugin();
-myPLugin.setTracerProvider(provider);
-myPLugin.setMeterProvider(meterProvider);
+myPLugin.setTracerProvider(provider); // this is optional, only if global TracerProvider shouldn't be used
+myPLugin.setMeterProvider(meterProvider); // this is optional, only if global MeterProvider shouldn't be used
 myPLugin.enable();
 // or use Auto Loader
 ```
@@ -162,7 +162,7 @@ myPLugin.enable();
 Successor of loading plugins through TracerProvider "plugins" option.
 It also supersedes PluginLoader for node. The old configurations usually looks like
 
-### NODE - old way using TracerProvider
+### NODE - old way using TracerProvider - not available anymore
 
 ```javascript
 const { NodeTracerProvider } = require('@opentelemetry/node');
@@ -177,7 +177,7 @@ provider.register({
 });
 ```
 
-### WEB - old way using TracerProvider
+### WEB - old way using TracerProvider - not available anymore
 
 ```javascript
 const { WebTracerProvider } = require('@opentelemetry/web');
@@ -208,26 +208,21 @@ All plugins will be bound to TracerProvider as well as instrumentations
 ```javascript
 const { B3Propagator } = require('@opentelemetry/propagator-b3');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
-const { GraphQLInstrumentation } = require('@opentelemetry/instrumentation-graphql');
+const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
 const { NodeTracerProvider } = require('@opentelemetry/node');
-const tracerProvider = new NodeTracerProvider();
 
-registerInstrumentations({
-  instrumentations: [
-    new UserInteractionPlugin(),
-    new XMLHttpRequestInstrumentation({
-      ignoreUrls: [/localhost/],
-      propagateTraceHeaderCorsUrls: [
-        'http://localhost:8090',
-      ],
-    }),
-  ],
-  meterProvider: meterProvider,
-  tracerProvider: tracerProvider,
-});
+const tracerProvider = new NodeTracerProvider();
 
 tracerProvider.register({
   propagator: new B3Propagator(),
+});
+
+registerInstrumentations({
+  instrumentations: [
+    new HttpInstrumentation(),
+  ],
+  //tracerProvider: tracerProvider, // optional, only if global TracerProvider shouldn't be used
+  //meterProvider: meterProvider, // optional, only if global MeterProvider shouldn't be used
 });
 
 ```
@@ -237,29 +232,36 @@ tracerProvider.register({
 ```javascript
 const { B3Propagator } = require('@opentelemetry/propagator-b3');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
-import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xml-http-request';
-const { UserInteractionPlugin } = require('@opentelemetry/plugin-user-interaction');
+const { XMLHttpRequestInstrumentation } = require('@opentelemetry/instrumentation-xml-http-request');
 const { WebTracerProvider } = require('@opentelemetry/web');
-const tracerProvider = new WebTracerProvider();
 
-registerInstrumentations({
-  instrumentations: [
-    new GraphQLInstrumentation(),
-    {
-      plugins: {
-        http: { enabled: false },
-      },
-    }
-  ],
-  meterProvider: meterProvider,
-  tracerProvider: tracerProvider,
-});
+const tracerProvider = new WebTracerProvider();
 
 tracerProvider.register({
   propagator: new B3Propagator(),
 });
 
+registerInstrumentations({
+  instrumentations: [
+    new XMLHttpRequestInstrumentation({
+      ignoreUrls: [/localhost/],
+      propagateTraceHeaderCorsUrls: [
+        'http://localhost:8090',
+      ],
+    }),
+  ],
+  //tracerProvider: tracerProvider, // optional, only if global TracerProvider shouldn't be used
+  //meterProvider: meterProvider, // optional, only if global MeterProvider shouldn't be used
+});
 ```
+
+## Selection of the used TracerProvider/MeterProvider
+
+The `registerInstrumentations()` API allows to specify which `TracerProvider` and/or `MeterProvider` to use by the given options object.
+If nothing is specified the global registered provider is used. Usually this is what most users want therefore it's recommended to keep this default.
+
+There might be usecase where someone has the need for more providers within an application. Please note that special care must be takes in such setups
+to avoid leaking information from one provider to the other because there are a lot places where e.g. the global `ContextManager` or `Propagator` is used.
 
 ## License
 
@@ -273,9 +275,9 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-instrumentation
+[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-instrumentation
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-instrumentation
-[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-instrumentation
+[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-instrumentation&type=dev
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-instrumentation&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/instrumentation
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Finstrumentation.svg

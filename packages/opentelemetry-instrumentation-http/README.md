@@ -24,25 +24,19 @@ To load a specific instrumentation (HTTP in this case), specify it in the Node T
 
 ```js
 const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
-
 const { ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { NodeTracerProvider } = require('@opentelemetry/node');
+const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 
-const provider = new NodeTracerProvider({
-  // be sure to disable old plugins
-  plugins: {
-    http: { enabled: false, path: '@opentelemetry/plugin-http' },
-    https: { enabled: false, path: '@opentelemetry/plugin-https' }
-  },
-});
-
-const httpInstrumentation = new HttpInstrumentation({
-  // see under for available configuration
-});
-httpInstrumentation.enable();
+const provider = new NodeTracerProvider();
 
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.register();
+
+registerInstrumentations({
+  instrumentations: [new HttpInstrumentation()],
+});
+
 ```
 
 See [examples/http](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/http) for a short example.
@@ -75,9 +69,9 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-instrumentation-http
+[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-instrumentation-http
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-instrumentation-http
-[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-instrumentation-http
+[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-instrumentation-http&type=dev
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-instrumentation-http&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/instrumentation-http
-[npm-img]: https://badge.fury.io/js/%40opentelemetry%instrumentation-http.svg
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Finstrumentation-http.svg

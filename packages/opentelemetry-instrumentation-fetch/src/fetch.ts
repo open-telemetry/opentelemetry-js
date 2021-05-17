@@ -19,11 +19,12 @@ import {
   isWrapped,
   InstrumentationBase,
   InstrumentationConfig,
+  safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import * as core from '@opentelemetry/core';
 import * as web from '@opentelemetry/web';
 import { AttributeNames } from './enums/AttributeNames';
-import { HttpAttribute } from '@opentelemetry/semantic-conventions';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { FetchError, FetchResponse, SpanData } from './types';
 import { VERSION } from './version';
 
@@ -32,7 +33,25 @@ import { VERSION } from './version';
 // hard to say how long it should really wait, seems like 300ms is
 // safe enough
 const OBSERVER_WAIT_TIME_MS = 300;
-const urlNormalizingA = document.createElement('a');
+
+// Used to normalize relative URLs
+let a: HTMLAnchorElement | undefined;
+const getUrlNormalizingAnchor = () => {
+  if (!a) {
+    a = document.createElement('a');
+  }
+
+  return a;
+};
+
+export interface FetchCustomAttributeFunction {
+  (
+    span: api.Span,
+    request: Request | RequestInit,
+    result: Response | FetchError
+  ): void;
+}
+
 /**
  * FetchPlugin Config
  */
@@ -51,6 +70,8 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
    * also not be traced.
    */
   ignoreUrls?: Array<string | RegExp>;
+  /** Function for adding custom attributes on the span */
+  applyCustomAttributesOnSpan?: FetchCustomAttributeFunction;
 }
 
 /**
@@ -111,16 +132,16 @@ export class FetchInstrumentation extends InstrumentationBase<
     response: FetchResponse
   ): void {
     const parsedUrl = web.parseUrl(response.url);
-    span.setAttribute(HttpAttribute.HTTP_STATUS_CODE, response.status);
+    span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, response.status);
     if (response.statusText != null) {
-      span.setAttribute(HttpAttribute.HTTP_STATUS_TEXT, response.statusText);
+      span.setAttribute(AttributeNames.HTTP_STATUS_TEXT, response.statusText);
     }
-    span.setAttribute(HttpAttribute.HTTP_HOST, parsedUrl.host);
+    span.setAttribute(SemanticAttributes.HTTP_HOST, parsedUrl.host);
     span.setAttribute(
-      HttpAttribute.HTTP_SCHEME,
+      SemanticAttributes.HTTP_SCHEME,
       parsedUrl.protocol.replace(':', '')
     );
-    span.setAttribute(HttpAttribute.HTTP_USER_AGENT, navigator.userAgent);
+    span.setAttribute(SemanticAttributes.HTTP_USER_AGENT, navigator.userAgent);
   }
 
   /**
@@ -135,6 +156,11 @@ export class FetchInstrumentation extends InstrumentationBase<
         this._getConfig().propagateTraceHeaderCorsUrls
       )
     ) {
+      const headers: Partial<Record<string, unknown>> = {};
+      api.propagation.inject(api.context.active(), headers);
+      if (Object.keys(headers).length > 0) {
+        api.diag.debug('headers inject skipped due to CORS policy');
+      }
       return;
     }
 
@@ -181,8 +207,8 @@ export class FetchInstrumentation extends InstrumentationBase<
       kind: api.SpanKind.CLIENT,
       attributes: {
         [AttributeNames.COMPONENT]: this.moduleName,
-        [HttpAttribute.HTTP_METHOD]: method,
-        [HttpAttribute.HTTP_URL]: url,
+        [SemanticAttributes.HTTP_METHOD]: method,
+        [SemanticAttributes.HTTP_URL]: url,
       },
     });
   }
@@ -282,8 +308,8 @@ export class FetchInstrumentation extends InstrumentationBase<
       ): Promise<Response> {
         const url = input instanceof Request ? input.url : input;
         const options = input instanceof Request ? input : init || {};
-        const span = plugin._createSpan(url, options);
-        if (!span) {
+        const createdSpan = plugin._createSpan(url, options);
+        if (!createdSpan) {
           return original.apply(this, [url, options]);
         }
         const spanData = plugin._prepareSpanData(url);
@@ -296,6 +322,7 @@ export class FetchInstrumentation extends InstrumentationBase<
           response: Response
         ) {
           try {
+            plugin._applyAttributesAfterFetch(span, options, response);
             if (response.status >= 200 && response.status < 400) {
               plugin._endSpan(span, spanData, response);
             } else {
@@ -316,6 +343,7 @@ export class FetchInstrumentation extends InstrumentationBase<
           error: FetchError
         ) {
           try {
+            plugin._applyAttributesAfterFetch(span, options, error);
             plugin._endSpan(span, spanData, {
               status: error.status || 0,
               statusText: error.message,
@@ -328,21 +356,43 @@ export class FetchInstrumentation extends InstrumentationBase<
 
         return new Promise((resolve, reject) => {
           return api.context.with(
-            api.setSpan(api.context.active(), span),
+            api.setSpan(api.context.active(), createdSpan),
             () => {
               plugin._addHeaders(options, url);
               plugin._tasksCount++;
               return original
                 .apply(this, [url, options])
                 .then(
-                  (onSuccess as any).bind(this, span, resolve),
-                  onError.bind(this, span, reject)
+                  (onSuccess as any).bind(this, createdSpan, resolve),
+                  onError.bind(this, createdSpan, reject)
                 );
             }
           );
         });
       };
     };
+  }
+
+  private _applyAttributesAfterFetch(
+    span: api.Span,
+    request: Request | RequestInit,
+    result: Response | FetchError
+  ) {
+    const applyCustomAttributesOnSpan = this._getConfig()
+      .applyCustomAttributesOnSpan;
+    if (applyCustomAttributesOnSpan) {
+      safeExecuteInTheMiddle(
+        () => applyCustomAttributesOnSpan(span, request, result),
+        error => {
+          if (!error) {
+            return;
+          }
+
+          api.diag.error('applyCustomAttributesOnSpan', error);
+        },
+        true
+      );
+    }
   }
 
   /**
@@ -359,11 +409,12 @@ export class FetchInstrumentation extends InstrumentationBase<
 
     const observer: PerformanceObserver = new PerformanceObserver(list => {
       const perfObsEntries = list.getEntries() as PerformanceResourceTiming[];
-      urlNormalizingA.href = spanUrl;
+      const urlNormalizingAnchor = getUrlNormalizingAnchor();
+      urlNormalizingAnchor.href = spanUrl;
       perfObsEntries.forEach(entry => {
         if (
           entry.initiatorType === 'fetch' &&
-          entry.name === urlNormalizingA.href
+          entry.name === urlNormalizingAnchor.href
         ) {
           entries.push(entry);
         }

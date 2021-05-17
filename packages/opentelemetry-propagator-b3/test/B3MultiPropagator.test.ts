@@ -20,18 +20,19 @@ import {
   getSpanContext,
   setSpanContext,
   SpanContext,
+  suppressInstrumentation,
   TraceFlags,
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
 import * as assert from 'assert';
+import { B3MultiPropagator } from '../src/B3MultiPropagator';
 import {
-  B3MultiPropagator,
   X_B3_FLAGS,
   X_B3_PARENT_SPAN_ID,
   X_B3_SAMPLED,
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
-} from '../src/B3MultiPropagator';
+} from '../src/constants';
 import { B3_DEBUG_FLAG_KEY } from '../src/common';
 
 describe('B3MultiPropagator', () => {
@@ -137,6 +138,23 @@ describe('B3MultiPropagator', () => {
       assert.deepStrictEqual(carrier[X_B3_SPAN_ID], undefined);
       assert.deepStrictEqual(carrier[X_B3_FLAGS], undefined);
       assert.deepStrictEqual(carrier[X_B3_PARENT_SPAN_ID], undefined);
+    });
+
+    it('should not inject if instrumentation suppressed', () => {
+      const spanContext = {
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: '6e0c63257de34c92',
+        traceFlags: TraceFlags.SAMPLED,
+      };
+      b3Propagator.inject(
+        suppressInstrumentation(setSpanContext(ROOT_CONTEXT, spanContext)),
+        carrier,
+        defaultTextMapSetter
+      );
+      assert.strictEqual(carrier[X_B3_TRACE_ID], undefined);
+      assert.strictEqual(carrier[X_B3_SPAN_ID], undefined);
+      assert.strictEqual(carrier[X_B3_FLAGS], undefined);
+      assert.strictEqual(carrier[X_B3_PARENT_SPAN_ID], undefined);
     });
   });
 

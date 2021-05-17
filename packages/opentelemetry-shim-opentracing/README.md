@@ -7,8 +7,6 @@
 
 OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry
 
-Note: Baggage is currently not propagated, see [issues/329](https://github.com/open-telemetry/opentelemetry-js/issues/329).
-
 ## Installation
 
 ```bash
@@ -34,6 +32,18 @@ opentracing.initGlobalTracer(new TracerShim(tracer));
 
 ```
 
+Optionally, you can specify propagators to be used for the OpenTracing `TextMap` and `HttpHeaders` formats:
+
+```javascript
+var b3Propagator = new B3Propagator();
+new TracerShim(tracer, {
+  textMapPropagator: b3Propagator,
+  httpHeadersPropagator: b3Propagator
+})
+```
+
+If propagators are not specified, OpenTelemetry's global propagator will be used.
+
 See [examples/opentracing-shim](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/opentracing-shim) for a short example.
 
 ## License
@@ -48,9 +58,9 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-tracing
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-tracing
-[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-tracing
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-tracing&type=dev
+[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-shim-opentracing
+[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-shim-opentracing
+[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-shim-opentracing&type=dev
+[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-shim-opentracing&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/shim-opentracing
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fshim-opentracing.svg

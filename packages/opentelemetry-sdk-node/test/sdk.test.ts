@@ -33,7 +33,6 @@ import { NoopContextManager } from '@opentelemetry/api';
 import { CompositePropagator } from '@opentelemetry/core';
 import { ConsoleMetricExporter, MeterProvider } from '@opentelemetry/metrics';
 import { NodeTracerProvider } from '@opentelemetry/node';
-import * as NodeConfig from '@opentelemetry/instrumentation/build/src/platform/node/old/autoLoader';
 import { awsEc2Detector } from '@opentelemetry/resource-detector-aws';
 import { resetIsAvailableCache } from '@opentelemetry/resource-detector-gcp';
 import { Resource } from '@opentelemetry/resources';
@@ -91,8 +90,6 @@ const DefaultContextManager = semver.gte(process.version, '14.8.0')
 
 describe('Node SDK', () => {
   before(() => {
-    // Disable attempted load of default plugins
-    Sinon.replace(NodeConfig, 'DEFAULT_INSTRUMENTATION_PLUGINS', {});
     nock.disableNetConnect();
   });
 

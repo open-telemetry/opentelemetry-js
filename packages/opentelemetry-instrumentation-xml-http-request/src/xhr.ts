@@ -19,9 +19,10 @@ import {
   isWrapped,
   InstrumentationBase,
   InstrumentationConfig,
+  safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import { hrTime, isUrlIgnored, otperformance } from '@opentelemetry/core';
-import { HttpAttribute } from '@opentelemetry/semantic-conventions';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import {
   addSpanNetworkEvents,
   getResource,
@@ -37,12 +38,18 @@ import {
   XhrMem,
 } from './types';
 import { VERSION } from './version';
+import { AttributeNames } from './enums/AttributeNames';
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
 // hard to say how long it should really wait, seems like 300ms is
 // safe enough
 const OBSERVER_WAIT_TIME_MS = 300;
+
+export type XHRCustomAttributeFunction = (
+  span: api.Span,
+  xhr: XMLHttpRequest
+) => void;
 
 /**
  * XMLHttpRequest config
@@ -63,6 +70,8 @@ export interface XMLHttpRequestInstrumentationConfig
    * also not be traced.
    */
   ignoreUrls?: Array<string | RegExp>;
+  /** Function for adding custom attributes on the span */
+  applyCustomAttributesOnSpan?: XHRCustomAttributeFunction;
 }
 
 /**
@@ -106,6 +115,11 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         this._getConfig().propagateTraceHeaderCorsUrls
       )
     ) {
+      const headers: Partial<Record<string, unknown>> = {};
+      api.propagation.inject(api.context.active(), headers);
+      if (Object.keys(headers).length > 0) {
+        api.diag.debug('headers inject skipped due to CORS policy');
+      }
       return;
     }
     const headers: { [key: string]: unknown } = {};
@@ -145,20 +159,41 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     if (typeof spanUrl === 'string') {
       const parsedUrl = parseUrl(spanUrl);
       if (xhrMem.status !== undefined) {
-        span.setAttribute(HttpAttribute.HTTP_STATUS_CODE, xhrMem.status);
+        span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, xhrMem.status);
       }
       if (xhrMem.statusText !== undefined) {
-        span.setAttribute(HttpAttribute.HTTP_STATUS_TEXT, xhrMem.statusText);
+        span.setAttribute(AttributeNames.HTTP_STATUS_TEXT, xhrMem.statusText);
       }
-      span.setAttribute(HttpAttribute.HTTP_HOST, parsedUrl.host);
+      span.setAttribute(SemanticAttributes.HTTP_HOST, parsedUrl.host);
       span.setAttribute(
-        HttpAttribute.HTTP_SCHEME,
+        SemanticAttributes.HTTP_SCHEME,
         parsedUrl.protocol.replace(':', '')
       );
 
       // @TODO do we want to collect this or it will be collected earlier once only or
       //    maybe when parent span is not available ?
-      span.setAttribute(HttpAttribute.HTTP_USER_AGENT, navigator.userAgent);
+      span.setAttribute(
+        SemanticAttributes.HTTP_USER_AGENT,
+        navigator.userAgent
+      );
+    }
+  }
+
+  private _applyAttributesAfterXHR(span: api.Span, xhr: XMLHttpRequest) {
+    const applyCustomAttributesOnSpan = this._getConfig()
+      .applyCustomAttributesOnSpan;
+    if (typeof applyCustomAttributesOnSpan === 'function') {
+      safeExecuteInTheMiddle(
+        () => applyCustomAttributesOnSpan(span, xhr),
+        error => {
+          if (!error) {
+            return;
+          }
+
+          api.diag.error('applyCustomAttributesOnSpan', error);
+        },
+        true
+      );
     }
   }
 
@@ -300,8 +335,8 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     const currentSpan = this.tracer.startSpan(spanName, {
       kind: api.SpanKind.CLIENT,
       attributes: {
-        [HttpAttribute.HTTP_METHOD]: method,
-        [HttpAttribute.HTTP_URL]: url,
+        [SemanticAttributes.HTTP_METHOD]: method,
+        [SemanticAttributes.HTTP_URL]: url,
       },
     });
 
@@ -389,6 +424,10 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       xhrMem.status = xhr.status;
       xhrMem.statusText = xhr.statusText;
       plugin._xhrMem.delete(xhr);
+
+      if (xhrMem.span) {
+        plugin._applyAttributesAfterXHR(xhrMem.span, xhr);
+      }
       const endTime = hrTime();
 
       // the timeout is needed as observer doesn't have yet information

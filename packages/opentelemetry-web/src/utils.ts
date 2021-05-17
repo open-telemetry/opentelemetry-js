@@ -26,10 +26,17 @@ import {
   timeInputToHrTime,
   urlMatches,
 } from '@opentelemetry/core';
-import { HttpAttribute } from '@opentelemetry/semantic-conventions';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 // Used to normalize relative URLs
-const urlNormalizingA = document.createElement('a');
+let a: HTMLAnchorElement | undefined;
+const getUrlNormalizingAnchor = () => {
+  if (!a) {
+    a = document.createElement('a');
+  }
+
+  return a;
+};
 
 /**
  * Helper function to be able to use enum as typed key in type and in interface when using forEach
@@ -83,7 +90,7 @@ export function addSpanNetworkEvents(
   const contentLength = resource[PTN.ENCODED_BODY_SIZE];
   if (contentLength !== undefined) {
     span.setAttribute(
-      HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH,
+      SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH,
       contentLength
     );
   }
@@ -125,8 +132,9 @@ export function getResource(
   initiatorType?: string
 ): PerformanceResourceTimingInfo {
   // de-relativize the URL before usage (does no harm to absolute URLs)
-  urlNormalizingA.href = spanUrl;
-  spanUrl = urlNormalizingA.href;
+  const urlNormalizingAnchor = getUrlNormalizingAnchor();
+  urlNormalizingAnchor.href = spanUrl;
+  spanUrl = urlNormalizingAnchor.href;
 
   const filteredResources = filterResourcesForSpan(
     spanUrl,

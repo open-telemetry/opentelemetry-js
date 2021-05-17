@@ -65,17 +65,15 @@ X-B3-Sampled: {SamplingState}
   - Optional
   - Debug is encoded as `X-B3-Flags`: 1. Absent or any other value can be ignored. Debug implies an accept decision, so don't also send the `X-B3-Sampled` header.
 
-## Propagator Implementations
-
-### B3Propagator
+## B3 Propagation
 
 The default `B3Propagator` implements b3 propagation according to the
 [OpenTelemetry specification][otel-b3-requirements]. It extracts b3 context
 from multi and single header encodings and injects context using the
-single-header b3 encoding. The inject encoding can be changed to multi-header
-via configuration.
+single-header b3 encoding by default. The inject encoding can be changed to
+multi-header via configuration. See the examples below.
 
-Example usage (default):
+### B3 Single-Header Configuration
 
 ```javascript
 const api = require('@opentelemetry/api');
@@ -84,7 +82,7 @@ const { B3Propagator } = require('@opentelemetry/propagator-b3');
 api.propagation.setGlobalPropagator(new B3Propagator());
 ```
 
-Example usage (specify inject encoding):
+### B3 Multi-Header Configuration
 
 ```javascript
 const api = require('@opentelemetry/api');
@@ -95,53 +93,21 @@ api.propagation.setGlobalPropagator(
 );
 ```
 
-### B3SinglePropagator
+### B3 Single and Multi-Header Configuration
 
-If a distributed system only needs support for the b3 single-header
-encoding it can use the `B3SinglePropagator` directly.
-
-Example usage:
-
-```javascript
-const api = require('@opentelemetry/api');
-const { B3SinglePropagator } = require('@opentelemetry/propagator-b3');
-
-api.propagation.setGlobalPropagator(new B3SinglePropagator());
-```
-
-### B3MultiPropagator
-
-If a distributed system only needs support for the b3 multi-header
-encoding it can use the `B3MultiPropagator` directly.
-
-Example usage:
+The B3Propagator always extracts both the single and multi-header b3 encodings.
+If you need to inject both encodings this can accomplished using a composite
+propagator.
 
 ```javascript
 const api = require('@opentelemetry/api');
-const { B3MultiPropagator } = require('@opentelemetry/propagator-b3');
-
-api.propagation.setGlobalPropagator(new B3MultiPropagator());
-```
-
-### CompositePropagator
-
-If a distributed system needs to support both single and multiple header
-encodings for inject and extract the `B3SinglePropagator` and
-`B3MultiPropagator` can be used in conjunction with a `CompositePropagator`.
-
-Example usage:
-
-```javascript
-const api = require('@opentelemetry/api');
-const { CompositePropagator } = require('@opentelemetry/core');
-const {
-  B3SinglePropagator,
-  B3MultiPropagator,
-} = require('@opentelemetry/propagator-b3');
-
+const { B3Propagator } = require('@opentelemetry/propagator-b3');
 api.propagation.setGlobalPropagator(
   new CompositePropagator({
-    propagators: [new B3SinglePropagator(), new B3MultiPropagator()],
+    propagators: [
+      new B3Propagator(),
+      new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
+    ],
   })
 );
 ```
@@ -159,12 +125,12 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js-contrib/blob/master/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-propagator-jaeger
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-propagator-jaeger
-[devdependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-propagator-jaeger
-[devdependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-propagator-jaeger&type=dev
-[npm-url]: https://www.npmjs.com/package/@opentelemetry/propagator-jaeger
-[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fpropagator-jaeger.svg
+[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-propagator-b3
+[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-propagator-b3
+[devdependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-propagator-b3&type=dev
+[devdependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-propagator-b3&type=dev
+[npm-url]: https://www.npmjs.com/package/@opentelemetry/propagator-b3
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fpropagator-b3.svg
 [b3-spec]: https://github.com/openzipkin/b3-propagation
 [otel-b3-requirements]: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/context/api-propagators.md#b3-requirements
 [otel-spec-id-format]: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/api.md#retrieving-the-traceid-and-spanid
