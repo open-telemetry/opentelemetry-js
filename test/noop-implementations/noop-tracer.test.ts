@@ -16,12 +16,13 @@
 
 import * as assert from 'assert';
 import {
+  context,
   NoopTracer,
+  Span,
   SpanContext,
   SpanKind,
-  TraceFlags,
-  context,
   trace,
+  TraceFlags,
 } from '../../src';
 import { NonRecordingSpan } from '../../src/trace/NonRecordingSpan';
 
@@ -55,5 +56,29 @@ describe('NoopTracer', () => {
     assert(span.spanContext().traceId === parent.traceId);
     assert(span.spanContext().spanId === parent.spanId);
     assert(span.spanContext().traceFlags === parent.traceFlags);
+  });
+
+  it('should accept 2 to 4 args and start an active span', () => {
+    const tracer = new NoopTracer();
+    const name = 'span-name';
+    const fn = (span: Span) => {
+      try {
+        return 1;
+      } finally {
+        span.end();
+      }
+    };
+    const opts = { attributes: { foo: 'bar' } };
+    const ctx = context.active();
+
+    const a = tracer.startActiveSpan(name, fn);
+    assert.strictEqual(a, 1);
+
+    const b = tracer.startActiveSpan(name, opts, fn);
+
+    assert.strictEqual(b, 1);
+
+    const c = tracer.startActiveSpan(name, opts, ctx, fn);
+    assert.strictEqual(c, 1);
   });
 });

@@ -17,18 +17,18 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
-  ProxyTracerProvider,
-  SpanKind,
-  TracerProvider,
-  ProxyTracer,
-  Tracer,
-  Span,
+  context,
   NoopTracer,
+  ProxyTracer,
+  ProxyTracerProvider,
   ROOT_CONTEXT,
+  Span,
+  SpanKind,
   SpanOptions,
+  Tracer,
+  TracerProvider,
 } from '../../src';
 import { NonRecordingSpan } from '../../src/trace/NonRecordingSpan';
-
 describe('ProxyTracer', () => {
   let provider: ProxyTracerProvider;
   const sandbox = sinon.createSandbox();
@@ -96,6 +96,10 @@ describe('ProxyTracer', () => {
         startSpan() {
           return delegateSpan;
         },
+
+        startActiveSpan() {
+          // stubbed
+        },
       };
 
       tracer = provider.getTracer('test');
@@ -114,6 +118,34 @@ describe('ProxyTracer', () => {
       assert.strictEqual(span, delegateSpan);
     });
 
+    it('should create active spans using the delegate tracer', () => {
+      // sinon types are broken with overloads, hence the any
+      // https://github.com/DefinitelyTyped/DefinitelyTyped/issues/36436
+      const startActiveSpanStub = sinon.stub<Tracer, any>(
+        delegateTracer,
+        'startActiveSpan'
+      );
+
+      const name = 'span-name';
+      const fn = (span: Span) => {
+        try {
+          return 1;
+        } finally {
+          span.end();
+        }
+      };
+      const opts = { attributes: { foo: 'bar' } };
+      const ctx = context.active();
+
+      startActiveSpanStub.withArgs(name, fn).returns(1);
+      startActiveSpanStub.withArgs(name, opts, fn).returns(2);
+      startActiveSpanStub.withArgs(name, opts, ctx, fn).returns(3);
+
+      assert.strictEqual(tracer.startActiveSpan(name, fn), 1);
+      assert.strictEqual(tracer.startActiveSpan(name, opts, fn), 2);
+      assert.strictEqual(tracer.startActiveSpan(name, opts, ctx, fn), 3);
+    });
+
     it('should pass original arguments to DelegateTracer#startSpan', () => {
       const startSpanStub = sandbox.stub(delegateTracer, 'startSpan');
 
@@ -130,6 +162,7 @@ describe('ProxyTracer', () => {
       assert.deepStrictEqual(Object.getOwnPropertyNames(NoopTracer.prototype), [
         'constructor',
         'startSpan',
+        'startActiveSpan',
       ]);
       sandbox.assert.calledOnceWithExactly(startSpanStub, name, options, ctx);
     });
