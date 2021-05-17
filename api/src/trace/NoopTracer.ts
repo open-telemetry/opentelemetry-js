@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-import { getSpanContext } from '../trace/context-utils';
+import { context } from '../';
 import { Context } from '../context/types';
+import { getSpanContext, setSpan } from '../trace/context-utils';
 import { NonRecordingSpan } from './NonRecordingSpan';
 import { Span } from './span';
 import { isSpanContextValid } from './spancontext-utils';
@@ -44,6 +45,45 @@ export class NoopTracer implements Tracer {
     } else {
       return new NonRecordingSpan();
     }
+  }
+
+  startActiveSpan<F extends (span: Span) => ReturnType<F>>(
+    name: string,
+    arg2: F | SpanOptions,
+    arg3?: F | Context,
+    arg4?: F
+  ): ReturnType<F> | undefined {
+    let fn: F | undefined,
+      options: SpanOptions | undefined,
+      activeContext: Context | undefined;
+    if (arguments.length === 2 && typeof arg2 === 'function') {
+      fn = arg2;
+    } else if (
+      arguments.length === 3 &&
+      typeof arg2 === 'object' &&
+      typeof arg3 === 'function'
+    ) {
+      options = arg2;
+      fn = arg3;
+    } else if (
+      arguments.length === 4 &&
+      typeof arg2 === 'object' &&
+      typeof arg3 === 'object' &&
+      typeof arg4 === 'function'
+    ) {
+      options = arg2;
+      activeContext = arg3;
+      fn = arg4;
+    }
+
+    const parentContext = activeContext ?? context.active();
+    const span = this.startSpan(name, options, parentContext);
+    const contextWithSpanSet = setSpan(parentContext, span);
+
+    if (fn) {
+      return context.with(contextWithSpanSet, fn, undefined, span);
+    }
+    return;
   }
 }
 

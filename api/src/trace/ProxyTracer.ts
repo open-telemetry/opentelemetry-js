@@ -38,6 +38,16 @@ export class ProxyTracer implements Tracer {
     return this._getTracer().startSpan(name, options, context);
   }
 
+  startActiveSpan<F extends (span: Span) => unknown>(
+    _name: string,
+    _options: F | SpanOptions,
+    _context?: F | Context,
+    _fn?: F
+  ): ReturnType<F> {
+    const tracer = this._getTracer();
+    return Reflect.apply(tracer.startActiveSpan, tracer, arguments);
+  }
+
   /**
    * Try to get a tracer from the proxy tracer provider.
    * If the proxy tracer provider has no delegate, return a noop tracer.
