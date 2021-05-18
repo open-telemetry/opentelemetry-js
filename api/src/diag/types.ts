@@ -89,3 +89,10 @@ export enum DiagLogLevel {
   /** Used to set the logging level to include all logging */
   ALL = 9999,
 }
+
+/**
+ * Defines options for ComponentLogger
+ */
+export interface ComponentLoggerOptions {
+  namespace: string;
+}

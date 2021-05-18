@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
+import { DiagComponentLogger } from '../diag/ComponentLogger';
 import { createLogLevelDiagLogger } from '../diag/internal/logLevelLogger';
-import { DiagLogFunction, DiagLogger, DiagLogLevel } from '../diag/types';
+import {
+  ComponentLoggerOptions,
+  DiagLogFunction,
+  DiagLogger,
+  DiagLogLevel,
+} from '../diag/types';
 import {
   getGlobal,
   registerGlobal,
@@ -90,6 +96,10 @@ export class DiagAPI implements DiagLogger {
       unregisterGlobal(API_NAME);
     };
 
+    self.createComponentLogger = (options: ComponentLoggerOptions) => {
+      return new DiagComponentLogger(options);
+    };
+
     self.verbose = _logProxy('verbose');
     self.debug = _logProxy('debug');
     self.info = _logProxy('info');
@@ -106,6 +116,12 @@ export class DiagAPI implements DiagLogger {
    * @returns true if the logger was successfully registered, else false
    */
   public setLogger!: (logger: DiagLogger, logLevel?: DiagLogLevel) => boolean;
+  /**
+   *
+   */
+  public createComponentLogger!: (
+    options: ComponentLoggerOptions
+  ) => DiagLogger;
 
   // DiagLogger implementation
   public verbose!: DiagLogFunction;
