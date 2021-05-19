@@ -33,7 +33,11 @@ module.exports = {
     "@typescript-eslint/no-unused-vars": ["error", {"argsIgnorePattern": "^_", "args": "after-used"}],
     "@typescript-eslint/no-inferrable-types": ["error", { ignoreProperties: true }],
     "@typescript-eslint/no-empty-function": ["off"],
-    "@typescript-eslint/ban-types": ["warn"],
+    "@typescript-eslint/ban-types": ["warn", {
+      "types": {
+        "Function": null,
+      }
+    }],
     "@typescript-eslint/no-shadow": ["warn"],
     "arrow-parens": ["error", "as-needed"],
     "node/no-deprecated-api": ["warn"],
@@ -56,6 +60,8 @@ module.exports = {
         "@typescript-eslint/no-var-requires": "off",
         "@typescript-eslint/no-shadow": ["off"],
         "@typescript-eslint/no-floating-promises": ["off"],
+        "@typescript-eslint/no-non-null-assertion": ["off"],
+        "@typescript-eslint/explicit-module-boundary-types": ["off"]
       }
     }
   ]
