@@ -37,13 +37,6 @@ import {
   serializeKeyPairs
 } from '../utils';
 
-// Maximum number of name-value pairs allowed by w3c spec
-export const MAX_NAME_VALUE_PAIRS = 180;
-// Maximum number of bytes per a single name-value pair allowed by w3c spec
-export const MAX_PER_NAME_VALUE_PAIRS = 4096;
-// Maximum total length of all name-value pairs allowed by w3c spec
-export const MAX_TOTAL_LENGTH = 8192;
-
 /**
  * Propagates {@link Baggage} through Context format propagation.
  *
