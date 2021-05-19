@@ -67,6 +67,7 @@
     "istanbul-instrumenter-loader": "3.0.1",
     "mocha": "7.2.0",
     "nyc": "15.1.0",
+    "prettier": "2.2.1",
     "semver": "7.3.5",
     "sinon": "10.0.0",
     "ts-loader": "8.2.0",

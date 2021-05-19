@@ -67,6 +67,7 @@
     "karma-webpack": "5.0.0",
     "mocha": "7.2.0",
     "nyc": "15.1.0",
+    "prettier": "2.2.1",
     "rimraf": "3.0.2",
     "sinon": "10.0.0",
     "ts-loader": "8.2.0",
