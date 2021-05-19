@@ -30,8 +30,7 @@ const NOOP_CALLBACK = () => {};
  */
 export abstract class BaseObserverMetric
   extends Metric<BoundObserver>
-  implements api.BaseObserver
-{
+  implements api.BaseObserver {
   protected _callback: (observerResult: api.ObserverResult) => unknown;
 
   constructor(

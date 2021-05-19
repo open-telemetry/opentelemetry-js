@@ -25,8 +25,7 @@ import { Metric } from './Metric';
 /** This is a SDK implementation of Value Recorder Metric. */
 export class ValueRecorderMetric
   extends Metric<BoundValueRecorder>
-  implements api.ValueRecorder
-{
+  implements api.ValueRecorder {
   constructor(
     name: string,
     options: api.MetricOptions,

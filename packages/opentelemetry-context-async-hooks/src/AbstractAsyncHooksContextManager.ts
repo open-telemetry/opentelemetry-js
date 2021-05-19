@@ -37,8 +37,7 @@ const ADD_LISTENER_METHODS = [
 ];
 
 export abstract class AbstractAsyncHooksContextManager
-  implements ContextManager
-{
+  implements ContextManager {
   abstract active(): Context;
 
   abstract with<A extends unknown[], F extends (...args: A) => ReturnType<F>>(

@@ -18,8 +18,7 @@ import { InstrumentationModuleFile } from './types';
 import { normalize } from 'path';
 
 export class InstrumentationNodeModuleFile<T>
-  implements InstrumentationModuleFile<T>
-{
+  implements InstrumentationModuleFile<T> {
   public name: string;
   constructor(
     name: string,

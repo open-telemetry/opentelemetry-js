@@ -25,8 +25,7 @@ import { ObserverResult } from './ObserverResult';
 /** This is a SDK implementation of SumObserver Metric. */
 export class SumObserverMetric
   extends BaseObserverMetric
-  implements api.SumObserver
-{
+  implements api.SumObserver {
   constructor(
     name: string,
     options: api.MetricOptions,

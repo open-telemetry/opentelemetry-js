@@ -27,8 +27,7 @@ import { diag } from '@opentelemetry/api';
  */
 export abstract class InstrumentationBase<T = any>
   extends InstrumentationAbstract
-  implements types.Instrumentation
-{
+  implements types.Instrumentation {
   private _modules: InstrumentationModuleDefinition<T>[];
   private _hooks: RequireInTheMiddle.Hooked[] = [];
   private _enabled = false;

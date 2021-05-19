@@ -22,8 +22,7 @@ import { hashLabels } from './Utils';
 
 /** This is a SDK implementation of {@link Metric} interface. */
 export abstract class Metric<T extends BaseBoundInstrument>
-  implements api.UnboundMetric<T>
-{
+  implements api.UnboundMetric<T> {
   protected readonly _disabled: boolean;
   protected readonly _valueType: api.ValueType;
   protected readonly _descriptor: MetricDescriptor;
