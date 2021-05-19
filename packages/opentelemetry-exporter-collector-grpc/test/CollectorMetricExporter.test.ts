@@ -266,7 +266,7 @@ describe('when configuring via environment', () => {
     const collectorExporter = new CollectorMetricExporter();
     assert.strictEqual(
       collectorExporter.url,
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT
+      'foo.bar'
     );
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
   });
@@ -276,7 +276,7 @@ describe('when configuring via environment', () => {
     const collectorExporter = new CollectorMetricExporter();
     assert.strictEqual(
       collectorExporter.url,
-      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
+      'foo.metrics'
     );
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
     envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
