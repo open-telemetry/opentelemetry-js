@@ -15,11 +15,8 @@
  */
 
 import {
-  BaggageEntry, Context,
-
-
-
-
+  BaggageEntry,
+  Context,
   createBaggage,
   getBaggage,
   setBaggage,
@@ -29,12 +26,16 @@ import {
 } from '@opentelemetry/api';
 import { isTracingSuppressed } from '../../trace/suppress-tracing';
 import {
-  BAGGAGE_HEADER, BAGGAGE_ITEMS_SEPARATOR, BAGGAGE_MAX_NAME_VALUE_PAIRS,
-
-
+  BAGGAGE_HEADER,
+  BAGGAGE_ITEMS_SEPARATOR,
+  BAGGAGE_MAX_NAME_VALUE_PAIRS,
   BAGGAGE_MAX_PER_NAME_VALUE_PAIRS
 } from '../constants';
-import { getKeyPairs, parsePairKeyValue, serializeKeyPairs } from '../utils';
+import {
+  getKeyPairs,
+  parsePairKeyValue,
+  serializeKeyPairs
+} from '../utils';
 
 // Maximum number of name-value pairs allowed by w3c spec
 export const MAX_NAME_VALUE_PAIRS = 180;
