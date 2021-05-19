@@ -170,7 +170,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
         const spyLoggerWarn = sinon.stub(diag, 'warn');
         collectorExporter = new CollectorMetricExporter({
           serviceName: 'basic-service',
-          url: address,
+          url: `http://${address}`,
           headers: {
             foo: 'bar',
           },
@@ -182,7 +182,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
         const spyLoggerWarn = sinon.stub(diag, 'warn');
         collectorExporter = new CollectorMetricExporter({
           serviceName: 'basic-service',
-          url: address + '/v1/metrics',
+          url: `http://${address}/v1/metrics`
         });
         const args = spyLoggerWarn.args[0];
         assert.strictEqual(
@@ -253,7 +253,7 @@ describe('CollectorMetricExporter - node (getDefaultUrl)', () => {
     const url = 'http://foo.bar.com';
     const collectorExporter = new CollectorMetricExporter({ url });
     setTimeout(() => {
-      assert.strictEqual(collectorExporter['url'], url);
+      assert.strictEqual(collectorExporter['url'], 'foo.bar.com');
       done();
     });
   });
