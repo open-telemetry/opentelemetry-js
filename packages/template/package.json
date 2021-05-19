@@ -88,8 +88,5 @@
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "4.0.2",
     "webpack": "4.44.2"
-  },
-  "Add these to devDependencies for linting": {
-    "gts": "3.1.0"
   }
 }

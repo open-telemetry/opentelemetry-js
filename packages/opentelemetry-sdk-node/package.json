@@ -63,7 +63,6 @@
     "@types/sinon": "9.0.11",
     "codecov": "3.8.1",
     "gcp-metadata": "^4.1.4",
-    "gts": "3.1.0",
     "istanbul-instrumenter-loader": "3.0.1",
     "mocha": "7.2.0",
     "nyc": "15.1.0",
