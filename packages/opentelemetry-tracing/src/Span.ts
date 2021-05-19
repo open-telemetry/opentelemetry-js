@@ -192,8 +192,9 @@ export class Span implements api.Span, ReadableSpan {
       attributes[SemanticAttributes.EXCEPTION_MESSAGE] = exception;
     } else if (exception) {
       if (exception.code) {
-        attributes[SemanticAttributes.EXCEPTION_TYPE] =
-          exception.code.toString();
+        attributes[
+          SemanticAttributes.EXCEPTION_TYPE
+        ] = exception.code.toString();
       } else if (exception.name) {
         attributes[SemanticAttributes.EXCEPTION_TYPE] = exception.name;
       }

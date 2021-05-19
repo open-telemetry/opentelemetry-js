@@ -27,7 +27,7 @@ function makeWrapped(
   defineProperty(wrapper, '__wrapped', wrapped);
   defineProperty(wrapper, '__unwrap', unwrap);
   defineProperty(wrapper, '__original', original);
-  return wrapper as unknown as ShimWrapped;
+  return (wrapper as unknown) as ShimWrapped;
 }
 
 function defineProperty(obj: any, name: string, value: unknown) {

@@ -155,7 +155,9 @@ export interface ValueRecorder extends UnboundMetric<BoundValueRecorder> {
 
 /** Base interface for the Observer metrics. */
 export interface BaseObserver extends UnboundMetric<BoundBaseObserver> {
-  observation: (value: number) => {
+  observation: (
+    value: number
+  ) => {
     value: number;
     observer: BaseObserver;
   };

@@ -113,8 +113,7 @@ describe('Node SDK', () => {
         propagation['_getGlobalPropagator']() instanceof NoopTextMapPropagator
       );
 
-      const apiTracerProvider =
-        trace.getTracerProvider() as ProxyTracerProvider;
+      const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
       assert.ok(apiTracerProvider.getDelegate() instanceof NoopTracerProvider);
 
       assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
@@ -136,8 +135,7 @@ describe('Node SDK', () => {
       assert.ok(
         propagation['_getGlobalPropagator']() instanceof CompositePropagator
       );
-      const apiTracerProvider =
-        trace.getTracerProvider() as ProxyTracerProvider;
+      const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
       assert.ok(apiTracerProvider.getDelegate() instanceof NodeTracerProvider);
     });
 
@@ -160,8 +158,7 @@ describe('Node SDK', () => {
       assert.ok(
         propagation['_getGlobalPropagator']() instanceof CompositePropagator
       );
-      const apiTracerProvider =
-        trace.getTracerProvider() as ProxyTracerProvider;
+      const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
       assert.ok(apiTracerProvider.getDelegate() instanceof NodeTracerProvider);
     });
 
@@ -180,8 +177,7 @@ describe('Node SDK', () => {
         propagation['_getGlobalPropagator']() instanceof NoopTextMapPropagator
       );
 
-      const apiTracerProvider =
-        trace.getTracerProvider() as ProxyTracerProvider;
+      const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
       assert.ok(apiTracerProvider.getDelegate() instanceof NoopTracerProvider);
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);

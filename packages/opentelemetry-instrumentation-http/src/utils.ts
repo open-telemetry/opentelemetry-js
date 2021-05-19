@@ -197,8 +197,9 @@ export const setRequestContentLengthAttribute = (
   if (isCompressed(request.headers)) {
     attributes[SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH] = length;
   } else {
-    attributes[SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED] =
-      length;
+    attributes[
+      SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
+    ] = length;
   }
 };
 
@@ -217,8 +218,9 @@ export const setResponseContentLengthAttribute = (
   if (isCompressed(response.headers)) {
     attributes[SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH] = length;
   } else {
-    attributes[SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED] =
-      length;
+    attributes[
+      SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED
+    ] = length;
   }
 };
 
@@ -471,7 +473,7 @@ export const getIncomingRequestAttributesOnResponse = (
   const { socket } = request;
   const { statusCode, statusMessage } = response;
   const { localAddress, localPort, remoteAddress, remotePort } = socket;
-  const { __ot_middlewares } = request as unknown as {
+  const { __ot_middlewares } = (request as unknown) as {
     [key: string]: unknown;
   };
   const route = Array.isArray(__ot_middlewares)

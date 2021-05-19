@@ -132,10 +132,10 @@ describe('utils', () => {
     it('should add all network events to span', () => {
       const addEventSpy = sinon.spy();
       const setAttributeSpy = sinon.spy();
-      const span = {
+      const span = ({
         addEvent: addEventSpy,
         setAttribute: setAttributeSpy,
-      } as unknown as tracing.Span;
+      } as unknown) as tracing.Span;
       const entries = {
         [PTN.FETCH_START]: 123,
         [PTN.DOMAIN_LOOKUP_START]: 123,
@@ -162,9 +162,9 @@ describe('utils', () => {
       describe(`when entry is ${value}`, () => {
         it('should add event to span', () => {
           const addEventSpy = sinon.spy();
-          const span = {
+          const span = ({
             addEvent: addEventSpy,
-          } as unknown as tracing.Span;
+          } as unknown) as tracing.Span;
           const entries = {
             [PTN.FETCH_START]: value,
           } as PerformanceEntries;
@@ -184,9 +184,9 @@ describe('utils', () => {
     describe('when entry is not numeric', () => {
       it('should NOT add event to span', () => {
         const addEventSpy = sinon.spy();
-        const span = {
+        const span = ({
           addEvent: addEventSpy,
-        } as unknown as tracing.Span;
+        } as unknown) as tracing.Span;
         const entries = {
           [PTN.FETCH_START]: 'non-numeric',
         } as unknown;
@@ -205,9 +205,9 @@ describe('utils', () => {
     describe('when entries does NOT contain the performance', () => {
       it('should NOT add event to span', () => {
         const addEventSpy = sinon.spy();
-        const span = {
+        const span = ({
           addEvent: addEventSpy,
-        } as unknown as tracing.Span;
+        } as unknown) as tracing.Span;
         const entries = {
           [PTN.FETCH_START]: 123,
         } as PerformanceEntries;

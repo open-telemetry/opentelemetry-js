@@ -41,7 +41,22 @@ const meterProvider = new metrics.MeterProvider({
 const meter = meterProvider.getMeter('default', '0.0.1');
 
 const traceIdArr = [
-  31, 16, 8, 220, 142, 39, 14, 133, 196, 10, 13, 124, 57, 57, 178, 120,
+  31,
+  16,
+  8,
+  220,
+  142,
+  39,
+  14,
+  133,
+  196,
+  10,
+  13,
+  124,
+  57,
+  57,
+  178,
+  120,
 ];
 const spanIdArr = [94, 16, 114, 97, 246, 79, 165, 62];
 const parentIdArr = [120, 168, 145, 80, 152, 134, 67, 136];

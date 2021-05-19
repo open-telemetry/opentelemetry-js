@@ -119,7 +119,7 @@ export const makeGrpcClientRemoteCall = function (
         }
       };
       context.bind(call);
-      (call as unknown as events.EventEmitter).on(
+      ((call as unknown) as events.EventEmitter).on(
         'error',
         (err: grpcTypes.ServiceError) => {
           span.setStatus({
@@ -134,7 +134,7 @@ export const makeGrpcClientRemoteCall = function (
         }
       );
 
-      (call as unknown as events.EventEmitter).on(
+      ((call as unknown) as events.EventEmitter).on(
         'status',
         (status: SpanStatus) => {
           span.setStatus({ code: SpanStatusCode.UNSET });

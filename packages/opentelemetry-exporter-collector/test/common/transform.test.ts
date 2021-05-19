@@ -146,8 +146,9 @@ describe('transform', () => {
         [resource2, new Map([[instrumentationLibrary, [span2, span3]]])],
       ]);
 
-      const result =
-        transform.groupSpansByResourceAndLibrary(multiResourceTrace);
+      const result = transform.groupSpansByResourceAndLibrary(
+        multiResourceTrace
+      );
 
       assert.deepStrictEqual(result, expected);
     });

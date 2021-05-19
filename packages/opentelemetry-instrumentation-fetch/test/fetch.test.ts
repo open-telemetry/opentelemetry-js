@@ -51,8 +51,8 @@ class DummySpanExporter implements tracing.SpanExporter {
   }
 }
 
-const getData = (url: string, method?: string) =>
-  fetch(url, {
+const getData = (url: string, method?: string) => {
+  return fetch(url, {
     method: method || 'GET',
     headers: {
       foo: 'bar',
@@ -60,6 +60,7 @@ const getData = (url: string, method?: string) =>
       'Content-Type': 'application/json',
     },
   });
+};
 
 const CUSTOM_ATTRIBUTE_KEY = 'span kind';
 const defaultResource = {
@@ -235,37 +236,33 @@ describe('fetch', () => {
     rootSpan = webTracerWithZone.startSpan('root');
     api.context.with(api.setSpan(api.context.active(), rootSpan), () => {
       fakeNow = 0;
-      getData(fileUrl, method).then(
-        response => {
-          // this is a bit tricky as the only way to get all request headers from
-          // fetch is to use json()
-          response.json().then(
-            json => {
-              lastResponse = json;
-              const headers: { [key: string]: string } = {};
-              Object.keys(lastResponse.headers).forEach(key => {
-                headers[key.toLowerCase()] = lastResponse.headers[key];
-              });
-              lastResponse.headers = headers;
-              // OBSERVER_WAIT_TIME_MS
-              sinon.clock.tick(300);
-              done();
-            },
-            () => {
-              lastResponse = undefined;
-              // OBSERVER_WAIT_TIME_MS
-              sinon.clock.tick(300);
-              done();
-            }
-          );
-        },
-        () => {
-          lastResponse = undefined;
-          // OBSERVER_WAIT_TIME_MS
-          sinon.clock.tick(300);
+      void getData(fileUrl, method)
+        .then(
+          response => {
+            // this is a bit tricky as the only way to get all request headers from
+            // fetch is to use json()
+            return response.json().then(
+              json => {
+                lastResponse = json;
+                const headers: { [key: string]: string } = {};
+                Object.keys(lastResponse.headers).forEach(key => {
+                  headers[key.toLowerCase()] = lastResponse.headers[key];
+                });
+                lastResponse.headers = headers;
+              },
+              () => {
+                lastResponse = undefined;
+              }
+            );
+          },
+          () => {
+            lastResponse = undefined;
+          }
+        )
+        .then(sinon.clock.runAllAsync)
+        .then(() => {
           done();
-        }
-      );
+        });
       fakeNow = 300;
     });
   };
@@ -529,7 +526,7 @@ describe('fetch', () => {
 
     it('should set trace headers with a request object', () => {
       const r = new Request('url');
-      window.fetch(r);
+      window.fetch(r).catch(() => {});
       assert.ok(typeof r.headers.get(X_B3_TRACE_ID) === 'string');
     });
 

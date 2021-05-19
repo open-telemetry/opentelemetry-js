@@ -36,7 +36,7 @@ function get(input: any, options?: any): GetResult {
     let req: http.ClientRequest;
 
     function onGetResponseCb(resp: http.IncomingMessage): void {
-      const res = resp as unknown as http.IncomingMessage & {
+      const res = (resp as unknown) as http.IncomingMessage & {
         req: http.IncomingMessage;
       };
       let data = '';

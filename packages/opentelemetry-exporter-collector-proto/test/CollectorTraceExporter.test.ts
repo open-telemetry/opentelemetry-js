@@ -146,8 +146,7 @@ describe('CollectorTraceExporter - node with proto over http', () => {
         write: (...args: any[]) => {
           const ExportTraceServiceRequestProto = getExportRequestProto();
           const data = ExportTraceServiceRequestProto?.decode(args[0]);
-          const json =
-            data?.toJSON() as collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+          const json = data?.toJSON() as collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
           const span1 =
             json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
           assert.ok(typeof span1 !== 'undefined', "span doesn't exist");

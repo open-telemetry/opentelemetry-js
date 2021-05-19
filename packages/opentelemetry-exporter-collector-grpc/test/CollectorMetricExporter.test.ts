@@ -78,8 +78,9 @@ const testCollectorMetricExporter = (params: TestParams) =>
           includeDirs,
         })
         .then((packageDefinition: protoLoader.PackageDefinition) => {
-          const packageObject: any =
-            grpc.loadPackageDefinition(packageDefinition);
+          const packageObject: any = grpc.loadPackageDefinition(
+            packageDefinition
+          );
           server.addService(
             packageObject.opentelemetry.proto.collector.metrics.v1
               .MetricsService.service,
@@ -138,13 +139,13 @@ const testCollectorMetricExporter = (params: TestParams) =>
         value: 1592602232694000000,
       });
       metrics = [];
-      const counter: metrics.Metric<metrics.BoundCounter> & Counter =
-        mockCounter();
-      const observer: metrics.Metric<metrics.BoundObserver> & ValueObserver =
-        mockObserver(observerResult => {
-          observerResult.observe(3, {});
-          observerResult.observe(6, {});
-        });
+      const counter: metrics.Metric<metrics.BoundCounter> &
+        Counter = mockCounter();
+      const observer: metrics.Metric<metrics.BoundObserver> &
+        ValueObserver = mockObserver(observerResult => {
+        observerResult.observe(3, {});
+        observerResult.observe(6, {});
+      });
       const recorder: metrics.Metric<metrics.BoundValueRecorder> &
         ValueRecorder = mockValueRecorder();
 

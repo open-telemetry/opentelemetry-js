@@ -191,8 +191,7 @@ describe('SimpleSpanProcessor', () => {
 
       processor.onEnd(span);
 
-      const exporterCreatedSpans =
-        testTracingExporter.getExporterCreatedSpans();
+      const exporterCreatedSpans = testTracingExporter.getExporterCreatedSpans();
       assert.equal(exporterCreatedSpans.length, 0);
     });
   });

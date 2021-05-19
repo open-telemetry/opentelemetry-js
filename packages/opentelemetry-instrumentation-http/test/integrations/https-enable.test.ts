@@ -322,7 +322,7 @@ describe('HttpsInstrumentation Integration tests', () => {
           `${protocol}://localhost:${mockServerPort}/`,
           options,
           (resp: http.IncomingMessage) => {
-            const res = resp as unknown as http.IncomingMessage & {
+            const res = (resp as unknown) as http.IncomingMessage & {
               req: http.IncomingMessage;
             };
 

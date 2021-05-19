@@ -168,7 +168,7 @@ describe('transformMetrics', () => {
             metricKind: 0,
             valueType: 0,
           },
-          labels: { foo: 1 as unknown as string },
+          labels: { foo: (1 as unknown) as string },
           aggregator: new SumAggregator(),
           resource: new Resource({}),
           aggregationTemporality: 0,
@@ -208,9 +208,11 @@ describe('transformMetrics', () => {
     it('should group by instrumentation library', async () => {
       const [resource] = mockedResources;
       const [lib1, lib2] = mockedInstrumentationLibraries;
-      const [metric1, metric2, metric3] = multiInstrumentationLibraryMetricsGet(
-        observerResult => {}
-      );
+      const [
+        metric1,
+        metric2,
+        metric3,
+      ] = multiInstrumentationLibraryMetricsGet(observerResult => {});
       const expected = new Map([
         [
           resource,

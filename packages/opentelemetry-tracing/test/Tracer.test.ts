@@ -34,9 +34,9 @@ import {
 
 describe('Tracer', () => {
   const tracerProvider = new BasicTracerProvider();
-  const envSource = (
-    typeof window !== 'undefined' ? window : process.env
-  ) as any;
+  const envSource = (typeof window !== 'undefined'
+    ? window
+    : process.env) as any;
 
   class TestSampler implements Sampler {
     shouldSample() {

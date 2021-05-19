@@ -64,7 +64,7 @@ export class ZoneContextManager implements ContextManager {
       writable: false,
       value: target.length,
     });
-    return contextWrapper as unknown as T;
+    return (contextWrapper as unknown) as T;
   }
 
   /**
@@ -72,7 +72,7 @@ export class ZoneContextManager implements ContextManager {
    * @param context A context (span) to be bind to target
    */
   private _bindListener<T>(obj: T, context: Context): T {
-    const target = obj as unknown as TargetWithEvents;
+    const target = (obj as unknown) as TargetWithEvents;
     if (target.__ot_listeners !== undefined) {
       return obj;
     }
@@ -215,7 +215,7 @@ export class ZoneContextManager implements ContextManager {
     } else if (isListenerObject(target)) {
       this._bindListener(target, context);
     }
-    return target as unknown as T;
+    return (target as unknown) as T;
   }
 
   /**

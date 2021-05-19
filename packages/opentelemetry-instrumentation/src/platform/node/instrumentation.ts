@@ -131,7 +131,7 @@ export abstract class InstrumentationBase<T = any>
           { internals: true },
           (exports, name, baseDir) => {
             return this._onRequire<typeof exports>(
-              module as unknown as InstrumentationModuleDefinition<
+              (module as unknown) as InstrumentationModuleDefinition<
                 typeof exports
               >,
               exports,

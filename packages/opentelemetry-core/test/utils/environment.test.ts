@@ -38,7 +38,7 @@ export function mockEnvironment(values: RAW_ENVIRONMENT) {
     });
   } else {
     Object.keys(values).forEach(key => {
-      (window as unknown as RAW_ENVIRONMENT)[key] = String(values[key]);
+      ((window as unknown) as RAW_ENVIRONMENT)[key] = String(values[key]);
     });
   }
 }
@@ -53,7 +53,7 @@ export function removeMockEnvironment() {
     });
   } else {
     Object.keys(lastMock).forEach(key => {
-      delete (window as unknown as RAW_ENVIRONMENT)[key];
+      delete ((window as unknown) as RAW_ENVIRONMENT)[key];
     });
   }
   lastMock = {};

@@ -180,8 +180,8 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   }
 
   private _applyAttributesAfterXHR(span: api.Span, xhr: XMLHttpRequest) {
-    const applyCustomAttributesOnSpan =
-      this._getConfig().applyCustomAttributesOnSpan;
+    const applyCustomAttributesOnSpan = this._getConfig()
+      .applyCustomAttributesOnSpan;
     if (typeof applyCustomAttributesOnSpan === 'function') {
       safeExecuteInTheMiddle(
         () => applyCustomAttributesOnSpan(span, xhr),
@@ -242,7 +242,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    */
   private _clearResources() {
     if (this._tasksCount === 0 && this._getConfig().clearTimingResources) {
-      (otperformance as unknown as Performance).clearResourceTimings();
+      ((otperformance as unknown) as Performance).clearResourceTimings();
       this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
       this._usedResources = new WeakSet<PerformanceResourceTiming>();
     }
@@ -271,7 +271,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       // then OBSERVER_WAIT_TIME_MS and observer didn't collect enough
       // information
       // ts thinks this is the perf_hooks module, but it is the browser performance api
-      resources = (otperformance as unknown as Performance).getEntriesByType(
+      resources = ((otperformance as unknown) as Performance).getEntriesByType(
         'resource'
       ) as PerformanceResourceTiming[];
     }
