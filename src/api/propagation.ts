@@ -28,7 +28,8 @@ import {
   registerGlobal,
   unregisterGlobal,
 } from '../internal/global-utils';
-import { getBaggage, createBaggage, setBaggage } from '../baggage/index';
+import { getBaggage, setBaggage } from '../baggage/context-helpers';
+import { createBaggage } from '../baggage/utils';
 
 const API_NAME = 'propagation';
 
