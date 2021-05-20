@@ -21,6 +21,8 @@ import {
   SpanContext,
   getSpanContext,
   setSpanContext,
+  TextMapGetter,
+  TextMapSetter,
 } from '@opentelemetry/api';
 import { Context, ROOT_CONTEXT } from '@opentelemetry/api';
 import * as assert from 'assert';
@@ -30,17 +32,25 @@ import {
   RandomIdGenerator,
 } from '../../src';
 import {
-  B3Propagator,
-  B3InjectEncoding,
-  X_B3_SAMPLED,
-  X_B3_SPAN_ID,
-  X_B3_TRACE_ID,
-} from '@opentelemetry/propagator-b3';
-import {
   TRACE_PARENT_HEADER,
   TRACE_STATE_HEADER,
 } from '../../src/trace/HttpTraceContextPropagator';
 import { TraceState } from '../../src/trace/TraceState';
+
+class DummyPropagator implements TextMapPropagator {
+  inject(context: Context, carrier: any, setter: TextMapSetter<any>): void {
+    carrier['dummy'] = getSpanContext(context);
+  }
+  extract(context: Context, carrier: any, getter: TextMapGetter<any>): Context {
+    if (carrier['dummy']) {
+      return setSpanContext(context, carrier['dummy']);
+    }
+    return context;
+  }
+  fields(): string[] {
+    return ['dummy'];
+  }
+}
 
 describe('Composite Propagator', () => {
   let traceId: string;
@@ -70,16 +80,11 @@ describe('Composite Propagator', () => {
 
     it('should inject context using all configured propagators', () => {
       const composite = new CompositePropagator({
-        propagators: [
-          new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
-          new HttpTraceContextPropagator(),
-        ],
+        propagators: [new DummyPropagator(), new HttpTraceContextPropagator()],
       });
       composite.inject(ctxWithSpanContext, carrier, defaultTextMapSetter);
 
-      assert.strictEqual(carrier[X_B3_TRACE_ID], traceId);
-      assert.strictEqual(carrier[X_B3_SPAN_ID], spanId);
-      assert.strictEqual(carrier[X_B3_SAMPLED], '1');
+      assert.strictEqual(carrier['dummy'], spanContext);
       assert.strictEqual(
         carrier[TRACE_PARENT_HEADER],
         `00-${traceId}-${spanId}-01`
@@ -108,9 +113,7 @@ describe('Composite Propagator', () => {
 
     beforeEach(() => {
       carrier = {
-        [X_B3_TRACE_ID]: traceId,
-        [X_B3_SPAN_ID]: spanId,
-        [X_B3_SAMPLED]: 1,
+        ['dummy']: { traceId, spanId },
         [TRACE_PARENT_HEADER]: `00-${traceId}-${spanId}-01`,
         [TRACE_STATE_HEADER]: 'foo=bar',
       };
@@ -118,10 +121,7 @@ describe('Composite Propagator', () => {
 
     it('should extract context using all configured propagators', () => {
       const composite = new CompositePropagator({
-        propagators: [
-          new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER }),
-          new HttpTraceContextPropagator(),
-        ],
+        propagators: [new DummyPropagator(), new HttpTraceContextPropagator()],
       });
       const spanContext = getSpanContext(
         composite.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)

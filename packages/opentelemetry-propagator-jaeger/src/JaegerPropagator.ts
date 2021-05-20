@@ -21,13 +21,13 @@ import {
   setBaggage,
   setSpanContext,
   SpanContext,
-  TraceFlags,
   TextMapGetter,
   TextMapPropagator,
   TextMapSetter,
-  isInstrumentationSuppressed,
   createBaggage,
+  TraceFlags,
 } from '@opentelemetry/api';
+import { isTracingSuppressed } from '@opentelemetry/core';
 
 export const UBER_TRACE_ID_HEADER = 'uber-trace-id';
 export const UBER_BAGGAGE_HEADER_PREFIX = 'uberctx';
@@ -61,7 +61,7 @@ export class JaegerPropagator implements TextMapPropagator {
   inject(context: Context, carrier: unknown, setter: TextMapSetter) {
     const spanContext = getSpanContext(context);
     const baggage = getBaggage(context);
-    if (spanContext && isInstrumentationSuppressed(context) === false) {
+    if (spanContext && isTracingSuppressed(context) === false) {
       const traceFlags = `0${(
         spanContext.traceFlags || TraceFlags.NONE
       ).toString(16)}`;

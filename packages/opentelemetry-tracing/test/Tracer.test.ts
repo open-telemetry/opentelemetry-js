@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
 import {
+  INVALID_TRACEID,
+  ROOT_CONTEXT,
   Sampler,
   SamplingDecision,
-  TraceFlags,
-  ROOT_CONTEXT,
-  suppressInstrumentation,
-  SpanContext,
-  INVALID_TRACEID,
   setSpanContext,
+  SpanContext,
+  TraceFlags,
 } from '@opentelemetry/api';
-import { BasicTracerProvider, Tracer, Span } from '../src';
 import {
-  InstrumentationLibrary,
-  AlwaysOnSampler,
   AlwaysOffSampler,
+  AlwaysOnSampler,
+  InstrumentationLibrary,
+  suppressTracing,
 } from '@opentelemetry/core';
+import * as assert from 'assert';
+import { BasicTracerProvider, Span, Tracer } from '../src';
 
 describe('Tracer', () => {
   const tracerProvider = new BasicTracerProvider();
@@ -121,8 +121,8 @@ describe('Tracer', () => {
     assert.strictEqual(lib.version, '0.0.1');
   });
 
-  describe('when suppressInstrumentation true', () => {
-    const context = suppressInstrumentation(ROOT_CONTEXT);
+  describe('when suppressTracing true', () => {
+    const context = suppressTracing(ROOT_CONTEXT);
 
     it('should return cached no-op span ', done => {
       const tracer = new Tracer(

@@ -20,6 +20,7 @@ import {
   InstrumentationLibrary,
   RandomIdGenerator,
   sanitizeAttributes,
+  isTracingSuppressed,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BasicTracerProvider } from './BasicTracerProvider';
@@ -62,7 +63,7 @@ export class Tracer implements api.Tracer {
     options: api.SpanOptions = {},
     context = api.context.active()
   ): api.Span {
-    if (api.isInstrumentationSuppressed(context)) {
+    if (isTracingSuppressed(context)) {
       api.diag.debug('Instrumentation suppressed, returning Noop Span');
       return api.NOOP_TRACER.startSpan(name, options, context);
     }

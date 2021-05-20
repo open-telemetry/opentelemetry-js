@@ -20,10 +20,10 @@ import {
   getSpanContext,
   setSpanContext,
   SpanContext,
-  suppressInstrumentation,
   TraceFlags,
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
+import { suppressTracing } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { B3MultiPropagator } from '../src/B3MultiPropagator';
 import {
@@ -147,7 +147,7 @@ describe('B3MultiPropagator', () => {
         traceFlags: TraceFlags.SAMPLED,
       };
       b3Propagator.inject(
-        suppressInstrumentation(setSpanContext(ROOT_CONTEXT, spanContext)),
+        suppressTracing(setSpanContext(ROOT_CONTEXT, spanContext)),
         carrier,
         defaultTextMapSetter
       );

@@ -17,7 +17,6 @@
 import {
   Context,
   getSpanContext,
-  isInstrumentationSuppressed,
   isSpanContextValid,
   setSpanContext,
   SpanContext,
@@ -26,6 +25,7 @@ import {
   TextMapSetter,
   TraceFlags,
 } from '@opentelemetry/api';
+import { isTracingSuppressed } from './suppress-tracing';
 import { TraceState } from './TraceState';
 
 export const TRACE_PARENT_HEADER = 'traceparent';
@@ -77,7 +77,7 @@ export class HttpTraceContextPropagator implements TextMapPropagator {
     const spanContext = getSpanContext(context);
     if (
       !spanContext ||
-      isInstrumentationSuppressed(context) ||
+      isTracingSuppressed(context) ||
       !isSpanContextValid(spanContext)
     )
       return;

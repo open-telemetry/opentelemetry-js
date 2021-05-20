@@ -24,10 +24,10 @@ import {
   setSpan,
   ROOT_CONTEXT,
   getSpan,
-  suppressInstrumentation,
   NOOP_TRACER,
   diag,
 } from '@opentelemetry/api';
+import { suppressTracing } from '@opentelemetry/core';
 import type * as http from 'http';
 import type * as https from 'https';
 import { Socket } from 'net';
@@ -388,7 +388,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           (e: Error) => diag.error('caught ignoreIncomingPaths error: ', e)
         )
       ) {
-        return context.with(suppressInstrumentation(context.active()), () => {
+        return context.with(suppressTracing(context.active()), () => {
           context.bind(request);
           context.bind(response);
           return original.apply(this, [event, ...args]);

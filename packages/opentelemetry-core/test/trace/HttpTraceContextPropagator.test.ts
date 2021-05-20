@@ -23,7 +23,6 @@ import {
   ROOT_CONTEXT,
   setSpanContext,
   SpanContext,
-  suppressInstrumentation,
   TraceFlags,
 } from '@opentelemetry/api';
 import * as assert from 'assert';
@@ -32,6 +31,7 @@ import {
   TRACE_PARENT_HEADER,
   TRACE_STATE_HEADER,
 } from '../../src/trace/HttpTraceContextPropagator';
+import { suppressTracing } from '../../src/trace/suppress-tracing';
 import { TraceState } from '../../src/trace/TraceState';
 
 describe('HttpTraceContextPropagator', () => {
@@ -90,7 +90,7 @@ describe('HttpTraceContextPropagator', () => {
       };
 
       httpTraceContext.inject(
-        suppressInstrumentation(setSpanContext(ROOT_CONTEXT, spanContext)),
+        suppressTracing(setSpanContext(ROOT_CONTEXT, spanContext)),
         carrier,
         defaultTextMapSetter
       );
@@ -107,7 +107,7 @@ describe('HttpTraceContextPropagator', () => {
       };
 
       httpTraceContext.inject(
-        suppressInstrumentation(setSpanContext(ROOT_CONTEXT, spanContext)),
+        suppressTracing(setSpanContext(ROOT_CONTEXT, spanContext)),
         carrier,
         defaultTextMapSetter
       );
