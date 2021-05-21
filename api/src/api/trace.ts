@@ -27,6 +27,7 @@ import {
 import { Tracer } from '../trace/tracer';
 import { TracerProvider } from '../trace/tracer_provider';
 import {
+  deleteSpan,
   getSpan,
   getSpanContext,
   setSpan,
@@ -88,6 +89,8 @@ export class TraceAPI {
   public wrapSpanContext = wrapSpanContext;
 
   public isSpanContextValid = isSpanContextValid;
+
+  public deleteSpan = deleteSpan;
 
   public getSpan = getSpan;
 
