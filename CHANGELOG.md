@@ -2,7 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
-## 1.0.0-rc.1
+## 0.20.0
+
+### :rocket: Enhancement
+
+* [#69](https://github.com/open-telemetry/opentelemetry-js-api/pull/69) feat(context): add utils method to remove keys from context ([@vmarchaud](https://github.com/vmarchaud))
+* [#71](https://github.com/open-telemetry/opentelemetry-js-api/pull/71) chore: export baggage ([@dyladan](https://github.com/dyladan))
+
+### Committers: 2
+
+* Daniel Dyla ([@dyladan](https://github.com/dyladan))
+* Valentin Marchaud ([@vmarchaud](https://github.com/vmarchaud))
+
+## 0.19.0
 
 ### :boom: Breaking Change
 
