@@ -45,6 +45,15 @@ export function setSpan(context: Context, span: Span): Context {
 }
 
 /**
+ * Remove current span stored in the context
+ *
+ * @param context context to delete span from
+ */
+export function deleteSpan(context: Context): Context {
+  return context.deleteValue(SPAN_KEY);
+}
+
+/**
  * Wrap span context in a NoopSpan and set as span in a new
  * context
  *
