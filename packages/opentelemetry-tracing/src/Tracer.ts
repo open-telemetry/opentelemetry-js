@@ -220,7 +220,30 @@ export class Tracer implements api.Tracer {
     options: api.SpanOptions,
     context: api.Context,
     fn: F
-  ): ReturnType<F> {
+  ): ReturnType<F>;
+  startActiveSpan<F extends (span: api.Span) => ReturnType<F>>(
+    name: string,
+    arg2?: F | api.SpanOptions,
+    arg3?: F | api.Context,
+    arg4?: F
+  ): ReturnType<F> | undefined {
+    let options: api.SpanOptions | undefined;
+    let context: api.Context | undefined;
+    let fn: F;
+
+    if (arguments.length < 2) {
+      return;
+    } else if (arguments.length === 2) {
+      fn = arg2 as F;
+    } else if (arguments.length === 3) {
+      options = arg2 as api.SpanOptions | undefined;
+      fn = arg3 as F;
+    } else {
+      options = arg2 as api.SpanOptions | undefined;
+      context = arg3 as api.Context | undefined;
+      fn = arg4 as F;
+    }
+
     const parentContext = context ?? api.context.active();
     const span = this.startSpan(name, options, parentContext);
     const contextWithSpanSet = api.setSpan(parentContext, span);
