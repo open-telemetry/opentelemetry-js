@@ -229,20 +229,30 @@ describe('Tracer', () => {
       { sampler: new TestSampler() },
       tracerProvider
     );
-    tracer.startActiveSpan('my-span', span => {
-      assert.strictEqual(getSpan(context.active()), span);
-      span.end();
-    });
 
-    tracer.startActiveSpan('my-span', {}, span => {
-      assert.strictEqual(getSpan(context.active()), span);
-      span.end();
-    });
+    assert.strictEqual( tracer.startActiveSpan('my-span', span => {
+      try {
+        return 1
+      } finally {
+        span.end();
+      }
+    }), 1);
 
-    tracer.startActiveSpan('my-span', {}, ROOT_CONTEXT, span => {
-      assert.strictEqual(getSpan(context.active()), span);
-      span.end();
-    });
+    assert.strictEqual( tracer.startActiveSpan('my-span', {}, span => {
+      try {
+        return 1
+      } finally {
+        span.end();
+      }
+    }), 1);
+
+    assert.strictEqual( tracer.startActiveSpan('my-span', {}, context.active(), span => {
+      try {
+        return 1
+      } finally {
+        span.end();
+      }
+    }), 1);
 
   });
 });
