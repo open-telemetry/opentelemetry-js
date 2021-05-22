@@ -15,19 +15,21 @@
  */
 
 import {
-  INVALID_TRACEID,
+  context,
+  getSpan, INVALID_TRACEID,
   ROOT_CONTEXT,
   Sampler,
   SamplingDecision,
-  TraceFlags,
-  SpanContext,
   trace,
+  setSpanContext,
+  SpanContext,
+  TraceFlags
 } from '@opentelemetry/api';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,
   InstrumentationLibrary,
-  suppressTracing,
+  suppressTracing
 } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { BasicTracerProvider, Span, Tracer } from '../src';
@@ -219,5 +221,28 @@ describe('Tracer', () => {
     const context = span.spanContext();
     assert.strictEqual(context.traceFlags, TraceFlags.NONE);
     span.end();
+  });
+
+  it('should start an active span', () => {
+    const tracer = new Tracer(
+      { name: 'default', version: '0.0.1' },
+      { sampler: new TestSampler() },
+      tracerProvider
+    );
+    tracer.startActiveSpan('my-span', span => {
+      assert.strictEqual(getSpan(context.active()), span);
+      span.end();
+    });
+
+    tracer.startActiveSpan('my-span', {}, span => {
+      assert.strictEqual(getSpan(context.active()), span);
+      span.end();
+    });
+
+    tracer.startActiveSpan('my-span', {}, ROOT_CONTEXT, span => {
+      assert.strictEqual(getSpan(context.active()), span);
+      span.end();
+    });
+
   });
 });
