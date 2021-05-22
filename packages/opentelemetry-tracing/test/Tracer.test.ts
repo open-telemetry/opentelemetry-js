@@ -16,7 +16,7 @@
 
 import {
   context,
-  getSpan, INVALID_TRACEID,
+  INVALID_TRACEID,
   ROOT_CONTEXT,
   Sampler,
   SamplingDecision,
