@@ -15,11 +15,19 @@
  */
 
 import * as assert from 'assert';
-import { Instrumentation, InstrumentationBase } from '../../src';
+import {
+  Instrumentation,
+  InstrumentationBase,
+  InstrumentationConfig,
+} from '../../src';
+
+interface TestInstrumentationConfig extends InstrumentationConfig {
+  isActive?: boolean;
+}
 
 class TestInstrumentation extends InstrumentationBase {
-  constructor() {
-    super('test', '1.0.0');
+  constructor(config: TestInstrumentationConfig & InstrumentationConfig = {}) {
+    super('test', '1.0.0', Object.assign({}, config));
   }
   enable() {}
   disable() {}
@@ -54,6 +62,24 @@ describe('BaseInstrumentation', () => {
       }
       instrumentation = new TestInstrumentation2();
       assert.strictEqual(called, true);
+    });
+  });
+
+  describe('config', () => {
+    it('should get config', () => {
+      const instrumentation: Instrumentation = new TestInstrumentation({
+        isActive: false,
+      });
+      const configuration = instrumentation.getConfig();
+      assert.notStrictEqual(configuration, null);
+      assert.strictEqual(configuration.isActive, false);
+    });
+
+    it('should modify config', () => {
+      const instrumentation: Instrumentation = new TestInstrumentation();
+      instrumentation.setConfig({ isActive: true });
+      const configuration = instrumentation.getConfig();
+      assert.strictEqual(configuration.isActive, true);
     });
   });
 });
