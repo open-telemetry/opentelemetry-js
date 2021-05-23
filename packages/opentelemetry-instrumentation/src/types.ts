@@ -45,10 +45,10 @@ export interface Instrumentation {
   setMeterProvider(meterProvider: MeterProvider): void;
 
   /** Method to set instrumentation config  */
-  setConfig(config: InstrumentationConfig & any): void;
+  setConfig(config: InstrumentationConfig): void;
 
   /** Method to get instrumentation config  */
-  getConfig(): InstrumentationConfig & any;
+  getConfig(): InstrumentationConfig;
 
   /**
    * Contains all supported versions.

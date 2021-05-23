@@ -70,15 +70,20 @@ describe('BaseInstrumentation', () => {
       const instrumentation: Instrumentation = new TestInstrumentation({
         isActive: false,
       });
-      const configuration = instrumentation.getConfig();
+      const configuration =
+        instrumentation.getConfig() as TestInstrumentationConfig;
       assert.notStrictEqual(configuration, null);
       assert.strictEqual(configuration.isActive, false);
     });
 
     it('should modify config', () => {
       const instrumentation: Instrumentation = new TestInstrumentation();
-      instrumentation.setConfig({ isActive: true });
-      const configuration = instrumentation.getConfig();
+      const config: TestInstrumentationConfig = {
+        isActive: true,
+      };
+      instrumentation.setConfig(config);
+      const configuration =
+        instrumentation.getConfig() as TestInstrumentationConfig;
       assert.strictEqual(configuration.isActive, true);
     });
   });
