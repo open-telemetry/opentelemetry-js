@@ -91,30 +91,6 @@ describe('NodeTracerProvider', () => {
       assert.ok(span);
     });
 
-    it('should start an active span with name and function only', () => {
-      provider = new NodeTracerProvider();
-      provider.getTracer('default').startActiveSpan('my-span', span => {
-        assert.strictEqual(getSpan(context.active()), span)
-        span.end();
-      });
-    });
-
-    it('should start an active span with name, options and function', () => {
-      provider = new NodeTracerProvider();
-      provider.getTracer('default').startActiveSpan('my-span', {attributes: {foo: 'bar'}}, span => {
-        assert.strictEqual(getSpan(context.active()), span)
-        span.end();
-      });
-    });
-
-    it('should start an active span with name, options, context and function', () => {
-      provider = new NodeTracerProvider();
-      provider.getTracer('default').startActiveSpan('my-span', {attributes: {foo: 'bar'}}, context.active(), span => {
-        assert.strictEqual(getSpan(context.active()), span)
-        span.end();
-      });
-    });
-
     it('should return a default span with no sampling (AlwaysOffSampler)', () => {
       provider = new NodeTracerProvider({
         sampler: new AlwaysOffSampler(),
@@ -172,6 +148,33 @@ describe('NodeTracerProvider', () => {
         span.resource.attributes[ResourceAttributes.TELEMETRY_SDK_LANGUAGE],
         'nodejs'
       );
+    });
+  });
+
+
+  describe('.startActiveSpan()', () => {
+    it('should start an active span with name and function only', () => {
+      provider = new NodeTracerProvider();
+      provider.getTracer('default').startActiveSpan('my-span', span => {
+        assert.strictEqual(getSpan(context.active()), span)
+        span.end();
+      });
+    });
+
+    it('should start an active span with name, options and function', () => {
+      provider = new NodeTracerProvider();
+      provider.getTracer('default').startActiveSpan('my-span', {attributes: {foo: 'bar'}}, span => {
+        assert.strictEqual(getSpan(context.active()), span)
+        span.end();
+      });
+    });
+
+    it('should start an active span with name, options, context and function', () => {
+      provider = new NodeTracerProvider();
+      provider.getTracer('default').startActiveSpan('my-span', {attributes: {foo: 'bar'}}, context.active(), span => {
+        assert.strictEqual(getSpan(context.active()), span)
+        span.end();
+      });
     });
   });
 
