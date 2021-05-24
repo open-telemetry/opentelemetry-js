@@ -21,11 +21,9 @@ import {
   SpanKind,
   SpanOptions,
   SpanStatus,
-  setSpan,
   ROOT_CONTEXT,
-  getSpan,
   NOOP_TRACER,
-  diag,
+  diag, trace,
 } from '@opentelemetry/api';
 import { suppressTracing } from '@opentelemetry/core';
 import type * as http from 'http';
@@ -412,7 +410,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         ctx
       );
 
-      return context.with(setSpan(ctx, span), () => {
+      return context.with(trace.setSpan(ctx, span), () => {
         context.bind(request);
         context.bind(response);
 
@@ -535,7 +533,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       const span = instrumentation._startHttpSpan(operationName, spanOptions);
 
       const parentContext = context.active();
-      const requestContext = setSpan(parentContext, span);
+      const requestContext = trace.setSpan(parentContext, span);
 
       if (!optionsParsed.headers) {
         optionsParsed.headers = {};
@@ -590,13 +588,13 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         : this._getConfig().requireParentforIncomingSpans;
 
     let span: Span;
-    const currentSpan = getSpan(ctx);
+    const currentSpan = trace.getSpan(ctx);
 
     if (requireParent === true && currentSpan === undefined) {
       // TODO: Refactor this when a solution is found in
       // https://github.com/open-telemetry/opentelemetry-specification/issues/530
       span = NOOP_TRACER.startSpan(name, options, ctx);
-    } else if (requireParent === true && currentSpan?.context().isRemote) {
+    } else if (requireParent === true && currentSpan?.spanContext().isRemote) {
       span = currentSpan;
     } else {
       span = this.tracer.startSpan(name, options, ctx);

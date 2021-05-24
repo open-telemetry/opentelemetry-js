@@ -31,11 +31,11 @@ import {
 import { GrpcInstrumentationConfig } from '../types';
 import {
   context,
+  diag,
   propagation,
   SpanOptions,
   SpanKind,
-  setSpan,
-  diag,
+  trace,
 } from '@opentelemetry/api';
 import {
   clientStreamAndUnaryHandler,
@@ -205,7 +205,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
                       [AttributeNames.GRPC_KIND]: spanOptions.kind,
                     });
 
-                  context.with(setSpan(context.active(), span), () => {
+                  context.with(trace.setSpan(context.active(), span), () => {
                     switch (type) {
                       case 'unary':
                       case 'client_stream':
@@ -299,7 +299,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
         const span = instrumentation.tracer.startSpan(name, {
           kind: SpanKind.CLIENT,
         });
-        return context.with(setSpan(context.active(), span), () =>
+        return context.with(trace.setSpan(context.active(), span), () =>
           makeGrpcClientRemoteCall(
             grpcClient,
             original,
