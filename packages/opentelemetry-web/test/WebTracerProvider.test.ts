@@ -137,5 +137,30 @@ describe('WebTracerProvider', () => {
         );
       });
     });
+    describe('.startActiveSpan()', () => {
+      it('should start an active span with name and function only', () => {
+        const provider = new WebTracerProvider();
+        provider.getTracer('default').startActiveSpan('my-span', span => {
+          assert.strictEqual(getSpan(context.active()), span)
+          span.end();
+        });
+      });
+
+      it('should start an active span with name, options and function', () => {
+        const provider = new WebTracerProvider();
+        provider.getTracer('default').startActiveSpan('my-span', {attributes: {foo: 'bar'}}, span => {
+          assert.strictEqual(getSpan(context.active()), span)
+          span.end();
+        });
+      });
+
+      it('should start an active span with name, options, context and function', () => {
+        const provider = new WebTracerProvider();
+        provider.getTracer('default').startActiveSpan('my-span', {attributes: {foo: 'bar'}}, context.active(), span => {
+          assert.strictEqual(getSpan(context.active()), span)
+          span.end();
+        });
+      });
+    });
   });
 });
