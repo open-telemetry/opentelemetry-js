@@ -223,36 +223,51 @@ describe('Tracer', () => {
     span.end();
   });
 
-  it('should start an active span', () => {
+  it('should start an active span with name and function as args', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
       tracerProvider
     );
 
-    assert.strictEqual( tracer.startActiveSpan('my-span', span => {
+    assert.strictEqual(tracer.startActiveSpan('my-span', span => {
       try {
         return 1
       } finally {
         span.end();
       }
     }), 1);
+  });
 
-    assert.strictEqual( tracer.startActiveSpan('my-span', {}, span => {
+  it('should start an active span with name, options and functin as args', () => {
+    const tracer = new Tracer(
+      { name: 'default', version: '0.0.1' },
+      { sampler: new TestSampler() },
+      tracerProvider
+    );
+
+    assert.strictEqual(tracer.startActiveSpan('my-span', {}, span => {
       try {
         return 1
       } finally {
         span.end();
       }
     }), 1);
+  });
 
-    assert.strictEqual( tracer.startActiveSpan('my-span', {}, context.active(), span => {
+  it('should start an active span with name, options, context and function as args', () => {
+    const tracer = new Tracer(
+      { name: 'default', version: '0.0.1' },
+      { sampler: new TestSampler() },
+      tracerProvider
+    );
+
+    assert.strictEqual(tracer.startActiveSpan('my-span', {}, context.active(), span => {
       try {
         return 1
       } finally {
         span.end();
       }
     }), 1);
-
   });
 });
