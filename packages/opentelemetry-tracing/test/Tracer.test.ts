@@ -233,7 +233,7 @@ describe('Tracer', () => {
 
     assert.strictEqual(tracer.startActiveSpan('my-span', span => {
       try {
-        // assert.strictEqual(getSpan(context.active()), span)
+        // todo: assert.strictEqual(getSpan(context.active()), span)
         return 1
       } finally {
         span.end();
@@ -250,7 +250,7 @@ describe('Tracer', () => {
 
     assert.strictEqual(tracer.startActiveSpan('my-span', {}, span => {
       try {
-        // assert.strictEqual(getSpan(context.active()), span)
+        // todo: assert.strictEqual(getSpan(context.active()), span)
         return 1
       } finally {
         span.end();
@@ -271,7 +271,7 @@ describe('Tracer', () => {
 
     assert.strictEqual(tracer.startActiveSpan('my-span', {}, ctx, span => {
       try {
-        // assert.strictEqual(getSpan(context.active()), span)
+        // todo: assert.strictEqual(getSpan(context.active()), span)
         assert.strictEqual(ctx.getValue(ctxKey), 'bar')
         return 1
       } finally {
