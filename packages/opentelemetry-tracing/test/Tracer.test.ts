@@ -17,7 +17,6 @@
 import {
   context,
   createContextKey,
-  getSpan,
   INVALID_TRACEID,
   ROOT_CONTEXT,
   Sampler,
