@@ -16,6 +16,8 @@
 
 import {
   context,
+  createContextKey,
+  getSpan,
   INVALID_TRACEID,
   ROOT_CONTEXT,
   Sampler,
@@ -223,7 +225,7 @@ describe('Tracer', () => {
     span.end();
   });
 
-  it('should start an active span with name and function as args', () => {
+  it('should start an active span with name and function args', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
@@ -232,6 +234,7 @@ describe('Tracer', () => {
 
     assert.strictEqual(tracer.startActiveSpan('my-span', span => {
       try {
+        // assert.strictEqual(getSpan(context.active()), span)
         return 1
       } finally {
         span.end();
@@ -239,7 +242,7 @@ describe('Tracer', () => {
     }), 1);
   });
 
-  it('should start an active span with name, options and functin as args', () => {
+  it('should start an active span with name, options and function args', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
@@ -248,6 +251,7 @@ describe('Tracer', () => {
 
     assert.strictEqual(tracer.startActiveSpan('my-span', {}, span => {
       try {
+        // assert.strictEqual(getSpan(context.active()), span)
         return 1
       } finally {
         span.end();
@@ -255,15 +259,21 @@ describe('Tracer', () => {
     }), 1);
   });
 
-  it('should start an active span with name, options, context and function as args', () => {
+  it('should start an active span with name, options, context and function args', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
       tracerProvider
     );
 
-    assert.strictEqual(tracer.startActiveSpan('my-span', {}, context.active(), span => {
+    const ctxKey = createContextKey('foo');
+
+    const ctx = context.active().setValue(ctxKey, 'bar')
+
+    assert.strictEqual(tracer.startActiveSpan('my-span', {}, ctx, span => {
       try {
+        // assert.strictEqual(getSpan(context.active()), span)
+        assert.strictEqual(ctx.getValue(ctxKey), 'bar')
         return 1
       } finally {
         span.end();
