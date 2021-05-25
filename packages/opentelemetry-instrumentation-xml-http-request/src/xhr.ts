@@ -46,6 +46,16 @@ import { AttributeNames } from './enums/AttributeNames';
 // safe enough
 const OBSERVER_WAIT_TIME_MS = 300;
 
+// Used to normalize relative URLs
+let a: HTMLAnchorElement | undefined;
+const getUrlNormalizingAnchor = () => {
+  if (!a) {
+    a = document.createElement('a');
+  }
+
+  return a;
+};
+
 export type XHRCustomAttributeFunction = (
   span: api.Span,
   xhr: XMLHttpRequest
@@ -216,10 +226,13 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     xhrMem.createdResources = {
       observer: new PerformanceObserver(list => {
         const entries = list.getEntries() as PerformanceResourceTiming[];
+        const urlNormalizingAnchor = getUrlNormalizingAnchor();
+        urlNormalizingAnchor.href = spanUrl;
+
         entries.forEach(entry => {
           if (
             entry.initiatorType === 'xmlhttprequest' &&
-            entry.name === spanUrl
+            entry.name === urlNormalizingAnchor.href
           ) {
             if (xhrMem.createdResources) {
               xhrMem.createdResources.entries.push(entry);

@@ -155,7 +155,7 @@ export function getResource(
       mainRequest: filteredResources[0],
     };
   }
-  const sorted = sortResources(filteredResources.slice());
+  const sorted = sortResources(filteredResources);
 
   const parsedSpanUrl = parseUrl(spanUrl);
   if (parsedSpanUrl.origin !== window.location.origin && sorted.length > 1) {
