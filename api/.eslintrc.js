@@ -13,8 +13,14 @@ module.exports = {
     ],
     parser: "@typescript-eslint/parser",
     parserOptions: {
-        "project": "./tsconfig.json"
+        "project": [
+            "./tsconfig.json",
+            "backwards-compatability/*/tsconfig.json"
+        ]
     },
+    ignorePatterns: [
+        'build',
+    ],
     rules: {
         "@typescript-eslint/no-this-alias": "off",
         "eqeqeq": [
