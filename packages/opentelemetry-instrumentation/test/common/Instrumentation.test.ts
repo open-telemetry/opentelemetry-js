@@ -65,8 +65,8 @@ describe('BaseInstrumentation', () => {
     });
   });
 
-  describe('config', () => {
-    it('should get config', () => {
+  describe('getConfig', () => {
+    it('should return instrumentation config', () => {
       const instrumentation: Instrumentation = new TestInstrumentation({
         isActive: false,
       });
@@ -75,8 +75,10 @@ describe('BaseInstrumentation', () => {
       assert.notStrictEqual(configuration, null);
       assert.strictEqual(configuration.isActive, false);
     });
+  });
 
-    it('should modify config', () => {
+  describe('setConfig', () => {
+    it('should set a new config for instrumentation', () => {
       const instrumentation: Instrumentation = new TestInstrumentation();
       const config: TestInstrumentationConfig = {
         isActive: true,
