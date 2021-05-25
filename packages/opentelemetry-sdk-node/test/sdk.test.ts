@@ -305,7 +305,7 @@ describe('Node SDK', () => {
         });
         const resource: Resource = sdk['_resource'];
         assert.ok(resource);
-        assert.deepStrictEqual(resource, Resource.createTelemetrySDKResource());
+        assert.deepStrictEqual(resource, Resource.empty());
 
         scope.done();
       });

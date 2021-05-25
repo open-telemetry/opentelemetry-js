@@ -343,7 +343,6 @@ export interface ExportServiceError {
 export interface CollectorExporterConfigBase {
   headers?: Partial<Record<string, unknown>>;
   hostname?: string;
-  serviceName?: string;
   attributes?: SpanAttributes;
   url?: string;
   concurrencyLimit?: number;

@@ -28,6 +28,7 @@ import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as grpc from '@grpc/grpc-js';
+import { VERSION } from '@opentelemetry/core';
 
 const meterProvider = new metrics.MeterProvider({
   interval: 30000,
@@ -154,11 +155,11 @@ export const mockedReadableSpan: ReadableSpan = {
     },
   ],
   duration: [0, 8885000],
-  resource: new Resource({
+  resource: Resource.default().merge(new Resource({
     service: 'ui',
     version: 1,
     cost: 112.12,
-  }),
+  })),
   instrumentationLibrary: { name: 'default', version: '0.0.1' },
 };
 
@@ -408,9 +409,30 @@ export function ensureResourceIsCorrect(
       {
         key: 'service.name',
         value: {
-          stringValue: 'basic-service',
+          stringValue: '@opentelemetry/exporter-collector-grpc',
           value: 'stringValue',
         },
+      },
+      {
+        "key": "telemetry.sdk.language",
+        "value": {
+          "stringValue": "nodejs",
+          "value": "stringValue"
+        }
+      },
+      {
+        "key": "telemetry.sdk.name",
+        "value": {
+          "stringValue": "opentelemetry",
+          "value": "stringValue"
+        }
+      },
+      {
+        "key": "telemetry.sdk.version",
+        "value": {
+          "stringValue": VERSION,
+          "value": "stringValue"
+        }
       },
       {
         key: 'service',

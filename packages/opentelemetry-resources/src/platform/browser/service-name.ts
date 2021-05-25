@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-import { Resource } from '../../Resource';
+/** only globals that common to node and browsers are allowed */
+// eslint-disable-next-line node/no-unsupported-features/es-builtins, no-undef
+const _globalThis = typeof globalThis === 'object' ? globalThis : window;
 
-/**
- * Detects resources for the browser platform, which is currently only the
- * telemetry SDK resource. More could be added in the future. This method
- * is async to match the signature of corresponding method for node.
- */
-export const detectResources = async (): Promise<Resource> => {
-  return Resource.empty();
-};
+export function serviceName(): string {
+  return _globalThis.location.host;
+}
