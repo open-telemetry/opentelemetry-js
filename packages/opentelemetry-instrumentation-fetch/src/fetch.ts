@@ -114,7 +114,7 @@ export class FetchInstrumentation extends InstrumentationBase<
       {
         startTime: corsPreFlightRequest[web.PerformanceTimingNames.FETCH_START],
       },
-      api.setSpan(api.context.active(), span)
+      api.trace.setSpan(api.context.active(), span)
     );
     web.addSpanNetworkEvents(childSpan, corsPreFlightRequest);
     childSpan.end(
@@ -385,7 +385,7 @@ export class FetchInstrumentation extends InstrumentationBase<
 
         return new Promise((resolve, reject) => {
           return api.context.with(
-            api.setSpan(api.context.active(), createdSpan),
+            api.trace.setSpan(api.context.active(), createdSpan),
             () => {
               plugin._addHeaders(options, url);
               plugin._tasksCount++;

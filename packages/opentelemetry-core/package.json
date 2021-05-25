@@ -55,7 +55,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/api": "^1.0.0-rc.0",
+    "@opentelemetry/api": "^0.20.0",
     "@types/mocha": "8.2.2",
     "@types/node": "14.14.43",
     "@types/semver": "7.3.5",
@@ -80,7 +80,7 @@
     "webpack": "4.46.0"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^1.0.0-rc.0"
+    "@opentelemetry/api": "^0.20.0"
   },
   "dependencies": {
     "semver": "^7.1.3",

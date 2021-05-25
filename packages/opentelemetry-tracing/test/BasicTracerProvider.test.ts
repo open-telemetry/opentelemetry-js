@@ -16,12 +16,10 @@
 
 import {
   context,
+  trace,
   SpanContext,
   TraceFlags,
   ROOT_CONTEXT,
-  setSpan,
-  setSpanContext,
-  getSpan,
   TextMapPropagator,
   TextMapSetter,
   Context,
@@ -161,7 +159,7 @@ describe('BasicTracerProvider', () => {
 
       let setGlobalPropagatorStub: sinon.SinonSpy<
         [TextMapPropagator],
-        TextMapPropagator
+        boolean
       >;
       let originalPropagators: string | number | undefined | string[];
       beforeEach(() => {
@@ -285,7 +283,7 @@ describe('BasicTracerProvider', () => {
       const span = tracer.startSpan('my-span', {});
       assert.ok(span);
       assert.ok(span instanceof Span);
-      const context = span.context();
+      const context = span.spanContext();
       assert.ok(context.traceId.match(/[a-f0-9]{32}/));
       assert.ok(context.spanId.match(/[a-f0-9]{16}/));
       assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
@@ -318,7 +316,7 @@ describe('BasicTracerProvider', () => {
       const span = tracer.startSpan(
         'my-span',
         {},
-        setSpanContext(ROOT_CONTEXT, {
+        trace.setSpanContext(ROOT_CONTEXT, {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
           traceFlags: TraceFlags.SAMPLED,
@@ -326,7 +324,7 @@ describe('BasicTracerProvider', () => {
         })
       );
       assert.ok(span instanceof Span);
-      const context = span.context();
+      const context = span.spanContext();
       assert.strictEqual(context.traceId, 'd4cda95b652f4a1592b449d5929fda1b');
       assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
       assert.deepStrictEqual(context.traceState, state);
@@ -339,10 +337,10 @@ describe('BasicTracerProvider', () => {
       const childSpan = tracer.startSpan(
         'child-span',
         {},
-        setSpan(ROOT_CONTEXT, span)
+        trace.setSpan(ROOT_CONTEXT, span)
       );
-      const context = childSpan.context();
-      assert.strictEqual(context.traceId, span.context().traceId);
+      const context = childSpan.spanContext();
+      assert.strictEqual(context.traceId, span.spanContext().traceId);
       assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
       span.end();
       childSpan.end();
@@ -355,10 +353,10 @@ describe('BasicTracerProvider', () => {
       const rootSpan = tracer.startSpan(
         'root-span',
         { root: true },
-        setSpan(ROOT_CONTEXT, span)
+        trace.setSpan(ROOT_CONTEXT, span)
       );
-      const context = rootSpan.context();
-      assert.notStrictEqual(context.traceId, overrideParent.context().traceId);
+      const context = rootSpan.spanContext();
+      assert.notStrictEqual(context.traceId, overrideParent.spanContext().traceId);
       span.end();
       rootSpan.end();
     });
@@ -370,7 +368,7 @@ describe('BasicTracerProvider', () => {
       const span = tracer.startSpan(
         'my-span',
         {},
-        setSpanContext(
+        trace.setSpanContext(
           ROOT_CONTEXT,
           ('invalid-parent' as unknown) as SpanContext
         )
@@ -384,14 +382,14 @@ describe('BasicTracerProvider', () => {
       const span = tracer.startSpan(
         'my-span',
         {},
-        setSpanContext(ROOT_CONTEXT, {
+        trace.setSpanContext(ROOT_CONTEXT, {
           traceId: '0',
           spanId: '0',
           traceFlags: TraceFlags.SAMPLED,
         })
       );
       assert.ok(span instanceof Span);
-      const context = span.context();
+      const context = span.spanContext();
       assert.ok(context.traceId.match(/[a-f0-9]{32}/));
       assert.ok(context.spanId.match(/[a-f0-9]{16}/));
       assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
@@ -404,7 +402,7 @@ describe('BasicTracerProvider', () => {
       }).getTracer('default');
       const span = tracer.startSpan('my-span');
       assert.ok(!span.isRecording());
-      const context = span.context();
+      const context = span.spanContext();
       assert.ok(context.traceId.match(/[a-f0-9]{32}/));
       assert.ok(context.spanId.match(/[a-f0-9]{16}/));
       assert.strictEqual(context.traceFlags, TraceFlags.NONE);
@@ -418,7 +416,7 @@ describe('BasicTracerProvider', () => {
       }).getTracer('default');
       const span = tracer.startSpan('my-span');
       assert.ok(span instanceof Span);
-      assert.strictEqual(span.context().traceFlags, TraceFlags.SAMPLED);
+      assert.strictEqual(span.spanContext().traceFlags, TraceFlags.SAMPLED);
       assert.strictEqual(span.isRecording(), true);
     });
 
@@ -434,8 +432,8 @@ describe('BasicTracerProvider', () => {
     it('should run context with NoopContextManager context manager', done => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
-      context.with(setSpan(context.active(), span), () => {
-        assert.deepStrictEqual(getSpan(context.active()), undefined);
+      context.with(trace.setSpan(context.active(), span), () => {
+        assert.deepStrictEqual(trace.getSpan(context.active()), undefined);
         return done();
       });
     });
@@ -504,10 +502,10 @@ describe('BasicTracerProvider', () => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
       const fn = () => {
-        assert.deepStrictEqual(getSpan(context.active()), undefined);
+        assert.deepStrictEqual(trace.getSpan(context.active()), undefined);
         return done();
       };
-      const patchedFn = context.bind(fn, setSpan(context.active(), span));
+      const patchedFn = context.bind(fn, trace.setSpan(context.active(), span));
       return patchedFn();
     });
   });

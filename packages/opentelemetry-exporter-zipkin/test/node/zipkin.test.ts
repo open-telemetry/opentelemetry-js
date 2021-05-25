@@ -37,10 +37,12 @@ function getReadableSpan() {
   const readableSpan: ReadableSpan = {
     name: 'my-span',
     kind: api.SpanKind.INTERNAL,
-    spanContext: {
-      traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-      spanId: '6e0c63257de34c92',
-      traceFlags: TraceFlags.NONE,
+    spanContext: () => {
+      return {
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: '6e0c63257de34c92',
+        traceFlags: TraceFlags.NONE,
+      };
     },
     startTime: [startTime, 0],
     endTime: [startTime + duration, 0],
@@ -134,10 +136,12 @@ describe('Zipkin Exporter - node', () => {
         name: 'my-span',
         kind: api.SpanKind.INTERNAL,
         parentSpanId,
-        spanContext: {
-          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-          spanId: '6e0c63257de34c92',
-          traceFlags: TraceFlags.NONE,
+        spanContext: () => {
+          return {
+            traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+            spanId: '6e0c63257de34c92',
+            traceFlags: TraceFlags.NONE,
+          };
         },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
@@ -164,10 +168,12 @@ describe('Zipkin Exporter - node', () => {
       const span2: ReadableSpan = {
         name: 'my-span',
         kind: api.SpanKind.SERVER,
-        spanContext: {
-          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-          spanId: '6e0c63257de34c92',
-          traceFlags: TraceFlags.NONE,
+        spanContext: () => {
+          return {
+            traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+            spanId: '6e0c63257de34c92',
+            traceFlags: TraceFlags.NONE,
+          };
         },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
@@ -200,7 +206,7 @@ describe('Zipkin Exporter - node', () => {
               },
             ],
             duration: duration * MICROS_PER_SECS,
-            id: span1.spanContext.spanId,
+            id: span1.spanContext().spanId,
             localEndpoint: {
               serviceName: 'my-service',
             },
@@ -212,12 +218,12 @@ describe('Zipkin Exporter - node', () => {
               'ot.status_code': 'OK',
             },
             timestamp: startTime * MICROS_PER_SECS,
-            traceId: span1.spanContext.traceId,
+            traceId: span1.spanContext().traceId,
           },
           // Span 2
           {
             duration: duration * MICROS_PER_SECS,
-            id: span2.spanContext.spanId,
+            id: span2.spanContext().spanId,
             kind: 'SERVER',
             localEndpoint: {
               serviceName: 'my-service',
@@ -227,7 +233,7 @@ describe('Zipkin Exporter - node', () => {
               'ot.status_code': 'OK',
             },
             timestamp: hrTimeToMicroseconds([startTime, 0]),
-            traceId: span2.spanContext.traceId,
+            traceId: span2.spanContext().traceId,
           },
         ]);
       });
@@ -320,10 +326,12 @@ describe('Zipkin Exporter - node', () => {
         name: 'my-span',
         kind: api.SpanKind.INTERNAL,
         parentSpanId,
-        spanContext: {
-          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-          spanId: '6e0c63257de34c92',
-          traceFlags: TraceFlags.NONE,
+        spanContext: () => {
+          return {
+            traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+            spanId: '6e0c63257de34c92',
+            traceFlags: TraceFlags.NONE,
+          };
         },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
@@ -350,10 +358,12 @@ describe('Zipkin Exporter - node', () => {
       const span2: ReadableSpan = {
         name: 'my-span',
         kind: api.SpanKind.SERVER,
-        spanContext: {
-          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-          spanId: '6e0c63257de34c92',
-          traceFlags: TraceFlags.NONE,
+        spanContext: () => {
+          return {
+            traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+            spanId: '6e0c63257de34c92',
+            traceFlags: TraceFlags.NONE,
+          };
         },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
@@ -392,10 +402,12 @@ describe('Zipkin Exporter - node', () => {
         name: 'my-span',
         kind: api.SpanKind.INTERNAL,
         parentSpanId,
-        spanContext: {
-          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-          spanId: '6e0c63257de34c92',
-          traceFlags: TraceFlags.NONE,
+        spanContext: () => {
+          return {
+            traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+            spanId: '6e0c63257de34c92',
+            traceFlags: TraceFlags.NONE,
+          };
         },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
@@ -424,10 +436,12 @@ describe('Zipkin Exporter - node', () => {
       const span2: ReadableSpan = {
         name: 'my-span',
         kind: api.SpanKind.SERVER,
-        spanContext: {
-          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-          spanId: '6e0c63257de34c92',
-          traceFlags: TraceFlags.NONE,
+        spanContext: () => {
+          return {
+            traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+            spanId: '6e0c63257de34c92',
+            traceFlags: TraceFlags.NONE,
+          };
         },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
@@ -494,10 +508,12 @@ describe('Zipkin Exporter - node', () => {
         name: 'my-span',
         kind: api.SpanKind.INTERNAL,
         parentSpanId,
-        spanContext: {
-          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-          spanId: '6e0c63257de34c92',
-          traceFlags: TraceFlags.NONE,
+        spanContext: () => {
+          return {
+            traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+            spanId: '6e0c63257de34c92',
+            traceFlags: TraceFlags.NONE,
+          };
         },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
@@ -526,10 +542,12 @@ describe('Zipkin Exporter - node', () => {
       const span2: ReadableSpan = {
         name: 'my-span',
         kind: api.SpanKind.SERVER,
-        spanContext: {
-          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-          spanId: '6e0c63257de34c92',
-          traceFlags: TraceFlags.NONE,
+        spanContext: () => {
+          return {
+            traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+            spanId: '6e0c63257de34c92',
+            traceFlags: TraceFlags.NONE,
+          };
         },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
@@ -583,10 +601,12 @@ describe('Zipkin Exporter - node', () => {
         name: 'my-span',
         kind: api.SpanKind.INTERNAL,
         parentSpanId,
-        spanContext: {
-          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-          spanId: '6e0c63257de34c92',
-          traceFlags: TraceFlags.NONE,
+        spanContext: () => {
+          return {
+            traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+            spanId: '6e0c63257de34c92',
+            traceFlags: TraceFlags.NONE,
+          };
         },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
@@ -614,10 +634,12 @@ describe('Zipkin Exporter - node', () => {
       const span2: ReadableSpan = {
         name: 'my-span',
         kind: api.SpanKind.SERVER,
-        spanContext: {
-          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-          spanId: '6e0c63257de34c92',
-          traceFlags: TraceFlags.NONE,
+        spanContext: () => {
+          return {
+            traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+            spanId: '6e0c63257de34c92',
+            traceFlags: TraceFlags.NONE,
+          };
         },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],

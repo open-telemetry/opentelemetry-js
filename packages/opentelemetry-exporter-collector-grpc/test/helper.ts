@@ -111,10 +111,12 @@ export function mockValueRecorder(): metrics.Metric<metrics.BoundValueRecorder> 
 export const mockedReadableSpan: ReadableSpan = {
   name: 'documentFetch',
   kind: 0,
-  spanContext: {
-    traceId: '1f1008dc8e270e85c40a0d7c3939b278',
-    spanId: '5e107261f64fa53e',
-    traceFlags: TraceFlags.SAMPLED,
+  spanContext: () => {
+    return {
+      traceId: '1f1008dc8e270e85c40a0d7c3939b278',
+      spanId: '5e107261f64fa53e',
+      traceFlags: TraceFlags.SAMPLED,
+    };
   },
   parentSpanId: '78a8915098864388',
   startTime: [1574120165, 429803070],
@@ -127,6 +129,7 @@ export const mockedReadableSpan: ReadableSpan = {
       context: {
         traceId: '1f1008dc8e270e85c40a0d7c3939b278',
         spanId: '78a8915098864388',
+        traceFlags: TraceFlags.SAMPLED,
       },
       attributes: { component: 'document-load' },
     },

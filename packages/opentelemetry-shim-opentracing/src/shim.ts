@@ -17,7 +17,6 @@
 import * as api from '@opentelemetry/api';
 import * as opentracing from 'opentracing';
 import {
-  createBaggage,
   SpanAttributes,
   SpanAttributeValue,
   TextMapPropagator,
@@ -54,9 +53,9 @@ function translateSpanOptions(
 function getContextWithParent(options: opentracing.SpanOptions) {
   if (options.childOf) {
     if (options.childOf instanceof SpanShim) {
-      return api.setSpan(api.context.active(), options.childOf.getSpan());
+      return api.trace.setSpan(api.context.active(), options.childOf.getSpan());
     } else if (options.childOf instanceof SpanContextShim) {
-      return api.setSpanContext(
+      return api.trace.setSpanContext(
         api.context.active(),
         options.childOf.getSpanContext()
       );
@@ -141,7 +140,7 @@ export class TracerShim extends opentracing.Tracer {
       getContextWithParent(options)
     );
 
-    let baggage: api.Baggage = createBaggage();
+    let baggage: api.Baggage = api.propagation.createBaggage();
     if (options.childOf instanceof SpanShim) {
       const shimContext = options.childOf.context() as SpanContextShim;
       baggage = shimContext.getBaggage();
@@ -175,8 +174,8 @@ export class TracerShim extends opentracing.Tracer {
 
     const propagator = this._getPropagator(format);
     if (propagator !== undefined) {
-      const context = api.setBaggage(
-        api.setSpanContext(api.ROOT_CONTEXT, oTelSpanContext),
+      const context = api.propagation.setBaggage(
+        api.trace.setSpanContext(api.ROOT_CONTEXT, oTelSpanContext),
         oTelSpanBaggage
       );
       propagator.inject(context, carrier, api.defaultTextMapSetter);
@@ -197,18 +196,18 @@ export class TracerShim extends opentracing.Tracer {
         carrier,
         api.defaultTextMapGetter
       );
-      const spanContext = api.getSpanContext(context);
-      const baggage = api.getBaggage(context);
+      const spanContext = api.trace.getSpanContext(context);
+      const baggage = api.propagation.getBaggage(context);
 
       if (!spanContext) {
         return null;
       }
-      return new SpanContextShim(spanContext, baggage || createBaggage());
+      return new SpanContextShim(spanContext, baggage || api.propagation.createBaggage());
     }
     return null;
   }
 
-  private _getPropagator(format: string): TextMapPropagator | undefined {
+  private _getPropagator(format: string): api.TextMapPropagator | undefined {
     switch (format) {
       case opentracing.FORMAT_TEXT_MAP:
         return this._propagators?.textMapPropagator ?? api.propagation;
@@ -235,7 +234,7 @@ export class SpanShim extends opentracing.Span {
   constructor(tracerShim: TracerShim, span: api.Span, baggage: api.Baggage) {
     super();
     this._span = span;
-    this._contextShim = new SpanContextShim(span.context(), baggage);
+    this._contextShim = new SpanContextShim(span.spanContext(), baggage);
     this._tracerShim = tracerShim;
   }
 

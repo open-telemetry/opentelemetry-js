@@ -51,10 +51,10 @@
     "@opentelemetry/tracing": "0.19.0"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^1.0.0-rc.0"
+    "@opentelemetry/api": "^0.20.0"
   },
   "devDependencies": {
-    "@opentelemetry/api": "^1.0.0-rc.0",
+    "@opentelemetry/api": "^0.20.0",
     "@opentelemetry/context-async-hooks": "0.19.0",
     "@types/mocha": "8.2.2",
     "@types/node": "14.14.43",

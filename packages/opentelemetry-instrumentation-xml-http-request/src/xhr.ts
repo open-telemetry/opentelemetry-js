@@ -139,7 +139,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     span: api.Span,
     corsPreFlightRequest: PerformanceResourceTiming
   ): void {
-    api.context.with(api.setSpan(api.context.active(), span), () => {
+    api.context.with(api.trace.setSpan(api.context.active(), span), () => {
       const childSpan = this.tracer.startSpan('CORS Preflight', {
         startTime: corsPreFlightRequest[PTN.FETCH_START],
       });
@@ -480,7 +480,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
 
         if (currentSpan && spanUrl) {
           api.context.with(
-            api.setSpan(api.context.active(), currentSpan),
+            api.trace.setSpan(api.context.active(), currentSpan),
             () => {
               plugin._tasksCount++;
               xhrMem.sendStartTime = hrTime();
