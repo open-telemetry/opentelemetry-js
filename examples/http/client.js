@@ -11,7 +11,7 @@ function makeRequest() {
   // the span, which is created to track work that happens outside of the
   // request lifecycle entirely.
   const span = tracer.startSpan('makeRequest');
-  api.context.with(api.setSpan(api.context.active(), span), () => {
+  api.context.with(api.setSpan(api.setBaggage(api.context.active(), api.createBaggage({"foo": String, "bar": String})), span), () => {
     http.get({
       host: 'localhost',
       port: 8080,

@@ -23,6 +23,7 @@ function handleRequest(request, response) {
   const currentSpan = api.getSpan(api.context.active());
   // display traceid in the terminal
   console.log(`traceid: ${currentSpan.context().traceId}`);
+  console.log(`baggage: ${api.getBaggage(api.context.active()).getAllEntries()}`);
   const span = tracer.startSpan('handleRequest', {
     kind: 1, // server
     attributes: { key: 'value' },
