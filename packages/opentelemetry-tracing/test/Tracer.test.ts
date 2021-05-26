@@ -21,9 +21,8 @@ import {
   ROOT_CONTEXT,
   Sampler,
   SamplingDecision,
-  trace,
-  setSpanContext,
   SpanContext,
+  trace,
   TraceFlags
 } from '@opentelemetry/api';
 import {

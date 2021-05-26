@@ -54,46 +54,6 @@ export class Tracer implements api.Tracer {
     this.instrumentationLibrary = instrumentationLibrary;
   }
 
-  startActiveSpan<F extends (span: api.Span) => ReturnType<F>>(
-    name: string,
-    arg2: F | api.SpanOptions,
-    arg3?: F | api.Context,
-    arg4?: F
-  ): ReturnType<F> | undefined {
-    let fn: F | undefined,
-      options: api.SpanOptions | undefined,
-      activeContext: api.Context | undefined;
-
-    if (arguments.length === 2 && typeof arg2 === 'function') {
-      fn = arg2;
-    } else if (
-      arguments.length === 3 &&
-      typeof arg2 === 'object' &&
-      typeof arg3 === 'function'
-    ) {
-      options = arg2;
-      fn = arg3;
-    } else if (
-      arguments.length === 4 &&
-      typeof arg2 === 'object' &&
-      typeof arg3 === 'object' &&
-      typeof arg4 === 'function'
-    ) {
-      options = arg2;
-      activeContext = arg3;
-      fn = arg4;
-    }
-
-    const parentContext = activeContext ?? api.context.active();
-    const span = this.startSpan(name, options, parentContext);
-    const contextWithSpanSet = api.trace.setSpan(parentContext, span);
-
-    if (fn) {
-      return api.context.with(contextWithSpanSet, fn, undefined, span);
-    }
-    return;
-  }
-
   /**
    * Starts a new Span or returns the default NoopSpan based on the sampling
    * decision.
