@@ -106,7 +106,7 @@ describe('Resource', () => {
       assert.strictEqual(resource.attributes[ResourceAttributes.TELEMETRY_SDK_NAME], SDK_INFO[ResourceAttributes.TELEMETRY_SDK_NAME]);
       assert.strictEqual(resource.attributes[ResourceAttributes.TELEMETRY_SDK_LANGUAGE], SDK_INFO[ResourceAttributes.TELEMETRY_SDK_LANGUAGE]);
       assert.strictEqual(resource.attributes[ResourceAttributes.TELEMETRY_SDK_VERSION], SDK_INFO[ResourceAttributes.TELEMETRY_SDK_VERSION]);
-      assert.strictEqual(resource.attributes[ResourceAttributes.SERVICE_NAME], "@opentelemetry/resources");
+      assert.strictEqual(resource.attributes[ResourceAttributes.SERVICE_NAME], `unknown_service:${process.argv0}`);
     });
   });
 });

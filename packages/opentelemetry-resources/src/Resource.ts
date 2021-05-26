@@ -15,8 +15,9 @@
  */
 
 import { ResourceAttributes as SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { getEnv, SDK_INFO } from '@opentelemetry/core';
+import { SDK_INFO } from '@opentelemetry/core';
 import { ResourceAttributes } from './types';
+import { defaultServiceName } from './platform';
 
 /**
  * A Resource describes the entity for which a signals (metrics or trace) are
@@ -37,6 +38,7 @@ export class Resource {
    */
   static default(): Resource {
     return new Resource({
+      [SemanticResourceAttributes.SERVICE_NAME]: defaultServiceName(),
       [SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]:
         SDK_INFO[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE],
       [SemanticResourceAttributes.TELEMETRY_SDK_NAME]:

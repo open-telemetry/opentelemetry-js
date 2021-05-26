@@ -395,34 +395,6 @@ describe('Node SDK', () => {
         );
       });
 
-      describe('with missing environment variable', () => {
-        beforeEach(() => {
-          delete process.env.OTEL_RESOURCE_ATTRIBUTES;
-        });
-
-        it('prints correct error messages when EnvDetector has no env variable', async () => {
-          const sdk = new NodeSDK({
-            autoDetectResources: true,
-          });
-          const mockedLoggerMethod = Sinon.fake();
-          diag.setLogger(
-            {
-              debug: mockedLoggerMethod,
-            } as any,
-            DiagLogLevel.DEBUG
-          );
-
-          await sdk.detectResources();
-
-          assert.ok(
-            callArgsContains(
-              mockedLoggerMethod,
-              'EnvDetector failed: Environment variable "OTEL_RESOURCE_ATTRIBUTES" is missing.'
-            )
-          );
-        });
-      });
-
       describe('with a faulty environment variable', () => {
         beforeEach(() => {
           process.env.OTEL_RESOURCE_ATTRIBUTES = 'bad=~attribute';

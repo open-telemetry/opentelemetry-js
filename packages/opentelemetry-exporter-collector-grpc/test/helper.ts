@@ -410,11 +410,11 @@ export function ensureResourceIsCorrect(
   assert.deepStrictEqual(resource, {
     attributes: [
       {
-        key: 'service.name',
-        value: {
-          stringValue: '@opentelemetry/exporter-collector-grpc',
-          value: 'stringValue',
-        },
+        "key": "service.name",
+        "value": {
+          "stringValue": `unknown_service:${process.argv0}`,
+          "value": "stringValue"
+        }
       },
       {
         "key": "telemetry.sdk.language",

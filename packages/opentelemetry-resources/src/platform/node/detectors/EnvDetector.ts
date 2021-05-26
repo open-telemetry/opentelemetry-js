@@ -23,7 +23,6 @@ import {
   ResourceDetectionConfig,
   ResourceAttributes,
 } from '../../../';
-import { ResourceAttributes } from '../../../types';
 
 /**
  * EnvDetector can be used to detect the presence of and create a Resource
@@ -57,31 +56,26 @@ class EnvDetector implements Detector {
    * @param config The resource detection config
    */
   async detect(_config?: ResourceDetectionConfig): Promise<Resource> {
-    try {
-      const attributes: ResourceAttributes = {};
-      const env = getEnv();
+    const attributes: ResourceAttributes = {};
+    const env = getEnv();
 
-      const rawAttributes = env.OTEL_RESOURCE_ATTRIBUTES;
-      const serviceName = env.OTEL_SERVICE_NAME;
+    const rawAttributes = env.OTEL_RESOURCE_ATTRIBUTES;
+    const serviceName = env.OTEL_SERVICE_NAME;
 
-      if (rawAttributes) {
-        try {
-          const parsedAttributes = this._parseResourceAttributes(rawAttributes);
-          Object.assign(attributes, parsedAttributes);
-        } catch (e) {
-          diag.debug(`EnvDetector failed to parse OTEL_RESOURCE_ATTRIBUTES: ${e.message}`);
-        }
+    if (rawAttributes) {
+      try {
+        const parsedAttributes = this._parseResourceAttributes(rawAttributes);
+        Object.assign(attributes, parsedAttributes);
+      } catch (e) {
+        diag.debug(`EnvDetector failed: ${e.message}`);
       }
-
-      if (serviceName) {
-        attributes[SemanticResourceAttributes.SERVICE_NAME] = serviceName;
-      }
-
-      return new Resource(attributes);
-    } catch (e) {
-      diag.debug(`EnvDetector failed: ${e.message}`);
-      return Resource.empty();
     }
+
+    if (serviceName) {
+      attributes[SemanticResourceAttributes.SERVICE_NAME] = serviceName;
+    }
+
+    return new Resource(attributes);
   }
 
   /**
