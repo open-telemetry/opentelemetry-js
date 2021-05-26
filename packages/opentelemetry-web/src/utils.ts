@@ -30,13 +30,13 @@ import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 // Used to normalize relative URLs
 let a: HTMLAnchorElement | undefined;
-const getUrlNormalizingAnchor = () => {
+export function getUrlNormalizingAnchor(): HTMLAnchorElement {
   if (!a) {
     a = document.createElement('a');
   }
 
   return a;
-};
+}
 
 /**
  * Helper function to be able to use enum as typed key in type and in interface when using forEach
