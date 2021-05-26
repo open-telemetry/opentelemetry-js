@@ -46,7 +46,7 @@ describe('API registration', () => {
   it('should register configured implementations', () => {
     const tracerProvider = new WebTracerProvider();
 
-    const contextManager = { disable() { } } as any;
+    const contextManager = { disable() { }, enable() { } } as any;
     const propagator = {} as any;
 
     tracerProvider.register({
