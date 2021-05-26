@@ -155,7 +155,7 @@ describe('Tracer', () => {
     const span = tracer.startSpan(
       'aSpan',
       undefined,
-      api.setSpanContext(ROOT_CONTEXT, parent)
+      api.trace.setSpanContext(ROOT_CONTEXT, parent)
     );
     assert.strictEqual((span as Span).parentSpanId, parent.spanId);
     assert.strictEqual(span.spanContext().traceId, parent.traceId);
@@ -175,7 +175,7 @@ describe('Tracer', () => {
     const span = tracer.startSpan(
       'aSpan',
       undefined,
-      api.setSpanContext(ROOT_CONTEXT, parent)
+      api.trace.setSpanContext(ROOT_CONTEXT, parent)
     );
     assert.strictEqual((span as Span).parentSpanId, undefined);
   });

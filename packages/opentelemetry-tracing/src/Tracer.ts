@@ -89,7 +89,7 @@ export class Tracer implements api.Tracer {
     // make sampling decision
     const samplingResult = this._sampler.shouldSample(
       options.root
-        ? api.setSpanContext(context, api.INVALID_SPAN_CONTEXT)
+        ? api.trace.setSpanContext(context, api.INVALID_SPAN_CONTEXT)
         : context,
       traceId,
       name,
@@ -206,7 +206,7 @@ export class Tracer implements api.Tracer {
 
     const parentContext = ctx ?? api.context.active();
     const span = this.startSpan(name, opts, parentContext);
-    const contextWithSpanSet = api.setSpan(parentContext, span);
+    const contextWithSpanSet = api.trace.setSpan(parentContext, span);
 
     return api.context.with(contextWithSpanSet, fn, undefined, span);
   }
@@ -233,5 +233,5 @@ function getParent(
   context: api.Context
 ): api.SpanContext | undefined {
   if (options.root) return undefined;
-  return api.getSpanContext(context);
+  return api.trace.getSpanContext(context);
 }
