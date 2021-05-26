@@ -22,7 +22,6 @@ import {
   Sampler,
   SamplingDecision,
   SpanContext,
-  trace,
   TraceFlags
 } from '@opentelemetry/api';
 import {
@@ -218,7 +217,7 @@ describe('Tracer', () => {
       tracerProvider
     );
     const span = tracer.startSpan('my-span');
-    const context = spanContext();
+    const context = span.spanContext();
     assert.strictEqual(context.traceFlags, TraceFlags.NONE);
     span.end();
   });
