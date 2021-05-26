@@ -16,4 +16,3 @@
 
 export * from './detect-resources';
 export * from './detectors';
-export * from './service-name';

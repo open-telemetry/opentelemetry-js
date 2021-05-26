@@ -92,7 +92,7 @@ describe('transform', () => {
         duration: hrTimeToMicroseconds(
           hrTimeDuration(span.startTime, span.endTime)
         ),
-        id: span.spanContext.spanId,
+        id: span.spanContext().spanId,
         localEndpoint: {
           serviceName: 'my-service',
         },
@@ -108,7 +108,7 @@ describe('transform', () => {
           'telemetry.sdk.version': VERSION,
         },
         timestamp: hrTimeToMicroseconds(span.startTime),
-        traceId: span.spanContext.traceId,
+        traceId: span.spanContext().traceId,
       });
     });
     it("should skip parentSpanId if doesn't exist", () => {
@@ -133,7 +133,7 @@ describe('transform', () => {
         duration: hrTimeToMicroseconds(
           hrTimeDuration(span.startTime, span.endTime)
         ),
-        id: span.spanContext.spanId,
+        id: span.spanContext().spanId,
         localEndpoint: {
           serviceName: 'my-service',
         },
@@ -147,7 +147,7 @@ describe('transform', () => {
           'telemetry.sdk.version': VERSION,
         },
         timestamp: hrTimeToMicroseconds(span.startTime),
-        traceId: span.spanContext.traceId,
+        traceId: span.spanContext().traceId,
       });
     });
     // SpanKind mapping tests
@@ -182,7 +182,7 @@ describe('transform', () => {
           duration: hrTimeToMicroseconds(
             hrTimeDuration(span.startTime, span.endTime)
           ),
-          id: span.spanContext.spanId,
+          id: span.spanContext().spanId,
           localEndpoint: {
             serviceName: 'my-service',
           },
@@ -196,7 +196,7 @@ describe('transform', () => {
             'telemetry.sdk.version': VERSION,
           },
           timestamp: hrTimeToMicroseconds(span.startTime),
-          traceId: span.spanContext.traceId,
+          traceId: span.spanContext().traceId,
         });
       })
     );

@@ -15,8 +15,7 @@
  */
 
 import { ResourceAttributes as SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { SDK_INFO } from '@opentelemetry/core';
-import { serviceName } from './platform';
+import { getEnv, SDK_INFO } from '@opentelemetry/core';
 import { ResourceAttributes } from './types';
 
 /**
@@ -38,7 +37,6 @@ export class Resource {
    */
   static default(): Resource {
     return new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: serviceName(),
       [SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]:
         SDK_INFO[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE],
       [SemanticResourceAttributes.TELEMETRY_SDK_NAME]:

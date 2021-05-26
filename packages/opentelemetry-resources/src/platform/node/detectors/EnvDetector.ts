@@ -16,12 +16,14 @@
 
 import { diag } from '@opentelemetry/api';
 import { getEnv } from '@opentelemetry/core';
+import { ResourceAttributes as SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import {
   Detector,
   Resource,
   ResourceDetectionConfig,
   ResourceAttributes,
 } from '../../../';
+import { ResourceAttributes } from '../../../types';
 
 /**
  * EnvDetector can be used to detect the presence of and create a Resource
@@ -56,14 +58,25 @@ class EnvDetector implements Detector {
    */
   async detect(_config?: ResourceDetectionConfig): Promise<Resource> {
     try {
-      const rawAttributes = getEnv().OTEL_RESOURCE_ATTRIBUTES;
-      if (!rawAttributes) {
-        diag.debug(
-          'EnvDetector failed: Environment variable "OTEL_RESOURCE_ATTRIBUTES" is missing.'
-        );
-        return Resource.empty();
+      const attributes: ResourceAttributes = {};
+      const env = getEnv();
+
+      const rawAttributes = env.OTEL_RESOURCE_ATTRIBUTES;
+      const serviceName = env.OTEL_SERVICE_NAME;
+
+      if (rawAttributes) {
+        try {
+          const parsedAttributes = this._parseResourceAttributes(rawAttributes);
+          Object.assign(attributes, parsedAttributes);
+        } catch (e) {
+          diag.debug(`EnvDetector failed to parse OTEL_RESOURCE_ATTRIBUTES: ${e.message}`);
+        }
       }
-      const attributes = this._parseResourceAttributes(rawAttributes);
+
+      if (serviceName) {
+        attributes[SemanticResourceAttributes.SERVICE_NAME] = serviceName;
+      }
+
       return new Resource(attributes);
     } catch (e) {
       diag.debug(`EnvDetector failed: ${e.message}`);

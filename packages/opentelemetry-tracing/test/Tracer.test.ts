@@ -19,9 +19,9 @@ import {
   ROOT_CONTEXT,
   Sampler,
   SamplingDecision,
-  setSpanContext,
-  SpanContext,
   TraceFlags,
+  SpanContext,
+  trace,
 } from '@opentelemetry/api';
 import {
   AlwaysOffSampler,
@@ -154,10 +154,10 @@ describe('Tracer', () => {
     const span = tracer.startSpan(
       'aSpan',
       undefined,
-      setSpanContext(ROOT_CONTEXT, parent)
+      trace.setSpanContext(ROOT_CONTEXT, parent)
     );
     assert.strictEqual((span as Span).parentSpanId, parent.spanId);
-    assert.strictEqual(span.context().traceId, parent.traceId);
+    assert.strictEqual(span.spanContext().traceId, parent.traceId);
   });
 
   it('should not use spanId from invalid parent', () => {
@@ -174,7 +174,7 @@ describe('Tracer', () => {
     const span = tracer.startSpan(
       'aSpan',
       undefined,
-      setSpanContext(ROOT_CONTEXT, parent)
+      trace.setSpanContext(ROOT_CONTEXT, parent)
     );
     assert.strictEqual((span as Span).parentSpanId, undefined);
   });
@@ -188,7 +188,7 @@ describe('Tracer', () => {
       tracerProvider
     );
     const span = tracer.startSpan('my-span');
-    const context = span.context();
+    const context = span.spanContext();
     assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
     span.end();
   });
@@ -202,7 +202,7 @@ describe('Tracer', () => {
       tracerProvider
     );
     const span = tracer.startSpan('my-span');
-    const context = span.context();
+    const context = span.spanContext();
     assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
     span.end();
   });
@@ -216,7 +216,7 @@ describe('Tracer', () => {
       tracerProvider
     );
     const span = tracer.startSpan('my-span');
-    const context = span.context();
+    const context = span.spanContext();
     assert.strictEqual(context.traceFlags, TraceFlags.NONE);
     span.end();
   });

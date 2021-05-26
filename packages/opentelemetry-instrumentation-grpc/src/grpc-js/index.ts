@@ -35,12 +35,12 @@ import {
 } from './types';
 import {
   context,
-  SpanOptions,
-  SpanKind,
+  diag,
   propagation,
   ROOT_CONTEXT,
-  setSpan,
-  diag,
+  SpanOptions,
+  SpanKind,
+  trace,
 } from '@opentelemetry/api';
 import {
   shouldNotTraceServerCall,
@@ -200,7 +200,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
                       [AttributeNames.GRPC_KIND]: spanOptions.kind,
                     });
 
-                  context.with(setSpan(context.active(), span), () => {
+                  context.with(trace.setSpan(context.active(), span), () => {
                     handleServerFunction.call(
                       self,
                       span,
@@ -292,7 +292,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
         const span = instrumentation.tracer.startSpan(name, {
           kind: SpanKind.CLIENT,
         });
-        return context.with(setSpan(context.active(), span), () =>
+        return context.with(trace.setSpan(context.active(), span), () =>
           makeGrpcClientRemoteCall(original, args, metadata, this)(span)
         );
       };

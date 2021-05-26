@@ -15,4 +15,3 @@
  */
 
 export * from './detect-resources';
-export * from './service-name';
