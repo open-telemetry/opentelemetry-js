@@ -89,7 +89,7 @@ export class Tracer implements api.Tracer {
     // make sampling decision
     const samplingResult = this._sampler.shouldSample(
       options.root
-        ? api.trace.setSpanContext(context, api.INVALID_SPAN_CONTEXT)
+        ? api.setSpanContext(context, api.INVALID_SPAN_CONTEXT)
         : context,
       traceId,
       name,
@@ -233,5 +233,5 @@ function getParent(
   context: api.Context
 ): api.SpanContext | undefined {
   if (options.root) return undefined;
-  return api.trace.getSpanContext(context);
+  return api.getSpanContext(context);
 }
