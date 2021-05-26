@@ -105,7 +105,7 @@ export class Tracer implements api.Tracer {
   ): api.Span {
     if (isTracingSuppressed(context)) {
       api.diag.debug('Instrumentation suppressed, returning Noop Span');
-      return api.NOOP_TRACER.startSpan(name, options, context);
+      return api.trace.wrapSpanContext(api.INVALID_SPAN_CONTEXT);
     }
 
     const parentContext = getParent(options, context);
@@ -144,12 +144,8 @@ export class Tracer implements api.Tracer {
         : api.TraceFlags.NONE;
     const spanContext = { traceId, spanId, traceFlags, traceState };
     if (samplingResult.decision === api.SamplingDecision.NOT_RECORD) {
-      api.diag.debug('Recording is off, starting no recording span');
-      return api.NOOP_TRACER.startSpan(
-        name,
-        options,
-        api.trace.setSpanContext(context, spanContext)
-      );
+      api.diag.debug('Recording is off, propagating context in a non-recording span');
+      return api.trace.wrapSpanContext(spanContext);
     }
 
     const span = new Span(
