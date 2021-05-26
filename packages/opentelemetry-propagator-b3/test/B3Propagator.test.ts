@@ -17,11 +17,10 @@
 import {
   defaultTextMapGetter,
   defaultTextMapSetter,
-  getSpanContext,
-  ROOT_CONTEXT,
-  setSpanContext,
   SpanContext,
   TraceFlags,
+  ROOT_CONTEXT,
+  trace,
 } from '@opentelemetry/api';
 import { suppressTracing } from '@opentelemetry/core';
 import * as assert from 'assert';
@@ -56,7 +55,7 @@ describe('B3Propagator', () => {
       };
 
       propagator.inject(
-        setSpanContext(ROOT_CONTEXT, spanContext),
+        trace.setSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
         defaultTextMapSetter
       );
@@ -77,7 +76,7 @@ describe('B3Propagator', () => {
       };
 
       propagator.inject(
-        setSpanContext(ROOT_CONTEXT, spanContext),
+        trace.setSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
         defaultTextMapSetter
       );
@@ -100,7 +99,7 @@ describe('B3Propagator', () => {
       };
 
       propagator.inject(
-        suppressTracing(setSpanContext(ROOT_CONTEXT, spanContext)),
+        suppressTracing(trace.setSpanContext(ROOT_CONTEXT, spanContext)),
         carrier,
         defaultTextMapSetter
       );
@@ -128,7 +127,7 @@ describe('B3Propagator', () => {
         defaultTextMapGetter
       );
 
-      const extractedSpanContext = getSpanContext(context);
+      const extractedSpanContext = trace.getSpanContext(context);
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'e457b5a2e4d86bd1',
         traceId: '80f198ee56343ba864fe8b2a57d3eff7',
@@ -144,7 +143,7 @@ describe('B3Propagator', () => {
         defaultTextMapGetter
       );
 
-      const extractedSpanContext = getSpanContext(context);
+      const extractedSpanContext = trace.getSpanContext(context);
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: '6e0c63257de34c92',
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
@@ -160,7 +159,7 @@ describe('B3Propagator', () => {
         defaultTextMapGetter
       );
 
-      const extractedSpanContext = getSpanContext(context);
+      const extractedSpanContext = trace.getSpanContext(context);
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'e457b5a2e4d86bd1',
         traceId: '80f198ee56343ba864fe8b2a57d3eff7',

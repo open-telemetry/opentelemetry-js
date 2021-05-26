@@ -16,11 +16,10 @@
 
 import {
   Context,
-  getSpanContext,
   isSpanContextValid,
   isValidSpanId,
   isValidTraceId,
-  setSpanContext,
+  trace,
   TextMapGetter,
   TextMapPropagator,
   TextMapSetter,
@@ -95,7 +94,7 @@ function getTraceFlags(
  */
 export class B3MultiPropagator implements TextMapPropagator {
   inject(context: Context, carrier: unknown, setter: TextMapSetter) {
-    const spanContext = getSpanContext(context);
+    const spanContext = trace.getSpanContext(context);
     if (
       !spanContext ||
       !isSpanContextValid(spanContext) ||
@@ -135,7 +134,7 @@ export class B3MultiPropagator implements TextMapPropagator {
       isValidSampledValue(traceFlags)
     ) {
       context = context.setValue(B3_DEBUG_FLAG_KEY, debug);
-      return setSpanContext(context, {
+      return trace.setSpanContext(context, {
         traceId,
         spanId,
         isRemote: true,

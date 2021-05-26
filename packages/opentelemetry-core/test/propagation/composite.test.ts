@@ -19,10 +19,8 @@ import {
   defaultTextMapSetter,
   TextMapPropagator,
   SpanContext,
-  getSpanContext,
-  setSpanContext,
   TextMapGetter,
-  TextMapSetter,
+  TextMapSetter, trace,
 } from '@opentelemetry/api';
 import { Context, ROOT_CONTEXT } from '@opentelemetry/api';
 import * as assert from 'assert';
@@ -39,11 +37,11 @@ import { TraceState } from '../../src/trace/TraceState';
 
 class DummyPropagator implements TextMapPropagator {
   inject(context: Context, carrier: any, setter: TextMapSetter<any>): void {
-    carrier['dummy'] = getSpanContext(context);
+    carrier['dummy'] = trace.getSpanContext(context);
   }
   extract(context: Context, carrier: any, getter: TextMapGetter<any>): Context {
     if (carrier['dummy']) {
-      return setSpanContext(context, carrier['dummy']);
+      return trace.setSpanContext(context, carrier['dummy']);
     }
     return context;
   }
@@ -75,7 +73,7 @@ describe('Composite Propagator', () => {
         traceFlags: 1,
         traceState: new TraceState('foo=bar'),
       };
-      ctxWithSpanContext = setSpanContext(ROOT_CONTEXT, spanContext);
+      ctxWithSpanContext = trace.setSpanContext(ROOT_CONTEXT, spanContext);
     });
 
     it('should inject context using all configured propagators', () => {
@@ -123,7 +121,7 @@ describe('Composite Propagator', () => {
       const composite = new CompositePropagator({
         propagators: [new DummyPropagator(), new HttpTraceContextPropagator()],
       });
-      const spanContext = getSpanContext(
+      const spanContext = trace.getSpanContext(
         composite.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       );
 
@@ -145,7 +143,7 @@ describe('Composite Propagator', () => {
           new HttpTraceContextPropagator(),
         ],
       });
-      const spanContext = getSpanContext(
+      const spanContext = trace.getSpanContext(
         composite.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       );
 

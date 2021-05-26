@@ -17,13 +17,12 @@
 import {
   BaggageEntry,
   Context,
-  createBaggage,
-  getBaggage,
-  setBaggage,
+  propagation,
   TextMapGetter,
   TextMapPropagator,
-  TextMapSetter
+  TextMapSetter,
 } from '@opentelemetry/api';
+
 import { isTracingSuppressed } from '../../trace/suppress-tracing';
 import {
   BAGGAGE_HEADER,
@@ -45,7 +44,7 @@ import {
  */
 export class HttpBaggagePropagator implements TextMapPropagator {
   inject(context: Context, carrier: unknown, setter: TextMapSetter) {
-    const baggage = getBaggage(context);
+    const baggage = propagation.getBaggage(context);
     if (!baggage || isTracingSuppressed(context)) return;
     const keyPairs = getKeyPairs(baggage)
       .filter((pair: string) => {
@@ -79,7 +78,7 @@ export class HttpBaggagePropagator implements TextMapPropagator {
     if (Object.entries(baggage).length === 0) {
       return context;
     }
-    return setBaggage(context, createBaggage(baggage));
+    return propagation.setBaggage(context, propagation.createBaggage(baggage));
   }
 
   fields(): string[] {
