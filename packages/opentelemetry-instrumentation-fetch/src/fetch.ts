@@ -34,16 +34,6 @@ import { VERSION } from './version';
 // safe enough
 const OBSERVER_WAIT_TIME_MS = 300;
 
-// Used to normalize relative URLs
-let a: HTMLAnchorElement | undefined;
-const getUrlNormalizingAnchor = () => {
-  if (!a) {
-    a = document.createElement('a');
-  }
-
-  return a;
-};
-
 export interface FetchCustomAttributeFunction {
   (
     span: api.Span,
@@ -438,7 +428,7 @@ export class FetchInstrumentation extends InstrumentationBase<
 
     const observer: PerformanceObserver = new PerformanceObserver(list => {
       const perfObsEntries = list.getEntries() as PerformanceResourceTiming[];
-      const urlNormalizingAnchor = getUrlNormalizingAnchor();
+      const urlNormalizingAnchor = web.getUrlNormalizingAnchor();
       urlNormalizingAnchor.href = spanUrl;
       perfObsEntries.forEach(entry => {
         if (

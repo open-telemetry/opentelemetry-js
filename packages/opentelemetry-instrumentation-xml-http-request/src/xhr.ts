@@ -29,6 +29,7 @@ import {
   parseUrl,
   PerformanceTimingNames as PTN,
   shouldPropagateTraceHeaders,
+  getUrlNormalizingAnchor
 } from '@opentelemetry/web';
 import { EventNames } from './enums/EventNames';
 import {
@@ -45,16 +46,6 @@ import { AttributeNames } from './enums/AttributeNames';
 // hard to say how long it should really wait, seems like 300ms is
 // safe enough
 const OBSERVER_WAIT_TIME_MS = 300;
-
-// Used to normalize relative URLs
-let a: HTMLAnchorElement | undefined;
-const getUrlNormalizingAnchor = () => {
-  if (!a) {
-    a = document.createElement('a');
-  }
-
-  return a;
-};
 
 export type XHRCustomAttributeFunction = (
   span: api.Span,
