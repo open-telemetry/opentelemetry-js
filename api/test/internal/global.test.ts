@@ -67,20 +67,19 @@ describe('Global Utils', () => {
   });
 
   it('should disable both if one is disabled', () => {
-    const original = api1.context['_getContextManager']();
+    const manager = new NoopContextManager();
+    api1.context.setGlobalContextManager(manager);
 
-    api1.context.setGlobalContextManager(new NoopContextManager());
-
-    assert.notStrictEqual(original, api1.context['_getContextManager']());
+    assert.strictEqual(manager, api1.context['_getContextManager']());
     api2.context.disable();
-    assert.strictEqual(original, api1.context['_getContextManager']());
+    assert.notStrictEqual(manager, api1.context['_getContextManager']());
   });
 
   it('should return the module NoOp implementation if the version is a mismatch', () => {
-    const original = api1.context['_getContextManager']();
     const newContextManager = new NoopContextManager();
     api1.context.setGlobalContextManager(newContextManager);
 
+    // ensure new context manager is returned
     assert.strictEqual(api1.context['_getContextManager'](), newContextManager);
 
     const globalInstance = getGlobal('context');
@@ -88,7 +87,11 @@ describe('Global Utils', () => {
     // @ts-expect-error we are modifying internals for testing purposes here
     _globalThis[Symbol.for(GLOBAL_API_SYMBOL_KEY)].version = '0.0.1';
 
-    assert.strictEqual(api1.context['_getContextManager'](), original);
+    // ensure new context manager is not returned because version above is incompatible
+    assert.notStrictEqual(
+      api1.context['_getContextManager'](),
+      newContextManager
+    );
   });
 
   it('should log an error if there is a duplicate registration', () => {

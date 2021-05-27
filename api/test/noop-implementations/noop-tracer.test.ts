@@ -17,7 +17,6 @@
 import * as assert from 'assert';
 import {
   context,
-  NoopTracer,
   Span,
   SpanContext,
   SpanKind,
@@ -25,6 +24,7 @@ import {
   TraceFlags,
 } from '../../src';
 import { NonRecordingSpan } from '../../src/trace/NonRecordingSpan';
+import { NoopTracer } from '../../src/trace/NoopTracer';
 
 describe('NoopTracer', () => {
   it('should not crash', () => {

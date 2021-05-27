@@ -17,7 +17,9 @@
 import { Tracer } from './tracer';
 import { TracerProvider } from './tracer_provider';
 import { ProxyTracer } from './ProxyTracer';
-import { NOOP_TRACER_PROVIDER } from './NoopTracerProvider';
+import { NoopTracerProvider } from './NoopTracerProvider';
+
+const NOOP_TRACER_PROVIDER = new NoopTracerProvider();
 
 /**
  * Tracer provider which provides {@link ProxyTracer}s.
