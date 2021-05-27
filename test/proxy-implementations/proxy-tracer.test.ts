@@ -18,7 +18,6 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
   context,
-  NoopTracer,
   ProxyTracer,
   ProxyTracerProvider,
   ROOT_CONTEXT,
@@ -29,6 +28,8 @@ import {
   TracerProvider,
 } from '../../src';
 import { NonRecordingSpan } from '../../src/trace/NonRecordingSpan';
+import { NoopTracer } from '../../src/trace/NoopTracer';
+
 describe('ProxyTracer', () => {
   let provider: ProxyTracerProvider;
   const sandbox = sinon.createSandbox();

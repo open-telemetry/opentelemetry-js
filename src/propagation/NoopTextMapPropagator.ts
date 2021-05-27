@@ -31,5 +31,3 @@ export class NoopTextMapPropagator implements TextMapPropagator {
     return [];
   }
 }
-
-export const NOOP_TEXT_MAP_PROPAGATOR = new NoopTextMapPropagator();

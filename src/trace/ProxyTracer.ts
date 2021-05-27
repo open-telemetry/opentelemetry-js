@@ -15,7 +15,7 @@
  */
 
 import { Context } from '../context/types';
-import { NOOP_TRACER } from './NoopTracer';
+import { NoopTracer } from './NoopTracer';
 import { ProxyTracerProvider } from './ProxyTracerProvider';
 import { Span } from './span';
 import { SpanOptions } from './SpanOptions';
@@ -60,7 +60,7 @@ export class ProxyTracer implements Tracer {
     const tracer = this._provider.getDelegateTracer(this.name, this.version);
 
     if (!tracer) {
-      return NOOP_TRACER;
+      return new NoopTracer();
     }
 
     this._delegate = tracer;

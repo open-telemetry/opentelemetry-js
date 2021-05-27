@@ -16,25 +16,25 @@
 
 import * as assert from 'assert';
 import api, {
-  TraceFlags,
-  NoopTracerProvider,
-  NoopTracer,
-  SpanOptions,
-  Span,
   context,
-  trace,
-  propagation,
-  TextMapPropagator,
   Context,
-  TextMapSetter,
-  TextMapGetter,
-  ROOT_CONTEXT,
-  defaultTextMapSetter,
   defaultTextMapGetter,
+  defaultTextMapSetter,
   diag,
+  propagation,
+  ROOT_CONTEXT,
+  Span,
+  SpanOptions,
+  TextMapGetter,
+  TextMapPropagator,
+  TextMapSetter,
+  trace,
+  TraceFlags,
 } from '../../src';
 import { DiagAPI } from '../../src/api/diag';
 import { NonRecordingSpan } from '../../src/trace/NonRecordingSpan';
+import { NoopTracer } from '../../src/trace/NoopTracer';
+import { NoopTracerProvider } from '../../src/trace/NoopTracerProvider';
 
 // DiagLogger implementation
 const diagLoggerFunctions = [

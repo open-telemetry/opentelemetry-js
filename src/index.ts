@@ -19,12 +19,9 @@ export { baggageEntryMetadataFromString } from './baggage/utils';
 export * from './common/Exception';
 export * from './common/Time';
 export * from './diag';
-export * from './propagation/NoopTextMapPropagator';
 export * from './propagation/TextMapPropagator';
 export * from './trace/attributes';
 export * from './trace/link';
-export * from './trace/NoopTracer';
-export * from './trace/NoopTracerProvider';
 export * from './trace/ProxyTracer';
 export * from './trace/ProxyTracerProvider';
 export * from './trace/Sampler';
@@ -49,7 +46,6 @@ export {
 } from './trace/spancontext-utils';
 
 export * from './context/context';
-export * from './context/NoopContextManager';
 export * from './context/types';
 
 import { ContextAPI } from './api/context';
