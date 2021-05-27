@@ -16,8 +16,6 @@
 
 import {
   context,
-  NoopTextMapPropagator,
-  NoopTracerProvider,
   propagation,
   ProxyTracerProvider,
   trace,
@@ -29,7 +27,6 @@ import {
   AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
-import { NoopContextManager } from '@opentelemetry/api';
 import { CompositePropagator } from '@opentelemetry/core';
 import { ConsoleMetricExporter, MeterProvider } from '@opentelemetry/metrics';
 import { NodeTracerProvider } from '@opentelemetry/node';
@@ -89,6 +86,10 @@ const DefaultContextManager = semver.gte(process.version, '14.8.0')
   : AsyncHooksContextManager;
 
 describe('Node SDK', () => {
+  let ctxManager: any;
+  let propagator: any;
+  let delegate: any;
+
   before(() => {
     nock.disableNetConnect();
   });
@@ -98,6 +99,10 @@ describe('Node SDK', () => {
     trace.disable();
     propagation.disable();
     metrics.disable();
+
+    ctxManager = context['_getContextManager']();
+    propagator = propagation['_getGlobalPropagator']();
+    delegate = (trace.getTracerProvider() as ProxyTracerProvider).getDelegate();
   });
 
   describe('Basic Registration', () => {
@@ -108,13 +113,9 @@ describe('Node SDK', () => {
 
       await sdk.start();
 
-      assert.ok(context['_getContextManager']() instanceof NoopContextManager);
-      assert.ok(
-        propagation['_getGlobalPropagator']() instanceof NoopTextMapPropagator
-      );
-
-      const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
-      assert.ok(apiTracerProvider.getDelegate() instanceof NoopTracerProvider);
+      assert.strictEqual(context['_getContextManager'](), ctxManager, "context manager should not change");
+      assert.strictEqual(propagation['_getGlobalPropagator'](), propagator, "propagator should not change");
+      assert.strictEqual((trace.getTracerProvider() as ProxyTracerProvider).getDelegate(), delegate, "tracer provider should not have changed");
 
       assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
     });
@@ -172,13 +173,9 @@ describe('Node SDK', () => {
 
       await sdk.start();
 
-      assert.ok(context['_getContextManager']() instanceof NoopContextManager);
-      assert.ok(
-        propagation['_getGlobalPropagator']() instanceof NoopTextMapPropagator
-      );
-
-      const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
-      assert.ok(apiTracerProvider.getDelegate() instanceof NoopTracerProvider);
+      assert.strictEqual(context['_getContextManager'](), ctxManager, "context manager should not change");
+      assert.strictEqual(propagation['_getGlobalPropagator'](), propagator, "propagator should not change");
+      assert.strictEqual((trace.getTracerProvider() as ProxyTracerProvider).getDelegate(), delegate, "tracer provider should not have changed");
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
     });

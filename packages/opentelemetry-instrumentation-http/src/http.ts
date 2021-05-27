@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 import {
-  SpanStatusCode,
   context,
+  diag,
+  INVALID_SPAN_CONTEXT,
   propagation,
+  ROOT_CONTEXT,
   Span,
   SpanKind,
   SpanOptions,
   SpanStatus,
-  ROOT_CONTEXT,
-  NOOP_TRACER,
-  diag, trace,
+  SpanStatusCode,
+  trace,
 } from '@opentelemetry/api';
 import { suppressTracing } from '@opentelemetry/core';
 import type * as http from 'http';
@@ -599,9 +600,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     const currentSpan = trace.getSpan(ctx);
 
     if (requireParent === true && currentSpan === undefined) {
-      // TODO: Refactor this when a solution is found in
-      // https://github.com/open-telemetry/opentelemetry-specification/issues/530
-      span = NOOP_TRACER.startSpan(name, options, ctx);
+      span = trace.wrapSpanContext(INVALID_SPAN_CONTEXT);
     } else if (requireParent === true && currentSpan?.spanContext().isRemote) {
       span = currentSpan;
     } else {
