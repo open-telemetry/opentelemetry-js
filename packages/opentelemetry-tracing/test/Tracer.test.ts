@@ -34,6 +34,7 @@ import {
 import * as assert from 'assert';
 import { BasicTracerProvider, Span, Tracer } from '../src';
 import { TestStackContextManager } from './export/TestStackContextManager';
+import * as sinon from 'sinon';
 
 describe('Tracer', () => {
   const tracerProvider = new BasicTracerProvider();
@@ -248,14 +249,18 @@ describe('Tracer', () => {
   });
 
   it('should start an active span with name, options and function args', () => {
+
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
       tracerProvider
     );
 
-    assert.strictEqual(tracer.startActiveSpan('my-span', {}, span => {
+    // const spy = sinon.spy(tracer, "startSpan");
+
+    assert.strictEqual(tracer.startActiveSpan('my-span', {attributes: {foo: 'bar'}}, span => {
       try {
+        // assert(spy.calledWith('my-span', {attributes: {foo: 'bar'}}))
         assert.strictEqual(getSpan(context.active()), span)
         return 1
       } finally {
@@ -275,8 +280,11 @@ describe('Tracer', () => {
 
     const ctx = context.active().setValue(ctxKey, 'bar')
 
-    assert.strictEqual(tracer.startActiveSpan('my-span', {}, ctx, span => {
+    const spy = sinon.spy(tracer, "startSpan");
+
+    assert.strictEqual(tracer.startActiveSpan('my-span', {attributes: {foo: 'bar'}}, ctx, span => {
       try {
+        assert(spy.calledWith('my-span', {attributes: {foo: 'bar'}}, ctx))
         assert.strictEqual(getSpan(context.active()), span)
         assert.strictEqual(ctx.getValue(ctxKey), 'bar')
         return 1
