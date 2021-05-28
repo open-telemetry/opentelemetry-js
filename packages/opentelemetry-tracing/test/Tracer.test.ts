@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as api from '@opentelemetry/api';
 import {
   context,
   createContextKey,
@@ -22,6 +21,7 @@ import {
   Sampler,
   SamplingDecision,
   SpanContext,
+  trace,
   TraceFlags
 } from '@opentelemetry/api';
 import {
@@ -155,7 +155,7 @@ describe('Tracer', () => {
     const span = tracer.startSpan(
       'aSpan',
       undefined,
-      api.trace.setSpanContext(ROOT_CONTEXT, parent)
+      trace.setSpanContext(ROOT_CONTEXT, parent)
     );
     assert.strictEqual((span as Span).parentSpanId, parent.spanId);
     assert.strictEqual(span.spanContext().traceId, parent.traceId);
@@ -175,7 +175,7 @@ describe('Tracer', () => {
     const span = tracer.startSpan(
       'aSpan',
       undefined,
-      api.trace.setSpanContext(ROOT_CONTEXT, parent)
+      trace.setSpanContext(ROOT_CONTEXT, parent)
     );
     assert.strictEqual((span as Span).parentSpanId, undefined);
   });
