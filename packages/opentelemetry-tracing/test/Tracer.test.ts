@@ -24,6 +24,7 @@ import {
   trace,
   TraceFlags
 } from '@opentelemetry/api';
+import { getSpan } from '@opentelemetry/api/build/src/trace/context-utils';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,
@@ -32,6 +33,7 @@ import {
 } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { BasicTracerProvider, Span, Tracer } from '../src';
+import { TestStackContextManager } from './export/TestStackContextManager';
 
 describe('Tracer', () => {
   const tracerProvider = new BasicTracerProvider();
@@ -50,7 +52,13 @@ describe('Tracer', () => {
     }
   }
 
+  beforeEach(() => {
+    const contextManager = new TestStackContextManager().enable();
+    context.setGlobalContextManager(contextManager);
+  });
+
   afterEach(() => {
+    context.disable();
     delete envSource.OTEL_TRACES_SAMPLER;
     delete envSource.OTEL_TRACES_SAMPLER_ARG;
   });
@@ -231,7 +239,7 @@ describe('Tracer', () => {
 
     assert.strictEqual(tracer.startActiveSpan('my-span', span => {
       try {
-        // todo: assert.strictEqual(getSpan(context.active()), span)
+        assert.strictEqual(getSpan(context.active()), span)
         return 1
       } finally {
         span.end();
@@ -248,7 +256,7 @@ describe('Tracer', () => {
 
     assert.strictEqual(tracer.startActiveSpan('my-span', {}, span => {
       try {
-        // todo: assert.strictEqual(getSpan(context.active()), span)
+        assert.strictEqual(getSpan(context.active()), span)
         return 1
       } finally {
         span.end();
@@ -269,7 +277,7 @@ describe('Tracer', () => {
 
     assert.strictEqual(tracer.startActiveSpan('my-span', {}, ctx, span => {
       try {
-        // todo: assert.strictEqual(getSpan(context.active()), span)
+        assert.strictEqual(getSpan(context.active()), span)
         assert.strictEqual(ctx.getValue(ctxKey), 'bar')
         return 1
       } finally {
