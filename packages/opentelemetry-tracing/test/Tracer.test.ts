@@ -238,8 +238,11 @@ describe('Tracer', () => {
       tracerProvider
     );
 
+    const spy = sinon.spy(tracer, "startSpan");
+
     assert.strictEqual(tracer.startActiveSpan('my-span', span => {
       try {
+        assert(spy.calledWith('my-span'))
         assert.strictEqual(getSpan(context.active()), span)
         return 1
       } finally {
