@@ -20,13 +20,9 @@ import { diag, DiagLogger, DiagLogLevel } from '../../src';
 
 class SpyLogger implements DiagLogger {
   debug() {}
-
   error() {}
-
   info() {}
-
   warn() {}
-
   verbose() {}
 }
 
@@ -41,6 +37,8 @@ describe('ComponentLogger', () => {
     logger = new SpyLogger();
     sandbox.spy(logger);
     diag.setLogger(logger, DiagLogLevel.ALL);
+    // clean any messages up that might be there from the registration
+    sandbox.reset();
   });
 
   afterEach(() => {

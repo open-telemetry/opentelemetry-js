@@ -45,6 +45,12 @@ describe('LogLevelFilter DiagLogger', () => {
   /** Simulated Legacy logger */
   let incompleteLogger: DiagLogger;
 
+  const restoreCallHistory = () => {
+    diagLoggerFunctions.forEach(fName => {
+      calledArgs[fName] = null;
+    });
+  };
+
   beforeEach(() => {
     // Set no logger so that sinon doesn't complain about TypeError: Attempted to wrap xxxx which is already wrapped
     diag.disable();
@@ -66,10 +72,7 @@ describe('LogLevelFilter DiagLogger', () => {
   });
 
   afterEach(() => {
-    // restore
-    diagLoggerFunctions.forEach(fName => {
-      calledArgs[fName] = null;
-    });
+    restoreCallHistory();
   });
 
   const levelMap: Array<{
@@ -170,6 +173,7 @@ describe('LogLevelFilter DiagLogger', () => {
                   map.level,
                   dummyLogger
                 );
+                restoreCallHistory();
                 testLogger[fName](`${fName} called %s`, 'param1');
                 diagLoggerFunctions.forEach(lName => {
                   if (
@@ -190,6 +194,7 @@ describe('LogLevelFilter DiagLogger', () => {
 
           it('diag.setLogger level and logger should log', () => {
             diag.setLogger(dummyLogger, map.level);
+            restoreCallHistory();
             diag[fName](`${fName} called %s`, 'param1');
             diagLoggerFunctions.forEach(lName => {
               if (fName === lName && map.ignoreFuncs.indexOf(lName) === -1) {
@@ -217,6 +222,7 @@ describe('LogLevelFilter DiagLogger', () => {
               map.level,
               invalidLogger as any
             );
+            restoreCallHistory();
 
             testLogger[fName](`${fName} called %s`, 'param1');
             diagLoggerFunctions.forEach(lName => {
