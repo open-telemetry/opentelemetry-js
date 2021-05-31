@@ -43,7 +43,7 @@ import {
   InMemorySpanExporter,
   SpanExporter,
   BatchSpanProcessor,
-} from '../src';
+} from '../../src';
 
 describe('BasicTracerProvider', () => {
   let removeEvent: Function | undefined;

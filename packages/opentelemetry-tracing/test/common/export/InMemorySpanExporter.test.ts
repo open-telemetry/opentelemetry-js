@@ -19,7 +19,7 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
   BasicTracerProvider,
-} from '../../src';
+} from '../../../src';
 import { context, trace } from '@opentelemetry/api';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 

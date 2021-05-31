@@ -32,7 +32,7 @@ import { SpanExporter } from './SpanExporter';
  * Implementation of the {@link SpanProcessor} that batches spans exported by
  * the SDK then pushes them to the exporter pipeline.
  */
-export class BatchSpanProcessor implements SpanProcessor {
+export abstract class BatchSpanProcessorBase implements SpanProcessor {
   private readonly _maxExportBatchSize: number;
   private readonly _maxQueueSize: number;
   private readonly _scheduledDelayMillis: number;
@@ -61,6 +61,8 @@ export class BatchSpanProcessor implements SpanProcessor {
       typeof config?.exportTimeoutMillis === 'number'
         ? config?.exportTimeoutMillis
         : env.OTEL_BSP_EXPORT_TIMEOUT;
+
+    this.onInit();
   }
 
   forceFlush(): Promise<void> {
@@ -87,6 +89,9 @@ export class BatchSpanProcessor implements SpanProcessor {
     this._isShutdown = true;
     this._shuttingDownPromise = new Promise((resolve, reject) => {
       Promise.resolve()
+        .then(() => {
+          return this.onShutdown();
+        })
         .then(() => {
           return this._flushAll();
         })
@@ -190,4 +195,7 @@ export class BatchSpanProcessor implements SpanProcessor {
       this._timer = undefined;
     }
   }
+
+  abstract onInit(): void;
+  abstract onShutdown(): void;
 }

@@ -23,15 +23,11 @@ import {
 } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
-  BasicTracerProvider,
-  BatchSpanProcessor,
-  InMemorySpanExporter,
-  Span,
-} from '../../src';
+import { BasicTracerProvider, InMemorySpanExporter, Span } from '../../../src';
 import { context } from '@opentelemetry/api';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { TestStackContextManager } from './TestStackContextManager';
+import { BatchSpanProcessorBase } from '../../../src/export/BatchSpanProcessorBase';
 
 function createSampledSpan(spanName: string): Span {
   const tracer = new BasicTracerProvider({
@@ -42,16 +38,25 @@ function createSampledSpan(spanName: string): Span {
   return span as Span;
 }
 
-describe('BatchSpanProcessor', () => {
+class BatchSpanProcessor extends BatchSpanProcessorBase {
+  onInit() {}
+  onShutdown() {}
+}
+
+describe('BatchSpanProcessorBase', () => {
   const name = 'span-name';
   const defaultBufferConfig = {
     maxExportBatchSize: 5,
     scheduledDelayMillis: 2500,
   };
   let exporter: InMemorySpanExporter;
+  let onInitSpy: any;
+
   beforeEach(() => {
     exporter = new InMemorySpanExporter();
+    onInitSpy = sinon.stub(BatchSpanProcessor.prototype, 'onInit');
   });
+
   afterEach(() => {
     exporter.reset();
     sinon.restore();
@@ -74,6 +79,11 @@ describe('BatchSpanProcessor', () => {
       const processor = new BatchSpanProcessor(exporter, {});
       assert.ok(processor instanceof BatchSpanProcessor);
       processor.shutdown();
+    });
+
+    it('should call onInit', () => {
+      new BatchSpanProcessor(exporter, {});
+      assert.strictEqual(onInitSpy.callCount, 1);
     });
 
     it('should read defaults from environment', () => {
@@ -104,6 +114,14 @@ describe('BatchSpanProcessor', () => {
   });
 
   describe('.onStart/.onEnd/.shutdown', () => {
+    it('should call onShutdown', async () => {
+      const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
+      const onShutdownSpy = sinon.stub(processor, 'onShutdown');
+      assert.strictEqual(onShutdownSpy.callCount, 0);
+      await processor.shutdown();
+      assert.strictEqual(onShutdownSpy.callCount, 1);
+    });
+
     it('should do nothing after processor is shutdown', async () => {
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
       const spy: sinon.SinonSpy = sinon.spy(exporter, 'export') as any;

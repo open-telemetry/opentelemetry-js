@@ -30,7 +30,7 @@ import {
 } from '@opentelemetry/core';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
-import { BasicTracerProvider, Span, SpanProcessor } from '../src';
+import { BasicTracerProvider, Span, SpanProcessor } from '../../src';
 
 const performanceTimeOrigin = hrTime();
 

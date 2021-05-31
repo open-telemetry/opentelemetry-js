@@ -13,8 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const testsContext = require.context('.', true, /test$/);
-testsContext.keys().forEach(testsContext);
 
-const srcContext = require.context('.', true, /src$/);
-srcContext.keys().forEach(srcContext);
+import { BatchSpanProcessorBase } from '../../../export/BatchSpanProcessorBase';
+
+export class BatchSpanProcessor extends BatchSpanProcessorBase {
+  private _onVisibilityChange(): void {
+    if (document.visibilityState === 'hidden') {
+      void this.forceFlush();
+    }
+  }
+
+  onInit(): void {
+    this._onVisibilityChange = this._onVisibilityChange.bind(this);
+    document.addEventListener('visibilitychange', this._onVisibilityChange);
+  }
+
+  onShutdown(): void {
+    document.removeEventListener('visibilitychange', this._onVisibilityChange);
+  }
+}
