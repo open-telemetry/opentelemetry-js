@@ -38,6 +38,12 @@ describe('DiagLogger functions', () => {
 
   let dummyLogger: DiagLogger;
 
+  const restoreCallHistory = () => {
+    diagLoggerFunctions.forEach(fName => {
+      calledArgs[fName] = null;
+    });
+  };
+
   beforeEach(() => {
     // mock
     dummyLogger = {} as DiagLogger;
@@ -49,10 +55,7 @@ describe('DiagLogger functions', () => {
   });
 
   afterEach(() => {
-    // restore
-    diagLoggerFunctions.forEach(fName => {
-      calledArgs[fName] = null;
-    });
+    restoreCallHistory();
     diag.disable();
   });
 
@@ -75,6 +78,7 @@ describe('DiagLogger functions', () => {
 
       it(`diag should log with ${fName} message`, () => {
         diag.setLogger(dummyLogger, DiagLogLevel.ALL);
+        restoreCallHistory();
         diag[fName](`${fName} called %s`, 'param1');
         diagLoggerFunctions.forEach(lName => {
           if (fName === lName) {
