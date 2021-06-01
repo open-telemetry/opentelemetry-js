@@ -124,7 +124,6 @@ const testCollectorExporter = (params: TestParams) =>
           )
         : undefined;
       collectorExporter = new CollectorTraceExporter({
-        serviceName: 'basic-service',
         url: 'grpcs://' + address,
         credentials,
         metadata: params.metadata,
@@ -146,7 +145,6 @@ const testCollectorExporter = (params: TestParams) =>
         // Need to stub/spy on the underlying logger as the 'diag' instance is global
         const spyLoggerWarn = sinon.stub(diag, 'warn');
         collectorExporter = new CollectorTraceExporter({
-          serviceName: 'basic-service',
           url: `http://${address}`,
           headers: {
             foo: 'bar',
@@ -158,7 +156,6 @@ const testCollectorExporter = (params: TestParams) =>
       it('should warn about path in url', () => {
         const spyLoggerWarn = sinon.stub(diag, 'warn');
         collectorExporter = new CollectorTraceExporter({
-          serviceName: 'basic-service',
           url: `http://${address}/v1/trace`,
         });
         const args = spyLoggerWarn.args[0];

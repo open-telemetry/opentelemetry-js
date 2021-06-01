@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "@opentelemetry/api": "^0.20.0",
-    "typescript": "4.2.4"
+    "typescript": "4.3.2"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^0.20.0"
