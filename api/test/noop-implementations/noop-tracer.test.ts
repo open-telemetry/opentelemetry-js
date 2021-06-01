@@ -69,16 +69,16 @@ describe('NoopTracer', () => {
       }
     };
     const opts = { attributes: { foo: 'bar' } };
-    const ctx = context.active();
 
-    const a = tracer.startActiveSpan(name, fn);
-    assert.strictEqual(a, 1);
+    assert.strictEqual((tracer as any).startActiveSpan(name), undefined);
 
-    const b = tracer.startActiveSpan(name, opts, fn);
+    assert.strictEqual(tracer.startActiveSpan(name, fn), 1);
 
-    assert.strictEqual(b, 1);
+    assert.strictEqual(tracer.startActiveSpan(name, opts, fn), 1);
 
-    const c = tracer.startActiveSpan(name, opts, ctx, fn);
-    assert.strictEqual(c, 1);
+    assert.strictEqual(
+      tracer.startActiveSpan(name, opts, context.active(), fn),
+      1
+    );
   });
 });

@@ -49,41 +49,47 @@ export class NoopTracer implements Tracer {
 
   startActiveSpan<F extends (span: Span) => ReturnType<F>>(
     name: string,
-    arg2: F | SpanOptions,
+    fn: F
+  ): ReturnType<F>;
+  startActiveSpan<F extends (span: Span) => ReturnType<F>>(
+    name: string,
+    opts: SpanOptions | undefined,
+    fn: F
+  ): ReturnType<F>;
+  startActiveSpan<F extends (span: Span) => ReturnType<F>>(
+    name: string,
+    opts: SpanOptions | undefined,
+    ctx: Context | undefined,
+    fn: F
+  ): ReturnType<F>;
+  startActiveSpan<F extends (span: Span) => ReturnType<F>>(
+    name: string,
+    arg2?: F | SpanOptions,
     arg3?: F | Context,
     arg4?: F
   ): ReturnType<F> | undefined {
-    let fn: F | undefined,
-      options: SpanOptions | undefined,
-      activeContext: Context | undefined;
-    if (arguments.length === 2 && typeof arg2 === 'function') {
-      fn = arg2;
-    } else if (
-      arguments.length === 3 &&
-      typeof arg2 === 'object' &&
-      typeof arg3 === 'function'
-    ) {
-      options = arg2;
-      fn = arg3;
-    } else if (
-      arguments.length === 4 &&
-      typeof arg2 === 'object' &&
-      typeof arg3 === 'object' &&
-      typeof arg4 === 'function'
-    ) {
-      options = arg2;
-      activeContext = arg3;
-      fn = arg4;
+    let opts: SpanOptions | undefined;
+    let ctx: Context | undefined;
+    let fn: F;
+
+    if (arguments.length < 2) {
+      return;
+    } else if (arguments.length === 2) {
+      fn = arg2 as F;
+    } else if (arguments.length === 3) {
+      opts = arg2 as SpanOptions | undefined;
+      fn = arg3 as F;
+    } else {
+      opts = arg2 as SpanOptions | undefined;
+      ctx = arg3 as Context | undefined;
+      fn = arg4 as F;
     }
 
-    const parentContext = activeContext ?? context.active();
-    const span = this.startSpan(name, options, parentContext);
+    const parentContext = ctx ?? context.active();
+    const span = this.startSpan(name, opts, parentContext);
     const contextWithSpanSet = setSpan(parentContext, span);
 
-    if (fn) {
-      return context.with(contextWithSpanSet, fn, undefined, span);
-    }
-    return;
+    return context.with(contextWithSpanSet, fn, undefined, span);
   }
 }
 
