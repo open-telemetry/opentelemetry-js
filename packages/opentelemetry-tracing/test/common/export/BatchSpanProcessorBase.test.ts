@@ -23,7 +23,7 @@ import {
 } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { BasicTracerProvider, InMemorySpanExporter, Span } from '../../../src';
+import { BasicTracerProvider, BufferConfig, InMemorySpanExporter, Span } from '../../../src';
 import { context } from '@opentelemetry/api';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { TestStackContextManager } from './TestStackContextManager';
@@ -38,7 +38,7 @@ function createSampledSpan(spanName: string): Span {
   return span as Span;
 }
 
-class BatchSpanProcessor extends BatchSpanProcessorBase {
+class BatchSpanProcessor extends BatchSpanProcessorBase<BufferConfig> {
   onInit() {}
   onShutdown() {}
 }
@@ -50,7 +50,7 @@ describe('BatchSpanProcessorBase', () => {
     scheduledDelayMillis: 2500,
   };
   let exporter: InMemorySpanExporter;
-  let onInitSpy: any;
+  let onInitSpy: sinon.SinonStub;
 
   beforeEach(() => {
     exporter = new InMemorySpanExporter();
@@ -82,8 +82,8 @@ describe('BatchSpanProcessorBase', () => {
     });
 
     it('should call onInit', () => {
-      new BatchSpanProcessor(exporter, {});
-      assert.strictEqual(onInitSpy.callCount, 1);
+      new BatchSpanProcessor(exporter, defaultBufferConfig);
+      assert.deepStrictEqual(onInitSpy.args, [[defaultBufferConfig]]);
     });
 
     it('should read defaults from environment', () => {

@@ -89,3 +89,10 @@ export interface BufferConfig {
    * The default value is 2048. */
   maxQueueSize?: number;
 }
+
+/** Interface configuration for BatchSpanProcessor on browser */
+export interface BatchSpanProcessorBrowserConfig extends BufferConfig {
+  /** Force flush when a user navigates to a new page, closes the tab or the browser, or,
+   * on mobile, switches to a different app. The default value is `true`. */
+  flushOnDocumentBecomesHidden?: boolean;
+}

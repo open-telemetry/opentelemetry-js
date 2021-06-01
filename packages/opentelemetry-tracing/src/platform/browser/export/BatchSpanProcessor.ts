@@ -15,20 +15,25 @@
  */
 
 import { BatchSpanProcessorBase } from '../../../export/BatchSpanProcessorBase';
+import { BatchSpanProcessorBrowserConfig } from '../../../types';
 
-export class BatchSpanProcessor extends BatchSpanProcessorBase {
-  private _onVisibilityChange(): void {
-    if (document.visibilityState === 'hidden') {
-      void this.forceFlush();
+export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcessorBrowserConfig> {
+  private _visibilityChangeListener?: () => void
+
+  onInit(config?: BatchSpanProcessorBrowserConfig): void {
+    if (config?.flushOnDocumentBecomesHidden !== false && document != null) {
+      this._visibilityChangeListener = () => {
+        if (document.visibilityState === 'hidden') {
+          void this.forceFlush();
+        }
+      }
+      document.addEventListener('visibilitychange', this._visibilityChangeListener);
     }
   }
 
-  onInit(): void {
-    this._onVisibilityChange = this._onVisibilityChange.bind(this);
-    document.addEventListener('visibilitychange', this._onVisibilityChange);
-  }
-
   onShutdown(): void {
-    document.removeEventListener('visibilitychange', this._onVisibilityChange);
+    if (this._visibilityChangeListener) {
+      document.removeEventListener('visibilitychange', this._visibilityChangeListener);
+    }
   }
 }

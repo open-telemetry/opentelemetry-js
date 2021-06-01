@@ -15,8 +15,9 @@
  */
 
 import { BatchSpanProcessorBase } from '../../../export/BatchSpanProcessorBase';
+import { BufferConfig } from '../../../types';
 
-export class BatchSpanProcessor extends BatchSpanProcessorBase {
+export class BatchSpanProcessor extends BatchSpanProcessorBase<BufferConfig> {
   onInit(): void {}
 
   onShutdown(): void {}
