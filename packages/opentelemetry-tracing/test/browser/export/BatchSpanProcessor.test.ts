@@ -58,8 +58,17 @@ describe('BatchSpanProcessor - web', () => {
       });
     })
 
-    describe('AND flushOnDocumentBecomesHidden configuration option is false', () => {
-      it('should NOT force flush spans', () => {
+    describe('AND flushOnDocumentBecomesHidden configuration option', () => {
+      it('set to true should force flush spans', () => {
+        processor = new BatchSpanProcessor(exporter, { flushOnDocumentBecomesHidden: true });
+        forceFlushSpy = sinon.stub(processor, 'forceFlush');
+        assert.strictEqual(forceFlushSpy.callCount, 0);
+        visibilityState = 'hidden';
+        document.dispatchEvent(visibilityChangeEvent);
+        assert.strictEqual(forceFlushSpy.callCount, 1);
+      })
+
+      it('set to false should NOT force flush spans', () => {
         processor = new BatchSpanProcessor(exporter, { flushOnDocumentBecomesHidden: false });
         forceFlushSpy = sinon.stub(processor, 'forceFlush');
         assert.strictEqual(forceFlushSpy.callCount, 0);
