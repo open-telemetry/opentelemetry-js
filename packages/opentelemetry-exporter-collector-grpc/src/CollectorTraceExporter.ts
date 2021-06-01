@@ -24,7 +24,6 @@ import { CollectorExporterConfigNode, ServiceClientType } from './types';
 import { getEnv } from '@opentelemetry/core';
 import { validateAndNormalizeUrl } from './util';
 
-const DEFAULT_SERVICE_NAME = 'collector-trace-exporter';
 const DEFAULT_COLLECTOR_URL = 'localhost:4317';
 
 /**
@@ -50,10 +49,6 @@ export class CollectorTraceExporter
       : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
       ? validateAndNormalizeUrl(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT)
       : DEFAULT_COLLECTOR_URL;
-  }
-
-  getDefaultServiceName(config: CollectorExporterConfigNode): string {
-    return config.serviceName || DEFAULT_SERVICE_NAME;
   }
 
   getServiceClientType() {
