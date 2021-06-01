@@ -302,7 +302,7 @@ describe('Node SDK', () => {
         });
         const resource: Resource = sdk['_resource'];
         assert.ok(resource);
-        assert.deepStrictEqual(resource, Resource.createTelemetrySDKResource());
+        assert.deepStrictEqual(resource, Resource.empty());
 
         scope.done();
       });
@@ -390,34 +390,6 @@ describe('Node SDK', () => {
             /{\s+'service\.instance\.id':\s+'627cc493',\s+'service\.name':\s+'my-service',\s+'service\.namespace':\s+'default',\s+'service\.version':\s+'0\.0\.1'\s+}\s*/
           )
         );
-      });
-
-      describe('with missing environment variable', () => {
-        beforeEach(() => {
-          delete process.env.OTEL_RESOURCE_ATTRIBUTES;
-        });
-
-        it('prints correct error messages when EnvDetector has no env variable', async () => {
-          const sdk = new NodeSDK({
-            autoDetectResources: true,
-          });
-          const mockedLoggerMethod = Sinon.fake();
-          diag.setLogger(
-            {
-              debug: mockedLoggerMethod,
-            } as any,
-            DiagLogLevel.DEBUG
-          );
-
-          await sdk.detectResources();
-
-          assert.ok(
-            callArgsContains(
-              mockedLoggerMethod,
-              'EnvDetector failed: Environment variable "OTEL_RESOURCE_ATTRIBUTES" is missing.'
-            )
-          );
-        });
       });
 
       describe('with a faulty environment variable', () => {

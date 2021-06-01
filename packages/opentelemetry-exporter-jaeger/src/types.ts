@@ -18,7 +18,6 @@
  * Options for Jaeger configuration
  */
 export interface ExporterConfig {
-  serviceName: string;
   tags?: Tag[];
   host?: string; // default: 'localhost'
   port?: number; // default: 6832
