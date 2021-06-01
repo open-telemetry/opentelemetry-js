@@ -131,7 +131,6 @@ const testCollectorMetricExporter = (params: TestParams) =>
       collectorExporter = new CollectorMetricExporter({
         url: 'grpcs://' + address,
         credentials,
-        serviceName: 'basic-service',
         metadata: params.metadata,
       });
       // Overwrites the start time to make tests consistent
@@ -169,7 +168,6 @@ const testCollectorMetricExporter = (params: TestParams) =>
         // Need to stub/spy on the underlying logger as the 'diag' instance is global
         const spyLoggerWarn = sinon.stub(diag, 'warn');
         collectorExporter = new CollectorMetricExporter({
-          serviceName: 'basic-service',
           url: `http://${address}`,
           headers: {
             foo: 'bar',
@@ -181,7 +179,6 @@ const testCollectorMetricExporter = (params: TestParams) =>
       it('should warn about path in url', () => {
         const spyLoggerWarn = sinon.stub(diag, 'warn');
         collectorExporter = new CollectorMetricExporter({
-          serviceName: 'basic-service',
           url: `http://${address}/v1/metrics`
         });
         const args = spyLoggerWarn.args[0];

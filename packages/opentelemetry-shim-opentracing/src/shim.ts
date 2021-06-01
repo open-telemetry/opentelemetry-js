@@ -96,14 +96,14 @@ export class SpanContextShim extends opentracing.SpanContext {
   /**
    * Returns the trace ID as a string.
    */
-  toTraceId(): string {
+   override toTraceId(): string {
     return this._spanContext.traceId;
   }
 
   /**
    * Returns the span ID as a string.
    */
-  toSpanId(): string {
+   override toSpanId(): string {
     return this._spanContext.spanId;
   }
 
@@ -131,7 +131,7 @@ export class TracerShim extends opentracing.Tracer {
     this._propagators = propagators;
   }
 
-  startSpan(
+  override startSpan(
     name: string,
     options: opentracing.SpanOptions = {}
   ): opentracing.Span {
@@ -156,7 +156,7 @@ export class TracerShim extends opentracing.Tracer {
     return new SpanShim(this, span, baggage);
   }
 
-  _inject(
+  override _inject(
     spanContext: opentracing.SpanContext,
     format: string,
     carrier: unknown
@@ -183,7 +183,7 @@ export class TracerShim extends opentracing.Tracer {
     }
   }
 
-  _extract(format: string, carrier: unknown): opentracing.SpanContext | null {
+  override _extract(format: string, carrier: unknown): opentracing.SpanContext | null {
     if (format === opentracing.FORMAT_BINARY) {
       api.diag.warn('OpentracingShim.extract() does not support FORMAT_BINARY');
       // @todo: Implement binary format
@@ -244,14 +244,14 @@ export class SpanShim extends opentracing.Span {
    *
    * @returns a {@link SpanContextShim} containing the underlying context.
    */
-  context(): opentracing.SpanContext {
+  override context(): opentracing.SpanContext {
     return this._contextShim;
   }
 
   /**
    * Returns the {@link opentracing.Tracer} that created the span.
    */
-  tracer(): opentracing.Tracer {
+  override tracer(): opentracing.Tracer {
     return this._tracerShim;
   }
 
@@ -260,7 +260,7 @@ export class SpanShim extends opentracing.Span {
    *
    * @param name the Span name.
    */
-  setOperationName(name: string): this {
+  override setOperationName(name: string): this {
     this._span.updateName(name);
     return this;
   }
@@ -271,7 +271,7 @@ export class SpanShim extends opentracing.Span {
    *
    * @param finishTime An optional timestamp to explicitly set the span's end time.
    */
-  finish(finishTime?: number): void {
+  override finish(finishTime?: number): void {
     this._span.end(finishTime);
   }
 
@@ -280,7 +280,7 @@ export class SpanShim extends opentracing.Span {
    * @param eventName name of the event.
    * @param payload an arbitrary object to be attached to the event.
    */
-  logEvent(eventName: string, payload?: SpanAttributes): void {
+  override logEvent(eventName: string, payload?: SpanAttributes): void {
     this._span.addEvent(eventName, payload);
   }
 
@@ -288,7 +288,7 @@ export class SpanShim extends opentracing.Span {
    * Logs a set of key value pairs. Since OpenTelemetry only supports events,
    * the KV pairs are used as attributes on an event named "log".
    */
-  log(keyValuePairs: SpanAttributes, _timestamp?: number): this {
+ override log(keyValuePairs: SpanAttributes, _timestamp?: number): this {
     // @todo: Handle timestamp
     this._span.addEvent('log', keyValuePairs);
     return this;
@@ -298,7 +298,7 @@ export class SpanShim extends opentracing.Span {
    * Adds a set of tags to the span.
    * @param keyValueMap set of KV pairs representing tags
    */
-  addTags(keyValueMap: SpanAttributes): this {
+  override addTags(keyValueMap: SpanAttributes): this {
     for (const [key, value] of Object.entries(keyValueMap)) {
       if (this._setErrorAsSpanStatusCode(key, value)) {
         continue;
@@ -316,7 +316,7 @@ export class SpanShim extends opentracing.Span {
    * @param key key for the tag
    * @param value value for the tag
    */
-  setTag(key: string, value: SpanAttributeValue): this {
+  override setTag(key: string, value: SpanAttributeValue): this {
     if (this._setErrorAsSpanStatusCode(key, value)) {
       return this;
     }
@@ -325,11 +325,11 @@ export class SpanShim extends opentracing.Span {
     return this;
   }
 
-  getBaggageItem(key: string): string | undefined {
+  override getBaggageItem(key: string): string | undefined {
     return this._contextShim.getBaggageItem(key);
   }
 
-  setBaggageItem(key: string, value: string): this {
+  override setBaggageItem(key: string, value: string): this {
     this._contextShim.setBaggageItem(key, value);
     return this;
   }

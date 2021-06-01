@@ -57,7 +57,7 @@ export class Meter implements api.Meter {
     const mergedConfig = merge({}, DEFAULT_CONFIG, config);
     this._processor = mergedConfig.processor ?? new UngroupedProcessor();
     this._resource =
-      mergedConfig.resource || Resource.createTelemetrySDKResource();
+      mergedConfig.resource || Resource.empty();
     this._instrumentationLibrary = instrumentationLibrary;
     // start the push controller
     const exporter = mergedConfig.exporter || new NoopExporter();
