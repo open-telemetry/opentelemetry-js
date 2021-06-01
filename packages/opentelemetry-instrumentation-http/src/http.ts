@@ -73,7 +73,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     return this._config;
   }
 
-  setConfig(config: HttpInstrumentationConfig & InstrumentationConfig = {}) {
+  override setConfig(config: HttpInstrumentationConfig & InstrumentationConfig = {}) {
     this._config = Object.assign({}, config);
   }
 
