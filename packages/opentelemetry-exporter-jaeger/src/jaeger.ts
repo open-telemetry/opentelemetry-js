@@ -133,10 +133,8 @@ export class JaegerExporter implements SpanExporter {
   }
 
   private async _append(span: jaegerTypes.ThriftSpan): Promise<number> {
-    const sender = this._getSender(span);
-
     return new Promise((resolve, reject) => {
-      sender.append(span, (count: number, err?: string) => {
+      this._getSender(span).append(span, (count: number, err?: string) => {
         if (err) {
           return reject(new Error(err));
         }
