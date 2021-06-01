@@ -32,7 +32,8 @@
     "lint:examples": "eslint ./examples/**/*.js",
     "lint:examples:fix": "eslint ./examples/**/*.js --fix",
     "lint:markdown": "./node_modules/.bin/markdownlint $(git ls-files '*.md') -i ./CHANGELOG.md",
-    "lint:markdown:fix": "./node_modules/.bin/markdownlint $(git ls-files '*.md') -i ./CHANGELOG.md --fix"
+    "lint:markdown:fix": "./node_modules/.bin/markdownlint $(git ls-files '*.md') -i ./CHANGELOG.md --fix",
+    "reset": "lerna clean -y && rm -rf node_modules && npm i && npm run compile && npm run lint:fix"
   },
   "repository": "open-telemetry/opentelemetry-js",
   "keywords": [
