@@ -14,8 +14,7 @@ module.exports = {
     parser: "@typescript-eslint/parser",
     parserOptions: {
         "project": [
-            "./tsconfig.json",
-            "backwards-compatability/*/tsconfig.json"
+            "./tsconfig.json"
         ]
     },
     ignorePatterns: [
