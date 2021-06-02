@@ -7,7 +7,10 @@ const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const provider = new BasicTracerProvider();
 
 // Configure span processor to send spans to the exporter
-const exporter = new JaegerExporter({ serviceName: 'basic-service' });
+const exporter = new JaegerExporter({
+  serviceName: 'basic-service',
+  endpoint: 'http://localhost:14268/api/traces',
+});
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
