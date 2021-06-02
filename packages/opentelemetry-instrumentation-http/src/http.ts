@@ -308,7 +308,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           this._callResponseHook(span, response);
         }
 
-        context.bind(response);
+        context.bind(context.active(), response);
         diag.debug('outgoingRequest on response()');
         response.on('end', () => {
           diag.debug('outgoingRequest on end()');
@@ -389,8 +389,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         )
       ) {
         return context.with(suppressTracing(context.active()), () => {
-          context.bind(request);
-          context.bind(response);
+          context.bind(context.active(), request);
+          context.bind(context.active(), response);
           return original.apply(this, [event, ...args]);
         });
       }
@@ -419,8 +419,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       return context.with(
         setRPCMetadata(trace.setSpan(ctx, span), rpcMetadata),
         () => {
-          context.bind(request);
-          context.bind(response);
+          context.bind(context.active(), request);
+          context.bind(context.active(), response);
 
           if (instrumentation._getConfig().requestHook) {
             instrumentation._callRequestHook(span, request);
@@ -556,7 +556,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
          */
         const cb = args[args.length - 1];
         if (typeof cb === 'function') {
-          args[args.length - 1] = context.bind(cb, parentContext);
+          args[args.length - 1] = context.bind(parentContext, cb);
         }
 
         const request: http.ClientRequest = safeExecuteInTheMiddle(
@@ -571,7 +571,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         );
 
         diag.debug('%s instrumentation outgoingRequest', component);
-        context.bind(request, parentContext);
+        context.bind(parentContext, request);
         return instrumentation._traceClientRequest(
           component,
           request,

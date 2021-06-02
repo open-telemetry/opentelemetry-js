@@ -51,18 +51,18 @@ export abstract class AbstractAsyncHooksContextManager
 
   abstract disable(): this;
 
-  bind<T>(target: T, context: Context = this.active()): T {
+  bind<T>(context: Context, target: T): T {
     if (target instanceof EventEmitter) {
-      return this._bindEventEmitter(target, context);
+      return this._bindEventEmitter(context, target);
     }
 
     if (typeof target === 'function') {
-      return this._bindFunction(target, context);
+      return this._bindFunction(context, target);
     }
     return target;
   }
 
-  private _bindFunction<T extends Function>(target: T, context: Context): T {
+  private _bindFunction<T extends Function>(context: Context, target: T): T {
     const manager = this;
     const contextWrapper = function (this: never, ...args: unknown[]) {
       return manager.with(context, () => target.apply(this, args));
@@ -85,12 +85,12 @@ export abstract class AbstractAsyncHooksContextManager
    * By default, EventEmitter call their callback with their context, which we do
    * not want, instead we will bind a specific context to all callbacks that
    * go through it.
-   * @param ee EventEmitter an instance of EventEmitter to patch
    * @param context the context we want to bind
+   * @param ee EventEmitter an instance of EventEmitter to patch
    */
   private _bindEventEmitter<T extends EventEmitter>(
-    ee: T,
-    context: Context
+    context: Context,
+    ee: T
   ): T {
     const map = this._getPatchMap(ee);
     if (map !== undefined) return ee;
@@ -180,7 +180,7 @@ export abstract class AbstractAsyncHooksContextManager
         listeners = new WeakMap();
         map[event] = listeners;
       }
-      const patchedListener = contextManager.bind(listener, context);
+      const patchedListener = contextManager.bind(context, listener);
       // store a weak reference of the user listener to ours
       listeners.set(listener, patchedListener);
       return original.call(this, event, patchedListener);
