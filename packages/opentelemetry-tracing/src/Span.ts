@@ -39,7 +39,7 @@ import { ExceptionEventName } from './enums';
 export class Span implements api.Span, ReadableSpan {
   // Below properties are included to implement ReadableSpan for export
   // purposes but are not intended to be written-to directly.
-  readonly spanContext: api.SpanContext;
+  private readonly _spanContext: api.SpanContext;
   readonly kind: api.SpanKind;
   readonly parentSpanId?: string;
   readonly attributes: api.SpanAttributes = {};
@@ -70,7 +70,7 @@ export class Span implements api.Span, ReadableSpan {
     startTime: api.TimeInput = hrTime()
   ) {
     this.name = spanName;
-    this.spanContext = spanContext;
+    this._spanContext = spanContext;
     this.parentSpanId = parentSpanId;
     this.kind = kind;
     this.links = links;
@@ -82,8 +82,8 @@ export class Span implements api.Span, ReadableSpan {
     this._spanProcessor.onStart(this, context);
   }
 
-  context(): api.SpanContext {
-    return this.spanContext;
+  spanContext(): api.SpanContext {
+    return this._spanContext;
   }
 
   setAttribute(key: string, value?: SpanAttributeValue): this;
@@ -229,8 +229,8 @@ export class Span implements api.Span, ReadableSpan {
     if (this._ended) {
       api.diag.warn(
         'Can not execute the operation on ended Span {traceId: %s, spanId: %s}',
-        this.spanContext.traceId,
-        this.spanContext.spanId
+        this._spanContext.traceId,
+        this._spanContext.spanId
       );
     }
     return this._ended;

@@ -114,7 +114,7 @@ export class FetchInstrumentation extends InstrumentationBase<
       {
         startTime: corsPreFlightRequest[web.PerformanceTimingNames.FETCH_START],
       },
-      api.setSpan(api.context.active(), span)
+      api.trace.setSpan(api.context.active(), span)
     );
     web.addSpanNetworkEvents(childSpan, corsPreFlightRequest);
     childSpan.end(
@@ -385,7 +385,7 @@ export class FetchInstrumentation extends InstrumentationBase<
 
         return new Promise((resolve, reject) => {
           return api.context.with(
-            api.setSpan(api.context.active(), createdSpan),
+            api.trace.setSpan(api.context.active(), createdSpan),
             () => {
               plugin._addHeaders(options, url);
               plugin._tasksCount++;
@@ -458,7 +458,7 @@ export class FetchInstrumentation extends InstrumentationBase<
   /**
    * implements enable function
    */
-  enable() {
+  override enable() {
     if (isWrapped(window.fetch)) {
       this._unwrap(window, 'fetch');
       api.diag.debug('removing previous patch for constructor');
@@ -469,7 +469,7 @@ export class FetchInstrumentation extends InstrumentationBase<
   /**
    * implements unpatch function
    */
-  disable() {
+  override disable() {
     this._unwrap(window, 'fetch');
     this._usedResources = new WeakSet<PerformanceResourceTiming>();
   }
