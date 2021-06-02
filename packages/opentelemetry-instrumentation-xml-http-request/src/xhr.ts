@@ -514,7 +514,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   /**
    * implements enable function
    */
-  enable() {
+  override enable() {
     api.diag.debug('applying patch to', this.moduleName, this.version);
 
     if (isWrapped(XMLHttpRequest.prototype.open)) {
@@ -534,7 +534,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   /**
    * implements disable function
    */
-  disable() {
+  override disable() {
     api.diag.debug('removing patch from', this.moduleName, this.version);
 
     this._unwrap(XMLHttpRequest.prototype, 'open');

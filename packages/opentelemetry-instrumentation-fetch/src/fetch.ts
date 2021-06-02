@@ -448,7 +448,7 @@ export class FetchInstrumentation extends InstrumentationBase<
   /**
    * implements enable function
    */
-  enable() {
+  override enable() {
     if (isWrapped(window.fetch)) {
       this._unwrap(window, 'fetch');
       api.diag.debug('removing previous patch for constructor');
@@ -459,7 +459,7 @@ export class FetchInstrumentation extends InstrumentationBase<
   /**
    * implements unpatch function
    */
-  disable() {
+  override disable() {
     this._unwrap(window, 'fetch');
     this._usedResources = new WeakSet<PerformanceResourceTiming>();
   }
