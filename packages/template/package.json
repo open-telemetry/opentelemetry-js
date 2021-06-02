@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/template",
-  "version": "0.19.0",
+  "version": "0.20.0",
   "private": true,
   "publishConfig": {
     "access": "restricted"

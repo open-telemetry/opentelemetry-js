@@ -4,6 +4,108 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.20.0
+
+### :boom: Breaking Change
+
+* `opentelemetry-sdk-node`, `opentelemetry-tracing`
+  * [#2190](https://github.com/open-telemetry/opentelemetry-js/pull/2190) feat: apply spec changes for `TraceParams` ([@weyert](https://github.com/weyert))
+* `opentelemetry-node`, `opentelemetry-propagator-jaeger`, `opentelemetry-shim-opentracing`
+  * [#2148](https://github.com/open-telemetry/opentelemetry-js/pull/2148) chore: renaming jaeger http trace propagator to jaeger propagator ([@obecny](https://github.com/obecny))
+* `opentelemetry-core`, `opentelemetry-instrumentation-grpc`, `opentelemetry-shim-opentracing`, `opentelemetry-tracing`
+  * [#2149](https://github.com/open-telemetry/opentelemetry-js/pull/2149) chore: adding sufix propagator to http baggage and http trace context ([@obecny](https://github.com/obecny))
+
+### :rocket: (Enhancement)
+
+* `opentelemetry-shim-opentracing`
+  * [#2194](https://github.com/open-telemetry/opentelemetry-js/pull/2194) feat(shim-opentracing): update setTag based on new spec ([@vreynolds](https://github.com/vreynolds))
+* `opentelemetry-tracing`
+  * [#2221](https://github.com/open-telemetry/opentelemetry-js/pull/2221) feat: add startActiveSpan method to Tracer ([@naseemkullah](https://github.com/naseemkullah))
+* `opentelemetry-core`, `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`, `opentelemetry-exporter-jaeger`, `opentelemetry-exporter-zipkin`, `opentelemetry-metrics`, `opentelemetry-resources`, `opentelemetry-sdk-node`, `opentelemetry-tracing`
+  * [#2227](https://github.com/open-telemetry/opentelemetry-js/pull/2227) chore: set default service name ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-api-metrics`, `opentelemetry-context-async-hooks`, `opentelemetry-context-zone-peer-dep`, `opentelemetry-context-zone`, `opentelemetry-core`, `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`, `opentelemetry-exporter-jaeger`, `opentelemetry-exporter-prometheus`, `opentelemetry-exporter-zipkin`, `opentelemetry-instrumentation-fetch`, `opentelemetry-instrumentation-grpc`, `opentelemetry-instrumentation-http`, `opentelemetry-instrumentation-xml-http-request`, `opentelemetry-instrumentation`, `opentelemetry-metrics`, `opentelemetry-node`, `opentelemetry-propagator-b3`, `opentelemetry-propagator-jaeger`, `opentelemetry-resource-detector-aws`, `opentelemetry-resource-detector-gcp`, `opentelemetry-resources`, `opentelemetry-sdk-node`, `opentelemetry-shim-opentracing`, `opentelemetry-tracing`, `opentelemetry-web`
+  * [#2225](https://github.com/open-telemetry/opentelemetry-js/pull/2225) chore: upgrading to api ver. 0.20.0 ([@obecny](https://github.com/obecny))
+* `opentelemetry-instrumentation`
+  * [#2224](https://github.com/open-telemetry/opentelemetry-js/pull/2224) feat(opentelemetry-instrumentation): getConfig and setConfig ([@mottibec](https://github.com/mottibec))
+* `opentelemetry-core`, `opentelemetry-instrumentation-http`, `opentelemetry-propagator-b3`, `opentelemetry-propagator-jaeger`, `opentelemetry-tracing`
+  * [#2202](https://github.com/open-telemetry/opentelemetry-js/pull/2202) Move suppress tracing context key to SDK ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-core`, `opentelemetry-tracing`
+  * [#2100](https://github.com/open-telemetry/opentelemetry-js/pull/2100) feat(tracing): allow to configure exporter by environment #1676 ([@vmarchaud](https://github.com/vmarchaud))
+* `opentelemetry-core`, `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`
+  * [#2117](https://github.com/open-telemetry/opentelemetry-js/pull/2117) feat(exporter-collector): support config from env #2099 ([@vmarchaud](https://github.com/vmarchaud))
+* `opentelemetry-exporter-collector`, `opentelemetry-exporter-zipkin`, `opentelemetry-tracing`
+  * [#2183](https://github.com/open-telemetry/opentelemetry-js/pull/2183) chore: removing usage of timed event from api ([@obecny](https://github.com/obecny))
+* Other
+  * [#2195](https://github.com/open-telemetry/opentelemetry-js/pull/2195) fix: remove redundant try-catch from http/https server examples ([@legendecas](https://github.com/legendecas))
+* `opentelemetry-exporter-collector-grpc`
+  * [#2130](https://github.com/open-telemetry/opentelemetry-js/pull/2130) chore: url validation & README to prevent gRPC footguns. ([@lizthegrey](https://github.com/lizthegrey))
+* `opentelemetry-semantic-conventions`
+  * [#2167](https://github.com/open-telemetry/opentelemetry-js/pull/2167) semantic-conventions: include built esm files in package ([@t2t2](https://github.com/t2t2))
+* `opentelemetry-instrumentation-xml-http-request`
+  * [#2134](https://github.com/open-telemetry/opentelemetry-js/pull/2134) feat(instrumentation-xhr): add applyCustomAttributesOnSpan hook ([@mhennoch](https://github.com/mhennoch))
+* `opentelemetry-exporter-prometheus`
+  * [#2122](https://github.com/open-telemetry/opentelemetry-js/pull/2122) feat: add diag warning when metric name is invalid ([@weyert](https://github.com/weyert))
+
+### :bug: (Bug Fix)
+
+* `opentelemetry-exporter-collector-grpc`
+  * [#2214](https://github.com/open-telemetry/opentelemetry-js/pull/2214) chore: fixes after last changes to url ([@obecny](https://github.com/obecny))
+* `opentelemetry-tracing`
+  * [#2185](https://github.com/open-telemetry/opentelemetry-js/pull/2185) fix: use invalid parent for sampler when options.root ([@dyladan](https://github.com/dyladan))
+  * [#2171](https://github.com/open-telemetry/opentelemetry-js/pull/2171) fix: move initialization of const above first use #2170 ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-instrumentation-grpc`
+  * [#2179](https://github.com/open-telemetry/opentelemetry-js/pull/2179) chore(grpc-instrumentation): fix grpc example #2160 ([@vmarchaud](https://github.com/vmarchaud))
+* `opentelemetry-core`
+  * [#2165](https://github.com/open-telemetry/opentelemetry-js/pull/2165) [sampler] treat invalid SpanContext as no SpanContext ([@thisthat](https://github.com/thisthat))
+
+### :books: (Refine Doc)
+
+* `opentelemetry-node`
+  * [#2180](https://github.com/open-telemetry/opentelemetry-js/pull/2180) fix docs typo ([@sbrichardson](https://github.com/sbrichardson))
+* Other
+  * [#2168](https://github.com/open-telemetry/opentelemetry-js/pull/2168) chore: update feature status in readme ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-instrumentation-fetch`, `opentelemetry-instrumentation-grpc`, `opentelemetry-instrumentation-http`, `opentelemetry-instrumentation-xml-http-request`, `opentelemetry-instrumentation`, `opentelemetry-node`, `opentelemetry-sdk-node`, `opentelemetry-web`
+  * [#2127](https://github.com/open-telemetry/opentelemetry-js/pull/2127) chore: prefer use of global TracerProvider/MeterProvider ([@Flarna](https://github.com/Flarna))
+
+### :house: (Internal)
+
+* `opentelemetry-api-metrics`, `opentelemetry-context-async-hooks`, `opentelemetry-context-zone-peer-dep`, `opentelemetry-context-zone`, `opentelemetry-core`, `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`, `opentelemetry-exporter-jaeger`, `opentelemetry-exporter-prometheus`, `opentelemetry-exporter-zipkin`, `opentelemetry-instrumentation-fetch`, `opentelemetry-instrumentation-grpc`, `opentelemetry-instrumentation-http`, `opentelemetry-instrumentation-xml-http-request`, `opentelemetry-instrumentation`, `opentelemetry-metrics`, `opentelemetry-node`, `opentelemetry-propagator-b3`, `opentelemetry-propagator-jaeger`, `opentelemetry-resource-detector-aws`, `opentelemetry-resource-detector-gcp`, `opentelemetry-resources`, `opentelemetry-sdk-node`, `opentelemetry-semantic-conventions`, `opentelemetry-shim-opentracing`, `opentelemetry-tracing`, `opentelemetry-web`, `template`
+  * [#2241](https://github.com/open-telemetry/opentelemetry-js/pull/2241) chore: update typescript to 4.3 and enable noImplicitOverride ([@Flarna](https://github.com/Flarna))
+  * [#2204](https://github.com/open-telemetry/opentelemetry-js/pull/2204) Remove GTS and prettier ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-instrumentation-http`, `opentelemetry-instrumentation`, `opentelemetry-tracing`
+  * [#2229](https://github.com/open-telemetry/opentelemetry-js/pull/2229) chore: remove references to NOOP singletons ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-node`, `opentelemetry-sdk-node`, `opentelemetry-web`
+  * [#2230](https://github.com/open-telemetry/opentelemetry-js/pull/2230) chore: remove references to Noop classes from API ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-api-metrics`, `opentelemetry-context-zone-peer-dep`, `opentelemetry-context-zone`, `opentelemetry-core`, `opentelemetry-exporter-collector`, `opentelemetry-exporter-zipkin`, `opentelemetry-instrumentation-fetch`, `opentelemetry-instrumentation-xml-http-request`, `opentelemetry-instrumentation`, `opentelemetry-propagator-jaeger`, `opentelemetry-tracing`, `opentelemetry-web`
+  * [#2234](https://github.com/open-telemetry/opentelemetry-js/pull/2234) chore: downgrade karma-webpack ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-sdk-node`
+  * [#2219](https://github.com/open-telemetry/opentelemetry-js/pull/2219) fix(opentelemetry-sdk-node): move nock to dev dependencies ([@nflaig](https://github.com/nflaig))
+* `opentelemetry-core`
+  * [#2155](https://github.com/open-telemetry/opentelemetry-js/pull/2155) chore: move tracecontext propagator into trace ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-api-metrics`, `opentelemetry-context-zone-peer-dep`, `opentelemetry-context-zone`, `opentelemetry-core`, `opentelemetry-exporter-collector`, `opentelemetry-exporter-zipkin`, `opentelemetry-instrumentation-fetch`, `opentelemetry-instrumentation-xml-http-request`, `opentelemetry-instrumentation`, `opentelemetry-metrics`, `opentelemetry-propagator-b3`, `opentelemetry-propagator-jaeger`, `opentelemetry-resources`, `opentelemetry-semantic-conventions`, `opentelemetry-tracing`, `opentelemetry-web`, `template`
+  * [#2112](https://github.com/open-telemetry/opentelemetry-js/pull/2112) feat: add ESM builds for packages used in browser ([@t2t2](https://github.com/t2t2))
+
+### Committers: 18
+
+* Bartlomiej Obecny ([@obecny](https://github.com/obecny))
+* Daniel Dyla ([@dyladan](https://github.com/dyladan))
+* Gerhard Stöbich ([@Flarna](https://github.com/Flarna))
+* Giovanni Liva ([@thisthat](https://github.com/thisthat))
+* Liz Fong-Jones ([@lizthegrey](https://github.com/lizthegrey))
+* MartenH ([@mhennoch](https://github.com/mhennoch))
+* Motti Bechhofer ([@mottibec](https://github.com/mottibec))
+* Naseem ([@naseemkullah](https://github.com/naseemkullah))
+* Nico Flaig ([@nflaig](https://github.com/nflaig))
+* Sergey Lanzman ([@sergeylanzman](https://github.com/sergeylanzman))
+* Severin Neumann ([@svrnm](https://github.com/svrnm))
+* Stephen Richardson  ([@sbrichardson](https://github.com/sbrichardson))
+* Valentin Marchaud ([@vmarchaud](https://github.com/vmarchaud))
+* Vera Reynolds ([@vreynolds](https://github.com/vreynolds))
+* Weyert de Boer ([@weyert](https://github.com/weyert))
+* andrew quartey ([@drexler](https://github.com/drexler))
+* legendecas ([@legendecas](https://github.com/legendecas))
+* t2t2 ([@t2t2](https://github.com/t2t2))
+
 ## 0.19.0
 
 ### :boom: Breaking Change

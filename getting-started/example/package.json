@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/getting-started-example",
-  "version": "0.19.0",
+  "version": "0.20.0",
   "description": "This repository provides everything required to follow the OpenTelemetry Getting Started Guide",
   "main": "app.js",
   "scripts": {
