@@ -58,6 +58,10 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 |             | 0.12.x       | 0.11.x                  |
 |             | 0.11.x       | 0.10.x                  |
 
+## Versioning
+
+The current version for each package can be found in the respective `package.json` file for that module. For additional details see the [versioning and stability][spec-versioning] document in the specification.
+
 ## Quick start
 
 ### Application Owner
@@ -434,3 +438,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-contrib-instrumentation-document-load]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web/opentelemetry-instrumentation-document-load
 [otel-contrib-instrumentation-hapi]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-hapi
 [otel-contrib-instrumentation-koa]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-koa
+
+[spec-versioning]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/versioning-and-stability.md
