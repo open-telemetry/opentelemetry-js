@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sdk-node",
-  "version": "0.19.0",
+  "version": "0.20.0",
   "description": "OpenTelemetry SDK for Node.js",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -40,22 +40,22 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/api-metrics": "0.19.0",
-    "@opentelemetry/core": "0.19.0",
-    "@opentelemetry/instrumentation": "0.19.0",
-    "@opentelemetry/metrics": "0.19.0",
-    "@opentelemetry/node": "0.19.0",
-    "@opentelemetry/resource-detector-aws": "0.19.0",
-    "@opentelemetry/resource-detector-gcp": "0.19.0",
-    "@opentelemetry/resources": "0.19.0",
-    "@opentelemetry/tracing": "0.19.0"
+    "@opentelemetry/api-metrics": "0.20.0",
+    "@opentelemetry/core": "0.20.0",
+    "@opentelemetry/instrumentation": "0.20.0",
+    "@opentelemetry/metrics": "0.20.0",
+    "@opentelemetry/node": "0.20.0",
+    "@opentelemetry/resource-detector-aws": "0.20.0",
+    "@opentelemetry/resource-detector-gcp": "0.20.0",
+    "@opentelemetry/resources": "0.20.0",
+    "@opentelemetry/tracing": "0.20.0"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^0.20.0"
   },
   "devDependencies": {
     "@opentelemetry/api": "^0.20.0",
-    "@opentelemetry/context-async-hooks": "0.19.0",
+    "@opentelemetry/context-async-hooks": "0.20.0",
     "@types/mocha": "8.2.2",
     "@types/node": "14.14.43",
     "@types/semver": "7.3.5",
