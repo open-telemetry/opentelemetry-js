@@ -83,7 +83,7 @@
     "@opentelemetry/api": "^0.20.0"
   },
   "dependencies": {
-    "@opentelemetry/semantic-conventions": "^0.20.0",
+    "@opentelemetry/semantic-conventions": "0.20.0",
     "semver": "^7.1.3"
   }
 }

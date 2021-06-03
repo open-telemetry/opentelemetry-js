@@ -74,6 +74,6 @@
     "@opentelemetry/api": "^0.20.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.20.0"
+    "@opentelemetry/core": "0.20.0"
   }
 }
