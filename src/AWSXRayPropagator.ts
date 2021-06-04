@@ -15,6 +15,7 @@
  */
 
 import {
+  trace,
   Context,
   TextMapPropagator,
   SpanContext,
@@ -26,8 +27,6 @@ import {
   isValidTraceId,
   INVALID_TRACEID,
   INVALID_SPANID,
-  getSpanContext,
-  setSpanContext,
   INVALID_SPAN_CONTEXT,
 } from '@opentelemetry/api';
 
@@ -60,7 +59,7 @@ const NOT_SAMPLED = '0';
  */
 export class AWSXRayPropagator implements TextMapPropagator {
   inject(context: Context, carrier: unknown, setter: TextMapSetter) {
-    const spanContext = getSpanContext(context);
+    const spanContext = trace.getSpan(context)?.spanContext();
     if (!spanContext || !isSpanContextValid(spanContext)) return;
 
     const otTraceId = spanContext.traceId;
@@ -82,7 +81,7 @@ export class AWSXRayPropagator implements TextMapPropagator {
     const spanContext = this.getSpanContextFromHeader(carrier, getter);
     if (!isSpanContextValid(spanContext)) return context;
 
-    return setSpanContext(context, spanContext);
+    return trace.setSpan(context, trace.wrapSpanContext(spanContext));
   }
 
   fields(): string[] {
