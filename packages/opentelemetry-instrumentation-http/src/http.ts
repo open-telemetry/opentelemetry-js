@@ -571,7 +571,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         );
 
         diag.debug('%s instrumentation outgoingRequest', component);
-        context.bind(parentContext, cb);
+        context.bind(parentContext, request);
         return instrumentation._traceClientRequest(
           component,
           request,
