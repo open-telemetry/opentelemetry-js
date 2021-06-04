@@ -119,13 +119,19 @@ describe('NoopContextManager', () => {
   describe('.bind()', () => {
     it('should return the same target (when enabled)', () => {
       const test = { a: 1 };
-      assert.deepStrictEqual(contextManager.bind(test), test);
+      assert.deepStrictEqual(
+        contextManager.bind(contextManager.active(), test),
+        test
+      );
     });
 
     it('should return the same target (when disabled)', () => {
       contextManager.disable();
       const test = { a: 1 };
-      assert.deepStrictEqual(contextManager.bind(test), test);
+      assert.deepStrictEqual(
+        contextManager.bind(contextManager.active(), test),
+        test
+      );
       contextManager.enable();
     });
   });

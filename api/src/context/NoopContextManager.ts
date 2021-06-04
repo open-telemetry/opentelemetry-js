@@ -31,7 +31,7 @@ export class NoopContextManager implements types.ContextManager {
     return fn.call(thisArg, ...args);
   }
 
-  bind<T>(target: T, _context?: types.Context): T {
+  bind<T>(_context: types.Context, target: T): T {
     return target;
   }
 
