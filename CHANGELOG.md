@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.21.0
+
+### :boom: Breaking Change
+
+* [#78](https://github.com/open-telemetry/opentelemetry-js-api/pull/78) feat: unify signatures of `with` and `bind` ([@Rauno56](https://github.com/Rauno56))
+* [#46](https://github.com/open-telemetry/opentelemetry-js-api/pull/46) chore: do not export singletons ([@dyladan](https://github.com/dyladan))
+
+### :rocket: Enhancement
+
+* [#81](https://github.com/open-telemetry/opentelemetry-js-api/pull/81) chore: function overloads implementation of startActiveSpan in noop t… ([@naseemkullah](https://github.com/naseemkullah))
+
+### :house: Internal
+
+* [#84](https://github.com/open-telemetry/opentelemetry-js-api/pull/84) chore: remove unused backwards compatibility folder ([@Flarna](https://github.com/Flarna))
+* [#85](https://github.com/open-telemetry/opentelemetry-js-api/pull/85) chore: add node:16 to the test matrix ([@Rauno56](https://github.com/Rauno56))
+* [#63](https://github.com/open-telemetry/opentelemetry-js-api/pull/63) feat: debug log global registrations and logger overwrites ([@Rauno56](https://github.com/Rauno56))
+* [#75](https://github.com/open-telemetry/opentelemetry-js-api/pull/75) Add CodeQL Security Scan ([@xukaren](https://github.com/xukaren))
+* [#79](https://github.com/open-telemetry/opentelemetry-js-api/pull/79) chore: fix eslint config ([@Rauno56](https://github.com/Rauno56))
+
+### Committers: 5
+
+* Daniel Dyla ([@dyladan](https://github.com/dyladan))
+* Gerhard Stöbich ([@Flarna](https://github.com/Flarna))
+* Karen Xu ([@xukaren](https://github.com/xukaren))
+* Naseem ([@naseemkullah](https://github.com/naseemkullah))
+* Rauno Viskus ([@Rauno56](https://github.com/Rauno56))
+
 ## 0.20.0
 
 ### :rocket: Enhancement
