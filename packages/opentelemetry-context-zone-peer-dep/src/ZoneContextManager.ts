@@ -153,7 +153,7 @@ export class ZoneContextManager implements ContextManager {
         listeners = new WeakMap();
         target.__ot_listeners[event] = listeners;
       }
-      const patchedListener = contextManager.bind(listener, context);
+      const patchedListener = contextManager.bind(context, listener);
       // store a weak reference of the user listener to ours
       listeners.set(listener, patchedListener);
       return original.call(this, event, patchedListener, opts);
@@ -205,7 +205,7 @@ export class ZoneContextManager implements ContextManager {
    * @param target
    * @param context A context (span) to be bind to target
    */
-  bind<T>(target: T | TargetWithEvents, context: Context): T {
+  bind<T>(context: Context, target: T | TargetWithEvents): T {
     // if no specific context to propagate is given, we use the current one
     if (context === undefined) {
       context = this.active();

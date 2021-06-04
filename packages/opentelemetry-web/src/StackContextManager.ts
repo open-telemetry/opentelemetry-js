@@ -65,7 +65,7 @@ export class StackContextManager implements ContextManager {
    * @param target
    * @param context
    */
-  bind<T>(target: T, context = ROOT_CONTEXT): T {
+  bind<T>(context: Context, target: T): T {
     // if no specific context to propagate is given, we use the current one
     if (context === undefined) {
       context = this.active();

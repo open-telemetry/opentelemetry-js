@@ -51,7 +51,7 @@ export abstract class AbstractAsyncHooksContextManager
 
   abstract disable(): this;
 
-  bind<T>(target: T, context: Context = this.active()): T {
+  bind<T>(context: Context, target: T): T {
     if (target instanceof EventEmitter) {
       return this._bindEventEmitter(target, context);
     }
@@ -180,7 +180,7 @@ export abstract class AbstractAsyncHooksContextManager
         listeners = new WeakMap();
         map[event] = listeners;
       }
-      const patchedListener = contextManager.bind(listener, context);
+      const patchedListener = contextManager.bind(context, listener);
       // store a weak reference of the user listener to ours
       listeners.set(listener, patchedListener);
       return original.call(this, event, patchedListener);
