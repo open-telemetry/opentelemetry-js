@@ -29,7 +29,7 @@ import {
 import { suppressTracing } from '@opentelemetry/core';
 import type * as http from 'http';
 import type * as https from 'https';
-import { Socket } from 'net';
+import type { Socket } from 'net';
 import * as semver from 'semver';
 import * as url from 'url';
 import {
@@ -56,7 +56,7 @@ import { RPCMetadata, RPCType, setRPCMetadata } from '@opentelemetry/core';
 /**
  * Http instrumentation instrumentation for Opentelemetry
  */
-export class HttpInstrumentation extends InstrumentationBase<Http> {
+export class HttpInstrumentation extends InstrumentationBase {
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span> = new WeakSet<Span>();
   private readonly _version = process.versions.node;
@@ -77,7 +77,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     this._config = Object.assign({}, config);
   }
 
-  init() {
+  // use InstrumentationNodeModuleDefinition<any>[] here to avoid leaking http types
+  protected init(): InstrumentationNodeModuleDefinition<any>[] {
     return [this._getHttpsInstrumentation(), this._getHttpInstrumentation()];
   }
 
@@ -170,7 +171,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   /**
    * Creates spans for incoming requests, restoring spans' context if applied.
    */
-  protected _getPatchIncomingRequestFunction(component: 'http' | 'https') {
+   private _getPatchIncomingRequestFunction(component: 'http' | 'https') {
     return (original: (event: string, ...args: unknown[]) => boolean) => {
       return this._incomingRequestFunction(component, original);
     };
@@ -180,13 +181,13 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
    * Creates spans for outgoing requests, sending spans' context for distributed
    * tracing.
    */
-  protected _getPatchOutgoingRequestFunction(component: 'http' | 'https') {
+  private _getPatchOutgoingRequestFunction(component: 'http' | 'https') {
     return (original: Func<http.ClientRequest>): Func<http.ClientRequest> => {
       return this._outgoingRequestFunction(component, original);
     };
   }
 
-  protected _getPatchOutgoingGetFunction(
+  private _getPatchOutgoingGetFunction(
     clientRequest: (
       options: http.RequestOptions | string | url.URL,
       ...args: HttpRequestArgs

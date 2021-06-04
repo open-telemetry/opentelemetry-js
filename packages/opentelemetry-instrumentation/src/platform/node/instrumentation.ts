@@ -25,10 +25,9 @@ import { diag } from '@opentelemetry/api';
 /**
  * Base abstract class for instrumenting node plugins
  */
-export abstract class InstrumentationBase<T = any>
-  extends InstrumentationAbstract
+export abstract class InstrumentationBase extends InstrumentationAbstract
   implements types.Instrumentation {
-  private _modules: InstrumentationModuleDefinition<T>[];
+  private _modules: InstrumentationModuleDefinition<unknown>[];
   private _hooks: RequireInTheMiddle.Hooked[] = [];
   private _enabled = false;
 
@@ -45,7 +44,7 @@ export abstract class InstrumentationBase<T = any>
       modules = [modules];
     }
 
-    this._modules = (modules as InstrumentationModuleDefinition<T>[]) || [];
+    this._modules = (modules as InstrumentationModuleDefinition<unknown>[]) || [];
 
     if (this._modules.length === 0) {
       diag.warn(
@@ -131,9 +130,7 @@ export abstract class InstrumentationBase<T = any>
           { internals: true },
           (exports, name, baseDir) => {
             return this._onRequire<typeof exports>(
-              (module as unknown) as InstrumentationModuleDefinition<
-                typeof exports
-              >,
+              module as InstrumentationModuleDefinition<typeof exports>,
               exports,
               name,
               baseDir

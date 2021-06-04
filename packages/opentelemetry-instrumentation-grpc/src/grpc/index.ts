@@ -52,9 +52,7 @@ import { AttributeNames } from '../enums/AttributeNames';
  */
 let grpcClient: typeof grpcTypes;
 
-export class GrpcNativeInstrumentation extends InstrumentationBase<
-  typeof grpcTypes
-> {
+export class GrpcNativeInstrumentation extends InstrumentationBase {
   constructor(
     protected override _config: GrpcInstrumentationConfig & InstrumentationConfig = {},
     name: string,
@@ -69,7 +67,8 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
     this._config = Object.assign({}, config);
   }
 
-  init() {
+  // use InstrumentationNodeModuleDefinition<any>[] to avoid leaking grpc types
+  protected init(): InstrumentationNodeModuleDefinition<any>[] {
     return [
       new InstrumentationNodeModuleDefinition<typeof grpcTypes>(
         'grpc',

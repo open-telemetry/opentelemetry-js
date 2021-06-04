@@ -70,7 +70,8 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
     this._config = Object.assign({}, config);
   }
 
-  init() {
+  // use InstrumentationNodeModuleDefinition<any>[] to avoid leaking grpc types
+  protected init(): InstrumentationNodeModuleDefinition<any>[] {
     return [
       new InstrumentationNodeModuleDefinition<typeof grpcJs>(
         '@grpc/grpc-js',

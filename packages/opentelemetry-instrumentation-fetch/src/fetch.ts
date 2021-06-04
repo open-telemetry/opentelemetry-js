@@ -77,9 +77,7 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
 /**
  * This class represents a fetch plugin for auto instrumentation
  */
-export class FetchInstrumentation extends InstrumentationBase<
-  Promise<Response>
-> {
+export class FetchInstrumentation extends InstrumentationBase {
   readonly component: string = 'fetch';
   readonly version: string = VERSION;
   moduleName = this.component;
@@ -94,7 +92,7 @@ export class FetchInstrumentation extends InstrumentationBase<
     );
   }
 
-  init() {}
+  protected init() {}
 
   private _getConfig(): FetchInstrumentationConfig {
     return this._config;
