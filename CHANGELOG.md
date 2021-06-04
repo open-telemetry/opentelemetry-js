@@ -45,6 +45,8 @@ All notable changes to this project will be documented in this file.
   * [#2134](https://github.com/open-telemetry/opentelemetry-js/pull/2134) feat(instrumentation-xhr): add applyCustomAttributesOnSpan hook ([@mhennoch](https://github.com/mhennoch))
 * `opentelemetry-exporter-prometheus`
   * [#2122](https://github.com/open-telemetry/opentelemetry-js/pull/2122) feat: add diag warning when metric name is invalid ([@weyert](https://github.com/weyert))
+* `opentelemetry-api-metrics`, `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`, `opentelemetry-metrics`
+  * [#2118](https://github.com/open-telemetry/opentelemetry-js/pull/2118) chore(deps): support cumulative, delta, and pass-through exporters ([@sergeylanzman](https://github.com/sergeylanzman))
 
 ### :bug: (Bug Fix)
 
