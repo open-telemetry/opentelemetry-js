@@ -202,8 +202,9 @@ export class ZoneContextManager implements ContextManager {
 
   /**
    * Binds a the certain context or the active one to the target function and then returns the target
-   * @param target
    * @param context A context (span) to be bind to target
+   * @param target a function or event emitter. When target or one of its callbacks is called,
+   *  the provided context will be used as the active context for the duration of the call.
    */
   bind<T>(context: Context, target: T | TargetWithEvents): T {
     // if no specific context to propagate is given, we use the current one

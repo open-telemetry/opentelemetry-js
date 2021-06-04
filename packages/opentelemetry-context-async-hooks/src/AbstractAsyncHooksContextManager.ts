@@ -51,6 +51,12 @@ export abstract class AbstractAsyncHooksContextManager
 
   abstract disable(): this;
 
+  /**
+   * Binds a the certain context or the active one to the target function and then returns the target
+   * @param context A context (span) to be bind to target
+   * @param target a function or event emitter. When target or one of its callbacks is called,
+   *  the provided context will be used as the active context for the duration of the call.
+   */
   bind<T>(context: Context, target: T): T {
     if (target instanceof EventEmitter) {
       return this._bindEventEmitter(target, context);
