@@ -105,9 +105,12 @@ Because the npm installer and node module resolution algorithm could potentially
 
 ## Upgrade Guidelines
 
-### 1.0.0-rc.1 to x
+### 0.20.0 to 0.21.0
 
-### 1.0.0-rc.0 to 1.0.0-rc.1
+- [#78](https://github.com/open-telemetry/opentelemetry-js-api/issues/78) `api.context.bind` arguments reversed and `context` is now a required argument.
+- [#46](https://github.com/open-telemetry/opentelemetry-js-api/issues/46) Noop classes and singletons are no longer exported. To create a noop span it is recommended to use `api.trace.wrapSpanContext` with `INVALID_SPAN_CONTEXT` instead of using the `NOOP_TRACER`.
+
+### 1.0.0-rc.3 to 0.20.0
 
 - Removing `TimedEvent` which was not part of spec
 - `HttpBaggage` renamed to `HttpBaggagePropagator`
