@@ -251,46 +251,48 @@ describe('ZoneContextManager', () => {
       const ctx = ROOT_CONTEXT.setValue(key1, obj1);
       obj1.title = 'a2';
       const obj2 = new Obj('b1');
-      const wrapper: any = contextManager.bind(obj2.getTitle, ctx);
+      const wrapper: any = contextManager.bind(ctx, obj2.getTitle);
       assert.ok(wrapper(), 'a2');
     });
 
     it('should return the same target (when enabled)', () => {
       const test = { a: 1 };
-      assert.deepStrictEqual(contextManager.bind(test, ROOT_CONTEXT), test);
+      assert.deepStrictEqual(contextManager.bind(ROOT_CONTEXT, test), test);
     });
 
     it('should return the same target (when disabled)', () => {
       contextManager.disable();
       const test = { a: 1 };
-      assert.deepStrictEqual(contextManager.bind(test, ROOT_CONTEXT), test);
+      assert.deepStrictEqual(contextManager.bind(ROOT_CONTEXT, test), test);
       contextManager.enable();
     });
 
     it('should return current context (when enabled)', done => {
       const context = ROOT_CONTEXT.setValue(key1, { a: 1 });
-      const fn: any = contextManager.bind(() => {
+      const fn: any = contextManager.bind(
+        context,
+        () => {
         assert.strictEqual(
           contextManager.active(),
           context,
           'should have context'
         );
         return done();
-      }, context);
+      });
       fn();
     });
 
     it('should return root context (when disabled)', done => {
       contextManager.disable();
       const context = ROOT_CONTEXT.setValue(key1, { a: 1 });
-      const fn: any = contextManager.bind(() => {
+      const fn: any = contextManager.bind(context, () => {
         assert.strictEqual(
           contextManager.active(),
           ROOT_CONTEXT,
           'should have context'
         );
         return done();
-      }, context);
+      });
       fn();
     });
 
@@ -298,7 +300,7 @@ describe('ZoneContextManager', () => {
       const ctx1 = ROOT_CONTEXT.setValue(key1, 1);
       const element = document.createElement('div');
 
-      contextManager.bind(element, ctx1);
+      contextManager.bind(ctx1, element);
 
       element.addEventListener('click', () => {
         assert.strictEqual(contextManager.active(), ctx1);
@@ -322,7 +324,7 @@ describe('ZoneContextManager', () => {
       const ctx1 = ROOT_CONTEXT.setValue(key1, 1);
       const element = document.createElement('div');
 
-      contextManager.bind(element, ctx1);
+      contextManager.bind(ctx1, element);
 
       element.addEventListener('click', () => {
         assert.strictEqual(contextManager.active(), ctx1);
