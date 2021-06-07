@@ -57,7 +57,7 @@ jobs:
   browser-tests:
     runs-on: ubuntu-latest
     container:
-      image: circleci/node:12-browsers
+      image: circleci/node:14-browsers
     env:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
@@ -84,7 +84,6 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           npm install --ignore-scripts
-          chown -R 1001:121 "/github/home/.npm" # fix npm cache permissions for npm v7
           npx lerna bootstrap --no-ci
           npm run compile
 
