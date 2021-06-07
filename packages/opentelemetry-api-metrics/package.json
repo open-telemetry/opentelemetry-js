@@ -53,10 +53,10 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^0.20.0"
+    "@opentelemetry/api": "^0.21.0"
   },
   "devDependencies": {
-    "@opentelemetry/api": "^0.20.0",
+    "@opentelemetry/api": "^0.21.0",
     "@types/mocha": "8.2.2",
     "@types/node": "14.14.43",
     "@types/webpack-env": "1.16.0",
