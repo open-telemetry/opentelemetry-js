@@ -94,13 +94,13 @@ describe('API', () => {
     });
 
     class TestTracer extends NoopTracer {
-      startSpan(name: string, options?: SpanOptions): Span {
+      override startSpan(name: string, options?: SpanOptions): Span {
         return dummySpan;
       }
     }
 
     class TestTracerProvider extends NoopTracerProvider {
-      getTracer(_name: string, version?: string) {
+      override getTracer(_name: string, version?: string) {
         return new TestTracer();
       }
     }

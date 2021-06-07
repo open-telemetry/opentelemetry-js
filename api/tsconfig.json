@@ -10,6 +10,7 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
+    "noImplicitOverride": true,
     "outDir": "build",
     "pretty": true,
     "rootDir": ".",
