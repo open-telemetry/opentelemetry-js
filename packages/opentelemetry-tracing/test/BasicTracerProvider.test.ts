@@ -225,7 +225,7 @@ describe('BasicTracerProvider', () => {
 
     describe('exporter', () => {
       class CustomTracerProvider extends BasicTracerProvider {
-        protected _getSpanExporter(name: string): SpanExporter | undefined {
+        protected override _getSpanExporter(name: string): SpanExporter | undefined {
           return name === 'memory'
             ? new InMemorySpanExporter()
             : BasicTracerProvider._registeredExporters.get(name)?.();
@@ -505,7 +505,7 @@ describe('BasicTracerProvider', () => {
         assert.deepStrictEqual(trace.getSpan(context.active()), undefined);
         return done();
       };
-      const patchedFn = context.bind(fn, trace.setSpan(context.active(), span));
+      const patchedFn = context.bind(trace.setSpan(context.active(), span), fn);
       return patchedFn();
     });
   });

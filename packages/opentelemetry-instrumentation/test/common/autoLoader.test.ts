@@ -29,8 +29,8 @@ class FooInstrumentation extends InstrumentationBase {
   init() {
     return [];
   }
-  enable() {}
-  disable() {}
+  override enable() {}
+  override disable() {}
 }
 
 describe('autoLoader', () => {

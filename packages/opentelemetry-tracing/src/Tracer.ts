@@ -54,46 +54,6 @@ export class Tracer implements api.Tracer {
     this.instrumentationLibrary = instrumentationLibrary;
   }
 
-  startActiveSpan<F extends (span: api.Span) => ReturnType<F>>(
-    name: string,
-    arg2: F | api.SpanOptions,
-    arg3?: F | api.Context,
-    arg4?: F
-  ): ReturnType<F> | undefined {
-    let fn: F | undefined,
-      options: api.SpanOptions | undefined,
-      activeContext: api.Context | undefined;
-
-    if (arguments.length === 2 && typeof arg2 === 'function') {
-      fn = arg2;
-    } else if (
-      arguments.length === 3 &&
-      typeof arg2 === 'object' &&
-      typeof arg3 === 'function'
-    ) {
-      options = arg2;
-      fn = arg3;
-    } else if (
-      arguments.length === 4 &&
-      typeof arg2 === 'object' &&
-      typeof arg3 === 'object' &&
-      typeof arg4 === 'function'
-    ) {
-      options = arg2;
-      activeContext = arg3;
-      fn = arg4;
-    }
-
-    const parentContext = activeContext ?? api.context.active();
-    const span = this.startSpan(name, options, parentContext);
-    const contextWithSpanSet = api.trace.setSpan(parentContext, span);
-
-    if (fn) {
-      return api.context.with(contextWithSpanSet, fn, undefined, span);
-    }
-    return;
-  }
-
   /**
    * Starts a new Span or returns the default NoopSpan based on the sampling
    * decision.
@@ -161,6 +121,94 @@ export class Tracer implements api.Tracer {
     // Set default attributes
     span.setAttributes(Object.assign(attributes, samplingResult.attributes));
     return span;
+  }
+
+  /**
+   * Starts a new {@link Span} and calls the given function passing it the
+   * created span as first argument.
+   * Additionally the new span gets set in context and this context is activated
+   * for the duration of the function call.
+   *
+   * @param name The name of the span
+   * @param [options] SpanOptions used for span creation
+   * @param [context] Context to use to extract parent
+   * @param fn function called in the context of the span and receives the newly created span as an argument
+   * @returns return value of fn
+   * @example
+   *   const something = tracer.startActiveSpan('op', span => {
+   *     try {
+   *       do some work
+   *       span.setStatus({code: SpanStatusCode.OK});
+   *       return something;
+   *     } catch (err) {
+   *       span.setStatus({
+   *         code: SpanStatusCode.ERROR,
+   *         message: err.message,
+   *       });
+   *       throw err;
+   *     } finally {
+   *       span.end();
+   *     }
+   *   });
+   * @example
+   *   const span = tracer.startActiveSpan('op', span => {
+   *     try {
+   *       do some work
+   *       return span;
+   *     } catch (err) {
+   *       span.setStatus({
+   *         code: SpanStatusCode.ERROR,
+   *         message: err.message,
+   *       });
+   *       throw err;
+   *     }
+   *   });
+   *   do some more work
+   *   span.end();
+   */
+  startActiveSpan<F extends (span: api.Span) => ReturnType<F>>(
+    name: string,
+    fn: F
+  ): ReturnType<F>;
+  startActiveSpan<F extends (span: api.Span) => ReturnType<F>>(
+    name: string,
+    opts: api.SpanOptions,
+    fn: F
+  ): ReturnType<F>;
+  startActiveSpan<F extends (span: api.Span) => ReturnType<F>>(
+    name: string,
+    opts: api.SpanOptions,
+    ctx: api.Context,
+    fn: F
+  ): ReturnType<F>;
+  startActiveSpan<F extends (span: api.Span) => ReturnType<F>>(
+    name: string,
+    arg2?: F | api.SpanOptions,
+    arg3?: F | api.Context,
+    arg4?: F
+  ): ReturnType<F> | undefined {
+    let opts: api.SpanOptions | undefined;
+    let ctx: api.Context | undefined;
+    let fn: F;
+
+    if (arguments.length < 2) {
+      return;
+    } else if (arguments.length === 2) {
+      fn = arg2 as F;
+    } else if (arguments.length === 3) {
+      opts = arg2 as api.SpanOptions | undefined;
+      fn = arg3 as F;
+    } else {
+      opts = arg2 as api.SpanOptions | undefined;
+      ctx = arg3 as api.Context | undefined;
+      fn = arg4 as F;
+    }
+
+    const parentContext = ctx ?? api.context.active();
+    const span = this.startSpan(name, opts, parentContext);
+    const contextWithSpanSet = api.trace.setSpan(parentContext, span);
+
+    return api.context.with(contextWithSpanSet, fn, undefined, span);
   }
 
   /** Returns the active {@link SpanLimits}. */

@@ -29,8 +29,8 @@ class TestInstrumentation extends InstrumentationBase {
   constructor(config: TestInstrumentationConfig & InstrumentationConfig = {}) {
     super('test', '1.0.0', Object.assign({}, config));
   }
-  enable() {}
-  disable() {}
+  override enable() {}
+  override disable() {}
   init() {}
 }
 
@@ -56,7 +56,7 @@ describe('BaseInstrumentation', () => {
     it('should enable instrumentation by default', () => {
       let called = false;
       class TestInstrumentation2 extends TestInstrumentation {
-        enable() {
+        override enable() {
           called = true;
         }
       }

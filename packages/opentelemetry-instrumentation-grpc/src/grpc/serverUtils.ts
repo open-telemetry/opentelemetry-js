@@ -71,7 +71,7 @@ export const clientStreamAndUnaryHandler = function <RequestType, ResponseType>(
     return callback(err, value, trailer, flags);
   }
 
-  context.bind(call);
+  context.bind(context.active(), call);
   return (original as Function).call(self, call, patchedCallback);
 };
 
@@ -89,7 +89,7 @@ export const serverStreamAndBidiHandler = function <RequestType, ResponseType>(
     }
   };
 
-  context.bind(call);
+  context.bind(context.active(), call);
   call.on('finish', () => {
     span.setStatus(_grpcStatusCodeToSpanStatus(call.status.code));
     span.setAttribute(
