@@ -50,11 +50,9 @@ describe('BatchSpanProcessorBase', () => {
     scheduledDelayMillis: 2500,
   };
   let exporter: InMemorySpanExporter;
-  let onInitSpy: sinon.SinonStub;
 
   beforeEach(() => {
     exporter = new InMemorySpanExporter();
-    onInitSpy = sinon.stub(BatchSpanProcessor.prototype, 'onInit');
   });
 
   afterEach(() => {
@@ -79,11 +77,6 @@ describe('BatchSpanProcessorBase', () => {
       const processor = new BatchSpanProcessor(exporter, {});
       assert.ok(processor instanceof BatchSpanProcessor);
       processor.shutdown();
-    });
-
-    it('should call onInit', () => {
-      new BatchSpanProcessor(exporter, defaultBufferConfig);
-      assert.deepStrictEqual(onInitSpy.args, [[defaultBufferConfig]]);
     });
 
     it('should read defaults from environment', () => {

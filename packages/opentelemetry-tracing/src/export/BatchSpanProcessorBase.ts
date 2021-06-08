@@ -61,8 +61,6 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
       typeof config?.exportTimeoutMillis === 'number'
         ? config.exportTimeoutMillis
         : env.OTEL_BSP_EXPORT_TIMEOUT;
-
-    this.onInit(config);
   }
 
   forceFlush(): Promise<void> {
@@ -196,6 +194,5 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
     }
   }
 
-  abstract onInit(config?: T): void;
-  abstract onShutdown(): void;
+  protected abstract onShutdown(): void;
 }

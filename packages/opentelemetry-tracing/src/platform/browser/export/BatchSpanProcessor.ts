@@ -15,12 +15,18 @@
  */
 
 import { BatchSpanProcessorBase } from '../../../export/BatchSpanProcessorBase';
+import { SpanExporter } from '../../../export/SpanExporter';
 import { BatchSpanProcessorBrowserConfig } from '../../../types';
 
 export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcessorBrowserConfig> {
   private _visibilityChangeListener?: () => void
 
-  onInit(config?: BatchSpanProcessorBrowserConfig): void {
+  constructor(_exporter: SpanExporter, config?: BatchSpanProcessorBrowserConfig) {
+    super(_exporter, config)
+    this.onInit(config)
+  }
+
+  private onInit(config?: BatchSpanProcessorBrowserConfig): void {
     if (config?.disableAutoFlushOnDocumentHide !== true && document != null) {
       this._visibilityChangeListener = () => {
         if (document.visibilityState === 'hidden') {
@@ -31,7 +37,7 @@ export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcesso
     }
   }
 
-  onShutdown(): void {
+  protected onShutdown(): void {
     if (this._visibilityChangeListener) {
       document.removeEventListener('visibilitychange', this._visibilityChangeListener);
     }

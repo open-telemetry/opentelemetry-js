@@ -36,8 +36,7 @@ describe('BatchSpanProcessor - web', () => {
     visibilityChangeEvent = new Event('visibilitychange');
   });
 
-  afterEach(() => {
-    processor.onShutdown();
+  afterEach(async () => {
     sinon.restore();
   });
 
