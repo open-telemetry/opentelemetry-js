@@ -26,6 +26,7 @@ describe('BatchSpanProcessor - web', () => {
   let processor: BatchSpanProcessor;
   let forceFlushSpy: sinon.SinonStub;
   let visibilityChangeEvent: Event;
+  let pageHideEvent: Event
 
   beforeEach(() => {
     sinon.replaceGetter(document, 'visibilityState', () => visibilityState);
@@ -34,6 +35,7 @@ describe('BatchSpanProcessor - web', () => {
     processor = new BatchSpanProcessor(exporter, {});
     forceFlushSpy = sinon.stub(processor, 'forceFlush');
     visibilityChangeEvent = new Event('visibilitychange');
+    pageHideEvent = new Event('pagehide');
   });
 
   afterEach(async () => {
@@ -41,40 +43,51 @@ describe('BatchSpanProcessor - web', () => {
   });
 
   describe('when document becomes hidden', () => {
-    it('should force flush spans', () => {
-      assert.strictEqual(forceFlushSpy.callCount, 0);
-      visibilityState = 'hidden';
-      document.dispatchEvent(visibilityChangeEvent);
-      assert.strictEqual(forceFlushSpy.callCount, 1);
-    });
-
-    describe('AND shutdown has been called', () => {
-      it('should NOT force flush spans', async () => {
+    const testDocumentHide = (hideDocument: () => void) => {
+      it('should force flush spans', () => {
         assert.strictEqual(forceFlushSpy.callCount, 0);
-        await processor.shutdown();
-        visibilityState = 'hidden';
-        document.dispatchEvent(visibilityChangeEvent);
-        assert.strictEqual(forceFlushSpy.callCount, 0);
-      });
-    })
-
-    describe('AND disableAutoFlushOnDocumentHide configuration option', () => {
-      it('set to false should force flush spans', () => {
-        processor = new BatchSpanProcessor(exporter, { disableAutoFlushOnDocumentHide: false });
-        forceFlushSpy = sinon.stub(processor, 'forceFlush');
-        assert.strictEqual(forceFlushSpy.callCount, 0);
-        visibilityState = 'hidden';
-        document.dispatchEvent(visibilityChangeEvent);
+        hideDocument()
         assert.strictEqual(forceFlushSpy.callCount, 1);
+      });
+
+      describe('AND shutdown has been called', () => {
+        it('should NOT force flush spans', async () => {
+          assert.strictEqual(forceFlushSpy.callCount, 0);
+          await processor.shutdown();
+          hideDocument()
+          assert.strictEqual(forceFlushSpy.callCount, 0);
+        });
       })
 
-      it('set to true should NOT force flush spans', () => {
-        processor = new BatchSpanProcessor(exporter, { disableAutoFlushOnDocumentHide: true });
-        forceFlushSpy = sinon.stub(processor, 'forceFlush');
-        assert.strictEqual(forceFlushSpy.callCount, 0);
+      describe('AND disableAutoFlushOnDocumentHide configuration option', () => {
+        it('set to false should force flush spans', () => {
+          processor = new BatchSpanProcessor(exporter, { disableAutoFlushOnDocumentHide: false });
+          forceFlushSpy = sinon.stub(processor, 'forceFlush');
+          assert.strictEqual(forceFlushSpy.callCount, 0);
+          hideDocument()
+          assert.strictEqual(forceFlushSpy.callCount, 1);
+        })
+
+        it('set to true should NOT force flush spans', () => {
+          processor = new BatchSpanProcessor(exporter, { disableAutoFlushOnDocumentHide: true });
+          forceFlushSpy = sinon.stub(processor, 'forceFlush');
+          assert.strictEqual(forceFlushSpy.callCount, 0);
+          hideDocument()
+          assert.strictEqual(forceFlushSpy.callCount, 0);
+        })
+      })
+    }
+
+    describe('by the visibilitychange event', () => {
+      testDocumentHide(() => {
         visibilityState = 'hidden';
         document.dispatchEvent(visibilityChangeEvent);
-        assert.strictEqual(forceFlushSpy.callCount, 0);
+      })
+    })
+
+    describe('by the pagehide event', () => {
+      testDocumentHide(() => {
+        document.dispatchEvent(pageHideEvent);
       })
     })
   })
