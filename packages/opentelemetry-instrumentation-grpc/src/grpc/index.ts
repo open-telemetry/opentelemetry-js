@@ -146,7 +146,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
   private _patchServer(grpcModule: typeof grpcTypes) {
     const instrumentation = this;
     return (originalRegister: typeof grpcTypes.Server.prototype.register) => {
-      this._diag.debug('patched gRPC server');
+      instrumentation._diag.debug('patched gRPC server');
 
       return function register<RequestType, ResponseType>(
         this: grpcTypes.Server & { handlers: any },
@@ -190,7 +190,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
                 kind: SpanKind.SERVER,
               };
 
-              this._diag.debug('patch func: %s', JSON.stringify(spanOptions));
+              instrumentation._diag.debug('patch func: %s', JSON.stringify(spanOptions));
 
               context.with(
                 propagation.extract(context.active(), call.metadata, {
@@ -242,7 +242,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
   private _patchClient() {
     const instrumentation = this;
     return (original: typeof grpcTypes.makeGenericClientConstructor): never => {
-      this._diag.debug('patching client');
+      instrumentation._diag.debug('patching client');
       return function makeClientConstructor(
         this: typeof grpcTypes.Client,
         methods: { [key: string]: { originalName?: string } },
@@ -287,7 +287,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
   private _getPatchedClientMethods() {
     const instrumentation = this;
     return (original: GrpcClientFunc) => {
-      this._diag.debug('patch all client methods');
+      instrumentation._diag.debug('patch all client methods');
       return function clientMethodTrace(this: grpcTypes.Client) {
         const name = `grpc.${(original.path as string | undefined)?.replace(
           '/',

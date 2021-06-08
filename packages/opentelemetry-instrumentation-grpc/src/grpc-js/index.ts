@@ -135,7 +135,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
     const instrumentation = this;
     return (originalRegister: ServerRegisterFunction) => {
       const config = this._config;
-      this._diag.debug('patched gRPC server');
+      instrumentation._diag.debug('patched gRPC server');
       return function register<RequestType, ResponseType>(
         this: grpcJs.Server,
         name: string,
@@ -185,7 +185,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
                 kind: SpanKind.SERVER,
               };
 
-              this._diag.debug('patch func: %s', JSON.stringify(spanOptions));
+              instrumentation._diag.debug('patch func: %s', JSON.stringify(spanOptions));
 
               context.with(
                 propagation.extract(ROOT_CONTEXT, call.metadata, {
@@ -230,7 +230,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
   ) => MakeClientConstructorFunction {
     const instrumentation = this;
     return (original: MakeClientConstructorFunction) => {
-      this._diag.debug('patching client');
+      instrumentation._diag.debug('patching client');
       return function makeClientConstructor(
         this: typeof grpcJs.Client,
         methods: grpcJs.ServiceDefinition,
@@ -254,7 +254,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
    */
   private _patchLoadPackageDefinition(grpcClient: typeof grpcJs) {
     const instrumentation = this;
-    this._diag.debug('patching loadPackageDefinition');
+    instrumentation._diag.debug('patching loadPackageDefinition');
     return (original: typeof grpcJs.loadPackageDefinition) => {
       return function patchedLoadPackageDefinition(
         this: null,
@@ -278,7 +278,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
   ): (original: GrpcClientFunc) => () => EventEmitter {
     const instrumentation = this;
     return (original: GrpcClientFunc) => {
-      this._diag.debug('patch all client methods');
+      instrumentation._diag.debug('patch all client methods');
       return function clientMethodTrace(this: grpcJs.Client) {
         const name = `grpc.${original.path.replace('/', '')}`;
         const args = [...arguments];
