@@ -21,7 +21,7 @@ export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcesso
   private _visibilityChangeListener?: () => void
 
   onInit(config?: BatchSpanProcessorBrowserConfig): void {
-    if (config?.flushOnDocumentBecomesHidden !== false && document != null) {
+    if (config?.disableAutoFlushOnDocumentHide !== true && document != null) {
       this._visibilityChangeListener = () => {
         if (document.visibilityState === 'hidden') {
           void this.forceFlush();

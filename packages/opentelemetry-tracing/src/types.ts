@@ -92,7 +92,7 @@ export interface BufferConfig {
 
 /** Interface configuration for BatchSpanProcessor on browser */
 export interface BatchSpanProcessorBrowserConfig extends BufferConfig {
-  /** Force flush when a user navigates to a new page, closes the tab or the browser, or,
-   * on mobile, switches to a different app. The default value is `true`. */
-  flushOnDocumentBecomesHidden?: boolean;
+  /** Disable flush when a user navigates to a new page, closes the tab or the browser, or,
+   * on mobile, switches to a different app. Auto flush is enabled by default. */
+  disableAutoFlushOnDocumentHide?: boolean;
 }

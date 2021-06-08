@@ -16,7 +16,8 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { BatchSpanProcessor, SpanExporter } from '../../../src';
+import { SpanExporter } from '../../../src';
+import { BatchSpanProcessor } from '../../../src/platform/browser/export/BatchSpanProcessor';
 import { TestTracingSpanExporter } from '../../common/export/TestTracingSpanExporter';
 
 describe('BatchSpanProcessor - web', () => {
@@ -58,9 +59,9 @@ describe('BatchSpanProcessor - web', () => {
       });
     })
 
-    describe('AND flushOnDocumentBecomesHidden configuration option', () => {
-      it('set to true should force flush spans', () => {
-        processor = new BatchSpanProcessor(exporter, { flushOnDocumentBecomesHidden: true });
+    describe('AND disableAutoFlushOnDocumentHide configuration option', () => {
+      it('set to false should force flush spans', () => {
+        processor = new BatchSpanProcessor(exporter, { disableAutoFlushOnDocumentHide: false });
         forceFlushSpy = sinon.stub(processor, 'forceFlush');
         assert.strictEqual(forceFlushSpy.callCount, 0);
         visibilityState = 'hidden';
@@ -68,8 +69,8 @@ describe('BatchSpanProcessor - web', () => {
         assert.strictEqual(forceFlushSpy.callCount, 1);
       })
 
-      it('set to false should NOT force flush spans', () => {
-        processor = new BatchSpanProcessor(exporter, { flushOnDocumentBecomesHidden: false });
+      it('set to true should NOT force flush spans', () => {
+        processor = new BatchSpanProcessor(exporter, { disableAutoFlushOnDocumentHide: true });
         forceFlushSpy = sinon.stub(processor, 'forceFlush');
         assert.strictEqual(forceFlushSpy.callCount, 0);
         visibilityState = 'hidden';
