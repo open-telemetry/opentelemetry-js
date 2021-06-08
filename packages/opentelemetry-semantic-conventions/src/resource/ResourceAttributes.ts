@@ -137,6 +137,27 @@ export const ResourceAttributes = {
   DEPLOYMENT_ENVIRONMENT: 'deployment.environment',
 
   /**
+   * A unique identifier representing the device.
+   *
+   * Note: The device identifier MUST only be defined using the values outlined below. This value is not an advertising identifier and MUST NOT be used as such. On iOS (Swift or Objective-C), this value MUST be equal to the [vendor identifier](https://developer.apple.com/documentation/uikit/uidevice/1620059-identifierforvendor). On Android (Java or Kotlin), this value MUST be equal to the Firebase Installation ID or a globally unique UUID which is persisted across sessions in your application. More information can be found [here](https://developer.android.com/training/articles/user-data-ids) on best practices and exact implementation details. Caution should be taken when storing personal data or anything which can identify a user. GDPR and data protection laws may apply, ensure you do your own due diligence.
+   */
+  DEVICE_ID: 'device.id',
+
+  /**
+   * The model identifier for the device.
+   *
+   * Note: It&#39;s recommended this value represents a machine readable version of the model identifier rather than the market or consumer-friendly name of the device.
+   */
+  DEVICE_MODEL_IDENTIFIER: 'device.model.identifier',
+
+  /**
+   * The marketing name for the device model.
+   *
+   * Note: It&#39;s recommended this value represents a human readable version of the device model rather than a machine readable alternative.
+   */
+  DEVICE_MODEL_NAME: 'device.model.name',
+
+  /**
    * The name of the function being executed.
    */
   FAAS_NAME: 'faas.name',
@@ -306,6 +327,16 @@ export const ResourceAttributes = {
   OS_DESCRIPTION: 'os.description',
 
   /**
+   * Human readable operating system name.
+   */
+  OS_NAME: 'os.name',
+
+  /**
+   * The version string of the operating system as defined in [Version Attributes](../../resource/semantic_conventions/README.md#version-attributes).
+   */
+  OS_VERSION: 'os.version',
+
+  /**
    * Process identifier (PID).
    */
   PROCESS_PID: 'process.pid',
@@ -438,27 +469,27 @@ export enum CloudPlatformValues {
   /** AWS Lambda. */
   AWS_LAMBDA = 'aws_lambda',
   /** AWS Elastic Beanstalk. */
-  AWS_ELASTICBEANSTALK = 'aws_elastic_beanstalk',
+  AWS_ELASTIC_BEANSTALK = 'aws_elastic_beanstalk',
   /** Azure Virtual Machines. */
   AZURE_VM = 'azure_vm',
   /** Azure Container Instances. */
-  AZURE_CONTAINERINSTANCES = 'azure_container_instances',
+  AZURE_CONTAINER_INSTANCES = 'azure_container_instances',
   /** Azure Kubernetes Service. */
   AZURE_AKS = 'azure_aks',
   /** Azure Functions. */
   AZURE_FUNCTIONS = 'azure_functions',
   /** Azure App Service. */
-  AZURE_APPSERVICE = 'azure_app_service',
+  AZURE_APP_SERVICE = 'azure_app_service',
   /** Google Cloud Compute Engine (GCE). */
-  GCP_COMPUTEENGINE = 'gcp_compute_engine',
+  GCP_COMPUTE_ENGINE = 'gcp_compute_engine',
   /** Google Cloud Run. */
-  GCP_CLOUDRUN = 'gcp_cloud_run',
+  GCP_CLOUD_RUN = 'gcp_cloud_run',
   /** Google Cloud Kubernetes Engine (GKE). */
-  GCP_KUBERNETESENGINE = 'gcp_kubernetes_engine',
+  GCP_KUBERNETES_ENGINE = 'gcp_kubernetes_engine',
   /** Google Cloud Functions (GCF). */
-  GCP_CLOUDFUNCTIONS = 'gcp_cloud_functions',
+  GCP_CLOUD_FUNCTIONS = 'gcp_cloud_functions',
   /** Google Cloud App Engine (GAE). */
-  GCP_APPENGINE = 'gcp_app_engine',
+  GCP_APP_ENGINE = 'gcp_app_engine',
 }
 
 export enum AwsEcsLaunchtypeValues {
@@ -487,27 +518,27 @@ export enum HostArchValues {
 
 export enum OsTypeValues {
   /** Microsoft Windows. */
-  WINDOWS = 'WINDOWS',
+  WINDOWS = 'windows',
   /** Linux. */
-  LINUX = 'LINUX',
+  LINUX = 'linux',
   /** Apple Darwin. */
-  DARWIN = 'DARWIN',
+  DARWIN = 'darwin',
   /** FreeBSD. */
-  FREEBSD = 'FREEBSD',
+  FREEBSD = 'freebsd',
   /** NetBSD. */
-  NETBSD = 'NETBSD',
+  NETBSD = 'netbsd',
   /** OpenBSD. */
-  OPENBSD = 'OPENBSD',
+  OPENBSD = 'openbsd',
   /** DragonFly BSD. */
-  DRAGONFLYBSD = 'DRAGONFLYBSD',
+  DRAGONFLYBSD = 'dragonflybsd',
   /** HP-UX (Hewlett Packard Unix). */
-  HPUX = 'HPUX',
+  HPUX = 'hpux',
   /** AIX (Advanced Interactive eXecutive). */
-  AIX = 'AIX',
+  AIX = 'aix',
   /** Oracle Solaris. */
-  SOLARIS = 'SOLARIS',
+  SOLARIS = 'solaris',
   /** IBM z/OS. */
-  ZOS = 'ZOS',
+  Z_OS = 'z_os',
 }
 
 export enum TelemetrySdkLanguageValues {

@@ -578,6 +578,11 @@ clear whether the exception will escape.
   MESSAGING_OPERATION: 'messaging.operation',
 
   /**
+   * RabbitMQ message routing key.
+   */
+  MESSAGING_RABBITMQ_ROUTING_KEY: 'messaging.rabbitmq.routing_key',
+
+  /**
    * Message keys in Kafka are used for grouping alike messages to ensure they&#39;re processed on the same partition. They differ from `messaging.message_id` in that they&#39;re not unique. If the key is `null`, the attribute MUST NOT be set.
    *
    * Note: If the key type is not string, it&#39;s string representation has to be supplied for the attribute. If the key has no unambiguous, canonical string form, don&#39;t include its value.
@@ -623,6 +628,31 @@ clear whether the exception will escape.
    * The [numeric status code](https://github.com/grpc/grpc/blob/v1.33.2/doc/statuscodes.md) of the gRPC request.
    */
   RPC_GRPC_STATUS_CODE: 'rpc.grpc.status_code',
+
+  /**
+   * Protocol version as in `jsonrpc` property of request/response. Since JSON-RPC 1.0 does not specify this, the value can be omitted.
+   */
+  RPC_JSONRPC_VERSION: 'rpc.jsonrpc.version',
+
+  /**
+   * `method` property from request. Unlike `rpc.method`, this may not relate to the actual method being called. Useful for client-side traces since client does not know what will be called on the server.
+   */
+  RPC_JSONRPC_METHOD: 'rpc.jsonrpc.method',
+
+  /**
+   * `id` property of request or response. Since protocol allows id to be int, string, `null` or missing (for notifications), value is expected to be cast to string for simplicity. Use empty string in case of `null` value. Omit entirely if this is a notification.
+   */
+  RPC_JSONRPC_REQUEST_ID: 'rpc.jsonrpc.request_id',
+
+  /**
+   * `error.code` property of response if it is an error response.
+   */
+  RPC_JSONRPC_ERROR_CODE: 'rpc.jsonrpc.error_code',
+
+  /**
+   * `error.message` property of response if it is an error response.
+   */
+  RPC_JSONRPC_ERROR_MESSAGE: 'rpc.jsonrpc.error_message',
 };
 
 // Enum definitions
@@ -718,31 +748,35 @@ export enum DbSystemValues {
   GEODE = 'geode',
   /** Elasticsearch. */
   ELASTICSEARCH = 'elasticsearch',
+  /** Memcached. */
+  MEMCACHED = 'memcached',
+  /** CockroachDB. */
+  COCKROACHDB = 'cockroachdb',
 }
 
 export enum DbCassandraConsistencyLevelValues {
-  /** ALL. */
-  ALL = 'ALL',
-  /** EACH_QUORUM. */
-  EACH_QUORUM = 'EACH_QUORUM',
-  /** QUORUM. */
-  QUORUM = 'QUORUM',
-  /** LOCAL_QUORUM. */
-  LOCAL_QUORUM = 'LOCAL_QUORUM',
-  /** ONE. */
-  ONE = 'ONE',
-  /** TWO. */
-  TWO = 'TWO',
-  /** THREE. */
-  THREE = 'THREE',
-  /** LOCAL_ONE. */
-  LOCAL_ONE = 'LOCAL_ONE',
-  /** ANY. */
-  ANY = 'ANY',
-  /** SERIAL. */
-  SERIAL = 'SERIAL',
-  /** LOCAL_SERIAL. */
-  LOCAL_SERIAL = 'LOCAL_SERIAL',
+  /** all. */
+  ALL = 'all',
+  /** each_quorum. */
+  EACH_QUORUM = 'each_quorum',
+  /** quorum. */
+  QUORUM = 'quorum',
+  /** local_quorum. */
+  LOCAL_QUORUM = 'local_quorum',
+  /** one. */
+  ONE = 'one',
+  /** two. */
+  TWO = 'two',
+  /** three. */
+  THREE = 'three',
+  /** local_one. */
+  LOCAL_ONE = 'local_one',
+  /** any. */
+  ANY = 'any',
+  /** serial. */
+  SERIAL = 'serial',
+  /** local_serial. */
+  LOCAL_SERIAL = 'local_serial',
 }
 
 export enum FaasTriggerValues {
@@ -777,14 +811,14 @@ export enum FaasInvokedProviderValues {
 }
 
 export enum NetTransportValues {
-  /** IP.TCP. */
-  IP_TCP = 'IP.TCP',
-  /** IP.UDP. */
-  IP_UDP = 'IP.UDP',
+  /** ip_tcp. */
+  IP_TCP = 'ip_tcp',
+  /** ip_udp. */
+  IP_UDP = 'ip_udp',
   /** Another IP-based protocol. */
-  IP = 'IP',
+  IP = 'ip',
   /** Unix Domain socket. See below. */
-  UNIX = 'Unix',
+  UNIX = 'unix',
   /** Named or anonymous pipe. See note below. */
   PIPE = 'pipe',
   /** In-process communication. */
