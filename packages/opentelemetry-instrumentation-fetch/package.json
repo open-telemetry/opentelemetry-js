@@ -57,7 +57,7 @@
     "@types/sinon": "9.0.11",
     "@types/webpack-env": "1.16.0",
     "babel-loader": "8.2.2",
-    "codecov": "3.8.1",
+    "codecov": "3.8.2",
     "istanbul-instrumenter-loader": "3.0.1",
     "karma": "5.2.3",
     "karma-chrome-launcher": "3.1.0",

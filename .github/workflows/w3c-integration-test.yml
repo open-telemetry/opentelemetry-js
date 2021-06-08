@@ -39,9 +39,9 @@ jobs:
         run: |
           npm ci --ignore-scripts
           npx lerna bootstrap --scope=propagation-validation-server --include-dependencies
-      
+
       - name: Build 🔧
-        run: npm run compile 
+        run: npm run compile
         working-directory: ./integration-tests/propagation-validation-server
 
       - name: Run W3C Test harness

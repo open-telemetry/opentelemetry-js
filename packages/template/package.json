@@ -71,7 +71,7 @@
   "Add these to devDependencies for testing": {
     "@types/mocha": "8.2.0",
     "@types/sinon": "9.0.9",
-    "codecov": "3.8.1",
+    "codecov": "3.8.2",
     "istanbul-instrumenter-loader": "3.0.1",
     "mocha": "7.2.0",
     "nyc": "15.1.0",
