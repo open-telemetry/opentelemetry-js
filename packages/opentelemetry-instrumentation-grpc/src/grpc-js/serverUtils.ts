@@ -56,7 +56,7 @@ function serverStreamAndBidiHandler<RequestType, ResponseType>(
     }
   };
 
-  context.bind(call);
+  context.bind(context.active(), call);
   call.on('finish', () => {
     // @grpc/js does not expose a way to check if this call also emitted an error,
     // e.g. call.status.code !== 0
@@ -143,7 +143,7 @@ function clientStreamAndUnaryHandler<RequestType, ResponseType>(
     return callback(err, value);
   };
 
-  context.bind(call);
+  context.bind(context.active(), call);
   return (original as Function).call({}, call, patchedCallback);
 }
 

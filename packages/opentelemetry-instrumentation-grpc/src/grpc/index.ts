@@ -56,14 +56,14 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
   typeof grpcTypes
 > {
   constructor(
-    protected _config: GrpcInstrumentationConfig & InstrumentationConfig = {},
+    protected override _config: GrpcInstrumentationConfig & InstrumentationConfig = {},
     name: string,
     version: string
   ) {
     super(name, version, _config);
   }
 
-  public setConfig(
+  public override setConfig(
     config: GrpcInstrumentationConfig & InstrumentationConfig = {}
   ) {
     this._config = Object.assign({}, config);

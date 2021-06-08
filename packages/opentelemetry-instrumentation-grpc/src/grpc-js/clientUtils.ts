@@ -110,7 +110,7 @@ export function makeGrpcClientRemoteCall(
       span.end();
       callback(err, res);
     };
-    return context.bind(wrappedFn);
+    return context.bind(context.active(), wrappedFn);
   }
 
   return (span: Span) => {
@@ -146,7 +146,7 @@ export function makeGrpcClientRemoteCall(
           spanEnded = true;
         }
       };
-      context.bind(call);
+      context.bind(context.active(), call);
       call.on('error', (err: grpcJs.ServiceError) => {
         if (call[CALL_SPAN_ENDED]) {
           return;

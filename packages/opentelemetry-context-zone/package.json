@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-zone",
-  "version": "0.19.0",
+  "version": "0.20.0",
   "description": "OpenTelemetry Context Zone",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -61,13 +61,13 @@
     "ts-loader": "8.2.0",
     "ts-mocha": "8.0.0",
     "ts-node": "9.1.1",
-    "typescript": "4.2.4",
+    "typescript": "4.3.2",
     "webpack": "4.46.0",
     "webpack-cli": "4.6.0",
     "webpack-merge": "5.7.3"
   },
   "dependencies": {
-    "@opentelemetry/context-zone-peer-dep": "0.19.0",
+    "@opentelemetry/context-zone-peer-dep": "0.20.0",
     "zone.js": "^0.11.0"
   },
   "sideEffects": true

@@ -285,10 +285,7 @@ export function toCollectorExportTraceServiceRequest<
 
   const additionalAttributes = Object.assign(
     {},
-    collectorTraceExporterBase.attributes,
-    {
-      'service.name': collectorTraceExporterBase.serviceName,
-    }
+    collectorTraceExporterBase.attributes
   );
 
   return {
