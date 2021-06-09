@@ -242,7 +242,7 @@ describe('CollectorMetricExporter - node (getDefaultUrl)', () => {
   it('should default to localhost', done => {
     const collectorExporter = new CollectorMetricExporter({});
     setTimeout(() => {
-      assert.strictEqual(collectorExporter['url'], 'localhost:4317');
+      assert.strictEqual(collectorExporter['url'], 'grpc://localhost:4317');
       done();
     });
   });
