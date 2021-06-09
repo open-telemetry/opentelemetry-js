@@ -20,30 +20,26 @@ function startServer(port) {
 
 /** A function which handles requests and send response. */
 function handleRequest(request, response) {
-  const currentSpan = api.getSpan(api.context.active());
+  const currentSpan = api.trace.getSpan(api.context.active());
   // display traceid in the terminal
-  console.log(`traceid: ${currentSpan.context().traceId}`);
+  console.log(`traceid: ${currentSpan.spanContext().traceId}`);
   const span = tracer.startSpan('handleRequest', {
     kind: 1, // server
     attributes: { key: 'value' },
   });
   // Annotate our span to capture metadata about the operation
   span.addEvent('invoking handleRequest');
-  try {
-    const body = [];
-    request.on('error', (err) => console.log(err));
-    request.on('data', (chunk) => body.push(chunk));
-    request.on('end', () => {
-      // deliberately sleeping to mock some action.
-      setTimeout(() => {
-        span.end();
-        response.end('Hello World!');
-      }, 2000);
-    });
-  } catch (err) {
-    console.error(err);
-    span.end();
-  }
+
+  const body = [];
+  request.on('error', (err) => console.log(err));
+  request.on('data', (chunk) => body.push(chunk));
+  request.on('end', () => {
+    // deliberately sleeping to mock some action.
+    setTimeout(() => {
+      span.end();
+      response.end('Hello World!');
+    }, 2000);
+  });
 }
 
 startServer(8080);

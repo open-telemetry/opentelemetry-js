@@ -15,11 +15,15 @@
  */
 
 import { VERSION } from '../../version';
+import {
+  TelemetrySdkLanguageValues,
+  ResourceAttributes,
+} from '@opentelemetry/semantic-conventions';
 
 /** Constants describing the SDK in use */
 export const SDK_INFO = {
-  NAME: 'opentelemetry',
-  RUNTIME: 'browser',
-  LANGUAGE: 'webjs',
-  VERSION: VERSION,
+  [ResourceAttributes.TELEMETRY_SDK_NAME]: 'opentelemetry',
+  [ResourceAttributes.PROCESS_RUNTIME_NAME]: 'browser',
+  [ResourceAttributes.TELEMETRY_SDK_LANGUAGE]: TelemetrySdkLanguageValues.WEBJS,
+  [ResourceAttributes.TELEMETRY_SDK_VERSION]: VERSION,
 };

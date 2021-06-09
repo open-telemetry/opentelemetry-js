@@ -299,26 +299,26 @@ for (const contextManagerClass of [
     describe('.bind(function)', () => {
       it('should return the same target (when enabled)', () => {
         const test = { a: 1 };
-        assert.deepStrictEqual(contextManager.bind(test, ROOT_CONTEXT), test);
+        assert.deepStrictEqual(contextManager.bind(ROOT_CONTEXT, test), test);
       });
 
       it('should return the same target (when disabled)', () => {
         contextManager.disable();
         const test = { a: 1 };
-        assert.deepStrictEqual(contextManager.bind(test, ROOT_CONTEXT), test);
+        assert.deepStrictEqual(contextManager.bind(ROOT_CONTEXT, test), test);
         contextManager.enable();
       });
 
       it('should return current context (when enabled)', done => {
         const context = ROOT_CONTEXT.setValue(key1, 1);
-        const fn = contextManager.bind(() => {
+        const fn = contextManager.bind(context, () => {
           assert.strictEqual(
             contextManager.active(),
             context,
             'should have context'
           );
           return done();
-        }, context);
+        });
         fn();
       });
 
@@ -329,20 +329,20 @@ for (const contextManagerClass of [
       it('should return current context (when disabled)', done => {
         contextManager.disable();
         const context = ROOT_CONTEXT.setValue(key1, 1);
-        const fn = contextManager.bind(() => {
+        const fn = contextManager.bind(context, () => {
           assert.strictEqual(
             contextManager.active(),
             context,
             'should have context'
           );
           return done();
-        }, context);
+        });
         fn();
       });
 
       it('should fail to return current context with async op', done => {
         const context = ROOT_CONTEXT.setValue(key1, 1);
-        const fn = contextManager.bind(() => {
+        const fn = contextManager.bind(context, () => {
           assert.strictEqual(contextManager.active(), context);
           setTimeout(() => {
             assert.strictEqual(
@@ -352,7 +352,7 @@ for (const contextManagerClass of [
             );
             return done();
           }, 100);
-        }, context);
+        });
         fn();
       });
 
@@ -363,12 +363,11 @@ for (const contextManagerClass of [
         const context = ROOT_CONTEXT.setValue(key1, 2);
         const otherContext = ROOT_CONTEXT.setValue(key1, 3);
         const fn = otherContextManager.bind(
-          contextManager.bind(() => {
+          otherContext,
+          contextManager.bind(context, () => {
             assert.strictEqual(contextManager.active(), context);
             assert.strictEqual(otherContextManager.active(), otherContext);
-          }, context),
-          otherContext
-        );
+          }));
         fn();
       });
     });
@@ -376,19 +375,19 @@ for (const contextManagerClass of [
     describe('.bind(event-emitter)', () => {
       it('should return the same target (when enabled)', () => {
         const ee = new EventEmitter();
-        assert.deepStrictEqual(contextManager.bind(ee, ROOT_CONTEXT), ee);
+        assert.deepStrictEqual(contextManager.bind(ROOT_CONTEXT, ee), ee);
       });
 
       it('should return the same target (when disabled)', () => {
         const ee = new EventEmitter();
         contextManager.disable();
-        assert.deepStrictEqual(contextManager.bind(ee, ROOT_CONTEXT), ee);
+        assert.deepStrictEqual(contextManager.bind(ROOT_CONTEXT, ee), ee);
       });
 
       it('should return current context and removeListener (when enabled)', done => {
         const ee = new EventEmitter();
         const context = ROOT_CONTEXT.setValue(key1, 1);
-        const patchedEE = contextManager.bind(ee, context);
+        const patchedEE = contextManager.bind(context, ee);
         const handler = () => {
           assert.deepStrictEqual(contextManager.active(), context);
           patchedEE.removeListener('test', handler);
@@ -403,7 +402,7 @@ for (const contextManagerClass of [
       it('should return current context and removeAllListener (when enabled)', done => {
         const ee = new EventEmitter();
         const context = ROOT_CONTEXT.setValue(key1, 1);
-        const patchedEE = contextManager.bind(ee, context);
+        const patchedEE = contextManager.bind(context, ee);
         const handler = () => {
           assert.deepStrictEqual(contextManager.active(), context);
           patchedEE.removeAllListeners('test');
@@ -418,7 +417,7 @@ for (const contextManagerClass of [
       it('should return current context and removeAllListeners (when enabled)', done => {
         const ee = new EventEmitter();
         const context = ROOT_CONTEXT.setValue(key1, 1);
-        const patchedEE = contextManager.bind(ee, context);
+        const patchedEE = contextManager.bind(context, ee);
         const handler = () => {
           assert.deepStrictEqual(contextManager.active(), context);
           patchedEE.removeAllListeners();
@@ -441,7 +440,7 @@ for (const contextManagerClass of [
         contextManager.disable();
         const ee = new EventEmitter();
         const context = ROOT_CONTEXT.setValue(key1, 1);
-        const patchedEE = contextManager.bind(ee, context);
+        const patchedEE = contextManager.bind(context, ee);
         const handler = () => {
           assert.deepStrictEqual(contextManager.active(), context);
           patchedEE.removeListener('test', handler);
@@ -456,7 +455,7 @@ for (const contextManagerClass of [
       it('should not return current context with async op', done => {
         const ee = new EventEmitter();
         const context = ROOT_CONTEXT.setValue(key1, 1);
-        const patchedEE = contextManager.bind(ee, context);
+        const patchedEE = contextManager.bind(context, ee);
         const handler = () => {
           assert.deepStrictEqual(contextManager.active(), context);
           setImmediate(() => {
@@ -479,8 +478,8 @@ for (const contextManagerClass of [
         const context = ROOT_CONTEXT.setValue(key1, 2);
         const otherContext = ROOT_CONTEXT.setValue(key1, 3);
         const patchedEE = otherContextManager.bind(
-          contextManager.bind(ee, context),
-          otherContext
+          otherContext,
+          contextManager.bind(context, ee),
         );
         const handler = () => {
           assert.strictEqual(contextManager.active(), context);

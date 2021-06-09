@@ -21,8 +21,9 @@ import {
 import { MetricRecord, MetricExporter } from '@opentelemetry/metrics';
 import { CollectorExporterConfigNode, ServiceClientType } from './types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
+import { getEnv } from '@opentelemetry/core';
+import { validateAndNormalizeUrl } from './util';
 
-const DEFAULT_SERVICE_NAME = 'collector-metric-exporter';
 const DEFAULT_COLLECTOR_URL = 'localhost:4317';
 
 /**
@@ -47,15 +48,14 @@ export class CollectorMetricExporter
     );
   }
 
-  getDefaultUrl(config: CollectorExporterConfigNode): string {
-    if (!config.url) {
-      return DEFAULT_COLLECTOR_URL;
-    }
-    return config.url;
-  }
-
-  getDefaultServiceName(config: CollectorExporterConfigNode): string {
-    return config.serviceName || DEFAULT_SERVICE_NAME;
+  getDefaultUrl(config: CollectorExporterConfigNode) {
+    return typeof config.url === 'string'
+      ? validateAndNormalizeUrl(config.url)
+      : getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0
+      ? validateAndNormalizeUrl(getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT)
+      : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
+      ? validateAndNormalizeUrl(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT)
+      : DEFAULT_COLLECTOR_URL;
   }
 
   getServiceClientType() {

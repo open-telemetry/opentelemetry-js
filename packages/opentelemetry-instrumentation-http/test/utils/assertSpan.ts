@@ -21,7 +21,7 @@ import * as assert from 'assert';
 import * as http from 'http';
 import * as utils from '../../src/utils';
 import { DummyPropagation } from './DummyPropagation';
-import { AttributeNames } from '../../src/enums';
+import { AttributeNames } from '../../src/enums/AttributeNames';
 
 export const assertSpan = (
   span: ReadableSpan,
@@ -39,8 +39,8 @@ export const assertSpan = (
     component: string;
   }
 ) => {
-  assert.strictEqual(span.spanContext.traceId.length, 32);
-  assert.strictEqual(span.spanContext.spanId.length, 16);
+  assert.strictEqual(span.spanContext().traceId.length, 32);
+  assert.strictEqual(span.spanContext().spanId.length, 16);
   assert.strictEqual(span.kind, kind);
   assert.strictEqual(
     span.name,

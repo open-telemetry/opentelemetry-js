@@ -131,7 +131,6 @@ const testCollectorMetricExporter = (params: TestParams) =>
       collectorExporter = new CollectorMetricExporter({
         url: 'grpcs://' + address,
         credentials,
-        serviceName: 'basic-service',
         metadata: params.metadata,
       });
       // Overwrites the start time to make tests consistent
@@ -169,8 +168,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
         // Need to stub/spy on the underlying logger as the 'diag' instance is global
         const spyLoggerWarn = sinon.stub(diag, 'warn');
         collectorExporter = new CollectorMetricExporter({
-          serviceName: 'basic-service',
-          url: address,
+          url: `http://${address}`,
           headers: {
             foo: 'bar',
           },
@@ -181,8 +179,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
       it('should warn about path in url', () => {
         const spyLoggerWarn = sinon.stub(diag, 'warn');
         collectorExporter = new CollectorMetricExporter({
-          serviceName: 'basic-service',
-          url: address + '/v1/metrics',
+          url: `http://${address}/v1/metrics`
         });
         const args = spyLoggerWarn.args[0];
         assert.strictEqual(
@@ -253,9 +250,33 @@ describe('CollectorMetricExporter - node (getDefaultUrl)', () => {
     const url = 'http://foo.bar.com';
     const collectorExporter = new CollectorMetricExporter({ url });
     setTimeout(() => {
-      assert.strictEqual(collectorExporter['url'], url);
+      assert.strictEqual(collectorExporter['url'], 'foo.bar.com');
       done();
     });
+  });
+});
+
+describe('when configuring via environment', () => {
+  const envSource = process.env;
+  it('should use url defined in env', () => {
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+    const collectorExporter = new CollectorMetricExporter();
+    assert.strictEqual(
+      collectorExporter.url,
+      'foo.bar'
+    );
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+  });
+  it('should override global exporter url with signal url defined in env', () => {
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.metrics';
+    const collectorExporter = new CollectorMetricExporter();
+    assert.strictEqual(
+      collectorExporter.url,
+      'foo.metrics'
+    );
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
   });
 });
 

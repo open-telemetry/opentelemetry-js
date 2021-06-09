@@ -21,8 +21,9 @@ import {
   toCollectorExportTraceServiceRequest,
 } from '@opentelemetry/exporter-collector';
 import { CollectorExporterConfigNode, ServiceClientType } from './types';
+import { getEnv } from '@opentelemetry/core';
+import { validateAndNormalizeUrl } from './util';
 
-const DEFAULT_SERVICE_NAME = 'collector-trace-exporter';
 const DEFAULT_COLLECTOR_URL = 'localhost:4317';
 
 /**
@@ -40,15 +41,14 @@ export class CollectorTraceExporter
     return toCollectorExportTraceServiceRequest(spans, this);
   }
 
-  getDefaultUrl(config: CollectorExporterConfigNode): string {
-    if (!config.url) {
-      return DEFAULT_COLLECTOR_URL;
-    }
-    return config.url;
-  }
-
-  getDefaultServiceName(config: CollectorExporterConfigNode): string {
-    return config.serviceName || DEFAULT_SERVICE_NAME;
+  getDefaultUrl(config: CollectorExporterConfigNode) {
+    return typeof config.url === 'string'
+      ? validateAndNormalizeUrl(config.url)
+      : getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT.length > 0
+      ? validateAndNormalizeUrl(getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
+      : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
+      ? validateAndNormalizeUrl(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT)
+      : DEFAULT_COLLECTOR_URL;
   }
 
   getServiceClientType() {

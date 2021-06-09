@@ -16,19 +16,19 @@
 
 import {
   defaultTextMapGetter,
-  defaultTextMapSetter,
-  getSpanContext,
+  defaultTextMapSetter, propagation,
   ROOT_CONTEXT,
-  setSpanContext,
   SpanContext,
-  suppressInstrumentation,
   TextMapGetter,
+  trace,
   TraceFlags,
 } from '@opentelemetry/api';
+import { suppressTracing } from '@opentelemetry/core';
 import * as assert from 'assert';
 import {
   JaegerPropagator,
   UBER_TRACE_ID_HEADER,
+  UBER_BAGGAGE_HEADER_PREFIX,
 } from '../src/JaegerPropagator';
 
 describe('JaegerPropagator', () => {
@@ -50,7 +50,7 @@ describe('JaegerPropagator', () => {
       };
 
       jaegerPropagator.inject(
-        setSpanContext(ROOT_CONTEXT, spanContext),
+        trace.setSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
         defaultTextMapSetter
       );
@@ -68,7 +68,7 @@ describe('JaegerPropagator', () => {
       };
 
       customJaegerPropagator.inject(
-        setSpanContext(ROOT_CONTEXT, spanContext),
+        trace.setSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
         defaultTextMapSetter
       );
@@ -86,11 +86,33 @@ describe('JaegerPropagator', () => {
       };
 
       jaegerPropagator.inject(
-        suppressInstrumentation(setSpanContext(ROOT_CONTEXT, spanContext)),
+        suppressTracing(trace.setSpanContext(ROOT_CONTEXT, spanContext)),
         carrier,
         defaultTextMapSetter
       );
       assert.strictEqual(carrier[UBER_TRACE_ID_HEADER], undefined);
+    });
+
+    it('should propagate baggage with url encoded values', () => {
+      const baggage = propagation.createBaggage({
+        test: {
+          value: '1',
+        },
+        myuser: {
+          value: '%id%',
+        },
+      });
+
+      jaegerPropagator.inject(
+        propagation.setBaggage(ROOT_CONTEXT, baggage),
+        carrier,
+        defaultTextMapSetter
+      );
+      assert.strictEqual(carrier[`${UBER_BAGGAGE_HEADER_PREFIX}-test`], '1');
+      assert.strictEqual(
+        carrier[`${UBER_BAGGAGE_HEADER_PREFIX}-myuser`],
+        encodeURIComponent('%id%')
+      );
     });
   });
 
@@ -98,7 +120,7 @@ describe('JaegerPropagator', () => {
     it('should extract context of a sampled span from carrier', () => {
       carrier[UBER_TRACE_ID_HEADER] =
         'd4cda95b652f4a1592b449d5929fda1b:6e0c63257de34c92:0:01';
-      const extractedSpanContext = getSpanContext(
+      const extractedSpanContext = trace.getSpanContext(
         jaegerPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       );
 
@@ -113,7 +135,7 @@ describe('JaegerPropagator', () => {
     it('should extract context of a sampled span from carrier with 1 bit flag', () => {
       carrier[UBER_TRACE_ID_HEADER] =
         '9c41e35aeb6d1272:45fd2a9709dadcf1:a13699e3fb724f40:1';
-      const extractedSpanContext = getSpanContext(
+      const extractedSpanContext = trace.getSpanContext(
         jaegerPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       );
 
@@ -128,7 +150,7 @@ describe('JaegerPropagator', () => {
     it('should extract context of a sampled span from UTF-8 encoded carrier', () => {
       carrier[UBER_TRACE_ID_HEADER] =
         'ac1f3dc3c2c0b06e%3A5ac292c4a11a163e%3Ac086aaa825821068%3A1';
-      const extractedSpanContext = getSpanContext(
+      const extractedSpanContext = trace.getSpanContext(
         jaegerPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       );
 
@@ -143,7 +165,7 @@ describe('JaegerPropagator', () => {
     it('should use custom header if provided', () => {
       carrier[customHeader] =
         'd4cda95b652f4a1592b449d5929fda1b:6e0c63257de34c92:0:01';
-      const extractedSpanContext = getSpanContext(
+      const extractedSpanContext = trace.getSpanContext(
         customJaegerPropagator.extract(
           ROOT_CONTEXT,
           carrier,
@@ -161,7 +183,7 @@ describe('JaegerPropagator', () => {
 
     it('returns undefined if UBER_TRACE_ID_HEADER header is missing', () => {
       assert.deepStrictEqual(
-        getSpanContext(
+        trace.getSpanContext(
           jaegerPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
         ),
         undefined
@@ -171,11 +193,69 @@ describe('JaegerPropagator', () => {
     it('returns undefined if UBER_TRACE_ID_HEADER header is invalid', () => {
       carrier[UBER_TRACE_ID_HEADER] = 'invalid!';
       assert.deepStrictEqual(
-        getSpanContext(
+        trace.getSpanContext(
           jaegerPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
         ),
         undefined
       );
+    });
+
+    it('should extract baggage from carrier', () => {
+      carrier[`${UBER_BAGGAGE_HEADER_PREFIX}-test`] = 'value';
+      carrier[`${UBER_BAGGAGE_HEADER_PREFIX}-myuser`] = '%25id%25';
+      const extractedBaggage = propagation.getBaggage(
+        jaegerPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
+      );
+
+      const firstEntry = extractedBaggage?.getEntry('test');
+      assert(typeof firstEntry !== 'undefined');
+      assert(firstEntry.value === 'value');
+      const secondEntry = extractedBaggage?.getEntry('myuser');
+      assert(typeof secondEntry !== 'undefined');
+      assert(secondEntry.value === '%id%');
+    });
+
+    it('should extract baggage from carrier and not override current one', () => {
+      carrier[`${UBER_BAGGAGE_HEADER_PREFIX}-test`] = 'value';
+      carrier[`${UBER_BAGGAGE_HEADER_PREFIX}-myuser`] = '%25id%25';
+      const extractedBaggage = propagation.getBaggage(
+        jaegerPropagator.extract(
+          propagation.setBaggage(ROOT_CONTEXT, propagation.createBaggage({ one: { value: 'two' } })),
+          carrier,
+          defaultTextMapGetter
+        )
+      );
+
+      const firstEntry = extractedBaggage?.getEntry('test');
+      assert(typeof firstEntry !== 'undefined');
+      assert(firstEntry.value === 'value');
+      const secondEntry = extractedBaggage?.getEntry('myuser');
+      assert(typeof secondEntry !== 'undefined');
+      assert(secondEntry.value === '%id%');
+      const alreadyExistingEntry = extractedBaggage?.getEntry('one');
+      assert(typeof alreadyExistingEntry !== 'undefined');
+      assert(alreadyExistingEntry.value === 'two');
+    });
+
+    it('should handle invalid baggage from carrier (undefined)', () => {
+      carrier[`${UBER_BAGGAGE_HEADER_PREFIX}-test`] = undefined;
+      const extractedBaggage = propagation.getBaggage(
+        jaegerPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
+      );
+
+      const firstEntry = extractedBaggage?.getEntry('test');
+      assert(typeof firstEntry === 'undefined');
+    });
+
+    it('should handle invalid baggage from carrier (array)', () => {
+      carrier[`${UBER_BAGGAGE_HEADER_PREFIX}-test`] = ['one', 'two'];
+      const extractedBaggage = propagation.getBaggage(
+        jaegerPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
+      );
+
+      const firstEntry = extractedBaggage?.getEntry('test');
+      assert(typeof firstEntry !== 'undefined');
+      assert(firstEntry.value === 'one');
     });
   });
 
