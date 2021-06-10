@@ -105,6 +105,10 @@ Because the npm installer and node module resolution algorithm could potentially
 
 ## Upgrade Guidelines
 
+### 0.21.0 to 1.0.0
+
+No breaking changes
+
 ### 0.20.0 to 0.21.0
 
 - [#78](https://github.com/open-telemetry/opentelemetry-js-api/issues/78) `api.context.bind` arguments reversed and `context` is now a required argument.
