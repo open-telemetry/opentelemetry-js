@@ -589,7 +589,7 @@ describe('xhr', () => {
 
             it('should debug info that injecting headers was skipped', () => {
               assert.strictEqual(
-                spyDebug.lastCall.args[0],
+                spyDebug.lastCall.args[1],
                 'headers inject skipped due to CORS policy'
               );
             });
