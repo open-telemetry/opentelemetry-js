@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.0.0
+
+### :memo: Documentation
+
+* [#89](https://github.com/open-telemetry/opentelemetry-js-api/pull/89) chore: update upgrade guidelines ([@dyladan](https://github.com/dyladan))
+
+### :house: Internal
+
+* [#90](https://github.com/open-telemetry/opentelemetry-js-api/pull/90) chore: enable typescript 4.3 noImplicitOverride option ([@Flarna](https://github.com/Flarna))
+
+### Committers: 2
+
+* Daniel Dyla ([@dyladan](https://github.com/dyladan))
+* Gerhard Stöbich ([@Flarna](https://github.com/Flarna))
+
 ## 0.21.0
 
 ### :boom: Breaking Change
