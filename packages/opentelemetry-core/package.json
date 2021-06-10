@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/core",
-  "version": "0.20.0",
+  "version": "0.21.0",
   "description": "OpenTelemetry Core provides default and no-op implementations of the OpenTelemetry types for trace and metrics",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -83,7 +83,7 @@
     "@opentelemetry/api": "^0.21.0"
   },
   "dependencies": {
-    "@opentelemetry/semantic-conventions": "0.20.0",
+    "@opentelemetry/semantic-conventions": "0.21.0",
     "semver": "^7.1.3"
   }
 }
