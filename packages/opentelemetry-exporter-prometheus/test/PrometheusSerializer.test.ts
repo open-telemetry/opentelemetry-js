@@ -403,6 +403,7 @@ describe('PrometheusSerializer', () => {
         error: () => {},
       };
       diag.setLogger(dummyLogger, DiagLogLevel.ALL);
+      calledArgs = [];
       const serializer = new PrometheusSerializer();
 
       const meter = new MeterProvider({
@@ -416,7 +417,7 @@ describe('PrometheusSerializer', () => {
 
       const result = serializer.serializeRecord(record.descriptor.name, record);
       assert.strictEqual(result, `test_total 1 ${mockedHrTimeMs}\n`);
-      assert.ok(calledArgs.length === 0);
+      assert.deepStrictEqual(calledArgs, []);
     });
   });
 

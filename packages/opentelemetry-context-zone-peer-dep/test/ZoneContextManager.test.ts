@@ -269,7 +269,9 @@ describe('ZoneContextManager', () => {
 
     it('should return current context (when enabled)', done => {
       const context = ROOT_CONTEXT.setValue(key1, { a: 1 });
-      const fn: any = contextManager.bind(context, () => {
+      const fn: any = contextManager.bind(
+        context,
+        () => {
         assert.strictEqual(
           contextManager.active(),
           context,
