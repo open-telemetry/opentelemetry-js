@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.14.0",
-    "@opentelemetry/api": "^0.21.0",
+    "@opentelemetry/api": "^1.0.0",
     "@opentelemetry/context-zone": "0.21.0",
     "@opentelemetry/propagator-b3": "0.21.0",
     "@opentelemetry/resources": "0.21.0",
@@ -78,7 +78,7 @@
     "webpack-merge": "5.7.3"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^0.21.0"
+    "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
     "@opentelemetry/core": "0.21.0",
