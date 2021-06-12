@@ -33,6 +33,8 @@
     "@opentelemetry/exporter-zipkin": "0.21.0",
     "@opentelemetry/instrumentation": "0.21.0",
     "@opentelemetry/node": "0.21.0",
+    "@opentelemetry/resources": "0.21.0",
+    "@opentelemetry/semantic-conventions": "0.21.0",
     "@opentelemetry/shim-opentracing": "0.21.0",
     "@opentelemetry/tracing": "0.21.0",
     "opentracing": "^0.14.4"
