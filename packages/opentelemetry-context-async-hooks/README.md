@@ -20,7 +20,7 @@ This package only handle storing a specific object for a given async hooks conte
 
 Even if the API is native to NodeJS, it doesn't cover all possible cases of context propagation but there is a big effort from the NodeJS team to fix those. That's why we generally advise to be on the latest LTS to benefit from performance and bug fixes.
 
-There are known modules that break context propagation ([some of them are listed there][pkgs-that-break-ah]), so it's possible that the context manager doesn't work with them.
+async-hooks may not work perfectly with some packages; see [here][pkgs-that-break-ah] for known issues. Consequently, it's possible that opentelemetry-context-async-hooks won't work reliably if context runs through those packages.
 
 ### Prior arts
 
@@ -53,6 +53,6 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [dd-js-tracer-scope]: https://github.com/DataDog/dd-trace-js/tree/main/packages/dd-trace/src/scope
 [opentracing-scope]: https://github.com/opentracing/opentracing-javascript/pull/113
 [diag-team-scope-discussion]: https://github.com/nodejs/diagnostics/issues/300
-[pkgs-that-break-ah]: https://github.com/nodejs/diagnostics/blob/master/tracing/AsyncHooks/problematic-modules.md
+[pkgs-that-break-ah]: https://github.com/nodejs/diagnostics/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3Aasync-continuity
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/context-async-hooks
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fcontext-async-hooks.svg
