@@ -27,6 +27,7 @@ export * from './platform';
 export * from './propagation/composite';
 export * from './trace/HttpTraceContextPropagator';
 export * from './trace/IdGenerator';
+export * from './trace/rpc-metadata';
 export * from './trace/sampler/AlwaysOffSampler';
 export * from './trace/sampler/AlwaysOnSampler';
 export * from './trace/sampler/ParentBasedSampler';

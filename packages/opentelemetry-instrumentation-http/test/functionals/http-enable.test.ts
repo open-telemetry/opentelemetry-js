@@ -41,6 +41,7 @@ import { ContextManager } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import type { ClientRequest, IncomingMessage, ServerResponse } from 'http';
 import { isWrapped } from '@opentelemetry/instrumentation';
+import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 
 const instrumentation = new HttpInstrumentation();
 instrumentation.enable();
@@ -838,6 +839,33 @@ describe('HttpInstrumentation', () => {
             })
             .catch(done);
         });
+      });
+    });
+    describe('rpc metadata', () => {
+      beforeEach(() => {
+        memoryExporter.reset();
+        instrumentation.setConfig({ requireParentforOutgoingSpans: true });
+        instrumentation.enable();
+      });
+
+      afterEach(() => {
+        server.close();
+        instrumentation.disable();
+      });
+
+      it('should set rpc metadata for incoming http request', async () => {
+        server = http.createServer((request, response) => {
+          const rpcMemadata = getRPCMetadata(context.active());
+          assert(typeof rpcMemadata !== 'undefined');
+          assert(rpcMemadata.type === RPCType.HTTP);
+          assert(rpcMemadata.span.setAttribute('key', 'value'));
+          response.end('Test Server Response');
+        });
+        await new Promise<void>(resolve => server.listen(serverPort, resolve));
+        await httpRequest.get(`${protocol}://${hostname}:${serverPort}`);
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 1);
+        assert.strictEqual(spans[0].attributes.key, 'value');
       });
     });
   });

@@ -48,7 +48,9 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 
 | API Version | Core version | Contrib Version         |
 | ----------- |--------------|-------------------------|
-| v1.0.0-rc.0 | 0.19.x       | ------                  |
+| 0.21.x      | 0.21.x       | ------                  |
+| 0.20.x      | 0.20.x       | 0.20.x                  |
+| v1.0.0-rc.3 | 0.19.x       | 0.16.x                  |
 | 0.18.x      | 0.18.x       | 0.14.x                  |
 |             | 0.17.x       | ------                  |
 |             | 0.16.x       | ------                  |
@@ -57,6 +59,10 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 |             | 0.13.x       | ------                  |
 |             | 0.12.x       | 0.11.x                  |
 |             | 0.11.x       | 0.10.x                  |
+
+## Versioning
+
+The current version for each package can be found in the respective `package.json` file for that module. For additional details see the [versioning and stability][spec-versioning] document in the specification.
 
 ## Quick start
 
@@ -126,6 +132,7 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 - [Mark Wolff](https://github.com/markwolff), Microsoft
 - [Matthew Wear](https://github.com/mwear), LightStep
 - [Naseem K. Ullah](https://github.com/naseemkullah), Transit
+- [Neville Wylie](https://github.com/MSNev), Microsoft
 - [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).*
@@ -224,13 +231,17 @@ To request automatic tracing support for a module not on this list, please [file
 
 ## Upgrade guidelines
 
-### 0.19.x to x
+### 0.20.x to x
+
+### 0.19.x to 0.20.0
 
 - `HttpBaggage` renamed to `HttpBaggagePropagator`
 
 - `HttpTraceContext` renamed to `HttpTraceContextPropagator`
 
 - `JaegerHttpTracePropagator` renamed to `JaegerPropagator`
+
+- `serviceName` configuration removed from Collector exporters. Use `service.name` Resource attribute instead.
 
 ### 0.18.x to 0.19.0
 
@@ -416,7 +427,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-shim-opentracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-shim-opentracing
 [otel-tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-tracing
 [otel-web]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-web
-[otel-api]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-api
+[otel-api]: https://github.com/open-telemetry/opentelemetry-js-api
 [otel-core]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-core
 [generate-api-documentation]: https://github.com/open-telemetry/opentelemetry-js/blob/main/CONTRIBUTING.md#generating-api-documentation
 
@@ -431,3 +442,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-contrib-instrumentation-document-load]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web/opentelemetry-instrumentation-document-load
 [otel-contrib-instrumentation-hapi]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-hapi
 [otel-contrib-instrumentation-koa]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-koa
+
+[spec-versioning]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/versioning-and-stability.md

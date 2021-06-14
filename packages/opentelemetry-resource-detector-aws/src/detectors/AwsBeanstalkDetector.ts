@@ -71,9 +71,9 @@ export class AwsBeanstalkDetector implements Detector {
       return new Resource({
         [ResourceAttributes.CLOUD_PROVIDER]: CloudProviderValues.AWS,
         [ResourceAttributes.CLOUD_PLATFORM]:
-          CloudPlatformValues.AWS_ELASTICBEANSTALK,
+          CloudPlatformValues.AWS_ELASTIC_BEANSTALK,
         [ResourceAttributes.SERVICE_NAME]:
-          CloudPlatformValues.AWS_ELASTICBEANSTALK,
+          CloudPlatformValues.AWS_ELASTIC_BEANSTALK,
         [ResourceAttributes.SERVICE_NAMESPACE]: parsedData.environment_name,
         [ResourceAttributes.SERVICE_VERSION]: parsedData.version_label,
         [ResourceAttributes.SERVICE_INSTANCE_ID]: parsedData.deployment_id,
