@@ -288,7 +288,7 @@ export class FetchInstrumentation extends InstrumentationBase<
       this._tasksCount--;
       this._clearResources();
       span.end(endTime);
-    }), OBSERVER_WAIT_TIME_MS);
+    }, this._diag), OBSERVER_WAIT_TIME_MS);
   }
 
   /**
@@ -315,7 +315,7 @@ export class FetchInstrumentation extends InstrumentationBase<
           createdSpan = plugin._createSpan(url, options);
           spanData = plugin._prepareSpanData(url);
         } catch (e) {
-          api.diag.error('Instrumentation error', e);
+          plugin._diag.error('Instrumentation error', e);
           return original.apply(this, [url, options]);
         }
 
@@ -376,7 +376,7 @@ export class FetchInstrumentation extends InstrumentationBase<
               endSpanOnSuccess(span, response);
             }
           } catch(e) {
-            api.diag.error('Instrumentation error', e);
+            plugin._diag.error('Instrumentation error', e);
           } finally {
             resolve(response);
           }
@@ -390,7 +390,7 @@ export class FetchInstrumentation extends InstrumentationBase<
           try {
             endSpanOnError(span, error);
           } catch(e) {
-            api.diag.error('Instrumentation error', e);
+            plugin._diag.error('Instrumentation error', e);
           } finally {
             reject(error);
           }
@@ -412,7 +412,7 @@ export class FetchInstrumentation extends InstrumentationBase<
               }
             );
           } catch (e) {
-            api.diag.error('Instrumentation error', e);
+            plugin._diag.error('Instrumentation error', e);
             return original
               .apply(this, [url, options])
               .then(resolve, reject);
@@ -468,10 +468,12 @@ export class FetchInstrumentation extends InstrumentationBase<
           entries.push(entry);
         }
       });
-    }));
+    }, this._diag));
+
     observer.observe({
       entryTypes: ['resource'],
     });
+
     return { entries, observer, startTime, spanUrl };
   }
 

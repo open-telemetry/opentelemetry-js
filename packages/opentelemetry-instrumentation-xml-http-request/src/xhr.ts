@@ -227,7 +227,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
             }
           }
         });
-      })),
+      }, this._diag)),
       entries: [],
     };
     xhrMem.createdResources.observer.observe({
@@ -377,7 +377,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
           const url: string = args[1];
           plugin._createSpan(this, url, method);
         } catch (e) {
-          api.diag.error('Instrumentation error', e);
+          plugin._diag.error('Instrumentation error', e);
         }
 
         return original.apply(this, args);
@@ -440,20 +440,20 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       // browser and speed of computer
       setTimeout( makeSafe( () => {
         endSpanTimeout(eventName, xhrMem, endTime);
-      }), OBSERVER_WAIT_TIME_MS);
+      }, plugin._diag), OBSERVER_WAIT_TIME_MS);
     }
 
     const onError = makeSafe( function (this: XMLHttpRequest) {
       endSpan(EventNames.EVENT_ERROR, this);
-    })
+    }, plugin._diag)
 
     const onAbort = makeSafe( function (this: XMLHttpRequest) {
       endSpan(EventNames.EVENT_ABORT, this);
-    })
+    }, plugin._diag)
 
     const onTimeout = makeSafe( function (this: XMLHttpRequest) {
       endSpan(EventNames.EVENT_TIMEOUT, this);
-    })
+    }, plugin._diag)
 
     const onLoad = makeSafe( function (this: XMLHttpRequest)  {
       if (this.status < 299) {
@@ -461,7 +461,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
         } else {
           endSpan(EventNames.EVENT_ERROR, this);
         }
-    })
+    }, plugin._diag)
 
     function unregister(xhr: XMLHttpRequest) {
       xhr.removeEventListener('abort', onAbort);
@@ -508,7 +508,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
             );
           }
         } catch (e) {
-          api.diag.error('Instrumentation error', e);
+          plugin._diag.error('Instrumentation error', e);
         }
         return original.apply(this, args);
       };
