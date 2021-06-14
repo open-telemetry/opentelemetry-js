@@ -29,6 +29,7 @@ import {
   parseUrl,
   PerformanceTimingNames as PTN,
   shouldPropagateTraceHeaders,
+  makeSafe
 } from '@opentelemetry/web';
 import { EventNames } from './enums/EventNames';
 import {
@@ -214,7 +215,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       return;
     }
     xhrMem.createdResources = {
-      observer: new PerformanceObserver(list => {
+      observer: new PerformanceObserver(makeSafe( (list: PerformanceObserverEntryList) => {
         const entries = list.getEntries() as PerformanceResourceTiming[];
         entries.forEach(entry => {
           if (
@@ -226,7 +227,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
             }
           }
         });
-      }),
+      })),
       entries: [],
     };
     xhrMem.createdResources.observer.observe({
@@ -371,9 +372,13 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     return (original: OpenFunction): OpenFunction => {
       const plugin = this;
       return function patchOpen(this: XMLHttpRequest, ...args): void {
-        const method: string = args[0];
-        const url: string = args[1];
-        plugin._createSpan(this, url, method);
+        try {
+          const method: string = args[0];
+          const url: string = args[1];
+          plugin._createSpan(this, url, method);
+        } catch (e) {
+          api.diag.error('Instrumentation error', e);
+        }
 
         return original.apply(this, args);
       };
@@ -433,30 +438,30 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       // the timeout is needed as observer doesn't have yet information
       // when event "load" is called. Also the time may differ depends on
       // browser and speed of computer
-      setTimeout(() => {
+      setTimeout( makeSafe( () => {
         endSpanTimeout(eventName, xhrMem, endTime);
-      }, OBSERVER_WAIT_TIME_MS);
+      }), OBSERVER_WAIT_TIME_MS);
     }
 
-    function onError(this: XMLHttpRequest) {
+    const onError = makeSafe( function (this: XMLHttpRequest) {
       endSpan(EventNames.EVENT_ERROR, this);
-    }
+    })
 
-    function onAbort(this: XMLHttpRequest) {
+    const onAbort = makeSafe( function (this: XMLHttpRequest) {
       endSpan(EventNames.EVENT_ABORT, this);
-    }
+    })
 
-    function onTimeout(this: XMLHttpRequest) {
+    const onTimeout = makeSafe( function (this: XMLHttpRequest) {
       endSpan(EventNames.EVENT_TIMEOUT, this);
-    }
+    })
 
-    function onLoad(this: XMLHttpRequest) {
+    const onLoad = makeSafe( function (this: XMLHttpRequest)  {
       if (this.status < 299) {
-        endSpan(EventNames.EVENT_LOAD, this);
-      } else {
-        endSpan(EventNames.EVENT_ERROR, this);
-      }
-    }
+          endSpan(EventNames.EVENT_LOAD, this);
+        } else {
+          endSpan(EventNames.EVENT_ERROR, this);
+        }
+    })
 
     function unregister(xhr: XMLHttpRequest) {
       xhr.removeEventListener('abort', onAbort);
@@ -471,36 +476,39 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
 
     return (original: SendFunction): SendFunction => {
       return function patchSend(this: XMLHttpRequest, ...args): void {
-        const xhrMem = plugin._xhrMem.get(this);
-        if (!xhrMem) {
-          return original.apply(this, args);
-        }
-        const currentSpan = xhrMem.span;
-        const spanUrl = xhrMem.spanUrl;
+        try {
+          const xhrMem = plugin._xhrMem.get(this);
+          if (!xhrMem) {
+            return original.apply(this, args);
+          }
+          const currentSpan = xhrMem.span;
+          const spanUrl = xhrMem.spanUrl;
+          if (currentSpan && spanUrl) {
+            api.context.with(
+              api.trace.setSpan(api.context.active(), currentSpan),
+              () => {
+                plugin._tasksCount++;
+                xhrMem.sendStartTime = hrTime();
+                currentSpan.addEvent(EventNames.METHOD_SEND);
 
-        if (currentSpan && spanUrl) {
-          api.context.with(
-            api.trace.setSpan(api.context.active(), currentSpan),
-            () => {
-              plugin._tasksCount++;
-              xhrMem.sendStartTime = hrTime();
-              currentSpan.addEvent(EventNames.METHOD_SEND);
+                this.addEventListener('abort', onAbort);
+                this.addEventListener('error', onError);
+                this.addEventListener('load', onLoad);
+                this.addEventListener('timeout', onTimeout);
 
-              this.addEventListener('abort', onAbort);
-              this.addEventListener('error', onError);
-              this.addEventListener('load', onLoad);
-              this.addEventListener('timeout', onTimeout);
-
-              xhrMem.callbackToRemoveEvents = () => {
-                unregister(this);
-                if (xhrMem.createdResources) {
-                  xhrMem.createdResources.observer.disconnect();
-                }
-              };
-              plugin._addHeaders(this, spanUrl);
-              plugin._addResourceObserver(this, spanUrl);
-            }
-          );
+                xhrMem.callbackToRemoveEvents = () => {
+                  unregister(this);
+                  if (xhrMem.createdResources) {
+                    xhrMem.createdResources.observer.disconnect();
+                  }
+                };
+                plugin._addHeaders(this, spanUrl);
+                plugin._addResourceObserver(this, spanUrl);
+              }
+            );
+          }
+        } catch (e) {
+          api.diag.error('Instrumentation error', e);
         }
         return original.apply(this, args);
       };

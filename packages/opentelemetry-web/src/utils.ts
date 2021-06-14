@@ -38,6 +38,16 @@ const getUrlNormalizingAnchor = () => {
   return a;
 };
 
+export function makeSafe<TThis, TArgs extends any[]>(func: (this: TThis, ...args: TArgs) => void) {
+  return function (this: TThis, ...args: TArgs): void {
+      try {
+          return func.call(this, ...args)
+      } catch (error) {
+        api.diag.error('Instrumentation error', error);
+      }
+  }
+}
+
 /**
  * Helper function to be able to use enum as typed key in type and in interface when using forEach
  * @param obj

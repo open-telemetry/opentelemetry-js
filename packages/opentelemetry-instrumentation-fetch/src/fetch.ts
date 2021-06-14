@@ -282,13 +282,13 @@ export class FetchInstrumentation extends InstrumentationBase<
     const endTime = core.hrTime();
     this._addFinalSpanAttributes(span, response);
 
-    setTimeout(() => {
+    setTimeout(web.makeSafe (() => {
       spanData.observer?.disconnect();
       this._findResourceAndAddNetworkEvents(span, spanData, endTime);
       this._tasksCount--;
       this._clearResources();
       span.end(endTime);
-    }, OBSERVER_WAIT_TIME_MS);
+    }), OBSERVER_WAIT_TIME_MS);
   }
 
   /**
@@ -308,11 +308,20 @@ export class FetchInstrumentation extends InstrumentationBase<
       ): Promise<Response> {
         const url = input instanceof Request ? input.url : input;
         const options = input instanceof Request ? input : init || {};
-        const createdSpan = plugin._createSpan(url, options);
+        let createdSpan: api.Span | undefined;
+        let spanData: SpanData;
+
+        try {
+          createdSpan = plugin._createSpan(url, options);
+          spanData = plugin._prepareSpanData(url);
+        } catch (e) {
+          api.diag.error('Instrumentation error', e);
+          return original.apply(this, [url, options]);
+        }
+
         if (!createdSpan) {
           return original.apply(this, [url, options]);
         }
-        const spanData = plugin._prepareSpanData(url);
 
         function endSpanOnError(span: api.Span, error: FetchError) {
           plugin._applyAttributesAfterFetch(span, options, error);
@@ -366,6 +375,8 @@ export class FetchInstrumentation extends InstrumentationBase<
               // some older browsers don't have .body implemented
               endSpanOnSuccess(span, response);
             }
+          } catch(e) {
+            api.diag.error('Instrumentation error', e);
           } finally {
             resolve(response);
           }
@@ -378,25 +389,34 @@ export class FetchInstrumentation extends InstrumentationBase<
         ) {
           try {
             endSpanOnError(span, error);
+          } catch(e) {
+            api.diag.error('Instrumentation error', e);
           } finally {
             reject(error);
           }
         }
 
         return new Promise((resolve, reject) => {
-          return api.context.with(
-            api.trace.setSpan(api.context.active(), createdSpan),
-            () => {
-              plugin._addHeaders(options, url);
-              plugin._tasksCount++;
-              return original
-                .apply(this, [url, options])
-                .then(
-                  (onSuccess as any).bind(this, createdSpan, resolve),
-                  onError.bind(this, createdSpan, reject)
-                );
-            }
-          );
+          try {
+            return api.context.with(
+              api.trace.setSpan(api.context.active(), createdSpan!),
+              () => {
+                plugin._addHeaders(options, url);
+                plugin._tasksCount++;
+                return original
+                  .apply(this, [url, options])
+                  .then(
+                    (onSuccess as any).bind(this, createdSpan, resolve),
+                    onError.bind(this, createdSpan!, reject)
+                  );
+              }
+            );
+          } catch (e) {
+            api.diag.error('Instrumentation error', e);
+            return original
+              .apply(this, [url, options])
+              .then(resolve, reject);
+          }
         });
       };
     };
@@ -436,7 +456,7 @@ export class FetchInstrumentation extends InstrumentationBase<
       return { entries, startTime, spanUrl };
     }
 
-    const observer: PerformanceObserver = new PerformanceObserver(list => {
+    const observer: PerformanceObserver = new PerformanceObserver( web.makeSafe( (list: PerformanceObserverEntryList) => {
       const perfObsEntries = list.getEntries() as PerformanceResourceTiming[];
       const urlNormalizingAnchor = getUrlNormalizingAnchor();
       urlNormalizingAnchor.href = spanUrl;
@@ -448,7 +468,7 @@ export class FetchInstrumentation extends InstrumentationBase<
           entries.push(entry);
         }
       });
-    });
+    }));
     observer.observe({
       entryTypes: ['resource'],
     });
