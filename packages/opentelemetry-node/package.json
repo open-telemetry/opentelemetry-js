@@ -41,7 +41,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/api": "^0.21.0",
+    "@opentelemetry/api": "^1.0.0",
     "@opentelemetry/resources": "0.21.0",
     "@opentelemetry/semantic-conventions": "0.21.0",
     "@types/mocha": "8.2.2",
@@ -60,7 +60,7 @@
     "typescript": "4.3.2"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^0.21.0"
+    "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
     "@opentelemetry/context-async-hooks": "0.21.0",
