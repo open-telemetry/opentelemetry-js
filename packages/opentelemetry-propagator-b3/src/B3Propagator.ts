@@ -61,7 +61,9 @@ export class B3Propagator implements TextMapPropagator {
   }
 
   extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
-    if (getter.get(carrier, B3_CONTEXT_HEADER)) {
+    const b3Context = getter.get(carrier, B3_CONTEXT_HEADER);
+
+    if (b3Context && b3Context.length) {
       return this._b3SinglePropagator.extract(context, carrier, getter);
     } else {
       return this._b3MultiPropagator.extract(context, carrier, getter);
