@@ -32,7 +32,7 @@ import {
   suppressTracing
 } from '@opentelemetry/core';
 import * as assert from 'assert';
-import { BasicTracerProvider, Span, Tracer } from '../src';
+import { BasicTracerProvider, Span, Tracer } from '../../src';
 import { TestStackContextManager } from './export/TestStackContextManager';
 import * as sinon from 'sinon';
 

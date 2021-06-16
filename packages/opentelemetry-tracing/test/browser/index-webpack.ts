@@ -13,17 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+const testsContext = require.context('../browser', true, /test$/);
+testsContext.keys().forEach(testsContext);
 
-export * from './Tracer';
-export * from './BasicTracerProvider';
-export * from './platform';
-export * from './export/ConsoleSpanExporter';
-export * from './export/InMemorySpanExporter';
-export * from './export/ReadableSpan';
-export * from './export/SimpleSpanProcessor';
-export * from './export/SpanExporter';
-export * from './export/NoopSpanProcessor';
-export * from './Span';
-export * from './SpanProcessor';
-export * from './TimedEvent';
-export * from './types';
+const testsContextCommon = require.context('../common', true, /test$/);
+testsContextCommon.keys().forEach(testsContextCommon);
+
+const srcContext = require.context('.', true, /src$/);
+srcContext.keys().forEach(srcContext);
