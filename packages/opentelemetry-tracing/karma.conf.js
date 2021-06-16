@@ -19,6 +19,8 @@ const karmaBaseConfig = require('../../karma.base');
 
 module.exports = (config) => {
   config.set(Object.assign({}, karmaBaseConfig, {
-    webpack: karmaWebpackConfig
+    webpack: karmaWebpackConfig,
+    files: ['test/browser/index-webpack.ts'],
+    preprocessors: { 'test/browser/index-webpack.ts': ['webpack'] }
   }))
 };
