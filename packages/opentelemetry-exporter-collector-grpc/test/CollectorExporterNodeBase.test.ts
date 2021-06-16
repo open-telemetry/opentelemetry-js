@@ -88,12 +88,12 @@ describe('CollectorExporterNodeBase', () => {
       // Mock that all requests finish sending
       exporter.sendCallbacks.forEach(({ onSuccess }) => onSuccess());
 
-      // All finished promises should be dropped off
+      // All finished promises should be popped off
       await promisesAllDone;
       assert.strictEqual(exporter['_sendingPromises'].length, 0);
     });
 
-    it('should drop export requests when already sending concurrencyLimit', async () => {
+    it('should drop new export requests when already sending at concurrencyLimit', async () => {
       const spans = [Object.assign({}, mockedReadableSpan)];
       const numToExport = concurrencyLimit + 5;
 
@@ -106,12 +106,12 @@ describe('CollectorExporterNodeBase', () => {
       // Mock that all requests finish sending
       exporter.sendCallbacks.forEach(({ onSuccess }) => onSuccess());
 
-      // All finished promises should be dropped off
+      // All finished promises should be popped off
       await promisesAllDone;
       assert.strictEqual(exporter['_sendingPromises'].length, 0);
     });
 
-    it('should drop export requests even if they failed', async () => {
+    it('should pop export request promises even if they failed', async () => {
       const spans = [Object.assign({}, mockedReadableSpan)];
 
       exporter.export(spans, () => {});
@@ -122,12 +122,12 @@ describe('CollectorExporterNodeBase', () => {
         onError(new Error('Failed to send!!'))
       );
 
-      // All finished promises should be dropped off
+      // All finished promises should be popped off
       await promisesAllDone;
       assert.strictEqual(exporter['_sendingPromises'].length, 0);
     });
 
-    it('should drop export requests even if success callback throws error', async () => {
+    it('should pop export request promises even if success callback throws error', async () => {
       const spans = [Object.assign({}, mockedReadableSpan)];
 
       exporter['_sendPromise'](
@@ -145,7 +145,7 @@ describe('CollectorExporterNodeBase', () => {
         onSuccess();
       });
 
-      // All finished promises should be dropped off
+      // All finished promises should be popped off
       await promisesAllDone;
       assert.strictEqual(exporter['_sendingPromises'].length, 0);
     });
