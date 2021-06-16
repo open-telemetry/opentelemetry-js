@@ -34,9 +34,10 @@ import { DEFAULT_CONFIG } from './config';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
 import { NoopSpanProcessor } from './export/NoopSpanProcessor';
 import { SDKRegistrationConfig, TracerConfig } from './types';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const merge = require('lodash.merge');
 import { SpanExporter } from './export/SpanExporter';
-import { BatchSpanProcessor } from './export/BatchSpanProcessor';
+import { BatchSpanProcessor } from './platform';
 
 export type PROPAGATOR_FACTORY = () => TextMapPropagator;
 export type EXPORTER_FACTORY = () => SpanExporter;
@@ -74,8 +75,8 @@ export class BasicTracerProvider implements TracerProvider {
 
   constructor(config: TracerConfig = {}) {
     const mergedConfig = merge({}, DEFAULT_CONFIG, config);
-    this.resource =
-      mergedConfig.resource ?? Resource.createTelemetrySDKResource();
+    this.resource = mergedConfig.resource ?? Resource.empty();
+    this.resource = Resource.default().merge(this.resource);
     this._config = Object.assign({}, mergedConfig, {
       resource: this.resource,
     });

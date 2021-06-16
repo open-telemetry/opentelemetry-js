@@ -118,7 +118,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       const headers: Partial<Record<string, unknown>> = {};
       api.propagation.inject(api.context.active(), headers);
       if (Object.keys(headers).length > 0) {
-        api.diag.debug('headers inject skipped due to CORS policy');
+        this._diag.debug('headers inject skipped due to CORS policy');
       }
       return;
     }
@@ -139,7 +139,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     span: api.Span,
     corsPreFlightRequest: PerformanceResourceTiming
   ): void {
-    api.context.with(api.setSpan(api.context.active(), span), () => {
+    api.context.with(api.trace.setSpan(api.context.active(), span), () => {
       const childSpan = this.tracer.startSpan('CORS Preflight', {
         startTime: corsPreFlightRequest[PTN.FETCH_START],
       });
@@ -190,7 +190,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
             return;
           }
 
-          api.diag.error('applyCustomAttributesOnSpan', error);
+          this._diag.error('applyCustomAttributesOnSpan', error);
         },
         true
       );
@@ -327,7 +327,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     method: string
   ): api.Span | undefined {
     if (isUrlIgnored(url, this._getConfig().ignoreUrls)) {
-      api.diag.debug('ignoring span as url matches ignored url');
+      this._diag.debug('ignoring span as url matches ignored url');
       return;
     }
     const spanName = `HTTP ${method.toUpperCase()}`;
@@ -480,7 +480,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
 
         if (currentSpan && spanUrl) {
           api.context.with(
-            api.setSpan(api.context.active(), currentSpan),
+            api.trace.setSpan(api.context.active(), currentSpan),
             () => {
               plugin._tasksCount++;
               xhrMem.sendStartTime = hrTime();
@@ -510,17 +510,17 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   /**
    * implements enable function
    */
-  enable() {
-    api.diag.debug('applying patch to', this.moduleName, this.version);
+  override enable() {
+    this._diag.debug('applying patch to', this.moduleName, this.version);
 
     if (isWrapped(XMLHttpRequest.prototype.open)) {
       this._unwrap(XMLHttpRequest.prototype, 'open');
-      api.diag.debug('removing previous patch from method open');
+      this._diag.debug('removing previous patch from method open');
     }
 
     if (isWrapped(XMLHttpRequest.prototype.send)) {
       this._unwrap(XMLHttpRequest.prototype, 'send');
-      api.diag.debug('removing previous patch from method send');
+      this._diag.debug('removing previous patch from method send');
     }
 
     this._wrap(XMLHttpRequest.prototype, 'open', this._patchOpen());
@@ -530,8 +530,8 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   /**
    * implements disable function
    */
-  disable() {
-    api.diag.debug('removing patch from', this.moduleName, this.version);
+  override disable() {
+    this._diag.debug('removing patch from', this.moduleName, this.version);
 
     this._unwrap(XMLHttpRequest.prototype, 'open');
     this._unwrap(XMLHttpRequest.prototype, 'send');

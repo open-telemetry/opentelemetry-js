@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 import {
-  SpanStatusCode,
   context,
+  INVALID_SPAN_CONTEXT,
   propagation,
+  ROOT_CONTEXT,
   Span,
   SpanKind,
   SpanOptions,
   SpanStatus,
-  setSpan,
-  ROOT_CONTEXT,
-  getSpan,
-  suppressInstrumentation,
-  NOOP_TRACER,
-  diag,
+  SpanStatusCode,
+  trace,
 } from '@opentelemetry/api';
+import { suppressTracing } from '@opentelemetry/core';
 import type * as http from 'http';
 import type * as https from 'https';
 import { Socket } from 'net';
@@ -52,6 +50,7 @@ import {
   isWrapped,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
+import { RPCMetadata, RPCType, setRPCMetadata } from '@opentelemetry/core';
 
 /**
  * Http instrumentation instrumentation for Opentelemetry
@@ -73,7 +72,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     return this._config;
   }
 
-  setConfig(config: HttpInstrumentationConfig & InstrumentationConfig = {}) {
+  override setConfig(config: HttpInstrumentationConfig & InstrumentationConfig = {}) {
     this._config = Object.assign({}, config);
   }
 
@@ -86,7 +85,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       'http',
       ['*'],
       moduleExports => {
-        diag.debug(`Applying patch for http@${this._version}`);
+        this._diag.debug(`Applying patch for http@${this._version}`);
         if (isWrapped(moduleExports.request)) {
           this._unwrap(moduleExports, 'request');
         }
@@ -115,7 +114,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       },
       moduleExports => {
         if (moduleExports === undefined) return;
-        diag.debug(`Removing patch for http@${this._version}`);
+        this._diag.debug(`Removing patch for http@${this._version}`);
 
         this._unwrap(moduleExports, 'request');
         this._unwrap(moduleExports, 'get');
@@ -129,7 +128,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       'https',
       ['*'],
       moduleExports => {
-        diag.debug(`Applying patch for https@${this._version}`);
+        this._diag.debug(`Applying patch for https@${this._version}`);
         if (isWrapped(moduleExports.request)) {
           this._unwrap(moduleExports, 'request');
         }
@@ -158,7 +157,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       },
       moduleExports => {
         if (moduleExports === undefined) return;
-        diag.debug(`Removing patch for https@${this._version}`);
+        this._diag.debug(`Removing patch for https@${this._version}`);
 
         this._unwrap(moduleExports, 'request');
         this._unwrap(moduleExports, 'get');
@@ -308,10 +307,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           this._callResponseHook(span, response);
         }
 
-        context.bind(response);
-        diag.debug('outgoingRequest on response()');
+        context.bind(context.active(), response);
+        this._diag.debug('outgoingRequest on response()');
         response.on('end', () => {
-          diag.debug('outgoingRequest on end()');
+          this._diag.debug('outgoingRequest on end()');
           let status: SpanStatus;
 
           if (response.aborted && !response.complete) {
@@ -353,7 +352,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       this._closeHttpSpan(span);
     });
 
-    diag.debug('http.ClientRequest return request');
+    this._diag.debug('http.ClientRequest return request');
     return request;
   }
 
@@ -379,18 +378,18 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         : '/';
       const method = request.method || 'GET';
 
-      diag.debug('%s instrumentation incomingRequest', component);
+      instrumentation._diag.debug('%s instrumentation incomingRequest', component);
 
       if (
         utils.isIgnored(
           pathname,
           instrumentation._getConfig().ignoreIncomingPaths,
-          (e: Error) => diag.error('caught ignoreIncomingPaths error: ', e)
+          (e: Error) => instrumentation._diag.error('caught ignoreIncomingPaths error: ', e)
         )
       ) {
-        return context.with(suppressInstrumentation(context.active()), () => {
-          context.bind(request);
-          context.bind(response);
+        return context.with(suppressTracing(context.active()), () => {
+          context.bind(context.active(), request);
+          context.bind(context.active(), response);
           return original.apply(this, [event, ...args]);
         });
       }
@@ -411,29 +410,72 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         spanOptions,
         ctx
       );
+      const rpcMetadata: RPCMetadata = {
+        type: RPCType.HTTP,
+        span,
+      };
 
-      return context.with(setSpan(ctx, span), () => {
-        context.bind(request);
-        context.bind(response);
+      return context.with(
+        setRPCMetadata(trace.setSpan(ctx, span), rpcMetadata),
+        () => {
+          context.bind(context.active(), request);
+          context.bind(context.active(), response);
 
-        if (instrumentation._getConfig().requestHook) {
-          instrumentation._callRequestHook(span, request);
-        }
-        if (instrumentation._getConfig().responseHook) {
-          instrumentation._callResponseHook(span, response);
-        }
+          if (instrumentation._getConfig().requestHook) {
+            instrumentation._callRequestHook(span, request);
+          }
+          if (instrumentation._getConfig().responseHook) {
+            instrumentation._callResponseHook(span, response);
+          }
 
-        // Wraps end (inspired by:
-        // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/instrumentations/instrumentation-connect.ts#L75)
-        const originalEnd = response.end;
-        response.end = function (
-          this: http.ServerResponse,
-          ..._args: ResponseEndArgs
-        ) {
-          response.end = originalEnd;
-          // Cannot pass args of type ResponseEndArgs,
-          const returned = safeExecuteInTheMiddle(
-            () => response.end.apply(this, arguments as never),
+          // Wraps end (inspired by:
+          // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/instrumentations/instrumentation-connect.ts#L75)
+          const originalEnd = response.end;
+          response.end = function (
+            this: http.ServerResponse,
+            ..._args: ResponseEndArgs
+          ) {
+            response.end = originalEnd;
+            // Cannot pass args of type ResponseEndArgs,
+            const returned = safeExecuteInTheMiddle(
+              () => response.end.apply(this, arguments as never),
+              error => {
+                if (error) {
+                  utils.setSpanWithError(span, error);
+                  instrumentation._closeHttpSpan(span);
+                  throw error;
+                }
+              }
+            );
+
+            const attributes = utils.getIncomingRequestAttributesOnResponse(
+              request,
+              response
+            );
+
+            span
+              .setAttributes(attributes)
+              .setStatus(utils.parseResponseStatus(response.statusCode));
+
+            if (instrumentation._getConfig().applyCustomAttributesOnSpan) {
+              safeExecuteInTheMiddle(
+                () =>
+                  instrumentation._getConfig().applyCustomAttributesOnSpan!(
+                    span,
+                    request,
+                    response
+                  ),
+                () => {},
+                true
+              );
+            }
+
+            instrumentation._closeHttpSpan(span);
+            return returned;
+          };
+
+          return safeExecuteInTheMiddle(
+            () => original.apply(this, [event, ...args]),
             error => {
               if (error) {
                 utils.setSpanWithError(span, error);
@@ -442,44 +484,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
               }
             }
           );
-
-          const attributes = utils.getIncomingRequestAttributesOnResponse(
-            request,
-            response
-          );
-
-          span
-            .setAttributes(attributes)
-            .setStatus(utils.parseResponseStatus(response.statusCode));
-
-          if (instrumentation._getConfig().applyCustomAttributesOnSpan) {
-            safeExecuteInTheMiddle(
-              () =>
-                instrumentation._getConfig().applyCustomAttributesOnSpan!(
-                  span,
-                  request,
-                  response
-                ),
-              () => {},
-              true
-            );
-          }
-
-          instrumentation._closeHttpSpan(span);
-          return returned;
-        };
-
-        return safeExecuteInTheMiddle(
-          () => original.apply(this, [event, ...args]),
-          error => {
-            if (error) {
-              utils.setSpanWithError(span, error);
-              instrumentation._closeHttpSpan(span);
-              throw error;
-            }
-          }
-        );
-      });
+        }
+      );
     };
   }
 
@@ -522,7 +528,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         utils.isIgnored(
           origin + pathname,
           instrumentation._getConfig().ignoreOutgoingUrls,
-          (e: Error) => diag.error('caught ignoreOutgoingUrls error: ', e)
+          (e: Error) => instrumentation._diag.error('caught ignoreOutgoingUrls error: ', e)
         )
       ) {
         return original.apply(this, [optionsParsed, ...args]);
@@ -535,7 +541,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       const span = instrumentation._startHttpSpan(operationName, spanOptions);
 
       const parentContext = context.active();
-      const requestContext = setSpan(parentContext, span);
+      const requestContext = trace.setSpan(parentContext, span);
 
       if (!optionsParsed.headers) {
         optionsParsed.headers = {};
@@ -549,7 +555,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
          */
         const cb = args[args.length - 1];
         if (typeof cb === 'function') {
-          args[args.length - 1] = context.bind(cb, parentContext);
+          args[args.length - 1] = context.bind(parentContext, cb);
         }
 
         const request: http.ClientRequest = safeExecuteInTheMiddle(
@@ -563,8 +569,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           }
         );
 
-        diag.debug('%s instrumentation outgoingRequest', component);
-        context.bind(request, parentContext);
+        instrumentation._diag.debug('%s instrumentation outgoingRequest', component);
+        context.bind(parentContext, request);
         return instrumentation._traceClientRequest(
           component,
           request,
@@ -590,13 +596,11 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         : this._getConfig().requireParentforIncomingSpans;
 
     let span: Span;
-    const currentSpan = getSpan(ctx);
+    const currentSpan = trace.getSpan(ctx);
 
     if (requireParent === true && currentSpan === undefined) {
-      // TODO: Refactor this when a solution is found in
-      // https://github.com/open-telemetry/opentelemetry-specification/issues/530
-      span = NOOP_TRACER.startSpan(name, options, ctx);
-    } else if (requireParent === true && currentSpan?.context().isRemote) {
+      span = trace.wrapSpanContext(INVALID_SPAN_CONTEXT);
+    } else if (requireParent === true && currentSpan?.spanContext().isRemote) {
       span = currentSpan;
     } else {
       span = this.tracer.startSpan(name, options, ctx);

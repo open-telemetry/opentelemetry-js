@@ -33,7 +33,7 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
   Span,
-} from '../../src';
+} from '../../../src';
 import { TestStackContextManager } from './TestStackContextManager';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 

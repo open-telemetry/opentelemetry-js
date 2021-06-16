@@ -21,7 +21,7 @@ import {
   BasicTracerProvider,
   ConsoleSpanExporter,
   SimpleSpanProcessor,
-} from '../../src';
+} from '../../../src';
 
 /* eslint-disable no-console */
 describe('ConsoleSpanExporter', () => {
@@ -79,7 +79,7 @@ describe('ConsoleSpanExporter', () => {
 
         assert.ok(firstSpan.name === 'foo');
         assert.ok(firstEvent.name === 'foobar');
-        assert.ok(consoleSpan.id === firstSpan.spanContext.spanId);
+        assert.ok(consoleSpan.id === firstSpan.spanContext().spanId);
         assert.ok(keys === expectedKeys);
 
         assert.ok(spyExport.calledOnce);

@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { TracerProvider, Tracer, trace } from '@opentelemetry/api';
+import {
+  diag,
+  DiagLogger,
+  trace,
+  Tracer,
+  TracerProvider,
+} from '@opentelemetry/api';
 import { Meter, MeterProvider, metrics } from '@opentelemetry/api-metrics';
 import * as shimmer from 'shimmer';
 import { InstrumentationModuleDefinition } from './platform/node';
@@ -29,6 +35,7 @@ export abstract class InstrumentationAbstract<T = any>
 
   private _tracer: Tracer;
   private _meter: Meter;
+  protected _diag: DiagLogger;
 
   constructor(
     public readonly instrumentationName: string,
@@ -39,6 +46,10 @@ export abstract class InstrumentationAbstract<T = any>
       enabled: true,
       ...config,
     };
+
+    this._diag = diag.createComponentLogger({
+      namespace: instrumentationName,
+    });
 
     this._tracer = trace.getTracer(instrumentationName, instrumentationVersion);
 
@@ -68,6 +79,19 @@ export abstract class InstrumentationAbstract<T = any>
       this.instrumentationName,
       this.instrumentationVersion
     );
+  }
+
+  /* Returns InstrumentationConfig */
+  public getConfig() {
+    return this._config;
+  }
+
+  /**
+   * Sets InstrumentationConfig to this plugin
+   * @param InstrumentationConfig
+   */
+  public setConfig(config: types.InstrumentationConfig = {}) {
+    this._config = Object.assign({}, config);
   }
 
   /**
