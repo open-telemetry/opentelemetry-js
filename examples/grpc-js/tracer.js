@@ -21,13 +21,9 @@ module.exports = (serviceName) => {
 
   let exporter;
   if (EXPORTER.toLowerCase().startsWith('z')) {
-    exporter = new ZipkinExporter({
-      serviceName,
-    });
+    exporter = new ZipkinExporter();
   } else {
-    exporter = new JaegerExporter({
-      serviceName,
-    });
+    exporter = new JaegerExporter();
   }
 
   provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
