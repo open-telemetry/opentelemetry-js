@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { diag } from '..';
+import type { DiagAPI } from '../api/diag';
 import { ContextManager } from '../context/types';
 import { DiagLogger } from '../diag';
 import { _globalThis } from '../platform';
@@ -33,6 +33,7 @@ const _global = _globalThis as OTelGlobal;
 export function registerGlobal<Type extends keyof OTelGlobalAPI>(
   type: Type,
   instance: OTelGlobalAPI[Type],
+  diag: DiagAPI,
   allowOverride = false
 ): boolean {
   const api = (_global[GLOBAL_OPENTELEMETRY_API_KEY] = _global[
@@ -77,7 +78,7 @@ export function getGlobal<Type extends keyof OTelGlobalAPI>(
   return _global[GLOBAL_OPENTELEMETRY_API_KEY]?.[type];
 }
 
-export function unregisterGlobal(type: keyof OTelGlobalAPI) {
+export function unregisterGlobal(type: keyof OTelGlobalAPI, diag: DiagAPI) {
   diag.debug(
     `@opentelemetry/api: Unregistering a global for ${type} v${VERSION}.`
   );

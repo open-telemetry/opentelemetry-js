@@ -21,6 +21,7 @@ import {
   registerGlobal,
   unregisterGlobal,
 } from '../internal/global-utils';
+import { DiagAPI } from './diag';
 
 const API_NAME = 'context';
 const NOOP_CONTEXT_MANAGER = new NoopContextManager();
@@ -49,7 +50,7 @@ export class ContextAPI {
    * @returns true if the context manager was successfully registered, else false
    */
   public setGlobalContextManager(contextManager: ContextManager): boolean {
-    return registerGlobal(API_NAME, contextManager);
+    return registerGlobal(API_NAME, contextManager, DiagAPI.instance());
   }
 
   /**
@@ -93,6 +94,6 @@ export class ContextAPI {
   /** Disable and remove the global context manager */
   public disable() {
     this._getContextManager().disable();
-    unregisterGlobal(API_NAME);
+    unregisterGlobal(API_NAME, DiagAPI.instance());
   }
 }

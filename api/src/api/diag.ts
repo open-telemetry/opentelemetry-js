@@ -96,11 +96,11 @@ export class DiagAPI implements DiagLogger {
         );
       }
 
-      return registerGlobal('diag', newLogger, true);
+      return registerGlobal('diag', newLogger, self, true);
     };
 
     self.disable = () => {
-      unregisterGlobal(API_NAME);
+      unregisterGlobal(API_NAME, self);
     };
 
     self.createComponentLogger = (options: ComponentLoggerOptions) => {

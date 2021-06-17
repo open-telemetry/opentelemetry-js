@@ -34,6 +34,7 @@ import {
   deleteBaggage,
 } from '../baggage/context-helpers';
 import { createBaggage } from '../baggage/utils';
+import { DiagAPI } from './diag';
 
 const API_NAME = 'propagation';
 const NOOP_TEXT_MAP_PROPAGATOR = new NoopTextMapPropagator();
@@ -62,7 +63,7 @@ export class PropagationAPI {
    * @returns true if the propagator was successfully registered, else false
    */
   public setGlobalPropagator(propagator: TextMapPropagator): boolean {
-    return registerGlobal(API_NAME, propagator);
+    return registerGlobal(API_NAME, propagator, DiagAPI.instance());
   }
 
   /**
@@ -104,7 +105,7 @@ export class PropagationAPI {
 
   /** Remove the global propagator */
   public disable() {
-    unregisterGlobal(API_NAME);
+    unregisterGlobal(API_NAME, DiagAPI.instance());
   }
 
   public createBaggage = createBaggage;
