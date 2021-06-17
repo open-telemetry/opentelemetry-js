@@ -15,9 +15,14 @@ All notable changes to this project will be documented in this file.
 * `opentelemetry-api-metrics`, `opentelemetry-context-async-hooks`, `opentelemetry-context-zone-peer-dep`, `opentelemetry-core`, `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`, `opentelemetry-exporter-jaeger`, `opentelemetry-exporter-prometheus`, `opentelemetry-exporter-zipkin`, `opentelemetry-instrumentation-fetch`, `opentelemetry-instrumentation-grpc`, `opentelemetry-instrumentation-http`, `opentelemetry-instrumentation-xml-http-request`, `opentelemetry-instrumentation`, `opentelemetry-metrics`, `opentelemetry-node`, `opentelemetry-propagator-b3`, `opentelemetry-propagator-jaeger`, `opentelemetry-resource-detector-aws`, `opentelemetry-resource-detector-gcp`, `opentelemetry-resources`, `opentelemetry-sdk-node`, `opentelemetry-shim-opentracing`, `opentelemetry-tracing`, `opentelemetry-web`
   * [#2276](https://github.com/open-telemetry/opentelemetry-js/pull/2276) chore(deps): update dependency @opentelemetry/api to v1 ([@renovate-bot](https://github.com/renovate-bot))
 
-### Committers: 2
+### :books: (Refine Doc)
+
+* [#2287](https://github.com/open-telemetry/opentelemetry-js/pull/2287) chore(doc): update compatibility matrix ([@vmarchaud](https://github.com/vmarchaud))
+
+### Committers: 3
 
 * Krystian Kruk ([@kkruk-sumo](https://github.com/kkruk-sumo))
+* Valentin Marchaud ([@vmarchaud](https://github.com/vmarchaud))
 * Weyert de Boer ([@weyert](https://github.com/weyert))
 
 ## 0.21.0
