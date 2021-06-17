@@ -48,7 +48,7 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 
 | API Version | Core version | Contrib Version         |
 | ----------- |--------------|-------------------------|
-| 1.0.0       | ------       | ------                  |
+| 1.0.x       | 0.22.x       | ------                  |
 | 0.21.x      | 0.21.x       | 0.21.x                  |
 | 0.20.x      | 0.20.x       | 0.20.x                  |
 | v1.0.0-rc.3 | 0.19.x       | 0.16.x                  |
