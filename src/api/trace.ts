@@ -33,6 +33,7 @@ import {
   setSpan,
   setSpanContext,
 } from '../trace/context-utils';
+import { DiagAPI } from './diag';
 
 const API_NAME = 'trace';
 
@@ -63,7 +64,11 @@ export class TraceAPI {
    */
   public setGlobalTracerProvider(provider: TracerProvider): boolean {
     this._proxyTracerProvider.setDelegate(provider);
-    return registerGlobal(API_NAME, this._proxyTracerProvider);
+    return registerGlobal(
+      API_NAME,
+      this._proxyTracerProvider,
+      DiagAPI.instance()
+    );
   }
 
   /**
@@ -82,7 +87,7 @@ export class TraceAPI {
 
   /** Remove the global tracer provider */
   public disable() {
-    unregisterGlobal(API_NAME);
+    unregisterGlobal(API_NAME, DiagAPI.instance());
     this._proxyTracerProvider = new ProxyTracerProvider();
   }
 
