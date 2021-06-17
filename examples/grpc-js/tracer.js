@@ -7,8 +7,8 @@ const { SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 const { GrpcInstrumentation } = require('@opentelemetry/instrumentation-grpc');
-const { ResourceAttributes } = require("@opentelemetry/semantic-conventions");
-const { Resource } = require("@opentelemetry/resources");
+const { ResourceAttributes } = require('@opentelemetry/semantic-conventions');
+const { Resource } = require('@opentelemetry/resources');
 
 const EXPORTER = process.env.EXPORTER || '';
 
