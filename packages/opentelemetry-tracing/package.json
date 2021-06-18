@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/tracing",
-  "version": "0.20.0",
+  "version": "0.22.0",
   "description": "OpenTelemetry Tracing",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -14,7 +14,7 @@
   "scripts": {
     "compile": "tsc --build tsconfig.json tsconfig.esm.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json",
-    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/index-webpack.ts'",
+    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "nyc karma start --single-run",
     "tdd": "npm run tdd:node",
     "tdd:node": "npm run test -- --watch-extensions ts --watch",
@@ -53,7 +53,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/api": "^0.21.0",
+    "@opentelemetry/api": "^1.0.0",
     "@types/lodash.merge": "4.6.6",
     "@types/mocha": "8.2.2",
     "@types/node": "14.14.43",
@@ -78,12 +78,12 @@
     "webpack": "4.46.0"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^0.21.0"
+    "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "0.20.0",
-    "@opentelemetry/resources": "0.20.0",
-    "@opentelemetry/semantic-conventions": "0.20.0",
+    "@opentelemetry/core": "0.22.0",
+    "@opentelemetry/resources": "0.22.0",
+    "@opentelemetry/semantic-conventions": "0.22.0",
     "lodash.merge": "^4.6.2"
   }
 }

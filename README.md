@@ -48,6 +48,8 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 
 | API Version | Core version | Contrib Version         |
 | ----------- |--------------|-------------------------|
+| 1.0.x       | 0.22.x       | ------                  |
+| 0.21.x      | 0.21.x       | 0.21.x                  |
 | 0.20.x      | 0.20.x       | 0.20.x                  |
 | v1.0.0-rc.3 | 0.19.x       | 0.16.x                  |
 | 0.18.x      | 0.18.x       | 0.14.x                  |
@@ -426,7 +428,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-shim-opentracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-shim-opentracing
 [otel-tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-tracing
 [otel-web]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-web
-[otel-api]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-api
+[otel-api]: https://github.com/open-telemetry/opentelemetry-js-api
 [otel-core]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-core
 [generate-api-documentation]: https://github.com/open-telemetry/opentelemetry-js/blob/main/CONTRIBUTING.md#generating-api-documentation
 

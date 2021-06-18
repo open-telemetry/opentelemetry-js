@@ -16,7 +16,7 @@
 
 
 {%- macro print_value(type, value) -%}
-  {{ "\"" if type == "string"}}{{value}}{{ "\"" if type == "string"}}
+  {{ "'" if type == "string"}}{{value}}{{ "'" if type == "string"}}
 {%- endmacro %}
 {%- macro upFirst(text) -%}
   {{ text[0]|upper}}{{text[1:] }}

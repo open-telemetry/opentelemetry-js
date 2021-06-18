@@ -22,12 +22,12 @@ import {
   SimpleSpanProcessor,
   Span,
   SpanProcessor,
-} from '../src';
+} from '../../src';
 import {
   setGlobalErrorHandler,
   loggingErrorHandler,
 } from '@opentelemetry/core';
-import { MultiSpanProcessor } from '../src/MultiSpanProcessor';
+import { MultiSpanProcessor } from '../../src/MultiSpanProcessor';
 
 class TestProcessor implements SpanProcessor {
   spans: Span[] = [];

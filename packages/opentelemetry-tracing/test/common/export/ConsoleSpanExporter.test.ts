@@ -21,7 +21,7 @@ import {
   BasicTracerProvider,
   ConsoleSpanExporter,
   SimpleSpanProcessor,
-} from '../../src';
+} from '../../../src';
 
 /* eslint-disable no-console */
 describe('ConsoleSpanExporter', () => {

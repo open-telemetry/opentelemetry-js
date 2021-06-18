@@ -15,7 +15,6 @@
  */
 import {
   context,
-  diag,
   INVALID_SPAN_CONTEXT,
   propagation,
   ROOT_CONTEXT,
@@ -86,7 +85,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       'http',
       ['*'],
       moduleExports => {
-        diag.debug(`Applying patch for http@${this._version}`);
+        this._diag.debug(`Applying patch for http@${this._version}`);
         if (isWrapped(moduleExports.request)) {
           this._unwrap(moduleExports, 'request');
         }
@@ -115,7 +114,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       },
       moduleExports => {
         if (moduleExports === undefined) return;
-        diag.debug(`Removing patch for http@${this._version}`);
+        this._diag.debug(`Removing patch for http@${this._version}`);
 
         this._unwrap(moduleExports, 'request');
         this._unwrap(moduleExports, 'get');
@@ -129,7 +128,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       'https',
       ['*'],
       moduleExports => {
-        diag.debug(`Applying patch for https@${this._version}`);
+        this._diag.debug(`Applying patch for https@${this._version}`);
         if (isWrapped(moduleExports.request)) {
           this._unwrap(moduleExports, 'request');
         }
@@ -158,7 +157,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       },
       moduleExports => {
         if (moduleExports === undefined) return;
-        diag.debug(`Removing patch for https@${this._version}`);
+        this._diag.debug(`Removing patch for https@${this._version}`);
 
         this._unwrap(moduleExports, 'request');
         this._unwrap(moduleExports, 'get');
@@ -309,9 +308,9 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         }
 
         context.bind(context.active(), response);
-        diag.debug('outgoingRequest on response()');
+        this._diag.debug('outgoingRequest on response()');
         response.on('end', () => {
-          diag.debug('outgoingRequest on end()');
+          this._diag.debug('outgoingRequest on end()');
           let status: SpanStatus;
 
           if (response.aborted && !response.complete) {
@@ -353,7 +352,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       this._closeHttpSpan(span);
     });
 
-    diag.debug('http.ClientRequest return request');
+    this._diag.debug('http.ClientRequest return request');
     return request;
   }
 
@@ -379,13 +378,13 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         : '/';
       const method = request.method || 'GET';
 
-      diag.debug('%s instrumentation incomingRequest', component);
+      instrumentation._diag.debug('%s instrumentation incomingRequest', component);
 
       if (
         utils.isIgnored(
           pathname,
           instrumentation._getConfig().ignoreIncomingPaths,
-          (e: Error) => diag.error('caught ignoreIncomingPaths error: ', e)
+          (e: Error) => instrumentation._diag.error('caught ignoreIncomingPaths error: ', e)
         )
       ) {
         return context.with(suppressTracing(context.active()), () => {
@@ -529,7 +528,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         utils.isIgnored(
           origin + pathname,
           instrumentation._getConfig().ignoreOutgoingUrls,
-          (e: Error) => diag.error('caught ignoreOutgoingUrls error: ', e)
+          (e: Error) => instrumentation._diag.error('caught ignoreOutgoingUrls error: ', e)
         )
       ) {
         return original.apply(this, [optionsParsed, ...args]);
@@ -570,7 +569,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           }
         );
 
-        diag.debug('%s instrumentation outgoingRequest', component);
+        instrumentation._diag.debug('%s instrumentation outgoingRequest', component);
         context.bind(parentContext, request);
         return instrumentation._traceClientRequest(
           component,
