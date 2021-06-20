@@ -20,7 +20,7 @@ import {
   ReadableSpan,
   Tracer,
   SpanProcessor,
-} from '../../src';
+} from '../../../src';
 import { ExportResult, AlwaysOnSampler } from '@opentelemetry/core';
 
 /**
