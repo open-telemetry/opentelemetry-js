@@ -719,6 +719,71 @@ describe('Span', () => {
         span.recordException('boom', [0, 123]);
         const event = span.events[0];
         assert.deepStrictEqual(event.time, [0, 123]);
+        assert.deepStrictEqual(event.attributes, { [SemanticAttributes.EXCEPTION_MESSAGE]: 'boom' });
+      });
+    });
+
+    describe('when attributes are provided', () => {
+      it('should record an exception with those attributes', () => {
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
+        assert.strictEqual(span.events.length, 0);
+        span.recordException('boom', { meow: 123, woof: "hello" });
+        const event = span.events[0];
+        assert.deepStrictEqual(event.attributes, {
+          [SemanticAttributes.EXCEPTION_MESSAGE]: 'boom',
+          meow: 123,
+          woof: "hello"
+        });
+      });
+
+      it('provided attributes should take precedence over generated ones', () => {
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
+        assert.strictEqual(span.events.length, 0);
+        span.recordException({ name: 'Error', message: 'boom', stack: 'bar' },
+          {
+            [SemanticAttributes.EXCEPTION_TYPE]: 'My Special Error',
+            [SemanticAttributes.EXCEPTION_MESSAGE]: 'My Special Message',
+            [SemanticAttributes.EXCEPTION_STACKTRACE]: 'My Special Stack',
+          });
+        const event = span.events[0];
+        assert.deepStrictEqual(event.attributes, {
+          [SemanticAttributes.EXCEPTION_TYPE]: 'My Special Error',
+          [SemanticAttributes.EXCEPTION_MESSAGE]: 'My Special Message',
+          [SemanticAttributes.EXCEPTION_STACKTRACE]: 'My Special Stack',
+        });
+      });
+    });
+
+    describe('when both attributes and time are provided', () => {
+      it('should record an exception with provided attributes and time', () => {
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
+        assert.strictEqual(span.events.length, 0);
+        span.recordException('boom', { meow: 123, woof: 'hello' }, [0, 123]);
+        const event = span.events[0];
+        assert.deepStrictEqual(event.time, [0, 123]);
+        assert.deepStrictEqual(event.attributes, {
+          [SemanticAttributes.EXCEPTION_MESSAGE]: 'boom',
+          meow: 123,
+          woof: "hello"
+        })
       });
     });
 

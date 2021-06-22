@@ -133,19 +133,11 @@ export class Span implements api.Span, ReadableSpan {
       api.diag.warn('Dropping extra events.');
       this.events.shift();
     }
-    if (isTimeInput(attributesOrStartTime)) {
-      if (typeof startTime === 'undefined') {
-        startTime = attributesOrStartTime as api.TimeInput;
-      }
-      attributesOrStartTime = undefined;
-    }
-    if (typeof startTime === 'undefined') {
-      startTime = hrTime();
-    }
+    const [resolvedAttributes, resolvedTime] = Span._resolveEventArgs(attributesOrStartTime, startTime);
     this.events.push({
       name,
-      attributes: attributesOrStartTime as api.SpanAttributes,
-      time: timeInputToHrTime(startTime),
+      attributes: resolvedAttributes,
+      time: timeInputToHrTime(resolvedTime),
     });
     return this;
   }
@@ -186,8 +178,13 @@ export class Span implements api.Span, ReadableSpan {
     return this._ended === false;
   }
 
-  recordException(exception: api.Exception, time: api.TimeInput = hrTime()) {
-    const attributes: api.SpanAttributes = {};
+  recordException(
+    exception: api.Exception,
+    attributesOrTime?: api.SpanAttributes | api.TimeInput,
+    time?: api.TimeInput
+  ): void {
+    const [resolvedAttributes, resolvedTime] = Span._resolveEventArgs(attributesOrTime, time);
+    let attributes: api.SpanAttributes = {};
     if (typeof exception === 'string') {
       attributes[SemanticAttributes.EXCEPTION_MESSAGE] = exception;
     } else if (exception) {
@@ -205,13 +202,14 @@ export class Span implements api.Span, ReadableSpan {
         attributes[SemanticAttributes.EXCEPTION_STACKTRACE] = exception.stack;
       }
     }
+    attributes = Object.assign(attributes, resolvedAttributes);
 
     // these are minimum requirements from spec
     if (
       attributes[SemanticAttributes.EXCEPTION_TYPE] ||
       attributes[SemanticAttributes.EXCEPTION_MESSAGE]
     ) {
-      this.addEvent(ExceptionEventName, attributes as api.SpanAttributes, time);
+      this.addEvent(ExceptionEventName, attributes as api.SpanAttributes, resolvedTime);
     } else {
       api.diag.warn(`Failed to record an exception ${exception}`);
     }
@@ -234,5 +232,25 @@ export class Span implements api.Span, ReadableSpan {
       );
     }
     return this._ended;
+  }
+
+  private static _resolveEventArgs(
+    attributesOrTimeArg?: api.SpanAttributes | api.TimeInput,
+    timeArg?: api.TimeInput
+  ): [api.SpanAttributes | undefined, api.TimeInput] {
+    let attributes: api.SpanAttributes | undefined;
+    let time = timeArg;
+    if (isTimeInput(attributesOrTimeArg)) {
+      if (typeof time === 'undefined') {
+        time = attributesOrTimeArg as api.TimeInput;
+      }
+    } else {
+      attributes = attributesOrTimeArg as api.SpanAttributes;
+    }
+    if (typeof time === 'undefined') {
+      time = hrTime();
+    }
+
+    return [attributes, time];
   }
 }
