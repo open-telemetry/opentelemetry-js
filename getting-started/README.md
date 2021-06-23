@@ -61,7 +61,8 @@ $ npm install \
   @opentelemetry/core \
   @opentelemetry/node \
   @opentelemetry/instrumentation-http \
-  @opentelemetry/instrumentation-express
+  @opentelemetry/instrumentation-express \
+  @opentelemetry/instrumentation-grpc
 ```
 
 #### Initialize a global tracer
