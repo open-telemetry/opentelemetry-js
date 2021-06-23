@@ -17,7 +17,7 @@ export function urlMatches(url: string, urlToMatch: string | RegExp): boolean {
   if (typeof urlToMatch === 'string') {
     return url === urlToMatch;
   } else {
-    return !!url.match(urlToMatch);
+    return urlToMatch.test(url);
   }
 }
 /**
