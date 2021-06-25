@@ -37,6 +37,7 @@ jobs:
 
       - name: Fix NPM Cache
         if: ${{ matrix.container == 'node:16' }}
+        continue-on-error: true
         run: chown -R 1001:121 "/github/home/.npm"
       
       - name: Install and Build (cache miss) 🔧
