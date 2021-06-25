@@ -45,9 +45,7 @@ const {
   getNodeAutoInstrumentations,
 } = require("@opentelemetry/auto-instrumentations-node");
 
-const jaegerExporter = new JaegerExporter({
-  serviceName: 'my-service',
-});
+const jaegerExporter = new JaegerExporter();
 const prometheusExporter = new PrometheusExporter({ startServer: true });
 
 const sdk = new opentelemetry.NodeSDK({
