@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.0.1
+
+### :bug: Bug Fix
+
+* [#96](https://github.com/open-telemetry/opentelemetry-js-api/pull/96) chore: remove circular dependency ([@dyladan](https://github.com/dyladan))
+
+### Committers: 1
+
+* Daniel Dyla ([@dyladan](https://github.com/dyladan))
+
 ## 1.0.0
 
 ### :memo: Documentation
