@@ -83,8 +83,7 @@ export abstract class CollectorExporterBrowserBase<
         sendWithBeacon(body, this.url, resolve, reject);
       }
     })
-      .then(onSuccess)
-      .catch(onError);
+      .then(onSuccess, onError);
 
     this._sendingPromises.push(promise);
     promise.finally(() => {
