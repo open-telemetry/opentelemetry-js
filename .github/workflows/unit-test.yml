@@ -34,6 +34,11 @@ jobs:
             packages/*/package-lock.json
             integration-tests/*/package-lock.json
           key: ${{ runner.os }}-unit_test-${{ matrix.container }}-${{ hashFiles('**/package.json') }}
+
+      - name: Fix NPM Cache
+        if: ${{ matrix.container == 'node:16' }}
+        run: chown -R 1001:121 "/github/home/.npm"
+      
       - name: Install and Build (cache miss) 🔧
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
