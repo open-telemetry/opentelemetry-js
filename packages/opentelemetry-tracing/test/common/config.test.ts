@@ -20,7 +20,7 @@ import {
   TraceIdRatioBasedSampler,
 } from '@opentelemetry/core';
 import * as assert from 'assert';
-import { buildSamplerFromEnv } from '../src/config';
+import { buildSamplerFromEnv } from '../../src/config';
 
 describe('config', () => {
   const envSource = (typeof window !== 'undefined'

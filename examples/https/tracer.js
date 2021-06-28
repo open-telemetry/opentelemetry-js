@@ -3,6 +3,8 @@
 const opentelemetry = require('@opentelemetry/api');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 const { NodeTracerProvider } = require('@opentelemetry/node');
+const { Resource } = require('@opentelemetry/resources');
+const { ResourceAttributes } = require('@opentelemetry/semantic-conventions');
 const { SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
@@ -13,16 +15,16 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 module.exports = (serviceName) => {
   let exporter;
-  const provider = new NodeTracerProvider();
+  const provider = new NodeTracerProvider({
+    resource: new Resource({
+      [ResourceAttributes.SERVICE_NAME]: serviceName,
+    }),
+  });
 
   if (EXPORTER.toLowerCase().startsWith('z')) {
-    exporter = new ZipkinExporter({
-      serviceName,
-    });
+    exporter = new ZipkinExporter();
   } else {
-    exporter = new JaegerExporter({
-      serviceName,
-    });
+    exporter = new JaegerExporter();
   }
 
   provider.addSpanProcessor(new SimpleSpanProcessor(exporter));

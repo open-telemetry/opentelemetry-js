@@ -32,7 +32,7 @@ import { SpanExporter } from './SpanExporter';
  * Implementation of the {@link SpanProcessor} that batches spans exported by
  * the SDK then pushes them to the exporter pipeline.
  */
-export class BatchSpanProcessor implements SpanProcessor {
+export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements SpanProcessor {
   private readonly _maxExportBatchSize: number;
   private readonly _maxQueueSize: number;
   private readonly _scheduledDelayMillis: number;
@@ -43,7 +43,7 @@ export class BatchSpanProcessor implements SpanProcessor {
   private _isShutdown = false;
   private _shuttingDownPromise: Promise<void> = Promise.resolve();
 
-  constructor(private readonly _exporter: SpanExporter, config?: BufferConfig) {
+  constructor(private readonly _exporter: SpanExporter, config?: T) {
     const env = getEnv();
     this._maxExportBatchSize =
       typeof config?.maxExportBatchSize === 'number'
@@ -51,15 +51,15 @@ export class BatchSpanProcessor implements SpanProcessor {
         : env.OTEL_BSP_MAX_EXPORT_BATCH_SIZE;
     this._maxQueueSize =
       typeof config?.maxQueueSize === 'number'
-        ? config?.maxQueueSize
+        ? config.maxQueueSize
         : env.OTEL_BSP_MAX_QUEUE_SIZE;
     this._scheduledDelayMillis =
       typeof config?.scheduledDelayMillis === 'number'
-        ? config?.scheduledDelayMillis
+        ? config.scheduledDelayMillis
         : env.OTEL_BSP_SCHEDULE_DELAY;
     this._exportTimeoutMillis =
       typeof config?.exportTimeoutMillis === 'number'
-        ? config?.exportTimeoutMillis
+        ? config.exportTimeoutMillis
         : env.OTEL_BSP_EXPORT_TIMEOUT;
   }
 
@@ -87,6 +87,9 @@ export class BatchSpanProcessor implements SpanProcessor {
     this._isShutdown = true;
     this._shuttingDownPromise = new Promise((resolve, reject) => {
       Promise.resolve()
+        .then(() => {
+          return this.onShutdown();
+        })
         .then(() => {
           return this._flushAll();
         })
@@ -190,4 +193,6 @@ export class BatchSpanProcessor implements SpanProcessor {
       this._timer = undefined;
     }
   }
+
+  protected abstract onShutdown(): void;
 }

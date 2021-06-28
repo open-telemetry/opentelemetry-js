@@ -5,18 +5,22 @@ const { CollectorMetricExporter } = require('@opentelemetry/exporter-collector')
 // const { CollectorMetricExporter } = require('@opentelemetry/exporter-collector-grpc');
 // const { CollectorMetricExporter } = require('@opentelemetry/exporter-collector-proto');
 const { MeterProvider } = require('@opentelemetry/metrics');
+const { Resource } = require('@opentelemetry/resources');
+const { ResourceAttributes } = require('@opentelemetry/semantic-conventions');
 
 // Optional and only needed to see the internal diagnostic logging (during development)
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
 
 const metricExporter = new CollectorMetricExporter({
-  serviceName: 'basic-metric-service',
   // url: 'http://localhost:55681/v1/metrics',
 });
 
 const meter = new MeterProvider({
   exporter: metricExporter,
   interval: 1000,
+  resource: new Resource({
+    [ResourceAttributes.SERVICE_NAME]: 'basic-metric-service',
+  }),
 }).getMeter('example-exporter-collector');
 
 const requestCounter = meter.createCounter('requests', {
