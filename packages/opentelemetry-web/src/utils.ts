@@ -30,13 +30,13 @@ import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 // Used to normalize relative URLs
 let a: HTMLAnchorElement | undefined;
-const getUrlNormalizingAnchor = () => {
+export function getUrlNormalizingAnchor(): HTMLAnchorElement {
   if (!a) {
     a = document.createElement('a');
   }
 
   return a;
-};
+}
 
 export function makeSafe<TThis, TArgs extends any[]>(func: (this: TThis, ...args: TArgs) => void, logger: api.DiagLogger) {
   return function (this: TThis, ...args: TArgs): void {
@@ -165,7 +165,7 @@ export function getResource(
       mainRequest: filteredResources[0],
     };
   }
-  const sorted = sortResources(filteredResources.slice());
+  const sorted = sortResources(filteredResources);
 
   const parsedSpanUrl = parseUrl(spanUrl);
   if (parsedSpanUrl.origin !== window.location.origin && sorted.length > 1) {

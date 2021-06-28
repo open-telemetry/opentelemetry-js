@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-zone",
-  "version": "0.21.0",
+  "version": "0.22.0",
   "description": "OpenTelemetry Context Zone",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -67,7 +67,7 @@
     "webpack-merge": "5.7.3"
   },
   "dependencies": {
-    "@opentelemetry/context-zone-peer-dep": "0.21.0",
+    "@opentelemetry/context-zone-peer-dep": "0.22.0",
     "zone.js": "^0.11.0"
   },
   "sideEffects": true
