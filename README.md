@@ -2,10 +2,11 @@
 ---
 <p align="center">
   <strong>
-    <a href="getting-started/README.md">Getting Started<a/>
+    <a href="getting-started/README.md">Getting Started</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="https://open-telemetry.github.io/opentelemetry-js">API Documentation<a/>
+    <a href="https://open-telemetry.github.io/opentelemetry-js-api">API Reference</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="https://open-telemetry.github.io/opentelemetry-js">SDK Reference</a>
   </strong>
 </p>
 
@@ -28,13 +29,13 @@
 
 <p align="center">
   <strong>
-    <a href="CONTRIBUTING.md">Contributing<a/>
+    <a href="CONTRIBUTING.md">Contributing</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="doc/development-guide.md">Development Guide<a/>
+    <a href="doc/development-guide.md">Development Guide</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="benchmark/README.md">Benchmarks<a/>
+    <a href="benchmark/README.md">Benchmarks</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="examples/">Examples<a/>
+    <a href="examples/">Examples</a>
   </strong>
 </p>
 

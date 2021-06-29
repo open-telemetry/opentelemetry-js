@@ -1,6 +1,47 @@
 {
   "extends": "./tsconfig.base.json",
   "files": [],
+  "typedocOptions": {
+    "packages": [
+      "packages/opentelemetry-api-metrics",
+      "packages/opentelemetry-context-async-hooks",
+      "packages/opentelemetry-context-zone",
+      "packages/opentelemetry-context-zone-peer-dep",
+      "packages/opentelemetry-core",
+      "packages/opentelemetry-exporter-collector",
+      "packages/opentelemetry-exporter-collector-grpc",
+      "packages/opentelemetry-exporter-collector-proto",
+      "packages/opentelemetry-exporter-jaeger",
+      "packages/opentelemetry-exporter-prometheus",
+      "packages/opentelemetry-exporter-zipkin",
+      "packages/opentelemetry-instrumentation",
+      "packages/opentelemetry-instrumentation-fetch",
+      "packages/opentelemetry-instrumentation-grpc",
+      "packages/opentelemetry-instrumentation-http",
+      "packages/opentelemetry-instrumentation-xml-http-request",
+      "packages/opentelemetry-metrics",
+      "packages/opentelemetry-node",
+      "packages/opentelemetry-propagator-b3",
+      "packages/opentelemetry-propagator-jaeger",
+      "packages/opentelemetry-resource-detector-aws",
+      "packages/opentelemetry-resource-detector-gcp",
+      "packages/opentelemetry-resources",
+      "packages/opentelemetry-sdk-node",
+      "packages/opentelemetry-semantic-conventions",
+      "packages/opentelemetry-shim-opentracing",
+      "packages/opentelemetry-tracing",
+      "packages/opentelemetry-web"
+    ],
+    "out": "docs",
+    "exclude": [
+      "**/dist/**",
+      "**/build/**",
+      "**/node_modules/**",
+      "**/*.spec.ts"
+    ],
+    "name": "OpenTelemetry SDK",
+    "excludePrivate": true
+  },
   "references": [
     {
       "path": "backwards-compatability/node10"
