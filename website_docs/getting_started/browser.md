@@ -69,17 +69,24 @@ Add the following code to the `document-load.js` to create a tracer provider, wh
 ```javascript
  // This is necessary for "parcel" to work OOTB. It is not needed for other build tools.
 import 'regenerator-runtime/runtime'
-import { LogLevel } from "@opentelemetry/core";
 import { WebTracerProvider } from '@opentelemetry/web';
 import { DocumentLoad } from '@opentelemetry/plugin-document-load';
+import { ZoneContextManager } from '@opentelemetry/context-zone';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
-// Minimum required setup - supports only synchronous operations
-const provider = new WebTracerProvider({
-  plugins: [
-    new DocumentLoad()
-  ]
+const provider = new WebTracerProvider();
+
+provider.register({
+  // Changing default contextManager to use ZoneContextManager - supports asynchronous operations - optional
+  contextManager: new ZoneContextManager(),
 });
-provider.register();
+
+// Registering instrumentations / plugins
+registerInstrumentations({
+  instrumentations: [
+    new DocumentLoad(),
+  ],
+});
 ```
 
 Run `parcel index.html` and open the development webserver (e.g. at `http://localhost:1234`) to see if your code works.
@@ -93,19 +100,26 @@ To export traces, modify `document-load.js` so that it matches the following cod
 ```javascript
  // This is necessary for "parcel" to work OOTB. It is not needed for other build tools.
 import 'regenerator-runtime/runtime'
-import { LogLevel } from "@opentelemetry/core";
+import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
 import { DocumentLoad } from '@opentelemetry/plugin-document-load';
-import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
+import { ZoneContextManager } from '@opentelemetry/context-zone';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
-// Minimum required setup - supports only synchronous operations
-const provider = new WebTracerProvider({
-  plugins: [
-    new DocumentLoad()
-  ]
+const provider = new WebTracerProvider();
+provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+
+provider.register({
+  // Changing default contextManager to use ZoneContextManager - supports asynchronous operations - optional
+  contextManager: new ZoneContextManager(),
 });
-provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()))
-provider.register();
+
+// Registering instrumentations / plugins
+registerInstrumentations({
+  instrumentations: [
+    new DocumentLoad(),
+  ],
+});
 ```
 
 Now, rebuild your application and open the browser again. In the console of the developer toolbar you should see some traces being exporterd:
