@@ -1,0 +1,542 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Tracer | OpenTelemetry SDK</title>
+	<meta name="description" content="Documentation for OpenTelemetry SDK">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+	<script async src="../assets/js/search.js" id="search-script"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">OpenTelemetry SDK</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../modules.html">OpenTelemetry SDK</a>
+				</li>
+				<li>
+					<a href="../modules/_opentelemetry_tracing.html">@opentelemetry/tracing</a>
+				</li>
+				<li>
+					<a href="_opentelemetry_tracing.tracer.html">Tracer</a>
+				</li>
+			</ul>
+			<h1>Class Tracer</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>This class represents a basic tracer.</p>
+					</div>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">Tracer</span>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel">
+				<h3>Implements</h3>
+				<ul class="tsd-hierarchy">
+					<li><span class="tsd-signature-type">Tracer</span></li>
+				</ul>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Constructors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="_opentelemetry_tracing.tracer.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_opentelemetry_tracing.tracer.html#instrumentationlibrary" class="tsd-kind-icon">instrumentation<wbr>Library</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_opentelemetry_tracing.tracer.html#resource" class="tsd-kind-icon">resource</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_opentelemetry_tracing.tracer.html#getactivespanprocessor" class="tsd-kind-icon">get<wbr>Active<wbr>Span<wbr>Processor</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_opentelemetry_tracing.tracer.html#getspanlimits" class="tsd-kind-icon">get<wbr>Span<wbr>Limits</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter"><a href="_opentelemetry_tracing.tracer.html#startactivespan" class="tsd-kind-icon">start<wbr>Active<wbr>Span</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_opentelemetry_tracing.tracer.html#startspan" class="tsd-kind-icon">start<wbr>Span</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Constructors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class">
+					<a name="constructor" class="tsd-anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Tracer<span class="tsd-signature-symbol">(</span>instrumentationLibrary<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">InstrumentationLibrary</span>, config<span class="tsd-signature-symbol">: </span><a href="../interfaces/_opentelemetry_tracing.tracerconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">TracerConfig</a>, _tracerProvider<span class="tsd-signature-symbol">: </span><a href="_opentelemetry_tracing.basictracerprovider.html" class="tsd-signature-type" data-tsd-kind="Class">BasicTracerProvider</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_opentelemetry_tracing.tracer.html" class="tsd-signature-type" data-tsd-kind="Class">Tracer</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-tracing/src/Tracer.ts#L39">opentelemetry-tracing/src/Tracer.ts:39</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Constructs a new Tracer instance.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>instrumentationLibrary: <span class="tsd-signature-type">InstrumentationLibrary</span></h5>
+								</li>
+								<li>
+									<h5>config: <a href="../interfaces/_opentelemetry_tracing.tracerconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">TracerConfig</a></h5>
+								</li>
+								<li>
+									<h5>_tracerProvider: <a href="_opentelemetry_tracing.basictracerprovider.html" class="tsd-signature-type" data-tsd-kind="Class">BasicTracerProvider</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_opentelemetry_tracing.tracer.html" class="tsd-signature-type" data-tsd-kind="Class">Tracer</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="instrumentationlibrary" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> instrumentation<wbr>Library</h3>
+					<div class="tsd-signature tsd-kind-icon">instrumentation<wbr>Library<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">InstrumentationLibrary</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-tracing/src/Tracer.ts#L39">opentelemetry-tracing/src/Tracer.ts:39</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="resource" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> resource</h3>
+					<div class="tsd-signature tsd-kind-icon">resource<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Resource</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-tracing/src/Tracer.ts#L38">opentelemetry-tracing/src/Tracer.ts:38</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getactivespanprocessor" class="tsd-anchor"></a>
+					<h3>get<wbr>Active<wbr>Span<wbr>Processor</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Active<wbr>Span<wbr>Processor<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_opentelemetry_tracing.spanprocessor.html" class="tsd-signature-type" data-tsd-kind="Interface">SpanProcessor</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-tracing/src/Tracer.ts#L219">opentelemetry-tracing/src/Tracer.ts:219</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_opentelemetry_tracing.spanprocessor.html" class="tsd-signature-type" data-tsd-kind="Interface">SpanProcessor</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getspanlimits" class="tsd-anchor"></a>
+					<h3>get<wbr>Span<wbr>Limits</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Span<wbr>Limits<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_opentelemetry_tracing.spanlimits.html" class="tsd-signature-type" data-tsd-kind="Interface">SpanLimits</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-tracing/src/Tracer.ts#L215">opentelemetry-tracing/src/Tracer.ts:215</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns the active <a href="../interfaces/_opentelemetry_tracing.spanlimits.html">SpanLimits</a>.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_opentelemetry_tracing.spanlimits.html" class="tsd-signature-type" data-tsd-kind="Interface">SpanLimits</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+					<a name="startactivespan" class="tsd-anchor"></a>
+					<h3>start<wbr>Active<wbr>Span</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">start<wbr>Active<wbr>Span&lt;F&gt;<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, fn<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">F</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ReturnType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">F</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">start<wbr>Active<wbr>Span&lt;F&gt;<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, opts<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">SpanOptions</span>, fn<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">F</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ReturnType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">F</span><span class="tsd-signature-symbol">&gt;</span></li>
+						<li class="tsd-signature tsd-kind-icon">start<wbr>Active<wbr>Span&lt;F&gt;<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, opts<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">SpanOptions</span>, ctx<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span>, fn<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">F</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ReturnType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">F</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of api.Tracer.startActiveSpan</p>
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-tracing/src/Tracer.ts#L169">opentelemetry-tracing/src/Tracer.ts:169</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Starts a new <a href="_opentelemetry_tracing.span.html">Span</a> and calls the given function passing it the
+										created span as first argument.
+										Additionally the new span gets set in context and this context is activated
+									for the duration of the function call.</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><p>  const something = tracer.startActiveSpan(&#39;op&#39;, span =&gt; {
+											try {
+											do some work
+											span.setStatus({code: SpanStatusCode.OK});
+											return something;
+											} catch (err) {
+											span.setStatus({
+											code: SpanStatusCode.ERROR,
+											message: err.message,
+											});
+											throw err;
+											} finally {
+											span.end();
+											}
+										});</p>
+									</dd>
+									<dt>example</dt>
+									<dd><p>  const span = tracer.startActiveSpan(&#39;op&#39;, span =&gt; {
+											try {
+											do some work
+											return span;
+											} catch (err) {
+											span.setStatus({
+											code: SpanStatusCode.ERROR,
+											message: err.message,
+											});
+											throw err;
+											}
+											});
+											do some more work
+										span.end();</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>F<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>span<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Span</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">ReturnType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">F</span><span class="tsd-signature-symbol">&gt;</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The name of the span</p>
+									</div>
+								</li>
+								<li>
+									<h5>fn: <span class="tsd-signature-type">F</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>function called in the context of the span and receives the newly created span as an argument</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ReturnType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">F</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>return value of fn</p>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of api.Tracer.startActiveSpan</p>
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-tracing/src/Tracer.ts#L173">opentelemetry-tracing/src/Tracer.ts:173</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>F<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>span<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Span</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">ReturnType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">F</span><span class="tsd-signature-symbol">&gt;</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>opts: <span class="tsd-signature-type">SpanOptions</span></h5>
+								</li>
+								<li>
+									<h5>fn: <span class="tsd-signature-type">F</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ReturnType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">F</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of api.Tracer.startActiveSpan</p>
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-tracing/src/Tracer.ts#L178">opentelemetry-tracing/src/Tracer.ts:178</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>F<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>span<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Span</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">ReturnType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">F</span><span class="tsd-signature-symbol">&gt;</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>opts: <span class="tsd-signature-type">SpanOptions</span></h5>
+								</li>
+								<li>
+									<h5>ctx: <span class="tsd-signature-type">Context</span></h5>
+								</li>
+								<li>
+									<h5>fn: <span class="tsd-signature-type">F</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ReturnType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">F</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="startspan" class="tsd-anchor"></a>
+					<h3>start<wbr>Span</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">start<wbr>Span<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">SpanOptions</span>, context<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Context</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Span</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of api.Tracer.startSpan</p>
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-tracing/src/Tracer.ts#L61">opentelemetry-tracing/src/Tracer.ts:61</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Starts a new Span or returns the default NoopSpan based on the sampling
+									decision.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>options: <span class="tsd-signature-type">SpanOptions</span><span class="tsd-signature-symbol"> = {}</span></h5>
+								</li>
+								<li>
+									<h5>context: <span class="tsd-signature-type">Context</span><span class="tsd-signature-symbol"> = ...</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Span</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class=" ">
+						<a href="../modules.html">Modules</a>
+					</li>
+					<li class="current tsd-kind-module">
+						<a href="../modules/_opentelemetry_tracing.html">@opentelemetry/tracing</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-enum tsd-parent-kind-module">
+						<a href="../enums/_opentelemetry_tracing.forceflushstate.html" class="tsd-kind-icon">Force<wbr>Flush<wbr>State</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="_opentelemetry_tracing.basictracerprovider.html" class="tsd-kind-icon">Basic<wbr>Tracer<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="_opentelemetry_tracing.batchspanprocessor.html" class="tsd-kind-icon">Batch<wbr>Span<wbr>Processor</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="_opentelemetry_tracing.consolespanexporter.html" class="tsd-kind-icon">Console<wbr>Span<wbr>Exporter</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="_opentelemetry_tracing.inmemoryspanexporter.html" class="tsd-kind-icon">In<wbr>Memory<wbr>Span<wbr>Exporter</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="_opentelemetry_tracing.noopspanprocessor.html" class="tsd-kind-icon">Noop<wbr>Span<wbr>Processor</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="_opentelemetry_tracing.simplespanprocessor.html" class="tsd-kind-icon">Simple<wbr>Span<wbr>Processor</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="_opentelemetry_tracing.span.html" class="tsd-kind-icon">Span</a>
+					</li>
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class tsd-parent-kind-module">
+						<a href="_opentelemetry_tracing.tracer.html" class="tsd-kind-icon">Tracer</a>
+						<ul>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class">
+								<a href="_opentelemetry_tracing.tracer.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_opentelemetry_tracing.tracer.html#instrumentationlibrary" class="tsd-kind-icon">instrumentation<wbr>Library</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_opentelemetry_tracing.tracer.html#resource" class="tsd-kind-icon">resource</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_opentelemetry_tracing.tracer.html#getactivespanprocessor" class="tsd-kind-icon">get<wbr>Active<wbr>Span<wbr>Processor</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_opentelemetry_tracing.tracer.html#getspanlimits" class="tsd-kind-icon">get<wbr>Span<wbr>Limits</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter">
+								<a href="_opentelemetry_tracing.tracer.html#startactivespan" class="tsd-kind-icon">start<wbr>Active<wbr>Span</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_opentelemetry_tracing.tracer.html#startspan" class="tsd-kind-icon">start<wbr>Span</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_opentelemetry_tracing.batchspanprocessorbrowserconfig.html" class="tsd-kind-icon">Batch<wbr>Span<wbr>Processor<wbr>Browser<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_opentelemetry_tracing.bufferconfig.html" class="tsd-kind-icon">Buffer<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_opentelemetry_tracing.readablespan.html" class="tsd-kind-icon">Readable<wbr>Span</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_opentelemetry_tracing.sdkregistrationconfig.html" class="tsd-kind-icon">SDKRegistration<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_opentelemetry_tracing.spanexporter.html" class="tsd-kind-icon">Span<wbr>Exporter</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_opentelemetry_tracing.spanlimits.html" class="tsd-kind-icon">Span<wbr>Limits</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_opentelemetry_tracing.spanprocessor.html" class="tsd-kind-icon">Span<wbr>Processor</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_opentelemetry_tracing.timedevent.html" class="tsd-kind-icon">Timed<wbr>Event</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_opentelemetry_tracing.tracerconfig.html" class="tsd-kind-icon">Tracer<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/_opentelemetry_tracing.html#exporter_factory" class="tsd-kind-icon">EXPORTER_<wbr>FACTORY</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/_opentelemetry_tracing.html#propagator_factory" class="tsd-kind-icon">PROPAGATOR_<wbr>FACTORY</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-namespace"><span class="tsd-kind-icon">Namespace</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

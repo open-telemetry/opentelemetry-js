@@ -1,0 +1,866 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>InstrumentationBase | OpenTelemetry SDK</title>
+	<meta name="description" content="Documentation for OpenTelemetry SDK">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+	<script async src="../assets/js/search.js" id="search-script"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">OpenTelemetry SDK</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../modules.html">OpenTelemetry SDK</a>
+				</li>
+				<li>
+					<a href="../modules/_opentelemetry_instrumentation.html">@opentelemetry/instrumentation</a>
+				</li>
+				<li>
+					<a href="_opentelemetry_instrumentation.instrumentationbase.html">InstrumentationBase</a>
+				</li>
+			</ul>
+			<h1>Class InstrumentationBase&lt;T&gt;</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Base abstract class for instrumenting node plugins</p>
+					</div>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-type-parameters">
+				<h3>Type parameters</h3>
+				<ul class="tsd-type-parameters">
+					<li>
+						<h4>T = <span class="tsd-signature-type">any</span></h4>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="tsd-signature-type">InstrumentationAbstract</span>
+						<ul class="tsd-hierarchy">
+							<li>
+								<span class="target">InstrumentationBase</span>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel">
+				<h3>Implements</h3>
+				<ul class="tsd-hierarchy">
+					<li><a href="../interfaces/_opentelemetry_instrumentation.instrumentation.html" class="tsd-signature-type" data-tsd-kind="Interface">Instrumentation</a></li>
+				</ul>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Constructors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-has-type-parameter tsd-is-overwrite"><a href="_opentelemetry_instrumentation.instrumentationbase.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section tsd-is-inherited">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected"><a href="_opentelemetry_instrumentation.instrumentationbase.html#_config" class="tsd-kind-icon">_config</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected"><a href="_opentelemetry_instrumentation.instrumentationbase.html#_diag" class="tsd-kind-icon">_diag</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected"><a href="_opentelemetry_instrumentation.instrumentationbase.html#_massunwrap" class="tsd-kind-icon">_mass<wbr>Unwrap</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected"><a href="_opentelemetry_instrumentation.instrumentationbase.html#_masswrap" class="tsd-kind-icon">_mass<wbr>Wrap</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected"><a href="_opentelemetry_instrumentation.instrumentationbase.html#_unwrap" class="tsd-kind-icon">_unwrap</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected"><a href="_opentelemetry_instrumentation.instrumentationbase.html#_wrap" class="tsd-kind-icon">_wrap</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_opentelemetry_instrumentation.instrumentationbase.html#instrumentationname" class="tsd-kind-icon">instrumentation<wbr>Name</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><a href="_opentelemetry_instrumentation.instrumentationbase.html#instrumentationversion" class="tsd-kind-icon">instrumentation<wbr>Version</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section tsd-is-private-protected">
+							<h3>Accessors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-protected"><a href="_opentelemetry_instrumentation.instrumentationbase.html#meter" class="tsd-kind-icon">meter</a></li>
+								<li class="tsd-kind-get-signature tsd-parent-kind-class tsd-is-protected"><a href="_opentelemetry_instrumentation.instrumentationbase.html#tracer" class="tsd-kind-icon">tracer</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_opentelemetry_instrumentation.instrumentationbase.html#disable" class="tsd-kind-icon">disable</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-overwrite"><a href="_opentelemetry_instrumentation.instrumentationbase.html#enable" class="tsd-kind-icon">enable</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_opentelemetry_instrumentation.instrumentationbase.html#getconfig" class="tsd-kind-icon">get<wbr>Config</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected"><a href="_opentelemetry_instrumentation.instrumentationbase.html#init" class="tsd-kind-icon">init</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_opentelemetry_instrumentation.instrumentationbase.html#isenabled" class="tsd-kind-icon">is<wbr>Enabled</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_opentelemetry_instrumentation.instrumentationbase.html#setconfig" class="tsd-kind-icon">set<wbr>Config</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_opentelemetry_instrumentation.instrumentationbase.html#setmeterprovider" class="tsd-kind-icon">set<wbr>Meter<wbr>Provider</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_opentelemetry_instrumentation.instrumentationbase.html#settracerprovider" class="tsd-kind-icon">set<wbr>Tracer<wbr>Provider</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Constructors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class tsd-has-type-parameter tsd-is-overwrite">
+					<a name="constructor" class="tsd-anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-has-type-parameter tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Instrumentation<wbr>Base&lt;T&gt;<span class="tsd-signature-symbol">(</span>instrumentationName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, instrumentationVersion<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, config<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_opentelemetry_instrumentation.instrumentationconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">InstrumentationConfig</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_opentelemetry_instrumentation.instrumentationbase.html" class="tsd-signature-type" data-tsd-kind="Class">InstrumentationBase</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Overrides InstrumentationAbstract.constructor</p>
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation/src/platform/node/instrumentation.ts#L33">opentelemetry-instrumentation/src/platform/node/instrumentation.ts:33</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T = <span class="tsd-signature-type">any</span></h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>instrumentationName: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>instrumentationVersion: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>config: <a href="../interfaces/_opentelemetry_instrumentation.instrumentationconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">InstrumentationConfig</a><span class="tsd-signature-symbol"> = {}</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_opentelemetry_instrumentation.instrumentationbase.html" class="tsd-signature-type" data-tsd-kind="Class">InstrumentationBase</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group tsd-is-inherited">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
+					<a name="_config" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> _config</h3>
+					<div class="tsd-signature tsd-kind-icon">_config<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_opentelemetry_instrumentation.instrumentationconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">InstrumentationConfig</a></div>
+					<aside class="tsd-sources">
+						<p>Inherited from InstrumentationAbstract._config</p>
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation/src/instrumentation.ts#L34">opentelemetry-instrumentation/src/instrumentation.ts:34</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
+					<a name="_diag" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> _diag</h3>
+					<div class="tsd-signature tsd-kind-icon">_diag<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">DiagLogger</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from InstrumentationAbstract._diag</p>
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation/src/instrumentation.ts#L38">opentelemetry-instrumentation/src/instrumentation.ts:38</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
+					<a name="_massunwrap" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> _mass<wbr>Unwrap</h3>
+					<div class="tsd-signature tsd-kind-icon">_mass<wbr>Unwrap<span class="tsd-signature-symbol">:</span> &lt;Nodule&gt;<span class="tsd-signature-symbol">(</span>nodules<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[]</span>, names<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from InstrumentationAbstract._massUnwrap</p>
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation/src/instrumentation.ts#L66">opentelemetry-instrumentation/src/instrumentation.ts:66</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-class tsd-has-type-parameter">
+									<li class="tsd-signature tsd-kind-icon">&lt;Nodule&gt;<span class="tsd-signature-symbol">(</span>nodules<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[]</span>, names<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-type-parameters-title">Type parameters</h4>
+										<ul class="tsd-type-parameters">
+											<li>
+												<h4>Nodule<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></h4>
+											</li>
+										</ul>
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>nodules: <span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[]</span></h5>
+											</li>
+											<li>
+												<h5>names: <span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[]</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
+					<a name="_masswrap" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> _mass<wbr>Wrap</h3>
+					<div class="tsd-signature tsd-kind-icon">_mass<wbr>Wrap<span class="tsd-signature-symbol">:</span> &lt;Nodule, FieldName&gt;<span class="tsd-signature-symbol">(</span>nodules<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[]</span>, names<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">[]</span>, wrapper<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>original<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from InstrumentationAbstract._massWrap</p>
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation/src/instrumentation.ts#L64">opentelemetry-instrumentation/src/instrumentation.ts:64</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-class tsd-has-type-parameter">
+									<li class="tsd-signature tsd-kind-icon">&lt;Nodule, FieldName&gt;<span class="tsd-signature-symbol">(</span>nodules<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[]</span>, names<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">[]</span>, wrapper<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>original<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-type-parameters-title">Type parameters</h4>
+										<ul class="tsd-type-parameters">
+											<li>
+												<h4>Nodule<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></h4>
+											</li>
+											<li>
+												<h4>FieldName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h4>
+											</li>
+										</ul>
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>nodules: <span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[]</span></h5>
+											</li>
+											<li>
+												<h5>names: <span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">[]</span></h5>
+											</li>
+											<li>
+												<h5>wrapper: <span class="tsd-signature-symbol">(</span>original<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">]</span></h5>
+												<ul class="tsd-parameters">
+													<li class="tsd-parameter-signature">
+														<ul class="tsd-signatures tsd-kind-type-literal">
+															<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>original<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">]</span></li>
+														</ul>
+														<ul class="tsd-descriptions">
+															<li class="tsd-description">
+																<h4 class="tsd-parameters-title">Parameters</h4>
+																<ul class="tsd-parameters">
+																	<li>
+																		<h5>original: <span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">]</span></h5>
+																	</li>
+																</ul>
+																<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">]</span></h4>
+															</li>
+														</ul>
+													</li>
+												</ul>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
+					<a name="_unwrap" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> _unwrap</h3>
+					<div class="tsd-signature tsd-kind-icon">_unwrap<span class="tsd-signature-symbol">:</span> &lt;Nodule&gt;<span class="tsd-signature-symbol">(</span>nodule<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Nodule</span>, name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from InstrumentationAbstract._unwrap</p>
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation/src/instrumentation.ts#L62">opentelemetry-instrumentation/src/instrumentation.ts:62</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-class tsd-has-type-parameter">
+									<li class="tsd-signature tsd-kind-icon">&lt;Nodule&gt;<span class="tsd-signature-symbol">(</span>nodule<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Nodule</span>, name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-type-parameters-title">Type parameters</h4>
+										<ul class="tsd-type-parameters">
+											<li>
+												<h4>Nodule<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></h4>
+											</li>
+										</ul>
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>nodule: <span class="tsd-signature-type">Nodule</span></h5>
+											</li>
+											<li>
+												<h5>name: <span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">Nodule</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
+					<a name="_wrap" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> _wrap</h3>
+					<div class="tsd-signature tsd-kind-icon">_wrap<span class="tsd-signature-symbol">:</span> &lt;Nodule, FieldName&gt;<span class="tsd-signature-symbol">(</span>nodule<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Nodule</span>, name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">FieldName</span>, wrapper<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>original<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from InstrumentationAbstract._wrap</p>
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation/src/instrumentation.ts#L60">opentelemetry-instrumentation/src/instrumentation.ts:60</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-class tsd-has-type-parameter">
+									<li class="tsd-signature tsd-kind-icon">&lt;Nodule, FieldName&gt;<span class="tsd-signature-symbol">(</span>nodule<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Nodule</span>, name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">FieldName</span>, wrapper<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>original<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-type-parameters-title">Type parameters</h4>
+										<ul class="tsd-type-parameters">
+											<li>
+												<h4>Nodule<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></h4>
+											</li>
+											<li>
+												<h4>FieldName<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h4>
+											</li>
+										</ul>
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>nodule: <span class="tsd-signature-type">Nodule</span></h5>
+											</li>
+											<li>
+												<h5>name: <span class="tsd-signature-type">FieldName</span></h5>
+											</li>
+											<li>
+												<h5>wrapper: <span class="tsd-signature-symbol">(</span>original<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">]</span></h5>
+												<ul class="tsd-parameters">
+													<li class="tsd-parameter-signature">
+														<ul class="tsd-signatures tsd-kind-type-literal">
+															<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>original<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">]</span></li>
+														</ul>
+														<ul class="tsd-descriptions">
+															<li class="tsd-description">
+																<h4 class="tsd-parameters-title">Parameters</h4>
+																<ul class="tsd-parameters">
+																	<li>
+																		<h5>original: <span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">]</span></h5>
+																	</li>
+																</ul>
+																<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Nodule</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">FieldName</span><span class="tsd-signature-symbol">]</span></h4>
+															</li>
+														</ul>
+													</li>
+												</ul>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="instrumentationname" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> instrumentation<wbr>Name</h3>
+					<div class="tsd-signature tsd-kind-icon">instrumentation<wbr>Name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<p>Implementation of <a href="../interfaces/_opentelemetry_instrumentation.instrumentation.html">Instrumentation</a>.<a href="../interfaces/_opentelemetry_instrumentation.instrumentation.html#instrumentationname">instrumentationName</a></p>
+						<p>Inherited from InstrumentationAbstract.instrumentationName</p>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Instrumentation Name</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+					<a name="instrumentationversion" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> instrumentation<wbr>Version</h3>
+					<div class="tsd-signature tsd-kind-icon">instrumentation<wbr>Version<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<p>Implementation of <a href="../interfaces/_opentelemetry_instrumentation.instrumentation.html">Instrumentation</a>.<a href="../interfaces/_opentelemetry_instrumentation.instrumentation.html#instrumentationversion">instrumentationVersion</a></p>
+						<p>Inherited from InstrumentationAbstract.instrumentationVersion</p>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Instrumentation Version</p>
+						</div>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group tsd-is-private-protected">
+				<h2>Accessors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-protected">
+					<a name="meter" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> meter</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-protected">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> meter<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Meter</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation/src/instrumentation.ts#L69">opentelemetry-instrumentation/src/instrumentation.ts:69</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Meter</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-get-signature tsd-parent-kind-class tsd-is-protected">
+					<a name="tracer" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> tracer</h3>
+					<ul class="tsd-signatures tsd-kind-get-signature tsd-parent-kind-class tsd-is-protected">
+						<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">get</span> tracer<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Tracer</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation/src/instrumentation.ts#L109">opentelemetry-instrumentation/src/instrumentation.ts:109</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Tracer</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="disable" class="tsd-anchor"></a>
+					<h3>disable</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">disable<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_opentelemetry_instrumentation.instrumentation.html">Instrumentation</a>.<a href="../interfaces/_opentelemetry_instrumentation.instrumentation.html#disable">disable</a></p>
+								<p>Overrides InstrumentationAbstract.disable</p>
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation/src/platform/node/instrumentation.ts#L147">opentelemetry-instrumentation/src/platform/node/instrumentation.ts:147</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Method to disable the instrumentation</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+					<a name="enable" class="tsd-anchor"></a>
+					<h3>enable</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+						<li class="tsd-signature tsd-kind-icon">enable<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_opentelemetry_instrumentation.instrumentation.html">Instrumentation</a>.<a href="../interfaces/_opentelemetry_instrumentation.instrumentation.html#enable">enable</a></p>
+								<p>Overrides InstrumentationAbstract.enable</p>
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation/src/platform/node/instrumentation.ts#L106">opentelemetry-instrumentation/src/platform/node/instrumentation.ts:106</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Method to enable the instrumentation</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="getconfig" class="tsd-anchor"></a>
+					<h3>get<wbr>Config</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Config<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_opentelemetry_instrumentation.instrumentationconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">InstrumentationConfig</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_opentelemetry_instrumentation.instrumentation.html">Instrumentation</a>.<a href="../interfaces/_opentelemetry_instrumentation.instrumentation.html#getconfig">getConfig</a></p>
+								<p>Inherited from InstrumentationAbstract.getConfig</p>
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation/src/instrumentation.ts#L85">opentelemetry-instrumentation/src/instrumentation.ts:85</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Method to get instrumentation config</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_opentelemetry_instrumentation.instrumentationconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">InstrumentationConfig</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
+					<a name="init" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> <span class="tsd-flag ts-flagAbstract">Abstract</span> init</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
+						<li class="tsd-signature tsd-kind-icon">init<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_opentelemetry_instrumentation.instrumentationmoduledefinition.html" class="tsd-signature-type" data-tsd-kind="Interface">InstrumentationModuleDefinition</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_opentelemetry_instrumentation.instrumentationmoduledefinition.html" class="tsd-signature-type" data-tsd-kind="Interface">InstrumentationModuleDefinition</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Inherited from InstrumentationAbstract.init</p>
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation/src/instrumentation.ts#L123">opentelemetry-instrumentation/src/instrumentation.ts:123</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Init method in which plugin should define _modules and patches for
+									methods</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_opentelemetry_instrumentation.instrumentationmoduledefinition.html" class="tsd-signature-type" data-tsd-kind="Interface">InstrumentationModuleDefinition</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><a href="../interfaces/_opentelemetry_instrumentation.instrumentationmoduledefinition.html" class="tsd-signature-type" data-tsd-kind="Interface">InstrumentationModuleDefinition</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="isenabled" class="tsd-anchor"></a>
+					<h3>is<wbr>Enabled</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Enabled<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation/src/platform/node/instrumentation.ts#L165">opentelemetry-instrumentation/src/platform/node/instrumentation.ts:165</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="setconfig" class="tsd-anchor"></a>
+					<h3>set<wbr>Config</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Config<span class="tsd-signature-symbol">(</span>config<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_opentelemetry_instrumentation.instrumentationconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">InstrumentationConfig</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_opentelemetry_instrumentation.instrumentation.html">Instrumentation</a>.<a href="../interfaces/_opentelemetry_instrumentation.instrumentation.html#setconfig">setConfig</a></p>
+								<p>Inherited from InstrumentationAbstract.setConfig</p>
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation/src/instrumentation.ts#L93">opentelemetry-instrumentation/src/instrumentation.ts:93</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Sets InstrumentationConfig to this plugin</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>config: <a href="../interfaces/_opentelemetry_instrumentation.instrumentationconfig.html" class="tsd-signature-type" data-tsd-kind="Interface">InstrumentationConfig</a><span class="tsd-signature-symbol"> = {}</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="setmeterprovider" class="tsd-anchor"></a>
+					<h3>set<wbr>Meter<wbr>Provider</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Meter<wbr>Provider<span class="tsd-signature-symbol">(</span>meterProvider<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">MeterProvider</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_opentelemetry_instrumentation.instrumentation.html">Instrumentation</a>.<a href="../interfaces/_opentelemetry_instrumentation.instrumentation.html#setmeterprovider">setMeterProvider</a></p>
+								<p>Inherited from InstrumentationAbstract.setMeterProvider</p>
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation/src/instrumentation.ts#L77">opentelemetry-instrumentation/src/instrumentation.ts:77</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Sets MeterProvider to this plugin</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>meterProvider: <span class="tsd-signature-type">MeterProvider</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="settracerprovider" class="tsd-anchor"></a>
+					<h3>set<wbr>Tracer<wbr>Provider</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Tracer<wbr>Provider<span class="tsd-signature-symbol">(</span>tracerProvider<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TracerProvider</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/_opentelemetry_instrumentation.instrumentation.html">Instrumentation</a>.<a href="../interfaces/_opentelemetry_instrumentation.instrumentation.html#settracerprovider">setTracerProvider</a></p>
+								<p>Inherited from InstrumentationAbstract.setTracerProvider</p>
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation/src/instrumentation.ts#L101">opentelemetry-instrumentation/src/instrumentation.ts:101</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Sets TraceProvider to this plugin</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>tracerProvider: <span class="tsd-signature-type">TracerProvider</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class=" ">
+						<a href="../modules.html">Modules</a>
+					</li>
+					<li class="current tsd-kind-module">
+						<a href="../modules/_opentelemetry_instrumentation.html">@opentelemetry/instrumentation</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="_opentelemetry_instrumentation.instrumentationbase.html" class="tsd-kind-icon">Instrumentation<wbr>Base</a>
+						<ul>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-has-type-parameter tsd-is-overwrite">
+								<a href="_opentelemetry_instrumentation.instrumentationbase.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
+								<a href="_opentelemetry_instrumentation.instrumentationbase.html#_config" class="tsd-kind-icon">_config</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
+								<a href="_opentelemetry_instrumentation.instrumentationbase.html#_diag" class="tsd-kind-icon">_diag</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
+								<a href="_opentelemetry_instrumentation.instrumentationbase.html#_massunwrap" class="tsd-kind-icon">_mass<wbr>Unwrap</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
+								<a href="_opentelemetry_instrumentation.instrumentationbase.html#_masswrap" class="tsd-kind-icon">_mass<wbr>Wrap</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
+								<a href="_opentelemetry_instrumentation.instrumentationbase.html#_unwrap" class="tsd-kind-icon">_unwrap</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
+								<a href="_opentelemetry_instrumentation.instrumentationbase.html#_wrap" class="tsd-kind-icon">_wrap</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="_opentelemetry_instrumentation.instrumentationbase.html#instrumentationname" class="tsd-kind-icon">instrumentation<wbr>Name</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-inherited">
+								<a href="_opentelemetry_instrumentation.instrumentationbase.html#instrumentationversion" class="tsd-kind-icon">instrumentation<wbr>Version</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-protected">
+								<a href="_opentelemetry_instrumentation.instrumentationbase.html#meter" class="tsd-kind-icon">meter</a>
+							</li>
+							<li class=" tsd-kind-get-signature tsd-parent-kind-class tsd-is-protected">
+								<a href="_opentelemetry_instrumentation.instrumentationbase.html#tracer" class="tsd-kind-icon">tracer</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_opentelemetry_instrumentation.instrumentationbase.html#disable" class="tsd-kind-icon">disable</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-overwrite">
+								<a href="_opentelemetry_instrumentation.instrumentationbase.html#enable" class="tsd-kind-icon">enable</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_opentelemetry_instrumentation.instrumentationbase.html#getconfig" class="tsd-kind-icon">get<wbr>Config</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited tsd-is-protected">
+								<a href="_opentelemetry_instrumentation.instrumentationbase.html#init" class="tsd-kind-icon">init</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_opentelemetry_instrumentation.instrumentationbase.html#isenabled" class="tsd-kind-icon">is<wbr>Enabled</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_opentelemetry_instrumentation.instrumentationbase.html#setconfig" class="tsd-kind-icon">set<wbr>Config</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_opentelemetry_instrumentation.instrumentationbase.html#setmeterprovider" class="tsd-kind-icon">set<wbr>Meter<wbr>Provider</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="_opentelemetry_instrumentation.instrumentationbase.html#settracerprovider" class="tsd-kind-icon">set<wbr>Tracer<wbr>Provider</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+					<li class=" tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="_opentelemetry_instrumentation.instrumentationnodemoduledefinition.html" class="tsd-kind-icon">Instrumentation<wbr>Node<wbr>Module<wbr>Definition</a>
+					</li>
+					<li class=" tsd-kind-class tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="_opentelemetry_instrumentation.instrumentationnodemodulefile.html" class="tsd-kind-icon">Instrumentation<wbr>Node<wbr>Module<wbr>File</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_opentelemetry_instrumentation.autoloaderoptions.html" class="tsd-kind-icon">Auto<wbr>Loader<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_opentelemetry_instrumentation.autoloaderresult.html" class="tsd-kind-icon">Auto<wbr>Loader<wbr>Result</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_opentelemetry_instrumentation.instrumentation.html" class="tsd-kind-icon">Instrumentation</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_opentelemetry_instrumentation.instrumentationconfig.html" class="tsd-kind-icon">Instrumentation<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="../interfaces/_opentelemetry_instrumentation.instrumentationmoduledefinition.html" class="tsd-kind-icon">Instrumentation<wbr>Module<wbr>Definition</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="../interfaces/_opentelemetry_instrumentation.instrumentationmodulefile.html" class="tsd-kind-icon">Instrumentation<wbr>Module<wbr>File</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_opentelemetry_instrumentation.shimwrapped.html" class="tsd-kind-icon">Shim<wbr>Wrapped</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/_opentelemetry_instrumentation.html#instrumentationoption" class="tsd-kind-icon">Instrumentation<wbr>Option</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="../modules/_opentelemetry_instrumentation.html#iswrapped" class="tsd-kind-icon">is<wbr>Wrapped</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="../modules/_opentelemetry_instrumentation.html#registerinstrumentations" class="tsd-kind-icon">register<wbr>Instrumentations</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="../modules/_opentelemetry_instrumentation.html#safeexecuteinthemiddle" class="tsd-kind-icon">safe<wbr>Execute<wbr>InThe<wbr>Middle</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="../modules/_opentelemetry_instrumentation.html#safeexecuteinthemiddleasync" class="tsd-kind-icon">safe<wbr>Execute<wbr>InThe<wbr>Middle<wbr>Async</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-namespace"><span class="tsd-kind-icon">Namespace</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

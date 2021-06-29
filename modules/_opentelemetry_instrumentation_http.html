@@ -1,0 +1,1038 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>@opentelemetry/instrumentation-http | OpenTelemetry SDK</title>
+	<meta name="description" content="Documentation for OpenTelemetry SDK">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+	<script async src="../assets/js/search.js" id="search-script"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">OpenTelemetry SDK</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../modules.html">OpenTelemetry SDK</a>
+				</li>
+				<li>
+					<a href="_opentelemetry_instrumentation_http.html">@opentelemetry/instrumentation-http</a>
+				</li>
+			</ul>
+			<h1>Module @opentelemetry/instrumentation-http</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Classes</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-class tsd-parent-kind-module"><a href="../classes/_opentelemetry_instrumentation_http.httpinstrumentation.html" class="tsd-kind-icon">Http<wbr>Instrumentation</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Interfaces</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/_opentelemetry_instrumentation_http.err.html" class="tsd-kind-icon">Err</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/_opentelemetry_instrumentation_http.httpcustomattributefunction.html" class="tsd-kind-icon">Http<wbr>Custom<wbr>Attribute<wbr>Function</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/_opentelemetry_instrumentation_http.httpinstrumentationconfig.html" class="tsd-kind-icon">Http<wbr>Instrumentation<wbr>Config</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/_opentelemetry_instrumentation_http.httprequestcustomattributefunction.html" class="tsd-kind-icon">Http<wbr>Request<wbr>Custom<wbr>Attribute<wbr>Function</a></li>
+								<li class="tsd-kind-interface tsd-parent-kind-module"><a href="../interfaces/_opentelemetry_instrumentation_http.httpresponsecustomattributefunction.html" class="tsd-kind-icon">Http<wbr>Response<wbr>Custom<wbr>Attribute<wbr>Function</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Type aliases</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-type-alias tsd-parent-kind-module tsd-has-type-parameter"><a href="_opentelemetry_instrumentation_http.html#func" class="tsd-kind-icon">Func</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#getfunction" class="tsd-kind-icon">Get<wbr>Function</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#http" class="tsd-kind-icon">Http</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#httpcallback" class="tsd-kind-icon">Http<wbr>Callback</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#httpcallbackoptional" class="tsd-kind-icon">Http<wbr>Callback<wbr>Optional</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#httprequestargs" class="tsd-kind-icon">Http<wbr>Request<wbr>Args</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#https" class="tsd-kind-icon">Https</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#ignorematcher" class="tsd-kind-icon">Ignore<wbr>Matcher</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#parsedrequestoptions" class="tsd-kind-icon">Parsed<wbr>Request<wbr>Options</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#requestfunction" class="tsd-kind-icon">Request<wbr>Function</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#requestsignature" class="tsd-kind-icon">Request<wbr>Signature</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#responseendargs" class="tsd-kind-icon">Response<wbr>End<wbr>Args</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Functions</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#getabsoluteurl" class="tsd-kind-icon">get<wbr>Absolute<wbr>Url</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#getattributesfromhttpkind" class="tsd-kind-icon">get<wbr>Attributes<wbr>From<wbr>Http<wbr>Kind</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#getincomingrequestattributes" class="tsd-kind-icon">get<wbr>Incoming<wbr>Request<wbr>Attributes</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#getincomingrequestattributesonresponse" class="tsd-kind-icon">get<wbr>Incoming<wbr>Request<wbr>Attributes<wbr>OnResponse</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#getoutgoingrequestattributes" class="tsd-kind-icon">get<wbr>Outgoing<wbr>Request<wbr>Attributes</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#getoutgoingrequestattributesonresponse" class="tsd-kind-icon">get<wbr>Outgoing<wbr>Request<wbr>Attributes<wbr>OnResponse</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#getrequestinfo" class="tsd-kind-icon">get<wbr>Request<wbr>Info</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#hasexpectheader" class="tsd-kind-icon">has<wbr>Expect<wbr>Header</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#iscompressed" class="tsd-kind-icon">is<wbr>Compressed</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#isignored" class="tsd-kind-icon">is<wbr>Ignored</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#isvalidoptionstype" class="tsd-kind-icon">is<wbr>Valid<wbr>Options<wbr>Type</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#parseresponsestatus" class="tsd-kind-icon">parse<wbr>Response<wbr>Status</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#satisfiespattern" class="tsd-kind-icon">satisfies<wbr>Pattern</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#setrequestcontentlengthattribute" class="tsd-kind-icon">set<wbr>Request<wbr>Content<wbr>Length<wbr>Attribute</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#setresponsecontentlengthattribute" class="tsd-kind-icon">set<wbr>Response<wbr>Content<wbr>Length<wbr>Attribute</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_opentelemetry_instrumentation_http.html#setspanwitherror" class="tsd-kind-icon">set<wbr>Span<wbr>With<wbr>Error</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Type aliases</h2>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module tsd-has-type-parameter">
+					<a name="func" class="tsd-anchor"></a>
+					<h3>Func</h3>
+					<div class="tsd-signature tsd-kind-icon">Func&lt;T&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">T</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/types.ts#L48">opentelemetry-instrumentation-http/src/types.ts:48</a></li>
+						</ul>
+					</aside>
+					<h4 class="tsd-type-parameters-title">Type parameters</h4>
+					<ul class="tsd-type-parameters">
+						<li>
+							<h4>T</h4>
+						</li>
+					</ul>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
+					<a name="getfunction" class="tsd-anchor"></a>
+					<h3>Get<wbr>Function</h3>
+					<div class="tsd-signature tsd-kind-icon">Get<wbr>Function<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">typeof </span><span class="tsd-signature-type">get</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/types.ts#L32">opentelemetry-instrumentation-http/src/types.ts:32</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
+					<a name="http" class="tsd-anchor"></a>
+					<h3>Http</h3>
+					<div class="tsd-signature tsd-kind-icon">Http<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">typeof </span><span class="tsd-signature-type">http</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/types.ts#L45">opentelemetry-instrumentation-http/src/types.ts:45</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
+					<a name="httpcallback" class="tsd-anchor"></a>
+					<h3>Http<wbr>Callback</h3>
+					<div class="tsd-signature tsd-kind-icon">Http<wbr>Callback<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>res<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IncomingMessage</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/types.ts#L30">opentelemetry-instrumentation-http/src/types.ts:30</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>res<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IncomingMessage</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>res: <span class="tsd-signature-type">IncomingMessage</span></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
+					<a name="httpcallbackoptional" class="tsd-anchor"></a>
+					<h3>Http<wbr>Callback<wbr>Optional</h3>
+					<div class="tsd-signature tsd-kind-icon">Http<wbr>Callback<wbr>Optional<span class="tsd-signature-symbol">:</span> <a href="_opentelemetry_instrumentation_http.html#httpcallback" class="tsd-signature-type" data-tsd-kind="Type alias">HttpCallback</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/types.ts#L34">opentelemetry-instrumentation-http/src/types.ts:34</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
+					<a name="httprequestargs" class="tsd-anchor"></a>
+					<h3>Http<wbr>Request<wbr>Args</h3>
+					<div class="tsd-signature tsd-kind-icon">Http<wbr>Request<wbr>Args<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span><a href="_opentelemetry_instrumentation_http.html#httpcallbackoptional" class="tsd-signature-type" data-tsd-kind="Type alias">HttpCallbackOptional</a><span class="tsd-signature-symbol"> | </span><a href="_opentelemetry_instrumentation_http.html#requestsignature" class="tsd-signature-type" data-tsd-kind="Type alias">RequestSignature</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">[]</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/types.ts#L40">opentelemetry-instrumentation-http/src/types.ts:40</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
+					<a name="https" class="tsd-anchor"></a>
+					<h3>Https</h3>
+					<div class="tsd-signature tsd-kind-icon">Https<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">typeof </span><span class="tsd-signature-type">https</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/types.ts#L46">opentelemetry-instrumentation-http/src/types.ts:46</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
+					<a name="ignorematcher" class="tsd-anchor"></a>
+					<h3>Ignore<wbr>Matcher</h3>
+					<div class="tsd-signature tsd-kind-icon">Ignore<wbr>Matcher<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">RegExp</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>url<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/types.ts#L29">opentelemetry-instrumentation-http/src/types.ts:29</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
+					<a name="parsedrequestoptions" class="tsd-anchor"></a>
+					<h3>Parsed<wbr>Request<wbr>Options</h3>
+					<div class="tsd-signature tsd-kind-icon">Parsed<wbr>Request<wbr>Options<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-signature-type">http.RequestOptions</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">url.UrlWithParsedQuery</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">http.RequestOptions</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/types.ts#L42">opentelemetry-instrumentation-http/src/types.ts:42</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
+					<a name="requestfunction" class="tsd-anchor"></a>
+					<h3>Request<wbr>Function</h3>
+					<div class="tsd-signature tsd-kind-icon">Request<wbr>Function<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">typeof </span><span class="tsd-signature-type">request</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/types.ts#L31">opentelemetry-instrumentation-http/src/types.ts:31</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
+					<a name="requestsignature" class="tsd-anchor"></a>
+					<h3>Request<wbr>Signature</h3>
+					<div class="tsd-signature tsd-kind-icon">Request<wbr>Signature<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">http.RequestOptions</span><span class="tsd-signature-symbol">, </span><a href="_opentelemetry_instrumentation_http.html#httpcallbackoptional" class="tsd-signature-type" data-tsd-kind="Type alias">HttpCallbackOptional</a><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol"> &amp; </span><a href="_opentelemetry_instrumentation_http.html#httpcallback" class="tsd-signature-type" data-tsd-kind="Type alias">HttpCallback</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/types.ts#L37">opentelemetry-instrumentation-http/src/types.ts:37</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-module">
+					<a name="responseendargs" class="tsd-anchor"></a>
+					<h3>Response<wbr>End<wbr>Args</h3>
+					<div class="tsd-signature tsd-kind-icon">Response<wbr>End<wbr>Args<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">[</span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">]</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/types.ts#L49">opentelemetry-instrumentation-http/src/types.ts:49</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Functions</h2>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="getabsoluteurl" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> get<wbr>Absolute<wbr>Url</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Absolute<wbr>Url<span class="tsd-signature-symbol">(</span>requestUrl<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><a href="_opentelemetry_instrumentation_http.html#parsedrequestoptions" class="tsd-signature-type" data-tsd-kind="Type alias">ParsedRequestOptions</a>, headers<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IncomingHttpHeaders</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">OutgoingHttpHeaders</span>, fallbackProtocol<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/utils.ts#L43">opentelemetry-instrumentation-http/src/utils.ts:43</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Get an absolute url</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>requestUrl: <span class="tsd-signature-type">null</span><span class="tsd-signature-symbol"> | </span><a href="_opentelemetry_instrumentation_http.html#parsedrequestoptions" class="tsd-signature-type" data-tsd-kind="Type alias">ParsedRequestOptions</a></h5>
+								</li>
+								<li>
+									<h5>headers: <span class="tsd-signature-type">IncomingHttpHeaders</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">OutgoingHttpHeaders</span></h5>
+								</li>
+								<li>
+									<h5>fallbackProtocol: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &#x27;http:&#x27;</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="getattributesfromhttpkind" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> get<wbr>Attributes<wbr>From<wbr>Http<wbr>Kind</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Attributes<wbr>From<wbr>Http<wbr>Kind<span class="tsd-signature-symbol">(</span>kind<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">SpanAttributes</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/utils.ts#L368">opentelemetry-instrumentation-http/src/utils.ts:368</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns attributes related to the kind of HTTP protocol used</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> kind: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">SpanAttributes</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="getincomingrequestattributes" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> get<wbr>Incoming<wbr>Request<wbr>Attributes</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Incoming<wbr>Request<wbr>Attributes<span class="tsd-signature-symbol">(</span>request<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IncomingMessage</span>, options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>component<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>serverName<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">SpanAttributes</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/utils.ts#L415">opentelemetry-instrumentation-http/src/utils.ts:415</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns incoming request attributes scoped to the request data</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>request: <span class="tsd-signature-type">IncomingMessage</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the request object</p>
+									</div>
+								</li>
+								<li>
+									<h5>options: <span class="tsd-signature-symbol">{ </span>component<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>serverName<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>used to pass data needed to create attributes</p>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5>component<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5><span class="tsd-flag ts-flagOptional">Optional</span> server<wbr>Name<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">SpanAttributes</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="getincomingrequestattributesonresponse" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> get<wbr>Incoming<wbr>Request<wbr>Attributes<wbr>OnResponse</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Incoming<wbr>Request<wbr>Attributes<wbr>OnResponse<span class="tsd-signature-symbol">(</span>request<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IncomingMessage</span>, response<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ServerResponse</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">SpanAttributes</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/utils.ts#L468">opentelemetry-instrumentation-http/src/utils.ts:468</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns incoming request attributes scoped to the response data</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>request: <span class="tsd-signature-type">IncomingMessage</span></h5>
+								</li>
+								<li>
+									<h5>response: <span class="tsd-signature-type">ServerResponse</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">SpanAttributes</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="getoutgoingrequestattributes" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> get<wbr>Outgoing<wbr>Request<wbr>Attributes</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Outgoing<wbr>Request<wbr>Attributes<span class="tsd-signature-symbol">(</span>requestOptions<span class="tsd-signature-symbol">: </span><a href="_opentelemetry_instrumentation_http.html#parsedrequestoptions" class="tsd-signature-type" data-tsd-kind="Type alias">ParsedRequestOptions</a>, options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>component<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>hostname<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">SpanAttributes</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/utils.ts#L334">opentelemetry-instrumentation-http/src/utils.ts:334</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns outgoing request attributes scoped to the options passed to the request</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>requestOptions: <a href="_opentelemetry_instrumentation_http.html#parsedrequestoptions" class="tsd-signature-type" data-tsd-kind="Type alias">ParsedRequestOptions</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the same options used to make the request</p>
+									</div>
+								</li>
+								<li>
+									<h5>options: <span class="tsd-signature-symbol">{ </span>component<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>hostname<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>used to pass data needed to create attributes</p>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5>component<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+										<li class="tsd-parameter">
+											<h5>hostname<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">SpanAttributes</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="getoutgoingrequestattributesonresponse" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> get<wbr>Outgoing<wbr>Request<wbr>Attributes<wbr>OnResponse</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Outgoing<wbr>Request<wbr>Attributes<wbr>OnResponse<span class="tsd-signature-symbol">(</span>response<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IncomingMessage</span>, options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>hostname<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">SpanAttributes</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/utils.ts#L386">opentelemetry-instrumentation-http/src/utils.ts:386</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns outgoing request attributes scoped to the response data</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>response: <span class="tsd-signature-type">IncomingMessage</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the response object</p>
+									</div>
+								</li>
+								<li>
+									<h5>options: <span class="tsd-signature-symbol">{ </span>hostname<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>used to pass data needed to create attributes</p>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5>hostname<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">SpanAttributes</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="getrequestinfo" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> get<wbr>Request<wbr>Info</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Request<wbr>Info<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">RequestOptions</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">URL</span>, extraOptions<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">RequestOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>method<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>optionsParsed<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">RequestOptions</span><span class="tsd-signature-symbol">; </span>origin<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>pathname<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/utils.ts#L254">opentelemetry-instrumentation-http/src/utils.ts:254</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Makes sure options is an url object
+									return an object with default value and parsed options</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>options: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">RequestOptions</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">URL</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>original options for the request</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> extraOptions: <span class="tsd-signature-type">RequestOptions</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{ </span>method<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>optionsParsed<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">RequestOptions</span><span class="tsd-signature-symbol">; </span>origin<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>pathname<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h4>
+							<ul class="tsd-parameters">
+								<li class="tsd-parameter">
+									<h5>method<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li class="tsd-parameter">
+									<h5>options<wbr>Parsed<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">RequestOptions</span></h5>
+								</li>
+								<li class="tsd-parameter">
+									<h5>origin<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li class="tsd-parameter">
+									<h5>pathname<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="hasexpectheader" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> has<wbr>Expect<wbr>Header</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">has<wbr>Expect<wbr>Header<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">RequestOptions</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/utils.ts#L87">opentelemetry-instrumentation-http/src/utils.ts:87</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns whether the Expect header is on the given options object.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>options: <span class="tsd-signature-type">RequestOptions</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Options for http.request.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="iscompressed" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> is<wbr>Compressed</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Compressed<span class="tsd-signature-symbol">(</span>headers<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IncomingHttpHeaders</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">OutgoingHttpHeaders</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/utils.ts#L240">opentelemetry-instrumentation-http/src/utils.ts:240</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>headers: <span class="tsd-signature-type">IncomingHttpHeaders</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">OutgoingHttpHeaders</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="isignored" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> is<wbr>Ignored</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Ignored<span class="tsd-signature-symbol">(</span>constant<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, list<span class="tsd-signature-symbol">?: </span><a href="_opentelemetry_instrumentation_http.html#ignorematcher" class="tsd-signature-type" data-tsd-kind="Type alias">IgnoreMatcher</a><span class="tsd-signature-symbol">[]</span>, onException<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">(</span>error<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Error</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/utils.ts#L124">opentelemetry-instrumentation-http/src/utils.ts:124</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Check whether the given request is ignored by configuration
+									It will not re-throw exceptions from <code>list</code> provided by the client</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>constant: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>e.g URL of request</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> list: <a href="_opentelemetry_instrumentation_http.html#ignorematcher" class="tsd-signature-type" data-tsd-kind="Type alias">IgnoreMatcher</a><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> onException: <span class="tsd-signature-symbol">(</span>error<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Error</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-signature">
+											<ul class="tsd-signatures tsd-kind-type-literal">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>error<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Error</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5>error: <span class="tsd-signature-type">Error</span></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="isvalidoptionstype" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> is<wbr>Valid<wbr>Options<wbr>Type</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Valid<wbr>Options<wbr>Type<span class="tsd-signature-symbol">(</span>options<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/utils.ts#L320">opentelemetry-instrumentation-http/src/utils.ts:320</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Makes sure options is of type string or object</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>options: <span class="tsd-signature-type">unknown</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>for the request</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="parseresponsestatus" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> parse<wbr>Response<wbr>Status</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">parse<wbr>Response<wbr>Status<span class="tsd-signature-symbol">(</span>statusCode<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Omit</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">SpanStatus</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">&quot;message&quot;</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/utils.ts#L71">opentelemetry-instrumentation-http/src/utils.ts:71</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Parse status code from HTTP response. <a href="https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-http.md#status">More details</a></p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>statusCode: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Omit</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">SpanStatus</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">&quot;message&quot;</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="satisfiespattern" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> satisfies<wbr>Pattern</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">satisfies<wbr>Pattern<span class="tsd-signature-symbol">(</span>constant<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, pattern<span class="tsd-signature-symbol">: </span><a href="_opentelemetry_instrumentation_http.html#ignorematcher" class="tsd-signature-type" data-tsd-kind="Type alias">IgnoreMatcher</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/utils.ts#L101">opentelemetry-instrumentation-http/src/utils.ts:101</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Check whether the given obj match pattern</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>constant: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>e.g URL of request</p>
+									</div>
+								</li>
+								<li>
+									<h5>pattern: <a href="_opentelemetry_instrumentation_http.html#ignorematcher" class="tsd-signature-type" data-tsd-kind="Type alias">IgnoreMatcher</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Match pattern</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="setrequestcontentlengthattribute" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> set<wbr>Request<wbr>Content<wbr>Length<wbr>Attribute</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Request<wbr>Content<wbr>Length<wbr>Attribute<span class="tsd-signature-symbol">(</span>request<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IncomingMessage</span>, attributes<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">SpanAttributes</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/utils.ts#L191">opentelemetry-instrumentation-http/src/utils.ts:191</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Adds attributes for request content-length and content-encoding HTTP headers</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>request: <span class="tsd-signature-type">IncomingMessage</span></h5>
+								</li>
+								<li>
+									<h5>attributes: <span class="tsd-signature-type">SpanAttributes</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="setresponsecontentlengthattribute" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> set<wbr>Response<wbr>Content<wbr>Length<wbr>Attribute</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Response<wbr>Content<wbr>Length<wbr>Attribute<span class="tsd-signature-symbol">(</span>response<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">IncomingMessage</span>, attributes<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">SpanAttributes</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/utils.ts#L212">opentelemetry-instrumentation-http/src/utils.ts:212</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Adds attributes for response content-length and content-encoding HTTP headers</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>response: <span class="tsd-signature-type">IncomingMessage</span></h5>
+								</li>
+								<li>
+									<h5>attributes: <span class="tsd-signature-type">SpanAttributes</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="setspanwitherror" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> set<wbr>Span<wbr>With<wbr>Error</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Span<wbr>With<wbr>Error<span class="tsd-signature-symbol">(</span>span<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Span</span>, error<span class="tsd-signature-symbol">: </span><a href="../interfaces/_opentelemetry_instrumentation_http.err.html" class="tsd-signature-type" data-tsd-kind="Interface">Err</a>, obj<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">ClientRequest</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">IncomingMessage</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c25ac926/packages/opentelemetry-instrumentation-http/src/utils.ts#L155">opentelemetry-instrumentation-http/src/utils.ts:155</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Sets the span with the error passed in params</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>span: <span class="tsd-signature-type">Span</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the span that need to be set</p>
+									</div>
+								</li>
+								<li>
+									<h5>error: <a href="../interfaces/_opentelemetry_instrumentation_http.err.html" class="tsd-signature-type" data-tsd-kind="Interface">Err</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>error that will be set to span</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> obj: <span class="tsd-signature-type">ClientRequest</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">IncomingMessage</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class=" ">
+						<a href="../modules.html">Modules</a>
+					</li>
+					<li class="current tsd-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html">@opentelemetry/instrumentation-<wbr>http</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/_opentelemetry_instrumentation_http.httpinstrumentation.html" class="tsd-kind-icon">Http<wbr>Instrumentation</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_opentelemetry_instrumentation_http.err.html" class="tsd-kind-icon">Err</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_opentelemetry_instrumentation_http.httpcustomattributefunction.html" class="tsd-kind-icon">Http<wbr>Custom<wbr>Attribute<wbr>Function</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_opentelemetry_instrumentation_http.httpinstrumentationconfig.html" class="tsd-kind-icon">Http<wbr>Instrumentation<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_opentelemetry_instrumentation_http.httprequestcustomattributefunction.html" class="tsd-kind-icon">Http<wbr>Request<wbr>Custom<wbr>Attribute<wbr>Function</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_opentelemetry_instrumentation_http.httpresponsecustomattributefunction.html" class="tsd-kind-icon">Http<wbr>Response<wbr>Custom<wbr>Attribute<wbr>Function</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="_opentelemetry_instrumentation_http.html#func" class="tsd-kind-icon">Func</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#getfunction" class="tsd-kind-icon">Get<wbr>Function</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#http" class="tsd-kind-icon">Http</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#httpcallback" class="tsd-kind-icon">Http<wbr>Callback</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#httpcallbackoptional" class="tsd-kind-icon">Http<wbr>Callback<wbr>Optional</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#httprequestargs" class="tsd-kind-icon">Http<wbr>Request<wbr>Args</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#https" class="tsd-kind-icon">Https</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#ignorematcher" class="tsd-kind-icon">Ignore<wbr>Matcher</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#parsedrequestoptions" class="tsd-kind-icon">Parsed<wbr>Request<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#requestfunction" class="tsd-kind-icon">Request<wbr>Function</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#requestsignature" class="tsd-kind-icon">Request<wbr>Signature</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#responseendargs" class="tsd-kind-icon">Response<wbr>End<wbr>Args</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#getabsoluteurl" class="tsd-kind-icon">get<wbr>Absolute<wbr>Url</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#getattributesfromhttpkind" class="tsd-kind-icon">get<wbr>Attributes<wbr>From<wbr>Http<wbr>Kind</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#getincomingrequestattributes" class="tsd-kind-icon">get<wbr>Incoming<wbr>Request<wbr>Attributes</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#getincomingrequestattributesonresponse" class="tsd-kind-icon">get<wbr>Incoming<wbr>Request<wbr>Attributes<wbr>OnResponse</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#getoutgoingrequestattributes" class="tsd-kind-icon">get<wbr>Outgoing<wbr>Request<wbr>Attributes</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#getoutgoingrequestattributesonresponse" class="tsd-kind-icon">get<wbr>Outgoing<wbr>Request<wbr>Attributes<wbr>OnResponse</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#getrequestinfo" class="tsd-kind-icon">get<wbr>Request<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#hasexpectheader" class="tsd-kind-icon">has<wbr>Expect<wbr>Header</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#iscompressed" class="tsd-kind-icon">is<wbr>Compressed</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#isignored" class="tsd-kind-icon">is<wbr>Ignored</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#isvalidoptionstype" class="tsd-kind-icon">is<wbr>Valid<wbr>Options<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#parseresponsestatus" class="tsd-kind-icon">parse<wbr>Response<wbr>Status</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#satisfiespattern" class="tsd-kind-icon">satisfies<wbr>Pattern</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#setrequestcontentlengthattribute" class="tsd-kind-icon">set<wbr>Request<wbr>Content<wbr>Length<wbr>Attribute</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#setresponsecontentlengthattribute" class="tsd-kind-icon">set<wbr>Response<wbr>Content<wbr>Length<wbr>Attribute</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_http.html#setspanwitherror" class="tsd-kind-icon">set<wbr>Span<wbr>With<wbr>Error</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-namespace"><span class="tsd-kind-icon">Namespace</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>
