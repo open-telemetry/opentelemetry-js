@@ -25,7 +25,7 @@ This is a small example application we will monitor in this guide.
 Install dependencies used by the example.
 
 ```sh
-$ npm install express
+npm install express
 ```
 
 ### Code
@@ -49,7 +49,7 @@ app.listen(parseInt(PORT, 10), () => {
 });
 ```
 
-Run the application with the following request and open http://localhost:8080 in your web browser to ensure it is working.
+Run the application with the following request and open <http://localhost:8080> in your web browser to ensure it is working.
 
 ```sh
 $ node app.js
@@ -77,9 +77,9 @@ In order to visualize and analyze your traces, you will need to export them to a
 - Jaeger - `@opentelemetry/exporter-jaeger`
 - Zipkin - `@opentelemetry/exporter-zipkin`
 - OpenTelemetry Protocol
-    - GRPC - `@opentelemetry/exporter-collector-grpc`
-    - Protobuf/HTTP - `@opentelemetry/exporter-collector-proto`
-    - JSON/HTTP - `@opentelemetry/exporter-collector`
+  - GRPC - `@opentelemetry/exporter-collector-grpc`
+  - Protobuf/HTTP - `@opentelemetry/exporter-collector-proto`
+  - JSON/HTTP - `@opentelemetry/exporter-collector`
 
 #### Instrumentation Modules
 
@@ -131,12 +131,12 @@ $ node --require './tracing.js' app.js
 Listening for requests on http://localhost:8080
 ```
 
-Now, when you open http://localhost:8080 in your web browser, you should see the spans printed in the console by the `ConsoleSpanExporter`.
+Now, when you open <http://localhost:8080> in your web browser, you should see the spans printed in the console by the `ConsoleSpanExporter`.
 
 <details>
 <summary>View example output</summary>
 
-```
+```json
 {
   traceId: '3f1fe6256ea46d19ec3ca97b3409ad6d',
   parentId: 'f0b7b340dd6e08a7',
@@ -214,4 +214,5 @@ Now, when you open http://localhost:8080 in your web browser, you should see the
   events: []
 }
 ```
+
 </details>
