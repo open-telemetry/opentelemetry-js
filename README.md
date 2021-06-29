@@ -2,7 +2,7 @@
 ---
 <p align="center">
   <strong>
-    <a href="https://open-telemetry.github.io/opentelemetry-js">API Documentation<a/>
+    <a href="https://open-telemetry.github.io/opentelemetry-js-api">API Documentation<a/>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
     <a href="https://github.com/open-telemetry/opentelemetry-js/discussions">Getting In Touch (GitHub Discussions)<a/>
   </strong>
