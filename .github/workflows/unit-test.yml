@@ -10,15 +10,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        container: ["node:8", "node:10", "node:12", "node:14", "node:16"]
+        node_version: ["8", "10", "12", "14", "16"]
     runs-on: ubuntu-latest
-    container:
-      image: ${{ matrix.container }}
     env:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node_version }}
 
       - name: restore lock files
         uses: actions/cache@master # must use unreleased master to cache multiple paths
@@ -33,12 +35,11 @@ jobs:
             metapackages/*/package-lock.json
             packages/*/package-lock.json
             integration-tests/*/package-lock.json
-          key: ${{ runner.os }}-unit_test-${{ matrix.container }}-${{ hashFiles('**/package.json') }}
+          key: ${{ runner.os }}-unit_test-${{ matrix.node_version }}-${{ hashFiles('**/package.json') }}
       - name: Install and Build (cache miss) 🔧
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           npm install --ignore-scripts
-          chown -R 1001:121 "/github/home/.npm" # fix npm cache permissions for npm v7
           npx lerna bootstrap --no-ci
           npm run compile
 
@@ -53,7 +54,7 @@ jobs:
         run: npm run test
       - name: Report Coverage
         run: npm run codecov
-        if: ${{ matrix.container == 'node:14' }}
+        if: ${{ matrix.node_version == '14' }}
   browser-tests:
     runs-on: ubuntu-latest
     container:
