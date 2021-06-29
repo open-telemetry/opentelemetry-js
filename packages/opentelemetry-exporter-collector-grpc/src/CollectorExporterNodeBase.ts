@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-import * as grpc from '@grpc/grpc-js'
 import { diag } from '@opentelemetry/api';
 import {
   CollectorExporterBase,
   collectorTypes,
 } from '@opentelemetry/exporter-collector';
-import type { Metadata } from '@grpc/grpc-js';
+import { Metadata } from '@grpc/grpc-js';
 import {
   CollectorExporterConfigNode,
   GRPCQueueItem,
@@ -51,7 +50,7 @@ export abstract class CollectorExporterNodeBase<
       diag.warn('Headers cannot be set when using grpc');
     }
     const headers = baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_HEADERS);
-    this.metadata = config.metadata || new grpc.Metadata();
+    this.metadata = config.metadata || new Metadata();
     for (const [k, v] of Object.entries(headers)) {
       this.metadata.set(k, v)
     }

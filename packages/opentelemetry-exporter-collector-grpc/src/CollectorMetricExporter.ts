@@ -23,7 +23,7 @@ import { CollectorExporterConfigNode, ServiceClientType } from './types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
 import { validateAndNormalizeUrl } from './util';
-import * as grpc from "@grpc/grpc-js";
+import { Metadata } from "@grpc/grpc-js";
 
 const DEFAULT_COLLECTOR_URL = 'localhost:4317';
 
@@ -42,7 +42,7 @@ export class CollectorMetricExporter
   constructor(config: CollectorExporterConfigNode = {}) {
     super(config);
     const headers = baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS);
-    this.metadata ||= new grpc.Metadata();
+    this.metadata ||= new Metadata();
     for (const [k, v] of Object.entries(headers)) {
       this.metadata.set(k, v)
     }
