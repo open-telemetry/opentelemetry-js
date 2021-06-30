@@ -57,6 +57,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "0.22.0",
+    "@opentelemetry/semantic-conventions": "0.22.0",
     "opentracing": "^0.14.4"
   }
 }
