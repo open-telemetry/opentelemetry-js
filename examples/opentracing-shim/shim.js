@@ -2,7 +2,6 @@
 
 const { ResourceAttributes } = require('@opentelemetry/semantic-conventions');
 const { Resource } = require('@opentelemetry/resources');
-const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 const { NodeTracerProvider } = require('@opentelemetry/node');
 const { SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
@@ -17,8 +16,6 @@ function shim(serviceName) {
   provider.addSpanProcessor(new SimpleSpanProcessor(getExporter(serviceName)));
   // Initialize the OpenTelemetry APIs to use the NodeTracerProvider bindings
   provider.register();
-
-  registerInstrumentations({});
 
   return new TracerShim(provider.getTracer('opentracing-shim'));
 }
