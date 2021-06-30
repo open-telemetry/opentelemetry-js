@@ -58,7 +58,7 @@ To create traces on NodeJS, you need `@opentelemetry/node`, `@opentelemetry/core
 
 ```sh
 $ npm install \
-  @opentelemetry/core \
+  @opentelemetry/api \
   @opentelemetry/node \
   @opentelemetry/instrumentation-http \
   @opentelemetry/instrumentation-express \
