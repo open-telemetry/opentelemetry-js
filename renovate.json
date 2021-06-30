@@ -9,6 +9,11 @@
     {
       "matchPackageNames": ["@opentelemetry/api"],
       "rangeStrategy": "bump"
+    },
+    {
+      "matchPaths": ["backwards-compatibility/**"],
+      "matchPackageNames": ["@types/node"],
+      "enabled": false
     }
   ],
   "ignoreDeps": ["gcp-metadata", "got", "mocha", "husky", "karma-webpack"],

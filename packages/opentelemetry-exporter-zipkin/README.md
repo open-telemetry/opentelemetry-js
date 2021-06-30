@@ -30,7 +30,6 @@ const options = {
     'my-header': 'header-value',
   },
   url: 'your-zipkin-url',
-  serviceName: 'your-application-name',
   // optional interceptor
   getExportRequestHeaders: () => {
     return {

@@ -134,6 +134,9 @@ import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
 
 const provider: NodeTracerProvider = new NodeTracerProvider({
   logLevel: LogLevel.ERROR,
+  resource: new Resource({
+    [ResourceAttributes.SERVICE_NAME]: 'getting-started',
+  }),
 });
 
 provider.addSpanProcessor(
@@ -141,7 +144,6 @@ provider.addSpanProcessor(
     new ZipkinExporter({
       // For Jaeger, use the following line instead:
       // new JaegerExporter({
-      serviceName: 'getting-started',
       // If you are running your tracing backend on another host,
       // you can point to it using the `url` parameter of the
       // exporter config.

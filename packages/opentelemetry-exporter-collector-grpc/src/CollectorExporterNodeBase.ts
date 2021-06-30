@@ -19,13 +19,14 @@ import {
   CollectorExporterBase,
   collectorTypes,
 } from '@opentelemetry/exporter-collector';
-import type { Metadata } from '@grpc/grpc-js';
+import { Metadata } from '@grpc/grpc-js';
 import {
   CollectorExporterConfigNode,
   GRPCQueueItem,
   ServiceClientType,
 } from './types';
 import { ServiceClient } from './types';
+import { getEnv, baggageUtils } from "@opentelemetry/core";
 
 /**
  * Collector Metric Exporter abstract base class
@@ -48,8 +49,13 @@ export abstract class CollectorExporterNodeBase<
     if (config.headers) {
       diag.warn('Headers cannot be set when using grpc');
     }
-    this.metadata = config.metadata;
+    const headers = baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_HEADERS);
+    this.metadata = config.metadata || new Metadata();
+    for (const [k, v] of Object.entries(headers)) {
+      this.metadata.set(k, v)
+    }
   }
+
   private _sendPromise(
     objects: ExportItem[],
     onSuccess: () => void,

@@ -45,9 +45,7 @@ const {
   getNodeAutoInstrumentations,
 } = require("@opentelemetry/auto-instrumentations-node");
 
-const jaegerExporter = new JaegerExporter({
-  serviceName: 'my-service',
-});
+const jaegerExporter = new JaegerExporter();
 const prometheusExporter = new PrometheusExporter({ startServer: true });
 
 const sdk = new opentelemetry.NodeSDK({
@@ -126,7 +124,7 @@ Configure a custom sampler. By default all traces will be sampled.
 
 ### traceExporter
 
-Configure a trace exporter. If an exporter OR span processor is not configured, the tracing SDK will not be initialized and registered. If an exporter is configured, it will be used with a [BatchSpanProcessor](../opentelemetry-tracing/src/export/BatchSpanProcessor.ts).
+Configure a trace exporter. If an exporter OR span processor is not configured, the tracing SDK will not be initialized and registered. If an exporter is configured, it will be used with a [BatchSpanProcessor](../opentelemetry-tracing/src/platform/node/export/BatchSpanProcessor.ts).
 
 ### spanLimits
 
