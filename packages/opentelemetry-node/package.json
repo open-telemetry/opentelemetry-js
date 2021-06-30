@@ -56,7 +56,7 @@
     "shimmer": "1.2.1",
     "sinon": "10.0.0",
     "ts-mocha": "8.0.0",
-    "ts-node": "9.1.1",
+    "ts-node": "10.0.0",
     "typescript": "4.3.4"
   },
   "peerDependencies": {
