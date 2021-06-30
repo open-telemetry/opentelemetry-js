@@ -3,8 +3,8 @@
 const opentelemetry = require('@opentelemetry/api');
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector');
-import { Resource } from '@opentelemetry/resources';
-import { ResourceAttributes } from '@opentelemetry/semantic-conventions';
+const { Resource } = require('@opentelemetry/resources');
+const { ResourceAttributes } = require('@opentelemetry/semantic-conventions');
 // const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector-grpc');
 // const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector-proto');
 

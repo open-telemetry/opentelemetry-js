@@ -21,8 +21,9 @@ import {
   toCollectorExportTraceServiceRequest,
 } from '@opentelemetry/exporter-collector';
 import { CollectorExporterConfigNode, ServiceClientType } from './types';
-import { getEnv } from '@opentelemetry/core';
+import { baggageUtils, getEnv } from '@opentelemetry/core';
 import { validateAndNormalizeUrl } from './util';
+import { Metadata } from "@grpc/grpc-js";
 
 const DEFAULT_COLLECTOR_URL = 'localhost:4317';
 
@@ -35,6 +36,16 @@ export class CollectorTraceExporter
     collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
   >
   implements SpanExporter {
+
+  constructor(config: CollectorExporterConfigNode = {}) {
+    super(config);
+    const headers = baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS);
+    this.metadata ||= new Metadata();
+    for (const [k, v] of Object.entries(headers)) {
+      this.metadata.set(k, v)
+    }
+  }
+
   convert(
     spans: ReadableSpan[]
   ): collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {

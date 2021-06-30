@@ -21,8 +21,9 @@ import {
 import { MetricRecord, MetricExporter } from '@opentelemetry/metrics';
 import { CollectorExporterConfigNode, ServiceClientType } from './types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
-import { getEnv } from '@opentelemetry/core';
+import { baggageUtils, getEnv } from '@opentelemetry/core';
 import { validateAndNormalizeUrl } from './util';
+import { Metadata } from "@grpc/grpc-js";
 
 const DEFAULT_COLLECTOR_URL = 'localhost:4317';
 
@@ -37,6 +38,15 @@ export class CollectorMetricExporter
   implements MetricExporter {
   // Converts time to nanoseconds
   protected readonly _startTime = new Date().getTime() * 1000000;
+
+  constructor(config: CollectorExporterConfigNode = {}) {
+    super(config);
+    const headers = baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS);
+    this.metadata ||= new Metadata();
+    for (const [k, v] of Object.entries(headers)) {
+      this.metadata.set(k, v)
+    }
+  }
 
   convert(
     metrics: MetricRecord[]

@@ -125,6 +125,36 @@ function createMainResource(resource = {}): PerformanceResourceTiming {
   return mainResource;
 }
 
+function createFakePerformanceObs(url: string) {
+  class FakePerfObs implements PerformanceObserver {
+    constructor(private readonly cb: PerformanceObserverCallback) {}
+    observe() {
+      const absoluteUrl = url.startsWith('http') ? url : location.origin + url;
+      const resources: PerformanceObserverEntryList = {
+        getEntries(): PerformanceEntryList {
+          return [
+            createResource({ name: absoluteUrl }) as any,
+            createMainResource({ name: absoluteUrl }) as any,
+          ];
+        },
+        getEntriesByName(): PerformanceEntryList {
+          return [];
+        },
+        getEntriesByType(): PerformanceEntryList {
+          return [];
+        },
+      };
+      this.cb(resources, this);
+    }
+    disconnect() {}
+    takeRecords(): PerformanceEntryList {
+      return [];
+    }
+  }
+
+  return FakePerfObs;
+}
+
 describe('xhr', () => {
   const asyncTests = [{ async: true }, { async: false }];
   asyncTests.forEach(test => {
@@ -200,6 +230,11 @@ describe('xhr', () => {
             'getEntriesByType'
           );
           spyEntries.withArgs('resource').returns(resources);
+
+          sinon
+            .stub(window, 'PerformanceObserver')
+            .value(createFakePerformanceObs(fileUrl));
+
           xmlHttpRequestInstrumentation = new XMLHttpRequestInstrumentation(
             config
           );
@@ -221,7 +256,7 @@ describe('xhr', () => {
 
           rootSpan = webTracerWithZone.startSpan('root');
           api.context.with(api.trace.setSpan(api.context.active(), rootSpan), () => {
-            getData(
+            void getData(
               new XMLHttpRequest(),
               fileUrl,
               () => {
@@ -635,20 +670,11 @@ describe('xhr', () => {
 
           beforeEach(done => {
             requests = [];
-            const resources: PerformanceResourceTiming[] = [];
-            resources.push(
-              createResource({
-                name: firstUrl,
-              }),
-              createResource({
-                name: secondUrl,
-              })
-            );
             const reusableReq = new XMLHttpRequest();
             api.context.with(
               api.trace.setSpan(api.context.active(), rootSpan),
               () => {
-                getData(
+                void getData(
                   reusableReq,
                   firstUrl,
                   () => {
@@ -665,7 +691,7 @@ describe('xhr', () => {
             api.context.with(
               api.trace.setSpan(api.context.active(), rootSpan),
               () => {
-                getData(
+                void getData(
                   reusableReq,
                   secondUrl,
                   () => {
@@ -728,6 +754,35 @@ describe('xhr', () => {
             assert.ok(attributes['xhr-custom-attribute'] === 'bar');
           });
         });
+
+        describe('when using relative url', () => {
+          beforeEach(done => {
+            clearData();
+            const propagateTraceHeaderCorsUrls = [window.location.origin];
+            prepareData(done, '/get', { propagateTraceHeaderCorsUrls });
+          });
+
+          it('should create correct span with events', () => {
+            // no prefetch span because mock observer uses location.origin as url when relative
+            // and prefetch span finding compares url origins
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            const events = span.events;
+
+            assert.strictEqual(
+              exportSpy.args.length,
+              1,
+              `Wrong number of spans: ${exportSpy.args.length}`
+            );
+
+            assert.strictEqual(events.length, 12, `number of events is wrong: ${events.length}`);
+            assert.strictEqual(
+              events[8].name,
+              PTN.REQUEST_START,
+              `event ${PTN.REQUEST_START} is not defined`
+            );
+          });
+        });
+
       });
 
       describe('when request is NOT successful', () => {
