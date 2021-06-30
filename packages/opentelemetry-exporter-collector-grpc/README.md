@@ -28,7 +28,7 @@ const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector-g
 
 const collectorOptions = {
   // url is optional and can be omitted - default is grpc://localhost:4317
-  url: '<collector-hostname>:<port>',
+  url: 'grpc://<collector-hostname>:<port>',
 };
 
 const provider = new BasicTracerProvider();
@@ -52,7 +52,7 @@ const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector-g
 
 const collectorOptions = {
   // url is optional and can be omitted - default is grpc://localhost:4317
-  url: '<collector-hostname>:<port>',
+  url: 'grpc://<collector-hostname>:<port>',
   credentials: grpc.credentials.createSsl(),
 };
 
@@ -92,7 +92,7 @@ metadata.set('k', 'v');
 
 const collectorOptions = {
   // url is optional and can be omitted - default is grpc://localhost:4317
-  url: '<collector-hostname>:<port>',
+  url: 'grpc://<collector-hostname>:<port>',
   metadata, // // an optional grpc.Metadata object to be sent with each request
 };
 
@@ -117,7 +117,7 @@ const { MeterProvider } = require('@opentelemetry/metrics');
 const { CollectorMetricExporter } =  require('@opentelemetry/exporter-collector-grpc');
 const collectorOptions = {
   // url is optional and can be omitted - default is grpc://localhost:4317
-  url: '<collector-hostname>:<port>',
+  url: 'grpc://<collector-hostname>:<port>',
 };
 const exporter = new CollectorMetricExporter(collectorOptions);
 

@@ -24,7 +24,7 @@ import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { getEnv } from '@opentelemetry/core';
 import { validateAndNormalizeUrl } from './util';
 
-const DEFAULT_COLLECTOR_URL = 'grpc://localhost:4317';
+const DEFAULT_COLLECTOR_URL = 'localhost:4317';
 
 /**
  * Collector Metric Exporter for Node
