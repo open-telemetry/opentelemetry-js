@@ -64,7 +64,6 @@ set, the value set by the option in code is authoritative.
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 
 const options = {
-  serviceName: 'my-service',
   tags: [], // optional
   // You can use the default UDPSender
   host: 'localhost', // optional
