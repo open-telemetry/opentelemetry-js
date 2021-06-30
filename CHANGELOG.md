@@ -31,10 +31,13 @@ All notable changes to this project will be documented in this file.
 
 ### :house: (Internal)
 
-* [#2296](https://github.com/open-telemetry/opentelemetry-js/pull/2296) chore: do not upgrade backwards compatibility ([@dyladan](https://github.com/dyladan))
-* [#2302](https://github.com/open-telemetry/opentelemetry-js/pull/2302) chore: use setup-node ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-context-async-hooks`, `opentelemetry-context-zone-peer-dep`, `opentelemetry-web`
+  * [#2247](https://github.com/open-telemetry/opentelemetry-js/pull/2247) feat: unify the signatures of bind and with ([@Rauno56](https://github.com/Rauno56))
+* Other
+  * [#2296](https://github.com/open-telemetry/opentelemetry-js/pull/2296) chore: do not upgrade backwards compatibility ([@dyladan](https://github.com/dyladan))
+  * [#2302](https://github.com/open-telemetry/opentelemetry-js/pull/2302) chore: use setup-node ([@dyladan](https://github.com/dyladan))
 
-### Committers: 8
+### Committers: 9
 
 * Ali Sabzevari ([@alisabzevari](https://github.com/alisabzevari))
 * Daniel Dyla ([@dyladan](https://github.com/dyladan))
@@ -43,6 +46,7 @@ All notable changes to this project will be documented in this file.
 * MartenH ([@mhennoch](https://github.com/mhennoch))
 * Omkar Kirpan ([@OmkarKirpan](https://github.com/OmkarKirpan))
 * Pramod ([@pramodsreek](https://github.com/pramodsreek))
+* Rauno Viskus ([@Rauno56](https://github.com/Rauno56))
 * Vera Reynolds ([@vreynolds](https://github.com/vreynolds))
 
 ## 0.22.0
