@@ -1,7 +1,7 @@
 {
   "name": "web-tracer-example",
   "private": true,
-  "version": "0.22.0",
+  "version": "0.23.0",
   "description": "Example of using @opentelemetry/web in browser",
   "main": "index.js",
   "scripts": {
@@ -35,17 +35,17 @@
   },
   "dependencies": {
     "@opentelemetry/api": "^1.0.0",
-    "@opentelemetry/context-zone": "0.22.0",
-    "@opentelemetry/core": "0.22.0",
-    "@opentelemetry/exporter-collector": "0.22.0",
-    "@opentelemetry/exporter-zipkin": "0.22.0",
-    "@opentelemetry/instrumentation": "0.22.0",
-    "@opentelemetry/instrumentation-fetch": "0.22.0",
-    "@opentelemetry/instrumentation-xml-http-request": "0.22.0",
-    "@opentelemetry/metrics": "0.22.0",
-    "@opentelemetry/propagator-b3": "0.22.0",
-    "@opentelemetry/tracing": "0.22.0",
-    "@opentelemetry/web": "0.22.0"
+    "@opentelemetry/context-zone": "0.23.0",
+    "@opentelemetry/core": "0.23.0",
+    "@opentelemetry/exporter-collector": "0.23.0",
+    "@opentelemetry/exporter-zipkin": "0.23.0",
+    "@opentelemetry/instrumentation": "0.23.0",
+    "@opentelemetry/instrumentation-fetch": "0.23.0",
+    "@opentelemetry/instrumentation-xml-http-request": "0.23.0",
+    "@opentelemetry/metrics": "0.23.0",
+    "@opentelemetry/propagator-b3": "0.23.0",
+    "@opentelemetry/tracing": "0.23.0",
+    "@opentelemetry/web": "0.23.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme"
 }
