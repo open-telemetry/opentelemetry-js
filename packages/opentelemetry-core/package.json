@@ -75,7 +75,7 @@
     "sinon": "10.0.0",
     "ts-loader": "8.3.0",
     "ts-mocha": "8.0.0",
-    "ts-node": "9.1.1",
+    "ts-node": "10.0.0",
     "typescript": "4.3.4",
     "webpack": "4.46.0"
   },
