@@ -15,13 +15,9 @@
  */
 
 import * as api from '@opentelemetry/api';
+import { SpanAttributes, SpanAttributeValue, SpanStatusCode, TextMapPropagator } from '@opentelemetry/api';
 import * as opentracing from 'opentracing';
-import {
-  SpanAttributes,
-  SpanAttributeValue,
-  SpanStatusCode,
-  TextMapPropagator,
-} from '@opentelemetry/api';
+import { SemanticAttributes } from "@opentelemetry/semantic-conventions";
 
 function translateReferences(references: opentracing.Reference[]): api.Link[] {
   const links: api.Link[] = [];
@@ -96,14 +92,14 @@ export class SpanContextShim extends opentracing.SpanContext {
   /**
    * Returns the trace ID as a string.
    */
-   override toTraceId(): string {
+  override toTraceId(): string {
     return this._spanContext.traceId;
   }
 
   /**
    * Returns the span ID as a string.
    */
-   override toSpanId(): string {
+  override toSpanId(): string {
     return this._spanContext.spanId;
   }
 
@@ -281,17 +277,60 @@ export class SpanShim extends opentracing.Span {
    * @param payload an arbitrary object to be attached to the event.
    */
   override logEvent(eventName: string, payload?: SpanAttributes): void {
-    this._span.addEvent(eventName, payload);
+    this._logInternal(eventName, payload);
   }
 
   /**
    * Logs a set of key value pairs. Since OpenTelemetry only supports events,
-   * the KV pairs are used as attributes on an event named "log".
+   * the KV pairs are used as attributes on a Span event.
+   * @param keyValuePairs a set of key-value pairs to be used as event attributes
+   * @param timestamp optional timestamp for the event
    */
- override log(keyValuePairs: SpanAttributes, _timestamp?: number): this {
-    // @todo: Handle timestamp
-    this._span.addEvent('log', keyValuePairs);
+  override log(keyValuePairs: SpanAttributes, timestamp?: number): this {
+    const entries = Object.entries(keyValuePairs);
+    const eventEntry = entries.find(([key, _]) => key === 'event');
+    const eventName = eventEntry?.[1] || 'log';
+    const name = eventName.toString();
+
+    this._logInternal(name, keyValuePairs, timestamp);
     return this;
+  }
+
+  private _logInternal(eventName: string, attributes: SpanAttributes | undefined, timestamp?: number): void {
+    if (attributes && eventName === 'error') {
+      const entries = Object.entries(attributes);
+      const errorEntry = entries.find(([key]) => key === 'error.object');
+      const error = errorEntry?.[1];
+      if (typeof error === "string") {
+        this._span.recordException(error, timestamp);
+        return;
+      }
+
+      const mappedAttributes: api.SpanAttributes = {};
+      for (const [k, v] of entries) {
+        switch (k) {
+          case "error.kind": {
+            mappedAttributes[SemanticAttributes.EXCEPTION_TYPE] = v;
+            break;
+          }
+          case "message": {
+            mappedAttributes[SemanticAttributes.EXCEPTION_MESSAGE] = v;
+            break;
+          }
+          case "stack": {
+            mappedAttributes[SemanticAttributes.EXCEPTION_STACKTRACE] = v;
+            break;
+          }
+          default: {
+            mappedAttributes[k] = v;
+            break;
+          }
+        }
+      }
+      this._span.addEvent('exception', mappedAttributes, timestamp);
+      return;
+    }
+    this._span.addEvent(eventName, attributes, timestamp);
   }
 
   /**

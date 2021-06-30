@@ -152,6 +152,31 @@ describe('B3Propagator', () => {
       });
     });
 
+    it('extracts multi header b3 using array getter', () => {
+      const context = propagator.extract(
+        ROOT_CONTEXT,
+        b3MultiCarrier,
+        {
+          get(carrier, key) {
+            if (carrier == null || carrier[key] === undefined) {
+              return [];
+            }
+            return [carrier[key]];
+          },
+        
+          keys: defaultTextMapGetter.keys
+        }
+      );
+
+      const extractedSpanContext = trace.getSpanContext(context);
+      assert.deepStrictEqual(extractedSpanContext, {
+        spanId: '6e0c63257de34c92',
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        isRemote: true,
+        traceFlags: TraceFlags.SAMPLED,
+      });
+    });
+
     it('extracts single header over multi', () => {
       const context = propagator.extract(
         ROOT_CONTEXT,

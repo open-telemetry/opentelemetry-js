@@ -3,21 +3,41 @@ title: "Node.JS"
 weight: 2
 ---
 
-This guide uses the example application in node.js provided below, but the steps to instrument your own application should be broadly the same. Here is an overview of what we will be doing.
+This guide will show you how to get started with tracing in Node.js.
 
-- Install the required OpenTelemetry libraries
-- Initialize a global [tracer](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/api.md#tracer)
-- Initialize and register a [span exporter](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk.md#span-exporter)
+- [Example Application](#example-application)
+  - [Dependencies](#dependencies)
+  - [Code](#code)
+- [Tracing](#tracing)
+  - [Dependencies](#dependencies-1)
+    - [Core Dependencies](#core-dependencies)
+    - [Exporter](#exporter)
+    - [Instrumentation Modules](#instrumentation-modules)
+  - [Setup](#setup)
+  - [Run Application](#run-application)
 
-Copy the following file into an empty directory and call it `app.js`.
+## Example Application
+
+This is a small example application we will monitor in this guide.
+
+### Dependencies
+
+Install dependencies used by the example.
+
+```sh
+npm install express
+```
+
+### Code
+
+Please save the following code as `app.js`.
 
 ```javascript
-"use strict";
-
-const PORT = process.env.PORT || "8080";
+/* app.js */
 
 const express = require("express");
 
+const PORT = process.env.PORT || "8080";
 const app = express();
 
 app.get("/", (req, res) => {
@@ -29,172 +49,104 @@ app.listen(parseInt(PORT, 10), () => {
 });
 ```
 
-Run `npm install express` to have all dependencies available.
-
-## Installation
-
-To create traces on NodeJS, you will need `@opentelemetry/node`, `@opentelemetry/core`, and any plugins required by your application such as gRPC, or HTTP. If you are using the example application, you will need to install `@opentelemetry/plugin-http`, `@opentelemetry/plugin-https` and `@opentelemetry/plugin-express`.
+Run the application with the following request and open <http://localhost:8080> in your web browser to ensure it is working.
 
 ```sh
-$ npm install \
-  @opentelemetry/core \
-  @opentelemetry/node \
-  @opentelemetry/plugin-http \
-  @opentelemetry/plugin-https \
-  @opentelemetry/plugin-express \
-  @opentelemetry/metrics \
-  @opentelemetry/tracing
+$ node app.js
+Listening for requests on http://localhost:8080
 ```
 
-## Initialization and Configuration
+## Tracing
 
-All tracing initialization should happen before your application’s code runs. The easiest way to do this is to initialize tracing in a separate file that is required using node’s `-r` option before application code runs.
+### Dependencies
 
-## Creating a Tracer Provider
+The following dependencies are required to trace a Node.js application.
 
-Create a file named `tracing.js` and add the following code to create a tracer provider:
+#### Core Dependencies
 
-```javascript
-'use strict';
+These dependencies are required to configure the tracing SDK and create spans.
 
-const { LogLevel } = require("@opentelemetry/core");
-const { NodeTracerProvider } = require("@opentelemetry/node");
+- `@opentelemetry/api`
+- `@opentelemetry/node`
+- `@opentelemetry/tracing`
 
-const provider = new NodeTracerProvider({
-  logLevel: LogLevel.ERROR
-});
+#### Exporter
 
-provider.register();
-```
+In order to visualize and analyze your traces, you will need to export them to a tracing backend such as Jaeger. OpenTelemetry JS provides exporters for some common open source tracing backends.
 
-If you run your application now with `node -r ./tracing.js app.js`, your application will create and propagate traces over HTTP. If an already instrumented service that supports [Trace Context](https://www.w3.org/TR/trace-context/) headers calls your application using HTTP, and you call another application using HTTP, the Trace Context headers will be correctly propagated.
+- Jaeger - `@opentelemetry/exporter-jaeger`
+- Zipkin - `@opentelemetry/exporter-zipkin`
+- OpenTelemetry Protocol
+  - GRPC - `@opentelemetry/exporter-collector-grpc`
+  - Protobuf/HTTP - `@opentelemetry/exporter-collector-proto`
+  - JSON/HTTP - `@opentelemetry/exporter-collector`
 
-If you wish to see a completed trace, however, there is one more step. You must register an exporter.
+#### Instrumentation Modules
 
-## Creating a Metric Provider
+Many common modules such as the `http` standard library module, `express`, and others can be automatically instrumented using autoinstrumentation modules. To find autoinstrumenatation modules, you can look at the [registry](https://opentelemetry.io/registry/?language=js&component=instrumentation#).
 
-In order to create and monitor metrics, we will need a `Meter`. In OpenTelemetry, a `Meter` is the mechanism used to create and manage metrics, labels, and metric exporters.
+You can also install all instrumentations maintained by the OpenTelemetry authors by using the `@opentelemetry/auto-instrumentations-node` module.
 
-Create a file named `monitoring.js` and add the following code:
+### Setup
 
-```javascript
-'use strict';
+The tracing setup and configuration should be run before your application code. One tool commonly used for this task is the [`-r, --require module`](https://nodejs.org/api/cli.html#cli_r_require_module) flag.
 
-const { MeterProvider } = require('@opentelemetry/metrics');
-
-const meter = new MeterProvider().getMeter('your-meter-name');
-```
-
-Now, you can require this file from your application code and use the `Meter` to create and manage metrics. The simplest of these metrics is a counter. Let's create and export from our `monitoring.js` file a middleware function that express can use to count all requests by route. Modify the `monitoring.js` file so that it looks like this:
+Create a file with a name like `tracing.js` which will contain your tracing setup code. In this example, we will use the `ConsoleSpanExporter` which prints all spans to the console. In your application, you should use the exporter which goes with the tracing backend of your choice. You may also want to use the `BatchSpanProcessor` to export spans in batches in order to more efficiently use resources.
 
 ```javascript
-'use strict';
+/* tracing.js */
 
-const { MeterProvider } = require('@opentelemetry/metrics');
-
-const meter = new MeterProvider().getMeter('your-meter-name');
-
-const requestCount = meter.createCounter("requests", {
-  description: "Count all incoming requests"
-});
-
-const boundInstruments = new Map();
-
-module.exports.countAllRequests = () => {
-  return (req, res, next) => {
-    if (!boundInstruments.has(req.path)) {
-      const labels = { route: req.path };
-      const boundCounter = requestCount.bind(labels);
-      boundInstruments.set(req.path, boundCounter);
-    }
-
-    boundInstruments.get(req.path).add(1);
-    next();
-  };
-};
-```
-
-Now let's import and use this middleware in our application code:
-
-```javascript
-const { countAllRequests } = require("./monitoring");
-const app = express();
-app.use(countAllRequests());
-```
-
-Now, when we make requests (e.g. `curl http://localhost:8080`) to our service our meter will count all requests.
-
-**Note**: Creating a new `labelSet` and `binding` on every request is not ideal as creating the `labelSet` can often be an expensive operation. This is why instruments are created and stored in a `Map` according to the route key.
-
-## Creating a Console Exporter
-
-To export traces, modify `tracing.js` so that it matches the following code snippet:
-
-```javascript
-'use strict';
-
-const { LogLevel } = require("@opentelemetry/core");
+// Require dependencies
 const { NodeTracerProvider } = require("@opentelemetry/node");
 const { SimpleSpanProcessor, ConsoleSpanExporter } = require("@opentelemetry/tracing");
+const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
+const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 
-const provider = new NodeTracerProvider({
-  logLevel: LogLevel.ERROR
-});
+// Create a tracer provider
+const provider = new NodeTracerProvider();
 
+// The exporter handles sending spans to your tracing backend
+const exporter = new ConsoleSpanExporter();
+
+// The simple span processor sends spans to the exporter as soon as they are ended.
+const processor = new SimpleSpanProcessor(exporter);
+provider.addSpanProcessor(processor);
+
+// The provider must be registered in order to
+// be used by the OpenTelemetry API and instrumentations
 provider.register();
 
-provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-
-console.log("tracing initialized");
-```
-
-To export metrics, modify `monitoring.js` so that it matches the following code snippet:
-
-```javascript
-'use strict';
-
-const { MeterProvider, ConsoleMetricExporter } = require('@opentelemetry/metrics');
-
-const exporter = new ConsoleMetricExporter()
-
-const meter = new MeterProvider({
-  exporter,
-  interval: 5000
-}).getMeter('your-meter-name');
-
-const requestCount = meter.createCounter("requests", {
-  description: "Count all incoming requests"
+// This will automatically enable all instrumentations
+registerInstrumentations({
+  instrumentations: [getNodeAutoInstrumentations()],
 });
-
-const boundInstruments = new Map();
-
-module.exports.countAllRequests = () => {
-  return (req, res, next) => {
-    if (!boundInstruments.has(req.path)) {
-      const labels = { route: req.path };
-      const boundCounter = requestCount.bind(labels);
-      boundInstruments.set(req.path, boundCounter);
-    }
-
-    boundInstruments.get(req.path).add(1);
-    next();
-  };
-};
 ```
 
-Now, restart your application and add some load, you will see traces & metrics printed to your console:
+### Run Application
 
-```javascript
+Now you can run your application as you normally would, but you can use the `--require` flag to load the tracing code before the application code.
+
+```sh
+$ node --require './tracing.js' app.js
+Listening for requests on http://localhost:8080
+```
+
+Now, when you open <http://localhost:8080> in your web browser, you should see the spans printed in the console by the `ConsoleSpanExporter`.
+
+<details>
+<summary>View example output</summary>
+
+```json
 {
-  traceId: 'f27805526b1c74293bbc9345cd48ff3b',
-  parentId: 'd6bdf2a18df04ef0',
+  traceId: '3f1fe6256ea46d19ec3ca97b3409ad6d',
+  parentId: 'f0b7b340dd6e08a7',
   name: 'middleware - query',
-  id: '36335b81de12cc4a',
+  id: '41a27f331c7bfed3',
   kind: 0,
-  timestamp: 1603789083744612,
-  duration: 365,
+  timestamp: 1624982589722992,
+  duration: 417,
   attributes: {
-    component: 'express',
+    'http.route': '/',
     'express.name': 'query',
     'express.type': 'middleware'
   },
@@ -202,87 +154,65 @@ Now, restart your application and add some load, you will see traces & metrics p
   events: []
 }
 {
-  name: 'requests',
-  description: 'Count all incoming requests',
-  unit: '1',
-  metricKind: 0,
-  valueType: 1
+  traceId: '3f1fe6256ea46d19ec3ca97b3409ad6d',
+  parentId: 'f0b7b340dd6e08a7',
+  name: 'middleware - expressInit',
+  id: 'e0ed537a699f652a',
+  kind: 0,
+  timestamp: 1624982589725778,
+  duration: 673,
+  attributes: {
+    'http.route': '/',
+    'express.name': 'expressInit',
+    'express.type': 'middleware'
+  },
+  status: { code: 0 },
+  events: []
 }
-{ route: '/' }
-value: 1
+{
+  traceId: '3f1fe6256ea46d19ec3ca97b3409ad6d',
+  parentId: 'f0b7b340dd6e08a7',
+  name: 'request handler - /',
+  id: '8614a81e1847b7ef',
+  kind: 0,
+  timestamp: 1624982589726941,
+  duration: 21,
+  attributes: {
+    'http.route': '/',
+    'express.name': '/',
+    'express.type': 'request_handler'
+  },
+  status: { code: 0 },
+  events: []
+}
+{
+  traceId: '3f1fe6256ea46d19ec3ca97b3409ad6d',
+  parentId: undefined,
+  name: 'GET /',
+  id: 'f0b7b340dd6e08a7',
+  kind: 1,
+  timestamp: 1624982589720260,
+  duration: 11380,
+  attributes: {
+    'http.url': 'http://localhost:8080/',
+    'http.host': 'localhost:8080',
+    'net.host.name': 'localhost',
+    'http.method': 'GET',
+    'http.route': '',
+    'http.target': '/',
+    'http.user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
+    'http.flavor': '1.1',
+    'net.transport': 'ip_tcp',
+    'net.host.ip': '::1',
+    'net.host.port': 8080,
+    'net.peer.ip': '::1',
+    'net.peer.port': 61520,
+    'http.status_code': 304,
+    'http.status_text': 'NOT MODIFIED'
+  },
+  status: { code: 1 },
+  events: []
+}
 ```
 
-If you'd like to write those traces and spanes to Zipkin or Prometheus follow the [complete guide](https://github.com/open-telemetry/opentelemetry-js/blob/main/getting-started/README.md).
-
-## Quick Start
-
-To have everything up and running in a few seconds, create an empty directory and create the following files:
-
-- package.json
-
-  ```json
-  {
-    "dependencies": {
-      "@opentelemetry/core": "^0.12.0",
-      "@opentelemetry/metrics": "^0.12.0",
-      "@opentelemetry/node": "^0.12.0",
-      "@opentelemetry/plugin-express": "^0.10.0",
-      "@opentelemetry/plugin-http": "^0.12.0",
-      "@opentelemetry/plugin-https": "^0.12.0",
-      "express": "^4.17.1"
-    }
-  }
-  ```
-  
-- app.js
-
-  ```javascript
-  "use strict";
-  const PORT = process.env.PORT || "8080";
-  const express = require("express");
-  const app = express();
-  const { countAllRequests } = require("./monitoring");
-  app.use(countAllRequests());
-  app.get("/", (req, res) => { res.send("Hello World"); });
-  app.listen(parseInt(PORT, 10), () => { console.log(`Listening for requests on http://localhost:${PORT}`); });
-  ```
-  
-- tracing.js
-
-  ```javascript
-  'use strict';
-  const { LogLevel } = require("@opentelemetry/core");
-  const { NodeTracerProvider } = require("@opentelemetry/node");
-  const { SimpleSpanProcessor, ConsoleSpanExporter } = require("@opentelemetry/tracing");
-  const provider = new NodeTracerProvider({ logLevel: LogLevel.ERROR });
-  provider.register();
-  provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-  console.log("tracing initialized");
-  ```
-  
-- monitoring.js
-
-  ```javascript
-  'use strict';
-  const { MeterProvider, ConsoleMetricExporter } = require('@opentelemetry/metrics');
-  const exporter = new ConsoleMetricExporter()
-  const meter = new MeterProvider({
-    exporter,
-    interval: 5000
-  }).getMeter('your-meter-name');
-  const requestCount = meter.createCounter("requests", { description: "Count all incoming requests" });
-  const boundInstruments = new Map();
-  module.exports.countAllRequests = () => {
-    return (req, res, next) => {
-      if (!boundInstruments.has(req.path)) {
-        const labels = { route: req.path };
-        const boundCounter = requestCount.bind(labels);
-        boundInstruments.set(req.path, boundCounter);
-      }
-      boundInstruments.get(req.path).add(1);
-      next();
-    };
-  };
-  ```
-
-Run `npm install` and `node -r ./tracing.js app.js` and add some load to the app, e.g. `curl http://localhost:8080`
+</details>

@@ -240,6 +240,25 @@ describe('when configuring via environment', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
     envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
   });
+  it('should use headers defined via env', () => {
+    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
+    const collectorExporter = new CollectorTraceExporter();
+    assert.deepStrictEqual(collectorExporter.metadata?.get('foo'), ['bar']);
+    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
+  });
+  it('should override global headers config with signal headers defined via env', () => {
+    const metadata = new grpc.Metadata();
+    metadata.set('foo', 'bar');
+    metadata.set('goo', 'lol');
+    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=jar,bar=foo';
+    envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = 'foo=boo';
+    const collectorExporter = new CollectorTraceExporter({ metadata });
+    assert.deepStrictEqual(collectorExporter.metadata?.get('foo'), ['boo']);
+    assert.deepStrictEqual(collectorExporter.metadata?.get('bar'), ['foo']);
+    assert.deepStrictEqual(collectorExporter.metadata?.get('goo'), ['lol']);
+    envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = '';
+    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
+  });
 });
 
 testCollectorExporter({ useTLS: true });
