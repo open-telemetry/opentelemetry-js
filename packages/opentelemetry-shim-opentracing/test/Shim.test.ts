@@ -36,6 +36,7 @@ import {
 import { performance } from 'perf_hooks';
 import { B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
+import { SemanticAttributes } from "@opentelemetry/semantic-conventions";
 
 describe('OpenTracing Shim', () => {
   const compositePropagator = new CompositePropagator({
@@ -355,18 +356,92 @@ describe('OpenTracing Shim', () => {
       });
     });
 
-    it('logs KV pairs', () => {
-      const kvLogs = { key: 'value', error: 'not a valid span' };
-      span.log(kvLogs);
-      assert.strictEqual(otSpan.events[0].name, 'log');
-      assert.strictEqual(otSpan.events[0].attributes, kvLogs);
-    });
+    describe('logging', () => {
+      describe('event with payload', () => {
+        it('logs an event with a payload', () => {
+          const payload = { user: 'payload', request: 1 };
+          span.logEvent('some log', payload);
+          assert.strictEqual(otSpan.events[0].name, 'some log');
+          assert.deepStrictEqual(otSpan.events[0].attributes, payload);
+        });
 
-    it('logs an event with a payload', () => {
-      const payload = { user: 'payload', request: 1 };
-      span.logEvent('some log', payload);
-      assert.strictEqual(otSpan.events[0].name, 'some log');
-      assert.deepStrictEqual(otSpan.events[0].attributes, payload);
+        it('records an exception', () => {
+          const payload = {
+            'error.object': 'boom', fault: 'meow'
+          };
+          span.logEvent('error', payload);
+          assert.strictEqual(otSpan.events[0].name, 'exception');
+          const expectedAttributes = {
+            [SemanticAttributes.EXCEPTION_MESSAGE]: 'boom',
+          };
+          assert.deepStrictEqual(otSpan.events[0].attributes, expectedAttributes);
+        });
+
+        it('maps to exception semantic conventions', () => {
+          const payload = {
+            fault: 'meow', 'error.kind': 'boom', message: 'oh no!', stack: 'pancakes'
+          };
+          span.logEvent('error', payload);
+          assert.strictEqual(otSpan.events[0].name, 'exception');
+          const expectedAttributes = {
+            fault: 'meow',
+            [SemanticAttributes.EXCEPTION_TYPE]: 'boom',
+            [SemanticAttributes.EXCEPTION_MESSAGE]: 'oh no!',
+            [SemanticAttributes.EXCEPTION_STACKTRACE]: 'pancakes'
+          };
+          assert.deepStrictEqual(otSpan.events[0].attributes, expectedAttributes);
+        });
+      });
+
+      describe('key-value pairs', () => {
+        const tomorrow = new Date().setDate(new Date().getDate() + 1);
+
+        it('names event after event attribute', () => {
+          const kvLogs = { event: 'fun-time', user: 'meow', value: 123 };
+          span.log(kvLogs, tomorrow);
+          assert.strictEqual(otSpan.events[0].name, 'fun-time');
+          assert.strictEqual(otSpan.events[0].time[0], Math.trunc(tomorrow / 1000));
+          assert.strictEqual(otSpan.events[0].attributes, kvLogs);
+        });
+
+        it('names event log, as a fallback', () => {
+          const kvLogs = { user: 'meow', value: 123 };
+          span.log(kvLogs, tomorrow);
+          assert.strictEqual(otSpan.events[0].name, 'log');
+          assert.strictEqual(otSpan.events[0].time[0], Math.trunc(tomorrow / 1000));
+          assert.strictEqual(otSpan.events[0].attributes, kvLogs);
+        });
+
+        it('records an exception', () => {
+          const kvLogs = {
+            event: 'error', 'error.object': 'boom', fault: 'meow'
+          };
+          span.log(kvLogs, tomorrow);
+          assert.strictEqual(otSpan.events[0].name, 'exception');
+          assert.strictEqual(otSpan.events[0].time[0], Math.trunc(tomorrow / 1000));
+          const expectedAttributes = {
+            [SemanticAttributes.EXCEPTION_MESSAGE]: 'boom',
+          };
+          assert.deepStrictEqual(otSpan.events[0].attributes, expectedAttributes);
+        });
+
+        it('maps to exception semantic conventions', () => {
+          const kvLogs = {
+            event: 'error', fault: 'meow', 'error.kind': 'boom', message: 'oh no!', stack: 'pancakes'
+          };
+          span.log(kvLogs, tomorrow);
+          assert.strictEqual(otSpan.events[0].name, 'exception');
+          assert.strictEqual(otSpan.events[0].time[0], Math.trunc(tomorrow / 1000));
+          const expectedAttributes = {
+            event: 'error',
+            fault: 'meow',
+            [SemanticAttributes.EXCEPTION_TYPE]: 'boom',
+            [SemanticAttributes.EXCEPTION_MESSAGE]: 'oh no!',
+            [SemanticAttributes.EXCEPTION_STACKTRACE]: 'pancakes'
+          };
+          assert.deepStrictEqual(otSpan.events[0].attributes, expectedAttributes);
+        });
+      });
     });
 
     it('updates the name', () => {
