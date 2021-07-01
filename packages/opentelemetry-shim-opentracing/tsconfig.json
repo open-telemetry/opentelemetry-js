@@ -19,6 +19,9 @@
       "path": "../opentelemetry-propagator-jaeger"
     },
     {
+      "path": "../opentelemetry-semantic-conventions"
+    },
+    {
       "path": "../opentelemetry-tracing"
     }
   ]

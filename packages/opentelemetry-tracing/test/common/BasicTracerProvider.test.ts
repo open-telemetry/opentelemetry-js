@@ -43,7 +43,7 @@ import {
   InMemorySpanExporter,
   SpanExporter,
   BatchSpanProcessor,
-} from '../src';
+} from '../../src';
 
 describe('BasicTracerProvider', () => {
   let removeEvent: Function | undefined;
@@ -505,7 +505,7 @@ describe('BasicTracerProvider', () => {
         assert.deepStrictEqual(trace.getSpan(context.active()), undefined);
         return done();
       };
-      const patchedFn = context.bind(fn, trace.setSpan(context.active(), span));
+      const patchedFn = context.bind(trace.setSpan(context.active(), span), fn);
       return patchedFn();
     });
   });
