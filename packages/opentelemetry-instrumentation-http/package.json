@@ -64,7 +64,7 @@
     "sinon": "10.0.0",
     "superagent": "6.1.0",
     "ts-mocha": "8.0.0",
-    "typescript": "4.3.4"
+    "typescript": "4.3.5"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.0.1"

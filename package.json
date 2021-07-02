@@ -62,7 +62,7 @@
     "lerna": "3.22.1",
     "lerna-changelog": "1.0.1",
     "markdownlint-cli": "0.27.1",
-    "typescript": "4.3.4",
+    "typescript": "4.3.5",
     "update-ts-references": "2.4.0"
   },
   "husky": {
