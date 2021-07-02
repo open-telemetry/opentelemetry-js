@@ -16,7 +16,7 @@
 
 import { VERSION } from '../version';
 
-const re = /^(\d+)\.(\d+)\.(\d+)(?:-(.*))?$/;
+const re = /^(\d+)\.(\d+)\.(\d+)(-(.+))?$/;
 
 /**
  * Create a function to test an API version to see if it is compatible with the provided ownVersion.
@@ -50,7 +50,15 @@ export function _makeCompatibilityCheck(
     major: +myVersionMatch[1],
     minor: +myVersionMatch[2],
     patch: +myVersionMatch[3],
+    prerelease: myVersionMatch[4],
   };
+
+  // if ownVersion has a prerelease tag, versions must match exactly
+  if (ownVersionParsed.prerelease != null) {
+    return function isExactmatch(globalVersion: string): boolean {
+      return globalVersion === ownVersion;
+    };
+  }
 
   function _reject(v: string) {
     rejectedVersions.add(v);
@@ -82,7 +90,13 @@ export function _makeCompatibilityCheck(
       major: +globalVersionMatch[1],
       minor: +globalVersionMatch[2],
       patch: +globalVersionMatch[3],
+      prerelease: globalVersionMatch[4],
     };
+
+    // if globalVersion has a prerelease tag, versions must match exactly
+    if (globalVersionParsed.prerelease != null) {
+      return _reject(globalVersion);
+    }
 
     // major versions must match
     if (ownVersionParsed.major !== globalVersionParsed.major) {
