@@ -44,6 +44,9 @@ describe('semver', () => {
       ['5.5.6', true],
       ['5.5.4', true],
 
+      // prerelease version should not be compatible
+      ['5.5.5-rc.0', false],
+
       // if our version has a minor version increase, we may try to call methods which don't exist on the global
       ['5.6.5', false],
       ['5.6.6', false],
@@ -84,6 +87,9 @@ describe('semver', () => {
       // same minor/patch should be compatible
       ['0.5.5', true],
 
+      // prerelease version should not be compatible
+      ['0.5.5-rc.0', false],
+
       // if our version has a patch version increase, we may try to call methods which don't exist on the global
       ['0.5.6', false],
 
@@ -112,21 +118,30 @@ describe('semver', () => {
 
     test(globalVersion, vers);
   });
+
+  describe('global version is prerelease', () => {
+    const globalVersion = '1.0.0-rc.3';
+    const vers: [string, boolean][] = [
+      // must match exactly
+      ['1.0.0', false],
+      ['1.0.0-rc.2', false],
+      ['1.0.0-rc.4', false],
+
+      ['1.0.0-rc.3', true],
+    ];
+
+    test(globalVersion, vers);
+  });
 });
 
 function test(globalVersion: string, vers: [string, boolean][]) {
   describe(`global version is ${globalVersion}`, () => {
     for (const [version, compatible] of vers) {
-      const alphaVersion = `${version}-alpha.1`;
       it(`API version ${version} ${
         compatible ? 'should' : 'should not'
       } be able to access global`, () => {
         const check = _makeCompatibilityCheck(version);
         assert.strictEqual(check(globalVersion), compatible);
-
-        // alpha tag should have no effect different than the regular version
-        const alphaCheck = _makeCompatibilityCheck(alphaVersion);
-        assert.strictEqual(alphaCheck(globalVersion), compatible);
       });
     }
   });
