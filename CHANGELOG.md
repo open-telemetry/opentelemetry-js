@@ -4,6 +4,51 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.23.0
+
+### :rocket: (Enhancement)
+
+* `opentelemetry-shim-opentracing`
+  * [#2282](https://github.com/open-telemetry/opentelemetry-js/pull/2282) feat(shim-opentracing): update logging based on new spec ([@vreynolds](https://github.com/vreynolds))
+* `opentelemetry-exporter-collector-grpc`
+  * [#2304](https://github.com/open-telemetry/opentelemetry-js/pull/2304) feat: otlp-grpc exporter uses headers environment variables ([@vreynolds](https://github.com/vreynolds))
+* `opentelemetry-propagator-b3`
+  * [#2285](https://github.com/open-telemetry/opentelemetry-js/pull/2285) fix(propagator-b3): update extract to check for array ([@jordanworner](https://github.com/jordanworner))
+* `opentelemetry-core`, `opentelemetry-instrumentation-fetch`, `opentelemetry-instrumentation-xml-http-request`, `opentelemetry-web`
+  * [#2226](https://github.com/open-telemetry/opentelemetry-js/pull/2226) fix(xhr): make performance observer work with relative urls ([@mhennoch](https://github.com/mhennoch))
+
+### :books: (Refine Doc)
+
+* Other
+  * [#2306](https://github.com/open-telemetry/opentelemetry-js/pull/2306) chore: update the website getting started docs ([@dyladan](https://github.com/dyladan))
+  * [#2283](https://github.com/open-telemetry/opentelemetry-js/pull/2283) Module opentelemetry/instrumentation-grpc required ([@pramodsreek](https://github.com/pramodsreek))
+* `opentelemetry-sdk-node`
+  * [#2300](https://github.com/open-telemetry/opentelemetry-js/pull/2300) chore(README): update link to BatchSpanProcessor in sdk node ([@pragmaticivan](https://github.com/pragmaticivan))
+* `opentelemetry-exporter-jaeger`, `opentelemetry-exporter-zipkin`, `opentelemetry-sdk-node`
+  * [#2290](https://github.com/open-telemetry/opentelemetry-js/pull/2290) fix: service.name resource attribute ([@OmkarKirpan](https://github.com/OmkarKirpan))
+* `opentelemetry-resources`
+  * [#2289](https://github.com/open-telemetry/opentelemetry-js/pull/2289) docs(opentelemetry-resources): fix wrong sample code in readme ([@alisabzevari](https://github.com/alisabzevari))
+
+### :house: (Internal)
+
+* `opentelemetry-context-async-hooks`, `opentelemetry-context-zone-peer-dep`, `opentelemetry-web`
+  * [#2247](https://github.com/open-telemetry/opentelemetry-js/pull/2247) feat: unify the signatures of bind and with ([@Rauno56](https://github.com/Rauno56))
+* Other
+  * [#2296](https://github.com/open-telemetry/opentelemetry-js/pull/2296) chore: do not upgrade backwards compatibility ([@dyladan](https://github.com/dyladan))
+  * [#2302](https://github.com/open-telemetry/opentelemetry-js/pull/2302) chore: use setup-node ([@dyladan](https://github.com/dyladan))
+
+### Committers: 9
+
+* Ali Sabzevari ([@alisabzevari](https://github.com/alisabzevari))
+* Daniel Dyla ([@dyladan](https://github.com/dyladan))
+* Ivan Santos ([@pragmaticivan](https://github.com/pragmaticivan))
+* Jordan Worner ([@jordanworner](https://github.com/jordanworner))
+* MartenH ([@mhennoch](https://github.com/mhennoch))
+* Omkar Kirpan ([@OmkarKirpan](https://github.com/OmkarKirpan))
+* Pramod ([@pramodsreek](https://github.com/pramodsreek))
+* Rauno Viskus ([@Rauno56](https://github.com/Rauno56))
+* Vera Reynolds ([@vreynolds](https://github.com/vreynolds))
+
 ## 0.22.0
 
 ### :rocket: (Enhancement)
