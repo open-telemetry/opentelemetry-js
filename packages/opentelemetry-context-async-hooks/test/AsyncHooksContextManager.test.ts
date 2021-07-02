@@ -367,7 +367,8 @@ for (const contextManagerClass of [
           contextManager.bind(context, () => {
             assert.strictEqual(contextManager.active(), context);
             assert.strictEqual(otherContextManager.active(), otherContext);
-          }));
+          })
+        );
         fn();
       });
     });
