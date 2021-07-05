@@ -15,7 +15,7 @@
  */
 
 import * as sinon from 'sinon';
-import { expect, use, should } from 'chai';
+import { use, should } from 'chai';
 import * as sinonChai from 'sinon-chai';
 should();
 use(sinonChai);
