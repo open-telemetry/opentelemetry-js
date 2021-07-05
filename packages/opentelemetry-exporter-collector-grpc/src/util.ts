@@ -108,8 +108,11 @@ export function send<ExportItem, ServiceRequest>(
 }
 
 export function validateAndNormalizeUrl(url: string): string {
+  if (!url.match(/:\/\//)) {
+    url = `https://${url}`;
+  }
   const target = new URL(url);
-  if (target.pathname !== '/') {
+  if (target.pathname && target.pathname !== '/') {
     diag.warn(
       'URL path should not be set when using grpc, the path part of the URL will be ignored.'
     );
