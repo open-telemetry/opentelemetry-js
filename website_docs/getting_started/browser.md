@@ -43,7 +43,7 @@ Copy the following file into an empty directory and call it `index.html`.
 To create traces in the browser, you will need `@opentelemetry/web`, and the plugin `@opentelemetry/plugin-document-load`:
 
 ```shell
-echo '{}' > package.json
+npm init -y
 npm install --save @opentelemetry/web @opentelemetry/instrumentation-document-load @opentelemetry/context-zone
 ```
 
