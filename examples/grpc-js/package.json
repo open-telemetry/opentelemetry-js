@@ -1,7 +1,7 @@
 {
   "name": "grpc-js-example",
   "private": true,
-  "version": "0.22.0",
+  "version": "0.23.0",
   "description": "Example of @grpc/grpc-js integration with OpenTelemetry",
   "main": "index.js",
   "scripts": {
@@ -30,12 +30,12 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.2.12",
     "@opentelemetry/api": "^1.0.0",
-    "@opentelemetry/exporter-jaeger": "0.22.0",
-    "@opentelemetry/exporter-zipkin": "0.22.0",
-    "@opentelemetry/instrumentation": "0.22.0",
-    "@opentelemetry/instrumentation-grpc": "0.22.0",
-    "@opentelemetry/node": "0.22.0",
-    "@opentelemetry/tracing": "0.22.0",
+    "@opentelemetry/exporter-jaeger": "0.23.0",
+    "@opentelemetry/exporter-zipkin": "0.23.0",
+    "@opentelemetry/instrumentation": "0.23.0",
+    "@opentelemetry/instrumentation-grpc": "0.23.0",
+    "@opentelemetry/node": "0.23.0",
+    "@opentelemetry/tracing": "0.23.0",
     "google-protobuf": "^3.9.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
