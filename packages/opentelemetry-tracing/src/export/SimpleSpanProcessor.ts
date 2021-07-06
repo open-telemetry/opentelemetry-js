@@ -43,7 +43,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
   }
 
   // does nothing.
-  onStart(_span: Span): void {}
+  onStart(_span: Span, _parentContext: Context): void {}
 
   onEnd(span: ReadableSpan): void {
     if (this._isShutdown) {
