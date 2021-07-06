@@ -142,6 +142,7 @@ npm install --save @opentelemetry/semantic-conventions
 ```
 
 Add the following to the top of your application file:
+
 ```javascript
 const { SemanticAttributes } = require('@opentelemetry/semantic-conventions');
 ```

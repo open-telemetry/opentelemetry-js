@@ -84,7 +84,7 @@ registerInstrumentations({
 
 In the following we will use [parcel](https://parceljs.org/) as web application bundler, but you can of course also use any other build tool.
 
-Run 
+Run
 
 ```shell
 npx parcel index.html
