@@ -3,6 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## Unreleased
+* `opentelemetry-exporter-collector-proto`
+  * [#2331](https://github.com/open-telemetry/opentelemetry-js/pull/2331) fix(opentelemetry-exporter-collector-proto): Change default HTTP exporter port to 55681 ([@NathanielRN](https://github.com/NathanielRN))
 
 ## 0.23.0
 
