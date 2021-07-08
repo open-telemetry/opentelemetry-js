@@ -63,6 +63,7 @@ export function onInit<ExportItem, ServiceRequest>(
 export function send<ExportItem, ServiceRequest>(
   collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
   objects: ExportItem[],
+  compress: boolean,
   onSuccess: () => void,
   onError: (error: collectorTypes.CollectorExporterError) => void
 ): void {
@@ -76,6 +77,7 @@ export function send<ExportItem, ServiceRequest>(
         collector,
         Buffer.from(body),
         'application/x-protobuf',
+        compress,
         onSuccess,
         onError
       );

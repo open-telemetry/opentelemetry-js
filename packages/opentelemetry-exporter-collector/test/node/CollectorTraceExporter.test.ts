@@ -174,7 +174,6 @@ describe('CollectorTraceExporter - node with json over http', () => {
     });
 
     it('should successfully send the spans', done => {
-      collectorExporter.export(spans, () => { });
       let buff = Buffer.from('');
 
       fakeRequest.on('end', () => {
@@ -198,6 +197,8 @@ describe('CollectorTraceExporter - node with json over http', () => {
       fakeRequest.on('data', chunk => {
         buff = Buffer.concat([buff, chunk]);
       });
+
+      collectorExporter.export(spans, () => { });
     });
 
     it('should log the successful message', done => {
