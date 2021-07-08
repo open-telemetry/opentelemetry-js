@@ -33,12 +33,12 @@ export class StackContextManager implements ContextManager {
 
   /**
    *
-   * @param target Function to be executed within the context
    * @param context
+   * @param target Function to be executed within the context
    */
   private _bindFunction<T extends Function>(
-    target: T,
-    context = ROOT_CONTEXT
+    context = ROOT_CONTEXT,
+    target: T
   ): T {
     const manager = this;
     const contextWrapper = function (this: unknown, ...args: unknown[]) {
@@ -72,7 +72,7 @@ export class StackContextManager implements ContextManager {
       context = this.active();
     }
     if (typeof target === 'function') {
-      return this._bindFunction(target, context);
+      return this._bindFunction(context, target);
     }
     return target;
   }
