@@ -17,7 +17,7 @@ import * as url from 'url';
 import * as http from 'http';
 import * as https from 'https';
 import * as zlib from 'zlib';
-import { pipeline, Readable } from 'stream';
+import { Readable } from 'stream';
 import * as collectorTypes from '../../types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { CollectorExporterNodeConfigBase } from '.';
@@ -83,25 +83,23 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
   });
 
   if (compress) {
-    const dataStream = Readable.from(data);
-    pipeline(dataStream, gzip, req, onGzipError(onError));
+    const dataStream = readableFromBuffer(data);
+    dataStream.on('error', onError)
+      .pipe(gzip).on('error', onError)
+      .pipe(req);
   } else {
     req.write(data);
     req.end();
   }
 }
 
-function onGzipError(onError: (error: collectorTypes.CollectorExporterError) => void) {
-  return (err: NodeJS.ErrnoException | null) => {
-    const error = new collectorTypes.CollectorExporterError(
-      err?.message,
-      500,
-      'Compressing the request body for collector exporter failed.'
-    );
-    onError(error)
-  }
+function readableFromBuffer(buff: string | Buffer): Readable {
+  const readable = new Readable();
+  readable.push(buff);
+  readable.push(null);
+  
+  return readable;
 }
-
 
 export function createHttpAgent(
   config: CollectorExporterNodeConfigBase
