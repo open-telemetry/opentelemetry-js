@@ -16,10 +16,14 @@
 import * as url from 'url';
 import * as http from 'http';
 import * as https from 'https';
+import * as zlib from 'zlib';
+import { pipeline, Readable } from 'stream';
 import * as collectorTypes from '../../types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { CollectorExporterNodeConfigBase } from '.';
 import { diag } from '@opentelemetry/api';
+
+const gzip = zlib.createGzip();
 
 /**
  * Sends data using http
@@ -33,6 +37,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
   collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
   data: string | Buffer,
   contentType: string,
+  compress: boolean,
   onSuccess: () => void,
   onError: (error: collectorTypes.CollectorExporterError) => void
 ): void {
@@ -46,6 +51,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
     headers: {
       'Content-Length': Buffer.byteLength(data),
       'Content-Type': contentType,
+      'Content-Encoding': 'gzip',
       ...collector.headers,
     },
     agent: collector.agent,
@@ -71,12 +77,31 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
     });
   });
 
+
   req.on('error', (error: Error) => {
     onError(error);
   });
-  req.write(data);
-  req.end();
+
+  if (compress) {
+    const dataStream = Readable.from(data);
+    pipeline(dataStream, gzip, req, onGzipError(onError));
+  } else {
+    req.write(data);
+    req.end();
+  }
 }
+
+function onGzipError(onError: (error: collectorTypes.CollectorExporterError) => void) {
+  return (err: NodeJS.ErrnoException | null) => {
+    const error = new collectorTypes.CollectorExporterError(
+      err?.message,
+      500,
+      'Compressing the request body for collector exporter failed.'
+    );
+    onError(error)
+  }
+}
+
 
 export function createHttpAgent(
   config: CollectorExporterNodeConfigBase

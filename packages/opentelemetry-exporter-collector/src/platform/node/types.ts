@@ -24,5 +24,6 @@ import { CollectorExporterConfigBase } from '../../types';
 export interface CollectorExporterNodeConfigBase
   extends CollectorExporterConfigBase {
   keepAlive?: boolean;
+  compress?: boolean;
   httpAgentOptions?: http.AgentOptions | https.AgentOptions;
 }

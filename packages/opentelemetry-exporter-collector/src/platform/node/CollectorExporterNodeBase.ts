@@ -39,6 +39,7 @@ export abstract class CollectorExporterNodeBase<
   DEFAULT_HEADERS: Record<string, string> = {};
   headers: Record<string, string>;
   agent: http.Agent | https.Agent | undefined;
+  compress: boolean;
 
   constructor(config: CollectorExporterNodeConfigBase = {}) {
     super(config);
@@ -51,6 +52,7 @@ export abstract class CollectorExporterNodeBase<
       baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_HEADERS)
     );
     this.agent = createHttpAgent(config);
+    this.compress = config.compress || false;
   }
 
   onInit(_config: CollectorExporterNodeConfigBase): void {
@@ -86,6 +88,7 @@ export abstract class CollectorExporterNodeBase<
         this,
         JSON.stringify(serviceRequest),
         'application/json',
+        this.compress,
         _onSuccess,
         _onError
       );
