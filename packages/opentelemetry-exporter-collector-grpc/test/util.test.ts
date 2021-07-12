@@ -50,6 +50,18 @@ describe('validateAndNormalizeUrl()', () => {
       expected: 'api.datacat.io:1234',
       warn: 'URL path should not be set when using grpc, the path part of the URL will be ignored.',
     },
+    {
+      name: ':// in path should not be used for protocol even if protocol not specified',
+      input: 'api.datacat.io/a/b://c',
+      expected: 'api.datacat.io',
+      warn: 'URL path should not be set when using grpc, the path part of the URL will be ignored.',
+    },
+    {
+      name: ':// in path is valid when a protocol is specified',
+      input: 'grpc://api.datacat.io/a/b://c',
+      expected: 'api.datacat.io',
+      warn: 'URL path should not be set when using grpc, the path part of the URL will be ignored.',
+    },
   ];
   tests.forEach(test => {
     it(test.name, () => {
