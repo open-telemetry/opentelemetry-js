@@ -108,7 +108,8 @@ export function send<ExportItem, ServiceRequest>(
 }
 
 export function validateAndNormalizeUrl(url: string): string {
-  if (!url.match(/^([\w]{1,8}):\/\//)) {
+  const hasProtocol = url.match(/^([\w]{1,8}):\/\//);
+  if (!hasProtocol) {
     url = `https://${url}`;
   }
   const target = new URL(url);
