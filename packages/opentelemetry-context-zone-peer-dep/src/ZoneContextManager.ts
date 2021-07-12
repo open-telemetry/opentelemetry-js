@@ -15,7 +15,7 @@
  */
 
 import { Context, ContextManager, ROOT_CONTEXT } from '@opentelemetry/api';
-import { Func, TargetWithEvents } from './types';
+import { TargetWithEvents } from './types';
 import { isListenerObject } from './util';
 
 /* Key name to be used to save a context reference in Zone */
@@ -53,9 +53,10 @@ export class ZoneContextManager implements ContextManager {
    * @param context A context (span) to be executed within target function
    * @param target Function to be executed within the context
    */
+  // eslint-disable-next-line @typescript-eslint/ban-types
   private _bindFunction<T extends Function>(context: Context, target: T): T {
     const manager = this;
-    const contextWrapper = function (this: any, ...args: unknown[]) {
+    const contextWrapper = function (this: unknown, ...args: unknown[]) {
       return manager.with(context, () => target.apply(this, args));
     };
     Object.defineProperty(contextWrapper, 'length', {
@@ -134,16 +135,16 @@ export class ZoneContextManager implements ContextManager {
    */
   private _patchAddEventListener(
     target: TargetWithEvents,
-    original: Function,
+    original: NonNullable<TargetWithEvents['addEventListener']>,
     context: Context
   ) {
     const contextManager = this;
 
     return function (
-      this: {},
-      event: string,
-      listener: Func<void>,
-      opts?: any
+      this: TargetWithEvents,
+      event,
+      listener,
+      opts
     ) {
       if (target.__ot_listeners === undefined) {
         target.__ot_listeners = {};
@@ -157,7 +158,7 @@ export class ZoneContextManager implements ContextManager {
       // store a weak reference of the user listener to ours
       listeners.set(listener, patchedListener);
       return original.call(this, event, patchedListener, opts);
-    };
+    } as TargetWithEvents['addEventListener'];
   }
 
   /**
@@ -167,9 +168,9 @@ export class ZoneContextManager implements ContextManager {
    */
   private _patchRemoveEventListener(
     target: TargetWithEvents,
-    original: Function
+    original: NonNullable<TargetWithEvents['removeEventListener']>
   ) {
-    return function (this: {}, event: string, listener: Func<void>) {
+    return function (this: TargetWithEvents, event, listener) {
       if (
         target.__ot_listeners === undefined ||
         target.__ot_listeners[event] === undefined
@@ -180,7 +181,7 @@ export class ZoneContextManager implements ContextManager {
       const patchedListener = events.get(listener);
       events.delete(listener);
       return original.call(this, event, patchedListener || listener);
-    };
+    } as TargetWithEvents['removeEventListener'];
   }
 
   /**
