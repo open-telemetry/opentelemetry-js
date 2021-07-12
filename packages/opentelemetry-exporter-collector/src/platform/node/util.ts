@@ -51,7 +51,6 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
     headers: {
       'Content-Length': Buffer.byteLength(data),
       'Content-Type': contentType,
-      'Content-Encoding': 'gzip',
       ...collector.headers,
     },
     agent: collector.agent,
@@ -84,6 +83,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
 
   switch (collector.compression) {
     case CompressionAlgorithm.GZIP: {
+      req.setHeader('Content-Encoding', 'gzip');
       const dataStream = readableFromBuffer(data);
       dataStream.on('error', onError)
         .pipe(gzip).on('error', onError)

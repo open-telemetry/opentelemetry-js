@@ -44,6 +44,7 @@ describe('CollectorTraceExporter - node with json over http', () => {
   let collectorExporter: CollectorTraceExporter;
   let collectorExporterConfig: CollectorExporterNodeConfigBase;
   let stubRequest: sinon.SinonStub;
+  let spySetHeader: sinon.SinonSpy;
   let spans: ReadableSpan[];
 
   afterEach(() => {
@@ -144,6 +145,17 @@ describe('CollectorTraceExporter - node with json over http', () => {
         const args = stubRequest.args[0];
         const options = args[0];
         assert.strictEqual(options.headers['foo'], 'bar');
+        done();
+      });
+    });
+
+    it('should not have Content-Encoding header', done => {
+      collectorExporter.export(spans, () => { });
+
+      setTimeout(() => {
+        const args = stubRequest.args[0];
+        const options = args[0];
+        assert.strictEqual(options.headers['Content-Encoding'], undefined);
         done();
       });
     });
@@ -251,6 +263,8 @@ describe('CollectorTraceExporter - node with json over http', () => {
   describe('export - with compression', () => {
     beforeEach(() => {
       stubRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
+      spySetHeader = sinon.spy();
+      (fakeRequest as any).setHeader = spySetHeader;
       collectorExporterConfig = {
         headers: {
           foo: 'bar',
@@ -285,6 +299,7 @@ describe('CollectorTraceExporter - node with json over http', () => {
         }
 
         ensureExportTraceServiceRequestIsSet(json);
+        assert.ok(spySetHeader.calledWith('Content-Encoding', 'gzip'));
 
         done();
       });
