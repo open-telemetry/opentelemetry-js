@@ -88,7 +88,6 @@ export abstract class CollectorExporterNodeBase<
         this,
         JSON.stringify(serviceRequest),
         'application/json',
-        this.compression,
         _onSuccess,
         _onError
       );

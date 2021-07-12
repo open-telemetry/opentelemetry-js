@@ -38,7 +38,6 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
   collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
   data: string | Buffer,
   contentType: string,
-  compression: CompressionAlgorithm,
   onSuccess: () => void,
   onError: (error: collectorTypes.CollectorExporterError) => void
 ): void {
@@ -83,7 +82,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
     onError(error);
   });
 
-  switch (compression) {
+  switch (collector.compression) {
     case CompressionAlgorithm.GZIP: {
       const dataStream = readableFromBuffer(data);
       dataStream.on('error', onError)

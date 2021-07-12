@@ -78,7 +78,6 @@ export function send<ExportItem, ServiceRequest>(
         collector,
         Buffer.from(body),
         'application/x-protobuf',
-        compression,
         onSuccess,
         onError
       );
