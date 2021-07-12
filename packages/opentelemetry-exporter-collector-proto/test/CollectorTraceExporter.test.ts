@@ -19,6 +19,7 @@ import { ExportResultCode } from '@opentelemetry/core';
 import {
   CollectorExporterNodeConfigBase,
   collectorTypes,
+  CompressionAlgorithm,
 } from '@opentelemetry/exporter-collector';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
@@ -211,7 +212,7 @@ describe('CollectorTraceExporter - node with proto over http', () => {
         attributes: {},
         url: 'http://foo.bar.com',
         keepAlive: true,
-        compress: true,
+        compression: CompressionAlgorithm.GZIP,
         httpAgentOptions: { keepAliveMsecs: 2000 },
       };
       collectorExporter = new CollectorTraceExporter(collectorExporterConfig);

@@ -25,6 +25,7 @@ import * as zlib from 'zlib';
 import {
   CollectorTraceExporter,
   CollectorExporterNodeConfigBase,
+  CompressionAlgorithm,
 } from '../../src/platform/node';
 import * as collectorTypes from '../../src/types';
 import { MockedResponse } from './nodeHelpers';
@@ -258,7 +259,7 @@ describe('CollectorTraceExporter - node with json over http', () => {
         attributes: {},
         url: 'http://foo.bar.com',
         keepAlive: true,
-        compress: true,
+        compression: CompressionAlgorithm.GZIP,
         httpAgentOptions: { keepAliveMsecs: 2000 },
       };
       collectorExporter = new CollectorTraceExporter(collectorExporterConfig);

@@ -22,6 +22,7 @@ import * as collectorTypes from '../../types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { CollectorExporterNodeConfigBase } from '.';
 import { diag } from '@opentelemetry/api';
+import { CompressionAlgorithm } from './types';
 
 const gzip = zlib.createGzip();
 
@@ -37,7 +38,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
   collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
   data: string | Buffer,
   contentType: string,
-  compress: boolean,
+  compression: CompressionAlgorithm,
   onSuccess: () => void,
   onError: (error: collectorTypes.CollectorExporterError) => void
 ): void {
@@ -82,14 +83,20 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
     onError(error);
   });
 
-  if (compress) {
-    const dataStream = readableFromBuffer(data);
-    dataStream.on('error', onError)
-      .pipe(gzip).on('error', onError)
-      .pipe(req);
-  } else {
-    req.write(data);
-    req.end();
+  switch (compression) {
+    case CompressionAlgorithm.GZIP: {
+      const dataStream = readableFromBuffer(data);
+      dataStream.on('error', onError)
+        .pipe(gzip).on('error', onError)
+        .pipe(req);
+
+      break;
+    }
+    default:
+      req.write(data);
+      req.end();
+
+      break;
   }
 }
 
@@ -97,7 +104,7 @@ function readableFromBuffer(buff: string | Buffer): Readable {
   const readable = new Readable();
   readable.push(buff);
   readable.push(null);
-  
+
   return readable;
 }
 
