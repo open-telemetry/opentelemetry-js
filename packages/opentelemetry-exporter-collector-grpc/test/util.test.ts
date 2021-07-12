@@ -15,10 +15,7 @@
  */
 
 import * as sinon from 'sinon';
-import { use, should } from 'chai';
-import * as sinonChai from 'sinon-chai';
-should();
-use(sinonChai);
+import * as assert from 'assert';
 
 import { diag } from '@opentelemetry/api';
 import { validateAndNormalizeUrl } from '../src/util';
@@ -58,11 +55,11 @@ describe('validateAndNormalizeUrl()', () => {
     it(test.name, () => {
       const diagWarn = sinon.stub(diag, 'warn');
       try {
-        validateAndNormalizeUrl(test.input).should.eq(test.expected);
+        assert.strictEqual(validateAndNormalizeUrl(test.input), (test.expected));
         if (test.warn) {
-          diagWarn.should.have.been.calledWith(test.warn);
+          sinon.assert.calledWith(diagWarn, test.warn);
         } else {
-          diagWarn.should.not.have.been.called;
+          sinon.assert.notCalled(diagWarn);
         }
       } finally {
         diagWarn.restore();
