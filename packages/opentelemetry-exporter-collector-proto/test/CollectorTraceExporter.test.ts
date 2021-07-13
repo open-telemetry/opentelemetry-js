@@ -226,6 +226,8 @@ describe('CollectorTraceExporter - node with proto over http', () => {
     it('should successfully send the spans', done => {
       const fakeRequest = new Stream.PassThrough();
       sinon.stub(http, 'request').returns(fakeRequest as any);
+      const spySetHeader = sinon.spy();
+      (fakeRequest as any).setHeader = spySetHeader;
 
       let buff = Buffer.from('');
       fakeRequest.on('end', () => {
@@ -241,6 +243,7 @@ describe('CollectorTraceExporter - node with proto over http', () => {
         }
 
         ensureExportTraceServiceRequestIsSet(json);
+        assert.ok(spySetHeader.calledWith('Content-Encoding', 'gzip'));
 
         done();
       });
