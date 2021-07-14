@@ -10,6 +10,7 @@ module.exports = {
     "project": "./tsconfig.json"
   },
   rules: {
+    "quotes": [2, "single", { "avoidEscape": true }],
     "@typescript-eslint/no-floating-promises": 2,
     "@typescript-eslint/no-this-alias": "off",
     "brace-style": ["error", "1tbs"],
