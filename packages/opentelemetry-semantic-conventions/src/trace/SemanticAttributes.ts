@@ -659,99 +659,99 @@ clear whether the exception will escape.
 
 export enum DbSystemValues {
   /** Some other SQL database. Fallback only. See notes. */
-  OTHER_SQL = "other_sql",
+  OTHER_SQL = 'other_sql',
   /** Microsoft SQL Server. */
-  MSSQL = "mssql",
+  MSSQL = 'mssql',
   /** MySQL. */
-  MYSQL = "mysql",
+  MYSQL = 'mysql',
   /** Oracle Database. */
-  ORACLE = "oracle",
+  ORACLE = 'oracle',
   /** IBM Db2. */
-  DB2 = "db2",
+  DB2 = 'db2',
   /** PostgreSQL. */
-  POSTGRESQL = "postgresql",
+  POSTGRESQL = 'postgresql',
   /** Amazon Redshift. */
-  REDSHIFT = "redshift",
+  REDSHIFT = 'redshift',
   /** Apache Hive. */
-  HIVE = "hive",
+  HIVE = 'hive',
   /** Cloudscape. */
-  CLOUDSCAPE = "cloudscape",
+  CLOUDSCAPE = 'cloudscape',
   /** HyperSQL DataBase. */
-  HSQLDB = "hsqldb",
+  HSQLDB = 'hsqldb',
   /** Progress Database. */
-  PROGRESS = "progress",
+  PROGRESS = 'progress',
   /** SAP MaxDB. */
-  MAXDB = "maxdb",
+  MAXDB = 'maxdb',
   /** SAP HANA. */
-  HANADB = "hanadb",
+  HANADB = 'hanadb',
   /** Ingres. */
-  INGRES = "ingres",
+  INGRES = 'ingres',
   /** FirstSQL. */
-  FIRSTSQL = "firstsql",
+  FIRSTSQL = 'firstsql',
   /** EnterpriseDB. */
-  EDB = "edb",
+  EDB = 'edb',
   /** InterSystems Caché. */
-  CACHE = "cache",
+  CACHE = 'cache',
   /** Adabas (Adaptable Database System). */
-  ADABAS = "adabas",
+  ADABAS = 'adabas',
   /** Firebird. */
-  FIREBIRD = "firebird",
+  FIREBIRD = 'firebird',
   /** Apache Derby. */
-  DERBY = "derby",
+  DERBY = 'derby',
   /** FileMaker. */
-  FILEMAKER = "filemaker",
+  FILEMAKER = 'filemaker',
   /** Informix. */
-  INFORMIX = "informix",
+  INFORMIX = 'informix',
   /** InstantDB. */
-  INSTANTDB = "instantdb",
+  INSTANTDB = 'instantdb',
   /** InterBase. */
-  INTERBASE = "interbase",
+  INTERBASE = 'interbase',
   /** MariaDB. */
-  MARIADB = "mariadb",
+  MARIADB = 'mariadb',
   /** Netezza. */
-  NETEZZA = "netezza",
+  NETEZZA = 'netezza',
   /** Pervasive PSQL. */
-  PERVASIVE = "pervasive",
+  PERVASIVE = 'pervasive',
   /** PointBase. */
-  POINTBASE = "pointbase",
+  POINTBASE = 'pointbase',
   /** SQLite. */
-  SQLITE = "sqlite",
+  SQLITE = 'sqlite',
   /** Sybase. */
-  SYBASE = "sybase",
+  SYBASE = 'sybase',
   /** Teradata. */
-  TERADATA = "teradata",
+  TERADATA = 'teradata',
   /** Vertica. */
-  VERTICA = "vertica",
+  VERTICA = 'vertica',
   /** H2. */
-  H2 = "h2",
+  H2 = 'h2',
   /** ColdFusion IMQ. */
-  COLDFUSION = "coldfusion",
+  COLDFUSION = 'coldfusion',
   /** Apache Cassandra. */
-  CASSANDRA = "cassandra",
+  CASSANDRA = 'cassandra',
   /** Apache HBase. */
-  HBASE = "hbase",
+  HBASE = 'hbase',
   /** MongoDB. */
-  MONGODB = "mongodb",
+  MONGODB = 'mongodb',
   /** Redis. */
-  REDIS = "redis",
+  REDIS = 'redis',
   /** Couchbase. */
-  COUCHBASE = "couchbase",
+  COUCHBASE = 'couchbase',
   /** CouchDB. */
-  COUCHDB = "couchdb",
+  COUCHDB = 'couchdb',
   /** Microsoft Azure Cosmos DB. */
-  COSMOSDB = "cosmosdb",
+  COSMOSDB = 'cosmosdb',
   /** Amazon DynamoDB. */
-  DYNAMODB = "dynamodb",
+  DYNAMODB = 'dynamodb',
   /** Neo4j. */
-  NEO4J = "neo4j",
+  NEO4J = 'neo4j',
   /** Apache Geode. */
-  GEODE = "geode",
+  GEODE = 'geode',
   /** Elasticsearch. */
-  ELASTICSEARCH = "elasticsearch",
+  ELASTICSEARCH = 'elasticsearch',
   /** Memcached. */
-  MEMCACHED = "memcached",
+  MEMCACHED = 'memcached',
   /** CockroachDB. */
-  COCKROACHDB = "cockroachdb",
+  COCKROACHDB = 'cockroachdb',
 }
 
 
@@ -759,27 +759,27 @@ export enum DbSystemValues {
 
 export enum DbCassandraConsistencyLevelValues {
   /** all. */
-  ALL = "all",
+  ALL = 'all',
   /** each_quorum. */
-  EACH_QUORUM = "each_quorum",
+  EACH_QUORUM = 'each_quorum',
   /** quorum. */
-  QUORUM = "quorum",
+  QUORUM = 'quorum',
   /** local_quorum. */
-  LOCAL_QUORUM = "local_quorum",
+  LOCAL_QUORUM = 'local_quorum',
   /** one. */
-  ONE = "one",
+  ONE = 'one',
   /** two. */
-  TWO = "two",
+  TWO = 'two',
   /** three. */
-  THREE = "three",
+  THREE = 'three',
   /** local_one. */
-  LOCAL_ONE = "local_one",
+  LOCAL_ONE = 'local_one',
   /** any. */
-  ANY = "any",
+  ANY = 'any',
   /** serial. */
-  SERIAL = "serial",
+  SERIAL = 'serial',
   /** local_serial. */
-  LOCAL_SERIAL = "local_serial",
+  LOCAL_SERIAL = 'local_serial',
 }
 
 
@@ -787,15 +787,15 @@ export enum DbCassandraConsistencyLevelValues {
 
 export enum FaasTriggerValues {
   /** A response to some data source operation such as a database or filesystem read/write. */
-  DATASOURCE = "datasource",
+  DATASOURCE = 'datasource',
   /** To provide an answer to an inbound HTTP request. */
-  HTTP = "http",
+  HTTP = 'http',
   /** A function is set to be executed when messages are sent to a messaging system. */
-  PUBSUB = "pubsub",
+  PUBSUB = 'pubsub',
   /** A function is scheduled to be executed regularly. */
-  TIMER = "timer",
+  TIMER = 'timer',
   /** If none of the others apply. */
-  OTHER = "other",
+  OTHER = 'other',
 }
 
 
@@ -803,11 +803,11 @@ export enum FaasTriggerValues {
 
 export enum FaasDocumentOperationValues {
   /** When a new object is created. */
-  INSERT = "insert",
+  INSERT = 'insert',
   /** When an object is modified. */
-  EDIT = "edit",
+  EDIT = 'edit',
   /** When an object is deleted. */
-  DELETE = "delete",
+  DELETE = 'delete',
 }
 
 
@@ -815,11 +815,11 @@ export enum FaasDocumentOperationValues {
 
 export enum FaasInvokedProviderValues {
   /** Amazon Web Services. */
-  AWS = "aws",
+  AWS = 'aws',
   /** Microsoft Azure. */
-  AZURE = "azure",
+  AZURE = 'azure',
   /** Google Cloud Platform. */
-  GCP = "gcp",
+  GCP = 'gcp',
 }
 
 
@@ -827,19 +827,19 @@ export enum FaasInvokedProviderValues {
 
 export enum NetTransportValues {
   /** ip_tcp. */
-  IP_TCP = "ip_tcp",
+  IP_TCP = 'ip_tcp',
   /** ip_udp. */
-  IP_UDP = "ip_udp",
+  IP_UDP = 'ip_udp',
   /** Another IP-based protocol. */
-  IP = "ip",
+  IP = 'ip',
   /** Unix Domain socket. See below. */
-  UNIX = "unix",
+  UNIX = 'unix',
   /** Named or anonymous pipe. See note below. */
-  PIPE = "pipe",
+  PIPE = 'pipe',
   /** In-process communication. */
-  INPROC = "inproc",
+  INPROC = 'inproc',
   /** Something else (non IP-based). */
-  OTHER = "other",
+  OTHER = 'other',
 }
 
 
@@ -847,15 +847,15 @@ export enum NetTransportValues {
 
 export enum HttpFlavorValues {
   /** HTTP 1.0. */
-  HTTP_1_0 = "1.0",
+  HTTP_1_0 = '1.0',
   /** HTTP 1.1. */
-  HTTP_1_1 = "1.1",
+  HTTP_1_1 = '1.1',
   /** HTTP 2. */
-  HTTP_2_0 = "2.0",
+  HTTP_2_0 = '2.0',
   /** SPDY protocol. */
-  SPDY = "SPDY",
+  SPDY = 'SPDY',
   /** QUIC protocol. */
-  QUIC = "QUIC",
+  QUIC = 'QUIC',
 }
 
 
@@ -863,9 +863,9 @@ export enum HttpFlavorValues {
 
 export enum MessagingDestinationKindValues {
   /** A message sent to a queue. */
-  QUEUE = "queue",
+  QUEUE = 'queue',
   /** A message sent to a topic. */
-  TOPIC = "topic",
+  TOPIC = 'topic',
 }
 
 
@@ -873,9 +873,9 @@ export enum MessagingDestinationKindValues {
 
 export enum MessagingOperationValues {
   /** receive. */
-  RECEIVE = "receive",
+  RECEIVE = 'receive',
   /** process. */
-  PROCESS = "process",
+  PROCESS = 'process',
 }
 
 

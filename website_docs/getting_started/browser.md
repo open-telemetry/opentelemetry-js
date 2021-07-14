@@ -43,13 +43,8 @@ Copy the following file into an empty directory and call it `index.html`.
 To create traces in the browser, you will need `@opentelemetry/web`, and the plugin `@opentelemetry/plugin-document-load`:
 
 ```shell
-npm install @opentelemetry/web @opentelemetry/plugin-document-load
-```
-
-In the following we will use parcel as web application bundler, but you can of course also use any other build tool:
-
-```shell
-npm install -g parcel
+npm init -y
+npm install --save @opentelemetry/web @opentelemetry/instrumentation-document-load @opentelemetry/context-zone
 ```
 
 ## Initialization and Configuration
@@ -67,22 +62,35 @@ We will add some code that will trace the document load timings and output those
 Add the following code to the `document-load.js` to create a tracer provider, which brings the plugin to trace document load:
 
 ```javascript
- // This is necessary for "parcel" to work OOTB. It is not needed for other build tools.
-import 'regenerator-runtime/runtime'
-import { LogLevel } from "@opentelemetry/core";
 import { WebTracerProvider } from '@opentelemetry/web';
-import { DocumentLoad } from '@opentelemetry/plugin-document-load';
+import { DocumentLoadInstrumentation } from '@opentelemetry/instrumentation-document-load';
+import { ZoneContextManager } from '@opentelemetry/context-zone';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
-// Minimum required setup - supports only synchronous operations
-const provider = new WebTracerProvider({
-  plugins: [
-    new DocumentLoad()
-  ]
+const provider = new WebTracerProvider();
+
+provider.register({
+  // Changing default contextManager to use ZoneContextManager - supports asynchronous operations - optional
+  contextManager: new ZoneContextManager(),
 });
-provider.register();
+
+// Registering instrumentations / plugins
+registerInstrumentations({
+  instrumentations: [
+    new DocumentLoadInstrumentation(),
+  ],
+});
 ```
 
-Run `parcel index.html` and open the development webserver (e.g. at `http://localhost:1234`) to see if your code works.
+In the following we will use [parcel](https://parceljs.org/) as web application bundler, but you can of course also use any other build tool.
+
+Run
+
+```shell
+npx parcel index.html
+```
+
+and open the development webserver (e.g. at `http://localhost:1234`) to see if your code works.
 
 There will be no output of traces yet, for this we need to add an exporter
 
@@ -91,21 +99,26 @@ There will be no output of traces yet, for this we need to add an exporter
 To export traces, modify `document-load.js` so that it matches the following code snippet:
 
 ```javascript
- // This is necessary for "parcel" to work OOTB. It is not needed for other build tools.
-import 'regenerator-runtime/runtime'
-import { LogLevel } from "@opentelemetry/core";
-import { WebTracerProvider } from '@opentelemetry/web';
-import { DocumentLoad } from '@opentelemetry/plugin-document-load';
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
+import { WebTracerProvider } from '@opentelemetry/web';
+import { DocumentLoadInstrumentation } from '@opentelemetry/instrumentation-document-load';
+import { ZoneContextManager } from '@opentelemetry/context-zone';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
-// Minimum required setup - supports only synchronous operations
-const provider = new WebTracerProvider({
-  plugins: [
-    new DocumentLoad()
-  ]
+const provider = new WebTracerProvider();
+provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+
+provider.register({
+  // Changing default contextManager to use ZoneContextManager - supports asynchronous operations - optional
+  contextManager: new ZoneContextManager(),
 });
-provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()))
-provider.register();
+
+// Registering instrumentations / plugins
+registerInstrumentations({
+  instrumentations: [
+    new DocumentLoadInstrumentation(),
+  ],
+});
 ```
 
 Now, rebuild your application and open the browser again. In the console of the developer toolbar you should see some traces being exporterd:
