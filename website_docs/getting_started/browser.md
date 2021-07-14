@@ -94,9 +94,16 @@ and open the development webserver (e.g. at `http://localhost:1234`) to see if y
 
 There will be no output of traces yet, for this we need to add an exporter
 
-## Creating a Console Exporter
+## Creating an Exporter
 
-To export traces, modify `document-load.js` so that it matches the following code snippet:
+In the following example, we will use the `ConsoleSpanExporter` which prints all spans to the console.
+
+In order to visualize and analyze your traces, you will need to export them to a tracing backend.
+Follow [these instructions](../exporters.md) for setting up a backend and exporter.
+
+You may also want to use the `BatchSpanProcessor` to export spans in batches in order to more efficiently use resources.
+
+To export traces to the console, modify `document-load.js` so that it matches the following code snippet:
 
 ```javascript
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
