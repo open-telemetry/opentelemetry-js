@@ -38,7 +38,6 @@ import {
   HttpInstrumentationConfig,
   HttpRequestArgs,
   Https,
-  ParsedRequestOptions,
   ResponseEndArgs,
 } from './types';
 import * as utils from './utils';
@@ -72,7 +71,9 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     return this._config;
   }
 
-  override setConfig(config: HttpInstrumentationConfig & InstrumentationConfig = {}) {
+  override setConfig(
+    config: HttpInstrumentationConfig & InstrumentationConfig = {}
+  ) {
     this._config = Object.assign({}, config);
   }
 
@@ -272,20 +273,10 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
    * @param span representing the current operation
    */
   private _traceClientRequest(
-    component: 'http' | 'https',
     request: http.ClientRequest,
-    options: ParsedRequestOptions,
+    hostname: string,
     span: Span
   ): http.ClientRequest {
-    const hostname =
-      options.hostname ||
-      options.host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') ||
-      'localhost';
-    const attributes = utils.getOutgoingRequestAttributes(options, {
-      component,
-      hostname,
-    });
-    span.setAttributes(attributes);
     if (this._getConfig().requestHook) {
       this._callRequestHook(span, request);
     }
@@ -378,13 +369,17 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         : '/';
       const method = request.method || 'GET';
 
-      instrumentation._diag.debug('%s instrumentation incomingRequest', component);
+      instrumentation._diag.debug(
+        '%s instrumentation incomingRequest',
+        component
+      );
 
       if (
         utils.isIgnored(
           pathname,
           instrumentation._getConfig().ignoreIncomingPaths,
-          (e: Error) => instrumentation._diag.error('caught ignoreIncomingPaths error: ', e)
+          (e: Error) =>
+            instrumentation._diag.error('caught ignoreIncomingPaths error: ', e)
         )
       ) {
         return context.with(suppressTracing(context.active()), () => {
@@ -528,15 +523,27 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         utils.isIgnored(
           origin + pathname,
           instrumentation._getConfig().ignoreOutgoingUrls,
-          (e: Error) => instrumentation._diag.error('caught ignoreOutgoingUrls error: ', e)
+          (e: Error) =>
+            instrumentation._diag.error('caught ignoreOutgoingUrls error: ', e)
         )
       ) {
         return original.apply(this, [optionsParsed, ...args]);
       }
 
       const operationName = `${component.toUpperCase()} ${method}`;
+
+      const hostname =
+        optionsParsed.hostname ||
+        optionsParsed.host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') ||
+        'localhost';
+      const attributes = utils.getOutgoingRequestAttributes(optionsParsed, {
+        component,
+        hostname,
+      });
+
       const spanOptions: SpanOptions = {
         kind: SpanKind.CLIENT,
+        attributes,
       };
       const span = instrumentation._startHttpSpan(operationName, spanOptions);
 
@@ -569,12 +576,14 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           }
         );
 
-        instrumentation._diag.debug('%s instrumentation outgoingRequest', component);
+        instrumentation._diag.debug(
+          '%s instrumentation outgoingRequest',
+          component
+        );
         context.bind(parentContext, request);
         return instrumentation._traceClientRequest(
-          component,
           request,
-          optionsParsed,
+          hostname,
           span
         );
       });

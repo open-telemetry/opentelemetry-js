@@ -479,12 +479,29 @@ describe('HttpInstrumentation', () => {
         });
       }
 
-      it('should have 1 ended span when request throw on bad "options" object', () => {
+      it('should have 1 ended span when request throw on bad "options" object', done => {
         try {
-          http.request({ protocol: 'telnet' });
+          http.request({ headers: { cookie: undefined} }); // <===== this makes http.request throw
+          done('exception should have being thrown but did not');
         } catch (error) {
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
+
+          const validations = {
+            httpStatusCode: undefined,
+            httpMethod: 'GET',
+            resHeaders: {},
+            hostname: 'localhost',
+            pathname: '/',
+            forceStatus: {
+              code: SpanStatusCode.ERROR, 
+              message: 'Invalid value "undefined" for header "cookie"',
+            },
+            component: 'http',
+            noNetPeer: true,
+          }
+          assertSpan(spans[0], SpanKind.CLIENT, validations);
+          done();
         }
       });
 
