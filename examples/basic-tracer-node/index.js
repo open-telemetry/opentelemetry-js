@@ -2,7 +2,7 @@
 
 const opentelemetry = require('@opentelemetry/api');
 const { Resource } = require('@opentelemetry/resources');
-const { SemanticSemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
+const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 
