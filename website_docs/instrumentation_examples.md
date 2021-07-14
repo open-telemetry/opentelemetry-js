@@ -12,8 +12,8 @@ The repository of the [JavaScript version of OpenTelemetry](https://github.com/s
 
 ## Plugin & Package Examples
 
-Many of the packages and plugins at the [repository for OpenTelemetry JavaScript](https://github.com/open-telemetry/opentelemetry-js-contrib/) 
-contributions come with an usage example. You can find them in the [examples folder](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/examples). 
+Many of the packages and plugins at the [repository for OpenTelemetry JavaScript](https://github.com/open-telemetry/opentelemetry-js-contrib/)
+contributions come with an usage example. You can find them in the [examples folder](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/examples).
 
 ## Community Resources
 

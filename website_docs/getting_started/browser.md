@@ -3,7 +3,7 @@ title: "Browser"
 weight: 2
 ---
 
-This guide uses the example application in HTML & javascript provided below, but the steps to instrument your own application should be broadly the same. 
+This guide uses the example application in HTML & javascript provided below, but the steps to instrument your own application should be broadly the same.
 
 - [Example Application](#example-application)
   - [Installation](#installation)
@@ -236,4 +236,4 @@ To leverage the most common instrumentations all in one you can simply use the
 ## Instrumentation with Browser Extension
 
 If you'd like to get a quick preview on how your website (or any other site) would look like with OpenTelemetry
-installed, you can use the [OpenTelemetry Browser Extension](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/packages/opentelemetry-browser-extension-autoinjection).
+installed, you can use the [OpenTelemetry Browser Extension](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/packages/opentelemetry-browser-extension-autoinjection)

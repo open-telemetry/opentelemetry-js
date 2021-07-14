@@ -72,7 +72,7 @@ These dependencies are required to configure the tracing SDK and create spans.
 
 #### Exporter
 
-In the following example, we will use the `ConsoleSpanExporter` which prints all spans to the console. 
+In the following example, we will use the `ConsoleSpanExporter` which prints all spans to the console.
 
 In order to visualize and analyze your traces, you will need to export them to a tracing backend.
 Follow [these instructions](../exporters.md) for setting up a backend and exporter.
