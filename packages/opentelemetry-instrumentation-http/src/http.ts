@@ -71,9 +71,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     return this._config;
   }
 
-  override setConfig(
-    config: HttpInstrumentationConfig & InstrumentationConfig = {}
-  ) {
+  override setConfig(config: HttpInstrumentationConfig & InstrumentationConfig = {}) {
     this._config = Object.assign({}, config);
   }
 
@@ -369,17 +367,13 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         : '/';
       const method = request.method || 'GET';
 
-      instrumentation._diag.debug(
-        '%s instrumentation incomingRequest',
-        component
-      );
+      instrumentation._diag.debug('%s instrumentation incomingRequest', component);
 
       if (
         utils.isIgnored(
           pathname,
           instrumentation._getConfig().ignoreIncomingPaths,
-          (e: Error) =>
-            instrumentation._diag.error('caught ignoreIncomingPaths error: ', e)
+          (e: Error) => instrumentation._diag.error('caught ignoreIncomingPaths error: ', e)
         )
       ) {
         return context.with(suppressTracing(context.active()), () => {
@@ -523,8 +517,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         utils.isIgnored(
           origin + pathname,
           instrumentation._getConfig().ignoreOutgoingUrls,
-          (e: Error) =>
-            instrumentation._diag.error('caught ignoreOutgoingUrls error: ', e)
+          (e: Error) => instrumentation._diag.error('caught ignoreOutgoingUrls error: ', e)
         )
       ) {
         return original.apply(this, [optionsParsed, ...args]);
@@ -576,10 +569,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           }
         );
 
-        instrumentation._diag.debug(
-          '%s instrumentation outgoingRequest',
-          component
-        );
+        instrumentation._diag.debug('%s instrumentation outgoingRequest', component);
         context.bind(parentContext, request);
         return instrumentation._traceClientRequest(
           request,
