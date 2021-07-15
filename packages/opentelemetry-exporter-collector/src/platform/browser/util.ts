@@ -55,8 +55,11 @@ export function sendWithXhr(
 ) {
   const xhr = new XMLHttpRequest();
   xhr.open('POST', url);
-  xhr.setRequestHeader('Accept', 'application/json');
-  xhr.setRequestHeader('Content-Type', 'application/json');
+
+  if (!Object.keys(headers).includes('Accept'))
+    xhr.setRequestHeader('Accept', 'application/json');
+  if (!Object.keys(headers).includes('Content-Type'))
+    xhr.setRequestHeader('Content-Type', 'application/json');
   Object.entries(headers).forEach(([k, v]) => {
     xhr.setRequestHeader(k, v);
   });
