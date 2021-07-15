@@ -479,11 +479,8 @@ describe('HttpInstrumentation', () => {
         });
       }
 
-      it('should have 1 ended span when request throw on bad "options" object', done => {
-        try {
-          http.request({ headers: { cookie: undefined} }); // <===== this makes http.request throw
-          done('exception should have been thrown but did not');
-        } catch (error) {
+      it('should have 1 ended span when request throw on bad "options" object', () => {
+        assert.throws(() => http.request({ headers: { cookie: undefined} }), err => {
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
 
@@ -495,14 +492,14 @@ describe('HttpInstrumentation', () => {
             pathname: '/',
             forceStatus: {
               code: SpanStatusCode.ERROR, 
-              message: error.message,
+              message: err.message,
             },
             component: 'http',
             noNetPeer: true,
           }
           assertSpan(spans[0], SpanKind.CLIENT, validations);
-          done();
-        }
+          return true;
+        });
       });
 
       it('should have 1 ended span when response.end throw an exception', async () => {
