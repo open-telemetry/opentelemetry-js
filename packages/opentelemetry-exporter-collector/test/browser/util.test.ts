@@ -18,7 +18,7 @@ import * as sinon from "sinon";
 import { sendWithXhr } from "../../src/platform/browser/util";
 import { ensureHeadersContain } from "../helper";
 
-describe("util - browser", () => {
+describe('util - browser', () => {
   let server: any;
   const body = "";
   const url = "";
@@ -37,72 +37,114 @@ describe("util - browser", () => {
     sinon.restore();
   });
 
-  describe("when Content-Type and Accept headers are set explicit", () => {
-    const explicitContentTypeAndAcceptHeaders = {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    };
-    it("should successfully use XMLHttpRequest, Request Headers contain the expilicit headers", done => {
-
-      sendWithXhr(
-        body,
-        url,
-        explicitContentTypeAndAcceptHeaders,
-        onSuccessStub,
-        onErrorStub
-      );
-
-      // ;charset=utf-8 is applied by sinon.fakeServer
-      const expectedHeaders = {
-        ...explicitContentTypeAndAcceptHeaders,
-        "Content-Type": "application/json;charset=utf-8",
+  describe('when XMLHTTPRequest is used', () => {
+    describe('and Content-Type header is set', () => {
+      const explicitContentType = {
+        'Content-Type': 'application/json',
       };
+      it('Request Headers should contain "Content-Type" header', done => {
+        sendWithXhr(body, url, explicitContentType, onSuccessStub, onErrorStub);
 
-      setTimeout(() => {
-        const { requestHeaders } = server.requests[0];
-        ensureHeadersContain(requestHeaders, expectedHeaders);
-        done();
+        // ;charset=utf-8 is applied by sinon.fakeServer
+        const expectedHeaders = {
+          'Content-Type': 'application/json;charset=utf-8',
+        };
+
+        setTimeout(() => {
+          const { requestHeaders } = server.requests[0];
+          ensureHeadersContain(requestHeaders, expectedHeaders);
+          done();
+        });
+      });
+      it('Request Headers should contain "Accept" header', done => {
+        sendWithXhr(body, url, explicitContentType, onSuccessStub, onErrorStub);
+
+        const expectedHeaders = {
+          'Accept': 'application/json',
+        };
+
+        setTimeout(() => {
+          const { requestHeaders } = server.requests[0];
+          ensureHeadersContain(requestHeaders, expectedHeaders);
+          done();
+        });
       });
     });
-  });
 
-  describe("when headers are set empty {}", () => {
-    const emptyHeaders = {};
-    it('should successfully use XMLHttpRequest, Request Headers contain Content-Type of value "application/json" and Accept of value "application/json"', done => {
+    describe('and empty headers are set', () => {
+      const emptyHeaders = {};
+      it('Request Headers should contain "Content-Type" header', done => {
+        sendWithXhr(body, url, emptyHeaders, onSuccessStub, onErrorStub);
 
-      sendWithXhr(body, url, emptyHeaders, onSuccessStub, onErrorStub);
+        // ;charset=utf-8 is applied by sinon.fakeServer
+        const expectedHeaders = {
+          'Content-Type': 'application/json;charset=utf-8',
+        };
 
-      // ;charset=utf-8 is applied by sinon.fakeServer
-      const expectedHeaders = {
-        Accept: "application/json",
-        "Content-Type": "application/json;charset=utf-8",
-      };
+        setTimeout(() => {
+          const { requestHeaders } = server.requests[0];
+          ensureHeadersContain(requestHeaders, expectedHeaders);
+          done();
+        });
+      });
+      it('Request Headers should contain "Accept" header', done => {
+        sendWithXhr(body, url, emptyHeaders, onSuccessStub, onErrorStub);
 
-      setTimeout(() => {
-        const { requestHeaders } = server.requests[0];
-        ensureHeadersContain(requestHeaders, expectedHeaders);
-        done();
+        // ;charset=utf-8 is applied by sinon.fakeServer
+        const expectedHeaders = {
+          'Accept': 'application/json',
+        };
+
+        setTimeout(() => {
+          const { requestHeaders } = server.requests[0];
+          ensureHeadersContain(requestHeaders, expectedHeaders);
+          done();
+        });
       });
     });
-  });
+    describe('and custom headers are set', () => {
+      const customHeaders = { aHeader: "aValue", bHeader: "bValue" };
+      it('Request Headers should contain "Content-Type" header', done => {
+        sendWithXhr(body, url, customHeaders, onSuccessStub, onErrorStub);
 
-  describe("when custom headers are set", () => {
-    const customHeaders = { aHeader: "aValue", bHeader: "bValue" };
-    it('should successfully use XMLHttpRequest, Request Headers contain Content-Type of value "application/json", Accept of value "application/json" and custom headers', done => {
+        // ;charset=utf-8 is applied by sinon.fakeServer
+        const expectedHeaders = {
+          'Content-Type': 'application/json;charset=utf-8',
+        };
 
-      sendWithXhr(body, url, customHeaders, onSuccessStub, onErrorStub);
+        setTimeout(() => {
+          const { requestHeaders } = server.requests[0];
+          ensureHeadersContain(requestHeaders, expectedHeaders);
+          done();
+        });
+      });
+      it('Request Headers should contain "Accept" header', done => {
+        sendWithXhr(body, url, customHeaders, onSuccessStub, onErrorStub);
 
-      // ;charset=utf-8 is applied by sinon.fakeServer
-      const expectedHeaders = {
-        ...customHeaders,
-        Accept: "application/json",
-        "Content-Type": "application/json;charset=utf-8",
-      };
+        // ;charset=utf-8 is applied by sinon.fakeServer
+        const expectedHeaders = {
+          'Accept': 'application/json',
+        };
 
-      setTimeout(() => {
-        const { requestHeaders } = server.requests[0];
-        ensureHeadersContain(requestHeaders, expectedHeaders);
-        done();
+        setTimeout(() => {
+          const { requestHeaders } = server.requests[0];
+          ensureHeadersContain(requestHeaders, expectedHeaders);
+          done();
+        });
+      });
+      it('Request Headers should contain custom headers', done => {
+        sendWithXhr(body, url, customHeaders, onSuccessStub, onErrorStub);
+
+        // ;charset=utf-8 is applied by sinon.fakeServer
+        const expectedHeaders = {
+          ...customHeaders,
+        };
+
+        setTimeout(() => {
+          const { requestHeaders } = server.requests[0];
+          ensureHeadersContain(requestHeaders, expectedHeaders);
+          done();
+        });
       });
     });
   });
