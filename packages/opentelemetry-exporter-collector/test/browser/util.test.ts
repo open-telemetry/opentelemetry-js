@@ -14,43 +14,90 @@
  * limitations under the License.
  */
 
-import * as sinon from 'sinon';
+import * as sinon from "sinon";
 import { sendWithXhr } from "../../src/platform/browser/util";
-import {
-  ensureHeadersContain,
-} from '../helper';
+import { ensureHeadersContain } from "../helper";
 
+describe("util - browser", () => {
+  let server: any;
+  const body = "";
+  const url = "";
 
-describe('util - browser', () => {
+  let onSuccessStub: sinon.SinonStub;
+  let onErrorStub: sinon.SinonStub;
 
-  describe('when Content-Type and Accept headers are set explicit', () => {
-    let server: any;
+  beforeEach(() => {
+    onSuccessStub = sinon.stub();
+    onErrorStub = sinon.stub();
+    server = sinon.fakeServer.create();
+  });
 
+  afterEach(() => {
+    server.restore();
+    sinon.restore();
+  });
+
+  describe("when Content-Type and Accept headers are set explicit", () => {
     const explicitContentTypeAndAcceptHeaders = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      "Content-Type": "application/json",
+      Accept: "application/json",
     };
-    const body = "";
-    const url = "";
+    it("should successfully use XMLHttpRequest, Request Headers contain the expilicit headers", done => {
 
-    let onSuccessStub: sinon.SinonStub;
-    let onErrorStub: sinon.SinonStub;
-
-    beforeEach(() => {
-      onSuccessStub = sinon.stub();
-      onErrorStub = sinon.stub();
-      server = sinon.fakeServer.create();
-    });
-    afterEach(() => {
-      server.restore();
-      sinon.restore();
-    });
-
-    it('should successfully use XMLHttpRequest and Request Headers contain the expilicit defined Content-Type and Accept Header Values', done => {
-      sendWithXhr(body, url, explicitContentTypeAndAcceptHeaders, onSuccessStub, onErrorStub)
+      sendWithXhr(
+        body,
+        url,
+        explicitContentTypeAndAcceptHeaders,
+        onSuccessStub,
+        onErrorStub
+      );
 
       // ;charset=utf-8 is applied by sinon.fakeServer
-      const expectedHeaders = { ...explicitContentTypeAndAcceptHeaders, "Content-Type": "application/json;charset=utf-8" }
+      const expectedHeaders = {
+        ...explicitContentTypeAndAcceptHeaders,
+        "Content-Type": "application/json;charset=utf-8",
+      };
+
+      setTimeout(() => {
+        const { requestHeaders } = server.requests[0];
+        ensureHeadersContain(requestHeaders, expectedHeaders);
+        done();
+      });
+    });
+  });
+
+  describe("when headers are set empty {}", () => {
+    const emptyHeaders = {};
+    it('should successfully use XMLHttpRequest, Request Headers contain Content-Type of value "application/json" and Accept of value "application/json"', done => {
+
+      sendWithXhr(body, url, emptyHeaders, onSuccessStub, onErrorStub);
+
+      // ;charset=utf-8 is applied by sinon.fakeServer
+      const expectedHeaders = {
+        Accept: "application/json",
+        "Content-Type": "application/json;charset=utf-8",
+      };
+
+      setTimeout(() => {
+        const { requestHeaders } = server.requests[0];
+        ensureHeadersContain(requestHeaders, expectedHeaders);
+        done();
+      });
+    });
+  });
+
+  describe("when custom headers are set", () => {
+    const customHeaders = { aHeader: "aValue", bHeader: "bValue" };
+    it('should successfully use XMLHttpRequest, Request Headers contain Content-Type of value "application/json", Accept of value "application/json" and custom headers', done => {
+
+      sendWithXhr(body, url, customHeaders, onSuccessStub, onErrorStub);
+
+      // ;charset=utf-8 is applied by sinon.fakeServer
+      const expectedHeaders = {
+        ...customHeaders,
+        Accept: "application/json",
+        "Content-Type": "application/json;charset=utf-8",
+      };
 
       setTimeout(() => {
         const { requestHeaders } = server.requests[0];
@@ -60,4 +107,3 @@ describe('util - browser', () => {
     });
   });
 });
-
