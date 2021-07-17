@@ -41,9 +41,9 @@
   },
   "devDependencies": {
     "@opentelemetry/api": "^1.0.1",
-    "@types/mocha": "8.2.2",
-    "@types/node": "14.17.4",
-    "@types/shimmer": "1.0.1",
+    "@types/mocha": "8.2.3",
+    "@types/node": "14.17.5",
+    "@types/shimmer": "1.0.2",
     "codecov": "3.8.2",
     "mocha": "7.2.0",
     "nyc": "15.1.0",
