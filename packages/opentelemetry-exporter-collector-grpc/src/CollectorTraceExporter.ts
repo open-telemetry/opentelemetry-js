@@ -23,7 +23,7 @@ import {
 import { CollectorExporterConfigNode, ServiceClientType } from './types';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
 import { validateAndNormalizeUrl } from './util';
-import { Metadata } from "@grpc/grpc-js";
+import { Metadata } from '@grpc/grpc-js';
 
 const DEFAULT_COLLECTOR_URL = 'localhost:4317';
 

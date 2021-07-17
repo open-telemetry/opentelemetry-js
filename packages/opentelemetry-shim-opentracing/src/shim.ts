@@ -17,7 +17,7 @@
 import * as api from '@opentelemetry/api';
 import { SpanAttributes, SpanAttributeValue, SpanStatusCode, TextMapPropagator } from '@opentelemetry/api';
 import * as opentracing from 'opentracing';
-import { SemanticAttributes } from "@opentelemetry/semantic-conventions";
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 function translateReferences(references: opentracing.Reference[]): api.Link[] {
   const links: api.Link[] = [];
@@ -301,7 +301,7 @@ export class SpanShim extends opentracing.Span {
       const entries = Object.entries(attributes);
       const errorEntry = entries.find(([key]) => key === 'error.object');
       const error = errorEntry?.[1];
-      if (typeof error === "string") {
+      if (typeof error === 'string') {
         this._span.recordException(error, timestamp);
         return;
       }
@@ -309,15 +309,15 @@ export class SpanShim extends opentracing.Span {
       const mappedAttributes: api.SpanAttributes = {};
       for (const [k, v] of entries) {
         switch (k) {
-          case "error.kind": {
+          case 'error.kind': {
             mappedAttributes[SemanticAttributes.EXCEPTION_TYPE] = v;
             break;
           }
-          case "message": {
+          case 'message': {
             mappedAttributes[SemanticAttributes.EXCEPTION_MESSAGE] = v;
             break;
           }
-          case "stack": {
+          case 'stack': {
             mappedAttributes[SemanticAttributes.EXCEPTION_STACKTRACE] = v;
             break;
           }

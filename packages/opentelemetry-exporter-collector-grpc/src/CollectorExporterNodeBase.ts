@@ -26,7 +26,7 @@ import {
   ServiceClientType,
 } from './types';
 import { ServiceClient } from './types';
-import { getEnv, baggageUtils } from "@opentelemetry/core";
+import { getEnv, baggageUtils } from '@opentelemetry/core';
 
 /**
  * Collector Metric Exporter abstract base class

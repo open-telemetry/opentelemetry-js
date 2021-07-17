@@ -36,7 +36,7 @@ import {
 import { performance } from 'perf_hooks';
 import { B3Propagator } from '@opentelemetry/propagator-b3';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';
-import { SemanticAttributes } from "@opentelemetry/semantic-conventions";
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 describe('OpenTracing Shim', () => {
   const compositePropagator = new CompositePropagator({

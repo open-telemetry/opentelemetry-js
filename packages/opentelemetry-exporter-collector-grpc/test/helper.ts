@@ -410,31 +410,31 @@ export function ensureResourceIsCorrect(
   assert.deepStrictEqual(resource, {
     attributes: [
       {
-        "key": "service.name",
-        "value": {
-          "stringValue": `unknown_service:${process.argv0}`,
-          "value": "stringValue"
+        'key': 'service.name',
+        'value': {
+          'stringValue': `unknown_service:${process.argv0}`,
+          'value': 'stringValue'
         }
       },
       {
-        "key": "telemetry.sdk.language",
-        "value": {
-          "stringValue": "nodejs",
-          "value": "stringValue"
+        'key': 'telemetry.sdk.language',
+        'value': {
+          'stringValue': 'nodejs',
+          'value': 'stringValue'
         }
       },
       {
-        "key": "telemetry.sdk.name",
-        "value": {
-          "stringValue": "opentelemetry",
-          "value": "stringValue"
+        'key': 'telemetry.sdk.name',
+        'value': {
+          'stringValue': 'opentelemetry',
+          'value': 'stringValue'
         }
       },
       {
-        "key": "telemetry.sdk.version",
-        "value": {
-          "stringValue": VERSION,
-          "value": "stringValue"
+        'key': 'telemetry.sdk.version',
+        'value': {
+          'stringValue': VERSION,
+          'value': 'stringValue'
         }
       },
       {

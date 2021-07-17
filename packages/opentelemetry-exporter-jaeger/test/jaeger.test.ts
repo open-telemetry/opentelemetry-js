@@ -93,8 +93,8 @@ describe('JaegerExporter', () => {
 
       const process: ThriftProcess = exporter['_getSender']({
         tags: [{
-          key: "service.name",
-          vStr: "opentelemetry"
+          key: 'service.name',
+          vStr: 'opentelemetry'
         }]
       } as any)._process;
       assert.strictEqual(exporter['_sender']._host, 'remotehost');
@@ -109,8 +109,8 @@ describe('JaegerExporter', () => {
       const exporter = new JaegerExporter();
       const sender = exporter['_getSender']({
         tags: [{
-          key: "service.name",
-          vStr: "opentelemetry"
+          key: 'service.name',
+          vStr: 'opentelemetry'
         }]
       } as any);
       assert.strictEqual(sender._host, 'localhost');
@@ -121,8 +121,8 @@ describe('JaegerExporter', () => {
       const exporter = new JaegerExporter();
       const sender = exporter['_getSender']({
         tags: [{
-          key: "service.name",
-          vStr: "opentelemetry"
+          key: 'service.name',
+          vStr: 'opentelemetry'
         }]
       } as any);
       assert.strictEqual(sender._host, 'env-set-host');
@@ -135,8 +135,8 @@ describe('JaegerExporter', () => {
       });
       const sender = exporter['_getSender']({
         tags: [{
-          key: "service.name",
-          vStr: "opentelemetry"
+          key: 'service.name',
+          vStr: 'opentelemetry'
         }]
       } as any);
       assert.strictEqual(sender._host, 'option-set-host');
