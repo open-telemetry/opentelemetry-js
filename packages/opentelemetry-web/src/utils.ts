@@ -87,11 +87,19 @@ export function addSpanNetworkEvents(
   addSpanNetworkEvent(span, PTN.REQUEST_START, resource);
   addSpanNetworkEvent(span, PTN.RESPONSE_START, resource);
   addSpanNetworkEvent(span, PTN.RESPONSE_END, resource);
-  const contentLength = resource[PTN.ENCODED_BODY_SIZE];
-  if (contentLength !== undefined) {
+  const encodedLength = resource[PTN.ENCODED_BODY_SIZE];
+  if (encodedLength !== undefined) {
     span.setAttribute(
       SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH,
-      contentLength
+      encodedLength
+    );
+  }
+  const decodedLength = resource[PTN.DECODED_BODY_SIZE];
+  // Spec: Not set if transport encoding not used (in which case encoded and decoded sizes match)
+  if (decodedLength !== undefined && encodedLength !== decodedLength) {
+    span.setAttribute(
+      SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+      decodedLength
     );
   }
 }
