@@ -11,7 +11,7 @@
       "rangeStrategy": "bump"
     },
     {
-      "matchPaths": ["backwards-compatibility/**"],
+      "matchPaths": ["backwards-compatibility"],
       "matchPackageNames": ["@types/node"],
       "enabled": false
     }

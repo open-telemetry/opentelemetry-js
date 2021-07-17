@@ -19,7 +19,7 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=8.5.0"
   },
   "scripts": {
     "compile": "tsc --build",
