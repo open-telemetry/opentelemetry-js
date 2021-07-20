@@ -71,7 +71,52 @@ The current version for each package can be found in the respective `package.jso
 
 ### Application Owner
 
-To get started tracing your own application, see the [Getting Started Guide](getting-started/README.md). For more information about automatic instrumentation see [@opentelemetry/node][otel-node], which provides auto-instrumentation for Node.js applications. If the automatic instrumentation does not suit your needs, or you would like to create manual traces, see [@opentelemetry/tracing][otel-tracing]
+#### Install Dependencies
+
+```shell
+npm install --save @opentelemetry/api
+npm install --save @opentelemetry/node
+npm install --save @opentelemetry/tracing
+npm install --save @opentelemetry/auto-instrumentations-node
+```
+
+#### Instantiate Tracing
+
+```js
+// tracing.js
+
+'use strict'
+
+const { getNodeAutoInstrumentations } = require("@opentelemetry/auto-instrumentations-node");
+const { registerInstrumentations } = require('@opentelemetry/instrumentation')
+const { ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing')
+const { NodeTracerProvider } = require('@opentelemetry/node')
+const { Resource } = require('@opentelemetry/resources');
+const { ResourceAttributes } = require('@opentelemetry/semantic-conventions');
+
+const exporter = new ConsoleSpanExporter();
+const provider = new NodeTracerProvider({
+  resource: new Resource({
+    [ResourceAttributes.SERVICE_NAME]: 'my-service',
+  }),
+});
+provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+provider.register();
+
+registerInstrumentations({
+  instrumentations: [
+    getNodeAutoInstrumentations(),
+  ],
+});
+```
+
+#### Run Your Application
+
+```shell
+node -r ./tracing.js app.js
+```
+
+The above example will emit auto-instrumented telemetry about your application to the console. For a more in-depth example, see the [Getting Started Guide](getting-started/README.md). For more information about automatic instrumentation see [@opentelemetry/node][otel-node], which provides auto-instrumentation for Node.js applications. If the automatic instrumentation does not suit your needs, or you would like to create manual traces, see [@opentelemetry/tracing][otel-tracing]
 
 ### Library Author
 
