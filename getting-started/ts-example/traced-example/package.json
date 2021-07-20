@@ -9,16 +9,16 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@types/express": "4.17.12",
-    "@types/node": "14.17.4",
-    "ts-node": "10.0.0"
+    "@types/express": "4.17.13",
+    "@types/node": "14.17.5",
+    "ts-node": "10.1.0"
   },
   "dependencies": {
     "@opentelemetry/core": "0.23.0",
     "@opentelemetry/exporter-zipkin": "0.23.0",
     "@opentelemetry/instrumentation": "0.23.0",
     "@opentelemetry/node": "0.23.0",
-    "@opentelemetry/instrumentation-express": "^0.22.0",
+    "@opentelemetry/instrumentation-express": "^0.23.0",
     "@opentelemetry/instrumentation-http": "0.23.0",
     "@opentelemetry/tracing": "0.23.0",
     "axios": "^0.21.0",
