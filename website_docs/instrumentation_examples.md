@@ -8,7 +8,7 @@ Here are Some of the resources for Opentelemetry Instrumentation Examples
 ## Core Examples
 
 The repository of the [JavaScript version of OpenTelemetry](https://github.com/svrnm/opentelemetry-js) holds some
-[examples](https://github.com/svrnm/opentelemetry-js/tree/main/examples) of how to run real application with OpenTelemetry Java Script.
+[examples](https://github.com/svrnm/opentelemetry-js/tree/main/examples) of how to run real application with OpenTelemetry JavaScript.
 
 ## Plugin & Package Examples
 
