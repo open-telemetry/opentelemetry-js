@@ -69,8 +69,13 @@ export const getAbsoluteUrl = (
  * Parse status code from HTTP response. [More details](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-http.md#status)
  */
 export const parseResponseStatus = (
-  statusCode: number
+  statusCode: number | undefined,
 ): Omit<SpanStatus, 'message'> => {
+
+  if(statusCode === undefined) {
+    return { code: SpanStatusCode.ERROR };
+  }
+
   // 1xx, 2xx, 3xx are OK
   if (statusCode >= 100 && statusCode < 400) {
     return { code: SpanStatusCode.OK };

@@ -47,6 +47,9 @@ export interface InstrumentationModuleDefinition<T> {
   /** Module internal files to be patched  */
   files: InstrumentationModuleFile<any>[];
 
+  /** If set to true, the includePrerelease check will be included when calling semver.satisfies */
+  includePrerelease?: boolean;
+
   /** Method to patch the instrumentation  */
   patch?: (moduleExports: T, moduleVersion?: string) => T;
 

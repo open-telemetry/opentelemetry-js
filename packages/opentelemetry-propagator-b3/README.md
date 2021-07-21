@@ -86,7 +86,7 @@ api.propagation.setGlobalPropagator(new B3Propagator());
 
 ```javascript
 const api = require('@opentelemetry/api');
-const { B3Propagator } = require('@opentelemetry/propagator-b3');
+const { B3Propagator, B3InjectEncoding } = require('@opentelemetry/propagator-b3');
 
 api.propagation.setGlobalPropagator(
   new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER })
@@ -101,7 +101,8 @@ propagator.
 
 ```javascript
 const api = require('@opentelemetry/api');
-const { B3Propagator } = require('@opentelemetry/propagator-b3');
+const { CompositePropagator } = require('@opentelemetry/core');
+const { B3Propagator, B3InjectEncoding } = require('@opentelemetry/propagator-b3');
 api.propagation.setGlobalPropagator(
   new CompositePropagator({
     propagators: [

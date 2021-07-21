@@ -2,10 +2,11 @@
 ---
 <p align="center">
   <strong>
-    <a href="getting-started/README.md">Getting Started<a/>
+    <a href="getting-started/README.md">Getting Started</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="https://open-telemetry.github.io/opentelemetry-js">API Documentation<a/>
+    <a href="https://open-telemetry.github.io/opentelemetry-js-api">API Reference</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="https://open-telemetry.github.io/opentelemetry-js">SDK Reference</a>
   </strong>
 </p>
 
@@ -28,13 +29,13 @@
 
 <p align="center">
   <strong>
-    <a href="CONTRIBUTING.md">Contributing<a/>
+    <a href="CONTRIBUTING.md">Contributing</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="doc/development-guide.md">Development Guide<a/>
+    <a href="doc/development-guide.md">Development Guide</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="benchmark/README.md">Benchmarks<a/>
+    <a href="benchmark/README.md">Benchmarks</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="examples/">Examples<a/>
+    <a href="examples/">Examples</a>
   </strong>
 </p>
 
@@ -48,7 +49,8 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 
 | API Version | Core version | Contrib Version         |
 | ----------- |--------------|-------------------------|
-| 1.0.x       | 0.22.x       | ------                  |
+| 1.0.x       | 0.23.x       | 0.23.x                  |
+| 1.0.x       | 0.22.x       | 0.22.x                  |
 | 0.21.x      | 0.21.x       | 0.21.x                  |
 | 0.20.x      | 0.20.x       | 0.20.x                  |
 | v1.0.0-rc.3 | 0.19.x       | 0.16.x                  |
@@ -79,6 +81,7 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 | Platform Version | Supported                                       |
 |------------------|-------------------------------------------------|
+| Node.JS `v16`    | ✅                                               |
 | Node.JS `v14`    | ✅                                               |
 | Node.JS `v12`    | ✅                                               |
 | Node.JS `v10`    | ✅                                               |
@@ -98,21 +101,11 @@ There is currently no list of officially supported browsers, but OpenTelemetry i
 
 ## Feature Status
 
-As of [`v0.19.0`][feature-status-release]:
-
-| Feature             | Status      |
-|---------------------|-------------|
-| B3 Propagation      | Beta        |
-| Zipkin Export       | Beta        |
-| Jaeger Propagation  | Beta        |
-| Jaeger Export       | Beta        |
-| OpenTracing Bridge  | Beta        |
-| Resources           | Beta        |
-| Tracing             | Beta        |
-| W3C Baggage         | Beta        |
-| W3C Trace Context   | Beta        |
-| Metrics API         | Development |
-| Metrics SDK         | Development |
+| Signal  | API Status  | SDK Status        |
+|---------|-------------|-------------------|
+| Tracing | Stable      | Release Candidate |
+| Metrics | Development | Development       |
+| Logs    | Roadmap     | Roadmap           |
 
 For a more detailed breakdown of feature support see the [specification compliance matrix][compliance-matrix].
 
@@ -414,7 +407,6 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [good-first-issues]: https://github.com/open-telemetry/OpenTelemetry-js/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22
 
 [docs]: https://open-telemetry.github.io/opentelemetry-js
-[feature-status-release]: https://github.com/open-telemetry/opentelemetry-js/releases/tag/v0.19.0
 [compliance-matrix]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/spec-compliance-matrix.md
 
 [otel-metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-metrics
