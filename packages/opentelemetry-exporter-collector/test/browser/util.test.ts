@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import * as sinon from "sinon";
-import { sendWithXhr } from "../../src/platform/browser/util";
-import { ensureHeadersContain } from "../helper";
+import * as sinon from 'sinon';
+import { sendWithXhr } from '../../src/platform/browser/util';
+import { ensureHeadersContain } from '../helper';
 
 describe('util - browser', () => {
   let server: any;
-  const body = "";
-  const url = "";
+  const body = '';
+  const url = '';
 
   let onSuccessStub: sinon.SinonStub;
   let onErrorStub: sinon.SinonStub;
@@ -96,7 +96,7 @@ describe('util - browser', () => {
     describe('and custom headers are set', () => {
       let customHeaders: Record<string,string>;
       beforeEach(()=>{
-        customHeaders = { aHeader: "aValue", bHeader: "bValue" };
+        customHeaders = { aHeader: 'aValue', bHeader: 'bValue' };
         sendWithXhr(body, url, customHeaders, onSuccessStub, onErrorStub);
       });
       it('Request Headers should contain "Content-Type" header', done => {
