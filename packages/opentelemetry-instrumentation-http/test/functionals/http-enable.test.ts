@@ -480,12 +480,26 @@ describe('HttpInstrumentation', () => {
       }
 
       it('should have 1 ended span when request throw on bad "options" object', () => {
-        try {
-          http.request({ protocol: 'telnet' });
-        } catch (error) {
+        assert.throws(() => http.request({ headers: { cookie: undefined} }), err => {
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
-        }
+
+          const validations = {
+            httpStatusCode: undefined,
+            httpMethod: 'GET',
+            resHeaders: {},
+            hostname: 'localhost',
+            pathname: '/',
+            forceStatus: {
+              code: SpanStatusCode.ERROR, 
+              message: err.message,
+            },
+            component: 'http',
+            noNetPeer: true,
+          }
+          assertSpan(spans[0], SpanKind.CLIENT, validations);
+          return true;
+        });
       });
 
       it('should have 1 ended span when response.end throw an exception', async () => {

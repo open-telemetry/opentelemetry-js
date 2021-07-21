@@ -78,7 +78,7 @@ describe('API registration', () => {
       contextManager: null,
     });
 
-    assert.strictEqual(context['_getContextManager'](), ctxManager, "context manager should not change");
+    assert.strictEqual(context['_getContextManager'](), ctxManager, 'context manager should not change');
 
     assert.ok(
       propagation['_getGlobalPropagator']() instanceof CompositePropagator
