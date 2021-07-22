@@ -235,5 +235,5 @@ To leverage the most common instrumentations all in one you can simply use the
 
 ## Instrumentation with Browser Extension
 
-If you'd like to get a quick preview on how your website (or any other site) would look like with OpenTelemetry
+If you'd like to quickly preview what OpenTelemetry instrumentation would look like with your website (or any other site)
 installed, you can use the [OpenTelemetry Browser Extension](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/packages/opentelemetry-browser-extension-autoinjection)
