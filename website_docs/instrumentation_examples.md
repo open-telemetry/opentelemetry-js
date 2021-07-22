@@ -26,13 +26,3 @@ Checkout [nodejs-opentelemetry-tempo](https://github.com/mnadeem/nodejs-opentele
 ```bash
 docker-compose up --build
 ```
-
-### otlp-logzio-fullstack
-
-This is a Fullstack playground of Opentelemetry in Javascript, Javascript in Browsers and Node.js
-
-Checkout [otlp-logzio-fullstack](https://github.com/niko-achilles/otlp-logzio-fullstack) and get started
-
-```bash
-docker-compose up --build
-```
