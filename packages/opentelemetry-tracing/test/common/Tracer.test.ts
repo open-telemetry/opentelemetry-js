@@ -238,7 +238,7 @@ describe('Tracer', () => {
       tracerProvider
     );
 
-    const spy = sinon.spy(tracer, "startSpan");
+    const spy = sinon.spy(tracer, 'startSpan');
 
     assert.strictEqual(tracer.startActiveSpan('my-span', span => {
       try {
@@ -259,7 +259,7 @@ describe('Tracer', () => {
       tracerProvider
     );
 
-    const spy = sinon.spy(tracer, "startSpan");
+    const spy = sinon.spy(tracer, 'startSpan');
 
     assert.strictEqual(tracer.startActiveSpan('my-span', {attributes: {foo: 'bar'}}, span => {
       try {
@@ -283,7 +283,7 @@ describe('Tracer', () => {
 
     const ctx = context.active().setValue(ctxKey, 'bar')
 
-    const spy = sinon.spy(tracer, "startSpan");
+    const spy = sinon.spy(tracer, 'startSpan');
 
     assert.strictEqual(tracer.startActiveSpan('my-span', {attributes: {foo: 'bar'}}, ctx, span => {
       try {

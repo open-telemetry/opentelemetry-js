@@ -156,7 +156,7 @@ export class JaegerExporter implements SpanExporter {
     }
 
     const serviceNameTag = span.tags.find(t => t.key === ResourceAttributes.SERVICE_NAME)
-    const serviceName = serviceNameTag?.vStr || "unknown_service";
+    const serviceName = serviceNameTag?.vStr || 'unknown_service';
 
     sender.setProcess({
       serviceName,

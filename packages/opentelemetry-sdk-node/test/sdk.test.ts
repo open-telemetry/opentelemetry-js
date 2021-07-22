@@ -113,9 +113,9 @@ describe('Node SDK', () => {
 
       await sdk.start();
 
-      assert.strictEqual(context['_getContextManager'](), ctxManager, "context manager should not change");
-      assert.strictEqual(propagation['_getGlobalPropagator'](), propagator, "propagator should not change");
-      assert.strictEqual((trace.getTracerProvider() as ProxyTracerProvider).getDelegate(), delegate, "tracer provider should not have changed");
+      assert.strictEqual(context['_getContextManager'](), ctxManager, 'context manager should not change');
+      assert.strictEqual(propagation['_getGlobalPropagator'](), propagator, 'propagator should not change');
+      assert.strictEqual((trace.getTracerProvider() as ProxyTracerProvider).getDelegate(), delegate, 'tracer provider should not have changed');
 
       assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
     });
@@ -173,9 +173,9 @@ describe('Node SDK', () => {
 
       await sdk.start();
 
-      assert.strictEqual(context['_getContextManager'](), ctxManager, "context manager should not change");
-      assert.strictEqual(propagation['_getGlobalPropagator'](), propagator, "propagator should not change");
-      assert.strictEqual((trace.getTracerProvider() as ProxyTracerProvider).getDelegate(), delegate, "tracer provider should not have changed");
+      assert.strictEqual(context['_getContextManager'](), ctxManager, 'context manager should not change');
+      assert.strictEqual(propagation['_getGlobalPropagator'](), propagator, 'propagator should not change');
+      assert.strictEqual((trace.getTracerProvider() as ProxyTracerProvider).getDelegate(), delegate, 'tracer provider should not have changed');
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
     });
