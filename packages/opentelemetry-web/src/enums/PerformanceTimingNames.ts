@@ -17,6 +17,7 @@
 export enum PerformanceTimingNames {
   CONNECT_END = 'connectEnd',
   CONNECT_START = 'connectStart',
+  DECODED_BODY_SIZE = 'decodedBodySize',
   DOM_COMPLETE = 'domComplete',
   DOM_CONTENT_LOADED_EVENT_END = 'domContentLoadedEventEnd',
   DOM_CONTENT_LOADED_EVENT_START = 'domContentLoadedEventStart',

@@ -22,7 +22,7 @@ import { InstrumentationBase, registerInstrumentations } from '../../src';
 
 class DummyTracerProvider implements TracerProvider {
   getTracer(name: string, version?: string): Tracer {
-    throw new Error("not implemented");
+    throw new Error('not implemented');
   }
 }
 class FooInstrumentation extends InstrumentationBase {
