@@ -24,7 +24,7 @@ import {
 import { ServiceClientType } from './types';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 
-const DEFAULT_COLLECTOR_URL = 'http://localhost:4317/v1/traces';
+const DEFAULT_COLLECTOR_URL = 'http://localhost:55681/v1/traces';
 
 /**
  * Collector Trace Exporter for Node with protobuf

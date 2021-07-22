@@ -146,7 +146,8 @@ describe('utils', () => {
         [PTN.REQUEST_START]: 123,
         [PTN.RESPONSE_START]: 123,
         [PTN.RESPONSE_END]: 123,
-        [PTN.ENCODED_BODY_SIZE]: 123,
+        [PTN.DECODED_BODY_SIZE]: 123,
+        [PTN.ENCODED_BODY_SIZE]: 61,
       } as PerformanceEntries;
 
       assert.strictEqual(addEventSpy.callCount, 0);
@@ -154,6 +155,25 @@ describe('utils', () => {
       addSpanNetworkEvents(span, entries);
 
       assert.strictEqual(addEventSpy.callCount, 9);
+      assert.strictEqual(setAttributeSpy.callCount, 2);
+    });
+    it('should only include encoded size when content encoding is being used', () => {
+      const addEventSpy = sinon.spy();
+      const setAttributeSpy = sinon.spy();
+      const span = ({
+        addEvent: addEventSpy,
+        setAttribute: setAttributeSpy,
+      } as unknown) as tracing.Span;
+      const entries = {
+        [PTN.DECODED_BODY_SIZE]: 123,
+        [PTN.ENCODED_BODY_SIZE]: 123,
+      } as PerformanceEntries;
+
+      assert.strictEqual(setAttributeSpy.callCount, 0);
+
+      addSpanNetworkEvents(span, entries);
+
+      assert.strictEqual(addEventSpy.callCount, 0);
       assert.strictEqual(setAttributeSpy.callCount, 1);
     });
   });
