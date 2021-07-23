@@ -88,32 +88,36 @@ npm install --save @opentelemetry/auto-instrumentations-node
 
 'use strict'
 
+const process = require('process');
+const opentelemetry = require('@opentelemetry/sdk-node');
 const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
-const { registerInstrumentations } = require('@opentelemetry/instrumentation')
-const { ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing')
-const { NodeTracerProvider } = require('@opentelemetry/node')
+const { ConsoleSpanExporter } = require('@opentelemetry/tracing');
 const { Resource } = require('@opentelemetry/resources');
 const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
 
-// configure a tracer provider that exports telemetry data to the console
-const exporter = new ConsoleSpanExporter();
-const provider = new NodeTracerProvider({
+// configure the SDK to export telemetry data to the console
+// enable all auto-instrumentations from the meta package
+const traceExporter = new ConsoleSpanExporter();
+const sdk = new opentelemetry.NodeSDK({
   resource: new Resource({
     [SemanticResourceAttributes.SERVICE_NAME]: 'my-service',
   }),
+  traceExporter,
+  instrumentations: [getNodeAutoInstrumentations()]
 });
-provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-// register the tracer provider with the OpenTelemetry API
+// initialize the SDK and register with the OpenTelemetry API
 // this enables the API to record telemetry
-provider.register();
+sdk.start()
+  .then(() => console.log('Tracing initialized'))
+  .catch((error) => console.log('Error initializing tracing', error));
 
-// enable auto-instrumentation
-// this activates and connects each instrumentation to the registered tracer provider
-registerInstrumentations({
-  instrumentations: [
-    getNodeAutoInstrumentations(),
-  ],
+// gracefully shut down the SDK on process exit
+process.on('SIGTERM', () => {
+  sdk.shutdown()
+    .then(() => console.log('Tracing terminated'))
+    .catch((error) => console.log('Error terminating tracing', error))
+    .finally(() => process.exit(0));
 });
 ```
 
