@@ -21,6 +21,8 @@ import { Span } from './span';
 import { SpanOptions } from './SpanOptions';
 import { Tracer } from './tracer';
 
+const NOOP_TRACER = new NoopTracer();
+
 /**
  * Proxy tracer provided by the proxy tracer provider
  */
@@ -60,7 +62,7 @@ export class ProxyTracer implements Tracer {
     const tracer = this._provider.getDelegateTracer(this.name, this.version);
 
     if (!tracer) {
-      return new NoopTracer();
+      return NOOP_TRACER;
     }
 
     this._delegate = tracer;
