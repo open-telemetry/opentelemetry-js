@@ -70,7 +70,7 @@ export abstract class CollectorExporterBrowserBase<
     items: ExportItem[],
     onSuccess: () => void,
     onError: (error: collectorTypes.CollectorExporterError) => void
-  ) {
+  ) : void {
     if (this._isShutdown) {
       diag.debug('Shutdown already started. Cannot send objects');
       return;
