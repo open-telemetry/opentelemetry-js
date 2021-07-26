@@ -71,7 +71,63 @@ The current version for each package can be found in the respective `package.jso
 
 ### Application Owner
 
-To get started tracing your own application, see the [Getting Started Guide](getting-started/README.md). For more information about automatic instrumentation see [@opentelemetry/node][otel-node], which provides auto-instrumentation for Node.js applications. If the automatic instrumentation does not suit your needs, or you would like to create manual traces, see [@opentelemetry/tracing][otel-tracing]
+#### Install Dependencies
+
+```shell
+npm install --save @opentelemetry/api
+npm install --save @opentelemetry/sdk-node
+npm install --save @opentelemetry/auto-instrumentations-node
+```
+
+**Note:** `auto-instrumentations-node` is a meta package from [opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/metapackages/auto-instrumentations-node) that provides a simple way to initialize multiple Node.js instrumentations.
+
+#### Instantiate Tracing
+
+```js
+// tracing.js
+
+'use strict'
+
+const process = require('process');
+const opentelemetry = require('@opentelemetry/sdk-node');
+const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
+const { ConsoleSpanExporter } = require('@opentelemetry/tracing');
+const { Resource } = require('@opentelemetry/resources');
+const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
+
+// configure the SDK to export telemetry data to the console
+// enable all auto-instrumentations from the meta package
+const traceExporter = new ConsoleSpanExporter();
+const sdk = new opentelemetry.NodeSDK({
+  resource: new Resource({
+    [SemanticResourceAttributes.SERVICE_NAME]: 'my-service',
+  }),
+  traceExporter,
+  instrumentations: [getNodeAutoInstrumentations()]
+});
+
+// initialize the SDK and register with the OpenTelemetry API
+// this enables the API to record telemetry
+sdk.start()
+  .then(() => console.log('Tracing initialized'))
+  .catch((error) => console.log('Error initializing tracing', error));
+
+// gracefully shut down the SDK on process exit
+process.on('SIGTERM', () => {
+  sdk.shutdown()
+    .then(() => console.log('Tracing terminated'))
+    .catch((error) => console.log('Error terminating tracing', error))
+    .finally(() => process.exit(0));
+});
+```
+
+#### Run Your Application
+
+```shell
+node -r ./tracing.js app.js
+```
+
+The above example will emit auto-instrumented telemetry about your Node.js application to the console. For a more in-depth example, see the [Getting Started Guide](getting-started/README.md). For more information about automatic instrumentation see [@opentelemetry/node][otel-node], which provides auto-instrumentation for Node.js applications. If the automatic instrumentation does not suit your needs, or you would like to create manual traces, see [@opentelemetry/tracing][otel-tracing]
 
 ### Library Author
 
