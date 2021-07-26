@@ -13,6 +13,8 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* `opentelemetry-instrumentation-http`
+  * [#2349](https://github.com/open-telemetry/opentelemetry-js/pull/2349) fix(instrumentation-http): set outgoing request attributes on start span ([@blumamir](https://github.com/blumamir))
 * `opentelemetry-web`
   * [#2343](https://github.com/open-telemetry/opentelemetry-js/pull/2343) feat(opentelemetry-web): capture decodedBodySize / http.response_content_length_uncompressed ([@t2t2](https://github.com/t2t2))
 * `opentelemetry-instrumentation`
@@ -30,10 +32,13 @@ All notable changes to this project will be documented in this file.
 ### :books: (Refine Doc)
 
 * Other
+  * [#2358](https://github.com/open-telemetry/opentelemetry-js/pull/2358) examples opentelemetry-api version fix ([@CptSchnitz](https://github.com/CptSchnitz))
   * [#2308](https://github.com/open-telemetry/opentelemetry-js/pull/2308) chore: use typedoc to build sdk reference ([@dyladan](https://github.com/dyladan))
   * [#2324](https://github.com/open-telemetry/opentelemetry-js/pull/2324) fix: update and make website docs work ([@svrnm](https://github.com/svrnm))
   * [#2328](https://github.com/open-telemetry/opentelemetry-js/pull/2328) chore: updating compatibility matrix ([@obecny](https://github.com/obecny))
   * [#2326](https://github.com/open-telemetry/opentelemetry-js/pull/2326) chore: fix tracer-web example webpack config ([@jonchurch](https://github.com/jonchurch))
+* `opentelemetry-propagator-b3`
+  * [#2342](https://github.com/open-telemetry/opentelemetry-js/pull/2342) docs: updates README.md for @opentelemetry/propagator-b3 ([@OmkarKirpan](https://github.com/OmkarKirpan))
 * `opentelemetry-exporter-collector-grpc`
   * [#2266](https://github.com/open-telemetry/opentelemetry-js/pull/2266) fix(exporter-collector-grpc): incorrect URL format on docs after 0.20.0 update ([@brunoluiz](https://github.com/brunoluiz))
 
@@ -42,8 +47,12 @@ All notable changes to this project will be documented in this file.
 * Other
   * [#2366](https://github.com/open-telemetry/opentelemetry-js/pull/2366) chore: adding Rauno56 to js approvers ([@obecny](https://github.com/obecny))
   * [#2350](https://github.com/open-telemetry/opentelemetry-js/pull/2350) chore: ignore backcompat in renovate ([@dyladan](https://github.com/dyladan))
+  * [#2352](https://github.com/open-telemetry/opentelemetry-js/pull/2352) replaced word plugin with instrumentation ([@niko-achilles](https://github.com/niko-achilles))
+  * [#2311](https://github.com/open-telemetry/opentelemetry-js/pull/2311) chore: ignore @types/node in backcompat ([@dyladan](https://github.com/dyladan))
 * `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-jaeger`, `opentelemetry-instrumentation`, `opentelemetry-node`, `opentelemetry-sdk-node`, `opentelemetry-shim-opentracing`, `opentelemetry-tracing`, `opentelemetry-web`
   * [#2351](https://github.com/open-telemetry/opentelemetry-js/pull/2351) style: use single quotes everywhere and add a rule to eslint ([@blumamir](https://github.com/blumamir))
+* `template`
+  * [#2319](https://github.com/open-telemetry/opentelemetry-js/pull/2319) chore: update package template engines version ([@jonchurch](https://github.com/jonchurch))
 
 ### Committers: 14
 
