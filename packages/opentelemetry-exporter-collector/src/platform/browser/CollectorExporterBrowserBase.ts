@@ -28,13 +28,14 @@ import { getEnv, baggageUtils } from '@opentelemetry/core';
 export abstract class CollectorExporterBrowserBase<
   ExportItem,
   ServiceRequest
-> extends CollectorExporterBase<
+  > extends CollectorExporterBase<
   CollectorExporterConfigBase,
   ExportItem,
   ServiceRequest
-> {
+  > {
   protected _headers: Record<string, string>;
   private _useXHR: boolean = false;
+  private _contentType: string = '';
 
   /**
    * @param config
@@ -53,6 +54,7 @@ export abstract class CollectorExporterBrowserBase<
       );
     } else {
       this._headers = {};
+      this._contentType = config.contentTypeBeacon ?? 'application/json';
     }
   }
 
@@ -94,7 +96,7 @@ export abstract class CollectorExporterBrowserBase<
       if (this._useXHR) {
         sendWithXhr(body, this.url, this._headers, _onSuccess, _onError);
       } else {
-        sendWithBeacon(body, this.url, _onSuccess, _onError);
+        sendWithBeacon(body, this.url, this._contentType, _onSuccess, _onError);
       }
     });
     this._sendingPromises.push(promise);

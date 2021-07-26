@@ -56,6 +56,7 @@ describe('CollectorTraceExporter - web', () => {
         hostname: 'foo',
         attributes: {},
         url: 'http://foo.bar.com',
+        contentTypeBeacon: 'text/plain',
       };
     });
 
@@ -67,13 +68,14 @@ describe('CollectorTraceExporter - web', () => {
       });
 
       it('should successfully send the spans using sendBeacon', done => {
-        collectorTraceExporter.export(spans, () => {});
+        collectorTraceExporter.export(spans, () => { });
 
         setTimeout(async () => {
           const args = stubBeacon.args[0];
           const url = args[0];
-          const blob:Blob = args[1];
+          const blob: Blob = args[1];
           const body = await blob.text();
+          const header: string = blob.type;
           const json = JSON.parse(
             body
           ) as collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
@@ -96,6 +98,8 @@ describe('CollectorTraceExporter - web', () => {
 
           assert.strictEqual(stubOpen.callCount, 0);
 
+          assert.strictEqual(header, collectorExporterConfig.contentTypeBeacon);
+
           ensureExportTraceServiceRequestIsSet(json);
 
           done();
@@ -108,7 +112,7 @@ describe('CollectorTraceExporter - web', () => {
         const spyLoggerError = sinon.stub(diag, 'error');
         stubBeacon.returns(true);
 
-        collectorTraceExporter.export(spans, () => {});
+        collectorTraceExporter.export(spans, () => { });
 
         setTimeout(() => {
           const response: any = spyLoggerDebug.args[1][0];
@@ -144,7 +148,7 @@ describe('CollectorTraceExporter - web', () => {
       });
 
       it('should successfully send the spans using XMLHttpRequest', done => {
-        collectorTraceExporter.export(spans, () => {});
+        collectorTraceExporter.export(spans, () => { });
 
         setTimeout(() => {
           const request = server.requests[0];
@@ -182,7 +186,7 @@ describe('CollectorTraceExporter - web', () => {
         const spyLoggerDebug = sinon.stub(diag, 'debug');
         const spyLoggerError = sinon.stub(diag, 'error');
 
-        collectorTraceExporter.export(spans, () => {});
+        collectorTraceExporter.export(spans, () => { });
 
         setTimeout(() => {
           const request = server.requests[0];
@@ -211,7 +215,7 @@ describe('CollectorTraceExporter - web', () => {
       });
 
       it('should send custom headers', done => {
-        collectorTraceExporter.export(spans, () => {});
+        collectorTraceExporter.export(spans, () => { });
 
         setTimeout(() => {
           const request = server.requests[0];
@@ -249,7 +253,7 @@ describe('CollectorTraceExporter - web', () => {
         );
       });
       it('should successfully send custom headers using XMLHTTPRequest', done => {
-        collectorTraceExporter.export(spans, () => {});
+        collectorTraceExporter.export(spans, () => { });
 
         setTimeout(() => {
           const [{ requestHeaders }] = server.requests;
@@ -272,7 +276,7 @@ describe('CollectorTraceExporter - web', () => {
       });
 
       it('should successfully send spans using XMLHttpRequest', done => {
-        collectorTraceExporter.export(spans, () => {});
+        collectorTraceExporter.export(spans, () => { });
 
         setTimeout(() => {
           const [{ requestHeaders }] = server.requests;

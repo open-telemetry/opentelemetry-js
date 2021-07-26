@@ -25,10 +25,12 @@ import * as collectorTypes from '../../types';
 export function sendWithBeacon(
   body: string,
   url: string,
+  contentType: string,
   onSuccess: () => void,
   onError: (error: collectorTypes.CollectorExporterError) => void
-) {
-  if (navigator.sendBeacon(url, new Blob([body], { type: "application/json" }))) {
+): void {
+  contentType = contentType !== '' ? contentType : 'application/json';
+  if (navigator.sendBeacon(url, new Blob([body], { type: contentType }))) {
     diag.debug('sendBeacon - can send', body);
     onSuccess();
   } else {
@@ -52,7 +54,7 @@ export function sendWithXhr(
   headers: Record<string, string>,
   onSuccess: () => void,
   onError: (error: collectorTypes.CollectorExporterError) => void
-) {
+): void {
   const xhr = new XMLHttpRequest();
   xhr.open('POST', url);
 
