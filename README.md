@@ -87,7 +87,6 @@ async function operation() {
   })
 
   span.end();
-  return output;
 }
 
 async function main() {
