@@ -10,7 +10,7 @@ This guide uses the example application in HTML & javascript provided below, but
   - [Initialization and Configuration](#initialization-and-configuration)
   - [Creating a Tracer Provider](#creating-a-tracer-provider)
   - [Creating an Exporter](#creating-an-exporter)
-  - [Add Plugins](#add-plugins)
+  - [Add Instrumentations](#add-instrumentations)
 - [Meta Packages for Web](#meta-packages-for-web)
 - [Instrumentation with Browser Extension](#instrumentation-with-browser-extension)
 
@@ -214,10 +214,9 @@ Now, rebuild your application and open the browser again. In the console of the 
 }
 ```
 
-### Add Plugins
+### Add Instrumentations
 
-If you want to instrument AJAX requests, User Interactions and others, you can add plugins to your
-instrumentation:
+If you want to instrument AJAX requests, User Interactions and others, you can register additional instrumentations for those:
 
 ```javascript
 registerInstrumentations({
