@@ -2,10 +2,11 @@
 ---
 <p align="center">
   <strong>
-    <a href="getting-started/README.md">Getting Started<a/>
+    <a href="getting-started/README.md">Getting Started</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="https://open-telemetry.github.io/opentelemetry-js">API Documentation<a/>
+    <a href="https://open-telemetry.github.io/opentelemetry-js-api">API Reference</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="https://open-telemetry.github.io/opentelemetry-js">SDK Reference</a>
   </strong>
 </p>
 
@@ -28,13 +29,13 @@
 
 <p align="center">
   <strong>
-    <a href="CONTRIBUTING.md">Contributing<a/>
+    <a href="CONTRIBUTING.md">Contributing</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="doc/development-guide.md">Development Guide<a/>
+    <a href="doc/development-guide.md">Development Guide</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="benchmark/README.md">Benchmarks<a/>
+    <a href="benchmark/README.md">Benchmarks</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="examples/">Examples<a/>
+    <a href="examples/">Examples</a>
   </strong>
 </p>
 
@@ -127,6 +128,7 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 - [Naseem K. Ullah](https://github.com/naseemkullah), Transit
 - [Neville Wylie](https://github.com/MSNev), Microsoft
 - [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal
+- [Rauno Viskus](https://github.com/Rauno56), Splunk
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).*
 
@@ -223,6 +225,10 @@ To request automatic tracing support for a module not on this list, please [file
 | [@opentelemetry/shim-opentracing][otel-shim-opentracing] | OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry |
 
 ## Upgrade guidelines
+
+### 0.23.x to x
+
+- `ResourceAttributes` renamed to `SemanticResourceAttributes` in the `@opentelemetry/semantic-conventions` package
 
 ### 0.20.x to x
 

@@ -18,7 +18,7 @@ Copy the following file into an empty directory and call it `index.html`.
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Document Load Plugin Example</title>
+  <title>Document Load Instrumentation Example</title>
   <base href="/">
   <!--
     https://www.w3.org/TR/trace-context/
@@ -33,14 +33,14 @@ Copy the following file into an empty directory and call it `index.html`.
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-  Example of using Web Tracer with document load plugin with console exporter and collector exporter
+  Example of using Web Tracer with document load instrumentation with console exporter and collector exporter
 </body>
 </html>
 ```
 
 ## Installation
 
-To create traces in the browser, you will need `@opentelemetry/web`, and the plugin `@opentelemetry/plugin-document-load`:
+To create traces in the browser, you will need `@opentelemetry/web`, and the instrumentation `@opentelemetry/instrumentation-document-load`:
 
 ```shell
 npm init -y
@@ -59,7 +59,7 @@ We will add some code that will trace the document load timings and output those
 
 ## Creating a Tracer Provider
 
-Add the following code to the `document-load.js` to create a tracer provider, which brings the plugin to trace document load:
+Add the following code to the `document-load.js` to create a tracer provider, which brings the instrumentaion to trace document load:
 
 ```javascript
 import { WebTracerProvider } from '@opentelemetry/web';
@@ -74,7 +74,7 @@ provider.register({
   contextManager: new ZoneContextManager(),
 });
 
-// Registering instrumentations / plugins
+// Registering instrumentations
 registerInstrumentations({
   instrumentations: [
     new DocumentLoadInstrumentation(),
@@ -113,7 +113,7 @@ provider.register({
   contextManager: new ZoneContextManager(),
 });
 
-// Registering instrumentations / plugins
+// Registering instrumentations
 registerInstrumentations({
   instrumentations: [
     new DocumentLoadInstrumentation(),
