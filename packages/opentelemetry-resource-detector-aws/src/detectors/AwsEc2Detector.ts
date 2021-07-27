@@ -48,7 +48,7 @@ class AwsEc2Detector implements Detector {
 
   /**
    * Attempts to connect and obtain an AWS instance Identity document. If the
-   * connection is succesful it returns a promise containing a {@link Resource}
+   * connection is successful it returns a promise containing a {@link Resource}
    * populated with instance metadata. Returns a promise containing an
    * empty {@link Resource} if the connection or parsing of the identity
    * document fails.
