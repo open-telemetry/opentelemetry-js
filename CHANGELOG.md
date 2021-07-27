@@ -13,6 +13,8 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`
+  * [#2337](https://github.com/open-telemetry/opentelemetry-js/pull/2337) Support gzip compression for node exporter collector ([@alisabzevari](https://github.com/alisabzevari))
 * `opentelemetry-instrumentation-http`
   * [#2332](https://github.com/open-telemetry/opentelemetry-js/pull/2332) feat(@opentelemetry-instrumentation-http): support adding custom attributes before a span is started ([@echoontheway](https://github.com/echoontheway))
   * [#2349](https://github.com/open-telemetry/opentelemetry-js/pull/2349) fix(instrumentation-http): set outgoing request attributes on start span ([@blumamir](https://github.com/blumamir))
@@ -58,9 +60,10 @@ All notable changes to this project will be documented in this file.
 * `template`
   * [#2319](https://github.com/open-telemetry/opentelemetry-js/pull/2319) chore: update package template engines version ([@jonchurch](https://github.com/jonchurch))
 
-### Committers: 17
+### Committers: 18
 
 * (Eliseo) Nathaniel Ruiz Nowell ([@NathanielRN](https://github.com/NathanielRN))
+* Ali Sabzevari ([@alisabzevari](https://github.com/alisabzevari))
 * Amir Blum ([@blumamir](https://github.com/blumamir))
 * Bartlomiej Obecny ([@obecny](https://github.com/obecny))
 * Bruno Luiz Silva ([@brunoluiz](https://github.com/brunoluiz))
