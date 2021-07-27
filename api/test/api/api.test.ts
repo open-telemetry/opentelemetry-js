@@ -93,6 +93,18 @@ describe('API', () => {
       assert.deepStrictEqual(span, dummySpan);
     });
 
+    it('should set delegate only on success', () => {
+      assert.strictEqual(
+        api.trace.setGlobalTracerProvider(new TestTracerProvider()),
+        true
+      );
+      assert.strictEqual(
+        api.trace.setGlobalTracerProvider(new NoopTracerProvider()),
+        false
+      );
+      assert.ok(api.trace.getTracer('name') instanceof TestTracer);
+    });
+
     class TestTracer extends NoopTracer {
       override startSpan(name: string, options?: SpanOptions): Span {
         return dummySpan;
