@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 ### :rocket: (Enhancement)
 
 * `opentelemetry-instrumentation-http`
+  * [#2332](https://github.com/open-telemetry/opentelemetry-js/pull/2332) feat(@opentelemetry-instrumentation-http): support adding custom attributes before a span is started ([@echoontheway](https://github.com/echoontheway))
   * [#2349](https://github.com/open-telemetry/opentelemetry-js/pull/2349) fix(instrumentation-http): set outgoing request attributes on start span ([@blumamir](https://github.com/blumamir))
 * `opentelemetry-web`
   * [#2343](https://github.com/open-telemetry/opentelemetry-js/pull/2343) feat(opentelemetry-web): capture decodedBodySize / http.response_content_length_uncompressed ([@t2t2](https://github.com/t2t2))
@@ -31,6 +32,8 @@ All notable changes to this project will be documented in this file.
 
 ### :books: (Refine Doc)
 
+* `opentelemetry-resource-detector-aws`
+  * [#2379](https://github.com/open-telemetry/opentelemetry-js/pull/2379) fix: fixup aws detector readme ([@legendecas](https://github.com/legendecas))
 * Other
   * [#2365](https://github.com/open-telemetry/opentelemetry-js/pull/2365) docs: add quickstart code example ([@vreynolds](https://github.com/vreynolds))
   * [#2358](https://github.com/open-telemetry/opentelemetry-js/pull/2358) examples opentelemetry-api version fix ([@CptSchnitz](https://github.com/CptSchnitz))
@@ -55,7 +58,7 @@ All notable changes to this project will be documented in this file.
 * `template`
   * [#2319](https://github.com/open-telemetry/opentelemetry-js/pull/2319) chore: update package template engines version ([@jonchurch](https://github.com/jonchurch))
 
-### Committers: 15
+### Committers: 17
 
 * (Eliseo) Nathaniel Ruiz Nowell ([@NathanielRN](https://github.com/NathanielRN))
 * Amir Blum ([@blumamir](https://github.com/blumamir))
@@ -71,6 +74,8 @@ All notable changes to this project will be documented in this file.
 * Severin Neumann ([@svrnm](https://github.com/svrnm))
 * Vera Reynolds ([@vreynolds](https://github.com/vreynolds))
 * Weyert de Boer ([@weyert](https://github.com/weyert))
+* [@echoontheway](https://github.com/echoontheway)
+* legendecas ([@legendecas](https://github.com/legendecas))
 * t2t2 ([@t2t2](https://github.com/t2t2))
 
 ## 0.23.0
