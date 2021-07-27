@@ -480,6 +480,8 @@ As an alternative, consider setting `faas.id` as a span attribute instead.
 
 
 export enum CloudProviderValues {
+  /** Alibaba Cloud. */
+  ALIYUN = 'aliyun',
   /** Amazon Web Services. */
   AWS = 'aws',
   /** Microsoft Azure. */
@@ -492,6 +494,8 @@ export enum CloudProviderValues {
 
 
 export enum CloudPlatformValues {
+  /** Alibaba Cloud Elastic Compute Service. */
+  ALIYUN_ECS = 'aliyun_ecs',
   /** AWS Elastic Compute Cloud. */
   AWS_EC2 = 'aws_ec2',
   /** AWS Elastic Container Service. */
