@@ -334,11 +334,11 @@ export const isValidOptionsType = (options: unknown): boolean => {
 /**
  * Returns outgoing request attributes scoped to the options passed to the request
  * @param {ParsedRequestOptions} requestOptions the same options used to make the request
- * @param {{ component: string, hostname: string }} options used to pass data needed to create attributes
+ * @param {{ component: string, hostname: string, hookAttributes?: SpanAttributes }} options used to pass data needed to create attributes
  */
 export const getOutgoingRequestAttributes = (
   requestOptions: ParsedRequestOptions,
-  options: { component: string; hostname: string }
+  options: { component: string; hostname: string; hookAttributes?: SpanAttributes }
 ): SpanAttributes => {
   const host = requestOptions.host;
   const hostname =
@@ -363,7 +363,7 @@ export const getOutgoingRequestAttributes = (
   if (userAgent !== undefined) {
     attributes[SemanticAttributes.HTTP_USER_AGENT] = userAgent;
   }
-  return attributes;
+  return Object.assign(attributes, options.hookAttributes);
 };
 
 /**
@@ -415,11 +415,11 @@ export const getOutgoingRequestAttributesOnResponse = (
 /**
  * Returns incoming request attributes scoped to the request data
  * @param {IncomingMessage} request the request object
- * @param {{ component: string, serverName?: string }} options used to pass data needed to create attributes
+ * @param {{ component: string, serverName?: string, hookAttributes?: SpanAttributes }} options used to pass data needed to create attributes
  */
 export const getIncomingRequestAttributes = (
   request: IncomingMessage,
-  options: { component: string; serverName?: string }
+  options: { component: string; serverName?: string; hookAttributes?: SpanAttributes }
 ): SpanAttributes => {
   const headers = request.headers;
   const userAgent = headers['user-agent'];
@@ -463,7 +463,7 @@ export const getIncomingRequestAttributes = (
   setRequestContentLengthAttribute(request, attributes);
 
   const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
-  return Object.assign(attributes, httpKindAttributes);
+  return Object.assign(attributes, httpKindAttributes, options.hookAttributes);
 };
 
 /**
