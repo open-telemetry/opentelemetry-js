@@ -33,6 +33,12 @@ export abstract class CollectorExporterBrowserBase<
   ExportItem,
   ServiceRequest
 > {
+  private DEFAULT_HEADERS = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  };
+  private DEFAULT_BLOB_TYPE = { type: 'application/json' };
+
   protected _headers: Record<string, string>;
   private _useXHR: boolean = false;
 
@@ -43,16 +49,20 @@ export abstract class CollectorExporterBrowserBase<
     super(config);
     this._useXHR =
       !!config.headers || typeof navigator.sendBeacon !== 'function';
+
     if (this._useXHR) {
-      this._headers = Object.assign(
-        {},
-        parseHeaders(config.headers),
-        baggageUtils.parseKeyPairsIntoRecord(
+      this._headers = {
+        ...this.DEFAULT_HEADERS,
+        ...parseHeaders(config.headers),
+        ...baggageUtils.parseKeyPairsIntoRecord(
           getEnv().OTEL_EXPORTER_OTLP_HEADERS
-        )
-      );
+        ),
+      };
     } else {
-      this._headers = {};
+      this._headers = {
+        ...this.DEFAULT_BLOB_TYPE,
+        ...parseHeaders({ type: config.blobType }),
+      };
     }
   }
 
@@ -94,7 +104,7 @@ export abstract class CollectorExporterBrowserBase<
       if (this._useXHR) {
         sendWithXhr(body, this.url, this._headers, _onSuccess, _onError);
       } else {
-        sendWithBeacon(body, this.url, _onSuccess, _onError);
+        sendWithBeacon(body, this.url, this._headers, _onSuccess, _onError);
       }
     });
     this._sendingPromises.push(promise);

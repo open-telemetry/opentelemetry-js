@@ -64,8 +64,8 @@ describe('CollectorMetricExporter - web', () => {
       },
       'double-observer2'
     );
-    const recorder: Metric<BoundValueRecorder> &
-      ValueRecorder = mockValueRecorder();
+    const recorder: Metric<BoundValueRecorder> & ValueRecorder =
+      mockValueRecorder();
     counter.add(1);
     recorder.record(7);
     recorder.record(14);
@@ -93,10 +93,11 @@ describe('CollectorMetricExporter - web', () => {
       it('should successfully send metrics using sendBeacon', done => {
         collectorExporter.export(metrics, () => {});
 
-        setTimeout(() => {
+        setTimeout(async () => {
           const args = stubBeacon.args[0];
           const url = args[0];
-          const body = args[1];
+          const blob: Blob = args[1];
+          const body = await blob.text();
           const json = JSON.parse(
             body
           ) as collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
@@ -154,6 +155,22 @@ describe('CollectorMetricExporter - web', () => {
 
           ensureExportMetricsServiceRequestIsSet(json);
 
+          done();
+        });
+      });
+
+      it('should successfully send blob type using sendBeacon', done => {
+        collectorExporter.export(metrics, () => {});
+        const expectedType = 'application/json';
+
+        setTimeout(() => {
+          const args = stubBeacon.args[0];
+          const blob: Blob = args[1];
+          const { type } = blob;
+
+          assert.strictEqual(type, expectedType);
+          assert.strictEqual(stubBeacon.callCount, 1);
+          assert.strictEqual(stubOpen.callCount, 0);
           done();
         });
       });

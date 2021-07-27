@@ -341,6 +341,10 @@ export interface ExportServiceError {
  * Collector Exporter base config
  */
 export interface CollectorExporterConfigBase {
+  /**
+   * type of the data contained in the Blob
+   */
+  blobType?: string;
   headers?: Partial<Record<string, unknown>>;
   hostname?: string;
   attributes?: SpanAttributes;
