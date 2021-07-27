@@ -395,7 +395,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
       const ctx = propagation.extract(ROOT_CONTEXT, headers);
       const span = instrumentation._startHttpSpan(
-        `${component.toLocaleUpperCase()} ${method}`,
+        instrumentation._getConfig().createSpanName?.(component, method) ?? `${component.toLocaleUpperCase()} ${method}`,
         spanOptions,
         ctx
       );
@@ -523,7 +523,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         return original.apply(this, [optionsParsed, ...args]);
       }
 
-      const operationName = `${component.toUpperCase()} ${method}`;
+      const operationName = instrumentation._getConfig().createSpanName?.(component, method) ?? `${component.toUpperCase()} ${method}`;
 
       const hostname =
         optionsParsed.hostname ||

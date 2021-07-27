@@ -882,5 +882,49 @@ describe('HttpInstrumentation', () => {
         assert.strictEqual(spans[0].attributes.key, 'value');
       });
     });
+
+    describe('create span name', () => {
+      beforeEach(done => {
+        memoryExporter.reset();
+        instrumentation.setConfig({});
+        instrumentation.enable();
+        server = http.createServer((request, response) => {
+          response.end('Test Server Response');
+        });
+        server.listen(serverPort, done);
+      });
+
+      afterEach(() => {
+        server.close();
+        instrumentation.disable();
+      });
+
+      it('should change the span name', async () => {
+        instrumentation.disable();
+        instrumentation.setConfig({createSpanName: (component, method) => `Custom Name ${component?.toLocaleLowerCase()}-${method?.toLocaleLowerCase()}`});
+        instrumentation.enable();
+        const testPath = '/test/test';
+        await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${testPath}`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(
+          spans.every(span => span.name === 'Custom Name http-get'),
+          true
+        );
+      });
+
+      it('should not change the span name', async () => {
+        const testPath = '/test/test';
+        await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${testPath}`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(
+          spans.every(span => span.name === 'HTTP GET'),
+          true
+        );
+      });
+    });
   });
 });

@@ -67,6 +67,10 @@ export interface HttpResponseCustomAttributeFunction {
   (span: Span, response: IncomingMessage | ServerResponse): void;
 }
 
+export interface HttpCustomSpanNameFunction {
+  (componentName?: 'http' | 'https', method?: string): string;
+}
+
 /**
  * Options available for the HTTP instrumentation (see [documentation](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-http#http-instrumentation-options))
  */
@@ -87,6 +91,8 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
   requireParentforOutgoingSpans?: boolean;
   /** Require parent to create span for incoming requests */
   requireParentforIncomingSpans?: boolean;
+  /** Function for creating a custom span name */
+  createSpanName?: HttpCustomSpanNameFunction;
 }
 
 export interface Err extends Error {

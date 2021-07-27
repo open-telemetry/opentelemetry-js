@@ -55,6 +55,7 @@ Http instrumentation has few options available to choose from. You can set the f
 | [`serverName`](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-instrumentation-http/src/types.ts#L85) | `string` | The primary server name of the matched virtual host. |
 | `requireParentforOutgoingSpans` | Boolean | Require that is a parent span to create new span for outgoing requests. |
 | `requireParentforIncomingSpans` | Boolean | Require that is a parent span to create new span for incoming requests. |
+| `createSpanName` | `HttpCustomSpanNameFunction` | Function for creating a custom span name |
 
 ## Useful links
 
