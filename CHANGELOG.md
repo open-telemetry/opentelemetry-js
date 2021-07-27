@@ -32,6 +32,7 @@ All notable changes to this project will be documented in this file.
 ### :books: (Refine Doc)
 
 * Other
+  * [#2365](https://github.com/open-telemetry/opentelemetry-js/pull/2365) docs: add quickstart code example ([@vreynolds](https://github.com/vreynolds))
   * [#2358](https://github.com/open-telemetry/opentelemetry-js/pull/2358) examples opentelemetry-api version fix ([@CptSchnitz](https://github.com/CptSchnitz))
   * [#2308](https://github.com/open-telemetry/opentelemetry-js/pull/2308) chore: use typedoc to build sdk reference ([@dyladan](https://github.com/dyladan))
   * [#2324](https://github.com/open-telemetry/opentelemetry-js/pull/2324) fix: update and make website docs work ([@svrnm](https://github.com/svrnm))
@@ -54,7 +55,7 @@ All notable changes to this project will be documented in this file.
 * `template`
   * [#2319](https://github.com/open-telemetry/opentelemetry-js/pull/2319) chore: update package template engines version ([@jonchurch](https://github.com/jonchurch))
 
-### Committers: 14
+### Committers: 15
 
 * (Eliseo) Nathaniel Ruiz Nowell ([@NathanielRN](https://github.com/NathanielRN))
 * Amir Blum ([@blumamir](https://github.com/blumamir))
@@ -68,6 +69,7 @@ All notable changes to this project will be documented in this file.
 * Ofer Adelstein ([@CptSchnitz](https://github.com/CptSchnitz))
 * Omkar Kirpan ([@OmkarKirpan](https://github.com/OmkarKirpan))
 * Severin Neumann ([@svrnm](https://github.com/svrnm))
+* Vera Reynolds ([@vreynolds](https://github.com/vreynolds))
 * Weyert de Boer ([@weyert](https://github.com/weyert))
 * t2t2 ([@t2t2](https://github.com/t2t2))
 
