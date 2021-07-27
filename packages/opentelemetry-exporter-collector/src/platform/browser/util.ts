@@ -25,12 +25,11 @@ import * as collectorTypes from '../../types';
 export function sendWithBeacon(
   body: string,
   url: string,
-  contentType: string,
+  blobPropertyBag: BlobPropertyBag,
   onSuccess: () => void,
   onError: (error: collectorTypes.CollectorExporterError) => void
 ): void {
-  contentType = contentType !== '' ? contentType : 'application/json';
-  if (navigator.sendBeacon(url, new Blob([body], { type: contentType }))) {
+  if (navigator.sendBeacon(url, new Blob([body], blobPropertyBag))) {
     diag.debug('sendBeacon - can send', body);
     onSuccess();
   } else {

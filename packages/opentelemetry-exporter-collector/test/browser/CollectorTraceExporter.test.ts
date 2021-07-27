@@ -56,7 +56,7 @@ describe('CollectorTraceExporter - web', () => {
         hostname: 'foo',
         attributes: {},
         url: 'http://foo.bar.com',
-        contentTypeBeacon: 'text/plain',
+        beaconBlobPropertyBag: { type: 'text/plain' },
       };
     });
 
@@ -98,7 +98,7 @@ describe('CollectorTraceExporter - web', () => {
 
           assert.strictEqual(stubOpen.callCount, 0);
 
-          assert.strictEqual(header, collectorExporterConfig.contentTypeBeacon);
+          assert.strictEqual(header, collectorExporterConfig.beaconBlobPropertyBag?.type);
 
           ensureExportTraceServiceRequestIsSet(json);
 
