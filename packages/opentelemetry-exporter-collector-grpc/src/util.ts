@@ -108,11 +108,15 @@ export function send<ExportItem, ServiceRequest>(
 }
 
 export function validateAndNormalizeUrl(url: string): string {
-  const hasProtocol = url.match(/^([\w]{1,8}):\/\//);
-  if (!hasProtocol) {
-    url = `https://${url}`;
-  }
   const target = new URL(url);
+
+  if (target.host === '') {
+    diag.warn(
+      'Parsing URL failed to return a valid host. Returning raw url.'
+    );
+    return url
+  }
+
   if (target.pathname && target.pathname !== '/') {
     diag.warn(
       'URL path should not be set when using grpc, the path part of the URL will be ignored.'
@@ -123,5 +127,6 @@ export function validateAndNormalizeUrl(url: string): string {
       'URL protocol should be http(s):// or grpc(s)://. Using grpc://.'
     );
   }
-  return target.host;
+
+  return target.host
 }

@@ -24,19 +24,21 @@ import { validateAndNormalizeUrl } from '../src/util';
 describe('validateAndNormalizeUrl()', () => {
   const tests = [
     {
-      name: 'bare hostname should return same value',
-      input: 'api.datacat.io',
-      expected: 'api.datacat.io',
-    },
-    {
-      name: 'host:port should return same value',
-      input: 'api.datacat.io:1234',
-      expected: 'api.datacat.io:1234',
-    },
-    {
       name: 'grpc://host:port should trim off protocol',
       input: 'grpc://api.datacat.io:1234',
       expected: 'api.datacat.io:1234',
+    },
+    {
+      name: 'bare hostname should warn but return same value',
+      input: 'api.datacat.io',
+      expected: 'api.datacat.io',
+      warn: 'Parsing URL failed to return a valid host. Returning raw url.',
+    },
+    {
+      name: 'host:port should warn but return same value',
+      input: 'api.datacat.io:1234',
+      expected: 'api.datacat.io:1234',
+      warn: 'Parsing URL failed to return a valid host. Returning raw url.',
     },
     {
       name: 'bad protocol should warn but return host:port',
