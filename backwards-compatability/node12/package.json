@@ -1,6 +1,6 @@
 {
   "name": "backcompat-node12",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "private": true,
   "description": "Backwards compatability app for node8 types and the OpenTelemetry Node.js SDK",
   "main": "index.js",
@@ -8,8 +8,8 @@
     "test:backcompat": "tsc --noEmit index.ts"
   },
   "dependencies": {
-    "@opentelemetry/sdk-node": "0.23.0",
-    "@opentelemetry/tracing": "0.23.0"
+    "@opentelemetry/sdk-node": "0.24.0",
+    "@opentelemetry/tracing": "0.24.0"
   },
   "devDependencies": {
     "@types/node": "12.20.16",
