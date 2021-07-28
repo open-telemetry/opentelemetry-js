@@ -34,15 +34,16 @@ All notable changes to this project will be documented in this file.
 
 ### :books: (Refine Doc)
 
-* `opentelemetry-resource-detector-aws`
-  * [#2379](https://github.com/open-telemetry/opentelemetry-js/pull/2379) fix: fixup aws detector readme ([@legendecas](https://github.com/legendecas))
 * Other
+  * [#2344](https://github.com/open-telemetry/opentelemetry-js/pull/2344) Additional website docs updates ([@svrnm](https://github.com/svrnm))
   * [#2365](https://github.com/open-telemetry/opentelemetry-js/pull/2365) docs: add quickstart code example ([@vreynolds](https://github.com/vreynolds))
   * [#2358](https://github.com/open-telemetry/opentelemetry-js/pull/2358) examples opentelemetry-api version fix ([@CptSchnitz](https://github.com/CptSchnitz))
   * [#2308](https://github.com/open-telemetry/opentelemetry-js/pull/2308) chore: use typedoc to build sdk reference ([@dyladan](https://github.com/dyladan))
   * [#2324](https://github.com/open-telemetry/opentelemetry-js/pull/2324) fix: update and make website docs work ([@svrnm](https://github.com/svrnm))
   * [#2328](https://github.com/open-telemetry/opentelemetry-js/pull/2328) chore: updating compatibility matrix ([@obecny](https://github.com/obecny))
   * [#2326](https://github.com/open-telemetry/opentelemetry-js/pull/2326) chore: fix tracer-web example webpack config ([@jonchurch](https://github.com/jonchurch))
+* `opentelemetry-resource-detector-aws`
+  * [#2379](https://github.com/open-telemetry/opentelemetry-js/pull/2379) fix: fixup aws detector readme ([@legendecas](https://github.com/legendecas))
 * `opentelemetry-propagator-b3`
   * [#2342](https://github.com/open-telemetry/opentelemetry-js/pull/2342) docs: updates README.md for @opentelemetry/propagator-b3 ([@OmkarKirpan](https://github.com/OmkarKirpan))
 * `opentelemetry-exporter-collector-grpc`
