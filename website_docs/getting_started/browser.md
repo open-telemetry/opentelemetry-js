@@ -51,7 +51,7 @@ To create traces in the browser, you will need `@opentelemetry/web`, and the ins
 
 ```shell
 npm init -y
-npm install --save @opentelemetry/web @opentelemetry/instrumentation-document-load @opentelemetry/context-zone
+npm install --save @opentelemetry/api @opentelemetry/web @opentelemetry/instrumentation-document-load @opentelemetry/context-zone
 ```
 
 ### Initialization and Configuration
