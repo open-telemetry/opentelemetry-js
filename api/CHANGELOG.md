@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.0.2
+
+### :bug: Bug Fix
+
+* [#105](https://github.com/open-telemetry/opentelemetry-js-api/pull/105) fix: set delegate after successful registration ([@Flarna](https://github.com/Flarna))
+* [#94](https://github.com/open-telemetry/opentelemetry-js-api/pull/94) fix: enforce strict equality on prerelease versions ([@dyladan](https://github.com/dyladan))
+
+### :memo: Documentation
+
+* [#106](https://github.com/open-telemetry/opentelemetry-js-api/pull/106) docs: fix crash in README example ([@trentm](https://github.com/trentm))
+* [#101](https://github.com/open-telemetry/opentelemetry-js-api/pull/101) docs: Format example for tracer.startActiveSpan ([@ad-m](https://github.com/ad-m))
+* [#99](https://github.com/open-telemetry/opentelemetry-js-api/pull/99) chore: fix link to API docs ([@dyladan](https://github.com/dyladan))
+
+### :house: Internal
+
+* [#109](https://github.com/open-telemetry/opentelemetry-js-api/pull/109) internal: add missing approvers from core ([@dyladan](https://github.com/dyladan))
+* [#103](https://github.com/open-telemetry/opentelemetry-js-api/pull/103) chore: reuse NoopTracer in ProxyTracer ([@Flarna](https://github.com/Flarna))
+
+### Committers: 4
+
+* Adam Dobrawy ([@ad-m](https://github.com/ad-m))
+* Daniel Dyla ([@dyladan](https://github.com/dyladan))
+* Gerhard Stöbich ([@Flarna](https://github.com/Flarna))
+* Trent Mick ([@trentm](https://github.com/trentm))
+
 ## 1.0.1
 
 ### :bug: Bug Fix
