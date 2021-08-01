@@ -46,9 +46,9 @@
   },
   "devDependencies": {
     "@babel/core": "7.14.8",
-    "@opentelemetry/api": "^1.0.1",
+    "@opentelemetry/api": "^1.0.2",
     "@types/mocha": "8.2.3",
-    "@types/node": "14.17.5",
+    "@types/node": "14.17.6",
     "@types/sinon": "10.0.2",
     "@types/webpack-env": "1.16.2",
     "@types/zone.js": "0.5.12",
@@ -73,7 +73,7 @@
     "zone.js": "0.11.4"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^1.0.1",
+    "@opentelemetry/api": "^1.0.2",
     "zone.js": "^0.10.2 || ^0.11.0"
   },
   "sideEffects": false
