@@ -75,7 +75,7 @@ describe('CollectorTraceExporter - web', () => {
           const url = args[0];
           const blob: Blob = args[1];
           const body = await blob.text();
-          const header: string = blob.type;
+          const blobType: string = blob.type;
           const json = JSON.parse(
             body
           ) as collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
@@ -98,7 +98,7 @@ describe('CollectorTraceExporter - web', () => {
 
           assert.strictEqual(stubOpen.callCount, 0);
 
-          assert.strictEqual(header, collectorExporterConfig.beaconBlobPropertyBag?.type);
+          assert.strictEqual(blobType, collectorExporterConfig.beaconBlobPropertyBag?.type);
 
           ensureExportTraceServiceRequestIsSet(json);
 
