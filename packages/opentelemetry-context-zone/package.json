@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-zone",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "description": "OpenTelemetry Context Zone",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -44,7 +44,7 @@
   "devDependencies": {
     "@babel/core": "7.14.8",
     "@types/mocha": "8.2.3",
-    "@types/node": "14.17.5",
+    "@types/node": "14.17.6",
     "@types/sinon": "10.0.2",
     "@types/webpack-env": "1.16.2",
     "babel-loader": "8.2.2",
@@ -66,7 +66,7 @@
     "webpack-merge": "5.8.0"
   },
   "dependencies": {
-    "@opentelemetry/context-zone-peer-dep": "0.23.0",
+    "@opentelemetry/context-zone-peer-dep": "0.24.0",
     "zone.js": "^0.11.0"
   },
   "sideEffects": true

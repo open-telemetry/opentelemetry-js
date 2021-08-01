@@ -1,6 +1,6 @@
 {
   "name": "opentelemetry",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "description": "OpenTelemetry is a distributed tracing and stats collection framework.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -47,8 +47,8 @@
   "devDependencies": {
     "@commitlint/cli": "12.1.4",
     "@commitlint/config-conventional": "12.1.4",
-    "@typescript-eslint/eslint-plugin": "4.28.4",
-    "@typescript-eslint/parser": "4.28.4",
+    "@typescript-eslint/eslint-plugin": "4.28.5",
+    "@typescript-eslint/parser": "4.28.5",
     "beautify-benchmark": "0.2.4",
     "benchmark": "2.1.4",
     "eslint": "7.31.0",
