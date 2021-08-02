@@ -29,9 +29,9 @@ import * as types from './types';
 /**
  * Base abstract internal class for instrumenting node and web plugins
  */
-export abstract class InstrumentationAbstract<T = any>
+export abstract class InstrumentationAbstract<InstrumentedModuleType = any, Config = types.InstrumentationConfig>
   implements types.Instrumentation {
-  protected _config: types.InstrumentationConfig;
+  protected _config: Partial<Config>;
 
   private _tracer: Tracer;
   private _meter: Meter;
@@ -40,7 +40,7 @@ export abstract class InstrumentationAbstract<T = any>
   constructor(
     public readonly instrumentationName: string,
     public readonly instrumentationVersion: string,
-    config: types.InstrumentationConfig = {}
+    config: Partial<Config> = {},
   ) {
     this._config = {
       enabled: true,
@@ -82,7 +82,7 @@ export abstract class InstrumentationAbstract<T = any>
   }
 
   /* Returns InstrumentationConfig */
-  public getConfig() {
+  public getConfig(): Partial<Config> {
     return this._config;
   }
 
@@ -90,7 +90,7 @@ export abstract class InstrumentationAbstract<T = any>
    * Sets InstrumentationConfig to this plugin
    * @param InstrumentationConfig
    */
-  public setConfig(config: types.InstrumentationConfig = {}) {
+  public setConfig(config: Partial<Config>) {
     this._config = Object.assign({}, config);
   }
 
@@ -121,7 +121,7 @@ export abstract class InstrumentationAbstract<T = any>
    * methods
    */
   protected abstract init():
-    | InstrumentationModuleDefinition<T>
-    | InstrumentationModuleDefinition<T>[]
+    | InstrumentationModuleDefinition<InstrumentedModuleType>
+    | InstrumentationModuleDefinition<InstrumentedModuleType>[]
     | void;
 }
