@@ -38,8 +38,14 @@ import { TestStackContextManager } from './TestStackContextManager';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 
 describe('SimpleSpanProcessor', () => {
-  const provider = new BasicTracerProvider();
-  const exporter = new InMemorySpanExporter();
+  let provider: BasicTracerProvider;
+  let exporter: InMemorySpanExporter;
+
+
+  beforeEach(() => {
+    provider = new BasicTracerProvider();
+    exporter = new InMemorySpanExporter();
+  });
 
   describe('constructor', () => {
     it('should create a SimpleSpanProcessor instance', () => {
@@ -103,7 +109,7 @@ describe('SimpleSpanProcessor', () => {
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
         spanId: '5e0c63257de34c92',
-        traceFlags: TraceFlags.NONE,
+        traceFlags: TraceFlags.SAMPLED,
       };
       const span = new Span(
         provider.getTracer('default'),

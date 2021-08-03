@@ -16,6 +16,7 @@
 
 import { diag } from '@opentelemetry/api';
 import {
+  AlwaysOffSampler,
   AlwaysOnSampler,
   ExportResultCode,
   loggingErrorHandler,
@@ -32,6 +33,15 @@ import { BatchSpanProcessorBase } from '../../../src/export/BatchSpanProcessorBa
 function createSampledSpan(spanName: string): Span {
   const tracer = new BasicTracerProvider({
     sampler: new AlwaysOnSampler(),
+  }).getTracer('default');
+  const span = tracer.startSpan(spanName);
+  span.end();
+  return span as Span;
+}
+
+function createUnsampledSpan(spanName: string): Span {
+  const tracer = new BasicTracerProvider({
+    sampler: new AlwaysOffSampler(),
   }).getTracer('default');
   const span = tracer.startSpan(spanName);
   span.end();
@@ -139,6 +149,20 @@ describe('BatchSpanProcessorBase', () => {
       assert.strictEqual(spy.args.length, 2);
       assert.strictEqual(processor['_finishedSpans'].length, 0);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
+    });
+
+    it('should not export unsampled spans', async () => {
+      const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
+      const spy: sinon.SinonSpy = sinon.spy(exporter, 'export') as any;
+
+      const span = createUnsampledSpan(`${name}_0`);
+
+      processor.onEnd(span);
+
+      await processor.forceFlush();
+      assert.strictEqual(processor['_finishedSpans'].length, 0);
+      assert.strictEqual(exporter.getFinishedSpans().length, 0);
+      assert.strictEqual(spy.args.length, 0);
     });
 
     it('should export the sampled spans with buffer size reached', done => {
