@@ -5,6 +5,7 @@
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "scripts": {
+    "precompile": "lerna run version",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json",
