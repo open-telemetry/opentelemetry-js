@@ -22,7 +22,7 @@ import {
   MeterProvider,
   LastValueAggregator,
   HistogramAggregator,
-} from '@opentelemetry/sdk-base-metrics';
+} from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as http from 'http';

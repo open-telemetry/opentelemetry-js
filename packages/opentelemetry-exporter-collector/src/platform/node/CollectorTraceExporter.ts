@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-base-tracing';
+import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { CollectorExporterNodeConfigBase } from './types';
 import * as collectorTypes from '../../types';

@@ -28,11 +28,11 @@ import { Socket } from 'net';
 import { assertSpan } from '../utils/assertSpan';
 import * as url from 'url';
 import * as utils from '../utils/utils';
-import { NodeTracerProvider } from '@opentelemetry/sdk-node-tracing';
+import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/sdk-base-tracing';
+} from '@opentelemetry/sdk-trace-base';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { HttpInstrumentation } from '../../src';
 

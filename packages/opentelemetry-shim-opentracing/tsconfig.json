@@ -22,7 +22,7 @@
       "path": "../opentelemetry-semantic-conventions"
     },
     {
-      "path": "../opentelemetry-sdk-base-tracing"
+      "path": "../opentelemetry-sdk-trace-base"
     }
   ]
 }

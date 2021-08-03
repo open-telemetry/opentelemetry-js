@@ -30,7 +30,7 @@ import {
   PerformanceTimingNames as PTN,
   shouldPropagateTraceHeaders,
   getUrlNormalizingAnchor
-} from '@opentelemetry/sdk-web-tracing';
+} from '@opentelemetry/sdk-trace-web';
 import { EventNames } from './enums/EventNames';
 import {
   OpenFunction,

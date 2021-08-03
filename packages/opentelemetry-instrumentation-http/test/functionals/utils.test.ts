@@ -21,7 +21,7 @@ import {
   TraceFlags,
   context,
 } from '@opentelemetry/api';
-import { BasicTracerProvider, Span } from '@opentelemetry/sdk-base-tracing';
+import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as http from 'http';
