@@ -18,6 +18,7 @@ import { TracerProvider } from '@opentelemetry/api';
 import { MeterProvider } from '@opentelemetry/api-metrics';
 import { Instrumentation } from './types';
 import { AutoLoaderResult, InstrumentationOption } from './types_internal';
+import { InstrumentationBase } from './platform';
 
 /**
  * Parses the options and returns instrumentations, node plugins and
@@ -29,18 +30,26 @@ export function parseInstrumentationOptions(
 ): AutoLoaderResult {
   let instrumentations: Instrumentation[] = [];
   for (let i = 0, j = options.length; i < j; i++) {
-    const option = options[i] as any;
+    const option = options[i];
     if (Array.isArray(option)) {
       const results = parseInstrumentationOptions(option);
       instrumentations = instrumentations.concat(results.instrumentations);
-    } else if (typeof option === 'function') {
+    } else if (isInstrumentationClass(option)) {
       instrumentations.push(new option());
-    } else if ((option as Instrumentation).instrumentationName) {
+    } else if (isInstrumentation(option)) {
       instrumentations.push(option);
     }
   }
 
   return { instrumentations };
+}
+
+function isInstrumentationClass<T extends InstrumentationBase>(option: InstrumentationOption): option is new () => T {
+  return typeof option === 'function';
+}
+
+function isInstrumentation(option: InstrumentationOption): option is Instrumentation {
+  return Boolean((option as Instrumentation).instrumentationName);
 }
 
 /**
@@ -53,7 +62,7 @@ export function enableInstrumentations(
   instrumentations: Instrumentation[],
   tracerProvider?: TracerProvider,
   meterProvider?: MeterProvider
-) {
+): void {
   for (let i = 0, j = instrumentations.length; i < j; i++) {
     const instrumentation = instrumentations[i];
     if (tracerProvider) {
@@ -76,6 +85,6 @@ export function enableInstrumentations(
  * Disable instrumentations
  * @param instrumentations
  */
-export function disableInstrumentations(instrumentations: Instrumentation[]) {
+export function disableInstrumentations(instrumentations: Instrumentation[]): void {
   instrumentations.forEach(instrumentation => instrumentation.disable());
 }
