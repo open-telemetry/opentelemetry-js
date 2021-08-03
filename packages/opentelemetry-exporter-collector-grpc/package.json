@@ -16,7 +16,9 @@
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "version": "node ../../scripts/version-update.js",
-    "watch": "npm run protos:copy && tsc -w"
+    "watch": "npm run protos:copy && tsc -w",
+    "precompile": "npm run version",
+    "prewatch": "npm run version"
   },
   "keywords": [
     "opentelemetry",
