@@ -346,7 +346,6 @@ export interface CollectorExporterConfigBase {
   attributes?: SpanAttributes;
   url?: string;
   concurrencyLimit?: number;
-  beaconBlobPropertyBag?: BlobPropertyBag;
 }
 
 /**

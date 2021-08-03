@@ -22,8 +22,6 @@ import { sendWithBeacon, sendWithXhr } from './util';
 import { diag } from '@opentelemetry/api';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 
-const DEFAULT_BLOB_PROPERTY_BAG: BlobPropertyBag = { type: 'application/json' };
-
 /**
  * Collector Metric Exporter abstract base class
  */
@@ -37,7 +35,6 @@ export abstract class CollectorExporterBrowserBase<
   > {
   protected _headers: Record<string, string>;
   private _useXHR: boolean = false;
-  private _blobPropertBag: BlobPropertyBag = {};
 
   /**
    * @param config
@@ -56,10 +53,6 @@ export abstract class CollectorExporterBrowserBase<
       );
     } else {
       this._headers = {};
-      this._blobPropertBag = {
-        ...DEFAULT_BLOB_PROPERTY_BAG,
-        ...config.beaconBlobPropertyBag
-      }
     }
   }
 
@@ -101,7 +94,7 @@ export abstract class CollectorExporterBrowserBase<
       if (this._useXHR) {
         sendWithXhr(body, this.url, this._headers, _onSuccess, _onError);
       } else {
-        sendWithBeacon(body, this.url, this._blobPropertBag, _onSuccess, _onError);
+        sendWithBeacon(body, this.url, { type: 'application/json' }, _onSuccess, _onError);
       }
     });
     this._sendingPromises.push(promise);

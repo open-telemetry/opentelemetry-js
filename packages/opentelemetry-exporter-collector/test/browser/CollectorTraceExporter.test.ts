@@ -56,7 +56,6 @@ describe('CollectorTraceExporter - web', () => {
         hostname: 'foo',
         attributes: {},
         url: 'http://foo.bar.com',
-        beaconBlobPropertyBag: { type: 'text/plain' },
       };
     });
 
@@ -75,7 +74,6 @@ describe('CollectorTraceExporter - web', () => {
           const url = args[0];
           const blob: Blob = args[1];
           const body = await blob.text();
-          const blobType: string = blob.type;
           const json = JSON.parse(
             body
           ) as collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
@@ -97,8 +95,6 @@ describe('CollectorTraceExporter - web', () => {
           assert.strictEqual(stubBeacon.callCount, 1);
 
           assert.strictEqual(stubOpen.callCount, 0);
-
-          assert.strictEqual(blobType, collectorExporterConfig.beaconBlobPropertyBag?.type);
 
           ensureExportTraceServiceRequestIsSet(json);
 
