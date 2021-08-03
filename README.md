@@ -283,11 +283,18 @@ To request automatic tracing support for a module not on this list, please [file
 
 ## Upgrade guidelines
 
-### 0.23.x to x
+### 0.24.x to x
+
+- SDKs packages for trace and metrics has been renamed to have a consistent naming schema:
+  - @opentelemetry/tracing -> @opentelemetry/sdk-trace-base
+  - @opentelemetry/node -> @opentelemetry/sdk-trace-node
+  - @opentelemetry/web -> @opentelemetry/sdk-trace-web
+  - @opentelemetry/metrics -> @opentelemetry/sdk-metrics-base
+  - @opentelemetry/node-sdk -> @opentelemetry/sdk-node
+
+### 0.23.x to 0.24.x
 
 - `ResourceAttributes` renamed to `SemanticResourceAttributes` in the `@opentelemetry/semantic-conventions` package
-
-### 0.20.x to x
 
 ### 0.19.x to 0.20.0
 
