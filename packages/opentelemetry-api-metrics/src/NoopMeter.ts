@@ -33,7 +33,7 @@ import {
   BoundBaseObserver,
 } from './types/BoundInstrument';
 import { ObserverResult } from './types/ObserverResult';
-import { Observation } from '.';
+import { Observation } from './types/Observation';
 
 /**
  * NoopMeter is a noop implementation of the {@link Meter} interface. It reuses
