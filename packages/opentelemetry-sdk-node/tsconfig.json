@@ -28,12 +28,6 @@
       "path": "../opentelemetry-node"
     },
     {
-      "path": "../opentelemetry-resource-detector-aws"
-    },
-    {
-      "path": "../opentelemetry-resource-detector-gcp"
-    },
-    {
       "path": "../opentelemetry-resources"
     },
     {
