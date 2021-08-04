@@ -17,8 +17,8 @@
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "version": "node ../../scripts/version-update.js",
     "watch": "npm run protos:copy && tsc -w",
-    "precompile": "npm run version",
-    "prewatch": "npm run version"
+    "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
+    "prewatch": "npm run precompile"
   },
   "keywords": [
     "opentelemetry",

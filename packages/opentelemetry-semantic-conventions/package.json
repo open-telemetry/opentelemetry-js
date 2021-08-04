@@ -15,8 +15,8 @@
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "version": "node ../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json",
-    "precompile": "npm run version",
-    "prewatch": "npm run version"
+    "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
+    "prewatch": "npm run precompile"
   },
   "keywords": [
     "opentelemetry",
