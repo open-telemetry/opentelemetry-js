@@ -7,6 +7,7 @@
   "scripts": {
     "precompile": "lerna run version",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json",
+    "prewatch": "npm run precompile",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json",
     "bench": "node benchmark",
