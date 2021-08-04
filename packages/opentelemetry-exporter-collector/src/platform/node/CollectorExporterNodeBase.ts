@@ -18,11 +18,12 @@ import type * as http from 'http';
 import type * as https from 'https';
 
 import { CollectorExporterBase } from '../../CollectorExporterBase';
-import { CollectorExporterNodeConfigBase } from './types';
+import { CollectorExporterNodeConfigBase, CompressionAlgorithm } from './types';
 import * as collectorTypes from '../../types';
 import { parseHeaders } from '../../util';
 import { createHttpAgent, sendWithHttp } from './util';
 import { diag } from '@opentelemetry/api';
+import { getEnv, baggageUtils } from '@opentelemetry/core';
 
 /**
  * Collector Metric Exporter abstract base class
@@ -38,13 +39,20 @@ export abstract class CollectorExporterNodeBase<
   DEFAULT_HEADERS: Record<string, string> = {};
   headers: Record<string, string>;
   agent: http.Agent | https.Agent | undefined;
+  compression: CompressionAlgorithm;
+
   constructor(config: CollectorExporterNodeConfigBase = {}) {
     super(config);
     if ((config as any).metadata) {
       diag.warn('Metadata cannot be set when using http');
     }
-    this.headers = parseHeaders(config.headers) || this.DEFAULT_HEADERS;
+    this.headers = Object.assign(
+      this.DEFAULT_HEADERS,
+      parseHeaders(config.headers),
+      baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_HEADERS)
+    );
     this.agent = createHttpAgent(config);
+    this.compression = config.compression || CompressionAlgorithm.NONE;
   }
 
   onInit(_config: CollectorExporterNodeConfigBase): void {

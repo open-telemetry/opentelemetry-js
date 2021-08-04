@@ -1,13 +1,21 @@
 'use strict';
 
 const opentelemetry = require('@opentelemetry/api');
+const { Resource } = require('@opentelemetry/resources');
+const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 
-const provider = new BasicTracerProvider();
+const provider = new BasicTracerProvider({
+  resource: new Resource({
+    [SemanticResourceAttributes.SERVICE_NAME]: 'basic-service',
+  }),
+});
 
 // Configure span processor to send spans to the exporter
-const exporter = new JaegerExporter({ serviceName: 'basic-service' });
+const exporter = new JaegerExporter({
+  endpoint: 'http://localhost:14268/api/traces',
+});
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
@@ -37,7 +45,7 @@ exporter.shutdown();
 function doWork(parent) {
   // Start another span. In this example, the main method already started a
   // span, so that'll be the parent span, and this will be a child span.
-  const ctx = opentelemetry.setSpan(opentelemetry.context.active(), parent);
+  const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), parent);
   const span = tracer.startSpan('doWork', undefined, ctx);
 
   // simulate some random work.

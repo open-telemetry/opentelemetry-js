@@ -17,15 +17,13 @@
 import {
   context,
   TraceFlags,
-  setSpan,
-  setSpanContext,
-  getSpan,
-  propagation,
+  propagation, trace,
 } from '@opentelemetry/api';
 import { AlwaysOnSampler, AlwaysOffSampler } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { Span } from '@opentelemetry/tracing';
-import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
+import { Resource } from '@opentelemetry/resources';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as path from 'path';
 import { ContextManager, ROOT_CONTEXT } from '@opentelemetry/api';
@@ -98,7 +96,7 @@ describe('NodeTracerProvider', () => {
         sampler: new AlwaysOffSampler(),
       });
       const span = provider.getTracer('default').startSpan('my-span');
-      assert.strictEqual(span.context().traceFlags, TraceFlags.NONE);
+      assert.strictEqual(span.spanContext().traceFlags, TraceFlags.NONE);
       assert.strictEqual(span.isRecording(), false);
     });
 
@@ -108,7 +106,7 @@ describe('NodeTracerProvider', () => {
       });
       const span = provider.getTracer('default').startSpan('my-span');
       assert.ok(span instanceof Span);
-      assert.strictEqual(span.context().traceFlags, TraceFlags.SAMPLED);
+      assert.strictEqual(span.spanContext().traceFlags, TraceFlags.SAMPLED);
       assert.strictEqual(span.isRecording(), true);
     });
 
@@ -120,7 +118,7 @@ describe('NodeTracerProvider', () => {
       const sampledParent = provider.getTracer('default').startSpan(
         'not-sampled-span',
         {},
-        setSpanContext(ROOT_CONTEXT, {
+        trace.setSpanContext(ROOT_CONTEXT, {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
           traceFlags: TraceFlags.NONE,
@@ -128,16 +126,16 @@ describe('NodeTracerProvider', () => {
       );
       assert.ok(sampledParent instanceof Span);
       assert.strictEqual(
-        sampledParent.context().traceFlags,
+        sampledParent.spanContext().traceFlags,
         TraceFlags.SAMPLED
       );
       assert.strictEqual(sampledParent.isRecording(), true);
 
       const span = provider
         .getTracer('default')
-        .startSpan('child-span', {}, setSpan(ROOT_CONTEXT, sampledParent));
+        .startSpan('child-span', {}, trace.setSpan(ROOT_CONTEXT, sampledParent));
       assert.ok(span instanceof Span);
-      assert.strictEqual(span.context().traceFlags, TraceFlags.SAMPLED);
+      assert.strictEqual(span.spanContext().traceFlags, TraceFlags.SAMPLED);
       assert.strictEqual(span.isRecording(), true);
     });
 
@@ -147,7 +145,7 @@ describe('NodeTracerProvider', () => {
       assert.ok(span);
       assert.ok(span.resource instanceof Resource);
       assert.equal(
-        span.resource.attributes[TELEMETRY_SDK_RESOURCE.LANGUAGE],
+        span.resource.attributes[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE],
         'nodejs'
       );
     });
@@ -157,46 +155,46 @@ describe('NodeTracerProvider', () => {
     it('should run context with AsyncHooksContextManager context manager', done => {
       provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');
-      context.with(setSpan(context.active(), span), () => {
-        assert.deepStrictEqual(getSpan(context.active()), span);
+      context.with(trace.setSpan(context.active(), span), () => {
+        assert.deepStrictEqual(trace.getSpan(context.active()), span);
         return done();
       });
-      assert.deepStrictEqual(getSpan(context.active()), undefined);
+      assert.deepStrictEqual(trace.getSpan(context.active()), undefined);
     });
 
     it('should run context with AsyncHooksContextManager context manager with multiple spans', done => {
       provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');
-      context.with(setSpan(context.active(), span), () => {
-        assert.deepStrictEqual(getSpan(context.active()), span);
+      context.with(trace.setSpan(context.active(), span), () => {
+        assert.deepStrictEqual(trace.getSpan(context.active()), span);
 
         const span1 = provider.getTracer('default').startSpan('my-span1');
 
-        context.with(setSpan(context.active(), span1), () => {
-          assert.deepStrictEqual(getSpan(context.active()), span1);
+        context.with(trace.setSpan(context.active(), span1), () => {
+          assert.deepStrictEqual(trace.getSpan(context.active()), span1);
           assert.deepStrictEqual(
-            span1.context().traceId,
-            span.context().traceId
+            span1.spanContext().traceId,
+            span.spanContext().traceId
           );
           return done();
         });
       });
       // when span ended.
       // @todo: below check is not running.
-      assert.deepStrictEqual(getSpan(context.active()), undefined);
+      assert.deepStrictEqual(trace.getSpan(context.active()), undefined);
     });
 
     it('should find correct context with promises', async () => {
       provider = new NodeTracerProvider();
       const span = provider.getTracer('default').startSpan('my-span');
-      await context.with(setSpan(context.active(), span), async () => {
+      await context.with(trace.setSpan(context.active(), span), async () => {
         for (let i = 0; i < 3; i++) {
           await sleep(5).then(() => {
-            assert.deepStrictEqual(getSpan(context.active()), span);
+            assert.deepStrictEqual(trace.getSpan(context.active()), span);
           });
         }
       });
-      assert.deepStrictEqual(getSpan(context.active()), undefined);
+      assert.deepStrictEqual(trace.getSpan(context.active()), undefined);
     });
   });
 
@@ -205,10 +203,10 @@ describe('NodeTracerProvider', () => {
       const provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');
       const fn = () => {
-        assert.deepStrictEqual(getSpan(context.active()), span);
+        assert.deepStrictEqual(trace.getSpan(context.active()), span);
         return done();
       };
-      const patchedFn = context.bind(fn, setSpan(context.active(), span));
+      const patchedFn = context.bind(trace.setSpan(context.active(), span), fn);
       return patchedFn();
     });
   });

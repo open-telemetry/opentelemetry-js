@@ -31,7 +31,8 @@ import { UpDownCounterMetric } from './UpDownCounterMetric';
 import { UpDownSumObserverMetric } from './UpDownSumObserverMetric';
 import { ValueObserverMetric } from './ValueObserverMetric';
 import { ValueRecorderMetric } from './ValueRecorderMetric';
-import merge = require('lodash.merge');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const merge = require('lodash.merge');
 
 /**
  * Meter is an implementation of the {@link Meter} interface.
@@ -56,7 +57,7 @@ export class Meter implements api.Meter {
     const mergedConfig = merge({}, DEFAULT_CONFIG, config);
     this._processor = mergedConfig.processor ?? new UngroupedProcessor();
     this._resource =
-      mergedConfig.resource || Resource.createTelemetrySDKResource();
+      mergedConfig.resource || Resource.empty();
     this._instrumentationLibrary = instrumentationLibrary;
     // start the push controller
     const exporter = mergedConfig.exporter || new NoopExporter();

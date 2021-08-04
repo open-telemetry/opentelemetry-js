@@ -21,13 +21,13 @@ import * as assert from 'assert';
 import * as http from 'http';
 import * as utils from '../../src/utils';
 import { DummyPropagation } from './DummyPropagation';
-import { AttributeNames } from '../../src/enums';
+import { AttributeNames } from '../../src/enums/AttributeNames';
 
 export const assertSpan = (
   span: ReadableSpan,
   kind: SpanKind,
   validations: {
-    httpStatusCode: number;
+    httpStatusCode?: number;
     httpMethod: string;
     resHeaders: http.IncomingHttpHeaders;
     hostname: string;
@@ -37,10 +37,11 @@ export const assertSpan = (
     forceStatus?: SpanStatus;
     serverName?: string;
     component: string;
+    noNetPeer?: boolean; // we don't expect net peer info when request throw before being sent
   }
 ) => {
-  assert.strictEqual(span.spanContext.traceId.length, 32);
-  assert.strictEqual(span.spanContext.spanId.length, 16);
+  assert.strictEqual(span.spanContext().traceId.length, 32);
+  assert.strictEqual(span.spanContext().spanId.length, 16);
   assert.strictEqual(span.kind, kind);
   assert.strictEqual(
     span.name,
@@ -110,14 +111,16 @@ export const assertSpan = (
       validations.hostname,
       'must be consistent (PEER_NAME and hostname)'
     );
-    assert.ok(
-      span.attributes[SemanticAttributes.NET_PEER_IP],
-      'must have PEER_IP'
-    );
-    assert.ok(
-      span.attributes[SemanticAttributes.NET_PEER_PORT],
-      'must have PEER_PORT'
-    );
+    if(!validations.noNetPeer) {
+      assert.ok(
+        span.attributes[SemanticAttributes.NET_PEER_IP],
+        'must have PEER_IP'
+      );
+      assert.ok(
+        span.attributes[SemanticAttributes.NET_PEER_PORT],
+        'must have PEER_PORT'
+      );  
+    }
     assert.ok(
       (span.attributes[SemanticAttributes.HTTP_URL] as string).indexOf(
         span.attributes[SemanticAttributes.NET_PEER_NAME] as string

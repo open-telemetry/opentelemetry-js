@@ -52,7 +52,6 @@ registerInstrumentations({
   instrumentations: [
     new DocumentLoad(),
   ],
-  tracerProvider: provider,
 });
 
 ```

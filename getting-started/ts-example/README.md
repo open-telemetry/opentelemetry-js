@@ -88,7 +88,6 @@ const provider: NodeTracerProvider = new NodeTracerProvider({
 provider.register();
 
 registerInstrumentations({
-  tracerProvider: provider,
   instrumentations: [
     new ExpressInstrumentation(),
     new HttpInstrumentation(),
@@ -132,19 +131,20 @@ import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express';
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 
 const provider: NodeTracerProvider = new NodeTracerProvider({
   logLevel: LogLevel.ERROR,
+  resource: new Resource({
+    [SemanticResourceAttributes.SERVICE_NAME]: 'getting-started',
+  }),
 });
-
-provider.register();
 
 provider.addSpanProcessor(
   new SimpleSpanProcessor(
     new ZipkinExporter({
       // For Jaeger, use the following line instead:
       // new JaegerExporter({
-      serviceName: 'getting-started',
       // If you are running your tracing backend on another host,
       // you can point to it using the `url` parameter of the
       // exporter config.
@@ -152,8 +152,9 @@ provider.addSpanProcessor(
   ),
 );
 
+provider.register();
+
 registerInstrumentations({
-  tracerProvider: provider,
   instrumentations: [
     new ExpressInstrumentation(),
     new HttpInstrumentation(),

@@ -19,6 +19,7 @@ import {
   isWrapped,
   InstrumentationBase,
   InstrumentationConfig,
+  safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import { hrTime, isUrlIgnored, otperformance } from '@opentelemetry/core';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
@@ -28,6 +29,7 @@ import {
   parseUrl,
   PerformanceTimingNames as PTN,
   shouldPropagateTraceHeaders,
+  getUrlNormalizingAnchor
 } from '@opentelemetry/web';
 import { EventNames } from './enums/EventNames';
 import {
@@ -44,6 +46,11 @@ import { AttributeNames } from './enums/AttributeNames';
 // hard to say how long it should really wait, seems like 300ms is
 // safe enough
 const OBSERVER_WAIT_TIME_MS = 300;
+
+export type XHRCustomAttributeFunction = (
+  span: api.Span,
+  xhr: XMLHttpRequest
+) => void;
 
 /**
  * XMLHttpRequest config
@@ -64,6 +71,8 @@ export interface XMLHttpRequestInstrumentationConfig
    * also not be traced.
    */
   ignoreUrls?: Array<string | RegExp>;
+  /** Function for adding custom attributes on the span */
+  applyCustomAttributesOnSpan?: XHRCustomAttributeFunction;
 }
 
 /**
@@ -110,7 +119,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       const headers: Partial<Record<string, unknown>> = {};
       api.propagation.inject(api.context.active(), headers);
       if (Object.keys(headers).length > 0) {
-        api.diag.debug('headers inject skipped due to CORS policy');
+        this._diag.debug('headers inject skipped due to CORS policy');
       }
       return;
     }
@@ -131,7 +140,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     span: api.Span,
     corsPreFlightRequest: PerformanceResourceTiming
   ): void {
-    api.context.with(api.setSpan(api.context.active(), span), () => {
+    api.context.with(api.trace.setSpan(api.context.active(), span), () => {
       const childSpan = this.tracer.startSpan('CORS Preflight', {
         startTime: corsPreFlightRequest[PTN.FETCH_START],
       });
@@ -171,6 +180,24 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     }
   }
 
+  private _applyAttributesAfterXHR(span: api.Span, xhr: XMLHttpRequest) {
+    const applyCustomAttributesOnSpan = this._getConfig()
+      .applyCustomAttributesOnSpan;
+    if (typeof applyCustomAttributesOnSpan === 'function') {
+      safeExecuteInTheMiddle(
+        () => applyCustomAttributesOnSpan(span, xhr),
+        error => {
+          if (!error) {
+            return;
+          }
+
+          this._diag.error('applyCustomAttributesOnSpan', error);
+        },
+        true
+      );
+    }
+  }
+
   /**
    * will collect information about all resources created
    * between "send" and "end" with additional waiting for main resource
@@ -190,10 +217,13 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     xhrMem.createdResources = {
       observer: new PerformanceObserver(list => {
         const entries = list.getEntries() as PerformanceResourceTiming[];
+        const urlNormalizingAnchor = getUrlNormalizingAnchor();
+        urlNormalizingAnchor.href = spanUrl;
+
         entries.forEach(entry => {
           if (
             entry.initiatorType === 'xmlhttprequest' &&
-            entry.name === spanUrl
+            entry.name === urlNormalizingAnchor.href
           ) {
             if (xhrMem.createdResources) {
               xhrMem.createdResources.entries.push(entry);
@@ -301,7 +331,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     method: string
   ): api.Span | undefined {
     if (isUrlIgnored(url, this._getConfig().ignoreUrls)) {
-      api.diag.debug('ignoring span as url matches ignored url');
+      this._diag.debug('ignoring span as url matches ignored url');
       return;
     }
     const spanName = `HTTP ${method.toUpperCase()}`;
@@ -398,6 +428,10 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       xhrMem.status = xhr.status;
       xhrMem.statusText = xhr.statusText;
       plugin._xhrMem.delete(xhr);
+
+      if (xhrMem.span) {
+        plugin._applyAttributesAfterXHR(xhrMem.span, xhr);
+      }
       const endTime = hrTime();
 
       // the timeout is needed as observer doesn't have yet information
@@ -450,7 +484,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
 
         if (currentSpan && spanUrl) {
           api.context.with(
-            api.setSpan(api.context.active(), currentSpan),
+            api.trace.setSpan(api.context.active(), currentSpan),
             () => {
               plugin._tasksCount++;
               xhrMem.sendStartTime = hrTime();
@@ -480,17 +514,17 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   /**
    * implements enable function
    */
-  enable() {
-    api.diag.debug('applying patch to', this.moduleName, this.version);
+  override enable() {
+    this._diag.debug('applying patch to', this.moduleName, this.version);
 
     if (isWrapped(XMLHttpRequest.prototype.open)) {
       this._unwrap(XMLHttpRequest.prototype, 'open');
-      api.diag.debug('removing previous patch from method open');
+      this._diag.debug('removing previous patch from method open');
     }
 
     if (isWrapped(XMLHttpRequest.prototype.send)) {
       this._unwrap(XMLHttpRequest.prototype, 'send');
-      api.diag.debug('removing previous patch from method send');
+      this._diag.debug('removing previous patch from method send');
     }
 
     this._wrap(XMLHttpRequest.prototype, 'open', this._patchOpen());
@@ -500,8 +534,8 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   /**
    * implements disable function
    */
-  disable() {
-    api.diag.debug('removing patch from', this.moduleName, this.version);
+  override disable() {
+    this._diag.debug('removing patch from', this.moduleName, this.version);
 
     this._unwrap(XMLHttpRequest.prototype, 'open');
     this._unwrap(XMLHttpRequest.prototype, 'send');

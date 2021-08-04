@@ -20,9 +20,10 @@ import {
   hrTimeToMicroseconds,
   VERSION,
 } from '@opentelemetry/core';
-import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
+import { Resource } from '@opentelemetry/resources';
 import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
 import * as assert from 'assert';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import {
   statusCodeTagName,
   statusDescriptionTagName,
@@ -31,9 +32,16 @@ import {
   _toZipkinTags,
 } from '../../src/transform';
 import * as zipkinTypes from '../../src/types';
-const tracer = new BasicTracerProvider().getTracer('default');
+const tracer = new BasicTracerProvider({
+  resource: Resource.default().merge(
+    new Resource({
+      [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+    })
+  ),
+}).getTracer('default');
 
-const language = tracer.resource.attributes[TELEMETRY_SDK_RESOURCE.LANGUAGE];
+const language =
+  tracer.resource.attributes[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE];
 
 const parentId = '5c1c63257de34c67';
 const spanContext: api.SpanContext = {
@@ -46,6 +54,7 @@ const DUMMY_RESOURCE = new Resource({
   service: 'ui',
   version: 1,
   cost: 112.12,
+  [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
 });
 
 describe('transform', () => {
@@ -83,7 +92,7 @@ describe('transform', () => {
         duration: hrTimeToMicroseconds(
           hrTimeDuration(span.startTime, span.endTime)
         ),
-        id: span.spanContext.spanId,
+        id: span.spanContext().spanId,
         localEndpoint: {
           serviceName: 'my-service',
         },
@@ -93,12 +102,13 @@ describe('transform', () => {
           key1: 'value1',
           key2: 'value2',
           [statusCodeTagName]: 'UNSET',
+          [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
           'telemetry.sdk.language': language,
           'telemetry.sdk.name': 'opentelemetry',
           'telemetry.sdk.version': VERSION,
         },
         timestamp: hrTimeToMicroseconds(span.startTime),
-        traceId: span.spanContext.traceId,
+        traceId: span.spanContext().traceId,
       });
     });
     it("should skip parentSpanId if doesn't exist", () => {
@@ -123,7 +133,7 @@ describe('transform', () => {
         duration: hrTimeToMicroseconds(
           hrTimeDuration(span.startTime, span.endTime)
         ),
-        id: span.spanContext.spanId,
+        id: span.spanContext().spanId,
         localEndpoint: {
           serviceName: 'my-service',
         },
@@ -131,12 +141,13 @@ describe('transform', () => {
         parentId: undefined,
         tags: {
           [statusCodeTagName]: 'UNSET',
+          [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
           'telemetry.sdk.language': language,
           'telemetry.sdk.name': 'opentelemetry',
           'telemetry.sdk.version': VERSION,
         },
         timestamp: hrTimeToMicroseconds(span.startTime),
-        traceId: span.spanContext.traceId,
+        traceId: span.spanContext().traceId,
       });
     });
     // SpanKind mapping tests
@@ -171,7 +182,7 @@ describe('transform', () => {
           duration: hrTimeToMicroseconds(
             hrTimeDuration(span.startTime, span.endTime)
           ),
-          id: span.spanContext.spanId,
+          id: span.spanContext().spanId,
           localEndpoint: {
             serviceName: 'my-service',
           },
@@ -179,12 +190,13 @@ describe('transform', () => {
           parentId: undefined,
           tags: {
             [statusCodeTagName]: 'UNSET',
+            [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
             'telemetry.sdk.language': language,
             'telemetry.sdk.name': 'opentelemetry',
             'telemetry.sdk.version': VERSION,
           },
           timestamp: hrTimeToMicroseconds(span.startTime),
-          traceId: span.spanContext.traceId,
+          traceId: span.spanContext().traceId,
         });
       })
     );
@@ -219,6 +231,7 @@ describe('transform', () => {
         cost: '112.12',
         service: 'ui',
         version: '1',
+        [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
       });
     });
     it('should map OpenTelemetry SpanStatus.code to a Zipkin tag', () => {
@@ -243,13 +256,18 @@ describe('transform', () => {
         span.status,
         statusCodeTagName,
         statusDescriptionTagName,
-        Resource.empty()
+        Resource.empty().merge(
+          new Resource({
+            [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+          })
+        )
       );
 
       assert.deepStrictEqual(tags, {
         key1: 'value1',
         key2: 'value2',
         [statusCodeTagName]: 'ERROR',
+        [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
       });
     });
     it('should map OpenTelemetry SpanStatus.message to a Zipkin tag', () => {
@@ -275,7 +293,11 @@ describe('transform', () => {
         span.status,
         statusCodeTagName,
         statusDescriptionTagName,
-        Resource.empty()
+        Resource.empty().merge(
+          new Resource({
+            [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
+          })
+        )
       );
 
       assert.deepStrictEqual(tags, {
@@ -283,6 +305,7 @@ describe('transform', () => {
         key2: 'value2',
         [statusCodeTagName]: 'ERROR',
         [statusDescriptionTagName]: status.message,
+        [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
       });
     });
   });

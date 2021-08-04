@@ -17,12 +17,12 @@
 import {
   SpanAttributes,
   Context,
-  getSpanContext,
+  isSpanContextValid,
   Link,
   Sampler,
   SamplingResult,
   SpanKind,
-  TraceFlags,
+  TraceFlags, trace,
 } from '@opentelemetry/api';
 import { globalErrorHandler } from '../../common/global-error-handler';
 import { AlwaysOffSampler } from './AlwaysOffSampler';
@@ -67,9 +67,9 @@ export class ParentBasedSampler implements Sampler {
     attributes: SpanAttributes,
     links: Link[]
   ): SamplingResult {
-    const parentContext = getSpanContext(context);
+    const parentContext = trace.getSpanContext(context);
 
-    if (!parentContext) {
+    if (!parentContext || !isSpanContextValid(parentContext)) {
       return this._root.shouldSample(
         context,
         traceId,

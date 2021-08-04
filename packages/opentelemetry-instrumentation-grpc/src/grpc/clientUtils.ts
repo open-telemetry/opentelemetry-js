@@ -31,7 +31,7 @@ import {
   _grpcStatusCodeToOpenTelemetryStatusCode,
   findIndex,
 } from '../utils';
-import { AttributeNames } from '../enums';
+import { AttributeNames } from '../enums/AttributeNames';
 
 /**
  * This method handles the client remote call
@@ -76,7 +76,7 @@ export const makeGrpcClientRemoteCall = function (
       span.end();
       callback(err, res);
     };
-    return context.bind(wrappedFn);
+    return context.bind(context.active(), wrappedFn);
   }
 
   return (span: Span) => {
@@ -118,7 +118,7 @@ export const makeGrpcClientRemoteCall = function (
           spanEnded = true;
         }
       };
-      context.bind(call);
+      context.bind(context.active(), call);
       ((call as unknown) as events.EventEmitter).on(
         'error',
         (err: grpcTypes.ServiceError) => {

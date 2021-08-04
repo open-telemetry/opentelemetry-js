@@ -16,11 +16,11 @@
 
 import {
   Context,
-  isInstrumentationSuppressed,
   TextMapGetter,
   TextMapPropagator,
   TextMapSetter,
 } from '@opentelemetry/api';
+import { isTracingSuppressed } from '@opentelemetry/core';
 import { B3MultiPropagator } from './B3MultiPropagator';
 import { B3SinglePropagator } from './B3SinglePropagator';
 import { B3_CONTEXT_HEADER } from './constants';
@@ -54,14 +54,17 @@ export class B3Propagator implements TextMapPropagator {
   }
 
   inject(context: Context, carrier: unknown, setter: TextMapSetter) {
-    if (isInstrumentationSuppressed(context)) {
+    if (isTracingSuppressed(context)) {
       return;
     }
     this._inject(context, carrier, setter);
   }
 
   extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
-    if (getter.get(carrier, B3_CONTEXT_HEADER)) {
+    const header = getter.get(carrier, B3_CONTEXT_HEADER);
+    const b3Context = Array.isArray(header) ? header[0] : header;
+
+    if (b3Context) {
       return this._b3SinglePropagator.extract(context, carrier, getter);
     } else {
       return this._b3MultiPropagator.extract(context, carrier, getter);

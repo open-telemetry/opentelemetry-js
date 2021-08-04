@@ -17,11 +17,9 @@
 import {
   context,
   SpanKind,
-  propagation,
-  setSpan,
-  getSpan,
+  propagation, trace,
 } from '@opentelemetry/api';
-import { HttpTraceContext } from '@opentelemetry/core';
+import { HttpTraceContextPropagator } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { ContextManager } from '@opentelemetry/api';
@@ -388,7 +386,7 @@ export const runTests = (
     let contextManager: ContextManager;
 
     before(() => {
-      propagation.setGlobalPropagator(new HttpTraceContext());
+      propagation.setGlobalPropagator(new HttpTraceContextPropagator());
     });
 
     beforeEach(() => {
@@ -512,8 +510,8 @@ export const runTests = (
         const span = provider
           .getTracer('default')
           .startSpan('TestSpan', { kind: SpanKind.PRODUCER });
-        return context.with(setSpan(context.active(), span), async () => {
-          const rootSpan = getSpan(context.active());
+        return context.with(trace.setSpan(context.active(), span), async () => {
+          const rootSpan = trace.getSpan(context.active());
           if (!rootSpan) {
             return assert.ok(false);
           }
@@ -547,11 +545,11 @@ export const runTests = (
                 );
                 assertPropagation(serverSpan, clientSpan);
                 assert.strictEqual(
-                  rootSpan.context().traceId,
-                  serverSpan.spanContext.traceId
+                  rootSpan.spanContext().traceId,
+                  serverSpan.spanContext().traceId
                 );
                 assert.strictEqual(
-                  rootSpan.context().spanId,
+                  rootSpan.spanContext().spanId,
                   clientSpan.parentSpanId
                 );
               }
@@ -608,8 +606,8 @@ export const runTests = (
         const span = provider
           .getTracer('default')
           .startSpan('TestSpan', { kind: SpanKind.PRODUCER });
-        return context.with(setSpan(context.active(), span), async () => {
-          const rootSpan = getSpan(context.active());
+        return context.with(trace.setSpan(context.active(), span), async () => {
+          const rootSpan = trace.getSpan(context.active());
           if (!rootSpan) {
             return assert.ok(false);
           }
@@ -636,11 +634,11 @@ export const runTests = (
               assertSpan(moduleName, clientSpan, SpanKind.CLIENT, validations);
               assertPropagation(serverSpan, clientSpan);
               assert.strictEqual(
-                rootSpan.context().traceId,
-                serverSpan.spanContext.traceId
+                rootSpan.spanContext().traceId,
+                serverSpan.spanContext().traceId
               );
               assert.strictEqual(
-                rootSpan.context().spanId,
+                rootSpan.spanContext().spanId,
                 clientSpan.parentSpanId
               );
             });

@@ -3,6 +3,8 @@
 const opentelemetry = require('@opentelemetry/api');
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector');
+const { Resource } = require('@opentelemetry/resources');
+const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
 // const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector-grpc');
 // const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector-proto');
 
@@ -12,13 +14,16 @@ const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector');
 // );
 
 const exporter = new CollectorTraceExporter({
-  serviceName: 'basic-service',
   // headers: {
   //   foo: 'bar'
   // },
 });
 
-const provider = new BasicTracerProvider();
+const provider = new BasicTracerProvider({
+  resource: new Resource({
+    [SemanticResourceAttributes.SERVICE_NAME]: 'basic-service',
+  }),
+});
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.register();
@@ -42,7 +47,7 @@ setTimeout(() => {
 function doWork(parent) {
   // Start another span. In this example, the main method already started a
   // span, so that'll be the parent span, and this will be a child span.
-  const ctx = opentelemetry.setSpan(opentelemetry.context.active(), parent);
+  const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), parent);
   const span = tracer.startSpan('doWork', undefined, ctx);
 
   // simulate some random work.

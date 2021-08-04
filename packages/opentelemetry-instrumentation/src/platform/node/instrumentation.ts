@@ -17,7 +17,7 @@
 import * as types from '../../types';
 import * as path from 'path';
 import * as RequireInTheMiddle from 'require-in-the-middle';
-import * as semver from 'semver';
+import { satisfies } from 'semver';
 import { InstrumentationAbstract } from '../../instrumentation';
 import { InstrumentationModuleDefinition } from './types';
 import { diag } from '@opentelemetry/api';
@@ -50,29 +50,13 @@ export abstract class InstrumentationBase<T = any>
     if (this._modules.length === 0) {
       diag.warn(
         'No modules instrumentation has been defined,' +
-          ' nothing will be patched'
+        ' nothing will be patched'
       );
     }
 
     if (this._config.enabled) {
       this.enable();
     }
-  }
-
-  private _isSupported(name: string, version: string): boolean {
-    for (const module of this._modules) {
-      if (module.name === name) {
-        if (!module.supportedVersions) {
-          return true;
-        }
-
-        return module.supportedVersions.some(supportedVersion => {
-          return semver.satisfies(version, supportedVersion);
-        });
-      }
-    }
-
-    return false;
   }
 
   private _onRequire<T>(
@@ -89,11 +73,15 @@ export abstract class InstrumentationBase<T = any>
       return exports;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const version = require(path.join(baseDir, 'package.json')).version;
     module.moduleVersion = version;
     if (module.name === name) {
       // main module
-      if (typeof version === 'string' && this._isSupported(name, version)) {
+      if (
+        typeof version === 'string' &&
+        isSupported(module.supportedVersions, version, module.includePrerelease)
+      ) {
         if (typeof module.patch === 'function') {
           module.moduleExports = exports;
           if (this._enabled) {
@@ -105,12 +93,7 @@ export abstract class InstrumentationBase<T = any>
       // internal file
       const files = module.files ?? [];
       const file = files.find(file => file.name === name);
-      if (
-        file &&
-        file.supportedVersions.some(supportedVersion =>
-          semver.satisfies(version, supportedVersion)
-        )
-      ) {
+      if (file && isSupported(file.supportedVersions, version, module.includePrerelease)) {
         file.moduleExports = exports;
         if (this._enabled) {
           return file.patch(exports, module.moduleVersion);
@@ -178,4 +161,14 @@ export abstract class InstrumentationBase<T = any>
       }
     }
   }
+
+  public isEnabled() {
+    return this._enabled;
+  }
+}
+
+function isSupported(supportedVersions: string[], version: string, includePrerelease?: boolean): boolean {
+  return supportedVersions.some(supportedVersion => {
+    return satisfies(version, supportedVersion, { includePrerelease });
+  });
 }

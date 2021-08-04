@@ -46,8 +46,7 @@ span.end();
 
 Tracing configuration is a merge of user supplied configuration with both the default
 configuration as specified in [config.ts](./src/config.ts) and an
-environmentally configurable (via `OTEL_SAMPLING_PROBABILITY`) probability
-sampler delegate of a [ParentBased](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/sdk.md#parentbased) sampler.
+environmentally configurable sampling (via `OTEL_TRACES_SAMPLER` and `OTEL_TRACES_SAMPLER_ARG`).
 
 ## Example
 

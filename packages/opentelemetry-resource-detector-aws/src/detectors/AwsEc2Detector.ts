@@ -17,10 +17,13 @@
 import {
   Detector,
   Resource,
-  CLOUD_RESOURCE,
-  HOST_RESOURCE,
   ResourceDetectionConfig,
 } from '@opentelemetry/resources';
+import {
+  CloudProviderValues,
+  CloudPlatformValues,
+  SemanticResourceAttributes,
+} from '@opentelemetry/semantic-conventions';
 import * as http from 'http';
 
 /**
@@ -45,7 +48,7 @@ class AwsEc2Detector implements Detector {
 
   /**
    * Attempts to connect and obtain an AWS instance Identity document. If the
-   * connection is succesful it returns a promise containing a {@link Resource}
+   * connection is successful it returns a promise containing a {@link Resource}
    * populated with instance metadata. Returns a promise containing an
    * empty {@link Resource} if the connection or parsing of the identity
    * document fails.
@@ -64,13 +67,14 @@ class AwsEc2Detector implements Detector {
     const hostname = await this._fetchHost(token);
 
     return new Resource({
-      [CLOUD_RESOURCE.PROVIDER]: 'aws',
-      [CLOUD_RESOURCE.ACCOUNT_ID]: accountId,
-      [CLOUD_RESOURCE.REGION]: region,
-      [CLOUD_RESOURCE.ZONE]: availabilityZone,
-      [HOST_RESOURCE.ID]: instanceId,
-      [HOST_RESOURCE.TYPE]: instanceType,
-      [HOST_RESOURCE.NAME]: hostname,
+      [SemanticResourceAttributes.CLOUD_PROVIDER]: CloudProviderValues.AWS,
+      [SemanticResourceAttributes.CLOUD_PLATFORM]: CloudPlatformValues.AWS_EC2,
+      [SemanticResourceAttributes.CLOUD_ACCOUNT_ID]: accountId,
+      [SemanticResourceAttributes.CLOUD_REGION]: region,
+      [SemanticResourceAttributes.CLOUD_AVAILABILITY_ZONE]: availabilityZone,
+      [SemanticResourceAttributes.HOST_ID]: instanceId,
+      [SemanticResourceAttributes.HOST_TYPE]: instanceType,
+      [SemanticResourceAttributes.HOST_NAME]: hostname,
     });
   }
 

@@ -84,7 +84,6 @@ describe('CollectorMetricExporter - web', () => {
       beforeEach(() => {
         collectorExporter = new CollectorMetricExporter({
           url: 'http://foo.bar.com',
-          serviceName: 'bar',
         });
         // Overwrites the start time to make tests consistent
         Object.defineProperty(collectorExporter, '_startTime', {
@@ -193,7 +192,6 @@ describe('CollectorMetricExporter - web', () => {
         (window.navigator as any).sendBeacon = false;
         collectorExporter = new CollectorMetricExporter({
           url: 'http://foo.bar.com',
-          serviceName: 'bar',
         });
         // Overwrites the start time to make tests consistent
         Object.defineProperty(collectorExporter, '_startTime', {
@@ -378,5 +376,47 @@ describe('CollectorMetricExporter - web', () => {
         });
       });
     });
+  });
+});
+
+describe('when configuring via environment', () => {
+  const envSource = window as any;
+  it('should use url defined in env', () => {
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+    const collectorExporter = new CollectorMetricExporter();
+    assert.strictEqual(
+      collectorExporter.url,
+      envSource.OTEL_EXPORTER_OTLP_ENDPOINT
+    );
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+  });
+  it('should override global exporter url with signal url defined in env', () => {
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.metrics';
+    const collectorExporter = new CollectorMetricExporter();
+    assert.strictEqual(
+      collectorExporter.url,
+      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
+    );
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
+  });
+  it('should use headers defined via env', () => {
+    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
+    const collectorExporter = new CollectorMetricExporter({ headers: {} });
+    // @ts-expect-error access internal property for testing
+    assert.strictEqual(collectorExporter._headers.foo, 'bar');
+    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
+  });
+  it('should override global headers config with signal headers defined via env', () => {
+    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
+    envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
+    const collectorExporter = new CollectorMetricExporter({ headers: {} });
+    // @ts-expect-error access internal property for testing
+    assert.strictEqual(collectorExporter._headers.foo, 'boo');
+    // @ts-expect-error access internal property for testing
+    assert.strictEqual(collectorExporter._headers.bar, 'foo');
+    envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
+    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });
 });

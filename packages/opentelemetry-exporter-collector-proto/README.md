@@ -5,13 +5,18 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-This module provides exporter for node to be used with [opentelemetry-collector][opentelemetry-collector-url] - last tested with version **0.16.0**.
+This module provides exporter for node to be used with [opentelemetry-collector][opentelemetry-collector-url] - last tested with version **0.25.0**.
 
 ## Installation
 
 ```bash
 npm install --save @opentelemetry/exporter-collector-proto
 ```
+
+## Service Name
+
+The OpenTelemetry Collector Exporter does not have a service name configuration.
+In order to set the service name, use the `service.name` resource attribute as prescribed in the [OpenTelemetry Resource Semantic Conventions][semconv-resource-service-name].
 
 ## Traces in Node - PROTO over http
 
@@ -20,8 +25,7 @@ const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tra
 const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector-proto');
 
 const collectorOptions = {
-  serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/trace
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/traces
   headers: {
     foo: 'bar'
   }, //an optional object containing custom headers to be sent with each request will only work with http
@@ -41,7 +45,6 @@ provider.register();
 const { MeterProvider } = require('@opentelemetry/metrics');
 const { CollectorMetricExporter } =  require('@opentelemetry/exporter-collector-proto');
 const collectorOptions = {
-  serviceName: 'basic-service',
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/metrics
 };
 const exporter = new CollectorMetricExporter(collectorOptions);
@@ -84,3 +87,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-collector-proto
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-collector-proto.svg
 [opentelemetry-collector-url]: https://github.com/open-telemetry/opentelemetry-collector
+[semconv-resource-service-name]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service

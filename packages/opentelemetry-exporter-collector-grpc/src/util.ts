@@ -21,6 +21,7 @@ import { globalErrorHandler } from '@opentelemetry/core';
 import { collectorTypes } from '@opentelemetry/exporter-collector';
 import * as path from 'path';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
+import { URL } from 'url';
 import {
   CollectorExporterConfigNode,
   GRPCQueueItem,
@@ -32,7 +33,6 @@ export function onInit<ExportItem, ServiceRequest>(
   config: CollectorExporterConfigNode
 ): void {
   collector.grpcQueue = [];
-  const serverAddress = removeProtocol(collector.url);
   const credentials: grpc.ChannelCredentials =
     config.credentials || grpc.credentials.createInsecure();
 
@@ -51,15 +51,17 @@ export function onInit<ExportItem, ServiceRequest>(
       const packageObject: any = grpc.loadPackageDefinition(packageDefinition);
 
       if (collector.getServiceClientType() === ServiceClientType.SPANS) {
-        collector.serviceClient = new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(
-          serverAddress,
-          credentials
-        );
+        collector.serviceClient =
+          new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(
+            collector.url,
+            credentials,
+          );
       } else {
-        collector.serviceClient = new packageObject.opentelemetry.proto.collector.metrics.v1.MetricsService(
-          serverAddress,
-          credentials
-        );
+        collector.serviceClient =
+          new packageObject.opentelemetry.proto.collector.metrics.v1.MetricsService(
+            collector.url,
+            credentials,
+          );
       }
 
       if (collector.grpcQueue.length > 0) {
@@ -105,6 +107,21 @@ export function send<ExportItem, ServiceRequest>(
   }
 }
 
-function removeProtocol(url: string): string {
-  return url.replace(/^https?:\/\//, '');
+export function validateAndNormalizeUrl(url: string): string {
+  const hasProtocol = url.match(/^([\w]{1,8}):\/\//);
+  if (!hasProtocol) {
+    url = `https://${url}`;
+  }
+  const target = new URL(url);
+  if (target.pathname && target.pathname !== '/') {
+    diag.warn(
+      'URL path should not be set when using grpc, the path part of the URL will be ignored.'
+    );
+  }
+  if (target.protocol !== '' && !target.protocol?.match(/(http|grpc)s?/)) {
+    diag.warn(
+      'URL protocol should be http(s):// or grpc(s)://. Using grpc://.'
+    );
+  }
+  return target.host;
 }

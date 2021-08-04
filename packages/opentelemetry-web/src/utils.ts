@@ -30,13 +30,13 @@ import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 // Used to normalize relative URLs
 let a: HTMLAnchorElement | undefined;
-const getUrlNormalizingAnchor = () => {
+export function getUrlNormalizingAnchor(): HTMLAnchorElement {
   if (!a) {
     a = document.createElement('a');
   }
 
   return a;
-};
+}
 
 /**
  * Helper function to be able to use enum as typed key in type and in interface when using forEach
@@ -87,11 +87,19 @@ export function addSpanNetworkEvents(
   addSpanNetworkEvent(span, PTN.REQUEST_START, resource);
   addSpanNetworkEvent(span, PTN.RESPONSE_START, resource);
   addSpanNetworkEvent(span, PTN.RESPONSE_END, resource);
-  const contentLength = resource[PTN.ENCODED_BODY_SIZE];
-  if (contentLength !== undefined) {
+  const encodedLength = resource[PTN.ENCODED_BODY_SIZE];
+  if (encodedLength !== undefined) {
     span.setAttribute(
       SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH,
-      contentLength
+      encodedLength
+    );
+  }
+  const decodedLength = resource[PTN.DECODED_BODY_SIZE];
+  // Spec: Not set if transport encoding not used (in which case encoded and decoded sizes match)
+  if (decodedLength !== undefined && encodedLength !== decodedLength) {
+    span.setAttribute(
+      SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED,
+      decodedLength
     );
   }
 }
@@ -155,7 +163,7 @@ export function getResource(
       mainRequest: filteredResources[0],
     };
   }
-  const sorted = sortResources(filteredResources.slice());
+  const sorted = sortResources(filteredResources);
 
   const parsedSpanUrl = parseUrl(spanUrl);
   if (parsedSpanUrl.origin !== window.location.origin && sorted.length > 1) {

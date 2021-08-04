@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-import { Detector, Resource, CLOUD_RESOURCE, HOST_RESOURCE } from '../../src';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { Detector, Resource } from '../../src';
 
 class SampleDetector implements Detector {
   async detect(): Promise<Resource> {
     return new Resource({
-      [CLOUD_RESOURCE.PROVIDER]: 'provider',
-      [CLOUD_RESOURCE.ACCOUNT_ID]: 'accountId',
-      [CLOUD_RESOURCE.REGION]: 'region',
-      [CLOUD_RESOURCE.ZONE]: 'zone',
-      [HOST_RESOURCE.ID]: 'instanceId',
-      [HOST_RESOURCE.TYPE]: 'instanceType',
+      [SemanticResourceAttributes.CLOUD_PROVIDER]: 'provider',
+      [SemanticResourceAttributes.CLOUD_ACCOUNT_ID]: 'accountId',
+      [SemanticResourceAttributes.CLOUD_REGION]: 'region',
+      [SemanticResourceAttributes.CLOUD_AVAILABILITY_ZONE]: 'zone',
+      [SemanticResourceAttributes.HOST_ID]: 'instanceId',
+      [SemanticResourceAttributes.HOST_TYPE]: 'instanceType',
     });
   }
 }

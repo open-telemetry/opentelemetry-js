@@ -32,7 +32,7 @@ import {
 } from '../utils';
 import { CALL_SPAN_ENDED } from './serverUtils';
 import { EventEmitter } from 'events';
-import { AttributeNames } from '../enums';
+import { AttributeNames } from '../enums/AttributeNames';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 /**
@@ -110,7 +110,7 @@ export function makeGrpcClientRemoteCall(
       span.end();
       callback(err, res);
     };
-    return context.bind(wrappedFn);
+    return context.bind(context.active(), wrappedFn);
   }
 
   return (span: Span) => {
@@ -146,7 +146,7 @@ export function makeGrpcClientRemoteCall(
           spanEnded = true;
         }
       };
-      context.bind(call);
+      context.bind(context.active(), call);
       call.on('error', (err: grpcJs.ServiceError) => {
         if (call[CALL_SPAN_ENDED]) {
           return;

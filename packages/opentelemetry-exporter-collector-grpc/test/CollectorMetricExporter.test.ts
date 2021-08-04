@@ -129,9 +129,8 @@ const testCollectorMetricExporter = (params: TestParams) =>
           )
         : undefined;
       collectorExporter = new CollectorMetricExporter({
-        url: address,
+        url: 'grpcs://' + address,
         credentials,
-        serviceName: 'basic-service',
         metadata: params.metadata,
       });
       // Overwrites the start time to make tests consistent
@@ -166,17 +165,27 @@ const testCollectorMetricExporter = (params: TestParams) =>
 
     describe('instance', () => {
       it('should warn about headers', () => {
-        // Need to stub/spy on the underlying logger as the "diag" instance is global
+        // Need to stub/spy on the underlying logger as the 'diag' instance is global
         const spyLoggerWarn = sinon.stub(diag, 'warn');
         collectorExporter = new CollectorMetricExporter({
-          serviceName: 'basic-service',
-          url: address,
+          url: `http://${address}`,
           headers: {
             foo: 'bar',
           },
         });
         const args = spyLoggerWarn.args[0];
         assert.strictEqual(args[0], 'Headers cannot be set when using grpc');
+      });
+      it('should warn about path in url', () => {
+        const spyLoggerWarn = sinon.stub(diag, 'warn');
+        collectorExporter = new CollectorMetricExporter({
+          url: `http://${address}/v1/metrics`
+        });
+        const args = spyLoggerWarn.args[0];
+        assert.strictEqual(
+          args[0],
+          'URL path should not be set when using grpc, the path part of the URL will be ignored.'
+        );
       });
     });
 
@@ -241,9 +250,52 @@ describe('CollectorMetricExporter - node (getDefaultUrl)', () => {
     const url = 'http://foo.bar.com';
     const collectorExporter = new CollectorMetricExporter({ url });
     setTimeout(() => {
-      assert.strictEqual(collectorExporter['url'], url);
+      assert.strictEqual(collectorExporter['url'], 'foo.bar.com');
       done();
     });
+  });
+});
+
+describe('when configuring via environment', () => {
+  const envSource = process.env;
+  it('should use url defined in env', () => {
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+    const collectorExporter = new CollectorMetricExporter();
+    assert.strictEqual(
+      collectorExporter.url,
+      'foo.bar'
+    );
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+  });
+  it('should override global exporter url with signal url defined in env', () => {
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.metrics';
+    const collectorExporter = new CollectorMetricExporter();
+    assert.strictEqual(
+      collectorExporter.url,
+      'foo.metrics'
+    );
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
+  });
+  it('should use headers defined via env', () => {
+    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
+    const collectorExporter = new CollectorMetricExporter();
+    assert.deepStrictEqual(collectorExporter.metadata?.get('foo'), ['bar']);
+    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
+  });
+  it('should override global headers config with signal headers defined via env', () => {
+    const metadata = new grpc.Metadata();
+    metadata.set('foo', 'bar');
+    metadata.set('goo', 'lol');
+    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=jar,bar=foo';
+    envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
+    const collectorExporter = new CollectorMetricExporter({ metadata });
+    assert.deepStrictEqual(collectorExporter.metadata?.get('foo'), ['boo']);
+    assert.deepStrictEqual(collectorExporter.metadata?.get('bar'), ['foo']);
+    assert.deepStrictEqual(collectorExporter.metadata?.get('goo'), ['lol']);
+    envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
+    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });
 });
 

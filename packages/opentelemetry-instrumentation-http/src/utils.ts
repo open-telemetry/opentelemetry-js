@@ -18,6 +18,7 @@ import {
   SpanStatusCode,
   Span,
   SpanStatus,
+  context,
 } from '@opentelemetry/api';
 import {
   NetTransportValues,
@@ -31,9 +32,9 @@ import {
   RequestOptions,
   ServerResponse,
 } from 'http';
-import { Socket } from 'net';
+import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 import * as url from 'url';
-import { AttributeNames } from './enums';
+import { AttributeNames } from './enums/AttributeNames';
 import { Err, IgnoreMatcher, ParsedRequestOptions } from './types';
 
 /**
@@ -68,8 +69,13 @@ export const getAbsoluteUrl = (
  * Parse status code from HTTP response. [More details](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-http.md#status)
  */
 export const parseResponseStatus = (
-  statusCode: number
+  statusCode: number | undefined,
 ): Omit<SpanStatus, 'message'> => {
+
+  if(statusCode === undefined) {
+    return { code: SpanStatusCode.ERROR };
+  }
+
   // 1xx, 2xx, 3xx are OK
   if (statusCode >= 100 && statusCode < 400) {
     return { code: SpanStatusCode.OK };
@@ -328,11 +334,11 @@ export const isValidOptionsType = (options: unknown): boolean => {
 /**
  * Returns outgoing request attributes scoped to the options passed to the request
  * @param {ParsedRequestOptions} requestOptions the same options used to make the request
- * @param {{ component: string, hostname: string }} options used to pass data needed to create attributes
+ * @param {{ component: string, hostname: string, hookAttributes?: SpanAttributes }} options used to pass data needed to create attributes
  */
 export const getOutgoingRequestAttributes = (
   requestOptions: ParsedRequestOptions,
-  options: { component: string; hostname: string }
+  options: { component: string; hostname: string; hookAttributes?: SpanAttributes }
 ): SpanAttributes => {
   const host = requestOptions.host;
   const hostname =
@@ -357,7 +363,7 @@ export const getOutgoingRequestAttributes = (
   if (userAgent !== undefined) {
     attributes[SemanticAttributes.HTTP_USER_AGENT] = userAgent;
   }
-  return attributes;
+  return Object.assign(attributes, options.hookAttributes);
 };
 
 /**
@@ -409,11 +415,11 @@ export const getOutgoingRequestAttributesOnResponse = (
 /**
  * Returns incoming request attributes scoped to the request data
  * @param {IncomingMessage} request the request object
- * @param {{ component: string, serverName?: string }} options used to pass data needed to create attributes
+ * @param {{ component: string, serverName?: string, hookAttributes?: SpanAttributes }} options used to pass data needed to create attributes
  */
 export const getIncomingRequestAttributes = (
   request: IncomingMessage,
-  options: { component: string; serverName?: string }
+  options: { component: string; serverName?: string; hookAttributes?: SpanAttributes }
 ): SpanAttributes => {
   const headers = request.headers;
   const userAgent = headers['user-agent'];
@@ -457,7 +463,7 @@ export const getIncomingRequestAttributes = (
   setRequestContentLengthAttribute(request, attributes);
 
   const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
-  return Object.assign(attributes, httpKindAttributes);
+  return Object.assign(attributes, httpKindAttributes, options.hookAttributes);
 };
 
 /**
@@ -465,25 +471,15 @@ export const getIncomingRequestAttributes = (
  * @param {(ServerResponse & { socket: Socket; })} response the response object
  */
 export const getIncomingRequestAttributesOnResponse = (
-  request: IncomingMessage & { __ot_middlewares?: string[] },
-  response: ServerResponse & { socket: Socket }
+  request: IncomingMessage,
+  response: ServerResponse
 ): SpanAttributes => {
   // take socket from the request,
   // since it may be detached from the response object in keep-alive mode
   const { socket } = request;
   const { statusCode, statusMessage } = response;
   const { localAddress, localPort, remoteAddress, remotePort } = socket;
-  const { __ot_middlewares } = (request as unknown) as {
-    [key: string]: unknown;
-  };
-  const route = Array.isArray(__ot_middlewares)
-    ? __ot_middlewares
-        .filter(path => path !== '/')
-        .map(path => {
-          return path[0] === '/' ? path : '/' + path;
-        })
-        .join('')
-    : undefined;
+  const rpcMetadata = getRPCMetadata(context.active());
 
   const attributes: SpanAttributes = {
     [SemanticAttributes.NET_HOST_IP]: localAddress,
@@ -494,8 +490,8 @@ export const getIncomingRequestAttributesOnResponse = (
     [AttributeNames.HTTP_STATUS_TEXT]: (statusMessage || '').toUpperCase(),
   };
 
-  if (route !== undefined) {
-    attributes[SemanticAttributes.HTTP_ROUTE] = route;
+  if (rpcMetadata?.type === RPCType.HTTP && rpcMetadata.route !== undefined) {
+    attributes[SemanticAttributes.HTTP_ROUTE] = rpcMetadata.route;
   }
   return attributes;
 };

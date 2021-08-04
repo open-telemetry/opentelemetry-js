@@ -18,6 +18,7 @@ import { PerformanceTimingNames } from './enums/PerformanceTimingNames';
 export type PerformanceEntries = {
   [PerformanceTimingNames.CONNECT_END]?: number;
   [PerformanceTimingNames.CONNECT_START]?: number;
+  [PerformanceTimingNames.DECODED_BODY_SIZE]?: number;
   [PerformanceTimingNames.DOM_COMPLETE]?: number;
   [PerformanceTimingNames.DOM_CONTENT_LOADED_EVENT_END]?: number;
   [PerformanceTimingNames.DOM_CONTENT_LOADED_EVENT_START]?: number;

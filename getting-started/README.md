@@ -4,8 +4,8 @@ This guide walks you through the setup and configuration process for a tracing b
 
 - [Getting started with OpenTelemetry JS](#getting-started-with-opentelemetry-js)
   - [Trace your application with OpenTelemetry](#trace-your-application-with-opentelemetry)
-    - [Set up a Tracing Backend](#set-up-a-tracing-backend)
-    - [Trace Your NodeJS Application](#trace-your-nodejs-application)
+    - [Set up a tracing backend](#set-up-a-tracing-backend)
+    - [Trace your NodeJS application](#trace-your-nodejs-application)
       - [Install the required OpenTelemetry libraries](#install-the-required-opentelemetry-libraries)
       - [Initialize a global tracer](#initialize-a-global-tracer)
       - [Initialize and register a trace exporter](#initialize-and-register-a-trace-exporter)
@@ -58,10 +58,11 @@ To create traces on NodeJS, you need `@opentelemetry/node`, `@opentelemetry/core
 
 ```sh
 $ npm install \
-  @opentelemetry/core \
+  @opentelemetry/api \
   @opentelemetry/node \
   @opentelemetry/instrumentation-http \
-  @opentelemetry/instrumentation-express
+  @opentelemetry/instrumentation-express \
+  @opentelemetry/instrumentation-grpc
 ```
 
 #### Initialize a global tracer
@@ -92,7 +93,6 @@ registerInstrumentations({
     new HttpInstrumentation(),
     new GrpcInstrumentation(),
   ],
-  tracerProvider: provider,
 });
 
 ```
@@ -125,20 +125,25 @@ After you install these dependencies, initialize and register them. Modify `trac
 
 const { diag, DiagConsoleLogger, DiagLogLevel } = require("@opentelemetry/api");
 const { NodeTracerProvider } = require("@opentelemetry/node");
+const { Resource } = require('@opentelemetry/resources');
+const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
 const { SimpleSpanProcessor } = require("@opentelemetry/tracing");
 const { ZipkinExporter } = require("@opentelemetry/exporter-zipkin");
 const { registerInstrumentations } = require("@opentelemetry/instrumentation");
 const { HttpInstrumentation } = require("@opentelemetry/instrumentation-http");
 const { GrpcInstrumentation } = require("@opentelemetry/instrumentation-grpc");
 
-const provider = new NodeTracerProvider();
+const provider = new NodeTracerProvider({
+  resource: new Resource({
+    [SemanticResourceAttributes.SERVICE_NAME]: "getting-started",
+  })
+});
 
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ALL);
 
 provider.addSpanProcessor(
   new SimpleSpanProcessor(
     new ZipkinExporter({
-      serviceName: "getting-started",
       // If you are running your tracing backend on another host,
       // you can point to it using the `url` parameter of the
       // exporter config.
@@ -153,7 +158,6 @@ registerInstrumentations({
     new HttpInstrumentation(),
     new GrpcInstrumentation(),
   ],
-  tracerProvider: provider,
 });
 
 console.log("tracing initialized");

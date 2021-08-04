@@ -50,10 +50,10 @@ export class ZoneContextManager implements ContextManager {
   }
 
   /**
-   * @param target Function to be executed within the context
    * @param context A context (span) to be executed within target function
+   * @param target Function to be executed within the context
    */
-  private _bindFunction<T extends Function>(target: T, context: Context): T {
+  private _bindFunction<T extends Function>(context: Context, target: T): T {
     const manager = this;
     const contextWrapper = function (this: any, ...args: unknown[]) {
       return manager.with(context, () => target.apply(this, args));
@@ -68,10 +68,10 @@ export class ZoneContextManager implements ContextManager {
   }
 
   /**
-   * @param obj target object on which the listeners will be patched
    * @param context A context (span) to be bind to target
+   * @param obj target object on which the listeners will be patched
    */
-  private _bindListener<T>(obj: T, context: Context): T {
+  private _bindListener<T>(context: Context, obj: T): T {
     const target = (obj as unknown) as TargetWithEvents;
     if (target.__ot_listeners !== undefined) {
       return obj;
@@ -153,7 +153,7 @@ export class ZoneContextManager implements ContextManager {
         listeners = new WeakMap();
         target.__ot_listeners[event] = listeners;
       }
-      const patchedListener = contextManager.bind(listener, context);
+      const patchedListener = contextManager.bind(context, listener);
       // store a weak reference of the user listener to ours
       listeners.set(listener, patchedListener);
       return original.call(this, event, patchedListener, opts);
@@ -202,18 +202,19 @@ export class ZoneContextManager implements ContextManager {
 
   /**
    * Binds a the certain context or the active one to the target function and then returns the target
-   * @param target
    * @param context A context (span) to be bind to target
+   * @param target a function or event emitter. When target or one of its callbacks is called,
+   *  the provided context will be used as the active context for the duration of the call.
    */
-  bind<T>(target: T | TargetWithEvents, context: Context): T {
+  bind<T>(context: Context, target: T | TargetWithEvents): T {
     // if no specific context to propagate is given, we use the current one
     if (context === undefined) {
       context = this.active();
     }
     if (typeof target === 'function') {
-      return this._bindFunction(target, context);
+      return this._bindFunction(context, target);
     } else if (isListenerObject(target)) {
-      this._bindListener(target, context);
+      this._bindListener(context, target);
     }
     return (target as unknown) as T;
   }

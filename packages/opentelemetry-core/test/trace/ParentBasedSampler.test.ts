@@ -17,7 +17,7 @@ import * as assert from 'assert';
 import * as api from '@opentelemetry/api';
 import { AlwaysOnSampler } from '../../src/trace/sampler/AlwaysOnSampler';
 import { ParentBasedSampler } from '../../src/trace/sampler/ParentBasedSampler';
-import { TraceFlags, SpanKind, setSpanContext } from '@opentelemetry/api';
+import { TraceFlags, SpanKind, trace } from '@opentelemetry/api';
 import { AlwaysOffSampler } from '../../src/trace/sampler/AlwaysOffSampler';
 import { TraceIdRatioBasedSampler } from '../../src';
 
@@ -58,7 +58,7 @@ describe('ParentBasedSampler', () => {
     };
     assert.deepStrictEqual(
       sampler.shouldSample(
-        setSpanContext(api.ROOT_CONTEXT, spanContext),
+        trace.setSpanContext(api.ROOT_CONTEXT, spanContext),
         traceId,
         spanName,
         SpanKind.CLIENT,
@@ -67,6 +67,24 @@ describe('ParentBasedSampler', () => {
       ),
       {
         decision: api.SamplingDecision.NOT_RECORD,
+      }
+    );
+  });
+
+  it('should return api.SamplingDecision.RECORD_AND_SAMPLED for invalid parent spanContext while composited with AlwaysOnSampler', () => {
+    const sampler = new ParentBasedSampler({ root: new AlwaysOnSampler() });
+
+    assert.deepStrictEqual(
+      sampler.shouldSample(
+        trace.setSpanContext(api.ROOT_CONTEXT, api.INVALID_SPAN_CONTEXT),
+        traceId,
+        spanName,
+        SpanKind.CLIENT,
+        {},
+        []
+      ),
+      {
+        decision: api.SamplingDecision.RECORD_AND_SAMPLED,
       }
     );
   });
@@ -99,7 +117,7 @@ describe('ParentBasedSampler', () => {
     };
     assert.deepStrictEqual(
       sampler.shouldSample(
-        setSpanContext(api.ROOT_CONTEXT, spanContext),
+        trace.setSpanContext(api.ROOT_CONTEXT, spanContext),
         traceId,
         spanName,
         SpanKind.CLIENT,
@@ -108,6 +126,24 @@ describe('ParentBasedSampler', () => {
       ),
       {
         decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+      }
+    );
+  });
+
+  it('should return api.SamplingDecision.NOT_RECORD for invalid parent spanContext while composited with AlwaysOffSampler', () => {
+    const sampler = new ParentBasedSampler({ root: new AlwaysOffSampler() });
+
+    assert.deepStrictEqual(
+      sampler.shouldSample(
+        trace.setSpanContext(api.ROOT_CONTEXT, api.INVALID_SPAN_CONTEXT),
+        traceId,
+        spanName,
+        SpanKind.CLIENT,
+        {},
+        []
+      ),
+      {
+        decision: api.SamplingDecision.NOT_RECORD,
       }
     );
   });

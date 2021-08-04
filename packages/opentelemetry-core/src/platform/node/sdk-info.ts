@@ -15,11 +15,16 @@
  */
 
 import { VERSION } from '../../version';
+import {
+  TelemetrySdkLanguageValues,
+  SemanticResourceAttributes,
+} from '@opentelemetry/semantic-conventions';
 
 /** Constants describing the SDK in use */
 export const SDK_INFO = {
-  NAME: 'opentelemetry',
-  RUNTIME: 'node',
-  LANGUAGE: 'nodejs',
-  VERSION: VERSION,
+  [SemanticResourceAttributes.TELEMETRY_SDK_NAME]: 'opentelemetry',
+  [SemanticResourceAttributes.PROCESS_RUNTIME_NAME]: 'node',
+  [SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]:
+    TelemetrySdkLanguageValues.NODEJS,
+  [SemanticResourceAttributes.TELEMETRY_SDK_VERSION]: VERSION,
 };
