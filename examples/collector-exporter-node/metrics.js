@@ -12,7 +12,7 @@ const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventi
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
 
 const metricExporter = new CollectorMetricExporter({
-  // url: 'http://localhost:55681/v1/metrics',
+  // url: 'http://localhost:4318/v1/metrics',
 });
 
 const meter = new MeterProvider({

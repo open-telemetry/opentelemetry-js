@@ -28,7 +28,7 @@ import { WebTracerProvider } from '@opentelemetry/web';
 import { CollectorTraceExporter } from '@opentelemetry/exporter-collector';
 
 const collectorOptions = {
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/trace
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/trace
   headers: {}, // an optional object containing custom headers to be sent with each request
   concurrencyLimit: 10, // an optional limit on pending requests
 };
@@ -58,7 +58,7 @@ The CollectorMetricExporter in Web expects the endpoint to end in `/v1/metrics`.
 import { MeterProvider } from '@opentelemetry/metrics';
 import { CollectorMetricExporter } from '@opentelemetry/exporter-collector';
 const collectorOptions = {
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/metrics
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
   headers: {}, // an optional object containing custom headers to be sent with each request
   concurrencyLimit: 1, // an optional limit on pending requests
 };
@@ -83,7 +83,7 @@ const { BasicTracerProvider, BatchSpanProcessor } = require('@opentelemetry/trac
 const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector');
 
 const collectorOptions = {
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/trace
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/trace
   headers: {
     foo: 'bar'
   }, // an optional object containing custom headers to be sent with each request will only work with http
@@ -109,7 +109,7 @@ provider.register();
 const { MeterProvider } = require('@opentelemetry/metrics');
 const { CollectorMetricExporter } =  require('@opentelemetry/exporter-collector');
 const collectorOptions = {
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/metrics
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
   concurrencyLimit: 1, // an optional limit on pending requests
 };
 const exporter = new CollectorMetricExporter(collectorOptions);

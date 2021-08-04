@@ -10,7 +10,7 @@ services:
     ports:
       - "9464:9464"
       - "4317:4317"
-      - "55681:55681"
+      - "4318:4318"
     depends_on:
       - zipkin-all-in-one
 

@@ -21,7 +21,7 @@ import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { toCollectorExportMetricServiceRequest } from '../../transformMetrics';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 
-const DEFAULT_COLLECTOR_URL = 'http://localhost:55681/v1/metrics';
+const DEFAULT_COLLECTOR_URL = 'http://localhost:4318/v1/metrics';
 
 /**
  * Collector Metric Exporter for Node
