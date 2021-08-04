@@ -12,10 +12,10 @@
   },
   "repository": "https://github.com/open-telemetry/opentelemetry-js-api.git",
   "scripts": {
-    "build": "npm run compile",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p .",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p .",
+    "precompile": "npm run version",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json",
     "docs": "typedoc",
     "docs:deploy": "gh-pages --dist docs/out",
@@ -25,6 +25,7 @@
     "test:browser": "nyc karma start --single-run",
     "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
     "version": "node scripts/version-update.js",
+    "prewatch": "npm run version",
     "watch": "tsc --build --watch"
   },
   "keywords": [
