@@ -118,6 +118,7 @@ describe('SimpleSpanProcessor', () => {
         spanContext,
         SpanKind.CLIENT
       );
+      processor.onStart(span);
 
       sinon.stub(exporter, 'export').callsFake((_, callback) => {
         setTimeout(() => {
@@ -195,6 +196,7 @@ describe('SimpleSpanProcessor', () => {
         SpanKind.CLIENT
       );
 
+      processor.onStart(span);
       processor.onEnd(span);
 
       const exporterCreatedSpans = testTracingExporter.getExporterCreatedSpans();

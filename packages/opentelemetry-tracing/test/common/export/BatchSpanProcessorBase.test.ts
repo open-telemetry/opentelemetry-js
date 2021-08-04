@@ -131,12 +131,14 @@ describe('BatchSpanProcessorBase', () => {
 
       const span = createSampledSpan(`${name}_0`);
 
+      processor.onStart(span);
       processor.onEnd(span);
       assert.strictEqual(processor['_finishedSpans'].length, 1);
 
       await processor.forceFlush();
       assert.strictEqual(exporter.getFinishedSpans().length, 1);
 
+      processor.onStart(span);
       processor.onEnd(span);
       assert.strictEqual(processor['_finishedSpans'].length, 1);
 
@@ -145,6 +147,7 @@ describe('BatchSpanProcessorBase', () => {
       assert.strictEqual(spy.args.length, 2);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
+      processor.onStart(span);
       processor.onEnd(span);
       assert.strictEqual(spy.args.length, 2);
       assert.strictEqual(processor['_finishedSpans'].length, 0);
@@ -157,6 +160,7 @@ describe('BatchSpanProcessorBase', () => {
 
       const span = createUnsampledSpan(`${name}_0`);
 
+      processor.onStart(span);
       processor.onEnd(span);
 
       await processor.forceFlush();
@@ -177,6 +181,7 @@ describe('BatchSpanProcessorBase', () => {
         assert.strictEqual(exporter.getFinishedSpans().length, 0);
       }
       const span = createSampledSpan(`${name}_6`);
+      processor.onStart(span);
       processor.onEnd(span);
 
       setTimeout(async () => {
@@ -194,6 +199,7 @@ describe('BatchSpanProcessorBase', () => {
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
       for (let i = 0; i < defaultBufferConfig.maxExportBatchSize; i++) {
         const span = createSampledSpan(`${name}_${i}`);
+        processor.onStart(span);
         processor.onEnd(span);
         assert.strictEqual(exporter.getFinishedSpans().length, 0);
       }
@@ -212,6 +218,7 @@ describe('BatchSpanProcessorBase', () => {
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
       for (let i = 0; i < defaultBufferConfig.maxExportBatchSize; i++) {
         const span = createSampledSpan(`${name}_${i}`);
+        processor.onStart(span);
         processor.onEnd(span);
       }
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
@@ -259,9 +266,11 @@ describe('BatchSpanProcessorBase', () => {
         const totalSpans = defaultBufferConfig.maxExportBatchSize * 2;
         for (let i = 0; i < totalSpans; i++) {
           const span = createSampledSpan(`${name}_${i}`);
+          processor.onStart(span);
           processor.onEnd(span);
         }
         const span = createSampledSpan(`${name}_last`);
+        processor.onStart(span);
         processor.onEnd(span);
         clock.tick(defaultBufferConfig.scheduledDelayMillis + 10);
 
