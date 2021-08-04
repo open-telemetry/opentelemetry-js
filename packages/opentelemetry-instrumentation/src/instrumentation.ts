@@ -31,7 +31,7 @@ import * as types from './types';
  */
 export abstract class InstrumentationAbstract<InstrumentedModuleType = any, Config = types.InstrumentationConfig>
   implements types.Instrumentation {
-  protected _config: Partial<Config>;
+  protected _config: Config;
 
   private _tracer: Tracer;
   private _meter: Meter;
@@ -40,7 +40,7 @@ export abstract class InstrumentationAbstract<InstrumentedModuleType = any, Conf
   constructor(
     public readonly instrumentationName: string,
     public readonly instrumentationVersion: string,
-    config: Partial<Config> = {},
+    config: Config,
   ) {
     this._config = {
       enabled: true,
@@ -82,7 +82,7 @@ export abstract class InstrumentationAbstract<InstrumentedModuleType = any, Conf
   }
 
   /* Returns InstrumentationConfig */
-  public getConfig(): Partial<Config> {
+  public getConfig(): Config {
     return this._config;
   }
 
@@ -90,7 +90,7 @@ export abstract class InstrumentationAbstract<InstrumentedModuleType = any, Conf
    * Sets InstrumentationConfig to this plugin
    * @param InstrumentationConfig
    */
-  public setConfig(config: Partial<Config>) {
+  public setConfig(config: Config) {
     this._config = Object.assign({}, config);
   }
 
