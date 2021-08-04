@@ -16,7 +16,6 @@
 
 import { diag } from '@opentelemetry/api';
 import {
-  AlwaysOffSampler,
   AlwaysOnSampler,
   ExportResultCode,
   loggingErrorHandler,
@@ -26,6 +25,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { BasicTracerProvider, BufferConfig, InMemorySpanExporter, Span } from '../../../src';
 import { context } from '@opentelemetry/api';
+import { TestRecordOnlySampler } from './TestRecordOnlySampler';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { TestStackContextManager } from './TestStackContextManager';
 import { BatchSpanProcessorBase } from '../../../src/export/BatchSpanProcessorBase';
@@ -41,7 +41,7 @@ function createSampledSpan(spanName: string): Span {
 
 function createUnsampledSpan(spanName: string): Span {
   const tracer = new BasicTracerProvider({
-    sampler: new AlwaysOffSampler(),
+    sampler: new TestRecordOnlySampler(),
   }).getTracer('default');
   const span = tracer.startSpan(spanName);
   span.end();
