@@ -264,7 +264,7 @@ const meter = new MeterProvider({
 }).getMeter('your-meter-name');
 ```
 
-Now you can require this file from your application code and use the `Meter` to create and manage metrics. The simplest of these metrics is a counter. 
+Now you can require this file from your application code and use the `Meter` to create and manage metrics. The simplest of these metrics is a counter.
 
 Let's create and export from your `monitoring.js` file a middleware function that express can use to count all requests by route. Modify the `monitoring.js` file so it looks like this:
 
@@ -330,7 +330,6 @@ Listening for requests on http://localhost:8080
 ```
 
 Now, when you open <http://localhost:8080> in your web browser, you should see the metrics printed in the console by the `ConsoleMetricExporter`.
-
 
 ```json
 {
