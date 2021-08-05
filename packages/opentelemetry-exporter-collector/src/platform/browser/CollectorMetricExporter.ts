@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { MetricRecord, MetricExporter } from '@opentelemetry/metrics';
+import { MetricRecord, MetricExporter } from '@opentelemetry/sdk-metrics-base';
 import { CollectorExporterConfigBase } from '../../types';
 import * as collectorTypes from '../../types';
 import { CollectorExporterBrowserBase } from './CollectorExporterBrowserBase';

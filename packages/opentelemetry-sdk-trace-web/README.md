@@ -8,7 +8,7 @@
 This module provides *automated instrumentation and tracing* for Web applications.
 
 For manual instrumentation see the
-[@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-tracing) package.
+[@opentelemetry/sdk-trace-base](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base) package.
 
 ## How does automatic tracing work
 
@@ -27,14 +27,14 @@ You can choose to use the `ZoneContextManager` if you want to trace asynchronous
 ## Installation
 
 ```bash
-npm install --save @opentelemetry/web
+npm install --save @opentelemetry/sdk-trace-web
 ```
 
 ## Usage
 
 ```js
-import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
-import { WebTracerProvider } from '@opentelemetry/web';
+import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
+import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
 import { DocumentLoad } from '@opentelemetry/plugin-document-load';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
@@ -69,9 +69,9 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-web
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-web
-[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-web&type=dev
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-web&type=dev
-[npm-url]: https://www.npmjs.com/package/@opentelemetry/web
+[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-sdk-trace-web
+[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-sdk-trace-web
+[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-sdk-trace-web&type=dev
+[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-sdk-trace-web&type=dev
+[npm-url]: https://www.npmjs.com/package/@opentelemetry/sdk-trace-web
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fweb.svg

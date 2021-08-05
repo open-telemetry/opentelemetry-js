@@ -8,7 +8,7 @@
 This module provides *automated instrumentation and tracing* for Node.js applications.
 
 For manual instrumentation see the
-[@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-tracing) package.
+[@opentelemetry/sdk-trace-base](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base) package.
 
 ## How auto instrumentation works
 
@@ -30,13 +30,13 @@ This instrumentation code will automatically
 
 ## Creating custom spans on top of auto-instrumentation
 
-Additionally to automated instrumentation, `NodeTracerProvider` exposes the same API as [@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-tracing), allowing creating custom spans if needed.
+Additionally to automated instrumentation, `NodeTracerProvider` exposes the same API as [@opentelemetry/sdk-trace-base](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base), allowing creating custom spans if needed.
 
 ## Installation
 
 ```bash
 npm install --save @opentelemetry/api
-npm install --save @opentelemetry/node
+npm install --save @opentelemetry/sdk-trace-node
 
 # Install instrumentation plugins
 npm install --save @opentelemetry/instrumentation-http
@@ -53,7 +53,7 @@ using `@opentelemetry/plugin-http`.
 
 ```javascript
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
-const { NodeTracerProvider } = require('@opentelemetry/node');
+const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
 
 // Create and configure NodeTracerProvider
 const provider = new NodeTracerProvider();
@@ -119,9 +119,9 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-node
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-node
-[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-node&type=dev
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-node&type=dev
-[npm-url]: https://www.npmjs.com/package/@opentelemetry/node
+[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-sdk-trace-node
+[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-sdk-trace-node
+[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-sdk-trace-node&type=dev
+[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-sdk-trace-node&type=dev
+[npm-url]: https://www.npmjs.com/package/@opentelemetry/sdk-trace-node
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fnode.svg

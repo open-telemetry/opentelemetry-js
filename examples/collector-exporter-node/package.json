@@ -28,13 +28,13 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/api": "^1.0.1",
+    "@opentelemetry/api": "^1.0.2",
     "@opentelemetry/core": "0.24.0",
     "@opentelemetry/exporter-collector": "0.24.0",
     "@opentelemetry/exporter-collector-grpc": "0.24.0",
     "@opentelemetry/exporter-collector-proto": "0.24.0",
-    "@opentelemetry/metrics": "0.24.0",
-    "@opentelemetry/tracing": "0.24.0"
+    "@opentelemetry/sdk-metrics-base": "0.24.0",
+    "@opentelemetry/sdk-trace-base": "0.24.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme"
 }

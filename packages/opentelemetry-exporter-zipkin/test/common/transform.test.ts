@@ -21,7 +21,7 @@ import {
   VERSION,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
+import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import {

@@ -2,10 +2,10 @@
 
 const opentelemetry = require('@opentelemetry/api');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
-const { NodeTracerProvider } = require('@opentelemetry/node');
+const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
 const { Resource } = require('@opentelemetry/resources');
 const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
-const { SimpleSpanProcessor } = require('@opentelemetry/tracing');
+const { SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 const { GrpcInstrumentation } = require('@opentelemetry/instrumentation-grpc');

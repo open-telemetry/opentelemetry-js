@@ -1,7 +1,7 @@
 "use strict";
 
-const { NodeTracerProvider } = require("@opentelemetry/node");
-const { SimpleSpanProcessor } = require("@opentelemetry/tracing");
+const { NodeTracerProvider } = require("@opentelemetry/sdk-trace-node");
+const { SimpleSpanProcessor } = require("@opentelemetry/sdk-trace-base");
 const { Resource } = require('@opentelemetry/resources');
 const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
 const { ZipkinExporter } = require("@opentelemetry/exporter-zipkin");
