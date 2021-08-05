@@ -17,12 +17,12 @@
 import { TextMapPropagator } from '@opentelemetry/api';
 import { metrics } from '@opentelemetry/api-metrics';
 import { ContextManager } from '@opentelemetry/api';
-import { MeterConfig, MeterProvider } from '@opentelemetry/metrics';
+import { MeterConfig, MeterProvider } from '@opentelemetry/sdk-metrics-base';
 import {
   InstrumentationOption,
   registerInstrumentations,
 } from '@opentelemetry/instrumentation';
-import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/node';
+import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { awsEc2Detector } from '@opentelemetry/resource-detector-aws';
 import { gcpDetector } from '@opentelemetry/resource-detector-gcp';
 import {
@@ -32,7 +32,7 @@ import {
   Resource,
   ResourceDetectionConfig,
 } from '@opentelemetry/resources';
-import { BatchSpanProcessor, SpanProcessor } from '@opentelemetry/tracing';
+import { BatchSpanProcessor, SpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { NodeSDKConfiguration } from './types';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */

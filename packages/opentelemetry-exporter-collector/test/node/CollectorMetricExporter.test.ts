@@ -27,7 +27,7 @@ import {
   BoundValueRecorder,
   Metric,
   MetricRecord,
-} from '@opentelemetry/metrics';
+} from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';

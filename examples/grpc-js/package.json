@@ -29,13 +29,13 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.2.12",
-    "@opentelemetry/api": "^1.0.1",
+    "@opentelemetry/api": "^1.0.2",
     "@opentelemetry/exporter-jaeger": "0.24.0",
     "@opentelemetry/exporter-zipkin": "0.24.0",
     "@opentelemetry/instrumentation": "0.24.0",
     "@opentelemetry/instrumentation-grpc": "0.24.0",
-    "@opentelemetry/node": "0.24.0",
-    "@opentelemetry/tracing": "0.24.0",
+    "@opentelemetry/sdk-trace-node": "0.24.0",
+    "@opentelemetry/sdk-trace-base": "0.24.0",
     "google-protobuf": "^3.9.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",

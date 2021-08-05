@@ -43,12 +43,12 @@
     "@opentelemetry/api-metrics": "0.24.0",
     "@opentelemetry/core": "0.24.0",
     "@opentelemetry/instrumentation": "0.24.0",
-    "@opentelemetry/metrics": "0.24.0",
-    "@opentelemetry/node": "0.24.0",
+    "@opentelemetry/sdk-metrics-base": "0.24.0",
+    "@opentelemetry/sdk-trace-node": "0.24.0",
     "@opentelemetry/resource-detector-aws": "0.24.0",
     "@opentelemetry/resource-detector-gcp": "0.24.0",
     "@opentelemetry/resources": "0.24.0",
-    "@opentelemetry/tracing": "0.24.0"
+    "@opentelemetry/sdk-trace-base": "0.24.0"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.0.2"

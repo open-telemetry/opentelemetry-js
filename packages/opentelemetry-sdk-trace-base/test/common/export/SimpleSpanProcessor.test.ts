@@ -41,7 +41,6 @@ describe('SimpleSpanProcessor', () => {
   let provider: BasicTracerProvider;
   let exporter: InMemorySpanExporter;
 
-
   beforeEach(() => {
     provider = new BasicTracerProvider();
     exporter = new InMemorySpanExporter();

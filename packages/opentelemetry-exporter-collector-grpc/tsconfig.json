@@ -19,13 +19,13 @@
       "path": "../opentelemetry-exporter-collector"
     },
     {
-      "path": "../opentelemetry-metrics"
+      "path": "../opentelemetry-sdk-metrics-base"
     },
     {
       "path": "../opentelemetry-resources"
     },
     {
-      "path": "../opentelemetry-tracing"
+      "path": "../opentelemetry-sdk-trace-base"
     }
   ]
 }
