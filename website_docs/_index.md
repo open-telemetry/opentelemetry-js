@@ -12,10 +12,11 @@ export data.
 
 ## Status and Releases
 
-|       | Tracing | Metrics |
-| ----- | ------- | ------- |
-| API   | GA      | Alpha   |
-| SDK   | Beta    | Alpha   |
+| Signal  | API Status  | SDK Status        |
+|---------|-------------|-------------------|
+| Tracing | Stable      | Release Candidate |
+| Metrics | Development | Development       |
+| Logs    | Roadmap     | Roadmap           |
 
 You can find release information [here](https://github.com/open-telemetry/opentelemetry-js/releases)
 
