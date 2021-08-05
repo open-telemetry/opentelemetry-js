@@ -5,6 +5,13 @@ weight: 3
 
 This guide will cover creating and annotating spans, creating and annotating metrics, how to pass context, and a guide to automatic instrumentation for JavaScript. This simple example works in the browser as well as with Node.JS
 
+- [Example Application](#example-application)
+- [Creating Spans](#creating-spans)
+- [Attributes](#attributes)
+  - [Semantic Attributes](#semantic-attributes)
+
+## Example Application
+
 In the following this guide will use the following sample app:
 
 ```javascript
