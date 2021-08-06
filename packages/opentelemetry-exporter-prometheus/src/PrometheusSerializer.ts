@@ -17,7 +17,7 @@ import {
   MetricRecord,
   AggregatorKind,
   MetricKind,
-} from '@opentelemetry/metrics';
+} from '@opentelemetry/sdk-metrics-base';
 import { PrometheusCheckpoint } from './types';
 import { Labels } from '@opentelemetry/api-metrics';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';

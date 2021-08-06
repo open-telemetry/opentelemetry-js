@@ -23,13 +23,13 @@ export type Func<T> = (...args: unknown[]) => T;
 export interface TargetWithEvents {
   addEventListener?(
     event: string,
-    listener: (...args: any[]) => void,
+    listener: (...args: unknown[]) => void,
     opts?: { once: boolean }
-  ): any;
+  ): unknown;
   removeEventListener?(
     event: string,
-    listener: (...args: any[]) => void,
+    listener: (...args: unknown[]) => void,
     opts?: { once: boolean }
-  ): any;
+  ): unknown;
   __ot_listeners?: { [name: string]: WeakMap<Func<void>, Func<void>> };
 }

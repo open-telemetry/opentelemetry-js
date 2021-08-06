@@ -1,6 +1,6 @@
 'use strict';
 
-const { MeterProvider } = require('@opentelemetry/metrics');
+const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
 const { DiagConsoleLogger, DiagLogLevel, diag } = require('@opentelemetry/api');
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 

@@ -26,10 +26,10 @@
       "path": "../opentelemetry-semantic-conventions"
     },
     {
-      "path": "../opentelemetry-tracing"
+      "path": "../opentelemetry-sdk-trace-base"
     },
     {
-      "path": "../opentelemetry-web"
+      "path": "../opentelemetry-sdk-trace-web"
     }
   ]
 }
