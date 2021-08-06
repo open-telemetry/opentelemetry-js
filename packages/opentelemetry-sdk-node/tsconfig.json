@@ -22,12 +22,6 @@
       "path": "../opentelemetry-instrumentation"
     },
     {
-      "path": "../opentelemetry-sdk-metrics-base"
-    },
-    {
-      "path": "../opentelemetry-sdk-trace-node"
-    },
-    {
       "path": "../opentelemetry-resource-detector-aws"
     },
     {
@@ -37,7 +31,13 @@
       "path": "../opentelemetry-resources"
     },
     {
+      "path": "../opentelemetry-sdk-metrics-base"
+    },
+    {
       "path": "../opentelemetry-sdk-trace-base"
+    },
+    {
+      "path": "../opentelemetry-sdk-trace-node"
     }
   ]
 }

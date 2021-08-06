@@ -101,12 +101,6 @@
       "path": "packages/opentelemetry-instrumentation"
     },
     {
-      "path": "packages/opentelemetry-sdk-metrics-base"
-    },
-    {
-      "path": "packages/opentelemetry-sdk-trace-node"
-    },
-    {
       "path": "packages/opentelemetry-propagator-b3"
     },
     {
@@ -122,19 +116,25 @@
       "path": "packages/opentelemetry-resources"
     },
     {
+      "path": "packages/opentelemetry-sdk-metrics-base"
+    },
+    {
       "path": "packages/opentelemetry-sdk-node"
+    },
+    {
+      "path": "packages/opentelemetry-sdk-trace-base"
+    },
+    {
+      "path": "packages/opentelemetry-sdk-trace-node"
+    },
+    {
+      "path": "packages/opentelemetry-sdk-trace-web"
     },
     {
       "path": "packages/opentelemetry-semantic-conventions"
     },
     {
       "path": "packages/opentelemetry-shim-opentracing"
-    },
-    {
-      "path": "packages/opentelemetry-sdk-trace-base"
-    },
-    {
-      "path": "packages/opentelemetry-sdk-trace-web"
     },
     {
       "path": "packages/template"
