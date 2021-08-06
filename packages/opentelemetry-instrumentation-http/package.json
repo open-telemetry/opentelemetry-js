@@ -47,7 +47,7 @@
     "@opentelemetry/sdk-trace-base": "0.24.0",
     "@types/got": "9.6.12",
     "@types/mocha": "8.2.3",
-    "@types/node": "14.17.6",
+    "@types/node": "14.17.9",
     "@types/request-promise-native": "1.0.18",
     "@types/semver": "7.3.8",
     "@types/sinon": "10.0.2",
