@@ -2,7 +2,7 @@
   "name": "example-metrics",
   "private": true,
   "version": "0.24.0",
-  "description": "Example of using @opentelemetry/metrics",
+  "description": "Example of using @opentelemetry/sdk-metrics-base",
   "main": "index.js",
   "scripts": {
     "start:observer": "node metrics/observer.js"
@@ -26,10 +26,10 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/api": "^1.0.1",
+    "@opentelemetry/api": "^1.0.2",
     "@opentelemetry/core": "0.24.0",
     "@opentelemetry/exporter-prometheus": "0.24.0",
-    "@opentelemetry/metrics": "0.24.0"
+    "@opentelemetry/sdk-metrics-base": "0.24.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme"
 }

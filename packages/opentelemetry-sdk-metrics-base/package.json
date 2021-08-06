@@ -1,5 +1,5 @@
 {
-  "name": "@opentelemetry/metrics",
+  "name": "@opentelemetry/sdk-metrics-base",
   "version": "0.24.0",
   "description": "OpenTelemetry metrics SDK",
   "main": "build/src/index.js",

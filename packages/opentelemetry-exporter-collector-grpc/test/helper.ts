@@ -23,9 +23,9 @@ import {
   ValueType,
 } from '@opentelemetry/api-metrics';
 import { collectorTypes } from '@opentelemetry/exporter-collector';
-import * as metrics from '@opentelemetry/metrics';
+import * as metrics from '@opentelemetry/sdk-metrics-base';
 import { Resource } from '@opentelemetry/resources';
-import { ReadableSpan } from '@opentelemetry/tracing';
+import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as grpc from '@grpc/grpc-js';
 import { VERSION } from '@opentelemetry/core';

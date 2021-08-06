@@ -10,7 +10,7 @@ OpenTelemetry metrics allow a user to collect data and export it to a metrics ba
 ## Installation
 
 ```bash
-npm install --save @opentelemetry/metrics
+npm install --save @opentelemetry/sdk-metrics-base
 ```
 
 ## Usage
@@ -27,7 +27,7 @@ Example uses for Counter:
 - count the number of 5xx errors.
 
 ```js
-const { MeterProvider } = require('@opentelemetry/metrics');
+const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
 
 // Initialize the Meter to capture measurements in various ways.
 const meter = new MeterProvider().getMeter('your-meter-name');
@@ -56,7 +56,7 @@ Example uses for UpDownCounter:
 - count semaphore up and down operations
 
 ```js
-const { MeterProvider } = require('@opentelemetry/metrics');
+const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
 
 // Initialize the Meter to capture measurements in various ways.
 const meter = new MeterProvider().getMeter('your-meter-name');
@@ -79,7 +79,7 @@ Choose this kind of metric when only last value is important without worry about
 The callback can be sync or async.
 
 ```js
-const { MeterProvider } = require('@opentelemetry/metrics');
+const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
 
 const meter = new MeterProvider().getMeter('your-meter-name');
 
@@ -119,7 +119,7 @@ Choose this kind of metric when sum is important and you want to capture any val
 The callback can be sync or async.
 
 ```js
-const { MeterProvider } = require('@opentelemetry/metrics');
+const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
 
 const meter = new MeterProvider().getMeter('your-meter-name');
 
@@ -158,7 +158,7 @@ Choose this kind of metric when collecting a sum that never decreases.
 The callback can be sync or async.
 
 ```js
-const { MeterProvider } = require('@opentelemetry/metrics');
+const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
 
 const meter = new MeterProvider().getMeter('your-meter-name');
 
@@ -196,7 +196,7 @@ function getRandomValue() {
 Choose this kind of metric when you need to update multiple observers with the results of a single async calculation.
 
 ```js
-const { MeterProvider } = require('@opentelemetry/metrics');
+const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 
 const exporter = new PrometheusExporter(
@@ -264,9 +264,9 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-metrics
+[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-sdk-metrics-base
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-metrsics
-[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-metrics&type=dev
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-metrics&type=dev
-[npm-url]: https://www.npmjs.com/package/@opentelemetry/metrics
+[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-sdk-metrics-base&type=dev
+[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-sdk-metrics-base&type=dev
+[npm-url]: https://www.npmjs.com/package/@opentelemetry/sdk-metrics-base
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fmetrics.svg

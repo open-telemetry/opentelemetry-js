@@ -14,8 +14,8 @@
     "@opentelemetry/instrumentation-express": "^0.24.0",
     "@opentelemetry/instrumentation-http": "0.24.0",
     "@opentelemetry/instrumentation": "0.24.0",
-    "@opentelemetry/node": "0.24.0",
-    "@opentelemetry/tracing": "0.24.0",
+    "@opentelemetry/sdk-trace-node": "0.24.0",
+    "@opentelemetry/sdk-trace-base": "0.24.0",
     "axios": "^0.21.0",
     "express": "^4.17.1"
   }
