@@ -96,7 +96,7 @@ Use a custom propagator. Default: [CompositePropagator](../opentelemetry-core/sr
 
 ### metricProcessor
 
-Use a custom processor for metrics. Default: [UngroupedProcessor](../opentelemetry-metrics/src/export/Processor.ts#L50)
+Use a custom processor for metrics. Default: [UngroupedProcessor](../opentelemetry-sdk-metrics-base/src/export/Processor.ts#L50)
 
 ### metricExporter
 
@@ -124,11 +124,11 @@ Configure a custom sampler. By default all traces will be sampled.
 
 ### traceExporter
 
-Configure a trace exporter. If an exporter OR span processor is not configured, the tracing SDK will not be initialized and registered. If an exporter is configured, it will be used with a [BatchSpanProcessor](../opentelemetry-tracing/src/platform/node/export/BatchSpanProcessor.ts).
+Configure a trace exporter. If an exporter OR span processor is not configured, the tracing SDK will not be initialized and registered. If an exporter is configured, it will be used with a [BatchSpanProcessor](../opentelemetry-sdk-trace-base/src/platform/node/export/BatchSpanProcessor.ts).
 
 ### spanLimits
 
-Configure tracing parameters. These are the same trace parameters used to [configure a tracer](../opentelemetry-tracing/src/types.ts#L71).
+Configure tracing parameters. These are the same trace parameters used to [configure a tracer](../opentelemetry-sdk-trace-base/src/types.ts#L71).
 
 ## Useful links
 

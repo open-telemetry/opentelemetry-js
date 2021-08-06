@@ -18,7 +18,7 @@ import {
   BasicTracerProvider,
   SDKRegistrationConfig,
   TracerConfig,
-} from '@opentelemetry/tracing';
+} from '@opentelemetry/sdk-trace-base';
 import { StackContextManager } from './StackContextManager';
 
 /**

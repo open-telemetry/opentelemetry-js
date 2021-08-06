@@ -24,9 +24,9 @@ import {
 } from '@opentelemetry/api-metrics';
 import { hexToBase64 } from '@opentelemetry/core';
 import { collectorTypes } from '@opentelemetry/exporter-collector';
-import * as metrics from '@opentelemetry/metrics';
+import * as metrics from '@opentelemetry/sdk-metrics-base';
 import { Resource } from '@opentelemetry/resources';
-import { ReadableSpan } from '@opentelemetry/tracing';
+import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import { Stream } from 'stream';
 

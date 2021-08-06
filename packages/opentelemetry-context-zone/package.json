@@ -42,9 +42,9 @@
     "access": "public"
   },
   "devDependencies": {
-    "@babel/core": "7.14.8",
+    "@babel/core": "7.15.0",
     "@types/mocha": "8.2.3",
-    "@types/node": "14.17.6",
+    "@types/node": "14.17.9",
     "@types/sinon": "10.0.2",
     "@types/webpack-env": "1.16.2",
     "babel-loader": "8.2.2",
