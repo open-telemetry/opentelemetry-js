@@ -17,13 +17,13 @@
 import { SpanAttributes, TextMapPropagator, Sampler } from '@opentelemetry/api';
 import type { ContextManager } from '@opentelemetry/api';
 import { InstrumentationOption } from '@opentelemetry/instrumentation';
-import { MetricExporter, Processor } from '@opentelemetry/metrics';
+import { MetricExporter, Processor } from '@opentelemetry/sdk-metrics-base';
 import { Resource } from '@opentelemetry/resources';
 import {
   SpanExporter,
   SpanProcessor,
   SpanLimits,
-} from '@opentelemetry/tracing';
+} from '@opentelemetry/sdk-trace-base';
 
 export interface NodeSDKConfiguration {
   autoDetectResources: boolean;

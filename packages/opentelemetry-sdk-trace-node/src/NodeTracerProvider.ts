@@ -23,7 +23,7 @@ import {
   BasicTracerProvider,
   PROPAGATOR_FACTORY,
   SDKRegistrationConfig,
-} from '@opentelemetry/tracing';
+} from '@opentelemetry/sdk-trace-base';
 import * as semver from 'semver';
 import { NodeTracerConfig } from './config';
 import { JaegerPropagator } from '@opentelemetry/propagator-jaeger';

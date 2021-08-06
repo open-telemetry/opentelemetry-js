@@ -33,6 +33,7 @@ import {
   BoundBaseObserver,
 } from './types/BoundInstrument';
 import { ObserverResult } from './types/ObserverResult';
+import { Observation } from './types/Observation';
 
 /**
  * NoopMeter is a noop implementation of the {@link Meter} interface. It reuses
@@ -159,7 +160,7 @@ export class NoopMetric<T> implements UnboundMetric<T> {
 export class NoopCounterMetric
   extends NoopMetric<BoundCounter>
   implements Counter {
-  add(value: number, labels: Labels) {
+  add(value: number, labels: Labels): void {
     this.bind(labels).add(value);
   }
 }
@@ -167,7 +168,7 @@ export class NoopCounterMetric
 export class NoopValueRecorderMetric
   extends NoopMetric<BoundValueRecorder>
   implements ValueRecorder {
-  record(value: number, labels: Labels) {
+  record(value: number, labels: Labels): void {
     this.bind(labels).record(value);
   }
 }
@@ -175,7 +176,7 @@ export class NoopValueRecorderMetric
 export class NoopBaseObserverMetric
   extends NoopMetric<BoundBaseObserver>
   implements BaseObserver {
-  observation() {
+  observation(): Observation {
     return {
       observer: this as BaseObserver,
       value: 0,
@@ -198,7 +199,7 @@ export class NoopBoundValueRecorder implements BoundValueRecorder {
 }
 
 export class NoopBoundBaseObserver implements BoundBaseObserver {
-  update(_value: number) {}
+  update(_value: number): void {}
 }
 
 export const NOOP_METER = new NoopMeter();

@@ -12,20 +12,20 @@ Used standalone, this module provides methods for manual instrumentation of code
 It does **not** provide automated instrumentation of known libraries, context propagation for asynchronous invocations or distributed-context out-of-the-box.
 
 For automated instrumentation for Node.js, please see
-[@opentelemetry/node](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-node).
+[@opentelemetry/sdk-trace-node](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node).
 
 ## Installation
 
 ```bash
 npm install --save @opentelemetry/api
-npm install --save @opentelemetry/tracing
+npm install --save @opentelemetry/sdk-trace-base
 ```
 
 ## Usage
 
 ```js
 const opentelemetry = require('@opentelemetry/api');
-const { BasicTracerProvider } = require('@opentelemetry/tracing');
+const { BasicTracerProvider } = require('@opentelemetry/sdk-trace-base');
 
 // To start a trace, you first need to initialize the Tracer provider.
 // NOTE: The default OpenTelemetry tracer provider does not record any tracing information.
@@ -65,9 +65,9 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-tracing
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-tracing
-[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-tracing&type=dev
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-tracing&type=dev
-[npm-url]: https://www.npmjs.com/package/@opentelemetry/tracing
+[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-sdk-trace-base
+[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-sdk-trace-base
+[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-sdk-trace-base&type=dev
+[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-sdk-trace-base&type=dev
+[npm-url]: https://www.npmjs.com/package/@opentelemetry/sdk-trace-base
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Ftracing.svg
