@@ -335,7 +335,7 @@ Now, when you open <http://localhost:8080> in your web browser, you should see t
 {
   "name": "requests",
   "description": "Count all incoming requests",
-  "unit": '1',
+  "unit": "1",
   "metricKind": 0,
   "valueType": 1
 }
