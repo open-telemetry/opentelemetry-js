@@ -78,7 +78,7 @@ export class MetricsAPI {
   }
 
   /** Remove the global meter provider */
-  public disable() {
+  public disable(): void {
     delete _global[GLOBAL_METRICS_API_KEY];
   }
 }
