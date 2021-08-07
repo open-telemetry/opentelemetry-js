@@ -19,13 +19,13 @@
       "path": "../opentelemetry-instrumentation"
     },
     {
+      "path": "../opentelemetry-sdk-trace-base"
+    },
+    {
       "path": "../opentelemetry-sdk-trace-node"
     },
     {
       "path": "../opentelemetry-semantic-conventions"
-    },
-    {
-      "path": "../opentelemetry-sdk-trace-base"
     }
   ]
 }
