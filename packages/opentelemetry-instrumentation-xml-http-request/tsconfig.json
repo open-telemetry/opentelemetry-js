@@ -23,13 +23,13 @@
       "path": "../opentelemetry-propagator-b3"
     },
     {
-      "path": "../opentelemetry-semantic-conventions"
-    },
-    {
       "path": "../opentelemetry-sdk-trace-base"
     },
     {
       "path": "../opentelemetry-sdk-trace-web"
+    },
+    {
+      "path": "../opentelemetry-semantic-conventions"
     }
   ]
 }
