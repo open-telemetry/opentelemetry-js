@@ -16,11 +16,11 @@ npm install --save @opentelemetry/semantic-conventions
 ## Usage
 
 ```ts
-import { GeneralAttribute } from '@opentelemetry/semantic-conventions';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 const span = tracer.startSpan().startSpan(spanName, spanOptions)
   .setAttributes({
-    [GeneralAttribute.NET_PEER_HOSTNAME]: 'localhost',
+    [SemanticAttributes.NET_PEER_NAME]: 'localhost',
   });
 ```
 
