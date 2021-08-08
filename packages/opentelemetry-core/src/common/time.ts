@@ -117,6 +117,7 @@ export function hrTimeDuration(
  * Convert hrTime to timestamp, for example "2019-05-14T17:00:00.000123456Z"
  * @param hrTime
  */
+// eslint-disable-next-line @typescript-eslint/no-shadow
 export function hrTimeToTimeStamp(hrTime: api.HrTime): string {
   const precision = NANOSECOND_DIGITS;
   const tmp = `${'0'.repeat(precision)}${hrTime[1]}Z`;
@@ -129,6 +130,7 @@ export function hrTimeToTimeStamp(hrTime: api.HrTime): string {
  * Convert hrTime to nanoseconds.
  * @param hrTime
  */
+// eslint-disable-next-line @typescript-eslint/no-shadow
 export function hrTimeToNanoseconds(hrTime: api.HrTime): number {
   return hrTime[0] * SECOND_TO_NANOSECONDS + hrTime[1];
 }
@@ -137,6 +139,7 @@ export function hrTimeToNanoseconds(hrTime: api.HrTime): number {
  * Convert hrTime to milliseconds.
  * @param hrTime
  */
+// eslint-disable-next-line @typescript-eslint/no-shadow
 export function hrTimeToMilliseconds(hrTime: api.HrTime): number {
   return Math.round(hrTime[0] * 1e3 + hrTime[1] / 1e6);
 }
@@ -145,6 +148,7 @@ export function hrTimeToMilliseconds(hrTime: api.HrTime): number {
  * Convert hrTime to microseconds.
  * @param hrTime
  */
+// eslint-disable-next-line @typescript-eslint/no-shadow
 export function hrTimeToMicroseconds(hrTime: api.HrTime): number {
   return Math.round(hrTime[0] * 1e6 + hrTime[1] / 1e3);
 }
@@ -153,7 +157,7 @@ export function hrTimeToMicroseconds(hrTime: api.HrTime): number {
  * check if time is HrTime
  * @param value
  */
-export function isTimeInputHrTime(value: unknown) {
+export function isTimeInputHrTime(value: unknown): value is api.HrTime {
   return (
     Array.isArray(value) &&
     value.length === 2 &&
@@ -166,7 +170,7 @@ export function isTimeInputHrTime(value: unknown) {
  * check if input value is a correct types.TimeInput
  * @param value
  */
-export function isTimeInput(value: unknown) {
+export function isTimeInput(value: unknown): value is api.HrTime | number | Date {
   return (
     isTimeInputHrTime(value) ||
     typeof value === 'number' ||
