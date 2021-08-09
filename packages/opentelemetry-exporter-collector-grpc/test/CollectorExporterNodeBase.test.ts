@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { collectorTypes } from "@opentelemetry/exporter-collector";
-import { ReadableSpan } from "@opentelemetry/sdk-trace-base";
+import { collectorTypes } from '@opentelemetry/exporter-collector';
+import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 
-import * as assert from "assert";
-import { CollectorExporterNodeBase } from "../src/CollectorExporterNodeBase";
-import { CollectorExporterConfigNode, ServiceClientType } from "../src/types";
-import { mockedReadableSpan } from "./helper";
+import * as assert from 'assert';
+import { CollectorExporterNodeBase } from '../src/CollectorExporterNodeBase';
+import { CollectorExporterConfigNode, ServiceClientType } from '../src/types';
+import { mockedReadableSpan } from './helper';
 
 class MockCollectorExporter extends CollectorExporterNodeBase<
   ReadableSpan,
@@ -35,11 +35,11 @@ class MockCollectorExporter extends CollectorExporterNodeBase<
   }[] = [];
 
   getDefaultUrl(config: CollectorExporterConfigNode): string {
-    return "";
+    return '';
   }
 
   getDefaultServiceName(config: CollectorExporterConfigNode): string {
-    return "";
+    return '';
   }
 
   convert(spans: ReadableSpan[]): ReadableSpan[] {
@@ -51,12 +51,12 @@ class MockCollectorExporter extends CollectorExporterNodeBase<
   }
 
   getServiceProtoPath(): string {
-    return "opentelemetry/proto/collector/trace/v1/trace_service.proto";
+    return 'opentelemetry/proto/collector/trace/v1/trace_service.proto';
   }
 }
 
 // Mocked _send which just saves the callbacks for later
-MockCollectorExporter.prototype["_send"] = function _sendMock(
+MockCollectorExporter.prototype['_send'] = function _sendMock(
   self: MockCollectorExporter,
   objects: ReadableSpan[],
   onSuccess: () => void,
@@ -65,17 +65,17 @@ MockCollectorExporter.prototype["_send"] = function _sendMock(
   self.sendCallbacks.push({ onSuccess, onError });
 };
 
-describe("CollectorExporterNodeBase", () => {
+describe('CollectorExporterNodeBase', () => {
   let exporter: MockCollectorExporter;
   const concurrencyLimit = 5;
 
-  beforeEach((done) => {
+  beforeEach(done => {
     exporter = new MockCollectorExporter({ concurrencyLimit });
     done();
   });
 
-  describe("export", () => {
-    it("should export requests concurrently", async () => {
+  describe('export', () => {
+    it('should export requests concurrently', async () => {
       const spans = [Object.assign({}, mockedReadableSpan)];
       const numToExport = concurrencyLimit;
 
@@ -83,17 +83,17 @@ describe("CollectorExporterNodeBase", () => {
         exporter.export(spans, () => {});
       }
 
-      assert.strictEqual(exporter["_sendingPromises"].length, numToExport);
-      const promisesAllDone = Promise.all(exporter["_sendingPromises"]);
+      assert.strictEqual(exporter['_sendingPromises'].length, numToExport);
+      const promisesAllDone = Promise.all(exporter['_sendingPromises']);
       // Mock that all requests finish sending
       exporter.sendCallbacks.forEach(({ onSuccess }) => onSuccess());
 
       // All finished promises should be popped off
       await promisesAllDone;
-      assert.strictEqual(exporter["_sendingPromises"].length, 0);
+      assert.strictEqual(exporter['_sendingPromises'].length, 0);
     });
 
-    it("should drop new export requests when already sending at concurrencyLimit", async () => {
+    it('should drop new export requests when already sending at concurrencyLimit', async () => {
       const spans = [Object.assign({}, mockedReadableSpan)];
       const numToExport = concurrencyLimit + 5;
 
@@ -101,45 +101,45 @@ describe("CollectorExporterNodeBase", () => {
         exporter.export(spans, () => {});
       }
 
-      assert.strictEqual(exporter["_sendingPromises"].length, concurrencyLimit);
-      const promisesAllDone = Promise.all(exporter["_sendingPromises"]);
+      assert.strictEqual(exporter['_sendingPromises'].length, concurrencyLimit);
+      const promisesAllDone = Promise.all(exporter['_sendingPromises']);
       // Mock that all requests finish sending
       exporter.sendCallbacks.forEach(({ onSuccess }) => onSuccess());
 
       // All finished promises should be popped off
       await promisesAllDone;
-      assert.strictEqual(exporter["_sendingPromises"].length, 0);
+      assert.strictEqual(exporter['_sendingPromises'].length, 0);
     });
 
-    it("should pop export request promises even if they failed", async () => {
+    it('should pop export request promises even if they failed', async () => {
       const spans = [Object.assign({}, mockedReadableSpan)];
 
       exporter.export(spans, () => {});
-      assert.strictEqual(exporter["_sendingPromises"].length, 1);
-      const promisesAllDone = Promise.all(exporter["_sendingPromises"]);
+      assert.strictEqual(exporter['_sendingPromises'].length, 1);
+      const promisesAllDone = Promise.all(exporter['_sendingPromises']);
       // Mock that all requests fail sending
       exporter.sendCallbacks.forEach(({ onError }) =>
-        onError(new Error("Failed to send!!"))
+        onError(new Error('Failed to send!!'))
       );
 
       // All finished promises should be popped off
       await promisesAllDone;
-      assert.strictEqual(exporter["_sendingPromises"].length, 0);
+      assert.strictEqual(exporter['_sendingPromises'].length, 0);
     });
 
-    it("should pop export request promises even if success callback throws error", async () => {
+    it('should pop export request promises even if success callback throws error', async () => {
       const spans = [Object.assign({}, mockedReadableSpan)];
 
-      exporter["_sendPromise"](
+      exporter['_sendPromise'](
         spans,
         () => {
-          throw new Error("Oops");
+          throw new Error('Oops');
         },
         () => {}
       );
 
-      assert.strictEqual(exporter["_sendingPromises"].length, 1);
-      const promisesAllDone = Promise.all(exporter["_sendingPromises"])
+      assert.strictEqual(exporter['_sendingPromises'].length, 1);
+      const promisesAllDone = Promise.all(exporter['_sendingPromises'])
         // catch expected unhandled exception
         .catch(() => {});
 
@@ -150,7 +150,7 @@ describe("CollectorExporterNodeBase", () => {
 
       // All finished promises should be popped off
       await promisesAllDone;
-      assert.strictEqual(exporter["_sendingPromises"].length, 0);
+      assert.strictEqual(exporter['_sendingPromises'].length, 0);
     });
   });
 });
