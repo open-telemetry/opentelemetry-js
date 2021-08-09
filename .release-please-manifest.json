@@ -15,16 +15,16 @@
   "packages/opentelemetry-instrumentation-grpc": "0.24.0",
   "packages/opentelemetry-instrumentation-http": "0.24.0",
   "packages/opentelemetry-instrumentation-xml-http-request": "0.24.0",
-  "packages/opentelemetry-metrics": "0.24.0",
-  "packages/opentelemetry-node": "0.24.0",
   "packages/opentelemetry-propagator-b3": "0.24.0",
   "packages/opentelemetry-propagator-jaeger": "0.24.0",
   "packages/opentelemetry-resource-detector-aws": "0.24.0",
   "packages/opentelemetry-resource-detector-gcp": "0.24.0",
   "packages/opentelemetry-resources": "0.24.0",
+  "packages/opentelemetry-sdk-metrics-base": "0.24.0",
   "packages/opentelemetry-sdk-node": "0.24.0",
+  "packages/opentelemetry-sdk-trace-base": "0.24.0",
+  "packages/opentelemetry-sdk-trace-node": "0.24.0",
+  "packages/opentelemetry-sdk-trace-web": "0.24.0",
   "packages/opentelemetry-semantic-conventions": "0.24.0",
-  "packages/opentelemetry-shim-opentracing": "0.24.0",
-  "packages/opentelemetry-tracing": "0.24.0",
-  "packages/opentelemetry-web": "0.24.0"
+  "packages/opentelemetry-shim-opentracing": "0.24.0"
 }
