@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { context } from '@opentelemetry/api';
+import { context, TraceFlags } from '@opentelemetry/api';
 import {
   ExportResultCode,
   getEnv,
@@ -77,6 +77,11 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
     if (this._isShutdown) {
       return;
     }
+
+    if ((span.spanContext().traceFlags & TraceFlags.SAMPLED) === 0) {
+      return;
+    }
+
     this._addToBuffer(span);
   }
 

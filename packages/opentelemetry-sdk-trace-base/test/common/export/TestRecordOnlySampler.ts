@@ -14,4 +14,17 @@
  * limitations under the License.
  */
 
-export * from './detectors';
+import { Sampler, SamplingDecision, SamplingResult } from '@opentelemetry/api';
+
+/** Sampler that always records but doesn't sample spans. */
+export class TestRecordOnlySampler implements Sampler {
+  shouldSample(): SamplingResult {
+    return {
+      decision: SamplingDecision.RECORD,
+    };
+  }
+
+  toString(): string {
+    return 'TestRecordOnlySampler';
+  }
+}
