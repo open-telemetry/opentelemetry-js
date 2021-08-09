@@ -25,6 +25,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { BasicTracerProvider, BufferConfig, InMemorySpanExporter, Span } from '../../../src';
 import { context } from '@opentelemetry/api';
+import { TestRecordOnlySampler } from './TestRecordOnlySampler';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
 import { TestStackContextManager } from './TestStackContextManager';
 import { BatchSpanProcessorBase } from '../../../src/export/BatchSpanProcessorBase';
@@ -32,6 +33,15 @@ import { BatchSpanProcessorBase } from '../../../src/export/BatchSpanProcessorBa
 function createSampledSpan(spanName: string): Span {
   const tracer = new BasicTracerProvider({
     sampler: new AlwaysOnSampler(),
+  }).getTracer('default');
+  const span = tracer.startSpan(spanName);
+  span.end();
+  return span as Span;
+}
+
+function createUnsampledSpan(spanName: string): Span {
+  const tracer = new BasicTracerProvider({
+    sampler: new TestRecordOnlySampler(),
   }).getTracer('default');
   const span = tracer.startSpan(spanName);
   span.end();
@@ -121,12 +131,14 @@ describe('BatchSpanProcessorBase', () => {
 
       const span = createSampledSpan(`${name}_0`);
 
+      processor.onStart(span);
       processor.onEnd(span);
       assert.strictEqual(processor['_finishedSpans'].length, 1);
 
       await processor.forceFlush();
       assert.strictEqual(exporter.getFinishedSpans().length, 1);
 
+      processor.onStart(span);
       processor.onEnd(span);
       assert.strictEqual(processor['_finishedSpans'].length, 1);
 
@@ -135,10 +147,26 @@ describe('BatchSpanProcessorBase', () => {
       assert.strictEqual(spy.args.length, 2);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
+      processor.onStart(span);
       processor.onEnd(span);
       assert.strictEqual(spy.args.length, 2);
       assert.strictEqual(processor['_finishedSpans'].length, 0);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
+    });
+
+    it('should not export unsampled spans', async () => {
+      const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
+      const spy: sinon.SinonSpy = sinon.spy(exporter, 'export') as any;
+
+      const span = createUnsampledSpan(`${name}_0`);
+
+      processor.onStart(span);
+      processor.onEnd(span);
+
+      await processor.forceFlush();
+      assert.strictEqual(processor['_finishedSpans'].length, 0);
+      assert.strictEqual(exporter.getFinishedSpans().length, 0);
+      assert.strictEqual(spy.args.length, 0);
     });
 
     it('should export the sampled spans with buffer size reached', done => {
@@ -153,6 +181,7 @@ describe('BatchSpanProcessorBase', () => {
         assert.strictEqual(exporter.getFinishedSpans().length, 0);
       }
       const span = createSampledSpan(`${name}_6`);
+      processor.onStart(span);
       processor.onEnd(span);
 
       setTimeout(async () => {
@@ -170,6 +199,7 @@ describe('BatchSpanProcessorBase', () => {
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
       for (let i = 0; i < defaultBufferConfig.maxExportBatchSize; i++) {
         const span = createSampledSpan(`${name}_${i}`);
+        processor.onStart(span);
         processor.onEnd(span);
         assert.strictEqual(exporter.getFinishedSpans().length, 0);
       }
@@ -188,6 +218,7 @@ describe('BatchSpanProcessorBase', () => {
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
       for (let i = 0; i < defaultBufferConfig.maxExportBatchSize; i++) {
         const span = createSampledSpan(`${name}_${i}`);
+        processor.onStart(span);
         processor.onEnd(span);
       }
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
@@ -235,9 +266,11 @@ describe('BatchSpanProcessorBase', () => {
         const totalSpans = defaultBufferConfig.maxExportBatchSize * 2;
         for (let i = 0; i < totalSpans; i++) {
           const span = createSampledSpan(`${name}_${i}`);
+          processor.onStart(span);
           processor.onEnd(span);
         }
         const span = createSampledSpan(`${name}_last`);
+        processor.onStart(span);
         processor.onEnd(span);
         clock.tick(defaultBufferConfig.scheduledDelayMillis + 10);
 

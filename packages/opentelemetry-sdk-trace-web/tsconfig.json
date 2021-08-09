@@ -23,10 +23,10 @@
       "path": "../opentelemetry-resources"
     },
     {
-      "path": "../opentelemetry-semantic-conventions"
+      "path": "../opentelemetry-sdk-trace-base"
     },
     {
-      "path": "../opentelemetry-sdk-trace-base"
+      "path": "../opentelemetry-semantic-conventions"
     }
   ]
 }
