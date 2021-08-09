@@ -61,9 +61,10 @@ server.on("GET", "/user/:id", onGet);
 
 ## Describing a Span
 
-Using span relationships, attributes, kind, and the related semantic conventions, we can more accurately describe the span in a way our tracing backend will more easily understand. The following example uses these mechanisms, which are described below.
+Using span relationships, attributes, kind, and the related [semantic conventions](https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions), we can more accurately describe the span in a way our tracing backend will more easily understand. The following example uses these mechanisms, which are described below.
 
 ```typescript
+import { NetTransportValues SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { context, setSpan, SpanKind } from '@opentelemetry/api';
 
 async function onGet(request, response) {
@@ -73,10 +74,10 @@ async function onGet(request, response) {
     attributes: {
       // Attributes from the HTTP tracce semantic conventions
       // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md
-      "http.method": "GET",
-      "http.flavor": "1.1",
-      "http.url": request.url
-      "net.peer.ip": "192.0.2.5",
+      [SemanticAttributes.HTTP_METHOD]: "GET",
+      [SemanticAttributes.HTTP_FLAVOR]: "1.1",
+      [SemanticAttributes.HTTP_URL]: request.url
+      [SemanticAttributes.NET_PEER_IP]: "192.0.2.5",
     },
     // This span represents a remote incoming synchronous request
     kind: SpanKind.SERVER
@@ -113,7 +114,7 @@ async function onGet(request, response) {
 
   response.send(user.toJson());
   span.setStatus({
-      code: SpanStatusCode.SUCCESS,
+      code: SpanStatusCode.OK,
   });
   span.end();
 
@@ -127,24 +128,24 @@ async function getUser(userId) {
     attributes: {
       // Attributes from the database trace semantic conventions
       // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/database.md
-      "db.system": "mysql",
-      "db.connection_string": "Server=shopdb.example.com;Database=ShopDb;Uid=billing_user;TableCache=true;UseCompression=True;MinimumPoolSize=10;MaximumPoolSize=50;",
-      "db.user": "app_user",
-      "net.peer.name": "shopdb.example.com",
-      "net.peer.ip": "192.0.2.12",
-      "net.peer.port": 3306,
-      "net.transport": "IP.TCP",
-      "db.name": "ShopDb",
-      "db.statement": `Select * from Users WHERE user_id = ${userId}`,
-      "db.operation": "SELECT",
-      "db.sql.table": "Users",
+      [SemanticAttributes.DB_SYSTEM]: "mysql",
+      [SemanticAttributes.DB_CONNECTION_STRING]: "Server=shopdb.example.com;Database=ShopDb;Uid=billing_user;TableCache=true;UseCompression=True;MinimumPoolSize=10;MaximumPoolSize=50;",
+      [SemanticAttributes.DB_USER]: "app_user",
+      [SemanticAttributes.NET_PEER_NAME]: "shopdb.example.com",
+      [SemanticAttributes.NET_PEER_IP]: "192.0.2.12",
+      [SemanticAttributes.NET_PEER_PORT]: 3306,
+      [SemanticAttributes.NET_TRANSPORT]: NetTransportValues.IP_TCP,
+      [SemanticAttributes.DB_NAME]: "ShopDb",
+      [SemanticAttributes.DB_STATEMENT]: `Select * from Users WHERE user_id = ${userId}`,
+      [SemanticAttributes.DB_OPERATION]: "SELECT",
+      [SemanticAttributes.DB_SQL_TABLE]: "Users",
     },
     kind: SpanKind.CLIENT,
   });
   const user = await db.select("Users", { id: userId });
 
   span.setStatus({
-      code: SpanStatusCode.SUCCESS,
+      code: SpanStatusCode.OK,
   });
   span.end();
   return user;
