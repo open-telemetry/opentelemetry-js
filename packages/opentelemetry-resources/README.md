@@ -18,18 +18,18 @@ npm install --save @opentelemetry/resources
 ## Usage
 
 ```typescript
-import { ResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { Resource } from '@opentelemetry/resources';
 
 const resource = new Resource({
-    [ResourceAttributes.SERVICE_NAME]: 'api-service',
+    [SemanticResourceAttributes.SERVICE_NAME]: 'api-service',
 });
 
-const another_resource = new Resource({
-    'service.version': 2.0.0,
+const anotherResource = new Resource({
+    'service.version': '2.0.0',
     'service.group': 'instrumentation-group'
 });
-const merged_resource = resource.merge(another_resource);
+const mergedResource = resource.merge(anotherResource);
 ```
 
 ## Useful links

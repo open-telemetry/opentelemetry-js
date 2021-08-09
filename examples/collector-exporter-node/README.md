@@ -24,14 +24,14 @@ npm install
 
     ```shell script
     # from this directory
-    npm start:tracing
+    npm run start:tracing
     ```
 
 3. Run metrics app
 
     ```shell script
     # from this directory
-    npm start:metrics
+    npm run start:metrics
     ```
 
 4. Open page at <http://localhost:9411/zipkin/> -  you should be able to see the spans in zipkin
@@ -49,7 +49,7 @@ Note: It may take some time for the application metrics to appear on the Prometh
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For more information on tracing, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-tracing>
+- For more information on tracing, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base>
 
 ## LICENSE
 

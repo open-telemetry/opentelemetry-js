@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/getting-started-ts-example",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "description": "This repository provides everything required to follow the OpenTelemetry Getting Started Guide",
   "main": "app.ts",
   "scripts": {
@@ -10,7 +10,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@types/express": "4.17.13",
-    "@types/node": "14.17.5",
+    "@types/node": "14.17.9",
     "ts-node": "10.1.0"
   },
   "dependencies": {

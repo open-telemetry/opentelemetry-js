@@ -67,19 +67,17 @@ The following dependencies are required to trace a Node.js application.
 These dependencies are required to configure the tracing SDK and create spans.
 
 - `@opentelemetry/api`
-- `@opentelemetry/node`
-- `@opentelemetry/tracing`
+- `@opentelemetry/sdk-trace-node`
+- `@opentelemetry/sdk-trace-base`
 
 #### Exporter
 
-In order to visualize and analyze your traces, you will need to export them to a tracing backend such as Jaeger. OpenTelemetry JS provides exporters for some common open source tracing backends.
+In the following example, we will use the `ConsoleSpanExporter` which prints all spans to the console.
 
-- Jaeger - `@opentelemetry/exporter-jaeger`
-- Zipkin - `@opentelemetry/exporter-zipkin`
-- OpenTelemetry Protocol
-  - GRPC - `@opentelemetry/exporter-collector-grpc`
-  - Protobuf/HTTP - `@opentelemetry/exporter-collector-proto`
-  - JSON/HTTP - `@opentelemetry/exporter-collector`
+In order to visualize and analyze your traces, you will need to export them to a tracing backend.
+Follow [these instructions](../exporters.md) for setting up a backend and exporter.
+
+You may also want to use the `BatchSpanProcessor` to export spans in batches in order to more efficiently use resources.
 
 #### Instrumentation Modules
 
@@ -91,14 +89,14 @@ You can also install all instrumentations maintained by the OpenTelemetry author
 
 The tracing setup and configuration should be run before your application code. One tool commonly used for this task is the [`-r, --require module`](https://nodejs.org/api/cli.html#cli_r_require_module) flag.
 
-Create a file with a name like `tracing.js` which will contain your tracing setup code. In this example, we will use the `ConsoleSpanExporter` which prints all spans to the console. In your application, you should use the exporter which goes with the tracing backend of your choice. You may also want to use the `BatchSpanProcessor` to export spans in batches in order to more efficiently use resources.
+Create a file with a name like `tracing.js` which will contain your tracing setup code.
 
 ```javascript
 /* tracing.js */
 
 // Require dependencies
-const { NodeTracerProvider } = require("@opentelemetry/node");
-const { SimpleSpanProcessor, ConsoleSpanExporter } = require("@opentelemetry/tracing");
+const { NodeTracerProvider } = require("@opentelemetry/sdk-trace-node");
+const { SimpleSpanProcessor, ConsoleSpanExporter } = require("@opentelemetry/sdk-trace-base");
 const { getNodeAutoInstrumentations } = require("@opentelemetry/auto-instrumentations-node');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 
@@ -127,7 +125,7 @@ registerInstrumentations({
 First, install the dependencies as described above. Here you need to add the following:
 
 ```shell
-npm install --save @opentelemetry/node @opentelemetry/auto-instrumentations-node
+npm install --save @opentelemetry/sdk-trace-node @opentelemetry/auto-instrumentations-node
 ```
 
 Now you can run your application as you normally would, but you can use the `--require` flag to load the tracing code before the application code.

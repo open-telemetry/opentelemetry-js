@@ -4,6 +4,84 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.24.0
+
+### :boom: Breaking Change
+
+* `opentelemetry-core`, `opentelemetry-exporter-jaeger`, `opentelemetry-exporter-zipkin`, `opentelemetry-node`, `opentelemetry-resource-detector-aws`, `opentelemetry-resource-detector-gcp`, `opentelemetry-resources`, `opentelemetry-semantic-conventions`, `opentelemetry-web`
+  * [#2345](https://github.com/open-telemetry/opentelemetry-js/pull/2345) feat: updated spec to v1.5.0 and renamed resource class ([@weyert](https://github.com/weyert))
+
+### :rocket: (Enhancement)
+
+* `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`
+  * [#2337](https://github.com/open-telemetry/opentelemetry-js/pull/2337) Support gzip compression for node exporter collector ([@alisabzevari](https://github.com/alisabzevari))
+* `opentelemetry-instrumentation-http`
+  * [#2332](https://github.com/open-telemetry/opentelemetry-js/pull/2332) feat(@opentelemetry-instrumentation-http): support adding custom attributes before a span is started ([@echoontheway](https://github.com/echoontheway))
+  * [#2349](https://github.com/open-telemetry/opentelemetry-js/pull/2349) fix(instrumentation-http): set outgoing request attributes on start span ([@blumamir](https://github.com/blumamir))
+* `opentelemetry-web`
+  * [#2343](https://github.com/open-telemetry/opentelemetry-js/pull/2343) feat(opentelemetry-web): capture decodedBodySize / http.response_content_length_uncompressed ([@t2t2](https://github.com/t2t2))
+* `opentelemetry-instrumentation`
+  * [#2309](https://github.com/open-telemetry/opentelemetry-js/pull/2309) chore: add includePrerelease option to instrumentation config ([@dyladan](https://github.com/dyladan))
+
+### :bug: (Bug Fix)
+
+* `opentelemetry-exporter-collector`
+  * [#2357](https://github.com/open-telemetry/opentelemetry-js/pull/2357) fix: headers are appended to existing one (open-telemetry#2335) ([@niko-achilles](https://github.com/niko-achilles))
+* `opentelemetry-exporter-collector-grpc`
+  * [#2322](https://github.com/open-telemetry/opentelemetry-js/pull/2322) fix(@opentelemetry/exporter-collector-grpc) regression from #2130 when host specified without protocol ([@lizthegrey](https://github.com/lizthegrey))
+* `opentelemetry-exporter-collector-proto`
+  * [#2331](https://github.com/open-telemetry/opentelemetry-js/pull/2331) Change default HTTP exporter port to 55681 ([@NathanielRN](https://github.com/NathanielRN))
+
+### :books: (Refine Doc)
+
+* Other
+  * [#2344](https://github.com/open-telemetry/opentelemetry-js/pull/2344) Additional website docs updates ([@svrnm](https://github.com/svrnm))
+  * [#2365](https://github.com/open-telemetry/opentelemetry-js/pull/2365) docs: add quickstart code example ([@vreynolds](https://github.com/vreynolds))
+  * [#2358](https://github.com/open-telemetry/opentelemetry-js/pull/2358) examples opentelemetry-api version fix ([@CptSchnitz](https://github.com/CptSchnitz))
+  * [#2308](https://github.com/open-telemetry/opentelemetry-js/pull/2308) chore: use typedoc to build sdk reference ([@dyladan](https://github.com/dyladan))
+  * [#2324](https://github.com/open-telemetry/opentelemetry-js/pull/2324) fix: update and make website docs work ([@svrnm](https://github.com/svrnm))
+  * [#2328](https://github.com/open-telemetry/opentelemetry-js/pull/2328) chore: updating compatibility matrix ([@obecny](https://github.com/obecny))
+  * [#2326](https://github.com/open-telemetry/opentelemetry-js/pull/2326) chore: fix tracer-web example webpack config ([@jonchurch](https://github.com/jonchurch))
+* `opentelemetry-resource-detector-aws`
+  * [#2379](https://github.com/open-telemetry/opentelemetry-js/pull/2379) fix: fixup aws detector readme ([@legendecas](https://github.com/legendecas))
+* `opentelemetry-propagator-b3`
+  * [#2342](https://github.com/open-telemetry/opentelemetry-js/pull/2342) docs: updates README.md for @opentelemetry/propagator-b3 ([@OmkarKirpan](https://github.com/OmkarKirpan))
+* `opentelemetry-exporter-collector-grpc`
+  * [#2266](https://github.com/open-telemetry/opentelemetry-js/pull/2266) fix(exporter-collector-grpc): incorrect URL format on docs after 0.20.0 update ([@brunoluiz](https://github.com/brunoluiz))
+
+### :house: (Internal)
+
+* Other
+  * [#2366](https://github.com/open-telemetry/opentelemetry-js/pull/2366) chore: adding Rauno56 to js approvers ([@obecny](https://github.com/obecny))
+  * [#2350](https://github.com/open-telemetry/opentelemetry-js/pull/2350) chore: ignore backcompat in renovate ([@dyladan](https://github.com/dyladan))
+  * [#2352](https://github.com/open-telemetry/opentelemetry-js/pull/2352) replaced word plugin with instrumentation ([@niko-achilles](https://github.com/niko-achilles))
+  * [#2311](https://github.com/open-telemetry/opentelemetry-js/pull/2311) chore: ignore @types/node in backcompat ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-jaeger`, `opentelemetry-instrumentation`, `opentelemetry-node`, `opentelemetry-sdk-node`, `opentelemetry-shim-opentracing`, `opentelemetry-tracing`, `opentelemetry-web`
+  * [#2351](https://github.com/open-telemetry/opentelemetry-js/pull/2351) style: use single quotes everywhere and add a rule to eslint ([@blumamir](https://github.com/blumamir))
+* `template`
+  * [#2319](https://github.com/open-telemetry/opentelemetry-js/pull/2319) chore: update package template engines version ([@jonchurch](https://github.com/jonchurch))
+
+### Committers: 18
+
+* (Eliseo) Nathaniel Ruiz Nowell ([@NathanielRN](https://github.com/NathanielRN))
+* Ali Sabzevari ([@alisabzevari](https://github.com/alisabzevari))
+* Amir Blum ([@blumamir](https://github.com/blumamir))
+* Bartlomiej Obecny ([@obecny](https://github.com/obecny))
+* Bruno Luiz Silva ([@brunoluiz](https://github.com/brunoluiz))
+* Daniel Dyla ([@dyladan](https://github.com/dyladan))
+* Gerhard Stöbich ([@Flarna](https://github.com/Flarna))
+* Jonathan Church ([@jonchurch](https://github.com/jonchurch))
+* Liz Fong-Jones ([@lizthegrey](https://github.com/lizthegrey))
+* Niko Achilles Kokkinos ([@niko-achilles](https://github.com/niko-achilles))
+* Ofer Adelstein ([@CptSchnitz](https://github.com/CptSchnitz))
+* Omkar Kirpan ([@OmkarKirpan](https://github.com/OmkarKirpan))
+* Severin Neumann ([@svrnm](https://github.com/svrnm))
+* Vera Reynolds ([@vreynolds](https://github.com/vreynolds))
+* Weyert de Boer ([@weyert](https://github.com/weyert))
+* [@echoontheway](https://github.com/echoontheway)
+* legendecas ([@legendecas](https://github.com/legendecas))
+* t2t2 ([@t2t2](https://github.com/t2t2))
+
 ## 0.23.0
 
 ### :rocket: (Enhancement)
