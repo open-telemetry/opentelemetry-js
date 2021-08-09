@@ -5,6 +5,8 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
+[component owners](https://github.com/open-telemetry/opentelemetry-js-contrib/blob/main/.github/component_owners.yml): @willarmiros @NathanielRN
+
 The OpenTelemetry Propagator for AWS X-Ray provides HTTP header propagation for systems that are using AWS `X-Amzn-Trace-Id` format.
 This propagator translates the OpenTelemetry SpanContext into the equivalent AWS header format, for use with the OpenTelemetry JS SDK.
 `TraceState` is currently not propagated.
