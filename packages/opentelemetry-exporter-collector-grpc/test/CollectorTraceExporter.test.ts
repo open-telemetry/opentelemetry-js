@@ -20,7 +20,7 @@ import { diag } from '@opentelemetry/api';
 import {
   BasicTracerProvider,
   SimpleSpanProcessor,
-} from '@opentelemetry/tracing';
+} from '@opentelemetry/sdk-trace-base';
 
 import * as assert from 'assert';
 import * as fs from 'fs';

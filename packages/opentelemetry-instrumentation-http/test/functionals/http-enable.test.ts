@@ -22,11 +22,11 @@ import {
   trace,
   SpanAttributes,
 } from '@opentelemetry/api';
-import { NodeTracerProvider } from '@opentelemetry/node';
+import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/tracing';
+} from '@opentelemetry/sdk-trace-base';
 import {
   NetTransportValues,
   SemanticAttributes,

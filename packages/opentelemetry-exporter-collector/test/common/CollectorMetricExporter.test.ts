@@ -21,7 +21,7 @@ import {
   BoundObserver,
   Metric,
   MetricRecord,
-} from '@opentelemetry/metrics';
+} from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorExporterBase } from '../../src/CollectorExporterBase';

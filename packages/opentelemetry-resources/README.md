@@ -25,11 +25,11 @@ const resource = new Resource({
     [SemanticResourceAttributes.SERVICE_NAME]: 'api-service',
 });
 
-const another_resource = new Resource({
-    'service.version': 2.0.0,
+const anotherResource = new Resource({
+    'service.version': '2.0.0',
     'service.group': 'instrumentation-group'
 });
-const merged_resource = resource.merge(another_resource);
+const mergedResource = resource.merge(anotherResource);
 ```
 
 ## Useful links

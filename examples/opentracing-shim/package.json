@@ -29,15 +29,15 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/api": "^1.0.1",
+    "@opentelemetry/api": "^1.0.2",
     "@opentelemetry/exporter-jaeger": "0.24.0",
     "@opentelemetry/exporter-zipkin": "0.24.0",
     "@opentelemetry/instrumentation": "0.24.0",
-    "@opentelemetry/node": "0.24.0",
+    "@opentelemetry/sdk-trace-node": "0.24.0",
     "@opentelemetry/resources": "0.24.0",
     "@opentelemetry/semantic-conventions": "0.24.0",
     "@opentelemetry/shim-opentracing": "0.24.0",
-    "@opentelemetry/tracing": "0.24.0",
+    "@opentelemetry/sdk-trace-base": "0.24.0",
     "opentracing": "^0.14.4"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
