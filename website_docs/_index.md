@@ -12,16 +12,16 @@ export data.
 
 ## Status and Releases
 
-|       | Tracing | Metrics |
-| ----- | ------- | ------- |
-| API   | GA      | Alpha   |
-| SDK   | Beta    | Alpha   |
+| Signal  | API Status  | SDK Status        |
+|---------|-------------|-------------------|
+| Trace   | Stable      | Release Candidate |
+| Metrics | Development | Development       |
+| Logs    | Roadmap     | Roadmap           |
 
 You can find release information [here](https://github.com/open-telemetry/opentelemetry-js/releases)
 
 ## Further Reading
 
 - [OpenTelemetry for JavaScript on GitHub](https://github.com/open-telemetry/opentelemetry-js)
-- [Getting Started](https://github.com/open-telemetry/opentelemetry-js/blob/main/getting-started/README.md)
-- [API Documentation](https://open-telemetry.github.io/opentelemetry-js)
-- [Getting In Touch (Gitter)](https://gitter.im/open-telemetry/opentelemetry-sdk-trace-node)
+- [API Reference](https://open-telemetry.github.io/opentelemetry-js-api)
+- [SDK Reference](https://open-telemetry.github.io/opentelemetry-js)

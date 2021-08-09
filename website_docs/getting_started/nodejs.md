@@ -15,6 +15,12 @@ This guide will show you how to get started with tracing in Node.js.
     - [Instrumentation Modules](#instrumentation-modules)
   - [Setup](#setup)
   - [Run Application](#run-application)
+- [Metrics](#metrics)
+  - [Dependencies](#dependencies-2)
+    - [Core Dependencies](#core-dependencies-1)
+    - [Exporter](#exporter-1)
+  - [Setup](#setup-1)
+  - [Run Application](#run-application-1)
 
 ## Example Application
 
@@ -220,3 +226,119 @@ Now, when you open <http://localhost:8080> in your web browser, you should see t
 ```
 
 </details>
+
+## Metrics
+
+### Dependencies
+
+The following dependencies are required to collect metrics in your Node.js application.
+
+#### Core Dependencies
+
+These dependencies are required to configure the tracing SDK and create spans.
+
+- `@opentelemetry/metrics`
+
+#### Exporter
+
+In the following example, we will use the `ConsoleMetricExporter` which prints all spans to the console.
+
+In order to visualize and analyze your metrics, you will need to export them to a metrics backend.
+Follow [these instructions](../exporters.md) for setting up a backend and exporter.
+
+### Setup
+
+You need a `Meter` to create and monitor metrics. A `Meter` in OpenTelemetry is the mechanism used to create and manage metrics, labels, and metric exporters.
+
+Create a file named `monitoring.js` and add the following code:
+
+```javascript
+/* monitoring.js */
+'use strict';
+
+const { MeterProvider, ConsoleMetricExporter } = require('@opentelemetry/metrics');
+
+const meter = new MeterProvider({
+  new ConsoleMetricExporter(),
+  interval: 1000,
+}).getMeter('your-meter-name');
+```
+
+Now you can require this file from your application code and use the `Meter` to create and manage metrics. The simplest of these metrics is a counter.
+
+Let's create and export from your `monitoring.js` file a middleware function that express can use to count all requests by route. Modify the `monitoring.js` file so it looks like this:
+
+```javascript
+/* monitoring.js */
+'use strict';
+
+const { MeterProvider, ConsoleMetricExporter } = require('@opentelemetry/metrics');
+
+const meter = new MeterProvider({
+  new ConsoleMetricExporter(),
+  interval: 1000,
+}).getMeter('your-meter-name');
+
+const requestCount = meter.createCounter("requests", {
+  description: "Count all incoming requests"
+});
+
+const boundInstruments = new Map();
+
+module.exports.countAllRequests = () => {
+  return (req, res, next) => {
+    if (!boundInstruments.has(req.path)) {
+      const labels = { route: req.path };
+      const boundCounter = requestCount.bind(labels);
+      boundInstruments.set(req.path, boundCounter);
+    }
+
+    boundInstruments.get(req.path).add(1);
+    next();
+  };
+};
+```
+
+Now import and use this middleware in your application code `app.js`:
+
+```javascript
+/* app.js */
+const express = require("express");
+const { countAllRequests } = require("./monitoring");
+const app = express();
+app.use(countAllRequests());
+/* ... */
+```
+
+Now when you make requests to your service, your meter will count all requests.
+
+**Note**: Creating a new labelSet and binding on every request is not ideal because creating the labelSet can often be an expensive operation. Therefore, the instruments are created and stored in a Map according to the route key.
+
+### Run Application
+
+First, install the dependencies as described above. Here you need to add the following:
+
+```shell
+npm install --save @opentelemetry/metrics
+```
+
+Now you can run your application:
+
+```shell
+$ node app.js
+Listening for requests on http://localhost:8080
+```
+
+Now, when you open <http://localhost:8080> in your web browser, you should see the metrics printed in the console by the `ConsoleMetricExporter`.
+
+```json
+{
+  "name": "requests",
+  "description": "Count all incoming requests",
+  "unit": "1",
+  "metricKind": 0,
+  "valueType": 1
+}
+{ "route": "/" }
+"value": "1"
+```
