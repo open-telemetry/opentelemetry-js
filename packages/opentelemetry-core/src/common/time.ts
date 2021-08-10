@@ -115,42 +115,38 @@ export function hrTimeDuration(
 
 /**
  * Convert hrTime to timestamp, for example "2019-05-14T17:00:00.000123456Z"
- * @param hrTime
+ * @param time
  */
-// eslint-disable-next-line @typescript-eslint/no-shadow
-export function hrTimeToTimeStamp(hrTime: api.HrTime): string {
+export function hrTimeToTimeStamp(time: api.HrTime): string {
   const precision = NANOSECOND_DIGITS;
-  const tmp = `${'0'.repeat(precision)}${hrTime[1]}Z`;
+  const tmp = `${'0'.repeat(precision)}${time[1]}Z`;
   const nanoString = tmp.substr(tmp.length - precision - 1);
-  const date = new Date(hrTime[0] * 1000).toISOString();
+  const date = new Date(time[0] * 1000).toISOString();
   return date.replace('000Z', nanoString);
 }
 
 /**
  * Convert hrTime to nanoseconds.
- * @param hrTime
+ * @param time
  */
-// eslint-disable-next-line @typescript-eslint/no-shadow
-export function hrTimeToNanoseconds(hrTime: api.HrTime): number {
-  return hrTime[0] * SECOND_TO_NANOSECONDS + hrTime[1];
+export function hrTimeToNanoseconds(time: api.HrTime): number {
+  return time[0] * SECOND_TO_NANOSECONDS + time[1];
 }
 
 /**
  * Convert hrTime to milliseconds.
- * @param hrTime
+ * @param time
  */
-// eslint-disable-next-line @typescript-eslint/no-shadow
-export function hrTimeToMilliseconds(hrTime: api.HrTime): number {
-  return Math.round(hrTime[0] * 1e3 + hrTime[1] / 1e6);
+export function hrTimeToMilliseconds(time: api.HrTime): number {
+  return Math.round(time[0] * 1e3 + time[1] / 1e6);
 }
 
 /**
  * Convert hrTime to microseconds.
- * @param hrTime
+ * @param time
  */
-// eslint-disable-next-line @typescript-eslint/no-shadow
-export function hrTimeToMicroseconds(hrTime: api.HrTime): number {
-  return Math.round(hrTime[0] * 1e6 + hrTime[1] / 1e3);
+export function hrTimeToMicroseconds(time: api.HrTime): number {
+  return Math.round(time[0] * 1e6 + time[1] / 1e3);
 }
 
 /**
