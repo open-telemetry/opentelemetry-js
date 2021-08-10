@@ -65,7 +65,7 @@ export abstract class CollectorExporterBase<
    * @param items
    * @param resultCallback
    */
-  export(items: ExportItem[], resultCallback: (result: ExportResult) => void) {
+  export(items: ExportItem[], resultCallback: (result: ExportResult) => void): void {
     if (this._isShutdown) {
       resultCallback({
         code: ExportResultCode.FAILED,
