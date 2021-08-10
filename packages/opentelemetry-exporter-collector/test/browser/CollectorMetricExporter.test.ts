@@ -96,7 +96,7 @@ describe('CollectorMetricExporter - web', () => {
         setTimeout(async () => {
           const args = stubBeacon.args[0];
           const url = args[0];
-          const blob:Blob = args[1];
+          const blob: Blob = args[1];
           const body = await blob.text();
           const json = JSON.parse(
             body
