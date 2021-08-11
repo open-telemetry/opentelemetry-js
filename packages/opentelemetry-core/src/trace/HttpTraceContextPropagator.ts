@@ -71,7 +71,7 @@ export function parseTraceParent(traceParent: string): SpanContext | null {
  * https://www.w3.org/TR/trace-context/
  */
 export class HttpTraceContextPropagator implements TextMapPropagator {
-  inject(context: Context, carrier: unknown, setter: TextMapSetter) {
+  inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
     const spanContext = trace.getSpanContext(context);
     if (
       !spanContext ||
