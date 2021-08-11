@@ -3,10 +3,14 @@ title: "Exporters"
 weight: 3
 ---
 
-In order to visualize and analyze your traces, you will need to export them to a tracing backend such as Jaeger or Zipkin.
-OpenTelemetry JS provides exporters for some common open source tracing backends.
+In order to visualize and analyze your traces and metrics, you will need to export them to a  backend such as [Jaeger](https://www.jaegertracing.io/) or [Zipkin](https://zipkin.io/). OpenTelemetry JS provides exporters for some common open source backends.
 
 Below you will find some introductions on how to setup backends and the matching exporters.
+
+- [Jaeger](#jaeger)
+- [Zipkin](#zipkin)
+- [Prometheus](#prometheus)
+- [OpenTelemetry Collector](#opentelemetry-collector)
 
 ## Jaeger
 
@@ -62,6 +66,43 @@ const { ZipkinExporter } = require("@opentelemetry/exporter-zipkin");
 const { BatchSpanProcessor } = require("@opentelemetry/tracing");
 
 provider.addSpanProcessor(new BatchSpanProcessor(new ZipkinExporter()))
+```
+
+## Prometheus
+
+To set up Prometheus as quickly as possible, run it in a docker container.
+You will need a `prometheus.yml` to configure the backend, use the following example
+and modify it to your needs:
+
+```yml
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+```
+
+With this file you can now start the docker container:
+
+```shell
+docker run \
+    -p 9090:9090 \
+    -v ${PWD}/prometheus.yml:/etc/prometheus/prometheus.yml \
+    prom/prometheus
+```
+
+Update your opentelemetry configuration to use the exporter and to send data to your prometheus backend:
+
+```javascript
+const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
+const { MeterProvider }  = require('@opentelemetry/metrics');
+const meter = new MeterProvider({
+  exporter: new PrometheusExporter({port: 9090}),
+  interval: 1000,
+}).getMeter('prometheus');
 ```
 
 ## OpenTelemetry Collector

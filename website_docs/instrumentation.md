@@ -5,6 +5,14 @@ weight: 3
 
 This guide will cover creating and annotating spans, creating and annotating metrics, how to pass context, and a guide to automatic instrumentation for JavaScript. This simple example works in the browser as well as with Node.JS
 
+- [Example Application](#example-application)
+- [Creating Spans](#creating-spans)
+- [Attributes](#attributes)
+  - [Semantic Attributes](#semantic-attributes)
+- [Span Status](#span-status)
+
+## Example Application
+
 In the following this guide will use the following sample app:
 
 ```javascript
@@ -158,6 +166,33 @@ function doWork(parent) {
     // empty
   }
   span.setAttribute(SemanticAttributes.CODE_FILEPATH, __filename);
+  span.end();
+}
+```
+
+## Span Status
+
+A status can be set on a span, to indicate if the traced operation has completed successfully (`Ok`) or with an `Error`. The default status is `Unset`.
+
+The status can be set at any time before the span is finished:
+
+```javascript
+function doWork(parent) {
+  const span = tracer.startSpan('doWork', {
+    parent,
+  });
+  span.setStatus({
+    code: opentelemetry.SpanStatusCode.OK,
+    message: 'Ok.'
+  })
+  for (let i = 0; i <= Math.floor(Math.random() * 40000000); i += 1) {
+    if(i > 10000) {
+      span.setStatus({
+        code: opentelemetry.SpanStatusCode.ERROR,
+        message: 'Error.'
+      })
+    }
+  }
   span.end();
 }
 ```
