@@ -22,11 +22,21 @@
       "packages/opentelemetry-propagator-b3": {},
       "packages/opentelemetry-propagator-jaeger": {},
       "packages/opentelemetry-resources": {},
-      "packages/opentelemetry-sdk-metrics-base": {},
-      "packages/opentelemetry-sdk-node": {},
-      "packages/opentelemetry-sdk-trace-base": {},
-      "packages/opentelemetry-sdk-trace-node": {},
-      "packages/opentelemetry-sdk-trace-web": {},
+      "packages/opentelemetry-sdk-metrics-base": {
+        "release-as": "0.24.0"
+      },
+      "packages/opentelemetry-sdk-node": {
+        "release-as": "0.24.0"
+      },
+      "packages/opentelemetry-sdk-trace-base": {
+        "release-as": "0.24.0"
+      },
+      "packages/opentelemetry-sdk-trace-node": {
+        "release-as": "0.24.0"
+      },
+      "packages/opentelemetry-sdk-trace-web": {
+        "release-as": "0.24.0"
+      },
       "packages/opentelemetry-semantic-conventions": {},
       "packages/opentelemetry-shim-opentracing": {}
     }
