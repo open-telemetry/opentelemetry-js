@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - main
+      - release-please-test
 name: release-please
 jobs:
   release-please:
@@ -10,3 +10,4 @@ jobs:
       - uses: google-github-actions/release-please-action@v2
         with:
           command: manifest
+          default-branch: release-please-test
