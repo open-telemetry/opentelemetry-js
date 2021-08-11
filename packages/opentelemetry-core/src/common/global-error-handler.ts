@@ -25,7 +25,7 @@ let delegateHandler = loggingErrorHandler();
  * Set the global error handler
  * @param {ErrorHandler} handler
  */
-export function setGlobalErrorHandler(handler: ErrorHandler) {
+export function setGlobalErrorHandler(handler: ErrorHandler): void {
   delegateHandler = handler;
 }
 
@@ -33,8 +33,8 @@ export function setGlobalErrorHandler(handler: ErrorHandler) {
  * Return the global error handler
  * @param {Exception} ex
  */
-export const globalErrorHandler = (ex: Exception) => {
+export function globalErrorHandler(ex: Exception): void {
   try {
     delegateHandler(ex);
   } catch {} // eslint-disable-line no-empty
-};
+}
