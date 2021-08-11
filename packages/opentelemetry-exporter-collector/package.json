@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-collector",
-  "version": "0.24.0",
+  "version": "0.25.0",
   "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -90,6 +90,6 @@
     "@opentelemetry/core": "0.24.0",
     "@opentelemetry/sdk-metrics-base": "0.24.0",
     "@opentelemetry/resources": "0.24.0",
-    "@opentelemetry/sdk-trace-base": "0.24.0"
+    "@opentelemetry/sdk-trace-base": "^0.24.0"
   }
 }

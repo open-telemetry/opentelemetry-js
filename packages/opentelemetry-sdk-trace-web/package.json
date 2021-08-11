@@ -84,6 +84,6 @@
   "dependencies": {
     "@opentelemetry/core": "0.24.0",
     "@opentelemetry/semantic-conventions": "0.24.0",
-    "@opentelemetry/sdk-trace-base": "0.24.0"
+    "@opentelemetry/sdk-trace-base": "^0.24.0"
   }
 }

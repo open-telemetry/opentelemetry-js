@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation-http",
-  "version": "0.24.0",
+  "version": "0.24.1",
   "description": "OpenTelemetry http/https automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -45,8 +45,8 @@
   "devDependencies": {
     "@opentelemetry/api": "^1.0.2",
     "@opentelemetry/context-async-hooks": "0.24.0",
-    "@opentelemetry/sdk-trace-node": "0.24.0",
-    "@opentelemetry/sdk-trace-base": "0.24.0",
+    "@opentelemetry/sdk-trace-node": "^0.24.0",
+    "@opentelemetry/sdk-trace-base": "^0.24.0",
     "@types/got": "9.6.12",
     "@types/mocha": "8.2.3",
     "@types/node": "14.17.9",

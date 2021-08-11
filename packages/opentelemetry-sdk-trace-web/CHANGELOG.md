@@ -1,0 +1,10 @@
+# Changelog
+
+## [0.24.0](https://www.github.com/open-telemetry/opentelemetry-js/compare/sdk-trace-web-v0.24.0...sdk-trace-web-v0.24.0) (2021-08-11)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @opentelemetry/sdk-trace-base bumped from 0.24.0 to ^0.24.0
