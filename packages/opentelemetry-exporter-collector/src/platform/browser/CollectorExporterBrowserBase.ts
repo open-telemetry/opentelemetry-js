@@ -28,11 +28,11 @@ import { getEnv, baggageUtils } from '@opentelemetry/core';
 export abstract class CollectorExporterBrowserBase<
   ExportItem,
   ServiceRequest
-> extends CollectorExporterBase<
+  > extends CollectorExporterBase<
   CollectorExporterConfigBase,
   ExportItem,
   ServiceRequest
-> {
+  > {
   protected _headers: Record<string, string>;
   private _useXHR: boolean = false;
 
@@ -68,7 +68,7 @@ export abstract class CollectorExporterBrowserBase<
     items: ExportItem[],
     onSuccess: () => void,
     onError: (error: collectorTypes.CollectorExporterError) => void
-  ) {
+  ): void {
     if (this._isShutdown) {
       diag.debug('Shutdown already started. Cannot send objects');
       return;
@@ -80,7 +80,7 @@ export abstract class CollectorExporterBrowserBase<
       if (this._useXHR) {
         sendWithXhr(body, this.url, this._headers, resolve, reject);
       } else {
-        sendWithBeacon(body, this.url, resolve, reject);
+        sendWithBeacon(body, this.url, { type: 'application/json' }, resolve, reject);
       }
     })
       .then(onSuccess, onError);
