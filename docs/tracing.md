@@ -65,7 +65,7 @@ Using span relationships, attributes, kind, and the related [semantic convention
 
 ```typescript
 import { NetTransportValues SemanticAttributes } from '@opentelemetry/semantic-conventions';
-import { context, setSpan, SpanKind } from '@opentelemetry/api';
+import { trace, context, SpanKind, SpanStatusCode } from '@opentelemetry/api';
 
 async function onGet(request, response) {
   // HTTP semantic conventions determine the span name and attributes for this span
@@ -76,7 +76,7 @@ async function onGet(request, response) {
       // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md
       [SemanticAttributes.HTTP_METHOD]: "GET",
       [SemanticAttributes.HTTP_FLAVOR]: "1.1",
-      [SemanticAttributes.HTTP_URL]: request.url
+      [SemanticAttributes.HTTP_URL]: request.url,
       [SemanticAttributes.NET_PEER_IP]: "192.0.2.5",
     },
     // This span represents a remote incoming synchronous request
@@ -86,7 +86,7 @@ async function onGet(request, response) {
   const userId = request.params.id;
 
   // Create a new context from the current context which has the span "active"
-  const ctx = setSpan(context.active(), span);
+  const ctx = trace.setSpan(context.active(), span);
   
   // Call getUser with the newly created context
   // 
