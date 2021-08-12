@@ -300,7 +300,7 @@ export class FetchInstrumentation extends InstrumentationBase<
         const options = input instanceof Request ? input : init || {};
         const createdSpan = plugin._createSpan(url, options);
         if (!createdSpan) {
-          return original.apply(this, options instanceof Request ? [options] : [url, options]);
+          return original.apply(this, arguments);
         }
         const spanData = plugin._prepareSpanData(url);
 
