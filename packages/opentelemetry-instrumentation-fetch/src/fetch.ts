@@ -300,7 +300,7 @@ export class FetchInstrumentation extends InstrumentationBase<
         const options = input instanceof Request ? input : init || {};
         const createdSpan = plugin._createSpan(url, options);
         if (!createdSpan) {
-          return original.apply(this, [url, options]);
+          return original.apply(this, options instanceof Request ? [options] : [url, options]);
         }
         const spanData = plugin._prepareSpanData(url);
 
@@ -380,7 +380,7 @@ export class FetchInstrumentation extends InstrumentationBase<
               plugin._addHeaders(options, url);
               plugin._tasksCount++;
               return original
-                .apply(this, [url, options])
+                .apply(this, options instanceof Request ? [options] : [url, options])
                 .then(
                   (onSuccess as any).bind(this, createdSpan, resolve),
                   onError.bind(this, createdSpan, reject)
