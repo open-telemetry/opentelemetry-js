@@ -72,9 +72,9 @@ The following dependencies are required to trace a Node.js application.
 
 These dependencies are required to configure the tracing SDK and create spans.
 
-- `@opentelemetry/api`
-- `@opentelemetry/sdk-trace-node`
-- `@opentelemetry/sdk-trace-base`
+```shell
+npm install @opentelemetry/sdk-node @opentelemetry/api
+```
 
 #### Exporter
 
@@ -91,6 +91,10 @@ Many common modules such as the `http` standard library module, `express`, and o
 
 You can also install all instrumentations maintained by the OpenTelemetry authors by using the `@opentelemetry/auto-instrumentations-node` module.
 
+```shell
+npm install @opentelemetry/auto-instrumentations-node
+```
+
 ### Setup
 
 The tracing setup and configuration should be run before your application code. One tool commonly used for this task is the [`-r, --require module`](https://nodejs.org/api/cli.html#cli_r_require_module) flag.
@@ -101,38 +105,18 @@ Create a file with a name like `tracing.js` which will contain your tracing setu
 /* tracing.js */
 
 // Require dependencies
-const { NodeTracerProvider } = require("@opentelemetry/sdk-trace-node");
-const { SimpleSpanProcessor, ConsoleSpanExporter } = require("@opentelemetry/sdk-trace-base");
-const { getNodeAutoInstrumentations } = require("@opentelemetry/auto-instrumentations-node');
-const { registerInstrumentations } = require('@opentelemetry/instrumentation');
+const opentelemetry = require("@opentelemetry/sdk-node");
+const { getNodeAutoInstrumentations } = require("@opentelemetry/auto-instrumentations-node");
 
-// Create a tracer provider
-const provider = new NodeTracerProvider();
-
-// The exporter handles sending spans to your tracing backend
-const exporter = new ConsoleSpanExporter();
-
-// The simple span processor sends spans to the exporter as soon as they are ended.
-const processor = new SimpleSpanProcessor(exporter);
-provider.addSpanProcessor(processor);
-
-// The provider must be registered in order to
-// be used by the OpenTelemetry API and instrumentations
-provider.register();
-
-// This will automatically enable all instrumentations
-registerInstrumentations({
-  instrumentations: [getNodeAutoInstrumentations()],
+const sdk = new opentelemetry.NodeSDK({
+  traceExporter: new opentelemetry.tracing.ConsoleSpanExporter(),
+  instrumentations: [getNodeAutoInstrumentations()]
 });
+
+sdk.start()
 ```
 
 ### Run Application
-
-First, install the dependencies as described above. Here you need to add the following:
-
-```shell
-npm install --save @opentelemetry/sdk-trace-node @opentelemetry/auto-instrumentations-node
-```
 
 Now you can run your application as you normally would, but you can use the `--require` flag to load the tracing code before the application code.
 
@@ -141,7 +125,7 @@ $ node --require './tracing.js' app.js
 Listening for requests on http://localhost:8080
 ```
 
-Now, when you open <http://localhost:8080> in your web browser, you should see the spans printed in the console by the `ConsoleSpanExporter`.
+Open <http://localhost:8080> in your web browser and reload the page a few times, after a while you should see the spans printed in the console by the `ConsoleSpanExporter`.
 
 <details>
 <summary>View example output</summary>
