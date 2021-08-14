@@ -49,7 +49,7 @@ function convertToTraceFlags(samplingState: string | undefined): TraceFlags {
  * Based on: https://github.com/openzipkin/b3-propagation
  */
 export class B3SinglePropagator implements TextMapPropagator {
-  inject(context: Context, carrier: unknown, setter: TextMapSetter) {
+  inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
     const spanContext = trace.getSpanContext(context);
     if (
       !spanContext ||
