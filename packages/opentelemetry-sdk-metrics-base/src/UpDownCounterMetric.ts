@@ -56,7 +56,7 @@ export class UpDownCounterMetric
    * @param [labels = {}] key-values pairs that are associated with a specific
    *     metric that you want to record.
    */
-  add(value: number, labels: api.Labels = {}) {
+  add(value: number, labels: api.Labels = {}): void {
     this.bind(labels).add(value);
   }
 }

@@ -59,6 +59,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
    */
   bind(labels: api.Labels): T {
     const hash = hashLabels(labels);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if (this._instruments.has(hash)) return this._instruments.get(hash)!;
 
     const instrument = this._makeInstrument(labels);
@@ -88,7 +89,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
     return this._kind;
   }
 
-  getAggregationTemporality() {
+  getAggregationTemporality(): api.AggregationTemporality {
     return this._aggregationTemporality;
   }
 

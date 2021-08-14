@@ -53,7 +53,7 @@ export class B3Propagator implements TextMapPropagator {
     }
   }
 
-  inject(context: Context, carrier: unknown, setter: TextMapSetter) {
+  inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
     if (isTracingSuppressed(context)) {
       return;
     }

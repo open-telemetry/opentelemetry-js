@@ -35,7 +35,7 @@ export class BatchObserverResult implements api.BatchObserverResult {
    *     updated
    * @param [callback]
    */
-  onObserveCalled(callback?: () => void) {
+  onObserveCalled(callback?: () => void): void {
     this._callback = callback;
   }
 
