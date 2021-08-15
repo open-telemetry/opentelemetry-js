@@ -339,7 +339,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       }
     });
     request.on('error', (error: Err) => {
-      diag.debug('outgoingRequest on request error()');
+      diag.debug('outgoingRequest on request error()', error);
       utils.setSpanWithError(span, error, request);
       this._closeHttpSpan(span);
     });
