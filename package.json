@@ -15,6 +15,7 @@
     "protos:copy": "lerna run protos:copy",
     "version:update": "lerna run version:update",
     "test": "lerna run test",
+    "test:ci": "lerna run test --parallel",
     "test:browser": "lerna run test:browser",
     "test:backcompat": "lerna run test:backcompat",
     "bootstrap": "lerna bootstrap --hoist --nohoist='zone.js'",
