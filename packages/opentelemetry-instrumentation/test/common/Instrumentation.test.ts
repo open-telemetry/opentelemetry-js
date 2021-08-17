@@ -28,10 +28,12 @@ interface TestInstrumentationConfig extends InstrumentationConfig {
 class TestInstrumentation extends InstrumentationBase {
   constructor(config: TestInstrumentationConfig & InstrumentationConfig = {}) {
     super('test', '1.0.0', Object.assign({}, config));
+    this.loadInstrumentation();
   }
+
   override enable() {}
+
   override disable() {}
-  init() {}
 }
 
 describe('BaseInstrumentation', () => {

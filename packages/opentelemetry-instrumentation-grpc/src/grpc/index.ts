@@ -60,6 +60,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
     version: string
   ) {
     super(name, version, _config);
+    this.loadInstrumentation(this.getInstrumentationsModules());
   }
 
   public override setConfig(
@@ -68,7 +69,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
     this._config = Object.assign({}, config);
   }
 
-  init() {
+  getInstrumentationsModules() {
     return [
       new InstrumentationNodeModuleDefinition<typeof grpcTypes>(
         'grpc',

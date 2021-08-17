@@ -16,20 +16,29 @@
 
 import { InstrumentationAbstract } from '../../instrumentation';
 import * as types from '../../types';
+import { InstrumentationBaseBrowser } from './types';
 
 /**
  * Base abstract class for instrumenting web plugins
  */
 export abstract class InstrumentationBase
   extends InstrumentationAbstract
-  implements types.Instrumentation {
+  implements InstrumentationBaseBrowser {
+  private _timer?: number;
+
   constructor(
     instrumentationName: string,
     instrumentationVersion: string,
     config: types.InstrumentationConfig = {}
   ) {
     super(instrumentationName, instrumentationVersion, config);
+    this._timer = window?.setTimeout(() => {
+      throw ('You forgot to call loadInstrumentation in constructor');
+    });
+  }
 
+  loadInstrumentation() {
+    clearTimeout(this._timer);
     if (this._config.enabled) {
       this.enable();
     }

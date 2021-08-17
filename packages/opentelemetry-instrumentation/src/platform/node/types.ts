@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
+import { Instrumentation } from '../../types';
+
+export interface InstrumentationBaseNode<T = any> extends Instrumentation {
+  loadInstrumentation(instrumentationModuleDefinitions: InstrumentationModuleDefinition<T>
+    | InstrumentationModuleDefinition<T>[]
+    | void
+  ): void;
+}
+
 export interface InstrumentationModuleFile<T> {
   /** Name of file to be patched with relative path */
   name: string;

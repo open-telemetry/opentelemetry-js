@@ -14,21 +14,8 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import { normalize } from 'path';
-import { InstrumentationNodeModuleFile } from '../../src/platform/node';
+import { Instrumentation } from '../../types';
 
-describe('InstrumentationNodeModuleFile', () => {
-  it('should convert path', () => {
-    const tests = ['c:\\\\foo\\\\bar\\aa', '///home//foo/bar///aa'];
-    tests.forEach(name => {
-      const instrumentationNodeModuleFile = new InstrumentationNodeModuleFile(
-        name,
-        [],
-        () => {},
-        () => {}
-      );
-      assert.strictEqual(instrumentationNodeModuleFile.name, normalize(name));
-    });
-  });
-});
+export interface InstrumentationBaseBrowser extends Instrumentation {
+  loadInstrumentation(): void;
+}

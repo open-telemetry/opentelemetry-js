@@ -18,7 +18,11 @@ import { Tracer, TracerProvider } from '@opentelemetry/api';
 import { NOOP_METER_PROVIDER } from '@opentelemetry/api-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { InstrumentationBase, registerInstrumentations } from '../../src';
+import {
+  InstrumentationBase,
+  InstrumentationConfig,
+  registerInstrumentations
+} from '../../src';
 
 class DummyTracerProvider implements TracerProvider {
   getTracer(name: string, version?: string): Tracer {
@@ -26,8 +30,9 @@ class DummyTracerProvider implements TracerProvider {
   }
 }
 class FooInstrumentation extends InstrumentationBase {
-  init() {
-    return [];
+  constructor(config?: InstrumentationConfig) {
+    super('test', '1.0.0', Object.assign({}, config));
+    this.loadInstrumentation();
   }
   override enable() {}
   override disable() {}
@@ -53,7 +58,7 @@ describe('autoLoader', () => {
       const tracerProvider = new DummyTracerProvider();
       const meterProvider = NOOP_METER_PROVIDER;
       beforeEach(() => {
-        instrumentation = new FooInstrumentation('foo', '1', {});
+        instrumentation = new FooInstrumentation();
         enableSpy = sinon.spy(instrumentation, 'enable');
         setTracerProviderSpy = sinon.stub(instrumentation, 'setTracerProvider');
         setsetMeterProvider = sinon.stub(instrumentation, 'setMeterProvider');

@@ -21,10 +21,7 @@ import { parseInstrumentationOptions } from '../../src/autoLoaderUtils';
 class FooInstrumentation extends InstrumentationBase {
   constructor() {
     super('foo', '1', {});
-  }
-
-  init() {
-    return [];
+    this.loadInstrumentation();
   }
 
   override enable() {}

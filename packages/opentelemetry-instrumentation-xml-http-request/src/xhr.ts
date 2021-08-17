@@ -79,10 +79,6 @@ export interface XMLHttpRequestInstrumentationConfig
  * This class represents a XMLHttpRequest plugin for auto instrumentation
  */
 export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRequest> {
-  readonly component: string = 'xml-http-request';
-  readonly version: string = VERSION;
-  moduleName = this.component;
-
   private _tasksCount = 0;
   private _xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
@@ -95,9 +91,8 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       VERSION,
       Object.assign({}, config)
     );
+    this.loadInstrumentation();
   }
-
-  init() {}
 
   private _getConfig(): XMLHttpRequestInstrumentationConfig {
     return this._config;
@@ -515,7 +510,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * implements enable function
    */
   override enable() {
-    this._diag.debug('applying patch to', this.moduleName, this.version);
+    this._diag.debug('applying patch to', this.instrumentationName, this.instrumentationVersion);
 
     if (isWrapped(XMLHttpRequest.prototype.open)) {
       this._unwrap(XMLHttpRequest.prototype, 'open');
@@ -535,7 +530,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
    * implements disable function
    */
   override disable() {
-    this._diag.debug('removing patch from', this.moduleName, this.version);
+    this._diag.debug('removing patch from', this.instrumentationName, this.instrumentationVersion);
 
     this._unwrap(XMLHttpRequest.prototype, 'open');
     this._unwrap(XMLHttpRequest.prototype, 'send');

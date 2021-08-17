@@ -61,6 +61,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
     version: string
   ) {
     super(name, version, _config);
+    this.loadInstrumentation(this.getInstrumentationsModules());
   }
 
   public override setConfig(
@@ -69,7 +70,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
     this._config = Object.assign({}, config);
   }
 
-  init() {
+  getInstrumentationsModules() {
     return [
       new InstrumentationNodeModuleDefinition<typeof grpcJs>(
         '@grpc/grpc-js',

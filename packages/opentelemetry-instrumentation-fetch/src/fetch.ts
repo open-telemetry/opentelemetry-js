@@ -70,9 +70,6 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
 export class FetchInstrumentation extends InstrumentationBase<
   Promise<Response>
 > {
-  readonly component: string = 'fetch';
-  readonly version: string = VERSION;
-  moduleName = this.component;
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
   private _tasksCount = 0;
 
@@ -82,9 +79,8 @@ export class FetchInstrumentation extends InstrumentationBase<
       VERSION,
       Object.assign({}, config)
     );
+    this.loadInstrumentation();
   }
-
-  init() {}
 
   private _getConfig(): FetchInstrumentationConfig {
     return this._config;
@@ -196,7 +192,7 @@ export class FetchInstrumentation extends InstrumentationBase<
     return this.tracer.startSpan(spanName, {
       kind: api.SpanKind.CLIENT,
       attributes: {
-        [AttributeNames.COMPONENT]: this.moduleName,
+        [AttributeNames.COMPONENT]: this.instrumentationName,
         [SemanticAttributes.HTTP_METHOD]: method,
         [SemanticAttributes.HTTP_URL]: url,
       },

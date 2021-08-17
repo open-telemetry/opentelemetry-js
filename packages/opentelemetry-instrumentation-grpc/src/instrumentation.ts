@@ -65,11 +65,6 @@ export class GrpcInstrumentation {
     return this._config;
   }
 
-  init() {
-    // sub instrumentations will already be init when constructing them
-    return;
-  }
-
   enable() {
     this._grpcJsInstrumentation.enable();
     this._grpcNativeInstrumentation.enable();

@@ -23,13 +23,12 @@ import {
 } from '@opentelemetry/api';
 import { Meter, MeterProvider, metrics } from '@opentelemetry/api-metrics';
 import * as shimmer from 'shimmer';
-import { InstrumentationModuleDefinition } from './platform/node';
 import * as types from './types';
 
 /**
  * Base abstract internal class for instrumenting node and web plugins
  */
-export abstract class InstrumentationAbstract<T = any>
+export abstract class InstrumentationAbstract
   implements types.Instrumentation {
   protected _config: types.InstrumentationConfig;
 
@@ -116,12 +115,4 @@ export abstract class InstrumentationAbstract<T = any>
   /* Enable plugin */
   public abstract disable(): void;
 
-  /**
-   * Init method in which plugin should define _modules and patches for
-   * methods
-   */
-  protected abstract init():
-    | InstrumentationModuleDefinition<T>
-    | InstrumentationModuleDefinition<T>[]
-    | void;
 }

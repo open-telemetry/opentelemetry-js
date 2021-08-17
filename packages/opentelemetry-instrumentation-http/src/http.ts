@@ -65,6 +65,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       VERSION,
       Object.assign({}, config)
     );
+    this.loadInstrumentation(this.getInstrumentationsModules());
   }
 
   private _getConfig(): HttpInstrumentationConfig {
@@ -75,7 +76,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     this._config = Object.assign({}, config);
   }
 
-  init() {
+  getInstrumentationsModules() {
     return [this._getHttpsInstrumentation(), this._getHttpInstrumentation()];
   }
 

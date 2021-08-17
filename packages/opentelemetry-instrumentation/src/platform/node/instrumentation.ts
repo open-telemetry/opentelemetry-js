@@ -19,7 +19,10 @@ import * as path from 'path';
 import * as RequireInTheMiddle from 'require-in-the-middle';
 import { satisfies } from 'semver';
 import { InstrumentationAbstract } from '../../instrumentation';
-import { InstrumentationModuleDefinition } from './types';
+import {
+  InstrumentationBaseNode,
+  InstrumentationModuleDefinition
+} from './types';
 import { diag } from '@opentelemetry/api';
 
 /**
@@ -27,10 +30,11 @@ import { diag } from '@opentelemetry/api';
  */
 export abstract class InstrumentationBase<T = any>
   extends InstrumentationAbstract
-  implements types.Instrumentation {
-  private _modules: InstrumentationModuleDefinition<T>[];
+  implements InstrumentationBaseNode<T> {
+  private _modules?: InstrumentationModuleDefinition<any>[];
   private _hooks: RequireInTheMiddle.Hooked[] = [];
   private _enabled = false;
+  private _timer?: NodeJS.Timeout;
 
   constructor(
     instrumentationName: string,
@@ -38,14 +42,27 @@ export abstract class InstrumentationBase<T = any>
     config: types.InstrumentationConfig = {}
   ) {
     super(instrumentationName, instrumentationVersion, config);
+    this._timer = setTimeout(() => {
+      throw new Error('You forgot to call loadInstrumentation in constructor');
+    });
+  }
 
-    let modules = this.init();
+  loadInstrumentation(instrumentationModuleDefinitions:
+                        InstrumentationModuleDefinition<any>
+                        | InstrumentationModuleDefinition<any>[]
+                        | void
+  ) {
+    if (typeof this._timer !== 'undefined'){
+      clearTimeout(this._timer);
+    }
+
+    let modules = instrumentationModuleDefinitions;
 
     if (modules && !Array.isArray(modules)) {
       modules = [modules];
     }
 
-    this._modules = (modules as InstrumentationModuleDefinition<T>[]) || [];
+    this._modules = modules || [];
 
     if (this._modules.length === 0) {
       diag.warn(
@@ -53,7 +70,6 @@ export abstract class InstrumentationBase<T = any>
         ' nothing will be patched'
       );
     }
-
     if (this._config.enabled) {
       this.enable();
     }
@@ -109,6 +125,10 @@ export abstract class InstrumentationBase<T = any>
     }
     this._enabled = true;
 
+    if (!this._modules) {
+      throw new Error('Modules not loaded, please call "loadInstrumentation" in' +
+        ' constructor with InstrumentationModuleDefinition as param');
+    }
     // already hooked, just call patch again
     if (this._hooks.length > 0) {
       for (const module of this._modules) {
@@ -149,7 +169,10 @@ export abstract class InstrumentationBase<T = any>
       return;
     }
     this._enabled = false;
-
+    if (!this._modules) {
+      throw new Error('Modules not loaded, please call "loadInstrumentation" in' +
+        ' constructor with InstrumentationModuleDefinition as param');
+    }
     for (const module of this._modules) {
       if (typeof module.unpatch === 'function' && module.moduleExports) {
         module.unpatch(module.moduleExports, module.moduleVersion);
