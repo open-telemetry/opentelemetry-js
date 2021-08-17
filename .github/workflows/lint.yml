@@ -49,14 +49,14 @@ jobs:
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
           npm ci --ignore-scripts
-          npx lerna bootstrap --ignore-scripts
+          npx lerna bootstrap --ignore-scripts --hoist --nohoist='zone.js'
 
       # On a cache miss, fall back to a regular install
       - name: Bootstrap (cache miss)
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --ignore-scripts -- --only=dev
+          npx lerna bootstrap --no-ci --ignore-scripts --hoist --nohoist='zone.js' -- --only=dev
 
       - name: Lint
         run: |
