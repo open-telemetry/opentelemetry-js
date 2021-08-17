@@ -17,7 +17,7 @@
     "test": "lerna run test",
     "test:browser": "lerna run test:browser",
     "test:backcompat": "lerna run test:backcompat",
-    "bootstrap": "lerna bootstrap",
+    "bootstrap": "lerna bootstrap --hoist --nohoist='zone.js'",
     "changelog": "lerna-changelog",
     "codecov": "lerna run codecov",
     "codecov:browser": "lerna run codecov:browser",

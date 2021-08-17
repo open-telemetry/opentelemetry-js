@@ -33,6 +33,8 @@
     "@opentelemetry/exporter-zipkin": "0.24.0",
     "@opentelemetry/instrumentation": "0.24.0",
     "@opentelemetry/instrumentation-grpc": "0.24.0",
+    "@opentelemetry/resources": "0.24.0",
+    "@opentelemetry/semantic-conventions": "0.24.0",
     "@opentelemetry/sdk-trace-node": "0.24.0",
     "@opentelemetry/sdk-trace-base": "0.24.0",
     "google-protobuf": "^3.9.2",

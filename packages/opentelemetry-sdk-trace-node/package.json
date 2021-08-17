@@ -67,6 +67,6 @@
     "@opentelemetry/propagator-b3": "0.24.0",
     "@opentelemetry/propagator-jaeger": "0.24.0",
     "@opentelemetry/sdk-trace-base": "0.24.0",
-    "semver": "^7.1.3"
+    "semver": "^7.3.5"
   }
 }
