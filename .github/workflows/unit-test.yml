@@ -51,7 +51,7 @@ jobs:
           npm run compile
 
       - name: Unit tests
-        run: npm run test:ci
+        run: npm run test
       - name: Report Coverage
         run: npm run codecov
         if: ${{ matrix.node_version == '14' }}
