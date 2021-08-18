@@ -240,7 +240,7 @@ export class Span implements api.Span, ReadableSpan {
   // for value type of string, will truncate to given limit
   // for type of non-string, will return same value
   private _truncateToLimitUtil(value: string, limit: number): string {
-    if (typeof value != 'string' || value.length <= limit) {
+    if (value.length <= limit) {
       return value;
     }
     return value.substr(0, limit);
@@ -249,9 +249,9 @@ export class Span implements api.Span, ReadableSpan {
   // Check whether given value is array of strings or not
   private _isArrayOfStrings(value: unknown): boolean {
     if (!Array.isArray(value)) {
-      return false
+      return false;
     }
-    return value.every(val => typeof val == 'string')
+    return value.every(val => typeof val == 'string');
   }
 
   /**
@@ -267,16 +267,12 @@ export class Span implements api.Span, ReadableSpan {
    * @returns truncated attribute value if required, otherwise same value
    */
   private _truncateToSize(value?: SpanAttributeValue): SpanAttributeValue | undefined {
-    const limit = this._spanLimits.attributeValueLengthLimit!
+    const limit = this._spanLimits.attributeValueLengthLimit;
     // Check limit
+    // undefined limit means do not truncate
     if (typeof limit != 'number' || limit <= 0) {
+      // Non-integer and negative values are invalid, so do not truncate
       api.diag.warn(`Attribute value limit must be positive, got ${limit}`);
-      return value;
-    }
-
-    // Check type of values
-    // Allowed types are string, array of strings
-    if (value == null || (typeof value != 'string' && !Array.isArray(value))) {
       return value;
     }
 
@@ -287,7 +283,7 @@ export class Span implements api.Span, ReadableSpan {
 
     // Array of strings
     if (this._isArrayOfStrings(value)) {
-      return value.map(val => this._truncateToLimitUtil(val as string, limit));
+      return (value as []).map(val => this._truncateToLimitUtil(val as string, limit));
     }
 
     // Other types, no need to apply value length limit

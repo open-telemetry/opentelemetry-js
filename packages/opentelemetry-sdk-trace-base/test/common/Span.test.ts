@@ -285,6 +285,8 @@ describe('Span', () => {
     span.setAttribute('attr-empty-string', '');
     span.setAttribute('attr-non-string', true);
     span.setAttribute('attr-array-of-strings', ['abcdefgh', 'abc', 'abcde', '']);
+    // This empty length key attribute should be avoided in setting attributes
+    span.setAttribute('', 'empty-key');
 
     assert.deepStrictEqual(span.attributes, {
       'attr-with-more-length': 'abcde',
@@ -292,6 +294,33 @@ describe('Span', () => {
       'attr-empty-string': '',
       'attr-non-string': true,
       'attr-array-of-strings': ['abcde', 'abc', 'abcde', ''],
+    });
+  });
+
+  it('should not truncate values when invalid attribute value length limit', () => {
+    const tracer = new BasicTracerProvider({
+      spanLimits: {
+        // Setting invalid attribute value length limit
+        attributeValueLengthLimit: -5,
+        attributeCountLimit: 100,
+        eventCountLimit: 100,
+      },
+    }).getTracer('default');
+
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.CLIENT
+    );
+
+    span.setAttribute('attr-not-truncate', 'abcdefgh');
+    span.setAttribute('attr-array-of-strings', ['abcdefgh', 'abc', 'abcde']);
+
+    assert.deepStrictEqual(span.attributes, {
+      'attr-not-truncate': 'abcdefgh',
+      'attr-array-of-strings': ['abcdefgh', 'abc', 'abcde'],
     });
   });
 
