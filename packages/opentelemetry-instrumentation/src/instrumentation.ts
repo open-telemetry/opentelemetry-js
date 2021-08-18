@@ -31,7 +31,7 @@ import * as types from './types';
  */
 export abstract class InstrumentationAbstract<T = any>
   implements types.Instrumentation {
-  protected _config: types.InstrumentationConfig;
+  protected _config: types.InstrumentationConfig<T>;
 
   private _tracer: Tracer;
   private _meter: Meter;
@@ -40,7 +40,7 @@ export abstract class InstrumentationAbstract<T = any>
   constructor(
     public readonly instrumentationName: string,
     public readonly instrumentationVersion: string,
-    config: types.InstrumentationConfig = {}
+    config: types.InstrumentationConfig<T> = {}
   ) {
     this._config = {
       enabled: true,

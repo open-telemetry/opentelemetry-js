@@ -124,23 +124,40 @@ export abstract class InstrumentationBase<T = any>
       return;
     }
 
+    let loaded: types.AlreadyLoadedDefinition<T>[] | undefined;
+    if (this._config.loadedModules) {
+      loaded = Array.isArray(this._config.loadedModules) ? this._config.loadedModules : [this._config.loadedModules];
+    }
+
     for (const module of this._modules) {
-      this._hooks.push(
-        RequireInTheMiddle(
-          [module.name],
-          { internals: true },
-          (exports, name, baseDir) => {
-            return this._onRequire<typeof exports>(
-              (module as unknown) as InstrumentationModuleDefinition<
-                typeof exports
-              >,
-              exports,
-              name,
-              baseDir
-            );
-          }
-        )
-      );
+      const alreadyLoaded = loaded?.find(loadedTarget => loadedTarget.name === module.name);
+      if (alreadyLoaded) {
+        this._hooks.push({
+          unhook: () => { }
+        });
+        this._onRequire<typeof alreadyLoaded.module>(
+          (module as unknown) as InstrumentationModuleDefinition<typeof alreadyLoaded.module>,
+          alreadyLoaded.module,
+          alreadyLoaded.name,
+        );
+      } else {
+        this._hooks.push(
+          RequireInTheMiddle(
+            [module.name],
+            { internals: true },
+            (exports, name, baseDir) => {
+              return this._onRequire<typeof exports>(
+                (module as unknown) as InstrumentationModuleDefinition<
+                  typeof exports
+                >,
+                exports,
+                name,
+                baseDir
+              );
+            }
+          )
+        );
+      }
     }
   }
 

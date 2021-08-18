@@ -59,7 +59,19 @@ export interface Instrumentation {
   supportedVersions?: string[];
 }
 
-export interface InstrumentationConfig {
+/**
+ * A reference to an already loaded module. Use this
+ * with [InstrumentationConfig#loadedModules] to provide
+ * a reference to the already loaded module
+ */
+export type AlreadyLoadedDefinition<WrappedType> = {
+  /* The module name */
+  name: string;
+  /* A reference to the loaded module (loaded with `require` or `import * as ...`) */
+  module: WrappedType;
+}
+
+export interface InstrumentationConfig<WrappedType = any> {
   /**
    * Whether to enable the plugin.
    * @default true
@@ -71,6 +83,14 @@ export interface InstrumentationConfig {
    * @default '@opentelemetry/plugin-http' in case of http.
    */
   path?: string;
+
+  /**
+   * The already required library to be wrapped. This may be
+   * useful when the existing auto-instrumentation does
+   * not work for your environment (such as when webpack
+   * is used)
+   */
+  loadedModules?: AlreadyLoadedDefinition<WrappedType> | AlreadyLoadedDefinition<WrappedType>[];
 }
 
 /**
