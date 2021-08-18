@@ -1,6 +1,6 @@
 {
   "name": "propagation-validation-server",
-  "version": "0.24.0",
+  "version": "0.25.0",
   "description": "server for w3c tests",
   "main": "validation_server.js",
   "private": true,
@@ -12,9 +12,9 @@
   },
   "dependencies": {
     "@opentelemetry/api": "^1.0.2",
-    "@opentelemetry/context-async-hooks": "0.24.0",
-    "@opentelemetry/core": "0.24.0",
-    "@opentelemetry/sdk-trace-base": "0.24.0",
+    "@opentelemetry/context-async-hooks": "0.25.0",
+    "@opentelemetry/core": "0.25.0",
+    "@opentelemetry/sdk-trace-base": "0.25.0",
     "axios": "0.21.1",
     "body-parser": "1.19.0",
     "express": "4.17.1"
