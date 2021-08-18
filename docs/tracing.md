@@ -4,7 +4,22 @@ This quick start is for end users of OpenTelemetry who wish to manually trace th
 
 For a high-level overview of OpenTelemetry tracing in general and definitions of some common terms, you can refer to the [OpenTelemetry Specification Overview][spec-overview]
 
-_Trace API reference: <https://open-telemetry.github.io/opentelemetry-js-api/classes/traceapi.html>_
+_Trace API Specification: <https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.0/specification/trace/api.md>_
+
+_Trace API Reference: <https://open-telemetry.github.io/opentelemetry-js-api/classes/traceapi.html>_
+
+- [Acquiring a Tracer](#acquiring-a-tracer)
+- [Starting and Ending a Span](#starting-and-ending-a-span)
+- [Describing a Span](#describing-a-span)
+  - [Span Relationships](#span-relationships)
+  - [Span Attributes](#span-attributes)
+  - [Span Kind](#span-kind)
+    - [Client](#client)
+    - [Server](#server)
+    - [Internal](#internal)
+    - [Producer](#producer)
+    - [Consumer](#consumer)
+  - [Semantic Conventions](#semantic-conventions)
 
 ## Acquiring a Tracer
 
