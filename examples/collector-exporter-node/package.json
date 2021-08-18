@@ -33,6 +33,8 @@
     "@opentelemetry/exporter-collector": "0.24.0",
     "@opentelemetry/exporter-collector-grpc": "0.24.0",
     "@opentelemetry/exporter-collector-proto": "0.24.0",
+    "@opentelemetry/resources": "0.24.0",
+    "@opentelemetry/semantic-conventions": "0.24.0",
     "@opentelemetry/sdk-metrics-base": "0.24.0",
     "@opentelemetry/sdk-trace-base": "0.24.0"
   },
