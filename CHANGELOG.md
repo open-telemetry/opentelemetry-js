@@ -35,6 +35,8 @@ All notable changes to this project will be documented in this file.
 
 ### :house: (Internal)
 
+* `opentelemetry-core`, `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector-proto`, `opentelemetry-instrumentation-http`, `opentelemetry-sdk-trace-node`
+  * [#2416](https://github.com/open-telemetry/opentelemetry-js/pull/2416) chore: hoist dependencies to speed up ci ([@dyladan](https://github.com/dyladan))
 * `opentelemetry-propagator-b3`, `opentelemetry-propagator-jaeger`, `opentelemetry-resources`, `opentelemetry-sdk-metrics-base`
   * [#2406](https://github.com/open-telemetry/opentelemetry-js/pull/2406) chore: Fix lint warnings in propagator-jaeger, propagator-b3, resources, and sdk-metrics-base packages ([@alisabzevari](https://github.com/alisabzevari))
 * `opentelemetry-core`
