@@ -105,7 +105,7 @@ export class Span implements api.Span, ReadableSpan {
     ) {
       return this;
     }
-    this.attributes[key] = value;
+    this.attributes[key] = this._truncateToSize(value);
     return this;
   }
 
@@ -234,5 +234,63 @@ export class Span implements api.Span, ReadableSpan {
       );
     }
     return this._ended;
+  }
+
+  // Utility function to truncate given value within size
+  // for value type of string, will truncate to given limit
+  // for type of non-string, will return same value
+  private _truncateToLimitUtil(value: string, limit: number): string {
+    if (typeof value != 'string' || value.length <= limit) {
+      return value;
+    }
+    return value.substr(0, limit);
+  }
+
+  // Check whether given value is array of strings or not
+  private _isArrayOfStrings(value: unknown): boolean {
+    if (!Array.isArray(value)) {
+      return false
+    }
+    return value.every(val => typeof val == 'string')
+  }
+
+  /**
+   * If the given attribute value is of type string and has more characters than given {@code attributeValueLengthLimit} then
+   * return string with trucated to {@code attributeValueLengthLimit} characters
+   *
+   * If the given attribute value is array of strings then
+   * return new array of strings with each element truncated to {@code attributeValueLengthLimit} characters
+   *
+   * Otherwise return same Attribute {@code value}
+   *
+   * @param value Attribute value
+   * @returns truncated attribute value if required, otherwise same value
+   */
+  private _truncateToSize(value?: SpanAttributeValue): SpanAttributeValue | undefined {
+    const limit = this._spanLimits.attributeValueLengthLimit!
+    // Check limit
+    if (typeof limit != 'number' || limit <= 0) {
+      api.diag.warn(`Attribute value limit must be positive, got ${limit}`);
+      return value;
+    }
+
+    // Check type of values
+    // Allowed types are string, array of strings
+    if (value == null || (typeof value != 'string' && !Array.isArray(value))) {
+      return value;
+    }
+
+    // String
+    if (typeof value == 'string') {
+      return this._truncateToLimitUtil(value, limit);
+    }
+
+    // Array of strings
+    if (this._isArrayOfStrings(value)) {
+      return value.map(val => this._truncateToLimitUtil(val as string, limit));
+    }
+
+    // Other types, no need to apply value length limit
+    return value;
   }
 }

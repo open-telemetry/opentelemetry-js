@@ -37,6 +37,7 @@ const performanceTimeOrigin = hrTime();
 describe('Span', () => {
   const tracer = new BasicTracerProvider({
     spanLimits: {
+      attributeValueLengthLimit: 100,
       attributeCountLimit: 100,
       eventCountLimit: 100,
     },
@@ -258,6 +259,39 @@ describe('Span', () => {
 
     assert.deepStrictEqual(span.attributes, {
       overwrite: 'overwritten value',
+    });
+  });
+
+  it('should truncate values more than attribute value length limit', () => {
+    const tracer = new BasicTracerProvider({
+      spanLimits: {
+        // Setting attribute value length limit
+        attributeValueLengthLimit: 5,
+        attributeCountLimit: 100,
+        eventCountLimit: 100,
+      },
+    }).getTracer('default');
+
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.CLIENT
+    );
+
+    span.setAttribute('attr-with-more-length', 'abcdefgh');
+    span.setAttribute('attr-with-less-length', 'abc');
+    span.setAttribute('attr-empty-string', '');
+    span.setAttribute('attr-non-string', true);
+    span.setAttribute('attr-array-of-strings', ['abcdefgh', 'abc', 'abcde', '']);
+
+    assert.deepStrictEqual(span.attributes, {
+      'attr-with-more-length': 'abcde',
+      'attr-with-less-length': 'abc',
+      'attr-empty-string': '',
+      'attr-non-string': true,
+      'attr-array-of-strings': ['abcde', 'abc', 'abcde', ''],
     });
   });
 

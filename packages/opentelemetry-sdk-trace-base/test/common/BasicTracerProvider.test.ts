@@ -79,6 +79,7 @@ describe('BasicTracerProvider', () => {
     it('should construct an instance with default span limits', () => {
       const tracer = new BasicTracerProvider({}).getTracer('default');
       assert.deepStrictEqual(tracer.getSpanLimits(), {
+        attributeValueLengthLimit: Infinity,
         attributeCountLimit: 128,
         eventCountLimit: 128,
         linkCountLimit: 128,
@@ -92,7 +93,22 @@ describe('BasicTracerProvider', () => {
         },
       }).getTracer('default');
       assert.deepStrictEqual(tracer.getSpanLimits(), {
+        attributeValueLengthLimit: Infinity,
         attributeCountLimit: 100,
+        eventCountLimit: 128,
+        linkCountLimit: 128,
+      });
+    });
+
+    it('should construct an instance with customized attributeValueLengthLimit span limits', () => {
+      const tracer = new BasicTracerProvider({
+        spanLimits: {
+          attributeValueLengthLimit: 10,
+        },
+      }).getTracer('default');
+      assert.deepStrictEqual(tracer.getSpanLimits(), {
+        attributeValueLengthLimit: 10,
+        attributeCountLimit: 128,
         eventCountLimit: 128,
         linkCountLimit: 128,
       });
@@ -105,6 +121,7 @@ describe('BasicTracerProvider', () => {
         },
       }).getTracer('default');
       assert.deepStrictEqual(tracer.getSpanLimits(), {
+        attributeValueLengthLimit: Infinity,
         attributeCountLimit: 128,
         eventCountLimit: 300,
         linkCountLimit: 128,
@@ -118,6 +135,7 @@ describe('BasicTracerProvider', () => {
         },
       }).getTracer('default');
       assert.deepStrictEqual(tracer.getSpanLimits(), {
+        attributeValueLengthLimit: Infinity,
         attributeCountLimit: 128,
         eventCountLimit: 128,
         linkCountLimit: 10,
