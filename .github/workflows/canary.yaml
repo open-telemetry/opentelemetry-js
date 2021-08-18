@@ -42,14 +42,14 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           npm install --ignore-scripts
-          npx lerna bootstrap --no-ci
+          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js'
           npm run compile
 
       - name: Install and Build (cache hit) 🔧
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
           npm ci --ignore-scripts
-          npx lerna bootstrap
+          npx lerna bootstrap --hoist --nohoist='zone.js'
           npm run compile
 
       - name: Publish
