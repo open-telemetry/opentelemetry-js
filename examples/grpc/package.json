@@ -1,7 +1,7 @@
 {
   "name": "grpc-example",
   "private": true,
-  "version": "0.24.0",
+  "version": "0.25.0",
   "description": "Example of gRPC integration with OpenTelemetry",
   "main": "index.js",
   "scripts": {
@@ -29,14 +29,14 @@
   },
   "dependencies": {
     "@opentelemetry/api": "^1.0.2",
-    "@opentelemetry/exporter-jaeger": "0.24.0",
-    "@opentelemetry/exporter-zipkin": "0.24.0",
-    "@opentelemetry/instrumentation": "0.24.0",
-    "@opentelemetry/instrumentation-grpc": "0.24.0",
-    "@opentelemetry/resources": "0.24.0",
-    "@opentelemetry/semantic-conventions": "0.24.0",
-    "@opentelemetry/sdk-trace-node": "0.24.0",
-    "@opentelemetry/sdk-trace-base": "0.24.0",
+    "@opentelemetry/exporter-jaeger": "0.25.0",
+    "@opentelemetry/exporter-zipkin": "0.25.0",
+    "@opentelemetry/instrumentation": "0.25.0",
+    "@opentelemetry/instrumentation-grpc": "0.25.0",
+    "@opentelemetry/resources": "0.25.0",
+    "@opentelemetry/semantic-conventions": "0.25.0",
+    "@opentelemetry/sdk-trace-node": "0.25.0",
+    "@opentelemetry/sdk-trace-base": "0.25.0",
     "google-protobuf": "^3.9.2",
     "grpc": "^1.23.3",
     "node-pre-gyp": "0.14.0"
