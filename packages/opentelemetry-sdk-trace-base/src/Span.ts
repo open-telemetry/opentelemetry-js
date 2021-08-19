@@ -246,14 +246,6 @@ export class Span implements api.Span, ReadableSpan {
     return value.substr(0, limit);
   }
 
-  // Check whether given value is array of strings or not
-  private _isArrayOfStrings(value: unknown): boolean {
-    if (!Array.isArray(value)) {
-      return false;
-    }
-    return value.every(val => typeof val == 'string');
-  }
-
   /**
    * If the given attribute value is of type string and has more characters than given {@code attributeValueLengthLimit} then
    * return string with trucated to {@code attributeValueLengthLimit} characters
@@ -270,20 +262,20 @@ export class Span implements api.Span, ReadableSpan {
     const limit = this._spanLimits.attributeValueLengthLimit;
     // Check limit
     // undefined limit means do not truncate
-    if (typeof limit != 'number' || limit <= 0) {
+    if (typeof limit !== 'number' || limit <= 0) {
       // Non-integer and negative values are invalid, so do not truncate
       api.diag.warn(`Attribute value limit must be positive, got ${limit}`);
       return value;
     }
 
     // String
-    if (typeof value == 'string') {
+    if (typeof value === 'string') {
       return this._truncateToLimitUtil(value, limit);
     }
 
     // Array of strings
-    if (this._isArrayOfStrings(value)) {
-      return (value as []).map(val => this._truncateToLimitUtil(val as string, limit));
+    if (Array.isArray(value)) {
+      return (value as []).map(val => typeof val === 'string' ? this._truncateToLimitUtil(val, limit) : val);
     }
 
     // Other types, no need to apply value length limit
