@@ -249,7 +249,7 @@ describe('Span', () => {
         });
       });
 
-      it('should able to overwrite attributes', () => {
+      it('should be able to overwrite attributes', () => {
         const span = new Span(
           tracer,
           ROOT_CONTEXT,
@@ -362,7 +362,7 @@ describe('Span', () => {
   });
 
   describe('setAttributes', () => {
-    it('should able to set multiple attributes', () => {
+    it('should be able to set multiple attributes', () => {
       const span = new Span(
         tracer,
         ROOT_CONTEXT,
