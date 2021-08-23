@@ -57,6 +57,7 @@ export class Span implements api.Span, ReadableSpan {
   private _duration: api.HrTime = [-1, -1];
   private readonly _spanProcessor: SpanProcessor;
   private readonly _spanLimits: SpanLimits;
+  private readonly _attributeValueLengthLimit: number;
 
   /** Constructs a new Span instance. */
   constructor(
@@ -80,6 +81,7 @@ export class Span implements api.Span, ReadableSpan {
     this._spanLimits = parentTracer.getSpanLimits();
     this._spanProcessor = parentTracer.getActiveSpanProcessor();
     this._spanProcessor.onStart(this, context);
+    this._attributeValueLengthLimit = this._spanLimits.attributeValueLengthLimit || 0;
   }
 
   spanContext(): api.SpanContext {
@@ -258,12 +260,11 @@ export class Span implements api.Span, ReadableSpan {
    * @param value Attribute value
    * @returns truncated attribute value if required, otherwise same value
    */
-  private _truncateToSize(value?: SpanAttributeValue): SpanAttributeValue | undefined {
-    const limit = this._spanLimits.attributeValueLengthLimit;
+  private _truncateToSize(value: SpanAttributeValue): SpanAttributeValue {
+    const limit = this._attributeValueLengthLimit;
     // Check limit
-    // undefined limit means do not truncate
-    if (typeof limit !== 'number' || limit <= 0) {
-      // Non-integer and negative values are invalid, so do not truncate
+    if (limit <= 0) {
+      // Negative values are invalid, so do not truncate
       api.diag.warn(`Attribute value limit must be positive, got ${limit}`);
       return value;
     }
