@@ -64,7 +64,7 @@ export class CompositePropagator implements TextMapPropagator {
    * @param context Context to inject
    * @param carrier Carrier into which context will be injected
    */
-  inject(context: Context, carrier: unknown, setter: TextMapSetter) {
+  inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
     for (const propagator of this._propagators) {
       try {
         propagator.inject(context, carrier, setter);

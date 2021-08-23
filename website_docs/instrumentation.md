@@ -5,6 +5,14 @@ weight: 3
 
 This guide will cover creating and annotating spans, creating and annotating metrics, how to pass context, and a guide to automatic instrumentation for JavaScript. This simple example works in the browser as well as with Node.JS
 
+- [Example Application](#example-application)
+- [Creating Spans](#creating-spans)
+- [Attributes](#attributes)
+  - [Semantic Attributes](#semantic-attributes)
+- [Span Status](#span-status)
+
+## Example Application
+
 In the following this guide will use the following sample app:
 
 ```javascript
@@ -100,9 +108,8 @@ for (let i = 0; i < 10; i += 1) {
 function doWork(parent) {
   // Start another span. In this example, the main method already started a
   // span, so that'll be the parent span, and this will be a child span.
-  const span = tracer.startSpan('doWork', {
-    parent,
-  });
+  const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), parent);
+  const span = tracer.startSpan('doWork', undefined, ctx);
 
   // simulate some random work.
   for (let i = 0; i <= Math.floor(Math.random() * 40000000); i += 1) {
@@ -110,6 +117,8 @@ function doWork(parent) {
   }
   span.end();
 }
+// Be sure to end the span.
+parentSpan.end();
 ```
 
 Invoking your application once again will give you a list of traces being exported.
@@ -120,9 +129,8 @@ Attributes can be used to describe your spans. Attributes can be added to a span
 
 ```javascript
 function doWork(parent) {
-  const span = tracer.startSpan('doWork', {
-    parent, attributes: { attribute1 : 'value1' }
-  });
+  const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), parent);
+  const span = tracer.startSpan('doWork', { attributes: { attribute1 : 'value1' } }, ctx);
   for (let i = 0; i <= Math.floor(Math.random() * 40000000); i += 1) {
     // empty
   }
@@ -151,13 +159,39 @@ Finally, you can update your file to include semantic attributes:
 
 ```javascript
 function doWork(parent) {
-  const span = tracer.startSpan('doWork', {
-    parent, attributes: { SemanticAttributes.CODE_FUNCTION : 'doWork' }
-  });
+  const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), parent);
+  const span = tracer.startSpan('doWork', { attributes: { [SemanticAttributes.CODE_FUNCTION] : 'doWork' } }, ctx);
   for (let i = 0; i <= Math.floor(Math.random() * 40000000); i += 1) {
     // empty
   }
   span.setAttribute(SemanticAttributes.CODE_FILEPATH, __filename);
+  span.end();
+}
+```
+
+## Span Status
+
+A status can be set on a span, to indicate if the traced operation has completed successfully (`Ok`) or with an `Error`. The default status is `Unset`.
+
+The status can be set at any time before the span is finished:
+
+```javascript
+function doWork(parent) {
+  const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), parent);
+  const span = tracer.startSpan('doWork', undefined, ctx);
+
+  span.setStatus({
+    code: opentelemetry.SpanStatusCode.OK,
+    message: 'Ok.'
+  })
+  for (let i = 0; i <= Math.floor(Math.random() * 40000000); i += 1) {
+    if(i > 10000) {
+      span.setStatus({
+        code: opentelemetry.SpanStatusCode.ERROR,
+        message: 'Error.'
+      })
+    }
+  }
   span.end();
 }
 ```

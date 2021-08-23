@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import * as api from '@opentelemetry/api-metrics';
+import { Observation } from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BoundObserver } from './BoundInstrument';
@@ -64,14 +65,14 @@ export abstract class BaseObserverMetric
     return super.getMetricRecord();
   }
 
-  protected _processResults(observerResult: ObserverResult) {
+  protected _processResults(observerResult: ObserverResult): void {
     observerResult.values.forEach((value, labels) => {
       const instrument = this.bind(labels);
       instrument.update(value);
     });
   }
 
-  observation(value: number) {
+  observation(value: number): Observation {
     return {
       value,
       observer: this as BaseObserverMetric,

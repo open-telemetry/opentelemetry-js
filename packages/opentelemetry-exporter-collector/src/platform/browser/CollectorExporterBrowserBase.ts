@@ -28,11 +28,11 @@ import { getEnv, baggageUtils } from '@opentelemetry/core';
 export abstract class CollectorExporterBrowserBase<
   ExportItem,
   ServiceRequest
-> extends CollectorExporterBase<
+  > extends CollectorExporterBase<
   CollectorExporterConfigBase,
   ExportItem,
   ServiceRequest
-> {
+  > {
   protected _headers: Record<string, string>;
   private _useXHR: boolean = false;
 
@@ -68,7 +68,7 @@ export abstract class CollectorExporterBrowserBase<
     items: ExportItem[],
     onSuccess: () => void,
     onError: (error: collectorTypes.CollectorExporterError) => void
-  ) {
+  ): void {
     if (this._isShutdown) {
       diag.debug('Shutdown already started. Cannot send objects');
       return;
@@ -76,27 +76,20 @@ export abstract class CollectorExporterBrowserBase<
     const serviceRequest = this.convert(items);
     const body = JSON.stringify(serviceRequest);
 
-    const promise = new Promise<void>(resolve => {
-      const _onSuccess = (): void => {
-        onSuccess();
-        _onFinish();
-      };
-      const _onError = (error: collectorTypes.CollectorExporterError): void => {
-        onError(error);
-        _onFinish();
-      };
-      const _onFinish = () => {
-        resolve();
-        const index = this._sendingPromises.indexOf(promise);
-        this._sendingPromises.splice(index, 1);
-      };
-
+    const promise = new Promise<void>((resolve, reject) => {
       if (this._useXHR) {
-        sendWithXhr(body, this.url, this._headers, _onSuccess, _onError);
+        sendWithXhr(body, this.url, this._headers, resolve, reject);
       } else {
-        sendWithBeacon(body, this.url, _onSuccess, _onError);
+        sendWithBeacon(body, this.url, { type: 'application/json' }, resolve, reject);
       }
-    });
+    })
+      .then(onSuccess, onError);
+
     this._sendingPromises.push(promise);
+    const popPromise = () => {
+      const index = this._sendingPromises.indexOf(promise);
+      this._sendingPromises.splice(index, 1);
+    }
+    promise.then(popPromise, popPromise);
   }
 }

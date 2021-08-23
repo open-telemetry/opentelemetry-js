@@ -22,12 +22,6 @@
       "path": "../opentelemetry-instrumentation"
     },
     {
-      "path": "../opentelemetry-resource-detector-aws"
-    },
-    {
-      "path": "../opentelemetry-resource-detector-gcp"
-    },
-    {
       "path": "../opentelemetry-resources"
     },
     {

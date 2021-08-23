@@ -23,8 +23,6 @@
       "packages/opentelemetry-node",
       "packages/opentelemetry-propagator-b3",
       "packages/opentelemetry-propagator-jaeger",
-      "packages/opentelemetry-resource-detector-aws",
-      "packages/opentelemetry-resource-detector-gcp",
       "packages/opentelemetry-resources",
       "packages/opentelemetry-sdk-node",
       "packages/opentelemetry-semantic-conventions",
@@ -105,12 +103,6 @@
     },
     {
       "path": "packages/opentelemetry-propagator-jaeger"
-    },
-    {
-      "path": "packages/opentelemetry-resource-detector-aws"
-    },
-    {
-      "path": "packages/opentelemetry-resource-detector-gcp"
     },
     {
       "path": "packages/opentelemetry-resources"

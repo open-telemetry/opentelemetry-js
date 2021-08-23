@@ -54,6 +54,7 @@ export class MeterProvider implements api.MeterProvider {
       );
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this._meters.get(key)!;
   }
 

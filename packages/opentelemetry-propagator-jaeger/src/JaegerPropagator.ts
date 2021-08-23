@@ -55,7 +55,7 @@ export class JaegerPropagator implements TextMapPropagator {
     this._jaegerTraceHeader = customTraceHeader || UBER_TRACE_ID_HEADER;
   }
 
-  inject(context: Context, carrier: unknown, setter: TextMapSetter) {
+  inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
     const spanContext = trace.getSpanContext(context);
     const baggage = propagation.getBaggage(context);
     if (spanContext && isTracingSuppressed(context) === false) {

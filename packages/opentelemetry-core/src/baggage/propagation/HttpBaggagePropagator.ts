@@ -43,7 +43,7 @@ import {
  * https://w3c.github.io/baggage/
  */
 export class HttpBaggagePropagator implements TextMapPropagator {
-  inject(context: Context, carrier: unknown, setter: TextMapSetter) {
+  inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
     const baggage = propagation.getBaggage(context);
     if (!baggage || isTracingSuppressed(context)) return;
     const keyPairs = getKeyPairs(baggage)

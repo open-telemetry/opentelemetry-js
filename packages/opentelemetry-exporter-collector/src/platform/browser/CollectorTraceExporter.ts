@@ -47,7 +47,7 @@ export class CollectorTraceExporter
     return toCollectorExportTraceServiceRequest(spans, this, true);
   }
 
-  getDefaultUrl(config: CollectorExporterConfigBase) {
+  getDefaultUrl(config: CollectorExporterConfigBase): string {
     return typeof config.url === 'string'
       ? config.url
       : getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT.length > 0
