@@ -63,6 +63,8 @@ export interface SDKRegistrationConfig {
 
 /** Global configuration of trace service */
 export interface SpanLimits {
+  /** attributeValueLengthLimit is maximum allowed attribute value size */
+  attributeValueLengthLimit?: number;
   /** attributeCountLimit is number of attributes per span */
   attributeCountLimit?: number;
   /** linkCountLimit is number of links per span */
