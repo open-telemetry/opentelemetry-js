@@ -37,6 +37,7 @@ const performanceTimeOrigin = hrTime();
 describe('Span', () => {
   const tracer = new BasicTracerProvider({
     spanLimits: {
+      attributeValueLengthLimit: 100,
       attributeCountLimit: 100,
       eventCountLimit: 100,
     },
@@ -213,83 +214,186 @@ describe('Span', () => {
     });
   });
 
-  it('should set an attribute', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
-      spanContext,
-      SpanKind.CLIENT
-    );
+  describe('setAttribute', () => {
+    describe('when default options set', () => {
+      it('should set an attribute', () => {
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
 
-    span.setAttribute('string', 'string');
-    span.setAttribute('number', 0);
-    span.setAttribute('bool', true);
-    span.setAttribute('array<string>', ['str1', 'str2']);
-    span.setAttribute('array<number>', [1, 2]);
-    span.setAttribute('array<bool>', [true, false]);
+        span.setAttribute('string', 'string');
+        span.setAttribute('number', 0);
+        span.setAttribute('bool', true);
+        span.setAttribute('array<string>', ['str1', 'str2']);
+        span.setAttribute('array<number>', [1, 2]);
+        span.setAttribute('array<bool>', [true, false]);
 
-    //@ts-expect-error invalid attribute type object
-    span.setAttribute('object', { foo: 'bar' });
-    //@ts-expect-error invalid attribute inhomogenous array
-    span.setAttribute('non-homogeneous-array', [0, '']);
+        //@ts-expect-error invalid attribute type object
+        span.setAttribute('object', { foo: 'bar' });
+        //@ts-expect-error invalid attribute inhomogenous array
+        span.setAttribute('non-homogeneous-array', [0, '']);
+        // This empty length attribute should not be set
+        span.setAttribute('', 'empty-key');
 
-    assert.deepStrictEqual(span.attributes, {
-      string: 'string',
-      number: 0,
-      bool: true,
-      'array<string>': ['str1', 'str2'],
-      'array<number>': [1, 2],
-      'array<bool>': [true, false],
+        assert.deepStrictEqual(span.attributes, {
+          string: 'string',
+          number: 0,
+          bool: true,
+          'array<string>': ['str1', 'str2'],
+          'array<number>': [1, 2],
+          'array<bool>': [true, false],
+        });
+      });
+
+      it('should be able to overwrite attributes', () => {
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
+
+        span.setAttribute('overwrite', 'initial value');
+        span.setAttribute('overwrite', 'overwritten value');
+
+        assert.deepStrictEqual(span.attributes, {
+          overwrite: 'overwritten value',
+        });
+      });
+    });
+
+    describe('when spanLimits options set', () => {
+      describe('when "attributeCountLimit" option defined', () => {
+        const tracer = new BasicTracerProvider({
+          spanLimits: {
+            // Setting count limit
+            attributeCountLimit: 100,
+          },
+        }).getTracer('default');
+
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
+        for (let i = 0; i < 150; i++) {
+          span.setAttribute('foo' + i, 'bar' + i);
+        }
+        span.end();
+
+        it('should remove / drop all remaining values after the number of values exceeds this limit', () => {
+          assert.strictEqual(Object.keys(span.attributes).length, 100);
+          assert.strictEqual(span.attributes['foo0'], 'bar0');
+          assert.strictEqual(span.attributes['foo99'], 'bar99');
+          assert.strictEqual(span.attributes['foo149'], undefined);
+        });
+      });
+
+      describe('when "attributeValueLengthLimit" option defined', () => {
+        const tracer = new BasicTracerProvider({
+          spanLimits: {
+            // Setting attribute value length limit
+            attributeValueLengthLimit: 5,
+          },
+        }).getTracer('default');
+
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
+
+        it('should truncate value which length exceeds this limit', () => {
+          span.setAttribute('attr-with-more-length', 'abcdefgh');
+          assert.strictEqual(span.attributes['attr-with-more-length'], 'abcde');
+        });
+
+        it('should truncate value of arrays which exceeds this limit', () => {
+          span.setAttribute('attr-array-of-strings', ['abcdefgh', 'abc', 'abcde', '']);
+          span.setAttribute('attr-array-of-bool', [true, false]);
+          assert.deepStrictEqual(span.attributes['attr-array-of-strings'], ['abcde', 'abc', 'abcde', '']);
+          assert.deepStrictEqual(span.attributes['attr-array-of-bool'], [true, false]);
+        });
+
+        it('should not truncate value which length not exceeds this limit', () => {
+          span.setAttribute('attr-with-less-length', 'abc');
+          assert.strictEqual(span.attributes['attr-with-less-length'], 'abc');
+        });
+
+        it('should return same value for non-string values', () => {
+          span.setAttribute('attr-non-string', true);
+          assert.strictEqual(span.attributes['attr-non-string'], true);
+        });
+      });
+
+      describe('when "attributeValueLengthLimit" option is invalid', () => {
+        const tracer = new BasicTracerProvider({
+          spanLimits: {
+            // Setting invalid attribute value length limit
+            attributeValueLengthLimit: -5,
+          },
+        }).getTracer('default');
+
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
+
+        it('should not truncate any value', () => {
+          span.setAttribute('attr-not-truncate', 'abcdefgh');
+          span.setAttribute('attr-array-of-strings', ['abcdefgh', 'abc', 'abcde']);
+          assert.deepStrictEqual(span.attributes['attr-not-truncate'], 'abcdefgh');
+          assert.deepStrictEqual(span.attributes['attr-array-of-strings'], ['abcdefgh', 'abc', 'abcde']);
+        });
+      });
     });
   });
 
-  it('should overwrite attributes', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
-      spanContext,
-      SpanKind.CLIENT
-    );
+  describe('setAttributes', () => {
+    it('should be able to set multiple attributes', () => {
+      const span = new Span(
+        tracer,
+        ROOT_CONTEXT,
+        name,
+        spanContext,
+        SpanKind.CLIENT
+      );
 
-    span.setAttribute('overwrite', 'initial value');
-    span.setAttribute('overwrite', 'overwritten value');
+      span.setAttributes({
+        string: 'string',
+        number: 0,
+        bool: true,
+        'array<string>': ['str1', 'str2'],
+        'array<number>': [1, 2],
+        'array<bool>': [true, false],
+        //@ts-expect-error invalid attribute type object
+        object: { foo: 'bar' },
+        //@ts-expect-error invalid attribute inhomogenous array
+        'non-homogeneous-array': [0, ''],
+        // This empty length attribute should not be set
+        '': 'empty-key',
+      });
 
-    assert.deepStrictEqual(span.attributes, {
-      overwrite: 'overwritten value',
-    });
-  });
-
-  it('should set attributes', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
-      spanContext,
-      SpanKind.CLIENT
-    );
-
-    span.setAttributes({
-      string: 'string',
-      number: 0,
-      bool: true,
-      'array<string>': ['str1', 'str2'],
-      'array<number>': [1, 2],
-      'array<bool>': [true, false],
-      //@ts-expect-error invalid attribute type object
-      object: { foo: 'bar' },
-      //@ts-expect-error invalid attribute inhomogenous array
-      'non-homogeneous-array': [0, ''],
-    });
-
-    assert.deepStrictEqual(span.attributes, {
-      string: 'string',
-      number: 0,
-      bool: true,
-      'array<string>': ['str1', 'str2'],
-      'array<number>': [1, 2],
-      'array<bool>': [true, false],
+      assert.deepStrictEqual(span.attributes, {
+        string: 'string',
+        number: 0,
+        bool: true,
+        'array<string>': ['str1', 'str2'],
+        'array<number>': [1, 2],
+        'array<bool>': [true, false],
+      });
     });
   });
 
@@ -330,7 +434,7 @@ describe('Span', () => {
     span.end();
   });
 
-  it('should drop extra attributes and events', () => {
+  it('should drop extra events', () => {
     const span = new Span(
       tracer,
       ROOT_CONTEXT,
@@ -339,17 +443,12 @@ describe('Span', () => {
       SpanKind.CLIENT
     );
     for (let i = 0; i < 150; i++) {
-      span.setAttribute('foo' + i, 'bar' + i);
       span.addEvent('sent' + i);
     }
     span.end();
 
     assert.strictEqual(span.events.length, 100);
-    assert.strictEqual(Object.keys(span.attributes).length, 100);
     assert.strictEqual(span.events[span.events.length - 1].name, 'sent149');
-    assert.strictEqual(span.attributes['foo0'], 'bar0');
-    assert.strictEqual(span.attributes['foo99'], 'bar99');
-    assert.strictEqual(span.attributes['sent100'], undefined);
   });
 
   it('should set an error status', () => {
