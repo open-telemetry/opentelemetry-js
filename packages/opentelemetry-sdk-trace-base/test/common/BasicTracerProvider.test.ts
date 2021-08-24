@@ -64,74 +64,97 @@ describe('BasicTracerProvider', () => {
   });
 
   describe('constructor', () => {
-    it('should construct an instance without any options', () => {
-      const provider = new BasicTracerProvider();
-      assert.ok(provider instanceof BasicTracerProvider);
-    });
-
-    it('should construct an instance with sampler', () => {
-      const provider = new BasicTracerProvider({
-        sampler: new AlwaysOnSampler(),
+    describe('when options not defined', () => {
+      it('should construct an instance', () => {
+        const tracer = new BasicTracerProvider();
+        assert.ok(tracer instanceof BasicTracerProvider);
       });
-      assert.ok(provider instanceof BasicTracerProvider);
-    });
 
-    it('should construct an instance with default span limits', () => {
-      const tracer = new BasicTracerProvider({}).getTracer('default');
-      assert.deepStrictEqual(tracer.getSpanLimits(), {
-        attributeCountLimit: 128,
-        eventCountLimit: 128,
-        linkCountLimit: 128,
+      it('should use noop span processor by default', () => {
+        const tracer = new BasicTracerProvider();
+        assert.ok(tracer.activeSpanProcessor instanceof NoopSpanProcessor);
       });
     });
 
-    it('should construct an instance with customized attributeCountLimit span limits', () => {
-      const tracer = new BasicTracerProvider({
-        spanLimits: {
-          attributeCountLimit: 100,
-        },
-      }).getTracer('default');
-      assert.deepStrictEqual(tracer.getSpanLimits(), {
-        attributeCountLimit: 100,
-        eventCountLimit: 128,
-        linkCountLimit: 128,
+    describe('when "sampler" option defined', () => {
+      it('should have an instance with sampler', () => {
+        const tracer = new BasicTracerProvider({
+          sampler: new AlwaysOnSampler(),
+        });
+        assert.ok(tracer instanceof BasicTracerProvider);
       });
     });
 
-    it('should construct an instance with customized eventCountLimit span limits', () => {
-      const tracer = new BasicTracerProvider({
-        spanLimits: {
-          eventCountLimit: 300,
-        },
-      }).getTracer('default');
-      assert.deepStrictEqual(tracer.getSpanLimits(), {
-        attributeCountLimit: 128,
-        eventCountLimit: 300,
-        linkCountLimit: 128,
+    describe('spanLimits', () => {
+      describe('when not defined default values', () => {
+        it('should have tracer with default values', () => {
+          const tracer = new BasicTracerProvider({}).getTracer('default');
+          assert.deepStrictEqual(tracer.getSpanLimits(), {
+            attributeValueLengthLimit: Infinity,
+            attributeCountLimit: 128,
+            eventCountLimit: 128,
+            linkCountLimit: 128,
+          });
+        });
       });
-    });
 
-    it('should construct an instance with customized linkCountLimit span limits', () => {
-      const tracer = new BasicTracerProvider({
-        spanLimits: {
-          linkCountLimit: 10,
-        },
-      }).getTracer('default');
-      assert.deepStrictEqual(tracer.getSpanLimits(), {
-        attributeCountLimit: 128,
-        eventCountLimit: 128,
-        linkCountLimit: 10,
+      describe('when "attributeCountLimit" is defined', () => {
+        it('should have tracer with defined value', () => {
+          const tracer = new BasicTracerProvider({
+            spanLimits: {
+              attributeCountLimit: 100,
+            },
+          }).getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          assert.strictEqual(spanLimits.attributeCountLimit, 100);
+        });
       });
-    });
 
-    it('should construct an instance of BasicTracerProvider', () => {
-      const tracer = new BasicTracerProvider();
-      assert.ok(tracer instanceof BasicTracerProvider);
-    });
+      describe('when "attributeValueLengthLimit" is defined', () => {
+        it('should have tracer with defined value', () => {
+          const tracer = new BasicTracerProvider({
+            spanLimits: {
+              attributeValueLengthLimit: 10,
+            },
+          }).getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          assert.strictEqual(spanLimits.attributeValueLengthLimit, 10);
+        });
 
-    it('should use noop span processor by default', () => {
-      const tracer = new BasicTracerProvider();
-      assert.ok(tracer.activeSpanProcessor instanceof NoopSpanProcessor);
+        it('should have tracer with negative "attributeValueLengthLimit" value', () => {
+          const tracer = new BasicTracerProvider({
+            spanLimits: {
+              attributeValueLengthLimit: -10,
+            },
+          }).getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          assert.strictEqual(spanLimits.attributeValueLengthLimit, -10);
+        });
+      });
+
+      describe('when "eventCountLimit" is defined', () => {
+        it('should have tracer with defined value', () => {
+          const tracer = new BasicTracerProvider({
+            spanLimits: {
+              eventCountLimit: 300,
+            },
+          }).getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          assert.strictEqual(spanLimits.eventCountLimit, 300);
+        });
+      });
+
+      describe('when "linkCountLimit" is defined', () => {
+        it('should have tracer with defined value', () => {
+          const tracer = new BasicTracerProvider({
+            spanLimits: {
+              linkCountLimit: 10,
+            },
+          }).getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          assert.strictEqual(spanLimits.linkCountLimit, 10);
+        });
+      });
     });
   });
 
