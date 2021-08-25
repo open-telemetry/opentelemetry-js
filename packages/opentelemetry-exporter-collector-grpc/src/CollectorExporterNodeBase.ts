@@ -61,25 +61,17 @@ export abstract class CollectorExporterNodeBase<
     onSuccess: () => void,
     onError: (error: collectorTypes.CollectorExporterError) => void
   ): void {
-    const promise = new Promise<void>(resolve => {
-      const _onSuccess = (): void => {
-        onSuccess();
-        _onFinish();
-      };
-      const _onError = (error: collectorTypes.CollectorExporterError): void => {
-        onError(error);
-        _onFinish();
-      };
-      const _onFinish = () => {
-        resolve();
-        const index = this._sendingPromises.indexOf(promise);
-        this._sendingPromises.splice(index, 1);
-      };
-
-      this._send(this, objects, _onSuccess, _onError);
-    });
+    const promise = new Promise<void>((resolve, reject) => {
+      this._send(this, objects, resolve, reject);
+    })
+      .then(onSuccess, onError);
 
     this._sendingPromises.push(promise);
+    const popPromise = () => {
+      const index = this._sendingPromises.indexOf(promise);
+      this._sendingPromises.splice(index, 1);
+    }
+    promise.then(popPromise, popPromise);
   }
 
   onInit(config: CollectorExporterConfigNode): void {

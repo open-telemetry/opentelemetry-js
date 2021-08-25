@@ -284,23 +284,18 @@ export class FetchInstrumentation extends InstrumentationBase<
   /**
    * Patches the constructor of fetch
    */
-  private _patchConstructor(): (
-    original: (input: RequestInfo, init?: RequestInit) => Promise<Response>
-  ) => (input: RequestInfo, init?: RequestInit) => Promise<Response> {
-    return (
-      original: (input: RequestInfo, init?: RequestInit) => Promise<Response>
-    ): ((input: RequestInfo, init?: RequestInit) => Promise<Response>) => {
+  private _patchConstructor(): (original: Window['fetch']) => Window['fetch'] {
+    return original => {
       const plugin = this;
       return function patchConstructor(
-        this: (input: RequestInfo, init?: RequestInit) => Promise<Response>,
-        input: RequestInfo,
-        init?: RequestInit
+        this: Window,
+        ...args: Parameters<Window['fetch']>
       ): Promise<Response> {
-        const url = input instanceof Request ? input.url : input;
-        const options = input instanceof Request ? input : init || {};
+        const url = args[0] instanceof Request ? args[0].url : args[0];
+        const options = args[0] instanceof Request ? args[0] : args[1] || {};
         const createdSpan = plugin._createSpan(url, options);
         if (!createdSpan) {
-          return original.apply(this, [url, options]);
+          return original.apply(this, args);
         }
         const spanData = plugin._prepareSpanData(url);
 
@@ -380,7 +375,7 @@ export class FetchInstrumentation extends InstrumentationBase<
               plugin._addHeaders(options, url);
               plugin._tasksCount++;
               return original
-                .apply(this, [url, options])
+                .apply(this, options instanceof Request ? [options] : [url, options])
                 .then(
                   (onSuccess as any).bind(this, createdSpan, resolve),
                   onError.bind(this, createdSpan, reject)

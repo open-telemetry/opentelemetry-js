@@ -51,7 +51,7 @@ export class ValueRecorderMetric
     );
   }
 
-  record(value: number, labels: api.Labels = {}) {
+  record(value: number, labels: api.Labels = {}): void {
     this.bind(labels).record(value);
   }
 }

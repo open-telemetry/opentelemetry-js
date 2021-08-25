@@ -8,7 +8,7 @@
     "packages/*",
     "integration-tests/*"
   ],
-  "version": "0.24.0",
+  "version": "0.25.0",
   "changelog": {
     "repo": "open-telemetry/opentelemetry-js",
     "labels": {
