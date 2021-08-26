@@ -84,6 +84,8 @@ describe('environment', () => {
         OTEL_LOG_LEVEL: 'ERROR',
         OTEL_NO_PATCH_MODULES: 'a,b,c',
         OTEL_RESOURCE_ATTRIBUTES: '<attrs>',
+        OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT: 40,
+        OTEL_ATTRIBUTE_COUNT_LIMIT: 50,
         OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT: 100,
         OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT: 10,
         OTEL_SPAN_EVENT_COUNT_LIMIT: 20,
@@ -94,6 +96,8 @@ describe('environment', () => {
       const env = getEnv();
       assert.deepStrictEqual(env.OTEL_NO_PATCH_MODULES, ['a', 'b', 'c']);
       assert.strictEqual(env.OTEL_LOG_LEVEL, DiagLogLevel.ERROR);
+      assert.strictEqual(env.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT, 40);
+      assert.strictEqual(env.OTEL_ATTRIBUTE_COUNT_LIMIT, 50);
       assert.strictEqual(env.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT, 100);
       assert.strictEqual(env.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT, 10);
       assert.strictEqual(env.OTEL_SPAN_EVENT_COUNT_LIMIT, 20);

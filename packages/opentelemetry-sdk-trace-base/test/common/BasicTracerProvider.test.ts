@@ -85,6 +85,52 @@ describe('BasicTracerProvider', () => {
       });
     });
 
+    describe('generalLimits', () => {
+      describe('when not defined default values', () => {
+        it('should have tracer with default values', () => {
+          const tracer = new BasicTracerProvider({}).getTracer('default');
+          assert.deepStrictEqual(tracer.getGeneralLimits(), {
+            attributeValueLengthLimit: Infinity,
+            attributeCountLimit: 128,
+          });
+        });
+      });
+
+      describe('when "attributeCountLimit" is defined', () => {
+        it('should have tracer with defined value', () => {
+          const tracer = new BasicTracerProvider({
+            generalLimits: {
+              attributeCountLimit: 100,
+            },
+          }).getTracer('default');
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeCountLimit, 100);
+        });
+      });
+
+      describe('when "attributeValueLengthLimit" is defined', () => {
+        it('should have tracer with defined value', () => {
+          const tracer = new BasicTracerProvider({
+            generalLimits: {
+              attributeValueLengthLimit: 10,
+            },
+          }).getTracer('default');
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeValueLengthLimit, 10);
+        });
+
+        it('should have tracer with negative "attributeValueLengthLimit" value', () => {
+          const tracer = new BasicTracerProvider({
+            generalLimits: {
+              attributeValueLengthLimit: -10,
+            },
+          }).getTracer('default');
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeValueLengthLimit, -10);
+        });
+      });
+    });
+
     describe('spanLimits', () => {
       describe('when not defined default values', () => {
         it('should have tracer with default values', () => {
@@ -153,6 +199,38 @@ describe('BasicTracerProvider', () => {
           }).getTracer('default');
           const spanLimits = tracer.getSpanLimits();
           assert.strictEqual(spanLimits.linkCountLimit, 10);
+        });
+      });
+
+      describe('when only generalLimits are defined', () => {
+        it('should have span limits as general limits', () => {
+          const tracer = new BasicTracerProvider({
+            generalLimits: {
+              attributeValueLengthLimit: 100,
+              attributeCountLimit: 200,
+            },
+          }).getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          assert.strictEqual(spanLimits.attributeValueLengthLimit, 100);
+          assert.strictEqual(spanLimits.attributeCountLimit, 200);
+        });
+      });
+
+      describe('when both generalLimits and spanLimits defined', () => {
+        it('should have span limits as priority than general limits', () => {
+          const tracer = new BasicTracerProvider({
+            generalLimits: {
+              attributeValueLengthLimit: 100,
+              attributeCountLimit: 200,
+            },
+            spanLimits: {
+              attributeValueLengthLimit: 10,
+              attributeCountLimit: 20,
+            },
+          }).getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          assert.strictEqual(spanLimits.attributeValueLengthLimit, 10);
+          assert.strictEqual(spanLimits.attributeCountLimit, 20);
         });
       });
     });
