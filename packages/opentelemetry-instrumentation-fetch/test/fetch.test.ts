@@ -535,6 +535,32 @@ describe('fetch', () => {
       assert.ok(typeof r.headers.get(X_B3_TRACE_ID) === 'string');
     });
 
+    it('should keep custom headers with a request object and a headers object', () => {
+      const r = new Request('url', {
+        headers: new Headers({'foo': 'bar'})
+      });
+      window.fetch(r).catch(() => {});
+      assert.ok(r.headers.get('foo') === 'bar');
+    });
+
+    it('should keep custom headers with url, untyped request object and typed headers object', () => {
+      const url = 'url';
+      const init = {
+        headers: new Headers({'foo': 'bar'})
+      };
+      window.fetch(url, init).catch(() => {});
+      assert.ok(init.headers.get('foo') === 'bar');
+    });
+
+    it('should keep custom headers with url, untyped request object and untyped headers object', () => {
+      const url = 'url';
+      const init = {
+        headers: {'foo': 'bar'}
+      };
+      window.fetch(url, init).catch(() => {});
+      assert.ok(init.headers['foo'] === 'bar');
+    });
+
     it('should pass request object as first parameter to the original function (#2411)', () => {
       const r = new Request(url);
       return window.fetch(r).then(() => {
