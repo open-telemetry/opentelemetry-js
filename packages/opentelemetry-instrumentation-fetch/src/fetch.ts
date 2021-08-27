@@ -159,7 +159,6 @@ export class FetchInstrumentation extends InstrumentationBase<
         set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
       });
     } else if(options.headers instanceof Headers) {
-      // ||-operator causes ts type error
       api.propagation.inject(api.context.active(), options.headers, {
         set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
       });
