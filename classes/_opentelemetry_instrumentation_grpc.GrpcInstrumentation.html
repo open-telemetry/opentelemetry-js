@@ -1,0 +1,495 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>GrpcInstrumentation | OpenTelemetry SDK</title>
+	<meta name="description" content="Documentation for OpenTelemetry SDK">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+	<script async src="../assets/js/search.js" id="search-script"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">OpenTelemetry SDK</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../modules.html">OpenTelemetry SDK</a>
+				</li>
+				<li>
+					<a href="../modules/_opentelemetry_instrumentation_grpc.html">@opentelemetry/instrumentation-grpc</a>
+				</li>
+				<li>
+					<a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html">GrpcInstrumentation</a>
+				</li>
+			</ul>
+			<h1>Class GrpcInstrumentation</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">GrpcInstrumentation</span>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Constructors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#_config" class="tsd-kind-icon">_config</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#instrumentationName" class="tsd-kind-icon">instrumentation<wbr>Name</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#instrumentationVersion" class="tsd-kind-icon">instrumentation<wbr>Version</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#disable" class="tsd-kind-icon">disable</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#enable" class="tsd-kind-icon">enable</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#getConfig" class="tsd-kind-icon">get<wbr>Config</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#init" class="tsd-kind-icon">init</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#setConfig" class="tsd-kind-icon">set<wbr>Config</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#setMeterProvider" class="tsd-kind-icon">set<wbr>Meter<wbr>Provider</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#setTracerProvider" class="tsd-kind-icon">set<wbr>Tracer<wbr>Provider</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Constructors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class">
+					<a name="constructor" class="tsd-anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Grpc<wbr>Instrumentation<span class="tsd-signature-symbol">(</span>_config<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_opentelemetry_instrumentation_grpc.GrpcInstrumentationConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">GrpcInstrumentationConfig</a><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">InstrumentationConfig</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html" class="tsd-signature-type" data-tsd-kind="Class">GrpcInstrumentation</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0ef1fc28/packages/opentelemetry-instrumentation-grpc/src/instrumentation.ts#L36">packages/opentelemetry-instrumentation-grpc/src/instrumentation.ts:36</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>_config: <a href="../interfaces/_opentelemetry_instrumentation_grpc.GrpcInstrumentationConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">GrpcInstrumentationConfig</a><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">InstrumentationConfig</span><span class="tsd-signature-symbol"> = {}</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html" class="tsd-signature-type" data-tsd-kind="Class">GrpcInstrumentation</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+					<a name="_config" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagProtected">Protected</span> _config</h3>
+					<div class="tsd-signature tsd-kind-icon">_config<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_opentelemetry_instrumentation_grpc.GrpcInstrumentationConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">GrpcInstrumentationConfig</a><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">InstrumentationConfig</span><span class="tsd-signature-symbol"> = {}</span></div>
+					<aside class="tsd-sources">
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="instrumentationName" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> instrumentation<wbr>Name</h3>
+					<div class="tsd-signature tsd-kind-icon">instrumentation<wbr>Name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &#x27;@opentelemetry/instrumentation-grpc&#x27;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0ef1fc28/packages/opentelemetry-instrumentation-grpc/src/instrumentation.ts#L32">packages/opentelemetry-instrumentation-grpc/src/instrumentation.ts:32</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="instrumentationVersion" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagReadonly">Readonly</span> instrumentation<wbr>Version</h3>
+					<div class="tsd-signature tsd-kind-icon">instrumentation<wbr>Version<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = ...</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0ef1fc28/packages/opentelemetry-instrumentation-grpc/src/instrumentation.ts#L34">packages/opentelemetry-instrumentation-grpc/src/instrumentation.ts:34</a></li>
+						</ul>
+					</aside>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="disable" class="tsd-anchor"></a>
+					<h3>disable</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">disable<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0ef1fc28/packages/opentelemetry-instrumentation-grpc/src/instrumentation.ts#L78">packages/opentelemetry-instrumentation-grpc/src/instrumentation.ts:78</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="enable" class="tsd-anchor"></a>
+					<h3>enable</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">enable<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0ef1fc28/packages/opentelemetry-instrumentation-grpc/src/instrumentation.ts#L73">packages/opentelemetry-instrumentation-grpc/src/instrumentation.ts:73</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getConfig" class="tsd-anchor"></a>
+					<h3>get<wbr>Config</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Config<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_opentelemetry_instrumentation_grpc.GrpcInstrumentationConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">GrpcInstrumentationConfig</a><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">InstrumentationConfig</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0ef1fc28/packages/opentelemetry-instrumentation-grpc/src/instrumentation.ts#L64">packages/opentelemetry-instrumentation-grpc/src/instrumentation.ts:64</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<dl class="tsd-comment-tags">
+									<dt>internal</dt>
+									<dd><p>Public reference to the protected BaseInstrumentation <code>_config</code> instance to be used by this
+										plugin&#39;s external helper functions</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_opentelemetry_instrumentation_grpc.GrpcInstrumentationConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">GrpcInstrumentationConfig</a><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">InstrumentationConfig</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="init" class="tsd-anchor"></a>
+					<h3>init</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">init<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0ef1fc28/packages/opentelemetry-instrumentation-grpc/src/instrumentation.ts#L68">packages/opentelemetry-instrumentation-grpc/src/instrumentation.ts:68</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setConfig" class="tsd-anchor"></a>
+					<h3>set<wbr>Config</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Config<span class="tsd-signature-symbol">(</span>config<span class="tsd-signature-symbol">?: </span><a href="../interfaces/_opentelemetry_instrumentation_grpc.GrpcInstrumentationConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">GrpcInstrumentationConfig</a><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">InstrumentationConfig</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0ef1fc28/packages/opentelemetry-instrumentation-grpc/src/instrumentation.ts#L51">packages/opentelemetry-instrumentation-grpc/src/instrumentation.ts:51</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>config: <a href="../interfaces/_opentelemetry_instrumentation_grpc.GrpcInstrumentationConfig.html" class="tsd-signature-type" data-tsd-kind="Interface">GrpcInstrumentationConfig</a><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">InstrumentationConfig</span><span class="tsd-signature-symbol"> = {}</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setMeterProvider" class="tsd-anchor"></a>
+					<h3>set<wbr>Meter<wbr>Provider</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Meter<wbr>Provider<span class="tsd-signature-symbol">(</span>meterProvider<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">MeterProvider</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0ef1fc28/packages/opentelemetry-instrumentation-grpc/src/instrumentation.ts#L87">packages/opentelemetry-instrumentation-grpc/src/instrumentation.ts:87</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Sets MeterProvider to this plugin</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>meterProvider: <span class="tsd-signature-type">MeterProvider</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="setTracerProvider" class="tsd-anchor"></a>
+					<h3>set<wbr>Tracer<wbr>Provider</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Tracer<wbr>Provider<span class="tsd-signature-symbol">(</span>tracerProvider<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TracerProvider</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0ef1fc28/packages/opentelemetry-instrumentation-grpc/src/instrumentation.ts#L96">packages/opentelemetry-instrumentation-grpc/src/instrumentation.ts:96</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Sets TraceProvider to this plugin</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>tracerProvider: <span class="tsd-signature-type">TracerProvider</span></h5>
+									<div class="tsd-comment tsd-typography">
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class=" ">
+						<a href="../modules.html">Modules</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_opentelemetry_api_metrics.html">@opentelemetry/api-<wbr>metrics</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_opentelemetry_context_async_hooks.html">@opentelemetry/context-<wbr>async-<wbr>hooks</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_opentelemetry_context_zone_peer_dep.html">@opentelemetry/context-<wbr>zone-<wbr>peer-<wbr>dep</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_opentelemetry_core.html">@opentelemetry/core</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_opentelemetry_exporter_collector.html">@opentelemetry/exporter-<wbr>collector</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_opentelemetry_exporter_collector_grpc.html">@opentelemetry/exporter-<wbr>collector-<wbr>grpc</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_opentelemetry_exporter_collector_proto.html">@opentelemetry/exporter-<wbr>collector-<wbr>proto</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_opentelemetry_exporter_jaeger.html">@opentelemetry/exporter-<wbr>jaeger</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_opentelemetry_exporter_prometheus.html">@opentelemetry/exporter-<wbr>prometheus</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_opentelemetry_exporter_zipkin.html">@opentelemetry/exporter-<wbr>zipkin</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_opentelemetry_instrumentation.html">@opentelemetry/instrumentation</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_opentelemetry_instrumentation_fetch.html">@opentelemetry/instrumentation-<wbr>fetch</a>
+					</li>
+					<li class="current tsd-kind-module">
+						<a href="../modules/_opentelemetry_instrumentation_grpc.html">@opentelemetry/instrumentation-<wbr>grpc</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_opentelemetry_instrumentation_http.html">@opentelemetry/instrumentation-<wbr>http</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_opentelemetry_instrumentation_xml_http_request.html">@opentelemetry/instrumentation-<wbr>xml-<wbr>http-<wbr>request</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_opentelemetry_propagator_b3.html">@opentelemetry/propagator-<wbr>b3</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_opentelemetry_propagator_jaeger.html">@opentelemetry/propagator-<wbr>jaeger</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_opentelemetry_resources.html">@opentelemetry/resources</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_opentelemetry_sdk_node.html">@opentelemetry/sdk-<wbr>node</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_opentelemetry_semantic_conventions.html">@opentelemetry/semantic-<wbr>conventions</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_opentelemetry_shim_opentracing.html">@opentelemetry/shim-<wbr>opentracing</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class tsd-parent-kind-module">
+						<a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html" class="tsd-kind-icon">Grpc<wbr>Instrumentation</a>
+						<ul>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class">
+								<a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-protected">
+								<a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#_config" class="tsd-kind-icon">_config</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#instrumentationName" class="tsd-kind-icon">instrumentation<wbr>Name</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#instrumentationVersion" class="tsd-kind-icon">instrumentation<wbr>Version</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#disable" class="tsd-kind-icon">disable</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#enable" class="tsd-kind-icon">enable</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#getConfig" class="tsd-kind-icon">get<wbr>Config</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#init" class="tsd-kind-icon">init</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#setConfig" class="tsd-kind-icon">set<wbr>Config</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#setMeterProvider" class="tsd-kind-icon">set<wbr>Meter<wbr>Provider</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_opentelemetry_instrumentation_grpc.GrpcInstrumentation.html#setTracerProvider" class="tsd-kind-icon">set<wbr>Tracer<wbr>Provider</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_opentelemetry_instrumentation_grpc.GrpcInstrumentationConfig.html" class="tsd-kind-icon">Grpc<wbr>Instrumentation<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-parent-kind-module">
+						<a href="../modules/_opentelemetry_instrumentation_grpc.html#GRPC_TRACE_KEY" class="tsd-kind-icon">GRPC_<wbr>TRACE_<wbr>KEY</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-namespace"><span class="tsd-kind-icon">Namespace</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>
