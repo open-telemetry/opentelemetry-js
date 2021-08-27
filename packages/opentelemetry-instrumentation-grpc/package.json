@@ -49,7 +49,7 @@
     "@opentelemetry/sdk-trace-base": "0.25.0",
     "@opentelemetry/sdk-trace-node": "0.25.0",
     "@types/mocha": "8.2.3",
-    "@types/node": "14.17.11",
+    "@types/node": "14.17.12",
     "@types/semver": "7.3.8",
     "@types/sinon": "10.0.2",
     "codecov": "3.8.3",
@@ -61,7 +61,7 @@
     "semver": "7.3.5",
     "sinon": "11.1.2",
     "ts-mocha": "8.0.0",
-    "typescript": "4.3.5"
+    "typescript": "4.4.2"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.0.2"

@@ -50,7 +50,7 @@
   "devDependencies": {
     "@opentelemetry/api": "^1.0.2",
     "@types/mocha": "8.2.3",
-    "@types/node": "14.17.11",
+    "@types/node": "14.17.12",
     "@types/sinon": "10.0.2",
     "codecov": "3.8.3",
     "mocha": "7.2.0",
@@ -59,7 +59,7 @@
     "rimraf": "3.0.2",
     "sinon": "11.1.2",
     "ts-mocha": "8.0.0",
-    "typescript": "4.3.5"
+    "typescript": "4.4.2"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.0.2"
