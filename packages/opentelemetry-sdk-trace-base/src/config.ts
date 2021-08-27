@@ -27,6 +27,7 @@ import {
 
 const env = getEnv();
 const FALLBACK_OTEL_TRACES_SAMPLER = TracesSamplerValues.AlwaysOn;
+const DEFAULT_RATIO = 1;
 
 /**
  * Default configuration. For fields with primitive values, any user-provided
@@ -38,6 +39,7 @@ export const DEFAULT_CONFIG = {
   sampler: buildSamplerFromEnv(env),
   forceFlushTimeoutMillis: 30000,
   spanLimits: {
+    attributeValueLengthLimit: getEnv().OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT,
     attributeCountLimit: getEnv().OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT,
     linkCountLimit: getEnv().OTEL_SPAN_LINK_COUNT_LIMIT,
     eventCountLimit: getEnv().OTEL_SPAN_EVENT_COUNT_LIMIT,
@@ -77,8 +79,6 @@ export function buildSamplerFromEnv(
       return new AlwaysOnSampler();
   }
 }
-
-const DEFAULT_RATIO = 1;
 
 function getSamplerProbabilityFromEnv(
   env: Required<ENVIRONMENT>
