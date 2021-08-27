@@ -27,6 +27,7 @@ import {
 
 const env = getEnv();
 const FALLBACK_OTEL_TRACES_SAMPLER = TracesSamplerValues.AlwaysOn;
+const DEFAULT_RATIO = 1;
 
 /**
  * Default configuration. For fields with primitive values, any user-provided
@@ -78,8 +79,6 @@ export function buildSamplerFromEnv(
       return new AlwaysOnSampler();
   }
 }
-
-const DEFAULT_RATIO = 1;
 
 function getSamplerProbabilityFromEnv(
   env: Required<ENVIRONMENT>
