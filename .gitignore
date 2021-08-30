@@ -1,3 +1,7 @@
+# version.ts file is automatically generated at compile time
+
+version.ts
+
 # Logs
 logs
 *.log
