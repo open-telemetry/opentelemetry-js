@@ -151,6 +151,7 @@ OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=https://trace-service:4317/v1/traces
 OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=https://metric-service:4317/v1/metrics
 # version and signal needs to be explicit
 ```
+
 > The per-signal endpoints take precedence and overrides `OTEL_EXPORTER_OTLP_ENDPOINT`
 
 For more details, see [OpenTelemetry Specification on Protocol Exporter][opentelemetry-spec-protocol-exporter].
