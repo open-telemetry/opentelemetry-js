@@ -28,17 +28,20 @@ jobs:
             integration-tests/*/package-lock.json
           key: ${{ runner.os }}-w3c_integration-${{ hashFiles('**/package.json') }}
 
-      - name: Install and Build (cache miss) 🔧
+      - name: Install and Bootstrap (cache miss) 🔧
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           npm install --ignore-scripts
           npx lerna bootstrap --no-ci --scope=propagation-validation-server --include-dependencies
 
-      - name: Install and Build (cache hit) 🔧
+      - name: Install and Bootstrap (cache hit) 🔧
         if: steps.cache.outputs.cache-hit == 'true'
         run: |
           npm ci --ignore-scripts
           npx lerna bootstrap --scope=propagation-validation-server --include-dependencies
+
+      - name: Generate version.ts files
+        run: lerna run version
 
       - name: Build 🔧
         run: npm run compile

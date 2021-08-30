@@ -292,6 +292,9 @@ To request automatic tracing support for a module not on this list, please [file
   - @opentelemetry/web -> @opentelemetry/sdk-trace-web
   - @opentelemetry/metrics -> @opentelemetry/sdk-metrics-base
   - @opentelemetry/node-sdk -> @opentelemetry/sdk-node
+- W3C propagators in @opentelemetry/core were renamed
+  - `HttpTraceContextPropagator` -> `W3CTraceContextPropagator`
+  - `W3CBaggagePropagator` -> `W3CBaggagePropagator`
 
 ### 0.23.x to 0.24.x
 

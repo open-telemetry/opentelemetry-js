@@ -19,7 +19,9 @@
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
-    "version": "node ../../scripts/version-update.js"
+    "version": "node ../../scripts/version-update.js",
+    "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
+    "prewatch": "npm run precompile"
   },
   "keywords": [
     "opentelemetry",

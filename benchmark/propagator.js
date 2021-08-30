@@ -17,8 +17,8 @@ const setups = [
     }
   },
   {
-    name: 'HttpTraceContextPropagator',
-    propagator: new opentelemetry.HttpTraceContextPropagator(),
+    name: 'W3CTraceContextPropagator',
+    propagator: new opentelemetry.W3CTraceContextPropagator(),
     injectCarrier: {},
     extractCarrier: {
       traceparent: '00-d4cda95b652f4a1592b449d5929fda1b-6e0c63257de34c92-00'

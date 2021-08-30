@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export * from './baggage/propagation/HttpBaggagePropagator';
+export * from './baggage/propagation/W3CBaggagePropagator';
 export * from './common/attributes';
 export * from './common/global-error-handler';
 export * from './common/logging-error-handler';
@@ -25,7 +25,7 @@ export * from './version';
 export * as baggageUtils from './baggage/utils';
 export * from './platform';
 export * from './propagation/composite';
-export * from './trace/HttpTraceContextPropagator';
+export * from './trace/W3CTraceContextPropagator';
 export * from './trace/IdGenerator';
 export * from './trace/rpc-metadata';
 export * from './trace/sampler/AlwaysOffSampler';

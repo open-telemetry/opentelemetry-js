@@ -22,33 +22,23 @@ jobs:
         with:
           node-version: ${{ matrix.node_version }}
 
-      - name: restore lock files
-        uses: actions/cache@master # must use unreleased master to cache multiple paths
+      - name: restore lerna
         id: cache
+        uses: actions/cache@v2
         with:
-          # must be done before bootstrap to not include node_modules files in the cache paths
           path: |
-            package-lock.json
-            packages/*/package-lock.json
-            benchmark/*/package-lock.json
-            backwards-compatability/*/package-lock.json
-            metapackages/*/package-lock.json
-            packages/*/package-lock.json
-            integration-tests/*/package-lock.json
-          key: ${{ runner.os }}-unit_test-${{ matrix.node_version }}-${{ hashFiles('**/package.json') }}
-      - name: Install and Build (cache miss) 🔧
+            node_modules
+            */*/node_modules
+          key: unittest-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('**/package.json') }}
+
+      - name: Bootstrap
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           npm install --ignore-scripts
           npx lerna bootstrap --no-ci --hoist --nohoist='zone.js'
-          npm run compile
 
-      - name: Install and Build (cache hit) 🔧
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: |
-          npm ci --ignore-scripts
-          npx lerna bootstrap --hoist --nohoist='zone.js'
-          npm run compile
+      - name: Build 🔧
+        run: npm run compile
 
       - name: Unit tests
         run: npm run test
@@ -66,35 +56,24 @@ jobs:
         uses: actions/checkout@v1
       - name: Permission Setup
         run: sudo chmod -R 777 /github /__w
-      - name: restore lock files
-        uses: actions/cache@master # must use unreleased master to cache multiple paths
+
+      - name: restore lerna
+        uses: actions/cache@v2
         id: cache
         with:
-          # must be done before bootstrap to not include node_modules files in the cache paths
           path: |
-            package-lock.json
-            packages/*/package-lock.json
-            benchmark/*/package-lock.json
-            backwards-compatability/*/package-lock.json
-            metapackages/*/package-lock.json
-            packages/*/package-lock.json
-            integration-tests/*/package-lock.json
-          key: ${{ runner.os }}-unit_test-${{ matrix.container }}-${{ hashFiles('**/package.json') }}
+            node_modules
+            */*/node_modules
+          key: unittest-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('**/package.json') }}
 
-      - name: Install and Build (cache miss) 🔧
+      - name: Bootstrap
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           npm install --ignore-scripts
           npx lerna bootstrap --no-ci --hoist --nohoist='zone.js'
-          npm run compile
 
-      - name: Install and Build (cache hit) 🔧
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: |
-          npm ci --ignore-scripts
-          npx lerna bootstrap --hoist --nohoist='zone.js'
-          npm run compile
-
+      - name: Build 🔧
+        run: npm run compile
       - name: Unit tests
         run: npm run test:browser
       - name: Report Coverage

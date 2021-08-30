@@ -28,31 +28,17 @@ jobs:
         with:
           args: "./**/*.md -i ./CHANGELOG.md"
 
-      - name: restore lock files
-        uses: actions/cache@master # must use unreleased master to cache multiple paths
+      - name: restore lerna
         id: cache
+        uses: actions/cache@v2
         with:
-          # must be done before bootstrap to not include node_modules files in the cache paths
           path: |
-            package-lock.json
-            packages/*/package-lock.json
-            benchmark/*/package-lock.json
-            backwards-compatability/*/package-lock.json
-            metapackages/*/package-lock.json
-            packages/*/package-lock.json
-            integration-tests/*/package-lock.json
-          # increment the trailing number to break the cache manually
-          key: ${{ runner.os }}-lint-${{ hashFiles('**/package.json') }}-0
+            node_modules
+            */*/node_modules
+          key: lint-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('**/package.json') }}
 
-      # On a cache hit, use ci to speed up the install process
-      - name: Bootstrap (cache hit)
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: |
-          npm ci --ignore-scripts
-          npx lerna bootstrap --ignore-scripts --hoist --nohoist='zone.js'
-
-      # On a cache miss, fall back to a regular install
-      - name: Bootstrap (cache miss)
+      # On a cache miss, install dependencies
+      - name: Bootstrap
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           npm install --ignore-scripts
