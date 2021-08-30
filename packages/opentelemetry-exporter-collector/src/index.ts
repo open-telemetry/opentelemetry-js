@@ -19,3 +19,4 @@ export * from './platform';
 export * as collectorTypes from './types';
 export { toCollectorExportTraceServiceRequest } from './transform';
 export { toCollectorExportMetricServiceRequest } from './transformMetrics';
+export { appendResourcePathToUrlIfNotPresent } from './util';
