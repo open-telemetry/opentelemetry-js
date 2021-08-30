@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import * as context from '../../src/trace/spancontext-utils';
-import { TraceFlags } from '../../src';
+import { INVALID_SPANID, INVALID_TRACEID, TraceFlags } from '../../src';
 
 describe('spancontext-utils', () => {
   it('should return true for valid spancontext', () => {
@@ -30,7 +30,7 @@ describe('spancontext-utils', () => {
 
   it('should return false when traceId is invalid', () => {
     const spanContext = {
-      traceId: context.INVALID_TRACEID,
+      traceId: INVALID_TRACEID,
       spanId: '6e0c63257de34c92',
       traceFlags: TraceFlags.NONE,
     };
@@ -40,7 +40,7 @@ describe('spancontext-utils', () => {
   it('should return false when spanId is invalid', () => {
     const spanContext = {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-      spanId: context.INVALID_SPANID,
+      spanId: INVALID_SPANID,
       traceFlags: TraceFlags.NONE,
     };
     assert.ok(!context.isSpanContextValid(spanContext));
@@ -48,8 +48,8 @@ describe('spancontext-utils', () => {
 
   it('should return false when traceId & spanId is invalid', () => {
     const spanContext = {
-      traceId: context.INVALID_TRACEID,
-      spanId: context.INVALID_SPANID,
+      traceId: INVALID_TRACEID,
+      spanId: INVALID_SPANID,
       traceFlags: TraceFlags.NONE,
     };
     assert.ok(!context.isSpanContextValid(spanContext));

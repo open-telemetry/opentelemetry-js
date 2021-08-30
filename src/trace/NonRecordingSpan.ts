@@ -17,10 +17,10 @@
 import { Exception } from '../common/Exception';
 import { TimeInput } from '../common/Time';
 import { SpanAttributes } from './attributes';
+import { INVALID_SPAN_CONTEXT } from './invalid-span-constants';
 import { Span } from './span';
 import { SpanContext } from './span_context';
 import { SpanStatus } from './status';
-import { INVALID_SPAN_CONTEXT } from './spancontext-utils';
 
 /**
  * The NonRecordingSpan is the default {@link Span} that is used when no Span

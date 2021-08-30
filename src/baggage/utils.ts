@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-import { diag } from '..';
+import { DiagAPI } from '../api/diag';
 import { BaggageImpl } from './internal/baggage-impl';
 import { baggageEntryMetadataSymbol } from './internal/symbol';
 import { Baggage, BaggageEntry, BaggageEntryMetadata } from './types';
+
+const diag = DiagAPI.instance();
 
 /**
  * Create a new Baggage with optional entries

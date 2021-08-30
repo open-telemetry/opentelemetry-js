@@ -27,11 +27,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Build 🔧
+        run: npm run compile
+
       - name: Lint
         run: npm run lint
 
-      - name: Build 🔧
-        run: npm run compile
+      - name: Check for Circular Dependencies
+        run: npm run cycle-check
 
       - name: Generate Documentation 📜
         run: npm run docs

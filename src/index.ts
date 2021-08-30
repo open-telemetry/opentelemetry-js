@@ -37,13 +37,16 @@ export * from './trace/tracer_provider';
 export * from './trace/tracer';
 
 export {
-  INVALID_SPANID,
-  INVALID_TRACEID,
-  INVALID_SPAN_CONTEXT,
   isSpanContextValid,
   isValidTraceId,
   isValidSpanId,
 } from './trace/spancontext-utils';
+
+export {
+  INVALID_SPANID,
+  INVALID_TRACEID,
+  INVALID_SPAN_CONTEXT,
+} from './trace/invalid-span-constants';
 
 export * from './context/context';
 export * from './context/types';
