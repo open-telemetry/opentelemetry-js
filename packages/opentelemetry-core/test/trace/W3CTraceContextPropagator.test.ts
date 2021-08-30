@@ -25,15 +25,15 @@ import {
 } from '@opentelemetry/api';
 import * as assert from 'assert';
 import {
-  HttpTraceContextPropagator,
+  W3CTraceContextPropagator,
   TRACE_PARENT_HEADER,
   TRACE_STATE_HEADER,
-} from '../../src/trace/HttpTraceContextPropagator';
+} from '../../src/trace/W3CTraceContextPropagator';
 import { suppressTracing } from '../../src/trace/suppress-tracing';
 import { TraceState } from '../../src/trace/TraceState';
 
-describe('HttpTraceContextPropagator', () => {
-  const httpTraceContext = new HttpTraceContextPropagator();
+describe('W3CTraceContextPropagator', () => {
+  const httpTraceContext = new W3CTraceContextPropagator();
   let carrier: { [key: string]: unknown };
 
   beforeEach(() => {

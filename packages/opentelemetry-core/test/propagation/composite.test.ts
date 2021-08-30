@@ -26,13 +26,13 @@ import { Context, ROOT_CONTEXT } from '@opentelemetry/api';
 import * as assert from 'assert';
 import {
   CompositePropagator,
-  HttpTraceContextPropagator,
+  W3CTraceContextPropagator,
   RandomIdGenerator,
 } from '../../src';
 import {
   TRACE_PARENT_HEADER,
   TRACE_STATE_HEADER,
-} from '../../src/trace/HttpTraceContextPropagator';
+} from '../../src/trace/W3CTraceContextPropagator';
 import { TraceState } from '../../src/trace/TraceState';
 
 class DummyPropagator implements TextMapPropagator {
@@ -78,7 +78,7 @@ describe('Composite Propagator', () => {
 
     it('should inject context using all configured propagators', () => {
       const composite = new CompositePropagator({
-        propagators: [new DummyPropagator(), new HttpTraceContextPropagator()],
+        propagators: [new DummyPropagator(), new W3CTraceContextPropagator()],
       });
       composite.inject(ctxWithSpanContext, carrier, defaultTextMapSetter);
 
@@ -94,7 +94,7 @@ describe('Composite Propagator', () => {
       const composite = new CompositePropagator({
         propagators: [
           new ThrowingPropagator(),
-          new HttpTraceContextPropagator(),
+          new W3CTraceContextPropagator(),
         ],
       });
       composite.inject(ctxWithSpanContext, carrier, defaultTextMapSetter);
@@ -119,7 +119,7 @@ describe('Composite Propagator', () => {
 
     it('should extract context using all configured propagators', () => {
       const composite = new CompositePropagator({
-        propagators: [new DummyPropagator(), new HttpTraceContextPropagator()],
+        propagators: [new DummyPropagator(), new W3CTraceContextPropagator()],
       });
       const spanContext = trace.getSpanContext(
         composite.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
@@ -140,7 +140,7 @@ describe('Composite Propagator', () => {
       const composite = new CompositePropagator({
         propagators: [
           new ThrowingPropagator(),
-          new HttpTraceContextPropagator(),
+          new W3CTraceContextPropagator(),
         ],
       });
       const spanContext = trace.getSpanContext(

@@ -23,11 +23,11 @@ import {
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
 import * as assert from 'assert';
-import { HttpBaggagePropagator } from '../../src/baggage/propagation/HttpBaggagePropagator';
+import { W3CBaggagePropagator } from '../../src/baggage/propagation/W3CBaggagePropagator';
 import { BAGGAGE_HEADER } from '../../src/baggage/constants';
 
-describe('HttpBaggagePropagator', () => {
-  const httpBaggagePropagator = new HttpBaggagePropagator();
+describe('W3CBaggagePropagator', () => {
+  const httpBaggagePropagator = new W3CBaggagePropagator();
 
   let carrier: { [key: string]: unknown };
 
@@ -196,7 +196,7 @@ describe('HttpBaggagePropagator', () => {
 
   describe('fields()', () => {
     it('returns the fields used by the baggage spec', () => {
-      const propagator = new HttpBaggagePropagator();
+      const propagator = new W3CBaggagePropagator();
       assert.deepStrictEqual(propagator.fields(), [BAGGAGE_HEADER]);
     });
   });
