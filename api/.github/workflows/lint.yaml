@@ -13,12 +13,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Lint changelog file
-        uses: docker://avtodev/markdown-lint:v1
-        with:
-          config: "/lint/config/changelog.yml"
-          args: "./CHANGELOG.md"
-
       - name: Lint markdown files
         uses: docker://avtodev/markdown-lint:v1
         with:
