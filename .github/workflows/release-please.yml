@@ -11,5 +11,4 @@ jobs:
         with:
           command: manifest
           token: ${{secrets.RELEASE_PR_TOKEN}}
-          fork: true
           default-branch: main
