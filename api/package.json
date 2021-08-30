@@ -24,6 +24,7 @@
     "lint": "eslint src test --ext .ts",
     "test:browser": "nyc karma start --single-run",
     "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
+    "cycle-check": "dpdm --exit-code circular:1 src/index.ts",
     "version": "node scripts/version-update.js",
     "prewatch": "npm run version",
     "watch": "tsc --build --watch"
@@ -63,6 +64,7 @@
     "@typescript-eslint/eslint-plugin": "4.28.1",
     "@typescript-eslint/parser": "4.28.1",
     "codecov": "3.8.2",
+    "dpdm": "3.7.1",
     "eslint": "7.30.0",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-import": "2.23.4",

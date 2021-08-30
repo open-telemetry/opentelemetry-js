@@ -16,7 +16,6 @@
 
 import { Context } from '../context/types';
 import { NoopTracer } from './NoopTracer';
-import { ProxyTracerProvider } from './ProxyTracerProvider';
 import { Span } from './span';
 import { SpanOptions } from './SpanOptions';
 import { Tracer } from './tracer';
@@ -31,7 +30,7 @@ export class ProxyTracer implements Tracer {
   private _delegate?: Tracer;
 
   constructor(
-    private _provider: ProxyTracerProvider,
+    private _provider: TracerDelegator,
     public readonly name: string,
     public readonly version?: string
   ) {}
@@ -68,4 +67,8 @@ export class ProxyTracer implements Tracer {
     this._delegate = tracer;
     return this._delegate;
   }
+}
+
+export interface TracerDelegator {
+  getDelegateTracer(name: string, version?: string): Tracer | undefined;
 }

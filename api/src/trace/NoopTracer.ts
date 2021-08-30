@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { context } from '../';
+import { ContextAPI } from '../api/context';
 import { Context } from '../context/types';
 import { getSpanContext, setSpan } from '../trace/context-utils';
 import { NonRecordingSpan } from './NonRecordingSpan';
@@ -23,6 +23,8 @@ import { isSpanContextValid } from './spancontext-utils';
 import { SpanOptions } from './SpanOptions';
 import { SpanContext } from './span_context';
 import { Tracer } from './tracer';
+
+const context = ContextAPI.getInstance();
 
 /**
  * No-op implementations of {@link Tracer}.
