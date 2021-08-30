@@ -144,6 +144,15 @@ OTEL_EXPORTER_OTLP_ENDPOINT=https://localhost:4317
 # e.g. https://localhost:4317/v1/traces for `CollectorTraceExporter` and https://localhost:4317/v1/metrics for `CollectorMetricExporter`
 ```
 
+If the trace and metric exporter endpoints have different providers, the env var for per-signal endpoints are available to use
+
+```sh
+OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=https://trace-service:4317/v1/traces
+OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=https://metric-service:4317/v1/metrics
+# version and signal needs to be explicit
+```
+> The per-signal endpoints take precedence and overrides `OTEL_EXPORTER_OTLP_ENDPOINT`
+
 For more details, see [OpenTelemetry Specification on Protocol Exporter][opentelemetry-spec-protocol-exporter].
 
 ## Running opentelemetry-collector locally to see the traces
