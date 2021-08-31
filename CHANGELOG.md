@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### [1.0.3](https://www.github.com/open-telemetry/opentelemetry-js-api/compare/v1.0.2...v1.0.3) (2021-08-30)
+
+
+### Bug Fixes
+
+* remove all circular dependencies ([#119](https://www.github.com/open-telemetry/opentelemetry-js-api/issues/119)) ([a8083e8](https://www.github.com/open-telemetry/opentelemetry-js-api/commit/a8083e84b23227828745da80fd5fe512357dd34b))
+
 ## 1.0.2
 
 ### :bug: Bug Fix
