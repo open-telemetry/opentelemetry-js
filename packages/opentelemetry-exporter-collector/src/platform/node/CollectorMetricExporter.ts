@@ -20,8 +20,10 @@ import { CollectorExporterNodeConfigBase } from './types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { toCollectorExportMetricServiceRequest } from '../../transformMetrics';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
+import { appendResourcePathToUrlIfNotPresent } from '../../util';
 
-const DEFAULT_COLLECTOR_URL = 'http://localhost:55681/v1/metrics';
+const DEFAULT_COLLECTOR_RESOURCE_PATH = '/v1/metrics';
+const DEFAULT_COLLECTOR_URL=`http://localhost:55681${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 
 /**
  * Collector Metric Exporter for Node
@@ -61,7 +63,7 @@ export class CollectorMetricExporter
       : getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0
       ? getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
       : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-      ? getEnv().OTEL_EXPORTER_OTLP_ENDPOINT
+      ? appendResourcePathToUrlIfNotPresent(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
       : DEFAULT_COLLECTOR_URL;
   }
 }

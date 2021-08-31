@@ -33,3 +33,9 @@ export function parseHeaders(
   });
   return headers;
 }
+
+export function appendResourcePathToUrlIfNotPresent(url: string, path: string): string {
+  if (url.match(/v\d\/(traces|metrics)$/)) return url;
+
+  return url + path;
+}

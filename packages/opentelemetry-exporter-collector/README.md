@@ -28,7 +28,7 @@ import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
 import { CollectorTraceExporter } from '@opentelemetry/exporter-collector';
 
 const collectorOptions = {
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/trace
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/traces
   headers: {}, // an optional object containing custom headers to be sent with each request
   concurrencyLimit: 10, // an optional limit on pending requests
 };
@@ -83,7 +83,7 @@ const { BasicTracerProvider, BatchSpanProcessor } = require('@opentelemetry/sdk-
 const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector');
 
 const collectorOptions = {
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/trace
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/traces
   headers: {
     foo: 'bar'
   }, // an optional object containing custom headers to be sent with each request will only work with http
@@ -134,6 +134,28 @@ For GRPC please check [npm-url-grpc]
 
 For PROTOBUF please check [npm-url-proto]
 
+## Configuration options as environment variables
+
+Instead of providing options to `CollectorMetricExporter` and `CollectorTraceExporter` explicitly, environment variables may be provided instead.
+
+```sh
+OTEL_EXPORTER_OTLP_ENDPOINT=https://localhost:4317
+# this will automatically append the version and signal path
+# e.g. https://localhost:4317/v1/traces for `CollectorTraceExporter` and https://localhost:4317/v1/metrics for `CollectorMetricExporter`
+```
+
+If the trace and metric exporter endpoints have different providers, the env var for per-signal endpoints are available to use
+
+```sh
+OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=https://trace-service:4317/v1/traces
+OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=https://metric-service:4317/v1/metrics
+# version and signal needs to be explicit
+```
+
+> The per-signal endpoints take precedence and overrides `OTEL_EXPORTER_OTLP_ENDPOINT`
+
+For more details, see [OpenTelemetry Specification on Protocol Exporter][opentelemetry-spec-protocol-exporter].
+
 ## Running opentelemetry-collector locally to see the traces
 
 1. Go to examples/collector-exporter-node
@@ -162,4 +184,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [npm-url-proto]: https://www.npmjs.com/package/@opentelemetry/exporter-collector-proto
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-collector.svg
 [opentelemetry-collector-url]: https://github.com/open-telemetry/opentelemetry-collector
+[opentelemetry-spec-protocol-exporter]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options
 [semconv-resource-service-name]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service
