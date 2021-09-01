@@ -17,6 +17,7 @@
 import * as types from '../../types';
 import * as path from 'path';
 import * as RequireInTheMiddle from 'require-in-the-middle';
+import { existsSync } from 'fs';
 import { satisfies } from 'semver';
 import { InstrumentationAbstract } from '../../instrumentation';
 import { InstrumentationModuleDefinition } from './types';
@@ -73,8 +74,9 @@ export abstract class InstrumentationBase<T = any>
       return exports;
     }
 
+    const packageJsonPath = path.join(baseDir, 'package.json');
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const version = require(path.join(baseDir, 'package.json')).version;
+    const version = existsSync(packageJsonPath) ? require(packageJsonPath).version : undefined;
     module.moduleVersion = version;
     if (module.name === name) {
       // main module
@@ -167,8 +169,13 @@ export abstract class InstrumentationBase<T = any>
   }
 }
 
-function isSupported(supportedVersions: string[], version: string, includePrerelease?: boolean): boolean {
+function isSupported(supportedVersions: string[], version?: string, includePrerelease?: boolean): boolean {
   return supportedVersions.some(supportedVersion => {
+    if (typeof version === 'undefined') {
+      // If we don't have the version, accept the wildcard case only
+      return supportedVersion === '*';
+    }
+
     return satisfies(version, supportedVersion, { includePrerelease });
   });
 }
