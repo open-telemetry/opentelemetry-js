@@ -8,7 +8,13 @@ on:
 
 jobs:
   build:
+    strategy:
+      fail-fast: false
+      matrix:
+        package-group: ["stable", "experimental"]
     runs-on: ubuntu-latest
+    container:
+      image: node:14
 
     steps:
       - uses: actions/checkout@v2
@@ -27,6 +33,9 @@ jobs:
         uses: avto-dev/markdown-lint@v1
         with:
           args: "./**/*.md -i ./CHANGELOG.md"
+          
+      - name: Use ${{ matrix.package-group }}
+        run: npm run use:${{ matrix.package-group }}
 
       - name: restore lerna
         id: cache
@@ -35,7 +44,7 @@ jobs:
           path: |
             node_modules
             */*/node_modules
-          key: lint-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('**/package.json') }}
+          key: lint-${{ matrix.package-group }}-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('**/package.json') }}
 
       # On a cache miss, install dependencies
       - name: Bootstrap
