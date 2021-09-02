@@ -10,16 +10,10 @@
   ],
   "references": [
     {
-      "path": "../opentelemetry-api-metrics"
-    },
-    {
       "path": "../opentelemetry-context-async-hooks"
     },
     {
       "path": "../opentelemetry-core"
-    },
-    {
-      "path": "../opentelemetry-instrumentation"
     },
     {
       "path": "../opentelemetry-resources"

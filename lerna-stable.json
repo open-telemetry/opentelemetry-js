@@ -1,0 +1,28 @@
+{
+  "lerna": "3.13.4",
+  "version": "0.25.0",
+  "npmClient": "npm",
+  "packages": [
+    "backwards-compatability/*",
+    "packages/opentelemetry-context-async-hooks",
+    "packages/opentelemetry-context-zone-peer-dep",
+    "packages/opentelemetry-context-zone",
+    "packages/opentelemetry-core",
+    "packages/opentelemetry-exporter-collector-grpc",
+    "packages/opentelemetry-exporter-collector-proto",
+    "packages/opentelemetry-exporter-collector",
+    "packages/opentelemetry-exporter-jaeger",
+    "packages/opentelemetry-exporter-prometheus",
+    "packages/opentelemetry-exporter-zipkin",
+    "packages/opentelemetry-propagator-b3",
+    "packages/opentelemetry-propagator-jaeger",
+    "packages/opentelemetry-resources",
+    "packages/opentelemetry-sdk-metrics-base",
+    "packages/opentelemetry-sdk-node",
+    "packages/opentelemetry-sdk-trace-base",
+    "packages/opentelemetry-sdk-trace-node",
+    "packages/opentelemetry-sdk-trace-web",
+    "packages/opentelemetry-semantic-conventions",
+    "packages/opentelemetry-shim-opentracing"
+  ]
+}

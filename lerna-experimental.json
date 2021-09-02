@@ -1,0 +1,14 @@
+{
+  "lerna": "3.13.4",
+  "version": "0.25.0",
+  "npmClient": "npm",
+  "packages": [
+    "packages/opentelemetry-api-metrics",
+    "packages/opentelemetry-sdk-metrics-base",
+    "packages/opentelemetry-instrumentation",
+    "packages/opentelemetry-instrumentation-fetch",
+    "packages/opentelemetry-instrumentation-grpc",
+    "packages/opentelemetry-instrumentation-http",
+    "packages/opentelemetry-instrumentation-xml-http-request"
+  ]
+}
