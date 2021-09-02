@@ -51,7 +51,7 @@ export class InMemorySpanExporter implements SpanExporter {
     return Promise.resolve();
   }
 
-  reset() {
+  reset(): void {
     this._finishedSpans = [];
   }
 
