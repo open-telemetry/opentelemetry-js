@@ -18,7 +18,6 @@ import { TracerProvider } from '@opentelemetry/api';
 import { MeterProvider } from '@opentelemetry/api-metrics';
 import { Instrumentation } from './types';
 import { AutoLoaderResult, InstrumentationOption } from './types_internal';
-import { InstrumentationBase } from './platform';
 
 /**
  * Parses the options and returns instrumentations, node plugins and
@@ -30,26 +29,19 @@ export function parseInstrumentationOptions(
 ): AutoLoaderResult {
   let instrumentations: Instrumentation[] = [];
   for (let i = 0, j = options.length; i < j; i++) {
-    const option = options[i];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const option = options[i] as any;
     if (Array.isArray(option)) {
       const results = parseInstrumentationOptions(option);
       instrumentations = instrumentations.concat(results.instrumentations);
-    } else if (isInstrumentationClass(option)) {
+    } else if (typeof option === 'function') {
       instrumentations.push(new option());
-    } else if (isInstrumentation(option)) {
+    } else if ((option as Instrumentation).instrumentationName) {
       instrumentations.push(option);
     }
   }
 
   return { instrumentations };
-}
-
-function isInstrumentationClass<T extends InstrumentationBase>(option: InstrumentationOption): option is new () => T {
-  return typeof option === 'function';
-}
-
-function isInstrumentation(option: InstrumentationOption): option is Instrumentation {
-  return Boolean((option as Instrumentation).instrumentationName);
 }
 
 /**
