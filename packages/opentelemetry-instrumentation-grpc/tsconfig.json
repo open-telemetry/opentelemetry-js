@@ -13,22 +13,7 @@
       "path": "../opentelemetry-api-metrics"
     },
     {
-      "path": "../opentelemetry-context-async-hooks"
-    },
-    {
-      "path": "../opentelemetry-core"
-    },
-    {
       "path": "../opentelemetry-instrumentation"
-    },
-    {
-      "path": "../opentelemetry-sdk-trace-base"
-    },
-    {
-      "path": "../opentelemetry-sdk-trace-node"
-    },
-    {
-      "path": "../opentelemetry-semantic-conventions"
     }
   ]
 }
