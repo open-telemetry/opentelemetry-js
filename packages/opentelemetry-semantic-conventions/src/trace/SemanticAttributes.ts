@@ -275,6 +275,36 @@ clear whether the exception will escape.
   NET_HOST_NAME: 'net.host.name',
 
   /**
+  * The internet connection type currently being used by the host.
+  */
+  NET_HOST_CONNECTION_TYPE: 'net.host.connection.type',
+
+  /**
+  * This describes more details regarding the connection.type. It may be the type of cell technology connection, but it could be used for describing details about a wifi connection.
+  */
+  NET_HOST_CONNECTION_SUBTYPE: 'net.host.connection.subtype',
+
+  /**
+  * The name of the mobile carrier.
+  */
+  NET_HOST_CARRIER_NAME: 'net.host.carrier.name',
+
+  /**
+  * The mobile carrier country code.
+  */
+  NET_HOST_CARRIER_MCC: 'net.host.carrier.mcc',
+
+  /**
+  * The mobile carrier network code.
+  */
+  NET_HOST_CARRIER_MNC: 'net.host.carrier.mnc',
+
+  /**
+  * The ISO 3166-1 alpha-2 2-character country code associated with the mobile carrier network.
+  */
+  NET_HOST_CARRIER_ICC: 'net.host.carrier.icc',
+
+  /**
   * The [`service.name`](../../resource/semantic_conventions/README.md#service) of the remote service. SHOULD be equal to the actual `service.name` resource attribute of the remote service if any.
   */
   PEER_SERVICE: 'peer.service',
@@ -814,6 +844,8 @@ export enum FaasDocumentOperationValues {
 
 
 export enum FaasInvokedProviderValues {
+  /** Alibaba Cloud. */
+  ALIBABA_CLOUD = 'alibaba_cloud',
   /** Amazon Web Services. */
   AWS = 'aws',
   /** Microsoft Azure. */
@@ -840,6 +872,70 @@ export enum NetTransportValues {
   INPROC = 'inproc',
   /** Something else (non IP-based). */
   OTHER = 'other',
+}
+
+
+
+
+export enum NetHostConnectionTypeValues {
+  /** wifi. */
+  WIFI = 'wifi',
+  /** wired. */
+  WIRED = 'wired',
+  /** cell. */
+  CELL = 'cell',
+  /** unavailable. */
+  UNAVAILABLE = 'unavailable',
+  /** unknown. */
+  UNKNOWN = 'unknown',
+}
+
+
+
+
+export enum NetHostConnectionSubtypeValues {
+  /** GPRS. */
+  GPRS = 'gprs',
+  /** EDGE. */
+  EDGE = 'edge',
+  /** UMTS. */
+  UMTS = 'umts',
+  /** CDMA. */
+  CDMA = 'cdma',
+  /** EVDO Rel. 0. */
+  EVDO_0 = 'evdo_0',
+  /** EVDO Rev. A. */
+  EVDO_A = 'evdo_a',
+  /** CDMA2000 1XRTT. */
+  CDMA2000_1XRTT = 'cdma2000_1xrtt',
+  /** HSDPA. */
+  HSDPA = 'hsdpa',
+  /** HSUPA. */
+  HSUPA = 'hsupa',
+  /** HSPA. */
+  HSPA = 'hspa',
+  /** IDEN. */
+  IDEN = 'iden',
+  /** EVDO Rev. B. */
+  EVDO_B = 'evdo_b',
+  /** LTE. */
+  LTE = 'lte',
+  /** EHRPD. */
+  EHRPD = 'ehrpd',
+  /** HSPAP. */
+  HSPAP = 'hspap',
+  /** GSM. */
+  GSM = 'gsm',
+  /** TD-SCDMA. */
+  TD_SCDMA = 'td_scdma',
+  /** IWLAN. */
+  IWLAN = 'iwlan',
+  /** 5G NR (New Radio). */
+  NR = 'nr',
+  /** 5G NRNSA (New Radio Non-Standalone). */
+  NRNSA = 'nrnsa',
+  /** LTE CA. */
+  LTE_CA = 'lte_ca',
 }
 
 
