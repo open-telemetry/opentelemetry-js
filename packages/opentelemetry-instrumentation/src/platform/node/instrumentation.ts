@@ -81,7 +81,6 @@ export abstract class InstrumentationBase<T = any>
     if (module.name === name) {
       // main module
       if (
-        typeof version === 'string' &&
         isSupported(module.supportedVersions, version, module.includePrerelease)
       ) {
         if (typeof module.patch === 'function') {
@@ -170,12 +169,12 @@ export abstract class InstrumentationBase<T = any>
 }
 
 function isSupported(supportedVersions: string[], version?: string, includePrerelease?: boolean): boolean {
-  return supportedVersions.some(supportedVersion => {
-    if (typeof version === 'undefined') {
-      // If we don't have the version, accept the wildcard case only
-      return supportedVersion === '*';
-    }
+  if (typeof version === 'undefined') {
+    // If we don't have the version, accept the wildcard case only
+    return supportedVersions.includes('*');
+  }
 
+  return supportedVersions.some(supportedVersion => {
     return satisfies(version, supportedVersion, { includePrerelease });
   });
 }
