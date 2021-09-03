@@ -17,7 +17,6 @@
 import * as types from '../../types';
 import * as path from 'path';
 import * as RequireInTheMiddle from 'require-in-the-middle';
-import { existsSync } from 'fs';
 import { satisfies } from 'semver';
 import { InstrumentationAbstract } from '../../instrumentation';
 import { InstrumentationModuleDefinition } from './types';
@@ -60,6 +59,18 @@ export abstract class InstrumentationBase<T = any>
     }
   }
 
+  private _extractPackageVersion(baseDir: string): string | undefined {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const version = require(path.join(baseDir, 'package.json')).version;
+      return typeof version === 'string' ? version : undefined;
+    } catch (error) {
+      diag.warn('Failed extracting version', baseDir);
+    }
+    
+    return undefined;
+  }
+
   private _onRequire<T>(
     module: InstrumentationModuleDefinition<T>,
     exports: T,
@@ -74,9 +85,7 @@ export abstract class InstrumentationBase<T = any>
       return exports;
     }
 
-    const packageJsonPath = path.join(baseDir, 'package.json');
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const version = existsSync(packageJsonPath) ? require(packageJsonPath).version : undefined;
+    const version = this._extractPackageVersion(baseDir);
     module.moduleVersion = version;
     if (module.name === name) {
       // main module
