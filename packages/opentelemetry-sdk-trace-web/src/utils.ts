@@ -108,10 +108,10 @@ export function addSpanNetworkEvents(
  * sort resources by startTime
  * @param filteredResources
  */
-export function sortResources(filteredResources: PerformanceResourceTiming[]) {
-  return filteredResources.slice().sort((a, b) => {
-    const valueA = a[PTN.FETCH_START];
-    const valueB = b[PTN.FETCH_START];
+export function sortResources(filteredResources: PerformanceResourceTiming[]): PerformanceResourceTiming[] {
+  return filteredResources.slice().sort((x, y) => {
+    const valueA = x[PTN.FETCH_START];
+    const valueB = y[PTN.FETCH_START];
     if (valueA > valueB) {
       return 1;
     } else if (valueA < valueB) {
@@ -284,9 +284,9 @@ function filterResourcesForSpan(
  * @param url
  */
 export function parseUrl(url: string): HTMLAnchorElement {
-  const a = document.createElement('a');
-  a.href = url;
-  return a;
+  const element = document.createElement('a');
+  element.href = url;
+  return element;
 }
 
 /**
@@ -296,7 +296,7 @@ export function parseUrl(url: string): HTMLAnchorElement {
  * simplified to contain id
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getElementXPath(target: any, optimised?: boolean) {
+export function getElementXPath(target: any, optimised?: boolean): string {
   if (target.nodeType === Node.DOCUMENT_NODE) {
     return '/';
   }
@@ -380,7 +380,7 @@ function getNodeValue(target: HTMLElement, optimised?: boolean): string {
 export function shouldPropagateTraceHeaders(
   spanUrl: string,
   propagateTraceHeaderCorsUrls?: PropagateTraceHeaderCorsUrls
-) {
+): boolean {
   let propagateTraceHeaderUrls = propagateTraceHeaderCorsUrls || [];
   if (
     typeof propagateTraceHeaderUrls === 'string' ||
