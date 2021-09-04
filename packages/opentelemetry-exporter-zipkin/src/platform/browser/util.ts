@@ -28,7 +28,7 @@ import * as zipkinTypes from '../../types';
  * @param headers - headers
  * send
  */
-export function prepareSend(urlStr: string, headers?: Record<string, string>) {
+export function prepareSend(urlStr: string, headers?: Record<string, string>): zipkinTypes.SendFn {
   let xhrHeaders: Record<string, string>;
   const useBeacon = typeof navigator.sendBeacon === 'function' && !headers;
   if (headers) {
