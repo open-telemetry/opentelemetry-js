@@ -27,6 +27,7 @@ import { BasicTracerProvider } from './BasicTracerProvider';
 import { Span } from './Span';
 import { SpanLimits, TracerConfig } from './types';
 import { mergeConfig } from './utility';
+import { SpanProcessor } from './SpanProcessor';
 
 /**
  * This class represents a basic tracer.
@@ -216,7 +217,7 @@ export class Tracer implements api.Tracer {
     return this._spanLimits;
   }
 
-  getActiveSpanProcessor() {
+  getActiveSpanProcessor(): SpanProcessor {
     return this._tracerProvider.getActiveSpanProcessor();
   }
 }

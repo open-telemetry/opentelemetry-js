@@ -56,7 +56,7 @@ export class NodeTracerProvider extends BasicTracerProvider {
     super(config);
   }
 
-  override register(config: SDKRegistrationConfig = {}) {
+  override register(config: SDKRegistrationConfig = {}): void {
     if (config.contextManager === undefined) {
       const ContextManager = semver.gte(process.version, '14.8.0')
         ? AsyncLocalStorageContextManager

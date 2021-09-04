@@ -27,7 +27,7 @@ import * as zipkinTypes from '../../types';
  * @param headers - headers
  * send
  */
-export function prepareSend(urlStr: string, headers?: Record<string, string>) {
+export function prepareSend(urlStr: string, headers?: Record<string, string>): zipkinTypes.SendFn {
   const urlOpts = url.parse(urlStr);
 
   const reqOpts: http.RequestOptions = Object.assign(
