@@ -71,11 +71,11 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     return this._config;
   }
 
-  override setConfig(config: HttpInstrumentationConfig & InstrumentationConfig = {}) {
+  override setConfig(config: HttpInstrumentationConfig & InstrumentationConfig = {}): void {
     this._config = Object.assign({}, config);
   }
 
-  init() {
+  init(): [InstrumentationNodeModuleDefinition<Https>, InstrumentationNodeModuleDefinition<Http>] {
     return [this._getHttpsInstrumentation(), this._getHttpInstrumentation()];
   }
 
@@ -169,7 +169,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
    * Creates spans for incoming requests, restoring spans' context if applied.
    */
   protected _getPatchIncomingRequestFunction(component: 'http' | 'https') {
-    return (original: (event: string, ...args: unknown[]) => boolean) => {
+    return (original: (event: string, ...args: unknown[]) => boolean): (this: unknown, event: string, ...args: unknown[]) => boolean => {
       return this._incomingRequestFunction(component, original);
     };
   }
@@ -305,7 +305,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           if (response.aborted && !response.complete) {
             status = { code: SpanStatusCode.ERROR };
           } else {
-            status = utils.parseResponseStatus(response.statusCode!);
+            status = utils.parseResponseStatus(response.statusCode);
           }
 
           span.setStatus(status);
@@ -351,7 +351,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   ) {
     const instrumentation = this;
     return function incomingRequest(
-      this: {},
+      this: unknown,
       event: string,
       ...args: unknown[]
     ): boolean {
@@ -488,7 +488,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   ): Func<http.ClientRequest> {
     const instrumentation = this;
     return function outgoingRequest(
-      this: {},
+      this: unknown,
       options: url.URL | http.RequestOptions | string,
       ...args: unknown[]
     ): http.ClientRequest {

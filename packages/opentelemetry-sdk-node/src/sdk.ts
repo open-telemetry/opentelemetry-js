@@ -111,7 +111,7 @@ export class NodeSDK {
     spanProcessor: SpanProcessor,
     contextManager?: ContextManager,
     textMapPropagator?: TextMapPropagator
-  ) {
+  ): void {
     this._tracerProviderConfig = {
       tracerConfig,
       spanProcessor,
@@ -121,12 +121,12 @@ export class NodeSDK {
   }
 
   /** Set configurations needed to register a MeterProvider */
-  public configureMeterProvider(config: MeterConfig) {
+  public configureMeterProvider(config: MeterConfig): void {
     this._meterProviderConfig = config;
   }
 
   /** Detect resource attributes */
-  public async detectResources(config?: ResourceDetectionConfig) {
+  public async detectResources(config?: ResourceDetectionConfig): Promise<void> {
     const internalConfig: ResourceDetectionConfig = {
       detectors: [awsEc2Detector, gcpDetector, envDetector, processDetector],
       ...config,
@@ -136,14 +136,14 @@ export class NodeSDK {
   }
 
   /** Manually add a resource */
-  public addResource(resource: Resource) {
+  public addResource(resource: Resource): void {
     this._resource = this._resource.merge(resource);
   }
 
   /**
    * Once the SDK has been configured, call this method to construct SDK components and register them with the OpenTelemetry API.
    */
-  public async start() {
+  public async start(): Promise<void> {
     if (this._autoDetectResources) {
       await this.detectResources();
     }

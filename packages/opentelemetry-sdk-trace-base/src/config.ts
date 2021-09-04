@@ -48,12 +48,12 @@ export const DEFAULT_CONFIG = {
 
 /**
  * Based on environment, builds a sampler, complies with specification.
- * @param env optional, by default uses getEnv(), but allows passing a value to reuse parsed environment
+ * @param environment optional, by default uses getEnv(), but allows passing a value to reuse parsed environment
  */
 export function buildSamplerFromEnv(
-  env: Required<ENVIRONMENT> = getEnv()
+  environment: Required<ENVIRONMENT> = getEnv()
 ): Sampler {
-  switch (env.OTEL_TRACES_SAMPLER) {
+  switch (environment.OTEL_TRACES_SAMPLER) {
     case TracesSamplerValues.AlwaysOn:
       return new AlwaysOnSampler();
     case TracesSamplerValues.AlwaysOff:
@@ -67,25 +67,25 @@ export function buildSamplerFromEnv(
         root: new AlwaysOffSampler(),
       });
     case TracesSamplerValues.TraceIdRatio:
-      return new TraceIdRatioBasedSampler(getSamplerProbabilityFromEnv(env));
+      return new TraceIdRatioBasedSampler(getSamplerProbabilityFromEnv(environment));
     case TracesSamplerValues.ParentBasedTraceIdRatio:
       return new ParentBasedSampler({
-        root: new TraceIdRatioBasedSampler(getSamplerProbabilityFromEnv(env)),
+        root: new TraceIdRatioBasedSampler(getSamplerProbabilityFromEnv(environment)),
       });
     default:
       diag.error(
-        `OTEL_TRACES_SAMPLER value "${env.OTEL_TRACES_SAMPLER} invalid, defaulting to ${FALLBACK_OTEL_TRACES_SAMPLER}".`
+        `OTEL_TRACES_SAMPLER value "${environment.OTEL_TRACES_SAMPLER} invalid, defaulting to ${FALLBACK_OTEL_TRACES_SAMPLER}".`
       );
       return new AlwaysOnSampler();
   }
 }
 
 function getSamplerProbabilityFromEnv(
-  env: Required<ENVIRONMENT>
+  environment: Required<ENVIRONMENT>
 ): number | undefined {
   if (
-    env.OTEL_TRACES_SAMPLER_ARG === undefined ||
-    env.OTEL_TRACES_SAMPLER_ARG === ''
+    environment.OTEL_TRACES_SAMPLER_ARG === undefined ||
+    environment.OTEL_TRACES_SAMPLER_ARG === ''
   ) {
     diag.error(
       `OTEL_TRACES_SAMPLER_ARG is blank, defaulting to ${DEFAULT_RATIO}.`
@@ -93,18 +93,18 @@ function getSamplerProbabilityFromEnv(
     return DEFAULT_RATIO;
   }
 
-  const probability = Number(env.OTEL_TRACES_SAMPLER_ARG);
+  const probability = Number(environment.OTEL_TRACES_SAMPLER_ARG);
 
   if (isNaN(probability)) {
     diag.error(
-      `OTEL_TRACES_SAMPLER_ARG=${env.OTEL_TRACES_SAMPLER_ARG} was given, but it is invalid, defaulting to ${DEFAULT_RATIO}.`
+      `OTEL_TRACES_SAMPLER_ARG=${environment.OTEL_TRACES_SAMPLER_ARG} was given, but it is invalid, defaulting to ${DEFAULT_RATIO}.`
     );
     return DEFAULT_RATIO;
   }
 
   if (probability < 0 || probability > 1) {
     diag.error(
-      `OTEL_TRACES_SAMPLER_ARG=${env.OTEL_TRACES_SAMPLER_ARG} was given, but it is out of range ([0..1]), defaulting to ${DEFAULT_RATIO}.`
+      `OTEL_TRACES_SAMPLER_ARG=${environment.OTEL_TRACES_SAMPLER_ARG} was given, but it is out of range ([0..1]), defaulting to ${DEFAULT_RATIO}.`
     );
     return DEFAULT_RATIO;
   }
