@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
+import { Sampler } from '@opentelemetry/api';
 import { buildSamplerFromEnv, DEFAULT_CONFIG } from './config';
-import { TracerConfig } from './types';
+import { SpanLimits, TracerConfig } from './types';
 
 /**
  * Function to merge Default configuration (as specified in './config') with
  * user provided configurations.
  */
-export function mergeConfig(userConfig: TracerConfig) {
+export function mergeConfig(userConfig: TracerConfig): TracerConfig & { sampler: Sampler; spanLimits: SpanLimits } {
   const perInstanceDefaults: Partial<TracerConfig> = {
     sampler: buildSamplerFromEnv(),
   };

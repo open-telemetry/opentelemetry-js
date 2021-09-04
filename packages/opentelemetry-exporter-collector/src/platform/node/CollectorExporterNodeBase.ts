@@ -43,6 +43,7 @@ export abstract class CollectorExporterNodeBase<
 
   constructor(config: CollectorExporterNodeConfigBase = {}) {
     super(config);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     if ((config as any).metadata) {
       diag.warn('Metadata cannot be set when using http');
     }
