@@ -96,6 +96,7 @@ export class BasicTracerProvider implements TracerProvider {
       this._tracers.set(key, new Tracer({ name, version }, this._config, this));
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return this._tracers.get(key)!;
   }
 
@@ -133,7 +134,7 @@ export class BasicTracerProvider implements TracerProvider {
    *
    * @param config Configuration object for SDK registration
    */
-  register(config: SDKRegistrationConfig = {}) {
+  register(config: SDKRegistrationConfig = {}): void {
     trace.setGlobalTracerProvider(this);
     if (config.propagator === undefined) {
       config.propagator = this._buildPropagatorFromEnv();
@@ -197,7 +198,7 @@ export class BasicTracerProvider implements TracerProvider {
     });
   }
 
-  shutdown() {
+  shutdown(): Promise<void> {
     return this.activeSpanProcessor.shutdown();
   }
 

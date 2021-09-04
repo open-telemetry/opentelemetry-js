@@ -100,7 +100,7 @@ export class PrometheusExporter implements MetricExporter {
    * @param records Metrics to be sent to the prometheus backend
    * @param cb result callback to be called on finish
    */
-  export(records: MetricRecord[], cb: (result: ExportResult) => void) {
+  export(records: MetricRecord[], cb: (result: ExportResult) => void): void {
     if (!this._server) {
       // It is conceivable that the _server may not be started as it is an async startup
       // However unlikely, if this happens the caller may retry the export
@@ -180,7 +180,7 @@ export class PrometheusExporter implements MetricExporter {
   public getMetricsRequestHandler(
     _request: IncomingMessage,
     response: ServerResponse
-  ) {
+  ): void {
     this._exportMetrics(response);
   }
 

@@ -188,7 +188,7 @@ export class Span implements api.Span, ReadableSpan {
     return this._ended === false;
   }
 
-  recordException(exception: api.Exception, time: api.TimeInput = hrTime()) {
+  recordException(exception: api.Exception, time: api.TimeInput = hrTime()): void {
     const attributes: api.SpanAttributes = {};
     if (typeof exception === 'string') {
       attributes[SemanticAttributes.EXCEPTION_MESSAGE] = exception;

@@ -46,7 +46,7 @@ import {
 } from '../../src';
 
 describe('BasicTracerProvider', () => {
-  let removeEvent: Function | undefined;
+  let removeEvent: (() => void) | undefined;
   const envSource = (typeof window !== 'undefined'
     ? window
     : process.env) as any;
@@ -267,7 +267,7 @@ describe('BasicTracerProvider', () => {
         provider.register();
         assert.ok(
           errorStub.getCall(0).args[0] ===
-            'Exporter "missing-exporter" requested through environment variable is unavailable.'
+          'Exporter "missing-exporter" requested through environment variable is unavailable.'
         );
         errorStub.restore();
       });

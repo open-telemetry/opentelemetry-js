@@ -21,8 +21,8 @@ import { prepareSend } from './platform/index';
 import * as zipkinTypes from './types';
 import {
   toZipkinSpan,
-  statusCodeTagName,
-  statusDescriptionTagName,
+  defaultStatusCodeTagName,
+  defaultStatusDescriptionTagName,
 } from './transform';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { prepareGetHeaders } from './utils';
@@ -45,9 +45,9 @@ export class ZipkinExporter implements SpanExporter {
     this._urlStr = config.url || getEnv().OTEL_EXPORTER_ZIPKIN_ENDPOINT;
     this._send = prepareSend(this._urlStr, config.headers);
     this._serviceName = config.serviceName;
-    this._statusCodeTagName = config.statusCodeTagName || statusCodeTagName;
+    this._statusCodeTagName = config.statusCodeTagName || defaultStatusCodeTagName;
     this._statusDescriptionTagName =
-      config.statusDescriptionTagName || statusDescriptionTagName;
+      config.statusDescriptionTagName || defaultStatusDescriptionTagName;
     this._isShutdown = false;
     if (typeof config.getExportRequestHeaders === 'function') {
       this._getHeaders = prepareGetHeaders(config.getExportRequestHeaders);
@@ -63,7 +63,7 @@ export class ZipkinExporter implements SpanExporter {
   export(
     spans: ReadableSpan[],
     resultCallback: (result: ExportResult) => void
-  ) {
+  ): void {
     const serviceName = String(
       this._serviceName ||
         spans[0].resource.attributes[SemanticResourceAttributes.SERVICE_NAME] ||
