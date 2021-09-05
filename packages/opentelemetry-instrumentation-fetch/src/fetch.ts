@@ -84,7 +84,7 @@ export class FetchInstrumentation extends InstrumentationBase<
     );
   }
 
-  init() {}
+  init(): void {}
 
   private _getConfig(): FetchInstrumentationConfig {
     return this._config;
@@ -326,11 +326,9 @@ export class FetchInstrumentation extends InstrumentationBase<
         }
         function onSuccess(
           span: api.Span,
-          resolve: (
-            value?: Response | PromiseLike<Response> | undefined
-          ) => void,
+          resolve: (value: Response | PromiseLike<Response>) => void,
           response: Response
-        ) {
+        ): void {
           try {
             const resClone = response.clone();
             const body = resClone.body;
@@ -381,7 +379,7 @@ export class FetchInstrumentation extends InstrumentationBase<
               return original
                 .apply(this, options instanceof Request ? [options] : [url, options])
                 .then(
-                  (onSuccess as any).bind(this, createdSpan, resolve),
+                  onSuccess.bind(this, createdSpan, resolve),
                   onError.bind(this, createdSpan, reject)
                 );
             }
@@ -447,7 +445,7 @@ export class FetchInstrumentation extends InstrumentationBase<
   /**
    * implements enable function
    */
-  override enable() {
+  override enable(): void {
     if (isWrapped(window.fetch)) {
       this._unwrap(window, 'fetch');
       this._diag.debug('removing previous patch for constructor');
@@ -458,7 +456,7 @@ export class FetchInstrumentation extends InstrumentationBase<
   /**
    * implements unpatch function
    */
-  override disable() {
+  override disable(): void {
     this._unwrap(window, 'fetch');
     this._usedResources = new WeakSet<PerformanceResourceTiming>();
   }
