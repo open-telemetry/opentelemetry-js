@@ -12,7 +12,7 @@ This package provides default implementations of the OpenTelemetry API for trace
 - [OpenTelemetry Core](#opentelemetry-core)
   - [Built-in Implementations](#built-in-implementations)
     - [Built-in Propagators](#built-in-propagators)
-      - [HttpTraceContextPropagator Propagator](#httptracecontext-propagator)
+      - [W3CTraceContextPropagator Propagator](#httptracecontext-propagator)
       - [Composite Propagator](#composite-propagator)
       - [Baggage Propagator](#baggage-propagator)
     - [Built-in Sampler](#built-in-sampler)
@@ -25,16 +25,16 @@ This package provides default implementations of the OpenTelemetry API for trace
 
 ### Built-in Propagators
 
-#### HttpTraceContextPropagator Propagator
+#### W3CTraceContextPropagator Propagator
 
 OpenTelemetry provides a text-based approach to propagate context to remote services using the [W3C Trace Context](https://www.w3.org/TR/trace-context/) HTTP headers.
 
 ```js
 const api = require("@opentelemetry/api");
-const { HttpTraceContextPropagator } = require("@opentelemetry/core");
+const { W3CTraceContextPropagator } = require("@opentelemetry/core");
 
 /* Set Global Propagator */
-api.propagation.setGlobalPropagator(new HttpTraceContextPropagator());
+api.propagation.setGlobalPropagator(new W3CTraceContextPropagator());
 ```
 
 #### Composite Propagator
@@ -57,10 +57,10 @@ Provides a text-based approach to propagate [baggage](https://w3c.github.io/bagg
 
 ```js
 const api = require("@opentelemetry/api");
-const { HttpBaggagePropagator } = require("@opentelemetry/core");
+const { W3CBaggagePropagator } = require("@opentelemetry/core");
 
 /* Set Global Propagator */
-api.propagation.setGlobalPropagator(new HttpBaggagePropagator());
+api.propagation.setGlobalPropagator(new W3CBaggagePropagator());
 ```
 
 ### Built-in Sampler

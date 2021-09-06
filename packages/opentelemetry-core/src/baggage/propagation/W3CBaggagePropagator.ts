@@ -42,7 +42,7 @@ import {
  * Based on the Baggage specification:
  * https://w3c.github.io/baggage/
  */
-export class HttpBaggagePropagator implements TextMapPropagator {
+export class W3CBaggagePropagator implements TextMapPropagator {
   inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
     const baggage = propagation.getBaggage(context);
     if (!baggage || isTracingSuppressed(context)) return;

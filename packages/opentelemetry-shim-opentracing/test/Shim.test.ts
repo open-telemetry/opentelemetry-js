@@ -20,8 +20,8 @@ import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
 import { SpanContextShim, SpanShim, TracerShim } from '../src/shim';
 import {
   CompositePropagator,
-  HttpBaggagePropagator,
-  HttpTraceContextPropagator,
+  W3CBaggagePropagator,
+  W3CTraceContextPropagator,
   timeInputToHrTime,
 } from '@opentelemetry/core';
 import {
@@ -41,8 +41,8 @@ import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 describe('OpenTracing Shim', () => {
   const compositePropagator = new CompositePropagator({
     propagators: [
-      new HttpTraceContextPropagator(),
-      new HttpBaggagePropagator(),
+      new W3CTraceContextPropagator(),
+      new W3CBaggagePropagator(),
     ],
   });
 

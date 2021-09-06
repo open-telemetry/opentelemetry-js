@@ -22,7 +22,9 @@
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "nyc karma start --single-run",
     "version": "node ../../scripts/version-update.js",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json"
+    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json",
+    "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
+    "prewatch": "npm run precompile"
   },
   "keywords": [
     "opentelemetry",

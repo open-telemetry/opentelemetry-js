@@ -70,7 +70,7 @@ export function parseTraceParent(traceParent: string): SpanContext | null {
  * Based on the Trace Context specification:
  * https://www.w3.org/TR/trace-context/
  */
-export class HttpTraceContextPropagator implements TextMapPropagator {
+export class W3CTraceContextPropagator implements TextMapPropagator {
   inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
     const spanContext = trace.getSpanContext(context);
     if (

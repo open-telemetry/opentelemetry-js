@@ -13,7 +13,9 @@
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "version": "node ../../scripts/version-update.js"
+    "version": "node ../../scripts/version-update.js",
+    "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
+    "prewatch": "npm run precompile"
   },
   "keywords": [
     "opentelemetry",

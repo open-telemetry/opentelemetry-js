@@ -23,7 +23,10 @@
   },
   "scripts": {
     "compile": "tsc --build",
-    "clean": "tsc --build --clean"
+    "version": "node ../../scripts/version-update.js",
+    "clean": "tsc --build --clean",
+    "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
+    "prewatch": "npm run precompile"
   },
   "Add these to scripts": {
     "compile": "tsc --build",

@@ -312,11 +312,20 @@ describe('CollectorTraceExporter - browser (getDefaultUrl)', () => {
 describe('when configuring via environment', () => {
   const envSource = window as any;
   it('should use url defined in env', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/traces';
     const collectorExporter = new CollectorTraceExporter();
     assert.strictEqual(
       collectorExporter.url,
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT
+    );
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+  });
+  it('should use url defined in env and append version and signal when not present', () => {
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+    const collectorExporter = new CollectorTraceExporter();
+    assert.strictEqual(
+      collectorExporter.url,
+      `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/traces`
     );
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
   });
