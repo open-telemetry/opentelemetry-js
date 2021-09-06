@@ -34,6 +34,9 @@ class TestInstrumentation extends InstrumentationBase {
 
 describe('InstrumentationBase', () => {
   describe('_onRequire - module version is not available', () => {
+    // For all of these cases, there is no indication of the actual module version,
+    // so we require there to be a wildcard supported version.
+
     let instrumentation: TestInstrumentation;
     let modulePatchSpy: sinon.SinonSpy;
   
