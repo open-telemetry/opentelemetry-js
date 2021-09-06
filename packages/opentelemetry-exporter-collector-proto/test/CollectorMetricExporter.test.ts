@@ -25,7 +25,7 @@ import {
   CollectorExporterNodeConfigBase,
   collectorTypes,
 } from '@opentelemetry/exporter-collector';
-import * as metrics from '@opentelemetry/metrics';
+import * as metrics from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';
@@ -56,11 +56,20 @@ describe('CollectorMetricExporter - node with proto over http', () => {
   describe('when configuring via environment', () => {
     const envSource = process.env;
     it('should use url defined in env', () => {
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/metrics';
       const collectorExporter = new CollectorMetricExporter();
       assert.strictEqual(
         collectorExporter.url,
         envSource.OTEL_EXPORTER_OTLP_ENDPOINT
+      );
+      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+    });
+    it('should use url defined in env and append version and signal when not present', () => {
+      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+      const collectorExporter = new CollectorMetricExporter();
+      assert.strictEqual(
+        collectorExporter.url,
+        `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/metrics`
       );
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
     });

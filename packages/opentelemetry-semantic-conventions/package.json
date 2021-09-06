@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/semantic-conventions",
-  "version": "0.24.0",
+  "version": "0.25.0",
   "description": "OpenTelemetry semantic conventions",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -14,7 +14,9 @@
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "version": "node ../../scripts/version-update.js",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json"
+    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json",
+    "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
+    "prewatch": "npm run precompile"
   },
   "keywords": [
     "opentelemetry",
@@ -44,7 +46,7 @@
   },
   "devDependencies": {
     "@types/mocha": "8.2.3",
-    "@types/node": "14.17.6",
+    "@types/node": "14.17.11",
     "@types/sinon": "10.0.2",
     "codecov": "3.8.3",
     "mocha": "7.2.0",

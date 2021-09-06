@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-export function defaultServiceName() {
+export function defaultServiceName(): string {
     return `unknown_service:${process.argv0}`;
 }

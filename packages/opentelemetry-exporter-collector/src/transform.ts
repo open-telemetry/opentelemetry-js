@@ -23,7 +23,7 @@ import {
 } from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { ReadableSpan, TimedEvent } from '@opentelemetry/tracing';
+import { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace-base';
 import { CollectorExporterBase } from './CollectorExporterBase';
 import {
   COLLECTOR_SPAN_KIND_MAPPING,

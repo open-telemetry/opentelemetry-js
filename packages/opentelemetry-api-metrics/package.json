@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/api-metrics",
-  "version": "0.24.0",
+  "version": "0.25.0",
   "description": "Public metrics API for OpenTelemetry",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -22,7 +22,9 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../scripts/version-update.js",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json"
+    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json",
+    "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
+    "prewatch": "npm run precompile"
   },
   "keywords": [
     "opentelemetry",
@@ -58,7 +60,7 @@
   "devDependencies": {
     "@opentelemetry/api": "^1.0.2",
     "@types/mocha": "8.2.3",
-    "@types/node": "14.17.6",
+    "@types/node": "14.17.11",
     "@types/webpack-env": "1.16.2",
     "codecov": "3.8.3",
     "istanbul-instrumenter-loader": "3.0.1",

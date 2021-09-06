@@ -15,7 +15,7 @@
  */
 
 import { SpanAttributes } from '@opentelemetry/api';
-import { TimedEvent } from '@opentelemetry/tracing';
+import { TimedEvent } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as transform from '../../src/transform';
 import {

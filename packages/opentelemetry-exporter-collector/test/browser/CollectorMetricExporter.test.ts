@@ -27,7 +27,7 @@ import {
   BoundValueRecorder,
   Metric,
   MetricRecord,
-} from '@opentelemetry/metrics';
+} from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorMetricExporter } from '../../src/platform/browser/index';
@@ -93,10 +93,11 @@ describe('CollectorMetricExporter - web', () => {
       it('should successfully send metrics using sendBeacon', done => {
         collectorExporter.export(metrics, () => {});
 
-        setTimeout(() => {
+        setTimeout(async () => {
           const args = stubBeacon.args[0];
           const url = args[0];
-          const body = args[1];
+          const blob: Blob = args[1];
+          const body = await blob.text();
           const json = JSON.parse(
             body
           ) as collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
@@ -382,11 +383,20 @@ describe('CollectorMetricExporter - web', () => {
 describe('when configuring via environment', () => {
   const envSource = window as any;
   it('should use url defined in env', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/metrics';
     const collectorExporter = new CollectorMetricExporter();
     assert.strictEqual(
       collectorExporter.url,
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT
+    );
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+  });
+  it('should use url defined in env and append version and signal when not present', () => {
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+    const collectorExporter = new CollectorMetricExporter();
+    assert.strictEqual(
+      collectorExporter.url,
+      `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/metrics`
     );
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
   });

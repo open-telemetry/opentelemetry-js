@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
+import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { CollectorExporterNodeConfigBase } from './types';
 import * as collectorTypes from '../../types';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
+import { appendResourcePathToUrlIfNotPresent } from '../../util';
 
-const DEFAULT_COLLECTOR_URL = 'http://localhost:55681/v1/traces';
+const DEFAULT_COLLECTOR_RESOURCE_PATH = '/v1/traces';
+const DEFAULT_COLLECTOR_URL=`http://localhost:55681${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 
 /**
  * Collector Trace Exporter for Node
@@ -48,13 +50,13 @@ export class CollectorTraceExporter
     return toCollectorExportTraceServiceRequest(spans, this, true);
   }
 
-  getDefaultUrl(config: CollectorExporterNodeConfigBase) {
+  getDefaultUrl(config: CollectorExporterNodeConfigBase) : string {
     return typeof config.url === 'string'
       ? config.url
       : getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT.length > 0
       ? getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
       : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-      ? getEnv().OTEL_EXPORTER_OTLP_ENDPOINT
+      ? appendResourcePathToUrlIfNotPresent(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
       : DEFAULT_COLLECTOR_URL;
   }
 }

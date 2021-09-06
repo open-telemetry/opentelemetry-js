@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { MeterProvider } from '@opentelemetry/metrics';
+import { MeterProvider } from '@opentelemetry/sdk-metrics-base';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
 const prometheusPort = PrometheusExporter.DEFAULT_OPTIONS.port;
@@ -27,15 +27,13 @@ const requestCount = meter.createCounter('requests', {
 
 const handles = new Map();
 
-export const countAllRequests = () => {
-  return (req: Request, _res: Response, next: NextFunction) => {
-    if (!handles.has(req.path)) {
-      const labels = { route: req.path };
-      const handle = requestCount.bind(labels);
-      handles.set(req.path, handle);
-    }
+export const countAllRequests = () => (req: Request, _res: Response, next: NextFunction): void => {
+  if (!handles.has(req.path)) {
+    const labels = { route: req.path };
+    const handle = requestCount.bind(labels);
+    handles.set(req.path, handle);
+  }
 
-    handles.get(req.path).add(1);
-    next();
-  };
+  handles.get(req.path).add(1);
+  next();
 };

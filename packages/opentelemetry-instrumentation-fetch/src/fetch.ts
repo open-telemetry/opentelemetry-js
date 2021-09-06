@@ -22,7 +22,7 @@ import {
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import * as core from '@opentelemetry/core';
-import * as web from '@opentelemetry/web';
+import * as web from '@opentelemetry/sdk-trace-web';
 import { AttributeNames } from './enums/AttributeNames';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { FetchError, FetchResponse, SpanData } from './types';
@@ -84,7 +84,7 @@ export class FetchInstrumentation extends InstrumentationBase<
     );
   }
 
-  init() {}
+  init(): void {}
 
   private _getConfig(): FetchInstrumentationConfig {
     return this._config;
@@ -155,6 +155,10 @@ export class FetchInstrumentation extends InstrumentationBase<
     }
 
     if (options instanceof Request) {
+      api.propagation.inject(api.context.active(), options.headers, {
+        set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
+      });
+    } else if(options.headers instanceof Headers) {
       api.propagation.inject(api.context.active(), options.headers, {
         set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
       });
@@ -284,23 +288,18 @@ export class FetchInstrumentation extends InstrumentationBase<
   /**
    * Patches the constructor of fetch
    */
-  private _patchConstructor(): (
-    original: (input: RequestInfo, init?: RequestInit) => Promise<Response>
-  ) => (input: RequestInfo, init?: RequestInit) => Promise<Response> {
-    return (
-      original: (input: RequestInfo, init?: RequestInit) => Promise<Response>
-    ): ((input: RequestInfo, init?: RequestInit) => Promise<Response>) => {
+  private _patchConstructor(): (original: Window['fetch']) => Window['fetch'] {
+    return original => {
       const plugin = this;
       return function patchConstructor(
-        this: (input: RequestInfo, init?: RequestInit) => Promise<Response>,
-        input: RequestInfo,
-        init?: RequestInit
+        this: Window,
+        ...args: Parameters<Window['fetch']>
       ): Promise<Response> {
-        const url = input instanceof Request ? input.url : input;
-        const options = input instanceof Request ? input : init || {};
+        const url = args[0] instanceof Request ? args[0].url : args[0];
+        const options = args[0] instanceof Request ? args[0] : args[1] || {};
         const createdSpan = plugin._createSpan(url, options);
         if (!createdSpan) {
-          return original.apply(this, [url, options]);
+          return original.apply(this, args);
         }
         const spanData = plugin._prepareSpanData(url);
 
@@ -327,11 +326,9 @@ export class FetchInstrumentation extends InstrumentationBase<
         }
         function onSuccess(
           span: api.Span,
-          resolve: (
-            value?: Response | PromiseLike<Response> | undefined
-          ) => void,
+          resolve: (value: Response | PromiseLike<Response>) => void,
           response: Response
-        ) {
+        ): void {
           try {
             const resClone = response.clone();
             const body = resClone.body;
@@ -380,9 +377,9 @@ export class FetchInstrumentation extends InstrumentationBase<
               plugin._addHeaders(options, url);
               plugin._tasksCount++;
               return original
-                .apply(this, [url, options])
+                .apply(this, options instanceof Request ? [options] : [url, options])
                 .then(
-                  (onSuccess as any).bind(this, createdSpan, resolve),
+                  onSuccess.bind(this, createdSpan, resolve),
                   onError.bind(this, createdSpan, reject)
                 );
             }
@@ -448,7 +445,7 @@ export class FetchInstrumentation extends InstrumentationBase<
   /**
    * implements enable function
    */
-  override enable() {
+  override enable(): void {
     if (isWrapped(window.fetch)) {
       this._unwrap(window, 'fetch');
       this._diag.debug('removing previous patch for constructor');
@@ -459,7 +456,7 @@ export class FetchInstrumentation extends InstrumentationBase<
   /**
    * implements unpatch function
    */
-  override disable() {
+  override disable(): void {
     this._unwrap(window, 'fetch');
     this._usedResources = new WeakSet<PerformanceResourceTiming>();
   }

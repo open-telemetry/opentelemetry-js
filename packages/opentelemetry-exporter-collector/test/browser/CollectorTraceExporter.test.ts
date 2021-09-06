@@ -16,7 +16,7 @@
 
 import { diag } from '@opentelemetry/api';
 import { ExportResultCode } from '@opentelemetry/core';
-import { ReadableSpan } from '@opentelemetry/tracing';
+import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorTraceExporter } from '../../src/platform/browser/index';
@@ -67,12 +67,13 @@ describe('CollectorTraceExporter - web', () => {
       });
 
       it('should successfully send the spans using sendBeacon', done => {
-        collectorTraceExporter.export(spans, () => {});
+        collectorTraceExporter.export(spans, () => { });
 
-        setTimeout(() => {
+        setTimeout(async () => {
           const args = stubBeacon.args[0];
           const url = args[0];
-          const body = args[1];
+          const blob: Blob = args[1];
+          const body = await blob.text();
           const json = JSON.parse(
             body
           ) as collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
@@ -107,7 +108,7 @@ describe('CollectorTraceExporter - web', () => {
         const spyLoggerError = sinon.stub(diag, 'error');
         stubBeacon.returns(true);
 
-        collectorTraceExporter.export(spans, () => {});
+        collectorTraceExporter.export(spans, () => { });
 
         setTimeout(() => {
           const response: any = spyLoggerDebug.args[1][0];
@@ -143,7 +144,7 @@ describe('CollectorTraceExporter - web', () => {
       });
 
       it('should successfully send the spans using XMLHttpRequest', done => {
-        collectorTraceExporter.export(spans, () => {});
+        collectorTraceExporter.export(spans, () => { });
 
         setTimeout(() => {
           const request = server.requests[0];
@@ -181,7 +182,7 @@ describe('CollectorTraceExporter - web', () => {
         const spyLoggerDebug = sinon.stub(diag, 'debug');
         const spyLoggerError = sinon.stub(diag, 'error');
 
-        collectorTraceExporter.export(spans, () => {});
+        collectorTraceExporter.export(spans, () => { });
 
         setTimeout(() => {
           const request = server.requests[0];
@@ -210,7 +211,7 @@ describe('CollectorTraceExporter - web', () => {
       });
 
       it('should send custom headers', done => {
-        collectorTraceExporter.export(spans, () => {});
+        collectorTraceExporter.export(spans, () => { });
 
         setTimeout(() => {
           const request = server.requests[0];
@@ -248,7 +249,7 @@ describe('CollectorTraceExporter - web', () => {
         );
       });
       it('should successfully send custom headers using XMLHTTPRequest', done => {
-        collectorTraceExporter.export(spans, () => {});
+        collectorTraceExporter.export(spans, () => { });
 
         setTimeout(() => {
           const [{ requestHeaders }] = server.requests;
@@ -271,7 +272,7 @@ describe('CollectorTraceExporter - web', () => {
       });
 
       it('should successfully send spans using XMLHttpRequest', done => {
-        collectorTraceExporter.export(spans, () => {});
+        collectorTraceExporter.export(spans, () => { });
 
         setTimeout(() => {
           const [{ requestHeaders }] = server.requests;
@@ -311,11 +312,20 @@ describe('CollectorTraceExporter - browser (getDefaultUrl)', () => {
 describe('when configuring via environment', () => {
   const envSource = window as any;
   it('should use url defined in env', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/traces';
     const collectorExporter = new CollectorTraceExporter();
     assert.strictEqual(
       collectorExporter.url,
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT
+    );
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+  });
+  it('should use url defined in env and append version and signal when not present', () => {
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+    const collectorExporter = new CollectorTraceExporter();
+    assert.strictEqual(
+      collectorExporter.url,
+      `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/traces`
     );
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
   });

@@ -28,8 +28,8 @@ import {
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
 import { CompositePropagator } from '@opentelemetry/core';
-import { ConsoleMetricExporter, MeterProvider } from '@opentelemetry/metrics';
-import { NodeTracerProvider } from '@opentelemetry/node';
+import { ConsoleMetricExporter, MeterProvider } from '@opentelemetry/sdk-metrics-base';
+import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { awsEc2Detector } from '@opentelemetry/resource-detector-aws';
 import { resetIsAvailableCache } from '@opentelemetry/resource-detector-gcp';
 import { Resource } from '@opentelemetry/resources';
@@ -41,7 +41,7 @@ import {
 import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/tracing';
+} from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import {
   BASE_PATH,

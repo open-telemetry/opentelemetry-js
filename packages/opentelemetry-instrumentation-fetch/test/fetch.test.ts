@@ -28,11 +28,11 @@ import {
   X_B3_SAMPLED,
 } from '@opentelemetry/propagator-b3';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
-import * as tracing from '@opentelemetry/tracing';
+import * as tracing from '@opentelemetry/sdk-trace-base';
 import {
   PerformanceTimingNames as PTN,
   WebTracerProvider,
-} from '@opentelemetry/web';
+} from '@opentelemetry/sdk-trace-web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
@@ -176,11 +176,16 @@ describe('fetch', () => {
         };
         response.headers = Object.assign({}, init.headers);
 
-        if (init.method === 'DELETE') {
+        if (init instanceof Request) {
+          // Passing request as 2nd argument causes missing body bug (#2411)
+          response.status = 400;
+          response.statusText = 'Bad Request (Request object as 2nd argument)';
+          reject(new window.Response(JSON.stringify(response), response));
+        } else if (init.method === 'DELETE') {
           response.status = 405;
           response.statusText = 'OK';
           resolve(new window.Response('foo', response));
-        } else if (input === url) {
+        } else if ((input instanceof Request && input.url === url) || input === url) {
           response.status = 200;
           response.statusText = 'OK';
           resolve(new window.Response(JSON.stringify(response), response));
@@ -530,6 +535,41 @@ describe('fetch', () => {
       assert.ok(typeof r.headers.get(X_B3_TRACE_ID) === 'string');
     });
 
+    it('should keep custom headers with a request object and a headers object', () => {
+      const r = new Request('url', {
+        headers: new Headers({'foo': 'bar'})
+      });
+      window.fetch(r).catch(() => {});
+      assert.ok(r.headers.get('foo') === 'bar');
+    });
+
+    it('should keep custom headers with url, untyped request object and typed headers object', () => {
+      const url = 'url';
+      const init = {
+        headers: new Headers({'foo': 'bar'})
+      };
+      window.fetch(url, init).catch(() => {});
+      assert.ok(init.headers.get('foo') === 'bar');
+    });
+
+    it('should keep custom headers with url, untyped request object and untyped headers object', () => {
+      const url = 'url';
+      const init = {
+        headers: {'foo': 'bar'}
+      };
+      window.fetch(url, init).catch(() => {});
+      assert.ok(init.headers['foo'] === 'bar');
+    });
+
+    it('should pass request object as first parameter to the original function (#2411)', () => {
+      const r = new Request(url);
+      return window.fetch(r).then(() => {
+        assert.ok(true);
+      }, (response: Response) => {
+        assert.fail(response.statusText);
+      });
+    });
+
     it('should NOT clear the resources', () => {
       assert.strictEqual(
         clearResourceTimingsSpy.args.length,
@@ -658,6 +698,14 @@ describe('fetch', () => {
     });
     it('should NOT create any span', () => {
       assert.strictEqual(exportSpy.args.length, 0, "span shouldn't b exported");
+    });
+    it('should pass request object as the first parameter to the original function (#2411)', () => {
+      const r = new Request(url);
+      return window.fetch(r).then(() => {
+        assert.ok(true);
+      }, (response: Response) => {
+        assert.fail(response.statusText);
+      });
     });
   });
 

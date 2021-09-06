@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ReadableSpan, TimedEvent } from '@opentelemetry/tracing';
+import { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace-base';
 import { hrTimeToMicroseconds } from '@opentelemetry/core';
 import * as zipkinTypes from './types';
 import { Resource } from '@opentelemetry/resources';
@@ -29,8 +29,8 @@ const ZIPKIN_SPAN_KIND_MAPPING = {
   [api.SpanKind.INTERNAL]: undefined,
 };
 
-export const statusCodeTagName = 'ot.status_code';
-export const statusDescriptionTagName = 'ot.status_description';
+export const defaultStatusCodeTagName = 'ot.status_code';
+export const defaultStatusDescriptionTagName = 'ot.status_description';
 
 /**
  * Translate OpenTelemetry ReadableSpan to ZipkinSpan format

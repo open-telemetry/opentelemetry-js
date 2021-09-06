@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-async-hooks",
-  "version": "0.24.0",
+  "version": "0.25.0",
   "description": "OpenTelemetry AsyncHooks-based Context Manager",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -13,7 +13,9 @@
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "version": "node ../../scripts/version-update.js"
+    "version": "node ../../scripts/version-update.js",
+    "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
+    "prewatch": "npm run precompile"
   },
   "keywords": [
     "opentelemetry",
@@ -42,8 +44,7 @@
   "devDependencies": {
     "@opentelemetry/api": "^1.0.2",
     "@types/mocha": "8.2.3",
-    "@types/node": "14.17.6",
-    "@types/shimmer": "1.0.2",
+    "@types/node": "14.17.11",
     "codecov": "3.8.3",
     "mocha": "7.2.0",
     "nyc": "15.1.0",
