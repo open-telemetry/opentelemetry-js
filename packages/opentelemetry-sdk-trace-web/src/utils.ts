@@ -61,7 +61,8 @@ export function addSpanNetworkEvent(
 ): api.Span | undefined {
   if (
     hasKey(entries, performanceName) &&
-    typeof entries[performanceName] === 'number'
+    typeof entries[performanceName] === 'number' &&
+    entries[performanceName] !== 0
   ) {
     span.addEvent(performanceName, entries[performanceName]);
     return span;
