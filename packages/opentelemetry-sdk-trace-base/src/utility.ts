@@ -18,13 +18,17 @@ import { DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT, DEFAULT_ATTRIBUTE_COUNT_LIMIT } f
 
 import { Sampler } from '@opentelemetry/api';
 import { buildSamplerFromEnv, DEFAULT_CONFIG } from './config';
-import { SpanLimits, TracerConfig } from './types';
+import { SpanLimits, TracerConfig, GeneralLimits } from './types';
 
 /**
  * Function to merge Default configuration (as specified in './config') with
  * user provided configurations.
  */
-export function mergeConfig(userConfig: TracerConfig): TracerConfig & { sampler: Sampler; spanLimits: SpanLimits } {
+export function mergeConfig(userConfig: TracerConfig): TracerConfig & {
+  sampler: Sampler;
+  spanLimits: SpanLimits;
+  generalLimits: GeneralLimits;
+} {
   const perInstanceDefaults: Partial<TracerConfig> = {
     sampler: buildSamplerFromEnv(),
   };
