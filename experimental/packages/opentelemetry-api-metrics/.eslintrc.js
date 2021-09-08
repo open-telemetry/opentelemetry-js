@@ -4,5 +4,5 @@ module.exports = {
         "commonjs": true,
         "shared-node-browser": true
     },
-    ...require('../../eslint.config.js')
+    ...require('../../../eslint.config.js')
 }

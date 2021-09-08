@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package-group: ["stable", "experimental"]
+        package-group: [".", "experimental"]
     runs-on: ubuntu-latest
     container:
       image: node:14
@@ -20,6 +20,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Lint changelog file
+        if: ${{ matrix.package-group == "." }}
         uses: avto-dev/markdown-lint@v1
         with:
           # Commenting due to
@@ -30,12 +31,10 @@ jobs:
           args: "./CHANGELOG.md"
 
       - name: Lint markdown files
+        if: ${{ matrix.package-group == "." }}
         uses: avto-dev/markdown-lint@v1
         with:
           args: "./**/*.md -i ./CHANGELOG.md"
-          
-      - name: Use ${{ matrix.package-group }}
-        run: cp lerna-${{ matrix.package-group }}.json lerna.json        
 
       - name: restore lerna
         id: cache
@@ -49,11 +48,13 @@ jobs:
       # On a cache miss, install dependencies
       - name: Bootstrap
         if: steps.cache.outputs.cache-hit != 'true'
+        working-directory: ${{ matrix.package-group }}
         run: |
           npm install --ignore-scripts
           npx lerna bootstrap --no-ci --ignore-scripts --hoist --nohoist='zone.js' -- --only=dev
 
       - name: Lint
+        working-directory: ${{ matrix.package-group }}
         run: |
           npm run lint
           npm run lint:examples

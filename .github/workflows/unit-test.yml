@@ -39,7 +39,6 @@ jobs:
 
       - name: Build 🔧
         run: |
-          npm run update-ts-references
           npm run compile
 
       - name: Unit tests
@@ -76,7 +75,6 @@ jobs:
 
       - name: Build 🔧
         run: |
-          npm run update-ts-references
           npm run compile
 
       - name: Unit tests
@@ -158,7 +156,6 @@ jobs:
       - name: Build 🔧
         working-directory: experimental
         run: |
-          npm run update-ts-references
           npm run compile
 
       - name: Unit tests
