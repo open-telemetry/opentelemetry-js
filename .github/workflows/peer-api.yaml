@@ -23,7 +23,7 @@ jobs:
         run: npm install -g lerna
 
       - name: Use ${{ package-group }}
-        run: npm run use:${{ matrix.package-group }}
+        run: cp lerna-${{ matrix.package-group }}.json lerna.json  
 
       - name: Check API dependency semantics
         run: lerna exec --ignore propagation-validation-server "node ../../scripts/peer-api-check.js"

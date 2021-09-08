@@ -23,7 +23,7 @@ jobs:
           node-version: ${{ matrix.node_version }}
       
       - name: Use lerna-stable.json
-        run: npm run use:stable
+        run: cp lerna-stable.json lerna.json
 
       - name: restore lerna
         id: cache
@@ -63,7 +63,7 @@ jobs:
         run: sudo chmod -R 777 /github /__w
 
       - name: Use lerna-stable.json
-        run: npm run use:stable
+        run: cp lerna-stable.json lerna.json
 
       - name: restore lerna
         uses: actions/cache@v2
@@ -106,7 +106,7 @@ jobs:
           node-version: ${{ matrix.node_version }}
       
       - name: Use lerna-experimental.json
-        run: npm run use:experimental
+        run: cp lerna-experimental.json lerna.json
 
       - name: restore lerna
         id: cache
@@ -146,7 +146,7 @@ jobs:
         run: sudo chmod -R 777 /github /__w
 
       - name: Use lerna-experimental.json
-        run: npm run use:experimental
+        run: cp lerna-experimental.json lerna.json
 
       - name: restore lerna
         uses: actions/cache@v2

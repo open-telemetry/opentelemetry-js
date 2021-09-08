@@ -35,7 +35,7 @@ jobs:
           args: "./**/*.md -i ./CHANGELOG.md"
           
       - name: Use ${{ matrix.package-group }}
-        run: npm run use:${{ matrix.package-group }}
+        run: cp lerna-${{ matrix.package-group }}.json lerna.json        
 
       - name: restore lerna
         id: cache
