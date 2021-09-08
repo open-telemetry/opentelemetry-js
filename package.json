@@ -38,8 +38,8 @@
     "lint:markdown:fix": "./node_modules/.bin/markdownlint $(git ls-files '*.md') -i ./CHANGELOG.md --fix",
     "reset": "lerna clean -y && rm -rf node_modules && npm i && npm run compile && npm run lint:fix",
     "update-ts-references": "update-ts-references --configName tsconfig.esm.json && update-ts-references",
-    "use:stable": "ln -sf lerna-stable.json lerna.json",
-    "use:experimental": "ln -sf lerna-experimental.json lerna.json"
+    "use:stable": "shx rm lerna.json && shx cp lerna-stable.json lerna.json",
+    "use:experimental": "shx rm lerna.json && shx cp lerna-experimental.json lerna.json"
   },
   "repository": "open-telemetry/opentelemetry-js",
   "keywords": [
@@ -68,6 +68,7 @@
     "lerna": "3.22.1",
     "lerna-changelog": "1.0.1",
     "markdownlint-cli": "0.28.1",
+    "shx": "0.3.3",
     "typedoc": "0.21.6",
     "typescript": "4.3.5",
     "update-ts-references": "2.4.0"
