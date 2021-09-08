@@ -48,49 +48,53 @@ describe('InstrumentationBase', () => {
     });
     
     describe('when patching a module', () => {
-      it('should not patch module when there is no wildcard supported version', () => {
-        const moduleExports = {};
-        const instrumentationModule = {
-          supportedVersions: [`^${MODULE_VERSION}`],
-          name: MODULE_NAME,
-          patch: modulePatchSpy as unknown,
-        } as InstrumentationModuleDefinition<unknown>;
-
-        // @ts-expect-error access internal property for testing
-        instrumentation._onRequire<unknown>(
-          instrumentationModule,
-          moduleExports,
-          MODULE_NAME,
-          MODULE_DIR
-        );
-    
-        assert.strictEqual(instrumentationModule.moduleVersion, undefined);
-        assert.strictEqual(instrumentationModule.moduleExports, undefined);
-        sinon.assert.notCalled(modulePatchSpy);
+      describe('AND there is no wildcard supported version', () => {
+        it('should not patch module', () => {
+          const moduleExports = {};
+          const instrumentationModule = {
+            supportedVersions: [`^${MODULE_VERSION}`],
+            name: MODULE_NAME,
+            patch: modulePatchSpy as unknown,
+          } as InstrumentationModuleDefinition<unknown>;
+  
+          // @ts-expect-error access internal property for testing
+          instrumentation._onRequire<unknown>(
+            instrumentationModule,
+            moduleExports,
+            MODULE_NAME,
+            MODULE_DIR
+          );
+      
+          assert.strictEqual(instrumentationModule.moduleVersion, undefined);
+          assert.strictEqual(instrumentationModule.moduleExports, undefined);
+          sinon.assert.notCalled(modulePatchSpy);
+        });
       });
 
-      it('should patch module when there is a wildcard supported version', () => {
-        const moduleExports = {};
-        const instrumentationModule = {
-          supportedVersions: [`^${MODULE_VERSION}`, WILDCARD_VERSION],
-          name: MODULE_NAME,
-          patch: modulePatchSpy as unknown,
-        } as InstrumentationModuleDefinition<unknown>;
-
-        // @ts-expect-error access internal property for testing
-        instrumentation._onRequire<unknown>(
-          instrumentationModule,
-          moduleExports,
-          MODULE_NAME,
-          MODULE_DIR
-        );
-    
-        assert.strictEqual(instrumentationModule.moduleVersion, undefined);
-        assert.strictEqual(instrumentationModule.moduleExports, moduleExports);
-        sinon.assert.calledOnceWithExactly(modulePatchSpy, moduleExports, undefined);
+      describe('AND there is a wildcard supported version', () => {
+        it('should patch module', () => {
+          const moduleExports = {};
+          const instrumentationModule = {
+            supportedVersions: [`^${MODULE_VERSION}`, WILDCARD_VERSION],
+            name: MODULE_NAME,
+            patch: modulePatchSpy as unknown,
+          } as InstrumentationModuleDefinition<unknown>;
+          
+          // @ts-expect-error access internal property for testing
+          instrumentation._onRequire<unknown>(
+            instrumentationModule,
+            moduleExports,
+            MODULE_NAME,
+            MODULE_DIR
+          );
+          
+          assert.strictEqual(instrumentationModule.moduleVersion, undefined);
+          assert.strictEqual(instrumentationModule.moduleExports, moduleExports);
+          sinon.assert.calledOnceWithExactly(modulePatchSpy, moduleExports, undefined);
+        });
       });
     });
-
+      
     describe('when patching module files', () => {
       let filePatchSpy: sinon.SinonSpy;
 
@@ -98,60 +102,64 @@ describe('InstrumentationBase', () => {
         filePatchSpy = sinon.spy();
       })
 
-      it('should not patch module file when there is no wildcard supported version', () => {
-        const moduleExports = {};
-        const supportedVersions = [`^${MODULE_VERSION}`];
-        const instrumentationModule = {
-          supportedVersions,
-          name: MODULE_NAME,
-          patch: modulePatchSpy as unknown,
-          files: [{
-            name: MODULE_FILE_NAME,
+      describe('AND there is no wildcard supported version', () => {
+        it('should not patch module file', () => {
+          const moduleExports = {};
+          const supportedVersions = [`^${MODULE_VERSION}`];
+          const instrumentationModule = {
             supportedVersions,
-            patch: filePatchSpy as unknown
-          }]
-        } as InstrumentationModuleDefinition<unknown>;
-
-        // @ts-expect-error access internal property for testing
-        instrumentation._onRequire<unknown>(
-          instrumentationModule,
-          moduleExports,
-          MODULE_FILE_NAME,
-          MODULE_DIR
-        );
-    
-        assert.strictEqual(instrumentationModule.moduleVersion, undefined);
-        assert.strictEqual(instrumentationModule.moduleExports, undefined);
-        sinon.assert.notCalled(modulePatchSpy);
-        sinon.assert.notCalled(filePatchSpy);
+            name: MODULE_NAME,
+            patch: modulePatchSpy as unknown,
+            files: [{
+              name: MODULE_FILE_NAME,
+              supportedVersions,
+              patch: filePatchSpy as unknown
+            }]
+          } as InstrumentationModuleDefinition<unknown>;
+  
+          // @ts-expect-error access internal property for testing
+          instrumentation._onRequire<unknown>(
+            instrumentationModule,
+            moduleExports,
+            MODULE_FILE_NAME,
+            MODULE_DIR
+          );
+      
+          assert.strictEqual(instrumentationModule.moduleVersion, undefined);
+          assert.strictEqual(instrumentationModule.moduleExports, undefined);
+          sinon.assert.notCalled(modulePatchSpy);
+          sinon.assert.notCalled(filePatchSpy);
+        });
       });
 
-      it('should patch module file when there is a wildcard supported version', () => {
-        const moduleExports = {};
-        const supportedVersions = [`^${MODULE_VERSION}`, WILDCARD_VERSION];
-        const instrumentationModule = {
-          supportedVersions,
-          name: MODULE_NAME,
-          patch: modulePatchSpy as unknown,
-          files: [{
-            name: MODULE_FILE_NAME,
+      describe('AND there is a wildcard supported version', () => {
+        it('should patch module file', () => {
+          const moduleExports = {};
+          const supportedVersions = [`^${MODULE_VERSION}`, WILDCARD_VERSION];
+          const instrumentationModule = {
             supportedVersions,
-            patch: filePatchSpy as unknown
-          }]
-        } as InstrumentationModuleDefinition<unknown>;
-
-        // @ts-expect-error access internal property for testing
-        instrumentation._onRequire<unknown>(
-          instrumentationModule,
-          moduleExports,
-          MODULE_FILE_NAME,
-          MODULE_DIR
-        );
-    
-        assert.strictEqual(instrumentationModule.moduleVersion, undefined);
-        assert.strictEqual(instrumentationModule.files[0].moduleExports, moduleExports);
-        sinon.assert.notCalled(modulePatchSpy);
-        sinon.assert.calledOnceWithExactly(filePatchSpy, moduleExports, undefined);
+            name: MODULE_NAME,
+            patch: modulePatchSpy as unknown,
+            files: [{
+              name: MODULE_FILE_NAME,
+              supportedVersions,
+              patch: filePatchSpy as unknown
+            }]
+          } as InstrumentationModuleDefinition<unknown>;
+  
+          // @ts-expect-error access internal property for testing
+          instrumentation._onRequire<unknown>(
+            instrumentationModule,
+            moduleExports,
+            MODULE_FILE_NAME,
+            MODULE_DIR
+          );
+      
+          assert.strictEqual(instrumentationModule.moduleVersion, undefined);
+          assert.strictEqual(instrumentationModule.files[0].moduleExports, moduleExports);
+          sinon.assert.notCalled(modulePatchSpy);
+          sinon.assert.calledOnceWithExactly(filePatchSpy, moduleExports, undefined);
+        });
       });
     });
   });
