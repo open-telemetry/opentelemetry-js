@@ -8,10 +8,6 @@ on:
 
 jobs:
   peer-api-check:
-    strategy:
-      fail-fast: false
-      matrix:
-        package-group: ["stable", "experimental"]
     runs-on: ubuntu-latest
     container:
       image: node:14
@@ -26,4 +22,5 @@ jobs:
         run: lerna exec --ignore propagation-validation-server "node ../../scripts/peer-api-check.js"
 
       - name: Check API dependency semantics (experimental)
+        working-directory: experimental
         run: lerna exec --ignore propagation-validation-server "node ../../../scripts/peer-api-check.js"
