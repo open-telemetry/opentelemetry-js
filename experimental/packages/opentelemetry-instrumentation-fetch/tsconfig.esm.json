@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.esm.json",
+  "extends": "../../../tsconfig.base.esm.json",
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "build/esm",
@@ -7,5 +7,10 @@
   },
   "include": [
     "src/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../opentelemetry-instrumentation/tsconfig.esm.json"
+    }
   ]
 }

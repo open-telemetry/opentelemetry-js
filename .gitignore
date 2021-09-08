@@ -87,6 +87,3 @@ package.json.lerna_backup
 #IDEA
 .idea
 *.iml
-
-# Symlink lerna-experimental.json or lerna-stable.json
-lerna.json

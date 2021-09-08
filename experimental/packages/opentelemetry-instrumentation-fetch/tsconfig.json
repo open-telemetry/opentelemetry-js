@@ -1,17 +1,15 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": ".",
-    "outDir": "build"
+    "outDir": "build",
+    "skipLibCheck": true
   },
   "include": [
     "src/**/*.ts",
     "test/**/*.ts"
   ],
   "references": [
-    {
-      "path": "../opentelemetry-api-metrics"
-    },
     {
       "path": "../opentelemetry-instrumentation"
     }

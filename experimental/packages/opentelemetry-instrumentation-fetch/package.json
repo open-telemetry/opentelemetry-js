@@ -12,12 +12,12 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
-    "version": "node ../../scripts/version-update.js",
+    "version": "node ../../../scripts/version-update.js",
     "tdd": "karma start",
     "test:browser": "nyc karma start --single-run",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
-    "prewatch": "npm run precompile"
+    "prewatch": "node ../../../scripts/version-update.js"
   },
   "keywords": [
     "fetch",

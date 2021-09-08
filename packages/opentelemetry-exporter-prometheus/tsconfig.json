@@ -11,9 +11,6 @@
   "references": [
     {
       "path": "../opentelemetry-core"
-    },
-    {
-      "path": "../opentelemetry-sdk-metrics-base"
     }
   ]
 }

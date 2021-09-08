@@ -90,9 +90,6 @@
       "path": "packages/opentelemetry-resources"
     },
     {
-      "path": "packages/opentelemetry-sdk-metrics-base"
-    },
-    {
       "path": "packages/opentelemetry-sdk-node"
     },
     {
@@ -109,6 +106,12 @@
     },
     {
       "path": "packages/opentelemetry-shim-opentracing"
+    },
+    {
+      "path": "packages/template"
+    },
+    {
+      "path": "integration-tests/propagation-validation-server"
     }
   ]
 }

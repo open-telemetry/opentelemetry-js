@@ -1,32 +1,39 @@
 {
-  "name": "@opentelemetry/instrumentation-xml-http-request",
+  "name": "@opentelemetry/api-metrics",
   "version": "0.25.0",
-  "description": "OpenTelemetry XMLHttpRequest automatic instrumentation package.",
+  "description": "Public metrics API for OpenTelemetry",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
   "types": "build/src/index.d.ts",
+  "browser": {
+    "./src/platform/index.ts": "./src/platform/browser/index.ts",
+    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
+    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "compile": "tsc --build tsconfig.json tsconfig.esm.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json",
+    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
+    "test:browser": "nyc karma start --single-run",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "build": "npm run compile",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
-    "version": "node ../../scripts/version-update.js",
-    "tdd": "karma start",
-    "test:browser": "nyc karma start --single-run",
+    "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
-    "prewatch": "npm run precompile"
+    "prewatch": "node ../../../scripts/version-update.js"
   },
   "keywords": [
     "opentelemetry",
+    "nodejs",
     "browser",
-    "tracing",
     "profiling",
     "metrics",
-    "XMLHttpRequest",
-    "stats"
+    "stats",
+    "monitoring"
   ],
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
@@ -47,17 +54,14 @@
   "publishConfig": {
     "access": "public"
   },
+  "peerDependencies": {
+    "@opentelemetry/api": "^1.0.2"
+  },
   "devDependencies": {
-    "@babel/core": "7.15.0",
     "@opentelemetry/api": "^1.0.2",
-    "@opentelemetry/context-zone": "0.25.0",
-    "@opentelemetry/propagator-b3": "0.25.0",
-    "@opentelemetry/sdk-trace-base": "0.25.0",
     "@types/mocha": "8.2.3",
     "@types/node": "14.17.11",
-    "@types/sinon": "10.0.2",
     "@types/webpack-env": "1.16.2",
-    "babel-loader": "8.2.2",
     "codecov": "3.8.3",
     "istanbul-instrumenter-loader": "3.0.1",
     "karma": "5.2.3",
@@ -68,22 +72,9 @@
     "karma-webpack": "4.0.2",
     "mocha": "7.2.0",
     "nyc": "15.1.0",
-    "rimraf": "3.0.2",
-    "sinon": "11.1.2",
     "ts-loader": "8.3.0",
     "ts-mocha": "8.0.0",
     "typescript": "4.3.5",
-    "webpack": "4.46.0",
-    "webpack-cli": "4.8.0",
-    "webpack-merge": "5.8.0"
-  },
-  "peerDependencies": {
-    "@opentelemetry/api": "^1.0.2"
-  },
-  "dependencies": {
-    "@opentelemetry/core": "0.25.0",
-    "@opentelemetry/instrumentation": "0.25.0",
-    "@opentelemetry/sdk-trace-web": "0.25.0",
-    "@opentelemetry/semantic-conventions": "0.25.0"
+    "webpack": "4.46.0"
   }
 }
