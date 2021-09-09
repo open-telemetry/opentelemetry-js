@@ -29,6 +29,9 @@ export interface TracerConfig {
    */
   sampler?: Sampler;
 
+  /** General Limits */
+  generalLimits?: GeneralLimits;
+
   /** Span Limits */
   spanLimits?: SpanLimits;
 
@@ -59,6 +62,14 @@ export interface SDKRegistrationConfig {
 
   /** Context manager to register as the global context manager */
   contextManager?: ContextManager | null;
+}
+
+/** Global configuration limits of trace service */
+export interface GeneralLimits {
+  /** attributeValueLengthLimit is maximum allowed attribute value size */
+  attributeValueLengthLimit?: number;
+  /** attributeCountLimit is number of attributes per trace */
+  attributeCountLimit?: number;
 }
 
 /** Global configuration of trace service */

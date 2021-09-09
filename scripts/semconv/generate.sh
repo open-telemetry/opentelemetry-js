@@ -4,8 +4,8 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT_DIR="${SCRIPT_DIR}/../../"
 
 # freeze the spec version to make SpanAttributess generation reproducible
-SPEC_VERSION=v1.5.0
-GENERATOR_VERSION=0.3.1
+SPEC_VERSION=v1.6.1
+GENERATOR_VERSION=0.5.0
 
 cd ${SCRIPT_DIR}
 

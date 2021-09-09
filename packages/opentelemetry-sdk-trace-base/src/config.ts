@@ -38,6 +38,10 @@ const DEFAULT_RATIO = 1;
 export const DEFAULT_CONFIG = {
   sampler: buildSamplerFromEnv(env),
   forceFlushTimeoutMillis: 30000,
+  generalLimits: {
+    attributeValueLengthLimit: getEnv().OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT,
+    attributeCountLimit: getEnv().OTEL_ATTRIBUTE_COUNT_LIMIT,
+  },
   spanLimits: {
     attributeValueLengthLimit: getEnv().OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT,
     attributeCountLimit: getEnv().OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT,

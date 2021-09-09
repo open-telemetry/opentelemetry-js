@@ -59,6 +59,18 @@ export abstract class InstrumentationBase<T = any>
     }
   }
 
+  private _extractPackageVersion(baseDir: string): string | undefined {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const version = require(path.join(baseDir, 'package.json')).version;
+      return typeof version === 'string' ? version : undefined;
+    } catch (error) {
+      diag.warn('Failed extracting version', baseDir);
+    }
+    
+    return undefined;
+  }
+
   private _onRequire<T>(
     module: InstrumentationModuleDefinition<T>,
     exports: T,
@@ -73,13 +85,11 @@ export abstract class InstrumentationBase<T = any>
       return exports;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const version = require(path.join(baseDir, 'package.json')).version;
+    const version = this._extractPackageVersion(baseDir);
     module.moduleVersion = version;
     if (module.name === name) {
       // main module
       if (
-        typeof version === 'string' &&
         isSupported(module.supportedVersions, version, module.includePrerelease)
       ) {
         if (typeof module.patch === 'function') {
@@ -167,7 +177,12 @@ export abstract class InstrumentationBase<T = any>
   }
 }
 
-function isSupported(supportedVersions: string[], version: string, includePrerelease?: boolean): boolean {
+function isSupported(supportedVersions: string[], version?: string, includePrerelease?: boolean): boolean {
+  if (typeof version === 'undefined') {
+    // If we don't have the version, accept the wildcard case only
+    return supportedVersions.includes('*');
+  }
+
   return supportedVersions.some(supportedVersion => {
     return satisfies(version, supportedVersion, { includePrerelease });
   });
