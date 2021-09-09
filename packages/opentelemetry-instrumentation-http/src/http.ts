@@ -326,17 +326,20 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           this._closeHttpSpan(span);
         });
         response.on('error', (error: Err) => {
+          this._diag.debug('outgoingRequest on error()', error);
           utils.setSpanWithError(span, error, response);
           this._closeHttpSpan(span);
         });
       }
     );
     request.on('close', () => {
+      this._diag.debug('outgoingRequest on request close()');
       if (!request.aborted) {
         this._closeHttpSpan(span);
       }
     });
     request.on('error', (error: Err) => {
+      this._diag.debug('outgoingRequest on request error()', error);
       utils.setSpanWithError(span, error, request);
       this._closeHttpSpan(span);
     });
