@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-import {
-  DEFAULT_ENVIRONMENT,
-  ENVIRONMENT,
-  RAW_ENVIRONMENT,
-  parseEnvironment,
-} from '../../utils/environment';
+import * as assert from 'assert';
+import { getEnv } from '../../../src/platform/browser/environment';
 
-/**
- * Gets the environment variables
- */
-export function getEnv(): Required<ENVIRONMENT> {
-  const _global = (typeof globalThis === 'object' ? globalThis : window) as typeof globalThis & RAW_ENVIRONMENT;
-  const globalEnv = parseEnvironment(_global);
-  return Object.assign({}, DEFAULT_ENVIRONMENT, globalEnv);
-}
+describe('getEnv', () => {
+  it('get environs in window', () => {
+    const env = getEnv();
+    assert.strictEqual(typeof env, 'object');
+  });
+});
