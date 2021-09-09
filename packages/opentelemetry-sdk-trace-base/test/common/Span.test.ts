@@ -267,6 +267,99 @@ describe('Span', () => {
       });
     });
 
+    describe('when generalLimits options set', () => {
+      describe('when "attributeCountLimit" option defined', () => {
+        const tracer = new BasicTracerProvider({
+          generalLimits: {
+            // Setting count limit
+            attributeCountLimit: 100,
+          },
+        }).getTracer('default');
+
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
+        for (let i = 0; i < 150; i++) {
+          span.setAttribute('foo' + i, 'bar' + i);
+        }
+        span.end();
+
+        it('should remove / drop all remaining values after the number of values exceeds this limit', () => {
+          assert.strictEqual(Object.keys(span.attributes).length, 100);
+          assert.strictEqual(span.attributes['foo0'], 'bar0');
+          assert.strictEqual(span.attributes['foo99'], 'bar99');
+          assert.strictEqual(span.attributes['foo149'], undefined);
+        });
+      });
+
+      describe('when "attributeValueLengthLimit" option defined', () => {
+        const tracer = new BasicTracerProvider({
+          generalLimits: {
+            // Setting attribute value length limit
+            attributeValueLengthLimit: 5,
+          },
+        }).getTracer('default');
+
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
+
+        it('should truncate value which length exceeds this limit', () => {
+          span.setAttribute('attr-with-more-length', 'abcdefgh');
+          assert.strictEqual(span.attributes['attr-with-more-length'], 'abcde');
+        });
+
+        it('should truncate value of arrays which exceeds this limit', () => {
+          span.setAttribute('attr-array-of-strings', ['abcdefgh', 'abc', 'abcde', '']);
+          span.setAttribute('attr-array-of-bool', [true, false]);
+          assert.deepStrictEqual(span.attributes['attr-array-of-strings'], ['abcde', 'abc', 'abcde', '']);
+          assert.deepStrictEqual(span.attributes['attr-array-of-bool'], [true, false]);
+        });
+
+        it('should not truncate value which length not exceeds this limit', () => {
+          span.setAttribute('attr-with-less-length', 'abc');
+          assert.strictEqual(span.attributes['attr-with-less-length'], 'abc');
+        });
+
+        it('should return same value for non-string values', () => {
+          span.setAttribute('attr-non-string', true);
+          assert.strictEqual(span.attributes['attr-non-string'], true);
+        });
+      });
+
+      describe('when "attributeValueLengthLimit" option is invalid', () => {
+        const tracer = new BasicTracerProvider({
+          generalLimits: {
+            // Setting invalid attribute value length limit
+            attributeValueLengthLimit: -5,
+          },
+        }).getTracer('default');
+
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
+
+        it('should not truncate any value', () => {
+          span.setAttribute('attr-not-truncate', 'abcdefgh');
+          span.setAttribute('attr-array-of-strings', ['abcdefgh', 'abc', 'abcde']);
+          assert.deepStrictEqual(span.attributes['attr-not-truncate'], 'abcdefgh');
+          assert.deepStrictEqual(span.attributes['attr-array-of-strings'], ['abcdefgh', 'abc', 'abcde']);
+        });
+      });
+    });
+
     describe('when spanLimits options set', () => {
       describe('when "attributeCountLimit" option defined', () => {
         const tracer = new BasicTracerProvider({
@@ -356,6 +449,83 @@ describe('Span', () => {
           span.setAttribute('attr-array-of-strings', ['abcdefgh', 'abc', 'abcde']);
           assert.deepStrictEqual(span.attributes['attr-not-truncate'], 'abcdefgh');
           assert.deepStrictEqual(span.attributes['attr-array-of-strings'], ['abcdefgh', 'abc', 'abcde']);
+        });
+      });
+    });
+
+    describe('when both generalLimits and spanLimits options set', () => {
+      describe('when "attributeCountLimit" option defined', () => {
+        const tracer = new BasicTracerProvider({
+          generalLimits: {
+            // Setting count limit
+            attributeCountLimit: 10,
+          },
+          spanLimits: {
+            attributeCountLimit: 5,
+          }
+        }).getTracer('default');
+
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
+        for (let i = 0; i < 150; i++) {
+          span.setAttribute('foo' + i, 'bar' + i);
+        }
+        span.end();
+
+        it('should remove / drop all remaining values after the number of values exceeds span limit', () => {
+          assert.strictEqual(Object.keys(span.attributes).length, 5);
+          assert.strictEqual(span.attributes['foo0'], 'bar0');
+          assert.strictEqual(span.attributes['foo4'], 'bar4');
+          assert.strictEqual(span.attributes['foo5'], undefined);
+          assert.strictEqual(span.attributes['foo10'], undefined);
+        });
+      });
+
+      describe('when "attributeValueLengthLimit" option defined', () => {
+        const tracer = new BasicTracerProvider({
+          generalLimits: {
+            // Setting attribute value length limit
+            attributeValueLengthLimit: 10,
+          },
+          spanLimits: {
+            // Setting attribute value length limit
+            attributeValueLengthLimit: 5,
+          },
+        }).getTracer('default');
+
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
+
+        it('should truncate value which length exceeds span limit', () => {
+          span.setAttribute('attr-with-more-length', 'abcdefgh');
+          assert.strictEqual(span.attributes['attr-with-more-length'], 'abcde');
+        });
+
+        it('should truncate value of arrays which exceeds span limit', () => {
+          span.setAttribute('attr-array-of-strings', ['abcdefgh', 'abc', 'abcde', '']);
+          span.setAttribute('attr-array-of-bool', [true, false]);
+          assert.deepStrictEqual(span.attributes['attr-array-of-strings'], ['abcde', 'abc', 'abcde', '']);
+          assert.deepStrictEqual(span.attributes['attr-array-of-bool'], [true, false]);
+        });
+
+        it('should not truncate value which length not exceeds span limit', () => {
+          span.setAttribute('attr-with-less-length', 'abc');
+          assert.strictEqual(span.attributes['attr-with-less-length'], 'abc');
+        });
+
+        it('should return same value for non-string values', () => {
+          span.setAttribute('attr-non-string', true);
+          assert.strictEqual(span.attributes['attr-non-string'], true);
         });
       });
     });
