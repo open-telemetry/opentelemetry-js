@@ -41,8 +41,8 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            node_modules
-            */*/node_modules
+            ${{ matrix.package-group }}/node_modules
+            ${{ matrix.package-group }}/*/*/node_modules
           key: lint-${{ matrix.package-group }}-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('**/package.json') }}
 
       # On a cache miss, install dependencies
