@@ -10,16 +10,10 @@
   ],
   "references": [
     {
-      "path": "../opentelemetry-api-metrics"
-    },
-    {
       "path": "../opentelemetry-core"
     },
     {
       "path": "../opentelemetry-resources"
-    },
-    {
-      "path": "../opentelemetry-sdk-metrics-base"
     },
     {
       "path": "../opentelemetry-sdk-trace-base"

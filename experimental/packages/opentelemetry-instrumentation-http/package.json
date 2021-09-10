@@ -1,0 +1,80 @@
+{
+  "name": "@opentelemetry/instrumentation-http",
+  "version": "0.25.0",
+  "description": "OpenTelemetry http/https automatic instrumentation package.",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "repository": "open-telemetry/opentelemetry-js",
+  "scripts": {
+    "compile": "tsc --build",
+    "clean": "tsc --build --clean",
+    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
+    "tdd": "npm run test -- --watch-extensions ts --watch",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "version": "node ../../../scripts/version-update.js",
+    "watch": "tsc --build --watch",
+    "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
+    "prewatch": "node ../../../scripts/version-update.js"
+  },
+  "keywords": [
+    "opentelemetry",
+    "http",
+    "nodejs",
+    "tracing",
+    "profiling",
+    "instrumentation"
+  ],
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "build/src/**/*.js",
+    "build/src/**/*.js.map",
+    "build/src/**/*.d.ts",
+    "doc",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@opentelemetry/api": "^1.0.2",
+    "@opentelemetry/context-async-hooks": "0.25.0",
+    "@opentelemetry/sdk-trace-base": "0.25.0",
+    "@opentelemetry/sdk-trace-node": "0.25.0",
+    "@types/got": "9.6.12",
+    "@types/mocha": "8.2.3",
+    "@types/node": "14.17.11",
+    "@types/request-promise-native": "1.0.18",
+    "@types/semver": "7.3.8",
+    "@types/sinon": "10.0.2",
+    "@types/superagent": "4.1.12",
+    "axios": "0.21.1",
+    "codecov": "3.8.3",
+    "got": "9.6.0",
+    "mocha": "7.2.0",
+    "nock": "12.0.3",
+    "nyc": "15.1.0",
+    "request": "2.88.2",
+    "request-promise-native": "1.0.9",
+    "rimraf": "3.0.2",
+    "sinon": "11.1.2",
+    "superagent": "6.1.0",
+    "ts-mocha": "8.0.0",
+    "typescript": "4.3.5"
+  },
+  "peerDependencies": {
+    "@opentelemetry/api": "^1.0.2"
+  },
+  "dependencies": {
+    "@opentelemetry/core": "0.25.0",
+    "@opentelemetry/instrumentation": "0.25.0",
+    "@opentelemetry/semantic-conventions": "0.25.0",
+    "semver": "^7.3.5"
+  }
+}

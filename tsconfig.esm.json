@@ -3,7 +3,16 @@
   "files": [],
   "references": [
     {
-      "path": "packages/opentelemetry-api-metrics/tsconfig.esm.json"
+      "path": "backwards-compatability/node10"
+    },
+    {
+      "path": "backwards-compatability/node12"
+    },
+    {
+      "path": "backwards-compatability/node8"
+    },
+    {
+      "path": "packages/opentelemetry-context-async-hooks"
     },
     {
       "path": "packages/opentelemetry-context-zone-peer-dep/tsconfig.esm.json"
@@ -15,22 +24,22 @@
       "path": "packages/opentelemetry-core/tsconfig.esm.json"
     },
     {
+      "path": "packages/opentelemetry-exporter-collector-grpc"
+    },
+    {
+      "path": "packages/opentelemetry-exporter-collector-proto"
+    },
+    {
       "path": "packages/opentelemetry-exporter-collector/tsconfig.esm.json"
     },
     {
+      "path": "packages/opentelemetry-exporter-jaeger"
+    },
+    {
+      "path": "packages/opentelemetry-exporter-prometheus"
+    },
+    {
       "path": "packages/opentelemetry-exporter-zipkin/tsconfig.esm.json"
-    },
-    {
-      "path": "packages/opentelemetry-instrumentation-fetch/tsconfig.esm.json"
-    },
-    {
-      "path": "packages/opentelemetry-instrumentation-xml-http-request/tsconfig.esm.json"
-    },
-    {
-      "path": "packages/opentelemetry-instrumentation/tsconfig.esm.json"
-    },
-    {
-      "path": "packages/opentelemetry-sdk-metrics-base/tsconfig.esm.json"
     },
     {
       "path": "packages/opentelemetry-propagator-b3/tsconfig.esm.json"
@@ -42,13 +51,28 @@
       "path": "packages/opentelemetry-resources/tsconfig.esm.json"
     },
     {
-      "path": "packages/opentelemetry-semantic-conventions/tsconfig.esm.json"
+      "path": "packages/opentelemetry-sdk-node"
     },
     {
       "path": "packages/opentelemetry-sdk-trace-base/tsconfig.esm.json"
     },
     {
+      "path": "packages/opentelemetry-sdk-trace-node"
+    },
+    {
       "path": "packages/opentelemetry-sdk-trace-web/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/opentelemetry-semantic-conventions/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/opentelemetry-shim-opentracing"
+    },
+    {
+      "path": "packages/template/tsconfig.esm.json"
+    },
+    {
+      "path": "integration-tests/propagation-validation-server"
     }
   ]
 }

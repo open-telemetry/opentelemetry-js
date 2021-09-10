@@ -18,5 +18,9 @@ jobs:
       - name: Install lerna
         run: npm install -g lerna
 
-      - name: Check API dependency semantics
+      - name: Check API dependency semantics (stable)
         run: lerna exec --ignore propagation-validation-server "node ../../scripts/peer-api-check.js"
+
+      - name: Check API dependency semantics (experimental)
+        working-directory: experimental
+        run: lerna exec --ignore propagation-validation-server "node ../../../scripts/peer-api-check.js"

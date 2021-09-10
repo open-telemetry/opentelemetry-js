@@ -11,7 +11,7 @@
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json",
     "bench": "node benchmark",
-    "postinstall": "update-ts-references && npm run bootstrap",
+    "postinstall": "npm run update-ts-references && npm run bootstrap",
     "postcompile": "npm run submodule && npm run protos:copy",
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "protos:copy": "lerna run protos:copy",
@@ -30,13 +30,14 @@
     "lint:changed": "lerna run --concurrency 1 --stream lint --since HEAD --exclude-dependents",
     "lint:fix": "lerna run lint:fix",
     "lint:fix:changed": "lerna run --concurrency 1 --stream lint:fix --since HEAD --exclude-dependents",
-    "lint:examples": "eslint ./examples/**/*.js",
-    "lint:examples:fix": "eslint ./examples/**/*.js --fix",
-    "lint:getting-started": "eslint ./getting-started/**/*.{js,ts}",
-    "lint:getting-started:fix": "eslint ./getting-started/**/*.{js,ts} --fix",
+    "lint:examples": "eslint --no-error-on-unmatched-pattern ./examples/**/*.js",
+    "lint:examples:fix": "eslint --no-error-on-unmatched-pattern ./examples/**/*.js --fix",
+    "lint:getting-started": "eslint --no-error-on-unmatched-pattern ./getting-started/**/*.{js,ts}",
+    "lint:getting-started:fix": "eslint --no-error-on-unmatched-pattern ./getting-started/**/*.{js,ts} --fix",
     "lint:markdown": "./node_modules/.bin/markdownlint $(git ls-files '*.md') -i ./CHANGELOG.md",
     "lint:markdown:fix": "./node_modules/.bin/markdownlint $(git ls-files '*.md') -i ./CHANGELOG.md --fix",
-    "reset": "lerna clean -y && rm -rf node_modules && npm i && npm run compile && npm run lint:fix"
+    "reset": "lerna clean -y && rm -rf node_modules && npm i && npm run compile && npm run lint:fix",
+    "update-ts-references": "update-ts-references --configName tsconfig.esm.json && update-ts-references"
   },
   "repository": "open-telemetry/opentelemetry-js",
   "keywords": [
@@ -74,5 +75,18 @@
       "pre-commit": "npm run lint:changed",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
+  },
+  "changelog": {
+    "repo": "open-telemetry/opentelemetry-js",
+    "labels": {
+      "breaking": ":boom: Breaking Change",
+      "enhancement": ":rocket: (Enhancement)",
+      "bug": ":bug: (Bug Fix)",
+      "core": ":wrench: Core",
+      "document": ":books: (Refine Doc)",
+      "feature-request": ":sparkles: (Feature)",
+      "internal": ":house: (Internal)"
+    },
+    "cacheDir": ".changelog"
   }
 }
