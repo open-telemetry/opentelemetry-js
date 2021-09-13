@@ -18,6 +18,7 @@ import { diag } from '@opentelemetry/api';
 import * as api from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
+import merge from 'lodash.merge';
 import { BatchObserver } from './BatchObserver';
 import { BaseBoundInstrument } from './BoundInstrument';
 import { CounterMetric } from './CounterMetric';
@@ -31,8 +32,6 @@ import { UpDownCounterMetric } from './UpDownCounterMetric';
 import { UpDownSumObserverMetric } from './UpDownSumObserverMetric';
 import { ValueObserverMetric } from './ValueObserverMetric';
 import { ValueRecorderMetric } from './ValueRecorderMetric';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const merge = require('lodash.merge');
 
 /**
  * Meter is an implementation of the {@link Meter} interface.

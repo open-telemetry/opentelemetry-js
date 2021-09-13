@@ -27,7 +27,7 @@ import {
 } from '@opentelemetry/exporter-collector';
 import * as metrics from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
-import * as http from 'http';
+import http from 'http';
 import * as sinon from 'sinon';
 import { CollectorMetricExporter } from '../src';
 import { getExportRequestProto } from '../src/util';

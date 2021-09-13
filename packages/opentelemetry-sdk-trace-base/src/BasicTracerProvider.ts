@@ -29,13 +29,12 @@ import {
   getEnv,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
+import merge from 'lodash.merge';
 import { SpanProcessor, Tracer } from '.';
 import { DEFAULT_CONFIG } from './config';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
 import { NoopSpanProcessor } from './export/NoopSpanProcessor';
 import { SDKRegistrationConfig, TracerConfig } from './types';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const merge = require('lodash.merge');
 import { SpanExporter } from './export/SpanExporter';
 import { BatchSpanProcessor } from './platform';
 

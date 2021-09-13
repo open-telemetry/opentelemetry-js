@@ -29,7 +29,7 @@ import {
   MetricRecord,
 } from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
-import * as http from 'http';
+import http from 'http';
 import * as sinon from 'sinon';
 import {
   CollectorExporterNodeConfigBase,

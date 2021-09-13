@@ -24,7 +24,7 @@ import {
   TraceFlags,
 } from '@opentelemetry/api';
 import { suppressTracing } from '@opentelemetry/core';
-import * as assert from 'assert';
+import assert from 'assert';
 import {
   JaegerPropagator,
   UBER_TRACE_ID_HEADER,

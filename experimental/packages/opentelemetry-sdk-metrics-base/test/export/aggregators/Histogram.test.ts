@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { HistogramAggregator } from '../../../src/export/aggregators';
 import { Histogram } from '../../../src';
 import { hrTime, hrTimeToMilliseconds } from '@opentelemetry/core';
-import sinon = require('sinon');
+import sinon from 'sinon';
 
 describe('HistogramAggregator', () => {
   describe('constructor()', () => {

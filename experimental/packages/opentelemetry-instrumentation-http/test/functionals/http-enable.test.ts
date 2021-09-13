@@ -18,7 +18,7 @@ import {
   context,
   propagation,
   Span as ISpan,
-  SpanKind, 
+  SpanKind,
   trace,
   SpanAttributes,
 } from '@opentelemetry/api';
@@ -31,8 +31,8 @@ import {
   NetTransportValues,
   SemanticAttributes,
 } from '@opentelemetry/semantic-conventions';
-import * as assert from 'assert';
-import * as nock from 'nock';
+import assert from 'assert';
+import nock from 'nock';
 import * as path from 'path';
 import { HttpInstrumentation } from '../../src/http';
 import { HttpInstrumentationConfig } from '../../src/types';
@@ -507,7 +507,7 @@ describe('HttpInstrumentation', () => {
             hostname: 'localhost',
             pathname: '/',
             forceStatus: {
-              code: SpanStatusCode.ERROR, 
+              code: SpanStatusCode.ERROR,
               message: err.message,
             },
             component: 'http',

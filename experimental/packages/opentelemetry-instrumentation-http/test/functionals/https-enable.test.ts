@@ -36,7 +36,7 @@ import {
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as semver from 'semver';
-import * as nock from 'nock';
+import nock from 'nock';
 import * as path from 'path';
 import { HttpInstrumentation } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';

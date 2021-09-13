@@ -16,7 +16,7 @@
 
 import * as types from '../../types';
 import * as path from 'path';
-import * as RequireInTheMiddle from 'require-in-the-middle';
+import RequireInTheMiddle from 'require-in-the-middle';
 import { satisfies } from 'semver';
 import { InstrumentationAbstract } from '../../instrumentation';
 import { InstrumentationModuleDefinition } from './types';
@@ -67,7 +67,7 @@ export abstract class InstrumentationBase<T = any>
     } catch (error) {
       diag.warn('Failed extracting version', baseDir);
     }
-    
+
     return undefined;
   }
 

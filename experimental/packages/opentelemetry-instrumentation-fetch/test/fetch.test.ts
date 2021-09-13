@@ -34,7 +34,7 @@ import {
   WebTracerProvider,
 } from '@opentelemetry/sdk-trace-web';
 import * as assert from 'assert';
-import * as sinon from 'sinon';
+import sinon from 'sinon';
 import {
   FetchInstrumentation,
   FetchInstrumentationConfig,

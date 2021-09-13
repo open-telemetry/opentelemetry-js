@@ -50,7 +50,7 @@ import {
   HOST_ADDRESS,
   SECONDARY_HOST_ADDRESS,
 } from 'gcp-metadata';
-import * as nock from 'nock';
+import nock from 'nock';
 import * as semver from 'semver';
 import * as Sinon from 'sinon';
 import { NodeSDK } from '../src';

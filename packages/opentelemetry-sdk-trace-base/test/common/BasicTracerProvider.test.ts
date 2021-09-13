@@ -34,7 +34,7 @@ import {
   TraceState,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import * as assert from 'assert';
+import assert from 'assert';
 import * as sinon from 'sinon';
 import {
   BasicTracerProvider,

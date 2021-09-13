@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import assert from 'assert';
 import { JaegerExporter } from '../src';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
@@ -22,7 +22,7 @@ import { ThriftProcess } from '../src/types';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { TraceFlags } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
-import * as nock from 'nock';
+import nock from 'nock';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 
 describe('JaegerExporter', () => {

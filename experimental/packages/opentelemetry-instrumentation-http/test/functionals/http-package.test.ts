@@ -33,9 +33,9 @@ instrumentation.enable();
 instrumentation.disable();
 
 import * as http from 'http';
-import * as request from 'request-promise-native';
+import request from 'request-promise-native';
 import * as superagent from 'superagent';
-import * as got from 'got';
+import got from 'got';
 import * as nock from 'nock';
 import axios, { AxiosResponse } from 'axios';
 

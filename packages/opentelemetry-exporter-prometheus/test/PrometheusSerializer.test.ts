@@ -24,7 +24,7 @@ import {
   ValueObserverMetric,
 } from '@opentelemetry/sdk-metrics-base';
 import { diag, DiagLogLevel } from '@opentelemetry/api';
-import * as assert from 'assert';
+import assert from 'assert';
 import { Labels } from '@opentelemetry/api-metrics';
 import { PrometheusSerializer } from '../src/PrometheusSerializer';
 import { PrometheusLabelsBatcher } from '../src/PrometheusLabelsBatcher';
