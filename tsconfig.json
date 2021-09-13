@@ -51,9 +51,6 @@
       "path": "backwards-compatability/node8"
     },
     {
-      "path": "packages/opentelemetry-api-metrics"
-    },
-    {
       "path": "packages/opentelemetry-context-async-hooks"
     },
     {
@@ -84,21 +81,6 @@
       "path": "packages/opentelemetry-exporter-zipkin"
     },
     {
-      "path": "packages/opentelemetry-instrumentation-fetch"
-    },
-    {
-      "path": "packages/opentelemetry-instrumentation-grpc"
-    },
-    {
-      "path": "packages/opentelemetry-instrumentation-http"
-    },
-    {
-      "path": "packages/opentelemetry-instrumentation-xml-http-request"
-    },
-    {
-      "path": "packages/opentelemetry-instrumentation"
-    },
-    {
       "path": "packages/opentelemetry-propagator-b3"
     },
     {
@@ -106,9 +88,6 @@
     },
     {
       "path": "packages/opentelemetry-resources"
-    },
-    {
-      "path": "packages/opentelemetry-sdk-metrics-base"
     },
     {
       "path": "packages/opentelemetry-sdk-node"

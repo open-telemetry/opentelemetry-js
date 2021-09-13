@@ -1,25 +1,11 @@
 {
   "lerna": "3.13.4",
+  "version": "0.25.0",
   "npmClient": "npm",
   "packages": [
     "benchmark/*",
     "backwards-compatability/*",
-    "metapackages/*",
     "packages/*",
     "integration-tests/*"
-  ],
-  "version": "independent",
-  "changelog": {
-    "repo": "open-telemetry/opentelemetry-js",
-    "labels": {
-      "breaking": ":boom: Breaking Change",
-      "enhancement": ":rocket: (Enhancement)",
-      "bug": ":bug: (Bug Fix)",
-      "core": ":wrench: Core",
-      "document": ":books: (Refine Doc)",
-      "feature-request": ":sparkles: (Feature)",
-      "internal": ":house: (Internal)"
-    },
-    "cacheDir": ".changelog"
-  }
+  ]
 }
