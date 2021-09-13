@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import { getEnv } from '../../../src/platform/browser/environment';
 
 describe('getEnv', () => {
-  it('get environs in window', () => {
+  it('get environments variables in a browser', () => {
     const env = getEnv();
     assert.strictEqual(typeof env, 'object');
   });
