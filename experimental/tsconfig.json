@@ -22,6 +22,9 @@
     },
     {
       "path": "packages/opentelemetry-sdk-metrics-base"
+    },
+    {
+      "path": "packages/opentelemetry-sdk-node"
     }
   ]
 }
