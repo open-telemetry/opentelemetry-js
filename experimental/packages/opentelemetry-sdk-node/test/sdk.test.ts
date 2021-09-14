@@ -37,7 +37,7 @@ import {
   assertCloudResource,
   assertHostResource,
   assertServiceResource,
-} from '@opentelemetry/resources/build/test/util/resource-assertions';
+} from './util/resource-assertions';
 import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,

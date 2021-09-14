@@ -22,6 +22,9 @@
     },
     {
       "path": "packages/opentelemetry-sdk-metrics-base/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/opentelemetry-sdk-node"
     }
   ]
 }
