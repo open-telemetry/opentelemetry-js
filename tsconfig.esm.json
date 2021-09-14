@@ -51,9 +51,6 @@
       "path": "packages/opentelemetry-resources/tsconfig.esm.json"
     },
     {
-      "path": "packages/opentelemetry-sdk-node"
-    },
-    {
       "path": "packages/opentelemetry-sdk-trace-base/tsconfig.esm.json"
     },
     {
