@@ -284,7 +284,7 @@ To request automatic tracing support for a module not on this list, please [file
 
 ## Upgrade guidelines
 
-### 0.25.x to 0.26.x
+### 0.25.x to 1.x.y
 
 Collector exporter packages and types are renamed:
 
@@ -294,18 +294,18 @@ Collector exporter packages and types are renamed:
   - `CollectorMetricExporter` => `OTLPMetricExporter`
   - `CollectorExporterBrowserBase` => `OTLPExporterBrowserBase`
   - `CollectorExporterNodeBase` => `OTLPExporterNodeBase`
-  - `OTLPExporterConfigBase` => `OTLPExporterConfigBase`
-  - `OTLPExporterError` => `OTLPExporterError`
-  - `OTLP_SPAN_KIND_MAPPING` => `OTLP_SPAN_KIND_MAPPING`
-  - `otlpTypes` => `otlpTypes`
+  - `CollectorExporterConfigBase` => `OTLPExporterConfigBase`
+  - `CollectorExporterError` => `OTLPExporterError`
+  - `COLLECTOR_SPAN_KIND_MAPPING` => `OTLP_SPAN_KIND_MAPPING`
+  - `collectorTypes` => `otlpTypes`
 - `@opentelemetry/exporter-collector-grpc` => `@opentelemetry/exporter-otlp-grpc`
-  - `OTLPTraceExporter` => `OTLPTraceExporter`
-  - `OTLPMetricExporter` => `OTLPMetricExporter`
-  - `OTLPExporterConfigNode` => `OTLPExporterConfigNode`
+  - `CollectorTraceExporter` => `OTLPTraceExporter`
+  - `CollectorMetricExporter` => `OTLPMetricExporter`
+  - `CollectorExporterConfigNode` => `OTLPExporterConfigNode`
 - `@opentelemetry/exporter-collector-proto` => `@opentelemetry/exporter-otlp-proto`
-  - `OTLPExporterNodeBase` => `OTLPExporterNodeBase`
-  - `OTLPMetricExporter` => `OTLPMetricExporter`
-  - `OTLPTraceExporter` => `OTLPTraceExporter`
+  - `CollectorExporterNodeBase` => `OTLPExporterNodeBase`
+  - `CollectorMetricExporter` => `OTLPMetricExporter`
+  - `CollectorTraceExporter` => `OTLPTraceExporter`
 
 ### 0.24.x to 0.25.x
 
