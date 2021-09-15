@@ -441,7 +441,7 @@ Some types exported from `"@opentelemetry/api"` have been changed to be more spe
 
 ### 0.15.0 to 0.16.0
 
-[PR-1863](https://github.com/open-telemetry/opentelemetry-js/pull/1863) removed public attributes `keepAlive` and `httpAgentOptions` from nodejs `CollectorTraceExporter` and `CollectorMetricExporter`
+[PR-1863](https://github.com/open-telemetry/opentelemetry-js/pull/1863) removed public attributes `keepAlive` and `httpAgentOptions` from nodejs `OTLPTraceExporter` and `OTLPMetricExporter`
 
 ### 0.14.0 to 0.15.0
 
@@ -457,7 +457,7 @@ Some types exported from `"@opentelemetry/api"` have been changed to be more spe
 
 [PR-1725](https://github.com/open-telemetry/opentelemetry-js/pull/1725) Use new gRPC default port
 
-- The default port used by `@opentelemetry/exporter-collector-grpc` is changed from `55680` to `4317`
+- The default port used by `@opentelemetry/exporter-otlp-grpc` is changed from `55680` to `4317`
 
 [PR-1749](https://github.com/open-telemetry/opentelemetry-js/pull/1749) chore: improve naming of span related context APIs
 

@@ -2,18 +2,18 @@
 
 const opentelemetry = require('@opentelemetry/api');
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
-const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector');
+const { OTLPTraceExporter } = require('@opentelemetry/exporter-otlp-http');
 const { Resource } = require('@opentelemetry/resources');
 const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
-// const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector-grpc');
-// const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector-proto');
+// const { OTLPTraceExporter } = require('@opentelemetry/exporter-otlp-grpc');
+// const { OTLPTraceExporter } = require('@opentelemetry/exporter-otlp-proto');
 
 // opentelemetry.diag.setLogger(
 //   new opentelemetry.DiagConsoleLogger(),
 //   opentelemetry.DiagLogLevel.DEBUG,
 // );
 
-const exporter = new CollectorTraceExporter({
+const exporter = new OTLPTraceExporter({
   // headers: {
   //   foo: 'bar'
   // },
