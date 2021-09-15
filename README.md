@@ -284,7 +284,30 @@ To request automatic tracing support for a module not on this list, please [file
 
 ## Upgrade guidelines
 
-### 0.24.x to x
+### 0.25.x to 1.x.y
+
+Collector exporter packages and types are renamed:
+
+- `@opentelemetry/exporter-collector` => `@opentelemetry/exporter-otlp-http`
+  - `CollectorExporterBase` => `OTLPExporterBase`
+  - `CollectorTraceExporter` => `OTLPTraceExporter`
+  - `CollectorMetricExporter` => `OTLPMetricExporter`
+  - `CollectorExporterBrowserBase` => `OTLPExporterBrowserBase`
+  - `CollectorExporterNodeBase` => `OTLPExporterNodeBase`
+  - `CollectorExporterConfigBase` => `OTLPExporterConfigBase`
+  - `CollectorExporterError` => `OTLPExporterError`
+  - `COLLECTOR_SPAN_KIND_MAPPING` => `OTLP_SPAN_KIND_MAPPING`
+  - `collectorTypes` => `otlpTypes`
+- `@opentelemetry/exporter-collector-grpc` => `@opentelemetry/exporter-otlp-grpc`
+  - `CollectorTraceExporter` => `OTLPTraceExporter`
+  - `CollectorMetricExporter` => `OTLPMetricExporter`
+  - `CollectorExporterConfigNode` => `OTLPExporterConfigNode`
+- `@opentelemetry/exporter-collector-proto` => `@opentelemetry/exporter-otlp-proto`
+  - `CollectorExporterNodeBase` => `OTLPExporterNodeBase`
+  - `CollectorMetricExporter` => `OTLPMetricExporter`
+  - `CollectorTraceExporter` => `OTLPTraceExporter`
+
+### 0.24.x to 0.25.x
 
 - SDKs packages for trace and metrics has been renamed to have a consistent naming schema:
   - @opentelemetry/tracing -> @opentelemetry/sdk-trace-base

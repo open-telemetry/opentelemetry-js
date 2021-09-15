@@ -3,13 +3,13 @@ import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-tra
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
 import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xml-http-request';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
-import { CollectorTraceExporter } from '@opentelemetry/exporter-collector';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-otlp-http';
 import { B3Propagator } from '@opentelemetry/propagator-b3';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
 const providerWithZone = new WebTracerProvider();
 providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorTraceExporter()));
+providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new OTLPTraceExporter()));
 
 providerWithZone.register({
   contextManager: new ZoneContextManager(),
