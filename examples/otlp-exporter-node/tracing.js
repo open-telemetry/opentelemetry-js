@@ -28,7 +28,7 @@ provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.register();
 
-const tracer = opentelemetry.trace.getTracer('example-collector-exporter-node');
+const tracer = opentelemetry.trace.getTracer('example-otlp-exporter-node');
 
 // Create a span. A span must be closed.
 const parentSpan = tracer.startSpan('main');

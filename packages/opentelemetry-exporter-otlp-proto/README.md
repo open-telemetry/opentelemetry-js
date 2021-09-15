@@ -63,7 +63,7 @@ counter.add(10, { 'key': 'value' });
 
 ## Running opentelemetry-collector locally to see the traces
 
-1. Go to examples/collector-exporter-node
+1. Go to examples/otlp-exporter-node
 2. run `npm run docker:start`
 3. Open page at `http://localhost:9411/zipkin/` to observe the traces
 

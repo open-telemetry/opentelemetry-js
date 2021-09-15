@@ -1,5 +1,5 @@
 {
-  "name": "example-collector-exporter-node",
+  "name": "example-otlp-exporter-node",
   "private": true,
   "version": "0.25.0",
   "description": "Example of using @opentelemetry/collector-exporter in Node.js",
