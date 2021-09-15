@@ -1,7 +1,7 @@
 'use strict';
 
 const { DiagConsoleLogger, DiagLogLevel, diag } = require('@opentelemetry/api');
-const { CollectorMetricExporter } = require('@opentelemetry/exporter-collector');
+const { OTLPMetricExporter } = require('@opentelemetry/exporter-otlp-http');
 const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
 const { Resource } = require('@opentelemetry/resources');
 const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
@@ -9,7 +9,7 @@ const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventi
 // Optional and only needed to see the internal diagnostic logging (during development)
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
 
-const metricExporter = new CollectorMetricExporter();
+const metricExporter = new OTLPMetricExporter();
 
 let interval;
 let meter;

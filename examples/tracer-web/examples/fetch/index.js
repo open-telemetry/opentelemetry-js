@@ -1,7 +1,7 @@
 'use strict';
 import { context, trace } from '@opentelemetry/api';
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
-import { CollectorTraceExporter } from '@opentelemetry/exporter-collector';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-otlp-http';
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
 import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
@@ -10,7 +10,7 @@ import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
 const provider = new WebTracerProvider();
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-provider.addSpanProcessor(new SimpleSpanProcessor(new CollectorTraceExporter()));
+provider.addSpanProcessor(new SimpleSpanProcessor(new OTLPTraceExporter()));
 provider.register({
   contextManager: new ZoneContextManager(),
   propagator: new B3Propagator(),
