@@ -17,7 +17,7 @@
 import { SpanAttributes, diag } from '@opentelemetry/api';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import {
-  CollectorExporterError,
+  OTLPExporterError,
   OTLPExporterConfigBase,
   ExportServiceError,
 } from './types';
@@ -135,7 +135,7 @@ export abstract class OTLPExporterBase<
   abstract send(
     items: ExportItem[],
     onSuccess: () => void,
-    onError: (error: CollectorExporterError) => void
+    onError: (error: OTLPExporterError) => void
   ): void;
   abstract getDefaultUrl(config: T): string;
   abstract convert(objects: ExportItem[]): ServiceRequest;

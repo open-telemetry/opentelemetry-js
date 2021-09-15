@@ -21,7 +21,7 @@ import {
   ValueRecorder,
 } from '@opentelemetry/api-metrics';
 import { diag } from '@opentelemetry/api';
-import { collectorTypes } from '@opentelemetry/exporter-otlp-http';
+import { otlpTypes } from '@opentelemetry/exporter-otlp-http';
 import * as metrics from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
 import * as fs from 'fs';
@@ -61,7 +61,7 @@ const testOTLPMetricExporter = (params: TestParams) =>
     let collectorExporter: OTLPMetricExporter;
     let server: grpc.Server;
     let exportedData:
-      | collectorTypes.opentelemetryProto.metrics.v1.ResourceMetrics[]
+      | otlpTypes.opentelemetryProto.metrics.v1.ResourceMetrics[]
       | undefined;
     let metrics: metrics.MetricRecord[];
     let reqMetadata: grpc.Metadata | undefined;
@@ -86,7 +86,7 @@ const testOTLPMetricExporter = (params: TestParams) =>
               .MetricsService.service,
             {
               Export: (data: {
-                request: collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
+                request: otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
                 metadata: grpc.Metadata;
               }) => {
                 try {

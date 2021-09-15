@@ -21,20 +21,20 @@ import * as sinon from 'sinon';
 import { OTLPExporterBase } from '../../src/OTLPExporterBase';
 import { OTLPExporterConfigBase } from '../../src/types';
 import { mockedReadableSpan } from '../helper';
-import * as collectorTypes from '../../src/types';
+import * as otlpTypes from '../../src/types';
 
 type CollectorExporterConfig = OTLPExporterConfigBase;
 class OTLPTraceExporter extends OTLPExporterBase<
   CollectorExporterConfig,
   ReadableSpan,
-  collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
+  otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
 > {
   onInit() {}
   onShutdown() {}
   send(
     items: any[],
     onSuccess: () => void,
-    onError: (error: collectorTypes.CollectorExporterError) => void
+    onError: (error: otlpTypes.OTLPExporterError) => void
   ) {
     const promise = Promise.resolve(null);
     this._sendingPromises.push(
@@ -49,7 +49,7 @@ class OTLPTraceExporter extends OTLPExporterBase<
 
   convert(
     spans: ReadableSpan[]
-  ): collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
+  ): otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
     return { resourceSpans: [] };
   }
 }
@@ -101,7 +101,7 @@ describe('OTLPTraceExporter - common', () => {
       collectorExporter = new OTLPTraceExporter(collectorExporterConfig);
     });
 
-    it('should export spans as collectorTypes.Spans', done => {
+    it('should export spans as otlpTypes.Spans', done => {
       const spans: ReadableSpan[] = [];
       spans.push(Object.assign({}, mockedReadableSpan));
 

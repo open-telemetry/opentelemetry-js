@@ -18,7 +18,7 @@ import * as http from 'http';
 import * as https from 'https';
 import * as zlib from 'zlib';
 import { Readable } from 'stream';
-import * as collectorTypes from '../../types';
+import * as otlpTypes from '../../types';
 import { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
 import { OTLPExporterNodeConfigBase } from '.';
 import { diag } from '@opentelemetry/api';
@@ -39,7 +39,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
   data: string | Buffer,
   contentType: string,
   onSuccess: () => void,
-  onError: (error: collectorTypes.CollectorExporterError) => void
+  onError: (error: otlpTypes.OTLPExporterError) => void
 ): void {
   const parsedUrl = new url.URL(collector.url);
 
@@ -66,7 +66,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
         diag.debug(`statusCode: ${res.statusCode}`, responseData);
         onSuccess();
       } else {
-        const error = new collectorTypes.CollectorExporterError(
+        const error = new otlpTypes.OTLPExporterError(
           res.statusMessage,
           res.statusCode,
           responseData

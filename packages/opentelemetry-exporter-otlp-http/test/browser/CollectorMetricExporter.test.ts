@@ -31,7 +31,7 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPMetricExporter } from '../../src/platform/browser/index';
-import * as collectorTypes from '../../src/types';
+import * as otlpTypes from '../../src/types';
 import { OTLPExporterConfigBase } from '../../src/types';
 import {
   ensureCounterIsCorrect,
@@ -100,7 +100,7 @@ describe('OTLPMetricExporter - web', () => {
           const body = await blob.text();
           const json = JSON.parse(
             body
-          ) as collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
+          ) as otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
           const metric1 =
             json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
           const metric2 =
@@ -215,7 +215,7 @@ describe('OTLPMetricExporter - web', () => {
           const body = request.requestBody;
           const json = JSON.parse(
             body
-          ) as collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
+          ) as otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
           const metric1 =
             json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
           const metric2 =

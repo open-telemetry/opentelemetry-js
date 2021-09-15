@@ -160,7 +160,7 @@ export function toCollectorMetric(
  * @param startTime start time of the metric in nanoseconds
  * @param collectorMetricExporterBase
  */
-export function toCollectorExportMetricServiceRequest<
+export function toOTLPExportMetricServiceRequest<
   T extends OTLPExporterConfigBase
 >(
   metrics: MetricRecord[],

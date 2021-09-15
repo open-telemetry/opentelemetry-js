@@ -16,7 +16,7 @@
 
 import { OTLPExporterBase } from '../../OTLPExporterBase';
 import { OTLPExporterConfigBase } from '../../types';
-import * as collectorTypes from '../../types';
+import * as otlpTypes from '../../types';
 import { parseHeaders } from '../../util';
 import { sendWithBeacon, sendWithXhr } from './util';
 import { diag } from '@opentelemetry/api';
@@ -67,7 +67,7 @@ export abstract class OTLPExporterBrowserBase<
   send(
     items: ExportItem[],
     onSuccess: () => void,
-    onError: (error: collectorTypes.CollectorExporterError) => void
+    onError: (error: otlpTypes.OTLPExporterError) => void
   ): void {
     if (this._isShutdown) {
       diag.debug('Shutdown already started. Cannot send objects');

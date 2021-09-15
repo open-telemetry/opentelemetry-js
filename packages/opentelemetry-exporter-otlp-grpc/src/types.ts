@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { collectorTypes } from '@opentelemetry/exporter-otlp-http';
+import { otlpTypes } from '@opentelemetry/exporter-otlp-http';
 import * as grpc from '@grpc/grpc-js';
 
 /**
@@ -24,7 +24,7 @@ import * as grpc from '@grpc/grpc-js';
 export interface GRPCQueueItem<ExportedItem> {
   objects: ExportedItem[];
   onSuccess: () => void;
-  onError: (error: collectorTypes.CollectorExporterError) => void;
+  onError: (error: otlpTypes.OTLPExporterError) => void;
 }
 
 /**
@@ -42,7 +42,7 @@ export interface ServiceClient extends grpc.Client {
  * OTLP Exporter Config for Node
  */
 export interface OTLPExporterConfigNode
-  extends collectorTypes.OTLPExporterConfigBase {
+  extends otlpTypes.OTLPExporterConfigBase {
   credentials?: grpc.ChannelCredentials;
   metadata?: grpc.Metadata;
 }

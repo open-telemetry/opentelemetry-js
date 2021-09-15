@@ -18,7 +18,7 @@ import { diag } from '@opentelemetry/api';
 import { ExportResultCode } from '@opentelemetry/core';
 import {
   OTLPExporterNodeConfigBase,
-  collectorTypes,
+  otlpTypes,
   CompressionAlgorithm,
 } from '@opentelemetry/exporter-otlp-http';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
@@ -156,7 +156,7 @@ describe('OTLPTraceExporter - node with proto over http', () => {
       fakeRequest.on('end', () => {
         const ExportTraceServiceRequestProto = getExportRequestProto();
         const data = ExportTraceServiceRequestProto?.decode(buff);
-        const json = data?.toJSON() as collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+        const json = data?.toJSON() as otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
         const span1 =
           json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
@@ -243,7 +243,7 @@ describe('OTLPTraceExporter - node with proto over http', () => {
         const unzippedBuff = zlib.gunzipSync(buff);
         const ExportTraceServiceRequestProto = getExportRequestProto();
         const data = ExportTraceServiceRequestProto?.decode(unzippedBuff);
-        const json = data?.toJSON() as collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+        const json = data?.toJSON() as otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
         const span1 =
           json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");

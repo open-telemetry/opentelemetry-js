@@ -15,7 +15,7 @@
  */
 
 import * as protoLoader from '@grpc/proto-loader';
-import { collectorTypes } from '@opentelemetry/exporter-otlp-http';
+import { otlpTypes } from '@opentelemetry/exporter-otlp-http';
 import { diag } from '@opentelemetry/api';
 import {
   BasicTracerProvider,
@@ -57,7 +57,7 @@ const testCollectorExporter = (params: TestParams) =>
     let collectorExporter: OTLPTraceExporter;
     let server: grpc.Server;
     let exportedData:
-      | collectorTypes.opentelemetryProto.trace.v1.ResourceSpans
+      | otlpTypes.opentelemetryProto.trace.v1.ResourceSpans
       | undefined;
     let reqMetadata: grpc.Metadata | undefined;
 
@@ -81,7 +81,7 @@ const testCollectorExporter = (params: TestParams) =>
               .service,
             {
               Export: (data: {
-                request: collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+                request: otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
                 metadata: grpc.Metadata;
               }) => {
                 try {

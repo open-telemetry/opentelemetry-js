@@ -22,7 +22,7 @@ import {
   ValueRecorder,
   ValueType,
 } from '@opentelemetry/api-metrics';
-import { collectorTypes } from '@opentelemetry/exporter-otlp-http';
+import { otlpTypes } from '@opentelemetry/exporter-otlp-http';
 import * as metrics from '@opentelemetry/sdk-metrics-base';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
@@ -167,7 +167,7 @@ export const mockedReadableSpan: ReadableSpan = {
 };
 
 export function ensureExportedEventsAreCorrect(
-  events: collectorTypes.opentelemetryProto.trace.v1.Span.Event[]
+  events: otlpTypes.opentelemetryProto.trace.v1.Span.Event[]
 ) {
   assert.deepStrictEqual(
     events,
@@ -226,7 +226,7 @@ export function ensureExportedEventsAreCorrect(
 }
 
 export function ensureExportedAttributesAreCorrect(
-  attributes: collectorTypes.opentelemetryProto.common.v1.KeyValue[]
+  attributes: otlpTypes.opentelemetryProto.common.v1.KeyValue[]
 ) {
   assert.deepStrictEqual(
     attributes,
@@ -244,7 +244,7 @@ export function ensureExportedAttributesAreCorrect(
 }
 
 export function ensureExportedLinksAreCorrect(
-  attributes: collectorTypes.opentelemetryProto.trace.v1.Span.Link[]
+  attributes: otlpTypes.opentelemetryProto.trace.v1.Span.Link[]
 ) {
   assert.deepStrictEqual(
     attributes,
@@ -270,7 +270,7 @@ export function ensureExportedLinksAreCorrect(
 }
 
 export function ensureExportedSpanIsCorrect(
-  span: collectorTypes.opentelemetryProto.trace.v1.Span
+  span: otlpTypes.opentelemetryProto.trace.v1.Span
 ) {
   if (span.attributes) {
     ensureExportedAttributesAreCorrect(span.attributes);
@@ -328,7 +328,7 @@ export function ensureExportedSpanIsCorrect(
 }
 
 export function ensureExportedCounterIsCorrect(
-  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time?: number
 ) {
   assert.deepStrictEqual(metric, {
@@ -353,7 +353,7 @@ export function ensureExportedCounterIsCorrect(
 }
 
 export function ensureExportedObserverIsCorrect(
-  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time?: number
 ) {
   assert.deepStrictEqual(metric, {
@@ -376,7 +376,7 @@ export function ensureExportedObserverIsCorrect(
 }
 
 export function ensureExportedValueRecorderIsCorrect(
-  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time?: number,
   explicitBounds: number[] = [Infinity],
   bucketCounts: string[] = ['2', '0']
@@ -405,7 +405,7 @@ export function ensureExportedValueRecorderIsCorrect(
 }
 
 export function ensureResourceIsCorrect(
-  resource: collectorTypes.opentelemetryProto.resource.v1.Resource
+  resource: otlpTypes.opentelemetryProto.resource.v1.Resource
 ) {
   assert.deepStrictEqual(resource, {
     attributes: [

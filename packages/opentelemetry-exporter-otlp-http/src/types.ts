@@ -314,9 +314,9 @@ export namespace opentelemetryProto {
 /**
  * Interface for handling error
  */
-export class CollectorExporterError extends Error {
+export class OTLPExporterError extends Error {
   readonly code?: number;
-  override readonly name: string = 'CollectorExporterError';
+  override readonly name: string = 'OTLPExporterError';
   readonly data?: string;
 
   constructor(message?: string, code?: number, data?: string) {
@@ -352,7 +352,7 @@ export interface OTLPExporterConfigBase {
 /**
  * Mapping between api SpanKind and proto SpanKind
  */
-export const COLLECTOR_SPAN_KIND_MAPPING = {
+export const OTLP_SPAN_KIND_MAPPING = {
   [SpanKind.INTERNAL]:
     opentelemetryProto.trace.v1.Span.SpanKind.SPAN_KIND_INTERNAL,
   [SpanKind.SERVER]: opentelemetryProto.trace.v1.Span.SpanKind.SPAN_KIND_SERVER,

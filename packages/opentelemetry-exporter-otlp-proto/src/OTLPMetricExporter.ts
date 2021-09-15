@@ -15,8 +15,8 @@
  */
 
 import {
-  collectorTypes,
-  toCollectorExportMetricServiceRequest,
+  otlpTypes,
+  toOTLPExportMetricServiceRequest,
   OTLPExporterNodeConfigBase,
   appendResourcePathToUrlIfNotPresent,
 } from '@opentelemetry/exporter-otlp-http';
@@ -29,12 +29,12 @@ const DEFAULT_COLLECTOR_RESOURCE_PATH = '/v1/metrics';
 const DEFAULT_COLLECTOR_URL=`http://localhost:55681${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 
 /**
- * Collector Metric Exporter for Node with protobuf
+ * OTLP Metric Exporter for Node with protobuf
  */
 export class OTLPMetricExporter
   extends OTLPExporterNodeBase<
     MetricRecord,
-    collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
+    otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
   >
   implements MetricExporter {
   // Converts time to nanoseconds
@@ -52,8 +52,8 @@ export class OTLPMetricExporter
 
   convert(
     metrics: MetricRecord[]
-  ): collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
-    return toCollectorExportMetricServiceRequest(
+  ): otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
+    return toOTLPExportMetricServiceRequest(
       metrics,
       this._startTime,
       this

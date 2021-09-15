@@ -284,7 +284,30 @@ To request automatic tracing support for a module not on this list, please [file
 
 ## Upgrade guidelines
 
-### 0.24.x to x
+### 0.25.x to 0.26.x
+
+Collector exporter packages and types are renamed:
+
+- `@opentelemetry/exporter-collector` => `@opentelemetry/exporter-otlp-http`
+  - `CollectorExporterBase` => `OTLPExporterBase`
+  - `CollectorTraceExporter` => `OTLPTraceExporter`
+  - `CollectorMetricExporter` => `OTLPMetricExporter`
+  - `CollectorExporterBrowserBase` => `OTLPExporterBrowserBase`
+  - `CollectorExporterNodeBase` => `OTLPExporterNodeBase`
+  - `OTLPExporterConfigBase` => `OTLPExporterConfigBase`
+  - `OTLPExporterError` => `OTLPExporterError`
+  - `OTLP_SPAN_KIND_MAPPING` => `OTLP_SPAN_KIND_MAPPING`
+  - `otlpTypes` => `otlpTypes`
+- `@opentelemetry/exporter-collector-grpc` => `@opentelemetry/exporter-otlp-grpc`
+  - `OTLPTraceExporter` => `OTLPTraceExporter`
+  - `OTLPMetricExporter` => `OTLPMetricExporter`
+  - `OTLPExporterConfigNode` => `OTLPExporterConfigNode`
+- `@opentelemetry/exporter-collector-proto` => `@opentelemetry/exporter-otlp-proto`
+  - `OTLPExporterNodeBase` => `OTLPExporterNodeBase`
+  - `OTLPMetricExporter` => `OTLPMetricExporter`
+  - `OTLPTraceExporter` => `OTLPTraceExporter`
+
+### 0.24.x to 0.25.x
 
 - SDKs packages for trace and metrics has been renamed to have a consistent naming schema:
   - @opentelemetry/tracing -> @opentelemetry/sdk-trace-base
@@ -441,7 +464,7 @@ Some types exported from `"@opentelemetry/api"` have been changed to be more spe
 
 ### 0.15.0 to 0.16.0
 
-[PR-1863](https://github.com/open-telemetry/opentelemetry-js/pull/1863) removed public attributes `keepAlive` and `httpAgentOptions` from nodejs `OTLPTraceExporter` and `OTLPMetricExporter`
+[PR-1863](https://github.com/open-telemetry/opentelemetry-js/pull/1863) removed public attributes `keepAlive` and `httpAgentOptions` from nodejs `CollectorTraceExporter` and `CollectorMetricExporter`
 
 ### 0.14.0 to 0.15.0
 
@@ -457,7 +480,7 @@ Some types exported from `"@opentelemetry/api"` have been changed to be more spe
 
 [PR-1725](https://github.com/open-telemetry/opentelemetry-js/pull/1725) Use new gRPC default port
 
-- The default port used by `@opentelemetry/exporter-otlp-grpc` is changed from `55680` to `4317`
+- The default port used by `@opentelemetry/exporter-collector-grpc` is changed from `55680` to `4317`
 
 [PR-1749](https://github.com/open-telemetry/opentelemetry-js/pull/1749) chore: improve naming of span related context APIs
 

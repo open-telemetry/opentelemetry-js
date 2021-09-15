@@ -17,7 +17,7 @@
 import { diag } from '@opentelemetry/api';
 import {
   OTLPExporterBase,
-  collectorTypes,
+  otlpTypes,
 } from '@opentelemetry/exporter-otlp-http';
 import { Metadata } from '@grpc/grpc-js';
 import {
@@ -59,7 +59,7 @@ export abstract class OTLPExporterNodeBase<
   private _sendPromise(
     objects: ExportItem[],
     onSuccess: () => void,
-    onError: (error: collectorTypes.CollectorExporterError) => void
+    onError: (error: otlpTypes.OTLPExporterError) => void
   ): void {
     const promise = new Promise<void>((resolve, reject) => {
       this._send(this, objects, resolve, reject);
@@ -88,7 +88,7 @@ export abstract class OTLPExporterNodeBase<
   send(
     objects: ExportItem[],
     onSuccess: () => void,
-    onError: (error: collectorTypes.CollectorExporterError) => void
+    onError: (error: otlpTypes.OTLPExporterError) => void
   ): void {
     if (this._isShutdown) {
       diag.debug('Shutdown already started. Cannot send objects');

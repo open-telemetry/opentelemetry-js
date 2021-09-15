@@ -23,7 +23,7 @@ import {
 import { ExportResultCode } from '@opentelemetry/core';
 import {
   OTLPExporterNodeConfigBase,
-  collectorTypes,
+  otlpTypes,
 } from '@opentelemetry/exporter-otlp-http';
 import * as metrics from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
@@ -183,7 +183,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
         write: (...writeArgs: any[]) => {
           const ExportTraceServiceRequestProto = getExportRequestProto();
           const data = ExportTraceServiceRequestProto?.decode(writeArgs[0]);
-          const json = data?.toJSON() as collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
+          const json = data?.toJSON() as otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
 
           const metric1 =
             json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];

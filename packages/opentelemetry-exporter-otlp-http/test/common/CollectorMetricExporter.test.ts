@@ -25,7 +25,7 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPExporterBase } from '../../src/OTLPExporterBase';
-import * as collectorTypes from '../../src/types';
+import * as otlpTypes from '../../src/types';
 import { OTLPExporterConfigBase } from '../../src/types';
 import { mockCounter, mockObserver } from '../helper';
 
@@ -33,7 +33,7 @@ type CollectorExporterConfig = OTLPExporterConfigBase;
 class OTLPMetricExporter extends OTLPExporterBase<
   CollectorExporterConfig,
   MetricRecord,
-  collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
+  otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
 > {
   onInit() {}
   onShutdown() {}
@@ -43,7 +43,7 @@ class OTLPMetricExporter extends OTLPExporterBase<
   }
   convert(
     metrics: MetricRecord[]
-  ): collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
+  ): otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
     return { resourceMetrics: [] };
   }
 }
@@ -115,7 +115,7 @@ describe('OTLPMetricExporter - common', () => {
       collectorExporter = new OTLPMetricExporter(collectorExporterConfig);
     });
 
-    it('should export metrics as collectorTypes.Metrics', done => {
+    it('should export metrics as otlpTypes.Metrics', done => {
       collectorExporter.export(metrics, () => {});
       setTimeout(() => {
         const metric1 = spySend.args[0][0][0] as MetricRecord;

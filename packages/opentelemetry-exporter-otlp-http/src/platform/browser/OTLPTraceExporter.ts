@@ -17,8 +17,8 @@
 import { OTLPExporterConfigBase } from '../../types';
 import { OTLPExporterBrowserBase } from './OTLPExporterBrowserBase';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
-import { toCollectorExportTraceServiceRequest } from '../../transform';
-import * as collectorTypes from '../../types';
+import { toOTLPExportTraceServiceRequest } from '../../transform';
+import * as otlpTypes from '../../types';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 import { appendResourcePathToUrlIfNotPresent } from '../../util';
 
@@ -31,7 +31,7 @@ const DEFAULT_COLLECTOR_URL=`http://localhost:55681${DEFAULT_COLLECTOR_RESOURCE_
 export class OTLPTraceExporter
   extends OTLPExporterBrowserBase<
     ReadableSpan,
-    collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
+    otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
   >
   implements SpanExporter {
   constructor(config: OTLPExporterConfigBase = {}) {
@@ -45,8 +45,8 @@ export class OTLPTraceExporter
   }
   convert(
     spans: ReadableSpan[]
-  ): collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
-    return toCollectorExportTraceServiceRequest(spans, this, true);
+  ): otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
+    return toOTLPExportTraceServiceRequest(spans, this, true);
   }
 
   getDefaultUrl(config: OTLPExporterConfigBase): string {

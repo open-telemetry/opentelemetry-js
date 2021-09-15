@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { diag } from '@opentelemetry/api';
-import * as collectorTypes from '../../types';
+import * as otlpTypes from '../../types';
 
 /**
  * Send metrics/spans using browser navigator.sendBeacon
@@ -27,13 +27,13 @@ export function sendWithBeacon(
   url: string,
   blobPropertyBag: BlobPropertyBag,
   onSuccess: () => void,
-  onError: (error: collectorTypes.CollectorExporterError) => void
+  onError: (error: otlpTypes.OTLPExporterError) => void
 ): void {
   if (navigator.sendBeacon(url, new Blob([body], blobPropertyBag))) {
     diag.debug('sendBeacon - can send', body);
     onSuccess();
   } else {
-    const error = new collectorTypes.CollectorExporterError(
+    const error = new otlpTypes.OTLPExporterError(
       `sendBeacon - cannot send ${body}`
     );
     onError(error);
@@ -52,7 +52,7 @@ export function sendWithXhr(
   url: string,
   headers: Record<string, string>,
   onSuccess: () => void,
-  onError: (error: collectorTypes.CollectorExporterError) => void
+  onError: (error: otlpTypes.OTLPExporterError) => void
 ): void {
   const xhr = new XMLHttpRequest();
   xhr.open('POST', url);
@@ -77,7 +77,7 @@ export function sendWithXhr(
         diag.debug('xhr success', body);
         onSuccess();
       } else {
-        const error = new collectorTypes.CollectorExporterError(
+        const error = new otlpTypes.OTLPExporterError(
           `Failed to export with XHR (status: ${xhr.status})`,
           xhr.status
         );

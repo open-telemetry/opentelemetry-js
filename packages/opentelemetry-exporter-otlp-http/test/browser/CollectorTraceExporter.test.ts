@@ -21,7 +21,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPTraceExporter } from '../../src/platform/browser/index';
 import { OTLPExporterConfigBase } from '../../src/types';
-import * as collectorTypes from '../../src/types';
+import * as otlpTypes from '../../src/types';
 
 import {
   ensureSpanIsCorrect,
@@ -76,7 +76,7 @@ describe('OTLPTraceExporter - web', () => {
           const body = await blob.text();
           const json = JSON.parse(
             body
-          ) as collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+          ) as otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
           const span1 =
             json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
 
@@ -154,7 +154,7 @@ describe('OTLPTraceExporter - web', () => {
           const body = request.requestBody;
           const json = JSON.parse(
             body
-          ) as collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+          ) as otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
           const span1 =
             json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
 

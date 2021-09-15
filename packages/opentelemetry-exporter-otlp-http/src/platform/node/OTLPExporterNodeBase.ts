@@ -19,7 +19,7 @@ import type * as https from 'https';
 
 import { OTLPExporterBase } from '../../OTLPExporterBase';
 import { OTLPExporterNodeConfigBase, CompressionAlgorithm } from './types';
-import * as collectorTypes from '../../types';
+import * as otlpTypes from '../../types';
 import { parseHeaders } from '../../util';
 import { createHttpAgent, sendWithHttp } from './util';
 import { diag } from '@opentelemetry/api';
@@ -63,7 +63,7 @@ export abstract class OTLPExporterNodeBase<
   send(
     objects: ExportItem[],
     onSuccess: () => void,
-    onError: (error: collectorTypes.CollectorExporterError) => void
+    onError: (error: otlpTypes.OTLPExporterError) => void
   ): void {
     if (this._isShutdown) {
       diag.debug('Shutdown already started. Cannot send objects');

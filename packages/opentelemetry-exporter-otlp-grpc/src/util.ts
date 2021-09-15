@@ -18,7 +18,7 @@ import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import { diag } from '@opentelemetry/api';
 import { globalErrorHandler } from '@opentelemetry/core';
-import { collectorTypes } from '@opentelemetry/exporter-otlp-http';
+import { otlpTypes } from '@opentelemetry/exporter-otlp-http';
 import * as path from 'path';
 import { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
 import { URL } from 'url';
@@ -80,7 +80,7 @@ export function send<ExportItem, ServiceRequest>(
   collector: OTLPExporterNodeBase<ExportItem, ServiceRequest>,
   objects: ExportItem[],
   onSuccess: () => void,
-  onError: (error: collectorTypes.CollectorExporterError) => void
+  onError: (error: otlpTypes.OTLPExporterError) => void
 ): void {
   if (collector.serviceClient) {
     const serviceRequest = collector.convert(objects);
@@ -88,7 +88,7 @@ export function send<ExportItem, ServiceRequest>(
     collector.serviceClient.export(
       serviceRequest,
       collector.metadata || new grpc.Metadata(),
-      (err: collectorTypes.ExportServiceError) => {
+      (err: otlpTypes.ExportServiceError) => {
         if (err) {
           diag.error('Service request', serviceRequest);
           onError(err);

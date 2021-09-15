@@ -29,7 +29,7 @@ import * as metrics from '@opentelemetry/sdk-metrics-base';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
-import * as collectorTypes from '../src/types';
+import * as otlpTypes from '../src/types';
 import { opentelemetryProto } from '../src/types';
 
 const meterProvider = new metrics.MeterProvider({
@@ -473,7 +473,7 @@ export function ensureLinksAreCorrect(
 }
 
 export function ensureSpanIsCorrect(
-  span: collectorTypes.opentelemetryProto.trace.v1.Span,
+  span: otlpTypes.opentelemetryProto.trace.v1.Span,
   useHex = true
 ) {
   if (span.attributes) {
@@ -531,7 +531,7 @@ export function ensureSpanIsCorrect(
 }
 
 export function ensureWebResourceIsCorrect(
-  resource: collectorTypes.opentelemetryProto.resource.v1.Resource
+  resource: otlpTypes.opentelemetryProto.resource.v1.Resource
 ) {
   assert.strictEqual(resource.attributes.length, 7);
   assert.strictEqual(resource.attributes[0].key, 'service.name');
@@ -552,7 +552,7 @@ export function ensureWebResourceIsCorrect(
 }
 
 export function ensureCounterIsCorrect(
-  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time: number
 ) {
   assert.deepStrictEqual(metric, {
@@ -570,14 +570,14 @@ export function ensureCounterIsCorrect(
       ],
       isMonotonic: true,
       aggregationTemporality:
-        collectorTypes.opentelemetryProto.metrics.v1.AggregationTemporality
+        otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
           .AGGREGATION_TEMPORALITY_CUMULATIVE,
     },
   });
 }
 
 export function ensureDoubleCounterIsCorrect(
-  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time: number
 ) {
   assert.deepStrictEqual(metric, {
@@ -595,14 +595,14 @@ export function ensureDoubleCounterIsCorrect(
       ],
       isMonotonic: true,
       aggregationTemporality:
-        collectorTypes.opentelemetryProto.metrics.v1.AggregationTemporality
+        otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
           .AGGREGATION_TEMPORALITY_CUMULATIVE,
     },
   });
 }
 
 export function ensureObserverIsCorrect(
-  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time: number,
   value: number,
   name = 'double-observer'
@@ -625,7 +625,7 @@ export function ensureObserverIsCorrect(
 }
 
 export function ensureSumObserverIsCorrect(
-  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time: number,
   value: number,
   name = 'double-sum-observer'
@@ -645,14 +645,14 @@ export function ensureSumObserverIsCorrect(
         },
       ],
       aggregationTemporality:
-        collectorTypes.opentelemetryProto.metrics.v1.AggregationTemporality
+        otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
           .AGGREGATION_TEMPORALITY_CUMULATIVE,
     },
   });
 }
 
 export function ensureUpDownSumObserverIsCorrect(
-  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time: number,
   value: number,
   name = 'double-up-down-sum-observer'
@@ -672,14 +672,14 @@ export function ensureUpDownSumObserverIsCorrect(
         },
       ],
       aggregationTemporality:
-        collectorTypes.opentelemetryProto.metrics.v1.AggregationTemporality
+        otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
           .AGGREGATION_TEMPORALITY_CUMULATIVE,
     },
   });
 }
 
 export function ensureValueRecorderIsCorrect(
-  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time: number,
   explicitBounds: (number | null)[] = [Infinity],
   bucketCounts: number[] = [2, 0]
@@ -701,14 +701,14 @@ export function ensureValueRecorderIsCorrect(
         },
       ],
       aggregationTemporality:
-        collectorTypes.opentelemetryProto.metrics.v1.AggregationTemporality
+        otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
           .AGGREGATION_TEMPORALITY_CUMULATIVE,
     },
   });
 }
 
 export function ensureExportTraceServiceRequestIsSet(
-  json: collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
+  json: otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
 ) {
   const resourceSpans = json.resourceSpans;
   assert.strictEqual(
@@ -741,7 +741,7 @@ export function ensureExportTraceServiceRequestIsSet(
 }
 
 export function ensureExportMetricsServiceRequestIsSet(
-  json: collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
+  json: otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
 ) {
   const resourceMetrics = json.resourceMetrics;
   assert.strictEqual(

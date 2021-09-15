@@ -27,7 +27,7 @@ import {
   OTLPExporterNodeConfigBase,
   CompressionAlgorithm,
 } from '../../src/platform/node';
-import * as collectorTypes from '../../src/types';
+import * as otlpTypes from '../../src/types';
 import { MockedResponse } from './nodeHelpers';
 
 import {
@@ -203,7 +203,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
 
         const json = JSON.parse(
           responseBody
-        ) as collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+        ) as otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
         const span1 =
           json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
@@ -259,7 +259,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
         setTimeout(() => {
           const result = responseSpy.args[0][0] as core.ExportResult;
           assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-          const error = result.error as collectorTypes.CollectorExporterError;
+          const error = result.error as otlpTypes.OTLPExporterError;
           assert.ok(error !== undefined);
           assert.strictEqual(error.code, 400);
           assert.strictEqual(error.data, 'failed');
@@ -299,7 +299,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
 
         const json = JSON.parse(
           responseBody
-        ) as collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+        ) as otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
         const span1 =
           json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");

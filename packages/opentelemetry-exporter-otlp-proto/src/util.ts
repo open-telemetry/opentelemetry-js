@@ -15,7 +15,7 @@
  */
 
 import {
-  collectorTypes,
+  otlpTypes,
   sendWithHttp,
   OTLPExporterNodeConfigBase,
   CompressionAlgorithm,
@@ -66,7 +66,7 @@ export function send<ExportItem, ServiceRequest>(
   objects: ExportItem[],
   compression: CompressionAlgorithm,
   onSuccess: () => void,
-  onError: (error: collectorTypes.CollectorExporterError) => void
+  onError: (error: otlpTypes.OTLPExporterError) => void
 ): void {
   const serviceRequest = collector.convert(objects);
 
@@ -83,6 +83,6 @@ export function send<ExportItem, ServiceRequest>(
       );
     }
   } else {
-    onError(new collectorTypes.CollectorExporterError('No proto'));
+    onError(new otlpTypes.OTLPExporterError('No proto'));
   }
 }

@@ -35,7 +35,7 @@ import {
   OTLPExporterNodeConfigBase,
   OTLPMetricExporter,
 } from '../../src/platform/node';
-import * as collectorTypes from '../../src/types';
+import * as otlpTypes from '../../src/types';
 import {
   ensureCounterIsCorrect,
   ensureExportMetricsServiceRequestIsSet,
@@ -212,7 +212,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
         const writeArgs = stubWrite.args[0];
         const json = JSON.parse(
           writeArgs[0]
-        ) as collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
+        ) as otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
         const metric1 =
           json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
         const metric2 =
@@ -286,7 +286,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
         setTimeout(() => {
           const result = responseSpy.args[0][0] as core.ExportResult;
           assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-          const error = result.error as collectorTypes.CollectorExporterError;
+          const error = result.error as otlpTypes.OTLPExporterError;
           assert.ok(error !== undefined);
           assert.strictEqual(error.code, 400);
           assert.strictEqual(error.data, 'failed');

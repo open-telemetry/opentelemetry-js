@@ -26,7 +26,7 @@ import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace-base';
 import { OTLPExporterBase } from './OTLPExporterBase';
 import {
-  COLLECTOR_SPAN_KIND_MAPPING,
+  OTLP_SPAN_KIND_MAPPING,
   opentelemetryProto,
   OTLPExporterConfigBase,
 } from './types';
@@ -244,7 +244,7 @@ export function toCollectorResource(
 export function toCollectorKind(
   kind: SpanKind
 ): opentelemetryProto.trace.v1.Span.SpanKind {
-  const collectorKind = COLLECTOR_SPAN_KIND_MAPPING[kind];
+  const collectorKind = OTLP_SPAN_KIND_MAPPING[kind];
   return typeof collectorKind === 'number'
     ? collectorKind
     : opentelemetryProto.trace.v1.Span.SpanKind.SPAN_KIND_UNSPECIFIED;
@@ -267,7 +267,7 @@ export function toCollectorTraceState(
  * @param collectorExporterBase
  * @param useHex - if ids should be kept as hex without converting to base64
  */
-export function toCollectorExportTraceServiceRequest<
+export function toOTLPExportTraceServiceRequest<
   T extends OTLPExporterConfigBase
 >(
   spans: ReadableSpan[],

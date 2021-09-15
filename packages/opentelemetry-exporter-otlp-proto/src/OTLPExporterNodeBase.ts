@@ -17,7 +17,7 @@
 import { diag } from '@opentelemetry/api';
 import {
   OTLPExporterNodeBase as OTLPExporterBaseMain,
-  collectorTypes,
+  otlpTypes,
   OTLPExporterNodeConfigBase,
   CompressionAlgorithm,
 } from '@opentelemetry/exporter-otlp-http';
@@ -27,7 +27,7 @@ type SendFn = <ExportItem, ServiceRequest>(collector: OTLPExporterNodeBase<Expor
   objects: ExportItem[],
   compression: CompressionAlgorithm,
   onSuccess: () => void,
-  onError: (error: collectorTypes.CollectorExporterError) => void) => void;
+  onError: (error: otlpTypes.OTLPExporterError) => void) => void;
 
 /**
  * Collector Metric Exporter abstract base class
@@ -45,7 +45,7 @@ export abstract class OTLPExporterNodeBase<
   private _sendPromise(
     objects: ExportItem[],
     onSuccess: () => void,
-    onError: (error: collectorTypes.CollectorExporterError) => void
+    onError: (error: otlpTypes.OTLPExporterError) => void
   ): void {
     const promise = new Promise<void>((resolve, reject) => {
       this._send(this, objects, this.compression, resolve, reject);
@@ -74,7 +74,7 @@ export abstract class OTLPExporterNodeBase<
   override send(
     objects: ExportItem[],
     onSuccess: () => void,
-    onError: (error: collectorTypes.CollectorExporterError) => void
+    onError: (error: otlpTypes.OTLPExporterError) => void
   ): void {
     if (this._isShutdown) {
       diag.debug('Shutdown already started. Cannot send objects');
