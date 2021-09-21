@@ -4,3 +4,6 @@
 [submodule "packages/opentelemetry-exporter-otlp-proto/protos"]
 	path = packages/opentelemetry-exporter-otlp-proto/protos
 	url = https://github.com/open-telemetry/opentelemetry-proto.git
+[submodule "experimental/packages/opentelemetry-exporter-metrics-otlp-grpc/protos"]
+	path = experimental/packages/opentelemetry-exporter-metrics-otlp-grpc/protos
+	url = https://github.com/open-telemetry/opentelemetry-proto.git
