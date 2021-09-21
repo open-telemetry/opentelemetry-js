@@ -21,6 +21,15 @@
       "path": "packages/opentelemetry-instrumentation"
     },
     {
+      "path": "packages/opentelemetry-exporter-metrics-otlp-http"
+    },
+    {
+      "path": "packages/opentelemetry-exporter-metrics-otlp-grpc"
+    },
+    {
+      "path": "packages/opentelemetry-exporter-metrics-otlp-proto"
+    },
+    {
       "path": "packages/opentelemetry-sdk-metrics-base"
     },
     {

@@ -20,7 +20,7 @@ import {
   OTLPExporterNodeConfigBase,
   otlpTypes,
   appendResourcePathToUrlIfNotPresent
-} from '../../../../../../packages/opentelemetry-exporter-otlp-http';
+} from '@opentelemetry/exporter-otlp-http';
 import { toOTLPExportMetricServiceRequest } from '../../transformMetrics';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 

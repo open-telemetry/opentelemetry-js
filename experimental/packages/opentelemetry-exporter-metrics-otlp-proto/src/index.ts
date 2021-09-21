@@ -14,7 +14,4 @@
  * limitations under the License.
  */
 
-export * from './OTLPExporterNodeBase';
-export * from './OTLPTraceExporter';
-export { ServiceClientType, OTLPExporterConfigNode } from './types';
-export { validateAndNormalizeUrl } from './util';
+export * from './OTLPMetricExporter';

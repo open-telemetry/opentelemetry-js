@@ -16,13 +16,13 @@
 
 import {
   otlpTypes,
-  toOTLPExportMetricServiceRequest,
   OTLPExporterNodeConfigBase,
   appendResourcePathToUrlIfNotPresent,
-} from '@opentelemetry/exporter-otlp-http';
+} from '../../../../packages/opentelemetry-exporter-otlp-http';
+import { toOTLPExportMetricServiceRequest } from '../../opentelemetry-exporter-metrics-otlp-http';
 import { MetricRecord, MetricExporter } from '@opentelemetry/sdk-metrics-base';
-import { ServiceClientType } from './types';
-import { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
+import { ServiceClientType, OTLPExporterNodeBase } from '../../../../packages/opentelemetry-exporter-otlp-proto';
+// import { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = '/v1/metrics';

@@ -24,7 +24,7 @@ import {
   MetricRecord,
 } from '@opentelemetry/sdk-metrics-base';
 import { Resource } from '@opentelemetry/resources';
-import { OTLPExporterBase, otlpTypes, toCollectorResource } from '../../../../packages/opentelemetry-exporter-otlp-http';
+import { OTLPExporterBase, otlpTypes, toCollectorResource } from '@opentelemetry/exporter-otlp-http';
 
 /**
  * Converts labels

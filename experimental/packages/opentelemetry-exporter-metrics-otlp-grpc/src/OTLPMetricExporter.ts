@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-import {
-  otlpTypes,
-  toOTLPExportMetricServiceRequest,
-} from '../../../../packages/opentelemetry-exporter-otlp-http';
+import { otlpTypes } from '@opentelemetry/exporter-otlp-http';
+import { toOTLPExportMetricServiceRequest } from '@opentelemetry/exporter-metrics-otlp-http'
 import { MetricRecord, MetricExporter } from '@opentelemetry/sdk-metrics-base';
 import {
   OTLPExporterConfigNode,
   OTLPExporterNodeBase,
   ServiceClientType,
   validateAndNormalizeUrl
-} from '../../../../packages/opentelemetry-exporter-otlp-grpc';
+} from '@opentelemetry/exporter-otlp-grpc';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
 import { Metadata } from '@grpc/grpc-js';
 

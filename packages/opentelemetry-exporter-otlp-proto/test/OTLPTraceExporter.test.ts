@@ -34,7 +34,7 @@ import {
   ensureProtoSpanIsCorrect,
   mockedReadableSpan,
   MockedResponse,
-} from './helper';
+} from './traceHelper';
 
 const fakeRequest = {
   end: function () { },

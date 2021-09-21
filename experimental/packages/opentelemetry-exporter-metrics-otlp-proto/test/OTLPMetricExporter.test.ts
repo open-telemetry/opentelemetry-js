@@ -25,12 +25,13 @@ import {
   OTLPExporterNodeConfigBase,
   otlpTypes,
 } from '@opentelemetry/exporter-otlp-http';
+import { getExportRequestProto } from '@opentelemetry/exporter-otlp-proto';
 import * as metrics from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';
 import { OTLPMetricExporter } from '../src';
-import { getExportRequestProto } from '../src/util';
+
 import {
   ensureExportedCounterIsCorrect,
   ensureExportedObserverIsCorrect,
@@ -40,7 +41,7 @@ import {
   MockedResponse,
   mockObserver,
   mockValueRecorder,
-} from './helper';
+} from './metricsHelper';
 
 const fakeRequest = {
   end: function () {},

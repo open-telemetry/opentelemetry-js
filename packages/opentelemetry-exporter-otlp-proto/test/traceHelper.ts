@@ -15,78 +15,12 @@
  */
 
 import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
-import {
-  Counter,
-  ObserverResult,
-  ValueObserver,
-  ValueRecorder,
-  ValueType,
-} from '@opentelemetry/api-metrics';
 import { hexToBase64 } from '@opentelemetry/core';
 import { otlpTypes } from '@opentelemetry/exporter-otlp-http';
-import * as metrics from '@opentelemetry/sdk-metrics-base';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import { Stream } from 'stream';
-
-const meterProvider = new metrics.MeterProvider({
-  interval: 30000,
-  resource: new Resource({
-    service: 'ui',
-    version: 1,
-    cost: 112.12,
-  }),
-});
-
-const meter = meterProvider.getMeter('default', '0.0.1');
-
-export function mockCounter(): metrics.Metric<metrics.BoundCounter> & Counter {
-  const name = 'int-counter';
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createCounter(name, {
-      description: 'sample counter description',
-      valueType: ValueType.INT,
-    });
-  metric.clear();
-  metric.bind({});
-  return metric;
-}
-
-export function mockObserver(
-  callback: (observerResult: ObserverResult) => void
-): metrics.Metric<metrics.BoundCounter> & ValueObserver {
-  const name = 'double-observer';
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createValueObserver(
-      name,
-      {
-        description: 'sample observer description',
-        valueType: ValueType.DOUBLE,
-      },
-      callback
-    );
-  metric.clear();
-  metric.bind({});
-  return metric;
-}
-
-export function mockValueRecorder(): metrics.Metric<metrics.BoundValueRecorder> &
-  ValueRecorder {
-  const name = 'int-recorder';
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createValueRecorder(name, {
-      description: 'sample recorder description',
-      valueType: ValueType.INT,
-      boundaries: [0, 100],
-    });
-  metric.clear();
-  metric.bind({});
-  return metric;
-}
 
 const traceIdHex = '1f1008dc8e270e85c40a0d7c3939b278';
 const spanIdHex = '5e107261f64fa53e';
@@ -294,74 +228,6 @@ export function ensureProtoSpanIsCorrect(
   );
 }
 
-export function ensureExportedCounterIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
-  time?: number
-) {
-  assert.deepStrictEqual(metric, {
-    name: 'int-counter',
-    description: 'sample counter description',
-    unit: '1',
-    intSum: {
-      dataPoints: [
-        {
-          value: '1',
-          startTimeUnixNano: '1592602232694000128',
-          timeUnixNano: String(time),
-        },
-      ],
-      isMonotonic: true,
-      aggregationTemporality: 'AGGREGATION_TEMPORALITY_CUMULATIVE',
-    },
-  });
-}
-
-export function ensureExportedObserverIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
-  time?: number
-) {
-  assert.deepStrictEqual(metric, {
-    name: 'double-observer',
-    description: 'sample observer description',
-    unit: '1',
-    doubleGauge: {
-      dataPoints: [
-        {
-          value: 6,
-          startTimeUnixNano: '1592602232694000128',
-          timeUnixNano: String(time),
-        },
-      ],
-    },
-  });
-}
-
-export function ensureExportedValueRecorderIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
-  time?: number,
-  explicitBounds: number[] = [Infinity],
-  bucketCounts: string[] = ['2', '0']
-) {
-  assert.deepStrictEqual(metric, {
-    name: 'int-recorder',
-    description: 'sample recorder description',
-    unit: '1',
-    intHistogram: {
-      dataPoints: [
-        {
-          sum: '21',
-          count: '2',
-          startTimeUnixNano: '1592602232694000128',
-          timeUnixNano: time,
-          bucketCounts,
-          explicitBounds,
-        },
-      ],
-      aggregationTemporality: 'AGGREGATION_TEMPORALITY_CUMULATIVE',
-    },
-  });
-}
-
 export function ensureExportTraceServiceRequestIsSet(
   json: otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
 ) {
@@ -393,39 +259,6 @@ export function ensureExportTraceServiceRequestIsSet(
 
   const spans = instrumentationLibrarySpans[0].spans;
   assert.strictEqual(spans && spans.length, 1, 'spans are missing');
-}
-
-export function ensureExportMetricsServiceRequestIsSet(
-  json: otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
-) {
-  const resourceMetrics = json.resourceMetrics;
-  assert.strictEqual(
-    resourceMetrics.length,
-    1,
-    'resourceMetrics has incorrect length'
-  );
-
-  const resource = resourceMetrics[0].resource;
-  assert.strictEqual(!!resource, true, 'resource is missing');
-
-  const instrumentationLibraryMetrics =
-    resourceMetrics[0].instrumentationLibraryMetrics;
-  assert.strictEqual(
-    instrumentationLibraryMetrics && instrumentationLibraryMetrics.length,
-    1,
-    'instrumentationLibraryMetrics is missing'
-  );
-
-  const instrumentationLibrary =
-    instrumentationLibraryMetrics[0].instrumentationLibrary;
-  assert.strictEqual(
-    !!instrumentationLibrary,
-    true,
-    'instrumentationLibrary is missing'
-  );
-
-  const metrics = resourceMetrics[0].instrumentationLibraryMetrics[0].metrics;
-  assert.strictEqual(metrics.length, 3, 'Metrics are missing');
 }
 
 export class MockedResponse extends Stream {
