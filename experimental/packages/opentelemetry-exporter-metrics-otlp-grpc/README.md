@@ -1,4 +1,4 @@
-# OpenTelemetry Collector Exporter for node with grpc
+# OpenTelemetry Collector Metrics Exporter for node with grpc
 
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -10,7 +10,7 @@ This module provides exporter for web and node to be used with [opentelemetry-co
 ## Installation
 
 ```bash
-npm install --save @opentelemetry/exporter-otlp-grpc
+npm install --save @opentelemetry/exporter-metrics-otlp-grpc
 ```
 
 ## Service Name
@@ -136,11 +136,11 @@ const counter = meter.createCounter('metric_name');
 counter.add(10, { 'key': 'value' });
 ```
 
-## Running opentelemetry-collector locally to see the traces
+## Running opentelemetry-collector locally to see the metrics
 
 1. Go to examples/otlp-exporter-node
 2. run `npm run docker:start`
-3. Open page at `http://localhost:9411/zipkin/` to observe the traces
+3. Open page at `http://localhost:9411/zipkin/` to observe the metrics
 
 ## Useful links
 
@@ -155,11 +155,11 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-otlp-grpc
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-otlp-grpc
-[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-otlp-grpc&type=dev
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-otlp-grpc&type=dev
-[npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-otlp-grpc
-[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-otlp-grpc.svg
+[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=experimental%2Fpackages%2Fopentelemetry-exporter-metrics-otlp-grpc
+[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=experimental%2Fpackages%2Fopentelemetry-exporter-metrics-otlp-grpc
+[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=experimental%2Fpackages%2Fopentelemetry-exporter-metrics-otlp-grpc&type=dev
+[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=experimental%2Fpackages%2Fopentelemetry-exporter-metrics-otlp-grpc&type=dev
+[npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-metrics-otlp-grpc
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-metrics-otlp-grpc.svg
 [opentelemetry-collector-url]: https://github.com/open-telemetry/opentelemetry-collector
 [semconv-resource-service-name]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service
