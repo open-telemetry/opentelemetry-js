@@ -34,7 +34,7 @@ import {
   ensureMetadataIsCorrect,
   ensureResourceIsCorrect,
   mockedReadableSpan,
-} from './helper';
+} from './traceHelper';
 
 const traceServiceProtoPath =
   'opentelemetry/proto/collector/trace/v1/trace_service.proto';

@@ -20,7 +20,7 @@ import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import { OTLPExporterNodeBase } from '../src/OTLPExporterNodeBase';
 import { OTLPExporterConfigNode, ServiceClientType } from '../src/types';
-import { mockedReadableSpan } from './helper';
+import { mockedReadableSpan } from './traceHelper';
 
 class MockCollectorExporter extends OTLPExporterNodeBase<
   ReadableSpan,

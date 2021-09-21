@@ -17,12 +17,15 @@
 import {
   otlpTypes,
   toOTLPExportMetricServiceRequest,
-} from '@opentelemetry/exporter-otlp-http';
+} from '../../../../packages/opentelemetry-exporter-otlp-http';
 import { MetricRecord, MetricExporter } from '@opentelemetry/sdk-metrics-base';
-import { OTLPExporterConfigNode, ServiceClientType } from './types';
-import { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
+import {
+  OTLPExporterConfigNode,
+  OTLPExporterNodeBase,
+  ServiceClientType,
+  validateAndNormalizeUrl
+} from '../../../../packages/opentelemetry-exporter-otlp-grpc';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
-import { validateAndNormalizeUrl } from './util';
 import { Metadata } from '@grpc/grpc-js';
 
 const DEFAULT_COLLECTOR_URL = 'localhost:4317';
@@ -58,7 +61,7 @@ export class OTLPMetricExporter
     );
   }
 
-  getDefaultUrl(config: OTLPExporterConfigNode) {
+  getDefaultUrl(config: OTLPExporterConfigNode): string {
     return typeof config.url === 'string'
       ? validateAndNormalizeUrl(config.url)
       : getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0
@@ -68,7 +71,7 @@ export class OTLPMetricExporter
       : DEFAULT_COLLECTOR_URL;
   }
 
-  getServiceClientType() {
+  getServiceClientType(): ServiceClientType {
     return ServiceClientType.METRICS;
   }
 

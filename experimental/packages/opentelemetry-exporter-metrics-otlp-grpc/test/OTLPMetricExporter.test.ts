@@ -21,7 +21,7 @@ import {
   ValueRecorder,
 } from '@opentelemetry/api-metrics';
 import { diag } from '@opentelemetry/api';
-import { otlpTypes } from '@opentelemetry/exporter-otlp-http';
+import { otlpTypes } from '../../../../packages/opentelemetry-exporter-otlp-http';
 import * as metrics from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
 import * as fs from 'fs';
@@ -38,7 +38,7 @@ import {
   mockCounter,
   mockObserver,
   mockValueRecorder,
-} from './helper';
+} from './metricsHelper';
 
 const metricsServiceProtoPath =
   'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';

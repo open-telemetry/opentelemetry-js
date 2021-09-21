@@ -15,31 +15,12 @@
  */
 
 import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
-import {
-  Counter,
-  ObserverResult,
-  ValueObserver,
-  ValueRecorder,
-  ValueType,
-} from '@opentelemetry/api-metrics';
 import { otlpTypes } from '@opentelemetry/exporter-otlp-http';
-import * as metrics from '@opentelemetry/sdk-metrics-base';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as grpc from '@grpc/grpc-js';
 import { VERSION } from '@opentelemetry/core';
-
-const meterProvider = new metrics.MeterProvider({
-  interval: 30000,
-  resource: new Resource({
-    service: 'ui',
-    version: 1,
-    cost: 112.12,
-  }),
-});
-
-const meter = meterProvider.getMeter('default', '0.0.1');
 
 const traceIdArr = [
   31,
@@ -61,53 +42,6 @@ const traceIdArr = [
 ];
 const spanIdArr = [94, 16, 114, 97, 246, 79, 165, 62];
 const parentIdArr = [120, 168, 145, 80, 152, 134, 67, 136];
-
-export function mockCounter(): metrics.Metric<metrics.BoundCounter> & Counter {
-  const name = 'int-counter';
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createCounter(name, {
-      description: 'sample counter description',
-      valueType: ValueType.INT,
-    });
-  metric.clear();
-  metric.bind({});
-  return metric;
-}
-
-export function mockObserver(
-  callback: (observerResult: ObserverResult) => void
-): metrics.Metric<metrics.BoundCounter> & ValueObserver {
-  const name = 'double-observer';
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createValueObserver(
-      name,
-      {
-        description: 'sample observer description',
-        valueType: ValueType.DOUBLE,
-      },
-      callback
-    );
-  metric.clear();
-  metric.bind({});
-  return metric;
-}
-
-export function mockValueRecorder(): metrics.Metric<metrics.BoundValueRecorder> &
-  ValueRecorder {
-  const name = 'int-recorder';
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createValueRecorder(name, {
-      description: 'sample recorder description',
-      valueType: ValueType.INT,
-      boundaries: [0, 100],
-    });
-  metric.clear();
-  metric.bind({});
-  return metric;
-}
 
 export const mockedReadableSpan: ReadableSpan = {
   name: 'documentFetch',
@@ -325,83 +259,6 @@ export function ensureExportedSpanIsCorrect(
     },
     'status is wrong'
   );
-}
-
-export function ensureExportedCounterIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
-  time?: number
-) {
-  assert.deepStrictEqual(metric, {
-    name: 'int-counter',
-    description: 'sample counter description',
-    unit: '1',
-    data: 'intSum',
-    intSum: {
-      dataPoints: [
-        {
-          labels: [],
-          exemplars: [],
-          value: '1',
-          startTimeUnixNano: '1592602232694000128',
-          timeUnixNano: String(time),
-        },
-      ],
-      isMonotonic: true,
-      aggregationTemporality: 'AGGREGATION_TEMPORALITY_CUMULATIVE',
-    },
-  });
-}
-
-export function ensureExportedObserverIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
-  time?: number
-) {
-  assert.deepStrictEqual(metric, {
-    name: 'double-observer',
-    description: 'sample observer description',
-    unit: '1',
-    data: 'doubleGauge',
-    doubleGauge: {
-      dataPoints: [
-        {
-          labels: [],
-          exemplars: [],
-          value: 6,
-          startTimeUnixNano: '1592602232694000128',
-          timeUnixNano: String(time),
-        },
-      ],
-    },
-  });
-}
-
-export function ensureExportedValueRecorderIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
-  time?: number,
-  explicitBounds: number[] = [Infinity],
-  bucketCounts: string[] = ['2', '0']
-) {
-  assert.deepStrictEqual(metric, {
-    name: 'int-recorder',
-    description: 'sample recorder description',
-    unit: '1',
-    data: 'intHistogram',
-    intHistogram: {
-      dataPoints: [
-        {
-          labels: [],
-          exemplars: [],
-          sum: '21',
-          count: '2',
-          startTimeUnixNano: '1592602232694000128',
-          timeUnixNano: String(time),
-          bucketCounts,
-          explicitBounds,
-        },
-      ],
-      aggregationTemporality: 'AGGREGATION_TEMPORALITY_CUMULATIVE',
-    },
-  });
 }
 
 export function ensureResourceIsCorrect(
