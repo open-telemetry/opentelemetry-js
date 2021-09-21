@@ -32,10 +32,9 @@ import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';
 import {
-  OTLPExporterNodeConfigBase,
   OTLPMetricExporter,
 } from '../../src/platform/node';
-import * as otlpTypes from '../../src/types';
+import { OTLPExporterNodeConfigBase, otlpTypes } from '../../../../../packages/opentelemetry-exporter-otlp-http';
 import {
   ensureCounterIsCorrect,
   ensureExportMetricsServiceRequestIsSet,
@@ -44,7 +43,7 @@ import {
   mockCounter,
   mockObserver,
   mockValueRecorder,
-} from '../helper';
+} from '../metricsHelper';
 import { MockedResponse } from './nodeHelpers';
 
 const fakeRequest = {

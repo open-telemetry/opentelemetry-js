@@ -24,9 +24,7 @@ import {
   MetricRecord,
 } from '@opentelemetry/sdk-metrics-base';
 import { Resource } from '@opentelemetry/resources';
-import { OTLPExporterBase } from './OTLPExporterBase';
-import { toCollectorResource } from './transform';
-import { OTLPExporterConfigBase, opentelemetryProto } from './types';
+import { OTLPExporterBase, otlpTypes, toCollectorResource } from '../../../../packages/opentelemetry-exporter-otlp-http';
 
 /**
  * Converts labels
@@ -34,7 +32,7 @@ import { OTLPExporterConfigBase, opentelemetryProto } from './types';
  */
 export function toCollectorLabels(
   labels: Labels
-): opentelemetryProto.common.v1.StringKeyValue[] {
+): otlpTypes.opentelemetryProto.common.v1.StringKeyValue[] {
   return Object.entries(labels).map(([key, value]) => {
     return { key, value: String(value) };
   });
@@ -46,9 +44,9 @@ export function toCollectorLabels(
  */
 export function toAggregationTemporality(
   metric: MetricRecord
-): opentelemetryProto.metrics.v1.AggregationTemporality {
+): otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality {
   if (metric.descriptor.metricKind === MetricKind.VALUE_OBSERVER) {
-    return opentelemetryProto.metrics.v1.AggregationTemporality
+    return otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
       .AGGREGATION_TEMPORALITY_UNSPECIFIED;
   }
 
@@ -63,7 +61,7 @@ export function toAggregationTemporality(
 export function toDataPoint(
   metric: MetricRecord,
   startTime: number
-): opentelemetryProto.metrics.v1.DataPoint {
+): otlpTypes.opentelemetryProto.metrics.v1.DataPoint {
   return {
     labels: toCollectorLabels(metric.labels),
     value: metric.aggregator.toPoint().value as number,
@@ -82,7 +80,7 @@ export function toDataPoint(
 export function toHistogramPoint(
   metric: MetricRecord,
   startTime: number
-): opentelemetryProto.metrics.v1.HistogramDataPoint {
+): otlpTypes.opentelemetryProto.metrics.v1.HistogramDataPoint {
   const { value, timestamp } = metric.aggregator.toPoint() as {
     value: Histogram;
     timestamp: HrTime;
@@ -106,8 +104,8 @@ export function toHistogramPoint(
 export function toCollectorMetric(
   metric: MetricRecord,
   startTime: number
-): opentelemetryProto.metrics.v1.Metric {
-  const metricCollector: opentelemetryProto.metrics.v1.Metric = {
+): otlpTypes.opentelemetryProto.metrics.v1.Metric {
+  const metricCollector: otlpTypes.opentelemetryProto.metrics.v1.Metric = {
     name: metric.descriptor.name,
     description: metric.descriptor.description,
     unit: metric.descriptor.unit,
@@ -161,16 +159,16 @@ export function toCollectorMetric(
  * @param collectorMetricExporterBase
  */
 export function toOTLPExportMetricServiceRequest<
-  T extends OTLPExporterConfigBase
+  T extends otlpTypes.OTLPExporterConfigBase
 >(
   metrics: MetricRecord[],
   startTime: number,
   collectorExporterBase: OTLPExporterBase<
     T,
     MetricRecord,
-    opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
+    otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
   >
-): opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
+): otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
   const groupedMetrics: Map<
     Resource,
     Map<core.InstrumentationLibrary, MetricRecord[]>
@@ -224,7 +222,7 @@ function toCollectorInstrumentationLibraryMetrics(
   instrumentationLibrary: core.InstrumentationLibrary,
   metrics: MetricRecord[],
   startTime: number
-): opentelemetryProto.metrics.v1.InstrumentationLibraryMetrics {
+): otlpTypes.opentelemetryProto.metrics.v1.InstrumentationLibraryMetrics {
   return {
     metrics: metrics.map(metric => toCollectorMetric(metric, startTime)),
     instrumentationLibrary,
@@ -243,7 +241,7 @@ function toCollectorResourceMetrics(
   >,
   baseAttributes: SpanAttributes,
   startTime: number
-): opentelemetryProto.metrics.v1.ResourceMetrics[] {
+): otlpTypes.opentelemetryProto.metrics.v1.ResourceMetrics[] {
   return Array.from(groupedMetrics, ([resource, libMetrics]) => {
     return {
       resource: toCollectorResource(resource, baseAttributes),

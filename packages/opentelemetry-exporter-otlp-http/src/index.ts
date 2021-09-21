@@ -17,6 +17,5 @@
 export * from './OTLPExporterBase';
 export * from './platform';
 export * as otlpTypes from './types';
-export { toOTLPExportTraceServiceRequest } from './transform';
-export { toOTLPExportMetricServiceRequest } from './transformMetrics';
+export { toCollectorResource, toOTLPExportTraceServiceRequest } from './transform';
 export { appendResourcePathToUrlIfNotPresent } from './util';

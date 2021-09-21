@@ -24,12 +24,10 @@ import {
 } from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { OTLPExporterBase } from '../../src/OTLPExporterBase';
-import * as otlpTypes from '../../src/types';
-import { OTLPExporterConfigBase } from '../../src/types';
-import { mockCounter, mockObserver } from '../helper';
+import { OTLPExporterBase, otlpTypes } from '../../../../../packages/opentelemetry-exporter-otlp-http';
+import { mockCounter, mockObserver } from '../metricsHelper';
 
-type CollectorExporterConfig = OTLPExporterConfigBase;
+type CollectorExporterConfig = otlpTypes.OTLPExporterConfigBase;
 class OTLPMetricExporter extends OTLPExporterBase<
   CollectorExporterConfig,
   MetricRecord,

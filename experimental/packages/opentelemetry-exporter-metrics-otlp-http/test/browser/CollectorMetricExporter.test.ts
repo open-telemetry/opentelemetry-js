@@ -31,8 +31,7 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPMetricExporter } from '../../src/platform/browser/index';
-import * as otlpTypes from '../../src/types';
-import { OTLPExporterConfigBase } from '../../src/types';
+import { otlpTypes } from '../../../../../packages/opentelemetry-exporter-otlp-http';
 import {
   ensureCounterIsCorrect,
   ensureExportMetricsServiceRequestIsSet,
@@ -43,7 +42,7 @@ import {
   mockCounter,
   mockObserver,
   mockValueRecorder,
-} from '../helper';
+} from '../metricsHelper';
 
 describe('OTLPMetricExporter - web', () => {
   let collectorExporter: OTLPMetricExporter;
@@ -321,7 +320,7 @@ describe('OTLPMetricExporter - web', () => {
       foo: 'bar',
       bar: 'baz',
     };
-    let collectorExporterConfig: OTLPExporterConfigBase;
+    let collectorExporterConfig: otlpTypes.OTLPExporterConfigBase;
 
     beforeEach(() => {
       collectorExporterConfig = {

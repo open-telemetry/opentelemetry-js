@@ -14,5 +14,5 @@
  * limitations under the License.
  */
 
-export * from './OTLPTraceExporter';
-export * from './OTLPExporterBrowserBase';
+export * from './platform';
+export { toOTLPExportMetricServiceRequest } from './transformMetrics';

@@ -15,32 +15,34 @@
  */
 
 import { MetricRecord, MetricExporter } from '@opentelemetry/sdk-metrics-base';
-import { OTLPExporterConfigBase } from '../../types';
-import * as otlpTypes from '../../types';
-import { OTLPExporterBrowserBase } from './OTLPExporterBrowserBase';
+import { 
+  OTLPExporterNodeBase,
+  OTLPExporterNodeConfigBase,
+  otlpTypes,
+  appendResourcePathToUrlIfNotPresent
+} from '../../../../../../packages/opentelemetry-exporter-otlp-http';
 import { toOTLPExportMetricServiceRequest } from '../../transformMetrics';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
-import { appendResourcePathToUrlIfNotPresent } from '../../util';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = '/v1/metrics';
 const DEFAULT_COLLECTOR_URL=`http://localhost:55681${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 
 /**
- * Collector Metric Exporter for Web
+ * Collector Metric Exporter for Node
  */
 export class OTLPMetricExporter
-  extends OTLPExporterBrowserBase<
+  extends OTLPExporterNodeBase<
     MetricRecord,
     otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
   >
   implements MetricExporter {
   // Converts time to nanoseconds
-  private readonly _startTime = new Date().getTime() * 1000000;
+  protected readonly _startTime = new Date().getTime() * 1000000;
 
-  constructor(config: OTLPExporterConfigBase = {}) {
+  constructor(config: OTLPExporterNodeConfigBase = {}) {
     super(config);
-    this._headers = Object.assign(
-      this._headers,
+    this.headers = Object.assign(
+      this.headers,
       baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
       )
@@ -57,7 +59,7 @@ export class OTLPMetricExporter
     );
   }
 
-  getDefaultUrl(config: OTLPExporterConfigBase): string {
+  getDefaultUrl(config: OTLPExporterNodeConfigBase): string {
     return typeof config.url === 'string'
       ? config.url
       : getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0

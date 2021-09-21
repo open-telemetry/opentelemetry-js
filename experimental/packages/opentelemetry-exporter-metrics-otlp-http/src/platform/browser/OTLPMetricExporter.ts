@@ -15,32 +15,30 @@
  */
 
 import { MetricRecord, MetricExporter } from '@opentelemetry/sdk-metrics-base';
-import * as otlpTypes from '../../types';
-import { OTLPExporterNodeConfigBase } from './types';
-import { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
+import { otlpTypes, appendResourcePathToUrlIfNotPresent } from '../../../../../../packages/opentelemetry-exporter-otlp-http';
+import { OTLPExporterBrowserBase } from '../../../../../../packages/opentelemetry-exporter-otlp-http/build/esm'
 import { toOTLPExportMetricServiceRequest } from '../../transformMetrics';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
-import { appendResourcePathToUrlIfNotPresent } from '../../util';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = '/v1/metrics';
 const DEFAULT_COLLECTOR_URL=`http://localhost:55681${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 
 /**
- * Collector Metric Exporter for Node
+ * Collector Metric Exporter for Web
  */
 export class OTLPMetricExporter
-  extends OTLPExporterNodeBase<
+  extends OTLPExporterBrowserBase<
     MetricRecord,
     otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
   >
   implements MetricExporter {
   // Converts time to nanoseconds
-  protected readonly _startTime = new Date().getTime() * 1000000;
+  private readonly _startTime = new Date().getTime() * 1000000;
 
-  constructor(config: OTLPExporterNodeConfigBase = {}) {
+  constructor(config: otlpTypes.OTLPExporterConfigBase = {}) {
     super(config);
-    this.headers = Object.assign(
-      this.headers,
+    this._headers = Object.assign(
+      this._headers,
       baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
       )
@@ -57,7 +55,7 @@ export class OTLPMetricExporter
     );
   }
 
-  getDefaultUrl(config: OTLPExporterNodeConfigBase): string {
+  getDefaultUrl(config: otlpTypes.OTLPExporterConfigBase): string {
     return typeof config.url === 'string'
       ? config.url
       : getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0

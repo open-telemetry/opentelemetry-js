@@ -48,7 +48,7 @@ import {
   mockValueRecorder,
   multiInstrumentationLibraryMetricsGet,
   multiResourceMetricsGet,
-} from '../helper';
+} from '../metricsHelper';
 
 describe('transformMetrics', () => {
   describe('toCollectorMetric', async () => {
