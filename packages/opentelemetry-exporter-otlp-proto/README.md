@@ -17,6 +17,7 @@ npm install --save @opentelemetry/exporter-otlp-proto
 
 The OpenTelemetry Collector Exporter does not have a service name configuration.
 In order to set the service name, use the `service.name` resource attribute as prescribed in the [OpenTelemetry Resource Semantic Conventions][semconv-resource-service-name].
+To see documentation and sample code for the metric exporter, see the [exporter-metrics-otlp-proto package][metrics-exporter-url]
 
 ## Traces in Node - PROTO over http
 
@@ -36,28 +37,6 @@ const exporter = new OTLPTraceExporter(collectorOptions);
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 provider.register();
-
-```
-
-## Metrics in Node - PROTO over http
-
-```js
-const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
-const { OTLPMetricExporter } =  require('@opentelemetry/exporter-otlp-proto');
-const collectorOptions = {
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/metrics
-};
-const exporter = new OTLPMetricExporter(collectorOptions);
-
-// Register the exporter
-const meter = new MeterProvider({
-  exporter,
-  interval: 60000,
-}).getMeter('example-meter');
-
-// Now, start recording data
-const counter = meter.createCounter('metric_name');
-counter.add(10, { 'key': 'value' });
 
 ```
 
@@ -88,3 +67,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-collector-otlp-proto.svg
 [opentelemetry-collector-url]: https://github.com/open-telemetry/opentelemetry-collector
 [semconv-resource-service-name]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service
+[metrics-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-metrics-otlp-proto

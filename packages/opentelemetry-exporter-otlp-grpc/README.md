@@ -17,6 +17,7 @@ npm install --save @opentelemetry/exporter-otlp-grpc
 
 The OpenTelemetry Collector Exporter does not have a service name configuration.
 In order to set the service name, use the `service.name` resource attribute as prescribed in the [OpenTelemetry Resource Semantic Conventions][semconv-resource-service-name].
+To see documentation and sample code for the metric exporter, see the [exporter-metrics-otlp-grpc package][metrics-exporter-url]
 
 ## Traces in Node - GRPC
 
@@ -108,34 +109,6 @@ provider.register();
 
 Note, that this will only work if TLS is also configured on the server.
 
-## Metrics in Node - GRPC
-
-The OTLPTraceExporter in Node expects the URL to only be the hostname. It will not work with `/v1/metrics`. All options that work with trace also work with metrics.
-
-```js
-const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
-const { OTLPMetricExporter } =  require('@opentelemetry/exporter-otlp-grpc');
-const collectorOptions = {
-  // url is optional and can be omitted - default is grpc://localhost:4317
-  url: 'grpc://<collector-hostname>:<port>',
-};
-const exporter = new OTLPMetricExporter(collectorOptions);
-
-// Register the exporter
-const provider = new MeterProvider({
-  exporter,
-  interval: 60000,
-})
-['SIGINT', 'SIGTERM'].forEach(signal => {
-  process.on(signal, () => provider.shutdown().catch(console.error));
-});
-
-// Now, start recording data
-const meter = provider.getMeter('example-meter');
-const counter = meter.createCounter('metric_name');
-counter.add(10, { 'key': 'value' });
-```
-
 ## Running opentelemetry-collector locally to see the traces
 
 1. Go to examples/otlp-exporter-node
@@ -163,3 +136,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-otlp-grpc.svg
 [opentelemetry-collector-url]: https://github.com/open-telemetry/opentelemetry-collector
 [semconv-resource-service-name]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service
+[metrics-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-metrics-otlp-grpc

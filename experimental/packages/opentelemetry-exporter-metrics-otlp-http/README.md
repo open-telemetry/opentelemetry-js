@@ -25,7 +25,7 @@ The OTLPMetricExporter in Web expects the endpoint to end in `/v1/metrics`.
 
 ```js
 import { MeterProvider } from '@opentelemetry/sdk-metrics-base';
-import { OTLPMetricExporter } from '@opentelemetry/exporter-otlp-http';
+import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/metrics
   headers: {}, // an optional object containing custom headers to be sent with each request
@@ -49,7 +49,7 @@ counter.add(10, { 'key': 'value' });
 
 ```js
 const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
-const { OTLPMetricExporter } =  require('@opentelemetry/exporter-otlp-http');
+const { OTLPMetricExporter } =  require('@opentelemetry/exporter-metrics-otlp-http');
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/metrics
   concurrencyLimit: 1, // an optional limit on pending requests

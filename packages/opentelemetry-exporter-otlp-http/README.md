@@ -17,6 +17,7 @@ npm install --save @opentelemetry/exporter-otlp-http
 
 The OpenTelemetry Collector Exporter does not have a service name configuration.
 In order to set the service name, use the `service.name` resource attribute as prescribed in the [OpenTelemetry Resource Semantic Conventions][semconv-resource-service-name].
+To see documentation and sample code for the metric exporter, see the [exporter-metrics-otlp-http package][metrics-exporter-url]
 
 ## Traces in Web
 
@@ -50,32 +51,6 @@ provider.register();
 
 ```
 
-## Metrics in Web
-
-The OTLPMetricExporter in Web expects the endpoint to end in `/v1/metrics`.
-
-```js
-import { MeterProvider } from '@opentelemetry/sdk-metrics-base';
-import { OTLPMetricExporter } from '@opentelemetry/exporter-otlp-http';
-const collectorOptions = {
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/metrics
-  headers: {}, // an optional object containing custom headers to be sent with each request
-  concurrencyLimit: 1, // an optional limit on pending requests
-};
-const exporter = new OTLPMetricExporter(collectorOptions);
-
-// Register the exporter
-const meter = new MeterProvider({
-  exporter,
-  interval: 60000,
-}).getMeter('example-meter');
-
-// Now, start recording data
-const counter = meter.createCounter('metric_name');
-counter.add(10, { 'key': 'value' });
-
-```
-
 ## Traces in Node - JSON over http
 
 ```js
@@ -100,29 +75,6 @@ provider.addSpanProcessor(new BatchSpanProcessor(exporter, {
 }));
 
 provider.register();
-
-```
-
-## Metrics in Node
-
-```js
-const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
-const { OTLPMetricExporter } =  require('@opentelemetry/exporter-otlp-http');
-const collectorOptions = {
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/metrics
-  concurrencyLimit: 1, // an optional limit on pending requests
-};
-const exporter = new OTLPMetricExporter(collectorOptions);
-
-// Register the exporter
-const meter = new MeterProvider({
-  exporter,
-  interval: 60000,
-}).getMeter('example-meter');
-
-// Now, start recording data
-const counter = meter.createCounter('metric_name');
-counter.add(10, { 'key': 'value' });
 
 ```
 
@@ -186,3 +138,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [opentelemetry-collector-url]: https://github.com/open-telemetry/opentelemetry-collector
 [opentelemetry-spec-protocol-exporter]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options
 [semconv-resource-service-name]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service
+[metrics-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-metrics-otlp-http
