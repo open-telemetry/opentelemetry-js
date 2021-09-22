@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-otlp-proto",
-  "version": "0.25.1",
+  "version": "0.25.0",
   "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector using protobuf over HTTP",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",

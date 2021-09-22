@@ -82,7 +82,6 @@ export function send<ExportItem, ServiceRequest>(
   onSuccess: () => void,
   onError: (error: otlpTypes.OTLPExporterError) => void
 ): void {
-  console.log(`SERVICE CLIENT IS: ${collector.serviceClient}`);
   if (collector.serviceClient) {
     const serviceRequest = collector.convert(objects);
 
