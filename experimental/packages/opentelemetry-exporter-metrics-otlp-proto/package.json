@@ -70,6 +70,7 @@
     "@opentelemetry/core": "0.25.0",
     "@opentelemetry/exporter-otlp-http": "0.25.0",
     "@opentelemetry/exporter-otlp-proto": "0.25.0",
+    "@opentelemetry/exporter-metrics-otlp-http": "0.25.0",
     "@opentelemetry/sdk-metrics-base": "0.25.0",
     "@opentelemetry/resources": "0.25.0",
     "protobufjs": "^6.9.0"

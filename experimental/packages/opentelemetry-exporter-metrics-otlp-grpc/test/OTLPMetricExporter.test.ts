@@ -92,7 +92,9 @@ const testOTLPMetricExporter = (params: TestParams) =>
                 try {
                   exportedData = data.request.resourceMetrics;
                   reqMetadata = data.metadata;
+                  console.log(`Exporting data: ${exportedData} and metadata: ${JSON.stringify(reqMetadata)}`);
                 } catch (e) {
+                  console.log('Caught Export error: ' + e);
                   exportedData = undefined;
                 }
               },
@@ -100,17 +102,18 @@ const testOTLPMetricExporter = (params: TestParams) =>
           );
           const credentials = params.useTLS
             ? grpc.ServerCredentials.createSsl(
-                fs.readFileSync('./test/certs/ca.crt'),
+                fs.readFileSync('/Users/armiros/opentelemetry/js/opentelemetry-js/willarmiros/opentelemetry-js/experimental/packages/opentelemetry-exporter-metrics-otlp-grpc/test/certs/ca.crt'),
                 [
                   {
-                    cert_chain: fs.readFileSync('./test/certs/server.crt'),
-                    private_key: fs.readFileSync('./test/certs/server.key'),
+                    cert_chain: fs.readFileSync('/Users/armiros/opentelemetry/js/opentelemetry-js/willarmiros/opentelemetry-js/experimental/packages/opentelemetry-exporter-metrics-otlp-grpc/test/certs/server.crt'),
+                    private_key: fs.readFileSync('/Users/armiros/opentelemetry/js/opentelemetry-js/willarmiros/opentelemetry-js/experimental/packages/opentelemetry-exporter-metrics-otlp-grpc/test/certs/server.key'),
                   },
                 ]
               )
             : grpc.ServerCredentials.createInsecure();
           server.bindAsync(address, credentials, () => {
             server.start();
+            console.log(`Server started on ${address}!!`);
             done();
           });
         });
@@ -118,14 +121,15 @@ const testOTLPMetricExporter = (params: TestParams) =>
 
     after(() => {
       server.forceShutdown();
+      console.log('Server shutdown!!');
     });
 
     beforeEach(async () => {
       const credentials = params.useTLS
         ? grpc.credentials.createSsl(
-            fs.readFileSync('./test/certs/ca.crt'),
-            fs.readFileSync('./test/certs/client.key'),
-            fs.readFileSync('./test/certs/client.crt')
+            fs.readFileSync('/Users/armiros/opentelemetry/js/opentelemetry-js/willarmiros/opentelemetry-js/experimental/packages/opentelemetry-exporter-metrics-otlp-grpc/test/certs/ca.crt'),
+            fs.readFileSync('/Users/armiros/opentelemetry/js/opentelemetry-js/willarmiros/opentelemetry-js/experimental/packages/opentelemetry-exporter-metrics-otlp-grpc/test/certs/client.key'),
+            fs.readFileSync('/Users/armiros/opentelemetry/js/opentelemetry-js/willarmiros/opentelemetry-js/experimental/packages/opentelemetry-exporter-metrics-otlp-grpc/test/certs/client.crt')
           )
         : undefined;
       collectorExporter = new OTLPMetricExporter({
@@ -194,6 +198,7 @@ const testOTLPMetricExporter = (params: TestParams) =>
         const responseSpy = sinon.spy();
         collectorExporter.export(metrics, responseSpy);
         setTimeout(() => {
+          console.log(`In assertion callback with exportedData: ${exportedData} and reqMetadata: ${JSON.stringify(reqMetadata)}`);
           assert.ok(
             typeof exportedData !== 'undefined',
             'resource' + " doesn't exist"
