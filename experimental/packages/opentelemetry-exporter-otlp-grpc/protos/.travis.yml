@@ -1,0 +1,6 @@
+sudo: required
+dist: xenial
+language: go
+
+script:
+  - make ci
