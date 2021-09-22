@@ -55,6 +55,7 @@
     "access": "public"
   },
   "devDependencies": {
+    "@opentelemetry/api": "^1.0.2",
     "@babel/core": "7.15.0",
     "@types/mocha": "8.2.3",
     "@types/node": "14.17.11",
