@@ -20,12 +20,12 @@ import {
   RAW_ENVIRONMENT,
   parseEnvironment,
 } from '../../utils/environment';
+import { _globalThis } from './globalThis';
 
 /**
  * Gets the environment variables
  */
 export function getEnv(): Required<ENVIRONMENT> {
-  const _global = (typeof globalThis === 'object' ? globalThis : window) as typeof globalThis & RAW_ENVIRONMENT;
-  const globalEnv = parseEnvironment(_global);
+  const globalEnv = parseEnvironment(_globalThis as typeof globalThis & RAW_ENVIRONMENT);
   return Object.assign({}, DEFAULT_ENVIRONMENT, globalEnv);
 }
