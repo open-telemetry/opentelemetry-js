@@ -4,6 +4,7 @@
   "typedocOptions": {
     "packages": [
       "experimental/packages/opentelemetry-api-metrics",
+      "experimental/packages/opentelemetry-exporter-prometheus",
       "experimental/packages/opentelemetry-instrumentation-fetch",
       "experimental/packages/opentelemetry-instrumentation-grpc",
       "experimental/packages/opentelemetry-instrumentation-http",
@@ -18,7 +19,6 @@
       "packages/opentelemetry-exporter-otlp-grpc",
       "packages/opentelemetry-exporter-otlp-http",
       "packages/opentelemetry-exporter-otlp-proto",
-      "packages/opentelemetry-exporter-prometheus",
       "packages/opentelemetry-exporter-zipkin",
       "packages/opentelemetry-propagator-b3",
       "packages/opentelemetry-propagator-jaeger",
@@ -73,9 +73,6 @@
     },
     {
       "path": "packages/opentelemetry-exporter-otlp-proto"
-    },
-    {
-      "path": "packages/opentelemetry-exporter-prometheus"
     },
     {
       "path": "packages/opentelemetry-exporter-zipkin"
