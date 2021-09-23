@@ -36,9 +36,6 @@
       "path": "packages/opentelemetry-exporter-otlp-proto"
     },
     {
-      "path": "packages/opentelemetry-exporter-prometheus"
-    },
-    {
       "path": "packages/opentelemetry-exporter-zipkin/tsconfig.esm.json"
     },
     {
