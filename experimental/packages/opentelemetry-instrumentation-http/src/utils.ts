@@ -453,7 +453,6 @@ export const getIncomingRequestAttributes = (
   }
 
   if (requestUrl) {
-    attributes[SemanticAttributes.HTTP_ROUTE] = requestUrl.pathname || '/';
     attributes[SemanticAttributes.HTTP_TARGET] = requestUrl.pathname || '/';
   }
 

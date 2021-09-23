@@ -465,4 +465,19 @@ describe('Utility', () => {
       verifyValueInAttributes(attributes, undefined, 1200);
     });
   });
+
+  describe('getIncomingRequestAttributes()', () => {
+    it('should not set http.route in http span attributes', () => {
+      const request = {
+        url: 'http://hostname/user/:id',
+        method: 'GET'
+      } as IncomingMessage;
+      request.headers = {
+        'user-agent': 'chrome',
+        'x-forwarded-for': '<client>, <proxy1>, <proxy2>'
+      }
+      const attributes = utils.getIncomingRequestAttributes(request, { component: 'http'})
+      assert.strictEqual(attributes[SemanticAttributes.HTTP_ROUTE], undefined)
+    });
+  })
 });
