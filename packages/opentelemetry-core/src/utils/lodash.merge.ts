@@ -17,9 +17,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * based on lodash.merge
- * @TODO - should I add here more info ?
- */
+ * based on lodash in order to support esm builds without esModuleInterop.
+ * lodash is using MIT License.
+ **/
+
 const objectTag = '[object Object]';
 const nullTag = '[object Null]';
 const undefinedTag = '[object Undefined]';
@@ -82,7 +83,7 @@ export function isPlainObject(value: any) {
   if (proto === null) {
     return true;
   }
-  const  Ctor = hasOwnProperty.call(proto, 'constructor') && proto.constructor;
+  const Ctor = hasOwnProperty.call(proto, 'constructor') && proto.constructor;
   return typeof Ctor == 'function' && Ctor instanceof Ctor &&
     funcToString.call(Ctor) === objectCtorString;
 }
