@@ -496,10 +496,6 @@ export const getIncomingRequestAttributesOnResponse = (
   return attributes;
 };
 
-export interface HeaderCaptureFunction {
-  (span: Span, getHeader: (key: string) => undefined | string | string[] | number): void;
-}
-
 export function headerCapture(type: 'request' | 'response', headers: string[]) {
   const normalizedHeaders = new Map(headers.map(header => [header.toLowerCase(), header.toLowerCase().replace(/-/g, '_')]));
 
