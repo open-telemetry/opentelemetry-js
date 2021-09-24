@@ -12,7 +12,7 @@ npm install
 ```
 
 How to setup [Prometheus](https://prometheus.io/docs/prometheus/latest/getting_started/) please check
-[Setup Prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-exporter-prometheus)
+[Setup Prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-prometheus)
 
 ## Run the Application
 
