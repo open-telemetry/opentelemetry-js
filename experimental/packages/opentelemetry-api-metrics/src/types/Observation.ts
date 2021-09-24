@@ -17,7 +17,7 @@
 import { BaseObserver } from './Metric';
 
 /**
- * Interface for updating value of certain value observer
+ * Interface for updating value of certain observer
  */
 export interface Observation {
   observer: BaseObserver;

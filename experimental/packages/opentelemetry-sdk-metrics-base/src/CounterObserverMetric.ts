@@ -19,12 +19,13 @@ import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BaseObserverMetric } from './BaseObserverMetric';
 import { Processor } from './export/Processor';
-import { MetricKind } from './export/types';
+import { LastValue, MetricKind } from './export/types';
+import { ObserverResult } from './ObserverResult';
 
-/** This is a SDK implementation of UpDownSumObserver Metric. */
-export class UpDownSumObserverMetric
+/** This is a SDK implementation of CounterObserver Metric. */
+export class CounterObserverMetric
   extends BaseObserverMetric
-  implements api.UpDownSumObserver {
+  implements api.CounterObserver {
   constructor(
     name: string,
     options: api.MetricOptions,
@@ -38,9 +39,25 @@ export class UpDownSumObserverMetric
       options,
       processor,
       resource,
-      MetricKind.UP_DOWN_SUM_OBSERVER,
+      MetricKind.COUNTER_OBSERVER,
       instrumentationLibrary,
       callback
     );
+  }
+
+  protected override _processResults(observerResult: ObserverResult): void {
+    observerResult.values.forEach((value, labels) => {
+      const instrument = this.bind(labels);
+      // CounterObserver is monotonic which means it should only accept values
+      // greater or equal then previous value
+      const previous = instrument.getAggregator().toPoint();
+      let previousValue = -Infinity;
+      if (previous.timestamp[0] !== 0 || previous.timestamp[1] !== 0) {
+        previousValue = previous.value as LastValue;
+      }
+      if (value >= previousValue) {
+        instrument.update(value);
+      }
+    });
   }
 }

@@ -20,10 +20,10 @@ import { BaseObserverMetric } from './BaseObserverMetric';
 import { Processor } from './export/Processor';
 import { MetricKind } from './export/types';
 
-/** This is a SDK implementation of Value Observer Metric. */
-export class ValueObserverMetric
+/** This is a SDK implementation of Gauge Observer Metric. */
+export class GaugeObserverMetric
   extends BaseObserverMetric
-  implements api.ValueObserver {
+  implements api.GaugeObserver {
   constructor(
     name: string,
     options: api.MetricOptions,
@@ -37,7 +37,7 @@ export class ValueObserverMetric
       options,
       processor,
       resource,
-      MetricKind.VALUE_OBSERVER,
+      MetricKind.GAUGE_OBSERVER,
       instrumentationLibrary,
       callback
     );

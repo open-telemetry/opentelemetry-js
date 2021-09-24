@@ -275,7 +275,7 @@ describe('PrometheusExporter', () => {
         return 0.999;
       }
 
-      meter.createValueObserver(
+      meter.createGaugeObserver(
         'metric_observer',
         {
           description: 'a test description',
@@ -472,12 +472,12 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should export a SumObserver as a counter', done => {
+    it('should export a CounterObserver as a counter', done => {
       function getValue() {
         return 20;
       }
 
-      meter.createSumObserver(
+      meter.createCounterObserver(
         'sum_observer',
         {
           description: 'a test description',
@@ -512,12 +512,12 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should export a UpDownSumObserver as a gauge', done => {
+    it('should export a UpDownCounterObserver as a gauge', done => {
       function getValue() {
         return 20;
       }
 
-      meter.createUpDownSumObserver(
+      meter.createUpDownCounterObserver(
         'updown_observer',
         {
           description: 'a test description',
@@ -552,12 +552,12 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should export a ValueRecorder as a summary', done => {
-      const valueRecorder = meter.createValueRecorder('value_recorder', {
+    it('should export a Histogram as a summary', done => {
+      const histogram = meter.createHistogram('value_recorder', {
         description: 'a test description',
       });
 
-      valueRecorder.bind({ key1: 'labelValue1' }).record(20);
+      histogram.bind({ key1: 'labelValue1' }).record(20);
 
       meter.collect().then(() => {
         exporter.export(meter.getProcessor().checkPointSet(), () => {

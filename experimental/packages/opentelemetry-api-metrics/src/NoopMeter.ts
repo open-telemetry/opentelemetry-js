@@ -21,14 +21,15 @@ import {
   UnboundMetric,
   Labels,
   Counter,
-  ValueRecorder,
-  ValueObserver,
+  Histogram,
+  GaugeObserver,
   UpDownCounter,
   BaseObserver,
-  UpDownSumObserver,
+  CounterObserver,
+  UpDownCounterObserver,
 } from './types/Metric';
 import {
-  BoundValueRecorder,
+  BoundHistogram,
   BoundCounter,
   BoundBaseObserver,
 } from './types/BoundInstrument';
@@ -43,21 +44,49 @@ export class NoopMeter implements Meter {
   constructor() {}
 
   /**
-   * Returns constant noop value recorder.
-   * @param name the name of the metric.
-   * @param [options] the metric options.
-   */
-  createValueRecorder(_name: string, _options?: MetricOptions): ValueRecorder {
-    return NOOP_VALUE_RECORDER_METRIC;
-  }
-
-  /**
    * Returns a constant noop counter.
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createCounter(_name: string, _options?: MetricOptions): Counter {
+   createCounter(_name: string, _options?: MetricOptions): Counter {
     return NOOP_COUNTER_METRIC;
+  }
+
+  /**
+   * Returns constant noop counter observer.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   * @param [callback] the counter observer callback
+   */
+  createCounterObserver(
+    _name: string,
+    _options?: MetricOptions,
+    _callback?: (observerResult: ObserverResult) => void
+  ): CounterObserver {
+    return NOOP_COUNTER_OBSERVER_METRIC;
+  }
+
+  /**
+   * Returns constant noop histogram.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   */
+  createHistogram(_name: string, _options?: MetricOptions): Histogram {
+    return NOOP_HISTOGRAM_METRIC;
+  }
+
+  /**
+   * Returns constant noop gauge observer.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   * @param [callback] the gauge observer callback
+   */
+  createGaugeObserver(
+    _name: string,
+    _options?: MetricOptions,
+    _callback?: (observerResult: ObserverResult) => void
+  ): GaugeObserver {
+    return NOOP_GAUGE_OBSERVER_METRIC;
   }
 
   /**
@@ -70,45 +99,17 @@ export class NoopMeter implements Meter {
   }
 
   /**
-   * Returns constant noop value observer.
+   * Returns constant noop up down counter observer.
    * @param name the name of the metric.
    * @param [options] the metric options.
-   * @param [callback] the value observer callback
+   * @param [callback] the up down counter observer callback
    */
-  createValueObserver(
+  createUpDownCounterObserver(
     _name: string,
     _options?: MetricOptions,
     _callback?: (observerResult: ObserverResult) => void
-  ): ValueObserver {
-    return NOOP_VALUE_OBSERVER_METRIC;
-  }
-
-  /**
-   * Returns constant noop sum observer.
-   * @param name the name of the metric.
-   * @param [options] the metric options.
-   * @param [callback] the sum observer callback
-   */
-  createSumObserver(
-    _name: string,
-    _options?: MetricOptions,
-    _callback?: (observerResult: ObserverResult) => void
-  ): ValueObserver {
-    return NOOP_SUM_OBSERVER_METRIC;
-  }
-
-  /**
-   * Returns constant noop up down sum observer.
-   * @param name the name of the metric.
-   * @param [options] the metric options.
-   * @param [callback] the up down sum observer callback
-   */
-  createUpDownSumObserver(
-    _name: string,
-    _options?: MetricOptions,
-    _callback?: (observerResult: ObserverResult) => void
-  ): UpDownSumObserver {
-    return NOOP_UP_DOWN_SUM_OBSERVER_METRIC;
+  ): UpDownCounterObserver {
+    return NOOP_UP_DOWN_COUNTER_OBSERVER_METRIC;
   }
 
   /**
@@ -165,9 +166,9 @@ export class NoopCounterMetric
   }
 }
 
-export class NoopValueRecorderMetric
-  extends NoopMetric<BoundValueRecorder>
-  implements ValueRecorder {
+export class NoopHistogramMetric
+  extends NoopMetric<BoundHistogram>
+  implements Histogram {
   record(value: number, labels: Labels): void {
     this.bind(labels).record(value);
   }
@@ -192,7 +193,7 @@ export class NoopBoundCounter implements BoundCounter {
   }
 }
 
-export class NoopBoundValueRecorder implements BoundValueRecorder {
+export class NoopBoundHistogram implements BoundHistogram {
   record(_value: number, _baggage?: unknown, _spanContext?: unknown): void {
     return;
   }
@@ -206,21 +207,21 @@ export const NOOP_METER = new NoopMeter();
 export const NOOP_BOUND_COUNTER = new NoopBoundCounter();
 export const NOOP_COUNTER_METRIC = new NoopCounterMetric(NOOP_BOUND_COUNTER);
 
-export const NOOP_BOUND_VALUE_RECORDER = new NoopBoundValueRecorder();
-export const NOOP_VALUE_RECORDER_METRIC = new NoopValueRecorderMetric(
-  NOOP_BOUND_VALUE_RECORDER
+export const NOOP_BOUND_HISTOGRAM = new NoopBoundHistogram();
+export const NOOP_HISTOGRAM_METRIC = new NoopHistogramMetric(
+  NOOP_BOUND_HISTOGRAM
 );
 
 export const NOOP_BOUND_BASE_OBSERVER = new NoopBoundBaseObserver();
-export const NOOP_VALUE_OBSERVER_METRIC = new NoopBaseObserverMetric(
+export const NOOP_GAUGE_OBSERVER_METRIC = new NoopBaseObserverMetric(
   NOOP_BOUND_BASE_OBSERVER
 );
 
-export const NOOP_UP_DOWN_SUM_OBSERVER_METRIC = new NoopBaseObserverMetric(
+export const NOOP_UP_DOWN_COUNTER_OBSERVER_METRIC = new NoopBaseObserverMetric(
   NOOP_BOUND_BASE_OBSERVER
 );
 
-export const NOOP_SUM_OBSERVER_METRIC = new NoopBaseObserverMetric(
+export const NOOP_COUNTER_OBSERVER_METRIC = new NoopBaseObserverMetric(
   NOOP_BOUND_BASE_OBSERVER
 );
 

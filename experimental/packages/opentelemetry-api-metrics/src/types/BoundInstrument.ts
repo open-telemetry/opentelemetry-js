@@ -23,10 +23,10 @@ export interface BoundCounter {
   add(value: number): void;
 }
 
-/** ValueRecorder to report instantaneous measurement of a value. */
-export interface BoundValueRecorder {
+/** Histogram to report instantaneous measurement of a value. */
+export interface BoundHistogram {
   /**
-   * Records the given value to this value recorder.
+   * Records the given value to this histogram.
    * @param value to record.
    */
   record(value: number): void;

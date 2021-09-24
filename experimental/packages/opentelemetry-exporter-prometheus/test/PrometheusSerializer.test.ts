@@ -19,9 +19,9 @@ import {
   LastValueAggregator,
   MeterProvider,
   CounterMetric,
-  ValueRecorderMetric,
+  HistogramMetric,
   UpDownCounterMetric,
-  ValueObserverMetric,
+  GaugeObserverMetric,
 } from '@opentelemetry/sdk-metrics-base';
 import { diag, DiagLogLevel } from '@opentelemetry/api';
 import * as assert from 'assert';
@@ -99,13 +99,13 @@ describe('PrometheusSerializer', () => {
         const meter = new MeterProvider({
           processor: new ExactProcessor(LastValueAggregator),
         }).getMeter('test');
-        const observer = meter.createValueObserver(
+        const observer = meter.createGaugeObserver(
           'test',
           {},
           observerResult => {
             observerResult.observe(1, labels);
           }
-        ) as ValueObserverMetric;
+        ) as GaugeObserverMetric;
         await meter.collect();
         const records = await observer.getMetricRecord();
         const record = records[0];
@@ -126,13 +126,13 @@ describe('PrometheusSerializer', () => {
         const meter = new MeterProvider({
           processor: new ExactProcessor(LastValueAggregator),
         }).getMeter('test');
-        const observer = meter.createValueObserver(
+        const observer = meter.createGaugeObserver(
           'test',
           {},
           observerResult => {
             observerResult.observe(1, labels);
           }
-        ) as ValueObserverMetric;
+        ) as GaugeObserverMetric;
         await meter.collect();
         const records = await observer.getMetricRecord();
         const record = records[0];
@@ -153,9 +153,9 @@ describe('PrometheusSerializer', () => {
 
         const processor = new ExactProcessor(HistogramAggregator, [1, 10, 100]);
         const meter = new MeterProvider({ processor }).getMeter('test');
-        const recorder = meter.createValueRecorder('test', {
+        const recorder = meter.createHistogram('test', {
           description: 'foobar',
-        }) as ValueRecorderMetric;
+        }) as HistogramMetric;
 
         recorder.bind(labels).record(5);
 
@@ -181,10 +181,10 @@ describe('PrometheusSerializer', () => {
         const serializer = new PrometheusSerializer();
 
         const meter = new MeterProvider().getMeter('test');
-        const recorder = meter.createValueRecorder('test', {
+        const recorder = meter.createHistogram('test', {
           description: 'foobar',
           boundaries: [1, 10, 100],
-        }) as ValueRecorderMetric;
+        }) as HistogramMetric;
         recorder.bind(labels).record(5);
 
         const records = await recorder.getMetricRecord();
@@ -210,9 +210,9 @@ describe('PrometheusSerializer', () => {
 
         const processor = new ExactProcessor(HistogramAggregator, [1, 10, 100]);
         const meter = new MeterProvider({ processor }).getMeter('test');
-        const recorder = meter.createValueRecorder('test', {
+        const recorder = meter.createHistogram('test', {
           description: 'foobar',
-        }) as ValueRecorderMetric;
+        }) as HistogramMetric;
         recorder.bind(labels).record(5);
 
         const records = await recorder.getMetricRecord();
@@ -304,7 +304,7 @@ describe('PrometheusSerializer', () => {
           processor: new ExactProcessor(LastValueAggregator),
         }).getMeter('test');
         const processor = new PrometheusLabelsBatcher();
-        const observer = meter.createValueObserver(
+        const observer = meter.createGaugeObserver(
           'test',
           {
             description: 'foobar',
@@ -312,7 +312,7 @@ describe('PrometheusSerializer', () => {
           observerResult => {
             observerResult.observe(1, labels);
           }
-        ) as ValueObserverMetric;
+        ) as GaugeObserverMetric;
         await meter.collect();
         const records = await observer.getMetricRecord();
         records.forEach(it => processor.process(it));
@@ -336,9 +336,9 @@ describe('PrometheusSerializer', () => {
 
         const processor = new ExactProcessor(HistogramAggregator, [1, 10, 100]);
         const meter = new MeterProvider({ processor }).getMeter('test');
-        const recorder = meter.createValueRecorder('test', {
+        const recorder = meter.createHistogram('test', {
           description: 'foobar',
-        }) as ValueRecorderMetric;
+        }) as HistogramMetric;
         recorder.bind({ val: '1' }).record(5);
         recorder.bind({ val: '1' }).record(50);
         recorder.bind({ val: '1' }).record(120);

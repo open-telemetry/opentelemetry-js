@@ -18,12 +18,12 @@ import { BatchObserverResult } from './BatchObserverResult';
 import {
   MetricOptions,
   Counter,
-  ValueRecorder,
-  ValueObserver,
+  Histogram,
+  GaugeObserver,
   BatchObserverOptions,
   UpDownCounter,
-  SumObserver,
-  UpDownSumObserver,
+  CounterObserver,
+  UpDownCounterObserver,
 } from './Metric';
 import { ObserverResult } from './ObserverResult';
 
@@ -31,17 +31,10 @@ import { ObserverResult } from './ObserverResult';
  * An interface to allow the recording metrics.
  *
  * {@link Metric}s are used for recording pre-defined aggregation (`Counter`),
- * or raw values (`ValueRecorder`) in which the aggregation and labels
+ * or raw values (`Histogram`) in which the aggregation and labels
  * for the exported metric are deferred.
  */
 export interface Meter {
-  /**
-   * Creates and returns a new `ValueRecorder`.
-   * @param name the name of the metric.
-   * @param [options] the metric options.
-   */
-  createValueRecorder(name: string, options?: MetricOptions): ValueRecorder;
-
   /**
    * Creates a new `Counter` metric. Generally, this kind of metric when the
    * value is a quantity, the sum is of primary interest, and the event count
@@ -50,6 +43,37 @@ export interface Meter {
    * @param [options] the metric options.
    */
   createCounter(name: string, options?: MetricOptions): Counter;
+
+  /**
+   * Creates a new `CounterObserver` metric.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   * @param [callback] the observer callback
+   */
+  createCounterObserver(
+    name: string,
+    options?: MetricOptions,
+    callback?: (observerResult: ObserverResult) => void
+  ): CounterObserver;
+
+  /**
+   * Creates and returns a new `Histogram`.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   */
+  createHistogram(name: string, options?: MetricOptions): Histogram;
+
+  /**
+   * Creates a new `GaugeObserver` metric.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   * @param [callback] the observer callback
+   */
+   createGaugeObserver(
+    name: string,
+    options?: MetricOptions,
+    callback?: (observerResult: ObserverResult) => void
+  ): GaugeObserver;
 
   /**
    * Creates a new `UpDownCounter` metric. UpDownCounter is a synchronous
@@ -71,40 +95,16 @@ export interface Meter {
   createUpDownCounter(name: string, options?: MetricOptions): UpDownCounter;
 
   /**
-   * Creates a new `ValueObserver` metric.
+   * Creates a new `UpDownCounterObserver` metric.
    * @param name the name of the metric.
    * @param [options] the metric options.
    * @param [callback] the observer callback
    */
-  createValueObserver(
+  createUpDownCounterObserver(
     name: string,
     options?: MetricOptions,
     callback?: (observerResult: ObserverResult) => void
-  ): ValueObserver;
-
-  /**
-   * Creates a new `SumObserver` metric.
-   * @param name the name of the metric.
-   * @param [options] the metric options.
-   * @param [callback] the observer callback
-   */
-  createSumObserver(
-    name: string,
-    options?: MetricOptions,
-    callback?: (observerResult: ObserverResult) => void
-  ): SumObserver;
-
-  /**
-   * Creates a new `UpDownSumObserver` metric.
-   * @param name the name of the metric.
-   * @param [options] the metric options.
-   * @param [callback] the observer callback
-   */
-  createUpDownSumObserver(
-    name: string,
-    options?: MetricOptions,
-    callback?: (observerResult: ObserverResult) => void
-  ): UpDownSumObserver;
+  ): UpDownCounterObserver;
 
   /**
    * Creates a new `BatchObserver`, can be used to update many metrics
