@@ -350,6 +350,6 @@ export class Meter implements api.Meter {
    * @param name Name of metric to be created
    */
   private _isValidName(name: string): boolean {
-    return Boolean(name.match(/^[a-z][a-z0-9_.-]*$/i));
+    return Boolean(name.match(/^[a-z][a-z0-9_.-]{0,62}$/i));
   }
 }

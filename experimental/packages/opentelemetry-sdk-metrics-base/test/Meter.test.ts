@@ -295,6 +295,11 @@ describe('Meter', () => {
         const counter = meter.createCounter('name with invalid characters^&*(');
         assert.ok(counter instanceof api.NoopMetric);
       });
+
+      it('should return no op metric if name exceeded length of 63', () => {
+        const counter = meter.createCounter('name_with_length_of_64_so_this_is_soooooooooooooooooooooooo_long');
+        assert.ok(counter instanceof api.NoopMetric);
+      });
     });
   });
 
