@@ -923,8 +923,8 @@ describe('HttpInstrumentation', () => {
       });
       instrumentation.enable();
       server = http.createServer((request, response) => {
-        response.setHeader('X-Server-Header1', 'server123');
-        response.setHeader('X-Server-Header2', '123server');
+        response.setHeader('X-ServeR-header1', 'server123');
+        response.setHeader('X-Server-header2', '123server');
         response.end('Test Server Response');
       });
 
@@ -941,8 +941,8 @@ describe('HttpInstrumentation', () => {
         `${protocol}://${hostname}:${serverPort}${pathname}`,
         {
           headers: {
-            'X-Client-Header1': 'client123',
-            'X-Client-Header2': '123client',
+            'X-client-header1': 'client123',
+            'X-CLIENT-HEADER2': '123client',
           }
         }
       );
