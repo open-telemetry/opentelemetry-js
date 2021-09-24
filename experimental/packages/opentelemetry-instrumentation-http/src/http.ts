@@ -283,8 +283,6 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       this._callRequestHook(span, request);
     }
 
-    this._headerCapture.client.captureRequestHeaders(span, header => request.getHeader(header));
-
     /*
      * User 'response' event listeners can be added before our listener,
      * force our listener to be the first, so response emitter is bound
@@ -302,6 +300,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           this._callResponseHook(span, response);
         }
 
+        this._headerCapture.client.captureRequestHeaders(span, header => request.getHeader(header));
         this._headerCapture.client.captureResponseHeaders(span, header => response.headers[header]);
 
         context.bind(context.active(), response);
