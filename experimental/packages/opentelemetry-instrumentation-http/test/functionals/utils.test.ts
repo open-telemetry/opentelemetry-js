@@ -465,4 +465,65 @@ describe('Utility', () => {
       verifyValueInAttributes(attributes, undefined, 1200);
     });
   });
+
+  describe('headers to span attributes capture', () => {
+    let span: Span;
+
+    beforeEach(() => {
+      span = new Span(
+        new BasicTracerProvider().getTracer('default'),
+        ROOT_CONTEXT,
+        'test',
+        { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
+        SpanKind.INTERNAL
+      );
+    });
+
+    it('should set attributes for request and response keys', () => {
+      utils.headerCapture('request', ['Origin'])(span, () => 'localhost');
+      utils.headerCapture('response', ['Cookie'])(span, () => 'token=123');
+      assert.deepStrictEqual(span.attributes['http.request.header.origin'], ['localhost']);
+      assert.deepStrictEqual(span.attributes['http.response.header.cookie'], ['token=123']);
+    });
+
+    it('should set attributes for multiple values', () => {
+      utils.headerCapture('request', ['Origin'])(span, () => ['localhost', 'www.example.com']);
+      assert.deepStrictEqual(span.attributes['http.request.header.origin'], ['localhost', 'www.example.com']);
+    });
+
+    it('sets attributes for multiple headers', () => {
+      utils.headerCapture('request', ['Origin', 'Foo'])(span, header => {
+        if (header === 'origin') {
+          return 'localhost';
+        }
+
+        if (header === 'foo') {
+          return 42;
+        }
+
+        return undefined;
+      });
+
+      assert.deepStrictEqual(span.attributes['http.request.header.origin'], ['localhost']);
+      assert.deepStrictEqual(span.attributes['http.request.header.foo'], [42]);
+    });
+
+    it('should normalize header names', () => {
+      utils.headerCapture('request', ['X-Forwarded-For'])(span, () => 'foo');
+      assert.deepStrictEqual(span.attributes['http.request.header.x_forwarded_for'], ['foo']);
+    });
+
+    it('ignores non-existent headers', () => {
+      utils.headerCapture('request', ['Origin', 'Accept'])(span, header => {
+        if (header === 'origin') {
+          return 'localhost';
+        }
+
+        return undefined;
+      });
+
+      assert.deepStrictEqual(span.attributes['http.request.header.origin'], ['localhost']);
+      assert.deepStrictEqual(span.attributes['http.request.header.accept'], undefined);
+    })
+  });
 });
