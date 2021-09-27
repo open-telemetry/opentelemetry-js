@@ -72,7 +72,6 @@ describe('OTLPMetricExporter - node with json over http', () => {
       // Need to stub/spy on the underlying logger as the "diag" instance is global
       const spyLoggerWarn = sinon.stub(diag, 'warn');
       collectorExporter = new OTLPMetricExporter({
-        serviceName: 'basic-service',
         url: address,
         metadata,
       } as any);
