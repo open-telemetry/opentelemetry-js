@@ -27,15 +27,6 @@
       "path": "packages/opentelemetry-exporter-jaeger"
     },
     {
-      "path": "packages/opentelemetry-exporter-otlp-grpc"
-    },
-    {
-      "path": "packages/opentelemetry-exporter-otlp-http/tsconfig.esm.json"
-    },
-    {
-      "path": "packages/opentelemetry-exporter-otlp-proto"
-    },
-    {
       "path": "packages/opentelemetry-exporter-zipkin/tsconfig.esm.json"
     },
     {
