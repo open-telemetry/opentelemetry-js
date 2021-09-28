@@ -4,6 +4,92 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.26.0
+
+### :boom: Breaking Change
+
+* `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-otlp-grpc`, `opentelemetry-exporter-otlp-http`, `opentelemetry-exporter-otlp-proto`
+  * [#2476](https://github.com/open-telemetry/opentelemetry-js/pull/2476) chore!: rename collector exporters ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-core`, `opentelemetry-instrumentation-grpc`, `opentelemetry-sdk-trace-base`, `opentelemetry-shim-opentracing`
+  * [#2429](https://github.com/open-telemetry/opentelemetry-js/pull/2429) fix!: remove 'Http' from W3C propagator names ([@aabmass](https://github.com/aabmass))
+
+### :rocket: (Enhancement)
+
+* `opentelemetry-core`, `opentelemetry-sdk-trace-base`
+  * [#2430](https://github.com/open-telemetry/opentelemetry-js/pull/2430) feat(opentelemetry-sdk-trace-base): implemented general limits of attributes ([@banothurameshnaik](https://github.com/banothurameshnaik))
+  * [#2418](https://github.com/open-telemetry/opentelemetry-js/pull/2418) feat(opentelemetry-sdk-trace-base): implemented option to limit length of values of attributes ([@banothurameshnaik](https://github.com/banothurameshnaik))
+* `opentelemetry-instrumentation`
+  * [#2450](https://github.com/open-telemetry/opentelemetry-js/pull/2450) fix: handle missing package.json file when checking for version ([@nozik](https://github.com/nozik))
+* `opentelemetry-semantic-conventions`
+  * [#2456](https://github.com/open-telemetry/opentelemetry-js/pull/2456) feat: upgrade semantic conventions to the latest 1.6.1 version ([@weyert](https://github.com/weyert))
+* `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`
+  * [#2438](https://github.com/open-telemetry/opentelemetry-js/pull/2438) feat: OTEL_EXPORTER_OTLP_ENDPOINT append version and signal ([@longility](https://github.com/longility))
+
+### :bug: (Bug Fix)
+
+* Other
+  * [#2494](https://github.com/open-telemetry/opentelemetry-js/pull/2494) fix: remove setting http.route in http span attributes ([@mustafain117](https://github.com/mustafain117))
+* `opentelemetry-instrumentation-fetch`
+  * [#2426](https://github.com/open-telemetry/opentelemetry-js/pull/2426) fix(opentelemetry-instrumentation-fetch): fixed override of headers ([@philipszalla](https://github.com/philipszalla))
+* `opentelemetry-sdk-trace-base`
+  * [#2434](https://github.com/open-telemetry/opentelemetry-js/pull/2434) fix: ReferenceError when OTEL_TRACES_SAMPLER used without OTEL_TRACES_SAMPLER_ARG ([@hermanbanken](https://github.com/hermanbanken))
+
+### :books: (Refine Doc)
+
+* [#2478](https://github.com/open-telemetry/opentelemetry-js/pull/2478) Update links to packages moved to experimental ([@jessitron](https://github.com/jessitron))
+* [#2463](https://github.com/open-telemetry/opentelemetry-js/pull/2463) docs(README): Fix links in README.md ([@JamesJHPark](https://github.com/JamesJHPark))
+* [#2437](https://github.com/open-telemetry/opentelemetry-js/pull/2437) docs(examples): updated examples readme links ([@banothurameshnaik](https://github.com/banothurameshnaik))
+* [#2421](https://github.com/open-telemetry/opentelemetry-js/pull/2421) docs(website): support GH page links to canonical src ([@chalin](https://github.com/chalin))
+* [#2408](https://github.com/open-telemetry/opentelemetry-js/pull/2408) docs: make link to exporters filter only exporters ([@Rauno56](https://github.com/Rauno56))
+* [#2297](https://github.com/open-telemetry/opentelemetry-js/pull/2297) eslint configuration for getting-started examples ([@alisabzevari](https://github.com/alisabzevari))
+
+### :house: (Internal)
+
+* `opentelemetry-exporter-otlp-http`
+  * [#2490](https://github.com/open-telemetry/opentelemetry-js/pull/2490) chore: mark otlp exporters experimental ([@dyladan](https://github.com/dyladan))
+  * [#2491](https://github.com/open-telemetry/opentelemetry-js/pull/2491) fix: remove usage of serviceName property in tests for otel collector ([@mustafain117](https://github.com/mustafain117))
+* `opentelemetry-sdk-node`
+  * [#2473](https://github.com/open-telemetry/opentelemetry-js/pull/2473) chore: move sdk-node to experimental ([@dyladan](https://github.com/dyladan))
+  * [#2453](https://github.com/open-telemetry/opentelemetry-js/pull/2453) chore(sdk-node): fix lint warnings ([@alisabzevari](https://github.com/alisabzevari))
+* Other
+  * [#2469](https://github.com/open-telemetry/opentelemetry-js/pull/2469) Drop website_docs folder ([@chalin](https://github.com/chalin))
+  * [#2474](https://github.com/open-telemetry/opentelemetry-js/pull/2474) chore: move missed test file to its package ([@dyladan](https://github.com/dyladan))
+  * [#2435](https://github.com/open-telemetry/opentelemetry-js/pull/2435) chore: simplify unit test cache ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-context-zone`, `opentelemetry-core`, `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`, `opentelemetry-exporter-prometheus`, `opentelemetry-exporter-zipkin`, `opentelemetry-instrumentation-fetch`, `opentelemetry-instrumentation-grpc`, `opentelemetry-instrumentation-http`, `opentelemetry-instrumentation-xml-http-request`, `opentelemetry-propagator-b3`, `opentelemetry-propagator-jaeger`, `opentelemetry-resources`, `opentelemetry-sdk-metrics-base`, `opentelemetry-sdk-node`, `opentelemetry-sdk-trace-base`, `opentelemetry-sdk-trace-web`
+  * [#2462](https://github.com/open-telemetry/opentelemetry-js/pull/2462) chore: split stable and experimental packages into groups using directories ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-instrumentation-http`
+  * [#2126](https://github.com/open-telemetry/opentelemetry-js/pull/2126) feat(instrumentation-http): add diag debug on http request events ([@Asafb26](https://github.com/Asafb26))
+  * [#2455](https://github.com/open-telemetry/opentelemetry-js/pull/2455) chore(instrumentation-http): fix lint warnings ([@alisabzevari](https://github.com/alisabzevari))
+* `opentelemetry-instrumentation-fetch`
+  * [#2454](https://github.com/open-telemetry/opentelemetry-js/pull/2454) chore(instrumentation-fetch): fix lint warnings ([@alisabzevari](https://github.com/alisabzevari))
+* `opentelemetry-exporter-collector`
+  * [#2452](https://github.com/open-telemetry/opentelemetry-js/pull/2452) chore(exporter-collector): fix lint warnings ([@alisabzevari](https://github.com/alisabzevari))
+* `opentelemetry-sdk-trace-base`, `opentelemetry-sdk-trace-node`
+  * [#2446](https://github.com/open-telemetry/opentelemetry-js/pull/2446) chore(sdk-trace): fix lint warnings ([@alisabzevari](https://github.com/alisabzevari))
+* `opentelemetry-exporter-prometheus`, `opentelemetry-exporter-zipkin`, `opentelemetry-shim-opentracing`
+  * [#2447](https://github.com/open-telemetry/opentelemetry-js/pull/2447) chore(exporter): fix lint warnings ([@alisabzevari](https://github.com/alisabzevari))
+
+### Committers: 18
+
+* Aaron Abbott ([@aabmass](https://github.com/aabmass))
+* Ali Sabzevari ([@alisabzevari](https://github.com/alisabzevari))
+* Asaf Ben Aharon ([@Asafb26](https://github.com/Asafb26))
+* Banothu Ramesh Naik ([@banothurameshnaik](https://github.com/banothurameshnaik))
+* Daniel Dyla ([@dyladan](https://github.com/dyladan))
+* Gerhard Stöbich ([@Flarna](https://github.com/Flarna))
+* Herman ([@hermanbanken](https://github.com/hermanbanken))
+* James ([@JamesJHPark](https://github.com/JamesJHPark))
+* Jessica Kerr ([@jessitron](https://github.com/jessitron))
+* Long Mai ([@longility](https://github.com/longility))
+* Mustafain Ali Khan ([@mustafain117](https://github.com/mustafain117))
+* Patrice Chalin ([@chalin](https://github.com/chalin))
+* Philip Szalla ([@philipszalla](https://github.com/philipszalla))
+* Ran Nozik ([@nozik](https://github.com/nozik))
+* Rauno Viskus ([@Rauno56](https://github.com/Rauno56))
+* Siim Kallas ([@seemk](https://github.com/seemk))
+* Weyert de Boer ([@weyert](https://github.com/weyert))
+* legendecas ([@legendecas](https://github.com/legendecas))
+
 ## 0.25.0
 
 ### :boom: Breaking Change
