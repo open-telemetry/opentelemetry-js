@@ -1,8 +1,8 @@
 # Overview
 
-This example shows how to use [@opentelemetry/exporter-otlp-http](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-exporter-otlp-http) to instrument a simple Node.js application.
+This example shows how to use [@opentelemetry/exporter-otlp-http](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-otlp-http) to instrument a simple Node.js application.
 
-This example will export spans data simultaneously using [Exporter Collector](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-exporter-otlp-http) and grpc. It will use [proto format](https://github.com/open-telemetry/opentelemetry-proto).
+This example will export spans data simultaneously using [Exporter Collector](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-otlp-http) and grpc. It will use [proto format](https://github.com/open-telemetry/opentelemetry-proto).
 
 ## Installation
 
