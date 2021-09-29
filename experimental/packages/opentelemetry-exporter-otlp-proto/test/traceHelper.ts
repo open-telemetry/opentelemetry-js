@@ -15,45 +15,28 @@
  */
 
 import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
+import { hexToBase64 } from '@opentelemetry/core';
 import { otlpTypes } from '@opentelemetry/exporter-otlp-http';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
-import * as grpc from '@grpc/grpc-js';
-import { VERSION } from '@opentelemetry/core';
+import { Stream } from 'stream';
 
-const traceIdArr = [
-  31,
-  16,
-  8,
-  220,
-  142,
-  39,
-  14,
-  133,
-  196,
-  10,
-  13,
-  124,
-  57,
-  57,
-  178,
-  120,
-];
-const spanIdArr = [94, 16, 114, 97, 246, 79, 165, 62];
-const parentIdArr = [120, 168, 145, 80, 152, 134, 67, 136];
+const traceIdHex = '1f1008dc8e270e85c40a0d7c3939b278';
+const spanIdHex = '5e107261f64fa53e';
+const parentIdHex = '78a8915098864388';
 
 export const mockedReadableSpan: ReadableSpan = {
   name: 'documentFetch',
   kind: 0,
   spanContext: () => {
     return {
-      traceId: '1f1008dc8e270e85c40a0d7c3939b278',
-      spanId: '5e107261f64fa53e',
+      traceId: traceIdHex,
+      spanId: spanIdHex,
       traceFlags: TraceFlags.SAMPLED,
     };
   },
-  parentSpanId: '78a8915098864388',
+  parentSpanId: parentIdHex,
   startTime: [1574120165, 429803070],
   endTime: [1574120165, 438688070],
   ended: true,
@@ -62,8 +45,8 @@ export const mockedReadableSpan: ReadableSpan = {
   links: [
     {
       context: {
-        traceId: '1f1008dc8e270e85c40a0d7c3939b278',
-        spanId: '78a8915098864388',
+        traceId: traceIdHex,
+        spanId: parentIdHex,
         traceFlags: TraceFlags.SAMPLED,
       },
       attributes: { component: 'document-load' },
@@ -92,74 +75,66 @@ export const mockedReadableSpan: ReadableSpan = {
     },
   ],
   duration: [0, 8885000],
-  resource: Resource.default().merge(new Resource({
+  resource: new Resource({
     service: 'ui',
     version: 1,
     cost: 112.12,
-  })),
+  }),
   instrumentationLibrary: { name: 'default', version: '0.0.1' },
 };
 
-export function ensureExportedEventsAreCorrect(
+export function ensureProtoEventsAreCorrect(
   events: otlpTypes.opentelemetryProto.trace.v1.Span.Event[]
 ) {
   assert.deepStrictEqual(
     events,
     [
       {
-        attributes: [],
         timeUnixNano: '1574120165429803008',
         name: 'fetchStart',
         droppedAttributesCount: 0,
       },
       {
-        attributes: [],
         timeUnixNano: '1574120165429803008',
         name: 'domainLookupStart',
         droppedAttributesCount: 0,
       },
       {
-        attributes: [],
         timeUnixNano: '1574120165429803008',
         name: 'domainLookupEnd',
         droppedAttributesCount: 0,
       },
       {
-        attributes: [],
         timeUnixNano: '1574120165429803008',
         name: 'connectStart',
         droppedAttributesCount: 0,
       },
       {
-        attributes: [],
         timeUnixNano: '1574120165429803008',
         name: 'connectEnd',
         droppedAttributesCount: 0,
       },
       {
-        attributes: [],
         timeUnixNano: '1574120165435513088',
         name: 'requestStart',
         droppedAttributesCount: 0,
       },
       {
-        attributes: [],
         timeUnixNano: '1574120165436923136',
         name: 'responseStart',
         droppedAttributesCount: 0,
       },
       {
-        attributes: [],
         timeUnixNano: '1574120165438688000',
         name: 'responseEnd',
         droppedAttributesCount: 0,
       },
     ],
-    'exported events are incorrect'
+    'events are incorrect'
   );
 }
 
-export function ensureExportedAttributesAreCorrect(
+export function ensureProtoAttributesAreCorrect(
   attributes: otlpTypes.opentelemetryProto.common.v1.KeyValue[]
 ) {
   assert.deepStrictEqual(
@@ -169,66 +144,62 @@ export function ensureExportedAttributesAreCorrect(
         key: 'component',
         value: {
           stringValue: 'document-load',
-          value: 'stringValue',
         },
       },
     ],
-    'exported attributes are incorrect'
+    'attributes are incorrect'
   );
 }
 
-export function ensureExportedLinksAreCorrect(
+export function ensureProtoLinksAreCorrect(
   attributes: otlpTypes.opentelemetryProto.trace.v1.Span.Link[]
 ) {
   assert.deepStrictEqual(
     attributes,
     [
       {
+        traceId: hexToBase64(traceIdHex),
+        spanId: hexToBase64(parentIdHex),
         attributes: [
           {
             key: 'component',
             value: {
               stringValue: 'document-load',
-              value: 'stringValue',
             },
           },
         ],
-        traceId: Buffer.from(traceIdArr),
-        spanId: Buffer.from(parentIdArr),
-        traceState: '',
         droppedAttributesCount: 0,
       },
     ],
-    'exported links are incorrect'
+    'links are incorrect'
   );
 }
 
-export function ensureExportedSpanIsCorrect(
+export function ensureProtoSpanIsCorrect(
   span: otlpTypes.opentelemetryProto.trace.v1.Span
 ) {
   if (span.attributes) {
-    ensureExportedAttributesAreCorrect(span.attributes);
+    ensureProtoAttributesAreCorrect(span.attributes);
   }
   if (span.events) {
-    ensureExportedEventsAreCorrect(span.events);
+    ensureProtoEventsAreCorrect(span.events);
   }
   if (span.links) {
-    ensureExportedLinksAreCorrect(span.links);
+    ensureProtoLinksAreCorrect(span.links);
   }
   assert.deepStrictEqual(
     span.traceId,
-    Buffer.from(traceIdArr),
-    'traceId is wrong'
+    hexToBase64(traceIdHex),
+    'traceId is' + ' wrong'
   );
   assert.deepStrictEqual(
     span.spanId,
-    Buffer.from(spanIdArr),
-    'spanId is wrong'
+    hexToBase64(spanIdHex),
+    'spanId is' + ' wrong'
   );
-  assert.strictEqual(span.traceState, '', 'traceState is wrong');
   assert.deepStrictEqual(
     span.parentSpanId,
-    Buffer.from(parentIdArr),
+    hexToBase64(parentIdHex),
     'parentIdArr is wrong'
   );
   assert.strictEqual(span.name, 'documentFetch', 'name is wrong');
@@ -252,80 +223,59 @@ export function ensureExportedSpanIsCorrect(
   assert.strictEqual(span.droppedLinksCount, 0, 'droppedLinksCount is wrong');
   assert.deepStrictEqual(
     span.status,
-    {
-      code: 'STATUS_CODE_OK',
-      deprecatedCode: 'DEPRECATED_STATUS_CODE_OK',
-      message: '',
-    },
+    { code: 'STATUS_CODE_OK' },
     'status is wrong'
   );
 }
 
-export function ensureResourceIsCorrect(
-  resource: otlpTypes.opentelemetryProto.resource.v1.Resource
+export function ensureExportTraceServiceRequestIsSet(
+  json: otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
 ) {
-  assert.deepStrictEqual(resource, {
-    attributes: [
-      {
-        'key': 'service.name',
-        'value': {
-          'stringValue': `unknown_service:${process.argv0}`,
-          'value': 'stringValue'
-        }
-      },
-      {
-        'key': 'telemetry.sdk.language',
-        'value': {
-          'stringValue': 'nodejs',
-          'value': 'stringValue'
-        }
-      },
-      {
-        'key': 'telemetry.sdk.name',
-        'value': {
-          'stringValue': 'opentelemetry',
-          'value': 'stringValue'
-        }
-      },
-      {
-        'key': 'telemetry.sdk.version',
-        'value': {
-          'stringValue': VERSION,
-          'value': 'stringValue'
-        }
-      },
-      {
-        key: 'service',
-        value: {
-          stringValue: 'ui',
-          value: 'stringValue',
-        },
-      },
-      {
-        key: 'version',
-        value: {
-          intValue: '1',
-          value: 'intValue',
-        },
-      },
-      {
-        key: 'cost',
-        value: {
-          doubleValue: 112.12,
-          value: 'doubleValue',
-        },
-      },
-    ],
-    droppedAttributesCount: 0,
-  });
+  const resourceSpans = json.resourceSpans;
+  assert.strictEqual(
+    resourceSpans && resourceSpans.length,
+    1,
+    'resourceSpans is missing'
+  );
+
+  const resource = resourceSpans[0].resource;
+  assert.strictEqual(!!resource, true, 'resource is missing');
+
+  const instrumentationLibrarySpans =
+    resourceSpans[0].instrumentationLibrarySpans;
+  assert.strictEqual(
+    instrumentationLibrarySpans && instrumentationLibrarySpans.length,
+    1,
+    'instrumentationLibrarySpans is missing'
+  );
+
+  const instrumentationLibrary =
+    instrumentationLibrarySpans[0].instrumentationLibrary;
+  assert.strictEqual(
+    !!instrumentationLibrary,
+    true,
+    'instrumentationLibrary is missing'
+  );
+
+  const spans = instrumentationLibrarySpans[0].spans;
+  assert.strictEqual(spans && spans.length, 1, 'spans are missing');
 }
 
-export function ensureMetadataIsCorrect(
-  actual: grpc.Metadata,
-  expected: grpc.Metadata
-) {
-  //ignore user agent
-  expected.remove('user-agent');
-  actual.remove('user-agent');
-  assert.deepStrictEqual(actual.getMap(), expected.getMap());
+export class MockedResponse extends Stream {
+  constructor(private _code: number, private _msg?: string) {
+    super();
+  }
+
+  send(data: string) {
+    this.emit('data', data);
+    this.emit('end');
+  }
+
+  get statusCode() {
+    return this._code;
+  }
+
+  get statusMessage() {
+    return this._msg;
+  }
 }
