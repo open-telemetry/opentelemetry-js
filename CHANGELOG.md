@@ -20,6 +20,8 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: (Bug Fix)
 
+* `opentelemetry-instrumentation-grpc`, `opentelemetry-instrumentation-http`, `opentelemetry-instrumentation-jaeger`, `opentelemetry-exporter-zipkin`, `opentelemetry-sdk-trace-base`
+  * [#2499](https://github.com/open-telemetry/opentelemetry-js/pull/2499) fix: 2389- replaced logger unformatted strings with template literals ([@PaurushGarg](https://github.com/PaurushGarg))
 * `opentelemetry-instrumentation-fetch`
   * [#2411](https://github.com/open-telemetry/opentelemetry-js/pull/2411) fix(instrumentation-fetch): `fetch(string, Request)` silently drops request body ([@t2t2](https://github.com/t2t2))
 * `opentelemetry-sdk-trace-base`
