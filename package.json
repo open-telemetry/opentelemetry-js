@@ -7,7 +7,7 @@
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js-contrib",
   "scripts": {
-    "precompile": "tsc --version && lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
+    "precompile": "tsc --version && lerna run version --scope @opentelemetry/propagator-aws-xray --include-filtered-dependencies",
     "prewatch": "npm run precompile",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json",
