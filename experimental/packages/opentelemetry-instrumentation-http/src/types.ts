@@ -103,6 +103,11 @@ export interface HttpInstrumentationConfig extends InstrumentationConfig {
   requireParentforOutgoingSpans?: boolean;
   /** Require parent to create span for incoming requests */
   requireParentforIncomingSpans?: boolean;
+  /** Map the following HTTP headers to span attributes. */
+  headersToSpanAttributes?: {
+    client?: { requestHeaders?: string[]; responseHeaders?: string[]; },
+    server?: { requestHeaders?: string[]; responseHeaders?: string[]; },
+  }
 }
 
 export interface Err extends Error {

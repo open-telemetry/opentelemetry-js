@@ -58,6 +58,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span> = new WeakSet<Span>();
   private readonly _version = process.versions.node;
+  private _headerCapture;
 
   constructor(config: HttpInstrumentationConfig & InstrumentationConfig = {}) {
     super(
@@ -65,6 +66,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       VERSION,
       Object.assign({}, config)
     );
+
+    this._headerCapture = this._createHeaderCapture();
   }
 
   private _getConfig(): HttpInstrumentationConfig {
@@ -73,6 +76,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
   override setConfig(config: HttpInstrumentationConfig & InstrumentationConfig = {}): void {
     this._config = Object.assign({}, config);
+    this._headerCapture = this._createHeaderCapture();
   }
 
   init(): [InstrumentationNodeModuleDefinition<Https>, InstrumentationNodeModuleDefinition<Http>] {
@@ -296,6 +300,9 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           this._callResponseHook(span, response);
         }
 
+        this._headerCapture.client.captureRequestHeaders(span, header => request.getHeader(header));
+        this._headerCapture.client.captureResponseHeaders(span, header => response.headers[header]);
+
         context.bind(context.active(), response);
         this._diag.debug('outgoingRequest on response()');
         response.on('end', () => {
@@ -424,6 +431,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
             instrumentation._callResponseHook(span, response);
           }
 
+          instrumentation._headerCapture.server.captureRequestHeaders(span, header => request.headers[header]);
+
           // Wraps end (inspired by:
           // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/instrumentations/instrumentation-connect.ts#L75)
           const originalEnd = response.end;
@@ -448,6 +457,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
               request,
               response
             );
+
+            instrumentation._headerCapture.server.captureResponseHeaders(span, header => response.getHeader(header));
 
             span
               .setAttributes(attributes)
@@ -660,6 +671,21 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         () => { },
         true
       );
+    }
+  }
+
+  private _createHeaderCapture() {
+    const config = this._getConfig();
+
+    return {
+      client: {
+        captureRequestHeaders: utils.headerCapture('request', config.headersToSpanAttributes?.client?.requestHeaders ?? []),
+        captureResponseHeaders: utils.headerCapture('response', config.headersToSpanAttributes?.client?.responseHeaders ?? [])
+      },
+      server: {
+        captureRequestHeaders: utils.headerCapture('request', config.headersToSpanAttributes?.server?.requestHeaders ?? []),
+        captureResponseHeaders: utils.headerCapture('response', config.headersToSpanAttributes?.server?.responseHeaders ?? []),
+      }
     }
   }
 }
