@@ -3,6 +3,7 @@
   "version": "0.25.0",
   "npmClient": "npm",
   "packages": [
-    "packages/*"
+    "packages/*",
+    "backwards-compatability/*"
   ]
 }
