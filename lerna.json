@@ -4,7 +4,6 @@
   "npmClient": "npm",
   "packages": [
     "benchmark/*",
-    "backwards-compatability/*",
     "packages/*",
     "integration-tests/*"
   ]
