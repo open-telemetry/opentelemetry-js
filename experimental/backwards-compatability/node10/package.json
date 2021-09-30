@@ -5,7 +5,7 @@
   "description": "Backwards compatability app for node8 types and the OpenTelemetry Node.js SDK",
   "main": "index.js",
   "scripts": {
-    "test:backcompat": "tsc --noEmit index.ts"
+    "test:backcompat": "tsc --noEmit index.ts && tsc --noEmit --esModuleInterop index.ts"
   },
   "dependencies": {
     "@opentelemetry/sdk-node": "0.25.0",
