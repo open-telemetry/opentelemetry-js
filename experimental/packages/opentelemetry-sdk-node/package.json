@@ -43,21 +43,21 @@
   },
   "dependencies": {
     "@opentelemetry/api-metrics": "0.25.0",
-    "@opentelemetry/core": "0.25.0",
+    "@opentelemetry/core": "0.26.0",
     "@opentelemetry/instrumentation": "0.25.0",
     "@opentelemetry/resource-detector-aws": "0.24.0",
     "@opentelemetry/resource-detector-gcp": "0.24.0",
-    "@opentelemetry/resources": "0.25.0",
+    "@opentelemetry/resources": "0.26.0",
     "@opentelemetry/sdk-metrics-base": "0.25.0",
-    "@opentelemetry/sdk-trace-base": "0.25.0",
-    "@opentelemetry/sdk-trace-node": "0.25.0"
+    "@opentelemetry/sdk-trace-base": "0.26.0",
+    "@opentelemetry/sdk-trace-node": "0.26.0"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.0.2"
   },
   "devDependencies": {
     "@opentelemetry/api": "^1.0.2",
-    "@opentelemetry/context-async-hooks": "0.25.0",
+    "@opentelemetry/context-async-hooks": "0.26.0",
     "@types/mocha": "8.2.3",
     "@types/node": "14.17.11",
     "@types/semver": "7.3.8",
