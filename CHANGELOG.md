@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 1.0.0
+
+No changes
+
 ## 0.26.0
 
 ### :boom: Breaking Change
