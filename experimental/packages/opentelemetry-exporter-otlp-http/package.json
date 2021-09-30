@@ -87,9 +87,9 @@
   },
   "dependencies": {
     "@opentelemetry/api-metrics": "0.25.0",
-    "@opentelemetry/core": "0.25.0",
-    "@opentelemetry/resources": "0.25.0",
+    "@opentelemetry/core": "0.26.0",
+    "@opentelemetry/resources": "0.26.0",
     "@opentelemetry/sdk-metrics-base": "0.25.0",
-    "@opentelemetry/sdk-trace-base": "0.25.0"
+    "@opentelemetry/sdk-trace-base": "0.26.0"
   }
 }

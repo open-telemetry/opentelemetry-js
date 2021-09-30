@@ -3,15 +3,6 @@
   "files": [],
   "references": [
     {
-      "path": "backwards-compatability/node10"
-    },
-    {
-      "path": "backwards-compatability/node12"
-    },
-    {
-      "path": "backwards-compatability/node8"
-    },
-    {
       "path": "packages/opentelemetry-context-async-hooks"
     },
     {
