@@ -16,6 +16,5 @@
     "typescript": "4.3.5"
   },
   "author": "OpenTelemetry Authors",
-  "touch-the-file": "to-invalidate-caches",
   "license": "Apache-2.0"
 }
