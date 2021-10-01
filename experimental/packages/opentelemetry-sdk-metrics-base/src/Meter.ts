@@ -21,7 +21,7 @@ import { Resource } from '@opentelemetry/resources';
 import { BatchObserver } from './BatchObserver';
 import { BaseBoundInstrument } from './BoundInstrument';
 import { CounterMetric } from './CounterMetric';
-import { PushController } from './export/Controller';
+import { PushController, Controller, PullController } from './export/Controller';
 import { NoopExporter } from './export/NoopExporter';
 import { Processor, UngroupedProcessor } from './export/Processor';
 import { Metric } from './Metric';
@@ -31,6 +31,7 @@ import { UpDownCounterMetric } from './UpDownCounterMetric';
 import { UpDownSumObserverMetric } from './UpDownSumObserverMetric';
 import { ValueObserverMetric } from './ValueObserverMetric';
 import { ValueRecorderMetric } from './ValueRecorderMetric';
+import { MetricExporter } from './export/types';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const merge = require('lodash.merge');
 
@@ -43,7 +44,7 @@ export class Meter implements api.Meter {
   private readonly _processor: Processor;
   private readonly _resource: Resource;
   private readonly _instrumentationLibrary: InstrumentationLibrary;
-  private readonly _controller: PushController;
+  private readonly _controller: Controller;
   private _isShutdown = false;
   private _shuttingDownPromise: Promise<void> = Promise.resolve();
 
@@ -59,10 +60,17 @@ export class Meter implements api.Meter {
     this._resource =
       mergedConfig.resource || Resource.empty();
     this._instrumentationLibrary = instrumentationLibrary;
-    // start the push controller
-    const exporter = mergedConfig.exporter || new NoopExporter();
-    const interval = mergedConfig.interval;
-    this._controller = new PushController(this, exporter, interval);
+    const exporter: MetricExporter = mergedConfig.exporter || new NoopExporter();
+
+    // start the pull or push controller, depending on if the exporter defines the optional function registerPullController
+    if(typeof exporter.registerPullController === 'function') {
+      const pullController = new PullController(this, exporter);
+      this._controller = pullController;
+      exporter.registerPullController(pullController);
+    } else {
+      const interval = mergedConfig.interval;
+      this._controller = new PushController(this, exporter, interval);
+    }
   }
 
   /**

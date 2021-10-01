@@ -22,6 +22,7 @@ import {
 } from '@opentelemetry/api-metrics';
 import { ExportResult, InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
+import { PullController } from './Controller';
 
 /** The kind of metric. */
 export enum MetricKind {
@@ -102,6 +103,11 @@ export interface MetricExporter {
   export(
     metrics: MetricRecord[],
     resultCallback: (result: ExportResult) => void
+  ): void;
+
+  /** Registers a {@Link PullController}. If this function is defined, the MetricsExporter will use a {@Link PullController} instead of a {@Link PushController} */
+  registerPullController?(
+    pullController: PullController
   ): void;
 
   /** Stops the exporter. */

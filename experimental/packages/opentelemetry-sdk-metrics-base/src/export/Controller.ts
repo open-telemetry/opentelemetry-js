@@ -26,7 +26,7 @@ const DEFAULT_EXPORT_INTERVAL = 60_000;
 
 export class Controller {}
 
-/** Controller organizes a periodic push of metric data. */
+/** PushController organizes a periodic push of metric data. */
 export class PushController extends Controller {
   private _timer: NodeJS.Timeout;
 
@@ -59,6 +59,38 @@ export class PushController extends Controller {
             globalErrorHandler(
               result.error ??
                 new Error('PushController: export failed in _collect')
+            );
+          }
+          resolve();
+        }
+      );
+    });
+  }
+}
+
+/** PullController pulls metric data whenever the exporter requests it. */
+export class PullController extends Controller {
+  constructor(
+    private readonly _meter: Meter,
+    private readonly _exporter: MetricExporter,
+  ) {
+    super();
+  }
+
+  shutdown(): Promise<void> {
+    return this._collect();
+  }
+
+  public async _collect(): Promise<void> {
+    await this._meter.collect();
+    return new Promise(resolve => {
+      this._exporter.export(
+        this._meter.getProcessor().checkPointSet(),
+        result => {
+          if (result.code !== ExportResultCode.SUCCESS) {
+            globalErrorHandler(
+              result.error ??
+                new Error('PullController: export failed in _collect')
             );
           }
           resolve();
