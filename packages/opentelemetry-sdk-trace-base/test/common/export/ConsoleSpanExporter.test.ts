@@ -39,14 +39,38 @@ describe('ConsoleSpanExporter', () => {
   });
 
   describe('.export()', () => {
+    it('should accept a customized logger', () => {
+      const customLoggerSpy = sinon.spy();
+
+      const basicTracerProvider = new BasicTracerProvider({
+        sampler: new AlwaysOnSampler(),
+      });
+      consoleExporter = new ConsoleSpanExporter(customLoggerSpy);
+
+      const spyConsole = sinon.spy(console, 'log');
+      const spyExport = sinon.spy(consoleExporter, 'export');
+
+      basicTracerProvider.addSpanProcessor(
+        new SimpleSpanProcessor(consoleExporter)
+      );
+
+      const span = basicTracerProvider.getTracer('default').startSpan('foo');
+      span.addEvent('foobar');
+      span.end();
+
+      assert.ok(customLoggerSpy.calledOnce);
+      assert.ok(spyConsole.notCalled);
+    });
+
     it('should export information about span', () => {
       assert.doesNotThrow(() => {
         const basicTracerProvider = new BasicTracerProvider({
           sampler: new AlwaysOnSampler(),
         });
-        consoleExporter = new ConsoleSpanExporter();
 
         const spyConsole = sinon.spy(console, 'log');
+        consoleExporter = new ConsoleSpanExporter();
+
         const spyExport = sinon.spy(consoleExporter, 'export');
 
         basicTracerProvider.addSpanProcessor(
@@ -61,6 +85,7 @@ describe('ConsoleSpanExporter', () => {
         const firstSpan = spans[0][0];
         const firstEvent = firstSpan.events[0];
         const consoleArgs = spyConsole.args[0];
+
         const consoleSpan = consoleArgs[0];
         const keys = Object.keys(consoleSpan).sort().join(',');
 

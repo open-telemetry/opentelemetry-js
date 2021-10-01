@@ -22,13 +22,23 @@ import {
   hrTimeToMicroseconds,
 } from '@opentelemetry/core';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+type loggerType = (...args: any) => void
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
 /**
  * This is implementation of {@link SpanExporter} that prints spans to the
  * console. This class can be used for diagnostic purposes.
  */
 
-/* eslint-disable no-console */
 export class ConsoleSpanExporter implements SpanExporter {
+  logger: loggerType;
+
+  constructor(logger?: loggerType) {
+    /* eslint-disable no-console */
+    this.logger = logger || console.log;
+    /* eslint-enable no-console */
+  }
   /**
    * Export spans.
    * @param spans
@@ -36,7 +46,7 @@ export class ConsoleSpanExporter implements SpanExporter {
    */
   export(
     spans: ReadableSpan[],
-    resultCallback: (result: ExportResult) => void
+    resultCallback: (result: ExportResult) => void,
   ): void {
     return this._sendSpans(spans, resultCallback);
   }
@@ -75,10 +85,10 @@ export class ConsoleSpanExporter implements SpanExporter {
    */
   private _sendSpans(
     spans: ReadableSpan[],
-    done?: (result: ExportResult) => void
+    done?: (result: ExportResult) => void,
   ): void {
     for (const span of spans) {
-      console.log(this._exportInfo(span));
+      this.logger(this._exportInfo(span));
     }
     if (done) {
       return done({ code: ExportResultCode.SUCCESS });
