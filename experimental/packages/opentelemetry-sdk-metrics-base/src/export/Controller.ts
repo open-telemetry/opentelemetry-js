@@ -78,10 +78,10 @@ export class PullController extends Controller {
   }
 
   shutdown(): Promise<void> {
-    return this._collect();
+    return this.collect();
   }
 
-  public async _collect(): Promise<void> {
+  public async collect(): Promise<void> {
     await this._meter.collect();
     return new Promise(resolve => {
       this._exporter.export(
