@@ -101,7 +101,6 @@ describe('transform', () => {
         tags: {
           key1: 'value1',
           key2: 'value2',
-          [defaultStatusCodeTagName]: 'UNSET',
           [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
           'telemetry.sdk.language': language,
           'telemetry.sdk.name': 'opentelemetry',
@@ -140,7 +139,6 @@ describe('transform', () => {
         name: span.name,
         parentId: undefined,
         tags: {
-          [defaultStatusCodeTagName]: 'UNSET',
           [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
           'telemetry.sdk.language': language,
           'telemetry.sdk.name': 'opentelemetry',
@@ -189,7 +187,6 @@ describe('transform', () => {
           name: span.name,
           parentId: undefined,
           tags: {
-            [defaultStatusCodeTagName]: 'UNSET',
             [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
             'telemetry.sdk.language': language,
             'telemetry.sdk.name': 'opentelemetry',
@@ -227,7 +224,6 @@ describe('transform', () => {
       assert.deepStrictEqual(tags, {
         key1: 'value1',
         key2: 'value2',
-        [defaultStatusCodeTagName]: 'UNSET',
         cost: '112.12',
         service: 'ui',
         version: '1',

@@ -215,7 +215,7 @@ describe('Zipkin Exporter - node', () => {
             tags: {
               key1: 'value1',
               key2: 'value2',
-              'ot.status_code': 'OK',
+              'otel.status_code': 'OK',
             },
             timestamp: startTime * MICROS_PER_SECS,
             traceId: span1.spanContext().traceId,
@@ -230,7 +230,7 @@ describe('Zipkin Exporter - node', () => {
             },
             name: span2.name,
             tags: {
-              'ot.status_code': 'OK',
+              'otel.status_code': 'OK',
             },
             timestamp: hrTimeToMicroseconds([startTime, 0]),
             traceId: span2.spanContext().traceId,
