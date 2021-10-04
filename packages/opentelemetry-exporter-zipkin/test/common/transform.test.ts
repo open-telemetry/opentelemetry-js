@@ -26,7 +26,7 @@ import * as assert from 'assert';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import {
   defaultStatusCodeTagName,
-  defaultStatusDescriptionTagName,
+  defaultStatusErrorTagName,
   toZipkinSpan,
   _toZipkinAnnotations,
   _toZipkinTags,
@@ -79,7 +79,7 @@ describe('transform', () => {
         span,
         'my-service',
         defaultStatusCodeTagName,
-        defaultStatusDescriptionTagName
+        defaultStatusErrorTagName
       );
       assert.deepStrictEqual(zipkinSpan, {
         kind: 'SERVER',
@@ -124,7 +124,7 @@ describe('transform', () => {
         span,
         'my-service',
         defaultStatusCodeTagName,
-        defaultStatusDescriptionTagName
+        defaultStatusErrorTagName
       );
       assert.deepStrictEqual(zipkinSpan, {
         kind: 'SERVER',
@@ -172,7 +172,7 @@ describe('transform', () => {
           span,
           'my-service',
           defaultStatusCodeTagName,
-          defaultStatusDescriptionTagName
+          defaultStatusErrorTagName
         );
         assert.deepStrictEqual(zipkinSpan, {
           kind: item.zipkin,
@@ -217,7 +217,7 @@ describe('transform', () => {
         span.attributes,
         span.status,
         defaultStatusCodeTagName,
-        defaultStatusDescriptionTagName,
+        defaultStatusErrorTagName,
         DUMMY_RESOURCE
       );
 
@@ -251,7 +251,7 @@ describe('transform', () => {
         span.attributes,
         span.status,
         defaultStatusCodeTagName,
-        defaultStatusDescriptionTagName,
+        defaultStatusErrorTagName,
         Resource.empty().merge(
           new Resource({
             [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
@@ -288,7 +288,7 @@ describe('transform', () => {
         span.attributes,
         span.status,
         defaultStatusCodeTagName,
-        defaultStatusDescriptionTagName,
+        defaultStatusErrorTagName,
         Resource.empty().merge(
           new Resource({
             [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
@@ -300,7 +300,7 @@ describe('transform', () => {
         key1: 'value1',
         key2: 'value2',
         [defaultStatusCodeTagName]: 'ERROR',
-        [defaultStatusDescriptionTagName]: status.message,
+        [defaultStatusErrorTagName]: status.message,
         [SemanticResourceAttributes.SERVICE_NAME]: 'zipkin-test',
       });
     });
