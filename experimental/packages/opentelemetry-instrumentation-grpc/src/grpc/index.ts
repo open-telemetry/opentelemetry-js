@@ -190,7 +190,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
                 kind: SpanKind.SERVER,
               };
 
-              instrumentation._diag.debug('patch func: %s', JSON.stringify(spanOptions));
+              instrumentation._diag.debug(`patch func: ${JSON.stringify(spanOptions)}`);
 
               context.with(
                 propagation.extract(context.active(), call.metadata, {
