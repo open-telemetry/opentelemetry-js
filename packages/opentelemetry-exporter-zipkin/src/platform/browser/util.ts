@@ -103,7 +103,7 @@ function sendWithXhr(
   xhr.onreadystatechange = () => {
     if (xhr.readyState === XMLHttpRequest.DONE) {
       const statusCode = xhr.status || 0;
-      diag.debug('Zipkin response status code: %d, body: %s', statusCode, data);
+      diag.debug(`Zipkin response status code: ${statusCode}, body: ${data}`);
 
       if (xhr.status >= 200 && xhr.status < 400) {
         return done({ code: ExportResultCode.SUCCESS });
@@ -124,6 +124,6 @@ function sendWithXhr(
   };
 
   // Issue request to remote service
-  diag.debug('Zipkin request payload: %s', data);
+  diag.debug(`Zipkin request payload: ${data}`);
   xhr.send(data);
 }

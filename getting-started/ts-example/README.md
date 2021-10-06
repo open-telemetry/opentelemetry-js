@@ -54,15 +54,17 @@ This guide uses the example application provided in the [example directory](exam
 
 ([link to JavaScript version](../README.md#install-the-required-opentelemetry-libraries))
 
-To create traces on NodeJS, you will need `@opentelemetry/sdk-trace-node`, `@opentelemetry/core`, and any plugins required by your application such as gRPC, or HTTP. If you are using the example application, you will need to install `@opentelemetry/plugin-http`.
+To create traces on NodeJS, you will need `@opentelemetry/sdk-trace-node`, `@opentelemetry/api`, and any plugins required by your application such as gRPC, or HTTP. If you are using the example application, you will need to install `@opentelemetry/instrumentation-http` and `@opentelemetry/instrumentation-express`.
 
 ```sh
 $ npm install \
-  @opentelemetry/core \
+  @opentelemetry/api \
   @opentelemetry/sdk-trace-node \
   @opentelemetry/instrumentation \
   @opentelemetry/instrumentation-http \
-  @opentelemetry/instrumentation-express
+  @opentelemetry/instrumentation-express \
+  @@opentelemetry/resources \
+  @opentelemetry/semantic-conventions
 ```
 
 #### Initialize a global tracer
@@ -74,16 +76,16 @@ All tracing initialization should happen before your application’s code runs. 
 Create a file named `tracing.ts` and add the following code:
 
 ```typescript
-import { LogLevel } from '@opentelemetry/core';
+import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express';
 import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
 
 
-const provider: NodeTracerProvider = new NodeTracerProvider({
-  logLevel: LogLevel.ERROR,
-});
+const provider: NodeTracerProvider = new NodeTracerProvider();
+
+diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ALL);
 
 provider.register();
 
@@ -120,25 +122,25 @@ $ # npm install @opentelemetry/exporter-jaeger
 After these dependencies are installed, we will need to initialize and register them. Modify `tracing.ts` so that it matches the following code snippet, replacing the service name `"getting-started"` with your own service name if you wish.
 
 ```typescript
-import { LogLevel } from '@opentelemetry/core';
+import { diag, DiagConsoleLogger, DiagLogLevel } from '@opentelemetry/api';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
-
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
+import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express';
+import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
+import { Resource } from '@opentelemetry/resources'
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 // For Jaeger, use the following line instead:
 // import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 
-import { registerInstrumentations } from '@opentelemetry/instrumentation';
-import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express';
-import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-
 const provider: NodeTracerProvider = new NodeTracerProvider({
-  logLevel: LogLevel.ERROR,
   resource: new Resource({
     [SemanticResourceAttributes.SERVICE_NAME]: 'getting-started',
   }),
 });
+
+diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.ALL);
 
 provider.addSpanProcessor(
   new SimpleSpanProcessor(
@@ -151,7 +153,6 @@ provider.addSpanProcessor(
     }),
   ),
 );
-
 provider.register();
 
 registerInstrumentations({
@@ -160,7 +161,6 @@ registerInstrumentations({
     new HttpInstrumentation(),
   ],
 });
-
 
 console.log('tracing initialized');
 ```

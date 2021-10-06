@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.es5.json",
+  "extends": "../../../tsconfig.es5.json",
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "build"
@@ -9,7 +9,7 @@
   ],
   "references": [
     {
-      "path": "../../packages/opentelemetry-sdk-trace-base"
+      "path": "../../packages/opentelemetry-sdk-node"
     }
   ]
 }

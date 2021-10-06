@@ -453,7 +453,6 @@ export const getIncomingRequestAttributes = (
   }
 
   if (requestUrl) {
-    attributes[SemanticAttributes.HTTP_ROUTE] = requestUrl.pathname || '/';
     attributes[SemanticAttributes.HTTP_TARGET] = requestUrl.pathname || '/';
   }
 
@@ -495,3 +494,27 @@ export const getIncomingRequestAttributesOnResponse = (
   }
   return attributes;
 };
+
+export function headerCapture(type: 'request' | 'response', headers: string[]) {
+  const normalizedHeaders = new Map(headers.map(header => [header.toLowerCase(), header.toLowerCase().replace(/-/g, '_')]));
+
+  return (span: Span, getHeader: (key: string) => undefined | string | string[] | number) => {
+    for (const [capturedHeader, normalizedHeader] of normalizedHeaders) {
+      const value = getHeader(capturedHeader);
+      
+      if (value === undefined) {
+        continue;
+      }
+
+      const key = `http.${type}.header.${normalizedHeader}`;
+
+      if (typeof value === 'string') {
+        span.setAttribute(key, [value]);
+      } else if (Array.isArray(value)) {
+        span.setAttribute(key, value);
+      } else {
+        span.setAttribute(key, [value]);
+      }
+    }
+  };
+}
