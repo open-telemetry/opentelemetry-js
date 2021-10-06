@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { Counter, ValueObserver } from '@opentelemetry/api-metrics';
+import { Counter, ObservableGauge } from '@opentelemetry/api-metrics';
 import { ExportResultCode } from '@opentelemetry/core';
 import {
   BoundCounter,
-  BoundObserver,
+  BoundObservable,
   Metric,
   MetricRecord,
 } from '@opentelemetry/sdk-metrics-base';
@@ -70,7 +70,7 @@ describe('OTLPMetricExporter - common', () => {
       collectorExporter = new OTLPMetricExporter(collectorExporterConfig);
       metrics = [];
       const counter: Metric<BoundCounter> & Counter = mockCounter();
-      const observer: Metric<BoundObserver> & ValueObserver = mockObserver(
+      const observer: Metric<BoundObservable> & ObservableGauge = mockObserver(
         observerResult => {
           observerResult.observe(3, {});
           observerResult.observe(6, {});

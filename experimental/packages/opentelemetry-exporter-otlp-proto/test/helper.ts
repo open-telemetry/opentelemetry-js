@@ -18,8 +18,8 @@ import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import {
   Counter,
   ObserverResult,
-  ValueObserver,
-  ValueRecorder,
+  ObservableGauge,
+  Histogram,
   ValueType,
 } from '@opentelemetry/api-metrics';
 import { hexToBase64 } from '@opentelemetry/core';
@@ -56,11 +56,11 @@ export function mockCounter(): metrics.Metric<metrics.BoundCounter> & Counter {
 
 export function mockObserver(
   callback: (observerResult: ObserverResult) => void
-): metrics.Metric<metrics.BoundCounter> & ValueObserver {
+): metrics.Metric<metrics.BoundCounter> & ObservableGauge {
   const name = 'double-observer';
   const metric =
     meter['_metrics'].get(name) ||
-    meter.createValueObserver(
+    meter.createObservableGauge(
       name,
       {
         description: 'sample observer description',
@@ -73,12 +73,12 @@ export function mockObserver(
   return metric;
 }
 
-export function mockValueRecorder(): metrics.Metric<metrics.BoundValueRecorder> &
-  ValueRecorder {
+export function mockHistogram(): metrics.Metric<metrics.BoundHistogram> &
+  Histogram {
   const name = 'int-recorder';
   const metric =
     meter['_metrics'].get(name) ||
-    meter.createValueRecorder(name, {
+    meter.createHistogram(name, {
       description: 'sample recorder description',
       valueType: ValueType.INT,
       boundaries: [0, 100],
@@ -336,7 +336,7 @@ export function ensureExportedObserverIsCorrect(
   });
 }
 
-export function ensureExportedValueRecorderIsCorrect(
+export function ensureExportedHistogramIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time?: number,
   explicitBounds: number[] = [Infinity],

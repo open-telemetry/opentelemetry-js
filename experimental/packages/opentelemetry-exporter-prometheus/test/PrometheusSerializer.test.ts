@@ -21,7 +21,7 @@ import {
   CounterMetric,
   HistogramMetric,
   UpDownCounterMetric,
-  GaugeObserverMetric,
+  ObservableGaugeMetric,
 } from '@opentelemetry/sdk-metrics-base';
 import { diag, DiagLogLevel } from '@opentelemetry/api';
 import * as assert from 'assert';
@@ -99,13 +99,13 @@ describe('PrometheusSerializer', () => {
         const meter = new MeterProvider({
           processor: new ExactProcessor(LastValueAggregator),
         }).getMeter('test');
-        const observer = meter.createGaugeObserver(
+        const observer = meter.createObservableGauge(
           'test',
           {},
           observerResult => {
             observerResult.observe(1, labels);
           }
-        ) as GaugeObserverMetric;
+        ) as ObservableGaugeMetric;
         await meter.collect();
         const records = await observer.getMetricRecord();
         const record = records[0];
@@ -126,13 +126,13 @@ describe('PrometheusSerializer', () => {
         const meter = new MeterProvider({
           processor: new ExactProcessor(LastValueAggregator),
         }).getMeter('test');
-        const observer = meter.createGaugeObserver(
+        const observer = meter.createObservableGauge(
           'test',
           {},
           observerResult => {
             observerResult.observe(1, labels);
           }
-        ) as GaugeObserverMetric;
+        ) as ObservableGaugeMetric;
         await meter.collect();
         const records = await observer.getMetricRecord();
         const record = records[0];
@@ -304,7 +304,7 @@ describe('PrometheusSerializer', () => {
           processor: new ExactProcessor(LastValueAggregator),
         }).getMeter('test');
         const processor = new PrometheusLabelsBatcher();
-        const observer = meter.createGaugeObserver(
+        const observer = meter.createObservableGauge(
           'test',
           {
             description: 'foobar',
@@ -312,7 +312,7 @@ describe('PrometheusSerializer', () => {
           observerResult => {
             observerResult.observe(1, labels);
           }
-        ) as GaugeObserverMetric;
+        ) as ObservableGaugeMetric;
         await meter.collect();
         const records = await observer.getMetricRecord();
         records.forEach(it => processor.process(it));

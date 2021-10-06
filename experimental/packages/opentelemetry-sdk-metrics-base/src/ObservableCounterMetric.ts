@@ -17,14 +17,15 @@
 import * as api from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { BaseObserverMetric } from './BaseObserverMetric';
+import { BaseObservableMetric } from './BaseObservableMetric';
 import { Processor } from './export/Processor';
-import { MetricKind } from './export/types';
+import { LastValue, MetricKind } from './export/types';
+import { ObserverResult } from './ObserverResult';
 
-/** This is a SDK implementation of UpDownCounterObserver Metric. */
-export class UpDownCounterObserverMetric
-  extends BaseObserverMetric
-  implements api.UpDownCounterObserver {
+/** This is a SDK implementation of ObservableCounter Metric. */
+export class ObservableCounterMetric
+  extends BaseObservableMetric
+  implements api.ObservableCounter {
   constructor(
     name: string,
     options: api.MetricOptions,
@@ -38,9 +39,25 @@ export class UpDownCounterObserverMetric
       options,
       processor,
       resource,
-      MetricKind.UP_DOWN_COUNTER_OBSERVER,
+      MetricKind.OBSERVABLE_COUNTER,
       instrumentationLibrary,
       callback
     );
+  }
+
+  protected override _processResults(observerResult: ObserverResult): void {
+    observerResult.values.forEach((value, labels) => {
+      const instrument = this.bind(labels);
+      // ObservableCounter is monotonic which means it should only accept values
+      // greater or equal then previous value
+      const previous = instrument.getAggregator().toPoint();
+      let previousValue = -Infinity;
+      if (previous.timestamp[0] !== 0 || previous.timestamp[1] !== 0) {
+        previousValue = previous.value as LastValue;
+      }
+      if (value >= previousValue) {
+        instrument.update(value);
+      }
+    });
   }
 }

@@ -23,7 +23,7 @@ const meter = new MeterProvider({
   interval: 2000,
 }).getMeter('example-observer');
 
-meter.createValueObserver('cpu_core_usage', {
+meter.createObservableGauge('cpu_core_usage', {
   description: 'Example of a sync value observer with callback',
 }, async (observerResult) => { // this callback is called once per each interval
   await new Promise((resolve) => {
@@ -34,12 +34,12 @@ meter.createValueObserver('cpu_core_usage', {
 });
 
 // no callback as they will be updated in batch observer
-const tempMetric = meter.createValueObserver('cpu_temp_per_app', {
+const tempMetric = meter.createObservableGauge('cpu_temp_per_app', {
   description: 'Example of sync value observer used with async batch observer',
 });
 
 // no callback as they will be updated in batch observer
-const cpuUsageMetric = meter.createValueObserver('cpu_usage_per_app', {
+const cpuUsageMetric = meter.createObservableGauge('cpu_usage_per_app', {
   description: 'Example of sync value observer used with async batch observer',
 });
 

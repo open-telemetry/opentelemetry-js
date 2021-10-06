@@ -275,7 +275,7 @@ describe('PrometheusExporter', () => {
         return 0.999;
       }
 
-      meter.createGaugeObserver(
+      meter.createObservableGauge(
         'metric_observer',
         {
           description: 'a test description',
@@ -472,12 +472,12 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should export a CounterObserver as a counter', done => {
+    it('should export a ObservableCounter as a counter', done => {
       function getValue() {
         return 20;
       }
 
-      meter.createCounterObserver(
+      meter.createObservableCounter(
         'sum_observer',
         {
           description: 'a test description',
@@ -512,12 +512,12 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should export a UpDownCounterObserver as a gauge', done => {
+    it('should export a ObservableUpDownCounter as a gauge', done => {
       function getValue() {
         return 20;
       }
 
-      meter.createUpDownCounterObserver(
+      meter.createObservableUpDownCounter(
         'updown_observer',
         {
           description: 'a test description',
@@ -553,7 +553,7 @@ describe('PrometheusExporter', () => {
     });
 
     it('should export a Histogram as a summary', done => {
-      const histogram = meter.createHistogram('value_recorder', {
+      const histogram = meter.createHistogram('test_histogram', {
         description: 'a test description',
       });
 
@@ -568,11 +568,11 @@ describe('PrometheusExporter', () => {
                 const lines = body.split('\n');
 
                 assert.deepStrictEqual(lines, [
-                  '# HELP value_recorder a test description',
-                  '# TYPE value_recorder histogram',
-                  `value_recorder_count{key1="labelValue1"} 1 ${mockedHrTimeMs}`,
-                  `value_recorder_sum{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
-                  `value_recorder_bucket{key1="labelValue1",le="+Inf"} 1 ${mockedHrTimeMs}`,
+                  '# HELP test_histogram a test description',
+                  '# TYPE test_histogram histogram',
+                  `test_histogram_count{key1="labelValue1"} 1 ${mockedHrTimeMs}`,
+                  `test_histogram_sum{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
+                  `test_histogram_bucket{key1="labelValue1",le="+Inf"} 1 ${mockedHrTimeMs}`,
                   '',
                 ]);
 

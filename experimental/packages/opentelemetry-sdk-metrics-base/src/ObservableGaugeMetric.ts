@@ -13,19 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import * as api from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { BaseObserverMetric } from './BaseObserverMetric';
+import { BaseObservableMetric } from './BaseObservableMetric';
 import { Processor } from './export/Processor';
-import { LastValue, MetricKind } from './export/types';
-import { ObserverResult } from './ObserverResult';
+import { MetricKind } from './export/types';
 
-/** This is a SDK implementation of CounterObserver Metric. */
-export class CounterObserverMetric
-  extends BaseObserverMetric
-  implements api.CounterObserver {
+/** This is a SDK implementation of Gauge Observer Metric. */
+export class ObservableGaugeMetric
+  extends BaseObservableMetric
+  implements api.ObservableGauge {
   constructor(
     name: string,
     options: api.MetricOptions,
@@ -39,25 +37,9 @@ export class CounterObserverMetric
       options,
       processor,
       resource,
-      MetricKind.COUNTER_OBSERVER,
+      MetricKind.OBSERVABLE_GAUGE,
       instrumentationLibrary,
       callback
     );
-  }
-
-  protected override _processResults(observerResult: ObserverResult): void {
-    observerResult.values.forEach((value, labels) => {
-      const instrument = this.bind(labels);
-      // CounterObserver is monotonic which means it should only accept values
-      // greater or equal then previous value
-      const previous = instrument.getAggregator().toPoint();
-      let previousValue = -Infinity;
-      if (previous.timestamp[0] !== 0 || previous.timestamp[1] !== 0) {
-        previousValue = previous.value as LastValue;
-      }
-      if (value >= previousValue) {
-        instrument.update(value);
-      }
-    });
   }
 }

@@ -18,10 +18,10 @@ import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import {
   Counter,
   ObserverResult,
-  SumObserver,
-  UpDownSumObserver,
-  ValueObserver,
-  ValueRecorder,
+  ObservableCounter,
+  ObservableUpDownCounter,
+  ObservableGauge,
+  Histogram,
   ValueType,
 } from '@opentelemetry/api-metrics';
 import { hexToBase64, InstrumentationLibrary, VERSION } from '@opentelemetry/core';
@@ -81,10 +81,10 @@ export function mockDoubleCounter(): metrics.Metric<metrics.BoundCounter> &
 export function mockObserver(
   callback: (observerResult: ObserverResult) => unknown,
   name = 'double-observer'
-): metrics.Metric<metrics.BoundObserver> & ValueObserver {
+): metrics.Metric<metrics.BoundObservable> & ObservableGauge {
   const metric =
     meter['_metrics'].get(name) ||
-    meter.createValueObserver(
+    meter.createObservableGauge(
       name,
       {
         description: 'sample observer description',
@@ -97,16 +97,16 @@ export function mockObserver(
   return metric;
 }
 
-export function mockSumObserver(
+export function mockObservableCounter(
   callback: (observerResult: ObserverResult) => unknown,
   name = 'double-sum-observer'
-): metrics.Metric<metrics.BoundObserver> & SumObserver {
+): metrics.Metric<metrics.BoundObservable> & ObservableCounter {
   const metric =
     meter['_metrics'].get(name) ||
-    meter.createSumObserver(
+    meter.createObservableCounter(
       name,
       {
-        description: 'sample sum observer description',
+        description: 'sample observable counter description',
         valueType: ValueType.DOUBLE,
       },
       callback
@@ -116,16 +116,16 @@ export function mockSumObserver(
   return metric;
 }
 
-export function mockUpDownSumObserver(
+export function mockObservableUpDownCounter(
   callback: (observerResult: ObserverResult) => unknown,
   name = 'double-up-down-sum-observer'
-): metrics.Metric<metrics.BoundObserver> & UpDownSumObserver {
+): metrics.Metric<metrics.BoundObservable> & ObservableUpDownCounter {
   const metric =
     meter['_metrics'].get(name) ||
-    meter.createUpDownSumObserver(
+    meter.createObservableUpDownCounter(
       name,
       {
-        description: 'sample up down sum observer description',
+        description: 'sample observable up down counter description',
         valueType: ValueType.DOUBLE,
       },
       callback
@@ -135,12 +135,12 @@ export function mockUpDownSumObserver(
   return metric;
 }
 
-export function mockValueRecorder(): metrics.Metric<metrics.BoundValueRecorder> &
-  ValueRecorder {
+export function mockHistogram(): metrics.Metric<metrics.BoundHistogram> &
+  Histogram {
   const name = 'int-recorder';
   const metric =
     meter['_metrics'].get(name) ||
-    meter.createValueRecorder(name, {
+    meter.createHistogram(name, {
       description: 'sample recorder description',
       valueType: ValueType.INT,
       boundaries: [0, 100],
@@ -624,7 +624,7 @@ export function ensureObserverIsCorrect(
   });
 }
 
-export function ensureSumObserverIsCorrect(
+export function ensureObservableCounterIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time: number,
   value: number,
@@ -632,7 +632,7 @@ export function ensureSumObserverIsCorrect(
 ) {
   assert.deepStrictEqual(metric, {
     name,
-    description: 'sample sum observer description',
+    description: 'sample observable counter description',
     unit: '1',
     doubleSum: {
       isMonotonic: true,
@@ -651,7 +651,7 @@ export function ensureSumObserverIsCorrect(
   });
 }
 
-export function ensureUpDownSumObserverIsCorrect(
+export function ensureObservableUpDownCounterIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time: number,
   value: number,
@@ -659,7 +659,7 @@ export function ensureUpDownSumObserverIsCorrect(
 ) {
   assert.deepStrictEqual(metric, {
     name,
-    description: 'sample up down sum observer description',
+    description: 'sample observable up down counter description',
     unit: '1',
     doubleSum: {
       isMonotonic: false,
@@ -678,7 +678,7 @@ export function ensureUpDownSumObserverIsCorrect(
   });
 }
 
-export function ensureValueRecorderIsCorrect(
+export function ensureHistogramIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time: number,
   explicitBounds: (number | null)[] = [Infinity],

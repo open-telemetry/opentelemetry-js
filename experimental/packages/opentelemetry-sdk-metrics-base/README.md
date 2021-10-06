@@ -85,7 +85,7 @@ const meter = new MeterProvider().getMeter('your-meter-name');
 
 
 // async callback - for operation that needs to wait for value
-meter.createGaugeObserver('your_metric_name', {
+meter.createObservableGauge('your_metric_name', {
   description: 'Example of an async observer with callback',
 }, async (observerResult) => {
   const value = await getAsyncValue();
@@ -101,7 +101,7 @@ function getAsyncValue() {
 }
 
 // sync callback in case you don't need to wait for value
-meter.createGaugeObserver('your_metric_name', {
+meter.createObservableGauge('your_metric_name', {
   description: 'Example of a sync observer with callback',
 }, (observerResult) => {
   observerResult.observe(getRandomValue(), { label: '1' });
@@ -113,7 +113,7 @@ function getRandomValue() {
 }
 ```
 
-### UpDownCounterObserver
+### ObservableUpDownCounter
 
 Choose this kind of metric when sum is important and you want to capture any value that starts at zero and rises or falls throughout the process lifetime.
 The callback can be sync or async.
@@ -124,7 +124,7 @@ const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
 const meter = new MeterProvider().getMeter('your-meter-name');
 
 // async callback - for operation that needs to wait for value
-meter.createUpDownCounterObserver('your_metric_name', {
+meter.createObservableUpDownCounter('your_metric_name', {
   description: 'Example of an async observer with callback',
 }, async (observerResult) => {
   const value = await getAsyncValue();
@@ -140,7 +140,7 @@ function getAsyncValue() {
 }
 
 // sync callback in case you don't need to wait for value
-meter.createUpDownCounterObserver('your_metric_name', {
+meter.createObservableUpDownCounter('your_metric_name', {
   description: 'Example of a sync observer with callback',
 }, (observerResult) => {
   observerResult.observe(getRandomValue(), { label: '1' });
@@ -152,7 +152,7 @@ function getRandomValue() {
 
 ```
 
-### Counter Observer
+### Observable Counter
 
 Choose this kind of metric when collecting a sum that never decreases.
 The callback can be sync or async.
@@ -163,8 +163,8 @@ const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
 const meter = new MeterProvider().getMeter('your-meter-name');
 
 // async callback in case you need to wait for values
-meter.createCounterObserver('example_metric', {
-  description: 'Example of an async counter observer with callback',
+meter.createObservableCounter('example_metric', {
+  description: 'Example of an async observable counter with callback',
 }, async (observerResult) => {
   const value = await getAsyncValue();
   observerResult.observe(value, { label: '1' });
@@ -179,8 +179,8 @@ function getAsyncValue() {
 }
 
 // sync callback in case you don't need to wait for values
-meter.createCounterObserver('example_metric', {
-  description: 'Example of a sync counter observer with callback',
+meter.createObservableCounter('example_metric', {
+  description: 'Example of a sync observable counter with callback',
 }, (observerResult) => {
   const value = getRandomValue();
   observerResult.observe(value, { label: '1' });
@@ -213,11 +213,11 @@ const meter = new MeterProvider({
   interval: 3000,
 }).getMeter('example-observer');
 
-const cpuUsageMetric = meter.createGaugeObserver('cpu_usage_per_app', {
+const cpuUsageMetric = meter.createObservableGauge('cpu_usage_per_app', {
   description: 'CPU',
 });
 
-const MemUsageMetric = meter.createGaugeObserver('mem_usage_per_app', {
+const MemUsageMetric = meter.createObservableGauge('mem_usage_per_app', {
   description: 'Memory',
 });
 

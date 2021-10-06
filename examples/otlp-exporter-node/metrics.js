@@ -31,8 +31,8 @@ const upDownCounter = meter.createUpDownCounter('test_up_down_counter', {
   description: 'Example of a UpDownCounter',
 });
 
-const recorder = meter.createValueRecorder('test_value_recorder', {
-  description: 'Example of a ValueRecorder',
+const recorder = meter.createHistogram('test_histogram', {
+  description: 'Example of a Histogram',
 });
 
 const labels = { pid: process.pid, environment: 'staging' };

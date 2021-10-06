@@ -18,8 +18,8 @@ import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import {
   Counter,
   ObserverResult,
-  ValueObserver,
-  ValueRecorder,
+  ObservableGauge,
+  Histogram,
   ValueType,
 } from '@opentelemetry/api-metrics';
 import { otlpTypes } from '@opentelemetry/exporter-otlp-http';
@@ -75,16 +75,16 @@ export function mockCounter(): metrics.Metric<metrics.BoundCounter> & Counter {
   return metric;
 }
 
-export function mockObserver(
+export function mockObservableGauge(
   callback: (observerResult: ObserverResult) => void
-): metrics.Metric<metrics.BoundCounter> & ValueObserver {
-  const name = 'double-observer';
+): metrics.Metric<metrics.BoundCounter> & ObservableGauge {
+  const name = 'double-observable';
   const metric =
     meter['_metrics'].get(name) ||
-    meter.createValueObserver(
+    meter.createObservableGauge(
       name,
       {
-        description: 'sample observer description',
+        description: 'sample observable description',
         valueType: ValueType.DOUBLE,
       },
       callback
@@ -94,12 +94,12 @@ export function mockObserver(
   return metric;
 }
 
-export function mockValueRecorder(): metrics.Metric<metrics.BoundValueRecorder> &
-  ValueRecorder {
+export function mockHistogram(): metrics.Metric<metrics.BoundHistogram> &
+  Histogram {
   const name = 'int-recorder';
   const metric =
     meter['_metrics'].get(name) ||
-    meter.createValueRecorder(name, {
+    meter.createHistogram(name, {
       description: 'sample recorder description',
       valueType: ValueType.INT,
       boundaries: [0, 100],
@@ -352,13 +352,13 @@ export function ensureExportedCounterIsCorrect(
   });
 }
 
-export function ensureExportedObserverIsCorrect(
+export function ensureExportedObservableGaugeIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time?: number
 ) {
   assert.deepStrictEqual(metric, {
-    name: 'double-observer',
-    description: 'sample observer description',
+    name: 'double-observable',
+    description: 'sample observable description',
     unit: '1',
     data: 'doubleGauge',
     doubleGauge: {
@@ -375,7 +375,7 @@ export function ensureExportedObserverIsCorrect(
   });
 }
 
-export function ensureExportedValueRecorderIsCorrect(
+export function ensureExportedHistogramIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time?: number,
   explicitBounds: number[] = [Infinity],

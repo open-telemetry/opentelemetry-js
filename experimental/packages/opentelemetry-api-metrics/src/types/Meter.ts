@@ -19,11 +19,11 @@ import {
   MetricOptions,
   Counter,
   Histogram,
-  GaugeObserver,
+  ObservableGauge,
   BatchObserverOptions,
   UpDownCounter,
-  CounterObserver,
-  UpDownCounterObserver,
+  ObservableCounter,
+  ObservableUpDownCounter,
 } from './Metric';
 import { ObserverResult } from './ObserverResult';
 
@@ -45,16 +45,16 @@ export interface Meter {
   createCounter(name: string, options?: MetricOptions): Counter;
 
   /**
-   * Creates a new `CounterObserver` metric.
+   * Creates a new `ObservableCounter` metric.
    * @param name the name of the metric.
    * @param [options] the metric options.
-   * @param [callback] the observer callback
+   * @param [callback] the observable callback
    */
-  createCounterObserver(
+  createObservableCounter(
     name: string,
     options?: MetricOptions,
     callback?: (observerResult: ObserverResult) => void
-  ): CounterObserver;
+  ): ObservableCounter;
 
   /**
    * Creates and returns a new `Histogram`.
@@ -64,16 +64,16 @@ export interface Meter {
   createHistogram(name: string, options?: MetricOptions): Histogram;
 
   /**
-   * Creates a new `GaugeObserver` metric.
+   * Creates a new `ObservableGauge` metric.
    * @param name the name of the metric.
    * @param [options] the metric options.
-   * @param [callback] the observer callback
+   * @param [callback] the observable callback
    */
-   createGaugeObserver(
+   createObservableGauge(
     name: string,
     options?: MetricOptions,
     callback?: (observerResult: ObserverResult) => void
-  ): GaugeObserver;
+  ): ObservableGauge;
 
   /**
    * Creates a new `UpDownCounter` metric. UpDownCounter is a synchronous
@@ -95,16 +95,16 @@ export interface Meter {
   createUpDownCounter(name: string, options?: MetricOptions): UpDownCounter;
 
   /**
-   * Creates a new `UpDownCounterObserver` metric.
+   * Creates a new `ObservableUpDownCounter` metric.
    * @param name the name of the metric.
    * @param [options] the metric options.
-   * @param [callback] the observer callback
+   * @param [callback] the observable callback
    */
-  createUpDownCounterObserver(
+  createObservableUpDownCounter(
     name: string,
     options?: MetricOptions,
     callback?: (observerResult: ObserverResult) => void
-  ): UpDownCounterObserver;
+  ): ObservableUpDownCounter;
 
   /**
    * Creates a new `BatchObserver`, can be used to update many metrics

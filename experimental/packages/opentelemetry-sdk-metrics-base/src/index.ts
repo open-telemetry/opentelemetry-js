@@ -20,7 +20,7 @@ export * from './HistogramMetric';
 export * from './Meter';
 export * from './MeterProvider';
 export * from './Metric';
-export * from './GaugeObserverMetric';
+export * from './ObservableGaugeMetric';
 export * from './export/aggregators';
 export * from './export/ConsoleMetricExporter';
 export * from './export/Processor';

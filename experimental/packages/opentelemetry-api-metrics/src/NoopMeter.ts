@@ -22,16 +22,16 @@ import {
   Labels,
   Counter,
   Histogram,
-  GaugeObserver,
+  ObservableGauge,
   UpDownCounter,
-  BaseObserver,
-  CounterObserver,
-  UpDownCounterObserver,
+  BaseObservable,
+  ObservableCounter,
+  ObservableUpDownCounter,
 } from './types/Metric';
 import {
   BoundHistogram,
   BoundCounter,
-  BoundBaseObserver,
+  BoundBaseObservable,
 } from './types/BoundInstrument';
 import { ObserverResult } from './types/ObserverResult';
 import { Observation } from './types/Observation';
@@ -53,17 +53,17 @@ export class NoopMeter implements Meter {
   }
 
   /**
-   * Returns constant noop counter observer.
+   * Returns constant noop observable counter.
    * @param name the name of the metric.
    * @param [options] the metric options.
-   * @param [callback] the counter observer callback
+   * @param [callback] the observable counter callback
    */
-  createCounterObserver(
+  createObservableCounter(
     _name: string,
     _options?: MetricOptions,
     _callback?: (observerResult: ObserverResult) => void
-  ): CounterObserver {
-    return NOOP_COUNTER_OBSERVER_METRIC;
+  ): ObservableCounter {
+    return NOOP_OBSERVABLE_COUNTER_METRIC;
   }
 
   /**
@@ -76,17 +76,17 @@ export class NoopMeter implements Meter {
   }
 
   /**
-   * Returns constant noop gauge observer.
+   * Returns constant noop observable gauge.
    * @param name the name of the metric.
    * @param [options] the metric options.
-   * @param [callback] the gauge observer callback
+   * @param [callback] the observable gauge callback
    */
-  createGaugeObserver(
+  createObservableGauge(
     _name: string,
     _options?: MetricOptions,
     _callback?: (observerResult: ObserverResult) => void
-  ): GaugeObserver {
-    return NOOP_GAUGE_OBSERVER_METRIC;
+  ): ObservableGauge {
+    return NOOP_OBSERVABLE_GAUGE_METRIC;
   }
 
   /**
@@ -99,17 +99,17 @@ export class NoopMeter implements Meter {
   }
 
   /**
-   * Returns constant noop up down counter observer.
+   * Returns constant noop up down observable counter.
    * @param name the name of the metric.
    * @param [options] the metric options.
-   * @param [callback] the up down counter observer callback
+   * @param [callback] the up down observable counter callback
    */
-  createUpDownCounterObserver(
+  createObservableUpDownCounter(
     _name: string,
     _options?: MetricOptions,
     _callback?: (observerResult: ObserverResult) => void
-  ): UpDownCounterObserver {
-    return NOOP_UP_DOWN_COUNTER_OBSERVER_METRIC;
+  ): ObservableUpDownCounter {
+    return NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC;
   }
 
   /**
@@ -174,12 +174,12 @@ export class NoopHistogramMetric
   }
 }
 
-export class NoopBaseObserverMetric
-  extends NoopMetric<BoundBaseObserver>
-  implements BaseObserver {
+export class NoopBaseObservableMetric
+  extends NoopMetric<BoundBaseObservable>
+  implements BaseObservable {
   observation(): Observation {
     return {
-      observer: this as BaseObserver,
+      observer: this as BaseObservable,
       value: 0,
     };
   }
@@ -199,7 +199,7 @@ export class NoopBoundHistogram implements BoundHistogram {
   }
 }
 
-export class NoopBoundBaseObserver implements BoundBaseObserver {
+export class NoopBoundBaseObservable implements BoundBaseObservable {
   update(_value: number): void {}
 }
 
@@ -212,16 +212,16 @@ export const NOOP_HISTOGRAM_METRIC = new NoopHistogramMetric(
   NOOP_BOUND_HISTOGRAM
 );
 
-export const NOOP_BOUND_BASE_OBSERVER = new NoopBoundBaseObserver();
-export const NOOP_GAUGE_OBSERVER_METRIC = new NoopBaseObserverMetric(
+export const NOOP_BOUND_BASE_OBSERVER = new NoopBoundBaseObservable();
+export const NOOP_OBSERVABLE_GAUGE_METRIC = new NoopBaseObservableMetric(
   NOOP_BOUND_BASE_OBSERVER
 );
 
-export const NOOP_UP_DOWN_COUNTER_OBSERVER_METRIC = new NoopBaseObserverMetric(
+export const NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC = new NoopBaseObservableMetric(
   NOOP_BOUND_BASE_OBSERVER
 );
 
-export const NOOP_COUNTER_OBSERVER_METRIC = new NoopBaseObserverMetric(
+export const NOOP_OBSERVABLE_COUNTER_METRIC = new NoopBaseObservableMetric(
   NOOP_BOUND_BASE_OBSERVER
 );
 

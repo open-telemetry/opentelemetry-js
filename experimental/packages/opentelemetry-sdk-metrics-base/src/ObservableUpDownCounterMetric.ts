@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import * as api from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { BaseObserverMetric } from './BaseObserverMetric';
+import { BaseObservableMetric } from './BaseObservableMetric';
 import { Processor } from './export/Processor';
 import { MetricKind } from './export/types';
 
-/** This is a SDK implementation of Gauge Observer Metric. */
-export class GaugeObserverMetric
-  extends BaseObserverMetric
-  implements api.GaugeObserver {
+/** This is a SDK implementation of ObservableUpDownCounter Metric. */
+export class ObservableUpDownCounterMetric
+  extends BaseObservableMetric
+  implements api.ObservableUpDownCounter {
   constructor(
     name: string,
     options: api.MetricOptions,
@@ -37,7 +38,7 @@ export class GaugeObserverMetric
       options,
       processor,
       resource,
-      MetricKind.GAUGE_OBSERVER,
+      MetricKind.OBSERVABLE_UP_DOWN_COUNTER,
       instrumentationLibrary,
       callback
     );

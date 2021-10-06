@@ -15,16 +15,16 @@
  */
 import {
   Counter,
-  SumObserver,
-  UpDownSumObserver,
-  ValueObserver,
-  ValueRecorder,
+  ObservableCounter,
+  ObservableUpDownCounter,
+  ObservableGauge,
+  Histogram,
 } from '@opentelemetry/api-metrics';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import {
   BoundCounter,
-  BoundObserver,
-  BoundValueRecorder,
+  BoundObservable,
+  BoundHistogram,
   Metric,
   SumAggregator,
 } from '@opentelemetry/sdk-metrics-base';
@@ -35,17 +35,17 @@ import {
   ensureCounterIsCorrect,
   ensureDoubleCounterIsCorrect,
   ensureObserverIsCorrect,
-  ensureSumObserverIsCorrect,
-  ensureUpDownSumObserverIsCorrect,
-  ensureValueRecorderIsCorrect,
+  ensureObservableCounterIsCorrect,
+  ensureObservableUpDownCounterIsCorrect,
+  ensureHistogramIsCorrect,
   mockCounter,
   mockDoubleCounter,
   mockedInstrumentationLibraries,
   mockedResources,
   mockObserver,
-  mockSumObserver,
-  mockUpDownSumObserver,
-  mockValueRecorder,
+  mockObservableCounter,
+  mockObservableUpDownCounter,
+  mockHistogram,
   multiInstrumentationLibraryMetricsGet,
   multiResourceMetricsGet,
 } from '../helper';
@@ -54,10 +54,10 @@ describe('transformMetrics', () => {
   describe('toCollectorMetric', async () => {
     let counter: Metric<BoundCounter> & Counter;
     let doubleCounter: Metric<BoundCounter> & Counter;
-    let observer: Metric<BoundObserver> & ValueObserver;
-    let sumObserver: Metric<BoundObserver> & SumObserver;
-    let upDownSumObserver: Metric<BoundObserver> & UpDownSumObserver;
-    let recorder: Metric<BoundValueRecorder> & ValueRecorder;
+    let observer: Metric<BoundObservable> & ObservableGauge;
+    let observableCounter: Metric<BoundObservable> & ObservableCounter;
+    let observableUpDownCounter: Metric<BoundObservable> & ObservableUpDownCounter;
+    let recorder: Metric<BoundHistogram> & Histogram;
     beforeEach(() => {
       counter = mockCounter();
       doubleCounter = mockDoubleCounter();
@@ -77,17 +77,17 @@ describe('transformMetrics', () => {
         observerResult.observe(getValue(count1), {});
       });
 
-      sumObserver = mockSumObserver(observerResult => {
+      observableCounter = mockObservableCounter(observerResult => {
         count2++;
         observerResult.observe(getValue(count2), {});
       });
 
-      upDownSumObserver = mockUpDownSumObserver(observerResult => {
+      observableUpDownCounter = mockObservableUpDownCounter(observerResult => {
         count3++;
         observerResult.observe(getValue(count3), {});
       });
 
-      recorder = mockValueRecorder();
+      recorder = mockHistogram();
 
       // Counter
       counter.add(1);
@@ -95,7 +95,7 @@ describe('transformMetrics', () => {
       // Double Counter
       doubleCounter.add(8);
 
-      // ValueRecorder
+      // Histogram
       recorder.record(7);
       recorder.record(14);
     });
@@ -123,34 +123,34 @@ describe('transformMetrics', () => {
       );
 
       // collect 3 times
-      await sumObserver.getMetricRecord();
-      await sumObserver.getMetricRecord();
-      const sumObserverMetric = (await sumObserver.getMetricRecord())[0];
-      ensureSumObserverIsCorrect(
-        transform.toCollectorMetric(sumObserverMetric, 1592602232694000000),
-        hrTimeToNanoseconds(sumObserverMetric.aggregator.toPoint().timestamp),
+      await observableCounter.getMetricRecord();
+      await observableCounter.getMetricRecord();
+      const observableCounterMetric = (await observableCounter.getMetricRecord())[0];
+      ensureObservableCounterIsCorrect(
+        transform.toCollectorMetric(observableCounterMetric, 1592602232694000000),
+        hrTimeToNanoseconds(observableCounterMetric.aggregator.toPoint().timestamp),
         3
       );
 
       // collect 3 times
-      await upDownSumObserver.getMetricRecord();
-      await upDownSumObserver.getMetricRecord();
-      const upDownSumObserverMetric = (
-        await upDownSumObserver.getMetricRecord()
+      await observableUpDownCounter.getMetricRecord();
+      await observableUpDownCounter.getMetricRecord();
+      const observableUpDownCounterMetric = (
+        await observableUpDownCounter.getMetricRecord()
       )[0];
-      ensureUpDownSumObserverIsCorrect(
+      ensureObservableUpDownCounterIsCorrect(
         transform.toCollectorMetric(
-          upDownSumObserverMetric,
+          observableUpDownCounterMetric,
           1592602232694000000
         ),
         hrTimeToNanoseconds(
-          upDownSumObserverMetric.aggregator.toPoint().timestamp
+          observableUpDownCounterMetric.aggregator.toPoint().timestamp
         ),
         -1
       );
 
       const recorderMetric = (await recorder.getMetricRecord())[0];
-      ensureValueRecorderIsCorrect(
+      ensureHistogramIsCorrect(
         transform.toCollectorMetric(recorderMetric, 1592602232694000000),
         hrTimeToNanoseconds(recorderMetric.aggregator.toPoint().timestamp),
         [0, 100],

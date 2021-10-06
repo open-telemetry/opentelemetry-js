@@ -17,7 +17,7 @@ import * as api from '@opentelemetry/api-metrics';
 import { Observation } from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { BoundObserver } from './BoundInstrument';
+import { BoundObservable } from './BoundInstrument';
 import { Processor } from './export/Processor';
 import { MetricKind, MetricRecord } from './export/types';
 import { Metric } from './Metric';
@@ -29,9 +29,9 @@ const NOOP_CALLBACK = () => {};
  * This is a SDK implementation of Base Observer Metric.
  * All observers should extend this class
  */
-export abstract class BaseObserverMetric
-  extends Metric<BoundObserver>
-  implements api.BaseObserver {
+export abstract class BaseObservableMetric
+  extends Metric<BoundObservable>
+  implements api.BaseObservable {
   protected _callback: (observerResult: api.ObserverResult) => unknown;
 
   constructor(
@@ -47,8 +47,8 @@ export abstract class BaseObserverMetric
     this._callback = callback || NOOP_CALLBACK;
   }
 
-  protected _makeInstrument(labels: api.Labels): BoundObserver {
-    return new BoundObserver(
+  protected _makeInstrument(labels: api.Labels): BoundObservable {
+    return new BoundObservable(
       labels,
       this._disabled,
       this._valueType,
@@ -75,7 +75,7 @@ export abstract class BaseObserverMetric
   observation(value: number): Observation {
     return {
       value,
-      observer: this as BaseObserverMetric,
+      observer: this as BaseObservableMetric,
     };
   }
 }

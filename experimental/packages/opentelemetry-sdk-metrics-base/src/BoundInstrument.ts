@@ -135,11 +135,11 @@ export class BoundHistogram
 }
 
 /**
- * BoundObserver is an implementation of the {@link BoundObserver} interface.
+ * BoundObservable is an implementation of the {@link BoundObservable} interface.
  */
-export class BoundObserver
+export class BoundObservable
   extends BaseBoundInstrument
-  implements api.BoundBaseObserver {
+  implements api.BoundBaseObservable {
   constructor(
     labels: api.Labels,
     disabled: boolean,
