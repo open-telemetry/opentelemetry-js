@@ -301,7 +301,6 @@ describe('Meter', () => {
         assert.ok(counter instanceof CounterMetric);
         const counter2 = meter.createCounter('a'.repeat(64));
         assert.ok(counter2 instanceof api.NoopMetric);
-        assert.ok(counter instanceof api.NoopMetric);
       });
     });
   });
