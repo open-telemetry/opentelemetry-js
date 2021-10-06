@@ -31,7 +31,7 @@ const upDownCounter = meter.createUpDownCounter('test_up_down_counter', {
   description: 'Example of a UpDownCounter',
 });
 
-const recorder = meter.createHistogram('test_histogram', {
+const histogram = meter.createHistogram('test_histogram', {
   description: 'Example of a Histogram',
 });
 
@@ -40,5 +40,5 @@ const labels = { pid: process.pid, environment: 'staging' };
 setInterval(() => {
   requestCounter.bind(labels).add(1);
   upDownCounter.bind(labels).add(Math.random() > 0.5 ? 1 : -1);
-  recorder.bind(labels).record(Math.random());
+  histogram.bind(labels).record(Math.random());
 }, 1000);

@@ -126,16 +126,16 @@ describe('OTLPMetricExporter - node with proto over http', () => {
         observerResult.observe(3, {});
         observerResult.observe(6, {});
       });
-      const recorder: metrics.Metric<metrics.BoundHistogram> &
+      const histogram: metrics.Metric<metrics.BoundHistogram> &
         Histogram = mockHistogram();
 
       counter.add(1);
-      recorder.record(7);
-      recorder.record(14);
+      histogram.record(7);
+      histogram.record(14);
 
       metrics.push((await counter.getMetricRecord())[0]);
       metrics.push((await observer.getMetricRecord())[0]);
-      metrics.push((await recorder.getMetricRecord())[0]);
+      metrics.push((await histogram.getMetricRecord())[0]);
     });
     afterEach(() => {
       sinon.restore();
