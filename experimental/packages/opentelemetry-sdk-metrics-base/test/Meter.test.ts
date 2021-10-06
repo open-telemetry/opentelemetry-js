@@ -297,7 +297,10 @@ describe('Meter', () => {
       });
 
       it('should return no op metric if name exceeded length of 63', () => {
-        const counter = meter.createCounter('name_with_length_of_64_so_this_is_soooooooooooooooooooooooo_long');
+        const counter = meter.createCounter('a'.repeat(63));
+        assert.ok(counter instanceof CounterMetric);
+        const counter2 = meter.createCounter('a'.repeat(64));
+        assert.ok(counter2 instanceof api.NoopMetric);
         assert.ok(counter instanceof api.NoopMetric);
       });
     });
