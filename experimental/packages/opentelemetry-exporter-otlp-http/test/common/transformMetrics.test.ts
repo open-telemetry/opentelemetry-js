@@ -34,7 +34,7 @@ import * as transform from '../../src/transformMetrics';
 import {
   ensureCounterIsCorrect,
   ensureDoubleCounterIsCorrect,
-  ensureObserverIsCorrect,
+  ensureObservableGaugeIsCorrect,
   ensureObservableCounterIsCorrect,
   ensureObservableUpDownCounterIsCorrect,
   ensureHistogramIsCorrect,
@@ -42,7 +42,7 @@ import {
   mockDoubleCounter,
   mockedInstrumentationLibraries,
   mockedResources,
-  mockObserver,
+  mockObservableGauge,
   mockObservableCounter,
   mockObservableUpDownCounter,
   mockHistogram,
@@ -54,10 +54,10 @@ describe('transformMetrics', () => {
   describe('toCollectorMetric', async () => {
     let counter: Metric<BoundCounter> & Counter;
     let doubleCounter: Metric<BoundCounter> & Counter;
-    let observer: Metric<BoundObservable> & ObservableGauge;
+    let observableGauge: Metric<BoundObservable> & ObservableGauge;
     let observableCounter: Metric<BoundObservable> & ObservableCounter;
     let observableUpDownCounter: Metric<BoundObservable> & ObservableUpDownCounter;
-    let recorder: Metric<BoundHistogram> & Histogram;
+    let histogram: Metric<BoundHistogram> & Histogram;
     beforeEach(() => {
       counter = mockCounter();
       doubleCounter = mockDoubleCounter();
@@ -72,7 +72,7 @@ describe('transformMetrics', () => {
         return -1;
       }
 
-      observer = mockObserver(observerResult => {
+      observableGauge = mockObservableGauge(observerResult => {
         count1++;
         observerResult.observe(getValue(count1), {});
       });
@@ -87,7 +87,7 @@ describe('transformMetrics', () => {
         observerResult.observe(getValue(count3), {});
       });
 
-      recorder = mockHistogram();
+      histogram = mockHistogram();
 
       // Counter
       counter.add(1);
@@ -96,8 +96,8 @@ describe('transformMetrics', () => {
       doubleCounter.add(8);
 
       // Histogram
-      recorder.record(7);
-      recorder.record(14);
+      histogram.record(7);
+      histogram.record(14);
     });
 
     it('should convert metric', async () => {
@@ -113,10 +113,10 @@ describe('transformMetrics', () => {
         hrTimeToNanoseconds(doubleCounterMetric.aggregator.toPoint().timestamp)
       );
 
-      await observer.getMetricRecord();
-      await observer.getMetricRecord();
-      const observerMetric = (await observer.getMetricRecord())[0];
-      ensureObserverIsCorrect(
+      await observableGauge.getMetricRecord();
+      await observableGauge.getMetricRecord();
+      const observerMetric = (await observableGauge.getMetricRecord())[0];
+      ensureObservableGaugeIsCorrect(
         transform.toCollectorMetric(observerMetric, 1592602232694000000),
         hrTimeToNanoseconds(observerMetric.aggregator.toPoint().timestamp),
         -1
@@ -149,10 +149,10 @@ describe('transformMetrics', () => {
         -1
       );
 
-      const recorderMetric = (await recorder.getMetricRecord())[0];
+      const histogramMetric = (await histogram.getMetricRecord())[0];
       ensureHistogramIsCorrect(
-        transform.toCollectorMetric(recorderMetric, 1592602232694000000),
-        hrTimeToNanoseconds(recorderMetric.aggregator.toPoint().timestamp),
+        transform.toCollectorMetric(histogramMetric, 1592602232694000000),
+        hrTimeToNanoseconds(histogramMetric.aggregator.toPoint().timestamp),
         [0, 100],
         [0, 2, 0]
       );

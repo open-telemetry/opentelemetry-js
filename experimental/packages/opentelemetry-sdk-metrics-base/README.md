@@ -73,7 +73,7 @@ boundCounter.add(Math.random() > 0.5 ? 1 : -1);
 
 ```
 
-### Gauge Observer
+### Observable Gauge
 
 Choose this kind of metric when only last value is important without worry about aggregation.
 The callback can be sync or async.

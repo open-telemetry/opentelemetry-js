@@ -153,13 +153,13 @@ describe('PrometheusSerializer', () => {
 
         const processor = new ExactProcessor(HistogramAggregator, [1, 10, 100]);
         const meter = new MeterProvider({ processor }).getMeter('test');
-        const recorder = meter.createHistogram('test', {
+        const histogram = meter.createHistogram('test', {
           description: 'foobar',
         }) as HistogramMetric;
 
-        recorder.bind(labels).record(5);
+        histogram.bind(labels).record(5);
 
-        const records = await recorder.getMetricRecord();
+        const records = await histogram.getMetricRecord();
         const record = records[0];
 
         const result = serializer.serializeRecord(
@@ -181,13 +181,13 @@ describe('PrometheusSerializer', () => {
         const serializer = new PrometheusSerializer();
 
         const meter = new MeterProvider().getMeter('test');
-        const recorder = meter.createHistogram('test', {
+        const histogram = meter.createHistogram('test', {
           description: 'foobar',
           boundaries: [1, 10, 100],
         }) as HistogramMetric;
-        recorder.bind(labels).record(5);
+        histogram.bind(labels).record(5);
 
-        const records = await recorder.getMetricRecord();
+        const records = await histogram.getMetricRecord();
         const record = records[0];
 
         const result = serializer.serializeRecord(
@@ -210,12 +210,12 @@ describe('PrometheusSerializer', () => {
 
         const processor = new ExactProcessor(HistogramAggregator, [1, 10, 100]);
         const meter = new MeterProvider({ processor }).getMeter('test');
-        const recorder = meter.createHistogram('test', {
+        const histogram = meter.createHistogram('test', {
           description: 'foobar',
         }) as HistogramMetric;
-        recorder.bind(labels).record(5);
+        histogram.bind(labels).record(5);
 
-        const records = await recorder.getMetricRecord();
+        const records = await histogram.getMetricRecord();
         const record = records[0];
 
         const result = serializer.serializeRecord(
@@ -336,16 +336,16 @@ describe('PrometheusSerializer', () => {
 
         const processor = new ExactProcessor(HistogramAggregator, [1, 10, 100]);
         const meter = new MeterProvider({ processor }).getMeter('test');
-        const recorder = meter.createHistogram('test', {
+        const histogram = meter.createHistogram('test', {
           description: 'foobar',
         }) as HistogramMetric;
-        recorder.bind({ val: '1' }).record(5);
-        recorder.bind({ val: '1' }).record(50);
-        recorder.bind({ val: '1' }).record(120);
+        histogram.bind({ val: '1' }).record(5);
+        histogram.bind({ val: '1' }).record(50);
+        histogram.bind({ val: '1' }).record(120);
 
-        recorder.bind({ val: '2' }).record(5);
+        histogram.bind({ val: '2' }).record(5);
 
-        const records = await recorder.getMetricRecord();
+        const records = await histogram.getMetricRecord();
         const labelBatcher = new PrometheusLabelsBatcher();
         records.forEach(it => labelBatcher.process(it));
         const checkPointSet = labelBatcher.checkPointSet();

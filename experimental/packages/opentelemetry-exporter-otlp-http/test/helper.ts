@@ -78,16 +78,16 @@ export function mockDoubleCounter(): metrics.Metric<metrics.BoundCounter> &
   return metric;
 }
 
-export function mockObserver(
+export function mockObservableGauge(
   callback: (observerResult: ObserverResult) => unknown,
-  name = 'double-observer'
+  name = 'double-observable-gauge'
 ): metrics.Metric<metrics.BoundObservable> & ObservableGauge {
   const metric =
     meter['_metrics'].get(name) ||
     meter.createObservableGauge(
       name,
       {
-        description: 'sample observer description',
+        description: 'sample observable gauge description',
         valueType: ValueType.DOUBLE,
       },
       callback
@@ -99,7 +99,7 @@ export function mockObserver(
 
 export function mockObservableCounter(
   callback: (observerResult: ObserverResult) => unknown,
-  name = 'double-sum-observer'
+  name = 'double-observable-counter'
 ): metrics.Metric<metrics.BoundObservable> & ObservableCounter {
   const metric =
     meter['_metrics'].get(name) ||
@@ -118,7 +118,7 @@ export function mockObservableCounter(
 
 export function mockObservableUpDownCounter(
   callback: (observerResult: ObserverResult) => unknown,
-  name = 'double-up-down-sum-observer'
+  name = 'double-up-down-observable-counter'
 ): metrics.Metric<metrics.BoundObservable> & ObservableUpDownCounter {
   const metric =
     meter['_metrics'].get(name) ||
@@ -137,11 +137,11 @@ export function mockObservableUpDownCounter(
 
 export function mockHistogram(): metrics.Metric<metrics.BoundHistogram> &
   Histogram {
-  const name = 'int-recorder';
+  const name = 'int-histogram';
   const metric =
     meter['_metrics'].get(name) ||
     meter.createHistogram(name, {
-      description: 'sample recorder description',
+      description: 'sample histogram description',
       valueType: ValueType.INT,
       boundaries: [0, 100],
     });
@@ -322,7 +322,7 @@ export const multiResourceMetricsGet = function (
       instrumentationLibrary: mockedInstrumentationLibraries[0],
     },
     {
-      ...mockObserver(callback),
+      ...mockObservableGauge(callback),
       resource: mockedResources[1],
       instrumentationLibrary: mockedInstrumentationLibraries[0],
     },
@@ -344,7 +344,7 @@ export const multiInstrumentationLibraryMetricsGet = function (
       instrumentationLibrary: mockedInstrumentationLibraries[0],
     },
     {
-      ...mockObserver(callback),
+      ...mockObservableGauge(callback),
       resource: mockedResources[0],
       instrumentationLibrary: mockedInstrumentationLibraries[1],
     },
@@ -601,15 +601,15 @@ export function ensureDoubleCounterIsCorrect(
   });
 }
 
-export function ensureObserverIsCorrect(
+export function ensureObservableGaugeIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time: number,
   value: number,
-  name = 'double-observer'
+  name = 'double-observable-gauge'
 ) {
   assert.deepStrictEqual(metric, {
     name,
-    description: 'sample observer description',
+    description: 'sample observable gauge description',
     unit: '1',
     doubleGauge: {
       dataPoints: [
@@ -628,7 +628,7 @@ export function ensureObservableCounterIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time: number,
   value: number,
-  name = 'double-sum-observer'
+  name = 'double-observable-counter'
 ) {
   assert.deepStrictEqual(metric, {
     name,
@@ -655,7 +655,7 @@ export function ensureObservableUpDownCounterIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time: number,
   value: number,
-  name = 'double-up-down-sum-observer'
+  name = 'double-up-down-observable-counter'
 ) {
   assert.deepStrictEqual(metric, {
     name,
@@ -685,8 +685,8 @@ export function ensureHistogramIsCorrect(
   bucketCounts: number[] = [2, 0]
 ) {
   assert.deepStrictEqual(metric, {
-    name: 'int-recorder',
-    description: 'sample recorder description',
+    name: 'int-histogram',
+    description: 'sample histogram description',
     unit: '1',
     intHistogram: {
       dataPoints: [

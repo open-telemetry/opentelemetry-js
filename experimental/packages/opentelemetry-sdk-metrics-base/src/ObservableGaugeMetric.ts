@@ -20,7 +20,7 @@ import { BaseObservableMetric } from './BaseObservableMetric';
 import { Processor } from './export/Processor';
 import { MetricKind } from './export/types';
 
-/** This is a SDK implementation of Gauge Observer Metric. */
+/** This is a SDK implementation of ObservableGauge Metric. */
 export class ObservableGaugeMetric
   extends BaseObservableMetric
   implements api.ObservableGauge {

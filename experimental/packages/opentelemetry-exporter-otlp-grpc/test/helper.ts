@@ -78,13 +78,13 @@ export function mockCounter(): metrics.Metric<metrics.BoundCounter> & Counter {
 export function mockObservableGauge(
   callback: (observerResult: ObserverResult) => void
 ): metrics.Metric<metrics.BoundCounter> & ObservableGauge {
-  const name = 'double-observable';
+  const name = 'double-observable-gauge';
   const metric =
     meter['_metrics'].get(name) ||
     meter.createObservableGauge(
       name,
       {
-        description: 'sample observable description',
+        description: 'sample observable gauge description',
         valueType: ValueType.DOUBLE,
       },
       callback
@@ -96,11 +96,11 @@ export function mockObservableGauge(
 
 export function mockHistogram(): metrics.Metric<metrics.BoundHistogram> &
   Histogram {
-  const name = 'int-recorder';
+  const name = 'int-histogram';
   const metric =
     meter['_metrics'].get(name) ||
     meter.createHistogram(name, {
-      description: 'sample recorder description',
+      description: 'sample histogram description',
       valueType: ValueType.INT,
       boundaries: [0, 100],
     });
@@ -357,8 +357,8 @@ export function ensureExportedObservableGaugeIsCorrect(
   time?: number
 ) {
   assert.deepStrictEqual(metric, {
-    name: 'double-observable',
-    description: 'sample observable description',
+    name: 'double-observable-gauge',
+    description: 'sample observable gauge description',
     unit: '1',
     data: 'doubleGauge',
     doubleGauge: {
@@ -382,8 +382,8 @@ export function ensureExportedHistogramIsCorrect(
   bucketCounts: string[] = ['2', '0']
 ) {
   assert.deepStrictEqual(metric, {
-    name: 'int-recorder',
-    description: 'sample recorder description',
+    name: 'int-histogram',
+    description: 'sample histogram description',
     unit: '1',
     data: 'intHistogram',
     intHistogram: {

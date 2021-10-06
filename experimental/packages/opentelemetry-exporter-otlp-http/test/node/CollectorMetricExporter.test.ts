@@ -39,10 +39,10 @@ import * as otlpTypes from '../../src/types';
 import {
   ensureCounterIsCorrect,
   ensureExportMetricsServiceRequestIsSet,
-  ensureObserverIsCorrect,
+  ensureObservableGaugeIsCorrect,
   ensureHistogramIsCorrect,
   mockCounter,
-  mockObserver,
+  mockObservableGauge,
   mockHistogram,
 } from '../helper';
 import { MockedResponse } from './nodeHelpers';
@@ -149,21 +149,21 @@ describe('OTLPMetricExporter - node with json over http', () => {
       });
       metrics = [];
       const counter: Metric<BoundCounter> & Counter = mockCounter();
-      const observer: Metric<BoundObservable> & ObservableGauge = mockObserver(
+      const observerGauge: Metric<BoundObservable> & ObservableGauge = mockObservableGauge(
         observerResult => {
           observerResult.observe(6, {});
         },
-        'double-observer2'
+        'double-observable-gauge2'
       );
-      const recorder: Metric<BoundHistogram> &
+      const histogram: Metric<BoundHistogram> &
         Histogram = mockHistogram();
       counter.add(1);
-      recorder.record(7);
-      recorder.record(14);
+      histogram.record(7);
+      histogram.record(14);
 
       metrics.push((await counter.getMetricRecord())[0]);
-      metrics.push((await observer.getMetricRecord())[0]);
-      metrics.push((await recorder.getMetricRecord())[0]);
+      metrics.push((await observerGauge.getMetricRecord())[0]);
+      metrics.push((await histogram.getMetricRecord())[0]);
     });
 
     it('should open the connection', done => {
@@ -225,11 +225,11 @@ describe('OTLPMetricExporter - node with json over http', () => {
           core.hrTimeToNanoseconds(metrics[0].aggregator.toPoint().timestamp)
         );
         assert.ok(typeof metric2 !== 'undefined', "observer doesn't exist");
-        ensureObserverIsCorrect(
+        ensureObservableGaugeIsCorrect(
           metric2,
           core.hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp),
           6,
-          'double-observer2'
+          'double-observable-gauge2'
         );
         assert.ok(typeof metric3 !== 'undefined', "histogram doesn't exist");
         ensureHistogramIsCorrect(

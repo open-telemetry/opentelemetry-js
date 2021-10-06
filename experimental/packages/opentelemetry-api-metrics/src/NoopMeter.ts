@@ -212,17 +212,17 @@ export const NOOP_HISTOGRAM_METRIC = new NoopHistogramMetric(
   NOOP_BOUND_HISTOGRAM
 );
 
-export const NOOP_BOUND_BASE_OBSERVER = new NoopBoundBaseObservable();
+export const NOOP_BOUND_BASE_OBSERVABLE = new NoopBoundBaseObservable();
 export const NOOP_OBSERVABLE_GAUGE_METRIC = new NoopBaseObservableMetric(
-  NOOP_BOUND_BASE_OBSERVER
+  NOOP_BOUND_BASE_OBSERVABLE
 );
 
 export const NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC = new NoopBaseObservableMetric(
-  NOOP_BOUND_BASE_OBSERVER
+  NOOP_BOUND_BASE_OBSERVABLE
 );
 
 export const NOOP_OBSERVABLE_COUNTER_METRIC = new NoopBaseObservableMetric(
-  NOOP_BOUND_BASE_OBSERVER
+  NOOP_BOUND_BASE_OBSERVABLE
 );
 
 export const NOOP_BATCH_OBSERVER = new NoopBatchObserver();

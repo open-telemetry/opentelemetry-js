@@ -54,16 +54,16 @@ export function mockCounter(): metrics.Metric<metrics.BoundCounter> & Counter {
   return metric;
 }
 
-export function mockObserver(
+export function mockObservableGauge(
   callback: (observerResult: ObserverResult) => void
 ): metrics.Metric<metrics.BoundCounter> & ObservableGauge {
-  const name = 'double-observer';
+  const name = 'double-observable-gauge';
   const metric =
     meter['_metrics'].get(name) ||
     meter.createObservableGauge(
       name,
       {
-        description: 'sample observer description',
+        description: 'sample observable gauge description',
         valueType: ValueType.DOUBLE,
       },
       callback
@@ -75,11 +75,11 @@ export function mockObserver(
 
 export function mockHistogram(): metrics.Metric<metrics.BoundHistogram> &
   Histogram {
-  const name = 'int-recorder';
+  const name = 'int-histogram';
   const metric =
     meter['_metrics'].get(name) ||
     meter.createHistogram(name, {
-      description: 'sample recorder description',
+      description: 'sample histogram description',
       valueType: ValueType.INT,
       boundaries: [0, 100],
     });
@@ -316,13 +316,13 @@ export function ensureExportedCounterIsCorrect(
   });
 }
 
-export function ensureExportedObserverIsCorrect(
+export function ensureExportedObservableGaugeIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time?: number
 ) {
   assert.deepStrictEqual(metric, {
-    name: 'double-observer',
-    description: 'sample observer description',
+    name: 'double-observable-gauge',
+    description: 'sample observable gauge description',
     unit: '1',
     doubleGauge: {
       dataPoints: [
@@ -343,8 +343,8 @@ export function ensureExportedHistogramIsCorrect(
   bucketCounts: string[] = ['2', '0']
 ) {
   assert.deepStrictEqual(metric, {
-    name: 'int-recorder',
-    description: 'sample recorder description',
+    name: 'int-histogram',
+    description: 'sample histogram description',
     unit: '1',
     intHistogram: {
       dataPoints: [

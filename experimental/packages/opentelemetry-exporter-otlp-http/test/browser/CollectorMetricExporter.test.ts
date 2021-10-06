@@ -37,11 +37,11 @@ import {
   ensureCounterIsCorrect,
   ensureExportMetricsServiceRequestIsSet,
   ensureHeadersContain,
-  ensureObserverIsCorrect,
+  ensureObservableGaugeIsCorrect,
   ensureHistogramIsCorrect,
   ensureWebResourceIsCorrect,
   mockCounter,
-  mockObserver,
+  mockObservableGauge,
   mockHistogram,
 } from '../helper';
 
@@ -57,22 +57,22 @@ describe('OTLPMetricExporter - web', () => {
     stubBeacon = sinon.stub(navigator, 'sendBeacon');
     metrics = [];
     const counter: Metric<BoundCounter> & Counter = mockCounter();
-    const observer: Metric<BoundObservable> & ObservableGauge = mockObserver(
+    const observerGauge: Metric<BoundObservable> & ObservableGauge = mockObservableGauge(
       observerResult => {
         observerResult.observe(3, {});
         observerResult.observe(6, {});
       },
-      'double-observer2'
+      'double-observable-gauge2'
     );
-    const recorder: Metric<BoundHistogram> &
+    const histogram: Metric<BoundHistogram> &
       Histogram = mockHistogram();
     counter.add(1);
-    recorder.record(7);
-    recorder.record(14);
+    histogram.record(7);
+    histogram.record(14);
 
     metrics.push((await counter.getMetricRecord())[0]);
-    metrics.push((await observer.getMetricRecord())[0]);
-    metrics.push((await recorder.getMetricRecord())[0]);
+    metrics.push((await observerGauge.getMetricRecord())[0]);
+    metrics.push((await histogram.getMetricRecord())[0]);
   });
 
   afterEach(() => {
@@ -121,11 +121,11 @@ describe('OTLPMetricExporter - web', () => {
             "second metric doesn't exist"
           );
           if (metric2) {
-            ensureObserverIsCorrect(
+            ensureObservableGaugeIsCorrect(
               metric2,
               hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp),
               6,
-              'double-observer2'
+              'double-observable-gauge2'
             );
           }
 
@@ -234,11 +234,11 @@ describe('OTLPMetricExporter - web', () => {
             "second metric doesn't exist"
           );
           if (metric2) {
-            ensureObserverIsCorrect(
+            ensureObservableGaugeIsCorrect(
               metric2,
               hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp),
               6,
-              'double-observer2'
+              'double-observable-gauge2'
             );
           }
 

@@ -164,7 +164,7 @@ export class Meter implements api.Meter {
    * Creates a new `ObservableGauge` metric.
    * @param name the name of the metric.
    * @param [options] the metric options.
-   * @param [callback] the gauge observer callback
+   * @param [callback] the observable gauge callback
    */
   createObservableGauge(
     name: string,
@@ -224,7 +224,7 @@ export class Meter implements api.Meter {
    * Creates a new `ObservableUpDownCounter` metric.
    * @param name the name of the metric.
    * @param [options] the metric options.
-   * @param [callback] the gauge observer callback
+   * @param [callback] the observable gauge callback
    */
   createObservableUpDownCounter(
     name: string,

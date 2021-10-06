@@ -33,12 +33,12 @@ import { OTLPMetricExporter } from '../src';
 import { getExportRequestProto } from '../src/util';
 import {
   ensureExportedCounterIsCorrect,
-  ensureExportedObserverIsCorrect,
+  ensureExportedObservableGaugeIsCorrect,
   ensureExportedHistogramIsCorrect,
   ensureExportMetricsServiceRequestIsSet,
   mockCounter,
   MockedResponse,
-  mockObserver,
+  mockObservableGauge,
   mockHistogram,
 } from './helper';
 
@@ -122,7 +122,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       const counter: metrics.Metric<metrics.BoundCounter> &
         Counter = mockCounter();
       const observer: metrics.Metric<metrics.BoundObservable> &
-        ObservableGauge = mockObserver(observerResult => {
+        ObservableGauge = mockObservableGauge(observerResult => {
         observerResult.observe(3, {});
         observerResult.observe(6, {});
       });
@@ -198,7 +198,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
             metric1.intSum?.dataPoints[0].timeUnixNano
           );
           assert.ok(typeof metric2 !== 'undefined', "observer doesn't exist");
-          ensureExportedObserverIsCorrect(
+          ensureExportedObservableGaugeIsCorrect(
             metric2,
             metric2.doubleGauge?.dataPoints[0].timeUnixNano
           );

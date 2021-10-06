@@ -914,7 +914,7 @@ describe('Meter', () => {
   });
 
   describe('#ObservableGauge', () => {
-    it('should create a gauge observer', () => {
+    it('should create a observable gauge', () => {
       const observableGauge = meter.createObservableGauge(
         'name'
       ) as ObservableGaugeMetric;
