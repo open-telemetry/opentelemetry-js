@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "build"
@@ -10,16 +10,13 @@
   ],
   "references": [
     {
-      "path": "../opentelemetry-core"
+      "path": "../opentelemetry-api-metrics"
     },
     {
       "path": "../opentelemetry-exporter-otlp-http"
     },
     {
-      "path": "../opentelemetry-resources"
-    },
-    {
-      "path": "../opentelemetry-sdk-trace-base"
+      "path": "../opentelemetry-sdk-metrics-base"
     }
   ]
 }

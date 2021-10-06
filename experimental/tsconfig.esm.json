@@ -6,6 +6,15 @@
       "path": "packages/opentelemetry-api-metrics/tsconfig.esm.json"
     },
     {
+      "path": "packages/opentelemetry-exporter-otlp-grpc"
+    },
+    {
+      "path": "packages/opentelemetry-exporter-otlp-http/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/opentelemetry-exporter-otlp-proto"
+    },
+    {
       "path": "packages/opentelemetry-exporter-prometheus"
     },
     {
@@ -28,6 +37,15 @@
     },
     {
       "path": "packages/opentelemetry-sdk-node"
+    },
+    {
+      "path": "backwards-compatability/node10"
+    },
+    {
+      "path": "backwards-compatability/node12"
+    },
+    {
+      "path": "backwards-compatability/node8"
     }
   ]
 }
