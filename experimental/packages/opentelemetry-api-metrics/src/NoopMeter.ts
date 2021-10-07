@@ -53,7 +53,7 @@ export class NoopMeter implements Meter {
   }
 
   /**
-   * Returns constant noop observable counter.
+   * Returns a constant noop observable counter.
    * @param name the name of the metric.
    * @param [options] the metric options.
    * @param [callback] the observable counter callback
@@ -67,7 +67,7 @@ export class NoopMeter implements Meter {
   }
 
   /**
-   * Returns constant noop histogram.
+   * Returns a constant noop histogram.
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
@@ -76,7 +76,7 @@ export class NoopMeter implements Meter {
   }
 
   /**
-   * Returns constant noop observable gauge.
+   * Returns a constant noop observable gauge.
    * @param name the name of the metric.
    * @param [options] the metric options.
    * @param [callback] the observable gauge callback
@@ -99,7 +99,7 @@ export class NoopMeter implements Meter {
   }
 
   /**
-   * Returns constant noop up down observable counter.
+   * Returns a constant noop up down observable counter.
    * @param name the name of the metric.
    * @param [options] the metric options.
    * @param [callback] the up down observable counter callback

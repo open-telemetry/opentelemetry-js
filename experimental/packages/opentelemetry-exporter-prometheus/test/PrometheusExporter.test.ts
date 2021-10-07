@@ -270,13 +270,13 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should export an observer aggregation', done => {
+    it('should export an observable gauge aggregation', done => {
       function getCpuUsage() {
         return 0.999;
       }
 
       meter.createObservableGauge(
-        'metric_observer',
+        'metric_observable_gauge',
         {
           description: 'a test description',
         },
@@ -298,9 +298,9 @@ describe('PrometheusExporter', () => {
                   const lines = body.split('\n');
 
                   assert.deepStrictEqual(lines, [
-                    '# HELP metric_observer a test description',
-                    '# TYPE metric_observer gauge',
-                    `metric_observer{pid="123",core="1"} 0.999 ${mockedHrTimeMs}`,
+                    '# HELP metric_observable_gauge a test description',
+                    '# TYPE metric_observable_gauge gauge',
+                    `metric_observable_gauge{pid="123",core="1"} 0.999 ${mockedHrTimeMs}`,
                     '',
                   ]);
                   done();
@@ -472,13 +472,13 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should export a ObservableCounter as a counter', done => {
+    it('should export an ObservableCounter as a counter', done => {
       function getValue() {
         return 20;
       }
 
       meter.createObservableCounter(
-        'sum_observer',
+        'metric_observable_counter',
         {
           description: 'a test description',
         },
@@ -498,9 +498,9 @@ describe('PrometheusExporter', () => {
                 const lines = body.split('\n');
 
                 assert.deepStrictEqual(lines, [
-                  '# HELP sum_observer a test description',
-                  '# TYPE sum_observer gauge',
-                  `sum_observer{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
+                  '# HELP metric_observable_counter a test description',
+                  '# TYPE metric_observable_counter gauge',
+                  `metric_observable_counter{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
                   '',
                 ]);
               });
@@ -512,13 +512,13 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should export a ObservableUpDownCounter as a gauge', done => {
+    it('should export an ObservableUpDownCounter as a gauge', done => {
       function getValue() {
         return 20;
       }
 
       meter.createObservableUpDownCounter(
-        'updown_observer',
+        'metric_observable_up_down_counter',
         {
           description: 'a test description',
         },
@@ -538,9 +538,9 @@ describe('PrometheusExporter', () => {
                 const lines = body.split('\n');
 
                 assert.deepStrictEqual(lines, [
-                  '# HELP updown_observer a test description',
-                  '# TYPE updown_observer gauge',
-                  `updown_observer{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
+                  '# HELP metric_observable_up_down_counter a test description',
+                  '# TYPE metric_observable_up_down_counter gauge',
+                  `metric_observable_up_down_counter{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
                   '',
                 ]);
               });
