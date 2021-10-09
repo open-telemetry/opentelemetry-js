@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/instrumentation-xml-http-request",
-  "version": "0.25.0",
+  "version": "0.26.0",
   "description": "OpenTelemetry XMLHttpRequest automatic instrumentation package.",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -82,7 +82,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "1.0.0",
-    "@opentelemetry/instrumentation": "0.25.0",
+    "@opentelemetry/instrumentation": "0.26.0",
     "@opentelemetry/sdk-trace-web": "1.0.0",
     "@opentelemetry/semantic-conventions": "1.0.0"
   }
