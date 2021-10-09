@@ -683,6 +683,22 @@ describe('fetch', () => {
 
       prepare(url, applyCustomAttributes);
     });
+
+    it('get response body from callback arguments response', done => {
+      const applyCustomAttributes: FetchCustomAttributeFunction = async (
+        span,
+        request,
+        response
+      ) => {
+        if(response instanceof Response ){
+          const rsp = await response.json();
+          assert.deepStrictEqual(rsp.args, {});
+          done();
+        }
+      };
+
+      prepare(url, applyCustomAttributes);
+    });
   });
 
   describe('when url is ignored', () => {
