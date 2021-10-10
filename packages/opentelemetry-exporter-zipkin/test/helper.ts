@@ -71,7 +71,7 @@ export function ensureSpanIsCorrect(span: Span) {
     localEndpoint: { serviceName: 'OpenTelemetry Service' },
     tags: {
       component: 'foo',
-      'ot.status_code': 'OK',
+      'otel.status_code': 'OK',
       service: 'ui',
       version: '1',
       cost: '112.12',
