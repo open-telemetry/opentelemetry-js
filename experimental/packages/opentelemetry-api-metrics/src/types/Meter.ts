@@ -28,6 +28,20 @@ import {
 import { ObserverResult } from './ObserverResult';
 
 /**
+ * An interface describes additional metadata of a meter.
+ */
+export interface MeterOptions {
+  /**
+   * The version of the meter or instrumentation library
+   */
+  version?: string;
+  /**
+   * The schemaUrl of the meter or instrumentation library
+   */
+  schemaUrl?: string;
+}
+
+/**
  * An interface to allow the recording metrics.
  *
  * {@link Metric}s are used for recording pre-defined aggregation (`Counter`),

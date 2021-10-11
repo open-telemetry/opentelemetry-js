@@ -217,7 +217,8 @@ describe('PrometheusExporter', () => {
         meterProvider = new MeterProvider({
           interval: Math.pow(2, 31) - 1,
         });
-        meter = meterProvider.getMeter('test-prometheus', '1', {
+        meter = meterProvider.getMeter('test-prometheus', {
+          version: '1',
           exporter,
         });
         done();

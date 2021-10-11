@@ -1366,7 +1366,8 @@ describe('Meter', () => {
   });
 
   it('should allow custom processor', () => {
-    const customMeter = new MeterProvider().getMeter('custom-processor', '*', {
+    const customMeter = new MeterProvider().getMeter('custom-processor', {
+      version: '*',
       processor: new CustomProcessor(),
     });
     assert.throws(() => {
