@@ -331,6 +331,7 @@ export class FetchInstrumentation extends InstrumentationBase<
         ): void {
           try {
             const resClone = response.clone();
+            const resClone4Hook = response.clone();
             const body = resClone.body;
             if (body) {
               const reader = body.getReader();
@@ -338,7 +339,7 @@ export class FetchInstrumentation extends InstrumentationBase<
                 reader.read().then(
                   ({ done }) => {
                     if (done) {
-                      endSpanOnSuccess(span, response);
+                      endSpanOnSuccess(span, resClone4Hook);
                     } else {
                       read();
                     }
