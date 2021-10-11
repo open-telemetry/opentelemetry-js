@@ -53,7 +53,7 @@ export class MeterProvider implements api.MeterProvider {
         new Meter({
           name,
           version: config?.version,
-          // @ts-expect-error ts(2345) TODO: define the types in @opentelemetry/core
+          // @ts-expect-error ts(2345) TODO: upgrade @opentelemetry/core
           schemaUrl: config?.schemaUrl
         }, Object.assign({}, this._config, config))
       );
