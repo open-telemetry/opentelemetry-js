@@ -372,7 +372,9 @@ clear whether the exception will escape.
   HTTP_TARGET: 'http.target',
 
   /**
-  * The value of the [HTTP host header](https://tools.ietf.org/html/rfc7230#section-5.4). When the header is empty or not present, this attribute should be the same.
+  * The value of the [HTTP host header](https://tools.ietf.org/html/rfc7230#section-5.4). An empty Host header should also be reported, see note.
+  *
+  * Note: When the header is present but empty the attribute SHOULD be set to the empty string. Note that this is a valid situation that is expected in certain cases, according the aforementioned [section of RFC 7230](https://tools.ietf.org/html/rfc7230#section-5.4). When the header is not set the attribute MUST NOT be set.
   */
   HTTP_HOST: 'http.host',
 
@@ -433,7 +435,17 @@ clear whether the exception will escape.
   /**
   * The IP address of the original client behind all proxies, if known (e.g. from [X-Forwarded-For](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For)).
   *
-  * Note: This is not necessarily the same as `net.peer.ip`, which would identify the network-level peer, which may be a proxy.
+  * Note: This is not necessarily the same as `net.peer.ip`, which would
+identify the network-level peer, which may be a proxy.
+
+This attribute should be set when a source of information different
+from the one used for `net.peer.ip`, is available even if that other
+source just confirms the same value as `net.peer.ip`.
+Rationale: For `net.peer.ip`, one typically does not know if it
+comes from a proxy, reverse proxy, or the actual client. Setting
+`http.client_ip` when it&#39;s the same as `net.peer.ip` means that
+one is at least somewhat confident that the address is not that of
+the closest proxy.
   */
   HTTP_CLIENT_IP: 'http.client_ip',
 
@@ -608,6 +620,11 @@ clear whether the exception will escape.
   MESSAGING_OPERATION: 'messaging.operation',
 
   /**
+  * The identifier for the consumer receiving a message. For Kafka, set it to `{messaging.kafka.consumer_group} - {messaging.kafka.client_id}`, if both are present, or only `messaging.kafka.consumer_group`. For brokers, such as RabbitMQ and Artemis, set it to the `client_id` of the client consuming the message.
+  */
+  MESSAGING_CONSUMER_ID: 'messaging.consumer_id',
+
+  /**
   * RabbitMQ message routing key.
   */
   MESSAGING_RABBITMQ_ROUTING_KEY: 'messaging.rabbitmq.routing_key',
@@ -682,6 +699,28 @@ clear whether the exception will escape.
   * `error.message` property of response if it is an error response.
   */
   RPC_JSONRPC_ERROR_MESSAGE: 'rpc.jsonrpc.error_message',
+
+  /**
+  * Whether this is a received or sent message.
+  */
+  MESSAGE_TYPE: 'message.type',
+
+  /**
+  * MUST be calculated as two different counters starting from `1` one for sent messages and one for received message.
+  *
+  * Note: This way we guarantee that the values will be consistent between different implementations.
+  */
+  MESSAGE_ID: 'message.id',
+
+  /**
+  * Compressed size of the message in bytes.
+  */
+  MESSAGE_COMPRESSED_SIZE: 'message.compressed_size',
+
+  /**
+  * Uncompressed size of the message in bytes.
+  */
+  MESSAGE_UNCOMPRESSED_SIZE: 'message.uncompressed_size',
 }
 
 // Enum definitions
@@ -1012,5 +1051,15 @@ export enum RpcGrpcStatusCodeValues {
   DATA_LOSS = 15,
   /** UNAUTHENTICATED. */
   UNAUTHENTICATED = 16,
+}
+
+
+
+
+export enum MessageTypeValues {
+  /** sent. */
+  SENT = 'SENT',
+  /** received. */
+  RECEIVED = 'RECEIVED',
 }
 

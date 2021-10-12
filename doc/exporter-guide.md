@@ -51,4 +51,4 @@ Please refer to the [Prometheus Exporter][prometheus-exporter] for more comprehe
 
 [zipkin-exporter]: https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-exporter-zipkin
 [jaeger-exporter]: https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-exporter-jaeger
-[prometheus-exporter]: https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-exporter-prometheus
+[prometheus-exporter]: https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-exporter-prometheus

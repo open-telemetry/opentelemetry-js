@@ -3,15 +3,6 @@
   "files": [],
   "references": [
     {
-      "path": "backwards-compatability/node10"
-    },
-    {
-      "path": "backwards-compatability/node12"
-    },
-    {
-      "path": "backwards-compatability/node8"
-    },
-    {
       "path": "packages/opentelemetry-context-async-hooks"
     },
     {
@@ -25,18 +16,6 @@
     },
     {
       "path": "packages/opentelemetry-exporter-jaeger"
-    },
-    {
-      "path": "packages/opentelemetry-exporter-otlp-grpc"
-    },
-    {
-      "path": "packages/opentelemetry-exporter-otlp-http/tsconfig.esm.json"
-    },
-    {
-      "path": "packages/opentelemetry-exporter-otlp-proto"
-    },
-    {
-      "path": "packages/opentelemetry-exporter-prometheus"
     },
     {
       "path": "packages/opentelemetry-exporter-zipkin/tsconfig.esm.json"
