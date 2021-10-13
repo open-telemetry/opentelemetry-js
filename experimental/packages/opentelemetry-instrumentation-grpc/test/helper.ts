@@ -19,7 +19,7 @@ import {
   SpanKind,
   propagation, trace,
 } from '@opentelemetry/api';
-import { HttpTraceContextPropagator } from '@opentelemetry/core';
+import { W3CTraceContextPropagator } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { ContextManager } from '@opentelemetry/api';
@@ -386,7 +386,7 @@ export const runTests = (
     let contextManager: ContextManager;
 
     before(() => {
-      propagation.setGlobalPropagator(new HttpTraceContextPropagator());
+      propagation.setGlobalPropagator(new W3CTraceContextPropagator());
     });
 
     beforeEach(() => {

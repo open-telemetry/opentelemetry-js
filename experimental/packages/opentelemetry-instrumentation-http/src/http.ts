@@ -377,7 +377,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         : '/';
       const method = request.method || 'GET';
 
-      instrumentation._diag.debug('%s instrumentation incomingRequest', component);
+      instrumentation._diag.debug(`${component} instrumentation incomingRequest`);
 
       if (
         utils.isIgnored(
@@ -591,7 +591,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           }
         );
 
-        instrumentation._diag.debug('%s instrumentation outgoingRequest', component);
+        instrumentation._diag.debug(`${component} instrumentation outgoingRequest`);
         context.bind(parentContext, request);
         return instrumentation._traceClientRequest(
           request,
