@@ -139,7 +139,7 @@ export class BoundHistogram
  */
 export class BoundObservable
   extends BaseBoundInstrument
-  implements api.BoundBaseObservable {
+  implements api.BoundObservableBase {
   constructor(
     labels: api.Labels,
     disabled: boolean,

@@ -19,6 +19,6 @@ import { Labels } from './Metric';
 /**
  * Interface that is being used in callback function for Observable Metric
  */
-export interface ObserverResult {
+export interface ObservableResult {
   observe(value: number, labels: Labels): void;
 }

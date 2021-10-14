@@ -72,19 +72,19 @@ describe('transformMetrics', () => {
         return -1;
       }
 
-      observableGauge = mockObservableGauge(observerResult => {
+      observableGauge = mockObservableGauge(observableResult => {
         count1++;
-        observerResult.observe(getValue(count1), {});
+        observableResult.observe(getValue(count1), {});
       });
 
-      observableCounter = mockObservableCounter(observerResult => {
+      observableCounter = mockObservableCounter(observableResult => {
         count2++;
-        observerResult.observe(getValue(count2), {});
+        observableResult.observe(getValue(count2), {});
       });
 
-      observableUpDownCounter = mockObservableUpDownCounter(observerResult => {
+      observableUpDownCounter = mockObservableUpDownCounter(observableResult => {
         count3++;
-        observerResult.observe(getValue(count3), {});
+        observableResult.observe(getValue(count3), {});
       });
 
       histogram = mockHistogram();
@@ -115,10 +115,10 @@ describe('transformMetrics', () => {
 
       await observableGauge.getMetricRecord();
       await observableGauge.getMetricRecord();
-      const observerMetric = (await observableGauge.getMetricRecord())[0];
+      const observableGaugeMetric = (await observableGauge.getMetricRecord())[0];
       ensureObservableGaugeIsCorrect(
-        transform.toCollectorMetric(observerMetric, 1592602232694000000),
-        hrTimeToNanoseconds(observerMetric.aggregator.toPoint().timestamp),
+        transform.toCollectorMetric(observableGaugeMetric, 1592602232694000000),
+        hrTimeToNanoseconds(observableGaugeMetric.aggregator.toPoint().timestamp),
         -1
       );
 
@@ -186,8 +186,8 @@ describe('transformMetrics', () => {
       const [resource1, resource2] = mockedResources;
       const [library] = mockedInstrumentationLibraries;
       const [metric1, metric2, metric3] = multiResourceMetricsGet(
-        observerResult => {
-          observerResult.observe(1, {});
+        observableResult => {
+          observableResult.observe(1, {});
         }
       );
 
@@ -197,8 +197,8 @@ describe('transformMetrics', () => {
       ]);
 
       const result = transform.groupMetricsByResourceAndLibrary(
-        multiResourceMetricsGet(observerResult => {
-          observerResult.observe(1, {});
+        multiResourceMetricsGet(observableResult => {
+          observableResult.observe(1, {});
         })
       );
 
@@ -212,7 +212,7 @@ describe('transformMetrics', () => {
         metric1,
         metric2,
         metric3,
-      ] = multiInstrumentationLibraryMetricsGet(observerResult => {});
+      ] = multiInstrumentationLibraryMetricsGet(observableResult => {});
       const expected = new Map([
         [
           resource,
@@ -224,7 +224,7 @@ describe('transformMetrics', () => {
       ]);
 
       const result = transform.groupMetricsByResourceAndLibrary(
-        multiInstrumentationLibraryMetricsGet(observerResult => {})
+        multiInstrumentationLibraryMetricsGet(observableResult => {})
       );
 
       assert.deepStrictEqual(result, expected);

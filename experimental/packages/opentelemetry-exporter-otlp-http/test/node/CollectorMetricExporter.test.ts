@@ -149,9 +149,9 @@ describe('OTLPMetricExporter - node with json over http', () => {
       });
       metrics = [];
       const counter: Metric<BoundCounter> & Counter = mockCounter();
-      const observerGauge: Metric<BoundObservable> & ObservableGauge = mockObservableGauge(
-        observerResult => {
-          observerResult.observe(6, {});
+      const observableGauge: Metric<BoundObservable> & ObservableGauge = mockObservableGauge(
+        observableResult => {
+          observableResult.observe(6, {});
         },
         'double-observable-gauge2'
       );
@@ -162,7 +162,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
       histogram.record(14);
 
       metrics.push((await counter.getMetricRecord())[0]);
-      metrics.push((await observerGauge.getMetricRecord())[0]);
+      metrics.push((await observableGauge.getMetricRecord())[0]);
       metrics.push((await histogram.getMetricRecord())[0]);
     });
 
@@ -224,7 +224,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
           metric1,
           core.hrTimeToNanoseconds(metrics[0].aggregator.toPoint().timestamp)
         );
-        assert.ok(typeof metric2 !== 'undefined', "observer doesn't exist");
+        assert.ok(typeof metric2 !== 'undefined', "observable gauge doesn't exist");
         ensureObservableGaugeIsCorrect(
           metric2,
           core.hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp),

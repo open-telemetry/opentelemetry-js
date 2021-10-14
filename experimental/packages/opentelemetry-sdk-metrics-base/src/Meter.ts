@@ -169,7 +169,7 @@ export class Meter implements api.Meter {
   createObservableGauge(
     name: string,
     options: api.MetricOptions = {},
-    callback?: (observerResult: api.ObserverResult) => unknown
+    callback?: (observableResult: api.ObservableResult) => unknown
   ): api.ObservableGauge {
     if (!this._isValidName(name)) {
       diag.warn(
@@ -196,7 +196,7 @@ export class Meter implements api.Meter {
   createObservableCounter(
     name: string,
     options: api.MetricOptions = {},
-    callback?: (observerResult: api.ObserverResult) => unknown
+    callback?: (observableResult: api.ObservableResult) => unknown
   ): api.ObservableCounter {
     if (!this._isValidName(name)) {
       diag.warn(
@@ -229,7 +229,7 @@ export class Meter implements api.Meter {
   createObservableUpDownCounter(
     name: string,
     options: api.MetricOptions = {},
-    callback?: (observerResult: api.ObserverResult) => unknown
+    callback?: (observableResult: api.ObservableResult) => unknown
   ): api.ObservableUpDownCounter {
     if (!this._isValidName(name)) {
       diag.warn(
@@ -259,7 +259,7 @@ export class Meter implements api.Meter {
    * @param [options] the batch options.
    */
   createBatchObserver(
-    callback: (observerResult: api.BatchObserverResult) => void,
+    callback: (observableResult: api.BatchObserverResult) => void,
     options: api.BatchObserverOptions = {}
   ): BatchObserver {
     const opt: api.BatchObserverOptions = {

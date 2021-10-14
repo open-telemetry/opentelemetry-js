@@ -71,9 +71,9 @@ describe('OTLPMetricExporter - common', () => {
       metrics = [];
       const counter: Metric<BoundCounter> & Counter = mockCounter();
       const observableGauge: Metric<BoundObservable> & ObservableGauge = mockObservableGauge(
-        observerResult => {
-          observerResult.observe(3, {});
-          observerResult.observe(6, {});
+        observableResult => {
+          observableResult.observe(3, {});
+          observableResult.observe(6, {});
         },
         'double-observable-gauge3'
       );

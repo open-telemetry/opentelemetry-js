@@ -33,6 +33,6 @@ export interface BoundHistogram {
 }
 
 /** An Instrument for Base Observable */
-export interface BoundBaseObservable {
+export interface BoundObservableBase {
   update(value: number): void;
 }

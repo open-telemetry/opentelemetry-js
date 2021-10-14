@@ -16,13 +16,13 @@
 import * as api from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { BaseObservableMetric } from './BaseObservableMetric';
+import { ObservableBaseMetric } from './ObservableBaseMetric';
 import { Processor } from './export/Processor';
 import { MetricKind } from './export/types';
 
 /** This is a SDK implementation of ObservableGauge Metric. */
 export class ObservableGaugeMetric
-  extends BaseObservableMetric
+  extends ObservableBaseMetric
   implements api.ObservableGauge {
   constructor(
     name: string,
@@ -30,7 +30,7 @@ export class ObservableGaugeMetric
     processor: Processor,
     resource: Resource,
     instrumentationLibrary: InstrumentationLibrary,
-    callback?: (observerResult: api.ObserverResult) => unknown
+    callback?: (observableResult: api.ObservableResult) => unknown
   ) {
     super(
       name,

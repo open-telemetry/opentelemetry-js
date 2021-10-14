@@ -15,10 +15,13 @@
  */
 
 import {
-  BoundBaseObservable,
+  BoundObservableBase,
   BoundCounter,
   BoundHistogram,
 } from './BoundInstrument';
+import {
+  Observation,
+} from './Observation';
 
 /**
  * Options needed for metric creation
@@ -153,24 +156,21 @@ export interface Histogram extends UnboundMetric<BoundHistogram> {
   record(value: number, labels?: Labels): void;
 }
 
-/** Base interface for the Observer metrics. */
-export interface BaseObservable extends UnboundMetric<BoundBaseObservable> {
+/** Base interface for the Observable metrics. */
+export interface ObservableBase extends UnboundMetric<BoundObservableBase> {
   observation: (
     value: number
-  ) => {
-    value: number;
-    observer: BaseObservable;
-  };
+  ) => Observation;
 }
 
 /** Base interface for the ObservableGauge metrics. */
-export type ObservableGauge = BaseObservable;
+export type ObservableGauge = ObservableBase;
 
 /** Base interface for the ObservableUpDownCounter metrics. */
-export type ObservableUpDownCounter = BaseObservable;
+export type ObservableUpDownCounter = ObservableBase;
 
 /** Base interface for the ObservableCounter metrics. */
-export type ObservableCounter = BaseObservable;
+export type ObservableCounter = ObservableBase;
 
 /**
  * key-value pairs passed by the user.

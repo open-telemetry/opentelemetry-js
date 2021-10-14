@@ -779,7 +779,7 @@ describe('Meter', () => {
       assert.ok(observableCounter instanceof Metric);
     });
 
-    it('should return noop observer when name is invalid', () => {
+    it('should return noop observable counter when name is invalid', () => {
       // Need to stub/spy on the underlying logger as the "diag" instance is global
       const spy = sinon.stub(diag, 'warn');
       const observableCounter = meter.createObservableCounter('na me');
@@ -791,7 +791,7 @@ describe('Meter', () => {
       );
     });
 
-    it('should create observer with options', () => {
+    it('should create observable counter with options', () => {
       const observableCounter = meter.createObservableCounter('name', {
         description: 'desc',
         unit: '1',
@@ -816,11 +816,11 @@ describe('Meter', () => {
         {
           description: 'desc',
         },
-        (observerResult: api.ObserverResult) => {
+        (observableResult: api.ObservableResult) => {
           // simulate async
           return new Promise<void>(resolve => {
             setTimeout(() => {
-              observerResult.observe(getValue(), { pid: '123', core: '1' });
+              observableResult.observe(getValue(), { pid: '123', core: '1' });
               resolve();
             }, 1);
           });
@@ -853,8 +853,8 @@ describe('Meter', () => {
         {
           description: 'desc',
         },
-        (observerResult: api.ObserverResult) => {
-          observerResult.observe(1, { pid: '123', core: '1' });
+        (observableResult: api.ObservableResult) => {
+          observableResult.observe(1, { pid: '123', core: '1' });
         }
       ) as ObservableCounterMetric;
 
@@ -871,8 +871,8 @@ describe('Meter', () => {
           {
             description: 'desc',
           },
-          (observerResult: api.ObserverResult) => {
-            observerResult.observe(1, { pid: '123', core: '1' });
+          (observableResult: api.ObservableResult) => {
+            observableResult.observe(1, { pid: '123', core: '1' });
             return '1';
           }
         ) as ObservableCounterMetric;
@@ -888,8 +888,8 @@ describe('Meter', () => {
         {
           description: 'desc',
         },
-        (observerResult: api.ObserverResult) => {
-          observerResult.observe(1, { pid: '123', core: '1' });
+        (observableResult: api.ObservableResult) => {
+          observableResult.observe(1, { pid: '123', core: '1' });
           throw new Error('Boom');
         }
       ) as ObservableCounterMetric;
@@ -921,7 +921,7 @@ describe('Meter', () => {
       assert.ok(observableGauge instanceof Metric);
     });
 
-    it('should return noop observer when name is invalid', () => {
+    it('should return noop observable gauge when name is invalid', () => {
       // Need to stub/spy on the underlying logger as the "diag" instance is global
       const spy = sinon.stub(diag, 'warn');
       const observableGauge = meter.createObservableGauge('na me');
@@ -933,7 +933,7 @@ describe('Meter', () => {
       );
     });
 
-    it('should create observer with options', () => {
+    it('should create observable gauge with options', () => {
       const observableGauge = meter.createObservableGauge('name', {
         description: 'desc',
         unit: '1',
@@ -948,14 +948,14 @@ describe('Meter', () => {
         {
           description: 'desc',
         },
-        (observerResult: api.ObserverResult) => {
+        (observableResult: api.ObservableResult) => {
           // simulate async
           return new Promise<void>(resolve => {
             setTimeout(() => {
-              observerResult.observe(getCpuUsage(), { pid: '123', core: '1' });
-              observerResult.observe(getCpuUsage(), { pid: '123', core: '2' });
-              observerResult.observe(getCpuUsage(), { pid: '123', core: '3' });
-              observerResult.observe(getCpuUsage(), { pid: '123', core: '4' });
+              observableResult.observe(getCpuUsage(), { pid: '123', core: '1' });
+              observableResult.observe(getCpuUsage(), { pid: '123', core: '2' });
+              observableResult.observe(getCpuUsage(), { pid: '123', core: '3' });
+              observableResult.observe(getCpuUsage(), { pid: '123', core: '4' });
               resolve();
             }, 1);
           });
@@ -1003,7 +1003,7 @@ describe('Meter', () => {
       assert.ok(observableUpDownCounter instanceof Metric);
     });
 
-    it('should return noop observer when name is invalid', () => {
+    it('should return noop observable up down counter when name is invalid', () => {
       // Need to stub/spy on the underlying logger as the "diag" instance is global
       const spy = sinon.stub(diag, 'warn');
       const observableUpDownCounter = meter.createObservableUpDownCounter('na me');
@@ -1015,7 +1015,7 @@ describe('Meter', () => {
       );
     });
 
-    it('should create observer with options', () => {
+    it('should create observable up down counter with options', () => {
       const observableUpDownCounter = meter.createObservableUpDownCounter('name', {
         description: 'desc',
         unit: '1',
@@ -1040,11 +1040,11 @@ describe('Meter', () => {
         {
           description: 'desc',
         },
-        (observerResult: api.ObserverResult) => {
+        (observableResult: api.ObservableResult) => {
           // simulate async
           return new Promise<void>(resolve => {
             setTimeout(() => {
-              observerResult.observe(getValue(), { pid: '123', core: '1' });
+              observableResult.observe(getValue(), { pid: '123', core: '1' });
               resolve();
             }, 1);
           });
@@ -1077,8 +1077,8 @@ describe('Meter', () => {
         {
           description: 'desc',
         },
-        (observerResult: api.ObserverResult) => {
-          observerResult.observe(1, { pid: '123', core: '1' });
+        (observableResult: api.ObservableResult) => {
+          observableResult.observe(1, { pid: '123', core: '1' });
         }
       ) as ObservableUpDownCounterMetric;
 
@@ -1095,8 +1095,8 @@ describe('Meter', () => {
           {
             description: 'desc',
           },
-          (observerResult: api.ObserverResult) => {
-            observerResult.observe(1, { pid: '123', core: '1' });
+          (observableResult: api.ObservableResult) => {
+            observableResult.observe(1, { pid: '123', core: '1' });
             return '1';
           }
         ) as ObservableUpDownCounterMetric;
@@ -1112,8 +1112,8 @@ describe('Meter', () => {
         {
           description: 'desc',
         },
-        (observerResult: api.ObserverResult) => {
-          observerResult.observe(1, { pid: '123', core: '1' });
+        (observableResult: api.ObservableResult) => {
+          observableResult.observe(1, { pid: '123', core: '1' });
           throw new Error('Boom');
         }
       ) as ObservableUpDownCounterMetric;
@@ -1163,7 +1163,7 @@ describe('Meter', () => {
         description: 'desc',
       }) as ObservableGaugeMetric;
 
-      meter.createBatchObserver(observerBatchResult => {
+      meter.createBatchObserver(batchObserverResult => {
         interface StatItem {
           usage: number;
           temp: number;
@@ -1202,11 +1202,11 @@ describe('Meter', () => {
         ]).then((stats: unknown[]) => {
           const apps = (stats[0] as unknown) as Stat[];
           apps.forEach(app => {
-            observerBatchResult.observe({ app: app.name, core: '1' }, [
+            batchObserverResult.observe({ app: app.name, core: '1' }, [
               tempMetric.observation(app.core1.temp),
               cpuUsageMetric.observation(app.core1.usage),
             ]);
-            observerBatchResult.observe({ app: app.name, core: '2' }, [
+            batchObserverResult.observe({ app: app.name, core: '2' }, [
               tempMetric.observation(app.core2.temp),
               cpuUsageMetric.observation(app.core2.usage),
             ]);
@@ -1253,7 +1253,7 @@ describe('Meter', () => {
       }) as ObservableGaugeMetric;
 
       meter.createBatchObserver(
-        observerBatchResult => {
+        batchObserverResult => {
           Promise.all([
             // simulate waiting 11ms
             new Promise((resolve, reject) => {
@@ -1261,8 +1261,8 @@ describe('Meter', () => {
             }),
           ]).then(async () => {
             // try to hack to be able to update
-            (observerBatchResult as BatchObserverResult).cancelled = false;
-            observerBatchResult.observe({ foo: 'bar' }, [
+            (batchObserverResult as BatchObserverResult).cancelled = false;
+            batchObserverResult.observe({ foo: 'bar' }, [
               cpuUsageMetric.observation(123),
             ]);
 
@@ -1289,16 +1289,16 @@ describe('Meter', () => {
     });
 
     it('should pipe through instrumentation library', async () => {
-      const observer = meter.createObservableGauge(
+      const observableGauge = meter.createObservableGauge(
         'name',
         {},
-        (observerResult: api.ObserverResult) => {
-          observerResult.observe(42, { foo: 'bar' });
+        (observableResult: api.ObservableResult) => {
+          observableResult.observe(42, { foo: 'bar' });
         }
       ) as ObservableGaugeMetric;
-      assert.ok(observer.instrumentationLibrary);
+      assert.ok(observableGauge.instrumentationLibrary);
 
-      const [record] = await observer.getMetricRecord();
+      const [record] = await observableGauge.getMetricRecord();
       const { name, version } = record.instrumentationLibrary;
       assert.strictEqual(name, 'test-meter');
       assert.strictEqual(version, undefined);

@@ -17,7 +17,7 @@
 import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import {
   Counter,
-  ObserverResult,
+  ObservableResult,
   ObservableGauge,
   Histogram,
   ValueType,
@@ -55,7 +55,7 @@ export function mockCounter(): metrics.Metric<metrics.BoundCounter> & Counter {
 }
 
 export function mockObservableGauge(
-  callback: (observerResult: ObserverResult) => void
+  callback: (observableResult: ObservableResult) => void
 ): metrics.Metric<metrics.BoundCounter> & ObservableGauge {
   const name = 'double-observable-gauge';
   const metric =

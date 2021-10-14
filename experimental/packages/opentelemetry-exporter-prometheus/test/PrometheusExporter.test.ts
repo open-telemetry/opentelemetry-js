@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ObserverResult } from '@opentelemetry/api-metrics';
+import { ObservableResult } from '@opentelemetry/api-metrics';
 import {
   CounterMetric,
   SumAggregator,
@@ -280,8 +280,8 @@ describe('PrometheusExporter', () => {
         {
           description: 'a test description',
         },
-        (observerResult: ObserverResult) => {
-          observerResult.observe(getCpuUsage(), {
+        (observableResult: ObservableResult) => {
+          observableResult.observe(getCpuUsage(), {
             pid: String(123),
             core: '1',
           });
@@ -482,8 +482,8 @@ describe('PrometheusExporter', () => {
         {
           description: 'a test description',
         },
-        (observerResult: ObserverResult) => {
-          observerResult.observe(getValue(), {
+        (observableResult: ObservableResult) => {
+          observableResult.observe(getValue(), {
             key1: 'labelValue1',
           });
         }
@@ -522,8 +522,8 @@ describe('PrometheusExporter', () => {
         {
           description: 'a test description',
         },
-        (observerResult: ObserverResult) => {
-          observerResult.observe(getValue(), {
+        (observableResult: ObservableResult) => {
+          observableResult.observe(getValue(), {
             key1: 'labelValue1',
           });
         }

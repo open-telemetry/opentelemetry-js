@@ -17,7 +17,7 @@
 import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import {
   Counter,
-  ObserverResult,
+  ObservableResult,
   ObservableCounter,
   ObservableUpDownCounter,
   ObservableGauge,
@@ -79,7 +79,7 @@ export function mockDoubleCounter(): metrics.Metric<metrics.BoundCounter> &
 }
 
 export function mockObservableGauge(
-  callback: (observerResult: ObserverResult) => unknown,
+  callback: (observableResult: ObservableResult) => unknown,
   name = 'double-observable-gauge'
 ): metrics.Metric<metrics.BoundObservable> & ObservableGauge {
   const metric =
@@ -98,7 +98,7 @@ export function mockObservableGauge(
 }
 
 export function mockObservableCounter(
-  callback: (observerResult: ObserverResult) => unknown,
+  callback: (observableResult: ObservableResult) => unknown,
   name = 'double-observable-counter'
 ): metrics.Metric<metrics.BoundObservable> & ObservableCounter {
   const metric =
@@ -117,7 +117,7 @@ export function mockObservableCounter(
 }
 
 export function mockObservableUpDownCounter(
-  callback: (observerResult: ObserverResult) => unknown,
+  callback: (observableResult: ObservableResult) => unknown,
   name = 'double-up-down-observable-counter'
 ): metrics.Metric<metrics.BoundObservable> & ObservableUpDownCounter {
   const metric =
@@ -313,7 +313,7 @@ export const multiResourceTrace: ReadableSpan[] = [
 ];
 
 export const multiResourceMetricsGet = function (
-  callback: (observerResult: ObserverResult) => unknown
+  callback: (observableResult: ObservableResult) => unknown
 ): any[] {
   return [
     {
@@ -335,7 +335,7 @@ export const multiResourceMetricsGet = function (
 };
 
 export const multiInstrumentationLibraryMetricsGet = function (
-  callback: (observerResult: ObserverResult) => unknown
+  callback: (observableResult: ObservableResult) => unknown
 ): any[] {
   return [
     {

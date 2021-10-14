@@ -86,10 +86,10 @@ const meter = new MeterProvider().getMeter('your-meter-name');
 
 // async callback - for operation that needs to wait for value
 meter.createObservableGauge('your_metric_name', {
-  description: 'Example of an async observer with callback',
-}, async (observerResult) => {
+  description: 'Example of an async observable gauge with callback',
+}, async (observableResult) => {
   const value = await getAsyncValue();
-  observerResult.observe(value, { label: '1' });
+  observableResult.observe(value, { label: '1' });
 });
 
 function getAsyncValue() {
@@ -102,10 +102,10 @@ function getAsyncValue() {
 
 // sync callback in case you don't need to wait for value
 meter.createObservableGauge('your_metric_name', {
-  description: 'Example of a sync observer with callback',
-}, (observerResult) => {
-  observerResult.observe(getRandomValue(), { label: '1' });
-  observerResult.observe(getRandomValue(), { label: '2' });
+  description: 'Example of a sync observable gauge with callback',
+}, (observableResult) => {
+  observableResult.observe(getRandomValue(), { label: '1' });
+  observableResult.observe(getRandomValue(), { label: '2' });
 });
 
 function getRandomValue() {
@@ -125,10 +125,10 @@ const meter = new MeterProvider().getMeter('your-meter-name');
 
 // async callback - for operation that needs to wait for value
 meter.createObservableUpDownCounter('your_metric_name', {
-  description: 'Example of an async observer with callback',
-}, async (observerResult) => {
+  description: 'Example of an async observable up down counter with callback',
+}, async (observableResult) => {
   const value = await getAsyncValue();
-  observerResult.observe(value, { label: '1' });
+  observableResult.observe(value, { label: '1' });
 });
 
 function getAsyncValue() {
@@ -141,9 +141,9 @@ function getAsyncValue() {
 
 // sync callback in case you don't need to wait for value
 meter.createObservableUpDownCounter('your_metric_name', {
-  description: 'Example of a sync observer with callback',
-}, (observerResult) => {
-  observerResult.observe(getRandomValue(), { label: '1' });
+  description: 'Example of a sync observable up down counter with callback',
+}, (observableResult) => {
+  observableResult.observe(getRandomValue(), { label: '1' });
 });
 
 function getRandomValue() {
@@ -165,9 +165,9 @@ const meter = new MeterProvider().getMeter('your-meter-name');
 // async callback in case you need to wait for values
 meter.createObservableCounter('example_metric', {
   description: 'Example of an async observable counter with callback',
-}, async (observerResult) => {
+}, async (observableResult) => {
   const value = await getAsyncValue();
-  observerResult.observe(value, { label: '1' });
+  observableResult.observe(value, { label: '1' });
 });
 
 function getAsyncValue() {
@@ -181,9 +181,9 @@ function getAsyncValue() {
 // sync callback in case you don't need to wait for values
 meter.createObservableCounter('example_metric', {
   description: 'Example of a sync observable counter with callback',
-}, (observerResult) => {
+}, (observableResult) => {
   const value = getRandomValue();
-  observerResult.observe(value, { label: '1' });
+  observableResult.observe(value, { label: '1' });
 });
 
 function getRandomValue() {
@@ -193,7 +193,7 @@ function getRandomValue() {
 
 ### Batch Observer
 
-Choose this kind of metric when you need to update multiple observers with the results of a single async calculation.
+Choose this kind of metric when you need to update multiple observables with the results of a single async calculation.
 
 ```js
 const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
@@ -221,9 +221,9 @@ const MemUsageMetric = meter.createObservableGauge('mem_usage_per_app', {
   description: 'Memory',
 });
 
-meter.createBatchObserver((observerBatchResult) => {
+meter.createBatchObserver((batchObserverResult) => {
   getSomeAsyncMetrics().then(metrics => {
-    observerBatchResult.observe({ app: 'myApp' }, [
+    batchObserverResult.observe({ app: 'myApp' }, [
       cpuUsageMetric.observation(metrics.value1),
       MemUsageMetric.observation(metrics.value2)
     ]);

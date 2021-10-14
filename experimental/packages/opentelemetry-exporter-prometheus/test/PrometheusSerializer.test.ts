@@ -99,15 +99,15 @@ describe('PrometheusSerializer', () => {
         const meter = new MeterProvider({
           processor: new ExactProcessor(LastValueAggregator),
         }).getMeter('test');
-        const observer = meter.createObservableGauge(
+        const observableGauge = meter.createObservableGauge(
           'test',
           {},
-          observerResult => {
-            observerResult.observe(1, labels);
+          observableResult => {
+            observableResult.observe(1, labels);
           }
         ) as ObservableGaugeMetric;
         await meter.collect();
-        const records = await observer.getMetricRecord();
+        const records = await observableGauge.getMetricRecord();
         const record = records[0];
 
         const result = serializer.serializeRecord(
@@ -126,15 +126,15 @@ describe('PrometheusSerializer', () => {
         const meter = new MeterProvider({
           processor: new ExactProcessor(LastValueAggregator),
         }).getMeter('test');
-        const observer = meter.createObservableGauge(
+        const observableGauge = meter.createObservableGauge(
           'test',
           {},
-          observerResult => {
-            observerResult.observe(1, labels);
+          observableResult => {
+            observableResult.observe(1, labels);
           }
         ) as ObservableGaugeMetric;
         await meter.collect();
-        const records = await observer.getMetricRecord();
+        const records = await observableGauge.getMetricRecord();
         const record = records[0];
 
         const result = serializer.serializeRecord(
@@ -304,17 +304,17 @@ describe('PrometheusSerializer', () => {
           processor: new ExactProcessor(LastValueAggregator),
         }).getMeter('test');
         const processor = new PrometheusLabelsBatcher();
-        const observer = meter.createObservableGauge(
+        const observableGauge = meter.createObservableGauge(
           'test',
           {
             description: 'foobar',
           },
-          observerResult => {
-            observerResult.observe(1, labels);
+          observableResult => {
+            observableResult.observe(1, labels);
           }
         ) as ObservableGaugeMetric;
         await meter.collect();
-        const records = await observer.getMetricRecord();
+        const records = await observableGauge.getMetricRecord();
         records.forEach(it => processor.process(it));
         const checkPointSet = processor.checkPointSet();
 

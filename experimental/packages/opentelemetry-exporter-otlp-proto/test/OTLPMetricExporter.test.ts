@@ -121,10 +121,10 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       metrics = [];
       const counter: metrics.Metric<metrics.BoundCounter> &
         Counter = mockCounter();
-      const observer: metrics.Metric<metrics.BoundObservable> &
-        ObservableGauge = mockObservableGauge(observerResult => {
-        observerResult.observe(3, {});
-        observerResult.observe(6, {});
+      const observableGauge: metrics.Metric<metrics.BoundObservable> &
+        ObservableGauge = mockObservableGauge(observableResult => {
+        observableResult.observe(3, {});
+        observableResult.observe(6, {});
       });
       const histogram: metrics.Metric<metrics.BoundHistogram> &
         Histogram = mockHistogram();
@@ -134,7 +134,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       histogram.record(14);
 
       metrics.push((await counter.getMetricRecord())[0]);
-      metrics.push((await observer.getMetricRecord())[0]);
+      metrics.push((await observableGauge.getMetricRecord())[0]);
       metrics.push((await histogram.getMetricRecord())[0]);
     });
     afterEach(() => {
@@ -197,7 +197,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
             metric1,
             metric1.intSum?.dataPoints[0].timeUnixNano
           );
-          assert.ok(typeof metric2 !== 'undefined', "observer doesn't exist");
+          assert.ok(typeof metric2 !== 'undefined', "observable gauge doesn't exist");
           ensureExportedObservableGaugeIsCorrect(
             metric2,
             metric2.doubleGauge?.dataPoints[0].timeUnixNano

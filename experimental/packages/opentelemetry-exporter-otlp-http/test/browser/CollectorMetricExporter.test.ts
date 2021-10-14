@@ -57,10 +57,10 @@ describe('OTLPMetricExporter - web', () => {
     stubBeacon = sinon.stub(navigator, 'sendBeacon');
     metrics = [];
     const counter: Metric<BoundCounter> & Counter = mockCounter();
-    const observerGauge: Metric<BoundObservable> & ObservableGauge = mockObservableGauge(
-      observerResult => {
-        observerResult.observe(3, {});
-        observerResult.observe(6, {});
+    const observableGauge: Metric<BoundObservable> & ObservableGauge = mockObservableGauge(
+      observableResult => {
+        observableResult.observe(3, {});
+        observableResult.observe(6, {});
       },
       'double-observable-gauge2'
     );
@@ -71,7 +71,7 @@ describe('OTLPMetricExporter - web', () => {
     histogram.record(14);
 
     metrics.push((await counter.getMetricRecord())[0]);
-    metrics.push((await observerGauge.getMetricRecord())[0]);
+    metrics.push((await observableGauge.getMetricRecord())[0]);
     metrics.push((await histogram.getMetricRecord())[0]);
   });
 

@@ -21,18 +21,18 @@ import { BoundObservable } from './BoundInstrument';
 import { Processor } from './export/Processor';
 import { MetricKind, MetricRecord } from './export/types';
 import { Metric } from './Metric';
-import { ObserverResult } from './ObserverResult';
+import { ObservableResult } from './ObservableResult';
 
 const NOOP_CALLBACK = () => {};
 
 /**
  * This is a SDK implementation of Base Observer Metric.
- * All observers should extend this class
+ * All observables should extend this class
  */
-export abstract class BaseObservableMetric
+export abstract class ObservableBaseMetric
   extends Metric<BoundObservable>
-  implements api.BaseObservable {
-  protected _callback: (observerResult: api.ObserverResult) => unknown;
+  implements api.ObservableBase {
+  protected _callback: (observableResult: api.ObservableResult) => unknown;
 
   constructor(
     name: string,
@@ -41,7 +41,7 @@ export abstract class BaseObservableMetric
     resource: Resource,
     metricKind: MetricKind,
     instrumentationLibrary: InstrumentationLibrary,
-    callback?: (observerResult: api.ObserverResult) => unknown
+    callback?: (observableResult: api.ObservableResult) => unknown
   ) {
     super(name, options, metricKind, resource, instrumentationLibrary);
     this._callback = callback || NOOP_CALLBACK;
@@ -57,16 +57,16 @@ export abstract class BaseObservableMetric
   }
 
   override async getMetricRecord(): Promise<MetricRecord[]> {
-    const observerResult = new ObserverResult();
-    await this._callback(observerResult);
+    const observableResult = new ObservableResult();
+    await this._callback(observableResult);
 
-    this._processResults(observerResult);
+    this._processResults(observableResult);
 
     return super.getMetricRecord();
   }
 
-  protected _processResults(observerResult: ObserverResult): void {
-    observerResult.values.forEach((value, labels) => {
+  protected _processResults(observableResult: ObservableResult): void {
+    observableResult.values.forEach((value, labels) => {
       const instrument = this.bind(labels);
       instrument.update(value);
     });
@@ -75,7 +75,7 @@ export abstract class BaseObservableMetric
   observation(value: number): Observation {
     return {
       value,
-      observer: this as BaseObservableMetric,
+      observable: this as ObservableBaseMetric,
     };
   }
 }

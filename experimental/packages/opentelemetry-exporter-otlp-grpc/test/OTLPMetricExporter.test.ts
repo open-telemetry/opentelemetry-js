@@ -141,9 +141,9 @@ const testOTLPMetricExporter = (params: TestParams) =>
       const counter: metrics.Metric<metrics.BoundCounter> &
         Counter = mockCounter();
       const observableGauge: metrics.Metric<metrics.BoundObservable> &
-        ObservableGauge = mockObservableGauge(observerResult => {
-        observerResult.observe(3, {});
-        observerResult.observe(6, {});
+        ObservableGauge = mockObservableGauge(observableResult => {
+        observableResult.observe(3, {});
+        observableResult.observe(6, {});
       });
       const histogram: metrics.Metric<metrics.BoundHistogram> &
         Histogram = mockHistogram();

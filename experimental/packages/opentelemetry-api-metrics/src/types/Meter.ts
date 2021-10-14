@@ -25,7 +25,7 @@ import {
   ObservableCounter,
   ObservableUpDownCounter,
 } from './Metric';
-import { ObserverResult } from './ObserverResult';
+import { ObservableResult } from './ObservableResult';
 
 /**
  * An interface to allow the recording metrics.
@@ -36,27 +36,6 @@ import { ObserverResult } from './ObserverResult';
  */
 export interface Meter {
   /**
-   * Creates a new `Counter` metric. Generally, this kind of metric when the
-   * value is a quantity, the sum is of primary interest, and the event count
-   * and value distribution are not of primary interest.
-   * @param name the name of the metric.
-   * @param [options] the metric options.
-   */
-  createCounter(name: string, options?: MetricOptions): Counter;
-
-  /**
-   * Creates a new `ObservableCounter` metric.
-   * @param name the name of the metric.
-   * @param [options] the metric options.
-   * @param [callback] the observable callback
-   */
-  createObservableCounter(
-    name: string,
-    options?: MetricOptions,
-    callback?: (observerResult: ObserverResult) => void
-  ): ObservableCounter;
-
-  /**
    * Creates and returns a new `Histogram`.
    * @param name the name of the metric.
    * @param [options] the metric options.
@@ -64,16 +43,13 @@ export interface Meter {
   createHistogram(name: string, options?: MetricOptions): Histogram;
 
   /**
-   * Creates a new `ObservableGauge` metric.
+   * Creates a new `Counter` metric. Generally, this kind of metric when the
+   * value is a quantity, the sum is of primary interest, and the event count
+   * and value distribution are not of primary interest.
    * @param name the name of the metric.
    * @param [options] the metric options.
-   * @param [callback] the observable callback
    */
-   createObservableGauge(
-    name: string,
-    options?: MetricOptions,
-    callback?: (observerResult: ObserverResult) => void
-  ): ObservableGauge;
+  createCounter(name: string, options?: MetricOptions): Counter;
 
   /**
    * Creates a new `UpDownCounter` metric. UpDownCounter is a synchronous
@@ -92,7 +68,31 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createUpDownCounter(name: string, options?: MetricOptions): UpDownCounter;
+   createUpDownCounter(name: string, options?: MetricOptions): UpDownCounter;
+
+  /**
+   * Creates a new `ObservableGauge` metric.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   * @param [callback] the observable callback
+   */
+   createObservableGauge(
+    name: string,
+    options?: MetricOptions,
+    callback?: (observableResult: ObservableResult) => void
+  ): ObservableGauge;
+
+  /**
+   * Creates a new `ObservableCounter` metric.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   * @param [callback] the observable callback
+   */
+  createObservableCounter(
+    name: string,
+    options?: MetricOptions,
+    callback?: (observableResult: ObservableResult) => void
+  ): ObservableCounter;
 
   /**
    * Creates a new `ObservableUpDownCounter` metric.
@@ -103,7 +103,7 @@ export interface Meter {
   createObservableUpDownCounter(
     name: string,
     options?: MetricOptions,
-    callback?: (observerResult: ObserverResult) => void
+    callback?: (observableResult: ObservableResult) => void
   ): ObservableUpDownCounter;
 
   /**
