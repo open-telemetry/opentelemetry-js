@@ -33,6 +33,8 @@ import { ObservableGaugeMetric } from './ObservableGaugeMetric';
 import { HistogramMetric } from './HistogramMetric';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const merge = require('lodash.merge');
+// @TODO - replace once the core is released
+// import { merge } from '@opentelemetry/core';
 
 /**
  * Meter is an implementation of the {@link Meter} interface.
@@ -350,6 +352,6 @@ export class Meter implements api.Meter {
    * @param name Name of metric to be created
    */
   private _isValidName(name: string): boolean {
-    return Boolean(name.match(/^[a-z][a-z0-9_.-]*$/i));
+    return Boolean(name.match(/^[a-z][a-z0-9_.-]{0,62}$/i));
   }
 }
