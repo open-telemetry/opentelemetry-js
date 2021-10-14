@@ -48,7 +48,7 @@ export class NoopMeter implements Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-   createHistogram(_name: string, _options?: MetricOptions): Histogram {
+  createHistogram(_name: string, _options?: MetricOptions): Histogram {
     return NOOP_HISTOGRAM_METRIC;
   }
 
@@ -57,7 +57,7 @@ export class NoopMeter implements Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-   createCounter(_name: string, _options?: MetricOptions): Counter {
+  createCounter(_name: string, _options?: MetricOptions): Counter {
     return NOOP_COUNTER_METRIC;
   }
 
@@ -66,7 +66,7 @@ export class NoopMeter implements Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-   createUpDownCounter(_name: string, _options?: MetricOptions): UpDownCounter {
+  createUpDownCounter(_name: string, _options?: MetricOptions): UpDownCounter {
     return NOOP_COUNTER_METRIC;
   }
 
@@ -76,7 +76,7 @@ export class NoopMeter implements Meter {
    * @param [options] the metric options.
    * @param [callback] the observable gauge callback
    */
-   createObservableGauge(
+  createObservableGauge(
     _name: string,
     _options?: MetricOptions,
     _callback?: (observableResult: ObservableResult) => void

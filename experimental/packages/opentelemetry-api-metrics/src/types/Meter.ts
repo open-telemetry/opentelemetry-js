@@ -68,7 +68,7 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-   createUpDownCounter(name: string, options?: MetricOptions): UpDownCounter;
+  createUpDownCounter(name: string, options?: MetricOptions): UpDownCounter;
 
   /**
    * Creates a new `ObservableGauge` metric.
@@ -76,7 +76,7 @@ export interface Meter {
    * @param [options] the metric options.
    * @param [callback] the observable callback
    */
-   createObservableGauge(
+  createObservableGauge(
     name: string,
     options?: MetricOptions,
     callback?: (observableResult: ObservableResult) => void
