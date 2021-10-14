@@ -55,7 +55,8 @@ export const {{class_name}} = {
   /** {% filter escape %}{{member.brief | to_doc_brief}}.{% endfilter %} */
   {{ member.member_id | to_const_name }}: {{ print_value(type, member.value) }},
   {%- endfor %}
-}
+} as const
+export type {{class_name}} = typeof {{class_name}}[keyof typeof {{class_name}}]
 {% endif %}
 {% endif %}
 
