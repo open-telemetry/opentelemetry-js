@@ -908,4 +908,87 @@ describe('HttpInstrumentation', () => {
       });
     });
   });
+
+  describe('capturing headers as span attributes', () => {
+    beforeEach(() => {
+      memoryExporter.reset();
+    });
+
+    before(() => {
+      instrumentation.setConfig({
+        headersToSpanAttributes: {
+          client: { requestHeaders: ['X-Client-Header1'], responseHeaders: ['X-Server-Header1'] },
+          server: { requestHeaders: ['X-Client-Header2'], responseHeaders: ['X-Server-Header2'] },
+        }
+      });
+      instrumentation.enable();
+      server = http.createServer((request, response) => {
+        response.setHeader('X-ServeR-header1', 'server123');
+        response.setHeader('X-Server-header2', '123server');
+        response.end('Test Server Response');
+      });
+
+      server.listen(serverPort);
+    });
+
+    after(() => {
+      server.close();
+      instrumentation.disable();
+    });
+
+    it('should convert headers to span attributes', async () => {
+      await httpRequest.get(
+        `${protocol}://${hostname}:${serverPort}${pathname}`,
+        {
+          headers: {
+            'X-client-header1': 'client123',
+            'X-CLIENT-HEADER2': '123client',
+          }
+        }
+      );
+      const spans = memoryExporter.getFinishedSpans();
+      const [incomingSpan, outgoingSpan] = spans;
+
+      assert.strictEqual(spans.length, 2);
+
+      assert.deepStrictEqual(
+        incomingSpan.attributes['http.request.header.x_client_header2'],
+        ['123client']
+      );
+
+      assert.deepStrictEqual(
+        incomingSpan.attributes['http.response.header.x_server_header2'],
+        ['123server']
+      );
+
+      assert.strictEqual(
+        incomingSpan.attributes['http.request.header.x_client_header1'],
+        undefined
+      );
+
+      assert.strictEqual(
+        incomingSpan.attributes['http.response.header.x_server_header1'],
+        undefined
+      );
+
+      assert.deepStrictEqual(
+        outgoingSpan.attributes['http.request.header.x_client_header1'],
+        ['client123']
+      );
+      assert.deepStrictEqual(
+        outgoingSpan.attributes['http.response.header.x_server_header1'],
+        ['server123']
+      );
+
+      assert.strictEqual(
+        outgoingSpan.attributes['http.request.header.x_client_header2'],
+        undefined
+      );
+
+      assert.strictEqual(
+        outgoingSpan.attributes['http.response.header.x_server_header2'],
+        undefined
+      );
+    });
+  });
 });
