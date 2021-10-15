@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ObserverResult } from '@opentelemetry/api-metrics';
+import { ObservableResult } from '@opentelemetry/api-metrics';
 import {
   CounterMetric,
   SumAggregator,
@@ -270,18 +270,18 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should export an observer aggregation', done => {
+    it('should export an observable gauge aggregation', done => {
       function getCpuUsage() {
         return 0.999;
       }
 
-      meter.createValueObserver(
-        'metric_observer',
+      meter.createObservableGauge(
+        'metric_observable_gauge',
         {
           description: 'a test description',
         },
-        (observerResult: ObserverResult) => {
-          observerResult.observe(getCpuUsage(), {
+        (observableResult: ObservableResult) => {
+          observableResult.observe(getCpuUsage(), {
             pid: String(123),
             core: '1',
           });
@@ -298,9 +298,9 @@ describe('PrometheusExporter', () => {
                   const lines = body.split('\n');
 
                   assert.deepStrictEqual(lines, [
-                    '# HELP metric_observer a test description',
-                    '# TYPE metric_observer gauge',
-                    `metric_observer{pid="123",core="1"} 0.999 ${mockedHrTimeMs}`,
+                    '# HELP metric_observable_gauge a test description',
+                    '# TYPE metric_observable_gauge gauge',
+                    `metric_observable_gauge{pid="123",core="1"} 0.999 ${mockedHrTimeMs}`,
                     '',
                   ]);
                   done();
@@ -472,18 +472,18 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should export a SumObserver as a counter', done => {
+    it('should export an ObservableCounter as a counter', done => {
       function getValue() {
         return 20;
       }
 
-      meter.createSumObserver(
-        'sum_observer',
+      meter.createObservableCounter(
+        'metric_observable_counter',
         {
           description: 'a test description',
         },
-        (observerResult: ObserverResult) => {
-          observerResult.observe(getValue(), {
+        (observableResult: ObservableResult) => {
+          observableResult.observe(getValue(), {
             key1: 'labelValue1',
           });
         }
@@ -498,9 +498,9 @@ describe('PrometheusExporter', () => {
                 const lines = body.split('\n');
 
                 assert.deepStrictEqual(lines, [
-                  '# HELP sum_observer a test description',
-                  '# TYPE sum_observer gauge',
-                  `sum_observer{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
+                  '# HELP metric_observable_counter a test description',
+                  '# TYPE metric_observable_counter gauge',
+                  `metric_observable_counter{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
                   '',
                 ]);
               });
@@ -512,18 +512,18 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should export a UpDownSumObserver as a gauge', done => {
+    it('should export an ObservableUpDownCounter as a gauge', done => {
       function getValue() {
         return 20;
       }
 
-      meter.createUpDownSumObserver(
-        'updown_observer',
+      meter.createObservableUpDownCounter(
+        'metric_observable_up_down_counter',
         {
           description: 'a test description',
         },
-        (observerResult: ObserverResult) => {
-          observerResult.observe(getValue(), {
+        (observableResult: ObservableResult) => {
+          observableResult.observe(getValue(), {
             key1: 'labelValue1',
           });
         }
@@ -538,9 +538,9 @@ describe('PrometheusExporter', () => {
                 const lines = body.split('\n');
 
                 assert.deepStrictEqual(lines, [
-                  '# HELP updown_observer a test description',
-                  '# TYPE updown_observer gauge',
-                  `updown_observer{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
+                  '# HELP metric_observable_up_down_counter a test description',
+                  '# TYPE metric_observable_up_down_counter gauge',
+                  `metric_observable_up_down_counter{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
                   '',
                 ]);
               });
@@ -552,12 +552,12 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should export a ValueRecorder as a summary', done => {
-      const valueRecorder = meter.createValueRecorder('value_recorder', {
+    it('should export a Histogram as a summary', done => {
+      const histogram = meter.createHistogram('test_histogram', {
         description: 'a test description',
       });
 
-      valueRecorder.bind({ key1: 'labelValue1' }).record(20);
+      histogram.bind({ key1: 'labelValue1' }).record(20);
 
       meter.collect().then(() => {
         exporter.export(meter.getProcessor().checkPointSet(), () => {
@@ -568,11 +568,11 @@ describe('PrometheusExporter', () => {
                 const lines = body.split('\n');
 
                 assert.deepStrictEqual(lines, [
-                  '# HELP value_recorder a test description',
-                  '# TYPE value_recorder histogram',
-                  `value_recorder_count{key1="labelValue1"} 1 ${mockedHrTimeMs}`,
-                  `value_recorder_sum{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
-                  `value_recorder_bucket{key1="labelValue1",le="+Inf"} 1 ${mockedHrTimeMs}`,
+                  '# HELP test_histogram a test description',
+                  '# TYPE test_histogram histogram',
+                  `test_histogram_count{key1="labelValue1"} 1 ${mockedHrTimeMs}`,
+                  `test_histogram_sum{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
+                  `test_histogram_bucket{key1="labelValue1",le="+Inf"} 1 ${mockedHrTimeMs}`,
                   '',
                 ]);
 

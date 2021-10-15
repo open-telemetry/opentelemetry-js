@@ -25,12 +25,12 @@ import { PushController } from './export/Controller';
 import { NoopExporter } from './export/NoopExporter';
 import { Processor, UngroupedProcessor } from './export/Processor';
 import { Metric } from './Metric';
-import { SumObserverMetric } from './SumObserverMetric';
+import { ObservableCounterMetric } from './ObservableCounterMetric';
 import { DEFAULT_CONFIG, DEFAULT_METRIC_OPTIONS, MeterConfig } from './types';
 import { UpDownCounterMetric } from './UpDownCounterMetric';
-import { UpDownSumObserverMetric } from './UpDownSumObserverMetric';
-import { ValueObserverMetric } from './ValueObserverMetric';
-import { ValueRecorderMetric } from './ValueRecorderMetric';
+import { ObservableUpDownCounterMetric } from './ObservableUpDownCounterMetric';
+import { ObservableGaugeMetric } from './ObservableGaugeMetric';
+import { HistogramMetric } from './HistogramMetric';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const merge = require('lodash.merge');
 // @TODO - replace once the core is released
@@ -68,34 +68,34 @@ export class Meter implements api.Meter {
   }
 
   /**
-   * Creates and returns a new {@link ValueRecorder}.
+   * Creates and returns a new {@link Histogram}.
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createValueRecorder(
+  createHistogram(
     name: string,
     options?: api.MetricOptions
-  ): api.ValueRecorder {
+  ): api.Histogram {
     if (!this._isValidName(name)) {
       diag.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return api.NOOP_VALUE_RECORDER_METRIC;
+      return api.NOOP_HISTOGRAM_METRIC;
     }
     const opt: api.MetricOptions = {
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
 
-    const valueRecorder = new ValueRecorderMetric(
+    const histogram = new HistogramMetric(
       name,
       opt,
       this._processor,
       this._resource,
       this._instrumentationLibrary
     );
-    this._registerMetric(name, valueRecorder);
-    return valueRecorder;
+    this._registerMetric(name, histogram);
+    return histogram;
   }
 
   /**
@@ -163,27 +163,27 @@ export class Meter implements api.Meter {
   }
 
   /**
-   * Creates a new `ValueObserver` metric.
+   * Creates a new `ObservableGauge` metric.
    * @param name the name of the metric.
    * @param [options] the metric options.
-   * @param [callback] the value observer callback
+   * @param [callback] the observable gauge callback
    */
-  createValueObserver(
+  createObservableGauge(
     name: string,
     options: api.MetricOptions = {},
-    callback?: (observerResult: api.ObserverResult) => unknown
-  ): api.ValueObserver {
+    callback?: (observableResult: api.ObservableResult) => unknown
+  ): api.ObservableGauge {
     if (!this._isValidName(name)) {
       diag.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return api.NOOP_VALUE_OBSERVER_METRIC;
+      return api.NOOP_OBSERVABLE_GAUGE_METRIC;
     }
     const opt: api.MetricOptions = {
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    const valueObserver = new ValueObserverMetric(
+    const observableGauge = new ObservableGaugeMetric(
       name,
       opt,
       this._processor,
@@ -191,26 +191,26 @@ export class Meter implements api.Meter {
       this._instrumentationLibrary,
       callback
     );
-    this._registerMetric(name, valueObserver);
-    return valueObserver;
+    this._registerMetric(name, observableGauge);
+    return observableGauge;
   }
 
-  createSumObserver(
+  createObservableCounter(
     name: string,
     options: api.MetricOptions = {},
-    callback?: (observerResult: api.ObserverResult) => unknown
-  ): api.SumObserver {
+    callback?: (observableResult: api.ObservableResult) => unknown
+  ): api.ObservableCounter {
     if (!this._isValidName(name)) {
       diag.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return api.NOOP_SUM_OBSERVER_METRIC;
+      return api.NOOP_OBSERVABLE_COUNTER_METRIC;
     }
     const opt: api.MetricOptions = {
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    const sumObserver = new SumObserverMetric(
+    const observableCounter = new ObservableCounterMetric(
       name,
       opt,
       this._processor,
@@ -218,32 +218,32 @@ export class Meter implements api.Meter {
       this._instrumentationLibrary,
       callback
     );
-    this._registerMetric(name, sumObserver);
-    return sumObserver;
+    this._registerMetric(name, observableCounter);
+    return observableCounter;
   }
 
   /**
-   * Creates a new `UpDownSumObserver` metric.
+   * Creates a new `ObservableUpDownCounter` metric.
    * @param name the name of the metric.
    * @param [options] the metric options.
-   * @param [callback] the value observer callback
+   * @param [callback] the observable gauge callback
    */
-  createUpDownSumObserver(
+  createObservableUpDownCounter(
     name: string,
     options: api.MetricOptions = {},
-    callback?: (observerResult: api.ObserverResult) => unknown
-  ): api.UpDownSumObserver {
+    callback?: (observableResult: api.ObservableResult) => unknown
+  ): api.ObservableUpDownCounter {
     if (!this._isValidName(name)) {
       diag.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return api.NOOP_UP_DOWN_SUM_OBSERVER_METRIC;
+      return api.NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC;
     }
     const opt: api.MetricOptions = {
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    const upDownSumObserver = new UpDownSumObserverMetric(
+    const observableUpDownCounter = new ObservableUpDownCounterMetric(
       name,
       opt,
       this._processor,
@@ -251,8 +251,8 @@ export class Meter implements api.Meter {
       this._instrumentationLibrary,
       callback
     );
-    this._registerMetric(name, upDownSumObserver);
-    return upDownSumObserver;
+    this._registerMetric(name, observableUpDownCounter);
+    return observableUpDownCounter;
   }
 
   /**
@@ -261,7 +261,7 @@ export class Meter implements api.Meter {
    * @param [options] the batch options.
    */
   createBatchObserver(
-    callback: (observerResult: api.BatchObserverResult) => void,
+    callback: (observableResult: api.BatchObserverResult) => void,
     options: api.BatchObserverOptions = {}
   ): BatchObserver {
     const opt: api.BatchObserverOptions = {

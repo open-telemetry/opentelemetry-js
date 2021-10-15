@@ -13,31 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import * as api from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { BaseObserverMetric } from './BaseObserverMetric';
+import { ObservableBaseMetric } from './ObservableBaseMetric';
 import { Processor } from './export/Processor';
 import { MetricKind } from './export/types';
 
-/** This is a SDK implementation of Value Observer Metric. */
-export class ValueObserverMetric
-  extends BaseObserverMetric
-  implements api.ValueObserver {
+/** This is a SDK implementation of ObservableUpDownCounter Metric. */
+export class ObservableUpDownCounterMetric
+  extends ObservableBaseMetric
+  implements api.ObservableUpDownCounter {
   constructor(
     name: string,
     options: api.MetricOptions,
     processor: Processor,
     resource: Resource,
     instrumentationLibrary: InstrumentationLibrary,
-    callback?: (observerResult: api.ObserverResult) => unknown
+    callback?: (observableResult: api.ObservableResult) => unknown
   ) {
     super(
       name,
       options,
       processor,
       resource,
-      MetricKind.VALUE_OBSERVER,
+      MetricKind.OBSERVABLE_UP_DOWN_COUNTER,
       instrumentationLibrary,
       callback
     );

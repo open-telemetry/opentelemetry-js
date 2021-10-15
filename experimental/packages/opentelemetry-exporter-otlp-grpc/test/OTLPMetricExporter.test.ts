@@ -17,8 +17,8 @@
 import * as protoLoader from '@grpc/proto-loader';
 import {
   Counter,
-  ValueObserver,
-  ValueRecorder,
+  ObservableGauge,
+  Histogram,
 } from '@opentelemetry/api-metrics';
 import { diag } from '@opentelemetry/api';
 import { otlpTypes } from '@opentelemetry/exporter-otlp-http';
@@ -31,13 +31,13 @@ import * as sinon from 'sinon';
 import { OTLPMetricExporter } from '../src';
 import {
   ensureExportedCounterIsCorrect,
-  ensureExportedObserverIsCorrect,
-  ensureExportedValueRecorderIsCorrect,
+  ensureExportedObservableGaugeIsCorrect,
+  ensureExportedHistogramIsCorrect,
   ensureMetadataIsCorrect,
   ensureResourceIsCorrect,
   mockCounter,
-  mockObserver,
-  mockValueRecorder,
+  mockObservableGauge,
+  mockHistogram,
 } from './helper';
 
 const metricsServiceProtoPath =
@@ -140,21 +140,21 @@ const testOTLPMetricExporter = (params: TestParams) =>
       metrics = [];
       const counter: metrics.Metric<metrics.BoundCounter> &
         Counter = mockCounter();
-      const observer: metrics.Metric<metrics.BoundObserver> &
-        ValueObserver = mockObserver(observerResult => {
-        observerResult.observe(3, {});
-        observerResult.observe(6, {});
+      const observableGauge: metrics.Metric<metrics.BoundObservable> &
+        ObservableGauge = mockObservableGauge(observableResult => {
+        observableResult.observe(3, {});
+        observableResult.observe(6, {});
       });
-      const recorder: metrics.Metric<metrics.BoundValueRecorder> &
-        ValueRecorder = mockValueRecorder();
+      const histogram: metrics.Metric<metrics.BoundHistogram> &
+        Histogram = mockHistogram();
 
       counter.add(1);
-      recorder.record(7);
-      recorder.record(14);
+      histogram.record(7);
+      histogram.record(14);
 
       metrics.push((await counter.getMetricRecord())[0]);
-      metrics.push((await observer.getMetricRecord())[0]);
-      metrics.push((await recorder.getMetricRecord())[0]);
+      metrics.push((await observableGauge.getMetricRecord())[0]);
+      metrics.push((await histogram.getMetricRecord())[0]);
     });
 
     afterEach(() => {
@@ -203,21 +203,21 @@ const testOTLPMetricExporter = (params: TestParams) =>
             resource = exportedData[0].resource;
             const counter =
               exportedData[0].instrumentationLibraryMetrics[0].metrics[0];
-            const observer =
+            const observableGauge =
               exportedData[0].instrumentationLibraryMetrics[0].metrics[1];
-            const recorder =
+            const histogram =
               exportedData[0].instrumentationLibraryMetrics[0].metrics[2];
             ensureExportedCounterIsCorrect(
               counter,
               counter.intSum?.dataPoints[0].timeUnixNano
             );
-            ensureExportedObserverIsCorrect(
-              observer,
-              observer.doubleGauge?.dataPoints[0].timeUnixNano
+            ensureExportedObservableGaugeIsCorrect(
+              observableGauge,
+              observableGauge.doubleGauge?.dataPoints[0].timeUnixNano
             );
-            ensureExportedValueRecorderIsCorrect(
-              recorder,
-              recorder.intHistogram?.dataPoints[0].timeUnixNano,
+            ensureExportedHistogramIsCorrect(
+              histogram,
+              histogram.intHistogram?.dataPoints[0].timeUnixNano,
               [0, 100],
               ['0', '2', '0']
             );
