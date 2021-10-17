@@ -31,6 +31,7 @@ import {
 import {
   BoundHistogram,
   BoundCounter,
+  BoundUpDownCounter,
   BoundObservableBase,
 } from './types/BoundInstrument';
 import { ObservableResult } from './types/ObservableResult';
@@ -67,7 +68,7 @@ export class NoopMeter implements Meter {
    * @param [options] the metric options.
    */
   createUpDownCounter(_name: string, _options?: MetricOptions): UpDownCounter {
-    return NOOP_COUNTER_METRIC;
+    return NOOP_UP_DOWN_COUNTER_METRIC;
   }
 
   /**
@@ -166,6 +167,14 @@ export class NoopCounterMetric
   }
 }
 
+export class NoopUpDownCounterMetric
+  extends NoopMetric<BoundUpDownCounter>
+  implements Counter {
+  add(value: number, labels: Labels): void {
+    this.bind(labels).add(value);
+  }
+}
+
 export class NoopHistogramMetric
   extends NoopMetric<BoundHistogram>
   implements Histogram {
@@ -193,6 +202,12 @@ export class NoopBoundCounter implements BoundCounter {
   }
 }
 
+export class NoopBoundUpDownCounter implements BoundUpDownCounter {
+  add(_value: number): void {
+    return;
+  }
+}
+
 export class NoopBoundHistogram implements BoundHistogram {
   record(_value: number, _baggage?: unknown, _spanContext?: unknown): void {
     return;
@@ -206,6 +221,8 @@ export class NoopBoundObservableBase implements BoundObservableBase {
 export const NOOP_METER = new NoopMeter();
 export const NOOP_BOUND_COUNTER = new NoopBoundCounter();
 export const NOOP_COUNTER_METRIC = new NoopCounterMetric(NOOP_BOUND_COUNTER);
+export const NOOP_BOUND_UP_DOWN_COUNTER = new NoopBoundUpDownCounter();
+export const NOOP_UP_DOWN_COUNTER_METRIC = new NoopUpDownCounterMetric(NOOP_BOUND_UP_DOWN_COUNTER);
 
 export const NOOP_BOUND_HISTOGRAM = new NoopBoundHistogram();
 export const NOOP_HISTOGRAM_METRIC = new NoopHistogramMetric(

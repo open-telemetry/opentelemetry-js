@@ -370,13 +370,13 @@ describe('Meter', () => {
     describe('.bind()', () => {
       it('should create a UpDownCounter instrument', async () => {
         const upDownCounter = meter.createUpDownCounter('name');
-        const boundCounter = upDownCounter.bind(labels);
-        boundCounter.add(10);
+        const boundUpDownCounter = upDownCounter.bind(labels);
+        boundUpDownCounter.add(10);
         await meter.collect();
         const [record1] = meter.getProcessor().checkPointSet();
 
         assert.strictEqual(record1.aggregator.toPoint().value, 10);
-        boundCounter.add(-200);
+        boundUpDownCounter.add(-200);
         assert.strictEqual(record1.aggregator.toPoint().value, -190);
       });
 
@@ -384,18 +384,18 @@ describe('Meter', () => {
         const upDownCounter = meter.createUpDownCounter(
           'name'
         ) as UpDownCounterMetric;
-        const boundCounter = upDownCounter.bind(labels);
-        boundCounter.add(20);
-        assert.ok(boundCounter.getAggregator() instanceof SumAggregator);
-        assert.strictEqual(boundCounter.getLabels(), labels);
+        const boundUpDownCounter = upDownCounter.bind(labels);
+        boundUpDownCounter.add(20);
+        assert.ok(boundUpDownCounter.getAggregator() instanceof SumAggregator);
+        assert.strictEqual(boundUpDownCounter.getLabels(), labels);
       });
 
       it('should not add the instrument data when disabled', async () => {
         const upDownCounter = meter.createUpDownCounter('name', {
           disabled: true,
         });
-        const boundCounter = upDownCounter.bind(labels);
-        boundCounter.add(10);
+        const boundUpDownCounter = upDownCounter.bind(labels);
+        boundUpDownCounter.add(10);
         await meter.collect();
         const [record1] = meter.getProcessor().checkPointSet();
         assert.strictEqual(record1.aggregator.toPoint().value, 0);
@@ -403,25 +403,25 @@ describe('Meter', () => {
 
       it('should return same instrument on same label values', async () => {
         const upDownCounter = meter.createUpDownCounter('name');
-        const boundCounter = upDownCounter.bind(labels);
-        boundCounter.add(10);
-        const boundCounter1 = upDownCounter.bind(labels);
-        boundCounter1.add(10);
+        const boundUpDownCounter = upDownCounter.bind(labels);
+        boundUpDownCounter.add(10);
+        const boundUpDownCounter1 = upDownCounter.bind(labels);
+        boundUpDownCounter1.add(10);
         await meter.collect();
         const [record1] = meter.getProcessor().checkPointSet();
 
         assert.strictEqual(record1.aggregator.toPoint().value, 20);
-        assert.strictEqual(boundCounter, boundCounter1);
+        assert.strictEqual(boundUpDownCounter, boundUpDownCounter1);
       });
 
       it('should truncate non-integer values for INT valueType', async () => {
         const upDownCounter = meter.createUpDownCounter('name', {
           valueType: api.ValueType.INT,
         });
-        const boundCounter = upDownCounter.bind(labels);
+        const boundUpDownCounter = upDownCounter.bind(labels);
 
         [-1.1, 2.2].forEach(val => {
-          boundCounter.add(val);
+          boundUpDownCounter.add(val);
         });
         await meter.collect();
         const [record1] = meter.getProcessor().checkPointSet();
@@ -432,12 +432,12 @@ describe('Meter', () => {
         const upDownCounter = meter.createUpDownCounter('name', {
           valueType: api.ValueType.DOUBLE,
         });
-        const boundCounter = upDownCounter.bind(labels);
+        const boundUpDownCounter = upDownCounter.bind(labels);
 
         await Promise.all(
           nonNumberValues.map(async val => {
             // @ts-expect-error verify non number types
-            boundCounter.add(val);
+            boundUpDownCounter.add(val);
             await meter.collect();
             const [record1] = meter.getProcessor().checkPointSet();
 
@@ -450,12 +450,12 @@ describe('Meter', () => {
         const upDownCounter = meter.createUpDownCounter('name', {
           valueType: api.ValueType.DOUBLE,
         });
-        const boundCounter = upDownCounter.bind(labels);
+        const boundUpDownCounter = upDownCounter.bind(labels);
 
         await Promise.all(
           nonNumberValues.map(async val => {
             // @ts-expect-error verify non number types
-            boundCounter.add(val);
+            boundUpDownCounter.add(val);
             await meter.collect();
             const [record1] = meter.getProcessor().checkPointSet();
 
@@ -470,13 +470,13 @@ describe('Meter', () => {
         const upDownCounter = meter.createUpDownCounter(
           'name'
         ) as UpDownCounterMetric;
-        const boundCounter = upDownCounter.bind(labels);
+        const boundUpDownCounter = upDownCounter.bind(labels);
         assert.strictEqual(upDownCounter['_instruments'].size, 1);
         upDownCounter.unbind(labels);
         assert.strictEqual(upDownCounter['_instruments'].size, 0);
-        const boundCounter1 = upDownCounter.bind(labels);
+        const boundUpDownCounter1 = upDownCounter.bind(labels);
         assert.strictEqual(upDownCounter['_instruments'].size, 1);
-        assert.notStrictEqual(boundCounter, boundCounter1);
+        assert.notStrictEqual(boundUpDownCounter, boundUpDownCounter1);
       });
 
       it('should not fail when removing non existing instrument', () => {

@@ -17,6 +17,7 @@
 import {
   BoundObservableBase,
   BoundCounter,
+  BoundUpDownCounter,
   BoundHistogram,
 } from './BoundInstrument';
 import {
@@ -137,14 +138,14 @@ export interface UnboundMetric<T> extends Metric {
  */
 export interface Counter extends UnboundMetric<BoundCounter> {
   /**
-   * Adds the given value to the current value. Values cannot be negative.
+   * Increment the Counter by a fixed amount. Values cannot be negative.
    */
   add(value: number, labels?: Labels): void;
 }
 
-export interface UpDownCounter extends UnboundMetric<BoundCounter> {
+export interface UpDownCounter extends UnboundMetric<BoundUpDownCounter> {
   /**
-   * Adds the given value to the current value. Values can be negative.
+   * Increment or decrement the UpDownCounter by a fixed amount. Values can be negative.
    */
   add(value: number, labels?: Labels): void;
 }

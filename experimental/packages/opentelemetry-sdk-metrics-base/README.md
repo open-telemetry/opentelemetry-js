@@ -61,15 +61,15 @@ const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
 // Initialize the Meter to capture measurements in various ways.
 const meter = new MeterProvider().getMeter('your-meter-name');
 
-const counter = meter.createUpDownCounter('metric_name', {
+const upDownCounter = meter.createUpDownCounter('metric_name', {
   description: 'Example of a UpDownCounter'
 });
 
 const labels = { pid: process.pid };
 
 // Create a BoundInstrument associated with specified label values.
-const boundCounter = counter.bind(labels);
-boundCounter.add(Math.random() > 0.5 ? 1 : -1);
+const boundUpDownCounter = upDownCounter.bind(labels);
+boundUpDownCounter.add(Math.random() > 0.5 ? 1 : -1);
 
 ```
 

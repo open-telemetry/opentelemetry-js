@@ -17,10 +17,19 @@
 /** An Instrument for Counter Metric. */
 export interface BoundCounter {
   /**
-   * Adds the given value to the current value. Values cannot be negative.
+   * Increment the Counter by a fixed amount. Values cannot be negative.
    * @param value the value to add.
    */
   add(value: number): void;
+}
+
+/** An Instrument for UpDownCounter Metric. */
+export interface BoundUpDownCounter {
+/**
+   * Increment or decrement the UpDownCounter by a fixed amount. Values can be negative.
+   * @param value the value to add.
+   */
+ add(value: number): void;
 }
 
 /** Histogram to report instantaneous measurement of a value. */

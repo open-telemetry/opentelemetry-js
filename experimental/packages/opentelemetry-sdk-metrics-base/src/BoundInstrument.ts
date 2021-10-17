@@ -99,7 +99,7 @@ export class BoundCounter
  */
 export class BoundUpDownCounter
   extends BaseBoundInstrument
-  implements api.BoundCounter {
+  implements api.BoundUpDownCounter {
   constructor(
     labels: api.Labels,
     disabled: boolean,
