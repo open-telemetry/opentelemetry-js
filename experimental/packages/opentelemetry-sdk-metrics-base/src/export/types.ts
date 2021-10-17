@@ -27,10 +27,10 @@ import { Resource } from '@opentelemetry/resources';
 export enum MetricKind {
   COUNTER,
   UP_DOWN_COUNTER,
-  VALUE_RECORDER,
-  SUM_OBSERVER,
-  UP_DOWN_SUM_OBSERVER,
-  VALUE_OBSERVER,
+  HISTOGRAM,
+  OBSERVABLE_COUNTER,
+  OBSERVABLE_UP_DOWN_COUNTER,
+  OBSERVABLE_GAUGE,
   BATCH_OBSERVER,
 }
 

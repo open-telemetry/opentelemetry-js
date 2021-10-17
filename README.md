@@ -286,6 +286,29 @@ To request automatic tracing support for a module not on this list, please [file
 
 ## Upgrade guidelines
 
+### 0.26.x to 0.27.x
+
+Metric types are renamed:
+
+- `@openetelemetry/api-metrics`
+  - `Meter`
+    - `createValueRecorder` => `createHistogram`
+    - `createValueObserver` => `createObservableGauge`
+    - `createSumObserver` => `createObservableCounter`
+    - `createUpDownSumObserver` => `createObservableUpDownCounter`
+  - `ValueRecorder` => `Histogram`
+  - `ValueObserver` => `ObservableGauge`
+  - `SumObserver` => `ObservableCounter`
+  - `UpDownSumObserver` => `ObservableUpDownCounter`
+  - `ObserverResult` => `ObservableResult`
+  - `Observation.observer` => `Observation.observable`
+- `@opentelemetry/sdk-metrics-base`
+  - `MetricKind`
+    - `VALUE_RECORDER` => `HISTOGRAM`
+    - `SUM_OBSERVER` => `OBSERVABLE_COUNTER`
+    - `UP_DOWN_SUM_OBSERVER` => `OBSERVABLE_UP_DOWN_COUNTER`
+    - `VALUE_OBSERVER` => `OBSERVABLE_GAUGE`
+
 ### 0.25.x to 1.x.y
 
 Collector exporter packages and types are renamed:

@@ -17,38 +17,38 @@
 import * as api from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { BaseObserverMetric } from './BaseObserverMetric';
+import { ObservableBaseMetric } from './ObservableBaseMetric';
 import { Processor } from './export/Processor';
 import { LastValue, MetricKind } from './export/types';
-import { ObserverResult } from './ObserverResult';
+import { ObservableResult } from './ObservableResult';
 
-/** This is a SDK implementation of SumObserver Metric. */
-export class SumObserverMetric
-  extends BaseObserverMetric
-  implements api.SumObserver {
+/** This is a SDK implementation of ObservableCounter Metric. */
+export class ObservableCounterMetric
+  extends ObservableBaseMetric
+  implements api.ObservableCounter {
   constructor(
     name: string,
     options: api.MetricOptions,
     processor: Processor,
     resource: Resource,
     instrumentationLibrary: InstrumentationLibrary,
-    callback?: (observerResult: api.ObserverResult) => unknown
+    callback?: (observableResult: api.ObservableResult) => unknown
   ) {
     super(
       name,
       options,
       processor,
       resource,
-      MetricKind.SUM_OBSERVER,
+      MetricKind.OBSERVABLE_COUNTER,
       instrumentationLibrary,
       callback
     );
   }
 
-  protected override _processResults(observerResult: ObserverResult): void {
-    observerResult.values.forEach((value, labels) => {
+  protected override _processResults(observableResult: ObservableResult): void {
+    observableResult.values.forEach((value, labels) => {
       const instrument = this.bind(labels);
-      // SumObserver is monotonic which means it should only accept values
+      // ObservableCounter is monotonic which means it should only accept values
       // greater or equal then previous value
       const previous = instrument.getAggregator().toPoint();
       let previousValue = -Infinity;

@@ -17,8 +17,8 @@
 import { diag } from '@opentelemetry/api';
 import {
   Counter,
-  ValueObserver,
-  ValueRecorder,
+  ObservableGauge,
+  Histogram,
 } from '@opentelemetry/api-metrics';
 import { ExportResultCode } from '@opentelemetry/core';
 import {
@@ -33,13 +33,13 @@ import { OTLPMetricExporter } from '../src';
 import { getExportRequestProto } from '../src/util';
 import {
   ensureExportedCounterIsCorrect,
-  ensureExportedObserverIsCorrect,
-  ensureExportedValueRecorderIsCorrect,
+  ensureExportedObservableGaugeIsCorrect,
+  ensureExportedHistogramIsCorrect,
   ensureExportMetricsServiceRequestIsSet,
   mockCounter,
   MockedResponse,
-  mockObserver,
-  mockValueRecorder,
+  mockObservableGauge,
+  mockHistogram,
 } from './helper';
 
 const fakeRequest = {
@@ -121,21 +121,21 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       metrics = [];
       const counter: metrics.Metric<metrics.BoundCounter> &
         Counter = mockCounter();
-      const observer: metrics.Metric<metrics.BoundObserver> &
-        ValueObserver = mockObserver(observerResult => {
-        observerResult.observe(3, {});
-        observerResult.observe(6, {});
+      const observableGauge: metrics.Metric<metrics.BoundObservable> &
+        ObservableGauge = mockObservableGauge(observableResult => {
+        observableResult.observe(3, {});
+        observableResult.observe(6, {});
       });
-      const recorder: metrics.Metric<metrics.BoundValueRecorder> &
-        ValueRecorder = mockValueRecorder();
+      const histogram: metrics.Metric<metrics.BoundHistogram> &
+        Histogram = mockHistogram();
 
       counter.add(1);
-      recorder.record(7);
-      recorder.record(14);
+      histogram.record(7);
+      histogram.record(14);
 
       metrics.push((await counter.getMetricRecord())[0]);
-      metrics.push((await observer.getMetricRecord())[0]);
-      metrics.push((await recorder.getMetricRecord())[0]);
+      metrics.push((await observableGauge.getMetricRecord())[0]);
+      metrics.push((await histogram.getMetricRecord())[0]);
     });
     afterEach(() => {
       sinon.restore();
@@ -197,8 +197,8 @@ describe('OTLPMetricExporter - node with proto over http', () => {
             metric1,
             metric1.intSum?.dataPoints[0].timeUnixNano
           );
-          assert.ok(typeof metric2 !== 'undefined', "observer doesn't exist");
-          ensureExportedObserverIsCorrect(
+          assert.ok(typeof metric2 !== 'undefined', "observable gauge doesn't exist");
+          ensureExportedObservableGaugeIsCorrect(
             metric2,
             metric2.doubleGauge?.dataPoints[0].timeUnixNano
           );
@@ -206,7 +206,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
             typeof metric3 !== 'undefined',
             "value recorder doesn't exist"
           );
-          ensureExportedValueRecorderIsCorrect(
+          ensureExportedHistogramIsCorrect(
             metric3,
             metric3.intHistogram?.dataPoints[0].timeUnixNano,
             [0, 100],
