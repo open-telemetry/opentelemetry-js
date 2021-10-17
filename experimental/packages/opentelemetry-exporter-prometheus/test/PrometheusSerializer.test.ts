@@ -19,9 +19,9 @@ import {
   LastValueAggregator,
   MeterProvider,
   CounterMetric,
-  ValueRecorderMetric,
+  HistogramMetric,
   UpDownCounterMetric,
-  ValueObserverMetric,
+  ObservableGaugeMetric,
 } from '@opentelemetry/sdk-metrics-base';
 import { diag, DiagLogLevel } from '@opentelemetry/api';
 import * as assert from 'assert';
@@ -99,15 +99,15 @@ describe('PrometheusSerializer', () => {
         const meter = new MeterProvider({
           processor: new ExactProcessor(LastValueAggregator),
         }).getMeter('test');
-        const observer = meter.createValueObserver(
+        const observableGauge = meter.createObservableGauge(
           'test',
           {},
-          observerResult => {
-            observerResult.observe(1, labels);
+          observableResult => {
+            observableResult.observe(1, labels);
           }
-        ) as ValueObserverMetric;
+        ) as ObservableGaugeMetric;
         await meter.collect();
-        const records = await observer.getMetricRecord();
+        const records = await observableGauge.getMetricRecord();
         const record = records[0];
 
         const result = serializer.serializeRecord(
@@ -126,15 +126,15 @@ describe('PrometheusSerializer', () => {
         const meter = new MeterProvider({
           processor: new ExactProcessor(LastValueAggregator),
         }).getMeter('test');
-        const observer = meter.createValueObserver(
+        const observableGauge = meter.createObservableGauge(
           'test',
           {},
-          observerResult => {
-            observerResult.observe(1, labels);
+          observableResult => {
+            observableResult.observe(1, labels);
           }
-        ) as ValueObserverMetric;
+        ) as ObservableGaugeMetric;
         await meter.collect();
-        const records = await observer.getMetricRecord();
+        const records = await observableGauge.getMetricRecord();
         const record = records[0];
 
         const result = serializer.serializeRecord(
@@ -153,13 +153,13 @@ describe('PrometheusSerializer', () => {
 
         const processor = new ExactProcessor(HistogramAggregator, [1, 10, 100]);
         const meter = new MeterProvider({ processor }).getMeter('test');
-        const recorder = meter.createValueRecorder('test', {
+        const histogram = meter.createHistogram('test', {
           description: 'foobar',
-        }) as ValueRecorderMetric;
+        }) as HistogramMetric;
 
-        recorder.bind(labels).record(5);
+        histogram.bind(labels).record(5);
 
-        const records = await recorder.getMetricRecord();
+        const records = await histogram.getMetricRecord();
         const record = records[0];
 
         const result = serializer.serializeRecord(
@@ -181,13 +181,13 @@ describe('PrometheusSerializer', () => {
         const serializer = new PrometheusSerializer();
 
         const meter = new MeterProvider().getMeter('test');
-        const recorder = meter.createValueRecorder('test', {
+        const histogram = meter.createHistogram('test', {
           description: 'foobar',
           boundaries: [1, 10, 100],
-        }) as ValueRecorderMetric;
-        recorder.bind(labels).record(5);
+        }) as HistogramMetric;
+        histogram.bind(labels).record(5);
 
-        const records = await recorder.getMetricRecord();
+        const records = await histogram.getMetricRecord();
         const record = records[0];
 
         const result = serializer.serializeRecord(
@@ -210,12 +210,12 @@ describe('PrometheusSerializer', () => {
 
         const processor = new ExactProcessor(HistogramAggregator, [1, 10, 100]);
         const meter = new MeterProvider({ processor }).getMeter('test');
-        const recorder = meter.createValueRecorder('test', {
+        const histogram = meter.createHistogram('test', {
           description: 'foobar',
-        }) as ValueRecorderMetric;
-        recorder.bind(labels).record(5);
+        }) as HistogramMetric;
+        histogram.bind(labels).record(5);
 
-        const records = await recorder.getMetricRecord();
+        const records = await histogram.getMetricRecord();
         const record = records[0];
 
         const result = serializer.serializeRecord(
@@ -304,17 +304,17 @@ describe('PrometheusSerializer', () => {
           processor: new ExactProcessor(LastValueAggregator),
         }).getMeter('test');
         const processor = new PrometheusLabelsBatcher();
-        const observer = meter.createValueObserver(
+        const observableGauge = meter.createObservableGauge(
           'test',
           {
             description: 'foobar',
           },
-          observerResult => {
-            observerResult.observe(1, labels);
+          observableResult => {
+            observableResult.observe(1, labels);
           }
-        ) as ValueObserverMetric;
+        ) as ObservableGaugeMetric;
         await meter.collect();
-        const records = await observer.getMetricRecord();
+        const records = await observableGauge.getMetricRecord();
         records.forEach(it => processor.process(it));
         const checkPointSet = processor.checkPointSet();
 
@@ -336,16 +336,16 @@ describe('PrometheusSerializer', () => {
 
         const processor = new ExactProcessor(HistogramAggregator, [1, 10, 100]);
         const meter = new MeterProvider({ processor }).getMeter('test');
-        const recorder = meter.createValueRecorder('test', {
+        const histogram = meter.createHistogram('test', {
           description: 'foobar',
-        }) as ValueRecorderMetric;
-        recorder.bind({ val: '1' }).record(5);
-        recorder.bind({ val: '1' }).record(50);
-        recorder.bind({ val: '1' }).record(120);
+        }) as HistogramMetric;
+        histogram.bind({ val: '1' }).record(5);
+        histogram.bind({ val: '1' }).record(50);
+        histogram.bind({ val: '1' }).record(120);
 
-        recorder.bind({ val: '2' }).record(5);
+        histogram.bind({ val: '2' }).record(5);
 
-        const records = await recorder.getMetricRecord();
+        const records = await histogram.getMetricRecord();
         const labelBatcher = new PrometheusLabelsBatcher();
         records.forEach(it => labelBatcher.process(it));
         const checkPointSet = labelBatcher.checkPointSet();

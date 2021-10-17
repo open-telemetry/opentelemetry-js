@@ -21,18 +21,19 @@ import {
   UnboundMetric,
   Labels,
   Counter,
-  ValueRecorder,
-  ValueObserver,
+  Histogram,
+  ObservableGauge,
   UpDownCounter,
-  BaseObserver,
-  UpDownSumObserver,
+  ObservableBase,
+  ObservableCounter,
+  ObservableUpDownCounter,
 } from './types/Metric';
 import {
-  BoundValueRecorder,
+  BoundHistogram,
   BoundCounter,
-  BoundBaseObserver,
+  BoundObservableBase,
 } from './types/BoundInstrument';
-import { ObserverResult } from './types/ObserverResult';
+import { ObservableResult } from './types/ObservableResult';
 import { Observation } from './types/Observation';
 
 /**
@@ -43,12 +44,12 @@ export class NoopMeter implements Meter {
   constructor() {}
 
   /**
-   * Returns constant noop value recorder.
+   * Returns a constant noop histogram.
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createValueRecorder(_name: string, _options?: MetricOptions): ValueRecorder {
-    return NOOP_VALUE_RECORDER_METRIC;
+  createHistogram(_name: string, _options?: MetricOptions): Histogram {
+    return NOOP_HISTOGRAM_METRIC;
   }
 
   /**
@@ -70,45 +71,45 @@ export class NoopMeter implements Meter {
   }
 
   /**
-   * Returns constant noop value observer.
+   * Returns a constant noop observable gauge.
    * @param name the name of the metric.
    * @param [options] the metric options.
-   * @param [callback] the value observer callback
+   * @param [callback] the observable gauge callback
    */
-  createValueObserver(
+  createObservableGauge(
     _name: string,
     _options?: MetricOptions,
-    _callback?: (observerResult: ObserverResult) => void
-  ): ValueObserver {
-    return NOOP_VALUE_OBSERVER_METRIC;
+    _callback?: (observableResult: ObservableResult) => void
+  ): ObservableGauge {
+    return NOOP_OBSERVABLE_GAUGE_METRIC;
   }
 
   /**
-   * Returns constant noop sum observer.
+   * Returns a constant noop observable counter.
    * @param name the name of the metric.
    * @param [options] the metric options.
-   * @param [callback] the sum observer callback
+   * @param [callback] the observable counter callback
    */
-  createSumObserver(
+  createObservableCounter(
     _name: string,
     _options?: MetricOptions,
-    _callback?: (observerResult: ObserverResult) => void
-  ): ValueObserver {
-    return NOOP_SUM_OBSERVER_METRIC;
+    _callback?: (observableResult: ObservableResult) => void
+  ): ObservableCounter {
+    return NOOP_OBSERVABLE_COUNTER_METRIC;
   }
 
   /**
-   * Returns constant noop up down sum observer.
+   * Returns a constant noop up down observable counter.
    * @param name the name of the metric.
    * @param [options] the metric options.
-   * @param [callback] the up down sum observer callback
+   * @param [callback] the up down observable counter callback
    */
-  createUpDownSumObserver(
+  createObservableUpDownCounter(
     _name: string,
     _options?: MetricOptions,
-    _callback?: (observerResult: ObserverResult) => void
-  ): UpDownSumObserver {
-    return NOOP_UP_DOWN_SUM_OBSERVER_METRIC;
+    _callback?: (observableResult: ObservableResult) => void
+  ): ObservableUpDownCounter {
+    return NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC;
   }
 
   /**
@@ -165,20 +166,20 @@ export class NoopCounterMetric
   }
 }
 
-export class NoopValueRecorderMetric
-  extends NoopMetric<BoundValueRecorder>
-  implements ValueRecorder {
+export class NoopHistogramMetric
+  extends NoopMetric<BoundHistogram>
+  implements Histogram {
   record(value: number, labels: Labels): void {
     this.bind(labels).record(value);
   }
 }
 
-export class NoopBaseObserverMetric
-  extends NoopMetric<BoundBaseObserver>
-  implements BaseObserver {
+export class NoopObservableBaseMetric
+  extends NoopMetric<BoundObservableBase>
+  implements ObservableBase {
   observation(): Observation {
     return {
-      observer: this as BaseObserver,
+      observable: this as ObservableBase,
       value: 0,
     };
   }
@@ -192,13 +193,13 @@ export class NoopBoundCounter implements BoundCounter {
   }
 }
 
-export class NoopBoundValueRecorder implements BoundValueRecorder {
+export class NoopBoundHistogram implements BoundHistogram {
   record(_value: number, _baggage?: unknown, _spanContext?: unknown): void {
     return;
   }
 }
 
-export class NoopBoundBaseObserver implements BoundBaseObserver {
+export class NoopBoundObservableBase implements BoundObservableBase {
   update(_value: number): void {}
 }
 
@@ -206,22 +207,22 @@ export const NOOP_METER = new NoopMeter();
 export const NOOP_BOUND_COUNTER = new NoopBoundCounter();
 export const NOOP_COUNTER_METRIC = new NoopCounterMetric(NOOP_BOUND_COUNTER);
 
-export const NOOP_BOUND_VALUE_RECORDER = new NoopBoundValueRecorder();
-export const NOOP_VALUE_RECORDER_METRIC = new NoopValueRecorderMetric(
-  NOOP_BOUND_VALUE_RECORDER
+export const NOOP_BOUND_HISTOGRAM = new NoopBoundHistogram();
+export const NOOP_HISTOGRAM_METRIC = new NoopHistogramMetric(
+  NOOP_BOUND_HISTOGRAM
 );
 
-export const NOOP_BOUND_BASE_OBSERVER = new NoopBoundBaseObserver();
-export const NOOP_VALUE_OBSERVER_METRIC = new NoopBaseObserverMetric(
-  NOOP_BOUND_BASE_OBSERVER
+export const NOOP_BOUND_OBSERVABLE_BASE = new NoopBoundObservableBase();
+export const NOOP_OBSERVABLE_GAUGE_METRIC = new NoopObservableBaseMetric(
+  NOOP_BOUND_OBSERVABLE_BASE
 );
 
-export const NOOP_UP_DOWN_SUM_OBSERVER_METRIC = new NoopBaseObserverMetric(
-  NOOP_BOUND_BASE_OBSERVER
+export const NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC = new NoopObservableBaseMetric(
+  NOOP_BOUND_OBSERVABLE_BASE
 );
 
-export const NOOP_SUM_OBSERVER_METRIC = new NoopBaseObserverMetric(
-  NOOP_BOUND_BASE_OBSERVER
+export const NOOP_OBSERVABLE_COUNTER_METRIC = new NoopObservableBaseMetric(
+  NOOP_BOUND_OBSERVABLE_BASE
 );
 
 export const NOOP_BATCH_OBSERVER = new NoopBatchObserver();

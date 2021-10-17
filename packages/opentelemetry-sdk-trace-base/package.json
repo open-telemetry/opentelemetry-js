@@ -56,7 +56,6 @@
   },
   "devDependencies": {
     "@opentelemetry/api": "^1.0.2",
-    "@types/lodash.merge": "4.6.6",
     "@types/mocha": "8.2.3",
     "@types/node": "14.17.11",
     "@types/sinon": "10.0.2",
@@ -84,7 +83,6 @@
   "dependencies": {
     "@opentelemetry/core": "1.0.0",
     "@opentelemetry/resources": "1.0.0",
-    "@opentelemetry/semantic-conventions": "1.0.0",
-    "lodash.merge": "^4.6.2"
+    "@opentelemetry/semantic-conventions": "1.0.0"
   }
 }

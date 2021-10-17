@@ -15,14 +15,14 @@
  */
 
 import {
-  ObserverResult as TypeObserverResult,
+  ObservableResult as TypeObservableResult,
   Labels,
 } from '@opentelemetry/api-metrics';
 
 /**
- * Implementation of {@link TypeObserverResult}
+ * Implementation of {@link TypeObservableResult}
  */
-export class ObserverResult implements TypeObserverResult {
+export class ObservableResult implements TypeObservableResult {
   values: Map<Labels, number> = new Map<Labels, number>();
 
   observe(value: number, labels: Labels): void {

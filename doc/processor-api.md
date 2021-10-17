@@ -138,7 +138,7 @@ const meter = new MeterProvider({
   interval: 1000,
 }).getMeter('example-custom-processor');
 
-const requestsLatency = meter.createValueRecorder('requests', {
+const requestsLatency = meter.createHistogram('requests', {
   monotonic: true,
   description: 'Average latency'
 });
