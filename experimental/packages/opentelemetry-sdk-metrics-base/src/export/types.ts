@@ -31,7 +31,6 @@ export enum MetricKind {
   OBSERVABLE_COUNTER,
   OBSERVABLE_UP_DOWN_COUNTER,
   OBSERVABLE_GAUGE,
-  BATCH_OBSERVER,
 }
 
 export const MetricKindValues = Object.values(MetricKind);
