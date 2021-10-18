@@ -16,11 +16,11 @@
 
 export * from './BoundInstrument';
 export * from './CounterMetric';
-export * from './ValueRecorderMetric';
+export * from './HistogramMetric';
 export * from './Meter';
 export * from './MeterProvider';
 export * from './Metric';
-export * from './ValueObserverMetric';
+export * from './ObservableGaugeMetric';
 export * from './export/aggregators';
 export * from './export/ConsoleMetricExporter';
 export * from './export/Processor';

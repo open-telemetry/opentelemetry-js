@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-otlp-http",
-  "version": "0.25.0",
+  "version": "0.26.0",
   "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -86,10 +86,10 @@
     "@opentelemetry/api": "^1.0.2"
   },
   "dependencies": {
-    "@opentelemetry/api-metrics": "0.25.0",
+    "@opentelemetry/api-metrics": "0.26.0",
     "@opentelemetry/core": "1.0.0",
     "@opentelemetry/resources": "1.0.0",
-    "@opentelemetry/sdk-metrics-base": "0.25.0",
+    "@opentelemetry/sdk-metrics-base": "0.26.0",
     "@opentelemetry/sdk-trace-base": "1.0.0"
   }
 }

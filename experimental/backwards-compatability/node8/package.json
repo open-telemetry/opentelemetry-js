@@ -8,7 +8,7 @@
     "test:backcompat": "tsc --noEmit index.ts && tsc --noEmit --esModuleInterop index.ts"
   },
   "dependencies": {
-    "@opentelemetry/sdk-node": "0.25.0",
+    "@opentelemetry/sdk-node": "0.26.0",
     "@opentelemetry/sdk-trace-base": "1.0.0"
   },
   "devDependencies": {

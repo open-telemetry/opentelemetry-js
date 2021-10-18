@@ -2,7 +2,7 @@
 ---
 <p align="center">
   <strong>
-    <a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/getting-started/README.md">Getting Started</a>
+    <a href="https://opentelemetry.io/docs/js/getting_started/">Getting Started</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
     <a href="https://open-telemetry.github.io/opentelemetry-js-api">API Reference</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
@@ -47,23 +47,25 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 
 ## Compatibility Matrix
 
-| API Version | Core version | Contrib Version         |
-| ----------- |--------------|-------------------------|
-| 1.0.x       | 0.25.x       | ------                  |
-| 1.0.x       | 0.24.x       | 0.24.x                  |
-| 1.0.x       | 0.23.x       | 0.23.x                  |
-| 1.0.x       | 0.22.x       | 0.22.x                  |
-| 0.21.x      | 0.21.x       | 0.21.x                  |
-| 0.20.x      | 0.20.x       | 0.20.x                  |
-| v1.0.0-rc.3 | 0.19.x       | 0.16.x                  |
-| 0.18.x      | 0.18.x       | 0.14.x                  |
-|             | 0.17.x       | ------                  |
-|             | 0.16.x       | ------                  |
-|             | 0.15.x       | 0.13.x                  |
-|             | 0.14.x       | 0.12.x                  |
-|             | 0.13.x       | ------                  |
-|             | 0.12.x       | 0.11.x                  |
-|             | 0.11.x       | 0.10.x                  |
+| API Version | Core version | Experimental Packages | Contrib Version         |
+| ----------- |--------------| --------------------- |-------------------------|
+| 1.0.x       | 1.x          | 0.26.x                | ------                  |
+| 1.0.x       | 0.26.x       | -----                 | ------                  |
+| 1.0.x       | 0.25.x       | -----                 | ------                  |
+| 1.0.x       | 0.24.x       | -----                 | 0.24.x                  |
+| 1.0.x       | 0.23.x       | -----                 | 0.23.x                  |
+| 1.0.x       | 0.22.x       | -----                 | 0.22.x                  |
+| 0.21.x      | 0.21.x       | -----                 | 0.21.x                  |
+| 0.20.x      | 0.20.x       | -----                 | 0.20.x                  |
+| v1.0.0-rc.3 | 0.19.x       | -----                 | 0.16.x                  |
+| 0.18.x      | 0.18.x       | -----                 | 0.14.x                  |
+|             | 0.17.x       | -----                 | ------                  |
+|             | 0.16.x       | -----                 | ------                  |
+|             | 0.15.x       | -----                 | 0.13.x                  |
+|             | 0.14.x       | -----                 | 0.12.x                  |
+|             | 0.13.x       | -----                 | ------                  |
+|             | 0.12.x       | -----                 | 0.11.x                  |
+|             | 0.11.x       | -----                 | 0.10.x                  |
 
 ## Versioning
 
@@ -129,7 +131,7 @@ process.on('SIGTERM', () => {
 node -r ./tracing.js app.js
 ```
 
-The above example will emit auto-instrumented telemetry about your Node.js application to the console. For a more in-depth example, see the [Getting Started Guide](https://github.com/open-telemetry/opentelemetry-js/blob/main/getting-started/README.md). For more information about automatic instrumentation see [@opentelemetry/sdk-trace-node][otel-node], which provides auto-instrumentation for Node.js applications. If the automatic instrumentation does not suit your needs, or you would like to create manual traces, see [@opentelemetry/sdk-trace-base][otel-tracing]
+The above example will emit auto-instrumented telemetry about your Node.js application to the console. For a more in-depth example, see the [Getting Started Guide](https://opentelemetry.io/docs/js/getting_started/). For more information about automatic instrumentation see [@opentelemetry/sdk-trace-node][otel-node], which provides auto-instrumentation for Node.js applications. If the automatic instrumentation does not suit your needs, or you would like to create manual traces, see [@opentelemetry/sdk-trace-base][otel-tracing]
 
 ### Library Author
 
@@ -283,6 +285,29 @@ To request automatic tracing support for a module not on this list, please [file
 | [@opentelemetry/shim-opentracing][otel-shim-opentracing] | OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry |
 
 ## Upgrade guidelines
+
+### 0.26.x to 0.27.x
+
+Metric types are renamed:
+
+- `@openetelemetry/api-metrics`
+  - `Meter`
+    - `createValueRecorder` => `createHistogram`
+    - `createValueObserver` => `createObservableGauge`
+    - `createSumObserver` => `createObservableCounter`
+    - `createUpDownSumObserver` => `createObservableUpDownCounter`
+  - `ValueRecorder` => `Histogram`
+  - `ValueObserver` => `ObservableGauge`
+  - `SumObserver` => `ObservableCounter`
+  - `UpDownSumObserver` => `ObservableUpDownCounter`
+  - `ObserverResult` => `ObservableResult`
+  - `Observation.observer` => `Observation.observable`
+- `@opentelemetry/sdk-metrics-base`
+  - `MetricKind`
+    - `VALUE_RECORDER` => `HISTOGRAM`
+    - `SUM_OBSERVER` => `OBSERVABLE_COUNTER`
+    - `UP_DOWN_SUM_OBSERVER` => `OBSERVABLE_UP_DOWN_COUNTER`
+    - `VALUE_OBSERVER` => `OBSERVABLE_GAUGE`
 
 ### 0.25.x to 1.x.y
 

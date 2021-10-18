@@ -22,7 +22,7 @@ import * as zipkinTypes from './types';
 import {
   toZipkinSpan,
   defaultStatusCodeTagName,
-  defaultStatusDescriptionTagName,
+  defaultStatusErrorTagName,
 } from './transform';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { prepareGetHeaders } from './utils';
@@ -47,7 +47,7 @@ export class ZipkinExporter implements SpanExporter {
     this._serviceName = config.serviceName;
     this._statusCodeTagName = config.statusCodeTagName || defaultStatusCodeTagName;
     this._statusDescriptionTagName =
-      config.statusDescriptionTagName || defaultStatusDescriptionTagName;
+      config.statusDescriptionTagName || defaultStatusErrorTagName;
     this._isShutdown = false;
     if (typeof config.getExportRequestHeaders === 'function') {
       this._getHeaders = prepareGetHeaders(config.getExportRequestHeaders);

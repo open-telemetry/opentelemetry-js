@@ -54,12 +54,12 @@ export class UngroupedProcessor extends Processor {
       case MetricKind.UP_DOWN_COUNTER:
         return new aggregators.SumAggregator();
 
-      case MetricKind.SUM_OBSERVER:
-      case MetricKind.UP_DOWN_SUM_OBSERVER:
-      case MetricKind.VALUE_OBSERVER:
+      case MetricKind.OBSERVABLE_COUNTER:
+      case MetricKind.OBSERVABLE_UP_DOWN_COUNTER:
+      case MetricKind.OBSERVABLE_GAUGE:
         return new aggregators.LastValueAggregator();
 
-      case MetricKind.VALUE_RECORDER:
+      case MetricKind.HISTOGRAM:
         return new aggregators.HistogramAggregator(
           metricDescriptor.boundaries || [Infinity]
         );
