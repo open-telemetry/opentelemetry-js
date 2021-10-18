@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { Counter, ValueObserver } from '@opentelemetry/api-metrics';
+import { Counter, ObservableGauge } from '@opentelemetry/api-metrics';
 import { ExportResultCode } from '@opentelemetry/core';
 import {
   BoundCounter,
-  BoundObserver,
+  BoundObservable,
   Metric,
   MetricRecord,
 } from '@opentelemetry/sdk-metrics-base';
@@ -27,7 +27,7 @@ import * as sinon from 'sinon';
 import { OTLPExporterBase } from '../../src/OTLPExporterBase';
 import * as otlpTypes from '../../src/types';
 import { OTLPExporterConfigBase } from '../../src/types';
-import { mockCounter, mockObserver } from '../helper';
+import { mockCounter, mockObservableGauge } from '../helper';
 
 type CollectorExporterConfig = OTLPExporterConfigBase;
 class OTLPMetricExporter extends OTLPExporterBase<
@@ -70,17 +70,17 @@ describe('OTLPMetricExporter - common', () => {
       collectorExporter = new OTLPMetricExporter(collectorExporterConfig);
       metrics = [];
       const counter: Metric<BoundCounter> & Counter = mockCounter();
-      const observer: Metric<BoundObserver> & ValueObserver = mockObserver(
-        observerResult => {
-          observerResult.observe(3, {});
-          observerResult.observe(6, {});
+      const observableGauge: Metric<BoundObservable> & ObservableGauge = mockObservableGauge(
+        observableResult => {
+          observableResult.observe(3, {});
+          observableResult.observe(6, {});
         },
-        'double-observer3'
+        'double-observable-gauge3'
       );
       counter.add(1);
 
       metrics.push((await counter.getMetricRecord())[0]);
-      metrics.push((await observer.getMetricRecord())[0]);
+      metrics.push((await observableGauge.getMetricRecord())[0]);
     });
 
     it('should create an instance', () => {

@@ -73,7 +73,7 @@ boundCounter.add(Math.random() > 0.5 ? 1 : -1);
 
 ```
 
-### Value Observer
+### Observable Gauge
 
 Choose this kind of metric when only last value is important without worry about aggregation.
 The callback can be sync or async.
@@ -85,11 +85,11 @@ const meter = new MeterProvider().getMeter('your-meter-name');
 
 
 // async callback - for operation that needs to wait for value
-meter.createValueObserver('your_metric_name', {
-  description: 'Example of an async observer with callback',
-}, async (observerResult) => {
+meter.createObservableGauge('your_metric_name', {
+  description: 'Example of an async observable gauge with callback',
+}, async (observableResult) => {
   const value = await getAsyncValue();
-  observerResult.observe(value, { label: '1' });
+  observableResult.observe(value, { label: '1' });
 });
 
 function getAsyncValue() {
@@ -101,11 +101,11 @@ function getAsyncValue() {
 }
 
 // sync callback in case you don't need to wait for value
-meter.createValueObserver('your_metric_name', {
-  description: 'Example of a sync observer with callback',
-}, (observerResult) => {
-  observerResult.observe(getRandomValue(), { label: '1' });
-  observerResult.observe(getRandomValue(), { label: '2' });
+meter.createObservableGauge('your_metric_name', {
+  description: 'Example of a sync observable gauge with callback',
+}, (observableResult) => {
+  observableResult.observe(getRandomValue(), { label: '1' });
+  observableResult.observe(getRandomValue(), { label: '2' });
 });
 
 function getRandomValue() {
@@ -113,7 +113,7 @@ function getRandomValue() {
 }
 ```
 
-### UpDownSumObserver
+### ObservableUpDownCounter
 
 Choose this kind of metric when sum is important and you want to capture any value that starts at zero and rises or falls throughout the process lifetime.
 The callback can be sync or async.
@@ -124,11 +124,11 @@ const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
 const meter = new MeterProvider().getMeter('your-meter-name');
 
 // async callback - for operation that needs to wait for value
-meter.createUpDownSumObserver('your_metric_name', {
-  description: 'Example of an async observer with callback',
-}, async (observerResult) => {
+meter.createObservableUpDownCounter('your_metric_name', {
+  description: 'Example of an async observable up down counter with callback',
+}, async (observableResult) => {
   const value = await getAsyncValue();
-  observerResult.observe(value, { label: '1' });
+  observableResult.observe(value, { label: '1' });
 });
 
 function getAsyncValue() {
@@ -140,10 +140,10 @@ function getAsyncValue() {
 }
 
 // sync callback in case you don't need to wait for value
-meter.createUpDownSumObserver('your_metric_name', {
-  description: 'Example of a sync observer with callback',
-}, (observerResult) => {
-  observerResult.observe(getRandomValue(), { label: '1' });
+meter.createObservableUpDownCounter('your_metric_name', {
+  description: 'Example of a sync observable up down counter with callback',
+}, (observableResult) => {
+  observableResult.observe(getRandomValue(), { label: '1' });
 });
 
 function getRandomValue() {
@@ -152,7 +152,7 @@ function getRandomValue() {
 
 ```
 
-### Sum Observer
+### Observable Counter
 
 Choose this kind of metric when collecting a sum that never decreases.
 The callback can be sync or async.
@@ -163,11 +163,11 @@ const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
 const meter = new MeterProvider().getMeter('your-meter-name');
 
 // async callback in case you need to wait for values
-meter.createSumObserver('example_metric', {
-  description: 'Example of an async sum observer with callback',
-}, async (observerResult) => {
+meter.createObservableCounter('example_metric', {
+  description: 'Example of an async observable counter with callback',
+}, async (observableResult) => {
   const value = await getAsyncValue();
-  observerResult.observe(value, { label: '1' });
+  observableResult.observe(value, { label: '1' });
 });
 
 function getAsyncValue() {
@@ -179,11 +179,11 @@ function getAsyncValue() {
 }
 
 // sync callback in case you don't need to wait for values
-meter.createSumObserver('example_metric', {
-  description: 'Example of a sync sum observer with callback',
-}, (observerResult) => {
+meter.createObservableCounter('example_metric', {
+  description: 'Example of a sync observable counter with callback',
+}, (observableResult) => {
   const value = getRandomValue();
-  observerResult.observe(value, { label: '1' });
+  observableResult.observe(value, { label: '1' });
 });
 
 function getRandomValue() {
@@ -193,7 +193,7 @@ function getRandomValue() {
 
 ### Batch Observer
 
-Choose this kind of metric when you need to update multiple observers with the results of a single async calculation.
+Choose this kind of metric when you need to update multiple observables with the results of a single async calculation.
 
 ```js
 const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
@@ -213,17 +213,17 @@ const meter = new MeterProvider({
   interval: 3000,
 }).getMeter('example-observer');
 
-const cpuUsageMetric = meter.createValueObserver('cpu_usage_per_app', {
+const cpuUsageMetric = meter.createObservableGauge('cpu_usage_per_app', {
   description: 'CPU',
 });
 
-const MemUsageMetric = meter.createValueObserver('mem_usage_per_app', {
+const MemUsageMetric = meter.createObservableGauge('mem_usage_per_app', {
   description: 'Memory',
 });
 
-meter.createBatchObserver((observerBatchResult) => {
+meter.createBatchObserver((batchObserverResult) => {
   getSomeAsyncMetrics().then(metrics => {
-    observerBatchResult.observe({ app: 'myApp' }, [
+    batchObserverResult.observe({ app: 'myApp' }, [
       cpuUsageMetric.observation(metrics.value1),
       MemUsageMetric.observation(metrics.value2)
     ]);
@@ -245,11 +245,11 @@ function getSomeAsyncMetrics() {
 
 See [examples/prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/prometheus) for a short example.
 
-### Value Recorder
+### Histogram
 
-`ValueRecorder` is a non-additive synchronous instrument useful for recording any non-additive number, positive or negative.
-Values captured by `ValueRecorder.record(value)` are treated as individual events belonging to a distribution that is being summarized.
-`ValueRecorder` should be chosen either when capturing measurements that do not contribute meaningfully to a sum, or when capturing numbers that are additive in nature, but where the distribution of individual increments is considered interesting.
+`Histogram` is a non-additive synchronous instrument useful for recording any non-additive number, positive or negative.
+Values captured by `Histogram.record(value)` are treated as individual events belonging to a distribution that is being summarized.
+`Histogram` should be chosen either when capturing measurements that do not contribute meaningfully to a sum, or when capturing numbers that are additive in nature, but where the distribution of individual increments is considered interesting.
 
 ## Useful links
 
