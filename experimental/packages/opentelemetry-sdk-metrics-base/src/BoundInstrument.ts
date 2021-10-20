@@ -117,9 +117,9 @@ export class BoundUpDownCounter
 /**
  * BoundMeasure is an implementation of the {@link BoundMeasure} interface.
  */
-export class BoundValueRecorder
+export class BoundHistogram
   extends BaseBoundInstrument
-  implements api.BoundValueRecorder {
+  implements api.BoundHistogram {
   constructor(
     labels: api.Labels,
     disabled: boolean,
@@ -135,11 +135,11 @@ export class BoundValueRecorder
 }
 
 /**
- * BoundObserver is an implementation of the {@link BoundObserver} interface.
+ * BoundObservable is an implementation of the {@link BoundObservable} interface.
  */
-export class BoundObserver
+export class BoundObservable
   extends BaseBoundInstrument
-  implements api.BoundBaseObserver {
+  implements api.BoundObservableBase {
   constructor(
     labels: api.Labels,
     disabled: boolean,

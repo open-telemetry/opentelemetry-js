@@ -47,7 +47,7 @@ export function toCollectorLabels(
 export function toAggregationTemporality(
   metric: MetricRecord
 ): opentelemetryProto.metrics.v1.AggregationTemporality {
-  if (metric.descriptor.metricKind === MetricKind.VALUE_OBSERVER) {
+  if (metric.descriptor.metricKind === MetricKind.OBSERVABLE_GAUGE) {
     return opentelemetryProto.metrics.v1.AggregationTemporality
       .AGGREGATION_TEMPORALITY_UNSPECIFIED;
   }
@@ -115,14 +115,14 @@ export function toCollectorMetric(
 
   if (
     metric.aggregator.kind === AggregatorKind.SUM ||
-    metric.descriptor.metricKind === MetricKind.SUM_OBSERVER ||
-    metric.descriptor.metricKind === MetricKind.UP_DOWN_SUM_OBSERVER
+    metric.descriptor.metricKind === MetricKind.OBSERVABLE_COUNTER ||
+    metric.descriptor.metricKind === MetricKind.OBSERVABLE_UP_DOWN_COUNTER
   ) {
     const result = {
       dataPoints: [toDataPoint(metric, startTime)],
       isMonotonic:
         metric.descriptor.metricKind === MetricKind.COUNTER ||
-        metric.descriptor.metricKind === MetricKind.SUM_OBSERVER,
+        metric.descriptor.metricKind === MetricKind.OBSERVABLE_COUNTER,
       aggregationTemporality: toAggregationTemporality(metric),
     };
     if (metric.descriptor.valueType === ValueType.INT) {

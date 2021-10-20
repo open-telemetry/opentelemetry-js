@@ -17,14 +17,14 @@
 import { diag } from '@opentelemetry/api';
 import {
   Counter,
-  ValueObserver,
-  ValueRecorder,
+  ObservableGauge,
+  Histogram,
 } from '@opentelemetry/api-metrics';
 import * as core from '@opentelemetry/core';
 import {
   BoundCounter,
-  BoundObserver,
-  BoundValueRecorder,
+  BoundObservable,
+  BoundHistogram,
   Metric,
   MetricRecord,
 } from '@opentelemetry/sdk-metrics-base';
@@ -39,11 +39,11 @@ import * as otlpTypes from '../../src/types';
 import {
   ensureCounterIsCorrect,
   ensureExportMetricsServiceRequestIsSet,
-  ensureObserverIsCorrect,
-  ensureValueRecorderIsCorrect,
+  ensureObservableGaugeIsCorrect,
+  ensureHistogramIsCorrect,
   mockCounter,
-  mockObserver,
-  mockValueRecorder,
+  mockObservableGauge,
+  mockHistogram,
 } from '../helper';
 import { MockedResponse } from './nodeHelpers';
 
@@ -149,21 +149,21 @@ describe('OTLPMetricExporter - node with json over http', () => {
       });
       metrics = [];
       const counter: Metric<BoundCounter> & Counter = mockCounter();
-      const observer: Metric<BoundObserver> & ValueObserver = mockObserver(
-        observerResult => {
-          observerResult.observe(6, {});
+      const observableGauge: Metric<BoundObservable> & ObservableGauge = mockObservableGauge(
+        observableResult => {
+          observableResult.observe(6, {});
         },
-        'double-observer2'
+        'double-observable-gauge2'
       );
-      const recorder: Metric<BoundValueRecorder> &
-        ValueRecorder = mockValueRecorder();
+      const histogram: Metric<BoundHistogram> &
+        Histogram = mockHistogram();
       counter.add(1);
-      recorder.record(7);
-      recorder.record(14);
+      histogram.record(7);
+      histogram.record(14);
 
       metrics.push((await counter.getMetricRecord())[0]);
-      metrics.push((await observer.getMetricRecord())[0]);
-      metrics.push((await recorder.getMetricRecord())[0]);
+      metrics.push((await observableGauge.getMetricRecord())[0]);
+      metrics.push((await histogram.getMetricRecord())[0]);
     });
 
     it('should open the connection', done => {
@@ -224,15 +224,15 @@ describe('OTLPMetricExporter - node with json over http', () => {
           metric1,
           core.hrTimeToNanoseconds(metrics[0].aggregator.toPoint().timestamp)
         );
-        assert.ok(typeof metric2 !== 'undefined', "observer doesn't exist");
-        ensureObserverIsCorrect(
+        assert.ok(typeof metric2 !== 'undefined', "observable gauge doesn't exist");
+        ensureObservableGaugeIsCorrect(
           metric2,
           core.hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp),
           6,
-          'double-observer2'
+          'double-observable-gauge2'
         );
         assert.ok(typeof metric3 !== 'undefined', "histogram doesn't exist");
-        ensureValueRecorderIsCorrect(
+        ensureHistogramIsCorrect(
           metric3,
           core.hrTimeToNanoseconds(metrics[2].aggregator.toPoint().timestamp),
           [0, 100],
