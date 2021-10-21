@@ -11,6 +11,8 @@ The OpenTelemetry Propagator for AWS X-Ray provides HTTP header propagation for 
 This propagator translates the OpenTelemetry SpanContext into the equivalent AWS header format, for use with the OpenTelemetry JS SDK.
 `TraceState` is currently not propagated.
 
+Compatible with OpenTelemetry JS API and SDK `1.0+`.
+
 ### Installation
 
 ```
