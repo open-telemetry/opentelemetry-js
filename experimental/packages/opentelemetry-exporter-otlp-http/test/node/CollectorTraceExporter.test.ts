@@ -325,7 +325,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
       setTimeout(() => {
         assert.strictEqual(
           collectorExporter['url'],
-          'http://localhost:55681/v1/traces'
+          'http://localhost:4318/v1/traces'
         );
         done();
       });
