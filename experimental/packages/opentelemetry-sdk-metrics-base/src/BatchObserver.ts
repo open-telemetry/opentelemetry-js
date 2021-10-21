@@ -23,12 +23,12 @@ const MAX_TIMEOUT_UPDATE_MS = 500;
 
 /** This is a SDK implementation of Batch Observer. */
 export class BatchObserver {
-  private _callback: (observerResult: api.BatchObserverResult) => void;
+  private _callback: (observableResult: api.BatchObserverResult) => void;
   private _maxTimeoutUpdateMS: number;
 
   constructor(
     options: api.BatchObserverOptions,
-    callback?: (observerResult: api.BatchObserverResult) => void
+    callback?: (observableResult: api.BatchObserverResult) => void
   ) {
     this._maxTimeoutUpdateMS =
       options.maxTimeoutUpdateMS ?? MAX_TIMEOUT_UPDATE_MS;
@@ -38,27 +38,27 @@ export class BatchObserver {
   collect(): Promise<void> {
     diag.debug('getMetricRecord - start');
     return new Promise(resolve => {
-      const observerResult = new BatchObserverResult();
+      const batchObserverResult = new BatchObserverResult();
 
       // cancels after MAX_TIMEOUT_MS - no more waiting for results
       const timer = setTimeout(() => {
-        observerResult.cancelled = true;
+        batchObserverResult.cancelled = true;
         // remove callback to prevent user from updating the values later if
-        // for any reason the observerBatchResult will be referenced
-        observerResult.onObserveCalled();
+        // for any reason the batchObserverResult will be referenced
+        batchObserverResult.onObserveCalled();
         resolve();
         diag.debug('getMetricRecord - timeout');
       }, this._maxTimeoutUpdateMS);
 
       // sets callback for each "observe" method
-      observerResult.onObserveCalled(() => {
+      batchObserverResult.onObserveCalled(() => {
         clearTimeout(timer);
         resolve();
         diag.debug('getMetricRecord - end');
       });
 
       // calls the BatchObserverResult callback
-      this._callback(observerResult);
+      this._callback(batchObserverResult);
     });
   }
 }

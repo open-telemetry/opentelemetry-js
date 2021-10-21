@@ -106,11 +106,11 @@ function toPrometheusType(
     case AggregatorKind.SUM:
       if (
         metricKind === MetricKind.COUNTER ||
-        metricKind === MetricKind.SUM_OBSERVER
+        metricKind === MetricKind.OBSERVABLE_COUNTER
       ) {
         return 'counter';
       }
-      /** MetricKind.UP_DOWN_COUNTER and MetricKind.UP_DOWN_SUM_OBSERVER */
+      /** MetricKind.UP_DOWN_COUNTER and MetricKind.OBSERVABLE_UP_DOWN_COUNTER */
       return 'gauge';
     case AggregatorKind.LAST_VALUE:
       return 'gauge';
