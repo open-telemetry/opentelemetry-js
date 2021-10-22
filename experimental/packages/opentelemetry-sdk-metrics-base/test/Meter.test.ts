@@ -230,7 +230,7 @@ describe('Meter', () => {
       });
 
       it('should not fail when removing non existing instrument', () => {
-        const counter = meter.createCounter('name');
+        const counter = meter.createCounter('name') as CounterMetric;
         counter.unbind({});
       });
 
@@ -369,7 +369,7 @@ describe('Meter', () => {
 
     describe('.bind()', () => {
       it('should create a UpDownCounter instrument', async () => {
-        const upDownCounter = meter.createUpDownCounter('name');
+        const upDownCounter = meter.createUpDownCounter('name') as UpDownCounterMetric;
         const boundCounter = upDownCounter.bind(labels);
         boundCounter.add(10);
         await meter.collect();
@@ -393,7 +393,7 @@ describe('Meter', () => {
       it('should not add the instrument data when disabled', async () => {
         const upDownCounter = meter.createUpDownCounter('name', {
           disabled: true,
-        });
+        }) as UpDownCounterMetric;
         const boundCounter = upDownCounter.bind(labels);
         boundCounter.add(10);
         await meter.collect();
@@ -402,7 +402,7 @@ describe('Meter', () => {
       });
 
       it('should return same instrument on same label values', async () => {
-        const upDownCounter = meter.createUpDownCounter('name');
+        const upDownCounter = meter.createUpDownCounter('name') as UpDownCounterMetric;
         const boundCounter = upDownCounter.bind(labels);
         boundCounter.add(10);
         const boundCounter1 = upDownCounter.bind(labels);
@@ -417,7 +417,7 @@ describe('Meter', () => {
       it('should truncate non-integer values for INT valueType', async () => {
         const upDownCounter = meter.createUpDownCounter('name', {
           valueType: api.ValueType.INT,
-        });
+        }) as UpDownCounterMetric;
         const boundCounter = upDownCounter.bind(labels);
 
         [-1.1, 2.2].forEach(val => {
@@ -431,7 +431,7 @@ describe('Meter', () => {
       it('should ignore non-number values for INT valueType', async () => {
         const upDownCounter = meter.createUpDownCounter('name', {
           valueType: api.ValueType.DOUBLE,
-        });
+        }) as UpDownCounterMetric;
         const boundCounter = upDownCounter.bind(labels);
 
         await Promise.all(
@@ -449,7 +449,7 @@ describe('Meter', () => {
       it('should ignore non-number values for DOUBLE valueType', async () => {
         const upDownCounter = meter.createUpDownCounter('name', {
           valueType: api.ValueType.DOUBLE,
-        });
+        }) as UpDownCounterMetric;
         const boundCounter = upDownCounter.bind(labels);
 
         await Promise.all(
@@ -480,7 +480,7 @@ describe('Meter', () => {
       });
 
       it('should not fail when removing non existing instrument', () => {
-        const upDownCounter = meter.createUpDownCounter('name');
+        const upDownCounter = meter.createUpDownCounter('name') as UpDownCounterMetric;
         upDownCounter.unbind({});
       });
 
@@ -673,7 +673,7 @@ describe('Meter', () => {
       });
 
       it('should accept negative (and positive) values', async () => {
-        const histogram = meter.createHistogram('name');
+        const histogram = meter.createHistogram('name') as HistogramMetric;
         const boundHistogram = histogram.bind(labels);
         boundHistogram.record(-10);
         boundHistogram.record(50);
@@ -764,7 +764,7 @@ describe('Meter', () => {
       });
 
       it('should not fail when removing non existing instrument', () => {
-        const histogram = meter.createHistogram('name');
+        const histogram = meter.createHistogram('name') as HistogramMetric;
         histogram.unbind({});
       });
 
@@ -1317,7 +1317,7 @@ describe('Meter', () => {
       const key = 'key';
       const counter = meter.createCounter('counter', {
         description: 'test',
-      });
+      }) as CounterMetric;
       const labels = { [key]: 'counter-value' };
       const boundCounter = counter.bind(labels);
       boundCounter.add(10.45);
@@ -1343,7 +1343,7 @@ describe('Meter', () => {
       const counter = meter.createCounter('counter', {
         description: 'test',
         valueType: api.ValueType.INT,
-      });
+      }) as CounterMetric;
       const labels = { [key]: 'counter-value' };
       const boundCounter = counter.bind(labels);
       boundCounter.add(10.45);
@@ -1370,7 +1370,7 @@ describe('Meter', () => {
       processor: new CustomProcessor(),
     });
     assert.throws(() => {
-      const histogram = customMeter.createHistogram('myHistogram');
+      const histogram = customMeter.createHistogram('myHistogram') as HistogramMetric;
       histogram.bind({}).record(1);
     }, /aggregatorFor method not implemented/);
   });
