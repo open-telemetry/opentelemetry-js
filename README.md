@@ -56,7 +56,7 @@ For additional reading, see the [AWS X-Ray Trace ID](https://docs.aws.amazon.com
 
 * 64-bit random number in base16 format. Populated from the [OpenTelemetry Span ID](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/overview.md#spancontext).
 
-#### Sampled - The sampling decision*
+#### Sampled - The sampling decision
 
 * Defined in the AWS X-Ray specification as a tri-state field, with "0", "1" and "?" as valid values. Only "0" and "1" are used in this propagator. If "?", a new trace will be started.
 * Populated from the [OpenTelemetry trace flags](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/overview.md#spancontext).
