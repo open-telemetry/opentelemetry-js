@@ -15,8 +15,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install lerna
-        run: npm install -g lerna
+      - name: Install lerna and semver
+        run: npm install -g lerna semver
 
       - name: Check API dependency semantics (stable)
         run: lerna exec --ignore propagation-validation-server "node ../../scripts/peer-api-check.js"
