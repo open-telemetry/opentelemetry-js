@@ -15,8 +15,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install lerna and semver
+      - name: Install lerna
         run: npm install -g lerna
+
+      - name: Install semver 
         run: npm install semver
 
       - name: Check API dependency semantics (stable)
