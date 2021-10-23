@@ -57,13 +57,15 @@ export type XHRCustomAttributeFunction = (
  */
 export interface XMLHttpRequestInstrumentationConfig
   extends InstrumentationConfig {
-  // the number of timing resources is limited, after the limit
-  // (chrome 250, safari 150) the information is not collected anymore
-  // the only way to prevent that is to regularly clean the resources
-  // whenever it is possible, this is needed only when PerformanceObserver
-  // is not available
+  /**
+   * The number of timing resources is limited, after the limit
+   * (chrome 250, safari 150) the information is not collected anymore.
+   * The only way to prevent that is to regularly clean the resources
+   * whenever it is possible. This is needed only when PerformanceObserver
+   * is not available
+   */
   clearTimingResources?: boolean;
-  // urls which should include trace headers when origin doesn't match
+  /** URLs which should include trace headers when origin doesn't match */
   propagateTraceHeaderCorsUrls?: PropagateTraceHeaderCorsUrls;
   /**
    * URLs that partially match any regex in ignoreUrls will not be traced.
