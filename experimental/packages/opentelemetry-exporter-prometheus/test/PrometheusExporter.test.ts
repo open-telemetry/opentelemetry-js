@@ -316,8 +316,8 @@ describe('PrometheusExporter', () => {
         description: 'a test description',
       }) as CounterMetric;
 
-      counter.bind({ counterKey1: 'labelValue1' }).add(10);
-      counter.bind({ counterKey1: 'labelValue2' }).add(20);
+      counter.add(10, { counterKey1: 'labelValue1' });
+      counter.add(20, { counterKey1: 'labelValue2' });
       meter.collect().then(() => {
         exporter.export(meter.getProcessor().checkPointSet(), () => {
           http
@@ -347,9 +347,9 @@ describe('PrometheusExporter', () => {
         description: 'a test description',
       }) as CounterMetric;
 
-      counter.bind({ counterKey1: 'labelValue1' }).add(10);
-      counter.bind({ counterKey1: 'labelValue2' }).add(20);
-      counter.bind({ counterKey1: 'labelValue3' }).add(30);
+      counter.add(10, { counterKey1: 'labelValue1' });
+      counter.add(20, { counterKey1: 'labelValue2' });
+      counter.add(30, { counterKey1: 'labelValue3' });
       meterProvider.shutdown().then(() => {
         http
           .get('http://localhost:9464/metrics', res => {
@@ -591,7 +591,7 @@ describe('PrometheusExporter', () => {
     beforeEach(() => {
       meter = new MeterProvider().getMeter('test-prometheus');
       counter = meter.createCounter('counter') as CounterMetric;
-      counter.bind({ key1: 'labelValue1' }).add(10);
+      counter.add(10, { key1: 'labelValue1' });
     });
 
     afterEach(done => {
