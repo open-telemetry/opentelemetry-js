@@ -19,7 +19,7 @@ import { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
 import {
   otlpTypes,
   toOTLPExportTraceServiceRequest,
-} from '@opentelemetry/exporter-otlp-http';
+} from '@opentelemetry/exporter-trace-otlp-http';
 import { OTLPExporterConfigNode, ServiceClientType } from './types';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
 import { validateAndNormalizeUrl } from './util';

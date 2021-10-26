@@ -5,7 +5,7 @@
     "packages": [
       "experimental/packages/opentelemetry-api-metrics",
       "experimental/packages/opentelemetry-exporter-otlp-grpc",
-      "experimental/packages/opentelemetry-exporter-otlp-http",
+      "experimental/packages/opentelemetry-exporter-trace-otlp-http",
       "experimental/packages/opentelemetry-exporter-otlp-proto",
       "experimental/packages/opentelemetry-exporter-prometheus",
       "experimental/packages/opentelemetry-instrumentation-fetch",

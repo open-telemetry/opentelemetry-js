@@ -16,7 +16,7 @@
 
 import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import { hexToBase64 } from '@opentelemetry/core';
-import { otlpTypes } from '@opentelemetry/exporter-otlp-http';
+import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';

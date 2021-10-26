@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { otlpTypes } from '@opentelemetry/exporter-otlp-http';
+import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import * as grpc from '@grpc/grpc-js';
 
 /**

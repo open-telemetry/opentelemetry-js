@@ -24,7 +24,7 @@ import { ExportResultCode } from '@opentelemetry/core';
 import {
   OTLPExporterNodeConfigBase,
   otlpTypes,
-} from '@opentelemetry/exporter-otlp-http';
+} from '@opentelemetry/exporter-trace-otlp-http';
 import { getExportRequestProto } from '@opentelemetry/exporter-otlp-proto';
 import * as metrics from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';

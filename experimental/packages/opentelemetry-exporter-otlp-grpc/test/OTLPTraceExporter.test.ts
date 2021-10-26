@@ -15,7 +15,7 @@
  */
 
 import * as protoLoader from '@grpc/proto-loader';
-import { otlpTypes } from '@opentelemetry/exporter-otlp-http';
+import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { diag } from '@opentelemetry/api';
 import {
   BasicTracerProvider,

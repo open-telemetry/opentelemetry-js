@@ -24,7 +24,7 @@ import {
 } from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { OTLPExporterBase, otlpTypes } from '@opentelemetry/exporter-otlp-http';
+import { OTLPExporterBase, otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { mockCounter, mockObservableGauge } from '../metricsHelper';
 
 type CollectorExporterConfig = otlpTypes.OTLPExporterConfigBase;

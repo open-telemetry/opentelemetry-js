@@ -15,8 +15,7 @@
  */
 
 import { MetricRecord, MetricExporter } from '@opentelemetry/sdk-metrics-base';
-import { OTLPExporterBrowserBase, otlpTypes, appendResourcePathToUrlIfNotPresent } from '@opentelemetry/exporter-otlp-http';
-// import {  } from '@opentelemetry/exporter-otlp-http'
+import { OTLPExporterBrowserBase, otlpTypes, appendResourcePathToUrlIfNotPresent } from '@opentelemetry/exporter-trace-otlp-http';
 import { toOTLPExportMetricServiceRequest } from '../../transformMetrics';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 

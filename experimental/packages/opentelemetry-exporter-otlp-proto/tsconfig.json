@@ -13,7 +13,7 @@
       "path": "../opentelemetry-api-metrics"
     },
     {
-      "path": "../opentelemetry-exporter-otlp-http"
+      "path": "../opentelemetry-exporter-trace-otlp-http"
     },
     {
       "path": "../opentelemetry-sdk-metrics-base"

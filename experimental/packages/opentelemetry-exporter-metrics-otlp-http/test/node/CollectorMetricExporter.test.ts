@@ -34,7 +34,7 @@ import * as sinon from 'sinon';
 import {
   OTLPMetricExporter,
 } from '../../src/platform/node';
-import { OTLPExporterNodeConfigBase, otlpTypes } from '@opentelemetry/exporter-otlp-http';
+import { OTLPExporterNodeConfigBase, otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import {
   ensureCounterIsCorrect,
   ensureExportMetricsServiceRequestIsSet,

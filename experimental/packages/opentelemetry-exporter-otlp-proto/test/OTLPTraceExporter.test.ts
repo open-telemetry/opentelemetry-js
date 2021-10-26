@@ -20,7 +20,7 @@ import {
   OTLPExporterNodeConfigBase,
   otlpTypes,
   CompressionAlgorithm,
-} from '@opentelemetry/exporter-otlp-http';
+} from '@opentelemetry/exporter-trace-otlp-http';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as http from 'http';

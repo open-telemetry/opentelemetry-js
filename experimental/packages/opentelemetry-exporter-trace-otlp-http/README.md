@@ -10,7 +10,7 @@ This module provides exporter for web and node to be used with [opentelemetry-co
 ## Installation
 
 ```bash
-npm install --save @opentelemetry/exporter-otlp-http
+npm install --save @opentelemetry/exporter-trace-otlp-http
 ```
 
 ## Service Name
@@ -26,7 +26,7 @@ The OTLPTraceExporter in Web expects the endpoint to end in `/v1/traces`.
 ```js
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-otlp-http';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/traces
@@ -55,7 +55,7 @@ provider.register();
 
 ```js
 const { BasicTracerProvider, BatchSpanProcessor } = require('@opentelemetry/sdk-trace-base');
-const { OTLPTraceExporter } =  require('@opentelemetry/exporter-otlp-http');
+const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-http');
 
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/traces
@@ -127,11 +127,11 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-otlp-http
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-otlp-http
-[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-otlp-http&type=dev
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-otlp-http&type=dev
-[npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-otlp-http
+[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-trace-otlp-http
+[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-trace-otlp-http
+[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-trace-otlp-http&type=dev
+[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-trace-otlp-http&type=dev
+[npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-trace-otlp-http
 [npm-url-grpc]: https://www.npmjs.com/package/@opentelemetry/exporter-otlp-grpc
 [npm-url-proto]: https://www.npmjs.com/package/@opentelemetry/exporter-otlp-proto
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-otlp-http.svg

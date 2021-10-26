@@ -9,7 +9,7 @@
       "path": "packages/opentelemetry-exporter-otlp-grpc"
     },
     {
-      "path": "packages/opentelemetry-exporter-otlp-http/tsconfig.esm.json"
+      "path": "packages/opentelemetry-exporter-trace-otlp-http/tsconfig.esm.json"
     },
     {
       "path": "packages/opentelemetry-exporter-otlp-proto"

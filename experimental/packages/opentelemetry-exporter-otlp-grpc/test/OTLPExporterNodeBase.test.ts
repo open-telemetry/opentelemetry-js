@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { otlpTypes } from '@opentelemetry/exporter-otlp-http';
+import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 
 import * as assert from 'assert';

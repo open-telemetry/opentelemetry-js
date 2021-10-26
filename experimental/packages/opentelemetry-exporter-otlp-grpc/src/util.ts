@@ -18,7 +18,7 @@ import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import { diag } from '@opentelemetry/api';
 import { globalErrorHandler } from '@opentelemetry/core';
-import { otlpTypes } from '@opentelemetry/exporter-otlp-http';
+import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import * as path from 'path';
 import { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
 import { URL } from 'url';

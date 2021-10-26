@@ -21,7 +21,7 @@ import {
   toOTLPExportTraceServiceRequest,
   OTLPExporterNodeConfigBase,
   appendResourcePathToUrlIfNotPresent,
-} from '@opentelemetry/exporter-otlp-http';
+} from '@opentelemetry/exporter-trace-otlp-http';
 import { ServiceClientType } from './types';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 

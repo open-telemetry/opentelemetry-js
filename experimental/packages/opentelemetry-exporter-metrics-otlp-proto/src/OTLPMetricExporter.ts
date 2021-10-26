@@ -18,7 +18,7 @@ import {
   otlpTypes,
   OTLPExporterNodeConfigBase,
   appendResourcePathToUrlIfNotPresent,
-} from '@opentelemetry/exporter-otlp-http';
+} from '@opentelemetry/exporter-trace-otlp-http';
 import { toOTLPExportMetricServiceRequest } from '@opentelemetry/exporter-metrics-otlp-http';
 import { MetricRecord, MetricExporter } from '@opentelemetry/sdk-metrics-base';
 import { ServiceClientType, OTLPExporterNodeBase } from '@opentelemetry/exporter-otlp-proto';

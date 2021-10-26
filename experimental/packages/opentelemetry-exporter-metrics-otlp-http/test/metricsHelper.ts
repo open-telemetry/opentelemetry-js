@@ -27,7 +27,7 @@ import { InstrumentationLibrary, VERSION } from '@opentelemetry/core';
 import * as metrics from '@opentelemetry/sdk-metrics-base';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
-import { otlpTypes } from '@opentelemetry/exporter-otlp-http';
+import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 
 const meterProvider = new metrics.MeterProvider({
   interval: 30000,

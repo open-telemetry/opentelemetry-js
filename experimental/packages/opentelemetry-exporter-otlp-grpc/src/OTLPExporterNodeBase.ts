@@ -18,7 +18,7 @@ import { diag } from '@opentelemetry/api';
 import {
   OTLPExporterBase,
   otlpTypes,
-} from '@opentelemetry/exporter-otlp-http';
+} from '@opentelemetry/exporter-trace-otlp-http';
 import { Metadata } from '@grpc/grpc-js';
 import {
   OTLPExporterConfigNode,

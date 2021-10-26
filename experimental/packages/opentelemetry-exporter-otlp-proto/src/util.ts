@@ -19,7 +19,7 @@ import {
   sendWithHttp,
   OTLPExporterNodeConfigBase,
   CompressionAlgorithm,
-} from '@opentelemetry/exporter-otlp-http';
+} from '@opentelemetry/exporter-trace-otlp-http';
 import * as path from 'path';
 
 import { ServiceClientType } from './types';

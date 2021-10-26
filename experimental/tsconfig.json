@@ -9,7 +9,7 @@
       "path": "packages/opentelemetry-exporter-otlp-grpc"
     },
     {
-      "path": "packages/opentelemetry-exporter-otlp-http"
+      "path": "packages/opentelemetry-exporter-trace-otlp-http"
     },
     {
       "path": "packages/opentelemetry-exporter-otlp-proto"

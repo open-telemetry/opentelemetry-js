@@ -20,7 +20,7 @@ import {
   otlpTypes,
   OTLPExporterNodeConfigBase,
   CompressionAlgorithm,
-} from '@opentelemetry/exporter-otlp-http';
+} from '@opentelemetry/exporter-trace-otlp-http';
 import { ServiceClientType } from './types';
 
 type SendFn = <ExportItem, ServiceRequest>(collector: OTLPExporterNodeBase<ExportItem, ServiceRequest>,
