@@ -10,7 +10,7 @@ This module provides exporter for web and node to be used with [opentelemetry-co
 ## Installation
 
 ```bash
-npm install --save @opentelemetry/exporter-otlp-grpc
+npm install --save @opentelemetry/exporter-trace-otlp-grpc
 ```
 
 ## Service Name
@@ -25,7 +25,7 @@ The OTLPTraceExporter in Node expects the URL to only be the hostname. It will n
 
 ```js
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
-const { OTLPTraceExporter } =  require('@opentelemetry/exporter-otlp-grpc');
+const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc');
 
 const collectorOptions = {
   // url is optional and can be omitted - default is grpc://localhost:4317
@@ -49,7 +49,7 @@ const fs = require('fs');
 const grpc = require('@grpc/grpc-js');
 
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
-const { OTLPTraceExporter } =  require('@opentelemetry/exporter-otlp-grpc');
+const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc');
 
 const collectorOptions = {
   // url is optional and can be omitted - default is grpc://localhost:4317
@@ -85,7 +85,7 @@ The exporter can be configured to send custom metadata with each request as in t
 const grpc = require('@grpc/grpc-js');
 
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
-const { OTLPTraceExporter } =  require('@opentelemetry/exporter-otlp-grpc');
+const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc');
 
 const metadata = new grpc.Metadata();
 // For instance, an API key or access token might go here.
@@ -128,11 +128,11 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-otlp-grpc
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-otlp-grpc
-[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-otlp-grpc&type=dev
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-otlp-grpc&type=dev
-[npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-otlp-grpc
+[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-trace-otlp-grpc
+[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-trace-otlp-grpc
+[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-trace-otlp-grpc&type=dev
+[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-trace-otlp-grpc&type=dev
+[npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-trace-otlp-grpc
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-otlp-grpc.svg
 [opentelemetry-collector-url]: https://github.com/open-telemetry/opentelemetry-collector
 [semconv-resource-service-name]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service

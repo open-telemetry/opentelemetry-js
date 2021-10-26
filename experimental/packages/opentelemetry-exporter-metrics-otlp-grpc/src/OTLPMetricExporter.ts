@@ -22,7 +22,7 @@ import {
   OTLPExporterNodeBase,
   ServiceClientType,
   validateAndNormalizeUrl
-} from '@opentelemetry/exporter-otlp-grpc';
+} from '@opentelemetry/exporter-trace-otlp-grpc';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
 import { Metadata } from '@grpc/grpc-js';
 

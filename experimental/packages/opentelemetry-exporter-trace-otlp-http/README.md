@@ -132,7 +132,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-trace-otlp-http&type=dev
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-trace-otlp-http&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-trace-otlp-http
-[npm-url-grpc]: https://www.npmjs.com/package/@opentelemetry/exporter-otlp-grpc
+[npm-url-grpc]: https://www.npmjs.com/package/@opentelemetry/exporter-trace-otlp-grpc
 [npm-url-proto]: https://www.npmjs.com/package/@opentelemetry/exporter-otlp-proto
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-otlp-http.svg
 [opentelemetry-collector-url]: https://github.com/open-telemetry/opentelemetry-collector

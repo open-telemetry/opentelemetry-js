@@ -1,5 +1,5 @@
 {
-  "name": "@opentelemetry/exporter-otlp-grpc",
+  "name": "@opentelemetry/exporter-trace-otlp-grpc",
   "version": "0.26.0",
   "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector",
   "main": "build/src/index.js",
