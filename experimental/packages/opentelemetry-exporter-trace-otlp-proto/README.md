@@ -10,7 +10,7 @@ This module provides exporter for node to be used with [opentelemetry-collector]
 ## Installation
 
 ```bash
-npm install --save @opentelemetry/exporter-otlp-proto
+npm install --save @opentelemetry/exporter-trace-otlp-proto
 ```
 
 ## Service Name
@@ -23,7 +23,7 @@ To see documentation and sample code for the metric exporter, see the [exporter-
 
 ```js
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
-const { OTLPTraceExporter } =  require('@opentelemetry/exporter-otlp-proto');
+const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-proto');
 
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/traces
@@ -59,11 +59,11 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-otlp-proto
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-otlp-proto
-[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-otlp-proto&type=dev
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-otlp-proto&type=dev
-[npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-otlp-proto
+[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-trace-otlp-proto
+[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-trace-otlp-proto
+[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-trace-otlp-proto&type=dev
+[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-trace-otlp-proto&type=dev
+[npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-trace-otlp-proto
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-collector-otlp-proto.svg
 [opentelemetry-collector-url]: https://github.com/open-telemetry/opentelemetry-collector
 [semconv-resource-service-name]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service

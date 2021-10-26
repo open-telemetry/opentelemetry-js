@@ -21,7 +21,7 @@ import {
 } from '@opentelemetry/exporter-trace-otlp-http';
 import { toOTLPExportMetricServiceRequest } from '@opentelemetry/exporter-metrics-otlp-http';
 import { MetricRecord, MetricExporter } from '@opentelemetry/sdk-metrics-base';
-import { ServiceClientType, OTLPExporterNodeBase } from '@opentelemetry/exporter-otlp-proto';
+import { ServiceClientType, OTLPExporterNodeBase } from '@opentelemetry/exporter-trace-otlp-proto';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = '/v1/metrics';

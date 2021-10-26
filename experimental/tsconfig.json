@@ -12,7 +12,7 @@
       "path": "packages/opentelemetry-exporter-trace-otlp-http"
     },
     {
-      "path": "packages/opentelemetry-exporter-otlp-proto"
+      "path": "packages/opentelemetry-exporter-trace-otlp-proto"
     },
     {
       "path": "packages/opentelemetry-exporter-prometheus"
