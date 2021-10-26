@@ -21,7 +21,6 @@ import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
-  Aggregator,
   CounterMetric,
   Histogram,
   LastValue,
@@ -29,7 +28,6 @@ import {
   Meter,
   MeterProvider,
   Metric,
-  MetricDescriptor,
   MetricKind,
   MetricRecord,
   Sum,
@@ -40,7 +38,6 @@ import {
 import { BatchObserver } from '../src/BatchObserver';
 import { BatchObserverResult } from '../src/BatchObserverResult';
 import { SumAggregator } from '../src/export/aggregators';
-import { Processor } from '../src/export/Processor';
 import { ObservableCounterMetric } from '../src/ObservableCounterMetric';
 import { ObservableUpDownCounterMetric } from '../src/ObservableUpDownCounterMetric';
 import { hashLabels } from '../src/Utils';
@@ -1364,27 +1361,7 @@ describe('Meter', () => {
       assert.strictEqual(value, 10);
     });
   });
-
-  it('should allow custom processor', () => {
-    const customMeter = new MeterProvider().getMeter('custom-processor', '*', {
-      processor: new CustomProcessor(),
-    });
-    assert.throws(() => {
-      const histogram = customMeter.createHistogram('myHistogram');
-      histogram.bind({}).record(1);
-    }, /aggregatorFor method not implemented/);
-  });
 });
-
-class CustomProcessor extends Processor {
-  process(record: MetricRecord): void {
-    throw new Error('process method not implemented.');
-  }
-
-  aggregatorFor(metricKind: MetricDescriptor): Aggregator {
-    throw new Error('aggregatorFor method not implemented.');
-  }
-}
 
 function ensureMetric(metric: MetricRecord, name?: string, value?: LastValue) {
   assert.ok(metric.aggregator instanceof LastValueAggregator);

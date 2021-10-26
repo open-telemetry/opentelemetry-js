@@ -48,12 +48,12 @@ export class MeterProvider implements api.MeterProvider {
    *
    * @returns Meter A Meter with the given name and version
    */
-  getMeter(name: string, version?: string, config?: MeterConfig): Meter {
+  getMeter(name: string, version?: string): Meter {
     const key = `${name}@${version || ''}`;
     if (!this._meters.has(key)) {
       this._meters.set(
         key,
-        new Meter({ name, version }, config || this._config)
+        new Meter({ name, version }, this._config)
       );
     }
 
