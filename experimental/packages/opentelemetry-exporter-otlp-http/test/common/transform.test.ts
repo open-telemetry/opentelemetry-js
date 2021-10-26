@@ -25,7 +25,7 @@ import {
   mockedInstrumentationLibraries,
   multiResourceTrace,
   multiInstrumentationLibraryTrace,
-} from '../helper';
+} from '../traceHelper';
 import { Resource } from '@opentelemetry/resources';
 describe('transform', () => {
   describe('toCollectorAttributes', () => {

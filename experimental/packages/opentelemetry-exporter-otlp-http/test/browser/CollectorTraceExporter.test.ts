@@ -29,7 +29,7 @@ import {
   ensureWebResourceIsCorrect,
   ensureHeadersContain,
   mockedReadableSpan,
-} from '../helper';
+} from '../traceHelper';
 
 describe('OTLPTraceExporter - web', () => {
   let collectorTraceExporter: OTLPTraceExporter;

@@ -34,7 +34,7 @@ import {
   ensureExportTraceServiceRequestIsSet,
   ensureSpanIsCorrect,
   mockedReadableSpan,
-} from '../helper';
+} from '../traceHelper';
 
 let fakeRequest: PassThrough;
 

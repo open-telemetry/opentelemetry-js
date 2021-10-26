@@ -20,7 +20,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPExporterBase } from '../../src/OTLPExporterBase';
 import { OTLPExporterConfigBase } from '../../src/types';
-import { mockedReadableSpan } from '../helper';
+import { mockedReadableSpan } from '../traceHelper';
 import * as otlpTypes from '../../src/types';
 
 type CollectorExporterConfig = OTLPExporterConfigBase;
