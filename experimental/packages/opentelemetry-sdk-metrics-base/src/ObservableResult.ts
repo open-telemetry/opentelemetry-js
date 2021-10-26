@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-import { ObservableBase } from './Metric';
+import {
+  ObservableResult as TypeObservableResult,
+  Labels,
+} from '@opentelemetry/api-metrics';
 
 /**
- * Interface for updating value of certain observable
+ * Implementation of {@link TypeObservableResult}
  */
-export interface Observation {
-  observable: ObservableBase;
-  value: number;
+export class ObservableResult implements TypeObservableResult {
+  values: Map<Labels, number> = new Map<Labels, number>();
+
+  observe(value: number, labels: Labels): void {
+    this.values.set(labels, value);
+  }
 }

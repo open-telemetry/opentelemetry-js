@@ -15,7 +15,7 @@
  */
 
 // Updates to this file should also be replicated to @opentelemetry/api and
-// @opentelemetry/core too.
+// @opentelemetry/api-metrics too.
 
 /**
  * - globalThis (New standard)
