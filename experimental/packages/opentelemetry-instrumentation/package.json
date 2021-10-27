@@ -67,11 +67,11 @@
     "shimmer": "^1.2.1"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^1.0.2"
+    "@opentelemetry/api": "^1.0.0"
   },
   "devDependencies": {
     "@babel/core": "7.15.0",
-    "@opentelemetry/api": "^1.0.2",
+    "@opentelemetry/api": "^1.0.3",
     "@types/mocha": "8.2.3",
     "@types/node": "14.17.11",
     "@types/semver": "7.3.8",

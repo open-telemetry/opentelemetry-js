@@ -131,6 +131,6 @@ export const shouldNotTraceServerCall = function (
   const parsedName = name.split('/');
   return _methodIsIgnored(
     parsedName[parsedName.length - 1] || name,
-    this._config.ignoreGrpcMethods
+    this.getConfig().ignoreGrpcMethods
   );
 };
