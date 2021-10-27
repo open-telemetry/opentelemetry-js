@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { BatchObserverResult } from './types/BatchObserverResult';
 import { Meter } from './types/Meter';
 import {
   MetricOptions,
@@ -111,17 +110,6 @@ export class NoopMeter implements Meter {
   ): ObservableUpDownCounter {
     return NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC;
   }
-
-  /**
-   * Returns constant noop batch observer.
-   * @param name the name of the metric.
-   * @param callback the batch observer callback
-   */
-  createBatchObserver(
-    _callback: (batchObserverResult: BatchObserverResult) => void
-  ): NoopBatchObserver {
-    return NOOP_BATCH_OBSERVER;
-  }
 }
 
 export class NoopMetric<T> implements UnboundMetric<T> {
@@ -185,8 +173,6 @@ export class NoopObservableBaseMetric
   }
 }
 
-export class NoopBatchObserver {}
-
 export class NoopBoundCounter implements BoundCounter {
   add(_value: number): void {
     return;
@@ -224,5 +210,3 @@ export const NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC = new NoopObservableBaseMetr
 export const NOOP_OBSERVABLE_COUNTER_METRIC = new NoopObservableBaseMetric(
   NOOP_BOUND_OBSERVABLE_BASE
 );
-
-export const NOOP_BATCH_OBSERVER = new NoopBatchObserver();
