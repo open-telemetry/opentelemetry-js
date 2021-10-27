@@ -165,13 +165,13 @@ export class Meter implements api.Meter {
   /**
    * Creates a new `ObservableGauge` metric.
    * @param name the name of the metric.
+   * @param callback the observable gauge callback
    * @param [options] the metric options.
-   * @param [callback] the observable gauge callback
    */
   createObservableGauge(
     name: string,
+    callback: (observableResult: api.ObservableResult) => unknown,
     options: api.MetricOptions = {},
-    callback?: (observableResult: api.ObservableResult) => unknown
   ): api.ObservableGauge {
     if (!this._isValidName(name)) {
       diag.warn(
@@ -197,8 +197,8 @@ export class Meter implements api.Meter {
 
   createObservableCounter(
     name: string,
+    callback: (observableResult: api.ObservableResult) => unknown,
     options: api.MetricOptions = {},
-    callback?: (observableResult: api.ObservableResult) => unknown
   ): api.ObservableCounter {
     if (!this._isValidName(name)) {
       diag.warn(
@@ -225,13 +225,13 @@ export class Meter implements api.Meter {
   /**
    * Creates a new `ObservableUpDownCounter` metric.
    * @param name the name of the metric.
+   * @param callback the observable gauge callback
    * @param [options] the metric options.
-   * @param [callback] the observable gauge callback
    */
   createObservableUpDownCounter(
     name: string,
+    callback: (observableResult: api.ObservableResult) => unknown,
     options: api.MetricOptions = {},
-    callback?: (observableResult: api.ObservableResult) => unknown
   ): api.ObservableUpDownCounter {
     if (!this._isValidName(name)) {
       diag.warn(

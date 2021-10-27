@@ -21,7 +21,6 @@ export * from './types/BoundInstrument';
 export * from './types/Meter';
 export * from './types/MeterProvider';
 export * from './types/Metric';
-export * from './types/Observation';
 export * from './types/ObservableResult';
 
 import { MetricsAPI } from './api/metrics';

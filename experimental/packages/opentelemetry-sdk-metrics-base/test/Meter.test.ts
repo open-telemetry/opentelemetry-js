@@ -780,16 +780,17 @@ describe('Meter', () => {
     });
   });
 
+  const NOOP_OBSERVABLE_CALLBACK = (_observableResult: api.ObservableResult) => {};
   describe('#ObservableCounterMetric', () => {
     it('should create an ObservableCounter', () => {
-      const observableCounter = meter.createObservableCounter('name') as ObservableCounterMetric;
+      const observableCounter = meter.createObservableCounter('name', NOOP_OBSERVABLE_CALLBACK) as ObservableCounterMetric;
       assert.ok(observableCounter instanceof Metric);
     });
 
     it('should return noop observable counter when name is invalid', () => {
       // Need to stub/spy on the underlying logger as the "diag" instance is global
       const spy = sinon.stub(diag, 'warn');
-      const observableCounter = meter.createObservableCounter('na me');
+      const observableCounter = meter.createObservableCounter('na me', NOOP_OBSERVABLE_CALLBACK);
       assert.ok(observableCounter === api.NOOP_OBSERVABLE_COUNTER_METRIC);
       const args = spy.args[0];
       assert.ok(
@@ -799,7 +800,7 @@ describe('Meter', () => {
     });
 
     it('should create observable counter with options', () => {
-      const observableCounter = meter.createObservableCounter('name', {
+      const observableCounter = meter.createObservableCounter('name', NOOP_OBSERVABLE_CALLBACK, {
         description: 'desc',
         unit: '1',
         disabled: false,
@@ -820,9 +821,6 @@ describe('Meter', () => {
 
       const observableCounter = meter.createObservableCounter(
         'name',
-        {
-          description: 'desc',
-        },
         (observableResult: api.ObservableResult) => {
           // simulate async
           return new Promise<void>(resolve => {
@@ -831,7 +829,10 @@ describe('Meter', () => {
               resolve();
             }, 1);
           });
-        }
+        },
+        {
+          description: 'desc',
+        },
       ) as ObservableCounterMetric;
 
       let metricRecords = await observableCounter.getMetricRecord();
@@ -857,12 +858,12 @@ describe('Meter', () => {
     it('should set callback and observe value when callback returns nothing', async () => {
       const observableCounter = meter.createObservableCounter(
         'name',
+        (observableResult: api.ObservableResult) => {
+          observableResult.observe(1, { pid: '123', core: '1' });
+        },
         {
           description: 'desc',
         },
-        (observableResult: api.ObservableResult) => {
-          observableResult.observe(1, { pid: '123', core: '1' });
-        }
       ) as ObservableCounterMetric;
 
       const metricRecords = await observableCounter.getMetricRecord();
@@ -875,13 +876,13 @@ describe('Meter', () => {
       async () => {
         const observableCounter = meter.createObservableCounter(
           'name',
-          {
-            description: 'desc',
-          },
           (observableResult: api.ObservableResult) => {
             observableResult.observe(1, { pid: '123', core: '1' });
             return '1';
-          }
+          },
+          {
+            description: 'desc',
+          },
         ) as ObservableCounterMetric;
 
         const metricRecords = await observableCounter.getMetricRecord();
@@ -892,13 +893,13 @@ describe('Meter', () => {
     it('should reject getMetricRecord when callback throws an error', async () => {
       const observableCounter = meter.createObservableCounter(
         'name',
-        {
-          description: 'desc',
-        },
         (observableResult: api.ObservableResult) => {
           observableResult.observe(1, { pid: '123', core: '1' });
           throw new Error('Boom');
-        }
+        },
+        {
+          description: 'desc',
+        },
       ) as ObservableCounterMetric;
       await observableCounter
         .getMetricRecord()
@@ -909,7 +910,7 @@ describe('Meter', () => {
     });
 
     it('should pipe through resource', async () => {
-      const observableCounter = meter.createObservableCounter('name', {}, result => {
+      const observableCounter = meter.createObservableCounter('name', result => {
         result.observe(42, { foo: 'bar' });
         return Promise.resolve();
       }) as ObservableCounterMetric;
@@ -923,7 +924,8 @@ describe('Meter', () => {
   describe('#ObservableGauge', () => {
     it('should create an observable gauge', () => {
       const observableGauge = meter.createObservableGauge(
-        'name'
+        'name',
+        NOOP_OBSERVABLE_CALLBACK,
       ) as ObservableGaugeMetric;
       assert.ok(observableGauge instanceof Metric);
     });
@@ -931,7 +933,7 @@ describe('Meter', () => {
     it('should return noop observable gauge when name is invalid', () => {
       // Need to stub/spy on the underlying logger as the "diag" instance is global
       const spy = sinon.stub(diag, 'warn');
-      const observableGauge = meter.createObservableGauge('na me');
+      const observableGauge = meter.createObservableGauge('na me', NOOP_OBSERVABLE_CALLBACK);
       assert.ok(observableGauge === api.NOOP_OBSERVABLE_GAUGE_METRIC);
       const args = spy.args[0];
       assert.ok(
@@ -941,7 +943,7 @@ describe('Meter', () => {
     });
 
     it('should create observable gauge with options', () => {
-      const observableGauge = meter.createObservableGauge('name', {
+      const observableGauge = meter.createObservableGauge('name', NOOP_OBSERVABLE_CALLBACK, {
         description: 'desc',
         unit: '1',
         disabled: false,
@@ -952,9 +954,6 @@ describe('Meter', () => {
     it('should set callback and observe value ', async () => {
       const observableGauge = meter.createObservableGauge(
         'name',
-        {
-          description: 'desc',
-        },
         (observableResult: api.ObservableResult) => {
           // simulate async
           return new Promise<void>(resolve => {
@@ -966,7 +965,10 @@ describe('Meter', () => {
               resolve();
             }, 1);
           });
-        }
+        },
+        {
+          description: 'desc',
+        },
       ) as ObservableGaugeMetric;
 
       function getCpuUsage() {
@@ -992,7 +994,7 @@ describe('Meter', () => {
     });
 
     it('should pipe through resource', async () => {
-      const observableGauge = meter.createObservableGauge('name', {}, result => {
+      const observableGauge = meter.createObservableGauge('name', result => {
         result.observe(42, { foo: 'bar' });
       }) as ObservableGaugeMetric;
       assert.ok(observableGauge.resource instanceof Resource);
@@ -1005,7 +1007,8 @@ describe('Meter', () => {
   describe('#ObservableUpDownCounterMetric', () => {
     it('should create an ObservableUpDownCounter', () => {
       const observableUpDownCounter = meter.createObservableUpDownCounter(
-        'name'
+        'name',
+        NOOP_OBSERVABLE_CALLBACK
       ) as ObservableUpDownCounterMetric;
       assert.ok(observableUpDownCounter instanceof Metric);
     });
@@ -1013,7 +1016,7 @@ describe('Meter', () => {
     it('should return noop observable up down counter when name is invalid', () => {
       // Need to stub/spy on the underlying logger as the "diag" instance is global
       const spy = sinon.stub(diag, 'warn');
-      const observableUpDownCounter = meter.createObservableUpDownCounter('na me');
+      const observableUpDownCounter = meter.createObservableUpDownCounter('na me', NOOP_OBSERVABLE_CALLBACK);
       assert.ok(observableUpDownCounter === api.NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC);
       const args = spy.args[0];
       assert.ok(
@@ -1023,7 +1026,7 @@ describe('Meter', () => {
     });
 
     it('should create observable up down counter with options', () => {
-      const observableUpDownCounter = meter.createObservableUpDownCounter('name', {
+      const observableUpDownCounter = meter.createObservableUpDownCounter('name', NOOP_OBSERVABLE_CALLBACK, {
         description: 'desc',
         unit: '1',
         disabled: false,
@@ -1044,9 +1047,6 @@ describe('Meter', () => {
 
       const observableUpDownCounter = meter.createObservableUpDownCounter(
         'name',
-        {
-          description: 'desc',
-        },
         (observableResult: api.ObservableResult) => {
           // simulate async
           return new Promise<void>(resolve => {
@@ -1055,7 +1055,10 @@ describe('Meter', () => {
               resolve();
             }, 1);
           });
-        }
+        },
+        {
+          description: 'desc',
+        },
       ) as ObservableUpDownCounterMetric;
 
       let metricRecords = await observableUpDownCounter.getMetricRecord();
@@ -1081,12 +1084,12 @@ describe('Meter', () => {
     it('should set callback and observe value when callback returns nothing', async () => {
       const observableUpDownCounter = meter.createObservableUpDownCounter(
         'name',
+        (observableResult: api.ObservableResult) => {
+          observableResult.observe(1, { pid: '123', core: '1' });
+        },
         {
           description: 'desc',
         },
-        (observableResult: api.ObservableResult) => {
-          observableResult.observe(1, { pid: '123', core: '1' });
-        }
       ) as ObservableUpDownCounterMetric;
 
       const metricRecords = await observableUpDownCounter.getMetricRecord();
@@ -1099,13 +1102,13 @@ describe('Meter', () => {
       async () => {
         const observableUpDownCounter = meter.createObservableUpDownCounter(
           'name',
-          {
-            description: 'desc',
-          },
           (observableResult: api.ObservableResult) => {
             observableResult.observe(1, { pid: '123', core: '1' });
             return '1';
-          }
+          },
+          {
+            description: 'desc',
+          },
         ) as ObservableUpDownCounterMetric;
 
         const metricRecords = await observableUpDownCounter.getMetricRecord();
@@ -1116,13 +1119,13 @@ describe('Meter', () => {
     it('should reject getMetricRecord when callback throws an error', async () => {
       const observableUpDownCounter = meter.createObservableUpDownCounter(
         'name',
-        {
-          description: 'desc',
-        },
         (observableResult: api.ObservableResult) => {
           observableResult.observe(1, { pid: '123', core: '1' });
           throw new Error('Boom');
-        }
+        },
+        {
+          description: 'desc',
+        },
       ) as ObservableUpDownCounterMetric;
       await observableUpDownCounter
         .getMetricRecord()
@@ -1135,11 +1138,10 @@ describe('Meter', () => {
     it('should pipe through resource', async () => {
       const observableUpDownCounter = meter.createObservableUpDownCounter(
         'name',
-        {},
         result => {
           result.observe(42, { foo: 'bar' });
           return Promise.resolve();
-        }
+        },
       ) as ObservableUpDownCounterMetric;
       assert.ok(observableUpDownCounter.resource instanceof Resource);
 
@@ -1162,11 +1164,11 @@ describe('Meter', () => {
     });
 
     it('should use callback to observe values ', async () => {
-      const tempMetric = meter.createObservableGauge('cpu_temp_per_app', {
+      const tempMetric = meter.createObservableGauge('cpu_temp_per_app', NOOP_OBSERVABLE_CALLBACK, {
         description: 'desc',
       }) as ObservableGaugeMetric;
 
-      const cpuUsageMetric = meter.createObservableGauge('cpu_usage_per_app', {
+      const cpuUsageMetric = meter.createObservableGauge('cpu_usage_per_app', NOOP_OBSERVABLE_CALLBACK, {
         description: 'desc',
       }) as ObservableGaugeMetric;
 
@@ -1255,7 +1257,7 @@ describe('Meter', () => {
     });
 
     it('should not observe values when timeout', done => {
-      const cpuUsageMetric = meter.createObservableGauge('cpu_usage_per_app', {
+      const cpuUsageMetric = meter.createObservableGauge('cpu_usage_per_app', NOOP_OBSERVABLE_CALLBACK, {
         description: 'desc',
       }) as ObservableGaugeMetric;
 
@@ -1298,10 +1300,9 @@ describe('Meter', () => {
     it('should pipe through instrumentation library', async () => {
       const observableGauge = meter.createObservableGauge(
         'name',
-        {},
         (observableResult: api.ObservableResult) => {
           observableResult.observe(42, { foo: 'bar' });
-        }
+        },
       ) as ObservableGaugeMetric;
       assert.ok(observableGauge.instrumentationLibrary);
 

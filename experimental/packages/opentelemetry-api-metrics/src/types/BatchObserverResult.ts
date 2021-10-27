@@ -15,7 +15,6 @@
  */
 
 import { Labels } from './Metric';
-import { Observation } from './Observation';
 
 /**
  * Interface that is being used in callback function for BatchObserver
@@ -26,5 +25,5 @@ export interface BatchObserverResult {
    * @param labels
    * @param observations
    */
-  observe(labels: Labels, observations: Observation[]): void;
+  observe(labels: Labels, observations: unknown[]): void;
 }

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import * as api from '@opentelemetry/api-metrics';
-import { Observation } from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BoundObservable } from './BoundInstrument';
@@ -70,12 +69,5 @@ export abstract class ObservableBaseMetric
       const instrument = this.bind(labels);
       instrument.update(value);
     });
-  }
-
-  observation(value: number): Observation {
-    return {
-      value,
-      observable: this as ObservableBaseMetric,
-    };
   }
 }
