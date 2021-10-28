@@ -17,8 +17,13 @@
 import { Attributes, ValueType } from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
+import * as assert from 'assert';
 import { InstrumentDescriptor } from '../src/InstrumentDescriptor';
-import { InstrumentType } from '../src/Instruments';
+import { Histogram, InstrumentType } from '../src/Instruments';
+import { MetricData, PointData, PointDataType } from '../src/export/MetricData';
+import { Measurement } from '../src/Measurement';
+import { isNotNullish } from '../src/utils';
+import { HrTime } from '@opentelemetry/api';
 
 export const defaultResource = new Resource({
   resourceKey: 'my-resource',
@@ -47,3 +52,57 @@ export const sleep = (time: number) =>
   new Promise(resolve => {
     return setTimeout(resolve, time);
   });
+
+export function assertMetricData(
+  actual: unknown,
+  pointDataType?: PointDataType,
+  instrumentDescriptor: InstrumentDescriptor = defaultInstrumentDescriptor,
+  instrumentationLibrary: InstrumentationLibrary = defaultInstrumentationLibrary,
+  resource: Resource = defaultResource,
+): asserts actual is MetricData {
+  const it = actual as MetricData;
+  assert.deepStrictEqual(it.resource, resource);
+  assert.deepStrictEqual(it.instrumentationLibrary, instrumentationLibrary);
+  assert.deepStrictEqual(it.instrumentDescriptor, instrumentDescriptor);
+  if (isNotNullish(pointDataType)) {
+    assert.strictEqual(it.pointDataType, pointDataType);
+  } else {
+    assert(isNotNullish(PointDataType[it.pointDataType]));
+  }
+  assert(Array.isArray(it.pointData));
+}
+
+export function assertPointData(
+  actual: unknown,
+  attributes: Attributes,
+  point: Histogram | number,
+  startTime?: HrTime,
+  endTime?: HrTime,
+): asserts actual is PointData<unknown> {
+  const it = actual as PointData<unknown>;
+  assert.deepStrictEqual(it.attributes, attributes);
+  assert.deepStrictEqual(it.point, point);
+  if (startTime) {
+    assert.deepStrictEqual(it.startTime, startTime);
+  } else {
+    assert(Array.isArray(it.startTime));
+    assert.strictEqual(it.startTime.length, 2);
+  }
+  if (endTime) {
+    assert.deepStrictEqual(it.endTime, endTime);
+  } else {
+    assert(Array.isArray(it.endTime));
+    assert.strictEqual(it.endTime.length, 2);
+  }
+}
+
+export function assertMeasurementEqual(actual: unknown, expected: Measurement): asserts actual is Measurement {
+  // NOTE: Node.js v8 assert.strictEquals treat two NaN as different values.
+  if (Number.isNaN(expected.value)) {
+    assert(Number.isNaN((actual as Measurement).value));
+  } else {
+    assert.strictEqual((actual as Measurement).value, expected.value);
+  }
+  assert.deepStrictEqual((actual as Measurement).attributes, expected.attributes);
+  assert.deepStrictEqual((actual as Measurement).context, expected.context);
+}

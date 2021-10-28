@@ -17,7 +17,13 @@
 import { Context } from '@opentelemetry/api';
 import { Attributes } from '@opentelemetry/api-metrics-wip';
 
+/**
+ * Internal interface.
+ *
+ * Stores {@link MetricData} and allows synchronous writes of measurements.
+ */
 export interface WritableMetricStorage {
+  /** Records a measurement. */
   record(value: number, attributes: Attributes, context: Context): void;
 }
 

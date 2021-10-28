@@ -18,13 +18,12 @@ import * as api from '@opentelemetry/api';
 import * as metrics from '@opentelemetry/api-metrics-wip';
 import { Resource } from '@opentelemetry/resources';
 import { Meter } from './Meter';
-import { MetricExporter } from './MetricExporter';
-import { MetricReader } from './MetricReader';
+import { MetricReader } from './export/MetricReader';
 import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { InstrumentSelector } from './view/InstrumentSelector';
 import { MeterSelector } from './view/MeterSelector';
 import { View } from './view/View';
-
+import { MetricCollector } from './state/MetricCollector';
 
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#meterprovider
 
@@ -35,8 +34,6 @@ export type MeterProviderOptions = {
 export class MeterProvider {
   private _sharedState: MeterProviderSharedState;
   private _shutdown = false;
-  private _metricReaders: MetricReader[] = [];
-  private _metricExporters: MetricExporter[] = [];
 
   constructor(options: MeterProviderOptions) {
     this._sharedState = new MeterProviderSharedState(options.resource ?? Resource.empty());
@@ -57,7 +54,9 @@ export class MeterProvider {
   }
 
   addMetricReader(metricReader: MetricReader) {
-    this._metricReaders.push(metricReader);
+    const collector = new MetricCollector(this._sharedState, metricReader);
+    metricReader.setMetricProducer(collector);
+    this._sharedState.metricCollectors.push(collector);
   }
 
   addView(view: View, instrumentSelector: InstrumentSelector, meterSelector: MeterSelector) {
@@ -66,7 +65,7 @@ export class MeterProvider {
   }
 
   /**
-   * Flush all buffered data and shut down the MeterProvider and all exporters and metric readers.
+   * Flush all buffered data and shut down the MeterProvider and all metric readers.
    * Returns a promise which is resolved when all flushes are complete.
    *
    * TODO: return errors to caller somehow?
@@ -82,11 +81,11 @@ export class MeterProvider {
     // TODO add a timeout - spec leaves it up the the SDK if this is configurable
     this._shutdown = true;
 
-    // Shut down all exporters and readers.
+    // Shut down all readers.
     // Log all Errors.
-    for (const exporter of this._metricExporters) {
+    for (const collector of this._sharedState.metricCollectors) {
       try {
-        await exporter.shutdown();
+        await collector.metricReader.shutdown();
       } catch (e) {
         if (e instanceof Error) {
           api.diag.error(`Error shutting down: ${e.message}`)
@@ -112,9 +111,9 @@ export class MeterProvider {
       return;
     }
 
-    for (const exporter of [...this._metricExporters, ...this._metricReaders]) {
+    for (const collector of this._sharedState.metricCollectors) {
       try {
-        await exporter.forceFlush();
+        await collector.metricReader.forceFlush();
       } catch (e) {
         if (e instanceof Error) {
           api.diag.error(`Error flushing: ${e.message}`)

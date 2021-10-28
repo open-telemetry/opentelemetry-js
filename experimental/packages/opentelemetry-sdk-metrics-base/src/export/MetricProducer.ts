@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
-export { MeterProvider, MeterProviderOptions } from './MeterProvider';
-export * from './export/MetricExporter';
-export * from './export/MetricReader';
+import { MetricData } from './MetricData';
+
+/**
+ * This is a public interface that represent an export state of a MetricReader.
+ */
+export interface MetricProducer {
+  collectAllMetrics(): Promise<MetricData[]>;
+}
