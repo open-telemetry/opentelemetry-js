@@ -54,11 +54,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "peerDependencies": {
-    "@opentelemetry/api": "^1.0.2"
-  },
   "devDependencies": {
-    "@opentelemetry/api": "^1.0.2",
     "@types/mocha": "8.2.3",
     "@types/node": "14.17.11",
     "@types/webpack-env": "1.16.2",

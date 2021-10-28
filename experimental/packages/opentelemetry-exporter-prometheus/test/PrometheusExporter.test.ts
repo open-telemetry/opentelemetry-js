@@ -36,6 +36,7 @@ describe('PrometheusExporter', () => {
   mockAggregator(HistogramAggregator);
 
   afterEach(() => {
+    sinon.restore();
     delete process.env.OTEL_EXPORTER_PROMETHEUS_HOST;
     delete process.env.OTEL_EXPORTER_PROMETHEUS_PORT;
   });
@@ -114,6 +115,16 @@ describe('PrometheusExporter', () => {
           });
         }
       );
+    });
+
+    it('should unref the server to allow graceful termination', () => {
+      const mockServer = sinon.createStubInstance(http.Server);
+      const createStub = sinon.stub(http, 'createServer');
+      createStub.returns((mockServer as any) as http.Server);
+      const exporter = new PrometheusExporter({}, async () => {
+        await exporter.shutdown();
+      });
+      sinon.assert.calledOnce(mockServer.unref);
     });
 
     it('should listen on environmentally set host and port', () => {
