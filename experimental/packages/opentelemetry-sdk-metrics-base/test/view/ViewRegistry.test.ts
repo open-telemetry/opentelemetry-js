@@ -17,11 +17,12 @@
 import * as assert from 'assert';
 import { ValueType } from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
-import { InstrumentDescriptor, InstrumentType } from '../../src/Instruments';
+import { InstrumentType } from '../../src/Instruments';
 import { ViewRegistry } from '../../src/view/ViewRegistry';
 import { View } from '../../src/view/View';
 import { InstrumentSelector } from '../../src/view/InstrumentSelector';
 import { MeterSelector } from '../../src/view/MeterSelector';
+import { InstrumentDescriptor } from '../../src/InstrumentDescriptor';
 
 const defaultInstrumentDescriptor: InstrumentDescriptor = {
   name: '',

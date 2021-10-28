@@ -17,14 +17,14 @@
 import * as api from '@opentelemetry/api';
 import * as metrics from '@opentelemetry/api-metrics';
 import { Resource } from '@opentelemetry/resources';
-import { Measurement } from './Measurement';
 import { Meter } from './Meter';
 import { MetricExporter } from './MetricExporter';
 import { MetricReader } from './MetricReader';
+import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { InstrumentSelector } from './view/InstrumentSelector';
 import { MeterSelector } from './view/MeterSelector';
 import { View } from './view/View';
-import { ViewRegistry } from './view/ViewRegistry';
+
 
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#meterprovider
 
@@ -33,14 +33,13 @@ export type MeterProviderOptions = {
 }
 
 export class MeterProvider {
-  private _resource: Resource;
+  private _sharedState: MeterProviderSharedState;
   private _shutdown = false;
   private _metricReaders: MetricReader[] = [];
   private _metricExporters: MetricExporter[] = [];
-  private readonly _viewRegistry = new ViewRegistry();
 
   constructor(options: MeterProviderOptions) {
-    this._resource = options.resource ?? Resource.empty();
+    this._sharedState = new MeterProviderSharedState(options.resource ?? Resource.empty());
   }
 
   /**
@@ -49,7 +48,7 @@ export class MeterProvider {
    * This method is only here to prevent typescript from complaining and may be removed.
    */
   getResource() {
-    return this._resource;
+    return this._sharedState.resource;
   }
 
   getMeter(name: string, version = '', options: metrics.MeterOptions = {}): metrics.Meter {
@@ -63,7 +62,7 @@ export class MeterProvider {
     // name/version returns the same meter. We create a new one here
     // for simplicity. This may change in the future.
     // TODO: consider returning the same meter if the same name/version is used
-    return new Meter(this, { name, version }, options.schemaUrl);
+    return new Meter(this._sharedState, { name, version }, options.schemaUrl);
   }
 
   addMetricReader(metricReader: MetricReader) {
@@ -72,7 +71,7 @@ export class MeterProvider {
 
   addView(view: View, instrumentSelector: InstrumentSelector, meterSelector: MeterSelector) {
     // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#view
-    this._viewRegistry.addView(view, instrumentSelector, meterSelector);
+    this._sharedState.viewRegistry.addView(view, instrumentSelector, meterSelector);
   }
 
   /**
@@ -131,21 +130,5 @@ export class MeterProvider {
         }
       }
     }
-  }
-
-  public aggregate(_meter: Meter, _metric: unknown, _measurement: Measurement) {
-    // TODO actually aggregate
-
-    /**
-     * if there are no views:
-     *   apply the default configuration
-     * else:
-     *   for each view:
-     *     if view matches:
-     *       apply view configuration
-     *   if no view matched:
-     *     if user has not disabled default fallback:
-     *       apply default configuration
-     */
   }
 }

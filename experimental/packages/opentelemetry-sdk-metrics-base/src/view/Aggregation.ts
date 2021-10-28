@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { InstrumentDescriptor } from "../Instruments";
+import { InstrumentDescriptor } from '../InstrumentDescriptor';
 
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#aggregation
 

@@ -15,7 +15,7 @@
  */
 
 import { InstrumentationLibrary } from '@opentelemetry/core';
-import { InstrumentDescriptor } from '../Instruments';
+import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { InstrumentSelector } from './InstrumentSelector';
 import { MeterSelector } from './MeterSelector';
 import { View } from './View';
