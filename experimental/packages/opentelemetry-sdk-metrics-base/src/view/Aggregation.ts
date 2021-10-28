@@ -14,12 +14,29 @@
  * limitations under the License.
  */
 
-import { Measurement } from './Measurement';
+import { InstrumentDescriptor } from "../Instruments";
 
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#aggregation
 
-export interface Aggregator {
-    aggregate(measurement: Measurement): void;
+/**
+ * Configures how measurements are combined into metrics for {@link View}s.
+ *
+ * Aggregation provides a set of built-in aggregations via static methods.
+ */
+export abstract class Aggregation {
+  // TODO: define the actual aggregator classes
+  abstract createAggregator(instrument: InstrumentDescriptor): unknown;
+
+  static None(): Aggregation {
+    return NONE_AGGREGATION;
+  }
 }
 
-// TODO define actual aggregator classes
+export class NoneAggregation extends Aggregation {
+  createAggregator(_instrument: InstrumentDescriptor) {
+    // TODO: define aggregator type
+    return;
+  }
+}
+
+const NONE_AGGREGATION = new NoneAggregation();

@@ -29,6 +29,14 @@ export enum InstrumentType {
     OBSERVABLE_UP_DOWN_COUNTER = 'OBSERVABLE_UP_DOWN_COUNTER',
 }
 
+export interface InstrumentDescriptor {
+  readonly name: string;
+  readonly description: string;
+  readonly unit: string;
+  readonly type: InstrumentType;
+  readonly valueType: metrics.ValueType;
+}
+
 export class SyncInstrument {
     constructor(private _meter: Meter, private _name: string) { }
 
@@ -36,7 +44,7 @@ export class SyncInstrument {
         return this._name;
     }
 
- 
+
     aggregate(value: number, attributes: metrics.Attributes = {}, ctx: api.Context = api.context.active()) {
         this._meter.aggregate(this, {
             value,
