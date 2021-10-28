@@ -14,14 +14,4 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api'
-import { Attributes } from '@opentelemetry/api-metrics-wip'
-
-// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#measurement
-
-export type Measurement = {
-    value: number;
-    // TODO use common attributes
-    attributes: Attributes
-    context?: api.Context;
-}
+export type Maybe<T> = T | undefined;

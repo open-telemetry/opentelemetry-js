@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
+import { Aggregator, SumAggregator, DropAggregator, LastValueAggregator, HistogramAggregator } from '../aggregator';
+import { Accumulation } from '../aggregator/types';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
+import { InstrumentType } from '../Instruments';
+import { Maybe } from '../utils';
 
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#aggregation
 
@@ -24,19 +28,91 @@ import { InstrumentDescriptor } from '../InstrumentDescriptor';
  * Aggregation provides a set of built-in aggregations via static methods.
  */
 export abstract class Aggregation {
-  // TODO: define the actual aggregator classes
-  abstract createAggregator(instrument: InstrumentDescriptor): unknown;
+  abstract createAggregator(instrument: InstrumentDescriptor): Aggregator<Maybe<Accumulation>>;
 
-  static None(): Aggregation {
-    return NONE_AGGREGATION;
+  static Drop(): Aggregation {
+    return DROP_AGGREGATION;
+  }
+
+  static Sum(): Aggregation {
+    return SUM_AGGREGATION;
+  }
+
+  static LastValue(): Aggregation {
+    return LAST_VALUE_AGGREGATION;
+  }
+
+  static Histogram(): Aggregation {
+    return HISTOGRAM_AGGREGATION;
+  }
+
+  static Default(): Aggregation {
+    return DEFAULT_AGGREGATION;
   }
 }
 
-export class NoneAggregation extends Aggregation {
+export class DropAggregation extends Aggregation {
+  static kDefault = new DropAggregator();
   createAggregator(_instrument: InstrumentDescriptor) {
-    // TODO: define aggregator type
-    return;
+    return DropAggregation.kDefault;
   }
 }
 
-const NONE_AGGREGATION = new NoneAggregation();
+export class SumAggregation extends Aggregation {
+  static kDefault = new SumAggregator();
+  createAggregator(_instrument: InstrumentDescriptor) {
+    return SumAggregation.kDefault;
+  }
+}
+
+export class LastValueAggregation extends Aggregation {
+  static kDefault = new LastValueAggregator();
+  createAggregator(_instrument: InstrumentDescriptor) {
+    return LastValueAggregation.kDefault;
+  }
+}
+
+export class HistogramAggregation extends Aggregation {
+  static kDefault = new HistogramAggregator([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]);
+  createAggregator(_instrument: InstrumentDescriptor) {
+    return HistogramAggregation.kDefault;
+  }
+}
+
+export class ExplicitBucketHistogramAggregation extends Aggregation {
+  constructor(private _boundaries: number[]) {
+    super();
+  }
+
+  createAggregator(_instrument: InstrumentDescriptor) {
+    return new HistogramAggregator(this._boundaries);
+  }
+}
+
+// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#default-aggregation
+export class DefaultAggregation extends Aggregation {
+  createAggregator(instrument: InstrumentDescriptor): Aggregator<Maybe<Accumulation>> {
+    // cast to unknown to disable complaints on the (unreachable) fallback.
+    switch (instrument.type as unknown) {
+      case InstrumentType.COUNTER:
+      case InstrumentType.UP_DOWN_COUNTER:
+      case InstrumentType.OBSERVABLE_COUNTER:
+      case InstrumentType.OBSERVABLE_UP_DOWN_COUNTER: {
+        return SumAggregation.kDefault;
+      }
+      case InstrumentType.OBSERVABLE_GAUGE: {
+        return LastValueAggregation.kDefault;
+      }
+      case InstrumentType.HISTOGRAM: {
+        return HistogramAggregation.kDefault;
+      }
+    }
+    return DropAggregation.kDefault;
+  }
+}
+
+const DROP_AGGREGATION = new DropAggregation();
+const SUM_AGGREGATION = new SumAggregation();
+const LAST_VALUE_AGGREGATION = new LastValueAggregation();
+const HISTOGRAM_AGGREGATION = new HistogramAggregation();
+const DEFAULT_AGGREGATION = new DefaultAggregation();
