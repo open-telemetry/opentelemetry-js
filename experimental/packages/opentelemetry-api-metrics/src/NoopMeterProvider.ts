@@ -23,7 +23,7 @@ import { NOOP_METER } from './NoopMeter';
  * for all calls to `getMeter`
  */
 export class NoopMeterProvider implements MeterProvider {
-  getMeter(_name?: string, _options?: MeterOptions): Meter {
+  getMeter(_name: string, _version?: string, _options?: MeterOptions): Meter {
     return NOOP_METER;
   }
 }

@@ -41,7 +41,7 @@ const meterProvider = new metrics.MeterProvider({
   }),
 });
 
-const meter = meterProvider.getMeter('default', { version: '0.0.1' });
+const meter = meterProvider.getMeter('default', '0.0.1');
 
 if (typeof Buffer === 'undefined') {
   (window as any).Buffer = {

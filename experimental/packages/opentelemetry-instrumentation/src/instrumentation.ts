@@ -53,9 +53,7 @@ export abstract class InstrumentationAbstract<T = any>
 
     this._tracer = trace.getTracer(instrumentationName, instrumentationVersion);
 
-    this._meter = metrics.getMeter(instrumentationName, {
-      version: instrumentationVersion,
-    });
+    this._meter = metrics.getMeter(instrumentationName, instrumentationVersion);
   }
 
   /* Api to wrap instrumented method */
@@ -79,9 +77,7 @@ export abstract class InstrumentationAbstract<T = any>
   public setMeterProvider(meterProvider: MeterProvider) {
     this._meter = meterProvider.getMeter(
       this.instrumentationName,
-      {
-        version: this.instrumentationVersion,
-      }
+      this.instrumentationVersion
     );
   }
 

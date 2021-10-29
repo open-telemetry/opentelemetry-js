@@ -39,7 +39,7 @@ const meterProvider = new metrics.MeterProvider({
   }),
 });
 
-const meter = meterProvider.getMeter('default', { version: '0.0.1' });
+const meter = meterProvider.getMeter('default', '0.0.1');
 
 export function mockCounter(): metrics.Metric<metrics.BoundCounter> & Counter {
   const name = 'int-counter';

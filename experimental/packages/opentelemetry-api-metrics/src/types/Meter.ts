@@ -32,10 +32,6 @@ import { ObservableResult } from './ObservableResult';
  */
 export interface MeterOptions {
   /**
-   * The version of the meter or instrumentation library
-   */
-  version?: string;
-  /**
    * The schemaUrl of the meter or instrumentation library
    */
   schemaUrl?: string;

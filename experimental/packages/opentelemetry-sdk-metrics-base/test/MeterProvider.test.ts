@@ -58,20 +58,20 @@ describe('MeterProvider', () => {
 
     it('should return the same Meter instance with same name & version', () => {
       const provider = new MeterProvider();
-      const meter1 = provider.getMeter('meter1', { version: 'ver1' });
-      const meter2 = provider.getMeter('meter1', { version: 'ver1' });
+      const meter1 = provider.getMeter('meter1', 'ver1');
+      const meter2 = provider.getMeter('meter1', 'ver1');
       assert.deepEqual(meter1, meter2);
     });
 
     it('should return different Meter instance with different name or version', () => {
       const provider = new MeterProvider();
 
-      const meter1 = provider.getMeter('meter1', { version: 'ver1' });
+      const meter1 = provider.getMeter('meter1', 'ver1');
       const meter2 = provider.getMeter('meter1');
       assert.notEqual(meter1, meter2);
 
-      const meter3 = provider.getMeter('meter2', { version: 'ver2' });
-      const meter4 = provider.getMeter('meter3', { version: 'ver2' });
+      const meter3 = provider.getMeter('meter2', 'ver2');
+      const meter4 = provider.getMeter('meter3', 'ver2');
       assert.notEqual(meter3, meter4);
     });
   });

@@ -73,8 +73,8 @@ export class MetricsAPI {
   /**
    * Returns a meter from the global meter provider.
    */
-  public getMeter(name: string, options?: MeterOptions): Meter {
-    return this.getMeterProvider().getMeter(name, options);
+  public getMeter(name: string, version?: string, options?: MeterOptions): Meter {
+    return this.getMeterProvider().getMeter(name, version, options);
   }
 
   /** Remove the global meter provider */
