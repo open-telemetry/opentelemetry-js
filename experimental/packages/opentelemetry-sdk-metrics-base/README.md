@@ -36,8 +36,8 @@ const counter = meter.createCounter('metric_name', {
   description: 'Example of a counter'
 });
 
-const labels = { pid: process.pid };
-counter.add(10, labels);
+const attributes = { pid: process.pid };
+counter.add(10, attributes);
 ```
 
 ### UpDownCounter
@@ -61,8 +61,8 @@ const counter = meter.createUpDownCounter('metric_name', {
   description: 'Example of a UpDownCounter'
 });
 
-const labels = { pid: process.pid };
-counter.add(Math.random() > 0.5 ? 1 : -1, labels);
+const attributes = { pid: process.pid };
+counter.add(Math.random() > 0.5 ? 1 : -1, attributes);
 ```
 
 ### Observable Gauge
@@ -81,7 +81,7 @@ meter.createObservableGauge('your_metric_name', {
   description: 'Example of an async observable gauge with callback',
 }, async (observableResult) => {
   const value = await getAsyncValue();
-  observableResult.observe(value, { label: '1' });
+  observableResult.observe(value, { attribute: '1' });
 });
 
 function getAsyncValue() {
@@ -96,8 +96,8 @@ function getAsyncValue() {
 meter.createObservableGauge('your_metric_name', {
   description: 'Example of a sync observable gauge with callback',
 }, (observableResult) => {
-  observableResult.observe(getRandomValue(), { label: '1' });
-  observableResult.observe(getRandomValue(), { label: '2' });
+  observableResult.observe(getRandomValue(), { attribute: '1' });
+  observableResult.observe(getRandomValue(), { attribute: '2' });
 });
 
 function getRandomValue() {
@@ -120,7 +120,7 @@ meter.createObservableUpDownCounter('your_metric_name', {
   description: 'Example of an async observable up down counter with callback',
 }, async (observableResult) => {
   const value = await getAsyncValue();
-  observableResult.observe(value, { label: '1' });
+  observableResult.observe(value, { attribute: '1' });
 });
 
 function getAsyncValue() {
@@ -135,7 +135,7 @@ function getAsyncValue() {
 meter.createObservableUpDownCounter('your_metric_name', {
   description: 'Example of a sync observable up down counter with callback',
 }, (observableResult) => {
-  observableResult.observe(getRandomValue(), { label: '1' });
+  observableResult.observe(getRandomValue(), { attribute: '1' });
 });
 
 function getRandomValue() {
@@ -159,7 +159,7 @@ meter.createObservableCounter('example_metric', {
   description: 'Example of an async observable counter with callback',
 }, async (observableResult) => {
   const value = await getAsyncValue();
-  observableResult.observe(value, { label: '1' });
+  observableResult.observe(value, { attribute: '1' });
 });
 
 function getAsyncValue() {
@@ -175,7 +175,7 @@ meter.createObservableCounter('example_metric', {
   description: 'Example of a sync observable counter with callback',
 }, (observableResult) => {
   const value = getRandomValue();
-  observableResult.observe(value, { label: '1' });
+  observableResult.observe(value, { attribute: '1' });
 });
 
 function getRandomValue() {
