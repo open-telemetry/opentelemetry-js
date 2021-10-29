@@ -17,9 +17,9 @@
 import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import {
   Counter,
-  ObserverResult,
-  ValueObserver,
-  ValueRecorder,
+  ObservableResult,
+  ObservableGauge,
+  Histogram,
   ValueType,
 } from '@opentelemetry/api-metrics';
 import { otlpTypes } from '@opentelemetry/exporter-otlp-http';
@@ -75,16 +75,16 @@ export function mockCounter(): metrics.Metric<metrics.BoundCounter> & Counter {
   return metric;
 }
 
-export function mockObserver(
-  callback: (observerResult: ObserverResult) => void
-): metrics.Metric<metrics.BoundCounter> & ValueObserver {
-  const name = 'double-observer';
+export function mockObservableGauge(
+  callback: (observableResult: ObservableResult) => void
+): metrics.Metric<metrics.BoundCounter> & ObservableGauge {
+  const name = 'double-observable-gauge';
   const metric =
     meter['_metrics'].get(name) ||
-    meter.createValueObserver(
+    meter.createObservableGauge(
       name,
       {
-        description: 'sample observer description',
+        description: 'sample observable gauge description',
         valueType: ValueType.DOUBLE,
       },
       callback
@@ -94,13 +94,13 @@ export function mockObserver(
   return metric;
 }
 
-export function mockValueRecorder(): metrics.Metric<metrics.BoundValueRecorder> &
-  ValueRecorder {
-  const name = 'int-recorder';
+export function mockHistogram(): metrics.Metric<metrics.BoundHistogram> &
+  Histogram {
+  const name = 'int-histogram';
   const metric =
     meter['_metrics'].get(name) ||
-    meter.createValueRecorder(name, {
-      description: 'sample recorder description',
+    meter.createHistogram(name, {
+      description: 'sample histogram description',
       valueType: ValueType.INT,
       boundaries: [0, 100],
     });
@@ -352,13 +352,13 @@ export function ensureExportedCounterIsCorrect(
   });
 }
 
-export function ensureExportedObserverIsCorrect(
+export function ensureExportedObservableGaugeIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time?: number
 ) {
   assert.deepStrictEqual(metric, {
-    name: 'double-observer',
-    description: 'sample observer description',
+    name: 'double-observable-gauge',
+    description: 'sample observable gauge description',
     unit: '1',
     data: 'doubleGauge',
     doubleGauge: {
@@ -375,15 +375,15 @@ export function ensureExportedObserverIsCorrect(
   });
 }
 
-export function ensureExportedValueRecorderIsCorrect(
+export function ensureExportedHistogramIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time?: number,
   explicitBounds: number[] = [Infinity],
   bucketCounts: string[] = ['2', '0']
 ) {
   assert.deepStrictEqual(metric, {
-    name: 'int-recorder',
-    description: 'sample recorder description',
+    name: 'int-histogram',
+    description: 'sample histogram description',
     unit: '1',
     data: 'intHistogram',
     intHistogram: {

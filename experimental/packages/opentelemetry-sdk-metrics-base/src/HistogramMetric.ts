@@ -17,15 +17,15 @@
 import * as api from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { BoundValueRecorder } from './BoundInstrument';
+import { BoundHistogram } from './BoundInstrument';
 import { Processor } from './export/Processor';
 import { MetricKind } from './export/types';
 import { Metric } from './Metric';
 
-/** This is a SDK implementation of Value Recorder Metric. */
-export class ValueRecorderMetric
-  extends Metric<BoundValueRecorder>
-  implements api.ValueRecorder {
+/** This is a SDK implementation of Histogram Metric. */
+export class HistogramMetric
+  extends Metric<BoundHistogram>
+  implements api.Histogram {
   constructor(
     name: string,
     options: api.MetricOptions,
@@ -36,14 +36,14 @@ export class ValueRecorderMetric
     super(
       name,
       options,
-      MetricKind.VALUE_RECORDER,
+      MetricKind.HISTOGRAM,
       resource,
       instrumentationLibrary
     );
   }
 
-  protected _makeInstrument(labels: api.Labels): BoundValueRecorder {
-    return new BoundValueRecorder(
+  protected _makeInstrument(labels: api.Labels): BoundHistogram {
+    return new BoundHistogram(
       labels,
       this._disabled,
       this._valueType,

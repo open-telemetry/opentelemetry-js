@@ -35,6 +35,7 @@ export * from './trace/sampler/TraceIdRatioBasedSampler';
 export * from './trace/suppress-tracing';
 export * from './trace/TraceState';
 export * from './utils/environment';
+export * from './utils/merge';
 export * from './utils/sampling';
 export * from './utils/url';
 export * from './utils/wrap';

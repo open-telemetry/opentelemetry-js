@@ -17,6 +17,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const semver = require('semver');
 
 const appRoot = process.cwd();
 
@@ -29,7 +30,7 @@ if (pjson.dependencies && pjson.dependencies["@opentelemetry/api"])
 const peerVersion = pjson.peerDependencies && pjson.peerDependencies["@opentelemetry/api"]
 const devVersion = pjson.devDependencies && pjson.devDependencies["@opentelemetry/api"]
 if (peerVersion) {
-    if (peerVersion !== devVersion) {
+    if (!semver.subset(devVersion, peerVersion)) {
         throw new Error(`Package ${pjson.name} depends on peer API version ${peerVersion} but version ${devVersion} in development`);
     }
     console.log(`${pjson.name} OK`);

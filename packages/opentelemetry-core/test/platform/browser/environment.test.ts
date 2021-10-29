@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-import {
-  ObserverResult as TypeObserverResult,
-  Labels,
-} from '@opentelemetry/api-metrics';
+import * as assert from 'assert';
+import { getEnv } from '../../../src/platform/browser/environment';
 
-/**
- * Implementation of {@link TypeObserverResult}
- */
-export class ObserverResult implements TypeObserverResult {
-  values: Map<Labels, number> = new Map<Labels, number>();
-
-  observe(value: number, labels: Labels): void {
-    this.values.set(labels, value);
-  }
-}
+describe('getEnv', () => {
+  it('get environments variables in a browser', () => {
+    const env = getEnv();
+    assert.strictEqual(typeof env, 'object');
+  });
+});

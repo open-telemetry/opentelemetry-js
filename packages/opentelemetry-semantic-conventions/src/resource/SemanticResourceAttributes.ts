@@ -476,141 +476,145 @@ As an alternative, consider setting `faas.id` as a span attribute instead.
   WEBENGINE_DESCRIPTION: 'webengine.description',
 }
 
-// Enum definitions
 
-
-export enum CloudProviderValues {
+export const CloudProviderValues = {
   /** Alibaba Cloud. */
-  ALIBABA_CLOUD = 'alibaba_cloud',
+  ALIBABA_CLOUD: 'alibaba_cloud',
   /** Amazon Web Services. */
-  AWS = 'aws',
+  AWS: 'aws',
   /** Microsoft Azure. */
-  AZURE = 'azure',
+  AZURE: 'azure',
   /** Google Cloud Platform. */
-  GCP = 'gcp',
-}
+  GCP: 'gcp',
+} as const
+export type CloudProviderValues = typeof CloudProviderValues[keyof typeof CloudProviderValues]
 
 
 
 
-export enum CloudPlatformValues {
+export const CloudPlatformValues = {
   /** Alibaba Cloud Elastic Compute Service. */
-  ALIBABA_CLOUD_ECS = 'alibaba_cloud_ecs',
+  ALIBABA_CLOUD_ECS: 'alibaba_cloud_ecs',
   /** Alibaba Cloud Function Compute. */
-  ALIBABA_CLOUD_FC = 'alibaba_cloud_fc',
+  ALIBABA_CLOUD_FC: 'alibaba_cloud_fc',
   /** AWS Elastic Compute Cloud. */
-  AWS_EC2 = 'aws_ec2',
+  AWS_EC2: 'aws_ec2',
   /** AWS Elastic Container Service. */
-  AWS_ECS = 'aws_ecs',
+  AWS_ECS: 'aws_ecs',
   /** AWS Elastic Kubernetes Service. */
-  AWS_EKS = 'aws_eks',
+  AWS_EKS: 'aws_eks',
   /** AWS Lambda. */
-  AWS_LAMBDA = 'aws_lambda',
+  AWS_LAMBDA: 'aws_lambda',
   /** AWS Elastic Beanstalk. */
-  AWS_ELASTIC_BEANSTALK = 'aws_elastic_beanstalk',
+  AWS_ELASTIC_BEANSTALK: 'aws_elastic_beanstalk',
   /** Azure Virtual Machines. */
-  AZURE_VM = 'azure_vm',
+  AZURE_VM: 'azure_vm',
   /** Azure Container Instances. */
-  AZURE_CONTAINER_INSTANCES = 'azure_container_instances',
+  AZURE_CONTAINER_INSTANCES: 'azure_container_instances',
   /** Azure Kubernetes Service. */
-  AZURE_AKS = 'azure_aks',
+  AZURE_AKS: 'azure_aks',
   /** Azure Functions. */
-  AZURE_FUNCTIONS = 'azure_functions',
+  AZURE_FUNCTIONS: 'azure_functions',
   /** Azure App Service. */
-  AZURE_APP_SERVICE = 'azure_app_service',
+  AZURE_APP_SERVICE: 'azure_app_service',
   /** Google Cloud Compute Engine (GCE). */
-  GCP_COMPUTE_ENGINE = 'gcp_compute_engine',
+  GCP_COMPUTE_ENGINE: 'gcp_compute_engine',
   /** Google Cloud Run. */
-  GCP_CLOUD_RUN = 'gcp_cloud_run',
+  GCP_CLOUD_RUN: 'gcp_cloud_run',
   /** Google Cloud Kubernetes Engine (GKE). */
-  GCP_KUBERNETES_ENGINE = 'gcp_kubernetes_engine',
+  GCP_KUBERNETES_ENGINE: 'gcp_kubernetes_engine',
   /** Google Cloud Functions (GCF). */
-  GCP_CLOUD_FUNCTIONS = 'gcp_cloud_functions',
+  GCP_CLOUD_FUNCTIONS: 'gcp_cloud_functions',
   /** Google Cloud App Engine (GAE). */
-  GCP_APP_ENGINE = 'gcp_app_engine',
-}
+  GCP_APP_ENGINE: 'gcp_app_engine',
+} as const
+export type CloudPlatformValues = typeof CloudPlatformValues[keyof typeof CloudPlatformValues]
 
 
 
 
-export enum AwsEcsLaunchtypeValues {
+export const AwsEcsLaunchtypeValues = {
   /** ec2. */
-  EC2 = 'ec2',
+  EC2: 'ec2',
   /** fargate. */
-  FARGATE = 'fargate',
-}
+  FARGATE: 'fargate',
+} as const
+export type AwsEcsLaunchtypeValues = typeof AwsEcsLaunchtypeValues[keyof typeof AwsEcsLaunchtypeValues]
 
 
 
 
-export enum HostArchValues {
+export const HostArchValues = {
   /** AMD64. */
-  AMD64 = 'amd64',
+  AMD64: 'amd64',
   /** ARM32. */
-  ARM32 = 'arm32',
+  ARM32: 'arm32',
   /** ARM64. */
-  ARM64 = 'arm64',
+  ARM64: 'arm64',
   /** Itanium. */
-  IA64 = 'ia64',
+  IA64: 'ia64',
   /** 32-bit PowerPC. */
-  PPC32 = 'ppc32',
+  PPC32: 'ppc32',
   /** 64-bit PowerPC. */
-  PPC64 = 'ppc64',
+  PPC64: 'ppc64',
   /** 32-bit x86. */
-  X86 = 'x86',
-}
+  X86: 'x86',
+} as const
+export type HostArchValues = typeof HostArchValues[keyof typeof HostArchValues]
 
 
 
 
-export enum OsTypeValues {
+export const OsTypeValues = {
   /** Microsoft Windows. */
-  WINDOWS = 'windows',
+  WINDOWS: 'windows',
   /** Linux. */
-  LINUX = 'linux',
+  LINUX: 'linux',
   /** Apple Darwin. */
-  DARWIN = 'darwin',
+  DARWIN: 'darwin',
   /** FreeBSD. */
-  FREEBSD = 'freebsd',
+  FREEBSD: 'freebsd',
   /** NetBSD. */
-  NETBSD = 'netbsd',
+  NETBSD: 'netbsd',
   /** OpenBSD. */
-  OPENBSD = 'openbsd',
+  OPENBSD: 'openbsd',
   /** DragonFly BSD. */
-  DRAGONFLYBSD = 'dragonflybsd',
+  DRAGONFLYBSD: 'dragonflybsd',
   /** HP-UX (Hewlett Packard Unix). */
-  HPUX = 'hpux',
+  HPUX: 'hpux',
   /** AIX (Advanced Interactive eXecutive). */
-  AIX = 'aix',
+  AIX: 'aix',
   /** Oracle Solaris. */
-  SOLARIS = 'solaris',
+  SOLARIS: 'solaris',
   /** IBM z/OS. */
-  Z_OS = 'z_os',
-}
+  Z_OS: 'z_os',
+} as const
+export type OsTypeValues = typeof OsTypeValues[keyof typeof OsTypeValues]
 
 
 
 
-export enum TelemetrySdkLanguageValues {
+export const TelemetrySdkLanguageValues = {
   /** cpp. */
-  CPP = 'cpp',
+  CPP: 'cpp',
   /** dotnet. */
-  DOTNET = 'dotnet',
+  DOTNET: 'dotnet',
   /** erlang. */
-  ERLANG = 'erlang',
+  ERLANG: 'erlang',
   /** go. */
-  GO = 'go',
+  GO: 'go',
   /** java. */
-  JAVA = 'java',
+  JAVA: 'java',
   /** nodejs. */
-  NODEJS = 'nodejs',
+  NODEJS: 'nodejs',
   /** php. */
-  PHP = 'php',
+  PHP: 'php',
   /** python. */
-  PYTHON = 'python',
+  PYTHON: 'python',
   /** ruby. */
-  RUBY = 'ruby',
+  RUBY: 'ruby',
   /** webjs. */
-  WEBJS = 'webjs',
-}
+  WEBJS: 'webjs',
+} as const
+export type TelemetrySdkLanguageValues = typeof TelemetrySdkLanguageValues[keyof typeof TelemetrySdkLanguageValues]
 

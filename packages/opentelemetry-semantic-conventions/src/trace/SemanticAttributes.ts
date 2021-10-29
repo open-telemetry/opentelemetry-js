@@ -723,343 +723,354 @@ the closest proxy.
   MESSAGE_UNCOMPRESSED_SIZE: 'message.uncompressed_size',
 }
 
-// Enum definitions
 
-
-export enum DbSystemValues {
+export const DbSystemValues = {
   /** Some other SQL database. Fallback only. See notes. */
-  OTHER_SQL = 'other_sql',
+  OTHER_SQL: 'other_sql',
   /** Microsoft SQL Server. */
-  MSSQL = 'mssql',
+  MSSQL: 'mssql',
   /** MySQL. */
-  MYSQL = 'mysql',
+  MYSQL: 'mysql',
   /** Oracle Database. */
-  ORACLE = 'oracle',
+  ORACLE: 'oracle',
   /** IBM Db2. */
-  DB2 = 'db2',
+  DB2: 'db2',
   /** PostgreSQL. */
-  POSTGRESQL = 'postgresql',
+  POSTGRESQL: 'postgresql',
   /** Amazon Redshift. */
-  REDSHIFT = 'redshift',
+  REDSHIFT: 'redshift',
   /** Apache Hive. */
-  HIVE = 'hive',
+  HIVE: 'hive',
   /** Cloudscape. */
-  CLOUDSCAPE = 'cloudscape',
+  CLOUDSCAPE: 'cloudscape',
   /** HyperSQL DataBase. */
-  HSQLDB = 'hsqldb',
+  HSQLDB: 'hsqldb',
   /** Progress Database. */
-  PROGRESS = 'progress',
+  PROGRESS: 'progress',
   /** SAP MaxDB. */
-  MAXDB = 'maxdb',
+  MAXDB: 'maxdb',
   /** SAP HANA. */
-  HANADB = 'hanadb',
+  HANADB: 'hanadb',
   /** Ingres. */
-  INGRES = 'ingres',
+  INGRES: 'ingres',
   /** FirstSQL. */
-  FIRSTSQL = 'firstsql',
+  FIRSTSQL: 'firstsql',
   /** EnterpriseDB. */
-  EDB = 'edb',
+  EDB: 'edb',
   /** InterSystems Caché. */
-  CACHE = 'cache',
+  CACHE: 'cache',
   /** Adabas (Adaptable Database System). */
-  ADABAS = 'adabas',
+  ADABAS: 'adabas',
   /** Firebird. */
-  FIREBIRD = 'firebird',
+  FIREBIRD: 'firebird',
   /** Apache Derby. */
-  DERBY = 'derby',
+  DERBY: 'derby',
   /** FileMaker. */
-  FILEMAKER = 'filemaker',
+  FILEMAKER: 'filemaker',
   /** Informix. */
-  INFORMIX = 'informix',
+  INFORMIX: 'informix',
   /** InstantDB. */
-  INSTANTDB = 'instantdb',
+  INSTANTDB: 'instantdb',
   /** InterBase. */
-  INTERBASE = 'interbase',
+  INTERBASE: 'interbase',
   /** MariaDB. */
-  MARIADB = 'mariadb',
+  MARIADB: 'mariadb',
   /** Netezza. */
-  NETEZZA = 'netezza',
+  NETEZZA: 'netezza',
   /** Pervasive PSQL. */
-  PERVASIVE = 'pervasive',
+  PERVASIVE: 'pervasive',
   /** PointBase. */
-  POINTBASE = 'pointbase',
+  POINTBASE: 'pointbase',
   /** SQLite. */
-  SQLITE = 'sqlite',
+  SQLITE: 'sqlite',
   /** Sybase. */
-  SYBASE = 'sybase',
+  SYBASE: 'sybase',
   /** Teradata. */
-  TERADATA = 'teradata',
+  TERADATA: 'teradata',
   /** Vertica. */
-  VERTICA = 'vertica',
+  VERTICA: 'vertica',
   /** H2. */
-  H2 = 'h2',
+  H2: 'h2',
   /** ColdFusion IMQ. */
-  COLDFUSION = 'coldfusion',
+  COLDFUSION: 'coldfusion',
   /** Apache Cassandra. */
-  CASSANDRA = 'cassandra',
+  CASSANDRA: 'cassandra',
   /** Apache HBase. */
-  HBASE = 'hbase',
+  HBASE: 'hbase',
   /** MongoDB. */
-  MONGODB = 'mongodb',
+  MONGODB: 'mongodb',
   /** Redis. */
-  REDIS = 'redis',
+  REDIS: 'redis',
   /** Couchbase. */
-  COUCHBASE = 'couchbase',
+  COUCHBASE: 'couchbase',
   /** CouchDB. */
-  COUCHDB = 'couchdb',
+  COUCHDB: 'couchdb',
   /** Microsoft Azure Cosmos DB. */
-  COSMOSDB = 'cosmosdb',
+  COSMOSDB: 'cosmosdb',
   /** Amazon DynamoDB. */
-  DYNAMODB = 'dynamodb',
+  DYNAMODB: 'dynamodb',
   /** Neo4j. */
-  NEO4J = 'neo4j',
+  NEO4J: 'neo4j',
   /** Apache Geode. */
-  GEODE = 'geode',
+  GEODE: 'geode',
   /** Elasticsearch. */
-  ELASTICSEARCH = 'elasticsearch',
+  ELASTICSEARCH: 'elasticsearch',
   /** Memcached. */
-  MEMCACHED = 'memcached',
+  MEMCACHED: 'memcached',
   /** CockroachDB. */
-  COCKROACHDB = 'cockroachdb',
-}
+  COCKROACHDB: 'cockroachdb',
+} as const
+export type DbSystemValues = typeof DbSystemValues[keyof typeof DbSystemValues]
 
 
 
 
-export enum DbCassandraConsistencyLevelValues {
+export const DbCassandraConsistencyLevelValues = {
   /** all. */
-  ALL = 'all',
+  ALL: 'all',
   /** each_quorum. */
-  EACH_QUORUM = 'each_quorum',
+  EACH_QUORUM: 'each_quorum',
   /** quorum. */
-  QUORUM = 'quorum',
+  QUORUM: 'quorum',
   /** local_quorum. */
-  LOCAL_QUORUM = 'local_quorum',
+  LOCAL_QUORUM: 'local_quorum',
   /** one. */
-  ONE = 'one',
+  ONE: 'one',
   /** two. */
-  TWO = 'two',
+  TWO: 'two',
   /** three. */
-  THREE = 'three',
+  THREE: 'three',
   /** local_one. */
-  LOCAL_ONE = 'local_one',
+  LOCAL_ONE: 'local_one',
   /** any. */
-  ANY = 'any',
+  ANY: 'any',
   /** serial. */
-  SERIAL = 'serial',
+  SERIAL: 'serial',
   /** local_serial. */
-  LOCAL_SERIAL = 'local_serial',
-}
+  LOCAL_SERIAL: 'local_serial',
+} as const
+export type DbCassandraConsistencyLevelValues = typeof DbCassandraConsistencyLevelValues[keyof typeof DbCassandraConsistencyLevelValues]
 
 
 
 
-export enum FaasTriggerValues {
+export const FaasTriggerValues = {
   /** A response to some data source operation such as a database or filesystem read/write. */
-  DATASOURCE = 'datasource',
+  DATASOURCE: 'datasource',
   /** To provide an answer to an inbound HTTP request. */
-  HTTP = 'http',
+  HTTP: 'http',
   /** A function is set to be executed when messages are sent to a messaging system. */
-  PUBSUB = 'pubsub',
+  PUBSUB: 'pubsub',
   /** A function is scheduled to be executed regularly. */
-  TIMER = 'timer',
+  TIMER: 'timer',
   /** If none of the others apply. */
-  OTHER = 'other',
-}
+  OTHER: 'other',
+} as const
+export type FaasTriggerValues = typeof FaasTriggerValues[keyof typeof FaasTriggerValues]
 
 
 
 
-export enum FaasDocumentOperationValues {
+export const FaasDocumentOperationValues = {
   /** When a new object is created. */
-  INSERT = 'insert',
+  INSERT: 'insert',
   /** When an object is modified. */
-  EDIT = 'edit',
+  EDIT: 'edit',
   /** When an object is deleted. */
-  DELETE = 'delete',
-}
+  DELETE: 'delete',
+} as const
+export type FaasDocumentOperationValues = typeof FaasDocumentOperationValues[keyof typeof FaasDocumentOperationValues]
 
 
 
 
-export enum FaasInvokedProviderValues {
+export const FaasInvokedProviderValues = {
   /** Alibaba Cloud. */
-  ALIBABA_CLOUD = 'alibaba_cloud',
+  ALIBABA_CLOUD: 'alibaba_cloud',
   /** Amazon Web Services. */
-  AWS = 'aws',
+  AWS: 'aws',
   /** Microsoft Azure. */
-  AZURE = 'azure',
+  AZURE: 'azure',
   /** Google Cloud Platform. */
-  GCP = 'gcp',
-}
+  GCP: 'gcp',
+} as const
+export type FaasInvokedProviderValues = typeof FaasInvokedProviderValues[keyof typeof FaasInvokedProviderValues]
 
 
 
 
-export enum NetTransportValues {
+export const NetTransportValues = {
   /** ip_tcp. */
-  IP_TCP = 'ip_tcp',
+  IP_TCP: 'ip_tcp',
   /** ip_udp. */
-  IP_UDP = 'ip_udp',
+  IP_UDP: 'ip_udp',
   /** Another IP-based protocol. */
-  IP = 'ip',
+  IP: 'ip',
   /** Unix Domain socket. See below. */
-  UNIX = 'unix',
+  UNIX: 'unix',
   /** Named or anonymous pipe. See note below. */
-  PIPE = 'pipe',
+  PIPE: 'pipe',
   /** In-process communication. */
-  INPROC = 'inproc',
+  INPROC: 'inproc',
   /** Something else (non IP-based). */
-  OTHER = 'other',
-}
+  OTHER: 'other',
+} as const
+export type NetTransportValues = typeof NetTransportValues[keyof typeof NetTransportValues]
 
 
 
 
-export enum NetHostConnectionTypeValues {
+export const NetHostConnectionTypeValues = {
   /** wifi. */
-  WIFI = 'wifi',
+  WIFI: 'wifi',
   /** wired. */
-  WIRED = 'wired',
+  WIRED: 'wired',
   /** cell. */
-  CELL = 'cell',
+  CELL: 'cell',
   /** unavailable. */
-  UNAVAILABLE = 'unavailable',
+  UNAVAILABLE: 'unavailable',
   /** unknown. */
-  UNKNOWN = 'unknown',
-}
+  UNKNOWN: 'unknown',
+} as const
+export type NetHostConnectionTypeValues = typeof NetHostConnectionTypeValues[keyof typeof NetHostConnectionTypeValues]
 
 
 
 
-export enum NetHostConnectionSubtypeValues {
+export const NetHostConnectionSubtypeValues = {
   /** GPRS. */
-  GPRS = 'gprs',
+  GPRS: 'gprs',
   /** EDGE. */
-  EDGE = 'edge',
+  EDGE: 'edge',
   /** UMTS. */
-  UMTS = 'umts',
+  UMTS: 'umts',
   /** CDMA. */
-  CDMA = 'cdma',
+  CDMA: 'cdma',
   /** EVDO Rel. 0. */
-  EVDO_0 = 'evdo_0',
+  EVDO_0: 'evdo_0',
   /** EVDO Rev. A. */
-  EVDO_A = 'evdo_a',
+  EVDO_A: 'evdo_a',
   /** CDMA2000 1XRTT. */
-  CDMA2000_1XRTT = 'cdma2000_1xrtt',
+  CDMA2000_1XRTT: 'cdma2000_1xrtt',
   /** HSDPA. */
-  HSDPA = 'hsdpa',
+  HSDPA: 'hsdpa',
   /** HSUPA. */
-  HSUPA = 'hsupa',
+  HSUPA: 'hsupa',
   /** HSPA. */
-  HSPA = 'hspa',
+  HSPA: 'hspa',
   /** IDEN. */
-  IDEN = 'iden',
+  IDEN: 'iden',
   /** EVDO Rev. B. */
-  EVDO_B = 'evdo_b',
+  EVDO_B: 'evdo_b',
   /** LTE. */
-  LTE = 'lte',
+  LTE: 'lte',
   /** EHRPD. */
-  EHRPD = 'ehrpd',
+  EHRPD: 'ehrpd',
   /** HSPAP. */
-  HSPAP = 'hspap',
+  HSPAP: 'hspap',
   /** GSM. */
-  GSM = 'gsm',
+  GSM: 'gsm',
   /** TD-SCDMA. */
-  TD_SCDMA = 'td_scdma',
+  TD_SCDMA: 'td_scdma',
   /** IWLAN. */
-  IWLAN = 'iwlan',
+  IWLAN: 'iwlan',
   /** 5G NR (New Radio). */
-  NR = 'nr',
+  NR: 'nr',
   /** 5G NRNSA (New Radio Non-Standalone). */
-  NRNSA = 'nrnsa',
+  NRNSA: 'nrnsa',
   /** LTE CA. */
-  LTE_CA = 'lte_ca',
-}
+  LTE_CA: 'lte_ca',
+} as const
+export type NetHostConnectionSubtypeValues = typeof NetHostConnectionSubtypeValues[keyof typeof NetHostConnectionSubtypeValues]
 
 
 
 
-export enum HttpFlavorValues {
+export const HttpFlavorValues = {
   /** HTTP 1.0. */
-  HTTP_1_0 = '1.0',
+  HTTP_1_0: '1.0',
   /** HTTP 1.1. */
-  HTTP_1_1 = '1.1',
+  HTTP_1_1: '1.1',
   /** HTTP 2. */
-  HTTP_2_0 = '2.0',
+  HTTP_2_0: '2.0',
   /** SPDY protocol. */
-  SPDY = 'SPDY',
+  SPDY: 'SPDY',
   /** QUIC protocol. */
-  QUIC = 'QUIC',
-}
+  QUIC: 'QUIC',
+} as const
+export type HttpFlavorValues = typeof HttpFlavorValues[keyof typeof HttpFlavorValues]
 
 
 
 
-export enum MessagingDestinationKindValues {
+export const MessagingDestinationKindValues = {
   /** A message sent to a queue. */
-  QUEUE = 'queue',
+  QUEUE: 'queue',
   /** A message sent to a topic. */
-  TOPIC = 'topic',
-}
+  TOPIC: 'topic',
+} as const
+export type MessagingDestinationKindValues = typeof MessagingDestinationKindValues[keyof typeof MessagingDestinationKindValues]
 
 
 
 
-export enum MessagingOperationValues {
+export const MessagingOperationValues = {
   /** receive. */
-  RECEIVE = 'receive',
+  RECEIVE: 'receive',
   /** process. */
-  PROCESS = 'process',
-}
+  PROCESS: 'process',
+} as const
+export type MessagingOperationValues = typeof MessagingOperationValues[keyof typeof MessagingOperationValues]
 
 
 
 
-export enum RpcGrpcStatusCodeValues {
+export const RpcGrpcStatusCodeValues = {
   /** OK. */
-  OK = 0,
+  OK: 0,
   /** CANCELLED. */
-  CANCELLED = 1,
+  CANCELLED: 1,
   /** UNKNOWN. */
-  UNKNOWN = 2,
+  UNKNOWN: 2,
   /** INVALID_ARGUMENT. */
-  INVALID_ARGUMENT = 3,
+  INVALID_ARGUMENT: 3,
   /** DEADLINE_EXCEEDED. */
-  DEADLINE_EXCEEDED = 4,
+  DEADLINE_EXCEEDED: 4,
   /** NOT_FOUND. */
-  NOT_FOUND = 5,
+  NOT_FOUND: 5,
   /** ALREADY_EXISTS. */
-  ALREADY_EXISTS = 6,
+  ALREADY_EXISTS: 6,
   /** PERMISSION_DENIED. */
-  PERMISSION_DENIED = 7,
+  PERMISSION_DENIED: 7,
   /** RESOURCE_EXHAUSTED. */
-  RESOURCE_EXHAUSTED = 8,
+  RESOURCE_EXHAUSTED: 8,
   /** FAILED_PRECONDITION. */
-  FAILED_PRECONDITION = 9,
+  FAILED_PRECONDITION: 9,
   /** ABORTED. */
-  ABORTED = 10,
+  ABORTED: 10,
   /** OUT_OF_RANGE. */
-  OUT_OF_RANGE = 11,
+  OUT_OF_RANGE: 11,
   /** UNIMPLEMENTED. */
-  UNIMPLEMENTED = 12,
+  UNIMPLEMENTED: 12,
   /** INTERNAL. */
-  INTERNAL = 13,
+  INTERNAL: 13,
   /** UNAVAILABLE. */
-  UNAVAILABLE = 14,
+  UNAVAILABLE: 14,
   /** DATA_LOSS. */
-  DATA_LOSS = 15,
+  DATA_LOSS: 15,
   /** UNAUTHENTICATED. */
-  UNAUTHENTICATED = 16,
-}
+  UNAUTHENTICATED: 16,
+} as const
+export type RpcGrpcStatusCodeValues = typeof RpcGrpcStatusCodeValues[keyof typeof RpcGrpcStatusCodeValues]
 
 
 
 
-export enum MessageTypeValues {
+export const MessageTypeValues = {
   /** sent. */
-  SENT = 'SENT',
+  SENT: 'SENT',
   /** received. */
-  RECEIVED = 'RECEIVED',
-}
+  RECEIVED: 'RECEIVED',
+} as const
+export type MessageTypeValues = typeof MessageTypeValues[keyof typeof MessageTypeValues]
 

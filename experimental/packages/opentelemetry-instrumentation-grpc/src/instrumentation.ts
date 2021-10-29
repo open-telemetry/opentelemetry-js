@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import { GrpcInstrumentationConfig } from './types';
 import { VERSION } from './version';
 import { GrpcNativeInstrumentation } from './grpc';
@@ -34,26 +33,23 @@ export class GrpcInstrumentation {
   public readonly instrumentationVersion: string = VERSION;
 
   constructor(
-    protected _config: GrpcInstrumentationConfig & InstrumentationConfig = {}
+    config?: GrpcInstrumentationConfig
   ) {
     this._grpcJsInstrumentation = new GrpcJsInstrumentation(
-      _config,
       this.instrumentationName,
-      this.instrumentationVersion
+      this.instrumentationVersion,
+      config
     );
     this._grpcNativeInstrumentation = new GrpcNativeInstrumentation(
-      _config,
       this.instrumentationName,
-      this.instrumentationVersion
+      this.instrumentationVersion,
+      config
     );
   }
 
-  public setConfig(
-    config: GrpcInstrumentationConfig & InstrumentationConfig = {}
-  ) {
-    this._config = Object.assign({}, config);
-    this._grpcJsInstrumentation.setConfig(this._config);
-    this._grpcNativeInstrumentation.setConfig(this._config);
+  public setConfig(config?: GrpcInstrumentationConfig) {
+    this._grpcJsInstrumentation.setConfig(config);
+    this._grpcNativeInstrumentation.setConfig(config);
   }
 
   /**
@@ -61,8 +57,9 @@ export class GrpcInstrumentation {
    * Public reference to the protected BaseInstrumentation `_config` instance to be used by this
    * plugin's external helper functions
    */
-  public getConfig() {
-    return this._config;
+  public getConfig(): GrpcInstrumentationConfig {
+    // grpcNative and grpcJs have their own config copy which should be identical so just pick one
+    return this._grpcJsInstrumentation.getConfig();
   }
 
   init() {

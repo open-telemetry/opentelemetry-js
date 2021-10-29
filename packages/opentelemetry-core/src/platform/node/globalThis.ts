@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 
-import { Labels } from './Metric';
-
-/**
- * Interface that is being used in callback function for Observer Metric
- */
-export interface ObserverResult {
-  observe(value: number, labels: Labels): void;
-}
+/** only globals that common to node and browsers are allowed */
+// eslint-disable-next-line node/no-unsupported-features/es-builtins
+export const _globalThis = typeof globalThis === 'object' ? globalThis : global;

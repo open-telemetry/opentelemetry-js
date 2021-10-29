@@ -20,6 +20,9 @@ import { Meter } from '.';
 import { DEFAULT_CONFIG, MeterConfig } from './types';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const merge = require('lodash.merge');
+// @TODO - replace once the core is released
+// import { merge } from '@opentelemetry/core';
+
 
 /**
  * This class represents a meter provider which platform libraries can extend
