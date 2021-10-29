@@ -66,7 +66,7 @@ Fetch instrumentation plugin has few options available to choose from. You can s
 
 | Options                                                                                                                                           | Type                          | Description                           |
 | ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------- | ------------------------------------- |
-| [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L47) | `HttpCustomAttributeFunction` | Function for adding custom attributes |
+| [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-fetch/src/fetch.ts#L64) | `HttpCustomAttributeFunction` | Function for adding custom attributes |
 
 ## Useful links
 
