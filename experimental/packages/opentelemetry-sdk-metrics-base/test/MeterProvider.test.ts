@@ -16,7 +16,15 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { MeterProvider, Meter, CounterMetric } from '../src';
+import {
+  MeterProvider,
+  Meter,
+  CounterMetric,
+  MetricRecord,
+  MetricDescriptor,
+  Aggregator,
+  Processor,
+} from '../src';
 
 describe('MeterProvider', () => {
   afterEach(() => {
@@ -73,6 +81,27 @@ describe('MeterProvider', () => {
       const meter3 = provider.getMeter('meter2', 'ver2');
       const meter4 = provider.getMeter('meter3', 'ver2');
       assert.notEqual(meter3, meter4);
+    });
+
+    it('should allow custom processor', () => {
+      class CustomProcessor extends Processor {
+        process(record: MetricRecord): void {
+          throw new Error('process method not implemented.');
+        }
+
+        aggregatorFor(metricKind: MetricDescriptor): Aggregator {
+          throw new Error('aggregatorFor method not implemented.');
+        }
+      }
+
+      const meter = new MeterProvider({
+        processor: new CustomProcessor(),
+      }).getMeter('custom-processor', '*');
+
+      assert.throws(() => {
+        const histogram = meter.createHistogram('myHistogram');
+        histogram.bind({}).record(1);
+      }, /aggregatorFor method not implemented/);
     });
   });
 
