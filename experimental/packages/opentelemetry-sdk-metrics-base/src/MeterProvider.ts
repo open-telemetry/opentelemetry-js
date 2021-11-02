@@ -48,8 +48,8 @@ export class MeterProvider implements api.MeterProvider {
    *
    * @returns Meter A Meter with the given name and version
    */
-  getMeter(name: string, version?: string, config?: MeterConfig): Meter {
-    const key = `${name}@${version ?? ''}:${config?.schemaUrl ?? ''}`;
+  getMeter(name: string, version?: string, options?: api.MeterOptions): Meter {
+    const key = `${name}@${version ?? ''}:${options?.schemaUrl ?? ''}`;
     if (!this._meters.has(key)) {
       this._meters.set(
         key,
@@ -57,8 +57,8 @@ export class MeterProvider implements api.MeterProvider {
           name,
           version,
           // @ts-expect-error ts(2345) TODO: upgrade @opentelemetry/core InstrumentationLibrary definition
-          schemaUrl: config?.schemaUrl
-        }, Object.assign({}, this._config, config))
+          schemaUrl: options?.schemaUrl
+        }, this._config)
       );
     }
 

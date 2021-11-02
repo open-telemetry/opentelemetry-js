@@ -227,10 +227,9 @@ describe('PrometheusExporter', () => {
       exporter = new PrometheusExporter({}, () => {
         meterProvider = new MeterProvider({
           interval: Math.pow(2, 31) - 1,
-        });
-        meter = meterProvider.getMeter('test-prometheus', '1', {
           exporter,
         });
+        meter = meterProvider.getMeter('test-prometheus', '1');
         done();
       });
     });
@@ -363,25 +362,15 @@ describe('PrometheusExporter', () => {
       counter.bind({ counterKey1: 'labelValue2' }).add(20);
       counter.bind({ counterKey1: 'labelValue3' }).add(30);
       meterProvider.shutdown().then(() => {
+        // exporter has been shut down along with meter provider.
         http
           .get('http://localhost:9464/metrics', res => {
-            res.on('data', chunk => {
-              const body = chunk.toString();
-              const lines = body.split('\n');
-
-              assert.deepStrictEqual(lines, [
-                '# HELP counter_total a test description',
-                '# TYPE counter_total counter',
-                `counter_total{counterKey1="labelValue1"} 10 ${mockedHrTimeMs}`,
-                `counter_total{counterKey1="labelValue2"} 20 ${mockedHrTimeMs}`,
-                `counter_total{counterKey1="labelValue3"} 30 ${mockedHrTimeMs}`,
-                '',
-              ]);
-
-              done();
-            });
+            errorHandler(done)(new Error('unreachable'));
           })
-          .on('error', errorHandler(done));
+          .on('error', err => {
+            assert(`${err}`.match('ECONNREFUSED'));
+            done();
+          });
       });
     });
 
