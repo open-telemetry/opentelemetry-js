@@ -37,11 +37,7 @@ const counter = meter.createCounter('metric_name', {
 });
 
 const labels = { pid: process.pid };
-
-// Create a BoundInstrument associated with specified label values.
-const boundCounter = counter.bind(labels);
-boundCounter.add(10);
-
+counter.add(10, labels);
 ```
 
 ### UpDownCounter
@@ -66,11 +62,7 @@ const counter = meter.createUpDownCounter('metric_name', {
 });
 
 const labels = { pid: process.pid };
-
-// Create a BoundInstrument associated with specified label values.
-const boundCounter = counter.bind(labels);
-boundCounter.add(Math.random() > 0.5 ? 1 : -1);
-
+counter.add(Math.random() > 0.5 ? 1 : -1, labels);
 ```
 
 ### Observable Gauge

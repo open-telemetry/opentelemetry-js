@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { ConsoleMetricExporter, MeterProvider, MetricKind } from '../../src';
+import { ConsoleMetricExporter, CounterMetric, MeterProvider, MetricKind } from '../../src';
 import { ValueType } from '@opentelemetry/api-metrics';
 
 /* eslint-disable no-console */
@@ -43,7 +43,7 @@ describe('ConsoleMetricExporter', () => {
       );
       const counter = meter.createCounter('counter', {
         description: 'a test description',
-      });
+      }) as CounterMetric;
       const boundCounter = counter.bind({
         key1: 'labelValue1',
         key2: 'labelValue2',

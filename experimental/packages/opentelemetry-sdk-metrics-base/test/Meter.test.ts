@@ -21,7 +21,6 @@ import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
-  Aggregator,
   CounterMetric,
   Histogram,
   LastValue,
@@ -29,7 +28,6 @@ import {
   Meter,
   MeterProvider,
   Metric,
-  MetricDescriptor,
   MetricKind,
   MetricRecord,
   Sum,
@@ -38,7 +36,6 @@ import {
   HistogramMetric,
 } from '../src';
 import { SumAggregator } from '../src/export/aggregators';
-import { Processor } from '../src/export/Processor';
 import { ObservableCounterMetric } from '../src/ObservableCounterMetric';
 import { ObservableUpDownCounterMetric } from '../src/ObservableUpDownCounterMetric';
 import { hashLabels } from '../src/Utils';
@@ -228,7 +225,7 @@ describe('Meter', () => {
       });
 
       it('should not fail when removing non existing instrument', () => {
-        const counter = meter.createCounter('name');
+        const counter = meter.createCounter('name') as CounterMetric;
         counter.unbind({});
       });
 
@@ -367,7 +364,7 @@ describe('Meter', () => {
 
     describe('.bind()', () => {
       it('should create a UpDownCounter instrument', async () => {
-        const upDownCounter = meter.createUpDownCounter('name');
+        const upDownCounter = meter.createUpDownCounter('name') as UpDownCounterMetric;
         const boundCounter = upDownCounter.bind(labels);
         boundCounter.add(10);
         await meter.collect();
@@ -391,7 +388,7 @@ describe('Meter', () => {
       it('should not add the instrument data when disabled', async () => {
         const upDownCounter = meter.createUpDownCounter('name', {
           disabled: true,
-        });
+        }) as UpDownCounterMetric;
         const boundCounter = upDownCounter.bind(labels);
         boundCounter.add(10);
         await meter.collect();
@@ -400,7 +397,7 @@ describe('Meter', () => {
       });
 
       it('should return same instrument on same label values', async () => {
-        const upDownCounter = meter.createUpDownCounter('name');
+        const upDownCounter = meter.createUpDownCounter('name') as UpDownCounterMetric;
         const boundCounter = upDownCounter.bind(labels);
         boundCounter.add(10);
         const boundCounter1 = upDownCounter.bind(labels);
@@ -415,7 +412,7 @@ describe('Meter', () => {
       it('should truncate non-integer values for INT valueType', async () => {
         const upDownCounter = meter.createUpDownCounter('name', {
           valueType: api.ValueType.INT,
-        });
+        }) as UpDownCounterMetric;
         const boundCounter = upDownCounter.bind(labels);
 
         [-1.1, 2.2].forEach(val => {
@@ -429,7 +426,7 @@ describe('Meter', () => {
       it('should ignore non-number values for INT valueType', async () => {
         const upDownCounter = meter.createUpDownCounter('name', {
           valueType: api.ValueType.DOUBLE,
-        });
+        }) as UpDownCounterMetric;
         const boundCounter = upDownCounter.bind(labels);
 
         await Promise.all(
@@ -447,7 +444,7 @@ describe('Meter', () => {
       it('should ignore non-number values for DOUBLE valueType', async () => {
         const upDownCounter = meter.createUpDownCounter('name', {
           valueType: api.ValueType.DOUBLE,
-        });
+        }) as UpDownCounterMetric;
         const boundCounter = upDownCounter.bind(labels);
 
         await Promise.all(
@@ -478,7 +475,7 @@ describe('Meter', () => {
       });
 
       it('should not fail when removing non existing instrument', () => {
-        const upDownCounter = meter.createUpDownCounter('name');
+        const upDownCounter = meter.createUpDownCounter('name') as UpDownCounterMetric;
         upDownCounter.unbind({});
       });
 
@@ -671,7 +668,7 @@ describe('Meter', () => {
       });
 
       it('should accept negative (and positive) values', async () => {
-        const histogram = meter.createHistogram('name');
+        const histogram = meter.createHistogram('name') as HistogramMetric;
         const boundHistogram = histogram.bind(labels);
         boundHistogram.record(-10);
         boundHistogram.record(50);
@@ -762,7 +759,7 @@ describe('Meter', () => {
       });
 
       it('should not fail when removing non existing instrument', () => {
-        const histogram = meter.createHistogram('name');
+        const histogram = meter.createHistogram('name') as HistogramMetric;
         histogram.unbind({});
       });
 
@@ -1151,7 +1148,7 @@ describe('Meter', () => {
       const key = 'key';
       const counter = meter.createCounter('counter', {
         description: 'test',
-      });
+      }) as CounterMetric;
       const labels = { [key]: 'counter-value' };
       const boundCounter = counter.bind(labels);
       boundCounter.add(10.45);
@@ -1177,7 +1174,7 @@ describe('Meter', () => {
       const counter = meter.createCounter('counter', {
         description: 'test',
         valueType: api.ValueType.INT,
-      });
+      }) as CounterMetric;
       const labels = { [key]: 'counter-value' };
       const boundCounter = counter.bind(labels);
       boundCounter.add(10.45);
@@ -1198,27 +1195,7 @@ describe('Meter', () => {
       assert.strictEqual(value, 10);
     });
   });
-
-  it('should allow custom processor', () => {
-    const customMeter = new MeterProvider().getMeter('custom-processor', '*', {
-      processor: new CustomProcessor(),
-    });
-    assert.throws(() => {
-      const histogram = customMeter.createHistogram('myHistogram');
-      histogram.bind({}).record(1);
-    }, /aggregatorFor method not implemented/);
-  });
 });
-
-class CustomProcessor extends Processor {
-  process(record: MetricRecord): void {
-    throw new Error('process method not implemented.');
-  }
-
-  aggregatorFor(metricKind: MetricDescriptor): Aggregator {
-    throw new Error('aggregatorFor method not implemented.');
-  }
-}
 
 function ensureMetric(metric: MetricRecord, name?: string, value?: LastValue) {
   assert.ok(metric.aggregator instanceof LastValueAggregator);
