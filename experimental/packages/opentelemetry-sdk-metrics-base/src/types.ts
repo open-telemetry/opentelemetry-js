@@ -20,7 +20,7 @@ import { Processor } from './export/Processor';
 import { MetricExporter } from './export/types';
 
 /** MeterConfig provides an interface for configuring a Meter. */
-export interface MeterConfig {
+export interface MeterConfig extends api.MeterOptions {
   /** Metric exporter. */
   exporter?: MetricExporter;
 
