@@ -38,7 +38,7 @@ const histogram = meter.createHistogram('test_histogram', {
 const labels = { pid: process.pid, environment: 'staging' };
 
 setInterval(() => {
-  requestCounter.bind(labels).add(1);
-  upDownCounter.bind(labels).add(Math.random() > 0.5 ? 1 : -1);
-  histogram.bind(labels).record(Math.random());
+  requestCounter.add(1, labels);
+  upDownCounter.add(Math.random() > 0.5 ? 1 : -1, labels);
+  histogram.record(Math.random(), labels);
 }, 1000);

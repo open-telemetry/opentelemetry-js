@@ -15,6 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api-metrics';
+import { ObservableBaseMetric } from './ObservableBaseMetric';
 
 /**
  * Implementation of api BatchObserverResult
@@ -44,7 +45,8 @@ export class BatchObserverResult implements api.BatchObserverResult {
       return;
     }
     observations.forEach(observation => {
-      observation.observable.bind(labels).update(observation.value);
+      const observable = observation.observable as ObservableBaseMetric;
+      observable.bind(labels).update(observation.value);
     });
     if (!this._immediate) {
       this._immediate = setImmediate(() => {
