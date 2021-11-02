@@ -25,6 +25,7 @@ import { diag } from '@opentelemetry/api';
 import { CompressionAlgorithm } from './types';
 
 let gzip: zlib.Gzip | undefined;
+
 /**
  * Sends data using http
  * @param collector
