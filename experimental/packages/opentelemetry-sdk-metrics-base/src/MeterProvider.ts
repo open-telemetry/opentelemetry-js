@@ -57,7 +57,7 @@ export class MeterProvider implements api.MeterProvider {
           name,
           version,
           // @ts-expect-error ts(2345) TODO: upgrade @opentelemetry/core InstrumentationLibrary definition
-          schemaUrl: config?.schemaUrl
+          schemaUrl: options?.schemaUrl
         }, this._config)
       );
     }
