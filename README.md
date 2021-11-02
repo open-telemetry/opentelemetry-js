@@ -339,7 +339,7 @@ Collector exporter packages and types are renamed:
   - `CollectorTraceExporter` => `OTLPTraceExporter`
 - W3C propagators in @opentelemetry/core were renamed
   - `HttpTraceContextPropagator` -> `W3CTraceContextPropagator`
-  - `W3CBaggagePropagator` -> `W3CBaggagePropagator`
+  - `HttpBaggagePropagator ` -> `W3CBaggagePropagator`
 
 ### 0.24.x to 0.25.x
 
