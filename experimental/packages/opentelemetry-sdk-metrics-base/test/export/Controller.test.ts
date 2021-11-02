@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { MeterProvider, MetricExporter, MetricRecord } from '../../src';
+import { CounterMetric, MeterProvider, MetricExporter, MetricRecord } from '../../src';
 import {
   ExportResult,
   ExportResultCode,
@@ -50,10 +50,10 @@ describe('Controller', () => {
           error: expectedError,
         }),
       }).getMeter('test-console-metric-exporter');
-      const counter = meter
+      const counter = (meter
         .createCounter('counter', {
           description: 'a test description',
-        })
+        }) as CounterMetric)
         .bind({});
       counter.add(10);
 

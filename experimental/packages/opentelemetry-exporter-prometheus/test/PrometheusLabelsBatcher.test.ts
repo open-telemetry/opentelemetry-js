@@ -40,8 +40,8 @@ describe('PrometheusBatcher', () => {
     it('should aggregate metric records with same metric name', async () => {
       const batcher = new PrometheusLabelsBatcher();
       const counter = meter.createCounter('test_counter') as CounterMetric;
-      counter.bind({ val: '1' }).add(1);
-      counter.bind({ val: '2' }).add(1);
+      counter.add(1, { val: '1' });
+      counter.add(1, { val: '2' });
 
       const records = await counter.getMetricRecord();
       records.forEach(it => batcher.process(it));
@@ -65,8 +65,8 @@ describe('PrometheusBatcher', () => {
       label2.key2 = '2';
       label2.key1 = '1';
 
-      counter.bind(label1).add(1);
-      counter.bind(label2).add(1);
+      counter.add(1, label1);
+      counter.add(1, label2);
 
       const records = await counter.getMetricRecord();
       records.forEach(it => batcher.process(it));

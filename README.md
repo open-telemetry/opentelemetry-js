@@ -288,6 +288,12 @@ To request automatic tracing support for a module not on this list, please [file
 
 ### 0.26.x to 0.27.x
 
+Metric and trace exporters are split into separate packages:
+
+- `@opentelemetry/exporter-otlp-http` => `@opentelemetry/exporter-trace-otlp-http` and `@opentelemetry/exporter-metrics-otlp-http`
+- `@opentelemetry/exporter-otlp-grpc` => `@opentelemetry/exporter-trace-otlp-grpc` and `@opentelemetry/exporter-metrics-otlp-grpc`
+- `@opentelemetry/exporter-otlp-proto` => `@opentelemetry/exporter-trace-otlp-proto` and `@opentelemetry/exporter-metrics-otlp-proto`
+
 Metric types are renamed:
 
 - `@openetelemetry/api-metrics`

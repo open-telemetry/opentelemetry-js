@@ -72,7 +72,7 @@ export class BaseBoundInstrument {
  */
 export class BoundCounter
   extends BaseBoundInstrument
-  implements api.BoundCounter {
+  implements api.Counter {
   constructor(
     labels: api.Labels,
     disabled: boolean,
@@ -99,7 +99,7 @@ export class BoundCounter
  */
 export class BoundUpDownCounter
   extends BaseBoundInstrument
-  implements api.BoundCounter {
+  implements api.UpDownCounter {
   constructor(
     labels: api.Labels,
     disabled: boolean,
@@ -119,7 +119,7 @@ export class BoundUpDownCounter
  */
 export class BoundHistogram
   extends BaseBoundInstrument
-  implements api.BoundHistogram {
+  implements api.Histogram {
   constructor(
     labels: api.Labels,
     disabled: boolean,
@@ -137,9 +137,7 @@ export class BoundHistogram
 /**
  * BoundObservable is an implementation of the {@link BoundObservable} interface.
  */
-export class BoundObservable
-  extends BaseBoundInstrument
-  implements api.BoundObservableBase {
+export class BoundObservable extends BaseBoundInstrument {
   constructor(
     labels: api.Labels,
     disabled: boolean,

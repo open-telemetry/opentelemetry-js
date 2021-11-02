@@ -243,15 +243,14 @@ describe('PrometheusExporter', () => {
         description: 'a test description',
       });
 
-      const boundCounter = counter.bind({ key1: 'labelValue1' });
-      boundCounter.add(10);
+      counter.add(10, { key1: 'labelValue1' });
       meter.collect().then(() => {
         exporter.export(meter.getProcessor().checkPointSet(), () => {
           // TODO: Remove this special case once the PR is ready.
           // This is to test the special case where counters are destroyed
           // and recreated in the exporter in order to get around prom-client's
           // aggregation and use ours.
-          boundCounter.add(10);
+          counter.add(10, { key1: 'labelValue1' });
           exporter.export(meter.getProcessor().checkPointSet(), () => {
             http
               .get('http://localhost:9464/metrics', res => {
@@ -327,8 +326,8 @@ describe('PrometheusExporter', () => {
         description: 'a test description',
       }) as CounterMetric;
 
-      counter.bind({ counterKey1: 'labelValue1' }).add(10);
-      counter.bind({ counterKey1: 'labelValue2' }).add(20);
+      counter.add(10, { counterKey1: 'labelValue1' });
+      counter.add(20, { counterKey1: 'labelValue2' });
       meter.collect().then(() => {
         exporter.export(meter.getProcessor().checkPointSet(), () => {
           http
@@ -358,9 +357,9 @@ describe('PrometheusExporter', () => {
         description: 'a test description',
       }) as CounterMetric;
 
-      counter.bind({ counterKey1: 'labelValue1' }).add(10);
-      counter.bind({ counterKey1: 'labelValue2' }).add(20);
-      counter.bind({ counterKey1: 'labelValue3' }).add(30);
+      counter.add(10, { counterKey1: 'labelValue1' });
+      counter.add(20, { counterKey1: 'labelValue2' });
+      counter.add(30, { counterKey1: 'labelValue3' });
       meterProvider.shutdown().then(() => {
         // exporter has been shut down along with meter provider.
         http
@@ -394,8 +393,7 @@ describe('PrometheusExporter', () => {
     it('should add a description if missing', done => {
       const counter = meter.createCounter('counter_total');
 
-      const boundCounter = counter.bind({ key1: 'labelValue1' });
-      boundCounter.add(10);
+      counter.add(10, { key1: 'labelValue1' });
       meter.collect().then(() => {
         exporter.export(meter.getProcessor().checkPointSet(), () => {
           http
@@ -421,8 +419,8 @@ describe('PrometheusExporter', () => {
 
     it('should sanitize names', done => {
       const counter = meter.createCounter('counter.bad-name');
-      const boundCounter = counter.bind({ key1: 'labelValue1' });
-      boundCounter.add(10);
+
+      counter.add(10, { key1: 'labelValue1' });
       meter.collect().then(() => {
         exporter.export(meter.getProcessor().checkPointSet(), () => {
           http
@@ -451,7 +449,7 @@ describe('PrometheusExporter', () => {
         description: 'a test description',
       });
 
-      counter.bind({ key1: 'labelValue1' }).add(20);
+      counter.add(20, { key1: 'labelValue1' });
       meter.collect().then(() => {
         exporter.export(meter.getProcessor().checkPointSet(), () => {
           http
@@ -557,7 +555,7 @@ describe('PrometheusExporter', () => {
         description: 'a test description',
       });
 
-      histogram.bind({ key1: 'labelValue1' }).record(20);
+      histogram.record(20, { key1: 'labelValue1' });
 
       meter.collect().then(() => {
         exporter.export(meter.getProcessor().checkPointSet(), () => {
@@ -593,7 +591,7 @@ describe('PrometheusExporter', () => {
     beforeEach(() => {
       meter = new MeterProvider().getMeter('test-prometheus');
       counter = meter.createCounter('counter') as CounterMetric;
-      counter.bind({ key1: 'labelValue1' }).add(10);
+      counter.add(10, { key1: 'labelValue1' });
     });
 
     afterEach(done => {
