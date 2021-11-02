@@ -18,7 +18,6 @@ import { BatchObserverResult } from './types/BatchObserverResult';
 import { Meter } from './types/Meter';
 import {
   MetricOptions,
-  UnboundMetric,
   Labels,
   Counter,
   Histogram,
@@ -28,11 +27,6 @@ import {
   ObservableCounter,
   ObservableUpDownCounter,
 } from './types/Metric';
-import {
-  BoundHistogram,
-  BoundCounter,
-  BoundObservableBase,
-} from './types/BoundInstrument';
 import { ObservableResult } from './types/ObservableResult';
 import { Observation } from './types/Observation';
 
@@ -67,7 +61,7 @@ export class NoopMeter implements Meter {
    * @param [options] the metric options.
    */
   createUpDownCounter(_name: string, _options?: MetricOptions): UpDownCounter {
-    return NOOP_COUNTER_METRIC;
+    return NOOP_UP_DOWN_COUNTER_METRIC;
   }
 
   /**
@@ -124,59 +118,21 @@ export class NoopMeter implements Meter {
   }
 }
 
-export class NoopMetric<T> implements UnboundMetric<T> {
-  private readonly _instrument: T;
+export class NoopMetric {}
 
-  constructor(instrument: T) {
-    this._instrument = instrument;
-  }
-
-  /**
-   * Returns a Bound Instrument associated with specified Labels.
-   * It is recommended to keep a reference to the Bound Instrument instead of
-   * always calling this method for every operations.
-   * @param labels key-values pairs that are associated with a specific metric
-   *     that you want to record.
-   */
-  bind(_labels: Labels): T {
-    return this._instrument;
-  }
-
-  /**
-   * Removes the Binding from the metric, if it is present.
-   * @param labels key-values pairs that are associated with a specific metric.
-   */
-  unbind(_labels: Labels): void {
-    return;
-  }
-
-  /**
-   * Clears all timeseries from the Metric.
-   */
-  clear(): void {
-    return;
-  }
+export class NoopCounterMetric extends NoopMetric implements Counter {
+  add(_value: number, _labels: Labels): void {}
 }
 
-export class NoopCounterMetric
-  extends NoopMetric<BoundCounter>
-  implements Counter {
-  add(value: number, labels: Labels): void {
-    this.bind(labels).add(value);
-  }
+export class NoopUpDownCounterMetric extends NoopMetric implements UpDownCounter {
+  add(_value: number, _labels: Labels): void {}
 }
 
-export class NoopHistogramMetric
-  extends NoopMetric<BoundHistogram>
-  implements Histogram {
-  record(value: number, labels: Labels): void {
-    this.bind(labels).record(value);
-  }
+export class NoopHistogramMetric extends NoopMetric implements Histogram {
+  record(_value: number, _labels: Labels): void {}
 }
 
-export class NoopObservableBaseMetric
-  extends NoopMetric<BoundObservableBase>
-  implements ObservableBase {
+export class NoopObservableBaseMetric extends NoopMetric implements ObservableBase {
   observation(): Observation {
     return {
       observable: this as ObservableBase,
@@ -187,42 +143,14 @@ export class NoopObservableBaseMetric
 
 export class NoopBatchObserver {}
 
-export class NoopBoundCounter implements BoundCounter {
-  add(_value: number): void {
-    return;
-  }
-}
-
-export class NoopBoundHistogram implements BoundHistogram {
-  record(_value: number, _baggage?: unknown, _spanContext?: unknown): void {
-    return;
-  }
-}
-
-export class NoopBoundObservableBase implements BoundObservableBase {
-  update(_value: number): void {}
-}
-
 export const NOOP_METER = new NoopMeter();
-export const NOOP_BOUND_COUNTER = new NoopBoundCounter();
-export const NOOP_COUNTER_METRIC = new NoopCounterMetric(NOOP_BOUND_COUNTER);
 
-export const NOOP_BOUND_HISTOGRAM = new NoopBoundHistogram();
-export const NOOP_HISTOGRAM_METRIC = new NoopHistogramMetric(
-  NOOP_BOUND_HISTOGRAM
-);
+export const NOOP_COUNTER_METRIC = new NoopCounterMetric();
+export const NOOP_UP_DOWN_COUNTER_METRIC = new NoopUpDownCounterMetric();
+export const NOOP_HISTOGRAM_METRIC = new NoopHistogramMetric();
 
-export const NOOP_BOUND_OBSERVABLE_BASE = new NoopBoundObservableBase();
-export const NOOP_OBSERVABLE_GAUGE_METRIC = new NoopObservableBaseMetric(
-  NOOP_BOUND_OBSERVABLE_BASE
-);
-
-export const NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC = new NoopObservableBaseMetric(
-  NOOP_BOUND_OBSERVABLE_BASE
-);
-
-export const NOOP_OBSERVABLE_COUNTER_METRIC = new NoopObservableBaseMetric(
-  NOOP_BOUND_OBSERVABLE_BASE
-);
+export const NOOP_OBSERVABLE_GAUGE_METRIC = new NoopObservableBaseMetric();
+export const NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC = new NoopObservableBaseMetric();
+export const NOOP_OBSERVABLE_COUNTER_METRIC = new NoopObservableBaseMetric();
 
 export const NOOP_BATCH_OBSERVER = new NoopBatchObserver();

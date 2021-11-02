@@ -100,7 +100,7 @@ describe('MeterProvider', () => {
 
       assert.throws(() => {
         const histogram = meter.createHistogram('myHistogram');
-        histogram.bind({}).record(1);
+        histogram.record(1);
       }, /aggregatorFor method not implemented/);
     });
   });
