@@ -183,60 +183,6 @@ function getRandomValue() {
 }
 ```
 
-### Batch Observer
-
-Choose this kind of metric when you need to update multiple observables with the results of a single async calculation.
-
-```js
-const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
-const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
-
-const exporter = new PrometheusExporter(
-  {
-    startServer: true,
-  },
-  () => {
-    console.log('prometheus scrape endpoint: http://localhost:9464/metrics');
-  },
-);
-
-const meter = new MeterProvider({
-  exporter,
-  interval: 3000,
-}).getMeter('example-observer');
-
-const cpuUsageMetric = meter.createObservableGauge('cpu_usage_per_app', {
-  description: 'CPU',
-});
-
-const MemUsageMetric = meter.createObservableGauge('mem_usage_per_app', {
-  description: 'Memory',
-});
-
-meter.createBatchObserver((batchObserverResult) => {
-  getSomeAsyncMetrics().then(metrics => {
-    batchObserverResult.observe({ app: 'myApp' }, [
-      cpuUsageMetric.observation(metrics.value1),
-      MemUsageMetric.observation(metrics.value2)
-    ]);
-  });
-});
-
-function getSomeAsyncMetrics() {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve({
-        value1: Math.random(),
-        value2: Math.random(),
-      });
-    }, 100)
-  });
-}
-
-```
-
-See [examples/prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/prometheus) for a short example.
-
 ### Histogram
 
 `Histogram` is a non-additive synchronous instrument useful for recording any non-additive number, positive or negative.

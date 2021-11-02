@@ -63,13 +63,6 @@ export interface MetricOptions {
   aggregationTemporality?: AggregationTemporality;
 }
 
-export interface BatchObserverOptions {
-  /**
-   * Indicates how long the batch metric should wait to update before cancel
-   */
-  maxTimeoutUpdateMS?: number;
-}
-
 /** The Type of value. It describes how the data is reported. */
 export enum ValueType {
   INT,
