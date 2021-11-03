@@ -59,11 +59,11 @@ export function mockObservableGauge(
     meter['_metrics'].get(name) ||
     meter.createObservableGauge(
       name,
+      callback,
       {
         description: 'sample observable gauge description',
         valueType: ValueType.DOUBLE,
-      },
-      callback
+      }
     );
   metric.clear();
   metric.bind({});

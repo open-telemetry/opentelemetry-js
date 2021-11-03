@@ -83,11 +83,11 @@ export function mockObservableGauge(
     meter['_metrics'].get(name) ||
     meter.createObservableGauge(
       name,
+      callback,
       {
         description: 'sample observable gauge description',
         valueType: ValueType.DOUBLE,
-      },
-      callback
+      }
     );
   metric.clear();
   metric.bind({});
@@ -102,11 +102,11 @@ export function mockObservableCounter(
     meter['_metrics'].get(name) ||
     meter.createObservableCounter(
       name,
+      callback,
       {
         description: 'sample observable counter description',
         valueType: ValueType.DOUBLE,
-      },
-      callback
+      }
     );
   metric.clear();
   metric.bind({});
@@ -121,11 +121,11 @@ export function mockObservableUpDownCounter(
     meter['_metrics'].get(name) ||
     meter.createObservableUpDownCounter(
       name,
+      callback,
       {
         description: 'sample observable up down counter description',
         valueType: ValueType.DOUBLE,
-      },
-      callback
+      }
     );
   metric.clear();
   metric.bind({});

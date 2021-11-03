@@ -77,11 +77,11 @@ const meter = new MeterProvider().getMeter('your-meter-name');
 
 
 // async callback - for operation that needs to wait for value
-meter.createObservableGauge('your_metric_name', {
-  description: 'Example of an async observable gauge with callback',
-}, async (observableResult) => {
+meter.createObservableGauge('your_metric_name', async (observableResult) => {
   const value = await getAsyncValue();
   observableResult.observe(value, { label: '1' });
+}, {
+  description: 'Example of an async observable gauge with callback',
 });
 
 function getAsyncValue() {
@@ -93,11 +93,11 @@ function getAsyncValue() {
 }
 
 // sync callback in case you don't need to wait for value
-meter.createObservableGauge('your_metric_name', {
-  description: 'Example of a sync observable gauge with callback',
-}, (observableResult) => {
+meter.createObservableGauge('your_metric_name', (observableResult) => {
   observableResult.observe(getRandomValue(), { label: '1' });
   observableResult.observe(getRandomValue(), { label: '2' });
+}, {
+  description: 'Example of a sync observable gauge with callback',
 });
 
 function getRandomValue() {
@@ -116,11 +116,11 @@ const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
 const meter = new MeterProvider().getMeter('your-meter-name');
 
 // async callback - for operation that needs to wait for value
-meter.createObservableUpDownCounter('your_metric_name', {
-  description: 'Example of an async observable up down counter with callback',
-}, async (observableResult) => {
+meter.createObservableUpDownCounter('your_metric_name', async (observableResult) => {
   const value = await getAsyncValue();
   observableResult.observe(value, { label: '1' });
+}, {
+  description: 'Example of an async observable up down counter with callback',
 });
 
 function getAsyncValue() {
@@ -132,10 +132,10 @@ function getAsyncValue() {
 }
 
 // sync callback in case you don't need to wait for value
-meter.createObservableUpDownCounter('your_metric_name', {
-  description: 'Example of a sync observable up down counter with callback',
-}, (observableResult) => {
+meter.createObservableUpDownCounter('your_metric_name', (observableResult) => {
   observableResult.observe(getRandomValue(), { label: '1' });
+}, {
+  description: 'Example of a sync observable up down counter with callback',
 });
 
 function getRandomValue() {
@@ -155,11 +155,11 @@ const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
 const meter = new MeterProvider().getMeter('your-meter-name');
 
 // async callback in case you need to wait for values
-meter.createObservableCounter('example_metric', {
-  description: 'Example of an async observable counter with callback',
-}, async (observableResult) => {
+meter.createObservableCounter('example_metric', async (observableResult) => {
   const value = await getAsyncValue();
   observableResult.observe(value, { label: '1' });
+}, {
+  description: 'Example of an async observable counter with callback',
 });
 
 function getAsyncValue() {
@@ -171,11 +171,11 @@ function getAsyncValue() {
 }
 
 // sync callback in case you don't need to wait for values
-meter.createObservableCounter('example_metric', {
-  description: 'Example of a sync observable counter with callback',
-}, (observableResult) => {
+meter.createObservableCounter('example_metric', (observableResult) => {
   const value = getRandomValue();
   observableResult.observe(value, { label: '1' });
+}, {
+  description: 'Example of a sync observable counter with callback',
 });
 
 function getRandomValue() {

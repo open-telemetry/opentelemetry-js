@@ -108,8 +108,10 @@ export interface Histogram {
   record(value: number, labels?: Labels): void;
 }
 
+// ObservableBase has to be an Object but for now there is no field or method
+// declared.
 /** Base interface for the Observable metrics. */
-export interface ObservableBase {}
+export type ObservableBase = Record<never, never>;
 
 /** Base interface for the ObservableGauge metrics. */
 export type ObservableGauge = ObservableBase;

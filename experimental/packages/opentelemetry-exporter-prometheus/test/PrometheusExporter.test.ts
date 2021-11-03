@@ -286,14 +286,14 @@ describe('PrometheusExporter', () => {
 
       meter.createObservableGauge(
         'metric_observable_gauge',
-        {
-          description: 'a test description',
-        },
         (observableResult: ObservableResult) => {
           observableResult.observe(getCpuUsage(), {
             pid: String(123),
             core: '1',
           });
+        },
+        {
+          description: 'a test description',
         }
       );
 
@@ -477,13 +477,13 @@ describe('PrometheusExporter', () => {
 
       meter.createObservableCounter(
         'metric_observable_counter',
-        {
-          description: 'a test description',
-        },
         (observableResult: ObservableResult) => {
           observableResult.observe(getValue(), {
             key1: 'labelValue1',
           });
+        },
+        {
+          description: 'a test description',
         }
       );
 
@@ -517,13 +517,13 @@ describe('PrometheusExporter', () => {
 
       meter.createObservableUpDownCounter(
         'metric_observable_up_down_counter',
-        {
-          description: 'a test description',
-        },
         (observableResult: ObservableResult) => {
           observableResult.observe(getValue(), {
             key1: 'labelValue1',
           });
+        },
+        {
+          description: 'a test description',
         }
       );
 
