@@ -18,7 +18,6 @@ import { diag } from '@opentelemetry/api';
 import * as api from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { BatchObserver } from './BatchObserver';
 import { BaseBoundInstrument } from './BoundInstrument';
 import { CounterMetric } from './CounterMetric';
 import { PushController } from './export/Controller';
@@ -40,7 +39,6 @@ const merge = require('lodash.merge');
  * Meter is an implementation of the {@link Meter} interface.
  */
 export class Meter implements api.Meter {
-  private readonly _batchObservers: BatchObserver[] = [];
   private readonly _metrics = new Map<string, Metric<BaseBoundInstrument>>();
   private readonly _processor: Processor;
   private readonly _resource: Resource;
@@ -256,23 +254,6 @@ export class Meter implements api.Meter {
   }
 
   /**
-   * Creates a new batch observer.
-   * @param callback the batch observer callback
-   * @param [options] the batch options.
-   */
-  createBatchObserver(
-    callback: (observableResult: api.BatchObserverResult) => void,
-    options: api.BatchObserverOptions = {}
-  ): BatchObserver {
-    const opt: api.BatchObserverOptions = {
-      ...options,
-    };
-    const batchObserver = new BatchObserver(opt, callback);
-    this._batchObservers.push(batchObserver);
-    return batchObserver;
-  }
-
-  /**
    * Collects all the metrics created with this `Meter` for export.
    *
    * Utilizes the processor to create checkpoints of the current values in
@@ -280,12 +261,6 @@ export class Meter implements api.Meter {
    * meter instance.
    */
   async collect(): Promise<void> {
-    // call batch observers first
-    const observations = this._batchObservers.map(observer => {
-      return observer.collect();
-    });
-    await Promise.all(observations);
-
     // after this all remaining metrics can be run
     const metricsRecords = Array.from(this._metrics.values()).map(metric => {
       return metric.getMetricRecord();

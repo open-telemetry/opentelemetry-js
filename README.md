@@ -49,7 +49,7 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 
 | API Version | Core version | Experimental Packages | Contrib Version         |
 | ----------- |--------------| --------------------- |-------------------------|
-| 1.0.x       | 1.x          | 0.26.x                | ------                  |
+| 1.0.x       | 1.x          | 0.26.x                | 0.26.x                  |
 | 1.0.x       | 0.26.x       | -----                 | ------                  |
 | 1.0.x       | 0.25.x       | -----                 | ------                  |
 | 1.0.x       | 0.24.x       | -----                 | 0.24.x                  |
@@ -288,6 +288,12 @@ To request automatic tracing support for a module not on this list, please [file
 
 ### 0.26.x to 0.27.x
 
+Metric and trace exporters are split into separate packages:
+
+- `@opentelemetry/exporter-otlp-http` => `@opentelemetry/exporter-trace-otlp-http` and `@opentelemetry/exporter-metrics-otlp-http`
+- `@opentelemetry/exporter-otlp-grpc` => `@opentelemetry/exporter-trace-otlp-grpc` and `@opentelemetry/exporter-metrics-otlp-grpc`
+- `@opentelemetry/exporter-otlp-proto` => `@opentelemetry/exporter-trace-otlp-proto` and `@opentelemetry/exporter-metrics-otlp-proto`
+
 Metric types are renamed:
 
 - `@openetelemetry/api-metrics`
@@ -331,6 +337,9 @@ Collector exporter packages and types are renamed:
   - `CollectorExporterNodeBase` => `OTLPExporterNodeBase`
   - `CollectorMetricExporter` => `OTLPMetricExporter`
   - `CollectorTraceExporter` => `OTLPTraceExporter`
+- W3C propagators in @opentelemetry/core were renamed
+  - `HttpTraceContextPropagator` -> `W3CTraceContextPropagator`
+  - `HttpBaggagePropagator` -> `W3CBaggagePropagator`
 
 ### 0.24.x to 0.25.x
 
@@ -340,9 +349,6 @@ Collector exporter packages and types are renamed:
   - @opentelemetry/web -> @opentelemetry/sdk-trace-web
   - @opentelemetry/metrics -> @opentelemetry/sdk-metrics-base
   - @opentelemetry/node-sdk -> @opentelemetry/sdk-node
-- W3C propagators in @opentelemetry/core were renamed
-  - `HttpTraceContextPropagator` -> `W3CTraceContextPropagator`
-  - `W3CBaggagePropagator` -> `W3CBaggagePropagator`
 
 ### 0.23.x to 0.24.x
 

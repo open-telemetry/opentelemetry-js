@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Meter } from '../types/Meter';
+import { Meter, MeterOptions } from '../types/Meter';
 import { MeterProvider } from '../types/MeterProvider';
 import { NOOP_METER_PROVIDER } from '../NoopMeterProvider';
 import {
@@ -73,8 +73,8 @@ export class MetricsAPI {
   /**
    * Returns a meter from the global meter provider.
    */
-  public getMeter(name: string, version?: string): Meter {
-    return this.getMeterProvider().getMeter(name, version);
+  public getMeter(name: string, version?: string, options?: MeterOptions): Meter {
+    return this.getMeterProvider().getMeter(name, version, options);
   }
 
   /** Remove the global meter provider */
