@@ -131,7 +131,7 @@ describe('Node SDK', () => {
       assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
 
       assert.ok(
-        context['_getContextManager']() instanceof DefaultContextManager
+        context['_getContextManager']().constructor.name === DefaultContextManager.name
       );
       assert.ok(
         propagation['_getGlobalPropagator']() instanceof CompositePropagator
@@ -154,7 +154,7 @@ describe('Node SDK', () => {
       assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
 
       assert.ok(
-        context['_getContextManager']() instanceof DefaultContextManager
+        context['_getContextManager']().constructor.name === DefaultContextManager.name
       );
       assert.ok(
         propagation['_getGlobalPropagator']() instanceof CompositePropagator
