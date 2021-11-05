@@ -33,7 +33,6 @@ const SECOND_TO_NANOSECONDS = Math.pow(10, NANOSECOND_DIGITS);
  * This is represented in HrTime format as [1609504210, 150000000].
  * @param epochMillis
  */
-
 function numberToHrtime(epochMillis: number): api.HrTime {
   const epochSeconds = epochMillis / 1000;
   // Decimals only.
