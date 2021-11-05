@@ -17,8 +17,6 @@
 import * as assert from 'assert';
 import {
   NoopMeterProvider,
-  NOOP_BOUND_COUNTER,
-  NOOP_BOUND_HISTOGRAM,
   NOOP_COUNTER_METRIC,
   NOOP_HISTOGRAM_METRIC,
 } from '../../src';
@@ -30,20 +28,16 @@ describe('NoopMeter', () => {
     const labels = {};
 
     // ensure NoopMetric does not crash.
-    counter.bind(labels).add(1);
-    counter.unbind(labels);
+    counter.add(1, labels);
 
     // ensure the correct noop const is returned
     assert.strictEqual(counter, NOOP_COUNTER_METRIC);
-    assert.strictEqual(counter.bind(labels), NOOP_BOUND_COUNTER);
-    counter.clear();
 
     const histogram = meter.createHistogram('some-name');
-    histogram.bind(labels).record(1);
+    histogram.record(1, labels);
 
     // ensure the correct noop const is returned
     assert.strictEqual(histogram, NOOP_HISTOGRAM_METRIC);
-    assert.strictEqual(histogram.bind(labels), NOOP_BOUND_HISTOGRAM);
 
     const options = {
       component: 'tests',
