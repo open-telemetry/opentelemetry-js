@@ -5,6 +5,7 @@
   "packages": [
     "benchmark/*",
     "packages/*",
-    "integration-tests/*"
+    "integration-tests/*",
+    "selenium-tests"
   ]
 }
