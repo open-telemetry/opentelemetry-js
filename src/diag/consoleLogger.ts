@@ -16,7 +16,8 @@
 
 import { DiagLogger, DiagLogFunction } from './types';
 
-const consoleMap: { n: keyof DiagLogger; c: keyof Console }[] = [
+type ConsoleMapKeys = 'error' | 'warn' | 'info' | 'debug' | 'trace';
+const consoleMap: { n: keyof DiagLogger; c: ConsoleMapKeys }[] = [
   { n: 'error', c: 'error' },
   { n: 'warn', c: 'warn' },
   { n: 'info', c: 'info' },
@@ -31,20 +32,21 @@ const consoleMap: { n: keyof DiagLogger; c: keyof Console }[] = [
  */
 export class DiagConsoleLogger implements DiagLogger {
   constructor() {
-    function _consoleFunc(funcName: keyof Console): DiagLogFunction {
-      return function () {
-        const orgArguments = arguments;
+    function _consoleFunc(funcName: ConsoleMapKeys): DiagLogFunction {
+      return function (...args) {
         if (console) {
           // Some environments only expose the console when the F12 developer console is open
+          // eslint-disable-next-line no-console
           let theFunc = console[funcName];
           if (typeof theFunc !== 'function') {
             // Not all environments support all functions
+            // eslint-disable-next-line no-console
             theFunc = console.log;
           }
 
           // One last final check
           if (typeof theFunc === 'function') {
-            return theFunc.apply(console, orgArguments);
+            return theFunc.apply(console, args);
           }
         }
       };
