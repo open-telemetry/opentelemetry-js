@@ -243,14 +243,14 @@ describe('PrometheusExporter', () => {
         description: 'a test description',
       });
 
-      counter.add(10, { key1: 'labelValue1' });
+      counter.add(10, { key1: 'attributeValue1' });
       meter.collect().then(() => {
         exporter.export(meter.getProcessor().checkPointSet(), () => {
           // TODO: Remove this special case once the PR is ready.
           // This is to test the special case where counters are destroyed
           // and recreated in the exporter in order to get around prom-client's
           // aggregation and use ours.
-          counter.add(10, { key1: 'labelValue1' });
+          counter.add(10, { key1: 'attributeValue1' });
           exporter.export(meter.getProcessor().checkPointSet(), () => {
             http
               .get('http://localhost:9464/metrics', res => {
@@ -266,7 +266,7 @@ describe('PrometheusExporter', () => {
                   assert.deepStrictEqual(lines, [
                     '# HELP counter_total a test description',
                     '# TYPE counter_total counter',
-                    `counter_total{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
+                    `counter_total{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
                     '',
                   ]);
 
@@ -321,13 +321,13 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should export multiple labels', done => {
+    it('should export multiple attributes', done => {
       const counter = meter.createCounter('counter_total', {
         description: 'a test description',
       }) as CounterMetric;
 
-      counter.add(10, { counterKey1: 'labelValue1' });
-      counter.add(20, { counterKey1: 'labelValue2' });
+      counter.add(10, { counterKey1: 'attributeValue1' });
+      counter.add(20, { counterKey1: 'attributeValue2' });
       meter.collect().then(() => {
         exporter.export(meter.getProcessor().checkPointSet(), () => {
           http
@@ -339,8 +339,8 @@ describe('PrometheusExporter', () => {
                 assert.deepStrictEqual(lines, [
                   '# HELP counter_total a test description',
                   '# TYPE counter_total counter',
-                  `counter_total{counterKey1="labelValue1"} 10 ${mockedHrTimeMs}`,
-                  `counter_total{counterKey1="labelValue2"} 20 ${mockedHrTimeMs}`,
+                  `counter_total{counterKey1="attributeValue1"} 10 ${mockedHrTimeMs}`,
+                  `counter_total{counterKey1="attributeValue2"} 20 ${mockedHrTimeMs}`,
                   '',
                 ]);
 
@@ -352,14 +352,14 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should export multiple labels on manual shutdown', done => {
+    it('should export multiple attributes on manual shutdown', done => {
       const counter = meter.createCounter('counter_total', {
         description: 'a test description',
       }) as CounterMetric;
 
-      counter.add(10, { counterKey1: 'labelValue1' });
-      counter.add(20, { counterKey1: 'labelValue2' });
-      counter.add(30, { counterKey1: 'labelValue3' });
+      counter.add(10, { counterKey1: 'attributeValue1' });
+      counter.add(20, { counterKey1: 'attributeValue2' });
+      counter.add(30, { counterKey1: 'attributeValue3' });
       meterProvider.shutdown().then(() => {
         // exporter has been shut down along with meter provider.
         http
@@ -393,7 +393,7 @@ describe('PrometheusExporter', () => {
     it('should add a description if missing', done => {
       const counter = meter.createCounter('counter_total');
 
-      counter.add(10, { key1: 'labelValue1' });
+      counter.add(10, { key1: 'attributeValue1' });
       meter.collect().then(() => {
         exporter.export(meter.getProcessor().checkPointSet(), () => {
           http
@@ -405,7 +405,7 @@ describe('PrometheusExporter', () => {
                 assert.deepStrictEqual(lines, [
                   '# HELP counter_total description missing',
                   '# TYPE counter_total counter',
-                  `counter_total{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
+                  `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
                   '',
                 ]);
 
@@ -420,7 +420,7 @@ describe('PrometheusExporter', () => {
     it('should sanitize names', done => {
       const counter = meter.createCounter('counter.bad-name');
 
-      counter.add(10, { key1: 'labelValue1' });
+      counter.add(10, { key1: 'attributeValue1' });
       meter.collect().then(() => {
         exporter.export(meter.getProcessor().checkPointSet(), () => {
           http
@@ -432,7 +432,7 @@ describe('PrometheusExporter', () => {
                 assert.deepStrictEqual(lines, [
                   '# HELP counter_bad_name_total description missing',
                   '# TYPE counter_bad_name_total counter',
-                  `counter_bad_name_total{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
+                  `counter_bad_name_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
                   '',
                 ]);
 
@@ -449,7 +449,7 @@ describe('PrometheusExporter', () => {
         description: 'a test description',
       });
 
-      counter.add(20, { key1: 'labelValue1' });
+      counter.add(20, { key1: 'attributeValue1' });
       meter.collect().then(() => {
         exporter.export(meter.getProcessor().checkPointSet(), () => {
           http
@@ -458,7 +458,7 @@ describe('PrometheusExporter', () => {
                 assert.deepStrictEqual(chunk.toString().split('\n'), [
                   '# HELP counter a test description',
                   '# TYPE counter gauge',
-                  `counter{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
+                  `counter{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
                   '',
                 ]);
 
@@ -482,7 +482,7 @@ describe('PrometheusExporter', () => {
         },
         (observableResult: ObservableResult) => {
           observableResult.observe(getValue(), {
-            key1: 'labelValue1',
+            key1: 'attributeValue1',
           });
         }
       );
@@ -498,7 +498,7 @@ describe('PrometheusExporter', () => {
                 assert.deepStrictEqual(lines, [
                   '# HELP metric_observable_counter a test description',
                   '# TYPE metric_observable_counter gauge',
-                  `metric_observable_counter{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
+                  `metric_observable_counter{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
                   '',
                 ]);
               });
@@ -522,7 +522,7 @@ describe('PrometheusExporter', () => {
         },
         (observableResult: ObservableResult) => {
           observableResult.observe(getValue(), {
-            key1: 'labelValue1',
+            key1: 'attributeValue1',
           });
         }
       );
@@ -538,7 +538,7 @@ describe('PrometheusExporter', () => {
                 assert.deepStrictEqual(lines, [
                   '# HELP metric_observable_up_down_counter a test description',
                   '# TYPE metric_observable_up_down_counter gauge',
-                  `metric_observable_up_down_counter{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
+                  `metric_observable_up_down_counter{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
                   '',
                 ]);
               });
@@ -555,7 +555,7 @@ describe('PrometheusExporter', () => {
         description: 'a test description',
       });
 
-      histogram.record(20, { key1: 'labelValue1' });
+      histogram.record(20, { key1: 'attributeValue1' });
 
       meter.collect().then(() => {
         exporter.export(meter.getProcessor().checkPointSet(), () => {
@@ -568,9 +568,9 @@ describe('PrometheusExporter', () => {
                 assert.deepStrictEqual(lines, [
                   '# HELP test_histogram a test description',
                   '# TYPE test_histogram histogram',
-                  `test_histogram_count{key1="labelValue1"} 1 ${mockedHrTimeMs}`,
-                  `test_histogram_sum{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
-                  `test_histogram_bucket{key1="labelValue1",le="+Inf"} 1 ${mockedHrTimeMs}`,
+                  `test_histogram_count{key1="attributeValue1"} 1 ${mockedHrTimeMs}`,
+                  `test_histogram_sum{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
+                  `test_histogram_bucket{key1="attributeValue1",le="+Inf"} 1 ${mockedHrTimeMs}`,
                   '',
                 ]);
 
@@ -591,7 +591,7 @@ describe('PrometheusExporter', () => {
     beforeEach(() => {
       meter = new MeterProvider().getMeter('test-prometheus');
       counter = meter.createCounter('counter') as CounterMetric;
-      counter.add(10, { key1: 'labelValue1' });
+      counter.add(10, { key1: 'attributeValue1' });
     });
 
     afterEach(done => {
@@ -620,7 +620,7 @@ describe('PrometheusExporter', () => {
                   assert.deepStrictEqual(lines, [
                     '# HELP test_prefix_counter_total description missing',
                     '# TYPE test_prefix_counter_total counter',
-                    `test_prefix_counter_total{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
+                    `test_prefix_counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
                     '',
                   ]);
 
@@ -650,7 +650,7 @@ describe('PrometheusExporter', () => {
                   assert.deepStrictEqual(lines, [
                     '# HELP counter_total description missing',
                     '# TYPE counter_total counter',
-                    `counter_total{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
+                    `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
                     '',
                   ]);
 
@@ -680,7 +680,7 @@ describe('PrometheusExporter', () => {
                   assert.deepStrictEqual(lines, [
                     '# HELP counter_total description missing',
                     '# TYPE counter_total counter',
-                    `counter_total{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
+                    `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
                     '',
                   ]);
 
@@ -710,7 +710,7 @@ describe('PrometheusExporter', () => {
                   assert.deepStrictEqual(lines, [
                     '# HELP counter_total description missing',
                     '# TYPE counter_total counter',
-                    'counter_total{key1="labelValue1"} 10',
+                    'counter_total{key1="attributeValue1"} 10',
                     '',
                   ]);
 

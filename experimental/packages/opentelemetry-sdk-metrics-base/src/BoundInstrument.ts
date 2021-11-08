@@ -23,15 +23,15 @@ import { Aggregator } from './export/types';
  * the TimeSeries.
  */
 export class BaseBoundInstrument {
-  protected _labels: api.Labels;
+  protected _attributes: api.Attributes;
 
   constructor(
-    labels: api.Labels,
+    attributes: api.Attributes,
     private readonly _disabled: boolean,
     private readonly _valueType: api.ValueType,
     private readonly _aggregator: Aggregator
   ) {
-    this._labels = labels;
+    this._attributes = attributes;
   }
 
   update(value: number): void {
@@ -39,7 +39,7 @@ export class BaseBoundInstrument {
     if (typeof value !== 'number') {
       diag.error(
         `Metric cannot accept a non-number value for ${Object.values(
-          this._labels
+          this._attributes
         )}.`
       );
       return;
@@ -48,7 +48,7 @@ export class BaseBoundInstrument {
     if (this._valueType === api.ValueType.INT && !Number.isInteger(value)) {
       diag.warn(
         `INT value type cannot accept a floating-point value for ${Object.values(
-          this._labels
+          this._attributes
         )}, ignoring the fractional digits.`
       );
       value = Math.trunc(value);
@@ -57,8 +57,8 @@ export class BaseBoundInstrument {
     this._aggregator.update(value);
   }
 
-  getLabels(): api.Labels {
-    return this._labels;
+  getAttributes(): api.Attributes {
+    return this._attributes;
   }
 
   getAggregator(): Aggregator {
@@ -68,23 +68,23 @@ export class BaseBoundInstrument {
 
 /**
  * BoundCounter allows the SDK to observe/record a single metric event. The
- * value of single instrument in the `Counter` associated with specified Labels.
+ * value of single instrument in the `Counter` associated with specified Attributes.
  */
 export class BoundCounter
   extends BaseBoundInstrument
   implements api.Counter {
   constructor(
-    labels: api.Labels,
+    attributes: api.Attributes,
     disabled: boolean,
     valueType: api.ValueType,
     aggregator: Aggregator
   ) {
-    super(labels, disabled, valueType, aggregator);
+    super(attributes, disabled, valueType, aggregator);
   }
 
   add(value: number): void {
     if (value < 0) {
-      diag.error(`Counter cannot descend for ${Object.values(this._labels)}`);
+      diag.error(`Counter cannot descend for ${Object.values(this._attributes)}`);
       return;
     }
 
@@ -95,18 +95,18 @@ export class BoundCounter
 /**
  * BoundUpDownCounter allows the SDK to observe/record a single metric event.
  * The value of single instrument in the `UpDownCounter` associated with
- * specified Labels.
+ * specified Attributes.
  */
 export class BoundUpDownCounter
   extends BaseBoundInstrument
   implements api.UpDownCounter {
   constructor(
-    labels: api.Labels,
+    attributes: api.Attributes,
     disabled: boolean,
     valueType: api.ValueType,
     aggregator: Aggregator
   ) {
-    super(labels, disabled, valueType, aggregator);
+    super(attributes, disabled, valueType, aggregator);
   }
 
   add(value: number): void {
@@ -121,12 +121,12 @@ export class BoundHistogram
   extends BaseBoundInstrument
   implements api.Histogram {
   constructor(
-    labels: api.Labels,
+    attributes: api.Attributes,
     disabled: boolean,
     valueType: api.ValueType,
     aggregator: Aggregator
   ) {
-    super(labels, disabled, valueType, aggregator);
+    super(attributes, disabled, valueType, aggregator);
   }
 
   record(value: number): void {
@@ -139,11 +139,11 @@ export class BoundHistogram
  */
 export class BoundObservable extends BaseBoundInstrument {
   constructor(
-    labels: api.Labels,
+    attributes: api.Attributes,
     disabled: boolean,
     valueType: api.ValueType,
     aggregator: Aggregator
   ) {
-    super(labels, disabled, valueType, aggregator);
+    super(attributes, disabled, valueType, aggregator);
   }
 }

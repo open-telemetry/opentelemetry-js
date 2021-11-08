@@ -37,8 +37,8 @@ export interface MetricOptions {
    */
   unit?: string;
 
-  /** The map of constant labels for the Metric. */
-  constantLabels?: Map<string, string>;
+  /** The map of constant attributes for the Metric. */
+  constantAttributes?: Map<string, string>;
 
   /**
    * Indicates the metric is a verbose metric that is disabled by default
@@ -93,30 +93,30 @@ export enum AggregationTemporality {
  */
 export interface Counter {
   /**
-   * Adds the given value to the current value. Values cannot be negative.
+   * Increment value of counter by the input. Inputs may not be negative.
    */
-  add(value: number, labels?: Labels): void;
+  add(value: number, attributes?: Attributes): void;
 }
 
 export interface UpDownCounter {
   /**
-   * Adds the given value to the current value. Values can be negative.
+   * Increment value of counter by the input. Inputs may be negative.
    */
-  add(value: number, labels?: Labels): void;
+  add(value: number, attributes?: Attributes): void;
 }
 
 export interface Histogram {
   /**
    * Records the given value to this histogram.
    */
-  record(value: number, labels?: Labels): void;
+  record(value: number, attributes?: Attributes): void;
 }
 
 /** Base interface for the Observable metrics. */
 export interface ObservableBase {
   observation: (
     value: number,
-    labels?: Labels,
+    attributes?: Attributes,
   ) => Observation;
 }
 
@@ -132,4 +132,4 @@ export type ObservableCounter = ObservableBase;
 /**
  * key-value pairs passed by the user.
  */
-export type Labels = { [key: string]: string };
+export type Attributes = { [key: string]: string };

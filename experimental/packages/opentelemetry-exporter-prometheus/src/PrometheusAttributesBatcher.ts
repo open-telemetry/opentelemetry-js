@@ -26,7 +26,7 @@ interface BatcherCheckpoint {
   records: Map<string, MetricRecord>;
 }
 
-export class PrometheusLabelsBatcher {
+export class PrometheusAttributesBatcher {
   private _batchMap = new Map<string, BatcherCheckpoint>();
 
   get hasMetric(): boolean {
@@ -45,10 +45,10 @@ export class PrometheusLabelsBatcher {
       this._batchMap.set(name, item);
     }
     const recordMap = item.records;
-    const labels = Object.keys(record.labels)
-      .map(k => `${k}=${record.labels[k]}`)
+    const attributes = Object.keys(record.attributes)
+      .map(k => `${k}=${record.attributes[k]}`)
       .join(',');
-    recordMap.set(labels, record);
+    recordMap.set(attributes, record);
   }
 
   checkPointSet(): PrometheusCheckpoint[] {

@@ -158,7 +158,7 @@ describe('transformMetrics', () => {
       );
     });
 
-    it('should convert metric labels value to string', () => {
+    it('should convert metric attributes value to string', () => {
       const metric = transform.toCollectorMetric(
         {
           descriptor: {
@@ -168,7 +168,7 @@ describe('transformMetrics', () => {
             metricKind: 0,
             valueType: 0,
           },
-          labels: { foo: (1 as unknown) as string },
+          attributes: { foo: (1 as unknown) as string },
           aggregator: new SumAggregator(),
           resource: new Resource({}),
           aggregationTemporality: 0,

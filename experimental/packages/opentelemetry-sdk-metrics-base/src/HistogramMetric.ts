@@ -42,16 +42,16 @@ export class HistogramMetric
     );
   }
 
-  protected _makeInstrument(labels: api.Labels): BoundHistogram {
+  protected _makeInstrument(attributes: api.Attributes): BoundHistogram {
     return new BoundHistogram(
-      labels,
+      attributes,
       this._disabled,
       this._valueType,
       this._processor.aggregatorFor(this._descriptor)
     );
   }
 
-  record(value: number, labels: api.Labels = {}): void {
-    this.bind(labels).record(value);
+  record(value: number, attributes: api.Attributes = {}): void {
+    this.bind(attributes).record(value);
   }
 }

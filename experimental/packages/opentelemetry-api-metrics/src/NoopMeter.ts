@@ -17,7 +17,7 @@
 import { Meter } from './types/Meter';
 import {
   MetricOptions,
-  Labels,
+  Attributes,
   Counter,
   Histogram,
   ObservableGauge,
@@ -109,15 +109,15 @@ export class NoopMeter implements Meter {
 export class NoopMetric {}
 
 export class NoopCounterMetric extends NoopMetric implements Counter {
-  add(_value: number, _labels: Labels): void {}
+  add(_value: number, _attributes: Attributes): void {}
 }
 
 export class NoopUpDownCounterMetric extends NoopMetric implements UpDownCounter {
-  add(_value: number, _labels: Labels): void {}
+  add(_value: number, _attributes: Attributes): void {}
 }
 
 export class NoopHistogramMetric extends NoopMetric implements Histogram {
-  record(_value: number, _labels: Labels): void {}
+  record(_value: number, _attributes: Attributes): void {}
 }
 
 export class NoopObservableBaseMetric extends NoopMetric implements ObservableBase {
