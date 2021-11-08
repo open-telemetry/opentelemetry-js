@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+/* eslint-disable no-console */
+
 import * as assert from 'assert';
 import { DiagConsoleLogger } from '../../src/diag/consoleLogger';
 

@@ -52,16 +52,11 @@ export class DiagAPI implements DiagLogger {
    */
   private constructor() {
     function _logProxy(funcName: keyof DiagLogger): DiagLogFunction {
-      return function () {
+      return function (...args) {
         const logger = getGlobal('diag');
         // shortcut if logger not set
         if (!logger) return;
-        return logger[funcName].apply(
-          logger,
-          // work around Function.prototype.apply types
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          arguments as any
-        );
+        return logger[funcName](...args);
       };
     }
 
