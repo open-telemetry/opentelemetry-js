@@ -16,7 +16,7 @@
 
 import { HrTime } from '@opentelemetry/api';
 import {
-  Labels,
+  Attributes,
   AggregationTemporality,
   ValueType,
 } from '@opentelemetry/api-metrics';
@@ -77,7 +77,7 @@ export type PointValueType = Sum | LastValue | Histogram;
 
 export interface MetricRecord {
   readonly descriptor: MetricDescriptor;
-  readonly labels: Labels;
+  readonly attributes: Attributes;
   readonly aggregator: Aggregator;
   readonly aggregationTemporality: AggregationTemporality;
   readonly resource: Resource;

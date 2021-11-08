@@ -6,13 +6,13 @@
       "path": "packages/opentelemetry-api-metrics/tsconfig.esm.json"
     },
     {
-      "path": "packages/opentelemetry-exporter-otlp-grpc"
+      "path": "packages/opentelemetry-exporter-trace-otlp-grpc"
     },
     {
-      "path": "packages/opentelemetry-exporter-otlp-http/tsconfig.esm.json"
+      "path": "packages/opentelemetry-exporter-trace-otlp-http/tsconfig.esm.json"
     },
     {
-      "path": "packages/opentelemetry-exporter-otlp-proto"
+      "path": "packages/opentelemetry-exporter-trace-otlp-proto"
     },
     {
       "path": "packages/opentelemetry-exporter-prometheus"

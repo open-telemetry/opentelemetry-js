@@ -16,19 +16,18 @@
 
 import * as api from '@opentelemetry/api-metrics';
 import * as assert from 'assert';
-import { Meter, MeterProvider } from '../src';
+import { CounterMetric, Meter, MeterProvider } from '../src';
 
 describe('Processor', () => {
   describe('Ungrouped', () => {
     let meter: Meter;
-    let fooCounter: api.BoundCounter;
-    let barCounter: api.BoundCounter;
-    let counter: api.Counter;
+    let fooCounter: api.Counter;
+    let barCounter: api.Counter;
     beforeEach(() => {
       meter = new MeterProvider({
         interval: 10000,
       }).getMeter('test-meter');
-      counter = meter.createCounter('ungrouped-processor-test');
+      const counter = meter.createCounter('ungrouped-processor-test') as CounterMetric;
       fooCounter = counter.bind({ key: 'foo' });
       barCounter = counter.bind({ key: 'bar' });
     });
@@ -41,7 +40,7 @@ describe('Processor', () => {
       const checkPointSet = meter.getProcessor().checkPointSet();
       assert.strictEqual(checkPointSet.length, 2);
       for (const record of checkPointSet) {
-        switch (record.labels.key) {
+        switch (record.attributes.key) {
           case 'foo':
             assert.strictEqual(record.aggregator.toPoint().value, 1);
             break;
@@ -49,7 +48,7 @@ describe('Processor', () => {
             assert.strictEqual(record.aggregator.toPoint().value, 3);
             break;
           default:
-            throw new Error('Unknown labelset');
+            throw new Error('Unknown attributeset');
         }
       }
     });
