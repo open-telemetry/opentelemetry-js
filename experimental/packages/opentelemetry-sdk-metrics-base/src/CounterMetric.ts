@@ -33,9 +33,9 @@ export class CounterMetric extends Metric<BoundCounter> implements api.Counter {
   ) {
     super(name, options, MetricKind.COUNTER, resource, instrumentationLibrary);
   }
-  protected _makeInstrument(labels: api.Labels): BoundCounter {
+  protected _makeInstrument(attributes: api.Attributes): BoundCounter {
     return new BoundCounter(
-      labels,
+      attributes,
       this._disabled,
       this._valueType,
       this._processor.aggregatorFor(this._descriptor)
@@ -45,10 +45,10 @@ export class CounterMetric extends Metric<BoundCounter> implements api.Counter {
   /**
    * Adds the given value to the current value. Values cannot be negative.
    * @param value the value to add.
-   * @param [labels = {}] key-values pairs that are associated with a specific metric
+   * @param [attributes = {}] key-values pairs that are associated with a specific metric
    *     that you want to record.
    */
-  add(value: number, labels: api.Labels = {}): void {
-    this.bind(labels).add(value);
+  add(value: number, attributes: api.Attributes = {}): void {
+    this.bind(attributes).add(value);
   }
 }

@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-import { BatchObserverResult } from './BatchObserverResult';
 import {
   MetricOptions,
   Counter,
   Histogram,
   ObservableGauge,
-  BatchObserverOptions,
   UpDownCounter,
   ObservableCounter,
   ObservableUpDownCounter,
@@ -41,7 +39,7 @@ export interface MeterOptions {
  * An interface to allow the recording metrics.
  *
  * {@link Metric}s are used for recording pre-defined aggregation (`Counter`),
- * or raw values (`Histogram`) in which the aggregation and labels
+ * or raw values (`Histogram`) in which the aggregation and attributes
  * for the exported metric are deferred.
  */
 export interface Meter {
@@ -115,15 +113,4 @@ export interface Meter {
     options?: MetricOptions,
     callback?: (observableResult: ObservableResult) => void
   ): ObservableUpDownCounter;
-
-  /**
-   * Creates a new `BatchObserver`, can be used to update many metrics
-   * at the same time and when operations needs to be async
-   * @param callback the batch observer callback
-   * @param [options] the batch observer options.
-   */
-  createBatchObserver(
-    callback: (batchObserverResult: BatchObserverResult) => void,
-    options?: BatchObserverOptions
-  ): void;
 }

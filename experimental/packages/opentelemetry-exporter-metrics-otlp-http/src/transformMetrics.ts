@@ -15,7 +15,7 @@
  */
 
 import { SpanAttributes, HrTime } from '@opentelemetry/api';
-import { Labels, ValueType } from '@opentelemetry/api-metrics';
+import { Attributes as Labels, ValueType } from '@opentelemetry/api-metrics';
 import * as core from '@opentelemetry/core';
 import {
   AggregatorKind,
@@ -54,7 +54,7 @@ export function toAggregationTemporality(
 }
 
 /**
- * Returns an DataPoint which can have integers or doublle values
+ * Returns an DataPoint which can have integers or double values
  * @param metric
  * @param startTime
  */
@@ -63,7 +63,7 @@ export function toDataPoint(
   startTime: number
 ): otlpTypes.opentelemetryProto.metrics.v1.DataPoint {
   return {
-    labels: toCollectorLabels(metric.labels),
+    labels: toCollectorLabels(metric.attributes),
     value: metric.aggregator.toPoint().value as number,
     startTimeUnixNano: startTime,
     timeUnixNano: core.hrTimeToNanoseconds(
@@ -86,7 +86,7 @@ export function toHistogramPoint(
     timestamp: HrTime;
   };
   return {
-    labels: toCollectorLabels(metric.labels),
+    labels: toCollectorLabels(metric.attributes),
     sum: value.sum,
     count: value.count,
     startTimeUnixNano: startTime,

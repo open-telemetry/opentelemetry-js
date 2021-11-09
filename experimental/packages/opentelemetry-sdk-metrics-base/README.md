@@ -36,8 +36,8 @@ const counter = meter.createCounter('metric_name', {
   description: 'Example of a counter'
 });
 
-const labels = { pid: process.pid };
-counter.add(10, labels);
+const attributes = { pid: process.pid };
+counter.add(10, attributes);
 ```
 
 ### UpDownCounter
@@ -61,8 +61,8 @@ const counter = meter.createUpDownCounter('metric_name', {
   description: 'Example of a UpDownCounter'
 });
 
-const labels = { pid: process.pid };
-counter.add(Math.random() > 0.5 ? 1 : -1, labels);
+const attributes = { pid: process.pid };
+counter.add(Math.random() > 0.5 ? 1 : -1, attributes);
 ```
 
 ### Observable Gauge
@@ -81,7 +81,7 @@ meter.createObservableGauge('your_metric_name', {
   description: 'Example of an async observable gauge with callback',
 }, async (observableResult) => {
   const value = await getAsyncValue();
-  observableResult.observe(value, { label: '1' });
+  observableResult.observe(value, { attribute: '1' });
 });
 
 function getAsyncValue() {
@@ -96,8 +96,8 @@ function getAsyncValue() {
 meter.createObservableGauge('your_metric_name', {
   description: 'Example of a sync observable gauge with callback',
 }, (observableResult) => {
-  observableResult.observe(getRandomValue(), { label: '1' });
-  observableResult.observe(getRandomValue(), { label: '2' });
+  observableResult.observe(getRandomValue(), { attribute: '1' });
+  observableResult.observe(getRandomValue(), { attribute: '2' });
 });
 
 function getRandomValue() {
@@ -120,7 +120,7 @@ meter.createObservableUpDownCounter('your_metric_name', {
   description: 'Example of an async observable up down counter with callback',
 }, async (observableResult) => {
   const value = await getAsyncValue();
-  observableResult.observe(value, { label: '1' });
+  observableResult.observe(value, { attribute: '1' });
 });
 
 function getAsyncValue() {
@@ -135,7 +135,7 @@ function getAsyncValue() {
 meter.createObservableUpDownCounter('your_metric_name', {
   description: 'Example of a sync observable up down counter with callback',
 }, (observableResult) => {
-  observableResult.observe(getRandomValue(), { label: '1' });
+  observableResult.observe(getRandomValue(), { attribute: '1' });
 });
 
 function getRandomValue() {
@@ -159,7 +159,7 @@ meter.createObservableCounter('example_metric', {
   description: 'Example of an async observable counter with callback',
 }, async (observableResult) => {
   const value = await getAsyncValue();
-  observableResult.observe(value, { label: '1' });
+  observableResult.observe(value, { attribute: '1' });
 });
 
 function getAsyncValue() {
@@ -175,67 +175,13 @@ meter.createObservableCounter('example_metric', {
   description: 'Example of a sync observable counter with callback',
 }, (observableResult) => {
   const value = getRandomValue();
-  observableResult.observe(value, { label: '1' });
+  observableResult.observe(value, { attribute: '1' });
 });
 
 function getRandomValue() {
   return Math.random();
 }
 ```
-
-### Batch Observer
-
-Choose this kind of metric when you need to update multiple observables with the results of a single async calculation.
-
-```js
-const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
-const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
-
-const exporter = new PrometheusExporter(
-  {
-    startServer: true,
-  },
-  () => {
-    console.log('prometheus scrape endpoint: http://localhost:9464/metrics');
-  },
-);
-
-const meter = new MeterProvider({
-  exporter,
-  interval: 3000,
-}).getMeter('example-observer');
-
-const cpuUsageMetric = meter.createObservableGauge('cpu_usage_per_app', {
-  description: 'CPU',
-});
-
-const MemUsageMetric = meter.createObservableGauge('mem_usage_per_app', {
-  description: 'Memory',
-});
-
-meter.createBatchObserver((batchObserverResult) => {
-  getSomeAsyncMetrics().then(metrics => {
-    batchObserverResult.observe({ app: 'myApp' }, [
-      cpuUsageMetric.observation(metrics.value1),
-      MemUsageMetric.observation(metrics.value2)
-    ]);
-  });
-});
-
-function getSomeAsyncMetrics() {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve({
-        value1: Math.random(),
-        value2: Math.random(),
-      });
-    }, 100)
-  });
-}
-
-```
-
-See [examples/prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/prometheus) for a short example.
 
 ### Histogram
 
@@ -261,4 +207,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-sdk-metrics-base&type=dev
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-sdk-metrics-base&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/sdk-metrics-base
-[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fmetrics.svg
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fsdk-metrics-base.svg
