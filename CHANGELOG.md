@@ -4,6 +4,77 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 1.0.1
+
+### :rocket: (Enhancement)
+
+* Other
+  * [#2465](https://github.com/open-telemetry/opentelemetry-js/pull/2465) fix: prefer globalThis instead of window to support webworkers ([@legendecas](https://github.com/legendecas))
+* `opentelemetry-semantic-conventions`
+  * [#2532](https://github.com/open-telemetry/opentelemetry-js/pull/2532) feat(@opentelemetry/semantic-conventions): change enum to object literals ([@echoontheway](https://github.com/echoontheway))
+  * [#2528](https://github.com/open-telemetry/opentelemetry-js/pull/2528) feat: upgrade semantic-conventions to latest v1.7.0 spec ([@weyert](https://github.com/weyert))
+* `opentelemetry-core`, `opentelemetry-sdk-trace-base`
+  * [#2484](https://github.com/open-telemetry/opentelemetry-js/pull/2484) feat: new merge function ([@obecny](https://github.com/obecny))
+
+### :bug: (Bug Fix)
+
+* Other
+  * [#2581](https://github.com/open-telemetry/opentelemetry-js/pull/2581) feat: lazy initialization of the gzip stream ([@fungiboletus](https://github.com/fungiboletus))
+  * [#2584](https://github.com/open-telemetry/opentelemetry-js/pull/2584) fix: fixing compatibility versions for detectors ([@obecny](https://github.com/obecny))
+  * [#2560](https://github.com/open-telemetry/opentelemetry-js/pull/2560) fix(core): support regex global flag in urlMatches ([@moander](https://github.com/moander))
+* `opentelemetry-exporter-zipkin`
+  * [#2519](https://github.com/open-telemetry/opentelemetry-js/pull/2519) fix(exporter-zipkin): correct status tags names ([@t2t2](https://github.com/t2t2))
+
+### :books: (Refine Doc)
+
+* `opentelemetry-core`
+  * [#2604](https://github.com/open-telemetry/opentelemetry-js/pull/2604) Docs: Document the HrTime format ([@JamesJHPark](https://github.com/JamesJHPark))
+* Other
+  * [#2576](https://github.com/open-telemetry/opentelemetry-js/pull/2576) docs(instrumentation): update links in the Readme ([@OlivierAlbertini](https://github.com/OlivierAlbertini))
+  * [#2600](https://github.com/open-telemetry/opentelemetry-js/pull/2600) docs: fix URLs in README post-experimental move ([@arbourd](https://github.com/arbourd))
+  * [#2579](https://github.com/open-telemetry/opentelemetry-js/pull/2579) doc: Move upgrade propagator notes to correct section ([@NathanielRN](https://github.com/NathanielRN))
+  * [#2568](https://github.com/open-telemetry/opentelemetry-js/pull/2568) chore(doc): update matrix with contrib version for 1.0 core ([@vmarchaud](https://github.com/vmarchaud))
+  * [#2555](https://github.com/open-telemetry/opentelemetry-js/pull/2555) docs: expose existing comments ([@moander](https://github.com/moander))
+  * [#2493](https://github.com/open-telemetry/opentelemetry-js/pull/2493) chore: remove getting started and link to documentation. ([@svrnm](https://github.com/svrnm))
+
+### :house: (Internal)
+
+* `opentelemetry-sdk-trace-base`, `opentelemetry-sdk-trace-node`, `opentelemetry-sdk-trace-web`
+  * [#2607](https://github.com/open-telemetry/opentelemetry-js/pull/2607) chore: update npm badge image links ([@legendecas](https://github.com/legendecas))
+* Other
+  * [#2570](https://github.com/open-telemetry/opentelemetry-js/pull/2570) chore: adding selenium tests with browserstack ([@obecny](https://github.com/obecny))
+  * [#2522](https://github.com/open-telemetry/opentelemetry-js/pull/2522) chore: cleanup setting config in instrumentations ([@Flarna](https://github.com/Flarna))
+  * [#2541](https://github.com/open-telemetry/opentelemetry-js/pull/2541) chore: slim font size for section title in PR template ([@legendecas](https://github.com/legendecas))
+  * [#2509](https://github.com/open-telemetry/opentelemetry-js/pull/2509) chore: expand pull request template with action items ([@pragmaticivan](https://github.com/pragmaticivan))
+  * [#2488](https://github.com/open-telemetry/opentelemetry-js/pull/2488) chore: inline sources in source maps ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-context-async-hooks`, `opentelemetry-context-zone-peer-dep`, `opentelemetry-core`, `opentelemetry-exporter-jaeger`, `opentelemetry-exporter-zipkin`, `opentelemetry-propagator-b3`, `opentelemetry-propagator-jaeger`, `opentelemetry-resources`, `opentelemetry-sdk-trace-base`, `opentelemetry-sdk-trace-node`, `opentelemetry-sdk-trace-web`, `opentelemetry-shim-opentracing`
+  * [#2531](https://github.com/open-telemetry/opentelemetry-js/pull/2531) chore(deps): pin minor API version ([@Flarna](https://github.com/Flarna))
+* `opentelemetry-core`
+  * [#2520](https://github.com/open-telemetry/opentelemetry-js/pull/2520) chore(deps): remove unused semver  ([@mhennoch](https://github.com/mhennoch))
+
+### Committers: 20
+
+* (Eliseo) Nathaniel Ruiz Nowell ([@NathanielRN](https://github.com/NathanielRN))
+* Antoine Pultier ([@fungiboletus](https://github.com/fungiboletus))
+* Bartlomiej Obecny ([@obecny](https://github.com/obecny))
+* Daniel Dyla ([@dyladan](https://github.com/dyladan))
+* Dylan Arbour ([@arbourd](https://github.com/arbourd))
+* Georg Pirklbauer ([@pirgeo](https://github.com/pirgeo))
+* Gerhard Stöbich ([@Flarna](https://github.com/Flarna))
+* Ivan Santos ([@pragmaticivan](https://github.com/pragmaticivan))
+* Jack ([@mothershipper](https://github.com/mothershipper))
+* James ([@JamesJHPark](https://github.com/JamesJHPark))
+* MartenH ([@mhennoch](https://github.com/mhennoch))
+* Olivier Albertini ([@OlivierAlbertini](https://github.com/OlivierAlbertini))
+* Severin Neumann ([@svrnm](https://github.com/svrnm))
+* Valentin Marchaud ([@vmarchaud](https://github.com/vmarchaud))
+* Weyert de Boer ([@weyert](https://github.com/weyert))
+* William Armiros ([@willarmiros](https://github.com/willarmiros))
+* [@echoontheway](https://github.com/echoontheway)
+* legendecas ([@legendecas](https://github.com/legendecas))
+* moander ([@moander](https://github.com/moander))
+* t2t2 ([@t2t2](https://github.com/t2t2))
+
 ## 1.0.0
 
 No changes
