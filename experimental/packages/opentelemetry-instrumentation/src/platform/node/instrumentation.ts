@@ -76,7 +76,7 @@ export abstract class InstrumentationBase<T = any>
     exports: T,
     name: string,
     baseDir?: string
-  ): InstrumentationModuleType {
+  ): T {
     if (!baseDir) {
       if (typeof module.patch === 'function') {
         module.moduleExports = exports;
