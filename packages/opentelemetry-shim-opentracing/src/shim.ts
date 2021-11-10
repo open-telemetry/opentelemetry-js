@@ -107,7 +107,7 @@ export class SpanContextShim extends opentracing.SpanContext {
     return this._baggage.getEntry(key)?.value;
   }
 
-  setBaggageItem(key: string, value: string) {
+  setBaggageItem(key: string, value: string): void {
     this._baggage = this._baggage.setEntry(key, { value });
   }
 }

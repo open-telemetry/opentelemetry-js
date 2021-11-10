@@ -45,7 +45,7 @@ class TestProcessor implements SpanProcessor {
 }
 
 describe('MultiSpanProcessor', () => {
-  let removeEvent: Function | undefined;
+  let removeEvent: (() => void) | undefined;
   afterEach(() => {
     if (removeEvent) {
       removeEvent();

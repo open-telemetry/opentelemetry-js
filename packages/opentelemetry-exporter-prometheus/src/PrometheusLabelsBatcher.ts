@@ -29,11 +29,11 @@ interface BatcherCheckpoint {
 export class PrometheusLabelsBatcher {
   private _batchMap = new Map<string, BatcherCheckpoint>();
 
-  get hasMetric() {
+  get hasMetric(): boolean {
     return this._batchMap.size > 0;
   }
 
-  process(record: MetricRecord) {
+  process(record: MetricRecord): void {
     const name = record.descriptor.name;
     let item = this._batchMap.get(name);
     if (item === undefined) {

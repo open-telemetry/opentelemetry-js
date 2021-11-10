@@ -203,6 +203,7 @@ export namespace opentelemetryProto {
         droppedAttributesCount: number;
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-shadow
       export enum SpanKind {
         SPAN_KIND_UNSPECIFIED,
         SPAN_KIND_INTERNAL,

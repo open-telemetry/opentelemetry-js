@@ -161,7 +161,7 @@ export const setSpanWithError = (
   span: Span,
   error: Err,
   obj?: IncomingMessage | ClientRequest
-) => {
+): void => {
   const message = error.message;
 
   span.setAttributes({
@@ -176,7 +176,7 @@ export const setSpanWithError = (
 
   let status: SpanStatus;
   if ((obj as IncomingMessage).statusCode) {
-    status = parseResponseStatus((obj as IncomingMessage).statusCode!);
+    status = parseResponseStatus((obj as IncomingMessage).statusCode);
   } else if ((obj as ClientRequest).aborted) {
     status = { code: SpanStatusCode.ERROR };
   } else {
@@ -196,7 +196,7 @@ export const setSpanWithError = (
 export const setRequestContentLengthAttribute = (
   request: IncomingMessage,
   attributes: SpanAttributes
-) => {
+): void => {
   const length = getContentLength(request.headers);
   if (length === null) return;
 
@@ -217,7 +217,7 @@ export const setRequestContentLengthAttribute = (
 export const setResponseContentLengthAttribute = (
   response: IncomingMessage,
   attributes: SpanAttributes
-) => {
+): void => {
   const length = getContentLength(response.headers);
   if (length === null) return;
 
@@ -259,7 +259,7 @@ export const isCompressed = (
 export const getRequestInfo = (
   options: url.URL | RequestOptions | string,
   extraOptions?: RequestOptions
-) => {
+): { origin: string; pathname: string; method: string; optionsParsed: RequestOptions; } => {
   let pathname = '/';
   let origin = '';
   let optionsParsed: RequestOptions;
