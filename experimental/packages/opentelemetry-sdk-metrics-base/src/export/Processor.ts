@@ -44,7 +44,7 @@ export abstract class Processor {
 }
 
 /**
- * Processor which retains all dimensions/labels. It accepts all records and
+ * Processor which retains all dimensions/attributes. It accepts all records and
  * passes them for exporting.
  */
 export class UngroupedProcessor extends Processor {
@@ -54,12 +54,12 @@ export class UngroupedProcessor extends Processor {
       case MetricKind.UP_DOWN_COUNTER:
         return new aggregators.SumAggregator();
 
-      case MetricKind.SUM_OBSERVER:
-      case MetricKind.UP_DOWN_SUM_OBSERVER:
-      case MetricKind.VALUE_OBSERVER:
+      case MetricKind.OBSERVABLE_COUNTER:
+      case MetricKind.OBSERVABLE_UP_DOWN_COUNTER:
+      case MetricKind.OBSERVABLE_GAUGE:
         return new aggregators.LastValueAggregator();
 
-      case MetricKind.VALUE_RECORDER:
+      case MetricKind.HISTOGRAM:
         return new aggregators.HistogramAggregator(
           metricDescriptor.boundaries || [Infinity]
         );
@@ -70,9 +70,9 @@ export class UngroupedProcessor extends Processor {
   }
 
   process(record: MetricRecord): void {
-    const labels = Object.keys(record.labels)
-      .map(k => `${k}=${record.labels[k]}`)
+    const attributes = Object.keys(record.attributes)
+      .map(k => `${k}=${record.attributes[k]}`)
       .join(',');
-    this._batchMap.set(record.descriptor.name + labels, record);
+    this._batchMap.set(record.descriptor.name + attributes, record);
   }
 }

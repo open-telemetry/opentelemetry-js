@@ -14,33 +14,41 @@
  * limitations under the License.
  */
 
-import { BatchObserverResult } from './BatchObserverResult';
 import {
   MetricOptions,
   Counter,
-  ValueRecorder,
-  ValueObserver,
-  BatchObserverOptions,
+  Histogram,
+  ObservableGauge,
   UpDownCounter,
-  SumObserver,
-  UpDownSumObserver,
+  ObservableCounter,
+  ObservableUpDownCounter,
 } from './Metric';
-import { ObserverResult } from './ObserverResult';
+import { ObservableResult } from './ObservableResult';
+
+/**
+ * An interface describes additional metadata of a meter.
+ */
+export interface MeterOptions {
+  /**
+   * The schemaUrl of the meter or instrumentation library
+   */
+  schemaUrl?: string;
+}
 
 /**
  * An interface to allow the recording metrics.
  *
  * {@link Metric}s are used for recording pre-defined aggregation (`Counter`),
- * or raw values (`ValueRecorder`) in which the aggregation and labels
+ * or raw values (`Histogram`) in which the aggregation and attributes
  * for the exported metric are deferred.
  */
 export interface Meter {
   /**
-   * Creates and returns a new `ValueRecorder`.
+   * Creates and returns a new `Histogram`.
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createValueRecorder(name: string, options?: MetricOptions): ValueRecorder;
+  createHistogram(name: string, options?: MetricOptions): Histogram;
 
   /**
    * Creates a new `Counter` metric. Generally, this kind of metric when the
@@ -71,49 +79,38 @@ export interface Meter {
   createUpDownCounter(name: string, options?: MetricOptions): UpDownCounter;
 
   /**
-   * Creates a new `ValueObserver` metric.
+   * Creates a new `ObservableGauge` metric.
    * @param name the name of the metric.
    * @param [options] the metric options.
-   * @param [callback] the observer callback
+   * @param [callback] the observable callback
    */
-  createValueObserver(
+  createObservableGauge(
     name: string,
     options?: MetricOptions,
-    callback?: (observerResult: ObserverResult) => void
-  ): ValueObserver;
+    callback?: (observableResult: ObservableResult) => void
+  ): ObservableGauge;
 
   /**
-   * Creates a new `SumObserver` metric.
+   * Creates a new `ObservableCounter` metric.
    * @param name the name of the metric.
    * @param [options] the metric options.
-   * @param [callback] the observer callback
+   * @param [callback] the observable callback
    */
-  createSumObserver(
+  createObservableCounter(
     name: string,
     options?: MetricOptions,
-    callback?: (observerResult: ObserverResult) => void
-  ): SumObserver;
+    callback?: (observableResult: ObservableResult) => void
+  ): ObservableCounter;
 
   /**
-   * Creates a new `UpDownSumObserver` metric.
+   * Creates a new `ObservableUpDownCounter` metric.
    * @param name the name of the metric.
    * @param [options] the metric options.
-   * @param [callback] the observer callback
+   * @param [callback] the observable callback
    */
-  createUpDownSumObserver(
+  createObservableUpDownCounter(
     name: string,
     options?: MetricOptions,
-    callback?: (observerResult: ObserverResult) => void
-  ): UpDownSumObserver;
-
-  /**
-   * Creates a new `BatchObserver`, can be used to update many metrics
-   * at the same time and when operations needs to be async
-   * @param callback the batch observer callback
-   * @param [options] the batch observer options.
-   */
-  createBatchObserver(
-    callback: (batchObserverResult: BatchObserverResult) => void,
-    options?: BatchObserverOptions
-  ): void;
+    callback?: (observableResult: ObservableResult) => void
+  ): ObservableUpDownCounter;
 }

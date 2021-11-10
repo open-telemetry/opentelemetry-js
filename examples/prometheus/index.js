@@ -30,6 +30,6 @@ const upDownCounter = meter.createUpDownCounter('test_up_down_counter', {
 const labels = { pid: process.pid, environment: 'staging' };
 
 setInterval(() => {
-  requestCounter.bind(labels).add(1);
-  upDownCounter.bind(labels).add(Math.random() > 0.5 ? 1 : -1);
+  requestCounter.add(1, labels);
+  upDownCounter.add(Math.random() > 0.5 ? 1 : -1, labels);
 }, 1000);

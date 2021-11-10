@@ -36,12 +36,8 @@ const counter = meter.createCounter('metric_name', {
   description: 'Example of a counter'
 });
 
-const labels = { pid: process.pid };
-
-// Create a BoundInstrument associated with specified label values.
-const boundCounter = counter.bind(labels);
-boundCounter.add(10);
-
+const attributes = { pid: process.pid };
+counter.add(10, attributes);
 ```
 
 ### UpDownCounter
@@ -65,15 +61,11 @@ const counter = meter.createUpDownCounter('metric_name', {
   description: 'Example of a UpDownCounter'
 });
 
-const labels = { pid: process.pid };
-
-// Create a BoundInstrument associated with specified label values.
-const boundCounter = counter.bind(labels);
-boundCounter.add(Math.random() > 0.5 ? 1 : -1);
-
+const attributes = { pid: process.pid };
+counter.add(Math.random() > 0.5 ? 1 : -1, attributes);
 ```
 
-### Value Observer
+### Observable Gauge
 
 Choose this kind of metric when only last value is important without worry about aggregation.
 The callback can be sync or async.
@@ -85,11 +77,11 @@ const meter = new MeterProvider().getMeter('your-meter-name');
 
 
 // async callback - for operation that needs to wait for value
-meter.createValueObserver('your_metric_name', {
-  description: 'Example of an async observer with callback',
-}, async (observerResult) => {
+meter.createObservableGauge('your_metric_name', {
+  description: 'Example of an async observable gauge with callback',
+}, async (observableResult) => {
   const value = await getAsyncValue();
-  observerResult.observe(value, { label: '1' });
+  observableResult.observe(value, { attribute: '1' });
 });
 
 function getAsyncValue() {
@@ -101,11 +93,11 @@ function getAsyncValue() {
 }
 
 // sync callback in case you don't need to wait for value
-meter.createValueObserver('your_metric_name', {
-  description: 'Example of a sync observer with callback',
-}, (observerResult) => {
-  observerResult.observe(getRandomValue(), { label: '1' });
-  observerResult.observe(getRandomValue(), { label: '2' });
+meter.createObservableGauge('your_metric_name', {
+  description: 'Example of a sync observable gauge with callback',
+}, (observableResult) => {
+  observableResult.observe(getRandomValue(), { attribute: '1' });
+  observableResult.observe(getRandomValue(), { attribute: '2' });
 });
 
 function getRandomValue() {
@@ -113,7 +105,7 @@ function getRandomValue() {
 }
 ```
 
-### UpDownSumObserver
+### ObservableUpDownCounter
 
 Choose this kind of metric when sum is important and you want to capture any value that starts at zero and rises or falls throughout the process lifetime.
 The callback can be sync or async.
@@ -124,11 +116,11 @@ const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
 const meter = new MeterProvider().getMeter('your-meter-name');
 
 // async callback - for operation that needs to wait for value
-meter.createUpDownSumObserver('your_metric_name', {
-  description: 'Example of an async observer with callback',
-}, async (observerResult) => {
+meter.createObservableUpDownCounter('your_metric_name', {
+  description: 'Example of an async observable up down counter with callback',
+}, async (observableResult) => {
   const value = await getAsyncValue();
-  observerResult.observe(value, { label: '1' });
+  observableResult.observe(value, { attribute: '1' });
 });
 
 function getAsyncValue() {
@@ -140,10 +132,10 @@ function getAsyncValue() {
 }
 
 // sync callback in case you don't need to wait for value
-meter.createUpDownSumObserver('your_metric_name', {
-  description: 'Example of a sync observer with callback',
-}, (observerResult) => {
-  observerResult.observe(getRandomValue(), { label: '1' });
+meter.createObservableUpDownCounter('your_metric_name', {
+  description: 'Example of a sync observable up down counter with callback',
+}, (observableResult) => {
+  observableResult.observe(getRandomValue(), { attribute: '1' });
 });
 
 function getRandomValue() {
@@ -152,7 +144,7 @@ function getRandomValue() {
 
 ```
 
-### Sum Observer
+### Observable Counter
 
 Choose this kind of metric when collecting a sum that never decreases.
 The callback can be sync or async.
@@ -163,11 +155,11 @@ const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
 const meter = new MeterProvider().getMeter('your-meter-name');
 
 // async callback in case you need to wait for values
-meter.createSumObserver('example_metric', {
-  description: 'Example of an async sum observer with callback',
-}, async (observerResult) => {
+meter.createObservableCounter('example_metric', {
+  description: 'Example of an async observable counter with callback',
+}, async (observableResult) => {
   const value = await getAsyncValue();
-  observerResult.observe(value, { label: '1' });
+  observableResult.observe(value, { attribute: '1' });
 });
 
 function getAsyncValue() {
@@ -179,11 +171,11 @@ function getAsyncValue() {
 }
 
 // sync callback in case you don't need to wait for values
-meter.createSumObserver('example_metric', {
-  description: 'Example of a sync sum observer with callback',
-}, (observerResult) => {
+meter.createObservableCounter('example_metric', {
+  description: 'Example of a sync observable counter with callback',
+}, (observableResult) => {
   const value = getRandomValue();
-  observerResult.observe(value, { label: '1' });
+  observableResult.observe(value, { attribute: '1' });
 });
 
 function getRandomValue() {
@@ -191,65 +183,11 @@ function getRandomValue() {
 }
 ```
 
-### Batch Observer
+### Histogram
 
-Choose this kind of metric when you need to update multiple observers with the results of a single async calculation.
-
-```js
-const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
-const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
-
-const exporter = new PrometheusExporter(
-  {
-    startServer: true,
-  },
-  () => {
-    console.log('prometheus scrape endpoint: http://localhost:9464/metrics');
-  },
-);
-
-const meter = new MeterProvider({
-  exporter,
-  interval: 3000,
-}).getMeter('example-observer');
-
-const cpuUsageMetric = meter.createValueObserver('cpu_usage_per_app', {
-  description: 'CPU',
-});
-
-const MemUsageMetric = meter.createValueObserver('mem_usage_per_app', {
-  description: 'Memory',
-});
-
-meter.createBatchObserver((observerBatchResult) => {
-  getSomeAsyncMetrics().then(metrics => {
-    observerBatchResult.observe({ app: 'myApp' }, [
-      cpuUsageMetric.observation(metrics.value1),
-      MemUsageMetric.observation(metrics.value2)
-    ]);
-  });
-});
-
-function getSomeAsyncMetrics() {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve({
-        value1: Math.random(),
-        value2: Math.random(),
-      });
-    }, 100)
-  });
-}
-
-```
-
-See [examples/prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/prometheus) for a short example.
-
-### Value Recorder
-
-`ValueRecorder` is a non-additive synchronous instrument useful for recording any non-additive number, positive or negative.
-Values captured by `ValueRecorder.record(value)` are treated as individual events belonging to a distribution that is being summarized.
-`ValueRecorder` should be chosen either when capturing measurements that do not contribute meaningfully to a sum, or when capturing numbers that are additive in nature, but where the distribution of individual increments is considered interesting.
+`Histogram` is a non-additive synchronous instrument useful for recording any non-additive number, positive or negative.
+Values captured by `Histogram.record(value)` are treated as individual events belonging to a distribution that is being summarized.
+`Histogram` should be chosen either when capturing measurements that do not contribute meaningfully to a sum, or when capturing numbers that are additive in nature, but where the distribution of individual increments is considered interesting.
 
 ## Useful links
 
@@ -269,4 +207,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-sdk-metrics-base&type=dev
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-sdk-metrics-base&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/sdk-metrics-base
-[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fmetrics.svg
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fsdk-metrics-base.svg

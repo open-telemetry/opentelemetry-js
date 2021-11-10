@@ -15,6 +15,7 @@
  */
 
 export * from './environment';
+export * from './globalThis';
 export * from './hex-to-base64';
 export * from './RandomIdGenerator';
 export * from './performance';

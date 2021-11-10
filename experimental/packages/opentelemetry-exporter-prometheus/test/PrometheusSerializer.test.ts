@@ -19,19 +19,19 @@ import {
   LastValueAggregator,
   MeterProvider,
   CounterMetric,
-  ValueRecorderMetric,
+  HistogramMetric,
   UpDownCounterMetric,
-  ValueObserverMetric,
+  ObservableGaugeMetric,
 } from '@opentelemetry/sdk-metrics-base';
 import { diag, DiagLogLevel } from '@opentelemetry/api';
 import * as assert from 'assert';
-import { Labels } from '@opentelemetry/api-metrics';
+import { Attributes } from '@opentelemetry/api-metrics';
 import { PrometheusSerializer } from '../src/PrometheusSerializer';
-import { PrometheusLabelsBatcher } from '../src/PrometheusLabelsBatcher';
+import { PrometheusAttributesBatcher } from '../src/PrometheusAttributesBatcher';
 import { ExactProcessor } from './ExactProcessor';
 import { mockedHrTimeMs, mockAggregator } from './util';
 
-const labels = {
+const attributes = {
   foo1: 'bar1',
   foo2: 'bar2',
 };
@@ -55,7 +55,7 @@ describe('PrometheusSerializer', () => {
           processor: new ExactProcessor(SumAggregator),
         }).getMeter('test');
         const counter = meter.createCounter('test_total') as CounterMetric;
-        counter.bind(labels).add(1);
+        counter.add(1, attributes);
 
         const records = await counter.getMetricRecord();
         const record = records[0];
@@ -77,7 +77,7 @@ describe('PrometheusSerializer', () => {
           processor: new ExactProcessor(SumAggregator),
         }).getMeter('test');
         const counter = meter.createCounter('test_total') as CounterMetric;
-        counter.bind(labels).add(1);
+        counter.add(1, attributes);
 
         const records = await counter.getMetricRecord();
         const record = records[0];
@@ -99,15 +99,15 @@ describe('PrometheusSerializer', () => {
         const meter = new MeterProvider({
           processor: new ExactProcessor(LastValueAggregator),
         }).getMeter('test');
-        const observer = meter.createValueObserver(
+        const observableGauge = meter.createObservableGauge(
           'test',
           {},
-          observerResult => {
-            observerResult.observe(1, labels);
+          observableResult => {
+            observableResult.observe(1, attributes);
           }
-        ) as ValueObserverMetric;
+        ) as ObservableGaugeMetric;
         await meter.collect();
-        const records = await observer.getMetricRecord();
+        const records = await observableGauge.getMetricRecord();
         const record = records[0];
 
         const result = serializer.serializeRecord(
@@ -126,15 +126,15 @@ describe('PrometheusSerializer', () => {
         const meter = new MeterProvider({
           processor: new ExactProcessor(LastValueAggregator),
         }).getMeter('test');
-        const observer = meter.createValueObserver(
+        const observableGauge = meter.createObservableGauge(
           'test',
           {},
-          observerResult => {
-            observerResult.observe(1, labels);
+          observableResult => {
+            observableResult.observe(1, attributes);
           }
-        ) as ValueObserverMetric;
+        ) as ObservableGaugeMetric;
         await meter.collect();
-        const records = await observer.getMetricRecord();
+        const records = await observableGauge.getMetricRecord();
         const record = records[0];
 
         const result = serializer.serializeRecord(
@@ -153,13 +153,13 @@ describe('PrometheusSerializer', () => {
 
         const processor = new ExactProcessor(HistogramAggregator, [1, 10, 100]);
         const meter = new MeterProvider({ processor }).getMeter('test');
-        const recorder = meter.createValueRecorder('test', {
+        const histogram = meter.createHistogram('test', {
           description: 'foobar',
-        }) as ValueRecorderMetric;
+        }) as HistogramMetric;
 
-        recorder.bind(labels).record(5);
+        histogram.record(5, attributes);
 
-        const records = await recorder.getMetricRecord();
+        const records = await histogram.getMetricRecord();
         const record = records[0];
 
         const result = serializer.serializeRecord(
@@ -181,13 +181,13 @@ describe('PrometheusSerializer', () => {
         const serializer = new PrometheusSerializer();
 
         const meter = new MeterProvider().getMeter('test');
-        const recorder = meter.createValueRecorder('test', {
+        const histogram = meter.createHistogram('test', {
           description: 'foobar',
           boundaries: [1, 10, 100],
-        }) as ValueRecorderMetric;
-        recorder.bind(labels).record(5);
+        }) as HistogramMetric;
+        histogram.record(5, attributes);
 
-        const records = await recorder.getMetricRecord();
+        const records = await histogram.getMetricRecord();
         const record = records[0];
 
         const result = serializer.serializeRecord(
@@ -210,12 +210,12 @@ describe('PrometheusSerializer', () => {
 
         const processor = new ExactProcessor(HistogramAggregator, [1, 10, 100]);
         const meter = new MeterProvider({ processor }).getMeter('test');
-        const recorder = meter.createValueRecorder('test', {
+        const histogram = meter.createHistogram('test', {
           description: 'foobar',
-        }) as ValueRecorderMetric;
-        recorder.bind(labels).record(5);
+        }) as HistogramMetric;
+        histogram.record(5, attributes);
 
-        const records = await recorder.getMetricRecord();
+        const records = await histogram.getMetricRecord();
         const record = records[0];
 
         const result = serializer.serializeRecord(
@@ -245,12 +245,12 @@ describe('PrometheusSerializer', () => {
         const meter = new MeterProvider({
           processor: new ExactProcessor(SumAggregator),
         }).getMeter('test');
-        const processor = new PrometheusLabelsBatcher();
+        const processor = new PrometheusAttributesBatcher();
         const counter = meter.createCounter('test_total', {
           description: 'foobar',
         }) as CounterMetric;
-        counter.bind({ val: '1' }).add(1);
-        counter.bind({ val: '2' }).add(1);
+        counter.add(1, { val: '1' });
+        counter.add(1, { val: '2' });
 
         const records = await counter.getMetricRecord();
         records.forEach(it => processor.process(it));
@@ -272,12 +272,12 @@ describe('PrometheusSerializer', () => {
         const meter = new MeterProvider({
           processor: new ExactProcessor(SumAggregator),
         }).getMeter('test');
-        const processor = new PrometheusLabelsBatcher();
+        const processor = new PrometheusAttributesBatcher();
         const counter = meter.createCounter('test_total', {
           description: 'foobar',
         }) as CounterMetric;
-        counter.bind({ val: '1' }).add(1);
-        counter.bind({ val: '2' }).add(1);
+        counter.add(1, { val: '1' });
+        counter.add(1, { val: '2' });
 
         const records = await counter.getMetricRecord();
         records.forEach(it => processor.process(it));
@@ -303,18 +303,18 @@ describe('PrometheusSerializer', () => {
         const meter = new MeterProvider({
           processor: new ExactProcessor(LastValueAggregator),
         }).getMeter('test');
-        const processor = new PrometheusLabelsBatcher();
-        const observer = meter.createValueObserver(
+        const processor = new PrometheusAttributesBatcher();
+        const observableGauge = meter.createObservableGauge(
           'test',
           {
             description: 'foobar',
           },
-          observerResult => {
-            observerResult.observe(1, labels);
+          observableResult => {
+            observableResult.observe(1, attributes);
           }
-        ) as ValueObserverMetric;
+        ) as ObservableGaugeMetric;
         await meter.collect();
-        const records = await observer.getMetricRecord();
+        const records = await observableGauge.getMetricRecord();
         records.forEach(it => processor.process(it));
         const checkPointSet = processor.checkPointSet();
 
@@ -336,19 +336,19 @@ describe('PrometheusSerializer', () => {
 
         const processor = new ExactProcessor(HistogramAggregator, [1, 10, 100]);
         const meter = new MeterProvider({ processor }).getMeter('test');
-        const recorder = meter.createValueRecorder('test', {
+        const histogram = meter.createHistogram('test', {
           description: 'foobar',
-        }) as ValueRecorderMetric;
-        recorder.bind({ val: '1' }).record(5);
-        recorder.bind({ val: '1' }).record(50);
-        recorder.bind({ val: '1' }).record(120);
+        }) as HistogramMetric;
+        histogram.record(5, { val: '1' });
+        histogram.record(50, { val: '1' });
+        histogram.record(120, { val: '1' });
 
-        recorder.bind({ val: '2' }).record(5);
+        histogram.record(5, { val: '2' });
 
-        const records = await recorder.getMetricRecord();
-        const labelBatcher = new PrometheusLabelsBatcher();
-        records.forEach(it => labelBatcher.process(it));
-        const checkPointSet = labelBatcher.checkPointSet();
+        const records = await histogram.getMetricRecord();
+        const attributeBatcher = new PrometheusAttributesBatcher();
+        records.forEach(it => attributeBatcher.process(it));
+        const checkPointSet = attributeBatcher.checkPointSet();
 
         const result = serializer.serialize(checkPointSet);
         assert.strictEqual(
@@ -382,7 +382,7 @@ describe('PrometheusSerializer', () => {
         processor: new ExactProcessor(SumAggregator),
       }).getMeter('test');
       const counter = meter.createCounter('test') as CounterMetric;
-      counter.bind({}).add(1);
+      counter.add(1);
 
       const records = await counter.getMetricRecord();
       const record = records[0];
@@ -410,7 +410,7 @@ describe('PrometheusSerializer', () => {
         processor: new ExactProcessor(SumAggregator),
       }).getMeter('test');
       const counter = meter.createCounter('test_total') as CounterMetric;
-      counter.bind({}).add(1);
+      counter.add(1);
 
       const records = await counter.getMetricRecord();
       const record = records[0];
@@ -425,14 +425,14 @@ describe('PrometheusSerializer', () => {
     describe('with SumAggregator', () => {
       mockAggregator(SumAggregator);
 
-      it('should serialize records without labels', async () => {
+      it('should serialize records without attributes', async () => {
         const serializer = new PrometheusSerializer();
 
         const meter = new MeterProvider({
           processor: new ExactProcessor(SumAggregator),
         }).getMeter('test');
         const counter = meter.createCounter('test_total') as CounterMetric;
-        counter.bind({}).add(1);
+        counter.add(1);
 
         const records = await counter.getMetricRecord();
         const record = records[0];
@@ -444,21 +444,19 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(result, `test_total 1 ${mockedHrTimeMs}\n`);
       });
 
-      it('should serialize non-string label values', async () => {
+      it('should serialize non-string attribute values', async () => {
         const serializer = new PrometheusSerializer();
 
         const meter = new MeterProvider({
           processor: new ExactProcessor(SumAggregator),
         }).getMeter('test');
         const counter = meter.createCounter('test_total') as CounterMetric;
-        counter
-          .bind(({
-            object: {},
-            NaN: NaN,
-            null: null,
-            undefined: undefined,
-          } as unknown) as Labels)
-          .add(1);
+        counter.add(1, ({
+          object: {},
+          NaN: NaN,
+          null: null,
+          undefined: undefined,
+        } as unknown) as Attributes);
         const records = await counter.getMetricRecord();
         const record = records[0];
 
@@ -487,7 +485,7 @@ describe('PrometheusSerializer', () => {
           const counter = meter.createUpDownCounter(
             'test'
           ) as UpDownCounterMetric;
-          counter.bind(labels).add(esac[0]);
+          counter.add(esac[0], attributes);
           const records = await counter.getMetricRecord();
           const record = records[0];
 
@@ -502,23 +500,21 @@ describe('PrometheusSerializer', () => {
         }
       });
 
-      it('should escape backslash (\\), double-quote ("), and line feed (\\n) in label values', async () => {
+      it('should escape backslash (\\), double-quote ("), and line feed (\\n) in attribute values', async () => {
         const serializer = new PrometheusSerializer();
 
         const meter = new MeterProvider({
           processor: new ExactProcessor(SumAggregator),
         }).getMeter('test');
         const counter = meter.createCounter('test_total') as CounterMetric;
-        counter
-          .bind(({
-            backslash: '\u005c', // \ => \\ (\u005c\u005c)
-            doubleQuote: '\u0022', // " => \" (\u005c\u0022)
-            lineFeed: '\u000a', // ↵ => \n (\u005c\u006e)
-            backslashN: '\u005c\u006e', // \n => \\n (\u005c\u005c\u006e)
-            backslashDoubleQuote: '\u005c\u0022', // \" => \\\" (\u005c\u005c\u005c\u0022)
-            backslashLineFeed: '\u005c\u000a', // \↵ => \\\n (\u005c\u005c\u005c\u006e)
-          } as unknown) as Labels)
-          .add(1);
+        counter.add(1, ({
+          backslash: '\u005c', // \ => \\ (\u005c\u005c)
+          doubleQuote: '\u0022', // " => \" (\u005c\u0022)
+          lineFeed: '\u000a', // ↵ => \n (\u005c\u006e)
+          backslashN: '\u005c\u006e', // \n => \\n (\u005c\u005c\u006e)
+          backslashDoubleQuote: '\u005c\u0022', // \" => \\\" (\u005c\u005c\u005c\u0022)
+          backslashLineFeed: '\u005c\u000a', // \↵ => \\\n (\u005c\u005c\u005c\u006e)
+        } as unknown) as Attributes);
         const records = await counter.getMetricRecord();
         const record = records[0];
 
@@ -539,21 +535,19 @@ describe('PrometheusSerializer', () => {
         );
       });
 
-      it('should sanitize label names', async () => {
+      it('should sanitize attribute names', async () => {
         const serializer = new PrometheusSerializer();
 
         const meter = new MeterProvider({
           processor: new ExactProcessor(SumAggregator),
         }).getMeter('test_total');
         const counter = meter.createCounter('test') as CounterMetric;
-        // if you try to use a label name like account-id prometheus will complain
+        // if you try to use a attribute name like account-id prometheus will complain
         // with an error like:
         // error while linting: text format parsing error in line 282: expected '=' after label name, found '-'
-        counter
-          .bind(({
-            'account-id': '123456',
-          } as unknown) as Labels)
-          .add(1);
+        counter.add(1, ({
+          'account-id': '123456',
+        } as unknown) as Attributes);
         const records = await counter.getMetricRecord();
         const record = records[0];
 

@@ -16,7 +16,7 @@
 
 import { HrTime } from '@opentelemetry/api';
 import {
-  Labels,
+  Attributes,
   AggregationTemporality,
   ValueType,
 } from '@opentelemetry/api-metrics';
@@ -27,11 +27,10 @@ import { Resource } from '@opentelemetry/resources';
 export enum MetricKind {
   COUNTER,
   UP_DOWN_COUNTER,
-  VALUE_RECORDER,
-  SUM_OBSERVER,
-  UP_DOWN_SUM_OBSERVER,
-  VALUE_OBSERVER,
-  BATCH_OBSERVER,
+  HISTOGRAM,
+  OBSERVABLE_COUNTER,
+  OBSERVABLE_UP_DOWN_COUNTER,
+  OBSERVABLE_GAUGE,
 }
 
 export const MetricKindValues = Object.values(MetricKind);
@@ -78,7 +77,7 @@ export type PointValueType = Sum | LastValue | Histogram;
 
 export interface MetricRecord {
   readonly descriptor: MetricDescriptor;
-  readonly labels: Labels;
+  readonly attributes: Attributes;
   readonly aggregator: Aggregator;
   readonly aggregationTemporality: AggregationTemporality;
   readonly resource: Resource;

@@ -17,44 +17,38 @@
 import * as assert from 'assert';
 import {
   NoopMeterProvider,
-  NOOP_BOUND_COUNTER,
-  NOOP_BOUND_VALUE_RECORDER,
   NOOP_COUNTER_METRIC,
-  NOOP_VALUE_RECORDER_METRIC,
+  NOOP_HISTOGRAM_METRIC,
 } from '../../src';
 
 describe('NoopMeter', () => {
   it('should not crash', () => {
     const meter = new NoopMeterProvider().getMeter('test-noop');
     const counter = meter.createCounter('some-name');
-    const labels = {};
+    const attributes = {};
 
     // ensure NoopMetric does not crash.
-    counter.bind(labels).add(1);
-    counter.unbind(labels);
+    counter.add(1, attributes);
 
     // ensure the correct noop const is returned
     assert.strictEqual(counter, NOOP_COUNTER_METRIC);
-    assert.strictEqual(counter.bind(labels), NOOP_BOUND_COUNTER);
-    counter.clear();
 
-    const valueRecorder = meter.createValueRecorder('some-name');
-    valueRecorder.bind(labels).record(1);
+    const histogram = meter.createHistogram('some-name');
+    histogram.record(1, attributes);
 
     // ensure the correct noop const is returned
-    assert.strictEqual(valueRecorder, NOOP_VALUE_RECORDER_METRIC);
-    assert.strictEqual(valueRecorder.bind(labels), NOOP_BOUND_VALUE_RECORDER);
+    assert.strictEqual(histogram, NOOP_HISTOGRAM_METRIC);
 
     const options = {
       component: 'tests',
       description: 'the testing package',
     };
 
-    const valueRecorderWithOptions = meter.createValueRecorder(
+    const histogramWithOptions = meter.createHistogram(
       'some-name',
       options
     );
-    assert.strictEqual(valueRecorderWithOptions, NOOP_VALUE_RECORDER_METRIC);
+    assert.strictEqual(histogramWithOptions, NOOP_HISTOGRAM_METRIC);
     const counterWithOptions = meter.createCounter('some-name', options);
     assert.strictEqual(counterWithOptions, NOOP_COUNTER_METRIC);
   });
