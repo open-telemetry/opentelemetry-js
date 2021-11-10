@@ -102,7 +102,7 @@ export abstract class InstrumentationBase<T = any>
     } else {
       // internal file
       const files = module.files ?? [];
-      const file = files.find(file => file.name === name);
+      const file = files.find(f => f.name === name);
       if (file && isSupported(file.supportedVersions, version, module.includePrerelease)) {
         file.moduleExports = exports;
         if (this._enabled) {
@@ -113,7 +113,7 @@ export abstract class InstrumentationBase<T = any>
     return exports;
   }
 
-  public enable() {
+  public enable(): void {
     if (this._enabled) {
       return;
     }
@@ -154,7 +154,7 @@ export abstract class InstrumentationBase<T = any>
     }
   }
 
-  public disable() {
+  public disable(): void {
     if (!this._enabled) {
       return;
     }
@@ -172,7 +172,7 @@ export abstract class InstrumentationBase<T = any>
     }
   }
 
-  public isEnabled() {
+  public isEnabled(): boolean {
     return this._enabled;
   }
 }
