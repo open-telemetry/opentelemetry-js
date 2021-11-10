@@ -34,6 +34,7 @@ class FooInstrumentation extends InstrumentationBase {
 }
 
 describe('autoLoader', () => {
+  // eslint-disable-next-line @typescript-eslint/ban-types
   let unload: Function | undefined;
 
   afterEach(() => {
