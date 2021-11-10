@@ -72,8 +72,28 @@ describe('autoLoader', () => {
         }
       });
 
-      it('should enable instrumentation', () => {
+      it('should enable disabled instrumentation', () => {
+        if (typeof unload === 'function') {
+          unload();
+          unload = undefined;
+        }
+        instrumentation = new FooInstrumentation(
+          'foo',
+          '1',
+          { enabled: false }
+        );
+        enableSpy = sinon.spy(instrumentation, 'enable');
+        setTracerProviderSpy = sinon.stub(instrumentation, 'setTracerProvider');
+        unload = registerInstrumentations({
+          instrumentations: [instrumentation],
+          tracerProvider,
+          meterProvider,
+        });
         assert.strictEqual(enableSpy.callCount, 1);
+      });
+
+      it('should NOT enable enabled instrumentation', () => {
+        assert.strictEqual(enableSpy.callCount, 0);
       });
 
       it('should set TracerProvider', () => {
