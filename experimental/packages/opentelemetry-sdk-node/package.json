@@ -57,7 +57,7 @@
   },
   "devDependencies": {
     "@opentelemetry/api": "~1.0.3",
-    "@opentelemetry/context-async-hooks": "1.0.0",
+    "@opentelemetry/context-async-hooks": "1.0.1",
     "@types/mocha": "8.2.3",
     "@types/node": "14.17.11",
     "@types/semver": "7.3.8",
