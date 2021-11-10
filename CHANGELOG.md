@@ -60,6 +60,7 @@ All notable changes to this project will be documented in this file.
 ### :house: (Internal)
 
 * Other
+  * [#2404](https://github.com/open-telemetry/opentelemetry-js/pull/2404) chore: Fix lint warnings in instrumentation package ([@alisabzevari](https://github.com/alisabzevari))
   * [#2533](https://github.com/open-telemetry/opentelemetry-js/pull/2533) chore: regularly close stale issues ([@Rauno56](https://github.com/Rauno56))
   * [#2570](https://github.com/open-telemetry/opentelemetry-js/pull/2570) chore: adding selenium tests with browserstack ([@obecny](https://github.com/obecny))
   * [#2522](https://github.com/open-telemetry/opentelemetry-js/pull/2522) chore: cleanup setting config in instrumentations ([@Flarna](https://github.com/Flarna))
@@ -74,9 +75,10 @@ All notable changes to this project will be documented in this file.
 * `opentelemetry-core`
   * [#2520](https://github.com/open-telemetry/opentelemetry-js/pull/2520) chore(deps): remove unused semver  ([@mhennoch](https://github.com/mhennoch))
 
-### Committers: 22
+### Committers: 23
 
 * (Eliseo) Nathaniel Ruiz Nowell ([@NathanielRN](https://github.com/NathanielRN))
+* Ali Sabzevari ([@alisabzevari](https://github.com/alisabzevari))
 * Antoine Pultier ([@fungiboletus](https://github.com/fungiboletus))
 * Bartlomiej Obecny ([@obecny](https://github.com/obecny))
 * Daniel Dyla ([@dyladan](https://github.com/dyladan))
