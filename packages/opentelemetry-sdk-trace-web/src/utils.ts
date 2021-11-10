@@ -29,13 +29,13 @@ import {
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 // Used to normalize relative URLs
-let a: HTMLAnchorElement | undefined;
+let urlNormalizingAnchor: HTMLAnchorElement | undefined;
 export function getUrlNormalizingAnchor(): HTMLAnchorElement {
-  if (!a) {
-    a = document.createElement('a');
+  if (!urlNormalizingAnchor) {
+    urlNormalizingAnchor = document.createElement('a');
   }
 
-  return a;
+  return urlNormalizingAnchor;
 }
 
 /**
@@ -109,9 +109,9 @@ export function addSpanNetworkEvents(
  * @param filteredResources
  */
 export function sortResources(filteredResources: PerformanceResourceTiming[]): PerformanceResourceTiming[] {
-  return filteredResources.slice().sort((x, y) => {
-    const valueA = x[PTN.FETCH_START];
-    const valueB = y[PTN.FETCH_START];
+  return filteredResources.slice().sort((a, b) => {
+    const valueA = a[PTN.FETCH_START];
+    const valueB = b[PTN.FETCH_START];
     if (valueA > valueB) {
       return 1;
     } else if (valueA < valueB) {
