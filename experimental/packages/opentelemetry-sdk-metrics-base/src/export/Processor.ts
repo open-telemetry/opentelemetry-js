@@ -44,7 +44,7 @@ export abstract class Processor {
 }
 
 /**
- * Processor which retains all dimensions/labels. It accepts all records and
+ * Processor which retains all dimensions/attributes. It accepts all records and
  * passes them for exporting.
  */
 export class UngroupedProcessor extends Processor {
@@ -70,9 +70,9 @@ export class UngroupedProcessor extends Processor {
   }
 
   process(record: MetricRecord): void {
-    const labels = Object.keys(record.labels)
-      .map(k => `${k}=${record.labels[k]}`)
+    const attributes = Object.keys(record.attributes)
+      .map(k => `${k}=${record.attributes[k]}`)
       .join(',');
-    this._batchMap.set(record.descriptor.name + labels, record);
+    this._batchMap.set(record.descriptor.name + attributes, record);
   }
 }

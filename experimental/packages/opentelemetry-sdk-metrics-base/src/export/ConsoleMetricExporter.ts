@@ -30,7 +30,7 @@ export class ConsoleMetricExporter implements MetricExporter {
   ): void {
     for (const metric of metrics) {
       console.log(metric.descriptor);
-      console.log(metric.labels);
+      console.log(metric.attributes);
       const point = metric.aggregator.toPoint();
       if (typeof point.value === 'number') {
         console.log('value: ' + point.value);

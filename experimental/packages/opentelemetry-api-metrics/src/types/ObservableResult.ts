@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { Labels } from './Metric';
+import { Attributes } from './Metric';
 
 /**
  * Interface that is being used in callback function for Observable Metric
  */
 export interface ObservableResult {
-  observe(value: number, labels: Labels): void;
+  observe(value: number, attributes: Attributes): void;
 }

@@ -48,7 +48,7 @@ export function getMethodsToWrap(
 
   // For a method defined in .proto as "UnaryMethod"
   Object.entries(methods).forEach(([name, { originalName }]) => {
-    if (!_methodIsIgnored(name, this._config.ignoreGrpcMethods)) {
+    if (!_methodIsIgnored(name, this.getConfig().ignoreGrpcMethods)) {
       methodList.push(name); // adds camel case method name: "unaryMethod"
       if (
         originalName &&

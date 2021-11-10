@@ -47,9 +47,9 @@ export abstract class ObservableBaseMetric
     this._callback = callback || NOOP_CALLBACK;
   }
 
-  protected _makeInstrument(labels: api.Labels): BoundObservable {
+  protected _makeInstrument(attributes: api.Attributes): BoundObservable {
     return new BoundObservable(
-      labels,
+      attributes,
       this._disabled,
       this._valueType,
       this._processor.aggregatorFor(this._descriptor)
@@ -66,8 +66,8 @@ export abstract class ObservableBaseMetric
   }
 
   protected _processResults(observableResult: ObservableResult): void {
-    observableResult.values.forEach((value, labels) => {
-      const instrument = this.bind(labels);
+    observableResult.values.forEach((value, attributes) => {
+      const instrument = this.bind(attributes);
       instrument.update(value);
     });
   }

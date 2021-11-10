@@ -41,9 +41,9 @@ export class UpDownCounterMetric
       instrumentationLibrary
     );
   }
-  protected _makeInstrument(labels: api.Labels): BoundUpDownCounter {
+  protected _makeInstrument(attributes: api.Attributes): BoundUpDownCounter {
     return new BoundUpDownCounter(
-      labels,
+      attributes,
       this._disabled,
       this._valueType,
       this._processor.aggregatorFor(this._descriptor)
@@ -53,10 +53,10 @@ export class UpDownCounterMetric
   /**
    * Adds the given value to the current value. Values cannot be negative.
    * @param value the value to add.
-   * @param [labels = {}] key-values pairs that are associated with a specific
+   * @param [attributes = {}] key-values pairs that are associated with a specific
    *     metric that you want to record.
    */
-  add(value: number, labels: api.Labels = {}): void {
-    this.bind(labels).add(value);
+  add(value: number, attributes: api.Attributes = {}): void {
+    this.bind(attributes).add(value);
   }
 }

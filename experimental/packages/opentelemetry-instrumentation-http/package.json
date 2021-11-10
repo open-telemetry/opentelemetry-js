@@ -43,7 +43,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/api": "^1.0.2",
+    "@opentelemetry/api": "^1.0.3",
     "@opentelemetry/context-async-hooks": "1.0.0",
     "@opentelemetry/sdk-trace-base": "1.0.0",
     "@opentelemetry/sdk-trace-node": "1.0.0",
@@ -63,13 +63,13 @@
     "request": "2.88.2",
     "request-promise-native": "1.0.9",
     "rimraf": "3.0.2",
-    "sinon": "11.1.2",
+    "sinon": "12.0.1",
     "superagent": "6.1.0",
     "ts-mocha": "8.0.0",
     "typescript": "4.3.5"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^1.0.2"
+    "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
     "@opentelemetry/core": "1.0.0",

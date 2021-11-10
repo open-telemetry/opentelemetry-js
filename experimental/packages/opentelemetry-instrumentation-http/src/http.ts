@@ -44,7 +44,6 @@ import * as utils from './utils';
 import { VERSION } from './version';
 import {
   InstrumentationBase,
-  InstrumentationConfig,
   InstrumentationNodeModuleDefinition,
   isWrapped,
   safeExecuteInTheMiddle,
@@ -60,11 +59,11 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   private readonly _version = process.versions.node;
   private _headerCapture;
 
-  constructor(config: HttpInstrumentationConfig & InstrumentationConfig = {}) {
+  constructor(config?: HttpInstrumentationConfig) {
     super(
       '@opentelemetry/instrumentation-http',
       VERSION,
-      Object.assign({}, config)
+      config
     );
 
     this._headerCapture = this._createHeaderCapture();
@@ -74,8 +73,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     return this._config;
   }
 
-  override setConfig(config: HttpInstrumentationConfig & InstrumentationConfig = {}): void {
-    this._config = Object.assign({}, config);
+  override setConfig(config?: HttpInstrumentationConfig): void {
+    super.setConfig(config);
     this._headerCapture = this._createHeaderCapture();
   }
 

@@ -15,11 +15,6 @@
  */
 
 import {
-  BoundObservableBase,
-  BoundCounter,
-  BoundHistogram,
-} from './BoundInstrument';
-import {
   Observation,
 } from './Observation';
 
@@ -42,8 +37,8 @@ export interface MetricOptions {
    */
   unit?: string;
 
-  /** The map of constant labels for the Metric. */
-  constantLabels?: Map<string, string>;
+  /** The map of constant attributes for the Metric. */
+  constantAttributes?: Map<string, string>;
 
   /**
    * Indicates the metric is a verbose metric that is disabled by default
@@ -68,13 +63,6 @@ export interface MetricOptions {
   aggregationTemporality?: AggregationTemporality;
 }
 
-export interface BatchObserverOptions {
-  /**
-   * Indicates how long the batch metric should wait to update before cancel
-   */
-  maxTimeoutUpdateMS?: number;
-}
-
 /** The Type of value. It describes how the data is reported. */
 export enum ValueType {
   INT,
@@ -86,38 +74,6 @@ export enum AggregationTemporality {
   AGGREGATION_TEMPORALITY_UNSPECIFIED,
   AGGREGATION_TEMPORALITY_DELTA,
   AGGREGATION_TEMPORALITY_CUMULATIVE,
-}
-
-/**
- * Metric represents a base class for different types of metric
- * pre aggregations.
- */
-export interface Metric {
-  /**
-   * Clears all bound instruments from the Metric.
-   */
-  clear(): void;
-}
-
-/**
- * UnboundMetric represents a base class for different types of metric
- * pre aggregations without label value bound yet.
- */
-export interface UnboundMetric<T> extends Metric {
-  /**
-   * Returns a Instrument associated with specified Labels.
-   * It is recommended to keep a reference to the Instrument instead of always
-   * calling this method for every operations.
-   * @param labels key-values pairs that are associated with a specific metric
-   *     that you want to record.
-   */
-  bind(labels: Labels): T;
-
-  /**
-   * Removes the Instrument from the metric, if it is present.
-   * @param labels key-values pairs that are associated with a specific metric.
-   */
-  unbind(labels: Labels): void;
 }
 
 /**
@@ -135,31 +91,32 @@ export interface UnboundMetric<T> extends Metric {
  *   <li> count the number of 5xx errors. </li>
  * <ol>
  */
-export interface Counter extends UnboundMetric<BoundCounter> {
+export interface Counter {
   /**
-   * Adds the given value to the current value. Values cannot be negative.
+   * Increment value of counter by the input. Inputs may not be negative.
    */
-  add(value: number, labels?: Labels): void;
+  add(value: number, attributes?: Attributes): void;
 }
 
-export interface UpDownCounter extends UnboundMetric<BoundCounter> {
+export interface UpDownCounter {
   /**
-   * Adds the given value to the current value. Values can be negative.
+   * Increment value of counter by the input. Inputs may be negative.
    */
-  add(value: number, labels?: Labels): void;
+  add(value: number, attributes?: Attributes): void;
 }
 
-export interface Histogram extends UnboundMetric<BoundHistogram> {
+export interface Histogram {
   /**
    * Records the given value to this histogram.
    */
-  record(value: number, labels?: Labels): void;
+  record(value: number, attributes?: Attributes): void;
 }
 
 /** Base interface for the Observable metrics. */
-export interface ObservableBase extends UnboundMetric<BoundObservableBase> {
+export interface ObservableBase {
   observation: (
-    value: number
+    value: number,
+    attributes?: Attributes,
   ) => Observation;
 }
 
@@ -175,4 +132,4 @@ export type ObservableCounter = ObservableBase;
 /**
  * key-value pairs passed by the user.
  */
-export type Labels = { [key: string]: string };
+export type Attributes = { [key: string]: string };

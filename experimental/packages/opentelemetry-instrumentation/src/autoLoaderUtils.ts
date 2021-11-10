@@ -62,7 +62,13 @@ export function enableInstrumentations(
     if (meterProvider) {
       instrumentation.setMeterProvider(meterProvider);
     }
-    instrumentation.enable();
+    // instrumentations have been already enabled during creation
+    // so enable only if user prevented that by setting enabled to false
+    // this is to prevent double enabling but when calling register all
+    // instrumentations should be now enabled
+    if (!instrumentation.getConfig().enabled) {
+      instrumentation.enable();
+    }
   }
 }
 

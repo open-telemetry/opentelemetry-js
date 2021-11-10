@@ -49,7 +49,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.15.0",
-    "@opentelemetry/api": "^1.0.2",
+    "@opentelemetry/api": "^1.0.3",
     "@opentelemetry/context-zone": "1.0.0",
     "@opentelemetry/propagator-b3": "1.0.0",
     "@opentelemetry/sdk-trace-base": "1.0.0",
@@ -60,7 +60,7 @@
     "babel-loader": "8.2.2",
     "codecov": "3.8.3",
     "istanbul-instrumenter-loader": "3.0.1",
-    "karma": "5.2.3",
+    "karma": "6.3.7",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage-istanbul-reporter": "3.0.3",
     "karma-mocha": "2.0.1",
@@ -69,7 +69,7 @@
     "mocha": "7.2.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "sinon": "11.1.2",
+    "sinon": "12.0.1",
     "ts-loader": "8.3.0",
     "ts-mocha": "8.0.0",
     "typescript": "4.3.5",
@@ -78,7 +78,7 @@
     "webpack-merge": "5.8.0"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^1.0.2"
+    "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
     "@opentelemetry/core": "1.0.0",
