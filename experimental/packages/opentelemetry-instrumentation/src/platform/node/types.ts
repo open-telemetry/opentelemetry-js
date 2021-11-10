@@ -45,6 +45,7 @@ export interface InstrumentationModuleDefinition<T> {
   supportedVersions: string[];
 
   /** Module internal files to be patched  */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   files: InstrumentationModuleFile<any>[];
 
   /** If set to true, the includePrerelease check will be included when calling semver.satisfies */

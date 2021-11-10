@@ -74,7 +74,7 @@ export abstract class InstrumentationAbstract<T = any>
    * Sets MeterProvider to this plugin
    * @param meterProvider
    */
-  public setMeterProvider(meterProvider: MeterProvider) {
+  public setMeterProvider(meterProvider: MeterProvider): void {
     this._meter = meterProvider.getMeter(
       this.instrumentationName,
       this.instrumentationVersion
@@ -82,7 +82,7 @@ export abstract class InstrumentationAbstract<T = any>
   }
 
   /* Returns InstrumentationConfig */
-  public getConfig() {
+  public getConfig(): types.InstrumentationConfig {
     return this._config;
   }
 
@@ -90,7 +90,7 @@ export abstract class InstrumentationAbstract<T = any>
    * Sets InstrumentationConfig to this plugin
    * @param InstrumentationConfig
    */
-  public setConfig(config: types.InstrumentationConfig = {}) {
+  public setConfig(config: types.InstrumentationConfig = {}): void {
     this._config = Object.assign({}, config);
   }
 
@@ -98,7 +98,7 @@ export abstract class InstrumentationAbstract<T = any>
    * Sets TraceProvider to this plugin
    * @param tracerProvider
    */
-  public setTracerProvider(tracerProvider: TracerProvider) {
+  public setTracerProvider(tracerProvider: TracerProvider): void {
     this._tracer = tracerProvider.getTracer(
       this.instrumentationName,
       this.instrumentationVersion
