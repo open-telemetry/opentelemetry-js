@@ -47,6 +47,7 @@ export interface ShimWrapped extends Function {
 export interface InstrumentationLibrary {
   readonly name: string;
   readonly version?: string;
+  readonly schemaUrl?: string;
 }
 
 /** Defines an error handler function */

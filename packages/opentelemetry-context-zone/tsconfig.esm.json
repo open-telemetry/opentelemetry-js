@@ -7,5 +7,10 @@
   },
   "include": [
     "src/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../opentelemetry-context-zone-peer-dep/tsconfig.esm.json"
+    }
   ]
 }

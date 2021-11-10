@@ -25,7 +25,7 @@ import {
 import { Resource } from '@opentelemetry/resources';
 import { BasicTracerProvider } from './BasicTracerProvider';
 import { Span } from './Span';
-import { SpanLimits, TracerConfig } from './types';
+import { GeneralLimits, SpanLimits, TracerConfig } from './types';
 import { mergeConfig } from './utility';
 import { SpanProcessor } from './SpanProcessor';
 
@@ -34,6 +34,7 @@ import { SpanProcessor } from './SpanProcessor';
  */
 export class Tracer implements api.Tracer {
   private readonly _sampler: api.Sampler;
+  private readonly _generalLimits: GeneralLimits;
   private readonly _spanLimits: SpanLimits;
   private readonly _idGenerator: IdGenerator;
   readonly resource: Resource;
@@ -49,6 +50,7 @@ export class Tracer implements api.Tracer {
   ) {
     const localConfig = mergeConfig(config);
     this._sampler = localConfig.sampler;
+    this._generalLimits = localConfig.generalLimits;
     this._spanLimits = localConfig.spanLimits;
     this._idGenerator = config.idGenerator || new RandomIdGenerator();
     this.resource = _tracerProvider.resource;
@@ -210,6 +212,11 @@ export class Tracer implements api.Tracer {
     const contextWithSpanSet = api.trace.setSpan(parentContext, span);
 
     return api.context.with(contextWithSpanSet, fn, undefined, span);
+  }
+
+  /** Returns the active {@link GeneralLimits}. */
+  getGeneralLimits(): GeneralLimits {
+    return this._generalLimits;
   }
 
   /** Returns the active {@link SpanLimits}. */

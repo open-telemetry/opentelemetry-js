@@ -229,11 +229,7 @@ export class Span implements api.Span, ReadableSpan {
 
   private _isSpanEnded(): boolean {
     if (this._ended) {
-      api.diag.warn(
-        'Can not execute the operation on ended Span {traceId: %s, spanId: %s}',
-        this._spanContext.traceId,
-        this._spanContext.spanId
-      );
+      api.diag.warn(`Can not execute the operation on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`);
     }
     return this._ended;
   }

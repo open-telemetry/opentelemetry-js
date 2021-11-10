@@ -1,0 +1,70 @@
+{
+  "name": "@opentelemetry/selenium-tests",
+  "version": "0.0.1",
+  "description": "OpenTelemetry Selenium Tests",
+  "main": "index.js",
+  "repository": "open-telemetry/opentelemetry-js",
+  "scripts": {
+    "all:bs": "nightwatch ./tests  --parallel --env browserstack.chrome,browserstack.safari,browserstack.firefox",
+    "all:local": "nightwatch ./tests --parallel --env selenium.chrome",
+    "local:bs:fetch": "node scripts/local.runner.js --test ./tests/fetch/fetch.js --parallel --env browserstack.local_chrome,browserstack.local_firefox,browserstack.local_safari",
+    "local:bs:xhr": "node scripts/local.runner.js --test ./tests/xhr/xhr.js --parallel --env browserstack.local_chrome,browserstack.local_firefox,browserstack.local_ie,browserstack.local_safari",
+    "local:fetch": "nightwatch ./tests/fetch/fetch.js --env selenium.chrome",
+    "local:xhr": "nightwatch ./tests/xhr/xhr.js --env selenium.chrome",
+    "server": "webpack serve --progress --port 8090 --config webpack.dev.js --hot --host 0.0.0.0"
+  },
+  "keywords": [
+    "opentelemetry",
+    "web",
+    "tracing",
+    "profiling",
+    "metrics",
+    "stats"
+  ],
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=10.0.0"
+  },
+  "publishConfig": {
+    "access": "private"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.15.8",
+    "@babel/plugin-proposal-class-properties": "^7.14.5",
+    "@babel/plugin-proposal-decorators": "^7.15.8",
+    "@babel/plugin-transform-runtime": "^7.15.8",
+    "@babel/preset-env": "^7.15.0",
+    "@opentelemetry/api": "^1.0.3",
+    "babel-loader": "^8.2.3",
+    "babel-polyfill": "^6.26.0",
+    "browserstack-local": "^1.4.8",
+    "chromedriver": "^95.0.0",
+    "dotenv": "^10.0.0",
+    "fast-safe-stringify": "^2.1.1",
+    "geckodriver": "^2.0.4",
+    "nightwatch": "^1.7.11",
+    "selenium-server": "^3.141.59",
+    "terser-webpack-plugin": "^5.2.4",
+    "webpack": "^5.60.0",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.3.1",
+    "webpack-merge": "^5.8.0"
+  },
+  "peerDependencies": {
+    "@opentelemetry/api": "^1.0.3"
+  },
+  "dependencies": {
+    "@opentelemetry/context-zone-peer-dep": "^1.0.0",
+    "@opentelemetry/core": "^1.0.0",
+    "@opentelemetry/exporter-otlp-http": "^0.26.0",
+    "@opentelemetry/exporter-zipkin": "^1.0.0",
+    "@opentelemetry/instrumentation": "^0.26.0",
+    "@opentelemetry/instrumentation-fetch": "^0.26.0",
+    "@opentelemetry/instrumentation-xml-http-request": "^0.26.0",
+    "@opentelemetry/sdk-metrics-base": "^0.26.0",
+    "@opentelemetry/sdk-trace-base": "^1.0.0",
+    "@opentelemetry/sdk-trace-web": "^1.0.0",
+    "zone.js": "^0.10.3"
+  }
+}

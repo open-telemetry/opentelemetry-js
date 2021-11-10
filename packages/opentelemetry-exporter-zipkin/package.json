@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-zipkin",
-  "version": "0.25.0",
+  "version": "1.0.0",
   "description": "OpenTelemetry Zipkin Exporter allows the user to send collected traces to Zipkin.",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -54,7 +54,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.15.0",
-    "@opentelemetry/api": "^1.0.2",
+    "@opentelemetry/api": "^1.0.3",
     "@types/mocha": "8.2.3",
     "@types/node": "14.17.11",
     "@types/sinon": "10.0.2",
@@ -62,7 +62,7 @@
     "babel-loader": "8.2.2",
     "codecov": "3.8.3",
     "istanbul-instrumenter-loader": "3.0.1",
-    "karma": "5.2.3",
+    "karma": "6.3.7",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage-istanbul-reporter": "3.0.3",
     "karma-mocha": "2.0.1",
@@ -72,7 +72,7 @@
     "nock": "12.0.3",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "sinon": "11.1.2",
+    "sinon": "12.0.1",
     "ts-loader": "8.3.0",
     "ts-mocha": "8.0.0",
     "typescript": "4.3.5",
@@ -81,12 +81,12 @@
     "webpack-merge": "5.8.0"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^1.0.2"
+    "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "0.25.0",
-    "@opentelemetry/resources": "0.25.0",
-    "@opentelemetry/sdk-trace-base": "0.25.0",
-    "@opentelemetry/semantic-conventions": "0.25.0"
+    "@opentelemetry/core": "1.0.0",
+    "@opentelemetry/resources": "1.0.0",
+    "@opentelemetry/sdk-trace-base": "1.0.0",
+    "@opentelemetry/semantic-conventions": "1.0.0"
   }
 }

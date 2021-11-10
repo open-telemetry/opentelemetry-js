@@ -3,32 +3,35 @@
   "files": [],
   "typedocOptions": {
     "packages": [
-      "packages/opentelemetry-api-metrics",
+      "experimental/packages/opentelemetry-api-metrics",
+      "experimental/packages/opentelemetry-exporter-trace-otlp-grpc",
+      "experimental/packages/opentelemetry-exporter-trace-otlp-http",
+      "experimental/packages/opentelemetry-exporter-trace-otlp-proto",
+      "experimental/packages/opentelemetry-exporter-prometheus",
+      "experimental/packages/opentelemetry-instrumentation-fetch",
+      "experimental/packages/opentelemetry-instrumentation-grpc",
+      "experimental/packages/opentelemetry-instrumentation-http",
+      "experimental/packages/opentelemetry-instrumentation-xml-http-request",
+      "experimental/packages/opentelemetry-instrumentation",
+      "experimental/packages/opentelemetry-sdk-node",
+      "experimental/packages/opentelemetry-exporter-metrics-otlp-http",
+      "experimental/packages/opentelemetry-exporter-metrics-otlp-grpc",
+      "experimental/packages/opentelemetry-exporter-metrics-otlp-proto",
       "packages/opentelemetry-context-async-hooks",
-      "packages/opentelemetry-context-zone",
       "packages/opentelemetry-context-zone-peer-dep",
+      "packages/opentelemetry-context-zone",
       "packages/opentelemetry-core",
-      "packages/opentelemetry-exporter-collector",
-      "packages/opentelemetry-exporter-collector-grpc",
-      "packages/opentelemetry-exporter-collector-proto",
       "packages/opentelemetry-exporter-jaeger",
-      "packages/opentelemetry-exporter-prometheus",
       "packages/opentelemetry-exporter-zipkin",
-      "packages/opentelemetry-instrumentation",
-      "packages/opentelemetry-instrumentation-fetch",
-      "packages/opentelemetry-instrumentation-grpc",
-      "packages/opentelemetry-instrumentation-http",
-      "packages/opentelemetry-instrumentation-xml-http-request",
-      "packages/opentelemetry-metrics",
-      "packages/opentelemetry-node",
       "packages/opentelemetry-propagator-b3",
       "packages/opentelemetry-propagator-jaeger",
       "packages/opentelemetry-resources",
-      "packages/opentelemetry-sdk-node",
+      "packages/opentelemetry-sdk-metrics-base",
+      "packages/opentelemetry-sdk-trace-base",
+      "packages/opentelemetry-sdk-trace-node",
+      "packages/opentelemetry-sdk-trace-web",
       "packages/opentelemetry-semantic-conventions",
-      "packages/opentelemetry-shim-opentracing",
-      "packages/opentelemetry-tracing",
-      "packages/opentelemetry-web"
+      "packages/opentelemetry-shim-opentracing"
     ],
     "out": "docs",
     "exclude": [
@@ -42,18 +45,6 @@
   },
   "references": [
     {
-      "path": "backwards-compatability/node10"
-    },
-    {
-      "path": "backwards-compatability/node12"
-    },
-    {
-      "path": "backwards-compatability/node8"
-    },
-    {
-      "path": "packages/opentelemetry-api-metrics"
-    },
-    {
       "path": "packages/opentelemetry-context-async-hooks"
     },
     {
@@ -66,37 +57,10 @@
       "path": "packages/opentelemetry-core"
     },
     {
-      "path": "packages/opentelemetry-exporter-collector-grpc"
-    },
-    {
-      "path": "packages/opentelemetry-exporter-collector-proto"
-    },
-    {
-      "path": "packages/opentelemetry-exporter-collector"
-    },
-    {
       "path": "packages/opentelemetry-exporter-jaeger"
     },
     {
-      "path": "packages/opentelemetry-exporter-prometheus"
-    },
-    {
       "path": "packages/opentelemetry-exporter-zipkin"
-    },
-    {
-      "path": "packages/opentelemetry-instrumentation-fetch"
-    },
-    {
-      "path": "packages/opentelemetry-instrumentation-grpc"
-    },
-    {
-      "path": "packages/opentelemetry-instrumentation-http"
-    },
-    {
-      "path": "packages/opentelemetry-instrumentation-xml-http-request"
-    },
-    {
-      "path": "packages/opentelemetry-instrumentation"
     },
     {
       "path": "packages/opentelemetry-propagator-b3"
@@ -106,12 +70,6 @@
     },
     {
       "path": "packages/opentelemetry-resources"
-    },
-    {
-      "path": "packages/opentelemetry-sdk-metrics-base"
-    },
-    {
-      "path": "packages/opentelemetry-sdk-node"
     },
     {
       "path": "packages/opentelemetry-sdk-trace-base"
