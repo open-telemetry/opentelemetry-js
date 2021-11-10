@@ -295,7 +295,7 @@ export function parseUrl(url: string): HTMLAnchorElement {
  * @param optimised - when id attribute of element is present the xpath can be
  * simplified to contain id
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-module-boundary-types
 export function getElementXPath(target: any, optimised?: boolean): string {
   if (target.nodeType === Node.DOCUMENT_NODE) {
     return '/';
