@@ -18,7 +18,7 @@ import * as metrics from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Measurement } from './Measurement';
 import { MeterProvider } from './MeterProvider';
-import { Histogram, Metric } from './Metric';
+import { Histogram, Instrument } from './Instruments';
 
 export class Meter implements metrics.Meter {
     // instrumentation library required by spec to be on meter
@@ -54,7 +54,7 @@ export class Meter implements metrics.Meter {
         throw new Error('Method not implemented.');
     }
 
-    public aggregate(metric: Metric, measurement: Measurement) {
+    public aggregate(metric: Instrument, measurement: Measurement) {
         this._provider.aggregate(this, metric, measurement);
     }
 }
