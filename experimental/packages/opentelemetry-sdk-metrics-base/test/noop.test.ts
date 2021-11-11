@@ -14,18 +14,6 @@
  * limitations under the License.
  */
 
-import {
-  ObservableResult as TypeObservableResult,
-  Attributes,
-} from '@opentelemetry/api-metrics';
-
-/**
- * Implementation of {@link TypeObservableResult}
- */
-export class ObservableResult implements TypeObservableResult {
-  values: Map<Attributes, number> = new Map<Attributes, number>();
-
-  observe(value: number, attributes: Attributes): void {
-    this.values.set(attributes, value);
-  }
-}
+describe('nothing', () => {
+    it.skip('tests nothing');
+});
