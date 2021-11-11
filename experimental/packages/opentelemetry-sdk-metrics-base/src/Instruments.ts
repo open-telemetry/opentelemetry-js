@@ -16,7 +16,6 @@
 
 import * as api from '@opentelemetry/api';
 import * as metrics from '@opentelemetry/api-metrics';
-import { Attributes } from '@opentelemetry/api-metrics';
 import { Meter } from './Meter';
 
 export enum InstrumentType {
@@ -42,7 +41,7 @@ export class Instrument {
         return this._version;
     }
 
-    aggregate(value: number, attributes: Attributes = {}, ctx: api.Context = api.context.active()) {
+    aggregate(value: number, attributes: metrics.Attributes = {}, ctx: api.Context = api.context.active()) {
         this._meter.aggregate(this, {
             value,
             attributes,
@@ -52,13 +51,13 @@ export class Instrument {
 }
 
 export class UpDownCounter extends Instrument implements metrics.Counter {
-    add(value: number, attributes?: Attributes, ctx?: api.Context): void {
+    add(value: number, attributes?: metrics.Attributes, ctx?: api.Context): void {
         this.aggregate(value, attributes, ctx);
     }
 }
 
 export class Counter extends Instrument implements metrics.Counter {
-    add(value: number, attributes?: Attributes, ctx?: api.Context): void {
+    add(value: number, attributes?: metrics.Attributes, ctx?: api.Context): void {
         if (value < 0) {
             api.diag.warn(`negative value provided to counter ${this.getName()}: ${value}`);
             return;
@@ -69,7 +68,7 @@ export class Counter extends Instrument implements metrics.Counter {
 }
 
 export class Histogram extends Instrument implements metrics.Histogram {
-    record(value: number, attributes?: Attributes, ctx?: api.Context): void {
+    record(value: number, attributes?: metrics.Attributes, ctx?: api.Context): void {
         this.aggregate(value, attributes, ctx);
     }
 }
