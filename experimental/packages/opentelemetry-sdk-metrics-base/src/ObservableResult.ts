@@ -25,7 +25,7 @@ import {
 export class ObservableResult implements TypeObservableResult {
   values: Map<Attributes, number> = new Map<Attributes, number>();
 
-  observe(value: number, attributes: Attributes): void {
+  observe(value: number, attributes: Attributes = {}): void {
     this.values.set(attributes, value);
   }
 }
