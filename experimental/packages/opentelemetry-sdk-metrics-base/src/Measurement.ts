@@ -15,10 +15,11 @@
  */
 
 import * as api from '@opentelemetry/api'
+import { Attributes } from '@opentelemetry/api-metrics'
 
 export type Measurement = {
     value: number;
     // TODO use common attributes
-    attributes: api.SpanAttributes;
+    attributes: Attributes
     context?: api.Context;
 }

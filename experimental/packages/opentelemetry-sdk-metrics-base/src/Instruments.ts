@@ -16,7 +16,7 @@
 
 import * as api from '@opentelemetry/api';
 import * as metrics from '@opentelemetry/api-metrics';
-import { Measurement } from './Measurement';
+import { Attributes } from '@opentelemetry/api-metrics';
 import { Meter } from './Meter';
 
 export enum InstrumentType {
@@ -42,22 +42,8 @@ export class Instrument {
         return this._version;
     }
 
-    aggregate(measurement: Measurement) {
-        this._meter.aggregate(this, measurement);
-    }
-}
-
-export class UpDownCounter extends Instrument implements metrics.Counter {
-    add(value: number, attributes?: api.SpanAttributes, ctx?: api.Context): void {
-        if (typeof value != 'number') {
-            api.diag.warn(`invalid type value provided to counter ${this.getName()}: ${typeof value}`);
-            return;
-        }
-
-        attributes = attributes ?? {};
-        ctx = ctx ?? api.context.active();
-
-        this.aggregate({
+    aggregate(value: number, attributes: Attributes = {}, ctx: api.Context = api.context.active()) {
+        this._meter.aggregate(this, {
             value,
             attributes,
             context: ctx,
@@ -65,19 +51,25 @@ export class UpDownCounter extends Instrument implements metrics.Counter {
     }
 }
 
-export class Counter extends UpDownCounter implements metrics.Counter {
-    override add(value: number, attributes?: api.SpanAttributes, ctx?: api.Context): void {
+export class UpDownCounter extends Instrument implements metrics.Counter {
+    add(value: number, attributes?: Attributes, ctx?: api.Context): void {
+        this.aggregate(value, attributes, ctx);
+    }
+}
+
+export class Counter extends Instrument implements metrics.Counter {
+    add(value: number, attributes?: Attributes, ctx?: api.Context): void {
         if (value < 0) {
             api.diag.warn(`negative value provided to counter ${this.getName()}: ${value}`);
             return;
         }
 
-        return super.add(value, attributes, ctx);
+        this.aggregate(value, attributes, ctx);
     }
 }
 
 export class Histogram extends Instrument implements metrics.Histogram {
-    record(_measurement: number, _labels?: metrics.Attributes, _context?: api.Context): void {
-        throw new Error('Method not implemented.');
+    record(value: number, attributes?: Attributes, ctx?: api.Context): void {
+        this.aggregate(value, attributes, ctx);
     }
 }
