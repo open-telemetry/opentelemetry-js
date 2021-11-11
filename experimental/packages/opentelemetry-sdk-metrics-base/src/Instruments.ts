@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
-export { MeterProvider, MeterProviderOptions } from './MeterProvider';
-export * from './MetricExporter';
-export * from './MetricReader';
+export enum InstrumentType {
+    COUNTER = 'COUNTER',
+    HISTOGRAM = 'HISTOGRAM',
+    UP_DOWN_COUNTER = 'UP_DOWN_COUNTER',
+    OBSERVABLE_COUNTER = 'OBSERVABLE_COUNTER',
+    OBSERVABLE_GAUGE = 'OBSERVABLE_GAUGE',
+    OBSERVABLE_UP_DOWN_COUNTER = 'OBSERVABLE_UP_DOWN_COUNTER',
+}

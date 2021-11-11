@@ -14,6 +14,29 @@
  * limitations under the License.
  */
 
-export { MeterProvider, MeterProviderOptions } from './MeterProvider';
-export * from './MetricExporter';
-export * from './MetricReader';
+export abstract class MetricExporter {
+    private _shutdown = false;
+
+    async shutdown(): Promise<void> {
+        try {
+            await this.forceFlush();
+        } finally {
+            this._shutdown = true;
+        }
+    }
+
+    abstract forceFlush(): Promise<void>;
+
+    isShutdown() {
+        return this._shutdown;
+    }
+}
+
+export class ConsoleMetricExporter extends MetricExporter {
+    export() {
+        throw new Error('Method not implemented');
+    }
+
+    // nothing to do
+    async forceFlush() {}
+}

@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
-export { MeterProvider, MeterProviderOptions } from './MeterProvider';
-export * from './MetricExporter';
-export * from './MetricReader';
+import * as api from '@opentelemetry/api'
+
+export type Measurement = {
+    value: number;
+    // TODO use common attributes
+    attributes: api.SpanAttributes;
+    context?: api.Context;
+}

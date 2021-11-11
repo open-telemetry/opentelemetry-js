@@ -14,6 +14,29 @@
  * limitations under the License.
  */
 
-export { MeterProvider, MeterProviderOptions } from './MeterProvider';
-export * from './MetricExporter';
-export * from './MetricReader';
+import { MetricExporter } from '.';
+
+export class MetricReader {
+    private _shutdown = false;
+
+    constructor(private _exporter: MetricExporter) {}
+
+    async shutdown(): Promise<void> {
+        if (this._shutdown) {
+            return;
+        }
+
+        this._shutdown = true;
+        // errors thrown to caller
+        await this._exporter.shutdown();
+    }
+
+    async forceFlush(): Promise<void> {
+        if (this._shutdown) {
+            return;
+        }
+
+        // errors thrown to caller
+        await this._exporter.forceFlush();
+    }
+}
