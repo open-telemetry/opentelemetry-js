@@ -7,5 +7,16 @@
   },
   "include": [
     "src/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../opentelemetry-api-metrics/tsconfig.esm.json"
+    },
+    {
+      "path": "../opentelemetry-exporter-trace-otlp-http/tsconfig.esm.json"
+    },
+    {
+      "path": "../opentelemetry-sdk-metrics-base/tsconfig.esm.json"
+    }
   ]
 }

@@ -7,13 +7,5 @@
   "include": [
     "src/**/*.ts",
     "test/**/*.ts"
-  ],
-  "references": [
-    {
-      "path": "../opentelemetry-api-metrics"
-    },
-    {
-      "path": "../opentelemetry-sdk-metrics-base"
-    }
   ]
 }
