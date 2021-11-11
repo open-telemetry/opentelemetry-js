@@ -14,16 +14,4 @@
  * limitations under the License.
  */
 
-export * from './BoundInstrument';
-export * from './CounterMetric';
-export * from './HistogramMetric';
-export * from './Meter';
-export * from './MeterProvider';
-export * from './Metric';
-export * from './ObservableGaugeMetric';
-export * from './export/aggregators';
-export * from './export/ConsoleMetricExporter';
-export * from './export/Processor';
-export * from './export/types';
-export * from './UpDownCounterMetric';
-export { MeterConfig } from './types';
+export * from './version';
