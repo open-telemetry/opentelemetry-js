@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sdk-metrics-base-wip",
-  "version": "0.26.0",
+  "version": "0.27.0",
   "private": true,
   "description": "Work in progress OpenTelemetry metrics SDK",
   "main": "build/src/index.js",
@@ -64,7 +64,7 @@
     "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
-    "@opentelemetry/api-metrics": "0.26.0",
+    "@opentelemetry/api-metrics": "0.27.0",
     "@opentelemetry/core": "1.0.0",
     "@opentelemetry/resources": "1.0.0",
     "lodash.merge": "^4.6.2"
