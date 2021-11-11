@@ -45,15 +45,15 @@ describe('ConsoleMetricExporter', () => {
         description: 'a test description',
       }) as CounterMetric;
       const boundCounter = counter.bind({
-        key1: 'labelValue1',
-        key2: 'labelValue2',
+        key1: 'attributeValue1',
+        key2: 'attributeValue2',
       });
       boundCounter.add(10);
 
       await meter.collect();
       consoleExporter.export(meter.getProcessor().checkPointSet(), () => {});
       assert.strictEqual(spyConsole.args.length, 3);
-      const [descriptor, labels, value] = spyConsole.args;
+      const [descriptor, attributes, value] = spyConsole.args;
       assert.deepStrictEqual(descriptor, [
         {
           description: 'a test description',
@@ -63,10 +63,10 @@ describe('ConsoleMetricExporter', () => {
           valueType: ValueType.DOUBLE,
         },
       ]);
-      assert.deepStrictEqual(labels, [
+      assert.deepStrictEqual(attributes, [
         {
-          key1: 'labelValue1',
-          key2: 'labelValue2',
+          key1: 'attributeValue1',
+          key2: 'attributeValue2',
         },
       ]);
       assert.deepStrictEqual(value[0], 'value: 10');

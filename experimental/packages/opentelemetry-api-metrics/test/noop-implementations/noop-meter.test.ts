@@ -25,16 +25,16 @@ describe('NoopMeter', () => {
   it('should not crash', () => {
     const meter = new NoopMeterProvider().getMeter('test-noop');
     const counter = meter.createCounter('some-name');
-    const labels = {};
+    const attributes = {};
 
     // ensure NoopMetric does not crash.
-    counter.add(1, labels);
+    counter.add(1, attributes);
 
     // ensure the correct noop const is returned
     assert.strictEqual(counter, NOOP_COUNTER_METRIC);
 
     const histogram = meter.createHistogram('some-name');
-    histogram.record(1, labels);
+    histogram.record(1, attributes);
 
     // ensure the correct noop const is returned
     assert.strictEqual(histogram, NOOP_HISTOGRAM_METRIC);

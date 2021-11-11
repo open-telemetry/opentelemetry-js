@@ -16,16 +16,16 @@
 
 import {
   ObservableResult as TypeObservableResult,
-  Labels,
+  Attributes,
 } from '@opentelemetry/api-metrics';
 
 /**
  * Implementation of {@link TypeObservableResult}
  */
 export class ObservableResult implements TypeObservableResult {
-  values: Map<Labels, number> = new Map<Labels, number>();
+  values: Map<Attributes, number> = new Map<Attributes, number>();
 
-  observe(value: number, labels: Labels): void {
-    this.values.set(labels, value);
+  observe(value: number, attributes: Attributes): void {
+    this.values.set(attributes, value);
   }
 }

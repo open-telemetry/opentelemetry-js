@@ -70,4 +70,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-sdk-trace-base&type=dev
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-sdk-trace-base&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/sdk-trace-base
-[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Ftracing.svg
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fsdk-trace-base.svg

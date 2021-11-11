@@ -41,9 +41,9 @@ export class ExactProcessor<T, R extends Aggregator> extends Processor {
   }
 
   process(record: MetricRecord): void {
-    const labels = Object.keys(record.labels)
-      .map(k => `${k}=${record.labels[k]}`)
+    const attributes = Object.keys(record.attributes)
+      .map(k => `${k}=${record.attributes[k]}`)
       .join(',');
-    this._batchMap.set(record.descriptor.name + labels, record);
+    this._batchMap.set(record.descriptor.name + attributes, record);
   }
 }

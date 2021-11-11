@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Labels } from '@opentelemetry/api-metrics';
+import { Attributes } from '@opentelemetry/api-metrics';
 
 /**
  * Type guard to remove nulls from arrays
@@ -26,11 +26,11 @@ export function notNull<T>(value: T | null): value is T {
 }
 
 /**
- * Converting the unordered labels into unique identifier string.
- * @param labels user provided unordered Labels.
+ * Converting the unordered attributes into unique identifier string.
+ * @param attributes user provided unordered Attributes.
  */
-export function hashLabels(labels: Labels): string {
-  let keys = Object.keys(labels);
+export function hashAttributes(attributes: Attributes): string {
+  let keys = Object.keys(attributes);
   if (keys.length === 0) return '';
 
   keys = keys.sort();
@@ -38,6 +38,6 @@ export function hashLabels(labels: Labels): string {
     if (result.length > 2) {
       result += ',';
     }
-    return (result += key + ':' + labels[key]);
+    return (result += key + ':' + attributes[key]);
   }, '|#');
 }

@@ -18,7 +18,7 @@ import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BaseBoundInstrument } from './BoundInstrument';
 import { MetricDescriptor, MetricKind, MetricRecord } from './export/types';
-import { hashLabels } from './Utils';
+import { hashAttributes } from './Utils';
 
 /** This is a SDK implementation of {@link Metric} interface. */
 export abstract class Metric<T extends BaseBoundInstrument> {
@@ -50,28 +50,28 @@ export abstract class Metric<T extends BaseBoundInstrument> {
   }
 
   /**
-   * Returns an Instrument associated with specified Labels.
+   * Returns an Instrument associated with specified Attributes.
    * It is recommended to keep a reference to the Instrument instead of always
    * calling this method for each operation.
-   * @param labels key-values pairs that are associated with a specific metric
+   * @param attributes key-values pairs that are associated with a specific metric
    *     that you want to record.
    */
-  bind(labels: api.Labels): T {
-    const hash = hashLabels(labels);
+  bind(attributes: api.Attributes): T {
+    const hash = hashAttributes(attributes);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if (this._instruments.has(hash)) return this._instruments.get(hash)!;
 
-    const instrument = this._makeInstrument(labels);
+    const instrument = this._makeInstrument(attributes);
     this._instruments.set(hash, instrument);
     return instrument;
   }
 
   /**
    * Removes the Instrument from the metric, if it is present.
-   * @param labels key-values pairs that are associated with a specific metric.
+   * @param attributes key-values pairs that are associated with a specific metric.
    */
-  unbind(labels: api.Labels): void {
-    this._instruments.delete(hashLabels(labels));
+  unbind(attributes: api.Attributes): void {
+    this._instruments.delete(hashAttributes(attributes));
   }
 
   /**
@@ -97,7 +97,7 @@ export abstract class Metric<T extends BaseBoundInstrument> {
       resolve(
         Array.from(this._instruments.values()).map(instrument => ({
           descriptor: this._descriptor,
-          labels: instrument.getLabels(),
+          attributes: instrument.getAttributes(),
           aggregator: instrument.getAggregator(),
           aggregationTemporality: this.getAggregationTemporality(),
           resource: this.resource,
@@ -118,5 +118,5 @@ export abstract class Metric<T extends BaseBoundInstrument> {
     };
   }
 
-  protected abstract _makeInstrument(labels: api.Labels): T;
+  protected abstract _makeInstrument(attributes: api.Attributes): T;
 }

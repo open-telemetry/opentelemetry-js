@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 import * as assert from 'assert';
-import { PrometheusLabelsBatcher } from '../src/PrometheusLabelsBatcher';
+import { PrometheusAttributesBatcher } from '../src/PrometheusAttributesBatcher';
 import {
   CounterMetric,
   AggregatorKind,
   MeterProvider,
   Meter,
 } from '@opentelemetry/sdk-metrics-base';
-import { Labels } from '@opentelemetry/api-metrics';
+import { Attributes } from '@opentelemetry/api-metrics';
 
 describe('PrometheusBatcher', () => {
   let meter: Meter;
@@ -31,14 +31,14 @@ describe('PrometheusBatcher', () => {
 
   describe('constructor', () => {
     it('should construct a batcher', () => {
-      const batcher = new PrometheusLabelsBatcher();
-      assert(batcher instanceof PrometheusLabelsBatcher);
+      const batcher = new PrometheusAttributesBatcher();
+      assert(batcher instanceof PrometheusAttributesBatcher);
     });
   });
 
   describe('process', () => {
     it('should aggregate metric records with same metric name', async () => {
-      const batcher = new PrometheusLabelsBatcher();
+      const batcher = new PrometheusAttributesBatcher();
       const counter = meter.createCounter('test_counter') as CounterMetric;
       counter.add(1, { val: '1' });
       counter.add(1, { val: '2' });
@@ -53,20 +53,20 @@ describe('PrometheusBatcher', () => {
       assert.strictEqual(checkPointSet[0].records.length, 2);
     });
 
-    it('should recognize identical labels with different key-insertion order', async () => {
-      const batcher = new PrometheusLabelsBatcher();
+    it('should recognize identical attributes with different key-insertion order', async () => {
+      const batcher = new PrometheusAttributesBatcher();
       const counter = meter.createCounter('test_counter') as CounterMetric;
 
-      const label1: Labels = {};
-      label1.key1 = '1';
-      label1.key2 = '2';
+      const attribute1: Attributes = {};
+      attribute1.key1 = '1';
+      attribute1.key2 = '2';
 
-      const label2: Labels = {};
-      label2.key2 = '2';
-      label2.key1 = '1';
+      const attribute2: Attributes = {};
+      attribute2.key2 = '2';
+      attribute2.key1 = '1';
 
-      counter.add(1, label1);
-      counter.add(1, label2);
+      counter.bind(attribute1).add(1);
+      counter.bind(attribute2).add(1);
 
       const records = await counter.getMetricRecord();
       records.forEach(it => batcher.process(it));

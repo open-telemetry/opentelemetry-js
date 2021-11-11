@@ -36,8 +36,8 @@ const counter = meter.createCounter('metric_name', {
   description: 'Example of a counter'
 });
 
-const labels = { pid: process.pid };
-counter.add(10, labels);
+const attributes = { pid: process.pid };
+counter.add(10, attributes);
 ```
 
 ### UpDownCounter
@@ -61,8 +61,8 @@ const counter = meter.createUpDownCounter('metric_name', {
   description: 'Example of a UpDownCounter'
 });
 
-const labels = { pid: process.pid };
-counter.add(Math.random() > 0.5 ? 1 : -1, labels);
+const attributes = { pid: process.pid };
+counter.add(Math.random() > 0.5 ? 1 : -1, attributes);
 ```
 
 ### Observable Gauge
@@ -79,7 +79,7 @@ const meter = new MeterProvider().getMeter('your-meter-name');
 // async callback - for operation that needs to wait for value
 meter.createObservableGauge('your_metric_name', async (observableResult) => {
   const value = await getAsyncValue();
-  observableResult.observe(value, { label: '1' });
+  observableResult.observe(value, { attribute: '1' });
 }, {
   description: 'Example of an async observable gauge with callback',
 });
@@ -94,8 +94,8 @@ function getAsyncValue() {
 
 // sync callback in case you don't need to wait for value
 meter.createObservableGauge('your_metric_name', (observableResult) => {
-  observableResult.observe(getRandomValue(), { label: '1' });
-  observableResult.observe(getRandomValue(), { label: '2' });
+  observableResult.observe(getRandomValue(), { attribute: '1' });
+  observableResult.observe(getRandomValue(), { attribute: '2' });
 }, {
   description: 'Example of a sync observable gauge with callback',
 });
@@ -118,7 +118,7 @@ const meter = new MeterProvider().getMeter('your-meter-name');
 // async callback - for operation that needs to wait for value
 meter.createObservableUpDownCounter('your_metric_name', async (observableResult) => {
   const value = await getAsyncValue();
-  observableResult.observe(value, { label: '1' });
+  observableResult.observe(value, { attribute: '1' });
 }, {
   description: 'Example of an async observable up down counter with callback',
 });
@@ -133,7 +133,7 @@ function getAsyncValue() {
 
 // sync callback in case you don't need to wait for value
 meter.createObservableUpDownCounter('your_metric_name', (observableResult) => {
-  observableResult.observe(getRandomValue(), { label: '1' });
+  observableResult.observe(getRandomValue(), { attribute: '1' });
 }, {
   description: 'Example of a sync observable up down counter with callback',
 });
@@ -157,7 +157,7 @@ const meter = new MeterProvider().getMeter('your-meter-name');
 // async callback in case you need to wait for values
 meter.createObservableCounter('example_metric', async (observableResult) => {
   const value = await getAsyncValue();
-  observableResult.observe(value, { label: '1' });
+  observableResult.observe(value, { attribute: '1' });
 }, {
   description: 'Example of an async observable counter with callback',
 });
@@ -173,7 +173,7 @@ function getAsyncValue() {
 // sync callback in case you don't need to wait for values
 meter.createObservableCounter('example_metric', (observableResult) => {
   const value = getRandomValue();
-  observableResult.observe(value, { label: '1' });
+  observableResult.observe(value, { attribute: '1' });
 }, {
   description: 'Example of a sync observable counter with callback',
 });
@@ -207,4 +207,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-sdk-metrics-base&type=dev
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-sdk-metrics-base&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/sdk-metrics-base
-[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fmetrics.svg
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fsdk-metrics-base.svg

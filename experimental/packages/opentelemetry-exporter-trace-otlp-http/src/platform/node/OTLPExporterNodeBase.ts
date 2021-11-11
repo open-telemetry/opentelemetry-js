@@ -90,5 +90,7 @@ export abstract class OTLPExporterNodeBase<
     promise.then(popPromise, popPromise);
   }
 
+  // TODO: end gzip stream from util.ts if not undefined
+  // It should perhaps be a class member here instead of a variable in util.ts
   onShutdown(): void {}
 }

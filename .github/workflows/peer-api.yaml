@@ -22,8 +22,9 @@ jobs:
         run: npm install semver
 
       - name: Check API dependency semantics (stable)
-        run: lerna exec --ignore propagation-validation-server "node ../../scripts/peer-api-check.js"
+        working-directory: packages
+        run: lerna exec --ignore propagation-validation-server --ignore propagation-validation-server --ignore @opentelemetry/selenium-tests "node ../../scripts/peer-api-check.js"
 
       - name: Check API dependency semantics (experimental)
         working-directory: experimental
-        run: lerna exec --ignore propagation-validation-server "node ../../../scripts/peer-api-check.js"
+        run: lerna exec --ignore propagation-validation-server --ignore @opentelemetry/selenium-tests "node ../../../scripts/peer-api-check.js"
