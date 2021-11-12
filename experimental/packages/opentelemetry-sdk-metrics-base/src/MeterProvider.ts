@@ -74,6 +74,11 @@ export class MeterProvider {
     async shutdown(): Promise<void> {
         // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#shutdown
 
+        if (this._shutdown) {
+            api.diag.warn('shutdown may only be called once per MeterProvider');
+            return;
+        }
+
         // TODO add a timeout - spec leaves it up the the SDK if this is configurable
         this._shutdown = true;
 
