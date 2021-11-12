@@ -10,13 +10,7 @@
   ],
   "references": [
     {
-      "path": "../opentelemetry-api-metrics"
-    },
-    {
       "path": "../opentelemetry-exporter-trace-otlp-http"
-    },
-    {
-      "path": "../opentelemetry-sdk-metrics-base"
     }
   ]
 }
