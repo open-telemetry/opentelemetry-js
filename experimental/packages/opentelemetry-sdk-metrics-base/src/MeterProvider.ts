@@ -72,6 +72,10 @@ export class MeterProvider {
         this._views.push(view);
     }
 
+    /**
+     * Flush all buffered data and shut down the MeterProvider and all exporters and metric readers.
+     * Returns a promise which is resolved when all flushes are complete.
+     */
     async shutdown(): Promise<void> {
         // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#shutdown
 
@@ -83,37 +87,13 @@ export class MeterProvider {
         // TODO add a timeout - spec leaves it up the the SDK if this is configurable
         this._shutdown = true;
 
-        // Shut down all exporters and readers.
-        // Throw the first error and log all others.
-        // TODO make sure it is acceptable to throw here
-        let err: unknown;
-        for (const exporter of this._metricExporters) {
-            try {
-                await exporter.shutdown();
-            } catch (e) {
-                if (e instanceof Error) {
-                    api.diag.error(`Error shutting down: ${e.message}`)
-                }
-                err = err || e;
-            }
-        }
-
-        for (const reader of this._metricReaders) {
-            try {
-                await reader.shutdown();
-            } catch (e) {
-                if (e instanceof Error) {
-                    api.diag.error(`Error shutting down: ${e.message}`)
-                }
-                err = err || e;
-            }
-        }
-
-        if (err != null) {
-            throw err;
-        }
+        await this._forceFlush();
     }
 
+    /**
+     * Notifies all exporters and metric readers to flush any buffered data.
+     * Returns a promise which is resolved when all flushes are complete.
+     */
     async forceFlush(): Promise<void> {
         // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#forceflush
 
@@ -121,36 +101,27 @@ export class MeterProvider {
 
         // do not flush after shutdown
         if (this._shutdown) {
+            api.diag.warn('invalid attempt to force flush after shutdown')
             return;
         }
 
-        // Flush all exporters and readers.
-        // Throw the first error and log all others.
-        let err: unknown;
-        for (const exporter of this._metricExporters) {
+        await this._forceFlush();
+    }
+
+    /** 
+     * A private implementation of force flush which doesn't check if the function is shut down
+     */
+    private async _forceFlush() {
+        // Shut down all exporters and readers.
+        // Catch and log all errors
+        for (const exporter of [...this._metricExporters, ...this._metricReaders]) {
             try {
-                await exporter.forceFlush();
+                await exporter.shutdown();
             } catch (e) {
                 if (e instanceof Error) {
-                    api.diag.error(`Error force flushing: ${e.message}`)
+                    api.diag.error(`Error shutting down: ${e.message}`)
                 }
-                err = err || e;
             }
-        }
-
-        for (const reader of this._metricReaders) {
-            try {
-                await reader.forceFlush();
-            } catch (e) {
-                if (e instanceof Error) {
-                    api.diag.error(`Error force flushing: ${e.message}`)
-                }
-                err = err || e;
-            }
-        }
-
-        if (err != null) {
-            throw err;
         }
     }
 
