@@ -6,6 +6,18 @@
       "path": "packages/opentelemetry-api-metrics/tsconfig.esm.json"
     },
     {
+      "path": "packages/opentelemetry-exporter-metrics-otlp-grpc"
+    },
+    {
+      "path": "packages/opentelemetry-exporter-metrics-otlp-http/tsconfig.esm.json"
+    },
+    {
+      "path": "packages/opentelemetry-exporter-metrics-otlp-proto"
+    },
+    {
+      "path": "packages/opentelemetry-exporter-prometheus"
+    },
+    {
       "path": "packages/opentelemetry-exporter-trace-otlp-grpc"
     },
     {
@@ -13,9 +25,6 @@
     },
     {
       "path": "packages/opentelemetry-exporter-trace-otlp-proto"
-    },
-    {
-      "path": "packages/opentelemetry-exporter-prometheus"
     },
     {
       "path": "packages/opentelemetry-instrumentation-fetch/tsconfig.esm.json"
