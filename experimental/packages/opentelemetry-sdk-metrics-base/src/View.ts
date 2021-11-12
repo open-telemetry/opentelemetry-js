@@ -72,6 +72,7 @@ export class View {
             return true;
         }
 
+        // TODO wildcard support
         return this._selector.instrumentName === name;
     }
 
