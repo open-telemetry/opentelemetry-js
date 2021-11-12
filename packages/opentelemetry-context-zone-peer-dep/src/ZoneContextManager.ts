@@ -15,7 +15,7 @@
  */
 
 import { Context, ContextManager, ROOT_CONTEXT } from '@opentelemetry/api';
-import { Func, TargetWithEvents } from './types';
+import { TargetWithEvents } from './types';
 import { isListenerObject } from './util';
 
 /* Key name to be used to save a context reference in Zone */
@@ -24,7 +24,7 @@ const ZONE_CONTEXT_KEY = 'OT_ZONE_CONTEXT';
 /**
  * ZoneContextManager
  * This module provides an easy functionality for tracing action between asynchronous operations in web.
- * It was not possible with standard [StackContextManager]{@link https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-web/src/StackContextManager.ts}.
+ * It was not possible with standard [StackContextManager]{@link https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-sdk-trace-web/src/StackContextManager.ts}.
  * It heavily depends on [zone.js]{@link https://www.npmjs.com/package/zone.js}.
  * It stores the information about context in zone. Each Context will have always new Zone;
  * It also supports binding a certain Span to a target that has "addEventListener" and "removeEventListener".
@@ -50,12 +50,13 @@ export class ZoneContextManager implements ContextManager {
   }
 
   /**
-   * @param target Function to be executed within the context
    * @param context A context (span) to be executed within target function
+   * @param target Function to be executed within the context
    */
-  private _bindFunction<T extends Function>(target: T, context: Context): T {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  private _bindFunction<T extends Function>(context: Context, target: T): T {
     const manager = this;
-    const contextWrapper = function (this: any, ...args: unknown[]) {
+    const contextWrapper = function (this: unknown, ...args: unknown[]) {
       return manager.with(context, () => target.apply(this, args));
     };
     Object.defineProperty(contextWrapper, 'length', {
@@ -68,10 +69,10 @@ export class ZoneContextManager implements ContextManager {
   }
 
   /**
-   * @param obj target object on which the listeners will be patched
    * @param context A context (span) to be bind to target
+   * @param obj target object on which the listeners will be patched
    */
-  private _bindListener<T>(obj: T, context: Context): T {
+  private _bindListener<T>(context: Context, obj: T): T {
     const target = (obj as unknown) as TargetWithEvents;
     if (target.__ot_listeners !== undefined) {
       return obj;
@@ -134,16 +135,16 @@ export class ZoneContextManager implements ContextManager {
    */
   private _patchAddEventListener(
     target: TargetWithEvents,
-    original: Function,
+    original: NonNullable<TargetWithEvents['addEventListener']>,
     context: Context
   ) {
     const contextManager = this;
 
     return function (
-      this: {},
-      event: string,
-      listener: Func<void>,
-      opts?: any
+      this: TargetWithEvents,
+      event,
+      listener,
+      opts
     ) {
       if (target.__ot_listeners === undefined) {
         target.__ot_listeners = {};
@@ -157,7 +158,7 @@ export class ZoneContextManager implements ContextManager {
       // store a weak reference of the user listener to ours
       listeners.set(listener, patchedListener);
       return original.call(this, event, patchedListener, opts);
-    };
+    } as TargetWithEvents['addEventListener'];
   }
 
   /**
@@ -167,9 +168,9 @@ export class ZoneContextManager implements ContextManager {
    */
   private _patchRemoveEventListener(
     target: TargetWithEvents,
-    original: Function
+    original: NonNullable<TargetWithEvents['removeEventListener']>
   ) {
-    return function (this: {}, event: string, listener: Func<void>) {
+    return function (this: TargetWithEvents, event, listener) {
       if (
         target.__ot_listeners === undefined ||
         target.__ot_listeners[event] === undefined
@@ -180,7 +181,7 @@ export class ZoneContextManager implements ContextManager {
       const patchedListener = events.get(listener);
       events.delete(listener);
       return original.call(this, event, patchedListener || listener);
-    };
+    } as TargetWithEvents['removeEventListener'];
   }
 
   /**
@@ -212,9 +213,9 @@ export class ZoneContextManager implements ContextManager {
       context = this.active();
     }
     if (typeof target === 'function') {
-      return this._bindFunction(target, context);
+      return this._bindFunction(context, target);
     } else if (isListenerObject(target)) {
-      this._bindListener(target, context);
+      this._bindListener(context, target);
     }
     return (target as unknown) as T;
   }

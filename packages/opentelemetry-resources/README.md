@@ -7,7 +7,7 @@
 
 The OpenTelemetry Resource is an immutable representation of the entity producing telemetry. For example, a process producing telemetry that is running in a container on Kubernetes has a Pod name, it is in a namespace and possibly is part of a Deployment which also has a name. All three of these attributes can be included in the `Resource`.
 
-[This document][resource-semantic_conventions] defines standard attributes for resources.
+[This document][resource-semantic_conventions] defines standard attributes for resources which are accessible via [`@opentelemetry/semantic-conventions`](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-semantic-conventions).
 
 ## Installation
 
@@ -18,16 +18,18 @@ npm install --save @opentelemetry/resources
 ## Usage
 
 ```typescript
-import { Resource, SERVICE_RESOURCE } from '@opentelemetry/resources';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { Resource } from '@opentelemetry/resources';
+
 const resource = new Resource({
-    [SERVICE_RESOURCE.NAME]: 'api-service',
+    [SemanticResourceAttributes.SERVICE_NAME]: 'api-service',
 });
 
-const another_resource = new Resource({
-    'service.version': 2.0.0,
+const anotherResource = new Resource({
+    'service.version': '2.0.0',
     'service.group': 'instrumentation-group'
 });
-const merged_resource = resource.merge(another_resource);
+const mergedResource = resource.merge(anotherResource);
 ```
 
 ## Useful links

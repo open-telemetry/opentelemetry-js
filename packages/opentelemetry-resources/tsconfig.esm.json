@@ -7,5 +7,13 @@
   },
   "include": [
     "src/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../opentelemetry-core/tsconfig.esm.json"
+    },
+    {
+      "path": "../opentelemetry-semantic-conventions/tsconfig.esm.json"
+    }
   ]
 }

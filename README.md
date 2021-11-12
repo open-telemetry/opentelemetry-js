@@ -2,10 +2,11 @@
 ---
 <p align="center">
   <strong>
-    <a href="getting-started/README.md">Getting Started<a/>
+    <a href="https://opentelemetry.io/docs/js/getting-started/">Getting Started</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="https://open-telemetry.github.io/opentelemetry-js">API Documentation<a/>
+    <a href="https://open-telemetry.github.io/opentelemetry-js-api">API Reference</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="https://open-telemetry.github.io/opentelemetry-js">SDK Reference</a>
   </strong>
 </p>
 
@@ -28,13 +29,13 @@
 
 <p align="center">
   <strong>
-    <a href="CONTRIBUTING.md">Contributing<a/>
+    <a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/CONTRIBUTING.md">Contributing</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="doc/development-guide.md">Development Guide<a/>
+    <a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/development-guide.md">Development Guide</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="benchmark/README.md">Benchmarks<a/>
+    <a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/benchmark/README.md">Benchmarks</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="examples/">Examples<a/>
+    <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/examples">Examples</a>
   </strong>
 </p>
 
@@ -46,19 +47,25 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 
 ## Compatibility Matrix
 
-| API Version | Core version | Contrib Version         |
-| ----------- |--------------|-------------------------|
-| 0.21.x      | 0.21.x       | ------                  |
-| 0.20.x      | 0.20.x       | 0.20.x                  |
-| v1.0.0-rc.3 | 0.19.x       | 0.16.x                  |
-| 0.18.x      | 0.18.x       | 0.14.x                  |
-|             | 0.17.x       | ------                  |
-|             | 0.16.x       | ------                  |
-|             | 0.15.x       | 0.13.x                  |
-|             | 0.14.x       | 0.12.x                  |
-|             | 0.13.x       | ------                  |
-|             | 0.12.x       | 0.11.x                  |
-|             | 0.11.x       | 0.10.x                  |
+| API Version | Core version | Experimental Packages | Contrib Version         |
+| ----------- |--------------| --------------------- |-------------------------|
+| 1.0.x       | 1.x          | 0.26.x                | 0.26.x                  |
+| 1.0.x       | 0.26.x       | -----                 | ------                  |
+| 1.0.x       | 0.25.x       | -----                 | ------                  |
+| 1.0.x       | 0.24.x       | -----                 | 0.24.x                  |
+| 1.0.x       | 0.23.x       | -----                 | 0.23.x                  |
+| 1.0.x       | 0.22.x       | -----                 | 0.22.x                  |
+| 0.21.x      | 0.21.x       | -----                 | 0.21.x                  |
+| 0.20.x      | 0.20.x       | -----                 | 0.20.x                  |
+| v1.0.0-rc.3 | 0.19.x       | -----                 | 0.16.x                  |
+| 0.18.x      | 0.18.x       | -----                 | 0.14.x                  |
+|             | 0.17.x       | -----                 | ------                  |
+|             | 0.16.x       | -----                 | ------                  |
+|             | 0.15.x       | -----                 | 0.13.x                  |
+|             | 0.14.x       | -----                 | 0.12.x                  |
+|             | 0.13.x       | -----                 | ------                  |
+|             | 0.12.x       | -----                 | 0.11.x                  |
+|             | 0.11.x       | -----                 | 0.10.x                  |
 
 ## Versioning
 
@@ -68,7 +75,63 @@ The current version for each package can be found in the respective `package.jso
 
 ### Application Owner
 
-To get started tracing your own application, see the [Getting Started Guide](getting-started/README.md). For more information about automatic instrumentation see [@opentelemetry/node][otel-node], which provides auto-instrumentation for Node.js applications. If the automatic instrumentation does not suit your needs, or you would like to create manual traces, see [@opentelemetry/tracing][otel-tracing]
+#### Install Dependencies
+
+```shell
+npm install --save @opentelemetry/api
+npm install --save @opentelemetry/sdk-node
+npm install --save @opentelemetry/auto-instrumentations-node
+```
+
+**Note:** `auto-instrumentations-node` is a meta package from [opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/metapackages/auto-instrumentations-node) that provides a simple way to initialize multiple Node.js instrumentations.
+
+#### Instantiate Tracing
+
+```js
+// tracing.js
+
+'use strict'
+
+const process = require('process');
+const opentelemetry = require('@opentelemetry/sdk-node');
+const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
+const { ConsoleSpanExporter } = require('@opentelemetry/sdk-trace-base');
+const { Resource } = require('@opentelemetry/resources');
+const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
+
+// configure the SDK to export telemetry data to the console
+// enable all auto-instrumentations from the meta package
+const traceExporter = new ConsoleSpanExporter();
+const sdk = new opentelemetry.NodeSDK({
+  resource: new Resource({
+    [SemanticResourceAttributes.SERVICE_NAME]: 'my-service',
+  }),
+  traceExporter,
+  instrumentations: [getNodeAutoInstrumentations()]
+});
+
+// initialize the SDK and register with the OpenTelemetry API
+// this enables the API to record telemetry
+sdk.start()
+  .then(() => console.log('Tracing initialized'))
+  .catch((error) => console.log('Error initializing tracing', error));
+
+// gracefully shut down the SDK on process exit
+process.on('SIGTERM', () => {
+  sdk.shutdown()
+    .then(() => console.log('Tracing terminated'))
+    .catch((error) => console.log('Error terminating tracing', error))
+    .finally(() => process.exit(0));
+});
+```
+
+#### Run Your Application
+
+```shell
+node -r ./tracing.js app.js
+```
+
+The above example will emit auto-instrumented telemetry about your Node.js application to the console. For a more in-depth example, see the [Getting Started Guide](https://opentelemetry.io/docs/js/getting-started/). For more information about automatic instrumentation see [@opentelemetry/sdk-trace-node][otel-node], which provides auto-instrumentation for Node.js applications. If the automatic instrumentation does not suit your needs, or you would like to create manual traces, see [@opentelemetry/sdk-trace-base][otel-tracing]
 
 ### Library Author
 
@@ -78,6 +141,7 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 | Platform Version | Supported                                       |
 |------------------|-------------------------------------------------|
+| Node.JS `v16`    | ✅                                               |
 | Node.JS `v14`    | ✅                                               |
 | Node.JS `v12`    | ✅                                               |
 | Node.JS `v10`    | ✅                                               |
@@ -97,21 +161,11 @@ There is currently no list of officially supported browsers, but OpenTelemetry i
 
 ## Feature Status
 
-As of [`v0.19.0`][feature-status-release]:
-
-| Feature             | Status      |
-|---------------------|-------------|
-| B3 Propagation      | Beta        |
-| Zipkin Export       | Beta        |
-| Jaeger Propagation  | Beta        |
-| Jaeger Export       | Beta        |
-| OpenTracing Bridge  | Beta        |
-| Resources           | Beta        |
-| Tracing             | Beta        |
-| W3C Baggage         | Beta        |
-| W3C Trace Context   | Beta        |
-| Metrics API         | Development |
-| Metrics SDK         | Development |
+| Signal  | API Status  | SDK Status        |
+|---------|-------------|-------------------|
+| Tracing | Stable      | Release Candidate |
+| Metrics | Development | Development       |
+| Logs    | Roadmap     | Roadmap           |
 
 For a more detailed breakdown of feature support see the [specification compliance matrix][compliance-matrix].
 
@@ -134,6 +188,7 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 - [Naseem K. Ullah](https://github.com/naseemkullah), Transit
 - [Neville Wylie](https://github.com/MSNev), Microsoft
 - [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal
+- [Rauno Viskus](https://github.com/Rauno56), Splunk
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).*
 
@@ -171,16 +226,16 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 
 | Package                                | Description                                                                                                                                                                                                                                                  |
 |----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [@opentelemetry/tracing][otel-tracing] | This module provides a full control over instrumentation and span creation. It doesn't load [`async_hooks`](https://nodejs.org/api/async_hooks.html) or any instrumentation by default. It is intended for use both on the server and in the browser.        |
-| [@opentelemetry/metrics][otel-metrics] | This module provides instruments and meters for reporting of time series data.                                                                                                                                                                               |
-| [@opentelemetry/node][otel-node]       | This module provides automatic tracing for Node.js applications. It is intended for use on the server only.                                                                                                                                                  |
-| [@opentelemetry/web][otel-web]         | This module provides automated instrumentation and tracing for Web applications. It is intended for use in the browser only.                                                                                                                                 |
+| [@opentelemetry/sdk-trace-base][otel-tracing] | This module provides a full control over instrumentation and span creation. It doesn't load [`async_hooks`](https://nodejs.org/api/async_hooks.html) or any instrumentation by default. It is intended for use both on the server and in the browser.        |
+| [@opentelemetry/sdk-metrics-base][otel-metrics] | This module provides instruments and meters for reporting of time series data.                                                                                                                                                                               |
+| [@opentelemetry/sdk-trace-node][otel-node]       | This module provides automatic tracing for Node.js applications. It is intended for use on the server only.                                                                                                                                                  |
+| [@opentelemetry/sdk-trace-web][otel-web]         | This module provides automated instrumentation and tracing for Web applications. It is intended for use in the browser only.                                                                                                                                 |
 
 ### Compatible Exporters
 
 OpenTelemetry is vendor-agnostic and can upload data to any backend with various exporter implementations. Even though, OpenTelemetry provides support for many backends, vendors/users can also implement their own exporters for proprietary and unofficially supported backends.
 
-See the [OpenTelemetry registry](https://opentelemetry.io/registry/?s=node.js) for a list of exporters available.
+See the [OpenTelemetry registry](https://opentelemetry.io/registry/?language=js&component=exporter#) for a list of exporters available.
 
 ### Instrumentations
 
@@ -231,7 +286,73 @@ To request automatic tracing support for a module not on this list, please [file
 
 ## Upgrade guidelines
 
-### 0.20.x to x
+### 0.26.x to 0.27.x
+
+Metric and trace exporters are split into separate packages:
+
+- `@opentelemetry/exporter-otlp-http` => `@opentelemetry/exporter-trace-otlp-http` and `@opentelemetry/exporter-metrics-otlp-http`
+- `@opentelemetry/exporter-otlp-grpc` => `@opentelemetry/exporter-trace-otlp-grpc` and `@opentelemetry/exporter-metrics-otlp-grpc`
+- `@opentelemetry/exporter-otlp-proto` => `@opentelemetry/exporter-trace-otlp-proto` and `@opentelemetry/exporter-metrics-otlp-proto`
+
+Metric types are renamed:
+
+- `@openetelemetry/api-metrics`
+  - `Meter`
+    - `createValueRecorder` => `createHistogram`
+    - `createValueObserver` => `createObservableGauge`
+    - `createSumObserver` => `createObservableCounter`
+    - `createUpDownSumObserver` => `createObservableUpDownCounter`
+  - `ValueRecorder` => `Histogram`
+  - `ValueObserver` => `ObservableGauge`
+  - `SumObserver` => `ObservableCounter`
+  - `UpDownSumObserver` => `ObservableUpDownCounter`
+  - `ObserverResult` => `ObservableResult`
+  - `Observation.observer` => `Observation.observable`
+- `@opentelemetry/sdk-metrics-base`
+  - `MetricKind`
+    - `VALUE_RECORDER` => `HISTOGRAM`
+    - `SUM_OBSERVER` => `OBSERVABLE_COUNTER`
+    - `UP_DOWN_SUM_OBSERVER` => `OBSERVABLE_UP_DOWN_COUNTER`
+    - `VALUE_OBSERVER` => `OBSERVABLE_GAUGE`
+
+### 0.25.x to 1.x.y
+
+Collector exporter packages and types are renamed:
+
+- `@opentelemetry/exporter-collector` => `@opentelemetry/exporter-otlp-http`
+  - `CollectorExporterBase` => `OTLPExporterBase`
+  - `CollectorTraceExporter` => `OTLPTraceExporter`
+  - `CollectorMetricExporter` => `OTLPMetricExporter`
+  - `CollectorExporterBrowserBase` => `OTLPExporterBrowserBase`
+  - `CollectorExporterNodeBase` => `OTLPExporterNodeBase`
+  - `CollectorExporterConfigBase` => `OTLPExporterConfigBase`
+  - `CollectorExporterError` => `OTLPExporterError`
+  - `COLLECTOR_SPAN_KIND_MAPPING` => `OTLP_SPAN_KIND_MAPPING`
+  - `collectorTypes` => `otlpTypes`
+- `@opentelemetry/exporter-collector-grpc` => `@opentelemetry/exporter-otlp-grpc`
+  - `CollectorTraceExporter` => `OTLPTraceExporter`
+  - `CollectorMetricExporter` => `OTLPMetricExporter`
+  - `CollectorExporterConfigNode` => `OTLPExporterConfigNode`
+- `@opentelemetry/exporter-collector-proto` => `@opentelemetry/exporter-otlp-proto`
+  - `CollectorExporterNodeBase` => `OTLPExporterNodeBase`
+  - `CollectorMetricExporter` => `OTLPMetricExporter`
+  - `CollectorTraceExporter` => `OTLPTraceExporter`
+- W3C propagators in @opentelemetry/core were renamed
+  - `HttpTraceContextPropagator` -> `W3CTraceContextPropagator`
+  - `HttpBaggagePropagator` -> `W3CBaggagePropagator`
+
+### 0.24.x to 0.25.x
+
+- SDKs packages for trace and metrics has been renamed to have a consistent naming schema:
+  - @opentelemetry/tracing -> @opentelemetry/sdk-trace-base
+  - @opentelemetry/node -> @opentelemetry/sdk-trace-node
+  - @opentelemetry/web -> @opentelemetry/sdk-trace-web
+  - @opentelemetry/metrics -> @opentelemetry/sdk-metrics-base
+  - @opentelemetry/node-sdk -> @opentelemetry/sdk-node
+
+### 0.23.x to 0.24.x
+
+- `ResourceAttributes` renamed to `SemanticResourceAttributes` in the `@opentelemetry/semantic-conventions` package
 
 ### 0.19.x to 0.20.0
 
@@ -413,34 +534,33 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [good-first-issues]: https://github.com/open-telemetry/OpenTelemetry-js/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22
 
 [docs]: https://open-telemetry.github.io/opentelemetry-js
-[feature-status-release]: https://github.com/open-telemetry/opentelemetry-js/releases/tag/v0.19.0
 [compliance-matrix]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/spec-compliance-matrix.md
 
-[otel-metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-metrics
-[otel-node]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-node
+[otel-metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-sdk-metrics-base
+[otel-node]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node
 
-[otel-instrumentation-fetch]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-fetch
-[otel-instrumentation-grpc]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-grpc
-[otel-instrumentation-http]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-http
-[otel-instrumentation-xml-http-request]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-xml-http-request
+[otel-instrumentation-fetch]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-fetch
+[otel-instrumentation-grpc]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-grpc
+[otel-instrumentation-http]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-http
+[otel-instrumentation-xml-http-request]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-xml-http-request
 
 [otel-shim-opentracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-shim-opentracing
-[otel-tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-tracing
-[otel-web]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-web
+[otel-tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base
+[otel-web]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-web
 [otel-api]: https://github.com/open-telemetry/opentelemetry-js-api
 [otel-core]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-core
 [generate-api-documentation]: https://github.com/open-telemetry/opentelemetry-js/blob/main/CONTRIBUTING.md#generating-api-documentation
 
-[otel-contrib-instrumentation-dns]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-dns
-[otel-contrib-instrumentation-ioredis]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-ioredis
-[otel-contrib-instrumentation-mongodb]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-mongodb
-[otel-contrib-instrumentation-mysql]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-mysql
-[otel-contrib-instrumentation-pg]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-pg
-[otel-contrib-instrumentation-redis]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-redis
-[otel-contrib-instrumentation-express]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-express
-[otel-contrib-instrumentation-user-interaction]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web/opentelemetry-instrumentation-user-interaction
-[otel-contrib-instrumentation-document-load]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web/opentelemetry-instrumentation-document-load
-[otel-contrib-instrumentation-hapi]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-hapi
-[otel-contrib-instrumentation-koa]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-koa
+[otel-contrib-instrumentation-dns]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-dns
+[otel-contrib-instrumentation-ioredis]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-ioredis
+[otel-contrib-instrumentation-mongodb]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-mongodb
+[otel-contrib-instrumentation-mysql]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-mysql
+[otel-contrib-instrumentation-pg]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-pg
+[otel-contrib-instrumentation-redis]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-redis
+[otel-contrib-instrumentation-express]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-express
+[otel-contrib-instrumentation-user-interaction]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/web/opentelemetry-instrumentation-user-interaction
+[otel-contrib-instrumentation-document-load]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/web/opentelemetry-instrumentation-document-load
+[otel-contrib-instrumentation-hapi]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-hapi
+[otel-contrib-instrumentation-koa]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-koa
 
 [spec-versioning]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/versioning-and-stability.md

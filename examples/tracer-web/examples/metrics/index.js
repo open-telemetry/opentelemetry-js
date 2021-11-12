@@ -1,15 +1,15 @@
 'use strict';
 
 const { DiagConsoleLogger, DiagLogLevel, diag } = require('@opentelemetry/api');
-const { CollectorMetricExporter } = require('@opentelemetry/exporter-collector');
-const { MeterProvider } = require('@opentelemetry/metrics');
+const { OTLPMetricExporter } = require('@opentelemetry/exporter-otlp-http');
+const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
+const { Resource } = require('@opentelemetry/resources');
+const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
 
 // Optional and only needed to see the internal diagnostic logging (during development)
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
 
-const metricExporter = new CollectorMetricExporter({
-  serviceName: 'basic-metric-service',
-});
+const metricExporter = new OTLPMetricExporter();
 
 let interval;
 let meter;
@@ -25,6 +25,9 @@ function startMetrics() {
   meter = new MeterProvider({
     exporter: metricExporter,
     interval: 1000,
+    resource: new Resource({
+      [SemanticResourceAttributes.SERVICE_NAME]: 'basic-metric-service',
+    }),
   }).getMeter('example-exporter-collector');
 
   const requestCounter = meter.createCounter('requests', {
@@ -38,8 +41,8 @@ function startMetrics() {
   const labels = { pid: process.pid, environment: 'staging' };
 
   interval = setInterval(() => {
-    requestCounter.bind(labels).add(1);
-    upDownCounter.bind(labels).add(Math.random() > 0.5 ? 1 : -1);
+    requestCounter.add(1, labels);
+    upDownCounter.add(Math.random() > 0.5 ? 1 : -1, labels);
   }, 1000);
 }
 

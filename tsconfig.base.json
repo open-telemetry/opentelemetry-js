@@ -6,19 +6,20 @@
     "declaration": true,
     "declarationMap": true,
     "forceConsistentCasingInFileNames": true,
+    "incremental": true,
+    "inlineSources": true,
     "module": "commonjs",
+    "newLine": "LF",
     "noEmitOnError": true,
     "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
-    "noImplicitOverride": true,
     "pretty": true,
     "sourceMap": true,
     "strict": true,
     "strictNullChecks": true,
-    "target": "es2017",
-    "incremental": true,
-    "newLine": "LF"
+    "target": "es2017"
   },
   "exclude": [
     "node_modules"

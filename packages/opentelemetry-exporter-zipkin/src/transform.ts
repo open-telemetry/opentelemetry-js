@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ReadableSpan, TimedEvent } from '@opentelemetry/tracing';
+import { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace-base';
 import { hrTimeToMicroseconds } from '@opentelemetry/core';
 import * as zipkinTypes from './types';
 import { Resource } from '@opentelemetry/resources';
@@ -29,8 +29,8 @@ const ZIPKIN_SPAN_KIND_MAPPING = {
   [api.SpanKind.INTERNAL]: undefined,
 };
 
-export const statusCodeTagName = 'ot.status_code';
-export const statusDescriptionTagName = 'ot.status_description';
+export const defaultStatusCodeTagName = 'otel.status_code';
+export const defaultStatusErrorTagName = 'error';
 
 /**
  * Translate OpenTelemetry ReadableSpan to ZipkinSpan format
@@ -40,7 +40,7 @@ export function toZipkinSpan(
   span: ReadableSpan,
   serviceName: string,
   statusCodeTagName: string,
-  statusDescriptionTagName: string
+  statusErrorTagName: string
 ): zipkinTypes.Span {
   const zipkinSpan: zipkinTypes.Span = {
     traceId: span.spanContext().traceId,
@@ -55,7 +55,7 @@ export function toZipkinSpan(
       span.attributes,
       span.status,
       statusCodeTagName,
-      statusDescriptionTagName,
+      statusErrorTagName,
       span.resource
     ),
     annotations: span.events.length
@@ -71,16 +71,18 @@ export function _toZipkinTags(
   attributes: api.SpanAttributes,
   status: api.SpanStatus,
   statusCodeTagName: string,
-  statusDescriptionTagName: string,
+  statusErrorTagName: string,
   resource: Resource
 ): zipkinTypes.Tags {
   const tags: { [key: string]: string } = {};
   for (const key of Object.keys(attributes)) {
     tags[key] = String(attributes[key]);
   }
-  tags[statusCodeTagName] = String(api.SpanStatusCode[status.code]);
-  if (status.message) {
-    tags[statusDescriptionTagName] = status.message;
+  if (status.code !== api.SpanStatusCode.UNSET) {
+    tags[statusCodeTagName] = String(api.SpanStatusCode[status.code]);
+  }
+  if (status.code === api.SpanStatusCode.ERROR && status.message) {
+    tags[statusErrorTagName] = status.message;
   }
 
   Object.keys(resource.attributes).forEach(

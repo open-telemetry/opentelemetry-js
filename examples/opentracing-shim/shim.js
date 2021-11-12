@@ -1,33 +1,33 @@
 'use strict';
 
-const { registerInstrumentations } = require('@opentelemetry/instrumentation');
-const { NodeTracerProvider } = require('@opentelemetry/node');
-const { SimpleSpanProcessor } = require('@opentelemetry/tracing');
+const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
+const { Resource } = require('@opentelemetry/resources');
+const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
+const { SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 const { TracerShim } = require('@opentelemetry/shim-opentracing');
 
 function shim(serviceName) {
-  const provider = new NodeTracerProvider();
+  const provider = new NodeTracerProvider({
+    resource: new Resource({ [SemanticResourceAttributes.SERVICE_NAME]: serviceName }),
+  });
 
   provider.addSpanProcessor(new SimpleSpanProcessor(getExporter(serviceName)));
   // Initialize the OpenTelemetry APIs to use the NodeTracerProvider bindings
   provider.register();
 
-  registerInstrumentations({
-  });
-
   return new TracerShim(provider.getTracer('opentracing-shim'));
 }
 
-function getExporter(serviceName) {
+function getExporter() {
   const type = process.env.EXPORTER.toLowerCase() || 'jaeger';
 
   if (type.startsWith('z')) {
-    return new ZipkinExporter({ serviceName });
+    return new ZipkinExporter();
   }
 
-  return new JaegerExporter({ serviceName, flushInterval: 100 });
+  return new JaegerExporter();
 }
 
 exports.shim = shim;

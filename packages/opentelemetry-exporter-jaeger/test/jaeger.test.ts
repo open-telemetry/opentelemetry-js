@@ -19,11 +19,11 @@ import { JaegerExporter } from '../src';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
 import { ThriftProcess } from '../src/types';
-import { ReadableSpan } from '@opentelemetry/tracing';
+import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { TraceFlags } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import * as nock from 'nock';
-import { ResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 
 describe('JaegerExporter', () => {
   const readableSpan: ReadableSpan = {
@@ -47,7 +47,7 @@ describe('JaegerExporter', () => {
     events: [],
     duration: [32, 800000000],
     resource: new Resource({
-      [ResourceAttributes.SERVICE_NAME]: 'opentelemetry'
+      [SemanticResourceAttributes.SERVICE_NAME]: 'opentelemetry'
     }),
     instrumentationLibrary: {
       name: 'default',
@@ -70,7 +70,7 @@ describe('JaegerExporter', () => {
       const scope =nock(mockedEndpoint)
         .post('/')
         .reply(202)
-        
+
       const exporter = new JaegerExporter({
         endpoint: mockedEndpoint,
       });
@@ -93,8 +93,8 @@ describe('JaegerExporter', () => {
 
       const process: ThriftProcess = exporter['_getSender']({
         tags: [{
-          key: "service.name",
-          vStr: "opentelemetry"
+          key: 'service.name',
+          vStr: 'opentelemetry'
         }]
       } as any)._process;
       assert.strictEqual(exporter['_sender']._host, 'remotehost');
@@ -109,8 +109,8 @@ describe('JaegerExporter', () => {
       const exporter = new JaegerExporter();
       const sender = exporter['_getSender']({
         tags: [{
-          key: "service.name",
-          vStr: "opentelemetry"
+          key: 'service.name',
+          vStr: 'opentelemetry'
         }]
       } as any);
       assert.strictEqual(sender._host, 'localhost');
@@ -121,8 +121,8 @@ describe('JaegerExporter', () => {
       const exporter = new JaegerExporter();
       const sender = exporter['_getSender']({
         tags: [{
-          key: "service.name",
-          vStr: "opentelemetry"
+          key: 'service.name',
+          vStr: 'opentelemetry'
         }]
       } as any);
       assert.strictEqual(sender._host, 'env-set-host');
@@ -135,8 +135,8 @@ describe('JaegerExporter', () => {
       });
       const sender = exporter['_getSender']({
         tags: [{
-          key: "service.name",
-          vStr: "opentelemetry"
+          key: 'service.name',
+          vStr: 'opentelemetry'
         }]
       } as any);
       assert.strictEqual(sender._host, 'option-set-host');

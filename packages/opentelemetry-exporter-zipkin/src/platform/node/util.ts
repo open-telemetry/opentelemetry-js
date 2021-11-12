@@ -27,7 +27,7 @@ import * as zipkinTypes from '../../types';
  * @param headers - headers
  * send
  */
-export function prepareSend(urlStr: string, headers?: Record<string, string>) {
+export function prepareSend(urlStr: string, headers?: Record<string, string>): zipkinTypes.SendFn {
   const urlOpts = url.parse(urlStr);
 
   const reqOpts: http.RequestOptions = Object.assign(
@@ -61,11 +61,7 @@ export function prepareSend(urlStr: string, headers?: Record<string, string>) {
       });
       res.on('end', () => {
         const statusCode = res.statusCode || 0;
-        diag.debug(
-          'Zipkin response status code: %d, body: %s',
-          statusCode,
-          rawData
-        );
+        diag.debug(`Zipkin response status code: ${statusCode}, body: ${rawData}`);
 
         // Consider 2xx and 3xx as success.
         if (statusCode < 400) {
@@ -91,7 +87,7 @@ export function prepareSend(urlStr: string, headers?: Record<string, string>) {
 
     // Issue request to remote service
     const payload = JSON.stringify(zipkinSpans);
-    diag.debug('Zipkin request payload: %s', payload);
+    diag.debug(`Zipkin request payload: ${payload}`);
     req.write(payload, 'utf8');
     req.end();
   };

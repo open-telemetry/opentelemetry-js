@@ -71,5 +71,18 @@ describe('Core - Utils - url', () => {
         );
       });
     });
+    describe('when regex has global flag', () => {
+      it('should return true', () => {
+        const ignoredUrls = [/myaddr/g];
+        // Run test multiple times to ensure same result (git.io/JimS1)
+        for (let i = 0; i < 3; i++) {
+          assert.strictEqual(
+            isUrlIgnored(urlToTest, ignoredUrls),
+            true,
+            urlIgnored
+          );
+        }
+      });
+    });
   });
 });

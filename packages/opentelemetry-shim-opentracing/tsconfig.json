@@ -19,7 +19,10 @@
       "path": "../opentelemetry-propagator-jaeger"
     },
     {
-      "path": "../opentelemetry-tracing"
+      "path": "../opentelemetry-sdk-trace-base"
+    },
+    {
+      "path": "../opentelemetry-semantic-conventions"
     }
   ]
 }

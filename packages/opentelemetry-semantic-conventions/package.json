@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/semantic-conventions",
-  "version": "0.21.0",
+  "version": "1.0.1",
   "description": "OpenTelemetry semantic conventions",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -14,7 +14,9 @@
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "version": "node ../../scripts/version-update.js",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json"
+    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json",
+    "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
+    "prewatch": "npm run precompile"
   },
   "keywords": [
     "opentelemetry",
@@ -43,17 +45,16 @@
     "access": "public"
   },
   "devDependencies": {
-    "@types/mocha": "8.2.2",
-    "@types/node": "14.14.43",
-    "@types/sinon": "9.0.11",
-    "codecov": "3.8.2",
+    "@types/mocha": "8.2.3",
+    "@types/node": "14.17.11",
+    "@types/sinon": "10.0.2",
+    "codecov": "3.8.3",
     "mocha": "7.2.0",
     "nock": "12.0.3",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "sinon": "10.0.0",
+    "sinon": "12.0.1",
     "ts-mocha": "8.0.0",
-    "ts-node": "9.1.1",
-    "typescript": "4.3.2"
+    "typescript": "4.3.5"
   }
 }

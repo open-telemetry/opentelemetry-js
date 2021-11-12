@@ -42,7 +42,7 @@ function isValidSampledValue(sampled: TraceFlags | undefined): boolean {
   return sampled === TraceFlags.SAMPLED || sampled === TraceFlags.NONE;
 }
 
-export function parseHeader(header: unknown) {
+function parseHeader(header: unknown) {
   return Array.isArray(header) ? header[0] : header;
 }
 
@@ -93,7 +93,7 @@ function getTraceFlags(
  * Based on: https://github.com/openzipkin/b3-propagation
  */
 export class B3MultiPropagator implements TextMapPropagator {
-  inject(context: Context, carrier: unknown, setter: TextMapSetter) {
+  inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
     const spanContext = trace.getSpanContext(context);
     if (
       !spanContext ||
