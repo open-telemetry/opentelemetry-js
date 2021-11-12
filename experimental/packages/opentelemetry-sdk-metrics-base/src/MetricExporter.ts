@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
+// TODO should this just be an interface and exporters can implement their own shutdown?
 export abstract class MetricExporter {
-    private _shutdown = false;
+    protected _shutdown = false;
+
+    // TODO: define the methods that actually export - must allow for push and pull exporters
 
     async shutdown(): Promise<void> {
-        try {
-            await this.forceFlush();
-        } finally {
-            this._shutdown = true;
+        if (this._shutdown) {
+            return;
         }
+
+        // Setting _shutdown before flushing might prevent some exporters from flushing
+        // Waiting until flushing is complete might allow another flush to occur during shutdown
+        const flushPromise = this.forceFlush();
+        this._shutdown = true;
+        await flushPromise;
     }
 
     abstract forceFlush(): Promise<void>;
@@ -33,7 +40,7 @@ export abstract class MetricExporter {
 }
 
 export class ConsoleMetricExporter extends MetricExporter {
-    export() {
+    async export() {
         throw new Error('Method not implemented');
     }
 
