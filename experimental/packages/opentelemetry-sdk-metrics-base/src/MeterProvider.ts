@@ -17,7 +17,6 @@
 import * as api from '@opentelemetry/api';
 import * as metrics from '@opentelemetry/api-metrics';
 import { Resource } from '@opentelemetry/resources';
-import { Instrument } from './Instruments';
 import { Measurement } from './Measurement';
 import { Meter } from './Meter';
 import { MetricExporter } from './MetricExporter';
@@ -148,7 +147,7 @@ export class MeterProvider {
         }
     }
 
-    public aggregate(_meter: Meter, _metric: Instrument, _measurement: Measurement) {
+    public aggregate(_meter: Meter, _metric: unknown, _measurement: Measurement) {
         // TODO actually aggregate
 
         /**

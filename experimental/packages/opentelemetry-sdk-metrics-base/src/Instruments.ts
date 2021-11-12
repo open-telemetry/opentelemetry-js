@@ -27,20 +27,14 @@ export enum InstrumentType {
     OBSERVABLE_UP_DOWN_COUNTER = 'OBSERVABLE_UP_DOWN_COUNTER',
 }
 
-export class Instrument {
-    constructor(private _meter: Meter, private _name: string, private _version?: string) { }
+export class SyncInstrument {
+    constructor(private _meter: Meter, private _name: string) { }
 
     getName(): string {
         return this._name;
     }
 
-    /**
-     * This only exists to stop typescript complaining about unused variable and may be removed. 
-     */
-    getVersion(): string | undefined {
-        return this._version;
-    }
-
+ 
     aggregate(value: number, attributes: metrics.Attributes = {}, ctx: api.Context = api.context.active()) {
         this._meter.aggregate(this, {
             value,
@@ -50,13 +44,13 @@ export class Instrument {
     }
 }
 
-export class UpDownCounter extends Instrument implements metrics.Counter {
+export class UpDownCounter extends SyncInstrument implements metrics.Counter {
     add(value: number, attributes?: metrics.Attributes, ctx?: api.Context): void {
         this.aggregate(value, attributes, ctx);
     }
 }
 
-export class Counter extends Instrument implements metrics.Counter {
+export class Counter extends SyncInstrument implements metrics.Counter {
     add(value: number, attributes?: metrics.Attributes, ctx?: api.Context): void {
         if (value < 0) {
             api.diag.warn(`negative value provided to counter ${this.getName()}: ${value}`);
@@ -67,7 +61,7 @@ export class Counter extends Instrument implements metrics.Counter {
     }
 }
 
-export class Histogram extends Instrument implements metrics.Histogram {
+export class Histogram extends SyncInstrument implements metrics.Histogram {
     record(value: number, attributes?: metrics.Attributes, ctx?: api.Context): void {
         this.aggregate(value, attributes, ctx);
     }

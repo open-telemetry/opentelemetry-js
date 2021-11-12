@@ -16,9 +16,9 @@
 
 import * as metrics from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
+import { Counter, Histogram, UpDownCounter } from './Instruments';
 import { Measurement } from './Measurement';
 import { MeterProvider } from './MeterProvider';
-import { Histogram, Instrument } from './Instruments';
 
 export class Meter implements metrics.Meter {
     // instrumentation library required by spec to be on meter
@@ -36,14 +36,17 @@ export class Meter implements metrics.Meter {
     }
 
     createHistogram(_name: string, _options?: metrics.MetricOptions): Histogram {
-        throw new Error('Method not implemented.');
+        return new Histogram(this, _name);
     }
+    
     createCounter(_name: string, _options?: metrics.MetricOptions): metrics.Counter {
-        throw new Error('Method not implemented.');
+        return new Counter(this, _name);
     }
+
     createUpDownCounter(_name: string, _options?: metrics.MetricOptions): metrics.UpDownCounter {
-        throw new Error('Method not implemented.');
+        return new UpDownCounter(this, _name);
     }
+
     createObservableGauge(_name: string, _options?: metrics.MetricOptions, _callback?: (observableResult: metrics.ObservableResult) => void): metrics.ObservableBase {
         throw new Error('Method not implemented.');
     }
@@ -54,7 +57,7 @@ export class Meter implements metrics.Meter {
         throw new Error('Method not implemented.');
     }
 
-    public aggregate(metric: Instrument, measurement: Measurement) {
+    public aggregate(metric: unknown, measurement: Measurement) {
         this._provider.aggregate(this, metric, measurement);
     }
 }
