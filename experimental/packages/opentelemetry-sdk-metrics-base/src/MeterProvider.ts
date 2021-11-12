@@ -59,6 +59,7 @@ export class MeterProvider {
         // Spec leaves it unspecified if creating a meter with duplicate
         // name/version returns the same meter. We create a new one here
         // for simplicity. This may change in the future.
+        // TODO: consider returning the same meter if the same name/version is used
         return new Meter(this, { name, version }, options.schemaUrl);
     }
 
@@ -84,6 +85,7 @@ export class MeterProvider {
 
         // Shut down all exporters and readers.
         // Throw the first error and log all others.
+        // TODO make sure it is acceptable to throw here
         let err: unknown;
         for (const exporter of this._metricExporters) {
             try {
