@@ -21,6 +21,7 @@ import {
   diag,
   TextMapSetter,
 } from '@opentelemetry/api';
+import { ensureError } from '../utils/error';
 
 /** Configuration object for composite propagator */
 export interface CompositePropagatorConfig {
@@ -69,11 +70,9 @@ export class CompositePropagator implements TextMapPropagator {
       try {
         propagator.inject(context, carrier, setter);
       } catch (err) {
-        if (err instanceof Error) {
-          diag.warn(
-            `Failed to inject with ${propagator.constructor.name}. Err: ${err.message}`
-          );
-        }
+        diag.warn(
+          `Failed to inject with ${propagator.constructor.name}. Err: ${ensureError(err).message}`
+        );
       }
     }
   }
@@ -92,11 +91,9 @@ export class CompositePropagator implements TextMapPropagator {
       try {
         return propagator.extract(ctx, carrier, getter);
       } catch (err) {
-        if (err instanceof Error) {
-          diag.warn(
-            `Failed to inject with ${propagator.constructor.name}. Err: ${err.message}`
-          );
-        }
+        diag.warn(
+          `Failed to extract with ${propagator.constructor.name}. Err: ${ensureError(err).message}`
+        );
       }
       return ctx;
     }, context);

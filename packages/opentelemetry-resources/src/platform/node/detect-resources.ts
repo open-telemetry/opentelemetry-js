@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import { Resource } from '../../Resource';
-import { ResourceDetectionConfig } from '../../config';
 import { diag } from '@opentelemetry/api';
+import { ensureError } from '@opentelemetry/core';
 import * as util from 'util';
+import { ResourceDetectionConfig } from '../../config';
+import { Resource } from '../../Resource';
 
 /**
  * Runs all resource detectors and returns the results merged into a single
@@ -37,9 +38,7 @@ export const detectResources = async (
         diag.debug(`${d.constructor.name} found resource.`, resource);
         return resource;
       } catch (e) {
-        if (e instanceof Error) {
-          diag.debug(`${d.constructor.name} failed: ${e.message}`);
-        }
+        diag.debug(`${d.constructor.name} failed: ${ensureError(e).message}`);
         return Resource.empty();
       }
     })

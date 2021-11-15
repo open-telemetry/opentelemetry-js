@@ -15,10 +15,10 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { ExportResult, ExportResultCode, getEnv } from '@opentelemetry/core';
+import { ensureError, ExportResult, ExportResultCode, getEnv } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
-import { Socket } from 'dgram';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { Socket } from 'dgram';
 import { spanToThrift } from './transform';
 import * as jaegerTypes from './types';
 
@@ -119,13 +119,14 @@ export class JaegerExporter implements SpanExporter {
     for (const span of thriftSpan) {
       try {
         await this._append(span);
-      } catch (unknownError) {
+      } catch (err) {
         // TODO right now we break out on first error, is that desirable?
-        const error = unknownError instanceof Error ? unknownError : new Error(String(unknownError));
-        if (done) return done({ code: ExportResultCode.FAILED, error });
+        if (done) {
+          return done({ code: ExportResultCode.FAILED, error: ensureError(err) });
+        }
       }
     }
-    diag.debug(`successful append for : ${thriftSpan.length}`);
+    diag.debug(`successful append for : ${thriftSpan.length} `);
 
     // Flush all spans on each export. No-op if span buffer is empty
     await this._flush();

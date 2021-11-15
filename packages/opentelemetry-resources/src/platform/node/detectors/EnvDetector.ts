@@ -15,13 +15,11 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { getEnv } from '@opentelemetry/core';
+import { ensureError, getEnv } from '@opentelemetry/core';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import {
   Detector,
-  Resource,
-  ResourceDetectionConfig,
-  ResourceAttributes,
+  Resource, ResourceAttributes, ResourceDetectionConfig
 } from '../../../';
 
 /**
@@ -67,9 +65,7 @@ class EnvDetector implements Detector {
         const parsedAttributes = this._parseResourceAttributes(rawAttributes);
         Object.assign(attributes, parsedAttributes);
       } catch (e) {
-        if (e instanceof Error) {
-          diag.debug(`EnvDetector failed: ${e.message}`);
-        }
+        diag.debug(`EnvDetector failed: ${ensureError(e).message}`);
       }
     }
 
