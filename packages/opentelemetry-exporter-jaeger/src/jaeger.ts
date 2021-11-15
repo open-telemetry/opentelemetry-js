@@ -119,8 +119,9 @@ export class JaegerExporter implements SpanExporter {
     for (const span of thriftSpan) {
       try {
         await this._append(span);
-      } catch (error) {
+      } catch (unknownError) {
         // TODO right now we break out on first error, is that desirable?
+        const error = unknownError instanceof Error ? unknownError : new Error(String(unknownError));
         if (done) return done({ code: ExportResultCode.FAILED, error });
       }
     }

@@ -69,9 +69,11 @@ export class CompositePropagator implements TextMapPropagator {
       try {
         propagator.inject(context, carrier, setter);
       } catch (err) {
-        diag.warn(
-          `Failed to inject with ${propagator.constructor.name}. Err: ${err.message}`
-        );
+        if (err instanceof Error) {
+          diag.warn(
+            `Failed to inject with ${propagator.constructor.name}. Err: ${err.message}`
+          );
+        }
       }
     }
   }
@@ -90,9 +92,11 @@ export class CompositePropagator implements TextMapPropagator {
       try {
         return propagator.extract(ctx, carrier, getter);
       } catch (err) {
-        diag.warn(
-          `Failed to inject with ${propagator.constructor.name}. Err: ${err.message}`
-        );
+        if (err instanceof Error) {
+          diag.warn(
+            `Failed to inject with ${propagator.constructor.name}. Err: ${err.message}`
+          );
+        }
       }
       return ctx;
     }, context);

@@ -37,7 +37,9 @@ export const detectResources = async (
         diag.debug(`${d.constructor.name} found resource.`, resource);
         return resource;
       } catch (e) {
-        diag.debug(`${d.constructor.name} failed: ${e.message}`);
+        if (e instanceof Error) {
+          diag.debug(`${d.constructor.name} failed: ${e.message}`);
+        }
         return Resource.empty();
       }
     })

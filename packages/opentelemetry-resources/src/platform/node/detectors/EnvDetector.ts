@@ -67,7 +67,9 @@ class EnvDetector implements Detector {
         const parsedAttributes = this._parseResourceAttributes(rawAttributes);
         Object.assign(attributes, parsedAttributes);
       } catch (e) {
-        diag.debug(`EnvDetector failed: ${e.message}`);
+        if (e instanceof Error) {
+          diag.debug(`EnvDetector failed: ${e.message}`);
+        }
       }
     }
 

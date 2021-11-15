@@ -19,8 +19,7 @@
     "sourceMap": true,
     "strict": true,
     "strictNullChecks": true,
-    "target": "es2017",
-    "useUnknownInCatchVariables": false
+    "target": "es2017"
   },
   "exclude": [
     "node_modules"

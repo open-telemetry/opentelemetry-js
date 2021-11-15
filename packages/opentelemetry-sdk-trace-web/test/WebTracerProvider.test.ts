@@ -54,7 +54,7 @@ describe('WebTracerProvider', () => {
     });
 
     it('should throw error when context manager is passed in constructor', () => {
-      let error = '';
+      let error: unknown = '';
       try {
         new WebTracerProvider({
           contextManager: new ZoneContextManager(),
@@ -70,7 +70,7 @@ describe('WebTracerProvider', () => {
     });
 
     it('should throw error when propagator is passed in constructor', () => {
-      let error = '';
+      let error: unknown = '';
       try {
         new WebTracerProvider({
           propagator: new B3Propagator(),
