@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
-export { MeterProvider, MeterProviderOptions } from './MeterProvider';
-export * from './MetricExporter';
-export * from './MetricReader';
+import { Measurement } from './Measurement';
+
+// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#aggregation
+
+export interface Aggregator {
+    aggregate(measurement: Measurement): void;
+}
+
+// TODO define actual aggregator classes
