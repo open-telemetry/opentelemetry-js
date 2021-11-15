@@ -20,6 +20,8 @@ import { Counter, Histogram, UpDownCounter } from './Instruments';
 import { Measurement } from './Measurement';
 import { MeterProvider } from './MeterProvider';
 
+// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#meter
+
 export class Meter implements metrics.Meter {
     // instrumentation library required by spec to be on meter
     // spec requires provider config changes to apply to previously created meters, achieved by holding a reference to the provider

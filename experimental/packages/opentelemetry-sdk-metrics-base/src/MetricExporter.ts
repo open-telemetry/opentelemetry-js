@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ 
+// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#metricexporter
 
 // TODO should this just be an interface and exporters can implement their own shutdown?
 export abstract class MetricExporter {

@@ -16,6 +16,8 @@
 
 import { MetricExporter } from '.';
 
+// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#metricreader
+
 export class MetricReader {
     private _shutdown = false;
 

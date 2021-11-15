@@ -75,6 +75,8 @@ export class MeterProvider {
     /**
      * Flush all buffered data and shut down the MeterProvider and all exporters and metric readers.
      * Returns a promise which is resolved when all flushes are complete.
+     * 
+     * TODO: return errors to caller somehow?
      */
     async shutdown(): Promise<void> {
         // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#shutdown
@@ -87,12 +89,24 @@ export class MeterProvider {
         // TODO add a timeout - spec leaves it up the the SDK if this is configurable
         this._shutdown = true;
 
-        await this._forceFlush();
+        // Shut down all exporters and readers.
+        // Log all Errors.
+        for (const exporter of this._metricExporters) {
+            try {
+                await exporter.shutdown();
+            } catch (e) {
+                if (e instanceof Error) {
+                    api.diag.error(`Error shutting down: ${e.message}`)
+                }
+            }
+        }
     }
 
     /**
      * Notifies all exporters and metric readers to flush any buffered data.
      * Returns a promise which is resolved when all flushes are complete.
+     * 
+     * TODO: return errors to caller somehow?
      */
     async forceFlush(): Promise<void> {
         // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#forceflush
@@ -105,21 +119,12 @@ export class MeterProvider {
             return;
         }
 
-        await this._forceFlush();
-    }
-
-    /** 
-     * A private implementation of force flush which doesn't check if the function is shut down
-     */
-    private async _forceFlush() {
-        // Shut down all exporters and readers.
-        // Catch and log all errors
         for (const exporter of [...this._metricExporters, ...this._metricReaders]) {
             try {
-                await exporter.shutdown();
+                await exporter.forceFlush();
             } catch (e) {
                 if (e instanceof Error) {
-                    api.diag.error(`Error shutting down: ${e.message}`)
+                    api.diag.error(`Error flushing: ${e.message}`)
                 }
             }
         }
