@@ -18,6 +18,8 @@ import * as api from '@opentelemetry/api';
 import * as metrics from '@opentelemetry/api-metrics';
 import { Meter } from './Meter';
 
+// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#instrument
+
 export enum InstrumentType {
     COUNTER = 'COUNTER',
     HISTOGRAM = 'HISTOGRAM',
