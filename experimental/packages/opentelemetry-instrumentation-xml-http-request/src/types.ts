@@ -30,7 +30,7 @@ export type OpenFunction = (
 /**
  * method "send" from XMLHttpRequest
  */
-export type SendFunction = (body?: SendBody) => void;
+export type SendFunction = typeof XMLHttpRequest.prototype.send;
 
 export type SendBody =
   | string
