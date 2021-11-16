@@ -62,7 +62,7 @@ export class MeterProvider {
     // name/version returns the same meter. We create a new one here
     // for simplicity. This may change in the future.
     // TODO: consider returning the same meter if the same name/version is used
-    return new Meter(this._sharedState, { name, version }, options.schemaUrl);
+    return new Meter(this._sharedState, { name, version, schemaUrl: options.schemaUrl });
   }
 
   addMetricReader(metricReader: MetricReader) {
