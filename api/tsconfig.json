@@ -19,7 +19,8 @@
     "strictNullChecks": true,
     "target": "es5",
     "incremental": true,
-    "newLine": "LF"
+    "newLine": "LF",
+    "inlineSources": true
   },
   "include": [
     "src/**/*.ts",
