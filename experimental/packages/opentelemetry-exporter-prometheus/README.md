@@ -1,0 +1,1 @@
+The prometheus exporter has been temporarily moved to https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/unlinked-packages/opentelemetry-exporter-prometheus until it is refactored to work with the new metrics SDK and API.
