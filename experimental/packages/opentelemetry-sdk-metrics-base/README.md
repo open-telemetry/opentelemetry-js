@@ -9,7 +9,7 @@ OpenTelemetry metrics allow a user to collect data and export it to a metrics ba
 
 ## Work In Progress
 
-The OpenTelemetry SDK in this directory is undergoing drastic changes. If you need to use metrics, we recommend you use [version `0.27.0`](https://github.com/open-telemetry/opentelemetry-js/tree/v0.27.0/experimental/packages/opentelemetry-sdk-metrics-base).
+The OpenTelemetry SDK in this directory is undergoing drastic changes. If you need to use metrics, we recommend you use [version `0.27.0`](https://github.com/open-telemetry/opentelemetry-js/blob/experimental/v0.27.0/experimental/packages/opentelemetry-sdk-metrics-base).
 
 ## Installation
 

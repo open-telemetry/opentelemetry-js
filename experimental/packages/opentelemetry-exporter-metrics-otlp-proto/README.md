@@ -7,45 +7,15 @@
 
 This module provides exporter for node to be used with [opentelemetry-collector][opentelemetry-collector-url] - last tested with version **0.25.0**.
 
+## Work In Progress
+
+The OpenTelemetry SDK in this directory is undergoing drastic changes. If you need to use metrics, we recommend you use [version `0.27.0`](https://github.com/open-telemetry/opentelemetry-js/blob/experimental/v0.27.0/experimental/packages/opentelemetry-exporter-metrics-otlp-grpc).
+
 ## Installation
 
 ```bash
-npm install --save @opentelemetry/exporter-metrics-otlp-proto
+npm install --save "@opentelemetry/exporter-metrics-otlp-proto~0.27.0"
 ```
-
-## Service Name
-
-The OpenTelemetry Collector Exporter does not have a service name configuration.
-In order to set the service name, use the `service.name` resource attribute as prescribed in the [OpenTelemetry Resource Semantic Conventions][semconv-resource-service-name].
-To see sample code and documentation for the traces exporter, visit the [Collector Trace Exporter for web and node][trace-exporter-url].
-
-## Metrics in Node - PROTO over http
-
-```js
-const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
-const { OTLPMetricExporter } =  require('@opentelemetry/exporter-metrics-otlp-proto');
-const collectorOptions = {
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/metrics
-};
-const exporter = new OTLPMetricExporter(collectorOptions);
-
-// Register the exporter
-const meter = new MeterProvider({
-  exporter,
-  interval: 60000,
-}).getMeter('example-meter');
-
-// Now, start recording data
-const counter = meter.createCounter('metric_name');
-counter.add(10, { 'key': 'value' });
-
-```
-
-## Running opentelemetry-collector locally to see the metrics
-
-1. Go to examples/otlp-exporter-node
-2. run `npm run docker:start`
-3. Open page at `http://localhost:9411/zipkin/` to observe the metrics
 
 ## Useful links
 

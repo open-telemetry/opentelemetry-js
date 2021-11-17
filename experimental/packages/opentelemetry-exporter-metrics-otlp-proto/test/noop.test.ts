@@ -14,4 +14,6 @@
  * limitations under the License.
  */
 
-export * from './OTLPMetricExporter';
+describe('nothing', () => {
+    it.skip('tests nothing');
+});

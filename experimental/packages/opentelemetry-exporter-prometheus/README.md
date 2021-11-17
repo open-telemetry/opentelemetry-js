@@ -9,43 +9,16 @@ The OpenTelemetry Prometheus Metrics Exporter allows the user to send collected 
 
 [Prometheus](https://prometheus.io/) is a monitoring system that collects metrics, by scraping exposed endpoints at regular intervals, evaluating rule expressions. It can also trigger alerts if certain conditions are met. For assistance setting up Prometheus, [Click here](https://opencensus.io/codelabs/prometheus/#0) for a guided codelab.
 
+## Work In Progress
+
+The OpenTelemetry SDK in this directory is undergoing drastic changes. If you need to use metrics, we recommend you use [version `0.27.0`](https://github.com/open-telemetry/opentelemetry-js/blob/experimental/v0.27.0/experimental/packages/opentelemetry-exporter-prometheus).
+
 ## Installation
 
 ```bash
-npm install --save @opentelemetry/sdk-metrics-base
-npm install --save @opentelemetry/exporter-prometheus
+npm install --save "@opentelemetry/sdk-metrics-base~0.27.0"
+npm install --save "@opentelemetry/exporter-prometheus~0.27.0"
 ```
-
-## Usage
-
-Create & register the exporter on your application.
-
-```js
-const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
-const { MeterProvider }  = require('@opentelemetry/sdk-metrics-base');
-
-// Add your port and startServer to the Prometheus options
-const options = {port: 9464, startServer: true};
-const exporter = new PrometheusExporter(options);
-
-// Register the exporter
-const meter = new MeterProvider({
-  exporter,
-  interval: 1000,
-}).getMeter('example-prometheus');
-
-// Now, start recording data
-const counter = meter.createCounter('metric_name', {
-  description: 'Example of a counter'
-});
-counter.add(10, { pid: process.pid });
-
-// .. some other work
-```
-
-## Viewing your metrics
-
-With the above you should now be able to navigate to the Prometheus UI at: <http://localhost:9464/metrics>
 
 ## Useful links
 
