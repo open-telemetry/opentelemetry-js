@@ -29,13 +29,13 @@ import {
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 // Used to normalize relative URLs
-let a: HTMLAnchorElement | undefined;
+let urlNormalizingAnchor: HTMLAnchorElement | undefined;
 export function getUrlNormalizingAnchor(): HTMLAnchorElement {
-  if (!a) {
-    a = document.createElement('a');
+  if (!urlNormalizingAnchor) {
+    urlNormalizingAnchor = document.createElement('a');
   }
 
-  return a;
+  return urlNormalizingAnchor;
 }
 
 /**
@@ -108,7 +108,7 @@ export function addSpanNetworkEvents(
  * sort resources by startTime
  * @param filteredResources
  */
-export function sortResources(filteredResources: PerformanceResourceTiming[]) {
+export function sortResources(filteredResources: PerformanceResourceTiming[]): PerformanceResourceTiming[] {
   return filteredResources.slice().sort((a, b) => {
     const valueA = a[PTN.FETCH_START];
     const valueB = b[PTN.FETCH_START];
@@ -284,9 +284,9 @@ function filterResourcesForSpan(
  * @param url
  */
 export function parseUrl(url: string): HTMLAnchorElement {
-  const a = document.createElement('a');
-  a.href = url;
-  return a;
+  const element = document.createElement('a');
+  element.href = url;
+  return element;
 }
 
 /**
@@ -295,8 +295,8 @@ export function parseUrl(url: string): HTMLAnchorElement {
  * @param optimised - when id attribute of element is present the xpath can be
  * simplified to contain id
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getElementXPath(target: any, optimised?: boolean) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-module-boundary-types
+export function getElementXPath(target: any, optimised?: boolean): string {
   if (target.nodeType === Node.DOCUMENT_NODE) {
     return '/';
   }
@@ -380,7 +380,7 @@ function getNodeValue(target: HTMLElement, optimised?: boolean): string {
 export function shouldPropagateTraceHeaders(
   spanUrl: string,
   propagateTraceHeaderCorsUrls?: PropagateTraceHeaderCorsUrls
-) {
+): boolean {
   let propagateTraceHeaderUrls = propagateTraceHeaderCorsUrls || [];
   if (
     typeof propagateTraceHeaderUrls === 'string' ||
