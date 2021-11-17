@@ -39,10 +39,12 @@ export class ViewRegistry {
   }
 
   findViews(instrument: InstrumentDescriptor, meter: InstrumentationLibrary): View[] {
-    const views = this._registeredViews.filter(it => {
-      return this._matchInstrument(it.instrumentSelector, instrument) &&
-        this._matchMeter(it.meterSelector, meter);
-    }).map(it => it.view);
+    const views = this._registeredViews
+      .filter(registeredView => {
+        return this._matchInstrument(registeredView.instrumentSelector, instrument) &&
+          this._matchMeter(registeredView.meterSelector, meter);
+      })
+      .map(it => it.view);
 
     if (views.length === 0) {
       return [ViewRegistry.DEFAULT_VIEW];

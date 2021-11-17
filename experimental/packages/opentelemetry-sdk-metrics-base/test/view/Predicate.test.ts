@@ -30,6 +30,7 @@ describe('PatternPredicate', () => {
       assert.ok(predicate.match('foo'));
       assert.ok(predicate.match('foobar'));
 
+      assert.ok(!predicate.match('_foo'));
       assert.ok(!predicate.match('bar'));
       assert.ok(!predicate.match(''));
     });
@@ -40,6 +41,7 @@ describe('PatternPredicate', () => {
       assert.ok(predicate.match('bar'));
 
       assert.ok(!predicate.match('foo'));
+      assert.ok(!predicate.match('bar_'));
       assert.ok(!predicate.match(''));
     });
   });
@@ -50,17 +52,18 @@ describe('PatternPredicate', () => {
       assert.ok(predicate.match('foobar'));
 
       assert.ok(!predicate.match('foo'));
+      assert.ok(!predicate.match('_foobar_'));
       assert.ok(!predicate.match(''));
     });
   });
 
   describe('escapePattern', () => {
     it('should escape regexp elements', () => {
-      assert.strictEqual(PatternPredicate.escapePattern('^$\\.+?()[]{}|'), '\\^\\$\\\\\\.\\+\\?\\(\\)\\[\\]\\{\\}\\|');
-      assert.strictEqual(PatternPredicate.escapePattern('*'), '.*');
-      assert.strictEqual(PatternPredicate.escapePattern('foobar'), 'foobar');
-      assert.strictEqual(PatternPredicate.escapePattern('foo*'), 'foo.*');
-      assert.strictEqual(PatternPredicate.escapePattern('*bar'), '.*bar');
+      assert.strictEqual(PatternPredicate.escapePattern('^$\\.+?()[]{}|'), '^\\^\\$\\\\\\.\\+\\?\\(\\)\\[\\]\\{\\}\\|$');
+      assert.strictEqual(PatternPredicate.escapePattern('*'), '^.*$');
+      assert.strictEqual(PatternPredicate.escapePattern('foobar'), '^foobar$');
+      assert.strictEqual(PatternPredicate.escapePattern('foo*'), '^foo.*$');
+      assert.strictEqual(PatternPredicate.escapePattern('*bar'), '^.*bar$');
     });
   });
 });

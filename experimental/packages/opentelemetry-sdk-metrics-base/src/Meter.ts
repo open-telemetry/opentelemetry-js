@@ -66,13 +66,13 @@ export class Meter implements metrics.Meter {
     throw new Error('Method not implemented.');
   }
 
-  private _registerMetricStorage(instrument: InstrumentDescriptor) {
-    const views = this._meterProviderSharedState.viewRegistry.findViews(instrument, this._instrumentationLibrary);
+  private _registerMetricStorage(descriptor: InstrumentDescriptor) {
+    const views = this._meterProviderSharedState.viewRegistry.findViews(descriptor, this._instrumentationLibrary);
     const storages = views.map(_view => {
       // TODO: create actual metric storages.
       const storage = new NoopWritableMetricStorage();
       // TODO: handle conflicts
-      this._metricStorageRegistry.set(instrument.name, storage);
+      this._metricStorageRegistry.set(descriptor.name, storage);
       return storage;
     });
     if (storages.length === 1)  {

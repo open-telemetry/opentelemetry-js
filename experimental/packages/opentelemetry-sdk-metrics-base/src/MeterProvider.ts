@@ -42,15 +42,6 @@ export class MeterProvider {
     this._sharedState = new MeterProviderSharedState(options.resource ?? Resource.empty());
   }
 
-  /**
-   * **Unstable**
-   *
-   * This method is only here to prevent typescript from complaining and may be removed.
-   */
-  getResource() {
-    return this._sharedState.resource;
-  }
-
   getMeter(name: string, version = '', options: metrics.MeterOptions = {}): metrics.Meter {
     // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#meter-creation
     if (this._shutdown) {

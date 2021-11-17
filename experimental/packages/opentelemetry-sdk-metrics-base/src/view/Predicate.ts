@@ -48,7 +48,7 @@ export class PatternPredicate implements Predicate {
   }
 
   static escapePattern(pattern: string): string {
-    return pattern.replace(ESCAPE, '\\$&').replace('*', '.*');
+    return `^${pattern.replace(ESCAPE, '\\$&').replace('*', '.*')}$`;
   }
 }
 
