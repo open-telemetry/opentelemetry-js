@@ -32,7 +32,7 @@ import * as api from "@opentelemetry/api";
 import { AsyncHooksContextManager } from "@opentelemetry/context-async-hooks";
 
 const contextManager = new AsyncHooksContextManager();
-context.Manager.enable();
+contextManager.enable();
 api.context.setGlobalContextManager(contextManager);
 ```
 
