@@ -48,7 +48,6 @@
   },
   "devDependencies": {
     "@opentelemetry/api": "^1.0.3",
-    "@opentelemetry/api-metrics-wip": "0.27.0",
     "@types/lodash.merge": "4.6.6",
     "@types/mocha": "8.2.3",
     "@types/node": "14.17.33",
@@ -62,10 +61,11 @@
     "typescript": "4.4.4"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^1.0.3",
-    "@opentelemetry/api-metrics-wip": "0.27.0"
+    "@opentelemetry/api": "^1.0.3"
   },
+  "todo": "Move API metrics to peer dependencies. While it is using an unpublished name, lerna doesn't properly link it if it is in peer dependencies",
   "dependencies": {
+    "@opentelemetry/api-metrics-wip": "0.27.0",
     "@opentelemetry/core": "1.0.1",
     "@opentelemetry/resources": "1.0.1",
     "lodash.merge": "4.6.2"
