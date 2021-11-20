@@ -1,6 +1,7 @@
 {
-  "name": "@opentelemetry/api-metrics",
+  "name": "@opentelemetry/api-metrics-wip",
   "version": "0.27.0",
+  "private": true,
   "description": "Public metrics API for OpenTelemetry",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
