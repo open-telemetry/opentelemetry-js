@@ -10,9 +10,6 @@
   ],
   "references": [
     {
-      "path": "../opentelemetry-api-metrics/tsconfig.esm.json"
-    },
-    {
       "path": "../opentelemetry-exporter-trace-otlp-http/tsconfig.esm.json"
     }
   ]
