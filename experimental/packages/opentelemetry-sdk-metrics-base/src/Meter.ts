@@ -16,50 +16,68 @@
 
 import * as metrics from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
-import { Counter, Histogram, UpDownCounter } from './Instruments';
-import { Measurement } from './Measurement';
-import { MeterProvider } from './MeterProvider';
+import { createInstrumentDescriptor, InstrumentDescriptor } from './InstrumentDescriptor';
+import { Counter, Histogram, InstrumentType, UpDownCounter } from './Instruments';
+import { MeterProviderSharedState } from './state/MeterProviderSharedState';
+import { MultiMetricStorage } from './state/MultiWritableMetricStorage';
+import { NoopWritableMetricStorage, WritableMetricStorage } from './state/WritableMetricStorage';
 
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#meter
 
 export class Meter implements metrics.Meter {
-    // instrumentation library required by spec to be on meter
-    // spec requires provider config changes to apply to previously created meters, achieved by holding a reference to the provider
-    constructor(private _provider: MeterProvider, private _instrumentationLibrary: InstrumentationLibrary, private _schemaUrl?: string) { }
+  private _metricStorageRegistry = new Map<string, WritableMetricStorage>();
 
-    /** this exists just to prevent ts errors from unused variables and may be removed */
-    getSchemaUrl(): string | undefined {
-        return this._schemaUrl;
-    }
+  // instrumentation library required by spec to be on meter
+  // spec requires provider config changes to apply to previously created meters, achieved by holding a reference to the provider
+  constructor(private _meterProviderSharedState: MeterProviderSharedState, private _instrumentationLibrary: InstrumentationLibrary) { }
 
-    /** this exists just to prevent ts errors from unused variables and may be removed */
-    getInstrumentationLibrary(): InstrumentationLibrary {
-        return this._instrumentationLibrary;
-    }
+  /** this exists just to prevent ts errors from unused variables and may be removed */
+  getInstrumentationLibrary(): InstrumentationLibrary {
+    return this._instrumentationLibrary;
+  }
 
-    createHistogram(_name: string, _options?: metrics.MetricOptions): Histogram {
-        return new Histogram(this, _name);
-    }
-    
-    createCounter(_name: string, _options?: metrics.MetricOptions): metrics.Counter {
-        return new Counter(this, _name);
-    }
+  createHistogram(name: string, options?: metrics.MetricOptions): Histogram {
+    const descriptor = createInstrumentDescriptor(name, InstrumentType.HISTOGRAM, options);
+    const storage = this._registerMetricStorage(descriptor);
+    return new Histogram(storage, descriptor);
+  }
 
-    createUpDownCounter(_name: string, _options?: metrics.MetricOptions): metrics.UpDownCounter {
-        return new UpDownCounter(this, _name);
-    }
+  createCounter(name: string, options?: metrics.MetricOptions): metrics.Counter {
+    const descriptor = createInstrumentDescriptor(name, InstrumentType.COUNTER, options);
+    const storage = this._registerMetricStorage(descriptor);
+    return new Counter(storage, descriptor);
+  }
 
-    createObservableGauge(_name: string, _options?: metrics.MetricOptions, _callback?: (observableResult: metrics.ObservableResult) => void): metrics.ObservableBase {
-        throw new Error('Method not implemented.');
-    }
-    createObservableCounter(_name: string, _options?: metrics.MetricOptions, _callback?: (observableResult: metrics.ObservableResult) => void): metrics.ObservableBase {
-        throw new Error('Method not implemented.');
-    }
-    createObservableUpDownCounter(_name: string, _options?: metrics.MetricOptions, _callback?: (observableResult: metrics.ObservableResult) => void): metrics.ObservableBase {
-        throw new Error('Method not implemented.');
-    }
+  createUpDownCounter(name: string, options?: metrics.MetricOptions): metrics.UpDownCounter {
+    const descriptor = createInstrumentDescriptor(name, InstrumentType.UP_DOWN_COUNTER, options);
+    const storage = this._registerMetricStorage(descriptor);
+    return new UpDownCounter(storage, descriptor);
+  }
 
-    public aggregate(metric: unknown, measurement: Measurement) {
-        this._provider.aggregate(this, metric, measurement);
+  createObservableGauge(_name: string, _options?: metrics.MetricOptions, _callback?: (observableResult: metrics.ObservableResult) => void): metrics.ObservableBase {
+    throw new Error('Method not implemented.');
+  }
+
+  createObservableCounter(_name: string, _options?: metrics.MetricOptions, _callback?: (observableResult: metrics.ObservableResult) => void): metrics.ObservableBase {
+    throw new Error('Method not implemented.');
+  }
+
+  createObservableUpDownCounter(_name: string, _options?: metrics.MetricOptions, _callback?: (observableResult: metrics.ObservableResult) => void): metrics.ObservableBase {
+    throw new Error('Method not implemented.');
+  }
+
+  private _registerMetricStorage(descriptor: InstrumentDescriptor) {
+    const views = this._meterProviderSharedState.viewRegistry.findViews(descriptor, this._instrumentationLibrary);
+    const storages = views.map(_view => {
+      // TODO: create actual metric storages.
+      const storage = new NoopWritableMetricStorage();
+      // TODO: handle conflicts
+      this._metricStorageRegistry.set(descriptor.name, storage);
+      return storage;
+    });
+    if (storages.length === 1)  {
+      return storages[0];
     }
+    return new MultiMetricStorage(storages);
+  }
 }

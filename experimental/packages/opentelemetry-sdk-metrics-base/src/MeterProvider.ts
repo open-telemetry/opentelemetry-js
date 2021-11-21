@@ -17,132 +17,109 @@
 import * as api from '@opentelemetry/api';
 import * as metrics from '@opentelemetry/api-metrics';
 import { Resource } from '@opentelemetry/resources';
-import { Measurement } from './Measurement';
 import { Meter } from './Meter';
 import { MetricExporter } from './MetricExporter';
 import { MetricReader } from './MetricReader';
-import { View } from './View';
+import { MeterProviderSharedState } from './state/MeterProviderSharedState';
+import { InstrumentSelector } from './view/InstrumentSelector';
+import { MeterSelector } from './view/MeterSelector';
+import { View } from './view/View';
+
 
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#meterprovider
 
 export type MeterProviderOptions = {
-    resource?: Resource;
+  resource?: Resource;
 }
 
 export class MeterProvider {
-    private _resource: Resource;
-    private _shutdown = false;
-    private _metricReaders: MetricReader[] = [];
-    private _metricExporters: MetricExporter[] = [];
-    private _views: View[] = [];
+  private _sharedState: MeterProviderSharedState;
+  private _shutdown = false;
+  private _metricReaders: MetricReader[] = [];
+  private _metricExporters: MetricExporter[] = [];
 
-    constructor(options: MeterProviderOptions) {
-        this._resource = options.resource ?? Resource.empty();
+  constructor(options: MeterProviderOptions) {
+    this._sharedState = new MeterProviderSharedState(options.resource ?? Resource.empty());
+  }
+
+  getMeter(name: string, version = '', options: metrics.MeterOptions = {}): metrics.Meter {
+    // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#meter-creation
+    if (this._shutdown) {
+        api.diag.warn('A shutdown MeterProvider cannot provide a Meter')
+        return metrics.NOOP_METER;
     }
 
-    /**
-     * **Unstable**
-     * 
-     * This method is only here to prevent typescript from complaining and may be removed.
-     */
-    getResource() {
-        return this._resource;
+    // Spec leaves it unspecified if creating a meter with duplicate
+    // name/version returns the same meter. We create a new one here
+    // for simplicity. This may change in the future.
+    // TODO: consider returning the same meter if the same name/version is used
+    return new Meter(this._sharedState, { name, version, schemaUrl: options.schemaUrl });
+  }
+
+  addMetricReader(metricReader: MetricReader) {
+    this._metricReaders.push(metricReader);
+  }
+
+  addView(view: View, instrumentSelector: InstrumentSelector, meterSelector: MeterSelector) {
+    // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#view
+    this._sharedState.viewRegistry.addView(view, instrumentSelector, meterSelector);
+  }
+
+  /**
+   * Flush all buffered data and shut down the MeterProvider and all exporters and metric readers.
+   * Returns a promise which is resolved when all flushes are complete.
+   *
+   * TODO: return errors to caller somehow?
+   */
+  async shutdown(): Promise<void> {
+    // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#shutdown
+
+    if (this._shutdown) {
+      api.diag.warn('shutdown may only be called once per MeterProvider');
+      return;
     }
 
-    getMeter(name: string, version = '', options: metrics.MeterOptions = {}): metrics.Meter {
-        // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#meter-creation
-        if (this._shutdown) {
-            api.diag.warn('A shutdown MeterProvider cannot provide a Meter')
-            return metrics.NOOP_METER;
+    // TODO add a timeout - spec leaves it up the the SDK if this is configurable
+    this._shutdown = true;
+
+    // Shut down all exporters and readers.
+    // Log all Errors.
+    for (const exporter of this._metricExporters) {
+      try {
+        await exporter.shutdown();
+      } catch (e) {
+        if (e instanceof Error) {
+          api.diag.error(`Error shutting down: ${e.message}`)
         }
+      }
+    }
+  }
 
-        // Spec leaves it unspecified if creating a meter with duplicate
-        // name/version returns the same meter. We create a new one here
-        // for simplicity. This may change in the future.
-        // TODO: consider returning the same meter if the same name/version is used
-        return new Meter(this, { name, version }, options.schemaUrl);
+  /**
+   * Notifies all exporters and metric readers to flush any buffered data.
+   * Returns a promise which is resolved when all flushes are complete.
+   *
+   * TODO: return errors to caller somehow?
+   */
+  async forceFlush(): Promise<void> {
+    // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#forceflush
+
+    // TODO add a timeout - spec leaves it up the the SDK if this is configurable
+
+    // do not flush after shutdown
+    if (this._shutdown) {
+      api.diag.warn('invalid attempt to force flush after shutdown')
+      return;
     }
 
-    addMetricReader(metricReader: MetricReader) {
-        this._metricReaders.push(metricReader);
-    }
-
-    addView(view: View) {
-        // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#view
-        this._views.push(view);
-    }
-
-    /**
-     * Flush all buffered data and shut down the MeterProvider and all exporters and metric readers.
-     * Returns a promise which is resolved when all flushes are complete.
-     * 
-     * TODO: return errors to caller somehow?
-     */
-    async shutdown(): Promise<void> {
-        // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#shutdown
-
-        if (this._shutdown) {
-            api.diag.warn('shutdown may only be called once per MeterProvider');
-            return;
+    for (const exporter of [...this._metricExporters, ...this._metricReaders]) {
+      try {
+        await exporter.forceFlush();
+      } catch (e) {
+        if (e instanceof Error) {
+          api.diag.error(`Error flushing: ${e.message}`)
         }
-
-        // TODO add a timeout - spec leaves it up the the SDK if this is configurable
-        this._shutdown = true;
-
-        // Shut down all exporters and readers.
-        // Log all Errors.
-        for (const exporter of this._metricExporters) {
-            try {
-                await exporter.shutdown();
-            } catch (e) {
-                if (e instanceof Error) {
-                    api.diag.error(`Error shutting down: ${e.message}`)
-                }
-            }
-        }
+      }
     }
-
-    /**
-     * Notifies all exporters and metric readers to flush any buffered data.
-     * Returns a promise which is resolved when all flushes are complete.
-     * 
-     * TODO: return errors to caller somehow?
-     */
-    async forceFlush(): Promise<void> {
-        // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#forceflush
-
-        // TODO add a timeout - spec leaves it up the the SDK if this is configurable
-
-        // do not flush after shutdown
-        if (this._shutdown) {
-            api.diag.warn('invalid attempt to force flush after shutdown')
-            return;
-        }
-
-        for (const exporter of [...this._metricExporters, ...this._metricReaders]) {
-            try {
-                await exporter.forceFlush();
-            } catch (e) {
-                if (e instanceof Error) {
-                    api.diag.error(`Error flushing: ${e.message}`)
-                }
-            }
-        }
-    }
-
-    public aggregate(_meter: Meter, _metric: unknown, _measurement: Measurement) {
-        // TODO actually aggregate
-
-        /**
-         * if there are no views:
-         *   apply the default configuration
-         * else:
-         *   for each view:
-         *     if view matches:
-         *       apply view configuration
-         *   if no view matched:
-         *     if user has not disabled default fallback:
-         *       apply default configuration
-         */
-    }
+  }
 }
