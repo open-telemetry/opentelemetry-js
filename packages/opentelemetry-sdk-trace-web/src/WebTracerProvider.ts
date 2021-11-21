@@ -55,7 +55,7 @@ export class WebTracerProvider extends BasicTracerProvider {
    *
    * @param config Configuration object for SDK registration
    */
-  override register(config: SDKRegistrationConfig = {}) {
+  override register(config: SDKRegistrationConfig = {}): void {
     if (config.contextManager === undefined) {
       config.contextManager = new StackContextManager();
     }
