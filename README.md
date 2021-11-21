@@ -13,13 +13,13 @@ This propagator translates the OpenTelemetry SpanContext into the equivalent AWS
 
 Compatible with OpenTelemetry JS API and SDK `1.0+`.
 
-### Installation
+## Installation
 
-```
+```sh
 npm install --save @opentelemetry/propagator-aws-xray
 ```
 
-### Usage
+## Usage
 
 In the [global tracer configuration file](https://github.com/open-telemetry/opentelemetry-js/blob/master/getting-started/README.md#initialize-a-global-tracer), configure the following:
 
@@ -36,38 +36,38 @@ provider.register({
 });
 ```
 
-### Propagator Details
+## Propagator Details
 
 Example header:`X-Amzn-Trace-Id: Root=1-5759e988-bd862e3fe1be46a994272793;Parent=53995c3f42cd8ad8;Sampled=1`
 
 The header consists of three parts: the root trace ID, the parent ID and the sampling decision.
 
-#### Root - The AWS X-Ray format trace ID
+### Root - The AWS X-Ray format trace ID
 
 * Format: (spec-version)-(timestamp)-(UUID)
-    * spec_version - The version of the AWS X-Ray header format. Currently, only "1" is valid.
-    * timestamp - 32-bit number in base16 format, corresponds to the first 8 characters of the OpenTelemetry trace ID. Note, while X-Ray calls this timestamp, for the purpose of propagation it is opaque and any value will work.
-    * UUID - 96-bit random number in base16 format, corresponds to the last 10 characters of the OpenTelemetry trace ID.
+  * spec_version - The version of the AWS X-Ray header format. Currently, only "1" is valid.
+  * timestamp - 32-bit number in base16 format, corresponds to the first 8 characters of the OpenTelemetry trace ID. Note, while X-Ray calls this timestamp, for the purpose of propagation it is opaque and any value will work.
+  * UUID - 96-bit random number in base16 format, corresponds to the last 10 characters of the OpenTelemetry trace ID.
 
 Root is analogous to the [OpenTelemetry Trace ID](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/overview.md#spancontext), with some small format changes.
 For additional reading, see the [AWS X-Ray Trace ID](https://docs.aws.amazon.com/xray/latest/devguide/xray-api-sendingdata.html#xray-api-traceids) public documentation.
 
-#### Parent - The ID of the AWS X-Ray Segment
+### Parent - The ID of the AWS X-Ray Segment
 
 * 64-bit random number in base16 format. Populated from the [OpenTelemetry Span ID](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/overview.md#spancontext).
 
-#### Sampled - The sampling decision
+### Sampled - The sampling decision
 
 * Defined in the AWS X-Ray specification as a tri-state field, with "0", "1" and "?" as valid values. Only "0" and "1" are used in this propagator. If "?", a new trace will be started.
 * Populated from the [OpenTelemetry trace flags](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/overview.md#spancontext).
 
 ## Useful links
 
-- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
-- For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
+* For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
+* For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
+* For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
 
-### License
+## License
 
 Apache 2.0 - See [LICENSE][license-url] for more information.
 
