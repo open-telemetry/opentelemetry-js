@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-import { Measurement } from './Measurement';
+import { Context } from '@opentelemetry/api';
+import { Attributes } from '@opentelemetry/api-metrics';
 
-// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#aggregation
-
-export interface Aggregator {
-    aggregate(measurement: Measurement): void;
+export interface WritableMetricStorage {
+  record(value: number, attributes: Attributes, context: Context): void;
 }
 
-// TODO define actual aggregator classes
+export class NoopWritableMetricStorage implements WritableMetricStorage {
+  record(_value: number, _attributes: Attributes, _context: Context): void {}
+}
