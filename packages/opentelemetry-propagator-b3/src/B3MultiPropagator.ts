@@ -26,7 +26,10 @@ import {
   TraceFlags,
 } from '@opentelemetry/api';
 import { isTracingSuppressed } from '@opentelemetry/core';
-import { B3_DEBUG_FLAG_KEY } from './common';
+import {
+  B3_DEBUG_FLAG_KEY,
+  B3_PARENT_SPAN_ID_KEY,
+} from './common';
 import {
   X_B3_FLAGS,
   X_B3_PARENT_SPAN_ID,
@@ -67,6 +70,14 @@ function getSpanId(carrier: unknown, getter: TextMapGetter): string {
   return '';
 }
 
+function getParentSpanId(carrier: unknown, getter: TextMapGetter): string {
+  const parentSpanId = getHeaderValue(carrier, getter, X_B3_PARENT_SPAN_ID);
+  if (typeof parentSpanId === 'string') {
+    return parentSpanId;
+  }
+  return '';
+}
+
 function getDebug(carrier: unknown, getter: TextMapGetter): string | undefined {
   const debug = getHeaderValue(carrier, getter, X_B3_FLAGS);
   return debug === '1' ? '1' : undefined;
@@ -103,8 +114,10 @@ export class B3MultiPropagator implements TextMapPropagator {
       return;
 
     const debug = context.getValue(B3_DEBUG_FLAG_KEY);
+    const parentSpanId = context.getValue(B3_PARENT_SPAN_ID_KEY) as string;
     setter.set(carrier, X_B3_TRACE_ID, spanContext.traceId);
     setter.set(carrier, X_B3_SPAN_ID, spanContext.spanId);
+    setter.set(carrier, X_B3_PARENT_SPAN_ID, parentSpanId);
     // According to the B3 spec, if the debug flag is set,
     // the sampled flag shouldn't be propagated as well.
     if (debug === '1') {
@@ -125,6 +138,7 @@ export class B3MultiPropagator implements TextMapPropagator {
   extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
     const traceId = getTraceId(carrier, getter);
     const spanId = getSpanId(carrier, getter);
+    const parentSpanId = getParentSpanId(carrier, getter);
     const traceFlags = getTraceFlags(carrier, getter) as TraceFlags;
     const debug = getDebug(carrier, getter);
 
@@ -134,6 +148,7 @@ export class B3MultiPropagator implements TextMapPropagator {
       isValidSampledValue(traceFlags)
     ) {
       context = context.setValue(B3_DEBUG_FLAG_KEY, debug);
+      context = context.setValue(B3_PARENT_SPAN_ID_KEY, parentSpanId);
       return trace.setSpanContext(context, {
         traceId,
         spanId,
