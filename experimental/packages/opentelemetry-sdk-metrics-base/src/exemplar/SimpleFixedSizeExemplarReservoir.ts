@@ -1,0 +1,50 @@
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { Context, HrTime } from '@opentelemetry/api';
+import { ValueType, Attributes } from '@opentelemetry/api-metrics';
+import { FixedSizeExemplarReservoirBase } from './ExemplarReservoir';
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
+
+export class SimpleFixedSizeExemplarReservoir extends FixedSizeExemplarReservoirBase {
+  private _counter: number;
+  constructor(size: number) {
+    super(size);
+    this._counter = 0;
+  }
+
+  getRandomInt(min: number, max: number) { //[min, max)
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min) + min); 
+  }
+
+  reservoirIndexFor(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context) {
+    const index = this.getRandomInt(this._counter, this._counter+1);
+    this._counter += 1;
+    return index < this._size ? index: -1;
+  }
+
+  numOfMeasurements(): number {
+    return this._counter;
+  }
+
+  override reset() {
+    this._counter = 0;
+  }
+}
