@@ -15,10 +15,24 @@
  */
 
 import * as assert from 'assert';
-import { Aggregator, HistogramAggregator, LastValueAggregator, SumAggregator } from '../../src/aggregator';
+import {
+  Aggregator,
+  DropAggregator,
+  HistogramAggregator,
+  LastValueAggregator,
+  SumAggregator,
+} from '../../src/aggregator';
 import { InstrumentDescriptor } from '../../src/InstrumentDescriptor';
 import { InstrumentType } from '../../src/Instruments';
-import { Aggregation, DefaultAggregation, DropAggregation, HistogramAggregation, LastValueAggregation, SumAggregation } from '../../src/view/Aggregation';
+import {
+  Aggregation,
+  DefaultAggregation,
+  DropAggregation,
+  ExplicitBucketHistogramAggregation,
+  HistogramAggregation,
+  LastValueAggregation,
+  SumAggregation,
+} from '../../src/view/Aggregation';
 import { defaultInstrumentDescriptor } from '../util';
 
 interface AggregationConstructor {
@@ -58,12 +72,33 @@ describe('DefaultAggregation', () => {
         [{ ...defaultInstrumentDescriptor, type: InstrumentType.OBSERVABLE_UP_DOWN_COUNTER }, SumAggregator],
         [{ ...defaultInstrumentDescriptor, type: InstrumentType.OBSERVABLE_GAUGE }, LastValueAggregator],
         [{ ...defaultInstrumentDescriptor, type: InstrumentType.HISTOGRAM }, HistogramAggregator],
+        // unknown instrument type
+        [{ ...defaultInstrumentDescriptor, type: -1 as unknown as InstrumentType }, DropAggregator],
       ];
 
       const aggregation = new DefaultAggregation();
       for (const [instrumentDescriptor, type] of expectations) {
         assert(aggregation.createAggregator(instrumentDescriptor) instanceof type, `${InstrumentType[instrumentDescriptor.type]}`);
       }
+    });
+  });
+});
+
+describe('ExplicitBucketHistogramAggregation', () => {
+  it('construct without exceptions', () => {
+    const aggregation = new ExplicitBucketHistogramAggregation([1, 10, 100]);
+    assert(aggregation instanceof ExplicitBucketHistogramAggregation);
+  });
+
+  describe('createAggregator', () => {
+    it('should create histogram aggregators with boundaries', () => {
+      const aggregator1 = new ExplicitBucketHistogramAggregation([1, 10, 100]).createAggregator(defaultInstrumentDescriptor);
+      assert(aggregator1 instanceof HistogramAggregator);
+      assert.deepStrictEqual(aggregator1['_boundaries'], [1, 10, 100]);
+
+      const aggregator2 = new ExplicitBucketHistogramAggregation([10, 100, 1000]).createAggregator(defaultInstrumentDescriptor);
+      assert(aggregator2 instanceof HistogramAggregator);
+      assert.deepStrictEqual(aggregator2['_boundaries'], [10, 100, 1000]);
     });
   });
 });
