@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import * as metrics from '@opentelemetry/api-metrics';
+import * as metrics from '@opentelemetry/api-metrics-wip';
 import { Resource } from '@opentelemetry/resources';
 import { Measurement } from './Measurement';
 import { Meter } from './Meter';
