@@ -17,11 +17,8 @@
 import { Attributes, ValueType } from '@opentelemetry/api-metrics-wip';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import * as assert from 'assert';
-import { MetricData } from '../src/export/MetricData';
 import { InstrumentDescriptor } from '../src/InstrumentDescriptor';
 import { InstrumentType } from '../src/Instruments';
-import { Measurement } from '../src/Measurement';
 
 export const defaultResource = new Resource({
   resourceKey: 'my-resource',
