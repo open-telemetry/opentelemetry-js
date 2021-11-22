@@ -101,6 +101,7 @@ describe('PrometheusSerializer', () => {
         }).getMeter('test');
         const observableGauge = meter.createObservableGauge(
           'test',
+          {},
           observableResult => {
             observableResult.observe(1, attributes);
           }
@@ -127,6 +128,7 @@ describe('PrometheusSerializer', () => {
         }).getMeter('test');
         const observableGauge = meter.createObservableGauge(
           'test',
+          {},
           observableResult => {
             observableResult.observe(1, attributes);
           }
@@ -304,11 +306,11 @@ describe('PrometheusSerializer', () => {
         const processor = new PrometheusAttributesBatcher();
         const observableGauge = meter.createObservableGauge(
           'test',
-          observableResult => {
-            observableResult.observe(1, attributes);
-          },
           {
             description: 'foobar',
+          },
+          observableResult => {
+            observableResult.observe(1, attributes);
           }
         ) as ObservableGaugeMetric;
         await meter.collect();
