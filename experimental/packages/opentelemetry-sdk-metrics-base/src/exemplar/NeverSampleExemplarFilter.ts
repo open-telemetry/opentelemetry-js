@@ -22,7 +22,7 @@ import { ExemplarFilter } from './ExemplarFilter';
 
 export class NeverSampleExemplarFilter implements ExemplarFilter {
 
-  shouldSampleMeasurement(
+  shouldSample(
     value: ValueType,
     timestamp: HrTime,
     attributes: Attributes,

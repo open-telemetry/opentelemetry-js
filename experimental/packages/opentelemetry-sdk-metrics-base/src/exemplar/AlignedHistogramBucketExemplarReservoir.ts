@@ -26,6 +26,7 @@ import { FixedSizeExemplarReservoirBase } from './ExemplarReservoir';
  * AlignedHistogramBucketExemplarReservoir takes the same boundaries
  * configuration of a Histogram. This alogorithm keeps the last seen measurement
  * that falls within a histogram bucket.
+ * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#exemplar-defaults
  */
 export class AlignedHistogramBucketExemplarReservoir extends FixedSizeExemplarReservoirBase {
   private _boundaries: number[];
@@ -34,7 +35,7 @@ export class AlignedHistogramBucketExemplarReservoir extends FixedSizeExemplarRe
     this._boundaries = boundaries;
   }
 
-  reservoirIndexFor(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context) {
+  findBucket(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context) {
     for(let i = 0; i < this._boundaries.length; i++) {
       if (value <= this._boundaries[i]) {
         return i;

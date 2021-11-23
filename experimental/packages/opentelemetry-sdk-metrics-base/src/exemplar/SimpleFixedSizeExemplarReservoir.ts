@@ -20,7 +20,11 @@ import { FixedSizeExemplarReservoirBase } from './ExemplarReservoir';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-
+/**
+ * Fixed size reservoir that uses equivalent of naive reservoir sampling
+ * algorithm to accept measurements.
+ * 
+ */
 export class SimpleFixedSizeExemplarReservoir extends FixedSizeExemplarReservoirBase {
   private _counter: number;
   constructor(size: number) {
@@ -34,14 +38,10 @@ export class SimpleFixedSizeExemplarReservoir extends FixedSizeExemplarReservoir
     return Math.floor(Math.random() * (max - min) + min); 
   }
 
-  reservoirIndexFor(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context) {
+  findBucket(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context) {
     const index = this.getRandomInt(this._counter, this._counter+1);
     this._counter += 1;
     return index < this._size ? index: -1;
-  }
-
-  numOfMeasurements(): number {
-    return this._counter;
   }
 
   override reset() {

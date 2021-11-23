@@ -15,7 +15,7 @@
  */
 
 import { ValueType, Attributes } from '@opentelemetry/api-metrics'
-import { Context, HrTime, trace } from '@opentelemetry/api'
+import { Context, HrTime, isSpanContextValid, trace } from '@opentelemetry/api'
 import { Exemplar } from './Exemplar'
 
 
@@ -25,7 +25,7 @@ import { Exemplar } from './Exemplar'
 export interface ExemplarReservoir {
 
   /** Offers a measurement to be sampled. */
-  offerMeasurement(
+  offer(
     value: ValueType,
     timestamp: HrTime,
     attributes: Attributes,
@@ -37,7 +37,7 @@ export interface ExemplarReservoir {
    * 
    * @param pointAttributes The attributes associated with metric point. 
    */
-  collectAndReset(pointAttributes: Attributes): ReadonlyArray<Exemplar>;
+  collect(pointAttributes: Attributes): Exemplar[];
 }
 
 
@@ -50,18 +50,21 @@ class StorageItem {
 
   constructor() {}
 
-  offerMeasurement(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context) {
+  offer(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context) {
     this.value = value;
-    this.attributes = attributes;
     this.timestamp = timestamp;
+    this.attributes = attributes;
     const spanContext = trace.getSpanContext(ctx);
-    this.spanId = spanContext?.spanId;
-    this.traceId = spanContext?.traceId;
+    if (spanContext && isSpanContextValid(spanContext)) {
+      this.spanId = spanContext.spanId;
+      this.traceId = spanContext.traceId;
+    }
   }
 
-  getAndReset(pointAttributes: Attributes): Exemplar | null {
+  collect(pointAttributes: Attributes): Exemplar | null {
     const currentAttriubtes = this.attributes;
     if (currentAttriubtes !== null) {
+      // filter attributes
       Object.keys(pointAttributes).forEach(key => {
         if (pointAttributes[key] === currentAttriubtes[key]) {
           delete currentAttriubtes[key];
@@ -98,30 +101,33 @@ export abstract class FixedSizeExemplarReservoirBase implements ExemplarReservoi
     }
   }
 
-  abstract reservoirIndexFor(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context): number;
+  abstract findBucket(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context): number;
 
   maxSize(): number {
     return this._size;
   }
 
-  offerMeasurement(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context) {
-    const index = this.reservoirIndexFor(value, timestamp, attributes, ctx);
+  offer(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context): void {
+    const index = this.findBucket(value, timestamp, attributes, ctx);
     if (index !== -1) {
-      this._reservoirStorage[index].offerMeasurement(value, timestamp, attributes, ctx)
+      this._reservoirStorage[index].offer(value, timestamp, attributes, ctx)
     }
   }
 
-  reset() {}
+  /**
+   * Resets the reservoir
+   */
+  reset(): void {}
 
-  collectAndReset(pointAttributes: Attributes): ReadonlyArray<Exemplar> {
-    const retVal: Exemplar[] = [];
+  collect(pointAttributes: Attributes): Exemplar[] {
+    const exemplars: Exemplar[] = [];
     this._reservoirStorage.forEach(storageItem => {
-      const res = storageItem.getAndReset(pointAttributes);
+      const res = storageItem.collect(pointAttributes);
       if (res !== null) {
-        retVal.push(res);
+        exemplars.push(res);
       }
     });
     this.reset();
-    return retVal;
+    return exemplars;
   }
 }

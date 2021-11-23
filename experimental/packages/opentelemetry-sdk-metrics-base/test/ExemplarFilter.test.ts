@@ -26,21 +26,21 @@ import {
 describe('ExemplarFilter', () => {
 
 	describe('AlwaysSampleExemplarFilter', () => {
-		it('should return true always for shouldSampleMeasurement', () => {
+		it('should return true always for shouldSample', () => {
 			const filter = new AlwaysSampleExemplarFilter();
-			assert.strictEqual(filter.shouldSampleMeasurement(10, [0, 0], {}, ROOT_CONTEXT), true);
+			assert.strictEqual(filter.shouldSample(10, [0, 0], {}, ROOT_CONTEXT), true);
 		});
 	})
 
 	describe('NeverSampleExemplarFilter', () => {
-		it('should return false always for shouldSampleMeasurement', () => {
+		it('should return false always for shouldSample', () => {
 			const filter = new NeverSampleExemplarFilter()
-			assert.strictEqual(filter.shouldSampleMeasurement(1, [0, 0], {}, ROOT_CONTEXT), false);
+			assert.strictEqual(filter.shouldSample(1, [0, 0], {}, ROOT_CONTEXT), false);
 		});
 	});
 
 	describe('WithTraceExemplarFilter', () => {
-		it('should return false for shouldSampleMeasurement when the trace is not sampled', () => {
+		it('should return false for shouldSample when the trace is not sampled', () => {
 			const filter = new WithTraceExemplarFilter();
       const spanContext: SpanContext = {
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
@@ -48,10 +48,10 @@ describe('ExemplarFilter', () => {
         traceFlags: TraceFlags.NONE,
       };
 			const ctx = trace.setSpanContext(ROOT_CONTEXT, spanContext)
-			assert.strictEqual(filter.shouldSampleMeasurement(5.3, [0, 0,], {}, ctx), false);
+			assert.strictEqual(filter.shouldSample(5.3, [0, 0,], {}, ctx), false);
 		});
 
-		it('should return true for shouldSampleMeasurement when the trace is sampled', () => {
+		it('should return true for shouldSample when the trace is sampled', () => {
 			const filter = new WithTraceExemplarFilter();
       const spanContext: SpanContext = {
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
@@ -59,7 +59,7 @@ describe('ExemplarFilter', () => {
         traceFlags: TraceFlags.SAMPLED,
       };
 			const ctx = trace.setSpanContext(ROOT_CONTEXT, spanContext)
-			assert.strictEqual(filter.shouldSampleMeasurement(5.3, [0, 0,], {}, ctx), true);
+			assert.strictEqual(filter.shouldSample(5.3, [0, 0,], {}, ctx), true);
 		});
 	});
 });

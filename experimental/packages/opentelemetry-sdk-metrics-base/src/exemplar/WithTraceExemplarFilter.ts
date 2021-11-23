@@ -15,18 +15,20 @@
  */
 
 import { ValueType, Attributes } from '@opentelemetry/api-metrics'
-import { Context, HrTime, trace, TraceFlags } from '@opentelemetry/api'
+import { Context, HrTime, isSpanContextValid, trace, TraceFlags } from '@opentelemetry/api'
 import { ExemplarFilter } from './ExemplarFilter';
 
 export class WithTraceExemplarFilter implements ExemplarFilter {
 
-  shouldSampleMeasurement(
+  shouldSample(
     value: ValueType,
     timestamp: HrTime,
     attributes: Attributes,
     ctx: Context
   ): boolean {
     const spanContext = trace.getSpanContext(ctx);
+    if (!spanContext || !isSpanContextValid(spanContext))
+      return false;
     return spanContext.traceFlags & TraceFlags.SAMPLED ? true : false;
   }
 }

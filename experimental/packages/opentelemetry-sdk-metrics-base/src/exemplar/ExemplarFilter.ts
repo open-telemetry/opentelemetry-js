@@ -31,7 +31,7 @@ export interface ExemplarFilter {
    * @param attributes The complete set of Attributes of the measurement
    * @param context The Context of the measurement
    */
-  shouldSampleMeasurement(
+  shouldSample(
     value: ValueType,
     timestamp: HrTime,
     attributes: Attributes,
