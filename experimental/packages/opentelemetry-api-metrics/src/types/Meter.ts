@@ -81,36 +81,36 @@ export interface Meter {
   /**
    * Creates a new `ObservableGauge` metric.
    * @param name the name of the metric.
+   * @param callback the observable callback
    * @param [options] the metric options.
-   * @param [callback] the observable callback
    */
   createObservableGauge(
     name: string,
-    options?: MetricOptions,
-    callback?: (observableResult: ObservableResult) => void
+    callback: (observableResult: ObservableResult) => void,
+    options?: MetricOptions
   ): ObservableGauge;
 
   /**
    * Creates a new `ObservableCounter` metric.
    * @param name the name of the metric.
+   * @param callback the observable callback
    * @param [options] the metric options.
-   * @param [callback] the observable callback
    */
   createObservableCounter(
     name: string,
-    options?: MetricOptions,
-    callback?: (observableResult: ObservableResult) => void
+    callback: (observableResult: ObservableResult) => void,
+    options?: MetricOptions
   ): ObservableCounter;
 
   /**
    * Creates a new `ObservableUpDownCounter` metric.
    * @param name the name of the metric.
+   * @param callback the observable callback
    * @param [options] the metric options.
-   * @param [callback] the observable callback
    */
   createObservableUpDownCounter(
     name: string,
-    options?: MetricOptions,
-    callback?: (observableResult: ObservableResult) => void
+    callback: (observableResult: ObservableResult) => void,
+    options?: MetricOptions
   ): ObservableUpDownCounter;
 }

@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-import { Attributes } from './Metric';
+import { Context } from '@opentelemetry/api';
+import { Attributes } from '@opentelemetry/api-metrics';
+import { WritableMetricStorage } from './WritableMetricStorage';
 
-/**
- * Interface that is being used in callback function for Observable Metric
- */
-export interface ObservableResult {
-  observe(value: number, attributes?: Attributes): void;
+export class MultiMetricStorage implements WritableMetricStorage {
+  constructor(private readonly _backingStorages: WritableMetricStorage[]) {}
+
+  record(value: number, attributes: Attributes, context: Context) {
+    this._backingStorages.forEach(it => {
+      it.record(value, attributes, context);
+    });
+  }
 }

@@ -14,11 +14,19 @@
  * limitations under the License.
  */
 
-import { Attributes } from './Metric';
+import * as assert from 'assert';
+import { context } from '@opentelemetry/api';
+import { NoopAttributesProcessor } from '../../src/view/AttributesProcessor';
 
-/**
- * Interface that is being used in callback function for Observable Metric
- */
-export interface ObservableResult {
-  observe(value: number, attributes?: Attributes): void;
-}
+describe('NoopAttributesProcessor', () => {
+  const processor = new NoopAttributesProcessor();
+
+  it('should return identical attributes on process', () => {
+    assert.deepStrictEqual(
+      processor.process({ foo: 'bar' }, context.active()),
+      {
+        foo: 'bar',
+      }
+    );
+  });
+});

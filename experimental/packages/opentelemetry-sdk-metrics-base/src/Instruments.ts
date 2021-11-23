@@ -16,55 +16,51 @@
 
 import * as api from '@opentelemetry/api';
 import * as metrics from '@opentelemetry/api-metrics';
-import { Meter } from './Meter';
+import { InstrumentDescriptor } from './InstrumentDescriptor';
+import { WritableMetricStorage } from './state/WritableMetricStorage';
 
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#instrument
 
 export enum InstrumentType {
-    COUNTER = 'COUNTER',
-    HISTOGRAM = 'HISTOGRAM',
-    UP_DOWN_COUNTER = 'UP_DOWN_COUNTER',
-    OBSERVABLE_COUNTER = 'OBSERVABLE_COUNTER',
-    OBSERVABLE_GAUGE = 'OBSERVABLE_GAUGE',
-    OBSERVABLE_UP_DOWN_COUNTER = 'OBSERVABLE_UP_DOWN_COUNTER',
+  COUNTER = 'COUNTER',
+  HISTOGRAM = 'HISTOGRAM',
+  UP_DOWN_COUNTER = 'UP_DOWN_COUNTER',
+  OBSERVABLE_COUNTER = 'OBSERVABLE_COUNTER',
+  OBSERVABLE_GAUGE = 'OBSERVABLE_GAUGE',
+  OBSERVABLE_UP_DOWN_COUNTER = 'OBSERVABLE_UP_DOWN_COUNTER',
 }
 
 export class SyncInstrument {
-    constructor(private _meter: Meter, private _name: string) { }
+  constructor(private _writableMetricStorage: WritableMetricStorage, private _descriptor: InstrumentDescriptor) { }
 
-    getName(): string {
-        return this._name;
-    }
+  getName(): string {
+    return this._descriptor.name;
+  }
 
- 
-    aggregate(value: number, attributes: metrics.Attributes = {}, ctx: api.Context = api.context.active()) {
-        this._meter.aggregate(this, {
-            value,
-            attributes,
-            context: ctx,
-        });
-    }
+  aggregate(value: number, attributes: metrics.Attributes = {}, context: api.Context = api.context.active()) {
+    this._writableMetricStorage.record(value, attributes, context);
+  }
 }
 
 export class UpDownCounter extends SyncInstrument implements metrics.Counter {
-    add(value: number, attributes?: metrics.Attributes, ctx?: api.Context): void {
-        this.aggregate(value, attributes, ctx);
-    }
+  add(value: number, attributes?: metrics.Attributes, ctx?: api.Context): void {
+    this.aggregate(value, attributes, ctx);
+  }
 }
 
 export class Counter extends SyncInstrument implements metrics.Counter {
-    add(value: number, attributes?: metrics.Attributes, ctx?: api.Context): void {
-        if (value < 0) {
-            api.diag.warn(`negative value provided to counter ${this.getName()}: ${value}`);
-            return;
-        }
-
-        this.aggregate(value, attributes, ctx);
+  add(value: number, attributes?: metrics.Attributes, ctx?: api.Context): void {
+    if (value < 0) {
+      api.diag.warn(`negative value provided to counter ${this.getName()}: ${value}`);
+      return;
     }
+
+    this.aggregate(value, attributes, ctx);
+  }
 }
 
 export class Histogram extends SyncInstrument implements metrics.Histogram {
-    record(value: number, attributes?: metrics.Attributes, ctx?: api.Context): void {
-        this.aggregate(value, attributes, ctx);
-    }
+  record(value: number, attributes?: metrics.Attributes, ctx?: api.Context): void {
+    this.aggregate(value, attributes, ctx);
+  }
 }

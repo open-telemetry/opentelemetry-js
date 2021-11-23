@@ -14,12 +14,28 @@
  * limitations under the License.
  */
 
-import { Measurement } from './Measurement';
+import { InstrumentType } from '../Instruments';
+import { PatternPredicate, Predicate } from './Predicate';
 
-// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#aggregation
-
-export interface Aggregator {
-    aggregate(measurement: Measurement): void;
+export interface InstrumentSelectorCriteria {
+  name?: string;
+  type?: InstrumentType;
 }
 
-// TODO define actual aggregator classes
+export class InstrumentSelector {
+  private _nameFilter: Predicate;
+  private _type?: InstrumentType;
+
+  constructor(criteria?: InstrumentSelectorCriteria) {
+    this._nameFilter = new PatternPredicate(criteria?.name ?? '*');
+    this._type = criteria?.type;
+  }
+
+  getType() {
+    return this._type
+  }
+
+  getNameFilter() {
+    return this._nameFilter;
+  }
+}

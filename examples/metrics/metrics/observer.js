@@ -23,14 +23,14 @@ const meter = new MeterProvider({
   interval: 2000,
 }).getMeter('example-meter');
 
-meter.createObservableGauge('cpu_core_usage', {
-  description: 'Example of a sync observable gauge with callback',
-}, async (observableResult) => { // this callback is called once per each interval
+meter.createObservableGauge('cpu_core_usage', async (observableResult) => { // this callback is called once per each interval
   await new Promise((resolve) => {
     setTimeout(() => { resolve(); }, 50);
   });
   observableResult.observe(getRandomValue(), { core: '1' });
   observableResult.observe(getRandomValue(), { core: '2' });
+}, {
+  description: 'Example of a sync observable gauge with callback',
 });
 
 function getRandomValue() {
