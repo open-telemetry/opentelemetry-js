@@ -24,6 +24,8 @@ import {
 } from '../src/exemplar/';
 
 describe('ExemplarFilter', () => {
+  const TRACE_ID = 'd4cda95b652f4a1592b449d5929fda1b';
+  const SPAN_ID = '6e0c63257de34c92';
 
 	describe('AlwaysSampleExemplarFilter', () => {
 		it('should return true always for shouldSample', () => {
@@ -43,8 +45,8 @@ describe('ExemplarFilter', () => {
 		it('should return false for shouldSample when the trace is not sampled', () => {
 			const filter = new WithTraceExemplarFilter();
       const spanContext: SpanContext = {
-        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-        spanId: '6e0c63257de34c92',
+        traceId: TRACE_ID,
+        spanId: SPAN_ID,
         traceFlags: TraceFlags.NONE,
       };
 			const ctx = trace.setSpanContext(ROOT_CONTEXT, spanContext)
@@ -54,8 +56,8 @@ describe('ExemplarFilter', () => {
 		it('should return true for shouldSample when the trace is sampled', () => {
 			const filter = new WithTraceExemplarFilter();
       const spanContext: SpanContext = {
-        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-        spanId: '6e0c63257de34c92',
+        traceId: TRACE_ID,
+        spanId: SPAN_ID,
         traceFlags: TraceFlags.SAMPLED,
       };
 			const ctx = trace.setSpanContext(ROOT_CONTEXT, spanContext)

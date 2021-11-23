@@ -25,6 +25,9 @@ import {
 
 describe('ExemplarReservoir', () => {
 
+  const TRACE_ID = 'd4cda95b652f4a1592b449d5929fda1b';
+  const SPAN_ID = '6e0c63257de34c92';
+
   describe('SimpleFixedSizeExemplarReservoir', () => {
     it('should not return any result without measurements', () => {
       const reservoir = new SimpleFixedSizeExemplarReservoir(10);
@@ -34,8 +37,8 @@ describe('ExemplarReservoir', () => {
     it('should have the trace context information', () => {
       const reservoir = new SimpleFixedSizeExemplarReservoir(1);
       const spanContext: SpanContext = {
-        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-        spanId: '6e0c63257de34c92',
+        traceId: TRACE_ID,
+        spanId: SPAN_ID,
         traceFlags: TraceFlags.SAMPLED,
       };
       const ctx = trace.setSpanContext(ROOT_CONTEXT, spanContext)
@@ -43,8 +46,8 @@ describe('ExemplarReservoir', () => {
       reservoir.offer(1, hrTime(), {}, ctx);
       const exemplars = reservoir.collect({});
       assert.strictEqual(exemplars.length, 1);
-      assert.strictEqual(exemplars[0].traceId, 'd4cda95b652f4a1592b449d5929fda1b');
-      assert.strictEqual(exemplars[0].spanId, '6e0c63257de34c92');
+      assert.strictEqual(exemplars[0].traceId, TRACE_ID);
+      assert.strictEqual(exemplars[0].spanId, SPAN_ID);
     });
 
   });
