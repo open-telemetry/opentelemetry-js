@@ -62,15 +62,15 @@ describe('ExemplarReservoir', () => {
   describe('AlignedHistogramBucketExemplarReservoir', () => {
     it('should put measurements into buckets', () => {
       const reservoir = new AlignedHistogramBucketExemplarReservoir([0, 5, 10, 25, 50, 75]);
-      reservoir.offer(52, hrTime(), {'bucket': 5}, ROOT_CONTEXT);
-      reservoir.offer(7, hrTime(), {'bucket': 3}, ROOT_CONTEXT);
-      reservoir.offer(6, hrTime(), {'bucket': 3}, ROOT_CONTEXT);
-      const exemplars = reservoir.collectAndReset({'bucket': 3});
+      reservoir.offer(52, hrTime(), {'bucket': '5'}, ROOT_CONTEXT);
+      reservoir.offer(7, hrTime(), {'bucket': '3'}, ROOT_CONTEXT);
+      reservoir.offer(6, hrTime(), {'bucket': '3'}, ROOT_CONTEXT);
+      const exemplars = reservoir.collectAndReset({'bucket': '3'});
       assert.strictEqual(exemplars.length, 2);
       assert.strictEqual(exemplars[0].value, 6);
       assert.strictEqual(Object.keys(exemplars[0].filteredAttributes).length, 0);
       assert.strictEqual(exemplars[1].value, 52);
-      assert.notStrictEqual(exemplars[1].filteredAttributes, {'bucket':5});
+      assert.notStrictEqual(exemplars[1].filteredAttributes, {'bucket':'5'});
     });
   });
 });
