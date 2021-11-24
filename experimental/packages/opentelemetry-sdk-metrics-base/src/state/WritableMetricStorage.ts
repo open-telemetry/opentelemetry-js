@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-import { ObservableBase } from './Metric';
+import { Context } from '@opentelemetry/api';
+import { Attributes } from '@opentelemetry/api-metrics';
 
-/**
- * Interface for updating value of certain observable
- */
-export interface Observation {
-  observable: ObservableBase;
-  value: number;
+export interface WritableMetricStorage {
+  record(value: number, attributes: Attributes, context: Context): void;
+}
+
+export class NoopWritableMetricStorage implements WritableMetricStorage {
+  record(_value: number, _attributes: Attributes, _context: Context): void {}
 }

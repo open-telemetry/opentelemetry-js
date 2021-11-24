@@ -14,11 +14,23 @@
  * limitations under the License.
  */
 
-import { Attributes } from './Metric';
+import { MetricOptions, ValueType } from '@opentelemetry/api-metrics';
+import { InstrumentType } from './Instruments';
 
-/**
- * Interface that is being used in callback function for Observable Metric
- */
-export interface ObservableResult {
-  observe(value: number, attributes?: Attributes): void;
+export interface InstrumentDescriptor {
+  readonly name: string;
+  readonly description: string;
+  readonly unit: string;
+  readonly type: InstrumentType;
+  readonly valueType: ValueType;
+}
+
+export function createInstrumentDescriptor(name: string, type: InstrumentType, options?: MetricOptions): InstrumentDescriptor {
+  return {
+    name,
+    type,
+    description: options?.description ?? '',
+    unit: options?.unit ?? '1',
+    valueType: options?.valueType ?? ValueType.DOUBLE,
+  };
 }

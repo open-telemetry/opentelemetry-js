@@ -27,7 +27,6 @@ import {
   ObservableUpDownCounter,
 } from './types/Metric';
 import { ObservableResult } from './types/ObservableResult';
-import { Observation } from './types/Observation';
 
 /**
  * NoopMeter is a noop implementation of the {@link Meter} interface. It reuses
@@ -66,13 +65,13 @@ export class NoopMeter implements Meter {
   /**
    * Returns a constant noop observable gauge.
    * @param name the name of the metric.
+   * @param callback the observable gauge callback
    * @param [options] the metric options.
-   * @param [callback] the observable gauge callback
    */
   createObservableGauge(
     _name: string,
+    _callback: (observableResult: ObservableResult) => void,
     _options?: MetricOptions,
-    _callback?: (observableResult: ObservableResult) => void
   ): ObservableGauge {
     return NOOP_OBSERVABLE_GAUGE_METRIC;
   }
@@ -80,13 +79,13 @@ export class NoopMeter implements Meter {
   /**
    * Returns a constant noop observable counter.
    * @param name the name of the metric.
+   * @param callback the observable counter callback
    * @param [options] the metric options.
-   * @param [callback] the observable counter callback
    */
   createObservableCounter(
     _name: string,
+    _callback: (observableResult: ObservableResult) => void,
     _options?: MetricOptions,
-    _callback?: (observableResult: ObservableResult) => void
   ): ObservableCounter {
     return NOOP_OBSERVABLE_COUNTER_METRIC;
   }
@@ -94,13 +93,13 @@ export class NoopMeter implements Meter {
   /**
    * Returns a constant noop up down observable counter.
    * @param name the name of the metric.
+   * @param callback the up down observable counter callback
    * @param [options] the metric options.
-   * @param [callback] the up down observable counter callback
    */
   createObservableUpDownCounter(
     _name: string,
+    _callback: (observableResult: ObservableResult) => void,
     _options?: MetricOptions,
-    _callback?: (observableResult: ObservableResult) => void
   ): ObservableUpDownCounter {
     return NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC;
   }
@@ -120,14 +119,7 @@ export class NoopHistogramMetric extends NoopMetric implements Histogram {
   record(_value: number, _attributes: Attributes): void {}
 }
 
-export class NoopObservableBaseMetric extends NoopMetric implements ObservableBase {
-  observation(): Observation {
-    return {
-      observable: this as ObservableBase,
-      value: 0,
-    };
-  }
-}
+export class NoopObservableBaseMetric extends NoopMetric implements ObservableBase {}
 
 export const NOOP_METER = new NoopMeter();
 

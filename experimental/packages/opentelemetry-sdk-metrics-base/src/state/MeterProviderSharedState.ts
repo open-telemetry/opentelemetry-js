@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-import { Attributes } from './Metric';
+import { Resource } from '@opentelemetry/resources';
+import { ViewRegistry } from '../view/ViewRegistry';
 
 /**
- * Interface that is being used in callback function for Observable Metric
+ * An internal record for shared meter provider states.
  */
-export interface ObservableResult {
-  observe(value: number, attributes?: Attributes): void;
+export class MeterProviderSharedState {
+  viewRegistry = new ViewRegistry();
+
+  constructor(public resource: Resource) {}
 }
