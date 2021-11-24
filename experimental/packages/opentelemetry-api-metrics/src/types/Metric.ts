@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-import {
-  Observation,
-} from './Observation';
-
 /**
  * Options needed for metric creation
  */
@@ -112,13 +108,10 @@ export interface Histogram {
   record(value: number, attributes?: Attributes): void;
 }
 
+// ObservableBase has to be an Object but for now there is no field or method
+// declared.
 /** Base interface for the Observable metrics. */
-export interface ObservableBase {
-  observation: (
-    value: number,
-    attributes?: Attributes,
-  ) => Observation;
-}
+export type ObservableBase = Record<never, never>;
 
 /** Base interface for the ObservableGauge metrics. */
 export type ObservableGauge = ObservableBase;
