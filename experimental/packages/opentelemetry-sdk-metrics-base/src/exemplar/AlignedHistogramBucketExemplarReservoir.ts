@@ -19,8 +19,6 @@ import { Context, HrTime } from '@opentelemetry/api';
 import { ValueType, Attributes } from '@opentelemetry/api-metrics';
 import { FixedSizeExemplarReservoirBase } from './ExemplarReservoir';
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 
 /**
  * AlignedHistogramBucketExemplarReservoir takes the same boundaries
@@ -35,7 +33,7 @@ export class AlignedHistogramBucketExemplarReservoir extends FixedSizeExemplarRe
     this._boundaries = boundaries;
   }
 
-  findBucket(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context) {
+  findBucketIndex(value: ValueType, _timestamp: HrTime, _attributes: Attributes, _ctx: Context) {
     for(let i = 0; i < this._boundaries.length; i++) {
       if (value <= this._boundaries[i]) {
         return i;

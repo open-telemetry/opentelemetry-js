@@ -18,8 +18,6 @@ import { Context, HrTime } from '@opentelemetry/api';
 import { ValueType, Attributes } from '@opentelemetry/api-metrics';
 import { FixedSizeExemplarReservoirBase } from './ExemplarReservoir';
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 /**
  * Fixed size reservoir that uses equivalent of naive reservoir sampling
  * algorithm to accept measurements.
@@ -38,7 +36,7 @@ export class SimpleFixedSizeExemplarReservoir extends FixedSizeExemplarReservoir
     return Math.floor(Math.random() * (max - min) + min); 
   }
 
-  findBucket(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context) {
+  findBucketIndex(_value: ValueType, _timestamp: HrTime, _attributes: Attributes, _ctx: Context) {
     const index = this.getRandomInt(this._counter, this._counter+1);
     this._counter += 1;
     return index < this._size ? index: -1;

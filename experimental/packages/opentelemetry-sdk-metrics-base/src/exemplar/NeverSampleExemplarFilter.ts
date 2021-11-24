@@ -18,15 +18,13 @@ import { ValueType, Attributes } from '@opentelemetry/api-metrics'
 import { Context, HrTime } from '@opentelemetry/api'
 import { ExemplarFilter } from './ExemplarFilter';
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 export class NeverSampleExemplarFilter implements ExemplarFilter {
 
   shouldSample(
-    value: ValueType,
-    timestamp: HrTime,
-    attributes: Attributes,
-    ctx: Context
+    _value: ValueType,
+    _timestamp: HrTime,
+    _attributes: Attributes,
+    _ctx: Context
   ): boolean {
       return false;
   }

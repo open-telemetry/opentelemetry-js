@@ -41,7 +41,7 @@ export interface ExemplarReservoir {
 }
 
 
-class StorageItem {
+class ExamplarBucket {
   private value: ValueType = 0;
   private attributes: Attributes = null;
   private timestamp: HrTime = [0, 0];
@@ -90,25 +90,25 @@ class StorageItem {
 
 
 export abstract class FixedSizeExemplarReservoirBase implements ExemplarReservoir {
-  private _reservoirStorage: StorageItem[];
+  private _reservoirStorage: ExamplarBucket[];
   protected _size: number;
 
   constructor(size: number) {
     this._size = size;
-    this._reservoirStorage = new Array<StorageItem>(size);
+    this._reservoirStorage = new Array<ExamplarBucket>(size);
     for(let i = 0; i < this._size; i++) {
-      this._reservoirStorage[i] = new StorageItem();
+      this._reservoirStorage[i] = new ExamplarBucket();
     }
   }
 
-  abstract findBucket(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context): number;
+  abstract findBucketIndex(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context): number;
 
   maxSize(): number {
     return this._size;
   }
 
   offer(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context): void {
-    const index = this.findBucket(value, timestamp, attributes, ctx);
+    const index = this.findBucketIndex(value, timestamp, attributes, ctx);
     if (index !== -1) {
       this._reservoirStorage[index].offer(value, timestamp, attributes, ctx)
     }
