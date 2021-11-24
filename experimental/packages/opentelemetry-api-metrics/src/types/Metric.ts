@@ -125,4 +125,4 @@ export type ObservableCounter = ObservableBase;
 /**
  * key-value pairs passed by the user.
  */
-export type Attributes = { [key: string]: string };
+export type Attributes = { [key: string]: string } | null;
