@@ -15,7 +15,7 @@
  */
 
 import { Context } from '@opentelemetry/api';
-import { Attributes } from '@opentelemetry/api-metrics';
+import { Attributes } from '@opentelemetry/api-metrics-wip';
 
 export interface WritableMetricStorage {
   record(value: number, attributes: Attributes, context: Context): void;

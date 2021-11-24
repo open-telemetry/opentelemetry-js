@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { ValueType } from '@opentelemetry/api-metrics';
+import { ValueType } from '@opentelemetry/api-metrics-wip';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { InstrumentType } from '../../src/Instruments';
 import { ViewRegistry } from '../../src/view/ViewRegistry';
