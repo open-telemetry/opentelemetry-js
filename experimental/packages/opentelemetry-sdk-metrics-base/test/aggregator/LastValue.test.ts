@@ -64,6 +64,7 @@ describe('LastValueAggregator', () => {
       accumulation.record(1);
       accumulation.record(2);
       accumulation.record(1);
+      accumulation.record(4);
 
       const sdkStartTime: HrTime = [0, 0];
       const lastCollectionTime: HrTime = [1, 1];
@@ -79,7 +80,7 @@ describe('LastValueAggregator', () => {
             attributes: {},
             startTime: lastCollectionTime,
             endTime: collectionTime,
-            point: 1,
+            point: 4,
           },
         ],
       };
