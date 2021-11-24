@@ -67,9 +67,9 @@ export enum ValueType {
 
 /** The kind of aggregator. */
 export enum AggregationTemporality {
-  UNSPECIFIED,
-  DELTA,
-  CUMULATIVE,
+  AGGREGATION_TEMPORALITY_UNSPECIFIED,
+  AGGREGATION_TEMPORALITY_DELTA,
+  AGGREGATION_TEMPORALITY_CUMULATIVE,
 }
 
 /**
