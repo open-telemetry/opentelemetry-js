@@ -23,6 +23,7 @@ import {
   WithTraceExemplarFilter
 } from '../src/exemplar/';
 
+
 describe('ExemplarFilter', () => {
   const TRACE_ID = 'd4cda95b652f4a1592b449d5929fda1b';
   const SPAN_ID = '6e0c63257de34c92';

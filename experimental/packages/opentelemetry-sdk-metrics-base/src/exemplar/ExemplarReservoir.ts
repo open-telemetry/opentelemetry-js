@@ -37,7 +37,7 @@ export interface ExemplarReservoir {
    * 
    * @param pointAttributes The attributes associated with metric point. 
    */
-  collect(pointAttributes: Attributes): Exemplar[];
+  collectAndReset(pointAttributes: Attributes): Exemplar[];
 }
 
 
@@ -61,7 +61,7 @@ class ExamplarBucket {
     }
   }
 
-  collect(pointAttributes: Attributes): Exemplar | null {
+  collectAndReset(pointAttributes: Attributes): Exemplar | null {
     const currentAttriubtes = this.attributes;
     if (currentAttriubtes !== null) {
       // filter attributes
@@ -119,10 +119,10 @@ export abstract class FixedSizeExemplarReservoirBase implements ExemplarReservoi
    */
   reset(): void {}
 
-  collect(pointAttributes: Attributes): Exemplar[] {
+  collectAndReset(pointAttributes: Attributes): Exemplar[] {
     const exemplars: Exemplar[] = [];
     this._reservoirStorage.forEach(storageItem => {
-      const res = storageItem.collect(pointAttributes);
+      const res = storageItem.collectAndReset(pointAttributes);
       if (res !== null) {
         exemplars.push(res);
       }
