@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { Sum, AggregatorKind, Aggregator, Accumulation, AccumulationRecord } from './types';
+import { LastValue, AggregatorKind, Aggregator, Accumulation, AccumulationRecord } from './types';
 import { HrTime } from '@opentelemetry/api';
-import { InstrumentationLibrary } from '@opentelemetry/core';
+import { hrTime, hrTimeToMicroseconds, InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 import { PointDataType, SingularMetricData } from '../export/MetricData';
@@ -24,18 +24,19 @@ import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 
 export class LastValueAccumulation implements Accumulation {
-  constructor(private _current: number = 0) {}
+  constructor(private _current: number = 0, public sampleTime: HrTime = [0, 0]) {}
 
   record(value: number): void {
     this._current = value;
+    this.sampleTime = hrTime();
   }
 
-  toPoint(): Sum {
+  toPoint(): LastValue {
     return this._current;
   }
 }
 
-/** Basic aggregator which calculates a Sum from individual measurements. */
+/** Basic aggregator which calculates a LastValue from individual measurements. */
 export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
   public kind: AggregatorKind.LAST_VALUE = AggregatorKind.LAST_VALUE;
 
@@ -48,18 +49,22 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
    *
    * Return the newly captured (delta) accumulation for LastValueAggregator.
    */
-  merge(_previous: LastValueAccumulation, delta: LastValueAccumulation): LastValueAccumulation {
-    return new LastValueAccumulation(delta.toPoint());
+  merge(previous: LastValueAccumulation, delta: LastValueAccumulation): LastValueAccumulation {
+    // nanoseconds may lose precisions.
+    const latestAccumulation = hrTimeToMicroseconds(delta.sampleTime) >= hrTimeToMicroseconds(previous.sampleTime) ? delta : previous;
+    return new LastValueAccumulation(latestAccumulation.toPoint(), latestAccumulation.sampleTime);
   }
 
   /**
    * Returns a new DELTA aggregation by comparing two cumulative measurements.
    *
    * A delta aggregation is not meaningful to LastValueAggregator, just return
-   * a new LastValueAccumulation with the current value.
+   * the newly captured (delta) accumulation for LastValueAggregator.
    */
-  diff(_previous: LastValueAccumulation, current: LastValueAccumulation): LastValueAccumulation {
-    return new LastValueAccumulation(current.toPoint());
+  diff(previous: LastValueAccumulation, current: LastValueAccumulation): LastValueAccumulation {
+    // nanoseconds may lose precisions.
+    const latestAccumulation = hrTimeToMicroseconds(current.sampleTime) >= hrTimeToMicroseconds(previous.sampleTime) ? current : previous;
+    return new LastValueAccumulation(latestAccumulation.toPoint(), latestAccumulation.sampleTime);
   }
 
   toMetricData(

@@ -19,7 +19,7 @@ import * as assert from 'assert';
 import { LastValueAccumulation, LastValueAggregator } from '../../src/aggregator';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { MetricData, PointDataType } from '../../src/export/MetricData';
-import { commonValues, defaultInstrumentationLibrary, defaultInstrumentDescriptor, defaultResource } from '../util';
+import { commonValues, defaultInstrumentationLibrary, defaultInstrumentDescriptor, defaultResource, sleep } from '../util';
 
 describe('LastValueAggregator', () => {
   describe('createAccumulation', () => {
@@ -34,12 +34,28 @@ describe('LastValueAggregator', () => {
     it('no exceptions', () => {
       const aggregator = new LastValueAggregator();
       const prev = aggregator.createAccumulation();
-      prev.record(2);
-
       const delta = aggregator.createAccumulation();
+
+      prev.record(2);
       delta.record(3);
 
       assert.deepStrictEqual(aggregator.merge(prev, delta), delta);
+    });
+
+    it('return the newly sampled accumulation', async () => {
+      const aggregator = new LastValueAggregator();
+      const accumulation1 = aggregator.createAccumulation();
+      const accumulation2 = aggregator.createAccumulation();
+
+      accumulation1.record(2);
+      await sleep(1);
+      accumulation2.record(3);
+      // refresh the accumulation1
+      await sleep(1);
+      accumulation1.record(4);
+
+      assert.deepStrictEqual(aggregator.merge(accumulation1, accumulation2), accumulation1);
+      assert.deepStrictEqual(aggregator.merge(accumulation2, accumulation1), accumulation1);
     });
   });
 
@@ -47,12 +63,27 @@ describe('LastValueAggregator', () => {
     it('no exceptions', () => {
       const aggregator = new LastValueAggregator();
       const prev = aggregator.createAccumulation();
-      prev.record(2);
-
       const curr = aggregator.createAccumulation();
+
+      prev.record(2);
       curr.record(3);
 
       assert.deepStrictEqual(aggregator.diff(prev, curr), curr);
+    });
+
+    it('return the newly sampled accumulation', async () => {
+      const aggregator = new LastValueAggregator();
+      const accumulation1 = aggregator.createAccumulation();
+      const accumulation2 = aggregator.createAccumulation();
+
+      accumulation1.record(2);
+      accumulation2.record(3);
+      // refresh the accumulation1
+      await sleep(1);
+      accumulation1.record(4);
+
+      assert.deepStrictEqual(aggregator.diff(accumulation1, accumulation2), accumulation1);
+      assert.deepStrictEqual(aggregator.diff(accumulation2, accumulation1), accumulation1);
     });
   });
 
