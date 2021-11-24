@@ -18,8 +18,8 @@ import { Sum, AggregatorKind, Aggregator, Accumulation, AccumulationRecord } fro
 import { HrTime } from '@opentelemetry/api';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
+import { AggregationTemporality } from '../export/AggregationTemporality';
 import { PointDataType, SingularMetricData } from '../export/MetricData';
-import { AggregationTemporality } from '@opentelemetry/api-metrics-wip';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 
@@ -43,10 +43,21 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
     return new LastValueAccumulation();
   }
 
+  /**
+   * Returns the result of the merge of the given accumulations.
+   *
+   * Return the newly captured (delta) accumulation for LastValueAggregator.
+   */
   merge(_previous: LastValueAccumulation, delta: LastValueAccumulation): LastValueAccumulation {
     return new LastValueAccumulation(delta.toPoint());
   }
 
+  /**
+   * Returns a new DELTA aggregation by comparing two cumulative measurements.
+   *
+   * A delta aggregation is not meaningful to LastValueAggregator, just return
+   * a new LastValueAccumulation with the current value.
+   */
   diff(_previous: LastValueAccumulation, current: LastValueAccumulation): LastValueAccumulation {
     return new LastValueAccumulation(current.toPoint());
   }

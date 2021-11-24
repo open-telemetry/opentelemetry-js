@@ -15,9 +15,10 @@
  */
 
 import { HrTime } from '@opentelemetry/api';
-import { AggregationTemporality, Attributes } from '@opentelemetry/api-metrics-wip';
+import { Attributes } from '@opentelemetry/api-metrics-wip';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
+import { AggregationTemporality } from '../export/AggregationTemporality';
 import { Histogram, MetricData } from '../export/MetricData';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
@@ -38,6 +39,9 @@ export type LastValue = number;
 
 export type PointValueType = Sum | LastValue | Histogram;
 
+/**
+ * An Aggregator accumulation state.
+ */
 export interface Accumulation {
   // TODO: attributes and context for `ExemplarReservoir.offer`.
   record(value: number): void;
@@ -53,12 +57,45 @@ export interface Aggregator<T> {
   /** The kind of the aggregator. */
   kind: AggregatorKind;
 
+  /**
+   * Create a clean state of accumulation.
+   */
   createAccumulation(): T;
 
+  /**
+   * Returns the result of the merge of the given accumulations.
+   *
+   * This should always assume that the accumulations do not overlap and merge together for a new
+   * cumulative report.
+   *
+   * @param previous the previously captured accumulation
+   * @param delta the newly captured (delta) accumulation
+   * @returns the result of the merge of the given accumulations
+   */
   merge(previous: T, delta: T): T;
 
+  /**
+   * Returns a new DELTA aggregation by comparing two cumulative measurements.
+   *
+   * @param previous the previously captured accumulation
+   * @param current the newly captured (cumulative) accumulation
+   * @returns The resulting delta accumulation
+   */
   diff(previous: T, current: T): T;
 
+  /**
+   * Returns the {@link MetricData} that this {@link Aggregator} will produce.
+   *
+   * @param resource the resource producing the metric.
+   * @param instrumentationLibrary the library that instrumented the metric
+   * @param instrumentDescriptor the metric instrument descriptor.
+   * @param accumulationByAttributes the array of attributes and accumulation pair.
+   * @param temporality the temporality of the accumulation.
+   * @param sdkStartTime the start time of the sdk.
+   * @param lastCollectionTime the last collection time of the instrument.
+   * @param collectionTime the active collection time of the instrument.
+   * @return the {@link MetricData} that this {@link Aggregator} will produce.
+   */
   toMetricData(resource: Resource,
     instrumentationLibrary: InstrumentationLibrary,
     instrumentDescriptor: InstrumentDescriptor,

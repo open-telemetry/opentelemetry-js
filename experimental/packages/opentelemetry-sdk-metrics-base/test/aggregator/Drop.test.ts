@@ -15,9 +15,9 @@
  */
 
 import { HrTime } from '@opentelemetry/api';
-import { AggregationTemporality } from '@opentelemetry/api-metrics-wip';
 import * as assert from 'assert';
 import { DropAggregator } from '../../src/aggregator';
+import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { defaultInstrumentationLibrary, defaultInstrumentDescriptor, defaultResource } from '../util';
 
 describe('DropAggregator', () => {

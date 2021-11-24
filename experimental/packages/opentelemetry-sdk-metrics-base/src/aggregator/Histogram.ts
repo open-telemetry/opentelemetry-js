@@ -23,8 +23,8 @@ import {
 import { Histogram, HistogramMetricData, PointDataType } from '../export/MetricData';
 import { Resource } from '@opentelemetry/resources';
 import { InstrumentationLibrary } from '@opentelemetry/core';
-import { AggregationTemporality } from '@opentelemetry/api-metrics-wip';
 import { HrTime } from '@opentelemetry/api';
+import { AggregationTemporality } from '../export/AggregationTemporality';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 
@@ -109,6 +109,9 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
     });
   }
 
+  /**
+   * Returns a new DELTA aggregation by comparing two cumulative measurements.
+   */
   diff(previous: HistogramAccumulation, current: HistogramAccumulation): HistogramAccumulation {
     const previousPoint = previous.toPoint();
     const currentPoint = current.toPoint();

@@ -15,9 +15,9 @@
  */
 
 import { HrTime } from '@opentelemetry/api';
-import { AggregationTemporality } from '@opentelemetry/api-metrics-wip';
 import * as assert from 'assert';
 import { SumAccumulation, SumAggregator } from '../../src/aggregator';
+import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { MetricData, PointDataType } from '../../src/export/MetricData';
 import { commonValues, defaultInstrumentationLibrary, defaultInstrumentDescriptor, defaultResource } from '../util';
 

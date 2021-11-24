@@ -15,9 +15,9 @@
  */
 
 import { HrTime } from '@opentelemetry/api';
-import { AggregationTemporality } from '@opentelemetry/api-metrics-wip';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
+import { AggregationTemporality } from '../export/AggregationTemporality';
 import { MetricData } from '../export/MetricData';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';

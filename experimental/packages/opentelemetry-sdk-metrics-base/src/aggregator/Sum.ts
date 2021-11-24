@@ -19,7 +19,7 @@ import { HrTime } from '@opentelemetry/api';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { PointDataType, SingularMetricData } from '../export/MetricData';
-import { AggregationTemporality } from '@opentelemetry/api-metrics-wip';
+import { AggregationTemporality } from '../export/AggregationTemporality';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 
@@ -43,10 +43,16 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
     return new SumAccumulation();
   }
 
+  /**
+   * Returns the result of the merge of the given accumulations.
+   */
   merge(previous: SumAccumulation, delta: SumAccumulation): SumAccumulation {
     return new SumAccumulation(previous.toPoint() + delta.toPoint());
   }
 
+  /**
+   * Returns a new DELTA aggregation by comparing two cumulative measurements.
+   */
   diff(previous: SumAccumulation, current: SumAccumulation): SumAccumulation {
     return new SumAccumulation(current.toPoint() - previous.toPoint());
   }

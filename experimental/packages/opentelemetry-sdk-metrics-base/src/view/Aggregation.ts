@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import * as api from '@opentelemetry/api';
 import { Aggregator, SumAggregator, DropAggregator, LastValueAggregator, HistogramAggregator } from '../aggregator';
 import { Accumulation } from '../aggregator/types';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
@@ -73,6 +74,7 @@ export class LastValueAggregation extends Aggregation {
 }
 
 export class HistogramAggregation extends Aggregation {
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#histogram-aggregation
   static kDefault = new HistogramAggregator([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]);
   createAggregator(_instrument: InstrumentDescriptor) {
     return HistogramAggregation.kDefault;
@@ -107,6 +109,7 @@ export class DefaultAggregation extends Aggregation {
         return HistogramAggregation.kDefault;
       }
     }
+    api.diag.warn(`Unable to recognize instrument type: ${instrument.type}`);
     return DropAggregation.kDefault;
   }
 }
