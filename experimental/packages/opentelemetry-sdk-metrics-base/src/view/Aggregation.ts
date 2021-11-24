@@ -53,31 +53,31 @@ export abstract class Aggregation {
 }
 
 export class DropAggregation extends Aggregation {
-  static kDefault = new DropAggregator();
+  private static DEFAULT_INSTANCE = new DropAggregator();
   createAggregator(_instrument: InstrumentDescriptor) {
-    return DropAggregation.kDefault;
+    return DropAggregation.DEFAULT_INSTANCE;
   }
 }
 
 export class SumAggregation extends Aggregation {
-  static kDefault = new SumAggregator();
+  private static DEFAULT_INSTANCE = new SumAggregator();
   createAggregator(_instrument: InstrumentDescriptor) {
-    return SumAggregation.kDefault;
+    return SumAggregation.DEFAULT_INSTANCE;
   }
 }
 
 export class LastValueAggregation extends Aggregation {
-  static kDefault = new LastValueAggregator();
+  private static DEFAULT_INSTANCE = new LastValueAggregator();
   createAggregator(_instrument: InstrumentDescriptor) {
-    return LastValueAggregation.kDefault;
+    return LastValueAggregation.DEFAULT_INSTANCE;
   }
 }
 
 export class HistogramAggregation extends Aggregation {
   // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#histogram-aggregation
-  static kDefault = new HistogramAggregator([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]);
+  private static DEFAULT_INSTANCE = new HistogramAggregator([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]);
   createAggregator(_instrument: InstrumentDescriptor) {
-    return HistogramAggregation.kDefault;
+    return HistogramAggregation.DEFAULT_INSTANCE;
   }
 }
 
@@ -93,24 +93,28 @@ export class ExplicitBucketHistogramAggregation extends Aggregation {
 
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#default-aggregation
 export class DefaultAggregation extends Aggregation {
-  createAggregator(instrument: InstrumentDescriptor): Aggregator<Maybe<Accumulation>> {
+  private _resolve(instrument: InstrumentDescriptor): Aggregation {
     // cast to unknown to disable complaints on the (unreachable) fallback.
     switch (instrument.type as unknown) {
       case InstrumentType.COUNTER:
       case InstrumentType.UP_DOWN_COUNTER:
       case InstrumentType.OBSERVABLE_COUNTER:
       case InstrumentType.OBSERVABLE_UP_DOWN_COUNTER: {
-        return SumAggregation.kDefault;
+        return SUM_AGGREGATION;
       }
       case InstrumentType.OBSERVABLE_GAUGE: {
-        return LastValueAggregation.kDefault;
+        return LAST_VALUE_AGGREGATION;
       }
       case InstrumentType.HISTOGRAM: {
-        return HistogramAggregation.kDefault;
+        return HISTOGRAM_AGGREGATION;
       }
     }
     api.diag.warn(`Unable to recognize instrument type: ${instrument.type}`);
-    return DropAggregation.kDefault;
+    return DROP_AGGREGATION;
+  }
+
+  createAggregator(instrument: InstrumentDescriptor): Aggregator<Maybe<Accumulation>> {
+    return this._resolve(instrument).createAggregator(instrument);
   }
 }
 
