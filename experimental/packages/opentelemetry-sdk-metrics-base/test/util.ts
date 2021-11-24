@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes, ValueType } from '@opentelemetry/api-metrics-wip';
+import { Attributes, ValueType } from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { InstrumentDescriptor } from '../src/InstrumentDescriptor';
