@@ -28,11 +28,12 @@ export interface Predicate {
  */
 export class PatternPredicate implements Predicate {
   private _matchAll: boolean;
-  private _regexp?: RegExp;
+  private _regexp: RegExp;
 
   constructor(pattern: string) {
     if (pattern === '*') {
       this._matchAll = true;
+      this._regexp = /.*/;
     } else {
       this._matchAll = false;
       this._regexp = new RegExp(PatternPredicate.escapePattern(pattern));
@@ -44,7 +45,7 @@ export class PatternPredicate implements Predicate {
       return true;
     }
 
-    return this._regexp!.test(str);
+    return this._regexp.test(str);
   }
 
   static escapePattern(pattern: string): string {
