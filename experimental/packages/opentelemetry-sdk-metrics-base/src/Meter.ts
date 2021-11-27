@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as metrics from '@opentelemetry/api-metrics';
+import * as metrics from '@opentelemetry/api-metrics-wip';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { createInstrumentDescriptor, InstrumentDescriptor } from './InstrumentDescriptor';
 import { Counter, Histogram, InstrumentType, UpDownCounter } from './Instruments';
@@ -54,15 +54,27 @@ export class Meter implements metrics.Meter {
     return new UpDownCounter(storage, descriptor);
   }
 
-  createObservableGauge(_name: string, _options?: metrics.MetricOptions, _callback?: (observableResult: metrics.ObservableResult) => void): metrics.ObservableBase {
+  createObservableGauge(
+    _name: string,
+    _callback: (observableResult: metrics.ObservableResult) => void,
+    _options?: metrics.MetricOptions,
+  ): metrics.ObservableGauge {
     throw new Error('Method not implemented.');
   }
 
-  createObservableCounter(_name: string, _options?: metrics.MetricOptions, _callback?: (observableResult: metrics.ObservableResult) => void): metrics.ObservableBase {
+  createObservableCounter(
+    _name: string,
+    _callback: (observableResult: metrics.ObservableResult) => void,
+    _options?: metrics.MetricOptions,
+  ): metrics.ObservableBase {
     throw new Error('Method not implemented.');
   }
 
-  createObservableUpDownCounter(_name: string, _options?: metrics.MetricOptions, _callback?: (observableResult: metrics.ObservableResult) => void): metrics.ObservableBase {
+  createObservableUpDownCounter(
+    _name: string,
+    _callback: (observableResult: metrics.ObservableResult) => void,
+    _options?: metrics.MetricOptions,
+  ): metrics.ObservableBase {
     throw new Error('Method not implemented.');
   }
 
