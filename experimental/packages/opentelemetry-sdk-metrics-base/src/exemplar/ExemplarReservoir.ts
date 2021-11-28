@@ -79,7 +79,7 @@ class ExamplarBucket {
       spanId: this.spanId,
       traceId: this.traceId
     };
-    this.attributes = null;
+    this.attributes = {};
     this.value = 0;
     this.timestamp = [0, 0];
     this.spanId = undefined;
