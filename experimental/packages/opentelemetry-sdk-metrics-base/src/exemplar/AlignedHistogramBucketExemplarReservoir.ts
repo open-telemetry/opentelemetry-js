@@ -16,7 +16,7 @@
 
 
 import { Context, HrTime } from '@opentelemetry/api';
-import { ValueType, Attributes } from '@opentelemetry/api-metrics';
+import { ValueType, Attributes } from '@opentelemetry/api-metrics-wip';
 import { FixedSizeExemplarReservoirBase } from './ExemplarReservoir';
 
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ValueType, Attributes } from '@opentelemetry/api-metrics'
+import { ValueType, Attributes } from '@opentelemetry/api-metrics-wip'
 import { Context, HrTime } from '@opentelemetry/api'
 
 /**

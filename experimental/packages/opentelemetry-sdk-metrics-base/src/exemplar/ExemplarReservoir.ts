@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ValueType, Attributes } from '@opentelemetry/api-metrics'
+import { ValueType, Attributes } from '@opentelemetry/api-metrics-wip'
 import { Context, HrTime, isSpanContextValid, trace } from '@opentelemetry/api'
 import { Exemplar } from './Exemplar'
 
@@ -43,10 +43,11 @@ export interface ExemplarReservoir {
 
 class ExamplarBucket {
   private value: ValueType = 0;
-  private attributes: Attributes = null;
+  private attributes: Attributes = {};
   private timestamp: HrTime = [0, 0];
   private spanId?: string;
   private traceId?: string;
+  private _offered: boolean = false;
 
   constructor() {}
 
@@ -59,32 +60,32 @@ class ExamplarBucket {
       this.spanId = spanContext.spanId;
       this.traceId = spanContext.traceId;
     }
+    this._offered = true;
   }
 
   collectAndReset(pointAttributes: Attributes): Exemplar | null {
+    if (!this._offered) return null;
     const currentAttriubtes = this.attributes;
-    if (currentAttriubtes !== null) {
       // filter attributes
-      Object.keys(pointAttributes).forEach(key => {
-        if (pointAttributes[key] === currentAttriubtes[key]) {
-          delete currentAttriubtes[key];
-        }
-      });
-      const retVal: Exemplar = {
-        filteredAttributes: currentAttriubtes,
-        value: this.value,
-        timestamp: this.timestamp,
-        spanId: this.spanId,
-        traceId: this.traceId
-      };
-      this.attributes = null;
-      this.value = 0;
-      this.timestamp = [0, 0];
-      this.spanId = undefined;
-      this.traceId = undefined;
-      return retVal;
-    }
-    return null;
+    Object.keys(pointAttributes).forEach(key => {
+      if (pointAttributes[key] === currentAttriubtes[key]) {
+        delete currentAttriubtes[key];
+      }
+    });
+    const retVal: Exemplar = {
+      filteredAttributes: currentAttriubtes,
+      value: this.value,
+      timestamp: this.timestamp,
+      spanId: this.spanId,
+      traceId: this.traceId
+    };
+    this.attributes = null;
+    this.value = 0;
+    this.timestamp = [0, 0];
+    this.spanId = undefined;
+    this.traceId = undefined;
+    this._offered = false;
+    return retVal;
   }
 }
 

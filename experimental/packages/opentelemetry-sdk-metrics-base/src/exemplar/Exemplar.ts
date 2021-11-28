@@ -15,7 +15,7 @@
  */
 
 import { HrTime } from '@opentelemetry/api';
-import { ValueType, Attributes } from '@opentelemetry/api-metrics';
+import { ValueType, Attributes } from '@opentelemetry/api-metrics-wip';
 
 // A representation of an exemplar, which is a sample input measurement.
 // Exemplars also hold information about the environment when the measurement

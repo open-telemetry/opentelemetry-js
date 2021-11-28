@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ValueType, Attributes } from '@opentelemetry/api-metrics'
+import { ValueType, Attributes } from '@opentelemetry/api-metrics-wip'
 import { Context, HrTime, isSpanContextValid, trace, TraceFlags } from '@opentelemetry/api'
 import { ExemplarFilter } from './ExemplarFilter';
 
