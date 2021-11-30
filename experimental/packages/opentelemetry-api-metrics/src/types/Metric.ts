@@ -52,13 +52,6 @@ export enum ValueType {
   DOUBLE,
 }
 
-/** The kind of aggregator. */
-export enum AggregationTemporality {
-  AGGREGATION_TEMPORALITY_UNSPECIFIED,
-  AGGREGATION_TEMPORALITY_DELTA,
-  AGGREGATION_TEMPORALITY_CUMULATIVE,
-}
-
 /**
  * Counter is the most common synchronous instrument. This instrument supports
  * an `Add(increment)` function for reporting a sum, and is restricted to
