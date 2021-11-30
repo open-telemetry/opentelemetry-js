@@ -36,19 +36,19 @@ export class Meter implements metrics.Meter {
     return this._instrumentationLibrary;
   }
 
-  createHistogram(name: string, options?: metrics.MetricOptions): Histogram {
+  createHistogram(name: string, options?: metrics.HistogramOptions): metrics.Histogram {
     const descriptor = createInstrumentDescriptor(name, InstrumentType.HISTOGRAM, options);
     const storage = this._registerMetricStorage(descriptor);
     return new Histogram(storage, descriptor);
   }
 
-  createCounter(name: string, options?: metrics.MetricOptions): metrics.Counter {
+  createCounter(name: string, options?: metrics.CounterOptions): metrics.Counter {
     const descriptor = createInstrumentDescriptor(name, InstrumentType.COUNTER, options);
     const storage = this._registerMetricStorage(descriptor);
     return new Counter(storage, descriptor);
   }
 
-  createUpDownCounter(name: string, options?: metrics.MetricOptions): metrics.UpDownCounter {
+  createUpDownCounter(name: string, options?: metrics.UpDownCounterOptions): metrics.UpDownCounter {
     const descriptor = createInstrumentDescriptor(name, InstrumentType.UP_DOWN_COUNTER, options);
     const storage = this._registerMetricStorage(descriptor);
     return new UpDownCounter(storage, descriptor);
@@ -57,7 +57,7 @@ export class Meter implements metrics.Meter {
   createObservableGauge(
     _name: string,
     _callback: (observableResult: metrics.ObservableResult) => void,
-    _options?: metrics.MetricOptions,
+    _options?: metrics.ObservableGaugeOptions,
   ): metrics.ObservableGauge {
     throw new Error('Method not implemented.');
   }
@@ -65,16 +65,16 @@ export class Meter implements metrics.Meter {
   createObservableCounter(
     _name: string,
     _callback: (observableResult: metrics.ObservableResult) => void,
-    _options?: metrics.MetricOptions,
-  ): metrics.ObservableBase {
+    _options?: metrics.ObservableCounterOptions,
+  ): metrics.ObservableCounter {
     throw new Error('Method not implemented.');
   }
 
   createObservableUpDownCounter(
     _name: string,
     _callback: (observableResult: metrics.ObservableResult) => void,
-    _options?: metrics.MetricOptions,
-  ): metrics.ObservableBase {
+    _options?: metrics.ObservableUpDownCounterOptions,
+  ): metrics.ObservableUpDownCounter {
     throw new Error('Method not implemented.');
   }
 
