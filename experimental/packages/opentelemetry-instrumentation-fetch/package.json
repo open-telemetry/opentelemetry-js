@@ -54,7 +54,7 @@
     "@opentelemetry/propagator-b3": "1.0.1",
     "@opentelemetry/sdk-trace-base": "1.0.1",
     "@types/mocha": "8.2.3",
-    "@types/node": "14.17.33",
+    "@types/node": "16.11.11",
     "@types/sinon": "10.0.6",
     "@types/webpack-env": "1.16.3",
     "babel-loader": "8.2.3",

@@ -51,7 +51,7 @@
     "@opentelemetry/sdk-trace-base": "1.0.1",
     "@opentelemetry/sdk-trace-node": "1.0.1",
     "@types/mocha": "8.2.3",
-    "@types/node": "14.17.33",
+    "@types/node": "16.11.11",
     "@types/semver": "7.3.9",
     "@types/sinon": "10.0.6",
     "codecov": "3.8.3",
