@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
+import { CounterOptions, HistogramOptions, UpDownCounterOptions } from '..';
 import {
-  MetricOptions,
   Counter,
   Histogram,
-  ObservableGauge,
-  UpDownCounter,
   ObservableCounter,
+  ObservableCounterOptions,
+  ObservableGauge,
+  ObservableGaugeOptions,
   ObservableUpDownCounter,
+  ObservableUpDownCounterOptions,
+  UpDownCounter,
 } from './Metric';
 import { ObservableResult } from './ObservableResult';
 
@@ -48,7 +51,7 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createHistogram(name: string, options?: MetricOptions): Histogram;
+  createHistogram(name: string, options?: HistogramOptions): Histogram;
 
   /**
    * Creates a new `Counter` metric. Generally, this kind of metric when the
@@ -57,7 +60,7 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createCounter(name: string, options?: MetricOptions): Counter;
+  createCounter(name: string, options?: CounterOptions): Counter;
 
   /**
    * Creates a new `UpDownCounter` metric. UpDownCounter is a synchronous
@@ -76,7 +79,7 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createUpDownCounter(name: string, options?: MetricOptions): UpDownCounter;
+  createUpDownCounter(name: string, options?: UpDownCounterOptions): UpDownCounter;
 
   /**
    * Creates a new `ObservableGauge` metric.
@@ -87,7 +90,7 @@ export interface Meter {
   createObservableGauge(
     name: string,
     callback: (observableResult: ObservableResult) => void,
-    options?: MetricOptions
+    options?: ObservableGaugeOptions
   ): ObservableGauge;
 
   /**
@@ -99,7 +102,7 @@ export interface Meter {
   createObservableCounter(
     name: string,
     callback: (observableResult: ObservableResult) => void,
-    options?: MetricOptions
+    options?: ObservableCounterOptions
   ): ObservableCounter;
 
   /**
@@ -111,6 +114,6 @@ export interface Meter {
   createObservableUpDownCounter(
     name: string,
     callback: (observableResult: ObservableResult) => void,
-    options?: MetricOptions
+    options?: ObservableUpDownCounterOptions
   ): ObservableUpDownCounter;
 }
