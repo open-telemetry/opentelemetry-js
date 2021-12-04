@@ -84,13 +84,12 @@ export class NodeSDK {
     }
 
     if (configuration.metricExporter) {
-      const meterConfig: MeterConfig = {};
+      const meterConfig: MeterConfig = {
+        exporter: configuration.metricExporter,
+      };
 
       if (configuration.metricProcessor) {
         meterConfig.processor = configuration.metricProcessor;
-      }
-      if (configuration.metricExporter) {
-        meterConfig.exporter = configuration.metricExporter;
       }
       if (typeof configuration.metricInterval === 'number') {
         meterConfig.interval = configuration.metricInterval;
