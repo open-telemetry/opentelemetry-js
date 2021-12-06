@@ -24,7 +24,7 @@ This is done by wrapping all tracing-relevant functions.
 This instrumentation code will automatically
 
 - extract a trace-context identifier from inbound requests to allow distributed tracing (if applicable)
-- make sure that this current trace-context is propagated while the transaction traverses an application (see [@opentelemetry/context-base](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-context-base/README.md) for an in-depth explanation)
+- make sure that this current trace-context is propagated while the transaction traverses an application (see [context document in @opentelemetry/api][def-context] for an in-depth explanation)
 - add this trace-context identifier to outbound requests to allow continuing the distributed trace on the next hop (if applicable)
 - create and end spans
 
@@ -119,6 +119,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
+[def-context]: https://github.com/open-telemetry/opentelemetry-js-api/blob/main/docs/context.md
 [dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-sdk-trace-node
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-sdk-trace-node
 [devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-sdk-trace-node&type=dev
