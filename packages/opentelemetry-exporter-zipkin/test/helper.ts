@@ -15,7 +15,7 @@
  */
 
 import { TraceFlags, SpanStatusCode } from '@opentelemetry/api';
-import { ReadableSpan } from '@opentelemetry/tracing';
+import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { Span } from '../src/types';
@@ -71,7 +71,7 @@ export function ensureSpanIsCorrect(span: Span) {
     localEndpoint: { serviceName: 'OpenTelemetry Service' },
     tags: {
       component: 'foo',
-      'ot.status_code': 'OK',
+      'otel.status_code': 'OK',
       service: 'ui',
       version: '1',
       cost: '112.12',

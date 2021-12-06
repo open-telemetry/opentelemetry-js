@@ -1,6 +1,6 @@
 {
   "name": "propagation-validation-server",
-  "version": "0.24.0",
+  "version": "1.0.1",
   "description": "server for w3c tests",
   "main": "validation_server.js",
   "private": true,
@@ -11,18 +11,15 @@
     "compile": "tsc --build"
   },
   "dependencies": {
-    "@opentelemetry/context-async-hooks": "0.24.0",
-    "@opentelemetry/core": "0.24.0",
-    "@opentelemetry/tracing": "0.24.0",
-    "axios": "0.21.1",
+    "@opentelemetry/api": "^1.0.3",
+    "@opentelemetry/context-async-hooks": "1.0.1",
+    "@opentelemetry/core": "1.0.1",
+    "@opentelemetry/sdk-trace-base": "1.0.1",
+    "axios": "0.24.0",
     "body-parser": "1.19.0",
     "express": "4.17.1"
   },
   "devDependencies": {
-    "@opentelemetry/api": "^1.0.1",
-    "typescript": "4.3.5"
-  },
-  "peerDependencies": {
-    "@opentelemetry/api": "^1.0.1"
+    "typescript": "4.4.4"
   }
 }

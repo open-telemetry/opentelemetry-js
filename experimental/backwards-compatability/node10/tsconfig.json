@@ -1,0 +1,15 @@
+{
+  "extends": "../../../tsconfig.es5.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "build"
+  },
+  "include": [
+    "index.ts"
+  ],
+  "references": [
+    {
+      "path": "../../packages/opentelemetry-sdk-node"
+    }
+  ]
+}

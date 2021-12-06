@@ -31,9 +31,11 @@ export interface TimeOriginLegacy {
  * This interface defines the params that are be added to the wrapped function
  * using the "shimmer.wrap"
  */
-export interface ShimWrapped {
+export interface ShimWrapped extends Function {
   __wrapped: boolean;
+  // eslint-disable-next-line @typescript-eslint/ban-types
   __unwrap: Function;
+  // eslint-disable-next-line @typescript-eslint/ban-types
   __original: Function;
 }
 
@@ -45,6 +47,7 @@ export interface ShimWrapped {
 export interface InstrumentationLibrary {
   readonly name: string;
   readonly version?: string;
+  readonly schemaUrl?: string;
 }
 
 /** Defines an error handler function */

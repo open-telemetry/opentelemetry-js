@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/propagator-b3",
-  "version": "0.24.0",
+  "version": "1.0.1",
   "description": "OpenTelemetry B3 propagator provides context propagation for systems that are using the B3 header format",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -14,7 +14,9 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../scripts/version-update.js",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json"
+    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json",
+    "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
+    "prewatch": "npm run precompile"
   },
   "keywords": [
     "opentelemetry",
@@ -43,15 +45,15 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/core": "0.24.0"
+    "@opentelemetry/core": "1.0.1"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^1.0.1"
+    "@opentelemetry/api": ">=1.0.0 <1.1.0"
   },
   "devDependencies": {
-    "@opentelemetry/api": "^1.0.1",
+    "@opentelemetry/api": "~1.0.3",
     "@types/mocha": "8.2.3",
-    "@types/node": "14.17.5",
+    "@types/node": "14.17.33",
     "codecov": "3.8.3",
     "istanbul-instrumenter-loader": "3.0.1",
     "mocha": "7.2.0",
@@ -59,6 +61,6 @@
     "rimraf": "3.0.2",
     "ts-loader": "8.3.0",
     "ts-mocha": "8.0.0",
-    "typescript": "4.3.5"
+    "typescript": "4.4.4"
   }
 }

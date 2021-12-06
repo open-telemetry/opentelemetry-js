@@ -22,6 +22,7 @@ export function sanitizeAttributes(attributes: unknown): SpanAttributes {
     return out;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   for (const [k, v] of Object.entries(attributes!)) {
     if (isAttributeValue(v)) {
       if (Array.isArray(v)) {

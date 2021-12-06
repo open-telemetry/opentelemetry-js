@@ -22,7 +22,15 @@ const NANOSECOND_DIGITS = 9;
 const SECOND_TO_NANOSECONDS = Math.pow(10, NANOSECOND_DIGITS);
 
 /**
- * Converts a number to HrTime
+ * Converts a number to HrTime, HrTime = [number, number].
+ * The first number is UNIX Epoch time in seconds since 00:00:00 UTC on 1 January 1970.
+ * The second number represents the partial second elapsed since Unix Epoch time represented by first number in nanoseconds.
+ * For example, 2021-01-01T12:30:10.150Z in UNIX Epoch time in milliseconds is represented as 1609504210150.
+ * numberToHrtime calculates the first number by converting and truncating the Epoch time in milliseconds to seconds:
+ * HrTime[0] = Math.trunc(1609504210150 / 1000) = 1609504210.
+ * numberToHrtime calculates the second number by converting the digits after the decimal point of the subtraction, (1609504210150 / 1000) - HrTime[0], to nanoseconds:
+ * HrTime[1] = Number((1609504210.150 - HrTime[0]).toFixed(9)) * SECOND_TO_NANOSECONDS = 150000000.
+ * This is represented in HrTime format as [1609504210, 150000000].
  * @param epochMillis
  */
 function numberToHrtime(epochMillis: number): api.HrTime {
@@ -115,45 +123,45 @@ export function hrTimeDuration(
 
 /**
  * Convert hrTime to timestamp, for example "2019-05-14T17:00:00.000123456Z"
- * @param hrTime
+ * @param time
  */
-export function hrTimeToTimeStamp(hrTime: api.HrTime): string {
+export function hrTimeToTimeStamp(time: api.HrTime): string {
   const precision = NANOSECOND_DIGITS;
-  const tmp = `${'0'.repeat(precision)}${hrTime[1]}Z`;
+  const tmp = `${'0'.repeat(precision)}${time[1]}Z`;
   const nanoString = tmp.substr(tmp.length - precision - 1);
-  const date = new Date(hrTime[0] * 1000).toISOString();
+  const date = new Date(time[0] * 1000).toISOString();
   return date.replace('000Z', nanoString);
 }
 
 /**
  * Convert hrTime to nanoseconds.
- * @param hrTime
+ * @param time
  */
-export function hrTimeToNanoseconds(hrTime: api.HrTime): number {
-  return hrTime[0] * SECOND_TO_NANOSECONDS + hrTime[1];
+export function hrTimeToNanoseconds(time: api.HrTime): number {
+  return time[0] * SECOND_TO_NANOSECONDS + time[1];
 }
 
 /**
  * Convert hrTime to milliseconds.
- * @param hrTime
+ * @param time
  */
-export function hrTimeToMilliseconds(hrTime: api.HrTime): number {
-  return Math.round(hrTime[0] * 1e3 + hrTime[1] / 1e6);
+export function hrTimeToMilliseconds(time: api.HrTime): number {
+  return Math.round(time[0] * 1e3 + time[1] / 1e6);
 }
 
 /**
  * Convert hrTime to microseconds.
- * @param hrTime
+ * @param time
  */
-export function hrTimeToMicroseconds(hrTime: api.HrTime): number {
-  return Math.round(hrTime[0] * 1e6 + hrTime[1] / 1e3);
+export function hrTimeToMicroseconds(time: api.HrTime): number {
+  return Math.round(time[0] * 1e6 + time[1] / 1e3);
 }
 
 /**
  * check if time is HrTime
  * @param value
  */
-export function isTimeInputHrTime(value: unknown) {
+export function isTimeInputHrTime(value: unknown): value is api.HrTime {
   return (
     Array.isArray(value) &&
     value.length === 2 &&
@@ -166,7 +174,7 @@ export function isTimeInputHrTime(value: unknown) {
  * check if input value is a correct types.TimeInput
  * @param value
  */
-export function isTimeInput(value: unknown) {
+export function isTimeInput(value: unknown): value is api.HrTime | number | Date {
   return (
     isTimeInputHrTime(value) ||
     typeof value === 'number' ||

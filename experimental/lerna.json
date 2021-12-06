@@ -1,0 +1,9 @@
+{
+  "lerna": "3.13.4",
+  "version": "0.27.0",
+  "npmClient": "npm",
+  "packages": [
+    "packages/*",
+    "backwards-compatability/*"
+  ]
+}

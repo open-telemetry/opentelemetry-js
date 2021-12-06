@@ -16,7 +16,7 @@
 
 import { diag } from '@opentelemetry/api';
 import { ExportResult, ExportResultCode, getEnv } from '@opentelemetry/core';
-import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
+import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { Socket } from 'dgram';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { spanToThrift } from './transform';
@@ -124,7 +124,7 @@ export class JaegerExporter implements SpanExporter {
         if (done) return done({ code: ExportResultCode.FAILED, error });
       }
     }
-    diag.debug('successful append for : %s', thriftSpan.length);
+    diag.debug(`successful append for : ${thriftSpan.length}`);
 
     // Flush all spans on each export. No-op if span buffer is empty
     await this._flush();
@@ -177,7 +177,7 @@ export class JaegerExporter implements SpanExporter {
         if (err) {
           return reject(new Error(err));
         }
-        diag.debug('successful flush for %s spans', _count);
+        diag.debug(`successful flush for ${_count} spans`);
         resolve();
       });
     });

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/shim-opentracing",
-  "version": "0.24.0",
+  "version": "1.0.1",
   "description": "OpenTracing to OpenTelemetry shim",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -13,7 +13,9 @@
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "version": "node ../../scripts/version-update.js"
+    "version": "node ../../scripts/version-update.js",
+    "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
+    "prewatch": "npm run precompile"
   },
   "keywords": [
     "opentelemetry",
@@ -38,25 +40,25 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/api": "^1.0.1",
-    "@opentelemetry/propagator-b3": "0.24.0",
-    "@opentelemetry/propagator-jaeger": "0.24.0",
-    "@opentelemetry/tracing": "0.24.0",
+    "@opentelemetry/api": "~1.0.3",
+    "@opentelemetry/propagator-b3": "1.0.1",
+    "@opentelemetry/propagator-jaeger": "1.0.1",
+    "@opentelemetry/sdk-trace-base": "1.0.1",
     "@types/mocha": "8.2.3",
-    "@types/node": "14.17.5",
+    "@types/node": "14.17.33",
     "codecov": "3.8.3",
     "mocha": "7.2.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "ts-mocha": "8.0.0",
-    "typescript": "4.3.5"
+    "typescript": "4.4.4"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^1.0.1"
+    "@opentelemetry/api": ">=1.0.0 <1.1.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "0.24.0",
-    "@opentelemetry/semantic-conventions": "0.24.0",
+    "@opentelemetry/core": "1.0.1",
+    "@opentelemetry/semantic-conventions": "1.0.1",
     "opentracing": "^0.14.4"
   }
 }

@@ -20,7 +20,7 @@ import { ShimWrapped } from '../common/types';
  * Checks if certain function has been already wrapped
  * @param func
  */
-export function isWrapped(func: any) {
+export function isWrapped(func: unknown): func is ShimWrapped {
   return (
     typeof func === 'function' &&
     typeof (func as ShimWrapped).__original === 'function' &&
