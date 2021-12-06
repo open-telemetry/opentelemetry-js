@@ -274,7 +274,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
     const instrumentation = this;
     return (original: GrpcClientFunc) => {
       instrumentation._diag.debug('patch all client methods');
-      return function clientMethodTrace(this: grpcJs.Client) {
+      function clientMethodTrace(this: grpcJs.Client) {
         const name = `grpc.${original.path.replace('/', '')}`;
         const args = [...arguments];
         const metadata = getMetadata.call(
@@ -289,7 +289,9 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
         return context.with(trace.setSpan(context.active(), span), () =>
           makeGrpcClientRemoteCall(original, args, metadata, this)(span)
         );
-      };
+      }
+      Object.assign(clientMethodTrace, original);
+      return clientMethodTrace;
     };
   }
 
