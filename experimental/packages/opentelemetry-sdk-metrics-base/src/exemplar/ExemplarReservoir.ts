@@ -41,15 +41,13 @@ export interface ExemplarReservoir {
 }
 
 
-class ExamplarBucket {
+class ExemplarBucket {
   private value: ValueType = 0;
   private attributes: Attributes = {};
   private timestamp: HrTime = [0, 0];
   private spanId?: string;
   private traceId?: string;
   private _offered: boolean = false;
-
-  constructor() {}
 
   offer(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context) {
     this.value = value;
@@ -65,15 +63,15 @@ class ExamplarBucket {
 
   collectAndReset(pointAttributes: Attributes): Exemplar | null {
     if (!this._offered) return null;
-    const currentAttriubtes = this.attributes;
+    const currentAttributes = this.attributes;
       // filter attributes
     Object.keys(pointAttributes).forEach(key => {
-      if (pointAttributes[key] === currentAttriubtes[key]) {
-        delete currentAttriubtes[key];
+      if (pointAttributes[key] === currentAttributes[key]) {
+        delete currentAttributes[key];
       }
     });
     const retVal: Exemplar = {
-      filteredAttributes: currentAttriubtes,
+      filteredAttributes: currentAttributes,
       value: this.value,
       timestamp: this.timestamp,
       spanId: this.spanId,
@@ -91,34 +89,27 @@ class ExamplarBucket {
 
 
 export abstract class FixedSizeExemplarReservoirBase implements ExemplarReservoir {
-  private _reservoirStorage: ExamplarBucket[];
+  protected _reservoirStorage: ExemplarBucket[];
   protected _size: number;
 
   constructor(size: number) {
     this._size = size;
-    this._reservoirStorage = new Array<ExamplarBucket>(size);
+    this._reservoirStorage = new Array<ExemplarBucket>(size);
     for(let i = 0; i < this._size; i++) {
-      this._reservoirStorage[i] = new ExamplarBucket();
+      this._reservoirStorage[i] = new ExemplarBucket();
     }
   }
 
-  abstract findBucketIndex(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context): number;
+  abstract offer(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context): void;
 
   maxSize(): number {
     return this._size;
   }
 
-  offer(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context): void {
-    const index = this.findBucketIndex(value, timestamp, attributes, ctx);
-    if (index !== -1) {
-      this._reservoirStorage[index].offer(value, timestamp, attributes, ctx)
-    }
-  }
-
   /**
    * Resets the reservoir
    */
-  reset(): void {}
+  protected reset(): void {}
 
   collectAndReset(pointAttributes: Attributes): Exemplar[] {
     const exemplars: Exemplar[] = [];

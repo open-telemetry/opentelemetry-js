@@ -24,25 +24,29 @@ import { FixedSizeExemplarReservoirBase } from './ExemplarReservoir';
  * 
  */
 export class SimpleFixedSizeExemplarReservoir extends FixedSizeExemplarReservoirBase {
-  private _counter: number;
+  private num_measurements_seen: number;
   constructor(size: number) {
     super(size);
-    this._counter = 0;
+    this.num_measurements_seen = 0;
   }
 
-  getRandomInt(min: number, max: number) { //[min, max)
-    min = Math.ceil(min);
-    max = Math.floor(max);
+  private getRandomInt(min: number, max: number) { //[min, max)
     return Math.floor(Math.random() * (max - min) + min); 
   }
 
-  findBucketIndex(_value: ValueType, _timestamp: HrTime, _attributes: Attributes, _ctx: Context) {
-    const index = this.getRandomInt(0, this._counter+1);
-    this._counter += 1;
+  private findBucketIndex(_value: ValueType, _timestamp: HrTime, _attributes: Attributes, _ctx: Context) {
+    const index = this.getRandomInt(0, ++this.num_measurements_seen);
     return index < this._size ? index: -1;
   }
 
+  offer(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context): void {
+    const index = this.findBucketIndex(value, timestamp, attributes, ctx);
+    if (index !== -1) {
+      this._reservoirStorage[index].offer(value, timestamp, attributes, ctx)
+    }
+  }
+
   override reset() {
-    this._counter = 0;
+    this.num_measurements_seen = 0;
   }
 }
