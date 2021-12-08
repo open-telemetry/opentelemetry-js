@@ -90,11 +90,11 @@ Use a custom context manager. Default: [AsyncHooksContextManager](../../../packa
 
 ### textMapPropagator
 
-Use a custom propagator. Default: [CompositePropagator](../../../packages/opentelemetry-core/src/context/propagation/composite.ts) using [W3C Trace Context](../opentelemetry-core/README.md#httptracecontext-propagator) and [Baggage](../../../packages/opentelemetry-core/README.md#baggage-propagator)
+Use a custom propagator. Default: [CompositePropagator](../../../packages/opentelemetry-core/src/propagation/composite.ts) using [W3C Trace Context](../../../packages/opentelemetry-core/README.md#w3ctracecontextpropagator-propagator) and [Baggage](../../../packages/opentelemetry-core/README.md#baggage-propagator)
 
 ### metricProcessor
 
-Use a custom processor for metrics. Default: [UngroupedProcessor](../../../packages/opentelemetry-sdk-metrics-base/src/export/Processor.ts#L50)
+Use a custom processor for metrics. Default: UngroupedProcessor
 
 ### metricExporter
 

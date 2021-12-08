@@ -10,7 +10,7 @@ This package provides default implementations of the OpenTelemetry API for trace
 - [OpenTelemetry Core](#opentelemetry-core)
   - [Built-in Implementations](#built-in-implementations)
     - [Built-in Propagators](#built-in-propagators)
-      - [W3CTraceContextPropagator Propagator](#httptracecontext-propagator)
+      - [W3CTraceContextPropagator Propagator](#w3ctracecontextpropagator-propagator)
       - [Composite Propagator](#composite-propagator)
       - [Baggage Propagator](#baggage-propagator)
     - [Built-in Sampler](#built-in-sampler)
