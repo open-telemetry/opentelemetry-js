@@ -87,7 +87,7 @@ async function onGet(request, response) {
   const span = tracer.startSpan(`GET /user/:id`, {
     // attributes can be added when the span is started
     attributes: {
-      // Attributes from the HTTP tracce semantic conventions
+      // Attributes from the HTTP trace semantic conventions
       // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md
       [SemanticAttributes.HTTP_METHOD]: "GET",
       [SemanticAttributes.HTTP_FLAVOR]: "1.1",
