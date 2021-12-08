@@ -1,11 +1,10 @@
 name: Markdown Linter
 
 # Link checking costs tens of minutes to run.
-# Runs every monday at 9 am.
+# Runs everyday at 9 am.
 on:
-  pull_request:
   schedule:
-    - cron: "0 9 * * 1"
+    - cron: "0 9 * * *"
 
 jobs:
   markdown-link-check:
