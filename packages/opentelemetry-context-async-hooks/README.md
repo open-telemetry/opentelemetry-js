@@ -9,7 +9,7 @@ This package provides [async-hooks][async-hooks-doc] based context manager which
 
 ## What is a ContextManager
 
-The definition and why they exist is available on [the readme of the context-base package][def-context-manager].
+The definition and why they exist is available on [the document for context manager][def-context-manager].
 
 ### Implementation in NodeJS
 
@@ -49,7 +49,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-context-async-hooks&type=dev
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-context-async-hooks&type=dev
 [async-hooks-doc]: http://nodejs.org/dist/latest/docs/api/async_hooks.html
-[def-context-manager]: https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-context-base/README.md
+[def-context-manager]: https://github.com/open-telemetry/opentelemetry-js-api/blob/main/docs/context.md#context-manager
 [dd-js-tracer-scope]: https://github.com/DataDog/dd-trace-js/tree/main/packages/dd-trace/src/scope
 [opentracing-scope]: https://github.com/opentracing/opentracing-javascript/pull/113
 [diag-team-scope-discussion]: https://github.com/nodejs/diagnostics/issues/300

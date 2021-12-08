@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as metrics from '@opentelemetry/api-metrics';
+import * as metrics from '@opentelemetry/api-metrics-wip';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { createInstrumentDescriptor, InstrumentDescriptor } from './InstrumentDescriptor';
 import { Counter, Histogram, InstrumentType, UpDownCounter } from './Instruments';
@@ -36,33 +36,45 @@ export class Meter implements metrics.Meter {
     return this._instrumentationLibrary;
   }
 
-  createHistogram(name: string, options?: metrics.MetricOptions): Histogram {
+  createHistogram(name: string, options?: metrics.HistogramOptions): metrics.Histogram {
     const descriptor = createInstrumentDescriptor(name, InstrumentType.HISTOGRAM, options);
     const storage = this._registerMetricStorage(descriptor);
     return new Histogram(storage, descriptor);
   }
 
-  createCounter(name: string, options?: metrics.MetricOptions): metrics.Counter {
+  createCounter(name: string, options?: metrics.CounterOptions): metrics.Counter {
     const descriptor = createInstrumentDescriptor(name, InstrumentType.COUNTER, options);
     const storage = this._registerMetricStorage(descriptor);
     return new Counter(storage, descriptor);
   }
 
-  createUpDownCounter(name: string, options?: metrics.MetricOptions): metrics.UpDownCounter {
+  createUpDownCounter(name: string, options?: metrics.UpDownCounterOptions): metrics.UpDownCounter {
     const descriptor = createInstrumentDescriptor(name, InstrumentType.UP_DOWN_COUNTER, options);
     const storage = this._registerMetricStorage(descriptor);
     return new UpDownCounter(storage, descriptor);
   }
 
-  createObservableGauge(_name: string, _options?: metrics.MetricOptions, _callback?: (observableResult: metrics.ObservableResult) => void): metrics.ObservableBase {
+  createObservableGauge(
+    _name: string,
+    _callback: (observableResult: metrics.ObservableResult) => void,
+    _options?: metrics.ObservableGaugeOptions,
+  ): metrics.ObservableGauge {
     throw new Error('Method not implemented.');
   }
 
-  createObservableCounter(_name: string, _options?: metrics.MetricOptions, _callback?: (observableResult: metrics.ObservableResult) => void): metrics.ObservableBase {
+  createObservableCounter(
+    _name: string,
+    _callback: (observableResult: metrics.ObservableResult) => void,
+    _options?: metrics.ObservableCounterOptions,
+  ): metrics.ObservableCounter {
     throw new Error('Method not implemented.');
   }
 
-  createObservableUpDownCounter(_name: string, _options?: metrics.MetricOptions, _callback?: (observableResult: metrics.ObservableResult) => void): metrics.ObservableBase {
+  createObservableUpDownCounter(
+    _name: string,
+    _callback: (observableResult: metrics.ObservableResult) => void,
+    _options?: metrics.ObservableUpDownCounterOptions,
+  ): metrics.ObservableUpDownCounter {
     throw new Error('Method not implemented.');
   }
 

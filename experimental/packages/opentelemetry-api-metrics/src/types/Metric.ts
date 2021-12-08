@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
+import { Context } from '@opentelemetry/api';
+
 /**
  * Options needed for metric creation
  */
 export interface MetricOptions {
-  /** The name of the component that reports the Metric. */
-  component?: string;
-
   /**
    * The description of the Metric.
    * @default ''
@@ -29,47 +28,28 @@ export interface MetricOptions {
 
   /**
    * The unit of the Metric values.
-   * @default '1'
+   * @default ''
    */
   unit?: string;
-
-  /** The map of constant attributes for the Metric. */
-  constantAttributes?: Map<string, string>;
-
-  /**
-   * Indicates the metric is a verbose metric that is disabled by default
-   * @default false
-   */
-  disabled?: boolean;
 
   /**
    * Indicates the type of the recorded value.
    * @default {@link ValueType.DOUBLE}
    */
   valueType?: ValueType;
-
-  /**
-   * Boundaries optional for histogram
-   */
-  boundaries?: number[];
-
-  /**
-   * Aggregation Temporality of metric
-   */
-  aggregationTemporality?: AggregationTemporality;
 }
+
+export type CounterOptions = MetricOptions;
+export type UpDownCounterOptions = MetricOptions;
+export type ObservableGaugeOptions = MetricOptions;
+export type ObservableCounterOptions = MetricOptions;
+export type ObservableUpDownCounterOptions = MetricOptions;
+export type HistogramOptions = MetricOptions;
 
 /** The Type of value. It describes how the data is reported. */
 export enum ValueType {
   INT,
   DOUBLE,
-}
-
-/** The kind of aggregator. */
-export enum AggregationTemporality {
-  AGGREGATION_TEMPORALITY_UNSPECIFIED,
-  AGGREGATION_TEMPORALITY_DELTA,
-  AGGREGATION_TEMPORALITY_CUMULATIVE,
 }
 
 /**
@@ -91,21 +71,21 @@ export interface Counter {
   /**
    * Increment value of counter by the input. Inputs may not be negative.
    */
-  add(value: number, attributes?: Attributes): void;
+  add(value: number, attributes?: Attributes, context?: Context): void;
 }
 
 export interface UpDownCounter {
   /**
    * Increment value of counter by the input. Inputs may be negative.
    */
-  add(value: number, attributes?: Attributes): void;
+  add(value: number, attributes?: Attributes, context?: Context): void;
 }
 
 export interface Histogram {
   /**
-   * Records the given value to this histogram.
+   * Records a measurement. Value of the measurement must not be negative.
    */
-  record(value: number, attributes?: Attributes): void;
+  record(value: number, attributes?: Attributes, context?: Context): void;
 }
 
 // ObservableBase has to be an Object but for now there is no field or method
