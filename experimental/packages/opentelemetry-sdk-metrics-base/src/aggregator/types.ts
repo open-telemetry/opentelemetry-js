@@ -19,31 +19,54 @@ import { Attributes } from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { AggregationTemporality } from '../export/AggregationTemporality';
-import { Histogram, MetricData } from '../export/MetricData';
+import { MetricData } from '../export/MetricData';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 
 /** The kind of aggregator. */
 export enum AggregatorKind {
-  NONE,
+  DROP,
   SUM,
   LAST_VALUE,
   HISTOGRAM,
 }
 
-/** Sum returns an aggregated sum. */
+/** Point type for SumAggregation. */
 export type Sum = number;
 
-/** LastValue returns last value. */
+/** Point type for LastValueAggregation. */
 export type LastValue = number;
 
-export type PointValueType = Sum | LastValue | Histogram;
+/** Point type for HistogramAggregation. */
+export interface Histogram {
+  /**
+   * Buckets are implemented using two different arrays:
+   *  - boundaries: contains every finite bucket boundary, which are inclusive lower bounds
+   *  - counts: contains event counts for each bucket
+   *
+   * Note that we'll always have n+1 buckets, where n is the number of boundaries.
+   * This is because we need to count events that are below the lowest boundary.
+   *
+   * Example: if we measure the values: [5, 30, 5, 40, 5, 15, 15, 15, 25]
+   *  with the boundaries [ 10, 20, 30 ], we will have the following state:
+   *
+   * buckets: {
+   *	boundaries: [10, 20, 30],
+   *	counts: [3, 3, 1, 2],
+   * }
+   */
+  buckets: {
+    boundaries: number[];
+    counts: number[];
+  };
+  sum: number;
+  count: number;
+}
 
 /**
  * An Aggregator accumulation state.
  */
 export interface Accumulation {
-  // TODO: attributes and context for `ExemplarReservoir.offer`.
   record(value: number): void;
 }
 
@@ -89,7 +112,7 @@ export interface Aggregator<T> {
    * @param resource the resource producing the metric.
    * @param instrumentationLibrary the library that instrumented the metric
    * @param instrumentDescriptor the metric instrument descriptor.
-   * @param accumulationByAttributes the array of attributes and accumulation pair.
+   * @param accumulationByAttributes the array of attributes and accumulation pairs.
    * @param temporality the temporality of the accumulation.
    * @param sdkStartTime the start time of the sdk.
    * @param lastCollectionTime the last collection time of the instrument.

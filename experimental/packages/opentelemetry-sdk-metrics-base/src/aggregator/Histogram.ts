@@ -19,8 +19,9 @@ import {
   AccumulationRecord,
   Aggregator,
   AggregatorKind,
+  Histogram,
 } from './types';
-import { Histogram, HistogramMetricData, PointDataType } from '../export/MetricData';
+import { HistogramMetricData, PointDataType } from '../export/MetricData';
 import { Resource } from '@opentelemetry/resources';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { HrTime } from '@opentelemetry/api';
@@ -40,7 +41,10 @@ function createNewEmptyCheckpoint(boundaries: number[]): Histogram {
 }
 
 export class HistogramAccumulation implements Accumulation {
-  constructor(private readonly _boundaries: number[], private _current: Histogram = createNewEmptyCheckpoint(_boundaries)) {}
+  constructor(
+    private readonly _boundaries: number[],
+    private _current: Histogram = createNewEmptyCheckpoint(_boundaries)
+  ) {}
 
   record(value: number): void {
     this._current.count += 1;

@@ -19,31 +19,7 @@ import { Attributes } from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
-
-export interface Histogram {
-  /**
-   * Buckets are implemented using two different arrays:
-   *  - boundaries: contains every finite bucket boundary, which are inclusive lower bounds
-   *  - counts: contains event counts for each bucket
-   *
-   * Note that we'll always have n+1 buckets, where n is the number of boundaries.
-   * This is because we need to count events that are below the lowest boundary.
-   *
-   * Example: if we measure the values: [5, 30, 5, 40, 5, 15, 15, 15, 25]
-   *  with the boundaries [ 10, 20, 30 ], we will have the following state:
-   *
-   * buckets: {
-   *	boundaries: [10, 20, 30],
-   *	counts: [3, 3, 1, 2],
-   * }
-   */
-  buckets: {
-    boundaries: number[];
-    counts: number[];
-  };
-  sum: number;
-  count: number;
-}
+import { Histogram } from '../aggregator/types';
 
 export interface BaseMetricData {
   readonly resource: Resource;
@@ -73,12 +49,13 @@ export enum PointDataType {
 export interface PointData<T> {
   /**
    * The start epoch timestamp of the PointData, usually the time when
-   * the metric was created or an aggregation was enabled.
+   * the metric was created when the preferred AggregationTemporality is
+   * CUMULATIVE, or last collection time otherwise.
    */
   readonly startTime: HrTime;
   /**
-   * The end epoch timestamp when data were collected, usually it represents the moment
-   * when `Meter.collectAndReset` was called.
+   * The end epoch timestamp when data were collected, usually it represents
+   * the moment when `MetricReader.collect` was called.
    */
   readonly endTime: HrTime;
   /**
@@ -86,7 +63,7 @@ export interface PointData<T> {
    */
   readonly attributes: Attributes;
   /**
-   * The data {@link PointData}s for this metric, or empty {@code Collection} if no points.
+   * The data points for this metric.
    */
   readonly point: T;
 }

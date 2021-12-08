@@ -29,7 +29,7 @@ import {
 
 /** Basic aggregator for None which keeps no recorded value. */
 export class DropAggregator implements Aggregator<undefined> {
-  kind: AggregatorKind.NONE = AggregatorKind.NONE;
+  kind: AggregatorKind.DROP = AggregatorKind.DROP;
 
   createAccumulation() {
     return undefined;
