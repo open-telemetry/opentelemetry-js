@@ -392,7 +392,7 @@ Collector exporter packages and types are renamed:
 
 #### Setting the global diagnostic logger
 
-The new global [```api.diag```](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-api/src/api/diag.ts#L32) provides the ability to set the global diagnostic logger ```setLogger()``` and logging level ```setLogLevel()```, it is also a ```DiagLogger``` implementation and should be directly to log diagnostic messages.
+The new global [```api.diag```](https://github.com/open-telemetry/opentelemetry-js-api/blob/main/src/api/diag.ts) provides the ability to set the global diagnostic logger ```setLogger()``` and logging level ```setLogLevel()```, it is also a ```DiagLogger``` implementation and should be directly to log diagnostic messages.
 
 All included logger references have been removed in preference to using the global ```api.diag``` directly, so you no longer need to pass around the logger instance via function parameters or included as part of the configuration for a component.
 
