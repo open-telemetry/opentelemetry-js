@@ -1,4 +1,6 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 const webpack = require('webpack');
+// eslint-disable-next-line import/no-extraneous-dependencies
 const webpackMerge = require('webpack-merge');
 const path = require('path');
 
@@ -10,6 +12,8 @@ const common = {
     metrics: 'examples/metrics/index.js',
     fetch: 'examples/fetch/index.js',
     'xml-http-request': 'examples/xml-http-request/index.js',
+    fetchXhr: 'examples/fetchXhr/index.js',
+    fetchXhrB3: 'examples/fetchXhrB3/index.js',
     zipkin: 'examples/zipkin/index.js',
   },
   output: {
@@ -43,12 +47,18 @@ const common = {
     ],
     extensions: ['.ts', '.js', '.jsx', '.json'],
   },
+  optimization: {
+    minimize: false,
+  },
 };
 
-module.exports = webpackMerge(common, {
+module.exports = webpackMerge.merge(common, {
   devtool: 'eval-source-map',
   devServer: {
-    contentBase: path.resolve(__dirname),
+    static: {
+      directory: path.resolve(__dirname, 'examples'),
+    },
+    compress: true,
   },
   plugins: [
     new webpack.DefinePlugin({
