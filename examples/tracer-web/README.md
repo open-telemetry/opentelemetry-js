@@ -38,6 +38,7 @@ The examples includes several variants so that you can see how to mix and match 
 This example shows how to use the XMLHttpRequest Instrumentation with the OTLP Trace exporter and  with the B3 Propagator.
 
 Included Components
+
 - XMLHttpRequestInstrumentation
 - ZoneContextManager
 - OTLPTraceExporter
@@ -54,6 +55,7 @@ The screen will look as follows:
 This example shows how to use the Fetch Instrumentation with the OTLP Trace exporter and with the B3 Propagator.
 
 Included Components
+
 - FetchInstrumentation
 - ZoneContextManager
 - OTLPTraceExporter
@@ -67,6 +69,7 @@ To see the results, open the browser at <http://localhost:8090/fetch/> and make 
 This example shows how to use both the XMLHttpRequest and Fetch Instrumentations with the OTLP Trace exporter but without the B3 Propagator.
 
 Included Components
+
 - XMLHttpRequestInstrumentation
 - FetchInstrumentation
 - ZoneContextManager
@@ -78,6 +81,7 @@ Included Components
 This example shows how to use both the XMLHttpRequest and Fetch Instrumentations with the OTLP Trace exporter and with the B3 Propagator
 
 Included Components
+
 - XMLHttpRequestInstrumentation
 - FetchInstrumentation
 - ZoneContextManager
@@ -90,6 +94,7 @@ Included Components
 This example shows how to use the OTLP Metric Exporter, it does not include the Trace Exporter. Does not include traces
 
 Included Components
+
 - OTLPMetricExporter
 - MeterProvider
 - Resource
@@ -100,6 +105,7 @@ Included Components
 This example show a simple usage of the ZipKin Exporter with the Web Tracer Provider
 
 Included Components
+
 - WebTracerProvider
 - ZipkinExporter
 
