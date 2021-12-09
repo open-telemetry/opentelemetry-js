@@ -1,4 +1,3 @@
-'use strict';
 import '../helper';
 
 import { context, trace } from '@opentelemetry/api';

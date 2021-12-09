@@ -180,19 +180,19 @@ describe('fetch', () => {
           // Passing request as 2nd argument causes missing body bug (#2411)
           response.status = 400;
           response.statusText = 'Bad Request (Request object as 2nd argument)';
-          reject(new window.Response(JSON.stringify(response), response));
+          reject(new Response(JSON.stringify(response), response));
         } else if (init.method === 'DELETE') {
           response.status = 405;
           response.statusText = 'OK';
-          resolve(new window.Response('foo', response));
+          resolve(new Response('foo', response));
         } else if ((input instanceof Request && input.url === url) || input === url) {
           response.status = 200;
           response.statusText = 'OK';
-          resolve(new window.Response(JSON.stringify(response), response));
+          resolve(new Response(JSON.stringify(response), response));
         } else {
           response.status = 404;
           response.statusText = 'Bad request';
-          reject(new window.Response(JSON.stringify(response), response));
+          reject(new Response(JSON.stringify(response), response));
         }
       });
     }

@@ -1,7 +1,7 @@
 /**
  * These are all needed to make otel to work correctly for IE
  */
-window.__Zone_enable_cross_context_check = true;
+globalThis.__Zone_enable_cross_context_check = true;
 import 'babel-polyfill';
 import 'zone.js';
 
@@ -40,7 +40,7 @@ function OTELSeleniumDone() {
   }, 1000);
 }
 
-window.otel = Object.assign({}, window.otel, {
+globalThis.otel = Object.assign({}, globalThis.otel, {
   JSONSafeStringify: JSONSafeStringify,
   OTELSeleniumDone: OTELSeleniumDone,
 });

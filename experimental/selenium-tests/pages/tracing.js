@@ -1,5 +1,3 @@
-'use strict';
-
 import { ConsoleSpanExporter, InMemorySpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
 import { ZoneContextManager } from '@opentelemetry/context-zone-peer-dep';
@@ -24,7 +22,7 @@ export function loadOtel(instrumentations) {
       instrumentations,
     ],
   });
-  window.otel = Object.assign({}, window.otel, {
+  globalThis.otel = Object.assign({}, globalThis.otel, {
     provider,
     memoryExporter,
   });

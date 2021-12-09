@@ -4,6 +4,8 @@ const directory = path.resolve(__dirname);
 module.exports = {
   entry: {
     fetch: 'pages/fetch/index.js',
+    fetch_worker: 'pages/fetch_worker/worker.js',
+    fetch_worker_index: 'pages/fetch_worker/index.js',
     xhr: 'pages/xhr/index.js',
   },
   output: {
@@ -11,7 +13,7 @@ module.exports = {
     filename: '[name].js',
     sourceMapFilename: '[file].map',
   },
-  target: ['web', 'es5'],
+  target: 'webworker',
   module: {
     rules: [
       {
