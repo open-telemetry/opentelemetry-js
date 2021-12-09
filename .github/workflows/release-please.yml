@@ -10,7 +10,7 @@ jobs:
       - uses: GoogleCloudPlatform/release-please-action@v2
         id: release
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{secrets.RELEASE_PR_TOKEN}}
           release-type: node
           package-name: "@opentelemetry/api"
       # The logic below handles the npm publication:
