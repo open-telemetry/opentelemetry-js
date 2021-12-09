@@ -24,7 +24,7 @@
     "codecov": "lerna run codecov",
     "codecov:browser": "lerna run codecov:browser",
     "predocs-test": "npm run docs",
-    "docs": "typedoc && touch out/.nojekyll",
+    "docs": "typedoc && touch docs/.nojekyll",
     "docs-deploy": "gh-pages --dotfiles --dist docs",
     "lint": "lerna run lint",
     "lint:changed": "lerna run --concurrency 1 --stream lint --since HEAD --exclude-dependents",
