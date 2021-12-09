@@ -18,6 +18,7 @@ provider.register();
 const tracer = provider.getTracer('example-tracer-web');
 
 const prepareClickEvent = () => {
+  // eslint-disable-next-line no-undef
   const element = document.getElementById('button1');
 
   const onClick = () => {
@@ -27,4 +28,5 @@ const prepareClickEvent = () => {
   element.addEventListener('click', onClick);
 };
 
+// eslint-disable-next-line no-undef
 window.addEventListener('load', prepareClickEvent);

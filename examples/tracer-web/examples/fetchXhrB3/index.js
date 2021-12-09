@@ -3,6 +3,7 @@ import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-tra
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
 import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch';
+import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xml-http-request';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { B3Propagator } from '@opentelemetry/propagator-b3';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
@@ -28,6 +29,17 @@ registerInstrumentations({
   ],
 });
 
+registerInstrumentations({
+  instrumentations: [
+    new XMLHttpRequestInstrumentation({
+      ignoreUrls: [/localhost:8090\/sockjs-node/],
+      propagateTraceHeaderCorsUrls: [
+        'https://httpbin.org/get',
+      ],
+    }),
+  ],
+});
+
 const webTracerWithZone = provider.getTracer('example-tracer-web');
 
 // eslint-disable-next-line no-undef
@@ -39,17 +51,35 @@ const getData = (url) => fetch(url, {
   },
 });
 
+const getDataXhr = (url) => new Promise((resolve, reject) => {
+  // eslint-disable-next-line no-undef
+  const req = new XMLHttpRequest();
+  req.open('GET', url, true);
+  req.setRequestHeader('Content-Type', 'application/json');
+  req.setRequestHeader('Accept', 'application/json');
+  req.onload = () => {
+    resolve();
+  };
+  req.onerror = () => {
+    reject();
+  };
+  req.send();
+});
+
 // example of keeping track of context between async operations
 const prepareClickEvent = () => {
   const url = 'https://httpbin.org/get';
 
   // eslint-disable-next-line no-undef
-  const element = document.getElementById('button1');
+  const element1 = document.getElementById('button1');
 
-  const onClick = () => {
+  // eslint-disable-next-line no-undef
+  const element2 = document.getElementById('button2');
+
+  const clickHandler = (fetchFn) => () => {
     const singleSpan = webTracerWithZone.startSpan('files-series-info');
     context.with(trace.setSpan(context.active(), singleSpan), () => {
-      getData(url).then((_data) => {
+      fetchFn(url).then((_data) => {
         trace.getSpan(context.active()).addEvent('fetching-single-span-completed');
         singleSpan.end();
       });
@@ -57,14 +87,15 @@ const prepareClickEvent = () => {
     for (let i = 0, j = 5; i < j; i += 1) {
       const span = webTracerWithZone.startSpan(`files-series-info-${i}`);
       context.with(trace.setSpan(context.active(), span), () => {
-        getData(url).then((_data) => {
+        fetchFn(url).then((_data) => {
           trace.getSpan(context.active()).addEvent(`fetching-span-${i}-completed`);
           span.end();
         });
       });
     }
   };
-  element.addEventListener('click', onClick);
+  element1.addEventListener('click', clickHandler(getData));
+  element2.addEventListener('click', clickHandler(getDataXhr));
 };
 
 // eslint-disable-next-line no-undef

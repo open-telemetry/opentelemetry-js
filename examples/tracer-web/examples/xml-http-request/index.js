@@ -3,7 +3,7 @@ import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-tra
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
 import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xml-http-request';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-otlp-http';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { B3Propagator } from '@opentelemetry/propagator-b3';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
@@ -48,6 +48,7 @@ const getData = (url) => new Promise((resolve, reject) => {
 const prepareClickEvent = () => {
   const url1 = 'https://httpbin.org/get';
 
+  // eslint-disable-next-line no-undef
   const element = document.getElementById('button1');
 
   const onClick = () => {
@@ -57,7 +58,7 @@ const prepareClickEvent = () => {
         getData(url1).then((_data) => {
           trace.getSpan(context.active()).addEvent('fetching-span1-completed');
           span1.end();
-        }, ()=> {
+        }, () => {
           trace.getSpan(context.active()).addEvent('fetching-error');
           span1.end();
         });
@@ -67,4 +68,5 @@ const prepareClickEvent = () => {
   element.addEventListener('click', onClick);
 };
 
+// eslint-disable-next-line no-undef
 window.addEventListener('load', prepareClickEvent);
