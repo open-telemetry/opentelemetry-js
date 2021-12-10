@@ -15,28 +15,13 @@
  */
 
 import * as assert from 'assert';
-import { ValueType } from '@opentelemetry/api-metrics-wip';
-import { InstrumentationLibrary } from '@opentelemetry/core';
 import { InstrumentType } from '../../src/Instruments';
 import { ViewRegistry } from '../../src/view/ViewRegistry';
 import { View } from '../../src/view/View';
 import { InstrumentSelector } from '../../src/view/InstrumentSelector';
 import { MeterSelector } from '../../src/view/MeterSelector';
-import { InstrumentDescriptor } from '../../src/InstrumentDescriptor';
+import { defaultInstrumentationLibrary, defaultInstrumentDescriptor } from '../util';
 
-const defaultInstrumentDescriptor: InstrumentDescriptor = {
-  name: '',
-  description: '',
-  type: InstrumentType.COUNTER,
-  unit: '',
-  valueType: ValueType.DOUBLE,
-};
-
-const defaultInstrumentationLibrary: InstrumentationLibrary = {
-  name: 'default',
-  version: '1.0.0',
-  schemaUrl: 'https://opentelemetry.io/schemas/1.7.0'
-};
 
 describe('ViewRegistry', () => {
   describe('findViews', () => {
