@@ -1,8 +1,6 @@
 # OpenTelemetry Collector Exporter for node with protobuf
 
 [![NPM Published Version][npm-img]][npm-url]
-[![dependencies][dependencies-image]][dependencies-url]
-[![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
 This module provides exporter for node to be used with [opentelemetry-collector][opentelemetry-collector-url] - last tested with version **0.25.0**.
@@ -59,12 +57,8 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-trace-otlp-proto
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-trace-otlp-proto
-[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-exporter-trace-otlp-proto&type=dev
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-trace-otlp-proto&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-trace-otlp-proto
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-trace-otlp-proto.svg
 [opentelemetry-collector-url]: https://github.com/open-telemetry/opentelemetry-collector
 [semconv-resource-service-name]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service
-[metrics-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-metrics-otlp-proto
+[metrics-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-proto

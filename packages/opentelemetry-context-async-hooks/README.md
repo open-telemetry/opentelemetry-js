@@ -1,8 +1,6 @@
 # OpenTelemetry AsyncHooks-based Context Manager
 
 [![NPM Published Version][npm-img]][npm-url]
-[![dependencies][dependencies-image]][dependencies-url]
-[![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
 This package provides [async-hooks][async-hooks-doc] based context manager which is used internally by OpenTelemetry plugins to propagate specific context between function calls and async operations. It only targets NodeJS since async-hooks is only available there.
@@ -44,15 +42,11 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-    [dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-context-async-hooks
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-context-async-hooks
-[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-context-async-hooks&type=dev
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-context-async-hooks&type=dev
 [async-hooks-doc]: http://nodejs.org/dist/latest/docs/api/async_hooks.html
 [def-context-manager]: https://github.com/open-telemetry/opentelemetry-js-api/blob/main/docs/context.md#context-manager
-[dd-js-tracer-scope]: https://github.com/DataDog/dd-trace-js/tree/main/packages/dd-trace/src/scope
+[dd-js-tracer-scope]: https://github.com/DataDog/dd-trace-js/blob/master/packages/dd-trace/src/scope.js
 [opentracing-scope]: https://github.com/opentracing/opentracing-javascript/pull/113
 [diag-team-scope-discussion]: https://github.com/nodejs/diagnostics/issues/300
-[pkgs-that-break-ah]: https://github.com/nodejs/diagnostics/blob/master/tracing/AsyncHooks/problematic-modules.md
+[pkgs-that-break-ah]: https://github.com/nodejs/diagnostics/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3Aasync-continuity
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/context-async-hooks
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fcontext-async-hooks.svg
