@@ -6,10 +6,10 @@
   "types": "build/src/index.d.ts",
   "scripts": {
     "precompile": "lerna run version",
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json",
+    "compile": "tsc --build",
     "prewatch": "npm run precompile",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json",
-    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json",
+    "watch": "tsc --build --watch",
+    "clean": "tsc --build --clean",
     "bench": "node benchmark",
     "postinstall": "npm run update-ts-references && npm run bootstrap",
     "postcompile": "npm run submodule && npm run protos:copy",
@@ -35,7 +35,7 @@
     "lint:markdown": "./node_modules/.bin/markdownlint $(git ls-files '*.md') -i ./CHANGELOG.md",
     "lint:markdown:fix": "./node_modules/.bin/markdownlint $(git ls-files '*.md') -i ./CHANGELOG.md --fix",
     "reset": "lerna clean -y && rm -rf node_modules && npm i && npm run compile && npm run lint:fix",
-    "update-ts-references": "update-ts-references --configName tsconfig.esm.json && update-ts-references"
+    "update-ts-references": "update-ts-references"
   },
   "repository": "open-telemetry/opentelemetry-js",
   "keywords": [
