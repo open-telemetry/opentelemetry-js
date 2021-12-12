@@ -3,13 +3,13 @@
   "files": [],
   "references": [
     {
-      "path": "packages/opentelemetry-api-metrics"
+      "path": "packages/opentelemetry-api-metrics/tsconfig.all.json"
     },
     {
       "path": "packages/opentelemetry-exporter-metrics-otlp-grpc"
     },
     {
-      "path": "packages/opentelemetry-exporter-metrics-otlp-http"
+      "path": "packages/opentelemetry-exporter-metrics-otlp-http/tsconfig.all.json"
     },
     {
       "path": "packages/opentelemetry-exporter-metrics-otlp-proto"
@@ -21,13 +21,13 @@
       "path": "packages/opentelemetry-exporter-trace-otlp-grpc"
     },
     {
-      "path": "packages/opentelemetry-exporter-trace-otlp-http"
+      "path": "packages/opentelemetry-exporter-trace-otlp-http/tsconfig.all.json"
     },
     {
       "path": "packages/opentelemetry-exporter-trace-otlp-proto"
     },
     {
-      "path": "packages/opentelemetry-instrumentation-fetch"
+      "path": "packages/opentelemetry-instrumentation-fetch/tsconfig.all.json"
     },
     {
       "path": "packages/opentelemetry-instrumentation-grpc"
@@ -36,13 +36,13 @@
       "path": "packages/opentelemetry-instrumentation-http"
     },
     {
-      "path": "packages/opentelemetry-instrumentation-xml-http-request"
+      "path": "packages/opentelemetry-instrumentation-xml-http-request/tsconfig.all.json"
     },
     {
-      "path": "packages/opentelemetry-instrumentation"
+      "path": "packages/opentelemetry-instrumentation/tsconfig.all.json"
     },
     {
-      "path": "packages/opentelemetry-sdk-metrics-base"
+      "path": "packages/opentelemetry-sdk-metrics-base/tsconfig.all.json"
     },
     {
       "path": "packages/opentelemetry-sdk-node"
