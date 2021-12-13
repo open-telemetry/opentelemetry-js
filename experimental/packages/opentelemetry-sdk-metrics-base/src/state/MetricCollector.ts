@@ -41,6 +41,10 @@ export class MetricCollector implements MetricProducer {
   }
 }
 
+/**
+ * An internal interface for MetricCollector. Exposes the necessary
+ * information for metric collection.
+ */
 export interface MetricCollectorHandle {
   aggregatorTemporality: AggregationTemporality;
 }

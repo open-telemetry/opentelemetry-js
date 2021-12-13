@@ -38,6 +38,12 @@ class TestMetricExporter extends MetricExporter {
   }
 }
 
+class TestDeltaMetricExporter extends TestMetricExporter {
+  override getPreferredAggregationTemporality(): AggregationTemporality {
+    return AggregationTemporality.DELTA;
+  }
+}
+
 class TestMetricReader extends MetricReader {
   getMetricCollector(): MetricCollector {
     return this['_metricProducer'] as MetricCollector;
@@ -52,12 +58,14 @@ describe('MetricCollector', () => {
   describe('constructor', () => {
     it('should construct MetricCollector without exceptions', () => {
       const meterProviderSharedState = new MeterProviderSharedState(defaultResource);
-      const exporter = new TestMetricExporter();
-      const reader = new TestMetricReader(exporter);
-      const metricCollector = new MetricCollector(meterProviderSharedState, reader);
+      const exporters = [ new TestMetricExporter(), new TestDeltaMetricExporter() ];
+      for (const exporter of exporters) {
+        const reader = new TestMetricReader(exporter);
+        const metricCollector = new MetricCollector(meterProviderSharedState, reader);
 
-      assert.strictEqual(metricCollector.aggregatorTemporality, exporter.getPreferredAggregationTemporality());
-      assert.strictEqual(metricCollector.metricReader, reader);
+        assert.strictEqual(metricCollector.aggregatorTemporality, exporter.getPreferredAggregationTemporality());
+        assert.strictEqual(metricCollector.metricReader, reader);
+      }
     });
   });
 
