@@ -15,7 +15,7 @@
  */
 
 import * as metrics from '@opentelemetry/api-metrics-wip';
-import { hrTime, InstrumentationLibrary } from '@opentelemetry/core';
+import { InstrumentationLibrary } from '@opentelemetry/core';
 import { createInstrumentDescriptor, InstrumentDescriptor } from './InstrumentDescriptor';
 import { Counter, Histogram, InstrumentType, UpDownCounter } from './Instruments';
 import { MeterProviderSharedState } from './state/MeterProviderSharedState';
@@ -25,6 +25,7 @@ import { MetricStorage } from './state/MetricStorage';
 import { MetricData } from './export/MetricData';
 import { isNotNullish } from './utils';
 import { MetricCollectorHandle } from './state/MetricCollector';
+import { HrTime } from '@opentelemetry/api';
 
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#meter
 
@@ -96,8 +97,7 @@ export class Meter implements metrics.Meter {
     return new MultiMetricStorage(storages);
   }
 
-  async collectAll(collector: MetricCollectorHandle): Promise<MetricData[]> {
-    const collectionTime = hrTime();
+  async collectAll(collector: MetricCollectorHandle, collectionTime: HrTime): Promise<MetricData[]> {
     const result = await Promise.all(Array.from(this._metricStorageRegistry.values()).map(metricStorage => {
       return metricStorage.collectAndReset(
         collector,

@@ -15,6 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
+import * as assert from 'assert';
 import { DropAggregator, SumAggregator } from '../../src/aggregator';
 import { DeltaMetricProcessor } from '../../src/state/DeltaMetricProcessor';
 import { commonAttributes, commonValues } from '../util';
@@ -39,6 +40,31 @@ describe('DeltaMetricProcessor', () => {
           metricStorage.record(value, attributes, api.context.active());
         }
       }
+    });
+  });
+
+  describe('collect', () => {
+    it('should export', () => {
+      const metricStorage = new DeltaMetricProcessor(new SumAggregator());
+
+      metricStorage.record(1, { attribute: '1' }, api.ROOT_CONTEXT);
+      metricStorage.record(2, { attribute: '1' }, api.ROOT_CONTEXT);
+      metricStorage.record(1, { attribute: '2' }, api.ROOT_CONTEXT);
+
+      let accumulations = metricStorage.collect();
+      assert.strictEqual(accumulations.size, 2);
+      {
+        const accumulation = accumulations.get({ attribute: '1' });
+        assert.strictEqual(accumulation?.toPoint(), 3);
+      }
+      {
+        const accumulation = accumulations.get({ attribute: '2' });
+        assert.strictEqual(accumulation?.toPoint(), 1);
+      }
+
+      /** the accumulations shall be reset. */
+      accumulations = metricStorage.collect();
+      assert.strictEqual(accumulations.size, 0);
     });
   });
 });

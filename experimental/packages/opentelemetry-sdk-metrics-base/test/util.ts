@@ -56,14 +56,14 @@ export const sleep = (time: number) =>
 export function assertMetricData(
   actual: unknown,
   pointDataType?: PointDataType,
-  instrumentDescriptor: InstrumentDescriptor = defaultInstrumentDescriptor,
-  instrumentationLibrary: InstrumentationLibrary = defaultInstrumentationLibrary,
+  instrumentDescriptor: Partial<InstrumentDescriptor> = defaultInstrumentDescriptor,
+  instrumentationLibrary: Partial<InstrumentationLibrary> = defaultInstrumentationLibrary,
   resource: Resource = defaultResource,
 ): asserts actual is MetricData {
   const it = actual as MetricData;
   assert.deepStrictEqual(it.resource, resource);
-  assert.deepStrictEqual(it.instrumentationLibrary, instrumentationLibrary);
-  assert.deepStrictEqual(it.instrumentDescriptor, instrumentDescriptor);
+  assertPartialDeepStrictEqual(it.instrumentDescriptor, instrumentDescriptor);
+  assertPartialDeepStrictEqual(it.instrumentationLibrary, instrumentationLibrary);
   if (isNotNullish(pointDataType)) {
     assert.strictEqual(it.pointDataType, pointDataType);
   } else {
@@ -105,4 +105,15 @@ export function assertMeasurementEqual(actual: unknown, expected: Measurement): 
   }
   assert.deepStrictEqual((actual as Measurement).attributes, expected.attributes);
   assert.deepStrictEqual((actual as Measurement).context, expected.context);
+}
+
+export function assertPartialDeepStrictEqual<T>(actual: unknown, expected: T, message?: string): asserts actual is T {
+  assert.strictEqual(typeof actual, typeof expected, message);
+  if (typeof expected !== 'object' && typeof expected !== 'function') {
+    return;
+  }
+  const ownNames = Object.getOwnPropertyNames(expected);
+  for (const ownName of ownNames) {
+    assert.deepStrictEqual((actual as any)[ownName], (expected as any)[ownName], message);
+  }
 }

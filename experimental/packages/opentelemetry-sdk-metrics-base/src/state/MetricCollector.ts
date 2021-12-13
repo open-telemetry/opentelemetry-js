@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { hrTime } from '@opentelemetry/core';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 import { MetricData } from '../export/MetricData';
 import { MetricProducer } from '../export/MetricProducer';
@@ -21,17 +22,20 @@ import { MetricReader } from '../export/MetricReader';
 import { MeterProviderSharedState } from './MeterProviderSharedState';
 
 /**
- * An internal opaque interface that the MetricReader receives as MetricProducer.
+ * An internal opaque interface that the MetricReader receives as
+ * MetricProducer. It acting as the storage key as the internal metric stream
+ * state for each MetricReader.
  */
 export class MetricCollector implements MetricProducer {
-  public aggregatorTemporality: AggregationTemporality;
+  public readonly aggregatorTemporality: AggregationTemporality;
   constructor(private _sharedState: MeterProviderSharedState, public metricReader: MetricReader) {
     this.aggregatorTemporality = this.metricReader.getPreferredAggregationTemporality();
   }
 
   async collectAllMetrics(): Promise<MetricData[]> {
+    const collectionTime = hrTime();
     const results = await Promise.all(Array.from(this._sharedState.meters.values())
-      .map(meter => meter.collectAll(this)));
+      .map(meter => meter.collectAll(this, collectionTime)));
 
     return results.reduce((cumulation, current) => cumulation.concat(current), []);
   }

@@ -62,6 +62,10 @@ export class HashMap<KeyType, ValueType, HashCodeType> {
       next = valueIterator.next();
     }
   }
+
+  get size() {
+    return this._valueMap.size;
+  }
 }
 
 export class AttributeHashMap<ValueType> extends HashMap<Attributes, ValueType, string> {
