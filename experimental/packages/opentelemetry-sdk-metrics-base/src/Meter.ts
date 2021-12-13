@@ -97,9 +97,9 @@ export class Meter implements metrics.Meter {
     return new MultiMetricStorage(storages);
   }
 
-  async collectAll(collector: MetricCollectorHandle, collectionTime: HrTime): Promise<MetricData[]> {
+  async collectAllMetrics(collector: MetricCollectorHandle, collectionTime: HrTime): Promise<MetricData[]> {
     const result = await Promise.all(Array.from(this._metricStorageRegistry.values()).map(metricStorage => {
-      return metricStorage.collectAndReset(
+      return metricStorage.collect(
         collector,
         this._meterProviderSharedState.metricCollectors,
         this._meterProviderSharedState.resource,

@@ -58,7 +58,7 @@ describe('SyncMetricStorage', () => {
         metricStorage.record(2, {}, api.context.active());
         metricStorage.record(3, {}, api.context.active());
         {
-          const metric = await metricStorage.collectAndReset(
+          const metric = await metricStorage.collect(
             deltaCollector,
             collectors,
             defaultResource,
@@ -73,7 +73,7 @@ describe('SyncMetricStorage', () => {
 
         // The attributes should not be memorized.
         {
-          const metric = await metricStorage.collectAndReset(
+          const metric = await metricStorage.collect(
             deltaCollector,
             collectors,
             defaultResource,
@@ -87,7 +87,7 @@ describe('SyncMetricStorage', () => {
 
         metricStorage.record(1, {}, api.context.active());
         {
-          const metric = await metricStorage.collectAndReset(
+          const metric = await metricStorage.collect(
             deltaCollector,
             [deltaCollector],
             defaultResource,
@@ -110,7 +110,7 @@ describe('SyncMetricStorage', () => {
         metricStorage.record(2, {}, api.context.active());
         metricStorage.record(3, {}, api.context.active());
         {
-          const metric = await metricStorage.collectAndReset(
+          const metric = await metricStorage.collect(
             cumulativeCollector,
             collectors,
             defaultResource,
@@ -125,7 +125,7 @@ describe('SyncMetricStorage', () => {
 
         // The attributes should be memorized.
         {
-          const metric = await metricStorage.collectAndReset(
+          const metric = await metricStorage.collect(
             cumulativeCollector,
             collectors,
             defaultResource,
@@ -140,7 +140,7 @@ describe('SyncMetricStorage', () => {
 
         metricStorage.record(1, {}, api.context.active());
         {
-          const metric = await metricStorage.collectAndReset(
+          const metric = await metricStorage.collect(
             cumulativeCollector,
             collectors,
             defaultResource,

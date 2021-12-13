@@ -28,13 +28,12 @@ import { MetricCollectorHandle } from './MetricCollector';
  */
 export interface MetricStorage {
   /**
-   * Collects the metrics from this storage and resets for the next
-   * collection period.
+   * Collects the metrics from this storage.
    *
-   * Note: This is a stateful operation and will reset any interval-related
+   * Note: This is a stateful operation and may reset any interval-related
    * state for the MetricCollector.
    */
-  collectAndReset(
+  collect(
     collector: MetricCollectorHandle,
     collectors: MetricCollectorHandle[],
     resource: Resource,

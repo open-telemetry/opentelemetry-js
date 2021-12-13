@@ -35,7 +35,7 @@ export class MetricCollector implements MetricProducer {
   async collectAllMetrics(): Promise<MetricData[]> {
     const collectionTime = hrTime();
     const results = await Promise.all(Array.from(this._sharedState.meters.values())
-      .map(meter => meter.collectAll(this, collectionTime)));
+      .map(meter => meter.collectAllMetrics(this, collectionTime)));
 
     return results.reduce((cumulation, current) => cumulation.concat(current), []);
   }
