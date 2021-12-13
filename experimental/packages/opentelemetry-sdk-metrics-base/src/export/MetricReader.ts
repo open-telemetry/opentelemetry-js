@@ -34,11 +34,11 @@ export abstract class MetricReader {
     return this._exporter.getPreferredAggregationTemporality();
   }
 
-  async collectAllMetric(): Promise<void> {
+  async collect(): Promise<void> {
     if (this._metricProducer === undefined) {
       throw new Error('MetricReader is not bound to a MeterProvider');
     }
-    const metrics = await this._metricProducer.collectAllMetrics();
+    const metrics = await this._metricProducer.collect();
 
     // errors thrown to caller
     await this._exporter.export(metrics);

@@ -69,7 +69,7 @@ describe('MetricCollector', () => {
     });
   });
 
-  describe('collectAllMetrics', () => {
+  describe('collect', () => {
     function setupInstruments(exporter: MetricExporter) {
       const meterProvider = new MeterProvider({ resource: defaultResource });
       const reader = new TestMetricReader(exporter);
@@ -83,7 +83,7 @@ describe('MetricCollector', () => {
       return { metricCollector, meter };
     }
 
-    it('should collect all metrics', async () => {
+    it('should collect metrics', async () => {
       /** preparing test instrumentations */
       const exporter = new TestMetricExporter();
       const { metricCollector, meter } = setupInstruments(exporter);
@@ -96,8 +96,8 @@ describe('MetricCollector', () => {
       const counter2 = meter.createCounter('counter2');
       counter2.add(3);
 
-      /** collectAllMetrics */
-      const batch = await metricCollector.collectAllMetrics();
+      /** collect metrics */
+      const batch = await metricCollector.collect();
       assert(Array.isArray(batch));
       assert.strictEqual(batch.length, 2);
 
