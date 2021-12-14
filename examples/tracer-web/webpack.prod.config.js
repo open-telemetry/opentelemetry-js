@@ -1,6 +1,4 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 const webpack = require('webpack');
-// eslint-disable-next-line import/no-extraneous-dependencies
 const webpackMerge = require('webpack-merge');
 const path = require('path');
 

@@ -8,6 +8,10 @@ import { B3Propagator } from '@opentelemetry/propagator-b3';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
 const provider = new WebTracerProvider();
+
+// Note: For production consider using the "BatchSpanProcessor" to reduce the number of requests
+// to your exporter. Using the SimpleSpanProcessor here as it sends the spans immediately to the
+// exporter without delay
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.addSpanProcessor(new SimpleSpanProcessor(new OTLPTraceExporter()));
 provider.register({
@@ -30,7 +34,6 @@ registerInstrumentations({
 
 const webTracerWithZone = provider.getTracer('example-tracer-web');
 
-// eslint-disable-next-line no-undef
 const getData = (url) => fetch(url, {
   method: 'GET',
   headers: {
@@ -43,7 +46,6 @@ const getData = (url) => fetch(url, {
 const prepareClickEvent = () => {
   const url = 'https://httpbin.org/get';
 
-  // eslint-disable-next-line no-undef
   const element = document.getElementById('button1');
 
   const onClick = () => {
@@ -67,5 +69,4 @@ const prepareClickEvent = () => {
   element.addEventListener('click', onClick);
 };
 
-// eslint-disable-next-line no-undef
 window.addEventListener('load', prepareClickEvent);

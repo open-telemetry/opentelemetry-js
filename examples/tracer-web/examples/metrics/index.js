@@ -45,14 +45,11 @@ function startMetrics() {
 }
 
 const addClickEvents = () => {
-  // eslint-disable-next-line no-undef
   const startBtn = document.getElementById('startBtn');
 
-  // eslint-disable-next-line no-undef
   const stopBtn = document.getElementById('stopBtn');
   startBtn.addEventListener('click', startMetrics);
   stopBtn.addEventListener('click', stopMetrics);
 };
 
-// eslint-disable-next-line no-undef
 window.addEventListener('load', addClickEvents);

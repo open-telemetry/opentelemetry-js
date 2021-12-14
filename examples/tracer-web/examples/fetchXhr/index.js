@@ -8,6 +8,10 @@ import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
 const provider = new WebTracerProvider();
+
+// Note: For production consider using the "BatchSpanProcessor" to reduce the number of requests
+// to your exporter. Using the SimpleSpanProcessor here as it sends the spans immediately to the
+// exporter without delay
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.addSpanProcessor(new SimpleSpanProcessor(new OTLPTraceExporter()));
 provider.register({
@@ -24,11 +28,6 @@ registerInstrumentations({
       ],
       clearTimingResources: true,
     }),
-  ],
-});
-
-registerInstrumentations({
-  instrumentations: [
     new XMLHttpRequestInstrumentation({
       ignoreUrls: [/localhost:8090\/sockjs-node/],
       propagateTraceHeaderCorsUrls: [
@@ -40,7 +39,6 @@ registerInstrumentations({
 
 const webTracerWithZone = provider.getTracer('example-tracer-web');
 
-// eslint-disable-next-line no-undef
 const getData = (url) => fetch(url, {
   method: 'GET',
   headers: {
@@ -50,7 +48,6 @@ const getData = (url) => fetch(url, {
 });
 
 const getDataXhr = (url) => new Promise((resolve, reject) => {
-  // eslint-disable-next-line no-undef
   const req = new XMLHttpRequest();
   req.open('GET', url, true);
   req.setRequestHeader('Content-Type', 'application/json');
@@ -68,10 +65,7 @@ const getDataXhr = (url) => new Promise((resolve, reject) => {
 const prepareClickEvent = () => {
   const url = 'https://httpbin.org/get';
 
-  // eslint-disable-next-line no-undef
   const element1 = document.getElementById('button1');
-
-  // eslint-disable-next-line no-undef
   const element2 = document.getElementById('button2');
 
   const clickHandler = (fetchFn) => () => {
@@ -96,5 +90,4 @@ const prepareClickEvent = () => {
   element2.addEventListener('click', clickHandler(getDataXhr));
 };
 
-// eslint-disable-next-line no-undef
 window.addEventListener('load', prepareClickEvent);
