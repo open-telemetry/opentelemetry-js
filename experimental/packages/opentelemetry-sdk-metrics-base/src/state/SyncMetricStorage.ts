@@ -33,7 +33,7 @@ import { MetricCollectorHandle } from './MetricCollector';
 /**
  * Internal interface.
  *
- * Stores and aggregate {@link MetricData} for synchronous instruments.
+ * Stores and aggregates {@link MetricData} for synchronous instruments.
  */
 export class SyncMetricStorage<T extends Maybe<Accumulation>> implements WritableMetricStorage, MetricStorage {
   private _deltaMetricStorage: DeltaMetricProcessor<T>;
@@ -80,7 +80,6 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>> implements Writabl
   static create(view: View, instrument: InstrumentDescriptor): SyncMetricStorage<Maybe<Accumulation>> {
     instrument = createInstrumentDescriptorWithView(view, instrument);
     const aggregator = view.aggregation.createAggregator(instrument);
-    const storage = new SyncMetricStorage(instrument, aggregator, view.attributesProcessor);
-    return storage;
+    return new SyncMetricStorage(instrument, aggregator, view.attributesProcessor);
   }
 }

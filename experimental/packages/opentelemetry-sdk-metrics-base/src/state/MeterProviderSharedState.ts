@@ -26,9 +26,6 @@ import { MetricCollector } from './MetricCollector';
  */
 export class MeterProviderSharedState {
   viewRegistry = new ViewRegistry();
-  // TODO: we should probably Object.freeze here but,
-  // return type Object.freeze(hrTime()) is `readonly [number, number]` which
-  // is not assignable to HrTime.
   readonly sdkStartTime: HrTime = hrTime();
 
   metricCollectors: MetricCollector[] = [];

@@ -23,7 +23,7 @@ import { MeterProviderSharedState } from './MeterProviderSharedState';
 
 /**
  * An internal opaque interface that the MetricReader receives as
- * MetricProducer. It acting as the storage key as the internal metric stream
+ * MetricProducer. It acts as the storage key to the internal metric stream
  * state for each MetricReader.
  */
 export class MetricCollector implements MetricProducer {

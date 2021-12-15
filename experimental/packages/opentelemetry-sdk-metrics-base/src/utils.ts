@@ -17,6 +17,7 @@
 import { Attributes } from '@opentelemetry/api-metrics-wip';
 
 export type Maybe<T> = T | undefined;
+
 export function isNotNullish<T>(item: Maybe<T>): item is T {
   return item !== undefined && item !== null;
 }

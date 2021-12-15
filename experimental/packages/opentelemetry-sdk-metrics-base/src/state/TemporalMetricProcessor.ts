@@ -53,7 +53,8 @@ export class TemporalMetricProcessor<T> {
 
   /**
    * Builds the {@link MetricData} streams to report against a specific metric reader.
-   * @param collectorInfo The information of the metric reader.
+   * @param collector The information of the metric reader.
+   * @param collectors The registered collectors.
    * @param resource The resource to attach these metrics against.
    * @param instrumentationLibrary The instrumentation library that generated these metrics.
    * @param instrumentDescriptor The instrumentation descriptor that these metrics generated with.
