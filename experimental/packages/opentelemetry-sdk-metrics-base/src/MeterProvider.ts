@@ -38,8 +38,8 @@ export class MeterProvider {
   private _metricReaders: MetricReader[] = [];
   private _metricExporters: MetricExporter[] = [];
 
-  constructor(options: MeterProviderOptions) {
-    this._sharedState = new MeterProviderSharedState(options.resource ?? Resource.empty());
+  constructor(options?: MeterProviderOptions) {
+    this._sharedState = new MeterProviderSharedState(options?.resource ?? Resource.empty());
   }
 
   getMeter(name: string, version = '', options: metrics.MeterOptions = {}): metrics.Meter {
@@ -48,12 +48,14 @@ export class MeterProvider {
         api.diag.warn('A shutdown MeterProvider cannot provide a Meter')
         return metrics.NOOP_METER;
     }
+    const id = `${name}#${version}#${options.schemaUrl ?? ''}`;
+    if (this._sharedState.meters.has(id)) {
+      return this._sharedState.meters.get(id)!;
+    }
 
-    // Spec leaves it unspecified if creating a meter with duplicate
-    // name/version returns the same meter. We create a new one here
-    // for simplicity. This may change in the future.
-    // TODO: consider returning the same meter if the same name/version is used
-    return new Meter(this._sharedState, { name, version, schemaUrl: options.schemaUrl });
+    const meter = new Meter(this._sharedState, { name, version, schemaUrl: options.schemaUrl });
+    this._sharedState.meters.set(id, meter);
+    return meter;
   }
 
   addMetricReader(metricReader: MetricReader) {

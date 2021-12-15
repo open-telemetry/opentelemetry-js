@@ -15,6 +15,7 @@
  */
 
 import { Resource } from '@opentelemetry/resources';
+import { Meter } from '../Meter';
 import { ViewRegistry } from '../view/ViewRegistry';
 
 /**
@@ -22,6 +23,7 @@ import { ViewRegistry } from '../view/ViewRegistry';
  */
 export class MeterProviderSharedState {
   viewRegistry = new ViewRegistry();
+  meters: Map<string, Meter> = new Map();
 
   constructor(public resource: Resource) {}
 }
