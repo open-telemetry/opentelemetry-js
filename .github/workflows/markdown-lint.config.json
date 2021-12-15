@@ -1,0 +1,11 @@
+{
+  "retryOn429": true,
+  "ignorePatterns": [
+    {
+      "pattern": "^http://localhost"
+    },
+    {
+      "pattern": "^https://github.com/snyder114"
+    }
+  ]
+}

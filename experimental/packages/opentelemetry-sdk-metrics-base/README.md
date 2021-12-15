@@ -1,15 +1,13 @@
 # OpenTelemetry Metrics SDK
 
 [![NPM Published Version][npm-img]][npm-url]
-[![dependencies][dependencies-image]][dependencies-url]
-[![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
 OpenTelemetry metrics allow a user to collect data and export it to a metrics backend like [Prometheus](https://prometheus.io/).
 
 ## Work In Progress
 
-The OpenTelemetry SDK in this directory is undergoing drastic changes. If you need to use metrics, we recommend you use [version `0.27.0`](https://github.com/open-telemetry/opentelemetry-js/tree/v0.27.0/experimental/packages/opentelemetry-sdk-metrics-base).
+The OpenTelemetry SDK in this directory is undergoing drastic changes. If you need to use metrics, we recommend you use [version `0.27.0`](https://github.com/open-telemetry/opentelemetry-js/tree/experimental/v0.27.0/experimental/packages/opentelemetry-sdk-metrics-base).
 
 ## Installation
 
@@ -19,7 +17,7 @@ npm install --save "@opentelemetry/sdk-metrics-base@~0.27.0"
 
 ## Usage
 
-Please see the [version `0.27.0` README](https://github.com/open-telemetry/opentelemetry-js/tree/v0.27.0/experimental/packages/opentelemetry-sdk-metrics-base#usage).
+Please see the [version `0.27.0` README](https://github.com/open-telemetry/opentelemetry-js/tree/experimental/v0.27.0/experimental/packages/opentelemetry-sdk-metrics-base#usage).
 
 TODO: Add usage information for updated SDK
 
@@ -36,9 +34,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-sdk-metrics-base
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-metrsics
-[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-sdk-metrics-base&type=dev
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-sdk-metrics-base&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/sdk-metrics-base
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fmetrics.svg

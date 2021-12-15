@@ -25,7 +25,7 @@ describe('View', () => {
       const view = new View();
       assert.strictEqual(view.name, undefined);
       assert.strictEqual(view.description, undefined);
-      assert.strictEqual(view.aggregation, Aggregation.None());
+      assert.strictEqual(view.aggregation, Aggregation.Default());
       assert.strictEqual(view.attributesProcessor, AttributesProcessor.Noop());
     });
   });

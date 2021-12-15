@@ -1,8 +1,6 @@
 # OpenTelemetry Core
 
 [![NPM Published Version][npm-img]][npm-url]
-[![dependencies][dependencies-image]][dependencies-url]
-[![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
 This package provides default implementations of the OpenTelemetry API for trace and metrics. It's intended for use both on the server and in the browser.
@@ -12,7 +10,7 @@ This package provides default implementations of the OpenTelemetry API for trace
 - [OpenTelemetry Core](#opentelemetry-core)
   - [Built-in Implementations](#built-in-implementations)
     - [Built-in Propagators](#built-in-propagators)
-      - [W3CTraceContextPropagator Propagator](#httptracecontext-propagator)
+      - [W3CTraceContextPropagator Propagator](#w3ctracecontextpropagator-propagator)
       - [Composite Propagator](#composite-propagator)
       - [Baggage Propagator](#baggage-propagator)
     - [Built-in Sampler](#built-in-sampler)
@@ -177,9 +175,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-core
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-core
-[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-core&type=dev
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-core&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/core
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fcore.svg

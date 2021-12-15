@@ -60,9 +60,7 @@ export class View {
   constructor(config?: ViewStreamConfig) {
     this.name = config?.name;
     this.description = config?.description;
-    // TODO: the default aggregation should be Aggregation.Default().
-    // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#default-aggregation
-    this.aggregation = config?.aggregation ?? Aggregation.None();
+    this.aggregation = config?.aggregation ?? Aggregation.Default();
     this.attributesProcessor = config?.attributesProcessor ?? AttributesProcessor.Noop();
   }
 }

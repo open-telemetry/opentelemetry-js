@@ -5,11 +5,13 @@ const path = require('path');
 const directory = path.resolve(__dirname);
 
 const common = {
-  mode: 'development',
+  mode: 'production',
   entry: {
     metrics: 'examples/metrics/index.js',
     fetch: 'examples/fetch/index.js',
     'xml-http-request': 'examples/xml-http-request/index.js',
+    fetchXhr: 'examples/fetchXhr/index.js',
+    fetchXhrB3: 'examples/fetchXhrB3/index.js',
     zipkin: 'examples/zipkin/index.js',
   },
   output: {
@@ -43,16 +45,22 @@ const common = {
     ],
     extensions: ['.ts', '.js', '.jsx', '.json'],
   },
+  optimization: {
+    minimize: true,
+  },
 };
 
-module.exports = webpackMerge(common, {
-  devtool: 'eval-source-map',
+module.exports = webpackMerge.merge(common, {
+  devtool: 'source-map',
   devServer: {
-    contentBase: path.resolve(__dirname),
+    static: {
+      directory: path.resolve(__dirname, 'examples'),
+    },
+    compress: true,
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('development'),
+      'process.env.NODE_ENV': JSON.stringify('production'),
     }),
   ],
 });

@@ -1,8 +1,6 @@
 # OpenTelemetry SDK for Node.js
 
 [![NPM Published Version][npm-img]][npm-url]
-[![dependencies][dependencies-image]][dependencies-url]
-[![devDependencies][devdependencies-image]][devdependencies-url]
 [![Apache License][license-image]][license-image]
 
 This package provides the full OpenTelemetry SDK for Node.js including tracing and metrics.
@@ -88,15 +86,15 @@ Detect resources automatically from the environment using the default resource d
 
 ### contextManager
 
-Use a custom context manager. Default: [AsyncHooksContextManager](../opentelemetry-context-async-hooks/README.md)
+Use a custom context manager. Default: [AsyncHooksContextManager](../../../packages/opentelemetry-context-async-hooks/README.md)
 
 ### textMapPropagator
 
-Use a custom propagator. Default: [CompositePropagator](../opentelemetry-core/src/context/propagation/composite.ts) using [W3C Trace Context](../opentelemetry-core/README.md#httptracecontext-propagator) and [Baggage](../opentelemetry-core/README.md#baggage-propagator)
+Use a custom propagator. Default: [CompositePropagator](../../../packages/opentelemetry-core/src/propagation/composite.ts) using [W3C Trace Context](../../../packages/opentelemetry-core/README.md#w3ctracecontextpropagator-propagator) and [Baggage](../../../packages/opentelemetry-core/README.md#baggage-propagator)
 
 ### metricProcessor
 
-Use a custom processor for metrics. Default: [UngroupedProcessor](../opentelemetry-sdk-metrics-base/src/export/Processor.ts#L50)
+Use a custom processor for metrics. Default: UngroupedProcessor
 
 ### metricExporter
 
@@ -124,11 +122,11 @@ Configure a custom sampler. By default all traces will be sampled.
 
 ### traceExporter
 
-Configure a trace exporter. If an exporter OR span processor is not configured, the tracing SDK will not be initialized and registered. If an exporter is configured, it will be used with a [BatchSpanProcessor](../opentelemetry-sdk-trace-base/src/platform/node/export/BatchSpanProcessor.ts).
+Configure a trace exporter. If an exporter OR span processor is not configured, the tracing SDK will not be initialized and registered. If an exporter is configured, it will be used with a [BatchSpanProcessor](../../../packages/opentelemetry-sdk-trace-base/src/platform/node/export/BatchSpanProcessor.ts).
 
 ### spanLimits
 
-Configure tracing parameters. These are the same trace parameters used to [configure a tracer](../opentelemetry-sdk-trace-base/src/types.ts#L71).
+Configure tracing parameters. These are the same trace parameters used to [configure a tracer](../../../packages/opentelemetry-sdk-trace-base/src/types.ts#L71).
 
 ## Useful links
 
@@ -143,10 +141,6 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-sdk-node
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-sdk-node
-[devdependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-sdk-node&type=dev
-[devdependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-sdk-node&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/sdk-node
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fsdk-node.svg
 [other-tracing-backends]: https://github.com/open-telemetry/opentelemetry-js#trace-exporters
