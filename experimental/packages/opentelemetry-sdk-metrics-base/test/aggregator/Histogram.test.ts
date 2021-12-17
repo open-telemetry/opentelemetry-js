@@ -81,48 +81,7 @@ describe('HistogramAggregator', () => {
   });
 
   describe('toMetricData', () => {
-    it('transform with AggregationTemporality.DELTA', () => {
-      const aggregator = new HistogramAggregator([1, 10, 100]);
-
-      const accumulation = aggregator.createAccumulation();
-      accumulation.record(0);
-      accumulation.record(1);
-
-      const startTime: HrTime = [0, 0];
-      const endTime: HrTime = [1, 1];
-
-      const expected: MetricData = {
-        resource: defaultResource,
-        instrumentationLibrary: defaultInstrumentationLibrary,
-        instrumentDescriptor: defaultInstrumentDescriptor,
-        pointDataType: PointDataType.HISTOGRAM,
-        pointData: [
-          {
-            attributes: {},
-            startTime,
-            endTime,
-            point: {
-              buckets: {
-                boundaries: [1, 10, 100],
-                counts: [1, 1, 0, 0],
-              },
-              count: 2,
-              sum: 1,
-            },
-          },
-        ],
-      };
-      assert.deepStrictEqual(aggregator.toMetricData(
-        defaultResource,
-        defaultInstrumentationLibrary,
-        defaultInstrumentDescriptor,
-        [[{}, accumulation]],
-        startTime,
-        endTime,
-      ), expected);
-    });
-
-    it('transform with AggregationTemporality.CUMULATIVE', () => {
+    it('transform without exception', () => {
       const aggregator = new HistogramAggregator([1, 10, 100]);
 
       const accumulation = aggregator.createAccumulation();

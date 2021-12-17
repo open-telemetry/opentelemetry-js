@@ -68,40 +68,7 @@ describe('SumAggregator', () => {
   });
 
   describe('toMetricData', () => {
-    it('transform with AggregationTemporality.DELTA', () => {
-      const aggregator = new SumAggregator();
-      const accumulation = aggregator.createAccumulation();
-      accumulation.record(1);
-      accumulation.record(2);
-
-      const startTime: HrTime = [0, 0];
-      const endTime: HrTime = [1, 1];
-
-      const expected: MetricData = {
-        resource: defaultResource,
-        instrumentationLibrary: defaultInstrumentationLibrary,
-        instrumentDescriptor: defaultInstrumentDescriptor,
-        pointDataType: PointDataType.SINGULAR,
-        pointData: [
-          {
-            attributes: {},
-            startTime,
-            endTime,
-            point: 3,
-          },
-        ],
-      };
-      assert.deepStrictEqual(aggregator.toMetricData(
-        defaultResource,
-        defaultInstrumentationLibrary,
-        defaultInstrumentDescriptor,
-        [[{}, accumulation]],
-        startTime,
-        endTime,
-      ), expected);
-    });
-
-    it('transform with AggregationTemporality.CUMULATIVE', () => {
+    it('transform without exception', () => {
       const aggregator = new SumAggregator();
       const accumulation = aggregator.createAccumulation();
       accumulation.record(1);
