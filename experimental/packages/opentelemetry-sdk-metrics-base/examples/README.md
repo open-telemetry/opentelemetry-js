@@ -10,7 +10,6 @@ These examples are using work in progress metrics packages.
 ------------- | ------------- | ------------ |
 |[metrics](metrics/) | Basic metrics collection and exports those metrics to a Prometheus compatible endpoint | Beginner |
 
-
 ## Contributing
 
 Please see [CONTRIBUTING.md](https://github.com/open-telemetry/opentelemetry-js/blob/main/CONTRIBUTING.md) for instructions on how to contribute.
