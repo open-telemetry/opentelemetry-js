@@ -52,8 +52,8 @@ export class TemporalMetricProcessor<T> {
   constructor(private _aggregator: Aggregator<T>) {}
 
   /**
-   * Builds the {@link MetricData} streams to report against a specific metric reader.
-   * @param collector The information of the metric reader.
+   * Builds the {@link MetricData} streams to report against a specific MetricCollector.
+   * @param collector The information of the MetricCollector.
    * @param collectors The registered collectors.
    * @param resource The resource to attach these metrics against.
    * @param instrumentationLibrary The instrumentation library that generated these metrics.

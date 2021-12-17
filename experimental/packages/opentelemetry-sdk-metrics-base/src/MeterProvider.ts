@@ -45,18 +45,12 @@ export class MeterProvider {
         api.diag.warn('A shutdown MeterProvider cannot provide a Meter')
         return metrics.NOOP_METER;
     }
-    // TODO: add schemaUrl to id?
-    const id = `${name}#${version}`;
-    if (this._sharedState.meters.has(id)) {
-      return this._sharedState.meters.get(id)!;
-    }
 
     // Spec leaves it unspecified if creating a meter with duplicate
     // name/version returns the same meter. We create a new one here
     // for simplicity. This may change in the future.
-    const meter = new Meter(this._sharedState, { name, version, schemaUrl: options.schemaUrl });
-    this._sharedState.meters.set(id, meter);
-    return meter;
+    // TODO: consider returning the same meter if the same name/version is used
+    return new Meter(this._sharedState, { name, version, schemaUrl: options.schemaUrl });
   }
 
   addMetricReader(metricReader: MetricReader) {
@@ -71,7 +65,8 @@ export class MeterProvider {
   }
 
   /**
-   * Flush all buffered data and shut down the MeterProvider and all metric readers.
+   * Flush all buffered data and shut down the MeterProvider and all registered
+   * MetricReaders.
    * Returns a promise which is resolved when all flushes are complete.
    *
    * TODO: return errors to caller somehow?
@@ -87,12 +82,11 @@ export class MeterProvider {
     // TODO add a timeout - spec leaves it up the the SDK if this is configurable
     this._shutdown = true;
 
-    // Shut down all readers.
-    // Log all Errors.
     for (const collector of this._sharedState.metricCollectors) {
       try {
-        await collector.metricReader.shutdown();
+        await collector.shutdown();
       } catch (e) {
+        // Log all Errors.
         if (e instanceof Error) {
           api.diag.error(`Error shutting down: ${e.message}`)
         }
@@ -101,7 +95,7 @@ export class MeterProvider {
   }
 
   /**
-   * Notifies all exporters and metric readers to flush any buffered data.
+   * Notifies all registered MetricReaders to flush any buffered data.
    * Returns a promise which is resolved when all flushes are complete.
    *
    * TODO: return errors to caller somehow?
@@ -119,8 +113,9 @@ export class MeterProvider {
 
     for (const collector of this._sharedState.metricCollectors) {
       try {
-        await collector.metricReader.forceFlush();
+        await collector.forceFlush();
       } catch (e) {
+        // Log all Errors.
         if (e instanceof Error) {
           api.diag.error(`Error flushing: ${e.message}`)
         }

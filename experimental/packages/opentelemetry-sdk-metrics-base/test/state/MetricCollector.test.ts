@@ -16,11 +16,11 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { MeterProvider } from '../../src';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { MetricData, PointDataType } from '../../src/export/MetricData';
 import { MetricExporter } from '../../src/export/MetricExporter';
 import { MetricReader } from '../../src/export/MetricReader';
+import { Meter } from '../../src/Meter';
 import { MeterProviderSharedState } from '../../src/state/MeterProviderSharedState';
 import { MetricCollector } from '../../src/state/MetricCollector';
 import { defaultInstrumentationLibrary, defaultResource, assertMetricData, assertPointData } from '../util';
@@ -64,21 +64,21 @@ describe('MetricCollector', () => {
         const metricCollector = new MetricCollector(meterProviderSharedState, reader);
 
         assert.strictEqual(metricCollector.aggregatorTemporality, exporter.getPreferredAggregationTemporality());
-        assert.strictEqual(metricCollector.metricReader, reader);
       }
     });
   });
 
   describe('collect', () => {
     function setupInstruments(exporter: MetricExporter) {
-      const meterProvider = new MeterProvider({ resource: defaultResource });
-      const reader = new TestMetricReader(exporter);
-      meterProvider.addMetricReader(reader);
-      const metricCollector = reader.getMetricCollector();
+      // TODO(legendecas): setup with MeterProvider when meter identity was settled.
+      const meterProviderSharedState = new MeterProviderSharedState(defaultResource);
 
-      const meter = meterProvider.getMeter(defaultInstrumentationLibrary.name, defaultInstrumentationLibrary.version, {
-        schemaUrl: defaultInstrumentationLibrary.schemaUrl,
-      });
+      const reader = new TestMetricReader(exporter);
+      const metricCollector = new MetricCollector(meterProviderSharedState, reader);
+      meterProviderSharedState.metricCollectors.push(metricCollector);
+
+      const meter = new Meter(meterProviderSharedState, defaultInstrumentationLibrary);
+      meterProviderSharedState.meters.set('test-meter', meter);
 
       return { metricCollector, meter };
     }

@@ -49,7 +49,7 @@ describe('SyncMetricStorage', () => {
     });
   });
 
-  describe('collectAndReset', () => {
+  describe('collect', () => {
     describe('Delta Collector', () => {
       const collectors = [deltaCollector];
       it('should collect and reset memos', async () => {

@@ -28,8 +28,8 @@ import { MeterProviderSharedState } from './MeterProviderSharedState';
  */
 export class MetricCollector implements MetricProducer {
   public readonly aggregatorTemporality: AggregationTemporality;
-  constructor(private _sharedState: MeterProviderSharedState, public metricReader: MetricReader) {
-    this.aggregatorTemporality = this.metricReader.getPreferredAggregationTemporality();
+  constructor(private _sharedState: MeterProviderSharedState, private _metricReader: MetricReader) {
+    this.aggregatorTemporality = this._metricReader.getPreferredAggregationTemporality();
   }
 
   async collect(): Promise<MetricData[]> {
@@ -38,6 +38,20 @@ export class MetricCollector implements MetricProducer {
       .map(meter => meter.collect(this, collectionTime)));
 
     return results.reduce((cumulation, current) => cumulation.concat(current), []);
+  }
+
+  /**
+   * Delegates for MetricReader.forceFlush.
+   */
+  async forceFlush(): Promise<void> {
+    return this._metricReader.forceFlush();
+  }
+
+  /**
+   * Delegates for MetricReader.shutdown.
+   */
+  async shutdown(): Promise<void> {
+    return this._metricReader.shutdown();
   }
 }
 
