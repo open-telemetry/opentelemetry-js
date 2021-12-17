@@ -1,0 +1,31 @@
+{
+  "extends": "../../tsconfig.base.esm2015.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "build/esm2015",
+    "tsBuildInfoFile": "build/esm2015/tsconfig.esm2015.tsbuildinfo"
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../opentelemetry-context-zone/tsconfig.esm2015.json"
+    },
+    {
+      "path": "../opentelemetry-core/tsconfig.esm2015.json"
+    },
+    {
+      "path": "../opentelemetry-propagator-b3/tsconfig.esm2015.json"
+    },
+    {
+      "path": "../opentelemetry-resources/tsconfig.esm2015.json"
+    },
+    {
+      "path": "../opentelemetry-sdk-trace-base/tsconfig.esm2015.json"
+    },
+    {
+      "path": "../opentelemetry-semantic-conventions/tsconfig.esm2015.json"
+    }
+  ]
+}
