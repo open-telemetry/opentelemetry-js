@@ -18,6 +18,9 @@ import { Context } from '@opentelemetry/api';
 import { Attributes } from '@opentelemetry/api-metrics-wip';
 import { WritableMetricStorage } from './WritableMetricStorage';
 
+/**
+ * Internal interface.
+ */
 export class MultiMetricStorage implements WritableMetricStorage {
   constructor(private readonly _backingStorages: WritableMetricStorage[]) {}
 
