@@ -4,7 +4,7 @@ This directory contains examples of how to run real applications with OpenTeleme
 
 ## Work in Progress Examples
 
-These examples are using work in progress metrics packages. 
+These examples are using work in progress metrics packages.
 
 |Name | Description | Complexity Level |
 ------------- | ------------- | ------------ |
