@@ -17,7 +17,6 @@
 import { HrTime } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { HistogramAccumulation, HistogramAggregator } from '../../src/aggregator';
-import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { MetricData, PointDataType } from '../../src/export/MetricData';
 import { commonValues, defaultInstrumentationLibrary, defaultInstrumentDescriptor, defaultResource } from '../util';
 
@@ -89,9 +88,8 @@ describe('HistogramAggregator', () => {
       accumulation.record(0);
       accumulation.record(1);
 
-      const sdkStartTime: HrTime = [0, 0];
-      const lastCollectionTime: HrTime = [1, 1];
-      const collectionTime: HrTime = [2, 2];
+      const startTime: HrTime = [0, 0];
+      const endTime: HrTime = [1, 1];
 
       const expected: MetricData = {
         resource: defaultResource,
@@ -101,8 +99,8 @@ describe('HistogramAggregator', () => {
         pointData: [
           {
             attributes: {},
-            startTime: lastCollectionTime,
-            endTime: collectionTime,
+            startTime,
+            endTime,
             point: {
               buckets: {
                 boundaries: [1, 10, 100],
@@ -119,10 +117,8 @@ describe('HistogramAggregator', () => {
         defaultInstrumentationLibrary,
         defaultInstrumentDescriptor,
         [[{}, accumulation]],
-        AggregationTemporality.DELTA,
-        sdkStartTime,
-        lastCollectionTime,
-        collectionTime,
+        startTime,
+        endTime,
       ), expected);
     });
 
@@ -133,9 +129,8 @@ describe('HistogramAggregator', () => {
       accumulation.record(0);
       accumulation.record(1);
 
-      const sdkStartTime: HrTime = [0, 0];
-      const lastCollectionTime: HrTime = [1, 1];
-      const collectionTime: HrTime = [2, 2];
+      const startTime: HrTime = [0, 0];
+      const endTime: HrTime = [1, 1];
 
       const expected: MetricData = {
         resource: defaultResource,
@@ -145,8 +140,8 @@ describe('HistogramAggregator', () => {
         pointData: [
           {
             attributes: {},
-            startTime: sdkStartTime,
-            endTime: collectionTime,
+            startTime,
+            endTime,
             point: {
               buckets: {
                 boundaries: [1, 10, 100],
@@ -163,10 +158,8 @@ describe('HistogramAggregator', () => {
         defaultInstrumentationLibrary,
         defaultInstrumentDescriptor,
         [[{}, accumulation]],
-        AggregationTemporality.CUMULATIVE,
-        sdkStartTime,
-        lastCollectionTime,
-        collectionTime,
+        startTime,
+        endTime,
       ), expected);
     });
   });

@@ -17,7 +17,6 @@
 import { HrTime } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { LastValueAccumulation, LastValueAggregator } from '../../src/aggregator';
-import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { MetricData, PointDataType } from '../../src/export/MetricData';
 import { commonValues, defaultInstrumentationLibrary, defaultInstrumentDescriptor, defaultResource, sleep } from '../util';
 
@@ -97,9 +96,8 @@ describe('LastValueAggregator', () => {
       accumulation.record(1);
       accumulation.record(4);
 
-      const sdkStartTime: HrTime = [0, 0];
-      const lastCollectionTime: HrTime = [1, 1];
-      const collectionTime: HrTime = [2, 2];
+      const startTime: HrTime = [0, 0];
+      const endTime: HrTime = [1, 1];
 
       const expected: MetricData = {
         resource: defaultResource,
@@ -109,8 +107,8 @@ describe('LastValueAggregator', () => {
         pointData: [
           {
             attributes: {},
-            startTime: lastCollectionTime,
-            endTime: collectionTime,
+            startTime,
+            endTime,
             point: 4,
           },
         ],
@@ -120,10 +118,8 @@ describe('LastValueAggregator', () => {
         defaultInstrumentationLibrary,
         defaultInstrumentDescriptor,
         [[{}, accumulation]],
-        AggregationTemporality.DELTA,
-        sdkStartTime,
-        lastCollectionTime,
-        collectionTime,
+        startTime,
+        endTime,
       ), expected);
     });
 
@@ -135,9 +131,8 @@ describe('LastValueAggregator', () => {
       accumulation.record(2);
       accumulation.record(1);
 
-      const sdkStartTime: HrTime = [0, 0];
-      const lastCollectionTime: HrTime = [1, 1];
-      const collectionTime: HrTime = [2, 2];
+      const startTime: HrTime = [0, 0];
+      const endTime: HrTime = [1, 1];
 
       const expected: MetricData = {
         resource: defaultResource,
@@ -147,8 +142,8 @@ describe('LastValueAggregator', () => {
         pointData: [
           {
             attributes: {},
-            startTime: sdkStartTime,
-            endTime: collectionTime,
+            startTime,
+            endTime,
             point: 1,
           },
         ],
@@ -158,10 +153,8 @@ describe('LastValueAggregator', () => {
         defaultInstrumentationLibrary,
         defaultInstrumentDescriptor,
         [[{}, accumulation]],
-        AggregationTemporality.CUMULATIVE,
-        sdkStartTime,
-        lastCollectionTime,
-        collectionTime,
+        startTime,
+        endTime,
       ), expected);
     });
   });
