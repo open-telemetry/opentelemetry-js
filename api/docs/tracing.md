@@ -33,9 +33,9 @@ const tracer = trace.getTracer("my-application", "0.1.0");
 
 ## Starting and Ending a Span
 
-In OpenTelemetry, all _traces_ are composed of [`Spans`](https://open-telemetry.github.io/opentelemetry-js/interfaces/span.html). A span describes a single operation with a start time and and end time like a database request, outgoing remote request, or a function invocation. These spans are linked together by parent-child relationships to form a tree. The resultant tree is your trace, and the root of the tree is commonly called the _root span_.
+In OpenTelemetry, all _traces_ are composed of [`Spans`](https://open-telemetry.github.io/opentelemetry-js-api/interfaces/span.html). A span describes a single operation with a start time and and end time like a database request, outgoing remote request, or a function invocation. These spans are linked together by parent-child relationships to form a tree. The resultant tree is your trace, and the root of the tree is commonly called the _root span_.
 
-You can create a span by calling [`Tracer#startSpan`](https://open-telemetry.github.io/opentelemetry-js/interfaces/tracer.html#startspan). The only required argument to `startSpan` is the _span name_, which should describe the operation being performed with low cardinality.
+You can create a span by calling [`Tracer#startSpan`](https://open-telemetry.github.io/opentelemetry-js-api/interfaces/tracer.html#startspan). The only required argument to `startSpan` is the _span name_, which should describe the operation being performed with low cardinality.
 
 ```typescript
 const span = tracer.startSpan("my-span-name");
@@ -102,18 +102,18 @@ async function onGet(request, response) {
 
   // Create a new context from the current context which has the span "active"
   const ctx = trace.setSpan(context.active(), span);
-  
+
   // Call getUser with the newly created context
-  // 
+  //
   // context.with calls a function with an associated "active" context. Within
   // the function, calling context.active() returns the currently active context.
   // If there is no active context, the ROOT_CONTEXT will be returned, which
   // has no key-value pairs.
-  // 
+  //
   // context.with requires at least 2 arguments: a context and a function to be called.
   // If a third argument is provided, it will be bound to `this` `this` inside the function.
   // Any additional parameters are used as arguments when calling the function.
-  // 
+  //
   //   Return value is the value returned from getUser
   //    |                         Context to be used as the "active" context
   //    |                         |    Function to be called
