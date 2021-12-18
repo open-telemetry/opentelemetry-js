@@ -19,7 +19,7 @@
     "compile": "tsc --build tsconfig.json tsconfig.esm.json",
     "docs": "typedoc",
     "docs:deploy": "gh-pages --dist docs/out",
-    "docs:test": "linkinator docs/out --silent --skip david-dm.org",
+    "docs:test": "linkinator docs/out --silent && linkinator docs/*.md *.md --markdown --silent",
     "lint:fix": "eslint src test --ext .ts --fix",
     "lint": "eslint src test --ext .ts",
     "test:browser": "nyc karma start --single-run",

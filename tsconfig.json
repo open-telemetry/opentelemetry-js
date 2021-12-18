@@ -33,6 +33,7 @@
     "name": "OpenTelemetry API for JavaScript",
     "out": "docs/out",
     "entryPoints": ["./src/index.ts"],
+    "excludePrivate": true,
     "hideGenerator": true
   }
 }
