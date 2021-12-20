@@ -1,17 +1,17 @@
 {
   "env": {
-    "browser": true
+    "node": true
   },
   "extends": "airbnb-base",
   "parserOptions": {
-    "sourceType": "module"
+    "sourceType": "script"
   },
   "rules": {
     "strict": ["error", "global"],
     "no-use-before-define": ["error", "nofunc"],
     "no-console": "off",
     "import/no-unresolved": "off",
-    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
-    "import/no-extraneous-dependencies": [ "error", { "devDependencies": true } ]
-  }
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
+  },
+  "ignorePatterns": "**/*_pb.js"
 }

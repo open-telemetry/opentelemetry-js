@@ -20,12 +20,17 @@ import { createInstrumentDescriptor, InstrumentDescriptor } from './InstrumentDe
 import { Counter, Histogram, InstrumentType, UpDownCounter } from './Instruments';
 import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { MultiMetricStorage } from './state/MultiWritableMetricStorage';
-import { NoopWritableMetricStorage, WritableMetricStorage } from './state/WritableMetricStorage';
+import { SyncMetricStorage } from './state/SyncMetricStorage';
+import { MetricStorage } from './state/MetricStorage';
+import { MetricData } from './export/MetricData';
+import { isNotNullish } from './utils';
+import { MetricCollectorHandle } from './state/MetricCollector';
+import { HrTime } from '@opentelemetry/api';
 
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#meter
 
 export class Meter implements metrics.Meter {
-  private _metricStorageRegistry = new Map<string, WritableMetricStorage>();
+  private _metricStorageRegistry = new Map<string, MetricStorage>();
 
   // instrumentation library required by spec to be on meter
   // spec requires provider config changes to apply to previously created meters, achieved by holding a reference to the provider
@@ -80,9 +85,8 @@ export class Meter implements metrics.Meter {
 
   private _registerMetricStorage(descriptor: InstrumentDescriptor) {
     const views = this._meterProviderSharedState.viewRegistry.findViews(descriptor, this._instrumentationLibrary);
-    const storages = views.map(_view => {
-      // TODO: create actual metric storages.
-      const storage = new NoopWritableMetricStorage();
+    const storages = views.map(view => {
+      const storage = SyncMetricStorage.create(view, descriptor);
       // TODO: handle conflicts
       this._metricStorageRegistry.set(descriptor.name, storage);
       return storage;
@@ -91,5 +95,18 @@ export class Meter implements metrics.Meter {
       return storages[0];
     }
     return new MultiMetricStorage(storages);
+  }
+
+  async collect(collector: MetricCollectorHandle, collectionTime: HrTime): Promise<MetricData[]> {
+    const result = await Promise.all(Array.from(this._metricStorageRegistry.values()).map(metricStorage => {
+      return metricStorage.collect(
+        collector,
+        this._meterProviderSharedState.metricCollectors,
+        this._meterProviderSharedState.resource,
+        this._instrumentationLibrary,
+        this._meterProviderSharedState.sdkStartTime,
+        collectionTime);
+    }));
+    return result.filter(isNotNullish);
   }
 }

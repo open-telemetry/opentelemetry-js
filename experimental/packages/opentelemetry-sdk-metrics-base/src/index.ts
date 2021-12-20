@@ -15,5 +15,5 @@
  */
 
 export { MeterProvider, MeterProviderOptions } from './MeterProvider';
-export * from './MetricExporter';
-export * from './MetricReader';
+export * from './export/MetricExporter';
+export * from './export/MetricReader';

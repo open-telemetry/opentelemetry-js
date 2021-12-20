@@ -14,4 +14,27 @@
  * limitations under the License.
  */
 
+import { Attributes } from '@opentelemetry/api-metrics-wip';
+
 export type Maybe<T> = T | undefined;
+
+export function isNotNullish<T>(item: Maybe<T>): item is T {
+  return item !== undefined && item !== null;
+}
+
+/**
+ * Converting the unordered attributes into unique identifier string.
+ * @param attributes user provided unordered Attributes.
+ */
+export function hashAttributes(attributes: Attributes): string {
+  let keys = Object.keys(attributes);
+  if (keys.length === 0) return '';
+
+  keys = keys.sort();
+  return keys.reduce((result, key) => {
+    if (result.length > 2) {
+      result += ',';
+    }
+    return (result += key + ':' + attributes[key]);
+  }, '|#');
+}
