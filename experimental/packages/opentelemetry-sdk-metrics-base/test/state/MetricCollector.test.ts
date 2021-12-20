@@ -48,6 +48,21 @@ class TestMetricReader extends MetricReader {
   getMetricCollector(): MetricCollector {
     return this['_metricProducer'] as MetricCollector;
   }
+
+  protected handleCollectedMetrics(metrics: MetricData[]): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+
+  protected onForceFlush(): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+
+  protected onShutdown(): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+
+  protected onInitialized(): void {
+  }
 }
 
 describe('MetricCollector', () => {
@@ -60,7 +75,7 @@ describe('MetricCollector', () => {
       const meterProviderSharedState = new MeterProviderSharedState(defaultResource);
       const exporters = [ new TestMetricExporter(), new TestDeltaMetricExporter() ];
       for (const exporter of exporters) {
-        const reader = new TestMetricReader(exporter);
+        const reader = new TestMetricReader(exporter.getPreferredAggregationTemporality());
         const metricCollector = new MetricCollector(meterProviderSharedState, reader);
 
         assert.strictEqual(metricCollector.aggregatorTemporality, exporter.getPreferredAggregationTemporality());
@@ -73,7 +88,7 @@ describe('MetricCollector', () => {
       // TODO(legendecas): setup with MeterProvider when meter identity was settled.
       const meterProviderSharedState = new MeterProviderSharedState(defaultResource);
 
-      const reader = new TestMetricReader(exporter);
+      const reader = new TestMetricReader(exporter.getPreferredAggregationTemporality());
       const metricCollector = new MetricCollector(meterProviderSharedState, reader);
       meterProviderSharedState.metricCollectors.push(metricCollector);
 
