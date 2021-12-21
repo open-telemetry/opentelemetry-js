@@ -68,7 +68,7 @@ const prepareClickEvent = () => {
   const element1 = document.getElementById('button1');
   const element2 = document.getElementById('button2');
 
-  const clickHandler = (fetchFn) => () => {
+  const clickHandler = (fetchFn) => {
     const singleSpan = webTracerWithZone.startSpan('files-series-info');
     context.with(trace.setSpan(context.active(), singleSpan), () => {
       fetchFn(url).then((_data) => {
