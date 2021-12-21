@@ -68,4 +68,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-metrics-otlp-grpc.svg
 [opentelemetry-collector-url]: https://github.com/open-telemetry/opentelemetry-collector
 [semconv-resource-service-name]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service
-[trace-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-trace-otlp-grpc
+[trace-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/exporter-trace-otlp-grpc
