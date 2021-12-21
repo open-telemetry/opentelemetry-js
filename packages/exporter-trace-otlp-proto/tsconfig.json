@@ -10,7 +10,7 @@
   ],
   "references": [
     {
-      "path": "../opentelemetry-exporter-trace-otlp-http"
+      "path": "../exporter-trace-otlp-http"
     }
   ]
 }
