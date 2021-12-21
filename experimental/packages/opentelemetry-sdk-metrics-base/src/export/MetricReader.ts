@@ -18,45 +18,23 @@ import { AggregationTemporality } from './AggregationTemporality';
 import { MetricProducer } from './MetricProducer';
 import { MetricData } from './MetricData';
 
-export type ReaderErrorOptions = {
-  message: string,
+
+export interface ReaderResult<T> {
+  code: ReaderResultCode;
   error?: Error;
+  returnValue?: T;
 }
 
-// TODO: result callback, look at trace implementation
-/**
- * Base error thrown by the reader.
- */
-export class ReaderError extends Error {
-  // Optional error that caused this error.
-  public readonly innerError?: Error;
-
-  /**
-   * Creates a new instance of the ReaderError class.
-   * @param options
-   */
-  constructor(options: ReaderErrorOptions) {
-    super(options.message);
-    this.innerError = options.error;
-  }
-}
-
-/**
- * Error that is thrown on timeouts (i.e. timeout on forceFlush or shutdown)
- */
-export class ReaderTimeoutError extends ReaderError {
-}
-
-/**
- * Error that is thrown on failures (i.e. unhandled exceptions during forceFlush or shutdown)
- */
-export class ReaderFailureError extends ReaderError {
+export enum ReaderResultCode {
+  SUCCESS,
+  FAILED,
+  TIMED_OUT
 }
 
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#metricreader
 
 /**
- * A registered reader of metrics that, when linked to a {@link MetricProducer} offers, global
+ * A registered reader of metrics that, when linked to a {@link MetricProducer}, offers global
  * control over metrics.
  */
 export abstract class MetricReader {
@@ -112,109 +90,143 @@ export abstract class MetricReader {
   /**
    * Collect all metrics from the associated {@link MetricProducer}
    */
-  async collect(): Promise<MetricData[]> {
+  collect(timeoutMillis: number, done?: (result: ReaderResult<MetricData[]>) => void): void {
     if (this._metricProducer === undefined) {
-      throw new ReaderFailureError({ message: 'MetricReader is not bound to a MetricProducer' });
+      if (done) {
+        done({
+          code: ReaderResultCode.FAILED,
+          error: new Error('MetricReader is not bound to a MetricProducer'),
+        });
+      }
+      return;
     }
 
-    // Subsequent invocations to collect are not allowed. SDKs SHOULD return some failure for these calls.
-    if (this._shutdown) {
-      throw new ReaderFailureError({ message: 'Collection is not allowed after shutdown' });
+    if(done) {
+      // Subsequent invocations to collect are not allowed. SDKs SHOULD return some failure for these calls.
+      if (this._shutdown) {
+        if (done) {
+          done({
+            code: ReaderResultCode.FAILED,
+            error: new Error('Collection is not allowed after shutdown'),
+          });
+        }
+        return;
+      }
     }
 
-    return await this._metricProducer.collect();
+    this._metricProducer.collect().then(
+      result => {
+        if(done){
+          done({
+            code: ReaderResultCode.SUCCESS,
+            returnValue: result
+          });
+        }
+      },
+      reason => {
+        if(done){
+          done({
+            code: ReaderResultCode.FAILED,
+            error: reason
+          })
+        }
+      }
+    )
   }
 
   /**
-   * Calls an async function with a timeout. Will reject if the async function passed to this does not complete
+   * Adds a timeout to a promise. Will reject if the async function passed to this does not complete
    * before the timeout is reached.
    * @param promise promise to use with timeout.
    * @param timeout timeout in milliseconds until the returned promise is rejected.
+   * @param done
    * @protected
    */
-  protected callWithTimeout<T>(promise: Promise<T>, timeout: number): Promise<T> {
+  protected static promiseWithTimeout<T>(promise: Promise<T>, timeout: number, done?: (result: ReaderResult<T>) => void): void {
     let timeoutHandle: ReturnType<typeof setTimeout>;
 
-    const timeoutPromise = new Promise<never>(function timeoutFunction(_resolve, reject) {
+    const timeoutPromise = new Promise<ReaderResult<T>>(function timeoutFunction(resolve) {
       timeoutHandle = setTimeout(
         function timeoutHandler() {
-          // TODO: This does not produce an adequate stacktrace.
-          reject(new ReaderTimeoutError({ message: 'Operation timed out.' }))
+          resolve({
+            code: ReaderResultCode.TIMED_OUT,
+            error: new Error('Operation timed out.')
+          })
         },
         timeout
       );
     });
 
-    return Promise.race([promise, timeoutPromise]).then(result => {
+    const resultCodePromise = promise.then(result => {
+      return { code: ReaderResultCode.SUCCESS, returnValue: result }
+    })
+
+    Promise.race([resultCodePromise, timeoutPromise]).then(result => {
+        // Clear timeout on success and return result.
         clearTimeout(timeoutHandle);
-        return result;
+        if (done) {
+          done(result);
+        }
       },
       reason => {
+        // Clear timeout on rejection and return failure.
         clearTimeout(timeoutHandle);
-        throw reason;
+        if (done) {
+          done({
+            code: ReaderResultCode.FAILED,
+            error: reason
+          });
+        }
       });
-  }
-
-
-  private async _tryShutdown() {
-    try {
-      await this.onShutdown();
-    } catch (err) {
-      // Re-throw timeout errors.
-      if (err instanceof ReaderTimeoutError) {
-        throw err;
-      }
-
-      throw new ReaderFailureError({
-        message: 'Unexpected error during shutdown.',
-        error: err
-      });
-
-    }
   }
 
   /**
    * Shuts down the metric reader
    * @param shutdownTimeout timeout for shutdown (default: 10000ms)
+   * @param done
    */
   // TODO: function will continue.
-  async shutdown(shutdownTimeout = 10000): Promise<void> {
+  shutdown(shutdownTimeout = 10000, done?: (result: ReaderResult<void>) => void): void {
     // Do not call shutdown again if it has already been called.
     if (this._shutdown) {
-      throw new ReaderFailureError({ message: 'Cannot call shutdown twice.' })
-    }
-
-    await this.callWithTimeout(this._tryShutdown(), shutdownTimeout);
-
-    // TODO: (spec) can i not call shutdown twice even on shutdown failure?
-    this._shutdown = true;
-  }
-
-  private async _tryForceFlush() {
-    try {
-      await this.onForceFlush();
-    } catch (err) {
-      // Re-throw timeout errors.
-      if (err instanceof ReaderTimeoutError) {
-        throw err;
+      if (done) {
+        done({
+          code: ReaderResultCode.FAILED,
+          error: new Error('Cannot call shutdown twice.')
+        });
+        return;
       }
-
-      throw new ReaderFailureError({
-        message: 'Unexpected error during forceFlush.',
-        error: err
-      });
     }
+
+    MetricReader.promiseWithTimeout(this.onShutdown(), shutdownTimeout, (result => {
+        if (result.code === ReaderResultCode.SUCCESS) {
+          this._shutdown = true;
+        }
+
+        if (done) {
+          done(result);
+        }
+      })
+    );
+
   }
 
   /**
    * Flushes metrics read by this reader.
    * @param forceFlushTimeout timeout for force-flush (default: 10000 ms)
+   * @param done
    */
-  async forceFlush(forceFlushTimeout = 10000): Promise<void> {
+  forceFlush(forceFlushTimeout = 10000, done ?: (result: ReaderResult<void>) => void): void {
     if (this._shutdown) {
-      throw new ReaderFailureError({ message: 'Cannot forceFlush on already shutdown MetricReader' })
+      if (done) {
+        done({
+          code: ReaderResultCode.FAILED,
+          error: new Error('Cannot forceFlush on already shutdown MetricReader')
+        });
+        return;
+      }
     }
 
-    await this.callWithTimeout(this._tryForceFlush(), forceFlushTimeout);
+    MetricReader.promiseWithTimeout(this.onForceFlush(), forceFlushTimeout, done);
   }
 }

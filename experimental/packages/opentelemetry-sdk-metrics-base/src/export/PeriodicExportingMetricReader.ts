@@ -15,8 +15,9 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { MetricReader } from './MetricReader';
+import { MetricReader, ReaderResult, ReaderResultCode } from './MetricReader';
 import { MetricExporter } from './MetricExporter';
+import { MetricData } from './MetricData';
 
 export type PeriodicExportingMetricReaderOptions = {
   exporter: MetricExporter
@@ -60,17 +61,35 @@ export class PeriodicExportingMetricReader extends MetricReader {
   }
 
   private async _runOnce(): Promise<void> {
-    const metrics = await this.collect();
-    await this._exporter.export(metrics);
+    const collectionResult = await new Promise<ReaderResult<MetricData[]>>(resolve => {
+      this.collect(100, (result => {
+        resolve(result);
+      }))
+    });
+
+    if (collectionResult.code !== ReaderResultCode.SUCCESS) {
+      throw collectionResult.error ?? new Error('Unknown error occurred during collection.');
+    }
+
+    if (collectionResult.returnValue == null) {
+      throw new Error('Unknown error occurred during collection.');
+    }
+
+    await this._exporter.export(collectionResult.returnValue);
   }
 
   protected onInitialized(): void {
     this._interval = setInterval(async () => {
-      try {
-        await this.callWithTimeout(this._runOnce(), this._exportTimeout);
-      } catch (err) {
-        api.diag.error('Unexpected error during export: %s', err)
-      }
+      MetricReader.promiseWithTimeout(this._runOnce(), this._exportTimeout, (result => {
+        if (result.code === ReaderResultCode.TIMED_OUT) {
+          api.diag.error('Export took longer than %s milliseconds and timed out.', this._exportTimeout);
+          return;
+        }
+        if (result.code === ReaderResultCode.FAILED) {
+          api.diag.error('Unexpected error during export: %s', result.error);
+          return;
+        }
+      }));
     }, this._exportInterval);
   }
 
