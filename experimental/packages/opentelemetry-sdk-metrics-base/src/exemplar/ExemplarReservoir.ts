@@ -36,8 +36,11 @@ export interface ExemplarReservoir {
    * for the next sampling period
    * 
    * @param pointAttributes The attributes associated with metric point. 
+   *
+   * @returns a list of {@link Exemplar}s. Retuned exemplars contain the attributes that were filtered out by the
+   * aggregator, but recorded alongside the original measurement.
    */
-  collectAndReset(pointAttributes: Attributes): Exemplar[];
+  collect(pointAttributes: Attributes): Exemplar[];
 }
 
 
@@ -61,7 +64,7 @@ class ExemplarBucket {
     this._offered = true;
   }
 
-  collectAndReset(pointAttributes: Attributes): Exemplar | null {
+  collect(pointAttributes: Attributes): Exemplar | null {
     if (!this._offered) return null;
     const currentAttributes = this.attributes;
       // filter attributes
@@ -111,10 +114,10 @@ export abstract class FixedSizeExemplarReservoirBase implements ExemplarReservoi
    */
   protected reset(): void {}
 
-  collectAndReset(pointAttributes: Attributes): Exemplar[] {
+  collect(pointAttributes: Attributes): Exemplar[] {
     const exemplars: Exemplar[] = [];
     this._reservoirStorage.forEach(storageItem => {
-      const res = storageItem.collectAndReset(pointAttributes);
+      const res = storageItem.collect(pointAttributes);
       if (res !== null) {
         exemplars.push(res);
       }

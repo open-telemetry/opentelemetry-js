@@ -35,6 +35,7 @@ export class SimpleFixedSizeExemplarReservoir extends FixedSizeExemplarReservoir
   }
 
   private findBucketIndex(_value: ValueType, _timestamp: HrTime, _attributes: Attributes, _ctx: Context) {
+    if (this.num_measurements_seen < this._size ) return this.num_measurements_seen++;
     const index = this.getRandomInt(0, ++this.num_measurements_seen);
     return index < this._size ? index: -1;
   }
