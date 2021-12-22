@@ -27,7 +27,7 @@ In case of the rare exception where `null` is used to mean something different t
 `===`/`!==` should be preferred over `==` and `!=`.
 An exception to this is when checking for `null`/`undefined` when it is preferred to use `== null` in order to treat `null` and `undefined` the same.
 
-## Prefer options objects to long lists of optional parameters
+## Prefer options objects to long lists of optional positional parameters
 
 For functions/methods/constructors with optional parameters, the parameters should be passed as an options object.
 This allows options to be added later without changing the function signature and avoids long lists of arguments.
