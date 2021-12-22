@@ -53,6 +53,11 @@ export class HashMap<KeyType, ValueType, HashCodeType> {
     this._valueMap.set(hashCode, value);
   }
 
+  has(key: KeyType, hashCode?: HashCodeType) {
+    hashCode ??= this._hash(key);
+    return this._valueMap.has(hashCode);
+  }
+
   *entries(): IterableIterator<[KeyType, ValueType, HashCodeType]> {
     const valueIterator = this._valueMap.entries();
     let next = valueIterator.next();

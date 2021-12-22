@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
+import { ObservableCallback } from '@opentelemetry/api-metrics-wip';
 import * as assert from 'assert';
 import { Counter, Histogram, UpDownCounter } from '../src/Instruments';
 import { Meter } from '../src/Meter';
 import { MeterProviderSharedState } from '../src/state/MeterProviderSharedState';
 import { defaultInstrumentationLibrary, defaultResource } from './util';
+
+const noopObservableCallback: ObservableCallback = _observableResult => {};
 
 describe('Meter', () => {
   describe('createCounter', () => {
@@ -42,6 +45,27 @@ describe('Meter', () => {
       const meter = new Meter(new MeterProviderSharedState(defaultResource), defaultInstrumentationLibrary);
       const counter = meter.createHistogram('foobar');
       assert(counter instanceof Histogram);
+    });
+  });
+
+  describe('createObservableGauge', () => {
+    it('should create observable gauge', () => {
+      const meter = new Meter(new MeterProviderSharedState(defaultResource), defaultInstrumentationLibrary);
+      meter.createObservableGauge('foobar', noopObservableCallback);
+    });
+  });
+
+  describe('createObservableCounter', () => {
+    it('should create observable counter', () => {
+      const meter = new Meter(new MeterProviderSharedState(defaultResource), defaultInstrumentationLibrary);
+      meter.createObservableCounter('foobar', noopObservableCallback);
+    });
+  });
+
+  describe('createObservableUpDownCounter', () => {
+    it('should create observable up-down-counter', () => {
+      const meter = new Meter(new MeterProviderSharedState(defaultResource), defaultInstrumentationLibrary);
+      meter.createObservableUpDownCounter('foobar', noopObservableCallback);
     });
   });
 });

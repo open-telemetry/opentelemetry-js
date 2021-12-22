@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-import { Context, HrTime } from '@opentelemetry/api';
-import { Attributes } from '@opentelemetry/api-metrics-wip';
-import { WritableMetricStorage } from './WritableMetricStorage';
+import { HrTime } from '@opentelemetry/api';
+import { ObservableCallback } from '@opentelemetry/api-metrics-wip';
 import { Accumulation, Aggregator } from '../aggregator/types';
 import { View } from '../view/View';
 import { createInstrumentDescriptorWithView, InstrumentDescriptor } from '../InstrumentDescriptor';
@@ -29,28 +28,34 @@ import { DeltaMetricProcessor } from './DeltaMetricProcessor';
 import { TemporalMetricProcessor } from './TemporalMetricProcessor';
 import { Maybe } from '../utils';
 import { MetricCollectorHandle } from './MetricCollector';
+import { ObservableResult } from '../ObservableResult';
+import { AttributeHashMap } from './HashMap';
 
 /**
  * Internal interface.
  *
  * Stores and aggregates {@link MetricData} for synchronous instruments.
  */
-export class SyncMetricStorage<T extends Maybe<Accumulation>> implements WritableMetricStorage, MetricStorage {
+export class AsyncMetricStorage<T extends Maybe<Accumulation>> implements MetricStorage {
   private _deltaMetricStorage: DeltaMetricProcessor<T>;
   private _temporalMetricStorage: TemporalMetricProcessor<T>;
 
   constructor(
     private _instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<T>,
-    private _attributesProcessor: AttributesProcessor
+    private _attributesProcessor: AttributesProcessor,
+    private _callback: ObservableCallback
   ) {
     this._deltaMetricStorage = new DeltaMetricProcessor(aggregator);
     this._temporalMetricStorage = new TemporalMetricProcessor(aggregator);
   }
 
-  record(value: number, attributes: Attributes, context: Context) {
-    attributes = this._attributesProcessor.process(attributes, context);
-    this._deltaMetricStorage.record(value, attributes, context);
+  private _record(measurements: AttributeHashMap<number>) {
+    const processed = new AttributeHashMap<number>();
+    for (const [attributes, value] of measurements.entries()) {
+      processed.set(this._attributesProcessor.process(attributes), value);
+    }
+    this._deltaMetricStorage.batchCumulate(processed);
   }
 
   /**
@@ -67,6 +72,11 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>> implements Writabl
     sdkStartTime: HrTime,
     collectionTime: HrTime,
   ): Promise<Maybe<MetricData>> {
+    const observableResult = new ObservableResult();
+    // TODO: timeout with callback
+    await this._callback(observableResult);
+    this._record(observableResult.buffer);
+
     const accumulations = this._deltaMetricStorage.collect();
 
     return this._temporalMetricStorage.buildMetrics(
@@ -81,9 +91,9 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>> implements Writabl
     );
   }
 
-  static create(view: View, instrument: InstrumentDescriptor): SyncMetricStorage<Maybe<Accumulation>> {
+  static create(view: View, instrument: InstrumentDescriptor, callback: ObservableCallback): AsyncMetricStorage<Maybe<Accumulation>> {
     instrument = createInstrumentDescriptorWithView(view, instrument);
     const aggregator = view.aggregation.createAggregator(instrument);
-    return new SyncMetricStorage(instrument, aggregator, view.attributesProcessor);
+    return new AsyncMetricStorage(instrument, aggregator, view.attributesProcessor, callback);
   }
 }
