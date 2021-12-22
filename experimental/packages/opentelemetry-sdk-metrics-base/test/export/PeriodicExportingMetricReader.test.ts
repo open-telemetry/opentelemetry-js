@@ -16,11 +16,12 @@
 
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import { MetricExporter, ReaderResultCode } from '../../src';
+import { MetricExporter } from '../../src';
 import { MetricData } from '../../src/export/MetricData';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MetricProducer } from '../../src/export/MetricProducer';
+import { ReaderResultCode } from '../../src/export/ReaderResult';
 
 const MAX_32_BIT_INT = 2 ** 31 - 1
 
@@ -167,7 +168,7 @@ describe('PeriodicExportingMetricReader', () => {
       const result = await exporter.waitForNumberOfExports(2);
 
       assert.deepEqual(result, [[], []]);
-      await reader.shutdown();
+      await new Promise(resolve => reader.shutdown({ done: resolve }));
     }).timeout(1000);
   });
 
@@ -187,7 +188,7 @@ describe('PeriodicExportingMetricReader', () => {
       assert.deepEqual(result, [[], []]);
 
       exporter.throwException = false;
-      await reader.shutdown();
+      await new Promise(resolve => reader.shutdown({ done: resolve }));
     });
   });
 
@@ -207,11 +208,11 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       reader.setMetricProducer(new TestMetricProducer());
-      reader.forceFlush(30, _result => {
-        exporterMock.verify();
-        reader.shutdown(20, _result => {
-          done();
-        });
+      reader.forceFlush({
+        done: _result => {
+          exporterMock.verify();
+          reader.shutdown({ done: _result => done() });
+        }
       });
     });
 
@@ -226,15 +227,16 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       reader.setMetricProducer(new TestMetricProducer());
-      reader.forceFlush(20, (result => {
-        assert.strictEqual(result.code, ReaderResultCode.TIMED_OUT);
+      reader.forceFlush({
+        timeoutMillis: 20,
+        done: result => {
+          assert.strictEqual(result.code, ReaderResultCode.TIMED_OUT);
 
-        // cleanup.
-        exporter.exportTime = 0;
-        reader.shutdown(20, _result => {
-          done();
-        })
-      }));
+          // cleanup.
+          exporter.exportTime = 0;
+          reader.shutdown({ done: _result => done() });
+        }
+      });
     }).timeout(1000);
 
     it('should return FAILED when handler throws', done => {
@@ -246,15 +248,15 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 80,
       });
 
-      reader.forceFlush(20, (result => {
-        assert.strictEqual(result.code, ReaderResultCode.FAILED);
+      reader.forceFlush({
+        done: result => {
+          assert.strictEqual(result.code, ReaderResultCode.FAILED);
 
-        // cleanup.
-        exporter.throwException = false;
-        reader.shutdown(100, _result => {
-          done();
-        })
-      }));
+          // cleanup.
+          exporter.throwException = false;
+          reader.shutdown({ done: _result => done() });
+        }
+      })
     });
 
     it('should return FAILED after shutdown', done => {
@@ -266,14 +268,17 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       reader.setMetricProducer(new TestMetricProducer());
-
-      reader.shutdown(20, _result => {
-        reader.forceFlush(20, (result => {
-          assert.strictEqual(result.code, ReaderResultCode.FAILED);
-          done();
-        }));
+      reader.shutdown({
+        done: result => {
+          assert.strictEqual(result.code, ReaderResultCode.SUCCESS);
+          reader.forceFlush({
+            done: forceFlushResult => {
+              assert.strictEqual(forceFlushResult.code, ReaderResultCode.FAILED);
+              done();
+            }
+          })
+        }
       });
-
     });
   });
 
@@ -289,9 +294,11 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       reader.setMetricProducer(new TestMetricProducer());
-      reader.shutdown(20, () => {
-        exporterMock.verify();
-        done()
+      reader.shutdown({
+        done: _result => {
+          exporterMock.verify();
+          done();
+        }
       });
     });
 
@@ -306,11 +313,12 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       reader.setMetricProducer(new TestMetricProducer());
-      reader.shutdown(20, result => {
+      reader.shutdown({
+        timeoutMillis: 20, done: result => {
           assert.strictEqual(result.code, ReaderResultCode.TIMED_OUT);
           done();
-        },
-      );
+        }
+      });
     }).timeout(1000);
 
     it('should return FAILED when called twice', done => {
@@ -324,18 +332,19 @@ describe('PeriodicExportingMetricReader', () => {
       reader.setMetricProducer(new TestMetricProducer());
 
       // first call should succeed.
-      reader.shutdown(20, result => {
+      reader.shutdown({
+        done: result => {
           assert.strictEqual(result.code, ReaderResultCode.SUCCESS);
 
-          // second call should fail.
-          reader.shutdown(20, result => {
-              assert.strictEqual(result.code, ReaderResultCode.FAILED);
+          //second call should fail
+          reader.shutdown({
+            done: secondResult => {
+              assert.strictEqual(secondResult.code, ReaderResultCode.FAILED);
               done();
-            },
-          );
-        },
-      );
-
+            }
+          })
+        }
+      });
     });
 
     it('should return FAILED when shutdown-handler throws.', done => {
@@ -347,9 +356,11 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 80,
       });
 
-      reader.shutdown(20, result => {
-          assert.strictEqual(result.code, ReaderResultCode.FAILED);
-          done();
+      reader.shutdown({
+          done: result => {
+            assert.strictEqual(result.code, ReaderResultCode.FAILED);
+            done();
+          }
         },
       );
     });
@@ -364,10 +375,35 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 80,
       });
 
-      reader.collect(20, (result => {
-        assert.strictEqual(result.code, ReaderResultCode.FAILED);
-        done();
-      }));
+      reader.collect({
+        done: (result => {
+          assert.strictEqual(result.code, ReaderResultCode.FAILED);
+          done();
+        })
+      });
     });
+
+    it('should return FAILED on shut-down instance', done => {
+      const exporter = new TestMetricExporter();
+      const reader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: MAX_32_BIT_INT,
+        exportTimeoutMillis: 80,
+      });
+
+      reader.setMetricProducer(new TestMetricProducer());
+
+      reader.shutdown({
+        done: _result => {
+          reader.collect({
+            done: (result => {
+              assert.strictEqual(result.code, ReaderResultCode.FAILED);
+              done();
+            })
+          });
+        }
+      })
+
+    })
   })
 });

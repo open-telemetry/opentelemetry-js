@@ -14,7 +14,15 @@
  * limitations under the License.
  */
 
-export { MeterProvider, MeterProviderOptions } from './MeterProvider';
-export * from './export/MetricExporter';
-export * from './export/MetricReader';
-export { ReaderResult } from "./export/ReaderResult";
+export interface ReaderResult<T> {
+  code: ReaderResultCode;
+  error?: Error;
+  returnValue?: T;
+}
+
+export enum ReaderResultCode {
+  SUCCESS,
+  FAILED,
+  TIMED_OUT
+}
+

@@ -15,9 +15,10 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { MetricReader, ReaderResult, ReaderResultCode } from './MetricReader';
+import { MetricReader, promiseWithTimeout } from './MetricReader';
 import { MetricExporter } from './MetricExporter';
 import { MetricData } from './MetricData';
+import { ReaderResult, ReaderResultCode } from './ReaderResult';
 
 export type PeriodicExportingMetricReaderOptions = {
   exporter: MetricExporter
@@ -61,16 +62,15 @@ export class PeriodicExportingMetricReader extends MetricReader {
   }
 
   private async _runOnce(): Promise<void> {
-    const collectionResult = await new Promise<ReaderResult<MetricData[]>>(resolve => {
-      this.collect(100, (result => {
-        resolve(result);
-      }))
-    });
+    const collectionResult = await new Promise<ReaderResult<MetricData[]>>(resolve =>
+      this.collect({ done: resolve }));
 
+    // Throw on any code that does not indicate success.
     if (collectionResult.code !== ReaderResultCode.SUCCESS) {
       throw collectionResult.error ?? new Error('Unknown error occurred during collection.');
     }
 
+    // This case should never occur.
     if (collectionResult.returnValue == null) {
       throw new Error('Unknown error occurred during collection.');
     }
@@ -79,8 +79,9 @@ export class PeriodicExportingMetricReader extends MetricReader {
   }
 
   protected onInitialized(): void {
+    // start running the interval as soon as this reader is initialized and keep handle for shutdown.
     this._interval = setInterval(async () => {
-      MetricReader.promiseWithTimeout(this._runOnce(), this._exportTimeout, (result => {
+      promiseWithTimeout(this._runOnce(), this._exportTimeout, (result => {
         if (result.code === ReaderResultCode.TIMED_OUT) {
           api.diag.error('Export took longer than %s milliseconds and timed out.', this._exportTimeout);
           return;
@@ -102,7 +103,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
       clearInterval(this._interval);
     }
 
-    await this._runOnce();
+    await this.onForceFlush();
     await this._exporter.shutdown();
   }
 }
