@@ -26,41 +26,9 @@ import { ReaderResultCode } from '../../src/export/ReaderResult';
 const MAX_32_BIT_INT = 2 ** 31 - 1
 
 class TestMetricExporter extends MetricExporter {
-  metricDataList: MetricData[] = []
   public exportTime = 0;
   public throwException = false;
-
-  async export(batch: MetricData[]): Promise<void> {
-    this.metricDataList.push(...batch);
-    if (this.throwException) {
-      throw new Error('Error during export');
-    }
-    await new Promise(resolve => setTimeout(resolve, this.exportTime));
-  }
-
-  async forceFlush(): Promise<void> {
-  }
-
-  getPreferredAggregationTemporality(): AggregationTemporality {
-    return AggregationTemporality.CUMULATIVE;
-  }
-}
-
-class TestDeltaMetricExporter extends TestMetricExporter {
-  override getPreferredAggregationTemporality(): AggregationTemporality {
-    return AggregationTemporality.DELTA;
-  }
-}
-
-class WaitingMetricExporter extends MetricExporter {
-  private _batches: MetricData[][];
-  public throwException: boolean;
-
-  constructor() {
-    super();
-    this._batches = [];
-    this.throwException = false;
-  }
+  private _batches: MetricData[][] = [];
 
   async export(batch: MetricData[]): Promise<void> {
     this._batches.push([]);
@@ -68,6 +36,7 @@ class WaitingMetricExporter extends MetricExporter {
     if (this.throwException) {
       throw new Error('Error during export');
     }
+    await new Promise(resolve => setTimeout(resolve, this.exportTime));
   }
 
   async forceFlush(): Promise<void> {
@@ -86,6 +55,12 @@ class WaitingMetricExporter extends MetricExporter {
 
   getPreferredAggregationTemporality(): AggregationTemporality {
     return AggregationTemporality.CUMULATIVE;
+  }
+}
+
+class TestDeltaMetricExporter extends TestMetricExporter {
+  override getPreferredAggregationTemporality(): AggregationTemporality {
+    return AggregationTemporality.DELTA;
   }
 }
 
@@ -157,7 +132,7 @@ describe('PeriodicExportingMetricReader', () => {
 
   describe('setMetricProducer', () => {
     it('should start exporting periodically', async () => {
-      const exporter = new WaitingMetricExporter();
+      const exporter = new TestMetricExporter();
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: 50,
@@ -169,12 +144,12 @@ describe('PeriodicExportingMetricReader', () => {
 
       assert.deepEqual(result, [[], []]);
       await new Promise(resolve => reader.shutdown({ done: resolve }));
-    }).timeout(1000);
+    });
   });
 
   describe('periodic export', () => {
     it('should keep running on export errors', async () => {
-      const exporter = new WaitingMetricExporter();
+      const exporter = new TestMetricExporter();
       exporter.throwException = true;
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
@@ -237,7 +212,7 @@ describe('PeriodicExportingMetricReader', () => {
           reader.shutdown({ done: _result => done() });
         }
       });
-    }).timeout(1000);
+    });
 
     it('should return FAILED when handler throws', done => {
       const exporter = new TestMetricExporter();
@@ -319,7 +294,7 @@ describe('PeriodicExportingMetricReader', () => {
           done();
         }
       });
-    }).timeout(1000);
+    });
 
     it('should return FAILED when called twice', done => {
       const exporter = new TestMetricExporter();
@@ -402,8 +377,7 @@ describe('PeriodicExportingMetricReader', () => {
             })
           });
         }
-      })
-
-    })
+      });
+    });
   })
 });
