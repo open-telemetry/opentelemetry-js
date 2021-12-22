@@ -21,8 +21,8 @@ import {
   Counter,
   Histogram,
   UpDownCounter,
+  ObservableCallback,
 } from './types/Metric';
-import { ObservableResult } from './types/ObservableResult';
 
 /**
  * NoopMeter is a noop implementation of the {@link Meter} interface. It reuses
@@ -66,7 +66,7 @@ export class NoopMeter implements Meter {
    */
   createObservableGauge(
     _name: string,
-    _callback: (observableResult: ObservableResult) => void,
+    _callback: ObservableCallback,
     _options?: MetricOptions,
   ): void {}
 
@@ -78,7 +78,7 @@ export class NoopMeter implements Meter {
    */
   createObservableCounter(
     _name: string,
-    _callback: (observableResult: ObservableResult) => void,
+    _callback: ObservableCallback,
     _options?: MetricOptions,
   ): void {}
 
@@ -90,7 +90,7 @@ export class NoopMeter implements Meter {
    */
   createObservableUpDownCounter(
     _name: string,
-    _callback: (observableResult: ObservableResult) => void,
+    _callback: ObservableCallback,
     _options?: MetricOptions,
   ): void {}
 }
