@@ -45,11 +45,7 @@ class TestDeltaMetricExporter extends TestMetricExporter {
 }
 
 class TestMetricReader extends MetricReader {
-  getMetricCollector(): MetricCollector {
-    return this['_metricProducer'] as MetricCollector;
-  }
-
-  protected handleCollectedMetrics(metrics: MetricData[]): Promise<void> {
+  protected handleCollectedMetrics(_metrics: MetricData[]): Promise<void> {
     return Promise.resolve(undefined);
   }
 
