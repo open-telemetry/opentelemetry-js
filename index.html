@@ -1,803 +1,684 @@
-<!doctype html>
-<html class="default no-js">
-<head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>OpenTelemetry SDK</title>
-	<meta name="description" content="Documentation for OpenTelemetry SDK">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="assets/css/main.css">
-	<script async src="assets/js/search.js" id="search-script"></script>
-</head>
-<body>
-<header>
-	<div class="tsd-page-toolbar">
-		<div class="container">
-			<div class="table-wrap">
-				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
-					<div class="field">
-						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
-						<input id="tsd-search-field" type="text" />
-					</div>
-					<ul class="results">
-						<li class="state loading">Preparing search index...</li>
-						<li class="state failure">The search index is not available</li>
-					</ul>
-					<a href="index.html" class="title">OpenTelemetry SDK</a>
-				</div>
-				<div class="table-cell" id="tsd-widgets">
-					<div id="tsd-filter">
-						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
-						<div class="tsd-filter-group">
-							<div class="tsd-select" id="tsd-filter-visibility">
-								<span class="tsd-select-label">All</span>
-								<ul class="tsd-select-list">
-									<li data-value="public">Public</li>
-									<li data-value="protected">Public/Protected</li>
-									<li data-value="private" class="selected">All</li>
-								</ul>
-							</div>
-							<input type="checkbox" id="tsd-filter-inherited" checked />
-							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
-							<input type="checkbox" id="tsd-filter-externals" checked />
-							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
-						</div>
-					</div>
-					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="tsd-page-title">
-		<div class="container">
-			<h1>OpenTelemetry SDK</h1>
-		</div>
-	</div>
-</header>
-<div class="container container-main">
-	<div class="row">
-		<div class="col-8 col-content">
-			<div class="tsd-panel tsd-typography">
-				<hr>
-				<p align="center">
-					<strong>
-						<a href="getting-started/README.md">Getting Started</a>
-						&nbsp;&nbsp;&bull;&nbsp;&nbsp;
-						<a href="https://open-telemetry.github.io/opentelemetry-js-api">API Reference</a>
-						&nbsp;&nbsp;&bull;&nbsp;&nbsp;
-						<a href="https://open-telemetry.github.io/opentelemetry-js">SDK Reference</a>
-					</strong>
-				</p>
-				<p align="center">
-					<a href="https://github.com/open-telemetry/opentelemetry-js/releases">
-						<img alt="GitHub release (latest by date including pre-releases)" src="https://img.shields.io/github/v/release/open-telemetry/opentelemetry-js?include_prereleases&style=for-the-badge">
-					</a>
-					<a href="https://codecov.io/gh/open-telemetry/opentelemetry-js/branch/main/">
-						<img alt="Codecov Status" src="https://img.shields.io/codecov/c/github/open-telemetry/opentelemetry-js?style=for-the-badge">
-					</a>
-					<a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE">
-						<img alt="license" src="https://img.shields.io/badge/license-Apache_2.0-green.svg?style=for-the-badge">
-					</a>
-					<br/>
-					<a href="https://circleci.com/gh/open-telemetry/opentelemetry-js">
-						<img alt="Build Status" src="https://circleci.com/gh/open-telemetry/opentelemetry-js.svg?style=shield">
-					</a>
-					<img alt="Beta" src="https://img.shields.io/badge/status-beta-informational?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAIRlWElmTU0AKgAAAAgABQESAAMAAAABAAEAAAEaAAUAAAABAAAASgEbAAUAAAABAAAAUgEoAAMAAAABAAIAAIdpAAQAAAABAAAAWgAAAAAAAACQAAAAAQAAAJAAAAABAAOgAQADAAAAAQABAACgAgAEAAAAAQAAABigAwAEAAAAAQAAABgAAAAA8A2UOAAAAAlwSFlzAAAWJQAAFiUBSVIk8AAAAVlpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDUuNC4wIj4KICAgPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIKICAgICAgICAgICAgeG1sbnM6dGlmZj0iaHR0cDovL25zLmFkb2JlLmNvbS90aWZmLzEuMC8iPgogICAgICAgICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICA8L3JkZjpEZXNjcmlwdGlvbj4KICAgPC9yZGY6UkRGPgo8L3g6eG1wbWV0YT4KTMInWQAABK5JREFUSA2dVm1sFEUYfmd2b/f2Pkqghn5eEQWKrRgjpkYgpoRCLC0oxV5apAiGUDEpJvwxEQ2raWPU+Kf8INU/RtEedwTCR9tYPloxGNJYTTQUwYqJ1aNpaLH3sXu3t7vjvFevpSqt7eSyM+/czvM8877PzB3APBoLgoDLsNePF56LBwqa07EKlDGg84CcWsI4CEbhNnDpAd951lXE2NkiNknCCTLv4HtzZuvPm1C/IKv4oDNXqNDHragety2XVzjECZsJARuBMyRzJrh1O0gQwLXuxofxsPSj4hG8fMLQo7bl9JJD8XZfC1E5yWFOMtd07dvX5kDwg6+2++Chq8txHGtfPoAp0gOFmhYoNFkHjn2TNUmrwRdna7W1QSkU8hvbGk4uThLrapaiLA2E6QY4u/lS9ItHfvJkxYsTMVtnAJLipYIWtVrcdX+8+b8IVnPl/R81prbuPZ1jpYw+0aEUGSkdFsgyBIaFTXCm6nyaxMtJ4n+TeDhJzGqZtQZcuYDgqDwDbqb0JF9oRpIG1Oea3bC1Y6N3x/WV8Zh83emhCs++hlaghDw+8w5UlYKq2lU7Pl8IkvS9KDqXmKmEwdMppVPKwGSEilmyAwJhRwWcq7wYC6z4wZ1rrEoMWxecdOjZWXeAQClBcYDN3NwVwD9pGwqUSyQgclcmxpNJqCuwLmDh3WtvPqXdlt+6Oz70HPGDNSNBee/EOen+rGbEFqDENBPDbtdCp0ukPANmzO0QQJYUpyS5IJJI3Hqt4maS+EB3199ozm8EDU/6fVNU2dQpdx3ZnKzeFXyaUTiasEV/gZMzJMjr3Z+WvAdQ+hs/zw9savimxUntDSaBdZ2f+Idbm1rlNY8esFffBit9HtK5/MejsrJVxikOXlb1Ukir2X+Rbdkd1KG2Ixfn2Ql4JRmELnYK9mEM8G36fAA3xEQ89fxXihC8q+sAKi9jhHxNqagY2hiaYgRCm0f0QP7H4Fp11LSXiuBY2aYFlh0DeDIVVFUJQn5rCnpiNI2gvLxHnASn9DIVHJJlm5rXvQAGEo4zvKq2w5G1NxENN7jrft1oxMdekETjxdH2Z3x+VTVYsPb+O0C/9/auN6v2hNZw5b2UOmSbG5/rkC3LBA+1PdxFxORjxpQ81GcxKc+ybVjEBvUJvaGJ7p7n5A5KSwe4AzkasA+crmzFtowoIVTiLjANm8GDsrWW35ScI3JY8Urv83tnkF8JR0yLvEt2hO/0qNyy3Jb3YKeHeHeLeOuVLRpNF+pkf85OW7/zJxWdXsbsKBUk2TC0BCPwMq5Q/CPvaJFkNS/1l1qUPe+uH3oD59erYGI/Y4sce6KaXYElAIOLt+0O3t2+/xJDF1XvOlWGC1W1B8VMszbGfOvT5qaRRAIFK3BCO164nZ0uYLH2YjNN8thXS2v2BK9gTfD7jHVxzHr4roOlEvYYz9QIz+Vl/sLDXInsctFsXjqIRnO2ZO387lxmIboLDZCJ59KLFliNIgh9ipt6tLg9SihpRPDO1ia5byw7de1aCQmF5geOQtK509rzfdwxaKOIq+73AvwCC5/5fcV4vo3+3LpMdtWHh0ywsJC/ZGoCb8/9D8F/ifgLLl8S8QWfU8cAAAAASUVORK5CYII=">
-				</p>
-				<p align="center">
-					<strong>
-						<a href="CONTRIBUTING.md">Contributing</a>
-						&nbsp;&nbsp;&bull;&nbsp;&nbsp;
-						<a href="doc/development-guide.md">Development Guide</a>
-						&nbsp;&nbsp;&bull;&nbsp;&nbsp;
-						<a href="benchmark/README.md">Benchmarks</a>
-						&nbsp;&nbsp;&bull;&nbsp;&nbsp;
-						<a href="examples/">Examples</a>
-					</strong>
-				</p>
-				<hr>
-				<a href="#about-this-project" id="about-this-project" style="color: inherit; text-decoration: none;">
-					<h2>About this project</h2>
-				</a>
-				<p>This is the JavaScript version of <a href="https://opentelemetry.io/">OpenTelemetry</a>, a framework for collecting traces and metrics from applications.</p>
-				<a href="#compatibility-matrix" id="compatibility-matrix" style="color: inherit; text-decoration: none;">
-					<h2>Compatibility Matrix</h2>
-				</a>
-				<table>
-					<thead>
-						<tr>
-							<th>API Version</th>
-							<th>Core version</th>
-							<th>Contrib Version</th>
-						</tr>
-					</thead>
-					<tbody><tr>
-							<td>1.0.x</td>
-							<td>0.25.x</td>
-							<td>------</td>
-						</tr>
-						<tr>
-							<td>1.0.x</td>
-							<td>0.24.x</td>
-							<td>0.24.x</td>
-						</tr>
-						<tr>
-							<td>1.0.x</td>
-							<td>0.23.x</td>
-							<td>0.23.x</td>
-						</tr>
-						<tr>
-							<td>1.0.x</td>
-							<td>0.22.x</td>
-							<td>0.22.x</td>
-						</tr>
-						<tr>
-							<td>0.21.x</td>
-							<td>0.21.x</td>
-							<td>0.21.x</td>
-						</tr>
-						<tr>
-							<td>0.20.x</td>
-							<td>0.20.x</td>
-							<td>0.20.x</td>
-						</tr>
-						<tr>
-							<td>v1.0.0-rc.3</td>
-							<td>0.19.x</td>
-							<td>0.16.x</td>
-						</tr>
-						<tr>
-							<td>0.18.x</td>
-							<td>0.18.x</td>
-							<td>0.14.x</td>
-						</tr>
-						<tr>
-							<td></td>
-							<td>0.17.x</td>
-							<td>------</td>
-						</tr>
-						<tr>
-							<td></td>
-							<td>0.16.x</td>
-							<td>------</td>
-						</tr>
-						<tr>
-							<td></td>
-							<td>0.15.x</td>
-							<td>0.13.x</td>
-						</tr>
-						<tr>
-							<td></td>
-							<td>0.14.x</td>
-							<td>0.12.x</td>
-						</tr>
-						<tr>
-							<td></td>
-							<td>0.13.x</td>
-							<td>------</td>
-						</tr>
-						<tr>
-							<td></td>
-							<td>0.12.x</td>
-							<td>0.11.x</td>
-						</tr>
-						<tr>
-							<td></td>
-							<td>0.11.x</td>
-							<td>0.10.x</td>
-						</tr>
-				</tbody></table>
-				<a href="#versioning" id="versioning" style="color: inherit; text-decoration: none;">
-					<h2>Versioning</h2>
-				</a>
-				<p>The current version for each package can be found in the respective <code>package.json</code> file for that module. For additional details see the <a href="https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/versioning-and-stability.md">versioning and stability</a> document in the specification.</p>
-				<a href="#quick-start" id="quick-start" style="color: inherit; text-decoration: none;">
-					<h2>Quick start</h2>
-				</a>
-				<a href="#application-owner" id="application-owner" style="color: inherit; text-decoration: none;">
-					<h3>Application Owner</h3>
-				</a>
-				<a href="#install-dependencies" id="install-dependencies" style="color: inherit; text-decoration: none;">
-					<h4>Install Dependencies</h4>
-				</a>
-				<pre><code class="language-shell"><span style="color: #000000">npm install --save @opentelemetry/api</span>
-<span style="color: #000000">npm install --save @opentelemetry/sdk-node</span>
-<span style="color: #000000">npm install --save @opentelemetry/auto-instrumentations-node</span>
+<!DOCTYPE html><html class="default"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>OpenTelemetry SDK</title><meta name="description" content="Documentation for OpenTelemetry SDK"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script async src="assets/search.js" id="search-script"></script></head><body><script>document.body.classList.add(localStorage.getItem("tsd-theme") || "os")</script><header><div class="tsd-page-toolbar"><div class="container"><div class="table-wrap"><div class="table-cell" id="tsd-search" data-base="."><div class="field"><label for="tsd-search-field" class="tsd-widget search no-caption">Search</label><input type="text" id="tsd-search-field"/></div><ul class="results"><li class="state loading">Preparing search index...</li><li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">OpenTelemetry SDK</a></div><div class="table-cell" id="tsd-widgets"><div id="tsd-filter"><a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a><div class="tsd-filter-group"><div class="tsd-select" id="tsd-filter-visibility"><span class="tsd-select-label">All</span><ul class="tsd-select-list"><li data-value="public">Public</li><li data-value="protected">Public/Protected</li><li data-value="private" class="selected">All</li></ul></div> <input type="checkbox" id="tsd-filter-inherited" checked/><label class="tsd-widget" for="tsd-filter-inherited">Inherited</label><input type="checkbox" id="tsd-filter-externals" checked/><label class="tsd-widget" for="tsd-filter-externals">Externals</label></div></div><a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a></div></div></div></div><div class="tsd-page-title"><div class="container"><h1> OpenTelemetry SDK</h1></div></div></header><div class="container container-main"><div class="row"><div class="col-8 col-content"><div class="tsd-panel tsd-typography"><hr>
+<p align="center">
+  <strong>
+    <a href="https://opentelemetry.io/docs/js/getting-started/">Getting Started</a>
+    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="https://open-telemetry.github.io/opentelemetry-js-api">API Reference</a>
+    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="https://open-telemetry.github.io/opentelemetry-js">SDK Reference</a>
+  </strong>
+</p>
+
+<p align="center">
+  <a href="https://github.com/open-telemetry/opentelemetry-js/releases">
+    <img alt="GitHub release (latest by date including pre-releases)" src="https://img.shields.io/github/v/release/open-telemetry/opentelemetry-js?include_prereleases&style=for-the-badge">
+  </a>
+  <a href="https://codecov.io/gh/open-telemetry/opentelemetry-js/branch/main/">
+    <img alt="Codecov Status" src="https://img.shields.io/codecov/c/github/open-telemetry/opentelemetry-js?style=for-the-badge">
+  </a>
+  <a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE">
+    <img alt="license" src="https://img.shields.io/badge/license-Apache_2.0-green.svg?style=for-the-badge">
+  </a>
+  <br/>
+  <a href="https://circleci.com/gh/open-telemetry/opentelemetry-js">
+    <img alt="Build Status" src="https://circleci.com/gh/open-telemetry/opentelemetry-js.svg?style=shield">
+  </a>
+  <img alt="Beta" src="https://img.shields.io/badge/status-beta-informational?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAAXNSR0IArs4c6QAAAIRlWElmTU0AKgAAAAgABQESAAMAAAABAAEAAAEaAAUAAAABAAAASgEbAAUAAAABAAAAUgEoAAMAAAABAAIAAIdpAAQAAAABAAAAWgAAAAAAAACQAAAAAQAAAJAAAAABAAOgAQADAAAAAQABAACgAgAEAAAAAQAAABigAwAEAAAAAQAAABgAAAAA8A2UOAAAAAlwSFlzAAAWJQAAFiUBSVIk8AAAAVlpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDUuNC4wIj4KICAgPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIKICAgICAgICAgICAgeG1sbnM6dGlmZj0iaHR0cDovL25zLmFkb2JlLmNvbS90aWZmLzEuMC8iPgogICAgICAgICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICA8L3JkZjpEZXNjcmlwdGlvbj4KICAgPC9yZGY6UkRGPgo8L3g6eG1wbWV0YT4KTMInWQAABK5JREFUSA2dVm1sFEUYfmd2b/f2Pkqghn5eEQWKrRgjpkYgpoRCLC0oxV5apAiGUDEpJvwxEQ2raWPU+Kf8INU/RtEedwTCR9tYPloxGNJYTTQUwYqJ1aNpaLH3sXu3t7vjvFevpSqt7eSyM+/czvM8877PzB3APBoLgoDLsNePF56LBwqa07EKlDGg84CcWsI4CEbhNnDpAd951lXE2NkiNknCCTLv4HtzZuvPm1C/IKv4oDNXqNDHragety2XVzjECZsJARuBMyRzJrh1O0gQwLXuxofxsPSj4hG8fMLQo7bl9JJD8XZfC1E5yWFOMtd07dvX5kDwg6+2++Chq8txHGtfPoAp0gOFmhYoNFkHjn2TNUmrwRdna7W1QSkU8hvbGk4uThLrapaiLA2E6QY4u/lS9ItHfvJkxYsTMVtnAJLipYIWtVrcdX+8+b8IVnPl/R81prbuPZ1jpYw+0aEUGSkdFsgyBIaFTXCm6nyaxMtJ4n+TeDhJzGqZtQZcuYDgqDwDbqb0JF9oRpIG1Oea3bC1Y6N3x/WV8Zh83emhCs++hlaghDw+8w5UlYKq2lU7Pl8IkvS9KDqXmKmEwdMppVPKwGSEilmyAwJhRwWcq7wYC6z4wZ1rrEoMWxecdOjZWXeAQClBcYDN3NwVwD9pGwqUSyQgclcmxpNJqCuwLmDh3WtvPqXdlt+6Oz70HPGDNSNBee/EOen+rGbEFqDENBPDbtdCp0ukPANmzO0QQJYUpyS5IJJI3Hqt4maS+EB3199ozm8EDU/6fVNU2dQpdx3ZnKzeFXyaUTiasEV/gZMzJMjr3Z+WvAdQ+hs/zw9savimxUntDSaBdZ2f+Idbm1rlNY8esFffBit9HtK5/MejsrJVxikOXlb1Ukir2X+Rbdkd1KG2Ixfn2Ql4JRmELnYK9mEM8G36fAA3xEQ89fxXihC8q+sAKi9jhHxNqagY2hiaYgRCm0f0QP7H4Fp11LSXiuBY2aYFlh0DeDIVVFUJQn5rCnpiNI2gvLxHnASn9DIVHJJlm5rXvQAGEo4zvKq2w5G1NxENN7jrft1oxMdekETjxdH2Z3x+VTVYsPb+O0C/9/auN6v2hNZw5b2UOmSbG5/rkC3LBA+1PdxFxORjxpQ81GcxKc+ybVjEBvUJvaGJ7p7n5A5KSwe4AzkasA+crmzFtowoIVTiLjANm8GDsrWW35ScI3JY8Urv83tnkF8JR0yLvEt2hO/0qNyy3Jb3YKeHeHeLeOuVLRpNF+pkf85OW7/zJxWdXsbsKBUk2TC0BCPwMq5Q/CPvaJFkNS/1l1qUPe+uH3oD59erYGI/Y4sce6KaXYElAIOLt+0O3t2+/xJDF1XvOlWGC1W1B8VMszbGfOvT5qaRRAIFK3BCO164nZ0uYLH2YjNN8thXS2v2BK9gTfD7jHVxzHr4roOlEvYYz9QIz+Vl/sLDXInsctFsXjqIRnO2ZO387lxmIboLDZCJ59KLFliNIgh9ipt6tLg9SihpRPDO1ia5byw7de1aCQmF5geOQtK509rzfdwxaKOIq+73AvwCC5/5fcV4vo3+3LpMdtWHh0ywsJC/ZGoCb8/9D8F/ifgLLl8S8QWfU8cAAAAASUVORK5CYII=">
+</p>
+
+<p align="center">
+  <strong>
+    <a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/CONTRIBUTING.md">Contributing</a>
+    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/development-guide.md">Development Guide</a>
+    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/benchmark/README.md">Benchmarks</a>
+    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/examples">Examples</a>
+  </strong>
+</p>
+
+<hr>
+
+<a href="#about-this-project" id="about-this-project" style="color: inherit; text-decoration: none;">
+  <h2>About this project</h2>
+</a>
+<p>This is the JavaScript version of <a href="https://opentelemetry.io/">OpenTelemetry</a>, a framework for collecting traces and metrics from applications.</p>
+
+<a href="#compatibility-matrix" id="compatibility-matrix" style="color: inherit; text-decoration: none;">
+  <h2>Compatibility Matrix</h2>
+</a>
+<table>
+<thead>
+<tr>
+<th>API Version</th>
+<th>Core version</th>
+<th>Experimental Packages</th>
+<th>Contrib Version</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1.0.x</td>
+<td>1.x</td>
+<td>0.26.x</td>
+<td>0.26.x</td>
+</tr>
+<tr>
+<td>1.0.x</td>
+<td>0.26.x</td>
+<td>-----</td>
+<td>------</td>
+</tr>
+<tr>
+<td>1.0.x</td>
+<td>0.25.x</td>
+<td>-----</td>
+<td>------</td>
+</tr>
+<tr>
+<td>1.0.x</td>
+<td>0.24.x</td>
+<td>-----</td>
+<td>0.24.x</td>
+</tr>
+<tr>
+<td>1.0.x</td>
+<td>0.23.x</td>
+<td>-----</td>
+<td>0.23.x</td>
+</tr>
+<tr>
+<td>1.0.x</td>
+<td>0.22.x</td>
+<td>-----</td>
+<td>0.22.x</td>
+</tr>
+<tr>
+<td>0.21.x</td>
+<td>0.21.x</td>
+<td>-----</td>
+<td>0.21.x</td>
+</tr>
+<tr>
+<td>0.20.x</td>
+<td>0.20.x</td>
+<td>-----</td>
+<td>0.20.x</td>
+</tr>
+<tr>
+<td>v1.0.0-rc.3</td>
+<td>0.19.x</td>
+<td>-----</td>
+<td>0.16.x</td>
+</tr>
+<tr>
+<td>0.18.x</td>
+<td>0.18.x</td>
+<td>-----</td>
+<td>0.14.x</td>
+</tr>
+<tr>
+<td></td>
+<td>0.17.x</td>
+<td>-----</td>
+<td>------</td>
+</tr>
+<tr>
+<td></td>
+<td>0.16.x</td>
+<td>-----</td>
+<td>------</td>
+</tr>
+<tr>
+<td></td>
+<td>0.15.x</td>
+<td>-----</td>
+<td>0.13.x</td>
+</tr>
+<tr>
+<td></td>
+<td>0.14.x</td>
+<td>-----</td>
+<td>0.12.x</td>
+</tr>
+<tr>
+<td></td>
+<td>0.13.x</td>
+<td>-----</td>
+<td>------</td>
+</tr>
+<tr>
+<td></td>
+<td>0.12.x</td>
+<td>-----</td>
+<td>0.11.x</td>
+</tr>
+<tr>
+<td></td>
+<td>0.11.x</td>
+<td>-----</td>
+<td>0.10.x</td>
+</tr>
+</tbody></table>
+
+<a href="#versioning" id="versioning" style="color: inherit; text-decoration: none;">
+  <h2>Versioning</h2>
+</a>
+<p>The current version for each package can be found in the respective <code>package.json</code> file for that module. For additional details see the <a href="https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/versioning-and-stability.md">versioning and stability</a> document in the specification.</p>
+
+<a href="#quick-start" id="quick-start" style="color: inherit; text-decoration: none;">
+  <h2>Quick start</h2>
+</a>
+
+<a href="#application-owner" id="application-owner" style="color: inherit; text-decoration: none;">
+  <h3>Application Owner</h3>
+</a>
+
+<a href="#install-dependencies" id="install-dependencies" style="color: inherit; text-decoration: none;">
+  <h4>Install Dependencies</h4>
+</a>
+<pre><code class="language-shell"><span class="hl-0">npm install --save @opentelemetry/api</span><br/><span class="hl-0">npm install --save @opentelemetry/sdk-node</span><br/><span class="hl-0">npm install --save @opentelemetry/auto-instrumentations-node</span>
 </code></pre>
-				<p><strong>Note:</strong> <code>auto-instrumentations-node</code> is a meta package from <a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/metapackages/auto-instrumentations-node">opentelemetry-js-contrib</a> that provides a simple way to initialize multiple Node.js instrumentations.</p>
-				<a href="#instantiate-tracing" id="instantiate-tracing" style="color: inherit; text-decoration: none;">
-					<h4>Instantiate Tracing</h4>
-				</a>
-				<pre><code class="language-js"><span style="color: #008000">// tracing.js</span>
+<p><strong>Note:</strong> <code>auto-instrumentations-node</code> is a meta package from <a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/metapackages/auto-instrumentations-node">opentelemetry-js-contrib</a> that provides a simple way to initialize multiple Node.js instrumentations.</p>
 
-<span style="color: #A31515">&#039;use strict&#039;</span>
-
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">process</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;process&#039;</span><span style="color: #000000">);</span>
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">opentelemetry</span><span style="color: #000000"> = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;@opentelemetry/sdk-node&#039;</span><span style="color: #000000">);</span>
-<span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">getNodeAutoInstrumentations</span><span style="color: #000000"> } = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;@opentelemetry/auto-instrumentations-node&#039;</span><span style="color: #000000">);</span>
-<span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">ConsoleSpanExporter</span><span style="color: #000000"> } = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;@opentelemetry/sdk-trace-base&#039;</span><span style="color: #000000">);</span>
-<span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">Resource</span><span style="color: #000000"> } = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;@opentelemetry/resources&#039;</span><span style="color: #000000">);</span>
-<span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">SemanticResourceAttributes</span><span style="color: #000000"> } = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;@opentelemetry/semantic-conventions&#039;</span><span style="color: #000000">);</span>
-
-<span style="color: #008000">// configure the SDK to export telemetry data to the console</span>
-<span style="color: #008000">// enable all auto-instrumentations from the meta package</span>
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">traceExporter</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">ConsoleSpanExporter</span><span style="color: #000000">();</span>
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">sdk</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #001080">opentelemetry</span><span style="color: #000000">.</span><span style="color: #795E26">NodeSDK</span><span style="color: #000000">({</span>
-<span style="color: #000000">  </span><span style="color: #001080">resource:</span><span style="color: #000000"> </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Resource</span><span style="color: #000000">({</span>
-<span style="color: #000000">    </span><span style="color: #001080">[SemanticResourceAttributes.</span><span style="color: #0070C1">SERVICE_NAME</span><span style="color: #001080">]:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;my-service&#039;</span><span style="color: #000000">,</span>
-<span style="color: #000000">  }),</span>
-<span style="color: #000000">  </span><span style="color: #001080">traceExporter</span><span style="color: #000000">,</span>
-<span style="color: #000000">  </span><span style="color: #001080">instrumentations:</span><span style="color: #000000"> [</span><span style="color: #795E26">getNodeAutoInstrumentations</span><span style="color: #000000">()]</span>
-<span style="color: #000000">});</span>
-
-<span style="color: #008000">// initialize the SDK and register with the OpenTelemetry API</span>
-<span style="color: #008000">// this enables the API to record telemetry</span>
-<span style="color: #001080">sdk</span><span style="color: #000000">.</span><span style="color: #795E26">start</span><span style="color: #000000">()</span>
-<span style="color: #000000">  .</span><span style="color: #795E26">then</span><span style="color: #000000">(() </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;Tracing initialized&#039;</span><span style="color: #000000">))</span>
-<span style="color: #000000">  .</span><span style="color: #795E26">catch</span><span style="color: #000000">((</span><span style="color: #001080">error</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;Error initializing tracing&#039;</span><span style="color: #000000">, </span><span style="color: #001080">error</span><span style="color: #000000">));</span>
-
-<span style="color: #008000">// gracefully shut down the SDK on process exit</span>
-<span style="color: #001080">process</span><span style="color: #000000">.</span><span style="color: #795E26">on</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;SIGTERM&#039;</span><span style="color: #000000">, () </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
-<span style="color: #000000">  </span><span style="color: #001080">sdk</span><span style="color: #000000">.</span><span style="color: #795E26">shutdown</span><span style="color: #000000">()</span>
-<span style="color: #000000">    .</span><span style="color: #795E26">then</span><span style="color: #000000">(() </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;Tracing terminated&#039;</span><span style="color: #000000">))</span>
-<span style="color: #000000">    .</span><span style="color: #795E26">catch</span><span style="color: #000000">((</span><span style="color: #001080">error</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;Error terminating tracing&#039;</span><span style="color: #000000">, </span><span style="color: #001080">error</span><span style="color: #000000">))</span>
-<span style="color: #000000">    .</span><span style="color: #795E26">finally</span><span style="color: #000000">(() </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> </span><span style="color: #001080">process</span><span style="color: #000000">.</span><span style="color: #795E26">exit</span><span style="color: #000000">(</span><span style="color: #098658">0</span><span style="color: #000000">));</span>
-<span style="color: #000000">});</span>
+<a href="#instantiate-tracing" id="instantiate-tracing" style="color: inherit; text-decoration: none;">
+  <h4>Instantiate Tracing</h4>
+</a>
+<pre><code class="language-js"><span class="hl-1">// tracing.js</span><br/><br/><span class="hl-2">&#39;use strict&#39;</span><br/><br/><span class="hl-3">const</span><span class="hl-0"> </span><span class="hl-4">process</span><span class="hl-0"> = </span><span class="hl-5">require</span><span class="hl-0">(</span><span class="hl-2">&#39;process&#39;</span><span class="hl-0">);</span><br/><span class="hl-3">const</span><span class="hl-0"> </span><span class="hl-4">opentelemetry</span><span class="hl-0"> = </span><span class="hl-5">require</span><span class="hl-0">(</span><span class="hl-2">&#39;@opentelemetry/sdk-node&#39;</span><span class="hl-0">);</span><br/><span class="hl-3">const</span><span class="hl-0"> { </span><span class="hl-4">getNodeAutoInstrumentations</span><span class="hl-0"> } = </span><span class="hl-5">require</span><span class="hl-0">(</span><span class="hl-2">&#39;@opentelemetry/auto-instrumentations-node&#39;</span><span class="hl-0">);</span><br/><span class="hl-3">const</span><span class="hl-0"> { </span><span class="hl-4">ConsoleSpanExporter</span><span class="hl-0"> } = </span><span class="hl-5">require</span><span class="hl-0">(</span><span class="hl-2">&#39;@opentelemetry/sdk-trace-base&#39;</span><span class="hl-0">);</span><br/><span class="hl-3">const</span><span class="hl-0"> { </span><span class="hl-4">Resource</span><span class="hl-0"> } = </span><span class="hl-5">require</span><span class="hl-0">(</span><span class="hl-2">&#39;@opentelemetry/resources&#39;</span><span class="hl-0">);</span><br/><span class="hl-3">const</span><span class="hl-0"> { </span><span class="hl-4">SemanticResourceAttributes</span><span class="hl-0"> } = </span><span class="hl-5">require</span><span class="hl-0">(</span><span class="hl-2">&#39;@opentelemetry/semantic-conventions&#39;</span><span class="hl-0">);</span><br/><br/><span class="hl-1">// configure the SDK to export telemetry data to the console</span><br/><span class="hl-1">// enable all auto-instrumentations from the meta package</span><br/><span class="hl-3">const</span><span class="hl-0"> </span><span class="hl-4">traceExporter</span><span class="hl-0"> = </span><span class="hl-3">new</span><span class="hl-0"> </span><span class="hl-5">ConsoleSpanExporter</span><span class="hl-0">();</span><br/><span class="hl-3">const</span><span class="hl-0"> </span><span class="hl-4">sdk</span><span class="hl-0"> = </span><span class="hl-3">new</span><span class="hl-0"> </span><span class="hl-6">opentelemetry</span><span class="hl-0">.</span><span class="hl-5">NodeSDK</span><span class="hl-0">({</span><br/><span class="hl-0">  </span><span class="hl-6">resource:</span><span class="hl-0"> </span><span class="hl-3">new</span><span class="hl-0"> </span><span class="hl-5">Resource</span><span class="hl-0">({</span><br/><span class="hl-0">    </span><span class="hl-6">[SemanticResourceAttributes.</span><span class="hl-4">SERVICE_NAME</span><span class="hl-6">]:</span><span class="hl-0"> </span><span class="hl-2">&#39;my-service&#39;</span><span class="hl-0">,</span><br/><span class="hl-0">  }),</span><br/><span class="hl-0">  </span><span class="hl-6">traceExporter</span><span class="hl-0">,</span><br/><span class="hl-0">  </span><span class="hl-6">instrumentations:</span><span class="hl-0"> [</span><span class="hl-5">getNodeAutoInstrumentations</span><span class="hl-0">()]</span><br/><span class="hl-0">});</span><br/><br/><span class="hl-1">// initialize the SDK and register with the OpenTelemetry API</span><br/><span class="hl-1">// this enables the API to record telemetry</span><br/><span class="hl-6">sdk</span><span class="hl-0">.</span><span class="hl-5">start</span><span class="hl-0">()</span><br/><span class="hl-0">  .</span><span class="hl-5">then</span><span class="hl-0">(() </span><span class="hl-3">=&gt;</span><span class="hl-0"> </span><span class="hl-6">console</span><span class="hl-0">.</span><span class="hl-5">log</span><span class="hl-0">(</span><span class="hl-2">&#39;Tracing initialized&#39;</span><span class="hl-0">))</span><br/><span class="hl-0">  .</span><span class="hl-5">catch</span><span class="hl-0">((</span><span class="hl-6">error</span><span class="hl-0">) </span><span class="hl-3">=&gt;</span><span class="hl-0"> </span><span class="hl-6">console</span><span class="hl-0">.</span><span class="hl-5">log</span><span class="hl-0">(</span><span class="hl-2">&#39;Error initializing tracing&#39;</span><span class="hl-0">, </span><span class="hl-6">error</span><span class="hl-0">));</span><br/><br/><span class="hl-1">// gracefully shut down the SDK on process exit</span><br/><span class="hl-6">process</span><span class="hl-0">.</span><span class="hl-5">on</span><span class="hl-0">(</span><span class="hl-2">&#39;SIGTERM&#39;</span><span class="hl-0">, () </span><span class="hl-3">=&gt;</span><span class="hl-0"> {</span><br/><span class="hl-0">  </span><span class="hl-6">sdk</span><span class="hl-0">.</span><span class="hl-5">shutdown</span><span class="hl-0">()</span><br/><span class="hl-0">    .</span><span class="hl-5">then</span><span class="hl-0">(() </span><span class="hl-3">=&gt;</span><span class="hl-0"> </span><span class="hl-6">console</span><span class="hl-0">.</span><span class="hl-5">log</span><span class="hl-0">(</span><span class="hl-2">&#39;Tracing terminated&#39;</span><span class="hl-0">))</span><br/><span class="hl-0">    .</span><span class="hl-5">catch</span><span class="hl-0">((</span><span class="hl-6">error</span><span class="hl-0">) </span><span class="hl-3">=&gt;</span><span class="hl-0"> </span><span class="hl-6">console</span><span class="hl-0">.</span><span class="hl-5">log</span><span class="hl-0">(</span><span class="hl-2">&#39;Error terminating tracing&#39;</span><span class="hl-0">, </span><span class="hl-6">error</span><span class="hl-0">))</span><br/><span class="hl-0">    .</span><span class="hl-5">finally</span><span class="hl-0">(() </span><span class="hl-3">=&gt;</span><span class="hl-0"> </span><span class="hl-6">process</span><span class="hl-0">.</span><span class="hl-5">exit</span><span class="hl-0">(</span><span class="hl-7">0</span><span class="hl-0">));</span><br/><span class="hl-0">});</span>
 </code></pre>
-				<a href="#run-your-application" id="run-your-application" style="color: inherit; text-decoration: none;">
-					<h4>Run Your Application</h4>
-				</a>
-				<pre><code class="language-shell"><span style="color: #000000">node -r ./tracing.js app.js</span>
+
+<a href="#run-your-application" id="run-your-application" style="color: inherit; text-decoration: none;">
+  <h4>Run Your Application</h4>
+</a>
+<pre><code class="language-shell"><span class="hl-0">node -r ./tracing.js app.js</span>
 </code></pre>
-				<p>The above example will emit auto-instrumented telemetry about your Node.js application to the console. For a more in-depth example, see the <a href="getting-started/README.md">Getting Started Guide</a>. For more information about automatic instrumentation see <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node">@opentelemetry/sdk-trace-node</a>, which provides auto-instrumentation for Node.js applications. If the automatic instrumentation does not suit your needs, or you would like to create manual traces, see <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base">@opentelemetry/sdk-trace-base</a></p>
-				<a href="#library-author" id="library-author" style="color: inherit; text-decoration: none;">
-					<h3>Library Author</h3>
-				</a>
-				<p>If you are a library author looking to build OpenTelemetry into your library, please see <a href="https://open-telemetry.github.io/opentelemetry-js">the documentation</a>. As a library author, it is important that you only depend on properties and methods published on the public API. If you use any properties or methods from the SDK that are not officially a part of the public API, your library may break if an <a href="#application-owner">Application Owner</a> uses a different SDK implementation.</p>
-				<a href="#supported-runtimes" id="supported-runtimes" style="color: inherit; text-decoration: none;">
-					<h2>Supported Runtimes</h2>
-				</a>
-				<table>
-					<thead>
-						<tr>
-							<th>Platform Version</th>
-							<th>Supported</th>
-						</tr>
-					</thead>
-					<tbody><tr>
-							<td>Node.JS <code>v16</code></td>
-							<td>✅</td>
-						</tr>
-						<tr>
-							<td>Node.JS <code>v14</code></td>
-							<td>✅</td>
-						</tr>
-						<tr>
-							<td>Node.JS <code>v12</code></td>
-							<td>✅</td>
-						</tr>
-						<tr>
-							<td>Node.JS <code>v10</code></td>
-							<td>✅</td>
-						</tr>
-						<tr>
-							<td>Node.JS <code>v8</code></td>
-							<td>See <a href="#node-support">Node Support</a> below</td>
-						</tr>
-						<tr>
-							<td>Web Browsers</td>
-							<td>✅ See <a href="#browser-support">Browser Support</a> below</td>
-						</tr>
-				</tbody></table>
-				<a href="#node-support" id="node-support" style="color: inherit; text-decoration: none;">
-					<h3>Node Support</h3>
-				</a>
-				<p>Automated tests are run using the latest release of each currently active version of Node.JS.
-					While Node.JS v8 is no longer supported by the Node.JS team, the latest version of Node.JS v8 is still included in our testing suite.
-				Please note that versions of Node.JS v8 prior to <code>v8.5.0</code> will NOT work, because OpenTelemetry Node depends on the <code>perf_hooks</code> module introduced in <code>v8.5.0</code></p>
-				<a href="#browser-support" id="browser-support" style="color: inherit; text-decoration: none;">
-					<h3>Browser Support</h3>
-				</a>
-				<p>Automated browser tests are run in the latest version of Headless Chrome.
-				There is currently no list of officially supported browsers, but OpenTelemetry is developed using standard web technologies with wide support and should work in currently supported versions of major browsers.</p>
-				<a href="#feature-status" id="feature-status" style="color: inherit; text-decoration: none;">
-					<h2>Feature Status</h2>
-				</a>
-				<table>
-					<thead>
-						<tr>
-							<th>Signal</th>
-							<th>API Status</th>
-							<th>SDK Status</th>
-						</tr>
-					</thead>
-					<tbody><tr>
-							<td>Tracing</td>
-							<td>Stable</td>
-							<td>Release Candidate</td>
-						</tr>
-						<tr>
-							<td>Metrics</td>
-							<td>Development</td>
-							<td>Development</td>
-						</tr>
-						<tr>
-							<td>Logs</td>
-							<td>Roadmap</td>
-							<td>Roadmap</td>
-						</tr>
-				</tbody></table>
-				<p>For a more detailed breakdown of feature support see the <a href="https://github.com/open-telemetry/opentelemetry-specification/blob/main/spec-compliance-matrix.md">specification compliance matrix</a>.</p>
-				<a href="#contributing" id="contributing" style="color: inherit; text-decoration: none;">
-					<h2>Contributing</h2>
-				</a>
-				<p>We&#39;d love your help!. Use tags <a href="https://github.com/open-telemetry/OpenTelemetry-js/issues?q=is%3Aissue+is%3Aopen+label%3Aup-for-grabs">up-for-grabs</a> and
-					<a href="https://github.com/open-telemetry/OpenTelemetry-js/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22">good first issue</a> to get started with the project. For
-					instructions to build and make changes to this project, see the
-				<a href="CONTRIBUTING.md">CONTRIBUTING</a> guide.</p>
-				<p>We have a weekly SIG meeting! See the <a href="https://github.com/open-telemetry/community#javascript-sdk">community page</a> for meeting details and notes.</p>
-				<p>Approvers (<a href="https://github.com/orgs/open-telemetry/teams/javascript-approvers">@open-telemetry/js-approvers</a>):</p>
-				<ul>
-					<li><a href="https://github.com/legendecas">Chengzhong Wu</a>, Alibaba</li>
-					<li><a href="https://github.com/Flarna">Gerhard Stöbich</a>, Dynatrace</li>
-					<li><a href="https://github.com/johnbley">John Bley</a>, Splunk</li>
-					<li><a href="https://github.com/markwolff">Mark Wolff</a>, Microsoft</li>
-					<li><a href="https://github.com/mwear">Matthew Wear</a>, LightStep</li>
-					<li><a href="https://github.com/naseemkullah">Naseem K. Ullah</a>, Transit</li>
-					<li><a href="https://github.com/MSNev">Neville Wylie</a>, Microsoft</li>
-					<li><a href="https://github.com/OlivierAlbertini">Olivier Albertini</a>, Ville de Montréal</li>
-					<li><a href="https://github.com/Rauno56">Rauno Viskus</a>, Splunk</li>
-				</ul>
-				<p><em>Find more about the approver role in <a href="https://github.com/open-telemetry/community/blob/main/community-membership.md#approver">community repository</a>.</em></p>
-				<p>Maintainers (<a href="https://github.com/orgs/open-telemetry/teams/javascript-maintainers">@open-telemetry/js-maintainers</a>):</p>
-				<ul>
-					<li><a href="https://github.com/obecny">Bartlomiej Obecny</a>, LightStep</li>
-					<li><a href="https://github.com/dyladan">Daniel Dyla</a>, Dynatrace</li>
-					<li><a href="https://github.com/vmarchaud">Valentin Marchaud</a>, Open Source Contributor</li>
-				</ul>
-				<p><em>Find more about the maintainer role in <a href="https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer">community repository</a>.</em></p>
-				<a href="#thanks-to-all-the-people-who-already-contributed" id="thanks-to-all-the-people-who-already-contributed" style="color: inherit; text-decoration: none;">
-					<h3>Thanks to all the people who already contributed</h3>
-				</a>
-				<a href="https://github.com/open-telemetry/opentelemetry-js/graphs/contributors">
-					<img src="https://contributors-img.web.app/image?repo=open-telemetry/opentelemetry-js" />
-				</a>
-				<a href="#thanks-to-all-previous-approvers-and-maintainers" id="thanks-to-all-previous-approvers-and-maintainers" style="color: inherit; text-decoration: none;">
-					<h3>Thanks to all previous approvers and maintainers</h3>
-				</a>
-				<ul>
-					<li><a href="https://github.com/dkhan">Daniel Khan</a>, Dynatrace, Maintainer</li>
-					<li><a href="https://github.com/mayurkale22">Mayur Kale</a>, Google, Maintainer</li>
-					<li><a href="https://github.com/bg451">Brandon Gonzalez</a>, LightStep, Approver</li>
-					<li><a href="https://github.com/rochdev">Roch Devost</a>, DataDog, Approver</li>
-				</ul>
-				<a href="#packages" id="packages" style="color: inherit; text-decoration: none;">
-					<h2>Packages</h2>
-				</a>
-				<a href="#api" id="api" style="color: inherit; text-decoration: none;">
-					<h3>API</h3>
-				</a>
-				<table>
-					<thead>
-						<tr>
-							<th>Package</th>
-							<th>Description</th>
-						</tr>
-					</thead>
-					<tbody><tr>
-							<td><a href="https://github.com/open-telemetry/opentelemetry-js-api">@opentelemetry/api</a></td>
-							<td>This package provides TypeScript interfaces, enums and no-op implementations for the OpenTelemetry core trace and metrics model. It is intended for use both on the server and in the browser.</td>
-						</tr>
-						<tr>
-							<td><a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-core">@opentelemetry/core</a></td>
-							<td>This package provides default and no-op implementations of the OpenTelemetry api for trace and metrics. It&#39;s intended for use both on the server and in the browser.</td>
-						</tr>
-				</tbody></table>
-				<a href="#implementation--sdks" id="implementation--sdks" style="color: inherit; text-decoration: none;">
-					<h3>Implementation / SDKs</h3>
-				</a>
-				<table>
-					<thead>
-						<tr>
-							<th>Package</th>
-							<th>Description</th>
-						</tr>
-					</thead>
-					<tbody><tr>
-							<td><a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base">@opentelemetry/sdk-trace-base</a></td>
-							<td>This module provides a full control over instrumentation and span creation. It doesn&#39;t load <a href="https://nodejs.org/api/async_hooks.html"><code>async_hooks</code></a> or any instrumentation by default. It is intended for use both on the server and in the browser.</td>
-						</tr>
-						<tr>
-							<td><a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-metrics-base">@opentelemetry/sdk-metrics-base</a></td>
-							<td>This module provides instruments and meters for reporting of time series data.</td>
-						</tr>
-						<tr>
-							<td><a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node">@opentelemetry/sdk-trace-node</a></td>
-							<td>This module provides automatic tracing for Node.js applications. It is intended for use on the server only.</td>
-						</tr>
-						<tr>
-							<td><a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-web">@opentelemetry/sdk-trace-web</a></td>
-							<td>This module provides automated instrumentation and tracing for Web applications. It is intended for use in the browser only.</td>
-						</tr>
-				</tbody></table>
-				<a href="#compatible-exporters" id="compatible-exporters" style="color: inherit; text-decoration: none;">
-					<h3>Compatible Exporters</h3>
-				</a>
-				<p>OpenTelemetry is vendor-agnostic and can upload data to any backend with various exporter implementations. Even though, OpenTelemetry provides support for many backends, vendors/users can also implement their own exporters for proprietary and unofficially supported backends.</p>
-				<p>See the <a href="https://opentelemetry.io/registry/?s=node.js">OpenTelemetry registry</a> for a list of exporters available.</p>
-				<a href="#instrumentations" id="instrumentations" style="color: inherit; text-decoration: none;">
-					<h3>Instrumentations</h3>
-				</a>
-				<p>OpenTelemetry can collect tracing data automatically using instrumentations. Vendors/Users can also create and use their own. Currently, OpenTelemetry supports automatic tracing for:</p>
-				<a href="#node-instrumentations" id="node-instrumentations" style="color: inherit; text-decoration: none;">
-					<h4>Node Instrumentations</h4>
-				</a>
-				<a href="#core" id="core" style="color: inherit; text-decoration: none;">
-					<h5>Core</h5>
-				</a>
-				<ul>
-					<li><a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-grpc">@opentelemetry/instrumentation-grpc</a></li>
-					<li><a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-http">@opentelemetry/instrumentation-http</a></li>
-				</ul>
-				<a href="#contrib" id="contrib" style="color: inherit; text-decoration: none;">
-					<h5>Contrib</h5>
-				</a>
-				<p>These plugins are hosted at <a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node">https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node</a></p>
-				<ul>
-					<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-mongodb">@opentelemetry/instrumentation-mongodb</a></li>
-					<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-mysql">@opentelemetry/instrumentation-mysql</a></li>
-					<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-pg">@opentelemetry/instrumentation-pg</a></li>
-					<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-redis">@opentelemetry/instrumentation-redis</a></li>
-					<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-ioredis">@opentelemetry/instrumentation-ioredis</a></li>
-					<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-express">@opentelemetry/instrumentation-express</a></li>
-					<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-dns">@opentelemetry/instrumentation-dns</a></li>
-					<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-hapi">@opentelemetry/instrumentation-hapi</a></li>
-					<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-instrumentation-koa">@opentelemetry/instrumentation-koa</a></li>
-				</ul>
-				<a href="#web-instrumentations" id="web-instrumentations" style="color: inherit; text-decoration: none;">
-					<h4>Web Instrumentations</h4>
-				</a>
-				<a href="#core-1" id="core-1" style="color: inherit; text-decoration: none;">
-					<h5>Core</h5>
-				</a>
-				<ul>
-					<li><a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-xml-http-request">@opentelemetry/instrumentation-xml-http-request</a></li>
-					<li><a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-fetch">@opentelemetry/instrumentation-fetch</a></li>
-				</ul>
-				<a href="#contrib-1" id="contrib-1" style="color: inherit; text-decoration: none;">
-					<h5>Contrib</h5>
-				</a>
-				<p>These instrumentations are hosted at <a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web">https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web</a></p>
-				<ul>
-					<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web/opentelemetry-instrumentation-document-load">@opentelemetry/instrumentation-document-load</a></li>
-					<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web/opentelemetry-instrumentation-user-interaction">@opentelemetry/instrumentation-user-interaction</a></li>
-				</ul>
-				<p>To request automatic tracing support for a module not on this list, please <a href="https://github.com/open-telemetry/opentelemetry-js/issues">file an issue</a>. Alternatively, you can <a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/instrumentation-guide.md">write an instrumentation yourself</a>.</p>
-				<a href="#shims" id="shims" style="color: inherit; text-decoration: none;">
-					<h3>Shims</h3>
-				</a>
-				<table>
-					<thead>
-						<tr>
-							<th>Package</th>
-							<th>Description</th>
-						</tr>
-					</thead>
-					<tbody><tr>
-							<td><a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-shim-opentracing">@opentelemetry/shim-opentracing</a></td>
-							<td>OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry</td>
-						</tr>
-				</tbody></table>
-				<a href="#upgrade-guidelines" id="upgrade-guidelines" style="color: inherit; text-decoration: none;">
-					<h2>Upgrade guidelines</h2>
-				</a>
-				<a href="#024x-to-x" id="024x-to-x" style="color: inherit; text-decoration: none;">
-					<h3>0.24.x to x</h3>
-				</a>
-				<ul>
-					<li>SDKs packages for trace and metrics has been renamed to have a consistent naming schema:<ul>
-							<li>@opentelemetry/tracing -&gt; @opentelemetry/sdk-trace-base</li>
-							<li>@opentelemetry/node -&gt; @opentelemetry/sdk-trace-node</li>
-							<li>@opentelemetry/web -&gt; @opentelemetry/sdk-trace-web</li>
-							<li>@opentelemetry/metrics -&gt; @opentelemetry/sdk-metrics-base</li>
-							<li>@opentelemetry/node-sdk -&gt; @opentelemetry/sdk-node</li>
-						</ul>
-					</li>
-				</ul>
-				<a href="#023x-to-024x" id="023x-to-024x" style="color: inherit; text-decoration: none;">
-					<h3>0.23.x to 0.24.x</h3>
-				</a>
-				<ul>
-					<li><code>ResourceAttributes</code> renamed to <code>SemanticResourceAttributes</code> in the <code>@opentelemetry/semantic-conventions</code> package</li>
-				</ul>
-				<a href="#019x-to-0200" id="019x-to-0200" style="color: inherit; text-decoration: none;">
-					<h3>0.19.x to 0.20.0</h3>
-				</a>
-				<ul>
-					<li><p><code>HttpBaggage</code> renamed to <code>HttpBaggagePropagator</code></p>
-					</li>
-					<li><p><code>HttpTraceContext</code> renamed to <code>HttpTraceContextPropagator</code></p>
-					</li>
-					<li><p><code>JaegerHttpTracePropagator</code> renamed to <code>JaegerPropagator</code></p>
-					</li>
-					<li><p><code>serviceName</code> configuration removed from Collector exporters. Use <code>service.name</code> Resource attribute instead.</p>
-					</li>
-				</ul>
-				<a href="#018x-to-0190" id="018x-to-0190" style="color: inherit; text-decoration: none;">
-					<h3>0.18.x to 0.19.0</h3>
-				</a>
-				<ul>
-					<li><p>API is now a peer dependency. This means that users will need to include <code>@opentelemetry/api</code> as a dependency of their project in order to use the SDK. NPM version 7+ (Node 15+) should do this automatically.</p>
-					</li>
-					<li><p>All plugins have been removed in favor of instrumentations.</p>
-					</li>
-					<li><p>The <code>@opentelemetry/propagator-b3</code> package previously exported three propagators: <code>B3Propagator</code>,<code>B3SinglePropagator</code>, and <code>B3MultiPropagator</code>, but now only exports the <code>B3Propagator</code>. It extracts b3 context in single and multi-header encodings, and injects context using the single-header encoding by default, but can be configured to inject context using the multi-header endcoding during construction: <code>new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER })</code>. If you were previously using the <code>B3SinglePropagator</code> or <code>B3MultiPropagator</code> directly, you should update your code to use the <code>B3Propagator</code> with the appropriate configuration. See the <a href="./packages/opentelemetry-propagator-b3/readme.md">readme</a> for full details and usage.</p>
-					</li>
-					<li><p>Sampling configuration via environment variable has changed. If you were using <code>OTEL_SAMPLING_PROBABILITY</code> then you should replace it with <code>OTEL_TRACES_SAMPLER=parentbased_traceidratio</code> and <code>OTEL_TRACES_SAMPLER_ARG=&lt;number&gt;</code> where <code>&lt;number&gt;</code> is a number in the [0..1] range, e.g. &quot;0.25&quot;. Default is 1.0 if unset.</p>
-					</li>
-				</ul>
-				<a href="#0170-to-0180" id="0170-to-0180" style="color: inherit; text-decoration: none;">
-					<h3>0.17.0 to 0.18.0</h3>
-				</a>
-				<ul>
-					<li><code>diag.setLogLevel</code> is removed and LogLevel can be set by an optional second parameter to <code>setLogger</code></li>
-				</ul>
-				<p><a href="https://github.com/open-telemetry/opentelemetry-js/pull/1975">PR-1975</a></p>
-				<ul>
-					<li>Breaking change - The resulting resource MUST have all attributes that are on any of the two input resources. If a key exists on both the old and updating resource, the value of the updating resource MUST be picked - previously it was opposite.</li>
-				</ul>
-				<a href="#0160-to-0170" id="0160-to-0170" style="color: inherit; text-decoration: none;">
-					<h3>0.16.0 to 0.17.0</h3>
-				</a>
-				<p><a href="https://github.com/open-telemetry/opentelemetry-js/pull/1880">PR-1880</a> feat(diag-logger): introduce a new global level api.diag for internal diagnostic logging</p>
-				<p><a href="https://github.com/open-telemetry/opentelemetry-js/pull/1925">PR-1925</a> feat(diag-logger): part 2 - breaking changes - remove api.Logger, api.NoopLogger, core.LogLevel, core.ConsoleLogger</p>
-				<ul>
-					<li>These PR&#39;s remove the previous <code>Logger</code> and <code>LogLevel</code> implementations and change the way you should use the replacement <code>DiagLogger</code> and <code>DiagLogLevel</code>, below are simple examples of how to change your existing usages.</li>
-				</ul>
-				<a href="#setting-the-global-diagnostic-logger" id="setting-the-global-diagnostic-logger" style="color: inherit; text-decoration: none;">
-					<h4>Setting the global diagnostic logger</h4>
-				</a>
-				<p>The new global <a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-api/src/api/diag.ts#L32"><code>api.diag</code></a> provides the ability to set the global diagnostic logger <code>setLogger()</code> and logging level <code>setLogLevel()</code>, it is also a <code>DiagLogger</code> implementation and should be directly to log diagnostic messages.</p>
-				<p>All included logger references have been removed in preference to using the global <code>api.diag</code> directly, so you no longer need to pass around the logger instance via function parameters or included as part of the configuration for a component.</p>
-				<pre><code class="language-javascript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">diag</span><span style="color: #000000">, </span><span style="color: #001080">DiagConsoleLogger</span><span style="color: #000000">, </span><span style="color: #001080">DiagLogLevel</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;@opentelemetry/api&quot;</span><span style="color: #000000">;</span>
-<span style="color: #008000">// Setting the default Global logger to use the Console</span>
-<span style="color: #008000">// And optionally change the logging level (Defaults to INFO)</span>
-<span style="color: #001080">diag</span><span style="color: #000000">.</span><span style="color: #795E26">setLogger</span><span style="color: #000000">(</span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">DiagConsoleLogger</span><span style="color: #000000">(), </span><span style="color: #001080">DiagLogLevel</span><span style="color: #000000">.</span><span style="color: #0070C1">ERROR</span><span style="color: #000000">)</span>
+<p>The above example will emit auto-instrumented telemetry about your Node.js application to the console. For a more in-depth example, see the <a href="https://opentelemetry.io/docs/js/getting-started/">Getting Started Guide</a>. For more information about automatic instrumentation see <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node">@opentelemetry/sdk-trace-node</a>, which provides auto-instrumentation for Node.js applications. If the automatic instrumentation does not suit your needs, or you would like to create manual traces, see <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base">@opentelemetry/sdk-trace-base</a></p>
+
+<a href="#library-author" id="library-author" style="color: inherit; text-decoration: none;">
+  <h3>Library Author</h3>
+</a>
+<p>If you are a library author looking to build OpenTelemetry into your library, please see <a href="https://open-telemetry.github.io/opentelemetry-js">the documentation</a>. As a library author, it is important that you only depend on properties and methods published on the public API. If you use any properties or methods from the SDK that are not officially a part of the public API, your library may break if an <a href="#application-owner">Application Owner</a> uses a different SDK implementation.</p>
+
+<a href="#supported-runtimes" id="supported-runtimes" style="color: inherit; text-decoration: none;">
+  <h2>Supported Runtimes</h2>
+</a>
+<table>
+<thead>
+<tr>
+<th>Platform Version</th>
+<th>Supported</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Node.JS <code>v16</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Node.JS <code>v14</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Node.JS <code>v12</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Node.JS <code>v10</code></td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Node.JS <code>v8</code></td>
+<td>See <a href="#node-support">Node Support</a> below</td>
+</tr>
+<tr>
+<td>Web Browsers</td>
+<td>✅ See <a href="#browser-support">Browser Support</a> below</td>
+</tr>
+</tbody></table>
+
+<a href="#node-support" id="node-support" style="color: inherit; text-decoration: none;">
+  <h3>Node Support</h3>
+</a>
+<p>Automated tests are run using the latest release of each currently active version of Node.JS.
+While Node.JS v8 is no longer supported by the Node.JS team, the latest version of Node.JS v8 is still included in our testing suite.
+Please note that versions of Node.JS v8 prior to <code>v8.5.0</code> will NOT work, because OpenTelemetry Node depends on the <code>perf_hooks</code> module introduced in <code>v8.5.0</code></p>
+
+<a href="#browser-support" id="browser-support" style="color: inherit; text-decoration: none;">
+  <h3>Browser Support</h3>
+</a>
+<p>Automated browser tests are run in the latest version of Headless Chrome.
+There is currently no list of officially supported browsers, but OpenTelemetry is developed using standard web technologies with wide support and should work in currently supported versions of major browsers.</p>
+
+<a href="#feature-status" id="feature-status" style="color: inherit; text-decoration: none;">
+  <h2>Feature Status</h2>
+</a>
+<table>
+<thead>
+<tr>
+<th>Signal</th>
+<th>API Status</th>
+<th>SDK Status</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Tracing</td>
+<td>Stable</td>
+<td>Release Candidate</td>
+</tr>
+<tr>
+<td>Metrics</td>
+<td>Development</td>
+<td>Development</td>
+</tr>
+<tr>
+<td>Logs</td>
+<td>Roadmap</td>
+<td>Roadmap</td>
+</tr>
+</tbody></table>
+<p>For a more detailed breakdown of feature support see the <a href="https://github.com/open-telemetry/opentelemetry-specification/blob/main/spec-compliance-matrix.md">specification compliance matrix</a>.</p>
+
+<a href="#contributing" id="contributing" style="color: inherit; text-decoration: none;">
+  <h2>Contributing</h2>
+</a>
+<p>We&#39;d love your help!. Use tags <a href="https://github.com/open-telemetry/OpenTelemetry-js/issues?q=is%3Aissue+is%3Aopen+label%3Aup-for-grabs">up-for-grabs</a> and
+<a href="https://github.com/open-telemetry/OpenTelemetry-js/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22">good first issue</a> to get started with the project. For
+instructions to build and make changes to this project, see the
+<a href="CONTRIBUTING.md">CONTRIBUTING</a> guide.</p>
+<p>We have a weekly SIG meeting! See the <a href="https://github.com/open-telemetry/community#javascript-sdk">community page</a> for meeting details and notes.</p>
+<p>Approvers (<a href="https://github.com/orgs/open-telemetry/teams/javascript-approvers">@open-telemetry/js-approvers</a>):</p>
+<ul>
+<li><a href="https://github.com/legendecas">Chengzhong Wu</a>, Alibaba</li>
+<li><a href="https://github.com/Flarna">Gerhard Stöbich</a>, Dynatrace</li>
+<li><a href="https://github.com/johnbley">John Bley</a>, Splunk</li>
+<li><a href="https://github.com/markwolff">Mark Wolff</a>, Microsoft</li>
+<li><a href="https://github.com/mwear">Matthew Wear</a>, LightStep</li>
+<li><a href="https://github.com/naseemkullah">Naseem K. Ullah</a>, Transit</li>
+<li><a href="https://github.com/MSNev">Neville Wylie</a>, Microsoft</li>
+<li><a href="https://github.com/OlivierAlbertini">Olivier Albertini</a>, Ville de Montréal</li>
+<li><a href="https://github.com/Rauno56">Rauno Viskus</a>, Splunk</li>
+</ul>
+<p><em>Find more about the approver role in <a href="https://github.com/open-telemetry/community/blob/main/community-membership.md#approver">community repository</a>.</em></p>
+<p>Maintainers (<a href="https://github.com/orgs/open-telemetry/teams/javascript-maintainers">@open-telemetry/js-maintainers</a>):</p>
+<ul>
+<li><a href="https://github.com/obecny">Bartlomiej Obecny</a>, LightStep</li>
+<li><a href="https://github.com/dyladan">Daniel Dyla</a>, Dynatrace</li>
+<li><a href="https://github.com/vmarchaud">Valentin Marchaud</a>, Open Source Contributor</li>
+</ul>
+<p><em>Find more about the maintainer role in <a href="https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer">community repository</a>.</em></p>
+
+<a href="#thanks-to-all-the-people-who-already-contributed" id="thanks-to-all-the-people-who-already-contributed" style="color: inherit; text-decoration: none;">
+  <h3>Thanks to all the people who already contributed</h3>
+</a>
+<a href="https://github.com/open-telemetry/opentelemetry-js/graphs/contributors">
+  <img src="https://contributors-img.web.app/image?repo=open-telemetry/opentelemetry-js" />
+</a>
+
+
+<a href="#thanks-to-all-previous-approvers-and-maintainers" id="thanks-to-all-previous-approvers-and-maintainers" style="color: inherit; text-decoration: none;">
+  <h3>Thanks to all previous approvers and maintainers</h3>
+</a>
+<ul>
+<li><a href="https://github.com/dkhan">Daniel Khan</a>, Dynatrace, Maintainer</li>
+<li><a href="https://github.com/mayurkale22">Mayur Kale</a>, Google, Maintainer</li>
+<li><a href="https://github.com/bg451">Brandon Gonzalez</a>, LightStep, Approver</li>
+<li><a href="https://github.com/rochdev">Roch Devost</a>, DataDog, Approver</li>
+</ul>
+
+<a href="#packages" id="packages" style="color: inherit; text-decoration: none;">
+  <h2>Packages</h2>
+</a>
+
+<a href="#api" id="api" style="color: inherit; text-decoration: none;">
+  <h3>API</h3>
+</a>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>[@opentelemetry/api][otel-api]</td>
+<td>This package provides TypeScript interfaces, enums and no-op implementations for the OpenTelemetry core trace and metrics model. It is intended for use both on the server and in the browser.</td>
+</tr>
+<tr>
+<td>[@opentelemetry/core][otel-core]</td>
+<td>This package provides default and no-op implementations of the OpenTelemetry api for trace and metrics. It&#39;s intended for use both on the server and in the browser.</td>
+</tr>
+</tbody></table>
+
+<a href="#implementation--sdks" id="implementation--sdks" style="color: inherit; text-decoration: none;">
+  <h3>Implementation / SDKs</h3>
+</a>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>[@opentelemetry/sdk-trace-base][otel-tracing]</td>
+<td>This module provides a full control over instrumentation and span creation. It doesn&#39;t load <a href="https://nodejs.org/api/async_hooks.html"><code>async_hooks</code></a> or any instrumentation by default. It is intended for use both on the server and in the browser.</td>
+</tr>
+<tr>
+<td>[@opentelemetry/sdk-metrics-base][otel-metrics]</td>
+<td>This module provides instruments and meters for reporting of time series data.</td>
+</tr>
+<tr>
+<td>[@opentelemetry/sdk-trace-node][otel-node]</td>
+<td>This module provides automatic tracing for Node.js applications. It is intended for use on the server only.</td>
+</tr>
+<tr>
+<td>[@opentelemetry/sdk-trace-web][otel-web]</td>
+<td>This module provides automated instrumentation and tracing for Web applications. It is intended for use in the browser only.</td>
+</tr>
+</tbody></table>
+
+<a href="#compatible-exporters" id="compatible-exporters" style="color: inherit; text-decoration: none;">
+  <h3>Compatible Exporters</h3>
+</a>
+<p>OpenTelemetry is vendor-agnostic and can upload data to any backend with various exporter implementations. Even though, OpenTelemetry provides support for many backends, vendors/users can also implement their own exporters for proprietary and unofficially supported backends.</p>
+<p>See the <a href="https://opentelemetry.io/registry/?language=js&amp;component=exporter#">OpenTelemetry registry</a> for a list of exporters available.</p>
+
+<a href="#instrumentations" id="instrumentations" style="color: inherit; text-decoration: none;">
+  <h3>Instrumentations</h3>
+</a>
+<p>OpenTelemetry can collect tracing data automatically using instrumentations. Vendors/Users can also create and use their own. Currently, OpenTelemetry supports automatic tracing for:</p>
+
+<a href="#node-instrumentations" id="node-instrumentations" style="color: inherit; text-decoration: none;">
+  <h4>Node Instrumentations</h4>
+</a>
+
+<a href="#core" id="core" style="color: inherit; text-decoration: none;">
+  <h5>Core</h5>
+</a>
+<ul>
+<li><a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-grpc">@opentelemetry/instrumentation-grpc</a></li>
+<li><a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-http">@opentelemetry/instrumentation-http</a></li>
+</ul>
+
+<a href="#contrib" id="contrib" style="color: inherit; text-decoration: none;">
+  <h5>Contrib</h5>
+</a>
+<p>These plugins are hosted at <a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node">https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node</a></p>
+<ul>
+<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-mongodb">@opentelemetry/instrumentation-mongodb</a></li>
+<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-mysql">@opentelemetry/instrumentation-mysql</a></li>
+<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-pg">@opentelemetry/instrumentation-pg</a></li>
+<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-redis">@opentelemetry/instrumentation-redis</a></li>
+<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-ioredis">@opentelemetry/instrumentation-ioredis</a></li>
+<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-express">@opentelemetry/instrumentation-express</a></li>
+<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-dns">@opentelemetry/instrumentation-dns</a></li>
+<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-hapi">@opentelemetry/instrumentation-hapi</a></li>
+<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/node/opentelemetry-instrumentation-koa">@opentelemetry/instrumentation-koa</a></li>
+</ul>
+
+<a href="#web-instrumentations" id="web-instrumentations" style="color: inherit; text-decoration: none;">
+  <h4>Web Instrumentations</h4>
+</a>
+
+<a href="#core-1" id="core-1" style="color: inherit; text-decoration: none;">
+  <h5>Core</h5>
+</a>
+<ul>
+<li><a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-xml-http-request">@opentelemetry/instrumentation-xml-http-request</a></li>
+<li><a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-fetch">@opentelemetry/instrumentation-fetch</a></li>
+</ul>
+
+<a href="#contrib-1" id="contrib-1" style="color: inherit; text-decoration: none;">
+  <h5>Contrib</h5>
+</a>
+<p>These instrumentations are hosted at <a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web">https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web</a></p>
+<ul>
+<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/web/opentelemetry-instrumentation-document-load">@opentelemetry/instrumentation-document-load</a></li>
+<li><a href="https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/web/opentelemetry-instrumentation-user-interaction">@opentelemetry/instrumentation-user-interaction</a></li>
+</ul>
+<p>To request automatic tracing support for a module not on this list, please <a href="https://github.com/open-telemetry/opentelemetry-js/issues">file an issue</a>. Alternatively, you can <a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/instrumentation-guide.md">write an instrumentation yourself</a>.</p>
+
+<a href="#shims" id="shims" style="color: inherit; text-decoration: none;">
+  <h3>Shims</h3>
+</a>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>[@opentelemetry/shim-opentracing][otel-shim-opentracing]</td>
+<td>OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry</td>
+</tr>
+</tbody></table>
+
+<a href="#upgrade-guidelines" id="upgrade-guidelines" style="color: inherit; text-decoration: none;">
+  <h2>Upgrade guidelines</h2>
+</a>
+
+<a href="#026x-to-027x" id="026x-to-027x" style="color: inherit; text-decoration: none;">
+  <h3>0.26.x to 0.27.x</h3>
+</a>
+<p>Metric and trace exporters are split into separate packages:</p>
+<ul>
+<li><code>@opentelemetry/exporter-otlp-http</code> =&gt; <code>@opentelemetry/exporter-trace-otlp-http</code> and <code>@opentelemetry/exporter-metrics-otlp-http</code></li>
+<li><code>@opentelemetry/exporter-otlp-grpc</code> =&gt; <code>@opentelemetry/exporter-trace-otlp-grpc</code> and <code>@opentelemetry/exporter-metrics-otlp-grpc</code></li>
+<li><code>@opentelemetry/exporter-otlp-proto</code> =&gt; <code>@opentelemetry/exporter-trace-otlp-proto</code> and <code>@opentelemetry/exporter-metrics-otlp-proto</code></li>
+</ul>
+<p>Metric types are renamed:</p>
+<ul>
+<li><code>@openetelemetry/api-metrics</code><ul>
+<li><code>Meter</code><ul>
+<li><code>createValueRecorder</code> =&gt; <code>createHistogram</code></li>
+<li><code>createValueObserver</code> =&gt; <code>createObservableGauge</code></li>
+<li><code>createSumObserver</code> =&gt; <code>createObservableCounter</code></li>
+<li><code>createUpDownSumObserver</code> =&gt; <code>createObservableUpDownCounter</code></li>
+</ul>
+</li>
+<li><code>ValueRecorder</code> =&gt; <code>Histogram</code></li>
+<li><code>ValueObserver</code> =&gt; <code>ObservableGauge</code></li>
+<li><code>SumObserver</code> =&gt; <code>ObservableCounter</code></li>
+<li><code>UpDownSumObserver</code> =&gt; <code>ObservableUpDownCounter</code></li>
+<li><code>ObserverResult</code> =&gt; <code>ObservableResult</code></li>
+<li><code>Observation.observer</code> =&gt; <code>Observation.observable</code></li>
+</ul>
+</li>
+<li><code>@opentelemetry/sdk-metrics-base</code><ul>
+<li><code>MetricKind</code><ul>
+<li><code>VALUE_RECORDER</code> =&gt; <code>HISTOGRAM</code></li>
+<li><code>SUM_OBSERVER</code> =&gt; <code>OBSERVABLE_COUNTER</code></li>
+<li><code>UP_DOWN_SUM_OBSERVER</code> =&gt; <code>OBSERVABLE_UP_DOWN_COUNTER</code></li>
+<li><code>VALUE_OBSERVER</code> =&gt; <code>OBSERVABLE_GAUGE</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<a href="#025x-to-1xy" id="025x-to-1xy" style="color: inherit; text-decoration: none;">
+  <h3>0.25.x to 1.x.y</h3>
+</a>
+<p>Collector exporter packages and types are renamed:</p>
+<ul>
+<li><code>@opentelemetry/exporter-collector</code> =&gt; <code>@opentelemetry/exporter-otlp-http</code><ul>
+<li><code>CollectorExporterBase</code> =&gt; <code>OTLPExporterBase</code></li>
+<li><code>CollectorTraceExporter</code> =&gt; <code>OTLPTraceExporter</code></li>
+<li><code>CollectorMetricExporter</code> =&gt; <code>OTLPMetricExporter</code></li>
+<li><code>CollectorExporterBrowserBase</code> =&gt; <code>OTLPExporterBrowserBase</code></li>
+<li><code>CollectorExporterNodeBase</code> =&gt; <code>OTLPExporterNodeBase</code></li>
+<li><code>CollectorExporterConfigBase</code> =&gt; <code>OTLPExporterConfigBase</code></li>
+<li><code>CollectorExporterError</code> =&gt; <code>OTLPExporterError</code></li>
+<li><code>COLLECTOR_SPAN_KIND_MAPPING</code> =&gt; <code>OTLP_SPAN_KIND_MAPPING</code></li>
+<li><code>collectorTypes</code> =&gt; <code>otlpTypes</code></li>
+</ul>
+</li>
+<li><code>@opentelemetry/exporter-collector-grpc</code> =&gt; <code>@opentelemetry/exporter-otlp-grpc</code><ul>
+<li><code>CollectorTraceExporter</code> =&gt; <code>OTLPTraceExporter</code></li>
+<li><code>CollectorMetricExporter</code> =&gt; <code>OTLPMetricExporter</code></li>
+<li><code>CollectorExporterConfigNode</code> =&gt; <code>OTLPExporterConfigNode</code></li>
+</ul>
+</li>
+<li><code>@opentelemetry/exporter-collector-proto</code> =&gt; <code>@opentelemetry/exporter-otlp-proto</code><ul>
+<li><code>CollectorExporterNodeBase</code> =&gt; <code>OTLPExporterNodeBase</code></li>
+<li><code>CollectorMetricExporter</code> =&gt; <code>OTLPMetricExporter</code></li>
+<li><code>CollectorTraceExporter</code> =&gt; <code>OTLPTraceExporter</code></li>
+</ul>
+</li>
+<li>W3C propagators in @opentelemetry/core were renamed<ul>
+<li><code>HttpTraceContextPropagator</code> -&gt; <code>W3CTraceContextPropagator</code></li>
+<li><code>HttpBaggagePropagator</code> -&gt; <code>W3CBaggagePropagator</code></li>
+</ul>
+</li>
+</ul>
+
+<a href="#024x-to-025x" id="024x-to-025x" style="color: inherit; text-decoration: none;">
+  <h3>0.24.x to 0.25.x</h3>
+</a>
+<ul>
+<li>SDKs packages for trace and metrics has been renamed to have a consistent naming schema:<ul>
+<li>@opentelemetry/tracing -&gt; @opentelemetry/sdk-trace-base</li>
+<li>@opentelemetry/node -&gt; @opentelemetry/sdk-trace-node</li>
+<li>@opentelemetry/web -&gt; @opentelemetry/sdk-trace-web</li>
+<li>@opentelemetry/metrics -&gt; @opentelemetry/sdk-metrics-base</li>
+<li>@opentelemetry/node-sdk -&gt; @opentelemetry/sdk-node</li>
+</ul>
+</li>
+</ul>
+
+<a href="#023x-to-024x" id="023x-to-024x" style="color: inherit; text-decoration: none;">
+  <h3>0.23.x to 0.24.x</h3>
+</a>
+<ul>
+<li><code>ResourceAttributes</code> renamed to <code>SemanticResourceAttributes</code> in the <code>@opentelemetry/semantic-conventions</code> package</li>
+</ul>
+
+<a href="#019x-to-0200" id="019x-to-0200" style="color: inherit; text-decoration: none;">
+  <h3>0.19.x to 0.20.0</h3>
+</a>
+<ul>
+<li><p><code>HttpBaggage</code> renamed to <code>HttpBaggagePropagator</code></p>
+</li>
+<li><p><code>HttpTraceContext</code> renamed to <code>HttpTraceContextPropagator</code></p>
+</li>
+<li><p><code>JaegerHttpTracePropagator</code> renamed to <code>JaegerPropagator</code></p>
+</li>
+<li><p><code>serviceName</code> configuration removed from Collector exporters. Use <code>service.name</code> Resource attribute instead.</p>
+</li>
+</ul>
+
+<a href="#018x-to-0190" id="018x-to-0190" style="color: inherit; text-decoration: none;">
+  <h3>0.18.x to 0.19.0</h3>
+</a>
+<ul>
+<li><p>API is now a peer dependency. This means that users will need to include <code>@opentelemetry/api</code> as a dependency of their project in order to use the SDK. NPM version 7+ (Node 15+) should do this automatically.</p>
+</li>
+<li><p>All plugins have been removed in favor of instrumentations.</p>
+</li>
+<li><p>The <code>@opentelemetry/propagator-b3</code> package previously exported three propagators: <code>B3Propagator</code>,<code>B3SinglePropagator</code>, and <code>B3MultiPropagator</code>, but now only exports the <code>B3Propagator</code>. It extracts b3 context in single and multi-header encodings, and injects context using the single-header encoding by default, but can be configured to inject context using the multi-header endcoding during construction: <code>new B3Propagator({ injectEncoding: B3InjectEncoding.MULTI_HEADER })</code>. If you were previously using the <code>B3SinglePropagator</code> or <code>B3MultiPropagator</code> directly, you should update your code to use the <code>B3Propagator</code> with the appropriate configuration. See the <a href="./packages/opentelemetry-propagator-b3/readme.md">readme</a> for full details and usage.</p>
+</li>
+<li><p>Sampling configuration via environment variable has changed. If you were using <code>OTEL_SAMPLING_PROBABILITY</code> then you should replace it with <code>OTEL_TRACES_SAMPLER=parentbased_traceidratio</code> and <code>OTEL_TRACES_SAMPLER_ARG=&lt;number&gt;</code> where <code>&lt;number&gt;</code> is a number in the [0..1] range, e.g. &quot;0.25&quot;. Default is 1.0 if unset.</p>
+</li>
+</ul>
+
+<a href="#0170-to-0180" id="0170-to-0180" style="color: inherit; text-decoration: none;">
+  <h3>0.17.0 to 0.18.0</h3>
+</a>
+<ul>
+<li><code>diag.setLogLevel</code> is removed and LogLevel can be set by an optional second parameter to <code>setLogger</code></li>
+</ul>
+<p><a href="https://github.com/open-telemetry/opentelemetry-js/pull/1975">PR-1975</a></p>
+<ul>
+<li>Breaking change - The resulting resource MUST have all attributes that are on any of the two input resources. If a key exists on both the old and updating resource, the value of the updating resource MUST be picked - previously it was opposite.</li>
+</ul>
+
+<a href="#0160-to-0170" id="0160-to-0170" style="color: inherit; text-decoration: none;">
+  <h3>0.16.0 to 0.17.0</h3>
+</a>
+<p><a href="https://github.com/open-telemetry/opentelemetry-js/pull/1880">PR-1880</a> feat(diag-logger): introduce a new global level api.diag for internal diagnostic logging</p>
+<p><a href="https://github.com/open-telemetry/opentelemetry-js/pull/1925">PR-1925</a> feat(diag-logger): part 2 - breaking changes - remove api.Logger, api.NoopLogger, core.LogLevel, core.ConsoleLogger</p>
+<ul>
+<li>These PR&#39;s remove the previous <code>Logger</code> and <code>LogLevel</code> implementations and change the way you should use the replacement <code>DiagLogger</code> and <code>DiagLogLevel</code>, below are simple examples of how to change your existing usages.</li>
+</ul>
+
+<a href="#setting-the-global-diagnostic-logger" id="setting-the-global-diagnostic-logger" style="color: inherit; text-decoration: none;">
+  <h4>Setting the global diagnostic logger</h4>
+</a>
+<p>The new global <a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-api/src/api/diag.ts#L32"><code>api.diag</code></a> provides the ability to set the global diagnostic logger <code>setLogger()</code> and logging level <code>setLogLevel()</code>, it is also a <code>DiagLogger</code> implementation and should be directly to log diagnostic messages.</p>
+<p>All included logger references have been removed in preference to using the global <code>api.diag</code> directly, so you no longer need to pass around the logger instance via function parameters or included as part of the configuration for a component.</p>
+<pre><code class="language-javascript"><span class="hl-8">import</span><span class="hl-0"> { </span><span class="hl-6">diag</span><span class="hl-0">, </span><span class="hl-6">DiagConsoleLogger</span><span class="hl-0">, </span><span class="hl-6">DiagLogLevel</span><span class="hl-0"> } </span><span class="hl-8">from</span><span class="hl-0"> </span><span class="hl-2">&quot;@opentelemetry/api&quot;</span><span class="hl-0">;</span><br/><span class="hl-1">// Setting the default Global logger to use the Console</span><br/><span class="hl-1">// And optionally change the logging level (Defaults to INFO)</span><br/><span class="hl-6">diag</span><span class="hl-0">.</span><span class="hl-5">setLogger</span><span class="hl-0">(</span><span class="hl-3">new</span><span class="hl-0"> </span><span class="hl-5">DiagConsoleLogger</span><span class="hl-0">(), </span><span class="hl-6">DiagLogLevel</span><span class="hl-0">.</span><span class="hl-4">ERROR</span><span class="hl-0">)</span>
 </code></pre>
-				<a href="#using-the-logger-anywhere-in-the-code" id="using-the-logger-anywhere-in-the-code" style="color: inherit; text-decoration: none;">
-					<h4>Using the logger anywhere in the code</h4>
-				</a>
-				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">diag</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;@opentelemetry/api&quot;</span><span style="color: #000000">;</span>
 
-<span style="color: #008000">// Remove or make optional the parameter and don&#039;t use it.</span>
-<span style="color: #AF00DB">export</span><span style="color: #000000"> </span><span style="color: #0000FF">function</span><span style="color: #000000"> </span><span style="color: #795E26">MyFunction</span><span style="color: #000000">() {</span>
-<span style="color: #000000">  </span><span style="color: #001080">diag</span><span style="color: #000000">.</span><span style="color: #795E26">debug</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;...&quot;</span><span style="color: #000000">);</span>
-<span style="color: #000000">  </span><span style="color: #001080">diag</span><span style="color: #000000">.</span><span style="color: #795E26">info</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;...&quot;</span><span style="color: #000000">);</span>
-<span style="color: #000000">  </span><span style="color: #001080">diag</span><span style="color: #000000">.</span><span style="color: #795E26">warn</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;...&quot;</span><span style="color: #000000">);</span>
-<span style="color: #000000">  </span><span style="color: #001080">diag</span><span style="color: #000000">.</span><span style="color: #795E26">error</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;...&quot;</span><span style="color: #000000">);</span>
-<span style="color: #000000">  </span><span style="color: #001080">diag</span><span style="color: #000000">.</span><span style="color: #795E26">verbose</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;..&quot;</span><span style="color: #000000">);</span>
-<span style="color: #000000">}</span>
-
+<a href="#using-the-logger-anywhere-in-the-code" id="using-the-logger-anywhere-in-the-code" style="color: inherit; text-decoration: none;">
+  <h4>Using the logger anywhere in the code</h4>
+</a>
+<pre><code class="language-typescript"><span class="hl-8">import</span><span class="hl-0"> { </span><span class="hl-6">diag</span><span class="hl-0"> } </span><span class="hl-8">from</span><span class="hl-0"> </span><span class="hl-2">&quot;@opentelemetry/api&quot;</span><span class="hl-0">;</span><br/><br/><span class="hl-1">// Remove or make optional the parameter and don&#39;t use it.</span><br/><span class="hl-8">export</span><span class="hl-0"> </span><span class="hl-3">function</span><span class="hl-0"> </span><span class="hl-5">MyFunction</span><span class="hl-0">() {</span><br/><span class="hl-0">  </span><span class="hl-6">diag</span><span class="hl-0">.</span><span class="hl-5">debug</span><span class="hl-0">(</span><span class="hl-2">&quot;...&quot;</span><span class="hl-0">);</span><br/><span class="hl-0">  </span><span class="hl-6">diag</span><span class="hl-0">.</span><span class="hl-5">info</span><span class="hl-0">(</span><span class="hl-2">&quot;...&quot;</span><span class="hl-0">);</span><br/><span class="hl-0">  </span><span class="hl-6">diag</span><span class="hl-0">.</span><span class="hl-5">warn</span><span class="hl-0">(</span><span class="hl-2">&quot;...&quot;</span><span class="hl-0">);</span><br/><span class="hl-0">  </span><span class="hl-6">diag</span><span class="hl-0">.</span><span class="hl-5">error</span><span class="hl-0">(</span><span class="hl-2">&quot;...&quot;</span><span class="hl-0">);</span><br/><span class="hl-0">  </span><span class="hl-6">diag</span><span class="hl-0">.</span><span class="hl-5">verbose</span><span class="hl-0">(</span><span class="hl-2">&quot;..&quot;</span><span class="hl-0">);</span><br/><span class="hl-0">}</span><br/>
 </code></pre>
-				<a href="#setting-the-logger-back-to-a-noop" id="setting-the-logger-back-to-a-noop" style="color: inherit; text-decoration: none;">
-					<h4>Setting the logger back to a noop</h4>
-				</a>
-				<pre><code class="language-typescript"><span style="color: #AF00DB">import</span><span style="color: #000000"> { </span><span style="color: #001080">diag</span><span style="color: #000000"> } </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;@opentelemetry/api&quot;</span><span style="color: #000000">;</span>
-<span style="color: #001080">diag</span><span style="color: #000000">.</span><span style="color: #795E26">setLogger</span><span style="color: #000000">();</span>
 
+<a href="#setting-the-logger-back-to-a-noop" id="setting-the-logger-back-to-a-noop" style="color: inherit; text-decoration: none;">
+  <h4>Setting the logger back to a noop</h4>
+</a>
+<pre><code class="language-typescript"><span class="hl-8">import</span><span class="hl-0"> { </span><span class="hl-6">diag</span><span class="hl-0"> } </span><span class="hl-8">from</span><span class="hl-0"> </span><span class="hl-2">&quot;@opentelemetry/api&quot;</span><span class="hl-0">;</span><br/><span class="hl-6">diag</span><span class="hl-0">.</span><span class="hl-5">setLogger</span><span class="hl-0">();</span><br/>
 </code></pre>
-				<p><a href="https://github.com/open-telemetry/opentelemetry-js/pull/1855">PR-1855</a> Use instrumentation loader to load plugins and instrumentations</p>
-				<ul>
-					<li>Providers do no load the plugins anymore. Also PluginLoader has been removed from providers, use <code>registerInstrumentations</code> instead</li>
-				</ul>
-				<pre><code class="language-javascript"><span style="color: #008000">//Previously in node</span>
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">provider</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">NodeTracerProvider</span><span style="color: #000000">({</span>
-<span style="color: #000000">  </span><span style="color: #001080">plugins:</span><span style="color: #000000"> {</span>
-<span style="color: #000000">    </span><span style="color: #A31515">&#039;@grpc/grpc-js&#039;</span><span style="color: #001080">:</span><span style="color: #000000"> {</span>
-<span style="color: #000000">      </span><span style="color: #001080">enabled:</span><span style="color: #000000"> </span><span style="color: #0000FF">true</span><span style="color: #000000">,</span>
-<span style="color: #000000">      </span><span style="color: #001080">path:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@opentelemetry/plugin-grpc-js&#039;</span><span style="color: #000000">,</span>
-<span style="color: #000000">    },</span>
-<span style="color: #000000">  }</span>
-<span style="color: #000000">});</span>
-
-<span style="color: #008000">// Now</span>
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">provider</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">NodeTracerProvider</span><span style="color: #000000">();</span>
-<span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">registerInstrumentations</span><span style="color: #000000"> } = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;@opentelemetry/instrumentation&#039;</span><span style="color: #000000">);</span>
-<span style="color: #795E26">registerInstrumentations</span><span style="color: #000000">({</span>
-<span style="color: #000000">  </span><span style="color: #001080">instrumentations:</span><span style="color: #000000"> [</span>
-<span style="color: #000000">    {</span>
-<span style="color: #000000">      </span><span style="color: #001080">plugins:</span><span style="color: #000000"> {</span>
-<span style="color: #000000">        </span><span style="color: #A31515">&#039;@grpc/grpc-js&#039;</span><span style="color: #001080">:</span><span style="color: #000000"> {</span>
-<span style="color: #000000">          </span><span style="color: #001080">enabled:</span><span style="color: #000000"> </span><span style="color: #0000FF">true</span><span style="color: #000000">,</span>
-<span style="color: #000000">          </span><span style="color: #001080">path:</span><span style="color: #000000"> </span><span style="color: #A31515">&#039;@opentelemetry/plugin-grpc-js&#039;</span><span style="color: #000000">,</span>
-<span style="color: #000000">        },</span>
-<span style="color: #000000">      }</span>
-<span style="color: #000000">    }</span>
-<span style="color: #000000">  ],</span>
-<span style="color: #000000">  </span><span style="color: #001080">tracerProvider:</span><span style="color: #000000"> </span><span style="color: #001080">provider</span><span style="color: #000000">,</span>
-<span style="color: #000000">});</span>
-
-<span style="color: #008000">// or if you want to load only default instrumentations / plugins</span>
-<span style="color: #795E26">registerInstrumentations</span><span style="color: #000000">({</span>
-<span style="color: #000000">  </span><span style="color: #001080">tracerProvider:</span><span style="color: #000000"> </span><span style="color: #001080">provider</span><span style="color: #000000">,</span>
-<span style="color: #000000">});</span>
-
-<span style="color: #008000">//Previously in browser</span>
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">provider</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">WebTracerProvider</span><span style="color: #000000">({</span>
-<span style="color: #000000">  </span><span style="color: #001080">plugins:</span><span style="color: #000000"> [</span>
-<span style="color: #000000">    </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">DocumentLoad</span><span style="color: #000000">()</span>
-<span style="color: #000000">  ]</span>
-<span style="color: #000000">});</span>
-<span style="color: #008000">// Now</span>
-<span style="color: #0000FF">const</span><span style="color: #000000"> { </span><span style="color: #0070C1">registerInstrumentations</span><span style="color: #000000"> } = </span><span style="color: #795E26">require</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;@opentelemetry/instrumentation&#039;</span><span style="color: #000000">);</span>
-<span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">provider</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">WebTracerProvider</span><span style="color: #000000">();</span>
-<span style="color: #795E26">registerInstrumentations</span><span style="color: #000000">({</span>
-<span style="color: #000000">  </span><span style="color: #001080">instrumentations:</span><span style="color: #000000"> [</span>
-<span style="color: #000000">    </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">DocumentLoad</span><span style="color: #000000">(),</span>
-<span style="color: #000000">  ],</span>
-<span style="color: #000000">});</span>
+<p><a href="https://github.com/open-telemetry/opentelemetry-js/pull/1855">PR-1855</a> Use instrumentation loader to load plugins and instrumentations</p>
+<ul>
+<li>Providers do no load the plugins anymore. Also PluginLoader has been removed from providers, use <code>registerInstrumentations</code> instead</li>
+</ul>
+<pre><code class="language-javascript"><span class="hl-1">//Previously in node</span><br/><span class="hl-3">const</span><span class="hl-0"> </span><span class="hl-4">provider</span><span class="hl-0"> = </span><span class="hl-3">new</span><span class="hl-0"> </span><span class="hl-5">NodeTracerProvider</span><span class="hl-0">({</span><br/><span class="hl-0">  </span><span class="hl-6">plugins:</span><span class="hl-0"> {</span><br/><span class="hl-0">    </span><span class="hl-2">&#39;@grpc/grpc-js&#39;</span><span class="hl-6">:</span><span class="hl-0"> {</span><br/><span class="hl-0">      </span><span class="hl-6">enabled:</span><span class="hl-0"> </span><span class="hl-3">true</span><span class="hl-0">,</span><br/><span class="hl-0">      </span><span class="hl-6">path:</span><span class="hl-0"> </span><span class="hl-2">&#39;@opentelemetry/plugin-grpc-js&#39;</span><span class="hl-0">,</span><br/><span class="hl-0">    },</span><br/><span class="hl-0">  }</span><br/><span class="hl-0">});</span><br/><br/><span class="hl-1">// Now</span><br/><span class="hl-3">const</span><span class="hl-0"> </span><span class="hl-4">provider</span><span class="hl-0"> = </span><span class="hl-3">new</span><span class="hl-0"> </span><span class="hl-5">NodeTracerProvider</span><span class="hl-0">();</span><br/><span class="hl-3">const</span><span class="hl-0"> { </span><span class="hl-4">registerInstrumentations</span><span class="hl-0"> } = </span><span class="hl-5">require</span><span class="hl-0">(</span><span class="hl-2">&#39;@opentelemetry/instrumentation&#39;</span><span class="hl-0">);</span><br/><span class="hl-5">registerInstrumentations</span><span class="hl-0">({</span><br/><span class="hl-0">  </span><span class="hl-6">instrumentations:</span><span class="hl-0"> [</span><br/><span class="hl-0">    {</span><br/><span class="hl-0">      </span><span class="hl-6">plugins:</span><span class="hl-0"> {</span><br/><span class="hl-0">        </span><span class="hl-2">&#39;@grpc/grpc-js&#39;</span><span class="hl-6">:</span><span class="hl-0"> {</span><br/><span class="hl-0">          </span><span class="hl-6">enabled:</span><span class="hl-0"> </span><span class="hl-3">true</span><span class="hl-0">,</span><br/><span class="hl-0">          </span><span class="hl-6">path:</span><span class="hl-0"> </span><span class="hl-2">&#39;@opentelemetry/plugin-grpc-js&#39;</span><span class="hl-0">,</span><br/><span class="hl-0">        },</span><br/><span class="hl-0">      }</span><br/><span class="hl-0">    }</span><br/><span class="hl-0">  ],</span><br/><span class="hl-0">  </span><span class="hl-6">tracerProvider:</span><span class="hl-0"> </span><span class="hl-6">provider</span><span class="hl-0">,</span><br/><span class="hl-0">});</span><br/><br/><span class="hl-1">// or if you want to load only default instrumentations / plugins</span><br/><span class="hl-5">registerInstrumentations</span><span class="hl-0">({</span><br/><span class="hl-0">  </span><span class="hl-6">tracerProvider:</span><span class="hl-0"> </span><span class="hl-6">provider</span><span class="hl-0">,</span><br/><span class="hl-0">});</span><br/><br/><span class="hl-1">//Previously in browser</span><br/><span class="hl-3">const</span><span class="hl-0"> </span><span class="hl-4">provider</span><span class="hl-0"> = </span><span class="hl-3">new</span><span class="hl-0"> </span><span class="hl-5">WebTracerProvider</span><span class="hl-0">({</span><br/><span class="hl-0">  </span><span class="hl-6">plugins:</span><span class="hl-0"> [</span><br/><span class="hl-0">    </span><span class="hl-3">new</span><span class="hl-0"> </span><span class="hl-5">DocumentLoad</span><span class="hl-0">()</span><br/><span class="hl-0">  ]</span><br/><span class="hl-0">});</span><br/><span class="hl-1">// Now</span><br/><span class="hl-3">const</span><span class="hl-0"> { </span><span class="hl-4">registerInstrumentations</span><span class="hl-0"> } = </span><span class="hl-5">require</span><span class="hl-0">(</span><span class="hl-2">&#39;@opentelemetry/instrumentation&#39;</span><span class="hl-0">);</span><br/><span class="hl-3">const</span><span class="hl-0"> </span><span class="hl-4">provider</span><span class="hl-0"> = </span><span class="hl-3">new</span><span class="hl-0"> </span><span class="hl-5">WebTracerProvider</span><span class="hl-0">();</span><br/><span class="hl-5">registerInstrumentations</span><span class="hl-0">({</span><br/><span class="hl-0">  </span><span class="hl-6">instrumentations:</span><span class="hl-0"> [</span><br/><span class="hl-0">    </span><span class="hl-3">new</span><span class="hl-0"> </span><span class="hl-5">DocumentLoad</span><span class="hl-0">(),</span><br/><span class="hl-0">  ],</span><br/><span class="hl-0">});</span>
 </code></pre>
-				<ul>
-					<li><code>registerInstrumentations</code> supports loading old plugins and instrumentations together. It also supports setting tracer provider and meter provider on instrumentations</li>
-				</ul>
-				<p><a href="https://github.com/open-telemetry/opentelemetry-js/pull/1874">PR-1874</a> More specific API type names</p>
-				<p>Some types exported from <code>&quot;@opentelemetry/api&quot;</code> have been changed to be more specific.</p>
-				<ul>
-					<li><code>AttributeValue</code> renamed to <code>SpanAttributeValue</code></li>
-					<li><code>Attributes</code> renamed to <code>SpanAttributes</code></li>
-					<li><code>EntryTtl</code> renamed to <code>BaggageEntryTtl</code></li>
-					<li><code>EntryValue</code> renamed to <code>BaggageEntryValue</code></li>
-					<li><code>Status</code> renamed to <code>SpanStatus</code></li>
-					<li><code>StatusCode</code> renamed to <code>SpanStatusCode</code></li>
-				</ul>
-				<a href="#0150-to-0160" id="0150-to-0160" style="color: inherit; text-decoration: none;">
-					<h3>0.15.0 to 0.16.0</h3>
-				</a>
-				<p><a href="https://github.com/open-telemetry/opentelemetry-js/pull/1863">PR-1863</a> removed public attributes <code>keepAlive</code> and <code>httpAgentOptions</code> from nodejs <code>CollectorTraceExporter</code> and <code>CollectorMetricExporter</code></p>
-				<a href="#0140-to-0150" id="0140-to-0150" style="color: inherit; text-decoration: none;">
-					<h3>0.14.0 to 0.15.0</h3>
-				</a>
-				<p><a href="https://github.com/open-telemetry/opentelemetry-js/pull/1764">PR-1764</a> removed some APIs from <code>Tracer</code>:</p>
-				<ul>
-					<li><code>Tracer.getCurrentSpan()</code>: use <code>api.getSpan(api.context.active())</code></li>
-					<li><code>Tracer.withSpan(span)</code>: use <code>api.context.with(api.setSpan(api.context.active(), span))</code></li>
-					<li><code>Tracer.bind(target)</code>: use <code>api.context.bind(target)</code></li>
-				</ul>
-				<p><a href="https://github.com/open-telemetry/opentelemetry-js/pull/1797">PR-1797</a> chore!: split metrics into its own api package:</p>
-				<ul>
-					<li>Any references to <code>require(&quot;@opentelemetry/api&quot;).metrics</code> will need to be changed to <code>require(&quot;@opentelemetry/api-metrics&quot;).metrics</code></li>
-				</ul>
-				<p><a href="https://github.com/open-telemetry/opentelemetry-js/pull/1725">PR-1725</a> Use new gRPC default port</p>
-				<ul>
-					<li>The default port used by <code>@opentelemetry/exporter-collector-grpc</code> is changed from <code>55680</code> to <code>4317</code></li>
-				</ul>
-				<p><a href="https://github.com/open-telemetry/opentelemetry-js/pull/1749">PR-1749</a> chore: improve naming of span related context APIs</p>
-				<ul>
-					<li>Rename <code>[gs]etActiveSpan()</code> to <code>[gs]etSpan()</code></li>
-					<li>Rename <code>setExtractedSpanContext()</code> to <code>setSpanContext()</code></li>
-					<li>Rename <code>getParentSpanContext()</code> to <code>getSpanContext()</code></li>
-				</ul>
-				<a href="#useful-links" id="useful-links" style="color: inherit; text-decoration: none;">
-					<h2>Useful links</h2>
-				</a>
-				<ul>
-					<li>For more information on OpenTelemetry, visit: <a href="https://opentelemetry.io/">https://opentelemetry.io/</a></li>
-					<li>For help or feedback on this project, join us in <a href="https://github.com/open-telemetry/opentelemetry-js/discussions">GitHub Discussions</a></li>
-				</ul>
-				<a href="#license" id="license" style="color: inherit; text-decoration: none;">
-					<h2>License</h2>
-				</a>
-				<p>Apache 2.0 - See <a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE">LICENSE</a> for more information.</p>
-			</div>
-		</div>
-		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
-			<nav class="tsd-navigation primary">
-				<ul>
-					<li class=" ">
-						<a href="modules.html">Modules</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_opentelemetry_api_metrics.html">@opentelemetry/api-<wbr>metrics</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_opentelemetry_context_async_hooks.html">@opentelemetry/context-<wbr>async-<wbr>hooks</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_opentelemetry_context_zone_peer_dep.html">@opentelemetry/context-<wbr>zone-<wbr>peer-<wbr>dep</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_opentelemetry_core.html">@opentelemetry/core</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_opentelemetry_exporter_collector.html">@opentelemetry/exporter-<wbr>collector</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_opentelemetry_exporter_collector_grpc.html">@opentelemetry/exporter-<wbr>collector-<wbr>grpc</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_opentelemetry_exporter_collector_proto.html">@opentelemetry/exporter-<wbr>collector-<wbr>proto</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_opentelemetry_exporter_jaeger.html">@opentelemetry/exporter-<wbr>jaeger</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_opentelemetry_exporter_prometheus.html">@opentelemetry/exporter-<wbr>prometheus</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_opentelemetry_exporter_zipkin.html">@opentelemetry/exporter-<wbr>zipkin</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_opentelemetry_instrumentation.html">@opentelemetry/instrumentation</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_opentelemetry_instrumentation_fetch.html">@opentelemetry/instrumentation-<wbr>fetch</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_opentelemetry_instrumentation_grpc.html">@opentelemetry/instrumentation-<wbr>grpc</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_opentelemetry_instrumentation_http.html">@opentelemetry/instrumentation-<wbr>http</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_opentelemetry_instrumentation_xml_http_request.html">@opentelemetry/instrumentation-<wbr>xml-<wbr>http-<wbr>request</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_opentelemetry_propagator_b3.html">@opentelemetry/propagator-<wbr>b3</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_opentelemetry_propagator_jaeger.html">@opentelemetry/propagator-<wbr>jaeger</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_opentelemetry_resources.html">@opentelemetry/resources</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_opentelemetry_sdk_node.html">@opentelemetry/sdk-<wbr>node</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_opentelemetry_semantic_conventions.html">@opentelemetry/semantic-<wbr>conventions</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/_opentelemetry_shim_opentracing.html">@opentelemetry/shim-<wbr>opentracing</a>
-					</li>
-				</ul>
-			</nav>
-			<nav class="tsd-navigation secondary menu-sticky">
-				<ul class="before-current">
-				</ul>
-			</nav>
-		</div>
-	</div>
-</div>
-<footer class="with-border-bottom">
-	<div class="container">
-		<h2>Legend</h2>
-		<div class="tsd-legend-group">
-			<ul class="tsd-legend">
-				<li class="tsd-kind-namespace"><span class="tsd-kind-icon">Namespace</span></li>
-				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
-				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
-				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
-				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
-				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
-				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
-				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
-			</ul>
-		</div>
-	</div>
-</footer>
-<div class="container tsd-generator">
-	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
-</div>
-<div class="overlay"></div>
-<script src="assets/js/main.js"></script>
-</body>
-</html>
+<ul>
+<li><code>registerInstrumentations</code> supports loading old plugins and instrumentations together. It also supports setting tracer provider and meter provider on instrumentations</li>
+</ul>
+<p><a href="https://github.com/open-telemetry/opentelemetry-js/pull/1874">PR-1874</a> More specific API type names</p>
+<p>Some types exported from <code>&quot;@opentelemetry/api&quot;</code> have been changed to be more specific.</p>
+<ul>
+<li><code>AttributeValue</code> renamed to <code>SpanAttributeValue</code></li>
+<li><code>Attributes</code> renamed to <code>SpanAttributes</code></li>
+<li><code>EntryTtl</code> renamed to <code>BaggageEntryTtl</code></li>
+<li><code>EntryValue</code> renamed to <code>BaggageEntryValue</code></li>
+<li><code>Status</code> renamed to <code>SpanStatus</code></li>
+<li><code>StatusCode</code> renamed to <code>SpanStatusCode</code></li>
+</ul>
+
+<a href="#0150-to-0160" id="0150-to-0160" style="color: inherit; text-decoration: none;">
+  <h3>0.15.0 to 0.16.0</h3>
+</a>
+<p><a href="https://github.com/open-telemetry/opentelemetry-js/pull/1863">PR-1863</a> removed public attributes <code>keepAlive</code> and <code>httpAgentOptions</code> from nodejs <code>CollectorTraceExporter</code> and <code>CollectorMetricExporter</code></p>
+
+<a href="#0140-to-0150" id="0140-to-0150" style="color: inherit; text-decoration: none;">
+  <h3>0.14.0 to 0.15.0</h3>
+</a>
+<p><a href="https://github.com/open-telemetry/opentelemetry-js/pull/1764">PR-1764</a> removed some APIs from <code>Tracer</code>:</p>
+<ul>
+<li><code>Tracer.getCurrentSpan()</code>: use <code>api.getSpan(api.context.active())</code></li>
+<li><code>Tracer.withSpan(span)</code>: use <code>api.context.with(api.setSpan(api.context.active(), span))</code></li>
+<li><code>Tracer.bind(target)</code>: use <code>api.context.bind(target)</code></li>
+</ul>
+<p><a href="https://github.com/open-telemetry/opentelemetry-js/pull/1797">PR-1797</a> chore!: split metrics into its own api package:</p>
+<ul>
+<li>Any references to <code>require(&quot;@opentelemetry/api&quot;).metrics</code> will need to be changed to <code>require(&quot;@opentelemetry/api-metrics&quot;).metrics</code></li>
+</ul>
+<p><a href="https://github.com/open-telemetry/opentelemetry-js/pull/1725">PR-1725</a> Use new gRPC default port</p>
+<ul>
+<li>The default port used by <code>@opentelemetry/exporter-collector-grpc</code> is changed from <code>55680</code> to <code>4317</code></li>
+</ul>
+<p><a href="https://github.com/open-telemetry/opentelemetry-js/pull/1749">PR-1749</a> chore: improve naming of span related context APIs</p>
+<ul>
+<li>Rename <code>[gs]etActiveSpan()</code> to <code>[gs]etSpan()</code></li>
+<li>Rename <code>setExtractedSpanContext()</code> to <code>setSpanContext()</code></li>
+<li>Rename <code>getParentSpanContext()</code> to <code>getSpanContext()</code></li>
+</ul>
+
+<a href="#useful-links" id="useful-links" style="color: inherit; text-decoration: none;">
+  <h2>Useful links</h2>
+</a>
+<ul>
+<li>For more information on OpenTelemetry, visit: <a href="https://opentelemetry.io/">https://opentelemetry.io/</a></li>
+<li>For help or feedback on this project, join us in <a href="https://github.com/open-telemetry/opentelemetry-js/discussions">GitHub Discussions</a></li>
+</ul>
+
+<a href="#license" id="license" style="color: inherit; text-decoration: none;">
+  <h2>License</h2>
+</a>
+<p>Apache 2.0 - See <a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE">LICENSE</a> for more information.</p>
+</div></div><div class="col-4 col-menu menu-sticky-wrap menu-highlight"><nav class="tsd-navigation primary"><ul><li class="current"><a href="modules.html">Modules</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_api_metrics.html">@opentelemetry/api-<wbr/>metrics</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_context_async_hooks.html">@opentelemetry/context-<wbr/>async-<wbr/>hooks</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_context_zone_peer_dep.html">@opentelemetry/context-<wbr/>zone-<wbr/>peer-<wbr/>dep</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_core.html">@opentelemetry/core</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_exporter_jaeger.html">@opentelemetry/exporter-<wbr/>jaeger</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_exporter_metrics_otlp_grpc.html">@opentelemetry/exporter-<wbr/>metrics-<wbr/>otlp-<wbr/>grpc</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_exporter_metrics_otlp_http.html">@opentelemetry/exporter-<wbr/>metrics-<wbr/>otlp-<wbr/>http</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_exporter_metrics_otlp_proto.html">@opentelemetry/exporter-<wbr/>metrics-<wbr/>otlp-<wbr/>proto</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_exporter_prometheus.html">@opentelemetry/exporter-<wbr/>prometheus</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_exporter_trace_otlp_grpc.html">@opentelemetry/exporter-<wbr/>trace-<wbr/>otlp-<wbr/>grpc</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_exporter_trace_otlp_http.html">@opentelemetry/exporter-<wbr/>trace-<wbr/>otlp-<wbr/>http</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_exporter_trace_otlp_proto.html">@opentelemetry/exporter-<wbr/>trace-<wbr/>otlp-<wbr/>proto</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_exporter_zipkin.html">@opentelemetry/exporter-<wbr/>zipkin</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_instrumentation.html">@opentelemetry/instrumentation</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_instrumentation_fetch.html">@opentelemetry/instrumentation-<wbr/>fetch</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_instrumentation_grpc.html">@opentelemetry/instrumentation-<wbr/>grpc</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_instrumentation_http.html">@opentelemetry/instrumentation-<wbr/>http</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_instrumentation_xml_http_request.html">@opentelemetry/instrumentation-<wbr/>xml-<wbr/>http-<wbr/>request</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_propagator_b3.html">@opentelemetry/propagator-<wbr/>b3</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_propagator_jaeger.html">@opentelemetry/propagator-<wbr/>jaeger</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_resources.html">@opentelemetry/resources</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_sdk_metrics_base.html">@opentelemetry/sdk-<wbr/>metrics-<wbr/>base</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_sdk_node.html">@opentelemetry/sdk-<wbr/>node</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_sdk_trace_base.html">@opentelemetry/sdk-<wbr/>trace-<wbr/>base</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_sdk_trace_node.html">@opentelemetry/sdk-<wbr/>trace-<wbr/>node</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_sdk_trace_web.html">@opentelemetry/sdk-<wbr/>trace-<wbr/>web</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_semantic_conventions.html">@opentelemetry/semantic-<wbr/>conventions</a></li><li class=" tsd-kind-module"><a href="modules/_opentelemetry_shim_opentracing.html">@opentelemetry/shim-<wbr/>opentracing</a></li></ul></nav></div></div></div><footer class="with-border-bottom"><div class="container"><h2>Legend</h2><div class="tsd-legend-group"><ul class="tsd-legend"><li class="tsd-kind-namespace"><span class="tsd-kind-icon">Namespace</span></li><li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li><li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li><li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li><li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li><li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li></ul><ul class="tsd-legend"><li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li><li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li></ul><ul class="tsd-legend"><li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li><li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li></ul><ul class="tsd-legend"><li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li></ul></div><h2>Settings</h2><p>Theme <select id="theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></p></div></footer><div class="container tsd-generator"><p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div><div class="overlay"></div><script src="assets/main.js"></script></body></html>
