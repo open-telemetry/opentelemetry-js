@@ -7,7 +7,7 @@ The code base is a monorepo. We use [Lerna](https://lerna.js.org/) for managing 
 ## Requirements
 
 Since this project supports multiple Node versions, using a version
-manager such as [nvm](https://github.com/creationix/nvm) is recommended.
+manager such as [nvm](https://github.com/nvm-sh/nvm) is recommended.
 
 To get started once you have Node installed, run:
 
