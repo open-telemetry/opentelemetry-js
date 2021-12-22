@@ -4,22 +4,22 @@
   "typedocOptions": {
     "packages": [
       "experimental/packages/opentelemetry-api-metrics",
-      "experimental/packages/opentelemetry-exporter-trace-otlp-grpc",
-      "experimental/packages/opentelemetry-exporter-trace-otlp-http",
-      "experimental/packages/opentelemetry-exporter-trace-otlp-proto",
+      "experimental/packages/opentelemetry-exporter-metrics-otlp-grpc",
+      "experimental/packages/opentelemetry-exporter-metrics-otlp-http",
+      "experimental/packages/opentelemetry-exporter-metrics-otlp-proto",
       "experimental/packages/opentelemetry-exporter-prometheus",
+      "experimental/packages/opentelemetry-instrumentation",
       "experimental/packages/opentelemetry-instrumentation-fetch",
       "experimental/packages/opentelemetry-instrumentation-grpc",
       "experimental/packages/opentelemetry-instrumentation-http",
       "experimental/packages/opentelemetry-instrumentation-xml-http-request",
-      "experimental/packages/opentelemetry-instrumentation",
       "experimental/packages/opentelemetry-sdk-node",
-      "experimental/packages/opentelemetry-exporter-metrics-otlp-http",
-      "experimental/packages/opentelemetry-exporter-metrics-otlp-grpc",
-      "experimental/packages/opentelemetry-exporter-metrics-otlp-proto",
+      "packages/exporter-trace-otlp-grpc",
+      "packages/exporter-trace-otlp-http",
+      "packages/exporter-trace-otlp-proto",
       "packages/opentelemetry-context-async-hooks",
-      "packages/opentelemetry-context-zone-peer-dep",
       "packages/opentelemetry-context-zone",
+      "packages/opentelemetry-context-zone-peer-dep",
       "packages/opentelemetry-core",
       "packages/opentelemetry-exporter-jaeger",
       "packages/opentelemetry-exporter-zipkin",
@@ -44,6 +44,15 @@
     "excludePrivate": true
   },
   "references": [
+    {
+      "path": "packages/exporter-trace-otlp-grpc"
+    },
+    {
+      "path": "packages/exporter-trace-otlp-http/tsconfig.all.json"
+    },
+    {
+      "path": "packages/exporter-trace-otlp-proto"
+    },
     {
       "path": "packages/opentelemetry-context-async-hooks"
     },
