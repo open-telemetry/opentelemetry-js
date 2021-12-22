@@ -51,23 +51,6 @@ To fix the linter, use:
 npm run lint:fix
 ```
 
-## Continuous Integration
-
-We rely on CircleCI 2.0 for our tests. If you want to test how the CI behaves
-locally, you can use the CircleCI Command Line Interface as described here:
-<https://circleci.com/docs/2.0/local-jobs/>
-
-After installing the `circleci` CLI, simply run one of the following:
-
-```sh
-circleci build --job lint
-circleci build --job node8
-circleci build --job node10
-circleci build --job node11
-circleci build --job node12
-circleci build --job node12-browsers
-```
-
 ## Docs
 
 We use [typedoc](https://www.npmjs.com/package/typedoc) to generate the api documentation.
