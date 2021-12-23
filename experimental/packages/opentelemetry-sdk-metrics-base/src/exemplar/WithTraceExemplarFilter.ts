@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { ValueType, Attributes } from '@opentelemetry/api-metrics-wip'
+import { Attributes } from '@opentelemetry/api-metrics-wip'
 import { Context, HrTime, isSpanContextValid, trace, TraceFlags } from '@opentelemetry/api'
 import { ExemplarFilter } from './ExemplarFilter';
 
 export class WithTraceExemplarFilter implements ExemplarFilter {
 
   shouldSample(
-    value: ValueType,
+    value: number,
     timestamp: HrTime,
     attributes: Attributes,
     ctx: Context

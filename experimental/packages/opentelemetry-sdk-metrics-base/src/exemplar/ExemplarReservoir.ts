@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ValueType, Attributes } from '@opentelemetry/api-metrics-wip'
+import { Attributes } from '@opentelemetry/api-metrics-wip'
 import { Context, HrTime, isSpanContextValid, trace } from '@opentelemetry/api'
 import { Exemplar } from './Exemplar'
 
@@ -26,7 +26,7 @@ export interface ExemplarReservoir {
 
   /** Offers a measurement to be sampled. */
   offer(
-    value: ValueType,
+    value: number,
     timestamp: HrTime,
     attributes: Attributes,
     ctx: Context    
@@ -45,14 +45,14 @@ export interface ExemplarReservoir {
 
 
 class ExemplarBucket {
-  private value: ValueType = 0;
+  private value: number = 0;
   private attributes: Attributes = {};
   private timestamp: HrTime = [0, 0];
   private spanId?: string;
   private traceId?: string;
   private _offered: boolean = false;
 
-  offer(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context) {
+  offer(value: number, timestamp: HrTime, attributes: Attributes, ctx: Context) {
     this.value = value;
     this.timestamp = timestamp;
     this.attributes = attributes;
@@ -103,7 +103,7 @@ export abstract class FixedSizeExemplarReservoirBase implements ExemplarReservoi
     }
   }
 
-  abstract offer(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context): void;
+  abstract offer(value: number, timestamp: HrTime, attributes: Attributes, ctx: Context): void;
 
   maxSize(): number {
     return this._size;

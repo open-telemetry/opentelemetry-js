@@ -15,12 +15,14 @@
  */
 
 import { HrTime } from '@opentelemetry/api';
-import { ValueType, Attributes } from '@opentelemetry/api-metrics-wip';
+import { Attributes } from '@opentelemetry/api-metrics-wip';
 
-// A representation of an exemplar, which is a sample input measurement.
-// Exemplars also hold information about the environment when the measurement
-// was recorded, for example the span and trace ID of the active span when the
-// exemplar was recorded.
+/**
+ * A representation of an exemplar, which is a sample input measurement.
+ * Exemplars also hold information about the environment when the measurement
+ * was recorded, for example the span and trace ID of the active span when the
+ * exemplar was recorded.
+ */
 export type Exemplar = {
   // The set of key/value pairs that were filtered out by the aggregator, but
   // recorded alongside the original measurement. Only key/value pairs that were
@@ -28,7 +30,7 @@ export type Exemplar = {
   filteredAttributes: Attributes;
 
   // The value of the measurement that was recorded.
-  value: ValueType;
+  value: number;
 
   // timestamp is the exact time when this exemplar was recorded
   timestamp: HrTime;

@@ -15,7 +15,7 @@
  */
 
 import { Context, HrTime } from '@opentelemetry/api';
-import { ValueType, Attributes } from '@opentelemetry/api-metrics-wip';
+import { Attributes } from '@opentelemetry/api-metrics-wip';
 import { FixedSizeExemplarReservoirBase } from './ExemplarReservoir';
 
 /**
@@ -24,30 +24,30 @@ import { FixedSizeExemplarReservoirBase } from './ExemplarReservoir';
  * 
  */
 export class SimpleFixedSizeExemplarReservoir extends FixedSizeExemplarReservoirBase {
-  private num_measurements_seen: number;
+  private _numMeasurementsSeen: number;
   constructor(size: number) {
     super(size);
-    this.num_measurements_seen = 0;
+    this._numMeasurementsSeen = 0;
   }
 
   private getRandomInt(min: number, max: number) { //[min, max)
     return Math.floor(Math.random() * (max - min) + min); 
   }
 
-  private findBucketIndex(_value: ValueType, _timestamp: HrTime, _attributes: Attributes, _ctx: Context) {
-    if (this.num_measurements_seen < this._size ) return this.num_measurements_seen++;
-    const index = this.getRandomInt(0, ++this.num_measurements_seen);
+  private _findBucketIndex(_value: number, _timestamp: HrTime, _attributes: Attributes, _ctx: Context) {
+    if (this._numMeasurementsSeen < this._size ) return this._numMeasurementsSeen++;
+    const index = this.getRandomInt(0, ++this._numMeasurementsSeen);
     return index < this._size ? index: -1;
   }
 
-  offer(value: ValueType, timestamp: HrTime, attributes: Attributes, ctx: Context): void {
-    const index = this.findBucketIndex(value, timestamp, attributes, ctx);
+  offer(value: number, timestamp: HrTime, attributes: Attributes, ctx: Context): void {
+    const index = this._findBucketIndex(value, timestamp, attributes, ctx);
     if (index !== -1) {
       this._reservoirStorage[index].offer(value, timestamp, attributes, ctx)
     }
   }
 
   override reset() {
-    this.num_measurements_seen = 0;
+    this._numMeasurementsSeen = 0;
   }
 }

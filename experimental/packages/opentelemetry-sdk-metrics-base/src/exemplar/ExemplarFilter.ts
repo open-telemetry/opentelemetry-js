@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ValueType, Attributes } from '@opentelemetry/api-metrics-wip'
+import { Attributes } from '@opentelemetry/api-metrics-wip'
 import { Context, HrTime } from '@opentelemetry/api'
 
 /**
@@ -32,7 +32,7 @@ export interface ExemplarFilter {
    * @param context The Context of the measurement
    */
   shouldSample(
-    value: ValueType,
+    value: number,
     timestamp: HrTime,
     attributes: Attributes,
     ctx: Context
