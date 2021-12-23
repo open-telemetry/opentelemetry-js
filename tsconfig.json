@@ -2,8 +2,8 @@
   "extends": "./tsconfig.base.json",
   "files": [],
   "typedocOptions": {
-    "packages": [
-      "experimental/packages/opentelemetry-api-metrics",
+    "entryPointStrategy": "packages",
+    "entryPoints": [
       "experimental/packages/opentelemetry-exporter-metrics-otlp-grpc",
       "experimental/packages/opentelemetry-exporter-metrics-otlp-http",
       "experimental/packages/opentelemetry-exporter-metrics-otlp-proto",
@@ -26,7 +26,6 @@
       "packages/opentelemetry-propagator-b3",
       "packages/opentelemetry-propagator-jaeger",
       "packages/opentelemetry-resources",
-      "packages/opentelemetry-sdk-metrics-base",
       "packages/opentelemetry-sdk-trace-base",
       "packages/opentelemetry-sdk-trace-node",
       "packages/opentelemetry-sdk-trace-web",
