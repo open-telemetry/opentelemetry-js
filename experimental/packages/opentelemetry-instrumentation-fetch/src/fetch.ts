@@ -379,6 +379,8 @@ export class FetchInstrumentation extends InstrumentationBase<
             () => {
               plugin._addHeaders(options, url);
               plugin._tasksCount++;
+              // TypeScript complains about arrow function captured a this typed as globalThis
+              // ts(7041)
               return original
                 .apply(self, options instanceof Request ? [options] : [url, options])
                 .then(
