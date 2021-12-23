@@ -424,7 +424,7 @@ export class FetchInstrumentation extends InstrumentationBase<
   private _prepareSpanData(spanUrl: string): SpanData {
     const startTime = core.hrTime();
     const entries: PerformanceResourceTiming[] = [];
-    if (typeof PerformanceObserver === 'undefined') {
+    if (PerformanceObserver == null) {
       return { entries, startTime, spanUrl };
     }
 
