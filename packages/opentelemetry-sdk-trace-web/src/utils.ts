@@ -280,7 +280,7 @@ function filterResourcesForSpan(
 }
 
 /**
- * The URLLike interface represents an URL and HTMLAnchorElement compatible fields.
+ * The URLLike interface represents an URL and HTMLAnchorElement compatible fields.
  */
 interface URLLike {
   hash: string;
