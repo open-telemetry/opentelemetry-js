@@ -20,8 +20,6 @@ jobs:
           node-version: '14'
 
       - uses: actions/checkout@v2
-        with:
-          submodules: true
 
       - name: Lint changelog file
         if: ${{ matrix.package-group == '.' }}
@@ -71,4 +69,4 @@ jobs:
         run: |
           npm run compile
           npm run docs
-          npm run docs:test
+          NODE_OPTIONS=--max npm run docs:test
