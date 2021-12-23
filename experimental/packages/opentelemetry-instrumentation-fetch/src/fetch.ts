@@ -428,12 +428,11 @@ export class FetchInstrumentation extends InstrumentationBase<
 
     const observer: PerformanceObserver = new PerformanceObserver(list => {
       const perfObsEntries = list.getEntries() as PerformanceResourceTiming[];
-      const urlNormalizingAnchor = web.getUrlNormalizingAnchor();
-      urlNormalizingAnchor.href = spanUrl;
+      const parsedUrl = web.parseUrl(spanUrl);
       perfObsEntries.forEach(entry => {
         if (
           entry.initiatorType === 'fetch' &&
-          entry.name === urlNormalizingAnchor.href
+          entry.name === parsedUrl.href
         ) {
           entries.push(entry);
         }

@@ -29,7 +29,6 @@ import {
   parseUrl,
   PerformanceTimingNames as PTN,
   shouldPropagateTraceHeaders,
-  getUrlNormalizingAnchor
 } from '@opentelemetry/sdk-trace-web';
 import { EventNames } from './enums/EventNames';
 import {
@@ -217,13 +216,12 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     xhrMem.createdResources = {
       observer: new PerformanceObserver(list => {
         const entries = list.getEntries() as PerformanceResourceTiming[];
-        const urlNormalizingAnchor = getUrlNormalizingAnchor();
-        urlNormalizingAnchor.href = spanUrl;
+        const parsedUrl = parseUrl(spanUrl);
 
         entries.forEach(entry => {
           if (
             entry.initiatorType === 'xmlhttprequest' &&
-            entry.name === urlNormalizingAnchor.href
+            entry.name === parsedUrl.href
           ) {
             if (xhrMem.createdResources) {
               xhrMem.createdResources.entries.push(entry);
