@@ -16,6 +16,8 @@
 
 import { MetricOptions, ValueType } from '@opentelemetry/api-metrics-wip';
 import { InstrumentType } from './Instruments';
+import { View } from './view/View';
+
 
 export interface InstrumentDescriptor {
   readonly name: string;
@@ -32,5 +34,15 @@ export function createInstrumentDescriptor(name: string, type: InstrumentType, o
     description: options?.description ?? '',
     unit: options?.unit ?? '1',
     valueType: options?.valueType ?? ValueType.DOUBLE,
+  };
+}
+
+export function createInstrumentDescriptorWithView(view: View, instrument: InstrumentDescriptor): InstrumentDescriptor {
+  return {
+    name: view.name ?? instrument.name,
+    description: view.description ?? instrument.description,
+    type: instrument.type,
+    unit: instrument.unit,
+    valueType: instrument.valueType,
   };
 }
