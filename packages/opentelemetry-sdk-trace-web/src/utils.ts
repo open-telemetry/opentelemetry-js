@@ -280,10 +280,30 @@ function filterResourcesForSpan(
 }
 
 /**
- * Parses url using anchor element
+ * The URLLike interface represents an URL and HTMLAnchorElement compatible fields.
+ */
+interface URLLike {
+  hash: string;
+  host: string;
+  hostname: string;
+  href: string;
+  readonly origin: string;
+  password: string;
+  pathname: string;
+  port: string;
+  protocol: string;
+  search: string;
+  username: string;
+}
+
+/**
+ * Parses url using URL constructor or fallback to anchor element.
  * @param url
  */
-export function parseUrl(url: string): HTMLAnchorElement {
+export function parseUrl(url: string): URLLike {
+  if (typeof URL === 'function') {
+    return new URL(url);
+  }
   const element = document.createElement('a');
   element.href = url;
   return element;

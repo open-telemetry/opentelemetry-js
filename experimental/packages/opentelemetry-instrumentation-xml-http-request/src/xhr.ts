@@ -209,8 +209,8 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     const xhrMem = this._xhrMem.get(xhr);
     if (
       !xhrMem ||
-      typeof window.PerformanceObserver === 'undefined' ||
-      typeof window.PerformanceResourceTiming === 'undefined'
+      typeof PerformanceObserver === 'undefined' ||
+      typeof PerformanceResourceTiming === 'undefined'
     ) {
       return;
     }
