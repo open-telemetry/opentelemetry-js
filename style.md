@@ -22,6 +22,9 @@ It may also be acceptable in some cases to modify the linting rules themselves i
 In general, null and undefined should be treated the same.
 In case of the rare exception where `null` is used to mean something different than `undefined` it should be documented clearly in the jsdocs.
 
+- Prefer `undefined` instead of `null` in most cases
+- Prefer `value == null` instead of `value == null || value == undefined`
+
 ## Prefer `===` over `==`
 
 `===`/`!==` should be preferred over `==` and `!=`.
