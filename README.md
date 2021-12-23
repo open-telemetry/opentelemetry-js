@@ -194,7 +194,6 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 
 Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers)):
 
-- [Bartlomiej Obecny](https://github.com/obecny), LightStep
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
 - [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
 
@@ -208,6 +207,7 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 
 ### Thanks to all previous approvers and maintainers
 
+- [Bartlomiej Obecny](https://github.com/obecny), LightStep, Maintainer
 - [Daniel Khan](https://github.com/dkhan), Dynatrace, Maintainer
 - [Mayur Kale](https://github.com/mayurkale22), Google, Maintainer
 - [Brandon Gonzalez](https://github.com/bg451), LightStep, Approver
