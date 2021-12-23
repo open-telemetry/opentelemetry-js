@@ -78,7 +78,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
     await this._exporter.export(collectionResult.returnValue);
   }
 
-  protected onInitialized(): void {
+  protected override onInitialized(): void {
     // start running the interval as soon as this reader is initialized and keep handle for shutdown.
     this._interval = setInterval(async () => {
       promiseWithTimeout(this._runOnce(), this._exportTimeout, (result => {

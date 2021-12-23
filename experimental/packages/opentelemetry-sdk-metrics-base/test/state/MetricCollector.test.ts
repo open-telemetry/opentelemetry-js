@@ -19,11 +19,11 @@ import * as sinon from 'sinon';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { MetricData, PointDataType } from '../../src/export/MetricData';
 import { MetricExporter } from '../../src/export/MetricExporter';
-import { MetricReader } from '../../src/export/MetricReader';
 import { Meter } from '../../src/Meter';
 import { MeterProviderSharedState } from '../../src/state/MeterProviderSharedState';
 import { MetricCollector } from '../../src/state/MetricCollector';
 import { defaultInstrumentationLibrary, defaultResource, assertMetricData, assertPointData } from '../util';
+import { TestMetricReader } from '../export/TestMetricReader';
 
 class TestMetricExporter extends MetricExporter {
   metricDataList: MetricData[] = []
@@ -41,23 +41,6 @@ class TestMetricExporter extends MetricExporter {
 class TestDeltaMetricExporter extends TestMetricExporter {
   override getPreferredAggregationTemporality(): AggregationTemporality {
     return AggregationTemporality.DELTA;
-  }
-}
-
-class TestMetricReader extends MetricReader {
-  protected handleCollectedMetrics(_metrics: MetricData[]): Promise<void> {
-    return Promise.resolve(undefined);
-  }
-
-  protected onForceFlush(): Promise<void> {
-    return Promise.resolve(undefined);
-  }
-
-  protected onShutdown(): Promise<void> {
-    return Promise.resolve(undefined);
-  }
-
-  protected onInitialized(): void {
   }
 }
 

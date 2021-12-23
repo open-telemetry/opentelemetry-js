@@ -116,10 +116,11 @@ export abstract class MetricReader {
 
   /**
    * Handle once the SDK has initialized this {@link MetricReader}
-   *
-   * @protected
+   * Overriding this method is optional.
    */
-  protected abstract onInitialized(): void;
+  protected onInitialized(): void {
+    // Default implementation is empty.
+  }
 
   /**
    * Handle a shutdown signal by the SDK.
