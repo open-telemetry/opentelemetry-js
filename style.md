@@ -4,11 +4,11 @@ This guide is meant to be a supplement to the linting rules.
 It is not exhaustive, nor should the suggestions in this guide be considered hard rules.
 Suggestions for changes and additions to this doc are welcome and this doc should not be considered to be set in stone.
 There may be code written before this guide which does not follow the suggestions in this guide.
-That code is not required to be updated, but maybe a good starting place for new contributors getting used to the codebase. 
+That code is not required to be updated, but maybe a good starting place for new contributors getting used to the codebase.
 
 ## Test coverage
 
-In general, all changes should be tested. 
+In general, all changes should be tested.
 New features generally require tests to be added and bugfixes require tests to ensure there are no regressions.
 
 ## Linting
