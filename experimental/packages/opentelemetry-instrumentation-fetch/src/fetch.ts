@@ -27,6 +27,7 @@ import { AttributeNames } from './enums/AttributeNames';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import { FetchError, FetchResponse, SpanData } from './types';
 import { VERSION } from './version';
+import { _globalThis } from '@opentelemetry/core';
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
@@ -288,13 +289,14 @@ export class FetchInstrumentation extends InstrumentationBase<
   /**
    * Patches the constructor of fetch
    */
-  private _patchConstructor(): (original: Window['fetch']) => Window['fetch'] {
+  private _patchConstructor(): (original: typeof fetch) => typeof fetch {
     return original => {
       const plugin = this;
       return function patchConstructor(
-        this: Window,
-        ...args: Parameters<Window['fetch']>
+        this: typeof globalThis,
+        ...args: Parameters<typeof fetch>
       ): Promise<Response> {
+        const self = this;
         const url = args[0] instanceof Request ? args[0].url : args[0];
         const options = args[0] instanceof Request ? args[0] : args[1] || {};
         const createdSpan = plugin._createSpan(url, options);
@@ -377,11 +379,13 @@ export class FetchInstrumentation extends InstrumentationBase<
             () => {
               plugin._addHeaders(options, url);
               plugin._tasksCount++;
+              // TypeScript complains about arrow function captured a this typed as globalThis
+              // ts(7041)
               return original
-                .apply(this, options instanceof Request ? [options] : [url, options])
+                .apply(self, options instanceof Request ? [options] : [url, options])
                 .then(
-                  onSuccess.bind(this, createdSpan, resolve),
-                  onError.bind(this, createdSpan, reject)
+                  onSuccess.bind(self, createdSpan, resolve),
+                  onError.bind(self, createdSpan, reject)
                 );
             }
           );
@@ -420,18 +424,17 @@ export class FetchInstrumentation extends InstrumentationBase<
   private _prepareSpanData(spanUrl: string): SpanData {
     const startTime = core.hrTime();
     const entries: PerformanceResourceTiming[] = [];
-    if (typeof window.PerformanceObserver === 'undefined') {
+    if (PerformanceObserver == null) {
       return { entries, startTime, spanUrl };
     }
 
     const observer: PerformanceObserver = new PerformanceObserver(list => {
       const perfObsEntries = list.getEntries() as PerformanceResourceTiming[];
-      const urlNormalizingAnchor = web.getUrlNormalizingAnchor();
-      urlNormalizingAnchor.href = spanUrl;
+      const parsedUrl = web.parseUrl(spanUrl);
       perfObsEntries.forEach(entry => {
         if (
           entry.initiatorType === 'fetch' &&
-          entry.name === urlNormalizingAnchor.href
+          entry.name === parsedUrl.href
         ) {
           entries.push(entry);
         }
@@ -447,18 +450,18 @@ export class FetchInstrumentation extends InstrumentationBase<
    * implements enable function
    */
   override enable(): void {
-    if (isWrapped(window.fetch)) {
-      this._unwrap(window, 'fetch');
+    if (isWrapped(fetch)) {
+      this._unwrap(_globalThis, 'fetch');
       this._diag.debug('removing previous patch for constructor');
     }
-    this._wrap(window, 'fetch', this._patchConstructor());
+    this._wrap(_globalThis, 'fetch', this._patchConstructor());
   }
 
   /**
    * implements unpatch function
    */
   override disable(): void {
-    this._unwrap(window, 'fetch');
+    this._unwrap(_globalThis, 'fetch');
     this._usedResources = new WeakSet<PerformanceResourceTiming>();
   }
 }
