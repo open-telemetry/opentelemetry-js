@@ -7,7 +7,7 @@ The code base is a monorepo. We use [Lerna](https://lerna.js.org/) for managing 
 ## Requirements
 
 Since this project supports multiple Node versions, using a version
-manager such as [nvm](https://github.com/creationix/nvm) is recommended.
+manager such as [nvm](https://github.com/nvm-sh/nvm) is recommended.
 
 To get started once you have Node installed, run:
 
@@ -49,23 +49,6 @@ To fix the linter, use:
 
 ```sh
 npm run lint:fix
-```
-
-## Continuous Integration
-
-We rely on CircleCI 2.0 for our tests. If you want to test how the CI behaves
-locally, you can use the CircleCI Command Line Interface as described here:
-<https://circleci.com/docs/2.0/local-jobs/>
-
-After installing the `circleci` CLI, simply run one of the following:
-
-```sh
-circleci build --job lint
-circleci build --job node8
-circleci build --job node10
-circleci build --job node11
-circleci build --job node12
-circleci build --job node12-browsers
 ```
 
 ## Docs
