@@ -30,7 +30,7 @@ import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 // Used to normalize relative URLs
 let urlNormalizingAnchor: HTMLAnchorElement | undefined;
-export function getUrlNormalizingAnchor(): HTMLAnchorElement {
+function getUrlNormalizingAnchor(): HTMLAnchorElement {
   if (!urlNormalizingAnchor) {
     urlNormalizingAnchor = document.createElement('a');
   }
@@ -140,9 +140,8 @@ export function getResource(
   initiatorType?: string
 ): PerformanceResourceTimingInfo {
   // de-relativize the URL before usage (does no harm to absolute URLs)
-  const urlNormalizingAnchor = getUrlNormalizingAnchor();
-  urlNormalizingAnchor.href = spanUrl;
-  spanUrl = urlNormalizingAnchor.href;
+  const parsedSpanUrl = parseUrl(spanUrl);
+  spanUrl = parsedSpanUrl.toString();
 
   const filteredResources = filterResourcesForSpan(
     spanUrl,
@@ -165,7 +164,6 @@ export function getResource(
   }
   const sorted = sortResources(filteredResources);
 
-  const parsedSpanUrl = parseUrl(spanUrl);
   if (parsedSpanUrl.origin !== window.location.origin && sorted.length > 1) {
     let corsPreFlightRequest: PerformanceResourceTiming | undefined = sorted[0];
     let mainRequest: PerformanceResourceTiming = findMainRequest(
@@ -280,13 +278,46 @@ function filterResourcesForSpan(
 }
 
 /**
- * Parses url using anchor element
+ * The URLLike interface represents an URL and HTMLAnchorElement compatible fields.
+ */
+export interface URLLike {
+  hash: string;
+  host: string;
+  hostname: string;
+  href: string;
+  readonly origin: string;
+  password: string;
+  pathname: string;
+  port: string;
+  protocol: string;
+  search: string;
+  username: string;
+}
+
+/**
+ * Parses url using URL constructor or fallback to anchor element.
  * @param url
  */
-export function parseUrl(url: string): HTMLAnchorElement {
-  const element = document.createElement('a');
+export function parseUrl(url: string): URLLike {
+  if (typeof URL === 'function') {
+    return new URL(url);
+  }
+  const element = getUrlNormalizingAnchor();
   element.href = url;
   return element;
+}
+
+/**
+ * Parses url using URL constructor or fallback to anchor element and serialize
+ * it to a string.
+ *
+ * Performs the steps described in https://html.spec.whatwg.org/multipage/urls-and-fetching.html#parse-a-url
+ *
+ * @param url
+ */
+export function normalizeUrl(url: string): string {
+  const urlLike = parseUrl(url);
+  return urlLike.href;
 }
 
 /**

@@ -43,7 +43,7 @@ You will receive the following error :
 ✖   type must be one of [ci, feat, fix, docs, style, refactor, perf, test, revert, chore] [type-enum]
 ```
 
-Here an exemple that will pass the verification: `git commit -s -am "chore(opentelemetry-core): update deps"`
+Here an example that will pass the verification: `git commit -s -am "chore(opentelemetry-core): update deps"`
 
 ### Fork
 

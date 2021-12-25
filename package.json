@@ -2,8 +2,6 @@
   "name": "opentelemetry",
   "version": "0.1.0",
   "description": "OpenTelemetry is a distributed tracing and stats collection framework.",
-  "main": "build/src/index.js",
-  "types": "build/src/index.d.ts",
   "scripts": {
     "precompile": "lerna run version",
     "compile": "tsc --build",
@@ -65,7 +63,7 @@
     "lerna-changelog": "1.0.1",
     "markdownlint-cli": "0.29.0",
     "semver": "7.3.5",
-    "typedoc": "0.22.9",
+    "typedoc": "0.22.10",
     "typescript": "4.4.4",
     "update-ts-references": "2.4.1"
   },
