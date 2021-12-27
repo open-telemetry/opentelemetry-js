@@ -36,6 +36,7 @@ export class StackContextManager implements ContextManager {
    * @param context
    * @param target Function to be executed within the context
    */
+  // eslint-disable-next-line @typescript-eslint/ban-types
   private _bindFunction<T extends Function>(
     context = ROOT_CONTEXT,
     target: T

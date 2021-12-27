@@ -19,7 +19,6 @@ import {
   InstrumentationNodeModuleDefinition,
   InstrumentationNodeModuleFile,
   InstrumentationBase,
-  InstrumentationConfig,
   isWrapped,
 } from '@opentelemetry/instrumentation';
 import {
@@ -55,17 +54,11 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
   typeof grpcTypes
 > {
   constructor(
-    protected override _config: GrpcInstrumentationConfig & InstrumentationConfig = {},
     name: string,
-    version: string
+    version: string,
+    config?: GrpcInstrumentationConfig
   ) {
-    super(name, version, _config);
-  }
-
-  public override setConfig(
-    config: GrpcInstrumentationConfig & InstrumentationConfig = {}
-  ) {
-    this._config = Object.assign({}, config);
+    super(name, version, config);
   }
 
   init() {
@@ -105,6 +98,10 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
         this._getInternalPatchs()
       ),
     ];
+  }
+
+  override getConfig(): GrpcInstrumentationConfig {
+    return super.getConfig();
   }
 
   private _getInternalPatchs() {
@@ -268,7 +265,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
 
     // For a method defined in .proto as "UnaryMethod"
     Object.entries(methods).forEach(([name, { originalName }]) => {
-      if (!_methodIsIgnored(name, this._config.ignoreGrpcMethods)) {
+      if (!_methodIsIgnored(name, this.getConfig().ignoreGrpcMethods)) {
         methodList.push(name); // adds camel case method name: "unaryMethod"
         if (
           originalName &&
@@ -288,7 +285,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
     const instrumentation = this;
     return (original: GrpcClientFunc) => {
       instrumentation._diag.debug('patch all client methods');
-      return function clientMethodTrace(this: grpcTypes.Client) {
+      function clientMethodTrace(this: grpcTypes.Client) {
         const name = `grpc.${(original.path as string | undefined)?.replace(
           '/',
           ''
@@ -307,7 +304,9 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
             this
           )(span)
         );
-      };
+      }
+      Object.assign(clientMethodTrace, original);
+      return clientMethodTrace;
     };
   }
 }

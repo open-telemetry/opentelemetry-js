@@ -2,28 +2,30 @@
   "extends": "./tsconfig.base.json",
   "files": [],
   "typedocOptions": {
-    "packages": [
-      "experimental/packages/opentelemetry-api-metrics",
-      "experimental/packages/opentelemetry-exporter-otlp-grpc",
-      "experimental/packages/opentelemetry-exporter-otlp-http",
-      "experimental/packages/opentelemetry-exporter-otlp-proto",
+    "entryPointStrategy": "packages",
+    "entryPoints": [
+      "experimental/packages/opentelemetry-exporter-metrics-otlp-grpc",
+      "experimental/packages/opentelemetry-exporter-metrics-otlp-http",
+      "experimental/packages/opentelemetry-exporter-metrics-otlp-proto",
       "experimental/packages/opentelemetry-exporter-prometheus",
+      "experimental/packages/opentelemetry-instrumentation",
       "experimental/packages/opentelemetry-instrumentation-fetch",
       "experimental/packages/opentelemetry-instrumentation-grpc",
       "experimental/packages/opentelemetry-instrumentation-http",
       "experimental/packages/opentelemetry-instrumentation-xml-http-request",
-      "experimental/packages/opentelemetry-instrumentation",
       "experimental/packages/opentelemetry-sdk-node",
+      "packages/exporter-trace-otlp-grpc",
+      "packages/exporter-trace-otlp-http",
+      "packages/exporter-trace-otlp-proto",
       "packages/opentelemetry-context-async-hooks",
-      "packages/opentelemetry-context-zone-peer-dep",
       "packages/opentelemetry-context-zone",
+      "packages/opentelemetry-context-zone-peer-dep",
       "packages/opentelemetry-core",
       "packages/opentelemetry-exporter-jaeger",
       "packages/opentelemetry-exporter-zipkin",
       "packages/opentelemetry-propagator-b3",
       "packages/opentelemetry-propagator-jaeger",
       "packages/opentelemetry-resources",
-      "packages/opentelemetry-sdk-metrics-base",
       "packages/opentelemetry-sdk-trace-base",
       "packages/opentelemetry-sdk-trace-node",
       "packages/opentelemetry-sdk-trace-web",
@@ -42,43 +44,52 @@
   },
   "references": [
     {
+      "path": "packages/exporter-trace-otlp-grpc"
+    },
+    {
+      "path": "packages/exporter-trace-otlp-http/tsconfig.all.json"
+    },
+    {
+      "path": "packages/exporter-trace-otlp-proto"
+    },
+    {
       "path": "packages/opentelemetry-context-async-hooks"
     },
     {
-      "path": "packages/opentelemetry-context-zone-peer-dep"
+      "path": "packages/opentelemetry-context-zone-peer-dep/tsconfig.all.json"
     },
     {
-      "path": "packages/opentelemetry-context-zone"
+      "path": "packages/opentelemetry-context-zone/tsconfig.all.json"
     },
     {
-      "path": "packages/opentelemetry-core"
+      "path": "packages/opentelemetry-core/tsconfig.all.json"
     },
     {
       "path": "packages/opentelemetry-exporter-jaeger"
     },
     {
-      "path": "packages/opentelemetry-exporter-zipkin"
+      "path": "packages/opentelemetry-exporter-zipkin/tsconfig.all.json"
     },
     {
-      "path": "packages/opentelemetry-propagator-b3"
+      "path": "packages/opentelemetry-propagator-b3/tsconfig.all.json"
     },
     {
       "path": "packages/opentelemetry-propagator-jaeger"
     },
     {
-      "path": "packages/opentelemetry-resources"
+      "path": "packages/opentelemetry-resources/tsconfig.all.json"
     },
     {
-      "path": "packages/opentelemetry-sdk-trace-base"
+      "path": "packages/opentelemetry-sdk-trace-base/tsconfig.all.json"
     },
     {
       "path": "packages/opentelemetry-sdk-trace-node"
     },
     {
-      "path": "packages/opentelemetry-sdk-trace-web"
+      "path": "packages/opentelemetry-sdk-trace-web/tsconfig.all.json"
     },
     {
-      "path": "packages/opentelemetry-semantic-conventions"
+      "path": "packages/opentelemetry-semantic-conventions/tsconfig.all.json"
     },
     {
       "path": "packages/opentelemetry-shim-opentracing"

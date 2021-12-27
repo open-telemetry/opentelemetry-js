@@ -29,13 +29,13 @@ import {
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 // Used to normalize relative URLs
-let a: HTMLAnchorElement | undefined;
-export function getUrlNormalizingAnchor(): HTMLAnchorElement {
-  if (!a) {
-    a = document.createElement('a');
+let urlNormalizingAnchor: HTMLAnchorElement | undefined;
+function getUrlNormalizingAnchor(): HTMLAnchorElement {
+  if (!urlNormalizingAnchor) {
+    urlNormalizingAnchor = document.createElement('a');
   }
 
-  return a;
+  return urlNormalizingAnchor;
 }
 
 /**
@@ -108,7 +108,7 @@ export function addSpanNetworkEvents(
  * sort resources by startTime
  * @param filteredResources
  */
-export function sortResources(filteredResources: PerformanceResourceTiming[]) {
+export function sortResources(filteredResources: PerformanceResourceTiming[]): PerformanceResourceTiming[] {
   return filteredResources.slice().sort((a, b) => {
     const valueA = a[PTN.FETCH_START];
     const valueB = b[PTN.FETCH_START];
@@ -140,9 +140,8 @@ export function getResource(
   initiatorType?: string
 ): PerformanceResourceTimingInfo {
   // de-relativize the URL before usage (does no harm to absolute URLs)
-  const urlNormalizingAnchor = getUrlNormalizingAnchor();
-  urlNormalizingAnchor.href = spanUrl;
-  spanUrl = urlNormalizingAnchor.href;
+  const parsedSpanUrl = parseUrl(spanUrl);
+  spanUrl = parsedSpanUrl.toString();
 
   const filteredResources = filterResourcesForSpan(
     spanUrl,
@@ -165,7 +164,6 @@ export function getResource(
   }
   const sorted = sortResources(filteredResources);
 
-  const parsedSpanUrl = parseUrl(spanUrl);
   if (parsedSpanUrl.origin !== window.location.origin && sorted.length > 1) {
     let corsPreFlightRequest: PerformanceResourceTiming | undefined = sorted[0];
     let mainRequest: PerformanceResourceTiming = findMainRequest(
@@ -280,13 +278,46 @@ function filterResourcesForSpan(
 }
 
 /**
- * Parses url using anchor element
+ * The URLLike interface represents an URL and HTMLAnchorElement compatible fields.
+ */
+export interface URLLike {
+  hash: string;
+  host: string;
+  hostname: string;
+  href: string;
+  readonly origin: string;
+  password: string;
+  pathname: string;
+  port: string;
+  protocol: string;
+  search: string;
+  username: string;
+}
+
+/**
+ * Parses url using URL constructor or fallback to anchor element.
  * @param url
  */
-export function parseUrl(url: string): HTMLAnchorElement {
-  const a = document.createElement('a');
-  a.href = url;
-  return a;
+export function parseUrl(url: string): URLLike {
+  if (typeof URL === 'function') {
+    return new URL(url);
+  }
+  const element = getUrlNormalizingAnchor();
+  element.href = url;
+  return element;
+}
+
+/**
+ * Parses url using URL constructor or fallback to anchor element and serialize
+ * it to a string.
+ *
+ * Performs the steps described in https://html.spec.whatwg.org/multipage/urls-and-fetching.html#parse-a-url
+ *
+ * @param url
+ */
+export function normalizeUrl(url: string): string {
+  const urlLike = parseUrl(url);
+  return urlLike.href;
 }
 
 /**
@@ -295,8 +326,8 @@ export function parseUrl(url: string): HTMLAnchorElement {
  * @param optimised - when id attribute of element is present the xpath can be
  * simplified to contain id
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getElementXPath(target: any, optimised?: boolean) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-module-boundary-types
+export function getElementXPath(target: any, optimised?: boolean): string {
   if (target.nodeType === Node.DOCUMENT_NODE) {
     return '/';
   }
@@ -380,7 +411,7 @@ function getNodeValue(target: HTMLElement, optimised?: boolean): string {
 export function shouldPropagateTraceHeaders(
   spanUrl: string,
   propagateTraceHeaderCorsUrls?: PropagateTraceHeaderCorsUrls
-) {
+): boolean {
   let propagateTraceHeaderUrls = propagateTraceHeaderCorsUrls || [];
   if (
     typeof propagateTraceHeaderUrls === 'string' ||

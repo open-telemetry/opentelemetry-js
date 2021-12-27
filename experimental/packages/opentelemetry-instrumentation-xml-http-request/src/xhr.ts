@@ -29,7 +29,6 @@ import {
   parseUrl,
   PerformanceTimingNames as PTN,
   shouldPropagateTraceHeaders,
-  getUrlNormalizingAnchor
 } from '@opentelemetry/sdk-trace-web';
 import { EventNames } from './enums/EventNames';
 import {
@@ -57,13 +56,15 @@ export type XHRCustomAttributeFunction = (
  */
 export interface XMLHttpRequestInstrumentationConfig
   extends InstrumentationConfig {
-  // the number of timing resources is limited, after the limit
-  // (chrome 250, safari 150) the information is not collected anymore
-  // the only way to prevent that is to regularly clean the resources
-  // whenever it is possible, this is needed only when PerformanceObserver
-  // is not available
+  /**
+   * The number of timing resources is limited, after the limit
+   * (chrome 250, safari 150) the information is not collected anymore.
+   * The only way to prevent that is to regularly clean the resources
+   * whenever it is possible. This is needed only when PerformanceObserver
+   * is not available
+   */
   clearTimingResources?: boolean;
-  // urls which should include trace headers when origin doesn't match
+  /** URLs which should include trace headers when origin doesn't match */
   propagateTraceHeaderCorsUrls?: PropagateTraceHeaderCorsUrls;
   /**
    * URLs that partially match any regex in ignoreUrls will not be traced.
@@ -87,13 +88,11 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   private _xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
 
-  constructor(
-    config: XMLHttpRequestInstrumentationConfig & InstrumentationConfig = {}
-  ) {
+  constructor(config?: XMLHttpRequestInstrumentationConfig) {
     super(
       '@opentelemetry/instrumentation-xml-http-request',
       VERSION,
-      Object.assign({}, config)
+      config
     );
   }
 
@@ -209,21 +208,20 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     const xhrMem = this._xhrMem.get(xhr);
     if (
       !xhrMem ||
-      typeof window.PerformanceObserver === 'undefined' ||
-      typeof window.PerformanceResourceTiming === 'undefined'
+      PerformanceObserver == null ||
+      PerformanceResourceTiming == null
     ) {
       return;
     }
     xhrMem.createdResources = {
       observer: new PerformanceObserver(list => {
         const entries = list.getEntries() as PerformanceResourceTiming[];
-        const urlNormalizingAnchor = getUrlNormalizingAnchor();
-        urlNormalizingAnchor.href = spanUrl;
+        const parsedUrl = parseUrl(spanUrl);
 
         entries.forEach(entry => {
           if (
             entry.initiatorType === 'xmlhttprequest' &&
-            entry.name === urlNormalizingAnchor.href
+            entry.name === parsedUrl.href
           ) {
             if (xhrMem.createdResources) {
               xhrMem.createdResources.entries.push(entry);

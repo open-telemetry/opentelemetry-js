@@ -29,6 +29,7 @@ export function parseInstrumentationOptions(
 ): AutoLoaderResult {
   let instrumentations: Instrumentation[] = [];
   for (let i = 0, j = options.length; i < j; i++) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const option = options[i] as any;
     if (Array.isArray(option)) {
       const results = parseInstrumentationOptions(option);
@@ -53,7 +54,7 @@ export function enableInstrumentations(
   instrumentations: Instrumentation[],
   tracerProvider?: TracerProvider,
   meterProvider?: MeterProvider
-) {
+): void {
   for (let i = 0, j = instrumentations.length; i < j; i++) {
     const instrumentation = instrumentations[i];
     if (tracerProvider) {
@@ -62,7 +63,13 @@ export function enableInstrumentations(
     if (meterProvider) {
       instrumentation.setMeterProvider(meterProvider);
     }
-    instrumentation.enable();
+    // instrumentations have been already enabled during creation
+    // so enable only if user prevented that by setting enabled to false
+    // this is to prevent double enabling but when calling register all
+    // instrumentations should be now enabled
+    if (!instrumentation.getConfig().enabled) {
+      instrumentation.enable();
+    }
   }
 }
 
@@ -70,6 +77,6 @@ export function enableInstrumentations(
  * Disable instrumentations
  * @param instrumentations
  */
-export function disableInstrumentations(instrumentations: Instrumentation[]) {
+export function disableInstrumentations(instrumentations: Instrumentation[]): void {
   instrumentations.forEach(instrumentation => instrumentation.disable());
 }

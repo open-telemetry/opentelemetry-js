@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Meter } from './types/Meter';
+import { Meter, MeterOptions } from './types/Meter';
 import { MeterProvider } from './types/MeterProvider';
 import { NOOP_METER } from './NoopMeter';
 
@@ -23,7 +23,7 @@ import { NOOP_METER } from './NoopMeter';
  * for all calls to `getMeter`
  */
 export class NoopMeterProvider implements MeterProvider {
-  getMeter(_name?: string, _version?: string): Meter {
+  getMeter(_name: string, _version?: string, _options?: MeterOptions): Meter {
     return NOOP_METER;
   }
 }

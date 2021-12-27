@@ -3,11 +3,15 @@ import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-tra
 import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
 import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xml-http-request';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-otlp-http';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { B3Propagator } from '@opentelemetry/propagator-b3';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 
 const providerWithZone = new WebTracerProvider();
+
+// Note: For production consider using the "BatchSpanProcessor" to reduce the number of requests
+// to your exporter. Using the SimpleSpanProcessor here as it sends the spans immediately to the
+// exporter without delay
 providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new OTLPTraceExporter()));
 
@@ -30,7 +34,6 @@ registerInstrumentations({
 const webTracerWithZone = providerWithZone.getTracer('example-tracer-web');
 
 const getData = (url) => new Promise((resolve, reject) => {
-  // eslint-disable-next-line no-undef
   const req = new XMLHttpRequest();
   req.open('GET', url, true);
   req.setRequestHeader('Content-Type', 'application/json');
@@ -57,7 +60,7 @@ const prepareClickEvent = () => {
         getData(url1).then((_data) => {
           trace.getSpan(context.active()).addEvent('fetching-span1-completed');
           span1.end();
-        }, ()=> {
+        }, () => {
           trace.getSpan(context.active()).addEvent('fetching-error');
           span1.end();
         });

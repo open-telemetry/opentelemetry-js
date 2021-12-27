@@ -94,7 +94,7 @@ function sendWithXhr(
   urlStr: string,
   xhrHeaders: Record<string, string> = {}
 ) {
-  const xhr = new window.XMLHttpRequest();
+  const xhr = new XMLHttpRequest();
   xhr.open('POST', urlStr);
   Object.entries(xhrHeaders).forEach(([k, v]) => {
     xhr.setRequestHeader(k, v);

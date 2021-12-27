@@ -1,8 +1,6 @@
 # OpenTelemetry API for JavaScript
 
 [![NPM Published Version][npm-img]][npm-url]
-[![dependencies][dependencies-image]][dependencies-url]
-[![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
 This package provides everything needed to interact with the unstable OpenTelemetry Metrics API, including all TypeScript interfaces, enums, and no-op implementations. It is intended for use both on the server and in the browser.
@@ -90,21 +88,9 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-api-metrics
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-api-metrics
-[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-api-metrics&type=dev
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-api-metrics&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/api-metrics
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fapi-metrics.svg
 
-[trace-api-docs]: https://open-telemetry.github.io/opentelemetry-js/classes/traceapi.html
-[metrics-api-docs]: https://open-telemetry.github.io/opentelemetry-js/classes/metricsapi.html
-[propagation-api-docs]: https://open-telemetry.github.io/opentelemetry-js/classes/propagationapi.html
-[context-api-docs]: https://open-telemetry.github.io/opentelemetry-js/classes/contextapi.html
-
-[web]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-web
-[tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base
-[node]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node
-[metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-metrics-base
+[metrics-api-docs]: https://open-telemetry.github.io/opentelemetry-js/modules/_opentelemetry_api_metrics.html
 
 [other-tracing-backends]: https://github.com/open-telemetry/opentelemetry-js#trace-exporters

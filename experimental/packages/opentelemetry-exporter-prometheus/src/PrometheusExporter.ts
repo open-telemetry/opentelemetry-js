@@ -25,7 +25,7 @@ import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
 import * as url from 'url';
 import { ExporterConfig } from './export/types';
 import { PrometheusSerializer } from './PrometheusSerializer';
-import { PrometheusLabelsBatcher } from './PrometheusLabelsBatcher';
+import { PrometheusAttributesBatcher } from './PrometheusAttributesBatcher';
 
 export class PrometheusExporter implements MetricExporter {
   static readonly DEFAULT_OPTIONS = {
@@ -43,10 +43,10 @@ export class PrometheusExporter implements MetricExporter {
   private readonly _prefix?: string;
   private readonly _appendTimestamp: boolean;
   private _serializer: PrometheusSerializer;
-  private _batcher = new PrometheusLabelsBatcher();
+  private _batcher = new PrometheusAttributesBatcher();
 
   // This will be required when histogram is implemented. Leaving here so it is not forgotten
-  // Histogram cannot have a label named 'le'
+  // Histogram cannot have a attribute named 'le'
   // private static readonly RESERVED_HISTOGRAM_LABEL = 'le';
 
   /**
@@ -68,7 +68,8 @@ export class PrometheusExporter implements MetricExporter {
       typeof config.appendTimestamp === 'boolean'
         ? config.appendTimestamp
         : PrometheusExporter.DEFAULT_OPTIONS.appendTimestamp;
-    this._server = createServer(this._requestHandler);
+    // unref to prevent prometheus exporter from holding the process open on exit
+    this._server = createServer(this._requestHandler).unref();
     this._serializer = new PrometheusSerializer(
       this._prefix,
       this._appendTimestamp

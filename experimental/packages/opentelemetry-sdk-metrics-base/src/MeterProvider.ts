@@ -14,77 +14,112 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api-metrics';
+import * as api from '@opentelemetry/api';
+import * as metrics from '@opentelemetry/api-metrics-wip';
 import { Resource } from '@opentelemetry/resources';
-import { Meter } from '.';
-import { DEFAULT_CONFIG, MeterConfig } from './types';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const merge = require('lodash.merge');
-// @TODO - replace once the core is released
-// import { merge } from '@opentelemetry/core';
+import { Meter } from './Meter';
+import { MetricReader } from './export/MetricReader';
+import { MeterProviderSharedState } from './state/MeterProviderSharedState';
+import { InstrumentSelector } from './view/InstrumentSelector';
+import { MeterSelector } from './view/MeterSelector';
+import { View } from './view/View';
+import { MetricCollector } from './state/MetricCollector';
 
+// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#meterprovider
 
-/**
- * This class represents a meter provider which platform libraries can extend
- */
-export class MeterProvider implements api.MeterProvider {
-  private readonly _config: MeterConfig;
-  private readonly _meters: Map<string, Meter> = new Map();
-  private _shuttingDownPromise: Promise<void> = Promise.resolve();
-  private _isShutdown = false;
-  readonly resource: Resource;
+export type MeterProviderOptions = {
+  resource?: Resource;
+}
 
-  constructor(config: MeterConfig = {}) {
-    const mergedConfig = merge({}, DEFAULT_CONFIG, config);
-    this.resource = mergedConfig.resource || Resource.empty();
-    this.resource = Resource.default().merge(this.resource);
-    this._config = Object.assign({}, mergedConfig, {
-      resource: this.resource,
-    });
+export class MeterProvider {
+  private _sharedState: MeterProviderSharedState;
+  private _shutdown = false;
+
+  constructor(options: MeterProviderOptions) {
+    this._sharedState = new MeterProviderSharedState(options.resource ?? Resource.empty());
+  }
+
+  getMeter(name: string, version = '', options: metrics.MeterOptions = {}): metrics.Meter {
+    // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#meter-creation
+    if (this._shutdown) {
+        api.diag.warn('A shutdown MeterProvider cannot provide a Meter')
+        return metrics.NOOP_METER;
+    }
+
+    // Spec leaves it unspecified if creating a meter with duplicate
+    // name/version returns the same meter. We create a new one here
+    // for simplicity. This may change in the future.
+    // TODO: consider returning the same meter if the same name/version is used
+    return new Meter(this._sharedState, { name, version, schemaUrl: options.schemaUrl });
+  }
+
+  addMetricReader(metricReader: MetricReader) {
+    const collector = new MetricCollector(this._sharedState, metricReader);
+    metricReader.setMetricProducer(collector);
+    this._sharedState.metricCollectors.push(collector);
+  }
+
+  addView(view: View, instrumentSelector: InstrumentSelector, meterSelector: MeterSelector) {
+    // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#view
+    this._sharedState.viewRegistry.addView(view, instrumentSelector, meterSelector);
   }
 
   /**
-   * Returns a Meter, creating one if one with the given name and version is not already created
+   * Flush all buffered data and shut down the MeterProvider and all registered
+   * MetricReaders.
+   * Returns a promise which is resolved when all flushes are complete.
    *
-   * @returns Meter A Meter with the given name and version
+   * TODO: return errors to caller somehow?
    */
-  getMeter(name: string, version?: string, config?: MeterConfig): Meter {
-    const key = `${name}@${version || ''}`;
-    if (!this._meters.has(key)) {
-      this._meters.set(
-        key,
-        new Meter({ name, version }, config || this._config)
-      );
+  async shutdown(): Promise<void> {
+    // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#shutdown
+
+    if (this._shutdown) {
+      api.diag.warn('shutdown may only be called once per MeterProvider');
+      return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return this._meters.get(key)!;
+    // TODO add a timeout - spec leaves it up the the SDK if this is configurable
+    this._shutdown = true;
+
+    for (const collector of this._sharedState.metricCollectors) {
+      try {
+        await collector.shutdown();
+      } catch (e) {
+        // Log all Errors.
+        if (e instanceof Error) {
+          api.diag.error(`Error shutting down: ${e.message}`)
+        }
+      }
+    }
   }
 
-  shutdown(): Promise<void> {
-    if (this._isShutdown) {
-      return this._shuttingDownPromise;
-    }
-    this._isShutdown = true;
+  /**
+   * Notifies all registered MetricReaders to flush any buffered data.
+   * Returns a promise which is resolved when all flushes are complete.
+   *
+   * TODO: return errors to caller somehow?
+   */
+  async forceFlush(): Promise<void> {
+    // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#forceflush
 
-    this._shuttingDownPromise = new Promise((resolve, reject) => {
-      Promise.resolve()
-        .then(() => {
-          return Promise.all(
-            Array.from(this._meters, ([_, meter]) => meter.shutdown())
-          );
-        })
-        .then(() => {
-          if (this._config.exporter) {
-            return this._config.exporter.shutdown();
-          }
-          return;
-        })
-        .then(resolve)
-        .catch(e => {
-          reject(e);
-        });
-    });
-    return this._shuttingDownPromise;
+    // TODO add a timeout - spec leaves it up the the SDK if this is configurable
+
+    // do not flush after shutdown
+    if (this._shutdown) {
+      api.diag.warn('invalid attempt to force flush after shutdown')
+      return;
+    }
+
+    for (const collector of this._sharedState.metricCollectors) {
+      try {
+        await collector.forceFlush();
+      } catch (e) {
+        // Log all Errors.
+        if (e instanceof Error) {
+          api.diag.error(`Error flushing: ${e.message}`)
+        }
+      }
+    }
   }
 }

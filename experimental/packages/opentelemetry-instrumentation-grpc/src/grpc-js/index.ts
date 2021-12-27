@@ -19,10 +19,7 @@ import {
   InstrumentationNodeModuleDefinition,
   isWrapped,
 } from '@opentelemetry/instrumentation';
-import {
-  InstrumentationBase,
-  InstrumentationConfig,
-} from '@opentelemetry/instrumentation';
+import { InstrumentationBase } from '@opentelemetry/instrumentation';
 import { GrpcInstrumentationConfig } from '../types';
 import {
   ServerCallWithMeta,
@@ -56,17 +53,11 @@ import { AttributeNames } from '../enums/AttributeNames';
 
 export class GrpcJsInstrumentation extends InstrumentationBase {
   constructor(
-    protected override _config: GrpcInstrumentationConfig & InstrumentationConfig = {},
     name: string,
-    version: string
+    version: string,
+    config?: GrpcInstrumentationConfig,
   ) {
-    super(name, version, _config);
-  }
-
-  public override setConfig(
-    config: GrpcInstrumentationConfig & InstrumentationConfig = {}
-  ) {
-    this._config = Object.assign({}, config);
+    super(name, version, config);
   }
 
   init() {
@@ -125,6 +116,10 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
     ];
   }
 
+  override getConfig(): GrpcInstrumentationConfig {
+    return super.getConfig();
+  }
+
   /**
    * Patch for grpc.Server.prototype.register(...) function. Provides auto-instrumentation for
    * client_stream, server_stream, bidi, unary server handler calls.
@@ -134,7 +129,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
   ) => ServerRegisterFunction {
     const instrumentation = this;
     return (originalRegister: ServerRegisterFunction) => {
-      const config = this._config;
+      const config = this.getConfig();
       instrumentation._diag.debug('patched gRPC server');
       return function register<RequestType, ResponseType>(
         this: grpcJs.Server,
@@ -279,7 +274,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
     const instrumentation = this;
     return (original: GrpcClientFunc) => {
       instrumentation._diag.debug('patch all client methods');
-      return function clientMethodTrace(this: grpcJs.Client) {
+      function clientMethodTrace(this: grpcJs.Client) {
         const name = `grpc.${original.path.replace('/', '')}`;
         const args = [...arguments];
         const metadata = getMetadata.call(
@@ -294,7 +289,9 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
         return context.with(trace.setSpan(context.active(), span), () =>
           makeGrpcClientRemoteCall(original, args, metadata, this)(span)
         );
-      };
+      }
+      Object.assign(clientMethodTrace, original);
+      return clientMethodTrace;
     };
   }
 
