@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "OpenTelemetry is a distributed tracing and stats collection framework.",
   "scripts": {
-    "precompile": "lerna run version",
+    "precompile": "lerna run version && lerna run generate",
     "compile": "tsc --build",
     "prewatch": "npm run precompile",
     "watch": "tsc --build --watch",
