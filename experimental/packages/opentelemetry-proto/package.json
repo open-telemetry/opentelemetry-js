@@ -8,7 +8,8 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "compile": "tsc --build",
-    "clean": "tsc --build --clean",
+    "generate": "./compile_proto.sh",
+    "clean": "tsc --build --clean && rimraf src/opentelemetry",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "postcompile": "npm run submodule && npm run protos:copy",
@@ -17,7 +18,7 @@
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "watch": "npm run protos:copy && tsc -w",
-    "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
+    "precompile": "npm run generate",
     "prewatch": "npm run precompile"
   },
   "keywords": [
@@ -51,11 +52,12 @@
   },
   "devDependencies": {
     "@babel/core": "7.16.0",
-    "@types/google-protobuf": "^3.15.5",
+    "@types/google-protobuf": "3.15.5",
     "@types/mocha": "8.2.3",
-    "grpc-tools": "^1.11.2",
+    "grpc-tools": "1.11.2",
     "mocha": "7.2.0",
-    "protoc-gen-ts": "^0.8.1",
+    "protoc-gen-ts": "0.8.1",
+    "rimraf": "3.0.2",
     "typescript": "4.4.4"
   },
   "dependencies": {
@@ -64,7 +66,7 @@
     "@opentelemetry/resources": "1.0.1",
     "@opentelemetry/sdk-metrics-base": "0.27.0",
     "@opentelemetry/sdk-trace-base": "1.0.1",
-    "@grpc/grpc-js": "^1.4.5",
-    "google-protobuf": "^3.19.1"
+    "@grpc/grpc-js": "1.4.5",
+    "google-protobuf": "3.19.1"
   }
 }
