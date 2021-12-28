@@ -20,13 +20,9 @@ import {
   Attributes,
   Counter,
   Histogram,
-  ObservableGauge,
   UpDownCounter,
-  ObservableBase,
-  ObservableCounter,
-  ObservableUpDownCounter,
+  ObservableCallback,
 } from './types/Metric';
-import { ObservableResult } from './types/ObservableResult';
 
 /**
  * NoopMeter is a noop implementation of the {@link Meter} interface. It reuses
@@ -70,11 +66,9 @@ export class NoopMeter implements Meter {
    */
   createObservableGauge(
     _name: string,
-    _callback: (observableResult: ObservableResult) => void,
+    _callback: ObservableCallback,
     _options?: MetricOptions,
-  ): ObservableGauge {
-    return NOOP_OBSERVABLE_GAUGE_METRIC;
-  }
+  ): void {}
 
   /**
    * Returns a constant noop observable counter.
@@ -84,11 +78,9 @@ export class NoopMeter implements Meter {
    */
   createObservableCounter(
     _name: string,
-    _callback: (observableResult: ObservableResult) => void,
+    _callback: ObservableCallback,
     _options?: MetricOptions,
-  ): ObservableCounter {
-    return NOOP_OBSERVABLE_COUNTER_METRIC;
-  }
+  ): void {}
 
   /**
    * Returns a constant noop up down observable counter.
@@ -98,11 +90,9 @@ export class NoopMeter implements Meter {
    */
   createObservableUpDownCounter(
     _name: string,
-    _callback: (observableResult: ObservableResult) => void,
+    _callback: ObservableCallback,
     _options?: MetricOptions,
-  ): ObservableUpDownCounter {
-    return NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC;
-  }
+  ): void {}
 }
 
 export class NoopMetric {}
@@ -119,16 +109,9 @@ export class NoopHistogramMetric extends NoopMetric implements Histogram {
   record(_value: number, _attributes: Attributes): void {}
 }
 
-export class NoopObservableBaseMetric extends NoopMetric implements ObservableBase {}
-
 export const NOOP_METER = new NoopMeter();
 
 // Synchronous instruments
 export const NOOP_COUNTER_METRIC = new NoopCounterMetric();
 export const NOOP_HISTOGRAM_METRIC = new NoopHistogramMetric();
 export const NOOP_UP_DOWN_COUNTER_METRIC = new NoopUpDownCounterMetric();
-
-// Asynchronous instruments
-export const NOOP_OBSERVABLE_COUNTER_METRIC = new NoopObservableBaseMetric();
-export const NOOP_OBSERVABLE_GAUGE_METRIC = new NoopObservableBaseMetric();
-export const NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC = new NoopObservableBaseMetric();
