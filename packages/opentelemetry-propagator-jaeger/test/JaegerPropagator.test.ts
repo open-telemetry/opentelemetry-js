@@ -34,7 +34,12 @@ import {
 describe('JaegerPropagator', () => {
   const jaegerPropagator = new JaegerPropagator();
   const customHeader = 'new-header';
+  const customBaggageHeaderPrefix = 'custom-baggage-header-prefix';
   const customJaegerPropagator = new JaegerPropagator(customHeader);
+  const customJaegerPropagatorWithConfig = new JaegerPropagator({
+    customTraceHeader: customHeader,
+    customBaggageHeaderPrefix,
+  });
   let carrier: { [key: string]: unknown };
 
   beforeEach(() => {
@@ -111,6 +116,28 @@ describe('JaegerPropagator', () => {
       assert.strictEqual(carrier[`${UBER_BAGGAGE_HEADER_PREFIX}-test`], '1');
       assert.strictEqual(
         carrier[`${UBER_BAGGAGE_HEADER_PREFIX}-myuser`],
+        encodeURIComponent('%id%')
+      );
+    });
+
+    it('should propagate baggage with custom prefix with url encoded values', () => {
+      const baggage = propagation.createBaggage({
+        test: {
+          value: '1',
+        },
+        myuser: {
+          value: '%id%',
+        },
+      });
+
+      customJaegerPropagatorWithConfig.inject(
+        propagation.setBaggage(ROOT_CONTEXT, baggage),
+        carrier,
+        defaultTextMapSetter
+      );
+      assert.strictEqual(carrier[`${customBaggageHeaderPrefix}-test`], '1');
+      assert.strictEqual(
+        carrier[`${customBaggageHeaderPrefix}-myuser`],
         encodeURIComponent('%id%')
       );
     });
@@ -215,6 +242,21 @@ describe('JaegerPropagator', () => {
       assert(secondEntry.value === '%id%');
     });
 
+    it('should extract baggage with custom prefix from carrier', () => {
+      carrier[`${customBaggageHeaderPrefix}-test`] = 'value';
+      carrier[`${customBaggageHeaderPrefix}-myuser`] = '%25id%25';
+      const extractedBaggage = propagation.getBaggage(
+        customJaegerPropagatorWithConfig.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
+      );
+
+      const firstEntry = extractedBaggage?.getEntry('test');
+      assert(typeof firstEntry !== 'undefined');
+      assert(firstEntry.value === 'value');
+      const secondEntry = extractedBaggage?.getEntry('myuser');
+      assert(typeof secondEntry !== 'undefined');
+      assert(secondEntry.value === '%id%');
+    });
+
     it('should extract baggage from carrier and not override current one', () => {
       carrier[`${UBER_BAGGAGE_HEADER_PREFIX}-test`] = 'value';
       carrier[`${UBER_BAGGAGE_HEADER_PREFIX}-myuser`] = '%25id%25';
@@ -265,6 +307,9 @@ describe('JaegerPropagator', () => {
     });
     it('returns the customized header if customized', () => {
       assert.deepStrictEqual(customJaegerPropagator.fields(), [customHeader]);
+    });
+    it('returns the customized header if customized with config', () => {
+      assert.deepStrictEqual(customJaegerPropagatorWithConfig.fields(), [customHeader]);
     });
   });
 
