@@ -68,5 +68,5 @@ jobs:
         if: ${{ matrix.package-group == '.' }}
         run: |
           npm run compile
-          npm run docs
-          NODE_OPTIONS=--max-old-space-size=4096 npm run docs:test
+          NODE_OPTIONS=--max-old-space-size=4096 npm run docs
+          npm run docs:test
