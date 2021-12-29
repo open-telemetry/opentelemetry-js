@@ -18,7 +18,7 @@ import { TraceState } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
-import { createExportTraceServiceRequest } from '../src/trace';
+import { createExportTraceServiceRequest } from '../src';
 
 describe('Trace', () => {
     describe('createExportTraceServiceRequest', () => {

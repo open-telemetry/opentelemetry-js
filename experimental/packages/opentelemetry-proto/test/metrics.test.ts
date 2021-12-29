@@ -23,7 +23,7 @@ import {
     SumAggregator
 } from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
-import { createExportMetricsServiceRequest } from '../src/metrics';
+import { createExportMetricsServiceRequest } from '../src';
 
 const START_TIME = '1640715235584374000';
 
