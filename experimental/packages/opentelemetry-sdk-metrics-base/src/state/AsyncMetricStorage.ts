@@ -34,7 +34,7 @@ import { AttributeHashMap } from './HashMap';
 /**
  * Internal interface.
  *
- * Stores and aggregates {@link MetricData} for synchronous instruments.
+ * Stores and aggregates {@link MetricData} for asynchronous instruments.
  */
 export class AsyncMetricStorage<T extends Maybe<Accumulation>> implements MetricStorage {
   private _deltaMetricStorage: DeltaMetricProcessor<T>;
@@ -59,7 +59,8 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>> implements Metric
   }
 
   /**
-   * Collects the metrics from this storage.
+   * Collects the metrics from this storage. The ObservableCallback is invoked
+   * during the collection.
    *
    * Note: This is a stateful operation and may reset any interval-related
    * state for the MetricCollector.

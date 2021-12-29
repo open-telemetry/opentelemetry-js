@@ -23,6 +23,13 @@ import { Attributes } from '@opentelemetry/api-metrics-wip';
  * additional dimension(s) from the {@link Context}.
  */
 export abstract class AttributesProcessor {
+  /**
+   * Process the metric instrument attributes.
+   *
+   * @param incoming The metric instrument attributes.
+   * @param context The active context when the instrument is synchronous.
+   * `undefined` otherwise.
+   */
   abstract process(incoming: Attributes, context?: Context): Attributes;
 
   static Noop() {

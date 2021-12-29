@@ -50,6 +50,7 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
       let accumulation = this._aggregator.createAccumulation();
       accumulation?.record(value);
       if (this._cumulativeMemoStorage.has(attributes, hashCode)) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const previous = this._cumulativeMemoStorage.get(attributes, hashCode)!;
         accumulation = this._aggregator.diff(previous, accumulation);
       }

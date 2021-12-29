@@ -61,7 +61,7 @@ export class TemporalMetricProcessor<T> {
    * @param currentAccumulations The current accumulation of metric data from instruments.
    * @param sdkStartTime The sdk start timestamp.
    * @param collectionTime The current collection timestamp.
-   * @returns The {@link MetricData} points or {@code null}.
+   * @returns The {@link MetricData} points or `null`.
    */
   buildMetrics(
     collector: MetricCollectorHandle,
