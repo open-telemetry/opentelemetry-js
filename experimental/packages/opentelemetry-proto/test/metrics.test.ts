@@ -25,12 +25,14 @@ import {
 import * as assert from 'assert';
 import { createExportMetricsServiceRequest } from '../src/metrics';
 
-const START_TIME = 1640715235584374000;
+const START_TIME = '1640715235584374000';
 
 describe('Metrics', () => {
     describe('createExportMetricsServiceRequest', () => {
         let sumRecord: MetricRecord;
         let sumAggregator: SumAggregator;
+        let observableSumRecord: MetricRecord;
+        let observableSumAggregator: SumAggregator;
         let gaugeRecord: MetricRecord;
         let gaugeAggregator: LastValueAggregator;
         let histRecord: MetricRecord;
@@ -56,6 +58,28 @@ describe('Metrics', () => {
                 aggregator: sumAggregator,
                 instrumentationLibrary: {
                     name: 'mylib',
+                    version: '0.1.0',
+                    schemaUrl: 'http://url.to.schema'
+                },
+                resource,
+            };
+            observableSumAggregator = new SumAggregator();
+            observableSumRecord = {
+                aggregationTemporality:
+                    AggregationTemporality.AGGREGATION_TEMPORALITY_DELTA,
+                attributes: { 'string-attribute': 'some attribute value' },
+                descriptor: {
+                    description: 'this is a description',
+                    metricKind: MetricKind.OBSERVABLE_COUNTER,
+                    name: 'counter',
+                    unit: '1',
+                    valueType: ValueType.INT,
+                },
+                aggregator: observableSumAggregator,
+                instrumentationLibrary: {
+                    name: 'mylib',
+                    version: '0.1.0',
+                    schemaUrl: 'http://url.to.schema'
                 },
                 resource,
             };
@@ -74,6 +98,8 @@ describe('Metrics', () => {
                 aggregator: gaugeAggregator,
                 instrumentationLibrary: {
                     name: 'mylib',
+                    version: '0.1.0',
+                    schemaUrl: 'http://url.to.schema'
                 },
                 resource,
             };
@@ -92,13 +118,15 @@ describe('Metrics', () => {
                 aggregator: histAggregator,
                 instrumentationLibrary: {
                     name: 'mylib',
+                    version: '0.1.0',
+                    schemaUrl: 'http://url.to.schema'
                 },
                 resource,
             };
         });
 
         it('returns null on an empty list', () => {
-            assert.strictEqual(createExportMetricsServiceRequest([], 0), null);
+            assert.strictEqual(createExportMetricsServiceRequest([], '0'), null);
         });
 
         it('serializes a sum metric record', () => {
@@ -111,50 +139,114 @@ describe('Metrics', () => {
             );
             assert.ok(exportRequest);
 
-            assert.deepStrictEqual(exportRequest.toObject(), {
-                resource_metrics: [
+            assert.deepStrictEqual(exportRequest.toJSON(), {
+                resourceMetrics: [
                     {
                         resource: {
                             attributes: [
                                 {
                                     key: 'resource-attribute',
                                     value: {
-                                        string_value: 'resource attribute value',
+                                        stringValue: 'resource attribute value',
                                     },
                                 },
                             ],
-                            dropped_attributes_count: 0,
+                            droppedAttributesCount: 0,
                         },
-                        instrumentation_library_metrics: [
+                        instrumentationLibraryMetrics: [
                             {
-                                instrumentation_library: {
+                                instrumentationLibrary: {
                                     name: 'mylib',
+                                    version: '0.1.0',
                                 },
+                                schemaUrl: 'http://url.to.schema',
                                 metrics: [
                                     {
                                         name: 'counter',
                                         description: 'this is a description',
                                         unit: '1',
                                         sum: {
-                                            data_points: [
+                                            dataPoints: [
                                                 {
                                                     attributes: [
                                                         {
                                                             key: 'string-attribute',
                                                             value: {
-                                                                string_value: 'some attribute value',
+                                                                stringValue: 'some attribute value',
                                                             },
                                                         },
                                                     ],
-                                                    labels: [],
-                                                    start_time_unix_nano: START_TIME,
-                                                    time_unix_nano: 1640715557342725400,
-                                                    as_int: 10,
-                                                    exemplars: [],
+                                                    startTimeUnixNano: START_TIME,
+                                                    timeUnixNano: '1640715557342725376',
+                                                    asInt: '10',
                                                 },
                                             ],
-                                            aggregation_temporality: 1,
-                                            is_monotonic: true,
+                                            aggregationTemporality: 'AGGREGATION_TEMPORALITY_DELTA',
+                                            isMonotonic: true,
+                                        },
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            });
+        });
+
+        it('serializes an observable sum metric record', () => {
+            observableSumAggregator.update(10);
+            // spoof the update time
+            observableSumAggregator['_lastUpdateTime'] = [1640715557, 342725388];
+            const exportRequest = createExportMetricsServiceRequest(
+                [observableSumRecord],
+                START_TIME
+            );
+            assert.ok(exportRequest);
+
+            assert.deepStrictEqual(exportRequest.toJSON(), {
+                resourceMetrics: [
+                    {
+                        resource: {
+                            attributes: [
+                                {
+                                    key: 'resource-attribute',
+                                    value: {
+                                        stringValue: 'resource attribute value',
+                                    },
+                                },
+                            ],
+                            droppedAttributesCount: 0,
+                        },
+                        instrumentationLibraryMetrics: [
+                            {
+                                instrumentationLibrary: {
+                                    name: 'mylib',
+                                    version: '0.1.0',
+                                },
+                                schemaUrl: 'http://url.to.schema',
+                                metrics: [
+                                    {
+                                        name: 'counter',
+                                        description: 'this is a description',
+                                        unit: '1',
+                                        sum: {
+                                            dataPoints: [
+                                                {
+                                                    attributes: [
+                                                        {
+                                                            key: 'string-attribute',
+                                                            value: {
+                                                                stringValue: 'some attribute value',
+                                                            },
+                                                        },
+                                                    ],
+                                                    startTimeUnixNano: START_TIME,
+                                                    timeUnixNano: '1640715557342725376',
+                                                    asInt: '10',
+                                                },
+                                            ],
+                                            aggregationTemporality: 'AGGREGATION_TEMPORALITY_DELTA',
+                                            isMonotonic: true,
                                         },
                                     },
                                 ],
@@ -175,46 +267,46 @@ describe('Metrics', () => {
             );
             assert.ok(exportRequest);
 
-            assert.deepStrictEqual(exportRequest.toObject(), {
-                resource_metrics: [
+            assert.deepStrictEqual(exportRequest.toJSON(), {
+                resourceMetrics: [
                     {
                         resource: {
                             attributes: [
                                 {
                                     key: 'resource-attribute',
                                     value: {
-                                        string_value: 'resource attribute value',
+                                        stringValue: 'resource attribute value',
                                     },
                                 },
                             ],
-                            dropped_attributes_count: 0,
+                            droppedAttributesCount: 0,
                         },
-                        instrumentation_library_metrics: [
+                        instrumentationLibraryMetrics: [
                             {
-                                instrumentation_library: {
+                                instrumentationLibrary: {
                                     name: 'mylib',
+                                    version: '0.1.0',
                                 },
+                                schemaUrl: 'http://url.to.schema',
                                 metrics: [
                                     {
                                         name: 'gauge',
                                         description: 'this is a description',
                                         unit: '1',
                                         gauge: {
-                                            data_points: [
+                                            dataPoints: [
                                                 {
                                                     attributes: [
                                                         {
                                                             key: 'string-attribute',
                                                             value: {
-                                                                string_value: 'some attribute value',
+                                                                stringValue: 'some attribute value',
                                                             },
                                                         },
                                                     ],
-                                                    labels: [],
-                                                    start_time_unix_nano: START_TIME,
-                                                    time_unix_nano: 1640715557342725400,
-                                                    as_double: 10.5,
-                                                    exemplars: [],
+                                                    startTimeUnixNano: START_TIME,
+                                                    timeUnixNano: '1640715557342725376',
+                                                    asDouble: 10.5,
                                                 },
                                             ],
                                         },
@@ -238,50 +330,50 @@ describe('Metrics', () => {
             );
             assert.ok(exportRequest);
 
-            assert.deepStrictEqual(exportRequest.toObject(), {
-                resource_metrics: [
+            assert.deepStrictEqual(exportRequest.toJSON(), {
+                resourceMetrics: [
                     {
                         resource: {
                             attributes: [
                                 {
                                     key: 'resource-attribute',
                                     value: {
-                                        string_value: 'resource attribute value',
+                                        stringValue: 'resource attribute value',
                                     },
                                 },
                             ],
-                            dropped_attributes_count: 0,
+                            droppedAttributesCount: 0,
                         },
-                        instrumentation_library_metrics: [
+                        instrumentationLibraryMetrics: [
                             {
-                                instrumentation_library: {
+                                instrumentationLibrary: {
                                     name: 'mylib',
+                                    version: '0.1.0',
                                 },
+                                schemaUrl: 'http://url.to.schema',
                                 metrics: [
                                     {
                                         name: 'hist',
                                         description: 'this is a description',
                                         unit: '1',
                                         histogram: {
-                                            aggregation_temporality: 0,
-                                            data_points: [
+                                            aggregationTemporality: 'AGGREGATION_TEMPORALITY_UNSPECIFIED',
+                                            dataPoints: [
                                                 {
                                                     attributes: [
                                                         {
                                                             key: 'string-attribute',
                                                             value: {
-                                                                string_value: 'some attribute value',
+                                                                stringValue: 'some attribute value',
                                                             },
                                                         },
                                                     ],
-                                                    bucket_counts: [1, 1],
-                                                    count: 2,
-                                                    explicit_bounds: [5],
+                                                    bucketCounts: ['1', '1'],
+                                                    count: '2',
+                                                    explicitBounds: [5],
                                                     sum: 9,
-                                                    labels: [],
-                                                    start_time_unix_nano: START_TIME,
-                                                    time_unix_nano: 1640715557342725400,
-                                                    exemplars: [],
+                                                    startTimeUnixNano: START_TIME,
+                                                    timeUnixNano: '1640715557342725376',
                                                 },
                                             ],
                                         },

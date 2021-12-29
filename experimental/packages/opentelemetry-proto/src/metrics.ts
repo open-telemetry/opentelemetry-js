@@ -17,33 +17,32 @@ import { ValueType } from '@opentelemetry/api-metrics';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { AggregatorKind, MetricKind, MetricRecord, Point, Histogram } from '@opentelemetry/sdk-metrics-base';
 import { toAttributes } from './common';
-import { opentelemetry as metrics_service } from './opentelemetry/proto/collector/metrics/v1/metrics_service';
-import { opentelemetry as metrics } from './opentelemetry/proto/metrics/v1/metrics';
+import { opentelemetry } from './generated';
 
-export function createExportMetricsServiceRequest(metricRecords: MetricRecord[], startTime: number): metrics_service.proto.collector.metrics.v1.ExportMetricsServiceRequest | null {
+export function createExportMetricsServiceRequest(metricRecords: MetricRecord[], startTime: string): opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest | null {
     if (metricRecords.length === 0) {
         return null;
     }
 
     const resource = metricRecords[0].resource;
 
-    return metrics_service.proto.collector.metrics.v1.ExportMetricsServiceRequest.fromObject({
-        resource_metrics: [{
+    return opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest.fromObject({
+        resourceMetrics: [{
             resource: {
                 attributes: toAttributes(resource.attributes),
-                dropped_attributes_count: 0,
+                droppedAttributesCount: 0,
             },
-            instrumentation_library_metrics: [{
-                instrumentation_library: { name: metricRecords[0].instrumentationLibrary.name, version: metricRecords[0].instrumentationLibrary.version },
-                schema_url: metricRecords[0].instrumentationLibrary.schemaUrl,
+            instrumentationLibraryMetrics: [{
+                instrumentationLibrary: { name: metricRecords[0].instrumentationLibrary.name, version: metricRecords[0].instrumentationLibrary.version },
+                schemaUrl: metricRecords[0].instrumentationLibrary.schemaUrl,
                 metrics: metricRecords.map(m => toMetric(m, startTime)),
             }],
         }],
     });
 }
 
-function toMetric(metric: MetricRecord, startTime: number): metrics.proto.metrics.v1.Metric {
-    return metrics.proto.metrics.v1.Metric.fromObject({
+function toMetric(metric: MetricRecord, startTime: string): opentelemetry.proto.metrics.v1.Metric {
+    return opentelemetry.proto.metrics.v1.Metric.fromObject({
         description: metric.descriptor.description,
         name: metric.descriptor.name,
         unit: metric.descriptor.unit,
@@ -61,9 +60,9 @@ function isSum(metric: MetricRecord) {
 
 function toAggregationTemporality(
     metric: MetricRecord
-): metrics.proto.metrics.v1.AggregationTemporality {
+): opentelemetry.proto.metrics.v1.AggregationTemporality {
     if (metric.descriptor.metricKind === MetricKind.OBSERVABLE_GAUGE) {
-        return metrics.proto.metrics.v1.AggregationTemporality.AGGREGATION_TEMPORALITY_UNSPECIFIED;
+        return opentelemetry.proto.metrics.v1.AggregationTemporality.AGGREGATION_TEMPORALITY_UNSPECIFIED;
     }
 
     return metric.aggregationTemporality;
@@ -71,46 +70,47 @@ function toAggregationTemporality(
 
 function toSum(
     metric: MetricRecord,
-    startTime: number
-): metrics.proto.metrics.v1.Sum {
-    return metrics.proto.metrics.v1.Sum.fromObject({
-        data_points: [toNumberDataPoint(metric, startTime)],
-        is_monotonic:
+    startTime: string
+): opentelemetry.proto.metrics.v1.Sum {
+    return opentelemetry.proto.metrics.v1.Sum.fromObject({
+        dataPoints: [toNumberDataPoint(metric, startTime)],
+        isMonotonic:
             metric.descriptor.metricKind === MetricKind.COUNTER ||
             metric.descriptor.metricKind === MetricKind.OBSERVABLE_COUNTER,
-        aggregation_temporality: toAggregationTemporality(metric),
+        aggregationTemporality: toAggregationTemporality(metric),
     })
 }
 
 function toGauge(
     metric: MetricRecord,
-    startTime: number
-): metrics.proto.metrics.v1.Gauge {
-    return metrics.proto.metrics.v1.Gauge.fromObject({
-        data_points: [toNumberDataPoint(metric, startTime)],
+    startTime: string
+): opentelemetry.proto.metrics.v1.Gauge {
+    return opentelemetry.proto.metrics.v1.Gauge.fromObject({
+        dataPoints: [toNumberDataPoint(metric, startTime)],
+        aggregationTemporality: toAggregationTemporality(metric),
     })
 }
 
 function toHistogram(
     metric: MetricRecord,
-    startTime: number
-): metrics.proto.metrics.v1.Histogram {
-    return metrics.proto.metrics.v1.Histogram.fromObject({
-        data_points: [toHistogramDataPoint(metric, startTime)],
-        aggregation_temporality: toAggregationTemporality(metric),
+    startTime: string
+): opentelemetry.proto.metrics.v1.Histogram {
+    return opentelemetry.proto.metrics.v1.Histogram.fromObject({
+        dataPoints: [toHistogramDataPoint(metric, startTime)],
+        aggregationTemporality: toAggregationTemporality(metric),
     });
 }
 
 function toNumberDataPoint(
     metric: MetricRecord,
-    startTime: number
-): metrics.proto.metrics.v1.NumberDataPoint {
-    return metrics.proto.metrics.v1.NumberDataPoint.fromObject({
+    startTime: string
+): opentelemetry.proto.metrics.v1.NumberDataPoint {
+    return opentelemetry.proto.metrics.v1.NumberDataPoint.fromObject({
         attributes: toAttributes(metric.attributes),
-        as_int: metric.descriptor.valueType === ValueType.INT ? metric.aggregator.toPoint().value as number : undefined,
-        as_double: metric.descriptor.valueType === ValueType.DOUBLE ? metric.aggregator.toPoint().value as number : undefined,
-        start_time_unix_nano: startTime,
-        time_unix_nano: hrTimeToNanoseconds(
+        asInt: metric.descriptor.valueType === ValueType.INT ? metric.aggregator.toPoint().value as number : undefined,
+        asDouble: metric.descriptor.valueType === ValueType.DOUBLE ? metric.aggregator.toPoint().value as number : undefined,
+        startTimeUnixNano: startTime,
+        timeUnixNano: hrTimeToNanoseconds(
             metric.aggregator.toPoint().timestamp
         ),
     });
@@ -118,17 +118,17 @@ function toNumberDataPoint(
 
 function toHistogramDataPoint(
     metric: MetricRecord,
-    startTime: number
-): metrics.proto.metrics.v1.HistogramDataPoint {
+    startTime: string
+): opentelemetry.proto.metrics.v1.HistogramDataPoint {
     const point = metric.aggregator.toPoint() as Point<Histogram>
-    return metrics.proto.metrics.v1.HistogramDataPoint.fromObject({
+    return opentelemetry.proto.metrics.v1.HistogramDataPoint.fromObject({
         attributes: toAttributes(metric.attributes),
-        bucket_counts: point.value.buckets.counts,
-        explicit_bounds: point.value.buckets.boundaries,
+        bucketCounts: point.value.buckets.counts,
+        explicitBounds: point.value.buckets.boundaries,
         count: point.value.count,
         sum: point.value.sum,
-        start_time_unix_nano: startTime,
-        time_unix_nano: hrTimeToNanoseconds(
+        startTimeUnixNano: startTime,
+        timeUnixNano: hrTimeToNanoseconds(
             metric.aggregator.toPoint().timestamp
         ),
     })
