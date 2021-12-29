@@ -46,7 +46,7 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
   }
 
   batchCumulate(measurements: AttributeHashMap<number>) {
-    for (const [attributes, value, hashCode] of measurements.entries()) {
+    Array.from(measurements.entries()).forEach(([attributes, value, hashCode]) => {
       let accumulation = this._aggregator.createAccumulation();
       accumulation?.record(value);
       if (this._cumulativeMemoStorage.has(attributes, hashCode)) {
@@ -56,7 +56,7 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
 
       this._cumulativeMemoStorage.set(attributes, accumulation, hashCode);
       this._activeCollectionStorage.set(attributes, accumulation, hashCode);
-    }
+    });
   }
 
   collect() {

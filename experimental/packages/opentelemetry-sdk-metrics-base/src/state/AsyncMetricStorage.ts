@@ -52,9 +52,9 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>> implements Metric
 
   private _record(measurements: AttributeHashMap<number>) {
     const processed = new AttributeHashMap<number>();
-    for (const [attributes, value] of measurements.entries()) {
+    Array.from(measurements.entries()).forEach(([attributes, value]) => {
       processed.set(this._attributesProcessor.process(attributes), value);
-    }
+    });
     this._deltaMetricStorage.batchCumulate(processed);
   }
 
