@@ -61,25 +61,25 @@ export class Meter implements metrics.Meter {
 
   createObservableGauge(
     _name: string,
-    _callback: (observableResult: metrics.ObservableResult) => void,
+    _callback: metrics.ObservableCallback,
     _options?: metrics.ObservableGaugeOptions,
-  ): metrics.ObservableGauge {
+  ): void {
     throw new Error('Method not implemented.');
   }
 
   createObservableCounter(
     _name: string,
-    _callback: (observableResult: metrics.ObservableResult) => void,
+    _callback: metrics.ObservableCallback,
     _options?: metrics.ObservableCounterOptions,
-  ): metrics.ObservableCounter {
+  ): void {
     throw new Error('Method not implemented.');
   }
 
   createObservableUpDownCounter(
     _name: string,
-    _callback: (observableResult: metrics.ObservableResult) => void,
+    _callback: metrics.ObservableCallback,
     _options?: metrics.ObservableUpDownCounterOptions,
-  ): metrics.ObservableUpDownCounter {
+  ): void {
     throw new Error('Method not implemented.');
   }
 

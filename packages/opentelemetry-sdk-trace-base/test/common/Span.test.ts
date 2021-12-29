@@ -621,6 +621,28 @@ describe('Span', () => {
     assert.strictEqual(span.events[span.events.length - 1].name, 'sent149');
   });
 
+  it('should add no event', () => {
+    const tracer = new BasicTracerProvider({
+      spanLimits: {
+        eventCountLimit: 0,
+      },
+    }).getTracer('default');
+
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.CLIENT
+    );
+    for (let i = 0; i < 10; i++) {
+      span.addEvent('sent' + i);
+    }
+    span.end();
+
+    assert.strictEqual(span.events.length, 0);
+  });
+
   it('should set an error status', () => {
     const span = new Span(
       tracer,
