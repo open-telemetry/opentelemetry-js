@@ -25,10 +25,10 @@ import {
   TraceFlags,
 } from '@opentelemetry/api';
 import { isTracingSuppressed } from '@opentelemetry/core';
+import { JaegerPropagatorConfig } from './types';
 
 export const UBER_TRACE_ID_HEADER = 'uber-trace-id';
 export const UBER_BAGGAGE_HEADER_PREFIX = 'uberctx';
-const UBER_BAGGAGE_HEADER_REGEX = /^uberctx-(.+)/i;
 
 /**
  * Propagates {@link SpanContext} through Trace Context format propagation.
@@ -47,12 +47,18 @@ const UBER_BAGGAGE_HEADER_REGEX = /^uberctx-(.+)/i;
  */
 export class JaegerPropagator implements TextMapPropagator {
   private readonly _jaegerTraceHeader: string;
+  private readonly _jaegerBaggageHeaderPrefix: string;
 
-  /**
-   * @param {string} [customTraceHeader="uber-trace-id"] - HTTP header to inject\extract trace from.
-   **/
-  constructor(customTraceHeader?: string) {
-    this._jaegerTraceHeader = customTraceHeader || UBER_TRACE_ID_HEADER;
+  constructor(customTraceHeader?: string)
+  constructor(config?: JaegerPropagatorConfig)
+  constructor(config?: JaegerPropagatorConfig | string) {
+    if (typeof config === 'string') {
+      this._jaegerTraceHeader = config;
+      this._jaegerBaggageHeaderPrefix = UBER_BAGGAGE_HEADER_PREFIX;
+    } else {
+      this._jaegerTraceHeader = config?.customTraceHeader || UBER_TRACE_ID_HEADER;
+      this._jaegerBaggageHeaderPrefix = config?.customBaggageHeaderPrefix || UBER_BAGGAGE_HEADER_PREFIX;
+    }
   }
 
   inject(context: Context, carrier: unknown, setter: TextMapSetter): void {
@@ -74,7 +80,7 @@ export class JaegerPropagator implements TextMapPropagator {
       for (const [key, entry] of baggage.getAllEntries()) {
         setter.set(
           carrier,
-          `${UBER_BAGGAGE_HEADER_PREFIX}-${key}`,
+          `${this._jaegerBaggageHeaderPrefix}-${key}`,
           encodeURIComponent(entry.value)
         );
       }
@@ -88,11 +94,11 @@ export class JaegerPropagator implements TextMapPropagator {
       : uberTraceIdHeader;
     const baggageValues = getter
       .keys(carrier)
-      .filter(key => UBER_BAGGAGE_HEADER_REGEX.test(key))
+      .filter(key => key.startsWith(`${this._jaegerBaggageHeaderPrefix}-`))
       .map(key => {
         const value = getter.get(carrier, key);
         return {
-          key: key.substring(UBER_BAGGAGE_HEADER_PREFIX.length + 1),
+          key: key.substring(this._jaegerBaggageHeaderPrefix.length + 1),
           value: Array.isArray(value) ? value[0] : value,
         };
       });
