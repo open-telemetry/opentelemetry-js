@@ -46,13 +46,15 @@ export abstract class OTLPExporterNodeBase<
 
   constructor(config: OTLPExporterConfigNode = {}) {
     super(config);
-    if (config.headers) {
-      diag.warn('Headers cannot be set when using grpc');
-    }
     const headers = baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_HEADERS);
     this.metadata = config.metadata || new Metadata();
     for (const [k, v] of Object.entries(headers)) {
       this.metadata.set(k, v)
+    }
+    if (config.headers) {
+      for (const [k, v] of Object.entries(config.headers)) {
+        this.metadata.set(k, v)
+      }
     }
   }
 
