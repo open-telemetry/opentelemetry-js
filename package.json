@@ -24,7 +24,7 @@
     "predocs-test": "npm run docs",
     "docs": "typedoc && touch docs/.nojekyll",
     "docs-deploy": "gh-pages --dotfiles --dist docs",
-    "docs:test": "linkinator docs --silent && linkinator doc/*.md --silent",
+    "docs:test": "linkinator docs --silent --retry && linkinator doc/*.md --silent --retry",
     "lint": "lerna run lint",
     "lint:changed": "lerna run --concurrency 1 --stream lint --since HEAD --exclude-dependents",
     "lint:fix": "lerna run lint:fix",
