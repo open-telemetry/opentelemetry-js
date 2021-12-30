@@ -56,16 +56,14 @@ export abstract class OTLPExporterNodeBase<
     this.compression = config.compression || CompressionAlgorithm.NONE;
   }
 
-  onInit(_config: OTLPExporterNodeConfigBase): void {
-    this._isShutdown = false;
-  }
+  onInit(_config: OTLPExporterNodeConfigBase): void {}
 
   send(
     objects: ExportItem[],
     onSuccess: () => void,
     onError: (error: otlpTypes.OTLPExporterError) => void
   ): void {
-    if (this._isShutdown) {
+    if (this._shutdownOnce.isCalled) {
       diag.debug('Shutdown already started. Cannot send objects');
       return;
     }
