@@ -13,10 +13,12 @@ jobs:
       matrix:
         package-group: [".", "experimental"]
     runs-on: ubuntu-latest
-    container:
-      image: node:14
 
     steps:
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
       - uses: actions/checkout@v2
 
       - name: Lint changelog file
@@ -34,7 +36,8 @@ jobs:
         if: ${{ matrix.package-group == '.' }}
         uses: avto-dev/markdown-lint@v1
         with:
-          args: "./**/*.md -i ./CHANGELOG.md"
+          args: "./**/*.md"
+          ignore: './CHANGELOG.md ./experimental/packages/opentelemetry-exporter-metrics-otlp-grpc/protos ./experimental/packages/opentelemetry-exporter-metrics-otlp-proto/protos ./packages/exporter-trace-otlp-grpc/protos ./packages/exporter-trace-otlp-proto/protos'
 
       - name: restore lerna
         id: cache
@@ -45,7 +48,7 @@ jobs:
             experimental/node_modules
             */*/node_modules
             experimental/*/*/node_modules
-          key: lint-${{ matrix.package-group }}-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('**/package.json') }}-20211009.2
+          key: lint-${{ matrix.package-group }}-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('**/package.json') }}-20211216.2
 
       # On a cache miss, install dependencies
       - name: Bootstrap
@@ -53,10 +56,17 @@ jobs:
         working-directory: ${{ matrix.package-group }}
         run: |
           npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --ignore-scripts --hoist --nohoist='zone.js' -- --only=dev
+          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js'
 
       - name: Lint
         working-directory: ${{ matrix.package-group }}
         run: |
           npm run lint
           npm run lint:examples
+
+      - name: Lint doc files
+        if: ${{ matrix.package-group == '.' }}
+        run: |
+          npm run compile
+          NODE_OPTIONS=--max-old-space-size=4096 npm run docs
+          npm run docs:test

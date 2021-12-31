@@ -15,6 +15,7 @@
  */
 
 import { Context } from '@opentelemetry/api';
+import { ObservableResult } from './ObservableResult';
 
 /**
  * Options needed for metric creation
@@ -88,21 +89,12 @@ export interface Histogram {
   record(value: number, attributes?: Attributes, context?: Context): void;
 }
 
-// ObservableBase has to be an Object but for now there is no field or method
-// declared.
-/** Base interface for the Observable metrics. */
-export type ObservableBase = Record<never, never>;
-
-/** Base interface for the ObservableGauge metrics. */
-export type ObservableGauge = ObservableBase;
-
-/** Base interface for the ObservableUpDownCounter metrics. */
-export type ObservableUpDownCounter = ObservableBase;
-
-/** Base interface for the ObservableCounter metrics. */
-export type ObservableCounter = ObservableBase;
-
 /**
  * key-value pairs passed by the user.
  */
 export type Attributes = { [key: string]: string };
+
+/**
+ * The observable callback for Observable instruments.
+ */
+export type ObservableCallback = (observableResult: ObservableResult) => void | Promise<void>;
