@@ -192,6 +192,7 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 
 Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers)):
 
+- [Amir Blum](https://github.com/blumamir), Aspecto
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
 - [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
 
