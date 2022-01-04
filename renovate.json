@@ -17,7 +17,7 @@
     }
   ],
   "ignoreDeps": ["gcp-metadata", "got", "mocha", "husky", "karma-webpack"],
-  "assignees": ["@dyladan", "@vmarchaud"],
+  "assignees": ["@dyladan", "@Rauno56", "@vmarchaud"],
   "schedule": ["before 3am on Friday"],
   "labels": ["dependencies"]
 }
