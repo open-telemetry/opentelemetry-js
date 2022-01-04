@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { 
+import {
   Span,
   SpanAttributes,
  } from '@opentelemetry/api';
@@ -63,6 +63,14 @@ export interface HttpCustomAttributeFunction {
   ): void;
 }
 
+export interface IgnoreIncomingRequestFunction {
+  (request: IncomingMessage ): boolean;
+}
+
+export interface IgnoreOutgoingRequestFunction {
+  (request: RequestOptions ): boolean;
+}
+
 export interface HttpRequestCustomAttributeFunction {
   (span: Span, request: ClientRequest | IncomingMessage): void;
 }
@@ -85,8 +93,12 @@ export interface StartOutgoingSpanCustomAttributeFunction {
 export interface HttpInstrumentationConfig extends InstrumentationConfig {
   /** Not trace all incoming requests that match paths */
   ignoreIncomingPaths?: IgnoreMatcher[];
+  /** Not trace all incoming requests that matched with custom function */
+  ignoreIncomingRequestHook?: IgnoreIncomingRequestFunction;
   /** Not trace all outgoing requests that match urls */
   ignoreOutgoingUrls?: IgnoreMatcher[];
+  /** Not trace all outgoing requests that matched with custom function */
+  ignoreOutgoingRequestHook?: IgnoreOutgoingRequestFunction;
   /** Function for adding custom attributes after response is handled */
   applyCustomAttributesOnSpan?: HttpCustomAttributeFunction;
   /** Function for adding custom attributes before request is handled */

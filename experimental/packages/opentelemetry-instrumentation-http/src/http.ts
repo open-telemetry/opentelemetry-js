@@ -382,7 +382,12 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         utils.isIgnored(
           pathname,
           instrumentation._getConfig().ignoreIncomingPaths,
-          (e: Error) => instrumentation._diag.error('caught ignoreIncomingPaths error: ', e)
+          (e: unknown) => instrumentation._diag.error('caught ignoreIncomingPaths error: ', e)
+        ) ||
+        safeExecuteInTheMiddle(
+          () => instrumentation._getConfig().ignoreIncomingRequestHook?.(request),
+          () => {},
+          true
         )
       ) {
         return context.with(suppressTracing(context.active()), () => {
@@ -534,7 +539,12 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         utils.isIgnored(
           origin + pathname,
           instrumentation._getConfig().ignoreOutgoingUrls,
-          (e: Error) => instrumentation._diag.error('caught ignoreOutgoingUrls error: ', e)
+          (e: unknown) => instrumentation._diag.error('caught ignoreOutgoingUrls error: ', e)
+        ) ||
+        safeExecuteInTheMiddle(
+          () => instrumentation._getConfig().ignoreOutgoingRequestHook?.(optionsParsed),
+          () => {},
+          true
         )
       ) {
         return original.apply(this, [optionsParsed, ...args]);

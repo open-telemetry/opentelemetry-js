@@ -170,7 +170,7 @@ describe('Utility', () => {
     });
 
     it('should not re-throw when function throws an exception', () => {
-      const onException = (e: Error) => {
+      const onException = (e: unknown) => {
         // Do nothing
       };
       for (const callback of [undefined, onException]) {
@@ -480,7 +480,7 @@ describe('Utility', () => {
       assert.strictEqual(attributes[SemanticAttributes.HTTP_ROUTE], undefined)
     });
   });
-  
+
   describe('headers to span attributes capture', () => {
     let span: Span;
 

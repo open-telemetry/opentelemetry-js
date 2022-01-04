@@ -129,7 +129,7 @@ export const satisfiesPattern = (
 export const isIgnored = (
   constant: string,
   list?: IgnoreMatcher[],
-  onException?: (error: Error) => void
+  onException?: (error: unknown) => void
 ): boolean => {
   if (!list) {
     // No ignored urls - trace everything
@@ -304,18 +304,18 @@ export const getRequestInfo = (
     }`;
   }
 
-  if (hasExpectHeader(optionsParsed)) {
-    optionsParsed.headers = Object.assign({}, optionsParsed.headers);
-  } else if (!optionsParsed.headers) {
-    optionsParsed.headers = {};
-  }
+  const headers = optionsParsed.headers ?? {};
+  optionsParsed.headers = Object.keys(headers).reduce((normalizedHeader, key) => {
+    normalizedHeader[key.toLowerCase()] = headers[key];
+    return normalizedHeader;
+  }, {} as OutgoingHttpHeaders);
   // some packages return method in lowercase..
   // ensure upperCase for consistency
   const method = optionsParsed.method
     ? optionsParsed.method.toUpperCase()
     : 'GET';
 
-  return { origin, pathname, method, optionsParsed };
+  return { origin, pathname, method, optionsParsed, };
 };
 
 /**
@@ -501,7 +501,7 @@ export function headerCapture(type: 'request' | 'response', headers: string[]) {
   return (span: Span, getHeader: (key: string) => undefined | string | string[] | number) => {
     for (const [capturedHeader, normalizedHeader] of normalizedHeaders) {
       const value = getHeader(capturedHeader);
-      
+
       if (value === undefined) {
         continue;
       }
