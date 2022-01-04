@@ -16,12 +16,11 @@
 
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import { MetricExporter } from '../../src';
+import { MetricExporter, ReaderTimeoutError } from '../../src';
 import { MetricData } from '../../src/export/MetricData';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MetricProducer } from '../../src/export/MetricProducer';
-import { ReaderResultCode } from '../../src/export/ReaderResult';
 
 const MAX_32_BIT_INT = 2 ** 31 - 1
 
@@ -124,7 +123,7 @@ describe('PeriodicExportingMetricReader', () => {
         exportIntervalMillis: 1,
         exportTimeoutMillis: 1
       });
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 50));
 
       exporterMock.verify();
     })
@@ -135,7 +134,7 @@ describe('PeriodicExportingMetricReader', () => {
       const exporter = new TestMetricExporter();
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
-        exportIntervalMillis: 50,
+        exportIntervalMillis: 30,
         exportTimeoutMillis: 20
       });
 
@@ -143,7 +142,7 @@ describe('PeriodicExportingMetricReader', () => {
       const result = await exporter.waitForNumberOfExports(2);
 
       assert.deepEqual(result, [[], []]);
-      await new Promise(resolve => reader.shutdown({ done: resolve }));
+      await reader.shutdown({});
     });
   });
 
@@ -153,7 +152,7 @@ describe('PeriodicExportingMetricReader', () => {
       exporter.throwException = true;
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
-        exportIntervalMillis: 50,
+        exportIntervalMillis: 30,
         exportTimeoutMillis: 20
       });
 
@@ -163,7 +162,7 @@ describe('PeriodicExportingMetricReader', () => {
       assert.deepEqual(result, [[], []]);
 
       exporter.throwException = false;
-      await new Promise(resolve => reader.shutdown({ done: resolve }));
+      await reader.shutdown({});
     });
   });
 
@@ -172,7 +171,7 @@ describe('PeriodicExportingMetricReader', () => {
       sinon.restore();
     });
 
-    it('should force export', done => {
+    it('should force export', async () => {
       const exporter = new TestMetricExporter();
       const exporterMock = sinon.mock(exporter);
       exporterMock.expects('export').calledOnceWithExactly([]);
@@ -183,17 +182,14 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       reader.setMetricProducer(new TestMetricProducer());
-      reader.forceFlush({
-        done: _result => {
-          exporterMock.verify();
-          reader.shutdown({ done: _result => done() });
-        }
-      });
+      await reader.forceFlush({});
+      exporterMock.verify();
+      await reader.shutdown({});
     });
 
-    it('should return TIMED_OUT when export takes too long', done => {
+    it('should throw ReaderTimeoutError when export takes too long', async () => {
       const exporter = new TestMetricExporter();
-      exporter.exportTime = 1000;
+      exporter.exportTime = 60;
 
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
@@ -202,19 +198,12 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       reader.setMetricProducer(new TestMetricProducer());
-      reader.forceFlush({
-        timeoutMillis: 20,
-        done: result => {
-          assert.strictEqual(result.code, ReaderResultCode.TIMED_OUT);
-
-          // cleanup.
-          exporter.exportTime = 0;
-          reader.shutdown({ done: _result => done() });
-        }
-      });
+      await assert.rejects(reader.forceFlush({ timeoutMillis: 20 }),
+        thrown => thrown instanceof ReaderTimeoutError);
+      await reader.shutdown({});
     });
 
-    it('should return FAILED when handler throws', done => {
+    it('should throw when handler throws', async () => {
       const exporter = new TestMetricExporter();
       exporter.throwException = true;
       const reader = new PeriodicExportingMetricReader({
@@ -223,18 +212,10 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 80,
       });
 
-      reader.forceFlush({
-        done: result => {
-          assert.strictEqual(result.code, ReaderResultCode.FAILED);
-
-          // cleanup.
-          exporter.throwException = false;
-          reader.shutdown({ done: _result => done() });
-        }
-      })
+      await assert.rejects(reader.forceFlush({}));
     });
 
-    it('should return FAILED after shutdown', done => {
+    it('should throw after shutdown', async () => {
       const exporter = new TestMetricExporter();
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
@@ -243,25 +224,20 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       reader.setMetricProducer(new TestMetricProducer());
-      reader.shutdown({
-        done: result => {
-          assert.strictEqual(result.code, ReaderResultCode.SUCCESS);
-          reader.forceFlush({
-            done: forceFlushResult => {
-              assert.strictEqual(forceFlushResult.code, ReaderResultCode.FAILED);
-              done();
-            }
-          })
-        }
-      });
+      await reader.shutdown({});
+      await assert.rejects(reader.shutdown({}));
     });
   });
 
   describe('shutdown', () => {
-    it('should export one last time', done => {
+    afterEach(() => {
+      sinon.restore();
+    });
+
+    it('should forceFlush', async () => {
       const exporter = new TestMetricExporter();
       const exporterMock = sinon.mock(exporter);
-      exporterMock.expects('export').calledOnceWithExactly([]);
+      exporterMock.expects('forceFlush').calledOnceWithExactly([]);
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
@@ -269,15 +245,11 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       reader.setMetricProducer(new TestMetricProducer());
-      reader.shutdown({
-        done: _result => {
-          exporterMock.verify();
-          done();
-        }
-      });
+      await reader.shutdown({});
+      exporterMock.verify();
     });
 
-    it('should return TIMED_OUT when export takes too long', done => {
+    it('should throw ReaderTimeoutError when export takes too long', async () => {
       const exporter = new TestMetricExporter();
       exporter.exportTime = 1000;
 
@@ -288,15 +260,11 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       reader.setMetricProducer(new TestMetricProducer());
-      reader.shutdown({
-        timeoutMillis: 20, done: result => {
-          assert.strictEqual(result.code, ReaderResultCode.TIMED_OUT);
-          done();
-        }
-      });
+      await assert.rejects(reader.shutdown({ timeoutMillis: 20 }),
+        thrown => thrown instanceof ReaderTimeoutError);
     });
 
-    it('should return FAILED when called twice', done => {
+    it('should throw when called twice', async () => {
       const exporter = new TestMetricExporter();
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
@@ -307,22 +275,11 @@ describe('PeriodicExportingMetricReader', () => {
       reader.setMetricProducer(new TestMetricProducer());
 
       // first call should succeed.
-      reader.shutdown({
-        done: result => {
-          assert.strictEqual(result.code, ReaderResultCode.SUCCESS);
-
-          //second call should fail
-          reader.shutdown({
-            done: secondResult => {
-              assert.strictEqual(secondResult.code, ReaderResultCode.FAILED);
-              done();
-            }
-          })
-        }
-      });
+      await reader.shutdown({});
+      await assert.rejects(reader.shutdown({}));
     });
 
-    it('should return FAILED when shutdown-handler throws.', done => {
+    it('should throw on non-initialized instance.', async () => {
       const exporter = new TestMetricExporter();
       exporter.throwException = true;
       const reader = new PeriodicExportingMetricReader({
@@ -331,18 +288,13 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 80,
       });
 
-      reader.shutdown({
-          done: result => {
-            assert.strictEqual(result.code, ReaderResultCode.FAILED);
-            done();
-          }
-        },
-      );
+      await assert.rejects(reader.shutdown({}));
     });
-  });
+  })
+  ;
 
   describe('collect', () => {
-    it('should return FAILED on non-initialized instance', done => {
+    it('should throw on non-initialized instance', async () => {
       const exporter = new TestMetricExporter();
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
@@ -350,15 +302,10 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 80,
       });
 
-      reader.collect({
-        done: (result => {
-          assert.strictEqual(result.code, ReaderResultCode.FAILED);
-          done();
-        })
-      });
+      await assert.rejects(reader.collect({}));
     });
 
-    it('should return FAILED on shut-down instance', done => {
+    it('should throw on shut-down instance', async () => {
       const exporter = new TestMetricExporter();
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
@@ -368,16 +315,8 @@ describe('PeriodicExportingMetricReader', () => {
 
       reader.setMetricProducer(new TestMetricProducer());
 
-      reader.shutdown({
-        done: _result => {
-          reader.collect({
-            done: (result => {
-              assert.strictEqual(result.code, ReaderResultCode.FAILED);
-              done();
-            })
-          });
-        }
-      });
+      await reader.shutdown({});
+      await assert.rejects(reader.collect({}));
     });
-  })
+  });
 });

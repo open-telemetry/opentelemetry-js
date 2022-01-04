@@ -15,10 +15,8 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { MetricReader, promiseWithTimeout } from './MetricReader';
+import { callWithTimeout, MetricReader, ReaderTimeoutError } from './MetricReader';
 import { MetricExporter } from './MetricExporter';
-import { MetricData } from './MetricData';
-import { ReaderResult, ReaderResultCode } from './ReaderResult';
 
 export type PeriodicExportingMetricReaderOptions = {
   exporter: MetricExporter
@@ -62,35 +60,23 @@ export class PeriodicExportingMetricReader extends MetricReader {
   }
 
   private async _runOnce(): Promise<void> {
-    const collectionResult = await new Promise<ReaderResult<MetricData[]>>(resolve =>
-      this.collect({ done: resolve }));
-
-    // Throw on any code that does not indicate success.
-    if (collectionResult.code !== ReaderResultCode.SUCCESS) {
-      throw collectionResult.error ?? new Error('Unknown error occurred during collection.');
-    }
-
-    // This case should never occur.
-    if (collectionResult.returnValue == null) {
-      throw new Error('Unknown error occurred during collection.');
-    }
-
-    await this._exporter.export(collectionResult.returnValue);
+    const metrics = await this.collect({});
+    await this._exporter.export(metrics);
   }
 
   protected override onInitialized(): void {
     // start running the interval as soon as this reader is initialized and keep handle for shutdown.
     this._interval = setInterval(async () => {
-      promiseWithTimeout(this._runOnce(), this._exportTimeout, (result => {
-        if (result.code === ReaderResultCode.TIMED_OUT) {
+      try {
+        await callWithTimeout(this._runOnce(), this._exportTimeout);
+      } catch (err) {
+        if (err instanceof ReaderTimeoutError) {
           api.diag.error('Export took longer than %s milliseconds and timed out.', this._exportTimeout);
           return;
         }
-        if (result.code === ReaderResultCode.FAILED) {
-          api.diag.error('Unexpected error during export: %s', result.error);
-          return;
-        }
-      }));
+
+        api.diag.error('Unexpected error during export: %s', err);
+      }
     }, this._exportInterval);
   }
 

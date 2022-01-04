@@ -17,68 +17,55 @@
 import { AggregationTemporality } from './AggregationTemporality';
 import { MetricProducer } from './MetricProducer';
 import { MetricData } from './MetricData';
-import { ReaderResult, ReaderResultCode } from './ReaderResult';
 
-export type ReaderOptions<T> = {
-  done?: (result: ReaderResult<T>) => void
+export type ReaderOptions = {
   timeoutMillis?: number
 }
 
-export type ReaderCollectionOptions = ReaderOptions<MetricData[]>;
+export type ReaderCollectionOptions = ReaderOptions;
 
-export type ReaderShutdownOptions = ReaderOptions<void>;
+export type ReaderShutdownOptions = ReaderOptions;
 
-export type ReaderForceFlushOptions = ReaderOptions<void>;
-
+export type ReaderForceFlushOptions = ReaderOptions;
 
 /**
- * Adds a timeout to a promise and executes the callback if the specified timeout has elapsed, or the promise
- * has resolved or rejected.
+ * Error that is thrown on timeouts (i.e. timeout on forceFlush or shutdown)
+ */
+export class ReaderTimeoutError extends Error {
+  constructor(message?: string) {
+    super(message);
+    Object.setPrototypeOf(this, ReaderTimeoutError.prototype);
+  }
+}
+
+/**
+ * Adds a timeout to a promise and rejects if the specified timeout has elapsed. Also rejects if the specified promise
+ * rejects, and resolves if the specified promise resolves.
  *
- * <p> NOTE: this operation will continue even after the timeout fires the callback.
+ * <p> NOTE: this operation will continue even after it throws a {@link ReaderTimeoutError}.
  *
  * @param promise promise to use with timeout.
  * @param timeout the timeout in milliseconds until the returned promise is rejected.
- * @param done the callback once the promise has resolved or rejected.
  */
-export function promiseWithTimeout<T>(promise: Promise<T>, timeout: number, done: (result: ReaderResult<T>) => void): void {
-  // keep handle so that we can clear it later.
+export function callWithTimeout<T>(promise: Promise<T>, timeout: number): Promise<T> {
   let timeoutHandle: ReturnType<typeof setTimeout>;
 
-  // Set up a promise to handle the timeout.
-  const timeoutPromise = new Promise<ReaderResult<T>>(function timeoutFunction(resolve) {
+  const timeoutPromise = new Promise<never>(function timeoutFunction(_resolve, reject) {
     timeoutHandle = setTimeout(
       function timeoutHandler() {
-        resolve({
-          code: ReaderResultCode.TIMED_OUT,
-          error: new Error('Operation timed out.')
-        })
+        reject(new ReaderTimeoutError('Operation timed out.'));
       },
       timeout
     );
   });
 
-  // Wrap to promise to get a result code with the result if it does not reject.
-  const resultCodePromise = promise.then(result => {
-    return { code: ReaderResultCode.SUCCESS, returnValue: result }
-  })
-
-  Promise.race([resultCodePromise, timeoutPromise]).then(result => {
-      // Clear timeout on success and return result.
+  return Promise.race([promise, timeoutPromise]).then(result => {
       clearTimeout(timeoutHandle);
-      if (done) {
-        done(result);
-      }
+      return result;
     },
     reason => {
-      // Clear timeout on rejection and return failure.
       clearTimeout(timeoutHandle);
-      if (done) {
-        done({
-          code: ReaderResultCode.FAILED,
-          error: reason
-        });
-      }
+      throw reason;
     });
 }
 
@@ -142,80 +129,46 @@ export abstract class MetricReader {
   /**
    * Collect all metrics from the associated {@link MetricProducer}
    */
-  collect(options: ReaderCollectionOptions): void {
-    const timeout = options.timeoutMillis ?? 10000;
-    const done = options.done ?? (_result => {
-    });
-
+  async collect(options: ReaderCollectionOptions): Promise<MetricData[]> {
     if (this._metricProducer === undefined) {
-      done({
-        code: ReaderResultCode.FAILED,
-        error: new Error('MetricReader is not bound to a MetricProducer'),
-      });
-      return;
+      throw new Error('MetricReader is not bound to a MetricProducer');
     }
 
     // Subsequent invocations to collect are not allowed. SDKs SHOULD return some failure for these calls.
     if (this._shutdown) {
-      done({
-        code: ReaderResultCode.FAILED,
-        error: new Error('Collection is not allowed after shutdown'),
-      });
-      return;
+      throw new Error('Collection is not allowed after shutdown');
     }
 
-    promiseWithTimeout(this._metricProducer.collect(), timeout, done);
+    return await callWithTimeout(this._metricProducer.collect(), options.timeoutMillis ?? 10000);
   }
 
   /**
-   * Shuts down the metric reader, the callback will fire after the specified timeout or after completion.
+   * Shuts down the metric reader, the promise will reject after the specified timeout or resolve after completion.
    *
-   * <p> NOTE: this operation will continue even after the timeout fires the callback.
-   * @param options
+   * <p> NOTE: this operation will continue even after the promise rejects due to a timeout.
+   * @param options options with timeout (default: 10000ms).
    */
-  shutdown(options: ReaderForceFlushOptions): void {
-    const timeout = options.timeoutMillis ?? 10000;
-    const done = options.done ?? (_result => {
-    });
-
+  async shutdown(options: ReaderForceFlushOptions): Promise<void> {
     // Do not call shutdown again if it has already been called.
     if (this._shutdown) {
-      done({
-        code: ReaderResultCode.FAILED,
-        error: new Error('Cannot call shutdown twice.')
-      });
-      return;
+      throw new Error('Cannot call shutdown twice.');
     }
 
-    promiseWithTimeout(this.onShutdown(), timeout, result => {
-        if (result.code === ReaderResultCode.SUCCESS) {
-          this._shutdown = true;
-        }
-        done(result);
-      }
-    );
-
+    await callWithTimeout(this.onShutdown(), options.timeoutMillis ?? 10000);
+    this._shutdown = true;
   }
 
   /**
-   * Flushes metrics read by this reader, the callback will fire after the specified timeout or after completion.
+   * Flushes metrics read by this reader, the promise will reject after the specified timeout or resolve after completion.
    *
-   * <p> NOTE: this operation will continue even after the timeout fires the callback.
-   * @param options options with timeout (default: 10000ms) and a result callback.
+   * <p> NOTE: this operation will continue even after the promise rejects due to a timeout.
+   * @param options options with timeout (default: 10000ms).
    */
-  forceFlush(options: ReaderShutdownOptions): void {
-    const timeout = options.timeoutMillis ?? 10000;
-    const done = options.done ?? (_result => {
-    });
-
+  async forceFlush(options: ReaderShutdownOptions): Promise<void> {
     if (this._shutdown) {
-      done({
-        code: ReaderResultCode.FAILED,
-        error: new Error('Cannot forceFlush on already shutdown MetricReader')
-      });
-      return;
+      throw new Error('Cannot forceFlush on already shutdown MetricReader.');
     }
 
-    promiseWithTimeout(this.onForceFlush(), timeout, done);
+    await callWithTimeout(this.onForceFlush(), options.timeoutMillis ?? 10000);
   }
 }
