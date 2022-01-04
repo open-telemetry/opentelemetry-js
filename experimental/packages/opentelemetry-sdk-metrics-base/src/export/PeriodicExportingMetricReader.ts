@@ -81,7 +81,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
   }
 
   protected async onForceFlush(): Promise<void> {
-    await this._runOnce();
+    await this._exporter.forceFlush();
   }
 
   protected async onShutdown(): Promise<void> {
@@ -89,7 +89,6 @@ export class PeriodicExportingMetricReader extends MetricReader {
       clearInterval(this._interval);
     }
 
-    await this.onForceFlush();
     await this._exporter.shutdown();
   }
 }

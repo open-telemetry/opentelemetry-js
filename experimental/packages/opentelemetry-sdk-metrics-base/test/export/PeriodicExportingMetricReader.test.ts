@@ -26,6 +26,7 @@ const MAX_32_BIT_INT = 2 ** 31 - 1
 
 class TestMetricExporter extends MetricExporter {
   public exportTime = 0;
+  public forceFlushTime = 0;
   public throwException = false;
   private _batches: MetricData[][] = [];
 
@@ -39,6 +40,11 @@ class TestMetricExporter extends MetricExporter {
   }
 
   async forceFlush(): Promise<void> {
+    if (this.throwException) {
+      throw new Error('Error during forceFlush');
+    }
+
+    await new Promise(resolve => setTimeout(resolve, this.forceFlushTime));
   }
 
   async waitForNumberOfExports(numberOfExports: number): Promise<MetricData[][]> {
@@ -171,10 +177,10 @@ describe('PeriodicExportingMetricReader', () => {
       sinon.restore();
     });
 
-    it('should force export', async () => {
+    it('should forceFlush exporter', async () => {
       const exporter = new TestMetricExporter();
       const exporterMock = sinon.mock(exporter);
-      exporterMock.expects('export').calledOnceWithExactly([]);
+      exporterMock.expects('forceFlush').calledOnceWithExactly();
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
@@ -187,9 +193,9 @@ describe('PeriodicExportingMetricReader', () => {
       await reader.shutdown({});
     });
 
-    it('should throw ReaderTimeoutError when export takes too long', async () => {
+    it('should throw ReaderTimeoutError when forceFlush takes too long', async () => {
       const exporter = new TestMetricExporter();
-      exporter.exportTime = 60;
+      exporter.forceFlushTime = 60;
 
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
@@ -203,7 +209,7 @@ describe('PeriodicExportingMetricReader', () => {
       await reader.shutdown({});
     });
 
-    it('should throw when handler throws', async () => {
+    it('should throw when exporter throws', async () => {
       const exporter = new TestMetricExporter();
       exporter.throwException = true;
       const reader = new PeriodicExportingMetricReader({
@@ -237,7 +243,7 @@ describe('PeriodicExportingMetricReader', () => {
     it('should forceFlush', async () => {
       const exporter = new TestMetricExporter();
       const exporterMock = sinon.mock(exporter);
-      exporterMock.expects('forceFlush').calledOnceWithExactly([]);
+      exporterMock.expects('forceFlush').calledOnceWithExactly();
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
@@ -249,9 +255,9 @@ describe('PeriodicExportingMetricReader', () => {
       exporterMock.verify();
     });
 
-    it('should throw ReaderTimeoutError when export takes too long', async () => {
+    it('should throw ReaderTimeoutError when forceFlush takes too long', async () => {
       const exporter = new TestMetricExporter();
-      exporter.exportTime = 1000;
+      exporter.forceFlushTime = 1000;
 
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
