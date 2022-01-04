@@ -44,14 +44,14 @@ export class MetricCollector implements MetricProducer {
    * Delegates for MetricReader.forceFlush.
    */
   async forceFlush(): Promise<void> {
-    await new Promise(resolve => this._metricReader.forceFlush({done: resolve}));
+    await this._metricReader.forceFlush({});
   }
 
   /**
    * Delegates for MetricReader.shutdown.
    */
   async shutdown(): Promise<void> {
-    await new Promise(resolve => this._metricReader.shutdown({done: resolve}));
+    await this._metricReader.shutdown({});
   }
 }
 
