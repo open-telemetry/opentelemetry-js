@@ -4,10 +4,12 @@
     "rootDir": ".",
     "outDir": "build",
     "noImplicitOverride": false,
-    "noUnusedLocals": false
+    "noUnusedLocals": false,
+    "allowJs": true
   },
   "include": [
     "src/**/*.ts",
+    "src/**/*.js",
     "test/**/*.ts"
   ],
   "references": []

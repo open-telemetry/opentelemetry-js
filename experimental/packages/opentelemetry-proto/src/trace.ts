@@ -16,8 +16,33 @@
 import { Link, SpanKind, SpanStatusCode } from '@opentelemetry/api';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace-base';
+import { RPCImpl } from 'protobufjs';
 import { toAttributes } from './common';
 import { opentelemetry } from './generated';
+
+/**
+ * Options for the TraceServiceClient
+ */
+export type TraceClientOptions = {
+    rpcImpl: RPCImpl,
+}
+
+/**
+ * A wrapper which takes an RPC Implementation and handles protobuf serialization and exporting
+ */
+export class TraceServiceClient {
+    private _service: opentelemetry.proto.collector.trace.v1.TraceService;
+
+    constructor(options: TraceClientOptions) {
+        this._service = new opentelemetry.proto.collector.trace.v1.TraceService(options.rpcImpl);
+    }
+
+    async export(spans: ReadableSpan[]): Promise<unknown> {
+        const request = createExportTraceServiceRequest(spans);
+        if (!request) return null;
+        return this._service.export(request);
+    }
+}
 
 export function createExportTraceServiceRequest(spans: ReadableSpan[]): opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest | null {
     if (spans.length === 0) {

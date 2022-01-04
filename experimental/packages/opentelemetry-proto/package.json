@@ -48,10 +48,12 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^1.0.3"
+    "@opentelemetry/api": "^1.0.3",
+    "long": "^4.0.0"
   },
   "devDependencies": {
     "@types/mocha": "8.2.3",
+    "long": "^4.0.0",
     "mocha": "7.2.0",
     "rimraf": "3.0.2",
     "typescript": "4.4.4"

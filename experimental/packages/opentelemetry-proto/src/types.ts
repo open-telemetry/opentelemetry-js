@@ -14,6 +14,5 @@
  * limitations under the License.
  */
 
-export * from './trace';
-export * from './metrics';
-export * from "./types";
+import type Long = require('long');
+export type Fixed64 = Long | number;

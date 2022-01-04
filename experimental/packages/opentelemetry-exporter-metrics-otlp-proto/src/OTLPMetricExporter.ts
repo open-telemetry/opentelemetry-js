@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import {
-  otlpTypes,
-  OTLPExporterNodeConfigBase,
-  appendResourcePathToUrlIfNotPresent,
-} from '@opentelemetry/exporter-trace-otlp-http';
+import { baggageUtils, getEnv } from '@opentelemetry/core';
+import { createTraceClient } from '@opentelemetry/proto';
 import { toOTLPExportMetricServiceRequest } from '@opentelemetry/exporter-metrics-otlp-http';
-import { MetricRecord, MetricExporter } from '@opentelemetry/sdk-metrics-base';
-import { ServiceClientType, OTLPExporterNodeBase } from '@opentelemetry/exporter-trace-otlp-proto';
-import { getEnv, baggageUtils } from '@opentelemetry/core';
+import {
+  appendResourcePathToUrlIfNotPresent, OTLPExporterNodeConfigBase, otlpTypes
+} from '@opentelemetry/exporter-trace-otlp-http';
+import { ServiceClientType } from '@opentelemetry/exporter-trace-otlp-proto';
+import { MetricExporter, MetricRecord } from '@opentelemetry/sdk-metrics-base';
+import { RPCImpl } from 'protobufjs';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = '/v1/metrics';
 const DEFAULT_COLLECTOR_URL=`http://localhost:55681${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
@@ -30,23 +30,31 @@ const DEFAULT_COLLECTOR_URL=`http://localhost:55681${DEFAULT_COLLECTOR_RESOURCE_
 /**
  * OTLP Metric Exporter for Node with protobuf
  */
-export class OTLPMetricExporter
-  extends OTLPExporterNodeBase<
-    MetricRecord,
-    otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
-  >
-  implements MetricExporter {
+export class OTLPMetricExporter implements MetricExporter {
   // Converts time to nanoseconds
   protected readonly _startTime = new Date().getTime() * 1000000;
+  // private _service: TraceService;
 
   constructor(config: OTLPExporterNodeConfigBase = {}) {
-    super(config);
+    this._service = createTraceClient(this._rpcImpl);
     this.headers = Object.assign(
       this.headers,
       baggageUtils.parseKeyPairsIntoRecord(
         getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
       )
     );
+  }
+
+
+  private _rpcImpl: RPCImpl = (method, data, callback) => {
+  };
+
+  shutdown(): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+
+  export(metrics: MetricRecord[]) {
+
   }
 
   convert(

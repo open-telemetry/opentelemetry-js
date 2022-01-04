@@ -15,11 +15,33 @@
  */
 import { ValueType } from '@opentelemetry/api-metrics';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
-import { AggregatorKind, MetricKind, MetricRecord, Point, Histogram } from '@opentelemetry/sdk-metrics-base';
+import { AggregatorKind, Histogram, MetricKind, MetricRecord, Point } from '@opentelemetry/sdk-metrics-base';
+import { RPCImpl } from 'protobufjs';
 import { toAttributes } from './common';
 import { opentelemetry } from './generated';
+import { Fixed64 } from './types';
 
-export function createExportMetricsServiceRequest(metricRecords: MetricRecord[], startTime: string): opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest | null {
+export type MetricsClientOptions = {
+    rpcImpl: RPCImpl,
+    startTime: Fixed64,
+}
+export class MetricsServiceClient {
+    private _service: opentelemetry.proto.collector.metrics.v1.MetricsService;
+    private _startTime: Fixed64;
+
+    constructor(options: MetricsClientOptions) {
+        this._service = new opentelemetry.proto.collector.metrics.v1.MetricsService(options.rpcImpl);
+        this._startTime = options.startTime ?? Date.now() * 1000;
+    }
+
+    async export(metricRecords: MetricRecord[]): Promise<unknown> {
+        const request = createExportMetricsServiceRequest(metricRecords, this._startTime);
+        if (!request) return null;
+        return this._service.export(request);
+    }
+}
+
+export function createExportMetricsServiceRequest(metricRecords: MetricRecord[], startTime: Fixed64): opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest | null {
     if (metricRecords.length === 0) {
         return null;
     }
@@ -41,7 +63,7 @@ export function createExportMetricsServiceRequest(metricRecords: MetricRecord[],
     });
 }
 
-function toMetric(metric: MetricRecord, startTime: string): opentelemetry.proto.metrics.v1.Metric {
+function toMetric(metric: MetricRecord, startTime: Fixed64): opentelemetry.proto.metrics.v1.Metric {
     return opentelemetry.proto.metrics.v1.Metric.fromObject({
         description: metric.descriptor.description,
         name: metric.descriptor.name,
@@ -70,7 +92,7 @@ function toAggregationTemporality(
 
 function toSum(
     metric: MetricRecord,
-    startTime: string
+    startTime: Fixed64
 ): opentelemetry.proto.metrics.v1.Sum {
     return opentelemetry.proto.metrics.v1.Sum.fromObject({
         dataPoints: [toNumberDataPoint(metric, startTime)],
@@ -83,7 +105,7 @@ function toSum(
 
 function toGauge(
     metric: MetricRecord,
-    startTime: string
+    startTime: Fixed64
 ): opentelemetry.proto.metrics.v1.Gauge {
     return opentelemetry.proto.metrics.v1.Gauge.fromObject({
         dataPoints: [toNumberDataPoint(metric, startTime)],
@@ -93,7 +115,7 @@ function toGauge(
 
 function toHistogram(
     metric: MetricRecord,
-    startTime: string
+    startTime: Fixed64
 ): opentelemetry.proto.metrics.v1.Histogram {
     return opentelemetry.proto.metrics.v1.Histogram.fromObject({
         dataPoints: [toHistogramDataPoint(metric, startTime)],
@@ -103,7 +125,7 @@ function toHistogram(
 
 function toNumberDataPoint(
     metric: MetricRecord,
-    startTime: string
+    startTime: Fixed64
 ): opentelemetry.proto.metrics.v1.NumberDataPoint {
     return opentelemetry.proto.metrics.v1.NumberDataPoint.fromObject({
         attributes: toAttributes(metric.attributes),
@@ -118,7 +140,7 @@ function toNumberDataPoint(
 
 function toHistogramDataPoint(
     metric: MetricRecord,
-    startTime: string
+    startTime: Fixed64
 ): opentelemetry.proto.metrics.v1.HistogramDataPoint {
     const point = metric.aggregator.toPoint() as Point<Histogram>
     return opentelemetry.proto.metrics.v1.HistogramDataPoint.fromObject({
