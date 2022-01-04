@@ -17,7 +17,7 @@
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "version": "node ../../scripts/version-update.js",
     "watch": "npm run protos:copy && tsc -w",
-    "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
+    "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "npm run precompile"
   },
   "keywords": [
