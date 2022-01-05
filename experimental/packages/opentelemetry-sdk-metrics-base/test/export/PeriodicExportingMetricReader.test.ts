@@ -71,7 +71,10 @@ class TestDeltaMetricExporter extends TestMetricExporter {
 }
 
 class TestMetricProducer implements MetricProducer {
+  public collectionTime = 0;
+
   async collect(): Promise<MetricData[]> {
+    await new Promise(resolve => setTimeout(resolve, this.collectionTime));
     return [];
   }
 }
@@ -328,6 +331,25 @@ describe('PeriodicExportingMetricReader', () => {
 
       await reader.shutdown({});
       await assert.rejects(() => reader.collect({}));
+    });
+
+    it('should time out when timeoutMillis is set', async () => {
+      const exporter = new TestMetricExporter();
+      const reader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: MAX_32_BIT_INT,
+        exportTimeoutMillis: 80,
+      });
+      const producer = new TestMetricProducer();
+      producer.collectionTime = 40;
+      reader.setMetricProducer(producer);
+
+      await assert.rejects(
+        () => reader.collect({ timeoutMillis: 20 }),
+        thrown => thrown instanceof TimeoutError
+      );
+
+      await reader.shutdown({});
     });
   });
 });

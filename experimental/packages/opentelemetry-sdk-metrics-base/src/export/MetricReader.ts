@@ -100,14 +100,19 @@ export abstract class MetricReader {
       throw new Error('Collection is not allowed after shutdown');
     }
 
-    return await callWithTimeout(this._metricProducer.collect(), options.timeoutMillis ?? 10000);
+    // No timeout if timeoutMillis is undefined or null.
+    if (options.timeoutMillis == null) {
+      return await this._metricProducer.collect();
+    }
+
+    return await callWithTimeout(this._metricProducer.collect(), options.timeoutMillis);
   }
 
   /**
-   * Shuts down the metric reader, the promise will reject after the specified timeout or resolve after completion.
+   * Shuts down the metric reader, the promise will reject after the optional timeout or resolve after completion.
    *
    * <p> NOTE: this operation will continue even after the promise rejects due to a timeout.
-   * @param options options with timeout (default: 10000ms).
+   * @param options options with timeout.
    */
   async shutdown(options: ReaderShutdownOptions): Promise<void> {
     // Do not call shutdown again if it has already been called.
@@ -116,21 +121,33 @@ export abstract class MetricReader {
       return;
     }
 
-    await callWithTimeout(this.onShutdown(), options.timeoutMillis ?? 10000);
+    // No timeout if timeoutMillis is undefined or null.
+    if (options.timeoutMillis == null) {
+      await this.onShutdown();
+    } else {
+      await callWithTimeout(this.onShutdown(), options.timeoutMillis);
+    }
+
     this._shutdown = true;
   }
 
   /**
-   * Flushes metrics read by this reader, the promise will reject after the specified timeout or resolve after completion.
+   * Flushes metrics read by this reader, the promise will reject after the optional timeout or resolve after completion.
    *
    * <p> NOTE: this operation will continue even after the promise rejects due to a timeout.
-   * @param options options with timeout (default: 10000ms).
+   * @param options options with timeout.
    */
   async forceFlush(options: ReaderForceFlushOptions): Promise<void> {
     if (this._shutdown) {
       throw new Error('Cannot forceFlush on already shutdown MetricReader.');
     }
 
-    await callWithTimeout(this.onForceFlush(), options.timeoutMillis ?? 10000);
+    // No timeout if timeoutMillis is undefined or null.
+    if (options.timeoutMillis == null) {
+      await this.onForceFlush();
+      return;
+    }
+
+    await callWithTimeout(this.onForceFlush(), options.timeoutMillis);
   }
 }
