@@ -299,6 +299,21 @@ describe('JaegerPropagator', () => {
       assert(typeof firstEntry !== 'undefined');
       assert(firstEntry.value === 'one');
     });
+
+    it('should 0-pad span and trace id from header', () => {
+      carrier[UBER_TRACE_ID_HEADER] = '4cda95b652f4a1592b449d5929fda1b:e0c63257de34c92:0:01';
+      const extractedSpanContext = trace.getSpanContext(
+        jaegerPropagator.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        )
+      );
+
+      assert.ok(extractedSpanContext);
+      assert.equal(extractedSpanContext.spanId, '0e0c63257de34c92');
+      assert.equal(extractedSpanContext.traceId, '04cda95b652f4a1592b449d5929fda1b');
+    });
   });
 
   describe('.fields()', () => {
