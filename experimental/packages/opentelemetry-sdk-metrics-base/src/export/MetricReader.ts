@@ -109,7 +109,7 @@ export abstract class MetricReader {
    * <p> NOTE: this operation will continue even after the promise rejects due to a timeout.
    * @param options options with timeout (default: 10000ms).
    */
-  async shutdown(options: ReaderForceFlushOptions): Promise<void> {
+  async shutdown(options: ReaderShutdownOptions): Promise<void> {
     // Do not call shutdown again if it has already been called.
     if (this._shutdown) {
       api.diag.error('Cannot call shutdown twice.');
@@ -126,7 +126,7 @@ export abstract class MetricReader {
    * <p> NOTE: this operation will continue even after the promise rejects due to a timeout.
    * @param options options with timeout (default: 10000ms).
    */
-  async forceFlush(options: ReaderShutdownOptions): Promise<void> {
+  async forceFlush(options: ReaderForceFlushOptions): Promise<void> {
     if (this._shutdown) {
       throw new Error('Cannot forceFlush on already shutdown MetricReader.');
     }
