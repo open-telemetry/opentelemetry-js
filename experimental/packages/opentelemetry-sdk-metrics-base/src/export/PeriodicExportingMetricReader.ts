@@ -15,8 +15,9 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { callWithTimeout, MetricReader, ReaderTimeoutError } from './MetricReader';
+import { MetricReader } from './MetricReader';
 import { MetricExporter } from './MetricExporter';
+import { callWithTimeout, TimeoutError } from '../utils';
 
 export type PeriodicExportingMetricReaderOptions = {
   exporter: MetricExporter
@@ -70,7 +71,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
       try {
         await callWithTimeout(this._runOnce(), this._exportTimeout);
       } catch (err) {
-        if (err instanceof ReaderTimeoutError) {
+        if (err instanceof TimeoutError) {
           api.diag.error('Export took longer than %s milliseconds and timed out.', this._exportTimeout);
           return;
         }

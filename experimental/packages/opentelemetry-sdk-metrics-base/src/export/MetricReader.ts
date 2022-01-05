@@ -18,6 +18,7 @@ import * as api from '@opentelemetry/api';
 import { AggregationTemporality } from './AggregationTemporality';
 import { MetricProducer } from './MetricProducer';
 import { MetricData } from './MetricData';
+import { callWithTimeout } from '../utils';
 
 export type ReaderOptions = {
   timeoutMillis?: number
@@ -28,47 +29,6 @@ export type ReaderCollectionOptions = ReaderOptions;
 export type ReaderShutdownOptions = ReaderOptions;
 
 export type ReaderForceFlushOptions = ReaderOptions;
-
-/**
- * Error that is thrown on timeouts (i.e. timeout on forceFlush or shutdown)
- */
-export class ReaderTimeoutError extends Error {
-  constructor(message?: string) {
-    super(message);
-    Object.setPrototypeOf(this, ReaderTimeoutError.prototype);
-  }
-}
-
-/**
- * Adds a timeout to a promise and rejects if the specified timeout has elapsed. Also rejects if the specified promise
- * rejects, and resolves if the specified promise resolves.
- *
- * <p> NOTE: this operation will continue even after it throws a {@link ReaderTimeoutError}.
- *
- * @param promise promise to use with timeout.
- * @param timeout the timeout in milliseconds until the returned promise is rejected.
- */
-export function callWithTimeout<T>(promise: Promise<T>, timeout: number): Promise<T> {
-  let timeoutHandle: ReturnType<typeof setTimeout>;
-
-  const timeoutPromise = new Promise<never>(function timeoutFunction(_resolve, reject) {
-    timeoutHandle = setTimeout(
-      function timeoutHandler() {
-        reject(new ReaderTimeoutError('Operation timed out.'));
-      },
-      timeout
-    );
-  });
-
-  return Promise.race([promise, timeoutPromise]).then(result => {
-      clearTimeout(timeoutHandle);
-      return result;
-    },
-    reason => {
-      clearTimeout(timeoutHandle);
-      throw reason;
-    });
-}
 
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#metricreader
 

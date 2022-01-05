@@ -16,11 +16,12 @@
 
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import { MetricExporter, ReaderTimeoutError } from '../../src';
+import { MetricExporter } from '../../src';
 import { MetricData } from '../../src/export/MetricData';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MetricProducer } from '../../src/export/MetricProducer';
+import { TimeoutError } from '../../src/utils';
 
 const MAX_32_BIT_INT = 2 ** 31 - 1
 
@@ -205,7 +206,7 @@ describe('PeriodicExportingMetricReader', () => {
 
       reader.setMetricProducer(new TestMetricProducer());
       await assert.rejects(() => reader.forceFlush({ timeoutMillis: 20 }),
-        thrown => thrown instanceof ReaderTimeoutError);
+        thrown => thrown instanceof TimeoutError);
       await reader.shutdown({});
     });
 
@@ -267,7 +268,7 @@ describe('PeriodicExportingMetricReader', () => {
 
       reader.setMetricProducer(new TestMetricProducer());
       await assert.rejects(() => reader.shutdown({ timeoutMillis: 20 }),
-        thrown => thrown instanceof ReaderTimeoutError);
+        thrown => thrown instanceof TimeoutError);
     });
 
     it('called twice should call export shutdown only once', async () => {
