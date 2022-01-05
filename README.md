@@ -178,7 +178,6 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers)):
 
-- [Chengzhong Wu](https://github.com/legendecas), Alibaba
 - [Gerhard Stöbich](https://github.com/Flarna), Dynatrace
 - [John Bley](https://github.com/johnbley), Splunk
 - [Mark Wolff](https://github.com/markwolff), Microsoft
@@ -193,6 +192,7 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers)):
 
 - [Amir Blum](https://github.com/blumamir), Aspecto
+- [Chengzhong Wu](https://github.com/legendecas), Alibaba
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
 - [Rauno Viskus](https://github.com/Rauno56), Splunk
 - [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
