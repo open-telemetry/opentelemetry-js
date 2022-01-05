@@ -194,6 +194,7 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 
 - [Amir Blum](https://github.com/blumamir), Aspecto
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
+- [Rauno Viskus](https://github.com/Rauno56), Splunk
 - [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
 
 *Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer).*
