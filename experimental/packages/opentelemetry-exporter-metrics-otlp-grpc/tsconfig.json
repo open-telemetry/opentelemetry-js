@@ -11,12 +11,6 @@
   "references": [
     {
       "path": "../opentelemetry-exporter-metrics-otlp-http"
-    },
-    {
-      "path": "../opentelemetry-exporter-trace-otlp-grpc"
-    },
-    {
-      "path": "../opentelemetry-exporter-trace-otlp-http"
     }
   ]
 }

@@ -131,6 +131,10 @@ export class Span implements api.Span, ReadableSpan {
     startTime?: api.TimeInput
   ): this {
     if (this._isSpanEnded()) return this;
+    if (this._spanLimits.eventCountLimit === 0) {
+      api.diag.warn('No events allowed.');
+      return this;
+    }
     if (this.events.length >= this._spanLimits.eventCountLimit!) {
       api.diag.warn('Dropping extra events.');
       this.events.shift();

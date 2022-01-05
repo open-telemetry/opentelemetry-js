@@ -18,15 +18,6 @@
       "path": "packages/opentelemetry-exporter-prometheus"
     },
     {
-      "path": "packages/opentelemetry-exporter-trace-otlp-grpc"
-    },
-    {
-      "path": "packages/opentelemetry-exporter-trace-otlp-http/tsconfig.all.json"
-    },
-    {
-      "path": "packages/opentelemetry-exporter-trace-otlp-proto"
-    },
-    {
       "path": "packages/opentelemetry-instrumentation-fetch/tsconfig.all.json"
     },
     {
