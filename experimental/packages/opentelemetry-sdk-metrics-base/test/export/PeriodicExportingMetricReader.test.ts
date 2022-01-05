@@ -231,7 +231,7 @@ describe('PeriodicExportingMetricReader', () => {
 
       reader.setMetricProducer(new TestMetricProducer());
       await reader.shutdown({});
-      await assert.rejects(() => reader.shutdown({}));
+      await assert.rejects(() => reader.forceFlush({}));
     });
   });
 
@@ -270,8 +270,10 @@ describe('PeriodicExportingMetricReader', () => {
         thrown => thrown instanceof ReaderTimeoutError);
     });
 
-    it('should throw when called twice', async () => {
+    it('called twice should call export shutdown only once', async () => {
       const exporter = new TestMetricExporter();
+      const exporterMock = sinon.mock(exporter);
+      exporterMock.expects('shutdown').calledOnceWithExactly();
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
@@ -280,9 +282,11 @@ describe('PeriodicExportingMetricReader', () => {
 
       reader.setMetricProducer(new TestMetricProducer());
 
-      // first call should succeed.
+      // call twice, the exporter's shutdown must only be called once.
       await reader.shutdown({});
-      await assert.rejects(() => reader.shutdown({}));
+      await reader.shutdown({});
+
+      exporterMock.verify();
     });
 
     it('should throw on non-initialized instance.', async () => {

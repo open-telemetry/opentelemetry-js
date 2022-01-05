@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import * as api from '@opentelemetry/api';
 import { AggregationTemporality } from './AggregationTemporality';
 import { MetricProducer } from './MetricProducer';
 import { MetricData } from './MetricData';
@@ -151,7 +152,8 @@ export abstract class MetricReader {
   async shutdown(options: ReaderForceFlushOptions): Promise<void> {
     // Do not call shutdown again if it has already been called.
     if (this._shutdown) {
-      throw new Error('Cannot call shutdown twice.');
+      api.diag.error('Cannot call shutdown twice.');
+      return;
     }
 
     await callWithTimeout(this.onShutdown(), options.timeoutMillis ?? 10000);
