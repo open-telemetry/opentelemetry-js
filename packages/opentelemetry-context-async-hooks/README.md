@@ -20,6 +20,9 @@ The former should be preferred over the latter as its implementation is substant
 
 > While you can create your own implementation [of `AsyncLocalStorage`] on top of [`AsyncHook`], `AsyncLocalStorage` should be preferred as it is a performant and memory safe implementation that involves significant optimizations that are non-obvious to implement.
 
+`AsyncLocalStorage` is available in node `^12.17.0 || >= 13.10.0`, however `AsyncLocalStorageContextManager` is not enabled by default for node `<14.8.0` because of some important bugfixes which were introduced in `v14.8.0`.
+For more information see [nodejs/node#34573](https://github.com/nodejs/node/pull/34573).
+
 ## Limitations
 
 It's possible that this package won't track context perfectly when used with certain packages. In particular, it inherits any bugs present in async_hooks. See [here][pkgs-that-break-ah] for known issues.
