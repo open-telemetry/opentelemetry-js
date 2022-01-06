@@ -45,13 +45,9 @@ export class MeterProvider {
         api.diag.warn('A shutdown MeterProvider cannot provide a Meter')
         return metrics.NOOP_METER;
     }
-    const id = `${name}#${version}#${options.schemaUrl ?? ''}`;
-    if (this._sharedState.meters.has(id)) {
-      return this._sharedState.meters.get(id)!;
-    }
 
     const meter = new Meter(this._sharedState, { name, version, schemaUrl: options.schemaUrl });
-    this._sharedState.meters.set(id, meter);
+    this._sharedState.meters.push(meter);
     return meter;
   }
 

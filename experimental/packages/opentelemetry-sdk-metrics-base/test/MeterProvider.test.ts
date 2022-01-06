@@ -40,38 +40,6 @@ describe('MeterProvider', () => {
       assert(meter instanceof Meter);
     });
 
-    it('should get identical meter with same name/version/schemaUrl', () => {
-      const meterProvider = new MeterProvider();
-      const cases = [
-        { name: 'test_meter', version: '1.0.0', schemaUrl: 'https://opentelemetry.io/schemas/1.7.0' },
-        { name: 'test_meter', version: '1.0.0' },
-        { name: 'test_meter' },
-      ];
-      for (const it of cases) {
-        const meter1 = meterProvider.getMeter(it.name, it.version, {
-          schemaUrl: it.schemaUrl,
-        });
-        const meter2 = meterProvider.getMeter(it.name, it.version, {
-          schemaUrl: it.schemaUrl,
-        });
-        assert.strictEqual(meter1, meter2);
-      }
-
-      for (const it of cases) {
-        const meter1 = meterProvider.getMeter(it.name, it.version, {
-          schemaUrl: it.schemaUrl,
-        });
-        const meter2 = meterProvider.getMeter(it.name, it.version, {
-          schemaUrl: 'https://opentelemetry.io/schemas/not-exists',
-        });
-        const meter3 = meterProvider.getMeter(it.name, '0.0.0');
-        const meter4 = meterProvider.getMeter('another-meter');
-        assert.notStrictEqual(meter1, meter2);
-        assert.notStrictEqual(meter1, meter3);
-        assert.notStrictEqual(meter1, meter4);
-      }
-    });
-
     it('get a noop meter on shutdown', () => {
       const meterProvider = new MeterProvider();
       meterProvider.shutdown();
