@@ -70,7 +70,6 @@ describe('MetricCollector', () => {
 
   describe('collect', () => {
     function setupInstruments(exporter: MetricExporter) {
-      // TODO(legendecas): setup with MeterProvider when meter identity was settled.
       const meterProvider = new MeterProvider({ resource: defaultResource });
 
       const reader = new TestMetricReader(exporter);
