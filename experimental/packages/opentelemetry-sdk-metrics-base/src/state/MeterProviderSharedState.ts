@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
+import { HrTime } from '@opentelemetry/api';
+import { hrTime } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { Meter } from '../Meter';
 import { ViewRegistry } from '../view/ViewRegistry';
+import { MetricCollector } from './MetricCollector';
 
 /**
  * An internal record for shared meter provider states.
  */
 export class MeterProviderSharedState {
   viewRegistry = new ViewRegistry();
+  readonly sdkStartTime: HrTime = hrTime();
+
+  metricCollectors: MetricCollector[] = [];
+
   meters: Map<string, Meter> = new Map();
 
   constructor(public resource: Resource) {}

@@ -18,15 +18,12 @@ import { CounterOptions, HistogramOptions, UpDownCounterOptions } from '..';
 import {
   Counter,
   Histogram,
-  ObservableCounter,
+  ObservableCallback,
   ObservableCounterOptions,
-  ObservableGauge,
   ObservableGaugeOptions,
-  ObservableUpDownCounter,
   ObservableUpDownCounterOptions,
   UpDownCounter,
 } from './Metric';
-import { ObservableResult } from './ObservableResult';
 
 /**
  * An interface describes additional metadata of a meter.
@@ -89,9 +86,9 @@ export interface Meter {
    */
   createObservableGauge(
     name: string,
-    callback: (observableResult: ObservableResult) => void,
+    callback: ObservableCallback,
     options?: ObservableGaugeOptions
-  ): ObservableGauge;
+  ): void;
 
   /**
    * Creates a new `ObservableCounter` metric.
@@ -101,9 +98,9 @@ export interface Meter {
    */
   createObservableCounter(
     name: string,
-    callback: (observableResult: ObservableResult) => void,
+    callback: ObservableCallback,
     options?: ObservableCounterOptions
-  ): ObservableCounter;
+  ): void;
 
   /**
    * Creates a new `ObservableUpDownCounter` metric.
@@ -113,7 +110,7 @@ export interface Meter {
    */
   createObservableUpDownCounter(
     name: string,
-    callback: (observableResult: ObservableResult) => void,
+    callback: ObservableCallback,
     options?: ObservableUpDownCounterOptions
-  ): ObservableUpDownCounter;
+  ): void;
 }

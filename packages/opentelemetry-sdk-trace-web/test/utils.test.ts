@@ -29,8 +29,11 @@ import {
   addSpanNetworkEvents,
   getElementXPath,
   getResource,
+  normalizeUrl,
+  parseUrl,
   PerformanceEntries,
   shouldPropagateTraceHeaders,
+  URLLike,
 } from '../src';
 import { PerformanceTimingNames as PTN } from '../src/enums/PerformanceTimingNames';
 
@@ -585,6 +588,49 @@ describe('utils', () => {
     it("should NOT propagate trace when url doesn't match", () => {
       const result = shouldPropagateTraceHeaders('http://foo.com');
       assert.strictEqual(result, false);
+    });
+  });
+
+  describe('parseUrl', () => {
+    const urlFields: Array<keyof URLLike> = [
+      'hash',
+      'host',
+      'hostname',
+      'href',
+      'origin',
+      'password',
+      'pathname',
+      'port',
+      'protocol',
+      'search',
+      'username',
+    ];
+    it('should parse url', () => {
+      const url = parseUrl('https://opentelemetry.io/foo');
+      urlFields.forEach(field => {
+        assert.strictEqual(typeof url[field], 'string');
+      });
+    });
+
+    it('should parse url with fallback', () => {
+      sinon.stub(window, 'URL').value(undefined);
+      const url = parseUrl('https://opentelemetry.io/foo');
+      urlFields.forEach(field => {
+        assert.strictEqual(typeof url[field], 'string');
+      });
+    });
+  });
+
+  describe('normalizeUrl', () => {
+    it('should normalize url', () => {
+      const url = normalizeUrl('https://opentelemetry.io/你好');
+      assert.strictEqual(url, 'https://opentelemetry.io/%E4%BD%A0%E5%A5%BD');
+    });
+
+    it('should parse url with fallback', () => {
+      sinon.stub(window, 'URL').value(undefined);
+      const url = normalizeUrl('https://opentelemetry.io/你好');
+      assert.strictEqual(url, 'https://opentelemetry.io/%E4%BD%A0%E5%A5%BD');
     });
   });
 });
