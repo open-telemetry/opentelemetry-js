@@ -19,7 +19,7 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json",
-    "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
+    "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "npm run precompile"
   },
   "keywords": [
