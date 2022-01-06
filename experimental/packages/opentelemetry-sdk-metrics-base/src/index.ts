@@ -14,4 +14,6 @@
  * limitations under the License.
  */
 
-export * from './version';
+export { MeterProvider, MeterProviderOptions } from './MeterProvider';
+export * from './export/MetricExporter';
+export * from './export/MetricReader';

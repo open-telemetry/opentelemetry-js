@@ -1,6 +1,6 @@
 {
   "env": {
-    "node": true
+    "browser": true
   },
   "extends": "airbnb-base",
   "parserOptions": {
@@ -11,6 +11,7 @@
     "no-use-before-define": ["error", "nofunc"],
     "no-console": "off",
     "import/no-unresolved": "off",
-    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "import/no-extraneous-dependencies": [ "error", { "devDependencies": true } ]
   }
 }

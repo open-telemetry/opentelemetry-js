@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.esm2015.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "build/esm2015",
+    "tsBuildInfoFile": "build/esm2015/tsconfig.esm2015.tsbuildinfo"
+  },
+  "files": [
+    "node_modules/zone.js/dist/zone.js.d.ts"
+  ],
+  "include": [
+    "src/**/*.ts"
+  ]
+}

@@ -4,16 +4,18 @@
   "description": "OpenTelemetry Core provides constants and utilities shared by all OpenTelemetry SDK packages.",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
+  "esm2015": "build/esm2015/index.js",
   "browser": {
     "./src/platform/index.ts": "./src/platform/browser/index.ts",
     "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
+    "./build/esm2015/platform/index.js": "./build/esm2015/platform/browser/index.js",
     "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
   },
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
-    "compile": "tsc --build tsconfig.json tsconfig.esm.json",
-    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json",
+    "compile": "tsc --build tsconfig.all.json",
+    "clean": "tsc --build --clean tsconfig.all.json",
     "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts --exclude 'test/platform/browser/**/*.ts'",
     "test:browser": "nyc karma start --single-run",
     "tdd": "npm run tdd:node",
@@ -24,8 +26,8 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../scripts/version-update.js",
-    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json",
-    "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
+    "watch": "tsc --build --watch tsconfig.all.json",
+    "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "npm run precompile"
   },
   "keywords": [
@@ -46,6 +48,9 @@
     "build/esm/**/*.js",
     "build/esm/**/*.js.map",
     "build/esm/**/*.d.ts",
+    "build/esm2015/**/*.js",
+    "build/esm2015/**/*.js.map",
+    "build/esm2015/**/*.d.ts",
     "build/src/**/*.js",
     "build/src/**/*.js.map",
     "build/src/**/*.d.ts",
@@ -59,12 +64,12 @@
   "devDependencies": {
     "@opentelemetry/api": "~1.0.3",
     "@types/mocha": "8.2.3",
-    "@types/node": "14.17.11",
-    "@types/sinon": "10.0.2",
-    "@types/webpack-env": "1.16.2",
+    "@types/node": "14.17.33",
+    "@types/sinon": "10.0.6",
+    "@types/webpack-env": "1.16.3",
     "codecov": "3.8.3",
     "istanbul-instrumenter-loader": "3.0.1",
-    "karma": "6.3.7",
+    "karma": "6.3.8",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage-istanbul-reporter": "3.0.3",
     "karma-mocha": "2.0.1",
@@ -77,7 +82,7 @@
     "sinon": "12.0.1",
     "ts-loader": "8.3.0",
     "ts-mocha": "8.0.0",
-    "typescript": "4.3.5",
+    "typescript": "4.4.4",
     "webpack": "4.46.0"
   },
   "peerDependencies": {

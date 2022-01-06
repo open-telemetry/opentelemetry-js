@@ -1,8 +1,6 @@
 # OpenTelemetry Node SDK
 
 [![NPM Published Version][npm-img]][npm-url]
-[![dependencies][dependencies-image]][dependencies-url]
-[![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
 This module provides *automated instrumentation and tracing* for Node.js applications.
@@ -13,7 +11,7 @@ For manual instrumentation see the
 ## How auto instrumentation works
 
 This package exposes a `NodeTracerProvider`.
-For loading instrumentations please use `registerInstrumentations` function from [opentelemetry-instrumentation](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-instrumentation)
+For loading instrumentations please use `registerInstrumentations` function from [opentelemetry-instrumentation](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation)
 
 OpenTelemetry comes with a growing number of instrumentation plugins for well known modules (see [supported modules](https://github.com/open-telemetry/opentelemetry-js#instrumentations)) and an API to create custom instrumentation (see [the instrumentation developer guide](https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/instrumentation-guide.md)).
 
@@ -24,7 +22,7 @@ This is done by wrapping all tracing-relevant functions.
 This instrumentation code will automatically
 
 - extract a trace-context identifier from inbound requests to allow distributed tracing (if applicable)
-- make sure that this current trace-context is propagated while the transaction traverses an application (see [@opentelemetry/context-base](https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-context-base/README.md) for an in-depth explanation)
+- make sure that this current trace-context is propagated while the transaction traverses an application (see [context document in @opentelemetry/api][def-context] for an in-depth explanation)
 - add this trace-context identifier to outbound requests to allow continuing the distributed trace on the next hop (if applicable)
 - create and end spans
 
@@ -119,9 +117,6 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-sdk-trace-node
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-sdk-trace-node
-[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-sdk-trace-node&type=dev
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-sdk-trace-node&type=dev
+[def-context]: https://github.com/open-telemetry/opentelemetry-js-api/blob/main/docs/context.md
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/sdk-trace-node
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fsdk-trace-node.svg

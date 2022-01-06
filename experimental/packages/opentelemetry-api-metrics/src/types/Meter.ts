@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
+import { CounterOptions, HistogramOptions, UpDownCounterOptions } from '..';
 import {
-  MetricOptions,
   Counter,
   Histogram,
-  ObservableGauge,
+  ObservableCallback,
+  ObservableCounterOptions,
+  ObservableGaugeOptions,
+  ObservableUpDownCounterOptions,
   UpDownCounter,
-  ObservableCounter,
-  ObservableUpDownCounter,
 } from './Metric';
-import { ObservableResult } from './ObservableResult';
 
 /**
  * An interface describes additional metadata of a meter.
@@ -48,7 +48,7 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createHistogram(name: string, options?: MetricOptions): Histogram;
+  createHistogram(name: string, options?: HistogramOptions): Histogram;
 
   /**
    * Creates a new `Counter` metric. Generally, this kind of metric when the
@@ -57,7 +57,7 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createCounter(name: string, options?: MetricOptions): Counter;
+  createCounter(name: string, options?: CounterOptions): Counter;
 
   /**
    * Creates a new `UpDownCounter` metric. UpDownCounter is a synchronous
@@ -76,41 +76,41 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createUpDownCounter(name: string, options?: MetricOptions): UpDownCounter;
+  createUpDownCounter(name: string, options?: UpDownCounterOptions): UpDownCounter;
 
   /**
    * Creates a new `ObservableGauge` metric.
    * @param name the name of the metric.
+   * @param callback the observable callback
    * @param [options] the metric options.
-   * @param [callback] the observable callback
    */
   createObservableGauge(
     name: string,
-    options?: MetricOptions,
-    callback?: (observableResult: ObservableResult) => void
-  ): ObservableGauge;
+    callback: ObservableCallback,
+    options?: ObservableGaugeOptions
+  ): void;
 
   /**
    * Creates a new `ObservableCounter` metric.
    * @param name the name of the metric.
+   * @param callback the observable callback
    * @param [options] the metric options.
-   * @param [callback] the observable callback
    */
   createObservableCounter(
     name: string,
-    options?: MetricOptions,
-    callback?: (observableResult: ObservableResult) => void
-  ): ObservableCounter;
+    callback: ObservableCallback,
+    options?: ObservableCounterOptions
+  ): void;
 
   /**
    * Creates a new `ObservableUpDownCounter` metric.
    * @param name the name of the metric.
+   * @param callback the observable callback
    * @param [options] the metric options.
-   * @param [callback] the observable callback
    */
   createObservableUpDownCounter(
     name: string,
-    options?: MetricOptions,
-    callback?: (observableResult: ObservableResult) => void
-  ): ObservableUpDownCounter;
+    callback: ObservableCallback,
+    options?: ObservableUpDownCounterOptions
+  ): void;
 }

@@ -20,5 +20,5 @@ import { Attributes } from './Metric';
  * Interface that is being used in callback function for Observable Metric
  */
 export interface ObservableResult {
-  observe(value: number, attributes: Attributes): void;
+  observe(value: number, attributes?: Attributes): void;
 }

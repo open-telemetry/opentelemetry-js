@@ -1,13 +1,13 @@
 # OpenTelemetry async_hooks-based Context Managers
 
 [![NPM Published Version][npm-img]][npm-url]
-[![dependencies][dependencies-image]][dependencies-url]
-[![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
 This package provides two [`ContextManager`](https://open-telemetry.github.io/opentelemetry-js-api/interfaces/contextmanager.html) implementations built on APIs from Node.js's [`async_hooks`][async-hooks-doc] module. If you're looking for a `ContextManager` to use in browser environments, consider [opentelemetry-context-zone](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone) or [opentelemetry-context-zone-peer-dep](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone-peer-dep).
 
 An introduction to the `ContextManager` interface and the problem it solves can be found [here](https://github.com/open-telemetry/opentelemetry-js-api/blob/main/docs/context.md).
+The definition and why they exist is available on [the document for context manager][def-context-manager].
+
 
 ## API
 
@@ -48,12 +48,8 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-    [dependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-context-async-hooks
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-context-async-hooks
-[devDependencies-image]: https://status.david-dm.org/gh/open-telemetry/opentelemetry-js.svg?path=packages%2Fopentelemetry-context-async-hooks&type=dev
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-context-async-hooks&type=dev
 [async-hooks-doc]: http://nodejs.org/dist/latest/docs/api/async_hooks.html
-[def-context-manager]: https://github.com/open-telemetry/opentelemetry-js/blob/main/packages/opentelemetry-context-base/README.md
+[def-context-manager]: https://opentelemetry.io/docs/instrumentation/js/api/context/#context-manager
 [dd-js-tracer-scope]: https://github.com/DataDog/dd-trace-js/blob/master/packages/dd-trace/src/scope.js
 [opentracing-scope]: https://github.com/opentracing/opentracing-javascript/pull/113
 [diag-team-scope-discussion]: https://github.com/nodejs/diagnostics/issues/300

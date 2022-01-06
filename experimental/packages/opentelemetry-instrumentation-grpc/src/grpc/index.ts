@@ -285,7 +285,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
     const instrumentation = this;
     return (original: GrpcClientFunc) => {
       instrumentation._diag.debug('patch all client methods');
-      return function clientMethodTrace(this: grpcTypes.Client) {
+      function clientMethodTrace(this: grpcTypes.Client) {
         const name = `grpc.${(original.path as string | undefined)?.replace(
           '/',
           ''
@@ -304,7 +304,9 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
             this
           )(span)
         );
-      };
+      }
+      Object.assign(clientMethodTrace, original);
+      return clientMethodTrace;
     };
   }
 }
