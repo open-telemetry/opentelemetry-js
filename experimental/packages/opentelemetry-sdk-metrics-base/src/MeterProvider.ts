@@ -46,9 +46,7 @@ export class MeterProvider {
         return metrics.NOOP_METER;
     }
 
-    const meter = new Meter(this._sharedState, { name, version, schemaUrl: options.schemaUrl });
-    this._sharedState.meters.push(meter);
-    return meter;
+    return new Meter(this._sharedState, { name, version, schemaUrl: options.schemaUrl });
   }
 
   addMetricReader(metricReader: MetricReader) {
