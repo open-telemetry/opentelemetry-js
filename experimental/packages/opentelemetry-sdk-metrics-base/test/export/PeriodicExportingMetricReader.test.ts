@@ -174,6 +174,25 @@ describe('PeriodicExportingMetricReader', () => {
       exporter.throwException = false;
       await reader.shutdown();
     });
+
+    it('should keep exporting on export timeouts', async () => {
+      const exporter = new TestMetricExporter();
+      // set time longer than timeout.
+      exporter.exportTime = 40;
+      const reader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 30,
+        exportTimeoutMillis: 20
+      });
+
+      reader.setMetricProducer(new TestMetricProducer());
+
+      const result = await exporter.waitForNumberOfExports(2);
+      assert.deepEqual(result, [[], []]);
+
+      exporter.throwException = false;
+      await reader.shutdown();
+    });
   });
 
   describe('forceFlush', () => {
