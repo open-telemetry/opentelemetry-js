@@ -90,7 +90,7 @@ export abstract class MetricReader {
   /**
    * Collect all metrics from the associated {@link MetricProducer}
    */
-  async collect(options: ReaderCollectionOptions): Promise<MetricData[]> {
+  async collect(options?: ReaderCollectionOptions): Promise<MetricData[]> {
     if (this._metricProducer === undefined) {
       throw new Error('MetricReader is not bound to a MetricProducer');
     }
@@ -101,7 +101,7 @@ export abstract class MetricReader {
     }
 
     // No timeout if timeoutMillis is undefined or null.
-    if (options.timeoutMillis == null) {
+    if (options?.timeoutMillis == null) {
       return await this._metricProducer.collect();
     }
 
@@ -114,7 +114,7 @@ export abstract class MetricReader {
    * <p> NOTE: this operation will continue even after the promise rejects due to a timeout.
    * @param options options with timeout.
    */
-  async shutdown(options: ReaderShutdownOptions): Promise<void> {
+  async shutdown(options?: ReaderShutdownOptions): Promise<void> {
     // Do not call shutdown again if it has already been called.
     if (this._shutdown) {
       api.diag.error('Cannot call shutdown twice.');
@@ -122,7 +122,7 @@ export abstract class MetricReader {
     }
 
     // No timeout if timeoutMillis is undefined or null.
-    if (options.timeoutMillis == null) {
+    if (options?.timeoutMillis == null) {
       await this.onShutdown();
     } else {
       await callWithTimeout(this.onShutdown(), options.timeoutMillis);
@@ -137,13 +137,13 @@ export abstract class MetricReader {
    * <p> NOTE: this operation will continue even after the promise rejects due to a timeout.
    * @param options options with timeout.
    */
-  async forceFlush(options: ReaderForceFlushOptions): Promise<void> {
+  async forceFlush(options?: ReaderForceFlushOptions): Promise<void> {
     if (this._shutdown) {
       throw new Error('Cannot forceFlush on already shutdown MetricReader.');
     }
 
     // No timeout if timeoutMillis is undefined or null.
-    if (options.timeoutMillis == null) {
+    if (options?.timeoutMillis == null) {
       await this.onForceFlush();
       return;
     }
