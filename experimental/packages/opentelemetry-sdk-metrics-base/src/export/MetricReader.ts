@@ -38,6 +38,7 @@ export type ReaderForceFlushOptions = ReaderOptions;
  */
 export abstract class MetricReader {
   // Tracks the shutdown state.
+  // TODO: use BindOncePromise here once a new version of @opentelemetry/core is available.
   private _shutdown = false;
   // MetricProducer used by this instance.
   private _metricProducer?: MetricProducer;
