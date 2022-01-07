@@ -32,7 +32,7 @@ class TestMetricExporter extends MetricExporter {
   private _batches: MetricData[][] = [];
 
   async export(batch: MetricData[]): Promise<void> {
-    this._batches.push([]);
+    this._batches.push(batch);
 
     if (this.throwException) {
       throw new Error('Error during export');
