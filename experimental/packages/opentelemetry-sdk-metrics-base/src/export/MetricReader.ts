@@ -98,7 +98,8 @@ export abstract class MetricReader {
 
     // Subsequent invocations to collect are not allowed. SDKs SHOULD return some failure for these calls.
     if (this._shutdown) {
-      throw new Error('Collection is not allowed after shutdown');
+      api.diag.warn('Collection is not allowed after shutdown');
+      return [];
     }
 
     // No timeout if timeoutMillis is undefined or null.
@@ -140,7 +141,8 @@ export abstract class MetricReader {
    */
   async forceFlush(options?: ReaderForceFlushOptions): Promise<void> {
     if (this._shutdown) {
-      throw new Error('Cannot forceFlush on already shutdown MetricReader.');
+      api.diag.warn('Cannot forceFlush on already shutdown MetricReader.');
+      return;
     }
 
     // No timeout if timeoutMillis is undefined or null.

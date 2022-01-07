@@ -244,8 +244,11 @@ describe('PeriodicExportingMetricReader', () => {
       await assert.rejects(() => reader.forceFlush());
     });
 
-    it('should throw after shutdown', async () => {
+    it('should not forceFlush exporter after shutdown', async () => {
       const exporter = new TestMetricExporter();
+      const exporterMock = sinon.mock(exporter);
+      // expect once on shutdown.
+      exporterMock.expects('forceFlush').once();
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
         exportIntervalMillis: MAX_32_BIT_INT,
@@ -254,7 +257,9 @@ describe('PeriodicExportingMetricReader', () => {
 
       reader.setMetricProducer(new TestMetricProducer());
       await reader.shutdown();
-      await assert.rejects(() => reader.forceFlush());
+      await reader.forceFlush();
+
+      exporterMock.verify();
     });
   });
 
@@ -338,7 +343,7 @@ describe('PeriodicExportingMetricReader', () => {
       await assert.rejects(() => reader.collect());
     });
 
-    it('should throw on shut-down instance', async () => {
+    it('should return empty on shut-down instance', async () => {
       const exporter = new TestMetricExporter();
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
@@ -349,7 +354,7 @@ describe('PeriodicExportingMetricReader', () => {
       reader.setMetricProducer(new TestMetricProducer());
 
       await reader.shutdown();
-      await assert.rejects(() => reader.collect());
+      assert.deepEqual([], await reader.collect());
     });
 
     it('should time out when timeoutMillis is set', async () => {
