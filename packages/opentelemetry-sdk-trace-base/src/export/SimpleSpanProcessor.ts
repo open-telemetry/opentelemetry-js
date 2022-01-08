@@ -19,6 +19,7 @@ import {
   ExportResultCode,
   globalErrorHandler,
   suppressTracing,
+  BindOnceFuture,
 } from '@opentelemetry/core';
 import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
@@ -32,10 +33,11 @@ import { SpanExporter } from './SpanExporter';
  * Only spans that are sampled are converted.
  */
 export class SimpleSpanProcessor implements SpanProcessor {
-  constructor(private readonly _exporter: SpanExporter) {}
+  private _shutdownOnce: BindOnceFuture<void>;
 
-  private _isShutdown = false;
-  private _shuttingDownPromise: Promise<void> = Promise.resolve();
+  constructor(private readonly _exporter: SpanExporter) {
+    this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
+  }
 
   forceFlush(): Promise<void> {
     // do nothing as all spans are being exported without waiting
@@ -46,7 +48,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
   onStart(_span: Span): void {}
 
   onEnd(span: ReadableSpan): void {
-    if (this._isShutdown) {
+    if (this._shutdownOnce.isCalled) {
       return;
     }
 
@@ -70,20 +72,10 @@ export class SimpleSpanProcessor implements SpanProcessor {
   }
 
   shutdown(): Promise<void> {
-    if (this._isShutdown) {
-      return this._shuttingDownPromise;
-    }
-    this._isShutdown = true;
-    this._shuttingDownPromise = new Promise((resolve, reject) => {
-      Promise.resolve()
-        .then(() => {
-          return this._exporter.shutdown();
-        })
-        .then(resolve)
-        .catch(e => {
-          reject(e);
-        });
-    });
-    return this._shuttingDownPromise;
+    return this._shutdownOnce.call();
+  }
+
+  private _shutdown(): Promise<void> {
+    return this._exporter.shutdown();
   }
 }

@@ -19,11 +19,11 @@ import * as sinon from 'sinon';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { MetricData, PointDataType } from '../../src/export/MetricData';
 import { MetricExporter } from '../../src/export/MetricExporter';
-import { MetricReader } from '../../src/export/MetricReader';
 import { Meter } from '../../src/Meter';
 import { MeterProviderSharedState } from '../../src/state/MeterProviderSharedState';
 import { MetricCollector } from '../../src/state/MetricCollector';
 import { defaultInstrumentationLibrary, defaultResource, assertMetricData, assertPointData } from '../util';
+import { TestMetricReader } from '../export/TestMetricReader';
 
 class TestMetricExporter extends MetricExporter {
   metricDataList: MetricData[] = []
@@ -44,12 +44,6 @@ class TestDeltaMetricExporter extends TestMetricExporter {
   }
 }
 
-class TestMetricReader extends MetricReader {
-  getMetricCollector(): MetricCollector {
-    return this['_metricProducer'] as MetricCollector;
-  }
-}
-
 describe('MetricCollector', () => {
   afterEach(() => {
     sinon.restore();
@@ -60,7 +54,7 @@ describe('MetricCollector', () => {
       const meterProviderSharedState = new MeterProviderSharedState(defaultResource);
       const exporters = [ new TestMetricExporter(), new TestDeltaMetricExporter() ];
       for (const exporter of exporters) {
-        const reader = new TestMetricReader(exporter);
+        const reader = new TestMetricReader(exporter.getPreferredAggregationTemporality());
         const metricCollector = new MetricCollector(meterProviderSharedState, reader);
 
         assert.strictEqual(metricCollector.aggregatorTemporality, exporter.getPreferredAggregationTemporality());
@@ -73,7 +67,7 @@ describe('MetricCollector', () => {
       // TODO(legendecas): setup with MeterProvider when meter identity was settled.
       const meterProviderSharedState = new MeterProviderSharedState(defaultResource);
 
-      const reader = new TestMetricReader(exporter);
+      const reader = new TestMetricReader(exporter.getPreferredAggregationTemporality());
       const metricCollector = new MetricCollector(meterProviderSharedState, reader);
       meterProviderSharedState.metricCollectors.push(metricCollector);
 
