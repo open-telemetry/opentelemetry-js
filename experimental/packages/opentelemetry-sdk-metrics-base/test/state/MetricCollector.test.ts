@@ -18,18 +18,24 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { MetricData, PointDataType } from '../../src/export/MetricData';
-import { MetricExporter } from '../../src/export/MetricExporter';
+import { PushMetricExporter } from '../../src/export/MetricExporter';
 import { Meter } from '../../src/Meter';
 import { MeterProviderSharedState } from '../../src/state/MeterProviderSharedState';
 import { MetricCollector } from '../../src/state/MetricCollector';
 import { defaultInstrumentationLibrary, defaultResource, assertMetricData, assertPointData } from '../util';
 import { TestMetricReader } from '../export/TestMetricReader';
+import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 
-class TestMetricExporter extends MetricExporter {
+class TestMetricExporter extends PushMetricExporter {
   metricDataList: MetricData[] = []
-  async export(batch: MetricData[]): Promise<void> {
+  async export(batch: MetricData[]): Promise<ExportResult> {
     this.metricDataList.push(...batch);
+    return new Promise<ExportResult>((resolve, _) => {
+      resolve({code: ExportResultCode.SUCCESS})
+    });
   }
+
+  async shutdown(): Promise<void> {}
 
   async forceFlush(): Promise<void> {}
 
@@ -63,7 +69,7 @@ describe('MetricCollector', () => {
   });
 
   describe('collect', () => {
-    function setupInstruments(exporter: MetricExporter) {
+    function setupInstruments(exporter: PushMetricExporter) {
       // TODO(legendecas): setup with MeterProvider when meter identity was settled.
       const meterProviderSharedState = new MeterProviderSharedState(defaultResource);
 

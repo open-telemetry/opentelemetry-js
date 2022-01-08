@@ -16,28 +16,38 @@
 
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import { MetricExporter } from '../../src';
+import { PushMetricExporter } from '../../src';
 import { MetricData } from '../../src/export/MetricData';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MetricProducer } from '../../src/export/MetricProducer';
 import { TimeoutError } from '../../src/utils';
+import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 
 const MAX_32_BIT_INT = 2 ** 31 - 1
 
-class TestMetricExporter extends MetricExporter {
+class TestMetricExporter extends PushMetricExporter {
   public exportTime = 0;
   public forceFlushTime = 0;
   public throwException = false;
   private _batches: MetricData[][] = [];
 
-  async export(batch: MetricData[]): Promise<void> {
+  async export(batch: MetricData[]): Promise<ExportResult> {
     this._batches.push(batch);
 
     if (this.throwException) {
       throw new Error('Error during export');
     }
-    await new Promise(resolve => setTimeout(resolve, this.exportTime));
+    return await new Promise(resolve => setTimeout(() => {
+      resolve({code: ExportResultCode.SUCCESS})
+    }, this.exportTime));
+  }
+
+  async shutdown(): Promise<void> {
+    if (this.isShutdown()) return;
+    const flushPromise = this.forceFlush();
+    this._shutdown = true;
+    await flushPromise;
   }
 
   async forceFlush(): Promise<void> {
