@@ -16,10 +16,10 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import { MeterProvider } from '../../src';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { MetricData, PointDataType } from '../../src/export/MetricData';
 import { MetricExporter } from '../../src/export/MetricExporter';
-import { Meter } from '../../src/Meter';
 import { MeterProviderSharedState } from '../../src/state/MeterProviderSharedState';
 import { MetricCollector } from '../../src/state/MetricCollector';
 import { defaultInstrumentationLibrary, defaultResource, assertMetricData, assertPointData } from '../util';
@@ -64,15 +64,15 @@ describe('MetricCollector', () => {
 
   describe('collect', () => {
     function setupInstruments(exporter: MetricExporter) {
-      // TODO(legendecas): setup with MeterProvider when meter identity was settled.
-      const meterProviderSharedState = new MeterProviderSharedState(defaultResource);
+      const meterProvider = new MeterProvider({ resource: defaultResource });
 
       const reader = new TestMetricReader(exporter.getPreferredAggregationTemporality());
-      const metricCollector = new MetricCollector(meterProviderSharedState, reader);
-      meterProviderSharedState.metricCollectors.push(metricCollector);
+      meterProvider.addMetricReader(reader);
+      const metricCollector = reader.getMetricCollector();
 
-      const meter = new Meter(meterProviderSharedState, defaultInstrumentationLibrary);
-      meterProviderSharedState.meters.set('test-meter', meter);
+      const meter = meterProvider.getMeter(defaultInstrumentationLibrary.name, defaultInstrumentationLibrary.version, {
+        schemaUrl: defaultInstrumentationLibrary.schemaUrl,
+      });
 
       return { metricCollector, meter };
     }
