@@ -14,14 +14,22 @@
  * limitations under the License.
  */
 
-import { Attributes, AttributeValue } from '../common/Attributes';
+/**
+ * Attributes is a map from string to attribute values.
+ */
+export interface Attributes {
+    [attributeKey: string]: AttributeValue | undefined;
+}
 
 /**
- * @deprecated please use Attributes
+ * Attribute values may be any non-nullish primitive value except an object.
+ *
+ * null or undefined attribute values are invalid and will result in undefined behavior.
  */
-export type SpanAttributes = Attributes;
-
-/**
- * @deprecated please use AttributeValue
- */
-export type SpanAttributeValue = AttributeValue;
+export type AttributeValue =
+    | string
+    | number
+    | boolean
+    | Array<null | undefined | string>
+    | Array<null | undefined | number>
+    | Array<null | undefined | boolean>;

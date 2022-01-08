@@ -18,6 +18,7 @@ export * from './baggage/types';
 export { baggageEntryMetadataFromString } from './baggage/utils';
 export * from './common/Exception';
 export * from './common/Time';
+export * from './common/Attributes';
 export * from './diag';
 export * from './propagation/TextMapPropagator';
 export * from './trace/attributes';
