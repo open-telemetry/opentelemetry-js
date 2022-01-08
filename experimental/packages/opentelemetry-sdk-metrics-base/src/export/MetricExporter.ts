@@ -16,40 +16,38 @@
 
 import { AggregationTemporality } from './AggregationTemporality';
 import { MetricData } from './MetricData';
+import {
+  ExportResult,
+  ExportResultCode,
+} from '@opentelemetry/core';
 
 
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#metricexporter
 
-// TODO should this just be an interface and exporters can implement their own shutdown?
-export abstract class MetricExporter {
+export abstract class PushMetricExporter {
   protected _shutdown = false;
 
-  abstract export(batch: MetricData[]): Promise<void>;
+  abstract export(batch: MetricData[]): Promise<ExportResult>;
 
   abstract forceFlush(): Promise<void>;
 
   abstract getPreferredAggregationTemporality(): AggregationTemporality;
 
-  async shutdown(): Promise<void> {
-    if (this._shutdown) {
-      return;
-    }
-
-    // Setting _shutdown before flushing might prevent some exporters from flushing
-    // Waiting until flushing is complete might allow another flush to occur during shutdown
-    const flushPromise = this.forceFlush();
-    this._shutdown = true;
-    await flushPromise;
-  }
+  abstract shutdown(): Promise<void>;
 
   isShutdown() {
     return this._shutdown;
   }
 }
 
-export class ConsoleMetricExporter extends MetricExporter {
+export class ConsoleMetricExporter extends PushMetricExporter {
   async export(_batch: MetricData[]) {
-    throw new Error('Method not implemented');
+    return new Promise<ExportResult>((_, reject) => {
+      reject({
+        code: ExportResultCode.FAILED,
+        error: new Error('Method not implemented')
+      });
+    });
   }
 
   getPreferredAggregationTemporality() {
@@ -58,4 +56,8 @@ export class ConsoleMetricExporter extends MetricExporter {
 
   // nothing to do
   async forceFlush() {}
+
+  async shutdown() {
+    this._shutdown = true;
+  }
 }

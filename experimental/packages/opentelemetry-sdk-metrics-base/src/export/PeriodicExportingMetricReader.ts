@@ -16,11 +16,11 @@
 
 import * as api from '@opentelemetry/api';
 import { MetricReader } from './MetricReader';
-import { MetricExporter } from './MetricExporter';
+import { PushMetricExporter } from './MetricExporter';
 import { callWithTimeout, TimeoutError } from '../utils';
 
 export type PeriodicExportingMetricReaderOptions = {
-  exporter: MetricExporter
+  exporter: PushMetricExporter
   exportIntervalMillis?: number,
   exportTimeoutMillis?: number
 }
@@ -32,7 +32,7 @@ export type PeriodicExportingMetricReaderOptions = {
 export class PeriodicExportingMetricReader extends MetricReader {
   private _interval?: ReturnType<typeof setInterval>;
 
-  private _exporter: MetricExporter;
+  private _exporter: PushMetricExporter;
 
   private readonly _exportInterval: number;
 
