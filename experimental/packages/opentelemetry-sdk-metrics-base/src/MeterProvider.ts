@@ -35,8 +35,8 @@ export class MeterProvider {
   private _sharedState: MeterProviderSharedState;
   private _shutdown = false;
 
-  constructor(options: MeterProviderOptions) {
-    this._sharedState = new MeterProviderSharedState(options.resource ?? Resource.empty());
+  constructor(options?: MeterProviderOptions) {
+    this._sharedState = new MeterProviderSharedState(options?.resource ?? Resource.empty());
   }
 
   getMeter(name: string, version = '', options: metrics.MeterOptions = {}): metrics.Meter {
@@ -46,10 +46,6 @@ export class MeterProvider {
         return metrics.NOOP_METER;
     }
 
-    // Spec leaves it unspecified if creating a meter with duplicate
-    // name/version returns the same meter. We create a new one here
-    // for simplicity. This may change in the future.
-    // TODO: consider returning the same meter if the same name/version is used
     return new Meter(this._sharedState, { name, version, schemaUrl: options.schemaUrl });
   }
 
