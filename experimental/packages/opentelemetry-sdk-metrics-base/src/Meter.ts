@@ -34,7 +34,9 @@ export class Meter implements metrics.Meter {
 
   // instrumentation library required by spec to be on meter
   // spec requires provider config changes to apply to previously created meters, achieved by holding a reference to the provider
-  constructor(private _meterProviderSharedState: MeterProviderSharedState, private _instrumentationLibrary: InstrumentationLibrary) { }
+  constructor(private _meterProviderSharedState: MeterProviderSharedState, private _instrumentationLibrary: InstrumentationLibrary) {
+    this._meterProviderSharedState.meters.push(this);
+  }
 
   /** this exists just to prevent ts errors from unused variables and may be removed */
   getInstrumentationLibrary(): InstrumentationLibrary {

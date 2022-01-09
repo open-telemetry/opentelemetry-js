@@ -15,6 +15,7 @@
  */
 
 import { MetricReader } from '../../src';
+import { MetricCollector } from '../../src/state/MetricCollector';
 
 /**
  * A test metric reader that implements no-op onForceFlush() and onShutdown() handlers.
@@ -26,5 +27,9 @@ export class TestMetricReader extends MetricReader {
 
   protected onShutdown(): Promise<void> {
     return Promise.resolve(undefined);
+  }
+
+  getMetricCollector(): MetricCollector {
+    return this['_metricProducer'] as MetricCollector;
   }
 }
