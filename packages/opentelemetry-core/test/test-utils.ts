@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-import { HrTime } from '@opentelemetry/api';
-import { hrTime } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
-import { Meter } from '../Meter';
-import { ViewRegistry } from '../view/ViewRegistry';
-import { MetricCollector } from './MetricCollector';
+import * as assert from 'assert';
 
 /**
- * An internal record for shared meter provider states.
+ * Node.js v8.x and browser compatible `assert.rejects`.
  */
-export class MeterProviderSharedState {
-  viewRegistry = new ViewRegistry();
-  readonly sdkStartTime: HrTime = hrTime();
-
-  metricCollectors: MetricCollector[] = [];
-
-  meters: Meter[] = [];
-
-  constructor(public resource: Resource) {}
+export async function assertRejects(promise: any, expect: any) {
+  try {
+    await promise;
+  } catch (err) {
+    assert.throws(() => {
+      throw err;
+    }, expect);
+  }
 }

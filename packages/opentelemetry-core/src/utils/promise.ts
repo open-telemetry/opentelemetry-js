@@ -14,23 +14,26 @@
  * limitations under the License.
  */
 
-import { HrTime } from '@opentelemetry/api';
-import { hrTime } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
-import { Meter } from '../Meter';
-import { ViewRegistry } from '../view/ViewRegistry';
-import { MetricCollector } from './MetricCollector';
+export class Deferred<T> {
+  private _promise: Promise<T>;
+  private _resolve!: (val: T) => void;
+  private _reject!: (error: unknown) => void;
+  constructor() {
+    this._promise = new Promise((resolve, reject) => {
+      this._resolve = resolve;
+      this._reject = reject;
+    });
+  }
 
-/**
- * An internal record for shared meter provider states.
- */
-export class MeterProviderSharedState {
-  viewRegistry = new ViewRegistry();
-  readonly sdkStartTime: HrTime = hrTime();
+  get promise() {
+    return this._promise;
+  }
 
-  metricCollectors: MetricCollector[] = [];
+  resolve(val: T) {
+    this._resolve(val);
+  }
 
-  meters: Meter[] = [];
-
-  constructor(public resource: Resource) {}
+  reject(err: unknown) {
+    this._reject(err);
+  }
 }

@@ -16,6 +16,7 @@
 
 import { context, TraceFlags } from '@opentelemetry/api';
 import {
+  BindOnceFuture,
   ExportResultCode,
   getEnv,
   globalErrorHandler,
@@ -40,8 +41,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
 
   private _finishedSpans: ReadableSpan[] = [];
   private _timer: NodeJS.Timeout | undefined;
-  private _isShutdown = false;
-  private _shuttingDownPromise: Promise<void> = Promise.resolve();
+  private _shutdownOnce: BindOnceFuture<void>;
 
   constructor(private readonly _exporter: SpanExporter, config?: T) {
     const env = getEnv();
@@ -61,11 +61,13 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
       typeof config?.exportTimeoutMillis === 'number'
         ? config.exportTimeoutMillis
         : env.OTEL_BSP_EXPORT_TIMEOUT;
+
+    this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
   }
 
   forceFlush(): Promise<void> {
-    if (this._isShutdown) {
-      return this._shuttingDownPromise;
+    if (this._shutdownOnce.isCalled) {
+      return this._shutdownOnce.promise;
     }
     return this._flushAll();
   }
@@ -74,7 +76,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
   onStart(_span: Span): void {}
 
   onEnd(span: ReadableSpan): void {
-    if (this._isShutdown) {
+    if (this._shutdownOnce.isCalled) {
       return;
     }
 
@@ -86,27 +88,20 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
   }
 
   shutdown(): Promise<void> {
-    if (this._isShutdown) {
-      return this._shuttingDownPromise;
-    }
-    this._isShutdown = true;
-    this._shuttingDownPromise = new Promise((resolve, reject) => {
-      Promise.resolve()
-        .then(() => {
-          return this.onShutdown();
-        })
-        .then(() => {
-          return this._flushAll();
-        })
-        .then(() => {
-          return this._exporter.shutdown();
-        })
-        .then(resolve)
-        .catch(e => {
-          reject(e);
-        });
-    });
-    return this._shuttingDownPromise;
+    return this._shutdownOnce.call();
+  }
+
+  private _shutdown() {
+    return Promise.resolve()
+      .then(() => {
+        return this.onShutdown();
+      })
+      .then(() => {
+        return this._flushAll();
+      })
+      .then(() => {
+        return this._exporter.shutdown();
+      });
   }
 
   /** Add a span in the buffer. */

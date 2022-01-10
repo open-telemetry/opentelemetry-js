@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-import { HrTime } from '@opentelemetry/api';
-import { hrTime } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
-import { Meter } from '../Meter';
-import { ViewRegistry } from '../view/ViewRegistry';
-import { MetricCollector } from './MetricCollector';
+import { MetricReader } from '../../src';
+import { MetricCollector } from '../../src/state/MetricCollector';
 
 /**
- * An internal record for shared meter provider states.
+ * A test metric reader that implements no-op onForceFlush() and onShutdown() handlers.
  */
-export class MeterProviderSharedState {
-  viewRegistry = new ViewRegistry();
-  readonly sdkStartTime: HrTime = hrTime();
+export class TestMetricReader extends MetricReader {
+  protected onForceFlush(): Promise<void> {
+    return Promise.resolve(undefined);
+  }
 
-  metricCollectors: MetricCollector[] = [];
+  protected onShutdown(): Promise<void> {
+    return Promise.resolve(undefined);
+  }
 
-  meters: Meter[] = [];
-
-  constructor(public resource: Resource) {}
+  getMetricCollector(): MetricCollector {
+    return this['_metricProducer'] as MetricCollector;
+  }
 }

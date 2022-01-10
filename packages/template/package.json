@@ -25,7 +25,7 @@
     "compile": "tsc --build",
     "version": "node ../../scripts/version-update.js",
     "clean": "tsc --build --clean",
-    "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
+    "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "npm run precompile"
   },
   "Add these to scripts": {

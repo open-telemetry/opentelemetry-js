@@ -14,7 +14,7 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../scripts/version-update.js",
-    "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
+    "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "npm run precompile"
   },
   "keywords": [
