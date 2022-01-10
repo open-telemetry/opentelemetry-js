@@ -17,7 +17,6 @@
 import { HrTime } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { DropAggregator } from '../../src/aggregator';
-import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { defaultInstrumentationLibrary, defaultInstrumentDescriptor, defaultResource } from '../util';
 
 describe('DropAggregator', () => {
@@ -51,19 +50,16 @@ describe('DropAggregator', () => {
     it('no exceptions', () => {
       const aggregator = new DropAggregator();
 
-      const sdkStartTime: HrTime = [0, 0];
-      const lastCollectionTime: HrTime = [1, 1];
-      const collectionTime: HrTime = [2, 2];
+      const startTime: HrTime = [0, 0];
+      const endTime: HrTime = [1, 1];
 
       assert.strictEqual(aggregator.toMetricData(
         defaultResource,
         defaultInstrumentationLibrary,
         defaultInstrumentDescriptor,
         [[{}, undefined]],
-        AggregationTemporality.DELTA,
-        sdkStartTime,
-        lastCollectionTime,
-        collectionTime,
+        startTime,
+        endTime,
       ), undefined);
     });
   });
