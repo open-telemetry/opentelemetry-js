@@ -19,8 +19,8 @@ import { SpanExporter } from '../../../export/SpanExporter';
 import { BatchSpanProcessorBrowserConfig } from '../../../types';
 
 export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcessorBrowserConfig> {
-  private _visibilityChangeListener?: () => void
-  private _pageHideListener?: () => void
+  private _visibilityChangeListener?: () => void;
+  private _pageHideListener?: () => void;
 
   constructor(_exporter: SpanExporter, config?: BatchSpanProcessorBrowserConfig) {
     super(_exporter, config);

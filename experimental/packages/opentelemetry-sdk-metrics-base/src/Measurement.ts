@@ -24,4 +24,4 @@ export type Measurement = {
     // TODO use common attributes
     attributes: Attributes
     context?: api.Context;
-}
+};

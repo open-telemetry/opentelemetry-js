@@ -10,7 +10,6 @@ module.exports = {
     "project": "./tsconfig.json"
   },
   rules: {
-    "semi": "error",
     "no-trailing-spaces": "error",
     "eol-last": "error",
     "quotes": [2, "single", { "avoidEscape": true }],
@@ -43,6 +42,7 @@ module.exports = {
       }
     }],
     "@typescript-eslint/no-shadow": ["warn"],
+    "@typescript-eslint/semi": "error",
     "arrow-parens": ["error", "as-needed"],
     "node/no-deprecated-api": ["warn"],
     "header/header": [2, "block", [{

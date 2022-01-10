@@ -820,7 +820,7 @@ export const DbSystemValues = {
   /** CockroachDB. */
   COCKROACHDB: 'cockroachdb',
 } as const;
-export type DbSystemValues = typeof DbSystemValues[keyof typeof DbSystemValues]
+export type DbSystemValues = typeof DbSystemValues[keyof typeof DbSystemValues];
 
 
 
@@ -849,7 +849,7 @@ export const DbCassandraConsistencyLevelValues = {
   /** local_serial. */
   LOCAL_SERIAL: 'local_serial',
 } as const;
-export type DbCassandraConsistencyLevelValues = typeof DbCassandraConsistencyLevelValues[keyof typeof DbCassandraConsistencyLevelValues]
+export type DbCassandraConsistencyLevelValues = typeof DbCassandraConsistencyLevelValues[keyof typeof DbCassandraConsistencyLevelValues];
 
 
 
@@ -866,7 +866,7 @@ export const FaasTriggerValues = {
   /** If none of the others apply. */
   OTHER: 'other',
 } as const;
-export type FaasTriggerValues = typeof FaasTriggerValues[keyof typeof FaasTriggerValues]
+export type FaasTriggerValues = typeof FaasTriggerValues[keyof typeof FaasTriggerValues];
 
 
 
@@ -879,7 +879,7 @@ export const FaasDocumentOperationValues = {
   /** When an object is deleted. */
   DELETE: 'delete',
 } as const;
-export type FaasDocumentOperationValues = typeof FaasDocumentOperationValues[keyof typeof FaasDocumentOperationValues]
+export type FaasDocumentOperationValues = typeof FaasDocumentOperationValues[keyof typeof FaasDocumentOperationValues];
 
 
 
@@ -894,7 +894,7 @@ export const FaasInvokedProviderValues = {
   /** Google Cloud Platform. */
   GCP: 'gcp',
 } as const;
-export type FaasInvokedProviderValues = typeof FaasInvokedProviderValues[keyof typeof FaasInvokedProviderValues]
+export type FaasInvokedProviderValues = typeof FaasInvokedProviderValues[keyof typeof FaasInvokedProviderValues];
 
 
 
@@ -915,7 +915,7 @@ export const NetTransportValues = {
   /** Something else (non IP-based). */
   OTHER: 'other',
 } as const;
-export type NetTransportValues = typeof NetTransportValues[keyof typeof NetTransportValues]
+export type NetTransportValues = typeof NetTransportValues[keyof typeof NetTransportValues];
 
 
 
@@ -932,7 +932,7 @@ export const NetHostConnectionTypeValues = {
   /** unknown. */
   UNKNOWN: 'unknown',
 } as const;
-export type NetHostConnectionTypeValues = typeof NetHostConnectionTypeValues[keyof typeof NetHostConnectionTypeValues]
+export type NetHostConnectionTypeValues = typeof NetHostConnectionTypeValues[keyof typeof NetHostConnectionTypeValues];
 
 
 
@@ -981,7 +981,7 @@ export const NetHostConnectionSubtypeValues = {
   /** LTE CA. */
   LTE_CA: 'lte_ca',
 } as const;
-export type NetHostConnectionSubtypeValues = typeof NetHostConnectionSubtypeValues[keyof typeof NetHostConnectionSubtypeValues]
+export type NetHostConnectionSubtypeValues = typeof NetHostConnectionSubtypeValues[keyof typeof NetHostConnectionSubtypeValues];
 
 
 
@@ -998,7 +998,7 @@ export const HttpFlavorValues = {
   /** QUIC protocol. */
   QUIC: 'QUIC',
 } as const;
-export type HttpFlavorValues = typeof HttpFlavorValues[keyof typeof HttpFlavorValues]
+export type HttpFlavorValues = typeof HttpFlavorValues[keyof typeof HttpFlavorValues];
 
 
 
@@ -1009,7 +1009,7 @@ export const MessagingDestinationKindValues = {
   /** A message sent to a topic. */
   TOPIC: 'topic',
 } as const;
-export type MessagingDestinationKindValues = typeof MessagingDestinationKindValues[keyof typeof MessagingDestinationKindValues]
+export type MessagingDestinationKindValues = typeof MessagingDestinationKindValues[keyof typeof MessagingDestinationKindValues];
 
 
 
@@ -1020,7 +1020,7 @@ export const MessagingOperationValues = {
   /** process. */
   PROCESS: 'process',
 } as const;
-export type MessagingOperationValues = typeof MessagingOperationValues[keyof typeof MessagingOperationValues]
+export type MessagingOperationValues = typeof MessagingOperationValues[keyof typeof MessagingOperationValues];
 
 
 
@@ -1061,7 +1061,7 @@ export const RpcGrpcStatusCodeValues = {
   /** UNAUTHENTICATED. */
   UNAUTHENTICATED: 16,
 } as const;
-export type RpcGrpcStatusCodeValues = typeof RpcGrpcStatusCodeValues[keyof typeof RpcGrpcStatusCodeValues]
+export type RpcGrpcStatusCodeValues = typeof RpcGrpcStatusCodeValues[keyof typeof RpcGrpcStatusCodeValues];
 
 
 
@@ -1072,5 +1072,5 @@ export const MessageTypeValues = {
   /** received. */
   RECEIVED: 'RECEIVED',
 } as const;
-export type MessageTypeValues = typeof MessageTypeValues[keyof typeof MessageTypeValues]
+export type MessageTypeValues = typeof MessageTypeValues[keyof typeof MessageTypeValues];
 

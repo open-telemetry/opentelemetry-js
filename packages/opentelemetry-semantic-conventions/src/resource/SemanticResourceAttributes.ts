@@ -487,7 +487,7 @@ export const CloudProviderValues = {
   /** Google Cloud Platform. */
   GCP: 'gcp',
 } as const;
-export type CloudProviderValues = typeof CloudProviderValues[keyof typeof CloudProviderValues]
+export type CloudProviderValues = typeof CloudProviderValues[keyof typeof CloudProviderValues];
 
 
 
@@ -528,7 +528,7 @@ export const CloudPlatformValues = {
   /** Google Cloud App Engine (GAE). */
   GCP_APP_ENGINE: 'gcp_app_engine',
 } as const;
-export type CloudPlatformValues = typeof CloudPlatformValues[keyof typeof CloudPlatformValues]
+export type CloudPlatformValues = typeof CloudPlatformValues[keyof typeof CloudPlatformValues];
 
 
 
@@ -539,7 +539,7 @@ export const AwsEcsLaunchtypeValues = {
   /** fargate. */
   FARGATE: 'fargate',
 } as const;
-export type AwsEcsLaunchtypeValues = typeof AwsEcsLaunchtypeValues[keyof typeof AwsEcsLaunchtypeValues]
+export type AwsEcsLaunchtypeValues = typeof AwsEcsLaunchtypeValues[keyof typeof AwsEcsLaunchtypeValues];
 
 
 
@@ -560,7 +560,7 @@ export const HostArchValues = {
   /** 32-bit x86. */
   X86: 'x86',
 } as const;
-export type HostArchValues = typeof HostArchValues[keyof typeof HostArchValues]
+export type HostArchValues = typeof HostArchValues[keyof typeof HostArchValues];
 
 
 
@@ -589,7 +589,7 @@ export const OsTypeValues = {
   /** IBM z/OS. */
   Z_OS: 'z_os',
 } as const;
-export type OsTypeValues = typeof OsTypeValues[keyof typeof OsTypeValues]
+export type OsTypeValues = typeof OsTypeValues[keyof typeof OsTypeValues];
 
 
 
@@ -616,5 +616,5 @@ export const TelemetrySdkLanguageValues = {
   /** webjs. */
   WEBJS: 'webjs',
 } as const;
-export type TelemetrySdkLanguageValues = typeof TelemetrySdkLanguageValues[keyof typeof TelemetrySdkLanguageValues]
+export type TelemetrySdkLanguageValues = typeof TelemetrySdkLanguageValues[keyof typeof TelemetrySdkLanguageValues];
 

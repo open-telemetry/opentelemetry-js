@@ -26,7 +26,7 @@ import { defaultInstrumentationLibrary, defaultResource, assertMetricData, asser
 import { TestMetricReader } from '../export/TestMetricReader';
 
 class TestMetricExporter extends MetricExporter {
-  metricDataList: MetricData[] = []
+  metricDataList: MetricData[] = [];
   async export(batch: MetricData[]): Promise<void> {
     this.metricDataList.push(...batch);
   }

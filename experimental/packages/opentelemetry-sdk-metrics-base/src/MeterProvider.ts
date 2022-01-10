@@ -29,7 +29,7 @@ import { MetricCollector } from './state/MetricCollector';
 
 export type MeterProviderOptions = {
   resource?: Resource;
-}
+};
 
 export class MeterProvider {
   private _sharedState: MeterProviderSharedState;
