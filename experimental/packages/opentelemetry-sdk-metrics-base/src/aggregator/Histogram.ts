@@ -25,7 +25,6 @@ import { HistogramMetricData, PointDataType } from '../export/MetricData';
 import { Resource } from '@opentelemetry/resources';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { HrTime } from '@opentelemetry/api';
-import { AggregationTemporality } from '../export/AggregationTemporality';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 
@@ -143,10 +142,8 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
     instrumentationLibrary: InstrumentationLibrary,
     metricDescriptor: InstrumentDescriptor,
     accumulationByAttributes: AccumulationRecord<HistogramAccumulation>[],
-    temporality: AggregationTemporality,
-    sdkStartTime: HrTime,
-    lastCollectionTime: HrTime,
-    collectionTime: HrTime): Maybe<HistogramMetricData> {
+    startTime: HrTime,
+    endTime: HrTime): Maybe<HistogramMetricData> {
     return {
       resource,
       instrumentationLibrary,
@@ -155,8 +152,8 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
       pointData: accumulationByAttributes.map(([attributes, accumulation]) => {
         return {
           attributes,
-          startTime: temporality === AggregationTemporality.CUMULATIVE ? sdkStartTime : lastCollectionTime,
-          endTime: collectionTime,
+          startTime,
+          endTime,
           point: accumulation.toPoint(),
         }
       })
