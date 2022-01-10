@@ -721,7 +721,7 @@ the closest proxy.
   * Uncompressed size of the message in bytes.
   */
   MESSAGE_UNCOMPRESSED_SIZE: 'message.uncompressed_size',
-}
+};
 
 
 export const DbSystemValues = {
@@ -819,7 +819,7 @@ export const DbSystemValues = {
   MEMCACHED: 'memcached',
   /** CockroachDB. */
   COCKROACHDB: 'cockroachdb',
-} as const
+} as const;
 export type DbSystemValues = typeof DbSystemValues[keyof typeof DbSystemValues]
 
 
@@ -848,7 +848,7 @@ export const DbCassandraConsistencyLevelValues = {
   SERIAL: 'serial',
   /** local_serial. */
   LOCAL_SERIAL: 'local_serial',
-} as const
+} as const;
 export type DbCassandraConsistencyLevelValues = typeof DbCassandraConsistencyLevelValues[keyof typeof DbCassandraConsistencyLevelValues]
 
 
@@ -865,7 +865,7 @@ export const FaasTriggerValues = {
   TIMER: 'timer',
   /** If none of the others apply. */
   OTHER: 'other',
-} as const
+} as const;
 export type FaasTriggerValues = typeof FaasTriggerValues[keyof typeof FaasTriggerValues]
 
 
@@ -878,7 +878,7 @@ export const FaasDocumentOperationValues = {
   EDIT: 'edit',
   /** When an object is deleted. */
   DELETE: 'delete',
-} as const
+} as const;
 export type FaasDocumentOperationValues = typeof FaasDocumentOperationValues[keyof typeof FaasDocumentOperationValues]
 
 
@@ -893,7 +893,7 @@ export const FaasInvokedProviderValues = {
   AZURE: 'azure',
   /** Google Cloud Platform. */
   GCP: 'gcp',
-} as const
+} as const;
 export type FaasInvokedProviderValues = typeof FaasInvokedProviderValues[keyof typeof FaasInvokedProviderValues]
 
 
@@ -914,7 +914,7 @@ export const NetTransportValues = {
   INPROC: 'inproc',
   /** Something else (non IP-based). */
   OTHER: 'other',
-} as const
+} as const;
 export type NetTransportValues = typeof NetTransportValues[keyof typeof NetTransportValues]
 
 
@@ -931,7 +931,7 @@ export const NetHostConnectionTypeValues = {
   UNAVAILABLE: 'unavailable',
   /** unknown. */
   UNKNOWN: 'unknown',
-} as const
+} as const;
 export type NetHostConnectionTypeValues = typeof NetHostConnectionTypeValues[keyof typeof NetHostConnectionTypeValues]
 
 
@@ -980,7 +980,7 @@ export const NetHostConnectionSubtypeValues = {
   NRNSA: 'nrnsa',
   /** LTE CA. */
   LTE_CA: 'lte_ca',
-} as const
+} as const;
 export type NetHostConnectionSubtypeValues = typeof NetHostConnectionSubtypeValues[keyof typeof NetHostConnectionSubtypeValues]
 
 
@@ -997,7 +997,7 @@ export const HttpFlavorValues = {
   SPDY: 'SPDY',
   /** QUIC protocol. */
   QUIC: 'QUIC',
-} as const
+} as const;
 export type HttpFlavorValues = typeof HttpFlavorValues[keyof typeof HttpFlavorValues]
 
 
@@ -1008,7 +1008,7 @@ export const MessagingDestinationKindValues = {
   QUEUE: 'queue',
   /** A message sent to a topic. */
   TOPIC: 'topic',
-} as const
+} as const;
 export type MessagingDestinationKindValues = typeof MessagingDestinationKindValues[keyof typeof MessagingDestinationKindValues]
 
 
@@ -1019,7 +1019,7 @@ export const MessagingOperationValues = {
   RECEIVE: 'receive',
   /** process. */
   PROCESS: 'process',
-} as const
+} as const;
 export type MessagingOperationValues = typeof MessagingOperationValues[keyof typeof MessagingOperationValues]
 
 
@@ -1060,7 +1060,7 @@ export const RpcGrpcStatusCodeValues = {
   DATA_LOSS: 15,
   /** UNAUTHENTICATED. */
   UNAUTHENTICATED: 16,
-} as const
+} as const;
 export type RpcGrpcStatusCodeValues = typeof RpcGrpcStatusCodeValues[keyof typeof RpcGrpcStatusCodeValues]
 
 
@@ -1071,6 +1071,6 @@ export const MessageTypeValues = {
   SENT: 'SENT',
   /** received. */
   RECEIVED: 'RECEIVED',
-} as const
+} as const;
 export type MessageTypeValues = typeof MessageTypeValues[keyof typeof MessageTypeValues]
 

@@ -77,8 +77,8 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
           startTime: temporality === AggregationTemporality.CUMULATIVE ? sdkStartTime : lastCollectionTime,
           endTime: collectionTime,
           point: accumulation.toPoint(),
-        }
+        };
       })
-    }
+    };
   }
 }

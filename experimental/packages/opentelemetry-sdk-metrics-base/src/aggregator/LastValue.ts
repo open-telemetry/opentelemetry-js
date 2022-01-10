@@ -87,8 +87,8 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
           startTime: temporality === AggregationTemporality.CUMULATIVE ? sdkStartTime : lastCollectionTime,
           endTime: collectionTime,
           point: accumulation.toPoint(),
-        }
+        };
       })
-    }
+    };
   }
 }

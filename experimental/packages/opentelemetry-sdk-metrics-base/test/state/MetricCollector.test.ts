@@ -47,7 +47,7 @@ class TestDeltaMetricExporter extends TestMetricExporter {
 describe('MetricCollector', () => {
   afterEach(() => {
     sinon.restore();
-  })
+  });
 
   describe('constructor', () => {
     it('should construct MetricCollector without exceptions', () => {

@@ -22,11 +22,11 @@ import { TestTracingSpanExporter } from '../../common/export/TestTracingSpanExpo
 
 describe('BatchSpanProcessor - web', () => {
   let visibilityState: VisibilityState = 'visible';
-  let exporter: SpanExporter
+  let exporter: SpanExporter;
   let processor: BatchSpanProcessor;
   let forceFlushSpy: sinon.SinonStub;
   let visibilityChangeEvent: Event;
-  let pageHideEvent: Event
+  let pageHideEvent: Event;
 
   beforeEach(() => {
     sinon.replaceGetter(document, 'visibilityState', () => visibilityState);
@@ -46,7 +46,7 @@ describe('BatchSpanProcessor - web', () => {
     const testDocumentHide = (hideDocument: () => void) => {
       it('should force flush spans', () => {
         assert.strictEqual(forceFlushSpy.callCount, 0);
-        hideDocument()
+        hideDocument();
         assert.strictEqual(forceFlushSpy.callCount, 1);
       });
 
@@ -54,43 +54,43 @@ describe('BatchSpanProcessor - web', () => {
         it('should NOT force flush spans', async () => {
           assert.strictEqual(forceFlushSpy.callCount, 0);
           await processor.shutdown();
-          hideDocument()
+          hideDocument();
           assert.strictEqual(forceFlushSpy.callCount, 0);
         });
-      })
+      });
 
       describe('AND disableAutoFlushOnDocumentHide configuration option', () => {
         it('set to false should force flush spans', () => {
           processor = new BatchSpanProcessor(exporter, { disableAutoFlushOnDocumentHide: false });
           forceFlushSpy = sinon.stub(processor, 'forceFlush');
           assert.strictEqual(forceFlushSpy.callCount, 0);
-          hideDocument()
+          hideDocument();
           assert.strictEqual(forceFlushSpy.callCount, 1);
-        })
+        });
 
         it('set to true should NOT force flush spans', () => {
           processor = new BatchSpanProcessor(exporter, { disableAutoFlushOnDocumentHide: true });
           forceFlushSpy = sinon.stub(processor, 'forceFlush');
           assert.strictEqual(forceFlushSpy.callCount, 0);
-          hideDocument()
+          hideDocument();
           assert.strictEqual(forceFlushSpy.callCount, 0);
-        })
-      })
-    }
+        });
+      });
+    };
 
     describe('by the visibilitychange event', () => {
       testDocumentHide(() => {
         visibilityState = 'hidden';
         document.dispatchEvent(visibilityChangeEvent);
-      })
-    })
+      });
+    });
 
     describe('by the pagehide event', () => {
       testDocumentHide(() => {
         document.dispatchEvent(pageHideEvent);
-      })
-    })
-  })
+      });
+    });
+  });
 
   describe('when document becomes visible', () => {
     it('should NOT force flush spans', () => {
@@ -98,5 +98,5 @@ describe('BatchSpanProcessor - web', () => {
       document.dispatchEvent(visibilityChangeEvent);
       assert.strictEqual(forceFlushSpy.callCount, 0);
     });
-  })
+  });
 });

@@ -158,8 +158,8 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
           startTime: temporality === AggregationTemporality.CUMULATIVE ? sdkStartTime : lastCollectionTime,
           endTime: collectionTime,
           point: accumulation.toPoint(),
-        }
+        };
       })
-    }
+    };
   }
 }

@@ -39,14 +39,14 @@ describe('InstrumentationBase', () => {
 
     let instrumentation: TestInstrumentation;
     let modulePatchSpy: sinon.SinonSpy;
-  
+
     beforeEach(() => {
       instrumentation = new TestInstrumentation();
       // @ts-expect-error access internal property for testing
       instrumentation._enabled = true;
       modulePatchSpy = sinon.spy();
     });
-    
+
     describe('when patching a module', () => {
       describe('AND there is no wildcard supported version', () => {
         it('should not patch module', () => {
@@ -56,7 +56,7 @@ describe('InstrumentationBase', () => {
             name: MODULE_NAME,
             patch: modulePatchSpy as unknown,
           } as InstrumentationModuleDefinition<unknown>;
-  
+
           // @ts-expect-error access internal property for testing
           instrumentation._onRequire<unknown>(
             instrumentationModule,
@@ -64,7 +64,7 @@ describe('InstrumentationBase', () => {
             MODULE_NAME,
             MODULE_DIR
           );
-      
+
           assert.strictEqual(instrumentationModule.moduleVersion, undefined);
           assert.strictEqual(instrumentationModule.moduleExports, undefined);
           sinon.assert.notCalled(modulePatchSpy);
@@ -79,7 +79,7 @@ describe('InstrumentationBase', () => {
             name: MODULE_NAME,
             patch: modulePatchSpy as unknown,
           } as InstrumentationModuleDefinition<unknown>;
-          
+
           // @ts-expect-error access internal property for testing
           instrumentation._onRequire<unknown>(
             instrumentationModule,
@@ -87,20 +87,20 @@ describe('InstrumentationBase', () => {
             MODULE_NAME,
             MODULE_DIR
           );
-          
+
           assert.strictEqual(instrumentationModule.moduleVersion, undefined);
           assert.strictEqual(instrumentationModule.moduleExports, moduleExports);
           sinon.assert.calledOnceWithExactly(modulePatchSpy, moduleExports, undefined);
         });
       });
     });
-      
+
     describe('when patching module files', () => {
       let filePatchSpy: sinon.SinonSpy;
 
       beforeEach(() => {
         filePatchSpy = sinon.spy();
-      })
+      });
 
       describe('AND there is no wildcard supported version', () => {
         it('should not patch module file', () => {
@@ -116,7 +116,7 @@ describe('InstrumentationBase', () => {
               patch: filePatchSpy as unknown
             }]
           } as InstrumentationModuleDefinition<unknown>;
-  
+
           // @ts-expect-error access internal property for testing
           instrumentation._onRequire<unknown>(
             instrumentationModule,
@@ -124,7 +124,7 @@ describe('InstrumentationBase', () => {
             MODULE_FILE_NAME,
             MODULE_DIR
           );
-      
+
           assert.strictEqual(instrumentationModule.moduleVersion, undefined);
           assert.strictEqual(instrumentationModule.moduleExports, undefined);
           sinon.assert.notCalled(modulePatchSpy);
@@ -146,7 +146,7 @@ describe('InstrumentationBase', () => {
               patch: filePatchSpy as unknown
             }]
           } as InstrumentationModuleDefinition<unknown>;
-  
+
           // @ts-expect-error access internal property for testing
           instrumentation._onRequire<unknown>(
             instrumentationModule,
@@ -154,7 +154,7 @@ describe('InstrumentationBase', () => {
             MODULE_FILE_NAME,
             MODULE_DIR
           );
-      
+
           assert.strictEqual(instrumentationModule.moduleVersion, undefined);
           assert.strictEqual(instrumentationModule.files[0].moduleExports, moduleExports);
           sinon.assert.notCalled(modulePatchSpy);

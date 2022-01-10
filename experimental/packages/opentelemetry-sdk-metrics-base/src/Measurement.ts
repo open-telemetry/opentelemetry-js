@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api'
-import { Attributes } from '@opentelemetry/api-metrics-wip'
+import * as api from '@opentelemetry/api';
+import { Attributes } from '@opentelemetry/api-metrics-wip';
 
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#measurement
 

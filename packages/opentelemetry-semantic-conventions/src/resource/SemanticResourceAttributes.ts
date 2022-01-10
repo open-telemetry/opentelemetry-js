@@ -474,7 +474,7 @@ As an alternative, consider setting `faas.id` as a span attribute instead.
   * Additional description of the web engine (e.g. detailed version and edition information).
   */
   WEBENGINE_DESCRIPTION: 'webengine.description',
-}
+};
 
 
 export const CloudProviderValues = {
@@ -486,7 +486,7 @@ export const CloudProviderValues = {
   AZURE: 'azure',
   /** Google Cloud Platform. */
   GCP: 'gcp',
-} as const
+} as const;
 export type CloudProviderValues = typeof CloudProviderValues[keyof typeof CloudProviderValues]
 
 
@@ -527,7 +527,7 @@ export const CloudPlatformValues = {
   GCP_CLOUD_FUNCTIONS: 'gcp_cloud_functions',
   /** Google Cloud App Engine (GAE). */
   GCP_APP_ENGINE: 'gcp_app_engine',
-} as const
+} as const;
 export type CloudPlatformValues = typeof CloudPlatformValues[keyof typeof CloudPlatformValues]
 
 
@@ -538,7 +538,7 @@ export const AwsEcsLaunchtypeValues = {
   EC2: 'ec2',
   /** fargate. */
   FARGATE: 'fargate',
-} as const
+} as const;
 export type AwsEcsLaunchtypeValues = typeof AwsEcsLaunchtypeValues[keyof typeof AwsEcsLaunchtypeValues]
 
 
@@ -559,7 +559,7 @@ export const HostArchValues = {
   PPC64: 'ppc64',
   /** 32-bit x86. */
   X86: 'x86',
-} as const
+} as const;
 export type HostArchValues = typeof HostArchValues[keyof typeof HostArchValues]
 
 
@@ -588,7 +588,7 @@ export const OsTypeValues = {
   SOLARIS: 'solaris',
   /** IBM z/OS. */
   Z_OS: 'z_os',
-} as const
+} as const;
 export type OsTypeValues = typeof OsTypeValues[keyof typeof OsTypeValues]
 
 
@@ -615,6 +615,6 @@ export const TelemetrySdkLanguageValues = {
   RUBY: 'ruby',
   /** webjs. */
   WEBJS: 'webjs',
-} as const
+} as const;
 export type TelemetrySdkLanguageValues = typeof TelemetrySdkLanguageValues[keyof typeof TelemetrySdkLanguageValues]
 
