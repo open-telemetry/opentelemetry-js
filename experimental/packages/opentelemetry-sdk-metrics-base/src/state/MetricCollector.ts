@@ -34,7 +34,7 @@ export class MetricCollector implements MetricProducer {
 
   async collect(): Promise<MetricData[]> {
     const collectionTime = hrTime();
-    const results = await Promise.all(Array.from(this._sharedState.meters.values())
+    const results = await Promise.all(this._sharedState.meters
       .map(meter => meter.collect(this, collectionTime)));
 
     return results.reduce((cumulation, current) => cumulation.concat(current), []);
@@ -44,14 +44,14 @@ export class MetricCollector implements MetricProducer {
    * Delegates for MetricReader.forceFlush.
    */
   async forceFlush(): Promise<void> {
-    return this._metricReader.forceFlush();
+    await this._metricReader.forceFlush();
   }
 
   /**
    * Delegates for MetricReader.shutdown.
    */
   async shutdown(): Promise<void> {
-    return this._metricReader.shutdown();
+    await this._metricReader.shutdown();
   }
 }
 

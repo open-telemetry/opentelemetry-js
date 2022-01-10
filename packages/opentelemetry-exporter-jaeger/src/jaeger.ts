@@ -15,7 +15,7 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { ExportResult, ExportResultCode, getEnv } from '@opentelemetry/core';
+import { BindOnceFuture, ExportResult, ExportResultCode, getEnv } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { Socket } from 'dgram';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
@@ -28,9 +28,7 @@ import * as jaegerTypes from './types';
 export class JaegerExporter implements SpanExporter {
   private readonly _onShutdownFlushTimeout: number;
   private readonly _localConfig: jaegerTypes.ExporterConfig;
-  private _isShutdown = false;
-  private _shutdownFlushTimeout: NodeJS.Timeout | undefined;
-  private _shuttingDownPromise: Promise<void> = Promise.resolve();
+  private _shutdownOnce: BindOnceFuture<void>;
 
   private _sender?: typeof jaegerTypes.UDPSender;
 
@@ -57,6 +55,8 @@ export class JaegerExporter implements SpanExporter {
     localConfig.host = localConfig.host || env.OTEL_EXPORTER_JAEGER_AGENT_HOST;
 
     this._localConfig = localConfig;
+
+    this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
   }
 
   /** Exports a list of spans to Jaeger. */
@@ -64,6 +64,9 @@ export class JaegerExporter implements SpanExporter {
     spans: ReadableSpan[],
     resultCallback: (result: ExportResult) => void
   ): void {
+    if (this._shutdownOnce.isCalled) {
+      return;
+    }
     if (spans.length === 0) {
       return resultCallback({ code: ExportResultCode.SUCCESS });
     }
@@ -75,39 +78,18 @@ export class JaegerExporter implements SpanExporter {
 
   /** Shutdown exporter. */
   shutdown(): Promise<void> {
-    if (this._isShutdown) {
-      return this._shuttingDownPromise;
-    }
-    this._isShutdown = true;
+    return this._shutdownOnce.call();
+  }
 
-    this._shuttingDownPromise = new Promise((resolve, reject) => {
-      let rejected = false;
-      this._shutdownFlushTimeout = setTimeout(() => {
-        rejected = true;
-        reject('timeout');
-        this._sender.close();
-      }, this._onShutdownFlushTimeout);
-
-      Promise.resolve()
-        .then(() => {
-          // Make an optimistic flush.
-          return this._flush();
-        })
-        .then(() => {
-          if (rejected) {
-            return;
-          } else {
-            this._shutdownFlushTimeout &&
-              clearTimeout(this._shutdownFlushTimeout);
-            resolve();
-            this._sender.close();
-          }
-        })
-        .catch(e => {
-          reject(e);
-        });
+  private _shutdown(): Promise<void> {
+    return Promise.race([
+      new Promise<void>((_resolve, reject) => {
+        setTimeout(() => reject(new Error('Flush timeout')), this._onShutdownFlushTimeout);
+      }),
+      this._flush(),
+    ]).finally(() => {
+      this._sender?.close();
     });
-    return this._shuttingDownPromise;
   }
 
   /** Transform spans and sends to Jaeger service. */

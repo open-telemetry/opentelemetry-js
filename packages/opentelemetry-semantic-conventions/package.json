@@ -16,7 +16,7 @@
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "version": "node ../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.all.json",
-    "precompile": "lerna run version --scope $(npm pkg get name) --include-filtered-dependencies",
+    "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "npm run precompile"
   },
   "keywords": [
