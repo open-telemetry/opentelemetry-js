@@ -50,7 +50,7 @@ describe('ViewRegistry', () => {
           }, defaultInstrumentationLibrary);
 
           assert.strictEqual(views.length, 2);
-          assert.strictEqual(views[0].name, 'no-filter')
+          assert.strictEqual(views[0].name, 'no-filter');
           assert.strictEqual(views[1].name, 'foo');
         }
 
@@ -83,7 +83,7 @@ describe('ViewRegistry', () => {
           }, defaultInstrumentationLibrary);
 
           assert.strictEqual(views.length, 2);
-          assert.strictEqual(views[0].name, 'no-filter')
+          assert.strictEqual(views[0].name, 'no-filter');
           assert.strictEqual(views[1].name, 'counter');
         }
 
@@ -118,7 +118,7 @@ describe('ViewRegistry', () => {
           });
 
           assert.strictEqual(views.length, 2);
-          assert.strictEqual(views[0].name, 'no-filter')
+          assert.strictEqual(views[0].name, 'no-filter');
           assert.strictEqual(views[1].name, 'foo');
         }
 

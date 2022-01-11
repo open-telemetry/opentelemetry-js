@@ -44,7 +44,7 @@ describe('util - browser', () => {
         // ;charset=utf-8 is applied by sinon.fakeServer
         'Content-Type': 'application/json;charset=utf-8',
         'Accept': 'application/json',
-      }
+      };
     });
     describe('and Content-Type header is set', () => {
       beforeEach(()=>{

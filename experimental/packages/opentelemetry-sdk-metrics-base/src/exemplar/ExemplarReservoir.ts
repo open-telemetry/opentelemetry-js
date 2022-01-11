@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api-metrics-wip'
-import { Context, HrTime, isSpanContextValid, trace } from '@opentelemetry/api'
-import { Exemplar } from './Exemplar'
+import { Attributes } from '@opentelemetry/api-metrics-wip';
+import { Context, HrTime, isSpanContextValid, trace } from '@opentelemetry/api';
+import { Exemplar } from './Exemplar';
 
 
 /**
@@ -29,13 +29,13 @@ export interface ExemplarReservoir {
     value: number,
     timestamp: HrTime,
     attributes: Attributes,
-    ctx: Context    
+    ctx: Context
   ): void;
   /**
    * Returns accumulated Exemplars and also resets the reservoir
    * for the next sampling period
-   * 
-   * @param pointAttributes The attributes associated with metric point. 
+   *
+   * @param pointAttributes The attributes associated with metric point.
    *
    * @returns a list of {@link Exemplar}s. Retuned exemplars contain the attributes that were filtered out by the
    * aggregator, but recorded alongside the original measurement.

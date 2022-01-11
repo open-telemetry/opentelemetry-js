@@ -84,8 +84,8 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
           startTime,
           endTime,
           point: accumulation.toPoint(),
-        }
+        };
       })
-    }
+    };
   }
 }

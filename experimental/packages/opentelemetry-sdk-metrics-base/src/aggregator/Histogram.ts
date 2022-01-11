@@ -155,8 +155,8 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
           startTime,
           endTime,
           point: accumulation.toPoint(),
-        }
+        };
       })
-    }
+    };
   }
 }

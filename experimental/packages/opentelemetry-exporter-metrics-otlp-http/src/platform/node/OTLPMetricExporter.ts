@@ -15,7 +15,7 @@
  */
 
 import { MetricRecord, MetricExporter } from '@opentelemetry/sdk-metrics-base';
-import { 
+import {
   OTLPExporterNodeBase,
   OTLPExporterNodeConfigBase,
   otlpTypes,

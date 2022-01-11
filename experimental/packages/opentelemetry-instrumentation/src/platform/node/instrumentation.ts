@@ -67,7 +67,7 @@ export abstract class InstrumentationBase<T = any>
     } catch (error) {
       diag.warn('Failed extracting version', baseDir);
     }
-    
+
     return undefined;
   }
 

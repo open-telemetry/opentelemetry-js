@@ -74,8 +74,8 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
           startTime,
           endTime,
           point: accumulation.toPoint(),
-        }
+        };
       })
-    }
+    };
   }
 }
