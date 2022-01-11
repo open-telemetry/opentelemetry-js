@@ -501,7 +501,7 @@ export function headerCapture(type: 'request' | 'response', headers: string[]) {
   return (span: Span, getHeader: (key: string) => undefined | string | string[] | number) => {
     for (const [capturedHeader, normalizedHeader] of normalizedHeaders) {
       const value = getHeader(capturedHeader);
-      
+
       if (value === undefined) {
         continue;
       }

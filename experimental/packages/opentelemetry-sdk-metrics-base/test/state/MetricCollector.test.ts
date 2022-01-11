@@ -26,7 +26,7 @@ import { defaultInstrumentationLibrary, defaultResource, assertMetricData, asser
 import { TestMetricReader } from '../export/TestMetricReader';
 
 class TestMetricExporter extends MetricExporter {
-  metricDataList: MetricData[] = []
+  metricDataList: MetricData[] = [];
   async export(batch: MetricData[]): Promise<void> {
     this.metricDataList.push(...batch);
   }
@@ -47,7 +47,7 @@ class TestDeltaMetricExporter extends TestMetricExporter {
 describe('MetricCollector', () => {
   afterEach(() => {
     sinon.restore();
-  })
+  });
 
   describe('constructor', () => {
     it('should construct MetricCollector without exceptions', () => {

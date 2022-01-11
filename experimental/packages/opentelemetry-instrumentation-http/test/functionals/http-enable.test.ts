@@ -18,7 +18,7 @@ import {
   context,
   propagation,
   Span as ISpan,
-  SpanKind, 
+  SpanKind,
   trace,
   SpanAttributes,
 } from '@opentelemetry/api';
@@ -100,13 +100,13 @@ export const responseHookFunction = (
 export const startIncomingSpanHookFunction = (
   request: IncomingMessage
 ): SpanAttributes => {
-  return {guid: request.headers?.guid}
+  return {guid: request.headers?.guid};
 };
 
 export const startOutgoingSpanHookFunction = (
   request: RequestOptions
 ): SpanAttributes => {
-  return {guid: request.headers?.guid}
+  return {guid: request.headers?.guid};
 };
 
 describe('HttpInstrumentation', () => {
@@ -507,12 +507,12 @@ describe('HttpInstrumentation', () => {
             hostname: 'localhost',
             pathname: '/',
             forceStatus: {
-              code: SpanStatusCode.ERROR, 
+              code: SpanStatusCode.ERROR,
               message: err.message,
             },
             component: 'http',
             noNetPeer: true,
-          }
+          };
           assertSpan(spans[0], SpanKind.CLIENT, validations);
           return true;
         });

@@ -45,7 +45,7 @@ export const defaultInstrumentationLibrary: InstrumentationLibrary = {
 
 export const commonValues: number[] = [1, -1, 1.0, Infinity, -Infinity, NaN];
 export const commonAttributes: Attributes[] = [{}, {1: '1'}, {a: '2'}, new (class Foo{
-a = '1'
+a = '1';
 })];
 
 export const sleep = (time: number) =>

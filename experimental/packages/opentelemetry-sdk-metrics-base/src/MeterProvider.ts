@@ -29,7 +29,7 @@ import { MetricCollector } from './state/MetricCollector';
 
 export type MeterProviderOptions = {
   resource?: Resource;
-}
+};
 
 export class MeterProvider {
   private _sharedState: MeterProviderSharedState;
@@ -42,7 +42,7 @@ export class MeterProvider {
   getMeter(name: string, version = '', options: metrics.MeterOptions = {}): metrics.Meter {
     // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#meter-creation
     if (this._shutdown) {
-        api.diag.warn('A shutdown MeterProvider cannot provide a Meter')
+        api.diag.warn('A shutdown MeterProvider cannot provide a Meter');
         return metrics.NOOP_METER;
     }
 
@@ -84,7 +84,7 @@ export class MeterProvider {
       } catch (e) {
         // Log all Errors.
         if (e instanceof Error) {
-          api.diag.error(`Error shutting down: ${e.message}`)
+          api.diag.error(`Error shutting down: ${e.message}`);
         }
       }
     }
@@ -103,7 +103,7 @@ export class MeterProvider {
 
     // do not flush after shutdown
     if (this._shutdown) {
-      api.diag.warn('invalid attempt to force flush after shutdown')
+      api.diag.warn('invalid attempt to force flush after shutdown');
       return;
     }
 
@@ -113,7 +113,7 @@ export class MeterProvider {
       } catch (e) {
         // Log all Errors.
         if (e instanceof Error) {
-          api.diag.error(`Error flushing: ${e.message}`)
+          api.diag.error(`Error flushing: ${e.message}`);
         }
       }
     }

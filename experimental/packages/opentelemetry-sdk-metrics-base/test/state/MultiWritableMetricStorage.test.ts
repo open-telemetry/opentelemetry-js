@@ -49,8 +49,8 @@ describe('MultiMetricStorage', () => {
       const expectedMeasurements: Measurement[] = [];
       for (const value of commonValues) {
         for (const attributes of commonAttributes) {
-          const context = api.context.active()
-          expectedMeasurements.push({ value, attributes, context })
+          const context = api.context.active();
+          expectedMeasurements.push({ value, attributes, context });
           metricStorage.record(value, attributes, context);
         }
       }

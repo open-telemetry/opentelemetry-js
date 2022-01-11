@@ -45,7 +45,7 @@ export class Resource {
         SDK_INFO[SemanticResourceAttributes.TELEMETRY_SDK_NAME],
       [SemanticResourceAttributes.TELEMETRY_SDK_VERSION]:
         SDK_INFO[SemanticResourceAttributes.TELEMETRY_SDK_VERSION],
-    })
+    });
   }
 
   constructor(
