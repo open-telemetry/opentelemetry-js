@@ -84,7 +84,7 @@ describe('API registration', () => {
       propagator: null,
     });
 
-    assert.strictEqual(propagation['_getGlobalPropagator'](), propagator, 'propagator should not change')
+    assert.strictEqual(propagation['_getGlobalPropagator'](), propagator, 'propagator should not change');
 
     assert.ok(context['_getContextManager']() instanceof StackContextManager);
     const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;

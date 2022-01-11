@@ -22,7 +22,7 @@ import { callWithTimeout } from '../utils';
 
 export type ReaderOptions = {
   timeoutMillis?: number
-}
+};
 
 export type ReaderCollectionOptions = ReaderOptions;
 

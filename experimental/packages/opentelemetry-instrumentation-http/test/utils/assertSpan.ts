@@ -119,7 +119,7 @@ export const assertSpan = (
       assert.ok(
         span.attributes[SemanticAttributes.NET_PEER_PORT],
         'must have PEER_PORT'
-      );  
+      );
     }
     assert.ok(
       (span.attributes[SemanticAttributes.HTTP_URL] as string).indexOf(

@@ -52,7 +52,7 @@ export abstract class OTLPExporterNodeBase<
     const headers = baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_HEADERS);
     this.metadata = config.metadata || new Metadata();
     for (const [k, v] of Object.entries(headers)) {
-      this.metadata.set(k, v)
+      this.metadata.set(k, v);
     }
   }
 
@@ -70,7 +70,7 @@ export abstract class OTLPExporterNodeBase<
     const popPromise = () => {
       const index = this._sendingPromises.indexOf(promise);
       this._sendingPromises.splice(index, 1);
-    }
+    };
     promise.then(popPromise, popPromise);
   }
 

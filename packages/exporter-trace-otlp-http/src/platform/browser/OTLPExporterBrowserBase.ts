@@ -89,7 +89,7 @@ export abstract class OTLPExporterBrowserBase<
     const popPromise = () => {
       const index = this._sendingPromises.indexOf(promise);
       this._sendingPromises.splice(index, 1);
-    }
+    };
     promise.then(popPromise, popPromise);
   }
 }
