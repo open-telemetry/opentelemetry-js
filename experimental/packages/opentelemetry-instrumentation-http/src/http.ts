@@ -386,7 +386,11 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         ) ||
         safeExecuteInTheMiddle(
           () => instrumentation._getConfig().ignoreIncomingRequestHook?.(request),
-          () => {},
+          (e: unknown) => {
+            if (e != null) {
+              instrumentation._diag.error('caught ignoreIncomingRequestHook error: ', e)
+            }
+          },
           true
         )
       ) {
@@ -543,7 +547,11 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         ) ||
         safeExecuteInTheMiddle(
           () => instrumentation._getConfig().ignoreOutgoingRequestHook?.(optionsParsed),
-          () => {},
+          (e: unknown) => {
+            if (e != null) {
+              instrumentation._diag.error('caught ignoreOutgoingRequestHook error: ', e)
+            }
+          },
           true
         )
       ) {

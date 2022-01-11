@@ -497,10 +497,23 @@ describe('HttpInstrumentation', () => {
                 'uSeR-aGeNt': testValue
               }
             }
-          )
+          ),
         ]);
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(spans.length, 0);
+      });
+
+      it('should trace not ignored requests with headers (client and server side)', async () => {
+        await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}`,
+          {
+            headers: {
+              'user-agent': 'test-bot',
+            }
+          }
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 2);
       });
 
       for (const arg of ['string', {}, new Date()]) {

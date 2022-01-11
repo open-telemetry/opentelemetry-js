@@ -58,28 +58,6 @@ describe('Utility', () => {
       }
     });
   });
-  describe('hasExpectHeader()', () => {
-    it('should throw if no option', () => {
-      try {
-        utils.hasExpectHeader('' as http.RequestOptions);
-        assert.fail();
-      } catch (ignore) {}
-    });
-
-    it('should not throw if no headers', () => {
-      const result = utils.hasExpectHeader({} as http.RequestOptions);
-      assert.strictEqual(result, false);
-    });
-
-    it('should return true on Expect (no case sensitive)', () => {
-      for (const headers of [{ Expect: 1 }, { expect: 1 }, { ExPect: 1 }]) {
-        const result = utils.hasExpectHeader({
-          headers,
-        } as http.RequestOptions);
-        assert.strictEqual(result, true);
-      }
-    });
-  });
 
   describe('getRequestInfo()', () => {
     it('should get options object', () => {
