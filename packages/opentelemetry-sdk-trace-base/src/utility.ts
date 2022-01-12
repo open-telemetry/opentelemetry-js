@@ -54,9 +54,8 @@ export function mergeConfig(userConfig: TracerConfig): TracerConfig & {
 }
 
 /**
- * When general limits are provided and model specific limits are not, 
+ * When general limits are provided and model specific limits are not,
  * configures the model specific limits by using the values from the general ones.
- * 
  * @param userConfig User provided tracer configuration
  */
 export function reconfigureLimits(userConfig: TracerConfig): TracerConfig {
