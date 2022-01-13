@@ -69,7 +69,7 @@ describe('JaegerExporter', () => {
       const mockedEndpoint = 'http://testendpoint';
       const scope =nock(mockedEndpoint)
         .post('/')
-        .reply(202)
+        .reply(202);
 
       const exporter = new JaegerExporter({
         endpoint: mockedEndpoint,

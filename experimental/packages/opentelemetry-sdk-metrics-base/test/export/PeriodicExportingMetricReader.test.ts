@@ -24,7 +24,7 @@ import { MetricProducer } from '../../src/export/MetricProducer';
 import { TimeoutError } from '../../src/utils';
 import { assertRejects } from '../test-utils';
 
-const MAX_32_BIT_INT = 2 ** 31 - 1
+const MAX_32_BIT_INT = 2 ** 31 - 1;
 
 class TestMetricExporter extends MetricExporter {
   public exportTime = 0;

@@ -512,10 +512,10 @@ describe('Zipkin Exporter - node', () => {
   describe('when env.OTEL_EXPORTER_ZIPKIN_ENDPOINT is set', () => {
     before(() => {
       process.env.OTEL_EXPORTER_ZIPKIN_ENDPOINT = 'http://localhost:9412';
-    })
+    });
     after(() => {
-      delete process.env.OTEL_EXPORTER_ZIPKIN_ENDPOINT
-    })
+      delete process.env.OTEL_EXPORTER_ZIPKIN_ENDPOINT;
+    });
     it('should use url from env', () => {
       const scope = nock('http://localhost:9412').post('/').reply(200);
 
