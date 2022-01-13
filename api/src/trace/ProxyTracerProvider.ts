@@ -18,6 +18,7 @@ import { Tracer } from './tracer';
 import { TracerProvider } from './tracer_provider';
 import { ProxyTracer } from './ProxyTracer';
 import { NoopTracerProvider } from './NoopTracerProvider';
+import { TracerOptions } from './tracer_options';
 
 const NOOP_TRACER_PROVIDER = new NoopTracerProvider();
 
@@ -35,10 +36,10 @@ export class ProxyTracerProvider implements TracerProvider {
   /**
    * Get a {@link ProxyTracer}
    */
-  getTracer(name: string, version?: string): Tracer {
+  getTracer(name: string, version?: string, options?: TracerOptions): Tracer {
     return (
-      this.getDelegateTracer(name, version) ??
-      new ProxyTracer(this, name, version)
+      this.getDelegateTracer(name, version, options) ??
+      new ProxyTracer(this, name, version, options)
     );
   }
 
@@ -53,7 +54,11 @@ export class ProxyTracerProvider implements TracerProvider {
     this._delegate = delegate;
   }
 
-  getDelegateTracer(name: string, version?: string): Tracer | undefined {
-    return this._delegate?.getTracer(name, version);
+  getDelegateTracer(
+    name: string,
+    version?: string,
+    options?: TracerOptions
+  ): Tracer | undefined {
+    return this._delegate?.getTracer(name, version, options);
   }
 }

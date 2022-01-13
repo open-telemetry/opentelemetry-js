@@ -81,7 +81,25 @@ describe('ProxyTracer', () => {
 
       sandbox.assert.calledOnce(getTracerStub);
       assert.strictEqual(getTracerStub.firstCall.returnValue, tracer);
-      assert.deepEqual(getTracerStub.firstCall.args, ['test', 'v0']);
+      assert.deepStrictEqual(getTracerStub.firstCall.args, [
+        'test',
+        'v0',
+        undefined,
+      ]);
+    });
+
+    it('should return tracers directly from the delegate with schema url', () => {
+      const tracer = provider.getTracer('test', 'v0', {
+        schemaUrl: 'https://opentelemetry.io/schemas/1.7.0',
+      });
+
+      sandbox.assert.calledOnce(getTracerStub);
+      assert.strictEqual(getTracerStub.firstCall.returnValue, tracer);
+      assert.deepStrictEqual(getTracerStub.firstCall.args, [
+        'test',
+        'v0',
+        { schemaUrl: 'https://opentelemetry.io/schemas/1.7.0' },
+      ]);
     });
   });
 

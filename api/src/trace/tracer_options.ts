@@ -14,23 +14,12 @@
  * limitations under the License.
  */
 
-import { NoopTracer } from './NoopTracer';
-import { Tracer } from './tracer';
-import { TracerOptions } from './tracer_options';
-import { TracerProvider } from './tracer_provider';
-
 /**
- * An implementation of the {@link TracerProvider} which returns an impotent
- * Tracer for all calls to `getTracer`.
- *
- * All operations are no-op.
+ * An interface describes additional metadata of a tracer.
  */
-export class NoopTracerProvider implements TracerProvider {
-  getTracer(
-    _name?: string,
-    _version?: string,
-    _options?: TracerOptions
-  ): Tracer {
-    return new NoopTracer();
-  }
+export interface TracerOptions {
+  /**
+   * The schemaUrl of the tracer or instrumentation library
+   */
+  schemaUrl?: string;
 }

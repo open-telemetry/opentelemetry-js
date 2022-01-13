@@ -19,6 +19,7 @@ import { NoopTracer } from './NoopTracer';
 import { Span } from './span';
 import { SpanOptions } from './SpanOptions';
 import { Tracer } from './tracer';
+import { TracerOptions } from './tracer_options';
 
 const NOOP_TRACER = new NoopTracer();
 
@@ -32,7 +33,8 @@ export class ProxyTracer implements Tracer {
   constructor(
     private _provider: TracerDelegator,
     public readonly name: string,
-    public readonly version?: string
+    public readonly version?: string,
+    public readonly options?: TracerOptions
   ) {}
 
   startSpan(name: string, options?: SpanOptions, context?: Context): Span {
@@ -58,7 +60,7 @@ export class ProxyTracer implements Tracer {
       return this._delegate;
     }
 
-    const tracer = this._provider.getDelegateTracer(this.name, this.version);
+    const tracer = this._provider.getDelegateTracer(this.name, this.version, this.options);
 
     if (!tracer) {
       return NOOP_TRACER;
@@ -70,5 +72,5 @@ export class ProxyTracer implements Tracer {
 }
 
 export interface TracerDelegator {
-  getDelegateTracer(name: string, version?: string): Tracer | undefined;
+  getDelegateTracer(name: string, version?: string, options?: TracerOptions): Tracer | undefined;
 }
