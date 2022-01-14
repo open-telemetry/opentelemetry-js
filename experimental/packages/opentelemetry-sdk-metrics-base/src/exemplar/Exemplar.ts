@@ -44,4 +44,4 @@ export type Exemplar = {
   // trace_id may be missing if the measurement is not recorded inside a trace
   // or if the trace is not sampled.
   traceId?: string;
-}
+};

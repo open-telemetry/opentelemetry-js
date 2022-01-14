@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api-metrics-wip';
-import { Context, HrTime } from '@opentelemetry/api';
-import { ExemplarFilter } from './ExemplarFilter';
+import * as assert from 'assert';
 
-
-export class AlwaysSampleExemplarFilter implements ExemplarFilter {
-
-  shouldSample(
-    _value: number,
-    _timestamp: HrTime,
-    _attributes: Attributes,
-    _ctx: Context
-  ): boolean {
-      return true;
+/**
+ * Node.js v8.x and browser compatible `assert.rejects`.
+ */
+export async function assertRejects(promise: any, expect: any) {
+  try {
+    await promise;
+  } catch (err) {
+    assert.throws(() => {
+      throw err;
+    }, expect);
   }
 }

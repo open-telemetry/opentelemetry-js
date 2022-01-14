@@ -32,7 +32,7 @@ export class InstrumentSelector {
   }
 
   getType() {
-    return this._type
+    return this._type;
   }
 
   getNameFilter() {

@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api-metrics-wip';
-import { Context, HrTime } from '@opentelemetry/api';
-import { ExemplarFilter } from './ExemplarFilter';
+import { MetricReader } from '../../src';
+import { MetricCollector } from '../../src/state/MetricCollector';
 
+/**
+ * A test metric reader that implements no-op onForceFlush() and onShutdown() handlers.
+ */
+export class TestMetricReader extends MetricReader {
+  protected onForceFlush(): Promise<void> {
+    return Promise.resolve(undefined);
+  }
 
-export class AlwaysSampleExemplarFilter implements ExemplarFilter {
+  protected onShutdown(): Promise<void> {
+    return Promise.resolve(undefined);
+  }
 
-  shouldSample(
-    _value: number,
-    _timestamp: HrTime,
-    _attributes: Attributes,
-    _ctx: Context
-  ): boolean {
-      return true;
+  getMetricCollector(): MetricCollector {
+    return this['_metricProducer'] as MetricCollector;
   }
 }

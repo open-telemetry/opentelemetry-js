@@ -14,19 +14,26 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api-metrics-wip';
-import { Context, HrTime } from '@opentelemetry/api';
-import { ExemplarFilter } from './ExemplarFilter';
+export class Deferred<T> {
+  private _promise: Promise<T>;
+  private _resolve!: (val: T) => void;
+  private _reject!: (error: unknown) => void;
+  constructor() {
+    this._promise = new Promise((resolve, reject) => {
+      this._resolve = resolve;
+      this._reject = reject;
+    });
+  }
 
+  get promise() {
+    return this._promise;
+  }
 
-export class AlwaysSampleExemplarFilter implements ExemplarFilter {
+  resolve(val: T) {
+    this._resolve(val);
+  }
 
-  shouldSample(
-    _value: number,
-    _timestamp: HrTime,
-    _attributes: Attributes,
-    _ctx: Context
-  ): boolean {
-      return true;
+  reject(err: unknown) {
+    this._reject(err);
   }
 }

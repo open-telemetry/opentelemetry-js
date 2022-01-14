@@ -475,12 +475,12 @@ describe('Utility', () => {
       request.headers = {
         'user-agent': 'chrome',
         'x-forwarded-for': '<client>, <proxy1>, <proxy2>'
-      }
-      const attributes = utils.getIncomingRequestAttributes(request, { component: 'http'})
-      assert.strictEqual(attributes[SemanticAttributes.HTTP_ROUTE], undefined)
+      };
+      const attributes = utils.getIncomingRequestAttributes(request, { component: 'http'});
+      assert.strictEqual(attributes[SemanticAttributes.HTTP_ROUTE], undefined);
     });
   });
-  
+
   describe('headers to span attributes capture', () => {
     let span: Span;
 
@@ -539,6 +539,6 @@ describe('Utility', () => {
 
       assert.deepStrictEqual(span.attributes['http.request.header.origin'], ['localhost']);
       assert.deepStrictEqual(span.attributes['http.request.header.accept'], undefined);
-    })
+    });
   });
 });
