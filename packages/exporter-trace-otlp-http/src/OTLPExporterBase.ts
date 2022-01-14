@@ -64,8 +64,25 @@ export abstract class OTLPExporterBase<
    * Export items.
    * @param items
    * @param resultCallback
+   * @param exportTimeoutMillis - optional
+   * @param onError - optional
    */
-  export(items: ExportItem[], resultCallback: (result: ExportResult) => void): void {
+
+  export(items: ExportItem[], resultCallback: (result: ExportResult) => void, exportTimeoutMillis?: number, onError?: (error: object) => void): void {
+    const DEFAULT_MAX_ATTEMPTS = 4;
+    const DEFAULT_INITIAL_BACKOFF = 15000;
+    const DEFAULT_BACKOFF_MULTIPLIER = 1.5;
+
+    let retryTimer: ReturnType<typeof setTimeout>;
+
+    const exportTimer = setTimeout(() => {
+      clearTimeout(retryTimer);
+      if (onError !== undefined) {
+        onError(new Error('Timeout'));
+      }
+    }, exportTimeoutMillis);
+
+
     if (this._shutdownOnce.isCalled) {
       resultCallback({
         code: ExportResultCode.FAILED,
@@ -82,13 +99,25 @@ export abstract class OTLPExporterBase<
       return;
     }
 
-    this._export(items)
+    const exportWithRetry = (retries = DEFAULT_MAX_ATTEMPTS, backoffMillis = DEFAULT_INITIAL_BACKOFF) => {
+      this._export(items)
       .then(() => {
+        clearTimeout(exportTimer);
         resultCallback({ code: ExportResultCode.SUCCESS });
       })
       .catch((error: ExportServiceError) => {
-        resultCallback({ code: ExportResultCode.FAILED, error });
+        if (this._isRetryable(error.code) && retries > 0) {
+            retryTimer = setTimeout(() => {
+                return exportWithRetry(retries - 1, backoffMillis *DEFAULT_BACKOFF_MULTIPLIER);
+            }, backoffMillis);
+        } else {
+            clearTimeout(exportTimer);
+            resultCallback({ code: ExportResultCode.FAILED, error });
+        }
       });
+    };
+
+    exportWithRetry();
   }
 
   private _export(items: ExportItem[]): Promise<unknown> {
@@ -100,6 +129,12 @@ export abstract class OTLPExporterBase<
         reject(e);
       }
     });
+  }
+
+  private _isRetryable(statusCode: number): boolean {
+    const retryCodes = [429, 502, 503, 504];
+
+    return retryCodes.includes(statusCode);
   }
 
   /**

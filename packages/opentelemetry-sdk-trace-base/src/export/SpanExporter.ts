@@ -28,10 +28,15 @@ export interface SpanExporter {
   /**
    * Called to export sampled {@link ReadableSpan}s.
    * @param spans the list of sampled Spans to be exported.
+   * @param resultCallback
+   * @param exportTimeoutMillis optional - currently only used by BatchSpanProcessorBase
+   * @param onError optional - currently only used by BatchSpanProcessorBase
    */
   export(
     spans: ReadableSpan[],
-    resultCallback: (result: ExportResult) => void
+    resultCallback: (result: ExportResult) => void,
+    exportTimeoutMillis?: number,
+    onError?: (error: object) => void,
   ): void;
 
   /** Stops the exporter. */
