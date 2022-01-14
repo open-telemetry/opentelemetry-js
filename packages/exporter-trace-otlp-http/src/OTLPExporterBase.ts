@@ -36,6 +36,10 @@ export abstract class OTLPExporterBase<
   protected _concurrencyLimit: number;
   protected _sendingPromises: Promise<unknown>[] = [];
   protected _shutdownOnce: BindOnceFuture<void>;
+  private DEFAULT_MAX_ATTEMPTS = 4;
+  private DEFAULT_INITIAL_BACKOFF = 1000;
+  private DEFAULT_BACKOFF_MULTIPLIER = 1.5;
+  private retryCodes = [429, 502, 503, 504];
 
   /**
    * @param config
@@ -69,9 +73,6 @@ export abstract class OTLPExporterBase<
    */
 
   export(items: ExportItem[], resultCallback: (result: ExportResult) => void, exportTimeoutMillis?: number, onError?: (error: object) => void): void {
-    const DEFAULT_MAX_ATTEMPTS = 4;
-    const DEFAULT_INITIAL_BACKOFF = 1000;
-    const DEFAULT_BACKOFF_MULTIPLIER = 1.5;
 
     let retryTimer: ReturnType<typeof setTimeout>;
     let exportTimer: ReturnType<typeof setTimeout>;
@@ -101,7 +102,7 @@ export abstract class OTLPExporterBase<
       return;
     }
 
-    const exportWithRetry = (retries = DEFAULT_MAX_ATTEMPTS, backoffMillis = DEFAULT_INITIAL_BACKOFF) => {
+    const exportWithRetry = (retries = this.DEFAULT_MAX_ATTEMPTS, backoffMillis = this.DEFAULT_INITIAL_BACKOFF) => {
       this._export(items)
       .then(() => {
         clearTimeout(exportTimer);
@@ -110,7 +111,7 @@ export abstract class OTLPExporterBase<
       .catch((error: ExportServiceError) => {
         if (this._isRetryable(error.code) && retries > 0) {
             retryTimer = setTimeout(() => {
-                return exportWithRetry(retries - 1, backoffMillis *DEFAULT_BACKOFF_MULTIPLIER);
+                return exportWithRetry(retries - 1, backoffMillis * this.DEFAULT_BACKOFF_MULTIPLIER);
             }, backoffMillis);
         } else {
             clearTimeout(exportTimer);
@@ -134,9 +135,7 @@ export abstract class OTLPExporterBase<
   }
 
   private _isRetryable(statusCode: number): boolean {
-    const retryCodes = [429, 502, 503, 504];
-
-    return retryCodes.includes(statusCode);
+    return this.retryCodes.includes(statusCode);
   }
 
   /**
