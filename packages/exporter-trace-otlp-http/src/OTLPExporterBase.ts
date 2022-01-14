@@ -70,7 +70,7 @@ export abstract class OTLPExporterBase<
 
   export(items: ExportItem[], resultCallback: (result: ExportResult) => void, exportTimeoutMillis?: number, onError?: (error: object) => void): void {
     const DEFAULT_MAX_ATTEMPTS = 4;
-    const DEFAULT_INITIAL_BACKOFF = 15000;
+    const DEFAULT_INITIAL_BACKOFF = 1000;
     const DEFAULT_BACKOFF_MULTIPLIER = 1.5;
 
     let retryTimer: ReturnType<typeof setTimeout>;
