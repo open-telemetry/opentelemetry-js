@@ -74,14 +74,16 @@ export abstract class OTLPExporterBase<
     const DEFAULT_BACKOFF_MULTIPLIER = 1.5;
 
     let retryTimer: ReturnType<typeof setTimeout>;
+    let exportTimer: ReturnType<typeof setTimeout>;
 
-    const exportTimer = setTimeout(() => {
-      clearTimeout(retryTimer);
-      if (onError !== undefined) {
-        onError(new Error('Timeout'));
-      }
-    }, exportTimeoutMillis);
-
+    if (exportTimeoutMillis && onError) {
+      exportTimer = setTimeout(() => {
+        clearTimeout(retryTimer);
+        if (onError !== undefined) {
+          onError(new Error('Timeout'));
+        }
+      }, exportTimeoutMillis);
+    }
 
     if (this._shutdownOnce.isCalled) {
       resultCallback({
