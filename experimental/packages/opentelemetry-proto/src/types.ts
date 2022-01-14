@@ -15,4 +15,4 @@
  */
 
 import type Long = require('long');
-export type Fixed64 = Long | number;
+export type Fixed64 = Long | number | string;

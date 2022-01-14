@@ -126,7 +126,7 @@ describe('Metrics', () => {
         });
 
         it('returns null on an empty list', () => {
-            assert.strictEqual(createExportMetricsServiceRequest([], '0'), null);
+            assert.strictEqual(createExportMetricsServiceRequest([], 0), null);
         });
 
         it('serializes a sum metric record', () => {

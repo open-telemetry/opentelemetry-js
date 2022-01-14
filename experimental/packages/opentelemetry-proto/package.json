@@ -1,8 +1,11 @@
 {
   "name": "@opentelemetry/proto",
   "private": true,
+  "publishConfig": {
+    "access": "restricted"
+  },
   "version": "0.27.0",
-  "description": "OpenTelemetry Collector Metrics Exporter allows user to send collected metrics to the OpenTelemetry Collector",
+  "description": "Transform OpenTelemetry SDK data into OTLP",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
@@ -25,10 +28,10 @@
     "opentelemetry",
     "nodejs",
     "grpc",
+    "protobuf",
+    "otlp",
     "tracing",
-    "profiling",
-    "metrics",
-    "stats"
+    "metrics"
   ],
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
@@ -39,14 +42,9 @@
     "build/src/**/*.js",
     "build/src/**/*.js.map",
     "build/src/**/*.d.ts",
-    "build/protos/**/*.proto",
-    "doc",
     "LICENSE",
     "README.md"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
   "peerDependencies": {
     "@opentelemetry/api": "^1.0.3",
     "long": "^4.0.0"
