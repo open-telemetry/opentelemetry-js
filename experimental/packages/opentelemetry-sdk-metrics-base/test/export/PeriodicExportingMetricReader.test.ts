@@ -23,7 +23,7 @@ import * as sinon from 'sinon';
 import { MetricProducer } from '../../src/export/MetricProducer';
 import { TimeoutError } from '../../src/utils';
 
-const MAX_32_BIT_INT = 2 ** 31 - 1
+const MAX_32_BIT_INT = 2 ** 31 - 1;
 
 class TestMetricExporter extends MetricExporter {
   public exportTime = 0;
@@ -94,7 +94,7 @@ describe('PeriodicExportingMetricReader', () => {
         }
       );
       assert.strictEqual(reader.getPreferredAggregationTemporality(), exporter.getPreferredAggregationTemporality());
-    })
+    });
 
     it('should throw when interval less or equal to 0', () => {
       const exporter = new TestDeltaMetricExporter();
@@ -103,7 +103,7 @@ describe('PeriodicExportingMetricReader', () => {
         exportIntervalMillis: 0,
         exportTimeoutMillis: 0
       }), new Error('exportIntervalMillis must be greater than 0'));
-    })
+    });
 
     it('should throw when timeout less or equal to 0', () => {
       const exporter = new TestDeltaMetricExporter();
@@ -112,7 +112,7 @@ describe('PeriodicExportingMetricReader', () => {
         exportIntervalMillis: 1,
         exportTimeoutMillis: 0
       }), new Error('exportTimeoutMillis must be greater than 0'));
-    })
+    });
 
     it('should throw when timeout less or equal to interval', () => {
       const exporter = new TestDeltaMetricExporter();
@@ -121,7 +121,7 @@ describe('PeriodicExportingMetricReader', () => {
         exportIntervalMillis: 100,
         exportTimeoutMillis: 200
       }), new Error('exportIntervalMillis must be greater than or equal to exportTimeoutMillis'));
-    })
+    });
 
     it('should not start exporting', async () => {
       const exporter = new TestDeltaMetricExporter();
@@ -136,7 +136,7 @@ describe('PeriodicExportingMetricReader', () => {
       await new Promise(resolve => setTimeout(resolve, 50));
 
       exporterMock.verify();
-    })
+    });
   });
 
   describe('setMetricProducer', () => {

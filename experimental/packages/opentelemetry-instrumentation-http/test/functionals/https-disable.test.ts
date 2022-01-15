@@ -37,7 +37,7 @@ describe('HttpsInstrumentation', () => {
   describe('disable()', () => {
     let provider: TracerProvider;
     let startSpanStub: sinon.SinonStub;
-  
+
     before(() => {
       provider = {
         getTracer: () => {

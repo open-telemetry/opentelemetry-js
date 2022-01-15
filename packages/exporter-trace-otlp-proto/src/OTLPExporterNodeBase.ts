@@ -39,7 +39,7 @@ export abstract class OTLPExporterNodeBase<
   private _send!: SendFn;
 
   constructor(config: OTLPExporterNodeConfigBase = {}) {
-    super(config)
+    super(config);
   }
 
   private _sendPromise(
@@ -56,7 +56,7 @@ export abstract class OTLPExporterNodeBase<
     const popPromise = () => {
       const index = this._sendingPromises.indexOf(promise);
       this._sendingPromises.splice(index, 1);
-    }
+    };
     promise.then(popPromise, popPromise);
   }
 

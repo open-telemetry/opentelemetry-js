@@ -100,13 +100,13 @@ export const responseHookFunction = (
 export const startIncomingSpanHookFunction = (
   request: IncomingMessage
 ): SpanAttributes => {
-  return {guid: request.headers?.guid}
+  return {guid: request.headers?.guid};
 };
 
 export const startOutgoingSpanHookFunction = (
   request: RequestOptions
 ): SpanAttributes => {
-  return {guid: request.headers?.guid}
+  return {guid: request.headers?.guid};
 };
 
 describe('HttpInstrumentation', () => {
@@ -570,7 +570,7 @@ describe('HttpInstrumentation', () => {
             },
             component: 'http',
             noNetPeer: true,
-          }
+          };
           assertSpan(spans[0], SpanKind.CLIENT, validations);
           return true;
         });

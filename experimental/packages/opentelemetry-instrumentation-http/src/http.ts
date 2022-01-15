@@ -703,6 +703,6 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         captureRequestHeaders: utils.headerCapture('request', config.headersToSpanAttributes?.server?.requestHeaders ?? []),
         captureResponseHeaders: utils.headerCapture('response', config.headersToSpanAttributes?.server?.responseHeaders ?? []),
       }
-    }
+    };
   }
 }

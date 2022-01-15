@@ -17,7 +17,6 @@
 import { HrTime } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { SumAccumulation, SumAggregator } from '../../src/aggregator';
-import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { MetricData, PointDataType } from '../../src/export/MetricData';
 import { commonValues, defaultInstrumentationLibrary, defaultInstrumentDescriptor, defaultResource } from '../util';
 
@@ -69,15 +68,14 @@ describe('SumAggregator', () => {
   });
 
   describe('toMetricData', () => {
-    it('transform with AggregationTemporality.DELTA', () => {
+    it('transform without exception', () => {
       const aggregator = new SumAggregator();
       const accumulation = aggregator.createAccumulation();
       accumulation.record(1);
       accumulation.record(2);
 
-      const sdkStartTime: HrTime = [0, 0];
-      const lastCollectionTime: HrTime = [1, 1];
-      const collectionTime: HrTime = [2, 2];
+      const startTime: HrTime = [0, 0];
+      const endTime: HrTime = [1, 1];
 
       const expected: MetricData = {
         resource: defaultResource,
@@ -87,8 +85,8 @@ describe('SumAggregator', () => {
         pointData: [
           {
             attributes: {},
-            startTime: lastCollectionTime,
-            endTime: collectionTime,
+            startTime,
+            endTime,
             point: 3,
           },
         ],
@@ -98,46 +96,8 @@ describe('SumAggregator', () => {
         defaultInstrumentationLibrary,
         defaultInstrumentDescriptor,
         [[{}, accumulation]],
-        AggregationTemporality.DELTA,
-        sdkStartTime,
-        lastCollectionTime,
-        collectionTime,
-      ), expected);
-    });
-
-    it('transform with AggregationTemporality.CUMULATIVE', () => {
-      const aggregator = new SumAggregator();
-      const accumulation = aggregator.createAccumulation();
-      accumulation.record(1);
-      accumulation.record(2);
-
-      const sdkStartTime: HrTime = [0, 0];
-      const lastCollectionTime: HrTime = [1, 1];
-      const collectionTime: HrTime = [2, 2];
-
-      const expected: MetricData = {
-        resource: defaultResource,
-        instrumentationLibrary: defaultInstrumentationLibrary,
-        instrumentDescriptor: defaultInstrumentDescriptor,
-        pointDataType: PointDataType.SINGULAR,
-        pointData: [
-          {
-            attributes: {},
-            startTime: sdkStartTime,
-            endTime: collectionTime,
-            point: 3,
-          },
-        ],
-      };
-      assert.deepStrictEqual(aggregator.toMetricData(
-        defaultResource,
-        defaultInstrumentationLibrary,
-        defaultInstrumentDescriptor,
-        [[{}, accumulation]],
-        AggregationTemporality.CUMULATIVE,
-        sdkStartTime,
-        lastCollectionTime,
-        collectionTime,
+        startTime,
+        endTime,
       ), expected);
     });
   });

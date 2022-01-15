@@ -10,6 +10,8 @@ module.exports = {
     "project": "./tsconfig.json"
   },
   rules: {
+    "no-trailing-spaces": "error",
+    "eol-last": "error",
     "quotes": [2, "single", { "avoidEscape": true }],
     "@typescript-eslint/no-floating-promises": 2,
     "@typescript-eslint/no-this-alias": "off",
@@ -40,6 +42,7 @@ module.exports = {
       }
     }],
     "@typescript-eslint/no-shadow": ["warn"],
+    "@typescript-eslint/semi": "error",
     "arrow-parens": ["error", "as-needed"],
     "node/no-deprecated-api": ["warn"],
     "header/header": [2, "block", [{
