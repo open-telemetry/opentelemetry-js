@@ -86,19 +86,6 @@ export const parseResponseStatus = (
 };
 
 /**
- * Returns whether the Expect header is on the given options object.
- * @param options Options for http.request.
- */
-export const hasExpectHeader = (options: RequestOptions): boolean => {
-  if (!options.headers) {
-    return false;
-  }
-
-  const keys = Object.keys(options.headers);
-  return !!keys.find(key => key.toLowerCase() === 'expect');
-};
-
-/**
  * Check whether the given obj match pattern
  * @param constant e.g URL of request
  * @param pattern Match pattern
@@ -129,7 +116,7 @@ export const satisfiesPattern = (
 export const isIgnored = (
   constant: string,
   list?: IgnoreMatcher[],
-  onException?: (error: Error) => void
+  onException?: (error: unknown) => void
 ): boolean => {
   if (!list) {
     // No ignored urls - trace everything
@@ -304,18 +291,18 @@ export const getRequestInfo = (
     }`;
   }
 
-  if (hasExpectHeader(optionsParsed)) {
-    optionsParsed.headers = Object.assign({}, optionsParsed.headers);
-  } else if (!optionsParsed.headers) {
-    optionsParsed.headers = {};
-  }
+  const headers = optionsParsed.headers ?? {};
+  optionsParsed.headers = Object.keys(headers).reduce((normalizedHeader, key) => {
+    normalizedHeader[key.toLowerCase()] = headers[key];
+    return normalizedHeader;
+  }, {} as OutgoingHttpHeaders);
   // some packages return method in lowercase..
   // ensure upperCase for consistency
   const method = optionsParsed.method
     ? optionsParsed.method.toUpperCase()
     : 'GET';
 
-  return { origin, pathname, method, optionsParsed };
+  return { origin, pathname, method, optionsParsed, };
 };
 
 /**
