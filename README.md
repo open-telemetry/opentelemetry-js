@@ -149,7 +149,7 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 ### Node Support
 
 Automated tests are run using the latest release of each currently active version of Node.JS.
-While Node.JS v8 is no longer supported by the Node.JS team, the latest version of Node.JS v8 is still included in our testing suite.
+While Node.JS v8 and v10 are no longer supported by the Node.JS team, the latest versions of Node.JS v8 and v10 are still included in our testing suite.
 Please note that versions of Node.JS v8 prior to `v8.5.0` will NOT work, because OpenTelemetry Node depends on the `perf_hooks` module introduced in `v8.5.0`
 
 ### Browser Support
@@ -178,7 +178,6 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers)):
 
-- [Chengzhong Wu](https://github.com/legendecas), Alibaba
 - [Gerhard Stöbich](https://github.com/Flarna), Dynatrace
 - [John Bley](https://github.com/johnbley), Splunk
 - [Mark Wolff](https://github.com/markwolff), Microsoft
@@ -192,7 +191,10 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 
 Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers)):
 
+- [Amir Blum](https://github.com/blumamir), Aspecto
+- [Chengzhong Wu](https://github.com/legendecas), Alibaba
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
+- [Rauno Viskus](https://github.com/Rauno56), Splunk
 - [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
 
 *Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#maintainer).*

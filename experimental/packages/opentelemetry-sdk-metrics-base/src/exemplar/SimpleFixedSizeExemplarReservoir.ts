@@ -21,7 +21,7 @@ import { FixedSizeExemplarReservoirBase } from './ExemplarReservoir';
 /**
  * Fixed size reservoir that uses equivalent of naive reservoir sampling
  * algorithm to accept measurements.
- * 
+ *
  */
 export class SimpleFixedSizeExemplarReservoir extends FixedSizeExemplarReservoirBase {
   private _numMeasurementsSeen: number;
@@ -31,7 +31,7 @@ export class SimpleFixedSizeExemplarReservoir extends FixedSizeExemplarReservoir
   }
 
   private getRandomInt(min: number, max: number) { //[min, max)
-    return Math.floor(Math.random() * (max - min) + min); 
+    return Math.floor(Math.random() * (max - min) + min);
   }
 
   private _findBucketIndex(_value: number, _timestamp: HrTime, _attributes: Attributes, _ctx: Context) {
@@ -43,7 +43,7 @@ export class SimpleFixedSizeExemplarReservoir extends FixedSizeExemplarReservoir
   offer(value: number, timestamp: HrTime, attributes: Attributes, ctx: Context): void {
     const index = this._findBucketIndex(value, timestamp, attributes, ctx);
     if (index !== -1) {
-      this._reservoirStorage[index].offer(value, timestamp, attributes, ctx)
+      this._reservoirStorage[index].offer(value, timestamp, attributes, ctx);
     }
   }
 

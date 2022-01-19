@@ -42,7 +42,7 @@ export class OTLPTraceExporter
     const headers = baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS);
     this.metadata ||= new Metadata();
     for (const [k, v] of Object.entries(headers)) {
-      this.metadata.set(k, v)
+      this.metadata.set(k, v);
     }
   }
 

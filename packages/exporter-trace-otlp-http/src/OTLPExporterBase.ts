@@ -15,7 +15,7 @@
  */
 
 import { SpanAttributes, diag } from '@opentelemetry/api';
-import { ExportResult, ExportResultCode } from '@opentelemetry/core';
+import { ExportResult, ExportResultCode, BindOnceFuture } from '@opentelemetry/core';
 import {
   OTLPExporterError,
   OTLPExporterConfigBase,
@@ -34,9 +34,8 @@ export abstract class OTLPExporterBase<
   public readonly hostname: string | undefined;
   public readonly attributes?: SpanAttributes;
   protected _concurrencyLimit: number;
-  protected _isShutdown: boolean = false;
-  private _shuttingDownPromise: Promise<void> = Promise.resolve();
   protected _sendingPromises: Promise<unknown>[] = [];
+  protected _shutdownOnce: BindOnceFuture<void>;
 
   /**
    * @param config
@@ -50,6 +49,7 @@ export abstract class OTLPExporterBase<
     this.attributes = config.attributes;
 
     this.shutdown = this.shutdown.bind(this);
+    this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
 
     this._concurrencyLimit =
       typeof config.concurrencyLimit === 'number'
@@ -66,7 +66,7 @@ export abstract class OTLPExporterBase<
    * @param resultCallback
    */
   export(items: ExportItem[], resultCallback: (result: ExportResult) => void): void {
-    if (this._isShutdown) {
+    if (this._shutdownOnce.isCalled) {
       resultCallback({
         code: ExportResultCode.FAILED,
         error: new Error('Exporter has been shutdown'),
@@ -106,28 +106,16 @@ export abstract class OTLPExporterBase<
    * Shutdown the exporter.
    */
   shutdown(): Promise<void> {
-    if (this._isShutdown) {
-      diag.debug('shutdown already started');
-      return this._shuttingDownPromise;
-    }
-    this._isShutdown = true;
+    return this._shutdownOnce.call();
+  }
+
+  private _shutdown(): Promise<void> {
     diag.debug('shutdown started');
-    this._shuttingDownPromise = new Promise((resolve, reject) => {
-      Promise.resolve()
-        .then(() => {
-          return this.onShutdown();
-        })
-        .then(() => {
-          return Promise.all(this._sendingPromises);
-        })
-        .then(() => {
-          resolve();
-        })
-        .catch(e => {
-          reject(e);
-        });
-    });
-    return this._shuttingDownPromise;
+    this.onShutdown();
+    return Promise.all(this._sendingPromises)
+      .then(() => {
+        /** ignore resolved values */
+      });
   }
 
   abstract onShutdown(): void;
