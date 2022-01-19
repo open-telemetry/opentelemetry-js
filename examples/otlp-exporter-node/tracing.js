@@ -2,7 +2,7 @@
 
 const opentelemetry = require('@opentelemetry/api');
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
-const { OTLPTraceExporter } = require('@opentelemetry/exporter-otlp-http');
+const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
 const { Resource } = require('@opentelemetry/resources');
 const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
 // const { OTLPTraceExporter } = require('@opentelemetry/exporter-otlp-grpc');
