@@ -26,6 +26,7 @@ import { MetricData } from './export/MetricData';
 import { isNotNullish } from './utils';
 import { MetricCollectorHandle } from './state/MetricCollector';
 import { HrTime } from '@opentelemetry/api';
+import { AsyncMetricStorage } from './state/AsyncMetricStorage';
 
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#meter
 
@@ -62,27 +63,30 @@ export class Meter implements metrics.Meter {
   }
 
   createObservableGauge(
-    _name: string,
-    _callback: metrics.ObservableCallback,
-    _options?: metrics.ObservableGaugeOptions,
+    name: string,
+    callback: metrics.ObservableCallback,
+    options?: metrics.ObservableGaugeOptions,
   ): void {
-    throw new Error('Method not implemented.');
+    const descriptor = createInstrumentDescriptor(name, InstrumentType.OBSERVABLE_GAUGE, options);
+    this._registerAsyncMetricStorage(descriptor, callback);
   }
 
   createObservableCounter(
-    _name: string,
-    _callback: metrics.ObservableCallback,
-    _options?: metrics.ObservableCounterOptions,
+    name: string,
+    callback: metrics.ObservableCallback,
+    options?: metrics.ObservableCounterOptions,
   ): void {
-    throw new Error('Method not implemented.');
+    const descriptor = createInstrumentDescriptor(name, InstrumentType.OBSERVABLE_COUNTER, options);
+    this._registerAsyncMetricStorage(descriptor, callback);
   }
 
   createObservableUpDownCounter(
-    _name: string,
-    _callback: metrics.ObservableCallback,
-    _options?: metrics.ObservableUpDownCounterOptions,
+    name: string,
+    callback: metrics.ObservableCallback,
+    options?: metrics.ObservableUpDownCounterOptions,
   ): void {
-    throw new Error('Method not implemented.');
+    const descriptor = createInstrumentDescriptor(name, InstrumentType.OBSERVABLE_UP_DOWN_COUNTER, options);
+    this._registerAsyncMetricStorage(descriptor, callback);
   }
 
   private _registerMetricStorage(descriptor: InstrumentDescriptor) {
@@ -97,6 +101,15 @@ export class Meter implements metrics.Meter {
       return storages[0];
     }
     return new MultiMetricStorage(storages);
+  }
+
+  private _registerAsyncMetricStorage(descriptor: InstrumentDescriptor, callback: metrics.ObservableCallback) {
+    const views = this._meterProviderSharedState.viewRegistry.findViews(descriptor, this._instrumentationLibrary);
+    views.forEach(view => {
+      const storage = AsyncMetricStorage.create(view, descriptor, callback);
+      // TODO: handle conflicts
+      this._metricStorageRegistry.set(descriptor.name, storage);
+    });
   }
 
   async collect(collector: MetricCollectorHandle, collectionTime: HrTime): Promise<MetricData[]> {
