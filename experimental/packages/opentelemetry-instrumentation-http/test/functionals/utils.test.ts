@@ -24,7 +24,6 @@ import {
 import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
-import * as http from 'http';
 import { IncomingMessage, ServerResponse } from 'http';
 import { Socket } from 'net';
 import * as sinon from 'sinon';
@@ -55,28 +54,6 @@ describe('Utility', () => {
       for (let index = 400; index <= 600; index++) {
         const status = utils.parseResponseStatus(index);
         assert.notStrictEqual(status.code, SpanStatusCode.OK);
-      }
-    });
-  });
-  describe('hasExpectHeader()', () => {
-    it('should throw if no option', () => {
-      try {
-        utils.hasExpectHeader('' as http.RequestOptions);
-        assert.fail();
-      } catch (ignore) {}
-    });
-
-    it('should not throw if no headers', () => {
-      const result = utils.hasExpectHeader({} as http.RequestOptions);
-      assert.strictEqual(result, false);
-    });
-
-    it('should return true on Expect (no case sensitive)', () => {
-      for (const headers of [{ Expect: 1 }, { expect: 1 }, { ExPect: 1 }]) {
-        const result = utils.hasExpectHeader({
-          headers,
-        } as http.RequestOptions);
-        assert.strictEqual(result, true);
       }
     });
   });
@@ -170,7 +147,7 @@ describe('Utility', () => {
     });
 
     it('should not re-throw when function throws an exception', () => {
-      const onException = (e: Error) => {
+      const onException = (e: unknown) => {
         // Do nothing
       };
       for (const callback of [undefined, onException]) {

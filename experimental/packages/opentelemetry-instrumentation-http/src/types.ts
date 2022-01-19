@@ -63,6 +63,14 @@ export interface HttpCustomAttributeFunction {
   ): void;
 }
 
+export interface IgnoreIncomingRequestFunction {
+  (request: IncomingMessage ): boolean;
+}
+
+export interface IgnoreOutgoingRequestFunction {
+  (request: RequestOptions ): boolean;
+}
+
 export interface HttpRequestCustomAttributeFunction {
   (span: Span, request: ClientRequest | IncomingMessage): void;
 }
@@ -83,10 +91,20 @@ export interface StartOutgoingSpanCustomAttributeFunction {
  * Options available for the HTTP instrumentation (see [documentation](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-instrumentation-http#http-instrumentation-options))
  */
 export interface HttpInstrumentationConfig extends InstrumentationConfig {
-  /** Not trace all incoming requests that match paths */
+  /**
+   * Not trace all incoming requests that match paths
+   * @deprecated use `ignoreIncomingRequestHook` instead
+   */
   ignoreIncomingPaths?: IgnoreMatcher[];
-  /** Not trace all outgoing requests that match urls */
+  /** Not trace all incoming requests that matched with custom function */
+  ignoreIncomingRequestHook?: IgnoreIncomingRequestFunction;
+  /**
+   * Not trace all outgoing requests that match urls
+   * @deprecated use `ignoreOutgoingRequestHook` instead
+   */
   ignoreOutgoingUrls?: IgnoreMatcher[];
+  /** Not trace all outgoing requests that matched with custom function */
+  ignoreOutgoingRequestHook?: IgnoreOutgoingRequestFunction;
   /** Function for adding custom attributes after response is handled */
   applyCustomAttributesOnSpan?: HttpCustomAttributeFunction;
   /** Function for adding custom attributes before request is handled */
