@@ -23,6 +23,8 @@ import {
   TraceFlags,
 } from '@opentelemetry/api';
 import {
+  DEFAULT_ATTRIBUTE_COUNT_LIMIT,
+  DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
   hrTime,
   hrTimeDuration,
   hrTimeToMilliseconds,
@@ -486,6 +488,38 @@ describe('Span', () => {
         });
       });
 
+      describe('when span "attributeCountLimit" set to the default value and general "attributeCountLimit" option defined', () => {
+        const tracer = new BasicTracerProvider({
+          generalLimits: {
+            // Setting count limit
+            attributeCountLimit: 10,
+          },
+          spanLimits: {
+            attributeCountLimit: DEFAULT_ATTRIBUTE_COUNT_LIMIT,
+          }
+        }).getTracer('default');
+
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
+        for (let i = 0; i < 150; i++) {
+          span.setAttribute('foo' + i, 'bar' + i);
+        }
+        span.end();
+
+        it('should remove / drop all remaining values after the number of values exceeds the span limit', () => {
+          assert.strictEqual(Object.keys(span.attributes).length, DEFAULT_ATTRIBUTE_COUNT_LIMIT);
+          assert.strictEqual(span.attributes['foo0'], 'bar0');
+          assert.strictEqual(span.attributes['foo10'], 'bar10');
+          assert.strictEqual(span.attributes['foo127'], 'bar127');
+          assert.strictEqual(span.attributes['foo128'], undefined);
+        });
+      });
+
       describe('when "attributeValueLengthLimit" option defined', () => {
         const tracer = new BasicTracerProvider({
           generalLimits: {
@@ -521,6 +555,44 @@ describe('Span', () => {
         it('should not truncate value which length not exceeds span limit', () => {
           span.setAttribute('attr-with-less-length', 'abc');
           assert.strictEqual(span.attributes['attr-with-less-length'], 'abc');
+        });
+
+        it('should return same value for non-string values', () => {
+          span.setAttribute('attr-non-string', true);
+          assert.strictEqual(span.attributes['attr-non-string'], true);
+        });
+      });
+
+      describe('when span "attributeValueLengthLimit" set to the default value and general "attributeValueLengthLimit" option defined', () => {
+        const tracer = new BasicTracerProvider({
+          generalLimits: {
+            // Setting attribute value length limit
+            attributeValueLengthLimit: 10,
+          },
+          spanLimits: {
+            // Setting attribute value length limit
+            attributeValueLengthLimit: DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
+          },
+        }).getTracer('default');
+
+        const span = new Span(
+          tracer,
+          ROOT_CONTEXT,
+          name,
+          spanContext,
+          SpanKind.CLIENT
+        );
+
+        it('should not truncate value', () => {
+          span.setAttribute('attr-with-more-length', 'abcdefghijklmn');
+          assert.strictEqual(span.attributes['attr-with-more-length'], 'abcdefghijklmn');
+        });
+
+        it('should not truncate value of arrays', () => {
+          span.setAttribute('attr-array-of-strings', ['abcdefghijklmn', 'abc', 'abcde', '']);
+          span.setAttribute('attr-array-of-bool', [true, false]);
+          assert.deepStrictEqual(span.attributes['attr-array-of-strings'], ['abcdefghijklmn', 'abc', 'abcde', '']);
+          assert.deepStrictEqual(span.attributes['attr-array-of-bool'], [true, false]);
         });
 
         it('should return same value for non-string values', () => {
