@@ -34,6 +34,7 @@ export * from './trace/SpanOptions';
 export * from './trace/status';
 export * from './trace/trace_flags';
 export * from './trace/trace_state';
+export { createTraceState } from './trace/internal/utils';
 export * from './trace/tracer_provider';
 export * from './trace/tracer';
 
