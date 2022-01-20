@@ -17,7 +17,7 @@
 /**
  * AggregationTemporality indicates the way additive quantities are expressed.
  *
- * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/datamodel.md#temporality
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/datamodel.md#temporality
  */
 export enum AggregationTemporality {
   DELTA,

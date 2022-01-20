@@ -17,16 +17,15 @@
 import * as api from '@opentelemetry/api';
 import { Aggregator, SumAggregator, DropAggregator, LastValueAggregator, HistogramAggregator } from '../aggregator';
 import { Accumulation } from '../aggregator/types';
-import { InstrumentDescriptor } from '../InstrumentDescriptor';
-import { InstrumentType } from '../Instruments';
+import { InstrumentDescriptor, InstrumentType } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 
-// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#aggregation
-
 /**
- * Configures how measurements are combined into metrics for {@link View}s.
+ * Configures how measurements are combined into metrics for views.
  *
  * Aggregation provides a set of built-in aggregations via static methods.
+ *
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#aggregation
  */
 export abstract class Aggregation {
   abstract createAggregator(instrument: InstrumentDescriptor): Aggregator<Maybe<Accumulation>>;
@@ -52,6 +51,10 @@ export abstract class Aggregation {
   }
 }
 
+/**
+ * The default drop aggregation.
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#drop-aggregation
+ */
 export class DropAggregation extends Aggregation {
   private static DEFAULT_INSTANCE = new DropAggregator();
   createAggregator(_instrument: InstrumentDescriptor) {
@@ -59,6 +62,10 @@ export class DropAggregation extends Aggregation {
   }
 }
 
+/**
+ * The default sum aggregation.
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#sum-aggregation
+ */
 export class SumAggregation extends Aggregation {
   private static DEFAULT_INSTANCE = new SumAggregator();
   createAggregator(_instrument: InstrumentDescriptor) {
@@ -66,6 +73,10 @@ export class SumAggregation extends Aggregation {
   }
 }
 
+/**
+ * The default last value aggregation.
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#last-value-aggregation
+ */
 export class LastValueAggregation extends Aggregation {
   private static DEFAULT_INSTANCE = new LastValueAggregator();
   createAggregator(_instrument: InstrumentDescriptor) {
@@ -73,15 +84,25 @@ export class LastValueAggregation extends Aggregation {
   }
 }
 
+/**
+ * The default histogram aggregation.
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#histogram-aggregation
+ */
 export class HistogramAggregation extends Aggregation {
-  // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#histogram-aggregation
   private static DEFAULT_INSTANCE = new HistogramAggregator([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]);
   createAggregator(_instrument: InstrumentDescriptor) {
     return HistogramAggregation.DEFAULT_INSTANCE;
   }
 }
 
+/**
+ * The explicit bucket histogram aggregation.
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#explicit-bucket-histogram-aggregation
+ */
 export class ExplicitBucketHistogramAggregation extends Aggregation {
+  /**
+   * @param _boundaries the bucket boundaries of the histogram aggregation
+   */
   constructor(private _boundaries: number[]) {
     super();
   }
@@ -91,7 +112,9 @@ export class ExplicitBucketHistogramAggregation extends Aggregation {
   }
 }
 
-// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#default-aggregation
+/**
+ * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#default-aggregation
+ */
 export class DefaultAggregation extends Aggregation {
   private _resolve(instrument: InstrumentDescriptor): Aggregation {
     // cast to unknown to disable complaints on the (unreachable) fallback.
