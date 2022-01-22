@@ -26,6 +26,8 @@ module.exports = {
   },
   reporters: ['spec', 'coverage-istanbul'],
   files: ['test/index-webpack.ts'],
-  preprocessors: { 'test/index-webpack.ts': ['webpack'] },
+  preprocessors: {
+    'test/index-webpack*.ts': ['webpack']
+  },
   webpackMiddleware: { noInfo: true }
 };

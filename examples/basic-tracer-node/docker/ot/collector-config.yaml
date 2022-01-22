@@ -3,19 +3,24 @@ receivers:
     protocols:
       grpc:
       http:
-        cors_allowed_origins:
-        - http://*
-        - https://*
+        cors:
+          allowed_origins:
+          - http://*
+          - https://*
 
 exporters:
   jaeger:
     endpoint: jaeger-all-in-one:14250
-    insecure: true
+    tls:
+      insecure: true
 
 processors:
   batch:
 
 service:
+  telemetry:
+    logs:
+      level: "debug"
   pipelines:
     traces:
       receivers: [otlp]

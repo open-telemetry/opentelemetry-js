@@ -39,7 +39,11 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>> implements Writabl
   private _deltaMetricStorage: DeltaMetricProcessor<T>;
   private _temporalMetricStorage: TemporalMetricProcessor<T>;
 
-  constructor(private _instrumentDescriptor: InstrumentDescriptor, aggregator: Aggregator<T>, private _attributesProcessor: AttributesProcessor) {
+  constructor(
+    private _instrumentDescriptor: InstrumentDescriptor,
+    aggregator: Aggregator<T>,
+    private _attributesProcessor: AttributesProcessor
+  ) {
     this._deltaMetricStorage = new DeltaMetricProcessor(aggregator);
     this._temporalMetricStorage = new TemporalMetricProcessor(aggregator);
   }

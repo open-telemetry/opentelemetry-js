@@ -30,7 +30,7 @@ export class MeterProviderSharedState {
 
   metricCollectors: MetricCollector[] = [];
 
-  meters: Map<string, Meter> = new Map();
+  meters: Meter[] = [];
 
   constructor(public resource: Resource) {}
 }

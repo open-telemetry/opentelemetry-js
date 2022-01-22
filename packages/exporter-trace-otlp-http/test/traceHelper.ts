@@ -42,7 +42,7 @@ export const mockedReadableSpan: ReadableSpan = {
       traceId: '1f1008dc8e270e85c40a0d7c3939b278',
       spanId: '5e107261f64fa53e',
       traceFlags: TraceFlags.SAMPLED,
-    }
+    };
   },
   parentSpanId: '78a8915098864388',
   startTime: [1574120165, 429803070],

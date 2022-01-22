@@ -69,7 +69,7 @@ export abstract class OTLPExporterBrowserBase<
     onSuccess: () => void,
     onError: (error: otlpTypes.OTLPExporterError) => void
   ): void {
-    if (this._isShutdown) {
+    if (this._shutdownOnce.isCalled) {
       diag.debug('Shutdown already started. Cannot send objects');
       return;
     }
@@ -89,7 +89,7 @@ export abstract class OTLPExporterBrowserBase<
     const popPromise = () => {
       const index = this._sendingPromises.indexOf(promise);
       this._sendingPromises.splice(index, 1);
-    }
+    };
     promise.then(popPromise, popPromise);
   }
 }

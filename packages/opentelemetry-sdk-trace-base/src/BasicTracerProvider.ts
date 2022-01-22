@@ -37,6 +37,7 @@ import { NoopSpanProcessor } from './export/NoopSpanProcessor';
 import { SDKRegistrationConfig, TracerConfig } from './types';
 import { SpanExporter } from './export/SpanExporter';
 import { BatchSpanProcessor } from './platform';
+import { reconfigureLimits } from './utility';
 
 export type PROPAGATOR_FACTORY = () => TextMapPropagator;
 export type EXPORTER_FACTORY = () => SpanExporter;
@@ -73,7 +74,7 @@ export class BasicTracerProvider implements TracerProvider {
   readonly resource: Resource;
 
   constructor(config: TracerConfig = {}) {
-    const mergedConfig = merge({}, DEFAULT_CONFIG, config);
+    const mergedConfig = merge({}, DEFAULT_CONFIG, reconfigureLimits(config));
     this.resource = mergedConfig.resource ?? Resource.empty();
     this.resource = Resource.default().merge(this.resource);
     this._config = Object.assign({}, mergedConfig, {

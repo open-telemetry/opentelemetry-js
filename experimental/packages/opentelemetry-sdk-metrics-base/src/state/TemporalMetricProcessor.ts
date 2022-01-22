@@ -61,7 +61,7 @@ export class TemporalMetricProcessor<T> {
    * @param currentAccumulations The current accumulation of metric data from instruments.
    * @param sdkStartTime The sdk start timestamp.
    * @param collectionTime The current collection timestamp.
-   * @returns The {@link MetricData} points or {@code null}.
+   * @returns The {@link MetricData} points or `null`.
    */
   buildMetrics(
     collector: MetricCollectorHandle,
@@ -107,7 +107,7 @@ export class TemporalMetricProcessor<T> {
       collectionTime,
     });
 
-    // Metric data time span is determined in Aggregator.toMetricData with aggregation temporality:
+    // Metric data time span is determined as:
     // 1. Cumulative Aggregation time span: (sdkStartTime, collectionTime]
     // 2. Delta Aggregation time span: (lastCollectionTime, collectionTime]
     return this._aggregator.toMetricData(
@@ -115,10 +115,8 @@ export class TemporalMetricProcessor<T> {
       instrumentationLibrary,
       instrumentDescriptor,
       AttributesMapToAccumulationRecords(result),
-      aggregationTemporality,
-      sdkStartTime,
-      lastCollectionTime,
-      collectionTime);
+      /* startTime */ aggregationTemporality === AggregationTemporality.CUMULATIVE ? sdkStartTime : lastCollectionTime,
+      /* endTime */ collectionTime);
   }
 
   private _stashAccumulations(collectors: MetricCollectorHandle[], currentAccumulation: AttributeHashMap<T>) {
