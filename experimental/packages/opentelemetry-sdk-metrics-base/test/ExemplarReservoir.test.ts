@@ -16,7 +16,7 @@
 
 import { ROOT_CONTEXT, SpanContext, TraceFlags, trace } from '@opentelemetry/api';
 import { hrTime } from '@opentelemetry/core';
-import * as assert from 'assert'
+import * as assert from 'assert';
 
 import {
   SimpleFixedSizeExemplarReservoir,
@@ -41,8 +41,8 @@ describe('ExemplarReservoir', () => {
         spanId: SPAN_ID,
         traceFlags: TraceFlags.SAMPLED,
       };
-      const ctx = trace.setSpanContext(ROOT_CONTEXT, spanContext)
-  
+      const ctx = trace.setSpanContext(ROOT_CONTEXT, spanContext);
+
       reservoir.offer(1, hrTime(), {}, ctx);
       const exemplars = reservoir.collect({});
       assert.strictEqual(exemplars.length, 1);

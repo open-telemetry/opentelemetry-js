@@ -19,12 +19,12 @@ import { SpanExporter } from '../../../export/SpanExporter';
 import { BatchSpanProcessorBrowserConfig } from '../../../types';
 
 export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcessorBrowserConfig> {
-  private _visibilityChangeListener?: () => void
-  private _pageHideListener?: () => void
+  private _visibilityChangeListener?: () => void;
+  private _pageHideListener?: () => void;
 
   constructor(_exporter: SpanExporter, config?: BatchSpanProcessorBrowserConfig) {
-    super(_exporter, config)
-    this.onInit(config)
+    super(_exporter, config);
+    this.onInit(config);
   }
 
   private onInit(config?: BatchSpanProcessorBrowserConfig): void {
@@ -33,10 +33,10 @@ export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcesso
         if (document.visibilityState === 'hidden') {
           void this.forceFlush();
         }
-      }
+      };
       this._pageHideListener = () => {
-        void this.forceFlush()
-      }
+        void this.forceFlush();
+      };
       document.addEventListener('visibilitychange', this._visibilityChangeListener);
 
       // use 'pagehide' event as a fallback for Safari; see https://bugs.webkit.org/show_bug.cgi?id=116769

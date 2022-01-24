@@ -23,7 +23,7 @@ export type PeriodicExportingMetricReaderOptions = {
   exporter: PushMetricExporter
   exportIntervalMillis?: number,
   exportTimeoutMillis?: number
-}
+};
 
 /**
  * {@link MetricReader} which collects metrics based on a user-configurable time interval, and passes the metrics to

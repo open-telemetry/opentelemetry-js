@@ -242,9 +242,9 @@ describe('Tracer', () => {
 
     assert.strictEqual(tracer.startActiveSpan('my-span', span => {
       try {
-        assert(spy.calledWith('my-span'))
-        assert.strictEqual(getSpan(context.active()), span)
-        return 1
+        assert(spy.calledWith('my-span'));
+        assert.strictEqual(getSpan(context.active()), span);
+        return 1;
       } finally {
         span.end();
       }
@@ -263,9 +263,9 @@ describe('Tracer', () => {
 
     assert.strictEqual(tracer.startActiveSpan('my-span', {attributes: {foo: 'bar'}}, span => {
       try {
-        assert(spy.calledWith('my-span', {attributes: {foo: 'bar'}}))
-        assert.strictEqual(getSpan(context.active()), span)
-        return 1
+        assert(spy.calledWith('my-span', {attributes: {foo: 'bar'}}));
+        assert.strictEqual(getSpan(context.active()), span);
+        return 1;
       } finally {
         span.end();
       }
@@ -281,16 +281,16 @@ describe('Tracer', () => {
 
     const ctxKey = createContextKey('foo');
 
-    const ctx = context.active().setValue(ctxKey, 'bar')
+    const ctx = context.active().setValue(ctxKey, 'bar');
 
     const spy = sinon.spy(tracer, 'startSpan');
 
     assert.strictEqual(tracer.startActiveSpan('my-span', {attributes: {foo: 'bar'}}, ctx, span => {
       try {
-        assert(spy.calledWith('my-span', {attributes: {foo: 'bar'}}, ctx))
-        assert.strictEqual(getSpan(context.active()), span)
-        assert.strictEqual(ctx.getValue(ctxKey), 'bar')
-        return 1
+        assert(spy.calledWith('my-span', {attributes: {foo: 'bar'}}, ctx));
+        assert.strictEqual(getSpan(context.active()), span);
+        assert.strictEqual(ctx.getValue(ctxKey), 'bar');
+        return 1;
       } finally {
         span.end();
       }

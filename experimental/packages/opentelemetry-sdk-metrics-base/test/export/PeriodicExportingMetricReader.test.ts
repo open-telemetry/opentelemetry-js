@@ -23,8 +23,9 @@ import * as sinon from 'sinon';
 import { MetricProducer } from '../../src/export/MetricProducer';
 import { TimeoutError } from '../../src/utils';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
+import { assertRejects } from '../test-utils';
 
-const MAX_32_BIT_INT = 2 ** 31 - 1
+const MAX_32_BIT_INT = 2 ** 31 - 1;
 
 class TestMetricExporter extends PushMetricExporter {
   public exportTime = 0;
@@ -104,7 +105,7 @@ describe('PeriodicExportingMetricReader', () => {
         }
       );
       assert.strictEqual(reader.getPreferredAggregationTemporality(), exporter.getPreferredAggregationTemporality());
-    })
+    });
 
     it('should throw when interval less or equal to 0', () => {
       const exporter = new TestDeltaMetricExporter();
@@ -112,8 +113,8 @@ describe('PeriodicExportingMetricReader', () => {
         exporter: exporter,
         exportIntervalMillis: 0,
         exportTimeoutMillis: 0
-      }), new Error('exportIntervalMillis must be greater than 0'));
-    })
+      }), /exportIntervalMillis must be greater than 0/);
+    });
 
     it('should throw when timeout less or equal to 0', () => {
       const exporter = new TestDeltaMetricExporter();
@@ -121,8 +122,8 @@ describe('PeriodicExportingMetricReader', () => {
         exporter: exporter,
         exportIntervalMillis: 1,
         exportTimeoutMillis: 0
-      }), new Error('exportTimeoutMillis must be greater than 0'));
-    })
+      }), /exportTimeoutMillis must be greater than 0/);
+    });
 
     it('should throw when timeout less or equal to interval', () => {
       const exporter = new TestDeltaMetricExporter();
@@ -130,8 +131,8 @@ describe('PeriodicExportingMetricReader', () => {
         exporter: exporter,
         exportIntervalMillis: 100,
         exportTimeoutMillis: 200
-      }), new Error('exportIntervalMillis must be greater than or equal to exportTimeoutMillis'));
-    })
+      }), /exportIntervalMillis must be greater than or equal to exportTimeoutMillis/);
+    });
 
     it('should not start exporting', async () => {
       const exporter = new TestDeltaMetricExporter();
@@ -146,7 +147,7 @@ describe('PeriodicExportingMetricReader', () => {
       await new Promise(resolve => setTimeout(resolve, 50));
 
       exporterMock.verify();
-    })
+    });
   });
 
   describe('setMetricProducer', () => {
@@ -161,7 +162,7 @@ describe('PeriodicExportingMetricReader', () => {
       reader.setMetricProducer(new TestMetricProducer());
       const result = await exporter.waitForNumberOfExports(2);
 
-      assert.deepEqual(result, [[], []]);
+      assert.deepStrictEqual(result, [[], []]);
       await reader.shutdown();
     });
   });
@@ -179,7 +180,7 @@ describe('PeriodicExportingMetricReader', () => {
       reader.setMetricProducer(new TestMetricProducer());
 
       const result = await exporter.waitForNumberOfExports(2);
-      assert.deepEqual(result, [[], []]);
+      assert.deepStrictEqual(result, [[], []]);
 
       exporter.throwException = false;
       await reader.shutdown();
@@ -198,7 +199,7 @@ describe('PeriodicExportingMetricReader', () => {
       reader.setMetricProducer(new TestMetricProducer());
 
       const result = await exporter.waitForNumberOfExports(2);
-      assert.deepEqual(result, [[], []]);
+      assert.deepStrictEqual(result, [[], []]);
 
       exporter.throwException = false;
       await reader.shutdown();
@@ -237,7 +238,7 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       reader.setMetricProducer(new TestMetricProducer());
-      await assert.rejects(() => reader.forceFlush({ timeoutMillis: 20 }),
+      await assertRejects(() => reader.forceFlush({ timeoutMillis: 20 }),
         TimeoutError);
       await reader.shutdown();
     });
@@ -251,7 +252,7 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 80,
       });
 
-      await assert.rejects(() => reader.forceFlush());
+      await assertRejects(() => reader.forceFlush(), /Error during forceFlush/);
     });
 
     it('should not forceFlush exporter after shutdown', async () => {
@@ -304,7 +305,7 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       reader.setMetricProducer(new TestMetricProducer());
-      await assert.rejects(() => reader.shutdown({ timeoutMillis: 20 }),
+      await assertRejects(() => reader.shutdown({ timeoutMillis: 20 }),
         TimeoutError);
     });
 
@@ -336,7 +337,7 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 80,
       });
 
-      await assert.rejects(() => reader.shutdown());
+      await assertRejects(() => reader.shutdown(), /Error during forceFlush/);
     });
   })
   ;
@@ -350,7 +351,7 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 80,
       });
 
-      await assert.rejects(() => reader.collect());
+      await assertRejects(() => reader.collect(), /MetricReader is not bound to a MetricProducer/);
     });
 
     it('should return empty on shut-down instance', async () => {
@@ -364,7 +365,7 @@ describe('PeriodicExportingMetricReader', () => {
       reader.setMetricProducer(new TestMetricProducer());
 
       await reader.shutdown();
-      assert.deepEqual([], await reader.collect());
+      assert.deepStrictEqual([], await reader.collect());
     });
 
     it('should time out when timeoutMillis is set', async () => {
@@ -378,7 +379,7 @@ describe('PeriodicExportingMetricReader', () => {
       producer.collectionTime = 40;
       reader.setMetricProducer(producer);
 
-      await assert.rejects(
+      await assertRejects(
         () => reader.collect({ timeoutMillis: 20 }),
         TimeoutError
       );

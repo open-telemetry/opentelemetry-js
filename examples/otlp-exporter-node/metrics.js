@@ -1,7 +1,7 @@
 'use strict';
 
 const { DiagConsoleLogger, DiagLogLevel, diag } = require('@opentelemetry/api');
-const { OTLPMetricExporter } = require('@opentelemetry/exporter-otlp-http');
+const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-http');
 // const { OTLPMetricExporter } = require('@opentelemetry/exporter-otlp-grpc');
 // const { OTLPMetricExporter } = require('@opentelemetry/exporter-otlp-proto');
 const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
@@ -12,7 +12,7 @@ const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventi
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
 
 const metricExporter = new OTLPMetricExporter({
-  // url: 'http://localhost:55681/v1/metrics',
+  url: 'http://localhost:4318/v1/metrics',
 });
 
 const meter = new MeterProvider({

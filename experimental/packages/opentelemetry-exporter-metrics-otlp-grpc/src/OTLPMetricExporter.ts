@@ -15,7 +15,7 @@
  */
 
 import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
-import { toOTLPExportMetricServiceRequest } from '@opentelemetry/exporter-metrics-otlp-http'
+import { toOTLPExportMetricServiceRequest } from '@opentelemetry/exporter-metrics-otlp-http';
 import { MetricRecord, MetricExporter } from '@opentelemetry/sdk-metrics-base';
 import {
   OTLPExporterConfigNode,
@@ -45,7 +45,7 @@ export class OTLPMetricExporter
     const headers = baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS);
     this.metadata ||= new Metadata();
     for (const [k, v] of Object.entries(headers)) {
-      this.metadata.set(k, v)
+      this.metadata.set(k, v);
     }
   }
 

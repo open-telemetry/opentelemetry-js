@@ -16,15 +16,26 @@
 
 import * as assert from 'assert';
 
+interface ErrorLikeConstructor {
+  new(): Error;
+}
+
 /**
  * Node.js v8.x and browser compatible `assert.rejects`.
  */
-export async function assertRejects(promise: any, expect: any) {
+export async function assertRejects(actual: any, expected: RegExp | ErrorLikeConstructor) {
+  let rejected;
   try {
-    await promise;
+    if (typeof actual === 'function') {
+      await actual();
+    } else {
+      await actual;
+    }
   } catch (err) {
+    rejected = true;
     assert.throws(() => {
       throw err;
-    }, expect);
+    }, expected);
   }
+  assert(rejected, 'Promise not rejected');
 }
