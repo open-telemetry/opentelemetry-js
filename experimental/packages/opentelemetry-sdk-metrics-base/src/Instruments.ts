@@ -33,7 +33,6 @@ export class SyncInstrument {
 
 /**
  * The class implements {@link metrics.UpDownCounter} interface.
- * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#updowncounter
  */
 export class UpDownCounter extends SyncInstrument implements metrics.UpDownCounter {
   /**
@@ -46,7 +45,6 @@ export class UpDownCounter extends SyncInstrument implements metrics.UpDownCount
 
 /**
  * The class implements {@link metrics.Counter} interface.
- * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#counter
  */
 export class Counter extends SyncInstrument implements metrics.Counter {
   /**
@@ -64,7 +62,6 @@ export class Counter extends SyncInstrument implements metrics.Counter {
 
 /**
  * The class implements {@link metrics.Histogram} interface.
- * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#histogram
  */
 export class Histogram extends SyncInstrument implements metrics.Histogram {
   /**

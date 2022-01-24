@@ -26,7 +26,7 @@ import { Histogram } from '../aggregator/types';
  */
 export interface BaseMetricData {
   /**
-   * Resource associated with metric telemetry
+   * Resource associated with metric telemetry.
    */
   readonly resource: Resource;
   /**
@@ -66,7 +66,7 @@ export interface HistogramMetricData extends BaseMetricData {
 export type MetricData = SingularMetricData | HistogramMetricData;
 
 /**
- * The aggregated point data type
+ * The aggregated point data type.
  */
 export enum PointDataType {
   SINGULAR,

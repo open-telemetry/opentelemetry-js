@@ -35,7 +35,6 @@ export interface MeterProviderOptions {
 
 /**
  * This class implements the {@link metrics.MeterProvider} interface.
- * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#meterprovider
  */
 export class MeterProvider implements metrics.MeterProvider {
   private _sharedState: MeterProviderSharedState;

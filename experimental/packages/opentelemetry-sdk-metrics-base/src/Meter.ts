@@ -30,7 +30,6 @@ import { AsyncMetricStorage } from './state/AsyncMetricStorage';
 
 /**
  * This class implements the {@link metrics.Meter} interface.
- * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#meter
  */
 export class Meter implements metrics.Meter {
   private _metricStorageRegistry = new Map<string, MetricStorage>();
