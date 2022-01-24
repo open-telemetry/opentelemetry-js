@@ -27,11 +27,11 @@ import { TestMetricReader } from '../export/TestMetricReader';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 
 class TestMetricExporter extends PushMetricExporter {
-  metricDataList: MetricData[] = []
+  metricDataList: MetricData[] = [];
   async export(batch: MetricData[]): Promise<ExportResult> {
     this.metricDataList.push(...batch);
     return new Promise<ExportResult>((resolve, _) => {
-      resolve({code: ExportResultCode.SUCCESS})
+      resolve({code: ExportResultCode.SUCCESS});
     });
   }
 

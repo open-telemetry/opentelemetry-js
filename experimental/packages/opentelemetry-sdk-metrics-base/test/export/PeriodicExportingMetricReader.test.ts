@@ -40,7 +40,7 @@ class TestMetricExporter extends PushMetricExporter {
       throw new Error('Error during export');
     }
     return await new Promise(resolve => setTimeout(() => {
-      resolve({code: ExportResultCode.SUCCESS})
+      resolve({code: ExportResultCode.SUCCESS});
     }, this.exportTime));
   }
 
