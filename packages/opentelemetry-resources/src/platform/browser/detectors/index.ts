@@ -13,11 +13,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { detectResources as detect } from '../utils';
 
-/**
- * Detects resources for the browser platform, which is currently only the
- * telemetry SDK resource. More could be added in the future. This method
- * is async to match the signature of corresponding method for node.
- */
-export const detectResources = detect;
+export * from './BrowserDetector';

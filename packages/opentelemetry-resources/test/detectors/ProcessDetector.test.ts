@@ -16,7 +16,7 @@
 import * as sinon from 'sinon';
 import { processDetector, Resource } from '../../src';
 import {
-  assertProcessResource,
+  assertResource,
   assertEmptyResource,
 } from '../util/resource-assertions';
 
@@ -36,7 +36,7 @@ describe('processDetector()', () => {
       .value({'node': '1.4.1'});
 
     const resource: Resource = await processDetector.detect();
-    assertProcessResource(resource, {
+    assertResource(resource, {
       pid: 1234,
       name: 'otProcess',
       command: '/home/ot/test.js',

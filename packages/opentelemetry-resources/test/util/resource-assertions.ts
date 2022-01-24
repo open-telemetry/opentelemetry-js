@@ -258,12 +258,12 @@ export const assertServiceResource = (
 };
 
 /**
- * Test utility method to validate a process resources
+ * Test utility method to validate a process / browser resources
  *
  * @param resource the Resource to validate
  * @param validations validations for the resource attributes
  */
-export const assertProcessResource = (
+export const assertResource = (
   resource: Resource,
   validations: {
     pid?: number;
