@@ -15,7 +15,7 @@
  */
 
 import { SpanAttributes, diag } from '@opentelemetry/api';
-import { ExportResult, ExportResultCode, BindOnceFuture } from '@opentelemetry/core';
+import { ExportResult, ExportResultCode, BindOnceFuture, getEnv } from '@opentelemetry/core';
 import {
   OTLPExporterError,
   OTLPExporterConfigBase,
@@ -36,6 +36,7 @@ export abstract class OTLPExporterBase<
   protected _concurrencyLimit: number;
   protected _sendingPromises: Promise<unknown>[] = [];
   protected _shutdownOnce: BindOnceFuture<void>;
+  private readonly _timeoutMillis: number;
 
   /**
    * @param config
@@ -55,6 +56,12 @@ export abstract class OTLPExporterBase<
       typeof config.concurrencyLimit === 'number'
         ? config.concurrencyLimit
         : Infinity;
+    this._timeoutMillis =
+      typeof config.timeoutMillis === 'number'
+        ? config.timeoutMillis < 0
+          ? this._invalidTimeout(config.timeoutMillis)
+          : config.timeoutMillis
+            : getEnv().OTEL_EXPORTER_OTLP_TIMEOUT;
 
     // platform dependent
     this.onInit(config);
@@ -93,6 +100,11 @@ export abstract class OTLPExporterBase<
 
   private _export(items: ExportItem[]): Promise<unknown> {
     return new Promise<void>((resolve, reject) => {
+      setTimeout(() => {
+        // don't wait anymore for export
+        reject(new Error('Timeout'));
+      }, this._timeoutMillis);
+
       try {
         diag.debug('items to be sent', items);
         this.send(items, resolve, reject);
@@ -100,6 +112,11 @@ export abstract class OTLPExporterBase<
         reject(e);
       }
     });
+  }
+
+  private _invalidTimeout(timeout: number): number {
+    diag.warn('Timeout must be non-negative', timeout);
+    return getEnv().OTEL_EXPORTER_OTLP_TIMEOUT;
   }
 
   /**
