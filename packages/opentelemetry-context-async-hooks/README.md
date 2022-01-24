@@ -30,16 +30,16 @@ async_hooks is still seeing significant correctness and performance fixes, it's 
 
 Context propagation is a big subject when talking about tracing in Node.js. If you want more information about it here are some resources:
 
-- <https://www.npmjs.com/package/continuation-local-storage> (which was the old way of doing context propagation)
-- Datadog's own implementation for their JavaScript tracer: [here][dd-js-tracer-scope]
-- OpenTracing implementation: [here][opentracing-scope]
-- Discussion about context propagation by the Node.js Diagnostics Working Group: [here][diag-team-scope-discussion]
+* <https://www.npmjs.com/package/continuation-local-storage> (which was the old way of doing context propagation)
+* Datadog's own implementation for their JavaScript tracer: [here][dd-js-tracer-scope]
+* OpenTracing implementation: [here][opentracing-scope]
+* Discussion about context propagation by the Node.js Diagnostics Working Group: [here][diag-team-scope-discussion]
 
 ## Useful links
 
-- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
-- For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
+* For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
+* For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
+* For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
 
 ## License
 
