@@ -48,6 +48,10 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>> implements Writabl
     this._temporalMetricStorage = new TemporalMetricProcessor(aggregator);
   }
 
+  getInstrumentDescriptor(): InstrumentDescriptor {
+    return this._instrumentDescriptor;
+  }
+
   record(value: number, attributes: Attributes, context: Context) {
     attributes = this._attributesProcessor.process(attributes, context);
     this._deltaMetricStorage.record(value, attributes, context);

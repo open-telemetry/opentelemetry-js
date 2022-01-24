@@ -46,3 +46,35 @@ export function createInstrumentDescriptorWithView(view: View, instrument: Instr
     valueType: instrument.valueType,
   };
 }
+
+export function isDescriptorCompatibleWith(descriptor: InstrumentDescriptor, otherDescriptor: InstrumentDescriptor) {
+  return descriptor.name === otherDescriptor.name
+    && descriptor.description === otherDescriptor.description
+    && descriptor.unit === otherDescriptor.unit
+    && descriptor.type === otherDescriptor.type
+    && descriptor.valueType === otherDescriptor.valueType;
+}
+
+export function getDescriptorIncompatibilityDetails(existing: InstrumentDescriptor, otherDescriptor: InstrumentDescriptor) {
+  let incompatibility = '';
+  if (existing.description !== otherDescriptor.description) {
+    incompatibility += `\n- Description '${existing.description}' does not match '${otherDescriptor.description}'`;
+  }
+  if (existing.unit !== otherDescriptor.unit) {
+    incompatibility += `\n- Unit '${existing.unit}' does not match '${otherDescriptor.description}'`;
+  }
+  if (existing.type !== otherDescriptor.type) {
+    incompatibility += `\n- Type '${existing.type}' does not match '${otherDescriptor.type}'`;
+  }
+  if (existing.valueType !== otherDescriptor.valueType) {
+    incompatibility += `\n- Value Type '${existing.valueType}' does not match '${otherDescriptor.valueType}'`;
+  }
+
+  return incompatibility;
+}
+
+export function isDescriptorAsync(descriptor: InstrumentDescriptor) {
+  return (descriptor.type === InstrumentType.OBSERVABLE_GAUGE ||
+    descriptor.type === InstrumentType.OBSERVABLE_UP_DOWN_COUNTER ||
+    descriptor.type === InstrumentType.OBSERVABLE_COUNTER);
+}

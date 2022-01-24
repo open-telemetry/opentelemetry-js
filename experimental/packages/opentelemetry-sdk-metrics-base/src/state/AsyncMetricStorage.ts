@@ -50,6 +50,10 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>> implements Metric
     this._temporalMetricStorage = new TemporalMetricProcessor(aggregator);
   }
 
+  getInstrumentDescriptor(): InstrumentDescriptor {
+    return this._instrumentDescriptor;
+  }
+
   private _record(measurements: AttributeHashMap<number>) {
     const processed = new AttributeHashMap<number>();
     Array.from(measurements.entries()).forEach(([attributes, value]) => {

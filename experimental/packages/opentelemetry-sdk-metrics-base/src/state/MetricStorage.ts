@@ -20,6 +20,7 @@ import { Resource } from '@opentelemetry/resources';
 import { MetricData } from '../export/MetricData';
 import { Maybe } from '../utils';
 import { MetricCollectorHandle } from './MetricCollector';
+import { InstrumentDescriptor } from '../InstrumentDescriptor';
 
 /**
  * Internal interface.
@@ -41,4 +42,6 @@ export interface MetricStorage {
     sdkStartTime: HrTime,
     collectionTime: HrTime,
   ): Promise<Maybe<MetricData>>;
+
+  getInstrumentDescriptor(): InstrumentDescriptor;
 }
