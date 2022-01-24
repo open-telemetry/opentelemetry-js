@@ -19,7 +19,6 @@ import { View } from './view/View';
 
 /**
  * Supported types of metric instruments.
- * @see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#instrument
  */
  export enum InstrumentType {
   COUNTER = 'COUNTER',
