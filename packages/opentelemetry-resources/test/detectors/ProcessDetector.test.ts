@@ -42,6 +42,8 @@ describe('processDetector()', () => {
       command: '/home/ot/test.js',
       commandLine: '/tmp/node /home/ot/test.js arg1 arg2',
       version: '1.4.1',
+      runtimeDescription: 'NodeJS',
+      runtimeName: 'nodejs',
     });
   });
   it('should return empty resources if title, command and commondLine is missing', async () => {

@@ -271,6 +271,8 @@ export const assertProcessResource = (
     command?: string;
     commandLine?: string;
     version?: string;
+    runtimeName?: string;
+    runtimeDescription?: string;
   }
 ) => {
   assert.strictEqual(
@@ -299,6 +301,18 @@ export const assertProcessResource = (
     assert.strictEqual(
       resource.attributes[SemanticResourceAttributes.PROCESS_RUNTIME_VERSION],
       validations.version
+    );
+  }
+  if (validations.runtimeName) {
+    assert.strictEqual(
+      resource.attributes[SemanticResourceAttributes.PROCESS_RUNTIME_NAME],
+      validations.runtimeName
+    );
+  }
+  if (validations.runtimeDescription) {
+    assert.strictEqual(
+      resource.attributes[SemanticResourceAttributes.PROCESS_RUNTIME_DESCRIPTION],
+      validations.runtimeDescription
     );
   }
 };
