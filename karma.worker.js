@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
+const baseConfig = require('./karma.base');
+
 module.exports = {
-  listenAddress: 'localhost',
-  hostname: 'localhost',
-  browsers: ['ChromeHeadless'],
-  frameworks: ['mocha'],
-  coverageIstanbulReporter: {
-    reports: ['html', 'json'],
-    dir: '.nyc_output',
-    fixWebpackSourcePaths: true
-  },
-  reporters: ['spec', 'coverage-istanbul'],
-  files: ['test/index-webpack.ts'],
-  preprocessors: {
-    'test/index-webpack*.ts': ['webpack']
-  },
-  webpackMiddleware: { noInfo: true }
+  ...baseConfig,
+  frameworks: ['mocha-webworker'],
+
+  files: [{
+    pattern: 'test/index-webpack.worker.ts',
+    included: false,
+  }],
 };
