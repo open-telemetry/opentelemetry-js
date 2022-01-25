@@ -33,7 +33,7 @@ class ProcessDetector implements Detector {
         process.argv.join(' ') || '',
       [SemanticResourceAttributes.PROCESS_RUNTIME_VERSION]: process.versions.node,
       [SemanticResourceAttributes.PROCESS_RUNTIME_NAME]: 'nodejs',
-      [SemanticResourceAttributes.PROCESS_RUNTIME_DESCRIPTION]: 'NodeJS',
+      [SemanticResourceAttributes.PROCESS_RUNTIME_DESCRIPTION]: 'Node.js',
     };
     return this._getResourceAttributes(processResource, config);
   }
