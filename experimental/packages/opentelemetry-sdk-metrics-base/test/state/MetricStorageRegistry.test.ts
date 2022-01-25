@@ -68,7 +68,7 @@ describe('MetricStorageRegistry', () => {
       assert.deepStrictEqual([storage], registeredStorages);
     });
 
-    it('should not register when incompatible instrument is already registered', () => {
+    it('should throw when incompatible instrument is already registered', () => {
       const registry = new MetricStorageRegistry();
       const storage = new TestMetricStorage({
         name: 'instrument',
@@ -87,11 +87,9 @@ describe('MetricStorageRegistry', () => {
       });
 
       registry.register(storage);
-      const failedRegisteredStorage = registry.register(otherStorage);
+      assert.throws(() => registry.register(otherStorage));
       const registeredStorages = Array.from(registry.getStorages());
 
-      // returned undefined
-      assert.strictEqual(failedRegisteredStorage, undefined);
       // registered the actual storage, but not more than that.
       assert.deepStrictEqual([storage], registeredStorages);
     });

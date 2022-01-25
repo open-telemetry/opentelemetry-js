@@ -49,7 +49,7 @@ export class MetricStorageRegistry {
     // Return storage if it is compatible.
     if (isDescriptorCompatibleWith(existingDescriptor, expectedDescriptor)) {
       // Is compatible, but views for async instruments cannot be registered twice.
-      if(isDescriptorAsync(existingDescriptor)) {
+      if (isDescriptorAsync(existingDescriptor)) {
         api.diag.warn(`A view for an async instrument with the name '${expectedDescriptor.name}' has already been registered.`);
         return undefined;
       }
@@ -57,9 +57,11 @@ export class MetricStorageRegistry {
       return (existingStorage as T);
     }
 
-    // Warn and return undefined if it is incompatible.
-    api.diag.warn(`A view or instrument with the name '${expectedDescriptor.name}' has already been registered and is incompatible with another registered view.\nDetails:\n`,
-      getDescriptorIncompatibilityDetails(existingDescriptor, expectedDescriptor));
-    return undefined;
+    // Throw an error if it is not compatible.
+    throw new Error('A view or instrument with the name'
+      + expectedDescriptor.name
+      + 'has already been registered and is incompatible with another registered view.\n'
+      + 'Details:\n'
+      + getDescriptorIncompatibilityDetails(existingDescriptor, expectedDescriptor));
   }
 }
