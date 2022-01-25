@@ -16,6 +16,8 @@
 
 /**
  * Attributes is a map from string to attribute values.
+ *
+ * Note: only the own enumerable keys are counted as valid attribute keys.
  */
 export interface Attributes {
     [attributeKey: string]: AttributeValue | undefined;
