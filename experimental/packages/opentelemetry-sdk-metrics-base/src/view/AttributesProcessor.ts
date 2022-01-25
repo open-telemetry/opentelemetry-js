@@ -52,10 +52,10 @@ export class FilteringAttributesProcessor extends AttributesProcessor {
     super();
   }
 
-  process(incoming: Attributes, _context:Context): Attributes {
+  process(incoming: Attributes, _context: Context): Attributes {
     const filteredAttributes: Attributes = {};
-    for(const allowedAttributeName of this._allowedAttributeNames){
-      if(allowedAttributeName in incoming){
+    for (const allowedAttributeName of this._allowedAttributeNames) {
+      if (Object.prototype.hasOwnProperty.call(incoming, allowedAttributeName)) {
         filteredAttributes[allowedAttributeName] = incoming[allowedAttributeName];
       }
     }
