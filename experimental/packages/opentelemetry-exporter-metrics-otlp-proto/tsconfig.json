@@ -6,7 +6,6 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.js",
     "test/**/*.ts"
   ],
   "references": [

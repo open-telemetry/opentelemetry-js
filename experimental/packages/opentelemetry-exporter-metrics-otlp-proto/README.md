@@ -23,7 +23,7 @@ To see sample code and documentation for the traces exporter, visit the [Collect
 const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
 const { OTLPMetricExporter } =  require('@opentelemetry/exporter-metrics-otlp-proto');
 const collectorOptions = {
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/metrics
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
 };
 const exporter = new OTLPMetricExporter(collectorOptions);
 
