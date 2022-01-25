@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 import { ValueType } from '@opentelemetry/api-metrics';
-import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { AggregatorKind, Histogram, MetricKind, MetricRecord, Point } from '@opentelemetry/sdk-metrics-base';
 import { RPCImpl } from 'protobufjs';
-import { toAttributes } from './common';
+import { hrTimeToLong, toAttributes } from './common';
 import { opentelemetry } from './generated';
 import { Fixed64 } from './types';
 
@@ -132,7 +131,7 @@ function toNumberDataPoint(
         asInt: metric.descriptor.valueType === ValueType.INT ? metric.aggregator.toPoint().value as number : undefined,
         asDouble: metric.descriptor.valueType === ValueType.DOUBLE ? metric.aggregator.toPoint().value as number : undefined,
         startTimeUnixNano: startTime,
-        timeUnixNano: hrTimeToNanoseconds(
+        timeUnixNano: hrTimeToLong(
             metric.aggregator.toPoint().timestamp
         ),
     });
@@ -150,7 +149,7 @@ function toHistogramDataPoint(
         count: point.value.count,
         sum: point.value.sum,
         startTimeUnixNano: startTime,
-        timeUnixNano: hrTimeToNanoseconds(
+        timeUnixNano: hrTimeToLong(
             metric.aggregator.toPoint().timestamp
         ),
     });

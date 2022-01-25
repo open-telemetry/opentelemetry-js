@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 import { Link, SpanKind, SpanStatusCode } from '@opentelemetry/api';
-import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace-base';
 import { RPCImpl } from 'protobufjs';
-import { toAttributes } from './common';
+import { hexToBuf, hrTimeToLong, toAttributes } from './common';
 import { opentelemetry } from './generated';
 
 /**
@@ -70,13 +69,13 @@ function toSpan(
     span: ReadableSpan,
 ): opentelemetry.proto.trace.v1.Span {
     return opentelemetry.proto.trace.v1.Span.fromObject({
-        traceId: Buffer.from(span.spanContext().traceId, 'hex'),
-        spanId: Buffer.from(span.spanContext().spanId, 'hex'),
-        parentSpanId: span.parentSpanId != null ? Buffer.from(span.parentSpanId, 'hex') : undefined,
+        traceId: hexToBuf(span.spanContext().traceId),
+        spanId: hexToBuf(span.spanContext().spanId),
+        parentSpanId: span.parentSpanId != null ? hexToBuf(span.parentSpanId) : undefined,
         name: span.name,
         kind: toKind(span.kind),
-        startTimeUnixNano: hrTimeToNanoseconds(span.startTime),
-        endTimeUnixNano: hrTimeToNanoseconds(span.endTime),
+        startTimeUnixNano: hrTimeToLong(span.startTime),
+        endTimeUnixNano: hrTimeToLong(span.endTime),
         attributes: toAttributes(span.attributes),
         droppedAttributesCount: 0,
         events: span.events && span.events.map(toSpanEvent),
@@ -93,8 +92,8 @@ function toSpan(
 function toLink(link: Link): opentelemetry.proto.trace.v1.Span.Link {
     return opentelemetry.proto.trace.v1.Span.Link.fromObject({
         attributes: link.attributes && toAttributes(link.attributes),
-        spanId: Buffer.from(link.context.spanId, 'hex'),
-        traceId: Buffer.from(link.context.traceId, 'hex'),
+        spanId: hexToBuf(link.context.spanId),
+        traceId: hexToBuf(link.context.traceId),
     });
 }
 
@@ -136,6 +135,6 @@ function toSpanEvent(
     return opentelemetry.proto.trace.v1.Span.Event.fromObject({
         attributes: timedEvent.attributes && toAttributes(timedEvent.attributes),
         name: timedEvent.name,
-        timeUnixNano: hrTimeToNanoseconds(timedEvent.time),
+        timeUnixNano: hrTimeToLong(timedEvent.time),
     });
 }

@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { SpanAttributes } from '@opentelemetry/api';
+import { HrTime, SpanAttributes } from '@opentelemetry/api';
 import { opentelemetry } from './generated';
+import Long = require('long');
 
 const MAX_INTEGER_VALUE = 2147483647;
 const MIN_INTEGER_VALUE = -2147483648;
@@ -47,7 +48,16 @@ export function toAnyValue(value: unknown): opentelemetry.proto.common.v1.AnyVal
                 ? value
                 : undefined,
         boolValue: typeof value === 'boolean' ? value : undefined,
-        bytesValue: value instanceof Buffer ? value : undefined,
+        bytesValue: value instanceof Uint8Array ? value : undefined,
         arrayValue: Array.isArray(value) ? { values: value.map(v => toAnyValue(v)) } : undefined,
     });
+}
+
+export function hexToBuf(hex: string): Uint8Array | undefined {
+    const ints = hex.match(/[\da-f]{2}/gi)?.map(h => parseInt(h, 16));
+    return ints && new Uint8Array(ints);
+}
+
+export function hrTimeToLong(hrtime: HrTime): Long {
+    return Long.fromInt(hrtime[0], true).mul(1e9).add(hrtime[1]);
 }

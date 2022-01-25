@@ -18,6 +18,7 @@ import { TraceState } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
+import Long = require('long');
 import { createExportTraceServiceRequest } from '../src';
 
 describe('Trace', () => {
@@ -116,8 +117,8 @@ describe('Trace', () => {
                                                 ]
                                             }
                                         ],
-                                        startTimeUnixNano: '1640715557342725376',
-                                        endTimeUnixNano: '1640715558642725376',
+                                        startTimeUnixNano: '1640715557342725388',
+                                        endTimeUnixNano: '1640715558642725388',
                                         events: [
                                             {
                                                 attributes: [
@@ -129,7 +130,7 @@ describe('Trace', () => {
                                                     }
                                                 ],
                                                 name: 'some event',
-                                                timeUnixNano: '1640715558542725376'
+                                                timeUnixNano: '1640715558542725388'
                                             }
                                         ],
                                         attributes: [

@@ -51,6 +51,7 @@
     "long": "^4.0.0"
   },
   "devDependencies": {
+    "@opentelemetry/core": "1.0.1",
     "@types/mocha": "8.2.3",
     "istanbul-instrumenter-loader": "3.0.1",
     "karma": "6.3.8",
@@ -59,7 +60,6 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "4.0.2",
-    "long": "^4.0.0",
     "mkdirp": "1.0.4",
     "mocha": "7.2.0",
     "nyc": "15.1.0",
@@ -70,7 +70,6 @@
   },
   "dependencies": {
     "@opentelemetry/api-metrics": "0.27.0",
-    "@opentelemetry/core": "1.0.1",
     "@opentelemetry/resources": "1.0.1",
     "@opentelemetry/sdk-metrics-base": "0.27.0",
     "@opentelemetry/sdk-trace-base": "1.0.1",
