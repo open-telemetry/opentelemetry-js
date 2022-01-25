@@ -37,6 +37,7 @@ export * from './trace/trace_state';
 export { createTraceState } from './trace/internal/utils';
 export * from './trace/tracer_provider';
 export * from './trace/tracer';
+export * from './trace/tracer_options';
 
 export {
   isSpanContextValid,
