@@ -92,6 +92,7 @@ describe('environment', () => {
         OTEL_SPAN_LINK_COUNT_LIMIT: 30,
         OTEL_TRACES_SAMPLER: 'always_on',
         OTEL_TRACES_SAMPLER_ARG: '0.5',
+        OTEL_EXPORTER_OTLP_TIMEOUT: 10000,
       });
       const env = getEnv();
       assert.deepStrictEqual(env.OTEL_NO_PATCH_MODULES, ['a', 'b', 'c']);
@@ -126,6 +127,7 @@ describe('environment', () => {
       assert.strictEqual(env.OTEL_BSP_SCHEDULE_DELAY, 50);
       assert.strictEqual(env.OTEL_TRACES_SAMPLER, 'always_on');
       assert.strictEqual(env.OTEL_TRACES_SAMPLER_ARG, '0.5');
+      assert.strictEqual(env.OTEL_EXPORTER_OTLP_TIMEOUT, 10000);
     });
 
     it('should parse OTEL_LOG_LEVEL despite casing', () => {
