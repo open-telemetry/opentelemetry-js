@@ -25,7 +25,7 @@ import { opentelemetry } from './generated';
  */
 export type TraceClientOptions = {
     rpcImpl: RPCImpl,
-}
+};
 
 /**
  * A wrapper which takes an RPC Implementation and handles protobuf serialization and exporting
@@ -63,7 +63,7 @@ export function createExportTraceServiceRequest(spans: ReadableSpan[]): opentele
                 spans: spans.map(toSpan),
             }]
         }],
-    })
+    });
 }
 
 function toSpan(
@@ -95,18 +95,18 @@ function toLink(link: Link): opentelemetry.proto.trace.v1.Span.Link {
         attributes: link.attributes && toAttributes(link.attributes),
         spanId: Buffer.from(link.context.spanId, 'hex'),
         traceId: Buffer.from(link.context.traceId, 'hex'),
-    })
+    });
 }
 
 function toSpanStatusCode(code: SpanStatusCode): opentelemetry.proto.trace.v1.Status.StatusCode {
     switch (code) {
         case SpanStatusCode.OK:
-            return opentelemetry.proto.trace.v1.Status.StatusCode.STATUS_CODE_OK
+            return opentelemetry.proto.trace.v1.Status.StatusCode.STATUS_CODE_OK;
         case SpanStatusCode.ERROR:
-            return opentelemetry.proto.trace.v1.Status.StatusCode.STATUS_CODE_ERROR
+            return opentelemetry.proto.trace.v1.Status.StatusCode.STATUS_CODE_ERROR;
         case SpanStatusCode.UNSET:
         default:
-            return opentelemetry.proto.trace.v1.Status.StatusCode.STATUS_CODE_UNSET
+            return opentelemetry.proto.trace.v1.Status.StatusCode.STATUS_CODE_UNSET;
     }
 }
 
@@ -115,17 +115,17 @@ function toKind(
 ): opentelemetry.proto.trace.v1.Span.SpanKind {
     switch (kind) {
         case SpanKind.CLIENT:
-            return opentelemetry.proto.trace.v1.Span.SpanKind.SPAN_KIND_CLIENT
+            return opentelemetry.proto.trace.v1.Span.SpanKind.SPAN_KIND_CLIENT;
         case SpanKind.CONSUMER:
-            return opentelemetry.proto.trace.v1.Span.SpanKind.SPAN_KIND_CONSUMER
+            return opentelemetry.proto.trace.v1.Span.SpanKind.SPAN_KIND_CONSUMER;
         case SpanKind.INTERNAL:
-            return opentelemetry.proto.trace.v1.Span.SpanKind.SPAN_KIND_INTERNAL
+            return opentelemetry.proto.trace.v1.Span.SpanKind.SPAN_KIND_INTERNAL;
         case SpanKind.PRODUCER:
-            return opentelemetry.proto.trace.v1.Span.SpanKind.SPAN_KIND_PRODUCER
+            return opentelemetry.proto.trace.v1.Span.SpanKind.SPAN_KIND_PRODUCER;
         case SpanKind.SERVER:
-            return opentelemetry.proto.trace.v1.Span.SpanKind.SPAN_KIND_SERVER
+            return opentelemetry.proto.trace.v1.Span.SpanKind.SPAN_KIND_SERVER;
         default:
-            return opentelemetry.proto.trace.v1.Span.SpanKind.SPAN_KIND_UNSPECIFIED
+            return opentelemetry.proto.trace.v1.Span.SpanKind.SPAN_KIND_UNSPECIFIED;
     }
 }
 
@@ -137,5 +137,5 @@ function toSpanEvent(
         attributes: timedEvent.attributes && toAttributes(timedEvent.attributes),
         name: timedEvent.name,
         timeUnixNano: hrTimeToNanoseconds(timedEvent.time),
-    })
+    });
 }

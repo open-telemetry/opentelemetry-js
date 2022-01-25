@@ -182,7 +182,7 @@ describe('Trace', () => {
                 assert.strictEqual(spanStatus.code, 'STATUS_CODE_ERROR');
                 assert.strictEqual(spanStatus.message, 'error message');
             });
-    
+
             it('unset', () => {
                 span.status.code = SpanStatusCode.UNSET;
                 const exportRequest = createExportTraceServiceRequest([span]);

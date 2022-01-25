@@ -32,7 +32,7 @@ export function toKeyValue(
     return opentelemetry.proto.common.v1.KeyValue.fromObject({
         key: key,
         value: toAnyValue(value),
-    })
+    });
 }
 
 export function toAnyValue(value: unknown): opentelemetry.proto.common.v1.AnyValue {
@@ -49,5 +49,5 @@ export function toAnyValue(value: unknown): opentelemetry.proto.common.v1.AnyVal
         boolValue: typeof value === 'boolean' ? value : undefined,
         bytesValue: value instanceof Buffer ? value : undefined,
         arrayValue: Array.isArray(value) ? { values: value.map(v => toAnyValue(v)) } : undefined,
-    })
+    });
 }

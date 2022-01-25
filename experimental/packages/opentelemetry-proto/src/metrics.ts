@@ -24,7 +24,7 @@ import { Fixed64 } from './types';
 export type MetricsClientOptions = {
     rpcImpl: RPCImpl,
     startTime: Fixed64,
-}
+};
 export class MetricsServiceClient {
     private _service: opentelemetry.proto.collector.metrics.v1.MetricsService;
     private _startTime: Fixed64;
@@ -100,7 +100,7 @@ function toSum(
             metric.descriptor.metricKind === MetricKind.COUNTER ||
             metric.descriptor.metricKind === MetricKind.OBSERVABLE_COUNTER,
         aggregationTemporality: toAggregationTemporality(metric),
-    })
+    });
 }
 
 function toGauge(
@@ -110,7 +110,7 @@ function toGauge(
     return opentelemetry.proto.metrics.v1.Gauge.fromObject({
         dataPoints: [toNumberDataPoint(metric, startTime)],
         aggregationTemporality: toAggregationTemporality(metric),
-    })
+    });
 }
 
 function toHistogram(
@@ -142,7 +142,7 @@ function toHistogramDataPoint(
     metric: MetricRecord,
     startTime: Fixed64
 ): opentelemetry.proto.metrics.v1.HistogramDataPoint {
-    const point = metric.aggregator.toPoint() as Point<Histogram>
+    const point = metric.aggregator.toPoint() as Point<Histogram>;
     return opentelemetry.proto.metrics.v1.HistogramDataPoint.fromObject({
         attributes: toAttributes(metric.attributes),
         bucketCounts: point.value.buckets.counts,
@@ -153,5 +153,5 @@ function toHistogramDataPoint(
         timeUnixNano: hrTimeToNanoseconds(
             metric.aggregator.toPoint().timestamp
         ),
-    })
+    });
 }
