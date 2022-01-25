@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-import { detectResources as detect } from '../utils';
-
 /**
  * Runs all resource detectors and returns the results merged into a single
  * Resource.
  *
  * @param config Configuration for resource detection
  */
-export const detectResources = detect;
+ export { detectResources } from '../utils';
