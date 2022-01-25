@@ -12,7 +12,7 @@
   "scripts": {
     "compile": "tsc --build",
     "generate": "npm run generate:js && npm run generate:types",
-    "generate:js": "mkdir -p src/generated && pbjs -t static-module -w commonjs -o src/generated/index.js opentelemetry-proto/opentelemetry/**/*.proto",
+    "generate:js": "mkdirp src/generated && pbjs -t static-module -w commonjs -o src/generated/index.js opentelemetry-proto/opentelemetry/**/*.proto",
     "generate:types": "pbts -o src/generated/index.d.ts src/generated/index.js",
     "clean": "tsc --build --clean && rimraf src/generated",
     "lint": "eslint . --ext .ts",
@@ -52,6 +52,7 @@
   "devDependencies": {
     "@types/mocha": "8.2.3",
     "long": "^4.0.0",
+    "mkdirp": "1.0.4",
     "mocha": "7.2.0",
     "rimraf": "3.0.2",
     "typescript": "4.4.4"
