@@ -48,8 +48,8 @@ export function createInstrumentDescriptorWithView(view: View, instrument: Instr
 }
 
 export function isDescriptorCompatibleWith(descriptor: InstrumentDescriptor, otherDescriptor: InstrumentDescriptor) {
+  // description is ignored as it is not semantic in nature.
   return descriptor.name === otherDescriptor.name
-    && descriptor.description === otherDescriptor.description
     && descriptor.unit === otherDescriptor.unit
     && descriptor.type === otherDescriptor.type
     && descriptor.valueType === otherDescriptor.valueType;
@@ -57,17 +57,14 @@ export function isDescriptorCompatibleWith(descriptor: InstrumentDescriptor, oth
 
 export function getDescriptorIncompatibilityDetails(existing: InstrumentDescriptor, otherDescriptor: InstrumentDescriptor) {
   let incompatibility = '';
-  if (existing.description !== otherDescriptor.description) {
-    incompatibility += `\n- Description '${existing.description}' does not match '${otherDescriptor.description}'`;
-  }
   if (existing.unit !== otherDescriptor.unit) {
-    incompatibility += `\n- Unit '${existing.unit}' does not match '${otherDescriptor.description}'`;
+    incompatibility += `\t- Unit '${existing.unit}' does not match '${otherDescriptor.description}'\n`;
   }
   if (existing.type !== otherDescriptor.type) {
-    incompatibility += `\n- Type '${existing.type}' does not match '${otherDescriptor.type}'`;
+    incompatibility += `\t- Type '${existing.type}' does not match '${otherDescriptor.type}'\n`;
   }
   if (existing.valueType !== otherDescriptor.valueType) {
-    incompatibility += `\n- Value Type '${existing.valueType}' does not match '${otherDescriptor.valueType}'`;
+    incompatibility += `\t- Value Type '${existing.valueType}' does not match '${otherDescriptor.valueType}'\n`;
   }
 
   return incompatibility;
