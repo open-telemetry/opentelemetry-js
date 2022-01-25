@@ -164,7 +164,7 @@ export function getResource(
   }
   const sorted = sortResources(filteredResources);
 
-  if (parsedSpanUrl.origin !== window.location.origin && sorted.length > 1) {
+  if (parsedSpanUrl.origin !== location.origin && sorted.length > 1) {
     let corsPreFlightRequest: PerformanceResourceTiming | undefined = sorted[0];
     let mainRequest: PerformanceResourceTiming = findMainRequest(
       sorted,
@@ -421,7 +421,7 @@ export function shouldPropagateTraceHeaders(
   }
   const parsedSpanUrl = parseUrl(spanUrl);
 
-  if (parsedSpanUrl.origin === window.location.origin) {
+  if (parsedSpanUrl.origin === location.origin) {
     return true;
   } else {
     return propagateTraceHeaderUrls.some(propagateTraceHeaderUrl =>

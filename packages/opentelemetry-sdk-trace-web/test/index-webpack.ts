@@ -13,8 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const testsContext = require.context('.', true, /test$/);
-testsContext.keys().forEach(testsContext);
 
-const srcContext = require.context('.', true, /src$/);
-srcContext.keys().forEach(srcContext);
+{
+  const testsContext = require.context('./', false, /test$/);
+  testsContext.keys().forEach(testsContext);
+}
+
+{
+  const testsContext = require.context('./window', false, /test$/);
+  testsContext.keys().forEach(testsContext);
+}

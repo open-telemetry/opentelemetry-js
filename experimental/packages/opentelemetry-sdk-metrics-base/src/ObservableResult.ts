@@ -14,28 +14,13 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import * as metrics from '@opentelemetry/api-metrics-wip';
+import { AttributeHashMap } from './state/HashMap';
 
-interface ErrorLikeConstructor {
-  new(): Error;
-}
+export class ObservableResult implements metrics.ObservableResult {
+  buffer = new AttributeHashMap<number>();
 
-/**
- * Node.js v8.x and browser compatible `assert.rejects`.
- */
-export async function assertRejects(actual: any, expected: RegExp | ErrorLikeConstructor) {
-  let rejected;
-  try {
-    if (typeof actual === 'function') {
-      await actual();
-    } else {
-      await actual;
-    }
-  } catch (err) {
-    rejected = true;
-    assert.throws(() => {
-      throw err;
-    }, expected);
+  observe(value: number, attributes: metrics.Attributes = {}): void {
+    this.buffer.set(attributes, value);
   }
-  assert(rejected, 'Promise not rejected');
 }

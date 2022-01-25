@@ -14,28 +14,8 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+const testsContext = require.context('.', true, /test$/);
+testsContext.keys().forEach(testsContext);
 
-interface ErrorLikeConstructor {
-  new(): Error;
-}
-
-/**
- * Node.js v8.x and browser compatible `assert.rejects`.
- */
-export async function assertRejects(actual: any, expected: RegExp | ErrorLikeConstructor) {
-  let rejected;
-  try {
-    if (typeof actual === 'function') {
-      await actual();
-    } else {
-      await actual;
-    }
-  } catch (err) {
-    rejected = true;
-    assert.throws(() => {
-      throw err;
-    }, expected);
-  }
-  assert(rejected, 'Promise not rejected');
-}
+const srcContext = require.context('.', true, /src$/);
+srcContext.keys().forEach(srcContext);
