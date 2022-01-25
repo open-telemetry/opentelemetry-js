@@ -20,6 +20,7 @@
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
+    "test:browser": "nyc karma start --single-run",
     "watch": "npm run generate && tsc --build -w tsconfig.all.json",
     "precompile": "npm run generate",
     "prewatch": "npm run precompile"
@@ -51,11 +52,21 @@
   },
   "devDependencies": {
     "@types/mocha": "8.2.3",
+    "istanbul-instrumenter-loader": "3.0.1",
+    "karma": "6.3.8",
+    "karma-chrome-launcher": "3.1.0",
+    "karma-coverage-istanbul-reporter": "3.0.3",
+    "karma-mocha": "2.0.1",
+    "karma-spec-reporter": "0.0.32",
+    "karma-webpack": "4.0.2",
     "long": "^4.0.0",
     "mkdirp": "1.0.4",
     "mocha": "7.2.0",
+    "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "typescript": "4.4.4"
+    "ts-loader": "8.3.0",
+    "typescript": "4.4.4",
+    "webpack": "4.46.0"
   },
   "dependencies": {
     "@opentelemetry/api-metrics": "0.27.0",
