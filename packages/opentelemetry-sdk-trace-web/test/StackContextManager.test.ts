@@ -111,7 +111,7 @@ describe('StackContextManager', () => {
         assert.strictEqual(contextManager.active(), ctx1);
         return done();
       });
-      assert.strictEqual(contextManager.active(), window);
+      assert.strictEqual(contextManager.active(), globalThis);
     });
 
     it('should finally restore an old context when context is an object', done => {
@@ -130,7 +130,7 @@ describe('StackContextManager', () => {
         assert.strictEqual(contextManager.active(), ctx1);
         return done();
       });
-      assert.strictEqual(contextManager.active(), window);
+      assert.strictEqual(contextManager.active(), globalThis);
     });
 
     it('should forward this, arguments and return value', () => {

@@ -14,20 +14,11 @@
  * limitations under the License.
  */
 
-module.exports = {
-  listenAddress: 'localhost',
-  hostname: 'localhost',
-  browsers: ['ChromeHeadless'],
-  frameworks: ['mocha'],
-  coverageIstanbulReporter: {
-    reports: ['html', 'json'],
-    dir: '.nyc_output',
-    fixWebpackSourcePaths: true
-  },
-  reporters: ['spec', 'coverage-istanbul'],
-  files: ['test/index-webpack.ts'],
-  preprocessors: {
-    'test/index-webpack*.ts': ['webpack']
-  },
-  webpackMiddleware: { noInfo: true }
+const karmaWebpackConfig = require('../../karma.webpack');
+const karmaBaseConfig = require('../../karma.worker');
+
+module.exports = (config) => {
+  config.set(Object.assign({}, karmaBaseConfig, {
+    webpack: karmaWebpackConfig
+  }))
 };

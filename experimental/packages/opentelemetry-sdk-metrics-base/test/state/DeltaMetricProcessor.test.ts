@@ -18,40 +18,89 @@ import * as api from '@opentelemetry/api';
 import * as assert from 'assert';
 import { DropAggregator, SumAggregator } from '../../src/aggregator';
 import { DeltaMetricProcessor } from '../../src/state/DeltaMetricProcessor';
+import { AttributeHashMap } from '../../src/state/HashMap';
 import { commonAttributes, commonValues } from '../util';
 
 describe('DeltaMetricProcessor', () => {
   describe('record', () => {
     it('no exceptions on record with DropAggregator', () => {
-      const metricStorage = new DeltaMetricProcessor(new DropAggregator());
+      const metricProcessor = new DeltaMetricProcessor(new DropAggregator());
 
       for (const value of commonValues) {
         for (const attributes of commonAttributes) {
-          metricStorage.record(value, attributes, api.context.active());
+          metricProcessor.record(value, attributes, api.context.active());
         }
       }
     });
 
     it('no exceptions on record with no-drop aggregator', () => {
-      const metricStorage = new DeltaMetricProcessor(new SumAggregator());
+      const metricProcessor = new DeltaMetricProcessor(new SumAggregator());
 
       for (const value of commonValues) {
         for (const attributes of commonAttributes) {
-          metricStorage.record(value, attributes, api.context.active());
+          metricProcessor.record(value, attributes, api.context.active());
         }
+      }
+    });
+  });
+
+  describe('batchCumulate', () => {
+    it('no exceptions on batchCumulate with DropAggregator', () => {
+      const metricProcessor = new DeltaMetricProcessor(new DropAggregator());
+
+      const measurements = new AttributeHashMap<number>();
+      for (const value of commonValues) {
+        for (const attributes of commonAttributes) {
+          measurements.set(attributes, value);
+        }
+      }
+      metricProcessor.batchCumulate(measurements);
+    });
+
+    it('no exceptions on record with no-drop aggregator', () => {
+      const metricProcessor = new DeltaMetricProcessor(new SumAggregator());
+
+      const measurements = new AttributeHashMap<number>();
+      for (const value of commonValues) {
+        for (const attributes of commonAttributes) {
+          measurements.set(attributes, value);
+        }
+      }
+      metricProcessor.batchCumulate(measurements);
+    });
+
+    it('should compute the diff of accumulations', () => {
+      const metricProcessor = new DeltaMetricProcessor(new SumAggregator());
+
+      {
+        const measurements = new AttributeHashMap<number>();
+        measurements.set({}, 10);
+        metricProcessor.batchCumulate(measurements);
+        const accumulations = metricProcessor.collect();
+        const accumulation = accumulations.get({});
+        assert.strictEqual(accumulation?.toPoint(), 10);
+      }
+
+      {
+        const measurements = new AttributeHashMap<number>();
+        measurements.set({}, 21);
+        metricProcessor.batchCumulate(measurements);
+        const accumulations = metricProcessor.collect();
+        const accumulation = accumulations.get({});
+        assert.strictEqual(accumulation?.toPoint(), 11);
       }
     });
   });
 
   describe('collect', () => {
     it('should export', () => {
-      const metricStorage = new DeltaMetricProcessor(new SumAggregator());
+      const metricProcessor = new DeltaMetricProcessor(new SumAggregator());
 
-      metricStorage.record(1, { attribute: '1' }, api.ROOT_CONTEXT);
-      metricStorage.record(2, { attribute: '1' }, api.ROOT_CONTEXT);
-      metricStorage.record(1, { attribute: '2' }, api.ROOT_CONTEXT);
+      metricProcessor.record(1, { attribute: '1' }, api.ROOT_CONTEXT);
+      metricProcessor.record(2, { attribute: '1' }, api.ROOT_CONTEXT);
+      metricProcessor.record(1, { attribute: '2' }, api.ROOT_CONTEXT);
 
-      let accumulations = metricStorage.collect();
+      let accumulations = metricProcessor.collect();
       assert.strictEqual(accumulations.size, 2);
       {
         const accumulation = accumulations.get({ attribute: '1' });
@@ -63,7 +112,7 @@ describe('DeltaMetricProcessor', () => {
       }
 
       /** the accumulations shall be reset. */
-      accumulations = metricStorage.collect();
+      accumulations = metricProcessor.collect();
       assert.strictEqual(accumulations.size, 0);
     });
   });
