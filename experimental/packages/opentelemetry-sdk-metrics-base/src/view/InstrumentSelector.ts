@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { InstrumentType } from '../Instruments';
+import { InstrumentType } from '../InstrumentDescriptor';
 import { PatternPredicate, Predicate } from './Predicate';
 
 export interface InstrumentSelectorCriteria {
