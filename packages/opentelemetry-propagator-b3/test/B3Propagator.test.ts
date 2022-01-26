@@ -163,7 +163,7 @@ describe('B3Propagator', () => {
             }
             return [carrier[key]];
           },
-        
+
           keys: defaultTextMapGetter.keys
         }
       );

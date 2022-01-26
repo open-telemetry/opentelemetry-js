@@ -18,46 +18,55 @@ import * as api from '@opentelemetry/api';
 import * as metrics from '@opentelemetry/api-metrics-wip';
 import { Resource } from '@opentelemetry/resources';
 import { Meter } from './Meter';
-import { MetricExporter } from './MetricExporter';
-import { MetricReader } from './MetricReader';
+import { MetricReader } from './export/MetricReader';
 import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { InstrumentSelector } from './view/InstrumentSelector';
 import { MeterSelector } from './view/MeterSelector';
 import { View } from './view/View';
+import { MetricCollector } from './state/MetricCollector';
 
-
-// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#meterprovider
-
-export type MeterProviderOptions = {
+/**
+ * MeterProviderOptions provides an interface for configuring a MeterProvider.
+ */
+export interface MeterProviderOptions {
+  /** Resource associated with metric telemetry  */
   resource?: Resource;
 }
 
-export class MeterProvider {
+/**
+ * This class implements the {@link metrics.MeterProvider} interface.
+ */
+export class MeterProvider implements metrics.MeterProvider {
   private _sharedState: MeterProviderSharedState;
   private _shutdown = false;
-  private _metricReaders: MetricReader[] = [];
-  private _metricExporters: MetricExporter[] = [];
 
-  constructor(options: MeterProviderOptions) {
-    this._sharedState = new MeterProviderSharedState(options.resource ?? Resource.empty());
+  constructor(options?: MeterProviderOptions) {
+    this._sharedState = new MeterProviderSharedState(options?.resource ?? Resource.empty());
   }
 
+  /**
+   * Get a meter with the configuration of the MeterProvider.
+   */
   getMeter(name: string, version = '', options: metrics.MeterOptions = {}): metrics.Meter {
     // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#meter-creation
     if (this._shutdown) {
-        api.diag.warn('A shutdown MeterProvider cannot provide a Meter')
+        api.diag.warn('A shutdown MeterProvider cannot provide a Meter');
         return metrics.NOOP_METER;
     }
 
-    // Spec leaves it unspecified if creating a meter with duplicate
-    // name/version returns the same meter. We create a new one here
-    // for simplicity. This may change in the future.
-    // TODO: consider returning the same meter if the same name/version is used
     return new Meter(this._sharedState, { name, version, schemaUrl: options.schemaUrl });
   }
 
+  /**
+   * Register a {@link MetricReader} to the meter provider. After the
+   * registration, the MetricReader can start metrics collection.
+   *
+   * @param metricReader the metric reader to be registered.
+   */
   addMetricReader(metricReader: MetricReader) {
-    this._metricReaders.push(metricReader);
+    const collector = new MetricCollector(this._sharedState, metricReader);
+    metricReader.setMetricProducer(collector);
+    this._sharedState.metricCollectors.push(collector);
   }
 
   addView(view: View, instrumentSelector: InstrumentSelector, meterSelector: MeterSelector) {
@@ -66,7 +75,8 @@ export class MeterProvider {
   }
 
   /**
-   * Flush all buffered data and shut down the MeterProvider and all exporters and metric readers.
+   * Flush all buffered data and shut down the MeterProvider and all registered
+   * MetricReaders.
    * Returns a promise which is resolved when all flushes are complete.
    *
    * TODO: return errors to caller somehow?
@@ -82,21 +92,20 @@ export class MeterProvider {
     // TODO add a timeout - spec leaves it up the the SDK if this is configurable
     this._shutdown = true;
 
-    // Shut down all exporters and readers.
-    // Log all Errors.
-    for (const exporter of this._metricExporters) {
+    for (const collector of this._sharedState.metricCollectors) {
       try {
-        await exporter.shutdown();
+        await collector.shutdown();
       } catch (e) {
+        // Log all Errors.
         if (e instanceof Error) {
-          api.diag.error(`Error shutting down: ${e.message}`)
+          api.diag.error(`Error shutting down: ${e.message}`);
         }
       }
     }
   }
 
   /**
-   * Notifies all exporters and metric readers to flush any buffered data.
+   * Notifies all registered MetricReaders to flush any buffered data.
    * Returns a promise which is resolved when all flushes are complete.
    *
    * TODO: return errors to caller somehow?
@@ -108,16 +117,17 @@ export class MeterProvider {
 
     // do not flush after shutdown
     if (this._shutdown) {
-      api.diag.warn('invalid attempt to force flush after shutdown')
+      api.diag.warn('invalid attempt to force flush after shutdown');
       return;
     }
 
-    for (const exporter of [...this._metricExporters, ...this._metricReaders]) {
+    for (const collector of this._sharedState.metricCollectors) {
       try {
-        await exporter.forceFlush();
+        await collector.forceFlush();
       } catch (e) {
+        // Log all Errors.
         if (e instanceof Error) {
-          api.diag.error(`Error flushing: ${e.message}`)
+          api.diag.error(`Error flushing: ${e.message}`);
         }
       }
     }
