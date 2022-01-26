@@ -24,11 +24,12 @@ import {
 
 describe('browserDetector()', () => {
   beforeEach(() => {
-    global.window = {
+    globalThis.window = {};
+    sinon.stub(globalThis, 'window').value({
       navigator: {
         userAgent: '',
       }
-    };
+    });
   });
 
   afterEach(() => {
@@ -36,8 +37,10 @@ describe('browserDetector()', () => {
   });
 
   it('should return browser information', async () => {
-    sinon.stub(window, 'navigator').value({
-      userAgent: 'dddd',
+    sinon.stub(globalThis, 'window').value({
+      navigator: {
+        userAgent: 'dddd',
+      }
     });
 
     const resource: Resource = await browserDetector.detect();
