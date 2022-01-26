@@ -42,7 +42,7 @@ describe('processDetector()', () => {
       command: '/home/ot/test.js',
       commandLine: '/tmp/node /home/ot/test.js arg1 arg2',
       version: '1.4.1',
-      runtimeDescription: 'NodeJS',
+      runtimeDescription: 'Node.js',
       runtimeName: 'nodejs',
     });
   });
