@@ -15,15 +15,13 @@
  */
 
 import { MetricStorageRegistry } from '../../src/state/MetricStorageRegistry';
-import { InstrumentType } from '../../src/Instruments';
 import { ValueType } from '@opentelemetry/api-metrics-wip';
 import { MetricStorage } from '../../src/state/MetricStorage';
 import { HrTime } from '@opentelemetry/api';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { MetricData } from '../../src/export/MetricData';
 import { MetricCollectorHandle } from '../../src/state/MetricCollector';
-import { InstrumentDescriptor } from '../../src/InstrumentDescriptor';
+import { MetricData, InstrumentDescriptor, InstrumentType } from '../../src';
 import { Maybe } from '../../src/utils';
 import * as assert from 'assert';
 

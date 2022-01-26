@@ -19,17 +19,6 @@ import * as metrics from '@opentelemetry/api-metrics-wip';
 import { InstrumentDescriptor } from './InstrumentDescriptor';
 import { WritableMetricStorage } from './state/WritableMetricStorage';
 
-// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#instrument
-
-export enum InstrumentType {
-  COUNTER = 'COUNTER',
-  HISTOGRAM = 'HISTOGRAM',
-  UP_DOWN_COUNTER = 'UP_DOWN_COUNTER',
-  OBSERVABLE_COUNTER = 'OBSERVABLE_COUNTER',
-  OBSERVABLE_GAUGE = 'OBSERVABLE_GAUGE',
-  OBSERVABLE_UP_DOWN_COUNTER = 'OBSERVABLE_UP_DOWN_COUNTER',
-}
-
 export class SyncInstrument {
   constructor(private _writableMetricStorage: WritableMetricStorage, private _descriptor: InstrumentDescriptor) { }
 
@@ -42,13 +31,25 @@ export class SyncInstrument {
   }
 }
 
-export class UpDownCounter extends SyncInstrument implements metrics.Counter {
+/**
+ * The class implements {@link metrics.UpDownCounter} interface.
+ */
+export class UpDownCounter extends SyncInstrument implements metrics.UpDownCounter {
+  /**
+   * Increment value of counter by the input. Inputs may be negative.
+   */
   add(value: number, attributes?: metrics.Attributes, ctx?: api.Context): void {
     this.aggregate(value, attributes, ctx);
   }
 }
 
+/**
+ * The class implements {@link metrics.Counter} interface.
+ */
 export class Counter extends SyncInstrument implements metrics.Counter {
+  /**
+   * Increment value of counter by the input. Inputs may not be negative.
+   */
   add(value: number, attributes?: metrics.Attributes, ctx?: api.Context): void {
     if (value < 0) {
       api.diag.warn(`negative value provided to counter ${this.getName()}: ${value}`);
@@ -59,7 +60,13 @@ export class Counter extends SyncInstrument implements metrics.Counter {
   }
 }
 
+/**
+ * The class implements {@link metrics.Histogram} interface.
+ */
 export class Histogram extends SyncInstrument implements metrics.Histogram {
+  /**
+   * Records a measurement. Value of the measurement must not be negative.
+   */
   record(value: number, attributes?: metrics.Attributes, ctx?: api.Context): void {
     this.aggregate(value, attributes, ctx);
   }
