@@ -111,17 +111,21 @@ export abstract class OTLPExporterBase<
   }
 
   private _configureTimeout(timeoutMillis: number | undefined): number {
-    let defaultTimeout = getEnv().OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
-
-    if ( defaultTimeout === null) {
-      defaultTimeout = getEnv().OTEL_EXPORTER_OTLP_TIMEOUT;
-    }
+    const timeout = this._selectATimeout();
 
     return typeof timeoutMillis === 'number'
-        ? timeoutMillis < 0
-          ? this._invalidTimeout(timeoutMillis, defaultTimeout)
-          : timeoutMillis
-            : defaultTimeout;
+      ? timeoutMillis < 0
+        ? this._invalidTimeout(timeoutMillis, timeout)
+        : timeoutMillis
+          : timeout;
+  }
+
+  private _selectATimeout(): number {
+    const definedTimeout =
+      Number(process.env.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT ||
+      process.env.OTEL_EXPORTER_OTLP_TIMEOUT);
+
+    return definedTimeout ? definedTimeout : getEnv().OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
   }
 
   private _invalidTimeout(timeout: number, defaultTimeout: number): number {
