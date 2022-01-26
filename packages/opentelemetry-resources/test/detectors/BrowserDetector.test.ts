@@ -24,7 +24,7 @@ import {
 
 describe('browserDetector()', () => {
   beforeEach(() => {
-    globalThis.window = {};
+    (globalThis.window as {}) = {};
     sinon.stub(globalThis, 'window').value({
       navigator: {
         userAgent: '',
