@@ -54,11 +54,9 @@ export class FilteringAttributesProcessor extends AttributesProcessor {
 
   process(incoming: Attributes, _context: Context): Attributes {
     const filteredAttributes: Attributes = {};
-    for (const allowedAttributeName of this._allowedAttributeNames) {
-      if (Object.prototype.hasOwnProperty.call(incoming, allowedAttributeName)) {
-        filteredAttributes[allowedAttributeName] = incoming[allowedAttributeName];
-      }
-    }
+    Object.keys(incoming)
+      .filter(attributeName => this._allowedAttributeNames.includes(attributeName))
+      .forEach(attributeName => filteredAttributes[attributeName] = incoming[attributeName]);
     return filteredAttributes;
   }
 }
