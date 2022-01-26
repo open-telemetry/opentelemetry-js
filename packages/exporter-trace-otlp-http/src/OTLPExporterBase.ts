@@ -56,12 +56,8 @@ export abstract class OTLPExporterBase<
       typeof config.concurrencyLimit === 'number'
         ? config.concurrencyLimit
         : Infinity;
-    this._timeoutMillis =
-      typeof config.timeoutMillis === 'number'
-        ? config.timeoutMillis < 0
-          ? this._invalidTimeout(config.timeoutMillis)
-          : config.timeoutMillis
-            : getEnv().OTEL_EXPORTER_OTLP_TIMEOUT;
+
+    this._timeoutMillis = this._configureTimeout(config.timeoutMillis);
 
     // platform dependent
     this.onInit(config);
@@ -114,9 +110,24 @@ export abstract class OTLPExporterBase<
     });
   }
 
-  private _invalidTimeout(timeout: number): number {
+  private _configureTimeout(timeoutMillis: number | undefined): number {
+    let defaultTimeout = getEnv().OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
+
+    if ( defaultTimeout === null) {
+      defaultTimeout = getEnv().OTEL_EXPORTER_OTLP_TIMEOUT;
+    }
+
+    return typeof timeoutMillis === 'number'
+        ? timeoutMillis < 0
+          ? this._invalidTimeout(timeoutMillis, defaultTimeout)
+          : timeoutMillis
+            : defaultTimeout;
+  }
+
+  private _invalidTimeout(timeout: number, defaultTimeout: number): number {
     diag.warn('Timeout must be non-negative', timeout);
-    return getEnv().OTEL_EXPORTER_OTLP_TIMEOUT;
+
+    return defaultTimeout;
   }
 
   /**
