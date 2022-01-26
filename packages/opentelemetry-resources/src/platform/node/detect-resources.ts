@@ -14,10 +14,4 @@
  * limitations under the License.
  */
 
-/**
- * Runs all resource detectors and returns the results merged into a single
- * Resource.
- *
- * @param config Configuration for resource detection
- */
  export { detectResources } from '../utils';

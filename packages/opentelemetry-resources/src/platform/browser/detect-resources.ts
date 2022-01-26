@@ -14,11 +14,4 @@
  * limitations under the License.
  */
 
-/**
- * Detects resources for the browser platform, which is currently only the
- * telemetry SDK resource. More could be added in the future. This method
- * is async to match the signature of corresponding method for node.
- *
- * @param config Configuration for resource detection
- */
 export { detectResources } from '../utils';
