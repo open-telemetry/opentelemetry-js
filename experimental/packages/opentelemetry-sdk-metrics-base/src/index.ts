@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
-export { MeterProvider, MeterProviderOptions } from './MeterProvider';
+export * from './export/AggregationTemporality';
+export * from './export/MetricData';
 export * from './export/MetricExporter';
+export * from './export/MetricProducer';
 export * from './export/MetricReader';
+export * from './export/PeriodicExportingMetricReader';
+export { InstrumentDescriptor, InstrumentType } from './InstrumentDescriptor';
+export * from './Instruments';
+export * from './Meter';
+export * from './MeterProvider';
+export * from './ObservableResult';
+export { TimeoutError } from './utils';
