@@ -24,6 +24,9 @@ import { InstrumentSelector } from './view/InstrumentSelector';
 import { MeterSelector } from './view/MeterSelector';
 import { View } from './view/View';
 import { MetricCollector } from './state/MetricCollector';
+import { Aggregation } from './view/Aggregation';
+import { FilteringAttributesProcessor } from './view/AttributesProcessor';
+import { InstrumentType } from './InstrumentDescriptor';
 
 /**
  * MeterProviderOptions provides an interface for configuring a MeterProvider.
@@ -32,6 +35,54 @@ export interface MeterProviderOptions {
   /** Resource associated with metric telemetry  */
   resource?: Resource;
 }
+
+export type ViewOptions = {
+  /**
+   *  If not provided, the Instrument name will be used by default. This will be used as the name of the metrics stream.
+   */
+  name?: string,
+  instrument?: {
+    /**
+     * The type of the Instrument(s).
+     */
+    type?: InstrumentType,
+    /**
+     * Name of the Instrument(s) with wildcard support.
+     */
+    name?: string,
+  }
+  meter?: {
+    /**
+     * The name of the Meter.
+     */
+    name?: string;
+    /**
+     * The version of the Meter.
+     */
+    version?: string;
+    /**
+     * The schema URL of the Meter.
+     */
+    schemaUrl?: string;
+  }
+  stream?: {
+    /**
+     * If not provided, the Instrument description will be used by default.
+     */
+    description?: string,
+    /**
+     * If provided, the attributes that are not in the list will be ignored.
+     * If not provided, all the attribute keys will be used by default.
+     */
+    attributeKeys?: string[],
+    /**
+     * The aggregation to be used.
+     */
+    aggregation?: Aggregation,
+
+    // TODO: Add ExemplarReservoir.
+  }
+};
 
 /**
  * This class implements the {@link metrics.MeterProvider} interface.
@@ -50,8 +101,8 @@ export class MeterProvider implements metrics.MeterProvider {
   getMeter(name: string, version = '', options: metrics.MeterOptions = {}): metrics.Meter {
     // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#meter-creation
     if (this._shutdown) {
-        api.diag.warn('A shutdown MeterProvider cannot provide a Meter');
-        return metrics.NOOP_METER;
+      api.diag.warn('A shutdown MeterProvider cannot provide a Meter');
+      return metrics.NOOP_METER;
     }
 
     return new Meter(this._sharedState, { name, version, schemaUrl: options.schemaUrl });
@@ -69,9 +120,33 @@ export class MeterProvider implements metrics.MeterProvider {
     this._sharedState.metricCollectors.push(collector);
   }
 
-  addView(view: View, instrumentSelector: InstrumentSelector, meterSelector: MeterSelector) {
-    // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#view
-    this._sharedState.viewRegistry.addView(view, instrumentSelector, meterSelector);
+  addView(options: ViewOptions) {
+    // the SDK MUST NOT allow Views with a specified name to be declared with instrument selectors that select by instrument type or wildcard
+    if (options.name !== undefined) {
+      if (options.instrument?.type !== undefined) {
+        throw new Error('Views with a specified name must not be declared with instrument selectors that select by instrument type.');
+      }
+      if (options.instrument?.name !== undefined && options.instrument.name.includes('*')) {
+        throw new Error('Views with a specified name must not be declared with instrument selectors that select by wildcard.');
+      }
+    }
+
+    // Create AttributesProcessor if attributeKeys are defined set.
+    let attributesProcessor = undefined;
+    if (options.stream?.attributeKeys !== undefined) {
+      attributesProcessor = new FilteringAttributesProcessor(options.stream?.attributeKeys);
+    }
+
+    const view = new View({
+      name: options.name,
+      description: options.stream?.description,
+      aggregation: options.stream?.aggregation,
+      attributesProcessor: attributesProcessor
+    });
+    const instrument = new InstrumentSelector(options.instrument);
+    const meter = new MeterSelector(options.meter);
+
+    this._sharedState.viewRegistry.addView(view, instrument, meter);
   }
 
   /**
