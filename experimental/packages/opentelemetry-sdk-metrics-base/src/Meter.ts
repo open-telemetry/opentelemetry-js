@@ -16,8 +16,8 @@
 
 import * as metrics from '@opentelemetry/api-metrics-wip';
 import { InstrumentationLibrary } from '@opentelemetry/core';
-import { createInstrumentDescriptor, InstrumentDescriptor } from './InstrumentDescriptor';
-import { Counter, Histogram, InstrumentType, UpDownCounter } from './Instruments';
+import { createInstrumentDescriptor, InstrumentDescriptor, InstrumentType } from './InstrumentDescriptor';
+import { Counter, Histogram, UpDownCounter } from './Instruments';
 import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { MultiMetricStorage } from './state/MultiWritableMetricStorage';
 import { SyncMetricStorage } from './state/SyncMetricStorage';
@@ -28,40 +28,46 @@ import { MetricCollectorHandle } from './state/MetricCollector';
 import { HrTime } from '@opentelemetry/api';
 import { AsyncMetricStorage } from './state/AsyncMetricStorage';
 
-// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#meter
-
+/**
+ * This class implements the {@link metrics.Meter} interface.
+ */
 export class Meter implements metrics.Meter {
   private _metricStorageRegistry = new Map<string, MetricStorage>();
 
-  // instrumentation library required by spec to be on meter
-  // spec requires provider config changes to apply to previously created meters, achieved by holding a reference to the provider
   constructor(private _meterProviderSharedState: MeterProviderSharedState, private _instrumentationLibrary: InstrumentationLibrary) {
     this._meterProviderSharedState.meters.push(this);
   }
 
-  /** this exists just to prevent ts errors from unused variables and may be removed */
-  getInstrumentationLibrary(): InstrumentationLibrary {
-    return this._instrumentationLibrary;
-  }
-
+  /**
+   * Create a {@link metrics.Histogram} instrument.
+   */
   createHistogram(name: string, options?: metrics.HistogramOptions): metrics.Histogram {
     const descriptor = createInstrumentDescriptor(name, InstrumentType.HISTOGRAM, options);
     const storage = this._registerMetricStorage(descriptor);
     return new Histogram(storage, descriptor);
   }
 
+  /**
+   * Create a {@link metrics.Counter} instrument.
+   */
   createCounter(name: string, options?: metrics.CounterOptions): metrics.Counter {
     const descriptor = createInstrumentDescriptor(name, InstrumentType.COUNTER, options);
     const storage = this._registerMetricStorage(descriptor);
     return new Counter(storage, descriptor);
   }
 
+  /**
+   * Create a {@link metrics.UpDownCounter} instrument.
+   */
   createUpDownCounter(name: string, options?: metrics.UpDownCounterOptions): metrics.UpDownCounter {
     const descriptor = createInstrumentDescriptor(name, InstrumentType.UP_DOWN_COUNTER, options);
     const storage = this._registerMetricStorage(descriptor);
     return new UpDownCounter(storage, descriptor);
   }
 
+  /**
+   * Create a ObservableGauge instrument.
+   */
   createObservableGauge(
     name: string,
     callback: metrics.ObservableCallback,
@@ -71,6 +77,9 @@ export class Meter implements metrics.Meter {
     this._registerAsyncMetricStorage(descriptor, callback);
   }
 
+  /**
+   * Create a ObservableCounter instrument.
+   */
   createObservableCounter(
     name: string,
     callback: metrics.ObservableCallback,
@@ -80,6 +89,9 @@ export class Meter implements metrics.Meter {
     this._registerAsyncMetricStorage(descriptor, callback);
   }
 
+  /**
+   * Create a ObservableUpDownCounter instrument.
+   */
   createObservableUpDownCounter(
     name: string,
     callback: metrics.ObservableCallback,
@@ -112,6 +124,12 @@ export class Meter implements metrics.Meter {
     });
   }
 
+  /**
+   * @internal
+   * @param collector opaque handle of {@link MetricCollector} which initiated the collection.
+   * @param collectionTime the HrTime at which the collection was initiated.
+   * @returns the list of {@link MetricData} collected.
+   */
   async collect(collector: MetricCollectorHandle, collectionTime: HrTime): Promise<MetricData[]> {
     const result = await Promise.all(Array.from(this._metricStorageRegistry.values()).map(metricStorage => {
       return metricStorage.collect(

@@ -17,9 +17,18 @@
 import * as metrics from '@opentelemetry/api-metrics-wip';
 import { AttributeHashMap } from './state/HashMap';
 
+/**
+ * The class implements {@link metrics.observableResult} interface.
+ */
 export class ObservableResult implements metrics.ObservableResult {
+  /**
+   * @internal
+   */
   buffer = new AttributeHashMap<number>();
 
+  /**
+   * Observe a measurement of the value associated with the given attributes.
+   */
   observe(value: number, attributes: metrics.Attributes = {}): void {
     this.buffer.set(attributes, value);
   }
