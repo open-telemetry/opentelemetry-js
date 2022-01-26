@@ -30,6 +30,7 @@ import {
   ensureHeadersContain,
   mockedReadableSpan,
 } from '../traceHelper';
+import { resetSendWithBeacon } from '../../src/platform/browser/util';
 
 describe('OTLPTraceExporter - web', () => {
   let collectorTraceExporter: OTLPTraceExporter;
@@ -44,6 +45,7 @@ describe('OTLPTraceExporter - web', () => {
     stubBeacon = sinon.stub(navigator, 'sendBeacon');
     spans = [];
     spans.push(Object.assign({}, mockedReadableSpan));
+    resetSendWithBeacon();
   });
 
   afterEach(() => {
@@ -51,128 +53,211 @@ describe('OTLPTraceExporter - web', () => {
   });
 
   describe('export', () => {
+    let server: any;
     beforeEach(() => {
       collectorExporterConfig = {
         hostname: 'foo',
         attributes: {},
         url: 'http://foo.bar.com',
       };
+      server = sinon.fakeServer.create();
     });
 
-    describe('when "sendBeacon" is available', () => {
+    afterEach(() => {
+      server.restore();
+    });
+
+    const testSpansSendUsingXhr = () => {
+      const request = server.requests[0];
+      assert.strictEqual(request.method, 'POST');
+      assert.strictEqual(request.url, 'http://foo.bar.com');
+
+      const body = request.requestBody;
+      const json = JSON.parse(
+        body
+      ) as otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+      const span1 =
+        json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
+
+      assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
+      if (span1) {
+        ensureSpanIsCorrect(span1);
+      }
+
+      const resource = json.resourceSpans[0].resource;
+      assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
+      if (resource) {
+        ensureWebResourceIsCorrect(resource);
+      }
+
+      ensureExportTraceServiceRequestIsSet(json);
+    };
+
+    describe('when "sendBeacon" is available and returns', () => {
       beforeEach(() => {
-        collectorTraceExporter = new OTLPTraceExporter(
-          collectorExporterConfig
-        );
+        collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
       });
 
-      it('should successfully send the spans using sendBeacon', done => {
-        collectorTraceExporter.export(spans, () => { });
+      describe('"true"', () => {
+        it('should successfully send the spans', done => {
+          stubBeacon.returns(true);
 
-        setTimeout(async () => {
-          const args = stubBeacon.args[0];
-          const url = args[0];
-          const blob: Blob = args[1];
-          const body = await blob.text();
-          const json = JSON.parse(
-            body
-          ) as otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
-          const span1 =
-            json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
+          collectorTraceExporter.export(spans, () => {});
 
-          assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
-          if (span1) {
-            ensureSpanIsCorrect(span1);
-          }
+          setTimeout(async () => {
+            const args = stubBeacon.args[0];
+            const url = args[0];
+            const blob: Blob = args[1];
+            const body = await blob.text();
+            const json = JSON.parse(
+              body
+            ) as otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+            const span1 =
+              json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
 
-          const resource = json.resourceSpans[0].resource;
-          assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
-          if (resource) {
-            ensureWebResourceIsCorrect(resource);
-          }
+            assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
+            if (span1) {
+              ensureSpanIsCorrect(span1);
+            }
 
-          assert.strictEqual(url, 'http://foo.bar.com');
-          assert.strictEqual(stubBeacon.callCount, 1);
+            const resource = json.resourceSpans[0].resource;
+            assert.ok(
+              typeof resource !== 'undefined',
+              "resource doesn't exist"
+            );
+            if (resource) {
+              ensureWebResourceIsCorrect(resource);
+            }
 
-          assert.strictEqual(stubOpen.callCount, 0);
+            assert.strictEqual(url, 'http://foo.bar.com');
+            assert.strictEqual(stubBeacon.callCount, 1);
 
-          ensureExportTraceServiceRequestIsSet(json);
+            assert.strictEqual(stubOpen.callCount, 0);
 
-          done();
+            ensureExportTraceServiceRequestIsSet(json);
+
+            done();
+          });
+        });
+
+        it('should log the successful message', done => {
+          // Need to stub/spy on the underlying logger as the "diag" instance is global
+          const spyLoggerDebug = sinon.stub(diag, 'debug');
+          const spyLoggerError = sinon.stub(diag, 'error');
+          stubBeacon.returns(true);
+
+          collectorTraceExporter.export(spans, () => {});
+
+          setTimeout(() => {
+            const response: any = spyLoggerDebug.args[1][0];
+            assert.strictEqual(response, 'sendBeacon - can send');
+            assert.strictEqual(spyLoggerError.args.length, 0);
+
+            done();
+          });
         });
       });
 
-      it('should log the successful message', done => {
-        // Need to stub/spy on the underlying logger as the "diag" instance is global
-        const spyLoggerDebug = sinon.stub(diag, 'debug');
-        const spyLoggerError = sinon.stub(diag, 'error');
-        stubBeacon.returns(true);
+      describe('"false"', () => {
+        it('should log the info message', done => {
+          const spyLoggerInfo = sinon.stub(diag, 'info');
+          const spyLoggerError = sinon.stub(diag, 'error');
+          stubBeacon.returns(false);
 
-        collectorTraceExporter.export(spans, () => { });
+          collectorTraceExporter.export(spans, () => {});
 
-        setTimeout(() => {
-          const response: any = spyLoggerDebug.args[1][0];
-          assert.strictEqual(response, 'sendBeacon - can send');
-          assert.strictEqual(spyLoggerError.args.length, 0);
+          setTimeout(() => {
+            const response: any = spyLoggerInfo.args[0][0];
+            assert.strictEqual(
+              response,
+              'sendBeacon failed because the given payload was too big; try to lower your span processor limits'
+            );
+            assert.strictEqual(spyLoggerError.args.length, 0);
 
-          done();
+            done();
+          });
         });
-      });
 
-      it('should log the error message', done => {
-        stubBeacon.returns(false);
+        it('should successfully send the spans using XMLHttpRequest as a fallback', done => {
+          stubBeacon.returns(false);
 
-        collectorTraceExporter.export(spans, result => {
-          assert.deepStrictEqual(result.code, ExportResultCode.FAILED);
-          assert.ok(result.error?.message.includes('cannot send'));
-          done();
+          collectorTraceExporter.export(spans, () => {});
+
+          setTimeout(() => {
+            assert.strictEqual(stubBeacon.callCount, 1);
+            testSpansSendUsingXhr();
+            done();
+          });
+        });
+
+        it('should NOT try to send a payload with size that previously failed', done => {
+          stubBeacon.returns(false);
+
+          collectorTraceExporter.export(spans, () => {});
+
+          setTimeout(() => {
+            assert.strictEqual(stubBeacon.callCount, 1);
+
+            collectorTraceExporter.export(spans, () => {});
+
+            setTimeout(() => {
+              assert.strictEqual(stubBeacon.callCount, 1);
+              done();
+            });
+          });
+        });
+
+        it('should NOT try to send a payload with size greater than previously failed', done => {
+          stubBeacon.returns(false);
+
+          collectorTraceExporter.export(spans, () => {});
+
+          setTimeout(() => {
+            assert.strictEqual(stubBeacon.callCount, 1);
+
+            spans.push(Object.assign({}, mockedReadableSpan));
+            collectorTraceExporter.export(spans, () => {});
+
+            setTimeout(() => {
+              assert.strictEqual(stubBeacon.callCount, 1);
+              done();
+            });
+          });
+        });
+
+        it('should try to send a payload with size smaller than previously failed', done => {
+          stubBeacon.returns(false);
+
+          spans.push(Object.assign({}, mockedReadableSpan));
+          collectorTraceExporter.export(spans, () => {});
+
+          setTimeout(() => {
+            assert.strictEqual(stubBeacon.callCount, 1);
+
+            spans.pop();
+            collectorTraceExporter.export(spans, () => {});
+
+            setTimeout(() => {
+              assert.strictEqual(stubBeacon.callCount, 2);
+              done();
+            });
+          });
         });
       });
     });
 
     describe('when "sendBeacon" is NOT available', () => {
-      let server: any;
       beforeEach(() => {
         (window.navigator as any).sendBeacon = false;
-        collectorTraceExporter = new OTLPTraceExporter(
-          collectorExporterConfig
-        );
-        server = sinon.fakeServer.create();
-      });
-      afterEach(() => {
-        server.restore();
+        collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
       });
 
       it('should successfully send the spans using XMLHttpRequest', done => {
-        collectorTraceExporter.export(spans, () => { });
+        collectorTraceExporter.export(spans, () => {});
 
         setTimeout(() => {
-          const request = server.requests[0];
-          assert.strictEqual(request.method, 'POST');
-          assert.strictEqual(request.url, 'http://foo.bar.com');
-
-          const body = request.requestBody;
-          const json = JSON.parse(
-            body
-          ) as otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
-          const span1 =
-            json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
-
-          assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
-          if (span1) {
-            ensureSpanIsCorrect(span1);
-          }
-
-          const resource = json.resourceSpans[0].resource;
-          assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
-          if (resource) {
-            ensureWebResourceIsCorrect(resource);
-          }
-
           assert.strictEqual(stubBeacon.callCount, 0);
-
-          ensureExportTraceServiceRequestIsSet(json);
-
+          testSpansSendUsingXhr();
           done();
         });
       });
@@ -182,7 +267,7 @@ describe('OTLPTraceExporter - web', () => {
         const spyLoggerDebug = sinon.stub(diag, 'debug');
         const spyLoggerError = sinon.stub(diag, 'error');
 
-        collectorTraceExporter.export(spans, () => { });
+        collectorTraceExporter.export(spans, () => {});
 
         setTimeout(() => {
           const request = server.requests[0];
@@ -211,7 +296,7 @@ describe('OTLPTraceExporter - web', () => {
       });
 
       it('should send custom headers', done => {
-        collectorTraceExporter.export(spans, () => { });
+        collectorTraceExporter.export(spans, () => {});
 
         setTimeout(() => {
           const request = server.requests[0];
@@ -244,12 +329,10 @@ describe('OTLPTraceExporter - web', () => {
 
     describe('when "sendBeacon" is available', () => {
       beforeEach(() => {
-        collectorTraceExporter = new OTLPTraceExporter(
-          collectorExporterConfig
-        );
+        collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
       });
       it('should successfully send custom headers using XMLHTTPRequest', done => {
-        collectorTraceExporter.export(spans, () => { });
+        collectorTraceExporter.export(spans, () => {});
 
         setTimeout(() => {
           const [{ requestHeaders }] = server.requests;
@@ -266,13 +349,11 @@ describe('OTLPTraceExporter - web', () => {
     describe('when "sendBeacon" is NOT available', () => {
       beforeEach(() => {
         (window.navigator as any).sendBeacon = false;
-        collectorTraceExporter = new OTLPTraceExporter(
-          collectorExporterConfig
-        );
+        collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
       });
 
       it('should successfully send spans using XMLHttpRequest', done => {
-        collectorTraceExporter.export(spans, () => { });
+        collectorTraceExporter.export(spans, () => {});
 
         setTimeout(() => {
           const [{ requestHeaders }] = server.requests;

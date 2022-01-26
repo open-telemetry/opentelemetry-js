@@ -28,11 +28,7 @@ import { getEnv, baggageUtils } from '@opentelemetry/core';
 export abstract class OTLPExporterBrowserBase<
   ExportItem,
   ServiceRequest
-  > extends OTLPExporterBase<
-  OTLPExporterConfigBase,
-  ExportItem,
-  ServiceRequest
-  > {
+> extends OTLPExporterBase<OTLPExporterConfigBase, ExportItem, ServiceRequest> {
   protected _headers: Record<string, string>;
   private _useXHR: boolean = false;
 
@@ -77,19 +73,19 @@ export abstract class OTLPExporterBrowserBase<
     const body = JSON.stringify(serviceRequest);
 
     const promise = new Promise<void>((resolve, reject) => {
-      if (this._useXHR) {
+      if (
+        this._useXHR ||
+        !sendWithBeacon(body, this.url, { type: 'application/json' })
+      ) {
         sendWithXhr(body, this.url, this._headers, resolve, reject);
-      } else {
-        sendWithBeacon(body, this.url, { type: 'application/json' }, resolve, reject);
       }
-    })
-      .then(onSuccess, onError);
+    }).then(onSuccess, onError);
 
     this._sendingPromises.push(promise);
     const popPromise = () => {
       const index = this._sendingPromises.indexOf(promise);
       this._sendingPromises.splice(index, 1);
-    }
+    };
     promise.then(popPromise, popPromise);
   }
 }
