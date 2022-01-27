@@ -111,13 +111,11 @@ export abstract class OTLPExporterBase<
   }
 
   private _configureTimeout(timeoutMillis: number | undefined): number {
-    const timeout = this._selectATimeout();
-
     return typeof timeoutMillis === 'number'
       ? timeoutMillis < 0
-        ? this._invalidTimeout(timeoutMillis, timeout)
-        : timeoutMillis
-          : timeout;
+          ? this._invalidTimeout(timeoutMillis, 10000)
+          : timeoutMillis
+            : this._selectATimeout();
   }
 
   private _selectATimeout(): number {
@@ -125,7 +123,11 @@ export abstract class OTLPExporterBase<
       Number(process.env.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT ||
       process.env.OTEL_EXPORTER_OTLP_TIMEOUT);
 
-    return definedTimeout ? definedTimeout : getEnv().OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
+    return definedTimeout
+      ? definedTimeout < 0
+          ? this._invalidTimeout(definedTimeout, 10000)
+          : definedTimeout
+              : getEnv().OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
   }
 
   private _invalidTimeout(timeout: number, defaultTimeout: number): number {
