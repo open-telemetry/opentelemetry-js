@@ -22,9 +22,8 @@ import { FixedSizeExemplarReservoirBase } from './ExemplarReservoir';
 
 /**
  * AlignedHistogramBucketExemplarReservoir takes the same boundaries
- * configuration of a Histogram. This alogorithm keeps the last seen measurement
+ * configuration of a Histogram. This algorithm keeps the last seen measurement
  * that falls within a histogram bucket.
- * https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#exemplar-defaults
  */
 export class AlignedHistogramBucketExemplarReservoir extends FixedSizeExemplarReservoirBase {
   private _boundaries: number[];

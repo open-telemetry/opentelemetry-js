@@ -25,13 +25,18 @@ import { MeterSelector } from './view/MeterSelector';
 import { View } from './view/View';
 import { MetricCollector } from './state/MetricCollector';
 
-// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#meterprovider
-
-export type MeterProviderOptions = {
+/**
+ * MeterProviderOptions provides an interface for configuring a MeterProvider.
+ */
+export interface MeterProviderOptions {
+  /** Resource associated with metric telemetry  */
   resource?: Resource;
-};
+}
 
-export class MeterProvider {
+/**
+ * This class implements the {@link metrics.MeterProvider} interface.
+ */
+export class MeterProvider implements metrics.MeterProvider {
   private _sharedState: MeterProviderSharedState;
   private _shutdown = false;
 
@@ -39,6 +44,9 @@ export class MeterProvider {
     this._sharedState = new MeterProviderSharedState(options?.resource ?? Resource.empty());
   }
 
+  /**
+   * Get a meter with the configuration of the MeterProvider.
+   */
   getMeter(name: string, version = '', options: metrics.MeterOptions = {}): metrics.Meter {
     // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#meter-creation
     if (this._shutdown) {
@@ -49,6 +57,12 @@ export class MeterProvider {
     return new Meter(this._sharedState, { name, version, schemaUrl: options.schemaUrl });
   }
 
+  /**
+   * Register a {@link MetricReader} to the meter provider. After the
+   * registration, the MetricReader can start metrics collection.
+   *
+   * @param metricReader the metric reader to be registered.
+   */
   addMetricReader(metricReader: MetricReader) {
     const collector = new MetricCollector(this._sharedState, metricReader);
     metricReader.setMetricProducer(collector);
