@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0](https://www.github.com/open-telemetry/opentelemetry-js-api/compare/v1.0.4...v1.1.0) (2022-01-25)
+
+
+### Features
+
+* add tracestate implementation to api ([#147](https://www.github.com/open-telemetry/opentelemetry-js-api/issues/147)) ([82842c7](https://www.github.com/open-telemetry/opentelemetry-js-api/commit/82842c7097614e6ece99e73838ac5e94ff5460b7))
+* define common attributes type ([#142](https://www.github.com/open-telemetry/opentelemetry-js-api/issues/142)) ([ae9bead](https://www.github.com/open-telemetry/opentelemetry-js-api/commit/ae9bead17750d35dec4b63cfae098087666abc85))
+* **trace:** add optional schema url to TracerProvider.getTracer ([#129](https://www.github.com/open-telemetry/opentelemetry-js-api/issues/129)) ([aa65fc6](https://www.github.com/open-telemetry/opentelemetry-js-api/commit/aa65fc66809d45090d6e4951c265386d17ccc6f6))
+
+
+### Bug Fixes
+
+* export tracer options ([#154](https://www.github.com/open-telemetry/opentelemetry-js-api/issues/154)) ([b125324](https://www.github.com/open-telemetry/opentelemetry-js-api/commit/b125324438fb2f24eb80c7c6673afc8cfc99575e))
+
 ### [1.0.4](https://www.github.com/open-telemetry/opentelemetry-js-api/compare/v1.0.3...v1.0.4) (2021-12-18)
 
 
