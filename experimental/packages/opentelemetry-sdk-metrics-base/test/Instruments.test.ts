@@ -26,7 +26,7 @@ import { ObservableResult } from '@opentelemetry/api-metrics-wip';
 
 describe('Instruments', () => {
   describe('Counter', () => {
-    it('should add common values and attributes', () => {
+    it('should add common values and attributes without exceptions', () => {
       const { meter } = setup();
       const counter = meter.createCounter('test');
 
@@ -43,11 +43,17 @@ describe('Instruments', () => {
 
       counter.add(1);
       counter.add(1);
+      counter.add(1, { foo: 'bar' });
       await validateExport(cumulativeReader, {
         pointDataType: PointDataType.SINGULAR,
         pointData: [
           {
+            attributes: {},
             point: 2,
+          },
+          {
+            attributes: { foo: 'bar' },
+            point: 1,
           },
         ],
       });
@@ -58,7 +64,12 @@ describe('Instruments', () => {
         pointDataType: PointDataType.SINGULAR,
         pointData: [
           {
+            attributes: {},
             point: 2,
+          },
+          {
+            attributes: { foo: 'bar' },
+            point: 1,
           },
         ],
       });
@@ -66,7 +77,7 @@ describe('Instruments', () => {
   });
 
   describe('UpDownCounter', () => {
-    it('should add common values and attributes', () => {
+    it('should add common values and attributes without exceptions', () => {
       const { meter } = setup();
       const upDownCounter = meter.createUpDownCounter('test');
 
@@ -83,19 +94,25 @@ describe('Instruments', () => {
 
       upDownCounter.add(3);
       upDownCounter.add(-1);
+      upDownCounter.add(4, { foo: 'bar' });
       await validateExport(deltaReader, {
         pointDataType: PointDataType.SINGULAR,
         pointData: [
           {
+            attributes: {},
             point: 2,
           },
+          {
+            attributes: { foo: 'bar' },
+            point: 4,
+          }
         ],
       });
     });
   });
 
   describe('Histogram', () => {
-    it('should record common values and attributes', () => {
+    it('should record common values and attributes without exceptions', () => {
       const { meter } = setup();
       const histogram = meter.createHistogram('test');
 
@@ -113,10 +130,12 @@ describe('Instruments', () => {
 
       histogram.record(10);
       histogram.record(-1);
+      histogram.record(100, { foo: 'bar' });
       await validateExport(deltaReader, {
         pointDataType: PointDataType.HISTOGRAM,
         pointData: [
           {
+            attributes: {},
             point: {
               buckets: {
                 boundaries: [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000],
@@ -126,13 +145,24 @@ describe('Instruments', () => {
               sum: 9,
             },
           },
+          {
+            attributes: { foo: 'bar' },
+            point: {
+              buckets: {
+                boundaries: [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000],
+                counts: [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+              },
+              count: 1,
+              sum: 100,
+            },
+          },
         ],
       });
     });
   });
 
   describe('ObservableCounter', () => {
-    it('should observe common values and attributes', async () => {
+    it('should observe common values and attributes without exceptions', async () => {
       const { meter, deltaReader } = setup();
       const callback = sinon.spy((observableResult: ObservableResult) => {
         for (const values of commonValues) {
@@ -152,12 +182,18 @@ describe('Instruments', () => {
       let callCount = 0;
       meter.createObservableCounter('test', observableResult => {
         observableResult.observe(++callCount);
+        observableResult.observe(1, { foo: 'bar' });
       });
 
       await validateExport(cumulativeReader, {
         pointDataType: PointDataType.SINGULAR,
         pointData: [
           {
+            attributes: {},
+            point: 1,
+          },
+          {
+            attributes: { foo: 'bar' },
             point: 1,
           },
         ],
@@ -166,7 +202,12 @@ describe('Instruments', () => {
         pointDataType: PointDataType.SINGULAR,
         pointData: [
           {
+            attributes: {},
             point: 2,
+          },
+          {
+            attributes: { foo: 'bar' },
+            point: 1,
           },
         ],
       });
@@ -174,7 +215,7 @@ describe('Instruments', () => {
   });
 
   describe('ObservableUpDownCounter', () => {
-    it('should observe common values and attributes', async () => {
+    it('should observe common values and attributes without exceptions', async () => {
       const { meter, deltaReader } = setup();
       const callback = sinon.spy((observableResult: ObservableResult) => {
         for (const values of commonValues) {
@@ -194,12 +235,18 @@ describe('Instruments', () => {
       let callCount = 0;
       meter.createObservableUpDownCounter('test', observableResult => {
         observableResult.observe(++callCount);
+        observableResult.observe(1, { foo: 'bar' });
       });
 
       await validateExport(cumulativeReader, {
         pointDataType: PointDataType.SINGULAR,
         pointData: [
           {
+            attributes: {},
+            point: 1,
+          },
+          {
+            attributes: { foo: 'bar' },
             point: 1,
           },
         ],
@@ -208,7 +255,12 @@ describe('Instruments', () => {
         pointDataType: PointDataType.SINGULAR,
         pointData: [
           {
+            attributes: {},
             point: 2,
+          },
+          {
+            attributes: { foo: 'bar' },
+            point: 1,
           },
         ],
       });
@@ -216,7 +268,7 @@ describe('Instruments', () => {
   });
 
   describe('ObservableGauge', () => {
-    it('should observe common values and attributes', async () => {
+    it('should observe common values and attributes without exceptions', async () => {
       const { meter, deltaReader } = setup();
       const callback = sinon.spy((observableResult: ObservableResult) => {
         for (const values of commonValues) {
@@ -241,21 +293,19 @@ describe('Instruments', () => {
         } else {
           observableResult.observe(num);
         }
+        observableResult.observe(1, { foo: 'bar' });
       });
 
       await validateExport(cumulativeReader, {
         pointDataType: PointDataType.SINGULAR,
         pointData: [
           {
+            attributes: {},
             point: 10,
           },
-        ],
-      });
-      await validateExport(cumulativeReader, {
-        pointDataType: PointDataType.SINGULAR,
-        pointData: [
           {
-            point: 20,
+            attributes: { foo: 'bar' },
+            point: 1,
           },
         ],
       });
@@ -263,7 +313,25 @@ describe('Instruments', () => {
         pointDataType: PointDataType.SINGULAR,
         pointData: [
           {
+            attributes: {},
+            point: 20,
+          },
+          {
+            attributes: { foo: 'bar' },
+            point: 1,
+          },
+        ],
+      });
+      await validateExport(cumulativeReader, {
+        pointDataType: PointDataType.SINGULAR,
+        pointData: [
+          {
+            attributes: {},
             point: -1,
+          },
+          {
+            attributes: { foo: 'bar' },
+            point: 1,
           },
         ],
       });
