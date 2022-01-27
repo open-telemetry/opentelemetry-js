@@ -92,7 +92,7 @@ export class BasicTracerProvider implements TracerProvider {
   }
 
   getTracer(name: string, version?: string, options?: TracerOptions): Tracer {
-    const key = `${name}@${version || ''}`;
+    const key = `${name}@${version || ''}:${options?.schemaUrl || ''}`;
     if (!this._tracers.has(key)) {
       this._tracers.set(key, new Tracer({ name, version, schemaUrl: options?.schemaUrl }, this._config, this));
     }
