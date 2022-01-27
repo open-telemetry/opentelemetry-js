@@ -17,6 +17,7 @@
 import { HrTime } from '@opentelemetry/api';
 import * as metrics from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
+import { MetricCollectOptions } from '..';
 import { InstrumentationLibraryMetrics } from '../export/MetricData';
 import { createInstrumentDescriptorWithView, InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Meter } from '../Meter';
@@ -76,12 +77,12 @@ export class MeterSharedState {
    * @param collectionTime the HrTime at which the collection was initiated.
    * @returns the list of {@link MetricData} collected.
    */
-  async collect(collector: MetricCollectorHandle, collectionTime: HrTime): Promise<InstrumentationLibraryMetrics> {
+  async collect(collector: MetricCollectorHandle, collectionTime: HrTime, options?: MetricCollectOptions): Promise<InstrumentationLibraryMetrics> {
     /**
      * 1. Call all observable callbacks first.
      * 2. Collect metric result for the collector.
      */
-    await this._observableRegistry.observe();
+    const errors = await this._observableRegistry.observe(options?.timeoutMillis);
     const metricDataList = Array.from(this._metricStorageRegistry.getStorages())
       .map(metricStorage => {
         return metricStorage.collect(
@@ -95,6 +96,7 @@ export class MeterSharedState {
     return {
       instrumentationLibrary: this._instrumentationLibrary,
       metrics: metricDataList.filter(isNotNullish),
+      errors,
     };
   }
 }

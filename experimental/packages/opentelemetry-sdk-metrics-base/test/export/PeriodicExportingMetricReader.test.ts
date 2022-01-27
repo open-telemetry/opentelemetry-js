@@ -91,10 +91,7 @@ class TestDeltaMetricExporter extends TestMetricExporter {
 const emptyResourceMetrics = { resource: defaultResource, instrumentationLibraryMetrics: [] };
 
 class TestMetricProducer implements MetricProducer {
-  public collectionTime = 0;
-
   async collect(): Promise<ResourceMetrics> {
-    await new Promise(resolve => setTimeout(resolve, this.collectionTime));
     return { resource: defaultResource, instrumentationLibraryMetrics: [] };
   }
 }
@@ -395,7 +392,7 @@ describe('PeriodicExportingMetricReader', () => {
       assert.deepStrictEqual(await reader.collect(), undefined);
     });
 
-    it('should time out when timeoutMillis is set', async () => {
+    it('should call MetricProduce.collect with timeout', async () => {
       const exporter = new TestMetricExporter();
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
@@ -403,13 +400,14 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 80,
       });
       const producer = new TestMetricProducer();
-      producer.collectionTime = 40;
       reader.setMetricProducer(producer);
 
-      await assertRejects(
-        () => reader.collect({ timeoutMillis: 20 }),
-        TimeoutError
-      );
+      const collectStub = sinon.stub(producer, 'collect');
+
+      await reader.collect({ timeoutMillis: 20 });
+      assert(collectStub.calledOnce);
+      const args = collectStub.args[0];
+      assert.deepStrictEqual(args, [{ timeoutMillis: 20 }]);
 
       await reader.shutdown();
     });

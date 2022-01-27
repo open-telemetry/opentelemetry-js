@@ -9,6 +9,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :rocket: (Enhancement)
 
 * feat(exporters): update proto version and use otlp-transformer #2929 @pichlermarc
+* feat(sdk-metrics-base): async instruments callback timeout #2742 @legendecas
 
 ### :bug: (Bug Fix)
 

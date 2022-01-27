@@ -91,3 +91,35 @@ export function callWithTimeout<T>(promise: Promise<T>, timeout: number): Promis
     throw reason;
   });
 }
+
+export interface PromiseAllSettledFulfillResult<T> {
+  status: 'fulfilled';
+  value: T;
+}
+
+export interface PromiseAllSettledRejectionResult {
+  status: 'rejected';
+  reason: unknown;
+}
+
+export type PromiseAllSettledResult<T> = PromiseAllSettledFulfillResult<T> | PromiseAllSettledRejectionResult;
+
+/**
+ * Node.js v12.9 lower and browser compatible `Promise.allSettled`.
+ */
+export async function PromiseAllSettled<T>(promises: Promise<T>[]): Promise<PromiseAllSettledResult<T>[]> {
+  return Promise.all(promises.map<Promise<PromiseAllSettledResult<T>>>(async p => {
+    try {
+      const ret = await p;
+      return {
+        status: 'fulfilled',
+        value: ret,
+      };
+    } catch (e) {
+      return {
+        status: 'rejected',
+        reason: e,
+      };
+    }
+  }));
+}

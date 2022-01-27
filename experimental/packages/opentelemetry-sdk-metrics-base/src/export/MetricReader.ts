@@ -96,12 +96,9 @@ export abstract class MetricReader {
       return undefined;
     }
 
-    // No timeout if timeoutMillis is undefined or null.
-    if (options?.timeoutMillis == null) {
-      return await this._metricProducer.collect();
-    }
-
-    return await callWithTimeout(this._metricProducer.collect(), options.timeoutMillis);
+    return this._metricProducer.collect({
+      timeoutMillis: options?.timeoutMillis,
+    });
   }
 
   /**

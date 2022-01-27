@@ -57,6 +57,7 @@ export type MetricData = SingularMetricData | HistogramMetricData;
 export interface InstrumentationLibraryMetrics {
   instrumentationLibrary: InstrumentationLibrary;
   metrics: MetricData[];
+  errors: unknown[];
 }
 
 export interface ResourceMetrics {

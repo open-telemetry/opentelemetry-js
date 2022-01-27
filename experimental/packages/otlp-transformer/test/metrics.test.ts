@@ -137,7 +137,8 @@ describe('Metrics', () => {
                 version: '0.1.0',
                 schemaUrl: 'http://url.to.schema'
               },
-              metrics: metricData
+              metrics: metricData,
+              errors: [],
             }
           ]
       };

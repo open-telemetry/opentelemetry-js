@@ -16,12 +16,12 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { MeterProvider } from '../../src';
+import { MeterProvider, TimeoutError } from '../../src';
 import { DataPointType } from '../../src/export/MetricData';
 import { PushMetricExporter } from '../../src/export/MetricExporter';
 import { MeterProviderSharedState } from '../../src/state/MeterProviderSharedState';
 import { MetricCollector } from '../../src/state/MetricCollector';
-import { defaultInstrumentationLibrary, defaultResource, assertMetricData, assertDataPoint } from '../util';
+import { defaultInstrumentationLibrary, defaultResource, assertMetricData, assertDataPoint, ObservableCallbackDelegate } from '../util';
 import { TestMetricReader } from '../export/TestMetricReader';
 import { TestDeltaMetricExporter, TestMetricExporter } from '../export/TestMetricExporter';
 
@@ -93,6 +93,86 @@ describe('MetricCollector', () => {
       });
       assert.strictEqual(metricData2.dataPoints.length, 1);
       assertDataPoint(metricData2.dataPoints[0], {}, 3);
+    });
+
+    it('should collect observer metrics with timeout', async () => {
+      sinon.useFakeTimers();
+      /** preparing test instrumentations */
+      const exporter = new TestMetricExporter();
+      const { metricCollector, meter } = setupInstruments(exporter);
+
+      /** creating metric events */
+
+      /** observer1 is an abnormal observer */
+      const delegate1 = new ObservableCallbackDelegate();
+      meter.createObservableCounter('observer1', delegate1.getCallback());
+      delegate1.setDelegate(_observableResult => {
+        return new Promise(() => {
+          /** promise never settles */
+        });
+      });
+
+      /** observer2 is a normal observer */
+      const delegate2 = new ObservableCallbackDelegate();
+      meter.createObservableCounter('observer2', delegate2.getCallback());
+      delegate2.setDelegate(observableResult => {
+        observableResult.observe(1, {});
+      });
+
+      /** collect metrics */
+      {
+        const future = metricCollector.collect({
+          timeoutMillis: 100,
+        });
+        sinon.clock.tick(200);
+        const { instrumentationLibraryMetrics } = await future;
+        const { metrics, errors } = instrumentationLibraryMetrics[0];
+        assert.strictEqual(metrics.length, 2);
+        assert.strictEqual(errors.length, 1);
+        assert(errors[0] instanceof TimeoutError);
+
+        /** observer1 */
+        assertMetricData(metrics[0], DataPointType.SINGULAR, {
+          name: 'observer1'
+        });
+        assert.strictEqual(metrics[0].dataPoints.length, 0);
+
+        /** observer2 */
+        assertMetricData(metrics[1], DataPointType.SINGULAR, {
+          name: 'observer2'
+        });
+        assert.strictEqual(metrics[1].dataPoints.length, 1);
+      }
+
+      /** now the observer1 is back to normal */
+      delegate1.setDelegate(async observableResult => {
+        observableResult.observe(100, {});
+      });
+
+      /** collect metrics */
+      {
+        const future = metricCollector.collect({
+          timeoutMillis: 100,
+        });
+        sinon.clock.tick(100);
+        const { instrumentationLibraryMetrics } = await future;
+        const { metrics, errors } = instrumentationLibraryMetrics[0];
+        assert.strictEqual(metrics.length, 2);
+        assert.strictEqual(errors.length, 0);
+
+        /** observer1 */
+        assertMetricData(metrics[0], DataPointType.SINGULAR, {
+          name: 'observer1'
+        });
+        assert.strictEqual(metrics[0].dataPoints.length, 1);
+        assertDataPoint(metrics[0].dataPoints[0], {}, 100);
+
+        /** observer2 */
+        assertMetricData(metrics[1], DataPointType.SINGULAR, {
+          name: 'observer2'
+        });
+        assert.strictEqual(metrics[1].dataPoints.length, 1);
+      }
     });
   });
 });
