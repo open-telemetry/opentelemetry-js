@@ -22,8 +22,7 @@ import {
   LastValueAggregator,
   SumAggregator,
 } from '../../src/aggregator';
-import { InstrumentDescriptor } from '../../src/InstrumentDescriptor';
-import { InstrumentType } from '../../src/Instruments';
+import { InstrumentDescriptor, InstrumentType } from '../../src/InstrumentDescriptor';
 import {
   Aggregation,
   DefaultAggregation,
