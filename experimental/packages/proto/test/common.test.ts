@@ -20,7 +20,7 @@ import * as assert from 'assert';
 describe('common', () => {
     describe('toAnyValue', () => {
         it('serializes an array', () => {
-            const anyValue = toAnyValue([1, 'two', false, 2.5, new Uint8Array([0, 1, 2])]);
+            const anyValue = toAnyValue([1, 'two', false, 2.5, new Uint8Array([0, 1, 2]), { somekey: 'somevalue' }]);
             assert.deepStrictEqual(anyValue.toJSON(), {
                 arrayValue: {
                     values: [
@@ -38,6 +38,18 @@ describe('common', () => {
                         },
                         {
                             bytesValue: 'AAEC'
+                        },
+                        {
+                            kvlistValue: {
+                                values: [
+                                    {
+                                        key: 'somekey',
+                                        value: {
+                                            stringValue: 'somevalue'
+                                        }
+                                    }
+                                ]
+                            }
                         },
                     ]
                 }

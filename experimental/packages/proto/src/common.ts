@@ -15,7 +15,7 @@
  */
 import { HrTime, SpanAttributes } from '@opentelemetry/api';
 import { opentelemetry } from './generated';
-import Long = require('long');
+import * as Long from 'long';
 
 const MAX_INTEGER_VALUE = 2147483647;
 const MIN_INTEGER_VALUE = -2147483648;
@@ -50,6 +50,12 @@ export function toAnyValue(value: unknown): opentelemetry.proto.common.v1.AnyVal
         boolValue: typeof value === 'boolean' ? value : undefined,
         bytesValue: value instanceof Uint8Array ? value : undefined,
         arrayValue: Array.isArray(value) ? { values: value.map(v => toAnyValue(v)) } : undefined,
+        kvlistValue: typeof value === 'object' &&
+            value != null &&
+            !Array.isArray(value) &&
+            !(value instanceof Uint8Array) ?
+            { values: Object.entries(value).map(([k, v]) => toKeyValue(k, v)) } :
+            undefined,
     });
 }
 

@@ -16,7 +16,7 @@
 
 // Required to use longjs to support unix timestamps in nanoseconds
 import * as protobuf from 'protobufjs';
-import Long = require('long');
+import * as Long from 'long';
 protobuf.util.Long = Long;
 protobuf.configure();
 
