@@ -77,7 +77,7 @@ const traceRpc: RPCImpl = function(method, requestData, callback) {
 // Construct service clients to use RPC Implementations
 const metricServiceClient = new MetricServiceClient({
     rpcImpl: metricRpc,
-    startTime: Date.now() * 1000, // exporter start time in milliseconds
+    startTime: Date.now(), // exporter start time in milliseconds
 });
 
 const traceServiceClient = new TraceServiceClient({
