@@ -22,6 +22,8 @@ import {
   ExportServiceError,
 } from './types';
 
+const DEFAULT_TIMEOUT = 10000;
+
 /**
  * Collector Exporter abstract base class
  */
@@ -113,7 +115,7 @@ export abstract class OTLPExporterBase<
   private _configureTimeout(timeoutMillis: number | undefined): number {
     return typeof timeoutMillis === 'number'
       ? timeoutMillis < 0
-        ? this._invalidTimeout(timeoutMillis, 10000)
+        ? this._invalidTimeout(timeoutMillis, DEFAULT_TIMEOUT)
         : timeoutMillis
           : this._selectATimeout();
   }
@@ -125,7 +127,7 @@ export abstract class OTLPExporterBase<
 
     return definedTimeout
       ? definedTimeout < 0
-        ? this._invalidTimeout(definedTimeout, 10000)
+        ? this._invalidTimeout(definedTimeout, DEFAULT_TIMEOUT)
         : definedTimeout
           : getEnv().OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
   }
