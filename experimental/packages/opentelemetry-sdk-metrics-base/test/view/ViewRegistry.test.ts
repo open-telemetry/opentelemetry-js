@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { InstrumentType } from '../../src/Instruments';
+import { InstrumentType } from '../../src/InstrumentDescriptor';
 import { ViewRegistry } from '../../src/view/ViewRegistry';
 import { View } from '../../src/view/View';
 import { InstrumentSelector } from '../../src/view/InstrumentSelector';

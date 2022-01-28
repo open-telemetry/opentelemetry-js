@@ -21,31 +21,63 @@ import { Resource } from '@opentelemetry/resources';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Histogram } from '../aggregator/types';
 
+/**
+ * Basic metric data fields.
+ */
 export interface BaseMetricData {
+  /**
+   * Resource associated with metric telemetry.
+   */
   readonly resource: Resource;
+  /**
+   * InstrumentationLibrary which created the metric instrument.
+   */
   readonly instrumentationLibrary: InstrumentationLibrary;
+  /**
+   * InstrumentDescriptor which describes the metric instrument.
+   */
   readonly instrumentDescriptor: InstrumentDescriptor;
+  /**
+   * PointDataType of the metric instrument.
+   */
   readonly pointDataType: PointDataType,
 }
 
+/**
+ * Represents a metric data aggregated by either a LastValueAggregation or
+ * SumAggregation.
+ */
 export interface SingularMetricData extends BaseMetricData {
   readonly pointDataType: PointDataType.SINGULAR,
   readonly pointData: PointData<number>[],
 }
 
+/**
+ * Represents a metric data aggregated by a HistogramAggregation.
+ */
 export interface HistogramMetricData extends BaseMetricData {
   readonly pointDataType: PointDataType.HISTOGRAM,
   readonly pointData: PointData<Histogram>[],
 }
 
+/**
+ * Represents an aggregated metric data.
+ */
 export type MetricData = SingularMetricData | HistogramMetricData;
 
+/**
+ * The aggregated point data type.
+ */
 export enum PointDataType {
   SINGULAR,
   HISTOGRAM,
   EXPONENTIAL_HISTOGRAM,
 }
 
+/**
+ * Represents an aggregated point data with start time, end time and their
+ * associated attributes and points.
+ */
 export interface PointData<T> {
   /**
    * The start epoch timestamp of the PointData, usually the time when
