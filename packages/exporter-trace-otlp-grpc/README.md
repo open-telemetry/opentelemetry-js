@@ -107,6 +107,29 @@ provider.register();
 
 Note, that this will only work if TLS is also configured on the server.
 
+## Exporter Timeout Configuration
+
+The OTLPTraceExporter has a timeout configuration option which is the maximum time, in milliseconds, the OTLP exporter will wait for each batch export. The default value is 10000ms.
+
+To override the default timeout duration, use the following options:
+
++ Set with environment variables:
+
+  | Environment variable | Description |
+  |----------------------|-------------|
+  | OTEL_EXPORTER_OTLP_TRACES_TIMEOUT | The maximum waiting time, in milliseconds, allowed to send each OTLP trace batch. Default is 10000. |
+  | OTEL_EXPORTER_OTLP_TIMEOUT | The maximum waiting time, in milliseconds, allowed to send each OTLP trace and metric batch. Default is 10000. |
+
+  > `OTEL_EXPORTER_OTLP_TRACES_TIMEOUT` takes precedence and overrides `OTEL_EXPORTER_OTLP_TIMEOUT`.
+
++ Provide `timeoutMillis` to OTLPTraceExporter with `collectorOptions`:
+  ```js
+  const collectorOptions = {
+    timeoutMillis: 15000
+  };
+  ```
+  > Providing `timeoutMillis` with `collectorOptions` takes precedence and overrides timeout set with environment variables.
+
 ## Running opentelemetry-collector locally to see the traces
 
 1. Go to examples/otlp-exporter-node
