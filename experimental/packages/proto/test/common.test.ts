@@ -18,42 +18,42 @@ import { toAnyValue } from '../src/common';
 import * as assert from 'assert';
 
 describe('common', () => {
-    describe('toAnyValue', () => {
-        it('serializes an array', () => {
-            const anyValue = toAnyValue([1, 'two', false, 2.5, new Uint8Array([0, 1, 2]), { somekey: 'somevalue' }]);
-            assert.deepStrictEqual(anyValue.toJSON(), {
-                arrayValue: {
-                    values: [
-                        {
-                            intValue: '1'
-                        },
-                        {
-                            stringValue: 'two'
-                        },
-                        {
-                            boolValue: false
-                        },
-                        {
-                            doubleValue: 2.5
-                        },
-                        {
-                            bytesValue: 'AAEC'
-                        },
-                        {
-                            kvlistValue: {
-                                values: [
-                                    {
-                                        key: 'somekey',
-                                        value: {
-                                            stringValue: 'somevalue'
-                                        }
-                                    }
-                                ]
-                            }
-                        },
-                    ]
-                }
-            });
-        });
+  describe('toAnyValue', () => {
+    it('serializes an array', () => {
+      const anyValue = toAnyValue([1, 'two', false, 2.5, new Uint8Array([0, 1, 2]), { somekey: 'somevalue' }]);
+      assert.deepStrictEqual(anyValue.toJSON(), {
+        arrayValue: {
+          values: [
+            {
+              intValue: '1'
+            },
+            {
+              stringValue: 'two'
+            },
+            {
+              boolValue: false
+            },
+            {
+              doubleValue: 2.5
+            },
+            {
+              bytesValue: 'AAEC'
+            },
+            {
+              kvlistValue: {
+                values: [
+                  {
+                    key: 'somekey',
+                    value: {
+                      stringValue: 'somevalue'
+                    }
+                  }
+                ]
+              }
+            },
+          ]
+        }
+      });
     });
+  });
 });
