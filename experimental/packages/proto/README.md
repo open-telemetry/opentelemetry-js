@@ -106,6 +106,8 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fproto.svg
 
 [sdk]: https://github.com/open-telemetry/opentelemetry-js
+[otlp]: https://github.com/open-telemetry/opentelemetry-proto
+
 [protobuf]: https://developers.google.com/protocol-buffers
 [grpc]: https://grpc.io/
 
