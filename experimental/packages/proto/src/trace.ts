@@ -16,7 +16,7 @@
 import { Link, SpanKind, SpanStatusCode } from '@opentelemetry/api';
 import { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace-base';
 import { RPCImpl } from 'protobufjs';
-import { hexToBuf, hrTimeToLong, toAttributes } from './common';
+import { bufToHex, hexToBuf, hrTimeToLong, toAttributes } from './common';
 import { opentelemetry } from './generated';
 
 /**
@@ -41,6 +41,38 @@ export class TraceServiceClient {
     if (!request) return null;
     return this._service.export(request);
   }
+}
+
+export function createExportTraceServiceRequestJSON(spans: ReadableSpan[]): { [k: string]: any } | null {
+  const traceServiceRequestProto = createExportTraceServiceRequest(spans);
+  if (!traceServiceRequestProto) {
+    return null;
+  }
+
+  const json = traceServiceRequestProto.toJSON();
+
+  /**
+   * By the default proto3 mapping, all byte arrays are converted to base64 strings
+   *  https://developers.google.com/protocol-buffers/docs/proto3#json
+   *
+   * According to the OpenTelemetry specification, span and trace ID values should be represented as hexadecimal strings
+   *  https://github.com/open-telemetry/opentelemetry-specification/blob/84922f70734354f327136ea80dc3611f89325516/specification/protocol/otlp.md#otlphttp-request
+   */
+  traceServiceRequestProto.resourceSpans.forEach((resourceSpan, i) => {
+    resourceSpan.instrumentationLibrarySpans?.forEach((instrumentationLibrarySpan, j) => {
+      instrumentationLibrarySpan.spans?.forEach((span, k) => {
+        json.resourceSpans[i].instrumentationLibrarySpans[j].spans[k].traceId = bufToHex(span.traceId);
+        json.resourceSpans[i].instrumentationLibrarySpans[j].spans[k].spanId = bufToHex(span.spanId);
+        json.resourceSpans[i].instrumentationLibrarySpans[j].spans[k].parentSpanId = bufToHex(span.parentSpanId);
+        span.links?.forEach((link, l) => {
+          json.resourceSpans[i].instrumentationLibrarySpans[j].spans[k].links[l].traceId = bufToHex(link.traceId);
+          json.resourceSpans[i].instrumentationLibrarySpans[j].spans[k].links[l].spanId = bufToHex(link.spanId);
+        });
+      });
+    });
+  });
+
+  return json;
 }
 
 export function createExportTraceServiceRequest(spans: ReadableSpan[]): opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest | null {

@@ -64,6 +64,15 @@ export function hexToBuf(hex: string): Uint8Array | undefined {
   return ints && new Uint8Array(ints);
 }
 
+function i2hex(i: number): string {
+  return ('0' + i.toString(16)).slice(-2);
+}
+
+export function bufToHex(buf?: Uint8Array | null): string | undefined {
+  if (buf == null || buf.length === 0) return undefined;
+  return Array.from(buf).map(i2hex).join('');
+}
+
 export function hrTimeToLong(hrtime: HrTime): Long {
   return Long.fromInt(hrtime[0], true).mul(1e9).add(hrtime[1]);
 }

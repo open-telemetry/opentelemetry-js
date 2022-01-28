@@ -19,10 +19,10 @@ import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import Long = require('long');
-import { createExportTraceServiceRequest } from '../src';
+import { createExportTraceServiceRequestJSON } from '../src';
 
 describe('Trace', () => {
-  describe('createExportTraceServiceRequest', () => {
+  describe('createExportTraceServiceRequestJSON', () => {
     let resource: Resource;
     let span: ReadableSpan;
     let expectedSpanJson: any;
@@ -98,15 +98,15 @@ describe('Trace', () => {
                 instrumentationLibrary: { name: 'myLib', version: '0.1.0' },
                 spans: [
                   {
-                    traceId: 'AAAAAAAAAAAAAAAAAAAAAQ==',
-                    spanId: 'AAAAAAAAAAI=',
-                    parentSpanId: 'AAAAAAAAAAE=',
+                    traceId: '00000000000000000000000000000001',
+                    spanId: '0000000000000002',
+                    parentSpanId: '0000000000000001',
                     name: 'span-name',
                     kind: 'SPAN_KIND_CLIENT',
                     links: [
                       {
-                        spanId: 'AAAAAAAAAAM=',
-                        traceId: 'AAAAAAAAAAAAAAAAAAAAAg==',
+                        spanId: '0000000000000003',
+                        traceId: '00000000000000000000000000000002',
                         attributes: [
                           {
                             key: 'link-attribute',
@@ -156,20 +156,20 @@ describe('Trace', () => {
     });
 
     it('returns null on an empty list', () => {
-      assert.strictEqual(createExportTraceServiceRequest([]), null);
+      assert.strictEqual(createExportTraceServiceRequestJSON([]), null);
     });
 
     it('serializes a span', () => {
-      const exportRequest = createExportTraceServiceRequest([span]);
+      const exportRequest = createExportTraceServiceRequestJSON([span]);
       assert.ok(exportRequest);
-      assert.deepStrictEqual(exportRequest.toJSON(), expectedSpanJson);
+      assert.deepStrictEqual(exportRequest, expectedSpanJson);
     });
 
     it('serializes a span without a parent', () => {
       (span as any).parentSpanId = undefined;
-      const exportRequest = createExportTraceServiceRequest([span]);
+      const exportRequest = createExportTraceServiceRequestJSON([span]);
       assert.ok(exportRequest);
-      assert.strictEqual(exportRequest.toJSON().resourceSpans[0].instrumentationLibrarySpans[0].spans[0].parentSpanId, undefined);
+      assert.strictEqual(exportRequest.resourceSpans[0].instrumentationLibrarySpans[0].spans[0].parentSpanId, undefined);
 
     });
 
@@ -177,51 +177,51 @@ describe('Trace', () => {
       it('error', () => {
         span.status.code = SpanStatusCode.ERROR;
         span.status.message = 'error message';
-        const exportRequest = createExportTraceServiceRequest([span]);
+        const exportRequest = createExportTraceServiceRequestJSON([span]);
         assert.ok(exportRequest);
-        const spanStatus = exportRequest.toJSON().resourceSpans[0].instrumentationLibrarySpans[0].spans[0].status;
+        const spanStatus = exportRequest.resourceSpans[0].instrumentationLibrarySpans[0].spans[0].status;
         assert.strictEqual(spanStatus.code, 'STATUS_CODE_ERROR');
         assert.strictEqual(spanStatus.message, 'error message');
       });
 
       it('unset', () => {
         span.status.code = SpanStatusCode.UNSET;
-        const exportRequest = createExportTraceServiceRequest([span]);
+        const exportRequest = createExportTraceServiceRequestJSON([span]);
         assert.ok(exportRequest);
-        assert.strictEqual(exportRequest.toJSON().resourceSpans[0].instrumentationLibrarySpans[0].spans[0].status.code, 'STATUS_CODE_UNSET');
+        assert.strictEqual(exportRequest.resourceSpans[0].instrumentationLibrarySpans[0].spans[0].status.code, 'STATUS_CODE_UNSET');
       });
     });
 
     describe('span kind', () => {
       it('consumer', () => {
         (span as any).kind = SpanKind.CONSUMER;
-        const exportRequest = createExportTraceServiceRequest([span]);
+        const exportRequest = createExportTraceServiceRequestJSON([span]);
         assert.ok(exportRequest);
-        assert.strictEqual(exportRequest.toJSON().resourceSpans[0].instrumentationLibrarySpans[0].spans[0].kind, 'SPAN_KIND_CONSUMER');
+        assert.strictEqual(exportRequest.resourceSpans[0].instrumentationLibrarySpans[0].spans[0].kind, 'SPAN_KIND_CONSUMER');
       });
       it('internal', () => {
         (span as any).kind = SpanKind.INTERNAL;
-        const exportRequest = createExportTraceServiceRequest([span]);
+        const exportRequest = createExportTraceServiceRequestJSON([span]);
         assert.ok(exportRequest);
-        assert.strictEqual(exportRequest.toJSON().resourceSpans[0].instrumentationLibrarySpans[0].spans[0].kind, 'SPAN_KIND_INTERNAL');
+        assert.strictEqual(exportRequest.resourceSpans[0].instrumentationLibrarySpans[0].spans[0].kind, 'SPAN_KIND_INTERNAL');
       });
       it('producer', () => {
         (span as any).kind = SpanKind.PRODUCER;
-        const exportRequest = createExportTraceServiceRequest([span]);
+        const exportRequest = createExportTraceServiceRequestJSON([span]);
         assert.ok(exportRequest);
-        assert.strictEqual(exportRequest.toJSON().resourceSpans[0].instrumentationLibrarySpans[0].spans[0].kind, 'SPAN_KIND_PRODUCER');
+        assert.strictEqual(exportRequest.resourceSpans[0].instrumentationLibrarySpans[0].spans[0].kind, 'SPAN_KIND_PRODUCER');
       });
       it('server', () => {
         (span as any).kind = SpanKind.SERVER;
-        const exportRequest = createExportTraceServiceRequest([span]);
+        const exportRequest = createExportTraceServiceRequestJSON([span]);
         assert.ok(exportRequest);
-        assert.strictEqual(exportRequest.toJSON().resourceSpans[0].instrumentationLibrarySpans[0].spans[0].kind, 'SPAN_KIND_SERVER');
+        assert.strictEqual(exportRequest.resourceSpans[0].instrumentationLibrarySpans[0].spans[0].kind, 'SPAN_KIND_SERVER');
       });
       it('unspecified', () => {
         (span as any).kind = undefined;
-        const exportRequest = createExportTraceServiceRequest([span]);
+        const exportRequest = createExportTraceServiceRequestJSON([span]);
         assert.ok(exportRequest);
-        assert.strictEqual(exportRequest.toJSON().resourceSpans[0].instrumentationLibrarySpans[0].spans[0].kind, 'SPAN_KIND_UNSPECIFIED');
+        assert.strictEqual(exportRequest.resourceSpans[0].instrumentationLibrarySpans[0].spans[0].kind, 'SPAN_KIND_UNSPECIFIED');
       });
     });
   });
