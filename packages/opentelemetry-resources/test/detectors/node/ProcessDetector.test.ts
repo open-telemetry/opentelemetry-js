@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 import * as sinon from 'sinon';
-import { processDetector, Resource } from '../../src';
+import { processDetector, Resource } from '../../../src';
 import {
   assertProcessResource,
   assertEmptyResource,
-} from '../util/resource-assertions';
+} from '../../util/resource-assertions';
+import { describeNode } from '../../util';
 
-describe('processDetector()', () => {
+describeNode('processDetector() on Node.js', () => {
   afterEach(() => {
     sinon.restore();
   });
