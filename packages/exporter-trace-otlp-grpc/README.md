@@ -27,7 +27,6 @@ const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc'
 
 const collectorOptions = {
   // url is optional and can be omitted - default is localhost:4317
-  // if the provided url is schemeless, the exporter will add "https" as the scheme
   url: '<collector-hostname>:<port>',
 };
 
@@ -52,7 +51,6 @@ const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc'
 
 const collectorOptions = {
   // url is optional and can be omitted - default is localhost:4317
-  // if the provided url is schemeless, the exporter will add "https" as the scheme
   url: '<collector-hostname>:<port>',
   credentials: grpc.credentials.createSsl(),
 };
@@ -93,7 +91,6 @@ metadata.set('k', 'v');
 
 const collectorOptions = {
   // url is optional and can be omitted - default is localhost:4317
-  // if the provided url is schemeless, the exporter will add "https" as the scheme
   url: '<collector-hostname>:<port>',
   metadata, // // an optional grpc.Metadata object to be sent with each request
 };
