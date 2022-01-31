@@ -13,9 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import * as sinon from 'sinon';
+import { processDetector, Resource } from '../../../src';
+import {
+  assertEmptyResource,
+} from '../../util/resource-assertions';
+import { describeBrowser } from '../../util';
 
-export * from './Resource';
-export * from './platform';
-export * from './types';
-export * from './config';
-export * from './detectors';
+describeBrowser('processDetector() on web browser', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
+  it('should return empty resource', async () => {
+    const resource: Resource = await processDetector.detect();
+    assertEmptyResource(resource);
+  });
+});
