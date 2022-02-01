@@ -98,7 +98,7 @@ export abstract class OTLPExporterBase<
 
   private _export(items: ExportItem[]): Promise<unknown> {
     return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         // don't wait anymore for export
         reject(new Error('Timeout'));
       }, this._timeoutMillis);
@@ -108,30 +108,41 @@ export abstract class OTLPExporterBase<
         this.send(items, resolve, reject);
       } catch (e) {
         reject(e);
+      } finally {
+        timer.unref();
       }
     });
   }
 
   private _configureTimeout(timeoutMillis: number | undefined): number {
-    return typeof timeoutMillis === 'number'
-      ? timeoutMillis < 0
-        ? this._invalidTimeout(timeoutMillis, DEFAULT_TIMEOUT)
-        : timeoutMillis
-          : this._selectATimeout();
+    if (typeof timeoutMillis === 'number') {
+      if (timeoutMillis < 0) {
+        // OTLP exporter configured timeout - using default value of 10000ms
+        return this._invalidTimeout(timeoutMillis, DEFAULT_TIMEOUT);
+      }
+      return timeoutMillis;
+    } else {
+      return this._getTimeoutFromEnv();
+    }
   }
 
-  private _selectATimeout(): number {
+  private _getTimeoutFromEnv(): number {
     const definedTimeout =
       Number(process.env.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT ||
       process.env.OTEL_EXPORTER_OTLP_TIMEOUT);
 
-    return definedTimeout
-      ? definedTimeout < 0
-        ? this._invalidTimeout(definedTimeout, DEFAULT_TIMEOUT)
-        : definedTimeout
-          : getEnv().OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
+    if (definedTimeout) {
+      if (definedTimeout < 0) {
+        // OTLP exporter configured timeout - using default value of 10000ms
+        return this._invalidTimeout(definedTimeout, DEFAULT_TIMEOUT);
+      }
+      return definedTimeout;
+    } else {
+      return getEnv().OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
+    }
   }
 
+  // OTLP exporter configured timeout - using default value of 10000ms
   private _invalidTimeout(timeout: number, defaultTimeout: number): number {
     diag.warn('Timeout must be non-negative', timeout);
 
