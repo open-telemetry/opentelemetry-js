@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-export * from './Resource';
-export * from './platform';
-export * from './types';
-export * from './config';
-export * from './detectors';
+{
+  const testsContext = require.context('./', false, /test$/);
+  testsContext.keys().forEach(testsContext);
+}
+
+{
+  const testsContext = require.context('./detectors/browser', false, /test$/);
+  testsContext.keys().forEach(testsContext);
+}
