@@ -17,12 +17,9 @@
 import { diag } from '@opentelemetry/api';
 import { getEnv } from '@opentelemetry/core';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import {
-  Detector,
-  Resource,
-  ResourceDetectionConfig,
-  ResourceAttributes,
-} from '../../../';
+import { Resource } from '../Resource';
+import { Detector, ResourceAttributes } from '../types';
+import { ResourceDetectionConfig } from '../config';
 
 /**
  * EnvDetector can be used to detect the presence of and create a Resource

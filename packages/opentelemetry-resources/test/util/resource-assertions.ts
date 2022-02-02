@@ -296,6 +296,31 @@ export const assertProcessResource = (
   }
 };
 
+export const assertWebEngineResource = (resource: Resource, validations: {
+  name?: string;
+  version?: string;
+  description?: string;
+}) => {
+  if (validations.name) {
+    assert.strictEqual(
+      resource.attributes[SemanticResourceAttributes.WEBENGINE_NAME],
+      validations.name
+    );
+  }
+  if (validations.version) {
+    assert.strictEqual(
+      resource.attributes[SemanticResourceAttributes.WEBENGINE_VERSION],
+      validations.version
+    );
+  }
+  if (validations.description) {
+    assert.strictEqual(
+      resource.attributes[SemanticResourceAttributes.WEBENGINE_DESCRIPTION],
+      validations.description
+    );
+  }
+};
+
 /**
  * Test utility method to validate an empty resource
  *
