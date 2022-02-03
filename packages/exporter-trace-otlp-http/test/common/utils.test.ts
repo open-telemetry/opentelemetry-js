@@ -18,6 +18,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag } from '@opentelemetry/api';
 import { parseHeaders } from '../../src/util';
+import { configureExporterTimeout } from '../../src/util';
 
 describe('utils', () => {
   afterEach(() => {
@@ -48,6 +49,36 @@ describe('utils', () => {
     it('should parse undefined', () => {
       const result = parseHeaders(undefined);
       assert.deepStrictEqual(result, {});
+    });
+  });
+
+  describe('configureExporterTimeout', () => {
+    const envSource = process.env;
+    it('should use default trace export timeout env variable value when timeoutMillis parameter is undefined', () => {
+      const exporterTimeout = configureExporterTimeout(undefined);
+      assert.strictEqual(exporterTimeout, 10000);
+    });
+    it('should use default trace export timeout env variable value when timeoutMillis parameter is negative', () => {
+      const exporterTimeout = configureExporterTimeout(-18000);
+      assert.strictEqual(exporterTimeout, 10000);
+    });
+    it('should use trace export timeout value defined in env', () => {
+      envSource.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT = '15000';
+      const exporterTimeout = configureExporterTimeout(undefined);
+      assert.strictEqual(exporterTimeout, 15000);
+      delete envSource.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
+    });
+    it('should use default trace export timeout env variable value when trace export timeout value defined in env is negative', () => {
+      envSource.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT = '-15000';
+      const exporterTimeout = configureExporterTimeout(undefined);
+      assert.strictEqual(exporterTimeout, 10000);
+      delete envSource.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
+    });
+    it('should use timeoutMillis parameter over trace export timeout value defined in env', () => {
+      envSource.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT = '11000';
+      const exporterTimeout = configureExporterTimeout(9000);
+      assert.strictEqual(exporterTimeout, 9000);
+      delete envSource.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
     });
   });
 });

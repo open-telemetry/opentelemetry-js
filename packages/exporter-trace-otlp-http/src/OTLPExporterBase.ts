@@ -15,14 +15,13 @@
  */
 
 import { SpanAttributes, diag } from '@opentelemetry/api';
-import { ExportResult, ExportResultCode, BindOnceFuture, getEnv } from '@opentelemetry/core';
+import { ExportResult, ExportResultCode, BindOnceFuture } from '@opentelemetry/core';
 import {
   OTLPExporterError,
   OTLPExporterConfigBase,
   ExportServiceError,
 } from './types';
-
-const DEFAULT_TIMEOUT = 10000;
+import { configureExporterTimeout } from './util';
 
 /**
  * Collector Exporter abstract base class
@@ -59,7 +58,7 @@ export abstract class OTLPExporterBase<
         ? config.concurrencyLimit
         : Infinity;
 
-    this._timeoutMillis = this._configureTimeout(config.timeoutMillis);
+    this._timeoutMillis = configureExporterTimeout(config.timeoutMillis);
 
     // platform dependent
     this.onInit(config);
@@ -112,41 +111,6 @@ export abstract class OTLPExporterBase<
         timer.unref();
       }
     });
-  }
-
-  private _configureTimeout(timeoutMillis: number | undefined): number {
-    if (typeof timeoutMillis === 'number') {
-      if (timeoutMillis < 0) {
-        // OTLP exporter configured timeout - using default value of 10000ms
-        return this._invalidTimeout(timeoutMillis, DEFAULT_TIMEOUT);
-      }
-      return timeoutMillis;
-    } else {
-      return this._getTimeoutFromEnv();
-    }
-  }
-
-  private _getTimeoutFromEnv(): number {
-    const definedTimeout =
-      Number(process.env.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT ||
-      process.env.OTEL_EXPORTER_OTLP_TIMEOUT);
-
-    if (definedTimeout) {
-      if (definedTimeout < 0) {
-        // OTLP exporter configured timeout - using default value of 10000ms
-        return this._invalidTimeout(definedTimeout, DEFAULT_TIMEOUT);
-      }
-      return definedTimeout;
-    } else {
-      return getEnv().OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
-    }
-  }
-
-  // OTLP exporter configured timeout - using default value of 10000ms
-  private _invalidTimeout(timeout: number, defaultTimeout: number): number {
-    diag.warn('Timeout must be non-negative', timeout);
-
-    return defaultTimeout;
   }
 
   /**

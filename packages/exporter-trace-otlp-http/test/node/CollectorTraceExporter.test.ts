@@ -232,6 +232,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
         const mockRes = new MockedResponse(200);
         const args = stubRequest.args[0];
         const callback = args[1];
+
         callback(mockRes);
         mockRes.send('success');
         setTimeout(() => {
