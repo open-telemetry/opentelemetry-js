@@ -46,8 +46,8 @@
     "geckodriver": "2.0.4",
     "nightwatch": "1.7.12",
     "selenium-server": "3.141.59",
-    "terser-webpack-plugin": "5.2.5",
-    "webpack": "5.64.1",
+    "terser-webpack-plugin": "4.2.3",
+    "webpack": "4.46.0",
     "webpack-cli": "4.9.1",
     "webpack-dev-server": "4.5.0",
     "webpack-merge": "5.8.0"
