@@ -17,6 +17,7 @@
 import * as types from '../../types';
 import * as path from 'path';
 import * as RequireInTheMiddle from 'require-in-the-middle';
+import ImportInTheMiddle, { HookFn } from 'import-in-the-middle';
 import { satisfies } from 'semver';
 import { InstrumentationAbstract } from '../../instrumentation';
 import { InstrumentationModuleDefinition } from './types';
@@ -29,7 +30,7 @@ export abstract class InstrumentationBase<T = any>
   extends InstrumentationAbstract
   implements types.Instrumentation {
   private _modules: InstrumentationModuleDefinition<T>[];
-  private _hooks: RequireInTheMiddle.Hooked[] = [];
+  private _hooks = 0;
   private _enabled = false;
 
   constructor(
@@ -71,12 +72,12 @@ export abstract class InstrumentationBase<T = any>
     return undefined;
   }
 
-  private _onRequire<T>(
-    module: InstrumentationModuleDefinition<T>,
-    exports: T,
+  private _onRequire<V>(
+    module: InstrumentationModuleDefinition<V>,
+    exports: V,
     name: string,
     baseDir?: string
-  ): T {
+  ): V {
     if (!baseDir) {
       if (typeof module.patch === 'function') {
         module.moduleExports = exports;
@@ -120,7 +121,7 @@ export abstract class InstrumentationBase<T = any>
     this._enabled = true;
 
     // already hooked, just call patch again
-    if (this._hooks.length > 0) {
+    if (this._hooks > 0) {
       for (const module of this._modules) {
         if (typeof module.patch === 'function' && module.moduleExports) {
           module.patch(module.moduleExports, module.moduleVersion);
@@ -135,22 +136,19 @@ export abstract class InstrumentationBase<T = any>
     }
 
     for (const module of this._modules) {
-      this._hooks.push(
-        RequireInTheMiddle(
-          [module.name],
-          { internals: true },
-          (exports, name, baseDir) => {
-            return this._onRequire<typeof exports>(
-              (module as unknown) as InstrumentationModuleDefinition<
-                typeof exports
-              >,
-              exports,
-              name,
-              baseDir
-            );
-          }
-        )
-      );
+      this._hooks++;
+      const hookFn: RequireInTheMiddle.OnRequireFn = (exports, name, baseDir) => {
+          return this._onRequire<typeof exports>(
+            (module as unknown) as InstrumentationModuleDefinition<
+            typeof exports
+          >,
+            exports,
+            name,
+            baseDir
+          );
+        };
+      RequireInTheMiddle([module.name], { internals: true }, hookFn);
+      new ImportInTheMiddle([module.name], { internals: true }, <HookFn>hookFn);
     }
   }
 

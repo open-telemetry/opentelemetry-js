@@ -19,7 +19,7 @@ declare module 'require-in-the-middle' {
     type Options = {
       internals?: boolean;
     };
-    type OnRequireFn = <T>(exports: T, name: string, basedir?: string) => T;
+    export type OnRequireFn = <T>(exports: T, name: string, basedir?: string) => T;
     type Hooked = { unhook(): void };
   }
   function hook(
