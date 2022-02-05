@@ -64,7 +64,7 @@
     "husky": "4.3.8",
     "lerna": "3.22.1",
     "lerna-changelog": "1.0.1",
-    "linkinator": "^2.16.2",
+    "linkinator": "2.16.2",
     "markdownlint-cli": "0.29.0",
     "semver": "7.3.5",
     "typedoc": "0.22.10",
