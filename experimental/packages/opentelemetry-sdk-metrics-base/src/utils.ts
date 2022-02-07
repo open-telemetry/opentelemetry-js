@@ -82,3 +82,21 @@ export function callWithTimeout<T>(promise: Promise<T>, timeout: number): Promis
       throw reason;
     });
 }
+
+/**
+ * Compatibility helper for environments that don't support
+ * Promise.prototype.finally (like Node.js v8.x).
+ */
+export function promiseFinally<T>(promise: Promise<T>, onFinally: () => unknown): Promise<T> {
+  if (promise.finally) {
+    return promise.finally(onFinally);
+  }
+  return promise.then(value => {
+    return Promise.resolve(onFinally()).then(() => value);
+  }, error => {
+    return Promise.resolve(onFinally())
+      .then(() => {
+        throw error;
+      });
+  });
+}

@@ -80,6 +80,9 @@ export interface Meter {
 
   /**
    * Creates a new `ObservableGauge` metric.
+   *
+   * The callback SHOULD not be called concurrently.
+   *
    * @param name the name of the metric.
    * @param callback the observable callback
    * @param [options] the metric options.
@@ -92,6 +95,9 @@ export interface Meter {
 
   /**
    * Creates a new `ObservableCounter` metric.
+   *
+   * The callback SHOULD not be called concurrently.
+   *
    * @param name the name of the metric.
    * @param callback the observable callback
    * @param [options] the metric options.
@@ -104,6 +110,9 @@ export interface Meter {
 
   /**
    * Creates a new `ObservableUpDownCounter` metric.
+   *
+   * The callback SHOULD not be called concurrently.
+   *
    * @param name the name of the metric.
    * @param callback the observable callback
    * @param [options] the metric options.

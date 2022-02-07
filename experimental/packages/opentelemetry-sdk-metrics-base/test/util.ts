@@ -49,7 +49,7 @@ a = '1';
 })];
 
 export const sleep = (time: number) =>
-  new Promise(resolve => {
+  new Promise<void>(resolve => {
     return setTimeout(resolve, time);
   });
 
