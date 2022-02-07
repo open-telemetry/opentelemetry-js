@@ -25,6 +25,7 @@ import { AsyncMetricStorage } from '../../src/state/AsyncMetricStorage';
 import { NoopAttributesProcessor } from '../../src/view/AttributesProcessor';
 import { assertMetricData, assertPointData, defaultInstrumentationLibrary, defaultInstrumentDescriptor, defaultResource } from '../util';
 import { ObservableCallback } from '@opentelemetry/api-metrics-wip';
+import { ObservableRegistry } from '../../src/state/ObservableRegistry';
 
 const deltaCollector: MetricCollectorHandle = {
   aggregatorTemporality: AggregationTemporality.DELTA,
@@ -38,14 +39,19 @@ const sdkStartTime = hrTime();
 
 class ObservableCallbackDelegate {
   private _delegate?: ObservableCallback;
+  private _callback: ObservableCallback;
+  constructor() {
+    this._callback = observableResult => {
+      this._delegate?.(observableResult);
+    };
+  }
+
   setDelegate(delegate: ObservableCallback) {
     this._delegate = delegate;
   }
 
   getCallback(): ObservableCallback {
-    return observableResult => {
-      this._delegate?.(observableResult);
-    };
+    return this._callback;
   }
 }
 
@@ -55,12 +61,15 @@ describe('AsyncMetricStorage', () => {
       const collectors = [deltaCollector];
       it('should collect and reset memos', async () => {
         const delegate = new ObservableCallbackDelegate();
+        const observableRegistry = new ObservableRegistry();
         const metricStorage = new AsyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(),
           new NoopAttributesProcessor(),
           delegate.getCallback(),
+          observableRegistry,
         );
+        observableRegistry.addCallback(delegate.getCallback(), metricStorage);
 
         delegate.setDelegate(observableResult => {
           observableResult.observe(1, { key: '1' });
@@ -68,7 +77,8 @@ describe('AsyncMetricStorage', () => {
           observableResult.observe(3, { key: '3' });
         });
         {
-          const metric = await metricStorage.collect(
+          await observableRegistry.observe();
+          const metric = metricStorage.collect(
             deltaCollector,
             collectors,
             defaultResource,
@@ -86,7 +96,8 @@ describe('AsyncMetricStorage', () => {
         delegate.setDelegate(observableResult => {});
         // The attributes should not be memorized if no measurement was reported.
         {
-          const metric = await metricStorage.collect(
+          await observableRegistry.observe();
+          const metric = metricStorage.collect(
             deltaCollector,
             collectors,
             defaultResource,
@@ -104,7 +115,8 @@ describe('AsyncMetricStorage', () => {
           observableResult.observe(6, { key: '3' });
         });
         {
-          const metric = await metricStorage.collect(
+          await observableRegistry.observe();
+          const metric = metricStorage.collect(
             deltaCollector,
             [deltaCollector],
             defaultResource,
@@ -126,12 +138,15 @@ describe('AsyncMetricStorage', () => {
       const collectors = [cumulativeCollector];
       it('should collect cumulative metrics', async () => {
         const delegate = new ObservableCallbackDelegate();
+        const observableRegistry = new ObservableRegistry();
         const metricStorage = new AsyncMetricStorage(
           defaultInstrumentDescriptor,
           new SumAggregator(),
           new NoopAttributesProcessor(),
           delegate.getCallback(),
+          observableRegistry,
         );
+        observableRegistry.addCallback(delegate.getCallback(), metricStorage);
 
         delegate.setDelegate(observableResult => {
           observableResult.observe(1, { key: '1' });
@@ -139,7 +154,8 @@ describe('AsyncMetricStorage', () => {
           observableResult.observe(3, { key: '3' });
         });
         {
-          const metric = await metricStorage.collect(
+          await observableRegistry.observe();
+          const metric = metricStorage.collect(
             cumulativeCollector,
             collectors,
             defaultResource,
@@ -157,7 +173,8 @@ describe('AsyncMetricStorage', () => {
         delegate.setDelegate(observableResult => {});
         // The attributes should be memorized even if no measurement was reported.
         {
-          const metric = await metricStorage.collect(
+          await observableRegistry.observe();
+          const metric = metricStorage.collect(
             cumulativeCollector,
             collectors,
             defaultResource,
@@ -178,7 +195,8 @@ describe('AsyncMetricStorage', () => {
           observableResult.observe(6, { key: '3' });
         });
         {
-          const metric = await metricStorage.collect(
+          await observableRegistry.observe();
+          const metric = metricStorage.collect(
             cumulativeCollector,
             collectors,
             defaultResource,

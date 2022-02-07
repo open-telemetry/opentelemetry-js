@@ -17,8 +17,7 @@
 import { HrTime } from '@opentelemetry/api';
 import { ObservableCallback } from '@opentelemetry/api-metrics-wip';
 import { Accumulation, Aggregator } from '../aggregator/types';
-import { View } from '../view/View';
-import { createInstrumentDescriptorWithView, InstrumentDescriptor } from '../InstrumentDescriptor';
+import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { AttributesProcessor } from '../view/AttributesProcessor';
 import { MetricStorage } from './MetricStorage';
 import { InstrumentationLibrary } from '@opentelemetry/core';
@@ -28,8 +27,8 @@ import { DeltaMetricProcessor } from './DeltaMetricProcessor';
 import { TemporalMetricProcessor } from './TemporalMetricProcessor';
 import { Maybe } from '../utils';
 import { MetricCollectorHandle } from './MetricCollector';
-import { ObservableResult } from '../ObservableResult';
 import { AttributeHashMap } from './HashMap';
+import { ObservableRegistry } from './ObservableRegistry';
 
 /**
  * Internal interface.
@@ -44,7 +43,8 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>> implements Metric
     private _instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<T>,
     private _attributesProcessor: AttributesProcessor,
-    private _callback: ObservableCallback
+    private _callback: ObservableCallback,
+    private _observableRegistry: ObservableRegistry,
   ) {
     this._deltaMetricStorage = new DeltaMetricProcessor(aggregator);
     this._temporalMetricStorage = new TemporalMetricProcessor(aggregator);
@@ -65,17 +65,18 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>> implements Metric
    * Note: This is a stateful operation and may reset any interval-related
    * state for the MetricCollector.
    */
-  async collect(
+  collect(
     collector: MetricCollectorHandle,
     collectors: MetricCollectorHandle[],
     resource: Resource,
     instrumentationLibrary: InstrumentationLibrary,
     sdkStartTime: HrTime,
     collectionTime: HrTime,
-  ): Promise<Maybe<MetricData>> {
-    const observableResult = new ObservableResult();
-    // TODO: timeout with callback
-    await this._callback(observableResult);
+  ): Maybe<MetricData> {
+    const observableResult = this._observableRegistry.getObservableResult(this._callback);
+    if (observableResult == null) {
+      return;
+    }
     this._record(observableResult.buffer);
 
     const accumulations = this._deltaMetricStorage.collect();
@@ -90,11 +91,5 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>> implements Metric
       sdkStartTime,
       collectionTime
     );
-  }
-
-  static create(view: View, instrument: InstrumentDescriptor, callback: ObservableCallback): AsyncMetricStorage<Maybe<Accumulation>> {
-    instrument = createInstrumentDescriptorWithView(view, instrument);
-    const aggregator = view.aggregation.createAggregator(instrument);
-    return new AsyncMetricStorage(instrument, aggregator, view.attributesProcessor, callback);
   }
 }

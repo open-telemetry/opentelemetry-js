@@ -40,5 +40,5 @@ export interface MetricStorage {
     instrumentationLibrary: InstrumentationLibrary,
     sdkStartTime: HrTime,
     collectionTime: HrTime,
-  ): Promise<Maybe<MetricData>>;
+  ): Maybe<MetricData>;
 }

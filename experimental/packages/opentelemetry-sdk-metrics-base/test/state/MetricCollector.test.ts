@@ -17,32 +17,21 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MeterProvider } from '../../src';
-import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import { MetricData, PointDataType } from '../../src/export/MetricData';
+import { PointDataType } from '../../src/export/MetricData';
 import { MetricExporter } from '../../src/export/MetricExporter';
 import { MeterProviderSharedState } from '../../src/state/MeterProviderSharedState';
 import { MetricCollector } from '../../src/state/MetricCollector';
-import { defaultInstrumentationLibrary, defaultResource, assertMetricData, assertPointData } from '../util';
+import {
+  defaultInstrumentationLibrary,
+  defaultResource,
+  assertMetricData,
+  assertPointData,
+} from '../util';
+import {
+  TestMetricExporter,
+  TestDeltaMetricExporter
+} from '../export/TestMetricExporter';
 import { TestMetricReader } from '../export/TestMetricReader';
-
-class TestMetricExporter extends MetricExporter {
-  metricDataList: MetricData[] = [];
-  async export(batch: MetricData[]): Promise<void> {
-    this.metricDataList.push(...batch);
-  }
-
-  async forceFlush(): Promise<void> {}
-
-  getPreferredAggregationTemporality(): AggregationTemporality {
-    return AggregationTemporality.CUMULATIVE;
-  }
-}
-
-class TestDeltaMetricExporter extends TestMetricExporter {
-  override getPreferredAggregationTemporality(): AggregationTemporality {
-    return AggregationTemporality.DELTA;
-  }
-}
 
 describe('MetricCollector', () => {
   afterEach(() => {
