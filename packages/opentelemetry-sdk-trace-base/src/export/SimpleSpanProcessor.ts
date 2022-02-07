@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { context, TraceFlags } from '@opentelemetry/api';
+import { context, Context, TraceFlags } from '@opentelemetry/api';
 import {
   ExportResultCode,
   globalErrorHandler,
@@ -45,7 +45,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
   }
 
   // does nothing.
-  onStart(_span: Span): void {}
+  onStart(_span: Span, _parentContext: Context): void {}
 
   onEnd(span: ReadableSpan): void {
     if (this._shutdownOnce.isCalled) {
