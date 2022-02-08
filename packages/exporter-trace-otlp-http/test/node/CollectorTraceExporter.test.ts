@@ -117,6 +117,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
   describe('export', () => {
     beforeEach(() => {
       stubRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
+      (fakeRequest as any).setTimeout = sinon.spy();
       collectorExporterConfig = {
         headers: {
           foo: 'bar',
@@ -272,6 +273,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
   describe('export - with compression', () => {
     beforeEach(() => {
       stubRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
+      (fakeRequest as any).setTimeout = sinon.spy();
       spySetHeader = sinon.spy();
       (fakeRequest as any).setHeader = spySetHeader;
       collectorExporterConfig = {
@@ -338,6 +340,51 @@ describe('OTLPTraceExporter - node with json over http', () => {
       setTimeout(() => {
         assert.strictEqual(collectorExporter['url'], url);
         done();
+      });
+    });
+  });
+
+  describe('export - with timeout', () => {
+    beforeEach(() => {
+      stubRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
+      (fakeRequest as any).setTimeout = sinon.spy();
+      spySetHeader = sinon.spy();
+      (fakeRequest as any).setHeader = spySetHeader;
+      collectorExporterConfig = {
+        headers: {
+          foo: 'bar',
+        },
+        hostname: 'foo',
+        attributes: {},
+        url: 'http://foo.bar.com',
+        keepAlive: true,
+        compression: CompressionAlgorithm.GZIP,
+        httpAgentOptions: { keepAliveMsecs: 2000 },
+      };
+      collectorExporter = new OTLPTraceExporter(collectorExporterConfig);
+      spans = [];
+      spans.push(Object.assign({}, mockedReadableSpan));
+    });
+    it('should log the timeout error message', done => {
+      const responseSpy = sinon.spy();
+      collectorExporter.export(spans, responseSpy);
+
+      const timeoutFunc = (fakeRequest as any).setTimeout.args[0][1];
+      timeoutFunc();
+
+      setTimeout(() => {
+        const mockResError = new MockedResponse(400);
+        fakeRequest.emit('error', { code: 'ECONNRESET'});
+        mockResError.send('failed');
+
+        setTimeout(() => {
+          const result = responseSpy.args[0][0] as core.ExportResult;
+          assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+          const error = result.error as otlpTypes.OTLPExporterError;
+          assert.ok(error !== undefined);
+          assert.strictEqual(error.message, 'Request Timeout');
+          done();
+        });
       });
     });
   });

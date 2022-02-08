@@ -17,6 +17,7 @@
 import * as sinon from 'sinon';
 import { sendWithXhr } from '../../src/platform/browser/util';
 import { ensureHeadersContain } from '../traceHelper';
+import { OTLPTraceExporter } from '../../src/platform/node';
 
 describe('util - browser', () => {
   let server: any;
@@ -51,7 +52,10 @@ describe('util - browser', () => {
         const explicitContentType = {
         'Content-Type': 'application/json',
       };
-        sendWithXhr(body, url, explicitContentType, onSuccessStub, onErrorStub);
+        // use default exporter timeout
+        const collectorExporter = new OTLPTraceExporter();
+        const exporterTimeout = collectorExporter._timeoutMillis;
+        sendWithXhr(body, url, explicitContentType, onSuccessStub, onErrorStub, exporterTimeout);
       });
       it('Request Headers should contain "Content-Type" header', done => {
 
@@ -74,7 +78,10 @@ describe('util - browser', () => {
     describe('and empty headers are set', () => {
       beforeEach(()=>{
         const emptyHeaders = {};
-        sendWithXhr(body, url, emptyHeaders, onSuccessStub, onErrorStub);
+        // use default exporter timeout
+        const collectorExporter = new OTLPTraceExporter();
+        const exporterTimeout = collectorExporter._timeoutMillis;
+        sendWithXhr(body, url, emptyHeaders, onSuccessStub, onErrorStub, exporterTimeout);
       });
       it('Request Headers should contain "Content-Type" header', done => {
 
@@ -97,7 +104,10 @@ describe('util - browser', () => {
       let customHeaders: Record<string,string>;
       beforeEach(()=>{
         customHeaders = { aHeader: 'aValue', bHeader: 'bValue' };
-        sendWithXhr(body, url, customHeaders, onSuccessStub, onErrorStub);
+        // use default exporter timeout
+        const collectorExporter = new OTLPTraceExporter();
+        const exporterTimeout = collectorExporter._timeoutMillis;
+        sendWithXhr(body, url, customHeaders, onSuccessStub, onErrorStub, exporterTimeout);
       });
       it('Request Headers should contain "Content-Type" header', done => {
 

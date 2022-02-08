@@ -37,7 +37,7 @@ export abstract class OTLPExporterBase<
   protected _concurrencyLimit: number;
   protected _sendingPromises: Promise<unknown>[] = [];
   protected _shutdownOnce: BindOnceFuture<void>;
-  private readonly _timeoutMillis: number;
+  public readonly _timeoutMillis: number;
 
   /**
    * @param config
@@ -97,18 +97,11 @@ export abstract class OTLPExporterBase<
 
   private _export(items: ExportItem[]): Promise<unknown> {
     return new Promise<void>((resolve, reject) => {
-      const timer = setTimeout(() => {
-        // don't wait anymore for export
-        reject(new Error('Timeout'));
-      }, this._timeoutMillis);
-
       try {
         diag.debug('items to be sent', items);
         this.send(items, resolve, reject);
       } catch (e) {
         reject(e);
-      } finally {
-        timer.unref();
       }
     });
   }

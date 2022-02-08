@@ -78,7 +78,7 @@ export abstract class OTLPExporterBrowserBase<
 
     const promise = new Promise<void>((resolve, reject) => {
       if (this._useXHR) {
-        sendWithXhr(body, this.url, this._headers, resolve, reject);
+        sendWithXhr(body, this.url, this._headers, resolve, reject, this._timeoutMillis);
       } else {
         sendWithBeacon(body, this.url, { type: 'application/json' }, resolve, reject);
       }

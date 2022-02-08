@@ -52,7 +52,8 @@ export function sendWithXhr(
   url: string,
   headers: Record<string, string>,
   onSuccess: () => void,
-  onError: (error: otlpTypes.OTLPExporterError) => void
+  onError: (error: otlpTypes.OTLPExporterError) => void,
+  exporterTimeout: number
 ): void {
   const xhr = new XMLHttpRequest();
   xhr.open('POST', url);
@@ -62,12 +63,18 @@ export function sendWithXhr(
     'Content-Type': 'application/json',
   };
 
+  xhr.timeout = exporterTimeout;
+
   Object.entries({
     ...defaultHeaders,
     ...headers,
   }).forEach(([k, v]) => {
     xhr.setRequestHeader(k, v);
   });
+
+  xhr.ontimeout = function () {
+    xhr.abort();
+  };
 
   xhr.send(body);
 
@@ -84,6 +91,12 @@ export function sendWithXhr(
 
         onError(error);
       }
+    } else if (xhr.readyState === XMLHttpRequest.UNSENT) {
+      const error = new otlpTypes.OTLPExporterError(
+        'Request Timeout', xhr.status
+      );
+
+      onError(error);
     }
   };
 }
