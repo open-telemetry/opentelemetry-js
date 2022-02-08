@@ -78,6 +78,7 @@ describe('environment', () => {
         OTEL_BSP_MAX_EXPORT_BATCH_SIZE: 40,
         OTEL_BSP_SCHEDULE_DELAY: 50,
         OTEL_EXPORTER_JAEGER_AGENT_HOST: 'host.domain.com',
+        OTEL_EXPORTER_JAEGER_AGENT_PORT: 1234,
         OTEL_EXPORTER_JAEGER_ENDPOINT: 'https://example.com/endpoint',
         OTEL_EXPORTER_JAEGER_PASSWORD: 'secret',
         OTEL_EXPORTER_JAEGER_USER: 'whoami',
@@ -114,6 +115,7 @@ describe('environment', () => {
         env.OTEL_EXPORTER_JAEGER_AGENT_HOST,
         'host.domain.com'
       );
+      assert.strictEqual(env.OTEL_EXPORTER_JAEGER_AGENT_PORT, 1234);
       assert.strictEqual(
         env.ECS_CONTAINER_METADATA_URI_V4,
         'https://ecs.uri/v4'
