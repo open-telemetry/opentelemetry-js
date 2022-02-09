@@ -16,7 +16,7 @@ jobs:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - uses: actions/setup-node@v2
         with:
@@ -49,14 +49,14 @@ jobs:
   browser-tests-stable:
     runs-on: ubuntu-latest
     container:
-      image: circleci/node:14-browsers
+      image: circleci/node:16-browsers
     env:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
       - name: Permission Setup
         run: sudo chmod -R 777 /github /__w
+      - name: Checkout
+        uses: actions/checkout@v2
 
       - name: restore lerna
         uses: actions/cache@v2
@@ -71,7 +71,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js'
+          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js' --ignore @opentelemetry/selenium-tests
 
       - name: Build 🔧
         run: |
@@ -126,7 +126,7 @@ jobs:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - uses: actions/setup-node@v2
         with:
@@ -146,7 +146,7 @@ jobs:
         working-directory: experimental
         run: |
           npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js' --ignore @opentelemetry/selenium-tests
+          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js'
 
       - name: Build 🔧
         working-directory: experimental
@@ -163,14 +163,14 @@ jobs:
   browser-tests-experimental:
     runs-on: ubuntu-latest
     container:
-      image: circleci/node:14-browsers
+      image: circleci/node:16-browsers
     env:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
       - name: Permission Setup
         run: sudo chmod -R 777 /github /__w
+      - name: Checkout
+        uses: actions/checkout@v2
 
       - name: restore lerna
         uses: actions/cache@v2
