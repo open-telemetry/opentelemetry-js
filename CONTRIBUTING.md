@@ -107,6 +107,9 @@ npm run clean
 
 These commands can also be run for specific packages instead of the whole project, which can speed up compilations while developing.
 
+**NOTE**: To run commands in specific packages (compile, lint, etc), please ensure you are using at least `7.x`
+version of `npm`.
+
 ```sh
 # Build a single module and all of its dependencies
 cd packages/opentelemetry-module-name
