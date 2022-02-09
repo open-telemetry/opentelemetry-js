@@ -20,6 +20,7 @@ import {
   defaultTextMapGetter,
   defaultTextMapSetter,
   propagation,
+  baggageEntryMetadataFromString
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/api';
 import * as assert from 'assert';
@@ -39,8 +40,9 @@ describe('W3CBaggagePropagator', () => {
     it('should set baggage header', () => {
       const baggage = propagation.createBaggage({
         key1: { value: 'd4cda95b652f4a1592b449d5929fda1b' },
-        key3: { value: 'c88815a7-0fa9-4d95-a1f1-cdccce3c5c2a' },
         'with/slash': { value: 'with spaces' },
+        key3: { value: 'c88815a7-0fa9-4d95-a1f1-cdccce3c5c2a' },
+        key4: { value: 'foo', metadata: baggageEntryMetadataFromString('key4prop1=value1;key4prop2=value2;key4prop3WithNoValue') }
       });
 
       httpBaggagePropagator.inject(
@@ -50,7 +52,7 @@ describe('W3CBaggagePropagator', () => {
       );
       assert.deepStrictEqual(
         carrier[BAGGAGE_HEADER],
-        'key1=d4cda95b652f4a1592b449d5929fda1b,key3=c88815a7-0fa9-4d95-a1f1-cdccce3c5c2a,with%2Fslash=with%20spaces'
+        'key1=d4cda95b652f4a1592b449d5929fda1b,with%2Fslash=with%20spaces,key3=c88815a7-0fa9-4d95-a1f1-cdccce3c5c2a,key4=foo;key4prop1=value1;key4prop2=value2;key4prop3WithNoValue'
       );
     });
 
