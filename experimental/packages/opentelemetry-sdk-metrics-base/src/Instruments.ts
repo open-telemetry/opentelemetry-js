@@ -16,17 +16,27 @@
 
 import * as api from '@opentelemetry/api';
 import * as metrics from '@opentelemetry/api-metrics-wip';
+import { ValueType } from '@opentelemetry/api-metrics-wip';
 import { InstrumentDescriptor } from './InstrumentDescriptor';
 import { WritableMetricStorage } from './state/WritableMetricStorage';
 
 export class SyncInstrument {
-  constructor(private _writableMetricStorage: WritableMetricStorage, private _descriptor: InstrumentDescriptor) { }
+  private _valueType: ValueType;
+  constructor(private _writableMetricStorage: WritableMetricStorage, private _descriptor: InstrumentDescriptor) {
+    this._valueType = _descriptor.valueType;
+  }
 
   getName(): string {
     return this._descriptor.name;
   }
 
-  aggregate(value: number, attributes: metrics.Attributes = {}, context: api.Context = api.context.active()) {
+  protected _record(value: number, attributes: metrics.Attributes = {}, context: api.Context = api.context.active()) {
+    if (this._valueType === ValueType.INT && !Number.isInteger(value)) {
+      api.diag.warn(
+        `INT value type cannot accept a floating-point value for ${this._descriptor.name}, ignoring the fractional digits.`
+      );
+      value = Math.trunc(value);
+    }
     this._writableMetricStorage.record(value, attributes, context);
   }
 }
@@ -39,7 +49,7 @@ export class UpDownCounter extends SyncInstrument implements metrics.UpDownCount
    * Increment value of counter by the input. Inputs may be negative.
    */
   add(value: number, attributes?: metrics.Attributes, ctx?: api.Context): void {
-    this.aggregate(value, attributes, ctx);
+    this._record(value, attributes, ctx);
   }
 }
 
@@ -56,7 +66,7 @@ export class Counter extends SyncInstrument implements metrics.Counter {
       return;
     }
 
-    this.aggregate(value, attributes, ctx);
+    this._record(value, attributes, ctx);
   }
 }
 
@@ -68,6 +78,6 @@ export class Histogram extends SyncInstrument implements metrics.Histogram {
    * Records a measurement. Value of the measurement must not be negative.
    */
   record(value: number, attributes?: metrics.Attributes, ctx?: api.Context): void {
-    this.aggregate(value, attributes, ctx);
+    this._record(value, attributes, ctx);
   }
 }
