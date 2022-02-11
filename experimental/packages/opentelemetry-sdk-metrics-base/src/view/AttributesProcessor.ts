@@ -43,4 +43,22 @@ export class NoopAttributesProcessor extends AttributesProcessor {
   }
 }
 
+/**
+ * {@link AttributesProcessor} that filters by allowed attribute names and drops any names that are not in the
+ * allow list.
+ */
+export class FilteringAttributesProcessor extends AttributesProcessor {
+  constructor(private _allowedAttributeNames: string[]) {
+    super();
+  }
+
+  process(incoming: Attributes, _context: Context): Attributes {
+    const filteredAttributes: Attributes = {};
+    Object.keys(incoming)
+      .filter(attributeName => this._allowedAttributeNames.includes(attributeName))
+      .forEach(attributeName => filteredAttributes[attributeName] = incoming[attributeName]);
+    return filteredAttributes;
+  }
+}
+
 const NOOP = new NoopAttributesProcessor;

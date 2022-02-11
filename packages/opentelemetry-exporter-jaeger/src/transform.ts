@@ -108,7 +108,7 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
     spanId: Utils.encodeInt64(span.spanContext().spanId),
     parentSpanId: parentSpan,
     operationName: span.name,
-    references: spanLinksToThriftRefs(span.links, span.parentSpanId),
+    references: spanLinksToThriftRefs(span.links),
     flags: span.spanContext().traceFlags || DEFAULT_FLAGS,
     startTime: Utils.encodeInt64(hrTimeToMicroseconds(span.startTime)),
     duration: Utils.encodeInt64(hrTimeToMicroseconds(span.duration)),
@@ -120,21 +120,16 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
 /** Translate OpenTelemetry {@link Link}s to Jaeger ThriftReference. */
 function spanLinksToThriftRefs(
   links: Link[],
-  parentSpanId?: string
 ): ThriftReference[] {
   return links
-    .map((link): ThriftReference | null => {
-      if (link.context.spanId === parentSpanId) {
-        const refType = ThriftReferenceType.FOLLOWS_FROM;
-        const traceId = link.context.traceId;
-        const traceIdHigh = Utils.encodeInt64(traceId.slice(0, 16));
-        const traceIdLow = Utils.encodeInt64(traceId.slice(16));
-        const spanId = Utils.encodeInt64(link.context.spanId);
-        return { traceIdLow, traceIdHigh, spanId, refType };
-      }
-      return null;
-    })
-    .filter(ref => !!ref) as ThriftReference[];
+    .map((link): ThriftReference => {
+      const refType = ThriftReferenceType.FOLLOWS_FROM;
+      const traceId = link.context.traceId;
+      const traceIdHigh = Utils.encodeInt64(traceId.slice(0, 16));
+      const traceIdLow = Utils.encodeInt64(traceId.slice(16));
+      const spanId = Utils.encodeInt64(link.context.spanId);
+      return { traceIdLow, traceIdHigh, spanId, refType };
+    });
 }
 
 /** Translate OpenTelemetry attribute value to Jaeger TagValue. */

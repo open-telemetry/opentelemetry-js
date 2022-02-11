@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
+import { diag, ROOT_CONTEXT } from '@opentelemetry/api';
 import {
   AlwaysOnSampler,
   ExportResultCode,
@@ -131,14 +131,14 @@ describe('BatchSpanProcessorBase', () => {
 
       const span = createSampledSpan(`${name}_0`);
 
-      processor.onStart(span);
+      processor.onStart(span, ROOT_CONTEXT);
       processor.onEnd(span);
       assert.strictEqual(processor['_finishedSpans'].length, 1);
 
       await processor.forceFlush();
       assert.strictEqual(exporter.getFinishedSpans().length, 1);
 
-      processor.onStart(span);
+      processor.onStart(span, ROOT_CONTEXT);
       processor.onEnd(span);
       assert.strictEqual(processor['_finishedSpans'].length, 1);
 
@@ -147,7 +147,7 @@ describe('BatchSpanProcessorBase', () => {
       assert.strictEqual(spy.args.length, 2);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
-      processor.onStart(span);
+      processor.onStart(span, ROOT_CONTEXT);
       processor.onEnd(span);
       assert.strictEqual(spy.args.length, 2);
       assert.strictEqual(processor['_finishedSpans'].length, 0);
@@ -160,7 +160,7 @@ describe('BatchSpanProcessorBase', () => {
 
       const span = createUnsampledSpan(`${name}_0`);
 
-      processor.onStart(span);
+      processor.onStart(span, ROOT_CONTEXT);
       processor.onEnd(span);
 
       await processor.forceFlush();
@@ -174,14 +174,14 @@ describe('BatchSpanProcessorBase', () => {
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
       for (let i = 0; i < defaultBufferConfig.maxExportBatchSize; i++) {
         const span = createSampledSpan(`${name}_${i}`);
-        processor.onStart(span);
+        processor.onStart(span, ROOT_CONTEXT);
         assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
         processor.onEnd(span);
         assert.strictEqual(exporter.getFinishedSpans().length, 0);
       }
       const span = createSampledSpan(`${name}_6`);
-      processor.onStart(span);
+      processor.onStart(span, ROOT_CONTEXT);
       processor.onEnd(span);
 
       setTimeout(async () => {
@@ -199,7 +199,7 @@ describe('BatchSpanProcessorBase', () => {
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
       for (let i = 0; i < defaultBufferConfig.maxExportBatchSize; i++) {
         const span = createSampledSpan(`${name}_${i}`);
-        processor.onStart(span);
+        processor.onStart(span, ROOT_CONTEXT);
         processor.onEnd(span);
         assert.strictEqual(exporter.getFinishedSpans().length, 0);
       }
@@ -218,7 +218,7 @@ describe('BatchSpanProcessorBase', () => {
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
       for (let i = 0; i < defaultBufferConfig.maxExportBatchSize; i++) {
         const span = createSampledSpan(`${name}_${i}`);
-        processor.onStart(span);
+        processor.onStart(span, ROOT_CONTEXT);
         processor.onEnd(span);
       }
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
@@ -238,7 +238,7 @@ describe('BatchSpanProcessorBase', () => {
       // start but do not end spans
       for (let i = 0; i < defaultBufferConfig.maxExportBatchSize; i++) {
         const span = tracer.startSpan('spanName');
-        processor.onStart(span as Span);
+        processor.onStart(span as Span, ROOT_CONTEXT);
       }
 
       setTimeout(() => {
@@ -266,11 +266,11 @@ describe('BatchSpanProcessorBase', () => {
         const totalSpans = defaultBufferConfig.maxExportBatchSize * 2;
         for (let i = 0; i < totalSpans; i++) {
           const span = createSampledSpan(`${name}_${i}`);
-          processor.onStart(span);
+          processor.onStart(span, ROOT_CONTEXT);
           processor.onEnd(span);
         }
         const span = createSampledSpan(`${name}_last`);
-        processor.onStart(span);
+        processor.onStart(span, ROOT_CONTEXT);
         processor.onEnd(span);
         clock.tick(defaultBufferConfig.scheduledDelayMillis + 10);
 
@@ -326,7 +326,7 @@ describe('BatchSpanProcessorBase', () => {
 
       it('should call an async callback when flushing is complete', done => {
         const span = createSampledSpan('test');
-        processor.onStart(span);
+        processor.onStart(span, ROOT_CONTEXT);
         processor.onEnd(span);
         processor.forceFlush().then(() => {
           assert.strictEqual(exporter.getFinishedSpans().length, 1);
@@ -343,7 +343,7 @@ describe('BatchSpanProcessorBase', () => {
           }, 0);
         });
         const span = createSampledSpan('test');
-        processor.onStart(span);
+        processor.onStart(span, ROOT_CONTEXT);
         processor.onEnd(span);
 
         processor.shutdown().then(() => {
@@ -367,7 +367,7 @@ describe('BatchSpanProcessorBase', () => {
 
         for (let i = 0; i < defaultBufferConfig.maxExportBatchSize; i++) {
           const span = createSampledSpan('test');
-          processor.onStart(span);
+          processor.onStart(span, ROOT_CONTEXT);
           processor.onEnd(span);
         }
 
@@ -402,7 +402,7 @@ describe('BatchSpanProcessorBase', () => {
         const processor = new BatchSpanProcessor(testTracingExporter);
 
         const span = createSampledSpan('test');
-        processor.onStart(span);
+        processor.onStart(span, ROOT_CONTEXT);
         processor.onEnd(span);
 
         processor.forceFlush().then(() => {
@@ -429,7 +429,7 @@ describe('BatchSpanProcessorBase', () => {
       it('should drop spans', () => {
         const span = createSampledSpan('test');
         for (let i = 0, j = 20; i < j; i++) {
-          processor.onStart(span);
+          processor.onStart(span, ROOT_CONTEXT);
           processor.onEnd(span);
         }
         assert.equal(processor['_finishedSpans'].length, 6);
