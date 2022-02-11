@@ -16,22 +16,18 @@
 
 import * as api from '@opentelemetry/api';
 import * as metrics from '@opentelemetry/api-metrics-wip';
-import { ValueType } from '@opentelemetry/api-metrics-wip';
 import { InstrumentDescriptor } from './InstrumentDescriptor';
 import { WritableMetricStorage } from './state/WritableMetricStorage';
 
 export class SyncInstrument {
-  private _valueType: ValueType;
-  constructor(private _writableMetricStorage: WritableMetricStorage, private _descriptor: InstrumentDescriptor) {
-    this._valueType = _descriptor.valueType;
-  }
+  constructor(private _writableMetricStorage: WritableMetricStorage, private _descriptor: InstrumentDescriptor) {}
 
   getName(): string {
     return this._descriptor.name;
   }
 
   protected _record(value: number, attributes: metrics.Attributes = {}, context: api.Context = api.context.active()) {
-    if (this._valueType === ValueType.INT && !Number.isInteger(value)) {
+    if (this._descriptor.valueType === metrics.ValueType.INT && !Number.isInteger(value)) {
       api.diag.warn(
         `INT value type cannot accept a floating-point value for ${this._descriptor.name}, ignoring the fractional digits.`
       );
