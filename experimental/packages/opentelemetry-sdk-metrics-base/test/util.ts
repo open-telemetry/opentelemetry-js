@@ -120,6 +120,6 @@ export function assertPartialDeepStrictEqual<T>(actual: unknown, expected: T, me
   }
   const ownNames = Object.getOwnPropertyNames(expected);
   for (const ownName of ownNames) {
-    assert.deepStrictEqual((actual as any)[ownName], (expected as any)[ownName], message);
+    assert.deepStrictEqual((actual as any)[ownName], (expected as any)[ownName], `${ownName} not equals: ${message ?? '<no-message>'}`);
   }
 }
