@@ -43,6 +43,12 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
 ): void {
   const exporterTimeout = collector._timeoutMillis;
   const parsedUrl = new url.URL(collector.url);
+  let reqIsDestroyed: boolean;
+
+  const exporterTimer = setTimeout(() => {
+    reqIsDestroyed = true;
+    req.destroy();
+  }, exporterTimeout);
 
   const options: http.RequestOptions | https.RequestOptions = {
     hostname: parsedUrl.hostname,
@@ -65,6 +71,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
     res.on('end', () => {
       if (res.statusCode && res.statusCode < 299) {
         diag.debug(`statusCode: ${res.statusCode}`, responseData);
+        clearTimeout(exporterTimer);
         onSuccess();
       } else {
         const error = new otlpTypes.OTLPExporterError(
@@ -72,18 +79,18 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
           res.statusCode,
           responseData
         );
+        clearTimeout(exporterTimer);
         onError(error);
       }
     });
   });
 
-  req.setTimeout(exporterTimeout, function requestTimeout () {
-    req.destroy();
-  });
-
   req.on('error', (error: Error | any) => {
-    if (error.code === 'ECONNRESET') {
-      onError(new Error('Request Timeout'));
+    if (reqIsDestroyed) {
+      const err = new otlpTypes.OTLPExporterError(
+        'Request Timeout', error.code
+      );
+      onError(err);
     } else {
       onError(error);
     }

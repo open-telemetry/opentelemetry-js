@@ -55,7 +55,7 @@ describe('util - browser', () => {
         // use default exporter timeout
         const collectorExporter = new OTLPTraceExporter();
         const exporterTimeout = collectorExporter._timeoutMillis;
-        sendWithXhr(body, url, explicitContentType, onSuccessStub, onErrorStub, exporterTimeout);
+        sendWithXhr(body, url, explicitContentType, exporterTimeout, onSuccessStub, onErrorStub);
       });
       it('Request Headers should contain "Content-Type" header', done => {
 
@@ -81,7 +81,7 @@ describe('util - browser', () => {
         // use default exporter timeout
         const collectorExporter = new OTLPTraceExporter();
         const exporterTimeout = collectorExporter._timeoutMillis;
-        sendWithXhr(body, url, emptyHeaders, onSuccessStub, onErrorStub, exporterTimeout);
+        sendWithXhr(body, url, emptyHeaders, exporterTimeout, onSuccessStub, onErrorStub);
       });
       it('Request Headers should contain "Content-Type" header', done => {
 
@@ -107,7 +107,7 @@ describe('util - browser', () => {
         // use default exporter timeout
         const collectorExporter = new OTLPTraceExporter();
         const exporterTimeout = collectorExporter._timeoutMillis;
-        sendWithXhr(body, url, customHeaders, onSuccessStub, onErrorStub, exporterTimeout);
+        sendWithXhr(body, url, customHeaders, exporterTimeout, onSuccessStub, onErrorStub);
       });
       it('Request Headers should contain "Content-Type" header', done => {
 

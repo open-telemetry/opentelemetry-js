@@ -51,10 +51,17 @@ export function sendWithXhr(
   body: string,
   url: string,
   headers: Record<string, string>,
+  exporterTimeout: number,
   onSuccess: () => void,
   onError: (error: otlpTypes.OTLPExporterError) => void,
-  exporterTimeout: number
 ): void {
+  let reqIsDestroyed: boolean;
+
+  const exporterTimer = setTimeout(() => {
+    reqIsDestroyed = true;
+    xhr.abort();
+  }, exporterTimeout);
+
   const xhr = new XMLHttpRequest();
   xhr.open('POST', url);
 
@@ -63,8 +70,6 @@ export function sendWithXhr(
     'Content-Type': 'application/json',
   };
 
-  xhr.timeout = exporterTimeout;
-
   Object.entries({
     ...defaultHeaders,
     ...headers,
@@ -72,15 +77,21 @@ export function sendWithXhr(
     xhr.setRequestHeader(k, v);
   });
 
-  xhr.ontimeout = function () {
-    xhr.abort();
-  };
+  xhr.addEventListener('abort', () => {
+    if (reqIsDestroyed) {
+      const error = new otlpTypes.OTLPExporterError(
+        'Request Timeout', xhr.status
+      );
+      onError(error);
+    }
+  });
 
   xhr.send(body);
 
   xhr.onreadystatechange = () => {
     if (xhr.readyState === XMLHttpRequest.DONE) {
       if (xhr.status >= 200 && xhr.status <= 299) {
+        clearTimeout(exporterTimer);
         diag.debug('xhr success', body);
         onSuccess();
       } else {
@@ -88,15 +99,9 @@ export function sendWithXhr(
           `Failed to export with XHR (status: ${xhr.status})`,
           xhr.status
         );
-
+        clearTimeout(exporterTimer);
         onError(error);
       }
-    } else if (xhr.readyState === XMLHttpRequest.UNSENT) {
-      const error = new otlpTypes.OTLPExporterError(
-        'Request Timeout', xhr.status
-      );
-
-      onError(error);
     }
   };
 }
