@@ -26,8 +26,8 @@ const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc');
 
 const collectorOptions = {
-  // url is optional and can be omitted - default is grpc://localhost:4317
-  url: 'grpc://<collector-hostname>:<port>',
+  // url is optional and can be omitted - default is localhost:4317
+  url: '<collector-hostname>:<port>',
 };
 
 const provider = new BasicTracerProvider();
@@ -50,8 +50,8 @@ const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc');
 
 const collectorOptions = {
-  // url is optional and can be omitted - default is grpc://localhost:4317
-  url: 'grpc://<collector-hostname>:<port>',
+  // url is optional and can be omitted - default is localhost:4317
+  url: '<collector-hostname>:<port>',
   credentials: grpc.credentials.createSsl(),
 };
 
@@ -90,8 +90,8 @@ const metadata = new grpc.Metadata();
 metadata.set('k', 'v');
 
 const collectorOptions = {
-  // url is optional and can be omitted - default is grpc://localhost:4317
-  url: 'grpc://<collector-hostname>:<port>',
+  // url is optional and can be omitted - default is localhost:4317
+  url: '<collector-hostname>:<port>',
   metadata, // // an optional grpc.Metadata object to be sent with each request
 };
 
