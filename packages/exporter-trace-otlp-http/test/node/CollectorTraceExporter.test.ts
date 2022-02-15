@@ -117,7 +117,6 @@ describe('OTLPTraceExporter - node with json over http', () => {
   describe('export', () => {
     beforeEach(() => {
       stubRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
-      (fakeRequest as any).setTimeout = sinon.spy();
       collectorExporterConfig = {
         headers: {
           foo: 'bar',
@@ -273,7 +272,6 @@ describe('OTLPTraceExporter - node with json over http', () => {
   describe('export - with compression', () => {
     beforeEach(() => {
       stubRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
-      (fakeRequest as any).setTimeout = sinon.spy();
       spySetHeader = sinon.spy();
       (fakeRequest as any).setHeader = spySetHeader;
       collectorExporterConfig = {
@@ -343,11 +341,9 @@ describe('OTLPTraceExporter - node with json over http', () => {
       });
     });
   });
-
   describe('export - with timeout', () => {
     beforeEach(() => {
       stubRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
-      (fakeRequest as any).setTimeout = sinon.spy();
       spySetHeader = sinon.spy();
       (fakeRequest as any).setHeader = spySetHeader;
       collectorExporterConfig = {
@@ -365,12 +361,13 @@ describe('OTLPTraceExporter - node with json over http', () => {
       spans = [];
       spans.push(Object.assign({}, mockedReadableSpan));
     });
-    it('should log the timeout error message', done => {
+    it('should log the timeout request error message', done => {
       const responseSpy = sinon.spy();
+      const clock = sinon.useFakeTimers();
       collectorExporter.export(spans, responseSpy);
 
-      const timeoutFunc = (fakeRequest as any).setTimeout.args[0][1];
-      timeoutFunc();
+      clock.tick(10000);
+      clock.restore();
 
       setTimeout(() => {
         const mockResError = new MockedResponse(400);
