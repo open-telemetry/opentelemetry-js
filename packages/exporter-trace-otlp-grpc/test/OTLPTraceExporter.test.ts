@@ -36,6 +36,8 @@ import {
   mockedReadableSpan,
 } from './traceHelper';
 
+import * as core from '@opentelemetry/core';
+
 const traceServiceProtoPath =
   'opentelemetry/proto/collector/trace/v1/trace_service.proto';
 const includeDirs = [path.resolve(__dirname, '../protos')];
@@ -196,6 +198,33 @@ const testCollectorExporter = (params: TestParams) =>
           }
           done();
         }, 200);
+      });
+      it('should log deadline exceeded error', done => {
+        const credentials = params.useTLS
+        ? grpc.credentials.createSsl(
+            fs.readFileSync('./test/certs/ca.crt'),
+            fs.readFileSync('./test/certs/client.key'),
+            fs.readFileSync('./test/certs/client.crt')
+          )
+        : undefined;
+
+        const collectorExporterWithTimeout = new OTLPTraceExporter({
+          url: 'grpcs://' + address,
+          credentials,
+          metadata: params.metadata,
+          timeoutMillis: 100,
+        });
+
+        const responseSpy = sinon.spy();
+        const spans = [Object.assign({}, mockedReadableSpan)];
+        collectorExporterWithTimeout.export(spans, responseSpy);
+
+        setTimeout(() => {
+          const result = responseSpy.args[0][0] as core.ExportResult;
+          assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+          assert.strictEqual(responseSpy.args[0][0].error.details, 'Deadline exceeded');
+          done();
+        }, 300);
       });
     });
   });
