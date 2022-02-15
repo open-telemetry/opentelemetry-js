@@ -40,7 +40,7 @@
     "babel-loader": "8.2.3",
     "babel-polyfill": "6.26.0",
     "browserstack-local": "1.4.8",
-    "chromedriver": "97.0.4",
+    "chromedriver": "98.0.0",
     "dotenv": "16.0.0",
     "fast-safe-stringify": "2.1.1",
     "geckodriver": "2.0.4",
