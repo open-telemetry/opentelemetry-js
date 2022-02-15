@@ -93,7 +93,7 @@
   "dependencies": {
     "@opentelemetry/api-metrics": "0.27.0",
     "@opentelemetry/core": "1.0.1",
-    "@opentelemetry/exporter-trace-otlp-http": "0.27.0",
+    "@opentelemetry/exporter-trace-otlp-http": "1.0.1",
     "@opentelemetry/resources": "1.0.1",
     "@opentelemetry/sdk-metrics-base": "0.27.0"
   }

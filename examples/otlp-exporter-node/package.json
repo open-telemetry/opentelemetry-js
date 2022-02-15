@@ -1,7 +1,7 @@
 {
   "name": "example-otlp-exporter-node",
   "private": true,
-  "version": "0.27.0",
+  "version": "1.0.1",
   "description": "Example of using @opentelemetry/collector-exporter in Node.js",
   "main": "index.js",
   "scripts": {
@@ -30,11 +30,11 @@
   "dependencies": {
     "@opentelemetry/api": "^1.0.2",
     "@opentelemetry/core": "1.0.1",
-    "@opentelemetry/exporter-trace-otlp-http": "0.27.0",
+    "@opentelemetry/exporter-trace-otlp-http": "1.0.1",
     "@opentelemetry/exporter-metrics-otlp-http": "0.27.0",
-    "@opentelemetry/exporter-trace-otlp-grpc": "0.27.0",
+    "@opentelemetry/exporter-trace-otlp-grpc": "1.0.1",
     "@opentelemetry/exporter-metrics-otlp-grpc": "0.27.0",
-    "@opentelemetry/exporter-trace-otlp-proto": "0.27.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "1.0.1",
     "@opentelemetry/exporter-metrics-otlp-proto": "0.27.0",
     "@opentelemetry/resources": "1.0.1",
     "@opentelemetry/semantic-conventions": "1.0.1",
