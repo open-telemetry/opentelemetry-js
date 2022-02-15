@@ -53,7 +53,7 @@ export function sendWithXhr(
   headers: Record<string, string>,
   exporterTimeout: number,
   onSuccess: () => void,
-  onError: (error: otlpTypes.OTLPExporterError) => void,
+  onError: (error: otlpTypes.OTLPExporterError) => void
 ): void {
   let reqIsDestroyed: boolean;
 
