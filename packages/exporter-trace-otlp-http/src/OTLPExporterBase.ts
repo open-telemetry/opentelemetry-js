@@ -36,10 +36,6 @@ export abstract class OTLPExporterBase<
   protected _concurrencyLimit: number;
   protected _sendingPromises: Promise<unknown>[] = [];
   protected _shutdownOnce: BindOnceFuture<void>;
-  private DEFAULT_MAX_ATTEMPTS = 4;
-  private DEFAULT_INITIAL_BACKOFF = 1000;
-  private DEFAULT_BACKOFF_MULTIPLIER = 1.5;
-  private retryCodes = [429, 502, 503, 504];
 
   /**
    * @param config
@@ -72,19 +68,7 @@ export abstract class OTLPExporterBase<
    * @param onError - optional
    */
 
-  export(items: ExportItem[], resultCallback: (result: ExportResult) => void, exportTimeoutMillis?: number, onError?: (error: object) => void): void {
-
-    let retryTimer: ReturnType<typeof setTimeout>;
-    let exportTimer: ReturnType<typeof setTimeout>;
-
-    if (exportTimeoutMillis && onError) {
-      exportTimer = setTimeout(() => {
-        clearTimeout(retryTimer);
-        if (onError !== undefined) {
-          onError(new Error('Timeout'));
-        }
-      }, exportTimeoutMillis);
-    }
+  export(items: ExportItem[], resultCallback: (result: ExportResult) => void): void {
 
     if (this._shutdownOnce.isCalled) {
       resultCallback({
@@ -102,25 +86,13 @@ export abstract class OTLPExporterBase<
       return;
     }
 
-    const exportWithRetry = (retries = this.DEFAULT_MAX_ATTEMPTS, backoffMillis = this.DEFAULT_INITIAL_BACKOFF) => {
-      this._export(items)
-      .then(() => {
-        clearTimeout(exportTimer);
-        resultCallback({ code: ExportResultCode.SUCCESS });
-      })
-      .catch((error: ExportServiceError) => {
-        if (this._isRetryable(error.code) && retries > 0) {
-            retryTimer = setTimeout(() => {
-                return exportWithRetry(retries - 1, backoffMillis * this.DEFAULT_BACKOFF_MULTIPLIER);
-            }, backoffMillis);
-        } else {
-            clearTimeout(exportTimer);
-            resultCallback({ code: ExportResultCode.FAILED, error });
-        }
-      });
-    };
-
-    exportWithRetry();
+    this._export(items)
+    .then(() => {
+      resultCallback({ code: ExportResultCode.SUCCESS });
+    })
+    .catch((error: ExportServiceError) => {
+      resultCallback({ code: ExportResultCode.FAILED, error });
+    });
   }
 
   private _export(items: ExportItem[]): Promise<unknown> {
@@ -132,10 +104,6 @@ export abstract class OTLPExporterBase<
         reject(e);
       }
     });
-  }
-
-  private _isRetryable(statusCode: number): boolean {
-    return this.retryCodes.includes(statusCode);
   }
 
   /**
