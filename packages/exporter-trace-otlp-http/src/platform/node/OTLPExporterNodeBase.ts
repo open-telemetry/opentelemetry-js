@@ -39,7 +39,7 @@ export abstract class OTLPExporterNodeBase<
   DEFAULT_HEADERS: Record<string, string> = {};
   headers: Record<string, string>;
   agent: http.Agent | https.Agent | undefined;
-  compression: CompressionAlgorithm;
+  compression: CompressionAlgorithm | string;
 
   constructor(config: OTLPExporterNodeConfigBase = {}) {
     super(config);
@@ -53,7 +53,9 @@ export abstract class OTLPExporterNodeBase<
       baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_HEADERS)
     );
     this.agent = createHttpAgent(config);
-    this.compression = config.compression || CompressionAlgorithm.NONE;
+    this.compression =
+      config.compression || process.env.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION ||
+      process.env.OTEL_EXPORTER_OTLP_COMPRESSION || CompressionAlgorithm.NONE;
   }
 
   onInit(_config: OTLPExporterNodeConfigBase): void {}
