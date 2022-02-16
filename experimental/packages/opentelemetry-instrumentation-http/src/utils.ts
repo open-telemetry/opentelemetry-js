@@ -18,7 +18,7 @@ import {
   SpanStatusCode,
   Span,
   SpanStatus,
-  context,
+  context, SpanKind,
 } from '@opentelemetry/api';
 import {
   NetTransportValues,
@@ -65,35 +65,19 @@ export const getAbsoluteUrl = (
   return `${protocol}//${host}${path}`;
 };
 
-export const parseServerResponseStatus = (statusCode?: number): Omit<SpanStatus, 'message'> => {
-  if (statusCode === undefined) {
-    return { code: SpanStatusCode.ERROR };
-  }
-
-  // 1xx, 2xx, 3xx, 4xx are OK from the server perspective
-  if (statusCode >= 100 && statusCode < 500) {
-    return { code: SpanStatusCode.OK };
-  }
-
-  // All other codes are error
-  return { code: SpanStatusCode.ERROR };
-};
-
 /**
  * Parse status code from HTTP response. [More details](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-http.md#status)
  */
-export const parseClientResponseStatus = (statusCode?: number): Omit<SpanStatus, 'message'> => {
-  if (statusCode === undefined) {
-    return { code: SpanStatusCode.ERROR };
-  }
-
-  // 1xx, 2xx, 3xx are OK
-  if (statusCode >= 100 && statusCode < 400) {
-    return { code: SpanStatusCode.OK };
+export const parseResponseStatus = (kind: SpanKind, statusCode?: number): SpanStatusCode => {
+  const upperBound = kind === SpanKind.CLIENT ? 400 : 500;
+  // 1xx, 2xx, 3xx are OK on client and server
+  // 4xx is OK on server
+  if (statusCode && statusCode >= 100 && statusCode < upperBound) {
+    return SpanStatusCode.UNSET;
   }
 
   // All other codes are error
-  return { code: SpanStatusCode.ERROR };
+  return SpanStatusCode.ERROR;
 };
 
 /**

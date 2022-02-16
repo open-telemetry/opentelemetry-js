@@ -13,68 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  SpanAttributes,
-  SpanStatusCode,
-  ROOT_CONTEXT,
-  SpanKind,
-  TraceFlags,
-  context,
-} from '@opentelemetry/api';
-import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {context, ROOT_CONTEXT, SpanAttributes, SpanKind, SpanStatusCode, TraceFlags,} from '@opentelemetry/api';
+import {BasicTracerProvider, Span} from '@opentelemetry/sdk-trace-base';
+import {SemanticAttributes} from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
-import { IncomingMessage, ServerResponse } from 'http';
-import { Socket } from 'net';
+import {IncomingMessage, ServerResponse} from 'http';
+import {Socket} from 'net';
 import * as sinon from 'sinon';
 import * as url from 'url';
-import { IgnoreMatcher } from '../../src/types';
+import {IgnoreMatcher} from '../../src/types';
 import * as utils from '../../src/utils';
-import { AttributeNames } from '../../src/enums/AttributeNames';
-import { RPCType, setRPCMetadata } from '@opentelemetry/core';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import {AttributeNames} from '../../src/enums/AttributeNames';
+import {RPCType, setRPCMetadata} from '@opentelemetry/core';
+import {AsyncHooksContextManager} from '@opentelemetry/context-async-hooks';
 
 describe('Utility', () => {
-  describe('parseClientResponseStatus()', () => {
+  describe('parseResponseStatus()', () => {
     it('should return ERROR code by default', () => {
-      const status = utils.parseClientResponseStatus(
-        (undefined as unknown) as number
-      );
-      assert.deepStrictEqual(status, { code: SpanStatusCode.ERROR });
+      const status = utils.parseResponseStatus(SpanKind.CLIENT, undefined);
+      assert.deepStrictEqual(status, SpanStatusCode.ERROR);
     });
 
-    it('should return OK for Success HTTP status code', () => {
+    it('should return UNSET for Success HTTP status code', () => {
       for (let index = 100; index < 400; index++) {
-        const status = utils.parseClientResponseStatus(index);
-        assert.deepStrictEqual(status, { code: SpanStatusCode.OK });
+        const status = utils.parseResponseStatus(SpanKind.CLIENT, index);
+        assert.deepStrictEqual(status, SpanStatusCode.UNSET);
       }
-    });
-
-    it('should not return OK for Bad HTTP status code', () => {
-      for (let index = 400; index <= 600; index++) {
-        const status = utils.parseClientResponseStatus(index);
-        assert.notStrictEqual(status.code, SpanStatusCode.OK);
-      }
-    });
-  });
-
-  describe('parseServerResponseStatus()', () => {
-    it('should return ERROR code by default', () => {
-      const status = utils.parseClientResponseStatus(undefined);
-      assert.deepStrictEqual(status, { code: SpanStatusCode.ERROR });
-    });
-
-    it('should return OK for Success HTTP status code', () => {
       for (let index = 100; index < 500; index++) {
-        const status = utils.parseClientResponseStatus(index);
-        assert.deepStrictEqual(status, { code: SpanStatusCode.OK });
+        const status = utils.parseResponseStatus(SpanKind.SERVER, index);
+        assert.deepStrictEqual(status, SpanStatusCode.UNSET);
       }
     });
 
-    it('should not return OK for Bad HTTP status code', () => {
+    it('should return ERROR for bad status codes', () => {
+      for (let index = 400; index <= 600; index++) {
+        const status = utils.parseResponseStatus(SpanKind.CLIENT, index);
+        assert.notStrictEqual(status, SpanStatusCode.UNSET);
+      }
       for (let index = 500; index <= 600; index++) {
-        const status = utils.parseClientResponseStatus(index);
-        assert.notStrictEqual(status.code, SpanStatusCode.OK);
+        const status = utils.parseResponseStatus(SpanKind.SERVER, index);
+        assert.notStrictEqual(status, SpanStatusCode.UNSET);
       }
     });
   });

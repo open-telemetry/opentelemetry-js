@@ -70,7 +70,7 @@ export const assertSpan = (
   assert.deepStrictEqual(
     span.status,
     validations.forceStatus ||
-      utils.parseClientResponseStatus(validations.httpStatusCode)
+    { code: utils.parseResponseStatus(span.kind, validations.httpStatusCode) }
   );
 
   assert.ok(span.endTime, 'must be finished');
