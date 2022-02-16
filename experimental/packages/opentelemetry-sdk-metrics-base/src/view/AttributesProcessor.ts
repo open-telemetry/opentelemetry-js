@@ -23,7 +23,14 @@ import { Attributes } from '@opentelemetry/api-metrics-wip';
  * additional dimension(s) from the {@link Context}.
  */
 export abstract class AttributesProcessor {
-  abstract process(incoming: Attributes, context: Context): Attributes;
+  /**
+   * Process the metric instrument attributes.
+   *
+   * @param incoming The metric instrument attributes.
+   * @param context The active context when the instrument is synchronous.
+   * `undefined` otherwise.
+   */
+  abstract process(incoming: Attributes, context?: Context): Attributes;
 
   static Noop() {
     return NOOP;
@@ -31,8 +38,26 @@ export abstract class AttributesProcessor {
 }
 
 export class NoopAttributesProcessor extends AttributesProcessor {
-  process(incoming: Attributes, _context: Context) {
+  process(incoming: Attributes, _context?: Context) {
     return incoming;
+  }
+}
+
+/**
+ * {@link AttributesProcessor} that filters by allowed attribute names and drops any names that are not in the
+ * allow list.
+ */
+export class FilteringAttributesProcessor extends AttributesProcessor {
+  constructor(private _allowedAttributeNames: string[]) {
+    super();
+  }
+
+  process(incoming: Attributes, _context: Context): Attributes {
+    const filteredAttributes: Attributes = {};
+    Object.keys(incoming)
+      .filter(attributeName => this._allowedAttributeNames.includes(attributeName))
+      .forEach(attributeName => filteredAttributes[attributeName] = incoming[attributeName]);
+    return filteredAttributes;
   }
 }
 

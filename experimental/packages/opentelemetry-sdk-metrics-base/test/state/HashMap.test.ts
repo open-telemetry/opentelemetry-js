@@ -39,6 +39,23 @@ describe('HashMap', () => {
     });
   });
 
+  describe('has', () => {
+    it('should return if the key exists in the value map', () => {
+      const map = new HashMap<Attributes, number, string>(hashAttributes);
+      const hash = hashAttributes({ foo: 'bar' });
+
+      // with pinned hash code
+      assert.strictEqual(map.has({}, hash), false);
+      assert.strictEqual(map.has({ foo: 'bar' }, hash), false);
+
+      map.set({ foo: 'bar' }, 1);
+      // with pinned hash code
+      assert.strictEqual(map.has({}, hash), true);
+      // with attributes object.
+      assert.strictEqual(map.has({ foo: 'bar' }), true);
+    });
+  });
+
   describe('entries', () => {
     it('iterating with entries', () => {
       const map = new HashMap<Attributes, number, string>(hashAttributes);

@@ -53,11 +53,17 @@ export class HashMap<KeyType, ValueType, HashCodeType> {
     this._valueMap.set(hashCode, value);
   }
 
+  has(key: KeyType, hashCode?: HashCodeType) {
+    hashCode ??= this._hash(key);
+    return this._valueMap.has(hashCode);
+  }
+
   *entries(): IterableIterator<[KeyType, ValueType, HashCodeType]> {
     const valueIterator = this._valueMap.entries();
     let next = valueIterator.next();
     while (next.done !== true) {
-      /** next.value[0] here can not be undefined */
+      // next.value[0] here can not be undefined
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       yield [ this._keyMap.get(next.value[0])!, next.value[1], next.value[0]];
       next = valueIterator.next();
     }

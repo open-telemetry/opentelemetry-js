@@ -18,8 +18,8 @@ import { Attributes, ValueType } from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
-import { InstrumentDescriptor } from '../src/InstrumentDescriptor';
-import { Histogram, InstrumentType } from '../src/Instruments';
+import { InstrumentDescriptor, InstrumentType } from '../src/InstrumentDescriptor';
+import { Histogram } from '../src/Instruments';
 import { MetricData, PointData, PointDataType } from '../src/export/MetricData';
 import { Measurement } from '../src/Measurement';
 import { isNotNullish } from '../src/utils';
@@ -56,14 +56,20 @@ export const sleep = (time: number) =>
 export function assertMetricData(
   actual: unknown,
   pointDataType?: PointDataType,
-  instrumentDescriptor: Partial<InstrumentDescriptor> = defaultInstrumentDescriptor,
-  instrumentationLibrary: Partial<InstrumentationLibrary> = defaultInstrumentationLibrary,
-  resource: Resource = defaultResource,
+  instrumentDescriptor: Partial<InstrumentDescriptor> | null = defaultInstrumentDescriptor,
+  instrumentationLibrary: Partial<InstrumentationLibrary> | null = defaultInstrumentationLibrary,
+  resource: Resource | null = defaultResource,
 ): asserts actual is MetricData {
   const it = actual as MetricData;
-  assert.deepStrictEqual(it.resource, resource);
-  assertPartialDeepStrictEqual(it.instrumentDescriptor, instrumentDescriptor);
-  assertPartialDeepStrictEqual(it.instrumentationLibrary, instrumentationLibrary);
+  if (resource != null) {
+    assert.deepStrictEqual(it.resource, resource);
+  }
+  if (instrumentDescriptor != null) {
+    assertPartialDeepStrictEqual(it.instrumentDescriptor, instrumentDescriptor);
+  }
+  if (instrumentationLibrary != null) {
+    assertPartialDeepStrictEqual(it.instrumentationLibrary, instrumentationLibrary);
+  }
   if (isNotNullish(pointDataType)) {
     assert.strictEqual(it.pointDataType, pointDataType);
   } else {
@@ -114,6 +120,6 @@ export function assertPartialDeepStrictEqual<T>(actual: unknown, expected: T, me
   }
   const ownNames = Object.getOwnPropertyNames(expected);
   for (const ownName of ownNames) {
-    assert.deepStrictEqual((actual as any)[ownName], (expected as any)[ownName], message);
+    assert.deepStrictEqual((actual as any)[ownName], (expected as any)[ownName], `${ownName} not equals: ${message ?? '<no-message>'}`);
   }
 }

@@ -24,7 +24,7 @@ const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-proto');
 
 const collectorOptions = {
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/traces
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/traces
   headers: {
     foo: 'bar'
   }, //an optional object containing custom headers to be sent with each request will only work with http

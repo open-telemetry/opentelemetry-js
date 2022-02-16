@@ -16,8 +16,8 @@
 
 import * as metrics from '@opentelemetry/api-metrics-wip';
 import { InstrumentationLibrary } from '@opentelemetry/core';
-import { createInstrumentDescriptor, InstrumentDescriptor } from './InstrumentDescriptor';
-import { Counter, Histogram, InstrumentType, UpDownCounter } from './Instruments';
+import { createInstrumentDescriptor, InstrumentDescriptor, InstrumentType } from './InstrumentDescriptor';
+import { Counter, Histogram, UpDownCounter } from './Instruments';
 import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { MultiMetricStorage } from './state/MultiWritableMetricStorage';
 import { SyncMetricStorage } from './state/SyncMetricStorage';
@@ -26,63 +26,79 @@ import { MetricData } from './export/MetricData';
 import { isNotNullish } from './utils';
 import { MetricCollectorHandle } from './state/MetricCollector';
 import { HrTime } from '@opentelemetry/api';
+import { AsyncMetricStorage } from './state/AsyncMetricStorage';
 
-// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#meter
-
+/**
+ * This class implements the {@link metrics.Meter} interface.
+ */
 export class Meter implements metrics.Meter {
   private _metricStorageRegistry = new Map<string, MetricStorage>();
 
-  // instrumentation library required by spec to be on meter
-  // spec requires provider config changes to apply to previously created meters, achieved by holding a reference to the provider
   constructor(private _meterProviderSharedState: MeterProviderSharedState, private _instrumentationLibrary: InstrumentationLibrary) {
     this._meterProviderSharedState.meters.push(this);
   }
 
-  /** this exists just to prevent ts errors from unused variables and may be removed */
-  getInstrumentationLibrary(): InstrumentationLibrary {
-    return this._instrumentationLibrary;
-  }
-
+  /**
+   * Create a {@link metrics.Histogram} instrument.
+   */
   createHistogram(name: string, options?: metrics.HistogramOptions): metrics.Histogram {
     const descriptor = createInstrumentDescriptor(name, InstrumentType.HISTOGRAM, options);
     const storage = this._registerMetricStorage(descriptor);
     return new Histogram(storage, descriptor);
   }
 
+  /**
+   * Create a {@link metrics.Counter} instrument.
+   */
   createCounter(name: string, options?: metrics.CounterOptions): metrics.Counter {
     const descriptor = createInstrumentDescriptor(name, InstrumentType.COUNTER, options);
     const storage = this._registerMetricStorage(descriptor);
     return new Counter(storage, descriptor);
   }
 
+  /**
+   * Create a {@link metrics.UpDownCounter} instrument.
+   */
   createUpDownCounter(name: string, options?: metrics.UpDownCounterOptions): metrics.UpDownCounter {
     const descriptor = createInstrumentDescriptor(name, InstrumentType.UP_DOWN_COUNTER, options);
     const storage = this._registerMetricStorage(descriptor);
     return new UpDownCounter(storage, descriptor);
   }
 
+  /**
+   * Create a ObservableGauge instrument.
+   */
   createObservableGauge(
-    _name: string,
-    _callback: metrics.ObservableCallback,
-    _options?: metrics.ObservableGaugeOptions,
+    name: string,
+    callback: metrics.ObservableCallback,
+    options?: metrics.ObservableGaugeOptions,
   ): void {
-    throw new Error('Method not implemented.');
+    const descriptor = createInstrumentDescriptor(name, InstrumentType.OBSERVABLE_GAUGE, options);
+    this._registerAsyncMetricStorage(descriptor, callback);
   }
 
+  /**
+   * Create a ObservableCounter instrument.
+   */
   createObservableCounter(
-    _name: string,
-    _callback: metrics.ObservableCallback,
-    _options?: metrics.ObservableCounterOptions,
+    name: string,
+    callback: metrics.ObservableCallback,
+    options?: metrics.ObservableCounterOptions,
   ): void {
-    throw new Error('Method not implemented.');
+    const descriptor = createInstrumentDescriptor(name, InstrumentType.OBSERVABLE_COUNTER, options);
+    this._registerAsyncMetricStorage(descriptor, callback);
   }
 
+  /**
+   * Create a ObservableUpDownCounter instrument.
+   */
   createObservableUpDownCounter(
-    _name: string,
-    _callback: metrics.ObservableCallback,
-    _options?: metrics.ObservableUpDownCounterOptions,
+    name: string,
+    callback: metrics.ObservableCallback,
+    options?: metrics.ObservableUpDownCounterOptions,
   ): void {
-    throw new Error('Method not implemented.');
+    const descriptor = createInstrumentDescriptor(name, InstrumentType.OBSERVABLE_UP_DOWN_COUNTER, options);
+    this._registerAsyncMetricStorage(descriptor, callback);
   }
 
   private _registerMetricStorage(descriptor: InstrumentDescriptor) {
@@ -99,6 +115,21 @@ export class Meter implements metrics.Meter {
     return new MultiMetricStorage(storages);
   }
 
+  private _registerAsyncMetricStorage(descriptor: InstrumentDescriptor, callback: metrics.ObservableCallback) {
+    const views = this._meterProviderSharedState.viewRegistry.findViews(descriptor, this._instrumentationLibrary);
+    views.forEach(view => {
+      const storage = AsyncMetricStorage.create(view, descriptor, callback);
+      // TODO: handle conflicts
+      this._metricStorageRegistry.set(descriptor.name, storage);
+    });
+  }
+
+  /**
+   * @internal
+   * @param collector opaque handle of {@link MetricCollector} which initiated the collection.
+   * @param collectionTime the HrTime at which the collection was initiated.
+   * @returns the list of {@link MetricData} collected.
+   */
   async collect(collector: MetricCollectorHandle, collectionTime: HrTime): Promise<MetricData[]> {
     const result = await Promise.all(Array.from(this._metricStorageRegistry.values()).map(metricStorage => {
       return metricStorage.collect(

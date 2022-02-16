@@ -142,11 +142,17 @@ describe('HttpInstrumentation', () => {
               throw new Error('bad ignoreIncomingPaths function');
             },
           ],
+          ignoreIncomingRequestHook: _request => {
+            throw new Error('bad ignoreIncomingRequestHook function');
+          },
           ignoreOutgoingUrls: [
             (url: string) => {
               throw new Error('bad ignoreOutgoingUrls function');
             },
           ],
+          ignoreOutgoingRequestHook: _request => {
+            throw new Error('bad ignoreOutgoingRequestHook function');
+          },
           applyCustomAttributesOnSpan: () => {
             throw new Error(applyCustomAttributesOnSpanErrorMessage);
           },
@@ -167,7 +173,12 @@ describe('HttpInstrumentation', () => {
 
       it('should generate valid spans (client side and server side)', async () => {
         const result = await httpRequest.get(
-          `${protocol}://${hostname}:${serverPort}${pathname}`
+          `${protocol}://${hostname}:${serverPort}${pathname}`,
+          {
+            headers: {
+              'user-agent': 'tester'
+            }
+          }
         );
         const spans = memoryExporter.getFinishedSpans();
         const [incomingSpan, outgoingSpan] = spans;
@@ -207,11 +218,20 @@ describe('HttpInstrumentation', () => {
             /\/ignored\/regexp$/i,
             (url: string) => url.endsWith('/ignored/function'),
           ],
+          ignoreIncomingRequestHook: request => {
+            return request.headers['user-agent']?.match('ignored-string') != null;
+          },
           ignoreOutgoingUrls: [
             `${protocol}://${hostname}:${serverPort}/ignored/string`,
             /\/ignored\/regexp$/i,
             (url: string) => url.endsWith('/ignored/function'),
           ],
+          ignoreOutgoingRequestHook: request => {
+            if (request.headers?.['user-agent'] != null) {
+              return `${request.headers['user-agent']}`.match('ignored-string') != null;
+            }
+            return false;
+          },
           applyCustomAttributesOnSpan: customAttributeFunction,
           requestHook: requestHookFunction,
           responseHook: responseHookFunction,
@@ -447,7 +467,7 @@ describe('HttpInstrumentation', () => {
       });
 
       for (const ignored of ['string', 'function', 'regexp']) {
-        it(`should not trace ignored requests (client and server side) with type ${ignored}`, async () => {
+        it(`should not trace ignored requests with paths (client and server side) with type ${ignored}`, async () => {
           const testPath = `/ignored/${ignored}`;
 
           await httpRequest.get(
@@ -457,6 +477,44 @@ describe('HttpInstrumentation', () => {
           assert.strictEqual(spans.length, 0);
         });
       }
+
+      it('should not trace ignored requests with headers (client and server side)', async () => {
+        const testValue = 'ignored-string';
+
+        await Promise.all([
+          httpRequest.get(
+            `${protocol}://${hostname}:${serverPort}`,
+            {
+              headers: {
+                'user-agent': testValue
+              }
+            }
+          ),
+          httpRequest.get(
+            `${protocol}://${hostname}:${serverPort}`,
+            {
+              headers: {
+                'uSeR-aGeNt': testValue
+              }
+            }
+          ),
+        ]);
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 0);
+      });
+
+      it('should trace not ignored requests with headers (client and server side)', async () => {
+        await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}`,
+          {
+            headers: {
+              'user-agent': 'test-bot',
+            }
+          }
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 2);
+      });
 
       for (const arg of ['string', {}, new Date()]) {
         it(`should be tracable and not throw exception in ${protocol} instrumentation when passing the following argument ${JSON.stringify(
