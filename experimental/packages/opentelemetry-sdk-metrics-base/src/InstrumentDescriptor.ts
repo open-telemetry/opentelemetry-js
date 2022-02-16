@@ -20,7 +20,7 @@ import { View } from './view/View';
 /**
  * Supported types of metric instruments.
  */
- export enum InstrumentType {
+export enum InstrumentType {
   COUNTER = 'COUNTER',
   HISTOGRAM = 'HISTOGRAM',
   UP_DOWN_COUNTER = 'UP_DOWN_COUNTER',
@@ -58,30 +58,8 @@ export function createInstrumentDescriptorWithView(view: View, instrument: Instr
 }
 
 export function isDescriptorCompatibleWith(descriptor: InstrumentDescriptor, otherDescriptor: InstrumentDescriptor) {
-  // description is ignored as it is not semantic in nature.
   return descriptor.name === otherDescriptor.name
     && descriptor.unit === otherDescriptor.unit
     && descriptor.type === otherDescriptor.type
     && descriptor.valueType === otherDescriptor.valueType;
-}
-
-export function getDescriptorIncompatibilityDetails(existing: InstrumentDescriptor, otherDescriptor: InstrumentDescriptor) {
-  let incompatibility = '';
-  if (existing.unit !== otherDescriptor.unit) {
-    incompatibility += `\t- Unit '${existing.unit}' does not match '${otherDescriptor.description}'\n`;
-  }
-  if (existing.type !== otherDescriptor.type) {
-    incompatibility += `\t- Type '${existing.type}' does not match '${otherDescriptor.type}'\n`;
-  }
-  if (existing.valueType !== otherDescriptor.valueType) {
-    incompatibility += `\t- Value Type '${existing.valueType}' does not match '${otherDescriptor.valueType}'\n`;
-  }
-
-  return incompatibility;
-}
-
-export function isDescriptorAsync(descriptor: InstrumentDescriptor) {
-  return (descriptor.type === InstrumentType.OBSERVABLE_GAUGE ||
-    descriptor.type === InstrumentType.OBSERVABLE_UP_DOWN_COUNTER ||
-    descriptor.type === InstrumentType.OBSERVABLE_COUNTER);
 }

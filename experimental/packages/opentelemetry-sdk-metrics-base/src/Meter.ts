@@ -129,7 +129,7 @@ export class Meter implements metrics.Meter {
    * @returns the list of {@link MetricData} collected.
    */
   async collect(collector: MetricCollectorHandle, collectionTime: HrTime): Promise<MetricData[]> {
-    const result = await Promise.all(Array.from(this._metricStorageRegistry.getStorages()).map(metricStorage => {
+    const result = await Promise.all(this._metricStorageRegistry.getStorages().map(metricStorage => {
       return metricStorage.collect(
         collector,
         this._meterProviderSharedState.metricCollectors,

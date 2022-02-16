@@ -15,53 +15,79 @@
  */
 
 import { MetricStorage } from './MetricStorage';
-import {
-  getDescriptorIncompatibilityDetails, isDescriptorAsync,
-  isDescriptorCompatibleWith
-} from '../InstrumentDescriptor';
+import { isDescriptorCompatibleWith } from '../InstrumentDescriptor';
 import * as api from '@opentelemetry/api';
 import { Maybe } from '../utils';
+import { getConflictResolutionRecipe, getIncompatibilityDetails } from '../view/RegistrationConflicts';
 
 /**
- * Internal class for storing @{LinkMetricStorage}
+ * Internal class for storing {@link MetricStorage}
  */
 export class MetricStorageRegistry {
-  private readonly _metricStorageRegistry = new Map<string, MetricStorage>();
+  private readonly _metricStorageRegistry = new Map<string, MetricStorage[]>();
 
-  getStorages(): IterableIterator<MetricStorage> {
-    return this._metricStorageRegistry.values();
+  getStorages(): MetricStorage[] {
+    const storages = [];
+    for (const metricStorages of Array.from(this._metricStorageRegistry.values())) {
+      storages.push(...metricStorages);
+    }
+
+    return storages;
   }
 
   register<T extends MetricStorage>(storage: T): Maybe<T> {
     const expectedDescriptor = storage.getInstrumentDescriptor();
+    const existingStorages = this._metricStorageRegistry.get(expectedDescriptor.name);
 
-    // create and register a new one if it does not exist yet.
-    if (!this._metricStorageRegistry.has(expectedDescriptor.name)) {
-      this._metricStorageRegistry.set(expectedDescriptor.name, storage);
+    // Add storage if it does not exist.
+    if (existingStorages === undefined) {
+      this._metricStorageRegistry.set(expectedDescriptor.name, [storage]);
       return storage;
     }
 
-    // We already checked for existence with has()
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const existingStorage = this._metricStorageRegistry.get(expectedDescriptor.name)!;
-    const existingDescriptor = existingStorage.getInstrumentDescriptor();
+    const compatibleStorages = [];
 
-    // Return storage if it is compatible.
-    if (isDescriptorCompatibleWith(existingDescriptor, expectedDescriptor)) {
-      // Is compatible, but views for async instruments cannot be registered twice.
-      if (isDescriptorAsync(existingDescriptor)) {
-        api.diag.warn(`A view for an async instrument with the name '${expectedDescriptor.name}' has already been registered.`);
-        return undefined;
+    for (const existingStorage of existingStorages) {
+      const existingDescriptor = existingStorage.getInstrumentDescriptor();
+
+      if (isDescriptorCompatibleWith(existingDescriptor, expectedDescriptor)) {
+        // Use the longer description if it does not match.
+        if (existingDescriptor.description !== expectedDescriptor.description) {
+          if (expectedDescriptor.description.length > existingDescriptor.description.length) {
+            existingStorage.updateDescription(expectedDescriptor.description);
+          }
+
+          api.diag.warn('A view or instrument with the name ',
+            expectedDescriptor.name,
+            ' has already been registered, but has a different description and is incompatible with another registered view.\n',
+            'Details:\n',
+            getIncompatibilityDetails(existingDescriptor, expectedDescriptor),
+            'The longer description will be used.\nTo resolve the conflict:',
+            getConflictResolutionRecipe(existingDescriptor, expectedDescriptor));
+        }
+        // Storage is fully compatible.
+        compatibleStorages.push(existingStorage as T);
+      } else {
+        // The implementation SHOULD warn about duplicate instrument registration
+        // conflicts after applying View configuration.
+        api.diag.warn('A view or instrument with the name ',
+          expectedDescriptor.name,
+          ' has already been registered and is incompatible with another registered view.\n',
+          'Details:\n',
+          getIncompatibilityDetails(existingDescriptor, expectedDescriptor),
+          'To resolve the conflict:\n',
+          getConflictResolutionRecipe(existingDescriptor, expectedDescriptor));
       }
-
-      return (existingStorage as T);
     }
 
-    // Throw an error if it is not compatible.
-    throw new Error('A view or instrument with the name'
-      + expectedDescriptor.name
-      + 'has already been registered and is incompatible with another registered view.\n'
-      + 'Details:\n'
-      + getDescriptorIncompatibilityDetails(existingDescriptor, expectedDescriptor));
+    // When one compatible storage is already present, another compatible one will not be pushed.
+    // Therefore this will never be > 1
+    if (compatibleStorages.length > 0) {
+      return compatibleStorages[0];
+    }
+
+    // None of the storages were compatible, add the current one to the list.
+    existingStorages.push(storage);
+    return storage;
   }
 }

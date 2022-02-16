@@ -19,7 +19,10 @@ import { Attributes } from '@opentelemetry/api-metrics-wip';
 import { WritableMetricStorage } from './WritableMetricStorage';
 import { Accumulation, Aggregator } from '../aggregator/types';
 import { View } from '../view/View';
-import { createInstrumentDescriptorWithView, InstrumentDescriptor } from '../InstrumentDescriptor';
+import {
+  createInstrumentDescriptorWithView,
+  InstrumentDescriptor
+} from '../InstrumentDescriptor';
 import { AttributesProcessor } from '../view/AttributesProcessor';
 import { MetricStorage } from './MetricStorage';
 import { InstrumentationLibrary } from '@opentelemetry/core';
@@ -35,21 +38,18 @@ import { MetricCollectorHandle } from './MetricCollector';
  *
  * Stores and aggregates {@link MetricData} for synchronous instruments.
  */
-export class SyncMetricStorage<T extends Maybe<Accumulation>> implements WritableMetricStorage, MetricStorage {
+export class SyncMetricStorage<T extends Maybe<Accumulation>> extends MetricStorage implements WritableMetricStorage {
   private _deltaMetricStorage: DeltaMetricProcessor<T>;
   private _temporalMetricStorage: TemporalMetricProcessor<T>;
 
   constructor(
-    private _instrumentDescriptor: InstrumentDescriptor,
+    instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<T>,
     private _attributesProcessor: AttributesProcessor
   ) {
+    super(instrumentDescriptor);
     this._deltaMetricStorage = new DeltaMetricProcessor(aggregator);
     this._temporalMetricStorage = new TemporalMetricProcessor(aggregator);
-  }
-
-  getInstrumentDescriptor(): InstrumentDescriptor {
-    return this._instrumentDescriptor;
   }
 
   record(value: number, attributes: Attributes, context: Context) {
