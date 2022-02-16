@@ -25,7 +25,6 @@ import {
   SemanticAttributes,
 } from '@opentelemetry/semantic-conventions';
 import {
-  ClientRequest,
   IncomingHttpHeaders,
   IncomingMessage,
   OutgoingHttpHeaders,
@@ -65,14 +64,26 @@ export const getAbsoluteUrl = (
 
   return `${protocol}//${host}${path}`;
 };
+
+export const parseServerResponseStatus = (statusCode?: number): Omit<SpanStatus, 'message'> => {
+  if (statusCode === undefined) {
+    return { code: SpanStatusCode.ERROR };
+  }
+
+  // 1xx, 2xx, 3xx, 4xx are OK from the server perspective
+  if (statusCode >= 100 && statusCode < 500) {
+    return { code: SpanStatusCode.OK };
+  }
+
+  // All other codes are error
+  return { code: SpanStatusCode.ERROR };
+};
+
 /**
  * Parse status code from HTTP response. [More details](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-http.md#status)
  */
-export const parseResponseStatus = (
-  statusCode: number | undefined,
-): Omit<SpanStatus, 'message'> => {
-
-  if(statusCode === undefined) {
+export const parseClientResponseStatus = (statusCode?: number): Omit<SpanStatus, 'message'> => {
+  if (statusCode === undefined) {
     return { code: SpanStatusCode.ERROR };
   }
 
@@ -142,12 +153,12 @@ export const isIgnored = (
  * Sets the span with the error passed in params
  * @param {Span} span the span that need to be set
  * @param {Error} error error that will be set to span
- * @param {(IncomingMessage | ClientRequest)} [obj] used for enriching the status by checking the statusCode.
+ * @param {SpanStatusCode} [code] used for overriding the status
  */
 export const setSpanWithError = (
   span: Span,
   error: Err,
-  obj?: IncomingMessage | ClientRequest
+  code = SpanStatusCode.ERROR
 ): void => {
   const message = error.message;
 
@@ -156,23 +167,7 @@ export const setSpanWithError = (
     [AttributeNames.HTTP_ERROR_MESSAGE]: message,
   });
 
-  if (!obj) {
-    span.setStatus({ code: SpanStatusCode.ERROR, message });
-    return;
-  }
-
-  let status: SpanStatus;
-  if ((obj as IncomingMessage).statusCode) {
-    status = parseResponseStatus((obj as IncomingMessage).statusCode);
-  } else if ((obj as ClientRequest).aborted) {
-    status = { code: SpanStatusCode.ERROR };
-  } else {
-    status = { code: SpanStatusCode.ERROR };
-  }
-
-  status.message = message;
-
-  span.setStatus(status);
+  span.setStatus({ code, message });
 };
 
 /**
