@@ -143,6 +143,10 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
       return Promise.resolve();
     }
     return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        // don't wait anymore for export, this way the next batch can start
+        reject(new Error('Timeout'));
+      }, this._exportTimeoutMillis);
       // prevent downstream exporter calls from generating spans
       context.with(suppressTracing(context.active()), () => {
         // Reset the finished spans buffer here because the next invocations of the _flush method
@@ -151,6 +155,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
         this._exporter.export(
           this._finishedSpans.splice(0, this._maxExportBatchSize),
           result => {
+            clearTimeout(timer);
             if (result.code === ExportResultCode.SUCCESS) {
               resolve();
             } else {
@@ -159,9 +164,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
                   new Error('BatchSpanProcessor: span export failed')
               );
             }
-          },
-          this._exportTimeoutMillis,
-          reject
+          }
         );
       });
     });
