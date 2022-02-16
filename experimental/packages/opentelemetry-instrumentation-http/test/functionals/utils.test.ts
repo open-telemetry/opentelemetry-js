@@ -13,19 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {context, ROOT_CONTEXT, SpanAttributes, SpanKind, SpanStatusCode, TraceFlags,} from '@opentelemetry/api';
-import {BasicTracerProvider, Span} from '@opentelemetry/sdk-trace-base';
-import {SemanticAttributes} from '@opentelemetry/semantic-conventions';
+import {
+  SpanAttributes,
+  SpanStatusCode,
+  ROOT_CONTEXT,
+  SpanKind,
+  TraceFlags,
+  context,
+} from '@opentelemetry/api';
+import { BasicTracerProvider, Span } from '@opentelemetry/sdk-trace-base';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
-import {IncomingMessage, ServerResponse} from 'http';
-import {Socket} from 'net';
+import { IncomingMessage, ServerResponse } from 'http';
+import { Socket } from 'net';
 import * as sinon from 'sinon';
 import * as url from 'url';
-import {IgnoreMatcher} from '../../src/types';
+import { IgnoreMatcher } from '../../src/types';
 import * as utils from '../../src/utils';
-import {AttributeNames} from '../../src/enums/AttributeNames';
-import {RPCType, setRPCMetadata} from '@opentelemetry/core';
-import {AsyncHooksContextManager} from '@opentelemetry/context-async-hooks';
+import { AttributeNames } from '../../src/enums/AttributeNames';
+import { RPCType, setRPCMetadata } from '@opentelemetry/core';
+import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 
 describe('Utility', () => {
   describe('parseResponseStatus()', () => {
