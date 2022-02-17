@@ -15,13 +15,14 @@
  */
 
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { envDetector, Resource } from '../../src';
+import { envDetector, Resource } from '../../../src';
 import {
   assertK8sResource,
   assertEmptyResource,
-} from '../util/resource-assertions';
+} from '../../util/resource-assertions';
+import { describeNode } from '../../util';
 
-describe('envDetector()', () => {
+describeNode('envDetector() on Node.js', () => {
   describe('with valid env', () => {
     before(() => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =

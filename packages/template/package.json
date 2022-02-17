@@ -90,6 +90,6 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "4.0.2",
-    "webpack": "4.44.2"
+    "webpack": "4.46.0"
   }
 }
