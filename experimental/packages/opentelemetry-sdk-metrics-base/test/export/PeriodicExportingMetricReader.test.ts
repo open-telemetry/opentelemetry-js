@@ -27,25 +27,26 @@ import { assertRejects } from '../test-utils';
 
 const MAX_32_BIT_INT = 2 ** 31 - 1;
 
-class TestMetricExporter extends PushMetricExporter {
+class TestMetricExporter implements PushMetricExporter {
   public exportTime = 0;
   public forceFlushTime = 0;
   public throwException = false;
   private _batches: MetricData[][] = [];
+  private _shutdown: boolean = false;
 
-  async export(batch: MetricData[]): Promise<ExportResult> {
+  async export(batch: MetricData[], resultCallback: (result: ExportResult) => void): Promise<void> {
     this._batches.push(batch);
 
     if (this.throwException) {
       throw new Error('Error during export');
     }
-    return await new Promise(resolve => setTimeout(() => {
-      resolve({code: ExportResultCode.SUCCESS});
-    }, this.exportTime));
+    setTimeout(() => {
+      resultCallback({code: ExportResultCode.SUCCESS});
+    }, this.exportTime);
   }
 
   async shutdown(): Promise<void> {
-    if (this.isShutdown()) return;
+    if (this._shutdown) return;
     const flushPromise = this.forceFlush();
     this._shutdown = true;
     await flushPromise;

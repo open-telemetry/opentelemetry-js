@@ -24,30 +24,26 @@ import {
 
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#metricexporter
 
-export abstract class PushMetricExporter {
-  protected _shutdown = false;
+export interface PushMetricExporter {
 
-  abstract export(batch: MetricData[]): Promise<ExportResult>;
+  export(batch: MetricData[], resultCallback: (result: ExportResult) => void): void;
 
-  abstract forceFlush(): Promise<void>;
+  forceFlush(): Promise<void>;
 
-  abstract getPreferredAggregationTemporality(): AggregationTemporality;
+  getPreferredAggregationTemporality(): AggregationTemporality;
 
-  abstract shutdown(): Promise<void>;
+  shutdown(): Promise<void>;
 
-  isShutdown() {
-    return this._shutdown;
-  }
 }
 
-export class ConsoleMetricExporter extends PushMetricExporter {
-  async export(_batch: MetricData[]) {
-    return new Promise<ExportResult>((_, reject) => {
-      reject({
+export class ConsoleMetricExporter implements PushMetricExporter {
+  protected _shutdown = true;
+
+  async export(_batch: MetricData[], resultCallback: (result: ExportResult) => void) {
+    return resultCallback({
         code: ExportResultCode.FAILED,
         error: new Error('Method not implemented')
       });
-    });
   }
 
   getPreferredAggregationTemporality() {

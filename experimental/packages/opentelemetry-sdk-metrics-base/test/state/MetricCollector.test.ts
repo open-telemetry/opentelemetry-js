@@ -26,13 +26,11 @@ import { defaultInstrumentationLibrary, defaultResource, assertMetricData, asser
 import { TestMetricReader } from '../export/TestMetricReader';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 
-class TestMetricExporter extends PushMetricExporter {
+class TestMetricExporter implements PushMetricExporter {
   metricDataList: MetricData[] = [];
-  async export(batch: MetricData[]): Promise<ExportResult> {
+  async export(batch: MetricData[], resultCallback: (result: ExportResult) => void): Promise<void> {
     this.metricDataList.push(...batch);
-    return new Promise<ExportResult>((resolve, _) => {
-      resolve({code: ExportResultCode.SUCCESS});
-    });
+    resultCallback({code: ExportResultCode.SUCCESS});
   }
 
   async shutdown(): Promise<void> {}

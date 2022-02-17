@@ -15,6 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
+import { ExportResultCode, globalErrorHandler } from '@opentelemetry/core';
 import { MetricReader } from './MetricReader';
 import { PushMetricExporter } from './MetricExporter';
 import { callWithTimeout, TimeoutError } from '../utils';
@@ -62,7 +63,16 @@ export class PeriodicExportingMetricReader extends MetricReader {
 
   private async _runOnce(): Promise<void> {
     const metrics = await this.collect({});
-    await this._exporter.export(metrics);
+    await this._exporter.export(metrics, result => {
+      if (result.code !== ExportResultCode.SUCCESS) {
+        globalErrorHandler(
+          result.error ??
+            new Error(
+              `PeriodicExportingMetricReader: metrics export failed (status ${result})`
+            )
+        );
+      }
+    });
   }
 
   protected override onInitialized(): void {
