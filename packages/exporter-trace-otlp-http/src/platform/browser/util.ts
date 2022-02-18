@@ -77,15 +77,6 @@ export function sendWithXhr(
     xhr.setRequestHeader(k, v);
   });
 
-  xhr.addEventListener('abort', () => {
-    if (reqIsDestroyed) {
-      const error = new otlpTypes.OTLPExporterError(
-        'Request Timeout', xhr.status
-      );
-      onError(error);
-    }
-  });
-
   xhr.send(body);
 
   xhr.onreadystatechange = () => {
@@ -94,6 +85,11 @@ export function sendWithXhr(
         clearTimeout(exporterTimer);
         diag.debug('xhr success', body);
         onSuccess();
+      } else if (reqIsDestroyed) {
+        const error = new otlpTypes.OTLPExporterError(
+          'Request Timeout', xhr.status
+        );
+        onError(error);
       } else {
         const error = new otlpTypes.OTLPExporterError(
           `Failed to export with XHR (status: ${xhr.status})`,

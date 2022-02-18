@@ -17,7 +17,7 @@
 import * as sinon from 'sinon';
 import { sendWithXhr } from '../../src/platform/browser/util';
 import { ensureHeadersContain } from '../traceHelper';
-import { OTLPTraceExporter } from '../../src/platform/node';
+import { OTLPTraceExporter } from '../../src/platform/browser/index';
 
 describe('util - browser', () => {
   let server: any;

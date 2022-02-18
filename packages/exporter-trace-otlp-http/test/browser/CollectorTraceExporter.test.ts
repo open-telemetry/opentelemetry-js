@@ -15,6 +15,7 @@
  */
 
 import { diag } from '@opentelemetry/api';
+import * as core from '@opentelemetry/core';
 import { ExportResultCode } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
@@ -281,6 +282,22 @@ describe('OTLPTraceExporter - web', () => {
           assert.strictEqual(stubBeacon.callCount, 0);
           assert.strictEqual(stubOpen.callCount, 0);
 
+          done();
+        });
+      });
+      it('should log the timeout request error message', done => {
+        const responseSpy = sinon.spy();
+        const clock = sinon.useFakeTimers();
+        collectorTraceExporter.export(spans, responseSpy);
+        clock.tick(10000);
+        clock.restore();
+
+        setTimeout(() => {
+          const result = responseSpy.args[0][0] as core.ExportResult;
+          assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+          const error = result.error as otlpTypes.OTLPExporterError;
+          assert.ok(error !== undefined);
+          assert.strictEqual(error.message, 'Request Timeout');
           done();
         });
       });

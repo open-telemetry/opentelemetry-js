@@ -63,8 +63,8 @@ export function configureExporterTimeout(timeoutMillis: number | undefined): num
 
 function getExporterTimeoutFromEnv(): number {
   const definedTimeout =
-    Number(process.env.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT ||
-    process.env.OTEL_EXPORTER_OTLP_TIMEOUT);
+    Number(getEnv().OTEL_EXPORTER_OTLP_TRACES_TIMEOUT ||
+    getEnv().OTEL_EXPORTER_OTLP_TIMEOUT);
 
   if (definedTimeout) {
     if (definedTimeout <= 0) {
