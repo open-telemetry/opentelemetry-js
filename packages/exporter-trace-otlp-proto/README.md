@@ -54,11 +54,13 @@ To override the default timeout duration, use the following options:
   > `OTEL_EXPORTER_OTLP_TRACES_TIMEOUT` takes precedence and overrides `OTEL_EXPORTER_OTLP_TIMEOUT`.
 
 + Provide `timeoutMillis` to OTLPTraceExporter with `collectorOptions`:
+
   ```js
   const collectorOptions = {
     timeoutMillis: 15000
   };
   ```
+
   > Providing `timeoutMillis` with `collectorOptions` takes precedence and overrides timeout set with environment variables.
 
 ## Running opentelemetry-collector locally to see the traces
