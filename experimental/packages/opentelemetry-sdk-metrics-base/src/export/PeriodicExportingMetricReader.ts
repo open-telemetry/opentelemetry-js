@@ -68,7 +68,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
         globalErrorHandler(
           result.error ??
             new Error(
-              `PeriodicExportingMetricReader: metrics export failed (status ${result})`
+              `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`
             )
         );
       }
