@@ -39,7 +39,7 @@ export interface PushMetricExporter {
 export class ConsoleMetricExporter implements PushMetricExporter {
   protected _shutdown = true;
 
-  async export(_batch: MetricData[], resultCallback: (result: ExportResult) => void) {
+  export(_batch: MetricData[], resultCallback: (result: ExportResult) => void) {
     return resultCallback({
         code: ExportResultCode.FAILED,
         error: new Error('Method not implemented')
