@@ -63,15 +63,19 @@ export class PeriodicExportingMetricReader extends MetricReader {
 
   private async _runOnce(): Promise<void> {
     const metrics = await this.collect({});
-    await this._exporter.export(metrics, result => {
-      if (result.code !== ExportResultCode.SUCCESS) {
-        globalErrorHandler(
-          result.error ??
-            new Error(
-              `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`
-            )
-        );
-      }
+    return new Promise((resolve, reject) => {
+      this._exporter.export(metrics, result => {
+        if (result.code !== ExportResultCode.SUCCESS) {
+          reject(
+            result.error ??
+              new Error(
+                `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`
+              )
+          );
+        } else {
+          resolve();
+        }
+      });
     });
   }
 
@@ -86,7 +90,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
           return;
         }
 
-        api.diag.error('Unexpected error during export: %s', err);
+        globalErrorHandler(err);
       }
     }, this._exportInterval);
   }

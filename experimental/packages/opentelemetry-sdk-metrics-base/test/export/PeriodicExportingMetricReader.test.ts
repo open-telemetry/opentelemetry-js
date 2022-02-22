@@ -31,17 +31,22 @@ class TestMetricExporter implements PushMetricExporter {
   public exportTime = 0;
   public forceFlushTime = 0;
   public throwException = false;
+  public failureResult = false;
   private _batches: MetricData[][] = [];
   private _shutdown: boolean = false;
 
-  async export(batch: MetricData[], resultCallback: (result: ExportResult) => void): Promise<void> {
+  export(batch: MetricData[], resultCallback: (result: ExportResult) => void): void {
     this._batches.push(batch);
 
     if (this.throwException) {
       throw new Error('Error during export');
     }
     setTimeout(() => {
-      resultCallback({code: ExportResultCode.SUCCESS});
+      if (this.failureResult) {
+        resultCallback({code: ExportResultCode.FAILED, error: new Error('some error') });
+      } else {
+        resultCallback({code: ExportResultCode.SUCCESS });
+      }
     }, this.exportTime);
   }
 
@@ -184,6 +189,24 @@ describe('PeriodicExportingMetricReader', () => {
       assert.deepStrictEqual(result, [[], []]);
 
       exporter.throwException = false;
+      await reader.shutdown();
+    });
+
+    it('should keep running on export failure', async () => {
+      const exporter = new TestMetricExporter();
+      exporter.failureResult = true;
+      const reader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 30,
+        exportTimeoutMillis: 20
+      });
+
+      reader.setMetricProducer(new TestMetricProducer());
+
+      const result = await exporter.waitForNumberOfExports(2);
+      assert.deepStrictEqual(result, [[], []]);
+
+      exporter.failureResult = false;
       await reader.shutdown();
     });
 
