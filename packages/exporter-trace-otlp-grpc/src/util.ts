@@ -51,17 +51,21 @@ export function onInit<ExportItem, ServiceRequest>(
     .then(packageDefinition => {
       const packageObject: any = grpc.loadPackageDefinition(packageDefinition);
 
+      const selectedCompressionAlgo = { 'grpc.default_compression_algorithm': collector.compression };
+
       if (collector.getServiceClientType() === ServiceClientType.SPANS) {
         collector.serviceClient =
           new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(
             collector.url,
             credentials,
+            selectedCompressionAlgo,
           );
       } else {
         collector.serviceClient =
           new packageObject.opentelemetry.proto.collector.metrics.v1.MetricsService(
             collector.url,
             credentials,
+            selectedCompressionAlgo,
           );
       }
 
