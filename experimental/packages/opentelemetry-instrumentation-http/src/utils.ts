@@ -17,8 +17,8 @@ import {
   SpanAttributes,
   SpanStatusCode,
   Span,
-  SpanStatus,
-  context, SpanKind,
+  context,
+  SpanKind,
 } from '@opentelemetry/api';
 import {
   NetTransportValues,
