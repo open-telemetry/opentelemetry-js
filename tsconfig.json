@@ -47,7 +47,7 @@
       "path": "packages/exporter-trace-otlp-grpc"
     },
     {
-      "path": "packages/exporter-trace-otlp-http/tsconfig.all.json"
+      "path": "packages/exporter-trace-otlp-http"
     },
     {
       "path": "packages/exporter-trace-otlp-proto"
@@ -56,40 +56,40 @@
       "path": "packages/opentelemetry-context-async-hooks"
     },
     {
-      "path": "packages/opentelemetry-context-zone-peer-dep/tsconfig.all.json"
+      "path": "packages/opentelemetry-context-zone-peer-dep"
     },
     {
-      "path": "packages/opentelemetry-context-zone/tsconfig.all.json"
+      "path": "packages/opentelemetry-context-zone"
     },
     {
-      "path": "packages/opentelemetry-core/tsconfig.all.json"
+      "path": "packages/opentelemetry-core"
     },
     {
       "path": "packages/opentelemetry-exporter-jaeger"
     },
     {
-      "path": "packages/opentelemetry-exporter-zipkin/tsconfig.all.json"
+      "path": "packages/opentelemetry-exporter-zipkin"
     },
     {
-      "path": "packages/opentelemetry-propagator-b3/tsconfig.all.json"
+      "path": "packages/opentelemetry-propagator-b3"
     },
     {
       "path": "packages/opentelemetry-propagator-jaeger"
     },
     {
-      "path": "packages/opentelemetry-resources/tsconfig.all.json"
+      "path": "packages/opentelemetry-resources"
     },
     {
-      "path": "packages/opentelemetry-sdk-trace-base/tsconfig.all.json"
+      "path": "packages/opentelemetry-sdk-trace-base"
     },
     {
       "path": "packages/opentelemetry-sdk-trace-node"
     },
     {
-      "path": "packages/opentelemetry-sdk-trace-web/tsconfig.all.json"
+      "path": "packages/opentelemetry-sdk-trace-web"
     },
     {
-      "path": "packages/opentelemetry-semantic-conventions/tsconfig.all.json"
+      "path": "packages/opentelemetry-semantic-conventions"
     },
     {
       "path": "packages/opentelemetry-shim-opentracing"
