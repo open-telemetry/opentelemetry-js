@@ -1,9 +1,9 @@
 {
-  "extends": "../../tsconfig.base.esm2015.json",
+  "extends": "../../tsconfig.base.esnext.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "build/esm2015",
-    "tsBuildInfoFile": "build/esm2015/tsconfig.esm2015.tsbuildinfo"
+    "outDir": "build/esnext",
+    "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo"
   },
   "files": [
     "node_modules/zone.js/dist/zone.js.d.ts"
