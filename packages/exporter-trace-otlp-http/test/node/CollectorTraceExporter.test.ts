@@ -356,6 +356,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
         keepAlive: true,
         compression: CompressionAlgorithm.GZIP,
         httpAgentOptions: { keepAliveMsecs: 2000 },
+        timeoutMillis: 3000,
       };
       collectorExporter = new OTLPTraceExporter(collectorExporterConfig);
       spans = [];
@@ -366,13 +367,12 @@ describe('OTLPTraceExporter - node with json over http', () => {
       const clock = sinon.useFakeTimers();
       collectorExporter.export(spans, responseSpy);
 
-      clock.tick(10000);
+      clock.tick(3000);
       clock.restore();
 
-      setTimeout(() => {
-        const mockResError = new MockedResponse(400);
-        fakeRequest.emit('error', { code: 'ECONNRESET'});
-        mockResError.send('failed');
+      const mockResError = new MockedResponse(400);
+      fakeRequest.emit('error', { code: 'ECONNRESET'});
+      mockResError.send('failed');
 
         setTimeout(() => {
           const result = responseSpy.args[0][0] as core.ExportResult;
@@ -382,7 +382,6 @@ describe('OTLPTraceExporter - node with json over http', () => {
           assert.strictEqual(error.message, 'Request Timeout');
           done();
         });
-      });
     });
   });
 });

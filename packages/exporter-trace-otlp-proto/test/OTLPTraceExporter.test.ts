@@ -25,7 +25,7 @@ import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';
-import { Stream } from 'stream';
+import { Stream, PassThrough } from 'stream';
 import * as zlib from 'zlib';
 import { OTLPTraceExporter } from '../src';
 import { getExportRequestProto } from '../src/util';
@@ -36,16 +36,17 @@ import {
   MockedResponse,
 } from './traceHelper';
 
-const fakeRequest = {
-  end: function () { },
-  on: function () { },
-  write: function () { },
-};
+let fakeRequest: PassThrough;
 
 describe('OTLPTraceExporter - node with proto over http', () => {
   let collectorExporter: OTLPTraceExporter;
   let collectorExporterConfig: OTLPExporterNodeConfigBase;
   let spans: ReadableSpan[];
+
+  afterEach(() => {
+    fakeRequest = new Stream.PassThrough();
+    sinon.restore();
+  });
 
   describe('when configuring via environment', () => {
     const envSource = process.env;

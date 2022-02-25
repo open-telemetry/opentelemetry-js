@@ -18,6 +18,7 @@ import * as sinon from 'sinon';
 import { sendWithXhr } from '../../src/platform/browser/util';
 import { ensureHeadersContain } from '../traceHelper';
 import { OTLPTraceExporter } from '../../src/platform/browser/index';
+import { nextTick } from 'process';
 
 describe('util - browser', () => {
   let server: any;
@@ -40,7 +41,12 @@ describe('util - browser', () => {
 
   describe('when XMLHTTPRequest is used', () => {
     let expectedHeaders: Record<string,string>;
+    let clock: sinon.SinonFakeTimers;
     beforeEach(()=>{
+      // fakeTimers is used to replace the next setTimeout which is
+      // located in sendWithXhr function called by the export method
+      clock = sinon.useFakeTimers();
+
       expectedHeaders = {
         // ;charset=utf-8 is applied by sinon.fakeServer
         'Content-Type': 'application/json;charset=utf-8',
@@ -59,17 +65,19 @@ describe('util - browser', () => {
       });
       it('Request Headers should contain "Content-Type" header', done => {
 
-        setTimeout(() => {
+        nextTick(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, expectedHeaders);
+          clock.restore();
           done();
         });
       });
       it('Request Headers should contain "Accept" header', done => {
 
-        setTimeout(() => {
+        nextTick(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, expectedHeaders);
+          clock.restore();
           done();
         });
       });
@@ -85,17 +93,19 @@ describe('util - browser', () => {
       });
       it('Request Headers should contain "Content-Type" header', done => {
 
-        setTimeout(() => {
+        nextTick(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, expectedHeaders);
+          clock.restore();
           done();
         });
       });
       it('Request Headers should contain "Accept" header', done => {
 
-        setTimeout(() => {
+        nextTick(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, expectedHeaders);
+          clock.restore();
           done();
         });
       });
@@ -111,25 +121,28 @@ describe('util - browser', () => {
       });
       it('Request Headers should contain "Content-Type" header', done => {
 
-        setTimeout(() => {
+        nextTick(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, expectedHeaders);
+          clock.restore();
           done();
         });
       });
       it('Request Headers should contain "Accept" header', done => {
 
-        setTimeout(() => {
+        nextTick(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, expectedHeaders);
+          clock.restore();
           done();
         });
       });
       it('Request Headers should contain custom headers', done => {
 
-        setTimeout(() => {
+        nextTick(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, customHeaders);
+          clock.restore();
           done();
         });
       });
