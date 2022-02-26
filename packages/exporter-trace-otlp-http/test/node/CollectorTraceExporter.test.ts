@@ -343,6 +343,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
   });
   describe('export - with timeout', () => {
     beforeEach(() => {
+      fakeRequest = new Stream.PassThrough();
       stubRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
       spySetHeader = sinon.spy();
       (fakeRequest as any).setHeader = spySetHeader;
@@ -356,7 +357,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
         keepAlive: true,
         compression: CompressionAlgorithm.GZIP,
         httpAgentOptions: { keepAliveMsecs: 2000 },
-        timeoutMillis: 3000,
+        timeoutMillis: 100,
       };
       collectorExporter = new OTLPTraceExporter(collectorExporterConfig);
       spans = [];
@@ -364,15 +365,13 @@ describe('OTLPTraceExporter - node with json over http', () => {
     });
     it('should log the timeout request error message', done => {
       const responseSpy = sinon.spy();
-      const clock = sinon.useFakeTimers();
+
       collectorExporter.export(spans, responseSpy);
 
-      clock.tick(3000);
-      clock.restore();
-
-      const mockResError = new MockedResponse(400);
-      fakeRequest.emit('error', { code: 'ECONNRESET'});
-      mockResError.send('failed');
+      setTimeout(() => {
+        const mockResError = new MockedResponse(400);
+        fakeRequest.emit('error', { code: 'ECONNRESET'});
+        mockResError.send('failed');
 
         setTimeout(() => {
           const result = responseSpy.args[0][0] as core.ExportResult;
@@ -380,8 +379,10 @@ describe('OTLPTraceExporter - node with json over http', () => {
           const error = result.error as otlpTypes.OTLPExporterError;
           assert.ok(error !== undefined);
           assert.strictEqual(error.message, 'Request Timeout');
+
           done();
         });
+      }, 100);
     });
   });
 });
