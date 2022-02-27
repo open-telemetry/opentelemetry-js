@@ -286,6 +286,10 @@ To request automatic tracing support for a module not on this list, please [file
 
 ## Upgrade guidelines
 
+### 0.27.x to 1.x.y
+
+- In `@opentelemetry/exporter-otlp-http`, `OTLPExporterBase._isShutdown` is replaced with `_shutdownOnce`.
+
 ### 0.26.x to 0.27.x
 
 Metric and trace exporters are split into separate packages:
