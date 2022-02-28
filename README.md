@@ -288,7 +288,7 @@ To request automatic tracing support for a module not on this list, please [file
 
 ### 0.27.x to 1.x.y
 
-- In `@opentelemetry/exporter-otlp-http`, `OTLPExporterBase._isShutdown` is replaced with `_shutdownOnce`.
+- In `@opentelemetry/exporter-trace-otlp-http`, `OTLPExporterBase._isShutdown` is replaced with `_shutdownOnce`.
 
 ### 0.26.x to 0.27.x
 
