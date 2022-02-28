@@ -23,7 +23,7 @@ import { PointDataType } from '../../src/export/MetricData';
 import { MetricCollectorHandle } from '../../src/state/MetricCollector';
 import { AsyncMetricStorage } from '../../src/state/AsyncMetricStorage';
 import { NoopAttributesProcessor } from '../../src/view/AttributesProcessor';
-import { assertMetricData, assertPointData, defaultInstrumentationLibrary, defaultInstrumentDescriptor, defaultResource } from '../util';
+import { assertMetricData, assertPointData, defaultInstrumentDescriptor } from '../util';
 import { ObservableCallback } from '@opentelemetry/api-metrics-wip';
 
 const deltaCollector: MetricCollectorHandle = {
@@ -71,8 +71,6 @@ describe('AsyncMetricStorage', () => {
           const metric = await metricStorage.collect(
             deltaCollector,
             collectors,
-            defaultResource,
-            defaultInstrumentationLibrary,
             sdkStartTime,
             hrTime());
 
@@ -89,8 +87,6 @@ describe('AsyncMetricStorage', () => {
           const metric = await metricStorage.collect(
             deltaCollector,
             collectors,
-            defaultResource,
-            defaultInstrumentationLibrary,
             sdkStartTime,
             hrTime());
 
@@ -107,8 +103,6 @@ describe('AsyncMetricStorage', () => {
           const metric = await metricStorage.collect(
             deltaCollector,
             [deltaCollector],
-            defaultResource,
-            defaultInstrumentationLibrary,
             sdkStartTime,
             hrTime());
 
@@ -142,8 +136,6 @@ describe('AsyncMetricStorage', () => {
           const metric = await metricStorage.collect(
             cumulativeCollector,
             collectors,
-            defaultResource,
-            defaultInstrumentationLibrary,
             sdkStartTime,
             hrTime());
 
@@ -160,8 +152,6 @@ describe('AsyncMetricStorage', () => {
           const metric = await metricStorage.collect(
             cumulativeCollector,
             collectors,
-            defaultResource,
-            defaultInstrumentationLibrary,
             sdkStartTime,
             hrTime());
 
@@ -181,8 +171,6 @@ describe('AsyncMetricStorage', () => {
           const metric = await metricStorage.collect(
             cumulativeCollector,
             collectors,
-            defaultResource,
-            defaultInstrumentationLibrary,
             sdkStartTime,
             hrTime());
 

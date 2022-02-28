@@ -15,7 +15,7 @@
  */
 
 import { AggregationTemporality } from './AggregationTemporality';
-import { MetricData } from './MetricData';
+import { MetricsData } from './MetricData';
 
 
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#metricexporter
@@ -24,7 +24,7 @@ import { MetricData } from './MetricData';
 export abstract class MetricExporter {
   protected _shutdown = false;
 
-  abstract export(batch: MetricData[]): Promise<void>;
+  abstract export(batch: MetricsData): Promise<void>;
 
   abstract forceFlush(): Promise<void>;
 
@@ -48,7 +48,7 @@ export abstract class MetricExporter {
 }
 
 export class ConsoleMetricExporter extends MetricExporter {
-  async export(_batch: MetricData[]) {
+  async export(_batch: MetricsData) {
     throw new Error('Method not implemented');
   }
 

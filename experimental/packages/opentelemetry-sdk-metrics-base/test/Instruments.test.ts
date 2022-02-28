@@ -543,15 +543,20 @@ interface ValidateMetricData {
 }
 
 async function validateExport(reader: MetricReader, expected: ValidateMetricData) {
-  const metricData = await reader.collect();
-  const metric = metricData[0];
+  const metricsData = await reader.collect();
+
+  const { resource, instrumentationLibraryMetrics } = metricsData.resourceMetrics()[0];
+  const { instrumentationLibrary, metrics } = instrumentationLibraryMetrics[0];
+
+  const metric = metrics[0];
+
+  assert.deepStrictEqual(resource, defaultResource);
+  assert.deepStrictEqual(instrumentationLibrary, defaultInstrumentationLibrary);
 
   assertMetricData(
     metric,
     expected.pointDataType,
     expected.instrumentDescriptor ?? null,
-    expected.instrumentationLibrary,
-    expected.resource
   );
 
   if (expected.pointData == null) {

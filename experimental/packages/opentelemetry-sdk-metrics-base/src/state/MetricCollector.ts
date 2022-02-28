@@ -16,7 +16,7 @@
 
 import { hrTime } from '@opentelemetry/core';
 import { AggregationTemporality } from '../export/AggregationTemporality';
-import { MetricData } from '../export/MetricData';
+import { MetricsData } from '../export/MetricData';
 import { MetricProducer } from '../export/MetricProducer';
 import { MetricReader } from '../export/MetricReader';
 import { MeterProviderSharedState } from './MeterProviderSharedState';
@@ -32,12 +32,12 @@ export class MetricCollector implements MetricProducer {
     this.aggregatorTemporality = this._metricReader.getPreferredAggregationTemporality();
   }
 
-  async collect(): Promise<MetricData[]> {
+  async collect(): Promise<MetricsData> {
     const collectionTime = hrTime();
     const results = await Promise.all(this._sharedState.meters
       .map(meter => meter.collect(this, collectionTime)));
 
-    return results.reduce((cumulation, current) => cumulation.concat(current), []);
+    return results.reduce((cumulation, current) => cumulation.merge(current), new MetricsData());
   }
 
   /**

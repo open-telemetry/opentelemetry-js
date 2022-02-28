@@ -17,7 +17,7 @@
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { MetricExporter } from '../../src';
-import { MetricData } from '../../src/export/MetricData';
+import { MetricsData } from '../../src/export/MetricData';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MetricProducer } from '../../src/export/MetricProducer';
@@ -30,9 +30,9 @@ class TestMetricExporter extends MetricExporter {
   public exportTime = 0;
   public forceFlushTime = 0;
   public throwException = false;
-  private _batches: MetricData[][] = [];
+  private _batches: MetricsData[] = [];
 
-  async export(batch: MetricData[]): Promise<void> {
+  async export(batch: MetricsData): Promise<void> {
     this._batches.push(batch);
 
     if (this.throwException) {
@@ -49,7 +49,7 @@ class TestMetricExporter extends MetricExporter {
     await new Promise(resolve => setTimeout(resolve, this.forceFlushTime));
   }
 
-  async waitForNumberOfExports(numberOfExports: number): Promise<MetricData[][]> {
+  async waitForNumberOfExports(numberOfExports: number): Promise<MetricsData[]> {
     if (numberOfExports <= 0) {
       throw new Error('numberOfExports must be greater than or equal to 0');
     }
@@ -74,9 +74,9 @@ class TestDeltaMetricExporter extends TestMetricExporter {
 class TestMetricProducer implements MetricProducer {
   public collectionTime = 0;
 
-  async collect(): Promise<MetricData[]> {
+  async collect(): Promise<MetricsData> {
     await new Promise(resolve => setTimeout(resolve, this.collectionTime));
-    return [];
+    return new MetricsData();
   }
 }
 
@@ -152,7 +152,7 @@ describe('PeriodicExportingMetricReader', () => {
       reader.setMetricProducer(new TestMetricProducer());
       const result = await exporter.waitForNumberOfExports(2);
 
-      assert.deepStrictEqual(result, [[], []]);
+      assert.deepStrictEqual(result, [new MetricsData(), new MetricsData()]);
       await reader.shutdown();
     });
   });
@@ -170,7 +170,7 @@ describe('PeriodicExportingMetricReader', () => {
       reader.setMetricProducer(new TestMetricProducer());
 
       const result = await exporter.waitForNumberOfExports(2);
-      assert.deepStrictEqual(result, [[], []]);
+      assert.deepStrictEqual(result, [new MetricsData(), new MetricsData()]);
 
       exporter.throwException = false;
       await reader.shutdown();
@@ -189,7 +189,7 @@ describe('PeriodicExportingMetricReader', () => {
       reader.setMetricProducer(new TestMetricProducer());
 
       const result = await exporter.waitForNumberOfExports(2);
-      assert.deepStrictEqual(result, [[], []]);
+      assert.deepStrictEqual(result, [new MetricsData(), new MetricsData()]);
 
       exporter.throwException = false;
       await reader.shutdown();
@@ -355,7 +355,7 @@ describe('PeriodicExportingMetricReader', () => {
       reader.setMetricProducer(new TestMetricProducer());
 
       await reader.shutdown();
-      assert.deepStrictEqual([], await reader.collect());
+      assert.deepStrictEqual(await reader.collect(), new MetricsData());
     });
 
     it('should time out when timeoutMillis is set', async () => {

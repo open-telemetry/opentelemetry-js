@@ -25,22 +25,11 @@ import { Histogram } from '../aggregator/types';
  * Basic metric data fields.
  */
 export interface BaseMetricData {
-  /**
-   * Resource associated with metric telemetry.
-   */
-  readonly resource: Resource;
-  /**
-   * InstrumentationLibrary which created the metric instrument.
-   */
-  readonly instrumentationLibrary: InstrumentationLibrary;
-  /**
-   * InstrumentDescriptor which describes the metric instrument.
-   */
   readonly instrumentDescriptor: InstrumentDescriptor;
   /**
    * PointDataType of the metric instrument.
    */
-  readonly pointDataType: PointDataType,
+  readonly pointDataType: PointDataType;
 }
 
 /**
@@ -48,22 +37,94 @@ export interface BaseMetricData {
  * SumAggregation.
  */
 export interface SingularMetricData extends BaseMetricData {
-  readonly pointDataType: PointDataType.SINGULAR,
-  readonly pointData: PointData<number>[],
+  readonly pointDataType: PointDataType.SINGULAR;
+  readonly pointData: PointData<number>[];
 }
 
 /**
  * Represents a metric data aggregated by a HistogramAggregation.
  */
 export interface HistogramMetricData extends BaseMetricData {
-  readonly pointDataType: PointDataType.HISTOGRAM,
-  readonly pointData: PointData<Histogram>[],
+  readonly pointDataType: PointDataType.HISTOGRAM;
+  readonly pointData: PointData<Histogram>[];
 }
 
 /**
  * Represents an aggregated metric data.
  */
 export type MetricData = SingularMetricData | HistogramMetricData;
+
+export interface InstrumentationLibraryMetrics {
+  instrumentationLibrary: InstrumentationLibrary;
+  metrics: MetricData[];
+}
+
+export interface ResourceMetrics {
+  resource: Resource;
+  instrumentationLibraryMetrics: InstrumentationLibraryMetrics[];
+}
+
+type InstrumentationLibraryMetricsMap = Map<InstrumentationLibrary, MetricData[]>;
+
+export class MetricsData {
+  private _metricsData: Map<Resource, InstrumentationLibraryMetricsMap> = new Map();
+
+  constructor(resourceMetrics?: ResourceMetrics) {
+    if (resourceMetrics === undefined) {
+      return;
+    }
+
+    const metricsByInstrLib = new Map();
+
+    for (const ilMetrics of resourceMetrics.instrumentationLibraryMetrics) {
+      metricsByInstrLib.set(ilMetrics.instrumentationLibrary, ilMetrics.metrics);
+    }
+
+    this._metricsData.set(resourceMetrics.resource, metricsByInstrLib);
+  }
+
+  resourceMetrics(): ResourceMetrics[] {
+    return Array.from(this._metricsData, ([resource, metricsByInstrLib]) => {
+      const instrumentationLibraryMetrics = Array.from(metricsByInstrLib, ([instrumentationLibrary, metrics]) => ({
+        instrumentationLibrary,
+        metrics
+      }));
+
+      return {
+        resource,
+        instrumentationLibraryMetrics,
+      };
+    });
+  }
+
+  merge(source: MetricsData): MetricsData {
+    function mergeIlMetrics(into: InstrumentationLibraryMetricsMap, from: InstrumentationLibraryMetricsMap): InstrumentationLibraryMetricsMap {
+      from.forEach((metrics, instrumentationLib) => {
+        const targetMetrics = into.get(instrumentationLib);
+
+        if (targetMetrics === undefined) {
+          into.set(instrumentationLib, metrics);
+        } else {
+          into.set(instrumentationLib, targetMetrics.concat(metrics));
+        }
+      });
+
+      return into;
+    }
+
+    source._metricsData.forEach((sourceIlMetrics, resource) => {
+      const targetIlMetrics = this._metricsData.get(resource);
+
+      if (targetIlMetrics === undefined) {
+        this._metricsData.set(resource, sourceIlMetrics);
+      } else {
+        this._metricsData.set(resource, mergeIlMetrics(targetIlMetrics, sourceIlMetrics));
+      }
+    });
+
+    return this;
+  }
+}
 
 /**
  * The aggregated point data type.
