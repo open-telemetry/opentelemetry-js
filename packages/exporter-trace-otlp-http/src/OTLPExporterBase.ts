@@ -109,6 +109,9 @@ export abstract class OTLPExporterBase<
     return this._shutdownOnce.call();
   }
 
+  /**
+   * Called by _shutdownOnce with BindOnceFuture
+   */
   private _shutdown(): Promise<void> {
     diag.debug('shutdown started');
     this.onShutdown();
