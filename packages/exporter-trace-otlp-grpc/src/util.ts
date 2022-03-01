@@ -17,7 +17,7 @@
 import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import { diag } from '@opentelemetry/api';
-import { globalErrorHandler } from '@opentelemetry/core';
+import { globalErrorHandler, getEnv } from '@opentelemetry/core';
 import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import * as path from 'path';
 import { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
@@ -33,8 +33,8 @@ export function onInit<ExportItem, ServiceRequest>(
   config: OTLPExporterConfigNode
 ): void {
   collector.grpcQueue = [];
-  const credentials: grpc.ChannelCredentials =
-    config.credentials || grpc.credentials.createInsecure();
+
+  const credentials: grpc.ChannelCredentials = configureInsecure(config.credentials);
 
   const includeDirs = [path.resolve(__dirname, '..', 'protos')];
 
@@ -124,4 +124,17 @@ export function validateAndNormalizeUrl(url: string): string {
     );
   }
   return target.host;
+}
+
+function configureInsecure(credentials: grpc.ChannelCredentials | undefined): grpc.ChannelCredentials {
+  if (credentials) {
+    return credentials;
+  } else {
+    const definedInsecure = getEnv().OTEL_EXPORTER_OTLP_TRACES_INSECURE || getEnv().OTEL_EXPORTER_OTLP_INSECURE;
+    if (definedInsecure === 'true') {
+      return grpc.credentials.createSsl();
+    } else {
+      return grpc.credentials.createInsecure();
+    }
+  }
 }
