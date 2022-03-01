@@ -18,7 +18,8 @@ import * as sinon from 'sinon';
 import * as assert from 'assert';
 
 import { diag } from '@opentelemetry/api';
-import { validateAndNormalizeUrl } from '../src/util';
+import { validateAndNormalizeUrl, configureSecurity } from '../src/util';
+import * as grpc from '@grpc/grpc-js';
 
 // Tests added to detect breakage released in #2130
 describe('validateAndNormalizeUrl()', () => {
@@ -77,5 +78,44 @@ describe('validateAndNormalizeUrl()', () => {
         diagWarn.restore();
       }
     });
+  });
+});
+
+describe('utils - configureSecurity', () => {
+  const envSource = process.env;
+  it('should use default insecure value when security value it not defined in config and env', () => {
+    const credentials = configureSecurity(undefined);
+    assert.ok(credentials);
+    assert.ok(credentials._isSecure() === false);
+  });
+  it('should use security value defined in config over security value defined in env', () => {
+    const insecure = grpc.ChannelCredentials.createInsecure();
+    envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE = 'true';
+    const credentials = configureSecurity(insecure);
+    assert.ok(credentials._isSecure() === false);
+  });
+  it('should use security parameter over security value defined in env', () => {
+    const secure = grpc.ChannelCredentials.createSsl();
+    envSource.OTEL_EXPORTER_OTLP_INSECURE = 'false';
+    const credentials = configureSecurity(secure);
+
+    assert.ok(credentials._isSecure() === true);
+    delete envSource.OTEL_EXPORTER_OTLP_INSECURE;
+  });
+  it('should use signal specific security value defined in env', () => {
+    envSource.OTEL_EXPORTER_OTLP_INSECURE = 'true';
+    envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE = 'false';
+    const credentials = configureSecurity(undefined);
+
+    assert.ok(credentials._isSecure() === false);
+    delete envSource.OTEL_EXPORTER_OTLP_INSECURE;
+    delete envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE;
+  });
+  it('should use default insecure value when security value defined in env is not valid', () => {
+    envSource.OTEL_EXPORTER_OTLP_INSECURE = 'foo';
+    const credentials = configureSecurity(undefined);
+
+    assert.ok(credentials._isSecure() === false);
+    delete envSource.OTEL_EXPORTER_OTLP_INSECURE;
   });
 });

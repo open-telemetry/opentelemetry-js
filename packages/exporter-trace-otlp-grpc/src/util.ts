@@ -34,7 +34,7 @@ export function onInit<ExportItem, ServiceRequest>(
 ): void {
   collector.grpcQueue = [];
 
-  const credentials: grpc.ChannelCredentials = configureInsecure(config.credentials);
+  const credentials: grpc.ChannelCredentials = configureSecurity(config.credentials);
 
   const includeDirs = [path.resolve(__dirname, '..', 'protos')];
 
@@ -126,12 +126,12 @@ export function validateAndNormalizeUrl(url: string): string {
   return target.host;
 }
 
-function configureInsecure(credentials: grpc.ChannelCredentials | undefined): grpc.ChannelCredentials {
+export function configureSecurity(credentials: grpc.ChannelCredentials | undefined): grpc.ChannelCredentials {
   if (credentials) {
     return credentials;
   } else {
-    const definedInsecure = getEnv().OTEL_EXPORTER_OTLP_TRACES_INSECURE || getEnv().OTEL_EXPORTER_OTLP_INSECURE;
-    if (definedInsecure === 'true') {
+    const definedSecurity = getEnv().OTEL_EXPORTER_OTLP_TRACES_INSECURE || getEnv().OTEL_EXPORTER_OTLP_INSECURE;
+    if (definedSecurity === 'true') {
       return grpc.credentials.createSsl();
     } else {
       return grpc.credentials.createInsecure();
