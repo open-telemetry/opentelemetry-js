@@ -119,10 +119,14 @@ describe('OTLPTraceExporter - node with proto over http', () => {
     it('should open the connection', done => {
       collectorExporter.export(spans, () => { });
 
-      sinon.stub(http, 'request').callsFake((options: any) => {
+      sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.hostname, 'foo.bar.com');
         assert.strictEqual(options.method, 'POST');
         assert.strictEqual(options.path, '/');
+
+        const mockRes = new MockedResponse(200);
+        cb(mockRes);
+        mockRes.send('success');
         done();
         return fakeRequest as any;
       });
@@ -131,8 +135,12 @@ describe('OTLPTraceExporter - node with proto over http', () => {
     it('should set custom headers', done => {
       collectorExporter.export(spans, () => { });
 
-      sinon.stub(http, 'request').callsFake((options: any) => {
+      sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.headers['foo'], 'bar');
+
+        const mockRes = new MockedResponse(200);
+        cb(mockRes);
+        mockRes.send('success');
         done();
         return fakeRequest as any;
       });
@@ -141,9 +149,13 @@ describe('OTLPTraceExporter - node with proto over http', () => {
     it('should have keep alive and keepAliveMsecs option set', done => {
       collectorExporter.export(spans, () => { });
 
-      sinon.stub(http, 'request').callsFake((options: any) => {
+      sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.agent.keepAlive, true);
         assert.strictEqual(options.agent.options.keepAliveMsecs, 2000);
+
+        const mockRes = new MockedResponse(200);
+        cb(mockRes);
+        mockRes.send('success');
         done();
         return fakeRequest as any;
       });
@@ -174,7 +186,10 @@ describe('OTLPTraceExporter - node with proto over http', () => {
         buff = Buffer.concat([buff, chunk]);
       });
 
+      const clock = sinon.useFakeTimers();
       collectorExporter.export(spans, () => { });
+      clock.tick(200);
+      clock.restore();
     });
 
     it('should log the successful message', done => {
@@ -262,7 +277,10 @@ describe('OTLPTraceExporter - node with proto over http', () => {
         buff = Buffer.concat([buff, chunk]);
       });
 
+      const clock = sinon.useFakeTimers();
       collectorExporter.export(spans, () => { });
+      clock.tick(200);
+      clock.restore();
     });
   });
 });

@@ -92,6 +92,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
       );
       onError(err);
     } else {
+      clearTimeout(exporterTimer);
       onError(error);
     }
   });

@@ -35,6 +35,7 @@ import {
   ensureSpanIsCorrect,
   mockedReadableSpan,
 } from '../traceHelper';
+import { nextTick } from 'process';
 
 let fakeRequest: PassThrough;
 
@@ -136,7 +137,11 @@ describe('OTLPTraceExporter - node with json over http', () => {
       collectorExporter.export(spans, () => { });
 
       setTimeout(() => {
+        const mockRes = new MockedResponse(200);
         const args = stubRequest.args[0];
+        const callback = args[1];
+        callback(mockRes);
+        mockRes.send('success');
         const options = args[0];
 
         assert.strictEqual(options.hostname, 'foo.bar.com');
@@ -150,7 +155,12 @@ describe('OTLPTraceExporter - node with json over http', () => {
       collectorExporter.export(spans, () => { });
 
       setTimeout(() => {
+        const mockRes = new MockedResponse(200);
         const args = stubRequest.args[0];
+        const callback = args[1];
+        callback(mockRes);
+        mockRes.send('success');
+
         const options = args[0];
         assert.strictEqual(options.headers['foo'], 'bar');
         done();
@@ -161,7 +171,12 @@ describe('OTLPTraceExporter - node with json over http', () => {
       collectorExporter.export(spans, () => { });
 
       setTimeout(() => {
+        const mockRes = new MockedResponse(200);
         const args = stubRequest.args[0];
+        const callback = args[1];
+        callback(mockRes);
+        mockRes.send('success');
+
         const options = args[0];
         assert.strictEqual(options.headers['Content-Encoding'], undefined);
         done();
@@ -172,7 +187,12 @@ describe('OTLPTraceExporter - node with json over http', () => {
       collectorExporter.export(spans, () => { });
 
       setTimeout(() => {
+        const mockRes = new MockedResponse(200);
         const args = stubRequest.args[0];
+        const callback = args[1];
+        callback(mockRes);
+        mockRes.send('success');
+
         const options = args[0];
         const agent = options.agent;
         assert.strictEqual(agent.keepAlive, true);
@@ -182,14 +202,34 @@ describe('OTLPTraceExporter - node with json over http', () => {
     });
 
     it('different http export requests should use the same agent', done => {
-      collectorExporter.export(spans, () => { });
+      const clock = sinon.useFakeTimers();
       collectorExporter.export(spans, () => { });
 
-      setTimeout(() => {
+      const mockRes = new MockedResponse(200);
+      const args = stubRequest.args[0];
+      const callback = args[1];
+
+      callback(mockRes);
+      mockRes.send('success');
+      clock.restore();
+
+      nextTick(() => {
+        const clock = sinon.useFakeTimers();
+        collectorExporter.export(spans, () => { });
+
+        const mockRes2 = new MockedResponse(200);
+        const args2 = stubRequest.args[1];
+        const callback2 = args2[1];
+
+        callback2(mockRes);
+        mockRes2.send('success');
+
         const [firstExportAgent, secondExportAgent] = stubRequest.args.map(
           a => a[0].agent
         );
+
         assert.strictEqual(firstExportAgent, secondExportAgent);
+        clock.restore();
         done();
       });
     });
@@ -220,6 +260,13 @@ describe('OTLPTraceExporter - node with json over http', () => {
       });
 
       collectorExporter.export(spans, () => { });
+
+      const mockRes = new MockedResponse(200);
+      const args = stubRequest.args[0];
+      const callback = args[1];
+
+      callback(mockRes);
+      mockRes.send('success');
     });
 
     it('should log the successful message', done => {
@@ -256,6 +303,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
         const callback = args[1];
         callback(mockResError);
         mockResError.send('failed');
+
         setTimeout(() => {
           const result = responseSpy.args[0][0] as core.ExportResult;
           assert.strictEqual(result.code, core.ExportResultCode.FAILED);
@@ -291,7 +339,6 @@ describe('OTLPTraceExporter - node with json over http', () => {
     });
 
     it('should successfully send the spans', done => {
-      collectorExporter.export(spans, () => { });
       let buff = Buffer.from('');
 
       fakeRequest.on('end', () => {
@@ -309,15 +356,22 @@ describe('OTLPTraceExporter - node with json over http', () => {
 
         ensureExportTraceServiceRequestIsSet(json);
         assert.ok(spySetHeader.calledWith('Content-Encoding', 'gzip'));
-
         done();
       });
 
       fakeRequest.on('data', chunk => {
         buff = Buffer.concat([buff, chunk]);
       });
-    });
 
+      collectorExporter.export(spans,() => { });
+
+      const mockRes = new MockedResponse(200);
+      const args = stubRequest.args[0];
+      const callback = args[1];
+
+      callback(mockRes);
+      mockRes.send('success');
+    });
   });
 
   describe('OTLPTraceExporter - node (getDefaultUrl)', () => {
@@ -355,7 +409,6 @@ describe('OTLPTraceExporter - node with json over http', () => {
         attributes: {},
         url: 'http://foo.bar.com',
         keepAlive: true,
-        compression: CompressionAlgorithm.GZIP,
         httpAgentOptions: { keepAliveMsecs: 2000 },
         timeoutMillis: 100,
       };
@@ -365,13 +418,10 @@ describe('OTLPTraceExporter - node with json over http', () => {
     });
     it('should log the timeout request error message', done => {
       const responseSpy = sinon.spy();
-
       collectorExporter.export(spans, responseSpy);
 
       setTimeout(() => {
-        const mockResError = new MockedResponse(400);
         fakeRequest.emit('error', { code: 'ECONNRESET'});
-        mockResError.send('failed');
 
         setTimeout(() => {
           const result = responseSpy.args[0][0] as core.ExportResult;
