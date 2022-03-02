@@ -107,6 +107,25 @@ provider.register();
 
 Note, that this will only work if TLS is also configured on the server.
 
+By default no compression will be used. To use compression, add it to the `collectorOptions` or with environment variables. Supported compression options: `gzip` and `none`. 
+
+```js
+// define compression via config
+const { CompressionAlgorithm } = require('@opentelemetry/exporter-trace-otlp-grpc');
+
+const collectorOptions = {
+  // url is optional and can be omitted - default is localhost:4317
+  url: '<collector-hostname>:<port>',
+  metadata, // // an optional grpc.Metadata object to be sent with each request
+  compression: CompressionAlgorithm.GZIP,
+};
+const exporter = new OTLPTraceExporter(collectorOptions);
+
+// or define via environment variables
+OTEL_EXPORTER_OTLP_TRACES_COMPRESSION=gzip
+```
+ > Providing `compression` with `collectorOptions` takes precedence and overrides compression set with environment variables. `OTEL_EXPORTER_OTLP_TRACES_COMPRESSION` takes precedence and overrides `OTEL_EXPORTER_OTLP_COMPRESSION`.
+
 ## Running opentelemetry-collector locally to see the traces
 
 1. Go to examples/otlp-exporter-node
