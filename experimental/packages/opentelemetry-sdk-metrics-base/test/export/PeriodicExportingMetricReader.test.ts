@@ -16,29 +16,45 @@
 
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import { MetricExporter } from '../../src';
+import { PushMetricExporter } from '../../src';
 import { MetricData } from '../../src/export/MetricData';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MetricProducer } from '../../src/export/MetricProducer';
 import { TimeoutError } from '../../src/utils';
+import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import { assertRejects } from '../test-utils';
 
 const MAX_32_BIT_INT = 2 ** 31 - 1;
 
-class TestMetricExporter extends MetricExporter {
+class TestMetricExporter implements PushMetricExporter {
   public exportTime = 0;
   public forceFlushTime = 0;
   public throwException = false;
+  public failureResult = false;
   private _batches: MetricData[][] = [];
+  private _shutdown: boolean = false;
 
-  async export(batch: MetricData[]): Promise<void> {
+  export(batch: MetricData[], resultCallback: (result: ExportResult) => void): void {
     this._batches.push(batch);
 
     if (this.throwException) {
       throw new Error('Error during export');
     }
-    await new Promise(resolve => setTimeout(resolve, this.exportTime));
+    setTimeout(() => {
+      if (this.failureResult) {
+        resultCallback({code: ExportResultCode.FAILED, error: new Error('some error') });
+      } else {
+        resultCallback({code: ExportResultCode.SUCCESS });
+      }
+    }, this.exportTime);
+  }
+
+  async shutdown(): Promise<void> {
+    if (this._shutdown) return;
+    const flushPromise = this.forceFlush();
+    this._shutdown = true;
+    await flushPromise;
   }
 
   async forceFlush(): Promise<void> {
@@ -173,6 +189,24 @@ describe('PeriodicExportingMetricReader', () => {
       assert.deepStrictEqual(result, [[], []]);
 
       exporter.throwException = false;
+      await reader.shutdown();
+    });
+
+    it('should keep running on export failure', async () => {
+      const exporter = new TestMetricExporter();
+      exporter.failureResult = true;
+      const reader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 30,
+        exportTimeoutMillis: 20
+      });
+
+      reader.setMetricProducer(new TestMetricProducer());
+
+      const result = await exporter.waitForNumberOfExports(2);
+      assert.deepStrictEqual(result, [[], []]);
+
+      exporter.failureResult = false;
       await reader.shutdown();
     });
 

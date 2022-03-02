@@ -16,8 +16,9 @@
 
 import { diag } from '@opentelemetry/api';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { Detector, Resource, ResourceDetectionConfig } from '../../../';
-import { ResourceAttributes } from '../../../types';
+import { Resource } from '../Resource';
+import { Detector, ResourceAttributes } from '../types';
+import { ResourceDetectionConfig } from '../config';
 
 /**
  * ProcessDetector will be used to detect the resources related current process running
@@ -25,6 +26,10 @@ import { ResourceAttributes } from '../../../types';
  */
 class ProcessDetector implements Detector {
   async detect(config?: ResourceDetectionConfig): Promise<Resource> {
+    // Skip if not in Node.js environment.
+    if (typeof process !== 'object') {
+      return Resource.empty();
+    }
     const processResource: ResourceAttributes = {
       [SemanticResourceAttributes.PROCESS_PID]: process.pid,
       [SemanticResourceAttributes.PROCESS_EXECUTABLE_NAME]: process.title || '',
