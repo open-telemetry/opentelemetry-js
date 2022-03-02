@@ -197,7 +197,7 @@ const testCollectorExporter = (params: TestParams) =>
             ensureMetadataIsCorrect(reqMetadata, params.metadata);
           }
           done();
-        }, 200);
+        }, 500);
       });
       it('should log deadline exceeded error', done => {
         const credentials = params.useTLS

@@ -63,10 +63,10 @@ export function configureExporterTimeout(timeoutMillis: number | undefined): num
 
 function getExporterTimeoutFromEnv(): number {
   const definedTimeout =
-    Number(getEnv().OTEL_EXPORTER_OTLP_TRACES_TIMEOUT ||
+    Number(getEnv().OTEL_EXPORTER_OTLP_TRACES_TIMEOUT ??
     getEnv().OTEL_EXPORTER_OTLP_TIMEOUT);
 
-  if (definedTimeout) {
+  if (definedTimeout !== undefined) {
     if (definedTimeout <= 0) {
       // OTLP exporter configured timeout - using default value of 10000ms
       return invalidTimeout(definedTimeout, DEFAULT_TRACE_TIMEOUT);
@@ -79,7 +79,7 @@ function getExporterTimeoutFromEnv(): number {
 
 // OTLP exporter configured timeout - using default value of 10000ms
 function invalidTimeout(timeout: number, defaultTimeout: number): number {
-  diag.warn('Timeout must be non-negative', timeout);
+  diag.warn('Timeout must be greater than 0', timeout);
 
   return defaultTimeout;
 }

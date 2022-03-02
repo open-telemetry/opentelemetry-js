@@ -255,7 +255,7 @@ describe('OTLPTraceExporter - web', () => {
     describe('when "sendBeacon" is available', () => {
       let clock: sinon.SinonFakeTimers;
       beforeEach(() => {
-         // fakeTimers is used to replace the next setTimeout which is
+        // fakeTimers is used to replace the next setTimeout which is
         // located in sendWithXhr function called by the export method
         clock = sinon.useFakeTimers();
 

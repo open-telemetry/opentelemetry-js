@@ -42,7 +42,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
   onSuccess: () => void,
   onError: (error: otlpTypes.OTLPExporterError) => void
 ): void {
-  const exporterTimeout = collector._timeoutMillis;
+  const exporterTimeout = collector.timeoutMillis;
   const parsedUrl = new url.URL(collector.url);
   let reqIsDestroyed: boolean;
 
@@ -72,7 +72,6 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
     res.on('end', () => {
       if (res.statusCode && res.statusCode < 299) {
         diag.debug(`statusCode: ${res.statusCode}`, responseData);
-        clearTimeout(exporterTimer);
         onSuccess();
       } else {
         const error = new otlpTypes.OTLPExporterError(
@@ -80,9 +79,9 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
           res.statusCode,
           responseData
         );
-        clearTimeout(exporterTimer);
         onError(error);
       }
+      clearTimeout(exporterTimer);
     });
   });
 

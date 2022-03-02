@@ -126,8 +126,13 @@ To override the default timeout duration, use the following options:
 
   ```js
   const collectorOptions = {
-    timeoutMillis: 15000
+    timeoutMillis: 15000,
+    // url is optional and can be omitted - default is localhost:4317
+    url: '<collector-hostname>:<port>',
+    metadata, // // an optional grpc.Metadata object to be sent with each request
   };
+    
+  const exporter = new OTLPTraceExporter(collectorOptions);
   ```
 
   > Providing `timeoutMillis` with `collectorOptions` takes precedence and overrides timeout set with environment variables.

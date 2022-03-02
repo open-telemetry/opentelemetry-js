@@ -57,8 +57,14 @@ To override the default timeout duration, use the following options:
 
   ```js
   const collectorOptions = {
-    timeoutMillis: 15000
+    timeoutMillis: 15000,
+    url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/traces
+    headers: {
+      foo: 'bar'
+    }, //an optional object containing custom headers to be sent with each request will only work with http
   };
+
+  const exporter = new OTLPTraceExporter(collectorOptions);
   ```
 
   > Providing `timeoutMillis` with `collectorOptions` takes precedence and overrides timeout set with environment variables.

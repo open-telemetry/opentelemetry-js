@@ -446,7 +446,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
 
           done();
         });
-      }, 100);
+      }, 300);
     });
   });
 });

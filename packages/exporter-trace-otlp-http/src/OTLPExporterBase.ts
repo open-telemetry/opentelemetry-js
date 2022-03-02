@@ -34,10 +34,10 @@ export abstract class OTLPExporterBase<
   public readonly url: string;
   public readonly hostname: string | undefined;
   public readonly attributes?: SpanAttributes;
+  public readonly timeoutMillis: number;
   protected _concurrencyLimit: number;
   protected _sendingPromises: Promise<unknown>[] = [];
   protected _shutdownOnce: BindOnceFuture<void>;
-  public readonly _timeoutMillis: number;
 
   /**
    * @param config
@@ -58,7 +58,7 @@ export abstract class OTLPExporterBase<
         ? config.concurrencyLimit
         : Infinity;
 
-    this._timeoutMillis = configureExporterTimeout(config.timeoutMillis);
+    this.timeoutMillis = configureExporterTimeout(config.timeoutMillis);
 
     // platform dependent
     this.onInit(config);
