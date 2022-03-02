@@ -84,6 +84,16 @@ describe('invalidTimeout', () => {
     assert.strictEqual(args[1], -9000);
     sinon.restore();
   });
+  it('diag warn was called', () => {
+    const spyLoggerWarn = sinon.stub(diag, 'warn');
+    invalidTimeout(-9000, 10000);
+    assert(spyLoggerWarn.calledOnce);
+    sinon.restore();
+  });
+  it('should return default timeout', () => {
+    const defaultTimeout = invalidTimeout(-9000, 10000);
+    assert.strictEqual(defaultTimeout, 10000);
+  });
 });
 
 describe('configureCompression', () => {
