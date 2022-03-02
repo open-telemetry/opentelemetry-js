@@ -15,12 +15,13 @@
  */
 
 import * as api from '@opentelemetry/api';
+import { ExportResultCode, globalErrorHandler } from '@opentelemetry/core';
 import { MetricReader } from './MetricReader';
-import { MetricExporter } from './MetricExporter';
+import { PushMetricExporter } from './MetricExporter';
 import { callWithTimeout, TimeoutError } from '../utils';
 
 export type PeriodicExportingMetricReaderOptions = {
-  exporter: MetricExporter
+  exporter: PushMetricExporter
   exportIntervalMillis?: number,
   exportTimeoutMillis?: number
 };
@@ -32,7 +33,7 @@ export type PeriodicExportingMetricReaderOptions = {
 export class PeriodicExportingMetricReader extends MetricReader {
   private _interval?: ReturnType<typeof setInterval>;
 
-  private _exporter: MetricExporter;
+  private _exporter: PushMetricExporter;
 
   private readonly _exportInterval: number;
 
@@ -62,7 +63,20 @@ export class PeriodicExportingMetricReader extends MetricReader {
 
   private async _runOnce(): Promise<void> {
     const metrics = await this.collect({});
-    await this._exporter.export(metrics);
+    return new Promise((resolve, reject) => {
+      this._exporter.export(metrics, result => {
+        if (result.code !== ExportResultCode.SUCCESS) {
+          reject(
+            result.error ??
+              new Error(
+                `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`
+              )
+          );
+        } else {
+          resolve();
+        }
+      });
+    });
   }
 
   protected override onInitialized(): void {
@@ -76,7 +90,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
           return;
         }
 
-        api.diag.error('Unexpected error during export: %s', err);
+        globalErrorHandler(err);
       }
     }, this._exportInterval);
   }
