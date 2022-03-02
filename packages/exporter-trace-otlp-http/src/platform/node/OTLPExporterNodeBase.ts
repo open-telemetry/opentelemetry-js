@@ -21,7 +21,7 @@ import { OTLPExporterBase } from '../../OTLPExporterBase';
 import { OTLPExporterNodeConfigBase, CompressionAlgorithm } from './types';
 import * as otlpTypes from '../../types';
 import { parseHeaders } from '../../util';
-import { createHttpAgent, sendWithHttp } from './util';
+import { createHttpAgent, sendWithHttp, configureCompression } from './util';
 import { diag } from '@opentelemetry/api';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 
@@ -53,7 +53,7 @@ export abstract class OTLPExporterNodeBase<
       baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_HEADERS)
     );
     this.agent = createHttpAgent(config);
-    this.compression = config.compression || CompressionAlgorithm.NONE;
+    this.compression = configureCompression(config.compression);
   }
 
   onInit(_config: OTLPExporterNodeConfigBase): void {}

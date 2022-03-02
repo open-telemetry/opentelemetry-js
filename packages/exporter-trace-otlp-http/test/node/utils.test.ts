@@ -16,7 +16,8 @@
 
 import * as assert from 'assert';
 import { configureExporterTimeout } from '../../src/util';
-
+import { CompressionAlgorithm} from '../../src/platform/node/types';
+import { configureCompression} from '../../src/platform/node/util';
 
 describe('configureExporterTimeout', () => {
   const envSource = process.env;
@@ -48,3 +49,23 @@ describe('configureExporterTimeout', () => {
   });
 });
 
+describe('configureCompression', () => {
+  const envSource = process.env;
+  it('should return none for compression', () => {
+    const compression = CompressionAlgorithm.NONE;
+    assert.strictEqual(configureCompression(compression), CompressionAlgorithm.NONE);
+  });
+  it('should return gzip compression defined via env', () => {
+    envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = 'gzip';
+    assert.strictEqual(configureCompression(undefined),CompressionAlgorithm.GZIP);
+    delete envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION;
+  });
+  it('should return none for compression defined via env', () => {
+    envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = 'none';
+    assert.strictEqual(configureCompression(undefined),CompressionAlgorithm.NONE);
+    delete envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION;
+  });
+  it('should return none for compression when no compression is set', () => {
+    assert.strictEqual(configureCompression(undefined),CompressionAlgorithm.NONE);
+  });
+});
