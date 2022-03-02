@@ -247,7 +247,7 @@ const testCollectorExporter = (params: TestParams) =>
             ensureMetadataIsCorrect(reqMetadata, params.metadata);
           }
           done();
-        }, 200);
+        }, 500);
       });
     });
   });
