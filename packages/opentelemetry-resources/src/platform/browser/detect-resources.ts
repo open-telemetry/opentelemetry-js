@@ -14,4 +14,36 @@
  * limitations under the License.
  */
 
-export { detectResources } from '../utils';
+import { Resource } from '../../Resource';
+import { ResourceDetectionConfig } from '../../config';
+import { diag } from '@opentelemetry/api';
+
+/**
+ * Runs all resource detectors and returns the results merged into a single
+ * Resource.
+ *
+ * @param config Configuration for resource detection
+ */
+export const detectResources = async (
+  config: ResourceDetectionConfig = {}
+): Promise<Resource> => {
+  const internalConfig: ResourceDetectionConfig = Object.assign(config);
+
+  const resources: Resource[] = await Promise.all(
+    (internalConfig.detectors || []).map(async d => {
+      try {
+        const resource = await d.detect(internalConfig);
+        diag.debug(`${d.constructor.name} found resource.`, resource);
+        return resource;
+      } catch (e) {
+        diag.debug(`${d.constructor.name} failed: ${e.message}`);
+        return Resource.empty();
+      }
+    })
+  );
+
+  return resources.reduce(
+    (acc, resource) => acc.merge(resource),
+    Resource.empty()
+  );
+};
