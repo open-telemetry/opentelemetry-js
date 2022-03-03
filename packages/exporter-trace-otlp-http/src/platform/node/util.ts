@@ -23,6 +23,7 @@ import { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
 import { OTLPExporterNodeConfigBase } from '.';
 import { diag } from '@opentelemetry/api';
 import { CompressionAlgorithm } from './types';
+import { getEnv } from '@opentelemetry/core';
 
 let gzip: zlib.Gzip | undefined;
 
@@ -129,5 +130,14 @@ export function createHttpAgent(
       `collector exporter failed to create http agent. err: ${err.message}`
     );
     return undefined;
+  }
+}
+
+export function configureCompression(compression: CompressionAlgorithm | undefined): CompressionAlgorithm {
+  if (compression) {
+    return compression;
+  } else {
+    const definedCompression = getEnv().OTEL_EXPORTER_OTLP_TRACES_COMPRESSION || getEnv().OTEL_EXPORTER_OTLP_COMPRESSION;
+    return definedCompression === CompressionAlgorithm.GZIP ? CompressionAlgorithm.GZIP : CompressionAlgorithm.NONE;
   }
 }
