@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 import * as sinon from 'sinon';
-import { Resource } from '../../src';
-import { browserDetector } from '../../src/platform/browser/detectors';
+import { Resource } from '../../../src';
+import { browserDetector } from '../../../src/detectors/BrowserDetector';
 import {
   assertResource,
   assertEmptyResource,
-} from '../util/resource-assertions';
+} from '../../util/resource-assertions';
 
 
 describe('browserDetector()', () => {
   beforeEach(() => {
     (globalThis.window as {}) = {};
     sinon.stub(globalThis, 'window').value({
+      document: 'document',
       navigator: {
         userAgent: '',
       }
@@ -40,7 +41,8 @@ describe('browserDetector()', () => {
     sinon.stub(globalThis, 'window').value({
       navigator: {
         userAgent: 'dddd',
-      }
+      },
+      document: 'document'
     });
 
     const resource: Resource = await browserDetector.detect();

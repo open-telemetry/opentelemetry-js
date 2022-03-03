@@ -16,14 +16,18 @@
 
 import { diag } from '@opentelemetry/api';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { Detector, Resource, ResourceDetectionConfig } from '../../..';
-import { ResourceAttributes } from '../../../types';
+import { Detector, Resource, ResourceDetectionConfig } from '..';
+import { ResourceAttributes } from '../types';
 
 /**
  * BrowserDetector will be used to detect the resources related to browser.
  */
 class BrowserDetector implements Detector {
   async detect(config?: ResourceDetectionConfig): Promise<Resource> {
+    const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
+    if (!isBrowser) {
+      return Resource.empty();
+    }
     const browserResource: ResourceAttributes = {
       [SemanticResourceAttributes.PROCESS_RUNTIME_NAME]: 'browser',
       [SemanticResourceAttributes.PROCESS_RUNTIME_DESCRIPTION]: 'Web Browser',
