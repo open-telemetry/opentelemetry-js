@@ -112,6 +112,20 @@ describe('OTLPTraceExporter - node with json over http', () => {
       envSource.OTEL_EXPORTER_OTLP_TRACES_HEADERS = '';
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
+    it('should use compression defined via env', () => {
+      envSource.OTEL_EXPORTER_OTLP_COMPRESSION = 'gzip';
+      const collectorExporter = new OTLPTraceExporter();
+      assert.strictEqual(collectorExporter.compression, 'gzip');
+      envSource.OTEL_EXPORTER_OTLP_COMPRESSION = '';
+    });
+    it('should override global compression config with signal compression defined via env', () => {
+      envSource.OTEL_EXPORTER_OTLP_COMPRESSION = 'foo';
+      envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = 'gzip';
+      const collectorExporter = new OTLPTraceExporter();
+      assert.strictEqual(collectorExporter.compression, 'gzip');
+      envSource.OTEL_EXPORTER_OTLP_COMPRESSION = '';
+      envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = '';
+    });
   });
 
   describe('export', () => {
