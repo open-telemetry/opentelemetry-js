@@ -27,9 +27,9 @@ export class MetricStorageRegistry {
   private readonly _metricStorageRegistry = new Map<string, MetricStorage[]>();
 
   getStorages(): MetricStorage[] {
-    const storages = [];
+    let storages: MetricStorage[] = [];
     for (const metricStorages of Array.from(this._metricStorageRegistry.values())) {
-      storages.push(...metricStorages);
+      storages = storages.concat(metricStorages);
     }
 
     return storages;
