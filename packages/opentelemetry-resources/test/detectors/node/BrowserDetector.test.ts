@@ -13,7 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Resource } from '../../../src';
+import { browserDetector } from '../../../src/detectors/BrowserDetector';
+import { describeNode } from '../../util';
+import {
+  assertEmptyResource,
+} from '../../util/resource-assertions';
 
-export * from './EnvDetector';
-export * from './ProcessDetector';
-export * from './BrowserDetector';
+
+describeNode('browserDetector()', () => {
+  it('should return empty resources if window.document is missing', async () => {
+    const resource: Resource = await browserDetector.detect();
+    assertEmptyResource(resource);
+  });
+});
+

@@ -15,12 +15,35 @@
  */
 
 import { Resource } from '../../Resource';
+import { ResourceDetectionConfig } from '../../config';
+import { diag } from '@opentelemetry/api';
 
 /**
- * Detects resources for the browser platform, which is currently only the
- * telemetry SDK resource. More could be added in the future. This method
- * is async to match the signature of corresponding method for node.
+ * Runs all resource detectors and returns the results merged into a single
+ * Resource.
+ *
+ * @param config Configuration for resource detection
  */
-export const detectResources = async (): Promise<Resource> => {
-  return Resource.empty();
+export const detectResources = async (
+  config: ResourceDetectionConfig = {}
+): Promise<Resource> => {
+  const internalConfig: ResourceDetectionConfig = Object.assign(config);
+
+  const resources: Resource[] = await Promise.all(
+    (internalConfig.detectors || []).map(async d => {
+      try {
+        const resource = await d.detect(internalConfig);
+        diag.debug(`${d.constructor.name} found resource.`, resource);
+        return resource;
+      } catch (e) {
+        diag.debug(`${d.constructor.name} failed: ${e.message}`);
+        return Resource.empty();
+      }
+    })
+  );
+
+  return resources.reduce(
+    (acc, resource) => acc.merge(resource),
+    Resource.empty()
+  );
 };
