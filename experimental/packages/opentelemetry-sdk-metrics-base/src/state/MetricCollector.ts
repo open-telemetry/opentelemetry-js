@@ -35,7 +35,7 @@ export class MetricCollector implements MetricProducer {
   async collect(): Promise<ResourceMetrics> {
     const collectionTime = hrTime();
     const instrumentationLibraryMetrics = (await Promise.all(this._sharedState.meters
-      .map(meter => meter.collect(this, collectionTime)))).filter(({ metrics }) => metrics.length > 0);
+      .map(meter => meter.collect(this, collectionTime))));
 
     return {
       resource: this._sharedState.resource,
