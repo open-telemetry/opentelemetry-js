@@ -64,68 +64,6 @@ export interface ResourceMetrics {
   instrumentationLibraryMetrics: InstrumentationLibraryMetrics[];
 }
 
-type InstrumentationLibraryMetricsMap = Map<InstrumentationLibrary, MetricData[]>;
-
-export class MetricsData {
-  private _metricsData: Map<Resource, InstrumentationLibraryMetricsMap> = new Map();
-
-  constructor(resourceMetrics?: ResourceMetrics) {
-    if (resourceMetrics === undefined) {
-      return;
-    }
-
-    const metricsByInstrLib = new Map();
-
-    for (const ilMetrics of resourceMetrics.instrumentationLibraryMetrics) {
-      metricsByInstrLib.set(ilMetrics.instrumentationLibrary, ilMetrics.metrics);
-    }
-
-    this._metricsData.set(resourceMetrics.resource, metricsByInstrLib);
-  }
-
-  resourceMetrics(): ResourceMetrics[] {
-    return Array.from(this._metricsData, ([resource, metricsByInstrLib]) => {
-      const instrumentationLibraryMetrics = Array.from(metricsByInstrLib, ([instrumentationLibrary, metrics]) => ({
-        instrumentationLibrary,
-        metrics
-      }));
-
-      return {
-        resource,
-        instrumentationLibraryMetrics,
-      };
-    });
-  }
-
-  merge(source: MetricsData): MetricsData {
-    function mergeIlMetrics(into: InstrumentationLibraryMetricsMap, from: InstrumentationLibraryMetricsMap): InstrumentationLibraryMetricsMap {
-      from.forEach((metrics, instrumentationLib) => {
-        const targetMetrics = into.get(instrumentationLib);
-
-        if (targetMetrics === undefined) {
-          into.set(instrumentationLib, metrics);
-        } else {
-          into.set(instrumentationLib, targetMetrics.concat(metrics));
-        }
-      });
-
-      return into;
-    }
-
-    source._metricsData.forEach((sourceIlMetrics, resource) => {
-      const targetIlMetrics = this._metricsData.get(resource);
-
-      if (targetIlMetrics === undefined) {
-        this._metricsData.set(resource, sourceIlMetrics);
-      } else {
-        this._metricsData.set(resource, mergeIlMetrics(targetIlMetrics, sourceIlMetrics));
-      }
-    });
-
-    return this;
-  }
-}
-
 /**
  * The aggregated point data type.
  */

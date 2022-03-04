@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MeterProvider } from '../../src';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import { MetricsData, PointDataType } from '../../src/export/MetricData';
+import { PointDataType, ResourceMetrics } from '../../src/export/MetricData';
 import { PushMetricExporter } from '../../src/export/MetricExporter';
 import { MeterProviderSharedState } from '../../src/state/MeterProviderSharedState';
 import { MetricCollector } from '../../src/state/MetricCollector';
@@ -27,9 +27,7 @@ import { TestMetricReader } from '../export/TestMetricReader';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 
 class TestMetricExporter implements PushMetricExporter {
-  metricDataList: MetricsData[] = [];
-  async export(batch: MetricsData, resultCallback: (result: ExportResult) => void): Promise<void> {
-    this.metricDataList.push(batch);
+  async export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): Promise<void> {
     resultCallback({code: ExportResultCode.SUCCESS});
   }
 
@@ -96,8 +94,8 @@ describe('MetricCollector', () => {
       counter2.add(3);
 
       /** collect metrics */
-      const metricsData = await metricCollector.collect();
-      const { metrics } = metricsData.resourceMetrics()[0].instrumentationLibraryMetrics[0];
+      const { instrumentationLibraryMetrics } = await metricCollector.collect();
+      const { metrics } = instrumentationLibraryMetrics[0];
       assert.strictEqual(metrics.length, 2);
 
       /** checking batch[0] */

@@ -22,7 +22,7 @@ import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { MultiMetricStorage } from './state/MultiWritableMetricStorage';
 import { SyncMetricStorage } from './state/SyncMetricStorage';
 import { MetricStorage } from './state/MetricStorage';
-import { MetricsData } from './export/MetricData';
+import { InstrumentationLibraryMetrics } from './export/MetricData';
 import { isNotNullish } from './utils';
 import { MetricCollectorHandle } from './state/MetricCollector';
 import { HrTime } from '@opentelemetry/api';
@@ -130,7 +130,7 @@ export class Meter implements metrics.Meter {
    * @param collectionTime the HrTime at which the collection was initiated.
    * @returns the list of {@link MetricData} collected.
    */
-  async collect(collector: MetricCollectorHandle, collectionTime: HrTime): Promise<MetricsData> {
+  async collect(collector: MetricCollectorHandle, collectionTime: HrTime): Promise<InstrumentationLibraryMetrics> {
     const metricData = await Promise.all(Array.from(this._metricStorageRegistry.values()).map(metricStorage => {
       return metricStorage.collect(
         collector,
@@ -139,12 +139,9 @@ export class Meter implements metrics.Meter {
         collectionTime);
     }));
 
-    return new MetricsData({
-      resource: this._meterProviderSharedState.resource,
-      instrumentationLibraryMetrics: [{
-        instrumentationLibrary: this._instrumentationLibrary,
-        metrics: metricData.filter(isNotNullish),
-      }]
-    });
+    return {
+      instrumentationLibrary: this._instrumentationLibrary,
+      metrics: metricData.filter(isNotNullish),
+    };
   }
 }
