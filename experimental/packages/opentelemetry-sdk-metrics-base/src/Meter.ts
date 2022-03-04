@@ -21,18 +21,19 @@ import { Counter, Histogram, UpDownCounter } from './Instruments';
 import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { MultiMetricStorage } from './state/MultiWritableMetricStorage';
 import { SyncMetricStorage } from './state/SyncMetricStorage';
-import { MetricStorage } from './state/MetricStorage';
 import { MetricData } from './export/MetricData';
 import { isNotNullish } from './utils';
 import { MetricCollectorHandle } from './state/MetricCollector';
 import { HrTime } from '@opentelemetry/api';
 import { AsyncMetricStorage } from './state/AsyncMetricStorage';
+import { WritableMetricStorage } from './state/WritableMetricStorage';
+import { MetricStorageRegistry } from './state/MetricStorageRegistry';
 
 /**
  * This class implements the {@link metrics.Meter} interface.
  */
 export class Meter implements metrics.Meter {
-  private _metricStorageRegistry = new Map<string, MetricStorage>();
+  private _metricStorageRegistry = new MetricStorageRegistry();
 
   constructor(private _meterProviderSharedState: MeterProviderSharedState, private _instrumentationLibrary: InstrumentationLibrary) {
     this._meterProviderSharedState.meters.push(this);
@@ -101,26 +102,23 @@ export class Meter implements metrics.Meter {
     this._registerAsyncMetricStorage(descriptor, callback);
   }
 
-  private _registerMetricStorage(descriptor: InstrumentDescriptor) {
+  private _registerMetricStorage(descriptor: InstrumentDescriptor): WritableMetricStorage {
     const views = this._meterProviderSharedState.viewRegistry.findViews(descriptor, this._instrumentationLibrary);
-    const storages = views.map(view => {
-      const storage = SyncMetricStorage.create(view, descriptor);
-      // TODO: handle conflicts
-      this._metricStorageRegistry.set(descriptor.name, storage);
-      return storage;
-    });
-    if (storages.length === 1)  {
+    const storages = views.map(view => this._metricStorageRegistry.register(SyncMetricStorage.create(view, descriptor)))
+      .filter(isNotNullish);
+
+    if (storages.length === 1) {
       return storages[0];
     }
+
+    // This will be a no-op WritableMetricStorage when length is null.
     return new MultiMetricStorage(storages);
   }
 
   private _registerAsyncMetricStorage(descriptor: InstrumentDescriptor, callback: metrics.ObservableCallback) {
     const views = this._meterProviderSharedState.viewRegistry.findViews(descriptor, this._instrumentationLibrary);
     views.forEach(view => {
-      const storage = AsyncMetricStorage.create(view, descriptor, callback);
-      // TODO: handle conflicts
-      this._metricStorageRegistry.set(descriptor.name, storage);
+      this._metricStorageRegistry.register(AsyncMetricStorage.create(view, descriptor, callback));
     });
   }
 
@@ -131,7 +129,7 @@ export class Meter implements metrics.Meter {
    * @returns the list of {@link MetricData} collected.
    */
   async collect(collector: MetricCollectorHandle, collectionTime: HrTime): Promise<MetricData[]> {
-    const result = await Promise.all(Array.from(this._metricStorageRegistry.values()).map(metricStorage => {
+    const result = await Promise.all(this._metricStorageRegistry.getStorages().map(metricStorage => {
       return metricStorage.collect(
         collector,
         this._meterProviderSharedState.metricCollectors,
