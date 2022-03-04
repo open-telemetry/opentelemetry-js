@@ -21,22 +21,32 @@ import {
   SpanContext,
   SpanKind,
   TraceFlags,
+  HrTime,
 } from '@opentelemetry/api';
 import {
   DEFAULT_ATTRIBUTE_COUNT_LIMIT,
   DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
-  hrTime,
   hrTimeDuration,
   hrTimeToMilliseconds,
   hrTimeToNanoseconds,
+  otperformance as performance,
 } from '@opentelemetry/core';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import { BasicTracerProvider, Span, SpanProcessor } from '../../src';
 
-const performanceTimeOrigin = hrTime();
+const performanceTimeOrigin: HrTime = [1, 1];
 
 describe('Span', () => {
+  beforeEach(() => {
+    sinon.stub(performance, 'timeOrigin')
+      .value(hrTimeToMilliseconds(performanceTimeOrigin));
+  });
+  afterEach(() => {
+    sinon.restore();
+  });
+
   const tracer = new BasicTracerProvider({
     spanLimits: {
       attributeValueLengthLimit: 100,
