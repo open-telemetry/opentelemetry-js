@@ -123,6 +123,7 @@ const testCollectorExporter = (params: TestParams) =>
             fs.readFileSync('./test/certs/client.crt')
           )
         : undefined;
+
       collectorExporter = new OTLPTraceExporter({
         url: 'grpcs://' + address,
         credentials,
@@ -264,3 +265,163 @@ describe('when configuring via environment', () => {
 testCollectorExporter({ useTLS: true });
 testCollectorExporter({ useTLS: false });
 testCollectorExporter({ metadata });
+
+const testCollectorExporterSecurity = (serverSecurity: boolean, isSecure: string, certificatePath: string) => {
+  describe('export with security options', () => {
+    let collectorExporter: OTLPTraceExporter;
+    let server: grpc.Server;
+    let exportedData:
+      | otlpTypes.opentelemetryProto.trace.v1.ResourceSpans
+      | undefined;
+    let reqMetadata: grpc.Metadata | undefined;
+    before(done => {
+    server = new grpc.Server();
+    protoLoader
+      .load(traceServiceProtoPath, {
+        keepCase: false,
+        longs: String,
+        enums: String,
+        defaults: true,
+        oneofs: true,
+        includeDirs,
+      })
+      .then((packageDefinition: protoLoader.PackageDefinition) => {
+        const packageObject: any = grpc.loadPackageDefinition(
+          packageDefinition
+        );
+        server.addService(
+          packageObject.opentelemetry.proto.collector.trace.v1.TraceService
+            .service,
+          {
+            Export: (data: {
+              request: otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+              metadata: grpc.Metadata;
+            }) => {
+              try {
+                exportedData = data.request.resourceSpans[0];
+                reqMetadata = data.metadata;
+              } catch (e) {
+                exportedData = undefined;
+              }
+            },
+          }
+        );
+        const credentials = serverSecurity
+        ? grpc.ServerCredentials.createSsl(
+            fs.readFileSync('./test/certs/ca.crt'),
+            [
+              {
+                cert_chain: fs.readFileSync('./test/certs/server.crt'),
+                private_key: fs.readFileSync('./test/certs/server.key'),
+              },
+            ]
+          )
+        : grpc.ServerCredentials.createInsecure();
+        server.bindAsync(address, credentials, () => {
+          server.start();
+          done();
+        });
+      });
+    });
+
+    after(() => {
+      server.forceShutdown();
+    });
+
+    afterEach(() => {
+      const envSource = process.env;
+      exportedData = undefined;
+      reqMetadata = undefined;
+      sinon.restore();
+      delete envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE;
+      delete envSource.OTEL_EXPORTER_OTLP_CERTIFICATE;
+    });
+
+    describe('export with security configuration', () => {
+      it('should export spans using env var values', done => {
+        const envSource = process.env;
+        envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE=isSecure;
+        envSource.OTEL_EXPORTER_OTLP_CERTIFICATE=certificatePath;
+
+        collectorExporter = new OTLPTraceExporter({
+          url: 'grpcs://' + address,
+        });
+
+        const provider = new BasicTracerProvider();
+        provider.addSpanProcessor(new SimpleSpanProcessor(collectorExporter));
+
+        const responseSpy = sinon.spy();
+        const spans = [Object.assign({}, mockedReadableSpan)];
+        collectorExporter.export(spans, responseSpy);
+
+        setTimeout(() => {
+          assert.ok(
+            typeof exportedData !== 'undefined',
+            'resource' + " doesn't exist"
+          );
+          let spans;
+          let resource;
+          if (exportedData) {
+            spans = exportedData.instrumentationLibrarySpans[0].spans;
+            resource = exportedData.resource;
+            ensureExportedSpanIsCorrect(spans[0]);
+
+            assert.ok(
+              typeof resource !== 'undefined',
+              "resource doesn't exist"
+            );
+            if (resource) {
+              ensureResourceIsCorrect(resource);
+            }
+          }
+
+          done();
+        }, 200);
+      });
+      it('should export spans using config values', done => {
+        const credentials = isSecure === 'true' ?
+        grpc.credentials.createSsl(fs.readFileSync(certificatePath)) :
+        grpc.credentials.createInsecure();
+
+        collectorExporter = new OTLPTraceExporter({
+          url: 'grpcs://' + address,
+          credentials,
+        });
+
+        const provider = new BasicTracerProvider();
+        provider.addSpanProcessor(new SimpleSpanProcessor(collectorExporter));
+
+        const responseSpy = sinon.spy();
+        const spans = [Object.assign({}, mockedReadableSpan)];
+        collectorExporter.export(spans, responseSpy);
+
+        setTimeout(() => {
+          assert.ok(
+            typeof exportedData !== 'undefined',
+            'resource' + " doesn't exist"
+          );
+          let spans;
+          let resource;
+          if (exportedData) {
+            spans = exportedData.instrumentationLibrarySpans[0].spans;
+            resource = exportedData.resource;
+            ensureExportedSpanIsCorrect(spans[0]);
+
+            assert.ok(
+              typeof resource !== 'undefined',
+              "resource doesn't exist"
+            );
+            if (resource) {
+              ensureResourceIsCorrect(resource);
+            }
+          }
+
+          done();
+        }, 200);
+      });
+    });
+  });
+};
+
+testCollectorExporterSecurity(true, 'true', './test/certs/ca.crt');
+testCollectorExporterSecurity(false, 'false', '');

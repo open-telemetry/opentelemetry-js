@@ -27,6 +27,7 @@ import {
   GRPCQueueItem,
   ServiceClientType,
 } from './types';
+import * as fs from 'fs';
 
 export function onInit<ExportItem, ServiceRequest>(
   collector: OTLPExporterNodeBase<ExportItem, ServiceRequest>,
@@ -34,7 +35,7 @@ export function onInit<ExportItem, ServiceRequest>(
 ): void {
   collector.grpcQueue = [];
 
-  const credentials: grpc.ChannelCredentials = configureSecurity(config.credentials);
+  const credentials: grpc.ChannelCredentials = configureSecurity(config.url, config.credentials);
 
   const includeDirs = [path.resolve(__dirname, '..', 'protos')];
 
@@ -126,15 +127,48 @@ export function validateAndNormalizeUrl(url: string): string {
   return target.host;
 }
 
-export function configureSecurity(credentials: grpc.ChannelCredentials | undefined): grpc.ChannelCredentials {
-  if (credentials) {
+export function configureSecurity(endpoint: string | undefined,
+  credentials: grpc.ChannelCredentials | undefined):
+  grpc.ChannelCredentials {
+  // if endpoing has https scheme it indicates a secure connection and
+  // override insecure configuration settings
+  const definedEndpoint = endpoint ||
+    getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT ||
+    getEnv().OTEL_EXPORTER_OTLP_ENDPOINT;
+
+  if (definedEndpoint && definedEndpoint.includes('https')) {
+    return useSecureConnection();
+  } else if (credentials) {
     return credentials;
   } else {
-    const definedSecurity = getEnv().OTEL_EXPORTER_OTLP_TRACES_INSECURE || getEnv().OTEL_EXPORTER_OTLP_INSECURE;
-    if (definedSecurity === 'true') {
-      return grpc.credentials.createSsl();
-    } else {
-      return grpc.credentials.createInsecure();
-    }
+    return getSecurityFromEnv();
   }
+}
+
+function getSecurityFromEnv(): grpc.ChannelCredentials {
+  const definedSecurity =
+    getEnv().OTEL_EXPORTER_OTLP_TRACES_INSECURE ||
+    getEnv().OTEL_EXPORTER_OTLP_INSECURE;
+
+  if (definedSecurity === 'true') {
+    return useSecureConnection();
+  } else {
+    return grpc.credentials.createInsecure();
+  }
+}
+
+function useSecureConnection(): grpc.ChannelCredentials {
+  const loadedCertificate = retrieveCertificate();
+
+  return loadedCertificate
+    ? grpc.credentials.createSsl(loadedCertificate)
+    : grpc.credentials.createSsl();
+}
+
+function retrieveCertificate(): Buffer | undefined {
+  const certificate =
+    getEnv().OTEL_EXPORTER_OTLP_CERTIFICATE ||
+    getEnv().OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE;
+
+  return certificate ? fs.readFileSync(certificate) : undefined;
 }
