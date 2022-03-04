@@ -28,7 +28,7 @@ export class MetricStorageRegistry {
 
   getStorages(): MetricStorage[] {
     let storages: MetricStorage[] = [];
-    for (const metricStorages of Array.from(this._metricStorageRegistry.values())) {
+    for (const metricStorages of this._metricStorageRegistry.values()) {
       storages = storages.concat(metricStorages);
     }
 
@@ -45,7 +45,7 @@ export class MetricStorageRegistry {
       return storage;
     }
 
-    const compatibleStorages = [];
+    let compatibleStorage = null;
 
     for (const existingStorage of existingStorages) {
       const existingDescriptor = existingStorage.getInstrumentDescriptor();
@@ -65,8 +65,8 @@ export class MetricStorageRegistry {
             'The longer description will be used.\nTo resolve the conflict:',
             getConflictResolutionRecipe(existingDescriptor, expectedDescriptor));
         }
-        // Storage is fully compatible.
-        compatibleStorages.push(existingStorage as T);
+        // Storage is fully compatible. There will never be more than one pre-existing fully compatible storage.
+        compatibleStorage = existingStorage as T;
       } else {
         // The implementation SHOULD warn about duplicate instrument registration
         // conflicts after applying View configuration.
@@ -80,10 +80,8 @@ export class MetricStorageRegistry {
       }
     }
 
-    // When one compatible storage is already present, another compatible one will not be pushed.
-    // Therefore this will never be > 1
-    if (compatibleStorages.length > 0) {
-      return compatibleStorages[0];
+    if (compatibleStorage != null) {
+      return compatibleStorage;
     }
 
     // None of the storages were compatible, add the current one to the list.
