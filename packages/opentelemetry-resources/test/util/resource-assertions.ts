@@ -258,18 +258,21 @@ export const assertServiceResource = (
 };
 
 /**
- * Test utility method to validate a process resources
+ * Test utility method to validate a process / browser resources
  *
  * @param resource the Resource to validate
  * @param validations validations for the resource attributes
  */
-export const assertProcessResource = (
+export const assertResource = (
   resource: Resource,
   validations: {
     pid?: number;
     name?: string;
     command?: string;
     commandLine?: string;
+    version?: string;
+    runtimeName?: string;
+    runtimeDescription?: string;
   }
 ) => {
   assert.strictEqual(
@@ -292,6 +295,24 @@ export const assertProcessResource = (
     assert.strictEqual(
       resource.attributes[SemanticResourceAttributes.PROCESS_COMMAND_LINE],
       validations.commandLine
+    );
+  }
+  if (validations.version) {
+    assert.strictEqual(
+      resource.attributes[SemanticResourceAttributes.PROCESS_RUNTIME_VERSION],
+      validations.version
+    );
+  }
+  if (validations.runtimeName) {
+    assert.strictEqual(
+      resource.attributes[SemanticResourceAttributes.PROCESS_RUNTIME_NAME],
+      validations.runtimeName
+    );
+  }
+  if (validations.runtimeDescription) {
+    assert.strictEqual(
+      resource.attributes[SemanticResourceAttributes.PROCESS_RUNTIME_DESCRIPTION],
+      validations.runtimeDescription
     );
   }
 };
