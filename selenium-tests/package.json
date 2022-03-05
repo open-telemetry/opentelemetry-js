@@ -44,7 +44,7 @@
     "dotenv": "16.0.0",
     "fast-safe-stringify": "2.1.1",
     "geckodriver": "2.0.4",
-    "nightwatch": "1.7.12",
+    "nightwatch": "2.0.10",
     "selenium-server": "3.141.59",
     "terser-webpack-plugin": "4.2.3",
     "webpack": "4.46.0",

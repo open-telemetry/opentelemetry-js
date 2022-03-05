@@ -20,7 +20,7 @@ import { View } from './view/View';
 /**
  * Supported types of metric instruments.
  */
- export enum InstrumentType {
+export enum InstrumentType {
   COUNTER = 'COUNTER',
   HISTOGRAM = 'HISTOGRAM',
   UP_DOWN_COUNTER = 'UP_DOWN_COUNTER',
@@ -55,4 +55,11 @@ export function createInstrumentDescriptorWithView(view: View, instrument: Instr
     unit: instrument.unit,
     valueType: instrument.valueType,
   };
+}
+
+export function isDescriptorCompatibleWith(descriptor: InstrumentDescriptor, otherDescriptor: InstrumentDescriptor) {
+  return descriptor.name === otherDescriptor.name
+    && descriptor.unit === otherDescriptor.unit
+    && descriptor.type === otherDescriptor.type
+    && descriptor.valueType === otherDescriptor.valueType;
 }
