@@ -16,7 +16,7 @@
 import * as sinon from 'sinon';
 import { processDetector, Resource } from '../../../src';
 import {
-  assertProcessResource,
+  assertResource,
   assertEmptyResource,
 } from '../../util/resource-assertions';
 import { describeNode } from '../../util';
@@ -32,13 +32,19 @@ describeNode('processDetector() on Node.js', () => {
     sinon
       .stub(process, 'argv')
       .value(['/tmp/node', '/home/ot/test.js', 'arg1', 'arg2']);
+    sinon
+      .stub(process, 'versions')
+      .value({'node': '1.4.1'});
 
     const resource: Resource = await processDetector.detect();
-    assertProcessResource(resource, {
+    assertResource(resource, {
       pid: 1234,
       name: 'otProcess',
       command: '/home/ot/test.js',
       commandLine: '/tmp/node /home/ot/test.js arg1 arg2',
+      version: '1.4.1',
+      runtimeDescription: 'Node.js',
+      runtimeName: 'nodejs',
     });
   });
   it('should return empty resources if title, command and commondLine is missing', async () => {
