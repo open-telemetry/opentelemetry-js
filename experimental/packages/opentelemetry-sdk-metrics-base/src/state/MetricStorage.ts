@@ -15,8 +15,6 @@
  */
 
 import { HrTime } from '@opentelemetry/api';
-import { InstrumentationLibrary } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
 import { MetricData } from '../export/MetricData';
 import { Maybe } from '../utils';
 import { MetricCollectorHandle } from './MetricCollector';
@@ -40,8 +38,6 @@ export abstract class MetricStorage {
   abstract collect(
     collector: MetricCollectorHandle,
     collectors: MetricCollectorHandle[],
-    resource: Resource,
-    instrumentationLibrary: InstrumentationLibrary,
     sdkStartTime: HrTime,
     collectionTime: HrTime,
   ): Promise<Maybe<MetricData>>;

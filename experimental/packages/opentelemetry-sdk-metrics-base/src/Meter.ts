@@ -21,7 +21,7 @@ import { Counter, Histogram, UpDownCounter } from './Instruments';
 import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { MultiMetricStorage } from './state/MultiWritableMetricStorage';
 import { SyncMetricStorage } from './state/SyncMetricStorage';
-import { MetricData } from './export/MetricData';
+import { InstrumentationLibraryMetrics } from './export/MetricData';
 import { isNotNullish } from './utils';
 import { MetricCollectorHandle } from './state/MetricCollector';
 import { HrTime } from '@opentelemetry/api';
@@ -128,16 +128,18 @@ export class Meter implements metrics.Meter {
    * @param collectionTime the HrTime at which the collection was initiated.
    * @returns the list of {@link MetricData} collected.
    */
-  async collect(collector: MetricCollectorHandle, collectionTime: HrTime): Promise<MetricData[]> {
-    const result = await Promise.all(this._metricStorageRegistry.getStorages().map(metricStorage => {
+  async collect(collector: MetricCollectorHandle, collectionTime: HrTime): Promise<InstrumentationLibraryMetrics> {
+    const metricData = await Promise.all(this._metricStorageRegistry.getStorages().map(metricStorage => {
       return metricStorage.collect(
         collector,
         this._meterProviderSharedState.metricCollectors,
-        this._meterProviderSharedState.resource,
-        this._instrumentationLibrary,
         this._meterProviderSharedState.sdkStartTime,
         collectionTime);
     }));
-    return result.filter(isNotNullish);
+
+    return {
+      instrumentationLibrary: this._instrumentationLibrary,
+      metrics: metricData.filter(isNotNullish),
+    };
   }
 }

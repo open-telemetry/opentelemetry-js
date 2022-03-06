@@ -17,13 +17,14 @@
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { PushMetricExporter } from '../../src';
-import { MetricData } from '../../src/export/MetricData';
+import { ResourceMetrics } from '../../src/export/MetricData';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MetricProducer } from '../../src/export/MetricProducer';
 import { TimeoutError } from '../../src/utils';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import { assertRejects } from '../test-utils';
+import { defaultResource } from '../util';
 
 const MAX_32_BIT_INT = 2 ** 31 - 1;
 
@@ -32,11 +33,11 @@ class TestMetricExporter implements PushMetricExporter {
   public forceFlushTime = 0;
   public throwException = false;
   public failureResult = false;
-  private _batches: MetricData[][] = [];
+  private _batches: ResourceMetrics[] = [];
   private _shutdown: boolean = false;
 
-  export(batch: MetricData[], resultCallback: (result: ExportResult) => void): void {
-    this._batches.push(batch);
+  export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): void {
+    this._batches.push(metrics);
 
     if (this.throwException) {
       throw new Error('Error during export');
@@ -65,7 +66,7 @@ class TestMetricExporter implements PushMetricExporter {
     await new Promise(resolve => setTimeout(resolve, this.forceFlushTime));
   }
 
-  async waitForNumberOfExports(numberOfExports: number): Promise<MetricData[][]> {
+  async waitForNumberOfExports(numberOfExports: number): Promise<ResourceMetrics[]> {
     if (numberOfExports <= 0) {
       throw new Error('numberOfExports must be greater than or equal to 0');
     }
@@ -87,12 +88,14 @@ class TestDeltaMetricExporter extends TestMetricExporter {
   }
 }
 
+const emptyResourceMetrics = { resource: defaultResource, instrumentationLibraryMetrics: [] };
+
 class TestMetricProducer implements MetricProducer {
   public collectionTime = 0;
 
-  async collect(): Promise<MetricData[]> {
+  async collect(): Promise<ResourceMetrics> {
     await new Promise(resolve => setTimeout(resolve, this.collectionTime));
-    return [];
+    return { resource: defaultResource, instrumentationLibraryMetrics: [] };
   }
 }
 
@@ -168,7 +171,7 @@ describe('PeriodicExportingMetricReader', () => {
       reader.setMetricProducer(new TestMetricProducer());
       const result = await exporter.waitForNumberOfExports(2);
 
-      assert.deepStrictEqual(result, [[], []]);
+      assert.deepStrictEqual(result, [emptyResourceMetrics, emptyResourceMetrics]);
       await reader.shutdown();
     });
   });
@@ -186,7 +189,7 @@ describe('PeriodicExportingMetricReader', () => {
       reader.setMetricProducer(new TestMetricProducer());
 
       const result = await exporter.waitForNumberOfExports(2);
-      assert.deepStrictEqual(result, [[], []]);
+      assert.deepStrictEqual(result, [emptyResourceMetrics, emptyResourceMetrics]);
 
       exporter.throwException = false;
       await reader.shutdown();
@@ -204,7 +207,7 @@ describe('PeriodicExportingMetricReader', () => {
       reader.setMetricProducer(new TestMetricProducer());
 
       const result = await exporter.waitForNumberOfExports(2);
-      assert.deepStrictEqual(result, [[], []]);
+      assert.deepStrictEqual(result, [emptyResourceMetrics, emptyResourceMetrics]);
 
       exporter.failureResult = false;
       await reader.shutdown();
@@ -223,7 +226,7 @@ describe('PeriodicExportingMetricReader', () => {
       reader.setMetricProducer(new TestMetricProducer());
 
       const result = await exporter.waitForNumberOfExports(2);
-      assert.deepStrictEqual(result, [[], []]);
+      assert.deepStrictEqual(result, [emptyResourceMetrics, emptyResourceMetrics]);
 
       exporter.throwException = false;
       await reader.shutdown();
@@ -389,7 +392,7 @@ describe('PeriodicExportingMetricReader', () => {
       reader.setMetricProducer(new TestMetricProducer());
 
       await reader.shutdown();
-      assert.deepStrictEqual([], await reader.collect());
+      assert.deepStrictEqual(await reader.collect(), undefined);
     });
 
     it('should time out when timeoutMillis is set', async () => {

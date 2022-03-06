@@ -25,8 +25,6 @@ import {
 } from '../InstrumentDescriptor';
 import { AttributesProcessor } from '../view/AttributesProcessor';
 import { MetricStorage } from './MetricStorage';
-import { InstrumentationLibrary } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
 import { MetricData } from '../export/MetricData';
 import { DeltaMetricProcessor } from './DeltaMetricProcessor';
 import { TemporalMetricProcessor } from './TemporalMetricProcessor';
@@ -66,8 +64,6 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>> extends MetricStor
   async collect(
     collector: MetricCollectorHandle,
     collectors: MetricCollectorHandle[],
-    resource: Resource,
-    instrumentationLibrary: InstrumentationLibrary,
     sdkStartTime: HrTime,
     collectionTime: HrTime,
   ): Promise<Maybe<MetricData>> {
@@ -76,8 +72,6 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>> extends MetricStor
     return this._temporalMetricStorage.buildMetrics(
       collector,
       collectors,
-      resource,
-      instrumentationLibrary,
       this._instrumentDescriptor,
       accumulations,
       sdkStartTime,
