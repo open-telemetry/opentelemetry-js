@@ -18,8 +18,6 @@ import { MetricStorageRegistry } from '../../src/state/MetricStorageRegistry';
 import { ValueType } from '@opentelemetry/api-metrics-wip';
 import { MetricStorage } from '../../src/state/MetricStorage';
 import { HrTime } from '@opentelemetry/api';
-import { InstrumentationLibrary } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
 import { MetricCollectorHandle } from '../../src/state/MetricCollector';
 import { MetricData, InstrumentDescriptor, InstrumentType } from '../../src';
 import { Maybe } from '../../src/utils';
@@ -35,8 +33,6 @@ import {
 class TestMetricStorage extends MetricStorage {
   collect(collector: MetricCollectorHandle,
           collectors: MetricCollectorHandle[],
-          resource: Resource,
-          instrumentationLibrary: InstrumentationLibrary,
           sdkStartTime: HrTime,
           collectionTime: HrTime,
   ): Promise<Maybe<MetricData>> {

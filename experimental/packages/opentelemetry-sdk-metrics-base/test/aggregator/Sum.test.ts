@@ -18,7 +18,7 @@ import { HrTime } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { SumAccumulation, SumAggregator } from '../../src/aggregator';
 import { MetricData, PointDataType } from '../../src/export/MetricData';
-import { commonValues, defaultInstrumentationLibrary, defaultInstrumentDescriptor, defaultResource } from '../util';
+import { commonValues, defaultInstrumentDescriptor } from '../util';
 
 describe('SumAggregator', () => {
   describe('createAccumulation', () => {
@@ -78,8 +78,6 @@ describe('SumAggregator', () => {
       const endTime: HrTime = [1, 1];
 
       const expected: MetricData = {
-        resource: defaultResource,
-        instrumentationLibrary: defaultInstrumentationLibrary,
         instrumentDescriptor: defaultInstrumentDescriptor,
         pointDataType: PointDataType.SINGULAR,
         pointData: [
@@ -92,8 +90,6 @@ describe('SumAggregator', () => {
         ],
       };
       assert.deepStrictEqual(aggregator.toMetricData(
-        defaultResource,
-        defaultInstrumentationLibrary,
         defaultInstrumentDescriptor,
         [[{}, accumulation]],
         startTime,

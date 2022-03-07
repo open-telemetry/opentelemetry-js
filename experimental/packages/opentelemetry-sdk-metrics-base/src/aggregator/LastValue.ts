@@ -16,8 +16,7 @@
 
 import { LastValue, AggregatorKind, Aggregator, Accumulation, AccumulationRecord } from './types';
 import { HrTime } from '@opentelemetry/api';
-import { hrTime, hrTimeToMicroseconds, InstrumentationLibrary } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import { hrTime, hrTimeToMicroseconds } from '@opentelemetry/core';
 import { PointDataType, SingularMetricData } from '../export/MetricData';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
@@ -67,15 +66,11 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
   }
 
   toMetricData(
-    resource: Resource,
-    instrumentationLibrary: InstrumentationLibrary,
     instrumentDescriptor: InstrumentDescriptor,
     accumulationByAttributes: AccumulationRecord<LastValueAccumulation>[],
     startTime: HrTime,
     endTime: HrTime): Maybe<SingularMetricData> {
     return {
-      resource,
-      instrumentationLibrary,
       instrumentDescriptor,
       pointDataType: PointDataType.SINGULAR,
       pointData: accumulationByAttributes.map(([attributes, accumulation]) => {
