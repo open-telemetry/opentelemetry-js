@@ -7,7 +7,7 @@
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js-contrib",
   "scripts": {
-    "precompile": "tsc --version && lerna run version --scope @opentelemetry/propagator-aws-xray --include-dependencies",
+    "precompile": "tsc --version && lerna run version:update --scope @opentelemetry/propagator-aws-xray --include-dependencies",
     "prewatch": "npm run precompile",
     "compile": "tsc --build tsconfig.json tsconfig.esm.json",
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json",
@@ -15,7 +15,6 @@
     "test:browser": "nyc karma start --single-run",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "version": "node ../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json",
     "prepare": "npm run compile"
   },
