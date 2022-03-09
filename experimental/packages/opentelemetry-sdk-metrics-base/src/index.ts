@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+export { Histogram } from './aggregator/types';
 export * from './export/AggregationTemporality';
 export * from './export/MetricData';
 export * from './export/MetricExporter';
@@ -26,3 +27,4 @@ export * from './Meter';
 export * from './MeterProvider';
 export * from './ObservableResult';
 export { TimeoutError } from './utils';
+export * from './view/Aggregation';

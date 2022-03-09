@@ -21,7 +21,7 @@ import {
   AggregatorKind,
   Histogram,
 } from './types';
-import { HistogramMetricData, PointDataType } from '../export/MetricData';
+import { HistogramMetricData, DataPointType } from '../export/MetricData';
 import { HrTime } from '@opentelemetry/api';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
@@ -141,14 +141,14 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
     startTime: HrTime,
     endTime: HrTime): Maybe<HistogramMetricData> {
     return {
-      instrumentDescriptor: metricDescriptor,
-      pointDataType: PointDataType.HISTOGRAM,
-      pointData: accumulationByAttributes.map(([attributes, accumulation]) => {
+      descriptor: metricDescriptor,
+      dataPointType: DataPointType.HISTOGRAM,
+      dataPoints: accumulationByAttributes.map(([attributes, accumulation]) => {
         return {
           attributes,
           startTime,
           endTime,
-          point: accumulation.toPoint(),
+          value: accumulation.toPoint(),
         };
       })
     };
