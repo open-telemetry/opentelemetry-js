@@ -162,5 +162,16 @@ function retrieveCertificate(): Buffer | undefined {
     getEnv().OTEL_EXPORTER_OTLP_CERTIFICATE ||
     getEnv().OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE;
 
-  return certificate ? fs.readFileSync(certificate) : undefined;
+    if (certificate) {
+      try {
+        return fs.readFileSync(certificate);
+      } catch {
+        diag.warn('unable to read certificate file - using default host platform trusted certificate');
+        return undefined;
+      }
+    } else {
+      return undefined;
+    }
+
+  // return certificate ? fs.readFileSync(path.join(process.cwd(), certificate)) : undefined;
 }

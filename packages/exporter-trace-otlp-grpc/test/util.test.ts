@@ -82,6 +82,7 @@ describe('validateAndNormalizeUrl()', () => {
 });
 
 describe('utils - configureSecurity', () => {
+  const envSource = process.env;
   it('should return insecure channel when default channel credendianls are used and endpoint with any or no scheme', () => {
     const credentials = configureSecurity(undefined);
     assert.ok(credentials._isSecure() === false);
@@ -89,7 +90,57 @@ describe('utils - configureSecurity', () => {
   it('should return user defined channel credentials no matter what scheme the endpoint contains', () => {
     const userDefinedCredentials = grpc.credentials.createSsl();
     const credentials = configureSecurity(userDefinedCredentials);
+
     assert.ok(userDefinedCredentials === credentials);
     assert.ok(credentials._isSecure() === true);
+  });
+  // env tests
+  it('should return credentials defined programatically instead of credentials defined via env var', () => {
+    const userDefinedCredentials = grpc.credentials.createInsecure();
+    envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE='false';
+    const credentials = configureSecurity(userDefinedCredentials);
+
+    assert.ok(userDefinedCredentials === credentials);
+    assert.ok(credentials._isSecure() === false);
+    delete envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE;
+  });
+  it('should return credentials defined via env var when credentials are not set programatically', () => {
+    envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE='true';
+    const credentials = configureSecurity(undefined);
+
+    assert.ok(credentials._isSecure() === false);
+    delete envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE;
+  });
+  it('should return credentials defined via signal specific env instead of general signal env', () => {
+    envSource.OTEL_EXPORTER_OTLP_INSECURE='true';
+    envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE='false';
+    const credentials = configureSecurity(undefined);
+
+    assert.ok(credentials._isSecure() === true);
+    delete envSource.OTEL_EXPORTER_OTLP_INSECURE;
+    delete envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE;
+  });
+  // certificate test - WIP
+  it('should return credentials with provided certificate via env var', () => {
+    envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE='false';
+    envSource.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE='test/certs/ca.crt';
+
+    const credentials = configureSecurity(undefined);
+    assert.ok(credentials._isSecure() === true);
+
+    delete envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE;
+    delete envSource.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE;
+  });
+  it('should return credentials without using provided certificate', () => {
+    envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE='false';
+    envSource.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE='test/certs/wrongpathtocertificate/ca.crt';
+
+    const diagWarn = sinon.stub(diag, 'warn');
+    const credentials = configureSecurity(undefined);
+    assert.ok(credentials._isSecure() === true);
+    sinon.assert.calledWith(diagWarn, 'unable to read certificate file - using default host platform trusted certificate');
+
+    delete envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE;
+    delete envSource.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE;
   });
 });
