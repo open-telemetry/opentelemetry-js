@@ -121,16 +121,17 @@ const collectorOptions = {
 const exporter = new OTLPTraceExporter(collectorOptions);
 ```
 
- > Providing `compression` with `collectorOptions` takes precedence and overrides compression set with environment variables. 
+ > Providing `compression` with `collectorOptions` takes precedence and overrides compression set with environment variables.
 
 ## Environment Variable Configuration
+
 Set compression with environment variables.
 
 ```shell
 OTEL_EXPORTER_OTLP_TRACES_COMPRESSION=gzip
 ```
 
- >  Compression set programatically in `collectorOptions` takes precedence over compression set with environment variables. `OTEL_EXPORTER_OTLP_TRACES_COMPRESSION` takes precedence and overrides `OTEL_EXPORTER_OTLP_COMPRESSION`.
+ > Compression set programatically in `collectorOptions` takes precedence over compression set with environment variables. `OTEL_EXPORTER_OTLP_TRACES_COMPRESSION` takes precedence and overrides `OTEL_EXPORTER_OTLP_COMPRESSION`.
 
 ## Running opentelemetry-collector locally to see the traces
 
