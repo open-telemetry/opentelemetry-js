@@ -35,7 +35,7 @@ export function onInit<ExportItem, ServiceRequest>(
 ): void {
   collector.grpcQueue = [];
 
-  const credentials: grpc.ChannelCredentials = configureSecurity(config.url, config.credentials);
+  const credentials: grpc.ChannelCredentials = configureSecurity(config.credentials);
 
   const includeDirs = [path.resolve(__dirname, '..', 'protos')];
 
@@ -127,18 +127,10 @@ export function validateAndNormalizeUrl(url: string): string {
   return target.host;
 }
 
-export function configureSecurity(endpoint: string | undefined,
-  credentials: grpc.ChannelCredentials | undefined):
+export function configureSecurity(credentials: grpc.ChannelCredentials | undefined):
   grpc.ChannelCredentials {
-  // if endpoing has https scheme it indicates a secure connection and
-  // override insecure configuration settings
-  const definedEndpoint = endpoint ||
-    getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT ||
-    getEnv().OTEL_EXPORTER_OTLP_ENDPOINT;
 
-  if (definedEndpoint && definedEndpoint.includes('https')) {
-    return useSecureConnection();
-  } else if (credentials) {
+  if (credentials) {
     return credentials;
   } else {
     return getSecurityFromEnv();
@@ -150,7 +142,7 @@ function getSecurityFromEnv(): grpc.ChannelCredentials {
     getEnv().OTEL_EXPORTER_OTLP_TRACES_INSECURE ||
     getEnv().OTEL_EXPORTER_OTLP_INSECURE;
 
-  if (definedSecurity === 'true') {
+  if (definedSecurity === 'false') {
     return useSecureConnection();
   } else {
     return grpc.credentials.createInsecure();
