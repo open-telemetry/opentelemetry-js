@@ -14,26 +14,25 @@
  * limitations under the License.
  */
 
-import { ObservableResult } from '@opentelemetry/api-metrics';
+import { Meter, ObservableResult } from '@opentelemetry/api-metrics-wip';
 import {
-  CounterMetric,
-  SumAggregator,
-  Meter,
   MeterProvider,
-  LastValueAggregator,
-  HistogramAggregator,
-} from '@opentelemetry/sdk-metrics-base';
+} from '@opentelemetry/sdk-metrics-base-wip';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as http from 'http';
 import { PrometheusExporter } from '../src';
-import { mockAggregator, mockedHrTimeMs } from './util';
+import { mockedHrTimeMs, mockHrTime } from './util';
 import { SinonStubbedInstance } from 'sinon';
+import { Counter } from '@opentelemetry/api-metrics-wip';
 
 describe('PrometheusExporter', () => {
-  mockAggregator(SumAggregator);
-  mockAggregator(LastValueAggregator);
-  mockAggregator(HistogramAggregator);
+  beforeEach(() => {
+    mockHrTime();
+  });
+  afterEach(() => {
+    sinon.restore();
+  });
 
   afterEach(() => {
     sinon.restore();
@@ -200,7 +199,7 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should able to call getMetricsRequestHandler function to generate response with metrics', () => {
+    it('should able to call getMetricsRequestHandler function to generate response with metrics', async () => {
       const exporter = new PrometheusExporter({ preventServerStart: true });
       const mockRequest: SinonStubbedInstance<http.IncomingMessage> = sinon.createStubInstance(
         http.IncomingMessage
@@ -208,10 +207,16 @@ describe('PrometheusExporter', () => {
       const mockResponse: SinonStubbedInstance<http.ServerResponse> = sinon.createStubInstance(
         http.ServerResponse
       );
+      let resolve: () => void;
+      const deferred = new Promise<void>(res => {
+ resolve = res;
+});
+      mockResponse.end.callsFake(() => resolve());
       exporter.getMetricsRequestHandler(
         (mockRequest as unknown) as http.IncomingMessage,
         (mockResponse as unknown) as http.ServerResponse
       );
+      await deferred;
       sinon.assert.calledOnce(mockResponse.setHeader);
       sinon.assert.calledOnce(mockResponse.end);
       assert.strictEqual(mockResponse.statusCode, 200);
@@ -225,10 +230,8 @@ describe('PrometheusExporter', () => {
 
     beforeEach(done => {
       exporter = new PrometheusExporter({}, () => {
-        meterProvider = new MeterProvider({
-          interval: Math.pow(2, 31) - 1,
-          exporter,
-        });
+        meterProvider = new MeterProvider();
+        meterProvider.addMetricReader(exporter);
         meter = meterProvider.getMeter('test-prometheus', '1');
         done();
       });
@@ -238,124 +241,81 @@ describe('PrometheusExporter', () => {
       exporter.shutdown().then(done);
     });
 
-    it('should export a count aggregation', done => {
+    it('should export a count aggregation', async () => {
       const counter = meter.createCounter('counter_total', {
         description: 'a test description',
       });
 
       counter.add(10, { key1: 'attributeValue1' });
-      meter.collect().then(() => {
-        exporter.export(meter.getProcessor().checkPointSet(), () => {
-          // TODO: Remove this special case once the PR is ready.
-          // This is to test the special case where counters are destroyed
-          // and recreated in the exporter in order to get around prom-client's
-          // aggregation and use ours.
-          counter.add(10, { key1: 'attributeValue1' });
-          exporter.export(meter.getProcessor().checkPointSet(), () => {
-            http
-              .get('http://localhost:9464/metrics', res => {
-                res.on('data', chunk => {
-                  const body = chunk.toString();
-                  const lines = body.split('\n');
+      const body = await request('http://localhost:9464/metrics');
+      const lines = body.split('\n');
 
-                  assert.strictEqual(
-                    lines[0],
-                    '# HELP counter_total a test description'
-                  );
+      assert.strictEqual(
+        lines[0],
+        '# HELP counter_total a test description'
+      );
 
-                  assert.deepStrictEqual(lines, [
-                    '# HELP counter_total a test description',
-                    '# TYPE counter_total counter',
-                    `counter_total{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
-                    '',
-                  ]);
-
-                  done();
-                });
-              })
-              .on('error', errorHandler(done));
-          });
-        });
-      });
+      assert.deepStrictEqual(lines, [
+        '# HELP counter_total a test description',
+        '# TYPE counter_total counter',
+        `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
+        '',
+      ]);
     });
 
-    it('should export an observable gauge aggregation', done => {
+    it('should export an observable gauge aggregation', async () => {
       function getCpuUsage() {
         return 0.999;
       }
 
       meter.createObservableGauge(
         'metric_observable_gauge',
-        {
-          description: 'a test description',
-        },
         (observableResult: ObservableResult) => {
           observableResult.observe(getCpuUsage(), {
             pid: String(123),
             core: '1',
           });
-        }
+        },
+        {
+          description: 'a test description',
+        },
       );
 
-      meter.collect().then(() => {
-        exporter.export(meter.getProcessor().checkPointSet(), () => {
-          exporter.export(meter.getProcessor().checkPointSet(), () => {
-            http
-              .get('http://localhost:9464/metrics', res => {
-                res.on('data', chunk => {
-                  const body = chunk.toString();
-                  const lines = body.split('\n');
+      const body = await request('http://localhost:9464/metrics');
+      const lines = body.split('\n');
 
-                  assert.deepStrictEqual(lines, [
-                    '# HELP metric_observable_gauge a test description',
-                    '# TYPE metric_observable_gauge gauge',
-                    `metric_observable_gauge{pid="123",core="1"} 0.999 ${mockedHrTimeMs}`,
-                    '',
-                  ]);
-                  done();
-                });
-              })
-              .on('error', errorHandler(done));
-          });
-        });
-      });
+      assert.deepStrictEqual(lines, [
+        '# HELP metric_observable_gauge a test description',
+        '# TYPE metric_observable_gauge gauge',
+        `metric_observable_gauge{pid="123",core="1"} 0.999 ${mockedHrTimeMs}`,
+        '',
+      ]);
     });
 
-    it('should export multiple attributes', done => {
+    it('should export multiple attributes', async () => {
       const counter = meter.createCounter('counter_total', {
         description: 'a test description',
-      }) as CounterMetric;
+      });
 
       counter.add(10, { counterKey1: 'attributeValue1' });
       counter.add(20, { counterKey1: 'attributeValue2' });
-      meter.collect().then(() => {
-        exporter.export(meter.getProcessor().checkPointSet(), () => {
-          http
-            .get('http://localhost:9464/metrics', res => {
-              res.on('data', chunk => {
-                const body = chunk.toString();
-                const lines = body.split('\n');
 
-                assert.deepStrictEqual(lines, [
-                  '# HELP counter_total a test description',
-                  '# TYPE counter_total counter',
-                  `counter_total{counterKey1="attributeValue1"} 10 ${mockedHrTimeMs}`,
-                  `counter_total{counterKey1="attributeValue2"} 20 ${mockedHrTimeMs}`,
-                  '',
-                ]);
+      const body = await request('http://localhost:9464/metrics');
+      const lines = body.split('\n');
 
-                done();
-              });
-            })
-            .on('error', errorHandler(done));
-        });
-      });
+      assert.deepStrictEqual(lines, [
+        '# HELP counter_total a test description',
+        '# TYPE counter_total counter',
+        `counter_total{counterKey1="attributeValue1"} 10 ${mockedHrTimeMs}`,
+        `counter_total{counterKey1="attributeValue2"} 20 ${mockedHrTimeMs}`,
+        '',
+      ]);
     });
 
     it('should export multiple attributes on manual shutdown', done => {
       const counter = meter.createCounter('counter_total', {
         description: 'a test description',
-      }) as CounterMetric;
+      });
 
       counter.add(10, { counterKey1: 'attributeValue1' });
       counter.add(20, { counterKey1: 'attributeValue2' });
@@ -373,224 +333,159 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should export a comment if no metrics are registered', done => {
-      exporter.export([], () => {
-        http
-          .get('http://localhost:9464/metrics', res => {
-            res.on('data', chunk => {
-              const body = chunk.toString();
-              const lines = body.split('\n');
+    it('should export a comment if no metrics are registered', async () => {
+      const body = await request('http://localhost:9464/metrics');
+      const lines = body.split('\n');
 
-              assert.deepStrictEqual(lines, ['# no registered metrics']);
-
-              done();
-            });
-          })
-          .on('error', errorHandler(done));
-      });
+      assert.deepStrictEqual(lines, ['# no registered metrics']);
     });
 
-    it('should add a description if missing', done => {
+    it('should add a description if missing', async () => {
       const counter = meter.createCounter('counter_total');
 
       counter.add(10, { key1: 'attributeValue1' });
-      meter.collect().then(() => {
-        exporter.export(meter.getProcessor().checkPointSet(), () => {
-          http
-            .get('http://localhost:9464/metrics', res => {
-              res.on('data', chunk => {
-                const body = chunk.toString();
-                const lines = body.split('\n');
 
-                assert.deepStrictEqual(lines, [
-                  '# HELP counter_total description missing',
-                  '# TYPE counter_total counter',
-                  `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
-                  '',
-                ]);
+      const body = await request('http://localhost:9464/metrics');
+      const lines = body.split('\n');
 
-                done();
-              });
-            })
-            .on('error', errorHandler(done));
-        });
-      });
+      assert.deepStrictEqual(lines, [
+        '# HELP counter_total description missing',
+        '# TYPE counter_total counter',
+        `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
+        '',
+      ]);
     });
 
-    it('should sanitize names', done => {
+    it('should sanitize names', async () => {
       const counter = meter.createCounter('counter.bad-name');
 
       counter.add(10, { key1: 'attributeValue1' });
-      meter.collect().then(() => {
-        exporter.export(meter.getProcessor().checkPointSet(), () => {
-          http
-            .get('http://localhost:9464/metrics', res => {
-              res.on('data', chunk => {
-                const body = chunk.toString();
-                const lines = body.split('\n');
 
-                assert.deepStrictEqual(lines, [
-                  '# HELP counter_bad_name_total description missing',
-                  '# TYPE counter_bad_name_total counter',
-                  `counter_bad_name_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
-                  '',
-                ]);
+      const body = await request('http://localhost:9464/metrics');
+      const lines = body.split('\n');
 
-                done();
-              });
-            })
-            .on('error', errorHandler(done));
-        });
-      });
+      assert.deepStrictEqual(lines, [
+        '# HELP counter_bad_name_total description missing',
+        '# TYPE counter_bad_name_total counter',
+        `counter_bad_name_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
+        '',
+      ]);
     });
 
-    it('should export a UpDownCounter as a gauge', done => {
+    it('should export a UpDownCounter as a gauge', async () => {
       const counter = meter.createUpDownCounter('counter', {
         description: 'a test description',
       });
 
       counter.add(20, { key1: 'attributeValue1' });
-      meter.collect().then(() => {
-        exporter.export(meter.getProcessor().checkPointSet(), () => {
-          http
-            .get('http://localhost:9464/metrics', res => {
-              res.on('data', chunk => {
-                assert.deepStrictEqual(chunk.toString().split('\n'), [
-                  '# HELP counter a test description',
-                  '# TYPE counter gauge',
-                  `counter{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
-                  '',
-                ]);
 
-                done();
-              });
-            })
-            .on('error', errorHandler(done));
-        });
-      });
+      const body = await request('http://localhost:9464/metrics');
+      const lines = body.split('\n');
+      assert.deepStrictEqual(lines, [
+        '# HELP counter a test description',
+        '# TYPE counter gauge',
+        `counter{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
+        '',
+      ]);
     });
 
-    it('should export an ObservableCounter as a counter', done => {
+    it('should export an ObservableCounter as a counter', async() => {
       function getValue() {
         return 20;
       }
 
       meter.createObservableCounter(
         'metric_observable_counter',
-        {
-          description: 'a test description',
-        },
         (observableResult: ObservableResult) => {
           observableResult.observe(getValue(), {
             key1: 'attributeValue1',
           });
-        }
+        },
+        {
+          description: 'a test description',
+        },
       );
 
-      meter.collect().then(() => {
-        exporter.export(meter.getProcessor().checkPointSet(), () => {
-          http
-            .get('http://localhost:9464/metrics', res => {
-              res.on('data', chunk => {
-                const body = chunk.toString();
-                const lines = body.split('\n');
+      const body = await request('http://localhost:9464/metrics');
+      const lines = body.split('\n');
 
-                assert.deepStrictEqual(lines, [
-                  '# HELP metric_observable_counter a test description',
-                  '# TYPE metric_observable_counter gauge',
-                  `metric_observable_counter{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
-                  '',
-                ]);
-              });
-
-              done();
-            })
-            .on('error', errorHandler(done));
-        });
-      });
+      assert.deepStrictEqual(lines, [
+        '# HELP metric_observable_counter a test description',
+        '# TYPE metric_observable_counter counter',
+        `metric_observable_counter{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
+        '',
+      ]);
     });
 
-    it('should export an ObservableUpDownCounter as a gauge', done => {
+    it('should export an ObservableUpDownCounter as a gauge', async () => {
       function getValue() {
         return 20;
       }
 
       meter.createObservableUpDownCounter(
         'metric_observable_up_down_counter',
-        {
-          description: 'a test description',
-        },
         (observableResult: ObservableResult) => {
           observableResult.observe(getValue(), {
             key1: 'attributeValue1',
           });
-        }
+        },
+        {
+          description: 'a test description',
+        },
       );
 
-      meter.collect().then(() => {
-        exporter.export(meter.getProcessor().checkPointSet(), () => {
-          http
-            .get('http://localhost:9464/metrics', res => {
-              res.on('data', chunk => {
-                const body = chunk.toString();
-                const lines = body.split('\n');
+      const body = await request('http://localhost:9464/metrics');
+      const lines = body.split('\n');
 
-                assert.deepStrictEqual(lines, [
-                  '# HELP metric_observable_up_down_counter a test description',
-                  '# TYPE metric_observable_up_down_counter gauge',
-                  `metric_observable_up_down_counter{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
-                  '',
-                ]);
-              });
-
-              done();
-            })
-            .on('error', errorHandler(done));
-        });
-      });
+      assert.deepStrictEqual(lines, [
+        '# HELP metric_observable_up_down_counter a test description',
+        '# TYPE metric_observable_up_down_counter gauge',
+        `metric_observable_up_down_counter{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
+        '',
+      ]);
     });
 
-    it('should export a Histogram as a summary', done => {
+    it('should export a Histogram as a summary', async() => {
       const histogram = meter.createHistogram('test_histogram', {
         description: 'a test description',
       });
 
       histogram.record(20, { key1: 'attributeValue1' });
 
-      meter.collect().then(() => {
-        exporter.export(meter.getProcessor().checkPointSet(), () => {
-          http
-            .get('http://localhost:9464/metrics', res => {
-              res.on('data', chunk => {
-                const body = chunk.toString();
-                const lines = body.split('\n');
+      const body = await request('http://localhost:9464/metrics');
+      const lines = body.split('\n');
 
-                assert.deepStrictEqual(lines, [
-                  '# HELP test_histogram a test description',
-                  '# TYPE test_histogram histogram',
-                  `test_histogram_count{key1="attributeValue1"} 1 ${mockedHrTimeMs}`,
-                  `test_histogram_sum{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
-                  `test_histogram_bucket{key1="attributeValue1",le="+Inf"} 1 ${mockedHrTimeMs}`,
-                  '',
-                ]);
-
-                done();
-              });
-            })
-            .on('error', errorHandler(done));
-        });
-      });
+      assert.deepStrictEqual(lines, [
+        '# HELP test_histogram a test description',
+        '# TYPE test_histogram histogram',
+        `test_histogram_count{key1="attributeValue1"} 1 ${mockedHrTimeMs}`,
+        `test_histogram_sum{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
+        `test_histogram_bucket{key1="attributeValue1",le="0"} 0 ${mockedHrTimeMs}`,
+        `test_histogram_bucket{key1="attributeValue1",le="5"} 0 ${mockedHrTimeMs}`,
+        `test_histogram_bucket{key1="attributeValue1",le="10"} 0 ${mockedHrTimeMs}`,
+        `test_histogram_bucket{key1="attributeValue1",le="25"} 1 ${mockedHrTimeMs}`,
+        `test_histogram_bucket{key1="attributeValue1",le="50"} 1 ${mockedHrTimeMs}`,
+        `test_histogram_bucket{key1="attributeValue1",le="75"} 1 ${mockedHrTimeMs}`,
+        `test_histogram_bucket{key1="attributeValue1",le="100"} 1 ${mockedHrTimeMs}`,
+        `test_histogram_bucket{key1="attributeValue1",le="250"} 1 ${mockedHrTimeMs}`,
+        `test_histogram_bucket{key1="attributeValue1",le="500"} 1 ${mockedHrTimeMs}`,
+        `test_histogram_bucket{key1="attributeValue1",le="1000"} 1 ${mockedHrTimeMs}`,
+        `test_histogram_bucket{key1="attributeValue1",le="+Inf"} 1 ${mockedHrTimeMs}`,
+        '',
+      ]);
     });
   });
 
   describe('configuration', () => {
     let meter: Meter;
-    let counter: CounterMetric;
+    let meterProvider: MeterProvider;
+    let counter: Counter;
     let exporter: PrometheusExporter | undefined;
 
     beforeEach(() => {
-      meter = new MeterProvider().getMeter('test-prometheus');
-      counter = meter.createCounter('counter') as CounterMetric;
+      meterProvider = new MeterProvider();
+      meter = meterProvider.getMeter('test-prometheus');
+      counter = meter.createCounter('counter');
       counter.add(10, { key1: 'attributeValue1' });
     });
 
@@ -609,26 +504,24 @@ describe('PrometheusExporter', () => {
           prefix: 'test_prefix',
         },
         async () => {
-          await meter.collect();
-          exporter!.export(meter.getProcessor().checkPointSet(), () => {
-            http
-              .get('http://localhost:9464/metrics', res => {
-                res.on('data', chunk => {
-                  const body = chunk.toString();
-                  const lines = body.split('\n');
+          meterProvider.addMetricReader(exporter!);
+          http
+            .get('http://localhost:9464/metrics', res => {
+              res.on('data', chunk => {
+                const body = chunk.toString();
+                const lines = body.split('\n');
 
-                  assert.deepStrictEqual(lines, [
-                    '# HELP test_prefix_counter_total description missing',
-                    '# TYPE test_prefix_counter_total counter',
-                    `test_prefix_counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
-                    '',
-                  ]);
+                assert.deepStrictEqual(lines, [
+                  '# HELP test_prefix_counter_total description missing',
+                  '# TYPE test_prefix_counter_total counter',
+                  `test_prefix_counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
+                  '',
+                ]);
 
-                  done();
-                });
-              })
-              .on('error', errorHandler(done));
-          });
+                done();
+              });
+            })
+            .on('error', errorHandler(done));
         }
       );
     });
@@ -639,26 +532,24 @@ describe('PrometheusExporter', () => {
           port: 8080,
         },
         async () => {
-          await meter.collect();
-          exporter!.export(meter.getProcessor().checkPointSet(), () => {
-            http
-              .get('http://localhost:8080/metrics', res => {
-                res.on('data', chunk => {
-                  const body = chunk.toString();
-                  const lines = body.split('\n');
+          meterProvider.addMetricReader(exporter!);
+          http
+            .get('http://localhost:8080/metrics', res => {
+              res.on('data', chunk => {
+                const body = chunk.toString();
+                const lines = body.split('\n');
 
-                  assert.deepStrictEqual(lines, [
-                    '# HELP counter_total description missing',
-                    '# TYPE counter_total counter',
-                    `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
-                    '',
-                  ]);
+                assert.deepStrictEqual(lines, [
+                  '# HELP counter_total description missing',
+                  '# TYPE counter_total counter',
+                  `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
+                  '',
+                ]);
 
-                  done();
-                });
-              })
-              .on('error', errorHandler(done));
-          });
+                done();
+              });
+            })
+            .on('error', errorHandler(done));
         }
       );
     });
@@ -669,26 +560,24 @@ describe('PrometheusExporter', () => {
           endpoint: '/test',
         },
         async () => {
-          await meter.collect();
-          exporter!.export(meter.getProcessor().checkPointSet(), () => {
-            http
-              .get('http://localhost:9464/test', res => {
-                res.on('data', chunk => {
-                  const body = chunk.toString();
-                  const lines = body.split('\n');
+          meterProvider.addMetricReader(exporter!);
+          http
+            .get('http://localhost:9464/test', res => {
+              res.on('data', chunk => {
+                const body = chunk.toString();
+                const lines = body.split('\n');
 
-                  assert.deepStrictEqual(lines, [
-                    '# HELP counter_total description missing',
-                    '# TYPE counter_total counter',
-                    `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
-                    '',
-                  ]);
+                assert.deepStrictEqual(lines, [
+                  '# HELP counter_total description missing',
+                  '# TYPE counter_total counter',
+                  `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
+                  '',
+                ]);
 
-                  done();
-                });
-              })
-              .on('error', errorHandler(done));
-          });
+                done();
+              });
+            })
+            .on('error', errorHandler(done));
         }
       );
     });
@@ -699,31 +588,51 @@ describe('PrometheusExporter', () => {
           appendTimestamp: false,
         },
         async () => {
-          await meter.collect();
-          exporter!.export(meter.getProcessor().checkPointSet(), () => {
-            http
-              .get('http://localhost:9464/metrics', res => {
-                res.on('data', chunk => {
-                  const body = chunk.toString();
-                  const lines = body.split('\n');
+          meterProvider.addMetricReader(exporter!);
+          http
+            .get('http://localhost:9464/metrics', res => {
+              res.on('data', chunk => {
+                const body = chunk.toString();
+                const lines = body.split('\n');
 
-                  assert.deepStrictEqual(lines, [
-                    '# HELP counter_total description missing',
-                    '# TYPE counter_total counter',
-                    'counter_total{key1="attributeValue1"} 10',
-                    '',
-                  ]);
+                assert.deepStrictEqual(lines, [
+                  '# HELP counter_total description missing',
+                  '# TYPE counter_total counter',
+                  'counter_total{key1="attributeValue1"} 10',
+                  '',
+                ]);
 
-                  done();
-                });
-              })
-              .on('error', errorHandler(done));
-          });
+                done();
+              });
+            })
+            .on('error', errorHandler(done));
         }
       );
     });
   });
 });
+
+function request(url: string): Promise<string> {
+  return new Promise<string>((resolve, reject) => {
+    http
+      .get(url, res => {
+        res.setEncoding('utf8');
+        let result = '';
+
+        res.on('data', chunk => {
+          result += chunk;
+        });
+        res.on('end', () => {
+          if (res.statusCode !== 200) {
+            reject(new Error('request failed with non-200 code'));
+            return;
+          }
+          resolve(result);
+        });
+      })
+      .on('error', reject);
+  });
+}
 
 function errorHandler(done: Mocha.Done): (err: Error) => void {
   return err => done(err);
