@@ -16,8 +16,6 @@
 
 import { HrTime } from '@opentelemetry/api';
 import { Attributes } from '@opentelemetry/api-metrics';
-import { InstrumentationLibrary } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
 import { MetricData } from '../export/MetricData';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
@@ -116,9 +114,7 @@ export interface Aggregator<T> {
    * @param endTime the end time of the metric data.
    * @return the {@link MetricData} that this {@link Aggregator} will produce.
    */
-  toMetricData(resource: Resource,
-    instrumentationLibrary: InstrumentationLibrary,
-    instrumentDescriptor: InstrumentDescriptor,
+  toMetricData(instrumentDescriptor: InstrumentDescriptor,
     accumulationByAttributes: AccumulationRecord<T>[],
     startTime: HrTime,
     endTime: HrTime): Maybe<MetricData>;
