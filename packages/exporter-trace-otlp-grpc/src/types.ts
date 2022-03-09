@@ -53,6 +53,9 @@ export enum ServiceClientType {
   METRICS,
 }
 
+/**
+ * These values are defined by grpc client
+ */
 export enum CompressionAlgorithm {
   NONE = 0,
   GZIP = 2
