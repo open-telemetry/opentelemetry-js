@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import { NOOP_METER } from '@opentelemetry/api-metrics-wip';
 import { Meter, MeterProvider, InstrumentType, PointDataType } from '../src';
-import { assertMetricData, defaultResource } from './util';
+import { assertInstrumentationLibraryMetrics, assertMetricData, defaultResource } from './util';
 import { TestMetricReader } from './export/TestMetricReader';
 
 describe('MeterProvider', () => {
@@ -110,6 +110,19 @@ describe('MeterProvider', () => {
       }));
     });
 
+    it('with no parameters should throw', () => {
+      const meterProvider = new MeterProvider({ resource: defaultResource });
+
+      assert.throws(() => meterProvider.addView({}));
+      assert.throws(() => meterProvider.addView({instrument:{}}));
+      assert.throws(() => meterProvider.addView({instrument:{}, meter: {}}));
+      assert.throws(() => meterProvider.addView({instrument:{}, meter: {}, stream: {}}));
+      assert.throws(() => meterProvider.addView({instrument:{}, stream: {}}));
+      assert.throws(() => meterProvider.addView({meter: {}, stream: {}}));
+      assert.throws(() => meterProvider.addView({meter: {}}));
+      assert.throws(() => meterProvider.addView({stream: {}}));
+    });
+
     it('with no meter name should apply view to instruments of all meters', async () => {
       const meterProvider = new MeterProvider({ resource: defaultResource });
 
@@ -135,13 +148,21 @@ describe('MeterProvider', () => {
       const result = await reader.collect();
 
       assert.strictEqual(result?.instrumentationLibraryMetrics.length, 2);
-
-      assert.strictEqual(result?.instrumentationLibraryMetrics[0].instrumentationLibrary.name, 'meter1');
+      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[0], {
+        name: 'meter1',
+        version: 'v1.0.0'
+      });
+      assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics.length, 1);
       assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], PointDataType.SINGULAR, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER,
       });
 
+      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[1], {
+        name: 'meter2',
+        version: 'v1.0.0'
+      });
+      assert.strictEqual(result?.instrumentationLibraryMetrics[1].metrics.length, 1);
       assert.strictEqual(result?.instrumentationLibraryMetrics[1].instrumentationLibrary.name, 'meter2');
       assertMetricData(result?.instrumentationLibraryMetrics[1].metrics[0], PointDataType.SINGULAR, {
         name: 'renamed-instrument',
@@ -177,12 +198,22 @@ describe('MeterProvider', () => {
       const result = await reader.collect();
 
       assert.strictEqual(result?.instrumentationLibraryMetrics.length, 2);
+      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[0], {
+        name: 'meter1',
+        version: 'v1.0.0'
+      });
+      assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics.length, 1);
       assert.strictEqual(result?.instrumentationLibraryMetrics[0].instrumentationLibrary.name, 'meter1');
       assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], PointDataType.SINGULAR, {
           name: 'renamed-instrument',
           type: InstrumentType.COUNTER
         });
 
+      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[1], {
+        name: 'meter2',
+        version: 'v1.0.0'
+      });
+      assert.strictEqual(result?.instrumentationLibraryMetrics[1].metrics.length, 1);
       assert.strictEqual(result?.instrumentationLibraryMetrics[1].instrumentationLibrary.name, 'meter2');
       assertMetricData(result?.instrumentationLibraryMetrics[1].metrics[0], PointDataType.SINGULAR, {
           name: 'test-counter',
@@ -225,6 +256,11 @@ describe('MeterProvider', () => {
       const result = await reader.collect();
 
       assert.strictEqual(result?.instrumentationLibraryMetrics.length, 1);
+      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[0], {
+        name: 'meter1',
+        version: 'v1.0.0'
+      });
+      assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics.length, 2);
       assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], PointDataType.SINGULAR, {
           name: 'renamed-instrument',
           type: InstrumentType.COUNTER

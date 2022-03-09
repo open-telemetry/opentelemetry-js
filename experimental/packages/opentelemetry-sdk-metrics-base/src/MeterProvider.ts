@@ -27,6 +27,7 @@ import { MetricCollector } from './state/MetricCollector';
 import { Aggregation } from './view/Aggregation';
 import { FilteringAttributesProcessor } from './view/AttributesProcessor';
 import { InstrumentType } from './InstrumentDescriptor';
+import { PatternPredicate } from './view/Predicate';
 
 /**
  * MeterProviderOptions provides an interface for configuring a MeterProvider.
@@ -76,13 +77,28 @@ export type ViewOptions = {
      */
     attributeKeys?: string[],
     /**
-     * The aggregation to be used.
+     * The {@link Aggregation} aggregation to be used.
      */
     aggregation?: Aggregation,
 
-    // TODO: Add ExemplarReservoir.
+    // TODO: Add ExemplarReservoir
   }
 };
+
+function isViewOptionsEmpty(options: ViewOptions): boolean {
+  return (options.name == null &&
+    (options.meter == null ||
+      (options.meter.name == null &&
+        options.meter.version == null &&
+        options.meter.schemaUrl == null)) &&
+    (options.stream == null ||
+      (options.stream.aggregation == null &&
+        options.stream.attributeKeys == null &&
+        options.stream.description == null)) &&
+    (options.instrument == null ||
+      (options.instrument.name == null
+        && options.instrument.type == null)));
+}
 
 /**
  * This class implements the {@link metrics.MeterProvider} interface.
@@ -121,12 +137,16 @@ export class MeterProvider implements metrics.MeterProvider {
   }
 
   addView(options: ViewOptions) {
+    if (isViewOptionsEmpty(options)) {
+      throw new Error('Cannot create view with no arguments supplied');
+    }
+
     // the SDK MUST NOT allow Views with a specified name to be declared with instrument selectors that select by instrument type or wildcard
     if (options.name !== undefined) {
       if (options.instrument?.type !== undefined) {
         throw new Error('Views with a specified name must not be declared with instrument selectors that select by instrument type.');
       }
-      if (options.instrument?.name !== undefined && options.instrument.name.includes('*')) {
+      if (options.instrument?.name !== undefined && PatternPredicate.hasWildcard(options.instrument.name)) {
         throw new Error('Views with a specified name must not be declared with instrument selectors that select by wildcard.');
       }
     }
