@@ -23,7 +23,7 @@ import { PointDataType } from '../../src/export/MetricData';
 import { DeltaMetricProcessor } from '../../src/state/DeltaMetricProcessor';
 import { MetricCollectorHandle } from '../../src/state/MetricCollector';
 import { TemporalMetricProcessor } from '../../src/state/TemporalMetricProcessor';
-import { assertMetricData, assertPointData, defaultInstrumentationLibrary, defaultInstrumentDescriptor, defaultResource } from '../util';
+import { assertMetricData, assertPointData, defaultInstrumentDescriptor } from '../util';
 
 const deltaCollector1: MetricCollectorHandle = {
   aggregatorTemporality: AggregationTemporality.DELTA,
@@ -54,8 +54,6 @@ describe('TemporalMetricProcessor', () => {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,
             collectors,
-            defaultResource,
-            defaultInstrumentationLibrary,
             defaultInstrumentDescriptor,
             deltaMetricStorage.collect(),
             sdkStartTime,
@@ -71,8 +69,6 @@ describe('TemporalMetricProcessor', () => {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,
             collectors,
-            defaultResource,
-            defaultInstrumentationLibrary,
             defaultInstrumentDescriptor,
             deltaMetricStorage.collect(),
             sdkStartTime,
@@ -87,8 +83,6 @@ describe('TemporalMetricProcessor', () => {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,
             collectors,
-            defaultResource,
-            defaultInstrumentationLibrary,
             defaultInstrumentDescriptor,
             deltaMetricStorage.collect(),
             sdkStartTime,
@@ -113,8 +107,6 @@ describe('TemporalMetricProcessor', () => {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,
             collectors,
-            defaultResource,
-            defaultInstrumentationLibrary,
             defaultInstrumentDescriptor,
             deltaMetricStorage.collect(),
             sdkStartTime,
@@ -129,8 +121,6 @@ describe('TemporalMetricProcessor', () => {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector2,
             collectors,
-            defaultResource,
-            defaultInstrumentationLibrary,
             defaultInstrumentDescriptor,
             deltaMetricStorage.collect(),
             sdkStartTime,
@@ -155,8 +145,6 @@ describe('TemporalMetricProcessor', () => {
           const metric = temporalMetricStorage.buildMetrics(
             cumulativeCollector1,
             collectors,
-            defaultResource,
-            defaultInstrumentationLibrary,
             defaultInstrumentDescriptor,
             deltaMetricStorage.collect(),
             sdkStartTime,
@@ -172,8 +160,6 @@ describe('TemporalMetricProcessor', () => {
           const metric = temporalMetricStorage.buildMetrics(
             cumulativeCollector1,
             collectors,
-            defaultResource,
-            defaultInstrumentationLibrary,
             defaultInstrumentDescriptor,
             deltaMetricStorage.collect(),
             sdkStartTime,
@@ -198,8 +184,6 @@ describe('TemporalMetricProcessor', () => {
           const metric = temporalMetricStorage.buildMetrics(
             cumulativeCollector1,
             collectors,
-            defaultResource,
-            defaultInstrumentationLibrary,
             defaultInstrumentDescriptor,
             deltaMetricStorage.collect(),
             sdkStartTime,
@@ -215,8 +199,6 @@ describe('TemporalMetricProcessor', () => {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,
             collectors,
-            defaultResource,
-            defaultInstrumentationLibrary,
             defaultInstrumentDescriptor,
             deltaMetricStorage.collect(),
             sdkStartTime,
@@ -230,8 +212,6 @@ describe('TemporalMetricProcessor', () => {
           const metric = temporalMetricStorage.buildMetrics(
             cumulativeCollector1,
             collectors,
-            defaultResource,
-            defaultInstrumentationLibrary,
             defaultInstrumentDescriptor,
             deltaMetricStorage.collect(),
             sdkStartTime,
