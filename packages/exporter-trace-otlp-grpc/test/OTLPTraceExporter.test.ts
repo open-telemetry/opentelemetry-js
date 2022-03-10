@@ -123,7 +123,6 @@ const testCollectorExporter = (params: TestParams) =>
             fs.readFileSync('./test/certs/client.crt')
           )
         : undefined;
-
       collectorExporter = new OTLPTraceExporter({
         url: 'grpcs://' + address,
         credentials,
