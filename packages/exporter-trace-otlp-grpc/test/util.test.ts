@@ -94,7 +94,7 @@ describe('utils - configureSecurity', () => {
     assert.ok(userDefinedCredentials === credentials);
     assert.ok(credentials._isSecure() === true);
   });
-  // env tests
+  // env var tests
   it('should return credentials defined programatically instead of credentials defined via env var', () => {
     const userDefinedCredentials = grpc.credentials.createInsecure();
     envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE='false';
@@ -121,7 +121,7 @@ describe('utils - configureSecurity', () => {
     delete envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE;
   });
   // certificate test - WIP
-  it('should return credentials with provided certificate via env var', () => {
+  it.skip('should return credentials with provided certificate via env var', () => {
     envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE='false';
     envSource.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE='test/certs/ca.crt';
 
@@ -131,7 +131,7 @@ describe('utils - configureSecurity', () => {
     delete envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE;
     delete envSource.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE;
   });
-  it('should return credentials without using provided certificate', () => {
+  it.skip('should return credentials without using provided certificate', () => {
     envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE='false';
     envSource.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE='test/certs/wrongpathtocertificate/ca.crt';
 

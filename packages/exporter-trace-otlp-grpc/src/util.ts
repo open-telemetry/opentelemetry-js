@@ -172,6 +172,4 @@ function retrieveCertificate(): Buffer | undefined {
     } else {
       return undefined;
     }
-
-  // return certificate ? fs.readFileSync(path.join(process.cwd(), certificate)) : undefined;
 }
