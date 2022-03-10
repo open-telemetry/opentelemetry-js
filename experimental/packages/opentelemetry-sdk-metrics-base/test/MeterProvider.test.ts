@@ -17,7 +17,12 @@
 import * as assert from 'assert';
 import { NOOP_METER } from '@opentelemetry/api-metrics-wip';
 import { Meter, MeterProvider, InstrumentType, PointDataType } from '../src';
-import { assertInstrumentationLibraryMetrics, assertMetricData, defaultResource } from './util';
+import {
+  assertInstrumentationLibraryMetrics,
+  assertMetricData,
+  assertPartialDeepStrictEqual,
+  defaultResource
+} from './util';
 import { TestMetricReader } from './export/TestMetricReader';
 
 describe('MeterProvider', () => {
@@ -49,41 +54,10 @@ describe('MeterProvider', () => {
   });
 
   describe('getView', () => {
-    it('with existing instrument should rename', async () => {
-      const meterProvider = new MeterProvider({ resource: defaultResource });
-
-      const reader = new TestMetricReader();
-      meterProvider.addMetricReader(reader);
-
-      meterProvider.addView({
-        name: 'renamed-instrument',
-        instrument: {
-          name: 'non-renamed-instrument',
-        },
-        stream: {
-          description: 'my renamed instrument',
-          attributeKeys: ['attrib1']
-        }
-      });
-
-      const myMeter = meterProvider.getMeter('meter1', '1.0.0');
-      const counter = myMeter.createCounter('non-renamed-instrument');
-      counter.add(1, { attrib1: 'attrib_value1', attrib2: 'attrib_value2' });
-
-      const result = await reader.collect();
-
-      assert.strictEqual(result?.instrumentationLibraryMetrics.length, 1);
-      assert.strictEqual(result?.instrumentationLibraryMetrics[0].instrumentationLibrary.name, 'meter1');
-
-      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], PointDataType.SINGULAR, {
-          name: 'renamed-instrument',
-          type: InstrumentType.COUNTER
-        });
-    });
-
     it('with named view and instrument wildcard should throw', () => {
       const meterProvider = new MeterProvider({ resource: defaultResource });
 
+      // Throws with wildcard character only.
       assert.throws(() => meterProvider.addView({
         name: 'renamed-instrument',
         instrument: {
@@ -91,6 +65,7 @@ describe('MeterProvider', () => {
         }
       }));
 
+      // Throws with wildcard character in instrument name.
       assert.throws(() => meterProvider.addView({
         name: 'renamed-instrument',
         instrument: {
@@ -114,13 +89,72 @@ describe('MeterProvider', () => {
       const meterProvider = new MeterProvider({ resource: defaultResource });
 
       assert.throws(() => meterProvider.addView({}));
-      assert.throws(() => meterProvider.addView({instrument:{}}));
-      assert.throws(() => meterProvider.addView({instrument:{}, meter: {}}));
-      assert.throws(() => meterProvider.addView({instrument:{}, meter: {}, stream: {}}));
-      assert.throws(() => meterProvider.addView({instrument:{}, stream: {}}));
-      assert.throws(() => meterProvider.addView({meter: {}, stream: {}}));
-      assert.throws(() => meterProvider.addView({meter: {}}));
-      assert.throws(() => meterProvider.addView({stream: {}}));
+      assert.throws(() => meterProvider.addView({ instrument: {} }));
+      assert.throws(() => meterProvider.addView({ instrument: {}, meter: {} }));
+      assert.throws(() => meterProvider.addView({ instrument: {}, meter: {}, stream: {} }));
+      assert.throws(() => meterProvider.addView({ instrument: {}, stream: {} }));
+      assert.throws(() => meterProvider.addView({ meter: {}, stream: {} }));
+      assert.throws(() => meterProvider.addView({ meter: {} }));
+      assert.throws(() => meterProvider.addView({ stream: {} }));
+    });
+
+    it('with existing instrument should rename', async () => {
+      const meterProvider = new MeterProvider({ resource: defaultResource });
+
+      const reader = new TestMetricReader();
+      meterProvider.addMetricReader(reader);
+
+      // Add view to rename 'non-renamed-instrument' to 'renamed-instrument'
+      meterProvider.addView({
+        name: 'renamed-instrument',
+        instrument: {
+          name: 'non-renamed-instrument',
+        },
+        stream: {
+          description: 'my renamed instrument',
+          attributeKeys: ['attrib1']
+        }
+      });
+
+      // Create meter and instrument.
+      const myMeter = meterProvider.getMeter('meter1', 'v1.0.0');
+      const counter = myMeter.createCounter('non-renamed-instrument');
+      counter.add(1, { attrib1: 'attrib_value1', attrib2: 'attrib_value2' });
+
+      // Perform collection.
+      const result = await reader.collect();
+
+      // Results came only from one Meter.
+      assert.strictEqual(result?.instrumentationLibraryMetrics.length, 1);
+
+      // InstrumentationLibrary matches the only created Meter.
+      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[0], {
+        name: 'meter1',
+        version: 'v1.0.0'
+      });
+
+      // Collected only one Metric.
+      assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics.length, 1);
+
+      // View updated name and description.
+      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], PointDataType.SINGULAR, {
+        name: 'renamed-instrument',
+        type: InstrumentType.COUNTER,
+        description: 'my renamed instrument'
+      });
+
+      // Only one PointData added.
+      assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics[0].pointData.length, 1);
+
+      // PointData matches attributes and point.
+      assertPartialDeepStrictEqual(result?.instrumentationLibraryMetrics[0].metrics[0].pointData[0], {
+        // 'attrib_1' is still here but 'attrib_2' is not.
+        attributes: {
+          attrib1: 'attrib_value1'
+        },
+        // Value that has been added to the counter.
+        point: 1
+      });
     });
 
     it('with no meter name should apply view to instruments of all meters', async () => {
@@ -129,6 +163,7 @@ describe('MeterProvider', () => {
       const reader = new TestMetricReader();
       meterProvider.addMetricReader(reader);
 
+      // Add view that renames 'test-counter' to 'renamed-instrument'
       meterProvider.addView({
         name: 'renamed-instrument',
         instrument: {
@@ -136,46 +171,62 @@ describe('MeterProvider', () => {
         }
       });
 
+      // Create two meters.
       const meter1 = meterProvider.getMeter('meter1', 'v1.0.0');
       const meter2 = meterProvider.getMeter('meter2', 'v1.0.0');
 
+      // Create identical counters on both meters.
       const counter1 = meter1.createCounter('test-counter', { unit: 'ms' });
       const counter2 = meter2.createCounter('test-counter', { unit: 'ms' });
 
+      // Add values to counters.
       counter1.add(1);
       counter2.add(2);
 
+      // Perform collection.
       const result = await reader.collect();
 
+      // Results came from two Meters.
       assert.strictEqual(result?.instrumentationLibraryMetrics.length, 2);
+
+      // First InstrumentationLibrary matches the first created Meter.
       assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[0], {
         name: 'meter1',
         version: 'v1.0.0'
       });
+
+      // Collected one Metric on 'meter1'
       assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics.length, 1);
+
+      // View updated the name to 'renamed-instrument' and instrument is still a Counter
       assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], PointDataType.SINGULAR, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER,
       });
 
+      // Second InstrumentationLibrary matches the second created Meter.
       assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[1], {
         name: 'meter2',
         version: 'v1.0.0'
       });
+
+      // Collected one Metric on 'meter2'
       assert.strictEqual(result?.instrumentationLibraryMetrics[1].metrics.length, 1);
-      assert.strictEqual(result?.instrumentationLibraryMetrics[1].instrumentationLibrary.name, 'meter2');
+
+      // View updated the name to 'renamed-instrument' and instrument is still a Counter
       assertMetricData(result?.instrumentationLibraryMetrics[1].metrics[0], PointDataType.SINGULAR, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER
       });
     });
 
-    it('with no meter name should apply view to only the selected meter', async () => {
+    it('with meter name should apply view to only the selected meter', async () => {
       const meterProvider = new MeterProvider({ resource: defaultResource });
 
       const reader = new TestMetricReader();
       meterProvider.addMetricReader(reader);
 
+      // Add view that renames 'test-counter' to 'renamed-instrument' on 'meter1'
       meterProvider.addView({
         name: 'renamed-instrument',
         instrument: {
@@ -186,39 +237,53 @@ describe('MeterProvider', () => {
         }
       });
 
+      // Create two meters.
       const meter1 = meterProvider.getMeter('meter1', 'v1.0.0');
       const meter2 = meterProvider.getMeter('meter2', 'v1.0.0');
 
+      // Create counters with same name on both meters.
       const counter1 = meter1.createCounter('test-counter', { unit: 'ms' });
       const counter2 = meter2.createCounter('test-counter', { unit: 'ms' });
 
+      // Add values to both.
       counter1.add(1);
-      counter2.add(2);
+      counter2.add(1);
 
+      // Perform collection.
       const result = await reader.collect();
 
+      // Results came from two Meters.
       assert.strictEqual(result?.instrumentationLibraryMetrics.length, 2);
+
+      // First InstrumentationLibrary matches the first created Meter.
       assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[0], {
         name: 'meter1',
         version: 'v1.0.0'
       });
-      assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics.length, 1);
-      assert.strictEqual(result?.instrumentationLibraryMetrics[0].instrumentationLibrary.name, 'meter1');
-      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], PointDataType.SINGULAR, {
-          name: 'renamed-instrument',
-          type: InstrumentType.COUNTER
-        });
 
+      // Collected one Metric on 'meter1'
+      assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics.length, 1);
+
+      // View updated the name to 'renamed-instrument' and instrument is still a Counter
+      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], PointDataType.SINGULAR, {
+        name: 'renamed-instrument',
+        type: InstrumentType.COUNTER
+      });
+
+      // Second InstrumentationLibrary matches the second created Meter.
       assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[1], {
         name: 'meter2',
         version: 'v1.0.0'
       });
+
+      // Collected one Metric on 'meter2'
       assert.strictEqual(result?.instrumentationLibraryMetrics[1].metrics.length, 1);
-      assert.strictEqual(result?.instrumentationLibraryMetrics[1].instrumentationLibrary.name, 'meter2');
+
+      // No updated name on 'test-counter'.
       assertMetricData(result?.instrumentationLibraryMetrics[1].metrics[0], PointDataType.SINGULAR, {
-          name: 'test-counter',
-          type: InstrumentType.COUNTER
-        });
+        name: 'test-counter',
+        type: InstrumentType.COUNTER
+      });
     });
 
     it('with different instrument types does not throw', async () => {
@@ -226,6 +291,8 @@ describe('MeterProvider', () => {
       const reader = new TestMetricReader();
       meterProvider.addMetricReader(reader);
 
+
+      // Add Views to rename both instruments (of different types) to the same name.
       meterProvider.addView({
         name: 'renamed-instrument',
         instrument: {
@@ -246,25 +313,35 @@ describe('MeterProvider', () => {
         }
       });
 
+      // Create meter and instruments.
       const meter = meterProvider.getMeter('meter1', 'v1.0.0');
-
       const counter = meter.createCounter('test-counter', { unit: 'ms' });
-      assert.doesNotThrow(() => meter.createHistogram('test-histogram', { unit: 'ms' }));
+      const histogram = meter.createHistogram('test-histogram', { unit: 'ms' });
 
+      // Record values for both.
       counter.add(1);
+      histogram.record(1);
 
+      // Collect.
       const result = await reader.collect();
 
+      // Results came only from one Meter.
       assert.strictEqual(result?.instrumentationLibraryMetrics.length, 1);
+
+      // InstrumentationLibrary matches the only created Meter.
       assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[0], {
         name: 'meter1',
         version: 'v1.0.0'
       });
+
+      // Two metrics are collected ('renamed-instrument'-Counter and 'renamed-instrument'-Histogram)
       assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics.length, 2);
+
+      // Both 'renamed-instrument' are still exported with their types.
       assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], PointDataType.SINGULAR, {
-          name: 'renamed-instrument',
-          type: InstrumentType.COUNTER
-        });
+        name: 'renamed-instrument',
+        type: InstrumentType.COUNTER
+      });
       assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[1], PointDataType.HISTOGRAM, {
         name: 'renamed-instrument',
         type: InstrumentType.HISTOGRAM
