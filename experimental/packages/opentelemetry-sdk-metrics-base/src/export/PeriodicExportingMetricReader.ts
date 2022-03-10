@@ -63,6 +63,11 @@ export class PeriodicExportingMetricReader extends MetricReader {
 
   private async _runOnce(): Promise<void> {
     const metrics = await this.collect({});
+
+    if (metrics === undefined) {
+      return;
+    }
+
     return new Promise((resolve, reject) => {
       this._exporter.export(metrics, result => {
         if (result.code !== ExportResultCode.SUCCESS) {

@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MeterProvider } from '../../src';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import { MetricData, PointDataType } from '../../src/export/MetricData';
+import { PointDataType, ResourceMetrics } from '../../src/export/MetricData';
 import { PushMetricExporter } from '../../src/export/MetricExporter';
 import { MeterProviderSharedState } from '../../src/state/MeterProviderSharedState';
 import { MetricCollector } from '../../src/state/MetricCollector';
@@ -27,9 +27,7 @@ import { TestMetricReader } from '../export/TestMetricReader';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 
 class TestMetricExporter implements PushMetricExporter {
-  metricDataList: MetricData[] = [];
-  async export(batch: MetricData[], resultCallback: (result: ExportResult) => void): Promise<void> {
-    this.metricDataList.push(...batch);
+  async export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): Promise<void> {
     resultCallback({code: ExportResultCode.SUCCESS});
   }
 
@@ -96,24 +94,24 @@ describe('MetricCollector', () => {
       counter2.add(3);
 
       /** collect metrics */
-      const batch = await metricCollector.collect();
-      assert(Array.isArray(batch));
-      assert.strictEqual(batch.length, 2);
+      const { instrumentationLibraryMetrics } = await metricCollector.collect();
+      const { metrics } = instrumentationLibraryMetrics[0];
+      assert.strictEqual(metrics.length, 2);
 
       /** checking batch[0] */
-      const metricData1 = batch[0];
+      const metricData1 = metrics[0];
       assertMetricData(metricData1, PointDataType.SINGULAR, {
         name: 'counter1'
-      }, defaultInstrumentationLibrary);
+      });
       assert.strictEqual(metricData1.pointData.length, 2);
       assertPointData(metricData1.pointData[0], {}, 1);
       assertPointData(metricData1.pointData[1], { foo: 'bar' }, 2);
 
       /** checking batch[1] */
-      const metricData2 = batch[1];
+      const metricData2 = metrics[1];
       assertMetricData(metricData2, PointDataType.SINGULAR, {
         name: 'counter2'
-      }, defaultInstrumentationLibrary);
+      });
       assert.strictEqual(metricData2.pointData.length, 1);
       assertPointData(metricData2.pointData[0], {}, 3);
     });

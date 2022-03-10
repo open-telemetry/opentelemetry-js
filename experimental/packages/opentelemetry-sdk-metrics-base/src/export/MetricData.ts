@@ -25,22 +25,11 @@ import { Histogram } from '../aggregator/types';
  * Basic metric data fields.
  */
 export interface BaseMetricData {
-  /**
-   * Resource associated with metric telemetry.
-   */
-  readonly resource: Resource;
-  /**
-   * InstrumentationLibrary which created the metric instrument.
-   */
-  readonly instrumentationLibrary: InstrumentationLibrary;
-  /**
-   * InstrumentDescriptor which describes the metric instrument.
-   */
   readonly instrumentDescriptor: InstrumentDescriptor;
   /**
    * PointDataType of the metric instrument.
    */
-  readonly pointDataType: PointDataType,
+  readonly pointDataType: PointDataType;
 }
 
 /**
@@ -48,22 +37,32 @@ export interface BaseMetricData {
  * SumAggregation.
  */
 export interface SingularMetricData extends BaseMetricData {
-  readonly pointDataType: PointDataType.SINGULAR,
-  readonly pointData: PointData<number>[],
+  readonly pointDataType: PointDataType.SINGULAR;
+  readonly pointData: PointData<number>[];
 }
 
 /**
  * Represents a metric data aggregated by a HistogramAggregation.
  */
 export interface HistogramMetricData extends BaseMetricData {
-  readonly pointDataType: PointDataType.HISTOGRAM,
-  readonly pointData: PointData<Histogram>[],
+  readonly pointDataType: PointDataType.HISTOGRAM;
+  readonly pointData: PointData<Histogram>[];
 }
 
 /**
  * Represents an aggregated metric data.
  */
 export type MetricData = SingularMetricData | HistogramMetricData;
+
+export interface InstrumentationLibraryMetrics {
+  instrumentationLibrary: InstrumentationLibrary;
+  metrics: MetricData[];
+}
+
+export interface ResourceMetrics {
+  resource: Resource;
+  instrumentationLibraryMetrics: InstrumentationLibraryMetrics[];
+}
 
 /**
  * The aggregated point data type.
