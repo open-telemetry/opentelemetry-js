@@ -57,10 +57,18 @@ describe('configureExporterTimeout', () => {
     assert.strictEqual(exporterTimeout, 9000);
     delete envSource.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
   });
-  it('should use default value when both timeoutMillis parameter export timeout value defined in env are negative', () => {
+  it('should use default value when both timeoutMillis parameter and export timeout values defined in env are negative', () => {
     envSource.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT = '-11000';
     envSource.OTEL_EXPORTER_OTLP_TIMEOUT = '-9000';
     const exporterTimeout = configureExporterTimeout(-5000);
+    assert.strictEqual(exporterTimeout, 10000);
+    delete envSource.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
+    delete envSource.OTEL_EXPORTER_OTLP_TIMEOUT;
+  });
+  it('should use default value export timeout value defined in env are negative', () => {
+    envSource.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT = '-11000';
+    envSource.OTEL_EXPORTER_OTLP_TIMEOUT = '-9000';
+    const exporterTimeout = configureExporterTimeout(undefined);
     assert.strictEqual(exporterTimeout, 10000);
     delete envSource.OTEL_EXPORTER_OTLP_TRACES_TIMEOUT;
     delete envSource.OTEL_EXPORTER_OTLP_TIMEOUT;
