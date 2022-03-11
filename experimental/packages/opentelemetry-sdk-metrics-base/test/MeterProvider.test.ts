@@ -53,7 +53,7 @@ describe('MeterProvider', () => {
     });
   });
 
-  describe('getView', () => {
+  describe('addView', () => {
     it('with named view and instrument wildcard should throw', () => {
       const meterProvider = new MeterProvider({ resource: defaultResource });
 
@@ -322,7 +322,7 @@ describe('MeterProvider', () => {
       counter.add(1);
       histogram.record(1);
 
-      // Collect.
+      // Perform collection.
       const result = await reader.collect();
 
       // Results came only from one Meter.
