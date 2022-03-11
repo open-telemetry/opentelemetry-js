@@ -15,7 +15,7 @@
  */
 
 import { AggregationTemporality } from './AggregationTemporality';
-import { MetricData } from './MetricData';
+import { ResourceMetrics } from './MetricData';
 import {
   ExportResult,
   ExportResultCode,
@@ -26,7 +26,7 @@ import {
 
 export interface PushMetricExporter {
 
-  export(batch: MetricData[], resultCallback: (result: ExportResult) => void): void;
+  export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): void;
 
   forceFlush(): Promise<void>;
 
@@ -39,7 +39,7 @@ export interface PushMetricExporter {
 export class ConsoleMetricExporter implements PushMetricExporter {
   protected _shutdown = true;
 
-  export(_batch: MetricData[], resultCallback: (result: ExportResult) => void) {
+  export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void) {
     return resultCallback({
         code: ExportResultCode.FAILED,
         error: new Error('Method not implemented')
