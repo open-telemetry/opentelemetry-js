@@ -347,7 +347,6 @@ describe('MeterProvider', () => {
       const reader = new TestMetricReader();
       meterProvider.addMetricReader(reader);
 
-
       // Add Views to rename both instruments (of different types) to the same name.
       meterProvider.addView({
         name: 'renamed-instrument',
