@@ -111,8 +111,7 @@ describe('MeterProvider', () => {
           name: 'non-renamed-instrument',
         },
         stream: {
-          description: 'my renamed instrument',
-          attributeKeys: ['attrib1']
+          description: 'my renamed instrument'
         }
       });
 
@@ -141,6 +140,63 @@ describe('MeterProvider', () => {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER,
         description: 'my renamed instrument'
+      });
+
+      // Only one PointData added.
+      assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics[0].pointData.length, 1);
+
+      // PointData matches attributes and point.
+      assertPartialDeepStrictEqual(result?.instrumentationLibraryMetrics[0].metrics[0].pointData[0], {
+        // Attributes are still there.
+        attributes: {
+          attrib1: 'attrib_value1',
+          attrib2: 'attrib_value2'
+        },
+        // Value that has been added to the counter.
+        point: 1
+      });
+    });
+
+    it('with attributeKeys should drop non-listed attributes', async () => {
+      const meterProvider = new MeterProvider({ resource: defaultResource });
+
+      const reader = new TestMetricReader();
+      meterProvider.addMetricReader(reader);
+
+      // Add view to drop all attributes except 'attrib1'
+      meterProvider.addView({
+        instrument: {
+          name: 'non-renamed-instrument',
+        },
+        stream: {
+          attributeKeys: ['attrib1']
+        }
+      });
+
+      // Create meter and instrument.
+      const myMeter = meterProvider.getMeter('meter1', 'v1.0.0');
+      const counter = myMeter.createCounter('non-renamed-instrument');
+      counter.add(1, { attrib1: 'attrib_value1', attrib2: 'attrib_value2' });
+
+      // Perform collection.
+      const result = await reader.collect();
+
+      // Results came only from one Meter.
+      assert.strictEqual(result?.instrumentationLibraryMetrics.length, 1);
+
+      // InstrumentationLibrary matches the only created Meter.
+      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[0], {
+        name: 'meter1',
+        version: 'v1.0.0'
+      });
+
+      // Collected only one Metric.
+      assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics.length, 1);
+
+      // View updated name and description.
+      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], PointDataType.SINGULAR, {
+        name: 'non-renamed-instrument',
+        type: InstrumentType.COUNTER,
       });
 
       // Only one PointData added.
