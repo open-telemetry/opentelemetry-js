@@ -253,20 +253,20 @@ const testCollectorExporter = (params: TestParams) =>
     describe('Trace Exporter with compression', () => {
       const envSource = process.env;
       it('should return gzip compression algorithm on exporter', () => {
-      const credentials = params.useTLS
-      ? grpc.credentials.createSsl(
-          fs.readFileSync('./test/certs/ca.crt'),
-          fs.readFileSync('./test/certs/client.key'),
-          fs.readFileSync('./test/certs/client.crt')
-        )
-      : undefined;
+        const credentials = params.useTLS
+        ? grpc.credentials.createSsl(
+            fs.readFileSync('./test/certs/ca.crt'),
+            fs.readFileSync('./test/certs/client.key'),
+            fs.readFileSync('./test/certs/client.crt')
+          )
+        : undefined;
 
-      envSource.OTEL_EXPORTER_OTLP_COMPRESSION='gzip';
-      collectorExporter = new OTLPTraceExporter({
-        url: 'grpcs://' + address,
-        credentials,
-        metadata: params.metadata,
-      });
+        envSource.OTEL_EXPORTER_OTLP_COMPRESSION='gzip';
+        collectorExporter = new OTLPTraceExporter({
+          url: 'grpcs://' + address,
+          credentials,
+          metadata: params.metadata,
+        });
         assert.strictEqual(collectorExporter.compression, CompressionAlgorithm.GZIP);
         delete envSource.OTEL_EXPORTER_OTLP_COMPRESSION;
       });
