@@ -28,13 +28,13 @@ export enum AggregatorKind {
   HISTOGRAM,
 }
 
-/** Point type for SumAggregation. */
+/** DataPoint value type for SumAggregation. */
 export type Sum = number;
 
-/** Point type for LastValueAggregation. */
+/** DataPoint value type for LastValueAggregation. */
 export type LastValue = number;
 
-/** Point type for HistogramAggregation. */
+/** DataPoint value type for HistogramAggregation. */
 export interface Histogram {
   /**
    * Buckets are implemented using two different arrays:

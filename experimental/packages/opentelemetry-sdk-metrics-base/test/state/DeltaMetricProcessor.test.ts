@@ -78,7 +78,7 @@ describe('DeltaMetricProcessor', () => {
         metricProcessor.batchCumulate(measurements);
         const accumulations = metricProcessor.collect();
         const accumulation = accumulations.get({});
-        assert.strictEqual(accumulation?.toPoint(), 10);
+        assert.strictEqual(accumulation?.toPointValue(), 10);
       }
 
       {
@@ -87,7 +87,7 @@ describe('DeltaMetricProcessor', () => {
         metricProcessor.batchCumulate(measurements);
         const accumulations = metricProcessor.collect();
         const accumulation = accumulations.get({});
-        assert.strictEqual(accumulation?.toPoint(), 11);
+        assert.strictEqual(accumulation?.toPointValue(), 11);
       }
     });
   });
@@ -104,11 +104,11 @@ describe('DeltaMetricProcessor', () => {
       assert.strictEqual(accumulations.size, 2);
       {
         const accumulation = accumulations.get({ attribute: '1' });
-        assert.strictEqual(accumulation?.toPoint(), 3);
+        assert.strictEqual(accumulation?.toPointValue(), 3);
       }
       {
         const accumulation = accumulations.get({ attribute: '2' });
-        assert.strictEqual(accumulation?.toPoint(), 1);
+        assert.strictEqual(accumulation?.toPointValue(), 1);
       }
 
       /** the accumulations shall be reset. */

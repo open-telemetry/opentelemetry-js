@@ -27,7 +27,7 @@ export class SumAccumulation implements Accumulation {
     this._current += value;
   }
 
-  toPoint(): Sum {
+  toPointValue(): Sum {
     return this._current;
   }
 }
@@ -44,14 +44,14 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
    * Returns the result of the merge of the given accumulations.
    */
   merge(previous: SumAccumulation, delta: SumAccumulation): SumAccumulation {
-    return new SumAccumulation(previous.toPoint() + delta.toPoint());
+    return new SumAccumulation(previous.toPointValue() + delta.toPointValue());
   }
 
   /**
    * Returns a new DELTA aggregation by comparing two cumulative measurements.
    */
   diff(previous: SumAccumulation, current: SumAccumulation): SumAccumulation {
-    return new SumAccumulation(current.toPoint() - previous.toPoint());
+    return new SumAccumulation(current.toPointValue() - previous.toPointValue());
   }
 
   toMetricData(
@@ -67,7 +67,7 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
           attributes,
           startTime,
           endTime,
-          value: accumulation.toPoint(),
+          value: accumulation.toPointValue(),
         };
       })
     };

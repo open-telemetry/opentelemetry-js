@@ -29,7 +29,7 @@ export class LastValueAccumulation implements Accumulation {
     this.sampleTime = hrTime();
   }
 
-  toPoint(): LastValue {
+  toPointValue(): LastValue {
     return this._current;
   }
 }
@@ -50,7 +50,7 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
   merge(previous: LastValueAccumulation, delta: LastValueAccumulation): LastValueAccumulation {
     // nanoseconds may lose precisions.
     const latestAccumulation = hrTimeToMicroseconds(delta.sampleTime) >= hrTimeToMicroseconds(previous.sampleTime) ? delta : previous;
-    return new LastValueAccumulation(latestAccumulation.toPoint(), latestAccumulation.sampleTime);
+    return new LastValueAccumulation(latestAccumulation.toPointValue(), latestAccumulation.sampleTime);
   }
 
   /**
@@ -62,7 +62,7 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
   diff(previous: LastValueAccumulation, current: LastValueAccumulation): LastValueAccumulation {
     // nanoseconds may lose precisions.
     const latestAccumulation = hrTimeToMicroseconds(current.sampleTime) >= hrTimeToMicroseconds(previous.sampleTime) ? current : previous;
-    return new LastValueAccumulation(latestAccumulation.toPoint(), latestAccumulation.sampleTime);
+    return new LastValueAccumulation(latestAccumulation.toPointValue(), latestAccumulation.sampleTime);
   }
 
   toMetricData(
@@ -78,7 +78,7 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
           attributes,
           startTime,
           endTime,
-          value: accumulation.toPoint(),
+          value: accumulation.toPointValue(),
         };
       })
     };
