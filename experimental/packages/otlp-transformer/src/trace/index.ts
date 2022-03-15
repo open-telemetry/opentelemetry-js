@@ -80,13 +80,14 @@ function spanRecordsToResourceSpans(spans: ReadableSpan[]): ResourceSpans[] {
     const [resource, ilmMap] = entry.value;
     const resourceSpans: InstrumentationLibrarySpans[] = [];
     const ilmIterator = ilmMap.values();
-    const ilmEntry = ilmIterator.next();
+    let ilmEntry = ilmIterator.next();
     while (!ilmEntry.done) {
       const instrumentationLibrarySpans = ilmEntry.value;
       if (instrumentationLibrarySpans.length > 0) {
         const { name, version, schemaUrl } = instrumentationLibrarySpans[0].instrumentationLibrary;
         resourceSpans.push({ instrumentationLibrary: { name, version }, instrumentationLibrarySpans, schemaUrl });
       }
+      ilmEntry = ilmIterator.next();
     }
     out.push({ resource, resourceSpans });
     entry = entryIterator.next();

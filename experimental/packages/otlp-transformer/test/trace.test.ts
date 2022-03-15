@@ -161,7 +161,7 @@ describe('Trace', () => {
     });
 
     it('returns null on an empty list', () => {
-      assert.strictEqual(createExportTraceServiceRequest([]), null);
+      assert.deepStrictEqual(createExportTraceServiceRequest([]), { resourceSpans: [] });
     });
 
     it('serializes a span', () => {

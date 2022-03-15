@@ -23,7 +23,8 @@ import {
   SumAggregator
 } from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
-import { createExportMetricsServiceRequest, EAggregationTemporality } from '../src';
+import { createExportMetricsServiceRequest } from '../src/metrics';
+import { EAggregationTemporality } from '../src/metrics/types';
 
 const START_TIME = 1640715235584374000;
 

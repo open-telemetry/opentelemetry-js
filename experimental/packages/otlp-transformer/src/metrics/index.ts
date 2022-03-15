@@ -81,20 +81,22 @@ function metricRecordsToResourceMetrics(metricRecords: MetricRecord[]): Resource
   const out: ResourceMetrics[] = [];
 
   const resourceMapEntryIterator = resourceMap.entries();
-  const resourceMapEntry = resourceMapEntryIterator.next();
+  let resourceMapEntry = resourceMapEntryIterator.next();
   while (!resourceMapEntry.done) {
     const [resource, ilmMap] = resourceMapEntry.value;
     const resourceMetrics: InstrumentationLibraryMetrics[] = [];
     const ilmIterator = ilmMap.values();
-    const ilmEntry = ilmIterator.next();
+    let ilmEntry = ilmIterator.next();
     while (!ilmEntry.done) {
       const instrumentationLibraryMetrics = ilmEntry.value;
       if (instrumentationLibraryMetrics.length > 0) {
         const lib = instrumentationLibraryMetrics[0].instrumentationLibrary;
         resourceMetrics.push({ instrumentationLibrary: lib, instrumentationLibraryMetrics, schemaUrl: lib.schemaUrl });
       }
+      ilmEntry = ilmIterator.next();
     }
     out.push({ resource, resourceMetrics });
+    resourceMapEntry = resourceMapEntryIterator.next();
   }
 
   return out;
