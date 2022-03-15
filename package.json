@@ -9,7 +9,7 @@
     "watch": "tsc --build --watch",
     "clean": "tsc --build --clean",
     "postinstall": "npm run update-ts-references && npm run bootstrap",
-    "postcompile": "npm run submodule && npm run protos:copy",
+    "postcompile": "npm run protos:copy",
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "protos:copy": "lerna run protos:copy",
     "version:update": "lerna run version:update",

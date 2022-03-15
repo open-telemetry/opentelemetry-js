@@ -12,7 +12,8 @@
     "test/**/*.*",
     ".eslintrc.js",
     "karma.conf.js",
-    "webpack/*.js"
+    "webpack/*.js",
+    "src/generated/**"
   ],
   "all": true
 }
