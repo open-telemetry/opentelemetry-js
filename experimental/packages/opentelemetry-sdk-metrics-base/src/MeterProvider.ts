@@ -134,23 +134,17 @@ export class MeterProvider implements metrics.MeterProvider {
       throw new Error('Cannot create view with no view arguments supplied');
     }
 
-    // the SDK MUST NOT allow Views with a specified name to be declared with instrument selectors that select by instrument type or wildcard
-    if (options.name !== undefined) {
-      if (selectorOptions === undefined ||
-        (selectorOptions.instrument?.name === undefined && selectorOptions.instrument?.type === undefined)) {
-        throw new Error('Views with a specified name must be declared with an instrument selector that selects at most one instrument.');
-      }
-      if (selectorOptions?.instrument?.type !== undefined) {
-        throw new Error('Views with a specified name must not be declared with instrument selectors that select by instrument type.');
-      }
-      if (selectorOptions?.instrument?.name !== undefined && PatternPredicate.hasWildcard(selectorOptions.instrument.name)) {
-        throw new Error('Views with a specified name must not be declared with instrument selectors that select by wildcard.');
-      }
+    // the SDK SHOULD NOT allow Views with a specified name to be declared with instrument selectors that
+    // may select more than one instrument (e.g. wild card instrument name) in the same Meter.
+    if (options.name != null &&
+      (selectorOptions?.instrument?.name == null ||
+        PatternPredicate.hasWildcard(selectorOptions.instrument.name))) {
+      throw new Error('Views with a specified name must be declared with an instrument selector that selects at most one instrument per meter.');
     }
 
     // Create AttributesProcessor if attributeKeys are defined set.
     let attributesProcessor = undefined;
-    if (options.attributeKeys !== undefined) {
+    if (options.attributeKeys != null) {
       attributesProcessor = new FilteringAttributesProcessor(options.attributeKeys);
     }
 
