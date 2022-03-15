@@ -42,6 +42,24 @@ export type ViewOptions = {
    *  If not provided, the Instrument name will be used by default. This will be used as the name of the metrics stream.
    */
   name?: string,
+  /**
+   * If not provided, the Instrument description will be used by default.
+   */
+  description?: string,
+  /**
+   * If provided, the attributes that are not in the list will be ignored.
+   * If not provided, all the attribute keys will be used by default.
+   */
+  attributeKeys?: string[],
+  /**
+   * The {@link Aggregation} aggregation to be used.
+   */
+  aggregation?: Aggregation,
+
+  // TODO: Add ExemplarReservoir
+};
+
+export type SelectorOptions = {
   instrument?: {
     /**
      * The type of the Instrument(s).
@@ -66,38 +84,13 @@ export type ViewOptions = {
      */
     schemaUrl?: string;
   }
-  stream?: {
-    /**
-     * If not provided, the Instrument description will be used by default.
-     */
-    description?: string,
-    /**
-     * If provided, the attributes that are not in the list will be ignored.
-     * If not provided, all the attribute keys will be used by default.
-     */
-    attributeKeys?: string[],
-    /**
-     * The {@link Aggregation} aggregation to be used.
-     */
-    aggregation?: Aggregation,
-
-    // TODO: Add ExemplarReservoir
-  }
 };
 
 function isViewOptionsEmpty(options: ViewOptions): boolean {
   return (options.name == null &&
-    (options.meter == null ||
-      (options.meter.name == null &&
-        options.meter.version == null &&
-        options.meter.schemaUrl == null)) &&
-    (options.stream == null ||
-      (options.stream.aggregation == null &&
-        options.stream.attributeKeys == null &&
-        options.stream.description == null)) &&
-    (options.instrument == null ||
-      (options.instrument.name == null
-        && options.instrument.type == null)));
+    options.aggregation == null &&
+    options.attributeKeys == null &&
+    options.description == null);
 }
 
 /**
@@ -136,35 +129,39 @@ export class MeterProvider implements metrics.MeterProvider {
     this._sharedState.metricCollectors.push(collector);
   }
 
-  addView(options: ViewOptions) {
+  addView(options: ViewOptions, selectorOptions?: SelectorOptions) {
     if (isViewOptionsEmpty(options)) {
-      throw new Error('Cannot create view with no arguments supplied');
+      throw new Error('Cannot create view with no view arguments supplied');
     }
 
     // the SDK MUST NOT allow Views with a specified name to be declared with instrument selectors that select by instrument type or wildcard
     if (options.name !== undefined) {
-      if (options.instrument?.type !== undefined) {
+      if (selectorOptions === undefined ||
+        (selectorOptions.instrument?.name === undefined && selectorOptions.instrument?.type === undefined)) {
+        throw new Error('Views with a specified name must be declared with an instrument selector that selects at most one instrument.');
+      }
+      if (selectorOptions?.instrument?.type !== undefined) {
         throw new Error('Views with a specified name must not be declared with instrument selectors that select by instrument type.');
       }
-      if (options.instrument?.name !== undefined && PatternPredicate.hasWildcard(options.instrument.name)) {
+      if (selectorOptions?.instrument?.name !== undefined && PatternPredicate.hasWildcard(selectorOptions.instrument.name)) {
         throw new Error('Views with a specified name must not be declared with instrument selectors that select by wildcard.');
       }
     }
 
     // Create AttributesProcessor if attributeKeys are defined set.
     let attributesProcessor = undefined;
-    if (options.stream?.attributeKeys !== undefined) {
-      attributesProcessor = new FilteringAttributesProcessor(options.stream?.attributeKeys);
+    if (options.attributeKeys !== undefined) {
+      attributesProcessor = new FilteringAttributesProcessor(options.attributeKeys);
     }
 
     const view = new View({
       name: options.name,
-      description: options.stream?.description,
-      aggregation: options.stream?.aggregation,
+      description: options.description,
+      aggregation: options.aggregation,
       attributesProcessor: attributesProcessor
     });
-    const instrument = new InstrumentSelector(options.instrument);
-    const meter = new MeterSelector(options.meter);
+    const instrument = new InstrumentSelector(selectorOptions?.instrument);
+    const meter = new MeterSelector(selectorOptions?.meter);
 
     this._sharedState.viewRegistry.addView(view, instrument, meter);
   }
