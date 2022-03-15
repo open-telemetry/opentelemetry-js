@@ -35,19 +35,19 @@ export function sdkSpanToOtlpSpan(
     endTimeUnixNano: hrTimeToNanoseconds(span.endTime),
     attributes: toAttributes(span.attributes),
     droppedAttributesCount: 0,
-    events: span.events.map(toSpanEvent),
+    events: span.events.map(toOtlpSpanEvent),
     droppedEventsCount: 0,
     status: {
       // API and proto enums share the same values
       code: status.code as unknown as EStatusCode,
       message: status.message,
     },
-    links: span.links.map(toLink),
+    links: span.links.map(toOtlpLink),
     droppedLinksCount: 0,
   };
 }
 
-export function toLink(link: Link): ILink {
+export function toOtlpLink(link: Link): ILink {
   return {
     attributes: link.attributes ? toAttributes(link.attributes) : [],
     spanId: link.context.spanId,
@@ -56,7 +56,7 @@ export function toLink(link: Link): ILink {
   };
 }
 
-export function toSpanEvent(
+export function toOtlpSpanEvent(
   timedEvent: TimedEvent
 ): IEvent {
   return {

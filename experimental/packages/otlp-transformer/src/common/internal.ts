@@ -36,7 +36,7 @@ export function toAnyValue(value: unknown): IAnyValue {
   const t = typeof value;
   if (t === 'string') return { stringValue: value as string };
   if (t === 'number') {
-    if (!Number.isInteger(value))return { doubleValue: value as number };
+    if (!Number.isInteger(value)) return { doubleValue: value as number };
     return { intValue: value as number };
   }
   if (t === 'boolean') return { boolValue: value as boolean };
