@@ -94,12 +94,16 @@ describe('MeterProvider', () => {
       const meterProvider = new MeterProvider({ resource: defaultResource });
 
       assert.throws(() => meterProvider.addView({
+        name: 'renamed-instrument'
+      }));
+
+      assert.throws(() => meterProvider.addView({
           name: 'renamed-instrument'
         },
         {}));
     });
 
-    it('with no parameters should throw', () => {
+    it('with no view parameters should throw', () => {
       const meterProvider = new MeterProvider({ resource: defaultResource });
 
       assert.throws(() => meterProvider.addView({}));
