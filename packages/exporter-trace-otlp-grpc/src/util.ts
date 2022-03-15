@@ -58,7 +58,7 @@ export function onInit<ExportItem, ServiceRequest>(
           new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(
             collector.url,
             credentials,
-            selectedCompressionAlgo,
+            options,
           );
       } else {
         collector.serviceClient =
