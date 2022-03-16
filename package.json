@@ -52,7 +52,6 @@
     "@types/mocha": "8.2.3",
     "@types/node": "16.11.21",
     "@types/webpack-env": "1.16.2",
-    "colors": "1.4.0",
     "gts": "3.1.0",
     "istanbul-instrumenter-loader": "3.0.1",
     "karma": "6.3.16",
