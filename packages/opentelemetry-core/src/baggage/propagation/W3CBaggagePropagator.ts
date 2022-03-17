@@ -59,7 +59,7 @@ export class W3CBaggagePropagator implements TextMapPropagator {
 
   extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
     const headerValue = getter.get(carrier, BAGGAGE_HEADER);
-    const baggageString = Array.isArray(headerValue) ? headerValue.join(',') : headerValue;
+    const baggageString = Array.isArray(headerValue) ? headerValue.join(BAGGAGE_ITEMS_SEPARATOR) : headerValue;
     if (!baggageString) return context;
     const baggage: Record<string, BaggageEntry> = {};
     if (baggageString.length === 0) {
