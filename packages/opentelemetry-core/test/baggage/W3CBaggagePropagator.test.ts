@@ -208,6 +208,19 @@ describe('W3CBaggagePropagator', () => {
 
       assert.deepStrictEqual(extractedBaggage, expected);
     });
+
+    it('should extract context of a sampled span when the headerValue comes as array with multiple items', () => {
+      carrier[BAGGAGE_HEADER] = ['key1=d4cda95b,key3=c88815a7, keyn   = valn', 'keym =valm'];
+      const extractedBaggage = propagation.getBaggage(
+        httpBaggagePropagator.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        )
+      );
+
+      assert.deepStrictEqual(extractedBaggage, expected);
+    });
   });
 
   describe('fields()', () => {
