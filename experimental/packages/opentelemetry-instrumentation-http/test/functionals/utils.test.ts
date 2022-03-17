@@ -259,7 +259,7 @@ describe('Utility', () => {
       );
       /* tslint:disable-next-line:no-any */
       utils.setSpanWithError(span, new Error('error'), SpanStatusCode.UNSET);
-      assert.strictEqual(span.status, SpanStatusCode.UNSET);
+      assert.strictEqual(span.status.code, SpanStatusCode.UNSET);
     });
   });
 
