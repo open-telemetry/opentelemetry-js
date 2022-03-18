@@ -18,11 +18,12 @@ import { HrTime } from '@opentelemetry/api';
 import { ObservableCallback } from '@opentelemetry/api-metrics-wip';
 import { Accumulation, Aggregator } from '../aggregator/types';
 import { View } from '../view/View';
-import { createInstrumentDescriptorWithView, InstrumentDescriptor } from '../InstrumentDescriptor';
+import {
+  createInstrumentDescriptorWithView,
+  InstrumentDescriptor
+} from '../InstrumentDescriptor';
 import { AttributesProcessor } from '../view/AttributesProcessor';
 import { MetricStorage } from './MetricStorage';
-import { InstrumentationLibrary } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
 import { MetricData } from '../export/MetricData';
 import { DeltaMetricProcessor } from './DeltaMetricProcessor';
 import { TemporalMetricProcessor } from './TemporalMetricProcessor';
@@ -36,16 +37,17 @@ import { AttributeHashMap } from './HashMap';
  *
  * Stores and aggregates {@link MetricData} for asynchronous instruments.
  */
-export class AsyncMetricStorage<T extends Maybe<Accumulation>> implements MetricStorage {
+export class AsyncMetricStorage<T extends Maybe<Accumulation>> extends MetricStorage {
   private _deltaMetricStorage: DeltaMetricProcessor<T>;
   private _temporalMetricStorage: TemporalMetricProcessor<T>;
 
   constructor(
-    private _instrumentDescriptor: InstrumentDescriptor,
+    _instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<T>,
     private _attributesProcessor: AttributesProcessor,
     private _callback: ObservableCallback
   ) {
+    super(_instrumentDescriptor);
     this._deltaMetricStorage = new DeltaMetricProcessor(aggregator);
     this._temporalMetricStorage = new TemporalMetricProcessor(aggregator);
   }
@@ -68,8 +70,6 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>> implements Metric
   async collect(
     collector: MetricCollectorHandle,
     collectors: MetricCollectorHandle[],
-    resource: Resource,
-    instrumentationLibrary: InstrumentationLibrary,
     sdkStartTime: HrTime,
     collectionTime: HrTime,
   ): Promise<Maybe<MetricData>> {
@@ -83,8 +83,6 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>> implements Metric
     return this._temporalMetricStorage.buildMetrics(
       collector,
       collectors,
-      resource,
-      instrumentationLibrary,
       this._instrumentDescriptor,
       accumulations,
       sdkStartTime,

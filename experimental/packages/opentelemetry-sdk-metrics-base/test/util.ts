@@ -57,18 +57,10 @@ export function assertMetricData(
   actual: unknown,
   pointDataType?: PointDataType,
   instrumentDescriptor: Partial<InstrumentDescriptor> | null = defaultInstrumentDescriptor,
-  instrumentationLibrary: Partial<InstrumentationLibrary> | null = defaultInstrumentationLibrary,
-  resource: Resource | null = defaultResource,
 ): asserts actual is MetricData {
   const it = actual as MetricData;
-  if (resource != null) {
-    assert.deepStrictEqual(it.resource, resource);
-  }
   if (instrumentDescriptor != null) {
     assertPartialDeepStrictEqual(it.instrumentDescriptor, instrumentDescriptor);
-  }
-  if (instrumentationLibrary != null) {
-    assertPartialDeepStrictEqual(it.instrumentationLibrary, instrumentationLibrary);
   }
   if (isNotNullish(pointDataType)) {
     assert.strictEqual(it.pointDataType, pointDataType);

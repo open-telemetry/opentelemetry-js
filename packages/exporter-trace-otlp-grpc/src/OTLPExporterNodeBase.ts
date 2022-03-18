@@ -75,7 +75,6 @@ export abstract class OTLPExporterNodeBase<
   }
 
   onInit(config: OTLPExporterConfigNode): void {
-    this._isShutdown = false;
     // defer to next tick and lazy load to avoid loading grpc too early
     // and making this impossible to be instrumented
     setImmediate(() => {
@@ -90,7 +89,7 @@ export abstract class OTLPExporterNodeBase<
     onSuccess: () => void,
     onError: (error: otlpTypes.OTLPExporterError) => void
   ): void {
-    if (this._isShutdown) {
+    if (this._shutdownOnce.isCalled) {
       diag.debug('Shutdown already started. Cannot send objects');
       return;
     }
@@ -110,7 +109,6 @@ export abstract class OTLPExporterNodeBase<
   }
 
   onShutdown(): void {
-    this._isShutdown = true;
     if (this.serviceClient) {
       this.serviceClient.close();
     }

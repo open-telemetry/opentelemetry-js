@@ -17,8 +17,9 @@
 import * as api from '@opentelemetry/api';
 import { AggregationTemporality } from './AggregationTemporality';
 import { MetricProducer } from './MetricProducer';
-import { MetricData } from './MetricData';
-import { callWithTimeout } from '../utils';
+import { ResourceMetrics } from './MetricData';
+import { callWithTimeout, Maybe } from '../utils';
+
 
 export type ReaderOptions = {
   timeoutMillis?: number
@@ -91,7 +92,7 @@ export abstract class MetricReader {
   /**
    * Collect all metrics from the associated {@link MetricProducer}
    */
-  async collect(options?: ReaderCollectionOptions): Promise<MetricData[]> {
+  async collect(options?: ReaderCollectionOptions): Promise<Maybe<ResourceMetrics>> {
     if (this._metricProducer === undefined) {
       throw new Error('MetricReader is not bound to a MetricProducer');
     }
@@ -99,7 +100,7 @@ export abstract class MetricReader {
     // Subsequent invocations to collect are not allowed. SDKs SHOULD return some failure for these calls.
     if (this._shutdown) {
       api.diag.warn('Collection is not allowed after shutdown');
-      return [];
+      return undefined;
     }
 
     // No timeout if timeoutMillis is undefined or null.

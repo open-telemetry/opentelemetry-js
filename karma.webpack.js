@@ -22,7 +22,7 @@ module.exports = {
   target: 'web',
   output: { filename: 'bundle.js' },
   resolve: { extensions: ['.ts', '.js'] },
-  devtool: 'inline-source-map',
+  devtool: 'eval-source-map',
   module: {
     rules: [
       { test: /\.ts$/, use: 'ts-loader' },
