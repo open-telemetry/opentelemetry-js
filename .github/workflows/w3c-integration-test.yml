@@ -21,7 +21,6 @@ jobs:
           path: |
             package-lock.json
             packages/*/package-lock.json
-            benchmark/*/package-lock.json
             metapackages/*/package-lock.json
             packages/*/package-lock.json
             integration-tests/*/package-lock.json
