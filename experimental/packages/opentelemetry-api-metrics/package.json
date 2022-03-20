@@ -15,7 +15,7 @@
   },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
-    "publishOnly": "npm run compile",
+    "prepublishOnly": "npm run compile",
     "compile": "tsc --build tsconfig.all.json",
     "clean": "tsc --build --clean tsconfig.all.json",
     "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",

@@ -26,7 +26,7 @@
     "node": ">=8.5.0"
   },
   "scripts": {
-    "publishOnly": "npm run compile",
+    "prepublishOnly": "npm run compile",
     "compile": "tsc --build",
     "version": "node ../../scripts/version-update.js",
     "clean": "tsc --build --clean",
