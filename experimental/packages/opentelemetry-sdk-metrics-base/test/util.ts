@@ -18,9 +18,15 @@ import { Attributes, ValueType } from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
-import { InstrumentDescriptor, InstrumentType } from '../src/InstrumentDescriptor';
-import { Histogram } from '../src/Instruments';
-import { MetricData, PointData, PointDataType } from '../src/export/MetricData';
+import {
+  InstrumentDescriptor,
+  InstrumentType,
+  Histogram,
+  MetricData,
+  PointData,
+  PointDataType,
+  InstrumentationLibraryMetrics
+} from '../src';
 import { Measurement } from '../src/Measurement';
 import { isNotNullish } from '../src/utils';
 import { HrTime } from '@opentelemetry/api';
@@ -44,14 +50,23 @@ export const defaultInstrumentationLibrary: InstrumentationLibrary = {
 };
 
 export const commonValues: number[] = [1, -1, 1.0, Infinity, -Infinity, NaN];
-export const commonAttributes: Attributes[] = [{}, {1: '1'}, {a: '2'}, new (class Foo{
-a = '1';
+export const commonAttributes: Attributes[] = [{}, { 1: '1' }, { a: '2' }, new (class Foo {
+  a = '1';
 })];
 
 export const sleep = (time: number) =>
   new Promise(resolve => {
     return setTimeout(resolve, time);
   });
+
+export function assertInstrumentationLibraryMetrics(
+  actual: unknown,
+  instrumentationLibrary: Partial<InstrumentationLibrary>
+): asserts actual is InstrumentationLibraryMetrics {
+  const it = actual as InstrumentationLibraryMetrics;
+  assertPartialDeepStrictEqual(it.instrumentationLibrary, instrumentationLibrary);
+  assert(Array.isArray(it.metrics));
+}
 
 export function assertMetricData(
   actual: unknown,

@@ -16,6 +16,7 @@
 
 export * from './export/AggregationTemporality';
 export * from './export/MetricData';
+export { MeterProvider, MeterProviderOptions } from './MeterProvider';
 export * from './export/MetricExporter';
 export * from './export/MetricProducer';
 export * from './export/MetricReader';
@@ -26,3 +27,4 @@ export * from './Meter';
 export * from './MeterProvider';
 export * from './ObservableResult';
 export { TimeoutError } from './utils';
+export { FilteringAttributesProcessor } from './view/AttributesProcessor';
