@@ -18,11 +18,11 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MeterProvider } from '../../src';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import { PointDataType, ResourceMetrics } from '../../src/export/MetricData';
+import { DataPointType, ResourceMetrics } from '../../src/export/MetricData';
 import { PushMetricExporter } from '../../src/export/MetricExporter';
 import { MeterProviderSharedState } from '../../src/state/MeterProviderSharedState';
 import { MetricCollector } from '../../src/state/MetricCollector';
-import { defaultInstrumentationLibrary, defaultResource, assertMetricData, assertPointData } from '../util';
+import { defaultInstrumentationLibrary, defaultResource, assertMetricData, assertDataPoint } from '../util';
 import { TestMetricReader } from '../export/TestMetricReader';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 
@@ -100,20 +100,20 @@ describe('MetricCollector', () => {
 
       /** checking batch[0] */
       const metricData1 = metrics[0];
-      assertMetricData(metricData1, PointDataType.SINGULAR, {
+      assertMetricData(metricData1, DataPointType.SINGULAR, {
         name: 'counter1'
       });
-      assert.strictEqual(metricData1.pointData.length, 2);
-      assertPointData(metricData1.pointData[0], {}, 1);
-      assertPointData(metricData1.pointData[1], { foo: 'bar' }, 2);
+      assert.strictEqual(metricData1.dataPoints.length, 2);
+      assertDataPoint(metricData1.dataPoints[0], {}, 1);
+      assertDataPoint(metricData1.dataPoints[1], { foo: 'bar' }, 2);
 
       /** checking batch[1] */
       const metricData2 = metrics[1];
-      assertMetricData(metricData2, PointDataType.SINGULAR, {
+      assertMetricData(metricData2, DataPointType.SINGULAR, {
         name: 'counter2'
       });
-      assert.strictEqual(metricData2.pointData.length, 1);
-      assertPointData(metricData2.pointData[0], {}, 3);
+      assert.strictEqual(metricData2.dataPoints.length, 1);
+      assertDataPoint(metricData2.dataPoints[0], {}, 3);
     });
   });
 });

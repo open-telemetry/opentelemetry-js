@@ -17,7 +17,7 @@
 import * as metrics from '@opentelemetry/api-metrics-wip';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { createInstrumentDescriptor, InstrumentDescriptor, InstrumentType } from './InstrumentDescriptor';
-import { Counter, Histogram, UpDownCounter } from './Instruments';
+import { CounterInstrument, HistogramInstrument, UpDownCounterInstrument } from './Instruments';
 import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { MultiMetricStorage } from './state/MultiWritableMetricStorage';
 import { SyncMetricStorage } from './state/SyncMetricStorage';
@@ -45,7 +45,7 @@ export class Meter implements metrics.Meter {
   createHistogram(name: string, options?: metrics.HistogramOptions): metrics.Histogram {
     const descriptor = createInstrumentDescriptor(name, InstrumentType.HISTOGRAM, options);
     const storage = this._registerMetricStorage(descriptor);
-    return new Histogram(storage, descriptor);
+    return new HistogramInstrument(storage, descriptor);
   }
 
   /**
@@ -54,7 +54,7 @@ export class Meter implements metrics.Meter {
   createCounter(name: string, options?: metrics.CounterOptions): metrics.Counter {
     const descriptor = createInstrumentDescriptor(name, InstrumentType.COUNTER, options);
     const storage = this._registerMetricStorage(descriptor);
-    return new Counter(storage, descriptor);
+    return new CounterInstrument(storage, descriptor);
   }
 
   /**
@@ -63,7 +63,7 @@ export class Meter implements metrics.Meter {
   createUpDownCounter(name: string, options?: metrics.UpDownCounterOptions): metrics.UpDownCounter {
     const descriptor = createInstrumentDescriptor(name, InstrumentType.UP_DOWN_COUNTER, options);
     const storage = this._registerMetricStorage(descriptor);
-    return new UpDownCounter(storage, descriptor);
+    return new UpDownCounterInstrument(storage, descriptor);
   }
 
   /**
