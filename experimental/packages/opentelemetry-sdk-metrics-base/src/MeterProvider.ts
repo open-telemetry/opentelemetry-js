@@ -24,6 +24,10 @@ import { InstrumentSelector } from './view/InstrumentSelector';
 import { MeterSelector } from './view/MeterSelector';
 import { View } from './view/View';
 import { MetricCollector } from './state/MetricCollector';
+import { Aggregation } from './view/Aggregation';
+import { FilteringAttributesProcessor } from './view/AttributesProcessor';
+import { InstrumentType } from './InstrumentDescriptor';
+import { PatternPredicate } from './view/Predicate';
 
 /**
  * MeterProviderOptions provides an interface for configuring a MeterProvider.
@@ -31,6 +35,62 @@ import { MetricCollector } from './state/MetricCollector';
 export interface MeterProviderOptions {
   /** Resource associated with metric telemetry  */
   resource?: Resource;
+}
+
+export type ViewOptions = {
+  /**
+   *  If not provided, the Instrument name will be used by default. This will be used as the name of the metrics stream.
+   */
+  name?: string,
+  /**
+   * If not provided, the Instrument description will be used by default.
+   */
+  description?: string,
+  /**
+   * If provided, the attributes that are not in the list will be ignored.
+   * If not provided, all the attribute keys will be used by default.
+   */
+  attributeKeys?: string[],
+  /**
+   * The {@link Aggregation} aggregation to be used.
+   */
+  aggregation?: Aggregation,
+
+  // TODO: Add ExemplarReservoir
+};
+
+export type SelectorOptions = {
+  instrument?: {
+    /**
+     * The type of the Instrument(s).
+     */
+    type?: InstrumentType,
+    /**
+     * Name of the Instrument(s) with wildcard support.
+     */
+    name?: string,
+  }
+  meter?: {
+    /**
+     * The name of the Meter.
+     */
+    name?: string;
+    /**
+     * The version of the Meter.
+     */
+    version?: string;
+    /**
+     * The schema URL of the Meter.
+     */
+    schemaUrl?: string;
+  }
+};
+
+function isViewOptionsEmpty(options: ViewOptions): boolean {
+  return (options.name == null &&
+    options.aggregation == null &&
+    options.attributeKeys == null &&
+    options.description == null);
 }
 
 /**
@@ -50,8 +110,8 @@ export class MeterProvider implements metrics.MeterProvider {
   getMeter(name: string, version = '', options: metrics.MeterOptions = {}): metrics.Meter {
     // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#meter-creation
     if (this._shutdown) {
-        api.diag.warn('A shutdown MeterProvider cannot provide a Meter');
-        return metrics.NOOP_METER;
+      api.diag.warn('A shutdown MeterProvider cannot provide a Meter');
+      return metrics.NOOP_METER;
     }
 
     return new Meter(this._sharedState, { name, version, schemaUrl: options.schemaUrl });
@@ -69,9 +129,35 @@ export class MeterProvider implements metrics.MeterProvider {
     this._sharedState.metricCollectors.push(collector);
   }
 
-  addView(view: View, instrumentSelector: InstrumentSelector, meterSelector: MeterSelector) {
-    // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#view
-    this._sharedState.viewRegistry.addView(view, instrumentSelector, meterSelector);
+  addView(options: ViewOptions, selectorOptions?: SelectorOptions) {
+    if (isViewOptionsEmpty(options)) {
+      throw new Error('Cannot create view with no view arguments supplied');
+    }
+
+    // the SDK SHOULD NOT allow Views with a specified name to be declared with instrument selectors that
+    // may select more than one instrument (e.g. wild card instrument name) in the same Meter.
+    if (options.name != null &&
+      (selectorOptions?.instrument?.name == null ||
+        PatternPredicate.hasWildcard(selectorOptions.instrument.name))) {
+      throw new Error('Views with a specified name must be declared with an instrument selector that selects at most one instrument per meter.');
+    }
+
+    // Create AttributesProcessor if attributeKeys are defined set.
+    let attributesProcessor = undefined;
+    if (options.attributeKeys != null) {
+      attributesProcessor = new FilteringAttributesProcessor(options.attributeKeys);
+    }
+
+    const view = new View({
+      name: options.name,
+      description: options.description,
+      aggregation: options.aggregation,
+      attributesProcessor: attributesProcessor
+    });
+    const instrument = new InstrumentSelector(selectorOptions?.instrument);
+    const meter = new MeterSelector(selectorOptions?.meter);
+
+    this._sharedState.viewRegistry.addView(view, instrument, meter);
   }
 
   /**

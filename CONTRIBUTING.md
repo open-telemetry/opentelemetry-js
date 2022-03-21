@@ -207,9 +207,3 @@ If all of the above requirements are met and there are no unresolved discussions
 
 - Generate and export your [Github access token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token): `export GITHUB_AUTH=<your_token>`
 - `npm run changelog` to generate CHANGELOG documentation in your terminal (see [RELEASING.md](RELEASING.md) for more details).
-
-### Benchmarks
-
-When two or more approaches must be compared, please write a benchmark in the benchmark/index.js module so that we can keep track of the most efficient algorithm.
-
-- `npm run bench` to run your benchmark.
