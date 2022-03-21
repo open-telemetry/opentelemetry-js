@@ -106,15 +106,13 @@ export interface Aggregator<T> {
   /**
    * Returns the {@link MetricData} that this {@link Aggregator} will produce.
    *
-   * @param resource the resource producing the metric.
-   * @param instrumentationLibrary the library that instrumented the metric
-   * @param instrumentDescriptor the metric instrument descriptor.
+   * @param descriptor the metric instrument descriptor.
    * @param accumulationByAttributes the array of attributes and accumulation pairs.
    * @param startTime the start time of the metric data.
    * @param endTime the end time of the metric data.
    * @return the {@link MetricData} that this {@link Aggregator} will produce.
    */
-  toMetricData(instrumentDescriptor: InstrumentDescriptor,
+  toMetricData(descriptor: InstrumentDescriptor,
     accumulationByAttributes: AccumulationRecord<T>[],
     startTime: HrTime,
     endTime: HrTime): Maybe<MetricData>;
