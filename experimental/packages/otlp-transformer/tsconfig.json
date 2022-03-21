@@ -2,15 +2,10 @@
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": ".",
-    "outDir": "build",
-    "noImplicitOverride": false,
-    "noUnusedLocals": false,
-    "allowJs": true
+    "outDir": "build"
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.js",
     "test/**/*.ts"
-  ],
-  "references": []
+  ]
 }
