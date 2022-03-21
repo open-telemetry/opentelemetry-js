@@ -83,9 +83,14 @@ export class LastValueAggregation extends Aggregation {
  * The default histogram aggregation.
  */
 export class HistogramAggregation extends Aggregation {
-  private static DEFAULT_INSTANCE = new HistogramAggregator([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]);
+  private DEFAULT_INSTANCE: HistogramAggregator;
+  constructor(boundaries: number[] = [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]) {
+    super();
+    this.DEFAULT_INSTANCE = new HistogramAggregator(boundaries);
+  }
+
   createAggregator(_instrument: InstrumentDescriptor) {
-    return HistogramAggregation.DEFAULT_INSTANCE;
+    return this.DEFAULT_INSTANCE;
   }
 }
 

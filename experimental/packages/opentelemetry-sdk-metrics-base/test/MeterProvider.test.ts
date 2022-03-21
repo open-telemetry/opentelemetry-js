@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import { NOOP_METER } from '@opentelemetry/api-metrics-wip';
-import { Meter, MeterProvider, InstrumentType, PointDataType } from '../src';
+import { Meter, MeterProvider, InstrumentType, DataPointType } from '../src';
 import {
   assertInstrumentationLibraryMetrics,
   assertMetricData,
@@ -147,24 +147,24 @@ describe('MeterProvider', () => {
       assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics.length, 1);
 
       // View updated name and description.
-      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], PointDataType.SINGULAR, {
+      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], DataPointType.SINGULAR, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER,
         description: 'my renamed instrument'
       });
 
-      // Only one PointData added.
-      assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics[0].pointData.length, 1);
+      // Only one DataPoint added.
+      assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics[0].dataPoints.length, 1);
 
-      // PointData matches attributes and point.
-      assertPartialDeepStrictEqual(result?.instrumentationLibraryMetrics[0].metrics[0].pointData[0], {
+      // DataPoint matches attributes and point.
+      assertPartialDeepStrictEqual(result?.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0], {
         // Attributes are still there.
         attributes: {
           attrib1: 'attrib_value1',
           attrib2: 'attrib_value2'
         },
         // Value that has been added to the counter.
-        point: 1
+        value: 1
       });
     });
 
@@ -205,22 +205,22 @@ describe('MeterProvider', () => {
       assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics.length, 1);
 
       // View updated name and description.
-      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], PointDataType.SINGULAR, {
+      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], DataPointType.SINGULAR, {
         name: 'non-renamed-instrument',
         type: InstrumentType.COUNTER,
       });
 
-      // Only one PointData added.
-      assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics[0].pointData.length, 1);
+      // Only one DataPoint added.
+      assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics[0].dataPoints.length, 1);
 
-      // PointData matches attributes and point.
-      assertPartialDeepStrictEqual(result?.instrumentationLibraryMetrics[0].metrics[0].pointData[0], {
+      // DataPoint matches attributes and point.
+      assertPartialDeepStrictEqual(result?.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0], {
         // 'attrib_1' is still here but 'attrib_2' is not.
         attributes: {
           attrib1: 'attrib_value1'
         },
         // Value that has been added to the counter.
-        point: 1
+        value: 1
       });
     });
 
@@ -268,7 +268,7 @@ describe('MeterProvider', () => {
       assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics.length, 1);
 
       // View updated the name to 'renamed-instrument' and instrument is still a Counter
-      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], PointDataType.SINGULAR, {
+      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], DataPointType.SINGULAR, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER,
       });
@@ -283,7 +283,7 @@ describe('MeterProvider', () => {
       assert.strictEqual(result?.instrumentationLibraryMetrics[1].metrics.length, 1);
 
       // View updated the name to 'renamed-instrument' and instrument is still a Counter
-      assertMetricData(result?.instrumentationLibraryMetrics[1].metrics[0], PointDataType.SINGULAR, {
+      assertMetricData(result?.instrumentationLibraryMetrics[1].metrics[0], DataPointType.SINGULAR, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER
       });
@@ -336,7 +336,7 @@ describe('MeterProvider', () => {
       assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics.length, 1);
 
       // View updated the name to 'renamed-instrument' and instrument is still a Counter
-      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], PointDataType.SINGULAR, {
+      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], DataPointType.SINGULAR, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER
       });
@@ -351,7 +351,7 @@ describe('MeterProvider', () => {
       assert.strictEqual(result?.instrumentationLibraryMetrics[1].metrics.length, 1);
 
       // No updated name on 'test-counter'.
-      assertMetricData(result?.instrumentationLibraryMetrics[1].metrics[0], PointDataType.SINGULAR, {
+      assertMetricData(result?.instrumentationLibraryMetrics[1].metrics[0], DataPointType.SINGULAR, {
         name: 'test-counter',
         type: InstrumentType.COUNTER
       });
@@ -412,11 +412,11 @@ describe('MeterProvider', () => {
       assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics.length, 2);
 
       // Both 'renamed-instrument' are still exported with their types.
-      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], PointDataType.SINGULAR, {
+      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], DataPointType.SINGULAR, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER
       });
-      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[1], PointDataType.HISTOGRAM, {
+      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[1], DataPointType.HISTOGRAM, {
         name: 'renamed-instrument',
         type: InstrumentType.HISTOGRAM
       });

@@ -19,11 +19,11 @@ import { hrTime } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { SumAggregator } from '../../src/aggregator';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import { PointDataType } from '../../src/export/MetricData';
+import { DataPointType } from '../../src/export/MetricData';
 import { DeltaMetricProcessor } from '../../src/state/DeltaMetricProcessor';
 import { MetricCollectorHandle } from '../../src/state/MetricCollector';
 import { TemporalMetricProcessor } from '../../src/state/TemporalMetricProcessor';
-import { assertMetricData, assertPointData, defaultInstrumentDescriptor } from '../util';
+import { assertMetricData, assertDataPoint, defaultInstrumentDescriptor } from '../util';
 
 const deltaCollector1: MetricCollectorHandle = {
   aggregatorTemporality: AggregationTemporality.DELTA,
@@ -59,9 +59,9 @@ describe('TemporalMetricProcessor', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 1);
-          assertPointData(metric.pointData[0], {}, 1);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 1);
+          assertDataPoint(metric.dataPoints[0], {}, 1);
         }
 
         deltaMetricStorage.record(2, {}, api.context.active());
@@ -74,9 +74,9 @@ describe('TemporalMetricProcessor', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 1);
-          assertPointData(metric.pointData[0], {}, 2);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 1);
+          assertDataPoint(metric.dataPoints[0], {}, 2);
         }
 
         {
@@ -88,8 +88,8 @@ describe('TemporalMetricProcessor', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 0);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 0);
         }
       });
     });
@@ -112,9 +112,9 @@ describe('TemporalMetricProcessor', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 1);
-          assertPointData(metric.pointData[0], {}, 1);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 1);
+          assertDataPoint(metric.dataPoints[0], {}, 1);
         }
 
         {
@@ -126,9 +126,9 @@ describe('TemporalMetricProcessor', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 1);
-          assertPointData(metric.pointData[0], {}, 1);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 1);
+          assertDataPoint(metric.dataPoints[0], {}, 1);
         }
       });
     });
@@ -150,9 +150,9 @@ describe('TemporalMetricProcessor', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 1);
-          assertPointData(metric.pointData[0], {}, 1);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 1);
+          assertDataPoint(metric.dataPoints[0], {}, 1);
         }
 
         deltaMetricStorage.record(2, {}, api.context.active());
@@ -165,9 +165,9 @@ describe('TemporalMetricProcessor', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 1);
-          assertPointData(metric.pointData[0], {}, 3);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 1);
+          assertDataPoint(metric.dataPoints[0], {}, 3);
         }
       });
     });
@@ -189,9 +189,9 @@ describe('TemporalMetricProcessor', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 1);
-          assertPointData(metric.pointData[0], {}, 1);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 1);
+          assertDataPoint(metric.dataPoints[0], {}, 1);
         }
 
         deltaMetricStorage.record(2, {}, api.context.active());
@@ -204,9 +204,9 @@ describe('TemporalMetricProcessor', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 1);
-          assertPointData(metric.pointData[0], {}, 3);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 1);
+          assertDataPoint(metric.dataPoints[0], {}, 3);
         }
         {
           const metric = temporalMetricStorage.buildMetrics(
@@ -217,9 +217,9 @@ describe('TemporalMetricProcessor', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 1);
-          assertPointData(metric.pointData[0], {}, 3);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 1);
+          assertDataPoint(metric.dataPoints[0], {}, 3);
         }
       });
     });

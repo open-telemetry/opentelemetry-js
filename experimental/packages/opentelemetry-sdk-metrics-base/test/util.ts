@@ -18,18 +18,17 @@ import { Attributes, ValueType } from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
+import { InstrumentDescriptor, InstrumentType } from '../src/InstrumentDescriptor';
 import {
-  InstrumentDescriptor,
-  InstrumentType,
-  Histogram,
   MetricData,
-  PointData,
-  PointDataType,
+  DataPoint,
+  DataPointType,
   InstrumentationLibraryMetrics
-} from '../src';
+} from '../src/export/MetricData';
 import { Measurement } from '../src/Measurement';
 import { isNotNullish } from '../src/utils';
 import { HrTime } from '@opentelemetry/api';
+import { Histogram } from '../src/aggregator/types';
 
 export const defaultResource = new Resource({
   resourceKey: 'my-resource',
@@ -70,31 +69,31 @@ export function assertInstrumentationLibraryMetrics(
 
 export function assertMetricData(
   actual: unknown,
-  pointDataType?: PointDataType,
+  dataPointType?: DataPointType,
   instrumentDescriptor: Partial<InstrumentDescriptor> | null = defaultInstrumentDescriptor,
 ): asserts actual is MetricData {
   const it = actual as MetricData;
   if (instrumentDescriptor != null) {
-    assertPartialDeepStrictEqual(it.instrumentDescriptor, instrumentDescriptor);
+    assertPartialDeepStrictEqual(it.descriptor, instrumentDescriptor);
   }
-  if (isNotNullish(pointDataType)) {
-    assert.strictEqual(it.pointDataType, pointDataType);
+  if (isNotNullish(dataPointType)) {
+    assert.strictEqual(it.dataPointType, dataPointType);
   } else {
-    assert(isNotNullish(PointDataType[it.pointDataType]));
+    assert(isNotNullish(DataPointType[it.dataPointType]));
   }
-  assert(Array.isArray(it.pointData));
+  assert(Array.isArray(it.dataPoints));
 }
 
-export function assertPointData(
+export function assertDataPoint(
   actual: unknown,
   attributes: Attributes,
   point: Histogram | number,
   startTime?: HrTime,
   endTime?: HrTime,
-): asserts actual is PointData<unknown> {
-  const it = actual as PointData<unknown>;
+): asserts actual is DataPoint<unknown> {
+  const it = actual as DataPoint<unknown>;
   assert.deepStrictEqual(it.attributes, attributes);
-  assert.deepStrictEqual(it.point, point);
+  assert.deepStrictEqual(it.value, point);
   if (startTime) {
     assert.deepStrictEqual(it.startTime, startTime);
   } else {
