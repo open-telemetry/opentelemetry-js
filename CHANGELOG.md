@@ -24,6 +24,11 @@ All notable changes to this project will be documented in this file.
 * [#2725](https://github.com/open-telemetry/opentelemetry-js/pull/2725) feat(sdk-metrics-base): document and export basic APIs ([@legendecas](https://github.com/legendecas))
 * [#2712](https://github.com/open-telemetry/opentelemetry-js/pull/2712) docs(api-metrics): add notes on ObservableResult.observe ([@legendecas](https://github.com/legendecas))
 
+
+### Other
+
+* [#2847](https://github.com/open-telemetry/opentelemetry-js/pull/2847) chore: require changelog entry to merge PR ([@dylaan](https://github.com/dyladan))
+
 ## 1.1.0
 
 ### :boom: Breaking Change
