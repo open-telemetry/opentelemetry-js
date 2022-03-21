@@ -61,7 +61,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.16.0",
-    "@opentelemetry/api": "^1.0.3",
+    "@opentelemetry/api": "^1.0.0",
     "@types/mocha": "8.2.3",
     "@types/node": "14.17.33",
     "@types/sinon": "10.0.6",
@@ -88,13 +88,13 @@
     "webpack-merge": "5.8.0"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^1.0.3"
+    "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
     "@opentelemetry/api-metrics": "0.27.0",
-    "@opentelemetry/core": "1.0.1",
+    "@opentelemetry/core": "^1.0.0",
     "@opentelemetry/exporter-trace-otlp-http": "0.27.0",
-    "@opentelemetry/resources": "1.0.1",
+    "@opentelemetry/resources": "^1.0.0",
     "@opentelemetry/sdk-metrics-base": "0.27.0"
   }
 }
