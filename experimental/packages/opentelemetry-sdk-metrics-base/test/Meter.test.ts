@@ -16,7 +16,7 @@
 
 import { ObservableCallback } from '@opentelemetry/api-metrics-wip';
 import * as assert from 'assert';
-import { Counter, Histogram, UpDownCounter } from '../src/Instruments';
+import { CounterInstrument, HistogramInstrument, UpDownCounterInstrument } from '../src/Instruments';
 import { Meter } from '../src/Meter';
 import { MeterProviderSharedState } from '../src/state/MeterProviderSharedState';
 import { defaultInstrumentationLibrary, defaultResource } from './util';
@@ -28,7 +28,7 @@ describe('Meter', () => {
     it('should create counter', () => {
       const meter = new Meter(new MeterProviderSharedState(defaultResource), defaultInstrumentationLibrary);
       const counter = meter.createCounter('foobar');
-      assert(counter instanceof Counter);
+      assert(counter instanceof CounterInstrument);
     });
   });
 
@@ -36,7 +36,7 @@ describe('Meter', () => {
     it('should create up down counter', () => {
       const meter = new Meter(new MeterProviderSharedState(defaultResource), defaultInstrumentationLibrary);
       const counter = meter.createUpDownCounter('foobar');
-      assert(counter instanceof UpDownCounter);
+      assert(counter instanceof UpDownCounterInstrument);
     });
   });
 
@@ -44,7 +44,7 @@ describe('Meter', () => {
     it('should create histogram', () => {
       const meter = new Meter(new MeterProviderSharedState(defaultResource), defaultInstrumentationLibrary);
       const counter = meter.createHistogram('foobar');
-      assert(counter instanceof Histogram);
+      assert(counter instanceof HistogramInstrument);
     });
   });
 

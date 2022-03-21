@@ -26,6 +26,10 @@ import { getConflictResolutionRecipe, getIncompatibilityDetails } from '../view/
 export class MetricStorageRegistry {
   private readonly _metricStorageRegistry = new Map<string, MetricStorage[]>();
 
+  static create(){
+    return new MetricStorageRegistry();
+  }
+
   getStorages(): MetricStorage[] {
     let storages: MetricStorage[] = [];
     for (const metricStorages of this._metricStorageRegistry.values()) {
