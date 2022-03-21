@@ -25,7 +25,6 @@ All notable changes to this project will be documented in this file.
 * [#2712](https://github.com/open-telemetry/opentelemetry-js/pull/2712) docs(api-metrics): add notes on ObservableResult.observe ([@legendecas](https://github.com/legendecas))
 * [#2695](https://github.com/open-telemetry/opentelemetry-js/pull/2695) refactor: unifying shutdown once with BindOnceFuture ([@legendecas](https://github.com/legendecas))
 
-
 ## 1.1.0
 
 ### :rocket: (Enhancement)
