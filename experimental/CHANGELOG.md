@@ -23,6 +23,8 @@ All notable changes to experimental packages in this project will be documented 
 * [#2733](https://github.com/open-telemetry/opentelemetry-js/pull/2733) feat(views): add FilteringAttributesProcessor ([@pichlermarc](https://github.com/pichlermarc))
 * [#2681](https://github.com/open-telemetry/opentelemetry-js/pull/2681) feat(metric-reader): add metric-reader ([@pichlermarc](https://github.com/pichlermarc))
 * [#2725](https://github.com/open-telemetry/opentelemetry-js/pull/2725) feat(sdk-metrics-base): document and export basic APIs ([@legendecas](https://github.com/legendecas))
+* [#2820](https://github.com/open-telemetry/opentelemetry-js/pull/2820) feat(views): Update addView() to disallow named views that select more than one instrument. ([@pichlermarc](https://github.com/pichlermarc))
+* [#2829](https://github.com/open-telemetry/opentelemetry-js/pull/2829) feat(sdk-metrics-base): update exporting names ([@legendecas](https://github.com/legendecas))
 
 ### :bug: (Bug Fix)
 
