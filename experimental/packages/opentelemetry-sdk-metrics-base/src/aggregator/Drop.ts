@@ -41,7 +41,7 @@ export class DropAggregator implements Aggregator<undefined> {
   }
 
   toMetricData(
-    _instrumentDescriptor: InstrumentDescriptor,
+    _descriptor: InstrumentDescriptor,
     _accumulationByAttributes: AccumulationRecord<undefined>[],
     _startTime: HrTime,
     _endTime: HrTime): Maybe<MetricData> {

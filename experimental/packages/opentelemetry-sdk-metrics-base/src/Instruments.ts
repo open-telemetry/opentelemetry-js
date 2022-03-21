@@ -40,7 +40,7 @@ export class SyncInstrument {
 /**
  * The class implements {@link metrics.UpDownCounter} interface.
  */
-export class UpDownCounter extends SyncInstrument implements metrics.UpDownCounter {
+export class UpDownCounterInstrument extends SyncInstrument implements metrics.UpDownCounter {
   /**
    * Increment value of counter by the input. Inputs may be negative.
    */
@@ -52,7 +52,7 @@ export class UpDownCounter extends SyncInstrument implements metrics.UpDownCount
 /**
  * The class implements {@link metrics.Counter} interface.
  */
-export class Counter extends SyncInstrument implements metrics.Counter {
+export class CounterInstrument extends SyncInstrument implements metrics.Counter {
   /**
    * Increment value of counter by the input. Inputs may not be negative.
    */
@@ -69,7 +69,7 @@ export class Counter extends SyncInstrument implements metrics.Counter {
 /**
  * The class implements {@link metrics.Histogram} interface.
  */
-export class Histogram extends SyncInstrument implements metrics.Histogram {
+export class HistogramInstrument extends SyncInstrument implements metrics.Histogram {
   /**
    * Records a measurement. Value of the measurement must not be negative.
    */
