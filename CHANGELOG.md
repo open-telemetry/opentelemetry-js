@@ -23,7 +23,6 @@ All notable changes to this project will be documented in this file.
 * [#2676](https://github.com/open-telemetry/opentelemetry-js/pull/2676) fix(sdk-metrics-base): remove aggregator.toMetricData dependency on AggregationTemporality ([@legendecas](https://github.com/legendecas))
 * [#2725](https://github.com/open-telemetry/opentelemetry-js/pull/2725) feat(sdk-metrics-base): document and export basic APIs ([@legendecas](https://github.com/legendecas))
 * [#2712](https://github.com/open-telemetry/opentelemetry-js/pull/2712) docs(api-metrics): add notes on ObservableResult.observe ([@legendecas](https://github.com/legendecas))
-* [#2695](https://github.com/open-telemetry/opentelemetry-js/pull/2695) refactor: unifying shutdown once with BindOnceFuture ([@legendecas](https://github.com/legendecas))
 
 ## 1.1.0
 
