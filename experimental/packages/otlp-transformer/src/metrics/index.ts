@@ -26,12 +26,12 @@ export function createExportMetricsServiceRequest(metricRecords: MetricRecord[],
   }
 
   return {
-    resourceMetrics: metricRecordsToResourceMetrics(metricRecords).map(({ resource, resourceMetrics, schemaUrl: resourceSchemaUrl }) => ({
+    resourceMetrics: metricRecordsToResourceMetrics(metricRecords).map(({ resource, resourceMetrics, resourceSchemaUrl }) => ({
       resource: {
         attributes: toAttributes(resource.attributes),
         droppedAttributesCount: 0,
       },
-      instrumentationLibraryMetrics: resourceMetrics.map(({ instrumentationLibrary, instrumentationLibraryMetrics, schemaUrl: librarySchemaUrl }) => ({
+      instrumentationLibraryMetrics: resourceMetrics.map(({ instrumentationLibrary, instrumentationLibraryMetrics, librarySchemaUrl }) => ({
         instrumentationLibrary: {
           name: instrumentationLibrary.name,
           version: instrumentationLibrary.version,
@@ -44,19 +44,19 @@ export function createExportMetricsServiceRequest(metricRecords: MetricRecord[],
   };
 }
 
-type ResourceMetrics = {
+type IntermediateResourceMetrics = {
   resource: Resource,
-  resourceMetrics: InstrumentationLibraryMetrics[],
-  schemaUrl?: string,
+  resourceMetrics: IntermediateInstrumentationLibraryMetrics[],
+  resourceSchemaUrl?: string,
 };
 
-type InstrumentationLibraryMetrics = {
+type IntermediateInstrumentationLibraryMetrics = {
   instrumentationLibrary: InstrumentationLibrary,
   instrumentationLibraryMetrics: MetricRecord[],
-  schemaUrl?: string,
+  librarySchemaUrl?: string,
 };
 
-function metricRecordsToResourceMetrics(metricRecords: MetricRecord[]): ResourceMetrics[] {
+function metricRecordsToResourceMetrics(metricRecords: MetricRecord[]): IntermediateResourceMetrics[] {
   const resourceMap: Map<Resource, Map<string, MetricRecord[]>> = new Map();
 
   for (const record of metricRecords) {
@@ -78,23 +78,24 @@ function metricRecordsToResourceMetrics(metricRecords: MetricRecord[]): Resource
     records.push(record);
   }
 
-  const out: ResourceMetrics[] = [];
+  const out: IntermediateResourceMetrics[] = [];
 
   const resourceMapEntryIterator = resourceMap.entries();
   let resourceMapEntry = resourceMapEntryIterator.next();
   while (!resourceMapEntry.done) {
     const [resource, ilmMap] = resourceMapEntry.value;
-    const resourceMetrics: InstrumentationLibraryMetrics[] = [];
+    const resourceMetrics: IntermediateInstrumentationLibraryMetrics[] = [];
     const ilmIterator = ilmMap.values();
     let ilmEntry = ilmIterator.next();
     while (!ilmEntry.done) {
       const instrumentationLibraryMetrics = ilmEntry.value;
       if (instrumentationLibraryMetrics.length > 0) {
         const lib = instrumentationLibraryMetrics[0].instrumentationLibrary;
-        resourceMetrics.push({ instrumentationLibrary: lib, instrumentationLibraryMetrics, schemaUrl: lib.schemaUrl });
+        resourceMetrics.push({ instrumentationLibrary: lib, instrumentationLibraryMetrics, librarySchemaUrl: lib.schemaUrl });
       }
       ilmEntry = ilmIterator.next();
     }
+    // TODO SDK types don't provide resource schema URL at this time
     out.push({ resource, resourceMetrics });
     resourceMapEntry = resourceMapEntryIterator.next();
   }

@@ -22,12 +22,12 @@ import { IExportTraceServiceRequest } from './types';
 
 export function createExportTraceServiceRequest(spans: ReadableSpan[]): IExportTraceServiceRequest | null {
   return {
-    resourceSpans: spanRecordsToResourceSpans(spans).map(({ resource, resourceSpans, schemaUrl: resourceSchemaUrl }) => ({
+    resourceSpans: spanRecordsToResourceSpans(spans).map(({ resource, resourceSpans, resourceSchemaUrl }) => ({
       resource: {
         attributes: toAttributes(resource.attributes),
         droppedAttributesCount: 0,
       },
-      instrumentationLibrarySpans: resourceSpans.map(({ instrumentationLibrary, instrumentationLibrarySpans, schemaUrl: librarySchemaUrl }) => ({
+      instrumentationLibrarySpans: resourceSpans.map(({ instrumentationLibrary, instrumentationLibrarySpans, librarySchemaUrl }) => ({
         instrumentationLibrary,
         spans: instrumentationLibrarySpans.map(sdkSpanToOtlpSpan),
         schemaUrl: librarySchemaUrl,
@@ -40,13 +40,13 @@ export function createExportTraceServiceRequest(spans: ReadableSpan[]): IExportT
 type ResourceSpans = {
   resource: Resource,
   resourceSpans: InstrumentationLibrarySpans[],
-  schemaUrl?: string,
+  resourceSchemaUrl?: string,
 };
 
 type InstrumentationLibrarySpans = {
   instrumentationLibrary: InstrumentationLibrary,
   instrumentationLibrarySpans: ReadableSpan[],
-  schemaUrl?: string,
+  librarySchemaUrl?: string,
 };
 
 function spanRecordsToResourceSpans(spans: ReadableSpan[]): ResourceSpans[] {
@@ -85,10 +85,11 @@ function spanRecordsToResourceSpans(spans: ReadableSpan[]): ResourceSpans[] {
       const instrumentationLibrarySpans = ilmEntry.value;
       if (instrumentationLibrarySpans.length > 0) {
         const { name, version, schemaUrl } = instrumentationLibrarySpans[0].instrumentationLibrary;
-        resourceSpans.push({ instrumentationLibrary: { name, version }, instrumentationLibrarySpans, schemaUrl });
+        resourceSpans.push({ instrumentationLibrary: { name, version }, instrumentationLibrarySpans, librarySchemaUrl: schemaUrl });
       }
       ilmEntry = ilmIterator.next();
     }
+    // TODO SDK types don't provide resource schema URL at this time
     out.push({ resource, resourceSpans });
     entry = entryIterator.next();
   }
