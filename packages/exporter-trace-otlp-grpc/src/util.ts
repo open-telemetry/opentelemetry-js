@@ -17,7 +17,7 @@
 import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import { diag } from '@opentelemetry/api';
-import { globalErrorHandler } from '@opentelemetry/core';
+import { globalErrorHandler, getEnv } from '@opentelemetry/core';
 import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import * as path from 'path';
 import { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
@@ -26,6 +26,7 @@ import {
   OTLPExporterConfigNode,
   GRPCQueueItem,
   ServiceClientType,
+  CompressionAlgorithm
 } from './types';
 
 export function onInit<ExportItem, ServiceRequest>(
@@ -50,17 +51,21 @@ export function onInit<ExportItem, ServiceRequest>(
     .then(packageDefinition => {
       const packageObject: any = grpc.loadPackageDefinition(packageDefinition);
 
+      const options = { 'grpc.default_compression_algorithm': collector.compression };
+
       if (collector.getServiceClientType() === ServiceClientType.SPANS) {
         collector.serviceClient =
           new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(
             collector.url,
             credentials,
+            options,
           );
       } else {
         collector.serviceClient =
           new packageObject.opentelemetry.proto.collector.metrics.v1.MetricsService(
             collector.url,
             credentials,
+            options,
           );
       }
 
@@ -124,4 +129,14 @@ export function validateAndNormalizeUrl(url: string): string {
     );
   }
   return target.host;
+}
+
+export function configureCompression(compression: CompressionAlgorithm | undefined): CompressionAlgorithm {
+  if (compression) {
+    return compression;
+  } else {
+    const definedCompression = getEnv().OTEL_EXPORTER_OTLP_TRACES_COMPRESSION || getEnv().OTEL_EXPORTER_OTLP_COMPRESSION;
+
+    return definedCompression === 'gzip' ? CompressionAlgorithm.GZIP: CompressionAlgorithm.NONE;
+  }
 }
