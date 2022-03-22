@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
+import { diag } from '@opentelemetry/api';
+import { baggageUtils, getEnv } from '@opentelemetry/core';
 import { OTLPExporterBase } from '../../OTLPExporterBase';
-import { OTLPExporterConfigBase } from '../../types';
 import * as otlpTypes from '../../types';
+import { OTLPExporterConfigBase } from '../../types';
 import { parseHeaders } from '../../util';
 import { sendWithBeacon, sendWithXhr } from './util';
-import { diag } from '@opentelemetry/api';
-import { getEnv, baggageUtils } from '@opentelemetry/core';
 
 /**
  * Collector Metric Exporter abstract base class
@@ -57,11 +57,15 @@ export abstract class OTLPExporterBrowserBase<
   }
 
   onInit(): void {
-    window.addEventListener('unload', this.shutdown);
+    if(typeof window !== "undefined" && window !== null) {
+      window.addEventListener('unload', this.shutdown);
+    }
   }
 
   onShutdown(): void {
-    window.removeEventListener('unload', this.shutdown);
+    if(typeof window !== "undefined" && window !== null) {
+      window.removeEventListener('unload', this.shutdown);
+    }
   }
 
   send(
