@@ -4,8 +4,6 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
-### Metrics
-
 * [#2588](https://github.com/open-telemetry/opentelemetry-js/pull/2588) feat: spec compliant metric creation and sync instruments ([@dyladan](https://github.com/dyladan))
 * [#2569](https://github.com/open-telemetry/opentelemetry-js/pull/2569) feat(api-metrics): async instruments spec compliance ([@legendecas](https://github.com/legendecas))
 * [#2707](https://github.com/open-telemetry/opentelemetry-js/pull/2707) feat(sdk-metrics-base): update metric exporter interfaces ([@srikanthccv](https://github.com/srikanthccv))
@@ -23,6 +21,16 @@ All notable changes to this project will be documented in this file.
 * [#2676](https://github.com/open-telemetry/opentelemetry-js/pull/2676) fix(sdk-metrics-base): remove aggregator.toMetricData dependency on AggregationTemporality ([@legendecas](https://github.com/legendecas))
 * [#2725](https://github.com/open-telemetry/opentelemetry-js/pull/2725) feat(sdk-metrics-base): document and export basic APIs ([@legendecas](https://github.com/legendecas))
 * [#2712](https://github.com/open-telemetry/opentelemetry-js/pull/2712) docs(api-metrics): add notes on ObservableResult.observe ([@legendecas](https://github.com/legendecas))
+* [#2820](https://github.com/open-telemetry/opentelemetry-js/pull/2820) feat(views): Update addView() to disallow named views that select more than one instrument. ([@pichlermarc](https://github.com/pichlermarc))
+* [#2829](https://github.com/open-telemetry/opentelemetry-js/pull/2829) feat(sdk-metrics-base): update exporting names ([@legendecas](https://github.com/legendecas))
+* [#2813](https://github.com/open-telemetry/opentelemetry-js/pull/2813) Add grpc compression to trace-otlp-grpc exporter ([@svetlanabrennan](https://github.com/svetlanabrennan))
+* [#2695](https://github.com/open-telemetry/opentelemetry-js/pull/2695) refactor: unifying shutdown once with BindOnceFuture ([@legendecas](https://github.com/legendecas))
+
+## 1.1.1
+
+* [#2849](https://github.com/open-telemetry/opentelemetry-js/pull/2849) fix: correct changelog and compat matrix for 1.1 release ([@Flarna](https://github.com/Flarna))
+* [#2823](https://github.com/open-telemetry/opentelemetry-js/pull/2823) fix: enable downlevelIteration for es5 targets ([@legendecas](https://github.com/legendecas))
+* [#2844](https://github.com/open-telemetry/opentelemetry-js/pull/2844) chore: add prepublishOnly to ensure a full build ([@legendecas](https://github.com/legendecas))
 
 ## 1.1.0
 
