@@ -15,6 +15,7 @@
     "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
   },
   "scripts": {
+    "prepublishOnly": "npm run compile",
     "compile": "tsc --build tsconfig.all.json",
     "clean": "tsc --build --clean tsconfig.all.json",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
