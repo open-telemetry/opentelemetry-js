@@ -76,6 +76,8 @@ jobs:
       - name: Build 🔧
         run: |
           npm run compile
+          # run additional compilation variants
+          npx lerna run compile
 
       - name: Unit tests
         run: npm run test:browser
@@ -111,6 +113,8 @@ jobs:
       - name: Build 🔧
         run: |
           npm run compile
+          # run additional compilation variants
+          npx lerna run compile
 
       - name: Unit tests
         run: npm run test:webworker
@@ -192,6 +196,8 @@ jobs:
         working-directory: experimental
         run: |
           npm run compile
+          # run additional compilation variants
+          npx lerna run compile
 
       - name: Unit tests
         working-directory: experimental
@@ -231,6 +237,8 @@ jobs:
         working-directory: experimental
         run: |
           npm run compile
+          # run additional compilation variants
+          npx lerna run compile
 
       - name: Unit tests
         working-directory: experimental
