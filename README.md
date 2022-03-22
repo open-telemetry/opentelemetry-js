@@ -47,7 +47,8 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 
 | API Version | Core version | Experimental Packages |
 | ----------- |--------------| --------------------- |
-| 1.0.x       | 1.x          | 0.26.x                |
+| 1.1.x       | 1.1.x        | 0.28.x                |
+| 1.0.x       | 1.0.x        | 0.26.x, 0.27.x        |
 | 1.0.x       | 0.26.x       | -----                 |
 | 1.0.x       | 0.25.x       | -----                 |
 | 1.0.x       | 0.24.x       | -----                 |
@@ -275,7 +276,7 @@ These instrumentations are hosted at <https://github.com/open-telemetry/opentele
 
 ## Upgrade guidelines
 
-### 0.27.x to 1.x.y
+### 0.27.x to 0.28.x
 
 - In `@opentelemetry/exporter-trace-otlp-http`, `OTLPExporterBase._isShutdown` is replaced with `_shutdownOnce`.
 
