@@ -26,11 +26,6 @@ All notable changes to this project will be documented in this file.
 
 ## 1.1.0
 
-### :boom: Breaking Change
-
-* `exporter-trace-otlp-grpc`, `exporter-trace-otlp-http`, `exporter-trace-otlp-proto`, `opentelemetry-core`, `opentelemetry-exporter-jaeger`, `opentelemetry-sdk-trace-base`
-  * [#2695](https://github.com/open-telemetry/opentelemetry-js/pull/2695) refactor: unifying shutdown once with BindOnceFuture ([@legendecas](https://github.com/legendecas))
-
 ### :rocket: (Enhancement)
 
 * `opentelemetry-resources`
