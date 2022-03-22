@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+<<<<<<< HEAD
 ### :boom: Breaking Change
 
 ### :rocket: (Enhancement)
@@ -15,6 +16,12 @@ All notable changes to this project will be documented in this file.
 ### :house: (Internal)
 
 * [#2847](https://github.com/open-telemetry/opentelemetry-js/pull/2847) chore: require changelog entry to merge PR ([@dylaan](https://github.com/dyladan))
+
+## 1.1.1
+
+* [#2849](https://github.com/open-telemetry/opentelemetry-js/pull/2849) fix: correct changelog and compat matrix for 1.1 release ([@Flarna](https://github.com/Flarna))
+* [#2823](https://github.com/open-telemetry/opentelemetry-js/pull/2823) fix: enable downlevelIteration for es5 targets ([@legendecas](https://github.com/legendecas))
+* [#2844](https://github.com/open-telemetry/opentelemetry-js/pull/2844) chore: add prepublishOnly to ensure a full build ([@legendecas](https://github.com/legendecas))
 
 ## 1.1.0
 
