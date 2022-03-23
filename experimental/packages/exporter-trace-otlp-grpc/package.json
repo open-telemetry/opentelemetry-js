@@ -68,8 +68,8 @@
     "@opentelemetry/api": ">=1.0.0 <1.2.0"
   },
   "dependencies": {
-    "@grpc/grpc-js": "^1.3.7",
-    "@grpc/proto-loader": "^0.6.4",
+    "@grpc/grpc-js": "1.5.9",
+    "@grpc/proto-loader": "0.6.9",
     "@opentelemetry/core": "1.1.1",
     "@opentelemetry/exporter-trace-otlp-http": "0.27.0",
     "@opentelemetry/resources": "1.1.1",
