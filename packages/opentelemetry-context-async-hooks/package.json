@@ -1,11 +1,12 @@
 {
   "name": "@opentelemetry/context-async-hooks",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "OpenTelemetry AsyncHooks-based Context Manager",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
+    "prepublishOnly": "npm run compile",
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",

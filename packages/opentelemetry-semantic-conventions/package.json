@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/semantic-conventions",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "OpenTelemetry semantic conventions",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -8,6 +8,7 @@
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
+    "prepublishOnly": "npm run compile",
     "compile": "tsc --build tsconfig.all.json",
     "clean": "tsc --build --clean tsconfig.all.json",
     "lint": "eslint . --ext .ts",
