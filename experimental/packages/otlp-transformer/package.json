@@ -1,0 +1,77 @@
+{
+  "name": "@opentelemetry/otlp-transformer",
+  "private": true,
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "version": "0.27.0",
+  "description": "Transform OpenTelemetry SDK data into OTLP",
+  "module": "build/esm/index.js",
+  "esnext": "build/esnext/index.js",
+  "types": "build/src/index.d.ts",
+  "repository": "open-telemetry/opentelemetry-js",
+  "scripts": {
+    "compile": "tsc --build tsconfig.all.json",
+    "clean": "tsc --build --clean tsconfig.all.json",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "tdd": "npm run test -- --watch-extensions ts --watch",
+    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
+    "test:browser": "nyc karma start --single-run",
+    "watch": "tsc --build -w tsconfig.all.json"
+  },
+  "keywords": [
+    "opentelemetry",
+    "nodejs",
+    "grpc",
+    "protobuf",
+    "otlp",
+    "tracing",
+    "metrics"
+  ],
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "build/src/**/*.js",
+    "build/src/**/*.js.map",
+    "build/src/**/*.d.ts",
+    "LICENSE",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "@opentelemetry/api": ">=1.0.0 <1.1.0",
+    "@opentelemetry/api-metrics": "~0.27.0"
+  },
+  "devDependencies": {
+    "@opentelemetry/api": "1.0.4",
+    "@opentelemetry/api-metrics": "0.27.0",
+    "@types/mocha": "8.2.3",
+    "@types/webpack-env": "1.16.3",
+    "codecov": "3.8.3",
+    "istanbul-instrumenter-loader": "3.0.1",
+    "karma": "6.3.16",
+    "karma-chrome-launcher": "3.1.0",
+    "karma-coverage-istanbul-reporter": "3.0.3",
+    "karma-mocha": "2.0.1",
+    "karma-spec-reporter": "0.0.32",
+    "karma-webpack": "4.0.2",
+    "mkdirp": "1.0.4",
+    "mocha": "7.2.0",
+    "nyc": "15.1.0",
+    "protobufjs": "6.11.2",
+    "rimraf": "3.0.2",
+    "ts-loader": "8.3.0",
+    "ts-mocha": "8.0.0",
+    "typescript": "4.4.4",
+    "webpack": "4.46.0"
+  },
+  "dependencies": {
+    "@opentelemetry/core": "1.0.1",
+    "@opentelemetry/resources": "1.0.1",
+    "@opentelemetry/sdk-metrics-base": "0.27.0",
+    "@opentelemetry/sdk-trace-base": "1.0.1"
+  }
+}
