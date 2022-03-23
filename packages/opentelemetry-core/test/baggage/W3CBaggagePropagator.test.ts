@@ -175,9 +175,16 @@ describe('W3CBaggagePropagator', () => {
   });
 
   describe('.extract()', () => {
+    const baggageValue = 'key1=d4cda95b,key3=c88815a7, keyn   = valn, keym =valm';
+    const expected = propagation.createBaggage({
+      key1: { value: 'd4cda95b' },
+      key3: { value: 'c88815a7' },
+      keyn: { value: 'valn' },
+      keym: { value: 'valm' },
+    });
+
     it('should extract context of a sampled span from carrier', () => {
-      carrier[BAGGAGE_HEADER] =
-        'key1=d4cda95b,key3=c88815a7, keyn   = valn, keym =valm';
+      carrier[BAGGAGE_HEADER] = baggageValue;
       const extractedBaggage = propagation.getBaggage(
         httpBaggagePropagator.extract(
           ROOT_CONTEXT,
@@ -186,12 +193,32 @@ describe('W3CBaggagePropagator', () => {
         )
       );
 
-      const expected = propagation.createBaggage({
-        key1: { value: 'd4cda95b' },
-        key3: { value: 'c88815a7' },
-        keyn: { value: 'valn' },
-        keym: { value: 'valm' },
-      });
+      assert.deepStrictEqual(extractedBaggage, expected);
+    });
+
+    it('should extract context of a sampled span when the headerValue comes as array', () => {
+      carrier[BAGGAGE_HEADER] = [baggageValue];
+      const extractedBaggage = propagation.getBaggage(
+        httpBaggagePropagator.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        )
+      );
+
+      assert.deepStrictEqual(extractedBaggage, expected);
+    });
+
+    it('should extract context of a sampled span when the headerValue comes as array with multiple items', () => {
+      carrier[BAGGAGE_HEADER] = ['key1=d4cda95b,key3=c88815a7, keyn   = valn', 'keym =valm'];
+      const extractedBaggage = propagation.getBaggage(
+        httpBaggagePropagator.extract(
+          ROOT_CONTEXT,
+          carrier,
+          defaultTextMapGetter
+        )
+      );
+
       assert.deepStrictEqual(extractedBaggage, expected);
     });
   });

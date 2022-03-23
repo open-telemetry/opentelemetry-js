@@ -1,6 +1,7 @@
 {
   "name": "@opentelemetry/exporter-trace-otlp-http",
-  "version": "1.0.1",
+  "version": "1.1.1",
+  "private": "true",
   "description": "OpenTelemetry Collector Trace Exporter allows user to send collected traces to the OpenTelemetry Collector",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -14,6 +15,7 @@
     "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
   },
   "scripts": {
+    "prepublishOnly": "npm run compile",
     "compile": "tsc --build tsconfig.all.json",
     "clean": "tsc --build --clean tsconfig.all.json",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
@@ -91,8 +93,8 @@
     "@opentelemetry/api": "^1.0.3"
   },
   "dependencies": {
-    "@opentelemetry/core": "1.0.1",
-    "@opentelemetry/resources": "1.0.1",
-    "@opentelemetry/sdk-trace-base": "1.0.1"
+    "@opentelemetry/core": "1.1.1",
+    "@opentelemetry/resources": "1.1.1",
+    "@opentelemetry/sdk-trace-base": "1.1.1"
   }
 }
