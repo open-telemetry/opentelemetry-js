@@ -16,14 +16,11 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { Meter, MeterProvider, PointDataType } from '../../src';
+import { Meter, MeterProvider, DataPointType } from '../../src';
 import { assertMetricData, defaultInstrumentationLibrary, defaultResource } from '../util';
 import { TestMetricReader } from '../export/TestMetricReader';
 import { TestDeltaMetricExporter, TestMetricExporter } from '../export/TestMetricExporter';
 import { MeterSharedState } from '../../src/state/MeterSharedState';
-import { View } from '../../src/view/View';
-import { InstrumentSelector } from '../../src/view/InstrumentSelector';
-import { MeterSelector } from '../../src/view/MeterSelector';
 
 describe('MeterSharedState', () => {
   afterEach(() => {
@@ -65,7 +62,7 @@ describe('MeterSharedState', () => {
         const result = await collector.collect();
         assert.strictEqual(result.instrumentationLibraryMetrics.length, 1);
         assert.strictEqual(result.instrumentationLibraryMetrics[0].metrics.length, 1);
-        assertMetricData(result.instrumentationLibraryMetrics[0].metrics[0], PointDataType.SINGULAR, {
+        assertMetricData(result.instrumentationLibraryMetrics[0].metrics[0], DataPointType.SINGULAR, {
           name: 'test',
         });
       }));
@@ -76,14 +73,8 @@ describe('MeterSharedState', () => {
       const { metricCollectors, meter, meterProvider } = setupInstruments();
 
       /** creating metric events */
-      meterProvider.addView(
-        new View({ name: 'foo' }),
-        new InstrumentSelector({ name: 'test' }),
-        new MeterSelector());
-      meterProvider.addView(
-        new View({ name: 'bar' }),
-        new InstrumentSelector({ name: 'test' }),
-        new MeterSelector());
+      meterProvider.addView({ name: 'foo' }, { instrument: { name: 'test' } });
+      meterProvider.addView({ name: 'bar' }, { instrument: { name: 'test' } });
 
       const counter = meter.createCounter('test');
 
@@ -93,10 +84,10 @@ describe('MeterSharedState', () => {
         const result = await collector.collect();
         assert.strictEqual(result.instrumentationLibraryMetrics.length, 1);
         assert.strictEqual(result.instrumentationLibraryMetrics[0].metrics.length, 2);
-        assertMetricData(result.instrumentationLibraryMetrics[0].metrics[0], PointDataType.SINGULAR, {
+        assertMetricData(result.instrumentationLibraryMetrics[0].metrics[0], DataPointType.SINGULAR, {
           name: 'foo',
         });
-        assertMetricData(result.instrumentationLibraryMetrics[0].metrics[1], PointDataType.SINGULAR, {
+        assertMetricData(result.instrumentationLibraryMetrics[0].metrics[1], DataPointType.SINGULAR, {
           name: 'bar',
         });
       }));
