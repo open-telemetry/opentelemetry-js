@@ -39,6 +39,9 @@
       "path": "packages/opentelemetry-sdk-node"
     },
     {
+      "path": "packages/otlp-transformer"
+    },
+    {
       "path": "backwards-compatability/node10"
     },
     {

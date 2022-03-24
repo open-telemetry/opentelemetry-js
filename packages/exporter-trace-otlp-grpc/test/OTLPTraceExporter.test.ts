@@ -37,6 +37,7 @@ import {
 } from './traceHelper';
 
 import * as core from '@opentelemetry/core';
+import { CompressionAlgorithm } from '../src/types';
 
 const traceServiceProtoPath =
   'opentelemetry/proto/collector/trace/v1/trace_service.proto';
@@ -225,6 +226,77 @@ const testCollectorExporter = (params: TestParams) =>
           assert.strictEqual(responseSpy.args[0][0].error.details, 'Deadline exceeded');
           done();
         }, 300);
+      });
+    });
+    describe('export - with gzip compression', () => {
+      beforeEach(() => {
+        const credentials = params.useTLS
+        ? grpc.credentials.createSsl(
+            fs.readFileSync('./test/certs/ca.crt'),
+            fs.readFileSync('./test/certs/client.key'),
+            fs.readFileSync('./test/certs/client.crt')
+          )
+        : undefined;
+        collectorExporter = new OTLPTraceExporter({
+          url: 'grpcs://' + address,
+          credentials,
+          metadata: params.metadata,
+          compression: CompressionAlgorithm.GZIP,
+        });
+
+        const provider = new BasicTracerProvider();
+        provider.addSpanProcessor(new SimpleSpanProcessor(collectorExporter));
+      });
+      it('should successfully send the spans', done => {
+        const responseSpy = sinon.spy();
+        const spans = [Object.assign({}, mockedReadableSpan)];
+        collectorExporter.export(spans, responseSpy);
+        setTimeout(() => {
+          assert.ok(
+            typeof exportedData !== 'undefined',
+            'resource' + " doesn't exist"
+          );
+          let spans;
+          let resource;
+          if (exportedData) {
+            spans = exportedData.instrumentationLibrarySpans[0].spans;
+            resource = exportedData.resource;
+            ensureExportedSpanIsCorrect(spans[0]);
+
+            assert.ok(
+              typeof resource !== 'undefined',
+              "resource doesn't exist"
+            );
+            if (resource) {
+              ensureResourceIsCorrect(resource);
+            }
+          }
+          if (params.metadata && reqMetadata) {
+            ensureMetadataIsCorrect(reqMetadata, params.metadata);
+          }
+          done();
+        }, 500);
+      });
+    });
+    describe('Trace Exporter with compression', () => {
+      const envSource = process.env;
+      it('should return gzip compression algorithm on exporter', () => {
+        const credentials = params.useTLS
+        ? grpc.credentials.createSsl(
+            fs.readFileSync('./test/certs/ca.crt'),
+            fs.readFileSync('./test/certs/client.key'),
+            fs.readFileSync('./test/certs/client.crt')
+          )
+        : undefined;
+
+        envSource.OTEL_EXPORTER_OTLP_COMPRESSION='gzip';
+        collectorExporter = new OTLPTraceExporter({
+          url: 'grpcs://' + address,
+          credentials,
+          metadata: params.metadata,
+        });
+        assert.strictEqual(collectorExporter.compression, CompressionAlgorithm.GZIP);
+        delete envSource.OTEL_EXPORTER_OTLP_COMPRESSION;
       });
     });
   });

@@ -46,9 +46,18 @@ export interface OTLPExporterConfigNode
   extends otlpTypes.OTLPExporterConfigBase {
   credentials?: grpc.ChannelCredentials;
   metadata?: grpc.Metadata;
+  compression?: CompressionAlgorithm;
 }
 
 export enum ServiceClientType {
   SPANS,
   METRICS,
+}
+
+/**
+ * These values are defined by grpc client
+ */
+export enum CompressionAlgorithm {
+  NONE = 0,
+  GZIP = 2
 }
