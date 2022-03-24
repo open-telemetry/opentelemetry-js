@@ -45,10 +45,15 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
   const exporterTimeout = collector.timeoutMillis;
   const parsedUrl = new url.URL(collector.url);
   let reqIsDestroyed: boolean;
+  const nodeVersion = Number(process.versions.node.split('.')[0]);
 
   const exporterTimer = setTimeout(() => {
     reqIsDestroyed = true;
-    req.destroy();
+    if (Number(nodeVersion) >= 14) {
+      req.destroy();
+    } else {
+      req.abort();
+    }
   }, exporterTimeout);
 
   const options: http.RequestOptions | https.RequestOptions = {
@@ -69,19 +74,34 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
   const req = request(options, (res: http.IncomingMessage) => {
     let responseData = '';
     res.on('data', chunk => (responseData += chunk));
-    res.on('end', () => {
-      if (res.statusCode && res.statusCode < 299) {
-        diag.debug(`statusCode: ${res.statusCode}`, responseData);
-        onSuccess();
-      } else {
-        const error = new otlpTypes.OTLPExporterError(
-          res.statusMessage,
-          res.statusCode,
-          responseData
+
+    res.on('aborted', () => {
+      if (reqIsDestroyed) {
+        const err = new otlpTypes.OTLPExporterError(
+          'Request Timeout'
         );
-        onError(error);
+        onError(err);
       }
-      clearTimeout(exporterTimer);
+    });
+
+    res.on('end', () => {
+      // node version <= 12 will emit 'end' event even if request was aborted
+      // no need to handle promise here if request was aborted since promise
+      // was already rejected in res.on('aborted')
+      if (!reqIsDestroyed) {
+        if (res.statusCode && res.statusCode < 299) {
+          diag.debug(`statusCode: ${res.statusCode}`, responseData);
+          onSuccess();
+        } else {
+          const error = new otlpTypes.OTLPExporterError(
+            res.statusMessage,
+            res.statusCode,
+            responseData
+          );
+          onError(error);
+        }
+        clearTimeout(exporterTimer);
+      }
     });
   });
 
