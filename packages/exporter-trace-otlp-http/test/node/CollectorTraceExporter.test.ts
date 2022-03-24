@@ -415,6 +415,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
       stubRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
       spySetHeader = sinon.spy();
       (fakeRequest as any).setHeader = spySetHeader;
+      (fakeRequest as any).abort = sinon.spy();
       collectorExporterConfig = {
         headers: {
           foo: 'bar',
