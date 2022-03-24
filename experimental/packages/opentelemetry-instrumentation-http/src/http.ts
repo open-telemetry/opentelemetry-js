@@ -333,8 +333,9 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         });
         response.on('error', (error: Err) => {
           this._diag.debug('outgoingRequest on error()', error);
+          utils.setSpanWithError(span, error);
           const code = utils.parseResponseStatus(SpanKind.CLIENT, response.statusCode);
-          utils.setSpanWithError(span, error, code);
+          span.setStatus({ code, message: error.message });
           this._closeHttpSpan(span);
         });
       }

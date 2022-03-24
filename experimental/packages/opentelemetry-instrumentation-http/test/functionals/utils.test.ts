@@ -249,18 +249,6 @@ describe('Utility', () => {
       );
       assert.ok(attributes[AttributeNames.HTTP_ERROR_NAME]);
     });
-    it('can override the status', () => {
-      const span = new Span(
-        new BasicTracerProvider().getTracer('default'),
-        ROOT_CONTEXT,
-        'test',
-        { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
-        SpanKind.INTERNAL
-      );
-      /* tslint:disable-next-line:no-any */
-      utils.setSpanWithError(span, new Error('error'), SpanStatusCode.UNSET);
-      assert.strictEqual(span.status.code, SpanStatusCode.UNSET);
-    });
   });
 
   describe('isValidOptionsType()', () => {
