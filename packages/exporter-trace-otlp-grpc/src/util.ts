@@ -84,7 +84,7 @@ export function send<ExportItem, ServiceRequest>(
 ): void {
   if (collector.serviceClient) {
     const serviceRequest = collector.convert(objects);
-    const deadline = new Date().setSeconds(new Date().getSeconds() + (collector.timeoutMillis / 1000));
+    const deadline = Date.now() + collector.timeoutMillis;
 
     collector.serviceClient.export(
       serviceRequest,
