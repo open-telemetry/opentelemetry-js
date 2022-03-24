@@ -83,21 +83,41 @@ describe('DefaultAggregation', () => {
   });
 });
 
+describe('HistogramAggregator', () => {
+  describe('createAggregator', () => {
+    it('should create histogram aggregators with boundaries', () => {
+      const aggregator = new HistogramAggregation().createAggregator(defaultInstrumentDescriptor);
+      assert(aggregator instanceof HistogramAggregator);
+      assert.deepStrictEqual(aggregator['_boundaries'], [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000, Infinity]);
+    });
+  });
+});
+
 describe('ExplicitBucketHistogramAggregation', () => {
   it('construct without exceptions', () => {
-    const aggregation = new ExplicitBucketHistogramAggregation([1, 10, 100]);
-    assert(aggregation instanceof ExplicitBucketHistogramAggregation);
+    const cases = [
+      [1, 10, 100],
+      [1, 10, 100, Infinity],
+    ];
+    for (const boundaries of cases) {
+      const aggregation = new ExplicitBucketHistogramAggregation(boundaries);
+      assert(aggregation instanceof ExplicitBucketHistogramAggregation);
+    }
   });
 
   describe('createAggregator', () => {
     it('should create histogram aggregators with boundaries', () => {
       const aggregator1 = new ExplicitBucketHistogramAggregation([1, 10, 100]).createAggregator(defaultInstrumentDescriptor);
       assert(aggregator1 instanceof HistogramAggregator);
-      assert.deepStrictEqual(aggregator1['_boundaries'], [1, 10, 100]);
+      assert.deepStrictEqual(aggregator1['_boundaries'], [1, 10, 100, Infinity]);
 
       const aggregator2 = new ExplicitBucketHistogramAggregation([10, 100, 1000]).createAggregator(defaultInstrumentDescriptor);
       assert(aggregator2 instanceof HistogramAggregator);
-      assert.deepStrictEqual(aggregator2['_boundaries'], [10, 100, 1000]);
+      assert.deepStrictEqual(aggregator2['_boundaries'], [10, 100, 1000, Infinity]);
+
+      const aggregator3 = new ExplicitBucketHistogramAggregation([10, 100, 1000, Infinity]).createAggregator(defaultInstrumentDescriptor);
+      assert(aggregator3 instanceof HistogramAggregator);
+      assert.deepStrictEqual(aggregator3['_boundaries'], [10, 100, 1000, Infinity]);
     });
   });
 });

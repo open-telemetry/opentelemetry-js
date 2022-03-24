@@ -23,7 +23,7 @@ import { commonValues, defaultInstrumentDescriptor } from '../util';
 describe('HistogramAggregator', () => {
   describe('createAccumulation', () => {
     it('no exceptions on createAccumulation', () => {
-      const aggregator = new HistogramAggregator([1, 10, 100]);
+      const aggregator = new HistogramAggregator([1, 10, 100, Infinity]);
       const accumulation = aggregator.createAccumulation();
       assert(accumulation instanceof HistogramAccumulation);
     });
@@ -31,7 +31,7 @@ describe('HistogramAggregator', () => {
 
   describe('merge', () => {
     it('no exceptions', () => {
-      const aggregator = new HistogramAggregator([1, 10, 100]);
+      const aggregator = new HistogramAggregator([1, 10, 100, Infinity]);
       const prev = aggregator.createAccumulation();
       prev.record(0);
       prev.record(1);
@@ -54,7 +54,7 @@ describe('HistogramAggregator', () => {
 
   describe('diff', () => {
     it('no exceptions', () => {
-      const aggregator = new HistogramAggregator([1, 10, 100]);
+      const aggregator = new HistogramAggregator([1, 10, 100, Infinity]);
       const prev = aggregator.createAccumulation();
       prev.record(0);
       prev.record(1);
@@ -67,9 +67,9 @@ describe('HistogramAggregator', () => {
       curr.record(2);
       curr.record(11);
 
-      const expected = new HistogramAccumulation([1, 10, 100], {
+      const expected = new HistogramAccumulation([1, 10, 100, Infinity], {
         buckets: {
-          boundaries: [1, 10, 100],
+          boundaries: [1, 10, 100, Infinity],
           counts: [0, 1, 1, 0],
         },
         count: 2,
@@ -82,7 +82,7 @@ describe('HistogramAggregator', () => {
 
   describe('toMetricData', () => {
     it('transform without exception', () => {
-      const aggregator = new HistogramAggregator([1, 10, 100]);
+      const aggregator = new HistogramAggregator([1, 10, 100, Infinity]);
 
       const accumulation = aggregator.createAccumulation();
       accumulation.record(0);
@@ -101,7 +101,7 @@ describe('HistogramAggregator', () => {
             endTime,
             value: {
               buckets: {
-                boundaries: [1, 10, 100],
+                boundaries: [1, 10, 100, Infinity],
                 counts: [1, 1, 0, 0],
               },
               count: 2,
@@ -123,7 +123,7 @@ describe('HistogramAggregator', () => {
 describe('HistogramAccumulation', () => {
   describe('record', () => {
     it('no exceptions on record', () => {
-      const accumulation = new HistogramAccumulation([1, 10, 100]);
+      const accumulation = new HistogramAccumulation([1, 10, 100, Infinity]);
 
       for (const value of commonValues) {
         accumulation.record(value);

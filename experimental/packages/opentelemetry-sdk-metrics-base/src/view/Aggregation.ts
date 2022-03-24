@@ -83,14 +83,9 @@ export class LastValueAggregation extends Aggregation {
  * The default histogram aggregation.
  */
 export class HistogramAggregation extends Aggregation {
-  private DEFAULT_INSTANCE: HistogramAggregator;
-  constructor(boundaries: number[] = [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]) {
-    super();
-    this.DEFAULT_INSTANCE = new HistogramAggregator(boundaries);
-  }
-
+  private static DEFAULT_INSTANCE = new HistogramAggregator([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000, Infinity]);
   createAggregator(_instrument: InstrumentDescriptor) {
-    return this.DEFAULT_INSTANCE;
+    return HistogramAggregation.DEFAULT_INSTANCE;
   }
 }
 
@@ -98,11 +93,24 @@ export class HistogramAggregation extends Aggregation {
  * The explicit bucket histogram aggregation.
  */
 export class ExplicitBucketHistogramAggregation extends Aggregation {
+  private _boundaries: number[];
   /**
-   * @param _boundaries the bucket boundaries of the histogram aggregation
+   * @param boundaries the bucket boundaries of the histogram aggregation
    */
-  constructor(private _boundaries: number[]) {
+  constructor(boundaries: number[]) {
     super();
+    if (boundaries === undefined || boundaries.length === 0) {
+      throw new Error('HistogramAggregator should be created with boundaries.');
+    }
+    // copy the boundaries array.
+    boundaries = boundaries.concat();
+    // we need to an ordered set to be able to correctly compute count for each
+    // boundary since we'll iterate on each in order.
+    boundaries = boundaries.sort((a, b) => a - b);
+    if (boundaries[boundaries.length - 1] !== Infinity) {
+      boundaries.push(Infinity);
+    }
+    this._boundaries = boundaries;
   }
 
   createAggregator(_instrument: InstrumentDescriptor) {

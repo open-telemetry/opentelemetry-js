@@ -26,11 +26,14 @@ import { HrTime } from '@opentelemetry/api';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 
+/**
+ * `boundaries` must end with an `+Infinity` element.
+ */
 function createNewEmptyCheckpoint(boundaries: number[]): Histogram {
   return {
     buckets: {
       boundaries,
-      counts: boundaries.map(() => 0).concat([0]),
+      counts: boundaries.map(() => 0),
     },
     sum: 0,
     count: 0,
@@ -53,8 +56,6 @@ export class HistogramAccumulation implements Accumulation {
         return;
       }
     }
-    // value is above all observed boundaries
-    this._current.buckets.counts[this._boundaries.length] += 1;
   }
 
   toPointValue(): Histogram {
@@ -68,16 +69,11 @@ export class HistogramAccumulation implements Accumulation {
  */
 export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
   public kind: AggregatorKind.HISTOGRAM = AggregatorKind.HISTOGRAM;
-  private readonly _boundaries: number[];
 
-  constructor(boundaries: number[]) {
-    if (boundaries === undefined || boundaries.length === 0) {
-      throw new Error('HistogramAggregator should be created with boundaries.');
-    }
-    // we need to an ordered set to be able to correctly compute count for each
-    // boundary since we'll iterate on each in order.
-    this._boundaries = boundaries.sort((a, b) => a - b);
-  }
+  /**
+   * @param _boundaries upper bounds of recorded values. The array must end with an `+Infinity` element.
+   */
+  constructor(private readonly _boundaries: number[]) {}
 
   createAccumulation() {
     return new HistogramAccumulation(this._boundaries);
