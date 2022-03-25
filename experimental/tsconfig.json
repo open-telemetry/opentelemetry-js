@@ -3,6 +3,15 @@
   "files": [],
   "references": [
     {
+      "path": "packages/exporter-trace-otlp-grpc"
+    },
+    {
+      "path": "packages/exporter-trace-otlp-http"
+    },
+    {
+      "path": "packages/exporter-trace-otlp-proto"
+    },
+    {
       "path": "packages/opentelemetry-api-metrics"
     },
     {

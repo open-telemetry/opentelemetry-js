@@ -7,10 +7,5 @@
   "include": [
     "src/**/*.ts",
     "test/**/*.ts"
-  ],
-  "references": [
-    {
-      "path": "../exporter-trace-otlp-http"
-    }
   ]
 }
