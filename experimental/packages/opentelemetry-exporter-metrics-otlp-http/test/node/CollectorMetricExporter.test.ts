@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
+import { diag, DiagLogger } from '@opentelemetry/api';
 import {
   Counter,
   ObservableGauge,
@@ -66,15 +66,33 @@ describe('OTLPMetricExporter - node with json over http', () => {
   });
 
   describe('instance', () => {
+    let warnStub: sinon.SinonStub;
+
+    beforeEach(() => {
+      // Need to stub/spy on the underlying logger as the "diag" instance is global
+      warnStub = sinon.stub();
+      const nop = () => {};
+      const diagLogger: DiagLogger = {
+        debug: nop,
+        error: nop,
+        info: nop,
+        verbose: nop,
+        warn: warnStub
+      };
+      diag.setLogger(diagLogger);
+    });
+
+    afterEach(() => {
+      diag.disable();
+    });
+
     it('should warn about metadata when using json', () => {
       const metadata = 'foo';
-      // Need to stub/spy on the underlying logger as the "diag" instance is global
-      const spyLoggerWarn = sinon.stub(diag, 'warn');
       collectorExporter = new OTLPMetricExporter({
         url: address,
         metadata,
       } as any);
-      const args = spyLoggerWarn.args[0];
+      const args = warnStub.args[0];
       assert.strictEqual(args[0], 'Metadata cannot be set when using http');
     });
   });
