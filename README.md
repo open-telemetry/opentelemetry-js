@@ -151,7 +151,7 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 Automated tests are run using the latest release of each currently active version of Node.JS.
 While Node.JS v8 and v10 are no longer supported by the Node.JS team, the latest versions of Node.JS v8 and v10 are still included in our testing suite.
-Please note that versions of Node.JS v8 prior to `v8.5.0` will NOT work, because OpenTelemetry Node depends on the `perf_hooks` module introduced in `v8.5.0`
+Please note that versions of Node.JS v8 prior to `v8.12.0` will NOT work, because OpenTelemetry Node depends on the `perf_hooks` module introduced in `v8.5.0` and `performance.timeOrigin` that is set correctly starting in `v8.12.0`.
 
 ### Browser Support
 
