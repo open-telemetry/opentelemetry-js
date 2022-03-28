@@ -41,7 +41,7 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=8.12.0"
   },
   "files": [
     "build/esm/**/*.js",
