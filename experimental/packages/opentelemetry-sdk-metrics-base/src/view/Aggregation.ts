@@ -83,7 +83,7 @@ export class LastValueAggregation extends Aggregation {
  * The default histogram aggregation.
  */
 export class HistogramAggregation extends Aggregation {
-  private static DEFAULT_INSTANCE = new HistogramAggregator([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000, Infinity]);
+  private static DEFAULT_INSTANCE = new HistogramAggregator([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]);
   createAggregator(_instrument: InstrumentDescriptor) {
     return HistogramAggregation.DEFAULT_INSTANCE;
   }
@@ -102,14 +102,18 @@ export class ExplicitBucketHistogramAggregation extends Aggregation {
     if (boundaries === undefined || boundaries.length === 0) {
       throw new Error('HistogramAggregator should be created with boundaries.');
     }
-    // copy the boundaries array.
+    // Copy the boundaries array for modification.
     boundaries = boundaries.concat();
-    // we need to an ordered set to be able to correctly compute count for each
+    // We need to an ordered set to be able to correctly compute count for each
     // boundary since we'll iterate on each in order.
     boundaries = boundaries.sort((a, b) => a - b);
-    if (boundaries[boundaries.length - 1] !== Infinity) {
-      boundaries.push(Infinity);
+    // Remove all Infinity from the boundaries.
+    const minusInfinityIndex = boundaries.lastIndexOf(-Infinity);
+    let infinityIndex: number | undefined = boundaries.indexOf(Infinity);
+    if (infinityIndex === -1) {
+      infinityIndex = undefined;
     }
+    boundaries = boundaries.slice(minusInfinityIndex + 1, infinityIndex);
     this._boundaries = boundaries;
   }
 

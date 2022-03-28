@@ -88,7 +88,7 @@ describe('HistogramAggregator', () => {
     it('should create histogram aggregators with boundaries', () => {
       const aggregator = new HistogramAggregation().createAggregator(defaultInstrumentDescriptor);
       assert(aggregator instanceof HistogramAggregator);
-      assert.deepStrictEqual(aggregator['_boundaries'], [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000, Infinity]);
+      assert.deepStrictEqual(aggregator['_boundaries'], [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]);
     });
   });
 });
@@ -98,26 +98,34 @@ describe('ExplicitBucketHistogramAggregation', () => {
     const cases = [
       [1, 10, 100],
       [1, 10, 100, Infinity],
+      [-Infinity, 1, 10, 100],
     ];
     for (const boundaries of cases) {
       const aggregation = new ExplicitBucketHistogramAggregation(boundaries);
       assert(aggregation instanceof ExplicitBucketHistogramAggregation);
+      assert.deepStrictEqual(aggregation['_boundaries'], [1, 10, 100]);
     }
+  });
+
+  it('constructor should not modify inputs', () => {
+    const boundaries = [100, 10, 1];
+    const aggregation = new ExplicitBucketHistogramAggregation(boundaries);
+    assert(aggregation instanceof ExplicitBucketHistogramAggregation);
+    assert.deepStrictEqual(aggregation['_boundaries'], [1, 10, 100]);
+    assert.deepStrictEqual(boundaries, [100, 10, 1]);
   });
 
   describe('createAggregator', () => {
     it('should create histogram aggregators with boundaries', () => {
-      const aggregator1 = new ExplicitBucketHistogramAggregation([1, 10, 100]).createAggregator(defaultInstrumentDescriptor);
+      const aggregator1 = new ExplicitBucketHistogramAggregation([100, 10, 1]).createAggregator(defaultInstrumentDescriptor);
       assert(aggregator1 instanceof HistogramAggregator);
-      assert.deepStrictEqual(aggregator1['_boundaries'], [1, 10, 100, Infinity]);
+      assert.deepStrictEqual(aggregator1['_boundaries'], [1, 10, 100]);
 
-      const aggregator2 = new ExplicitBucketHistogramAggregation([10, 100, 1000]).createAggregator(defaultInstrumentDescriptor);
+      const aggregator2 = new ExplicitBucketHistogramAggregation(
+        [-Infinity, -Infinity, 10, 100, 1000, Infinity, Infinity]
+      ).createAggregator(defaultInstrumentDescriptor);
       assert(aggregator2 instanceof HistogramAggregator);
-      assert.deepStrictEqual(aggregator2['_boundaries'], [10, 100, 1000, Infinity]);
-
-      const aggregator3 = new ExplicitBucketHistogramAggregation([10, 100, 1000, Infinity]).createAggregator(defaultInstrumentDescriptor);
-      assert(aggregator3 instanceof HistogramAggregator);
-      assert.deepStrictEqual(aggregator3['_boundaries'], [10, 100, 1000, Infinity]);
+      assert.deepStrictEqual(aggregator2['_boundaries'], [10, 100, 1000]);
     });
   });
 });

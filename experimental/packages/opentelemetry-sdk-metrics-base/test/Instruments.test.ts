@@ -275,7 +275,7 @@ describe('Instruments', () => {
             attributes: {},
             value: {
               buckets: {
-                boundaries: [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000, Infinity],
+                boundaries: [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000],
                 counts: [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
               },
               count: 2,
@@ -286,7 +286,7 @@ describe('Instruments', () => {
             attributes: { foo: 'bar' },
             value: {
               buckets: {
-                boundaries: [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000, Infinity],
+                boundaries: [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000],
                 counts: [0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0],
               },
               count: 2,
@@ -315,7 +315,7 @@ describe('Instruments', () => {
             attributes: {},
             value: {
               buckets: {
-                boundaries: [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000, Infinity],
+                boundaries: [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000],
                 counts: [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
               },
               count: 2,
@@ -326,7 +326,7 @@ describe('Instruments', () => {
             attributes: { foo: 'bar' },
             value: {
               buckets: {
-                boundaries: [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000, Infinity],
+                boundaries: [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000],
                 counts: [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
               },
               count: 2,

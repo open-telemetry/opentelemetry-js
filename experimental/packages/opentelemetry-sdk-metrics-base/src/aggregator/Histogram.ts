@@ -26,14 +26,13 @@ import { HrTime } from '@opentelemetry/api';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 
-/**
- * `boundaries` must end with an `+Infinity` element.
- */
 function createNewEmptyCheckpoint(boundaries: number[]): Histogram {
+  const counts = boundaries.map(() => 0);
+  counts.push(0);
   return {
     buckets: {
       boundaries,
-      counts: boundaries.map(() => 0),
+      counts,
     },
     sum: 0,
     count: 0,
@@ -56,6 +55,8 @@ export class HistogramAccumulation implements Accumulation {
         return;
       }
     }
+    // value is above all observed boundaries
+    this._current.buckets.counts[this._boundaries.length] += 1;
   }
 
   toPointValue(): Histogram {
@@ -71,7 +72,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
   public kind: AggregatorKind.HISTOGRAM = AggregatorKind.HISTOGRAM;
 
   /**
-   * @param _boundaries upper bounds of recorded values. The array must end with an `+Infinity` element.
+   * @param _boundaries upper bounds of recorded values.
    */
   constructor(private readonly _boundaries: number[]) {}
 
