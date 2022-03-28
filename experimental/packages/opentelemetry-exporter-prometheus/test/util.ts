@@ -13,22 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Point, Sum } from '@opentelemetry/sdk-metrics-base';
-import { HrTime } from '@opentelemetry/api';
 
-export const mockedHrTime: HrTime = [1586347902, 211_000_000];
+import * as sinon from 'sinon';
+import * as perf_hooks from 'perf_hooks';
+
 export const mockedHrTimeMs = 1586347902211;
-export function mockAggregator(Aggregator: any) {
-  let toPoint: () => Point<Sum>;
-  before(() => {
-    toPoint = Aggregator.prototype.toPoint;
-    Aggregator.prototype.toPoint = function (): Point<Sum> {
-      const point = toPoint.apply(this);
-      point.timestamp = mockedHrTime;
-      return point;
-    };
-  });
-  after(() => {
-    Aggregator.prototype.toPoint = toPoint;
-  });
+
+export function mockHrTime() {
+  // We cannot stub core.now or core.timeOrigin since a property of
+  // ModuleNamespace can not be reconfigured.ß
+  sinon.stub(perf_hooks.performance, 'timeOrigin').value(0);
+  sinon.stub(perf_hooks.performance, 'now').returns(mockedHrTimeMs);
 }
