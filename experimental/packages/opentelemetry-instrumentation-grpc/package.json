@@ -30,7 +30,7 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=8.12.0"
   },
   "files": [
     "build/src/**/*.js",
@@ -44,8 +44,8 @@
     "access": "public"
   },
   "devDependencies": {
-    "@grpc/grpc-js": "1.4.4",
-    "@grpc/proto-loader": "0.6.6",
+    "@grpc/grpc-js": "1.5.9",
+    "@grpc/proto-loader": "0.6.9",
     "@opentelemetry/api": "^1.0.3",
     "@opentelemetry/context-async-hooks": "1.0.1",
     "@opentelemetry/core": "1.0.1",

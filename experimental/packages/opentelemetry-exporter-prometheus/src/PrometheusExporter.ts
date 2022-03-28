@@ -16,18 +16,18 @@
 
 import { diag } from '@opentelemetry/api';
 import {
-  ExportResult,
   globalErrorHandler,
-  ExportResultCode,
 } from '@opentelemetry/core';
-import { MetricExporter, MetricRecord } from '@opentelemetry/sdk-metrics-base';
+import { AggregationTemporality, MetricReader } from '@opentelemetry/sdk-metrics-base-wip';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
-import * as url from 'url';
 import { ExporterConfig } from './export/types';
 import { PrometheusSerializer } from './PrometheusSerializer';
-import { PrometheusAttributesBatcher } from './PrometheusAttributesBatcher';
+/** Node.js v8.x compat */
+import { URL } from 'url';
 
-export class PrometheusExporter implements MetricExporter {
+const NO_REGISTERED_METRICS = '# no registered metrics';
+
+export class PrometheusExporter extends MetricReader {
   static readonly DEFAULT_OPTIONS = {
     host: undefined,
     port: 9464,
@@ -38,12 +38,12 @@ export class PrometheusExporter implements MetricExporter {
 
   private readonly _host?: string;
   private readonly _port: number;
+  private readonly _baseUrl: string;
   private readonly _endpoint: string;
   private readonly _server: Server;
   private readonly _prefix?: string;
   private readonly _appendTimestamp: boolean;
   private _serializer: PrometheusSerializer;
-  private _batcher = new PrometheusAttributesBatcher();
 
   // This will be required when histogram is implemented. Leaving here so it is not forgotten
   // Histogram cannot have a attribute named 'le'
@@ -55,6 +55,7 @@ export class PrometheusExporter implements MetricExporter {
    * @param callback Callback to be called after a server was started
    */
   constructor(config: ExporterConfig = {}, callback?: () => void) {
+    super(AggregationTemporality.CUMULATIVE);
     this._host =
       config.host ||
       process.env.OTEL_EXPORTER_PROMETHEUS_HOST ||
@@ -75,6 +76,7 @@ export class PrometheusExporter implements MetricExporter {
       this._appendTimestamp
     );
 
+    this._baseUrl = `http://${this._host}:${this._port}/`;
     this._endpoint = (
       config.endpoint || PrometheusExporter.DEFAULT_OPTIONS.endpoint
     ).replace(/^([^/])/, '/$1');
@@ -88,40 +90,14 @@ export class PrometheusExporter implements MetricExporter {
     }
   }
 
-  /**
-   * Saves the current values of all exported {@link MetricRecord}s so that
-   * they can be pulled by the Prometheus backend.
-   *
-   * In its current state, the exporter saves the current values of all metrics
-   * when export is called and returns them when the export endpoint is called.
-   * In the future, this should be a no-op and the exporter should reach into
-   * the metrics when the export endpoint is called. As there is currently no
-   * interface to do this, this is our only option.
-   *
-   * @param records Metrics to be sent to the prometheus backend
-   * @param cb result callback to be called on finish
-   */
-  export(records: MetricRecord[], cb: (result: ExportResult) => void): void {
-    if (!this._server) {
-      // It is conceivable that the _server may not be started as it is an async startup
-      // However unlikely, if this happens the caller may retry the export
-      cb({ code: ExportResultCode.FAILED });
-      return;
-    }
-
-    diag.debug('Prometheus exporter export');
-
-    for (const record of records) {
-      this._batcher.process(record);
-    }
-
-    cb({ code: ExportResultCode.SUCCESS });
+  override async onForceFlush(): Promise<void> {
+    /** do nothing */
   }
 
   /**
    * Shuts down the export server and clears the registry
    */
-  shutdown(): Promise<void> {
+  override onShutdown(): Promise<void> {
     return this.stopServer();
   }
 
@@ -196,7 +172,7 @@ export class PrometheusExporter implements MetricExporter {
     request: IncomingMessage,
     response: ServerResponse
   ) => {
-    if (url.parse(request.url!).pathname === this._endpoint) {
+    if (request.url != null && new URL(request.url, this._baseUrl).pathname === this._endpoint) {
       this._exportMetrics(response);
     } else {
       this._notFound(response);
@@ -209,11 +185,22 @@ export class PrometheusExporter implements MetricExporter {
   private _exportMetrics = (response: ServerResponse) => {
     response.statusCode = 200;
     response.setHeader('content-type', 'text/plain');
-    if (!this._batcher.hasMetric) {
-      response.end('# no registered metrics');
-      return;
-    }
-    response.end(this._serializer.serialize(this._batcher.checkPointSet()));
+    this.collect()
+      .then(
+        resourceMetrics => {
+          let result = NO_REGISTERED_METRICS;
+          if (resourceMetrics != null) {
+            result = this._serializer.serialize(resourceMetrics);
+          }
+          if (result === '') {
+            result = NO_REGISTERED_METRICS;
+          }
+          response.end(result);
+        },
+        err => {
+          response.end(`# failed to export metrics: ${err}`);
+        }
+      );
   };
 
   /**
