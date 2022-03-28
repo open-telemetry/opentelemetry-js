@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+/*
 import { diag, DiagLogger } from '@opentelemetry/api';
 import {
   Counter,
@@ -333,3 +334,4 @@ describe('OTLPMetricExporter - node with json over http', () => {
     });
   });
 });
+*/

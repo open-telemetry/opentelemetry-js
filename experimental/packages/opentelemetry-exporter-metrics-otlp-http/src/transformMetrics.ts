@@ -21,7 +21,7 @@ import {
   AggregationTemporality, Histogram,
   InstrumentType,
   MetricData,
-  PointDataType,
+  DataPointType,
   ResourceMetrics
 } from '@opentelemetry/sdk-metrics-base-wip';
 import { Attributes, ValueType } from '@opentelemetry/api-metrics';
@@ -65,10 +65,10 @@ export function toAggregationTemporality(
 export function toDataPoints(
   metric: MetricData
 ): otlpTypes.opentelemetryProto.metrics.v1.DataPoint[] {
-  return Array.from(metric.pointData.map(pointData => {
+  return Array.from(metric.dataPoints.map(pointData => {
     return {
       labels: toCollectorAttributes(pointData.attributes),
-      value: pointData.point as number,
+      value: pointData.value as number,
       startTimeUnixNano: core.hrTimeToNanoseconds(
         pointData.startTime
       ),
@@ -86,8 +86,8 @@ export function toDataPoints(
 export function toHistogramPoints(
   metric: MetricData
 ): otlpTypes.opentelemetryProto.metrics.v1.HistogramDataPoint[] {
-  return Array.from(metric.pointData.map(pointData => {
-    const histogram = pointData.point as Histogram;
+  return Array.from(metric.dataPoints.map(pointData => {
+    const histogram = pointData.value as Histogram;
     return {
       labels: toCollectorAttributes(pointData.attributes),
       sum: histogram.sum,
@@ -114,31 +114,31 @@ export function toCollectorMetric(
   aggregationTemporality: AggregationTemporality
 ): otlpTypes.opentelemetryProto.metrics.v1.Metric {
   const metricCollector: otlpTypes.opentelemetryProto.metrics.v1.Metric = {
-    name: metric.instrumentDescriptor.name,
-    description: metric.instrumentDescriptor.description,
-    unit: metric.instrumentDescriptor.unit,
+    name: metric.descriptor.name,
+    description: metric.descriptor.description,
+    unit: metric.descriptor.unit,
   };
 
-  if (metric.pointDataType === PointDataType.SINGULAR) {
+  if (metric.dataPointType === DataPointType.SINGULAR) {
     const result = {
       dataPoints: toDataPoints(metric),
       isMonotonic:
-        metric.instrumentDescriptor.type === InstrumentType.COUNTER ||
-        metric.instrumentDescriptor.type === InstrumentType.OBSERVABLE_COUNTER,
+        metric.descriptor.type === InstrumentType.COUNTER ||
+        metric.descriptor.type === InstrumentType.OBSERVABLE_COUNTER,
       aggregationTemporality: toAggregationTemporality(aggregationTemporality),
     };
 
-    if (metric.instrumentDescriptor.valueType === ValueType.INT) {
+    if (metric.descriptor.valueType === ValueType.INT) {
       metricCollector.intSum = result;
     } else {
       metricCollector.doubleSum = result;
     }
-  } else if (metric.pointDataType === PointDataType.HISTOGRAM) {
+  } else if (metric.dataPointType === DataPointType.HISTOGRAM) {
     const result = {
       dataPoints: toHistogramPoints(metric),
       aggregationTemporality: toAggregationTemporality(aggregationTemporality)
     };
-    if (metric.instrumentDescriptor.valueType === ValueType.INT) {
+    if (metric.descriptor.valueType === ValueType.INT) {
       metricCollector.intHistogram = result;
     } else {
       metricCollector.doubleHistogram = result;

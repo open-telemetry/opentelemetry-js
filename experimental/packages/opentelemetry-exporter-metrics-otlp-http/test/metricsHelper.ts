@@ -14,30 +14,32 @@
  * limitations under the License.
  */
 
-import {
-  Counter,
-  ObservableResult,
-  ObservableCounter,
-  ObservableUpDownCounter,
-  ObservableGauge,
-  Histogram,
-  ValueType,
-} from '@opentelemetry/api-metrics';
+import { Counter, Histogram, ObservableResult, ValueType, } from '@opentelemetry/api-metrics-wip';
 import { InstrumentationLibrary, VERSION } from '@opentelemetry/core';
-import * as metrics from '@opentelemetry/sdk-metrics-base';
+import { MeterProvider, MetricReader } from '@opentelemetry/sdk-metrics-base-wip';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 
-const meterProvider = new metrics.MeterProvider({
-  interval: 30000,
-  resource: new Resource({
-    service: 'ui',
-    version: 1,
-    cost: 112.12,
-  }),
+export class TestMetricReader extends MetricReader {
+  protected onForceFlush(): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+
+  protected onShutdown(): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+}
+
+const defaultResource = new Resource({
+  resourceKey: 'my-resource',
 });
 
+const meterProvider = new MeterProvider({ resource: defaultResource });
+export const reader = new TestMetricReader();
+meterProvider.addMetricReader(
+  reader
+);
 const meter = meterProvider.getMeter('default', '0.0.1');
 
 if (typeof Buffer === 'undefined') {
@@ -48,103 +50,72 @@ if (typeof Buffer === 'undefined') {
   };
 }
 
-export function mockCounter(): metrics.Metric<metrics.BoundCounter> & Counter {
+export function mockCounter(): Counter {
   const name = 'int-counter';
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createCounter(name, {
-      description: 'sample counter description',
-      valueType: ValueType.INT,
-    });
-  metric.clear();
-  metric.bind({});
-  return metric;
+  return meter.createCounter(name, {
+    description: 'sample counter description',
+    valueType: ValueType.INT,
+  });
 }
 
-export function mockDoubleCounter(): metrics.Metric<metrics.BoundCounter> &
-  Counter {
+export function mockDoubleCounter(): Counter {
   const name = 'double-counter';
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createCounter(name, {
-      description: 'sample counter description',
-      valueType: ValueType.DOUBLE,
-    });
-  metric.clear();
-  metric.bind({});
-  return metric;
+  return meter.createCounter(name, {
+    description: 'sample counter description',
+    valueType: ValueType.DOUBLE,
+  });
 }
 
 export function mockObservableGauge(
-  callback: (observableResult: ObservableResult) => unknown,
+  callback: (observableResult: ObservableResult) => void,
   name = 'double-observable-gauge'
-): metrics.Metric<metrics.BoundObservable> & ObservableGauge {
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createObservableGauge(
-      name,
-      {
-        description: 'sample observable gauge description',
-        valueType: ValueType.DOUBLE,
-      },
-      callback
-    );
-  metric.clear();
-  metric.bind({});
-  return metric;
+): void {
+  return meter.createObservableGauge(
+    name,
+    callback,
+    {
+      description: 'sample observable gauge description',
+      valueType: ValueType.DOUBLE,
+    }
+  );
 }
 
 export function mockObservableCounter(
-  callback: (observableResult: ObservableResult) => unknown,
+  callback: (observableResult: ObservableResult) => void,
   name = 'double-observable-counter'
-): metrics.Metric<metrics.BoundObservable> & ObservableCounter {
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createObservableCounter(
-      name,
-      {
-        description: 'sample observable counter description',
-        valueType: ValueType.DOUBLE,
-      },
-      callback
-    );
-  metric.clear();
-  metric.bind({});
-  return metric;
+): void {
+  meter.createObservableCounter(
+    name,
+    callback,
+    {
+      description: 'sample observable counter description',
+      valueType: ValueType.DOUBLE,
+    }
+  );
 }
 
 export function mockObservableUpDownCounter(
-  callback: (observableResult: ObservableResult) => unknown,
+  callback: (observableResult: ObservableResult) => void,
   name = 'double-up-down-observable-counter'
-): metrics.Metric<metrics.BoundObservable> & ObservableUpDownCounter {
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createObservableUpDownCounter(
-      name,
-      {
-        description: 'sample observable up down counter description',
-        valueType: ValueType.DOUBLE,
-      },
-      callback
-    );
-  metric.clear();
-  metric.bind({});
-  return metric;
+): void {
+
+  meter.createObservableUpDownCounter(
+    name,
+    callback,
+    {
+      description: 'sample observable up down counter description',
+      valueType: ValueType.DOUBLE,
+    },
+  );
 }
 
-export function mockHistogram(): metrics.Metric<metrics.BoundHistogram> &
-  Histogram {
+export function mockHistogram(): Histogram {
   const name = 'int-histogram';
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createHistogram(name, {
-      description: 'sample histogram description',
-      valueType: ValueType.INT,
-      boundaries: [0, 100],
-    });
-  metric.clear();
-  metric.bind({});
-  return metric;
+  // TODO boundaries 1-100
+  return meter.createHistogram(name, {
+    description: 'sample histogram description',
+    valueType: ValueType.INT,
+  });
 }
 
 export const mockedResources: Resource[] = [
@@ -163,7 +134,7 @@ export const mockedInstrumentationLibraries: InstrumentationLibrary[] = [
   },
 ];
 
-export const multiResourceMetricsGet = function (
+/*export const multiResourceMetricsGet = function (
   callback: (observableResult: ObservableResult) => unknown
 ): any[] {
   return [
@@ -183,8 +154,9 @@ export const multiResourceMetricsGet = function (
       instrumentationLibrary: mockedInstrumentationLibraries[0],
     },
   ];
-};
+};*/
 
+/*
 export const multiInstrumentationLibraryMetricsGet = function (
   callback: (observableResult: ObservableResult) => unknown
 ): any[] {
@@ -205,7 +177,7 @@ export const multiInstrumentationLibraryMetricsGet = function (
       instrumentationLibrary: mockedInstrumentationLibraries[0],
     },
   ];
-};
+};*/
 
 export function ensureAttributesAreCorrect(
   attributes: otlpTypes.opentelemetryProto.common.v1.KeyValue[]
@@ -264,8 +236,8 @@ export function ensureCounterIsCorrect(
       ],
       isMonotonic: true,
       aggregationTemporality:
-        otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
-          .AGGREGATION_TEMPORALITY_CUMULATIVE,
+      otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
+        .AGGREGATION_TEMPORALITY_CUMULATIVE,
     },
   });
 }
@@ -289,8 +261,8 @@ export function ensureDoubleCounterIsCorrect(
       ],
       isMonotonic: true,
       aggregationTemporality:
-        otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
-          .AGGREGATION_TEMPORALITY_CUMULATIVE,
+      otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
+        .AGGREGATION_TEMPORALITY_CUMULATIVE,
     },
   });
 }
@@ -339,8 +311,8 @@ export function ensureObservableCounterIsCorrect(
         },
       ],
       aggregationTemporality:
-        otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
-          .AGGREGATION_TEMPORALITY_CUMULATIVE,
+      otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
+        .AGGREGATION_TEMPORALITY_CUMULATIVE,
     },
   });
 }
@@ -366,8 +338,8 @@ export function ensureObservableUpDownCounterIsCorrect(
         },
       ],
       aggregationTemporality:
-        otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
-          .AGGREGATION_TEMPORALITY_CUMULATIVE,
+      otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
+        .AGGREGATION_TEMPORALITY_CUMULATIVE,
     },
   });
 }
@@ -395,8 +367,8 @@ export function ensureHistogramIsCorrect(
         },
       ],
       aggregationTemporality:
-        otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
-          .AGGREGATION_TEMPORALITY_CUMULATIVE,
+      otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
+        .AGGREGATION_TEMPORALITY_CUMULATIVE,
     },
   });
 }

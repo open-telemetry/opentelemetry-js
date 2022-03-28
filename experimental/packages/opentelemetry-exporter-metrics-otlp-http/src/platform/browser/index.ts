@@ -15,4 +15,3 @@
  */
 
 export * from './OTLPMetricExporter';
-export { OTLPMetricExporterOptions } from "../../OTLPExporterOptions";

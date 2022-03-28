@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-import { Counter, ObservableGauge } from '@opentelemetry/api-metrics';
 import { ExportResultCode } from '@opentelemetry/core';
 import {
-  BoundCounter,
-  BoundObservable,
-  Metric,
-  MetricRecord,
-} from '@opentelemetry/sdk-metrics-base';
+  ResourceMetrics,
+} from '@opentelemetry/sdk-metrics-base-wip';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPExporterBase, otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
-import { mockCounter, mockObservableGauge } from '../metricsHelper';
+import { mockCounter, mockObservableGauge, reader } from '../metricsHelper';
 
 type CollectorExporterConfig = otlpTypes.OTLPExporterConfigBase;
 class OTLPMetricExporter extends OTLPExporterBase<
   CollectorExporterConfig,
-  MetricRecord,
+  ResourceMetrics,
   otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
 > {
   onInit() {}
@@ -40,7 +36,7 @@ class OTLPMetricExporter extends OTLPExporterBase<
     return config.url || '';
   }
   convert(
-    metrics: MetricRecord[]
+    metrics: ResourceMetrics[]
   ): otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
     return { resourceMetrics: [] };
   }
@@ -49,7 +45,7 @@ class OTLPMetricExporter extends OTLPExporterBase<
 describe('OTLPMetricExporter - common', () => {
   let collectorExporter: OTLPMetricExporter;
   let collectorExporterConfig: CollectorExporterConfig;
-  let metrics: MetricRecord[];
+  let metrics: ResourceMetrics;
 
   afterEach(() => {
     sinon.restore();
@@ -66,9 +62,8 @@ describe('OTLPMetricExporter - common', () => {
         url: 'http://foo.bar.com',
       };
       collectorExporter = new OTLPMetricExporter(collectorExporterConfig);
-      metrics = [];
-      const counter: Metric<BoundCounter> & Counter = mockCounter();
-      const observableGauge: Metric<BoundObservable> & ObservableGauge = mockObservableGauge(
+      const counter = mockCounter();
+      mockObservableGauge(
         observableResult => {
           observableResult.observe(3, {});
           observableResult.observe(6, {});
@@ -77,8 +72,7 @@ describe('OTLPMetricExporter - common', () => {
       );
       counter.add(1);
 
-      metrics.push((await counter.getMetricRecord())[0]);
-      metrics.push((await observableGauge.getMetricRecord())[0]);
+      metrics = (await reader.collect())!;
     });
 
     it('should create an instance', () => {
@@ -114,12 +108,10 @@ describe('OTLPMetricExporter - common', () => {
     });
 
     it('should export metrics as otlpTypes.Metrics', done => {
-      collectorExporter.export(metrics, () => {});
+      collectorExporter.export([metrics], () => {});
       setTimeout(() => {
-        const metric1 = spySend.args[0][0][0] as MetricRecord;
-        assert.deepStrictEqual(metrics[0], metric1);
-        const metric2 = spySend.args[0][0][1] as MetricRecord;
-        assert.deepStrictEqual(metrics[1], metric2);
+        const metric1 = spySend.args[0][0][0] as ResourceMetrics;
+        assert.deepStrictEqual(metrics, metric1);
         done();
       });
       assert.strictEqual(spySend.callCount, 1);
@@ -134,7 +126,7 @@ describe('OTLPMetricExporter - common', () => {
           spySend.resetHistory();
 
           const callbackSpy = sinon.spy();
-          collectorExporter.export(metrics, callbackSpy);
+          collectorExporter.export([metrics], callbackSpy);
           const returnCode = callbackSpy.args[0][0];
           assert.strictEqual(
             returnCode.code,
@@ -155,7 +147,7 @@ describe('OTLPMetricExporter - common', () => {
           stack: 'Stack',
         });
         const callbackSpy = sinon.spy();
-        collectorExporter.export(metrics, callbackSpy);
+        collectorExporter.export([metrics], callbackSpy);
         setTimeout(() => {
           const returnCode = callbackSpy.args[0][0];
           assert.strictEqual(
