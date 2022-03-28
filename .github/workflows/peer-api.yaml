@@ -27,4 +27,4 @@ jobs:
 
       - name: Check API dependency semantics (experimental)
         working-directory: experimental
-        run: lerna exec --ignore propagation-validation-server --ignore @opentelemetry/selenium-tests --ignore @opentelemetry/api-metrics-wip "node ../../../scripts/peer-api-check.js"
+        run: lerna exec --ignore propagation-validation-server --ignore @opentelemetry/selenium-tests --ignore @opentelemetry/api-metrics-wip --ignore @opentelemetry/otlp-transformer "node ../../../scripts/peer-api-check.js"

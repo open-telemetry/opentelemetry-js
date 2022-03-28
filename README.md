@@ -47,7 +47,8 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 
 | API Version | Core version | Experimental Packages |
 | ----------- |--------------| --------------------- |
-| 1.0.x       | 1.x          | 0.26.x                |
+| 1.1.x       | 1.1.x        | 0.28.x                |
+| 1.0.x       | 1.0.x        | 0.26.x, 0.27.x        |
 | 1.0.x       | 0.26.x       | -----                 |
 | 1.0.x       | 0.25.x       | -----                 |
 | 1.0.x       | 0.24.x       | -----                 |
@@ -150,7 +151,7 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 Automated tests are run using the latest release of each currently active version of Node.JS.
 While Node.JS v8 and v10 are no longer supported by the Node.JS team, the latest versions of Node.JS v8 and v10 are still included in our testing suite.
-Please note that versions of Node.JS v8 prior to `v8.5.0` will NOT work, because OpenTelemetry Node depends on the `perf_hooks` module introduced in `v8.5.0`
+Please note that versions of Node.JS v8 prior to `v8.12.0` will NOT work, because OpenTelemetry Node depends on the `perf_hooks` module introduced in `v8.5.0` and `performance.timeOrigin` that is set correctly starting in `v8.12.0`.
 
 ### Browser Support
 
@@ -275,7 +276,7 @@ These instrumentations are hosted at <https://github.com/open-telemetry/opentele
 
 ## Upgrade guidelines
 
-### 0.27.x to 1.x.y
+### 0.27.x to 0.28.x
 
 - In `@opentelemetry/exporter-trace-otlp-http`, `OTLPExporterBase._isShutdown` is replaced with `_shutdownOnce`.
 

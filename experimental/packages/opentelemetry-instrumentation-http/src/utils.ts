@@ -17,15 +17,14 @@ import {
   SpanAttributes,
   SpanStatusCode,
   Span,
-  SpanStatus,
   context,
+  SpanKind,
 } from '@opentelemetry/api';
 import {
   NetTransportValues,
   SemanticAttributes,
 } from '@opentelemetry/semantic-conventions';
 import {
-  ClientRequest,
   IncomingHttpHeaders,
   IncomingMessage,
   OutgoingHttpHeaders,
@@ -65,24 +64,20 @@ export const getAbsoluteUrl = (
 
   return `${protocol}//${host}${path}`;
 };
+
 /**
  * Parse status code from HTTP response. [More details](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-http.md#status)
  */
-export const parseResponseStatus = (
-  statusCode: number | undefined,
-): Omit<SpanStatus, 'message'> => {
-
-  if(statusCode === undefined) {
-    return { code: SpanStatusCode.ERROR };
-  }
-
-  // 1xx, 2xx, 3xx are OK
-  if (statusCode >= 100 && statusCode < 400) {
-    return { code: SpanStatusCode.OK };
+export const parseResponseStatus = (kind: SpanKind, statusCode?: number): SpanStatusCode => {
+  const upperBound = kind === SpanKind.CLIENT ? 400 : 500;
+  // 1xx, 2xx, 3xx are OK on client and server
+  // 4xx is OK on server
+  if (statusCode && statusCode >= 100 && statusCode < upperBound) {
+    return SpanStatusCode.UNSET;
   }
 
   // All other codes are error
-  return { code: SpanStatusCode.ERROR };
+  return SpanStatusCode.ERROR;
 };
 
 /**
@@ -142,12 +137,10 @@ export const isIgnored = (
  * Sets the span with the error passed in params
  * @param {Span} span the span that need to be set
  * @param {Error} error error that will be set to span
- * @param {(IncomingMessage | ClientRequest)} [obj] used for enriching the status by checking the statusCode.
  */
 export const setSpanWithError = (
   span: Span,
-  error: Err,
-  obj?: IncomingMessage | ClientRequest
+  error: Err
 ): void => {
   const message = error.message;
 
@@ -156,23 +149,7 @@ export const setSpanWithError = (
     [AttributeNames.HTTP_ERROR_MESSAGE]: message,
   });
 
-  if (!obj) {
-    span.setStatus({ code: SpanStatusCode.ERROR, message });
-    return;
-  }
-
-  let status: SpanStatus;
-  if ((obj as IncomingMessage).statusCode) {
-    status = parseResponseStatus((obj as IncomingMessage).statusCode);
-  } else if ((obj as ClientRequest).aborted) {
-    status = { code: SpanStatusCode.ERROR };
-  } else {
-    status = { code: SpanStatusCode.ERROR };
-  }
-
-  status.message = message;
-
-  span.setStatus(status);
+  span.setStatus({ code: SpanStatusCode.ERROR, message });
 };
 
 /**

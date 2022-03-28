@@ -18,9 +18,9 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { AggregationTemporality, InstrumentDescriptor, InstrumentType, MeterProvider, MetricReader, PointData, PointDataType } from '../src';
+import { AggregationTemporality, InstrumentDescriptor, InstrumentType, MeterProvider, MetricReader, DataPoint, DataPointType } from '../src';
 import { TestMetricReader } from './export/TestMetricReader';
-import { assertMetricData, assertPointData, commonValues, commonAttributes, defaultResource, defaultInstrumentationLibrary } from './util';
+import { assertMetricData, assertDataPoint, commonValues, commonAttributes, defaultResource, defaultInstrumentationLibrary } from './util';
 import { Histogram } from '../src/aggregator/types';
 import { ObservableResult, ValueType } from '@opentelemetry/api-metrics-wip';
 
@@ -40,7 +40,7 @@ describe('Instruments', () => {
       }
 
       await validateExport(cumulativeReader, {
-        instrumentDescriptor: {
+        descriptor: {
           name: 'test',
           description: 'foobar',
           unit: 'kB',
@@ -61,22 +61,22 @@ describe('Instruments', () => {
       counter.add(1.1);
       counter.add(1, { foo: 'bar' });
       await validateExport(cumulativeReader, {
-        instrumentDescriptor: {
+        descriptor: {
           name: 'test',
           description: '',
           unit: '1',
           type: InstrumentType.COUNTER,
           valueType: ValueType.INT,
         },
-        pointDataType: PointDataType.SINGULAR,
-        pointData: [
+        dataPointType: DataPointType.SINGULAR,
+        dataPoints: [
           {
             attributes: {},
-            point: 2,
+            value: 2,
           },
           {
             attributes: { foo: 'bar' },
-            point: 1,
+            value: 1,
           },
         ],
       });
@@ -84,15 +84,15 @@ describe('Instruments', () => {
       // add negative values should not be observable.
       counter.add(-1.1);
       await validateExport(cumulativeReader, {
-        pointDataType: PointDataType.SINGULAR,
-        pointData: [
+        dataPointType: DataPointType.SINGULAR,
+        dataPoints: [
           {
             attributes: {},
-            point: 2,
+            value: 2,
           },
           {
             attributes: { foo: 'bar' },
-            point: 1,
+            value: 1,
           },
         ],
       });
@@ -110,15 +110,15 @@ describe('Instruments', () => {
       counter.add(1, { foo: 'bar' });
       counter.add(1.2, { foo: 'bar' });
       await validateExport(cumulativeReader, {
-        pointDataType: PointDataType.SINGULAR,
-        pointData: [
+        dataPointType: DataPointType.SINGULAR,
+        dataPoints: [
           {
             attributes: {},
-            point: 2.1,
+            value: 2.1,
           },
           {
             attributes: { foo: 'bar' },
-            point: 2.2,
+            value: 2.2,
           },
         ],
       });
@@ -126,15 +126,15 @@ describe('Instruments', () => {
       // add negative values should not be observable.
       counter.add(-1.1);
       await validateExport(cumulativeReader, {
-        pointDataType: PointDataType.SINGULAR,
-        pointData: [
+        dataPointType: DataPointType.SINGULAR,
+        dataPoints: [
           {
             attributes: {},
-            point: 2.1,
+            value: 2.1,
           },
           {
             attributes: { foo: 'bar' },
-            point: 2.2,
+            value: 2.2,
           },
         ],
       });
@@ -156,7 +156,7 @@ describe('Instruments', () => {
       }
 
       await validateExport(cumulativeReader, {
-        instrumentDescriptor: {
+        descriptor: {
           name: 'test',
           description: 'foobar',
           unit: 'kB',
@@ -177,22 +177,22 @@ describe('Instruments', () => {
       upDownCounter.add(4, { foo: 'bar' });
       upDownCounter.add(1.1, { foo: 'bar' });
       await validateExport(deltaReader, {
-        instrumentDescriptor: {
+        descriptor: {
           name: 'test',
           description: '',
           unit: '1',
           type: InstrumentType.UP_DOWN_COUNTER,
           valueType: ValueType.INT,
         },
-        pointDataType: PointDataType.SINGULAR,
-        pointData: [
+        dataPointType: DataPointType.SINGULAR,
+        dataPoints: [
           {
             attributes: {},
-            point: 2,
+            value: 2,
           },
           {
             attributes: { foo: 'bar' },
-            point: 5,
+            value: 5,
           }
         ],
       });
@@ -209,15 +209,15 @@ describe('Instruments', () => {
       upDownCounter.add(4, { foo: 'bar' });
       upDownCounter.add(1.1, { foo: 'bar' });
       await validateExport(deltaReader, {
-        pointDataType: PointDataType.SINGULAR,
-        pointData: [
+        dataPointType: DataPointType.SINGULAR,
+        dataPoints: [
           {
             attributes: {},
-            point: 1.9,
+            value: 1.9,
           },
           {
             attributes: { foo: 'bar' },
-            point: 5.1,
+            value: 5.1,
           }
         ],
       });
@@ -240,7 +240,7 @@ describe('Instruments', () => {
       }
 
       await validateExport(cumulativeReader, {
-        instrumentDescriptor: {
+        descriptor: {
           name: 'test',
           description: 'foobar',
           unit: 'kB',
@@ -262,18 +262,18 @@ describe('Instruments', () => {
       histogram.record(100, { foo: 'bar' });
       histogram.record(-0.1, { foo: 'bar' });
       await validateExport(deltaReader, {
-        instrumentDescriptor: {
+        descriptor: {
           name: 'test',
           description: '',
           unit: '1',
           type: InstrumentType.HISTOGRAM,
           valueType: ValueType.INT,
         },
-        pointDataType: PointDataType.HISTOGRAM,
-        pointData: [
+        dataPointType: DataPointType.HISTOGRAM,
+        dataPoints: [
           {
             attributes: {},
-            point: {
+            value: {
               buckets: {
                 boundaries: [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000],
                 counts: [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
@@ -284,7 +284,7 @@ describe('Instruments', () => {
           },
           {
             attributes: { foo: 'bar' },
-            point: {
+            value: {
               buckets: {
                 boundaries: [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000],
                 counts: [0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0],
@@ -309,11 +309,11 @@ describe('Instruments', () => {
       histogram.record(100, { foo: 'bar' });
       histogram.record(-0.1, { foo: 'bar' });
       await validateExport(deltaReader, {
-        pointDataType: PointDataType.HISTOGRAM,
-        pointData: [
+        dataPointType: DataPointType.HISTOGRAM,
+        dataPoints: [
           {
             attributes: {},
-            point: {
+            value: {
               buckets: {
                 boundaries: [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000],
                 counts: [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
@@ -324,7 +324,7 @@ describe('Instruments', () => {
           },
           {
             attributes: { foo: 'bar' },
-            point: {
+            value: {
               buckets: {
                 boundaries: [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000],
                 counts: [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
@@ -363,28 +363,28 @@ describe('Instruments', () => {
       });
 
       await validateExport(cumulativeReader, {
-        pointDataType: PointDataType.SINGULAR,
-        pointData: [
+        dataPointType: DataPointType.SINGULAR,
+        dataPoints: [
           {
             attributes: {},
-            point: 1,
+            value: 1,
           },
           {
             attributes: { foo: 'bar' },
-            point: 1,
+            value: 1,
           },
         ],
       });
       await validateExport(cumulativeReader, {
-        pointDataType: PointDataType.SINGULAR,
-        pointData: [
+        dataPointType: DataPointType.SINGULAR,
+        dataPoints: [
           {
             attributes: {},
-            point: 2,
+            value: 2,
           },
           {
             attributes: { foo: 'bar' },
-            point: 1,
+            value: 1,
           },
         ],
       });
@@ -416,28 +416,28 @@ describe('Instruments', () => {
       });
 
       await validateExport(cumulativeReader, {
-        pointDataType: PointDataType.SINGULAR,
-        pointData: [
+        dataPointType: DataPointType.SINGULAR,
+        dataPoints: [
           {
             attributes: {},
-            point: 1,
+            value: 1,
           },
           {
             attributes: { foo: 'bar' },
-            point: 1,
+            value: 1,
           },
         ],
       });
       await validateExport(cumulativeReader, {
-        pointDataType: PointDataType.SINGULAR,
-        pointData: [
+        dataPointType: DataPointType.SINGULAR,
+        dataPoints: [
           {
             attributes: {},
-            point: 2,
+            value: 2,
           },
           {
             attributes: { foo: 'bar' },
-            point: 1,
+            value: 1,
           },
         ],
       });
@@ -474,41 +474,41 @@ describe('Instruments', () => {
       });
 
       await validateExport(cumulativeReader, {
-        pointDataType: PointDataType.SINGULAR,
-        pointData: [
+        dataPointType: DataPointType.SINGULAR,
+        dataPoints: [
           {
             attributes: {},
-            point: 10,
+            value: 10,
           },
           {
             attributes: { foo: 'bar' },
-            point: 1,
+            value: 1,
           },
         ],
       });
       await validateExport(cumulativeReader, {
-        pointDataType: PointDataType.SINGULAR,
-        pointData: [
+        dataPointType: DataPointType.SINGULAR,
+        dataPoints: [
           {
             attributes: {},
-            point: 20,
+            value: 20,
           },
           {
             attributes: { foo: 'bar' },
-            point: 1,
+            value: 1,
           },
         ],
       });
       await validateExport(cumulativeReader, {
-        pointDataType: PointDataType.SINGULAR,
-        pointData: [
+        dataPointType: DataPointType.SINGULAR,
+        dataPoints: [
           {
             attributes: {},
-            point: -1,
+            value: -1,
           },
           {
             attributes: { foo: 'bar' },
-            point: 1,
+            value: 1,
           },
         ],
       });
@@ -537,9 +537,9 @@ function setup() {
 interface ValidateMetricData {
   resource?: Resource;
   instrumentationLibrary?: InstrumentationLibrary;
-  instrumentDescriptor?: InstrumentDescriptor;
-  pointDataType?: PointDataType,
-  pointData?: Partial<PointData<number | Partial<Histogram>>>[];
+  descriptor?: InstrumentDescriptor;
+  dataPointType?: DataPointType,
+  dataPoints?: Partial<DataPoint<number | Partial<Histogram>>>[];
 }
 
 async function validateExport(reader: MetricReader, expected: ValidateMetricData) {
@@ -558,23 +558,23 @@ async function validateExport(reader: MetricReader, expected: ValidateMetricData
 
   assertMetricData(
     metric,
-    expected.pointDataType,
-    expected.instrumentDescriptor ?? null,
+    expected.dataPointType,
+    expected.descriptor ?? null,
   );
 
-  if (expected.pointData == null) {
+  if (expected.dataPoints == null) {
     return;
   }
-  assert.strictEqual(metric.pointData.length, expected.pointData.length);
+  assert.strictEqual(metric.dataPoints.length, expected.dataPoints.length);
 
-  for (let idx = 0; idx < metric.pointData.length; idx++) {
-    const expectedPointData = expected.pointData[idx];
-    assertPointData(
-      metric.pointData[idx],
-      expectedPointData.attributes ?? {},
-      expectedPointData.point as any,
-      expectedPointData.startTime,
-      expectedPointData.endTime
+  for (let idx = 0; idx < metric.dataPoints.length; idx++) {
+    const expectedDataPoint = expected.dataPoints[idx];
+    assertDataPoint(
+      metric.dataPoints[idx],
+      expectedDataPoint.attributes ?? {},
+      expectedDataPoint.value as any,
+      expectedDataPoint.startTime,
+      expectedDataPoint.endTime
     );
   }
 }

@@ -20,11 +20,11 @@ import * as assert from 'assert';
 
 import { SumAggregator } from '../../src/aggregator';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import { PointDataType } from '../../src/export/MetricData';
+import { DataPointType } from '../../src/export/MetricData';
 import { MetricCollectorHandle } from '../../src/state/MetricCollector';
 import { SyncMetricStorage } from '../../src/state/SyncMetricStorage';
 import { NoopAttributesProcessor } from '../../src/view/AttributesProcessor';
-import { assertMetricData, assertPointData, commonAttributes, commonValues, defaultInstrumentDescriptor } from '../util';
+import { assertMetricData, assertDataPoint, commonAttributes, commonValues, defaultInstrumentDescriptor } from '../util';
 
 const deltaCollector: MetricCollectorHandle = {
   aggregatorTemporality: AggregationTemporality.DELTA,
@@ -64,9 +64,9 @@ describe('SyncMetricStorage', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 1);
-          assertPointData(metric.pointData[0], {}, 6);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 1);
+          assertDataPoint(metric.dataPoints[0], {}, 6);
         }
 
         // The attributes should not be memorized.
@@ -77,8 +77,8 @@ describe('SyncMetricStorage', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 0);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 0);
         }
 
         metricStorage.record(1, {}, api.context.active());
@@ -89,9 +89,9 @@ describe('SyncMetricStorage', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 1);
-          assertPointData(metric.pointData[0], {}, 1);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 1);
+          assertDataPoint(metric.dataPoints[0], {}, 1);
         }
       });
     });
@@ -110,9 +110,9 @@ describe('SyncMetricStorage', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 1);
-          assertPointData(metric.pointData[0], {}, 6);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 1);
+          assertDataPoint(metric.dataPoints[0], {}, 6);
         }
 
         // The attributes should be memorized.
@@ -123,9 +123,9 @@ describe('SyncMetricStorage', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 1);
-          assertPointData(metric.pointData[0], {}, 6);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 1);
+          assertDataPoint(metric.dataPoints[0], {}, 6);
         }
 
         metricStorage.record(1, {}, api.context.active());
@@ -136,9 +136,9 @@ describe('SyncMetricStorage', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 1);
-          assertPointData(metric.pointData[0], {}, 7);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 1);
+          assertDataPoint(metric.dataPoints[0], {}, 7);
         }
       });
     });

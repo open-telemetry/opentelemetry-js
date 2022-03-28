@@ -17,7 +17,7 @@
 import { HrTime } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { HistogramAccumulation, HistogramAggregator } from '../../src/aggregator';
-import { MetricData, PointDataType } from '../../src/export/MetricData';
+import { MetricData, DataPointType } from '../../src/export/MetricData';
 import { commonValues, defaultInstrumentDescriptor } from '../util';
 
 describe('HistogramAggregator', () => {
@@ -92,14 +92,14 @@ describe('HistogramAggregator', () => {
       const endTime: HrTime = [1, 1];
 
       const expected: MetricData = {
-        instrumentDescriptor: defaultInstrumentDescriptor,
-        pointDataType: PointDataType.HISTOGRAM,
-        pointData: [
+        descriptor: defaultInstrumentDescriptor,
+        dataPointType: DataPointType.HISTOGRAM,
+        dataPoints: [
           {
             attributes: {},
             startTime,
             endTime,
-            point: {
+            value: {
               buckets: {
                 boundaries: [1, 10, 100],
                 counts: [1, 1, 0, 0],

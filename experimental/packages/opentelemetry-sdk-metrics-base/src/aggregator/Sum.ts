@@ -16,7 +16,7 @@
 
 import { Sum, AggregatorKind, Aggregator, Accumulation, AccumulationRecord } from './types';
 import { HrTime } from '@opentelemetry/api';
-import { PointDataType, SingularMetricData } from '../export/MetricData';
+import { DataPointType, SingularMetricData } from '../export/MetricData';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 
@@ -27,7 +27,7 @@ export class SumAccumulation implements Accumulation {
     this._current += value;
   }
 
-  toPoint(): Sum {
+  toPointValue(): Sum {
     return this._current;
   }
 }
@@ -44,30 +44,30 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
    * Returns the result of the merge of the given accumulations.
    */
   merge(previous: SumAccumulation, delta: SumAccumulation): SumAccumulation {
-    return new SumAccumulation(previous.toPoint() + delta.toPoint());
+    return new SumAccumulation(previous.toPointValue() + delta.toPointValue());
   }
 
   /**
    * Returns a new DELTA aggregation by comparing two cumulative measurements.
    */
   diff(previous: SumAccumulation, current: SumAccumulation): SumAccumulation {
-    return new SumAccumulation(current.toPoint() - previous.toPoint());
+    return new SumAccumulation(current.toPointValue() - previous.toPointValue());
   }
 
   toMetricData(
-    instrumentDescriptor: InstrumentDescriptor,
+    descriptor: InstrumentDescriptor,
     accumulationByAttributes: AccumulationRecord<SumAccumulation>[],
     startTime: HrTime,
     endTime: HrTime): Maybe<SingularMetricData> {
     return {
-      instrumentDescriptor,
-      pointDataType: PointDataType.SINGULAR,
-      pointData: accumulationByAttributes.map(([attributes, accumulation]) => {
+      descriptor,
+      dataPointType: DataPointType.SINGULAR,
+      dataPoints: accumulationByAttributes.map(([attributes, accumulation]) => {
         return {
           attributes,
           startTime,
           endTime,
-          point: accumulation.toPoint(),
+          value: accumulation.toPointValue(),
         };
       })
     };
