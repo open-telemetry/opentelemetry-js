@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
+import { AggregationTemporality } from '@opentelemetry/sdk-metrics-base-wip';
 
-export * from './platform';
-export * from './OTLPExporterOptions';
-export { toOTLPExportMetricServiceRequest } from './transformMetrics';
+export interface OTLPExporterOptions extends otlpTypes.OTLPExporterConfigBase {
+  aggregationTemporality: AggregationTemporality
+}

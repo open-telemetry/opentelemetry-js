@@ -11,6 +11,9 @@
   "references": [
     {
       "path": "../exporter-trace-otlp-http"
+    },
+    {
+      "path": "../opentelemetry-sdk-metrics-base"
     }
   ]
 }
