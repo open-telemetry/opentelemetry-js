@@ -113,8 +113,7 @@ export class ExplicitBucketHistogramAggregation extends Aggregation {
     if (infinityIndex === -1) {
       infinityIndex = undefined;
     }
-    boundaries = boundaries.slice(minusInfinityIndex + 1, infinityIndex);
-    this._boundaries = boundaries;
+    this._boundaries = boundaries.slice(minusInfinityIndex + 1, infinityIndex);
   }
 
   createAggregator(_instrument: InstrumentDescriptor) {
