@@ -32,7 +32,7 @@ export class OTLPExporterBrowserProxy extends OTLPExporterBrowserBase<ResourceMe
   otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest> {
   protected readonly _aggregationTemporality: AggregationTemporality;
 
-  constructor(config: OTLPMetricExporterOptions = defaultOptions) {
+  constructor(config: OTLPMetricExporterOptions & otlpTypes.OTLPExporterConfigBase = defaultOptions) {
     super(config);
     this._headers = Object.assign(
       this._headers,

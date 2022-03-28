@@ -16,7 +16,7 @@
 
 import { Counter, Histogram, ObservableResult, ValueType, } from '@opentelemetry/api-metrics-wip';
 import { InstrumentationLibrary, VERSION } from '@opentelemetry/core';
-import { MeterProvider, MetricReader } from '@opentelemetry/sdk-metrics-base-wip';
+import { HistogramAggregation, MeterProvider, MetricReader } from '@opentelemetry/sdk-metrics-base-wip';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
@@ -35,12 +35,12 @@ const defaultResource = new Resource({
   resourceKey: 'my-resource',
 });
 
-const meterProvider = new MeterProvider({ resource: defaultResource });
-export const reader = new TestMetricReader();
+let meterProvider = new MeterProvider({ resource: defaultResource });
+let reader = new TestMetricReader();
 meterProvider.addMetricReader(
   reader
 );
-const meter = meterProvider.getMeter('default', '0.0.1');
+let meter = meterProvider.getMeter('default', '0.0.1');
 
 if (typeof Buffer === 'undefined') {
   (window as any).Buffer = {
@@ -48,6 +48,23 @@ if (typeof Buffer === 'undefined') {
       return new Uint8Array(arr);
     },
   };
+}
+
+export function setUp(){
+  meterProvider = new MeterProvider({ resource: defaultResource });
+  reader = new TestMetricReader();
+  meterProvider.addMetricReader(
+    reader
+  );
+  meter = meterProvider.getMeter('default', '0.0.1');
+}
+
+export async function shutdown(){
+  await meterProvider.shutdown();
+}
+
+export async function collect(){
+  return (await reader.collect())!;
 }
 
 export function mockCounter(): Counter {
@@ -111,7 +128,9 @@ export function mockObservableUpDownCounter(
 
 export function mockHistogram(): Histogram {
   const name = 'int-histogram';
-  // TODO boundaries 1-100
+
+  meterProvider.addView({aggregation: new HistogramAggregation([0,100])});
+
   return meter.createHistogram(name, {
     description: 'sample histogram description',
     valueType: ValueType.INT,
@@ -219,7 +238,8 @@ export function ensureWebResourceIsCorrect(
 
 export function ensureCounterIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
-  time: number
+  endTime: number,
+  startTime: number
 ) {
   assert.deepStrictEqual(metric, {
     name: 'int-counter',
@@ -230,8 +250,8 @@ export function ensureCounterIsCorrect(
         {
           labels: [],
           value: 1,
-          startTimeUnixNano: 1592602232694000000,
-          timeUnixNano: time,
+          startTimeUnixNano: startTime,
+          timeUnixNano: endTime,
         },
       ],
       isMonotonic: true,
@@ -270,6 +290,7 @@ export function ensureDoubleCounterIsCorrect(
 export function ensureObservableGaugeIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time: number,
+  startTime: number,
   value: number,
   name = 'double-observable-gauge'
 ) {
@@ -282,10 +303,14 @@ export function ensureObservableGaugeIsCorrect(
         {
           labels: [],
           value,
-          startTimeUnixNano: 1592602232694000000,
+          startTimeUnixNano: startTime,
           timeUnixNano: time,
         },
       ],
+      aggregationTemporality:
+      otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
+        .AGGREGATION_TEMPORALITY_CUMULATIVE,
+      isMonotonic: false,
     },
   });
 }
@@ -347,6 +372,7 @@ export function ensureObservableUpDownCounterIsCorrect(
 export function ensureHistogramIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time: number,
+  startTime: number,
   explicitBounds: (number | null)[] = [Infinity],
   bucketCounts: number[] = [2, 0]
 ) {
@@ -360,7 +386,7 @@ export function ensureHistogramIsCorrect(
           labels: [],
           sum: 21,
           count: 2,
-          startTimeUnixNano: 1592602232694000000,
+          startTimeUnixNano: startTime,
           timeUnixNano: time,
           bucketCounts,
           explicitBounds,

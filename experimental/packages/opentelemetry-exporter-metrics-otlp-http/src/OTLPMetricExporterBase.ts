@@ -21,21 +21,21 @@ import { defaultOptions, OTLPMetricExporterOptions } from './OTLPMetricExporterO
 
 export class OTLPMetricExporterBase
   implements PushMetricExporter {
-  protected _otlpExporter: OTLPExporterBase<OTLPMetricExporterOptions, ResourceMetrics, otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest>;
+  public otlpExporter: OTLPExporterBase<OTLPMetricExporterOptions, ResourceMetrics, otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest>;
   protected _preferredAggregationTemporality: AggregationTemporality;
 
   constructor(exporter: OTLPExporterBase<OTLPMetricExporterOptions, ResourceMetrics, otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest>,
               config: OTLPMetricExporterOptions = defaultOptions) {
-    this._otlpExporter = exporter;
+    this.otlpExporter = exporter;
     this._preferredAggregationTemporality = config.aggregationTemporality;
   }
 
   export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): void {
-    this._otlpExporter.export([metrics], resultCallback);
+    this.otlpExporter.export([metrics], resultCallback);
   }
 
   async shutdown(): Promise<void> {
-    await this._otlpExporter.shutdown();
+    await this.otlpExporter.shutdown();
   }
 
   forceFlush(): Promise<void> {

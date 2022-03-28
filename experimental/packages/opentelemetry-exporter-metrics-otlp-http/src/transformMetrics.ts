@@ -128,10 +128,22 @@ export function toCollectorMetric(
       aggregationTemporality: toAggregationTemporality(aggregationTemporality),
     };
 
-    if (metric.descriptor.valueType === ValueType.INT) {
-      metricCollector.intSum = result;
-    } else {
-      metricCollector.doubleSum = result;
+    if (
+      metric.descriptor.type === InstrumentType.COUNTER ||
+      metric.descriptor.type === InstrumentType.OBSERVABLE_COUNTER
+    ) {
+      if (metric.descriptor.valueType === ValueType.INT) {
+        metricCollector.intSum = result;
+      } else {
+        metricCollector.doubleSum = result;
+      }
+    } else{
+      // Instrument is a gauge.
+      if (metric.descriptor.valueType === ValueType.INT) {
+        metricCollector.intGauge = result;
+      } else {
+        metricCollector.doubleGauge = result;
+      }
     }
   } else if (metric.dataPointType === DataPointType.HISTOGRAM) {
     const result = {

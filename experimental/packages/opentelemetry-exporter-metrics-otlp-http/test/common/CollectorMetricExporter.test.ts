@@ -21,7 +21,7 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPExporterBase, otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
-import { mockCounter, mockObservableGauge, reader } from '../metricsHelper';
+import { collect, mockCounter, mockObservableGauge, setUp, shutdown } from '../metricsHelper';
 
 type CollectorExporterConfig = otlpTypes.OTLPExporterConfigBase;
 class OTLPMetricExporter extends OTLPExporterBase<
@@ -47,7 +47,12 @@ describe('OTLPMetricExporter - common', () => {
   let collectorExporterConfig: CollectorExporterConfig;
   let metrics: ResourceMetrics;
 
-  afterEach(() => {
+  beforeEach(() => {
+    setUp();
+  });
+
+  afterEach(async () => {
+    await shutdown();
     sinon.restore();
   });
 
@@ -72,7 +77,7 @@ describe('OTLPMetricExporter - common', () => {
       );
       counter.add(1);
 
-      metrics = (await reader.collect())!;
+      metrics = await collect();
     });
 
     it('should create an instance', () => {

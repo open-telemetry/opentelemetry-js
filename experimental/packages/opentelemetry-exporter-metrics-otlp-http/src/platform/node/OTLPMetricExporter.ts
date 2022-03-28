@@ -33,7 +33,7 @@ export class OTLPExporterNodeProxy extends OTLPExporterNodeBase<ResourceMetrics,
   otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest> {
   protected readonly _aggregationTemporality: AggregationTemporality;
 
-  constructor(config: OTLPMetricExporterOptions = defaultOptions) {
+  constructor(config: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions = defaultOptions) {
     super(config);
     this.headers = Object.assign(
       this.headers,
@@ -69,7 +69,7 @@ export class OTLPExporterNodeProxy extends OTLPExporterNodeBase<ResourceMetrics,
  * Collector Metric Exporter for Node
  */
 export class OTLPMetricExporter extends OTLPMetricExporterBase {
-  constructor(config: OTLPMetricExporterOptions = defaultOptions) {
+  constructor(config: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions = defaultOptions) {
     super(new OTLPExporterNodeProxy(config), config);
   }
 }
