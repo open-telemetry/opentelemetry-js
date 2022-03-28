@@ -15,5 +15,6 @@
  */
 
 export * from './platform';
-export * from './OTLPExporterOptions';
+export * from './OTLPMetricExporterOptions';
+export * from './OTLPMetricExporterBase';
 export { toOTLPExportMetricServiceRequest } from './transformMetrics';

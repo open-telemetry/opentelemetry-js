@@ -16,10 +16,9 @@
 
 import { SpanAttributes } from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
-import { Histogram, MetricRecord, } from '@opentelemetry/sdk-metrics-base';
 import { OTLPExporterBase, otlpTypes, toCollectorResource } from '@opentelemetry/exporter-trace-otlp-http';
 import {
-  AggregationTemporality,
+  AggregationTemporality, Histogram,
   InstrumentType,
   MetricData,
   PointDataType,
@@ -161,7 +160,7 @@ export function toOTLPExportMetricServiceRequest<T extends otlpTypes.OTLPExporte
   metrics: ResourceMetrics,
   aggregationTemporality: AggregationTemporality,
   collectorExporterBase: OTLPExporterBase<T,
-    MetricRecord,
+    ResourceMetrics,
     otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest>
 ): otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
   const additionalAttributes = Object.assign(

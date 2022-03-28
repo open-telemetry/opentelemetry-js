@@ -16,6 +16,8 @@
 import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { AggregationTemporality } from '@opentelemetry/sdk-metrics-base-wip';
 
-export interface OTLPExporterOptions extends otlpTypes.OTLPExporterConfigBase {
+export interface OTLPMetricExporterOptions extends otlpTypes.OTLPExporterConfigBase {
   aggregationTemporality: AggregationTemporality
 }
+
+export const defaultOptions = {aggregationTemporality: AggregationTemporality.CUMULATIVE};
