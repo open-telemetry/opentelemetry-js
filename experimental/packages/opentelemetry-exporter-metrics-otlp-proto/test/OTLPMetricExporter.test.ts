@@ -60,7 +60,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/metrics';
       const collectorExporter = new OTLPMetricExporter();
       assert.strictEqual(
-        collectorExporter.url,
+        collectorExporter.otlpExporter.url,
         envSource.OTEL_EXPORTER_OTLP_ENDPOINT
       );
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
@@ -69,7 +69,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
       const collectorExporter = new OTLPMetricExporter();
       assert.strictEqual(
-        collectorExporter.url,
+        collectorExporter.otlpExporter.url,
         `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/metrics`
       );
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
@@ -79,7 +79,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.metrics';
       const collectorExporter = new OTLPMetricExporter();
       assert.strictEqual(
-        collectorExporter.url,
+        collectorExporter.otlpExporter.url,
         envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
       );
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';

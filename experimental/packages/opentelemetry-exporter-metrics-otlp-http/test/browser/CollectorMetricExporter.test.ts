@@ -26,6 +26,7 @@ import * as sinon from 'sinon';
 import { OTLPMetricExporter } from '../../src/platform/browser';
 import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import {
+  collect,
   ensureCounterIsCorrect,
   ensureExportMetricsServiceRequestIsSet,
   ensureHistogramIsCorrect,
@@ -33,7 +34,7 @@ import {
   ensureWebResourceIsCorrect,
   mockCounter,
   mockHistogram,
-  mockObservableGauge, reader,
+  mockObservableGauge, setUp, shutdown,
 } from '../metricsHelper';
 
 describe('OTLPMetricExporter - web', () => {
@@ -45,6 +46,7 @@ describe('OTLPMetricExporter - web', () => {
   let errorStub: sinon.SinonStub;
 
   beforeEach(async () => {
+    setUp();
     stubOpen = sinon.stub(XMLHttpRequest.prototype, 'open');
     sinon.stub(XMLHttpRequest.prototype, 'send');
     stubBeacon = sinon.stub(navigator, 'sendBeacon');
@@ -63,7 +65,7 @@ describe('OTLPMetricExporter - web', () => {
     histogram.record(7);
     histogram.record(14);
 
-    metrics = (await reader.collect())!;
+    metrics = await collect();
 
     // Need to stub/spy on the underlying logger as the "diag" instance is global
     debugStub = sinon.stub();
@@ -80,7 +82,8 @@ describe('OTLPMetricExporter - web', () => {
     diag.setLogger(diagLogger, DiagLogLevel.DEBUG);
   });
 
-  afterEach(() => {
+  afterEach(async () => {
+    await shutdown();
     sinon.restore();
     diag.disable();
   });
@@ -116,7 +119,8 @@ describe('OTLPMetricExporter - web', () => {
           if (metric1) {
             ensureCounterIsCorrect(
               metric1,
-              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0].endTime)
+              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0].endTime),
+              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0].startTime)
             );
           }
 
@@ -128,6 +132,7 @@ describe('OTLPMetricExporter - web', () => {
             ensureObservableGaugeIsCorrect(
               metric2,
               hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[1].dataPoints[0].endTime),
+              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[1].dataPoints[0].startTime),
               6,
               'double-observable-gauge2'
             );
@@ -141,6 +146,7 @@ describe('OTLPMetricExporter - web', () => {
             ensureHistogramIsCorrect(
               metric3,
               hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[3].dataPoints[0].endTime),
+              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[3].dataPoints[0].startTime),
               [0, 100],
               [0, 2, 0]
             );
@@ -188,6 +194,8 @@ describe('OTLPMetricExporter - web', () => {
         });
       });
     });
+
+    // TODO: Update these tests.
 /*
     describe('when "sendBeacon" is NOT available', () => {
       let server: any;
