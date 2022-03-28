@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.esnext.json",
+  "extends": "../../../tsconfig.base.esnext.json",
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "build/esnext",

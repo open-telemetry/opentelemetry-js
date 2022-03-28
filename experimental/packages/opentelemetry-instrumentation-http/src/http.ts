@@ -311,7 +311,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           if (response.aborted && !response.complete) {
             status = { code: SpanStatusCode.ERROR };
           } else {
-            status = utils.parseResponseStatus(response.statusCode);
+            status = { code: utils.parseResponseStatus(SpanKind.CLIENT, response.statusCode) };
           }
 
           span.setStatus(status);
@@ -333,7 +333,9 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         });
         response.on('error', (error: Err) => {
           this._diag.debug('outgoingRequest on error()', error);
-          utils.setSpanWithError(span, error, response);
+          utils.setSpanWithError(span, error);
+          const code = utils.parseResponseStatus(SpanKind.CLIENT, response.statusCode);
+          span.setStatus({ code, message: error.message });
           this._closeHttpSpan(span);
         });
       }
@@ -346,7 +348,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     });
     request.on('error', (error: Err) => {
       this._diag.debug('outgoingRequest on request error()', error);
-      utils.setSpanWithError(span, error, request);
+      utils.setSpanWithError(span, error);
       this._closeHttpSpan(span);
     });
 
@@ -470,7 +472,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
             span
               .setAttributes(attributes)
-              .setStatus(utils.parseResponseStatus(response.statusCode));
+              .setStatus({ code: utils.parseResponseStatus(SpanKind.SERVER, response.statusCode) });
 
             if (instrumentation._getConfig().applyCustomAttributesOnSpan) {
               safeExecuteInTheMiddle(
