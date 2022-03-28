@@ -49,7 +49,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
 
   const exporterTimer = setTimeout(() => {
     reqIsDestroyed = true;
-    if (Number(nodeVersion) >= 14) {
+    if (nodeVersion >= 14) {
       req.destroy();
     } else {
       req.abort();
