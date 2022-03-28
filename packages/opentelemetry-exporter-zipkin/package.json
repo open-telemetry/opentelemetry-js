@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-zipkin",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "OpenTelemetry Zipkin Exporter allows the user to send collected traces to Zipkin.",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -14,6 +14,7 @@
     "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
   },
   "scripts": {
+    "prepublishOnly": "npm run compile",
     "compile": "tsc --build tsconfig.all.json",
     "clean": "tsc --build --clean tsconfig.all.json",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
@@ -38,7 +39,7 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=8.12.0"
   },
   "files": [
     "build/esm/**/*.js",
@@ -89,9 +90,9 @@
     "@opentelemetry/api": "^1.0.3"
   },
   "dependencies": {
-    "@opentelemetry/core": "1.1.0",
-    "@opentelemetry/resources": "1.1.0",
-    "@opentelemetry/sdk-trace-base": "1.1.0",
-    "@opentelemetry/semantic-conventions": "1.1.0"
+    "@opentelemetry/core": "1.1.1",
+    "@opentelemetry/resources": "1.1.1",
+    "@opentelemetry/sdk-trace-base": "1.1.1",
+    "@opentelemetry/semantic-conventions": "1.1.1"
   }
 }

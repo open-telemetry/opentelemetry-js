@@ -21,7 +21,7 @@ import {
   AggregatorKind,
   Histogram,
 } from './types';
-import { HistogramMetricData, PointDataType } from '../export/MetricData';
+import { HistogramMetricData, DataPointType } from '../export/MetricData';
 import { HrTime } from '@opentelemetry/api';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
@@ -57,7 +57,7 @@ export class HistogramAccumulation implements Accumulation {
     this._current.buckets.counts[this._boundaries.length] += 1;
   }
 
-  toPoint(): Histogram {
+  toPointValue(): Histogram {
     return this._current;
   }
 }
@@ -89,24 +89,24 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
    * merging accumulations with different boundaries.
    */
   merge(previous: HistogramAccumulation, delta: HistogramAccumulation): HistogramAccumulation {
-    const previousPoint = previous.toPoint();
-    const deltaPoint = delta.toPoint();
+    const previousValue = previous.toPointValue();
+    const deltaValue = delta.toPointValue();
 
-    const previousCounts = previousPoint.buckets.counts;
-    const deltaCounts = deltaPoint.buckets.counts;
+    const previousCounts = previousValue.buckets.counts;
+    const deltaCounts = deltaValue.buckets.counts;
 
     const mergedCounts = new Array(previousCounts.length);
     for (let idx = 0; idx < previousCounts.length; idx++) {
       mergedCounts[idx] = previousCounts[idx] + deltaCounts[idx];
     }
 
-    return new HistogramAccumulation(previousPoint.buckets.boundaries, {
+    return new HistogramAccumulation(previousValue.buckets.boundaries, {
       buckets: {
-        boundaries: previousPoint.buckets.boundaries,
+        boundaries: previousValue.buckets.boundaries,
         counts: mergedCounts,
       },
-      count: previousPoint.count + deltaPoint.count,
-      sum: previousPoint.sum + deltaPoint.sum,
+      count: previousValue.count + deltaValue.count,
+      sum: previousValue.sum + deltaValue.sum,
     });
   }
 
@@ -114,41 +114,41 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
    * Returns a new DELTA aggregation by comparing two cumulative measurements.
    */
   diff(previous: HistogramAccumulation, current: HistogramAccumulation): HistogramAccumulation {
-    const previousPoint = previous.toPoint();
-    const currentPoint = current.toPoint();
+    const previousValue = previous.toPointValue();
+    const currentValue = current.toPointValue();
 
-    const previousCounts = previousPoint.buckets.counts;
-    const currentCounts = currentPoint.buckets.counts;
+    const previousCounts = previousValue.buckets.counts;
+    const currentCounts = currentValue.buckets.counts;
 
     const diffedCounts = new Array(previousCounts.length);
     for (let idx = 0; idx < previousCounts.length; idx++) {
       diffedCounts[idx] = currentCounts[idx] - previousCounts[idx];
     }
 
-    return new HistogramAccumulation(previousPoint.buckets.boundaries, {
+    return new HistogramAccumulation(previousValue.buckets.boundaries, {
       buckets: {
-        boundaries: previousPoint.buckets.boundaries,
+        boundaries: previousValue.buckets.boundaries,
         counts: diffedCounts,
       },
-      count: currentPoint.count - previousPoint.count,
-      sum: currentPoint.sum - previousPoint.sum,
+      count: currentValue.count - previousValue.count,
+      sum: currentValue.sum - previousValue.sum,
     });
   }
 
   toMetricData(
-    metricDescriptor: InstrumentDescriptor,
+    descriptor: InstrumentDescriptor,
     accumulationByAttributes: AccumulationRecord<HistogramAccumulation>[],
     startTime: HrTime,
     endTime: HrTime): Maybe<HistogramMetricData> {
     return {
-      instrumentDescriptor: metricDescriptor,
-      pointDataType: PointDataType.HISTOGRAM,
-      pointData: accumulationByAttributes.map(([attributes, accumulation]) => {
+      descriptor,
+      dataPointType: DataPointType.HISTOGRAM,
+      dataPoints: accumulationByAttributes.map(([attributes, accumulation]) => {
         return {
           attributes,
           startTime,
           endTime,
-          point: accumulation.toPoint(),
+          value: accumulation.toPointValue(),
         };
       })
     };
