@@ -52,7 +52,7 @@ if (typeof Buffer === 'undefined') {
   };
 }
 
-export function setUp(){
+export function setUp() {
   meterProvider = new MeterProvider({ resource: defaultResource });
   reader = new TestMetricReader();
   meterProvider.addMetricReader(
@@ -61,11 +61,11 @@ export function setUp(){
   meter = meterProvider.getMeter('default', '0.0.1');
 }
 
-export async function shutdown(){
+export async function shutdown() {
   await meterProvider.shutdown();
 }
 
-export async function collect(){
+export async function collect() {
   return (await reader.collect())!;
 }
 
@@ -117,7 +117,6 @@ export function mockObservableUpDownCounter(
   callback: (observableResult: ObservableResult) => void,
   name = 'double-up-down-observable-counter'
 ): void {
-
   meter.createObservableUpDownCounter(
     name,
     callback,
@@ -131,7 +130,14 @@ export function mockObservableUpDownCounter(
 export function mockHistogram(): Histogram {
   const name = 'int-histogram';
 
-  meterProvider.addView({aggregation: new HistogramAggregation([0,100])});
+  meterProvider.addView({
+      aggregation: new HistogramAggregation([0, 100])
+    },
+    {
+      instrument: {
+        name: name
+      }
+    });
 
   return meter.createHistogram(name, {
     description: 'sample histogram description',
@@ -154,51 +160,6 @@ export const mockedInstrumentationLibraries: InstrumentationLibrary[] = [
     version: '0.0.2',
   },
 ];
-
-/*export const multiResourceMetricsGet = function (
-  callback: (observableResult: ObservableResult) => unknown
-): any[] {
-  return [
-    {
-      ...mockCounter(),
-      resource: mockedResources[0],
-      instrumentationLibrary: mockedInstrumentationLibraries[0],
-    },
-    {
-      ...mockObservableGauge(callback),
-      resource: mockedResources[1],
-      instrumentationLibrary: mockedInstrumentationLibraries[0],
-    },
-    {
-      ...mockCounter(),
-      resource: mockedResources[0],
-      instrumentationLibrary: mockedInstrumentationLibraries[0],
-    },
-  ];
-};*/
-
-/*
-export const multiInstrumentationLibraryMetricsGet = function (
-  callback: (observableResult: ObservableResult) => unknown
-): any[] {
-  return [
-    {
-      ...mockCounter(),
-      resource: mockedResources[0],
-      instrumentationLibrary: mockedInstrumentationLibraries[0],
-    },
-    {
-      ...mockObservableGauge(callback),
-      resource: mockedResources[0],
-      instrumentationLibrary: mockedInstrumentationLibraries[1],
-    },
-    {
-      ...mockCounter(),
-      resource: mockedResources[0],
-      instrumentationLibrary: mockedInstrumentationLibraries[0],
-    },
-  ];
-};*/
 
 export function ensureAttributesAreCorrect(
   attributes: otlpTypes.opentelemetryProto.common.v1.KeyValue[]
@@ -266,7 +227,8 @@ export function ensureCounterIsCorrect(
 
 export function ensureDoubleCounterIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
-  time: number
+  time: number,
+  endTime: number
 ) {
   assert.deepStrictEqual(metric, {
     name: 'double-counter',
@@ -277,7 +239,7 @@ export function ensureDoubleCounterIsCorrect(
         {
           labels: [],
           value: 8,
-          startTimeUnixNano: 1592602232694000000,
+          startTimeUnixNano: endTime,
           timeUnixNano: time,
         },
       ],
@@ -320,6 +282,7 @@ export function ensureObservableGaugeIsCorrect(
 export function ensureObservableCounterIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time: number,
+  startTime: number,
   value: number,
   name = 'double-observable-counter'
 ) {
@@ -333,7 +296,7 @@ export function ensureObservableCounterIsCorrect(
         {
           labels: [],
           value,
-          startTimeUnixNano: 1592602232694000000,
+          startTimeUnixNano: startTime,
           timeUnixNano: time,
         },
       ],
@@ -347,6 +310,7 @@ export function ensureObservableCounterIsCorrect(
 export function ensureObservableUpDownCounterIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time: number,
+  startTime: number,
   value: number,
   name = 'double-up-down-observable-counter'
 ) {
@@ -360,7 +324,7 @@ export function ensureObservableUpDownCounterIsCorrect(
         {
           labels: [],
           value,
-          startTimeUnixNano: 1592602232694000000,
+          startTimeUnixNano: startTime,
           timeUnixNano: time,
         },
       ],

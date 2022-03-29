@@ -18,10 +18,11 @@ import { SpanAttributes } from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
 import { OTLPExporterBase, otlpTypes, toCollectorResource } from '@opentelemetry/exporter-trace-otlp-http';
 import {
-  AggregationTemporality, Histogram,
+  AggregationTemporality,
+  DataPointType,
+  Histogram,
   InstrumentType,
   MetricData,
-  DataPointType,
   ResourceMetrics
 } from '@opentelemetry/sdk-metrics-base-wip';
 import { Attributes, ValueType } from '@opentelemetry/api-metrics';
@@ -130,7 +131,9 @@ export function toCollectorMetric(
 
     if (
       metric.descriptor.type === InstrumentType.COUNTER ||
-      metric.descriptor.type === InstrumentType.OBSERVABLE_COUNTER
+      metric.descriptor.type === InstrumentType.OBSERVABLE_COUNTER ||
+      metric.descriptor.type === InstrumentType.UP_DOWN_COUNTER ||
+      metric.descriptor.type === InstrumentType.OBSERVABLE_UP_DOWN_COUNTER
     ) {
       if (metric.descriptor.valueType === ValueType.INT) {
         metricCollector.intSum = result;
