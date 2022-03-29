@@ -131,8 +131,8 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       metrics = await collect();
     });
 
-    afterEach(() => {
-      shutdown();
+    afterEach(async () => {
+      await shutdown();
       sinon.restore();
     });
 

@@ -21,10 +21,12 @@ import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';
 import {
-  OTLPExporterNodeProxy,
-  OTLPMetricExporter,
   OTLPMetricExporterOptions
 } from '../../src';
+
+import {
+  OTLPMetricExporter
+} from '../../src/platform/node';
 import { OTLPExporterNodeConfigBase, otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import {
   ensureCounterIsCorrect,
@@ -133,15 +135,15 @@ describe('OTLPMetricExporter - node with json over http', () => {
     it('should use headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
       const collectorExporter = new OTLPMetricExporter();
-      assert.strictEqual((collectorExporter.otlpExporter as OTLPExporterNodeProxy).headers.foo, 'bar');
+      assert.strictEqual(collectorExporter.otlpExporter.headers.foo, 'bar');
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
     it('should override global headers config with signal headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
       envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
       const collectorExporter = new OTLPMetricExporter();
-      assert.strictEqual((collectorExporter.otlpExporter as OTLPExporterNodeProxy).headers.foo, 'boo');
-      assert.strictEqual((collectorExporter.otlpExporter as OTLPExporterNodeProxy).headers.bar, 'foo');
+      assert.strictEqual(collectorExporter.otlpExporter.headers.foo, 'boo');
+      assert.strictEqual(collectorExporter.otlpExporter.headers.bar, 'foo');
       envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });

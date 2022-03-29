@@ -145,8 +145,8 @@ describe('OTLPMetricExporter - web', () => {
           if (metric3) {
             ensureHistogramIsCorrect(
               metric3,
-              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[3].dataPoints[0].endTime),
-              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[3].dataPoints[0].startTime),
+              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[2].dataPoints[0].endTime),
+              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[2].dataPoints[0].startTime),
               [0, 100],
               [0, 2, 0]
             );

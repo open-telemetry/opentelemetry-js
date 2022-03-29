@@ -151,8 +151,8 @@ const testOTLPMetricExporter = (params: TestParams) =>
       metrics = await collect();
     });
 
-    afterEach(() => {
-      shutdown();
+    afterEach(async () => {
+      await shutdown();
       exportedData = undefined;
       reqMetadata = undefined;
       sinon.restore();

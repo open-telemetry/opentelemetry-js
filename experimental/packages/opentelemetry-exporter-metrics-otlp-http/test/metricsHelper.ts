@@ -31,9 +31,11 @@ export class TestMetricReader extends MetricReader {
   }
 }
 
-const defaultResource = new Resource({
-  resourceKey: 'my-resource',
-});
+const defaultResource = Resource.default().merge(new Resource({
+  service: 'ui',
+  version: 1,
+  cost: 112.12,
+}));
 
 let meterProvider = new MeterProvider({ resource: defaultResource });
 let reader = new TestMetricReader();
