@@ -20,7 +20,7 @@ import {
   ObservableGauge,
   Histogram,
 } from '@opentelemetry/api-metrics';
-import { diag } from '@opentelemetry/api';
+import { diag, DiagLogger } from '@opentelemetry/api';
 import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import * as metrics from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
@@ -164,24 +164,41 @@ const testOTLPMetricExporter = (params: TestParams) =>
     });
 
     describe('instance', () => {
+      let warnStub: sinon.SinonStub;
+
+      beforeEach(() => {
+        // Need to stub/spy on the underlying logger as the "diag" instance is global
+        warnStub = sinon.stub();
+        const nop = () => {};
+        const diagLogger: DiagLogger = {
+          debug: nop,
+          error: nop,
+          info: nop,
+          verbose: nop,
+          warn: warnStub
+        };
+        diag.setLogger(diagLogger);
+      });
+
+      afterEach(() => {
+        diag.disable();
+      });
+
       it('should warn about headers', () => {
-        // Need to stub/spy on the underlying logger as the 'diag' instance is global
-        const spyLoggerWarn = sinon.stub(diag, 'warn');
         collectorExporter = new OTLPMetricExporter({
           url: `http://${address}`,
           headers: {
             foo: 'bar',
           },
         });
-        const args = spyLoggerWarn.args[0];
+        const args = warnStub.args[0];
         assert.strictEqual(args[0], 'Headers cannot be set when using grpc');
       });
       it('should warn about path in url', () => {
-        const spyLoggerWarn = sinon.stub(diag, 'warn');
         collectorExporter = new OTLPMetricExporter({
           url: `http://${address}/v1/metrics`
         });
-        const args = spyLoggerWarn.args[0];
+        const args = warnStub.args[0];
         assert.strictEqual(
           args[0],
           'URL path should not be set when using grpc, the path part of the URL will be ignored.'
