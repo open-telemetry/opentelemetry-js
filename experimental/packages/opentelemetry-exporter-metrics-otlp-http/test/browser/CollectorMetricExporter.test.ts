@@ -17,10 +17,7 @@
 import { diag, DiagLogger, DiagLogLevel } from '@opentelemetry/api';
 import { Counter, Histogram, } from '@opentelemetry/api-metrics-wip';
 import { ExportResultCode, hrTimeToNanoseconds } from '@opentelemetry/core';
-import {
-  AggregationTemporality,
-  ResourceMetrics,
-} from '@opentelemetry/sdk-metrics-base-wip';
+import { AggregationTemporality, ResourceMetrics, } from '@opentelemetry/sdk-metrics-base-wip';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPMetricExporter } from '../../src/platform/browser';
@@ -28,14 +25,17 @@ import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import {
   collect,
   ensureCounterIsCorrect,
-  ensureExportMetricsServiceRequestIsSet,
+  ensureExportMetricsServiceRequestIsSet, ensureHeadersContain,
   ensureHistogramIsCorrect,
   ensureObservableGaugeIsCorrect,
   ensureWebResourceIsCorrect,
   mockCounter,
   mockHistogram,
-  mockObservableGauge, setUp, shutdown,
+  mockObservableGauge,
+  setUp,
+  shutdown,
 } from '../metricsHelper';
+import { OTLPMetricExporterOptions } from '../../src';
 
 describe('OTLPMetricExporter - web', () => {
   let collectorExporter: OTLPMetricExporter;
@@ -195,14 +195,13 @@ describe('OTLPMetricExporter - web', () => {
       });
     });
 
-    // TODO: Update these tests.
-/*
     describe('when "sendBeacon" is NOT available', () => {
       let server: any;
       beforeEach(() => {
         (window.navigator as any).sendBeacon = false;
         collectorExporter = new OTLPMetricExporter({
           url: 'http://foo.bar.com',
+          aggregationTemporality: AggregationTemporality.CUMULATIVE
         });
         // Overwrites the start time to make tests consistent
         Object.defineProperty(collectorExporter, '_startTime', {
@@ -237,7 +236,8 @@ describe('OTLPMetricExporter - web', () => {
           if (metric1) {
             ensureCounterIsCorrect(
               metric1,
-              hrTimeToNanoseconds(metrics[0].aggregator.toPoint().timestamp)
+              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0].endTime),
+              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0].startTime)
             );
           }
           assert.ok(
@@ -247,7 +247,8 @@ describe('OTLPMetricExporter - web', () => {
           if (metric2) {
             ensureObservableGaugeIsCorrect(
               metric2,
-              hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp),
+              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[1].dataPoints[0].endTime),
+              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[1].dataPoints[0].startTime),
               6,
               'double-observable-gauge2'
             );
@@ -260,7 +261,8 @@ describe('OTLPMetricExporter - web', () => {
           if (metric3) {
             ensureHistogramIsCorrect(
               metric3,
-              hrTimeToNanoseconds(metrics[2].aggregator.toPoint().timestamp),
+              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[2].dataPoints[0].endTime),
+              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[2].dataPoints[0].startTime),
               [0, 100],
               [0, 2, 0]
             );
@@ -320,22 +322,22 @@ describe('OTLPMetricExporter - web', () => {
           assert.strictEqual(stubBeacon.callCount, 0);
           done();
         });
-      });*/
+      });
     });
   });
 
-/*
   describe('export with custom headers', () => {
     let server: any;
     const customHeaders = {
       foo: 'bar',
       bar: 'baz',
     };
-    let collectorExporterConfig: otlpTypes.OTLPExporterConfigBase;
+    let collectorExporterConfig: (otlpTypes.OTLPExporterConfigBase & OTLPMetricExporterOptions) | undefined;
 
     beforeEach(() => {
       collectorExporterConfig = {
         headers: customHeaders,
+        aggregationTemporality: AggregationTemporality.CUMULATIVE
       };
       server = sinon.fakeServer.create();
     });
@@ -390,56 +392,61 @@ describe('OTLPMetricExporter - web', () => {
       });
     });
   });
-});
 
-describe('when configuring via environment', () => {
-  const envSource = window as any;
-  it('should use url defined in env', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/metrics';
-    const collectorExporter = new OTLPMetricExporter();
-    assert.strictEqual(
-      collectorExporter.url,
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT
-    );
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-  });
-  it('should use url defined in env and append version and signal when not present', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-    const collectorExporter = new OTLPMetricExporter();
-    assert.strictEqual(
-      collectorExporter.url,
-      `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/metrics`
-    );
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-  });
-  it('should override global exporter url with signal url defined in env', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.metrics';
-    const collectorExporter = new OTLPMetricExporter();
-    assert.strictEqual(
-      collectorExporter.url,
-      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
-    );
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
-  });
-  it('should use headers defined via env', () => {
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
-    const collectorExporter = new OTLPMetricExporter({ headers: {} });
-    // @ts-expect-error access internal property for testing
-    assert.strictEqual(collectorExporter._headers.foo, 'bar');
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
-  });
-  it('should override global headers config with signal headers defined via env', () => {
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
-    envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
-    const collectorExporter = new OTLPMetricExporter({ headers: {} });
-    // @ts-expect-error access internal property for testing
-    assert.strictEqual(collectorExporter._headers.foo, 'boo');
-    // @ts-expect-error access internal property for testing
-    assert.strictEqual(collectorExporter._headers.bar, 'foo');
-    envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
-    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
+  describe('when configuring via environment', () => {
+    const envSource = window as any;
+    it('should use url defined in env', () => {
+      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/metrics';
+      const collectorExporter = new OTLPMetricExporter();
+      assert.strictEqual(
+        collectorExporter.otlpExporter.url,
+        envSource.OTEL_EXPORTER_OTLP_ENDPOINT
+      );
+      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+    });
+    it('should use url defined in env and append version and signal when not present', () => {
+      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+      const collectorExporter = new OTLPMetricExporter();
+      assert.strictEqual(
+        collectorExporter.otlpExporter.url,
+        `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/metrics`
+      );
+      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+    });
+    it('should override global exporter url with signal url defined in env', () => {
+      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.metrics';
+      const collectorExporter = new OTLPMetricExporter();
+      assert.strictEqual(
+        collectorExporter.otlpExporter.url,
+        envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
+      );
+      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
+    });
+    it('should use headers defined via env', () => {
+      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
+      const collectorExporter = new OTLPMetricExporter({
+        headers: {},
+        aggregationTemporality: AggregationTemporality.CUMULATIVE
+      });
+      // @ts-expect-error access internal property for testing
+      assert.strictEqual(collectorExporter.otlpExporter._headers.foo, 'bar');
+      envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
+    });
+    it('should override global headers config with signal headers defined via env', () => {
+      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
+      envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
+      const collectorExporter = new OTLPMetricExporter({
+        headers: {},
+        aggregationTemporality: AggregationTemporality.CUMULATIVE
+      });
+      // @ts-expect-error access internal property for testing
+      assert.strictEqual(collectorExporter.otlpExporter._headers.foo, 'boo');
+      // @ts-expect-error access internal property for testing
+      assert.strictEqual(collectorExporter.otlpExporter._headers.bar, 'foo');
+      envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
+      envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
+    });
   });
 });
-*/
