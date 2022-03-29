@@ -67,8 +67,8 @@ export class OTLPExporterBrowserProxy extends OTLPExporterBrowserBase<ResourceMe
 /**
  * Collector Metric Exporter for Web
  */
-export class OTLPMetricExporter extends OTLPMetricExporterBase {
-  constructor(config: OTLPMetricExporterOptions = defaultOptions) {
+export class OTLPMetricExporter extends OTLPMetricExporterBase<OTLPExporterBrowserProxy> {
+  constructor(config: otlpTypes.OTLPExporterConfigBase & OTLPMetricExporterOptions = defaultOptions) {
     super(new OTLPExporterBrowserProxy(config), config);
   }
 }

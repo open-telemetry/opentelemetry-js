@@ -32,7 +32,7 @@ import {
   ensureResourceIsCorrect,
   mockCounter,
   mockHistogram,
-  mockObservableGauge,
+  mockObservableGauge, setUp, shutdown,
 } from './metricsHelper';
 import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base-wip';
 
@@ -135,6 +135,8 @@ const testOTLPMetricExporter = (params: TestParams) =>
         value: 1592602232694000000,
       });
 
+      setUp();
+
       const counter = mockCounter();
       mockObservableGauge(observableResult => {
         observableResult.observe(3, {});
@@ -150,6 +152,7 @@ const testOTLPMetricExporter = (params: TestParams) =>
     });
 
     afterEach(() => {
+      shutdown();
       exportedData = undefined;
       reqMetadata = undefined;
       sinon.restore();
@@ -221,15 +224,18 @@ const testOTLPMetricExporter = (params: TestParams) =>
               exportedData[0].instrumentationLibraryMetrics[0].metrics[2];
             ensureExportedCounterIsCorrect(
               counter,
-              counter.intSum?.dataPoints[0].timeUnixNano
+              counter.intSum?.dataPoints[0].timeUnixNano,
+              counter.intSum?.dataPoints[0].startTimeUnixNano
             );
             ensureExportedObservableGaugeIsCorrect(
               observableGauge,
-              observableGauge.doubleGauge?.dataPoints[0].timeUnixNano
+              observableGauge.doubleGauge?.dataPoints[0].timeUnixNano,
+              observableGauge.doubleGauge?.dataPoints[0].startTimeUnixNano
             );
             ensureExportedHistogramIsCorrect(
               histogram,
               histogram.intHistogram?.dataPoints[0].timeUnixNano,
+              histogram.intHistogram?.dataPoints[0].startTimeUnixNano,
               [0, 100],
               ['0', '2', '0']
             );
@@ -296,9 +302,7 @@ describe('when configuring via environment', () => {
   it('should use headers defined via env', () => {
     envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
     const collectorExporter = new OTLPMetricExporter();
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore TODO: fix this assertion to not require this.
-    assert.deepStrictEqual(collectorExporter.otlpExporter['metadata']?.get('foo'), ['bar']);
+    assert.deepStrictEqual(collectorExporter.otlpExporter.metadata?.get('foo'), ['bar']);
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });
   it('should override global headers config with signal headers defined via env', () => {
@@ -311,17 +315,17 @@ describe('when configuring via environment', () => {
       metadata,
       aggregationTemporality: AggregationTemporality.CUMULATIVE
     });
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore TODO: fix these assertions to not require this.
-    const actualMetadata = collectorExporter.otlpExporter['metadata'];
-    assert.deepStrictEqual(actualMetadata.get('foo'), ['boo']);
-    assert.deepStrictEqual(actualMetadata.get('bar'), ['foo']);
-    assert.deepStrictEqual(actualMetadata.get('goo'), ['lol']);
+    assert.deepStrictEqual(collectorExporter.otlpExporter.metadata?.get('foo'), ['boo']);
+    assert.deepStrictEqual(collectorExporter.otlpExporter.metadata?.get('bar'), ['foo']);
+    assert.deepStrictEqual(collectorExporter.otlpExporter.metadata?.get('goo'), ['lol']);
     envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });
 });
 
-testOTLPMetricExporter({ useTLS: true });
-testOTLPMetricExporter({ useTLS: false });
-testOTLPMetricExporter({ metadata });
+describe('', () => {
+  testOTLPMetricExporter({ useTLS: true });
+  testOTLPMetricExporter({ useTLS: false });
+  testOTLPMetricExporter({ metadata });
+});
+

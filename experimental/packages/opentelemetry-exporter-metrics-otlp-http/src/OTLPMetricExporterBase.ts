@@ -19,12 +19,12 @@ import { AggregationTemporality, ResourceMetrics, PushMetricExporter } from '@op
 import { OTLPExporterBase, otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { defaultOptions, OTLPMetricExporterOptions } from './OTLPMetricExporterOptions';
 
-export class OTLPMetricExporterBase
+export class OTLPMetricExporterBase<T extends OTLPExporterBase<OTLPMetricExporterOptions, ResourceMetrics, otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest>>
   implements PushMetricExporter {
-  public otlpExporter: OTLPExporterBase<OTLPMetricExporterOptions, ResourceMetrics, otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest>;
+  public otlpExporter: T;
   protected _preferredAggregationTemporality: AggregationTemporality;
 
-  constructor(exporter: OTLPExporterBase<OTLPMetricExporterOptions, ResourceMetrics, otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest>,
+  constructor(exporter: T,
               config: OTLPMetricExporterOptions = defaultOptions) {
     this.otlpExporter = exporter;
     this._preferredAggregationTemporality = config.aggregationTemporality;

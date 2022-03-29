@@ -17,72 +17,86 @@
 import {
   Counter,
   ObservableResult,
-  ObservableGauge,
   Histogram,
   ValueType,
 } from '@opentelemetry/api-metrics';
 import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
-import * as metrics from '@opentelemetry/sdk-metrics-base';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { Stream } from 'stream';
+import { HistogramAggregation, MeterProvider, MetricReader } from '@opentelemetry/sdk-metrics-base-wip';
 
-const meterProvider = new metrics.MeterProvider({
-  interval: 30000,
-  resource: new Resource({
-    service: 'ui',
-    version: 1,
-    cost: 112.12,
-  }),
+export class TestMetricReader extends MetricReader {
+  protected onForceFlush(): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+
+  protected onShutdown(): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+}
+
+const defaultResource = new Resource({
+  service: 'ui',
+  version: 1,
+  cost: 112.12,
 });
 
-const meter = meterProvider.getMeter('default', '0.0.1');
+let meterProvider = new MeterProvider({ resource: defaultResource });
+let reader = new TestMetricReader();
+meterProvider.addMetricReader(
+  reader
+);
+let meter = meterProvider.getMeter('default', '0.0.1');
 
-export function mockCounter(): metrics.Metric<metrics.BoundCounter> & Counter {
+export async function collect(){
+  return (await reader.collect())!;
+}
+
+
+export function setUp() {
+  meterProvider = new MeterProvider({ resource: defaultResource });
+  reader = new TestMetricReader();
+  meterProvider.addMetricReader(
+    reader
+  );
+  meter = meterProvider.getMeter('default', '0.0.1');
+}
+
+export async function shutdown() {
+  await meterProvider.shutdown();
+}
+
+export function mockCounter(): Counter {
   const name = 'int-counter';
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createCounter(name, {
-      description: 'sample counter description',
-      valueType: ValueType.INT,
-    });
-  metric.clear();
-  metric.bind({});
-  return metric;
+  return meter.createCounter(name, {
+    description: 'sample counter description',
+    valueType: ValueType.INT,
+  });
 }
 
 export function mockObservableGauge(
   callback: (observableResult: ObservableResult) => void
-): metrics.Metric<metrics.BoundCounter> & ObservableGauge {
+): void {
   const name = 'double-observable-gauge';
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createObservableGauge(
-      name,
-      {
-        description: 'sample observable gauge description',
-        valueType: ValueType.DOUBLE,
-      },
-      callback
-    );
-  metric.clear();
-  metric.bind({});
-  return metric;
+  return meter.createObservableGauge(
+    name,
+    callback,
+    {
+      description: 'sample observable gauge description',
+      valueType: ValueType.DOUBLE,
+    },
+  );
 }
 
-export function mockHistogram(): metrics.Metric<metrics.BoundHistogram> &
-  Histogram {
+export function mockHistogram(): Histogram {
   const name = 'int-histogram';
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createHistogram(name, {
-      description: 'sample histogram description',
-      valueType: ValueType.INT,
-      boundaries: [0, 100],
-    });
-  metric.clear();
-  metric.bind({});
-  return metric;
+  meterProvider.addView({aggregation: new HistogramAggregation([0,100])});
+
+  return meter.createHistogram(name, {
+    description: 'sample histogram description',
+    valueType: ValueType.INT,
+  });
 }
 
 export function ensureProtoAttributesAreCorrect(

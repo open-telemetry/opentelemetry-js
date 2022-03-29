@@ -68,7 +68,7 @@ export class OTLPExporterNodeProxy extends OTLPExporterNodeBase<ResourceMetrics,
 /**
  * Collector Metric Exporter for Node
  */
-export class OTLPMetricExporter extends OTLPMetricExporterBase {
+export class OTLPMetricExporter extends OTLPMetricExporterBase<OTLPExporterNodeProxy> {
   constructor(config: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions = defaultOptions) {
     super(new OTLPExporterNodeProxy(config), config);
   }

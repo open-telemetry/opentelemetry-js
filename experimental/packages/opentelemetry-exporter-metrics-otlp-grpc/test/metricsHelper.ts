@@ -32,11 +32,11 @@ export class TestMetricReader extends MetricReader {
   }
 }
 
-const defaultResource = new Resource({
+const defaultResource = Resource.default().merge(new Resource({
   service: 'ui',
   version: 1,
   cost: 112.12,
-});
+}));
 
 let meterProvider = new MeterProvider({ resource: defaultResource });
 let reader = new TestMetricReader();
@@ -48,7 +48,6 @@ let meter = meterProvider.getMeter('default', '0.0.1');
 export async function collect(){
   return (await reader.collect())!;
 }
-
 
 export function setUp() {
   meterProvider = new MeterProvider({ resource: defaultResource });
@@ -116,7 +115,8 @@ export function ensureExportedAttributesAreCorrect(
 
 export function ensureExportedCounterIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
-  time?: number
+  time?: number,
+  startTime?: number
 ) {
   assert.deepStrictEqual(metric, {
     name: 'int-counter',
@@ -129,7 +129,7 @@ export function ensureExportedCounterIsCorrect(
           labels: [],
           exemplars: [],
           value: '1',
-          startTimeUnixNano: '1592602232694000128',
+          startTimeUnixNano: String(startTime),
           timeUnixNano: String(time),
         },
       ],
@@ -141,7 +141,8 @@ export function ensureExportedCounterIsCorrect(
 
 export function ensureExportedObservableGaugeIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
-  time?: number
+  time?: number,
+  startTime?: number
 ) {
   assert.deepStrictEqual(metric, {
     name: 'double-observable-gauge',
@@ -154,7 +155,7 @@ export function ensureExportedObservableGaugeIsCorrect(
           labels: [],
           exemplars: [],
           value: 6,
-          startTimeUnixNano: '1592602232694000128',
+          startTimeUnixNano: String(startTime),
           timeUnixNano: String(time),
         },
       ],
@@ -165,6 +166,7 @@ export function ensureExportedObservableGaugeIsCorrect(
 export function ensureExportedHistogramIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time?: number,
+  startTime?: number,
   explicitBounds: number[] = [Infinity],
   bucketCounts: string[] = ['2', '0']
 ) {
@@ -180,7 +182,7 @@ export function ensureExportedHistogramIsCorrect(
           exemplars: [],
           sum: '21',
           count: '2',
-          startTimeUnixNano: '1592602232694000128',
+          startTimeUnixNano: String(startTime),
           timeUnixNano: String(time),
           bucketCounts,
           explicitBounds,

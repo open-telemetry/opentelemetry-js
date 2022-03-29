@@ -81,7 +81,7 @@ class OTLPMetricExporterProxy extends OTLPExporterNodeBase<ResourceMetrics,
 /**
  * OTLP-gRPC metric exporter
  */
-export class OTLPMetricExporter extends OTLPMetricExporterBase{
+export class OTLPMetricExporter extends OTLPMetricExporterBase<OTLPMetricExporterProxy>{
   constructor(config: OTLPMetricExporterOptions = defaultOptions) {
     super(new OTLPMetricExporterProxy(config), config);
   }
