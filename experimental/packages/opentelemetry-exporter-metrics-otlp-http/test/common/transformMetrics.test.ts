@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { hrTimeToNanoseconds } from '@opentelemetry/core';
+import { hrTimeToNanoseconds, hrTime } from '@opentelemetry/core';
 import { AggregationTemporality, DataPointType, InstrumentType } from '@opentelemetry/sdk-metrics-base-wip';
 import * as assert from 'assert';
 import * as transform from '../../src/transformMetrics';
@@ -174,8 +174,8 @@ describe('transformMetrics', () => {
             {
               value: 1,
               attributes: { foo: (1 as unknown) as string },
-              startTime: process.hrtime(),
-              endTime: process.hrtime(),
+              startTime: hrTime(),
+              endTime: hrTime(),
             }
           ],
           dataPointType: DataPointType.SINGULAR,
