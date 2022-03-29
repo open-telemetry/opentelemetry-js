@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import { Meter, ObservableResult } from '@opentelemetry/api-metrics-wip';
+import { Meter, ObservableResult } from '@opentelemetry/api-metrics';
 import {
   MeterProvider,
-} from '@opentelemetry/sdk-metrics-base-wip';
+} from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as http from 'http';
 import { PrometheusExporter } from '../src';
 import { mockedHrTimeMs, mockHrTime } from './util';
 import { SinonStubbedInstance } from 'sinon';
-import { Counter } from '@opentelemetry/api-metrics-wip';
+import { Counter } from '@opentelemetry/api-metrics';
 
 describe('PrometheusExporter', () => {
   beforeEach(() => {
