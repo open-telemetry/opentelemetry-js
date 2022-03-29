@@ -34,7 +34,7 @@ import {
   mockCounter,
   MockedResponse,
   mockObservableGauge,
-  mockHistogram, collect,
+  mockHistogram, collect, setUp, shutdown,
 } from './metricsHelper';
 import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base-wip';
 import { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
@@ -115,13 +115,14 @@ describe('OTLPMetricExporter - node with proto over http', () => {
         aggregationTemporality: AggregationTemporality.CUMULATIVE
       };
       collectorExporter = new OTLPMetricExporter(collectorExporterConfig);
+      setUp();
 
       const counter = mockCounter();
       mockObservableGauge(observableResult => {
         observableResult.observe(3, {});
         observableResult.observe(6, {});
       });
-      const histogram=mockHistogram();
+      const histogram = mockHistogram();
 
       counter.add(1);
       histogram.record(7);
@@ -131,6 +132,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
     });
 
     afterEach(() => {
+      shutdown();
       sinon.restore();
     });
 
@@ -194,12 +196,14 @@ describe('OTLPMetricExporter - node with proto over http', () => {
           assert.ok(typeof metric1 !== 'undefined', "counter doesn't exist");
           ensureExportedCounterIsCorrect(
             metric1,
-            metric1.intSum?.dataPoints[0].timeUnixNano
+            metric1.intSum?.dataPoints[0].timeUnixNano,
+            metric1.intSum?.dataPoints[0].startTimeUnixNano
           );
           assert.ok(typeof metric2 !== 'undefined', "observable gauge doesn't exist");
           ensureExportedObservableGaugeIsCorrect(
             metric2,
-            metric2.doubleGauge?.dataPoints[0].timeUnixNano
+            metric2.doubleGauge?.dataPoints[0].timeUnixNano,
+            metric2.doubleGauge?.dataPoints[0].startTimeUnixNano
           );
           assert.ok(
             typeof metric3 !== 'undefined',
@@ -208,6 +212,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
           ensureExportedHistogramIsCorrect(
             metric3,
             metric3.intHistogram?.dataPoints[0].timeUnixNano,
+            metric3.intHistogram?.dataPoints[0].startTimeUnixNano,
             [0, 100],
             ['0', '2', '0']
           );

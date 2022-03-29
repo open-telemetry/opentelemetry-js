@@ -118,7 +118,8 @@ export function ensureProtoAttributesAreCorrect(
 
 export function ensureExportedCounterIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
-  time?: number
+  time?: number,
+  startTime?: number
 ) {
   assert.deepStrictEqual(metric, {
     name: 'int-counter',
@@ -128,7 +129,7 @@ export function ensureExportedCounterIsCorrect(
       dataPoints: [
         {
           value: '1',
-          startTimeUnixNano: '1592602232694000128',
+          startTimeUnixNano: String(startTime),
           timeUnixNano: String(time),
         },
       ],
@@ -140,7 +141,8 @@ export function ensureExportedCounterIsCorrect(
 
 export function ensureExportedObservableGaugeIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
-  time?: number
+  time?: number,
+  startTime?: number
 ) {
   assert.deepStrictEqual(metric, {
     name: 'double-observable-gauge',
@@ -150,7 +152,7 @@ export function ensureExportedObservableGaugeIsCorrect(
       dataPoints: [
         {
           value: 6,
-          startTimeUnixNano: '1592602232694000128',
+          startTimeUnixNano: String(startTime),
           timeUnixNano: String(time),
         },
       ],
@@ -161,6 +163,7 @@ export function ensureExportedObservableGaugeIsCorrect(
 export function ensureExportedHistogramIsCorrect(
   metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
   time?: number,
+  startTime?: number,
   explicitBounds: number[] = [Infinity],
   bucketCounts: string[] = ['2', '0']
 ) {
@@ -173,8 +176,8 @@ export function ensureExportedHistogramIsCorrect(
         {
           sum: '21',
           count: '2',
-          startTimeUnixNano: '1592602232694000128',
-          timeUnixNano: time,
+          startTimeUnixNano: String(startTime),
+          timeUnixNano: String(time),
           bucketCounts,
           explicitBounds,
         },
