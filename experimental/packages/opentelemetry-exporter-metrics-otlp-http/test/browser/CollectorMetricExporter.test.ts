@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
+import { diag, DiagLogger, DiagLogLevel } from '@opentelemetry/api';
 import {
   Counter,
   ObservableGauge,
@@ -49,6 +49,8 @@ describe('OTLPMetricExporter - web', () => {
   let stubOpen: sinon.SinonStub;
   let stubBeacon: sinon.SinonStub;
   let metrics: MetricRecord[];
+  let debugStub: sinon.SinonStub;
+  let errorStub: sinon.SinonStub;
 
   beforeEach(async () => {
     stubOpen = sinon.stub(XMLHttpRequest.prototype, 'open');
@@ -72,10 +74,24 @@ describe('OTLPMetricExporter - web', () => {
     metrics.push((await counter.getMetricRecord())[0]);
     metrics.push((await observableGauge.getMetricRecord())[0]);
     metrics.push((await histogram.getMetricRecord())[0]);
+
+    // Need to stub/spy on the underlying logger as the "diag" instance is global
+    debugStub = sinon.stub();
+    errorStub = sinon.stub();
+    const nop = () => {};
+    const diagLogger: DiagLogger = {
+      debug: debugStub,
+      error: errorStub,
+      info: nop,
+      verbose: nop,
+      warn: nop
+    };
+    diag.setLogger(diagLogger, DiagLogLevel.DEBUG);
   });
 
   afterEach(() => {
     sinon.restore();
+    diag.disable();
   });
 
   describe('export', () => {
@@ -159,17 +175,14 @@ describe('OTLPMetricExporter - web', () => {
       });
 
       it('should log the successful message', done => {
-        // Need to stub/spy on the underlying logger as the "diag" instance is global
-        const spyLoggerDebug = sinon.stub(diag, 'debug');
-        const spyLoggerError = sinon.stub(diag, 'error');
         stubBeacon.returns(true);
 
         collectorExporter.export(metrics, () => {});
 
         setTimeout(() => {
-          const response: any = spyLoggerDebug.args[1][0];
+          const response: any = debugStub.args[2][0];
           assert.strictEqual(response, 'sendBeacon - can send');
-          assert.strictEqual(spyLoggerError.args.length, 0);
+          assert.strictEqual(errorStub.args.length, 0);
 
           done();
         });
@@ -268,19 +281,15 @@ describe('OTLPMetricExporter - web', () => {
       });
 
       it('should log the successful message', done => {
-        // Need to stub/spy on the underlying logger as the "diag" instance is global
-        const spyLoggerDebug = sinon.stub(diag, 'debug');
-        const spyLoggerError = sinon.stub(diag, 'error');
-
         collectorExporter.export(metrics, () => {});
 
         setTimeout(() => {
           const request = server.requests[0];
           request.respond(200);
 
-          const response: any = spyLoggerDebug.args[1][0];
+          const response: any = debugStub.args[2][0];
           assert.strictEqual(response, 'xhr success');
-          assert.strictEqual(spyLoggerError.args.length, 0);
+          assert.strictEqual(errorStub.args.length, 0);
 
           assert.strictEqual(stubBeacon.callCount, 0);
           done();
