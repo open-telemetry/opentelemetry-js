@@ -21,6 +21,14 @@ import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 
+if (typeof Buffer === 'undefined') {
+  (window as any).Buffer = {
+    from: function (arr: []) {
+      return new Uint8Array(arr);
+    },
+  };
+}
+
 export class TestMetricReader extends MetricReader {
   protected onForceFlush(): Promise<void> {
     return Promise.resolve(undefined);
@@ -44,12 +52,8 @@ meterProvider.addMetricReader(
 );
 let meter = meterProvider.getMeter('default', '0.0.1');
 
-if (typeof Buffer === 'undefined') {
-  (window as any).Buffer = {
-    from: function (arr: []) {
-      return new Uint8Array(arr);
-    },
-  };
+export async function collect() {
+  return (await reader.collect())!;
 }
 
 export function setUp() {
@@ -65,23 +69,11 @@ export async function shutdown() {
   await meterProvider.shutdown();
 }
 
-export async function collect() {
-  return (await reader.collect())!;
-}
-
 export function mockCounter(): Counter {
   const name = 'int-counter';
   return meter.createCounter(name, {
     description: 'sample counter description',
     valueType: ValueType.INT,
-  });
-}
-
-export function mockDoubleCounter(): Counter {
-  const name = 'double-counter';
-  return meter.createCounter(name, {
-    description: 'sample counter description',
-    valueType: ValueType.DOUBLE,
   });
 }
 
@@ -98,6 +90,16 @@ export function mockObservableGauge(
     }
   );
 }
+
+export function mockDoubleCounter(): Counter {
+  const name = 'double-counter';
+  return meter.createCounter(name, {
+    description: 'sample counter description',
+    valueType: ValueType.DOUBLE,
+  });
+}
+
+
 
 export function mockObservableCounter(
   callback: (observableResult: ObservableResult) => void,

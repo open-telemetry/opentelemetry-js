@@ -32,25 +32,25 @@ export class TestMetricReader extends MetricReader {
   }
 }
 
-const defaultResource = Resource.default().merge(new Resource({
+const testResource = Resource.default().merge(new Resource({
   service: 'ui',
   version: 1,
   cost: 112.12,
 }));
 
-let meterProvider = new MeterProvider({ resource: defaultResource });
+let meterProvider = new MeterProvider({ resource: testResource });
+
 let reader = new TestMetricReader();
-meterProvider.addMetricReader(
-  reader
-);
+meterProvider.addMetricReader(reader);
+
 let meter = meterProvider.getMeter('default', '0.0.1');
 
-export async function collect(){
+export async function collect() {
   return (await reader.collect())!;
 }
 
 export function setUp() {
-  meterProvider = new MeterProvider({ resource: defaultResource });
+  meterProvider = new MeterProvider({ resource: testResource });
   reader = new TestMetricReader();
   meterProvider.addMetricReader(
     reader
@@ -61,7 +61,6 @@ export function setUp() {
 export async function shutdown() {
   await meterProvider.shutdown();
 }
-
 
 export function mockCounter(): Counter {
   const name = 'int-counter';
@@ -87,7 +86,7 @@ export function mockObservableGauge(
 
 export function mockHistogram(): Histogram {
   const name = 'int-histogram';
-  meterProvider.addView({aggregation: new HistogramAggregation([0,100])});
+  meterProvider.addView({ aggregation: new HistogramAggregation([0, 100]) });
 
   return meter.createHistogram(name, {
     description: 'sample histogram description',

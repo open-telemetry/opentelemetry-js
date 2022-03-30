@@ -130,10 +130,6 @@ const testOTLPMetricExporter = (params: TestParams) =>
         metadata: params.metadata,
         aggregationTemporality: AggregationTemporality.CUMULATIVE
       });
-      // Overwrites the start time to make tests consistent
-      Object.defineProperty(collectorExporter, '_startTime', {
-        value: 1592602232694000000,
-      });
 
       setUp();
 
