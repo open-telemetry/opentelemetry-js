@@ -399,7 +399,7 @@ describe('OTLPMetricExporter - web', () => {
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/metrics';
       const collectorExporter = new OTLPMetricExporter();
       assert.strictEqual(
-        collectorExporter.otlpExporter.url,
+        collectorExporter._otlpExporter.url,
         envSource.OTEL_EXPORTER_OTLP_ENDPOINT
       );
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
@@ -408,7 +408,7 @@ describe('OTLPMetricExporter - web', () => {
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
       const collectorExporter = new OTLPMetricExporter();
       assert.strictEqual(
-        collectorExporter.otlpExporter.url,
+        collectorExporter._otlpExporter.url,
         `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/metrics`
       );
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
@@ -418,7 +418,7 @@ describe('OTLPMetricExporter - web', () => {
       envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.metrics';
       const collectorExporter = new OTLPMetricExporter();
       assert.strictEqual(
-        collectorExporter.otlpExporter.url,
+        collectorExporter._otlpExporter.url,
         envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
       );
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
@@ -431,7 +431,7 @@ describe('OTLPMetricExporter - web', () => {
         aggregationTemporality: AggregationTemporality.CUMULATIVE
       });
       // @ts-expect-error access internal property for testing
-      assert.strictEqual(collectorExporter.otlpExporter._headers.foo, 'bar');
+      assert.strictEqual(collectorExporter._otlpExporter._headers.foo, 'bar');
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
     it('should override global headers config with signal headers defined via env', () => {
@@ -442,9 +442,9 @@ describe('OTLPMetricExporter - web', () => {
         aggregationTemporality: AggregationTemporality.CUMULATIVE
       });
       // @ts-expect-error access internal property for testing
-      assert.strictEqual(collectorExporter.otlpExporter._headers.foo, 'boo');
+      assert.strictEqual(collectorExporter._otlpExporter._headers.foo, 'boo');
       // @ts-expect-error access internal property for testing
-      assert.strictEqual(collectorExporter.otlpExporter._headers.bar, 'foo');
+      assert.strictEqual(collectorExporter._otlpExporter._headers.bar, 'foo');
       envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });

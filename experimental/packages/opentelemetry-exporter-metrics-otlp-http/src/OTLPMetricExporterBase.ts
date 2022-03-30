@@ -15,27 +15,29 @@
  */
 
 import { ExportResult } from '@opentelemetry/core';
-import { AggregationTemporality, ResourceMetrics, PushMetricExporter } from '@opentelemetry/sdk-metrics-base-wip';
+import { AggregationTemporality, PushMetricExporter, ResourceMetrics } from '@opentelemetry/sdk-metrics-base-wip';
 import { OTLPExporterBase, otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { defaultOptions, OTLPMetricExporterOptions } from './OTLPMetricExporterOptions';
 
-export class OTLPMetricExporterBase<T extends OTLPExporterBase<OTLPMetricExporterOptions, ResourceMetrics, otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest>>
+export class OTLPMetricExporterBase<T extends OTLPExporterBase<OTLPMetricExporterOptions,
+  ResourceMetrics,
+  otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest>>
   implements PushMetricExporter {
-  public otlpExporter: T;
+  public _otlpExporter: T;
   protected _preferredAggregationTemporality: AggregationTemporality;
 
   constructor(exporter: T,
               config: OTLPMetricExporterOptions = defaultOptions) {
-    this.otlpExporter = exporter;
-    this._preferredAggregationTemporality = config.aggregationTemporality;
+    this._otlpExporter = exporter;
+    this._preferredAggregationTemporality = config.aggregationTemporality ?? AggregationTemporality.CUMULATIVE;
   }
 
   export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): void {
-    this.otlpExporter.export([metrics], resultCallback);
+    this._otlpExporter.export([metrics], resultCallback);
   }
 
   async shutdown(): Promise<void> {
-    await this.otlpExporter.shutdown();
+    await this._otlpExporter.shutdown();
   }
 
   forceFlush(): Promise<void> {

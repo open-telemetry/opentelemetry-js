@@ -260,7 +260,7 @@ describe('OTLPMetricExporter - node (getDefaultUrl)', () => {
   it('should default to localhost', done => {
     const collectorExporter = new OTLPMetricExporter();
     setTimeout(() => {
-      assert.strictEqual(collectorExporter.otlpExporter.url, 'localhost:4317');
+      assert.strictEqual(collectorExporter._otlpExporter.url, 'localhost:4317');
       done();
     });
   });
@@ -271,7 +271,7 @@ describe('OTLPMetricExporter - node (getDefaultUrl)', () => {
       aggregationTemporality: AggregationTemporality.CUMULATIVE
     });
     setTimeout(() => {
-      assert.strictEqual(collectorExporter.otlpExporter.url, 'foo.bar.com');
+      assert.strictEqual(collectorExporter._otlpExporter.url, 'foo.bar.com');
       done();
     });
   });
@@ -283,7 +283,7 @@ describe('when configuring via environment', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
     const collectorExporter = new OTLPMetricExporter();
     assert.strictEqual(
-      collectorExporter.otlpExporter.url,
+      collectorExporter._otlpExporter.url,
       'foo.bar'
     );
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
@@ -293,7 +293,7 @@ describe('when configuring via environment', () => {
     envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.metrics';
     const collectorExporter = new OTLPMetricExporter();
     assert.strictEqual(
-      collectorExporter.otlpExporter.url,
+      collectorExporter._otlpExporter.url,
       'foo.metrics'
     );
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
@@ -302,7 +302,7 @@ describe('when configuring via environment', () => {
   it('should use headers defined via env', () => {
     envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
     const collectorExporter = new OTLPMetricExporter();
-    assert.deepStrictEqual(collectorExporter.otlpExporter.metadata?.get('foo'), ['bar']);
+    assert.deepStrictEqual(collectorExporter._otlpExporter.metadata?.get('foo'), ['bar']);
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });
   it('should override global headers config with signal headers defined via env', () => {
@@ -315,9 +315,9 @@ describe('when configuring via environment', () => {
       metadata,
       aggregationTemporality: AggregationTemporality.CUMULATIVE
     });
-    assert.deepStrictEqual(collectorExporter.otlpExporter.metadata?.get('foo'), ['boo']);
-    assert.deepStrictEqual(collectorExporter.otlpExporter.metadata?.get('bar'), ['foo']);
-    assert.deepStrictEqual(collectorExporter.otlpExporter.metadata?.get('goo'), ['lol']);
+    assert.deepStrictEqual(collectorExporter._otlpExporter.metadata?.get('foo'), ['boo']);
+    assert.deepStrictEqual(collectorExporter._otlpExporter.metadata?.get('bar'), ['foo']);
+    assert.deepStrictEqual(collectorExporter._otlpExporter.metadata?.get('goo'), ['lol']);
     envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });

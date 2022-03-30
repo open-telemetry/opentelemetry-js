@@ -107,7 +107,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/metrics';
       const collectorExporter = new OTLPMetricExporter();
       assert.strictEqual(
-        collectorExporter.otlpExporter.url,
+        collectorExporter._otlpExporter.url,
         envSource.OTEL_EXPORTER_OTLP_ENDPOINT
       );
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
@@ -116,7 +116,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
       const collectorExporter = new OTLPMetricExporter();
       assert.strictEqual(
-        collectorExporter.otlpExporter.url,
+        collectorExporter._otlpExporter.url,
         `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/metrics`
       );
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
@@ -126,7 +126,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
       envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.metrics';
       const collectorExporter = new OTLPMetricExporter();
       assert.strictEqual(
-        collectorExporter.otlpExporter.url,
+        collectorExporter._otlpExporter.url,
         envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
       );
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
@@ -135,15 +135,15 @@ describe('OTLPMetricExporter - node with json over http', () => {
     it('should use headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
       const collectorExporter = new OTLPMetricExporter();
-      assert.strictEqual(collectorExporter.otlpExporter.headers.foo, 'bar');
+      assert.strictEqual(collectorExporter._otlpExporter.headers.foo, 'bar');
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
     it('should override global headers config with signal headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
       envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
       const collectorExporter = new OTLPMetricExporter();
-      assert.strictEqual(collectorExporter.otlpExporter.headers.foo, 'boo');
-      assert.strictEqual(collectorExporter.otlpExporter.headers.bar, 'foo');
+      assert.strictEqual(collectorExporter._otlpExporter.headers.foo, 'boo');
+      assert.strictEqual(collectorExporter._otlpExporter.headers.bar, 'foo');
       envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
@@ -322,7 +322,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
       const collectorExporter = new OTLPMetricExporter();
       setTimeout(() => {
         assert.strictEqual(
-          collectorExporter.otlpExporter.url,
+          collectorExporter._otlpExporter.url,
           'http://localhost:4318/v1/metrics'
         );
         done();
@@ -336,7 +336,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
         aggregationTemporality: AggregationTemporality.CUMULATIVE
       });
       setTimeout(() => {
-        assert.strictEqual(collectorExporter.otlpExporter.url, url);
+        assert.strictEqual(collectorExporter._otlpExporter.url, url);
         done();
       });
     });

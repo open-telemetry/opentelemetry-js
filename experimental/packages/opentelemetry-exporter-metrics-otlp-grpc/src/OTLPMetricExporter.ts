@@ -16,8 +16,9 @@
 
 import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import {
+  defaultExporterTemporality,
   defaultOptions,
-  OTLPMetricExporterBase,
+  OTLPMetricExporterBase, OTLPMetricExporterOptions,
   toOTLPExportMetricServiceRequest
 } from '@opentelemetry/exporter-metrics-otlp-http';
 import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base-wip';
@@ -32,23 +33,19 @@ import { Metadata } from '@grpc/grpc-js';
 
 const DEFAULT_COLLECTOR_URL = 'localhost:4317';
 
-export interface OTLPMetricExporterOptions extends OTLPExporterConfigNode {
-  aggregationTemporality: AggregationTemporality
-}
 
 class OTLPMetricExporterProxy extends OTLPExporterNodeBase<ResourceMetrics,
   otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest> {
   protected readonly _aggregationTemporality: AggregationTemporality;
 
-  constructor(config: OTLPMetricExporterOptions = defaultOptions) {
+  constructor(config: OTLPExporterConfigNode & OTLPMetricExporterOptions= defaultOptions) {
     super(config);
     this.metadata ||= new Metadata();
     const headers = baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS);
     for (const [k, v] of Object.entries(headers)) {
       this.metadata.set(k, v);
     }
-    this._aggregationTemporality = config.aggregationTemporality;
-
+    this._aggregationTemporality = config.aggregationTemporality ?? defaultExporterTemporality;
   }
 
   getServiceProtoPath(): string {
@@ -82,7 +79,7 @@ class OTLPMetricExporterProxy extends OTLPExporterNodeBase<ResourceMetrics,
  * OTLP-gRPC metric exporter
  */
 export class OTLPMetricExporter extends OTLPMetricExporterBase<OTLPMetricExporterProxy>{
-  constructor(config: OTLPMetricExporterOptions = defaultOptions) {
+  constructor(config: OTLPExporterConfigNode & OTLPMetricExporterOptions = defaultOptions) {
     super(new OTLPMetricExporterProxy(config), config);
   }
 }
