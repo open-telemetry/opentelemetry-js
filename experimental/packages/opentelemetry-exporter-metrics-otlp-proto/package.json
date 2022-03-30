@@ -69,11 +69,11 @@
   },
   "dependencies": {
     "@grpc/proto-loader": "0.6.9",
-    "@opentelemetry/core": "1.0.1",
+    "@opentelemetry/core": "1.1.1",
     "@opentelemetry/exporter-metrics-otlp-http": "0.27.0",
     "@opentelemetry/exporter-trace-otlp-http": "0.27.0",
     "@opentelemetry/exporter-trace-otlp-proto": "0.27.0",
-    "@opentelemetry/resources": "1.0.1",
+    "@opentelemetry/resources": "1.1.1",
     "@opentelemetry/sdk-metrics-base": "0.27.0",
     "protobufjs": "^6.9.0"
   }

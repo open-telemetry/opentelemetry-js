@@ -60,7 +60,7 @@
   },
   "dependencies": {
     "@opentelemetry/api-metrics-wip": "0.27.0",
-    "@opentelemetry/core": "1.0.1",
+    "@opentelemetry/core": "1.1.1",
     "@opentelemetry/sdk-metrics-base-wip": "0.27.0"
   }
 }
