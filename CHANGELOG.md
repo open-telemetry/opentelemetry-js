@@ -4,7 +4,6 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
-<<<<<<< HEAD
 ### :boom: Breaking Change
 
 ### :rocket: (Enhancement)
