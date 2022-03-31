@@ -27,10 +27,12 @@ import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 
 function createNewEmptyCheckpoint(boundaries: number[]): Histogram {
+  const counts = boundaries.map(() => 0);
+  counts.push(0);
   return {
     buckets: {
       boundaries,
-      counts: boundaries.map(() => 0).concat([0]),
+      counts,
     },
     sum: 0,
     count: 0,
@@ -68,16 +70,11 @@ export class HistogramAccumulation implements Accumulation {
  */
 export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
   public kind: AggregatorKind.HISTOGRAM = AggregatorKind.HISTOGRAM;
-  private readonly _boundaries: number[];
 
-  constructor(boundaries: number[]) {
-    if (boundaries === undefined || boundaries.length === 0) {
-      throw new Error('HistogramAggregator should be created with boundaries.');
-    }
-    // we need to an ordered set to be able to correctly compute count for each
-    // boundary since we'll iterate on each in order.
-    this._boundaries = boundaries.sort((a, b) => a - b);
-  }
+  /**
+   * @param _boundaries upper bounds of recorded values.
+   */
+  constructor(private readonly _boundaries: number[]) {}
 
   createAccumulation() {
     return new HistogramAccumulation(this._boundaries);
