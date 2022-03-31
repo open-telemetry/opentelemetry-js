@@ -17,7 +17,7 @@
 import { ExportResultCode } from '@opentelemetry/core';
 import {
   ResourceMetrics,
-} from '@opentelemetry/sdk-metrics-base-wip';
+} from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPExporterBase, otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';

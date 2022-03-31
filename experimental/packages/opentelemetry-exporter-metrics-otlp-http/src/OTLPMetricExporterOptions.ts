@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
-import { AggregationTemporality } from '@opentelemetry/sdk-metrics-base-wip';
+import { AggregationTemporality } from '@opentelemetry/sdk-metrics-base';
 
 export interface OTLPMetricExporterOptions extends otlpTypes.OTLPExporterConfigBase {
   aggregationTemporality?: AggregationTemporality

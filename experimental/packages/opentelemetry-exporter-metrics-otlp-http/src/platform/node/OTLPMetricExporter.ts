@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ResourceMetrics, AggregationTemporality } from '@opentelemetry/sdk-metrics-base-wip';
+import { ResourceMetrics, AggregationTemporality } from '@opentelemetry/sdk-metrics-base';
 import {
   OTLPExporterNodeBase,
   OTLPExporterNodeConfigBase,

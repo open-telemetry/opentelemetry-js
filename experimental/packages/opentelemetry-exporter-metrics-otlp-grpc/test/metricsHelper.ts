@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { Counter, Histogram, ObservableResult, ValueType } from '@opentelemetry/api-metrics-wip';
+import { Counter, Histogram, ObservableResult, ValueType } from '@opentelemetry/api-metrics';
 import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as grpc from '@grpc/grpc-js';
 import { VERSION } from '@opentelemetry/core';
-import { HistogramAggregation, MeterProvider, MetricReader } from '@opentelemetry/sdk-metrics-base-wip';
+import { HistogramAggregation, MeterProvider, MetricReader } from '@opentelemetry/sdk-metrics-base';
 
 export class TestMetricReader extends MetricReader {
   protected onForceFlush(): Promise<void> {

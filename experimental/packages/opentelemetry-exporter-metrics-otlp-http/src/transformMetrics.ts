@@ -24,7 +24,7 @@ import {
   InstrumentType,
   MetricData,
   ResourceMetrics
-} from '@opentelemetry/sdk-metrics-base-wip';
+} from '@opentelemetry/sdk-metrics-base';
 import { Attributes, ValueType } from '@opentelemetry/api-metrics';
 
 /**

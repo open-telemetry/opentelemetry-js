@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { Attributes, UpDownCounter } from '@opentelemetry/api-metrics-wip';
+import { Attributes, UpDownCounter } from '@opentelemetry/api-metrics';
 import {
   AggregationTemporality,
   MeterProvider,
@@ -25,7 +25,7 @@ import {
   ExplicitBucketHistogramAggregation,
   SumAggregation,
   Histogram,
-} from '@opentelemetry/sdk-metrics-base-wip';
+} from '@opentelemetry/sdk-metrics-base';
 import * as sinon from 'sinon';
 import { PrometheusSerializer } from '../src/PrometheusSerializer';
 import { mockedHrTimeMs, mockHrTime } from './util';

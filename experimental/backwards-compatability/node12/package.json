@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@opentelemetry/sdk-node": "0.27.0",
-    "@opentelemetry/sdk-trace-base": "1.0.1"
+    "@opentelemetry/sdk-trace-base": "1.1.1"
   },
   "devDependencies": {
     "@types/node": "12.20.37",

@@ -15,9 +15,9 @@
  */
 
 import { diag, DiagLogger, DiagLogLevel } from '@opentelemetry/api';
-import { Counter, Histogram, } from '@opentelemetry/api-metrics-wip';
+import { Counter, Histogram, } from '@opentelemetry/api-metrics';
 import { ExportResultCode, hrTimeToNanoseconds } from '@opentelemetry/core';
-import { AggregationTemporality, ResourceMetrics, } from '@opentelemetry/sdk-metrics-base-wip';
+import { AggregationTemporality, ResourceMetrics, } from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPMetricExporter } from '../../src/platform/browser';

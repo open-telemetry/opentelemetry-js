@@ -15,7 +15,7 @@
  */
 
 import { hrTimeToNanoseconds, hrTime } from '@opentelemetry/core';
-import { AggregationTemporality, DataPointType, InstrumentType } from '@opentelemetry/sdk-metrics-base-wip';
+import { AggregationTemporality, DataPointType, InstrumentType } from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
 import * as transform from '../../src/transformMetrics';
 import {

@@ -34,7 +34,7 @@ import {
   mockHistogram,
   mockObservableGauge, setUp, shutdown,
 } from './metricsHelper';
-import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base-wip';
+import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
 
 const metricsServiceProtoPath =
   'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';

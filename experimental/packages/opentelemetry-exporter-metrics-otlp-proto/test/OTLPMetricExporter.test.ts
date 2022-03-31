@@ -36,7 +36,7 @@ import {
   mockObservableGauge,
   mockHistogram, collect, setUp, shutdown,
 } from './metricsHelper';
-import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base-wip';
+import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
 import { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
 
 const fakeRequest = {

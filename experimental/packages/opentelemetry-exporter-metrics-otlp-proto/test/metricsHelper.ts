@@ -24,7 +24,7 @@ import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { Stream } from 'stream';
-import { HistogramAggregation, MeterProvider, MetricReader } from '@opentelemetry/sdk-metrics-base-wip';
+import { HistogramAggregation, MeterProvider, MetricReader } from '@opentelemetry/sdk-metrics-base';
 
 export class TestMetricReader extends MetricReader {
   protected onForceFlush(): Promise<void> {
