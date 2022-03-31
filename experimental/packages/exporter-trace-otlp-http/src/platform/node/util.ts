@@ -85,9 +85,6 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
     });
 
     res.on('end', () => {
-      // node version <= 12 will emit 'end' event even if request was aborted
-      // no need to handle promise here if request was aborted since promise
-      // was already rejected in res.on('aborted')
       if (!reqIsDestroyed) {
         if (res.statusCode && res.statusCode < 299) {
           diag.debug(`statusCode: ${res.statusCode}`, responseData);
