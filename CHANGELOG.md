@@ -18,7 +18,6 @@ All notable changes to this project will be documented in this file.
 
 * [#2847](https://github.com/open-telemetry/opentelemetry-js/pull/2847) chore: require changelog entry to merge PR ([@dyladan](https://github.com/dyladan))
 
-
 ## 1.1.1
 
 * [#2849](https://github.com/open-telemetry/opentelemetry-js/pull/2849) fix: correct changelog and compat matrix for 1.1 release ([@Flarna](https://github.com/Flarna))
