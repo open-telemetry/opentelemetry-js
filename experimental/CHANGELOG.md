@@ -27,10 +27,15 @@ All notable changes to experimental packages in this project will be documented 
 * [#2829](https://github.com/open-telemetry/opentelemetry-js/pull/2829) feat(sdk-metrics-base): update exporting names ([@legendecas](https://github.com/legendecas))
 * [#2813](https://github.com/open-telemetry/opentelemetry-js/pull/2813) Add grpc compression to trace-otlp-grpc exporter ([@svetlanabrennan](https://github.com/svetlanabrennan))
 * [#2695](https://github.com/open-telemetry/opentelemetry-js/pull/2695) refactor: unifying shutdown once with BindOnceFuture ([@legendecas](https://github.com/legendecas))
+* [#2824](https://github.com/open-telemetry/opentelemetry-js/pull/2824) feat(prometheus): update prometheus exporter with wip metrics sdk ([@legendecas](https://github.com/legendecas))
+* [#2134](https://github.com/open-telemetry/opentelemetry-js/pull/2134) feat(instrumentation-xhr): add applyCustomAttributesOnSpan hook ([@mhennoch](https://github.com/mhennoch))
+* [#2746](https://github.com/open-telemetry/opentelemetry-js/pull/2746) feat(proto): add @opentelemetry/otlp-transformer package with hand-rolled transformation ([@dyladan](https://github.com/dyladan))
 
 ### :bug: (Bug Fix)
 
 * [#2676](https://github.com/open-telemetry/opentelemetry-js/pull/2676) fix(sdk-metrics-base): remove aggregator.toMetricData dependency on AggregationTemporality ([@legendecas](https://github.com/legendecas))
+* [#2859](https://github.com/open-telemetry/opentelemetry-js/pull/2859) fix(sdk-metrics-base): coerce histogram boundaries to be implicit Infinity ([@legendecas](https://github.com/legendecas))
+* [#2789](https://github.com/open-telemetry/opentelemetry-js/pull/2789) fix(instrumentation-http): HTTP 400 status code should not set span status to error on servers ([@nordfjord](https://github.com/nordfjord))
 
 ### :books: (Refine Doc)
 
@@ -38,6 +43,8 @@ All notable changes to experimental packages in this project will be documented 
 * [#2712](https://github.com/open-telemetry/opentelemetry-js/pull/2712) docs(api-metrics): add notes on ObservableResult.observe ([@legendecas](https://github.com/legendecas))
 
 ### :house: (Internal)
+
+* [#2835](https://github.com/open-telemetry/opentelemetry-js/pull/2835) chore: move trace exporters back to experimental ([@dyladan](https://github.com/dyladan))
 
 ## v0.27.0
 
