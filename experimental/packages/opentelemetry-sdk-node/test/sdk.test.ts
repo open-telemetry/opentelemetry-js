@@ -28,7 +28,7 @@ import {
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
 import { CompositePropagator } from '@opentelemetry/core';
-import { ConsoleMetricExporter, MeterProvider } from '@opentelemetry/sdk-metrics-base';
+import { ConsoleMetricExporter, MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics-base';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { awsEc2Detector } from '@opentelemetry/resource-detector-aws';
 import { resetIsAvailableCache } from '@opentelemetry/resource-detector-gcp';
@@ -163,11 +163,16 @@ describe('Node SDK', () => {
       assert.ok(apiTracerProvider.getDelegate() instanceof NodeTracerProvider);
     });
 
-    it('should register a meter provider if an exporter is provided', async () => {
+    it('should register a meter provider if a reader is provided', async () => {
       const exporter = new ConsoleMetricExporter();
+      const metricReader = new PeriodicExportingMetricReader({
+        exporter: exporter,
+        exportIntervalMillis: 100,
+        exportTimeoutMillis: 100
+      });
 
       const sdk = new NodeSDK({
-        metricExporter: exporter,
+        metricReader: metricReader,
         autoDetectResources: false,
       });
 
@@ -178,6 +183,8 @@ describe('Node SDK', () => {
       assert.strictEqual((trace.getTracerProvider() as ProxyTracerProvider).getDelegate(), delegate, 'tracer provider should not have changed');
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+
+      await sdk.shutdown();
     });
   });
 
