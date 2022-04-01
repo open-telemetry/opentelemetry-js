@@ -88,6 +88,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
         gzip = zlib.createGzip();
       }
       req.setHeader('Content-Encoding', 'gzip');
+      req.removeHeader('Content-Length');
       const dataStream = readableFromBuffer(data);
       dataStream.on('error', onError)
         .pipe(gzip).on('error', onError)
