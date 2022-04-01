@@ -24,7 +24,11 @@ import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { Stream } from 'stream';
-import { HistogramAggregation, MeterProvider, MetricReader } from '@opentelemetry/sdk-metrics-base';
+import {
+  ExplicitBucketHistogramAggregation,
+  MeterProvider,
+  MetricReader
+} from '@opentelemetry/sdk-metrics-base';
 
 export class TestMetricReader extends MetricReader {
   protected onForceFlush(): Promise<void> {
@@ -90,7 +94,7 @@ export function mockObservableGauge(
 
 export function mockHistogram(): Histogram {
   const name = 'int-histogram';
-  meterProvider.addView({ aggregation: new HistogramAggregation([0, 100]) });
+  meterProvider.addView({ aggregation: new ExplicitBucketHistogramAggregation([0, 100]) });
 
   return meter.createHistogram(name, {
     description: 'sample histogram description',

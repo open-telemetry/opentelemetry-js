@@ -16,7 +16,7 @@
 
 import { Counter, Histogram, ObservableResult, ValueType, } from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary, VERSION } from '@opentelemetry/core';
-import { HistogramAggregation, MeterProvider, MetricReader } from '@opentelemetry/sdk-metrics-base';
+import { ExplicitBucketHistogramAggregation, MeterProvider, MetricReader } from '@opentelemetry/sdk-metrics-base';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
@@ -133,7 +133,7 @@ export function mockHistogram(): Histogram {
   const name = 'int-histogram';
 
   meterProvider.addView({
-      aggregation: new HistogramAggregation([0, 100])
+      aggregation: new ExplicitBucketHistogramAggregation([0, 100])
     },
     {
       instrument: {
