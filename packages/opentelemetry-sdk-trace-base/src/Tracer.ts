@@ -29,6 +29,7 @@ import { GeneralLimits, SpanLimits, TracerConfig } from './types';
 import { mergeConfig } from './utility';
 import { SpanProcessor } from './SpanProcessor';
 
+const spanNameReservedAttribute = "__spanName__"
 /**
  * This class represents a basic tracer.
  */
@@ -94,6 +95,7 @@ export class Tracer implements api.Tracer {
     const spanKind = options.kind ?? api.SpanKind.INTERNAL;
     const links = options.links ?? [];
     const attributes = sanitizeAttributes(options.attributes);
+
     // make sampling decision
     const samplingResult = this._sampler.shouldSample(
       context,
@@ -112,6 +114,11 @@ export class Tracer implements api.Tracer {
     if (samplingResult.decision === api.SamplingDecision.NOT_RECORD) {
       api.diag.debug('Recording is off, propagating context in a non-recording span');
       return api.trace.wrapSpanContext(spanContext);
+    }
+
+    if (attributes[spanNameReservedAttribute]) {
+      name = attributes[spanNameReservedAttribute]
+      delete attributes[spanNameReservedAttribute]
     }
 
     const span = new Span(
