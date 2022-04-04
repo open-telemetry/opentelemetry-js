@@ -95,10 +95,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
       break;
     }
     default:
-      req.setHeader('Content-Length', Buffer.byteLength(data));
-      req.write(data);
-      req.end();
-
+      req.end(data);
       break;
   }
 }
