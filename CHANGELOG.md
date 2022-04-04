@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: (Bug Fix)
 
+* [#2881](https://github.com/open-telemetry/opentelemetry-js/pull/2881) fix: sanitize attributes inputs ([@legendecas](https://githuc.com/legendecas))
+
 ### :books: (Refine Doc)
 
 * [#2860](https://github.com/open-telemetry/opentelemetry-js/pull/2860) docs(sdk): update earliest support node version ([@svetlanabrennan](https://github.com/svetlanabrennan))

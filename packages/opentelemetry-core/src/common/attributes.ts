@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { SpanAttributeValue, SpanAttributes } from '@opentelemetry/api';
+import { AttributeValue, Attributes } from '@opentelemetry/api';
 
-export function sanitizeAttributes(attributes: unknown): SpanAttributes {
-  const out: SpanAttributes = {};
+export function sanitizeAttributes(attributes: unknown): Attributes {
+  const out: Attributes = {};
 
-  if (attributes == null || typeof attributes !== 'object') {
+  if (typeof attributes !== 'object' || attributes == null) {
     return out;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  for (const [k, v] of Object.entries(attributes!)) {
+  for (const [k, v] of Object.entries(attributes)) {
+    if (!isAttributeKey(k)) {
+      continue;
+    }
     if (isAttributeValue(v)) {
       if (Array.isArray(v)) {
         out[k] = v.slice();
@@ -36,7 +38,11 @@ export function sanitizeAttributes(attributes: unknown): SpanAttributes {
   return out;
 }
 
-export function isAttributeValue(val: unknown): val is SpanAttributeValue {
+export function isAttributeKey(key: unknown): key is string {
+  return typeof key === 'string' && key.length > 0;
+}
+
+export function isAttributeValue(val: unknown): val is AttributeValue {
   if (val == null) {
     return true;
   }

@@ -68,7 +68,7 @@ export class Resource {
   merge(other: Resource | null): Resource {
     if (!other || !Object.keys(other.attributes).length) return this;
 
-    // SpanAttributes from resource overwrite attributes from other resource.
+    // Attributes from resource overwrite attributes from other resource.
     const mergedAttributes = Object.assign(
       {},
       this.attributes,
