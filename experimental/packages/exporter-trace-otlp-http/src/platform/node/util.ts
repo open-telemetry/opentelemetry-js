@@ -50,7 +50,6 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
     path: parsedUrl.pathname,
     method: 'POST',
     headers: {
-      'Content-Length': Buffer.byteLength(data),
       'Content-Type': contentType,
       ...collector.headers,
     },
@@ -88,7 +87,6 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
         gzip = zlib.createGzip();
       }
       req.setHeader('Content-Encoding', 'gzip');
-      req.removeHeader('Content-Length');
       const dataStream = readableFromBuffer(data);
       dataStream.on('error', onError)
         .pipe(gzip).on('error', onError)
@@ -97,6 +95,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
       break;
     }
     default:
+      req.setHeader('Content-Length', Buffer.byteLength(data));
       req.write(data);
       req.end();
 
