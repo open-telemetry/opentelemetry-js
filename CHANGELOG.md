@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* [#2871](https://github.com/open-telemetry/opentelemetry-js/pull/2871) feat(experimental-packages): Update packages to latest SDK Version. ([@pichlermarc](https://github.com/pichlermarc))
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
