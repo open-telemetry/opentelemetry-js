@@ -88,15 +88,15 @@ function toSingularDataPoint(dataPoint: DataPoint<number> | DataPoint<Histogram>
 function toSingularDataPoints(
   metricData: MetricData
 ): INumberDataPoint[] {
-  return Array.from(metricData.dataPoints.map(dataPoint => {
+  return metricData.dataPoints.map(dataPoint => {
     return toSingularDataPoint(dataPoint, metricData.descriptor.valueType);
-  }));
+  });
 }
 
 function toHistogramDataPoints(
   metricData: MetricData
 ): IHistogramDataPoint[] {
-  return Array.from(metricData.dataPoints.map(dataPoint => {
+  return metricData.dataPoints.map(dataPoint => {
     const histogram = dataPoint.value as Histogram;
     return {
       attributes: toAttributes(dataPoint.attributes),
@@ -109,7 +109,7 @@ function toHistogramDataPoints(
         dataPoint.endTime
       ),
     };
-  }));
+  });
 }
 
 function isSum(metric: MetricData) {
