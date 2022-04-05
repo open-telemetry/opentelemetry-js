@@ -148,7 +148,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
   describe('export', () => {
     beforeEach(async () => {
       stubRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
-      stubWrite = sinon.stub(fakeRequest, 'write');
+      stubWrite = sinon.stub(fakeRequest, 'end');
       collectorExporterConfig = {
         headers: {
           foo: 'bar',
