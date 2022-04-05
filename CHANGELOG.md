@@ -4,27 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
-* [#2588](https://github.com/open-telemetry/opentelemetry-js/pull/2588) feat: spec compliant metric creation and sync instruments ([@dyladan](https://github.com/dyladan))
-* [#2569](https://github.com/open-telemetry/opentelemetry-js/pull/2569) feat(api-metrics): async instruments spec compliance ([@legendecas](https://github.com/legendecas))
-* [#2707](https://github.com/open-telemetry/opentelemetry-js/pull/2707) feat(sdk-metrics-base): update metric exporter interfaces ([@srikanthccv](https://github.com/srikanthccv))
-* [#2776](https://github.com/open-telemetry/opentelemetry-js/pull/2776) feat(sdk-metrics-base): add ValueType support for sync instruments ([@legendecas](https://github.com/legendecas))
-* [#2686](https://github.com/open-telemetry/opentelemetry-js/pull/2686) feat(sdk-metrics-base): implement async instruments support ([@legendecas](https://github.com/legendecas))
-* [#2666](https://github.com/open-telemetry/opentelemetry-js/pull/2666) feat(sdk-metrics-base): meter registration ([@legendecas](https://github.com/legendecas))
-* [#2641](https://github.com/open-telemetry/opentelemetry-js/pull/2641) feat(sdk-metrics-base): bootstrap metrics exemplars ([@srikanthccv](https://github.com/srikanthccv))
-* [#2634](https://github.com/open-telemetry/opentelemetry-js/pull/2634) feat(metrics-sdk): bootstrap aggregation support ([@legendecas](https://github.com/legendecas))
-* [#2625](https://github.com/open-telemetry/opentelemetry-js/pull/2625) feat(metrics-sdk): bootstrap views api ([@legendecas](https://github.com/legendecas))
-* [#2636](https://github.com/open-telemetry/opentelemetry-js/pull/2636) feat(sdk-metrics): bootstrap metric streams ([@legendecas](https://github.com/legendecas))
-* [#2733](https://github.com/open-telemetry/opentelemetry-js/pull/2733) feat(views): add FilteringAttributesProcessor ([@pichlermarc](https://github.com/pichlermarc))
-* [#2681](https://github.com/open-telemetry/opentelemetry-js/pull/2681) feat(metric-reader): add metric-reader ([@pichlermarc](https://github.com/pichlermarc))
-* [#2687](https://github.com/open-telemetry/opentelemetry-js/pull/2687) feat(api-metrics): remove observable types ([@legendecas](https://github.com/legendecas))
-* [#2658](https://github.com/open-telemetry/opentelemetry-js/pull/2658) Update metrics example ([@svetlanabrennan](https://github.com/svetlanabrennan))
-* [#2676](https://github.com/open-telemetry/opentelemetry-js/pull/2676) fix(sdk-metrics-base): remove aggregator.toMetricData dependency on AggregationTemporality ([@legendecas](https://github.com/legendecas))
-* [#2725](https://github.com/open-telemetry/opentelemetry-js/pull/2725) feat(sdk-metrics-base): document and export basic APIs ([@legendecas](https://github.com/legendecas))
-* [#2712](https://github.com/open-telemetry/opentelemetry-js/pull/2712) docs(api-metrics): add notes on ObservableResult.observe ([@legendecas](https://github.com/legendecas))
-* [#2820](https://github.com/open-telemetry/opentelemetry-js/pull/2820) feat(views): Update addView() to disallow named views that select more than one instrument. ([@pichlermarc](https://github.com/pichlermarc))
-* [#2829](https://github.com/open-telemetry/opentelemetry-js/pull/2829) feat(sdk-metrics-base): update exporting names ([@legendecas](https://github.com/legendecas))
-* [#2813](https://github.com/open-telemetry/opentelemetry-js/pull/2813) Add grpc compression to trace-otlp-grpc exporter ([@svetlanabrennan](https://github.com/svetlanabrennan))
-* [#2695](https://github.com/open-telemetry/opentelemetry-js/pull/2695) refactor: unifying shutdown once with BindOnceFuture ([@legendecas](https://github.com/legendecas))
+### :boom: Breaking Change
+
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+* [#2860](https://github.com/open-telemetry/opentelemetry-js/pull/2860) docs(sdk): update earliest support node version ([@svetlanabrennan](https://github.com/svetlanabrennan))
+
+### :house: (Internal)
+
+* [#2847](https://github.com/open-telemetry/opentelemetry-js/pull/2847) chore: require changelog entry to merge PR ([@dyladan](https://github.com/dyladan))
 
 ## 1.1.1
 
