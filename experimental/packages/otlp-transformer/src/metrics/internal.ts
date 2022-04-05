@@ -76,9 +76,7 @@ function toSingularDataPoint(dataPoint: DataPoint<number> | DataPoint<Histogram>
 
   if (valueType === ValueType.INT) {
     out.asInt = dataPoint.value as number;
-  }
-
-  if (valueType === ValueType.DOUBLE) {
+  } else if (valueType === ValueType.DOUBLE) {
     out.asDouble = dataPoint.value as number;
   }
 
