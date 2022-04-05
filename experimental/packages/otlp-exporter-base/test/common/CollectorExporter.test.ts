@@ -15,20 +15,24 @@
  */
 
 import { ExportResultCode } from '@opentelemetry/core';
-import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPExporterBase } from '../../src/OTLPExporterBase';
 import { OTLPExporterConfigBase } from '../../src/types';
-import { mockedReadableSpan } from '../traceHelper';
+import { ComplexTestObject, mockedComplexTestObject } from '../testHelper';
 import * as otlpTypes from '../../src/types';
+
+
+interface ExportRequest {
+  resourceSpans: object[]
+}
 
 type CollectorExporterConfig = OTLPExporterConfigBase;
 class OTLPTraceExporter extends OTLPExporterBase<
   CollectorExporterConfig,
-  ReadableSpan,
-  otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
-> {
+  ComplexTestObject,
+  ExportRequest
+  > {
   onInit() {}
   onShutdown() {}
   send(
@@ -48,8 +52,8 @@ class OTLPTraceExporter extends OTLPExporterBase<
   }
 
   convert(
-    spans: ReadableSpan[]
-  ): otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
+    spans: ComplexTestObject[]
+  ): ExportRequest {
     return { resourceSpans: [] };
   }
 }
@@ -102,12 +106,12 @@ describe('OTLPTraceExporter - common', () => {
     });
 
     it('should export spans as otlpTypes.Spans', done => {
-      const spans: ReadableSpan[] = [];
-      spans.push(Object.assign({}, mockedReadableSpan));
+      const spans: ComplexTestObject[] = [];
+      spans.push(Object.assign({}, mockedComplexTestObject));
 
       collectorExporter.export(spans, () => {});
       setTimeout(() => {
-        const span1 = spySend.args[0][0][0] as ReadableSpan;
+        const span1 = spySend.args[0][0][0] as ComplexTestObject;
         assert.deepStrictEqual(spans[0], span1);
         done();
       });
@@ -117,10 +121,10 @@ describe('OTLPTraceExporter - common', () => {
     describe('when exporter is shutdown', () => {
       it(
         'should not export anything but return callback with code' +
-          ' "FailedNotRetryable"',
+        ' "FailedNotRetryable"',
         async () => {
-          const spans: ReadableSpan[] = [];
-          spans.push(Object.assign({}, mockedReadableSpan));
+          const spans: ComplexTestObject[] = [];
+          spans.push(Object.assign({}, mockedComplexTestObject));
           await collectorExporter.shutdown();
           spySend.resetHistory();
 
@@ -139,8 +143,8 @@ describe('OTLPTraceExporter - common', () => {
     });
     describe('when an error occurs', () => {
       it('should return failed export result', done => {
-        const spans: ReadableSpan[] = [];
-        spans.push(Object.assign({}, mockedReadableSpan));
+        const spans: ComplexTestObject[] = [];
+        spans.push(Object.assign({}, mockedComplexTestObject));
         spySend.throws({
           code: 100,
           details: 'Test error',
@@ -174,7 +178,7 @@ describe('OTLPTraceExporter - common', () => {
         ...collectorExporterConfig,
         concurrencyLimit: 3,
       });
-      const spans: ReadableSpan[] = [{ ...mockedReadableSpan }];
+      const spans: ComplexTestObject[] = [{ ...mockedComplexTestObject }];
       const callbackSpy = sinon.spy();
       for (let i = 0; i < 7; i++) {
         collectorExporterWithConcurrencyLimit.export(spans, callbackSpy);

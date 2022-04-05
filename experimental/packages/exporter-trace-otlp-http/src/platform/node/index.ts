@@ -15,6 +15,3 @@
  */
 
 export * from './OTLPTraceExporter';
-export * from './OTLPExporterNodeBase';
-export * from './util';
-export * from './types';

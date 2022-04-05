@@ -18,12 +18,12 @@ import * as http from 'http';
 import * as https from 'https';
 import * as zlib from 'zlib';
 import { Readable } from 'stream';
-import * as otlpTypes from '../../types';
 import { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
 import { OTLPExporterNodeConfigBase } from '.';
 import { diag } from '@opentelemetry/api';
 import { CompressionAlgorithm } from './types';
 import { getEnv } from '@opentelemetry/core';
+import { OTLPExporterError } from '../../types';
 
 let gzip: zlib.Gzip | undefined;
 
@@ -40,7 +40,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
   data: string | Buffer,
   contentType: string,
   onSuccess: () => void,
-  onError: (error: otlpTypes.OTLPExporterError) => void
+  onError: (error: OTLPExporterError) => void
 ): void {
   const parsedUrl = new url.URL(collector.url);
 
@@ -66,7 +66,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
         diag.debug(`statusCode: ${res.statusCode}`, responseData);
         onSuccess();
       } else {
-        const error = new otlpTypes.OTLPExporterError(
+        const error = new OTLPExporterError(
           res.statusMessage,
           res.statusCode,
           responseData

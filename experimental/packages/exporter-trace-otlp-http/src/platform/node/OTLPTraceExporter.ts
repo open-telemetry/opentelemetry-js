@@ -15,24 +15,24 @@
  */
 
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
-import { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
-import { OTLPExporterNodeConfigBase } from './types';
 import * as otlpTypes from '../../types';
 import { toOTLPExportTraceServiceRequest } from '../../transform';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
-import { appendResourcePathToUrlIfNotPresent } from '../../util';
+import { OTLPExporterNodeBase } from '@opentelemetry/otlp-exporter-base';
+import {
+  OTLPExporterNodeConfigBase,
+  appendResourcePathToUrlIfNotPresent
+} from '@opentelemetry/otlp-exporter-base';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = '/v1/traces';
-const DEFAULT_COLLECTOR_URL=`http://localhost:4318${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
+const DEFAULT_COLLECTOR_URL = `http://localhost:4318${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 
 /**
  * Collector Trace Exporter for Node
  */
 export class OTLPTraceExporter
-  extends OTLPExporterNodeBase<
-    ReadableSpan,
-    otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
-  >
+  extends OTLPExporterNodeBase<ReadableSpan,
+    otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest>
   implements SpanExporter {
   constructor(config: OTLPExporterNodeConfigBase = {}) {
     super(config);
@@ -50,13 +50,13 @@ export class OTLPTraceExporter
     return toOTLPExportTraceServiceRequest(spans, this, true);
   }
 
-  getDefaultUrl(config: OTLPExporterNodeConfigBase) : string {
+  getDefaultUrl(config: OTLPExporterNodeConfigBase): string {
     return typeof config.url === 'string'
       ? config.url
       : getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT.length > 0
-      ? getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-      : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-      ? appendResourcePathToUrlIfNotPresent(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
-      : DEFAULT_COLLECTOR_URL;
+        ? getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+        : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
+          ? appendResourcePathToUrlIfNotPresent(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
+          : DEFAULT_COLLECTOR_URL;
   }
 }

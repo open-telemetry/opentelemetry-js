@@ -13,5 +13,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-export * from './OTLPTraceExporter';
+export * from './node';
+export { OTLPExporterBrowserBase } from './browser';

@@ -23,18 +23,20 @@ import * as sinon from 'sinon';
 import { PassThrough, Stream } from 'stream';
 import * as zlib from 'zlib';
 import {
-  OTLPTraceExporter,
-  OTLPExporterNodeConfigBase,
-  CompressionAlgorithm,
+  OTLPTraceExporter
 } from '../../src/platform/node';
 import * as otlpTypes from '../../src/types';
 import { MockedResponse } from './nodeHelpers';
-
 import {
   ensureExportTraceServiceRequestIsSet,
   ensureSpanIsCorrect,
   mockedReadableSpan,
 } from '../traceHelper';
+import { OTLPExporterError } from '@opentelemetry/otlp-exporter-base';
+import {
+  CompressionAlgorithm,
+  OTLPExporterNodeConfigBase
+} from '@opentelemetry/otlp-exporter-base/src/platform/node';
 
 let fakeRequest: PassThrough;
 
@@ -272,7 +274,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
         setTimeout(() => {
           const result = responseSpy.args[0][0] as core.ExportResult;
           assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-          const error = result.error as otlpTypes.OTLPExporterError;
+          const error = result.error as OTLPExporterError;
           assert.ok(error !== undefined);
           assert.strictEqual(error.code, 400);
           assert.strictEqual(error.data, 'failed');

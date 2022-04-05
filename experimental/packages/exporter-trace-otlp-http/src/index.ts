@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-export * from './OTLPExporterBase';
 export * from './platform';
 export * as otlpTypes from './types';
 export { toCollectorResource, toOTLPExportTraceServiceRequest } from './transform';
-export { appendResourcePathToUrlIfNotPresent } from './util';

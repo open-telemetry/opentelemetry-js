@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanAttributes, SpanKind, SpanStatusCode } from '@opentelemetry/api';
+import { SpanKind, SpanStatusCode } from '@opentelemetry/api';
 
 /* eslint-disable @typescript-eslint/no-namespace */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -309,44 +309,6 @@ export namespace opentelemetryProto {
       BOOL,
     }
   }
-}
-
-/**
- * Interface for handling error
- */
-export class OTLPExporterError extends Error {
-  readonly code?: number;
-  override readonly name: string = 'OTLPExporterError';
-  readonly data?: string;
-
-  constructor(message?: string, code?: number, data?: string) {
-    super(message);
-    this.data = data;
-    this.code = code;
-  }
-}
-
-/**
- * Interface for handling export service errors
- */
-export interface ExportServiceError {
-  name: string;
-  code: number;
-  details: string;
-  metadata: { [key: string]: unknown };
-  message: string;
-  stack: string;
-}
-
-/**
- * Collector Exporter base config
- */
-export interface OTLPExporterConfigBase {
-  headers?: Partial<Record<string, unknown>>;
-  hostname?: string;
-  attributes?: SpanAttributes;
-  url?: string;
-  concurrencyLimit?: number;
 }
 
 /**

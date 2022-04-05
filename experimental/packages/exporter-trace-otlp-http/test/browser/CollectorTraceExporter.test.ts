@@ -20,7 +20,6 @@ import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPTraceExporter } from '../../src/platform/browser/index';
-import { OTLPExporterConfigBase } from '../../src/types';
 import * as otlpTypes from '../../src/types';
 
 import {
@@ -30,6 +29,7 @@ import {
   ensureHeadersContain,
   mockedReadableSpan,
 } from '../traceHelper';
+import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 
 describe('OTLPTraceExporter - web', () => {
   let collectorTraceExporter: OTLPTraceExporter;

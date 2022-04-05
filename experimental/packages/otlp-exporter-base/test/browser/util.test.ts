@@ -16,7 +16,7 @@
 
 import * as sinon from 'sinon';
 import { sendWithXhr } from '../../src/platform/browser/util';
-import { ensureHeadersContain } from '../traceHelper';
+import { ensureHeadersContain } from '../testHelper';
 
 describe('util - browser', () => {
   let server: any;
@@ -49,8 +49,8 @@ describe('util - browser', () => {
     describe('and Content-Type header is set', () => {
       beforeEach(()=>{
         const explicitContentType = {
-        'Content-Type': 'application/json',
-      };
+          'Content-Type': 'application/json',
+        };
         sendWithXhr(body, url, explicitContentType, onSuccessStub, onErrorStub);
       });
       it('Request Headers should contain "Content-Type" header', done => {

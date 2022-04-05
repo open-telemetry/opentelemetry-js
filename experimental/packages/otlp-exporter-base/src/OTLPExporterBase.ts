@@ -29,7 +29,7 @@ export abstract class OTLPExporterBase<
   T extends OTLPExporterConfigBase,
   ExportItem,
   ServiceRequest
-> {
+  > {
   public readonly url: string;
   public readonly hostname: string | undefined;
   public readonly attributes?: SpanAttributes;

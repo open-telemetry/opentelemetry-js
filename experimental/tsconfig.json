@@ -48,6 +48,9 @@
       "path": "packages/opentelemetry-sdk-node"
     },
     {
+      "path": "packages/otlp-exporter-base"
+    },
+    {
       "path": "packages/otlp-transformer"
     },
     {
