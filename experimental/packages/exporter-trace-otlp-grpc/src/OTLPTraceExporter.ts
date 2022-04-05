@@ -25,7 +25,7 @@ import { baggageUtils, getEnv } from '@opentelemetry/core';
 import { validateAndNormalizeUrl } from './util';
 import { Metadata } from '@grpc/grpc-js';
 
-const DEFAULT_COLLECTOR_URL = 'localhost:4317';
+export const DEFAULT_COLLECTOR_URL = 'localhost:4317';
 
 /**
  * OTLP Trace Exporter for Node

@@ -28,6 +28,7 @@ import {
   ServiceClientType,
   CompressionAlgorithm
 } from './types';
+import { DEFAULT_COLLECTOR_URL } from './OTLPTraceExporter';
 import * as fs from 'fs';
 
 export function onInit<ExportItem, ServiceRequest>(
@@ -36,7 +37,7 @@ export function onInit<ExportItem, ServiceRequest>(
 ): void {
   collector.grpcQueue = [];
 
-  const credentials: grpc.ChannelCredentials = configureSecurity(config.credentials);
+  const credentials: grpc.ChannelCredentials = configureSecurity(config.credentials, collector.url);
 
   const includeDirs = [path.resolve(__dirname, '..', 'protos')];
 
@@ -132,51 +133,101 @@ export function validateAndNormalizeUrl(url: string): string {
   return target.host;
 }
 
-export function configureSecurity(credentials: grpc.ChannelCredentials | undefined):
+export function configureSecurity(credentials: grpc.ChannelCredentials | undefined, endpoint: string):
   grpc.ChannelCredentials {
 
+  // 2: anytime user provides their own credentials, use those same credentials (no matter the scheme or env insecure settings)
   if (credentials) {
     return credentials;
+    // 3. if user sets https scheme return secure channel (ignoring insecure env settings)
+  } else if (endpoint.startsWith('https')) {
+    return useSecureConnection();
+    // 4-9. use cases
   } else {
-    return getSecurityFromEnv();
+    return getSecurityFromEnv(endpoint);
   }
 }
 
-function getSecurityFromEnv(): grpc.ChannelCredentials {
-  const definedSecurity =
+function getSecurityFromEnv(endpoint: string): grpc.ChannelCredentials {
+  const definedInsecure =
     getEnv().OTEL_EXPORTER_OTLP_TRACES_INSECURE ||
-    getEnv().OTEL_EXPORTER_OTLP_INSECURE;
+    getEnv().OTEL_EXPORTER_OTLP_INSECURE || getEnv().OTEL_EXPORTER_OTLP_SPAN_INSECURE;
 
-  if (definedSecurity === 'false') {
-    return useSecureConnection();
+  let insecure: boolean;
+
+  // get insecurity from insecure env value
+  if (definedInsecure) {
+    insecure = definedInsecure === 'true';
+  // 1. if user wants to use default url or http scheme url return insecure
   } else {
+    if (endpoint === DEFAULT_COLLECTOR_URL || endpoint.startsWith('http')) {
+      insecure = true;
+    } else {
+      // if default url has no scheme return secure
+      insecure = false;
+    }
+  }
+
+  if (insecure) {
     return grpc.credentials.createInsecure();
+  } else {
+    return useSecureConnection();
   }
 }
 
 function useSecureConnection(): grpc.ChannelCredentials {
-  const loadedCertificate = retrieveCertificate();
+  const rootCert = retrieveRootCert();
+  const privateKey = retrievePrivateKey();
+  const certChain = retrieveCertChain();
 
-  return loadedCertificate
-    ? grpc.credentials.createSsl(loadedCertificate)
-    : grpc.credentials.createSsl();
+  return grpc.credentials.createSsl(rootCert, privateKey, certChain);
 }
 
-function retrieveCertificate(): Buffer | undefined {
-  const certificate =
+function retrieveRootCert(): Buffer | undefined {
+  const rootCertificate =
     getEnv().OTEL_EXPORTER_OTLP_CERTIFICATE ||
     getEnv().OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE;
 
-    if (certificate) {
+    if (rootCertificate) {
       try {
-        return fs.readFileSync(certificate);
+        return fs.readFileSync(rootCertificate);
       } catch {
-        diag.warn('unable to read certificate file - using default host platform trusted certificate');
+        diag.warn('Failed to read root certificate file');
         return undefined;
       }
     } else {
       return undefined;
     }
+}
+
+function retrievePrivateKey(): Buffer | undefined {
+  const clientKey = getEnv().OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY || getEnv().OTEL_EXPORTER_OTLP_CLIENT_KEY;
+
+  if (clientKey) {
+    try {
+      return fs.readFileSync(clientKey);
+    } catch {
+      diag.warn('Failed to read client certificate private key file');
+      return undefined;
+    }
+  } else {
+    return undefined;
+  }
+}
+
+function retrieveCertChain(): Buffer | undefined {
+  const clientChain = getEnv().OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE || getEnv().OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE;
+
+  if (clientChain) {
+    try {
+      return fs.readFileSync(clientChain);
+    } catch {
+      diag.warn('Failed to read client certificate chain file');
+      return undefined;
+    }
+  } else {
+    return undefined;
+  }
 }
 
 export function configureCompression(compression: CompressionAlgorithm | undefined): CompressionAlgorithm {
