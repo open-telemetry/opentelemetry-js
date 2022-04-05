@@ -140,7 +140,7 @@ export function configureSecurity(credentials: grpc.ChannelCredentials | undefin
   if (credentials) {
     return credentials;
     // 3. if user sets https scheme return secure channel (ignoring insecure env settings)
-  } else if (endpoint.startsWith('https')) {
+  } else if (endpoint.startsWith('https://')) {
     return useSecureConnection();
     // 4-9. use cases
   } else {
@@ -160,7 +160,7 @@ function getSecurityFromEnv(endpoint: string): grpc.ChannelCredentials {
     insecure = definedInsecure === 'true';
   // 1. if user wants to use default url or http scheme url return insecure
   } else {
-    if (endpoint === DEFAULT_COLLECTOR_URL || endpoint.startsWith('http')) {
+    if (endpoint === DEFAULT_COLLECTOR_URL || endpoint.startsWith('http://')) {
       insecure = true;
     } else {
       // if default url has no scheme return secure

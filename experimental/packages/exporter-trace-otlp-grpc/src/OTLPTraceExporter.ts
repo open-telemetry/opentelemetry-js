@@ -25,7 +25,7 @@ import { baggageUtils, getEnv } from '@opentelemetry/core';
 import { validateAndNormalizeUrl } from './util';
 import { Metadata } from '@grpc/grpc-js';
 
-export const DEFAULT_COLLECTOR_URL = 'localhost:4317';
+export const DEFAULT_COLLECTOR_URL = 'http://localhost:4317';
 
 /**
  * OTLP Trace Exporter for Node
@@ -59,7 +59,7 @@ export class OTLPTraceExporter
       ? validateAndNormalizeUrl(getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
       : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
       ? validateAndNormalizeUrl(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT)
-      : DEFAULT_COLLECTOR_URL;
+      : validateAndNormalizeUrl(DEFAULT_COLLECTOR_URL);
   }
 
   getServiceClientType() {
