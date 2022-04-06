@@ -9,6 +9,12 @@ All notable changes to this project will be documented in this file.
 ### :rocket: (Enhancement)
 
 * [#2871](https://github.com/open-telemetry/opentelemetry-js/pull/2871) feat(experimental-packages): Update packages to latest SDK Version. ([@pichlermarc](https://github.com/pichlermarc))
+  * removed the -wip suffix from api-metrics and metrics-sdk-base.
+  * updated dependencies to stable packages to `1.1.1` for all "experimental" packages.
+  * updated Metrics Exporters to the latest Metrics SDK (`exporter-metrics-otlp-grpc`, `exporter-metrics-otlp-http`, `exporter-metrics-otlp-proto`)
+  * updated `opentelemetry-sdk-node` to the latest Metrics SDK.
+  * updated `otlp-transformer` to the latest Metrics SDK.
+  * updated all `instrumentation-*` packages to use local implementations of `parseUrl()` due to [#2884](https://github.com/open-telemetry/opentelemetry-js/issues/2884)
 
 ### :bug: (Bug Fix)
 
