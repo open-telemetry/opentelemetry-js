@@ -36,7 +36,7 @@ import {
   shutdown,
 } from '../metricsHelper';
 import { OTLPMetricExporterOptions } from '../../src';
-import { OTLPExporterConfigBase } from "@opentelemetry/otlp-exporter-base";
+import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 
 describe('OTLPMetricExporter - web', () => {
   let collectorExporter: OTLPMetricExporter;
