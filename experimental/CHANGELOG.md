@@ -8,6 +8,7 @@ All notable changes to experimental packages in this project will be documented 
 
 * [#2707](https://github.com/open-telemetry/opentelemetry-js/pull/2707) feat(sdk-metrics-base): update metric exporter interfaces ([@srikanthccv](https://github.com/srikanthccv))
 * [#2687](https://github.com/open-telemetry/opentelemetry-js/pull/2687) feat(api-metrics): remove observable types ([@legendecas](https://github.com/legendecas))
+* [#2879](https://github.com/open-telemetry/opentelemetry-js/pull/2879) fix(otlp-http-exporter): remove content length header ([@svetlanabrennan](https://github.com/svetlanabrennan))
 
 ### :rocket: (Enhancement)
 
