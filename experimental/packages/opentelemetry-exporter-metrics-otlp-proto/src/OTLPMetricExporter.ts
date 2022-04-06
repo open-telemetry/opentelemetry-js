@@ -15,9 +15,7 @@
  */
 
 import {
-  otlpTypes,
-  OTLPExporterNodeConfigBase,
-  appendResourcePathToUrlIfNotPresent,
+  otlpTypes
 } from '@opentelemetry/exporter-trace-otlp-http';
 import {
   defaultExporterTemporality,
