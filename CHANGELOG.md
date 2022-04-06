@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 ### :house: (Internal)
 
 * [#2847](https://github.com/open-telemetry/opentelemetry-js/pull/2847) chore: require changelog entry to merge PR ([@dyladan](https://github.com/dyladan))
+* refactor(sdk-metrics-base): meter shared states #2821 @legendecas
 
 ## 1.1.1
 
