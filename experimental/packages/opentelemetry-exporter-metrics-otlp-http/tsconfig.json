@@ -17,6 +17,9 @@
     },
     {
       "path": "../opentelemetry-sdk-metrics-base"
+    },
+    {
+      "path": "../otlp-exporter-base"
     }
   ]
 }

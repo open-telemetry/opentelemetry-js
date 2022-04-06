@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
-import { AggregationTemporality } from '@opentelemetry/sdk-metrics-base';
 
-export interface OTLPMetricExporterOptions extends otlpTypes.OTLPExporterConfigBase {
+import { AggregationTemporality } from '@opentelemetry/sdk-metrics-base';
+import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
+
+export interface OTLPMetricExporterOptions extends OTLPExporterConfigBase {
   aggregationTemporality?: AggregationTemporality
 }
 export const defaultExporterTemporality = AggregationTemporality.CUMULATIVE;

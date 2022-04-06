@@ -36,6 +36,7 @@ import {
   shutdown,
 } from '../metricsHelper';
 import { OTLPMetricExporterOptions } from '../../src';
+import { OTLPExporterConfigBase } from "@opentelemetry/otlp-exporter-base";
 
 describe('OTLPMetricExporter - web', () => {
   let collectorExporter: OTLPMetricExporter;
@@ -332,7 +333,7 @@ describe('OTLPMetricExporter - web', () => {
       foo: 'bar',
       bar: 'baz',
     };
-    let collectorExporterConfig: (otlpTypes.OTLPExporterConfigBase & OTLPMetricExporterOptions) | undefined;
+    let collectorExporterConfig: (OTLPExporterConfigBase & OTLPMetricExporterOptions) | undefined;
 
     beforeEach(() => {
       collectorExporterConfig = {

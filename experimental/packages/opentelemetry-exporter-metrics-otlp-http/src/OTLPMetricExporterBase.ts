@@ -16,8 +16,9 @@
 
 import { ExportResult } from '@opentelemetry/core';
 import { AggregationTemporality, PushMetricExporter, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
-import { OTLPExporterBase, otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
+import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { defaultOptions, OTLPMetricExporterOptions } from './OTLPMetricExporterOptions';
+import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 
 export class OTLPMetricExporterBase<T extends OTLPExporterBase<OTLPMetricExporterOptions,
   ResourceMetrics,
