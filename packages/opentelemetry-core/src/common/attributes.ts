@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { AttributeValue, Attributes } from '@opentelemetry/api';
+
+import { diag, AttributeValue, Attributes } from '@opentelemetry/api';
 
 export function sanitizeAttributes(attributes: unknown): Attributes {
   const out: Attributes = {};
@@ -24,14 +25,17 @@ export function sanitizeAttributes(attributes: unknown): Attributes {
 
   for (const [k, v] of Object.entries(attributes)) {
     if (!isAttributeKey(k)) {
+      diag.warn(`Invalid attribute key: ${k}`);
       continue;
     }
-    if (isAttributeValue(v)) {
-      if (Array.isArray(v)) {
-        out[k] = v.slice();
-      } else {
-        out[k] = v;
-      }
+    if (!isAttributeValue(v)) {
+      diag.warn(`Invalid attribute value set for key: ${k}`);
+      continue;
+    }
+    if (Array.isArray(v)) {
+      out[k] = v.slice();
+    } else {
+      out[k] = v;
     }
   }
 

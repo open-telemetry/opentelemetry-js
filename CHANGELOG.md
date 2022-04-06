@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: (Bug Fix)
 
-* [#2881](https://github.com/open-telemetry/opentelemetry-js/pull/2881) fix: sanitize attributes inputs ([@legendecas](https://githuc.com/legendecas))
+* fix: sanitize attributes inputs #2881 @legendecas
 
 ### :books: (Refine Doc)
 
