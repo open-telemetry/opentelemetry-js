@@ -392,61 +392,61 @@ describe('OTLPMetricExporter - web', () => {
       });
     });
   });
+});
 
-  describe('when configuring via environment', () => {
-    const envSource = window as any;
-    it('should use url defined in env', () => {
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/metrics';
-      const collectorExporter = new OTLPMetricExporter();
-      assert.strictEqual(
-        collectorExporter._otlpExporter.url,
-        envSource.OTEL_EXPORTER_OTLP_ENDPOINT
-      );
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+describe('when configuring via environment', () => {
+  const envSource = window as any;
+  it('should use url defined in env', () => {
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/metrics';
+    const collectorExporter = new OTLPMetricExporter();
+    assert.strictEqual(
+      collectorExporter._otlpExporter.url,
+      envSource.OTEL_EXPORTER_OTLP_ENDPOINT
+    );
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+  });
+  it('should use url defined in env and append version and signal when not present', () => {
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+    const collectorExporter = new OTLPMetricExporter();
+    assert.strictEqual(
+      collectorExporter._otlpExporter.url,
+      `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/metrics`
+    );
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+  });
+  it('should override global exporter url with signal url defined in env', () => {
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
+    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.metrics';
+    const collectorExporter = new OTLPMetricExporter();
+    assert.strictEqual(
+      collectorExporter._otlpExporter.url,
+      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
+    );
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
+  });
+  it('should use headers defined via env', () => {
+    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
+    const collectorExporter = new OTLPMetricExporter({
+      headers: {},
+      aggregationTemporality: AggregationTemporality.CUMULATIVE
     });
-    it('should use url defined in env and append version and signal when not present', () => {
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-      const collectorExporter = new OTLPMetricExporter();
-      assert.strictEqual(
-        collectorExporter._otlpExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/metrics`
-      );
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+    // @ts-expect-error access internal property for testing
+    assert.strictEqual(collectorExporter._otlpExporter._headers.foo, 'bar');
+    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
+  });
+  it('should override global headers config with signal headers defined via env', () => {
+    envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
+    envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
+    const collectorExporter = new OTLPMetricExporter({
+      headers: {},
+      aggregationTemporality: AggregationTemporality.CUMULATIVE
     });
-    it('should override global exporter url with signal url defined in env', () => {
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.metrics';
-      const collectorExporter = new OTLPMetricExporter();
-      assert.strictEqual(
-        collectorExporter._otlpExporter.url,
-        envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
-      );
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
-      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
-    });
-    it('should use headers defined via env', () => {
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
-      const collectorExporter = new OTLPMetricExporter({
-        headers: {},
-        aggregationTemporality: AggregationTemporality.CUMULATIVE
-      });
-      // @ts-expect-error access internal property for testing
-      assert.strictEqual(collectorExporter._otlpExporter._headers.foo, 'bar');
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
-    });
-    it('should override global headers config with signal headers defined via env', () => {
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar,bar=foo';
-      envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
-      const collectorExporter = new OTLPMetricExporter({
-        headers: {},
-        aggregationTemporality: AggregationTemporality.CUMULATIVE
-      });
-      // @ts-expect-error access internal property for testing
-      assert.strictEqual(collectorExporter._otlpExporter._headers.foo, 'boo');
-      // @ts-expect-error access internal property for testing
-      assert.strictEqual(collectorExporter._otlpExporter._headers.bar, 'foo');
-      envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
-      envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
-    });
+    // @ts-expect-error access internal property for testing
+    assert.strictEqual(collectorExporter._otlpExporter._headers.foo, 'boo');
+    // @ts-expect-error access internal property for testing
+    assert.strictEqual(collectorExporter._otlpExporter._headers.bar, 'foo');
+    envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
+    envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });
 });
