@@ -15,22 +15,22 @@
  */
 
 import { diag } from '@opentelemetry/api';
+import { ServiceClientType } from './types';
 import {
   OTLPExporterNodeBase as OTLPExporterBaseMain,
-  otlpTypes,
-  OTLPExporterNodeConfigBase,
   CompressionAlgorithm,
-} from '@opentelemetry/exporter-trace-otlp-http';
-import { ServiceClientType } from './types';
+  OTLPExporterError,
+  OTLPExporterNodeConfigBase
+} from '@opentelemetry/otlp-exporter-base';
 
 type SendFn = <ExportItem, ServiceRequest>(collector: OTLPExporterNodeBase<ExportItem, ServiceRequest>,
   objects: ExportItem[],
   compression: CompressionAlgorithm,
   onSuccess: () => void,
-  onError: (error: otlpTypes.OTLPExporterError) => void) => void;
+  onError: (error: OTLPExporterError) => void) => void;
 
 /**
- * Collector Metric Exporter abstract base class
+ * Collector Exporter abstract base class
  */
 export abstract class OTLPExporterNodeBase<
   ExportItem,
@@ -45,7 +45,7 @@ export abstract class OTLPExporterNodeBase<
   private _sendPromise(
     objects: ExportItem[],
     onSuccess: () => void,
-    onError: (error: otlpTypes.OTLPExporterError) => void
+    onError: (error: OTLPExporterError) => void
   ): void {
     const promise = new Promise<void>((resolve, reject) => {
       this._send(this, objects, this.compression, resolve, reject);
@@ -73,7 +73,7 @@ export abstract class OTLPExporterNodeBase<
   override send(
     objects: ExportItem[],
     onSuccess: () => void,
-    onError: (error: otlpTypes.OTLPExporterError) => void
+    onError: (error: OTLPExporterError) => void
   ): void {
     if (this._shutdownOnce.isCalled) {
       diag.debug('Shutdown already started. Cannot send objects');

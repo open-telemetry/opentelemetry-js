@@ -17,9 +17,7 @@
 import { diag } from '@opentelemetry/api';
 import { ExportResultCode } from '@opentelemetry/core';
 import {
-  OTLPExporterNodeConfigBase,
-  otlpTypes,
-  CompressionAlgorithm,
+  otlpTypes
 } from '@opentelemetry/exporter-trace-otlp-http';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
@@ -35,6 +33,7 @@ import {
   mockedReadableSpan,
   MockedResponse,
 } from './traceHelper';
+import { CompressionAlgorithm, OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 
 const fakeRequest = {
   end: function () { },

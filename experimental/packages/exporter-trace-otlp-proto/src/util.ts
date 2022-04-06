@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-import {
-  otlpTypes,
-  sendWithHttp,
-  OTLPExporterNodeConfigBase,
-  CompressionAlgorithm,
-} from '@opentelemetry/exporter-trace-otlp-http';
 import * as path from 'path';
 
 import { ServiceClientType } from './types';
 import { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
 import type { Type } from 'protobufjs';
 import * as protobufjs from 'protobufjs';
+import {
+  CompressionAlgorithm,
+  OTLPExporterError,
+  OTLPExporterNodeConfigBase,
+  sendWithHttp
+} from '@opentelemetry/otlp-exporter-base';
 
 let ExportRequestProto: Type | undefined;
 
@@ -66,7 +66,7 @@ export function send<ExportItem, ServiceRequest>(
   objects: ExportItem[],
   compression: CompressionAlgorithm,
   onSuccess: () => void,
-  onError: (error: otlpTypes.OTLPExporterError) => void
+  onError: (error: OTLPExporterError) => void
 ): void {
   const serviceRequest = collector.convert(objects);
 
@@ -83,6 +83,6 @@ export function send<ExportItem, ServiceRequest>(
       );
     }
   } else {
-    onError(new otlpTypes.OTLPExporterError('No proto'));
+    onError(new OTLPExporterError('No proto'));
   }
 }
