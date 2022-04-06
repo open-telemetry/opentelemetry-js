@@ -31,7 +31,6 @@ export interface NodeSDKConfiguration {
   defaultAttributes: SpanAttributes;
   textMapPropagator: TextMapPropagator;
   metricReader: MetricReader;
-  metricInterval: number;
   instrumentations: InstrumentationOption[];
   resource: Resource;
   sampler: Sampler;
