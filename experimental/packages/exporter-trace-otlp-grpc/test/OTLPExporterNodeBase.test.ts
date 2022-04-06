@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
-
 import * as assert from 'assert';
 import { OTLPExporterNodeBase } from '../src/OTLPExporterNodeBase';
 import { OTLPExporterConfigNode, ServiceClientType } from '../src/types';
 import { mockedReadableSpan } from './traceHelper';
+import { OTLPExporterError } from '@opentelemetry/otlp-exporter-base';
 
 class MockCollectorExporter extends OTLPExporterNodeBase<
   ReadableSpan,
@@ -31,7 +30,7 @@ class MockCollectorExporter extends OTLPExporterNodeBase<
    */
   sendCallbacks: {
     onSuccess: () => void;
-    onError: (error: otlpTypes.OTLPExporterError) => void;
+    onError: (error: OTLPExporterError) => void;
   }[] = [];
 
   getDefaultUrl(config: OTLPExporterConfigNode): string {
@@ -60,7 +59,7 @@ MockCollectorExporter.prototype['_send'] = function _sendMock(
   self: MockCollectorExporter,
   objects: ReadableSpan[],
   onSuccess: () => void,
-  onError: (error: otlpTypes.OTLPExporterError) => void
+  onError: (error: OTLPExporterError) => void
 ): void {
   self.sendCallbacks.push({ onSuccess, onError });
 };
