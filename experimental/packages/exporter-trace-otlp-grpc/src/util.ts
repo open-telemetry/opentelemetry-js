@@ -144,34 +144,32 @@ export function configureSecurity(credentials: grpc.ChannelCredentials | undefin
     return useSecureConnection();
     // 4-9. use cases
   } else {
-    return getSecurityFromEnv(endpoint);
+   const insecure = getInsecureSetting(endpoint);
+
+    if (insecure) {
+      return grpc.credentials.createInsecure();
+    } else {
+      return useSecureConnection();
+    }
+
   }
 }
 
-function getSecurityFromEnv(endpoint: string): grpc.ChannelCredentials {
+function getInsecureSetting(endpoint: string): boolean {
   const definedInsecure =
     getEnv().OTEL_EXPORTER_OTLP_TRACES_INSECURE ||
     getEnv().OTEL_EXPORTER_OTLP_INSECURE || getEnv().OTEL_EXPORTER_OTLP_SPAN_INSECURE;
 
-  let insecure: boolean;
-
   // get insecurity from insecure env value
   if (definedInsecure) {
-    insecure = definedInsecure === 'true';
+    return definedInsecure === 'true';
   // 1. if user wants to use default url or http scheme url return insecure
+  // note: verifying #4 use case
+  } else if (endpoint === DEFAULT_COLLECTOR_URL || endpoint.startsWith('http://')) {
+      return true;
   } else {
-    if (endpoint === DEFAULT_COLLECTOR_URL || endpoint.startsWith('http://')) {
-      insecure = true;
-    } else {
-      // if default url has no scheme return secure
-      insecure = false;
-    }
-  }
-
-  if (insecure) {
-    return grpc.credentials.createInsecure();
-  } else {
-    return useSecureConnection();
+    // if default url has no scheme return secure
+    return false;
   }
 }
 
