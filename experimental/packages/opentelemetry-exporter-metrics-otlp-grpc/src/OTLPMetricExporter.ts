@@ -23,22 +23,22 @@ import {
 } from '@opentelemetry/exporter-metrics-otlp-http';
 import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
 import {
-  OTLPExporterConfigNode,
-  OTLPExporterNodeBase,
+  OTLPGRPCExporterConfigNode,
+  OTLPGRPCExporterNodeBase,
   ServiceClientType,
   validateAndNormalizeUrl
-} from '@opentelemetry/exporter-trace-otlp-grpc';
+} from '@opentelemetry/otlp-grpc-exporter-base';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
 import { Metadata } from '@grpc/grpc-js';
 
 const DEFAULT_COLLECTOR_URL = 'localhost:4317';
 
 
-class OTLPMetricExporterProxy extends OTLPExporterNodeBase<ResourceMetrics,
+class OTLPMetricExporterProxy extends OTLPGRPCExporterNodeBase<ResourceMetrics,
   otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest> {
   protected readonly _aggregationTemporality: AggregationTemporality;
 
-  constructor(config: OTLPExporterConfigNode & OTLPMetricExporterOptions= defaultOptions) {
+  constructor(config: OTLPGRPCExporterConfigNode & OTLPMetricExporterOptions= defaultOptions) {
     super(config);
     this.metadata ||= new Metadata();
     const headers = baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS);
@@ -56,7 +56,7 @@ class OTLPMetricExporterProxy extends OTLPExporterNodeBase<ResourceMetrics,
     return ServiceClientType.METRICS;
   }
 
-  getDefaultUrl(config: OTLPExporterConfigNode): string {
+  getDefaultUrl(config: OTLPGRPCExporterConfigNode): string {
     return typeof config.url === 'string'
       ? validateAndNormalizeUrl(config.url)
       : getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0
@@ -79,7 +79,7 @@ class OTLPMetricExporterProxy extends OTLPExporterNodeBase<ResourceMetrics,
  * OTLP-gRPC metric exporter
  */
 export class OTLPMetricExporter extends OTLPMetricExporterBase<OTLPMetricExporterProxy>{
-  constructor(config: OTLPExporterConfigNode & OTLPMetricExporterOptions = defaultOptions) {
+  constructor(config: OTLPGRPCExporterConfigNode & OTLPMetricExporterOptions = defaultOptions) {
     super(new OTLPMetricExporterProxy(config), config);
   }
 }

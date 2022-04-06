@@ -73,7 +73,7 @@
     "@opentelemetry/core": "1.1.1",
     "@opentelemetry/exporter-metrics-otlp-http": "0.27.0",
     "@opentelemetry/otlp-exporter-base": "0.27.0",
-    "@opentelemetry/exporter-trace-otlp-grpc": "0.27.0",
+    "@opentelemetry/otlp-grpc-exporter-base": "0.27.0",
     "@opentelemetry/exporter-trace-otlp-http": "0.27.0",
     "@opentelemetry/resources": "1.1.1",
     "@opentelemetry/sdk-metrics-base": "0.27.0"

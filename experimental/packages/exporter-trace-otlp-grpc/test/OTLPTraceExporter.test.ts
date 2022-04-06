@@ -35,12 +35,11 @@ import {
   ensureResourceIsCorrect,
   mockedReadableSpan,
 } from './traceHelper';
-
-import { CompressionAlgorithm } from '../src/types';
+import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
 
 const traceServiceProtoPath =
   'opentelemetry/proto/collector/trace/v1/trace_service.proto';
-const includeDirs = [path.resolve(__dirname, '../protos')];
+const includeDirs = [path.resolve(__dirname, '../../otlp-grpc-exporter-base/protos')];
 
 const address = 'localhost:1501';
 
@@ -334,6 +333,9 @@ describe('when configuring via environment', () => {
   });
 });
 
-testCollectorExporter({ useTLS: true });
+describe('', () =>  {
+  testCollectorExporter({ useTLS: true });
+});
+
 testCollectorExporter({ useTLS: false });
 testCollectorExporter({ metadata });

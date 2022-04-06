@@ -16,12 +16,12 @@
 
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
-import { OTLPExporterNodeBase } from '../src/OTLPExporterNodeBase';
-import { OTLPExporterConfigNode, ServiceClientType } from '../src/types';
+import { OTLPGRPCExporterNodeBase } from '../src/OTLPGRPCExporterNodeBase';
+import { OTLPGRPCExporterConfigNode, ServiceClientType } from '../src/types';
 import { mockedReadableSpan } from './traceHelper';
 import { OTLPExporterError } from '@opentelemetry/otlp-exporter-base';
 
-class MockCollectorExporter extends OTLPExporterNodeBase<
+class MockCollectorExporter extends OTLPGRPCExporterNodeBase<
   ReadableSpan,
   ReadableSpan[]
 > {
@@ -33,11 +33,11 @@ class MockCollectorExporter extends OTLPExporterNodeBase<
     onError: (error: OTLPExporterError) => void;
   }[] = [];
 
-  getDefaultUrl(config: OTLPExporterConfigNode): string {
+  getDefaultUrl(config: OTLPGRPCExporterConfigNode): string {
     return '';
   }
 
-  getDefaultServiceName(config: OTLPExporterConfigNode): string {
+  getDefaultServiceName(config: OTLPGRPCExporterConfigNode): string {
     return '';
   }
 
@@ -64,7 +64,7 @@ MockCollectorExporter.prototype['_send'] = function _sendMock(
   self.sendCallbacks.push({ onSuccess, onError });
 };
 
-describe('OTLPExporterNodeBase', () => {
+describe('OTLPGRPCExporterNodeBase', () => {
   let exporter: MockCollectorExporter;
   const concurrencyLimit = 5;
 

@@ -17,23 +17,23 @@
 import { diag } from '@opentelemetry/api';
 import { Metadata } from '@grpc/grpc-js';
 import {
-  OTLPExporterConfigNode,
+  OTLPGRPCExporterConfigNode,
   GRPCQueueItem,
   ServiceClientType,
 } from './types';
-import { ServiceClient, CompressionAlgorithm } from './types';
+import { ServiceClient } from './types';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 import { configureCompression } from './util';
-import { OTLPExporterBase, OTLPExporterError } from '@opentelemetry/otlp-exporter-base';
+import { CompressionAlgorithm, OTLPExporterBase, OTLPExporterError } from '@opentelemetry/otlp-exporter-base';
 
 /**
  * OTLP Exporter abstract base class
  */
-export abstract class OTLPExporterNodeBase<
+export abstract class OTLPGRPCExporterNodeBase<
   ExportItem,
   ServiceRequest
 > extends OTLPExporterBase<
-  OTLPExporterConfigNode,
+  OTLPGRPCExporterConfigNode,
   ExportItem,
   ServiceRequest
 > {
@@ -43,7 +43,7 @@ export abstract class OTLPExporterNodeBase<
   private _send!: Function;
   compression: CompressionAlgorithm;
 
-  constructor(config: OTLPExporterConfigNode = {}) {
+  constructor(config: OTLPGRPCExporterConfigNode = {}) {
     super(config);
     if (config.headers) {
       diag.warn('Headers cannot be set when using grpc');
@@ -74,7 +74,7 @@ export abstract class OTLPExporterNodeBase<
     promise.then(popPromise, popPromise);
   }
 
-  onInit(config: OTLPExporterConfigNode): void {
+  onInit(config: OTLPGRPCExporterConfigNode): void {
     // defer to next tick and lazy load to avoid loading grpc too early
     // and making this impossible to be instrumented
     setImmediate(() => {

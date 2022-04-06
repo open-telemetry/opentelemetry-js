@@ -19,7 +19,7 @@ import * as assert from 'assert';
 
 import { diag } from '@opentelemetry/api';
 import { validateAndNormalizeUrl, configureCompression } from '../src/util';
-import { CompressionAlgorithm} from '../src/types';
+import { CompressionAlgorithm } from "@opentelemetry/otlp-exporter-base";
 
 // Tests added to detect breakage released in #2130
 describe('validateAndNormalizeUrl()', () => {

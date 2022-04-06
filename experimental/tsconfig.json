@@ -51,6 +51,9 @@
       "path": "packages/otlp-exporter-base"
     },
     {
+      "path": "packages/otlp-grpc-exporter-base"
+    },
+    {
       "path": "packages/otlp-transformer"
     },
     {
