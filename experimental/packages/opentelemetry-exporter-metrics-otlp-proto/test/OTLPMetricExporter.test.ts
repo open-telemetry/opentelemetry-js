@@ -179,9 +179,9 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       collectorExporter.export(metrics, () => {});
 
       sinon.stub(http, 'request').returns({
-        end: () => {},
+        write: () => {},
         on: () => {},
-        write: (...writeArgs: any[]) => {
+        end: (...writeArgs: any[]) => {
           const ExportTraceServiceRequestProto = getExportRequestProto();
           const data = ExportTraceServiceRequestProto?.decode(writeArgs[0]);
           const json = data?.toJSON() as otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
