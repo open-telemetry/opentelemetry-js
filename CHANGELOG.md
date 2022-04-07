@@ -12,11 +12,11 @@ All notable changes to this project will be documented in this file.
 
 ### :books: (Refine Doc)
 
-* [#2860](https://github.com/open-telemetry/opentelemetry-js/pull/2860) docs(sdk): update earliest support node version ([@svetlanabrennan](https://github.com/svetlanabrennan))
+* docs(sdk): update earliest support node version #2860 @svetlanabrennan
 
 ### :house: (Internal)
 
-* [#2847](https://github.com/open-telemetry/opentelemetry-js/pull/2847) chore: require changelog entry to merge PR ([@dyladan](https://github.com/dyladan))
+* chore: require changelog entry to merge PR #2847 @dyladan
 
 ## 1.1.1
 
