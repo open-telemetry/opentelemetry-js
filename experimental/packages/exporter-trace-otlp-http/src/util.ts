@@ -40,9 +40,13 @@ export function parseHeaders(
  * @param path
  */
 export function appendResourcePathToUrl(url: string, path: string): string {
-  if (url.endsWith('/')) {
-    return url + path;
-  } else {
-    return `${url}/${path}`;
+  url = appendRootPathToUrlIfNeeded(url);
+  return url + path;
+}
+
+export function appendRootPathToUrlIfNeeded(url: string): string {
+  if (!url.endsWith('/')) {
+    url = url + '/';
   }
+  return url;
 }

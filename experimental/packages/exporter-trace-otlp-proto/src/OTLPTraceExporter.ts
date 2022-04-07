@@ -20,7 +20,7 @@ import {
   otlpTypes,
   toOTLPExportTraceServiceRequest,
   OTLPExporterNodeConfigBase,
-  appendResourcePathToUrl,
+  appendResourcePathToUrl, appendRootPathToUrlIfNeeded
 } from '@opentelemetry/exporter-trace-otlp-http';
 import { ServiceClientType } from './types';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
@@ -57,7 +57,7 @@ export class OTLPTraceExporter
     return typeof config.url === 'string'
       ? config.url
       : getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT.length > 0
-      ? getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+      ? appendRootPathToUrlIfNeeded(getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
       : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
       ? appendResourcePathToUrl(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
       : DEFAULT_COLLECTOR_URL;

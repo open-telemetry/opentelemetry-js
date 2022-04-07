@@ -18,6 +18,7 @@ import {
   otlpTypes,
   OTLPExporterNodeConfigBase,
   appendResourcePathToUrl,
+  appendRootPathToUrlIfNeeded,
 } from '@opentelemetry/exporter-trace-otlp-http';
 import { toOTLPExportMetricServiceRequest } from '@opentelemetry/exporter-metrics-otlp-http';
 import { MetricRecord, MetricExporter } from '@opentelemetry/sdk-metrics-base';
@@ -63,7 +64,7 @@ export class OTLPMetricExporter
     return typeof config.url === 'string'
       ? config.url
       : getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0
-      ? getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
+      ? appendRootPathToUrlIfNeeded(getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT)
       : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
       ? appendResourcePathToUrl(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
       : DEFAULT_COLLECTOR_URL;

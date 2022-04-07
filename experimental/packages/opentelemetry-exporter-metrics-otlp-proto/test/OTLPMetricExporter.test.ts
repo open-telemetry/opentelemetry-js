@@ -94,6 +94,15 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
       envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
     });
+    it('should add root path when signal url defined in env contains no path', () => {
+      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.bar';
+      const collectorExporter = new OTLPMetricExporter();
+      assert.strictEqual(
+        collectorExporter.url,
+        `${envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT}/`
+      );
+      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
+    });
     it('should use headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
       const collectorExporter = new OTLPMetricExporter();

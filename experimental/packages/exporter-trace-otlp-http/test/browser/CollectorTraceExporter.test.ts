@@ -339,14 +339,23 @@ describe('when configuring via environment', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
   });
   it('should override global exporter url with signal url defined in env', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.traces';
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
+    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.traces/';
     const collectorExporter = new OTLPTraceExporter();
     assert.strictEqual(
       collectorExporter.url,
       envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
     );
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
+  });
+  it('should add root path when signal url defined in env contains no path', () => {
+    envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar';
+    const collectorExporter = new OTLPTraceExporter();
+    assert.strictEqual(
+      collectorExporter.url,
+      `${envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}/`
+    );
     envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
   });
   it('should use headers defined via env', () => {
