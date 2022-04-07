@@ -6,46 +6,46 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
-* [#2707](https://github.com/open-telemetry/opentelemetry-js/pull/2707) feat(sdk-metrics-base): update metric exporter interfaces ([@srikanthccv](https://github.com/srikanthccv))
-* [#2687](https://github.com/open-telemetry/opentelemetry-js/pull/2687) feat(api-metrics): remove observable types ([@legendecas](https://github.com/legendecas))
-* [#2879](https://github.com/open-telemetry/opentelemetry-js/pull/2879) fix(otlp-http-exporter): remove content length header ([@svetlanabrennan](https://github.com/svetlanabrennan))
+* feat(sdk-metrics-base): update metric exporter interfaces #2707 @srikanthccv
+* feat(api-metrics): remove observable types #2687 @legendecas
+* fix(otlp-http-exporter): remove content length header #2879 @svetlanabrennan
 
 ### :rocket: (Enhancement)
 
-* [#2588](https://github.com/open-telemetry/opentelemetry-js/pull/2588) feat: spec compliant metric creation and sync instruments ([@dyladan](https://github.com/dyladan))
-* [#2569](https://github.com/open-telemetry/opentelemetry-js/pull/2569) feat(api-metrics): async instruments spec compliance ([@legendecas](https://github.com/legendecas))
-* [#2776](https://github.com/open-telemetry/opentelemetry-js/pull/2776) feat(sdk-metrics-base): add ValueType support for sync instruments ([@legendecas](https://github.com/legendecas))
-* [#2686](https://github.com/open-telemetry/opentelemetry-js/pull/2686) feat(sdk-metrics-base): implement async instruments support ([@legendecas](https://github.com/legendecas))
-* [#2666](https://github.com/open-telemetry/opentelemetry-js/pull/2666) feat(sdk-metrics-base): meter registration ([@legendecas](https://github.com/legendecas))
-* [#2641](https://github.com/open-telemetry/opentelemetry-js/pull/2641) feat(sdk-metrics-base): bootstrap metrics exemplars ([@srikanthccv](https://github.com/srikanthccv))
-* [#2634](https://github.com/open-telemetry/opentelemetry-js/pull/2634) feat(metrics-sdk): bootstrap aggregation support ([@legendecas](https://github.com/legendecas))
-* [#2625](https://github.com/open-telemetry/opentelemetry-js/pull/2625) feat(metrics-sdk): bootstrap views api ([@legendecas](https://github.com/legendecas))
-* [#2636](https://github.com/open-telemetry/opentelemetry-js/pull/2636) feat(sdk-metrics): bootstrap metric streams ([@legendecas](https://github.com/legendecas))
-* [#2733](https://github.com/open-telemetry/opentelemetry-js/pull/2733) feat(views): add FilteringAttributesProcessor ([@pichlermarc](https://github.com/pichlermarc))
-* [#2681](https://github.com/open-telemetry/opentelemetry-js/pull/2681) feat(metric-reader): add metric-reader ([@pichlermarc](https://github.com/pichlermarc))
-* [#2725](https://github.com/open-telemetry/opentelemetry-js/pull/2725) feat(sdk-metrics-base): document and export basic APIs ([@legendecas](https://github.com/legendecas))
-* [#2820](https://github.com/open-telemetry/opentelemetry-js/pull/2820) feat(views): Update addView() to disallow named views that select more than one instrument. ([@pichlermarc](https://github.com/pichlermarc))
-* [#2829](https://github.com/open-telemetry/opentelemetry-js/pull/2829) feat(sdk-metrics-base): update exporting names ([@legendecas](https://github.com/legendecas))
-* [#2813](https://github.com/open-telemetry/opentelemetry-js/pull/2813) Add grpc compression to trace-otlp-grpc exporter ([@svetlanabrennan](https://github.com/svetlanabrennan))
-* [#2695](https://github.com/open-telemetry/opentelemetry-js/pull/2695) refactor: unifying shutdown once with BindOnceFuture ([@legendecas](https://github.com/legendecas))
-* [#2824](https://github.com/open-telemetry/opentelemetry-js/pull/2824) feat(prometheus): update prometheus exporter with wip metrics sdk ([@legendecas](https://github.com/legendecas))
-* [#2134](https://github.com/open-telemetry/opentelemetry-js/pull/2134) feat(instrumentation-xhr): add applyCustomAttributesOnSpan hook ([@mhennoch](https://github.com/mhennoch))
-* [#2746](https://github.com/open-telemetry/opentelemetry-js/pull/2746) feat(proto): add @opentelemetry/otlp-transformer package with hand-rolled transformation ([@dyladan](https://github.com/dyladan))
+* feat: spec compliant metric creation and sync instruments #2588 @dyladan
+* feat(api-metrics): async instruments spec compliance #2569 @legendecas
+* feat(sdk-metrics-base): add ValueType support for sync instruments #2776 @legendecas
+* feat(sdk-metrics-base): implement async instruments support #2686 @legendecas
+* feat(sdk-metrics-base): meter registration #2666 @legendecas
+* feat(sdk-metrics-base): bootstrap metrics exemplars #2641 @srikanthccv
+* feat(metrics-sdk): bootstrap aggregation support #2634 @legendecas
+* feat(metrics-sdk): bootstrap views api #2625 @legendecas
+* feat(sdk-metrics): bootstrap metric streams #2636 @legendecas
+* feat(views): add FilteringAttributesProcessor #2733 @pichlermarc
+* feat(metric-reader): add metric-reader #2681 @pichlermarc
+* feat(sdk-metrics-base): document and export basic APIs #2725 @legendecas
+* feat(views): Update addView() to disallow named views that select more than one instrument. #2820 @pichlermarc
+* feat(sdk-metrics-base): update exporting names #2829 @legendecas
+* Add grpc compression to trace-otlp-grpc exporter #2813 @svetlanabrennan
+* refactor: unifying shutdown once with BindOnceFuture #2695 @legendecas
+* feat(prometheus): update prometheus exporter with wip metrics sdk #2824 @legendecas
+* feat(instrumentation-xhr): add applyCustomAttributesOnSpan hook #2134 @mhennoch
+* feat(proto): add @opentelemetry/otlp-transformer package with hand-rolled transformation #2746 @dyladan
 
 ### :bug: (Bug Fix)
 
-* [#2676](https://github.com/open-telemetry/opentelemetry-js/pull/2676) fix(sdk-metrics-base): remove aggregator.toMetricData dependency on AggregationTemporality ([@legendecas](https://github.com/legendecas))
-* [#2859](https://github.com/open-telemetry/opentelemetry-js/pull/2859) fix(sdk-metrics-base): coerce histogram boundaries to be implicit Infinity ([@legendecas](https://github.com/legendecas))
-* [#2789](https://github.com/open-telemetry/opentelemetry-js/pull/2789) fix(instrumentation-http): HTTP 400 status code should not set span status to error on servers ([@nordfjord](https://github.com/nordfjord))
+* fix(sdk-metrics-base): remove aggregator.toMetricData dependency on AggregationTemporality #2676 @legendecas
+* fix(sdk-metrics-base): coerce histogram boundaries to be implicit Infinity #2859 @legendecas
+* fix(instrumentation-http): HTTP 400 status code should not set span status to error on servers #2789 @nordfjord
 
 ### :books: (Refine Doc)
 
-* [#2658](https://github.com/open-telemetry/opentelemetry-js/pull/2658) Update metrics example ([@svetlanabrennan](https://github.com/svetlanabrennan))
-* [#2712](https://github.com/open-telemetry/opentelemetry-js/pull/2712) docs(api-metrics): add notes on ObservableResult.observe ([@legendecas](https://github.com/legendecas))
+* Update metrics example #2658 @svetlanabrennan
+* docs(api-metrics): add notes on ObservableResult.observe #2712 @legendecas
 
 ### :house: (Internal)
 
-* [#2835](https://github.com/open-telemetry/opentelemetry-js/pull/2835) chore: move trace exporters back to experimental ([@dyladan](https://github.com/dyladan))
+* chore: move trace exporters back to experimental #2835 @dyladan
 
 ## v0.27.0
 
