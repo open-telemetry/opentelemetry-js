@@ -34,6 +34,15 @@ export function parseHeaders(
   return headers;
 }
 
+/**
+ * Adds path (version + signal) to a no per-signal endpoint and returns updated url
+ * @param url
+ * @param path
+ */
 export function appendResourcePathToUrl(url: string, path: string): string {
-  return url + path;
+  if (url.endsWith('/')) {
+    return url + path;
+  } else {
+    return `${url}/${path}`;
+  }
 }

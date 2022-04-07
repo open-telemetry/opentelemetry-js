@@ -19,8 +19,8 @@ import { OTLPExporterBrowserBase, otlpTypes, appendResourcePathToUrl } from '@op
 import { toOTLPExportMetricServiceRequest } from '../../transformMetrics';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 
-const DEFAULT_COLLECTOR_RESOURCE_PATH = '/v1/metrics';
-const DEFAULT_COLLECTOR_URL=`http://localhost:4318${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
+const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/metrics';
+const DEFAULT_COLLECTOR_URL=`http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 
 /**
  * Collector Metric Exporter for Web

@@ -390,6 +390,15 @@ describe('OTLPMetricExporter - web', () => {
 
 describe('when configuring via environment', () => {
   const envSource = window as any;
+  it('should use url defined in env that ends with root path and append version and signal path', () => {
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
+    const collectorExporter = new OTLPMetricExporter();
+    assert.strictEqual(
+      collectorExporter.url,
+      `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}v1/metrics`
+    );
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+  });
   it('should use url defined in env without checking if path is already present', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/metrics';
     const collectorExporter = new OTLPMetricExporter();

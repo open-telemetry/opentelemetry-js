@@ -311,6 +311,15 @@ describe('OTLPTraceExporter - browser (getDefaultUrl)', () => {
 
 describe('when configuring via environment', () => {
   const envSource = window as any;
+  it('should use url defined in env that ends with root path and append version and signal path', () => {
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
+    const collectorExporter = new OTLPTraceExporter();
+    assert.strictEqual(
+      collectorExporter.url,
+      `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}v1/traces`
+    );
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+  });
   it('should use url defined in env without checking if path is already present', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/traces';
     const collectorExporter = new OTLPTraceExporter();

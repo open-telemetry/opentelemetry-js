@@ -24,8 +24,8 @@ import { MetricRecord, MetricExporter } from '@opentelemetry/sdk-metrics-base';
 import { ServiceClientType, OTLPExporterNodeBase } from '@opentelemetry/exporter-trace-otlp-proto';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
 
-const DEFAULT_COLLECTOR_RESOURCE_PATH = '/v1/metrics';
-const DEFAULT_COLLECTOR_URL=`http://localhost:4318${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
+const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/metrics';
+const DEFAULT_COLLECTOR_URL=`http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 
 /**
  * OTLP Metric Exporter for Node with protobuf
