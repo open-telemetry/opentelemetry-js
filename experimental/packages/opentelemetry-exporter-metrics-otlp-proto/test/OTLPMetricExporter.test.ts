@@ -56,16 +56,16 @@ describe('OTLPMetricExporter - node with proto over http', () => {
 
   describe('when configuring via environment', () => {
     const envSource = process.env;
-    it('should use url defined in env', () => {
+    it('should use url defined in env without checking if path is already present', () => {
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/metrics';
       const collectorExporter = new OTLPMetricExporter();
       assert.strictEqual(
         collectorExporter.url,
-        envSource.OTEL_EXPORTER_OTLP_ENDPOINT
+        `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/metrics`
       );
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
     });
-    it('should use url defined in env and append version and signal when not present', () => {
+    it('should use url defined in env and append version and signal', () => {
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
       const collectorExporter = new OTLPMetricExporter();
       assert.strictEqual(

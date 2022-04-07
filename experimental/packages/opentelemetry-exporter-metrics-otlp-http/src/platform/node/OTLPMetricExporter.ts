@@ -19,7 +19,7 @@ import {
   OTLPExporterNodeBase,
   OTLPExporterNodeConfigBase,
   otlpTypes,
-  appendResourcePathToUrlIfNotPresent
+  appendResourcePathToUrl
 } from '@opentelemetry/exporter-trace-otlp-http';
 import { toOTLPExportMetricServiceRequest } from '../../transformMetrics';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
@@ -65,7 +65,7 @@ export class OTLPMetricExporter
       : getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0
       ? getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
       : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-      ? appendResourcePathToUrlIfNotPresent(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
+      ? appendResourcePathToUrl(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
       : DEFAULT_COLLECTOR_URL;
   }
 }
