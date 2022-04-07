@@ -45,6 +45,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :house: (Internal)
 
 * [#2835](https://github.com/open-telemetry/opentelemetry-js/pull/2835) chore: move trace exporters back to experimental ([@dyladan](https://github.com/dyladan))
+* refactor(sdk-metrics-base): meter shared states #2821 @legendecas
 
 ## v0.27.0
 
