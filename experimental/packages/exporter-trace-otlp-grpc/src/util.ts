@@ -136,39 +136,38 @@ export function validateAndNormalizeUrl(url: string): string {
 export function configureSecurity(credentials: grpc.ChannelCredentials | undefined, endpoint: string):
   grpc.ChannelCredentials {
 
+  let insecure: boolean;
+
   // 2: anytime user provides their own credentials, use those same credentials (no matter the scheme or env insecure settings)
   if (credentials) {
     return credentials;
     // 3. if user sets https scheme return secure channel (ignoring insecure env settings)
   } else if (endpoint.startsWith('https://')) {
-    return useSecureConnection();
-    // 4-9. use cases
+    insecure = false;
+    // 4, 6, 7 if user sets http scheme or
+    // 1. user wants to use default url return insecure
+  } else if (endpoint.startsWith('http://') || endpoint === DEFAULT_COLLECTOR_URL) {
+    insecure = true;
+    // 5, 8, 9 (no scheme)
   } else {
-   const insecure = getInsecureSetting(endpoint);
+    insecure = getSecurityFromEnv();
+  }
 
-    if (insecure) {
-      return grpc.credentials.createInsecure();
-    } else {
-      return useSecureConnection();
-    }
-
+  if (insecure) {
+    return grpc.credentials.createInsecure();
+  } else {
+    return useSecureConnection();
   }
 }
 
-function getInsecureSetting(endpoint: string): boolean {
+function getSecurityFromEnv(): boolean {
   const definedInsecure =
     getEnv().OTEL_EXPORTER_OTLP_TRACES_INSECURE ||
     getEnv().OTEL_EXPORTER_OTLP_INSECURE || getEnv().OTEL_EXPORTER_OTLP_SPAN_INSECURE;
 
-  // get insecurity from insecure env value
   if (definedInsecure) {
     return definedInsecure === 'true';
-  // 1. if user wants to use default url or http scheme url return insecure
-  // note: verifying #4 use case
-  } else if (endpoint === DEFAULT_COLLECTOR_URL || endpoint.startsWith('http://')) {
-      return true;
   } else {
-    // if default url has no scheme return secure
     return false;
   }
 }
