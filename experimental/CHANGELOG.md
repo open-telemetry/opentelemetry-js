@@ -9,6 +9,13 @@ All notable changes to experimental packages in this project will be documented 
 * feat(sdk-metrics-base): update metric exporter interfaces #2707 @srikanthccv
 * feat(api-metrics): remove observable types #2687 @legendecas
 * fix(otlp-http-exporter): remove content length header #2879 @svetlanabrennan
+* feat(experimental-packages): Update packages to latest SDK Version. #2871 @pichlermarc
+  * removed the -wip suffix from api-metrics and metrics-sdk-base.
+  * updated dependencies to stable packages to `1.1.1` for all "experimental" packages.
+  * updated Metrics Exporters to the latest Metrics SDK (`exporter-metrics-otlp-grpc`, `exporter-metrics-otlp-http`, `exporter-metrics-otlp-proto`)
+  * updated `opentelemetry-sdk-node` to the latest Metrics SDK.
+  * updated `otlp-transformer` to the latest Metrics SDK.
+  * updated all `instrumentation-*` packages to use local implementations of `parseUrl()` due to #2884
 
 ### :rocket: (Enhancement)
 

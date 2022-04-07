@@ -1,5 +1,5 @@
 {
-  "name": "@opentelemetry/api-metrics-wip",
+  "name": "@opentelemetry/api-metrics",
   "version": "0.27.0",
   "private": true,
   "description": "Public metrics API for OpenTelemetry",

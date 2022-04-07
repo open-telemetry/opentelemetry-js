@@ -29,6 +29,12 @@ import { FetchError, FetchResponse, SpanData } from './types';
 import { VERSION } from './version';
 import { _globalThis } from '@opentelemetry/core';
 
+function parseUrl(url: string): web.URLLike {
+  const element = document.createElement('a');
+  element.href = url;
+  return element;
+}
+
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
 // hard to say how long it should really wait, seems like 300ms is
@@ -68,9 +74,7 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
 /**
  * This class represents a fetch plugin for auto instrumentation
  */
-export class FetchInstrumentation extends InstrumentationBase<
-  Promise<Response>
-> {
+export class FetchInstrumentation extends InstrumentationBase<Promise<Response>> {
   readonly component: string = 'fetch';
   readonly version: string = VERSION;
   moduleName = this.component;
@@ -122,7 +126,7 @@ export class FetchInstrumentation extends InstrumentationBase<
     span: api.Span,
     response: FetchResponse
   ): void {
-    const parsedUrl = web.parseUrl(response.url);
+    const parsedUrl = parseUrl(response.url);
     span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, response.status);
     if (response.statusText != null) {
       span.setAttribute(AttributeNames.HTTP_STATUS_TEXT, response.statusText);
@@ -159,7 +163,7 @@ export class FetchInstrumentation extends InstrumentationBase<
       api.propagation.inject(api.context.active(), options.headers, {
         set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
       });
-    } else if(options.headers instanceof Headers) {
+    } else if (options.headers instanceof Headers) {
       api.propagation.inject(api.context.active(), options.headers, {
         set: (h, k, v) => h.set(k, typeof v === 'string' ? v : String(v)),
       });
@@ -297,7 +301,8 @@ export class FetchInstrumentation extends InstrumentationBase<
         ...args: Parameters<typeof fetch>
       ): Promise<Response> {
         const self = this;
-        const url = args[0] instanceof Request ? args[0].url : args[0];
+        const url = parseUrl(args[0] instanceof Request ? args[0].url : args[0]).href;
+
         const options = args[0] instanceof Request ? args[0] : args[1] || {};
         const createdSpan = plugin._createSpan(url, options);
         if (!createdSpan) {
@@ -316,16 +321,24 @@ export class FetchInstrumentation extends InstrumentationBase<
 
         function endSpanOnSuccess(span: api.Span, response: Response) {
           plugin._applyAttributesAfterFetch(span, options, response);
+          const spanResponse = {
+            status: response.status,
+            statusText: response.statusText,
+            headers: response.headers,
+            url
+          };
           if (response.status >= 200 && response.status < 400) {
-            plugin._endSpan(span, spanData, response);
-          } else {
-            plugin._endSpan(span, spanData, {
-              status: response.status,
-              statusText: response.statusText,
-              url,
-            });
+            if (response.url != null && response.url !== '') {
+              spanResponse.url = url;
+            }
           }
+          plugin._endSpan(span, spanData, {
+            status: response.status,
+            statusText: response.statusText,
+            url,
+          });
         }
+
         function onSuccess(
           span: api.Span,
           resolve: (value: Response | PromiseLike<Response>) => void,
@@ -430,7 +443,7 @@ export class FetchInstrumentation extends InstrumentationBase<
 
     const observer: PerformanceObserver = new PerformanceObserver(list => {
       const perfObsEntries = list.getEntries() as PerformanceResourceTiming[];
-      const parsedUrl = web.parseUrl(spanUrl);
+      const parsedUrl = parseUrl(spanUrl);
       perfObsEntries.forEach(entry => {
         if (
           entry.initiatorType === 'fetch' &&

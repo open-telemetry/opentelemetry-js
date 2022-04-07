@@ -15,7 +15,7 @@
  */
 
 import { HrTime } from '@opentelemetry/api';
-import { ObservableCallback } from '@opentelemetry/api-metrics-wip';
+import { ObservableCallback } from '@opentelemetry/api-metrics';
 import { Accumulation, Aggregator } from '../aggregator/types';
 import { View } from '../view/View';
 import {
