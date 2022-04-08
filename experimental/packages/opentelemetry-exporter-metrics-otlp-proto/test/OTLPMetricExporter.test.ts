@@ -19,7 +19,7 @@ import { ExportResultCode } from '@opentelemetry/core';
 import {
   otlpTypes
 } from '@opentelemetry/exporter-trace-otlp-http';
-import { getExportRequestProto } from '@opentelemetry/exporter-trace-otlp-proto';
+import { getExportRequestProto } from '@opentelemetry/otlp-proto-exporter-base';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';

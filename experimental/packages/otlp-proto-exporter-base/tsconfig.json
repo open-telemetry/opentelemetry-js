@@ -10,13 +10,7 @@
   ],
   "references": [
     {
-      "path": "../exporter-trace-otlp-http"
-    },
-    {
       "path": "../otlp-exporter-base"
-    },
-    {
-      "path": "../otlp-proto-exporter-base"
     }
   ]
 }

@@ -23,7 +23,7 @@ import {
   OTLPExporterNodeConfigBase
 } from '@opentelemetry/otlp-exporter-base';
 
-type SendFn = <ExportItem, ServiceRequest>(collector: OTLPExporterNodeBase<ExportItem, ServiceRequest>,
+type SendFn = <ExportItem, ServiceRequest>(collector: OTLPProtoExporterNodeBase<ExportItem, ServiceRequest>,
   objects: ExportItem[],
   compression: CompressionAlgorithm,
   onSuccess: () => void,
@@ -32,7 +32,7 @@ type SendFn = <ExportItem, ServiceRequest>(collector: OTLPExporterNodeBase<Expor
 /**
  * Collector Exporter abstract base class
  */
-export abstract class OTLPExporterNodeBase<
+export abstract class OTLPProtoExporterNodeBase<
   ExportItem,
   ServiceRequest
 > extends OTLPExporterBaseMain<ExportItem, ServiceRequest> {

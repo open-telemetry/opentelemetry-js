@@ -13,9 +13,6 @@
       "path": "../exporter-trace-otlp-http"
     },
     {
-      "path": "../exporter-trace-otlp-proto"
-    },
-    {
       "path": "../opentelemetry-api-metrics"
     },
     {
@@ -26,6 +23,9 @@
     },
     {
       "path": "../otlp-exporter-base"
+    },
+    {
+      "path": "../otlp-proto-exporter-base"
     }
   ]
 }

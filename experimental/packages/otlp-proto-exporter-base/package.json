@@ -1,7 +1,7 @@
 {
-  "name": "@opentelemetry/exporter-metrics-otlp-proto",
+  "name": "@opentelemetry/otlp-proto-exporter-base",
   "version": "0.27.0",
-  "description": "OpenTelemetry Collector Metrics Exporter allows user to send collected metrics to the OpenTelemetry Collector using protobuf over HTTP",
+  "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector using protobuf over HTTP",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
@@ -50,7 +50,6 @@
   "devDependencies": {
     "@babel/core": "7.16.0",
     "@opentelemetry/api": "^1.1.0",
-    "@opentelemetry/api-metrics": "0.27.0",
     "@types/mocha": "8.2.3",
     "@types/node": "14.17.33",
     "@types/sinon": "10.0.6",
@@ -68,14 +67,9 @@
     "@opentelemetry/api": "^1.1.0"
   },
   "dependencies": {
-    "@grpc/proto-loader": "0.6.9",
     "@opentelemetry/core": "1.1.1",
-    "@opentelemetry/exporter-metrics-otlp-http": "0.27.0",
-    "@opentelemetry/otlp-proto-exporter-base": "0.27.0",
+    "@grpc/proto-loader": "^0.6.9",
     "@opentelemetry/otlp-exporter-base": "0.27.0",
-    "@opentelemetry/exporter-trace-otlp-http": "0.27.0",
-    "@opentelemetry/resources": "1.1.1",
-    "@opentelemetry/sdk-metrics-base": "0.27.0",
     "protobufjs": "^6.9.0"
   }
 }

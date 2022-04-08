@@ -26,7 +26,6 @@ import * as sinon from 'sinon';
 import { Stream } from 'stream';
 import * as zlib from 'zlib';
 import { OTLPTraceExporter } from '../src';
-import { getExportRequestProto } from '../src/util';
 import {
   ensureExportTraceServiceRequestIsSet,
   ensureProtoSpanIsCorrect,
@@ -34,6 +33,7 @@ import {
   MockedResponse,
 } from './traceHelper';
 import { CompressionAlgorithm, OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import { getExportRequestProto } from '@opentelemetry/otlp-proto-exporter-base';
 
 const fakeRequest = {
   end: function () { },

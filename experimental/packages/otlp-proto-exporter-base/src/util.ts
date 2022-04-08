@@ -17,7 +17,7 @@
 import * as path from 'path';
 
 import { ServiceClientType } from './types';
-import { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
+import { OTLPProtoExporterNodeBase } from './OTLPProtoExporterNodeBase';
 import type { Type } from 'protobufjs';
 import * as protobufjs from 'protobufjs';
 import {
@@ -34,7 +34,7 @@ export function getExportRequestProto(): Type | undefined {
 }
 
 export function onInit<ExportItem, ServiceRequest>(
-  collector: OTLPExporterNodeBase<ExportItem, ServiceRequest>,
+  collector: OTLPProtoExporterNodeBase<ExportItem, ServiceRequest>,
   _config: OTLPExporterNodeConfigBase
 ): void {
   const dir = path.resolve(__dirname, '..', 'protos');
@@ -62,7 +62,7 @@ export function onInit<ExportItem, ServiceRequest>(
 }
 
 export function send<ExportItem, ServiceRequest>(
-  collector: OTLPExporterNodeBase<ExportItem, ServiceRequest>,
+  collector: OTLPProtoExporterNodeBase<ExportItem, ServiceRequest>,
   objects: ExportItem[],
   compression: CompressionAlgorithm,
   onSuccess: () => void,
