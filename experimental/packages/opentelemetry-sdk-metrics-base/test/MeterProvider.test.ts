@@ -24,8 +24,13 @@ import {
   defaultResource
 } from './util';
 import { TestMetricReader } from './export/TestMetricReader';
+import * as sinon from 'sinon';
 
 describe('MeterProvider', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
   describe('constructor', () => {
     it('should construct without exceptions', () => {
       const meterProvider = new MeterProvider();
@@ -420,6 +425,49 @@ describe('MeterProvider', () => {
         name: 'renamed-instrument',
         type: InstrumentType.HISTOGRAM
       });
+    });
+  });
+
+  describe('shutdown', () => {
+    it('should shutdown all registered metric readers', async () => {
+      const meterProvider = new MeterProvider({ resource: defaultResource });
+      const reader1 = new TestMetricReader();
+      const reader2 = new TestMetricReader();
+      const reader1ShutdownSpy = sinon.spy(reader1, 'shutdown');
+      const reader2ShutdownSpy = sinon.spy(reader2, 'shutdown');
+
+      meterProvider.addMetricReader(reader1);
+      meterProvider.addMetricReader(reader2);
+
+      await meterProvider.shutdown();
+      await meterProvider.shutdown();
+      await meterProvider.shutdown();
+
+      assert.strictEqual(reader1ShutdownSpy.callCount, 1);
+      assert.strictEqual(reader2ShutdownSpy.callCount, 1);
+    });
+  });
+
+  describe('forceFlush', () => {
+    it('should forceFlush all registered metric readers', async () => {
+      const meterProvider = new MeterProvider({ resource: defaultResource });
+      const reader1 = new TestMetricReader();
+      const reader2 = new TestMetricReader();
+      const reader1ForceFlushSpy = sinon.spy(reader1, 'forceFlush');
+      const reader2ForceFlushSpy = sinon.spy(reader2, 'forceFlush');
+
+      meterProvider.addMetricReader(reader1);
+      meterProvider.addMetricReader(reader2);
+
+      await meterProvider.forceFlush();
+      await meterProvider.forceFlush();
+      assert.strictEqual(reader1ForceFlushSpy.callCount, 2);
+      assert.strictEqual(reader2ForceFlushSpy.callCount, 2);
+
+      await meterProvider.shutdown();
+      await meterProvider.forceFlush();
+      assert.strictEqual(reader1ForceFlushSpy.callCount, 2);
+      assert.strictEqual(reader2ForceFlushSpy.callCount, 2);
     });
   });
 });

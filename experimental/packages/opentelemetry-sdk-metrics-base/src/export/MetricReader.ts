@@ -53,6 +53,9 @@ export abstract class MetricReader {
    * @param metricProducer
    */
   setMetricProducer(metricProducer: MetricProducer) {
+    if (this._metricProducer) {
+      throw new Error('MetricReader can not be bound to a MeterProvider again.');
+    }
     this._metricProducer = metricProducer;
     this.onInitialized();
   }
