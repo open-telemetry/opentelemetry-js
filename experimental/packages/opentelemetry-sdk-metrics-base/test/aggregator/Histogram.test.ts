@@ -17,8 +17,8 @@
 import { HrTime } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { HistogramAccumulation, HistogramAggregator } from '../../src/aggregator';
-import { MetricData, PointDataType } from '../../src/export/MetricData';
-import { commonValues, defaultInstrumentationLibrary, defaultInstrumentDescriptor, defaultResource } from '../util';
+import { MetricData, DataPointType } from '../../src/export/MetricData';
+import { commonValues, defaultInstrumentDescriptor } from '../util';
 
 describe('HistogramAggregator', () => {
   describe('createAccumulation', () => {
@@ -92,16 +92,14 @@ describe('HistogramAggregator', () => {
       const endTime: HrTime = [1, 1];
 
       const expected: MetricData = {
-        resource: defaultResource,
-        instrumentationLibrary: defaultInstrumentationLibrary,
-        instrumentDescriptor: defaultInstrumentDescriptor,
-        pointDataType: PointDataType.HISTOGRAM,
-        pointData: [
+        descriptor: defaultInstrumentDescriptor,
+        dataPointType: DataPointType.HISTOGRAM,
+        dataPoints: [
           {
             attributes: {},
             startTime,
             endTime,
-            point: {
+            value: {
               buckets: {
                 boundaries: [1, 10, 100],
                 counts: [1, 1, 0, 0],
@@ -113,8 +111,6 @@ describe('HistogramAggregator', () => {
         ],
       };
       assert.deepStrictEqual(aggregator.toMetricData(
-        defaultResource,
-        defaultInstrumentationLibrary,
         defaultInstrumentDescriptor,
         [[{}, accumulation]],
         startTime,

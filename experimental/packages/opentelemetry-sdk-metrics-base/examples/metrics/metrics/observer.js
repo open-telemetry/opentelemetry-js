@@ -7,16 +7,13 @@ const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 // Optional and only needed to see the internal diagnostic logging (during development)
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
 
-const exporter = new PrometheusExporter(
-  {
-    startServer: true,
-  },
-  () => {
-    console.log(
-      `prometheus scrape endpoint: http://localhost:${PrometheusExporter.DEFAULT_OPTIONS.port}${PrometheusExporter.DEFAULT_OPTIONS.endpoint}`,
-    );
-  },
-);
+const { endpoint, port } = PrometheusExporter.DEFAULT_OPTIONS;
+
+const exporter = new PrometheusExporter({}, () => {
+  console.log(
+    `prometheus scrape endpoint: http://localhost:${port}${endpoint}`,
+  );
+});
 
 const meter = new MeterProvider({
   exporter,
@@ -34,12 +31,12 @@ meter.createObservableGauge('cpu_core_usage', {
 
 function getAsyncValue() {
   return new Promise((resolve) => {
-    setTimeout(()=> {
+    setTimeout(() => {
       resolve(Math.random());
     }, 100);
   });
 }
 
-setInterval(function(){
+setInterval(function () {
   console.log("simulating an app being kept open")
 }, 5000);

@@ -16,3 +16,4 @@
 
 export * from './EnvDetector';
 export * from './ProcessDetector';
+export * from './BrowserDetector';

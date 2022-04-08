@@ -16,9 +16,8 @@
 
 import { LastValue, AggregatorKind, Aggregator, Accumulation, AccumulationRecord } from './types';
 import { HrTime } from '@opentelemetry/api';
-import { hrTime, hrTimeToMicroseconds, InstrumentationLibrary } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
-import { PointDataType, SingularMetricData } from '../export/MetricData';
+import { hrTime, hrTimeToMicroseconds } from '@opentelemetry/core';
+import { DataPointType, SingularMetricData } from '../export/MetricData';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 
@@ -30,7 +29,7 @@ export class LastValueAccumulation implements Accumulation {
     this.sampleTime = hrTime();
   }
 
-  toPoint(): LastValue {
+  toPointValue(): LastValue {
     return this._current;
   }
 }
@@ -51,7 +50,7 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
   merge(previous: LastValueAccumulation, delta: LastValueAccumulation): LastValueAccumulation {
     // nanoseconds may lose precisions.
     const latestAccumulation = hrTimeToMicroseconds(delta.sampleTime) >= hrTimeToMicroseconds(previous.sampleTime) ? delta : previous;
-    return new LastValueAccumulation(latestAccumulation.toPoint(), latestAccumulation.sampleTime);
+    return new LastValueAccumulation(latestAccumulation.toPointValue(), latestAccumulation.sampleTime);
   }
 
   /**
@@ -63,27 +62,23 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
   diff(previous: LastValueAccumulation, current: LastValueAccumulation): LastValueAccumulation {
     // nanoseconds may lose precisions.
     const latestAccumulation = hrTimeToMicroseconds(current.sampleTime) >= hrTimeToMicroseconds(previous.sampleTime) ? current : previous;
-    return new LastValueAccumulation(latestAccumulation.toPoint(), latestAccumulation.sampleTime);
+    return new LastValueAccumulation(latestAccumulation.toPointValue(), latestAccumulation.sampleTime);
   }
 
   toMetricData(
-    resource: Resource,
-    instrumentationLibrary: InstrumentationLibrary,
-    instrumentDescriptor: InstrumentDescriptor,
+    descriptor: InstrumentDescriptor,
     accumulationByAttributes: AccumulationRecord<LastValueAccumulation>[],
     startTime: HrTime,
     endTime: HrTime): Maybe<SingularMetricData> {
     return {
-      resource,
-      instrumentationLibrary,
-      instrumentDescriptor,
-      pointDataType: PointDataType.SINGULAR,
-      pointData: accumulationByAttributes.map(([attributes, accumulation]) => {
+      descriptor,
+      dataPointType: DataPointType.SINGULAR,
+      dataPoints: accumulationByAttributes.map(([attributes, accumulation]) => {
         return {
           attributes,
           startTime,
           endTime,
-          point: accumulation.toPoint(),
+          value: accumulation.toPointValue(),
         };
       })
     };

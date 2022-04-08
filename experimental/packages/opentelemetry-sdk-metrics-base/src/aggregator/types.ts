@@ -16,8 +16,6 @@
 
 import { HrTime } from '@opentelemetry/api';
 import { Attributes } from '@opentelemetry/api-metrics';
-import { InstrumentationLibrary } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
 import { MetricData } from '../export/MetricData';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
@@ -30,13 +28,13 @@ export enum AggregatorKind {
   HISTOGRAM,
 }
 
-/** Point type for SumAggregation. */
+/** DataPoint value type for SumAggregation. */
 export type Sum = number;
 
-/** Point type for LastValueAggregation. */
+/** DataPoint value type for LastValueAggregation. */
 export type LastValue = number;
 
-/** Point type for HistogramAggregation. */
+/** DataPoint value type for HistogramAggregation. */
 export interface Histogram {
   /**
    * Buckets are implemented using two different arrays:
@@ -108,17 +106,13 @@ export interface Aggregator<T> {
   /**
    * Returns the {@link MetricData} that this {@link Aggregator} will produce.
    *
-   * @param resource the resource producing the metric.
-   * @param instrumentationLibrary the library that instrumented the metric
-   * @param instrumentDescriptor the metric instrument descriptor.
+   * @param descriptor the metric instrument descriptor.
    * @param accumulationByAttributes the array of attributes and accumulation pairs.
    * @param startTime the start time of the metric data.
    * @param endTime the end time of the metric data.
    * @return the {@link MetricData} that this {@link Aggregator} will produce.
    */
-  toMetricData(resource: Resource,
-    instrumentationLibrary: InstrumentationLibrary,
-    instrumentDescriptor: InstrumentDescriptor,
+  toMetricData(descriptor: InstrumentDescriptor,
     accumulationByAttributes: AccumulationRecord<T>[],
     startTime: HrTime,
     endTime: HrTime): Maybe<MetricData>;

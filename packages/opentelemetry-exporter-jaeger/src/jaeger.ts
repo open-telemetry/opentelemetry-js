@@ -53,6 +53,7 @@ export class JaegerExporter implements SpanExporter {
     localConfig.password =
       localConfig.password || env.OTEL_EXPORTER_JAEGER_PASSWORD;
     localConfig.host = localConfig.host || env.OTEL_EXPORTER_JAEGER_AGENT_HOST;
+    localConfig.port = localConfig.port || env.OTEL_EXPORTER_JAEGER_AGENT_PORT;
 
     this._localConfig = localConfig;
 

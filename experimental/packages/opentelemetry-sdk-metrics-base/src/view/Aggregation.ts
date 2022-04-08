@@ -93,11 +93,27 @@ export class HistogramAggregation extends Aggregation {
  * The explicit bucket histogram aggregation.
  */
 export class ExplicitBucketHistogramAggregation extends Aggregation {
+  private _boundaries: number[];
   /**
-   * @param _boundaries the bucket boundaries of the histogram aggregation
+   * @param boundaries the bucket boundaries of the histogram aggregation
    */
-  constructor(private _boundaries: number[]) {
+  constructor(boundaries: number[]) {
     super();
+    if (boundaries === undefined || boundaries.length === 0) {
+      throw new Error('HistogramAggregator should be created with boundaries.');
+    }
+    // Copy the boundaries array for modification.
+    boundaries = boundaries.concat();
+    // We need to an ordered set to be able to correctly compute count for each
+    // boundary since we'll iterate on each in order.
+    boundaries = boundaries.sort((a, b) => a - b);
+    // Remove all Infinity from the boundaries.
+    const minusInfinityIndex = boundaries.lastIndexOf(-Infinity);
+    let infinityIndex: number | undefined = boundaries.indexOf(Infinity);
+    if (infinityIndex === -1) {
+      infinityIndex = undefined;
+    }
+    this._boundaries = boundaries.slice(minusInfinityIndex + 1, infinityIndex);
   }
 
   createAggregator(_instrument: InstrumentDescriptor) {

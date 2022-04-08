@@ -25,22 +25,11 @@ import { Histogram } from '../aggregator/types';
  * Basic metric data fields.
  */
 export interface BaseMetricData {
+  readonly descriptor: InstrumentDescriptor;
   /**
-   * Resource associated with metric telemetry.
+   * DataPointType of the metric instrument.
    */
-  readonly resource: Resource;
-  /**
-   * InstrumentationLibrary which created the metric instrument.
-   */
-  readonly instrumentationLibrary: InstrumentationLibrary;
-  /**
-   * InstrumentDescriptor which describes the metric instrument.
-   */
-  readonly instrumentDescriptor: InstrumentDescriptor;
-  /**
-   * PointDataType of the metric instrument.
-   */
-  readonly pointDataType: PointDataType,
+  readonly dataPointType: DataPointType;
 }
 
 /**
@@ -48,16 +37,16 @@ export interface BaseMetricData {
  * SumAggregation.
  */
 export interface SingularMetricData extends BaseMetricData {
-  readonly pointDataType: PointDataType.SINGULAR,
-  readonly pointData: PointData<number>[],
+  readonly dataPointType: DataPointType.SINGULAR;
+  readonly dataPoints: DataPoint<number>[];
 }
 
 /**
  * Represents a metric data aggregated by a HistogramAggregation.
  */
 export interface HistogramMetricData extends BaseMetricData {
-  readonly pointDataType: PointDataType.HISTOGRAM,
-  readonly pointData: PointData<Histogram>[],
+  readonly dataPointType: DataPointType.HISTOGRAM;
+  readonly dataPoints: DataPoint<Histogram>[];
 }
 
 /**
@@ -65,10 +54,20 @@ export interface HistogramMetricData extends BaseMetricData {
  */
 export type MetricData = SingularMetricData | HistogramMetricData;
 
+export interface InstrumentationLibraryMetrics {
+  instrumentationLibrary: InstrumentationLibrary;
+  metrics: MetricData[];
+}
+
+export interface ResourceMetrics {
+  resource: Resource;
+  instrumentationLibraryMetrics: InstrumentationLibraryMetrics[];
+}
+
 /**
  * The aggregated point data type.
  */
-export enum PointDataType {
+export enum DataPointType {
   SINGULAR,
   HISTOGRAM,
   EXPONENTIAL_HISTOGRAM,
@@ -78,9 +77,9 @@ export enum PointDataType {
  * Represents an aggregated point data with start time, end time and their
  * associated attributes and points.
  */
-export interface PointData<T> {
+export interface DataPoint<T> {
   /**
-   * The start epoch timestamp of the PointData, usually the time when
+   * The start epoch timestamp of the DataPoint, usually the time when
    * the metric was created when the preferred AggregationTemporality is
    * CUMULATIVE, or last collection time otherwise.
    */
@@ -91,11 +90,11 @@ export interface PointData<T> {
    */
   readonly endTime: HrTime;
   /**
-   * The attributes associated with this PointData.
+   * The attributes associated with this DataPoint.
    */
   readonly attributes: Attributes;
   /**
-   * The data points for this metric.
+   * The value for this DataPoint.
    */
-  readonly point: T;
+  readonly value: T;
 }

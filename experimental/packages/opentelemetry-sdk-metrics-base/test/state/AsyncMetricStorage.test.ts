@@ -19,12 +19,12 @@ import * as assert from 'assert';
 
 import { SumAggregator } from '../../src/aggregator';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import { PointDataType } from '../../src/export/MetricData';
+import { DataPointType } from '../../src/export/MetricData';
 import { MetricCollectorHandle } from '../../src/state/MetricCollector';
 import { AsyncMetricStorage } from '../../src/state/AsyncMetricStorage';
 import { NoopAttributesProcessor } from '../../src/view/AttributesProcessor';
-import { assertMetricData, assertPointData, defaultInstrumentationLibrary, defaultInstrumentDescriptor, defaultResource } from '../util';
-import { ObservableCallback } from '@opentelemetry/api-metrics-wip';
+import { assertMetricData, assertDataPoint, defaultInstrumentDescriptor } from '../util';
+import { ObservableCallback } from '@opentelemetry/api-metrics';
 
 const deltaCollector: MetricCollectorHandle = {
   aggregatorTemporality: AggregationTemporality.DELTA,
@@ -71,16 +71,14 @@ describe('AsyncMetricStorage', () => {
           const metric = await metricStorage.collect(
             deltaCollector,
             collectors,
-            defaultResource,
-            defaultInstrumentationLibrary,
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 3);
-          assertPointData(metric.pointData[0], { key: '1' }, 1);
-          assertPointData(metric.pointData[1], { key: '2' }, 2);
-          assertPointData(metric.pointData[2], { key: '3' }, 3);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 3);
+          assertDataPoint(metric.dataPoints[0], { key: '1' }, 1);
+          assertDataPoint(metric.dataPoints[1], { key: '2' }, 2);
+          assertDataPoint(metric.dataPoints[2], { key: '3' }, 3);
         }
 
         delegate.setDelegate(observableResult => {});
@@ -89,13 +87,11 @@ describe('AsyncMetricStorage', () => {
           const metric = await metricStorage.collect(
             deltaCollector,
             collectors,
-            defaultResource,
-            defaultInstrumentationLibrary,
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 0);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 0);
         }
 
         delegate.setDelegate(observableResult => {
@@ -107,17 +103,15 @@ describe('AsyncMetricStorage', () => {
           const metric = await metricStorage.collect(
             deltaCollector,
             [deltaCollector],
-            defaultResource,
-            defaultInstrumentationLibrary,
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 3);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 3);
           // all values were diffed.
-          assertPointData(metric.pointData[0], { key: '1' }, 3);
-          assertPointData(metric.pointData[1], { key: '2' }, 3);
-          assertPointData(metric.pointData[2], { key: '3' }, 3);
+          assertDataPoint(metric.dataPoints[0], { key: '1' }, 3);
+          assertDataPoint(metric.dataPoints[1], { key: '2' }, 3);
+          assertDataPoint(metric.dataPoints[2], { key: '3' }, 3);
         }
       });
     });
@@ -142,16 +136,14 @@ describe('AsyncMetricStorage', () => {
           const metric = await metricStorage.collect(
             cumulativeCollector,
             collectors,
-            defaultResource,
-            defaultInstrumentationLibrary,
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 3);
-          assertPointData(metric.pointData[0], { key: '1' }, 1);
-          assertPointData(metric.pointData[1], { key: '2' }, 2);
-          assertPointData(metric.pointData[2], { key: '3' }, 3);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 3);
+          assertDataPoint(metric.dataPoints[0], { key: '1' }, 1);
+          assertDataPoint(metric.dataPoints[1], { key: '2' }, 2);
+          assertDataPoint(metric.dataPoints[2], { key: '3' }, 3);
         }
 
         delegate.setDelegate(observableResult => {});
@@ -160,16 +152,14 @@ describe('AsyncMetricStorage', () => {
           const metric = await metricStorage.collect(
             cumulativeCollector,
             collectors,
-            defaultResource,
-            defaultInstrumentationLibrary,
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 3);
-          assertPointData(metric.pointData[0], { key: '1' }, 1);
-          assertPointData(metric.pointData[1], { key: '2' }, 2);
-          assertPointData(metric.pointData[2], { key: '3' }, 3);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 3);
+          assertDataPoint(metric.dataPoints[0], { key: '1' }, 1);
+          assertDataPoint(metric.dataPoints[1], { key: '2' }, 2);
+          assertDataPoint(metric.dataPoints[2], { key: '3' }, 3);
         }
 
         delegate.setDelegate(observableResult => {
@@ -181,16 +171,14 @@ describe('AsyncMetricStorage', () => {
           const metric = await metricStorage.collect(
             cumulativeCollector,
             collectors,
-            defaultResource,
-            defaultInstrumentationLibrary,
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, PointDataType.SINGULAR);
-          assert.strictEqual(metric.pointData.length, 3);
-          assertPointData(metric.pointData[0], { key: '1' }, 4);
-          assertPointData(metric.pointData[1], { key: '2' }, 5);
-          assertPointData(metric.pointData[2], { key: '3' }, 6);
+          assertMetricData(metric, DataPointType.SINGULAR);
+          assert.strictEqual(metric.dataPoints.length, 3);
+          assertDataPoint(metric.dataPoints[0], { key: '1' }, 4);
+          assertDataPoint(metric.dataPoints[1], { key: '2' }, 5);
+          assertDataPoint(metric.dataPoints[2], { key: '3' }, 6);
         }
       });
     });

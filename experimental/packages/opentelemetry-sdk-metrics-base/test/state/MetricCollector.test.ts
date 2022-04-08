@@ -18,18 +18,20 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MeterProvider } from '../../src';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import { MetricData, PointDataType } from '../../src/export/MetricData';
-import { MetricExporter } from '../../src/export/MetricExporter';
+import { DataPointType, ResourceMetrics } from '../../src/export/MetricData';
+import { PushMetricExporter } from '../../src/export/MetricExporter';
 import { MeterProviderSharedState } from '../../src/state/MeterProviderSharedState';
 import { MetricCollector } from '../../src/state/MetricCollector';
-import { defaultInstrumentationLibrary, defaultResource, assertMetricData, assertPointData } from '../util';
+import { defaultInstrumentationLibrary, defaultResource, assertMetricData, assertDataPoint } from '../util';
 import { TestMetricReader } from '../export/TestMetricReader';
+import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 
-class TestMetricExporter extends MetricExporter {
-  metricDataList: MetricData[] = [];
-  async export(batch: MetricData[]): Promise<void> {
-    this.metricDataList.push(...batch);
+class TestMetricExporter implements PushMetricExporter {
+  async export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): Promise<void> {
+    resultCallback({code: ExportResultCode.SUCCESS});
   }
+
+  async shutdown(): Promise<void> {}
 
   async forceFlush(): Promise<void> {}
 
@@ -63,7 +65,8 @@ describe('MetricCollector', () => {
   });
 
   describe('collect', () => {
-    function setupInstruments(exporter: MetricExporter) {
+
+    function setupInstruments(exporter: PushMetricExporter) {
       const meterProvider = new MeterProvider({ resource: defaultResource });
 
       const reader = new TestMetricReader(exporter.getPreferredAggregationTemporality());
@@ -91,26 +94,26 @@ describe('MetricCollector', () => {
       counter2.add(3);
 
       /** collect metrics */
-      const batch = await metricCollector.collect();
-      assert(Array.isArray(batch));
-      assert.strictEqual(batch.length, 2);
+      const { instrumentationLibraryMetrics } = await metricCollector.collect();
+      const { metrics } = instrumentationLibraryMetrics[0];
+      assert.strictEqual(metrics.length, 2);
 
       /** checking batch[0] */
-      const metricData1 = batch[0];
-      assertMetricData(metricData1, PointDataType.SINGULAR, {
+      const metricData1 = metrics[0];
+      assertMetricData(metricData1, DataPointType.SINGULAR, {
         name: 'counter1'
-      }, defaultInstrumentationLibrary);
-      assert.strictEqual(metricData1.pointData.length, 2);
-      assertPointData(metricData1.pointData[0], {}, 1);
-      assertPointData(metricData1.pointData[1], { foo: 'bar' }, 2);
+      });
+      assert.strictEqual(metricData1.dataPoints.length, 2);
+      assertDataPoint(metricData1.dataPoints[0], {}, 1);
+      assertDataPoint(metricData1.dataPoints[1], { foo: 'bar' }, 2);
 
       /** checking batch[1] */
-      const metricData2 = batch[1];
-      assertMetricData(metricData2, PointDataType.SINGULAR, {
+      const metricData2 = metrics[1];
+      assertMetricData(metricData2, DataPointType.SINGULAR, {
         name: 'counter2'
-      }, defaultInstrumentationLibrary);
-      assert.strictEqual(metricData2.pointData.length, 1);
-      assertPointData(metricData2.pointData[0], {}, 3);
+      });
+      assert.strictEqual(metricData2.dataPoints.length, 1);
+      assertDataPoint(metricData2.dataPoints[0], {}, 3);
     });
   });
 });

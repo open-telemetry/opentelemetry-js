@@ -19,11 +19,16 @@ import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { InstrumentDescriptor, InstrumentType } from '../src/InstrumentDescriptor';
-import { Histogram } from '../src/Instruments';
-import { MetricData, PointData, PointDataType } from '../src/export/MetricData';
+import {
+  MetricData,
+  DataPoint,
+  DataPointType,
+  InstrumentationLibraryMetrics
+} from '../src/export/MetricData';
 import { Measurement } from '../src/Measurement';
 import { isNotNullish } from '../src/utils';
 import { HrTime } from '@opentelemetry/api';
+import { Histogram } from '../src/aggregator/types';
 
 export const defaultResource = new Resource({
   resourceKey: 'my-resource',
@@ -44,8 +49,8 @@ export const defaultInstrumentationLibrary: InstrumentationLibrary = {
 };
 
 export const commonValues: number[] = [1, -1, 1.0, Infinity, -Infinity, NaN];
-export const commonAttributes: Attributes[] = [{}, {1: '1'}, {a: '2'}, new (class Foo{
-a = '1';
+export const commonAttributes: Attributes[] = [{}, { 1: '1' }, { a: '2' }, new (class Foo {
+  a = '1';
 })];
 
 export const sleep = (time: number) =>
@@ -53,35 +58,42 @@ export const sleep = (time: number) =>
     return setTimeout(resolve, time);
   });
 
-export function assertMetricData(
+export function assertInstrumentationLibraryMetrics(
   actual: unknown,
-  pointDataType?: PointDataType,
-  instrumentDescriptor: Partial<InstrumentDescriptor> = defaultInstrumentDescriptor,
-  instrumentationLibrary: Partial<InstrumentationLibrary> = defaultInstrumentationLibrary,
-  resource: Resource = defaultResource,
-): asserts actual is MetricData {
-  const it = actual as MetricData;
-  assert.deepStrictEqual(it.resource, resource);
-  assertPartialDeepStrictEqual(it.instrumentDescriptor, instrumentDescriptor);
+  instrumentationLibrary: Partial<InstrumentationLibrary>
+): asserts actual is InstrumentationLibraryMetrics {
+  const it = actual as InstrumentationLibraryMetrics;
   assertPartialDeepStrictEqual(it.instrumentationLibrary, instrumentationLibrary);
-  if (isNotNullish(pointDataType)) {
-    assert.strictEqual(it.pointDataType, pointDataType);
-  } else {
-    assert(isNotNullish(PointDataType[it.pointDataType]));
-  }
-  assert(Array.isArray(it.pointData));
+  assert(Array.isArray(it.metrics));
 }
 
-export function assertPointData(
+export function assertMetricData(
+  actual: unknown,
+  dataPointType?: DataPointType,
+  instrumentDescriptor: Partial<InstrumentDescriptor> | null = defaultInstrumentDescriptor,
+): asserts actual is MetricData {
+  const it = actual as MetricData;
+  if (instrumentDescriptor != null) {
+    assertPartialDeepStrictEqual(it.descriptor, instrumentDescriptor);
+  }
+  if (isNotNullish(dataPointType)) {
+    assert.strictEqual(it.dataPointType, dataPointType);
+  } else {
+    assert(isNotNullish(DataPointType[it.dataPointType]));
+  }
+  assert(Array.isArray(it.dataPoints));
+}
+
+export function assertDataPoint(
   actual: unknown,
   attributes: Attributes,
   point: Histogram | number,
   startTime?: HrTime,
   endTime?: HrTime,
-): asserts actual is PointData<unknown> {
-  const it = actual as PointData<unknown>;
+): asserts actual is DataPoint<unknown> {
+  const it = actual as DataPoint<unknown>;
   assert.deepStrictEqual(it.attributes, attributes);
-  assert.deepStrictEqual(it.point, point);
+  assert.deepStrictEqual(it.value, point);
   if (startTime) {
     assert.deepStrictEqual(it.startTime, startTime);
   } else {
@@ -114,6 +126,6 @@ export function assertPartialDeepStrictEqual<T>(actual: unknown, expected: T, me
   }
   const ownNames = Object.getOwnPropertyNames(expected);
   for (const ownName of ownNames) {
-    assert.deepStrictEqual((actual as any)[ownName], (expected as any)[ownName], message);
+    assert.deepStrictEqual((actual as any)[ownName], (expected as any)[ownName], `${ownName} not equals: ${message ?? '<no-message>'}`);
   }
 }

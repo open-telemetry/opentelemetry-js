@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
-  "esm2015": "build/esm2015/index.js",
+  "esnext": "build/esnext/index.js",
   "types": "build/src/index.d.ts",
   "publishConfig": {
     "access": "public"
@@ -19,13 +19,16 @@
   "browser": {
     "./src/platform/index.ts": "./src/platform/browser/index.ts",
     "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
-    "./build/esm2015/platform/index.js": "./build/esm2015/platform/browser/index.js",
+    "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
     "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
   },
   "files": [
     "build/esm/**/*.js",
     "build/esm/**/*.js.map",
     "build/esm/**/*.d.ts",
+    "build/esnext/**/*.js",
+    "build/esnext/**/*.js.map",
+    "build/esnext/**/*.d.ts",
     "build/src/**/*.js",
     "build/src/**/*.js.map",
     "build/src/**/*.d.ts",
@@ -34,6 +37,7 @@
     "README.md"
   ],
   "scripts": {
+    "prepublishOnly": "npm run compile",
     "compile": "tsc --build tsconfig.all.json",
     "clean": "tsc --build --clean tsconfig.all.json",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
@@ -85,7 +89,7 @@
     "codecov": "3.8.3",
     "cpx": "1.5.0",
     "istanbul-instrumenter-loader": "3.0.1",
-    "karma": "6.3.8",
+    "karma": "6.3.16",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage-istanbul-reporter": "3.0.3",
     "karma-mocha": "2.0.1",

@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { Attributes } from '@opentelemetry/api-metrics-wip';
+import { Attributes } from '@opentelemetry/api-metrics';
 import * as assert from 'assert';
 import { Measurement } from '../../src/Measurement';
 import { MultiMetricStorage } from '../../src/state/MultiWritableMetricStorage';

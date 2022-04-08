@@ -21,6 +21,7 @@ import {
   Sampler,
   SamplingDecision,
   SpanContext,
+  SpanKind,
   trace,
   TraceFlags
 } from '@opentelemetry/api';
@@ -32,7 +33,7 @@ import {
   suppressTracing
 } from '@opentelemetry/core';
 import * as assert from 'assert';
-import { BasicTracerProvider, Span, Tracer } from '../../src';
+import { BasicTracerProvider, Span, SpanProcessor, Tracer } from '../../src';
 import { TestStackContextManager } from './export/TestStackContextManager';
 import * as sinon from 'sinon';
 
@@ -51,6 +52,17 @@ describe('Tracer', () => {
         },
       };
     }
+  }
+
+  class DummySpanProcessor implements SpanProcessor {
+      forceFlush () {
+        return Promise.resolve();
+      }
+      onStart() {}
+      onEnd() {}
+      shutdown() {
+        return Promise.resolve();
+      }
   }
 
   beforeEach(() => {
@@ -187,6 +199,54 @@ describe('Tracer', () => {
       trace.setSpanContext(ROOT_CONTEXT, parent)
     );
     assert.strictEqual((span as Span).parentSpanId, undefined);
+  });
+
+  it('should pass the same context to sampler and spanprocessor', () => {
+    const parent: SpanContext = {
+      traceId: '00112233445566778899001122334455',
+      spanId: '0011223344556677',
+      traceFlags: TraceFlags.SAMPLED,
+    };
+    const context = trace.setSpanContext(ROOT_CONTEXT, parent);
+
+    const sp: SpanProcessor = new DummySpanProcessor();
+    const onStartSpy = sinon.spy(sp, 'onStart');
+    const tp = new BasicTracerProvider();
+    tp.addSpanProcessor(sp);
+
+    const sampler: Sampler = new AlwaysOnSampler();
+    const shouldSampleSpy = sinon.spy(sampler, 'shouldSample');
+    const tracer = new Tracer({ name: 'default' }, { sampler }, tp);
+    const span = tracer.startSpan('a', {}, context) as Span;
+    assert.strictEqual(span.parentSpanId, parent.spanId);
+    sinon.assert.calledOnceWithExactly(shouldSampleSpy, context, parent.traceId, 'a', SpanKind.INTERNAL, {}, []);
+    sinon.assert.calledOnceWithExactly(onStartSpy, span, context);
+  });
+
+  it('should pass the same context to sampler and spanprocessor if options.root is true', () => {
+    const parent: SpanContext = {
+      traceId: '00112233445566778899001122334455',
+      spanId: '0011223344556677',
+      traceFlags: TraceFlags.SAMPLED,
+    };
+    const context = trace.setSpanContext(ROOT_CONTEXT, parent);
+
+    const sp: SpanProcessor = new DummySpanProcessor();
+    const onStartSpy = sinon.spy(sp, 'onStart');
+    const tp = new BasicTracerProvider();
+    tp.addSpanProcessor(sp);
+
+    const sampler: Sampler = new AlwaysOnSampler();
+    const shouldSampleSpy = sinon.spy(sampler, 'shouldSample');
+    const tracer = new Tracer({ name: 'default' }, { sampler }, tp);
+    const span = tracer.startSpan('a', { root: true }, context) as Span;
+    assert.strictEqual(span.parentSpanId, undefined);
+    sinon.assert.calledOnce(shouldSampleSpy);
+    sinon.assert.calledOnce(onStartSpy);
+    const samplerContext = shouldSampleSpy.firstCall.args[0];
+    const processorContext = onStartSpy.firstCall.args[1];
+    assert.strictEqual(samplerContext, processorContext);
+    assert.strictEqual(getSpan(samplerContext), undefined);
   });
 
   it('should sample a trace when OTEL_TRACES_SAMPLER_ARG is unset', () => {

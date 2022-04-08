@@ -1,14 +1,15 @@
 {
-  "name": "@opentelemetry/sdk-metrics-base-wip",
+  "name": "@opentelemetry/sdk-metrics-base",
   "version": "0.27.0",
   "private": true,
   "description": "Work in progress OpenTelemetry metrics SDK",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
-  "esm2015": "build/esm2015/index.js",
+  "esnext": "build/esnext/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
+    "prepublishOnly": "npm run compile",
     "compile": "tsc --build tsconfig.all.json",
     "clean": "tsc --build --clean tsconfig.all.json",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
@@ -33,15 +34,15 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=8.12.0"
   },
   "files": [
     "build/esm/**/*.js",
     "build/esm/**/*.js.map",
     "build/esm/**/*.d.ts",
-    "build/esm2015/**/*.js",
-    "build/esm2015/**/*.js.map",
-    "build/esm2015/**/*.d.ts",
+    "build/esnext/**/*.js",
+    "build/esnext/**/*.js.map",
+    "build/esnext/**/*.d.ts",
     "build/src/**/*.js",
     "build/src/**/*.js.map",
     "build/src/**/*.d.ts",
@@ -59,7 +60,7 @@
     "@types/node": "14.17.33",
     "@types/sinon": "10.0.6",
     "codecov": "3.8.3",
-    "karma": "6.3.8",
+    "karma": "6.3.16",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage-istanbul-reporter": "3.0.3",
     "karma-mocha": "2.0.1",
@@ -77,9 +78,9 @@
   },
   "todo": "Move API metrics to peer dependencies. While it is using an unpublished name, lerna doesn't properly link it if it is in peer dependencies",
   "dependencies": {
-    "@opentelemetry/api-metrics-wip": "0.27.0",
-    "@opentelemetry/core": "1.0.1",
-    "@opentelemetry/resources": "1.0.1",
+    "@opentelemetry/api-metrics": "0.27.0",
+    "@opentelemetry/core": "1.1.1",
+    "@opentelemetry/resources": "1.1.1",
     "lodash.merge": "4.6.2"
   }
 }

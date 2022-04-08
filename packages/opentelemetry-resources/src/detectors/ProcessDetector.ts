@@ -36,6 +36,9 @@ class ProcessDetector implements Detector {
       [SemanticResourceAttributes.PROCESS_COMMAND]: process.argv[1] || '',
       [SemanticResourceAttributes.PROCESS_COMMAND_LINE]:
         process.argv.join(' ') || '',
+      [SemanticResourceAttributes.PROCESS_RUNTIME_VERSION]: process.versions.node,
+      [SemanticResourceAttributes.PROCESS_RUNTIME_NAME]: 'nodejs',
+      [SemanticResourceAttributes.PROCESS_RUNTIME_DESCRIPTION]: 'Node.js',
     };
     return this._getResourceAttributes(processResource, config);
   }
@@ -56,7 +59,8 @@ class ProcessDetector implements Detector {
       processResource[SemanticResourceAttributes.PROCESS_EXECUTABLE_PATH] ===
         '' ||
       processResource[SemanticResourceAttributes.PROCESS_COMMAND] === '' ||
-      processResource[SemanticResourceAttributes.PROCESS_COMMAND_LINE] === ''
+      processResource[SemanticResourceAttributes.PROCESS_COMMAND_LINE] === '' ||
+      processResource[SemanticResourceAttributes.PROCESS_RUNTIME_VERSION] === ''
     ) {
       diag.debug(
         'ProcessDetector failed: Unable to find required process resources. '

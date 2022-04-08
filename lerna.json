@@ -1,8 +1,7 @@
 {
-  "version": "1.0.1",
+  "version": "1.1.1",
   "npmClient": "npm",
   "packages": [
-    "benchmark/*",
     "packages/*",
     "integration-tests/*",
     "selenium-tests"
