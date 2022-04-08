@@ -8,6 +8,9 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* `opentelemetry-instrumentation`
+  * [#2763](https://github.com/open-telemetry/opentelemetry-js/pull/2763) feat: support ESM in node via import-in-the-middle ([@lizthegrey](https://github.com/lizthegrey), [@bengl](https://github.com/bengl), and [@JamieDanielson](https://github.com/JamieDanielson))
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
