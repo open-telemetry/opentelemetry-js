@@ -3,6 +3,8 @@
   "npmClient": "npm",
   "packages": [
     "packages/*",
+    "experimental/packages/*",
+    "experimental/backwards-compatability/*",
     "integration-tests/*",
     "selenium-tests"
   ]

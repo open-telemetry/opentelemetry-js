@@ -10,6 +10,21 @@
   ],
   "references": [
     {
+      "path": "../../../packages/opentelemetry-context-async-hooks"
+    },
+    {
+      "path": "../../../packages/opentelemetry-core"
+    },
+    {
+      "path": "../../../packages/opentelemetry-sdk-trace-base"
+    },
+    {
+      "path": "../../../packages/opentelemetry-sdk-trace-node"
+    },
+    {
+      "path": "../../../packages/opentelemetry-semantic-conventions"
+    },
+    {
       "path": "../opentelemetry-instrumentation"
     }
   ]
