@@ -65,16 +65,16 @@
     "typescript": "4.4.4"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^1.0.3"
+    "@opentelemetry/api": "^1.1.0"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.5.9",
     "@grpc/proto-loader": "^0.6.9",
-    "@opentelemetry/core": "1.0.1",
+    "@opentelemetry/core": "1.1.1",
     "@opentelemetry/exporter-metrics-otlp-http": "0.27.0",
     "@opentelemetry/exporter-trace-otlp-grpc": "0.27.0",
     "@opentelemetry/exporter-trace-otlp-http": "0.27.0",
-    "@opentelemetry/resources": "1.0.1",
+    "@opentelemetry/resources": "1.1.1",
     "@opentelemetry/sdk-metrics-base": "0.27.0"
   }
 }

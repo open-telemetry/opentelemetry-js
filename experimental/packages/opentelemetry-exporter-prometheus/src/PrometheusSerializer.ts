@@ -23,8 +23,8 @@ import {
   MetricData,
   DataPoint,
   Histogram,
-} from '@opentelemetry/sdk-metrics-base-wip';
-import { Attributes } from '@opentelemetry/api-metrics-wip';
+} from '@opentelemetry/sdk-metrics-base';
+import { Attributes } from '@opentelemetry/api-metrics';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
 
 type PrometheusDataTypeLiteral =

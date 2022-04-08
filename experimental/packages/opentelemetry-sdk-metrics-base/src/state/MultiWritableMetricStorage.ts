@@ -15,7 +15,7 @@
  */
 
 import { Context } from '@opentelemetry/api';
-import { Attributes } from '@opentelemetry/api-metrics-wip';
+import { Attributes } from '@opentelemetry/api-metrics';
 import { WritableMetricStorage } from './WritableMetricStorage';
 
 /**

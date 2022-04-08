@@ -46,11 +46,11 @@
   "devDependencies": {
     "@grpc/grpc-js": "1.5.9",
     "@grpc/proto-loader": "0.6.9",
-    "@opentelemetry/api": "^1.0.3",
-    "@opentelemetry/context-async-hooks": "1.0.1",
-    "@opentelemetry/core": "1.0.1",
-    "@opentelemetry/sdk-trace-base": "1.0.1",
-    "@opentelemetry/sdk-trace-node": "1.0.1",
+    "@opentelemetry/api": "^1.1.0",
+    "@opentelemetry/context-async-hooks": "1.1.1",
+    "@opentelemetry/core": "1.1.1",
+    "@opentelemetry/sdk-trace-base": "1.1.1",
+    "@opentelemetry/sdk-trace-node": "1.1.1",
     "@types/mocha": "8.2.3",
     "@types/node": "14.17.33",
     "@types/semver": "7.3.9",
@@ -67,11 +67,11 @@
     "typescript": "4.4.4"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^1.0.3"
+    "@opentelemetry/api": "^1.1.0"
   },
   "dependencies": {
     "@opentelemetry/api-metrics": "0.27.0",
     "@opentelemetry/instrumentation": "0.27.0",
-    "@opentelemetry/semantic-conventions": "1.0.1"
+    "@opentelemetry/semantic-conventions": "1.1.1"
   }
 }

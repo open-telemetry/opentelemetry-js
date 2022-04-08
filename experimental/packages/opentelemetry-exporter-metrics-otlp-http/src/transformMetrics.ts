@@ -14,140 +14,153 @@
  * limitations under the License.
  */
 
-import { SpanAttributes, HrTime } from '@opentelemetry/api';
-import { Attributes as Labels, ValueType } from '@opentelemetry/api-metrics';
+import { SpanAttributes } from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
-import {
-  AggregatorKind,
-  Histogram,
-  MetricKind,
-  MetricRecord,
-} from '@opentelemetry/sdk-metrics-base';
-import { Resource } from '@opentelemetry/resources';
 import { OTLPExporterBase, otlpTypes, toCollectorResource } from '@opentelemetry/exporter-trace-otlp-http';
+import {
+  AggregationTemporality,
+  DataPointType,
+  Histogram,
+  InstrumentType,
+  MetricData,
+  ResourceMetrics
+} from '@opentelemetry/sdk-metrics-base';
+import { Attributes, ValueType } from '@opentelemetry/api-metrics';
 
 /**
- * Converts labels
- * @param labels
+ * Converts {@link Attributes} to a collector-compatible format.
+ * @param attributes
  */
-export function toCollectorLabels(
-  labels: Labels
+export function toCollectorAttributes(
+  attributes: Attributes
 ): otlpTypes.opentelemetryProto.common.v1.StringKeyValue[] {
-  return Object.entries(labels).map(([key, value]) => {
+  return Object.entries(attributes).map(([key, value]) => {
     return { key, value: String(value) };
   });
 }
 
 /**
- * Given a MetricDescriptor, return its temporality in a compatible format with the collector
- * @param descriptor
+ * Convert {@link AggregationTemporality} to a collector-compatible format.
+ * @param aggregationTemporality
  */
 export function toAggregationTemporality(
-  metric: MetricRecord
+  aggregationTemporality: AggregationTemporality
 ): otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality {
-  if (metric.descriptor.metricKind === MetricKind.OBSERVABLE_GAUGE) {
+  if (aggregationTemporality === AggregationTemporality.CUMULATIVE) {
     return otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
-      .AGGREGATION_TEMPORALITY_UNSPECIFIED;
+      .AGGREGATION_TEMPORALITY_CUMULATIVE;
+  }
+  if (aggregationTemporality === AggregationTemporality.DELTA) {
+    return otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
+      .AGGREGATION_TEMPORALITY_DELTA;
   }
 
-  return metric.aggregationTemporality;
+  return otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
+    .AGGREGATION_TEMPORALITY_UNSPECIFIED;
 }
 
 /**
- * Returns an DataPoint which can have integers or double values
- * @param metric
- * @param startTime
+ * Convert {@link MetricData} of {@link DataPointType.SINGULAR} to a collector-compatible format.
+ * @param metricData
  */
-export function toDataPoint(
-  metric: MetricRecord,
-  startTime: number
-): otlpTypes.opentelemetryProto.metrics.v1.DataPoint {
-  return {
-    labels: toCollectorLabels(metric.attributes),
-    value: metric.aggregator.toPoint().value as number,
-    startTimeUnixNano: startTime,
-    timeUnixNano: core.hrTimeToNanoseconds(
-      metric.aggregator.toPoint().timestamp
-    ),
-  };
+export function toSingularDataPoints(
+  metricData: MetricData
+): otlpTypes.opentelemetryProto.metrics.v1.DataPoint[] {
+  return Array.from(metricData.dataPoints.map(dataPoint => {
+    return {
+      labels: toCollectorAttributes(dataPoint.attributes),
+      value: dataPoint.value as number,
+      startTimeUnixNano: core.hrTimeToNanoseconds(
+        dataPoint.startTime
+      ),
+      timeUnixNano: core.hrTimeToNanoseconds(
+        dataPoint.endTime
+      ),
+    };
+  }));
 }
 
 /**
- * Returns a HistogramPoint to the collector
- * @param metric
- * @param startTime
+ * Convert {@link MetricData} of {@link DataPointType.HISTOGRAM} to a collector-compatible format.
+ * @param metricData
  */
-export function toHistogramPoint(
-  metric: MetricRecord,
-  startTime: number
-): otlpTypes.opentelemetryProto.metrics.v1.HistogramDataPoint {
-  const { value, timestamp } = metric.aggregator.toPoint() as {
-    value: Histogram;
-    timestamp: HrTime;
-  };
-  return {
-    labels: toCollectorLabels(metric.attributes),
-    sum: value.sum,
-    count: value.count,
-    startTimeUnixNano: startTime,
-    timeUnixNano: core.hrTimeToNanoseconds(timestamp),
-    bucketCounts: value.buckets.counts,
-    explicitBounds: value.buckets.boundaries,
-  };
+export function toHistogramDataPoints(
+  metricData: MetricData
+): otlpTypes.opentelemetryProto.metrics.v1.HistogramDataPoint[] {
+  return Array.from(metricData.dataPoints.map(dataPoints => {
+    const histogram = dataPoints.value as Histogram;
+    return {
+      labels: toCollectorAttributes(dataPoints.attributes),
+      sum: histogram.sum,
+      count: histogram.count,
+      startTimeUnixNano: core.hrTimeToNanoseconds(
+        dataPoints.startTime
+      ),
+      timeUnixNano: core.hrTimeToNanoseconds(
+        dataPoints.endTime
+      ),
+      bucketCounts: histogram.buckets.counts,
+      explicitBounds: histogram.buckets.boundaries,
+    };
+  }));
 }
 
 /**
- * Converts a metric to be compatible with the collector
- * @param metric
- * @param startTime start time in nanoseconds
+ * Converts {@link MetricData} to a collector-compatible format.
+ * @param metricData
+ * @param aggregationTemporality
  */
 export function toCollectorMetric(
-  metric: MetricRecord,
-  startTime: number
+  metricData: MetricData,
+  aggregationTemporality: AggregationTemporality
 ): otlpTypes.opentelemetryProto.metrics.v1.Metric {
   const metricCollector: otlpTypes.opentelemetryProto.metrics.v1.Metric = {
-    name: metric.descriptor.name,
-    description: metric.descriptor.description,
-    unit: metric.descriptor.unit,
+    name: metricData.descriptor.name,
+    description: metricData.descriptor.description,
+    unit: metricData.descriptor.unit,
   };
 
-  if (
-    metric.aggregator.kind === AggregatorKind.SUM ||
-    metric.descriptor.metricKind === MetricKind.OBSERVABLE_COUNTER ||
-    metric.descriptor.metricKind === MetricKind.OBSERVABLE_UP_DOWN_COUNTER
-  ) {
+  if (metricData.dataPointType === DataPointType.SINGULAR) {
     const result = {
-      dataPoints: [toDataPoint(metric, startTime)],
+      dataPoints: toSingularDataPoints(metricData),
       isMonotonic:
-        metric.descriptor.metricKind === MetricKind.COUNTER ||
-        metric.descriptor.metricKind === MetricKind.OBSERVABLE_COUNTER,
-      aggregationTemporality: toAggregationTemporality(metric),
+        metricData.descriptor.type === InstrumentType.COUNTER ||
+        metricData.descriptor.type === InstrumentType.OBSERVABLE_COUNTER,
+      aggregationTemporality: toAggregationTemporality(aggregationTemporality),
     };
-    if (metric.descriptor.valueType === ValueType.INT) {
-      metricCollector.intSum = result;
-    } else {
-      metricCollector.doubleSum = result;
+
+    if (
+      metricData.descriptor.type === InstrumentType.COUNTER ||
+      metricData.descriptor.type === InstrumentType.OBSERVABLE_COUNTER ||
+      metricData.descriptor.type === InstrumentType.UP_DOWN_COUNTER ||
+      metricData.descriptor.type === InstrumentType.OBSERVABLE_UP_DOWN_COUNTER
+    ) {
+      if (metricData.descriptor.valueType === ValueType.INT) {
+        metricCollector.intSum = result;
+      } else {
+        metricCollector.doubleSum = result;
+      }
+    } else{
+      // Instrument is a gauge.
+      if (metricData.descriptor.valueType === ValueType.INT) {
+        metricCollector.intGauge = result;
+      } else {
+        metricCollector.doubleGauge = result;
+      }
     }
-  } else if (metric.aggregator.kind === AggregatorKind.LAST_VALUE) {
+  } else if (metricData.dataPointType === DataPointType.HISTOGRAM) {
     const result = {
-      dataPoints: [toDataPoint(metric, startTime)],
+      dataPoints: toHistogramDataPoints(metricData),
+      aggregationTemporality: toAggregationTemporality(aggregationTemporality)
     };
-    if (metric.descriptor.valueType === ValueType.INT) {
-      metricCollector.intGauge = result;
-    } else {
-      metricCollector.doubleGauge = result;
-    }
-  } else if (metric.aggregator.kind === AggregatorKind.HISTOGRAM) {
-    const result = {
-      dataPoints: [toHistogramPoint(metric, startTime)],
-      aggregationTemporality: toAggregationTemporality(metric),
-    };
-    if (metric.descriptor.valueType === ValueType.INT) {
+    if (metricData.descriptor.valueType === ValueType.INT) {
       metricCollector.intHistogram = result;
     } else {
       metricCollector.doubleHistogram = result;
     }
   }
+
+  // TODO: Add support for exponential histograms when they're ready.
 
   return metricCollector;
 }
@@ -155,105 +168,64 @@ export function toCollectorMetric(
 /**
  * Prepares metric service request to be sent to collector
  * @param metrics metrics
- * @param startTime start time of the metric in nanoseconds
- * @param collectorMetricExporterBase
+ * @param aggregationTemporality
+ * @param collectorExporterBase
  */
-export function toOTLPExportMetricServiceRequest<
-  T extends otlpTypes.OTLPExporterConfigBase
->(
-  metrics: MetricRecord[],
-  startTime: number,
-  collectorExporterBase: OTLPExporterBase<
-    T,
-    MetricRecord,
-    otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
-  >
+export function toOTLPExportMetricServiceRequest<T extends otlpTypes.OTLPExporterConfigBase>(
+  metrics: ResourceMetrics,
+  aggregationTemporality: AggregationTemporality,
+  collectorExporterBase: OTLPExporterBase<T,
+    ResourceMetrics,
+    otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest>
 ): otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
-  const groupedMetrics: Map<
-    Resource,
-    Map<core.InstrumentationLibrary, MetricRecord[]>
-  > = groupMetricsByResourceAndLibrary(metrics);
   const additionalAttributes = Object.assign(
     {},
     collectorExporterBase.attributes
   );
   return {
     resourceMetrics: toCollectorResourceMetrics(
-      groupedMetrics,
+      metrics,
       additionalAttributes,
-      startTime
+      aggregationTemporality
     ),
   };
-}
-
-/**
- * Takes an array of metrics and groups them by resource and instrumentation
- * library
- * @param metrics metrics
- */
-export function groupMetricsByResourceAndLibrary(
-  metrics: MetricRecord[]
-): Map<Resource, Map<core.InstrumentationLibrary, MetricRecord[]>> {
-  return metrics.reduce((metricMap, metric) => {
-    //group by resource
-    let resourceMetrics = metricMap.get(metric.resource);
-    if (!resourceMetrics) {
-      resourceMetrics = new Map<core.InstrumentationLibrary, MetricRecord[]>();
-      metricMap.set(metric.resource, resourceMetrics);
-    }
-    //group by instrumentation library
-    let libMetrics = resourceMetrics.get(metric.instrumentationLibrary);
-    if (!libMetrics) {
-      libMetrics = new Array<MetricRecord>();
-      resourceMetrics.set(metric.instrumentationLibrary, libMetrics);
-    }
-    libMetrics.push(metric);
-    return metricMap;
-  }, new Map<Resource, Map<core.InstrumentationLibrary, MetricRecord[]>>());
 }
 
 /**
  * Convert to InstrumentationLibraryMetrics
  * @param instrumentationLibrary
  * @param metrics
- * @param startTime
+ * @param aggregationTemporality
  */
 function toCollectorInstrumentationLibraryMetrics(
   instrumentationLibrary: core.InstrumentationLibrary,
-  metrics: MetricRecord[],
-  startTime: number
+  metrics: MetricData[],
+  aggregationTemporality: AggregationTemporality
 ): otlpTypes.opentelemetryProto.metrics.v1.InstrumentationLibraryMetrics {
   return {
-    metrics: metrics.map(metric => toCollectorMetric(metric, startTime)),
+    metrics: metrics.map(metric => toCollectorMetric(metric, aggregationTemporality)),
     instrumentationLibrary,
   };
 }
 
 /**
  * Returns a list of resource metrics which will be exported to the collector
- * @param groupedSpans
+ * @param resourceMetrics
  * @param baseAttributes
+ * @param aggregationTemporality
  */
 function toCollectorResourceMetrics(
-  groupedMetrics: Map<
-    Resource,
-    Map<core.InstrumentationLibrary, MetricRecord[]>
-  >,
+  resourceMetrics: ResourceMetrics,
   baseAttributes: SpanAttributes,
-  startTime: number
+  aggregationTemporality: AggregationTemporality
 ): otlpTypes.opentelemetryProto.metrics.v1.ResourceMetrics[] {
-  return Array.from(groupedMetrics, ([resource, libMetrics]) => {
-    return {
-      resource: toCollectorResource(resource, baseAttributes),
-      instrumentationLibraryMetrics: Array.from(
-        libMetrics,
-        ([instrumentationLibrary, metrics]) =>
-          toCollectorInstrumentationLibraryMetrics(
-            instrumentationLibrary,
-            metrics,
-            startTime
-          )
-      ),
-    };
-  });
+  return [{
+    resource: toCollectorResource(resourceMetrics.resource, baseAttributes),
+    instrumentationLibraryMetrics: Array.from(resourceMetrics.instrumentationLibraryMetrics.map(
+      instrumentationLibraryMetrics => toCollectorInstrumentationLibraryMetrics(
+        instrumentationLibraryMetrics.instrumentationLibrary,
+        instrumentationLibraryMetrics.metrics,
+        aggregationTemporality
+      )))
+  }];
 }

@@ -13,130 +13,141 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { AggregationTemporality, ValueType } from '@opentelemetry/api-metrics';
+import { ValueType } from '@opentelemetry/api-metrics';
 import { Resource } from '@opentelemetry/resources';
 import {
-  HistogramAggregator,
-  LastValueAggregator,
-  MetricKind,
-  MetricRecord,
-  SumAggregator
+  AggregationTemporality,
+  DataPointType,
+  InstrumentType,
+  MetricData,
+  ResourceMetrics
 } from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
 import { createExportMetricsServiceRequest } from '../src/metrics';
 import { EAggregationTemporality } from '../src/metrics/types';
+import { hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
 
-const START_TIME = 1640715235584374000;
+const START_TIME = hrTime();
+const END_TIME = hrTime();
 
 describe('Metrics', () => {
   describe('createExportMetricsServiceRequest', () => {
-    let sumRecord: MetricRecord;
-    let sumAggregator: SumAggregator;
-    let observableSumRecord: MetricRecord;
-    let observableSumAggregator: SumAggregator;
-    let gaugeRecord: MetricRecord;
-    let gaugeAggregator: LastValueAggregator;
-    let histRecord: MetricRecord;
-    let histAggregator: HistogramAggregator;
-    let resource: Resource;
+    function createCounterData(value: number): MetricData {
+      return {
+        descriptor: {
+          description: 'this is a description',
+          type: InstrumentType.COUNTER,
+          name: 'counter',
+          unit: '1',
+          valueType: ValueType.INT,
+        },
+        dataPointType: DataPointType.SINGULAR,
+        dataPoints: [
+          {
+            value: value,
+            startTime: START_TIME,
+            endTime: END_TIME,
+            attributes: { 'string-attribute': 'some attribute value' }
+          }
+        ]
+      };
+    }
 
-    beforeEach(() => {
-      resource = new Resource({
-        'resource-attribute': 'resource attribute value',
-      });
-      sumAggregator = new SumAggregator();
-      sumRecord = {
-        aggregationTemporality:
-          AggregationTemporality.AGGREGATION_TEMPORALITY_DELTA,
-        attributes: { 'string-attribute': 'some attribute value' },
+    function createObservableCounterData(value: number): MetricData {
+      return {
         descriptor: {
           description: 'this is a description',
-          metricKind: MetricKind.COUNTER,
-          name: 'counter',
+          type: InstrumentType.OBSERVABLE_COUNTER,
+          name: 'observable-counter',
           unit: '1',
           valueType: ValueType.INT,
         },
-        aggregator: sumAggregator,
-        instrumentationLibrary: {
-          name: 'mylib',
-          version: '0.1.0',
-          schemaUrl: 'http://url.to.schema'
-        },
-        resource,
+        dataPointType: DataPointType.SINGULAR,
+        dataPoints: [
+          {
+            value: value,
+            startTime: START_TIME,
+            endTime: END_TIME,
+            attributes: { 'string-attribute': 'some attribute value' }
+          }
+        ]
       };
-      observableSumAggregator = new SumAggregator();
-      observableSumRecord = {
-        aggregationTemporality:
-          AggregationTemporality.AGGREGATION_TEMPORALITY_DELTA,
-        attributes: { 'string-attribute': 'some attribute value' },
+    }
+
+    function createObservableGaugeData(value: number): MetricData {
+      return {
         descriptor: {
           description: 'this is a description',
-          metricKind: MetricKind.OBSERVABLE_COUNTER,
-          name: 'counter',
-          unit: '1',
-          valueType: ValueType.INT,
-        },
-        aggregator: observableSumAggregator,
-        instrumentationLibrary: {
-          name: 'mylib',
-          version: '0.1.0',
-          schemaUrl: 'http://url.to.schema'
-        },
-        resource,
-      };
-      gaugeAggregator = new LastValueAggregator();
-      gaugeRecord = {
-        aggregationTemporality:
-          AggregationTemporality.AGGREGATION_TEMPORALITY_UNSPECIFIED,
-        attributes: { 'string-attribute': 'some attribute value' },
-        descriptor: {
-          description: 'this is a description',
-          metricKind: MetricKind.OBSERVABLE_GAUGE,
+          type: InstrumentType.OBSERVABLE_GAUGE,
           name: 'gauge',
           unit: '1',
           valueType: ValueType.DOUBLE,
         },
-        aggregator: gaugeAggregator,
-        instrumentationLibrary: {
-          name: 'mylib',
-          version: '0.1.0',
-          schemaUrl: 'http://url.to.schema'
-        },
-        resource,
+        dataPointType: DataPointType.SINGULAR,
+        dataPoints: [
+          {
+            value: value,
+            startTime: START_TIME,
+            endTime: END_TIME,
+            attributes: { 'string-attribute': 'some attribute value' }
+          }
+        ]
       };
-      histAggregator = new HistogramAggregator([5]);
-      histRecord = {
-        aggregationTemporality:
-          AggregationTemporality.AGGREGATION_TEMPORALITY_UNSPECIFIED,
-        attributes: { 'string-attribute': 'some attribute value' },
+    }
+
+    function createHistogramMetrics(count: number, sum: number, boundaries: number[], counts: number[]): MetricData {
+      return {
         descriptor: {
           description: 'this is a description',
-          metricKind: MetricKind.HISTOGRAM,
+          type: InstrumentType.HISTOGRAM,
           name: 'hist',
           unit: '1',
           valueType: ValueType.INT,
         },
-        aggregator: histAggregator,
-        instrumentationLibrary: {
-          name: 'mylib',
-          version: '0.1.0',
-          schemaUrl: 'http://url.to.schema'
-        },
-        resource,
+        dataPointType: DataPointType.HISTOGRAM,
+        dataPoints: [
+          {
+            value: {
+              sum: sum,
+              count: count,
+              buckets: {
+                boundaries: boundaries,
+                counts: counts
+              }
+            },
+            startTime: START_TIME,
+            endTime: END_TIME,
+            attributes: { 'string-attribute': 'some attribute value' },
+          }
+        ]
       };
-    });
+    }
 
-    it('returns null on an empty list', () => {
-      assert.strictEqual(createExportMetricsServiceRequest([], 0), null);
-    });
+    function createResourceMetrics(metricData: MetricData[]): ResourceMetrics {
+      const resource = new Resource({
+        'resource-attribute': 'resource attribute value',
+      });
+      return {
+        resource: resource,
+        instrumentationLibraryMetrics:
+          [
+            {
+              instrumentationLibrary: {
+                name: 'mylib',
+                version: '0.1.0',
+                schemaUrl: 'http://url.to.schema'
+              },
+              metrics: metricData
+            }
+          ]
+      };
+    }
 
     it('serializes a sum metric record', () => {
-      sumAggregator.update(10);
-      // spoof the update time
-      sumAggregator['_lastUpdateTime'] = [1640715557, 342725388];
+      const metrics = createResourceMetrics([createCounterData(10)]);
       const exportRequest = createExportMetricsServiceRequest(
-        [sumRecord],
-        START_TIME
+        metrics,
+        AggregationTemporality.DELTA
       );
       assert.ok(exportRequest);
 
@@ -178,9 +189,8 @@ describe('Metrics', () => {
                               },
                             },
                           ],
-                          startTimeUnixNano: START_TIME,
-                          // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
-                          timeUnixNano: 1640715557342725388,
+                          startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
+                          timeUnixNano: hrTimeToNanoseconds(END_TIME),
                           asInt: 10,
                         },
                       ],
@@ -197,12 +207,9 @@ describe('Metrics', () => {
     });
 
     it('serializes an observable sum metric record', () => {
-      observableSumAggregator.update(10);
-      // spoof the update time
-      observableSumAggregator['_lastUpdateTime'] = [1640715557, 342725388];
       const exportRequest = createExportMetricsServiceRequest(
-        [observableSumRecord],
-        START_TIME
+        createResourceMetrics([createObservableCounterData(10)]),
+        AggregationTemporality.DELTA
       );
       assert.ok(exportRequest);
 
@@ -230,7 +237,7 @@ describe('Metrics', () => {
                 schemaUrl: 'http://url.to.schema',
                 metrics: [
                   {
-                    name: 'counter',
+                    name: 'observable-counter',
                     description: 'this is a description',
                     unit: '1',
                     sum: {
@@ -244,9 +251,8 @@ describe('Metrics', () => {
                               },
                             },
                           ],
-                          startTimeUnixNano: START_TIME,
-                          // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
-                          timeUnixNano: 1640715557342725388,
+                          startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
+                          timeUnixNano: hrTimeToNanoseconds(END_TIME),
                           asInt: 10,
                         },
                       ],
@@ -263,12 +269,9 @@ describe('Metrics', () => {
     });
 
     it('serializes a gauge metric record', () => {
-      gaugeAggregator.update(10.5);
-      // spoof the update time
-      gaugeAggregator['_lastUpdateTime'] = [1640715557, 342725388];
       const exportRequest = createExportMetricsServiceRequest(
-        [gaugeRecord],
-        START_TIME
+        createResourceMetrics([createObservableGaugeData(10.5)]),
+        AggregationTemporality.DELTA
       );
       assert.ok(exportRequest);
 
@@ -310,9 +313,8 @@ describe('Metrics', () => {
                               },
                             },
                           ],
-                          startTimeUnixNano: START_TIME,
-                          // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
-                          timeUnixNano: 1640715557342725388,
+                          startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
+                          timeUnixNano: hrTimeToNanoseconds(END_TIME),
                           asDouble: 10.5,
                         },
                       ],
@@ -327,13 +329,9 @@ describe('Metrics', () => {
     });
 
     it('serializes a histogram metric record', () => {
-      histAggregator.update(2);
-      histAggregator.update(7);
-      // spoof the update time
-      histAggregator['_lastUpdateTime'] = [1640715557, 342725388];
       const exportRequest = createExportMetricsServiceRequest(
-        [histRecord],
-        START_TIME
+        createResourceMetrics([createHistogramMetrics(2, 9, [5], [1,1])]),
+        AggregationTemporality.CUMULATIVE
       );
       assert.ok(exportRequest);
 
@@ -365,7 +363,7 @@ describe('Metrics', () => {
                     description: 'this is a description',
                     unit: '1',
                     histogram: {
-                      aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_UNSPECIFIED,
+                      aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
                       dataPoints: [
                         {
                           attributes: [
@@ -380,9 +378,8 @@ describe('Metrics', () => {
                           count: 2,
                           explicitBounds: [5],
                           sum: 9,
-                          startTimeUnixNano: START_TIME,
-                          // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
-                          timeUnixNano: 1640715557342725388,
+                          startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
+                          timeUnixNano: hrTimeToNanoseconds(END_TIME),
                         },
                       ],
                     },
