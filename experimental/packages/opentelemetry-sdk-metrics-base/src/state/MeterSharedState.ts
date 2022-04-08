@@ -15,7 +15,7 @@
  */
 
 import { HrTime } from '@opentelemetry/api';
-import * as metrics from '@opentelemetry/api-metrics-wip';
+import * as metrics from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { InstrumentationLibraryMetrics } from '../export/MetricData';
 import { createInstrumentDescriptorWithView, InstrumentDescriptor } from '../InstrumentDescriptor';
