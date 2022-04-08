@@ -19,7 +19,7 @@ node --require '@opentelemetry/auto-instrumentation-agent' app.js
 For configuration you can provide different environment variables, e.g. if you want to change the log level and the exporter:
 
 ```shell
-env OTEL_SERVICE=my-app OTEL_LOG_LEVEL=debug OTEL_TRACES_EXPORTER=logger node --require '@opentelemetry/auto-instrumentation-agent' app.js
+env OTEL_SERVICE=my-app OTEL_LOG_LEVEL=debug OTEL_TRACES_EXPORTER=console node --require '@opentelemetry/auto-instrumentation-agent' app.js
 ```
 
 If your `node` is encapsulated in a complex run script, you can also set it via an environment variable.

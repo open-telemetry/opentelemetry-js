@@ -42,17 +42,16 @@ function buildTraceExporterFromEnv() : tracing.SpanExporter | undefined {
                 url: getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT || getEnv().OTEL_EXPORTER_OTLP_ENDPOINT,
                 headers: {}// something something getEnv().OTEL_EXPORTER_OTLP_HEADERS 
             })
+        case 'console':
         case 'logger':
             return new tracing.ConsoleSpanExporter()
         default:
             diag.error( 
-                `Exporter "${exporterName}" requested through environment variable is unavailable.` 
+                `Exporter "${exporterName}" is unavailable.` 
               ); 
             return
     }
 }
-
-diag.setLogger(new DiagConsoleLogger(), getEnv().OTEL_LOG_LEVEL);
 
 const sdk = new NodeSDK({
     autoDetectResources: true,
@@ -61,3 +60,5 @@ const sdk = new NodeSDK({
 });
 
 sdk.start();
+
+diag.setLogger(new DiagConsoleLogger(), getEnv().OTEL_LOG_LEVEL);
