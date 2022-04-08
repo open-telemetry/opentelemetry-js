@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { Attributes } from '@opentelemetry/api-metrics-wip';
+import { Attributes } from '@opentelemetry/api-metrics';
 
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#measurement
 

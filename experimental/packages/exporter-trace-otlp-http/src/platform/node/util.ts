@@ -50,7 +50,6 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
     path: parsedUrl.pathname,
     method: 'POST',
     headers: {
-      'Content-Length': Buffer.byteLength(data),
       'Content-Type': contentType,
       ...collector.headers,
     },
@@ -96,9 +95,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
       break;
     }
     default:
-      req.write(data);
-      req.end();
-
+      req.end(data);
       break;
   }
 }

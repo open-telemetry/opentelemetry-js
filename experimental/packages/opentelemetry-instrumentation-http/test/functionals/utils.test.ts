@@ -37,23 +37,29 @@ import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 describe('Utility', () => {
   describe('parseResponseStatus()', () => {
     it('should return ERROR code by default', () => {
-      const status = utils.parseResponseStatus(
-        (undefined as unknown) as number
-      );
-      assert.deepStrictEqual(status, { code: SpanStatusCode.ERROR });
+      const status = utils.parseResponseStatus(SpanKind.CLIENT, undefined);
+      assert.deepStrictEqual(status, SpanStatusCode.ERROR);
     });
 
-    it('should return OK for Success HTTP status code', () => {
+    it('should return UNSET for Success HTTP status code', () => {
       for (let index = 100; index < 400; index++) {
-        const status = utils.parseResponseStatus(index);
-        assert.deepStrictEqual(status, { code: SpanStatusCode.OK });
+        const status = utils.parseResponseStatus(SpanKind.CLIENT, index);
+        assert.deepStrictEqual(status, SpanStatusCode.UNSET);
+      }
+      for (let index = 100; index < 500; index++) {
+        const status = utils.parseResponseStatus(SpanKind.SERVER, index);
+        assert.deepStrictEqual(status, SpanStatusCode.UNSET);
       }
     });
 
-    it('should not return OK for Bad HTTP status code', () => {
+    it('should return ERROR for bad status codes', () => {
       for (let index = 400; index <= 600; index++) {
-        const status = utils.parseResponseStatus(index);
-        assert.notStrictEqual(status.code, SpanStatusCode.OK);
+        const status = utils.parseResponseStatus(SpanKind.CLIENT, index);
+        assert.notStrictEqual(status, SpanStatusCode.UNSET);
+      }
+      for (let index = 500; index <= 600; index++) {
+        const status = utils.parseResponseStatus(SpanKind.SERVER, index);
+        assert.notStrictEqual(status, SpanStatusCode.UNSET);
       }
     });
   });
@@ -227,23 +233,21 @@ describe('Utility', () => {
   describe('setSpanWithError()', () => {
     it('should have error attributes', () => {
       const errorMessage = 'test error';
-      for (const obj of [undefined, { statusCode: 400 }]) {
-        const span = new Span(
-          new BasicTracerProvider().getTracer('default'),
-          ROOT_CONTEXT,
-          'test',
-          { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
-          SpanKind.INTERNAL
-        );
-        /* tslint:disable-next-line:no-any */
-        utils.setSpanWithError(span, new Error(errorMessage), obj as any);
-        const attributes = span.attributes;
-        assert.strictEqual(
-          attributes[AttributeNames.HTTP_ERROR_MESSAGE],
-          errorMessage
-        );
-        assert.ok(attributes[AttributeNames.HTTP_ERROR_NAME]);
-      }
+      const span = new Span(
+        new BasicTracerProvider().getTracer('default'),
+        ROOT_CONTEXT,
+        'test',
+        { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
+        SpanKind.INTERNAL
+      );
+      /* tslint:disable-next-line:no-any */
+      utils.setSpanWithError(span, new Error(errorMessage));
+      const attributes = span.attributes;
+      assert.strictEqual(
+        attributes[AttributeNames.HTTP_ERROR_MESSAGE],
+        errorMessage
+      );
+      assert.ok(attributes[AttributeNames.HTTP_ERROR_NAME]);
     });
   });
 

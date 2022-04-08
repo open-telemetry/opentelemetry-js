@@ -13,92 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { InstrumentationLibrary } from '@opentelemetry/core';
-import type { Resource } from '@opentelemetry/resources';
-import type { MetricRecord } from '@opentelemetry/sdk-metrics-base';
+import type { ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
 import { toAttributes } from '../common/internal';
 import { toMetric } from './internal';
 import type { IExportMetricsServiceRequest } from './types';
+import { AggregationTemporality } from '@opentelemetry/sdk-metrics-base';
 
-export function createExportMetricsServiceRequest(metricRecords: MetricRecord[], startTime: number): IExportMetricsServiceRequest | null {
-  if (metricRecords.length === 0) {
-    return null;
-  }
-
+export function createExportMetricsServiceRequest(resourceMetrics: ResourceMetrics,
+                                                  aggregationTemporality: AggregationTemporality): IExportMetricsServiceRequest | null {
   return {
-    resourceMetrics: metricRecordsToResourceMetrics(metricRecords).map(({ resource, resourceMetrics, resourceSchemaUrl }) => ({
+    resourceMetrics: [{
       resource: {
-        attributes: toAttributes(resource.attributes),
-        droppedAttributesCount: 0,
+        attributes: toAttributes(resourceMetrics.resource.attributes),
+        droppedAttributesCount: 0
       },
-      instrumentationLibraryMetrics: resourceMetrics.map(({ instrumentationLibrary, instrumentationLibraryMetrics, librarySchemaUrl }) => ({
-        instrumentationLibrary: {
-          name: instrumentationLibrary.name,
-          version: instrumentationLibrary.version,
-        },
-        metrics: instrumentationLibraryMetrics.map(m => toMetric(m, startTime)),
-        schemaUrl: librarySchemaUrl,
-      })),
-      schemaUrl: resourceSchemaUrl,
-    }))
+      schemaUrl: undefined, // TODO: Schema Url does not exist yet in the SDK.
+      instrumentationLibraryMetrics: Array.from(resourceMetrics.instrumentationLibraryMetrics.map(metrics => {
+        return {
+          instrumentationLibrary: {
+            name: metrics.instrumentationLibrary.name,
+            version: metrics.instrumentationLibrary.version,
+          },
+          metrics: metrics.metrics.map(metricData => toMetric(metricData, aggregationTemporality)),
+          schemaUrl: metrics.instrumentationLibrary.schemaUrl
+        };
+      }))
+    }]
   };
-}
-
-type IntermediateResourceMetrics = {
-  resource: Resource,
-  resourceMetrics: IntermediateInstrumentationLibraryMetrics[],
-  resourceSchemaUrl?: string,
-};
-
-type IntermediateInstrumentationLibraryMetrics = {
-  instrumentationLibrary: InstrumentationLibrary,
-  instrumentationLibraryMetrics: MetricRecord[],
-  librarySchemaUrl?: string,
-};
-
-function metricRecordsToResourceMetrics(metricRecords: MetricRecord[]): IntermediateResourceMetrics[] {
-  const resourceMap: Map<Resource, Map<string, MetricRecord[]>> = new Map();
-
-  for (const record of metricRecords) {
-    let ilmMap = resourceMap.get(record.resource);
-
-    if (!ilmMap) {
-      ilmMap = new Map();
-      resourceMap.set(record.resource, ilmMap);
-    }
-
-    const instrumentationLibraryKey = `${record.instrumentationLibrary.name}@${record.instrumentationLibrary.name || ''}:${record.instrumentationLibrary.schemaUrl || ''}`;
-    let records = ilmMap.get(instrumentationLibraryKey);
-
-    if (!records) {
-      records = [];
-      ilmMap.set(instrumentationLibraryKey, records);
-    }
-
-    records.push(record);
-  }
-
-  const out: IntermediateResourceMetrics[] = [];
-
-  const resourceMapEntryIterator = resourceMap.entries();
-  let resourceMapEntry = resourceMapEntryIterator.next();
-  while (!resourceMapEntry.done) {
-    const [resource, ilmMap] = resourceMapEntry.value;
-    const resourceMetrics: IntermediateInstrumentationLibraryMetrics[] = [];
-    const ilmIterator = ilmMap.values();
-    let ilmEntry = ilmIterator.next();
-    while (!ilmEntry.done) {
-      const instrumentationLibraryMetrics = ilmEntry.value;
-      if (instrumentationLibraryMetrics.length > 0) {
-        const lib = instrumentationLibraryMetrics[0].instrumentationLibrary;
-        resourceMetrics.push({ instrumentationLibrary: lib, instrumentationLibraryMetrics, librarySchemaUrl: lib.schemaUrl });
-      }
-      ilmEntry = ilmIterator.next();
-    }
-    // TODO SDK types don't provide resource schema URL at this time
-    out.push({ resource, resourceMetrics });
-    resourceMapEntry = resourceMapEntryIterator.next();
-  }
-
-  return out;
 }

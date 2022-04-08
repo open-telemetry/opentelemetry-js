@@ -45,6 +45,33 @@ You will receive the following error :
 
 Here an example that will pass the verification: `git commit -s -am "chore(opentelemetry-core): update deps"`
 
+### Changelog
+
+An entry into `CHANGELOG.md` or `experimental/CHANGELOG.md` is required for the following reasons:
+
+- Changes made to the behaviour of the component
+- Changes to the configuration
+- Changes to default settings
+- New components being added
+
+It is reasonable to omit an entry to the changelog under these circuimstances:
+
+- Updating test to remove flakiness or improve coverage
+- Updates to the CI/CD process
+
+If there is some uncertainty with regards to if a changelog entry is needed, the recommendation is to create an entry to in the event that the change is important to the project consumers.
+If a change does not require a changelog entry, the label `"Skip Changelog"` may be applied.
+Pull requests with the `dependencies` label will be skipped by the changelog CI check.
+If the change affects the overall project and not any individual package, it should usually go in the main changelog.
+Changelog entries should be in the following format:
+
+```md
+* feat(subject): pull request title here #{pull request number} @{author github handle}
+```
+
+Subject should describe the area of the project that was changed as descriptively as is possible in a short space.
+For example, this may be the package name if a single package was updated or just `metrics` if both the metrics API and SDK are affected.
+
 ### Fork
 
 In the interest of keeping this repository clean and manageable, you should work from a fork. To create a fork, click the 'Fork' button at the top of the repository, then clone the fork locally using `git clone git@github.com:USERNAME/opentelemetry-js.git`.

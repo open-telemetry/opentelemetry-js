@@ -1,5 +1,5 @@
 {
-  "name": "@opentelemetry/api-metrics-wip",
+  "name": "@opentelemetry/api-metrics",
   "version": "0.27.0",
   "private": true,
   "description": "Public metrics API for OpenTelemetry",
@@ -42,7 +42,7 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=8.12.0"
   },
   "files": [
     "build/esm/**/*.js",

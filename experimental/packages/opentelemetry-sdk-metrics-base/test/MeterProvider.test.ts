@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { NOOP_METER } from '@opentelemetry/api-metrics-wip';
+import { NOOP_METER } from '@opentelemetry/api-metrics';
 import { Meter, MeterProvider, InstrumentType, DataPointType } from '../src';
 import {
   assertInstrumentationLibraryMetrics,
