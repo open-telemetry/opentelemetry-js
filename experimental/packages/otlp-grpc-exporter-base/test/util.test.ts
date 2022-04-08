@@ -18,7 +18,7 @@ import * as sinon from 'sinon';
 import * as assert from 'assert';
 
 import { diag } from '@opentelemetry/api';
-import { validateAndNormalizeUrl, configureCompression } from '../src/util';
+import { validateAndNormalizeUrl, configureCompression, GrpcCompressionAlgorithm } from '../src/util';
 import { CompressionAlgorithm } from "@opentelemetry/otlp-exporter-base";
 
 // Tests added to detect breakage released in #2130
@@ -85,19 +85,19 @@ describe('configureCompression', () => {
   const envSource = process.env;
   it('should return none for compression', () => {
     const compression = CompressionAlgorithm.NONE;
-    assert.strictEqual(configureCompression(compression), CompressionAlgorithm.NONE);
+    assert.strictEqual(configureCompression(compression), GrpcCompressionAlgorithm.NONE);
   });
   it('should return gzip compression defined via env', () => {
     envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = 'gzip';
-    assert.strictEqual(configureCompression(undefined),CompressionAlgorithm.GZIP);
+    assert.strictEqual(configureCompression(undefined),GrpcCompressionAlgorithm.GZIP);
     delete envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION;
   });
   it('should return none for compression defined via env', () => {
     envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION = 'none';
-    assert.strictEqual(configureCompression(undefined),CompressionAlgorithm.NONE);
+    assert.strictEqual(configureCompression(undefined),GrpcCompressionAlgorithm.NONE);
     delete envSource.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION;
   });
   it('should return none for compression when no compression is set', () => {
-    assert.strictEqual(configureCompression(undefined),CompressionAlgorithm.NONE);
+    assert.strictEqual(configureCompression(undefined),GrpcCompressionAlgorithm.NONE);
   });
 });

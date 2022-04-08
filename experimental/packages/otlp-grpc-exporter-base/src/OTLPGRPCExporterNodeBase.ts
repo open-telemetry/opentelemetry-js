@@ -23,8 +23,8 @@ import {
 } from './types';
 import { ServiceClient } from './types';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
-import { configureCompression } from './util';
-import { CompressionAlgorithm, OTLPExporterBase, OTLPExporterError } from '@opentelemetry/otlp-exporter-base';
+import { configureCompression, GrpcCompressionAlgorithm } from './util';
+import { OTLPExporterBase, OTLPExporterError } from '@opentelemetry/otlp-exporter-base';
 
 /**
  * OTLP Exporter abstract base class
@@ -41,7 +41,7 @@ export abstract class OTLPGRPCExporterNodeBase<
   metadata?: Metadata;
   serviceClient?: ServiceClient = undefined;
   private _send!: Function;
-  compression: CompressionAlgorithm;
+  compression: GrpcCompressionAlgorithm;
 
   constructor(config: OTLPGRPCExporterConfigNode = {}) {
     super(config);

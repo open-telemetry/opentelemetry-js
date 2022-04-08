@@ -16,4 +16,4 @@
 
 export * from './OTLPGRPCExporterNodeBase';
 export { ServiceClientType, OTLPGRPCExporterConfigNode } from './types';
-export { validateAndNormalizeUrl } from './util';
+export { validateAndNormalizeUrl, GrpcCompressionAlgorithm } from './util';

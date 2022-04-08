@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
+import { diag, DiagLogger } from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as http from 'http';
@@ -32,11 +32,9 @@ import {
   ensureSpanIsCorrect,
   mockedReadableSpan,
 } from '../traceHelper';
-import { OTLPExporterError } from '@opentelemetry/otlp-exporter-base';
-import {
+import { OTLPExporterError,
   CompressionAlgorithm,
-  OTLPExporterNodeConfigBase
-} from '@opentelemetry/otlp-exporter-base/src/platform/node';
+  OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 
 let fakeRequest: PassThrough;
 
@@ -58,12 +56,23 @@ describe('OTLPTraceExporter - node with json over http', () => {
     it('should warn about metadata when using json', () => {
       const metadata = 'foo';
       // Need to stub/spy on the underlying logger as the "diag" instance is global
-      const spyLoggerWarn = sinon.stub(diag, 'warn');
+      const warnStub = sinon.stub();
+      const nop = () => {
+      };
+      const diagLogger: DiagLogger = {
+        debug: nop,
+        error: nop,
+        info: nop,
+        verbose: nop,
+        warn: warnStub
+      };
+      diag.setLogger(diagLogger);
+
       collectorExporter = new OTLPTraceExporter({
         metadata,
         url: address,
       } as any);
-      const args = spyLoggerWarn.args[0];
+      const args = warnStub.args[0];
       assert.strictEqual(args[0], 'Metadata cannot be set when using http');
     });
   });

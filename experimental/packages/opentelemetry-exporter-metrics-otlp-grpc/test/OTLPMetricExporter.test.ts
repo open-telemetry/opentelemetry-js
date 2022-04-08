@@ -38,9 +38,9 @@ import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metr
 
 const metricsServiceProtoPath =
   'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
-const includeDirs = [path.resolve(__dirname, '../protos')];
+const includeDirs = [path.resolve(__dirname, '../../otlp-grpc-exporter-base/protos')];
 
-const address = 'localhost:1501';
+const address = 'localhost:1502';
 
 type TestParams = {
   useTLS?: boolean;
@@ -105,7 +105,9 @@ const testOTLPMetricExporter = (params: TestParams) =>
               ]
             )
             : grpc.ServerCredentials.createInsecure();
-          server.bindAsync(address, credentials, () => {
+          server.bindAsync(address, credentials, error => {
+            if(error)
+              throw error;
             server.start();
             done();
           });
@@ -324,4 +326,6 @@ describe('', () => {
   testOTLPMetricExporter({ useTLS: false });
   testOTLPMetricExporter({ metadata });
 });
+
+
 
