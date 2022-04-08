@@ -17,7 +17,8 @@
 import * as types from '../../types';
 import * as path from 'path';
 import * as RequireInTheMiddle from 'require-in-the-middle';
-import ImportInTheMiddle, { HookFn } from 'import-in-the-middle';
+import { HookFn } from 'import-in-the-middle';
+import * as ImportInTheMiddle from 'import-in-the-middle';
 import { satisfies } from 'semver';
 import { InstrumentationAbstract } from '../../instrumentation';
 import { InstrumentationModuleDefinition } from './types';
@@ -148,7 +149,7 @@ export abstract class InstrumentationBase<T = any>
           );
         };
       RequireInTheMiddle([module.name], { internals: true }, hookFn);
-      new ImportInTheMiddle([module.name], { internals: true }, <HookFn>hookFn);
+      new (ImportInTheMiddle as unknown as typeof ImportInTheMiddle.default) ([module.name], { internals: true }, <HookFn>hookFn);
     }
   }
 
