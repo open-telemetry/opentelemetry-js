@@ -16,6 +16,12 @@ Start your node.js application as you are used to it but add a require statement
 node --require '@opentelemetry/auto-instrumentation-agent' app.js
 ```
 
+For configuration you can provide different environment variables, e.g. if you want to change the log level and the exporter:
+
+```shell
+env OTEL_SERVICE=my-app OTEL_LOG_LEVEL=debug OTEL_TRACES_EXPORTER=logger node --require '@opentelemetry/auto-instrumentation-agent' app.js
+```
+
 If your `node` is encapsulated in a complex run script, you can also set it via an environment variable.
 
 Let's say you have a `run.sh` that sets up a few things, before running `node` you can add the agent like the following:
@@ -29,9 +35,6 @@ Of course you can load the agent as requirement in your source code. Put it at t
 ```shell
 require('@opentelemetry/auto-instrumentation-agent')
 ```
-
-This is especially useful in containerized environments.
-
 
 ## Why?
 

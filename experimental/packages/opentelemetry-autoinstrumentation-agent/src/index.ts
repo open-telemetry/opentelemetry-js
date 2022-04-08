@@ -14,14 +14,50 @@
  * limitations under the License.
  */
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
-// import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
+// import { OTLPTraceExporter as OTLP_GRPC_TraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
+import { OTLPTraceExporter as OTLP_HTTP_TraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 
+
+import { diag, DiagConsoleLogger } from '@opentelemetry/api';
+import { getEnv } from '@opentelemetry/core';
 import { NodeSDK, tracing } from '@opentelemetry/sdk-node';
+
+
+// copied from https://github.com/open-telemetry/opentelemetry-js/issues/2873
+// todo: move this to @opentelemetry/sdk-node
+function buildTraceExporterFromEnv() : tracing.SpanExporter | undefined {
+    const exporterName = getEnv().OTEL_TRACES_EXPORTER; 
+    switch(exporterName) {
+        case 'none':
+            return
+        case 'otlp':
+            /* OTEL_EXPORTER_OTLP_PROTOCOL is not yet supported
+            if(getEnv().OTEL_EXPORTER_OTLP_PROTOCOL === 'grpc') {
+                return new OTLP_GRPC_TraceExporter({
+                    url: getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT || getEnv().OTEL_EXPORTER_OTLP_ENDPOINT,
+                    headers: // something something getEnv().OTEL_EXPORTER_OTLP_HEADERS 
+                })
+            }*/
+            return new OTLP_HTTP_TraceExporter({
+                url: getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT || getEnv().OTEL_EXPORTER_OTLP_ENDPOINT,
+                headers: {}// something something getEnv().OTEL_EXPORTER_OTLP_HEADERS 
+            })
+        case 'logger':
+            return new tracing.ConsoleSpanExporter()
+        default:
+            diag.error( 
+                `Exporter "${exporterName}" requested through environment variable is unavailable.` 
+              ); 
+            return
+    }
+}
+
+diag.setLogger(new DiagConsoleLogger(), getEnv().OTEL_LOG_LEVEL);
 
 const sdk = new NodeSDK({
     autoDetectResources: true,
     instrumentations: [getNodeAutoInstrumentations()],
-    traceExporter: new tracing.ConsoleSpanExporter(),
+    traceExporter: buildTraceExporterFromEnv()
 });
 
 sdk.start();
