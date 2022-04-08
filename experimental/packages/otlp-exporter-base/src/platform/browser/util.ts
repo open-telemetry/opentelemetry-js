@@ -85,7 +85,6 @@ export function sendWithXhr(
           `Failed to export with XHR (status: ${xhr.status})`,
           xhr.status
         );
-
         onError(error);
       }
     }

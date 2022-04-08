@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
+import { diag, DiagLogger, DiagLogLevel } from '@opentelemetry/api';
 import { ExportResultCode } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
@@ -103,15 +103,26 @@ describe('OTLPTraceExporter - web', () => {
       });
 
       it('should log the successful message', done => {
-        // Need to stub/spy on the underlying logger as the "diag" instance is global
-        const spyLoggerDebug = sinon.stub(diag, 'debug');
-        const spyLoggerError = sinon.stub(diag, 'error');
+        const spyLoggerDebug = sinon.stub();
+        const spyLoggerError = sinon.stub();
+        const nop = () => {
+        };
+        const diagLogger: DiagLogger = {
+          debug: spyLoggerDebug,
+          error: spyLoggerError,
+          info: nop,
+          verbose: nop,
+          warn: nop
+        };
+
+        diag.setLogger(diagLogger, DiagLogLevel.ALL);
+
         stubBeacon.returns(true);
 
         collectorTraceExporter.export(spans, () => { });
 
         setTimeout(() => {
-          const response: any = spyLoggerDebug.args[1][0];
+          const response: any = spyLoggerDebug.args[2][0];
           assert.strictEqual(response, 'sendBeacon - can send');
           assert.strictEqual(spyLoggerError.args.length, 0);
 
@@ -178,9 +189,19 @@ describe('OTLPTraceExporter - web', () => {
       });
 
       it('should log the successful message', done => {
-        // Need to stub/spy on the underlying logger as the "diag" instance is global
-        const spyLoggerDebug = sinon.stub(diag, 'debug');
-        const spyLoggerError = sinon.stub(diag, 'error');
+        const spyLoggerDebug = sinon.stub();
+        const spyLoggerError = sinon.stub();
+        const nop = () => {
+        };
+        const diagLogger: DiagLogger = {
+          debug: spyLoggerDebug,
+          error: spyLoggerError,
+          info: nop,
+          verbose: nop,
+          warn: nop
+        };
+
+        diag.setLogger(diagLogger, DiagLogLevel.ALL);
 
         collectorTraceExporter.export(spans, () => { });
 
@@ -188,7 +209,7 @@ describe('OTLPTraceExporter - web', () => {
           const request = server.requests[0];
           request.respond(200);
 
-          const response: any = spyLoggerDebug.args[1][0];
+          const response: any = spyLoggerDebug.args[2][0];
           assert.strictEqual(response, 'xhr success');
           assert.strictEqual(spyLoggerError.args.length, 0);
 

@@ -105,9 +105,7 @@ const testOTLPMetricExporter = (params: TestParams) =>
               ]
             )
             : grpc.ServerCredentials.createInsecure();
-          server.bindAsync(address, credentials, error => {
-            if(error)
-              throw error;
+          server.bindAsync(address, credentials, () => {
             server.start();
             done();
           });
