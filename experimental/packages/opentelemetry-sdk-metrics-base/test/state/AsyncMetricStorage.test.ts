@@ -24,7 +24,7 @@ import { MetricCollectorHandle } from '../../src/state/MetricCollector';
 import { AsyncMetricStorage } from '../../src/state/AsyncMetricStorage';
 import { NoopAttributesProcessor } from '../../src/view/AttributesProcessor';
 import { assertMetricData, assertDataPoint, defaultInstrumentDescriptor } from '../util';
-import { ObservableCallback } from '@opentelemetry/api-metrics-wip';
+import { ObservableCallback } from '@opentelemetry/api-metrics';
 
 const deltaCollector: MetricCollectorHandle = {
   aggregatorTemporality: AggregationTemporality.DELTA,

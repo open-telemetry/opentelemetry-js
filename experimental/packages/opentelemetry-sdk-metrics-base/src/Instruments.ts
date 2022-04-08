@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import * as metrics from '@opentelemetry/api-metrics-wip';
+import * as metrics from '@opentelemetry/api-metrics';
 import { InstrumentDescriptor } from './InstrumentDescriptor';
 import { WritableMetricStorage } from './state/WritableMetricStorage';
 

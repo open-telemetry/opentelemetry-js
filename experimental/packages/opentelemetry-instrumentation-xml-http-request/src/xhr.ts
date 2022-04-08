@@ -26,9 +26,9 @@ import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import {
   addSpanNetworkEvents,
   getResource,
-  parseUrl,
   PerformanceTimingNames as PTN,
   shouldPropagateTraceHeaders,
+  URLLike
 } from '@opentelemetry/sdk-trace-web';
 import { EventNames } from './enums/EventNames';
 import {
@@ -39,6 +39,12 @@ import {
 } from './types';
 import { VERSION } from './version';
 import { AttributeNames } from './enums/AttributeNames';
+
+function parseUrl(url: string): URLLike {
+  const element = document.createElement('a');
+  element.href = url;
+  return element;
+}
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
@@ -105,13 +111,14 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
   /**
    * Adds custom headers to XMLHttpRequest
    * @param xhr
-   * @param span
+   * @param spanUrl
    * @private
    */
   private _addHeaders(xhr: XMLHttpRequest, spanUrl: string) {
+    const url = parseUrl(spanUrl).href;
     if (
       !shouldPropagateTraceHeaders(
-        spanUrl,
+        url,
         this._getConfig().propagateTraceHeaderCorsUrls
       )
     ) {
@@ -279,7 +286,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     }
 
     const resource = getResource(
-      spanUrl,
+      parseUrl(spanUrl).href,
       startTime,
       endTime,
       resources,

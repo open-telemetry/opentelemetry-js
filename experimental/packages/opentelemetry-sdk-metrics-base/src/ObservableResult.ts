@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as metrics from '@opentelemetry/api-metrics-wip';
+import * as metrics from '@opentelemetry/api-metrics';
 import { AttributeHashMap } from './state/HashMap';
 
 /**

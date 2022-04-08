@@ -10,6 +10,9 @@
   ],
   "references": [
     {
+      "path": "../opentelemetry-api-metrics"
+    },
+    {
       "path": "../opentelemetry-instrumentation"
     }
   ]
