@@ -400,7 +400,7 @@ describe('when configuring via environment', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
     const collectorExporter = new OTLPMetricExporter();
     assert.strictEqual(
-      collectorExporter.url,
+      collectorExporter._otlpExporter.url,
       `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}v1/metrics`
     );
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
@@ -409,7 +409,7 @@ describe('when configuring via environment', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/metrics';
     const collectorExporter = new OTLPMetricExporter();
     assert.strictEqual(
-      collectorExporter.url,
+      collectorExporter._otlpExporter.url,
       `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/metrics`
     );
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
