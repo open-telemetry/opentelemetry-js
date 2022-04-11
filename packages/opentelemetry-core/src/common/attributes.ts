@@ -23,19 +23,19 @@ export function sanitizeAttributes(attributes: unknown): Attributes {
     return out;
   }
 
-  for (const [k, v] of Object.entries(attributes)) {
-    if (!isAttributeKey(k)) {
-      diag.warn(`Invalid attribute key: ${k}`);
+  for (const [key, val] of Object.entries(attributes)) {
+    if (!isAttributeKey(key)) {
+      diag.warn(`Invalid attribute key: ${key}`);
       continue;
     }
-    if (!isAttributeValue(v)) {
-      diag.warn(`Invalid attribute value set for key: ${k}`);
+    if (!isAttributeValue(val)) {
+      diag.warn(`Invalid attribute value set for key: ${key}`);
       continue;
     }
-    if (Array.isArray(v)) {
-      out[k] = v.slice();
+    if (Array.isArray(val)) {
+      out[key] = val.slice();
     } else {
-      out[k] = v;
+      out[key] = val;
     }
   }
 
