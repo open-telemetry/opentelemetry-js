@@ -188,7 +188,7 @@ export class MeterProvider implements metrics.MeterProvider {
   async forceFlush(options?: ForceFlushOptions): Promise<void> {
     // do not flush after shutdown
     if (this._shutdown) {
-      api.diag.warn('invalid attempt to force flush after shutdown');
+      api.diag.warn('invalid attempt to force flush after MeterProvider shutdown');
       return;
     }
 
