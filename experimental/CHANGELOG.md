@@ -38,6 +38,7 @@ All notable changes to experimental packages in this project will be documented 
 * feat(prometheus): update prometheus exporter with wip metrics sdk #2824 @legendecas
 * feat(instrumentation-xhr): add applyCustomAttributesOnSpan hook #2134 @mhennoch
 * feat(proto): add @opentelemetry/otlp-transformer package with hand-rolled transformation #2746 @dyladan
+* feat(sdk-metrics-base): shutdown and forceflush on MeterProvider #2890 @legendecas
 
 ### :bug: (Bug Fix)
 
