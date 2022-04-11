@@ -18,7 +18,7 @@ import * as sinon from 'sinon';
 import * as assert from 'assert';
 
 import { diag } from '@opentelemetry/api';
-import { validateAndNormalizeUrl, configureSecurity, configureCompression } from '../src/util';
+import { validateAndNormalizeUrl, configureSecurity, configureCompression, useSecureConnection } from '../src/util';
 import * as grpc from '@grpc/grpc-js';
 import { CompressionAlgorithm} from '../src/types';
 import { DEFAULT_COLLECTOR_URL } from '../src/OTLPTraceExporter';
@@ -141,6 +141,30 @@ describe('utils - configureSecurity', () => {
     const credentials = configureSecurity(undefined, 'foo.bar');
     assert.ok(credentials._isSecure() === false);
     delete envSource.OTEL_EXPORTER_OTLP_INSECURE;
+  });
+});
+
+describe('useSecureConnection', () => {
+  const envSource = process.env;
+  it('should return secure connection using all credentials', () => {
+    envSource.OTEL_EXPORTER_OTLP_CERTIFICATE='./certs/ca.crt';
+    envSource.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY='./certs/client.key';
+    envSource.OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE='./certs/client.crt';
+
+    const credentials = useSecureConnection();
+    assert.ok(credentials._isSecure() === true);
+
+    delete envSource.OTEL_EXPORTER_OTLP_CERTIFICATE;
+    delete envSource.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY;
+    delete envSource.OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE;
+  });
+  it('should return secure connection using only root certificate', () => {
+    envSource.OTEL_EXPORTER_OTLP_CERTIFICATE='./certs/ca.crt';
+
+    const credentials = useSecureConnection();
+    assert.ok(credentials._isSecure() === true);
+
+    delete envSource.OTEL_EXPORTER_OTLP_CERTIFICATE;
   });
 });
 

@@ -163,7 +163,7 @@ export function configureSecurity(credentials: grpc.ChannelCredentials | undefin
 function getSecurityFromEnv(): boolean {
   const definedInsecure =
     getEnv().OTEL_EXPORTER_OTLP_TRACES_INSECURE ||
-    getEnv().OTEL_EXPORTER_OTLP_INSECURE || getEnv().OTEL_EXPORTER_OTLP_SPAN_INSECURE;
+    getEnv().OTEL_EXPORTER_OTLP_INSECURE;
 
   if (definedInsecure) {
     return definedInsecure === 'true';
@@ -172,7 +172,7 @@ function getSecurityFromEnv(): boolean {
   }
 }
 
-function useSecureConnection(): grpc.ChannelCredentials {
+export function useSecureConnection(): grpc.ChannelCredentials {
   const rootCert = retrieveRootCert();
   const privateKey = retrievePrivateKey();
   const certChain = retrieveCertChain();
@@ -182,12 +182,12 @@ function useSecureConnection(): grpc.ChannelCredentials {
 
 function retrieveRootCert(): Buffer | undefined {
   const rootCertificate =
-    getEnv().OTEL_EXPORTER_OTLP_CERTIFICATE ||
-    getEnv().OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE;
+    getEnv().OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE ||
+    getEnv().OTEL_EXPORTER_OTLP_CERTIFICATE;
 
     if (rootCertificate) {
       try {
-        return fs.readFileSync(rootCertificate);
+        return fs.readFileSync(path.resolve(process.cwd(), rootCertificate));
       } catch {
         diag.warn('Failed to read root certificate file');
         return undefined;
@@ -198,11 +198,13 @@ function retrieveRootCert(): Buffer | undefined {
 }
 
 function retrievePrivateKey(): Buffer | undefined {
-  const clientKey = getEnv().OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY || getEnv().OTEL_EXPORTER_OTLP_CLIENT_KEY;
+  const clientKey =
+    getEnv().OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY ||
+    getEnv().OTEL_EXPORTER_OTLP_CLIENT_KEY;
 
   if (clientKey) {
     try {
-      return fs.readFileSync(clientKey);
+      return fs.readFileSync(path.resolve(process.cwd(), clientKey));
     } catch {
       diag.warn('Failed to read client certificate private key file');
       return undefined;
@@ -213,11 +215,13 @@ function retrievePrivateKey(): Buffer | undefined {
 }
 
 function retrieveCertChain(): Buffer | undefined {
-  const clientChain = getEnv().OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE || getEnv().OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE;
+  const clientChain =
+    getEnv().OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE ||
+    getEnv().OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE;
 
   if (clientChain) {
     try {
-      return fs.readFileSync(clientChain);
+      return fs.readFileSync(path.resolve(process.cwd(), clientChain));
     } catch {
       diag.warn('Failed to read client certificate chain file');
       return undefined;
