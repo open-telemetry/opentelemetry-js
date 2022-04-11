@@ -53,6 +53,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :house: (Internal)
 
 * chore: move trace exporters back to experimental #2835 @dyladan
+* refactor(sdk-metrics-base): meter shared states #2821 @legendecas
 
 ## v0.27.0
 
