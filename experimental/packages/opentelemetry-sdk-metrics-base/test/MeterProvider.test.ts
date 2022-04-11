@@ -439,12 +439,14 @@ describe('MeterProvider', () => {
       meterProvider.addMetricReader(reader1);
       meterProvider.addMetricReader(reader2);
 
-      await meterProvider.shutdown();
+      await meterProvider.shutdown({ timeoutMillis: 1234 });
       await meterProvider.shutdown();
       await meterProvider.shutdown();
 
       assert.strictEqual(reader1ShutdownSpy.callCount, 1);
+      assert.deepStrictEqual(reader1ShutdownSpy.args[0][0], { timeoutMillis: 1234 });
       assert.strictEqual(reader2ShutdownSpy.callCount, 1);
+      assert.deepStrictEqual(reader2ShutdownSpy.args[0][0], { timeoutMillis: 1234 });
     });
   });
 
@@ -459,10 +461,14 @@ describe('MeterProvider', () => {
       meterProvider.addMetricReader(reader1);
       meterProvider.addMetricReader(reader2);
 
-      await meterProvider.forceFlush();
-      await meterProvider.forceFlush();
+      await meterProvider.forceFlush({ timeoutMillis: 1234 });
+      await meterProvider.forceFlush({ timeoutMillis: 5678 });
       assert.strictEqual(reader1ForceFlushSpy.callCount, 2);
+      assert.deepStrictEqual(reader1ForceFlushSpy.args[0][0], { timeoutMillis: 1234 });
+      assert.deepStrictEqual(reader1ForceFlushSpy.args[1][0], { timeoutMillis: 5678 });
       assert.strictEqual(reader2ForceFlushSpy.callCount, 2);
+      assert.deepStrictEqual(reader2ForceFlushSpy.args[0][0], { timeoutMillis: 1234 });
+      assert.deepStrictEqual(reader2ForceFlushSpy.args[1][0], { timeoutMillis: 5678 });
 
       await meterProvider.shutdown();
       await meterProvider.forceFlush();

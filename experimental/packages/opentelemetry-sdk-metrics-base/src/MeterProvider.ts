@@ -18,7 +18,7 @@ import * as api from '@opentelemetry/api';
 import * as metrics from '@opentelemetry/api-metrics';
 import { Resource } from '@opentelemetry/resources';
 import { Meter } from './Meter';
-import { MetricReader, ReaderForceFlushOptions, ReaderShutdownOptions } from './export/MetricReader';
+import { MetricReader } from './export/MetricReader';
 import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { InstrumentSelector } from './view/InstrumentSelector';
 import { MeterSelector } from './view/MeterSelector';
@@ -28,6 +28,7 @@ import { Aggregation } from './view/Aggregation';
 import { FilteringAttributesProcessor } from './view/AttributesProcessor';
 import { InstrumentType } from './InstrumentDescriptor';
 import { PatternPredicate } from './view/Predicate';
+import { ForceFlushOptions, ShutdownOptions } from './types';
 
 /**
  * MeterProviderOptions provides an interface for configuring a MeterProvider.
@@ -166,7 +167,7 @@ export class MeterProvider implements metrics.MeterProvider {
    *
    * Returns a promise which is resolved when all flushes are complete.
    */
-  async shutdown(options?: ReaderShutdownOptions): Promise<void> {
+  async shutdown(options?: ShutdownOptions): Promise<void> {
     if (this._shutdown) {
       api.diag.warn('shutdown may only be called once per MeterProvider');
       return;
@@ -184,7 +185,7 @@ export class MeterProvider implements metrics.MeterProvider {
    *
    * Returns a promise which is resolved when all flushes are complete.
    */
-  async forceFlush(options?: ReaderForceFlushOptions): Promise<void> {
+  async forceFlush(options?: ForceFlushOptions): Promise<void> {
     // do not flush after shutdown
     if (this._shutdown) {
       api.diag.warn('invalid attempt to force flush after shutdown');
