@@ -15,7 +15,7 @@
  */
 
 import { Context } from '@opentelemetry/api';
-import { Attributes } from '@opentelemetry/api-metrics-wip';
+import { Attributes } from '@opentelemetry/api-metrics';
 
 /**
  * The {@link AttributesProcessor} is responsible for customizing which

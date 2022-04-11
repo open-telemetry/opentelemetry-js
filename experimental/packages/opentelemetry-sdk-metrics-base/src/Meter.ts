@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as metrics from '@opentelemetry/api-metrics-wip';
+import * as metrics from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { createInstrumentDescriptor, InstrumentDescriptor, InstrumentType } from './InstrumentDescriptor';
 import { CounterInstrument, HistogramInstrument, UpDownCounterInstrument } from './Instruments';

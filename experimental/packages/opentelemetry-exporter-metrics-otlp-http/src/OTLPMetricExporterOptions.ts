@@ -13,20 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
+import { AggregationTemporality } from '@opentelemetry/sdk-metrics-base';
 
-import { Attributes } from '@opentelemetry/api-metrics';
-import { Context, HrTime } from '@opentelemetry/api';
-import { ExemplarFilter } from './ExemplarFilter';
-
-
-export class AlwaysSampleExemplarFilter implements ExemplarFilter {
-
-  shouldSample(
-    _value: number,
-    _timestamp: HrTime,
-    _attributes: Attributes,
-    _ctx: Context
-  ): boolean {
-      return true;
-  }
+export interface OTLPMetricExporterOptions extends otlpTypes.OTLPExporterConfigBase {
+  aggregationTemporality?: AggregationTemporality
 }
+export const defaultExporterTemporality = AggregationTemporality.CUMULATIVE;
+export const defaultOptions = {aggregationTemporality: defaultExporterTemporality};

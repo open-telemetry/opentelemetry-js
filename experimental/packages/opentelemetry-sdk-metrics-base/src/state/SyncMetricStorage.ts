@@ -15,7 +15,7 @@
  */
 
 import { Context, HrTime } from '@opentelemetry/api';
-import { Attributes } from '@opentelemetry/api-metrics-wip';
+import { Attributes } from '@opentelemetry/api-metrics';
 import { WritableMetricStorage } from './WritableMetricStorage';
 import { Accumulation, Aggregator } from '../aggregator/types';
 import { View } from '../view/View';
