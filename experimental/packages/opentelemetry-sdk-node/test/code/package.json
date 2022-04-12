@@ -1,0 +1,8 @@
+{
+    "dependencies": {
+        "@opentelemetry/sdk-node": "file:../../build/src"
+    },
+    "scripts": {
+        "clean": "rm -rf node_modules package-lock.json"
+    }
+}

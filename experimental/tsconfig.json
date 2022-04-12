@@ -15,6 +15,9 @@
       "path": "packages/opentelemetry-api-metrics"
     },
     {
+      "path": "packages/opentelemetry-autoinstrumentation-agent"
+    },
+    {
       "path": "packages/opentelemetry-exporter-metrics-otlp-grpc"
     },
     {
@@ -46,9 +49,6 @@
     },
     {
       "path": "packages/opentelemetry-sdk-node"
-    },
-    {
-      "path": "packages/opentelemetry-agent"
     },
     {
       "path": "packages/otlp-transformer"
