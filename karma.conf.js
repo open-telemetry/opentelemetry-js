@@ -1,5 +1,5 @@
 /*!
- * Copyright 2020, OpenTelemetry Authors
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,29 @@
  * limitations under the License.
  */
 
+const webpack = require('webpack');
+
 const karmaWebpackConfig = require('../../karma.webpack');
 const karmaBaseConfig = require('../../karma.base');
 
 module.exports = (config) => {
+  {
+    const plugins = karmaWebpackConfig.plugins = [];
+    plugins.push(new webpack.ProvidePlugin({
+      process: 'process/browser',
+    }));
+  }
+
+  {
+    const plugins = karmaBaseConfig.plugins = [];
+    const toAdd = Object.keys(require('./package.json').devDependencies)
+      .filter((packageName) => packageName.startsWith('karma-'))
+      .map((packageName) => require(packageName));
+    plugins.push(
+      ...toAdd
+    );
+  }
+
   config.set(Object.assign({}, karmaBaseConfig, {
     webpack: karmaWebpackConfig
   }))
