@@ -15,17 +15,17 @@
  */
 
 import * as assert from 'assert';
-import { Attributes, UpDownCounter } from '@opentelemetry/api-metrics-wip';
+import { Attributes, UpDownCounter } from '@opentelemetry/api-metrics';
 import {
   AggregationTemporality,
   MeterProvider,
   MetricReader,
   DataPoint,
   DataPointType,
-  HistogramAggregation,
+  ExplicitBucketHistogramAggregation,
   SumAggregation,
   Histogram,
-} from '@opentelemetry/sdk-metrics-base-wip';
+} from '@opentelemetry/sdk-metrics-base';
 import * as sinon from 'sinon';
 import { PrometheusSerializer } from '../src/PrometheusSerializer';
 import { mockedHrTimeMs, mockHrTime } from './util';
@@ -109,7 +109,7 @@ describe('PrometheusSerializer', () => {
         const reader = new TestMetricReader();
         const meterProvider = new MeterProvider();
         meterProvider.addMetricReader(reader);
-        meterProvider.addView({ aggregation: new HistogramAggregation([1, 10, 100]) });
+        meterProvider.addView({ aggregation: new ExplicitBucketHistogramAggregation([1, 10, 100]) });
         const meter = meterProvider.getMeter('test');
 
         const histogram = meter.createHistogram('test');
@@ -208,12 +208,12 @@ describe('PrometheusSerializer', () => {
       });
     });
 
-    describe('with HistogramAggregator', () => {
+    describe('with ExplicitBucketHistogramAggregation', () => {
       async function testSerializer(serializer: PrometheusSerializer) {
         const reader = new TestMetricReader();
         const meterProvider = new MeterProvider();
         meterProvider.addMetricReader(reader);
-        meterProvider.addView({ aggregation: new HistogramAggregation([1, 10, 100]) });
+        meterProvider.addView({ aggregation: new ExplicitBucketHistogramAggregation([1, 10, 100]) });
         const meter = meterProvider.getMeter('test');
 
         const histogram = meter.createHistogram('test', {
@@ -235,7 +235,7 @@ describe('PrometheusSerializer', () => {
         return result;
       }
 
-      it('serialize metric record with HistogramAggregator aggregator, cumulative', async () => {
+      it('serialize metric record with ExplicitHistogramAggregation aggregator, cumulative', async () => {
         const serializer = new PrometheusSerializer();
         const result = await testSerializer(serializer);
         assert.strictEqual(

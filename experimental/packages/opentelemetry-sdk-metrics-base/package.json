@@ -1,5 +1,5 @@
 {
-  "name": "@opentelemetry/sdk-metrics-base-wip",
+  "name": "@opentelemetry/sdk-metrics-base",
   "version": "0.27.0",
   "private": true,
   "description": "Work in progress OpenTelemetry metrics SDK",
@@ -78,9 +78,9 @@
   },
   "todo": "Move API metrics to peer dependencies. While it is using an unpublished name, lerna doesn't properly link it if it is in peer dependencies",
   "dependencies": {
-    "@opentelemetry/api-metrics-wip": "0.27.0",
-    "@opentelemetry/core": "1.0.1",
-    "@opentelemetry/resources": "1.0.1",
+    "@opentelemetry/api-metrics": "0.27.0",
+    "@opentelemetry/core": "1.1.1",
+    "@opentelemetry/resources": "1.1.1",
     "lodash.merge": "4.6.2"
   }
 }
