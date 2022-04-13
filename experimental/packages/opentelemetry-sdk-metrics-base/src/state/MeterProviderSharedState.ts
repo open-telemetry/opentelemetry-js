@@ -15,10 +15,10 @@
  */
 
 import { HrTime } from '@opentelemetry/api';
-import { hrTime } from '@opentelemetry/core';
+import { hrTime, InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { Meter } from '../Meter';
 import { ViewRegistry } from '../view/ViewRegistry';
+import { MeterSharedState } from './MeterSharedState';
 import { MetricCollector } from './MetricCollector';
 
 /**
@@ -30,7 +30,15 @@ export class MeterProviderSharedState {
 
   metricCollectors: MetricCollector[] = [];
 
-  meters: Meter[] = [];
+  meterSharedStates: MeterSharedState[] = [];
 
   constructor(public resource: Resource) {}
+
+  getMeterSharedState(instrumentationLibrary: InstrumentationLibrary) {
+    // TODO: meter identity
+    // https://github.com/open-telemetry/opentelemetry-js/issues/2593
+    const meterSharedState = new MeterSharedState(this, instrumentationLibrary);
+    this.meterSharedStates.push(meterSharedState);
+    return meterSharedState;
+  }
 }
