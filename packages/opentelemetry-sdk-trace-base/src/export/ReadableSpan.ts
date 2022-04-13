@@ -17,7 +17,7 @@
 import {
   SpanKind,
   SpanStatus,
-  SpanAttributes,
+  Attributes,
   HrTime,
   Link,
   SpanContext,
@@ -34,7 +34,7 @@ export interface ReadableSpan {
   readonly startTime: HrTime;
   readonly endTime: HrTime;
   readonly status: SpanStatus;
-  readonly attributes: SpanAttributes;
+  readonly attributes: Attributes;
   readonly links: Link[];
   readonly events: TimedEvent[];
   readonly duration: HrTime;

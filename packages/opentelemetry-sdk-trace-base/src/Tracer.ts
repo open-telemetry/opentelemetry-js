@@ -92,7 +92,12 @@ export class Tracer implements api.Tracer {
     }
 
     const spanKind = options.kind ?? api.SpanKind.INTERNAL;
-    const links = options.links ?? [];
+    const links = (options.links ?? []).map(link => {
+      return {
+        context: link.context,
+        attributes: sanitizeAttributes(link.attributes),
+      };
+    });
     const attributes = sanitizeAttributes(options.attributes);
     // make sampling decision
     const samplingResult = this._sampler.shouldSample(
@@ -124,8 +129,10 @@ export class Tracer implements api.Tracer {
       links,
       options.startTime
     );
-    // Set default attributes
-    span.setAttributes(Object.assign(attributes, samplingResult.attributes));
+    // Set initial span attributes. The attributes object may have been mutated
+    // by the sampler, so we sanitize the merged attributes before setting them.
+    const initAttributes = sanitizeAttributes(Object.assign(attributes, samplingResult.attributes));
+    span.setAttributes(initAttributes);
     return span;
   }
 
