@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
 
 * chore: require changelog entry to merge PR [#2847](https://github.com/open-telemetry/opentelemetry-js/pull/2847) @dyladan
 * chore: remove peer API check [#2892](https://github.com/open-telemetry/opentelemetry-js/pull/2892) @dyladan
+* chore: merge lerna subdirectories into a single monorepo [#2892](https://github.com/open-telemetry/opentelemetry-js/pull/2892) @dyladan
 
 ## 1.1.1
 
