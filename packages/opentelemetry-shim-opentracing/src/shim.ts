@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { SpanAttributes, SpanAttributeValue, SpanStatusCode, TextMapPropagator } from '@opentelemetry/api';
+import { Attributes, AttributeValue, SpanStatusCode, TextMapPropagator } from '@opentelemetry/api';
 import * as opentracing from 'opentracing';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
@@ -276,7 +276,7 @@ export class SpanShim extends opentracing.Span {
    * @param eventName name of the event.
    * @param payload an arbitrary object to be attached to the event.
    */
-  override logEvent(eventName: string, payload?: SpanAttributes): void {
+  override logEvent(eventName: string, payload?: Attributes): void {
     this._logInternal(eventName, payload);
   }
 
@@ -286,7 +286,7 @@ export class SpanShim extends opentracing.Span {
    * @param keyValuePairs a set of key-value pairs to be used as event attributes
    * @param timestamp optional timestamp for the event
    */
-  override log(keyValuePairs: SpanAttributes, timestamp?: number): this {
+  override log(keyValuePairs: Attributes, timestamp?: number): this {
     const entries = Object.entries(keyValuePairs);
     const eventEntry = entries.find(([key, _]) => key === 'event');
     const eventName = eventEntry?.[1] || 'log';
@@ -296,7 +296,7 @@ export class SpanShim extends opentracing.Span {
     return this;
   }
 
-  private _logInternal(eventName: string, attributes: SpanAttributes | undefined, timestamp?: number): void {
+  private _logInternal(eventName: string, attributes: Attributes | undefined, timestamp?: number): void {
     if (attributes && eventName === 'error') {
       const entries = Object.entries(attributes);
       const errorEntry = entries.find(([key]) => key === 'error.object');
@@ -306,7 +306,7 @@ export class SpanShim extends opentracing.Span {
         return;
       }
 
-      const mappedAttributes: api.SpanAttributes = {};
+      const mappedAttributes: api.Attributes = {};
       for (const [k, v] of entries) {
         switch (k) {
           case 'error.kind': {
@@ -337,7 +337,7 @@ export class SpanShim extends opentracing.Span {
    * Adds a set of tags to the span.
    * @param keyValueMap set of KV pairs representing tags
    */
-  override addTags(keyValueMap: SpanAttributes): this {
+  override addTags(keyValueMap: Attributes): this {
     for (const [key, value] of Object.entries(keyValueMap)) {
       if (this._setErrorAsSpanStatusCode(key, value)) {
         continue;
@@ -355,7 +355,7 @@ export class SpanShim extends opentracing.Span {
    * @param key key for the tag
    * @param value value for the tag
    */
-  override setTag(key: string, value: SpanAttributeValue): this {
+  override setTag(key: string, value: AttributeValue): this {
     if (this._setErrorAsSpanStatusCode(key, value)) {
       return this;
     }
@@ -383,7 +383,7 @@ export class SpanShim extends opentracing.Span {
 
   private _setErrorAsSpanStatusCode(
     key: string,
-    value: SpanAttributeValue | undefined
+    value: AttributeValue | undefined
   ): boolean {
     if (key === opentracing.Tags.ERROR) {
       const statusCode = SpanShim._mapErrorTag(value);
@@ -394,7 +394,7 @@ export class SpanShim extends opentracing.Span {
   }
 
   private static _mapErrorTag(
-    value: SpanAttributeValue | undefined
+    value: AttributeValue | undefined
   ): SpanStatusCode {
     switch (value) {
       case true:

@@ -13,30 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { SpanAttributeValue, SpanAttributes } from '@opentelemetry/api';
 
-export function sanitizeAttributes(attributes: unknown): SpanAttributes {
-  const out: SpanAttributes = {};
+import { diag, AttributeValue, Attributes } from '@opentelemetry/api';
 
-  if (attributes == null || typeof attributes !== 'object') {
+export function sanitizeAttributes(attributes: unknown): Attributes {
+  const out: Attributes = {};
+
+  if (typeof attributes !== 'object' || attributes == null) {
     return out;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  for (const [k, v] of Object.entries(attributes!)) {
-    if (isAttributeValue(v)) {
-      if (Array.isArray(v)) {
-        out[k] = v.slice();
-      } else {
-        out[k] = v;
-      }
+  for (const [key, val] of Object.entries(attributes)) {
+    if (!isAttributeKey(key)) {
+      diag.warn(`Invalid attribute key: ${key}`);
+      continue;
+    }
+    if (!isAttributeValue(val)) {
+      diag.warn(`Invalid attribute value set for key: ${key}`);
+      continue;
+    }
+    if (Array.isArray(val)) {
+      out[key] = val.slice();
+    } else {
+      out[key] = val;
     }
   }
 
   return out;
 }
 
-export function isAttributeValue(val: unknown): val is SpanAttributeValue {
+export function isAttributeKey(key: unknown): key is string {
+  return typeof key === 'string' && key.length > 0;
+}
+
+export function isAttributeValue(val: unknown): val is AttributeValue {
   if (val == null) {
     return true;
   }
