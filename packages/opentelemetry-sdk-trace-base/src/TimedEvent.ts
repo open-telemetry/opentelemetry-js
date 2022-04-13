@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { HrTime, Attributes } from '@opentelemetry/api';
+import { HrTime, SpanAttributes } from '@opentelemetry/api';
 
 /**
  * Represents a timed event.
@@ -25,5 +25,5 @@ export interface TimedEvent {
   /** The name of the event. */
   name: string;
   /** The attributes of the event. */
-  attributes?: Attributes;
+  attributes?: SpanAttributes;
 }

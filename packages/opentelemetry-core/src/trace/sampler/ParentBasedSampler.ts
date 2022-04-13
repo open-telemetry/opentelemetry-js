@@ -15,12 +15,12 @@
  */
 
 import {
-  Attributes,
   Context,
   isSpanContextValid,
   Link,
   Sampler,
   SamplingResult,
+  SpanAttributes,
   SpanKind,
   TraceFlags, trace,
 } from '@opentelemetry/api';
@@ -64,7 +64,7 @@ export class ParentBasedSampler implements Sampler {
     traceId: string,
     spanName: string,
     spanKind: SpanKind,
-    attributes: Attributes,
+    attributes: SpanAttributes,
     links: Link[]
   ): SamplingResult {
     const parentContext = trace.getSpanContext(context);

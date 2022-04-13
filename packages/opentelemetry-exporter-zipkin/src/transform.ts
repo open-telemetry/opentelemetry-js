@@ -66,9 +66,9 @@ export function toZipkinSpan(
   return zipkinSpan;
 }
 
-/** Converts OpenTelemetry Attributes and SpanStatus to Zipkin Tags format. */
+/** Converts OpenTelemetry SpanAttributes and SpanStatus to Zipkin Tags format. */
 export function _toZipkinTags(
-  attributes: api.Attributes,
+  attributes: api.SpanAttributes,
   status: api.SpanStatus,
   statusCodeTagName: string,
   statusErrorTagName: string,
