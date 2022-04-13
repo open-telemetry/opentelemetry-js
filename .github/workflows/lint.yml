@@ -39,8 +39,9 @@ jobs:
         with:
           path: |
             node_modules
-            */*/node_modules
-          key: lint-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('**/package.json') }}-20211216.2
+            packages/*/node_modules
+            experimental/packages/*/node_modules
+          key: lint-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}
 
       # On a cache miss, install dependencies
       - name: Bootstrap
