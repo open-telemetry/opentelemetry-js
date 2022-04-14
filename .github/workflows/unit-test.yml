@@ -67,12 +67,14 @@ jobs:
         with:
           path: |
             node_modules
+            package-lock.json
             packages/*/node_modules
+            packages/*/package-lock.json
             experimental/packages/*/node_modules
-          key: browser-tests-${{ runner.os }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}
+            experimental/packages/*/package-lock.json
+          key: browser-tests-${{ runner.os }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}-04142022
 
       - name: Bootstrap
-        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           npm install --ignore-scripts
           npx lerna bootstrap --no-ci --hoist --nohoist='zone.js' --ignore @opentelemetry/selenium-tests
@@ -105,12 +107,14 @@ jobs:
         with:
           path: |
             node_modules
+            package-lock.json
             packages/*/node_modules
+            packages/*/package-lock.json
             experimental/packages/*/node_modules
-          key: webworker-tests-${{ runner.os }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}
+            experimental/packages/*/package-lock.json
+          key: webworker-tests-${{ runner.os }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}-04142022
 
       - name: Bootstrap
-        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           npm install --ignore-scripts
           npx lerna bootstrap --no-ci --hoist --nohoist='zone.js'
