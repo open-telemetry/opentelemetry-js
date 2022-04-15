@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 import {
+  Attributes,
+  Context,
   context,
   createContextKey,
   INVALID_TRACEID,
+  Link,
   ROOT_CONTEXT,
   Sampler,
   SamplingDecision,
@@ -30,12 +33,14 @@ import {
   AlwaysOffSampler,
   AlwaysOnSampler,
   InstrumentationLibrary,
+  sanitizeAttributes,
   suppressTracing
 } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { BasicTracerProvider, Span, SpanProcessor, Tracer } from '../../src';
 import { TestStackContextManager } from './export/TestStackContextManager';
 import * as sinon from 'sinon';
+import { invalidAttributes, validAttributes } from './util';
 
 describe('Tracer', () => {
   const tracerProvider = new BasicTracerProvider();
@@ -44,12 +49,19 @@ describe('Tracer', () => {
     : process.env) as any;
 
   class TestSampler implements Sampler {
-    shouldSample() {
+    shouldSample(_context: Context, _traceId: string, _spanName: string, _spanKind: SpanKind, attributes: Attributes, links: Link[]) {
+      // The attributes object should be valid.
+      assert.deepStrictEqual(sanitizeAttributes(attributes), attributes);
+      links.forEach(link => {
+        assert.deepStrictEqual(sanitizeAttributes(link.attributes), link.attributes);
+      });
       return {
         decision: SamplingDecision.RECORD_AND_SAMPLED,
         attributes: {
           testAttribute: 'foobar',
-        },
+          // invalid attributes should be sanitized.
+          ...invalidAttributes,
+        } as unknown as Attributes,
       };
     }
   }
@@ -312,7 +324,6 @@ describe('Tracer', () => {
   });
 
   it('should start an active span with name, options and function args', () => {
-
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
@@ -355,5 +366,30 @@ describe('Tracer', () => {
         span.end();
       }
     }), 1);
+  });
+
+  it('should sample with valid attributes', () => {
+    const tracer = new Tracer(
+      { name: 'default', version: '0.0.1' },
+      { sampler: new TestSampler() },
+      tracerProvider
+    );
+
+    const attributes = { ...validAttributes, ...invalidAttributes } as unknown as Attributes;
+    const links = [{
+      context: {
+        traceId: 'b3cda95b652f4a1592b449d5929fda1b',
+        spanId: '6e0c63257de34c92',
+        traceFlags: TraceFlags.SAMPLED
+      },
+      attributes: { ...attributes },
+    }];
+    // TestSampler should validate the attributes and links.
+    const span = tracer.startSpan('my-span', { attributes, links }) as Span;
+    span.end();
+
+    assert.deepStrictEqual(span.attributes, { ...validAttributes, testAttribute: 'foobar' });
+    assert.strictEqual(span.links.length, 1);
+    assert.deepStrictEqual(span.links[0].attributes, validAttributes);
   });
 });

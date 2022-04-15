@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-import { HrTime, Attributes } from '@opentelemetry/api';
+export const validAttributes = {
+  string: 'string',
+  number: 0,
+  bool: true,
+  'array<string>': ['str1', 'str2'],
+  'array<number>': [1, 2],
+  'array<bool>': [true, false],
+};
 
-/**
- * Represents a timed event.
- * A timed event is an event with a timestamp.
- */
-export interface TimedEvent {
-  time: HrTime;
-  /** The name of the event. */
-  name: string;
-  /** The attributes of the event. */
-  attributes?: Attributes;
-}
+export const invalidAttributes = {
+  // invalid attribute type object
+  object: { foo: 'bar' },
+  // invalid attribute inhomogenous array
+  'non-homogeneous-array': [0, ''],
+  // This empty length attribute should not be set
+  '': 'empty-key',
+};

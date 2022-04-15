@@ -54,7 +54,7 @@ export const commonAttributes: Attributes[] = [{}, { 1: '1' }, { a: '2' }, new (
 })];
 
 export const sleep = (time: number) =>
-  new Promise(resolve => {
+  new Promise<void>(resolve => {
     return setTimeout(resolve, time);
   });
 
