@@ -22,6 +22,7 @@ import {
   InstrumentationLibrary,
   isTimeInput,
   timeInputToHrTime,
+  sanitizeAttributes,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
@@ -30,7 +31,7 @@ import { TimedEvent } from './TimedEvent';
 import { Tracer } from './Tracer';
 import { SpanProcessor } from './SpanProcessor';
 import { SpanLimits } from './types';
-import { SpanAttributeValue, Context } from '@opentelemetry/api';
+import { AttributeValue, Context } from '@opentelemetry/api';
 import { ExceptionEventName } from './enums';
 
 /**
@@ -42,7 +43,7 @@ export class Span implements api.Span, ReadableSpan {
   private readonly _spanContext: api.SpanContext;
   readonly kind: api.SpanKind;
   readonly parentSpanId?: string;
-  readonly attributes: api.SpanAttributes = {};
+  readonly attributes: api.Attributes = {};
   readonly links: api.Link[] = [];
   readonly events: TimedEvent[] = [];
   readonly startTime: api.HrTime;
@@ -88,7 +89,7 @@ export class Span implements api.Span, ReadableSpan {
     return this._spanContext;
   }
 
-  setAttribute(key: string, value?: SpanAttributeValue): this;
+  setAttribute(key: string, value?: AttributeValue): this;
   setAttribute(key: string, value: unknown): this {
     if (value == null || this._isSpanEnded()) return this;
     if (key.length === 0) {
@@ -111,7 +112,7 @@ export class Span implements api.Span, ReadableSpan {
     return this;
   }
 
-  setAttributes(attributes: api.SpanAttributes): this {
+  setAttributes(attributes: api.Attributes): this {
     for (const [k, v] of Object.entries(attributes)) {
       this.setAttribute(k, v);
     }
@@ -127,7 +128,7 @@ export class Span implements api.Span, ReadableSpan {
    */
   addEvent(
     name: string,
-    attributesOrStartTime?: api.SpanAttributes | api.TimeInput,
+    attributesOrStartTime?: api.Attributes | api.TimeInput,
     startTime?: api.TimeInput
   ): this {
     if (this._isSpanEnded()) return this;
@@ -148,9 +149,11 @@ export class Span implements api.Span, ReadableSpan {
     if (typeof startTime === 'undefined') {
       startTime = hrTime();
     }
+
+    const attributes = sanitizeAttributes(attributesOrStartTime);
     this.events.push({
       name,
-      attributes: attributesOrStartTime as api.SpanAttributes,
+      attributes,
       time: timeInputToHrTime(startTime),
     });
     return this;
@@ -193,7 +196,7 @@ export class Span implements api.Span, ReadableSpan {
   }
 
   recordException(exception: api.Exception, time: api.TimeInput = hrTime()): void {
-    const attributes: api.SpanAttributes = {};
+    const attributes: api.Attributes = {};
     if (typeof exception === 'string') {
       attributes[SemanticAttributes.EXCEPTION_MESSAGE] = exception;
     } else if (exception) {
@@ -217,7 +220,7 @@ export class Span implements api.Span, ReadableSpan {
       attributes[SemanticAttributes.EXCEPTION_TYPE] ||
       attributes[SemanticAttributes.EXCEPTION_MESSAGE]
     ) {
-      this.addEvent(ExceptionEventName, attributes as api.SpanAttributes, time);
+      this.addEvent(ExceptionEventName, attributes, time);
     } else {
       api.diag.warn(`Failed to record an exception ${exception}`);
     }
@@ -260,7 +263,7 @@ export class Span implements api.Span, ReadableSpan {
    * @param value Attribute value
    * @returns truncated attribute value if required, otherwise same value
    */
-  private _truncateToSize(value: SpanAttributeValue): SpanAttributeValue {
+  private _truncateToSize(value: AttributeValue): AttributeValue {
     const limit = this._attributeValueLengthLimit;
     // Check limit
     if (limit <= 0) {

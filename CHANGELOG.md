@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: (Bug Fix)
 
+* fix: sanitize attributes inputs #2881 @legendecas
+
 ### :books: (Refine Doc)
 
 * docs(sdk): update earliest support node version #2860 @svetlanabrennan
