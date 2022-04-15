@@ -28,6 +28,7 @@ import { Aggregation } from './view/Aggregation';
 import { FilteringAttributesProcessor } from './view/AttributesProcessor';
 import { InstrumentType } from './InstrumentDescriptor';
 import { PatternPredicate } from './view/Predicate';
+import { ForceFlushOptions, ShutdownOptions } from './types';
 
 /**
  * MeterProviderOptions provides an interface for configuring a MeterProvider.
@@ -163,59 +164,36 @@ export class MeterProvider implements metrics.MeterProvider {
   /**
    * Flush all buffered data and shut down the MeterProvider and all registered
    * MetricReaders.
-   * Returns a promise which is resolved when all flushes are complete.
    *
-   * TODO: return errors to caller somehow?
+   * Returns a promise which is resolved when all flushes are complete.
    */
-  async shutdown(): Promise<void> {
-    // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#shutdown
-
+  async shutdown(options?: ShutdownOptions): Promise<void> {
     if (this._shutdown) {
       api.diag.warn('shutdown may only be called once per MeterProvider');
       return;
     }
 
-    // TODO add a timeout - spec leaves it up the the SDK if this is configurable
     this._shutdown = true;
 
-    for (const collector of this._sharedState.metricCollectors) {
-      try {
-        await collector.shutdown();
-      } catch (e) {
-        // Log all Errors.
-        if (e instanceof Error) {
-          api.diag.error(`Error shutting down: ${e.message}`);
-        }
-      }
-    }
+    await Promise.all(this._sharedState.metricCollectors.map(collector => {
+      return collector.shutdown(options);
+    }));
   }
 
   /**
    * Notifies all registered MetricReaders to flush any buffered data.
-   * Returns a promise which is resolved when all flushes are complete.
    *
-   * TODO: return errors to caller somehow?
+   * Returns a promise which is resolved when all flushes are complete.
    */
-  async forceFlush(): Promise<void> {
-    // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#forceflush
-
-    // TODO add a timeout - spec leaves it up the the SDK if this is configurable
-
+  async forceFlush(options?: ForceFlushOptions): Promise<void> {
     // do not flush after shutdown
     if (this._shutdown) {
-      api.diag.warn('invalid attempt to force flush after shutdown');
+      api.diag.warn('invalid attempt to force flush after MeterProvider shutdown');
       return;
     }
 
-    for (const collector of this._sharedState.metricCollectors) {
-      try {
-        await collector.forceFlush();
-      } catch (e) {
-        // Log all Errors.
-        if (e instanceof Error) {
-          api.diag.error(`Error flushing: ${e.message}`);
-        }
-      }
-    }
+    await Promise.all(this._sharedState.metricCollectors.map(collector => {
+      return collector.forceFlush(options);
+    }));
   }
 }
