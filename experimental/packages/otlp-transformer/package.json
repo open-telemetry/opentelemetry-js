@@ -18,7 +18,8 @@
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "test:browser": "nyc karma start --single-run",
-    "watch": "tsc --build -w tsconfig.all.json"
+    "watch": "tsc --build -w tsconfig.all.json",
+    "peer-api-check": "node ../../../scripts/peer-api-check.js"
   },
   "keywords": [
     "opentelemetry",

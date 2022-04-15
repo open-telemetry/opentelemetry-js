@@ -21,7 +21,8 @@
     "test:webworker": "nyc karma start karma.worker.js --single-run",
     "watch": "tsc --build --watch tsconfig.all.json",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
-    "prewatch": "npm run precompile"
+    "prewatch": "npm run precompile",
+    "peer-api-check": "node ../../scripts/peer-api-check.js"
   },
   "keywords": [
     "opentelemetry",

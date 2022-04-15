@@ -17,7 +17,8 @@
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
-    "prewatch": "node ../../../scripts/version-update.js"
+    "prewatch": "node ../../../scripts/version-update.js",
+    "peer-api-check": "node ../../../scripts/peer-api-check.js"
   },
   "keywords": [
     "opentelemetry",

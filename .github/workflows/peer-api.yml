@@ -23,4 +23,4 @@ jobs:
 
       - name: Check API dependency semantics
         working-directory: packages
-        run: lerna exec --ignore propagation-validation-server --ignore @opentelemetry/api-metrics --ignore propagation-validation-server --ignore @opentelemetry/selenium-tests \"node $(pwd)/scripts/peer-api-check.js\"
+        run: lerna run peer-api-check
