@@ -401,7 +401,7 @@ describe('OpenTracing Shim', () => {
           span.log(kvLogs, tomorrow);
           assert.strictEqual(otSpan.events[0].name, 'fun-time');
           assert.strictEqual(otSpan.events[0].time[0], Math.trunc(tomorrow / 1000));
-          assert.strictEqual(otSpan.events[0].attributes, kvLogs);
+          assert.deepStrictEqual(otSpan.events[0].attributes, kvLogs);
         });
 
         it('names event log, as a fallback', () => {
@@ -409,7 +409,7 @@ describe('OpenTracing Shim', () => {
           span.log(kvLogs, tomorrow);
           assert.strictEqual(otSpan.events[0].name, 'log');
           assert.strictEqual(otSpan.events[0].time[0], Math.trunc(tomorrow / 1000));
-          assert.strictEqual(otSpan.events[0].attributes, kvLogs);
+          assert.deepStrictEqual(otSpan.events[0].attributes, kvLogs);
         });
 
         it('records an exception', () => {

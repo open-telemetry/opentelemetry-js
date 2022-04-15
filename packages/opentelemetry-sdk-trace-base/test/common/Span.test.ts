@@ -22,6 +22,8 @@ import {
   SpanKind,
   TraceFlags,
   HrTime,
+  Attributes,
+  AttributeValue,
 } from '@opentelemetry/api';
 import {
   DEFAULT_ATTRIBUTE_COUNT_LIMIT,
@@ -35,6 +37,7 @@ import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { BasicTracerProvider, Span, SpanProcessor } from '../../src';
+import { invalidAttributes, validAttributes } from './util';
 
 const performanceTimeOrigin: HrTime = [1, 1];
 
@@ -237,28 +240,14 @@ describe('Span', () => {
           SpanKind.CLIENT
         );
 
-        span.setAttribute('string', 'string');
-        span.setAttribute('number', 0);
-        span.setAttribute('bool', true);
-        span.setAttribute('array<string>', ['str1', 'str2']);
-        span.setAttribute('array<number>', [1, 2]);
-        span.setAttribute('array<bool>', [true, false]);
+        for (const [k, v] of Object.entries(validAttributes)) {
+          span.setAttribute(k, v);
+        }
+        for (const [k, v] of Object.entries(invalidAttributes)) {
+          span.setAttribute(k, v as unknown as AttributeValue);
+        }
 
-        //@ts-expect-error invalid attribute type object
-        span.setAttribute('object', { foo: 'bar' });
-        //@ts-expect-error invalid attribute inhomogenous array
-        span.setAttribute('non-homogeneous-array', [0, '']);
-        // This empty length attribute should not be set
-        span.setAttribute('', 'empty-key');
-
-        assert.deepStrictEqual(span.attributes, {
-          string: 'string',
-          number: 0,
-          bool: true,
-          'array<string>': ['str1', 'str2'],
-          'array<number>': [1, 2],
-          'array<bool>': [true, false],
-        });
+        assert.deepStrictEqual(span.attributes, validAttributes);
       });
 
       it('should be able to overwrite attributes', () => {
@@ -623,43 +612,42 @@ describe('Span', () => {
         SpanKind.CLIENT
       );
 
-      span.setAttributes({
-        string: 'string',
-        number: 0,
-        bool: true,
-        'array<string>': ['str1', 'str2'],
-        'array<number>': [1, 2],
-        'array<bool>': [true, false],
-        //@ts-expect-error invalid attribute type object
-        object: { foo: 'bar' },
-        //@ts-expect-error invalid attribute inhomogenous array
-        'non-homogeneous-array': [0, ''],
-        // This empty length attribute should not be set
-        '': 'empty-key',
-      });
+      span.setAttributes(validAttributes);
+      span.setAttributes(invalidAttributes as unknown as Attributes);
 
-      assert.deepStrictEqual(span.attributes, {
-        string: 'string',
-        number: 0,
-        bool: true,
-        'array<string>': ['str1', 'str2'],
-        'array<number>': [1, 2],
-        'array<bool>': [true, false],
-      });
+      assert.deepStrictEqual(span.attributes, validAttributes);
     });
   });
 
-  it('should set an event', () => {
-    const span = new Span(
-      tracer,
-      ROOT_CONTEXT,
-      name,
-      spanContext,
-      SpanKind.CLIENT
-    );
-    span.addEvent('sent');
-    span.addEvent('rev', { attr1: 'value', attr2: 123, attr3: true });
-    span.end();
+  describe('addEvent', () => {
+    it('should add an event', () => {
+      const span = new Span(
+        tracer,
+        ROOT_CONTEXT,
+        name,
+        spanContext,
+        SpanKind.CLIENT
+      );
+      span.addEvent('sent');
+      span.addEvent('rev', { attr1: 'value', attr2: 123, attr3: true });
+      span.end();
+    });
+
+    it('should sanitize attribute values', () => {
+      const span = new Span(
+        tracer,
+        ROOT_CONTEXT,
+        name,
+        spanContext,
+        SpanKind.CLIENT
+      );
+      span.addEvent('rev', { ...validAttributes, ...invalidAttributes } as unknown as Attributes);
+      span.end();
+
+      assert.strictEqual(span.events.length, 1);
+      assert.deepStrictEqual(span.events[0].name, 'rev');
+      assert.deepStrictEqual(span.events[0].attributes, validAttributes);
+    });
   });
 
   it('should set a link', () => {
@@ -836,14 +824,14 @@ describe('Span', () => {
     assert.strictEqual(span.events.length, 1);
     const [event] = span.events;
     assert.deepStrictEqual(event.name, 'sent');
-    assert.ok(!event.attributes);
+    assert.deepStrictEqual(event.attributes, {});
     assert.ok(event.time[0] > 0);
 
     span.addEvent('rev', { attr1: 'value', attr2: 123, attr3: true });
     assert.strictEqual(span.events.length, 2);
     const [event1, event2] = span.events;
     assert.deepStrictEqual(event1.name, 'sent');
-    assert.ok(!event1.attributes);
+    assert.deepStrictEqual(event1.attributes, {});
     assert.ok(event1.time[0] > 0);
     assert.deepStrictEqual(event2.name, 'rev');
     assert.deepStrictEqual(event2.attributes, {
