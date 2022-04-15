@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanAttributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api-metrics';
 import { Context, HrTime } from '@opentelemetry/api';
 
 /**
@@ -28,13 +28,13 @@ export interface ExemplarFilter {
    *
    * @param value The value of the measurement
    * @param timestamp A timestamp that best represents when the measurement was taken
-   * @param attributes The complete set of SpanAttributes of the measurement
+   * @param attributes The complete set of MetricAttributes of the measurement
    * @param context The Context of the measurement
    */
   shouldSample(
     value: number,
     timestamp: HrTime,
-    attributes: SpanAttributes,
+    attributes: MetricAttributes,
     ctx: Context
   ): boolean;
 }

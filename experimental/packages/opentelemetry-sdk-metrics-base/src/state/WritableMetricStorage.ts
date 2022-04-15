@@ -15,7 +15,7 @@
  */
 
 import { Context } from '@opentelemetry/api';
-import { SpanAttributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api-metrics';
 
 /**
  * Internal interface.
@@ -24,9 +24,9 @@ import { SpanAttributes } from '@opentelemetry/api-metrics';
  */
 export interface WritableMetricStorage {
   /** Records a measurement. */
-  record(value: number, attributes: SpanAttributes, context: Context): void;
+  record(value: number, attributes: MetricAttributes, context: Context): void;
 }
 
 export class NoopWritableMetricStorage implements WritableMetricStorage {
-  record(_value: number, _attributes: SpanAttributes, _context: Context): void {}
+  record(_value: number, _attributes: MetricAttributes, _context: Context): void {}
 }

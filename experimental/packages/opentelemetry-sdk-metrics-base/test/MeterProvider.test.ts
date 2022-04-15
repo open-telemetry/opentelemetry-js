@@ -158,7 +158,7 @@ describe('MeterProvider', () => {
 
       // DataPoint matches attributes and point.
       assertPartialDeepStrictEqual(result?.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0], {
-        // SpanAttributes are still there.
+        // MetricAttributes are still there.
         attributes: {
           attrib1: 'attrib_value1',
           attrib2: 'attrib_value2'
