@@ -17,7 +17,7 @@
 import { Meter } from './types/Meter';
 import {
   MetricOptions,
-  Attributes,
+  MetricAttributes,
   Counter,
   Histogram,
   UpDownCounter,
@@ -98,15 +98,15 @@ export class NoopMeter implements Meter {
 export class NoopMetric {}
 
 export class NoopCounterMetric extends NoopMetric implements Counter {
-  add(_value: number, _attributes: Attributes): void {}
+  add(_value: number, _attributes: MetricAttributes): void {}
 }
 
 export class NoopUpDownCounterMetric extends NoopMetric implements UpDownCounter {
-  add(_value: number, _attributes: Attributes): void {}
+  add(_value: number, _attributes: MetricAttributes): void {}
 }
 
 export class NoopHistogramMetric extends NoopMetric implements Histogram {
-  record(_value: number, _attributes: Attributes): void {}
+  record(_value: number, _attributes: MetricAttributes): void {}
 }
 
 export const NOOP_METER = new NoopMeter();

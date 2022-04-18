@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import {
-  Attributes,
+  SpanAttributes,
   Context,
   context,
   createContextKey,
@@ -49,7 +49,7 @@ describe('Tracer', () => {
     : process.env) as any;
 
   class TestSampler implements Sampler {
-    shouldSample(_context: Context, _traceId: string, _spanName: string, _spanKind: SpanKind, attributes: Attributes, links: Link[]) {
+    shouldSample(_context: Context, _traceId: string, _spanName: string, _spanKind: SpanKind, attributes: SpanAttributes, links: Link[]) {
       // The attributes object should be valid.
       assert.deepStrictEqual(sanitizeAttributes(attributes), attributes);
       links.forEach(link => {
@@ -61,7 +61,7 @@ describe('Tracer', () => {
           testAttribute: 'foobar',
           // invalid attributes should be sanitized.
           ...invalidAttributes,
-        } as unknown as Attributes,
+        } as unknown as SpanAttributes,
       };
     }
   }
@@ -375,7 +375,7 @@ describe('Tracer', () => {
       tracerProvider
     );
 
-    const attributes = { ...validAttributes, ...invalidAttributes } as unknown as Attributes;
+    const attributes = { ...validAttributes, ...invalidAttributes } as unknown as SpanAttributes;
     const links = [{
       context: {
         traceId: 'b3cda95b652f4a1592b449d5929fda1b',

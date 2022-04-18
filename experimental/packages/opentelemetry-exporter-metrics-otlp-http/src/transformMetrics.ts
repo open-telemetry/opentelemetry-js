@@ -15,8 +15,10 @@
  */
 
 import { SpanAttributes } from '@opentelemetry/api';
+import { ValueType } from '@opentelemetry/api-metrics';
 import * as core from '@opentelemetry/core';
 import { otlpTypes, toCollectorResource } from '@opentelemetry/exporter-trace-otlp-http';
+import { OTLPExporterBase, OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 import {
   AggregationTemporality,
   DataPointType,
@@ -25,15 +27,13 @@ import {
   MetricData,
   ResourceMetrics
 } from '@opentelemetry/sdk-metrics-base';
-import { Attributes, ValueType } from '@opentelemetry/api-metrics';
-import { OTLPExporterBase, OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 
 /**
- * Converts {@link Attributes} to a collector-compatible format.
+ * Converts {@link SpanAttributes} to a collector-compatible format.
  * @param attributes
  */
 export function toCollectorAttributes(
-  attributes: Attributes
+  attributes: SpanAttributes
 ): otlpTypes.opentelemetryProto.common.v1.StringKeyValue[] {
   return Object.entries(attributes).map(([key, value]) => {
     return { key, value: String(value) };

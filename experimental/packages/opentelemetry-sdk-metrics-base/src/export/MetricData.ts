@@ -15,7 +15,7 @@
  */
 
 import { HrTime } from '@opentelemetry/api';
-import { Attributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
@@ -92,7 +92,7 @@ export interface DataPoint<T> {
   /**
    * The attributes associated with this DataPoint.
    */
-  readonly attributes: Attributes;
+  readonly attributes: MetricAttributes;
   /**
    * The value for this DataPoint.
    */

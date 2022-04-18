@@ -16,7 +16,7 @@
 
 
 import { Context, HrTime } from '@opentelemetry/api';
-import { Attributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api-metrics';
 import { FixedSizeExemplarReservoirBase } from './ExemplarReservoir';
 
 
@@ -32,7 +32,7 @@ export class AlignedHistogramBucketExemplarReservoir extends FixedSizeExemplarRe
     this._boundaries = boundaries;
   }
 
-  private _findBucketIndex(value: number, _timestamp: HrTime, _attributes: Attributes, _ctx: Context) {
+  private _findBucketIndex(value: number, _timestamp: HrTime, _attributes: MetricAttributes, _ctx: Context) {
     for(let i = 0; i < this._boundaries.length; i++) {
       if (value <= this._boundaries[i]) {
         return i;
@@ -41,7 +41,7 @@ export class AlignedHistogramBucketExemplarReservoir extends FixedSizeExemplarRe
     return this._boundaries.length;
   }
 
-  offer(value: number, timestamp: HrTime, attributes: Attributes, ctx: Context): void {
+  offer(value: number, timestamp: HrTime, attributes: MetricAttributes, ctx: Context): void {
     const index = this._findBucketIndex(value, timestamp, attributes, ctx);
     this._reservoirStorage[index].offer(value, timestamp, attributes, ctx);
   }

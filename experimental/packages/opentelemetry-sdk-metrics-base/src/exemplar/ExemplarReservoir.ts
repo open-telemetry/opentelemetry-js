@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api-metrics';
 import { Context, HrTime, isSpanContextValid, trace } from '@opentelemetry/api';
 import { Exemplar } from './Exemplar';
 
@@ -28,7 +28,7 @@ export interface ExemplarReservoir {
   offer(
     value: number,
     timestamp: HrTime,
-    attributes: Attributes,
+    attributes: MetricAttributes,
     ctx: Context
   ): void;
   /**
@@ -40,19 +40,19 @@ export interface ExemplarReservoir {
    * @returns a list of {@link Exemplar}s. Retuned exemplars contain the attributes that were filtered out by the
    * aggregator, but recorded alongside the original measurement.
    */
-  collect(pointAttributes: Attributes): Exemplar[];
+  collect(pointAttributes: MetricAttributes): Exemplar[];
 }
 
 
 class ExemplarBucket {
   private value: number = 0;
-  private attributes: Attributes = {};
+  private attributes: MetricAttributes = {};
   private timestamp: HrTime = [0, 0];
   private spanId?: string;
   private traceId?: string;
   private _offered: boolean = false;
 
-  offer(value: number, timestamp: HrTime, attributes: Attributes, ctx: Context) {
+  offer(value: number, timestamp: HrTime, attributes: MetricAttributes, ctx: Context) {
     this.value = value;
     this.timestamp = timestamp;
     this.attributes = attributes;
@@ -64,7 +64,7 @@ class ExemplarBucket {
     this._offered = true;
   }
 
-  collect(pointAttributes: Attributes): Exemplar | null {
+  collect(pointAttributes: MetricAttributes): Exemplar | null {
     if (!this._offered) return null;
     const currentAttributes = this.attributes;
       // filter attributes
@@ -103,7 +103,7 @@ export abstract class FixedSizeExemplarReservoirBase implements ExemplarReservoi
     }
   }
 
-  abstract offer(value: number, timestamp: HrTime, attributes: Attributes, ctx: Context): void;
+  abstract offer(value: number, timestamp: HrTime, attributes: MetricAttributes, ctx: Context): void;
 
   maxSize(): number {
     return this._size;
@@ -114,7 +114,7 @@ export abstract class FixedSizeExemplarReservoirBase implements ExemplarReservoi
    */
   protected reset(): void {}
 
-  collect(pointAttributes: Attributes): Exemplar[] {
+  collect(pointAttributes: MetricAttributes): Exemplar[] {
     const exemplars: Exemplar[] = [];
     this._reservoirStorage.forEach(storageItem => {
       const res = storageItem.collect(pointAttributes);

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api-metrics';
 import { Context, HrTime } from '@opentelemetry/api';
 import { ExemplarFilter } from './ExemplarFilter';
 
@@ -24,7 +24,7 @@ export class AlwaysSampleExemplarFilter implements ExemplarFilter {
   shouldSample(
     _value: number,
     _timestamp: HrTime,
-    _attributes: Attributes,
+    _attributes: MetricAttributes,
     _ctx: Context
   ): boolean {
       return true;

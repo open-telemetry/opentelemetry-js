@@ -15,7 +15,7 @@
  */
 
 import { Context, HrTime } from '@opentelemetry/api';
-import { Attributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api-metrics';
 import { FixedSizeExemplarReservoirBase } from './ExemplarReservoir';
 
 /**
@@ -34,13 +34,13 @@ export class SimpleFixedSizeExemplarReservoir extends FixedSizeExemplarReservoir
     return Math.floor(Math.random() * (max - min) + min);
   }
 
-  private _findBucketIndex(_value: number, _timestamp: HrTime, _attributes: Attributes, _ctx: Context) {
+  private _findBucketIndex(_value: number, _timestamp: HrTime, _attributes: MetricAttributes, _ctx: Context) {
     if (this._numMeasurementsSeen < this._size ) return this._numMeasurementsSeen++;
     const index = this.getRandomInt(0, ++this._numMeasurementsSeen);
     return index < this._size ? index: -1;
   }
 
-  offer(value: number, timestamp: HrTime, attributes: Attributes, ctx: Context): void {
+  offer(value: number, timestamp: HrTime, attributes: MetricAttributes, ctx: Context): void {
     const index = this._findBucketIndex(value, timestamp, attributes, ctx);
     if (index !== -1) {
       this._reservoirStorage[index].offer(value, timestamp, attributes, ctx);

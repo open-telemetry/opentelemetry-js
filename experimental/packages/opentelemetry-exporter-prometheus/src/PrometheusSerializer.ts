@@ -24,7 +24,7 @@ import {
   DataPoint,
   Histogram,
 } from '@opentelemetry/sdk-metrics-base';
-import { Attributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api-metrics';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
 
 type PrometheusDataTypeLiteral =
@@ -131,10 +131,10 @@ function toPrometheusType(
 
 function stringify(
   metricName: string,
-  attributes: Attributes,
+  attributes: MetricAttributes,
   value: number,
   timestamp?: number,
-  additionalAttributes?: Attributes
+  additionalAttributes?: MetricAttributes
 ) {
   let hasAttribute = false;
   let attributesStr = '';

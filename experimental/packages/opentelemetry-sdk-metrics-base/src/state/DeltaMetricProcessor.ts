@@ -15,7 +15,7 @@
  */
 
 import { Context } from '@opentelemetry/api';
-import { Attributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api-metrics';
 import { Maybe } from '../utils';
 import { Accumulation, Aggregator } from '../aggregator/types';
 import { AttributeHashMap } from './HashMap';
@@ -36,11 +36,11 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
   constructor(private _aggregator: Aggregator<T>) {}
 
   /** Bind an efficient storage handle for a set of attributes. */
-  private bind(attributes: Attributes) {
+  private bind(attributes: MetricAttributes) {
     return this._activeCollectionStorage.getOrDefault(attributes, () => this._aggregator.createAccumulation());
   }
 
-  record(value: number, attributes: Attributes, _context: Context) {
+  record(value: number, attributes: MetricAttributes, _context: Context) {
     const accumulation = this.bind(attributes);
     accumulation?.record(value);
   }
