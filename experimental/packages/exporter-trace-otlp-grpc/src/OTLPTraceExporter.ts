@@ -22,10 +22,8 @@ import {
 } from '@opentelemetry/exporter-trace-otlp-http';
 import { OTLPExporterConfigNode, ServiceClientType } from './types';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
-import { validateAndNormalizeUrl } from './util';
+import { validateAndNormalizeUrl, DEFAULT_COLLECTOR_URL } from './util';
 import { Metadata } from '@grpc/grpc-js';
-
-export const DEFAULT_COLLECTOR_URL = 'http://localhost:4317';
 
 /**
  * OTLP Trace Exporter for Node

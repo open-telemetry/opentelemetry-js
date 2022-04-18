@@ -28,8 +28,9 @@ import {
   ServiceClientType,
   CompressionAlgorithm
 } from './types';
-import { DEFAULT_COLLECTOR_URL } from './OTLPTraceExporter';
 import * as fs from 'fs';
+
+export const DEFAULT_COLLECTOR_URL = 'http://localhost:4317';
 
 export function onInit<ExportItem, ServiceRequest>(
   collector: OTLPExporterNodeBase<ExportItem, ServiceRequest>,
@@ -173,11 +174,17 @@ function getSecurityFromEnv(): boolean {
 }
 
 export function useSecureConnection(): grpc.ChannelCredentials {
-  const rootCert = retrieveRootCert();
-  const privateKey = retrievePrivateKey();
-  const certChain = retrieveCertChain();
+  const rootCertPath = retrieveRootCert();
+  const privateKeyPath = retrievePrivateKey();
+  const certChainPath = retrieveCertChain();
 
-  return grpc.credentials.createSsl(rootCert, privateKey, certChain);
+  // todo: add error message
+  try {
+    return grpc.credentials.createSsl(rootCertPath, privateKeyPath, certChainPath)
+  } catch (error) {
+    diag.warn(error.message, 'ADD ERROR MSG HERE')
+    return grpc.credentials.createSsl();
+  }
 }
 
 function retrieveRootCert(): Buffer | undefined {
