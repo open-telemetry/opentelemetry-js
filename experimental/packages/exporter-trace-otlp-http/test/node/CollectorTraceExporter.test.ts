@@ -16,9 +16,14 @@
 
 import { diag, DiagLogger } from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
+import {
+  CompressionAlgorithm,
+  OTLPExporterError,
+  OTLPExporterNodeConfigBase
+} from '@opentelemetry/otlp-exporter-base';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
-import * as http from 'http';
 import * as assert from 'assert';
+import * as http from 'http';
 import * as sinon from 'sinon';
 import { PassThrough, Stream } from 'stream';
 import * as zlib from 'zlib';
@@ -26,15 +31,12 @@ import {
   OTLPTraceExporter
 } from '../../src/platform/node';
 import * as otlpTypes from '../../src/types';
-import { MockedResponse } from './nodeHelpers';
 import {
   ensureExportTraceServiceRequestIsSet,
   ensureSpanIsCorrect,
-  mockedReadableSpan,
+  mockedReadableSpan
 } from '../traceHelper';
-import { OTLPExporterError,
-  CompressionAlgorithm,
-  OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import { MockedResponse } from './nodeHelpers';
 
 let fakeRequest: PassThrough;
 
