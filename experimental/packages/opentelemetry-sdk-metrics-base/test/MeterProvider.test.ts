@@ -50,6 +50,13 @@ describe('MeterProvider', () => {
       assert(meter instanceof Meter);
     });
 
+    it('should get an identical meter on duplicated calls', () => {
+      const meterProvider = new MeterProvider();
+      const meter1 = meterProvider.getMeter('meter1', '1.0.0');
+      const meter2 = meterProvider.getMeter('meter1', '1.0.0');
+      assert.strictEqual(meter1, meter2);
+    });
+
     it('get a noop meter on shutdown', () => {
       const meterProvider = new MeterProvider();
       meterProvider.shutdown();
