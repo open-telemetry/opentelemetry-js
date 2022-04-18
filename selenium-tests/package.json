@@ -36,7 +36,7 @@
     "@babel/plugin-proposal-decorators": "7.16.4",
     "@babel/plugin-transform-runtime": "7.16.4",
     "@babel/preset-env": "7.16.4",
-    "@opentelemetry/api": "^1.1.0",
+    "@opentelemetry/api": "^1.0.0",
     "babel-loader": "8.2.3",
     "babel-polyfill": "6.26.0",
     "browserstack-local": "1.4.8",
@@ -53,12 +53,12 @@
     "webpack-merge": "5.8.0"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^1.1.0"
+    "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
     "@opentelemetry/context-zone-peer-dep": "1.1.1",
     "@opentelemetry/core": "1.1.1",
-    "@opentelemetry/exporter-otlp-http": "0.26.0",
+    "@opentelemetry/exporter-trace-otlp-http": "0.27.0",
     "@opentelemetry/exporter-zipkin": "1.1.1",
     "@opentelemetry/instrumentation": "0.27.0",
     "@opentelemetry/instrumentation-fetch": "0.27.0",

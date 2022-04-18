@@ -10,15 +10,18 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: (Bug Fix)
 
-* fix: sanitize attributes inputs #2881 @legendecas
+* fix: sanitize attributes inputs [#2881](https://github.com/open-telemetry/opentelemetry-js/pull/2881) @legendecas
+* fix: support earlier API versions [#2892](https://github.com/open-telemetry/opentelemetry-js/pull/2892) @dyladan
 
 ### :books: (Refine Doc)
 
-* docs(sdk): update earliest support node version #2860 @svetlanabrennan
+* docs(sdk): update earliest support node version [#2860](https://github.com/open-telemetry/opentelemetry-js/pull/2860) @svetlanabrennan
 
 ### :house: (Internal)
 
-* chore: require changelog entry to merge PR #2847 @dyladan
+* chore: require changelog entry to merge PR [#2847](https://github.com/open-telemetry/opentelemetry-js/pull/2847) @dyladan
+* chore: remove peer API check [#2892](https://github.com/open-telemetry/opentelemetry-js/pull/2892) @dyladan
+* chore: merge lerna subdirectories into a single monorepo [#2892](https://github.com/open-telemetry/opentelemetry-js/pull/2892) @dyladan
 
 ## 1.1.1
 

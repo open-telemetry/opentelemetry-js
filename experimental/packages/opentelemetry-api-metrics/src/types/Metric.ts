@@ -72,27 +72,27 @@ export interface Counter {
   /**
    * Increment value of counter by the input. Inputs may not be negative.
    */
-  add(value: number, attributes?: Attributes, context?: Context): void;
+  add(value: number, attributes?: MetricAttributes, context?: Context): void;
 }
 
 export interface UpDownCounter {
   /**
    * Increment value of counter by the input. Inputs may be negative.
    */
-  add(value: number, attributes?: Attributes, context?: Context): void;
+  add(value: number, attributes?: MetricAttributes, context?: Context): void;
 }
 
 export interface Histogram {
   /**
    * Records a measurement. Value of the measurement must not be negative.
    */
-  record(value: number, attributes?: Attributes, context?: Context): void;
+  record(value: number, attributes?: MetricAttributes, context?: Context): void;
 }
 
 /**
  * key-value pairs passed by the user.
  */
-export type Attributes = { [key: string]: string };
+export type MetricAttributes = { [key: string]: string };
 
 /**
  * The observable callback for Observable instruments.

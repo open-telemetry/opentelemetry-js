@@ -26,7 +26,8 @@
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "version": "node ../../scripts/version-update.js",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
-    "prewatch": "npm run precompile"
+    "prewatch": "npm run precompile",
+    "peer-api-check": "node ../../scripts/peer-api-check.js"
   },
   "keywords": [
     "opentelemetry",
@@ -58,7 +59,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/api": "~1.1.0",
+    "@opentelemetry/api": ">=1.0.0 <1.2.0",
     "@types/mocha": "8.2.3",
     "@types/node": "14.17.33",
     "@types/sinon": "10.0.6",

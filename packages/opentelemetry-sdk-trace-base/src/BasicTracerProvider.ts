@@ -20,7 +20,6 @@ import {
   propagation,
   TextMapPropagator,
   trace,
-  TracerOptions,
   TracerProvider,
 } from '@opentelemetry/api';
 import {
@@ -91,7 +90,7 @@ export class BasicTracerProvider implements TracerProvider {
     }
   }
 
-  getTracer(name: string, version?: string, options?: TracerOptions): Tracer {
+  getTracer(name: string, version?: string, options?: { schemaUrl?: string }): Tracer {
     const key = `${name}@${version || ''}:${options?.schemaUrl || ''}`;
     if (!this._tracers.has(key)) {
       this._tracers.set(key, new Tracer({ name, version, schemaUrl: options?.schemaUrl }, this._config, this));

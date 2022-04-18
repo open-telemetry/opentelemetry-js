@@ -15,13 +15,13 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { Attributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api-metrics';
 
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#measurement
 
 export type Measurement = {
     value: number;
     // TODO use common attributes
-    attributes: Attributes
+    attributes: MetricAttributes
     context?: api.Context;
 };
