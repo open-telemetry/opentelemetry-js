@@ -25,12 +25,18 @@ import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { Stream } from 'stream';
 import {
+  AggregationTemporalitySelector,
+  CumulativeTemporalitySelector,
   ExplicitBucketHistogramAggregation,
   MeterProvider,
   MetricReader
 } from '@opentelemetry/sdk-metrics-base';
 
 export class TestMetricReader extends MetricReader {
+  constructor(temporalitySelector?: AggregationTemporalitySelector) {
+    super(temporalitySelector ?? CumulativeTemporalitySelector);
+  }
+
   protected onForceFlush(): Promise<void> {
     return Promise.resolve(undefined);
   }

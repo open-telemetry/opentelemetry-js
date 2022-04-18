@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-import { MetricReader } from '../../src';
+import { AggregationTemporalitySelector, CumulativeTemporalitySelector, MetricReader } from '../../src';
 import { MetricCollector } from '../../src/state/MetricCollector';
 
 /**
  * A test metric reader that implements no-op onForceFlush() and onShutdown() handlers.
  */
 export class TestMetricReader extends MetricReader {
+  constructor(aggregationTemporalitySelector?: AggregationTemporalitySelector) {
+    super(aggregationTemporalitySelector ?? CumulativeTemporalitySelector);
+  }
+
   protected onForceFlush(): Promise<void> {
     return Promise.resolve(undefined);
   }

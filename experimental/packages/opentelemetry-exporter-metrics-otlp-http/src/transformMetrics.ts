@@ -112,21 +112,19 @@ export function toHistogramDataPoints(
  */
 export function toCollectorMetric(
   metricData: MetricData,
-  aggregationTemporality: AggregationTemporality
 ): otlpTypes.opentelemetryProto.metrics.v1.Metric {
   const metricCollector: otlpTypes.opentelemetryProto.metrics.v1.Metric = {
     name: metricData.descriptor.name,
     description: metricData.descriptor.description,
     unit: metricData.descriptor.unit,
   };
-
   if (metricData.dataPointType === DataPointType.SINGULAR) {
     const result = {
       dataPoints: toSingularDataPoints(metricData),
       isMonotonic:
         metricData.descriptor.type === InstrumentType.COUNTER ||
         metricData.descriptor.type === InstrumentType.OBSERVABLE_COUNTER,
-      aggregationTemporality: toAggregationTemporality(aggregationTemporality),
+      aggregationTemporality: toAggregationTemporality(metricData.aggregationTemporality),
     };
 
     if (
@@ -151,7 +149,7 @@ export function toCollectorMetric(
   } else if (metricData.dataPointType === DataPointType.HISTOGRAM) {
     const result = {
       dataPoints: toHistogramDataPoints(metricData),
-      aggregationTemporality: toAggregationTemporality(aggregationTemporality)
+      aggregationTemporality: toAggregationTemporality(metricData.aggregationTemporality)
     };
     if (metricData.descriptor.valueType === ValueType.INT) {
       metricCollector.intHistogram = result;
@@ -173,7 +171,6 @@ export function toCollectorMetric(
  */
 export function toOTLPExportMetricServiceRequest<T extends otlpTypes.OTLPExporterConfigBase>(
   metrics: ResourceMetrics,
-  aggregationTemporality: AggregationTemporality,
   collectorExporterBase: OTLPExporterBase<T,
     ResourceMetrics,
     otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest>
@@ -186,7 +183,6 @@ export function toOTLPExportMetricServiceRequest<T extends otlpTypes.OTLPExporte
     resourceMetrics: toCollectorResourceMetrics(
       metrics,
       additionalAttributes,
-      aggregationTemporality
     ),
   };
 }
@@ -195,15 +191,14 @@ export function toOTLPExportMetricServiceRequest<T extends otlpTypes.OTLPExporte
  * Convert to InstrumentationLibraryMetrics
  * @param instrumentationLibrary
  * @param metrics
- * @param aggregationTemporality
+ * @param temporalitySelector
  */
 function toCollectorInstrumentationLibraryMetrics(
   instrumentationLibrary: core.InstrumentationLibrary,
   metrics: MetricData[],
-  aggregationTemporality: AggregationTemporality
 ): otlpTypes.opentelemetryProto.metrics.v1.InstrumentationLibraryMetrics {
   return {
-    metrics: metrics.map(metric => toCollectorMetric(metric, aggregationTemporality)),
+    metrics: metrics.map(metric => toCollectorMetric(metric)),
     instrumentationLibrary,
   };
 }
@@ -217,7 +212,6 @@ function toCollectorInstrumentationLibraryMetrics(
 function toCollectorResourceMetrics(
   resourceMetrics: ResourceMetrics,
   baseAttributes: SpanAttributes,
-  aggregationTemporality: AggregationTemporality
 ): otlpTypes.opentelemetryProto.metrics.v1.ResourceMetrics[] {
   return [{
     resource: toCollectorResource(resourceMetrics.resource, baseAttributes),
@@ -225,7 +219,6 @@ function toCollectorResourceMetrics(
       instrumentationLibraryMetrics => toCollectorInstrumentationLibraryMetrics(
         instrumentationLibraryMetrics.instrumentationLibrary,
         instrumentationLibraryMetrics.metrics,
-        aggregationTemporality
       )))
   }];
 }

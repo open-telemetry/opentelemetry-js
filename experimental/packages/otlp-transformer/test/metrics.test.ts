@@ -32,7 +32,7 @@ const END_TIME = hrTime();
 
 describe('Metrics', () => {
   describe('createExportMetricsServiceRequest', () => {
-    function createCounterData(value: number): MetricData {
+    function createCounterData(value: number, aggregationTemporality: AggregationTemporality): MetricData {
       return {
         descriptor: {
           description: 'this is a description',
@@ -41,6 +41,7 @@ describe('Metrics', () => {
           unit: '1',
           valueType: ValueType.INT,
         },
+        aggregationTemporality,
         dataPointType: DataPointType.SINGULAR,
         dataPoints: [
           {
@@ -53,7 +54,7 @@ describe('Metrics', () => {
       };
     }
 
-    function createObservableCounterData(value: number): MetricData {
+    function createObservableCounterData(value: number, aggregationTemporality: AggregationTemporality): MetricData {
       return {
         descriptor: {
           description: 'this is a description',
@@ -62,6 +63,7 @@ describe('Metrics', () => {
           unit: '1',
           valueType: ValueType.INT,
         },
+        aggregationTemporality,
         dataPointType: DataPointType.SINGULAR,
         dataPoints: [
           {
@@ -83,6 +85,7 @@ describe('Metrics', () => {
           unit: '1',
           valueType: ValueType.DOUBLE,
         },
+        aggregationTemporality: AggregationTemporality.CUMULATIVE,
         dataPointType: DataPointType.SINGULAR,
         dataPoints: [
           {
@@ -95,7 +98,7 @@ describe('Metrics', () => {
       };
     }
 
-    function createHistogramMetrics(count: number, sum: number, boundaries: number[], counts: number[]): MetricData {
+    function createHistogramMetrics(count: number, sum: number, boundaries: number[], counts: number[], aggregationTemporality: AggregationTemporality): MetricData {
       return {
         descriptor: {
           description: 'this is a description',
@@ -104,6 +107,7 @@ describe('Metrics', () => {
           unit: '1',
           valueType: ValueType.INT,
         },
+        aggregationTemporality,
         dataPointType: DataPointType.HISTOGRAM,
         dataPoints: [
           {
@@ -144,11 +148,8 @@ describe('Metrics', () => {
     }
 
     it('serializes a sum metric record', () => {
-      const metrics = createResourceMetrics([createCounterData(10)]);
-      const exportRequest = createExportMetricsServiceRequest(
-        metrics,
-        AggregationTemporality.DELTA
-      );
+      const metrics = createResourceMetrics([createCounterData(10,AggregationTemporality.DELTA)]);
+      const exportRequest = createExportMetricsServiceRequest(metrics);
       assert.ok(exportRequest);
 
       assert.deepStrictEqual(exportRequest, {
@@ -208,8 +209,7 @@ describe('Metrics', () => {
 
     it('serializes an observable sum metric record', () => {
       const exportRequest = createExportMetricsServiceRequest(
-        createResourceMetrics([createObservableCounterData(10)]),
-        AggregationTemporality.DELTA
+        createResourceMetrics([createObservableCounterData(10, AggregationTemporality.DELTA)])
       );
       assert.ok(exportRequest);
 
@@ -271,7 +271,6 @@ describe('Metrics', () => {
     it('serializes a gauge metric record', () => {
       const exportRequest = createExportMetricsServiceRequest(
         createResourceMetrics([createObservableGaugeData(10.5)]),
-        AggregationTemporality.DELTA
       );
       assert.ok(exportRequest);
 
@@ -330,8 +329,7 @@ describe('Metrics', () => {
 
     it('serializes a histogram metric record', () => {
       const exportRequest = createExportMetricsServiceRequest(
-        createResourceMetrics([createHistogramMetrics(2, 9, [5], [1,1])]),
-        AggregationTemporality.CUMULATIVE
+        createResourceMetrics([createHistogramMetrics(2, 9, [5], [1,1], AggregationTemporality.CUMULATIVE)])
       );
       assert.ok(exportRequest);
 

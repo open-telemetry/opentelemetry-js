@@ -17,10 +17,8 @@ import type { ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
 import { toAttributes } from '../common/internal';
 import { toMetric } from './internal';
 import type { IExportMetricsServiceRequest } from './types';
-import { AggregationTemporality } from '@opentelemetry/sdk-metrics-base';
 
-export function createExportMetricsServiceRequest(resourceMetrics: ResourceMetrics,
-                                                  aggregationTemporality: AggregationTemporality): IExportMetricsServiceRequest | null {
+export function createExportMetricsServiceRequest(resourceMetrics: ResourceMetrics): IExportMetricsServiceRequest | null {
   return {
     resourceMetrics: [{
       resource: {
@@ -34,7 +32,7 @@ export function createExportMetricsServiceRequest(resourceMetrics: ResourceMetri
             name: metrics.instrumentationLibrary.name,
             version: metrics.instrumentationLibrary.version,
           },
-          metrics: metrics.metrics.map(metricData => toMetric(metricData, aggregationTemporality)),
+          metrics: metrics.metrics.map(metricData => toMetric(metricData)),
           schemaUrl: metrics.instrumentationLibrary.schemaUrl
         };
       }))

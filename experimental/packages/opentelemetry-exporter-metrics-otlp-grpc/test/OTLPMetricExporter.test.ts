@@ -128,7 +128,7 @@ const testOTLPMetricExporter = (params: TestParams) =>
         url: 'grpcs://' + address,
         credentials,
         metadata: params.metadata,
-        aggregationTemporality: AggregationTemporality.CUMULATIVE
+        preferredAggregationTemporality: AggregationTemporality.CUMULATIVE
       });
 
       setUp();
@@ -182,7 +182,7 @@ const testOTLPMetricExporter = (params: TestParams) =>
           headers: {
             foo: 'bar',
           },
-          aggregationTemporality: AggregationTemporality.CUMULATIVE
+          preferredAggregationTemporality: AggregationTemporality.CUMULATIVE
         });
         const args = warnStub.args[0];
         assert.strictEqual(args[0], 'Headers cannot be set when using grpc');
@@ -190,7 +190,7 @@ const testOTLPMetricExporter = (params: TestParams) =>
       it('should warn about path in url', () => {
         collectorExporter = new OTLPMetricExporter({
           url: `http://${address}/v1/metrics`,
-          aggregationTemporality: AggregationTemporality.CUMULATIVE
+          preferredAggregationTemporality: AggregationTemporality.CUMULATIVE
         });
         const args = warnStub.args[0];
         assert.strictEqual(
@@ -264,7 +264,7 @@ describe('OTLPMetricExporter - node (getDefaultUrl)', () => {
     const url = 'http://foo.bar.com';
     const collectorExporter = new OTLPMetricExporter({
       url,
-      aggregationTemporality: AggregationTemporality.CUMULATIVE
+      preferredAggregationTemporality: AggregationTemporality.CUMULATIVE
     });
     setTimeout(() => {
       assert.strictEqual(collectorExporter._otlpExporter.url, 'foo.bar.com');
@@ -309,7 +309,7 @@ describe('when configuring via environment', () => {
     envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
     const collectorExporter = new OTLPMetricExporter({
       metadata,
-      aggregationTemporality: AggregationTemporality.CUMULATIVE
+      preferredAggregationTemporality: AggregationTemporality.CUMULATIVE
     });
     assert.deepStrictEqual(collectorExporter._otlpExporter.metadata?.get('foo'), ['boo']);
     assert.deepStrictEqual(collectorExporter._otlpExporter.metadata?.get('bar'), ['foo']);

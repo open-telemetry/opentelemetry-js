@@ -20,14 +20,13 @@ import {
   appendResourcePathToUrlIfNotPresent,
 } from '@opentelemetry/exporter-trace-otlp-http';
 import {
-  defaultExporterTemporality,
   defaultOptions,
   OTLPMetricExporterOptions,
   toOTLPExportMetricServiceRequest
 } from '@opentelemetry/exporter-metrics-otlp-http';
 import { ServiceClientType, OTLPExporterNodeBase } from '@opentelemetry/exporter-trace-otlp-proto';
 import { getEnv, baggageUtils} from '@opentelemetry/core';
-import { AggregationTemporality, ResourceMetrics} from '@opentelemetry/sdk-metrics-base';
+import { ResourceMetrics} from '@opentelemetry/sdk-metrics-base';
 import { OTLPMetricExporterBase } from '@opentelemetry/exporter-metrics-otlp-http';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = '/v1/metrics';
@@ -36,7 +35,6 @@ const DEFAULT_COLLECTOR_URL = `http://localhost:4318${DEFAULT_COLLECTOR_RESOURCE
 
 class OTLPMetricExporterNodeProxy extends OTLPExporterNodeBase<ResourceMetrics,
   otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest> {
-  protected readonly _aggregationTemporality: AggregationTemporality;
 
   constructor(config: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions = defaultOptions) {
     super(config);
@@ -46,7 +44,6 @@ class OTLPMetricExporterNodeProxy extends OTLPExporterNodeBase<ResourceMetrics,
         getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
       )
     );
-    this._aggregationTemporality = config.aggregationTemporality ?? defaultExporterTemporality;
   }
 
   convert(
@@ -54,7 +51,6 @@ class OTLPMetricExporterNodeProxy extends OTLPExporterNodeBase<ResourceMetrics,
   ): otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
     return toOTLPExportMetricServiceRequest(
       metrics[0],
-      this._aggregationTemporality,
       this
     );
   }

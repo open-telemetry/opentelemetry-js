@@ -27,13 +27,13 @@ export class TestMetricExporter implements PushMetricExporter {
   async forceFlush(): Promise<void> {}
   async shutdown(): Promise<void> {}
 
-  getPreferredAggregationTemporality(): AggregationTemporality {
+  getAggregationTemporality(): AggregationTemporality {
     return AggregationTemporality.CUMULATIVE;
   }
 }
 
 export class TestDeltaMetricExporter extends TestMetricExporter {
-  override getPreferredAggregationTemporality(): AggregationTemporality {
+  override getAggregationTemporality(): AggregationTemporality {
     return AggregationTemporality.DELTA;
   }
 }

@@ -25,6 +25,7 @@ import { HistogramMetricData, DataPointType } from '../export/MetricData';
 import { HrTime } from '@opentelemetry/api';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
+import { AggregationTemporality } from '../export/AggregationTemporality';
 
 function createNewEmptyCheckpoint(boundaries: number[]): Histogram {
   const counts = boundaries.map(() => 0);
@@ -134,11 +135,13 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
 
   toMetricData(
     descriptor: InstrumentDescriptor,
+    aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<HistogramAccumulation>[],
     startTime: HrTime,
     endTime: HrTime): Maybe<HistogramMetricData> {
     return {
       descriptor,
+      aggregationTemporality,
       dataPointType: DataPointType.HISTOGRAM,
       dataPoints: accumulationByAttributes.map(([attributes, accumulation]) => {
         return {

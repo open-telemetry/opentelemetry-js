@@ -15,10 +15,11 @@
  */
 
 import { hrTime } from '@opentelemetry/core';
-import { AggregationTemporality } from '../export/AggregationTemporality';
+import { AggregationTemporalitySelector } from '../export/AggregationTemporality';
 import { ResourceMetrics } from '../export/MetricData';
 import { MetricProducer } from '../export/MetricProducer';
 import { MetricReader } from '../export/MetricReader';
+import { InstrumentType } from '../InstrumentDescriptor';
 import { ForceFlushOptions, ShutdownOptions } from '../types';
 import { MeterProviderSharedState } from './MeterProviderSharedState';
 
@@ -28,9 +29,7 @@ import { MeterProviderSharedState } from './MeterProviderSharedState';
  * state for each MetricReader.
  */
 export class MetricCollector implements MetricProducer {
-  public readonly aggregatorTemporality: AggregationTemporality;
   constructor(private _sharedState: MeterProviderSharedState, private _metricReader: MetricReader) {
-    this.aggregatorTemporality = this._metricReader.getPreferredAggregationTemporality();
   }
 
   async collect(): Promise<ResourceMetrics> {
@@ -57,6 +56,10 @@ export class MetricCollector implements MetricProducer {
   async shutdown(options?: ShutdownOptions): Promise<void> {
     await this._metricReader.shutdown(options);
   }
+
+  getAggregationTemporality(instrumentType: InstrumentType) {
+    return this._metricReader.getAggregationTemporality(instrumentType);
+  }
 }
 
 /**
@@ -64,5 +67,5 @@ export class MetricCollector implements MetricProducer {
  * information for metric collection.
  */
 export interface MetricCollectorHandle {
-  aggregatorTemporality: AggregationTemporality;
+  getAggregationTemporality: AggregationTemporalitySelector;
 }

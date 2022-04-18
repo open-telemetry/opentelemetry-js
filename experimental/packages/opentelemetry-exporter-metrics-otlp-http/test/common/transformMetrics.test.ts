@@ -56,7 +56,7 @@ describe('transformMetrics', () => {
 
         const metric = metrics.instrumentationLibraryMetrics[0].metrics[0];
         ensureCounterIsCorrect(
-          transform.toCollectorMetric(metric, AggregationTemporality.CUMULATIVE),
+          transform.toCollectorMetric(metric),
           hrTimeToNanoseconds(metric.dataPoints[0].endTime),
           hrTimeToNanoseconds(metric.dataPoints[0].startTime)
         );
@@ -70,7 +70,7 @@ describe('transformMetrics', () => {
 
         const metric = metrics.instrumentationLibraryMetrics[0].metrics[0];
         ensureDoubleCounterIsCorrect(
-          transform.toCollectorMetric(metric, AggregationTemporality.CUMULATIVE),
+          transform.toCollectorMetric(metric),
           hrTimeToNanoseconds(metric.dataPoints[0].endTime),
           hrTimeToNanoseconds(metric.dataPoints[0].startTime),
         );
@@ -91,7 +91,7 @@ describe('transformMetrics', () => {
 
         const metric = metrics.instrumentationLibraryMetrics[0].metrics[0];
         ensureObservableGaugeIsCorrect(
-          transform.toCollectorMetric(metric, AggregationTemporality.CUMULATIVE),
+          transform.toCollectorMetric(metric),
           hrTimeToNanoseconds(metric.dataPoints[0].endTime),
           hrTimeToNanoseconds(metric.dataPoints[0].startTime),
           -1,
@@ -113,7 +113,7 @@ describe('transformMetrics', () => {
 
         const metric = metrics.instrumentationLibraryMetrics[0].metrics[0];
         ensureObservableCounterIsCorrect(
-          transform.toCollectorMetric(metric, AggregationTemporality.CUMULATIVE),
+          transform.toCollectorMetric(metric),
           hrTimeToNanoseconds(metric.dataPoints[0].endTime),
           hrTimeToNanoseconds(metric.dataPoints[0].startTime),
           2,
@@ -134,7 +134,7 @@ describe('transformMetrics', () => {
 
         const metric = metrics.instrumentationLibraryMetrics[0].metrics[0];
         ensureObservableUpDownCounterIsCorrect(
-          transform.toCollectorMetric(metric, AggregationTemporality.CUMULATIVE),
+          transform.toCollectorMetric(metric),
           hrTimeToNanoseconds(metric.dataPoints[0].endTime),
           hrTimeToNanoseconds(metric.dataPoints[0].startTime),
           2,
@@ -151,7 +151,7 @@ describe('transformMetrics', () => {
 
         const metric = metrics.instrumentationLibraryMetrics[0].metrics[0];
         ensureHistogramIsCorrect(
-          transform.toCollectorMetric(metric, AggregationTemporality.CUMULATIVE),
+          transform.toCollectorMetric(metric),
           hrTimeToNanoseconds(metric.dataPoints[0].endTime),
           hrTimeToNanoseconds(metric.dataPoints[0].startTime),
           [0, 100],
@@ -170,6 +170,7 @@ describe('transformMetrics', () => {
             type: InstrumentType.COUNTER,
             valueType: 0,
           },
+          aggregationTemporality: AggregationTemporality.CUMULATIVE,
           dataPoints: [
             {
               value: 1,
@@ -180,7 +181,6 @@ describe('transformMetrics', () => {
           ],
           dataPointType: DataPointType.SINGULAR,
         },
-        AggregationTemporality.CUMULATIVE
       );
       const collectorMetric = metric.intSum?.dataPoints[0];
       assert.strictEqual(collectorMetric?.labels[0].value, '1');

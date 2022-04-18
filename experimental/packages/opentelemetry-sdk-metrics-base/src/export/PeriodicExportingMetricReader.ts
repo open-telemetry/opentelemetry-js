@@ -40,7 +40,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
   private readonly _exportTimeout: number;
 
   constructor(options: PeriodicExportingMetricReaderOptions) {
-    super(options.exporter.getPreferredAggregationTemporality());
+    super(options.exporter.getAggregationTemporality);
 
     if (options.exportIntervalMillis !== undefined && options.exportIntervalMillis <= 0) {
       throw Error('exportIntervalMillis must be greater than 0');

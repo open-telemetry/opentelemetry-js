@@ -27,14 +27,14 @@ import { toAttributes } from '../common/internal';
 import { EAggregationTemporality, IHistogramDataPoint, IMetric, INumberDataPoint } from './types';
 
 
-export function toMetric(metricData: MetricData, metricTemporality: AggregationTemporality): IMetric {
+export function toMetric(metricData: MetricData): IMetric {
   const out: IMetric = {
     name: metricData.descriptor.name,
     description: metricData.descriptor.description,
     unit: metricData.descriptor.unit,
   };
 
-  const aggregationTemporality = toAggregationTemporality(metricTemporality);
+  const aggregationTemporality = toAggregationTemporality(metricData.aggregationTemporality);
 
   if (metricData.dataPointType === DataPointType.SINGULAR) {
     const dataPoints = toSingularDataPoints(metricData);
