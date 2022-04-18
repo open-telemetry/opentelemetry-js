@@ -29,7 +29,7 @@ import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import {
   PerformanceTimingNames as PTN,
   WebTracerProvider,
-  parseUrl,
+  URLLike,
 } from '@opentelemetry/sdk-trace-web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -41,11 +41,18 @@ import {
 import { AttributeNames } from '../src/enums/AttributeNames';
 
 class DummySpanExporter implements tracing.SpanExporter {
-  export(spans: any) {}
+  export(spans: any) {
+  }
 
   shutdown() {
     return Promise.resolve();
   }
+}
+
+function parseUrl(url: string): URLLike {
+  const element = document.createElement('a');
+  element.href = url;
+  return element;
 }
 
 const XHR_TIMEOUT = 2000;
@@ -127,7 +134,9 @@ function createMainResource(resource = {}): PerformanceResourceTiming {
 
 function createFakePerformanceObs(url: string) {
   class FakePerfObs implements PerformanceObserver {
-    constructor(private readonly cb: PerformanceObserverCallback) {}
+    constructor(private readonly cb: PerformanceObserverCallback) {
+    }
+
     observe() {
       const absoluteUrl = url.startsWith('http') ? url : location.origin + url;
       const resources: PerformanceObserverEntryList = {
@@ -146,7 +155,10 @@ function createFakePerformanceObs(url: string) {
       };
       this.cb(resources, this);
     }
-    disconnect() {}
+
+    disconnect() {
+    }
+
     takeRecords(): PerformanceEntryList {
       return [];
     }
@@ -557,7 +569,7 @@ describe('xhr', () => {
 
         describe(
           'AND origin does NOT match window.location but match with' +
-            ' propagateTraceHeaderCorsUrls',
+          ' propagateTraceHeaderCorsUrls',
           () => {
             beforeEach(done => {
               clearData();
@@ -590,7 +602,7 @@ describe('xhr', () => {
         );
         describe(
           'AND origin does NOT match window.location And does NOT match' +
-            ' with propagateTraceHeaderCorsUrls',
+          ' with propagateTraceHeaderCorsUrls',
           () => {
             let spyDebug: sinon.SinonSpy;
             beforeEach(done => {
@@ -866,7 +878,8 @@ describe('xhr', () => {
 
         function abortedRequest(done: any) {
           api.context.with(api.trace.setSpan(api.context.active(), rootSpan), () => {
-            void getData(new XMLHttpRequest(), url, () => {}, testAsync).then(
+            void getData(new XMLHttpRequest(), url, () => {
+            }, testAsync).then(
               () => {
                 fakeNow = 0;
                 sinon.clock.tick(1000);
@@ -904,7 +917,8 @@ describe('xhr', () => {
 
         function networkErrorRequest(done: any) {
           api.context.with(api.trace.setSpan(api.context.active(), rootSpan), () => {
-            void getData(new XMLHttpRequest(), url, () => {}, testAsync).then(
+            void getData(new XMLHttpRequest(), url, () => {
+            }, testAsync).then(
               () => {
                 fakeNow = 0;
                 sinon.clock.tick(1000);

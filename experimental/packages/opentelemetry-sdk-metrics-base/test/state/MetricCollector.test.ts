@@ -17,34 +17,13 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MeterProvider } from '../../src';
-import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import { DataPointType, ResourceMetrics } from '../../src/export/MetricData';
+import { DataPointType } from '../../src/export/MetricData';
 import { PushMetricExporter } from '../../src/export/MetricExporter';
 import { MeterProviderSharedState } from '../../src/state/MeterProviderSharedState';
 import { MetricCollector } from '../../src/state/MetricCollector';
 import { defaultInstrumentationLibrary, defaultResource, assertMetricData, assertDataPoint } from '../util';
 import { TestMetricReader } from '../export/TestMetricReader';
-import { ExportResult, ExportResultCode } from '@opentelemetry/core';
-
-class TestMetricExporter implements PushMetricExporter {
-  async export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): Promise<void> {
-    resultCallback({code: ExportResultCode.SUCCESS});
-  }
-
-  async shutdown(): Promise<void> {}
-
-  async forceFlush(): Promise<void> {}
-
-  getPreferredAggregationTemporality(): AggregationTemporality {
-    return AggregationTemporality.CUMULATIVE;
-  }
-}
-
-class TestDeltaMetricExporter extends TestMetricExporter {
-  override getPreferredAggregationTemporality(): AggregationTemporality {
-    return AggregationTemporality.DELTA;
-  }
-}
+import { TestDeltaMetricExporter, TestMetricExporter } from '../export/TestMetricExporter';
 
 describe('MetricCollector', () => {
   afterEach(() => {

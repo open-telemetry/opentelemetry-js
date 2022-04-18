@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as metrics from '@opentelemetry/api-metrics-wip';
+import * as metrics from '@opentelemetry/api-metrics';
 import { AttributeHashMap } from './state/HashMap';
 
 /**
@@ -29,7 +29,7 @@ export class ObservableResult implements metrics.ObservableResult {
   /**
    * Observe a measurement of the value associated with the given attributes.
    */
-  observe(value: number, attributes: metrics.Attributes = {}): void {
+  observe(value: number, attributes: metrics.MetricAttributes = {}): void {
     this.buffer.set(attributes, value);
   }
 }

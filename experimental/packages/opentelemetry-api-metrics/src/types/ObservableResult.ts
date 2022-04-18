@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes } from './Metric';
+import { MetricAttributes } from './Metric';
 
 /**
  * Interface that is being used in callback function for Observable Metric
@@ -28,5 +28,5 @@ export interface ObservableResult {
    * one values associated with the same attributes values, SDK may pick the
    * last one or simply drop the entire observable result.
    */
-  observe(value: number, attributes?: Attributes): void;
+  observe(value: number, attributes?: MetricAttributes): void;
 }

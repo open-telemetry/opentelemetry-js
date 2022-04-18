@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ObservableCallback } from '@opentelemetry/api-metrics-wip';
+import { ObservableCallback } from '@opentelemetry/api-metrics';
 import * as assert from 'assert';
 import { CounterInstrument, HistogramInstrument, UpDownCounterInstrument } from '../src/Instruments';
 import { Meter } from '../src/Meter';

@@ -22,7 +22,7 @@ import { AggregationTemporality, InstrumentDescriptor, InstrumentType, MeterProv
 import { TestMetricReader } from './export/TestMetricReader';
 import { assertMetricData, assertDataPoint, commonValues, commonAttributes, defaultResource, defaultInstrumentationLibrary } from './util';
 import { Histogram } from '../src/aggregator/types';
-import { ObservableResult, ValueType } from '@opentelemetry/api-metrics-wip';
+import { ObservableResult, ValueType } from '@opentelemetry/api-metrics';
 
 describe('Instruments', () => {
   describe('Counter', () => {

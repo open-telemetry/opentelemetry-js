@@ -66,7 +66,7 @@ If the change affects the overall project and not any individual package, it sho
 Changelog entries should be in the following format:
 
 ```md
-* [#{pull request number}](https://github.com/open-telemetry/opentelemetry-js/pull/{pull request number}) feat(subject): pull request title here ([@author](https://github.com/author))
+* feat(subject): pull request title here #{pull request number} @{author github handle}
 ```
 
 Subject should describe the area of the project that was changed as descriptively as is possible in a short space.

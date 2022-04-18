@@ -21,7 +21,8 @@
     "test:webworker": "nyc karma start karma.worker.js --single-run",
     "watch": "tsc --build --watch tsconfig.all.json",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
-    "prewatch": "npm run precompile"
+    "prewatch": "npm run precompile",
+    "peer-api-check": "node ../../scripts/peer-api-check.js"
   },
   "keywords": [
     "opentelemetry",
@@ -55,7 +56,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.16.0",
-    "@opentelemetry/api": "~1.1.0",
+    "@opentelemetry/api": ">=1.0.0 <1.2.0",
     "@opentelemetry/context-zone": "1.1.1",
     "@opentelemetry/propagator-b3": "1.1.1",
     "@opentelemetry/resources": "1.1.1",
@@ -87,7 +88,7 @@
     "webpack-merge": "5.8.0"
   },
   "peerDependencies": {
-    "@opentelemetry/api": ">=1.1.0 <1.2.0"
+    "@opentelemetry/api": ">=1.0.0 <1.2.0"
   },
   "dependencies": {
     "@opentelemetry/core": "1.1.1",

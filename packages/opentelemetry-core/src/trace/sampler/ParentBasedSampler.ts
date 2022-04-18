@@ -15,12 +15,12 @@
  */
 
 import {
-  SpanAttributes,
   Context,
   isSpanContextValid,
   Link,
   Sampler,
   SamplingResult,
+  SpanAttributes,
   SpanKind,
   TraceFlags, trace,
 } from '@opentelemetry/api';

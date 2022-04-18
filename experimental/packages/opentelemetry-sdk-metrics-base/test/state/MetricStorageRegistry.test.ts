@@ -15,7 +15,7 @@
  */
 
 import { MetricStorageRegistry } from '../../src/state/MetricStorageRegistry';
-import { ValueType } from '@opentelemetry/api-metrics-wip';
+import { ValueType } from '@opentelemetry/api-metrics';
 import { MetricStorage } from '../../src/state/MetricStorage';
 import { HrTime } from '@opentelemetry/api';
 import { MetricCollectorHandle } from '../../src/state/MetricCollector';
