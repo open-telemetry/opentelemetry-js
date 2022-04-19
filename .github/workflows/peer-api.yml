@@ -13,7 +13,7 @@ jobs:
       image: node:14
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install lerna
         run: npm install -g lerna
