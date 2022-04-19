@@ -25,14 +25,14 @@ import {
   MetricData,
   ResourceMetrics
 } from '@opentelemetry/sdk-metrics-base';
-import { Attributes, ValueType } from '@opentelemetry/api-metrics';
+import { ValueType } from '@opentelemetry/api-metrics';
 
 /**
- * Converts {@link Attributes} to a collector-compatible format.
+ * Converts {@link SpanAttributes} to a collector-compatible format.
  * @param attributes
  */
 export function toCollectorAttributes(
-  attributes: Attributes
+  attributes: SpanAttributes
 ): otlpTypes.opentelemetryProto.common.v1.StringKeyValue[] {
   return Object.entries(attributes).map(([key, value]) => {
     return { key, value: String(value) };

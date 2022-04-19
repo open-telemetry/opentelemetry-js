@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api-metrics';
 import { Context, HrTime, isSpanContextValid, trace, TraceFlags } from '@opentelemetry/api';
 import { ExemplarFilter } from './ExemplarFilter';
 
@@ -23,7 +23,7 @@ export class WithTraceExemplarFilter implements ExemplarFilter {
   shouldSample(
     value: number,
     timestamp: HrTime,
-    attributes: Attributes,
+    attributes: MetricAttributes,
     ctx: Context
   ): boolean {
     const spanContext = trace.getSpanContext(ctx);

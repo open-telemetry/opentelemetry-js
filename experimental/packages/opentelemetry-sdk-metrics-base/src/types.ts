@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
-import { MetricAttributes } from '@opentelemetry/api-metrics';
-
-// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#measurement
-
-export type Measurement = {
-    value: number;
-    // TODO use common attributes
-    attributes: MetricAttributes
-    context?: api.Context;
+export type CommonReaderOptions = {
+  timeoutMillis?: number
 };
+
+export type CollectionOptions = CommonReaderOptions;
+
+export type ShutdownOptions = CommonReaderOptions;
+
+export type ForceFlushOptions = CommonReaderOptions;

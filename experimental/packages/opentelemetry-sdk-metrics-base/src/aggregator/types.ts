@@ -15,7 +15,7 @@
  */
 
 import { HrTime } from '@opentelemetry/api';
-import { Attributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api-metrics';
 import { MetricData } from '../export/MetricData';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
@@ -67,7 +67,7 @@ export interface Accumulation {
   record(value: number): void;
 }
 
-export type AccumulationRecord<T> = [Attributes, T];
+export type AccumulationRecord<T> = [MetricAttributes, T];
 
 /**
  * Base interface for aggregators. Aggregators are responsible for holding

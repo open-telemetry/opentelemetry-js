@@ -15,7 +15,7 @@
  */
 
 import { Context } from '@opentelemetry/api';
-import { Attributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api-metrics';
 import { WritableMetricStorage } from './WritableMetricStorage';
 
 /**
@@ -24,7 +24,7 @@ import { WritableMetricStorage } from './WritableMetricStorage';
 export class MultiMetricStorage implements WritableMetricStorage {
   constructor(private readonly _backingStorages: WritableMetricStorage[]) {}
 
-  record(value: number, attributes: Attributes, context: Context) {
+  record(value: number, attributes: MetricAttributes, context: Context) {
     this._backingStorages.forEach(it => {
       it.record(value, attributes, context);
     });

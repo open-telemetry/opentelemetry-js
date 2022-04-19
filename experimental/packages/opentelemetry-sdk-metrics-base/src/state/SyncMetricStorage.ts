@@ -15,7 +15,7 @@
  */
 
 import { Context, HrTime } from '@opentelemetry/api';
-import { Attributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api-metrics';
 import { WritableMetricStorage } from './WritableMetricStorage';
 import { Accumulation, Aggregator } from '../aggregator/types';
 import { View } from '../view/View';
@@ -50,7 +50,7 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>> extends MetricStor
     this._temporalMetricStorage = new TemporalMetricProcessor(aggregator);
   }
 
-  record(value: number, attributes: Attributes, context: Context) {
+  record(value: number, attributes: MetricAttributes, context: Context) {
     attributes = this._attributesProcessor.process(attributes, context);
     this._deltaMetricStorage.record(value, attributes, context);
   }

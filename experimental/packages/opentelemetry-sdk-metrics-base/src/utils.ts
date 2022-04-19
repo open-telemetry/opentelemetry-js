@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api-metrics';
+import { InstrumentationLibrary } from '@opentelemetry/core';
 
 export type Maybe<T> = T | undefined;
 
@@ -24,9 +25,9 @@ export function isNotNullish<T>(item: Maybe<T>): item is T {
 
 /**
  * Converting the unordered attributes into unique identifier string.
- * @param attributes user provided unordered Attributes.
+ * @param attributes user provided unordered MetricAttributes.
  */
-export function hashAttributes(attributes: Attributes): string {
+export function hashAttributes(attributes: MetricAttributes): string {
   let keys = Object.keys(attributes);
   if (keys.length === 0) return '';
 
@@ -37,6 +38,14 @@ export function hashAttributes(attributes: Attributes): string {
     }
     return (result += key + ':' + attributes[key]);
   }, '|#');
+}
+
+/**
+ * Converting the instrumentation library object to a unique identifier string.
+ * @param instrumentationLibrary
+ */
+export function instrumentationLibraryId(instrumentationLibrary: InstrumentationLibrary): string {
+  return `${instrumentationLibrary.name}:${instrumentationLibrary.version ?? ''}:${instrumentationLibrary.schemaUrl ?? ''}`;
 }
 
 /**
