@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@opentelemetry/auto-instrumentation-agent": "file:../build/src",
-    "express": "^4.17.3"
-  }
-}
