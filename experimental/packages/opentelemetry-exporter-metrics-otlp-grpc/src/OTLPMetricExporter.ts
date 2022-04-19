@@ -26,7 +26,7 @@ import {
   OTLPExporterConfigNode,
   OTLPExporterNodeBase,
   ServiceClientType,
-  validateAndNormalizeUrl,
+  validateAndNormalizeUrl
 } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
 import { Metadata } from '@grpc/grpc-js';
