@@ -174,7 +174,7 @@ export function useSecureConnection(): grpc.ChannelCredentials {
   const certChainPath = retrieveCertChain();
 
   try {
-    return grpc.credentials.createSsl(rootCertPath, privateKeyPath, certChainPath)
+    return grpc.credentials.createSsl(rootCertPath, privateKeyPath, certChainPath);
   } catch (error) {
     diag.warn(`${error.message}. Creating secure channel using default public root certificates.`);
     return grpc.credentials.createSsl();
