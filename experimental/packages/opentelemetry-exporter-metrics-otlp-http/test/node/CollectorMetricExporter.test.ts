@@ -40,15 +40,9 @@ import {
 } from '../metricsHelper';
 import { MockedResponse } from './nodeHelpers';
 import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
+import { Stream, PassThrough } from 'stream';
 
-const fakeRequest = {
-  end: function () {
-  },
-  on: function () {
-  },
-  write: function () {
-  },
-};
+let fakeRequest: PassThrough;
 
 const address = 'localhost:1501';
 
@@ -56,7 +50,6 @@ describe('OTLPMetricExporter - node with json over http', () => {
   let collectorExporter: OTLPMetricExporter;
   let collectorExporterConfig: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions;
   let stubRequest: sinon.SinonStub;
-  let stubWrite: sinon.SinonStub;
   let metrics: ResourceMetrics;
 
   beforeEach(async () => {
@@ -64,6 +57,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
   });
 
   afterEach(async () => {
+    fakeRequest = new Stream.PassThrough();
     await shutdown();
     sinon.restore();
   });
@@ -152,7 +146,6 @@ describe('OTLPMetricExporter - node with json over http', () => {
   describe('export', () => {
     beforeEach(async () => {
       stubRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
-      stubWrite = sinon.stub(fakeRequest, 'end');
       collectorExporterConfig = {
         headers: {
           foo: 'bar',
@@ -187,7 +180,11 @@ describe('OTLPMetricExporter - node with json over http', () => {
       });
 
       setTimeout(() => {
+        const mockRes = new MockedResponse(200);
         const args = stubRequest.args[0];
+        const callback = args[1];
+        callback(mockRes);
+        mockRes.send('success');
         const options = args[0];
 
         assert.strictEqual(options.hostname, 'foo.bar.com');
@@ -202,7 +199,11 @@ describe('OTLPMetricExporter - node with json over http', () => {
       });
 
       setTimeout(() => {
+        const mockRes = new MockedResponse(200);
         const args = stubRequest.args[0];
+        const callback = args[1];
+        callback(mockRes);
+        mockRes.send('success');
         const options = args[0];
         assert.strictEqual(options.headers['foo'], 'bar');
         done();
@@ -214,7 +215,11 @@ describe('OTLPMetricExporter - node with json over http', () => {
       });
 
       setTimeout(() => {
+        const mockRes = new MockedResponse(200);
         const args = stubRequest.args[0];
+        const callback = args[1];
+        callback(mockRes);
+        mockRes.send('success');
         const options = args[0];
         const agent = options.agent;
         assert.strictEqual(agent.keepAlive, true);
@@ -224,13 +229,16 @@ describe('OTLPMetricExporter - node with json over http', () => {
     });
 
     it('should successfully send metrics', done => {
+      let buff = Buffer.from('');
+
       collectorExporter.export(metrics, () => {
       });
 
-      setTimeout(() => {
-        const writeArgs = stubWrite.args[0];
+      fakeRequest.on('end', () => {
+        const responseBody = buff.toString();
+
         const json = JSON.parse(
-          writeArgs[0]
+          responseBody
         ) as otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
         const metric1 =
           json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
@@ -265,7 +273,18 @@ describe('OTLPMetricExporter - node with json over http', () => {
         ensureExportMetricsServiceRequestIsSet(json);
 
         done();
+      })
+
+      fakeRequest.on('data', chunk => {
+        buff = Buffer.concat([buff, chunk]);
       });
+
+      const mockRes = new MockedResponse(200);
+      const args = stubRequest.args[0];
+      const callback = args[1];
+
+      callback(mockRes);
+      mockRes.send('success');
     });
 
     it('should log the successful message', done => {

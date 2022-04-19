@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### :boom: Breaking Change
 
 ### :rocket: (Enhancement)
+* feat(otlp-exporter): add timeout env var [#2738](https://github.com/open-telemetry/opentelemetry-js/pull/2738) @svetlanabrennan
 
 ### :bug: (Bug Fix)
 
