@@ -23,7 +23,7 @@ import { ZoneContextManager } from '@opentelemetry/context-zone';
 
 const providerWithZone = new WebTracerProvider();
 providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-provider.register({
+providerWithZone.register({
   contextManager: new ZoneContextManager()
 });
 
