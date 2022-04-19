@@ -17,7 +17,6 @@
 import * as api from '@opentelemetry/api';
 import * as metrics from '@opentelemetry/api-metrics';
 import { Resource } from '@opentelemetry/resources';
-import { Meter } from './Meter';
 import { MetricReader } from './export/MetricReader';
 import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { InstrumentSelector } from './view/InstrumentSelector';
@@ -115,7 +114,9 @@ export class MeterProvider implements metrics.MeterProvider {
       return metrics.NOOP_METER;
     }
 
-    return new Meter(this._sharedState, { name, version, schemaUrl: options.schemaUrl });
+    return this._sharedState
+      .getMeterSharedState({ name, version, schemaUrl: options.schemaUrl })
+      .meter;
   }
 
   /**

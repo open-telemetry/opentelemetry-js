@@ -15,21 +15,15 @@
  */
 
 import * as metrics from '@opentelemetry/api-metrics';
-import { InstrumentationLibrary } from '@opentelemetry/core';
 import { createInstrumentDescriptor, InstrumentType } from './InstrumentDescriptor';
 import { CounterInstrument, HistogramInstrument, UpDownCounterInstrument } from './Instruments';
-import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { MeterSharedState } from './state/MeterSharedState';
 
 /**
  * This class implements the {@link metrics.Meter} interface.
  */
 export class Meter implements metrics.Meter {
-  private _meterSharedState: MeterSharedState;
-
-  constructor(meterProviderSharedState: MeterProviderSharedState, instrumentationLibrary: InstrumentationLibrary) {
-    this._meterSharedState = meterProviderSharedState.getMeterSharedState(instrumentationLibrary);
-  }
+  constructor(private _meterSharedState: MeterSharedState) {}
 
   /**
    * Create a {@link metrics.Histogram} instrument.

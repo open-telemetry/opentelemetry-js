@@ -50,11 +50,63 @@ describe('MeterProvider', () => {
       assert(meter instanceof Meter);
     });
 
+    it('should get an identical meter on duplicated calls', () => {
+      const meterProvider = new MeterProvider();
+      const meter1 = meterProvider.getMeter('meter1', '1.0.0');
+      const meter2 = meterProvider.getMeter('meter1', '1.0.0');
+      assert.strictEqual(meter1, meter2);
+    });
+
     it('get a noop meter on shutdown', () => {
       const meterProvider = new MeterProvider();
       meterProvider.shutdown();
       const meter = meterProvider.getMeter('meter1', '1.0.0');
       assert.strictEqual(meter, NOOP_METER);
+    });
+
+    it('get meter with same identity', async () => {
+      const meterProvider = new MeterProvider({ resource: defaultResource });
+      const reader = new TestMetricReader();
+      meterProvider.addMetricReader(reader);
+
+      // Create meter and instrument.
+      // name+version pair 1
+      meterProvider.getMeter('meter1', 'v1.0.0');
+      meterProvider.getMeter('meter1', 'v1.0.0');
+      // name+version pair 2
+      meterProvider.getMeter('meter2', 'v1.0.0');
+      meterProvider.getMeter('meter2', 'v1.0.0');
+      // name+version pair 3
+      meterProvider.getMeter('meter1', 'v1.0.1');
+      meterProvider.getMeter('meter1', 'v1.0.1');
+      // name+version+schemaUrl pair 4
+      meterProvider.getMeter('meter1', 'v1.0.1', { schemaUrl: 'https://opentelemetry.io/schemas/1.4.0' });
+      meterProvider.getMeter('meter1', 'v1.0.1', { schemaUrl: 'https://opentelemetry.io/schemas/1.4.0' });
+
+      // Perform collection.
+      const result = await reader.collect();
+
+      // Results came only from de-duplicated meters.
+      assert.strictEqual(result?.instrumentationLibraryMetrics.length, 4);
+
+      // InstrumentationLibrary matches from de-duplicated meters.
+      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[0], {
+        name: 'meter1',
+        version: 'v1.0.0'
+      });
+      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[1], {
+        name: 'meter2',
+        version: 'v1.0.0'
+      });
+      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[2], {
+        name: 'meter1',
+        version: 'v1.0.1'
+      });
+      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[3], {
+        name: 'meter1',
+        version: 'v1.0.1',
+        schemaUrl: 'https://opentelemetry.io/schemas/1.4.0',
+      });
     });
   });
 
