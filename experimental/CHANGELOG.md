@@ -40,6 +40,7 @@ All notable changes to experimental packages in this project will be documented 
 * feat(proto): add @opentelemetry/otlp-transformer package with hand-rolled transformation #2746 @dyladan
 * feat(sdk-metrics-base): shutdown and forceflush on MeterProvider #2890 @legendecas
 * feat(sdk-metrics-base): return the same meter for identical input to getMeter #2901 @legendecas
+* feat(otlp-exporter): add timeout env var #2738 @svetlanabrennan
 
 ### :bug: (Bug Fix)
 

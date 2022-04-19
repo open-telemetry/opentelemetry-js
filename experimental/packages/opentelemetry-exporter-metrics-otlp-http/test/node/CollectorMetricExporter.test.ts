@@ -273,7 +273,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
         ensureExportMetricsServiceRequestIsSet(json);
 
         done();
-      })
+      });
 
       fakeRequest.on('data', chunk => {
         buff = Buffer.concat([buff, chunk]);
