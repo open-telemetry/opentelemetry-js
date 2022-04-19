@@ -26,12 +26,12 @@ import {
   OTLPExporterConfigNode,
   OTLPExporterNodeBase,
   ServiceClientType,
-  validateAndNormalizeUrl
+  validateAndNormalizeUrl,
 } from '@opentelemetry/exporter-trace-otlp-grpc';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
 import { Metadata } from '@grpc/grpc-js';
 
-const DEFAULT_COLLECTOR_URL = 'localhost:4317';
+const DEFAULT_COLLECTOR_URL = 'http://localhost:4317';
 
 
 class OTLPMetricExporterProxy extends OTLPExporterNodeBase<ResourceMetrics,

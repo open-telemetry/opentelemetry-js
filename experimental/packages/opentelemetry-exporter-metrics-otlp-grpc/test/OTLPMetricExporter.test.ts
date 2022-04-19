@@ -123,7 +123,7 @@ const testOTLPMetricExporter = (params: TestParams) =>
           fs.readFileSync('./test/certs/client.key'),
           fs.readFileSync('./test/certs/client.crt')
         )
-        : undefined;
+        : grpc.credentials.createInsecure();
       collectorExporter = new OTLPMetricExporter({
         url: 'grpcs://' + address,
         credentials,
@@ -256,7 +256,7 @@ describe('OTLPMetricExporter - node (getDefaultUrl)', () => {
   it('should default to localhost', done => {
     const collectorExporter = new OTLPMetricExporter();
     setTimeout(() => {
-      assert.strictEqual(collectorExporter._otlpExporter.url, 'localhost:4317');
+      assert.strictEqual(collectorExporter._otlpExporter.url, 'http://localhost:4317');
       done();
     });
   });
