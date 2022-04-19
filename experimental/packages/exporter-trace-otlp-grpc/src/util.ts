@@ -139,17 +139,12 @@ export function configureSecurity(credentials: grpc.ChannelCredentials | undefin
 
   let insecure: boolean;
 
-  // 2: anytime user provides their own credentials, use those same credentials (no matter the scheme or env insecure settings)
   if (credentials) {
     return credentials;
-    // 3. if user sets https scheme return secure channel (ignoring insecure env settings)
   } else if (endpoint.startsWith('https://')) {
     insecure = false;
-    // 4, 6, 7 if user sets http scheme or
-    // 1. user wants to use default url return insecure
   } else if (endpoint.startsWith('http://') || endpoint === DEFAULT_COLLECTOR_URL) {
     insecure = true;
-    // 5, 8, 9 (no scheme)
   } else {
     insecure = getSecurityFromEnv();
   }
@@ -178,11 +173,10 @@ export function useSecureConnection(): grpc.ChannelCredentials {
   const privateKeyPath = retrievePrivateKey();
   const certChainPath = retrieveCertChain();
 
-  // todo: add error message
   try {
     return grpc.credentials.createSsl(rootCertPath, privateKeyPath, certChainPath)
   } catch (error) {
-    diag.warn(error.message, 'ADD ERROR MSG HERE')
+    diag.warn(error.message, 'Creating secure channel using default public root certificates');
     return grpc.credentials.createSsl();
   }
 }

@@ -84,12 +84,10 @@ describe('validateAndNormalizeUrl()', () => {
 
 describe('utils - configureSecurity', () => {
   const envSource = process.env;
-  // 1
   it('should return insecure channel when using all defaults', () => {
     const credentials = configureSecurity(undefined, DEFAULT_COLLECTOR_URL);
     assert.ok(credentials._isSecure() === false);
   });
-  // 2
   it('should return user defined channel credentials', () => {
     const userDefinedCredentials = grpc.credentials.createSsl();
     const credentials = configureSecurity(userDefinedCredentials, 'http://foo.bar');
@@ -97,45 +95,38 @@ describe('utils - configureSecurity', () => {
     assert.ok(userDefinedCredentials === credentials);
     assert.ok(credentials._isSecure() === true);
   });
-  // 3
   it('should return secure channel when endpoint contains https scheme - no matter insecure env settings,', () => {
     envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE='true';
     const credentials = configureSecurity(undefined, 'https://foo.bar');
     assert.ok(credentials._isSecure() === true);
     delete envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE;
   });
-  // 4
   it('should return insecure channel when endpoint contains http scheme and no insecure env settings', () => {
     const credentials = configureSecurity(undefined, 'http://foo.bar');
     assert.ok(credentials._isSecure() === false);
   });
-  // 5
   it('should return secure channel when endpoint does not contain scheme and no insecure env settings', () => {
     const credentials = configureSecurity(undefined, 'foo.bar');
     assert.ok(credentials._isSecure() === true);
   });
-  // 6
   it('should return insecure channel when endpoint contains http scheme and insecure env set to false', () => {
     envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE='false';
     const credentials = configureSecurity(undefined, 'http://foo.bar');
     assert.ok(credentials._isSecure() === false);
     delete envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE;
   });
-  // 7
   it('should return insecure channel when endpoint contains http scheme and insecure env set to true', () => {
     envSource.OTEL_EXPORTER_OTLP_INSECURE='true';
     const credentials = configureSecurity(undefined, 'http://localhost');
     assert.ok(credentials._isSecure() === false);
     delete envSource.OTEL_EXPORTER_OTLP_INSECURE;
   });
-  // 8
   it('should return secure channel when endpoint does not contain scheme and insecure env set to false', () => {
     envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE='false';
     const credentials = configureSecurity(undefined, 'foo.bar');
     assert.ok(credentials._isSecure() === true);
     delete envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE;
   });
-  // 9
   it('should return insecure channel when endpoint does not contain scheme and insecure env set to true', () => {
     envSource.OTEL_EXPORTER_OTLP_INSECURE='true';
     const credentials = configureSecurity(undefined, 'foo.bar');
@@ -160,23 +151,19 @@ describe('useSecureConnection', () => {
   });
   it('should return secure connection using only root certificate', () => {
     envSource.OTEL_EXPORTER_OTLP_CERTIFICATE='./test/certs/ca.crt';
-
     const credentials = useSecureConnection();
     assert.ok(credentials._isSecure() === true);
     delete envSource.OTEL_EXPORTER_OTLP_CERTIFICATE;
   });
-  // WIP
-  it('should return error', () => {
+  it('should return secure connection using default certificates if there is an error', () => {
     envSource.OTEL_EXPORTER_OTLP_CERTIFICATE='./test/certs/ca.crt';
     envSource.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY='./test/certs/client.key';
 
-
     const credentials = useSecureConnection();
-    console.log("credentials", credentials)
     assert.ok(credentials._isSecure() === true);
+
     delete envSource.OTEL_EXPORTER_OTLP_CERTIFICATE;
     delete envSource.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY;
-
   });
 });
 
