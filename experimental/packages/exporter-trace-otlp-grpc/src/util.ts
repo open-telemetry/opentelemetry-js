@@ -141,9 +141,9 @@ export function configureSecurity(credentials: grpc.ChannelCredentials | undefin
 
   if (credentials) {
     return credentials;
-  } else if (endpoint.startsWith('https://')) {
+  } else if (endpoint.startsWith('https://') || endpoint.startsWith('grpcs://')) {
     insecure = false;
-  } else if (endpoint.startsWith('http://') || endpoint === DEFAULT_COLLECTOR_URL) {
+  } else if (endpoint.startsWith('http://') || endpoint.startsWith('grpc://') || endpoint === DEFAULT_COLLECTOR_URL) {
     insecure = true;
   } else {
     insecure = getSecurityFromEnv();
@@ -173,12 +173,7 @@ export function useSecureConnection(): grpc.ChannelCredentials {
   const privateKeyPath = retrievePrivateKey();
   const certChainPath = retrieveCertChain();
 
-  try {
-    return grpc.credentials.createSsl(rootCertPath, privateKeyPath, certChainPath);
-  } catch (error) {
-    diag.warn(`${error.message}. Creating secure channel using default public root certificates.`);
-    return grpc.credentials.createSsl();
-  }
+  return grpc.credentials.createSsl(rootCertPath, privateKeyPath, certChainPath);
 }
 
 function retrieveRootCert(): Buffer | undefined {

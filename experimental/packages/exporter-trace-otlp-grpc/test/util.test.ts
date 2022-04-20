@@ -155,26 +155,14 @@ describe('useSecureConnection', () => {
     assert.ok(credentials._isSecure() === true);
     delete envSource.OTEL_EXPORTER_OTLP_CERTIFICATE;
   });
-  it('should return secure connection using default certificates when there is an error', () => {
-    envSource.OTEL_EXPORTER_OTLP_CERTIFICATE='./test/certs/ca.crt';
-    envSource.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY='./test/certs/client.key';
-
-    const diagWarn = sinon.stub(diag, 'warn');
-    const credentials = useSecureConnection();
-    assert(diagWarn.calledOnce);
-    assert.ok(credentials._isSecure() === true);
-
-    delete envSource.OTEL_EXPORTER_OTLP_CERTIFICATE;
-    delete envSource.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY;
-    diagWarn.restore();
-  });
-  it('should warn user when file cannot be read and create secure connection using default certificates', () => {
+  it('should warn user when file cannot be read and use default root certificate', () => {
     envSource.OTEL_EXPORTER_OTLP_CERTIFICATE='./wrongpath/test/certs/ca.crt';
     const diagWarn = sinon.stub(diag, 'warn');
     const credentials = useSecureConnection();
     const args = diagWarn.args[0];
 
     assert.strictEqual(args[0], 'Failed to read root certificate file');
+    sinon.assert.calledOnce(diagWarn);
     assert.ok(credentials._isSecure() === true);
 
     delete envSource.OTEL_EXPORTER_OTLP_CERTIFICATE;
