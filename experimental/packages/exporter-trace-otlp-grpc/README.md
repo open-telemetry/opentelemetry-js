@@ -51,7 +51,7 @@ const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc'
 
 const collectorOptions = {
   // url is optional and can be omitted - default is http://localhost:4317
-  url: '<collector-hostname>:<port>',
+  url: 'http://<collector-hostname>:<port>',
   credentials: grpc.credentials.createSsl(),
 };
 
@@ -91,7 +91,7 @@ metadata.set('k', 'v');
 
 const collectorOptions = {
   // url is optional and can be omitted - http://localhost:4317
-  url: '<collector-hostname>:<port>',
+  url: 'http://<collector-hostname>:<port>',
   metadata, // // an optional grpc.Metadata object to be sent with each request
 };
 
@@ -114,7 +114,7 @@ const { CompressionAlgorithm } = require('@opentelemetry/exporter-trace-otlp-grp
 
 const collectorOptions = {
   // url is optional and can be omitted - http://localhost:4317
-  url: '<collector-hostname>:<port>',
+  url: 'http://<collector-hostname>:<port>',
   metadata, // // an optional grpc.Metadata object to be sent with each request
   compression: CompressionAlgorithm.GZIP,
 };
@@ -124,14 +124,20 @@ const exporter = new OTLPTraceExporter(collectorOptions);
  > Providing `compression` with `collectorOptions` takes precedence and overrides compression set with environment variables.
 
 ## Environment Variable Configuration
+ | Environment variable | Description |
+  |----------------------|-------------|
+  | OTEL_EXPORTER_OTLP_TRACES_COMPRESSION | The compression type to use on OTLP trace requests. Options include gzip. By default no compression will be used. |
+  | OTEL_EXPORTER_OTLP_COMPRESSION | The compression type to use on OTLP trace, metric, and log requests. Options include gzip. By default no compression will be used. |
+  | OTEL_EXPORTER_OTLP_TRACES_INSECURE | Whether to enable client transport security for the exporter's gRPC connection for trace requests. This option only applies to OTLP/gRPC when an endpoint is provided without the http or https scheme. Options include true or false. By default insecure is false which creates a secure connection. |
+  | OTEL_EXPORTER_OTLP_INSECURE | Whether to enable client transport security for the exporter's gRPC connection for trace, metric and log requests. This option only applies to OTLP/gRPC when an endpoint is provided without the http or https scheme. Options include true or false. By default insecure is false which creates a secure connection. |
+  | OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE | The path to the file containing trusted root certificate to use when verifying an OTLP trace server's TLS credentials. By default the host platform's trusted root certificate is used.|
+  | OTEL_EXPORTER_OTLP_CERTIFICATE | The path to the file containing trusted root certificate to use when verifying an OTLP trace, metric, or log server's TLS credentials. By default the host platform's trusted root certificate is used. |
+  | OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY | The path to the file containing private client key to use when verifying an OTLP trace client's TLS credentials. Must provide a client certificate/chain when providing a private client key. By default no client key file is used. |
+  | OTEL_EXPORTER_OTLP_CLIENT_KEY | The path to the file containing private client key to use when verifying an OTLP trace, metric or log client's TLS credentials. Must provide a client certificate/chain when providing a private client key. By default no client key file is used. |
+  | OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE | The path to the file containing trusted client certificate/chain for clients private key to use when verifying an OTLP trace server's TLS credentials. Must provide a private client key when providing a certificate/chain. By default no chain file is used. |
+  | OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE | The path to the file containing trusted client certificate/chain for clients private key to use when verifying an OTLP trace, metric and log server's TLS credentials. Must provide a private client key when providing a certificate/chain. By default no chain file is used. |
 
-Set compression with environment variables.
-
-```shell
-OTEL_EXPORTER_OTLP_TRACES_COMPRESSION=gzip
-```
-
- > Compression set programatically in `collectorOptions` takes precedence over compression set with environment variables. `OTEL_EXPORTER_OTLP_TRACES_COMPRESSION` takes precedence and overrides `OTEL_EXPORTER_OTLP_COMPRESSION`.
+ > Settings configured programmatically take precedence over environment variables. Per-signal environment variables take precedence over non-per-signal environment variables.
 
 ## Running opentelemetry-collector locally to see the traces
 
