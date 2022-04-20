@@ -17,23 +17,23 @@ import { promisify } from 'util';
 import * as childProcess from 'child_process';
 import * as assert from 'assert';
 
-const exec = promisify(childProcess.exec)
+const exec = promisify(childProcess.exec);
 
 describe('Node SDK :: Register', async () => {
 
     before(async () => {
-        const { stderr } = await exec('cd ./test/code ; npm run clean ; cd ../..')
-        assert.ok(stderr === '')
+        const { stderr } = await exec('cd ./test/code ; npm run clean ; cd ../..');
+        assert.ok(stderr === '');
     });
 
     after(async () => {
-        const { stderr } = await exec('cd ./test/code ; npm run clean ; cd ../..')
-        assert.ok(stderr === '')        
+        const { stderr } = await exec('cd ./test/code ; npm run clean ; cd ../..');
+        assert.ok(stderr === '');
     });
 
     it('can load the node sdk from the command line', async () => {
-         const { stdout, stderr } = await exec('cd ./test/code ; npm install ; env OTEL_LOG_LEVEL=debug node --require @opentelemetry/sdk-node/register sample.js ; cd ../..')
-         assert.ok(stderr === '')
-         assert.ok(stdout.includes('@opentelemetry/api'))
-    }).timeout(10000)
-})
+         const { stdout, stderr } = await exec('cd ./test/code ; npm install ; env OTEL_LOG_LEVEL=debug node --require @opentelemetry/sdk-node/register sample.js ; cd ../..');
+         assert.ok(stderr === '');
+         assert.ok(stdout.includes('@opentelemetry/api'));
+    }).timeout(10000);
+});
