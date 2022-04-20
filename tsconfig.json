@@ -89,6 +89,63 @@
       "path": "packages/template"
     },
     {
+      "path": "experimental/packages/exporter-trace-otlp-grpc"
+    },
+    {
+      "path": "experimental/packages/exporter-trace-otlp-http"
+    },
+    {
+      "path": "experimental/packages/exporter-trace-otlp-proto"
+    },
+    {
+      "path": "experimental/packages/opentelemetry-api-metrics"
+    },
+    {
+      "path": "experimental/packages/opentelemetry-exporter-metrics-otlp-grpc"
+    },
+    {
+      "path": "experimental/packages/opentelemetry-exporter-metrics-otlp-http"
+    },
+    {
+      "path": "experimental/packages/opentelemetry-exporter-metrics-otlp-proto"
+    },
+    {
+      "path": "experimental/packages/opentelemetry-exporter-prometheus"
+    },
+    {
+      "path": "experimental/packages/opentelemetry-instrumentation-fetch"
+    },
+    {
+      "path": "experimental/packages/opentelemetry-instrumentation-grpc"
+    },
+    {
+      "path": "experimental/packages/opentelemetry-instrumentation-http"
+    },
+    {
+      "path": "experimental/packages/opentelemetry-instrumentation-xml-http-request"
+    },
+    {
+      "path": "experimental/packages/opentelemetry-instrumentation"
+    },
+    {
+      "path": "experimental/packages/opentelemetry-sdk-metrics-base"
+    },
+    {
+      "path": "experimental/packages/opentelemetry-sdk-node"
+    },
+    {
+      "path": "experimental/packages/otlp-transformer"
+    },
+    {
+      "path": "experimental/backwards-compatability/node10"
+    },
+    {
+      "path": "experimental/backwards-compatability/node12"
+    },
+    {
+      "path": "experimental/backwards-compatability/node8"
+    },
+    {
       "path": "integration-tests/propagation-validation-server"
     }
   ]

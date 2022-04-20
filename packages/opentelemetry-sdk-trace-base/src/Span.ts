@@ -22,6 +22,7 @@ import {
   InstrumentationLibrary,
   isTimeInput,
   timeInputToHrTime,
+  sanitizeAttributes,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
@@ -148,9 +149,11 @@ export class Span implements api.Span, ReadableSpan {
     if (typeof startTime === 'undefined') {
       startTime = hrTime();
     }
+
+    const attributes = sanitizeAttributes(attributesOrStartTime);
     this.events.push({
       name,
-      attributes: attributesOrStartTime as api.SpanAttributes,
+      attributes,
       time: timeInputToHrTime(startTime),
     });
     return this;
@@ -217,7 +220,7 @@ export class Span implements api.Span, ReadableSpan {
       attributes[SemanticAttributes.EXCEPTION_TYPE] ||
       attributes[SemanticAttributes.EXCEPTION_MESSAGE]
     ) {
-      this.addEvent(ExceptionEventName, attributes as api.SpanAttributes, time);
+      this.addEvent(ExceptionEventName, attributes, time);
     } else {
       api.diag.warn(`Failed to record an exception ${exception}`);
     }

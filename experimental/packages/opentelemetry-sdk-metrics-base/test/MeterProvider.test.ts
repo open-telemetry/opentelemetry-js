@@ -24,8 +24,13 @@ import {
   defaultResource
 } from './util';
 import { TestMetricReader } from './export/TestMetricReader';
+import * as sinon from 'sinon';
 
 describe('MeterProvider', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
   describe('constructor', () => {
     it('should construct without exceptions', () => {
       const meterProvider = new MeterProvider();
@@ -45,11 +50,63 @@ describe('MeterProvider', () => {
       assert(meter instanceof Meter);
     });
 
+    it('should get an identical meter on duplicated calls', () => {
+      const meterProvider = new MeterProvider();
+      const meter1 = meterProvider.getMeter('meter1', '1.0.0');
+      const meter2 = meterProvider.getMeter('meter1', '1.0.0');
+      assert.strictEqual(meter1, meter2);
+    });
+
     it('get a noop meter on shutdown', () => {
       const meterProvider = new MeterProvider();
       meterProvider.shutdown();
       const meter = meterProvider.getMeter('meter1', '1.0.0');
       assert.strictEqual(meter, NOOP_METER);
+    });
+
+    it('get meter with same identity', async () => {
+      const meterProvider = new MeterProvider({ resource: defaultResource });
+      const reader = new TestMetricReader();
+      meterProvider.addMetricReader(reader);
+
+      // Create meter and instrument.
+      // name+version pair 1
+      meterProvider.getMeter('meter1', 'v1.0.0');
+      meterProvider.getMeter('meter1', 'v1.0.0');
+      // name+version pair 2
+      meterProvider.getMeter('meter2', 'v1.0.0');
+      meterProvider.getMeter('meter2', 'v1.0.0');
+      // name+version pair 3
+      meterProvider.getMeter('meter1', 'v1.0.1');
+      meterProvider.getMeter('meter1', 'v1.0.1');
+      // name+version+schemaUrl pair 4
+      meterProvider.getMeter('meter1', 'v1.0.1', { schemaUrl: 'https://opentelemetry.io/schemas/1.4.0' });
+      meterProvider.getMeter('meter1', 'v1.0.1', { schemaUrl: 'https://opentelemetry.io/schemas/1.4.0' });
+
+      // Perform collection.
+      const result = await reader.collect();
+
+      // Results came only from de-duplicated meters.
+      assert.strictEqual(result?.instrumentationLibraryMetrics.length, 4);
+
+      // InstrumentationLibrary matches from de-duplicated meters.
+      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[0], {
+        name: 'meter1',
+        version: 'v1.0.0'
+      });
+      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[1], {
+        name: 'meter2',
+        version: 'v1.0.0'
+      });
+      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[2], {
+        name: 'meter1',
+        version: 'v1.0.1'
+      });
+      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[3], {
+        name: 'meter1',
+        version: 'v1.0.1',
+        schemaUrl: 'https://opentelemetry.io/schemas/1.4.0',
+      });
     });
   });
 
@@ -158,7 +215,7 @@ describe('MeterProvider', () => {
 
       // DataPoint matches attributes and point.
       assertPartialDeepStrictEqual(result?.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0], {
-        // Attributes are still there.
+        // MetricAttributes are still there.
         attributes: {
           attrib1: 'attrib_value1',
           attrib2: 'attrib_value2'
@@ -420,6 +477,55 @@ describe('MeterProvider', () => {
         name: 'renamed-instrument',
         type: InstrumentType.HISTOGRAM
       });
+    });
+  });
+
+  describe('shutdown', () => {
+    it('should shutdown all registered metric readers', async () => {
+      const meterProvider = new MeterProvider({ resource: defaultResource });
+      const reader1 = new TestMetricReader();
+      const reader2 = new TestMetricReader();
+      const reader1ShutdownSpy = sinon.spy(reader1, 'shutdown');
+      const reader2ShutdownSpy = sinon.spy(reader2, 'shutdown');
+
+      meterProvider.addMetricReader(reader1);
+      meterProvider.addMetricReader(reader2);
+
+      await meterProvider.shutdown({ timeoutMillis: 1234 });
+      await meterProvider.shutdown();
+      await meterProvider.shutdown();
+
+      assert.strictEqual(reader1ShutdownSpy.callCount, 1);
+      assert.deepStrictEqual(reader1ShutdownSpy.args[0][0], { timeoutMillis: 1234 });
+      assert.strictEqual(reader2ShutdownSpy.callCount, 1);
+      assert.deepStrictEqual(reader2ShutdownSpy.args[0][0], { timeoutMillis: 1234 });
+    });
+  });
+
+  describe('forceFlush', () => {
+    it('should forceFlush all registered metric readers', async () => {
+      const meterProvider = new MeterProvider({ resource: defaultResource });
+      const reader1 = new TestMetricReader();
+      const reader2 = new TestMetricReader();
+      const reader1ForceFlushSpy = sinon.spy(reader1, 'forceFlush');
+      const reader2ForceFlushSpy = sinon.spy(reader2, 'forceFlush');
+
+      meterProvider.addMetricReader(reader1);
+      meterProvider.addMetricReader(reader2);
+
+      await meterProvider.forceFlush({ timeoutMillis: 1234 });
+      await meterProvider.forceFlush({ timeoutMillis: 5678 });
+      assert.strictEqual(reader1ForceFlushSpy.callCount, 2);
+      assert.deepStrictEqual(reader1ForceFlushSpy.args[0][0], { timeoutMillis: 1234 });
+      assert.deepStrictEqual(reader1ForceFlushSpy.args[1][0], { timeoutMillis: 5678 });
+      assert.strictEqual(reader2ForceFlushSpy.callCount, 2);
+      assert.deepStrictEqual(reader2ForceFlushSpy.args[0][0], { timeoutMillis: 1234 });
+      assert.deepStrictEqual(reader2ForceFlushSpy.args[1][0], { timeoutMillis: 5678 });
+
+      await meterProvider.shutdown();
+      await meterProvider.forceFlush();
+      assert.strictEqual(reader1ForceFlushSpy.callCount, 2);
+      assert.strictEqual(reader2ForceFlushSpy.callCount, 2);
     });
   });
 });

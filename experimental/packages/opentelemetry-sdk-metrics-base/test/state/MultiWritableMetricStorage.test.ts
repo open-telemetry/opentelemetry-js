@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { Attributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api-metrics';
 import * as assert from 'assert';
 import { Measurement } from '../../src/Measurement';
 import { MultiMetricStorage } from '../../src/state/MultiWritableMetricStorage';
@@ -37,7 +37,7 @@ describe('MultiMetricStorage', () => {
     it('record with multiple backing storages', () => {
       class TestWritableMetricStorage implements WritableMetricStorage {
         records: Measurement[] = [];
-        record(value: number, attributes: Attributes, context: api.Context): void {
+        record(value: number, attributes: MetricAttributes, context: api.Context): void {
           this.records.push({ value, attributes, context });
         }
       }

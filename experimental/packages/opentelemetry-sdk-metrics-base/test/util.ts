@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes, ValueType } from '@opentelemetry/api-metrics';
+import { MetricAttributes, ValueType } from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -49,7 +49,7 @@ export const defaultInstrumentationLibrary: InstrumentationLibrary = {
 };
 
 export const commonValues: number[] = [1, -1, 1.0, Infinity, -Infinity, NaN];
-export const commonAttributes: Attributes[] = [{}, { 1: '1' }, { a: '2' }, new (class Foo {
+export const commonAttributes: MetricAttributes[] = [{}, { 1: '1' }, { a: '2' }, new (class Foo {
   a = '1';
 })];
 
@@ -86,7 +86,7 @@ export function assertMetricData(
 
 export function assertDataPoint(
   actual: unknown,
-  attributes: Attributes,
+  attributes: MetricAttributes,
   point: Histogram | number,
   startTime?: HrTime,
   endTime?: HrTime,

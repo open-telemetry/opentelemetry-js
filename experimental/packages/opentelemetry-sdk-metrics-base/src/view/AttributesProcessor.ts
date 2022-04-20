@@ -15,7 +15,7 @@
  */
 
 import { Context } from '@opentelemetry/api';
-import { Attributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api-metrics';
 
 /**
  * The {@link AttributesProcessor} is responsible for customizing which
@@ -30,7 +30,7 @@ export abstract class AttributesProcessor {
    * @param context The active context when the instrument is synchronous.
    * `undefined` otherwise.
    */
-  abstract process(incoming: Attributes, context?: Context): Attributes;
+  abstract process(incoming: MetricAttributes, context?: Context): MetricAttributes;
 
   static Noop() {
     return NOOP;
@@ -38,7 +38,7 @@ export abstract class AttributesProcessor {
 }
 
 export class NoopAttributesProcessor extends AttributesProcessor {
-  process(incoming: Attributes, _context?: Context) {
+  process(incoming: MetricAttributes, _context?: Context) {
     return incoming;
   }
 }
@@ -52,8 +52,8 @@ export class FilteringAttributesProcessor extends AttributesProcessor {
     super();
   }
 
-  process(incoming: Attributes, _context: Context): Attributes {
-    const filteredAttributes: Attributes = {};
+  process(incoming: MetricAttributes, _context: Context): MetricAttributes {
+    const filteredAttributes: MetricAttributes = {};
     Object.keys(incoming)
       .filter(attributeName => this._allowedAttributeNames.includes(attributeName))
       .forEach(attributeName => filteredAttributes[attributeName] = incoming[attributeName]);

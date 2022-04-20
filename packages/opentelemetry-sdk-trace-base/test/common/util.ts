@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
-import { MetricAttributes } from '@opentelemetry/api-metrics';
+export const validAttributes = {
+  string: 'string',
+  number: 0,
+  bool: true,
+  'array<string>': ['str1', 'str2'],
+  'array<number>': [1, 2],
+  'array<bool>': [true, false],
+};
 
-// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#measurement
-
-export type Measurement = {
-    value: number;
-    // TODO use common attributes
-    attributes: MetricAttributes
-    context?: api.Context;
+export const invalidAttributes = {
+  // invalid attribute type object
+  object: { foo: 'bar' },
+  // invalid attribute inhomogenous array
+  'non-homogeneous-array': [0, ''],
+  // This empty length attribute should not be set
+  '': 'empty-key',
 };
