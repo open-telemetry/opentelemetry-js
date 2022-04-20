@@ -50,6 +50,38 @@ describe('OTLPTraceExporter - web', () => {
     sinon.restore();
   });
 
+  describe('constructor', () => {
+    let onInitSpy: any;
+
+    beforeEach(() => {
+      onInitSpy = sinon.stub(OTLPTraceExporter.prototype, 'onInit');
+      collectorExporterConfig = {
+        hostname: 'foo',
+        attributes: {},
+        url: 'http://foo.bar.com',
+      };
+      collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
+    });
+
+    it('should create an instance', () => {
+      assert.ok(typeof collectorTraceExporter !== 'undefined');
+    });
+
+    it('should call onInit', () => {
+      assert.strictEqual(onInitSpy.callCount, 1);
+    });
+
+    describe('when config contains certain params', () => {
+      it('should set hostname', () => {
+        assert.strictEqual(collectorTraceExporter.hostname, 'foo');
+      });
+
+      it('should set url', () => {
+        assert.strictEqual(collectorTraceExporter.url, 'http://foo.bar.com');
+      });
+    });
+  });
+
   describe('export', () => {
     beforeEach(() => {
       collectorExporterConfig = {
@@ -67,7 +99,8 @@ describe('OTLPTraceExporter - web', () => {
       });
 
       it('should successfully send the spans using sendBeacon', done => {
-        collectorTraceExporter.export(spans, () => { });
+        collectorTraceExporter.export(spans, () => {
+        });
 
         setTimeout(async () => {
           const args = stubBeacon.args[0];
@@ -119,7 +152,8 @@ describe('OTLPTraceExporter - web', () => {
 
         stubBeacon.returns(true);
 
-        collectorTraceExporter.export(spans, () => { });
+        collectorTraceExporter.export(spans, () => {
+        });
 
         setTimeout(() => {
           const response: any = spyLoggerDebug.args[2][0];
@@ -155,7 +189,8 @@ describe('OTLPTraceExporter - web', () => {
       });
 
       it('should successfully send the spans using XMLHttpRequest', done => {
-        collectorTraceExporter.export(spans, () => { });
+        collectorTraceExporter.export(spans, () => {
+        });
 
         setTimeout(() => {
           const request = server.requests[0];
@@ -203,7 +238,8 @@ describe('OTLPTraceExporter - web', () => {
 
         diag.setLogger(diagLogger, DiagLogLevel.ALL);
 
-        collectorTraceExporter.export(spans, () => { });
+        collectorTraceExporter.export(spans, () => {
+        });
 
         setTimeout(() => {
           const request = server.requests[0];
@@ -232,13 +268,91 @@ describe('OTLPTraceExporter - web', () => {
       });
 
       it('should send custom headers', done => {
-        collectorTraceExporter.export(spans, () => { });
+        collectorTraceExporter.export(spans, () => {
+        });
 
         setTimeout(() => {
           const request = server.requests[0];
           request.respond(200);
 
           assert.strictEqual(stubBeacon.callCount, 0);
+          done();
+        });
+      });
+    });
+  });
+
+
+  describe('export - common', () => {
+    let spySend: any;
+    beforeEach(() => {
+      spySend = sinon.stub(OTLPTraceExporter.prototype, 'send');
+      collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
+    });
+
+    it('should export spans as otlpTypes.Spans', done => {
+      const spans: ReadableSpan[] = [];
+      spans.push(Object.assign({}, mockedReadableSpan));
+
+      collectorTraceExporter.export(spans, () => {
+      });
+      setTimeout(() => {
+        const span1 = spySend.args[0][0][0] as ReadableSpan;
+        assert.deepStrictEqual(spans[0], span1);
+        done();
+      });
+      assert.strictEqual(spySend.callCount, 1);
+    });
+
+    describe('when exporter is shutdown', () => {
+      it(
+        'should not export anything but return callback with code' +
+        ' "FailedNotRetryable"',
+        async () => {
+          const spans: ReadableSpan[] = [];
+          spans.push(Object.assign({}, mockedReadableSpan));
+          await collectorTraceExporter.shutdown();
+          spySend.resetHistory();
+
+          const callbackSpy = sinon.spy();
+          collectorTraceExporter.export(spans, callbackSpy);
+          const returnCode = callbackSpy.args[0][0];
+
+          assert.strictEqual(
+            returnCode.code,
+            ExportResultCode.FAILED,
+            'return value is wrong'
+          );
+          assert.strictEqual(spySend.callCount, 0, 'should not call send');
+        }
+      );
+    });
+    describe('when an error occurs', () => {
+      it('should return failed export result', done => {
+        const spans: ReadableSpan[] = [];
+        spans.push(Object.assign({}, mockedReadableSpan));
+        spySend.throws({
+          code: 100,
+          details: 'Test error',
+          metadata: {},
+          message: 'Non-retryable',
+          stack: 'Stack',
+        });
+        const callbackSpy = sinon.spy();
+        collectorTraceExporter.export(spans, callbackSpy);
+        setTimeout(() => {
+          const returnCode = callbackSpy.args[0][0];
+          assert.strictEqual(
+            returnCode.code,
+            ExportResultCode.FAILED,
+            'return value is wrong'
+          );
+          assert.strictEqual(
+            returnCode.error.message,
+            'Non-retryable',
+            'return error message is wrong'
+          );
+          assert.strictEqual(spySend.callCount, 1, 'should call send');
           done();
         });
       });
@@ -270,7 +384,8 @@ describe('OTLPTraceExporter - web', () => {
         );
       });
       it('should successfully send custom headers using XMLHTTPRequest', done => {
-        collectorTraceExporter.export(spans, () => { });
+        collectorTraceExporter.export(spans, () => {
+        });
 
         setTimeout(() => {
           const [{ requestHeaders }] = server.requests;
@@ -293,7 +408,8 @@ describe('OTLPTraceExporter - web', () => {
       });
 
       it('should successfully send spans using XMLHttpRequest', done => {
-        collectorTraceExporter.export(spans, () => { });
+        collectorTraceExporter.export(spans, () => {
+        });
 
         setTimeout(() => {
           const [{ requestHeaders }] = server.requests;
@@ -304,6 +420,35 @@ describe('OTLPTraceExporter - web', () => {
 
           done();
         });
+      });
+    });
+  });
+
+  describe('export - concurrency limit', () => {
+    it('should error if too many concurrent exports are queued', done => {
+      const collectorExporterWithConcurrencyLimit = new OTLPTraceExporter({
+        ...collectorExporterConfig,
+        concurrencyLimit: 3,
+      });
+      const spans: ReadableSpan[] = [{ ...mockedReadableSpan }];
+      const callbackSpy = sinon.spy();
+      for (let i = 0; i < 7; i++) {
+        collectorExporterWithConcurrencyLimit.export(spans, callbackSpy);
+      }
+
+      const failures = callbackSpy.args.filter(([result]) => result.code === ExportResultCode.FAILED);
+
+      setTimeout(() => {
+        // Expect 4 failures
+        assert.strictEqual(failures.length, 4);
+        failures.forEach(([result]) => {
+          assert.strictEqual(result.code, ExportResultCode.FAILED);
+          assert.strictEqual(
+            result.error!.message,
+            'Concurrent export limit reached'
+          );
+        });
+        done();
       });
     });
   });
