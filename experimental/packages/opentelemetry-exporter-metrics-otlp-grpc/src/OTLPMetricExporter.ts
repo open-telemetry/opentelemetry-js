@@ -33,7 +33,6 @@ import { Metadata } from '@grpc/grpc-js';
 
 const DEFAULT_COLLECTOR_URL = 'http://localhost:4317';
 
-
 class OTLPMetricExporterProxy extends OTLPExporterNodeBase<ResourceMetrics,
   otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest> {
   protected readonly _aggregationTemporality: AggregationTemporality;
@@ -63,7 +62,7 @@ class OTLPMetricExporterProxy extends OTLPExporterNodeBase<ResourceMetrics,
         ? validateAndNormalizeUrl(getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT)
         : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
           ? validateAndNormalizeUrl(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT)
-          : DEFAULT_COLLECTOR_URL;
+          : validateAndNormalizeUrl(DEFAULT_COLLECTOR_URL);
   }
 
   convert(metrics: ResourceMetrics[]): otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
