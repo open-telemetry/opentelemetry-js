@@ -20,7 +20,8 @@
     "watch": "npm run protos:copy && tsc -w",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "npm run precompile",
-    "peer-api-check": "node ../../../scripts/peer-api-check.js"
+    "peer-api-check": "node ../../../scripts/peer-api-check.js",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../"
   },
   "keywords": [
     "opentelemetry",
