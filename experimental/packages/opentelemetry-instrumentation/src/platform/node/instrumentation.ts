@@ -52,11 +52,35 @@ export abstract class InstrumentationBase<T = any>
         'No modules instrumentation has been defined,' +
         ' nothing will be patched'
       );
+    } else {
+      this._warnOnPreloadedModules();
     }
 
     if (this._config.enabled) {
       this.enable();
     }
+  }
+
+  private _warnOnPreloadedModules(): void {
+    const preloadedModules: string[] = [];
+    this._modules.forEach((module: InstrumentationModuleDefinition<T>) => {
+      const { name } = module;
+      try {
+        const resolvedModule = require.resolve(name);
+        if (require.cache[resolvedModule]) {
+          // Module is already cached, which means the instrumentation hook might not work
+          preloadedModules.push(name);
+        }
+      } catch {
+        // Module isn't available, we can simply skip
+      }
+    });
+
+    if (!preloadedModules.length) {
+      return;
+    }
+
+    this._diag.warn(`Some modules (${preloadedModules.join(', ')}) were already required when their respective plugin was loaded, some plugins might not work. Make sure the SDK is setup before you require in other modules.`);
   }
 
   private _extractPackageVersion(baseDir: string): string | undefined {
