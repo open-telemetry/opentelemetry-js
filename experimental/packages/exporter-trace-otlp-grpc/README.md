@@ -124,6 +124,7 @@ const exporter = new OTLPTraceExporter(collectorOptions);
  > Providing `compression` with `collectorOptions` takes precedence and overrides compression set with environment variables.
 
 ## Environment Variable Configuration
+
  | Environment variable | Description |
   |----------------------|-------------|
   | OTEL_EXPORTER_OTLP_TRACES_COMPRESSION | The compression type to use on OTLP trace requests. Options include gzip. By default no compression will be used. |

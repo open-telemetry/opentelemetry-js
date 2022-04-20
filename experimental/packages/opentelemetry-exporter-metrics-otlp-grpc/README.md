@@ -46,6 +46,7 @@ counter.add(10, { 'key': 'value' });
 ```
 
 ## Environment Variable Configuration
+
  | Environment variable | Description |
   |----------------------|-------------|
   | OTEL_EXPORTER_OTLP_METRICS_COMPRESSION | The compression type to use on OTLP metric requests. Options include gzip. By default no compression will be used. |
