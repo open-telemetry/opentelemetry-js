@@ -101,6 +101,12 @@ describe('utils - configureSecurity', () => {
     assert.ok(credentials._isSecure() === true);
     delete envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE;
   });
+  it('should return secure channel when endpoint contains grpcs scheme - no matter insecure env settings,', () => {
+    envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE='true';
+    const credentials = configureSecurity(undefined, 'grpcs://foo.bar');
+    assert.ok(credentials._isSecure() === true);
+    delete envSource.OTEL_EXPORTER_OTLP_TRACES_INSECURE;
+  });
   it('should return insecure channel when endpoint contains http scheme and no insecure env settings', () => {
     const credentials = configureSecurity(undefined, 'http://foo.bar');
     assert.ok(credentials._isSecure() === false);
