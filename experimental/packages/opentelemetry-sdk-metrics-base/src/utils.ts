@@ -15,6 +15,7 @@
  */
 
 import { MetricAttributes } from '@opentelemetry/api-metrics';
+import { InstrumentationLibrary } from '@opentelemetry/core';
 
 export type Maybe<T> = T | undefined;
 
@@ -37,6 +38,14 @@ export function hashAttributes(attributes: MetricAttributes): string {
     }
     return (result += key + ':' + attributes[key]);
   }, '|#');
+}
+
+/**
+ * Converting the instrumentation library object to a unique identifier string.
+ * @param instrumentationLibrary
+ */
+export function instrumentationLibraryId(instrumentationLibrary: InstrumentationLibrary): string {
+  return `${instrumentationLibrary.name}:${instrumentationLibrary.version ?? ''}:${instrumentationLibrary.schemaUrl ?? ''}`;
 }
 
 /**
