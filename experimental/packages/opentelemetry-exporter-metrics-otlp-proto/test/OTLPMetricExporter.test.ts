@@ -189,9 +189,6 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       const fakeRequest = new Stream.PassThrough();
       sinon.stub(http, 'request').returns(fakeRequest as any);
 
-      collectorExporter.export(metrics, () => {
-      });
-
       let buff = Buffer.from('');
 
       fakeRequest.on('end', () => {
@@ -238,6 +235,11 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       fakeRequest.on('data', chunk => {
         buff = Buffer.concat([buff, chunk]);
       });
+
+      const clock = sinon.useFakeTimers();
+      collectorExporter.export(metrics, () => { });
+      clock.tick(200);
+      clock.restore();
     });
 
     it('should log the successful message', done => {
