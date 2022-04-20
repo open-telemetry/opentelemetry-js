@@ -460,7 +460,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
     beforeEach(() => {
       server.listen(8080);
     });
-    afterEach((done) => {
+    afterEach(done => {
       server.close(done);
     });
     it('should log the timeout request error message when timeout is 1', done => {
