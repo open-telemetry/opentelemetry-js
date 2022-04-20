@@ -1,7 +1,7 @@
 {
   "name": "@opentelemetry/otlp-grpc-exporter-base",
   "version": "0.27.0",
-  "description": "OpenTelemetry Exporter base for gRPC",
+  "description": "OpenTelemetry OTLP-gRPC Exporter base (for internal use only)",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
