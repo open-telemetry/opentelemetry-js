@@ -14,7 +14,7 @@ All notable changes to this project will be documented in this file.
 
 ### :house: (Internal)
 
-## 1.1.0
+## 1.2.0
 
 ### :boom: Breaking Change
 
