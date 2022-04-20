@@ -39,6 +39,7 @@ All notable changes to experimental packages in this project will be documented 
 * feat(instrumentation-xhr): add applyCustomAttributesOnSpan hook #2134 @mhennoch
 * feat(proto): add @opentelemetry/otlp-transformer package with hand-rolled transformation #2746 @dyladan
 * feat(sdk-metrics-base): shutdown and forceflush on MeterProvider #2890 @legendecas
+* feat(trace-otlp-grpc): configure security with env vars #2827 @svetlanabrennan
 
 ### :bug: (Bug Fix)
 

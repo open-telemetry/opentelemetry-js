@@ -174,7 +174,7 @@ describe('useSecureConnection', () => {
     const credentials = useSecureConnection();
     const args = diagWarn.args[0];
 
-    assert.strictEqual(args[0], 'Failed to read root certificate file')
+    assert.strictEqual(args[0], 'Failed to read root certificate file');
     assert.ok(credentials._isSecure() === true);
 
     delete envSource.OTEL_EXPORTER_OTLP_CERTIFICATE;
