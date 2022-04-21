@@ -30,16 +30,16 @@ import {
 /* eslint-disable no-console */
 describe('ConsoleSpanExporter', () => {
   let consoleExporter: ConsoleSpanExporter;
-  let previousConsoleLog: any;
+  let previousConsoleDir: any;
 
   beforeEach(() => {
-    previousConsoleLog = console.log;
-    console.log = () => {};
+    previousConsoleDir = console.dir;
+    console.dir = () => {};
     consoleExporter = new ConsoleSpanExporter();
   });
 
   afterEach(() => {
-    console.log = previousConsoleLog;
+    console.dir = previousConsoleDir;
   });
 
   describe('.export()', () => {
@@ -50,7 +50,7 @@ describe('ConsoleSpanExporter', () => {
         });
         consoleExporter = new ConsoleSpanExporter();
 
-        const spyConsole = sinon.spy(console, 'log');
+        const spyConsole = sinon.spy(console, 'dir');
         const spyExport = sinon.spy(consoleExporter, 'export');
 
         basicTracerProvider.addSpanProcessor(
