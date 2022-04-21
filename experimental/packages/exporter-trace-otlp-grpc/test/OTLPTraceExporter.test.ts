@@ -35,12 +35,12 @@ import {
   ensureResourceIsCorrect,
   mockedReadableSpan,
 } from './traceHelper';
-
-import { CompressionAlgorithm } from '../src/types';
+import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
+import { GrpcCompressionAlgorithm } from '@opentelemetry/otlp-grpc-exporter-base';
 
 const traceServiceProtoPath =
   'opentelemetry/proto/collector/trace/v1/trace_service.proto';
-const includeDirs = [path.resolve(__dirname, '../protos')];
+const includeDirs = [path.resolve(__dirname, '../../otlp-grpc-exporter-base/protos')];
 
 const address = 'localhost:1501';
 
@@ -267,7 +267,7 @@ const testCollectorExporter = (params: TestParams) =>
           credentials,
           metadata: params.metadata,
         });
-        assert.strictEqual(collectorExporter.compression, CompressionAlgorithm.GZIP);
+        assert.strictEqual(collectorExporter.compression, GrpcCompressionAlgorithm.GZIP);
         delete envSource.OTEL_EXPORTER_OTLP_COMPRESSION;
       });
     });
@@ -337,3 +337,5 @@ describe('when configuring via environment', () => {
 testCollectorExporter({ useTLS: true });
 testCollectorExporter({ useTLS: false });
 testCollectorExporter({ metadata });
+
+

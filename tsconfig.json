@@ -134,6 +134,15 @@
       "path": "experimental/packages/opentelemetry-sdk-node"
     },
     {
+      "path": "experimental/packages/otlp-exporter-base"
+    },
+    {
+      "path": "experimental/packages/otlp-grpc-exporter-base"
+    },
+    {
+      "path": "experimental/packages/otlp-proto-exporter-base"
+    },
+    {
       "path": "experimental/packages/otlp-transformer"
     },
     {
