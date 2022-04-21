@@ -96,6 +96,7 @@
   "dependencies": {
     "@opentelemetry/core": "1.2.0",
     "@opentelemetry/resources": "1.2.0",
-    "@opentelemetry/sdk-trace-base": "1.2.0"
+    "@opentelemetry/sdk-trace-base": "1.2.0",
+    "@opentelemetry/otlp-exporter-base": "0.28.0"
   }
 }
