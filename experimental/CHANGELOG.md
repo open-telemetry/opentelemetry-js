@@ -16,6 +16,10 @@ All notable changes to experimental packages in this project will be documented 
   * updated `opentelemetry-sdk-node` to the latest Metrics SDK.
   * updated `otlp-transformer` to the latest Metrics SDK.
   * updated all `instrumentation-*` packages to use local implementations of `parseUrl()` due to #2884
+* refactor(otlp-exporters) move base classes and associated types into their own packages #2893 @pichlermarc
+  * `otlp-exporter-base` => `OTLPExporterBase`, `OTLPExporterBrowserBase`, `OTLPExporterNodeBase`
+  * `otlp-grpc-exporter-base` => `OTLPGRPCExporterNodeBase`
+  * `otlp-proto-exporter-base` => `OTLPProtoExporterNodeBase`
 
 ### :rocket: (Enhancement)
 

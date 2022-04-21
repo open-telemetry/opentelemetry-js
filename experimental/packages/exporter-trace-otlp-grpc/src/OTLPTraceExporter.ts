@@ -15,27 +15,29 @@
  */
 
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
-import { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
 import {
   otlpTypes,
   toOTLPExportTraceServiceRequest,
 } from '@opentelemetry/exporter-trace-otlp-http';
-import { OTLPExporterConfigNode, ServiceClientType } from './types';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
-import { validateAndNormalizeUrl, DEFAULT_COLLECTOR_URL } from './util';
 import { Metadata } from '@grpc/grpc-js';
+import {
+  OTLPGRPCExporterConfigNode,
+  OTLPGRPCExporterNodeBase,
+  ServiceClientType,
+  validateAndNormalizeUrl,
+  DEFAULT_COLLECTOR_URL
+} from '@opentelemetry/otlp-grpc-exporter-base';
 
 /**
  * OTLP Trace Exporter for Node
  */
 export class OTLPTraceExporter
-  extends OTLPExporterNodeBase<
-    ReadableSpan,
-    otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
-  >
+  extends OTLPGRPCExporterNodeBase<ReadableSpan,
+    otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest>
   implements SpanExporter {
 
-  constructor(config: OTLPExporterConfigNode = {}) {
+  constructor(config: OTLPGRPCExporterConfigNode = {}) {
     super(config);
     const headers = baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS);
     this.metadata ||= new Metadata();
@@ -50,7 +52,7 @@ export class OTLPTraceExporter
     return toOTLPExportTraceServiceRequest(spans, this);
   }
 
-  getDefaultUrl(config: OTLPExporterConfigNode) {
+  getDefaultUrl(config: OTLPGRPCExporterConfigNode) {
     return typeof config.url === 'string'
       ? validateAndNormalizeUrl(config.url)
       : getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT.length > 0
