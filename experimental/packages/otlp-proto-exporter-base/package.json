@@ -7,7 +7,7 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
     "lint": "eslint . --ext .ts",
