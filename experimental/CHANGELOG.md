@@ -41,7 +41,6 @@ All notable changes to experimental packages in this project will be documented 
 * feat(sdk-metrics-base): shutdown and forceflush on MeterProvider #2890 @legendecas
 * feat(trace-otlp-grpc): configure security with env vars #2827 @svetlanabrennan
 * feat(sdk-metrics-base): return the same meter for identical input to getMeter #2901 @legendecas
-* feat(trace-otlp-grpc): configure security with env vars #2827 @svetlanabrennan
 
 ### :bug: (Bug Fix)
 

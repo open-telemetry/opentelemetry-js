@@ -162,7 +162,7 @@ function getSecurityFromEnv(): boolean {
     getEnv().OTEL_EXPORTER_OTLP_INSECURE;
 
   if (definedInsecure) {
-    return definedInsecure === 'true';
+    return definedInsecure.toLowerCase() === 'true';
   } else {
     return false;
   }
