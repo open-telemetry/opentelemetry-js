@@ -27,7 +27,7 @@ import {
 import {
   OTLPMetricExporter
 } from '../../src/platform/node';
-import { OTLPExporterNodeConfigBase, otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
+import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import {
   ensureCounterIsCorrect,
   ensureExportMetricsServiceRequestIsSet,
@@ -41,6 +41,7 @@ import {
 import { MockedResponse } from './nodeHelpers';
 import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
 import { Stream, PassThrough } from 'stream';
+import { OTLPExporterError, OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 
 let fakeRequest: PassThrough;
 
@@ -327,7 +328,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
         setTimeout(() => {
           const result = responseSpy.args[0][0] as core.ExportResult;
           assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-          const error = result.error as otlpTypes.OTLPExporterError;
+          const error = result.error as OTLPExporterError;
           assert.ok(error !== undefined);
           assert.strictEqual(error.code, 400);
           assert.strictEqual(error.data, 'failed');
