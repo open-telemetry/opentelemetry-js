@@ -13,7 +13,7 @@
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",

@@ -19,7 +19,8 @@
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "test:browser": "nyc karma start --single-run",
     "watch": "tsc --build -w tsconfig.all.json",
-    "peer-api-check": "node ../../../scripts/peer-api-check.js"
+    "peer-api-check": "node ../../../scripts/peer-api-check.js",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../"
   },
   "keywords": [
     "opentelemetry",
@@ -43,12 +44,10 @@
     "README.md"
   ],
   "peerDependencies": {
-    "@opentelemetry/api": ">=1.0.0 <1.2.0",
-    "@opentelemetry/api-metrics": "~0.27.0"
+    "@opentelemetry/api": ">=1.0.0 <1.2.0"
   },
   "devDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.2.0",
-    "@opentelemetry/api-metrics": "~0.27.0",
     "@types/mocha": "8.2.3",
     "@types/webpack-env": "1.16.3",
     "codecov": "3.8.3",
@@ -70,6 +69,7 @@
     "webpack": "4.46.0"
   },
   "dependencies": {
+    "@opentelemetry/api-metrics": "0.27.0",
     "@opentelemetry/core": "1.1.1",
     "@opentelemetry/resources": "1.1.1",
     "@opentelemetry/sdk-metrics-base": "0.27.0",

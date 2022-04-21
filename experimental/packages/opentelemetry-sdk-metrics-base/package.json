@@ -16,7 +16,7 @@
     "test:browser": "nyc karma start --single-run",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
-    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../../scripts/version-update.js",
@@ -77,7 +77,6 @@
   "peerDependencies": {
     "@opentelemetry/api": "^1.0.0"
   },
-  "todo": "Move API metrics to peer dependencies. While it is using an unpublished name, lerna doesn't properly link it if it is in peer dependencies",
   "dependencies": {
     "@opentelemetry/api-metrics": "0.27.0",
     "@opentelemetry/core": "1.1.1",

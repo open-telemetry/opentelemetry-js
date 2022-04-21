@@ -15,4 +15,3 @@
  */
 
 export * from './OTLPTraceExporter';
-export * from './OTLPExporterBrowserBase';

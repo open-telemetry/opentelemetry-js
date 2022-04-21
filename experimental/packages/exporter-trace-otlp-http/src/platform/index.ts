@@ -15,4 +15,3 @@
  */
 
 export * from './node';
-export { OTLPExporterBrowserBase } from './browser';

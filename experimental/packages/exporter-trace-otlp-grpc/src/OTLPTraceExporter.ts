@@ -15,15 +15,18 @@
  */
 
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
-import { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
 import {
   otlpTypes,
   toOTLPExportTraceServiceRequest,
 } from '@opentelemetry/exporter-trace-otlp-http';
-import { OTLPExporterConfigNode, ServiceClientType } from './types';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
-import { validateAndNormalizeUrl } from './util';
 import { Metadata } from '@grpc/grpc-js';
+import {
+  OTLPGRPCExporterConfigNode,
+  OTLPGRPCExporterNodeBase,
+  ServiceClientType,
+  validateAndNormalizeUrl
+} from '@opentelemetry/otlp-grpc-exporter-base';
 
 const DEFAULT_COLLECTOR_URL = 'localhost:4317';
 
@@ -31,13 +34,11 @@ const DEFAULT_COLLECTOR_URL = 'localhost:4317';
  * OTLP Trace Exporter for Node
  */
 export class OTLPTraceExporter
-  extends OTLPExporterNodeBase<
-    ReadableSpan,
-    otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
-  >
+  extends OTLPGRPCExporterNodeBase<ReadableSpan,
+    otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest>
   implements SpanExporter {
 
-  constructor(config: OTLPExporterConfigNode = {}) {
+  constructor(config: OTLPGRPCExporterConfigNode = {}) {
     super(config);
     const headers = baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS);
     this.metadata ||= new Metadata();
@@ -52,14 +53,14 @@ export class OTLPTraceExporter
     return toOTLPExportTraceServiceRequest(spans, this);
   }
 
-  getDefaultUrl(config: OTLPExporterConfigNode) {
+  getDefaultUrl(config: OTLPGRPCExporterConfigNode) {
     return typeof config.url === 'string'
       ? validateAndNormalizeUrl(config.url)
       : getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT.length > 0
-      ? validateAndNormalizeUrl(getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
-      : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-      ? validateAndNormalizeUrl(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT)
-      : DEFAULT_COLLECTOR_URL;
+        ? validateAndNormalizeUrl(getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
+        : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
+          ? validateAndNormalizeUrl(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT)
+          : DEFAULT_COLLECTOR_URL;
   }
 
   getServiceClientType() {
