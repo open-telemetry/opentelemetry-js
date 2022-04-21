@@ -27,7 +27,7 @@ const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc'
 
 const collectorOptions = {
   // url is optional and can be omitted - default is http://localhost:4317
-  url: '<collector-hostname>:<port>',
+  url: 'http://<collector-hostname>:<port>',
 };
 
 const provider = new BasicTracerProvider();
@@ -90,7 +90,7 @@ const metadata = new grpc.Metadata();
 metadata.set('k', 'v');
 
 const collectorOptions = {
-  // url is optional and can be omitted - http://localhost:4317
+  // url is optional and can be omitted - default is http://localhost:4317
   url: 'http://<collector-hostname>:<port>',
   metadata, // // an optional grpc.Metadata object to be sent with each request
 };
@@ -113,7 +113,7 @@ By default no compression will be used. To use compression, set it programmatica
 const { CompressionAlgorithm } = require('@opentelemetry/exporter-trace-otlp-grpc');
 
 const collectorOptions = {
-  // url is optional and can be omitted - http://localhost:4317
+  // url is optional and can be omitted - default is http://localhost:4317
   url: 'http://<collector-hostname>:<port>',
   metadata, // // an optional grpc.Metadata object to be sent with each request
   compression: CompressionAlgorithm.GZIP,
