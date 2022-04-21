@@ -13,7 +13,7 @@
     "clean": "tsc --build --clean tsconfig.all.json",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
     "version": "node ../../../scripts/version-update.js",
     "tdd": "karma start",
     "test:browser": "nyc karma start --single-run",
