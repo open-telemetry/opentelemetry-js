@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+import {
+  SpanContext,
+  TraceFlags,
+} from '@opentelemetry/api';
 import { AlwaysOnSampler } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -53,7 +57,15 @@ describe('ConsoleSpanExporter', () => {
           new SimpleSpanProcessor(consoleExporter)
         );
 
-        const span = basicTracerProvider.getTracer('default').startSpan('foo');
+        const tracer = basicTracerProvider.getTracer('default');
+        const context: SpanContext = {
+          traceId: 'a3cda95b652f4a1592b449d5929fda1b',
+          spanId: '5e0c63257de34c92',
+          traceFlags: TraceFlags.SAMPLED,
+        };
+        const span = tracer.startSpan('foo', {
+          links: [ { context, attributes: { anAttr: 'aValue' } } ]
+        });
         span.addEvent('foobar');
         span.end();
 
@@ -70,6 +82,7 @@ describe('ConsoleSpanExporter', () => {
           'events',
           'id',
           'kind',
+          'links',
           'name',
           'parentId',
           'status',
@@ -80,7 +93,7 @@ describe('ConsoleSpanExporter', () => {
         assert.ok(firstSpan.name === 'foo');
         assert.ok(firstEvent.name === 'foobar');
         assert.ok(consoleSpan.id === firstSpan.spanContext().spanId);
-        assert.ok(keys === expectedKeys);
+        assert.ok(keys === expectedKeys, 'expectedKeys');
 
         assert.ok(spyExport.calledOnce);
       });
