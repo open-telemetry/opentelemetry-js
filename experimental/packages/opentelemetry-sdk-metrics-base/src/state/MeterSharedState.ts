@@ -19,6 +19,7 @@ import * as metrics from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { InstrumentationLibraryMetrics } from '../export/MetricData';
 import { createInstrumentDescriptorWithView, InstrumentDescriptor } from '../InstrumentDescriptor';
+import { Meter } from '../Meter';
 import { isNotNullish } from '../utils';
 import { AsyncMetricStorage } from './AsyncMetricStorage';
 import { MeterProviderSharedState } from './MeterProviderSharedState';
@@ -32,8 +33,11 @@ import { SyncMetricStorage } from './SyncMetricStorage';
  */
 export class MeterSharedState {
   private _metricStorageRegistry = new MetricStorageRegistry();
+  meter: Meter;
 
-  constructor(private _meterProviderSharedState: MeterProviderSharedState, private _instrumentationLibrary: InstrumentationLibrary) {}
+  constructor(private _meterProviderSharedState: MeterProviderSharedState, private _instrumentationLibrary: InstrumentationLibrary) {
+    this.meter = new Meter(this);
+  }
 
   registerMetricStorage(descriptor: InstrumentDescriptor) {
     const views = this._meterProviderSharedState.viewRegistry.findViews(descriptor, this._instrumentationLibrary);

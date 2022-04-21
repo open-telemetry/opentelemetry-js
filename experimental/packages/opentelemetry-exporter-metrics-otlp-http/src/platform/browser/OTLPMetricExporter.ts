@@ -16,14 +16,17 @@
 
 import { ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
 import {
-  appendResourcePathToUrlIfNotPresent,
-  OTLPExporterBrowserBase,
   otlpTypes
 } from '@opentelemetry/exporter-trace-otlp-http';
 import { toOTLPExportMetricServiceRequest } from '../../transformMetrics';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
 import { defaultOptions, OTLPMetricExporterOptions } from '../../OTLPMetricExporterOptions';
 import { OTLPMetricExporterBase } from '../../OTLPMetricExporterBase';
+import {
+  appendResourcePathToUrlIfNotPresent,
+  OTLPExporterBrowserBase,
+  OTLPExporterConfigBase
+} from '@opentelemetry/otlp-exporter-base';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = '/v1/metrics';
 const DEFAULT_COLLECTOR_URL = `http://localhost:4318${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
@@ -31,7 +34,7 @@ const DEFAULT_COLLECTOR_URL = `http://localhost:4318${DEFAULT_COLLECTOR_RESOURCE
 class OTLPExporterBrowserProxy extends OTLPExporterBrowserBase<ResourceMetrics,
   otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest> {
 
-  constructor(config: OTLPMetricExporterOptions & otlpTypes.OTLPExporterConfigBase = defaultOptions) {
+  constructor(config: OTLPMetricExporterOptions & OTLPExporterConfigBase = defaultOptions) {
     super(config);
     this._headers = Object.assign(
       this._headers,
@@ -41,7 +44,7 @@ class OTLPExporterBrowserProxy extends OTLPExporterBrowserBase<ResourceMetrics,
     );
   }
 
-  getDefaultUrl(config: otlpTypes.OTLPExporterConfigBase): string {
+  getDefaultUrl(config: OTLPExporterConfigBase): string {
     return typeof config.url === 'string'
       ? config.url
       : getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0
@@ -65,7 +68,7 @@ class OTLPExporterBrowserProxy extends OTLPExporterBrowserBase<ResourceMetrics,
  * Collector Metric Exporter for Web
  */
 export class OTLPMetricExporter extends OTLPMetricExporterBase<OTLPExporterBrowserProxy> {
-  constructor(config: otlpTypes.OTLPExporterConfigBase & OTLPMetricExporterOptions = defaultOptions) {
+  constructor(config: OTLPExporterConfigBase & OTLPMetricExporterOptions = defaultOptions) {
     super(new OTLPExporterBrowserProxy(config), config);
   }
 }

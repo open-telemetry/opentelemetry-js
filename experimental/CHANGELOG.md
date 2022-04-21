@@ -16,6 +16,10 @@ All notable changes to experimental packages in this project will be documented 
   * updated `opentelemetry-sdk-node` to the latest Metrics SDK.
   * updated `otlp-transformer` to the latest Metrics SDK.
   * updated all `instrumentation-*` packages to use local implementations of `parseUrl()` due to #2884
+* refactor(otlp-exporters) move base classes and associated types into their own packages #2893 @pichlermarc
+  * `otlp-exporter-base` => `OTLPExporterBase`, `OTLPExporterBrowserBase`, `OTLPExporterNodeBase`
+  * `otlp-grpc-exporter-base` => `OTLPGRPCExporterNodeBase`
+  * `otlp-proto-exporter-base` => `OTLPProtoExporterNodeBase`
 
 ### :rocket: (Enhancement)
 
@@ -39,6 +43,7 @@ All notable changes to experimental packages in this project will be documented 
 * feat(instrumentation-xhr): add applyCustomAttributesOnSpan hook #2134 @mhennoch
 * feat(proto): add @opentelemetry/otlp-transformer package with hand-rolled transformation #2746 @dyladan
 * feat(sdk-metrics-base): shutdown and forceflush on MeterProvider #2890 @legendecas
+* feat(sdk-metrics-base): return the same meter for identical input to getMeter #2901 @legendecas
 
 ### :bug: (Bug Fix)
 

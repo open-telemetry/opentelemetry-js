@@ -17,10 +17,9 @@
 import { diag } from '@opentelemetry/api';
 import { ExportResultCode } from '@opentelemetry/core';
 import {
-  OTLPExporterNodeConfigBase,
-  otlpTypes,
+  otlpTypes
 } from '@opentelemetry/exporter-trace-otlp-http';
-import { getExportRequestProto } from '@opentelemetry/exporter-trace-otlp-proto';
+import { getExportRequestProto } from '@opentelemetry/otlp-proto-exporter-base';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';
@@ -38,6 +37,7 @@ import {
 } from './metricsHelper';
 import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
 import { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
+import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 
 const fakeRequest = {
   end: function () {

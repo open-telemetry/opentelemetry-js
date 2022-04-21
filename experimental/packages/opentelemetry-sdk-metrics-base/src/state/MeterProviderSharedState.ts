@@ -17,6 +17,7 @@
 import { HrTime } from '@opentelemetry/api';
 import { hrTime, InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
+import { instrumentationLibraryId } from '../utils';
 import { ViewRegistry } from '../view/ViewRegistry';
 import { MeterSharedState } from './MeterSharedState';
 import { MetricCollector } from './MetricCollector';
@@ -30,15 +31,17 @@ export class MeterProviderSharedState {
 
   metricCollectors: MetricCollector[] = [];
 
-  meterSharedStates: MeterSharedState[] = [];
+  meterSharedStates: Map<string, MeterSharedState> = new Map();
 
   constructor(public resource: Resource) {}
 
   getMeterSharedState(instrumentationLibrary: InstrumentationLibrary) {
-    // TODO: meter identity
-    // https://github.com/open-telemetry/opentelemetry-js/issues/2593
-    const meterSharedState = new MeterSharedState(this, instrumentationLibrary);
-    this.meterSharedStates.push(meterSharedState);
+    const id = instrumentationLibraryId(instrumentationLibrary);
+    let meterSharedState = this.meterSharedStates.get(id);
+    if (meterSharedState == null) {
+      meterSharedState = new MeterSharedState(this, instrumentationLibrary);
+      this.meterSharedStates.set(id, meterSharedState);
+    }
     return meterSharedState;
   }
 }

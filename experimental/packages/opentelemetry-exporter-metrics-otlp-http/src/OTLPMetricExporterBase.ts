@@ -15,9 +15,18 @@
  */
 
 import { ExportResult } from '@opentelemetry/core';
-import { AggregationTemporality, AggregationTemporalitySelector, CumulativeTemporalitySelector, DeltaTemporalitySelector, InstrumentType, PushMetricExporter, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
-import { OTLPExporterBase, otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
+import {
+  AggregationTemporality,
+  AggregationTemporalitySelector,
+  CumulativeTemporalitySelector,
+  DeltaTemporalitySelector,
+  InstrumentType,
+  PushMetricExporter,
+  ResourceMetrics
+} from '@opentelemetry/sdk-metrics-base';
+import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { defaultOptions, OTLPMetricExporterOptions } from './OTLPMetricExporterOptions';
+import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 
 function chooseTemporalitySelector(preferredAggregationTemporality?: AggregationTemporality): AggregationTemporalitySelector {
   if (preferredAggregationTemporality === AggregationTemporality.DELTA) {
