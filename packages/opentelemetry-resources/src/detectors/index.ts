@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
-export * from './EnvDetector';
-export * from './ProcessDetector';
 export * from './BrowserDetector';
+export * from './EnvDetector';
+export * from './HostDetector';
+export * from './ProcessDetector';
