@@ -10,6 +10,18 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: (Bug Fix)
 
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.2.0
+
+### :boom: Breaking Change
+
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
 * fix: sanitize attributes inputs [#2881](https://github.com/open-telemetry/opentelemetry-js/pull/2881) @legendecas
 * fix: support earlier API versions [#2892](https://github.com/open-telemetry/opentelemetry-js/pull/2892) @dyladan
 
