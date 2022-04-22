@@ -454,7 +454,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
         setTimeout(() => {
           const result = responseSpy.args[0][0] as core.ExportResult;
           assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-          const error = result.error as otlpTypes.OTLPExporterError;
+          const error = result.error as OTLPExporterError;
           assert.ok(error !== undefined);
           assert.strictEqual(error.message, 'Request Timeout');
 
@@ -487,7 +487,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
 
       collectorExporter.export(spans, result => {
         assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-        const error = result.error as otlpTypes.OTLPExporterError;
+        const error = result.error as OTLPExporterError;
         assert.ok(error !== undefined);
         assert.strictEqual(error.message, 'Request Timeout');
         done();
@@ -504,7 +504,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
 
       collectorExporter.export(spans, result => {
         assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-        const error = result.error as otlpTypes.OTLPExporterError;
+        const error = result.error as OTLPExporterError;
         assert.ok(error !== undefined);
         assert.strictEqual(error.message, 'Request Timeout');
         done();
@@ -532,7 +532,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
 
       collectorExporter.export(spans, result => {
         assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-        const error = result.error as otlpTypes.OTLPExporterError;
+        const error = result.error as OTLPExporterError;
         assert.ok(error !== undefined);
         assert.strictEqual(error.message, 'Request Timeout');
         done();

@@ -16,8 +16,6 @@
 
 import * as sinon from 'sinon';
 import { sendWithXhr } from '../../src/platform/browser/util';
-
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { nextTick } from 'process';
 import { ensureHeadersContain } from '../testHelper';
 
@@ -59,9 +57,7 @@ describe('util - browser', () => {
         const explicitContentType = {
         'Content-Type': 'application/json',
       };
-        // use default exporter timeout
-        const collectorExporter = new OTLPTraceExporter();
-        const exporterTimeout = collectorExporter.timeoutMillis;
+        const exporterTimeout = 10000;
         sendWithXhr(body, url, explicitContentType, exporterTimeout, onSuccessStub, onErrorStub);
       });
       it('Request Headers should contain "Content-Type" header', done => {
@@ -88,8 +84,7 @@ describe('util - browser', () => {
       beforeEach(()=>{
         const emptyHeaders = {};
         // use default exporter timeout
-        const collectorExporter = new OTLPTraceExporter();
-        const exporterTimeout = collectorExporter.timeoutMillis;
+        const exporterTimeout = 10000;
         sendWithXhr(body, url, emptyHeaders, exporterTimeout, onSuccessStub, onErrorStub);
       });
       it('Request Headers should contain "Content-Type" header', done => {
@@ -115,9 +110,7 @@ describe('util - browser', () => {
       let customHeaders: Record<string,string>;
       beforeEach(()=>{
         customHeaders = { aHeader: 'aValue', bHeader: 'bValue' };
-        // use default exporter timeout
-        const collectorExporter = new OTLPTraceExporter();
-        const exporterTimeout = collectorExporter.timeoutMillis;
+        const exporterTimeout = 10000;
         sendWithXhr(body, url, customHeaders, exporterTimeout, onSuccessStub, onErrorStub);
       });
       it('Request Headers should contain "Content-Type" header', done => {

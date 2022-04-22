@@ -34,6 +34,7 @@ import {
 } from './traceHelper';
 import { CompressionAlgorithm, OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { getExportRequestProto } from '@opentelemetry/otlp-proto-exporter-base';
+import { OTLPExporterError } from '@opentelemetry/otlp-exporter-base';
 
 let fakeRequest: PassThrough;
 
@@ -306,7 +307,7 @@ describe('OTLPTraceExporter - node with proto over http', () => {
 
       collectorExporter.export(spans, result => {
         assert.strictEqual(result.code, ExportResultCode.FAILED);
-        const error = result.error as otlpTypes.OTLPExporterError;
+        const error = result.error as OTLPExporterError;
         assert.ok(error !== undefined);
         assert.strictEqual(error.message, 'Request Timeout');
         done();
@@ -323,7 +324,7 @@ describe('OTLPTraceExporter - node with proto over http', () => {
 
       collectorExporter.export(spans, result => {
         assert.strictEqual(result.code, ExportResultCode.FAILED);
-        const error = result.error as otlpTypes.OTLPExporterError;
+        const error = result.error as OTLPExporterError;
         assert.ok(error !== undefined);
         assert.strictEqual(error.message, 'Request Timeout');
         done();
@@ -351,7 +352,7 @@ describe('OTLPTraceExporter - node with proto over http', () => {
 
       collectorExporter.export(spans, result => {
         assert.strictEqual(result.code, ExportResultCode.FAILED);
-        const error = result.error as otlpTypes.OTLPExporterError;
+        const error = result.error as OTLPExporterError;
         assert.ok(error !== undefined);
         assert.strictEqual(error.message, 'Request Timeout');
         done();

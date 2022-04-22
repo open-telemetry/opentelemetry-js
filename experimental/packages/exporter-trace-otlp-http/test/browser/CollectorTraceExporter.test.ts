@@ -22,6 +22,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPTraceExporter } from '../../src/platform/browser/index';
 import * as otlpTypes from '../../src/types';
+import { OTLPExporterError } from '@opentelemetry/otlp-exporter-base';
 import { nextTick } from 'process';
 
 import {
@@ -451,7 +452,7 @@ describe('OTLPTraceExporter - web', () => {
         nextTick(() => {
           const result = responseSpy.args[0][0] as core.ExportResult;
           assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-          const error = result.error as otlpTypes.OTLPExporterError;
+          const error = result.error as OTLPExporterError;
           assert.ok(error !== undefined);
           assert.strictEqual(error.message, 'Request Timeout');
 
