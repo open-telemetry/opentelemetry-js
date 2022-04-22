@@ -27,11 +27,11 @@ import { assertMetricData, assertDataPoint, defaultInstrumentDescriptor } from '
 import { ObservableCallback } from '@opentelemetry/api-metrics';
 
 const deltaCollector: MetricCollectorHandle = {
-  getAggregationTemporality: () => AggregationTemporality.DELTA,
+  selectAggregationTemporality: () => AggregationTemporality.DELTA,
 };
 
 const cumulativeCollector: MetricCollectorHandle = {
-  getAggregationTemporality: () => AggregationTemporality.CUMULATIVE,
+  selectAggregationTemporality: () => AggregationTemporality.CUMULATIVE,
 };
 
 const sdkStartTime = hrTime();

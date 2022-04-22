@@ -58,8 +58,8 @@ export class MetricCollector implements MetricProducer {
     await this._metricReader.shutdown(options);
   }
 
-  getAggregationTemporality(instrumentType: InstrumentType) {
-    return this._metricReader.getAggregationTemporality(instrumentType);
+  selectAggregationTemporality(instrumentType: InstrumentType) {
+    return this._metricReader.selectAggregationTemporality(instrumentType);
   }
 }
 
@@ -68,5 +68,5 @@ export class MetricCollector implements MetricProducer {
  * information for metric collection.
  */
 export interface MetricCollectorHandle {
-  getAggregationTemporality: AggregationTemporalitySelector;
+  selectAggregationTemporality: AggregationTemporalitySelector;
 }

@@ -26,15 +26,15 @@ import { TemporalMetricProcessor } from '../../src/state/TemporalMetricProcessor
 import { assertMetricData, assertDataPoint, defaultInstrumentDescriptor } from '../util';
 
 const deltaCollector1: MetricCollectorHandle = {
-  getAggregationTemporality: () => AggregationTemporality.DELTA,
+  selectAggregationTemporality: () => AggregationTemporality.DELTA,
 };
 
 const deltaCollector2: MetricCollectorHandle = {
-  getAggregationTemporality: () => AggregationTemporality.DELTA,
+  selectAggregationTemporality: () => AggregationTemporality.DELTA,
 };
 
 const cumulativeCollector1: MetricCollectorHandle = {
-  getAggregationTemporality: () => AggregationTemporality.CUMULATIVE,
+  selectAggregationTemporality: () => AggregationTemporality.CUMULATIVE,
 };
 
 const sdkStartTime = hrTime();

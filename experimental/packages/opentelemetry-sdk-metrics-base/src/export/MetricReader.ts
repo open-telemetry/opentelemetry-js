@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { AggregationTemporality, AggregationTemporalitySelector } from './AggregationTemporality';
+import { AggregationTemporality } from './AggregationTemporality';
 import { MetricProducer } from './MetricProducer';
 import { ResourceMetrics } from './MetricData';
 import { callWithTimeout, Maybe } from '../utils';
@@ -35,9 +35,6 @@ export abstract class MetricReader {
   // MetricProducer used by this instance.
   private _metricProducer?: MetricProducer;
 
-  constructor(private readonly _aggregationTemporalitySelector: AggregationTemporalitySelector) {
-  }
-
   /**
    * Set the {@link MetricProducer} used by this instance.
    *
@@ -52,11 +49,9 @@ export abstract class MetricReader {
   }
 
   /**
-   * Get the {@link AggregationTemporality} preferred by this {@link MetricReader}
+   * Get the default {@link AggregationTemporality} for the given {@link InstrumentType}
    */
-  getAggregationTemporality(instrumentType: InstrumentType): AggregationTemporality {
-    return this._aggregationTemporalitySelector(instrumentType);
-  }
+  abstract selectAggregationTemporality(instrumentType: InstrumentType): AggregationTemporality;
 
   /**
    * Handle once the SDK has initialized this {@link MetricReader}

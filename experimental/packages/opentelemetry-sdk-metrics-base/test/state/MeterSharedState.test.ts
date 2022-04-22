@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { Meter, MeterProvider, DataPointType, CumulativeTemporalitySelector, DeltaTemporalitySelector } from '../../src';
+import { AggregationTemporality, Meter, MeterProvider, DataPointType } from '../../src';
 import { assertMetricData, defaultInstrumentationLibrary, defaultResource } from '../util';
 import { TestMetricReader } from '../export/TestMetricReader';
 import { MeterSharedState } from '../../src/state/MeterSharedState';
@@ -30,11 +30,11 @@ describe('MeterSharedState', () => {
     function setupInstruments() {
       const meterProvider = new MeterProvider({ resource: defaultResource });
 
-      const cumulativeReader = new TestMetricReader(CumulativeTemporalitySelector);
+      const cumulativeReader = new TestMetricReader(() => AggregationTemporality.CUMULATIVE);
       meterProvider.addMetricReader(cumulativeReader);
       const cumulativeCollector = cumulativeReader.getMetricCollector();
 
-      const deltaReader = new TestMetricReader(DeltaTemporalitySelector);
+      const deltaReader = new TestMetricReader(() => AggregationTemporality.DELTA);
       meterProvider.addMetricReader(deltaReader);
       const deltaCollector = deltaReader.getMetricCollector();
 

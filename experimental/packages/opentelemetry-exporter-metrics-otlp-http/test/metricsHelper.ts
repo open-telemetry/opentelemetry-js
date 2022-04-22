@@ -17,8 +17,7 @@
 import { Counter, Histogram, ObservableResult, ValueType, } from '@opentelemetry/api-metrics';
 import { InstrumentationLibrary, VERSION } from '@opentelemetry/core';
 import {
-  AggregationTemporalitySelector,
-  CumulativeTemporalitySelector,
+  AggregationTemporality,
   ExplicitBucketHistogramAggregation,
   MeterProvider,
   MetricReader
@@ -35,17 +34,17 @@ if (typeof Buffer === 'undefined') {
   };
 }
 
-export class TestMetricReader extends MetricReader {
-  constructor(temporalitySelector?: AggregationTemporalitySelector) {
-    super(temporalitySelector ?? CumulativeTemporalitySelector);
-  }
-
+class TestMetricReader extends MetricReader {
   protected onForceFlush(): Promise<void> {
     return Promise.resolve(undefined);
   }
 
   protected onShutdown(): Promise<void> {
     return Promise.resolve(undefined);
+  }
+
+  selectAggregationTemporality() {
+    return AggregationTemporality.CUMULATIVE;
   }
 }
 

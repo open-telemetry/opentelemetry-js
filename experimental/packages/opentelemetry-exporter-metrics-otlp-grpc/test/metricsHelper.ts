@@ -20,11 +20,16 @@ import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as grpc from '@grpc/grpc-js';
 import { VERSION } from '@opentelemetry/core';
-import { AggregationTemporalitySelector, CumulativeTemporalitySelector, ExplicitBucketHistogramAggregation, MeterProvider, MetricReader } from '@opentelemetry/sdk-metrics-base';
+import {
+  AggregationTemporality,
+  ExplicitBucketHistogramAggregation,
+  MeterProvider,
+  MetricReader,
+} from '@opentelemetry/sdk-metrics-base';
 
-export class TestMetricReader extends MetricReader {
-  constructor(temporalitySelector?: AggregationTemporalitySelector) {
-    super(temporalitySelector ?? CumulativeTemporalitySelector);
+class TestMetricReader extends MetricReader {
+  selectAggregationTemporality() {
+    return AggregationTemporality.CUMULATIVE;
   }
 
   protected onForceFlush(): Promise<void> {

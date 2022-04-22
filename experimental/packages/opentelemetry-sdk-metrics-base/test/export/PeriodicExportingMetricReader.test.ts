@@ -77,13 +77,13 @@ class TestMetricExporter implements PushMetricExporter {
     return this._batches.slice(0, numberOfExports);
   }
 
-  getAggregationTemporality(_instrumentType: InstrumentType): AggregationTemporality {
+  selectAggregationTemporality(_instrumentType: InstrumentType): AggregationTemporality {
     return AggregationTemporality.CUMULATIVE;
   }
 }
 
 class TestDeltaMetricExporter extends TestMetricExporter {
-  override getAggregationTemporality(_instrumentType: InstrumentType): AggregationTemporality {
+  override selectAggregationTemporality(_instrumentType: InstrumentType): AggregationTemporality {
     return AggregationTemporality.DELTA;
   }
 }

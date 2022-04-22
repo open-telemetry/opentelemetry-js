@@ -18,8 +18,6 @@ import { ExportResult } from '@opentelemetry/core';
 import {
   AggregationTemporality,
   AggregationTemporalitySelector,
-  CumulativeTemporalitySelector,
-  DeltaTemporalitySelector,
   InstrumentType,
   PushMetricExporter,
   ResourceMetrics
@@ -27,6 +25,21 @@ import {
 import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { defaultOptions, OTLPMetricExporterOptions } from './OTLPMetricExporterOptions';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
+
+export const CumulativeTemporalitySelector: AggregationTemporalitySelector = () => AggregationTemporality.CUMULATIVE;
+
+export const DeltaTemporalitySelector: AggregationTemporalitySelector = (instrumentType: InstrumentType) => {
+  switch (instrumentType) {
+    case InstrumentType.COUNTER:
+    case InstrumentType.OBSERVABLE_COUNTER:
+    case InstrumentType.HISTOGRAM:
+    case InstrumentType.OBSERVABLE_GAUGE:
+      return AggregationTemporality.DELTA;
+    case InstrumentType.UP_DOWN_COUNTER:
+    case InstrumentType.OBSERVABLE_UP_DOWN_COUNTER:
+      return AggregationTemporality.CUMULATIVE;
+  }
+};
 
 function chooseTemporalitySelector(preferredAggregationTemporality?: AggregationTemporality): AggregationTemporalitySelector {
   if (preferredAggregationTemporality === AggregationTemporality.DELTA) {
@@ -61,7 +74,7 @@ export class OTLPMetricExporterBase<T extends OTLPExporterBase<OTLPMetricExporte
     return Promise.resolve();
   }
 
-  getAggregationTemporality(instrumentType: InstrumentType): AggregationTemporality {
+  selectAggregationTemporality(instrumentType: InstrumentType): AggregationTemporality {
     return this._aggregationTemporalitySelector(instrumentType);
   }
 

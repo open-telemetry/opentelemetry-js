@@ -35,7 +35,7 @@ describe('MetricCollector', () => {
       const meterProviderSharedState = new MeterProviderSharedState(defaultResource);
       const exporters = [ new TestMetricExporter(), new TestDeltaMetricExporter() ];
       for (const exporter of exporters) {
-        const reader = new TestMetricReader(exporter.getAggregationTemporality);
+        const reader = new TestMetricReader(exporter.selectAggregationTemporality);
         assert.doesNotThrow(() => new MetricCollector(meterProviderSharedState, reader));
       }
     });
@@ -46,7 +46,7 @@ describe('MetricCollector', () => {
     function setupInstruments(exporter: PushMetricExporter) {
       const meterProvider = new MeterProvider({ resource: defaultResource });
 
-      const reader = new TestMetricReader(exporter.getAggregationTemporality);
+      const reader = new TestMetricReader(exporter.selectAggregationTemporality);
       meterProvider.addMetricReader(reader);
       const metricCollector = reader.getMetricCollector();
 

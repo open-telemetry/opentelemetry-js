@@ -25,18 +25,3 @@ export enum AggregationTemporality {
 }
 
 export type AggregationTemporalitySelector = (instrumentType: InstrumentType) => AggregationTemporality;
-
-export const CumulativeTemporalitySelector: AggregationTemporalitySelector = () => AggregationTemporality.CUMULATIVE;
-
-export const DeltaTemporalitySelector: AggregationTemporalitySelector = (instrumentType: InstrumentType) => {
-  switch (instrumentType) {
-    case InstrumentType.COUNTER:
-    case InstrumentType.OBSERVABLE_COUNTER:
-    case InstrumentType.HISTOGRAM:
-    case InstrumentType.OBSERVABLE_GAUGE:
-      return AggregationTemporality.DELTA;
-    case InstrumentType.UP_DOWN_COUNTER:
-    case InstrumentType.OBSERVABLE_UP_DOWN_COUNTER:
-      return AggregationTemporality.CUMULATIVE;
-  }
-};

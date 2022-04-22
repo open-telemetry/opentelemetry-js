@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { AggregationTemporality, AggregationTemporalitySelector, CumulativeTemporalitySelector } from './AggregationTemporality';
+import { AggregationTemporality } from './AggregationTemporality';
 import { ResourceMetrics } from './MetricData';
 import {
   ExportResult,
@@ -31,7 +31,7 @@ export interface PushMetricExporter {
 
   forceFlush(): Promise<void>;
 
-  getAggregationTemporality(instrumentType: InstrumentType): AggregationTemporality;
+  selectAggregationTemporality(instrumentType: InstrumentType): AggregationTemporality;
 
   shutdown(): Promise<void>;
 
@@ -39,8 +39,10 @@ export interface PushMetricExporter {
 
 export class ConsoleMetricExporter implements PushMetricExporter {
   protected _shutdown = true;
+  private _aggregationTemporality: AggregationTemporality;
 
-  constructor(private _aggregationTemporalitySelector: AggregationTemporalitySelector = CumulativeTemporalitySelector) {
+  constructor(aggregationTemporality?: AggregationTemporality) {
+    this._aggregationTemporality = aggregationTemporality ?? AggregationTemporality.CUMULATIVE;
   }
 
   export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void) {
@@ -50,8 +52,8 @@ export class ConsoleMetricExporter implements PushMetricExporter {
       });
   }
 
-  getAggregationTemporality(instrumentType: InstrumentType) {
-    return this._aggregationTemporalitySelector(instrumentType);
+  selectAggregationTemporality(_instrumentType: InstrumentType) {
+    return this._aggregationTemporality;
   }
 
   // nothing to do
