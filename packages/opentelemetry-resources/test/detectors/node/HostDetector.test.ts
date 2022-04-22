@@ -25,7 +25,7 @@ describeNode('hostDetector() on Node.js', () => {
     sinon.restore();
   });
 
-  it('should return resource information from process', async () => {
+  it('should return resource information about the host', async () => {
     const os = require('os');
 
     sinon.stub(os, 'arch').returns('x64');
@@ -40,6 +40,19 @@ describeNode('hostDetector() on Node.js', () => {
     assert.strictEqual(
       resource.attributes[SemanticResourceAttributes.HOST_ARCH],
       'amd64'
+    );
+  });
+
+  it('should pass through arch string if unknown', async () => {
+    const os = require('os');
+
+    sinon.stub(os, 'arch').returns('some-unknown-arch');
+
+    const resource: Resource = await hostDetector.detect();
+
+    assert.strictEqual(
+      resource.attributes[SemanticResourceAttributes.HOST_ARCH],
+      'some-unknown-arch'
     );
   });
 });
