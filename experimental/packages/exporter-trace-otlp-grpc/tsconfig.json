@@ -20,6 +20,12 @@
     },
     {
       "path": "../exporter-trace-otlp-http"
+    },
+    {
+      "path": "../otlp-exporter-base"
+    },
+    {
+      "path": "../otlp-grpc-exporter-base"
     }
   ]
 }

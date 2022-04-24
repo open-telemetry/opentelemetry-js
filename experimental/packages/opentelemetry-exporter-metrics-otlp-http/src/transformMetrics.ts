@@ -15,8 +15,10 @@
  */
 
 import { SpanAttributes } from '@opentelemetry/api';
+import { ValueType } from '@opentelemetry/api-metrics';
 import * as core from '@opentelemetry/core';
-import { OTLPExporterBase, otlpTypes, toCollectorResource } from '@opentelemetry/exporter-trace-otlp-http';
+import { otlpTypes, toCollectorResource } from '@opentelemetry/exporter-trace-otlp-http';
+import { OTLPExporterBase, OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 import {
   AggregationTemporality,
   DataPointType,
@@ -25,7 +27,6 @@ import {
   MetricData,
   ResourceMetrics
 } from '@opentelemetry/sdk-metrics-base';
-import { ValueType } from '@opentelemetry/api-metrics';
 
 /**
  * Converts {@link SpanAttributes} to a collector-compatible format.
@@ -171,7 +172,7 @@ export function toCollectorMetric(
  * @param aggregationTemporality
  * @param collectorExporterBase
  */
-export function toOTLPExportMetricServiceRequest<T extends otlpTypes.OTLPExporterConfigBase>(
+export function toOTLPExportMetricServiceRequest<T extends OTLPExporterConfigBase>(
   metrics: ResourceMetrics,
   aggregationTemporality: AggregationTemporality,
   collectorExporterBase: OTLPExporterBase<T,
