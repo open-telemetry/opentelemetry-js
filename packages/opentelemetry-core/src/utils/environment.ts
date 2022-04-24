@@ -233,21 +233,21 @@ export function parseEnvironment(values: RAW_ENVIRONMENT): ENVIRONMENT {
     const key = env as keyof ENVIRONMENT;
 
     switch (key) {
-      case 'OTEL_LOG_LEVEL':
-        setLogLevelFromEnv(key, environment, values);
-        break;
+    case 'OTEL_LOG_LEVEL':
+      setLogLevelFromEnv(key, environment, values);
+      break;
 
-      default:
-        if (isEnvVarANumber(key)) {
-          parseNumber(key, environment, values);
-        } else if (isEnvVarAList(key)) {
-          parseStringList(key, environment, values);
-        } else {
-          const value = values[key];
-          if (typeof value !== 'undefined' && value !== null) {
-            environment[key] = String(value);
-          }
+    default:
+      if (isEnvVarANumber(key)) {
+        parseNumber(key, environment, values);
+      } else if (isEnvVarAList(key)) {
+        parseStringList(key, environment, values);
+      } else {
+        const value = values[key];
+        if (typeof value !== 'undefined' && value !== null) {
+          environment[key] = String(value);
         }
+      }
     }
   }
 

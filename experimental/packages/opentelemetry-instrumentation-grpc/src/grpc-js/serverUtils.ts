@@ -159,29 +159,29 @@ export function handleServerFunction<RequestType, ResponseType>(
   callback: SendUnaryDataCallback<unknown>
 ): void {
   switch (type) {
-    case 'unary':
-    case 'clientStream':
-    case 'client_stream':
-      return clientStreamAndUnaryHandler(
-        span,
-        call,
-        callback,
+  case 'unary':
+  case 'clientStream':
+  case 'client_stream':
+    return clientStreamAndUnaryHandler(
+      span,
+      call,
+      callback,
         originalFunc as
           | grpcJs.handleUnaryCall<RequestType, ResponseType>
           | grpcJs.ClientReadableStream<RequestType>
-      );
-    case 'serverStream':
-    case 'server_stream':
-    case 'bidi':
-      return serverStreamAndBidiHandler(
-        span,
-        call,
+    );
+  case 'serverStream':
+  case 'server_stream':
+  case 'bidi':
+    return serverStreamAndBidiHandler(
+      span,
+      call,
         originalFunc as
           | grpcJs.handleBidiStreamingCall<RequestType, ResponseType>
           | grpcJs.handleServerStreamingCall<RequestType, ResponseType>
-      );
-    default:
-      break;
+    );
+  default:
+    break;
   }
 }
 
@@ -196,16 +196,16 @@ export function handleUntracedServerFunction<RequestType, ResponseType>(
   callback: SendUnaryDataCallback<unknown>
 ): void {
   switch (type) {
-    case 'unary':
-    case 'clientStream':
-    case 'client_stream':
-      return (originalFunc as Function).call({}, call, callback);
-    case 'serverStream':
-    case 'server_stream':
-    case 'bidi':
-      return (originalFunc as Function).call({}, call);
-    default:
-      break;
+  case 'unary':
+  case 'clientStream':
+  case 'client_stream':
+    return (originalFunc as Function).call({}, call, callback);
+  case 'serverStream':
+  case 'server_stream':
+  case 'bidi':
+    return (originalFunc as Function).call({}, call);
+  default:
+    break;
   }
 }
 

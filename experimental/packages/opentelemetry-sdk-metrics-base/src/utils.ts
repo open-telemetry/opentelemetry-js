@@ -83,11 +83,11 @@ export function callWithTimeout<T>(promise: Promise<T>, timeout: number): Promis
   });
 
   return Promise.race([promise, timeoutPromise]).then(result => {
-      clearTimeout(timeoutHandle);
-      return result;
-    },
-    reason => {
-      clearTimeout(timeoutHandle);
-      throw reason;
-    });
+    clearTimeout(timeoutHandle);
+    return result;
+  },
+  reason => {
+    clearTimeout(timeoutHandle);
+    throw reason;
+  });
 }

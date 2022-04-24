@@ -108,24 +108,24 @@ function toPrometheusType(
   dataPointType: DataPointType,
 ): PrometheusDataTypeLiteral {
   switch (dataPointType) {
-    case DataPointType.SINGULAR:
-      if (
-        instrumentType === InstrumentType.COUNTER ||
+  case DataPointType.SINGULAR:
+    if (
+      instrumentType === InstrumentType.COUNTER ||
         instrumentType === InstrumentType.OBSERVABLE_COUNTER
-      ) {
-        return 'counter';
-      }
-      /**
+    ) {
+      return 'counter';
+    }
+    /**
        * - HISTOGRAM
        * - UP_DOWN_COUNTER
        * - OBSERVABLE_GAUGE
        * - OBSERVABLE_UP_DOWN_COUNTER
        */
-      return 'gauge';
-    case DataPointType.HISTOGRAM:
-      return 'histogram';
-    default:
-      return 'untyped';
+    return 'gauge';
+  case DataPointType.HISTOGRAM:
+    return 'histogram';
+  default:
+    return 'untyped';
   }
 }
 
@@ -216,21 +216,21 @@ export class PrometheusSerializer {
 
     let results = '';
     switch (dataPointType) {
-      case DataPointType.SINGULAR: {
-        results = metricData.dataPoints
-          .map(it => this.serializeSingularDataPoint(name, metricData.descriptor.type, it))
-          .join('');
-        break;
-      }
-      case DataPointType.HISTOGRAM: {
-        results = metricData.dataPoints
-          .map(it => this.serializeHistogramDataPoint(name, metricData.descriptor.type, it))
-          .join('');
-        break;
-      }
-      default: {
-        diag.error(`Unrecognizable DataPointType: ${dataPointType} for metric "${name}"`);
-      }
+    case DataPointType.SINGULAR: {
+      results = metricData.dataPoints
+        .map(it => this.serializeSingularDataPoint(name, metricData.descriptor.type, it))
+        .join('');
+      break;
+    }
+    case DataPointType.HISTOGRAM: {
+      results = metricData.dataPoints
+        .map(it => this.serializeHistogramDataPoint(name, metricData.descriptor.type, it))
+        .join('');
+      break;
+    }
+    default: {
+      diag.error(`Unrecognizable DataPointType: ${dataPointType} for metric "${name}"`);
+    }
     }
 
     return `${help}\n${type}\n${results}`.trim();

@@ -206,12 +206,12 @@ export class TracerShim extends opentracing.Tracer {
 
   private _getPropagator(format: string): api.TextMapPropagator | undefined {
     switch (format) {
-      case opentracing.FORMAT_TEXT_MAP:
-        return this._propagators?.textMapPropagator ?? api.propagation;
-      case opentracing.FORMAT_HTTP_HEADERS:
-        return this._propagators?.httpHeadersPropagator ?? api.propagation;
-      default:
-        return;
+    case opentracing.FORMAT_TEXT_MAP:
+      return this._propagators?.textMapPropagator ?? api.propagation;
+    case opentracing.FORMAT_HTTP_HEADERS:
+      return this._propagators?.httpHeadersPropagator ?? api.propagation;
+    default:
+      return;
     }
   }
 }
@@ -309,22 +309,22 @@ export class SpanShim extends opentracing.Span {
       const mappedAttributes: api.SpanAttributes = {};
       for (const [k, v] of entries) {
         switch (k) {
-          case 'error.kind': {
-            mappedAttributes[SemanticAttributes.EXCEPTION_TYPE] = v;
-            break;
-          }
-          case 'message': {
-            mappedAttributes[SemanticAttributes.EXCEPTION_MESSAGE] = v;
-            break;
-          }
-          case 'stack': {
-            mappedAttributes[SemanticAttributes.EXCEPTION_STACKTRACE] = v;
-            break;
-          }
-          default: {
-            mappedAttributes[k] = v;
-            break;
-          }
+        case 'error.kind': {
+          mappedAttributes[SemanticAttributes.EXCEPTION_TYPE] = v;
+          break;
+        }
+        case 'message': {
+          mappedAttributes[SemanticAttributes.EXCEPTION_MESSAGE] = v;
+          break;
+        }
+        case 'stack': {
+          mappedAttributes[SemanticAttributes.EXCEPTION_STACKTRACE] = v;
+          break;
+        }
+        default: {
+          mappedAttributes[k] = v;
+          break;
+        }
         }
       }
       this._span.addEvent('exception', mappedAttributes, timestamp);
@@ -397,14 +397,14 @@ export class SpanShim extends opentracing.Span {
     value: SpanAttributeValue | undefined
   ): SpanStatusCode {
     switch (value) {
-      case true:
-      case 'true':
-        return SpanStatusCode.ERROR;
-      case false:
-      case 'false':
-        return SpanStatusCode.OK;
-      default:
-        return SpanStatusCode.UNSET;
+    case true:
+    case 'true':
+      return SpanStatusCode.ERROR;
+    case false:
+    case 'false':
+      return SpanStatusCode.OK;
+    default:
+      return SpanStatusCode.UNSET;
     }
   }
 }

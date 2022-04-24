@@ -86,10 +86,10 @@ function isHomogeneousAttributeValueArray(arr: unknown[]): boolean {
 
 function isValidPrimitiveAttributeValue(val: unknown): boolean {
   switch (typeof val) {
-    case 'number':
-    case 'boolean':
-    case 'string':
-      return true;
+  case 'number':
+  case 'boolean':
+  case 'string':
+    return true;
   }
 
   return false;

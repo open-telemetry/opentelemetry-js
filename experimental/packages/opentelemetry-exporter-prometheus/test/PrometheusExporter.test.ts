@@ -209,8 +209,8 @@ describe('PrometheusExporter', () => {
       );
       let resolve: () => void;
       const deferred = new Promise<void>(res => {
- resolve = res;
-});
+        resolve = res;
+      });
       mockResponse.end.callsFake(() => resolve());
       exporter.getMetricsRequestHandler(
         (mockRequest as unknown) as http.IncomingMessage,
