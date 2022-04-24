@@ -19,8 +19,8 @@ import { ResourceDetectionConfig } from './config';
 import { SpanAttributes } from '@opentelemetry/api';
 
 /**
- * @deprecated please use {@link Attributes}
- * `Attributes` interface is added in api v1.1.0.
+ * Interface for Resource attributes.
+ * General `Attributes` interface is added in api v1.1.0.
  * To backward support older api (1.0.x), the deprecated `SpanAttributes` is used here.
  */
 export type ResourceAttributes = SpanAttributes;
