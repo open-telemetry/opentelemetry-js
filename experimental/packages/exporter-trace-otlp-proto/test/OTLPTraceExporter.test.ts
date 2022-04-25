@@ -76,8 +76,8 @@ describe('OTLPTraceExporter - node with proto over http', () => {
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
     });
     it('should override global exporter url with signal url defined in env', () => {
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.traces';
+      envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
+      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.traces/';
       const collectorExporter = new OTLPTraceExporter();
       assert.strictEqual(
         collectorExporter.url,

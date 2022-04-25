@@ -425,8 +425,8 @@ describe('when configuring via environment', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
   });
   it('should override global exporter url with signal url defined in env', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.metrics';
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
+    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.metrics/';
     const collectorExporter = new OTLPMetricExporter();
     assert.strictEqual(
       collectorExporter._otlpExporter.url,
