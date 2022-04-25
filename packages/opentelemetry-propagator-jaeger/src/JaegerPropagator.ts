@@ -145,7 +145,7 @@ function deserializeSpanContext(serializedString: string): SpanContext | null {
 
   const traceId = _traceId.padStart(32, '0');
   const spanId = _spanId.padStart(16, '0');
-  const traceFlags = flags.match(/^[0-9a-f]{2}$/i) ? parseInt(flags) & 1 : 1;
+  const traceFlags = flags.match(/^[0-9a-f]{1,2}$/i) ? parseInt(flags, 16) & 1 : 1;
 
   return { traceId, spanId, isRemote: true, traceFlags };
 }
