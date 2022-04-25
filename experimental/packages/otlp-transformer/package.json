@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/otlp-transformer",
-  "private": true,
+  "private": false,
   "publishConfig": {
     "access": "restricted"
   },
