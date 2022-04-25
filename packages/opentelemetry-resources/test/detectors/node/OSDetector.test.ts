@@ -42,4 +42,17 @@ describeNode('osDetector() on Node.js', () => {
       '2.2.1(0.289/5/3)'
     );
   });
+
+  it('should pass through type string if unknown', async () => {
+    const os = require('os');
+
+    sinon.stub(os, 'platform').returns('some-unknown-platform');
+
+    const resource: Resource = await osDetector.detect();
+
+    assert.strictEqual(
+      resource.attributes[SemanticResourceAttributes.OS_TYPE],
+      'some-unknown-platform'
+    );
+  });
 });
