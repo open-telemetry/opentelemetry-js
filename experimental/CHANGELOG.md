@@ -6,6 +6,18 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.28.0
+
+### :boom: Breaking Change
+
 * feat(sdk-metrics-base): update metric exporter interfaces #2707 @srikanthccv
 * feat(api-metrics): remove observable types #2687 @legendecas
 * fix(otlp-http-exporter): remove content length header #2879 @svetlanabrennan

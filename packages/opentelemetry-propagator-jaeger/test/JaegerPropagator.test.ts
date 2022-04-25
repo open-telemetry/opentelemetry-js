@@ -159,7 +159,7 @@ describe('JaegerPropagator', () => {
       });
     });
 
-    it('should extract context of a sampled span from carrier with 1 bit flag', () => {
+    it('should extract context of a sampled span from carrier with 1 bit flag(1)', () => {
       carrier[UBER_TRACE_ID_HEADER] =
         '9c41e35aeb6d1272:45fd2a9709dadcf1:a13699e3fb724f40:1';
       const extractedSpanContext = trace.getSpanContext(
@@ -171,6 +171,21 @@ describe('JaegerPropagator', () => {
         traceId: '00000000000000009c41e35aeb6d1272',
         isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
+      });
+    });
+
+    it('should extract context of a sampled span from carrier with 1 bit flag(0)', () => {
+      carrier[UBER_TRACE_ID_HEADER] =
+        '9c41e35aeb6d1272:45fd2a9709dadcf1:a13699e3fb724f40:0';
+      const extractedSpanContext = trace.getSpanContext(
+        jaegerPropagator.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
+      );
+
+      assert.deepStrictEqual(extractedSpanContext, {
+        spanId: '45fd2a9709dadcf1',
+        traceId: '00000000000000009c41e35aeb6d1272',
+        isRemote: true,
+        traceFlags: TraceFlags.NONE,
       });
     });
 
