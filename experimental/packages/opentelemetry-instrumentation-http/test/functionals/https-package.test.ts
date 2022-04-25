@@ -127,19 +127,19 @@ describe('Packages', () => {
         assert.strictEqual(span.name, 'HTTPS GET');
 
         switch (name) {
-        case 'axios':
-          assert.ok(
-            result.request._headers[DummyPropagation.TRACE_CONTEXT_KEY]
-          );
-          assert.ok(
-            result.request._headers[DummyPropagation.SPAN_CONTEXT_KEY]
-          );
-          break;
-        case 'got':
-        case 'superagent':
-          break;
-        default:
-          break;
+          case 'axios':
+            assert.ok(
+              result.request._headers[DummyPropagation.TRACE_CONTEXT_KEY]
+            );
+            assert.ok(
+              result.request._headers[DummyPropagation.SPAN_CONTEXT_KEY]
+            );
+            break;
+          case 'got':
+          case 'superagent':
+            break;
+          default:
+            break;
         }
         assert.strictEqual(span.attributes['span kind'], SpanKind.CLIENT);
         assertSpan(span, SpanKind.CLIENT, validations);

@@ -128,18 +128,18 @@ export class DefaultAggregation extends Aggregation {
   private _resolve(instrument: InstrumentDescriptor): Aggregation {
     // cast to unknown to disable complaints on the (unreachable) fallback.
     switch (instrument.type as unknown) {
-    case InstrumentType.COUNTER:
-    case InstrumentType.UP_DOWN_COUNTER:
-    case InstrumentType.OBSERVABLE_COUNTER:
-    case InstrumentType.OBSERVABLE_UP_DOWN_COUNTER: {
-      return SUM_AGGREGATION;
-    }
-    case InstrumentType.OBSERVABLE_GAUGE: {
-      return LAST_VALUE_AGGREGATION;
-    }
-    case InstrumentType.HISTOGRAM: {
-      return HISTOGRAM_AGGREGATION;
-    }
+      case InstrumentType.COUNTER:
+      case InstrumentType.UP_DOWN_COUNTER:
+      case InstrumentType.OBSERVABLE_COUNTER:
+      case InstrumentType.OBSERVABLE_UP_DOWN_COUNTER: {
+        return SUM_AGGREGATION;
+      }
+      case InstrumentType.OBSERVABLE_GAUGE: {
+        return LAST_VALUE_AGGREGATION;
+      }
+      case InstrumentType.HISTOGRAM: {
+        return HISTOGRAM_AGGREGATION;
+      }
     }
     api.diag.warn(`Unable to recognize instrument type: ${instrument.type}`);
     return DROP_AGGREGATION;

@@ -82,21 +82,21 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
   });
 
   switch (collector.compression) {
-  case CompressionAlgorithm.GZIP: {
-    if (!gzip) {
-      gzip = zlib.createGzip();
-    }
-    req.setHeader('Content-Encoding', 'gzip');
-    const dataStream = readableFromBuffer(data);
-    dataStream.on('error', onError)
-      .pipe(gzip).on('error', onError)
-      .pipe(req);
+    case CompressionAlgorithm.GZIP: {
+      if (!gzip) {
+        gzip = zlib.createGzip();
+      }
+      req.setHeader('Content-Encoding', 'gzip');
+      const dataStream = readableFromBuffer(data);
+      dataStream.on('error', onError)
+        .pipe(gzip).on('error', onError)
+        .pipe(req);
 
-    break;
-  }
-  default:
-    req.end(data);
-    break;
+      break;
+    }
+    default:
+      req.end(data);
+      break;
   }
 }
 

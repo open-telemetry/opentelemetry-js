@@ -58,29 +58,29 @@ export function buildSamplerFromEnv(
   environment: Required<ENVIRONMENT> = getEnv()
 ): Sampler {
   switch (environment.OTEL_TRACES_SAMPLER) {
-  case TracesSamplerValues.AlwaysOn:
-    return new AlwaysOnSampler();
-  case TracesSamplerValues.AlwaysOff:
-    return new AlwaysOffSampler();
-  case TracesSamplerValues.ParentBasedAlwaysOn:
-    return new ParentBasedSampler({
-      root: new AlwaysOnSampler(),
-    });
-  case TracesSamplerValues.ParentBasedAlwaysOff:
-    return new ParentBasedSampler({
-      root: new AlwaysOffSampler(),
-    });
-  case TracesSamplerValues.TraceIdRatio:
-    return new TraceIdRatioBasedSampler(getSamplerProbabilityFromEnv(environment));
-  case TracesSamplerValues.ParentBasedTraceIdRatio:
-    return new ParentBasedSampler({
-      root: new TraceIdRatioBasedSampler(getSamplerProbabilityFromEnv(environment)),
-    });
-  default:
-    diag.error(
-      `OTEL_TRACES_SAMPLER value "${environment.OTEL_TRACES_SAMPLER} invalid, defaulting to ${FALLBACK_OTEL_TRACES_SAMPLER}".`
-    );
-    return new AlwaysOnSampler();
+    case TracesSamplerValues.AlwaysOn:
+      return new AlwaysOnSampler();
+    case TracesSamplerValues.AlwaysOff:
+      return new AlwaysOffSampler();
+    case TracesSamplerValues.ParentBasedAlwaysOn:
+      return new ParentBasedSampler({
+        root: new AlwaysOnSampler(),
+      });
+    case TracesSamplerValues.ParentBasedAlwaysOff:
+      return new ParentBasedSampler({
+        root: new AlwaysOffSampler(),
+      });
+    case TracesSamplerValues.TraceIdRatio:
+      return new TraceIdRatioBasedSampler(getSamplerProbabilityFromEnv(environment));
+    case TracesSamplerValues.ParentBasedTraceIdRatio:
+      return new ParentBasedSampler({
+        root: new TraceIdRatioBasedSampler(getSamplerProbabilityFromEnv(environment)),
+      });
+    default:
+      diag.error(
+        `OTEL_TRACES_SAMPLER value "${environment.OTEL_TRACES_SAMPLER} invalid, defaulting to ${FALLBACK_OTEL_TRACES_SAMPLER}".`
+      );
+      return new AlwaysOnSampler();
   }
 }
 

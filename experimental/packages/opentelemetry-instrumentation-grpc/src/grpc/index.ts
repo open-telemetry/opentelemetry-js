@@ -168,18 +168,18 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
               const self = this;
               if (shouldNotTraceServerCall.call(instrumentation, call, name)) {
                 switch (type) {
-                case 'unary':
-                case 'client_stream':
-                  return (originalFunc as Function).call(
-                    self,
-                    call,
-                    callback
-                  );
-                case 'server_stream':
-                case 'bidi':
-                  return (originalFunc as Function).call(self, call);
-                default:
-                  return originalResult;
+                  case 'unary':
+                  case 'client_stream':
+                    return (originalFunc as Function).call(
+                      self,
+                      call,
+                      callback
+                    );
+                  case 'server_stream':
+                  case 'bidi':
+                    return (originalFunc as Function).call(self, call);
+                  default:
+                    return originalResult;
                 }
               }
               const spanName = `grpc.${name.replace('/', '')}`;
@@ -203,26 +203,26 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
 
                   context.with(trace.setSpan(context.active(), span), () => {
                     switch (type) {
-                    case 'unary':
-                    case 'client_stream':
-                      return clientStreamAndUnaryHandler(
-                        grpcModule,
-                        span,
-                        call,
-                        callback,
-                        originalFunc,
-                        self
-                      );
-                    case 'server_stream':
-                    case 'bidi':
-                      return serverStreamAndBidiHandler(
-                        span,
-                        call,
-                        originalFunc,
-                        self
-                      );
-                    default:
-                      break;
+                      case 'unary':
+                      case 'client_stream':
+                        return clientStreamAndUnaryHandler(
+                          grpcModule,
+                          span,
+                          call,
+                          callback,
+                          originalFunc,
+                          self
+                        );
+                      case 'server_stream':
+                      case 'bidi':
+                        return serverStreamAndBidiHandler(
+                          span,
+                          call,
+                          originalFunc,
+                          self
+                        );
+                      default:
+                        break;
                     }
                   });
                 }
