@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* feat: implement OSDetector [#2927](https://github.com/open-telemetry/opentelemetry-js/pull/2927) @rauno56
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
