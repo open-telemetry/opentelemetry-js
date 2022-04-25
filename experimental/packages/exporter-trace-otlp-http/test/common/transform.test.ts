@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanAttributes } from '@opentelemetry/api';
+import { SpanAttributes, SpanStatusCode } from '@opentelemetry/api';
 import { TimedEvent } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as transform from '../../src/transform';
@@ -27,6 +27,7 @@ import {
   multiInstrumentationLibraryTrace,
 } from '../traceHelper';
 import { Resource } from '@opentelemetry/resources';
+
 describe('transform', () => {
   describe('toCollectorAttributes', () => {
     it('should convert attribute string', () => {
@@ -99,6 +100,44 @@ describe('transform', () => {
           droppedAttributesCount: 0,
         },
       ]);
+    });
+  });
+
+  describe('toCollectorAnyValue', () => {
+    it('should use correct type on array', () => {
+      assert.deepStrictEqual(transform.toCollectorAnyValue(['string', true, 1]), {
+        arrayValue: {
+          values:
+            [
+              { stringValue: 'string' },
+              { boolValue: true },
+              { intValue: 1 }
+            ]
+        }
+      });
+    });
+
+    it('should use correct type on kvlist', () => {
+      assert.deepStrictEqual(transform.toCollectorAnyValue({ string: 'string', boolean: true, integer: 1 }), {
+        kvlistValue: {
+          values:
+            [
+              { key: 'string', value: { stringValue: 'string' } },
+              { key: 'boolean', value: { boolValue: true } },
+              { key: 'integer', value: { intValue: 1 } }
+            ]
+        }
+      });
+    });
+  });
+
+  describe('toCollectorStatus', () => {
+    it('should set message if status is not undefined', () => {
+      const result = transform.toCollectorStatus({
+        code: SpanStatusCode.OK,
+        message: 'message'
+      });
+      assert.deepStrictEqual(result.message, 'message');
     });
   });
 

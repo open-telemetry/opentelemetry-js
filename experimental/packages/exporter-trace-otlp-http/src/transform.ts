@@ -24,12 +24,11 @@ import {
 import * as core from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace-base';
-import { OTLPExporterBase } from './OTLPExporterBase';
 import {
   OTLP_SPAN_KIND_MAPPING,
   opentelemetryProto,
-  OTLPExporterConfigBase,
 } from './types';
+import { OTLPExporterBase, OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 
 const MAX_INTEGER_VALUE = 2147483647;
 const MIN_INTEGER_VALUE = -2147483648;
