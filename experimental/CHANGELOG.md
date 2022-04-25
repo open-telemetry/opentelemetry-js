@@ -6,6 +6,18 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.28.0
+
+### :boom: Breaking Change
+
 * feat(sdk-metrics-base): update metric exporter interfaces #2707 @srikanthccv
 * feat(api-metrics): remove observable types #2687 @legendecas
 * fix(otlp-http-exporter): remove content length header #2879 @svetlanabrennan
@@ -16,6 +28,10 @@ All notable changes to experimental packages in this project will be documented 
   * updated `opentelemetry-sdk-node` to the latest Metrics SDK.
   * updated `otlp-transformer` to the latest Metrics SDK.
   * updated all `instrumentation-*` packages to use local implementations of `parseUrl()` due to #2884
+* refactor(otlp-exporters) move base classes and associated types into their own packages #2893 @pichlermarc
+  * `otlp-exporter-base` => `OTLPExporterBase`, `OTLPExporterBrowserBase`, `OTLPExporterNodeBase`
+  * `otlp-grpc-exporter-base` => `OTLPGRPCExporterNodeBase`
+  * `otlp-proto-exporter-base` => `OTLPProtoExporterNodeBase`
 
 ### :rocket: (Enhancement)
 
@@ -38,6 +54,8 @@ All notable changes to experimental packages in this project will be documented 
 * feat(prometheus): update prometheus exporter with wip metrics sdk #2824 @legendecas
 * feat(instrumentation-xhr): add applyCustomAttributesOnSpan hook #2134 @mhennoch
 * feat(proto): add @opentelemetry/otlp-transformer package with hand-rolled transformation #2746 @dyladan
+* feat(sdk-metrics-base): shutdown and forceflush on MeterProvider #2890 @legendecas
+* feat(sdk-metrics-base): return the same meter for identical input to getMeter #2901 @legendecas
 
 ### :bug: (Bug Fix)
 

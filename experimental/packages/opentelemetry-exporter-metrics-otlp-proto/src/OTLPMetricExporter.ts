@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-import {
-  otlpTypes,
-  OTLPExporterNodeConfigBase,
-  appendResourcePathToUrl,
-  appendRootPathToUrlIfNeeded,
-} from '@opentelemetry/exporter-trace-otlp-http';
+import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import {
   defaultExporterTemporality,
   defaultOptions,
   OTLPMetricExporterOptions,
   toOTLPExportMetricServiceRequest
 } from '@opentelemetry/exporter-metrics-otlp-http';
-import { ServiceClientType, OTLPExporterNodeBase } from '@opentelemetry/exporter-trace-otlp-proto';
+import { ServiceClientType, OTLPProtoExporterNodeBase } from '@opentelemetry/otlp-proto-exporter-base';
 import { getEnv, baggageUtils} from '@opentelemetry/core';
 import { AggregationTemporality, ResourceMetrics} from '@opentelemetry/sdk-metrics-base';
 import { OTLPMetricExporterBase } from '@opentelemetry/exporter-metrics-otlp-http';
+import {
+  OTLPExporterNodeConfigBase,
+  appendResourcePathToUrl,
+  appendRootPathToUrlIfNeeded
+} from '@opentelemetry/otlp-exporter-base';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/metrics';
 const DEFAULT_COLLECTOR_URL=`http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 
-class OTLPMetricExporterNodeProxy extends OTLPExporterNodeBase<ResourceMetrics,
+class OTLPMetricExporterNodeProxy extends OTLPProtoExporterNodeBase<ResourceMetrics,
   otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest> {
   protected readonly _aggregationTemporality: AggregationTemporality;
 

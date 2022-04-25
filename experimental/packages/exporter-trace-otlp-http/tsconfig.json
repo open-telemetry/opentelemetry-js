@@ -7,5 +7,19 @@
   "include": [
     "src/**/*.ts",
     "test/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../../../packages/opentelemetry-core"
+    },
+    {
+      "path": "../../../packages/opentelemetry-resources"
+    },
+    {
+      "path": "../../../packages/opentelemetry-sdk-trace-base"
+    },
+    {
+      "path": "../otlp-exporter-base"
+    }
   ]
 }

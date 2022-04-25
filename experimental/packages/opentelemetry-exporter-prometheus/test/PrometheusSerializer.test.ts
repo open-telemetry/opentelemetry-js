@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { Attributes, UpDownCounter } from '@opentelemetry/api-metrics';
+import { MetricAttributes, UpDownCounter } from '@opentelemetry/api-metrics';
 import {
   AggregationTemporality,
   MeterProvider,
@@ -341,7 +341,7 @@ describe('PrometheusSerializer', () => {
           NaN: NaN,
           null: null,
           undefined: undefined,
-        } as unknown) as Attributes);
+        } as unknown) as MetricAttributes);
       });
 
       assert.strictEqual(
@@ -381,7 +381,7 @@ describe('PrometheusSerializer', () => {
           backslashN: '\u005c\u006e', // \n => \\n (\u005c\u005c\u006e)
           backslashDoubleQuote: '\u005c\u0022', // \" => \\\" (\u005c\u005c\u005c\u0022)
           backslashLineFeed: '\u005c\u000a', // \↵ => \\\n (\u005c\u005c\u005c\u006e)
-        } as unknown) as Attributes);
+        } as unknown) as MetricAttributes);
       });
 
       assert.strictEqual(
@@ -406,7 +406,7 @@ describe('PrometheusSerializer', () => {
         // error while linting: text format parsing error in line 282: expected '=' after label name, found '-'
         counter.add(1, ({
           'account-id': '123456',
-        } as unknown) as Attributes);
+        } as unknown) as MetricAttributes);
       });
 
       assert.strictEqual(

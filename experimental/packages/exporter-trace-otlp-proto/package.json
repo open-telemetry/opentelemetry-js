@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-trace-otlp-proto",
-  "version": "0.27.0",
+  "version": "0.28.0",
   "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector using protobuf over HTTP",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -11,15 +11,14 @@
     "clean": "tsc --build --clean",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "postcompile": "npm run submodule && npm run protos:copy",
-    "protos:copy": "cpx protos/opentelemetry/**/*.* build/protos/opentelemetry",
-    "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "version": "node ../../../scripts/version-update.js",
-    "watch": "npm run protos:copy && tsc -w",
+    "watch": "tsc -w",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
-    "prewatch": "npm run precompile"
+    "prewatch": "npm run precompile",
+    "peer-api-check": "node ../../../scripts/peer-api-check.js",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../"
   },
   "keywords": [
     "opentelemetry",
@@ -49,7 +48,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.16.0",
-    "@opentelemetry/api": "^1.1.0",
+    "@opentelemetry/api": "^1.0.0",
     "@types/mocha": "8.2.3",
     "@types/node": "14.17.33",
     "@types/sinon": "10.0.6",
@@ -60,18 +59,20 @@
     "rimraf": "3.0.2",
     "sinon": "12.0.1",
     "ts-loader": "8.3.0",
-    "ts-mocha": "8.0.0",
+    "ts-mocha": "9.0.2",
     "typescript": "4.4.4"
   },
   "peerDependencies": {
-    "@opentelemetry/api": "^1.1.0"
+    "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
     "@opentelemetry/core": "1.1.1",
     "@grpc/proto-loader": "^0.6.9",
-    "@opentelemetry/exporter-trace-otlp-http": "0.27.0",
-    "@opentelemetry/resources": "1.1.1",
-    "@opentelemetry/sdk-trace-base": "1.1.1",
+    "@opentelemetry/exporter-trace-otlp-http": "0.28.0",
+    "@opentelemetry/resources": "1.2.0",
+    "@opentelemetry/sdk-trace-base": "1.2.0",
+    "@opentelemetry/otlp-exporter-base": "0.28.0",
+    "@opentelemetry/otlp-proto-exporter-base": "0.28.0",
     "protobufjs": "^6.9.0"
   }
 }

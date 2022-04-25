@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/propagator-b3",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "OpenTelemetry B3 propagator provides context propagation for systems that are using the B3 header format",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
@@ -18,7 +18,8 @@
     "version": "node ../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.all.json",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
-    "prewatch": "npm run precompile"
+    "prewatch": "npm run precompile",
+    "peer-api-check": "node ../../scripts/peer-api-check.js"
   },
   "keywords": [
     "opentelemetry",
@@ -50,13 +51,13 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/core": "1.1.1"
+    "@opentelemetry/core": "1.2.0"
   },
   "peerDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.2.0"
   },
   "devDependencies": {
-    "@opentelemetry/api": "~1.1.0",
+    "@opentelemetry/api": ">=1.0.0 <1.2.0",
     "@types/mocha": "8.2.3",
     "@types/node": "14.17.33",
     "codecov": "3.8.3",
@@ -65,7 +66,7 @@
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "ts-loader": "8.3.0",
-    "ts-mocha": "8.0.0",
+    "ts-mocha": "9.0.2",
     "typescript": "4.4.4"
   }
 }

@@ -15,15 +15,10 @@
  */
 
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
-import { OTLPExporterNodeBase } from './OTLPExporterNodeBase';
-import {
-  otlpTypes,
-  toOTLPExportTraceServiceRequest,
-  OTLPExporterNodeConfigBase,
-  appendResourcePathToUrl, appendRootPathToUrlIfNeeded
-} from '@opentelemetry/exporter-trace-otlp-http';
-import { ServiceClientType } from './types';
+import { otlpTypes, toOTLPExportTraceServiceRequest } from '@opentelemetry/exporter-trace-otlp-http';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
+import { OTLPExporterNodeConfigBase, appendResourcePathToUrl, appendRootPathToUrlIfNeeded } from '@opentelemetry/otlp-exporter-base';
+import { OTLPProtoExporterNodeBase, ServiceClientType } from '@opentelemetry/otlp-proto-exporter-base';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/traces';
 const DEFAULT_COLLECTOR_URL=`http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
@@ -32,7 +27,7 @@ const DEFAULT_COLLECTOR_URL=`http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_
  * Collector Trace Exporter for Node with protobuf
  */
 export class OTLPTraceExporter
-  extends OTLPExporterNodeBase<
+  extends OTLPProtoExporterNodeBase<
     ReadableSpan,
     otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
   >

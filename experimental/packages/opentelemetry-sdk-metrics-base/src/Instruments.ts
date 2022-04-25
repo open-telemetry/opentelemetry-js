@@ -26,7 +26,7 @@ export class SyncInstrument {
     return this._descriptor.name;
   }
 
-  protected _record(value: number, attributes: metrics.Attributes = {}, context: api.Context = api.context.active()) {
+  protected _record(value: number, attributes: metrics.MetricAttributes = {}, context: api.Context = api.context.active()) {
     if (this._descriptor.valueType === metrics.ValueType.INT && !Number.isInteger(value)) {
       api.diag.warn(
         `INT value type cannot accept a floating-point value for ${this._descriptor.name}, ignoring the fractional digits.`
@@ -44,7 +44,7 @@ export class UpDownCounterInstrument extends SyncInstrument implements metrics.U
   /**
    * Increment value of counter by the input. Inputs may be negative.
    */
-  add(value: number, attributes?: metrics.Attributes, ctx?: api.Context): void {
+  add(value: number, attributes?: metrics.MetricAttributes, ctx?: api.Context): void {
     this._record(value, attributes, ctx);
   }
 }
@@ -56,7 +56,7 @@ export class CounterInstrument extends SyncInstrument implements metrics.Counter
   /**
    * Increment value of counter by the input. Inputs may not be negative.
    */
-  add(value: number, attributes?: metrics.Attributes, ctx?: api.Context): void {
+  add(value: number, attributes?: metrics.MetricAttributes, ctx?: api.Context): void {
     if (value < 0) {
       api.diag.warn(`negative value provided to counter ${this.getName()}: ${value}`);
       return;
@@ -73,7 +73,7 @@ export class HistogramInstrument extends SyncInstrument implements metrics.Histo
   /**
    * Records a measurement. Value of the measurement must not be negative.
    */
-  record(value: number, attributes?: metrics.Attributes, ctx?: api.Context): void {
+  record(value: number, attributes?: metrics.MetricAttributes, ctx?: api.Context): void {
     this._record(value, attributes, ctx);
   }
 }

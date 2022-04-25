@@ -15,17 +15,17 @@
  */
 
 import { ResourceMetrics, AggregationTemporality } from '@opentelemetry/sdk-metrics-base';
-import {
-  OTLPExporterNodeBase,
-  OTLPExporterNodeConfigBase,
-  otlpTypes,
-  appendResourcePathToUrl,
-  appendRootPathToUrlIfNeeded
-} from '@opentelemetry/exporter-trace-otlp-http';
+import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { toOTLPExportMetricServiceRequest } from '../../transformMetrics';
 import { getEnv, baggageUtils} from '@opentelemetry/core';
 import { defaultExporterTemporality, defaultOptions, OTLPMetricExporterOptions } from '../../OTLPMetricExporterOptions';
 import { OTLPMetricExporterBase } from '../../OTLPMetricExporterBase';
+import {
+  OTLPExporterNodeBase,
+  OTLPExporterNodeConfigBase,
+  appendResourcePathToUrl,
+  appendRootPathToUrlIfNeeded
+} from '@opentelemetry/otlp-exporter-base';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/metrics';
 const DEFAULT_COLLECTOR_URL=`http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
