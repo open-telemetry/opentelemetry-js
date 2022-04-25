@@ -18,7 +18,7 @@ import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { toOTLPExportTraceServiceRequest } from '../../transform';
 import * as otlpTypes from '../../types';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
-import { 
+import {
   OTLPExporterConfigBase,
   appendResourcePathToUrl,
   appendRootPathToUrlIfNeeded,
