@@ -52,12 +52,12 @@ function chooseTemporalitySelector(preferredAggregationTemporality?: Aggregation
 export class OTLPMetricExporterBase<T extends OTLPExporterBase<OTLPMetricExporterOptions,
   ResourceMetrics,
   otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest>>
-  implements PushMetricExporter {
+implements PushMetricExporter {
   public _otlpExporter: T;
   protected _aggregationTemporalitySelector: AggregationTemporalitySelector;
 
   constructor(exporter: T,
-              config: OTLPMetricExporterOptions = defaultOptions) {
+    config: OTLPMetricExporterOptions = defaultOptions) {
     this._otlpExporter = exporter;
     this._aggregationTemporalitySelector = chooseTemporalitySelector(config.preferredAggregationTemporality);
   }

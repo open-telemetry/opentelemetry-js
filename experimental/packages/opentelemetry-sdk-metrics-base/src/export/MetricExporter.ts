@@ -47,9 +47,9 @@ export class ConsoleMetricExporter implements PushMetricExporter {
 
   export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void) {
     return resultCallback({
-        code: ExportResultCode.FAILED,
-        error: new Error('Method not implemented')
-      });
+      code: ExportResultCode.FAILED,
+      error: new Error('Method not implemented')
+    });
   }
 
   selectAggregationTemporality(_instrumentType: InstrumentType) {

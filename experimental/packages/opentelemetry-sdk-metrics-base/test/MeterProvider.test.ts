@@ -116,13 +116,13 @@ describe('MeterProvider', () => {
 
       // Throws with wildcard character only.
       assert.throws(() => meterProvider.addView({
-          name: 'renamed-instrument'
-        },
-        {
-          instrument: {
-            name: '*'
-          }
-        }));
+        name: 'renamed-instrument'
+      },
+      {
+        instrument: {
+          name: '*'
+        }
+      }));
 
       // Throws with wildcard character in instrument name.
       assert.throws(() => meterProvider.addView({
@@ -138,13 +138,13 @@ describe('MeterProvider', () => {
       const meterProvider = new MeterProvider({ resource: defaultResource });
 
       assert.throws(() => meterProvider.addView({
-          name: 'renamed-instrument'
-        },
-        {
-          instrument: {
-            type: InstrumentType.COUNTER
-          }
-        }));
+        name: 'renamed-instrument'
+      },
+      {
+        instrument: {
+          type: InstrumentType.COUNTER
+        }
+      }));
     });
 
     it('with named view and no instrument selector should throw', () => {
@@ -155,9 +155,9 @@ describe('MeterProvider', () => {
       }));
 
       assert.throws(() => meterProvider.addView({
-          name: 'renamed-instrument'
-        },
-        {}));
+        name: 'renamed-instrument'
+      },
+      {}));
     });
 
     it('with no view parameters should throw', () => {
@@ -174,14 +174,14 @@ describe('MeterProvider', () => {
 
       // Add view to rename 'non-renamed-instrument' to 'renamed-instrument'
       meterProvider.addView({
-          name: 'renamed-instrument',
-          description: 'my renamed instrument'
+        name: 'renamed-instrument',
+        description: 'my renamed instrument'
+      },
+      {
+        instrument: {
+          name: 'non-renamed-instrument',
         },
-        {
-          instrument: {
-            name: 'non-renamed-instrument',
-          },
-        });
+      });
 
       // Create meter and instrument.
       const myMeter = meterProvider.getMeter('meter1', 'v1.0.0');
@@ -233,13 +233,13 @@ describe('MeterProvider', () => {
 
       // Add view to drop all attributes except 'attrib1'
       meterProvider.addView({
-          attributeKeys: ['attrib1']
-        },
-        {
-          instrument: {
-            name: 'non-renamed-instrument',
-          }
-        });
+        attributeKeys: ['attrib1']
+      },
+      {
+        instrument: {
+          name: 'non-renamed-instrument',
+        }
+      });
 
       // Create meter and instrument.
       const myMeter = meterProvider.getMeter('meter1', 'v1.0.0');
@@ -289,13 +289,13 @@ describe('MeterProvider', () => {
 
       // Add view that renames 'test-counter' to 'renamed-instrument'
       meterProvider.addView({
-          name: 'renamed-instrument'
-        },
-        {
-          instrument: {
-            name: 'test-counter'
-          }
-        });
+        name: 'renamed-instrument'
+      },
+      {
+        instrument: {
+          name: 'test-counter'
+        }
+      });
 
       // Create two meters.
       const meter1 = meterProvider.getMeter('meter1', 'v1.0.0');
@@ -354,16 +354,16 @@ describe('MeterProvider', () => {
 
       // Add view that renames 'test-counter' to 'renamed-instrument' on 'meter1'
       meterProvider.addView({
-          name: 'renamed-instrument'
+        name: 'renamed-instrument'
+      },
+      {
+        instrument: {
+          name: 'test-counter'
         },
-        {
-          instrument: {
-            name: 'test-counter'
-          },
-          meter: {
-            name: 'meter1'
-          }
-        });
+        meter: {
+          name: 'meter1'
+        }
+      });
 
       // Create two meters.
       const meter1 = meterProvider.getMeter('meter1', 'v1.0.0');
@@ -421,28 +421,28 @@ describe('MeterProvider', () => {
 
       // Add Views to rename both instruments (of different types) to the same name.
       meterProvider.addView({
-          name: 'renamed-instrument'
+        name: 'renamed-instrument'
+      },
+      {
+        instrument: {
+          name: 'test-counter'
         },
-        {
-          instrument: {
-            name: 'test-counter'
-          },
-          meter: {
-            name: 'meter1'
-          }
-        });
+        meter: {
+          name: 'meter1'
+        }
+      });
 
       meterProvider.addView({
-          name: 'renamed-instrument'
+        name: 'renamed-instrument'
+      },
+      {
+        instrument: {
+          name: 'test-histogram'
         },
-        {
-          instrument: {
-            name: 'test-histogram'
-          },
-          meter: {
-            name: 'meter1'
-          }
-        });
+        meter: {
+          name: 'meter1'
+        }
+      });
 
       // Create meter and instruments.
       const meter = meterProvider.getMeter('meter1', 'v1.0.0');

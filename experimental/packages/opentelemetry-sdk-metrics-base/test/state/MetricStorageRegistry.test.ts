@@ -32,9 +32,9 @@ import {
 
 class TestMetricStorage extends MetricStorage {
   collect(collector: MetricCollectorHandle,
-          collectors: MetricCollectorHandle[],
-          sdkStartTime: HrTime,
-          collectionTime: HrTime,
+    collectors: MetricCollectorHandle[],
+    sdkStartTime: HrTime,
+    collectionTime: HrTime,
   ): Promise<Maybe<MetricData>> {
     return Promise.resolve(undefined);
   }
@@ -74,8 +74,8 @@ describe('MetricStorageRegistry', () => {
     });
 
     function testConflictingRegistration(existingDescriptor: InstrumentDescriptor,
-                                         otherDescriptor: InstrumentDescriptor,
-                                         expectedLog: string) {
+      otherDescriptor: InstrumentDescriptor,
+      expectedLog: string) {
       const registry = new MetricStorageRegistry();
 
       const storage = new TestMetricStorage(existingDescriptor);

@@ -67,14 +67,14 @@ describe('Tracer', () => {
   }
 
   class DummySpanProcessor implements SpanProcessor {
-      forceFlush () {
-        return Promise.resolve();
-      }
-      onStart() {}
-      onEnd() {}
-      shutdown() {
-        return Promise.resolve();
-      }
+    forceFlush () {
+      return Promise.resolve();
+    }
+    onStart() {}
+    onEnd() {}
+    shutdown() {
+      return Promise.resolve();
+    }
   }
 
   beforeEach(() => {
