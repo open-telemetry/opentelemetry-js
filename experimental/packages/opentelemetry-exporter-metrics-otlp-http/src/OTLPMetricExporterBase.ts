@@ -41,8 +41,8 @@ export const DeltaTemporalitySelector: AggregationTemporalitySelector = (instrum
   }
 };
 
-function chooseTemporalitySelector(preferredAggregationTemporality?: AggregationTemporality): AggregationTemporalitySelector {
-  if (preferredAggregationTemporality === AggregationTemporality.DELTA) {
+function chooseTemporalitySelector(temporalityPreference?: AggregationTemporality): AggregationTemporalitySelector {
+  if (temporalityPreference === AggregationTemporality.DELTA) {
     return DeltaTemporalitySelector;
   }
 
@@ -59,7 +59,7 @@ implements PushMetricExporter {
   constructor(exporter: T,
     config: OTLPMetricExporterOptions = defaultOptions) {
     this._otlpExporter = exporter;
-    this._aggregationTemporalitySelector = chooseTemporalitySelector(config.preferredAggregationTemporality);
+    this._aggregationTemporalitySelector = chooseTemporalitySelector(config.temporalityPreference);
   }
 
   export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): void {

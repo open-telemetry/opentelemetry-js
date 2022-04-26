@@ -112,7 +112,7 @@ describe('OTLPMetricExporter - node with proto over http', () => {
         url: 'http://foo.bar.com',
         keepAlive: true,
         httpAgentOptions: { keepAliveMsecs: 2000 },
-        preferredAggregationTemporality: AggregationTemporality.CUMULATIVE
+        temporalityPreference: AggregationTemporality.CUMULATIVE
       };
       collectorExporter = new OTLPMetricExporter(collectorExporterConfig);
       setUp();
