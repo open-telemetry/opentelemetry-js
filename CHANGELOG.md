@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### :boom: Breaking Change
 
-* feat: metric aggregation temporality controls [#2902](https://github.com/open-telemetry/opentelemetry-js/pull/2902) @seemk
+* feat(metrics): metric readers and exporters now select aggregation temporality based on instrument type [#2902](https://github.com/open-telemetry/opentelemetry-js/pull/2902) @seemk
 
 ### :rocket: (Enhancement)
 
