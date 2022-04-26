@@ -202,12 +202,12 @@ const testCollectorExporter = (params: TestParams) =>
       });
       it('should log deadline exceeded error', done => {
         const credentials = params.useTLS
-        ? grpc.credentials.createSsl(
+          ? grpc.credentials.createSsl(
             fs.readFileSync('./test/certs/ca.crt'),
             fs.readFileSync('./test/certs/client.key'),
             fs.readFileSync('./test/certs/client.crt')
           )
-        : undefined;
+          : undefined;
 
         const collectorExporterWithTimeout = new OTLPTraceExporter({
           url: 'grpcs://' + address,

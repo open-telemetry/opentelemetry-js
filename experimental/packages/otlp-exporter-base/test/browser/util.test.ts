@@ -55,8 +55,8 @@ describe('util - browser', () => {
     describe('and Content-Type header is set', () => {
       beforeEach(()=>{
         const explicitContentType = {
-        'Content-Type': 'application/json',
-      };
+          'Content-Type': 'application/json',
+        };
         const exporterTimeout = 10000;
         sendWithXhr(body, url, explicitContentType, exporterTimeout, onSuccessStub, onErrorStub);
       });
