@@ -26,7 +26,7 @@ type ParsedBaggageKeyValue = { key: string, value: string, metadata: BaggageEntr
 export function serializeKeyPairs(keyPairs: string[]): string {
   return keyPairs.reduce((hValue: string, current: string) => {
     const value = `${hValue}${hValue !== '' ? BAGGAGE_ITEMS_SEPARATOR : ''
-      }${current}`;
+    }${current}`;
     return value.length > BAGGAGE_MAX_TOTAL_LENGTH ? hValue : value;
   }, '');
 }
