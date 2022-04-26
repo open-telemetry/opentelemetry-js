@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* feat(ConsoleSpanExporter): export span links [#2917](https://github.com/open-telemetry/opentelemetry-js/pull/2917) @trentm
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
