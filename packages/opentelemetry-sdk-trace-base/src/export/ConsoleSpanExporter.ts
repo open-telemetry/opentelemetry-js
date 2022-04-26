@@ -65,6 +65,7 @@ export class ConsoleSpanExporter implements SpanExporter {
       attributes: span.attributes,
       status: span.status,
       events: span.events,
+      links: span.links
     };
   }
 
@@ -78,7 +79,7 @@ export class ConsoleSpanExporter implements SpanExporter {
     done?: (result: ExportResult) => void
   ): void {
     for (const span of spans) {
-      console.log(this._exportInfo(span));
+      console.dir(this._exportInfo(span), { depth: 3 });
     }
     if (done) {
       return done({ code: ExportResultCode.SUCCESS });

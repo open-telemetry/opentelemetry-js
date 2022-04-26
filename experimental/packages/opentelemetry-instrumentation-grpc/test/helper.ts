@@ -104,8 +104,8 @@ const checkEqual = (x: TestRequestResponse | TestRequestResponse[]) => (
   x instanceof Array && y instanceof Array
     ? arrayIsEqual(requestEqual)(x as any)(y as any)
     : !(x instanceof Array) && !(y instanceof Array)
-    ? requestEqual(x)(y)
-    : false;
+      ? requestEqual(x)(y)
+      : false;
 
 export const runTests = (
   plugin: GrpcInstrumentation,
@@ -292,7 +292,7 @@ export const runTests = (
                 'Unary Method Error',
                 call.request.num
               ) as grpcJs.ServiceError
-            )
+          )
           : callback(null, { num: call.request.num });
       },
 
@@ -304,7 +304,7 @@ export const runTests = (
                 'Unary Method Error',
                 call.request.num
               ) as grpcJs.ServiceError
-            )
+          )
           : callback(null, { num: call.request.num });
       },
 

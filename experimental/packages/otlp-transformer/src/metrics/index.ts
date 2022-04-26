@@ -20,7 +20,7 @@ import type { IExportMetricsServiceRequest } from './types';
 import { AggregationTemporality } from '@opentelemetry/sdk-metrics-base';
 
 export function createExportMetricsServiceRequest(resourceMetrics: ResourceMetrics,
-                                                  aggregationTemporality: AggregationTemporality): IExportMetricsServiceRequest | null {
+  aggregationTemporality: AggregationTemporality): IExportMetricsServiceRequest | null {
   return {
     resourceMetrics: [{
       resource: {
