@@ -52,9 +52,9 @@ export class OTLPTraceExporter
     return typeof config.url === 'string'
       ? config.url
       : getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT.length > 0
-      ? getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-      : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-      ? appendResourcePathToUrlIfNotPresent(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
-      : DEFAULT_COLLECTOR_URL;
+        ? getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+        : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
+          ? appendResourcePathToUrlIfNotPresent(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
+          : DEFAULT_COLLECTOR_URL;
   }
 }

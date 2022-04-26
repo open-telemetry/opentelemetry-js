@@ -16,7 +16,7 @@
 import {
   Span,
   SpanAttributes,
- } from '@opentelemetry/api';
+} from '@opentelemetry/api';
 import type * as http from 'http';
 import type * as https from 'https';
 import {

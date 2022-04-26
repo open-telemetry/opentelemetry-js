@@ -133,13 +133,13 @@ export function mockHistogram(): Histogram {
   const name = 'int-histogram';
 
   meterProvider.addView({
-      aggregation: new ExplicitBucketHistogramAggregation([0, 100])
-    },
-    {
-      instrument: {
-        name: name
-      }
-    });
+    aggregation: new ExplicitBucketHistogramAggregation([0, 100])
+  },
+  {
+    instrument: {
+      name: name
+    }
+  });
 
   return meter.createHistogram(name, {
     description: 'sample histogram description',

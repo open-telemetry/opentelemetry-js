@@ -23,12 +23,12 @@ import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 export class OTLPMetricExporterBase<T extends OTLPExporterBase<OTLPMetricExporterOptions,
   ResourceMetrics,
   otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest>>
-  implements PushMetricExporter {
+implements PushMetricExporter {
   public _otlpExporter: T;
   protected _preferredAggregationTemporality: AggregationTemporality;
 
   constructor(exporter: T,
-              config: OTLPMetricExporterOptions = defaultOptions) {
+    config: OTLPMetricExporterOptions = defaultOptions) {
     this._otlpExporter = exporter;
     this._preferredAggregationTemporality = config.aggregationTemporality ?? AggregationTemporality.CUMULATIVE;
   }

@@ -97,14 +97,14 @@ const testCollectorExporter = (params: TestParams) =>
           );
           const credentials = params.useTLS
             ? grpc.ServerCredentials.createSsl(
-                fs.readFileSync('./test/certs/ca.crt'),
-                [
-                  {
-                    cert_chain: fs.readFileSync('./test/certs/server.crt'),
-                    private_key: fs.readFileSync('./test/certs/server.key'),
-                  },
-                ]
-              )
+              fs.readFileSync('./test/certs/ca.crt'),
+              [
+                {
+                  cert_chain: fs.readFileSync('./test/certs/server.crt'),
+                  private_key: fs.readFileSync('./test/certs/server.key'),
+                },
+              ]
+            )
             : grpc.ServerCredentials.createInsecure();
           server.bindAsync(address, credentials, () => {
             server.start();
@@ -120,10 +120,10 @@ const testCollectorExporter = (params: TestParams) =>
     beforeEach(done => {
       const credentials = params.useTLS
         ? grpc.credentials.createSsl(
-            fs.readFileSync('./test/certs/ca.crt'),
-            fs.readFileSync('./test/certs/client.key'),
-            fs.readFileSync('./test/certs/client.crt')
-          )
+          fs.readFileSync('./test/certs/ca.crt'),
+          fs.readFileSync('./test/certs/client.key'),
+          fs.readFileSync('./test/certs/client.crt')
+        )
         : undefined;
       collectorExporter = new OTLPTraceExporter({
         url: 'grpcs://' + address,
@@ -203,12 +203,12 @@ const testCollectorExporter = (params: TestParams) =>
     describe('export - with gzip compression', () => {
       beforeEach(() => {
         const credentials = params.useTLS
-        ? grpc.credentials.createSsl(
+          ? grpc.credentials.createSsl(
             fs.readFileSync('./test/certs/ca.crt'),
             fs.readFileSync('./test/certs/client.key'),
             fs.readFileSync('./test/certs/client.crt')
           )
-        : undefined;
+          : undefined;
         collectorExporter = new OTLPTraceExporter({
           url: 'grpcs://' + address,
           credentials,
@@ -254,12 +254,12 @@ const testCollectorExporter = (params: TestParams) =>
       const envSource = process.env;
       it('should return gzip compression algorithm on exporter', () => {
         const credentials = params.useTLS
-        ? grpc.credentials.createSsl(
+          ? grpc.credentials.createSsl(
             fs.readFileSync('./test/certs/ca.crt'),
             fs.readFileSync('./test/certs/client.key'),
             fs.readFileSync('./test/certs/client.crt')
           )
-        : undefined;
+          : undefined;
 
         envSource.OTEL_EXPORTER_OTLP_COMPRESSION='gzip';
         collectorExporter = new OTLPTraceExporter({
