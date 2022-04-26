@@ -176,16 +176,16 @@ function retrieveRootCert(): Buffer | undefined {
     getEnv().OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE ||
     getEnv().OTEL_EXPORTER_OTLP_CERTIFICATE;
 
-    if (rootCertificate) {
-      try {
-        return fs.readFileSync(path.resolve(process.cwd(), rootCertificate));
-      } catch {
-        diag.warn('Failed to read root certificate file');
-        return undefined;
-      }
-    } else {
+  if (rootCertificate) {
+    try {
+      return fs.readFileSync(path.resolve(process.cwd(), rootCertificate));
+    } catch {
+      diag.warn('Failed to read root certificate file');
       return undefined;
     }
+  } else {
+    return undefined;
+  }
 }
 
 function retrievePrivateKey(): Buffer | undefined {

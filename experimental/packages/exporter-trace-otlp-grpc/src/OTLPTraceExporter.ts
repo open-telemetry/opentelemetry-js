@@ -56,10 +56,10 @@ export class OTLPTraceExporter
     return typeof config.url === 'string'
       ? validateAndNormalizeUrl(config.url)
       : getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT.length > 0
-      ? validateAndNormalizeUrl(getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
-      : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-      ? validateAndNormalizeUrl(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT)
-      : validateAndNormalizeUrl(DEFAULT_COLLECTOR_URL);
+        ? validateAndNormalizeUrl(getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
+        : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
+          ? validateAndNormalizeUrl(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT)
+          : validateAndNormalizeUrl(DEFAULT_COLLECTOR_URL);
   }
 
   getServiceClientType() {
