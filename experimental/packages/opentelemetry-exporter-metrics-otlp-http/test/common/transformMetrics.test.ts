@@ -50,114 +50,114 @@ describe('transformMetrics', () => {
     });
 
     it('should convert counter', async () => {
-        const counter = mockCounter();
-        counter.add(1);
-        const metrics = (await collect());
+      const counter = mockCounter();
+      counter.add(1);
+      const metrics = (await collect());
 
-        const metric = metrics.instrumentationLibraryMetrics[0].metrics[0];
-        ensureCounterIsCorrect(
-          transform.toCollectorMetric(metric, AggregationTemporality.CUMULATIVE),
-          hrTimeToNanoseconds(metric.dataPoints[0].endTime),
-          hrTimeToNanoseconds(metric.dataPoints[0].startTime)
-        );
-      }
+      const metric = metrics.instrumentationLibraryMetrics[0].metrics[0];
+      ensureCounterIsCorrect(
+        transform.toCollectorMetric(metric, AggregationTemporality.CUMULATIVE),
+        hrTimeToNanoseconds(metric.dataPoints[0].endTime),
+        hrTimeToNanoseconds(metric.dataPoints[0].startTime)
+      );
+    }
     );
 
     it('should convert double counter', async () => {
-        const doubleCounter = mockDoubleCounter();
-        doubleCounter.add(8);
-        const metrics = (await collect());
+      const doubleCounter = mockDoubleCounter();
+      doubleCounter.add(8);
+      const metrics = (await collect());
 
-        const metric = metrics.instrumentationLibraryMetrics[0].metrics[0];
-        ensureDoubleCounterIsCorrect(
-          transform.toCollectorMetric(metric, AggregationTemporality.CUMULATIVE),
-          hrTimeToNanoseconds(metric.dataPoints[0].endTime),
-          hrTimeToNanoseconds(metric.dataPoints[0].startTime),
-        );
-      }
+      const metric = metrics.instrumentationLibraryMetrics[0].metrics[0];
+      ensureDoubleCounterIsCorrect(
+        transform.toCollectorMetric(metric, AggregationTemporality.CUMULATIVE),
+        hrTimeToNanoseconds(metric.dataPoints[0].endTime),
+        hrTimeToNanoseconds(metric.dataPoints[0].startTime),
+      );
+    }
     );
 
     it('should convert observable gauge', async () => {
-        let count = 0;
-        mockObservableGauge(observableResult => {
-          count++;
-          observableResult.observe(getValue(count), {});
-        });
+      let count = 0;
+      mockObservableGauge(observableResult => {
+        count++;
+        observableResult.observe(getValue(count), {});
+      });
 
-        // collect three times.
-        await collect();
-        await collect();
-        const metrics = (await collect());
+      // collect three times.
+      await collect();
+      await collect();
+      const metrics = (await collect());
 
-        const metric = metrics.instrumentationLibraryMetrics[0].metrics[0];
-        ensureObservableGaugeIsCorrect(
-          transform.toCollectorMetric(metric, AggregationTemporality.CUMULATIVE),
-          hrTimeToNanoseconds(metric.dataPoints[0].endTime),
-          hrTimeToNanoseconds(metric.dataPoints[0].startTime),
-          -1,
-        );
-      }
+      const metric = metrics.instrumentationLibraryMetrics[0].metrics[0];
+      ensureObservableGaugeIsCorrect(
+        transform.toCollectorMetric(metric, AggregationTemporality.CUMULATIVE),
+        hrTimeToNanoseconds(metric.dataPoints[0].endTime),
+        hrTimeToNanoseconds(metric.dataPoints[0].startTime),
+        -1,
+      );
+    }
     );
 
 
     it('should convert observable counter', async () => {
-        mockObservableCounter(observableResult => {
-          observableResult.observe(1, {});
-        });
+      mockObservableCounter(observableResult => {
+        observableResult.observe(1, {});
+      });
 
-        // collect three times.
-        await collect();
-        await collect();
-        const metrics = (await collect());
-        // TODO: Collect seems to not deliver the last observation -> why?
+      // collect three times.
+      await collect();
+      await collect();
+      const metrics = (await collect());
+      // TODO: Collect seems to not deliver the last observation -> why?
 
-        const metric = metrics.instrumentationLibraryMetrics[0].metrics[0];
-        ensureObservableCounterIsCorrect(
-          transform.toCollectorMetric(metric, AggregationTemporality.CUMULATIVE),
-          hrTimeToNanoseconds(metric.dataPoints[0].endTime),
-          hrTimeToNanoseconds(metric.dataPoints[0].startTime),
-          2,
-        );
-      }
+      const metric = metrics.instrumentationLibraryMetrics[0].metrics[0];
+      ensureObservableCounterIsCorrect(
+        transform.toCollectorMetric(metric, AggregationTemporality.CUMULATIVE),
+        hrTimeToNanoseconds(metric.dataPoints[0].endTime),
+        hrTimeToNanoseconds(metric.dataPoints[0].startTime),
+        2,
+      );
+    }
     );
 
     it('should convert observable up-down counter', async () => {
-        mockObservableUpDownCounter(observableResult => {
-          observableResult.observe(1, {});
-        });
+      mockObservableUpDownCounter(observableResult => {
+        observableResult.observe(1, {});
+      });
 
-        // collect three times.
-        await collect();
-        await collect();
-        const metrics = (await collect());
-        // TODO: Collect seems to not deliver the last observation -> why?
+      // collect three times.
+      await collect();
+      await collect();
+      const metrics = (await collect());
+      // TODO: Collect seems to not deliver the last observation -> why?
 
-        const metric = metrics.instrumentationLibraryMetrics[0].metrics[0];
-        ensureObservableUpDownCounterIsCorrect(
-          transform.toCollectorMetric(metric, AggregationTemporality.CUMULATIVE),
-          hrTimeToNanoseconds(metric.dataPoints[0].endTime),
-          hrTimeToNanoseconds(metric.dataPoints[0].startTime),
-          2,
-        );
-      }
+      const metric = metrics.instrumentationLibraryMetrics[0].metrics[0];
+      ensureObservableUpDownCounterIsCorrect(
+        transform.toCollectorMetric(metric, AggregationTemporality.CUMULATIVE),
+        hrTimeToNanoseconds(metric.dataPoints[0].endTime),
+        hrTimeToNanoseconds(metric.dataPoints[0].startTime),
+        2,
+      );
+    }
     );
 
     it('should convert observable histogram', async () => {
-        const histogram = mockHistogram();
-        histogram.record(7);
-        histogram.record(14);
+      const histogram = mockHistogram();
+      histogram.record(7);
+      histogram.record(14);
 
-        const metrics = (await collect());
+      const metrics = (await collect());
 
-        const metric = metrics.instrumentationLibraryMetrics[0].metrics[0];
-        ensureHistogramIsCorrect(
-          transform.toCollectorMetric(metric, AggregationTemporality.CUMULATIVE),
-          hrTimeToNanoseconds(metric.dataPoints[0].endTime),
-          hrTimeToNanoseconds(metric.dataPoints[0].startTime),
-          [0, 100],
-          [0, 2, 0]
-        );
-      }
+      const metric = metrics.instrumentationLibraryMetrics[0].metrics[0];
+      ensureHistogramIsCorrect(
+        transform.toCollectorMetric(metric, AggregationTemporality.CUMULATIVE),
+        hrTimeToNanoseconds(metric.dataPoints[0].endTime),
+        hrTimeToNanoseconds(metric.dataPoints[0].startTime),
+        [0, 100],
+        [0, 2, 0]
+      );
+    }
     );
 
     it('should convert metric attributes value to string', () => {

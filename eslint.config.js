@@ -10,6 +10,7 @@ module.exports = {
     "project": "./tsconfig.json"
   },
   rules: {
+    "indent": ["error", 2, { "SwitchCase": 1 }],
     "no-trailing-spaces": "error",
     "eol-last": "error",
     "quotes": [2, "single", { "avoidEscape": true }],
