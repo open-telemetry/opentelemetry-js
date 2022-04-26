@@ -108,10 +108,10 @@ describe('PeriodicExportingMetricReader', () => {
     it('should construct PeriodicExportingMetricReader without exceptions', () => {
       const exporter = new TestDeltaMetricExporter();
       const reader = new PeriodicExportingMetricReader({
-          exporter: exporter,
-          exportIntervalMillis: 4000,
-          exportTimeoutMillis: 3000
-        }
+        exporter: exporter,
+        exportIntervalMillis: 4000,
+        exportTimeoutMillis: 3000
+      }
       );
       assert.strictEqual(reader.getPreferredAggregationTemporality(), exporter.getPreferredAggregationTemporality());
     });

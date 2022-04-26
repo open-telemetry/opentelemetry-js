@@ -67,7 +67,7 @@ class ExemplarBucket {
   collect(pointAttributes: MetricAttributes): Exemplar | null {
     if (!this._offered) return null;
     const currentAttributes = this.attributes;
-      // filter attributes
+    // filter attributes
     Object.keys(pointAttributes).forEach(key => {
       if (pointAttributes[key] === currentAttributes[key]) {
         delete currentAttributes[key];
