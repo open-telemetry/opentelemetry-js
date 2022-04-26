@@ -20,7 +20,6 @@ import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPTraceExporter } from '../../src/platform/browser/index';
-import * as otlpTypes from '../../src/types';
 
 import {
   ensureSpanIsCorrect,
@@ -30,6 +29,7 @@ import {
   mockedReadableSpan,
 } from '../traceHelper';
 import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
+import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
 
 describe('OTLPTraceExporter - web', () => {
   let collectorTraceExporter: OTLPTraceExporter;
@@ -109,16 +109,16 @@ describe('OTLPTraceExporter - web', () => {
           const body = await blob.text();
           const json = JSON.parse(
             body
-          ) as otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+          ) as IExportTraceServiceRequest;
           const span1 =
-            json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
+            json.resourceSpans?.[0].instrumentationLibrarySpans?.[0].spans?.[0];
 
           assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
           if (span1) {
             ensureSpanIsCorrect(span1);
           }
 
-          const resource = json.resourceSpans[0].resource;
+          const resource = json.resourceSpans?.[0].resource;
           assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
           if (resource) {
             ensureWebResourceIsCorrect(resource);
@@ -200,16 +200,16 @@ describe('OTLPTraceExporter - web', () => {
           const body = request.requestBody;
           const json = JSON.parse(
             body
-          ) as otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+          ) as IExportTraceServiceRequest;
           const span1 =
-            json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
+            json.resourceSpans?.[0].instrumentationLibrarySpans?.[0].spans?.[0];
 
           assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
           if (span1) {
             ensureSpanIsCorrect(span1);
           }
 
-          const resource = json.resourceSpans[0].resource;
+          const resource = json.resourceSpans?.[0].resource;
           assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
           if (resource) {
             ensureWebResourceIsCorrect(resource);

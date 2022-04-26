@@ -20,7 +20,7 @@ import { toAttributes } from '../common/internal';
 import { sdkSpanToOtlpSpan } from './internal';
 import { IExportTraceServiceRequest } from './types';
 
-export function createExportTraceServiceRequest(spans: ReadableSpan[]): IExportTraceServiceRequest | null {
+export function createExportTraceServiceRequest(spans: ReadableSpan[], useHex?: boolean): IExportTraceServiceRequest {
   return {
     resourceSpans: spanRecordsToResourceSpans(spans).map(({ resource, resourceSpans, resourceSchemaUrl }) => ({
       resource: {
@@ -29,7 +29,7 @@ export function createExportTraceServiceRequest(spans: ReadableSpan[]): IExportT
       },
       instrumentationLibrarySpans: resourceSpans.map(({ instrumentationLibrary, instrumentationLibrarySpans, librarySchemaUrl }) => ({
         instrumentationLibrary,
-        spans: instrumentationLibrarySpans.map(sdkSpanToOtlpSpan),
+        spans: instrumentationLibrarySpans.map(span => sdkSpanToOtlpSpan(span, useHex)),
         schemaUrl: librarySchemaUrl,
       })),
       schemaUrl: resourceSchemaUrl,

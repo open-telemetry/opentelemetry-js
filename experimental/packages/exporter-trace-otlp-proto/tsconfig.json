@@ -26,6 +26,9 @@
     },
     {
       "path": "../otlp-proto-exporter-base"
+    },
+    {
+      "path": "../otlp-transformer"
     }
   ]
 }

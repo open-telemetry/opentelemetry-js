@@ -161,24 +161,24 @@ describe('Trace', () => {
     });
 
     it('returns null on an empty list', () => {
-      assert.deepStrictEqual(createExportTraceServiceRequest([]), { resourceSpans: [] });
+      assert.deepStrictEqual(createExportTraceServiceRequest([], true), { resourceSpans: [] });
     });
 
     it('serializes a span', () => {
-      const exportRequest = createExportTraceServiceRequest([span]);
+      const exportRequest = createExportTraceServiceRequest([span], true);
       assert.ok(exportRequest);
       assert.deepStrictEqual(exportRequest, expectedSpanJson);
     });
 
     it('serializes a span', () => {
-      const exportRequest = createExportTraceServiceRequest([span]);
+      const exportRequest = createExportTraceServiceRequest([span], true);
       assert.ok(exportRequest);
       assert.deepStrictEqual(exportRequest, expectedSpanJson);
     });
 
     it('serializes a span without a parent', () => {
       (span as any).parentSpanId = undefined;
-      const exportRequest = createExportTraceServiceRequest([span]);
+      const exportRequest = createExportTraceServiceRequest([span], true);
       assert.ok(exportRequest);
       assert.strictEqual(exportRequest.resourceSpans?.[0].instrumentationLibrarySpans[0].spans?.[0].parentSpanId, undefined);
 
@@ -188,7 +188,7 @@ describe('Trace', () => {
       it('error', () => {
         span.status.code = SpanStatusCode.ERROR;
         span.status.message = 'error message';
-        const exportRequest = createExportTraceServiceRequest([span]);
+        const exportRequest = createExportTraceServiceRequest([span], true);
         assert.ok(exportRequest);
         const spanStatus = exportRequest.resourceSpans?.[0].instrumentationLibrarySpans[0].spans?.[0].status;
         assert.strictEqual(spanStatus?.code, EStatusCode.STATUS_CODE_ERROR);
@@ -197,7 +197,7 @@ describe('Trace', () => {
 
       it('unset', () => {
         span.status.code = SpanStatusCode.UNSET;
-        const exportRequest = createExportTraceServiceRequest([span]);
+        const exportRequest = createExportTraceServiceRequest([span], true);
         assert.ok(exportRequest);
         assert.strictEqual(exportRequest.resourceSpans?.[0].instrumentationLibrarySpans[0].spans?.[0].status.code, EStatusCode.STATUS_CODE_UNSET);
       });
@@ -206,31 +206,31 @@ describe('Trace', () => {
     describe('span kind', () => {
       it('consumer', () => {
         (span as any).kind = SpanKind.CONSUMER;
-        const exportRequest = createExportTraceServiceRequest([span]);
+        const exportRequest = createExportTraceServiceRequest([span], true);
         assert.ok(exportRequest);
         assert.strictEqual(exportRequest.resourceSpans?.[0].instrumentationLibrarySpans[0].spans?.[0].kind, ESpanKind.SPAN_KIND_CONSUMER);
       });
       it('internal', () => {
         (span as any).kind = SpanKind.INTERNAL;
-        const exportRequest = createExportTraceServiceRequest([span]);
+        const exportRequest = createExportTraceServiceRequest([span], true);
         assert.ok(exportRequest);
         assert.strictEqual(exportRequest.resourceSpans?.[0].instrumentationLibrarySpans[0].spans?.[0].kind, ESpanKind.SPAN_KIND_INTERNAL);
       });
       it('producer', () => {
         (span as any).kind = SpanKind.PRODUCER;
-        const exportRequest = createExportTraceServiceRequest([span]);
+        const exportRequest = createExportTraceServiceRequest([span], true);
         assert.ok(exportRequest);
         assert.strictEqual(exportRequest.resourceSpans?.[0].instrumentationLibrarySpans[0].spans?.[0].kind, ESpanKind.SPAN_KIND_PRODUCER);
       });
       it('server', () => {
         (span as any).kind = SpanKind.SERVER;
-        const exportRequest = createExportTraceServiceRequest([span]);
+        const exportRequest = createExportTraceServiceRequest([span], true);
         assert.ok(exportRequest);
         assert.strictEqual(exportRequest.resourceSpans?.[0].instrumentationLibrarySpans[0].spans?.[0].kind, ESpanKind.SPAN_KIND_SERVER);
       });
       it('unspecified', () => {
         (span as any).kind = undefined;
-        const exportRequest = createExportTraceServiceRequest([span]);
+        const exportRequest = createExportTraceServiceRequest([span], true);
         assert.ok(exportRequest);
         assert.strictEqual(exportRequest.resourceSpans?.[0].instrumentationLibrarySpans[0].spans?.[0].kind, ESpanKind.SPAN_KIND_UNSPECIFIED);
       });

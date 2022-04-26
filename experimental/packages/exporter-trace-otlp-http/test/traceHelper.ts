@@ -19,8 +19,15 @@ import { hexToBase64, InstrumentationLibrary, VERSION } from '@opentelemetry/cor
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
-import * as otlpTypes from '../src/types';
-import { opentelemetryProto } from '../src/types';
+import {
+  ESpanKind,
+  IEvent,
+  IExportTraceServiceRequest,
+  IKeyValue,
+  ILink,
+  IResource,
+  ISpan
+} from '@opentelemetry/otlp-transformer';
 
 if (typeof Buffer === 'undefined') {
   (window as any).Buffer = {
@@ -208,7 +215,7 @@ export const multiInstrumentationLibraryTrace: ReadableSpan[] = [
 ];
 
 export function ensureEventsAreCorrect(
-  events: opentelemetryProto.trace.v1.Span.Event[]
+  events: IEvent[]
 ) {
   assert.deepStrictEqual(
     events,
@@ -267,7 +274,7 @@ export function ensureEventsAreCorrect(
 }
 
 export function ensureAttributesAreCorrect(
-  attributes: opentelemetryProto.common.v1.KeyValue[]
+  attributes: IKeyValue[]
 ) {
   assert.deepStrictEqual(
     attributes,
@@ -284,7 +291,7 @@ export function ensureAttributesAreCorrect(
 }
 
 export function ensureLinksAreCorrect(
-  attributes: opentelemetryProto.trace.v1.Span.Link[],
+  attributes: ILink[],
   useHex?: boolean
 ) {
   assert.deepStrictEqual(
@@ -309,7 +316,7 @@ export function ensureLinksAreCorrect(
 }
 
 export function ensureSpanIsCorrect(
-  span: otlpTypes.opentelemetryProto.trace.v1.Span,
+  span: ISpan,
   useHex = true
 ) {
   if (span.attributes) {
@@ -339,7 +346,7 @@ export function ensureSpanIsCorrect(
   assert.strictEqual(span.name, 'documentFetch', 'name is wrong');
   assert.strictEqual(
     span.kind,
-    opentelemetryProto.trace.v1.Span.SpanKind.SPAN_KIND_INTERNAL,
+    ESpanKind.SPAN_KIND_INTERNAL,
     'kind is wrong'
   );
   assert.strictEqual(
@@ -367,7 +374,7 @@ export function ensureSpanIsCorrect(
 }
 
 export function ensureWebResourceIsCorrect(
-  resource: otlpTypes.opentelemetryProto.resource.v1.Resource
+  resource: IResource
 ) {
   assert.strictEqual(resource.attributes.length, 7);
   assert.strictEqual(resource.attributes[0].key, 'service.name');
@@ -388,7 +395,7 @@ export function ensureWebResourceIsCorrect(
 }
 
 export function ensureExportTraceServiceRequestIsSet(
-  json: otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
+  json: IExportTraceServiceRequest
 ) {
   const resourceSpans = json.resourceSpans;
   assert.strictEqual(
@@ -397,11 +404,11 @@ export function ensureExportTraceServiceRequestIsSet(
     'resourceSpans is missing'
   );
 
-  const resource = resourceSpans[0].resource;
+  const resource = resourceSpans?.[0].resource;
   assert.strictEqual(!!resource, true, 'resource is missing');
 
   const instrumentationLibrarySpans =
-    resourceSpans[0].instrumentationLibrarySpans;
+    resourceSpans?.[0].instrumentationLibrarySpans;
   assert.strictEqual(
     instrumentationLibrarySpans && instrumentationLibrarySpans.length,
     1,
@@ -409,14 +416,14 @@ export function ensureExportTraceServiceRequestIsSet(
   );
 
   const instrumentationLibrary =
-    instrumentationLibrarySpans[0].instrumentationLibrary;
+    instrumentationLibrarySpans?.[0].instrumentationLibrary;
   assert.strictEqual(
     !!instrumentationLibrary,
     true,
     'instrumentationLibrary is missing'
   );
 
-  const spans = instrumentationLibrarySpans[0].spans;
+  const spans = instrumentationLibrarySpans?.[0].spans;
   assert.strictEqual(spans && spans.length, 1, 'spans are missing');
 }
 

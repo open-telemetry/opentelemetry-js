@@ -30,13 +30,13 @@ import * as zlib from 'zlib';
 import {
   OTLPTraceExporter
 } from '../../src/platform/node';
-import * as otlpTypes from '../../src/types';
 import {
   ensureExportTraceServiceRequestIsSet,
   ensureSpanIsCorrect,
   mockedReadableSpan
 } from '../traceHelper';
 import { MockedResponse } from './nodeHelpers';
+import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
 
 let fakeRequest: PassThrough;
 
@@ -229,9 +229,9 @@ describe('OTLPTraceExporter - node with json over http', () => {
 
         const json = JSON.parse(
           responseBody
-        ) as otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+        ) as IExportTraceServiceRequest;
         const span1 =
-          json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
+          json.resourceSpans?.[0].instrumentationLibrarySpans?.[0].spans?.[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
         if (span1) {
           ensureSpanIsCorrect(span1);
@@ -325,9 +325,9 @@ describe('OTLPTraceExporter - node with json over http', () => {
 
         const json = JSON.parse(
           responseBody
-        ) as otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+        ) as IExportTraceServiceRequest;
         const span1 =
-          json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
+          json.resourceSpans?.[0].instrumentationLibrarySpans?.[0].spans?.[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
         if (span1) {
           ensureSpanIsCorrect(span1);

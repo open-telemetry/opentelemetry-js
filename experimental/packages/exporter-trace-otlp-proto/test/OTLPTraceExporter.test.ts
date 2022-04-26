@@ -16,9 +16,6 @@
 
 import { diag } from '@opentelemetry/api';
 import { ExportResultCode } from '@opentelemetry/core';
-import {
-  otlpTypes
-} from '@opentelemetry/exporter-trace-otlp-http';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as http from 'http';
@@ -34,6 +31,7 @@ import {
 } from './traceHelper';
 import { CompressionAlgorithm, OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { getExportRequestProto } from '@opentelemetry/otlp-proto-exporter-base';
+import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
 
 const fakeRequest = {
   end: function () { },
@@ -155,9 +153,9 @@ describe('OTLPTraceExporter - node with proto over http', () => {
       fakeRequest.on('end', () => {
         const ExportTraceServiceRequestProto = getExportRequestProto();
         const data = ExportTraceServiceRequestProto?.decode(buff);
-        const json = data?.toJSON() as otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+        const json = data?.toJSON() as IExportTraceServiceRequest;
         const span1 =
-          json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
+          json.resourceSpans?.[0].instrumentationLibrarySpans?.[0].spans?.[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
         if (span1) {
           ensureProtoSpanIsCorrect(span1);
@@ -242,9 +240,9 @@ describe('OTLPTraceExporter - node with proto over http', () => {
         const unzippedBuff = zlib.gunzipSync(buff);
         const ExportTraceServiceRequestProto = getExportRequestProto();
         const data = ExportTraceServiceRequestProto?.decode(unzippedBuff);
-        const json = data?.toJSON() as otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+        const json = data?.toJSON() as IExportTraceServiceRequest;
         const span1 =
-          json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
+          json.resourceSpans?.[0].instrumentationLibrarySpans?.[0].spans?.[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
         if (span1) {
           ensureProtoSpanIsCorrect(span1);
