@@ -272,13 +272,13 @@ describe('ZoneContextManager', () => {
       const fn: any = contextManager.bind(
         context,
         () => {
-        assert.strictEqual(
-          contextManager.active(),
-          context,
-          'should have context'
-        );
-        return done();
-      });
+          assert.strictEqual(
+            contextManager.active(),
+            context,
+            'should have context'
+          );
+          return done();
+        });
       fn();
     });
 

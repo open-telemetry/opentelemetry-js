@@ -27,6 +27,6 @@ export class AlwaysSampleExemplarFilter implements ExemplarFilter {
     _attributes: MetricAttributes,
     _ctx: Context
   ): boolean {
-      return true;
+    return true;
   }
 }

@@ -15,5 +15,5 @@
  */
 
 export function defaultServiceName(): string {
-    return 'unknown_service';
+  return 'unknown_service';
 }
