@@ -21,13 +21,13 @@ import {
   getEnv,
   globalErrorHandler,
   suppressTracing,
-  unrefTimer,
+  unrefTimer
 } from '@opentelemetry/core';
-import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
 import { BufferConfig } from '../types';
 import { ReadableSpan } from './ReadableSpan';
 import { SpanExporter } from './SpanExporter';
+import { WriteableSpan } from './WriteableSpan';
 
 /**
  * Implementation of the {@link SpanProcessor} that batches spans exported by
@@ -73,7 +73,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
   }
 
   // does nothing.
-  onStart(_span: Span, _parentContext: Context): void {}
+  onStart(_span: WriteableSpan, _parentContext: Context): void {}
 
   onEnd(span: ReadableSpan): void {
     if (this._shutdownOnce.isCalled) {
