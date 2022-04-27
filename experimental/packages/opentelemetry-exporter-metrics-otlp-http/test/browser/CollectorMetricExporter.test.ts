@@ -21,7 +21,6 @@ import { AggregationTemporality, ResourceMetrics, } from '@opentelemetry/sdk-met
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPMetricExporter } from '../../src/platform/browser';
-import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import {
   collect,
   ensureCounterIsCorrect,
@@ -37,6 +36,7 @@ import {
 } from '../metricsHelper';
 import { OTLPMetricExporterOptions } from '../../src';
 import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
+import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 
 describe('OTLPMetricExporter - web', () => {
   let collectorExporter: OTLPMetricExporter;
@@ -108,7 +108,7 @@ describe('OTLPMetricExporter - web', () => {
           const body = await blob.text();
           const json = JSON.parse(
             body
-          ) as otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
+          ) as IExportMetricsServiceRequest;
           const metric1 =
             json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
           const metric2 =
@@ -226,7 +226,7 @@ describe('OTLPMetricExporter - web', () => {
           const body = request.requestBody;
           const json = JSON.parse(
             body
-          ) as otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
+          ) as IExportMetricsServiceRequest;
           const metric1 =
             json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
           const metric2 =

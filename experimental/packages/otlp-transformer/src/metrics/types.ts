@@ -100,7 +100,7 @@ export interface ISum {
 /** Properties of a Histogram. */
 export interface IHistogram {
   /** Histogram dataPoints */
-  dataPoints?: IHistogramDataPoint[]
+  dataPoints: IHistogramDataPoint[]
 
   /** Histogram aggregationTemporality */
   aggregationTemporality?: EAggregationTemporality

@@ -27,7 +27,6 @@ import {
 import {
   OTLPMetricExporter
 } from '../../src/platform/node';
-import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import {
   ensureCounterIsCorrect,
   ensureExportMetricsServiceRequestIsSet,
@@ -41,6 +40,7 @@ import {
 import { MockedResponse } from './nodeHelpers';
 import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
 import { OTLPExporterError, OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 
 const fakeRequest = {
   end: function () {
@@ -230,9 +230,10 @@ describe('OTLPMetricExporter - node with json over http', () => {
 
       setTimeout(() => {
         const writeArgs = stubWrite.args[0];
-        const json = JSON.parse(
+        const myJson = JSON.parse(
           writeArgs[0]
-        ) as otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
+        );
+        const json = myJson as IExportMetricsServiceRequest;
         const metric1 =
           json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
         const metric2 =
