@@ -99,39 +99,42 @@ describe('OTLPTraceExporter - web', () => {
       });
 
       it('should successfully send the spans using sendBeacon', done => {
-        collectorTraceExporter.export(spans, () => {
+        collectorTraceExporter.export(spans, result => {
         });
 
         setTimeout(async () => {
-          const args = stubBeacon.args[0];
-          const url = args[0];
-          const blob: Blob = args[1];
-          const body = await blob.text();
-          const json = JSON.parse(
-            body
-          ) as IExportTraceServiceRequest;
-          const span1 =
-            json.resourceSpans?.[0].instrumentationLibrarySpans?.[0].spans?.[0];
+          try {
+            const args = stubBeacon.args[0];
+            const url = args[0];
+            const blob: Blob = args[1];
+            const body = await blob.text();
+            const json = JSON.parse(
+              body
+            ) as IExportTraceServiceRequest;
+            const span1 =
+              json.resourceSpans?.[0].instrumentationLibrarySpans?.[0].spans?.[0];
 
-          assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
-          if (span1) {
-            ensureSpanIsCorrect(span1);
+            assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
+            if (span1) {
+              ensureSpanIsCorrect(span1);
+            }
+
+            const resource = json.resourceSpans?.[0].resource;
+            assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
+            if (resource) {
+              ensureWebResourceIsCorrect(resource);
+            }
+
+            assert.strictEqual(url, 'http://foo.bar.com');
+            assert.strictEqual(stubBeacon.callCount, 1);
+
+            assert.strictEqual(stubOpen.callCount, 0);
+
+            ensureExportTraceServiceRequestIsSet(json);
+            done();
+          } catch (err) {
+            done(err);
           }
-
-          const resource = json.resourceSpans?.[0].resource;
-          assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
-          if (resource) {
-            ensureWebResourceIsCorrect(resource);
-          }
-
-          assert.strictEqual(url, 'http://foo.bar.com');
-          assert.strictEqual(stubBeacon.callCount, 1);
-
-          assert.strictEqual(stubOpen.callCount, 0);
-
-          ensureExportTraceServiceRequestIsSet(json);
-
-          done();
         });
       });
 
