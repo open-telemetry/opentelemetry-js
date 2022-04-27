@@ -59,6 +59,21 @@ export abstract class InstrumentationBase<T = any>
     }
   }
 
+  private _warnOnPreloadedModules(): void {
+    this._modules.forEach((module: InstrumentationModuleDefinition<T>) => {
+      const { name } = module;
+      try {
+        const resolvedModule = require.resolve(name);
+        if (require.cache[resolvedModule]) {
+          // Module is already cached, which means the instrumentation hook might not work
+          this._diag.warn(`Module ${name} has been loaded before ${this.instrumentationName} so it might not work, please initialize it before requiring ${name}`);
+        }
+      } catch {
+        // Module isn't available, we can simply skip
+      }
+    });
+  }
+
   private _extractPackageVersion(baseDir: string): string | undefined {
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -134,6 +149,7 @@ export abstract class InstrumentationBase<T = any>
       return;
     }
 
+    this._warnOnPreloadedModules();
     for (const module of this._modules) {
       this._hooks.push(
         RequireInTheMiddle(
