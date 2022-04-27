@@ -16,15 +16,14 @@
 
 import { context, Context, TraceFlags } from '@opentelemetry/api';
 import {
-  ExportResultCode,
+  BindOnceFuture, ExportResultCode,
   globalErrorHandler,
-  suppressTracing,
-  BindOnceFuture,
+  suppressTracing
 } from '@opentelemetry/core';
-import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
 import { ReadableSpan } from './ReadableSpan';
 import { SpanExporter } from './SpanExporter';
+import { WriteableSpan } from './WriteableSpan';
 
 /**
  * An implementation of the {@link SpanProcessor} that converts the {@link Span}
@@ -45,7 +44,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
   }
 
   // does nothing.
-  onStart(_span: Span, _parentContext: Context): void {}
+  onStart(_span: WriteableSpan, _parentContext: Context): void {}
 
   onEnd(span: ReadableSpan): void {
     if (this._shutdownOnce.isCalled) {

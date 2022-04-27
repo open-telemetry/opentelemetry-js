@@ -15,29 +15,30 @@
  */
 
 import * as api from '@opentelemetry/api';
+import { Context, SpanAttributeValue } from '@opentelemetry/api';
 import {
-  isAttributeValue,
   hrTime,
   hrTimeDuration,
   InstrumentationLibrary,
+  isAttributeValue,
   isTimeInput,
-  timeInputToHrTime,
   sanitizeAttributes,
+  timeInputToHrTime
 } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
+import { IResource } from '@opentelemetry/resources';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import { ExceptionEventName } from './enums';
 import { ReadableSpan } from './export/ReadableSpan';
+import { WriteableSpan } from './export/WriteableSpan';
+import { SpanProcessor } from './SpanProcessor';
 import { TimedEvent } from './TimedEvent';
 import { Tracer } from './Tracer';
-import { SpanProcessor } from './SpanProcessor';
 import { SpanLimits } from './types';
-import { SpanAttributeValue, Context } from '@opentelemetry/api';
-import { ExceptionEventName } from './enums';
 
 /**
  * This class represents a span.
  */
-export class Span implements api.Span, ReadableSpan {
+export class Span implements api.Span, ReadableSpan, WriteableSpan {
   // Below properties are included to implement ReadableSpan for export
   // purposes but are not intended to be written-to directly.
   private readonly _spanContext: api.SpanContext;
@@ -47,7 +48,7 @@ export class Span implements api.Span, ReadableSpan {
   readonly links: api.Link[] = [];
   readonly events: TimedEvent[] = [];
   readonly startTime: api.HrTime;
-  readonly resource: Resource;
+  readonly resource: IResource;
   readonly instrumentationLibrary: InstrumentationLibrary;
   name: string;
   status: api.SpanStatus = {
@@ -103,7 +104,7 @@ export class Span implements api.Span, ReadableSpan {
 
     if (
       Object.keys(this.attributes).length >=
-        this._spanLimits.attributeCountLimit! &&
+      this._spanLimits.attributeCountLimit! &&
       !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
       return this;

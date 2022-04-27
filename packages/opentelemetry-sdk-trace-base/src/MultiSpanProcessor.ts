@@ -17,7 +17,7 @@
 import { Context } from '@opentelemetry/api';
 import { globalErrorHandler } from '@opentelemetry/core';
 import { ReadableSpan } from './export/ReadableSpan';
-import { Span } from './Span';
+import { WriteableSpan } from './export/WriteableSpan';
 import { SpanProcessor } from './SpanProcessor';
 
 /**
@@ -47,7 +47,7 @@ export class MultiSpanProcessor implements SpanProcessor {
     });
   }
 
-  onStart(span: Span, context: Context): void {
+  onStart(span: WriteableSpan, context: Context): void {
     for (const spanProcessor of this._spanProcessors) {
       spanProcessor.onStart(span, context);
     }

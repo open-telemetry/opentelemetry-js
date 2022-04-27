@@ -17,6 +17,11 @@
 import { Resource } from './Resource';
 import { ResourceDetectionConfig } from './config';
 
+export interface IResource {
+  readonly attributes: ResourceAttributes
+  merge(other: IResource | null): IResource
+}
+
 /** Interface for Resource attributes  */
 export interface ResourceAttributes {
   [key: string]: number | string | boolean;

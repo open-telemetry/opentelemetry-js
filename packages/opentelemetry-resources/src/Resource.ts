@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { SDK_INFO } from '@opentelemetry/core';
-import { ResourceAttributes } from './types';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { defaultServiceName } from './platform';
+import { IResource, ResourceAttributes } from './types';
 
 /**
  * A Resource describes the entity for which a signals (metrics or trace) are
  * collected.
  */
-export class Resource {
+export class Resource implements IResource {
   static readonly EMPTY = new Resource({});
 
   /**

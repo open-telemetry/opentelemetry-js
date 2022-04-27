@@ -16,7 +16,7 @@
 
 import { Context } from '@opentelemetry/api';
 import { ReadableSpan } from './export/ReadableSpan';
-import { Span } from './Span';
+import { WriteableSpan } from './export/WriteableSpan';
 
 /**
  * SpanProcessor is the interface Tracer SDK uses to allow synchronous hooks
@@ -33,7 +33,7 @@ export interface SpanProcessor {
    * returns true.
    * @param span the Span that just started.
    */
-  onStart(span: Span, parentContext: Context): void;
+  onStart(span: WriteableSpan, parentContext: Context): void;
 
   /**
    * Called when a {@link ReadableSpan} is ended, if the `span.isRecording()`
