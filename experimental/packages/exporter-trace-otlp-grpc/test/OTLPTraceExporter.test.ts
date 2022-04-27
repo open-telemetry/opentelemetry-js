@@ -178,11 +178,17 @@ const testCollectorExporter = (params: TestParams) =>
           );
           let spans;
           let resource;
-          if (exportedData && exportedData.scopeSpans[0].spans) {
+          if (exportedData) {
             spans = exportedData.scopeSpans[0].spans;
-
             resource = exportedData.resource;
-            ensureExportedSpanIsCorrect(spans[0]);
+
+            assert.ok(
+              typeof spans !== 'undefined',
+              'spans do not exist'
+            );
+            if(spans) {
+              ensureExportedSpanIsCorrect(spans[0]);
+            }
 
             assert.ok(
               typeof resource !== 'undefined',
@@ -229,9 +235,14 @@ const testCollectorExporter = (params: TestParams) =>
           );
           let spans;
           let resource;
-          if (exportedData && exportedData.scopeSpans[0].spans) {
+          if (exportedData) {
             spans = exportedData.scopeSpans[0].spans;
             resource = exportedData.resource;
+
+            assert.ok(
+              typeof spans !== 'undefined',
+              'spans do not exist'
+            );
             ensureExportedSpanIsCorrect(spans[0]);
 
             assert.ok(

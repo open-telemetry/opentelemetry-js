@@ -43,9 +43,7 @@ export class OTLPTraceExporter
     );
   }
 
-  convert(
-    spans: ReadableSpan[]
-  ): IExportTraceServiceRequest {
+  convert(spans: ReadableSpan[]): IExportTraceServiceRequest {
     return createExportTraceServiceRequest(spans, true);
   }
 

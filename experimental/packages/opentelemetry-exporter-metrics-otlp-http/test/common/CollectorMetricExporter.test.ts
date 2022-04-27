@@ -36,9 +36,7 @@ class OTLPMetricExporter extends OTLPExporterBase<
   getDefaultUrl(config: CollectorExporterConfig) {
     return config.url || '';
   }
-  convert(
-    metrics: ResourceMetrics[]
-  ): IExportMetricsServiceRequest {
+  convert(metrics: ResourceMetrics[]): IExportMetricsServiceRequest {
     return { resourceMetrics: [] };
   }
 }

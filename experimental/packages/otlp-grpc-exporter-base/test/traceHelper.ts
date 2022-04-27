@@ -100,9 +100,7 @@ export const mockedReadableSpan: ReadableSpan = {
   instrumentationLibrary: { name: 'default', version: '0.0.1' },
 };
 
-export function ensureExportedEventsAreCorrect(
-  events: IEvent[]
-) {
+export function ensureExportedEventsAreCorrect(events: IEvent[]) {
   assert.deepStrictEqual(
     events,
     [
@@ -159,9 +157,7 @@ export function ensureExportedEventsAreCorrect(
   );
 }
 
-export function ensureExportedAttributesAreCorrect(
-  attributes: IKeyValue[]
-) {
+export function ensureExportedAttributesAreCorrect(attributes: IKeyValue[]) {
   assert.deepStrictEqual(
     attributes,
     [
@@ -177,9 +173,7 @@ export function ensureExportedAttributesAreCorrect(
   );
 }
 
-export function ensureExportedLinksAreCorrect(
-  attributes: ILink[]
-) {
+export function ensureExportedLinksAreCorrect(attributes: ILink[]) {
   assert.deepStrictEqual(
     attributes,
     [
@@ -203,9 +197,7 @@ export function ensureExportedLinksAreCorrect(
   );
 }
 
-export function ensureExportedSpanIsCorrect(
-  span: ISpan
-) {
+export function ensureExportedSpanIsCorrect(span: ISpan) {
   if (span.attributes) {
     ensureExportedAttributesAreCorrect(span.attributes);
   }
@@ -261,9 +253,7 @@ export function ensureExportedSpanIsCorrect(
   );
 }
 
-export function ensureResourceIsCorrect(
-  resource: IResource
-) {
+export function ensureResourceIsCorrect(resource: IResource) {
   assert.deepStrictEqual(resource, {
     attributes: [
       {

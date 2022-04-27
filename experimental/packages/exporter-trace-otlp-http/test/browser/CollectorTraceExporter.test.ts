@@ -99,7 +99,7 @@ describe('OTLPTraceExporter - web', () => {
       });
 
       it('should successfully send the spans using sendBeacon', done => {
-        collectorTraceExporter.export(spans, result => {
+        collectorTraceExporter.export(spans, () => {
         });
 
         setTimeout(async () => {

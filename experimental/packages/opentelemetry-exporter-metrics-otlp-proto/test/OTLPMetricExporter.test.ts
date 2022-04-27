@@ -179,12 +179,9 @@ describe('OTLPMetricExporter - node with proto over http', () => {
           const data = ExportTraceServiceRequestProto?.decode(writeArgs[0]);
           const json = data?.toJSON() as IExportMetricsServiceRequest;
 
-          const metric1 =
-            json.resourceMetrics[0].scopeMetrics[0].metrics[0];
-          const metric2 =
-            json.resourceMetrics[0].scopeMetrics[0].metrics[1];
-          const metric3 =
-            json.resourceMetrics[0].scopeMetrics[0].metrics[2];
+          const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[0];
+          const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[1];
+          const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[2];
 
           assert.ok(typeof metric1 !== 'undefined', "counter doesn't exist");
           ensureExportedCounterIsCorrect(

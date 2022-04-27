@@ -19,9 +19,6 @@
       "path": "../../../packages/opentelemetry-sdk-trace-base"
     },
     {
-      "path": "../exporter-trace-otlp-http"
-    },
-    {
       "path": "../otlp-exporter-base"
     },
     {

@@ -154,8 +154,7 @@ describe('OTLPTraceExporter - node with proto over http', () => {
         const ExportTraceServiceRequestProto = getExportRequestProto();
         const data = ExportTraceServiceRequestProto?.decode(buff);
         const json = data?.toJSON() as IExportTraceServiceRequest;
-        const span1 =
-          json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
+        const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
         if (span1) {
           ensureProtoSpanIsCorrect(span1);
@@ -241,8 +240,7 @@ describe('OTLPTraceExporter - node with proto over http', () => {
         const ExportTraceServiceRequestProto = getExportRequestProto();
         const data = ExportTraceServiceRequestProto?.decode(unzippedBuff);
         const json = data?.toJSON() as IExportTraceServiceRequest;
-        const span1 =
-          json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
+        const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
         if (span1) {
           ensureProtoSpanIsCorrect(span1);

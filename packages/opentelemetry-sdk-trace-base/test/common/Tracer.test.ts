@@ -142,7 +142,7 @@ describe('Tracer', () => {
     span.end();
   });
 
-  it('should have an scope', () => {
+  it('should have an instrumentationLibrary', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       {},

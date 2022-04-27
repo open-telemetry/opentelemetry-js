@@ -230,16 +230,10 @@ describe('OTLPMetricExporter - node with json over http', () => {
 
       setTimeout(() => {
         const writeArgs = stubWrite.args[0];
-        const myJson = JSON.parse(
-          writeArgs[0]
-        );
-        const json = myJson as IExportMetricsServiceRequest;
-        const metric1 =
-          json.resourceMetrics[0].scopeMetrics[0].metrics[0];
-        const metric2 =
-          json.resourceMetrics[0].scopeMetrics[0].metrics[1];
-        const metric3 =
-          json.resourceMetrics[0].scopeMetrics[0].metrics[2];
+        const json = JSON.parse(writeArgs[0]) as IExportMetricsServiceRequest;
+        const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[0];
+        const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[1];
+        const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[2];
 
         assert.ok(typeof metric1 !== 'undefined', "counter doesn't exist");
         ensureCounterIsCorrect(

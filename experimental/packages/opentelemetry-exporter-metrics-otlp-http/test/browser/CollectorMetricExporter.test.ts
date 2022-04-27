@@ -106,15 +106,10 @@ describe('OTLPMetricExporter - web', () => {
           const url = args[0];
           const blob: Blob = args[1];
           const body = await blob.text();
-          const json = JSON.parse(
-            body
-          ) as IExportMetricsServiceRequest;
-          const metric1 =
-            json.resourceMetrics[0].scopeMetrics[0].metrics[0];
-          const metric2 =
-            json.resourceMetrics[0].scopeMetrics[0].metrics[1];
-          const metric3 =
-            json.resourceMetrics[0].scopeMetrics[0].metrics[2];
+          const json = JSON.parse(body) as IExportMetricsServiceRequest;
+          const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[0];
+          const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[1];
+          const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[2];
 
           assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
           if (metric1) {
@@ -224,15 +219,10 @@ describe('OTLPMetricExporter - web', () => {
           assert.strictEqual(request.url, 'http://foo.bar.com');
 
           const body = request.requestBody;
-          const json = JSON.parse(
-            body
-          ) as IExportMetricsServiceRequest;
-          const metric1 =
-            json.resourceMetrics[0].scopeMetrics[0].metrics[0];
-          const metric2 =
-            json.resourceMetrics[0].scopeMetrics[0].metrics[1];
-          const metric3 =
-            json.resourceMetrics[0].scopeMetrics[0].metrics[2];
+          const json = JSON.parse(body) as IExportMetricsServiceRequest;
+          const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[0];
+          const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[1];
+          const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[2];
           assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
           if (metric1) {
             ensureCounterIsCorrect(

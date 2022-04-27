@@ -227,11 +227,8 @@ describe('OTLPTraceExporter - node with json over http', () => {
       fakeRequest.on('end', () => {
         const responseBody = buff.toString();
 
-        const json = JSON.parse(
-          responseBody
-        ) as IExportTraceServiceRequest;
-        const span1 =
-          json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
+        const json = JSON.parse(responseBody) as IExportTraceServiceRequest;
+        const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
         if (span1) {
           ensureSpanIsCorrect(span1);
@@ -323,11 +320,8 @@ describe('OTLPTraceExporter - node with json over http', () => {
       fakeRequest.on('end', () => {
         const responseBody = zlib.gunzipSync(buff).toString();
 
-        const json = JSON.parse(
-          responseBody
-        ) as IExportTraceServiceRequest;
-        const span1 =
-          json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
+        const json = JSON.parse(responseBody) as IExportTraceServiceRequest;
+        const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
         if (span1) {
           ensureSpanIsCorrect(span1);
