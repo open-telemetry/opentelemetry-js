@@ -121,9 +121,9 @@ export function validateAndNormalizeUrl(url: string): string {
       'URL path should not be set when using grpc, the path part of the URL will be ignored.'
     );
   }
-  if (target.protocol !== '' && !target.protocol?.match(/(http|grpc)s?/)) {
+  if (target.protocol !== '' && !target.protocol?.match(/(http)s?/)) {
     diag.warn(
-      'URL protocol should be http(s):// or grpc(s)://. Using grpc://.'
+      'URL protocol should be http(s)://. Using http://.'
     );
   }
   return target.host;
@@ -136,9 +136,9 @@ export function configureSecurity(credentials: grpc.ChannelCredentials | undefin
 
   if (credentials) {
     return credentials;
-  } else if (endpoint.startsWith('https://') || endpoint.startsWith('grpcs://')) {
+  } else if (endpoint.startsWith('https://')) {
     insecure = false;
-  } else if (endpoint.startsWith('http://') || endpoint.startsWith('grpc://') || endpoint === DEFAULT_COLLECTOR_URL) {
+  } else if (endpoint.startsWith('http://') || endpoint === DEFAULT_COLLECTOR_URL) {
     insecure = true;
   } else {
     insecure = getSecurityFromEnv();

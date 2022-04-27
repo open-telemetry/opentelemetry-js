@@ -126,7 +126,7 @@ const testCollectorExporter = (params: TestParams) =>
         )
         : grpc.credentials.createInsecure();
       collectorExporter = new OTLPTraceExporter({
-        url: 'grpcs://' + address,
+        url: 'https://' + address,
         credentials,
         metadata: params.metadata,
       });
@@ -210,7 +210,7 @@ const testCollectorExporter = (params: TestParams) =>
           )
           : grpc.credentials.createInsecure();
         collectorExporter = new OTLPTraceExporter({
-          url: 'grpcs://' + address,
+          url: 'https://' + address,
           credentials,
           metadata: params.metadata,
           compression: CompressionAlgorithm.GZIP,
@@ -263,7 +263,7 @@ const testCollectorExporter = (params: TestParams) =>
 
         envSource.OTEL_EXPORTER_OTLP_COMPRESSION='gzip';
         collectorExporter = new OTLPTraceExporter({
-          url: 'grpcs://' + address,
+          url: 'https://' + address,
           credentials,
           metadata: params.metadata,
         });

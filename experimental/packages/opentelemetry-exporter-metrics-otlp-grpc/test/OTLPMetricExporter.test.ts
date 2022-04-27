@@ -125,7 +125,7 @@ const testOTLPMetricExporter = (params: TestParams) =>
         )
         : grpc.credentials.createInsecure();
       collectorExporter = new OTLPMetricExporter({
-        url: 'grpcs://' + address,
+        url: 'https://' + address,
         credentials,
         metadata: params.metadata,
         aggregationTemporality: AggregationTemporality.CUMULATIVE
