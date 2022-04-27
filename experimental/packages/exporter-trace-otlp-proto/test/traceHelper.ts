@@ -241,20 +241,18 @@ export function ensureExportTraceServiceRequestIsSet(
   const resource = resourceSpans?.[0].resource;
   assert.strictEqual(!!resource, true, 'resource is missing');
 
-  const instrumentationLibrarySpans =
-    resourceSpans?.[0].instrumentationLibrarySpans;
+  const instrumentationLibrarySpans = resourceSpans?.[0].scopeSpans;
   assert.strictEqual(
     instrumentationLibrarySpans && instrumentationLibrarySpans.length,
     1,
-    'instrumentationLibrarySpans is missing'
+    'scopeSpans is missing'
   );
 
-  const instrumentationLibrary =
-    instrumentationLibrarySpans?.[0].instrumentationLibrary;
+  const scope = instrumentationLibrarySpans?.[0].scope;
   assert.strictEqual(
-    !!instrumentationLibrary,
+    !!scope,
     true,
-    'instrumentationLibrary is missing'
+    'scope is missing'
   );
 
   const spans = instrumentationLibrarySpans?.[0].spans;

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-/** Properties of an InstrumentationLibrary. */
-export interface IInstrumentationLibrary {
-  /** InstrumentationLibrary name */
+/** Properties of an InstrumentationScope. */
+export interface IInstrumentationScope {
+  /** InstrumentationScope name */
   name: string
 
-  /** InstrumentationLibrary version */
+  /** InstrumentationScope version */
   version?: string;
 }
 

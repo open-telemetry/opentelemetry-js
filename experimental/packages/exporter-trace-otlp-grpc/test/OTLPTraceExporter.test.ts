@@ -178,8 +178,8 @@ const testCollectorExporter = (params: TestParams) =>
           );
           let spans;
           let resource;
-          if (exportedData && exportedData.instrumentationLibrarySpans[0].spans) {
-            spans = exportedData.instrumentationLibrarySpans[0].spans;
+          if (exportedData && exportedData.scopeSpans[0].spans) {
+            spans = exportedData.scopeSpans[0].spans;
 
             resource = exportedData.resource;
             ensureExportedSpanIsCorrect(spans[0]);
@@ -229,8 +229,8 @@ const testCollectorExporter = (params: TestParams) =>
           );
           let spans;
           let resource;
-          if (exportedData && exportedData.instrumentationLibrarySpans[0].spans) {
-            spans = exportedData.instrumentationLibrarySpans[0].spans;
+          if (exportedData && exportedData.scopeSpans[0].spans) {
+            spans = exportedData.scopeSpans[0].spans;
             resource = exportedData.resource;
             ensureExportedSpanIsCorrect(spans[0]);
 

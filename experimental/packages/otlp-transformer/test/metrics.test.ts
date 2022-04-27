@@ -166,9 +166,9 @@ describe('Metrics', () => {
               droppedAttributesCount: 0,
             },
             schemaUrl: undefined,
-            instrumentationLibraryMetrics: [
+            scopeMetrics: [
               {
-                instrumentationLibrary: {
+                scope: {
                   name: 'mylib',
                   version: '0.1.0',
                 },
@@ -228,9 +228,9 @@ describe('Metrics', () => {
               droppedAttributesCount: 0,
             },
             schemaUrl: undefined,
-            instrumentationLibraryMetrics: [
+            scopeMetrics: [
               {
-                instrumentationLibrary: {
+                scope: {
                   name: 'mylib',
                   version: '0.1.0',
                 },
@@ -290,9 +290,9 @@ describe('Metrics', () => {
               droppedAttributesCount: 0,
             },
             schemaUrl: undefined,
-            instrumentationLibraryMetrics: [
+            scopeMetrics: [
               {
-                instrumentationLibrary: {
+                scope: {
                   name: 'mylib',
                   version: '0.1.0',
                 },
@@ -350,9 +350,9 @@ describe('Metrics', () => {
               droppedAttributesCount: 0,
             },
             schemaUrl: undefined,
-            instrumentationLibraryMetrics: [
+            scopeMetrics: [
               {
-                instrumentationLibrary: {
+                scope: {
                   name: 'mylib',
                   version: '0.1.0',
                 },

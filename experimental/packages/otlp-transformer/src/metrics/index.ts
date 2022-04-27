@@ -28,9 +28,9 @@ export function createExportMetricsServiceRequest(resourceMetrics: ResourceMetri
         droppedAttributesCount: 0
       },
       schemaUrl: undefined, // TODO: Schema Url does not exist yet in the SDK.
-      instrumentationLibraryMetrics: Array.from(resourceMetrics.instrumentationLibraryMetrics.map(metrics => {
+      scopeMetrics: Array.from(resourceMetrics.instrumentationLibraryMetrics.map(metrics => {
         return {
-          instrumentationLibrary: {
+          scope: {
             name: metrics.instrumentationLibrary.name,
             version: metrics.instrumentationLibrary.version,
           },

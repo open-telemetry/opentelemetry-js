@@ -213,11 +213,11 @@ const testOTLPMetricExporter = (params: TestParams) =>
           if (exportedData) {
             resource = exportedData[0].resource;
             const counter =
-              exportedData[0].instrumentationLibraryMetrics[0].metrics[0];
+              exportedData[0].scopeMetrics[0].metrics[0];
             const observableGauge =
-              exportedData[0].instrumentationLibraryMetrics[0].metrics[1];
+              exportedData[0].scopeMetrics[0].metrics[1];
             const histogram =
-              exportedData[0].instrumentationLibraryMetrics[0].metrics[2];
+              exportedData[0].scopeMetrics[0].metrics[2];
             ensureExportedCounterIsCorrect(
               counter,
               counter.sum?.dataPoints[0].timeUnixNano,

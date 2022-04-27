@@ -184,6 +184,7 @@ export function ensureExportedHistogramIsCorrect(
           attributes: [],
           exemplars: [],
           flags: 0,
+          _sum: 'sum',
           sum: 21,
           count: '2',
           startTimeUnixNano: String(startTime),

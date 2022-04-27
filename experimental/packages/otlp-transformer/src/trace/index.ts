@@ -27,8 +27,8 @@ export function createExportTraceServiceRequest(spans: ReadableSpan[], useHex?: 
         attributes: toAttributes(resource.attributes),
         droppedAttributesCount: 0,
       },
-      instrumentationLibrarySpans: resourceSpans.map(({ instrumentationLibrary, instrumentationLibrarySpans, librarySchemaUrl }) => ({
-        instrumentationLibrary,
+      scopeSpans: resourceSpans.map(({ instrumentationLibrary, instrumentationLibrarySpans, librarySchemaUrl }) => ({
+        scope: instrumentationLibrary,
         spans: instrumentationLibrarySpans.map(span => sdkSpanToOtlpSpan(span, useHex)),
         schemaUrl: librarySchemaUrl,
       })),

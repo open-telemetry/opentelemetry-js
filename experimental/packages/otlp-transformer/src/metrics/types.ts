@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { IInstrumentationLibrary, IKeyValue } from '../common/types';
+import { IInstrumentationScope, IKeyValue } from '../common/types';
 import { IResource } from '../resource/types';
 
 /** Properties of an ExportMetricsServiceRequest. */
@@ -29,24 +29,24 @@ export interface IResourceMetrics {
   /** ResourceMetrics resource */
   resource?: IResource;
 
-  /** ResourceMetrics instrumentationLibraryMetrics */
-  instrumentationLibraryMetrics: IInstrumentationLibraryMetrics[]
+  /** ResourceMetrics scopeMetrics */
+  scopeMetrics: IScopeMetrics[]
 
   /** ResourceMetrics schemaUrl */
   schemaUrl?: string;
 }
 
 
-/** Properties of an InstrumentationLibraryMetrics. */
-export interface IInstrumentationLibraryMetrics {
+/** Properties of an IScopeMetrics. */
+export interface IScopeMetrics {
 
-  /** InstrumentationLibraryMetrics instrumentationLibrary */
-  instrumentationLibrary?: IInstrumentationLibrary;
+  /** ScopeMetrics scope */
+  scope?: IInstrumentationScope;
 
-  /** InstrumentationLibraryMetrics metrics */
+  /** ScopeMetrics metrics */
   metrics: IMetric[];
 
-  /** InstrumentationLibraryMetrics schemaUrl */
+  /** ScopeMetrics schemaUrl */
   schemaUrl?: string;
 }
 

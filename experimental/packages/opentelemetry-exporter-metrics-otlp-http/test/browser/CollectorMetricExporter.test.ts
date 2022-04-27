@@ -110,11 +110,11 @@ describe('OTLPMetricExporter - web', () => {
             body
           ) as IExportMetricsServiceRequest;
           const metric1 =
-            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
+            json.resourceMetrics[0].scopeMetrics[0].metrics[0];
           const metric2 =
-            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[1];
+            json.resourceMetrics[0].scopeMetrics[0].metrics[1];
           const metric3 =
-            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[2];
+            json.resourceMetrics[0].scopeMetrics[0].metrics[2];
 
           assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
           if (metric1) {
@@ -228,11 +228,11 @@ describe('OTLPMetricExporter - web', () => {
             body
           ) as IExportMetricsServiceRequest;
           const metric1 =
-            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
+            json.resourceMetrics[0].scopeMetrics[0].metrics[0];
           const metric2 =
-            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[1];
+            json.resourceMetrics[0].scopeMetrics[0].metrics[1];
           const metric3 =
-            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[2];
+            json.resourceMetrics[0].scopeMetrics[0].metrics[2];
           assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
           if (metric1) {
             ensureCounterIsCorrect(

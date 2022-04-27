@@ -203,23 +203,23 @@ export function ensureExportMetricsServiceRequestIsSet(
   const resource = resourceMetrics[0].resource;
   assert.strictEqual(!!resource, true, 'resource is missing');
 
-  const instrumentationLibraryMetrics =
-    resourceMetrics[0].instrumentationLibraryMetrics;
+  const scopeMetrics =
+    resourceMetrics[0].scopeMetrics;
   assert.strictEqual(
-    instrumentationLibraryMetrics && instrumentationLibraryMetrics.length,
+    scopeMetrics && scopeMetrics.length,
     1,
-    'instrumentationLibraryMetrics is missing'
+    'scopeMetrics is missing'
   );
 
-  const instrumentationLibrary =
-    instrumentationLibraryMetrics[0].instrumentationLibrary;
+  const scope =
+    scopeMetrics[0].scope;
   assert.strictEqual(
-    !!instrumentationLibrary,
+    !!scope,
     true,
-    'instrumentationLibrary is missing'
+    'scope is missing'
   );
 
-  const metrics = resourceMetrics[0].instrumentationLibraryMetrics[0].metrics;
+  const metrics = resourceMetrics[0].scopeMetrics[0].metrics;
   assert.strictEqual(metrics.length, 3, 'Metrics are missing');
 }
 

@@ -112,7 +112,7 @@ describe('OTLPTraceExporter - web', () => {
               body
             ) as IExportTraceServiceRequest;
             const span1 =
-              json.resourceSpans?.[0].instrumentationLibrarySpans?.[0].spans?.[0];
+              json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
 
             assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
             if (span1) {
@@ -205,7 +205,7 @@ describe('OTLPTraceExporter - web', () => {
             body
           ) as IExportTraceServiceRequest;
           const span1 =
-            json.resourceSpans?.[0].instrumentationLibrarySpans?.[0].spans?.[0];
+            json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
 
           assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
           if (span1) {
