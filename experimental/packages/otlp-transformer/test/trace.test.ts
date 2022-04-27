@@ -14,17 +14,103 @@
  * limitations under the License.
  */
 import { SpanKind, SpanStatusCode } from '@opentelemetry/api';
-import { TraceState } from '@opentelemetry/core';
+import { TraceState, hexToBase64 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import { createExportTraceServiceRequest, ESpanKind, EStatusCode } from '../src';
 
+function createExpectedSpanJson(useHex: boolean){
+  const traceId = useHex? '00000000000000000000000000000001' : hexToBase64('00000000000000000000000000000001');
+  const spanId = useHex? '0000000000000002' : hexToBase64('0000000000000002');
+  const parentSpanId = useHex? '0000000000000001' : hexToBase64('0000000000000001');
+  const linkSpanId = useHex? '0000000000000003' : hexToBase64('0000000000000003');
+  const linkTraceId = useHex? '00000000000000000000000000000002' : hexToBase64('00000000000000000000000000000002');
+
+  return  {
+    resourceSpans: [
+      {
+        resource: {
+          attributes: [
+            {
+              key: 'resource-attribute',
+              value: { stringValue: 'resource attribute value' },
+            },
+          ],
+          droppedAttributesCount: 0,
+        },
+        schemaUrl: undefined,
+        instrumentationLibrarySpans: [
+          {
+            instrumentationLibrary: { name: 'myLib', version: '0.1.0' },
+            spans: [
+              {
+                traceId: traceId,
+                spanId: spanId,
+                parentSpanId: parentSpanId,
+                name: 'span-name',
+                kind: ESpanKind.SPAN_KIND_CLIENT,
+                links: [
+                  {
+                    droppedAttributesCount: 0,
+                    spanId: linkSpanId,
+                    traceId: linkTraceId,
+                    attributes: [
+                      {
+                        key: 'link-attribute',
+                        value: {
+                          stringValue: 'string value'
+                        }
+                      }
+                    ]
+                  }
+                ],
+                // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
+                startTimeUnixNano: 1640715557342725388,
+                // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
+                endTimeUnixNano: 1640715558642725388,
+                events: [
+                  {
+                    droppedAttributesCount: 0,
+                    attributes: [
+                      {
+                        key: 'event-attribute',
+                        value: {
+                          stringValue: 'some string value'
+                        }
+                      }
+                    ],
+                    name: 'some event',
+                    timeUnixNano: 1640715558542725400
+                  }
+                ],
+                attributes: [
+                  {
+                    key: 'string-attribute',
+                    value: { stringValue: 'some attribute value' },
+                  },
+                ],
+                droppedAttributesCount: 0,
+                droppedEventsCount: 0,
+                droppedLinksCount: 0,
+                status: {
+                  code: EStatusCode.STATUS_CODE_OK,
+                  message: undefined,
+                },
+              },
+            ],
+            schemaUrl: 'http://url.to.schema',
+          },
+        ],
+      },
+    ],
+  };
+}
+
 describe('Trace', () => {
   describe('createExportTraceServiceRequest', () => {
     let resource: Resource;
     let span: ReadableSpan;
-    let expectedSpanJson: any;
 
     beforeEach(() => {
       resource = new Resource({
@@ -79,109 +165,36 @@ describe('Trace', () => {
           code: SpanStatusCode.OK,
         },
       };
-
-      expectedSpanJson = {
-        resourceSpans: [
-          {
-            resource: {
-              attributes: [
-                {
-                  key: 'resource-attribute',
-                  value: { stringValue: 'resource attribute value' },
-                },
-              ],
-              droppedAttributesCount: 0,
-            },
-            schemaUrl: undefined,
-            instrumentationLibrarySpans: [
-              {
-                instrumentationLibrary: { name: 'myLib', version: '0.1.0' },
-                spans: [
-                  {
-                    traceId: '00000000000000000000000000000001',
-                    spanId: '0000000000000002',
-                    parentSpanId: '0000000000000001',
-                    name: 'span-name',
-                    kind: ESpanKind.SPAN_KIND_CLIENT,
-                    links: [
-                      {
-                        droppedAttributesCount: 0,
-                        spanId: '0000000000000003',
-                        traceId: '00000000000000000000000000000002',
-                        attributes: [
-                          {
-                            key: 'link-attribute',
-                            value: {
-                              stringValue: 'string value'
-                            }
-                          }
-                        ]
-                      }
-                    ],
-                    // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
-                    startTimeUnixNano: 1640715557342725388,
-                    // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
-                    endTimeUnixNano: 1640715558642725388,
-                    events: [
-                      {
-                        droppedAttributesCount: 0,
-                        attributes: [
-                          {
-                            key: 'event-attribute',
-                            value: {
-                              stringValue: 'some string value'
-                            }
-                          }
-                        ],
-                        name: 'some event',
-                        timeUnixNano: 1640715558542725400
-                      }
-                    ],
-                    attributes: [
-                      {
-                        key: 'string-attribute',
-                        value: { stringValue: 'some attribute value' },
-                      },
-                    ],
-                    droppedAttributesCount: 0,
-                    droppedEventsCount: 0,
-                    droppedLinksCount: 0,
-                    status: {
-                      code: EStatusCode.STATUS_CODE_OK,
-                      message: undefined,
-                    },
-                  },
-                ],
-                schemaUrl: 'http://url.to.schema',
-              },
-            ],
-          },
-        ],
-      };
     });
 
     it('returns null on an empty list', () => {
       assert.deepStrictEqual(createExportTraceServiceRequest([], true), { resourceSpans: [] });
     });
 
-    it('serializes a span', () => {
+    it('serializes a span with useHex = true', () => {
       const exportRequest = createExportTraceServiceRequest([span], true);
       assert.ok(exportRequest);
-      assert.deepStrictEqual(exportRequest, expectedSpanJson);
+      assert.deepStrictEqual(exportRequest, createExpectedSpanJson(true));
     });
 
-    it('serializes a span', () => {
-      const exportRequest = createExportTraceServiceRequest([span], true);
+    it('serializes a span with useHex = false', () => {
+      const exportRequest = createExportTraceServiceRequest([span], false);
       assert.ok(exportRequest);
-      assert.deepStrictEqual(exportRequest, expectedSpanJson);
+      assert.deepStrictEqual(exportRequest, createExpectedSpanJson(false));
     });
 
-    it('serializes a span without a parent', () => {
+    it('serializes a span without a parent with useHex = true', () => {
       (span as any).parentSpanId = undefined;
       const exportRequest = createExportTraceServiceRequest([span], true);
       assert.ok(exportRequest);
       assert.strictEqual(exportRequest.resourceSpans?.[0].instrumentationLibrarySpans[0].spans?.[0].parentSpanId, undefined);
+    });
 
+    it('serializes a span without a parent with useHex = false', () => {
+      (span as any).parentSpanId = undefined;
+      const exportRequest = createExportTraceServiceRequest([span], false);
+      assert.ok(exportRequest);
+      assert.strictEqual(exportRequest.resourceSpans?.[0].instrumentationLibrarySpans[0].spans?.[0].parentSpanId, undefined);
     });
 
     describe('status code', () => {
