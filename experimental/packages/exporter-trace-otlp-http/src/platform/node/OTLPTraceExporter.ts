@@ -55,7 +55,7 @@ export class OTLPTraceExporter
     return typeof config.url === 'string'
       ? config.url
       : getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT.length > 0
-        ? appendRootPathToUrlIfNeeded(getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
+        ? appendRootPathToUrlIfNeeded(getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
         : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
           ? appendResourcePathToUrl(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
           : DEFAULT_COLLECTOR_URL;

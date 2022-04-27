@@ -40,12 +40,14 @@ export function parseHeaders(
  * @param path
  */
 export function appendResourcePathToUrl(url: string, path: string): string {
-  url = appendRootPathToUrlIfNeeded(url);
+  if (!url.endsWith('/')) {
+    url = url + '/';
+  }
   return url + path;
 }
 
-export function appendRootPathToUrlIfNeeded(url: string): string {
-  if (!url.endsWith('/')) {
+export function appendRootPathToUrlIfNeeded(url: string, path: string): string {
+  if (!url.includes(path) && !url.endsWith('/')) {
     url = url + '/';
   }
   return url;
