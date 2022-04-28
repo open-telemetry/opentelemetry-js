@@ -59,7 +59,7 @@ class OTLPExporterNodeProxy extends OTLPExporterNodeBase<ResourceMetrics,
     return typeof config.url === 'string'
       ? config.url
       : getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0
-        ? appendRootPathToUrlIfNeeded(getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT)
+        ? appendRootPathToUrlIfNeeded(getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
         : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
           ? appendResourcePathToUrl(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
           : DEFAULT_COLLECTOR_URL;

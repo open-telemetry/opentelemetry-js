@@ -86,12 +86,39 @@ describe('OTLPTraceExporter - node with proto over http', () => {
       envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
       envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
     });
-    it('should add root path when signal url defined in env contains no path', () => {
+    it('should add root path when signal url defined in env contains no path and no root path', () => {
       envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar';
       const collectorExporter = new OTLPTraceExporter();
       assert.strictEqual(
         collectorExporter.url,
         `${envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}/`
+      );
+      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
+    });
+    it('should not add root path when signal url defined in env contains root path but no path', () => {
+      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar/';
+      const collectorExporter = new OTLPTraceExporter();
+      assert.strictEqual(
+        collectorExporter.url,
+        `${envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}`
+      );
+      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
+    });
+    it('should not root path when signal url defined in env contains path', () => {
+      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar/v1/traces';
+      const collectorExporter = new OTLPTraceExporter();
+      assert.strictEqual(
+        collectorExporter.url,
+        `${envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}`
+      );
+      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
+    });
+    it('should not root path when signal url defined in env contains path and ends in /', () => {
+      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar/v1/traces/';
+      const collectorExporter = new OTLPTraceExporter();
+      assert.strictEqual(
+        collectorExporter.url,
+        `${envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}`
       );
       envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
     });
