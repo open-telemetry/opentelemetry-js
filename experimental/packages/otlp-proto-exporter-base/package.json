@@ -1,13 +1,12 @@
 {
   "name": "@opentelemetry/otlp-proto-exporter-base",
-  "version": "0.27.0",
+  "version": "0.28.0",
   "description": "OpenTelemetry OTLP-HTTP-protobuf Exporter base (for internal use only)",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
     "lint": "eslint . --ext .ts",
@@ -15,8 +14,6 @@
     "postcompile": "npm run submodule && npm run protos:copy",
     "protos:copy": "cpx protos/opentelemetry/**/*.* build/protos/opentelemetry",
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
-    "tdd": "npm run test -- --watch-extensions ts --watch",
-    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "version": "node ../../../scripts/version-update.js",
     "watch": "npm run protos:copy && tsc -w",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
@@ -61,16 +58,16 @@
     "rimraf": "3.0.2",
     "sinon": "12.0.1",
     "ts-loader": "8.3.0",
-    "ts-mocha": "8.0.0",
+    "ts-mocha": "9.0.2",
     "typescript": "4.4.4"
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
-    "@opentelemetry/core": "1.1.1",
+    "@opentelemetry/core": "1.2.0",
     "@grpc/proto-loader": "^0.6.9",
-    "@opentelemetry/otlp-exporter-base": "0.27.0",
+    "@opentelemetry/otlp-exporter-base": "0.28.0",
     "protobufjs": "^6.9.0"
   }
 }
