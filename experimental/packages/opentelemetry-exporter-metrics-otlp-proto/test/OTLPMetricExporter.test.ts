@@ -103,31 +103,31 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
     });
     it('should not add root path when signal url defined in env contains root path but no path', () => {
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar/';
+      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.bar/';
       const collectorExporter = new OTLPMetricExporter();
       assert.strictEqual(
         collectorExporter._otlpExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}`
+        `${envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT}`
       );
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
+      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
     });
     it('should not root path when signal url defined in env contains path', () => {
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar/v1/traces';
+      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.bar/v1/metrics';
       const collectorExporter = new OTLPMetricExporter();
       assert.strictEqual(
         collectorExporter._otlpExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}`
+        `${envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT}`
       );
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
+      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
     });
     it('should not root path when signal url defined in env contains path and ends in /', () => {
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar/v1/traces/';
+      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.bar/v1/metrics/';
       const collectorExporter = new OTLPMetricExporter();
       assert.strictEqual(
         collectorExporter._otlpExporter.url,
-        `${envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}`
+        `${envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT}`
       );
-      envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
+      envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
     });
     it('should use headers defined via env', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
