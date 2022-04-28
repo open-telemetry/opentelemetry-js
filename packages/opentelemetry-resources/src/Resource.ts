@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { diag } from '@opentelemetry/api';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { SDK_INFO } from '@opentelemetry/core';
 import { ResourceAttributes } from './types';
@@ -25,6 +26,10 @@ import { defaultServiceName } from './platform';
  */
 export class Resource {
   static readonly EMPTY = new Resource({});
+  private _attributes: ResourceAttributes;
+  private asyncAttributesPromise: Promise<ResourceAttributes> | undefined;
+
+  private _asyncAttributesHaveResolved: boolean;
 
   /**
    * Returns an empty Resource
@@ -34,7 +39,7 @@ export class Resource {
   }
 
   /**
-   * Returns a Resource that indentifies the SDK in use.
+   *  Returns a Resource that indentifies the SDK in use.
    */
   static default(): Resource {
     return new Resource({
@@ -54,8 +59,50 @@ export class Resource {
      * information about the entity as numbers, strings or booleans
      * TODO: Consider to add check/validation on attributes.
      */
-    readonly attributes: ResourceAttributes
-  ) {}
+    attributes: ResourceAttributes,
+    asyncAttributesPromise?: Promise<ResourceAttributes>,
+  ) {
+    this._attributes = attributes;
+    this._asyncAttributesHaveResolved = asyncAttributesPromise === undefined;
+    this.asyncAttributesPromise = asyncAttributesPromise?.then(
+      asyncAttributes => {
+        this._attributes = Object.assign({}, this._attributes, asyncAttributes);
+        this._asyncAttributesHaveResolved = true;
+        return asyncAttributes;
+      }
+    );
+    this.asyncAttributesPromise?.catch(err => {
+      diag.debug("The resource's async promise rejected: %s", err);
+      this._asyncAttributesHaveResolved = true;
+      return {};
+    });
+  }
+
+  get attributes(): ResourceAttributes {
+    return this._attributes;
+  }
+
+  /**
+   * Check if async attributes have resolved. This is useful to avoid awaiting
+   * waitForAsyncAttributes (which will introduce asynchronous behavior) when not necessary.
+   *
+   * @returns true if no async attributes promise was provided or if the promise has resolved
+   * and been merged together with the sync attributes.
+   */
+  asyncAttributesHaveResolved(): boolean {
+    return this._asyncAttributesHaveResolved;
+  }
+
+  /**
+   * Returns a promise that resolves when all async attributes have finished being added to
+   * this Resource's attributes. This is useful in exporters to block until resource detection
+   * has finished.
+   */
+  async waitForAsyncAttributes(): Promise<void> {
+    if (!this._asyncAttributesHaveResolved) {
+      await this.asyncAttributesPromise;
+    }
+  }
 
   /**
    * Returns a new, merged {@link Resource} by merging the current Resource
@@ -66,7 +113,7 @@ export class Resource {
    * @returns the newly merged Resource.
    */
   merge(other: Resource | null): Resource {
-    if (!other || !Object.keys(other.attributes).length) return this;
+    if (!other) return this;
 
     // SpanAttributes from resource overwrite attributes from other resource.
     const mergedAttributes = Object.assign(
@@ -74,6 +121,22 @@ export class Resource {
       this.attributes,
       other.attributes
     );
-    return new Resource(mergedAttributes);
+
+    let mergedAsyncAttributesPromise: Promise<ResourceAttributes> | undefined;
+    if (this.asyncAttributesPromise && other.asyncAttributesPromise) {
+      mergedAsyncAttributesPromise = Promise.all([
+        this.asyncAttributesPromise.catch(() => ({})),
+        other.asyncAttributesPromise.catch(() => ({})),
+      ]).then(
+        ([thisAttributes, otherAttributes]) => {
+          return Object.assign({}, thisAttributes, otherAttributes);
+        }
+      );
+    } else {
+      mergedAsyncAttributesPromise = this.asyncAttributesPromise ?? other.asyncAttributesPromise;
+    }
+
+
+    return new Resource(mergedAttributes, mergedAsyncAttributesPromise);
   }
 }

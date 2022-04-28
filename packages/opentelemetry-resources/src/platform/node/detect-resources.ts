@@ -20,9 +20,11 @@ import { diag } from '@opentelemetry/api';
 import * as util from 'util';
 
 /**
- * Runs all resource detectors and returns the results merged into a single
- * Resource.
+ * Runs all resource detectors and returns the results merged into a single Resource. Promise
+ * does not resolve until all of the underlying detectors have resolved, unlike
+ * detectResourcesSync.
  *
+ * @deprecated use detectResourceSync() instead.
  * @param config Configuration for resource detection
  */
 export const detectResources = async (
@@ -52,6 +54,57 @@ export const detectResources = async (
   );
 };
 
+/**
+ * Runs all resource detectors synchronously, merging their results. Any asynchronous
+ * attributes will be merged together in-order after they resolve.
+ *
+ * @param config Configuration for resource detection
+ */
+export const detectResourcesSync = (
+  config: ResourceDetectionConfig = {}
+): Resource => {
+  const internalConfig: ResourceDetectionConfig = Object.assign(config);
+
+  const resources: Resource[] = (internalConfig.detectors ?? []).map(d => {
+    try {
+      const resourceOrPromise = d.detect(internalConfig);
+      let resource: Resource;
+      if (resourceOrPromise instanceof Promise) {
+        diag.info('Resource detector %s should return a Resource directly instead of a promise.', d.constructor.name);
+        const createPromise = async () => {
+          const resolved = await resourceOrPromise;
+          await resolved.waitForAsyncAttributes();
+          return resolved.attributes;
+        };
+        resource = new Resource({}, createPromise());
+      } else {
+        resource = resourceOrPromise;
+      }
+
+      resource.waitForAsyncAttributes().then(() => {
+        diag.debug(`${d.constructor.name} found resource.`, resource);
+      }).catch(e => {
+        diag.debug(`${d.constructor.name} failed: ${e.message}`);
+      });
+
+      return resource;
+    } catch (e) {
+      diag.debug(`${d.constructor.name} failed: ${e.message}`);
+      return Resource.empty();
+    }
+  });
+
+
+  const mergedResources = resources.reduce(
+    (acc, resource) => acc.merge(resource),
+    Resource.empty()
+  );
+  void mergedResources.waitForAsyncAttributes().then(() => {
+    // Future check if verbose logging is enabled issue #1903
+    logResources(resources);
+  });
+  return mergedResources;
+};
 
 /**
  * Writes debug information about the detected resources to the logger defined in the resource detection config, if one is provided.

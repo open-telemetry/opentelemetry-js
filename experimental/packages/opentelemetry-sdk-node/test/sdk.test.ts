@@ -70,7 +70,7 @@ describe('Node SDK', () => {
         autoDetectResources: false,
       });
 
-      await sdk.start();
+      sdk.start();
 
       assert.strictEqual(context['_getContextManager'](), ctxManager, 'context manager should not change');
       assert.strictEqual(propagation['_getGlobalPropagator'](), propagator, 'propagator should not change');
@@ -85,7 +85,7 @@ describe('Node SDK', () => {
         autoDetectResources: false,
       });
 
-      await sdk.start();
+      sdk.start();
 
       assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
 
@@ -108,7 +108,7 @@ describe('Node SDK', () => {
         autoDetectResources: false,
       });
 
-      await sdk.start();
+      sdk.start();
 
       assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
 
@@ -135,7 +135,7 @@ describe('Node SDK', () => {
         autoDetectResources: false,
       });
 
-      await sdk.start();
+      sdk.start();
 
       assert.strictEqual(context['_getContextManager'](), ctxManager, 'context manager should not change');
       assert.strictEqual(propagation['_getGlobalPropagator'](), propagator, 'propagator should not change');
@@ -162,7 +162,7 @@ describe('Node SDK', () => {
         const sdk = new NodeSDK({
           autoDetectResources: true,
         });
-        await sdk.detectResources({
+        sdk.detectResources({
           detectors: [ processDetector, {
             detect() {
               throw new Error('Buggy detector');
@@ -171,6 +171,7 @@ describe('Node SDK', () => {
           envDetector ]
         });
         const resource = sdk['_resource'];
+        await resource.waitForAsyncAttributes();
 
         assertServiceResource(resource, {
           instanceId: '627cc493',
@@ -217,7 +218,8 @@ describe('Node SDK', () => {
           DiagLogLevel.VERBOSE
         );
 
-        await sdk.detectResources();
+        sdk.detectResources();
+        await sdk['_resource'].waitForAsyncAttributes().catch(() => {});
 
         // Test that the Env Detector successfully found its resource and populated it with the right values.
         assert.ok(
@@ -249,7 +251,7 @@ describe('Node SDK', () => {
             DiagLogLevel.DEBUG
           );
 
-          await sdk.detectResources();
+          sdk.detectResources();
 
           assert.ok(
             callArgsContains(

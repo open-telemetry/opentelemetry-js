@@ -21,6 +21,7 @@ import { AggregationTemporality } from './AggregationTemporality';
 import { InstrumentType } from '../InstrumentDescriptor';
 import { PushMetricExporter } from './MetricExporter';
 import { callWithTimeout, TimeoutError } from '../utils';
+import { diag } from '@opentelemetry/api';
 
 export type PeriodicExportingMetricReaderOptions = {
   exporter: PushMetricExporter
@@ -71,7 +72,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
     }
 
     return new Promise((resolve, reject) => {
-      this._exporter.export(resourceMetrics, result => {
+      const doExport = () => this._exporter.export(resourceMetrics, result => {
         if (result.code !== ExportResultCode.SUCCESS) {
           reject(
             result.error ??
@@ -83,6 +84,14 @@ export class PeriodicExportingMetricReader extends MetricReader {
           resolve();
         }
       });
+
+      // Avoid scheduling a promise to make the behavior more predictable and easier to test
+      if (resourceMetrics.resource.asyncAttributesHaveResolved()) {
+        doExport();
+      } else {
+        resourceMetrics.resource.waitForAsyncAttributes()
+          .then(doExport, err => diag.debug('Error while resolving async portion of resource: ', err));
+      }
     });
   }
 
