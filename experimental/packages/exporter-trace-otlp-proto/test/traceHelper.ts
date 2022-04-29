@@ -249,11 +249,7 @@ export function ensureExportTraceServiceRequestIsSet(
   );
 
   const scope = scopeSpans?.[0].scope;
-  assert.strictEqual(
-    !!scope,
-    true,
-    'scope is missing'
-  );
+  assert.ok(scope, 'scope is missing');
 
   const spans = scopeSpans?.[0].spans;
   assert.strictEqual(spans && spans.length, 1, 'spans are missing');
