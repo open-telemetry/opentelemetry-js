@@ -59,7 +59,7 @@ export abstract class InstrumentationBase<T = any>
     }
   }
 
-  private _warnOnPreloadedModules(): void {
+  protected _warnOnPreloadedModules(): void {
     this._modules.forEach((module: InstrumentationModuleDefinition<T>) => {
       const { name } = module;
       try {

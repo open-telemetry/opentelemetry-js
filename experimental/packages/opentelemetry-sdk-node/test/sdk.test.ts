@@ -363,11 +363,16 @@ describe('Node SDK', () => {
         // This test depends on the env detector to be functioning as intended
         const mockedLoggerMethod = Sinon.fake();
         const mockedVerboseLoggerMethod = Sinon.fake();
+        const nop = () => {
+        };
         diag.setLogger(
           {
             debug: mockedLoggerMethod,
             verbose: mockedVerboseLoggerMethod,
-          } as any,
+            warn: nop,
+            error: nop,
+            info: nop
+          },
           DiagLogLevel.VERBOSE
         );
 
