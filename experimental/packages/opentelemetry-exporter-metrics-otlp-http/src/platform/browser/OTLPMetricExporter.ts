@@ -53,11 +53,9 @@ class OTLPExporterBrowserProxy extends OTLPExporterBrowserBase<ResourceMetrics,
           : DEFAULT_COLLECTOR_URL;
   }
 
-  convert(
-    metrics: ResourceMetrics[]
-  ): IExportMetricsServiceRequest {
+  convert(metrics: ResourceMetrics[]): IExportMetricsServiceRequest {
     return createExportMetricsServiceRequest(
-      metrics[0],
+      metrics,
       this._aggregationTemporality
     );
   }

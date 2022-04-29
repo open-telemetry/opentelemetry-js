@@ -43,11 +43,9 @@ class OTLPExporterNodeProxy extends OTLPExporterNodeBase<ResourceMetrics,
     this._aggregationTemporality = config.aggregationTemporality ?? defaultExporterTemporality;
   }
 
-  convert(
-    metrics: ResourceMetrics[]
-  ): IExportMetricsServiceRequest {
+  convert(metrics: ResourceMetrics[]): IExportMetricsServiceRequest {
     return createExportMetricsServiceRequest(
-      metrics[0],
+      metrics,
       this._aggregationTemporality
     );
   }

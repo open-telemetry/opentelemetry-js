@@ -46,7 +46,7 @@ class OTLPMetricExporterNodeProxy extends OTLPProtoExporterNodeBase<ResourceMetr
 
   convert(metrics: ResourceMetrics[]): IExportMetricsServiceRequest {
     return createExportMetricsServiceRequest(
-      metrics[0],
+      metrics,
       this._aggregationTemporality
     );
   }
