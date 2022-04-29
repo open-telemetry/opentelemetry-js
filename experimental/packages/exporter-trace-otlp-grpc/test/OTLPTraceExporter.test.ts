@@ -349,5 +349,3 @@ describe('', () => {
   testCollectorExporter({ useTLS: false });
   testCollectorExporter({ metadata });
 });
-
-

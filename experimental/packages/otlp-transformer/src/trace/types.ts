@@ -31,22 +31,22 @@ export interface IResourceSpans {
   resource?: IResource;
 
   /** ResourceSpans scopeSpans */
-  scopeSpans: IInstrumentationLibrarySpans[];
+  scopeSpans: IScopeSpans[];
 
   /** ResourceSpans schemaUrl */
   schemaUrl?: string;
 }
 
-/** Properties of an InstrumentationLibrarySpans. */
-export interface IInstrumentationLibrarySpans {
+/** Properties of an ScopeSpans. */
+export interface IScopeSpans {
 
-  /** InstrumentationLibrarySpans scope */
+  /** IScopeSpans scope */
   scope?: IInstrumentationScope;
 
-  /** InstrumentationLibrarySpans spans */
+  /** IScopeSpans spans */
   spans?: ISpan[]
 
-  /** InstrumentationLibrarySpans schemaUrl */
+  /** IScopeSpans schemaUrl */
   schemaUrl?: (string | null);
 }
 

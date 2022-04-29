@@ -40,8 +40,8 @@ class OTLPMetricExporterProxy extends OTLPGRPCExporterNodeBase<ResourceMetrics,
 
   constructor(config: OTLPGRPCExporterConfigNode & OTLPMetricExporterOptions= defaultOptions) {
     super(config);
-    this.metadata ||= new Metadata();
     const headers = baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS);
+    this.metadata ||= new Metadata();
     for (const [k, v] of Object.entries(headers)) {
       this.metadata.set(k, v);
     }
