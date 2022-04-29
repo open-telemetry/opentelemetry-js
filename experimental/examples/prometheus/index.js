@@ -29,10 +29,10 @@ const upDownCounter = meter.createUpDownCounter('test_up_down_counter', {
   description: 'Example of a UpDownCounter',
 });
 
-const labels = { pid: process.pid, environment: 'staging' };
+const attributes = { pid: process.pid, environment: 'staging' };
 
 // Record metrics
 setInterval(() => {
-  requestCounter.add(1, labels);
-  upDownCounter.add(Math.random() > 0.5 ? 1 : -1, labels);
+  requestCounter.add(1, attributes);
+  upDownCounter.add(Math.random() > 0.5 ? 1 : -1, attributes);
 }, 1000);
