@@ -28,6 +28,7 @@ All notable changes to this project will be documented in this file.
 * fix: sanitize attributes inputs [#2881](https://github.com/open-telemetry/opentelemetry-js/pull/2881) @legendecas
 * fix: support earlier API versions [#2892](https://github.com/open-telemetry/opentelemetry-js/pull/2892) @dyladan
 * fix: support extract one digit '0' in jaeger traceFlag [#2905](https://github.com/open-telemetry/opentelemetry-js/issues/2905) @shmilyoo
+* fix(resources): extend ResourceAttributes interface to comply with spec [#2924](https://github.com/open-telemetry/opentelemetry-js/pull/2924) @blumamir
 
 ### :books: (Refine Doc)
 
