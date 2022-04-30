@@ -683,7 +683,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   private _callStartSpanHook(
     request: http.IncomingMessage | http.RequestOptions,
     hookFunc: Function | undefined,
-    ) {
+  ) {
     if(typeof hookFunc === 'function'){
       return safeExecuteInTheMiddle(
         () => hookFunc(request),

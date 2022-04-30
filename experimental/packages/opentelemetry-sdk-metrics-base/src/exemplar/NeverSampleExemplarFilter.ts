@@ -26,6 +26,6 @@ export class NeverSampleExemplarFilter implements ExemplarFilter {
     _attributes: MetricAttributes,
     _ctx: Context
   ): boolean {
-      return false;
+    return false;
   }
 }

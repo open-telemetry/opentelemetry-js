@@ -61,7 +61,7 @@
     "rimraf": "3.0.2",
     "sinon": "12.0.1",
     "ts-loader": "8.3.0",
-    "ts-mocha": "8.0.0",
+    "ts-mocha": "9.0.2",
     "typescript": "4.4.4",
     "@opentelemetry/sdk-trace-base": "1.2.0",
     "@opentelemetry/resources": "1.2.0",
