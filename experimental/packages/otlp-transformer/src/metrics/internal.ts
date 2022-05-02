@@ -19,9 +19,11 @@ import {
   AggregationTemporality,
   DataPoint,
   DataPointType,
-  Histogram, InstrumentationLibraryMetrics,
+  Histogram,
+  InstrumentationLibraryMetrics,
   InstrumentType,
-  MetricData, ResourceMetrics
+  MetricData,
+  ResourceMetrics
 } from '@opentelemetry/sdk-metrics-base';
 import { toAttributes } from '../common/internal';
 import {

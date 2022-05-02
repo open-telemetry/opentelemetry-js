@@ -66,21 +66,6 @@ export interface IInstrumentationLibrarySpans {
   schemaUrl?: (string | null);
 }
 
-
-/** Properties of an InstrumentationLibrarySpans. */
-export interface IInstrumentationLibrarySpans {
-
-  /** IInstrumentationLibrarySpans InstrumentationLibrary */
-  instrumentationLibrary?: IInstrumentationScope;
-
-  /** IInstrumentationLibrarySpans spans */
-  spans?: ISpan[]
-
-  /** IInstrumentationLibrarySpans schemaUrl */
-  schemaUrl?: (string | null);
-}
-
-
 /** Properties of a Span. */
 export interface ISpan {
   /** Span traceId */
