@@ -15,6 +15,7 @@
  */
 import { IInstrumentationScope, IKeyValue } from '../common/types';
 import { IResource } from '../resource/types';
+import { InstrumentationLibrary } from '@opentelemetry/core';
 
 /** Properties of an ExportMetricsServiceRequest. */
 export interface IExportMetricsServiceRequest {
@@ -32,6 +33,9 @@ export interface IResourceMetrics {
   /** ResourceMetrics scopeMetrics */
   scopeMetrics: IScopeMetrics[]
 
+  /** ResourceMetrics instrumentationLibraryMetrics */
+  instrumentationLibraryMetrics?: IInstrumentationLibraryMetrics[]
+
   /** ResourceMetrics schemaUrl */
   schemaUrl?: string;
 }
@@ -39,7 +43,6 @@ export interface IResourceMetrics {
 
 /** Properties of an IScopeMetrics. */
 export interface IScopeMetrics {
-
   /** ScopeMetrics scope */
   scope?: IInstrumentationScope;
 
@@ -47,6 +50,20 @@ export interface IScopeMetrics {
   metrics: IMetric[];
 
   /** ScopeMetrics schemaUrl */
+  schemaUrl?: string;
+}
+
+/** Properties of an IInstrumentationLibraryMetrics. */
+export interface IInstrumentationLibraryMetrics {
+  /**
+   * InstrumentationLibraryMetrics instrumentationLibrary
+   */
+  instrumentationLibrary?: InstrumentationLibrary
+
+  /** InstrumentationLibraryMetrics metrics */
+  metrics: IMetric[];
+
+  /** InstrumentationLibraryMetrics schemaUrl */
   schemaUrl?: string;
 }
 

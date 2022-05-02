@@ -19,31 +19,68 @@ import {
   AggregationTemporality,
   DataPoint,
   DataPointType,
-  Histogram,
+  Histogram, InstrumentationLibraryMetrics,
   InstrumentType,
   MetricData, ResourceMetrics
 } from '@opentelemetry/sdk-metrics-base';
 import { toAttributes } from '../common/internal';
-import { EAggregationTemporality, IHistogramDataPoint, IMetric, INumberDataPoint, IResourceMetrics } from './types';
+import {
+  EAggregationTemporality,
+  IHistogramDataPoint, IInstrumentationLibraryMetrics,
+  IMetric,
+  INumberDataPoint,
+  IResourceMetrics,
+  IScopeMetrics
+} from './types';
 
-export function toResourceMetrics(resourceMetrics: ResourceMetrics, aggregationTemporality: AggregationTemporality): IResourceMetrics {
-  return {
+export function toResourceMetrics(resourceMetrics: ResourceMetrics,
+  aggregationTemporality: AggregationTemporality,
+  json?: boolean): IResourceMetrics {
+  const transformedMetrics: IResourceMetrics = {
     resource: {
       attributes: toAttributes(resourceMetrics.resource.attributes),
       droppedAttributesCount: 0
     },
     schemaUrl: undefined, // TODO: Schema Url does not exist yet in the SDK.
-    scopeMetrics: Array.from(resourceMetrics.instrumentationLibraryMetrics.map(metrics => {
-      return {
-        scope: {
-          name: metrics.instrumentationLibrary.name,
-          version: metrics.instrumentationLibrary.version,
-        },
-        metrics: metrics.metrics.map(metricData => toMetric(metricData, aggregationTemporality)),
-        schemaUrl: metrics.instrumentationLibrary.schemaUrl
-      };
-    }))
+    scopeMetrics: toScopeMetrics(resourceMetrics.instrumentationLibraryMetrics, aggregationTemporality)
   };
+
+  if (json) {
+    transformedMetrics.instrumentationLibraryMetrics =
+      toInstrumentationLibraryMetrics(resourceMetrics.instrumentationLibraryMetrics, aggregationTemporality);
+  }
+
+  return transformedMetrics;
+}
+
+export function toScopeMetrics(instrumentationLibraryMetrics: InstrumentationLibraryMetrics[],
+  aggregationTemporality: AggregationTemporality): IScopeMetrics[]{
+  return Array.from(instrumentationLibraryMetrics.map(metrics => {
+    const scopeMetrics : IScopeMetrics = {
+      scope: {
+        name: metrics.instrumentationLibrary.name,
+        version: metrics.instrumentationLibrary.version,
+      },
+      metrics: metrics.metrics.map(metricData => toMetric(metricData, aggregationTemporality)),
+      schemaUrl: metrics.instrumentationLibrary.schemaUrl
+    };
+    return scopeMetrics;
+  }));
+}
+
+export function toInstrumentationLibraryMetrics(instrumentationLibraryMetrics: InstrumentationLibraryMetrics[],
+  aggregationTemporality: AggregationTemporality): IInstrumentationLibraryMetrics[]{
+  return Array.from(instrumentationLibraryMetrics.map(metrics => {
+    const resultMetrics : IInstrumentationLibraryMetrics = {
+      instrumentationLibrary: {
+        name: metrics.instrumentationLibrary.name,
+        version: metrics.instrumentationLibrary.version,
+      },
+      metrics: metrics.metrics.map(metricData => toMetric(metricData, aggregationTemporality)),
+      schemaUrl: metrics.instrumentationLibrary.schemaUrl
+    };
+    return resultMetrics;
+  }));
 }
 
 export function toMetric(metricData: MetricData, metricTemporality: AggregationTemporality): IMetric {
