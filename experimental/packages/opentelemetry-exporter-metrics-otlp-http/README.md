@@ -6,7 +6,6 @@
 This module provides exporter for web and node to be used with [opentelemetry-collector][opentelemetry-collector-url].
 Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.48 <=0.50`.
 
-
 ## Installation
 
 ```bash
