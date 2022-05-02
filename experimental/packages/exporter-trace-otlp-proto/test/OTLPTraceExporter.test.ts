@@ -104,7 +104,7 @@ describe('OTLPTraceExporter - node with proto over http', () => {
       );
       envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
     });
-    it('should not root path when signal url defined in env contains path', () => {
+    it('should not add root path when signal url defined in env contains path', () => {
       envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar/v1/traces';
       const collectorExporter = new OTLPTraceExporter();
       assert.strictEqual(
@@ -113,7 +113,7 @@ describe('OTLPTraceExporter - node with proto over http', () => {
       );
       envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = '';
     });
-    it('should not root path when signal url defined in env contains path and ends in /', () => {
+    it('should not add root path when signal url defined in env contains path and ends in /', () => {
       envSource.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = 'http://foo.bar/v1/traces/';
       const collectorExporter = new OTLPTraceExporter();
       assert.strictEqual(

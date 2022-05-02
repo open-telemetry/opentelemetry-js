@@ -17,7 +17,11 @@
 import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { otlpTypes, toOTLPExportTraceServiceRequest } from '@opentelemetry/exporter-trace-otlp-http';
 import { getEnv, baggageUtils } from '@opentelemetry/core';
-import { OTLPExporterNodeConfigBase, appendResourcePathToUrl, appendRootPathToUrlIfNeeded } from '@opentelemetry/otlp-exporter-base';
+import {
+  OTLPExporterNodeConfigBase,
+  appendResourcePathToUrl,
+  appendRootPathToUrlIfNeeded
+} from '@opentelemetry/otlp-exporter-base';
 import { OTLPProtoExporterNodeBase, ServiceClientType } from '@opentelemetry/otlp-proto-exporter-base';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/traces';
