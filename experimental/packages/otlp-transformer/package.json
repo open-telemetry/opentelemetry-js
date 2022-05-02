@@ -2,7 +2,7 @@
   "name": "@opentelemetry/otlp-transformer",
   "private": false,
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   },
   "version": "0.28.0",
   "description": "Transform OpenTelemetry SDK data into OTLP",
