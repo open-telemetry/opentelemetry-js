@@ -398,27 +398,19 @@ export function ensureExportTraceServiceRequestIsSet(
   json: IExportTraceServiceRequest
 ) {
   const resourceSpans = json.resourceSpans;
-  assert.strictEqual(
-    resourceSpans && resourceSpans.length,
-    1,
-    'resourceSpans is missing'
-  );
+  assert.strictEqual(resourceSpans?.length, 1, 'resourceSpans is missing');
 
   const resource = resourceSpans?.[0].resource;
-  assert.strictEqual(!!resource, true, 'resource is missing');
+  assert.ok(resource, 'resource is missing');
 
   const scopeSpans = resourceSpans?.[0].scopeSpans;
-  assert.strictEqual(
-    scopeSpans && scopeSpans.length,
-    1,
-    'scopeSpans is missing'
-  );
+  assert.strictEqual(scopeSpans?.length, 1, 'scopeSpans is missing');
 
   const scope = scopeSpans?.[0].scope;
   assert.ok(scope, 'scope is missing');
 
   const spans = scopeSpans?.[0].spans;
-  assert.strictEqual(spans && spans.length, 1, 'spans are missing');
+  assert.strictEqual(spans?.length, 1, 'spans are missing');
 }
 
 export function ensureHeadersContain(

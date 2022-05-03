@@ -378,14 +378,10 @@ export function ensureExportMetricsServiceRequestIsSet(
   );
 
   const resource = resourceMetrics[0].resource;
-  assert.strictEqual(!!resource, true, 'resource is missing');
+  assert.ok(resource, 'resource is missing');
 
   const scopeMetrics = resourceMetrics[0].scopeMetrics;
-  assert.strictEqual(
-    scopeMetrics && scopeMetrics.length,
-    1,
-    'scopeMetrics is missing'
-  );
+  assert.strictEqual(scopeMetrics?.length, 1, 'scopeMetrics is missing');
 
   const scope = scopeMetrics[0].scope;
   assert.ok(scope, 'scope is missing');
