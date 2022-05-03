@@ -33,9 +33,6 @@ export interface IResourceSpans {
   /** ResourceSpans scopeSpans */
   scopeSpans: IScopeSpans[];
 
-  /** ResourceSpans instrumentationLibrarySpans */
-  instrumentationLibrarySpans?: IScopeSpans[];
-
   /** ResourceSpans schemaUrl */
   schemaUrl?: string;
 }
@@ -50,19 +47,6 @@ export interface IScopeSpans {
   spans?: ISpan[]
 
   /** IScopeSpans schemaUrl */
-  schemaUrl?: (string | null);
-}
-
-/** Properties of an InstrumentationLibrarySpans. */
-export interface IInstrumentationLibrarySpans {
-
-  /** InstrumentationLibrarySpans scope */
-  instrumentationLibrary?: IInstrumentationScope;
-
-  /** InstrumentationLibrarySpans spans */
-  spans?: ISpan[]
-
-  /** InstrumentationLibrarySpans schemaUrl */
   schemaUrl?: (string | null);
 }
 

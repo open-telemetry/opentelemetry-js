@@ -19,9 +19,8 @@ import { AggregationTemporality } from '@opentelemetry/sdk-metrics-base';
 import { toResourceMetrics } from './internal';
 
 export function createExportMetricsServiceRequest(resourceMetrics: ResourceMetrics[],
-  aggregationTemporality: AggregationTemporality,
-  json?: boolean): IExportMetricsServiceRequest {
+  aggregationTemporality: AggregationTemporality): IExportMetricsServiceRequest {
   return {
-    resourceMetrics: resourceMetrics.map(metrics => toResourceMetrics(metrics, aggregationTemporality, json))
+    resourceMetrics: resourceMetrics.map(metrics => toResourceMetrics(metrics, aggregationTemporality))
   };
 }

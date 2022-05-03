@@ -17,11 +17,11 @@ import type { Resource } from '@opentelemetry/resources';
 import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { toAttributes } from '../common/internal';
 import { sdkSpanToOtlpSpan } from './internal';
-import { IExportTraceServiceRequest, IInstrumentationLibrarySpans, IResourceSpans, IScopeSpans } from './types';
+import { IExportTraceServiceRequest, IResourceSpans, IScopeSpans } from './types';
 
-export function createExportTraceServiceRequest(spans: ReadableSpan[], useHex?: boolean, json?: boolean): IExportTraceServiceRequest {
+export function createExportTraceServiceRequest(spans: ReadableSpan[], useHex?: boolean): IExportTraceServiceRequest {
   return {
-    resourceSpans: spanRecordsToResourceSpans(spans, useHex, json)
+    resourceSpans: spanRecordsToResourceSpans(spans, useHex)
   };
 }
 
@@ -50,7 +50,7 @@ function createResourceMap(readableSpans: ReadableSpan[]) {
   return resourceMap;
 }
 
-function spanRecordsToResourceSpans(readableSpans: ReadableSpan[], useHex?: boolean, json?: boolean): IResourceSpans[] {
+function spanRecordsToResourceSpans(readableSpans: ReadableSpan[], useHex?: boolean): IResourceSpans[] {
   const resourceMap = createResourceMap(readableSpans);
   const out: IResourceSpans[] = [];
 
@@ -59,7 +59,6 @@ function spanRecordsToResourceSpans(readableSpans: ReadableSpan[], useHex?: bool
   while (!entry.done) {
     const [resource, ilmMap] = entry.value;
     const scopeResourceSpans: IScopeSpans[] = [];
-    const instrumentationLibraryResourceSpans: IInstrumentationLibrarySpans[] = [];
     const ilmIterator = ilmMap.values();
     let ilmEntry = ilmIterator.next();
     while (!ilmEntry.done) {
@@ -73,14 +72,6 @@ function spanRecordsToResourceSpans(readableSpans: ReadableSpan[], useHex?: bool
           spans: spans,
           schemaUrl: schemaUrl
         });
-
-        if (json) {
-          instrumentationLibraryResourceSpans.push({
-            instrumentationLibrary: { name, version },
-            spans: spans,
-            schemaUrl: schemaUrl
-          });
-        }
       }
       ilmEntry = ilmIterator.next();
     }
@@ -93,10 +84,6 @@ function spanRecordsToResourceSpans(readableSpans: ReadableSpan[], useHex?: bool
       scopeSpans: scopeResourceSpans,
       schemaUrl: undefined
     };
-
-    if (json) {
-      transformedSpans.instrumentationLibrarySpans = instrumentationLibraryResourceSpans;
-    }
 
     out.push(transformedSpans);
     entry = entryIterator.next();

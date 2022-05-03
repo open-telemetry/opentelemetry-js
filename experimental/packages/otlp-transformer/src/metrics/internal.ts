@@ -28,7 +28,7 @@ import {
 import { toAttributes } from '../common/internal';
 import {
   EAggregationTemporality,
-  IHistogramDataPoint, IInstrumentationLibraryMetrics,
+  IHistogramDataPoint,
   IMetric,
   INumberDataPoint,
   IResourceMetrics,
@@ -36,9 +36,8 @@ import {
 } from './types';
 
 export function toResourceMetrics(resourceMetrics: ResourceMetrics,
-  aggregationTemporality: AggregationTemporality,
-  json?: boolean): IResourceMetrics {
-  const transformedMetrics: IResourceMetrics = {
+  aggregationTemporality: AggregationTemporality): IResourceMetrics {
+  return {
     resource: {
       attributes: toAttributes(resourceMetrics.resource.attributes),
       droppedAttributesCount: 0
@@ -46,13 +45,6 @@ export function toResourceMetrics(resourceMetrics: ResourceMetrics,
     schemaUrl: undefined, // TODO: Schema Url does not exist yet in the SDK.
     scopeMetrics: toScopeMetrics(resourceMetrics.instrumentationLibraryMetrics, aggregationTemporality)
   };
-
-  if (json) {
-    transformedMetrics.instrumentationLibraryMetrics =
-      toInstrumentationLibraryMetrics(resourceMetrics.instrumentationLibraryMetrics, aggregationTemporality);
-  }
-
-  return transformedMetrics;
 }
 
 export function toScopeMetrics(instrumentationLibraryMetrics: InstrumentationLibraryMetrics[],
@@ -67,21 +59,6 @@ export function toScopeMetrics(instrumentationLibraryMetrics: InstrumentationLib
       schemaUrl: metrics.instrumentationLibrary.schemaUrl
     };
     return scopeMetrics;
-  }));
-}
-
-export function toInstrumentationLibraryMetrics(instrumentationLibraryMetrics: InstrumentationLibraryMetrics[],
-  aggregationTemporality: AggregationTemporality): IInstrumentationLibraryMetrics[]{
-  return Array.from(instrumentationLibraryMetrics.map(metrics => {
-    const resultMetrics : IInstrumentationLibraryMetrics = {
-      instrumentationLibrary: {
-        name: metrics.instrumentationLibrary.name,
-        version: metrics.instrumentationLibrary.version,
-      },
-      metrics: metrics.metrics.map(metricData => toMetric(metricData, aggregationTemporality)),
-      schemaUrl: metrics.instrumentationLibrary.schemaUrl
-    };
-    return resultMetrics;
   }));
 }
 

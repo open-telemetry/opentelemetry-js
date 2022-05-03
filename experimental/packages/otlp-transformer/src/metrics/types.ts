@@ -15,7 +15,6 @@
  */
 import { IInstrumentationScope, IKeyValue } from '../common/types';
 import { IResource } from '../resource/types';
-import { InstrumentationLibrary } from '@opentelemetry/core';
 
 /** Properties of an ExportMetricsServiceRequest. */
 export interface IExportMetricsServiceRequest {
@@ -24,25 +23,22 @@ export interface IExportMetricsServiceRequest {
   resourceMetrics: IResourceMetrics[]
 }
 
-
 /** Properties of a ResourceMetrics. */
 export interface IResourceMetrics {
+
   /** ResourceMetrics resource */
   resource?: IResource;
 
   /** ResourceMetrics scopeMetrics */
   scopeMetrics: IScopeMetrics[]
 
-  /** ResourceMetrics instrumentationLibraryMetrics */
-  instrumentationLibraryMetrics?: IInstrumentationLibraryMetrics[]
-
   /** ResourceMetrics schemaUrl */
   schemaUrl?: string;
 }
 
-
 /** Properties of an IScopeMetrics. */
 export interface IScopeMetrics {
+
   /** ScopeMetrics scope */
   scope?: IInstrumentationScope;
 
@@ -50,20 +46,6 @@ export interface IScopeMetrics {
   metrics: IMetric[];
 
   /** ScopeMetrics schemaUrl */
-  schemaUrl?: string;
-}
-
-/** Properties of an IInstrumentationLibraryMetrics. */
-export interface IInstrumentationLibraryMetrics {
-  /**
-   * InstrumentationLibraryMetrics instrumentationLibrary
-   */
-  instrumentationLibrary?: InstrumentationLibrary
-
-  /** InstrumentationLibraryMetrics metrics */
-  metrics: IMetric[];
-
-  /** InstrumentationLibraryMetrics schemaUrl */
   schemaUrl?: string;
 }
 
@@ -299,8 +281,7 @@ export interface IExemplar {
  * AggregationTemporality defines how a metric aggregator reports aggregated
  * values. It describes how those values relate to the time interval over
  * which they are aggregated.
- */
-export const enum EAggregationTemporality {
+ */export const enum EAggregationTemporality {
   /* UNSPECIFIED is the default AggregationTemporality, it MUST not be used. */
   AGGREGATION_TEMPORALITY_UNSPECIFIED = 0,
 

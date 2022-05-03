@@ -44,7 +44,7 @@ export class OTLPTraceExporter
   }
 
   convert(spans: ReadableSpan[]): IExportTraceServiceRequest {
-    return createExportTraceServiceRequest(spans, true, true);
+    return createExportTraceServiceRequest(spans, true);
   }
 
   getDefaultUrl(config: OTLPExporterNodeConfigBase): string {
