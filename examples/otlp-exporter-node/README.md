@@ -1,8 +1,8 @@
 # Overview
 
 This example shows how to use
-[@opentelemetry/exporter-trace-otlp-http](https://github.com/open-telemetry/opentelemetry-js/tree/v0.26.0/experimental/packages/opentelemetry-exporter-trace-otlp-http)
-and [@opentelemetry/exporter-metrics-otlp-http](https://github.com/open-telemetry/opentelemetry-js/tree/v0.26.0/experimental/packages/opentelemetry-exporter-metrics-otlp-http)
+[@opentelemetry/exporter-trace-otlp-http](https://github.com/open-telemetry/opentelemetry-js/tree/v0.28.0/experimental/packages/exporter-trace-otlp-http)
+and [@opentelemetry/exporter-metrics-otlp-http](https://github.com/open-telemetry/opentelemetry-js/tree/v0.28.0/experimental/packages/opentelemetry-exporter-metrics-otlp-http)
 to instrument a simple Node.js application.
 
 ## Installation
