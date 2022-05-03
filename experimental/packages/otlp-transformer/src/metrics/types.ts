@@ -281,7 +281,8 @@ export interface IExemplar {
  * AggregationTemporality defines how a metric aggregator reports aggregated
  * values. It describes how those values relate to the time interval over
  * which they are aggregated.
- */export const enum EAggregationTemporality {
+ */
+export const enum EAggregationTemporality {
   /* UNSPECIFIED is the default AggregationTemporality, it MUST not be used. */
   AGGREGATION_TEMPORALITY_UNSPECIFIED = 0,
 

@@ -186,17 +186,15 @@ const testCollectorExporter = (params: TestParams) =>
               typeof spans !== 'undefined',
               'spans do not exist'
             );
-            if(spans) {
-              ensureExportedSpanIsCorrect(spans[0]);
-            }
+
+            ensureExportedSpanIsCorrect(spans[0]);
 
             assert.ok(
               typeof resource !== 'undefined',
               "resource doesn't exist"
             );
-            if (resource) {
-              ensureResourceIsCorrect(resource);
-            }
+
+            ensureResourceIsCorrect(resource);
           }
           if (params.metadata && reqMetadata) {
             ensureMetadataIsCorrect(reqMetadata, params.metadata);
@@ -344,8 +342,6 @@ describe('when configuring via environment', () => {
   });
 });
 
-describe('', () => {
-  testCollectorExporter({ useTLS: true });
-  testCollectorExporter({ useTLS: false });
-  testCollectorExporter({ metadata });
-});
+testCollectorExporter({ useTLS: true });
+testCollectorExporter({ useTLS: false });
+testCollectorExporter({ metadata });

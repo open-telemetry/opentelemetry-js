@@ -121,9 +121,7 @@ describe('OTLPTraceExporter - web', () => {
 
             const resource = json.resourceSpans?.[0].resource;
             assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
-            if (resource) {
-              ensureWebResourceIsCorrect(resource);
-            }
+            ensureWebResourceIsCorrect(resource);
 
             assert.strictEqual(url, 'http://foo.bar.com');
             assert.strictEqual(stubBeacon.callCount, 1);

@@ -239,9 +239,7 @@ const testOTLPMetricExporter = (params: TestParams) =>
               typeof resource !== 'undefined',
               "resource doesn't exist"
             );
-            if (resource) {
-              ensureResourceIsCorrect(resource);
-            }
+            ensureResourceIsCorrect(resource);
           }
           if (params.metadata && reqMetadata) {
             ensureMetadataIsCorrect(reqMetadata, params.metadata);
@@ -319,11 +317,6 @@ describe('when configuring via environment', () => {
   });
 });
 
-describe('', () => {
-  testOTLPMetricExporter({ useTLS: true });
-  testOTLPMetricExporter({ useTLS: false });
-  testOTLPMetricExporter({ metadata });
-});
-
-
-
+testOTLPMetricExporter({ useTLS: true });
+testOTLPMetricExporter({ useTLS: false });
+testOTLPMetricExporter({ metadata });

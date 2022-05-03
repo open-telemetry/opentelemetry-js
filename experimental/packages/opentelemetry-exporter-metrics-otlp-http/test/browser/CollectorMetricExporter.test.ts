@@ -150,13 +150,11 @@ describe('OTLPMetricExporter - web', () => {
 
           const resource = json.resourceMetrics[0].resource;
           assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
-          if (resource) {
-            ensureWebResourceIsCorrect(resource);
-          }
+          ensureWebResourceIsCorrect(resource);
 
           assert.strictEqual(url, 'http://foo.bar.com');
-          assert.strictEqual(stubBeacon.callCount, 1);
 
+          assert.strictEqual(stubBeacon.callCount, 1);
           assert.strictEqual(stubOpen.callCount, 0);
 
           ensureExportMetricsServiceRequestIsSet(json);
@@ -261,9 +259,7 @@ describe('OTLPMetricExporter - web', () => {
 
           const resource = json.resourceMetrics[0].resource;
           assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
-          if (resource) {
-            ensureWebResourceIsCorrect(resource);
-          }
+          ensureWebResourceIsCorrect(resource);
 
           assert.strictEqual(stubBeacon.callCount, 0);
           ensureExportMetricsServiceRequestIsSet(json);
