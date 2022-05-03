@@ -264,7 +264,8 @@ export const getRequestInfo = (
       pathname = url.parse(optionsParsed.path).pathname || '/';
     }
     origin = `${optionsParsed.protocol || 'http:'}//${
-      optionsParsed.host || `${optionsParsed.hostname}:${optionsParsed.port}`
+      optionsParsed.host ||
+      `${optionsParsed.hostname}${optionsParsed.port ? `:${optionsParsed.port}` : ''}`
     }`;
   }
 

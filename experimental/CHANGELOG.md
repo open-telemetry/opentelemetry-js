@@ -9,6 +9,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
+* fix(opentelemetry-instrumentation-http): handle null ports in options #2948 @danielgblanco
 
 ### :books: (Refine Doc)
 

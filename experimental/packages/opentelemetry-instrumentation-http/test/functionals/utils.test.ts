@@ -72,11 +72,23 @@ describe('Utility', () => {
         ...urlParsed,
         pathname: undefined,
       };
+      const urlParsedWithUndefinedHostAndPort = {
+        ...urlParsed,
+        host: undefined,
+        port: undefined,
+      };
+      const urlParsedWithUndefinedHostAndNullPort = {
+        ...urlParsed,
+        host: undefined,
+        port: null,
+      };
       const whatWgUrl = new url.URL(webUrl);
       for (const param of [
         webUrl,
         urlParsed,
         urlParsedWithoutPathname,
+        urlParsedWithUndefinedHostAndPort,
+        urlParsedWithUndefinedHostAndNullPort,
         whatWgUrl,
       ]) {
         const result = utils.getRequestInfo(param);
