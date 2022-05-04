@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { IInstrumentationLibrary, IKeyValue } from '../common/types';
+import { IInstrumentationScope, IKeyValue } from '../common/types';
 import { IResource } from '../resource/types';
 
 /** Properties of an ExportTraceServiceRequest. */
@@ -30,26 +30,25 @@ export interface IResourceSpans {
   /** ResourceSpans resource */
   resource?: IResource;
 
-  /** ResourceSpans instrumentationLibrarySpans */
-  instrumentationLibrarySpans: IInstrumentationLibrarySpans[];
+  /** ResourceSpans scopeSpans */
+  scopeSpans: IScopeSpans[];
 
   /** ResourceSpans schemaUrl */
   schemaUrl?: string;
 }
 
-/** Properties of an InstrumentationLibrarySpans. */
-export interface IInstrumentationLibrarySpans {
+/** Properties of an ScopeSpans. */
+export interface IScopeSpans {
 
-  /** InstrumentationLibrarySpans instrumentationLibrary */
-  instrumentationLibrary?: IInstrumentationLibrary;
+  /** IScopeSpans scope */
+  scope?: IInstrumentationScope;
 
-  /** InstrumentationLibrarySpans spans */
+  /** IScopeSpans spans */
   spans?: ISpan[]
 
-  /** InstrumentationLibrarySpans schemaUrl */
+  /** IScopeSpans schemaUrl */
   schemaUrl?: (string | null);
 }
-
 
 /** Properties of a Span. */
 export interface ISpan {

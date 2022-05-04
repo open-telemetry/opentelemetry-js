@@ -70,7 +70,7 @@
     "@opentelemetry/core": "1.2.0",
     "@grpc/grpc-js": "^1.5.9",
     "@grpc/proto-loader": "^0.6.9",
-    "@opentelemetry/exporter-trace-otlp-http": "0.28.0",
+    "@opentelemetry/otlp-transformer": "0.28.0",
     "@opentelemetry/otlp-grpc-exporter-base": "0.28.0",
     "@opentelemetry/resources": "1.2.0",
     "@opentelemetry/sdk-trace-base": "1.2.0"

@@ -16,13 +16,13 @@
 
 import { ExportResult } from '@opentelemetry/core';
 import { AggregationTemporality, PushMetricExporter, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
-import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { defaultOptions, OTLPMetricExporterOptions } from './OTLPMetricExporterOptions';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
+import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 
 export class OTLPMetricExporterBase<T extends OTLPExporterBase<OTLPMetricExporterOptions,
   ResourceMetrics,
-  otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest>>
+  IExportMetricsServiceRequest>>
 implements PushMetricExporter {
   public _otlpExporter: T;
   protected _preferredAggregationTemporality: AggregationTemporality;
@@ -48,5 +48,4 @@ implements PushMetricExporter {
   getPreferredAggregationTemporality(): AggregationTemporality {
     return this._preferredAggregationTemporality;
   }
-
 }

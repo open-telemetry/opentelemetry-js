@@ -3,7 +3,8 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-This module provides exporter for web and node to be used with [opentelemetry-collector][opentelemetry-collector-url] - last tested with version **0.25.0**.
+This module provides exporter for web and node to be used with [opentelemetry-collector][opentelemetry-collector-url].
+Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.16 <=0.50`.
 
 ## Installation
 
@@ -19,37 +20,38 @@ To see sample code and documentation for the traces exporter, as well as instruc
 
 ## Metrics in Node - GRPC
 
-The OTLPTraceExporter in Node expects the URL to only be the hostname. It will not work with `/v1/metrics`. All options that work with trace also work with metrics.
+The OTLPMetricsExporter in Node expects the URL to only be the hostname. It will not work with `/v1/metrics`. All options that work with trace also work with metrics.
 
 ```js
-const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
+const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics-base');
 const { OTLPMetricExporter } =  require('@opentelemetry/exporter-metrics-otlp-grpc');
 const collectorOptions = {
   // url is optional and can be omitted - default is grpc://localhost:4317
   url: 'grpc://<collector-hostname>:<port>',
 };
-const exporter = new OTLPMetricExporter(collectorOptions);
 
-// Register the exporter
-const provider = new MeterProvider({
-  exporter,
-  interval: 60000,
-})
+const exporter = new OTLPMetricExporter(collectorOptions);
+const meterProvider = new MeterProvider({});
+
+meterProvider.addMetricReader(new PeriodicExportingMetricReader({
+  exporter: metricExporter,
+  exportIntervalMillis: 1000,
+}));
+
 ['SIGINT', 'SIGTERM'].forEach(signal => {
-  process.on(signal, () => provider.shutdown().catch(console.error));
+  process.on(signal, () => meterProvider.shutdown().catch(console.error));
 });
 
 // Now, start recording data
-const meter = provider.getMeter('example-meter');
+const meter = meterProvider.getMeter('example-meter');
 const counter = meter.createCounter('metric_name');
 counter.add(10, { 'key': 'value' });
 ```
 
 ## Running opentelemetry-collector locally to see the metrics
 
-1. Go to examples/otlp-exporter-node
-2. run `npm run docker:start`
-3. Open page at `http://localhost:9411/zipkin/` to observe the metrics
+1. Go to `examples/otlp-exporter-node`
+2. Follow the instructions there to observe the metrics.
 
 ## Useful links
 

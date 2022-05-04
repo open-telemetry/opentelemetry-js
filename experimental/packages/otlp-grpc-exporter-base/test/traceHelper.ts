@@ -15,12 +15,12 @@
  */
 
 import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
-import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as grpc from '@grpc/grpc-js';
 import { VERSION } from '@opentelemetry/core';
+import { IEvent, IKeyValue, ILink, IResource, ISpan } from '@opentelemetry/otlp-transformer';
 
 const traceIdArr = [
   31,
@@ -100,9 +100,7 @@ export const mockedReadableSpan: ReadableSpan = {
   instrumentationLibrary: { name: 'default', version: '0.0.1' },
 };
 
-export function ensureExportedEventsAreCorrect(
-  events: otlpTypes.opentelemetryProto.trace.v1.Span.Event[]
-) {
+export function ensureExportedEventsAreCorrect(events: IEvent[]) {
   assert.deepStrictEqual(
     events,
     [
@@ -159,9 +157,7 @@ export function ensureExportedEventsAreCorrect(
   );
 }
 
-export function ensureExportedAttributesAreCorrect(
-  attributes: otlpTypes.opentelemetryProto.common.v1.KeyValue[]
-) {
+export function ensureExportedAttributesAreCorrect(attributes: IKeyValue[]) {
   assert.deepStrictEqual(
     attributes,
     [
@@ -177,9 +173,7 @@ export function ensureExportedAttributesAreCorrect(
   );
 }
 
-export function ensureExportedLinksAreCorrect(
-  attributes: otlpTypes.opentelemetryProto.trace.v1.Span.Link[]
-) {
+export function ensureExportedLinksAreCorrect(attributes: ILink[]) {
   assert.deepStrictEqual(
     attributes,
     [
@@ -203,9 +197,7 @@ export function ensureExportedLinksAreCorrect(
   );
 }
 
-export function ensureExportedSpanIsCorrect(
-  span: otlpTypes.opentelemetryProto.trace.v1.Span
-) {
+export function ensureExportedSpanIsCorrect(span: ISpan) {
   if (span.attributes) {
     ensureExportedAttributesAreCorrect(span.attributes);
   }
@@ -261,9 +253,7 @@ export function ensureExportedSpanIsCorrect(
   );
 }
 
-export function ensureResourceIsCorrect(
-  resource: otlpTypes.opentelemetryProto.resource.v1.Resource
-) {
+export function ensureResourceIsCorrect(resource: IResource) {
   assert.deepStrictEqual(resource, {
     attributes: [
       {

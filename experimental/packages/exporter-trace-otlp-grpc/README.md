@@ -3,7 +3,8 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-This module provides exporter for web and node to be used with [opentelemetry-collector][opentelemetry-collector-url] - last tested with version **0.25.0**.
+This module provides exporter for web and node to be used with [opentelemetry-collector][opentelemetry-collector-url].
+Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.16 <=0.50`.
 
 ## Installation
 
@@ -135,9 +136,8 @@ OTEL_EXPORTER_OTLP_TRACES_COMPRESSION=gzip
 
 ## Running opentelemetry-collector locally to see the traces
 
-1. Go to examples/otlp-exporter-node
-2. run `npm run docker:start`
-3. Open page at `http://localhost:9411/zipkin/` to observe the traces
+1. Go to `examples/otlp-exporter-node`
+2. Follow the instructions there to inspect traces.
 
 ## Useful links
 

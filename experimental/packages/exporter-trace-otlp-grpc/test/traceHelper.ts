@@ -15,12 +15,12 @@
  */
 
 import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
-import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as grpc from '@grpc/grpc-js';
 import { VERSION } from '@opentelemetry/core';
+import { IEvent, IKeyValue, ILink, IResource, ISpan } from '@opentelemetry/otlp-transformer';
 
 const traceIdArr = [
   31,
@@ -101,7 +101,7 @@ export const mockedReadableSpan: ReadableSpan = {
 };
 
 export function ensureExportedEventsAreCorrect(
-  events: otlpTypes.opentelemetryProto.trace.v1.Span.Event[]
+  events: IEvent[]
 ) {
   assert.deepStrictEqual(
     events,
@@ -160,7 +160,7 @@ export function ensureExportedEventsAreCorrect(
 }
 
 export function ensureExportedAttributesAreCorrect(
-  attributes: otlpTypes.opentelemetryProto.common.v1.KeyValue[]
+  attributes: IKeyValue[]
 ) {
   assert.deepStrictEqual(
     attributes,
@@ -178,7 +178,7 @@ export function ensureExportedAttributesAreCorrect(
 }
 
 export function ensureExportedLinksAreCorrect(
-  attributes: otlpTypes.opentelemetryProto.trace.v1.Span.Link[]
+  attributes: ILink[]
 ) {
   assert.deepStrictEqual(
     attributes,
@@ -204,7 +204,7 @@ export function ensureExportedLinksAreCorrect(
 }
 
 export function ensureExportedSpanIsCorrect(
-  span: otlpTypes.opentelemetryProto.trace.v1.Span
+  span: ISpan
 ) {
   if (span.attributes) {
     ensureExportedAttributesAreCorrect(span.attributes);
@@ -254,7 +254,6 @@ export function ensureExportedSpanIsCorrect(
     span.status,
     {
       code: 'STATUS_CODE_OK',
-      deprecatedCode: 'DEPRECATED_STATUS_CODE_OK',
       message: '',
     },
     'status is wrong'
@@ -262,7 +261,7 @@ export function ensureExportedSpanIsCorrect(
 }
 
 export function ensureResourceIsCorrect(
-  resource: otlpTypes.opentelemetryProto.resource.v1.Resource
+  resource: IResource
 ) {
   assert.deepStrictEqual(resource, {
     attributes: [
@@ -321,11 +320,11 @@ export function ensureResourceIsCorrect(
 }
 
 export function ensureMetadataIsCorrect(
-  actual: grpc.Metadata,
-  expected: grpc.Metadata
+  actual?: grpc.Metadata,
+  expected?: grpc.Metadata
 ) {
   //ignore user agent
-  expected.remove('user-agent');
-  actual.remove('user-agent');
-  assert.deepStrictEqual(actual.getMap(), expected.getMap());
+  expected?.remove('user-agent');
+  actual?.remove('user-agent');
+  assert.deepStrictEqual(actual?.getMap(), expected?.getMap() ?? {});
 }
