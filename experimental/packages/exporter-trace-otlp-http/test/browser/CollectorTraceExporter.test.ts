@@ -115,9 +115,7 @@ describe('OTLPTraceExporter - web', () => {
               json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
 
             assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
-            if (span1) {
-              ensureSpanIsCorrect(span1);
-            }
+            ensureSpanIsCorrect(span1);
 
             const resource = json.resourceSpans?.[0].resource;
             assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
@@ -206,15 +204,11 @@ describe('OTLPTraceExporter - web', () => {
             json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
 
           assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
-          if (span1) {
-            ensureSpanIsCorrect(span1);
-          }
+          ensureSpanIsCorrect(span1);
 
           const resource = json.resourceSpans?.[0].resource;
           assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
-          if (resource) {
-            ensureWebResourceIsCorrect(resource);
-          }
+          ensureWebResourceIsCorrect(resource);
 
           assert.strictEqual(stubBeacon.callCount, 0);
 
