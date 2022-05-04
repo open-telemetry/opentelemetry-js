@@ -1,17 +1,20 @@
 'use strict';
 
-const opentelemetry = require('@opentelemetry/api');
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
-const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
 const { Resource } = require('@opentelemetry/resources');
 const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
-// const { OTLPTraceExporter } = require('@opentelemetry/exporter-otlp-grpc');
-// const { OTLPTraceExporter } = require('@opentelemetry/exporter-otlp-proto');
+const {
+  diag,
+  trace,
+  context,
+  DiagConsoleLogger,
+  DiagLogLevel,
+} = require('@opentelemetry/api');
+const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
+// const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc');
+// const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-proto');
 
-// opentelemetry.diag.setLogger(
-//   new opentelemetry.DiagConsoleLogger(),
-//   opentelemetry.DiagLogLevel.DEBUG,
-// );
+diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
 
 const exporter = new OTLPTraceExporter({
   // headers: {
@@ -28,7 +31,7 @@ provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.register();
 
-const tracer = opentelemetry.trace.getTracer('example-otlp-exporter-node');
+const tracer = trace.getTracer('example-otlp-exporter-node');
 
 // Create a span. A span must be closed.
 const parentSpan = tracer.startSpan('main');
@@ -47,7 +50,7 @@ setTimeout(() => {
 function doWork(parent) {
   // Start another span. In this example, the main method already started a
   // span, so that'll be the parent span, and this will be a child span.
-  const ctx = opentelemetry.trace.setSpan(opentelemetry.context.active(), parent);
+  const ctx = trace.setSpan(context.active(), parent);
   const span = tracer.startSpan('doWork', undefined, ctx);
 
   // simulate some random work.

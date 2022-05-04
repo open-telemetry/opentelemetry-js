@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import {
   defaultExporterTemporality,
   defaultOptions,
-  OTLPMetricExporterBase, OTLPMetricExporterOptions,
-  toOTLPExportMetricServiceRequest
+  OTLPMetricExporterBase,
+  OTLPMetricExporterOptions
 } from '@opentelemetry/exporter-metrics-otlp-http';
 import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
 import {
@@ -30,18 +29,19 @@ import {
 } from '@opentelemetry/otlp-grpc-exporter-base';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
 import { Metadata } from '@grpc/grpc-js';
+import { createExportMetricsServiceRequest, IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 
 const DEFAULT_COLLECTOR_URL = 'localhost:4317';
 
 
 class OTLPMetricExporterProxy extends OTLPGRPCExporterNodeBase<ResourceMetrics,
-  otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest> {
+  IExportMetricsServiceRequest> {
   protected readonly _aggregationTemporality: AggregationTemporality;
 
   constructor(config: OTLPGRPCExporterConfigNode & OTLPMetricExporterOptions= defaultOptions) {
     super(config);
-    this.metadata ||= new Metadata();
     const headers = baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS);
+    this.metadata ||= new Metadata();
     for (const [k, v] of Object.entries(headers)) {
       this.metadata.set(k, v);
     }
@@ -66,12 +66,8 @@ class OTLPMetricExporterProxy extends OTLPGRPCExporterNodeBase<ResourceMetrics,
           : DEFAULT_COLLECTOR_URL;
   }
 
-  convert(metrics: ResourceMetrics[]): otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
-    return toOTLPExportMetricServiceRequest(
-      metrics[0],
-      this._aggregationTemporality,
-      this
-    );
+  convert(metrics: ResourceMetrics[]): IExportMetricsServiceRequest {
+    return createExportMetricsServiceRequest(metrics, this._aggregationTemporality);
   }
 }
 

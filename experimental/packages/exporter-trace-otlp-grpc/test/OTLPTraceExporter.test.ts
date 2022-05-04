@@ -15,7 +15,6 @@
  */
 
 import * as protoLoader from '@grpc/proto-loader';
-import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { diag } from '@opentelemetry/api';
 import {
   BasicTracerProvider,
@@ -37,6 +36,7 @@ import {
 } from './traceHelper';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
 import { GrpcCompressionAlgorithm } from '@opentelemetry/otlp-grpc-exporter-base';
+import { IExportTraceServiceRequest, IResourceSpans } from '@opentelemetry/otlp-transformer';
 
 const traceServiceProtoPath =
   'opentelemetry/proto/collector/trace/v1/trace_service.proto';
@@ -59,7 +59,7 @@ const testCollectorExporter = (params: TestParams) =>
     let collectorExporter: OTLPTraceExporter;
     let server: grpc.Server;
     let exportedData:
-      | otlpTypes.opentelemetryProto.trace.v1.ResourceSpans
+      | IResourceSpans
       | undefined;
     let reqMetadata: grpc.Metadata | undefined;
 
@@ -83,15 +83,13 @@ const testCollectorExporter = (params: TestParams) =>
               .service,
             {
               Export: (data: {
-                request: otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+                request: IExportTraceServiceRequest;
                 metadata: grpc.Metadata;
               }) => {
-                try {
+                if (data.request.resourceSpans != null) {
                   exportedData = data.request.resourceSpans[0];
-                  reqMetadata = data.metadata;
-                } catch (e) {
-                  exportedData = undefined;
                 }
+                reqMetadata = data.metadata;
               },
             }
           );
@@ -178,24 +176,26 @@ const testCollectorExporter = (params: TestParams) =>
             typeof exportedData !== 'undefined',
             'resource' + " doesn't exist"
           );
-          let spans;
-          let resource;
-          if (exportedData) {
-            spans = exportedData.instrumentationLibrarySpans[0].spans;
-            resource = exportedData.resource;
-            ensureExportedSpanIsCorrect(spans[0]);
 
-            assert.ok(
-              typeof resource !== 'undefined',
-              "resource doesn't exist"
-            );
-            if (resource) {
-              ensureResourceIsCorrect(resource);
-            }
-          }
-          if (params.metadata && reqMetadata) {
-            ensureMetadataIsCorrect(reqMetadata, params.metadata);
-          }
+          const spans = exportedData.scopeSpans[0].spans;
+          const resource = exportedData.resource;
+
+          assert.ok(
+            typeof spans !== 'undefined',
+            'spans do not exist'
+          );
+
+          ensureExportedSpanIsCorrect(spans[0]);
+
+          assert.ok(
+            typeof resource !== 'undefined',
+            "resource doesn't exist"
+          );
+
+          ensureResourceIsCorrect(resource);
+
+          ensureMetadataIsCorrect(reqMetadata, params?.metadata);
+
           done();
         }, 200);
       });
@@ -228,24 +228,23 @@ const testCollectorExporter = (params: TestParams) =>
             typeof exportedData !== 'undefined',
             'resource' + " doesn't exist"
           );
-          let spans;
-          let resource;
-          if (exportedData) {
-            spans = exportedData.instrumentationLibrarySpans[0].spans;
-            resource = exportedData.resource;
-            ensureExportedSpanIsCorrect(spans[0]);
+          const spans = exportedData.scopeSpans[0].spans;
+          const resource = exportedData.resource;
 
-            assert.ok(
-              typeof resource !== 'undefined',
-              "resource doesn't exist"
-            );
-            if (resource) {
-              ensureResourceIsCorrect(resource);
-            }
-          }
-          if (params.metadata && reqMetadata) {
-            ensureMetadataIsCorrect(reqMetadata, params.metadata);
-          }
+          assert.ok(
+            typeof spans !== 'undefined',
+            'spans do not exist'
+          );
+          ensureExportedSpanIsCorrect(spans[0]);
+
+          assert.ok(
+            typeof resource !== 'undefined',
+            "resource doesn't exist"
+          );
+          ensureResourceIsCorrect(resource);
+
+          ensureMetadataIsCorrect(reqMetadata, params.metadata);
+
           done();
         }, 500);
       });
@@ -261,7 +260,7 @@ const testCollectorExporter = (params: TestParams) =>
           )
           : undefined;
 
-        envSource.OTEL_EXPORTER_OTLP_COMPRESSION='gzip';
+        envSource.OTEL_EXPORTER_OTLP_COMPRESSION = 'gzip';
         collectorExporter = new OTLPTraceExporter({
           url: 'grpcs://' + address,
           credentials,
@@ -337,5 +336,3 @@ describe('when configuring via environment', () => {
 testCollectorExporter({ useTLS: true });
 testCollectorExporter({ useTLS: false });
 testCollectorExporter({ metadata });
-
-

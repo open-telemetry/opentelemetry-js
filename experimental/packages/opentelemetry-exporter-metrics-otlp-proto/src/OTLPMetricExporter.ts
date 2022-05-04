@@ -13,28 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import {
-  otlpTypes
-} from '@opentelemetry/exporter-trace-otlp-http';
 import {
   defaultExporterTemporality,
   defaultOptions,
-  OTLPMetricExporterOptions,
-  toOTLPExportMetricServiceRequest
+  OTLPMetricExporterOptions
 } from '@opentelemetry/exporter-metrics-otlp-http';
 import { ServiceClientType, OTLPProtoExporterNodeBase } from '@opentelemetry/otlp-proto-exporter-base';
 import { getEnv, baggageUtils} from '@opentelemetry/core';
 import { AggregationTemporality, ResourceMetrics} from '@opentelemetry/sdk-metrics-base';
 import { OTLPMetricExporterBase } from '@opentelemetry/exporter-metrics-otlp-http';
 import { appendResourcePathToUrlIfNotPresent, OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import { createExportMetricsServiceRequest, IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = '/v1/metrics';
 const DEFAULT_COLLECTOR_URL = `http://localhost:4318${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 
 
 class OTLPMetricExporterNodeProxy extends OTLPProtoExporterNodeBase<ResourceMetrics,
-  otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest> {
+  IExportMetricsServiceRequest> {
   protected readonly _aggregationTemporality: AggregationTemporality;
 
   constructor(config: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions = defaultOptions) {
@@ -48,13 +44,10 @@ class OTLPMetricExporterNodeProxy extends OTLPProtoExporterNodeBase<ResourceMetr
     this._aggregationTemporality = config.aggregationTemporality ?? defaultExporterTemporality;
   }
 
-  convert(
-    metrics: ResourceMetrics[]
-  ): otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
-    return toOTLPExportMetricServiceRequest(
-      metrics[0],
-      this._aggregationTemporality,
-      this
+  convert(metrics: ResourceMetrics[]): IExportMetricsServiceRequest {
+    return createExportMetricsServiceRequest(
+      metrics,
+      this._aggregationTemporality
     );
   }
 
