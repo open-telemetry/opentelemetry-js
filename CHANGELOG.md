@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ### :boom: Breaking Change
 
+* chore: remove unused InstrumentationConfig#path [#2944](https://github.com/open-telemetry/opentelemetry-js/pull/2944) @flarna
+
 ### :rocket: (Enhancement)
 
 * feat(ConsoleSpanExporter): export span links [#2917](https://github.com/open-telemetry/opentelemetry-js/pull/2917) @trentm
