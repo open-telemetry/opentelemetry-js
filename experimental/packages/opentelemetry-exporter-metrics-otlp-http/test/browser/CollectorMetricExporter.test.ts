@@ -112,41 +112,37 @@ describe('OTLPMetricExporter - web', () => {
           const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[2];
 
           assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
-          if (metric1) {
-            ensureCounterIsCorrect(
-              metric1,
-              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0].endTime),
-              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0].startTime)
-            );
-          }
+
+          ensureCounterIsCorrect(
+            metric1,
+            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0].endTime),
+            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0].startTime)
+          );
+
 
           assert.ok(
             typeof metric2 !== 'undefined',
             "second metric doesn't exist"
           );
-          if (metric2) {
-            ensureObservableGaugeIsCorrect(
-              metric2,
-              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[1].dataPoints[0].endTime),
-              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[1].dataPoints[0].startTime),
-              6,
-              'double-observable-gauge2'
-            );
-          }
+          ensureObservableGaugeIsCorrect(
+            metric2,
+            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[1].dataPoints[0].endTime),
+            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[1].dataPoints[0].startTime),
+            6,
+            'double-observable-gauge2'
+          );
 
           assert.ok(
             typeof metric3 !== 'undefined',
             "third metric doesn't exist"
           );
-          if (metric3) {
-            ensureHistogramIsCorrect(
-              metric3,
-              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[2].dataPoints[0].endTime),
-              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[2].dataPoints[0].startTime),
-              [0, 100],
-              [0, 2, 0]
-            );
-          }
+          ensureHistogramIsCorrect(
+            metric3,
+            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[2].dataPoints[0].endTime),
+            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[2].dataPoints[0].startTime),
+            [0, 100],
+            [0, 2, 0]
+          );
 
           const resource = json.resourceMetrics[0].resource;
           assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
@@ -221,41 +217,37 @@ describe('OTLPMetricExporter - web', () => {
           const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[0];
           const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[1];
           const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[2];
+
           assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
-          if (metric1) {
-            ensureCounterIsCorrect(
-              metric1,
-              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0].endTime),
-              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0].startTime)
-            );
-          }
+          ensureCounterIsCorrect(
+            metric1,
+            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0].endTime),
+            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0].startTime)
+          );
+
           assert.ok(
             typeof metric2 !== 'undefined',
             "second metric doesn't exist"
           );
-          if (metric2) {
-            ensureObservableGaugeIsCorrect(
-              metric2,
-              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[1].dataPoints[0].endTime),
-              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[1].dataPoints[0].startTime),
-              6,
-              'double-observable-gauge2'
-            );
-          }
+          ensureObservableGaugeIsCorrect(
+            metric2,
+            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[1].dataPoints[0].endTime),
+            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[1].dataPoints[0].startTime),
+            6,
+            'double-observable-gauge2'
+          );
 
           assert.ok(
             typeof metric3 !== 'undefined',
             "third metric doesn't exist"
           );
-          if (metric3) {
-            ensureHistogramIsCorrect(
-              metric3,
-              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[2].dataPoints[0].endTime),
-              hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[2].dataPoints[0].startTime),
-              [0, 100],
-              [0, 2, 0]
-            );
-          }
+          ensureHistogramIsCorrect(
+            metric3,
+            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[2].dataPoints[0].endTime),
+            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[2].dataPoints[0].startTime),
+            [0, 100],
+            [0, 2, 0]
+          );
 
           const resource = json.resourceMetrics[0].resource;
           assert.ok(typeof resource !== 'undefined', "resource doesn't exist");

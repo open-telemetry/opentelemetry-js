@@ -207,43 +207,43 @@ const testOTLPMetricExporter = (params: TestParams) =>
         setTimeout(() => {
           assert.ok(
             typeof exportedData !== 'undefined',
-            'resource' + " doesn't exist"
+            'resource does not exist'
           );
-          let resource;
-          if (exportedData) {
-            resource = exportedData[0].resource;
-            const counter =
-              exportedData[0].scopeMetrics[0].metrics[0];
-            const observableGauge =
-              exportedData[0].scopeMetrics[0].metrics[1];
-            const histogram =
-              exportedData[0].scopeMetrics[0].metrics[2];
-            ensureExportedCounterIsCorrect(
-              counter,
-              counter.sum?.dataPoints[0].timeUnixNano,
-              counter.sum?.dataPoints[0].startTimeUnixNano
-            );
-            ensureExportedObservableGaugeIsCorrect(
-              observableGauge,
-              observableGauge.gauge?.dataPoints[0].timeUnixNano,
-              observableGauge.gauge?.dataPoints[0].startTimeUnixNano
-            );
-            ensureExportedHistogramIsCorrect(
-              histogram,
-              histogram.histogram?.dataPoints[0].timeUnixNano,
-              histogram.histogram?.dataPoints[0].startTimeUnixNano,
-              [0, 100],
-              ['0', '2', '0']
-            );
-            assert.ok(
-              typeof resource !== 'undefined',
-              "resource doesn't exist"
-            );
-            ensureResourceIsCorrect(resource);
-          }
-          if (params.metadata && reqMetadata) {
-            ensureMetadataIsCorrect(reqMetadata, params.metadata);
-          }
+
+          assert.ok(exportedData, 'exportedData does not exist');
+
+          const resource = exportedData[0].resource;
+          const counter =
+            exportedData[0].scopeMetrics[0].metrics[0];
+          const observableGauge =
+            exportedData[0].scopeMetrics[0].metrics[1];
+          const histogram =
+            exportedData[0].scopeMetrics[0].metrics[2];
+          ensureExportedCounterIsCorrect(
+            counter,
+            counter.sum?.dataPoints[0].timeUnixNano,
+            counter.sum?.dataPoints[0].startTimeUnixNano
+          );
+          ensureExportedObservableGaugeIsCorrect(
+            observableGauge,
+            observableGauge.gauge?.dataPoints[0].timeUnixNano,
+            observableGauge.gauge?.dataPoints[0].startTimeUnixNano
+          );
+          ensureExportedHistogramIsCorrect(
+            histogram,
+            histogram.histogram?.dataPoints[0].timeUnixNano,
+            histogram.histogram?.dataPoints[0].startTimeUnixNano,
+            [0, 100],
+            ['0', '2', '0']
+          );
+          assert.ok(
+            typeof resource !== 'undefined',
+            "resource doesn't exist"
+          );
+          ensureResourceIsCorrect(resource);
+
+          ensureMetadataIsCorrect(reqMetadata, params.metadata);
+
           done();
         }, 500);
       });

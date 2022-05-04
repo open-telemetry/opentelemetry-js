@@ -320,11 +320,11 @@ export function ensureResourceIsCorrect(
 }
 
 export function ensureMetadataIsCorrect(
-  actual: grpc.Metadata,
-  expected: grpc.Metadata
+  actual?: grpc.Metadata,
+  expected?: grpc.Metadata
 ) {
   //ignore user agent
-  expected.remove('user-agent');
-  actual.remove('user-agent');
-  assert.deepStrictEqual(actual.getMap(), expected.getMap());
+  expected?.remove('user-agent');
+  actual?.remove('user-agent');
+  assert.deepStrictEqual(actual?.getMap(), expected?.getMap() ?? {});
 }

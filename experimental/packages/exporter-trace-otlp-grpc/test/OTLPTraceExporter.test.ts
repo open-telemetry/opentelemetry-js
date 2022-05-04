@@ -176,29 +176,26 @@ const testCollectorExporter = (params: TestParams) =>
             typeof exportedData !== 'undefined',
             'resource' + " doesn't exist"
           );
-          let spans;
-          let resource;
-          if (exportedData) {
-            spans = exportedData.scopeSpans[0].spans;
-            resource = exportedData.resource;
 
-            assert.ok(
-              typeof spans !== 'undefined',
-              'spans do not exist'
-            );
+          const spans = exportedData.scopeSpans[0].spans;
+          const resource = exportedData.resource;
 
-            ensureExportedSpanIsCorrect(spans[0]);
+          assert.ok(
+            typeof spans !== 'undefined',
+            'spans do not exist'
+          );
 
-            assert.ok(
-              typeof resource !== 'undefined',
-              "resource doesn't exist"
-            );
+          ensureExportedSpanIsCorrect(spans[0]);
 
-            ensureResourceIsCorrect(resource);
-          }
-          if (params.metadata && reqMetadata) {
-            ensureMetadataIsCorrect(reqMetadata, params.metadata);
-          }
+          assert.ok(
+            typeof resource !== 'undefined',
+            "resource doesn't exist"
+          );
+
+          ensureResourceIsCorrect(resource);
+
+          ensureMetadataIsCorrect(reqMetadata, params?.metadata);
+
           done();
         }, 200);
       });
@@ -247,13 +244,13 @@ const testCollectorExporter = (params: TestParams) =>
               typeof resource !== 'undefined',
               "resource doesn't exist"
             );
-            if (resource) {
-              ensureResourceIsCorrect(resource);
-            }
+
+            ensureResourceIsCorrect(resource);
+
           }
-          if (params.metadata && reqMetadata) {
-            ensureMetadataIsCorrect(reqMetadata, params.metadata);
-          }
+
+          ensureMetadataIsCorrect(reqMetadata, params.metadata);
+
           done();
         }, 500);
       });

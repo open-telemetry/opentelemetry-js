@@ -230,9 +230,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
         const json = JSON.parse(responseBody) as IExportTraceServiceRequest;
         const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
-        if (span1) {
-          ensureSpanIsCorrect(span1);
-        }
+        ensureSpanIsCorrect(span1);
 
         ensureExportTraceServiceRequestIsSet(json);
 
@@ -323,9 +321,7 @@ describe('OTLPTraceExporter - node with json over http', () => {
         const json = JSON.parse(responseBody) as IExportTraceServiceRequest;
         const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
-        if (span1) {
-          ensureSpanIsCorrect(span1);
-        }
+        ensureSpanIsCorrect(span1);
 
         ensureExportTraceServiceRequestIsSet(json);
         assert.ok(spySetHeader.calledWith('Content-Encoding', 'gzip'));

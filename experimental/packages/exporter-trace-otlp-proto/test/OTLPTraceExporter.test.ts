@@ -156,9 +156,7 @@ describe('OTLPTraceExporter - node with proto over http', () => {
         const json = data?.toJSON() as IExportTraceServiceRequest;
         const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
-        if (span1) {
-          ensureProtoSpanIsCorrect(span1);
-        }
+        ensureProtoSpanIsCorrect(span1);
 
         ensureExportTraceServiceRequestIsSet(json);
 
@@ -242,9 +240,7 @@ describe('OTLPTraceExporter - node with proto over http', () => {
         const json = data?.toJSON() as IExportTraceServiceRequest;
         const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
-        if (span1) {
-          ensureProtoSpanIsCorrect(span1);
-        }
+        ensureProtoSpanIsCorrect(span1);
 
         ensureExportTraceServiceRequestIsSet(json);
         assert.ok(spySetHeader.calledWith('Content-Encoding', 'gzip'));
