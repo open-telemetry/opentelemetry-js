@@ -228,26 +228,20 @@ const testCollectorExporter = (params: TestParams) =>
             typeof exportedData !== 'undefined',
             'resource' + " doesn't exist"
           );
-          let spans;
-          let resource;
-          if (exportedData) {
-            spans = exportedData.scopeSpans[0].spans;
-            resource = exportedData.resource;
+          const spans = exportedData.scopeSpans[0].spans;
+          const resource = exportedData.resource;
 
-            assert.ok(
-              typeof spans !== 'undefined',
-              'spans do not exist'
-            );
-            ensureExportedSpanIsCorrect(spans[0]);
+          assert.ok(
+            typeof spans !== 'undefined',
+            'spans do not exist'
+          );
+          ensureExportedSpanIsCorrect(spans[0]);
 
-            assert.ok(
-              typeof resource !== 'undefined',
-              "resource doesn't exist"
-            );
-
-            ensureResourceIsCorrect(resource);
-
-          }
+          assert.ok(
+            typeof resource !== 'undefined',
+            "resource doesn't exist"
+          );
+          ensureResourceIsCorrect(resource);
 
           ensureMetadataIsCorrect(reqMetadata, params.metadata);
 
