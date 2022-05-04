@@ -7,11 +7,14 @@ All notable changes to this project will be documented in this file.
 ### :boom: Breaking Change
 
 * feat(metrics): metric readers and exporters now select aggregation temporality based on instrument type [#2902](https://github.com/open-telemetry/opentelemetry-js/pull/2902) @seemk
+* chore: remove unused InstrumentationConfig#path [#2944](https://github.com/open-telemetry/opentelemetry-js/pull/2944) @flarna
 
 ### :rocket: (Enhancement)
 
 * feat(ConsoleSpanExporter): export span links [#2917](https://github.com/open-telemetry/opentelemetry-js/pull/2917) @trentm
 * feat: warn when hooked module is already loaded [#2926](https://github.com/open-telemetry/opentelemetry-js/pull/2926) @nozik
+* feat: implement OSDetector [#2927](https://github.com/open-telemetry/opentelemetry-js/pull/2927) @rauno56
+* feat: implement HostDetector [#2921](https://github.com/open-telemetry/opentelemetry-js/pull/2921) @rauno56
 
 ### :bug: (Bug Fix)
 
@@ -30,6 +33,7 @@ All notable changes to this project will be documented in this file.
 * fix: sanitize attributes inputs [#2881](https://github.com/open-telemetry/opentelemetry-js/pull/2881) @legendecas
 * fix: support earlier API versions [#2892](https://github.com/open-telemetry/opentelemetry-js/pull/2892) @dyladan
 * fix: support extract one digit '0' in jaeger traceFlag [#2905](https://github.com/open-telemetry/opentelemetry-js/issues/2905) @shmilyoo
+* fix(resources): extend ResourceAttributes interface to comply with spec [#2924](https://github.com/open-telemetry/opentelemetry-js/pull/2924) @blumamir
 
 ### :books: (Refine Doc)
 
