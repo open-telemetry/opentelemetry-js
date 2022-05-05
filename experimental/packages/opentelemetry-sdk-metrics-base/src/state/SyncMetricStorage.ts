@@ -15,15 +15,16 @@
  */
 
 import { Context, HrTime } from '@opentelemetry/api';
-import { Attributes } from '@opentelemetry/api-metrics-wip';
+import { MetricAttributes } from '@opentelemetry/api-metrics';
 import { WritableMetricStorage } from './WritableMetricStorage';
 import { Accumulation, Aggregator } from '../aggregator/types';
 import { View } from '../view/View';
-import { createInstrumentDescriptorWithView, InstrumentDescriptor } from '../InstrumentDescriptor';
+import {
+  createInstrumentDescriptorWithView,
+  InstrumentDescriptor
+} from '../InstrumentDescriptor';
 import { AttributesProcessor } from '../view/AttributesProcessor';
 import { MetricStorage } from './MetricStorage';
-import { InstrumentationLibrary } from '@opentelemetry/core';
-import { Resource } from '@opentelemetry/resources';
 import { MetricData } from '../export/MetricData';
 import { DeltaMetricProcessor } from './DeltaMetricProcessor';
 import { TemporalMetricProcessor } from './TemporalMetricProcessor';
@@ -35,20 +36,21 @@ import { MetricCollectorHandle } from './MetricCollector';
  *
  * Stores and aggregates {@link MetricData} for synchronous instruments.
  */
-export class SyncMetricStorage<T extends Maybe<Accumulation>> implements WritableMetricStorage, MetricStorage {
+export class SyncMetricStorage<T extends Maybe<Accumulation>> extends MetricStorage implements WritableMetricStorage {
   private _deltaMetricStorage: DeltaMetricProcessor<T>;
   private _temporalMetricStorage: TemporalMetricProcessor<T>;
 
   constructor(
-    private _instrumentDescriptor: InstrumentDescriptor,
+    instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<T>,
     private _attributesProcessor: AttributesProcessor
   ) {
+    super(instrumentDescriptor);
     this._deltaMetricStorage = new DeltaMetricProcessor(aggregator);
     this._temporalMetricStorage = new TemporalMetricProcessor(aggregator);
   }
 
-  record(value: number, attributes: Attributes, context: Context) {
+  record(value: number, attributes: MetricAttributes, context: Context) {
     attributes = this._attributesProcessor.process(attributes, context);
     this._deltaMetricStorage.record(value, attributes, context);
   }
@@ -62,8 +64,6 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>> implements Writabl
   async collect(
     collector: MetricCollectorHandle,
     collectors: MetricCollectorHandle[],
-    resource: Resource,
-    instrumentationLibrary: InstrumentationLibrary,
     sdkStartTime: HrTime,
     collectionTime: HrTime,
   ): Promise<Maybe<MetricData>> {
@@ -72,8 +72,6 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>> implements Writabl
     return this._temporalMetricStorage.buildMetrics(
       collector,
       collectors,
-      resource,
-      instrumentationLibrary,
       this._instrumentDescriptor,
       accumulations,
       sdkStartTime,

@@ -1,10 +1,12 @@
 {
-  "version": "1.0.1",
+  "version": "independent",
   "npmClient": "npm",
   "packages": [
-    "benchmark/*",
     "packages/*",
+    "experimental/packages/*",
+    "experimental/backwards-compatability/*",
     "integration-tests/*",
-    "selenium-tests"
+    "selenium-tests",
+    "examples/otlp-exporter-node"
   ]
 }

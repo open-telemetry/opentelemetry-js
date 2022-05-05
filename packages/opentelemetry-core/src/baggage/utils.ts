@@ -26,18 +26,23 @@ type ParsedBaggageKeyValue = { key: string, value: string, metadata: BaggageEntr
 export function serializeKeyPairs(keyPairs: string[]): string {
   return keyPairs.reduce((hValue: string, current: string) => {
     const value = `${hValue}${hValue !== '' ? BAGGAGE_ITEMS_SEPARATOR : ''
-      }${current}`;
+    }${current}`;
     return value.length > BAGGAGE_MAX_TOTAL_LENGTH ? hValue : value;
   }, '');
 }
 
 export function getKeyPairs(baggage: Baggage): string[] {
-  return baggage
-    .getAllEntries()
-    .map(
-      ([key, value]) =>
-        `${encodeURIComponent(key)}=${encodeURIComponent(value.value)}`
-    );
+  return baggage.getAllEntries().map(([key, value]) => {
+    let entry = `${encodeURIComponent(key)}=${encodeURIComponent(value.value)}`;
+
+    // include opaque metadata if provided
+    // NOTE: we intentionally don't URI-encode the metadata - that responsibility falls on the metadata implementation
+    if (value.metadata !== undefined) {
+      entry += BAGGAGE_PROPERTIES_SEPARATOR + value.metadata.toString();
+    }
+
+    return entry;
+  });
 }
 
 export function parsePairKeyValue(entry: string): ParsedBaggageKeyValue | undefined {

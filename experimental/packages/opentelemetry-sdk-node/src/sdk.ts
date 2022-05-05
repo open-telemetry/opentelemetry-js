@@ -17,7 +17,7 @@
 import { TextMapPropagator } from '@opentelemetry/api';
 import { metrics } from '@opentelemetry/api-metrics';
 import { ContextManager } from '@opentelemetry/api';
-import { MeterConfig, MeterProvider } from '@opentelemetry/sdk-metrics-base';
+import { MeterProvider, MetricReader } from '@opentelemetry/sdk-metrics-base';
 import {
   InstrumentationOption,
   registerInstrumentations,
@@ -44,7 +44,7 @@ export class NodeSDK {
     textMapPropagator?: TextMapPropagator;
   };
   private _instrumentations: InstrumentationOption[];
-  private _meterProviderConfig?: MeterConfig;
+  private _metricReader?: MetricReader;
 
   private _resource: Resource;
 
@@ -83,19 +83,8 @@ export class NodeSDK {
       );
     }
 
-    if (configuration.metricExporter) {
-      const meterConfig: MeterConfig = {
-        exporter: configuration.metricExporter,
-      };
-
-      if (configuration.metricProcessor) {
-        meterConfig.processor = configuration.metricProcessor;
-      }
-      if (typeof configuration.metricInterval === 'number') {
-        meterConfig.interval = configuration.metricInterval;
-      }
-
-      this.configureMeterProvider(meterConfig);
+    if (configuration.metricReader) {
+      this.configureMeterProvider(configuration.metricReader);
     }
 
     let instrumentations: InstrumentationOption[] = [];
@@ -104,6 +93,7 @@ export class NodeSDK {
     }
     this._instrumentations = instrumentations;
   }
+
   /** Set configurations required to register a NodeTracerProvider */
   public configureTracerProvider(
     tracerConfig: NodeTracerConfig,
@@ -120,8 +110,8 @@ export class NodeSDK {
   }
 
   /** Set configurations needed to register a MeterProvider */
-  public configureMeterProvider(config: MeterConfig): void {
-    this._meterProviderConfig = config;
+  public configureMeterProvider(reader: MetricReader): void {
+    this._metricReader = reader;
   }
 
   /** Detect resource attributes */
@@ -162,11 +152,12 @@ export class NodeSDK {
       });
     }
 
-    if (this._meterProviderConfig) {
+    if (this._metricReader) {
       const meterProvider = new MeterProvider({
-        ...this._meterProviderConfig,
         resource: this._resource,
       });
+
+      meterProvider.addMetricReader(this._metricReader);
 
       this._meterProvider = meterProvider;
 
@@ -190,7 +181,8 @@ export class NodeSDK {
     return (
       Promise.all(promises)
         // return void instead of the array from Promise.all
-        .then(() => {})
+        .then(() => {
+        })
     );
   }
 }

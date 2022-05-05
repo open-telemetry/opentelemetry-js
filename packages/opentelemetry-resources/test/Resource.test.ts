@@ -18,6 +18,7 @@ import * as assert from 'assert';
 import { SDK_INFO } from '@opentelemetry/core';
 import { Resource } from '../src';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { describeBrowser, describeNode } from './util';
 
 describe('Resource', () => {
   const resource1 = new Resource({
@@ -100,13 +101,23 @@ describe('Resource', () => {
     });
   });
 
-  describe('.default()', () => {
+  describeNode('.default()', () => {
     it('should return a default resource', () => {
       const resource = Resource.default();
       assert.strictEqual(resource.attributes[SemanticResourceAttributes.TELEMETRY_SDK_NAME], SDK_INFO[SemanticResourceAttributes.TELEMETRY_SDK_NAME]);
       assert.strictEqual(resource.attributes[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE], SDK_INFO[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]);
       assert.strictEqual(resource.attributes[SemanticResourceAttributes.TELEMETRY_SDK_VERSION], SDK_INFO[SemanticResourceAttributes.TELEMETRY_SDK_VERSION]);
       assert.strictEqual(resource.attributes[SemanticResourceAttributes.SERVICE_NAME], `unknown_service:${process.argv0}`);
+    });
+  });
+
+  describeBrowser('.default()', () => {
+    it('should return a default resource', () => {
+      const resource = Resource.default();
+      assert.strictEqual(resource.attributes[SemanticResourceAttributes.TELEMETRY_SDK_NAME], SDK_INFO[SemanticResourceAttributes.TELEMETRY_SDK_NAME]);
+      assert.strictEqual(resource.attributes[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE], SDK_INFO[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]);
+      assert.strictEqual(resource.attributes[SemanticResourceAttributes.TELEMETRY_SDK_VERSION], SDK_INFO[SemanticResourceAttributes.TELEMETRY_SDK_VERSION]);
+      assert.strictEqual(resource.attributes[SemanticResourceAttributes.SERVICE_NAME], 'unknown_service');
     });
   });
 });

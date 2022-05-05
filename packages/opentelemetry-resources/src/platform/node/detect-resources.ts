@@ -30,7 +30,7 @@ export const detectResources = async (
 ): Promise<Resource> => {
   const internalConfig: ResourceDetectionConfig = Object.assign(config);
 
-  const resources: Array<Resource> = await Promise.all(
+  const resources: Resource[] = await Promise.all(
     (internalConfig.detectors || []).map(async d => {
       try {
         const resource = await d.detect(internalConfig);
@@ -52,10 +52,11 @@ export const detectResources = async (
   );
 };
 
+
 /**
  * Writes debug information about the detected resources to the logger defined in the resource detection config, if one is provided.
  *
- * @param resources The array of {@link Resource} that should be logged. Empty entried will be ignored.
+ * @param resources The array of {@link Resource} that should be logged. Empty entries will be ignored.
  */
 const logResources = (resources: Array<Resource>) => {
   resources.forEach(resource => {

@@ -4,6 +4,6 @@
   "references": [
     { "path": "./tsconfig.json" },
     { "path": "./tsconfig.esm.json" },
-    { "path": "./tsconfig.esm2015.json" }
+    { "path": "./tsconfig.esnext.json" }
   ]
 }

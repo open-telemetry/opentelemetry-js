@@ -51,6 +51,10 @@ export class PatternPredicate implements Predicate {
   static escapePattern(pattern: string): string {
     return `^${pattern.replace(ESCAPE, '\\$&').replace('*', '.*')}$`;
   }
+
+  static hasWildcard(pattern: string): boolean{
+    return pattern.includes('*');
+  }
 }
 
 export class ExactPredicate implements Predicate {

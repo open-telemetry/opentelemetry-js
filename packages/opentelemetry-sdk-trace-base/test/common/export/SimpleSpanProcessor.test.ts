@@ -68,7 +68,7 @@ describe('SimpleSpanProcessor', () => {
         spanContext,
         SpanKind.CLIENT
       );
-      processor.onStart(span);
+      processor.onStart(span, ROOT_CONTEXT);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
       processor.onEnd(span);
@@ -92,7 +92,7 @@ describe('SimpleSpanProcessor', () => {
         spanContext,
         SpanKind.CLIENT
       );
-      processor.onStart(span);
+      processor.onStart(span, ROOT_CONTEXT);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
       processor.onEnd(span);
@@ -117,7 +117,7 @@ describe('SimpleSpanProcessor', () => {
         spanContext,
         SpanKind.CLIENT
       );
-      processor.onStart(span);
+      processor.onStart(span, ROOT_CONTEXT);
 
       sinon.stub(exporter, 'export').callsFake((_, callback) => {
         setTimeout(() => {
@@ -195,7 +195,7 @@ describe('SimpleSpanProcessor', () => {
         SpanKind.CLIENT
       );
 
-      processor.onStart(span);
+      processor.onStart(span, ROOT_CONTEXT);
       processor.onEnd(span);
 
       const exporterCreatedSpans = testTracingExporter.getExporterCreatedSpans();

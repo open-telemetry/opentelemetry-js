@@ -17,76 +17,93 @@
 import {
   Counter,
   ObservableResult,
-  ObservableGauge,
   Histogram,
   ValueType,
 } from '@opentelemetry/api-metrics';
-import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
-import * as metrics from '@opentelemetry/sdk-metrics-base';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
+import {
+  ExplicitBucketHistogramAggregation,
+  MeterProvider,
+  MetricReader
+} from '@opentelemetry/sdk-metrics-base';
+import { IExportMetricsServiceRequest, IKeyValue, IMetric } from '@opentelemetry/otlp-transformer';
 import { Stream } from 'stream';
 
-const meterProvider = new metrics.MeterProvider({
-  interval: 30000,
-  resource: new Resource({
-    service: 'ui',
-    version: 1,
-    cost: 112.12,
-  }),
-});
+export class TestMetricReader extends MetricReader {
+  protected onForceFlush(): Promise<void> {
+    return Promise.resolve(undefined);
+  }
 
-const meter = meterProvider.getMeter('default', '0.0.1');
+  protected onShutdown(): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+}
 
-export function mockCounter(): metrics.Metric<metrics.BoundCounter> & Counter {
+const testResource = Resource.default().merge(new Resource({
+  service: 'ui',
+  version: 1,
+  cost: 112.12,
+}));
+
+let meterProvider = new MeterProvider({ resource: testResource });
+
+let reader = new TestMetricReader();
+meterProvider.addMetricReader(reader);
+
+let meter = meterProvider.getMeter('default', '0.0.1');
+
+export async function collect() {
+  return (await reader.collect())!;
+}
+
+export function setUp() {
+  meterProvider = new MeterProvider({ resource: testResource });
+  reader = new TestMetricReader();
+  meterProvider.addMetricReader(
+    reader
+  );
+  meter = meterProvider.getMeter('default', '0.0.1');
+}
+
+export async function shutdown() {
+  await meterProvider.shutdown();
+}
+
+export function mockCounter(): Counter {
   const name = 'int-counter';
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createCounter(name, {
-      description: 'sample counter description',
-      valueType: ValueType.INT,
-    });
-  metric.clear();
-  metric.bind({});
-  return metric;
+  return meter.createCounter(name, {
+    description: 'sample counter description',
+    valueType: ValueType.INT,
+  });
 }
 
 export function mockObservableGauge(
   callback: (observableResult: ObservableResult) => void
-): metrics.Metric<metrics.BoundCounter> & ObservableGauge {
+): void {
   const name = 'double-observable-gauge';
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createObservableGauge(
-      name,
-      {
-        description: 'sample observable gauge description',
-        valueType: ValueType.DOUBLE,
-      },
-      callback
-    );
-  metric.clear();
-  metric.bind({});
-  return metric;
+  return meter.createObservableGauge(
+    name,
+    callback,
+    {
+      description: 'sample observable gauge description',
+      valueType: ValueType.DOUBLE,
+    },
+  );
 }
 
-export function mockHistogram(): metrics.Metric<metrics.BoundHistogram> &
-  Histogram {
+export function mockHistogram(): Histogram {
   const name = 'int-histogram';
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createHistogram(name, {
-      description: 'sample histogram description',
-      valueType: ValueType.INT,
-      boundaries: [0, 100],
-    });
-  metric.clear();
-  metric.bind({});
-  return metric;
+  meterProvider.addView({ aggregation: new ExplicitBucketHistogramAggregation([0, 100]) });
+
+  return meter.createHistogram(name, {
+    description: 'sample histogram description',
+    valueType: ValueType.INT,
+  });
 }
 
 export function ensureProtoAttributesAreCorrect(
-  attributes: otlpTypes.opentelemetryProto.common.v1.KeyValue[]
+  attributes: IKeyValue[]
 ) {
   assert.deepStrictEqual(
     attributes,
@@ -103,18 +120,19 @@ export function ensureProtoAttributesAreCorrect(
 }
 
 export function ensureExportedCounterIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
-  time?: number
+  metric: IMetric,
+  time?: number,
+  startTime?: number
 ) {
   assert.deepStrictEqual(metric, {
     name: 'int-counter',
     description: 'sample counter description',
     unit: '1',
-    intSum: {
+    sum: {
       dataPoints: [
         {
-          value: '1',
-          startTimeUnixNano: '1592602232694000128',
+          asInt: '1',
+          startTimeUnixNano: String(startTime),
           timeUnixNano: String(time),
         },
       ],
@@ -125,18 +143,19 @@ export function ensureExportedCounterIsCorrect(
 }
 
 export function ensureExportedObservableGaugeIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
-  time?: number
+  metric: IMetric,
+  time?: number,
+  startTime?: number
 ) {
   assert.deepStrictEqual(metric, {
     name: 'double-observable-gauge',
     description: 'sample observable gauge description',
     unit: '1',
-    doubleGauge: {
+    gauge: {
       dataPoints: [
         {
-          value: 6,
-          startTimeUnixNano: '1592602232694000128',
+          asDouble: 6,
+          startTimeUnixNano: String(startTime),
           timeUnixNano: String(time),
         },
       ],
@@ -145,8 +164,9 @@ export function ensureExportedObservableGaugeIsCorrect(
 }
 
 export function ensureExportedHistogramIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: IMetric,
   time?: number,
+  startTime?: number,
   explicitBounds: number[] = [Infinity],
   bucketCounts: string[] = ['2', '0']
 ) {
@@ -154,13 +174,13 @@ export function ensureExportedHistogramIsCorrect(
     name: 'int-histogram',
     description: 'sample histogram description',
     unit: '1',
-    intHistogram: {
+    histogram: {
       dataPoints: [
         {
-          sum: '21',
+          sum: 21,
           count: '2',
-          startTimeUnixNano: '1592602232694000128',
-          timeUnixNano: time,
+          startTimeUnixNano: String(startTime),
+          timeUnixNano: String(time),
           bucketCounts,
           explicitBounds,
         },
@@ -171,7 +191,7 @@ export function ensureExportedHistogramIsCorrect(
 }
 
 export function ensureExportMetricsServiceRequestIsSet(
-  json: otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
+  json: IExportMetricsServiceRequest
 ) {
   const resourceMetrics = json.resourceMetrics;
   assert.strictEqual(
@@ -181,25 +201,15 @@ export function ensureExportMetricsServiceRequestIsSet(
   );
 
   const resource = resourceMetrics[0].resource;
-  assert.strictEqual(!!resource, true, 'resource is missing');
+  assert.ok(resource, 'resource is missing');
 
-  const instrumentationLibraryMetrics =
-    resourceMetrics[0].instrumentationLibraryMetrics;
-  assert.strictEqual(
-    instrumentationLibraryMetrics && instrumentationLibraryMetrics.length,
-    1,
-    'instrumentationLibraryMetrics is missing'
-  );
+  const scopeMetrics = resourceMetrics[0].scopeMetrics;
+  assert.strictEqual(scopeMetrics?.length, 1, 'scopeMetrics is missing');
 
-  const instrumentationLibrary =
-    instrumentationLibraryMetrics[0].instrumentationLibrary;
-  assert.strictEqual(
-    !!instrumentationLibrary,
-    true,
-    'instrumentationLibrary is missing'
-  );
+  const scope = scopeMetrics[0].scope;
+  assert.ok(scope, 'scope is missing');
 
-  const metrics = resourceMetrics[0].instrumentationLibraryMetrics[0].metrics;
+  const metrics = resourceMetrics[0].scopeMetrics[0].metrics;
   assert.strictEqual(metrics.length, 3, 'Metrics are missing');
 }
 

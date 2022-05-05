@@ -71,29 +71,37 @@ export class Tracer implements api.Tracer {
       return api.trace.wrapSpanContext(api.INVALID_SPAN_CONTEXT);
     }
 
-    const parentContext = getParent(options, context);
+    // remove span from context in case a root span is requested via options
+    if (options.root) {
+      context = api.trace.deleteSpan(context);
+    }
+
+    const parentSpanContext = api.trace.getSpanContext(context);
     const spanId = this._idGenerator.generateSpanId();
     let traceId;
     let traceState;
     let parentSpanId;
-    if (!parentContext || !api.trace.isSpanContextValid(parentContext)) {
+    if (!parentSpanContext || !api.trace.isSpanContextValid(parentSpanContext)) {
       // New root span.
       traceId = this._idGenerator.generateTraceId();
     } else {
       // New child span.
-      traceId = parentContext.traceId;
-      traceState = parentContext.traceState;
-      parentSpanId = parentContext.spanId;
+      traceId = parentSpanContext.traceId;
+      traceState = parentSpanContext.traceState;
+      parentSpanId = parentSpanContext.spanId;
     }
 
     const spanKind = options.kind ?? api.SpanKind.INTERNAL;
-    const links = options.links ?? [];
+    const links = (options.links ?? []).map(link => {
+      return {
+        context: link.context,
+        attributes: sanitizeAttributes(link.attributes),
+      };
+    });
     const attributes = sanitizeAttributes(options.attributes);
     // make sampling decision
     const samplingResult = this._sampler.shouldSample(
-      options.root
-        ? api.trace.setSpanContext(context, api.INVALID_SPAN_CONTEXT)
-        : context,
+      context,
       traceId,
       name,
       spanKind,
@@ -121,8 +129,10 @@ export class Tracer implements api.Tracer {
       links,
       options.startTime
     );
-    // Set default attributes
-    span.setAttributes(Object.assign(attributes, samplingResult.attributes));
+    // Set initial span attributes. The attributes object may have been mutated
+    // by the sampler, so we sanitize the merged attributes before setting them.
+    const initAttributes = sanitizeAttributes(Object.assign(attributes, samplingResult.attributes));
+    span.setAttributes(initAttributes);
     return span;
   }
 
@@ -227,19 +237,4 @@ export class Tracer implements api.Tracer {
   getActiveSpanProcessor(): SpanProcessor {
     return this._tracerProvider.getActiveSpanProcessor();
   }
-}
-
-/**
- * Get the parent to assign to a started span. If options.parent is null,
- * do not assign a parent.
- *
- * @param options span options
- * @param context context to check for parent
- */
-function getParent(
-  options: api.SpanOptions,
-  context: api.Context
-): api.SpanContext | undefined {
-  if (options.root) return undefined;
-  return api.trace.getSpanContext(context);
 }

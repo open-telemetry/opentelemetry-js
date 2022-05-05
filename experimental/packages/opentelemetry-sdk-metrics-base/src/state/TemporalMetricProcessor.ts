@@ -17,8 +17,6 @@
 import { HrTime } from '@opentelemetry/api';
 import { AccumulationRecord, Aggregator } from '../aggregator/types';
 import { MetricData } from '../export/MetricData';
-import { Resource } from '@opentelemetry/resources';
-import { InstrumentationLibrary } from '@opentelemetry/core';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 import { Maybe } from '../utils';
@@ -66,8 +64,6 @@ export class TemporalMetricProcessor<T> {
   buildMetrics(
     collector: MetricCollectorHandle,
     collectors: MetricCollectorHandle[],
-    resource: Resource,
-    instrumentationLibrary: InstrumentationLibrary,
     instrumentDescriptor: InstrumentDescriptor,
     currentAccumulations: AttributeHashMap<T>,
     sdkStartTime: HrTime,
@@ -111,8 +107,6 @@ export class TemporalMetricProcessor<T> {
     // 1. Cumulative Aggregation time span: (sdkStartTime, collectionTime]
     // 2. Delta Aggregation time span: (lastCollectionTime, collectionTime]
     return this._aggregator.toMetricData(
-      resource,
-      instrumentationLibrary,
       instrumentDescriptor,
       AttributesMapToAccumulationRecords(result),
       /* startTime */ aggregationTemporality === AggregationTemporality.CUMULATIVE ? sdkStartTime : lastCollectionTime,

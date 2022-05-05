@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-import { ObservableCallback } from '@opentelemetry/api-metrics-wip';
+import { ObservableCallback } from '@opentelemetry/api-metrics';
 import * as assert from 'assert';
-import { Counter, Histogram, UpDownCounter } from '../src/Instruments';
+import { CounterInstrument, HistogramInstrument, UpDownCounterInstrument } from '../src/Instruments';
 import { Meter } from '../src/Meter';
 import { MeterProviderSharedState } from '../src/state/MeterProviderSharedState';
+import { MeterSharedState } from '../src/state/MeterSharedState';
 import { defaultInstrumentationLibrary, defaultResource } from './util';
 
 const noopObservableCallback: ObservableCallback = _observableResult => {};
@@ -26,45 +27,63 @@ const noopObservableCallback: ObservableCallback = _observableResult => {};
 describe('Meter', () => {
   describe('createCounter', () => {
     it('should create counter', () => {
-      const meter = new Meter(new MeterProviderSharedState(defaultResource), defaultInstrumentationLibrary);
+      const meterSharedState = new MeterSharedState(
+        new MeterProviderSharedState(defaultResource),
+        defaultInstrumentationLibrary);
+      const meter = new Meter(meterSharedState);
       const counter = meter.createCounter('foobar');
-      assert(counter instanceof Counter);
+      assert(counter instanceof CounterInstrument);
     });
   });
 
   describe('createUpDownCounter', () => {
     it('should create up down counter', () => {
-      const meter = new Meter(new MeterProviderSharedState(defaultResource), defaultInstrumentationLibrary);
+      const meterSharedState = new MeterSharedState(
+        new MeterProviderSharedState(defaultResource),
+        defaultInstrumentationLibrary);
+      const meter = new Meter(meterSharedState);
       const counter = meter.createUpDownCounter('foobar');
-      assert(counter instanceof UpDownCounter);
+      assert(counter instanceof UpDownCounterInstrument);
     });
   });
 
   describe('createHistogram', () => {
     it('should create histogram', () => {
-      const meter = new Meter(new MeterProviderSharedState(defaultResource), defaultInstrumentationLibrary);
+      const meterSharedState = new MeterSharedState(
+        new MeterProviderSharedState(defaultResource),
+        defaultInstrumentationLibrary);
+      const meter = new Meter(meterSharedState);
       const counter = meter.createHistogram('foobar');
-      assert(counter instanceof Histogram);
+      assert(counter instanceof HistogramInstrument);
     });
   });
 
   describe('createObservableGauge', () => {
     it('should create observable gauge', () => {
-      const meter = new Meter(new MeterProviderSharedState(defaultResource), defaultInstrumentationLibrary);
+      const meterSharedState = new MeterSharedState(
+        new MeterProviderSharedState(defaultResource),
+        defaultInstrumentationLibrary);
+      const meter = new Meter(meterSharedState);
       meter.createObservableGauge('foobar', noopObservableCallback);
     });
   });
 
   describe('createObservableCounter', () => {
     it('should create observable counter', () => {
-      const meter = new Meter(new MeterProviderSharedState(defaultResource), defaultInstrumentationLibrary);
+      const meterSharedState = new MeterSharedState(
+        new MeterProviderSharedState(defaultResource),
+        defaultInstrumentationLibrary);
+      const meter = new Meter(meterSharedState);
       meter.createObservableCounter('foobar', noopObservableCallback);
     });
   });
 
   describe('createObservableUpDownCounter', () => {
     it('should create observable up-down-counter', () => {
-      const meter = new Meter(new MeterProviderSharedState(defaultResource), defaultInstrumentationLibrary);
+      const meterSharedState = new MeterSharedState(
+        new MeterProviderSharedState(defaultResource),
+        defaultInstrumentationLibrary);
+      const meter = new Meter(meterSharedState);
       meter.createObservableUpDownCounter('foobar', noopObservableCallback);
     });
   });

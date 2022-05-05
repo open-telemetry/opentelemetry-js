@@ -14,80 +14,88 @@
  * limitations under the License.
  */
 
-import {
-  Counter,
-  ObservableResult,
-  ObservableGauge,
-  Histogram,
-  ValueType,
-} from '@opentelemetry/api-metrics';
-import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
-import * as metrics from '@opentelemetry/sdk-metrics-base';
+import { Counter, Histogram, ObservableResult, ValueType } from '@opentelemetry/api-metrics';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as grpc from '@grpc/grpc-js';
 import { VERSION } from '@opentelemetry/core';
+import { ExplicitBucketHistogramAggregation, MeterProvider, MetricReader } from '@opentelemetry/sdk-metrics-base';
+import { IKeyValue, IMetric, IResource } from '@opentelemetry/otlp-transformer';
 
-const meterProvider = new metrics.MeterProvider({
-  interval: 30000,
-  resource: new Resource({
-    service: 'ui',
-    version: 1,
-    cost: 112.12,
-  }),
-});
+export class TestMetricReader extends MetricReader {
+  protected onForceFlush(): Promise<void> {
+    return Promise.resolve(undefined);
+  }
 
-const meter = meterProvider.getMeter('default', '0.0.1');
+  protected onShutdown(): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+}
 
-export function mockCounter(): metrics.Metric<metrics.BoundCounter> & Counter {
+const testResource = Resource.default().merge(new Resource({
+  service: 'ui',
+  version: 1,
+  cost: 112.12,
+}));
+
+let meterProvider = new MeterProvider({ resource: testResource });
+
+let reader = new TestMetricReader();
+meterProvider.addMetricReader(reader);
+
+let meter = meterProvider.getMeter('default', '0.0.1');
+
+export async function collect() {
+  return (await reader.collect())!;
+}
+
+export function setUp() {
+  meterProvider = new MeterProvider({ resource: testResource });
+  reader = new TestMetricReader();
+  meterProvider.addMetricReader(
+    reader
+  );
+  meter = meterProvider.getMeter('default', '0.0.1');
+}
+
+export async function shutdown() {
+  await meterProvider.shutdown();
+}
+
+export function mockCounter(): Counter {
   const name = 'int-counter';
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createCounter(name, {
-      description: 'sample counter description',
-      valueType: ValueType.INT,
-    });
-  metric.clear();
-  metric.bind({});
-  return metric;
+  return meter.createCounter(name, {
+    description: 'sample counter description',
+    valueType: ValueType.INT,
+  });
 }
 
 export function mockObservableGauge(
   callback: (observableResult: ObservableResult) => void
-): metrics.Metric<metrics.BoundCounter> & ObservableGauge {
+): void {
   const name = 'double-observable-gauge';
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createObservableGauge(
-      name,
-      {
-        description: 'sample observable gauge description',
-        valueType: ValueType.DOUBLE,
-      },
-      callback
-    );
-  metric.clear();
-  metric.bind({});
-  return metric;
+  return meter.createObservableGauge(
+    name,
+    callback,
+    {
+      description: 'sample observable gauge description',
+      valueType: ValueType.DOUBLE,
+    },
+  );
 }
 
-export function mockHistogram(): metrics.Metric<metrics.BoundHistogram> &
-  Histogram {
+export function mockHistogram(): Histogram {
   const name = 'int-histogram';
-  const metric =
-    meter['_metrics'].get(name) ||
-    meter.createHistogram(name, {
-      description: 'sample histogram description',
-      valueType: ValueType.INT,
-      boundaries: [0, 100],
-    });
-  metric.clear();
-  metric.bind({});
-  return metric;
+  meterProvider.addView({ aggregation: new ExplicitBucketHistogramAggregation([0, 100]) });
+
+  return meter.createHistogram(name, {
+    description: 'sample histogram description',
+    valueType: ValueType.INT,
+  });
 }
 
 export function ensureExportedAttributesAreCorrect(
-  attributes: otlpTypes.opentelemetryProto.common.v1.KeyValue[]
+  attributes: IKeyValue[]
 ) {
   assert.deepStrictEqual(
     attributes,
@@ -105,21 +113,24 @@ export function ensureExportedAttributesAreCorrect(
 }
 
 export function ensureExportedCounterIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
-  time?: number
+  metric: IMetric,
+  time?: number,
+  startTime?: number
 ) {
   assert.deepStrictEqual(metric, {
     name: 'int-counter',
     description: 'sample counter description',
     unit: '1',
-    data: 'intSum',
-    intSum: {
+    data: 'sum',
+    sum: {
       dataPoints: [
         {
-          labels: [],
+          attributes: [],
           exemplars: [],
-          value: '1',
-          startTimeUnixNano: '1592602232694000128',
+          value: 'asInt',
+          asInt: '1',
+          flags: 0,
+          startTimeUnixNano: String(startTime),
           timeUnixNano: String(time),
         },
       ],
@@ -130,21 +141,24 @@ export function ensureExportedCounterIsCorrect(
 }
 
 export function ensureExportedObservableGaugeIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
-  time?: number
+  metric: IMetric,
+  time?: number,
+  startTime?: number
 ) {
   assert.deepStrictEqual(metric, {
     name: 'double-observable-gauge',
     description: 'sample observable gauge description',
     unit: '1',
-    data: 'doubleGauge',
-    doubleGauge: {
+    data: 'gauge',
+    gauge: {
       dataPoints: [
         {
-          labels: [],
+          attributes: [],
           exemplars: [],
-          value: 6,
-          startTimeUnixNano: '1592602232694000128',
+          value: 'asDouble',
+          asDouble: 6,
+          flags: 0,
+          startTimeUnixNano: String(startTime),
           timeUnixNano: String(time),
         },
       ],
@@ -153,8 +167,9 @@ export function ensureExportedObservableGaugeIsCorrect(
 }
 
 export function ensureExportedHistogramIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: IMetric,
   time?: number,
+  startTime?: number,
   explicitBounds: number[] = [Infinity],
   bucketCounts: string[] = ['2', '0']
 ) {
@@ -162,15 +177,17 @@ export function ensureExportedHistogramIsCorrect(
     name: 'int-histogram',
     description: 'sample histogram description',
     unit: '1',
-    data: 'intHistogram',
-    intHistogram: {
+    data: 'histogram',
+    histogram: {
       dataPoints: [
         {
-          labels: [],
+          attributes: [],
           exemplars: [],
-          sum: '21',
+          flags: 0,
+          _sum: 'sum',
+          sum: 21,
           count: '2',
-          startTimeUnixNano: '1592602232694000128',
+          startTimeUnixNano: String(startTime),
           timeUnixNano: String(time),
           bucketCounts,
           explicitBounds,
@@ -182,7 +199,7 @@ export function ensureExportedHistogramIsCorrect(
 }
 
 export function ensureResourceIsCorrect(
-  resource: otlpTypes.opentelemetryProto.resource.v1.Resource
+  resource: IResource
 ) {
   assert.deepStrictEqual(resource, {
     attributes: [
@@ -241,11 +258,11 @@ export function ensureResourceIsCorrect(
 }
 
 export function ensureMetadataIsCorrect(
-  actual: grpc.Metadata,
-  expected: grpc.Metadata
+  actual?: grpc.Metadata,
+  expected?: grpc.Metadata
 ) {
   //ignore user agent
-  expected.remove('user-agent');
-  actual.remove('user-agent');
-  assert.deepStrictEqual(actual.getMap(), expected.getMap());
+  expected?.remove('user-agent');
+  actual?.remove('user-agent');
+  assert.deepStrictEqual(actual?.getMap(), expected?.getMap() ?? {});
 }

@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.esnext.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "build/esnext",
+    "tsBuildInfoFile": "build/esnext/tsconfig.esnext.tsbuildinfo"
+  },
+  "files": [
+    "node_modules/zone.js/dist/zone.js.d.ts"
+  ],
+  "include": [
+    "src/**/*.ts"
+  ]
+}

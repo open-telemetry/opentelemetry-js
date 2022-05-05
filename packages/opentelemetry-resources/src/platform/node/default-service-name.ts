@@ -15,5 +15,5 @@
  */
 
 export function defaultServiceName(): string {
-    return `unknown_service:${process.argv0}`;
+  return `unknown_service:${process.argv0}`;
 }

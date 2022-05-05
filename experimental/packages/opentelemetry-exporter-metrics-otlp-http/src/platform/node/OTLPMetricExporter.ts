@@ -14,32 +14,25 @@
  * limitations under the License.
  */
 
-import { MetricRecord, MetricExporter } from '@opentelemetry/sdk-metrics-base';
+import { ResourceMetrics, AggregationTemporality } from '@opentelemetry/sdk-metrics-base';
+import { getEnv, baggageUtils} from '@opentelemetry/core';
+import { defaultExporterTemporality, defaultOptions, OTLPMetricExporterOptions } from '../../OTLPMetricExporterOptions';
+import { OTLPMetricExporterBase } from '../../OTLPMetricExporterBase';
 import {
+  appendResourcePathToUrlIfNotPresent,
   OTLPExporterNodeBase,
-  OTLPExporterNodeConfigBase,
-  otlpTypes,
-  appendResourcePathToUrlIfNotPresent
-} from '@opentelemetry/exporter-trace-otlp-http';
-import { toOTLPExportMetricServiceRequest } from '../../transformMetrics';
-import { getEnv, baggageUtils } from '@opentelemetry/core';
+  OTLPExporterNodeConfigBase
+} from '@opentelemetry/otlp-exporter-base';
+import { createExportMetricsServiceRequest, IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = '/v1/metrics';
-const DEFAULT_COLLECTOR_URL=`http://localhost:4318${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
+const DEFAULT_COLLECTOR_URL = `http://localhost:4318${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 
-/**
- * Collector Metric Exporter for Node
- */
-export class OTLPMetricExporter
-  extends OTLPExporterNodeBase<
-    MetricRecord,
-    otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
-  >
-  implements MetricExporter {
-  // Converts time to nanoseconds
-  protected readonly _startTime = new Date().getTime() * 1000000;
+class OTLPExporterNodeProxy extends OTLPExporterNodeBase<ResourceMetrics,
+  IExportMetricsServiceRequest> {
+  protected readonly _aggregationTemporality: AggregationTemporality;
 
-  constructor(config: OTLPExporterNodeConfigBase = {}) {
+  constructor(config: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions = defaultOptions) {
     super(config);
     this.headers = Object.assign(
       this.headers,
@@ -47,15 +40,13 @@ export class OTLPMetricExporter
         getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS
       )
     );
+    this._aggregationTemporality = config.aggregationTemporality ?? defaultExporterTemporality;
   }
 
-  convert(
-    metrics: MetricRecord[]
-  ): otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
-    return toOTLPExportMetricServiceRequest(
+  convert(metrics: ResourceMetrics[]): IExportMetricsServiceRequest {
+    return createExportMetricsServiceRequest(
       metrics,
-      this._startTime,
-      this
+      this._aggregationTemporality
     );
   }
 
@@ -63,9 +54,18 @@ export class OTLPMetricExporter
     return typeof config.url === 'string'
       ? config.url
       : getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0
-      ? getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
-      : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-      ? appendResourcePathToUrlIfNotPresent(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
-      : DEFAULT_COLLECTOR_URL;
+        ? getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
+        : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
+          ? appendResourcePathToUrlIfNotPresent(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
+          : DEFAULT_COLLECTOR_URL;
+  }
+}
+
+/**
+ * Collector Metric Exporter for Node
+ */
+export class OTLPMetricExporter extends OTLPMetricExporterBase<OTLPExporterNodeProxy> {
+  constructor(config: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions = defaultOptions) {
+    super(new OTLPExporterNodeProxy(config), config);
   }
 }

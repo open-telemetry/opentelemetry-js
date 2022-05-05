@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { context, TraceFlags } from '@opentelemetry/api';
+import { context, Context, TraceFlags } from '@opentelemetry/api';
 import {
   BindOnceFuture,
   ExportResultCode,
@@ -73,7 +73,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
   }
 
   // does nothing.
-  onStart(_span: Span): void {}
+  onStart(_span: Span, _parentContext: Context): void {}
 
   onEnd(span: ReadableSpan): void {
     if (this._shutdownOnce.isCalled) {

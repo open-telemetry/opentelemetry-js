@@ -116,8 +116,9 @@ describe('JaegerExporter', () => {
       assert.strictEqual(sender._host, 'localhost');
     });
 
-    it('should respect jaeger host env variable', () => {
+    it('should respect jaeger host and port env variable', () => {
       process.env.OTEL_EXPORTER_JAEGER_AGENT_HOST = 'env-set-host';
+      process.env.OTEL_EXPORTER_JAEGER_AGENT_PORT = '1234';
       const exporter = new JaegerExporter();
       const sender = exporter['_getSender']({
         tags: [{
@@ -126,12 +127,15 @@ describe('JaegerExporter', () => {
         }]
       } as any);
       assert.strictEqual(sender._host, 'env-set-host');
+      assert.strictEqual(sender._port, 1234);
     });
 
-    it('should prioritize host option over env variable', () => {
+    it('should prioritize host and port option over env variable', () => {
       process.env.OTEL_EXPORTER_JAEGER_AGENT_HOST = 'env-set-host';
+      process.env.OTEL_EXPORTER_JAEGER_AGENT_PORT = '1234';
       const exporter = new JaegerExporter({
         host: 'option-set-host',
+        port: 5678
       });
       const sender = exporter['_getSender']({
         tags: [{
@@ -140,6 +144,7 @@ describe('JaegerExporter', () => {
         }]
       } as any);
       assert.strictEqual(sender._host, 'option-set-host');
+      assert.strictEqual(sender._port, 5678);
     });
 
     it('should construct an exporter with flushTimeout', () => {

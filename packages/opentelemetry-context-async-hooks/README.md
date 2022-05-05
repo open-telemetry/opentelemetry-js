@@ -1,39 +1,45 @@
-# OpenTelemetry AsyncHooks-based Context Manager
+# OpenTelemetry async_hooks-based Context Managers
 
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-This package provides [async-hooks][async-hooks-doc] based context manager which is used internally by OpenTelemetry plugins to propagate specific context between function calls and async operations. It only targets NodeJS since async-hooks is only available there.
+This package provides two [`ContextManager`](https://open-telemetry.github.io/opentelemetry-js-api/interfaces/contextmanager.html) implementations built on APIs from Node.js's [`async_hooks`][async-hooks-doc] module. If you're looking for a `ContextManager` to use in browser environments, consider [opentelemetry-context-zone](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone) or [opentelemetry-context-zone-peer-dep](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone-peer-dep).
 
-## What is a ContextManager
+The definition of the `ContextManager` interface and the problem it solves can be found [here](def-context-manager).
 
-The definition and why they exist is available on [the document for context manager][def-context-manager].
+## API
 
-### Implementation in NodeJS
+Two `ContextManager` implementations are exported:
 
-NodeJS has a specific API to track async context: [async-hooks][async-hooks-doc], it allows to track creation of new async operation and their respective parent.
-This package only handle storing a specific object for a given async hooks context.
+* `AsyncLocalStorageContextManager`, based on [`AsyncLocalStorage`](https://nodejs.org/api/async_context.html#class-asynclocalstorage)
+* `AsyncHooksContextManager`, based on [`AsyncHook`](https://nodejs.org/api/async_hooks.html#async_hooks_class_asynchook)
 
-### Limitations
+The former should be preferred over the latter as its implementation is substantially simpler than the latter's, and according to [Node.js docs](https://github.com/nodejs/node/blame/v17.1.0/doc/api/async_context.md#L42-L45),
 
-Even if the API is native to NodeJS, it doesn't cover all possible cases of context propagation but there is a big effort from the NodeJS team to fix those. That's why we generally advise to be on the latest LTS to benefit from performance and bug fixes.
+> While you can create your own implementation [of `AsyncLocalStorage`] on top of [`AsyncHook`], `AsyncLocalStorage` should be preferred as it is a performant and memory safe implementation that involves significant optimizations that are non-obvious to implement.
 
-There are known modules that break context propagation ([some of them are listed there][pkgs-that-break-ah]), so it's possible that the context manager doesn't work with them.
+`AsyncLocalStorage` is available in node `^12.17.0 || >= 13.10.0`, however `AsyncLocalStorageContextManager` is not enabled by default for node `<14.8.0` because of some important bugfixes which were introduced in `v14.8.0` (e.g., [nodejs/node#34573](https://github.com/nodejs/node/pull/34573)).
 
-### Prior arts
+## Limitations
 
-Context propagation is a big subject when talking about tracing in NodeJS, if you want more information about that here are some resources:
+It's possible that this package won't track context perfectly when used with certain packages. In particular, it inherits any bugs present in async_hooks. See [here][pkgs-that-break-ah] for known issues.
 
-- <https://www.npmjs.com/package/continuation-local-storage> (which was the old way of doing context propagation)
-- Datadog's own implementation for their Javascript tracer: [here][dd-js-tracer-scope]
-- OpenTracing implementation: [here][opentracing-scope]
-- Discussion about context propagation by the NodeJS diagnostics working group: [here][diag-team-scope-discussion]
+async_hooks is still seeing significant correctness and performance fixes, it's recommended to run the latest Node.js LTS release to benefit from said fixes.
+
+## Prior art
+
+Context propagation is a big subject when talking about tracing in Node.js. If you want more information about it here are some resources:
+
+* <https://www.npmjs.com/package/continuation-local-storage> (which was the old way of doing context propagation)
+* Datadog's own implementation for their JavaScript tracer: [here][dd-js-tracer-scope]
+* OpenTracing implementation: [here][opentracing-scope]
+* Discussion about context propagation by the Node.js Diagnostics Working Group: [here][diag-team-scope-discussion]
 
 ## Useful links
 
-- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
-- For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
+* For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
+* For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
+* For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
 
 ## License
 
@@ -43,7 +49,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [async-hooks-doc]: http://nodejs.org/dist/latest/docs/api/async_hooks.html
-[def-context-manager]: https://github.com/open-telemetry/opentelemetry-js-api/blob/main/docs/context.md#context-manager
+[def-context-manager]: https://opentelemetry.io/docs/instrumentation/js/api/context/#context-manager
 [dd-js-tracer-scope]: https://github.com/DataDog/dd-trace-js/blob/master/packages/dd-trace/src/scope.js
 [opentracing-scope]: https://github.com/opentracing/opentracing-javascript/pull/113
 [diag-team-scope-discussion]: https://github.com/nodejs/diagnostics/issues/300

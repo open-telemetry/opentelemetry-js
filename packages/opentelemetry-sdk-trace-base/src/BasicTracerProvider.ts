@@ -15,12 +15,12 @@
  */
 
 import {
-  TracerProvider,
-  trace,
   context,
+  diag,
   propagation,
   TextMapPropagator,
-  diag,
+  trace,
+  TracerProvider,
 } from '@opentelemetry/api';
 import {
   CompositePropagator,
@@ -90,10 +90,10 @@ export class BasicTracerProvider implements TracerProvider {
     }
   }
 
-  getTracer(name: string, version?: string): Tracer {
-    const key = `${name}@${version || ''}`;
+  getTracer(name: string, version?: string, options?: { schemaUrl?: string }): Tracer {
+    const key = `${name}@${version || ''}:${options?.schemaUrl || ''}`;
     if (!this._tracers.has(key)) {
-      this._tracers.set(key, new Tracer({ name, version }, this._config, this));
+      this._tracers.set(key, new Tracer({ name, version, schemaUrl: options?.schemaUrl }, this._config, this));
     }
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion

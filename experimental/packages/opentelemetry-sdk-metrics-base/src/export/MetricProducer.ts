@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { MetricData } from './MetricData';
+import { ResourceMetrics } from './MetricData';
 
 /**
  * This is a public interface that represent an export state of a MetricReader.
  */
 export interface MetricProducer {
-  collect(): Promise<MetricData[]>;
+  collect(): Promise<ResourceMetrics>;
 }

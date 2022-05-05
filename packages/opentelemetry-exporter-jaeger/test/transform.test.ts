@@ -129,7 +129,13 @@ describe('transform', () => {
       assert.strictEqual(tag7.key, 'cost');
       assert.strictEqual(tag7.vType, 'DOUBLE');
       assert.strictEqual(tag7.vDouble, 112.12);
-      assert.strictEqual(thriftSpan.references.length, 0);
+
+      assert.strictEqual(thriftSpan.references.length, 1);
+      const [reference1] = thriftSpan.references;
+      assert.strictEqual(reference1.refType, ThriftReferenceType.FOLLOWS_FROM);
+      assert.strictEqual(reference1.spanId.toString('hex'), readableSpan.links[0].context.spanId);
+      assert.strictEqual(reference1.traceIdLow.toString('hex'), readableSpan.links[0].context.traceId.substring(16, 32));
+      assert.strictEqual(reference1.traceIdHigh.toString('hex'), readableSpan.links[0].context.traceId.substring(0, 16));
 
       assert.strictEqual(thriftSpan.logs.length, 1);
       const [log1] = thriftSpan.logs;

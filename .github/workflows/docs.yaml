@@ -11,7 +11,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: '14'
 
@@ -23,7 +23,6 @@ jobs:
           path: |
             package-lock.json
             packages/*/package-lock.json
-            benchmark/*/package-lock.json
             backwards-compatability/*/package-lock.json
             metapackages/*/package-lock.json
             packages/*/package-lock.json
