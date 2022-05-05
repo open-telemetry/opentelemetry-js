@@ -39,6 +39,7 @@ export abstract class OTLPExporterBrowserBase<
   /**
    * exported only for test files
    */
+  // @ts-ignore
   private _resetSendWithBeacon = resetSendWithBeacon;
 
   /**
