@@ -190,40 +190,40 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       let buff = Buffer.from('');
 
       fakeRequest.on('end', () => {
-          const ExportTraceServiceRequestProto = getExportRequestProto();
-          const data = ExportTraceServiceRequestProto?.decode(writeArgs[0]);
-          const json = data?.toJSON() as IExportMetricsServiceRequest;
+        const ExportTraceServiceRequestProto = getExportRequestProto();
+        const data = ExportTraceServiceRequestProto?.decode(buff);
+        const json = data?.toJSON() as IExportMetricsServiceRequest;
 
-          const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[0];
-          const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[1];
-          const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[2];
+        const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[0];
+        const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[1];
+        const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[2];
 
-          assert.ok(typeof metric1 !== 'undefined', "counter doesn't exist");
-          ensureExportedCounterIsCorrect(
-            metric1,
-            metric1.sum?.dataPoints[0].timeUnixNano,
-            metric1.sum?.dataPoints[0].startTimeUnixNano
-          );
-          assert.ok(typeof metric2 !== 'undefined', "observable gauge doesn't exist");
-          ensureExportedObservableGaugeIsCorrect(
-            metric2,
-            metric2.gauge?.dataPoints[0].timeUnixNano,
-            metric2.gauge?.dataPoints[0].startTimeUnixNano
-          );
-          assert.ok(
-            typeof metric3 !== 'undefined',
-            "value recorder doesn't exist"
-          );
-          ensureExportedHistogramIsCorrect(
-            metric3,
-            metric3.histogram?.dataPoints[0].timeUnixNano,
-            metric3.histogram?.dataPoints[0].startTimeUnixNano,
-            [0, 100],
-            ['0', '2', '0']
-          );
+        assert.ok(typeof metric1 !== 'undefined', "counter doesn't exist");
+        ensureExportedCounterIsCorrect(
+          metric1,
+          metric1.sum?.dataPoints[0].timeUnixNano,
+          metric1.sum?.dataPoints[0].startTimeUnixNano
+        );
+        assert.ok(typeof metric2 !== 'undefined', "observable gauge doesn't exist");
+        ensureExportedObservableGaugeIsCorrect(
+          metric2,
+          metric2.gauge?.dataPoints[0].timeUnixNano,
+          metric2.gauge?.dataPoints[0].startTimeUnixNano
+        );
+        assert.ok(
+          typeof metric3 !== 'undefined',
+          "value recorder doesn't exist"
+        );
+        ensureExportedHistogramIsCorrect(
+          metric3,
+          metric3.histogram?.dataPoints[0].timeUnixNano,
+          metric3.histogram?.dataPoints[0].startTimeUnixNano,
+          [0, 100],
+          ['0', '2', '0']
+        );
 
-          ensureExportMetricsServiceRequestIsSet(json);
-          done();
+        ensureExportMetricsServiceRequestIsSet(json);
+        done();
       });
 
       fakeRequest.on('data', chunk => {

@@ -29,7 +29,7 @@ import {
   ensureHeadersContain,
   mockedReadableSpan,
 } from '../traceHelper';
-import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
+import { OTLPExporterConfigBase, OTLPExporterError } from '@opentelemetry/otlp-exporter-base';
 import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
 
 describe('OTLPTraceExporter - web', () => {
