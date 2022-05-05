@@ -20,15 +20,15 @@ import {
 } from '@opentelemetry/sdk-metrics-base';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { collect, mockCounter, mockObservableGauge, setUp, shutdown } from '../metricsHelper';
 import { OTLPExporterBase, OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
+import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 
 type CollectorExporterConfig = OTLPExporterConfigBase;
 class OTLPMetricExporter extends OTLPExporterBase<
   CollectorExporterConfig,
   ResourceMetrics,
-  otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
+  IExportMetricsServiceRequest
 > {
   onInit() {}
   onShutdown() {}
@@ -36,9 +36,7 @@ class OTLPMetricExporter extends OTLPExporterBase<
   getDefaultUrl(config: CollectorExporterConfig) {
     return config.url || '';
   }
-  convert(
-    metrics: ResourceMetrics[]
-  ): otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
+  convert(metrics: ResourceMetrics[]): IExportMetricsServiceRequest {
     return { resourceMetrics: [] };
   }
 }
