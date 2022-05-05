@@ -27,7 +27,6 @@ import {
 import {
   OTLPMetricExporter
 } from '../../src/platform/node';
-import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import {
   ensureCounterIsCorrect,
   ensureExportMetricsServiceRequestIsSet,
@@ -42,6 +41,7 @@ import { MockedResponse } from './nodeHelpers';
 import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
 import { Stream, PassThrough } from 'stream';
 import { OTLPExporterError, OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 
 let fakeRequest: PassThrough;
 
@@ -236,18 +236,12 @@ describe('OTLPMetricExporter - node with json over http', () => {
       });
 
       fakeRequest.on('end', () => {
-        const responseBody = buff.toString();
-
-        const json = JSON.parse(
-          responseBody
-        ) as otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
-        const metric1 =
-          json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
-        const metric2 =
-          json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[1];
-        const metric3 =
-          json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[2];
-
+        const writeArgs = stubWrite.args[0];
+        const json = JSON.parse(writeArgs[0]) as IExportMetricsServiceRequest;
+        const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[0];
+        const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[1];
+        const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[2];
+        
         assert.ok(typeof metric1 !== 'undefined', "counter doesn't exist");
         ensureCounterIsCorrect(
           metric1,

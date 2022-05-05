@@ -30,7 +30,6 @@ import * as zlib from 'zlib';
 import {
   OTLPTraceExporter
 } from '../../src/platform/node';
-import * as otlpTypes from '../../src/types';
 import {
   ensureExportTraceServiceRequestIsSet,
   ensureSpanIsCorrect,
@@ -38,6 +37,7 @@ import {
 } from '../traceHelper';
 import { nextTick } from 'process';
 import { MockedResponse } from './nodeHelpers';
+import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
 
 let fakeRequest: PassThrough;
 
@@ -267,15 +267,10 @@ describe('OTLPTraceExporter - node with json over http', () => {
       fakeRequest.on('end', () => {
         const responseBody = buff.toString();
 
-        const json = JSON.parse(
-          responseBody
-        ) as otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
-        const span1 =
-          json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
+        const json = JSON.parse(responseBody) as IExportTraceServiceRequest;
+        const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
-        if (span1) {
-          ensureSpanIsCorrect(span1);
-        }
+        ensureSpanIsCorrect(span1);
 
         ensureExportTraceServiceRequestIsSet(json);
 
@@ -371,15 +366,10 @@ describe('OTLPTraceExporter - node with json over http', () => {
       fakeRequest.on('end', () => {
         const responseBody = zlib.gunzipSync(buff).toString();
 
-        const json = JSON.parse(
-          responseBody
-        ) as otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
-        const span1 =
-          json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
+        const json = JSON.parse(responseBody) as IExportTraceServiceRequest;
+        const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
-        if (span1) {
-          ensureSpanIsCorrect(span1);
-        }
+        ensureSpanIsCorrect(span1);
 
         ensureExportTraceServiceRequestIsSet(json);
         assert.ok(spySetHeader.calledWith('Content-Encoding', 'gzip'));

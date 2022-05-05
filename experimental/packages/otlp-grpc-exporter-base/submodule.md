@@ -40,7 +40,7 @@ the latest sha when this guide was written is `59c488bfb8fb6d0458ad6425758b70259
 8. Now thing which is very important. You have to commit this to apply these changes
 
     ```shell script
-    git commit -am "chore: updating submodule for opentelemetry-proto"
+    git commit -am "chore: updating submodule for otlp-grpc-exporter-base"
     ```
 
 9. If you look now at git log you will notice that the folder `protos` has been changed and it will show what was the previous sha and what is current one.

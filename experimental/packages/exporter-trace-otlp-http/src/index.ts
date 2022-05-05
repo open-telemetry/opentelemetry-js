@@ -15,5 +15,3 @@
  */
 
 export * from './platform';
-export * as otlpTypes from './types';
-export { toCollectorResource, toOTLPExportTraceServiceRequest } from './transform';

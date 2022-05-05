@@ -276,6 +276,13 @@ These instrumentations are hosted at <https://github.com/open-telemetry/opentele
 
 ## Upgrade guidelines
 
+### 0.28.x to 0.29.x
+
+- `@opentelemetry/exporter-trace-otlp-http` is now exporting `scopeSpans` instead of `instrumentationLibrarySpans`
+  - this exporter now requires collector version `0.48` and up.
+- `@opentelemetry/exporter-metrics-otlp-http` is now exporting `scopeMetrics` instead of `instrumentationLibraryMetrics`
+  - this exporter now requires collector version `0.48` and up.
+
 ### 0.27.x to 0.28.x
 
 - In `@opentelemetry/exporter-trace-otlp-http`, `OTLPExporterBase._isShutdown` is replaced with `_shutdownOnce`.

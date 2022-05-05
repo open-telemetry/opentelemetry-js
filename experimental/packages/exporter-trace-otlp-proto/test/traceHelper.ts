@@ -16,11 +16,11 @@
 
 import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
 import { hexToBase64 } from '@opentelemetry/core';
-import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import { Stream } from 'stream';
+import { IEvent, IExportTraceServiceRequest, IKeyValue, ILink, ISpan } from '@opentelemetry/otlp-transformer';
 
 const traceIdHex = '1f1008dc8e270e85c40a0d7c3939b278';
 const spanIdHex = '5e107261f64fa53e';
@@ -84,7 +84,7 @@ export const mockedReadableSpan: ReadableSpan = {
 };
 
 export function ensureProtoEventsAreCorrect(
-  events: otlpTypes.opentelemetryProto.trace.v1.Span.Event[]
+  events: IEvent[]
 ) {
   assert.deepStrictEqual(
     events,
@@ -135,7 +135,7 @@ export function ensureProtoEventsAreCorrect(
 }
 
 export function ensureProtoAttributesAreCorrect(
-  attributes: otlpTypes.opentelemetryProto.common.v1.KeyValue[]
+  attributes: IKeyValue[]
 ) {
   assert.deepStrictEqual(
     attributes,
@@ -152,7 +152,7 @@ export function ensureProtoAttributesAreCorrect(
 }
 
 export function ensureProtoLinksAreCorrect(
-  attributes: otlpTypes.opentelemetryProto.trace.v1.Span.Link[]
+  attributes: ILink[]
 ) {
   assert.deepStrictEqual(
     attributes,
@@ -176,7 +176,7 @@ export function ensureProtoLinksAreCorrect(
 }
 
 export function ensureProtoSpanIsCorrect(
-  span: otlpTypes.opentelemetryProto.trace.v1.Span
+  span: ISpan
 ) {
   if (span.attributes) {
     ensureProtoAttributesAreCorrect(span.attributes);
@@ -229,36 +229,26 @@ export function ensureProtoSpanIsCorrect(
 }
 
 export function ensureExportTraceServiceRequestIsSet(
-  json: otlpTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
+  json: IExportTraceServiceRequest
 ) {
   const resourceSpans = json.resourceSpans;
+  assert.strictEqual(resourceSpans?.length, 1, 'resourceSpans is missing');
+
+  const resource = resourceSpans?.[0].resource;
+  assert.ok(resource, 'resource is missing');
+
+  const scopeSpans = resourceSpans?.[0].scopeSpans;
   assert.strictEqual(
-    resourceSpans && resourceSpans.length,
+    scopeSpans?.length,
     1,
-    'resourceSpans is missing'
+    'scopeSpans is missing'
   );
 
-  const resource = resourceSpans[0].resource;
-  assert.strictEqual(!!resource, true, 'resource is missing');
+  const scope = scopeSpans?.[0].scope;
+  assert.ok(scope, 'scope is missing');
 
-  const instrumentationLibrarySpans =
-    resourceSpans[0].instrumentationLibrarySpans;
-  assert.strictEqual(
-    instrumentationLibrarySpans && instrumentationLibrarySpans.length,
-    1,
-    'instrumentationLibrarySpans is missing'
-  );
-
-  const instrumentationLibrary =
-    instrumentationLibrarySpans[0].instrumentationLibrary;
-  assert.strictEqual(
-    !!instrumentationLibrary,
-    true,
-    'instrumentationLibrary is missing'
-  );
-
-  const spans = instrumentationLibrarySpans[0].spans;
-  assert.strictEqual(spans && spans.length, 1, 'spans are missing');
+  const spans = scopeSpans?.[0].spans;
+  assert.strictEqual(spans?.length, 1, 'spans are missing');
 }
 
 export class MockedResponse extends Stream {
