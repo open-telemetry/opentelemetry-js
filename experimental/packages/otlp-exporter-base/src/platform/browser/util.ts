@@ -16,11 +16,11 @@
 import { diag } from "@opentelemetry/api";
 import { OTLPExporterError } from "../../types";
 
-let minimumFailedSendBeaconPayloadSize = Infinity;
+let maxSendBeaconPayloadSize = Infinity;
 
 // exported only for test files
 export const resetSendWithBeacon = () => {
-  minimumFailedSendBeaconPayloadSize = Infinity;
+  maxSendBeaconPayloadSize = Infinity;
 };
 
 /**
@@ -41,14 +41,14 @@ export function sendWithBeacon(
   // Because we don't know what the limit is and to keep user's console clean, we only try to send payloads that may suceed.
   const blob = new Blob([body], blobPropertyBag);
   if (
-    blob.size < minimumFailedSendBeaconPayloadSize &&
+    blob.size < maxSendBeaconPayloadSize &&
     navigator.sendBeacon(url, blob)
   ) {
     diag.debug("sendBeacon - can send", body);
     return true;
   }
 
-  minimumFailedSendBeaconPayloadSize = blob.size;
+  maxSendBeaconPayloadSize = blob.size;
   diag.info(
     "sendBeacon failed because the given payload was too big; try to lower your span processor limits"
   );
