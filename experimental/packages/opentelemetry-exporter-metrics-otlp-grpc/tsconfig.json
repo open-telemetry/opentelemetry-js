@@ -16,9 +16,6 @@
       "path": "../../../packages/opentelemetry-resources"
     },
     {
-      "path": "../exporter-trace-otlp-http"
-    },
-    {
       "path": "../opentelemetry-api-metrics"
     },
     {
@@ -29,6 +26,9 @@
     },
     {
       "path": "../otlp-grpc-exporter-base"
+    },
+    {
+      "path": "../otlp-transformer"
     }
   ]
 }

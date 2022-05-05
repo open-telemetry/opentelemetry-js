@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { IInstrumentationLibrary, IKeyValue } from '../common/types';
+import { IInstrumentationScope, IKeyValue } from '../common/types';
 import { IResource } from '../resource/types';
 
 /** Properties of an ExportMetricsServiceRequest. */
@@ -23,30 +23,29 @@ export interface IExportMetricsServiceRequest {
   resourceMetrics: IResourceMetrics[]
 }
 
-
 /** Properties of a ResourceMetrics. */
 export interface IResourceMetrics {
+
   /** ResourceMetrics resource */
   resource?: IResource;
 
-  /** ResourceMetrics instrumentationLibraryMetrics */
-  instrumentationLibraryMetrics: IInstrumentationLibraryMetrics[]
+  /** ResourceMetrics scopeMetrics */
+  scopeMetrics: IScopeMetrics[]
 
   /** ResourceMetrics schemaUrl */
   schemaUrl?: string;
 }
 
+/** Properties of an IScopeMetrics. */
+export interface IScopeMetrics {
 
-/** Properties of an InstrumentationLibraryMetrics. */
-export interface IInstrumentationLibraryMetrics {
+  /** ScopeMetrics scope */
+  scope?: IInstrumentationScope;
 
-  /** InstrumentationLibraryMetrics instrumentationLibrary */
-  instrumentationLibrary?: IInstrumentationLibrary;
-
-  /** InstrumentationLibraryMetrics metrics */
+  /** ScopeMetrics metrics */
   metrics: IMetric[];
 
-  /** InstrumentationLibraryMetrics schemaUrl */
+  /** ScopeMetrics schemaUrl */
   schemaUrl?: string;
 }
 
@@ -100,7 +99,7 @@ export interface ISum {
 /** Properties of a Histogram. */
 export interface IHistogram {
   /** Histogram dataPoints */
-  dataPoints?: IHistogramDataPoint[]
+  dataPoints: IHistogramDataPoint[]
 
   /** Histogram aggregationTemporality */
   aggregationTemporality?: EAggregationTemporality

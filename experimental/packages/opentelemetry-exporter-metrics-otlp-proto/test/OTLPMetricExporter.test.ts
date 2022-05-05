@@ -16,9 +16,6 @@
 
 import { diag } from '@opentelemetry/api';
 import { ExportResultCode } from '@opentelemetry/core';
-import {
-  otlpTypes
-} from '@opentelemetry/exporter-trace-otlp-http';
 import { getExportRequestProto } from '@opentelemetry/otlp-proto-exporter-base';
 import * as assert from 'assert';
 import * as http from 'http';
@@ -38,6 +35,7 @@ import {
 import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
 import { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
 import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 
 const fakeRequest = {
   end: function () {
@@ -173,35 +171,29 @@ describe('OTLPMetricExporter - node with proto over http', () => {
     });
 
     it('should successfully send metrics', done => {
-      collectorExporter.export(metrics, () => {
-      });
-
       sinon.stub(http, 'request').returns({
         write: () => {},
         on: () => {},
         end: (...writeArgs: any[]) => {
           const ExportTraceServiceRequestProto = getExportRequestProto();
           const data = ExportTraceServiceRequestProto?.decode(writeArgs[0]);
-          const json = data?.toJSON() as otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
+          const json = data?.toJSON() as IExportMetricsServiceRequest;
 
-          const metric1 =
-            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
-          const metric2 =
-            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[1];
-          const metric3 =
-            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[2];
+          const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[0];
+          const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[1];
+          const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[2];
 
           assert.ok(typeof metric1 !== 'undefined', "counter doesn't exist");
           ensureExportedCounterIsCorrect(
             metric1,
-            metric1.intSum?.dataPoints[0].timeUnixNano,
-            metric1.intSum?.dataPoints[0].startTimeUnixNano
+            metric1.sum?.dataPoints[0].timeUnixNano,
+            metric1.sum?.dataPoints[0].startTimeUnixNano
           );
           assert.ok(typeof metric2 !== 'undefined', "observable gauge doesn't exist");
           ensureExportedObservableGaugeIsCorrect(
             metric2,
-            metric2.doubleGauge?.dataPoints[0].timeUnixNano,
-            metric2.doubleGauge?.dataPoints[0].startTimeUnixNano
+            metric2.gauge?.dataPoints[0].timeUnixNano,
+            metric2.gauge?.dataPoints[0].startTimeUnixNano
           );
           assert.ok(
             typeof metric3 !== 'undefined',
@@ -209,17 +201,20 @@ describe('OTLPMetricExporter - node with proto over http', () => {
           );
           ensureExportedHistogramIsCorrect(
             metric3,
-            metric3.intHistogram?.dataPoints[0].timeUnixNano,
-            metric3.intHistogram?.dataPoints[0].startTimeUnixNano,
+            metric3.histogram?.dataPoints[0].timeUnixNano,
+            metric3.histogram?.dataPoints[0].startTimeUnixNano,
             [0, 100],
             ['0', '2', '0']
           );
 
           ensureExportMetricsServiceRequestIsSet(json);
-
           done();
         },
       } as any);
+
+      collectorExporter.export(metrics, result => {
+        done(result.error);
+      });
     });
 
     it('should log the successful message', done => {
