@@ -1,14 +1,15 @@
 {
   "name": "@opentelemetry/otlp-transformer",
-  "private": true,
+  "private": false,
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   },
   "version": "0.28.0",
   "description": "Transform OpenTelemetry SDK data into OTLP",
   "module": "build/esm/index.js",
   "esnext": "build/esnext/index.js",
   "types": "build/src/index.d.ts",
+  "main": "build/src/index.js",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "compile": "tsc --build tsconfig.all.json",

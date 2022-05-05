@@ -14,30 +14,13 @@
  * limitations under the License.
  */
 import type { ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
-import { toAttributes } from '../common/internal';
-import { toMetric } from './internal';
 import type { IExportMetricsServiceRequest } from './types';
 import { AggregationTemporality } from '@opentelemetry/sdk-metrics-base';
+import { toResourceMetrics } from './internal';
 
-export function createExportMetricsServiceRequest(resourceMetrics: ResourceMetrics,
-  aggregationTemporality: AggregationTemporality): IExportMetricsServiceRequest | null {
+export function createExportMetricsServiceRequest(resourceMetrics: ResourceMetrics[],
+  aggregationTemporality: AggregationTemporality): IExportMetricsServiceRequest {
   return {
-    resourceMetrics: [{
-      resource: {
-        attributes: toAttributes(resourceMetrics.resource.attributes),
-        droppedAttributesCount: 0
-      },
-      schemaUrl: undefined, // TODO: Schema Url does not exist yet in the SDK.
-      instrumentationLibraryMetrics: Array.from(resourceMetrics.instrumentationLibraryMetrics.map(metrics => {
-        return {
-          instrumentationLibrary: {
-            name: metrics.instrumentationLibrary.name,
-            version: metrics.instrumentationLibrary.version,
-          },
-          metrics: metrics.metrics.map(metricData => toMetric(metricData, aggregationTemporality)),
-          schemaUrl: metrics.instrumentationLibrary.schemaUrl
-        };
-      }))
-    }]
+    resourceMetrics: resourceMetrics.map(metrics => toResourceMetrics(metrics, aggregationTemporality))
   };
 }

@@ -20,15 +20,15 @@ import {
   Histogram,
   ValueType,
 } from '@opentelemetry/api-metrics';
-import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
-import { Stream } from 'stream';
 import {
   ExplicitBucketHistogramAggregation,
   MeterProvider,
   MetricReader
 } from '@opentelemetry/sdk-metrics-base';
+import { IExportMetricsServiceRequest, IKeyValue, IMetric } from '@opentelemetry/otlp-transformer';
+import { Stream } from 'stream';
 
 export class TestMetricReader extends MetricReader {
   protected onForceFlush(): Promise<void> {
@@ -103,7 +103,7 @@ export function mockHistogram(): Histogram {
 }
 
 export function ensureProtoAttributesAreCorrect(
-  attributes: otlpTypes.opentelemetryProto.common.v1.KeyValue[]
+  attributes: IKeyValue[]
 ) {
   assert.deepStrictEqual(
     attributes,
@@ -120,7 +120,7 @@ export function ensureProtoAttributesAreCorrect(
 }
 
 export function ensureExportedCounterIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: IMetric,
   time?: number,
   startTime?: number
 ) {
@@ -128,10 +128,10 @@ export function ensureExportedCounterIsCorrect(
     name: 'int-counter',
     description: 'sample counter description',
     unit: '1',
-    intSum: {
+    sum: {
       dataPoints: [
         {
-          value: '1',
+          asInt: '1',
           startTimeUnixNano: String(startTime),
           timeUnixNano: String(time),
         },
@@ -143,7 +143,7 @@ export function ensureExportedCounterIsCorrect(
 }
 
 export function ensureExportedObservableGaugeIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: IMetric,
   time?: number,
   startTime?: number
 ) {
@@ -151,10 +151,10 @@ export function ensureExportedObservableGaugeIsCorrect(
     name: 'double-observable-gauge',
     description: 'sample observable gauge description',
     unit: '1',
-    doubleGauge: {
+    gauge: {
       dataPoints: [
         {
-          value: 6,
+          asDouble: 6,
           startTimeUnixNano: String(startTime),
           timeUnixNano: String(time),
         },
@@ -164,7 +164,7 @@ export function ensureExportedObservableGaugeIsCorrect(
 }
 
 export function ensureExportedHistogramIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: IMetric,
   time?: number,
   startTime?: number,
   explicitBounds: number[] = [Infinity],
@@ -174,10 +174,10 @@ export function ensureExportedHistogramIsCorrect(
     name: 'int-histogram',
     description: 'sample histogram description',
     unit: '1',
-    intHistogram: {
+    histogram: {
       dataPoints: [
         {
-          sum: '21',
+          sum: 21,
           count: '2',
           startTimeUnixNano: String(startTime),
           timeUnixNano: String(time),
@@ -191,7 +191,7 @@ export function ensureExportedHistogramIsCorrect(
 }
 
 export function ensureExportMetricsServiceRequestIsSet(
-  json: otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
+  json: IExportMetricsServiceRequest
 ) {
   const resourceMetrics = json.resourceMetrics;
   assert.strictEqual(
@@ -201,25 +201,15 @@ export function ensureExportMetricsServiceRequestIsSet(
   );
 
   const resource = resourceMetrics[0].resource;
-  assert.strictEqual(!!resource, true, 'resource is missing');
+  assert.ok(resource, 'resource is missing');
 
-  const instrumentationLibraryMetrics =
-    resourceMetrics[0].instrumentationLibraryMetrics;
-  assert.strictEqual(
-    instrumentationLibraryMetrics && instrumentationLibraryMetrics.length,
-    1,
-    'instrumentationLibraryMetrics is missing'
-  );
+  const scopeMetrics = resourceMetrics[0].scopeMetrics;
+  assert.strictEqual(scopeMetrics?.length, 1, 'scopeMetrics is missing');
 
-  const instrumentationLibrary =
-    instrumentationLibraryMetrics[0].instrumentationLibrary;
-  assert.strictEqual(
-    !!instrumentationLibrary,
-    true,
-    'instrumentationLibrary is missing'
-  );
+  const scope = scopeMetrics[0].scope;
+  assert.ok(scope, 'scope is missing');
 
-  const metrics = resourceMetrics[0].instrumentationLibraryMetrics[0].metrics;
+  const metrics = resourceMetrics[0].scopeMetrics[0].metrics;
   assert.strictEqual(metrics.length, 3, 'Metrics are missing');
 }
 
