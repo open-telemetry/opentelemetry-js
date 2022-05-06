@@ -81,7 +81,7 @@ export interface Meter {
   /**
    * Creates a new `ObservableGauge` metric.
    *
-   * The callback SHOULD be reentrant safe.
+   * The callback SHOULD be safe to be invoked concurrently.
    *
    * @param name the name of the metric.
    * @param callback the observable callback
@@ -96,7 +96,7 @@ export interface Meter {
   /**
    * Creates a new `ObservableCounter` metric.
    *
-   * The callback SHOULD be reentrant safe.
+   * The callback SHOULD be safe to be invoked concurrently.
    *
    * @param name the name of the metric.
    * @param callback the observable callback
@@ -111,7 +111,7 @@ export interface Meter {
   /**
    * Creates a new `ObservableUpDownCounter` metric.
    *
-   * The callback SHOULD be reentrant safe.
+   * The callback SHOULD be safe to be invoked concurrently.
    *
    * @param name the name of the metric.
    * @param callback the observable callback
