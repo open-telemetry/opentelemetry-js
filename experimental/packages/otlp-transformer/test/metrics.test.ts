@@ -144,7 +144,7 @@ describe('Metrics', () => {
     }
 
     it('serializes a sum metric record', () => {
-      const metrics = createResourceMetrics([createCounterData(10)]);
+      const metrics = [createResourceMetrics([createCounterData(10)])];
       const exportRequest = createExportMetricsServiceRequest(
         metrics,
         AggregationTemporality.DELTA
@@ -166,9 +166,9 @@ describe('Metrics', () => {
               droppedAttributesCount: 0,
             },
             schemaUrl: undefined,
-            instrumentationLibraryMetrics: [
+            scopeMetrics: [
               {
-                instrumentationLibrary: {
+                scope: {
                   name: 'mylib',
                   version: '0.1.0',
                 },
@@ -208,7 +208,7 @@ describe('Metrics', () => {
 
     it('serializes an observable sum metric record', () => {
       const exportRequest = createExportMetricsServiceRequest(
-        createResourceMetrics([createObservableCounterData(10)]),
+        [createResourceMetrics([createObservableCounterData(10)])],
         AggregationTemporality.DELTA
       );
       assert.ok(exportRequest);
@@ -228,9 +228,9 @@ describe('Metrics', () => {
               droppedAttributesCount: 0,
             },
             schemaUrl: undefined,
-            instrumentationLibraryMetrics: [
+            scopeMetrics: [
               {
-                instrumentationLibrary: {
+                scope: {
                   name: 'mylib',
                   version: '0.1.0',
                 },
@@ -270,7 +270,7 @@ describe('Metrics', () => {
 
     it('serializes a gauge metric record', () => {
       const exportRequest = createExportMetricsServiceRequest(
-        createResourceMetrics([createObservableGaugeData(10.5)]),
+        [createResourceMetrics([createObservableGaugeData(10.5)])],
         AggregationTemporality.DELTA
       );
       assert.ok(exportRequest);
@@ -290,9 +290,9 @@ describe('Metrics', () => {
               droppedAttributesCount: 0,
             },
             schemaUrl: undefined,
-            instrumentationLibraryMetrics: [
+            scopeMetrics: [
               {
-                instrumentationLibrary: {
+                scope: {
                   name: 'mylib',
                   version: '0.1.0',
                 },
@@ -330,7 +330,7 @@ describe('Metrics', () => {
 
     it('serializes a histogram metric record', () => {
       const exportRequest = createExportMetricsServiceRequest(
-        createResourceMetrics([createHistogramMetrics(2, 9, [5], [1,1])]),
+        [createResourceMetrics([createHistogramMetrics(2, 9, [5], [1,1])])],
         AggregationTemporality.CUMULATIVE
       );
       assert.ok(exportRequest);
@@ -350,9 +350,9 @@ describe('Metrics', () => {
               droppedAttributesCount: 0,
             },
             schemaUrl: undefined,
-            instrumentationLibraryMetrics: [
+            scopeMetrics: [
               {
-                instrumentationLibrary: {
+                scope: {
                   name: 'mylib',
                   version: '0.1.0',
                 },

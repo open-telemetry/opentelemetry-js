@@ -6,6 +6,7 @@
     "experimental/packages/*",
     "experimental/backwards-compatability/*",
     "integration-tests/*",
-    "selenium-tests"
+    "selenium-tests",
+    "examples/otlp-exporter-node"
   ]
 }

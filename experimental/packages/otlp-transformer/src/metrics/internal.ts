@@ -20,12 +20,47 @@ import {
   DataPoint,
   DataPointType,
   Histogram,
+  InstrumentationLibraryMetrics,
   InstrumentType,
-  MetricData
+  MetricData,
+  ResourceMetrics
 } from '@opentelemetry/sdk-metrics-base';
 import { toAttributes } from '../common/internal';
-import { EAggregationTemporality, IHistogramDataPoint, IMetric, INumberDataPoint } from './types';
+import {
+  EAggregationTemporality,
+  IHistogramDataPoint,
+  IMetric,
+  INumberDataPoint,
+  IResourceMetrics,
+  IScopeMetrics
+} from './types';
 
+export function toResourceMetrics(resourceMetrics: ResourceMetrics,
+  aggregationTemporality: AggregationTemporality): IResourceMetrics {
+  return {
+    resource: {
+      attributes: toAttributes(resourceMetrics.resource.attributes),
+      droppedAttributesCount: 0
+    },
+    schemaUrl: undefined, // TODO: Schema Url does not exist yet in the SDK.
+    scopeMetrics: toScopeMetrics(resourceMetrics.instrumentationLibraryMetrics, aggregationTemporality)
+  };
+}
+
+export function toScopeMetrics(instrumentationLibraryMetrics: InstrumentationLibraryMetrics[],
+  aggregationTemporality: AggregationTemporality): IScopeMetrics[]{
+  return Array.from(instrumentationLibraryMetrics.map(metrics => {
+    const scopeMetrics : IScopeMetrics = {
+      scope: {
+        name: metrics.instrumentationLibrary.name,
+        version: metrics.instrumentationLibrary.version,
+      },
+      metrics: metrics.metrics.map(metricData => toMetric(metricData, aggregationTemporality)),
+      schemaUrl: metrics.instrumentationLibrary.schemaUrl
+    };
+    return scopeMetrics;
+  }));
+}
 
 export function toMetric(metricData: MetricData, metricTemporality: AggregationTemporality): IMetric {
   const out: IMetric = {
