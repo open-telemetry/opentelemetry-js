@@ -12,6 +12,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(otlp-exporter-base): include esm and esnext in package files #2952 @dyladan
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
