@@ -16,17 +16,26 @@
 
 import { Context } from '@opentelemetry/api';
 import { MetricAttributes } from '@opentelemetry/api-metrics';
+import { AttributeHashMap } from './HashMap';
 
 /**
- * Internal interface.
+ * Internal interface. Stores measurements and allows synchronous writes of
+ * measurements.
  *
- * Stores {@link MetricData} and allows synchronous writes of measurements.
+ * An interface representing SyncMetricStorage with type parameters removed.
  */
 export interface WritableMetricStorage {
   /** Records a measurement. */
   record(value: number, attributes: MetricAttributes, context: Context): void;
 }
 
-export class NoopWritableMetricStorage implements WritableMetricStorage {
-  record(_value: number, _attributes: MetricAttributes, _context: Context): void {}
+/**
+ * Internal interface. Stores measurements and allows asynchronous writes of
+ * measurements.
+ *
+ * An interface representing AsyncMetricStorage with type parameters removed.
+ */
+export interface AsyncWritableMetricStorage {
+  /** Records a batch of measurements. */
+  record(measurements: AttributeHashMap<number>): void;
 }
