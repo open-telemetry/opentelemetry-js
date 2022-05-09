@@ -26,6 +26,7 @@ import { MeterProviderSharedState } from './MeterProviderSharedState';
 import { MetricCollectorHandle } from './MetricCollector';
 import { MetricStorageRegistry } from './MetricStorageRegistry';
 import { MultiMetricStorage } from './MultiWritableMetricStorage';
+import { ObservableRegistry } from './ObservableRegistry';
 import { SyncMetricStorage } from './SyncMetricStorage';
 
 /**
@@ -33,6 +34,7 @@ import { SyncMetricStorage } from './SyncMetricStorage';
  */
 export class MeterSharedState {
   private _metricStorageRegistry = new MetricStorageRegistry();
+  private _observableRegistry = new ObservableRegistry();
   meter: Meter;
 
   constructor(private _meterProviderSharedState: MeterProviderSharedState, private _instrumentationLibrary: InstrumentationLibrary) {
@@ -60,8 +62,12 @@ export class MeterSharedState {
     views.forEach(view => {
       const viewDescriptor = createInstrumentDescriptorWithView(view, descriptor);
       const aggregator = view.aggregation.createAggregator(viewDescriptor);
-      const viewStorage = new AsyncMetricStorage(viewDescriptor, aggregator, view.attributesProcessor, callback);
-      this._metricStorageRegistry.register(viewStorage);
+      const viewStorage = new AsyncMetricStorage(viewDescriptor, aggregator, view.attributesProcessor);
+      const storage = this._metricStorageRegistry.register(viewStorage);
+      if (storage == null) {
+        return;
+      }
+      this._observableRegistry.addCallback(callback, storage);
     });
   }
 
@@ -75,7 +81,8 @@ export class MeterSharedState {
      * 1. Call all observable callbacks first.
      * 2. Collect metric result for the collector.
      */
-    const metricDataList = await Promise.all(Array.from(this._metricStorageRegistry.getStorages())
+    await this._observableRegistry.observe();
+    const metricDataList = Array.from(this._metricStorageRegistry.getStorages())
       .map(metricStorage => {
         return metricStorage.collect(
           collector,
@@ -83,7 +90,7 @@ export class MeterSharedState {
           this._meterProviderSharedState.sdkStartTime,
           collectionTime);
       })
-      .filter(isNotNullish));
+      .filter(isNotNullish);
 
     return {
       instrumentationLibrary: this._instrumentationLibrary,
