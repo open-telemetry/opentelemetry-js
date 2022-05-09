@@ -18,11 +18,7 @@ import { Context, HrTime } from '@opentelemetry/api';
 import { MetricAttributes } from '@opentelemetry/api-metrics';
 import { WritableMetricStorage } from './WritableMetricStorage';
 import { Accumulation, Aggregator } from '../aggregator/types';
-import { View } from '../view/View';
-import {
-  createInstrumentDescriptorWithView,
-  InstrumentDescriptor
-} from '../InstrumentDescriptor';
+import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { AttributesProcessor } from '../view/AttributesProcessor';
 import { MetricStorage } from './MetricStorage';
 import { MetricData } from '../export/MetricData';
@@ -61,12 +57,12 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>> extends MetricStor
    * Note: This is a stateful operation and may reset any interval-related
    * state for the MetricCollector.
    */
-  async collect(
+  collect(
     collector: MetricCollectorHandle,
     collectors: MetricCollectorHandle[],
     sdkStartTime: HrTime,
     collectionTime: HrTime,
-  ): Promise<Maybe<MetricData>> {
+  ): Maybe<MetricData> {
     const accumulations = this._deltaMetricStorage.collect();
 
     return this._temporalMetricStorage.buildMetrics(
@@ -77,11 +73,5 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>> extends MetricStor
       sdkStartTime,
       collectionTime
     );
-  }
-
-  static create(view: View, instrument: InstrumentDescriptor): SyncMetricStorage<Maybe<Accumulation>> {
-    instrument = createInstrumentDescriptorWithView(view, instrument);
-    const aggregator = view.aggregation.createAggregator(instrument);
-    return new SyncMetricStorage(instrument, aggregator, view.attributesProcessor);
   }
 }

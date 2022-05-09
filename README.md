@@ -365,6 +365,8 @@ Collector exporter packages and types are renamed:
 
 - `serviceName` configuration removed from Collector exporters. Use `service.name` Resource attribute instead.
 
+- Prometheus exporter added suffix `_total` to counter metrics.
+
 ### 0.18.x to 0.19.0
 
 - API is now a peer dependency. This means that users will need to include `@opentelemetry/api` as a dependency of their project in order to use the SDK. NPM version 7+ (Node 15+) should do this automatically.
