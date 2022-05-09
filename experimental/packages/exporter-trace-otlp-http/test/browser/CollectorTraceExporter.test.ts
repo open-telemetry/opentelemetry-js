@@ -21,7 +21,6 @@ import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPTraceExporter } from '../../src/platform/browser/index';
-import { nextTick } from 'process';
 import {
   ensureSpanIsCorrect,
   ensureExportTraceServiceRequestIsSet,
@@ -197,7 +196,7 @@ describe('OTLPTraceExporter - web', () => {
         collectorTraceExporter.export(spans, () => {
         });
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const request = server.requests[0];
           assert.strictEqual(request.method, 'POST');
           assert.strictEqual(request.url, 'http://foo.bar.com');
@@ -242,7 +241,7 @@ describe('OTLPTraceExporter - web', () => {
         collectorTraceExporter.export(spans, () => {
         });
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const request = server.requests[0];
           request.respond(200);
           const response: any = spyLoggerDebug.args[2][0];
@@ -262,7 +261,7 @@ describe('OTLPTraceExporter - web', () => {
           done();
         });
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const request = server.requests[0];
           request.respond(400);
           clock.restore();
@@ -274,7 +273,7 @@ describe('OTLPTraceExporter - web', () => {
         collectorTraceExporter.export(spans, () => {
         });
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const request = server.requests[0];
           request.respond(200);
 
@@ -396,7 +395,7 @@ describe('OTLPTraceExporter - web', () => {
         collectorTraceExporter.export(spans, () => {
         });
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const [{ requestHeaders }] = server.requests;
 
           ensureHeadersContain(requestHeaders, customHeaders);
@@ -426,7 +425,7 @@ describe('OTLPTraceExporter - web', () => {
         collectorTraceExporter.export(spans, () => {
         });
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const [{ requestHeaders }] = server.requests;
 
           ensureHeadersContain(requestHeaders, customHeaders);
@@ -441,15 +440,15 @@ describe('OTLPTraceExporter - web', () => {
         const responseSpy = sinon.spy();
         collectorTraceExporter.export(spans, responseSpy);
         clock.tick(10000);
+        clock.restore();
 
-        nextTick(() => {
+        setTimeout(() => {
           const result = responseSpy.args[0][0] as core.ExportResult;
           assert.strictEqual(result.code, core.ExportResultCode.FAILED);
           const error = result.error as OTLPExporterError;
           assert.ok(error !== undefined);
           assert.strictEqual(error.message, 'Request Timeout');
 
-          clock.restore();
           done();
         });
       });
