@@ -16,8 +16,8 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { Meter, MeterProvider, DataPointType } from '../../src';
-import { assertMetricData, defaultInstrumentationLibrary, defaultResource } from '../util';
+import { Meter, MeterProvider, DataPointType, ResourceMetrics } from '../../src';
+import { assertMetricData, defaultInstrumentationLibrary, defaultResource, sleep } from '../util';
 import { TestMetricReader } from '../export/TestMetricReader';
 import { TestDeltaMetricExporter, TestMetricExporter } from '../export/TestMetricExporter';
 import { MeterSharedState } from '../../src/state/MeterSharedState';
@@ -93,5 +93,89 @@ describe('MeterSharedState', () => {
       }));
     });
 
+    it('should collect async metrics with callbacks', async () => {
+      /** preparing test instrumentations */
+      const { metricCollectors, meter } = setupInstruments();
+
+      /** creating metric events */
+      let observableCalledCount = 0;
+      meter.createObservableCounter('test', observableResult => {
+        observableCalledCount++;
+        observableResult.observe(1);
+
+        // async observers.
+        return sleep(10);
+      });
+
+      /** collect metrics */
+      await Promise.all([
+        // initiate collection concurrently.
+        ...metricCollectors.map(collector => collector.collect()),
+        sleep(1).then(() => metricCollectors[0].collect()),
+      ]);
+      // the callback is called each time the collection initiated.
+      assert.strictEqual(observableCalledCount, 3);
+
+      /** collect metrics */
+      await Promise.all([
+        // initiate collection concurrently.
+        ...metricCollectors.map(collector => collector.collect()),
+        sleep(1).then(() => metricCollectors[0].collect()),
+      ]);
+      assert.strictEqual(observableCalledCount, 6);
+    });
+
+    it('should call observable callback with view-ed async instruments', async () => {
+      /** preparing test instrumentations */
+      const { metricCollectors, meter, meterProvider } = setupInstruments();
+
+      /** creating metric events */
+      meterProvider.addView({ name: 'foo' }, {
+        instrument: {
+          name: 'test',
+        },
+      });
+      meterProvider.addView({ name: 'bar' }, {
+        instrument: {
+          name: 'test',
+        },
+      });
+
+      let observableCalledCount = 0;
+      meter.createObservableCounter('test', observableResult => {
+        observableCalledCount++;
+        observableResult.observe(1);
+
+        // async observers.
+        return sleep(10);
+      });
+
+      function verifyResult(resourceMetrics: ResourceMetrics) {
+        assert.strictEqual(resourceMetrics.instrumentationLibraryMetrics.length, 1);
+        assert.strictEqual(resourceMetrics.instrumentationLibraryMetrics[0].metrics.length, 2);
+        assertMetricData(resourceMetrics.instrumentationLibraryMetrics[0].metrics[0], DataPointType.SINGULAR, {
+          name: 'foo'
+        });
+        assertMetricData(resourceMetrics.instrumentationLibraryMetrics[0].metrics[1], DataPointType.SINGULAR, {
+          name: 'bar'
+        });
+      }
+
+      /** collect metrics */
+      await Promise.all([
+        // initiate collection concurrently.
+        ...metricCollectors.map(collector => collector.collect().then(verifyResult)),
+        sleep(1).then(() => metricCollectors[0].collect().then(verifyResult)),
+      ]);
+      assert.strictEqual(observableCalledCount, 6);
+
+      /** collect metrics */
+      await Promise.all([
+        // initiate collection concurrently.
+        ...metricCollectors.map(collector => collector.collect().then(verifyResult)),
+        sleep(1).then(() => metricCollectors[0].collect().then(verifyResult)),
+      ]);
+      assert.strictEqual(observableCalledCount, 12);
+    });
   });
 });
