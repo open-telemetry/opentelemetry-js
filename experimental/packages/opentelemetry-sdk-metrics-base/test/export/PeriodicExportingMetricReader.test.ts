@@ -88,14 +88,14 @@ class TestDeltaMetricExporter extends TestMetricExporter {
   }
 }
 
-const emptyResourceMetrics = { resource: defaultResource, instrumentationLibraryMetrics: [] };
+const emptyResourceMetrics = { resource: defaultResource, scopeMetrics: [] };
 
 class TestMetricProducer implements MetricProducer {
   public collectionTime = 0;
 
   async collect(): Promise<ResourceMetrics> {
     await new Promise(resolve => setTimeout(resolve, this.collectionTime));
-    return { resource: defaultResource, instrumentationLibraryMetrics: [] };
+    return { resource: defaultResource, scopeMetrics: [] };
   }
 }
 

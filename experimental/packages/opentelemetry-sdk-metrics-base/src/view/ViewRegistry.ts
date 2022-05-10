@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { InstrumentationLibrary } from '@opentelemetry/core';
+import { InstrumentationScope } from '@opentelemetry/core';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { InstrumentSelector } from './InstrumentSelector';
 import { MeterSelector } from './MeterSelector';
@@ -38,7 +38,7 @@ export class ViewRegistry {
     });
   }
 
-  findViews(instrument: InstrumentDescriptor, meter: InstrumentationLibrary): View[] {
+  findViews(instrument: InstrumentDescriptor, meter: InstrumentationScope): View[] {
     const views = this._registeredViews
       .filter(registeredView => {
         return this._matchInstrument(registeredView.instrumentSelector, instrument) &&
@@ -57,7 +57,7 @@ export class ViewRegistry {
       selector.getNameFilter().match(instrument.name);
   }
 
-  private _matchMeter(selector: MeterSelector, meter: InstrumentationLibrary): boolean {
+  private _matchMeter(selector: MeterSelector, meter: InstrumentationScope): boolean {
     return selector.getNameFilter().match(meter.name) &&
       (meter.version === undefined || selector.getVersionFilter().match(meter.version)) &&
       (meter.schemaUrl === undefined || selector.getSchemaUrlFilter().match(meter.schemaUrl));

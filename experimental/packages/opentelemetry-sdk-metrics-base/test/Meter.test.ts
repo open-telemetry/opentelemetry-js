@@ -20,7 +20,7 @@ import { CounterInstrument, HistogramInstrument, UpDownCounterInstrument } from 
 import { Meter } from '../src/Meter';
 import { MeterProviderSharedState } from '../src/state/MeterProviderSharedState';
 import { MeterSharedState } from '../src/state/MeterSharedState';
-import { defaultInstrumentationLibrary, defaultResource } from './util';
+import { defaultInstrumentationScope, defaultResource } from './util';
 
 const noopObservableCallback: ObservableCallback = _observableResult => {};
 
@@ -29,7 +29,7 @@ describe('Meter', () => {
     it('should create counter', () => {
       const meterSharedState = new MeterSharedState(
         new MeterProviderSharedState(defaultResource),
-        defaultInstrumentationLibrary);
+        defaultInstrumentationScope);
       const meter = new Meter(meterSharedState);
       const counter = meter.createCounter('foobar');
       assert(counter instanceof CounterInstrument);
@@ -40,7 +40,7 @@ describe('Meter', () => {
     it('should create up down counter', () => {
       const meterSharedState = new MeterSharedState(
         new MeterProviderSharedState(defaultResource),
-        defaultInstrumentationLibrary);
+        defaultInstrumentationScope);
       const meter = new Meter(meterSharedState);
       const counter = meter.createUpDownCounter('foobar');
       assert(counter instanceof UpDownCounterInstrument);
@@ -51,7 +51,7 @@ describe('Meter', () => {
     it('should create histogram', () => {
       const meterSharedState = new MeterSharedState(
         new MeterProviderSharedState(defaultResource),
-        defaultInstrumentationLibrary);
+        defaultInstrumentationScope);
       const meter = new Meter(meterSharedState);
       const counter = meter.createHistogram('foobar');
       assert(counter instanceof HistogramInstrument);
@@ -62,7 +62,7 @@ describe('Meter', () => {
     it('should create observable gauge', () => {
       const meterSharedState = new MeterSharedState(
         new MeterProviderSharedState(defaultResource),
-        defaultInstrumentationLibrary);
+        defaultInstrumentationScope);
       const meter = new Meter(meterSharedState);
       meter.createObservableGauge('foobar', noopObservableCallback);
     });
@@ -72,7 +72,7 @@ describe('Meter', () => {
     it('should create observable counter', () => {
       const meterSharedState = new MeterSharedState(
         new MeterProviderSharedState(defaultResource),
-        defaultInstrumentationLibrary);
+        defaultInstrumentationScope);
       const meter = new Meter(meterSharedState);
       meter.createObservableCounter('foobar', noopObservableCallback);
     });
@@ -82,7 +82,7 @@ describe('Meter', () => {
     it('should create observable up-down-counter', () => {
       const meterSharedState = new MeterSharedState(
         new MeterProviderSharedState(defaultResource),
-        defaultInstrumentationLibrary);
+        defaultInstrumentationScope);
       const meter = new Meter(meterSharedState);
       meter.createObservableUpDownCounter('foobar', noopObservableCallback);
     });
