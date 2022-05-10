@@ -15,12 +15,10 @@
  */
 import type { ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
 import type { IExportMetricsServiceRequest } from './types';
-import { AggregationTemporality } from '@opentelemetry/sdk-metrics-base';
 import { toResourceMetrics } from './internal';
 
-export function createExportMetricsServiceRequest(resourceMetrics: ResourceMetrics[],
-  aggregationTemporality: AggregationTemporality): IExportMetricsServiceRequest {
+export function createExportMetricsServiceRequest(resourceMetrics: ResourceMetrics[]): IExportMetricsServiceRequest {
   return {
-    resourceMetrics: resourceMetrics.map(metrics => toResourceMetrics(metrics, aggregationTemporality))
+    resourceMetrics: resourceMetrics.map(metrics => toResourceMetrics(metrics))
   };
 }

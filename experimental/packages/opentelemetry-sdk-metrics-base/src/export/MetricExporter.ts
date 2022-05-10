@@ -20,6 +20,7 @@ import {
   ExportResult,
   ExportResultCode,
 } from '@opentelemetry/core';
+import { InstrumentType } from '../InstrumentDescriptor';
 
 
 // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#metricexporter
@@ -30,7 +31,7 @@ export interface PushMetricExporter {
 
   forceFlush(): Promise<void>;
 
-  getPreferredAggregationTemporality(): AggregationTemporality;
+  selectAggregationTemporality(instrumentType: InstrumentType): AggregationTemporality;
 
   shutdown(): Promise<void>;
 
@@ -38,6 +39,11 @@ export interface PushMetricExporter {
 
 export class ConsoleMetricExporter implements PushMetricExporter {
   protected _shutdown = true;
+  private _aggregationTemporality: AggregationTemporality;
+
+  constructor(aggregationTemporality?: AggregationTemporality) {
+    this._aggregationTemporality = aggregationTemporality ?? AggregationTemporality.CUMULATIVE;
+  }
 
   export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void) {
     return resultCallback({
@@ -46,8 +52,8 @@ export class ConsoleMetricExporter implements PushMetricExporter {
     });
   }
 
-  getPreferredAggregationTemporality() {
-    return AggregationTemporality.CUMULATIVE;
+  selectAggregationTemporality(_instrumentType: InstrumentType) {
+    return this._aggregationTemporality;
   }
 
   // nothing to do
