@@ -35,41 +35,39 @@ import {
   IScopeMetrics
 } from './types';
 
-export function toResourceMetrics(resourceMetrics: ResourceMetrics,
-  aggregationTemporality: AggregationTemporality): IResourceMetrics {
+export function toResourceMetrics(resourceMetrics: ResourceMetrics): IResourceMetrics {
   return {
     resource: {
       attributes: toAttributes(resourceMetrics.resource.attributes),
       droppedAttributesCount: 0
     },
     schemaUrl: undefined, // TODO: Schema Url does not exist yet in the SDK.
-    scopeMetrics: toScopeMetrics(resourceMetrics.instrumentationLibraryMetrics, aggregationTemporality)
+    scopeMetrics: toScopeMetrics(resourceMetrics.instrumentationLibraryMetrics)
   };
 }
 
-export function toScopeMetrics(instrumentationLibraryMetrics: InstrumentationLibraryMetrics[],
-  aggregationTemporality: AggregationTemporality): IScopeMetrics[]{
+export function toScopeMetrics(instrumentationLibraryMetrics: InstrumentationLibraryMetrics[]): IScopeMetrics[]{
   return Array.from(instrumentationLibraryMetrics.map(metrics => {
     const scopeMetrics : IScopeMetrics = {
       scope: {
         name: metrics.instrumentationLibrary.name,
         version: metrics.instrumentationLibrary.version,
       },
-      metrics: metrics.metrics.map(metricData => toMetric(metricData, aggregationTemporality)),
+      metrics: metrics.metrics.map(metricData => toMetric(metricData)),
       schemaUrl: metrics.instrumentationLibrary.schemaUrl
     };
     return scopeMetrics;
   }));
 }
 
-export function toMetric(metricData: MetricData, metricTemporality: AggregationTemporality): IMetric {
+export function toMetric(metricData: MetricData): IMetric {
   const out: IMetric = {
     name: metricData.descriptor.name,
     description: metricData.descriptor.description,
     unit: metricData.descriptor.unit,
   };
 
-  const aggregationTemporality = toAggregationTemporality(metricTemporality);
+  const aggregationTemporality = toAggregationTemporality(metricData.aggregationTemporality);
 
   if (metricData.dataPointType === DataPointType.SINGULAR) {
     const dataPoints = toSingularDataPoints(metricData);

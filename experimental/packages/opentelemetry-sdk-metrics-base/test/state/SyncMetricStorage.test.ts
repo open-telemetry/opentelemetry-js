@@ -27,11 +27,11 @@ import { NoopAttributesProcessor } from '../../src/view/AttributesProcessor';
 import { assertMetricData, assertDataPoint, commonAttributes, commonValues, defaultInstrumentDescriptor } from '../util';
 
 const deltaCollector: MetricCollectorHandle = {
-  aggregatorTemporality: AggregationTemporality.DELTA,
+  selectAggregationTemporality: () => AggregationTemporality.DELTA,
 };
 
 const cumulativeCollector: MetricCollectorHandle = {
-  aggregatorTemporality: AggregationTemporality.CUMULATIVE,
+  selectAggregationTemporality: () => AggregationTemporality.CUMULATIVE,
 };
 
 const sdkStartTime = hrTime();

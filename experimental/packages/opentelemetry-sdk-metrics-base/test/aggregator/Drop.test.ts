@@ -16,6 +16,7 @@
 
 import { HrTime } from '@opentelemetry/api';
 import * as assert from 'assert';
+import { AggregationTemporality } from '../../src';
 import { DropAggregator } from '../../src/aggregator';
 import { defaultInstrumentDescriptor } from '../util';
 
@@ -55,6 +56,7 @@ describe('DropAggregator', () => {
 
       assert.strictEqual(aggregator.toMetricData(
         defaultInstrumentDescriptor,
+        AggregationTemporality.CUMULATIVE,
         [[{}, undefined]],
         startTime,
         endTime,

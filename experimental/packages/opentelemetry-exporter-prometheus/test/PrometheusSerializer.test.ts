@@ -37,8 +37,13 @@ const attributes = {
 
 class TestMetricReader extends MetricReader {
   constructor() {
-    super(AggregationTemporality.CUMULATIVE);
+    super();
   }
+
+  selectAggregationTemporality() {
+    return AggregationTemporality.CUMULATIVE;
+  }
+
   async onForceFlush() {}
   async onShutdown() {}
 }

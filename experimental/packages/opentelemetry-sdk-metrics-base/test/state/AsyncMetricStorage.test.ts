@@ -28,11 +28,11 @@ import { ObservableCallback } from '@opentelemetry/api-metrics';
 import { ObservableRegistry } from '../../src/state/ObservableRegistry';
 
 const deltaCollector: MetricCollectorHandle = {
-  aggregatorTemporality: AggregationTemporality.DELTA,
+  selectAggregationTemporality: () => AggregationTemporality.DELTA,
 };
 
 const cumulativeCollector: MetricCollectorHandle = {
-  aggregatorTemporality: AggregationTemporality.CUMULATIVE,
+  selectAggregationTemporality: () => AggregationTemporality.CUMULATIVE,
 };
 
 const sdkStartTime = hrTime();

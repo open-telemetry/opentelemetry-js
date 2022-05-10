@@ -94,7 +94,7 @@ describe('OTLPMetricExporter - web', () => {
       beforeEach(() => {
         collectorExporter = new OTLPMetricExporter({
           url: 'http://foo.bar.com',
-          aggregationTemporality: AggregationTemporality.CUMULATIVE
+          temporalityPreference: AggregationTemporality.CUMULATIVE
         });
       });
       it('should successfully send metrics using sendBeacon', done => {
@@ -191,7 +191,7 @@ describe('OTLPMetricExporter - web', () => {
         (window.navigator as any).sendBeacon = false;
         collectorExporter = new OTLPMetricExporter({
           url: 'http://foo.bar.com',
-          aggregationTemporality: AggregationTemporality.CUMULATIVE
+          temporalityPreference: AggregationTemporality.CUMULATIVE
         });
         // Overwrites the start time to make tests consistent
         Object.defineProperty(collectorExporter, '_startTime', {
@@ -316,7 +316,7 @@ describe('OTLPMetricExporter - web', () => {
     beforeEach(() => {
       collectorExporterConfig = {
         headers: customHeaders,
-        aggregationTemporality: AggregationTemporality.CUMULATIVE
+        temporalityPreference: AggregationTemporality.CUMULATIVE
       };
       server = sinon.fakeServer.create();
     });
@@ -408,7 +408,7 @@ describe('when configuring via environment', () => {
     envSource.OTEL_EXPORTER_OTLP_HEADERS = 'foo=bar';
     const collectorExporter = new OTLPMetricExporter({
       headers: {},
-      aggregationTemporality: AggregationTemporality.CUMULATIVE
+      temporalityPreference: AggregationTemporality.CUMULATIVE
     });
     assert.strictEqual(collectorExporter['_otlpExporter']['_headers'].foo, 'bar');
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
@@ -418,7 +418,7 @@ describe('when configuring via environment', () => {
     envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
     const collectorExporter = new OTLPMetricExporter({
       headers: {},
-      aggregationTemporality: AggregationTemporality.CUMULATIVE
+      temporalityPreference: AggregationTemporality.CUMULATIVE
     });
     assert.strictEqual(collectorExporter['_otlpExporter']['_headers'].foo, 'boo');
     assert.strictEqual(collectorExporter['_otlpExporter']['_headers'].bar, 'foo');

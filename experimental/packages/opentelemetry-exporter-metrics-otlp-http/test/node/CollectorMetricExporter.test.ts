@@ -163,7 +163,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
         url: 'http://foo.bar.com',
         keepAlive: true,
         httpAgentOptions: { keepAliveMsecs: 2000 },
-        aggregationTemporality: AggregationTemporality.CUMULATIVE
+        temporalityPreference: AggregationTemporality.CUMULATIVE
       };
 
       collectorExporter = new OTLPMetricExporter(collectorExporterConfig);
@@ -329,7 +329,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
       const url = 'http://foo.bar.com';
       const collectorExporter = new OTLPMetricExporter({
         url,
-        aggregationTemporality: AggregationTemporality.CUMULATIVE
+        temporalityPreference: AggregationTemporality.CUMULATIVE
       });
       setTimeout(() => {
         assert.strictEqual(collectorExporter._otlpExporter.url, url);
