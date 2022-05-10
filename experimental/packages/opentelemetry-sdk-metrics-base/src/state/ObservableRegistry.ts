@@ -16,7 +16,7 @@
 
 import { ObservableCallback } from '@opentelemetry/api-metrics';
 import { ObservableResult } from '../ObservableResult';
-import { callWithTimeout, PromiseAllSettled, PromiseAllSettledRejectionResult } from '../utils';
+import { callWithTimeout, PromiseAllSettled, isPromiseAllSettledRejectionResult } from '../utils';
 import { AsyncWritableMetricStorage } from './WritableMetricStorage';
 
 /**
@@ -54,7 +54,7 @@ export class ObservableRegistry {
       })
     );
 
-    const rejections = results.filter((it): it is PromiseAllSettledRejectionResult => it.status === 'rejected')
+    const rejections = results.filter(isPromiseAllSettledRejectionResult)
       .map(it => it.reason);
     return rejections;
   }

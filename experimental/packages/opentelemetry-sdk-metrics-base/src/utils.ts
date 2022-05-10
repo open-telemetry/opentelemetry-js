@@ -123,3 +123,7 @@ export async function PromiseAllSettled<T>(promises: Promise<T>[]): Promise<Prom
     }
   }));
 }
+
+export function isPromiseAllSettledRejectionResult(it: PromiseAllSettledResult<unknown>): it is PromiseAllSettledRejectionResult {
+  return it.status === 'rejected';
+}
