@@ -15,6 +15,7 @@
  */
 
 import { HrTime } from '@opentelemetry/api';
+import { AggregationTemporality } from '../export/AggregationTemporality';
 import { MetricData } from '../export/MetricData';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
@@ -42,6 +43,7 @@ export class DropAggregator implements Aggregator<undefined> {
 
   toMetricData(
     _descriptor: InstrumentDescriptor,
+    _aggregationTemporality: AggregationTemporality,
     _accumulationByAttributes: AccumulationRecord<undefined>[],
     _startTime: HrTime,
     _endTime: HrTime): Maybe<MetricData> {
