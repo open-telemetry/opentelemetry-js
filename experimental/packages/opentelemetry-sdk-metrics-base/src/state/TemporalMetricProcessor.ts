@@ -35,6 +35,10 @@ interface LastReportedHistory<T> {
    * The timestamp the data was reported.
    */
   collectionTime: HrTime;
+  /**
+   * The AggregationTemporality used to aggregate reports.
+   */
+  aggregationTemporality: AggregationTemporality;
 }
 
 /**
@@ -69,7 +73,6 @@ export class TemporalMetricProcessor<T> {
     sdkStartTime: HrTime,
     collectionTime: HrTime,
   ): Maybe<MetricData> {
-    const aggregationTemporality = collector.selectAggregationTemporality(instrumentDescriptor.type);
     // In case it's our first collection, default to start timestamp (see below for explanation).
     let lastCollectionTime = sdkStartTime;
 
@@ -77,11 +80,13 @@ export class TemporalMetricProcessor<T> {
     const unreportedAccumulations = this._getMergedUnreportedAccumulations(collector);
 
     let result = unreportedAccumulations;
+    let aggregationTemporality: AggregationTemporality;
     // Check our last report time.
     if (this._reportHistory.has(collector)) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const last = this._reportHistory.get(collector)!;
       lastCollectionTime = last.collectionTime;
+      aggregationTemporality = last.aggregationTemporality;
 
       // Use aggregation temporality + instrument to determine if we do a merge or a diff of
       // previous. We have the following four scenarios:
@@ -95,12 +100,16 @@ export class TemporalMetricProcessor<T> {
         // for the next cumulative measurement.
         result = TemporalMetricProcessor.merge(last.accumulations, unreportedAccumulations, this._aggregator);
       }
+    } else {
+      // Call into user code to select aggregation temporality for the instrument.
+      aggregationTemporality = collector.selectAggregationTemporality(instrumentDescriptor.type);
     }
 
     // Update last reported (cumulative) accumulation.
     this._reportHistory.set(collector, {
       accumulations: result,
       collectionTime,
+      aggregationTemporality,
     });
 
     // Metric data time span is determined as:
