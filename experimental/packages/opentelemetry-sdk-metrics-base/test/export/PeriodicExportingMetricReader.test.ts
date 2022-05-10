@@ -16,7 +16,7 @@
 
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
-import { PushMetricExporter } from '../../src';
+import { InstrumentType, PushMetricExporter } from '../../src';
 import { ResourceMetrics } from '../../src/export/MetricData';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -77,13 +77,13 @@ class TestMetricExporter implements PushMetricExporter {
     return this._batches.slice(0, numberOfExports);
   }
 
-  getPreferredAggregationTemporality(): AggregationTemporality {
+  selectAggregationTemporality(_instrumentType: InstrumentType): AggregationTemporality {
     return AggregationTemporality.CUMULATIVE;
   }
 }
 
 class TestDeltaMetricExporter extends TestMetricExporter {
-  override getPreferredAggregationTemporality(): AggregationTemporality {
+  override selectAggregationTemporality(_instrumentType: InstrumentType): AggregationTemporality {
     return AggregationTemporality.DELTA;
   }
 }
@@ -107,13 +107,11 @@ describe('PeriodicExportingMetricReader', () => {
   describe('constructor', () => {
     it('should construct PeriodicExportingMetricReader without exceptions', () => {
       const exporter = new TestDeltaMetricExporter();
-      const reader = new PeriodicExportingMetricReader({
-        exporter: exporter,
+      assert.doesNotThrow(() => new PeriodicExportingMetricReader({
+        exporter,
         exportIntervalMillis: 4000,
         exportTimeoutMillis: 3000
-      }
-      );
-      assert.strictEqual(reader.getPreferredAggregationTemporality(), exporter.getPreferredAggregationTemporality());
+      }));
     });
 
     it('should throw when interval less or equal to 0', () => {

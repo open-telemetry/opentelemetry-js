@@ -15,22 +15,51 @@
  */
 
 import { ExportResult } from '@opentelemetry/core';
-import { AggregationTemporality, PushMetricExporter, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
+import {
+  AggregationTemporality,
+  AggregationTemporalitySelector,
+  InstrumentType,
+  PushMetricExporter,
+  ResourceMetrics
+} from '@opentelemetry/sdk-metrics-base';
 import { defaultOptions, OTLPMetricExporterOptions } from './OTLPMetricExporterOptions';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
+
+export const CumulativeTemporalitySelector: AggregationTemporalitySelector = () => AggregationTemporality.CUMULATIVE;
+
+export const DeltaTemporalitySelector: AggregationTemporalitySelector = (instrumentType: InstrumentType) => {
+  switch (instrumentType) {
+    case InstrumentType.COUNTER:
+    case InstrumentType.OBSERVABLE_COUNTER:
+    case InstrumentType.HISTOGRAM:
+    case InstrumentType.OBSERVABLE_GAUGE:
+      return AggregationTemporality.DELTA;
+    case InstrumentType.UP_DOWN_COUNTER:
+    case InstrumentType.OBSERVABLE_UP_DOWN_COUNTER:
+      return AggregationTemporality.CUMULATIVE;
+  }
+};
+
+function chooseTemporalitySelector(temporalityPreference?: AggregationTemporality): AggregationTemporalitySelector {
+  if (temporalityPreference === AggregationTemporality.DELTA) {
+    return DeltaTemporalitySelector;
+  }
+
+  return CumulativeTemporalitySelector;
+}
 
 export class OTLPMetricExporterBase<T extends OTLPExporterBase<OTLPMetricExporterOptions,
   ResourceMetrics,
   IExportMetricsServiceRequest>>
 implements PushMetricExporter {
   public _otlpExporter: T;
-  protected _preferredAggregationTemporality: AggregationTemporality;
+  protected _aggregationTemporalitySelector: AggregationTemporalitySelector;
 
   constructor(exporter: T,
     config: OTLPMetricExporterOptions = defaultOptions) {
     this._otlpExporter = exporter;
-    this._preferredAggregationTemporality = config.aggregationTemporality ?? AggregationTemporality.CUMULATIVE;
+    this._aggregationTemporalitySelector = chooseTemporalitySelector(config.temporalityPreference);
   }
 
   export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): void {
@@ -45,7 +74,7 @@ implements PushMetricExporter {
     return Promise.resolve();
   }
 
-  getPreferredAggregationTemporality(): AggregationTemporality {
-    return this._preferredAggregationTemporality;
+  selectAggregationTemporality(instrumentType: InstrumentType): AggregationTemporality {
+    return this._aggregationTemporalitySelector(instrumentType);
   }
 }

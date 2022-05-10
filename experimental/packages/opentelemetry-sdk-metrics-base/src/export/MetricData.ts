@@ -20,12 +20,14 @@ import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Histogram } from '../aggregator/types';
+import { AggregationTemporality } from './AggregationTemporality';
 
 /**
  * Basic metric data fields.
  */
 export interface BaseMetricData {
   readonly descriptor: InstrumentDescriptor;
+  readonly aggregationTemporality: AggregationTemporality;
   /**
    * DataPointType of the metric instrument.
    */

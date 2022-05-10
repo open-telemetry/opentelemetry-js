@@ -521,9 +521,9 @@ function setup() {
   const meter = meterProvider.getMeter(defaultInstrumentationLibrary.name, defaultInstrumentationLibrary.version, {
     schemaUrl: defaultInstrumentationLibrary.schemaUrl,
   });
-  const deltaReader = new TestMetricReader(AggregationTemporality.DELTA);
+  const deltaReader = new TestMetricReader(() => AggregationTemporality.DELTA);
   meterProvider.addMetricReader(deltaReader);
-  const cumulativeReader = new TestMetricReader(AggregationTemporality.CUMULATIVE);
+  const cumulativeReader = new TestMetricReader(() => AggregationTemporality.CUMULATIVE);
   meterProvider.addMetricReader(cumulativeReader);
 
   return {
