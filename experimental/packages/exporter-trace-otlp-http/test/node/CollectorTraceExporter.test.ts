@@ -475,13 +475,15 @@ describe('OTLPTraceExporter - node with json over http', () => {
       spans = [];
       spans.push(Object.assign({}, mockedReadableSpan));
 
-      collectorExporter.export(spans, result => {
-        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-        const error = result.error as OTLPExporterError;
-        assert.ok(error !== undefined);
-        assert.strictEqual(error.message, 'Request Timeout');
-        done();
-      });
+      setTimeout(() => {
+        collectorExporter.export(spans, result => {
+          assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+          const error = result.error as OTLPExporterError;
+          assert.ok(error !== undefined);
+          assert.strictEqual(error.message, 'Request Timeout');
+          done();
+        });
+      }, 0);
     });
     it('should log the timeout request error message when timeout is 100', done => {
       collectorExporterConfig = {
@@ -492,13 +494,15 @@ describe('OTLPTraceExporter - node with json over http', () => {
       spans = [];
       spans.push(Object.assign({}, mockedReadableSpan));
 
-      collectorExporter.export(spans, result => {
-        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-        const error = result.error as OTLPExporterError;
-        assert.ok(error !== undefined);
-        assert.strictEqual(error.message, 'Request Timeout');
-        done();
-      });
+      setTimeout(() => {
+        collectorExporter.export(spans, result => {
+          assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+          const error = result.error as OTLPExporterError;
+          assert.ok(error !== undefined);
+          assert.strictEqual(error.message, 'Request Timeout');
+          done();
+        });
+      }, 0);
     });
   });
   describe('export - real http request destroyed after response received', () => {
@@ -520,13 +524,15 @@ describe('OTLPTraceExporter - node with json over http', () => {
       spans = [];
       spans.push(Object.assign({}, mockedReadableSpan));
 
-      collectorExporter.export(spans, result => {
-        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-        const error = result.error as OTLPExporterError;
-        assert.ok(error !== undefined);
-        assert.strictEqual(error.message, 'Request Timeout');
-        done();
-      });
+      setTimeout(() => {
+        collectorExporter.export(spans, result => {
+          assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+          const error = result.error as OTLPExporterError;
+          assert.ok(error !== undefined);
+          assert.strictEqual(error.message, 'Request Timeout');
+          done();
+        });
+      }, 0);
     });
   });
 });
