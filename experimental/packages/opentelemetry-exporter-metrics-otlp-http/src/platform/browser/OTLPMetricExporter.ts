@@ -15,10 +15,6 @@
  */
 
 import { ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
-import {
-  otlpTypes
-} from '@opentelemetry/exporter-trace-otlp-http';
-import { toOTLPExportMetricServiceRequest } from '../../transformMetrics';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
 import { defaultOptions, OTLPMetricExporterOptions } from '../../OTLPMetricExporterOptions';
 import { OTLPMetricExporterBase } from '../../OTLPMetricExporterBase';
@@ -27,12 +23,12 @@ import {
   OTLPExporterBrowserBase,
   OTLPExporterConfigBase
 } from '@opentelemetry/otlp-exporter-base';
+import { createExportMetricsServiceRequest, IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = '/v1/metrics';
 const DEFAULT_COLLECTOR_URL = `http://localhost:4318${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 
-class OTLPExporterBrowserProxy extends OTLPExporterBrowserBase<ResourceMetrics,
-  otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest> {
+class OTLPExporterBrowserProxy extends OTLPExporterBrowserBase<ResourceMetrics, IExportMetricsServiceRequest> {
 
   constructor(config: OTLPMetricExporterOptions & OTLPExporterConfigBase = defaultOptions) {
     super(config);
@@ -54,13 +50,8 @@ class OTLPExporterBrowserProxy extends OTLPExporterBrowserBase<ResourceMetrics,
           : DEFAULT_COLLECTOR_URL;
   }
 
-  convert(
-    metrics: ResourceMetrics[]
-  ): otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
-    return toOTLPExportMetricServiceRequest(
-      metrics[0],
-      this
-    );
+  convert(metrics: ResourceMetrics[]): IExportMetricsServiceRequest {
+    return createExportMetricsServiceRequest(metrics);
   }
 }
 

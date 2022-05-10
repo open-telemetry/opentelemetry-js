@@ -3,7 +3,8 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-This module provides exporter for web and node to be used with [opentelemetry-collector][opentelemetry-collector-url] - last tested with version **0.25.0**.
+This module provides exporter for web and node to be used with [opentelemetry-collector][opentelemetry-collector-url]
+Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.48 <=0.50`.
 
 ## Installation
 
@@ -86,19 +87,19 @@ For PROTOBUF please check [npm-url-proto]
 
 ## Configuration options as environment variables
 
-Instead of providing options to `OTLPMetricExporter` and `OTLPTraceExporter` explicitly, environment variables may be provided instead.
+Instead of providing options to `OTLPTraceExporter` explicitly, environment variables may be provided instead.
 
 ```sh
-OTEL_EXPORTER_OTLP_ENDPOINT=https://localhost:4317
+OTEL_EXPORTER_OTLP_ENDPOINT=https://localhost:4318
 # this will automatically append the version and signal path
-# e.g. https://localhost:4317/v1/traces for `OTLPTraceExporter` and https://localhost:4317/v1/metrics for `OTLPMetricExporter`
+# e.g. https://localhost:4318/v1/traces for `OTLPTraceExporter` and https://localhost:4318/v1/metrics for `OTLPMetricExporter`
 ```
 
 If the trace and metric exporter endpoints have different providers, the env var for per-signal endpoints are available to use
 
 ```sh
-OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=https://trace-service:4317/v1/traces
-OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=https://metric-service:4317/v1/metrics
+OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=https://trace-service:4318/v1/traces
+OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=https://metric-service:4318/v1/metrics
 # version and signal needs to be explicit
 ```
 
@@ -108,9 +109,8 @@ For more details, see [OpenTelemetry Specification on Protocol Exporter][opentel
 
 ## Running opentelemetry-collector locally to see the traces
 
-1. Go to examples/otlp-exporter-node
-2. run `npm run docker:start`
-3. Open page at `http://localhost:9411/zipkin/` to observe the traces
+1. Go to `examples/otlp-exporter-node`
+2. Follow the instructions there to inspect traces.
 
 ## Useful links
 

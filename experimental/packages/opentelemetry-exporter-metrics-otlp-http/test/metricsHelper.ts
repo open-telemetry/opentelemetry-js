@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 
-import { Counter, Histogram, ObservableResult, ValueType, } from '@opentelemetry/api-metrics';
+import {
+  Counter,
+  ObservableResult,
+  Histogram,
+  ValueType,
+} from '@opentelemetry/api-metrics';
+import { Resource } from '@opentelemetry/resources';
+import * as assert from 'assert';
 import { InstrumentationLibrary, VERSION } from '@opentelemetry/core';
 import {
   AggregationTemporality,
@@ -22,9 +29,12 @@ import {
   MeterProvider,
   MetricReader
 } from '@opentelemetry/sdk-metrics-base';
-import { Resource } from '@opentelemetry/resources';
-import * as assert from 'assert';
-import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
+import {
+  IExportMetricsServiceRequest,
+  IKeyValue,
+  IMetric,
+  IResource
+} from '@opentelemetry/otlp-transformer';
 
 if (typeof Buffer === 'undefined') {
   (window as any).Buffer = {
@@ -173,7 +183,7 @@ export const mockedInstrumentationLibraries: InstrumentationLibrary[] = [
 ];
 
 export function ensureAttributesAreCorrect(
-  attributes: otlpTypes.opentelemetryProto.common.v1.KeyValue[]
+  attributes: IKeyValue[]
 ) {
   assert.deepStrictEqual(
     attributes,
@@ -190,7 +200,7 @@ export function ensureAttributesAreCorrect(
 }
 
 export function ensureWebResourceIsCorrect(
-  resource: otlpTypes.opentelemetryProto.resource.v1.Resource
+  resource: IResource
 ) {
   assert.strictEqual(resource.attributes.length, 7);
   assert.strictEqual(resource.attributes[0].key, 'service.name');
@@ -211,33 +221,31 @@ export function ensureWebResourceIsCorrect(
 }
 
 export function ensureCounterIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
-  endTime: number,
-  startTime: number
+  metric: IMetric,
+  time?: number,
+  startTime?: number
 ) {
   assert.deepStrictEqual(metric, {
     name: 'int-counter',
     description: 'sample counter description',
     unit: '1',
-    intSum: {
+    sum: {
       dataPoints: [
         {
-          labels: [],
-          value: 1,
+          attributes: [],
+          asInt: 1,
           startTimeUnixNano: startTime,
-          timeUnixNano: endTime,
+          timeUnixNano: time,
         },
       ],
       isMonotonic: true,
-      aggregationTemporality:
-      otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
-        .AGGREGATION_TEMPORALITY_CUMULATIVE,
+      aggregationTemporality: 2,
     },
   });
 }
 
 export function ensureDoubleCounterIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: IMetric,
   time: number,
   endTime: number
 ) {
@@ -255,15 +263,13 @@ export function ensureDoubleCounterIsCorrect(
         },
       ],
       isMonotonic: true,
-      aggregationTemporality:
-      otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
-        .AGGREGATION_TEMPORALITY_CUMULATIVE,
+      aggregationTemporality: 2,
     },
   });
 }
 
 export function ensureObservableGaugeIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: IMetric,
   time: number,
   startTime: number,
   value: number,
@@ -273,25 +279,21 @@ export function ensureObservableGaugeIsCorrect(
     name,
     description: 'sample observable gauge description',
     unit: '1',
-    doubleGauge: {
+    gauge: {
       dataPoints: [
         {
-          labels: [],
-          value,
+          attributes: [],
+          asDouble: value,
           startTimeUnixNano: startTime,
           timeUnixNano: time,
         },
-      ],
-      aggregationTemporality:
-      otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
-        .AGGREGATION_TEMPORALITY_CUMULATIVE,
-      isMonotonic: false,
+      ]
     },
   });
 }
 
 export function ensureObservableCounterIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: IMetric,
   time: number,
   startTime: number,
   value: number,
@@ -305,21 +307,19 @@ export function ensureObservableCounterIsCorrect(
       isMonotonic: true,
       dataPoints: [
         {
-          labels: [],
+          attributes: [],
           value,
           startTimeUnixNano: startTime,
           timeUnixNano: time,
         },
       ],
-      aggregationTemporality:
-      otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
-        .AGGREGATION_TEMPORALITY_CUMULATIVE,
+      aggregationTemporality: 2
     },
   });
 }
 
 export function ensureObservableUpDownCounterIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: IMetric,
   time: number,
   startTime: number,
   value: number,
@@ -339,15 +339,13 @@ export function ensureObservableUpDownCounterIsCorrect(
           timeUnixNano: time,
         },
       ],
-      aggregationTemporality:
-      otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
-        .AGGREGATION_TEMPORALITY_CUMULATIVE,
+      aggregationTemporality: 2
     },
   });
 }
 
 export function ensureHistogramIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: IMetric,
   time: number,
   startTime: number,
   explicitBounds: (number | null)[] = [Infinity],
@@ -357,10 +355,10 @@ export function ensureHistogramIsCorrect(
     name: 'int-histogram',
     description: 'sample histogram description',
     unit: '1',
-    intHistogram: {
+    histogram: {
       dataPoints: [
         {
-          labels: [],
+          attributes: [],
           sum: 21,
           count: 2,
           startTimeUnixNano: startTime,
@@ -369,15 +367,13 @@ export function ensureHistogramIsCorrect(
           explicitBounds,
         },
       ],
-      aggregationTemporality:
-      otlpTypes.opentelemetryProto.metrics.v1.AggregationTemporality
-        .AGGREGATION_TEMPORALITY_CUMULATIVE,
+      aggregationTemporality: 2
     },
   });
 }
 
 export function ensureExportMetricsServiceRequestIsSet(
-  json: otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
+  json: IExportMetricsServiceRequest
 ) {
   const resourceMetrics = json.resourceMetrics;
   assert.strictEqual(
@@ -387,25 +383,15 @@ export function ensureExportMetricsServiceRequestIsSet(
   );
 
   const resource = resourceMetrics[0].resource;
-  assert.strictEqual(!!resource, true, 'resource is missing');
+  assert.ok(resource, 'resource is missing');
 
-  const instrumentationLibraryMetrics =
-    resourceMetrics[0].instrumentationLibraryMetrics;
-  assert.strictEqual(
-    instrumentationLibraryMetrics && instrumentationLibraryMetrics.length,
-    1,
-    'instrumentationLibraryMetrics is missing'
-  );
+  const scopeMetrics = resourceMetrics[0].scopeMetrics;
+  assert.strictEqual(scopeMetrics?.length, 1, 'scopeMetrics is missing');
 
-  const instrumentationLibrary =
-    instrumentationLibraryMetrics[0].instrumentationLibrary;
-  assert.strictEqual(
-    !!instrumentationLibrary,
-    true,
-    'instrumentationLibrary is missing'
-  );
+  const scope = scopeMetrics[0].scope;
+  assert.ok(scope, 'scope is missing');
 
-  const metrics = resourceMetrics[0].instrumentationLibraryMetrics[0].metrics;
+  const metrics = resourceMetrics[0].scopeMetrics[0].metrics;
   assert.strictEqual(metrics.length, 3, 'Metrics are missing');
 }
 

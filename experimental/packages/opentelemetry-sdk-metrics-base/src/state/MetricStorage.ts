@@ -40,7 +40,7 @@ export abstract class MetricStorage {
     collectors: MetricCollectorHandle[],
     sdkStartTime: HrTime,
     collectionTime: HrTime,
-  ): Promise<Maybe<MetricData>>;
+  ): Maybe<MetricData>;
 
   getInstrumentDescriptor(): InstrumentDescriptor{
     return this._instrumentDescriptor;

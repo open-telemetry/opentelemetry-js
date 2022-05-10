@@ -22,9 +22,9 @@ import {
   PushMetricExporter,
   ResourceMetrics
 } from '@opentelemetry/sdk-metrics-base';
-import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { defaultOptions, OTLPMetricExporterOptions } from './OTLPMetricExporterOptions';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
+import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 
 export const CumulativeTemporalitySelector: AggregationTemporalitySelector = () => AggregationTemporality.CUMULATIVE;
 
@@ -51,7 +51,7 @@ function chooseTemporalitySelector(temporalityPreference?: AggregationTemporalit
 
 export class OTLPMetricExporterBase<T extends OTLPExporterBase<OTLPMetricExporterOptions,
   ResourceMetrics,
-  otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest>>
+  IExportMetricsServiceRequest>>
 implements PushMetricExporter {
   public _otlpExporter: T;
   protected _aggregationTemporalitySelector: AggregationTemporalitySelector;
@@ -77,5 +77,4 @@ implements PushMetricExporter {
   selectAggregationTemporality(instrumentType: InstrumentType): AggregationTemporality {
     return this._aggregationTemporalitySelector(instrumentType);
   }
-
 }

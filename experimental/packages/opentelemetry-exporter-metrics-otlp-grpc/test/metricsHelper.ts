@@ -15,7 +15,6 @@
  */
 
 import { Counter, Histogram, ObservableResult, ValueType } from '@opentelemetry/api-metrics';
-import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as grpc from '@grpc/grpc-js';
@@ -26,6 +25,7 @@ import {
   MeterProvider,
   MetricReader,
 } from '@opentelemetry/sdk-metrics-base';
+import { IKeyValue, IMetric, IResource } from '@opentelemetry/otlp-transformer';
 
 class TestMetricReader extends MetricReader {
   selectAggregationTemporality() {
@@ -104,7 +104,7 @@ export function mockHistogram(): Histogram {
 }
 
 export function ensureExportedAttributesAreCorrect(
-  attributes: otlpTypes.opentelemetryProto.common.v1.KeyValue[]
+  attributes: IKeyValue[]
 ) {
   assert.deepStrictEqual(
     attributes,
@@ -122,7 +122,7 @@ export function ensureExportedAttributesAreCorrect(
 }
 
 export function ensureExportedCounterIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: IMetric,
   time?: number,
   startTime?: number
 ) {
@@ -130,13 +130,15 @@ export function ensureExportedCounterIsCorrect(
     name: 'int-counter',
     description: 'sample counter description',
     unit: '1',
-    data: 'intSum',
-    intSum: {
+    data: 'sum',
+    sum: {
       dataPoints: [
         {
-          labels: [],
+          attributes: [],
           exemplars: [],
-          value: '1',
+          value: 'asInt',
+          asInt: '1',
+          flags: 0,
           startTimeUnixNano: String(startTime),
           timeUnixNano: String(time),
         },
@@ -148,7 +150,7 @@ export function ensureExportedCounterIsCorrect(
 }
 
 export function ensureExportedObservableGaugeIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: IMetric,
   time?: number,
   startTime?: number
 ) {
@@ -156,13 +158,15 @@ export function ensureExportedObservableGaugeIsCorrect(
     name: 'double-observable-gauge',
     description: 'sample observable gauge description',
     unit: '1',
-    data: 'doubleGauge',
-    doubleGauge: {
+    data: 'gauge',
+    gauge: {
       dataPoints: [
         {
-          labels: [],
+          attributes: [],
           exemplars: [],
-          value: 6,
+          value: 'asDouble',
+          asDouble: 6,
+          flags: 0,
           startTimeUnixNano: String(startTime),
           timeUnixNano: String(time),
         },
@@ -172,7 +176,7 @@ export function ensureExportedObservableGaugeIsCorrect(
 }
 
 export function ensureExportedHistogramIsCorrect(
-  metric: otlpTypes.opentelemetryProto.metrics.v1.Metric,
+  metric: IMetric,
   time?: number,
   startTime?: number,
   explicitBounds: number[] = [Infinity],
@@ -182,13 +186,15 @@ export function ensureExportedHistogramIsCorrect(
     name: 'int-histogram',
     description: 'sample histogram description',
     unit: '1',
-    data: 'intHistogram',
-    intHistogram: {
+    data: 'histogram',
+    histogram: {
       dataPoints: [
         {
-          labels: [],
+          attributes: [],
           exemplars: [],
-          sum: '21',
+          flags: 0,
+          _sum: 'sum',
+          sum: 21,
           count: '2',
           startTimeUnixNano: String(startTime),
           timeUnixNano: String(time),
@@ -202,7 +208,7 @@ export function ensureExportedHistogramIsCorrect(
 }
 
 export function ensureResourceIsCorrect(
-  resource: otlpTypes.opentelemetryProto.resource.v1.Resource
+  resource: IResource
 ) {
   assert.deepStrictEqual(resource, {
     attributes: [
@@ -261,11 +267,11 @@ export function ensureResourceIsCorrect(
 }
 
 export function ensureMetadataIsCorrect(
-  actual: grpc.Metadata,
-  expected: grpc.Metadata
+  actual?: grpc.Metadata,
+  expected?: grpc.Metadata
 ) {
   //ignore user agent
-  expected.remove('user-agent');
-  actual.remove('user-agent');
-  assert.deepStrictEqual(actual.getMap(), expected.getMap());
+  expected?.remove('user-agent');
+  actual?.remove('user-agent');
+  assert.deepStrictEqual(actual?.getMap(), expected?.getMap() ?? {});
 }

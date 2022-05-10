@@ -58,7 +58,7 @@ describe('SyncMetricStorage', () => {
         metricStorage.record(2, {}, api.context.active());
         metricStorage.record(3, {}, api.context.active());
         {
-          const metric = await metricStorage.collect(
+          const metric = metricStorage.collect(
             deltaCollector,
             collectors,
             sdkStartTime,
@@ -71,7 +71,7 @@ describe('SyncMetricStorage', () => {
 
         // The attributes should not be memorized.
         {
-          const metric = await metricStorage.collect(
+          const metric = metricStorage.collect(
             deltaCollector,
             collectors,
             sdkStartTime,
@@ -83,7 +83,7 @@ describe('SyncMetricStorage', () => {
 
         metricStorage.record(1, {}, api.context.active());
         {
-          const metric = await metricStorage.collect(
+          const metric = metricStorage.collect(
             deltaCollector,
             [deltaCollector],
             sdkStartTime,
@@ -104,7 +104,7 @@ describe('SyncMetricStorage', () => {
         metricStorage.record(2, {}, api.context.active());
         metricStorage.record(3, {}, api.context.active());
         {
-          const metric = await metricStorage.collect(
+          const metric = metricStorage.collect(
             cumulativeCollector,
             collectors,
             sdkStartTime,
@@ -117,7 +117,7 @@ describe('SyncMetricStorage', () => {
 
         // The attributes should be memorized.
         {
-          const metric = await metricStorage.collect(
+          const metric = metricStorage.collect(
             cumulativeCollector,
             collectors,
             sdkStartTime,
@@ -130,7 +130,7 @@ describe('SyncMetricStorage', () => {
 
         metricStorage.record(1, {}, api.context.active());
         {
-          const metric = await metricStorage.collect(
+          const metric = metricStorage.collect(
             cumulativeCollector,
             collectors,
             sdkStartTime,

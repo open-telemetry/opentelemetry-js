@@ -35,8 +35,8 @@ class TestMetricStorage extends MetricStorage {
     collectors: MetricCollectorHandle[],
     sdkStartTime: HrTime,
     collectionTime: HrTime,
-  ): Promise<Maybe<MetricData>> {
-    return Promise.resolve(undefined);
+  ): Maybe<MetricData> {
+    return undefined;
   }
 }
 
