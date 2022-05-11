@@ -15,6 +15,9 @@
  */
 
 import { diag } from '@opentelemetry/api';
+import { getEnv } from '@opentelemetry/core';
+
+const DEFAULT_TRACE_TIMEOUT = 10000;
 
 /**
  * Parses headers from config leaving only those that have defined values
@@ -38,4 +41,42 @@ export function appendResourcePathToUrlIfNotPresent(url: string, path: string): 
   if (url.match(/v\d\/(traces|metrics)$/)) return url;
 
   return url + path;
+}
+
+/**
+ * Configure exporter trace timeout value from passed in value or environment variables
+ * @param timeoutMillis
+ * @returns timeout value in milliseconds
+ */
+
+export function configureExporterTimeout(timeoutMillis: number | undefined): number {
+  if (typeof timeoutMillis === 'number') {
+    if (timeoutMillis <= 0) {
+      // OTLP exporter configured timeout - using default value of 10000ms
+      return invalidTimeout(timeoutMillis, DEFAULT_TRACE_TIMEOUT);
+    }
+    return timeoutMillis;
+  } else {
+    return getExporterTimeoutFromEnv();
+  }
+}
+
+function getExporterTimeoutFromEnv(): number {
+  const definedTimeout =
+    Number(getEnv().OTEL_EXPORTER_OTLP_TRACES_TIMEOUT ??
+    getEnv().OTEL_EXPORTER_OTLP_TIMEOUT);
+
+  if (definedTimeout <= 0) {
+    // OTLP exporter configured timeout - using default value of 10000ms
+    return invalidTimeout(definedTimeout, DEFAULT_TRACE_TIMEOUT);
+  } else {
+    return definedTimeout;
+  }
+}
+
+// OTLP exporter configured timeout - using default value of 10000ms
+export function invalidTimeout(timeout: number, defaultTimeout: number): number {
+  diag.warn('Timeout must be greater than 0', timeout);
+
+  return defaultTimeout;
 }

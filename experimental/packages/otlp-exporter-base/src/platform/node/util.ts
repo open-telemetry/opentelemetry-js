@@ -42,7 +42,20 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
   onSuccess: () => void,
   onError: (error: OTLPExporterError) => void
 ): void {
+  const exporterTimeout = collector.timeoutMillis;
   const parsedUrl = new url.URL(collector.url);
+  let reqIsDestroyed: boolean;
+  const nodeVersion = Number(process.versions.node.split('.')[0]);
+
+  const exporterTimer = setTimeout(() => {
+    reqIsDestroyed = true;
+    // req.abort() was deprecated since v14
+    if (nodeVersion >= 14) {
+      req.destroy();
+    } else {
+      req.abort();
+    }
+  }, exporterTimeout);
 
   const options: http.RequestOptions | https.RequestOptions = {
     hostname: parsedUrl.hostname,
@@ -61,24 +74,44 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
   const req = request(options, (res: http.IncomingMessage) => {
     let responseData = '';
     res.on('data', chunk => (responseData += chunk));
-    res.on('end', () => {
-      if (res.statusCode && res.statusCode < 299) {
-        diag.debug(`statusCode: ${res.statusCode}`, responseData);
-        onSuccess();
-      } else {
-        const error = new OTLPExporterError(
-          res.statusMessage,
-          res.statusCode,
-          responseData
+
+    res.on('aborted', () => {
+      if (reqIsDestroyed) {
+        const err = new OTLPExporterError(
+          'Request Timeout'
         );
-        onError(error);
+        onError(err);
+      }
+    });
+
+    res.on('end', () => {
+      if (!reqIsDestroyed) {
+        if (res.statusCode && res.statusCode < 299) {
+          diag.debug(`statusCode: ${res.statusCode}`, responseData);
+          onSuccess();
+        } else {
+          const error = new OTLPExporterError(
+            res.statusMessage,
+            res.statusCode,
+            responseData
+          );
+          onError(error);
+        }
+        clearTimeout(exporterTimer);
       }
     });
   });
 
-
-  req.on('error', (error: Error) => {
-    onError(error);
+  req.on('error', (error: Error | any) => {
+    if (reqIsDestroyed) {
+      const err = new OTLPExporterError(
+        'Request Timeout', error.code
+      );
+      onError(err);
+    } else {
+      clearTimeout(exporterTimer);
+      onError(error);
+    }
   });
 
   switch (collector.compression) {

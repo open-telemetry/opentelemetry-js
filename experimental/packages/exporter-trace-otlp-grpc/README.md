@@ -108,6 +108,27 @@ provider.register();
 
 Note, that this will only work if TLS is also configured on the server.
 
+## Exporter Timeout Configuration
+
+The OTLPTraceExporter has a timeout configuration option which is the maximum time, in milliseconds, the OTLP exporter will wait for each batch export. The default value is 10000ms.
+
++ To override the default timeout duration, provide `timeoutMillis` to OTLPTraceExporter with `collectorOptions`:
+
+  ```js
+  const collectorOptions = {
+    timeoutMillis: 15000,
+    // url is optional and can be omitted - default is localhost:4317
+    url: '<collector-hostname>:<port>',
+    metadata, // // an optional grpc.Metadata object to be sent with each request
+  };
+    
+  const exporter = new OTLPTraceExporter(collectorOptions);
+  ```
+
+  > Providing `timeoutMillis` with `collectorOptions` takes precedence and overrides timeout set with environment variables.
+
+## Exporter Compression Configuration
+
 By default no compression will be used. To use compression, set it programmatically in `collectorOptions` or with environment variables. Supported compression options: `gzip` and `none`.
 
 ```js
@@ -126,13 +147,13 @@ const exporter = new OTLPTraceExporter(collectorOptions);
 
 ## Environment Variable Configuration
 
-Set compression with environment variables.
-
-```shell
-OTEL_EXPORTER_OTLP_TRACES_COMPRESSION=gzip
-```
-
- > Compression set programatically in `collectorOptions` takes precedence over compression set with environment variables. `OTEL_EXPORTER_OTLP_TRACES_COMPRESSION` takes precedence and overrides `OTEL_EXPORTER_OTLP_COMPRESSION`.
+ | Environment variable | Description |
+  |----------------------|-------------|
+  | OTEL_EXPORTER_OTLP_TRACES_TIMEOUT | The maximum waiting time, in milliseconds, allowed to send each OTLP trace batch. Default is 10000. |
+  | OTEL_EXPORTER_OTLP_TIMEOUT | The maximum waiting time, in milliseconds, allowed to send each OTLP trace and metric batch. Default is 10000. |
+  | OTEL_EXPORTER_OTLP_TRACES_COMPRESSION | The compression type to use on OTLP trace requests. Options include gzip. By default no compression will be used. |
+  | OTEL_EXPORTER_OTLP_COMPRESSION | The compression type to use on OTLP trace, metric, and log requests. Options include gzip. By default no compression will be used. |
+ > The per-signal environment variables (`OTEL_EXPORTER_OTLP_TRACES_TIMEOUT`) takes precedence and non-per-signal environment variable (`OTEL_EXPORTER_OTLP_TIMEOUT`).
 
 ## Running opentelemetry-collector locally to see the traces
 
@@ -141,9 +162,9 @@ OTEL_EXPORTER_OTLP_TRACES_COMPRESSION=gzip
 
 ## Useful links
 
-- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
-- For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
++ For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
++ For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
++ For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
 
 ## License
 
