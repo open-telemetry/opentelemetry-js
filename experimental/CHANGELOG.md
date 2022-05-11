@@ -14,6 +14,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(opentelemetry-instrumentation-http): use correct origin when port is `null` #2948 @danielgblanco
 * fix(otlp-exporter-base): include esm and esnext in package files #2952 @dyladan
 
 ### :books: (Refine Doc)
