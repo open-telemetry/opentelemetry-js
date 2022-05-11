@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 * feat: warn when hooked module is already loaded [#2926](https://github.com/open-telemetry/opentelemetry-js/pull/2926) @nozik
 * feat: implement OSDetector [#2927](https://github.com/open-telemetry/opentelemetry-js/pull/2927) @rauno56
 * feat: implement HostDetector [#2921](https://github.com/open-telemetry/opentelemetry-js/pull/2921) @rauno56
+* feat(opentelemetry-core): add InstrumentationScope [#2959](https://github.com/open-telemetry/opentelemetry-js/pull/2959) @pichlermarc
 
 ### :bug: (Bug Fix)
 

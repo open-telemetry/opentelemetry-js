@@ -36,11 +36,11 @@ export class MetricCollector implements MetricProducer {
     const collectionTime = hrTime();
     const meterCollectionPromises = Array.from(this._sharedState.meterSharedStates.values())
       .map(meterSharedState => meterSharedState.collect(this, collectionTime));
-    const instrumentationLibraryMetrics = await Promise.all(meterCollectionPromises);
+    const scopeMetrics = await Promise.all(meterCollectionPromises);
 
     return {
       resource: this._sharedState.resource,
-      instrumentationLibraryMetrics,
+      scopeMetrics,
     };
   }
 

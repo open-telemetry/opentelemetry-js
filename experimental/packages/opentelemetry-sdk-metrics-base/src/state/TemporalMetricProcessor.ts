@@ -54,7 +54,7 @@ export class TemporalMetricProcessor<T> {
    * @param collector The information of the MetricCollector.
    * @param collectors The registered collectors.
    * @param resource The resource to attach these metrics against.
-   * @param instrumentationLibrary The instrumentation library that generated these metrics.
+   * @param instrumentationScope The instrumentation scope that generated these metrics.
    * @param instrumentDescriptor The instrumentation descriptor that these metrics generated with.
    * @param currentAccumulations The current accumulation of metric data from instruments.
    * @param sdkStartTime The sdk start timestamp.
