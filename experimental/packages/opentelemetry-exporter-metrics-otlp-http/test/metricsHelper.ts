@@ -22,7 +22,7 @@ import {
 } from '@opentelemetry/api-metrics';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
-import { InstrumentationLibrary, VERSION } from '@opentelemetry/core';
+import { InstrumentationScope, VERSION } from '@opentelemetry/core';
 import {
   AggregationTemporality,
   ExplicitBucketHistogramAggregation,
@@ -171,7 +171,7 @@ export const mockedResources: Resource[] = [
   new Resource({ name: 'resource 2' }),
 ];
 
-export const mockedInstrumentationLibraries: InstrumentationLibrary[] = [
+export const mockedInstrumentationLibraries: InstrumentationScope[] = [
   {
     name: 'lib1',
     version: '0.0.1',
