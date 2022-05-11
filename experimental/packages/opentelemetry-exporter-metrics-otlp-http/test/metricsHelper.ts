@@ -22,8 +22,9 @@ import {
 } from '@opentelemetry/api-metrics';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
-import { InstrumentationLibrary, VERSION } from '@opentelemetry/core';
+import { InstrumentationScope, VERSION } from '@opentelemetry/core';
 import {
+  AggregationTemporality,
   ExplicitBucketHistogramAggregation,
   MeterProvider,
   MetricReader
@@ -43,13 +44,17 @@ if (typeof Buffer === 'undefined') {
   };
 }
 
-export class TestMetricReader extends MetricReader {
+class TestMetricReader extends MetricReader {
   protected onForceFlush(): Promise<void> {
     return Promise.resolve(undefined);
   }
 
   protected onShutdown(): Promise<void> {
     return Promise.resolve(undefined);
+  }
+
+  selectAggregationTemporality() {
+    return AggregationTemporality.CUMULATIVE;
   }
 }
 
@@ -166,7 +171,7 @@ export const mockedResources: Resource[] = [
   new Resource({ name: 'resource 2' }),
 ];
 
-export const mockedInstrumentationLibraries: InstrumentationLibrary[] = [
+export const mockedInstrumentationLibraries: InstrumentationScope[] = [
   {
     name: 'lib1',
     version: '0.0.1',

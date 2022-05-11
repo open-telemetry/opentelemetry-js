@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### :boom: Breaking Change
 
+* feat(metrics): metric readers and exporters now select aggregation temporality based on instrument type [#2902](https://github.com/open-telemetry/opentelemetry-js/pull/2902) @seemk
 * chore: remove unused InstrumentationConfig#path [#2944](https://github.com/open-telemetry/opentelemetry-js/pull/2944) @flarna
 
 ### :rocket: (Enhancement)
@@ -14,6 +15,7 @@ All notable changes to this project will be documented in this file.
 * feat: warn when hooked module is already loaded [#2926](https://github.com/open-telemetry/opentelemetry-js/pull/2926) @nozik
 * feat: implement OSDetector [#2927](https://github.com/open-telemetry/opentelemetry-js/pull/2927) @rauno56
 * feat: implement HostDetector [#2921](https://github.com/open-telemetry/opentelemetry-js/pull/2921) @rauno56
+* feat(opentelemetry-core): add InstrumentationScope [#2959](https://github.com/open-telemetry/opentelemetry-js/pull/2959) @pichlermarc
 
 ### :bug: (Bug Fix)
 

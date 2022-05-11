@@ -16,10 +16,15 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { Meter, MeterProvider, DataPointType, ResourceMetrics } from '../../src';
-import { assertMetricData, defaultInstrumentationLibrary, defaultResource, sleep } from '../util';
+import {
+  AggregationTemporality,
+  Meter,
+  MeterProvider,
+  DataPointType,
+  ResourceMetrics
+} from '../../src';
+import { assertMetricData, defaultInstrumentationScope, defaultResource, sleep } from '../util';
 import { TestMetricReader } from '../export/TestMetricReader';
-import { TestDeltaMetricExporter, TestMetricExporter } from '../export/TestMetricExporter';
 import { MeterSharedState } from '../../src/state/MeterSharedState';
 
 describe('MeterSharedState', () => {
@@ -31,18 +36,18 @@ describe('MeterSharedState', () => {
     function setupInstruments() {
       const meterProvider = new MeterProvider({ resource: defaultResource });
 
-      const cumulativeReader = new TestMetricReader(new TestMetricExporter().getPreferredAggregationTemporality());
+      const cumulativeReader = new TestMetricReader(() => AggregationTemporality.CUMULATIVE);
       meterProvider.addMetricReader(cumulativeReader);
       const cumulativeCollector = cumulativeReader.getMetricCollector();
 
-      const deltaReader = new TestMetricReader(new TestDeltaMetricExporter().getPreferredAggregationTemporality());
+      const deltaReader = new TestMetricReader(() => AggregationTemporality.DELTA);
       meterProvider.addMetricReader(deltaReader);
       const deltaCollector = deltaReader.getMetricCollector();
 
       const metricCollectors = [cumulativeCollector, deltaCollector];
 
-      const meter = meterProvider.getMeter(defaultInstrumentationLibrary.name, defaultInstrumentationLibrary.version, {
-        schemaUrl: defaultInstrumentationLibrary.schemaUrl,
+      const meter = meterProvider.getMeter(defaultInstrumentationScope.name, defaultInstrumentationScope.version, {
+        schemaUrl: defaultInstrumentationScope.schemaUrl,
       }) as Meter;
       const meterSharedState = meter['_meterSharedState'] as MeterSharedState;
 
@@ -60,9 +65,9 @@ describe('MeterSharedState', () => {
       counter.add(1);
       await Promise.all(metricCollectors.map(async collector => {
         const result = await collector.collect();
-        assert.strictEqual(result.instrumentationLibraryMetrics.length, 1);
-        assert.strictEqual(result.instrumentationLibraryMetrics[0].metrics.length, 1);
-        assertMetricData(result.instrumentationLibraryMetrics[0].metrics[0], DataPointType.SINGULAR, {
+        assert.strictEqual(result.scopeMetrics.length, 1);
+        assert.strictEqual(result.scopeMetrics[0].metrics.length, 1);
+        assertMetricData(result.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
           name: 'test',
         });
       }));
@@ -82,12 +87,12 @@ describe('MeterSharedState', () => {
       counter.add(1);
       await Promise.all(metricCollectors.map(async collector => {
         const result = await collector.collect();
-        assert.strictEqual(result.instrumentationLibraryMetrics.length, 1);
-        assert.strictEqual(result.instrumentationLibraryMetrics[0].metrics.length, 2);
-        assertMetricData(result.instrumentationLibraryMetrics[0].metrics[0], DataPointType.SINGULAR, {
+        assert.strictEqual(result.scopeMetrics.length, 1);
+        assert.strictEqual(result.scopeMetrics[0].metrics.length, 2);
+        assertMetricData(result.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
           name: 'foo',
         });
-        assertMetricData(result.instrumentationLibraryMetrics[0].metrics[1], DataPointType.SINGULAR, {
+        assertMetricData(result.scopeMetrics[0].metrics[1], DataPointType.SINGULAR, {
           name: 'bar',
         });
       }));
@@ -151,12 +156,12 @@ describe('MeterSharedState', () => {
       });
 
       function verifyResult(resourceMetrics: ResourceMetrics) {
-        assert.strictEqual(resourceMetrics.instrumentationLibraryMetrics.length, 1);
-        assert.strictEqual(resourceMetrics.instrumentationLibraryMetrics[0].metrics.length, 2);
-        assertMetricData(resourceMetrics.instrumentationLibraryMetrics[0].metrics[0], DataPointType.SINGULAR, {
+        assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
+        assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 2);
+        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
           name: 'foo'
         });
-        assertMetricData(resourceMetrics.instrumentationLibraryMetrics[0].metrics[1], DataPointType.SINGULAR, {
+        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[1], DataPointType.SINGULAR, {
           name: 'bar'
         });
       }

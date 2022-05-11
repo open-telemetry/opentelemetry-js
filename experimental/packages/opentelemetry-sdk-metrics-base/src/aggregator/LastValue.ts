@@ -20,6 +20,7 @@ import { hrTime, hrTimeToMicroseconds } from '@opentelemetry/core';
 import { DataPointType, SingularMetricData } from '../export/MetricData';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
+import { AggregationTemporality } from '../export/AggregationTemporality';
 
 export class LastValueAccumulation implements Accumulation {
   constructor(private _current: number = 0, public sampleTime: HrTime = [0, 0]) {}
@@ -67,11 +68,13 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
 
   toMetricData(
     descriptor: InstrumentDescriptor,
+    aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<LastValueAccumulation>[],
     startTime: HrTime,
     endTime: HrTime): Maybe<SingularMetricData> {
     return {
       descriptor,
+      aggregationTemporality,
       dataPointType: DataPointType.SINGULAR,
       dataPoints: accumulationByAttributes.map(([attributes, accumulation]) => {
         return {

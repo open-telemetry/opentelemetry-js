@@ -18,7 +18,7 @@ import { AggregationTemporality } from '@opentelemetry/sdk-metrics-base';
 import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
 
 export interface OTLPMetricExporterOptions extends OTLPExporterConfigBase {
-  aggregationTemporality?: AggregationTemporality
+  temporalityPreference?: AggregationTemporality
 }
 export const defaultExporterTemporality = AggregationTemporality.CUMULATIVE;
-export const defaultOptions = {aggregationTemporality: defaultExporterTemporality};
+export const defaultOptions = {temporalityPreference: defaultExporterTemporality};

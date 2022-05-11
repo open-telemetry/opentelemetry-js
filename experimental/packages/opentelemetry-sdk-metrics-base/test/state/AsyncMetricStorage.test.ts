@@ -27,11 +27,11 @@ import { ObservableRegistry } from '../../src/state/ObservableRegistry';
 import { assertMetricData, assertDataPoint, defaultInstrumentDescriptor, ObservableCallbackDelegate } from '../util';
 
 const deltaCollector: MetricCollectorHandle = {
-  aggregatorTemporality: AggregationTemporality.DELTA,
+  selectAggregationTemporality: () => AggregationTemporality.DELTA,
 };
 
 const cumulativeCollector: MetricCollectorHandle = {
-  aggregatorTemporality: AggregationTemporality.CUMULATIVE,
+  selectAggregationTemporality: () => AggregationTemporality.CUMULATIVE,
 };
 
 const sdkStartTime = hrTime();
