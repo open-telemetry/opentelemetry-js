@@ -16,11 +16,11 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { InstrumentationLibrary } from '@opentelemetry/core';
+import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { AggregationTemporality, InstrumentDescriptor, InstrumentType, MeterProvider, MetricReader, DataPoint, DataPointType } from '../src';
 import { TestMetricReader } from './export/TestMetricReader';
-import { assertMetricData, assertDataPoint, commonValues, commonAttributes, defaultResource, defaultInstrumentationLibrary } from './util';
+import { assertMetricData, assertDataPoint, commonValues, commonAttributes, defaultResource, defaultInstrumentationScope } from './util';
 import { Histogram } from '../src/aggregator/types';
 import { ObservableResult, ValueType } from '@opentelemetry/api-metrics';
 
@@ -518,8 +518,8 @@ describe('Instruments', () => {
 
 function setup() {
   const meterProvider = new MeterProvider({ resource: defaultResource });
-  const meter = meterProvider.getMeter(defaultInstrumentationLibrary.name, defaultInstrumentationLibrary.version, {
-    schemaUrl: defaultInstrumentationLibrary.schemaUrl,
+  const meter = meterProvider.getMeter(defaultInstrumentationScope.name, defaultInstrumentationScope.version, {
+    schemaUrl: defaultInstrumentationScope.schemaUrl,
   });
   const deltaReader = new TestMetricReader(() => AggregationTemporality.DELTA);
   meterProvider.addMetricReader(deltaReader);
@@ -536,7 +536,7 @@ function setup() {
 
 interface ValidateMetricData {
   resource?: Resource;
-  instrumentationLibrary?: InstrumentationLibrary;
+  instrumentationScope?: InstrumentationScope;
   descriptor?: InstrumentDescriptor;
   dataPointType?: DataPointType,
   dataPoints?: Partial<DataPoint<number | Partial<Histogram>>>[];
@@ -547,12 +547,12 @@ async function validateExport(reader: MetricReader, expected: ValidateMetricData
 
   assert.notStrictEqual(resourceMetrics, undefined);
 
-  const { resource, instrumentationLibraryMetrics } = resourceMetrics!;
+  const { resource, scopeMetrics } = resourceMetrics!;
 
-  const { instrumentationLibrary, metrics } = instrumentationLibraryMetrics[0];
+  const { scope, metrics } = scopeMetrics[0];
 
   assert.deepStrictEqual(resource, defaultResource);
-  assert.deepStrictEqual(instrumentationLibrary, defaultInstrumentationLibrary);
+  assert.deepStrictEqual(scope, defaultInstrumentationScope);
 
   const metric = metrics[0];
 

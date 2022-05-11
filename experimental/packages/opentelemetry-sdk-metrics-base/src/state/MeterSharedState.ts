@@ -16,8 +16,8 @@
 
 import { HrTime } from '@opentelemetry/api';
 import * as metrics from '@opentelemetry/api-metrics';
-import { InstrumentationLibrary } from '@opentelemetry/core';
-import { InstrumentationLibraryMetrics } from '../export/MetricData';
+import { InstrumentationScope } from '@opentelemetry/core';
+import { ScopeMetrics } from '../export/MetricData';
 import { createInstrumentDescriptorWithView, InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Meter } from '../Meter';
 import { isNotNullish } from '../utils';
@@ -37,12 +37,12 @@ export class MeterSharedState {
   private _observableRegistry = new ObservableRegistry();
   meter: Meter;
 
-  constructor(private _meterProviderSharedState: MeterProviderSharedState, private _instrumentationLibrary: InstrumentationLibrary) {
+  constructor(private _meterProviderSharedState: MeterProviderSharedState, private _instrumentationScope: InstrumentationScope) {
     this.meter = new Meter(this);
   }
 
   registerMetricStorage(descriptor: InstrumentDescriptor) {
-    const views = this._meterProviderSharedState.viewRegistry.findViews(descriptor, this._instrumentationLibrary);
+    const views = this._meterProviderSharedState.viewRegistry.findViews(descriptor, this._instrumentationScope);
     const storages = views
       .map(view => {
         const viewDescriptor = createInstrumentDescriptorWithView(view, descriptor);
@@ -58,7 +58,7 @@ export class MeterSharedState {
   }
 
   registerAsyncMetricStorage(descriptor: InstrumentDescriptor, callback: metrics.ObservableCallback) {
-    const views = this._meterProviderSharedState.viewRegistry.findViews(descriptor, this._instrumentationLibrary);
+    const views = this._meterProviderSharedState.viewRegistry.findViews(descriptor, this._instrumentationScope);
     views.forEach(view => {
       const viewDescriptor = createInstrumentDescriptorWithView(view, descriptor);
       const aggregator = view.aggregation.createAggregator(viewDescriptor);
@@ -76,7 +76,7 @@ export class MeterSharedState {
    * @param collectionTime the HrTime at which the collection was initiated.
    * @returns the list of {@link MetricData} collected.
    */
-  async collect(collector: MetricCollectorHandle, collectionTime: HrTime): Promise<InstrumentationLibraryMetrics> {
+  async collect(collector: MetricCollectorHandle, collectionTime: HrTime): Promise<ScopeMetrics> {
     /**
      * 1. Call all observable callbacks first.
      * 2. Collect metric result for the collector.
@@ -93,7 +93,7 @@ export class MeterSharedState {
       .filter(isNotNullish);
 
     return {
-      instrumentationLibrary: this._instrumentationLibrary,
+      scope: this._instrumentationScope,
       metrics: metricDataList.filter(isNotNullish),
     };
   }
