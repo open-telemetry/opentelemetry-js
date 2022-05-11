@@ -19,7 +19,7 @@ import {
   ResourceMetrics,
   InstrumentType,
   DataPointType,
-  InstrumentationLibraryMetrics,
+  ScopeMetrics,
   MetricData,
   DataPoint,
   Histogram,
@@ -178,15 +178,15 @@ export class PrometheusSerializer {
 
   serialize(resourceMetrics: ResourceMetrics): string {
     let str = '';
-    for (const instrumentationLibraryMetrics of resourceMetrics.instrumentationLibraryMetrics) {
-      str += this.serializeInstrumentationLibraryMetrics(instrumentationLibraryMetrics);
+    for (const scopeMetrics of resourceMetrics.scopeMetrics) {
+      str += this.serializeScopeMetrics(scopeMetrics);
     }
     return str;
   }
 
-  serializeInstrumentationLibraryMetrics(instrumentationLibraryMetrics: InstrumentationLibraryMetrics) {
+  serializeScopeMetrics(scopeMetrics: ScopeMetrics) {
     let str = '';
-    for (const metric of instrumentationLibraryMetrics.metrics) {
+    for (const metric of scopeMetrics.metrics) {
       str += this.serializeMetricData(metric) + '\n';
     }
     return str;

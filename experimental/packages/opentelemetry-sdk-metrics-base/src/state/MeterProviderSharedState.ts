@@ -15,9 +15,9 @@
  */
 
 import { HrTime } from '@opentelemetry/api';
-import { hrTime, InstrumentationLibrary } from '@opentelemetry/core';
+import { hrTime, InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { instrumentationLibraryId } from '../utils';
+import { instrumentationScopeId } from '../utils';
 import { ViewRegistry } from '../view/ViewRegistry';
 import { MeterSharedState } from './MeterSharedState';
 import { MetricCollector } from './MetricCollector';
@@ -35,11 +35,11 @@ export class MeterProviderSharedState {
 
   constructor(public resource: Resource) {}
 
-  getMeterSharedState(instrumentationLibrary: InstrumentationLibrary) {
-    const id = instrumentationLibraryId(instrumentationLibrary);
+  getMeterSharedState(instrumentationScope: InstrumentationScope) {
+    const id = instrumentationScopeId(instrumentationScope);
     let meterSharedState = this.meterSharedStates.get(id);
     if (meterSharedState == null) {
-      meterSharedState = new MeterSharedState(this, instrumentationLibrary);
+      meterSharedState = new MeterSharedState(this, instrumentationScope);
       this.meterSharedStates.set(id, meterSharedState);
     }
     return meterSharedState;

@@ -115,8 +115,8 @@ describe('OTLPMetricExporter - web', () => {
 
           ensureCounterIsCorrect(
             metric1,
-            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0].endTime),
-            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0].startTime)
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[0].dataPoints[0].endTime),
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[0].dataPoints[0].startTime)
           );
 
 
@@ -126,8 +126,8 @@ describe('OTLPMetricExporter - web', () => {
           );
           ensureObservableGaugeIsCorrect(
             metric2,
-            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[1].dataPoints[0].endTime),
-            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[1].dataPoints[0].startTime),
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[1].dataPoints[0].endTime),
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[1].dataPoints[0].startTime),
             6,
             'double-observable-gauge2'
           );
@@ -138,8 +138,8 @@ describe('OTLPMetricExporter - web', () => {
           );
           ensureHistogramIsCorrect(
             metric3,
-            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[2].dataPoints[0].endTime),
-            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[2].dataPoints[0].startTime),
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[2].dataPoints[0].endTime),
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[2].dataPoints[0].startTime),
             [0, 100],
             [0, 2, 0]
           );
@@ -221,8 +221,8 @@ describe('OTLPMetricExporter - web', () => {
           assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
           ensureCounterIsCorrect(
             metric1,
-            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0].endTime),
-            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0].startTime)
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[0].dataPoints[0].endTime),
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[0].dataPoints[0].startTime)
           );
 
           assert.ok(
@@ -231,8 +231,8 @@ describe('OTLPMetricExporter - web', () => {
           );
           ensureObservableGaugeIsCorrect(
             metric2,
-            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[1].dataPoints[0].endTime),
-            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[1].dataPoints[0].startTime),
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[1].dataPoints[0].endTime),
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[1].dataPoints[0].startTime),
             6,
             'double-observable-gauge2'
           );
@@ -243,8 +243,8 @@ describe('OTLPMetricExporter - web', () => {
           );
           ensureHistogramIsCorrect(
             metric3,
-            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[2].dataPoints[0].endTime),
-            hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[2].dataPoints[0].startTime),
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[2].dataPoints[0].endTime),
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[2].dataPoints[0].startTime),
             [0, 100],
             [0, 2, 0]
           );

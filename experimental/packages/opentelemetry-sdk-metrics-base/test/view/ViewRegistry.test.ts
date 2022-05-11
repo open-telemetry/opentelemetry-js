@@ -20,14 +20,14 @@ import { ViewRegistry } from '../../src/view/ViewRegistry';
 import { View } from '../../src/view/View';
 import { InstrumentSelector } from '../../src/view/InstrumentSelector';
 import { MeterSelector } from '../../src/view/MeterSelector';
-import { defaultInstrumentationLibrary, defaultInstrumentDescriptor } from '../util';
+import { defaultInstrumentationScope, defaultInstrumentDescriptor } from '../util';
 
 
 describe('ViewRegistry', () => {
   describe('findViews', () => {
     it('should return default view if no view registered', () => {
       const registry = new ViewRegistry();
-      const views = registry.findViews(defaultInstrumentDescriptor, defaultInstrumentationLibrary);
+      const views = registry.findViews(defaultInstrumentDescriptor, defaultInstrumentationScope);
       assert.strictEqual(views.length, 1);
       assert.strictEqual(views[0], ViewRegistry['DEFAULT_VIEW']);
     });
@@ -47,7 +47,7 @@ describe('ViewRegistry', () => {
           const views = registry.findViews({
             ...defaultInstrumentDescriptor,
             name: 'foo'
-          }, defaultInstrumentationLibrary);
+          }, defaultInstrumentationScope);
 
           assert.strictEqual(views.length, 2);
           assert.strictEqual(views[0].name, 'no-filter');
@@ -58,7 +58,7 @@ describe('ViewRegistry', () => {
           const views = registry.findViews({
             ...defaultInstrumentDescriptor,
             name: 'bar'
-          }, defaultInstrumentationLibrary);
+          }, defaultInstrumentationScope);
 
           assert.strictEqual(views.length, 2);
           assert.strictEqual(views[0].name, 'no-filter');
@@ -80,7 +80,7 @@ describe('ViewRegistry', () => {
           const views = registry.findViews({
             ...defaultInstrumentDescriptor,
             type: InstrumentType.COUNTER
-          }, defaultInstrumentationLibrary);
+          }, defaultInstrumentationScope);
 
           assert.strictEqual(views.length, 2);
           assert.strictEqual(views[0].name, 'no-filter');
@@ -91,7 +91,7 @@ describe('ViewRegistry', () => {
           const views = registry.findViews({
             ...defaultInstrumentDescriptor,
             type: InstrumentType.HISTOGRAM
-          }, defaultInstrumentationLibrary);
+          }, defaultInstrumentationScope);
 
           assert.strictEqual(views.length, 2);
           assert.strictEqual(views[0].name, 'no-filter');
@@ -113,7 +113,7 @@ describe('ViewRegistry', () => {
 
         {
           const views = registry.findViews(defaultInstrumentDescriptor, {
-            ...defaultInstrumentationLibrary,
+            ...defaultInstrumentationScope,
             name: 'foo',
           });
 
@@ -124,7 +124,7 @@ describe('ViewRegistry', () => {
 
         {
           const views = registry.findViews(defaultInstrumentDescriptor, {
-            ...defaultInstrumentationLibrary,
+            ...defaultInstrumentationScope,
             name: 'bar'
           });
 

@@ -6,6 +6,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* refactor(metrics-sdk): rename InstrumentationLibrary -> InstrumentationScope #2959 @pichlermarc
+
 ### :rocket: (Enhancement)
 
 * feat(exporters): update proto version and use otlp-transformer #2929 @pichlermarc
