@@ -20,7 +20,7 @@ import {
   DataPoint,
   DataPointType,
   Histogram,
-  InstrumentationLibraryMetrics,
+  ScopeMetrics,
   InstrumentType,
   MetricData,
   ResourceMetrics
@@ -42,19 +42,19 @@ export function toResourceMetrics(resourceMetrics: ResourceMetrics): IResourceMe
       droppedAttributesCount: 0
     },
     schemaUrl: undefined, // TODO: Schema Url does not exist yet in the SDK.
-    scopeMetrics: toScopeMetrics(resourceMetrics.instrumentationLibraryMetrics)
+    scopeMetrics: toScopeMetrics(resourceMetrics.scopeMetrics)
   };
 }
 
-export function toScopeMetrics(instrumentationLibraryMetrics: InstrumentationLibraryMetrics[]): IScopeMetrics[]{
-  return Array.from(instrumentationLibraryMetrics.map(metrics => {
+export function toScopeMetrics(scopeMetrics: ScopeMetrics[]): IScopeMetrics[]{
+  return Array.from(scopeMetrics.map(metrics => {
     const scopeMetrics : IScopeMetrics = {
       scope: {
-        name: metrics.instrumentationLibrary.name,
-        version: metrics.instrumentationLibrary.version,
+        name: metrics.scope.name,
+        version: metrics.scope.version,
       },
       metrics: metrics.metrics.map(metricData => toMetric(metricData)),
-      schemaUrl: metrics.instrumentationLibrary.schemaUrl
+      schemaUrl: metrics.scope.schemaUrl
     };
     return scopeMetrics;
   }));

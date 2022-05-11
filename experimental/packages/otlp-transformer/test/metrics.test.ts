@@ -133,10 +133,10 @@ describe('Metrics', () => {
       });
       return {
         resource: resource,
-        instrumentationLibraryMetrics:
+        scopeMetrics:
           [
             {
-              instrumentationLibrary: {
+              scope: {
                 name: 'mylib',
                 version: '0.1.0',
                 schemaUrl: 'http://url.to.schema'

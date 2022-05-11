@@ -16,7 +16,7 @@
 
 import { HrTime } from '@opentelemetry/api';
 import { MetricAttributes } from '@opentelemetry/api-metrics';
-import { InstrumentationLibrary } from '@opentelemetry/core';
+import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Histogram } from '../aggregator/types';
@@ -56,14 +56,14 @@ export interface HistogramMetricData extends BaseMetricData {
  */
 export type MetricData = SingularMetricData | HistogramMetricData;
 
-export interface InstrumentationLibraryMetrics {
-  instrumentationLibrary: InstrumentationLibrary;
+export interface ScopeMetrics {
+  scope: InstrumentationScope;
   metrics: MetricData[];
 }
 
 export interface ResourceMetrics {
   resource: Resource;
-  instrumentationLibraryMetrics: InstrumentationLibraryMetrics[];
+  scopeMetrics: ScopeMetrics[];
 }
 
 /**

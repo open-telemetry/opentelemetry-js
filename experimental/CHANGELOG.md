@@ -7,6 +7,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :boom: Breaking Change
 
 * feat(metrics): metric readers and exporters now select aggregation temporality based on instrument type #2902 @seemk
+* refactor(metrics-sdk): rename InstrumentationLibrary -> InstrumentationScope #2959 @pichlermarc
 
 ### :rocket: (Enhancement)
 

@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import { NOOP_METER } from '@opentelemetry/api-metrics';
 import { Meter, MeterProvider, InstrumentType, DataPointType } from '../src';
 import {
-  assertInstrumentationLibraryMetrics,
+  assertScopeMetrics,
   assertMetricData,
   assertPartialDeepStrictEqual,
   defaultResource
@@ -87,22 +87,22 @@ describe('MeterProvider', () => {
       const result = await reader.collect();
 
       // Results came only from de-duplicated meters.
-      assert.strictEqual(result?.instrumentationLibraryMetrics.length, 4);
+      assert.strictEqual(result?.scopeMetrics.length, 4);
 
-      // InstrumentationLibrary matches from de-duplicated meters.
-      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[0], {
+      // InstrumentationScope matches from de-duplicated meters.
+      assertScopeMetrics(result?.scopeMetrics[0], {
         name: 'meter1',
         version: 'v1.0.0'
       });
-      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[1], {
+      assertScopeMetrics(result?.scopeMetrics[1], {
         name: 'meter2',
         version: 'v1.0.0'
       });
-      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[2], {
+      assertScopeMetrics(result?.scopeMetrics[2], {
         name: 'meter1',
         version: 'v1.0.1'
       });
-      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[3], {
+      assertScopeMetrics(result?.scopeMetrics[3], {
         name: 'meter1',
         version: 'v1.0.1',
         schemaUrl: 'https://opentelemetry.io/schemas/1.4.0',
@@ -192,29 +192,29 @@ describe('MeterProvider', () => {
       const result = await reader.collect();
 
       // Results came only from one Meter.
-      assert.strictEqual(result?.instrumentationLibraryMetrics.length, 1);
+      assert.strictEqual(result?.scopeMetrics.length, 1);
 
-      // InstrumentationLibrary matches the only created Meter.
-      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[0], {
+      // InstrumentationScope matches the only created Meter.
+      assertScopeMetrics(result?.scopeMetrics[0], {
         name: 'meter1',
         version: 'v1.0.0'
       });
 
       // Collected only one Metric.
-      assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics.length, 1);
+      assert.strictEqual(result?.scopeMetrics[0].metrics.length, 1);
 
       // View updated name and description.
-      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(result?.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER,
         description: 'my renamed instrument'
       });
 
       // Only one DataPoint added.
-      assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics[0].dataPoints.length, 1);
+      assert.strictEqual(result?.scopeMetrics[0].metrics[0].dataPoints.length, 1);
 
       // DataPoint matches attributes and point.
-      assertPartialDeepStrictEqual(result?.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0], {
+      assertPartialDeepStrictEqual(result?.scopeMetrics[0].metrics[0].dataPoints[0], {
         // MetricAttributes are still there.
         attributes: {
           attrib1: 'attrib_value1',
@@ -250,28 +250,28 @@ describe('MeterProvider', () => {
       const result = await reader.collect();
 
       // Results came only from one Meter.
-      assert.strictEqual(result?.instrumentationLibraryMetrics.length, 1);
+      assert.strictEqual(result?.scopeMetrics.length, 1);
 
-      // InstrumentationLibrary matches the only created Meter.
-      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[0], {
+      // InstrumentationScope matches the only created Meter.
+      assertScopeMetrics(result?.scopeMetrics[0], {
         name: 'meter1',
         version: 'v1.0.0'
       });
 
       // Collected only one Metric.
-      assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics.length, 1);
+      assert.strictEqual(result?.scopeMetrics[0].metrics.length, 1);
 
       // View updated name and description.
-      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(result?.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
         name: 'non-renamed-instrument',
         type: InstrumentType.COUNTER,
       });
 
       // Only one DataPoint added.
-      assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics[0].dataPoints.length, 1);
+      assert.strictEqual(result?.scopeMetrics[0].metrics[0].dataPoints.length, 1);
 
       // DataPoint matches attributes and point.
-      assertPartialDeepStrictEqual(result?.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0], {
+      assertPartialDeepStrictEqual(result?.scopeMetrics[0].metrics[0].dataPoints[0], {
         // 'attrib_1' is still here but 'attrib_2' is not.
         attributes: {
           attrib1: 'attrib_value1'
@@ -313,34 +313,34 @@ describe('MeterProvider', () => {
       const result = await reader.collect();
 
       // Results came from two Meters.
-      assert.strictEqual(result?.instrumentationLibraryMetrics.length, 2);
+      assert.strictEqual(result?.scopeMetrics.length, 2);
 
-      // First InstrumentationLibrary matches the first created Meter.
-      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[0], {
+      // First InstrumentationScope matches the first created Meter.
+      assertScopeMetrics(result?.scopeMetrics[0], {
         name: 'meter1',
         version: 'v1.0.0'
       });
 
       // Collected one Metric on 'meter1'
-      assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics.length, 1);
+      assert.strictEqual(result?.scopeMetrics[0].metrics.length, 1);
 
       // View updated the name to 'renamed-instrument' and instrument is still a Counter
-      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(result?.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER,
       });
 
-      // Second InstrumentationLibrary matches the second created Meter.
-      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[1], {
+      // Second InstrumentationScope matches the second created Meter.
+      assertScopeMetrics(result?.scopeMetrics[1], {
         name: 'meter2',
         version: 'v1.0.0'
       });
 
       // Collected one Metric on 'meter2'
-      assert.strictEqual(result?.instrumentationLibraryMetrics[1].metrics.length, 1);
+      assert.strictEqual(result?.scopeMetrics[1].metrics.length, 1);
 
       // View updated the name to 'renamed-instrument' and instrument is still a Counter
-      assertMetricData(result?.instrumentationLibraryMetrics[1].metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(result?.scopeMetrics[1].metrics[0], DataPointType.SINGULAR, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER
       });
@@ -381,34 +381,34 @@ describe('MeterProvider', () => {
       const result = await reader.collect();
 
       // Results came from two Meters.
-      assert.strictEqual(result?.instrumentationLibraryMetrics.length, 2);
+      assert.strictEqual(result?.scopeMetrics.length, 2);
 
-      // First InstrumentationLibrary matches the first created Meter.
-      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[0], {
+      // First InstrumentationScope matches the first created Meter.
+      assertScopeMetrics(result?.scopeMetrics[0], {
         name: 'meter1',
         version: 'v1.0.0'
       });
 
       // Collected one Metric on 'meter1'
-      assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics.length, 1);
+      assert.strictEqual(result?.scopeMetrics[0].metrics.length, 1);
 
       // View updated the name to 'renamed-instrument' and instrument is still a Counter
-      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(result?.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER
       });
 
-      // Second InstrumentationLibrary matches the second created Meter.
-      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[1], {
+      // Second InstrumentationScope matches the second created Meter.
+      assertScopeMetrics(result?.scopeMetrics[1], {
         name: 'meter2',
         version: 'v1.0.0'
       });
 
       // Collected one Metric on 'meter2'
-      assert.strictEqual(result?.instrumentationLibraryMetrics[1].metrics.length, 1);
+      assert.strictEqual(result?.scopeMetrics[1].metrics.length, 1);
 
       // No updated name on 'test-counter'.
-      assertMetricData(result?.instrumentationLibraryMetrics[1].metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(result?.scopeMetrics[1].metrics[0], DataPointType.SINGULAR, {
         name: 'test-counter',
         type: InstrumentType.COUNTER
       });
@@ -457,23 +457,23 @@ describe('MeterProvider', () => {
       const result = await reader.collect();
 
       // Results came only from one Meter.
-      assert.strictEqual(result?.instrumentationLibraryMetrics.length, 1);
+      assert.strictEqual(result?.scopeMetrics.length, 1);
 
-      // InstrumentationLibrary matches the only created Meter.
-      assertInstrumentationLibraryMetrics(result?.instrumentationLibraryMetrics[0], {
+      // InstrumentationScope matches the only created Meter.
+      assertScopeMetrics(result?.scopeMetrics[0], {
         name: 'meter1',
         version: 'v1.0.0'
       });
 
       // Two metrics are collected ('renamed-instrument'-Counter and 'renamed-instrument'-Histogram)
-      assert.strictEqual(result?.instrumentationLibraryMetrics[0].metrics.length, 2);
+      assert.strictEqual(result?.scopeMetrics[0].metrics.length, 2);
 
       // Both 'renamed-instrument' are still exported with their types.
-      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(result?.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER
       });
-      assertMetricData(result?.instrumentationLibraryMetrics[0].metrics[1], DataPointType.HISTOGRAM, {
+      assertMetricData(result?.scopeMetrics[0].metrics[1], DataPointType.HISTOGRAM, {
         name: 'renamed-instrument',
         type: InstrumentType.HISTOGRAM
       });
