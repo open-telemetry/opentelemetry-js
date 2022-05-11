@@ -27,7 +27,6 @@ import {
 import {
   OTLPMetricExporter
 } from '../../src/platform/node';
-import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import {
   ensureCounterIsCorrect,
   ensureExportMetricsServiceRequestIsSet,
@@ -41,6 +40,7 @@ import {
 import { MockedResponse } from './nodeHelpers';
 import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
 import { OTLPExporterError, OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 
 const fakeRequest = {
   end: function () {
@@ -163,7 +163,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
         url: 'http://foo.bar.com',
         keepAlive: true,
         httpAgentOptions: { keepAliveMsecs: 2000 },
-        aggregationTemporality: AggregationTemporality.CUMULATIVE
+        temporalityPreference: AggregationTemporality.CUMULATIVE
       };
 
       collectorExporter = new OTLPMetricExporter(collectorExporterConfig);
@@ -230,35 +230,30 @@ describe('OTLPMetricExporter - node with json over http', () => {
 
       setTimeout(() => {
         const writeArgs = stubWrite.args[0];
-        const json = JSON.parse(
-          writeArgs[0]
-        ) as otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
-        const metric1 =
-          json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
-        const metric2 =
-          json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[1];
-        const metric3 =
-          json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[2];
+        const json = JSON.parse(writeArgs[0]) as IExportMetricsServiceRequest;
+        const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[0];
+        const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[1];
+        const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[2];
 
         assert.ok(typeof metric1 !== 'undefined', "counter doesn't exist");
         ensureCounterIsCorrect(
           metric1,
-          core.hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0].endTime),
-          core.hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[0].dataPoints[0].startTime)
+          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[0].dataPoints[0].endTime),
+          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[0].dataPoints[0].startTime)
         );
         assert.ok(typeof metric2 !== 'undefined', "observable gauge doesn't exist");
         ensureObservableGaugeIsCorrect(
           metric2,
-          core.hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[1].dataPoints[0].endTime),
-          core.hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[1].dataPoints[0].startTime),
+          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[1].dataPoints[0].endTime),
+          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[1].dataPoints[0].startTime),
           6,
           'double-observable-gauge2'
         );
         assert.ok(typeof metric3 !== 'undefined', "histogram doesn't exist");
         ensureHistogramIsCorrect(
           metric3,
-          core.hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[1].dataPoints[0].endTime),
-          core.hrTimeToNanoseconds(metrics.instrumentationLibraryMetrics[0].metrics[1].dataPoints[0].startTime),
+          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[1].dataPoints[0].endTime),
+          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[1].dataPoints[0].startTime),
           [0, 100],
           [0, 2, 0]
         );
@@ -334,7 +329,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
       const url = 'http://foo.bar.com';
       const collectorExporter = new OTLPMetricExporter({
         url,
-        aggregationTemporality: AggregationTemporality.CUMULATIVE
+        temporalityPreference: AggregationTemporality.CUMULATIVE
       });
       setTimeout(() => {
         assert.strictEqual(collectorExporter._otlpExporter.url, url);

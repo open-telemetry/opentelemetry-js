@@ -21,7 +21,7 @@ import { DataPointType } from '../../src/export/MetricData';
 import { PushMetricExporter } from '../../src/export/MetricExporter';
 import { MeterProviderSharedState } from '../../src/state/MeterProviderSharedState';
 import { MetricCollector } from '../../src/state/MetricCollector';
-import { defaultInstrumentationLibrary, defaultResource, assertMetricData, assertDataPoint } from '../util';
+import { defaultInstrumentationScope, defaultResource, assertMetricData, assertDataPoint } from '../util';
 import { TestMetricReader } from '../export/TestMetricReader';
 import { TestDeltaMetricExporter, TestMetricExporter } from '../export/TestMetricExporter';
 
@@ -35,10 +35,8 @@ describe('MetricCollector', () => {
       const meterProviderSharedState = new MeterProviderSharedState(defaultResource);
       const exporters = [ new TestMetricExporter(), new TestDeltaMetricExporter() ];
       for (const exporter of exporters) {
-        const reader = new TestMetricReader(exporter.getPreferredAggregationTemporality());
-        const metricCollector = new MetricCollector(meterProviderSharedState, reader);
-
-        assert.strictEqual(metricCollector.aggregatorTemporality, exporter.getPreferredAggregationTemporality());
+        const reader = new TestMetricReader(exporter.selectAggregationTemporality);
+        assert.doesNotThrow(() => new MetricCollector(meterProviderSharedState, reader));
       }
     });
   });
@@ -48,12 +46,12 @@ describe('MetricCollector', () => {
     function setupInstruments(exporter: PushMetricExporter) {
       const meterProvider = new MeterProvider({ resource: defaultResource });
 
-      const reader = new TestMetricReader(exporter.getPreferredAggregationTemporality());
+      const reader = new TestMetricReader(exporter.selectAggregationTemporality);
       meterProvider.addMetricReader(reader);
       const metricCollector = reader.getMetricCollector();
 
-      const meter = meterProvider.getMeter(defaultInstrumentationLibrary.name, defaultInstrumentationLibrary.version, {
-        schemaUrl: defaultInstrumentationLibrary.schemaUrl,
+      const meter = meterProvider.getMeter(defaultInstrumentationScope.name, defaultInstrumentationScope.version, {
+        schemaUrl: defaultInstrumentationScope.schemaUrl,
       });
 
       return { metricCollector, meter };
@@ -73,8 +71,8 @@ describe('MetricCollector', () => {
       counter2.add(3);
 
       /** collect metrics */
-      const { instrumentationLibraryMetrics } = await metricCollector.collect();
-      const { metrics } = instrumentationLibraryMetrics[0];
+      const { scopeMetrics } = await metricCollector.collect();
+      const { metrics } = scopeMetrics[0];
       assert.strictEqual(metrics.length, 2);
 
       /** checking batch[0] */

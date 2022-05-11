@@ -2,26 +2,29 @@
 
 const { DiagConsoleLogger, DiagLogLevel, diag } = require('@opentelemetry/api');
 const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-http');
-// const { OTLPMetricExporter } = require('@opentelemetry/exporter-otlp-grpc');
-// const { OTLPMetricExporter } = require('@opentelemetry/exporter-otlp-proto');
-const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
+// const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-grpc');
+// const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-proto');
+const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics-base');
 const { Resource } = require('@opentelemetry/resources');
 const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
 
 // Optional and only needed to see the internal diagnostic logging (during development)
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
 
-const metricExporter = new OTLPMetricExporter({
-  url: 'http://localhost:4318/v1/metrics',
-});
+const metricExporter = new OTLPMetricExporter({});
 
-const meter = new MeterProvider({
-  exporter: metricExporter,
-  interval: 1000,
+const meterProvider = new MeterProvider({
   resource: new Resource({
     [SemanticResourceAttributes.SERVICE_NAME]: 'basic-metric-service',
   }),
-}).getMeter('example-exporter-collector');
+});
+
+meterProvider.addMetricReader(new PeriodicExportingMetricReader({
+  exporter: metricExporter,
+  exportIntervalMillis: 1000,
+}));
+
+const meter = meterProvider.getMeter('example-exporter-collector');
 
 const requestCounter = meter.createCounter('requests', {
   description: 'Example of a Counter',
@@ -35,10 +38,10 @@ const histogram = meter.createHistogram('test_histogram', {
   description: 'Example of a Histogram',
 });
 
-const labels = { pid: process.pid, environment: 'staging' };
+const attributes = { pid: process.pid, environment: 'staging' };
 
 setInterval(() => {
-  requestCounter.add(1, labels);
-  upDownCounter.add(Math.random() > 0.5 ? 1 : -1, labels);
-  histogram.record(Math.random(), labels);
+  requestCounter.add(1, attributes);
+  upDownCounter.add(Math.random() > 0.5 ? 1 : -1, attributes);
+  histogram.record(Math.random(), attributes);
 }, 1000);

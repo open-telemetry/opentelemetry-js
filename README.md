@@ -181,6 +181,7 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 
 - [Gerhard Stöbich](https://github.com/Flarna), Dynatrace
 - [John Bley](https://github.com/johnbley), Splunk
+- [Marc Pichler](https://github.com/pichlermarc), Dynatrace
 - [Mark Wolff](https://github.com/markwolff), Microsoft
 - [Matthew Wear](https://github.com/mwear), LightStep
 - [Naseem K. Ullah](https://github.com/naseemkullah), Transit
@@ -276,6 +277,13 @@ These instrumentations are hosted at <https://github.com/open-telemetry/opentele
 
 ## Upgrade guidelines
 
+### 0.28.x to 0.29.x
+
+- `@opentelemetry/exporter-trace-otlp-http` is now exporting `scopeSpans` instead of `instrumentationLibrarySpans`
+  - this exporter now requires collector version `0.48` and up.
+- `@opentelemetry/exporter-metrics-otlp-http` is now exporting `scopeMetrics` instead of `instrumentationLibraryMetrics`
+  - this exporter now requires collector version `0.48` and up.
+
 ### 0.27.x to 0.28.x
 
 - In `@opentelemetry/exporter-trace-otlp-http`, `OTLPExporterBase._isShutdown` is replaced with `_shutdownOnce`.
@@ -357,6 +365,8 @@ Collector exporter packages and types are renamed:
 - `JaegerHttpTracePropagator` renamed to `JaegerPropagator`
 
 - `serviceName` configuration removed from Collector exporters. Use `service.name` Resource attribute instead.
+
+- Prometheus exporter added suffix `_total` to counter metrics.
 
 ### 0.18.x to 0.19.0
 

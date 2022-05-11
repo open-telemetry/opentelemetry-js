@@ -16,7 +16,6 @@
 
 import * as protoLoader from '@grpc/proto-loader';
 import { diag, DiagLogger } from '@opentelemetry/api';
-import { otlpTypes } from '@opentelemetry/exporter-trace-otlp-http';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as grpc from '@grpc/grpc-js';
@@ -35,6 +34,7 @@ import {
   mockObservableGauge, setUp, shutdown,
 } from './metricsHelper';
 import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
+import { IExportMetricsServiceRequest, IResourceMetrics } from '@opentelemetry/otlp-transformer';
 
 const metricsServiceProtoPath =
   'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
@@ -57,7 +57,7 @@ const testOTLPMetricExporter = (params: TestParams) =>
     let collectorExporter: OTLPMetricExporter;
     let server: grpc.Server;
     let exportedData:
-      | otlpTypes.opentelemetryProto.metrics.v1.ResourceMetrics[]
+      | IResourceMetrics[]
       | undefined;
     let metrics: ResourceMetrics;
     let reqMetadata: grpc.Metadata | undefined;
@@ -82,7 +82,7 @@ const testOTLPMetricExporter = (params: TestParams) =>
               .MetricsService.service,
             {
               Export: (data: {
-                request: otlpTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
+                request: IExportMetricsServiceRequest;
                 metadata: grpc.Metadata;
               }) => {
                 try {
@@ -128,7 +128,7 @@ const testOTLPMetricExporter = (params: TestParams) =>
         url: 'grpcs://' + address,
         credentials,
         metadata: params.metadata,
-        aggregationTemporality: AggregationTemporality.CUMULATIVE
+        temporalityPreference: AggregationTemporality.CUMULATIVE
       });
 
       setUp();
@@ -182,7 +182,7 @@ const testOTLPMetricExporter = (params: TestParams) =>
           headers: {
             foo: 'bar',
           },
-          aggregationTemporality: AggregationTemporality.CUMULATIVE
+          temporalityPreference: AggregationTemporality.CUMULATIVE
         });
         const args = warnStub.args[0];
         assert.strictEqual(args[0], 'Headers cannot be set when using grpc');
@@ -190,7 +190,7 @@ const testOTLPMetricExporter = (params: TestParams) =>
       it('should warn about path in url', () => {
         collectorExporter = new OTLPMetricExporter({
           url: `http://${address}/v1/metrics`,
-          aggregationTemporality: AggregationTemporality.CUMULATIVE
+          temporalityPreference: AggregationTemporality.CUMULATIVE
         });
         const args = warnStub.args[0];
         assert.strictEqual(
@@ -207,45 +207,43 @@ const testOTLPMetricExporter = (params: TestParams) =>
         setTimeout(() => {
           assert.ok(
             typeof exportedData !== 'undefined',
-            'resource' + " doesn't exist"
+            'resource does not exist'
           );
-          let resource;
-          if (exportedData) {
-            resource = exportedData[0].resource;
-            const counter =
-              exportedData[0].instrumentationLibraryMetrics[0].metrics[0];
-            const observableGauge =
-              exportedData[0].instrumentationLibraryMetrics[0].metrics[1];
-            const histogram =
-              exportedData[0].instrumentationLibraryMetrics[0].metrics[2];
-            ensureExportedCounterIsCorrect(
-              counter,
-              counter.intSum?.dataPoints[0].timeUnixNano,
-              counter.intSum?.dataPoints[0].startTimeUnixNano
-            );
-            ensureExportedObservableGaugeIsCorrect(
-              observableGauge,
-              observableGauge.doubleGauge?.dataPoints[0].timeUnixNano,
-              observableGauge.doubleGauge?.dataPoints[0].startTimeUnixNano
-            );
-            ensureExportedHistogramIsCorrect(
-              histogram,
-              histogram.intHistogram?.dataPoints[0].timeUnixNano,
-              histogram.intHistogram?.dataPoints[0].startTimeUnixNano,
-              [0, 100],
-              ['0', '2', '0']
-            );
-            assert.ok(
-              typeof resource !== 'undefined',
-              "resource doesn't exist"
-            );
-            if (resource) {
-              ensureResourceIsCorrect(resource);
-            }
-          }
-          if (params.metadata && reqMetadata) {
-            ensureMetadataIsCorrect(reqMetadata, params.metadata);
-          }
+
+          assert.ok(exportedData, 'exportedData does not exist');
+
+          const resource = exportedData[0].resource;
+          const counter =
+            exportedData[0].scopeMetrics[0].metrics[0];
+          const observableGauge =
+            exportedData[0].scopeMetrics[0].metrics[1];
+          const histogram =
+            exportedData[0].scopeMetrics[0].metrics[2];
+          ensureExportedCounterIsCorrect(
+            counter,
+            counter.sum?.dataPoints[0].timeUnixNano,
+            counter.sum?.dataPoints[0].startTimeUnixNano
+          );
+          ensureExportedObservableGaugeIsCorrect(
+            observableGauge,
+            observableGauge.gauge?.dataPoints[0].timeUnixNano,
+            observableGauge.gauge?.dataPoints[0].startTimeUnixNano
+          );
+          ensureExportedHistogramIsCorrect(
+            histogram,
+            histogram.histogram?.dataPoints[0].timeUnixNano,
+            histogram.histogram?.dataPoints[0].startTimeUnixNano,
+            [0, 100],
+            ['0', '2', '0']
+          );
+          assert.ok(
+            typeof resource !== 'undefined',
+            "resource doesn't exist"
+          );
+          ensureResourceIsCorrect(resource);
+
+          ensureMetadataIsCorrect(reqMetadata, params.metadata);
+
           done();
         }, 500);
       });
@@ -264,7 +262,7 @@ describe('OTLPMetricExporter - node (getDefaultUrl)', () => {
     const url = 'http://foo.bar.com';
     const collectorExporter = new OTLPMetricExporter({
       url,
-      aggregationTemporality: AggregationTemporality.CUMULATIVE
+      temporalityPreference: AggregationTemporality.CUMULATIVE
     });
     setTimeout(() => {
       assert.strictEqual(collectorExporter._otlpExporter.url, 'foo.bar.com');
@@ -309,7 +307,7 @@ describe('when configuring via environment', () => {
     envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = 'foo=boo';
     const collectorExporter = new OTLPMetricExporter({
       metadata,
-      aggregationTemporality: AggregationTemporality.CUMULATIVE
+      temporalityPreference: AggregationTemporality.CUMULATIVE
     });
     assert.deepStrictEqual(collectorExporter._otlpExporter.metadata?.get('foo'), ['boo']);
     assert.deepStrictEqual(collectorExporter._otlpExporter.metadata?.get('bar'), ['foo']);
@@ -319,11 +317,6 @@ describe('when configuring via environment', () => {
   });
 });
 
-describe('', () => {
-  testOTLPMetricExporter({ useTLS: true });
-  testOTLPMetricExporter({ useTLS: false });
-  testOTLPMetricExporter({ metadata });
-});
-
-
-
+testOTLPMetricExporter({ useTLS: true });
+testOTLPMetricExporter({ useTLS: false });
+testOTLPMetricExporter({ metadata });

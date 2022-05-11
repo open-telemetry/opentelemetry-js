@@ -16,6 +16,7 @@
 
 import { HrTime } from '@opentelemetry/api';
 import * as assert from 'assert';
+import { AggregationTemporality } from '../../src';
 import { LastValueAccumulation, LastValueAggregator } from '../../src/aggregator';
 import { MetricData, DataPointType } from '../../src/export/MetricData';
 import { commonValues, defaultInstrumentDescriptor, sleep } from '../util';
@@ -101,6 +102,7 @@ describe('LastValueAggregator', () => {
 
       const expected: MetricData = {
         descriptor: defaultInstrumentDescriptor,
+        aggregationTemporality: AggregationTemporality.CUMULATIVE,
         dataPointType: DataPointType.SINGULAR,
         dataPoints: [
           {
@@ -113,6 +115,7 @@ describe('LastValueAggregator', () => {
       };
       assert.deepStrictEqual(aggregator.toMetricData(
         defaultInstrumentDescriptor,
+        AggregationTemporality.CUMULATIVE,
         [[{}, accumulation]],
         startTime,
         endTime,

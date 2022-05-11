@@ -15,7 +15,7 @@
  */
 
 import { MetricAttributes, ValueType } from '@opentelemetry/api-metrics';
-import { InstrumentationLibrary } from '@opentelemetry/core';
+import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { InstrumentDescriptor, InstrumentType } from '../src/InstrumentDescriptor';
@@ -23,7 +23,7 @@ import {
   MetricData,
   DataPoint,
   DataPointType,
-  InstrumentationLibraryMetrics
+  ScopeMetrics
 } from '../src/export/MetricData';
 import { Measurement } from '../src/Measurement';
 import { isNotNullish } from '../src/utils';
@@ -42,7 +42,7 @@ export const defaultInstrumentDescriptor: InstrumentDescriptor = {
   valueType: ValueType.DOUBLE,
 };
 
-export const defaultInstrumentationLibrary: InstrumentationLibrary = {
+export const defaultInstrumentationScope: InstrumentationScope = {
   name: 'default',
   version: '1.0.0',
   schemaUrl: 'https://opentelemetry.io/schemas/1.7.0'
@@ -58,12 +58,12 @@ export const sleep = (time: number) =>
     return setTimeout(resolve, time);
   });
 
-export function assertInstrumentationLibraryMetrics(
+export function assertScopeMetrics(
   actual: unknown,
-  instrumentationLibrary: Partial<InstrumentationLibrary>
-): asserts actual is InstrumentationLibraryMetrics {
-  const it = actual as InstrumentationLibraryMetrics;
-  assertPartialDeepStrictEqual(it.instrumentationLibrary, instrumentationLibrary);
+  instrumentationScope: Partial<InstrumentationScope>
+): asserts actual is ScopeMetrics {
+  const it = actual as ScopeMetrics;
+  assertPartialDeepStrictEqual(it.scope, instrumentationScope);
   assert(Array.isArray(it.metrics));
 }
 

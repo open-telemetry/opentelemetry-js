@@ -19,13 +19,13 @@
       "path": "../../../packages/opentelemetry-sdk-trace-base"
     },
     {
-      "path": "../exporter-trace-otlp-http"
-    },
-    {
       "path": "../otlp-exporter-base"
     },
     {
       "path": "../otlp-grpc-exporter-base"
+    },
+    {
+      "path": "../otlp-transformer"
     }
   ]
 }

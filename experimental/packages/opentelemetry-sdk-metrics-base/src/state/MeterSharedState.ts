@@ -16,8 +16,8 @@
 
 import { HrTime } from '@opentelemetry/api';
 import * as metrics from '@opentelemetry/api-metrics';
-import { InstrumentationLibrary } from '@opentelemetry/core';
-import { InstrumentationLibraryMetrics } from '../export/MetricData';
+import { InstrumentationScope } from '@opentelemetry/core';
+import { ScopeMetrics } from '../export/MetricData';
 import { createInstrumentDescriptorWithView, InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Meter } from '../Meter';
 import { isNotNullish } from '../utils';
@@ -26,6 +26,7 @@ import { MeterProviderSharedState } from './MeterProviderSharedState';
 import { MetricCollectorHandle } from './MetricCollector';
 import { MetricStorageRegistry } from './MetricStorageRegistry';
 import { MultiMetricStorage } from './MultiWritableMetricStorage';
+import { ObservableRegistry } from './ObservableRegistry';
 import { SyncMetricStorage } from './SyncMetricStorage';
 
 /**
@@ -33,14 +34,15 @@ import { SyncMetricStorage } from './SyncMetricStorage';
  */
 export class MeterSharedState {
   private _metricStorageRegistry = new MetricStorageRegistry();
+  private _observableRegistry = new ObservableRegistry();
   meter: Meter;
 
-  constructor(private _meterProviderSharedState: MeterProviderSharedState, private _instrumentationLibrary: InstrumentationLibrary) {
+  constructor(private _meterProviderSharedState: MeterProviderSharedState, private _instrumentationScope: InstrumentationScope) {
     this.meter = new Meter(this);
   }
 
   registerMetricStorage(descriptor: InstrumentDescriptor) {
-    const views = this._meterProviderSharedState.viewRegistry.findViews(descriptor, this._instrumentationLibrary);
+    const views = this._meterProviderSharedState.viewRegistry.findViews(descriptor, this._instrumentationScope);
     const storages = views
       .map(view => {
         const viewDescriptor = createInstrumentDescriptorWithView(view, descriptor);
@@ -56,12 +58,16 @@ export class MeterSharedState {
   }
 
   registerAsyncMetricStorage(descriptor: InstrumentDescriptor, callback: metrics.ObservableCallback) {
-    const views = this._meterProviderSharedState.viewRegistry.findViews(descriptor, this._instrumentationLibrary);
+    const views = this._meterProviderSharedState.viewRegistry.findViews(descriptor, this._instrumentationScope);
     views.forEach(view => {
       const viewDescriptor = createInstrumentDescriptorWithView(view, descriptor);
       const aggregator = view.aggregation.createAggregator(viewDescriptor);
-      const viewStorage = new AsyncMetricStorage(viewDescriptor, aggregator, view.attributesProcessor, callback);
-      this._metricStorageRegistry.register(viewStorage);
+      const viewStorage = new AsyncMetricStorage(viewDescriptor, aggregator, view.attributesProcessor);
+      const storage = this._metricStorageRegistry.register(viewStorage);
+      if (storage == null) {
+        return;
+      }
+      this._observableRegistry.addCallback(callback, storage);
     });
   }
 
@@ -70,12 +76,13 @@ export class MeterSharedState {
    * @param collectionTime the HrTime at which the collection was initiated.
    * @returns the list of {@link MetricData} collected.
    */
-  async collect(collector: MetricCollectorHandle, collectionTime: HrTime): Promise<InstrumentationLibraryMetrics> {
+  async collect(collector: MetricCollectorHandle, collectionTime: HrTime): Promise<ScopeMetrics> {
     /**
      * 1. Call all observable callbacks first.
      * 2. Collect metric result for the collector.
      */
-    const metricDataList = await Promise.all(Array.from(this._metricStorageRegistry.getStorages())
+    await this._observableRegistry.observe();
+    const metricDataList = Array.from(this._metricStorageRegistry.getStorages())
       .map(metricStorage => {
         return metricStorage.collect(
           collector,
@@ -83,10 +90,10 @@ export class MeterSharedState {
           this._meterProviderSharedState.sdkStartTime,
           collectionTime);
       })
-      .filter(isNotNullish));
+      .filter(isNotNullish);
 
     return {
-      instrumentationLibrary: this._instrumentationLibrary,
+      scope: this._instrumentationScope,
       metrics: metricDataList.filter(isNotNullish),
     };
   }

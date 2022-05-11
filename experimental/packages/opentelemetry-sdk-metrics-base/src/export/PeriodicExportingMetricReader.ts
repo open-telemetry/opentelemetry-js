@@ -17,6 +17,8 @@
 import * as api from '@opentelemetry/api';
 import { ExportResultCode, globalErrorHandler } from '@opentelemetry/core';
 import { MetricReader } from './MetricReader';
+import { AggregationTemporality } from './AggregationTemporality';
+import { InstrumentType } from '../InstrumentDescriptor';
 import { PushMetricExporter } from './MetricExporter';
 import { callWithTimeout, TimeoutError } from '../utils';
 
@@ -40,7 +42,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
   private readonly _exportTimeout: number;
 
   constructor(options: PeriodicExportingMetricReaderOptions) {
-    super(options.exporter.getPreferredAggregationTemporality());
+    super();
 
     if (options.exportIntervalMillis !== undefined && options.exportIntervalMillis <= 0) {
       throw Error('exportIntervalMillis must be greater than 0');
@@ -110,5 +112,9 @@ export class PeriodicExportingMetricReader extends MetricReader {
     }
 
     await this._exporter.shutdown();
+  }
+
+  selectAggregationTemporality(instrumentType: InstrumentType): AggregationTemporality {
+    return this._exporter.selectAggregationTemporality(instrumentType);
   }
 }

@@ -54,7 +54,7 @@ export class TemporalMetricProcessor<T> {
    * @param collector The information of the MetricCollector.
    * @param collectors The registered collectors.
    * @param resource The resource to attach these metrics against.
-   * @param instrumentationLibrary The instrumentation library that generated these metrics.
+   * @param instrumentationScope The instrumentation scope that generated these metrics.
    * @param instrumentDescriptor The instrumentation descriptor that these metrics generated with.
    * @param currentAccumulations The current accumulation of metric data from instruments.
    * @param sdkStartTime The sdk start timestamp.
@@ -69,7 +69,7 @@ export class TemporalMetricProcessor<T> {
     sdkStartTime: HrTime,
     collectionTime: HrTime,
   ): Maybe<MetricData> {
-    const aggregationTemporality = collector.aggregatorTemporality;
+    const aggregationTemporality = collector.selectAggregationTemporality(instrumentDescriptor.type);
     // In case it's our first collection, default to start timestamp (see below for explanation).
     let lastCollectionTime = sdkStartTime;
 
@@ -108,6 +108,7 @@ export class TemporalMetricProcessor<T> {
     // 2. Delta Aggregation time span: (lastCollectionTime, collectionTime]
     return this._aggregator.toMetricData(
       instrumentDescriptor,
+      aggregationTemporality,
       AttributesMapToAccumulationRecords(result),
       /* startTime */ aggregationTemporality === AggregationTemporality.CUMULATIVE ? sdkStartTime : lastCollectionTime,
       /* endTime */ collectionTime);

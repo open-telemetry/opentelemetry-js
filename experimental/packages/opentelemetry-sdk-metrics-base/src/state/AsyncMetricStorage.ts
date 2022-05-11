@@ -15,13 +15,8 @@
  */
 
 import { HrTime } from '@opentelemetry/api';
-import { ObservableCallback } from '@opentelemetry/api-metrics';
 import { Accumulation, Aggregator } from '../aggregator/types';
-import { View } from '../view/View';
-import {
-  createInstrumentDescriptorWithView,
-  InstrumentDescriptor
-} from '../InstrumentDescriptor';
+import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { AttributesProcessor } from '../view/AttributesProcessor';
 import { MetricStorage } from './MetricStorage';
 import { MetricData } from '../export/MetricData';
@@ -29,15 +24,15 @@ import { DeltaMetricProcessor } from './DeltaMetricProcessor';
 import { TemporalMetricProcessor } from './TemporalMetricProcessor';
 import { Maybe } from '../utils';
 import { MetricCollectorHandle } from './MetricCollector';
-import { ObservableResult } from '../ObservableResult';
 import { AttributeHashMap } from './HashMap';
+import { AsyncWritableMetricStorage } from './WritableMetricStorage';
 
 /**
  * Internal interface.
  *
  * Stores and aggregates {@link MetricData} for asynchronous instruments.
  */
-export class AsyncMetricStorage<T extends Maybe<Accumulation>> extends MetricStorage {
+export class AsyncMetricStorage<T extends Maybe<Accumulation>> extends MetricStorage implements AsyncWritableMetricStorage {
   private _deltaMetricStorage: DeltaMetricProcessor<T>;
   private _temporalMetricStorage: TemporalMetricProcessor<T>;
 
@@ -45,14 +40,13 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>> extends MetricSto
     _instrumentDescriptor: InstrumentDescriptor,
     aggregator: Aggregator<T>,
     private _attributesProcessor: AttributesProcessor,
-    private _callback: ObservableCallback
   ) {
     super(_instrumentDescriptor);
     this._deltaMetricStorage = new DeltaMetricProcessor(aggregator);
     this._temporalMetricStorage = new TemporalMetricProcessor(aggregator);
   }
 
-  private _record(measurements: AttributeHashMap<number>) {
+  record(measurements: AttributeHashMap<number>) {
     const processed = new AttributeHashMap<number>();
     Array.from(measurements.entries()).forEach(([attributes, value]) => {
       processed.set(this._attributesProcessor.process(attributes), value);
@@ -67,17 +61,12 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>> extends MetricSto
    * Note: This is a stateful operation and may reset any interval-related
    * state for the MetricCollector.
    */
-  async collect(
+  collect(
     collector: MetricCollectorHandle,
     collectors: MetricCollectorHandle[],
     sdkStartTime: HrTime,
     collectionTime: HrTime,
-  ): Promise<Maybe<MetricData>> {
-    const observableResult = new ObservableResult();
-    // TODO: timeout with callback
-    await this._callback(observableResult);
-    this._record(observableResult.buffer);
-
+  ): Maybe<MetricData> {
     const accumulations = this._deltaMetricStorage.collect();
 
     return this._temporalMetricStorage.buildMetrics(
@@ -88,11 +77,5 @@ export class AsyncMetricStorage<T extends Maybe<Accumulation>> extends MetricSto
       sdkStartTime,
       collectionTime
     );
-  }
-
-  static create(view: View, instrument: InstrumentDescriptor, callback: ObservableCallback): AsyncMetricStorage<Maybe<Accumulation>> {
-    instrument = createInstrumentDescriptorWithView(view, instrument);
-    const aggregator = view.aggregation.createAggregator(instrument);
-    return new AsyncMetricStorage(instrument, aggregator, view.attributesProcessor, callback);
   }
 }
