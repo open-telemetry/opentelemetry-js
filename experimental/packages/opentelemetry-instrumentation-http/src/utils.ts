@@ -265,7 +265,7 @@ export const getRequestInfo = (
     }
     origin = `${optionsParsed.protocol || 'http:'}//${
       optionsParsed.host ||
-      `${optionsParsed.hostname}${optionsParsed.port ? `:${optionsParsed.port}` : ''}`
+      optionsParsed.port != null ? `${optionsParsed.hostname}${optionsParsed.port}` : optionsParsed.hostName
     }`;
   }
 

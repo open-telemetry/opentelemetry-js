@@ -10,7 +10,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
-* fix(opentelemetry-instrumentation-http): handle null ports in options #2948 @danielgblanco
+* fix(opentelemetry-instrumentation-http): use correct origin when port is `null` #2948 @danielgblanco
 
 ### :books: (Refine Doc)
 
