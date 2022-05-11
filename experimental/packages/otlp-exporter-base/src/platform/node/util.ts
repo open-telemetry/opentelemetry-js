@@ -49,6 +49,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
 
   const exporterTimer = setTimeout(() => {
     reqIsDestroyed = true;
+    // req.abort() was deprecated since v14
     if (nodeVersion >= 14) {
       req.destroy();
     } else {
