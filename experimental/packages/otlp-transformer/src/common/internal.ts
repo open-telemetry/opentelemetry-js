@@ -13,14 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { SpanAttributes } from '@opentelemetry/api';
 import { IAnyValue, IKeyValue } from './types';
-
-export function toAttributes(
-  attributes: SpanAttributes
-): IKeyValue[] {
-  return Object.keys(attributes).map(key => toKeyValue(key, attributes[key]));
-}
 
 export function toKeyValue(
   key: string,

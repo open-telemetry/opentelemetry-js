@@ -25,7 +25,7 @@ import {
   MetricData,
   ResourceMetrics
 } from '@opentelemetry/sdk-metrics-base';
-import { toAttributes } from '../common/internal';
+import { toAttributes } from '../common';
 import {
   EAggregationTemporality,
   IHistogramDataPoint,

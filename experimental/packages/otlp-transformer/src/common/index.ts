@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { SpanAttributes } from '@opentelemetry/api';
+import { IKeyValue } from './types';
+import { toKeyValue } from './internal';
 
-export * from './common/types';
-export * from './metrics/types';
-export * from './resource/types';
-export * from './trace/types';
-
-export { toAttributes } from './common';
-export { createExportTraceServiceRequest } from './trace';
-export { createExportMetricsServiceRequest } from './metrics';
+export function toAttributes(
+  attributes: SpanAttributes
+): IKeyValue[] {
+  return Object.keys(attributes).map(key => toKeyValue(key, attributes[key]));
+}

@@ -15,9 +15,9 @@
  */
 import type { Resource } from '@opentelemetry/resources';
 import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
-import { toAttributes } from '../common/internal';
 import { sdkSpanToOtlpSpan } from './internal';
 import { IExportTraceServiceRequest, IResourceSpans, IScopeSpans } from './types';
+import { toAttributes } from '../common';
 
 export function createExportTraceServiceRequest(spans: ReadableSpan[], useHex?: boolean): IExportTraceServiceRequest {
   return {
