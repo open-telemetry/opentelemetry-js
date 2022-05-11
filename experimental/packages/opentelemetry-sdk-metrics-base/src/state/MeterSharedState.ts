@@ -77,7 +77,7 @@ export class MeterSharedState {
    * @param collectionTime the HrTime at which the collection was initiated.
    * @returns the list of metric data collected.
    */
-  async collect(collector: MetricCollectorHandle, collectionTime: HrTime, options?: MetricCollectOptions): Promise<ScopeMetrics> {
+  async collect(collector: MetricCollectorHandle, collectionTime: HrTime, options?: MetricCollectOptions): Promise<ScopeMetricsResult> {
     /**
      * 1. Call all observable callbacks first.
      * 2. Collect metric result for the collector.
@@ -94,9 +94,16 @@ export class MeterSharedState {
       .filter(isNotNullish);
 
     return {
-      scope: this._instrumentationScope,
-      metrics: metricDataList.filter(isNotNullish),
+      scopeMetrics: {
+        scope: this._instrumentationScope,
+        metrics: metricDataList.filter(isNotNullish),
+      },
       errors,
     };
   }
+}
+
+interface ScopeMetricsResult {
+  scopeMetrics: ScopeMetrics;
+  errors: unknown[];
 }

@@ -127,3 +127,14 @@ export async function PromiseAllSettled<T>(promises: Promise<T>[]): Promise<Prom
 export function isPromiseAllSettledRejectionResult(it: PromiseAllSettledResult<unknown>): it is PromiseAllSettledRejectionResult {
   return it.status === 'rejected';
 }
+
+/**
+ * Node.js v11.0 lower and browser compatible `Array.prototype.flatMap`.
+ */
+export function FlatMap<T, R>(arr: T[], fn: (it: T) => R[]): R[] {
+  const result: R[] = [];
+  arr.forEach(it => {
+    result.push.apply(result, fn(it));
+  });
+  return result;
+}

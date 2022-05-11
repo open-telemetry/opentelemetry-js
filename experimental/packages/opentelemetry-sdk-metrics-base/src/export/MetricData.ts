@@ -59,12 +59,16 @@ export type MetricData = SingularMetricData | HistogramMetricData;
 export interface ScopeMetrics {
   scope: InstrumentationScope;
   metrics: MetricData[];
-  errors: unknown[];
 }
 
 export interface ResourceMetrics {
   resource: Resource;
   scopeMetrics: ScopeMetrics[];
+}
+
+export interface CollectionResult {
+  resourceMetrics: ResourceMetrics;
+  errors: unknown[];
 }
 
 /**

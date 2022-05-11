@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ResourceMetrics } from './MetricData';
+import { CollectionResult } from './MetricData';
 
 export interface MetricCollectOptions {
   timeoutMillis?: number;
@@ -24,5 +24,5 @@ export interface MetricCollectOptions {
  * This is a public interface that represent an export state of a MetricReader.
  */
 export interface MetricProducer {
-  collect(options?: MetricCollectOptions): Promise<ResourceMetrics>;
+  collect(options?: MetricCollectOptions): Promise<CollectionResult>;
 }
