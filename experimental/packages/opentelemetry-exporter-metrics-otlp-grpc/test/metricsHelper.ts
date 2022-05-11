@@ -25,7 +25,8 @@ import {
   MeterProvider,
   MetricReader,
 } from '@opentelemetry/sdk-metrics-base';
-import { IKeyValue, IMetric, IResource } from '@opentelemetry/otlp-transformer';
+import { IKeyValue, IResource } from '@opentelemetry/otlp-transformer';
+import { IMetric } from '@opentelemetry/otlp-transformer-metrics';
 
 class TestMetricReader extends MetricReader {
   selectAggregationTemporality() {

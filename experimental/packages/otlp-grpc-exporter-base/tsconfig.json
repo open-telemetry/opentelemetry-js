@@ -22,7 +22,7 @@
       "path": "../otlp-exporter-base"
     },
     {
-      "path": "../otlp-transformer"
+      "path": "../otlp-transformer-trace"
     }
   ]
 }

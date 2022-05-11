@@ -34,7 +34,7 @@ import {
   mockObservableGauge, setUp, shutdown,
 } from './metricsHelper';
 import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
-import { IExportMetricsServiceRequest, IResourceMetrics } from '@opentelemetry/otlp-transformer';
+import { IExportMetricsServiceRequest, IResourceMetrics } from '@opentelemetry/otlp-transformer-metrics';
 
 const metricsServiceProtoPath =
   'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';

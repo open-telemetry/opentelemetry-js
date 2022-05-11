@@ -22,7 +22,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { collect, mockCounter, mockObservableGauge, setUp, shutdown } from '../metricsHelper';
 import { OTLPExporterBase, OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
-import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
+import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer-metrics';
 
 type CollectorExporterConfig = OTLPExporterConfigBase;
 class OTLPMetricExporter extends OTLPExporterBase<

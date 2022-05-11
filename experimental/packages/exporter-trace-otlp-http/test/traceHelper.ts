@@ -20,14 +20,10 @@ import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import {
-  ESpanKind,
-  IEvent,
-  IExportTraceServiceRequest,
   IKeyValue,
-  ILink,
-  IResource,
-  ISpan
+  IResource
 } from '@opentelemetry/otlp-transformer';
+import { ESpanKind, IEvent, IExportTraceServiceRequest, ILink, ISpan } from '@opentelemetry/otlp-transformer-trace';
 
 if (typeof Buffer === 'undefined') {
   (window as any).Buffer = {

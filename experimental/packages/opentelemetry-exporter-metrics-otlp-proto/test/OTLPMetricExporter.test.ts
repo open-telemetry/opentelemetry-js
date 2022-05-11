@@ -36,7 +36,7 @@ import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metr
 import { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
 import { Stream, PassThrough } from 'stream';
 import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
-import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
+import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer-metrics';
 
 let fakeRequest: PassThrough;
 

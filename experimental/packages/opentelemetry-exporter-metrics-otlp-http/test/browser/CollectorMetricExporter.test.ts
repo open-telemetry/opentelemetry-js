@@ -36,7 +36,7 @@ import {
 } from '../metricsHelper';
 import { OTLPMetricExporterOptions } from '../../src';
 import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
-import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
+import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer-metrics';
 
 describe('OTLPMetricExporter - web', () => {
   let collectorExporter: OTLPMetricExporter;

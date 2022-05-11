@@ -20,7 +20,9 @@ import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as grpc from '@grpc/grpc-js';
 import { VERSION } from '@opentelemetry/core';
-import { IEvent, IKeyValue, ILink, IResource, ISpan } from '@opentelemetry/otlp-transformer';
+import { IKeyValue, IResource } from '@opentelemetry/otlp-transformer';
+import { IEvent, ILink, ISpan } from '@opentelemetry/otlp-transformer-trace';
+
 
 const traceIdArr = [
   31,

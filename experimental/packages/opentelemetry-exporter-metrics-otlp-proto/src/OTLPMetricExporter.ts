@@ -22,7 +22,7 @@ import { getEnv, baggageUtils} from '@opentelemetry/core';
 import { ResourceMetrics} from '@opentelemetry/sdk-metrics-base';
 import { OTLPMetricExporterBase } from '@opentelemetry/exporter-metrics-otlp-http';
 import { appendResourcePathToUrlIfNotPresent, OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
-import { createExportMetricsServiceRequest, IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
+import { createExportMetricsServiceRequest, IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer-metrics';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = '/v1/metrics';
 const DEFAULT_COLLECTOR_URL = `http://localhost:4318${DEFAULT_COLLECTOR_RESOURCE_PATH}`;

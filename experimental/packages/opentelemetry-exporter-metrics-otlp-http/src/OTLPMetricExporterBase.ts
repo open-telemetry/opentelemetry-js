@@ -24,7 +24,7 @@ import {
 } from '@opentelemetry/sdk-metrics-base';
 import { defaultOptions, OTLPMetricExporterOptions } from './OTLPMetricExporterOptions';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
-import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
+import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer-metrics';
 
 export const CumulativeTemporalitySelector: AggregationTemporalitySelector = () => AggregationTemporality.CUMULATIVE;
 

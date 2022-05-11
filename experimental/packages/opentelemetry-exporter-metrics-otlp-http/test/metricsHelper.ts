@@ -30,11 +30,10 @@ import {
   MetricReader
 } from '@opentelemetry/sdk-metrics-base';
 import {
-  IExportMetricsServiceRequest,
   IKeyValue,
-  IMetric,
   IResource
 } from '@opentelemetry/otlp-transformer';
+import { IExportMetricsServiceRequest, IMetric } from '@opentelemetry/otlp-transformer-metrics';
 
 if (typeof Buffer === 'undefined') {
   (window as any).Buffer = {

@@ -28,7 +28,7 @@ import {
 } from '@opentelemetry/otlp-grpc-exporter-base';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
 import { Metadata } from '@grpc/grpc-js';
-import { createExportMetricsServiceRequest, IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
+import { createExportMetricsServiceRequest, IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer-metrics';
 
 const DEFAULT_COLLECTOR_URL = 'localhost:4317';
 

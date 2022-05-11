@@ -73,6 +73,6 @@
     "@opentelemetry/otlp-exporter-base": "0.28.0",
     "@opentelemetry/otlp-proto-exporter-base": "0.28.0",
     "protobufjs": "^6.9.0",
-    "@opentelemetry/otlp-transformer": "0.28.0"
+    "@opentelemetry/otlp-transformer-trace": "0.28.0"
   }
 }

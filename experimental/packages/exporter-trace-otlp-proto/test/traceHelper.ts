@@ -20,7 +20,13 @@ import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import { Stream } from 'stream';
-import { IEvent, IExportTraceServiceRequest, IKeyValue, ILink, ISpan } from '@opentelemetry/otlp-transformer';
+import { IKeyValue } from '@opentelemetry/otlp-transformer';
+import {
+  IEvent,
+  IExportTraceServiceRequest,
+  ILink,
+  ISpan
+} from '@opentelemetry/otlp-transformer-trace';
 
 const traceIdHex = '1f1008dc8e270e85c40a0d7c3939b278';
 const spanIdHex = '5e107261f64fa53e';

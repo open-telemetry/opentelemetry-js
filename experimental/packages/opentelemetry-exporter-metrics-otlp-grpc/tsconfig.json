@@ -28,7 +28,7 @@
       "path": "../otlp-grpc-exporter-base"
     },
     {
-      "path": "../otlp-transformer"
+      "path": "../otlp-transformer-metrics"
     }
   ]
 }

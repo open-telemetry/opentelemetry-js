@@ -41,7 +41,7 @@ import { MockedResponse } from './nodeHelpers';
 import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
 import { Stream, PassThrough } from 'stream';
 import { OTLPExporterError, OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
-import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
+import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer-metrics';
 
 let fakeRequest: PassThrough;
 

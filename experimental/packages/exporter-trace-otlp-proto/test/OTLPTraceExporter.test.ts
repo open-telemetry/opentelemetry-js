@@ -31,7 +31,7 @@ import {
 } from './traceHelper';
 import { CompressionAlgorithm, OTLPExporterNodeConfigBase, OTLPExporterError } from '@opentelemetry/otlp-exporter-base';
 import { getExportRequestProto } from '@opentelemetry/otlp-proto-exporter-base';
-import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
+import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer-trace';
 
 let fakeRequest: PassThrough;
 

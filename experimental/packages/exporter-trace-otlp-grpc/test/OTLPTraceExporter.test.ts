@@ -37,7 +37,7 @@ import {
 import * as core from '@opentelemetry/core';
 import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
 import { GrpcCompressionAlgorithm } from '@opentelemetry/otlp-grpc-exporter-base';
-import { IExportTraceServiceRequest, IResourceSpans } from '@opentelemetry/otlp-transformer';
+import { IExportTraceServiceRequest, IResourceSpans } from '@opentelemetry/otlp-transformer-trace';
 
 const traceServiceProtoPath =
   'opentelemetry/proto/collector/trace/v1/trace_service.proto';

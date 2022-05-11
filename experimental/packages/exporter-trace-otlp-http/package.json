@@ -98,6 +98,6 @@
     "@opentelemetry/resources": "1.2.0",
     "@opentelemetry/sdk-trace-base": "1.2.0",
     "@opentelemetry/otlp-exporter-base": "0.28.0",
-    "@opentelemetry/otlp-transformer": "0.28.0"
+    "@opentelemetry/otlp-transformer-trace": "0.28.0"
   }
 }

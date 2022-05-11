@@ -37,7 +37,7 @@ import {
 } from '../traceHelper';
 import { nextTick } from 'process';
 import { MockedResponse } from './nodeHelpers';
-import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
+import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer-trace';
 
 let fakeRequest: PassThrough;
 

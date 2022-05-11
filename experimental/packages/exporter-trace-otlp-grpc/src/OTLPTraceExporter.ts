@@ -23,7 +23,10 @@ import {
   ServiceClientType,
   validateAndNormalizeUrl
 } from '@opentelemetry/otlp-grpc-exporter-base';
-import { createExportTraceServiceRequest, IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
+import {
+  createExportTraceServiceRequest,
+  IExportTraceServiceRequest
+} from '@opentelemetry/otlp-transformer-trace';
 
 const DEFAULT_COLLECTOR_URL = 'localhost:4317';
 

@@ -21,7 +21,10 @@ import {
   OTLPExporterNodeConfigBase,
   appendResourcePathToUrlIfNotPresent
 } from '@opentelemetry/otlp-exporter-base';
-import { createExportTraceServiceRequest, IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
+import {
+  createExportTraceServiceRequest,
+  IExportTraceServiceRequest
+} from '@opentelemetry/otlp-transformer-trace';
 
 const DEFAULT_COLLECTOR_RESOURCE_PATH = '/v1/traces';
 const DEFAULT_COLLECTOR_URL = `http://localhost:4318${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
