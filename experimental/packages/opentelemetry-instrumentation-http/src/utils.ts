@@ -263,9 +263,8 @@ export const getRequestInfo = (
     if (!pathname && optionsParsed.path) {
       pathname = url.parse(optionsParsed.path).pathname || '/';
     }
-    origin = `${optionsParsed.protocol || 'http:'}//${
-      optionsParsed.host || `${optionsParsed.hostname}:${optionsParsed.port}`
-    }`;
+    const hostname = optionsParsed.host || (optionsParsed.port != null ? `${optionsParsed.hostname}${optionsParsed.port}` : optionsParsed.hostname);
+    origin = `${optionsParsed.protocol || 'http:'}//${hostname}`;
   }
 
   const headers = optionsParsed.headers ?? {};

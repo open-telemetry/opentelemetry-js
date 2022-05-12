@@ -16,6 +16,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(opentelemetry-instrumentation-http): use correct origin when port is `null` #2948 @danielgblanco
 * fix(otlp-exporter-base): include esm and esnext in package files #2952 @dyladan
 
 ### :books: (Refine Doc)
@@ -64,6 +65,7 @@ All notable changes to experimental packages in this project will be documented 
 * feat(proto): add @opentelemetry/otlp-transformer package with hand-rolled transformation #2746 @dyladan
 * feat(sdk-metrics-base): shutdown and forceflush on MeterProvider #2890 @legendecas
 * feat(sdk-metrics-base): return the same meter for identical input to getMeter #2901 @legendecas
+* feat(otlp-exporter): add [OTEL_EXPORTER_OTLP_TIMEOUT](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options) env var to otlp exporters #2738 @svetlanabrennan
 * feat(sdk-metrics-base): hoist async instrument callback invocations #2822 @legendecas
 
 ### :bug: (Bug Fix)

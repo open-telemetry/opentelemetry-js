@@ -20,7 +20,7 @@ import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';
-import { Stream } from 'stream';
+import { Stream, PassThrough } from 'stream';
 import * as zlib from 'zlib';
 import { OTLPTraceExporter } from '../src';
 import {
@@ -29,20 +29,21 @@ import {
   mockedReadableSpan,
   MockedResponse,
 } from './traceHelper';
-import { CompressionAlgorithm, OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import { CompressionAlgorithm, OTLPExporterNodeConfigBase, OTLPExporterError } from '@opentelemetry/otlp-exporter-base';
 import { getExportRequestProto } from '@opentelemetry/otlp-proto-exporter-base';
 import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
 
-const fakeRequest = {
-  end: function () { },
-  on: function () { },
-  write: function () { },
-};
+let fakeRequest: PassThrough;
 
 describe('OTLPTraceExporter - node with proto over http', () => {
   let collectorExporter: OTLPTraceExporter;
   let collectorExporterConfig: OTLPExporterNodeConfigBase;
   let spans: ReadableSpan[];
+
+  afterEach(() => {
+    fakeRequest = new Stream.PassThrough();
+    sinon.restore();
+  });
 
   describe('when configuring via environment', () => {
     const envSource = process.env;
@@ -115,10 +116,14 @@ describe('OTLPTraceExporter - node with proto over http', () => {
     it('should open the connection', done => {
       collectorExporter.export(spans, () => { });
 
-      sinon.stub(http, 'request').callsFake((options: any) => {
+      sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.hostname, 'foo.bar.com');
         assert.strictEqual(options.method, 'POST');
         assert.strictEqual(options.path, '/');
+
+        const mockRes = new MockedResponse(200);
+        cb(mockRes);
+        mockRes.send('success');
         done();
         return fakeRequest as any;
       });
@@ -127,8 +132,12 @@ describe('OTLPTraceExporter - node with proto over http', () => {
     it('should set custom headers', done => {
       collectorExporter.export(spans, () => { });
 
-      sinon.stub(http, 'request').callsFake((options: any) => {
+      sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.headers['foo'], 'bar');
+
+        const mockRes = new MockedResponse(200);
+        cb(mockRes);
+        mockRes.send('success');
         done();
         return fakeRequest as any;
       });
@@ -137,9 +146,13 @@ describe('OTLPTraceExporter - node with proto over http', () => {
     it('should have keep alive and keepAliveMsecs option set', done => {
       collectorExporter.export(spans, () => { });
 
-      sinon.stub(http, 'request').callsFake((options: any) => {
+      sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.agent.keepAlive, true);
         assert.strictEqual(options.agent.options.keepAliveMsecs, 2000);
+
+        const mockRes = new MockedResponse(200);
+        cb(mockRes);
+        mockRes.send('success');
         done();
         return fakeRequest as any;
       });
@@ -167,7 +180,10 @@ describe('OTLPTraceExporter - node with proto over http', () => {
         buff = Buffer.concat([buff, chunk]);
       });
 
+      const clock = sinon.useFakeTimers();
       collectorExporter.export(spans, () => { });
+      clock.tick(200);
+      clock.restore();
     });
 
     it('should log the successful message', done => {
@@ -252,7 +268,96 @@ describe('OTLPTraceExporter - node with proto over http', () => {
         buff = Buffer.concat([buff, chunk]);
       });
 
+      const clock = sinon.useFakeTimers();
       collectorExporter.export(spans, () => { });
+      clock.tick(200);
+      clock.restore();
+    });
+  });
+});
+
+
+describe('export - real http request destroyed before response received', () => {
+  let collectorExporter: OTLPTraceExporter;
+  let collectorExporterConfig: OTLPExporterNodeConfigBase;
+  let spans: ReadableSpan[];
+  const server = http.createServer((_, res) => {
+    setTimeout(() => {
+      res.statusCode = 200;
+      res.end();
+    }, 200);
+  });
+  before(done => {
+    server.listen(8080, done);
+  });
+  after(done => {
+    server.close(done);
+  });
+  it('should log the timeout request error message when timeout is 1', done => {
+    collectorExporterConfig = {
+      url: 'http://localhost:8080',
+      timeoutMillis: 1,
+    };
+    collectorExporter = new OTLPTraceExporter(collectorExporterConfig);
+    spans = [];
+    spans.push(Object.assign({}, mockedReadableSpan));
+
+    collectorExporter.export(spans, result => {
+      assert.strictEqual(result.code, ExportResultCode.FAILED);
+      const error = result.error as OTLPExporterError;
+      assert.ok(error !== undefined);
+      assert.strictEqual(error.message, 'Request Timeout');
+      done();
+    });
+  });
+  it('should log the timeout request error message when timeout is 100', done => {
+    collectorExporterConfig = {
+      url: 'http://localhost:8080',
+      timeoutMillis: 100,
+    };
+    collectorExporter = new OTLPTraceExporter(collectorExporterConfig);
+    spans = [];
+    spans.push(Object.assign({}, mockedReadableSpan));
+
+    collectorExporter.export(spans, result => {
+      assert.strictEqual(result.code, ExportResultCode.FAILED);
+      const error = result.error as OTLPExporterError;
+      assert.ok(error !== undefined);
+      assert.strictEqual(error.message, 'Request Timeout');
+      done();
+    });
+  });
+});
+
+describe('export - real http request destroyed after response received', () => {
+  let collectorExporter: OTLPTraceExporter;
+  let collectorExporterConfig: OTLPExporterNodeConfigBase;
+  let spans: ReadableSpan[];
+
+  const server = http.createServer((_, res) => {
+    res.write('writing something');
+  });
+  before(done => {
+    server.listen(8080, done);
+  });
+  after(done => {
+    server.close(done);
+  });
+  it('should log the timeout request error message', done => {
+    collectorExporterConfig = {
+      url: 'http://localhost:8080',
+      timeoutMillis: 300,
+    };
+    collectorExporter = new OTLPTraceExporter(collectorExporterConfig);
+    spans = [];
+    spans.push(Object.assign({}, mockedReadableSpan));
+
+    collectorExporter.export(spans, result => {
+      assert.strictEqual(result.code, ExportResultCode.FAILED);
+      const error = result.error as OTLPExporterError;
+      assert.ok(error !== undefined);
+      assert.strictEqual(error.message, 'Request Timeout');
+      done();
     });
   });
 });

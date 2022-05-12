@@ -16,6 +16,7 @@
 
 import * as sinon from 'sinon';
 import { sendWithXhr } from '../../src/platform/browser/util';
+import { nextTick } from 'process';
 import { ensureHeadersContain } from '../testHelper';
 
 describe('util - browser', () => {
@@ -39,7 +40,12 @@ describe('util - browser', () => {
 
   describe('when XMLHTTPRequest is used', () => {
     let expectedHeaders: Record<string,string>;
+    let clock: sinon.SinonFakeTimers;
     beforeEach(()=>{
+      // fakeTimers is used to replace the next setTimeout which is
+      // located in sendWithXhr function called by the export method
+      clock = sinon.useFakeTimers();
+
       expectedHeaders = {
         // ;charset=utf-8 is applied by sinon.fakeServer
         'Content-Type': 'application/json;charset=utf-8',
@@ -51,21 +57,24 @@ describe('util - browser', () => {
         const explicitContentType = {
           'Content-Type': 'application/json',
         };
-        sendWithXhr(body, url, explicitContentType, onSuccessStub, onErrorStub);
+        const exporterTimeout = 10000;
+        sendWithXhr(body, url, explicitContentType, exporterTimeout, onSuccessStub, onErrorStub);
       });
       it('Request Headers should contain "Content-Type" header', done => {
 
-        setTimeout(() => {
+        nextTick(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, expectedHeaders);
+          clock.restore();
           done();
         });
       });
       it('Request Headers should contain "Accept" header', done => {
 
-        setTimeout(() => {
+        nextTick(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, expectedHeaders);
+          clock.restore();
           done();
         });
       });
@@ -74,21 +83,25 @@ describe('util - browser', () => {
     describe('and empty headers are set', () => {
       beforeEach(()=>{
         const emptyHeaders = {};
-        sendWithXhr(body, url, emptyHeaders, onSuccessStub, onErrorStub);
+        // use default exporter timeout
+        const exporterTimeout = 10000;
+        sendWithXhr(body, url, emptyHeaders, exporterTimeout, onSuccessStub, onErrorStub);
       });
       it('Request Headers should contain "Content-Type" header', done => {
 
-        setTimeout(() => {
+        nextTick(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, expectedHeaders);
+          clock.restore();
           done();
         });
       });
       it('Request Headers should contain "Accept" header', done => {
 
-        setTimeout(() => {
+        nextTick(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, expectedHeaders);
+          clock.restore();
           done();
         });
       });
@@ -97,29 +110,33 @@ describe('util - browser', () => {
       let customHeaders: Record<string,string>;
       beforeEach(()=>{
         customHeaders = { aHeader: 'aValue', bHeader: 'bValue' };
-        sendWithXhr(body, url, customHeaders, onSuccessStub, onErrorStub);
+        const exporterTimeout = 10000;
+        sendWithXhr(body, url, customHeaders, exporterTimeout, onSuccessStub, onErrorStub);
       });
       it('Request Headers should contain "Content-Type" header', done => {
 
-        setTimeout(() => {
+        nextTick(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, expectedHeaders);
+          clock.restore();
           done();
         });
       });
       it('Request Headers should contain "Accept" header', done => {
 
-        setTimeout(() => {
+        nextTick(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, expectedHeaders);
+          clock.restore();
           done();
         });
       });
       it('Request Headers should contain custom headers', done => {
 
-        setTimeout(() => {
+        nextTick(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, customHeaders);
+          clock.restore();
           done();
         });
       });

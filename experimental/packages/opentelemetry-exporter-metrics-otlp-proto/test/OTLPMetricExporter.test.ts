@@ -34,22 +34,21 @@ import {
 } from './metricsHelper';
 import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
 import { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
+import { Stream, PassThrough } from 'stream';
 import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 
-const fakeRequest = {
-  end: function () {
-  },
-  on: function () {
-  },
-  write: function () {
-  },
-};
+let fakeRequest: PassThrough;
 
 describe('OTLPMetricExporter - node with proto over http', () => {
   let collectorExporter: OTLPMetricExporter;
   let collectorExporterConfig: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions;
   let metrics: ResourceMetrics;
+
+  afterEach(() => {
+    fakeRequest = new Stream.PassThrough();
+    sinon.restore();
+  });
 
   describe('when configuring via environment', () => {
     const envSource = process.env;
@@ -138,10 +137,14 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       collectorExporter.export(metrics, () => {
       });
 
-      sinon.stub(http, 'request').callsFake((options: any) => {
+      sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.hostname, 'foo.bar.com');
         assert.strictEqual(options.method, 'POST');
         assert.strictEqual(options.path, '/');
+
+        const mockRes = new MockedResponse(200);
+        cb(mockRes);
+        mockRes.send('success');
         done();
         return fakeRequest as any;
       });
@@ -151,8 +154,13 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       collectorExporter.export(metrics, () => {
       });
 
-      sinon.stub(http, 'request').callsFake((options: any) => {
+      sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.headers['foo'], 'bar');
+
+        const mockRes = new MockedResponse(200);
+        cb(mockRes);
+        mockRes.send('success');
+
         done();
         return fakeRequest as any;
       });
@@ -162,59 +170,70 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       collectorExporter.export(metrics, () => {
       });
 
-      sinon.stub(http, 'request').callsFake((options: any) => {
+      sinon.stub(http, 'request').callsFake((options: any, cb: any) => {
         assert.strictEqual(options.agent.keepAlive, true);
         assert.strictEqual(options.agent.options.keepAliveMsecs, 2000);
+
+        const mockRes = new MockedResponse(200);
+        cb(mockRes);
+        mockRes.send('success');
+
         done();
         return fakeRequest as any;
       });
     });
 
     it('should successfully send metrics', done => {
-      sinon.stub(http, 'request').returns({
-        write: () => {},
-        on: () => {},
-        end: (...writeArgs: any[]) => {
-          const ExportTraceServiceRequestProto = getExportRequestProto();
-          const data = ExportTraceServiceRequestProto?.decode(writeArgs[0]);
-          const json = data?.toJSON() as IExportMetricsServiceRequest;
+      const fakeRequest = new Stream.PassThrough();
+      sinon.stub(http, 'request').returns(fakeRequest as any);
 
-          const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[0];
-          const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[1];
-          const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[2];
+      let buff = Buffer.from('');
 
-          assert.ok(typeof metric1 !== 'undefined', "counter doesn't exist");
-          ensureExportedCounterIsCorrect(
-            metric1,
-            metric1.sum?.dataPoints[0].timeUnixNano,
-            metric1.sum?.dataPoints[0].startTimeUnixNano
-          );
-          assert.ok(typeof metric2 !== 'undefined', "observable gauge doesn't exist");
-          ensureExportedObservableGaugeIsCorrect(
-            metric2,
-            metric2.gauge?.dataPoints[0].timeUnixNano,
-            metric2.gauge?.dataPoints[0].startTimeUnixNano
-          );
-          assert.ok(
-            typeof metric3 !== 'undefined',
-            "value recorder doesn't exist"
-          );
-          ensureExportedHistogramIsCorrect(
-            metric3,
-            metric3.histogram?.dataPoints[0].timeUnixNano,
-            metric3.histogram?.dataPoints[0].startTimeUnixNano,
-            [0, 100],
-            ['0', '2', '0']
-          );
+      fakeRequest.on('end', () => {
+        const ExportTraceServiceRequestProto = getExportRequestProto();
+        const data = ExportTraceServiceRequestProto?.decode(buff);
+        const json = data?.toJSON() as IExportMetricsServiceRequest;
 
-          ensureExportMetricsServiceRequestIsSet(json);
-          done();
-        },
-      } as any);
+        const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[0];
+        const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[1];
+        const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[2];
 
-      collectorExporter.export(metrics, result => {
-        done(result.error);
+        assert.ok(typeof metric1 !== 'undefined', "counter doesn't exist");
+        ensureExportedCounterIsCorrect(
+          metric1,
+          metric1.sum?.dataPoints[0].timeUnixNano,
+          metric1.sum?.dataPoints[0].startTimeUnixNano
+        );
+        assert.ok(typeof metric2 !== 'undefined', "observable gauge doesn't exist");
+        ensureExportedObservableGaugeIsCorrect(
+          metric2,
+          metric2.gauge?.dataPoints[0].timeUnixNano,
+          metric2.gauge?.dataPoints[0].startTimeUnixNano
+        );
+        assert.ok(
+          typeof metric3 !== 'undefined',
+          "value recorder doesn't exist"
+        );
+        ensureExportedHistogramIsCorrect(
+          metric3,
+          metric3.histogram?.dataPoints[0].timeUnixNano,
+          metric3.histogram?.dataPoints[0].startTimeUnixNano,
+          [0, 100],
+          ['0', '2', '0']
+        );
+
+        ensureExportMetricsServiceRequestIsSet(json);
+        done();
       });
+
+      fakeRequest.on('data', chunk => {
+        buff = Buffer.concat([buff, chunk]);
+      });
+
+      const clock = sinon.useFakeTimers();
+      collectorExporter.export(metrics, () => { });
+      clock.tick(200);
+      clock.restore();
     });
 
     it('should log the successful message', done => {

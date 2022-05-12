@@ -34,6 +34,7 @@ export interface ServiceClient extends grpc.Client {
   export: (
     request: any,
     metadata: grpc.Metadata,
+    options: grpc.CallOptions,
     callback: Function
   ) => {};
 }
