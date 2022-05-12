@@ -29,6 +29,7 @@ import { Measurement } from '../src/Measurement';
 import { isNotNullish } from '../src/utils';
 import { HrTime } from '@opentelemetry/api';
 import { Histogram } from '../src/aggregator/types';
+import { AggregationTemporality } from '../src/export/AggregationTemporality';
 
 export const defaultResource = new Resource({
   resourceKey: 'my-resource',
@@ -71,6 +72,7 @@ export function assertMetricData(
   actual: unknown,
   dataPointType?: DataPointType,
   instrumentDescriptor: Partial<InstrumentDescriptor> | null = defaultInstrumentDescriptor,
+  aggregationTemporality?: AggregationTemporality,
 ): asserts actual is MetricData {
   const it = actual as MetricData;
   if (instrumentDescriptor != null) {
@@ -80,6 +82,9 @@ export function assertMetricData(
     assert.strictEqual(it.dataPointType, dataPointType);
   } else {
     assert(isNotNullish(DataPointType[it.dataPointType]));
+  }
+  if (aggregationTemporality != null) {
+    assert.strictEqual(aggregationTemporality, it.aggregationTemporality);
   }
   assert(Array.isArray(it.dataPoints));
 }

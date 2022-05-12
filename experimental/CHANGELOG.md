@@ -6,11 +6,13 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* feat(metrics): metric readers and exporters now select aggregation temporality based on instrument type #2902 @seemk
 * refactor(metrics-sdk): rename InstrumentationLibrary -> InstrumentationScope #2959 @pichlermarc
 
 ### :rocket: (Enhancement)
 
 * feat(exporters): update proto version and use otlp-transformer #2929 @pichlermarc
+* fix(sdk-metrics-base): misbehaving aggregation temporality selector tolerance #2958 @legendecas
 
 ### :bug: (Bug Fix)
 
