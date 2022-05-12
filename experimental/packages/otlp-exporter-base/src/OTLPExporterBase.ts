@@ -21,6 +21,7 @@ import {
   OTLPExporterConfigBase,
   ExportServiceError,
 } from './types';
+import { configureExporterTimeout } from './util';
 
 /**
  * Collector Exporter abstract base class
@@ -33,6 +34,7 @@ export abstract class OTLPExporterBase<
   public readonly url: string;
   public readonly hostname: string | undefined;
   public readonly attributes?: SpanAttributes;
+  public readonly timeoutMillis: number;
   protected _concurrencyLimit: number;
   protected _sendingPromises: Promise<unknown>[] = [];
   protected _shutdownOnce: BindOnceFuture<void>;
@@ -55,6 +57,8 @@ export abstract class OTLPExporterBase<
       typeof config.concurrencyLimit === 'number'
         ? config.concurrencyLimit
         : Infinity;
+
+    this.timeoutMillis = configureExporterTimeout(config.timeoutMillis);
 
     // platform dependent
     this.onInit(config);
