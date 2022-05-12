@@ -207,7 +207,7 @@ const testCollectorExporter = (params: TestParams) =>
             fs.readFileSync('./test/certs/client.key'),
             fs.readFileSync('./test/certs/client.crt')
           )
-          : undefined;
+          : grpc.credentials.createInsecure();
 
         const collectorExporterWithTimeout = new OTLPTraceExporter({
           url: 'grpcs://' + address,
