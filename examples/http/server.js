@@ -2,7 +2,6 @@
 
 const api = require('@opentelemetry/api');
 const tracer = require('./tracer')('example-http-server');
-// eslint-disable-next-line import/order
 const http = require('http');
 
 /** Starts a HTTP server that receives requests on sample server port. */
