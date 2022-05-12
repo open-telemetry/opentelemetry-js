@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
+import * as core from '@opentelemetry/core';
 import { diag, DiagLogger, DiagLogLevel } from '@opentelemetry/api';
 import { ExportResultCode } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { OTLPTraceExporter } from '../../src/platform/browser/index';
-
 import {
   ensureSpanIsCorrect,
   ensureExportTraceServiceRequestIsSet,
@@ -28,7 +28,7 @@ import {
   ensureHeadersContain,
   mockedReadableSpan,
 } from '../traceHelper';
-import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
+import { OTLPExporterConfigBase, OTLPExporterError } from '@opentelemetry/otlp-exporter-base';
 import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
 
 describe('OTLPTraceExporter - web', () => {
@@ -176,7 +176,12 @@ describe('OTLPTraceExporter - web', () => {
 
     describe('when "sendBeacon" is NOT available', () => {
       let server: any;
+      let clock: sinon.SinonFakeTimers;
       beforeEach(() => {
+        // fakeTimers is used to replace the next setTimeout which is
+        // located in sendWithXhr function called by the export method
+        clock = sinon.useFakeTimers();
+
         (window.navigator as any).sendBeacon = false;
         collectorTraceExporter = new OTLPTraceExporter(
           collectorExporterConfig
@@ -191,7 +196,7 @@ describe('OTLPTraceExporter - web', () => {
         collectorTraceExporter.export(spans, () => {
         });
 
-        setTimeout(() => {
+        queueMicrotask(() => {
           const request = server.requests[0];
           assert.strictEqual(request.method, 'POST');
           assert.strictEqual(request.url, 'http://foo.bar.com');
@@ -211,9 +216,9 @@ describe('OTLPTraceExporter - web', () => {
           ensureWebResourceIsCorrect(resource);
 
           assert.strictEqual(stubBeacon.callCount, 0);
-
           ensureExportTraceServiceRequestIsSet(json);
 
+          clock.restore();
           done();
         });
       });
@@ -236,15 +241,15 @@ describe('OTLPTraceExporter - web', () => {
         collectorTraceExporter.export(spans, () => {
         });
 
-        setTimeout(() => {
+        queueMicrotask(() => {
           const request = server.requests[0];
           request.respond(200);
-
           const response: any = spyLoggerDebug.args[2][0];
           assert.strictEqual(response, 'xhr success');
           assert.strictEqual(spyLoggerError.args.length, 0);
-
           assert.strictEqual(stubBeacon.callCount, 0);
+
+          clock.restore();
           done();
         });
       });
@@ -256,9 +261,11 @@ describe('OTLPTraceExporter - web', () => {
           done();
         });
 
-        setTimeout(() => {
+        queueMicrotask(() => {
           const request = server.requests[0];
           request.respond(400);
+          clock.restore();
+          done();
         });
       });
 
@@ -266,11 +273,12 @@ describe('OTLPTraceExporter - web', () => {
         collectorTraceExporter.export(spans, () => {
         });
 
-        setTimeout(() => {
+        queueMicrotask(() => {
           const request = server.requests[0];
           request.respond(200);
 
           assert.strictEqual(stubBeacon.callCount, 0);
+          clock.restore();
           done();
         });
       });
@@ -373,7 +381,12 @@ describe('OTLPTraceExporter - web', () => {
     });
 
     describe('when "sendBeacon" is available', () => {
+      let clock: sinon.SinonFakeTimers;
       beforeEach(() => {
+        // fakeTimers is used to replace the next setTimeout which is
+        // located in sendWithXhr function called by the export method
+        clock = sinon.useFakeTimers();
+
         collectorTraceExporter = new OTLPTraceExporter(
           collectorExporterConfig
         );
@@ -382,20 +395,26 @@ describe('OTLPTraceExporter - web', () => {
         collectorTraceExporter.export(spans, () => {
         });
 
-        setTimeout(() => {
+        queueMicrotask(() => {
           const [{ requestHeaders }] = server.requests;
 
           ensureHeadersContain(requestHeaders, customHeaders);
           assert.strictEqual(stubBeacon.callCount, 0);
           assert.strictEqual(stubOpen.callCount, 0);
 
+          clock.restore();
           done();
         });
       });
     });
 
     describe('when "sendBeacon" is NOT available', () => {
+      let clock: sinon.SinonFakeTimers;
       beforeEach(() => {
+        // fakeTimers is used to replace the next setTimeout which is
+        // located in sendWithXhr function called by the export method
+        clock = sinon.useFakeTimers();
+
         (window.navigator as any).sendBeacon = false;
         collectorTraceExporter = new OTLPTraceExporter(
           collectorExporterConfig
@@ -406,12 +425,29 @@ describe('OTLPTraceExporter - web', () => {
         collectorTraceExporter.export(spans, () => {
         });
 
-        setTimeout(() => {
+        queueMicrotask(() => {
           const [{ requestHeaders }] = server.requests;
 
           ensureHeadersContain(requestHeaders, customHeaders);
           assert.strictEqual(stubBeacon.callCount, 0);
           assert.strictEqual(stubOpen.callCount, 0);
+
+          clock.restore();
+          done();
+        });
+      });
+      it('should log the timeout request error message', done => {
+        const responseSpy = sinon.spy();
+        collectorTraceExporter.export(spans, responseSpy);
+        clock.tick(10000);
+        clock.restore();
+
+        setTimeout(() => {
+          const result = responseSpy.args[0][0] as core.ExportResult;
+          assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+          const error = result.error as OTLPExporterError;
+          assert.ok(error !== undefined);
+          assert.strictEqual(error.message, 'Request Timeout');
 
           done();
         });

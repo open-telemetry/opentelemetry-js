@@ -17,6 +17,7 @@
 import * as api from '@opentelemetry/api';
 import { hrTime } from '@opentelemetry/core';
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import { SumAggregator } from '../../src/aggregator';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { DataPointType } from '../../src/export/MetricData';
@@ -40,11 +41,17 @@ const cumulativeCollector1: MetricCollectorHandle = {
 const sdkStartTime = hrTime();
 
 describe('TemporalMetricProcessor', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
   describe('buildMetrics', () => {
     describe('single delta collector', () => {
       const collectors = [ deltaCollector1 ];
 
       it('should build metrics', () => {
+        const spy = sinon.spy(deltaCollector1, 'selectAggregationTemporality');
+
         const aggregator = new SumAggregator();
         const deltaMetricStorage = new DeltaMetricProcessor(aggregator);
         const temporalMetricStorage = new TemporalMetricProcessor(aggregator);
@@ -59,7 +66,10 @@ describe('TemporalMetricProcessor', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric,
+            DataPointType.SINGULAR,
+            defaultInstrumentDescriptor,
+            AggregationTemporality.DELTA);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], {}, 1);
         }
@@ -74,7 +84,10 @@ describe('TemporalMetricProcessor', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric,
+            DataPointType.SINGULAR,
+            defaultInstrumentDescriptor,
+            AggregationTemporality.DELTA);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], {}, 2);
         }
@@ -88,9 +101,15 @@ describe('TemporalMetricProcessor', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric,
+            DataPointType.SINGULAR,
+            defaultInstrumentDescriptor,
+            AggregationTemporality.DELTA);
           assert.strictEqual(metric.dataPoints.length, 0);
         }
+
+        // selectAggregationTemporality should be called only once.
+        assert.strictEqual(spy.callCount, 1);
       });
     });
 
@@ -112,7 +131,10 @@ describe('TemporalMetricProcessor', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric,
+            DataPointType.SINGULAR,
+            defaultInstrumentDescriptor,
+            AggregationTemporality.DELTA);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], {}, 1);
         }
@@ -126,7 +148,10 @@ describe('TemporalMetricProcessor', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric,
+            DataPointType.SINGULAR,
+            defaultInstrumentDescriptor,
+            AggregationTemporality.DELTA);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], {}, 1);
         }
@@ -136,6 +161,8 @@ describe('TemporalMetricProcessor', () => {
     describe('single cumulative collector', () => {
       const collectors = [ cumulativeCollector1 ];
       it('should build metrics', () => {
+        const spy = sinon.spy(cumulativeCollector1, 'selectAggregationTemporality');
+
         const aggregator = new SumAggregator();
         const deltaMetricStorage = new DeltaMetricProcessor(aggregator);
         const temporalMetricStorage = new TemporalMetricProcessor(aggregator);
@@ -150,7 +177,10 @@ describe('TemporalMetricProcessor', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric,
+            DataPointType.SINGULAR,
+            defaultInstrumentDescriptor,
+            AggregationTemporality.CUMULATIVE);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], {}, 1);
         }
@@ -165,10 +195,16 @@ describe('TemporalMetricProcessor', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric,
+            DataPointType.SINGULAR,
+            defaultInstrumentDescriptor,
+            AggregationTemporality.CUMULATIVE);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], {}, 3);
         }
+
+        // selectAggregationTemporality should be called only once.
+        assert.strictEqual(spy.callCount, 1);
       });
     });
 
@@ -189,7 +225,10 @@ describe('TemporalMetricProcessor', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric,
+            DataPointType.SINGULAR,
+            defaultInstrumentDescriptor,
+            AggregationTemporality.CUMULATIVE);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], {}, 1);
         }
@@ -204,7 +243,10 @@ describe('TemporalMetricProcessor', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric,
+            DataPointType.SINGULAR,
+            defaultInstrumentDescriptor,
+            AggregationTemporality.DELTA);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], {}, 3);
         }
@@ -217,7 +259,10 @@ describe('TemporalMetricProcessor', () => {
             sdkStartTime,
             hrTime());
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric,
+            DataPointType.SINGULAR,
+            defaultInstrumentDescriptor,
+            AggregationTemporality.CUMULATIVE);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], {}, 3);
         }

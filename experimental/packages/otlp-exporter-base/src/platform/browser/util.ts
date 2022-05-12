@@ -55,9 +55,17 @@ export function sendWithXhr(
   body: string,
   url: string,
   headers: Record<string, string>,
+  exporterTimeout: number,
   onSuccess: () => void,
   onError: (error: OTLPExporterError) => void
 ): void {
+  let reqIsDestroyed: boolean;
+
+  const exporterTimer = setTimeout(() => {
+    reqIsDestroyed = true;
+    xhr.abort();
+  }, exporterTimeout);
+
   const xhr = new XMLHttpRequest();
   xhr.open('POST', url);
 
@@ -78,13 +86,20 @@ export function sendWithXhr(
   xhr.onreadystatechange = () => {
     if (xhr.readyState === XMLHttpRequest.DONE) {
       if (xhr.status >= 200 && xhr.status <= 299) {
+        clearTimeout(exporterTimer);
         diag.debug('xhr success', body);
         onSuccess();
+      } else if (reqIsDestroyed) {
+        const error = new OTLPExporterError(
+          'Request Timeout', xhr.status
+        );
+        onError(error);
       } else {
         const error = new OTLPExporterError(
           `Failed to export with XHR (status: ${xhr.status})`,
           xhr.status
         );
+        clearTimeout(exporterTimer);
         onError(error);
       }
     }
