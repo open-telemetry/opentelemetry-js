@@ -2,7 +2,6 @@
 
 const api = require('@opentelemetry/api');
 const tracer = require('./tracer')(('example-grpc-server'));
-// eslint-disable-next-line import/order
 const grpc = require('grpc');
 
 const messages = require('./helloworld_pb');
