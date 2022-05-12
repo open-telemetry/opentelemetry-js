@@ -87,10 +87,12 @@ export function send<ExportItem, ServiceRequest>(
 ): void {
   if (collector.serviceClient) {
     const serviceRequest = collector.convert(objects);
+    const deadline = Date.now() + collector.timeoutMillis;
 
     collector.serviceClient.export(
       serviceRequest,
       collector.metadata || new grpc.Metadata(),
+      {deadline: deadline},
       (err: ExportServiceError) => {
         if (err) {
           diag.error('Service request', serviceRequest);

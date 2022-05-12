@@ -108,6 +108,27 @@ provider.register();
 
 Note, that this will only work if TLS is also configured on the server.
 
+## Exporter Timeout Configuration
+
+The OTLPTraceExporter has a timeout configuration option which is the maximum time, in milliseconds, the OTLP exporter will wait for each batch export. The default value is 10000ms.
+
++ To override the default timeout duration, provide `timeoutMillis` to OTLPTraceExporter with `collectorOptions`:
+
+  ```js
+  const collectorOptions = {
+    timeoutMillis: 15000,
+    // url is optional and can be omitted - default is localhost:4317
+    url: '<collector-hostname>:<port>',
+    metadata, // // an optional grpc.Metadata object to be sent with each request
+  };
+    
+  const exporter = new OTLPTraceExporter(collectorOptions);
+  ```
+
+  > Providing `timeoutMillis` with `collectorOptions` takes precedence and overrides timeout set with environment variables.
+
+## Exporter Compression Configuration
+
 By default no compression will be used. To use compression, set it programmatically in `collectorOptions` or with environment variables. Supported compression options: `gzip` and `none`.
 
 ```js
@@ -138,6 +159,8 @@ const exporter = new OTLPTraceExporter(collectorOptions);
   | OTEL_EXPORTER_OTLP_CLIENT_KEY | The path to the file containing private client key to use when verifying an OTLP trace, metric or log client's TLS credentials. Must provide a client certificate/chain when providing a private client key. By default no client key file is used. |
   | OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE | The path to the file containing trusted client certificate/chain for clients private key to use when verifying an OTLP trace server's TLS credentials. Must provide a private client key when providing a certificate/chain. By default no chain file is used. |
   | OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE | The path to the file containing trusted client certificate/chain for clients private key to use when verifying an OTLP trace, metric and log server's TLS credentials. Must provide a private client key when providing a certificate/chain. By default no chain file is used. |
+  | OTEL_EXPORTER_OTLP_TRACES_TIMEOUT | The maximum waiting time, in milliseconds, allowed to send each OTLP trace batch. Default is 10000. |
+  | OTEL_EXPORTER_OTLP_TIMEOUT | The maximum waiting time, in milliseconds, allowed to send each OTLP trace and metric batch. Default is 10000. |
 
  > Settings configured programmatically take precedence over environment variables. Per-signal environment variables take precedence over non-per-signal environment variables.
 
@@ -148,9 +171,9 @@ const exporter = new OTLPTraceExporter(collectorOptions);
 
 ## Useful links
 
-- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
-- For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
++ For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
++ For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
++ For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
 
 ## License
 
