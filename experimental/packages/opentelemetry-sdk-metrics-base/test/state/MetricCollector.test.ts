@@ -77,7 +77,9 @@ describe('MetricCollector', () => {
       counter2.add(3);
 
       /** collect metrics */
-      const { scopeMetrics } = await metricCollector.collect();
+      const { resourceMetrics, errors } = await metricCollector.collect();
+      assert.strictEqual(errors.length, 0);
+      const { scopeMetrics } = resourceMetrics;
       const { metrics } = scopeMetrics[0];
       assert.strictEqual(metrics.length, 2);
 
@@ -129,11 +131,12 @@ describe('MetricCollector', () => {
           timeoutMillis: 100,
         });
         sinon.clock.tick(200);
-        const { scopeMetrics } = await future;
-        const { metrics, errors } = scopeMetrics[0];
-        assert.strictEqual(metrics.length, 2);
+        const { resourceMetrics, errors } = await future
         assert.strictEqual(errors.length, 1);
         assert(errors[0] instanceof TimeoutError);
+        const { scopeMetrics } = resourceMetrics;
+        const { metrics } = scopeMetrics[0];
+        assert.strictEqual(metrics.length, 2);
 
         /** observer1 */
         assertMetricData(metrics[0], DataPointType.SINGULAR, {
@@ -159,10 +162,11 @@ describe('MetricCollector', () => {
           timeoutMillis: 100,
         });
         sinon.clock.tick(100);
-        const { scopeMetrics } = await future;
-        const { metrics, errors } = scopeMetrics[0];
-        assert.strictEqual(metrics.length, 2);
+        const { resourceMetrics, errors } = await future;
         assert.strictEqual(errors.length, 0);
+        const { scopeMetrics } = resourceMetrics;
+        const { metrics } = scopeMetrics[0];
+        assert.strictEqual(metrics.length, 2);
 
         /** observer1 */
         assertMetricData(metrics[0], DataPointType.SINGULAR, {

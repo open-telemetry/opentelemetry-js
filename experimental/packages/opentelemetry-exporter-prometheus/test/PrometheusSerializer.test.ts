@@ -77,8 +77,8 @@ describe('PrometheusSerializer', () => {
         const counter = meter.createCounter('test_total');
         counter.add(1, attributes);
 
-        const resourceMetrics = await reader.collect();
-        assert(resourceMetrics != null);
+        const { resourceMetrics, errors } = await reader.collect();
+        assert.strictEqual(errors.length, 0);
         assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
         assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
         const metric = resourceMetrics.scopeMetrics[0].metrics[0];
@@ -120,8 +120,8 @@ describe('PrometheusSerializer', () => {
         const histogram = meter.createHistogram('test');
         histogram.record(5, attributes);
 
-        const resourceMetrics = await reader.collect();
-        assert(resourceMetrics != null);
+        const { resourceMetrics, errors } = await reader.collect();
+        assert.strictEqual(errors.length, 0);
         assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
         assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
         const metric = resourceMetrics.scopeMetrics[0].metrics[0];
@@ -178,8 +178,8 @@ describe('PrometheusSerializer', () => {
         counter.add(1, { val: '1' });
         counter.add(1, { val: '2' });
 
-        const resourceMetrics = await reader.collect();
-        assert(resourceMetrics != null);
+        const { resourceMetrics, errors } = await reader.collect();
+        assert.strictEqual(errors.length, 0);
         assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
         assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
         const scopeMetrics = resourceMetrics.scopeMetrics[0];
@@ -230,8 +230,8 @@ describe('PrometheusSerializer', () => {
 
         histogram.record(5, { val: '2' });
 
-        const resourceMetrics = await reader.collect();
-        assert(resourceMetrics != null);
+        const { resourceMetrics, errors } = await reader.collect();
+        assert.strictEqual(errors.length, 0);
         assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
         assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
         const scopeMetrics = resourceMetrics.scopeMetrics[0];
@@ -275,8 +275,8 @@ describe('PrometheusSerializer', () => {
       const counter = meter.createCounter(name);
       counter.add(1);
 
-      const resourceMetrics = await reader.collect();
-      assert(resourceMetrics != null);
+      const { resourceMetrics, errors } = await reader.collect();
+      assert.strictEqual(errors.length, 0);
       assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
       const metric = resourceMetrics.scopeMetrics[0].metrics[0];
@@ -314,8 +314,8 @@ describe('PrometheusSerializer', () => {
       const counter = meter.createUpDownCounter(name);
       fn(counter);
 
-      const resourceMetrics = await reader.collect();
-      assert(resourceMetrics != null);
+      const { resourceMetrics, errors } = await reader.collect();
+      assert.strictEqual(errors.length, 0);
       assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
       const metric = resourceMetrics.scopeMetrics[0].metrics[0];

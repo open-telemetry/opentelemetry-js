@@ -17,7 +17,7 @@
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { InstrumentType, PushMetricExporter } from '../../src';
-import { ResourceMetrics } from '../../src/export/MetricData';
+import { CollectionResult, ResourceMetrics } from '../../src/export/MetricData';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MetricProducer } from '../../src/export/MetricProducer';
@@ -91,8 +91,11 @@ class TestDeltaMetricExporter extends TestMetricExporter {
 const emptyResourceMetrics = { resource: defaultResource, scopeMetrics: [] };
 
 class TestMetricProducer implements MetricProducer {
-  async collect(): Promise<ResourceMetrics> {
-    return { resource: defaultResource, scopeMetrics: [] };
+  async collect(): Promise<CollectionResult> {
+    return {
+      resourceMetrics: { resource: defaultResource, scopeMetrics: [] },
+      errors: [],
+    };
   }
 }
 
@@ -387,7 +390,7 @@ describe('PeriodicExportingMetricReader', () => {
       reader.setMetricProducer(new TestMetricProducer());
 
       await reader.shutdown();
-      assert.deepStrictEqual(await reader.collect(), undefined);
+      assertRejects(reader.collect(), /MetricReader is shutdown/);
     });
 
     it('should call MetricProduce.collect with timeout', async () => {

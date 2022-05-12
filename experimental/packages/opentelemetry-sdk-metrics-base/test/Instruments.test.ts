@@ -543,8 +543,9 @@ interface ValidateMetricData {
 }
 
 async function validateExport(reader: MetricReader, expected: ValidateMetricData) {
-  const resourceMetrics = await reader.collect();
+  const { resourceMetrics, errors } = await reader.collect();
 
+  assert.strictEqual(errors.length, 0);
   assert.notStrictEqual(resourceMetrics, undefined);
 
   const { resource, scopeMetrics } = resourceMetrics!;

@@ -142,7 +142,6 @@ describe('Metrics', () => {
                 schemaUrl: 'http://url.to.schema'
               },
               metrics: metricData,
-              errors: [],
             }
           ]
       };

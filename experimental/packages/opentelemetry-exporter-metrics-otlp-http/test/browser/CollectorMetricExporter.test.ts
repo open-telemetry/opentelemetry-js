@@ -66,7 +66,9 @@ describe('OTLPMetricExporter - web', () => {
     histogram.record(7);
     histogram.record(14);
 
-    metrics = await collect();
+    const { resourceMetrics, errors } = await collect();
+    assert.strictEqual(errors.length, 0);
+    metrics = resourceMetrics;
 
     // Need to stub/spy on the underlying logger as the "diag" instance is global
     debugStub = sinon.stub();
