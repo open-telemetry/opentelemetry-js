@@ -67,7 +67,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
     const { resourceMetrics, errors } = await this.collect({});
 
     if (errors.length > 0) {
-      api.diag.error('PeriodicExportingMetricReader: metrics collection errors', ...errors)
+      api.diag.error('PeriodicExportingMetricReader: metrics collection errors', ...errors);
     }
 
     return new Promise((resolve, reject) => {

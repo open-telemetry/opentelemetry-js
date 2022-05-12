@@ -131,7 +131,7 @@ describe('MetricCollector', () => {
           timeoutMillis: 100,
         });
         sinon.clock.tick(200);
-        const { resourceMetrics, errors } = await future
+        const { resourceMetrics, errors } = await future;
         assert.strictEqual(errors.length, 1);
         assert(errors[0] instanceof TimeoutError);
         const { scopeMetrics } = resourceMetrics;

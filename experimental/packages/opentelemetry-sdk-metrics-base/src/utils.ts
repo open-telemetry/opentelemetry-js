@@ -134,7 +134,7 @@ export function isPromiseAllSettledRejectionResult(it: PromiseAllSettledResult<u
 export function FlatMap<T, R>(arr: T[], fn: (it: T) => R[]): R[] {
   const result: R[] = [];
   arr.forEach(it => {
-    result.push.apply(result, fn(it));
+    result.push(...fn(it));
   });
   return result;
 }
