@@ -29,7 +29,7 @@ import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import {
   PerformanceTimingNames as PTN,
   WebTracerProvider,
-  URLLike,
+  parseUrl,
 } from '@opentelemetry/sdk-trace-web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -47,12 +47,6 @@ class DummySpanExporter implements tracing.SpanExporter {
   shutdown() {
     return Promise.resolve();
   }
-}
-
-function parseUrl(url: string): URLLike {
-  const element = document.createElement('a');
-  element.href = url;
-  return element;
 }
 
 const XHR_TIMEOUT = 2000;
