@@ -23,9 +23,8 @@ import { DataPointType } from '../../src/export/MetricData';
 import { MetricCollectorHandle } from '../../src/state/MetricCollector';
 import { AsyncMetricStorage } from '../../src/state/AsyncMetricStorage';
 import { NoopAttributesProcessor } from '../../src/view/AttributesProcessor';
-import { assertDataPoint, assertMetricData, defaultInstrumentDescriptor } from '../util';
-import { ObservableCallback } from '@opentelemetry/api-metrics';
 import { ObservableRegistry } from '../../src/state/ObservableRegistry';
+import { assertMetricData, assertDataPoint, defaultInstrumentDescriptor, ObservableCallbackDelegate } from '../util';
 
 const deltaCollector: MetricCollectorHandle = {
   selectAggregationTemporality: () => AggregationTemporality.DELTA,
@@ -36,24 +35,6 @@ const cumulativeCollector: MetricCollectorHandle = {
 };
 
 const sdkStartTime = hrTime();
-
-class ObservableCallbackDelegate {
-  private _delegate?: ObservableCallback;
-  private _callback: ObservableCallback;
-  constructor() {
-    this._callback = observableResult => {
-      this._delegate?.(observableResult);
-    };
-  }
-
-  setDelegate(delegate: ObservableCallback) {
-    this._delegate = delegate;
-  }
-
-  getCallback(): ObservableCallback {
-    return this._callback;
-  }
-}
 
 describe('AsyncMetricStorage', () => {
   describe('collect', () => {

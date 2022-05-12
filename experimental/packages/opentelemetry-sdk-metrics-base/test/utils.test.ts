@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-import { CollectionResult } from './MetricData';
+import * as sinon from 'sinon';
+import { callWithTimeout, TimeoutError } from '../src/utils';
+import { assertRejects } from './test-utils';
 
-export interface MetricCollectOptions {
-  timeoutMillis?: number;
-}
+describe('utils', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
 
-/**
- * This is a public interface that represent an export state of a MetricReader.
- */
-export interface MetricProducer {
-  collect(options?: MetricCollectOptions): Promise<CollectionResult>;
-}
+  describe('callWithTimeout', () => {
+    it('should reject if given promise not settled before timeout', async () => {
+      sinon.useFakeTimers();
+      const promise = new Promise(() => {
+        /** promise never settles */
+      });
+      assertRejects(callWithTimeout(promise, 100), TimeoutError);
+    });
+  });
+});

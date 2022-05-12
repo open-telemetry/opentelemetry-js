@@ -16,11 +16,12 @@
 
 import { hrTime } from '@opentelemetry/core';
 import { AggregationTemporalitySelector } from '../export/AggregationTemporality';
-import { ResourceMetrics } from '../export/MetricData';
-import { MetricProducer } from '../export/MetricProducer';
+import { CollectionResult } from '../export/MetricData';
+import { MetricProducer, MetricCollectOptions } from '../export/MetricProducer';
 import { MetricReader } from '../export/MetricReader';
 import { InstrumentType } from '../InstrumentDescriptor';
 import { ForceFlushOptions, ShutdownOptions } from '../types';
+import { FlatMap } from '../utils';
 import { MeterProviderSharedState } from './MeterProviderSharedState';
 
 /**
@@ -32,15 +33,18 @@ export class MetricCollector implements MetricProducer {
   constructor(private _sharedState: MeterProviderSharedState, private _metricReader: MetricReader) {
   }
 
-  async collect(): Promise<ResourceMetrics> {
+  async collect(options?: MetricCollectOptions): Promise<CollectionResult> {
     const collectionTime = hrTime();
     const meterCollectionPromises = Array.from(this._sharedState.meterSharedStates.values())
-      .map(meterSharedState => meterSharedState.collect(this, collectionTime));
-    const scopeMetrics = await Promise.all(meterCollectionPromises);
+      .map(meterSharedState => meterSharedState.collect(this, collectionTime, options));
+    const result = await Promise.all(meterCollectionPromises);
 
     return {
-      resource: this._sharedState.resource,
-      scopeMetrics,
+      resourceMetrics: {
+        resource: this._sharedState.resource,
+        scopeMetrics: result.map(it => it.scopeMetrics),
+      },
+      errors: FlatMap(result, it => it.errors),
     };
   }
 
