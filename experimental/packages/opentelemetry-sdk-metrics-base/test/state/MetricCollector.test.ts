@@ -182,5 +182,42 @@ describe('MetricCollector', () => {
         assert.strictEqual(metrics[1].dataPoints.length, 1);
       }
     });
+
+    it('should collect with throwing observable callbacks', async () => {
+      /** preparing test instrumentations */
+      const exporter = new TestMetricExporter();
+      const { metricCollector, meter } = setupInstruments(exporter);
+
+      /** creating metric events */
+      const counter = meter.createCounter('counter1');
+      counter.add(1);
+
+      /** observer1 is an abnormal observer */
+      const delegate1 = new ObservableCallbackDelegate();
+      meter.createObservableCounter('observer1', delegate1.getCallback());
+      delegate1.setDelegate(_observableResult => {
+        throw new Error('foobar');
+      });
+
+      /** collect metrics */
+      const { resourceMetrics, errors } = await metricCollector.collect();
+      assert.strictEqual(errors.length, 1);
+      assert.strictEqual(`${errors[0]}`, 'Error: foobar');
+      const { scopeMetrics } = resourceMetrics;
+      const { metrics } = scopeMetrics[0];
+      assert.strictEqual(metrics.length, 2);
+
+      /** counter1 data points are collected */
+      assertMetricData(metrics[0], DataPointType.SINGULAR, {
+        name: 'counter1'
+      });
+      assert.strictEqual(metrics[0].dataPoints.length, 1);
+
+      /** observer1 data points are not collected */
+      assertMetricData(metrics[1], DataPointType.SINGULAR, {
+        name: 'observer1'
+      });
+      assert.strictEqual(metrics[1].dataPoints.length, 0);
+    });
   });
 });
