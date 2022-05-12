@@ -107,6 +107,38 @@ OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=https://metric-service:4318/v1/metrics
 
 For more details, see [OpenTelemetry Specification on Protocol Exporter][opentelemetry-spec-protocol-exporter].
 
+## Exporter Timeout Configuration
+
+The OTLPTraceExporter has a timeout configuration option which is the maximum time, in milliseconds, the OTLP exporter will wait for each batch export. The default value is 10000ms.
+
+To override the default timeout duration, use the following options:
+
++ Set with environment variables:
+
+  | Environment variable | Description |
+  |----------------------|-------------|
+  | OTEL_EXPORTER_OTLP_TRACES_TIMEOUT | The maximum waiting time, in milliseconds, allowed to send each OTLP trace batch. Default is 10000. |
+  | OTEL_EXPORTER_OTLP_TIMEOUT | The maximum waiting time, in milliseconds, allowed to send each OTLP trace and metric batch. Default is 10000. |
+
+  > `OTEL_EXPORTER_OTLP_TRACES_TIMEOUT` takes precedence and overrides `OTEL_EXPORTER_OTLP_TIMEOUT`.
+
++ Provide `timeoutMillis` to OTLPTraceExporter with `collectorOptions`:
+
+  ```js
+  const collectorOptions = {
+    timeoutMillis: 15000,
+    url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/traces
+    headers: {
+      foo: 'bar'
+    }, // an optional object containing custom headers to be sent with each request will only work with http
+    concurrencyLimit: 10, // an optional limit on pending requests
+  };
+
+  const exporter = new OTLPTraceExporter(collectorOptions);
+  ```
+
+  > Providing `timeoutMillis` with `collectorOptions` takes precedence and overrides timeout set with environment variables.
+
 ## Running opentelemetry-collector locally to see the traces
 
 1. Go to `examples/otlp-exporter-node`
@@ -114,9 +146,9 @@ For more details, see [OpenTelemetry Specification on Protocol Exporter][opentel
 
 ## Useful links
 
-- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
-- For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
++ For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
++ For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
++ For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
 
 ## License
 
