@@ -15,7 +15,7 @@
  */
 
 import { Context } from '@opentelemetry/api';
-import { ObservableResult } from './ObservableResult';
+import { BatchObservableResult, ObservableResult } from './ObservableResult';
 
 /**
  * Options needed for metric creation
@@ -98,3 +98,26 @@ export type MetricAttributes = { [key: string]: string };
  * The observable callback for Observable instruments.
  */
 export type ObservableCallback = (observableResult: ObservableResult) => void | Promise<void>;
+
+/**
+ * The observable callback for a batch of Observable instruments.
+ */
+export type BatchObservableCallback = (observableResult: BatchObservableResult) => void | Promise<void>;
+
+export interface Observable {
+  /**
+   * Sets up a function that will be called whenever a metric collection is initiated.
+   *
+   * If the function is already in the list of callbacks for this Observable, the function is not added a second time.
+   */
+  addCallback(callback: ObservableCallback): void;
+
+  /**
+   * Removes a callback previously registered with {@link Observable.addCallback}.
+   */
+  removeCallback(callback: ObservableCallback): void;
+}
+
+export type ObservableCounter = Observable;
+export type ObservableUpDownCounter = Observable;
+export type ObservableGauge = Observable;

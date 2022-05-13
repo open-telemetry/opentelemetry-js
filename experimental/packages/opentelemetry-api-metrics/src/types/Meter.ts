@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-import { CounterOptions, HistogramOptions, UpDownCounterOptions } from '..';
 import {
+  BatchObservableCallback,
   Counter,
+  CounterOptions,
   Histogram,
-  ObservableCallback,
+  HistogramOptions,
+  Observable,
+  ObservableCounter,
   ObservableCounterOptions,
+  ObservableGauge,
   ObservableGaugeOptions,
+  ObservableUpDownCounter,
   ObservableUpDownCounterOptions,
   UpDownCounter,
+  UpDownCounterOptions,
 } from './Metric';
 
 /**
@@ -84,14 +90,12 @@ export interface Meter {
    * The callback SHOULD be safe to be invoked concurrently.
    *
    * @param name the name of the metric.
-   * @param callback the observable callback
    * @param [options] the metric options.
    */
   createObservableGauge(
     name: string,
-    callback: ObservableCallback,
     options?: ObservableGaugeOptions
-  ): void;
+  ): ObservableGauge;
 
   /**
    * Creates a new `ObservableCounter` metric.
@@ -99,14 +103,12 @@ export interface Meter {
    * The callback SHOULD be safe to be invoked concurrently.
    *
    * @param name the name of the metric.
-   * @param callback the observable callback
    * @param [options] the metric options.
    */
   createObservableCounter(
     name: string,
-    callback: ObservableCallback,
     options?: ObservableCounterOptions
-  ): void;
+  ): ObservableCounter;
 
   /**
    * Creates a new `ObservableUpDownCounter` metric.
@@ -114,12 +116,37 @@ export interface Meter {
    * The callback SHOULD be safe to be invoked concurrently.
    *
    * @param name the name of the metric.
-   * @param callback the observable callback
    * @param [options] the metric options.
    */
   createObservableUpDownCounter(
     name: string,
-    callback: ObservableCallback,
     options?: ObservableUpDownCounterOptions
-  ): void;
+  ): ObservableUpDownCounter;
+
+  /**
+   * Sets up a function that will be called whenever a metric collection is
+   * initiated.
+   *
+   * If the function is already in the list of callbacks for this Observable,
+   * the function is not added a second time.
+   *
+   * Only the associated observables can be observed in the callback.
+   * Measurements of observables that are not associated observed in the
+   * callback are dropped.
+   *
+   * @param callback the batch observable callback
+   * @param observables the observables associated with this batch observable callback
+   */
+  addBatchObservableCallback(callback: BatchObservableCallback, observables: Observable[]): void;
+
+  /**
+   * Removes a callback previously registered with {@link Meter.addBatchObservableCallback}.
+   *
+   * The callback to be removed is identified using a combination of the callback itself,
+   * and the set of the observables associated with it.
+   *
+   * @param callback the batch observable callback
+   * @param observables the observables associated with this batch observable callback
+   */
+  removeBatchObservableCallback(callback: BatchObservableCallback, observables: Observable[]): void;
 }

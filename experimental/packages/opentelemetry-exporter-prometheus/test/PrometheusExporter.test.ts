@@ -268,18 +268,18 @@ describe('PrometheusExporter', () => {
         return 0.999;
       }
 
-      meter.createObservableGauge(
+      const observableGauge = meter.createObservableGauge(
         'metric_observable_gauge',
-        (observableResult: ObservableResult) => {
-          observableResult.observe(getCpuUsage(), {
-            pid: String(123),
-            core: '1',
-          });
-        },
         {
           description: 'a test description',
         },
       );
+      observableGauge.addCallback((observableResult: ObservableResult) => {
+        observableResult.observe(getCpuUsage(), {
+          pid: String(123),
+          core: '1',
+        });
+      });
 
       const body = await request('http://localhost:9464/metrics');
       const lines = body.split('\n');
@@ -394,17 +394,17 @@ describe('PrometheusExporter', () => {
         return 20;
       }
 
-      meter.createObservableCounter(
+      const observableCounter = meter.createObservableCounter(
         'metric_observable_counter',
-        (observableResult: ObservableResult) => {
-          observableResult.observe(getValue(), {
-            key1: 'attributeValue1',
-          });
-        },
         {
           description: 'a test description',
         },
       );
+      observableCounter.addCallback((observableResult: ObservableResult) => {
+        observableResult.observe(getValue(), {
+          key1: 'attributeValue1',
+        });
+      });
 
       const body = await request('http://localhost:9464/metrics');
       const lines = body.split('\n');
@@ -422,17 +422,17 @@ describe('PrometheusExporter', () => {
         return 20;
       }
 
-      meter.createObservableUpDownCounter(
+      const observableUpDownCounter = meter.createObservableUpDownCounter(
         'metric_observable_up_down_counter',
-        (observableResult: ObservableResult) => {
-          observableResult.observe(getValue(), {
-            key1: 'attributeValue1',
-          });
-        },
         {
           description: 'a test description',
         },
       );
+      observableUpDownCounter.addCallback((observableResult: ObservableResult) => {
+        observableResult.observe(getValue(), {
+          key1: 'attributeValue1',
+        });
+      });
 
       const body = await request('http://localhost:9464/metrics');
       const lines = body.split('\n');
