@@ -406,13 +406,35 @@ for (const contextManagerClass of [
         const patchedEE = contextManager.bind(context, ee);
         const handler = () => {
           assert.deepStrictEqual(contextManager.active(), context);
-          patchedEE.removeAllListeners('test');
+          patchedEE.removeListener('test', handler);
           assert.strictEqual(patchedEE.listeners('test').length, 0);
           return done();
         };
         patchedEE.on('test', handler);
         assert.strictEqual(patchedEE.listeners('test').length, 1);
         patchedEE.emit('test');
+      });
+
+      it('should remove event handler enabled by .on using removeAllListener (when enabled)', () => {
+        const ee = new EventEmitter();
+        const context = ROOT_CONTEXT.setValue(key1, 1);
+        const patchedEE = contextManager.bind(context, ee);
+        const handler = () => { };
+        patchedEE.on('test', handler);
+        assert.strictEqual(patchedEE.listeners('test').length, 1);
+        patchedEE.removeListener('test', handler);
+        assert.strictEqual(patchedEE.listeners('test').length, 0);
+      });
+
+      it('should remove event handler enabled by .once using removeAllListener (when enabled)', () => {
+        const ee = new EventEmitter();
+        const context = ROOT_CONTEXT.setValue(key1, 1);
+        const patchedEE = contextManager.bind(context, ee);
+        const handler = () => { };
+        patchedEE.once('test', handler);
+        assert.strictEqual(patchedEE.listeners('test').length, 1);
+        patchedEE.removeListener('test', handler);
+        assert.strictEqual(patchedEE.listeners('test').length, 0);
       });
 
       it('should return current context and removeAllListeners (when enabled)', done => {
