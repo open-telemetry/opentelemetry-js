@@ -19,7 +19,7 @@
       "path": "../opentelemetry-sdk-metrics-base"
     },
     {
-      "path": "../otlp-transformer"
+      "path": "../otlp-transformer-base"
     }
   ]
 }

@@ -33,7 +33,7 @@ import {
   IResourceMetrics,
   IScopeMetrics
 } from './types';
-import { toAttributes } from '@opentelemetry/otlp-transformer';
+import { toAttributes } from '@opentelemetry/otlp-transformer-base';
 
 export function toResourceMetrics(resourceMetrics: ResourceMetrics): IResourceMetrics {
   return {
@@ -46,9 +46,9 @@ export function toResourceMetrics(resourceMetrics: ResourceMetrics): IResourceMe
   };
 }
 
-export function toScopeMetrics(scopeMetrics: ScopeMetrics[]): IScopeMetrics[]{
+export function toScopeMetrics(scopeMetrics: ScopeMetrics[]): IScopeMetrics[] {
   return Array.from(scopeMetrics.map(metrics => {
-    const scopeMetrics : IScopeMetrics = {
+    const scopeMetrics: IScopeMetrics = {
       scope: {
         name: metrics.scope.name,
         version: metrics.scope.version,

@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { IResource, IInstrumentationScope } from '@opentelemetry/otlp-transformer';
-import { IKeyValue } from '@opentelemetry/otlp-transformer';
+import { IInstrumentationScope, IKeyValue, IResource } from '@opentelemetry/otlp-transformer-base';
 
 /** Properties of an ExportMetricsServiceRequest. */
 export interface IExportMetricsServiceRequest {

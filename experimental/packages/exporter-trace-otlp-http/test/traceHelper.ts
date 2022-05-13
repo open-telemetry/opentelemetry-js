@@ -22,7 +22,7 @@ import * as assert from 'assert';
 import {
   IKeyValue,
   IResource
-} from '@opentelemetry/otlp-transformer';
+} from '@opentelemetry/otlp-transformer-base';
 import { ESpanKind, IEvent, IExportTraceServiceRequest, ILink, ISpan } from '@opentelemetry/otlp-transformer-trace';
 
 if (typeof Buffer === 'undefined') {

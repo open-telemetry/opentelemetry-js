@@ -32,7 +32,7 @@ import {
 import {
   IKeyValue,
   IResource
-} from '@opentelemetry/otlp-transformer';
+} from '@opentelemetry/otlp-transformer-base';
 import { IExportMetricsServiceRequest, IMetric } from '@opentelemetry/otlp-transformer-metrics';
 
 if (typeof Buffer === 'undefined') {

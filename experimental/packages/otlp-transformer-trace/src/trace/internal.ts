@@ -18,7 +18,7 @@ import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import type { ReadableSpan, TimedEvent } from '@opentelemetry/sdk-trace-base';
 import { EStatusCode, IEvent, ILink, ISpan } from './types';
 import * as core from '@opentelemetry/core';
-import { toAttributes } from '@opentelemetry/otlp-transformer';
+import { toAttributes } from '@opentelemetry/otlp-transformer-base';
 
 export function sdkSpanToOtlpSpan(
   span: ReadableSpan,

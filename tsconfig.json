@@ -143,13 +143,13 @@
       "path": "experimental/packages/otlp-proto-exporter-base"
     },
     {
+      "path": "experimental/packages/otlp-transformer-base"
+    },
+    {
       "path": "experimental/packages/otlp-transformer-metrics"
     },
     {
       "path": "experimental/packages/otlp-transformer-trace"
-    },
-    {
-      "path": "experimental/packages/otlp-transformer"
     },
     {
       "path": "experimental/backwards-compatability/node10"

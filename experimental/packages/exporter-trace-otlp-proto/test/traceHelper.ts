@@ -20,7 +20,7 @@ import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import { Stream } from 'stream';
-import { IKeyValue } from '@opentelemetry/otlp-transformer';
+import { IKeyValue } from '@opentelemetry/otlp-transformer-base';
 import {
   IEvent,
   IExportTraceServiceRequest,
