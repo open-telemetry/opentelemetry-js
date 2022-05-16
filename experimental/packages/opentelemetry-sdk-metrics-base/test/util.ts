@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { MetricAttributes, ValueType } from '@opentelemetry/api-metrics';
+import { MetricAttributes, ValueType, ObservableCallback } from '@opentelemetry/api-metrics';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -132,5 +132,18 @@ export function assertPartialDeepStrictEqual<T>(actual: unknown, expected: T, me
   const ownNames = Object.getOwnPropertyNames(expected);
   for (const ownName of ownNames) {
     assert.deepStrictEqual((actual as any)[ownName], (expected as any)[ownName], `${ownName} not equals: ${message ?? '<no-message>'}`);
+  }
+}
+
+export class ObservableCallbackDelegate {
+  private _delegate?: ObservableCallback;
+  setDelegate(delegate: ObservableCallback) {
+    this._delegate = delegate;
+  }
+
+  getCallback(): ObservableCallback {
+    return observableResult => {
+      return this._delegate?.(observableResult);
+    };
   }
 }

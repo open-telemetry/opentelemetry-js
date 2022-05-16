@@ -144,7 +144,9 @@ const testOTLPMetricExporter = (params: TestParams) =>
       histogram.record(7);
       histogram.record(14);
 
-      metrics = await collect();
+      const { resourceMetrics, errors } = await collect();
+      assert.strictEqual(errors.length, 0);
+      metrics = resourceMetrics;
     });
 
     afterEach(async () => {

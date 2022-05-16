@@ -191,11 +191,12 @@ export class PrometheusExporter extends MetricReader {
     response.setHeader('content-type', 'text/plain');
     this.collect()
       .then(
-        resourceMetrics => {
-          let result = NO_REGISTERED_METRICS;
-          if (resourceMetrics != null) {
-            result = this._serializer.serialize(resourceMetrics);
+        collectionResult => {
+          const { resourceMetrics, errors } = collectionResult;
+          if (errors.length) {
+            diag.error('PrometheusExporter: metrics collection errors', ...errors);
           }
+          let result = this._serializer.serialize(resourceMetrics);
           if (result === '') {
             result = NO_REGISTERED_METRICS;
           }

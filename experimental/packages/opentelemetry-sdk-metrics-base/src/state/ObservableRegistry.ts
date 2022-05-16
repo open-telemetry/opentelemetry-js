@@ -16,6 +16,7 @@
 
 import { ObservableCallback } from '@opentelemetry/api-metrics';
 import { ObservableResult } from '../ObservableResult';
+import { callWithTimeout, PromiseAllSettled, isPromiseAllSettledRejectionResult } from '../utils';
 import { AsyncWritableMetricStorage } from './WritableMetricStorage';
 
 /**
@@ -35,19 +36,26 @@ export class ObservableRegistry {
     this._callbacks.push([callback, metricStorage]);
   }
 
-  async observe(): Promise<void> {
+  /**
+   * @returns a promise of rejected reasons for invoking callbacks.
+   */
+  async observe(timeoutMillis?: number): Promise<unknown[]> {
     // TODO: batch observables
     // https://github.com/open-telemetry/opentelemetry-specification/pull/2363
-    const promise = Promise.all(this._callbacks
+    const results = await PromiseAllSettled(this._callbacks
       .map(async ([observableCallback, metricStorage]) => {
         const observableResult = new ObservableResult();
-        // TODO: timeout with callback
-        // https://github.com/open-telemetry/opentelemetry-specification/issues/2295
-        await observableCallback(observableResult);
+        let callPromise: Promise<void> = Promise.resolve(observableCallback(observableResult));
+        if (timeoutMillis != null) {
+          callPromise = callWithTimeout(callPromise, timeoutMillis);
+        }
+        await callPromise;
         metricStorage.record(observableResult.buffer);
       })
     );
 
-    await promise;
+    const rejections = results.filter(isPromiseAllSettledRejectionResult)
+      .map(it => it.reason);
+    return rejections;
   }
 }

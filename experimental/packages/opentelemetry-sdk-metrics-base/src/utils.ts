@@ -91,3 +91,50 @@ export function callWithTimeout<T>(promise: Promise<T>, timeout: number): Promis
     throw reason;
   });
 }
+
+export interface PromiseAllSettledFulfillResult<T> {
+  status: 'fulfilled';
+  value: T;
+}
+
+export interface PromiseAllSettledRejectionResult {
+  status: 'rejected';
+  reason: unknown;
+}
+
+export type PromiseAllSettledResult<T> = PromiseAllSettledFulfillResult<T> | PromiseAllSettledRejectionResult;
+
+/**
+ * Node.js v12.9 lower and browser compatible `Promise.allSettled`.
+ */
+export async function PromiseAllSettled<T>(promises: Promise<T>[]): Promise<PromiseAllSettledResult<T>[]> {
+  return Promise.all(promises.map<Promise<PromiseAllSettledResult<T>>>(async p => {
+    try {
+      const ret = await p;
+      return {
+        status: 'fulfilled',
+        value: ret,
+      };
+    } catch (e) {
+      return {
+        status: 'rejected',
+        reason: e,
+      };
+    }
+  }));
+}
+
+export function isPromiseAllSettledRejectionResult(it: PromiseAllSettledResult<unknown>): it is PromiseAllSettledRejectionResult {
+  return it.status === 'rejected';
+}
+
+/**
+ * Node.js v11.0 lower and browser compatible `Array.prototype.flatMap`.
+ */
+export function FlatMap<T, R>(arr: T[], fn: (it: T) => R[]): R[] {
+  const result: R[] = [];
+  arr.forEach(it => {
+    result.push(...fn(it));
+  });
+  return result;
+}

@@ -21,7 +21,7 @@ import {
   Meter,
   MeterProvider,
   DataPointType,
-  ResourceMetrics
+  CollectionResult
 } from '../../src';
 import { assertMetricData, defaultInstrumentationScope, defaultResource, sleep } from '../util';
 import { TestMetricReader } from '../export/TestMetricReader';
@@ -64,10 +64,11 @@ describe('MeterSharedState', () => {
       /** collect metrics */
       counter.add(1);
       await Promise.all(metricCollectors.map(async collector => {
-        const result = await collector.collect();
-        assert.strictEqual(result.scopeMetrics.length, 1);
-        assert.strictEqual(result.scopeMetrics[0].metrics.length, 1);
-        assertMetricData(result.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
+        const { resourceMetrics, errors } = await collector.collect();
+        assert.strictEqual(errors.length, 0);
+        assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
+        assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
+        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
           name: 'test',
         });
       }));
@@ -86,13 +87,14 @@ describe('MeterSharedState', () => {
       /** collect metrics */
       counter.add(1);
       await Promise.all(metricCollectors.map(async collector => {
-        const result = await collector.collect();
-        assert.strictEqual(result.scopeMetrics.length, 1);
-        assert.strictEqual(result.scopeMetrics[0].metrics.length, 2);
-        assertMetricData(result.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
+        const { resourceMetrics, errors } = await collector.collect();
+        assert.strictEqual(errors.length, 0);
+        assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
+        assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 2);
+        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
           name: 'foo',
         });
-        assertMetricData(result.scopeMetrics[0].metrics[1], DataPointType.SINGULAR, {
+        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[1], DataPointType.SINGULAR, {
           name: 'bar',
         });
       }));
@@ -155,7 +157,9 @@ describe('MeterSharedState', () => {
         return sleep(10);
       });
 
-      function verifyResult(resourceMetrics: ResourceMetrics) {
+      function verifyResult(collectionResult: CollectionResult) {
+        const { resourceMetrics, errors } = collectionResult;
+        assert.strictEqual(errors.length, 0);
         assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
         assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 2);
         assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {

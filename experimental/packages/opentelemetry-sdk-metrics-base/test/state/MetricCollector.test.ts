@@ -16,12 +16,18 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { MeterProvider } from '../../src';
+import { MeterProvider, TimeoutError } from '../../src';
 import { DataPointType } from '../../src/export/MetricData';
 import { PushMetricExporter } from '../../src/export/MetricExporter';
 import { MeterProviderSharedState } from '../../src/state/MeterProviderSharedState';
 import { MetricCollector } from '../../src/state/MetricCollector';
-import { defaultInstrumentationScope, defaultResource, assertMetricData, assertDataPoint } from '../util';
+import {
+  defaultInstrumentationScope,
+  defaultResource,
+  assertMetricData,
+  assertDataPoint,
+  ObservableCallbackDelegate,
+} from '../util';
 import { TestMetricReader } from '../export/TestMetricReader';
 import { TestDeltaMetricExporter, TestMetricExporter } from '../export/TestMetricExporter';
 
@@ -71,7 +77,9 @@ describe('MetricCollector', () => {
       counter2.add(3);
 
       /** collect metrics */
-      const { scopeMetrics } = await metricCollector.collect();
+      const { resourceMetrics, errors } = await metricCollector.collect();
+      assert.strictEqual(errors.length, 0);
+      const { scopeMetrics } = resourceMetrics;
       const { metrics } = scopeMetrics[0];
       assert.strictEqual(metrics.length, 2);
 
@@ -91,6 +99,125 @@ describe('MetricCollector', () => {
       });
       assert.strictEqual(metricData2.dataPoints.length, 1);
       assertDataPoint(metricData2.dataPoints[0], {}, 3);
+    });
+
+    it('should collect observer metrics with timeout', async () => {
+      sinon.useFakeTimers();
+      /** preparing test instrumentations */
+      const exporter = new TestMetricExporter();
+      const { metricCollector, meter } = setupInstruments(exporter);
+
+      /** creating metric events */
+
+      /** observer1 is an abnormal observer */
+      const delegate1 = new ObservableCallbackDelegate();
+      meter.createObservableCounter('observer1', delegate1.getCallback());
+      delegate1.setDelegate(_observableResult => {
+        return new Promise(() => {
+          /** promise never settles */
+        });
+      });
+
+      /** observer2 is a normal observer */
+      const delegate2 = new ObservableCallbackDelegate();
+      meter.createObservableCounter('observer2', delegate2.getCallback());
+      delegate2.setDelegate(observableResult => {
+        observableResult.observe(1, {});
+      });
+
+      /** collect metrics */
+      {
+        const future = metricCollector.collect({
+          timeoutMillis: 100,
+        });
+        sinon.clock.tick(200);
+        const { resourceMetrics, errors } = await future;
+        assert.strictEqual(errors.length, 1);
+        assert(errors[0] instanceof TimeoutError);
+        const { scopeMetrics } = resourceMetrics;
+        const { metrics } = scopeMetrics[0];
+        assert.strictEqual(metrics.length, 2);
+
+        /** observer1 */
+        assertMetricData(metrics[0], DataPointType.SINGULAR, {
+          name: 'observer1'
+        });
+        assert.strictEqual(metrics[0].dataPoints.length, 0);
+
+        /** observer2 */
+        assertMetricData(metrics[1], DataPointType.SINGULAR, {
+          name: 'observer2'
+        });
+        assert.strictEqual(metrics[1].dataPoints.length, 1);
+      }
+
+      /** now the observer1 is back to normal */
+      delegate1.setDelegate(async observableResult => {
+        observableResult.observe(100, {});
+      });
+
+      /** collect metrics */
+      {
+        const future = metricCollector.collect({
+          timeoutMillis: 100,
+        });
+        sinon.clock.tick(100);
+        const { resourceMetrics, errors } = await future;
+        assert.strictEqual(errors.length, 0);
+        const { scopeMetrics } = resourceMetrics;
+        const { metrics } = scopeMetrics[0];
+        assert.strictEqual(metrics.length, 2);
+
+        /** observer1 */
+        assertMetricData(metrics[0], DataPointType.SINGULAR, {
+          name: 'observer1'
+        });
+        assert.strictEqual(metrics[0].dataPoints.length, 1);
+        assertDataPoint(metrics[0].dataPoints[0], {}, 100);
+
+        /** observer2 */
+        assertMetricData(metrics[1], DataPointType.SINGULAR, {
+          name: 'observer2'
+        });
+        assert.strictEqual(metrics[1].dataPoints.length, 1);
+      }
+    });
+
+    it('should collect with throwing observable callbacks', async () => {
+      /** preparing test instrumentations */
+      const exporter = new TestMetricExporter();
+      const { metricCollector, meter } = setupInstruments(exporter);
+
+      /** creating metric events */
+      const counter = meter.createCounter('counter1');
+      counter.add(1);
+
+      /** observer1 is an abnormal observer */
+      const delegate1 = new ObservableCallbackDelegate();
+      meter.createObservableCounter('observer1', delegate1.getCallback());
+      delegate1.setDelegate(_observableResult => {
+        throw new Error('foobar');
+      });
+
+      /** collect metrics */
+      const { resourceMetrics, errors } = await metricCollector.collect();
+      assert.strictEqual(errors.length, 1);
+      assert.strictEqual(`${errors[0]}`, 'Error: foobar');
+      const { scopeMetrics } = resourceMetrics;
+      const { metrics } = scopeMetrics[0];
+      assert.strictEqual(metrics.length, 2);
+
+      /** counter1 data points are collected */
+      assertMetricData(metrics[0], DataPointType.SINGULAR, {
+        name: 'counter1'
+      });
+      assert.strictEqual(metrics[0].dataPoints.length, 1);
+
+      /** observer1 data points are not collected */
+      assertMetricData(metrics[1], DataPointType.SINGULAR, {
+        name: 'observer1'
+      });
+      assert.strictEqual(metrics[1].dataPoints.length, 0);
     });
   });
 });
