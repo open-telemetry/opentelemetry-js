@@ -123,7 +123,7 @@ export function validateAndNormalizeUrl(url: string): string {
       'URL path should not be set when using grpc, the path part of the URL will be ignored.'
     );
   }
-  if (target.protocol !== '' && !target.protocol?.match(/(http)s?/)) {
+  if (target.protocol !== '' && !target.protocol?.match(/^(http)s?:$/)) {
     diag.warn(
       'URL protocol should be http(s)://. Using http://.'
     );
