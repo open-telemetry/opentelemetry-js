@@ -18,6 +18,7 @@ All notable changes to experimental packages in this project will be documented 
 
 * fix(opentelemetry-instrumentation-http): use correct origin when port is `null` #2948 @danielgblanco
 * fix(otlp-exporter-base): include esm and esnext in package files #2952 @dyladan
+* fix(otlp-http-exporter): update endpoint to match spec #2895 @svetlanabrennan
 
 ### :books: (Refine Doc)
 
@@ -73,7 +74,6 @@ All notable changes to experimental packages in this project will be documented 
 * fix(sdk-metrics-base): remove aggregator.toMetricData dependency on AggregationTemporality #2676 @legendecas
 * fix(sdk-metrics-base): coerce histogram boundaries to be implicit Infinity #2859 @legendecas
 * fix(instrumentation-http): HTTP 400 status code should not set span status to error on servers #2789 @nordfjord
-* fix(otlp-http-exporter): update endpoint to match spec #2895 @svetlanabrennan
 
 ### :books: (Refine Doc)
 
