@@ -76,7 +76,9 @@ describe('OTLPMetricExporter - common', () => {
       );
       counter.add(1);
 
-      metrics = await collect();
+      const { resourceMetrics, errors } = await collect();
+      assert.strictEqual(errors.length, 0);
+      metrics = resourceMetrics;
     });
 
     it('should create an instance', () => {

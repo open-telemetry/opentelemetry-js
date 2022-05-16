@@ -66,6 +66,11 @@ export interface ResourceMetrics {
   scopeMetrics: ScopeMetrics[];
 }
 
+export interface CollectionResult {
+  resourceMetrics: ResourceMetrics;
+  errors: unknown[];
+}
+
 /**
  * The aggregated point data type.
  */

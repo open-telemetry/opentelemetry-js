@@ -17,7 +17,7 @@
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { InstrumentType, PushMetricExporter } from '../../src';
-import { ResourceMetrics } from '../../src/export/MetricData';
+import { CollectionResult, ResourceMetrics } from '../../src/export/MetricData';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MetricProducer } from '../../src/export/MetricProducer';
@@ -91,11 +91,11 @@ class TestDeltaMetricExporter extends TestMetricExporter {
 const emptyResourceMetrics = { resource: defaultResource, scopeMetrics: [] };
 
 class TestMetricProducer implements MetricProducer {
-  public collectionTime = 0;
-
-  async collect(): Promise<ResourceMetrics> {
-    await new Promise(resolve => setTimeout(resolve, this.collectionTime));
-    return { resource: defaultResource, scopeMetrics: [] };
+  async collect(): Promise<CollectionResult> {
+    return {
+      resourceMetrics: { resource: defaultResource, scopeMetrics: [] },
+      errors: [],
+    };
   }
 }
 
@@ -390,10 +390,10 @@ describe('PeriodicExportingMetricReader', () => {
       reader.setMetricProducer(new TestMetricProducer());
 
       await reader.shutdown();
-      assert.deepStrictEqual(await reader.collect(), undefined);
+      assertRejects(reader.collect(), /MetricReader is shutdown/);
     });
 
-    it('should time out when timeoutMillis is set', async () => {
+    it('should call MetricProduce.collect with timeout', async () => {
       const exporter = new TestMetricExporter();
       const reader = new PeriodicExportingMetricReader({
         exporter: exporter,
@@ -401,13 +401,14 @@ describe('PeriodicExportingMetricReader', () => {
         exportTimeoutMillis: 80,
       });
       const producer = new TestMetricProducer();
-      producer.collectionTime = 40;
       reader.setMetricProducer(producer);
 
-      await assertRejects(
-        () => reader.collect({ timeoutMillis: 20 }),
-        TimeoutError
-      );
+      const collectStub = sinon.stub(producer, 'collect');
+
+      await reader.collect({ timeoutMillis: 20 });
+      assert(collectStub.calledOnce);
+      const args = collectStub.args[0];
+      assert.deepStrictEqual(args, [{ timeoutMillis: 20 }]);
 
       await reader.shutdown();
     });
