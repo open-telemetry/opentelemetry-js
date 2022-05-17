@@ -37,10 +37,30 @@ export function parseHeaders(
   return headers;
 }
 
-export function appendResourcePathToUrlIfNotPresent(url: string, path: string): string {
-  if (url.match(/v\d\/(traces|metrics)$/)) return url;
-
+/**
+ * Adds path (version + signal) to a no per-signal endpoint
+ * @param url
+ * @param path
+ * @returns url + path
+ */
+export function appendResourcePathToUrl(url: string, path: string): string {
+  if (!url.endsWith('/')) {
+    url = url + '/';
+  }
   return url + path;
+}
+
+/**
+ * Adds root path to signal specific endpoint when endpoint contains no path part and no root path
+ * @param url
+ * @param path
+ * @returns url
+ */
+export function appendRootPathToUrlIfNeeded(url: string, path: string): string {
+  if (!url.includes(path) && !url.endsWith('/')) {
+    url = url + '/';
+  }
+  return url;
 }
 
 /**
@@ -48,7 +68,6 @@ export function appendResourcePathToUrlIfNotPresent(url: string, path: string): 
  * @param timeoutMillis
  * @returns timeout value in milliseconds
  */
-
 export function configureExporterTimeout(timeoutMillis: number | undefined): number {
   if (typeof timeoutMillis === 'number') {
     if (timeoutMillis <= 0) {

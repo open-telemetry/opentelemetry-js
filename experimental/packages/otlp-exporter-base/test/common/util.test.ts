@@ -17,7 +17,11 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { diag } from '@opentelemetry/api';
-import { parseHeaders } from '../../src/util';
+import {
+  parseHeaders,
+  appendResourcePathToUrl,
+  appendRootPathToUrlIfNeeded
+} from '../../src/util';
 
 describe('utils', () => {
   afterEach(() => {
@@ -48,6 +52,56 @@ describe('utils', () => {
     it('should parse undefined', () => {
       const result = parseHeaders(undefined);
       assert.deepStrictEqual(result, {});
+    });
+  });
+
+  // only invoked with general endpoint (not signal specific endpoint)
+  describe('appendResourcePathToUrl - general http endpoint', () => {
+    it('should append resource path when missing', () => {
+      const url = 'http://foo.bar/';
+      const resourcePath = 'v1/traces';
+
+      const finalUrl = appendResourcePathToUrl(url, resourcePath);
+      assert.strictEqual(finalUrl, url + resourcePath);
+    });
+    it('should append root path and resource path when missing', () => {
+      const url = 'http://foo.bar';
+      const resourcePath = 'v1/traces';
+
+      const finalUrl = appendResourcePathToUrl(url, resourcePath);
+      assert.strictEqual(finalUrl, url + '/' + resourcePath);
+    });
+    it('should append resourse path even when url already contains path ', () => {
+      const url = 'http://foo.bar/v1/traces';
+      const resourcePath = 'v1/traces';
+
+      const finalUrl = appendResourcePathToUrl(url, resourcePath);
+      assert.strictEqual(finalUrl, url + '/' + resourcePath);
+    });
+  });
+
+  // only invoked with signal specific endpoint
+  describe('appendRootPathToUrlIfNeeded - specifc signal http endpoint', () => {
+    it('should append root path when missing', () => {
+      const url = 'http://foo.bar';
+      const resourcePath = 'v1/traces';
+
+      const finalUrl = appendRootPathToUrlIfNeeded(url, resourcePath);
+      assert.strictEqual(finalUrl, url + '/');
+    });
+    it('should not append root path and return same url', () => {
+      const url = 'http://foo.bar/';
+      const resourcePath = 'v1/traces';
+
+      const finalUrl = appendRootPathToUrlIfNeeded(url, resourcePath);
+      assert.strictEqual(finalUrl, url);
+    });
+    it('should append root path when url contains resource path', () => {
+      const url = 'http://foo.bar/v1/traces';
+      const resourcePath = 'v1/traces';
+
+      const finalUrl = appendRootPathToUrlIfNeeded(url, resourcePath);
+      assert.strictEqual(finalUrl, url);
     });
   });
 });
