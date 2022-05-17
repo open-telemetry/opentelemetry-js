@@ -28,7 +28,7 @@ import {
   getResource,
   PerformanceTimingNames as PTN,
   shouldPropagateTraceHeaders,
-  URLLike
+  parseUrl,
 } from '@opentelemetry/sdk-trace-web';
 import { EventNames } from './enums/EventNames';
 import {
@@ -39,12 +39,6 @@ import {
 } from './types';
 import { VERSION } from './version';
 import { AttributeNames } from './enums/AttributeNames';
-
-function parseUrl(url: string): URLLike {
-  const element = document.createElement('a');
-  element.href = url;
-  return element;
-}
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
@@ -215,8 +209,8 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
     const xhrMem = this._xhrMem.get(xhr);
     if (
       !xhrMem ||
-      PerformanceObserver == null ||
-      PerformanceResourceTiming == null
+      typeof PerformanceObserver !== 'function' ||
+      typeof PerformanceResourceTiming !== 'function'
     ) {
       return;
     }
