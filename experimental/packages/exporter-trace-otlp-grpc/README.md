@@ -27,8 +27,8 @@ const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc');
 
 const collectorOptions = {
-  // url is optional and can be omitted - default is localhost:4317
-  url: '<collector-hostname>:<port>',
+  // url is optional and can be omitted - default is http://localhost:4317
+  url: 'http://<collector-hostname>:<port>',
 };
 
 const provider = new BasicTracerProvider();
@@ -51,8 +51,8 @@ const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/sdk
 const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-grpc');
 
 const collectorOptions = {
-  // url is optional and can be omitted - default is localhost:4317
-  url: '<collector-hostname>:<port>',
+  // url is optional and can be omitted - default is http://localhost:4317
+  url: 'http://<collector-hostname>:<port>',
   credentials: grpc.credentials.createSsl(),
 };
 
@@ -91,8 +91,8 @@ const metadata = new grpc.Metadata();
 metadata.set('k', 'v');
 
 const collectorOptions = {
-  // url is optional and can be omitted - default is localhost:4317
-  url: '<collector-hostname>:<port>',
+  // url is optional and can be omitted - default is http://localhost:4317
+  url: 'http://<collector-hostname>:<port>',
   metadata, // // an optional grpc.Metadata object to be sent with each request
 };
 
@@ -135,8 +135,8 @@ By default no compression will be used. To use compression, set it programmatica
 const { CompressionAlgorithm } = require('@opentelemetry/exporter-trace-otlp-grpc');
 
 const collectorOptions = {
-  // url is optional and can be omitted - default is localhost:4317
-  url: '<collector-hostname>:<port>',
+  // url is optional and can be omitted - default is http://localhost:4317
+  url: 'http://<collector-hostname>:<port>',
   metadata, // // an optional grpc.Metadata object to be sent with each request
   compression: CompressionAlgorithm.GZIP,
 };
@@ -149,11 +149,20 @@ const exporter = new OTLPTraceExporter(collectorOptions);
 
  | Environment variable | Description |
   |----------------------|-------------|
-  | OTEL_EXPORTER_OTLP_TRACES_TIMEOUT | The maximum waiting time, in milliseconds, allowed to send each OTLP trace batch. Default is 10000. |
-  | OTEL_EXPORTER_OTLP_TIMEOUT | The maximum waiting time, in milliseconds, allowed to send each OTLP trace and metric batch. Default is 10000. |
   | OTEL_EXPORTER_OTLP_TRACES_COMPRESSION | The compression type to use on OTLP trace requests. Options include gzip. By default no compression will be used. |
   | OTEL_EXPORTER_OTLP_COMPRESSION | The compression type to use on OTLP trace, metric, and log requests. Options include gzip. By default no compression will be used. |
- > The per-signal environment variables (`OTEL_EXPORTER_OTLP_TRACES_TIMEOUT`) takes precedence and non-per-signal environment variable (`OTEL_EXPORTER_OTLP_TIMEOUT`).
+  | OTEL_EXPORTER_OTLP_TRACES_INSECURE | Whether to enable client transport security for the exporter's gRPC connection for trace requests. This option only applies to OTLP/gRPC when an endpoint is provided without the http or https scheme. Options include true or false. By default insecure is false which creates a secure connection. |
+  | OTEL_EXPORTER_OTLP_INSECURE | Whether to enable client transport security for the exporter's gRPC connection for trace, metric and log requests. This option only applies to OTLP/gRPC when an endpoint is provided without the http or https scheme. Options include true or false. By default insecure is false which creates a secure connection. |
+  | OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE | The path to the file containing trusted root certificate to use when verifying an OTLP trace server's TLS credentials. By default the host platform's trusted root certificate is used.|
+  | OTEL_EXPORTER_OTLP_CERTIFICATE | The path to the file containing trusted root certificate to use when verifying an OTLP trace, metric, or log server's TLS credentials. By default the host platform's trusted root certificate is used. |
+  | OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY | The path to the file containing private client key to use when verifying an OTLP trace client's TLS credentials. Must provide a client certificate/chain when providing a private client key. By default no client key file is used. |
+  | OTEL_EXPORTER_OTLP_CLIENT_KEY | The path to the file containing private client key to use when verifying an OTLP trace, metric or log client's TLS credentials. Must provide a client certificate/chain when providing a private client key. By default no client key file is used. |
+  | OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE | The path to the file containing trusted client certificate/chain for clients private key to use when verifying an OTLP trace server's TLS credentials. Must provide a private client key when providing a certificate/chain. By default no chain file is used. |
+  | OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE | The path to the file containing trusted client certificate/chain for clients private key to use when verifying an OTLP trace, metric and log server's TLS credentials. Must provide a private client key when providing a certificate/chain. By default no chain file is used. |
+  | OTEL_EXPORTER_OTLP_TRACES_TIMEOUT | The maximum waiting time, in milliseconds, allowed to send each OTLP trace batch. Default is 10000. |
+  | OTEL_EXPORTER_OTLP_TIMEOUT | The maximum waiting time, in milliseconds, allowed to send each OTLP trace and metric batch. Default is 10000. |
+
+ > Settings configured programmatically take precedence over environment variables. Per-signal environment variables take precedence over non-per-signal environment variables.
 
 ## Running opentelemetry-collector locally to see the traces
 

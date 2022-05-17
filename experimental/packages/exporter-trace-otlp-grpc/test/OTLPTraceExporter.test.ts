@@ -123,9 +123,9 @@ const testCollectorExporter = (params: TestParams) =>
           fs.readFileSync('./test/certs/client.key'),
           fs.readFileSync('./test/certs/client.crt')
         )
-        : undefined;
+        : grpc.credentials.createInsecure();
       collectorExporter = new OTLPTraceExporter({
-        url: 'grpcs://' + address,
+        url: 'https://' + address,
         credentials,
         metadata: params.metadata,
       });
@@ -207,7 +207,7 @@ const testCollectorExporter = (params: TestParams) =>
             fs.readFileSync('./test/certs/client.key'),
             fs.readFileSync('./test/certs/client.crt')
           )
-          : undefined;
+          : grpc.credentials.createInsecure();
 
         const collectorExporterWithTimeout = new OTLPTraceExporter({
           url: 'grpcs://' + address,
@@ -236,9 +236,9 @@ const testCollectorExporter = (params: TestParams) =>
             fs.readFileSync('./test/certs/client.key'),
             fs.readFileSync('./test/certs/client.crt')
           )
-          : undefined;
+          : grpc.credentials.createInsecure();
         collectorExporter = new OTLPTraceExporter({
-          url: 'grpcs://' + address,
+          url: 'https://' + address,
           credentials,
           metadata: params.metadata,
           compression: CompressionAlgorithm.GZIP,
@@ -286,11 +286,11 @@ const testCollectorExporter = (params: TestParams) =>
             fs.readFileSync('./test/certs/client.key'),
             fs.readFileSync('./test/certs/client.crt')
           )
-          : undefined;
+          : grpc.credentials.createInsecure();
 
         envSource.OTEL_EXPORTER_OTLP_COMPRESSION = 'gzip';
         collectorExporter = new OTLPTraceExporter({
-          url: 'grpcs://' + address,
+          url: 'https://' + address,
           credentials,
           metadata: params.metadata,
         });
