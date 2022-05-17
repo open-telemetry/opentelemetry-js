@@ -21,11 +21,10 @@ import {
   OTLPGRPCExporterConfigNode,
   OTLPGRPCExporterNodeBase,
   ServiceClientType,
-  validateAndNormalizeUrl
+  validateAndNormalizeUrl,
+  DEFAULT_COLLECTOR_URL
 } from '@opentelemetry/otlp-grpc-exporter-base';
 import { createExportTraceServiceRequest, IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
-
-const DEFAULT_COLLECTOR_URL = 'localhost:4317';
 
 /**
  * OTLP Trace Exporter for Node
@@ -55,7 +54,7 @@ export class OTLPTraceExporter
         ? validateAndNormalizeUrl(getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
         : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
           ? validateAndNormalizeUrl(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT)
-          : DEFAULT_COLLECTOR_URL;
+          : validateAndNormalizeUrl(DEFAULT_COLLECTOR_URL);
   }
 
   getServiceClientType() {

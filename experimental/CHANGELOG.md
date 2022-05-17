@@ -13,6 +13,7 @@ All notable changes to experimental packages in this project will be documented 
 
 * feat(exporters): update proto version and use otlp-transformer #2929 @pichlermarc
 * fix(sdk-metrics-base): misbehaving aggregation temporality selector tolerance #2958 @legendecas
+* feat(trace-otlp-grpc): configure security with env vars #2827 @svetlanabrennan
 * feat(sdk-metrics-base): async instruments callback timeout #2742 @legendecas
 
 ### :bug: (Bug Fix)
