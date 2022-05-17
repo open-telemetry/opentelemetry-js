@@ -123,9 +123,9 @@ const testOTLPMetricExporter = (params: TestParams) =>
           fs.readFileSync('./test/certs/client.key'),
           fs.readFileSync('./test/certs/client.crt')
         )
-        : undefined;
+        : grpc.credentials.createInsecure();
       collectorExporter = new OTLPMetricExporter({
-        url: 'grpcs://' + address,
+        url: 'https://' + address,
         credentials,
         metadata: params.metadata,
         temporalityPreference: AggregationTemporality.CUMULATIVE

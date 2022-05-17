@@ -21,16 +21,19 @@ import { getEnv, globalErrorHandler } from '@opentelemetry/core';
 import * as path from 'path';
 import { OTLPGRPCExporterNodeBase } from './OTLPGRPCExporterNodeBase';
 import { URL } from 'url';
+import * as fs from 'fs';
 import { GRPCQueueItem, OTLPGRPCExporterConfigNode, ServiceClientType, } from './types';
 import { CompressionAlgorithm, ExportServiceError, OTLPExporterError } from '@opentelemetry/otlp-exporter-base';
+
+export const DEFAULT_COLLECTOR_URL = 'http://localhost:4317';
 
 export function onInit<ExportItem, ServiceRequest>(
   collector: OTLPGRPCExporterNodeBase<ExportItem, ServiceRequest>,
   config: OTLPGRPCExporterConfigNode
 ): void {
   collector.grpcQueue = [];
-  const credentials: grpc.ChannelCredentials =
-    config.credentials || grpc.credentials.createInsecure();
+
+  const credentials: grpc.ChannelCredentials = configureSecurity(config.credentials, collector.url);
 
   const includeDirs = [path.resolve(__dirname, '..', 'protos')];
 
@@ -120,12 +123,105 @@ export function validateAndNormalizeUrl(url: string): string {
       'URL path should not be set when using grpc, the path part of the URL will be ignored.'
     );
   }
-  if (target.protocol !== '' && !target.protocol?.match(/(http|grpc)s?/)) {
+  if (target.protocol !== '' && !target.protocol?.match(/^(http)s?:$/)) {
     diag.warn(
-      'URL protocol should be http(s):// or grpc(s)://. Using grpc://.'
+      'URL protocol should be http(s)://. Using http://.'
     );
   }
   return target.host;
+}
+
+export function configureSecurity(credentials: grpc.ChannelCredentials | undefined, endpoint: string):
+  grpc.ChannelCredentials {
+
+  let insecure: boolean;
+
+  if (credentials) {
+    return credentials;
+  } else if (endpoint.startsWith('https://')) {
+    insecure = false;
+  } else if (endpoint.startsWith('http://') || endpoint === DEFAULT_COLLECTOR_URL) {
+    insecure = true;
+  } else {
+    insecure = getSecurityFromEnv();
+  }
+
+  if (insecure) {
+    return grpc.credentials.createInsecure();
+  } else {
+    return useSecureConnection();
+  }
+}
+
+function getSecurityFromEnv(): boolean {
+  const definedInsecure =
+    getEnv().OTEL_EXPORTER_OTLP_TRACES_INSECURE ||
+    getEnv().OTEL_EXPORTER_OTLP_INSECURE;
+
+  if (definedInsecure) {
+    return definedInsecure.toLowerCase() === 'true';
+  } else {
+    return false;
+  }
+}
+
+export function useSecureConnection(): grpc.ChannelCredentials {
+  const rootCertPath = retrieveRootCert();
+  const privateKeyPath = retrievePrivateKey();
+  const certChainPath = retrieveCertChain();
+
+  return grpc.credentials.createSsl(rootCertPath, privateKeyPath, certChainPath);
+}
+
+function retrieveRootCert(): Buffer | undefined {
+  const rootCertificate =
+    getEnv().OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE ||
+    getEnv().OTEL_EXPORTER_OTLP_CERTIFICATE;
+
+  if (rootCertificate) {
+    try {
+      return fs.readFileSync(path.resolve(process.cwd(), rootCertificate));
+    } catch {
+      diag.warn('Failed to read root certificate file');
+      return undefined;
+    }
+  } else {
+    return undefined;
+  }
+}
+
+function retrievePrivateKey(): Buffer | undefined {
+  const clientKey =
+    getEnv().OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY ||
+    getEnv().OTEL_EXPORTER_OTLP_CLIENT_KEY;
+
+  if (clientKey) {
+    try {
+      return fs.readFileSync(path.resolve(process.cwd(), clientKey));
+    } catch {
+      diag.warn('Failed to read client certificate private key file');
+      return undefined;
+    }
+  } else {
+    return undefined;
+  }
+}
+
+function retrieveCertChain(): Buffer | undefined {
+  const clientChain =
+    getEnv().OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE ||
+    getEnv().OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE;
+
+  if (clientChain) {
+    try {
+      return fs.readFileSync(path.resolve(process.cwd(), clientChain));
+    } catch {
+      diag.warn('Failed to read client certificate chain file');
+      return undefined;
+    }
+  } else {
+    return undefined;
+  }
 }
 
 function toGrpcCompression(compression: CompressionAlgorithm): GrpcCompressionAlgorithm {
