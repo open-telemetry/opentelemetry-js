@@ -42,6 +42,7 @@ export const CALL_SPAN_ENDED = Symbol('opentelemetry call span ended');
  * Handle patching for serverStream and Bidi type server handlers
  */
 function serverStreamAndBidiHandler<RequestType, ResponseType>(
+  grpcClient: typeof grpcJs,
   span: Span,
   call: GrpcEmitter,
   original:
@@ -72,7 +73,7 @@ function serverStreamAndBidiHandler<RequestType, ResponseType>(
     });
     span.setAttribute(
       SemanticAttributes.RPC_GRPC_STATUS_CODE,
-      SpanStatusCode.OK.toString()
+      grpcClient.status.OK.toString()
     );
 
     endSpan();
@@ -105,6 +106,7 @@ function serverStreamAndBidiHandler<RequestType, ResponseType>(
  * Handle patching for clientStream and unary type server handlers
  */
 function clientStreamAndUnaryHandler<RequestType, ResponseType>(
+  grpcClient: typeof grpcJs,
   span: Span,
   call: ServerCallWithMeta<RequestType, ResponseType>,
   callback: SendUnaryDataCallback<ResponseType>,
@@ -135,7 +137,7 @@ function clientStreamAndUnaryHandler<RequestType, ResponseType>(
       span.setStatus({ code: SpanStatusCode.UNSET });
       span.setAttribute(
         SemanticAttributes.RPC_GRPC_STATUS_CODE,
-        SpanStatusCode.OK.toString()
+        grpcClient.status.OK.toString(),
       );
     }
 
@@ -152,6 +154,7 @@ function clientStreamAndUnaryHandler<RequestType, ResponseType>(
  * properties based on its result.
  */
 export function handleServerFunction<RequestType, ResponseType>(
+  grpcModule: typeof grpcJs,
   span: Span,
   type: string,
   originalFunc: HandleCall<RequestType, ResponseType>,
@@ -163,6 +166,7 @@ export function handleServerFunction<RequestType, ResponseType>(
     case 'clientStream':
     case 'client_stream':
       return clientStreamAndUnaryHandler(
+        grpcModule,
         span,
         call,
         callback,
@@ -174,6 +178,7 @@ export function handleServerFunction<RequestType, ResponseType>(
     case 'server_stream':
     case 'bidi':
       return serverStreamAndBidiHandler(
+        grpcModule,
         span,
         call,
         originalFunc as

@@ -74,7 +74,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
           this._wrap(
             moduleExports.Server.prototype,
             'register',
-            this._patchServer() as any
+            this._patchServer(moduleExports) as any
           );
           // Patch Client methods
           if (isWrapped(moduleExports.makeGenericClientConstructor)) {
@@ -124,7 +124,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
    * Patch for grpc.Server.prototype.register(...) function. Provides auto-instrumentation for
    * client_stream, server_stream, bidi, unary server handler calls.
    */
-  private _patchServer(): (
+  private _patchServer(grpcModule: typeof grpcJs): (
     originalRegister: ServerRegisterFunction
   ) => ServerRegisterFunction {
     const instrumentation = this;
@@ -197,6 +197,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
                   context.with(trace.setSpan(context.active(), span), () => {
                     handleServerFunction.call(
                       self,
+                      grpcModule,
                       span,
                       type,
                       originalFunc,
