@@ -42,6 +42,7 @@ function createNewEmptyCheckpoint(boundaries: number[]): Histogram {
 
 export class HistogramAccumulation implements Accumulation {
   constructor(
+    public startTime: HrTime,
     private readonly _boundaries: number[],
     private _current: Histogram = createNewEmptyCheckpoint(_boundaries)
   ) {}
@@ -58,6 +59,10 @@ export class HistogramAccumulation implements Accumulation {
     }
     // value is above all observed boundaries
     this._current.buckets.counts[this._boundaries.length] += 1;
+  }
+
+  setStartTime(startTime: HrTime): void {
+    this.startTime = startTime;
   }
 
   toPointValue(): Histogram {
@@ -77,8 +82,8 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
    */
   constructor(private readonly _boundaries: number[]) {}
 
-  createAccumulation() {
-    return new HistogramAccumulation(this._boundaries);
+  createAccumulation(startTime: HrTime) {
+    return new HistogramAccumulation(startTime, this._boundaries);
   }
 
   /**
@@ -98,7 +103,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
       mergedCounts[idx] = previousCounts[idx] + deltaCounts[idx];
     }
 
-    return new HistogramAccumulation(previousValue.buckets.boundaries, {
+    return new HistogramAccumulation(previous.startTime, previousValue.buckets.boundaries, {
       buckets: {
         boundaries: previousValue.buckets.boundaries,
         counts: mergedCounts,
@@ -123,7 +128,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
       diffedCounts[idx] = currentCounts[idx] - previousCounts[idx];
     }
 
-    return new HistogramAccumulation(previousValue.buckets.boundaries, {
+    return new HistogramAccumulation(current.startTime, previousValue.buckets.boundaries, {
       buckets: {
         boundaries: previousValue.buckets.boundaries,
         counts: diffedCounts,
@@ -137,7 +142,6 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
     descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<HistogramAccumulation>[],
-    startTime: HrTime,
     endTime: HrTime): Maybe<HistogramMetricData> {
     return {
       descriptor,
@@ -146,7 +150,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
       dataPoints: accumulationByAttributes.map(([attributes, accumulation]) => {
         return {
           attributes,
-          startTime,
+          startTime: accumulation.startTime,
           endTime,
           value: accumulation.toPointValue(),
         };

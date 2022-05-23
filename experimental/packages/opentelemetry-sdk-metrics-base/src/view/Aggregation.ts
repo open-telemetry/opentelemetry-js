@@ -63,9 +63,19 @@ export class DropAggregation extends Aggregation {
  * The default sum aggregation.
  */
 export class SumAggregation extends Aggregation {
-  private static DEFAULT_INSTANCE = new SumAggregator();
-  createAggregator(_instrument: InstrumentDescriptor) {
-    return SumAggregation.DEFAULT_INSTANCE;
+  private static MONOTONIC_INSTANCE = new SumAggregator(true);
+  private static NON_MONOTONIC_INSTANCE = new SumAggregator(false);
+  createAggregator(instrument: InstrumentDescriptor) {
+    switch (instrument.type) {
+      case InstrumentType.COUNTER:
+      case InstrumentType.OBSERVABLE_COUNTER:
+      case InstrumentType.HISTOGRAM: {
+        return SumAggregation.MONOTONIC_INSTANCE;
+      }
+      default: {
+        return SumAggregation.NON_MONOTONIC_INSTANCE;
+      }
+    }
   }
 }
 
