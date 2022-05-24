@@ -18,12 +18,14 @@ All notable changes to experimental packages in this project will be documented 
 
 * feat(exporters): update proto version and use otlp-transformer #2929 @pichlermarc
 * fix(sdk-metrics-base): misbehaving aggregation temporality selector tolerance #2958 @legendecas
+* feat(trace-otlp-grpc): configure security with env vars #2827 @svetlanabrennan
 * feat(sdk-metrics-base): async instruments callback timeout #2742 @legendecas
 
 ### :bug: (Bug Fix)
 
 * fix(opentelemetry-instrumentation-http): use correct origin when port is `null` #2948 @danielgblanco
 * fix(otlp-exporter-base): include esm and esnext in package files #2952 @dyladan
+* fix(otlp-http-exporter): update endpoint to match spec #2895 @svetlanabrennan
 
 ### :books: (Refine Doc)
 

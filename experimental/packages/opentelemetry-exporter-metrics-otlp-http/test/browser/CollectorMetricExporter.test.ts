@@ -377,16 +377,25 @@ describe('OTLPMetricExporter - web', () => {
 
 describe('when configuring via environment', () => {
   const envSource = window as any;
-  it('should use url defined in env', () => {
+  it('should use url defined in env that ends with root path and append version and signal path', () => {
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
+    const collectorExporter = new OTLPMetricExporter();
+    assert.strictEqual(
+      collectorExporter._otlpExporter.url,
+      `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}v1/metrics`
+    );
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+  });
+  it('should use url defined in env without checking if path is already present', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/v1/metrics';
     const collectorExporter = new OTLPMetricExporter();
     assert.strictEqual(
       collectorExporter._otlpExporter.url,
-      envSource.OTEL_EXPORTER_OTLP_ENDPOINT
+      `${envSource.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/metrics`
     );
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
   });
-  it('should use url defined in env and append version and signal when not present', () => {
+  it('should use url defined in env and append version and signal', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
     const collectorExporter = new OTLPMetricExporter();
     assert.strictEqual(
@@ -396,14 +405,50 @@ describe('when configuring via environment', () => {
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
   });
   it('should override global exporter url with signal url defined in env', () => {
-    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar';
-    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.metrics';
+    envSource.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://foo.bar/';
+    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.metrics/';
     const collectorExporter = new OTLPMetricExporter();
     assert.strictEqual(
       collectorExporter._otlpExporter.url,
       envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
     );
     envSource.OTEL_EXPORTER_OTLP_ENDPOINT = '';
+    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
+  });
+  it('should add root path when signal url defined in env contains no path and no root path', () => {
+    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.bar';
+    const collectorExporter = new OTLPMetricExporter();
+    assert.strictEqual(
+      collectorExporter._otlpExporter.url,
+      `${envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT}/`
+    );
+    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
+  });
+  it('should not add root path when signal url defined in env contains root path but no path', () => {
+    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.bar/';
+    const collectorExporter = new OTLPMetricExporter();
+    assert.strictEqual(
+      collectorExporter._otlpExporter.url,
+      `${envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT}`
+    );
+    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
+  });
+  it('should not add root path when signal url defined in env contains path', () => {
+    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.bar/v1/metrics';
+    const collectorExporter = new OTLPMetricExporter();
+    assert.strictEqual(
+      collectorExporter._otlpExporter.url,
+      `${envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT}`
+    );
+    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
+  });
+  it('should not add root path when signal url defined in env contains path and ends in /', () => {
+    envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = 'http://foo.bar/v1/metrics/';
+    const collectorExporter = new OTLPMetricExporter();
+    assert.strictEqual(
+      collectorExporter._otlpExporter.url,
+      `${envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT}`
+    );
     envSource.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT = '';
   });
   it('should use headers defined via env', () => {

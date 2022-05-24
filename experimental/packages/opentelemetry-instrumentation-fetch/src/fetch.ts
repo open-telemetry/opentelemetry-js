@@ -29,12 +29,6 @@ import { FetchError, FetchResponse, SpanData } from './types';
 import { VERSION } from './version';
 import { _globalThis } from '@opentelemetry/core';
 
-function parseUrl(url: string): web.URLLike {
-  const element = document.createElement('a');
-  element.href = url;
-  return element;
-}
-
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
 // hard to say how long it should really wait, seems like 300ms is
@@ -126,7 +120,7 @@ export class FetchInstrumentation extends InstrumentationBase<Promise<Response>>
     span: api.Span,
     response: FetchResponse
   ): void {
-    const parsedUrl = parseUrl(response.url);
+    const parsedUrl = web.parseUrl(response.url);
     span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, response.status);
     if (response.statusText != null) {
       span.setAttribute(AttributeNames.HTTP_STATUS_TEXT, response.statusText);
@@ -301,7 +295,7 @@ export class FetchInstrumentation extends InstrumentationBase<Promise<Response>>
         ...args: Parameters<typeof fetch>
       ): Promise<Response> {
         const self = this;
-        const url = parseUrl(args[0] instanceof Request ? args[0].url : args[0]).href;
+        const url = web.parseUrl(args[0] instanceof Request ? args[0].url : args[0]).href;
 
         const options = args[0] instanceof Request ? args[0] : args[1] || {};
         const createdSpan = plugin._createSpan(url, options);
@@ -437,17 +431,16 @@ export class FetchInstrumentation extends InstrumentationBase<Promise<Response>>
   private _prepareSpanData(spanUrl: string): SpanData {
     const startTime = core.hrTime();
     const entries: PerformanceResourceTiming[] = [];
-    if (PerformanceObserver == null) {
+    if (typeof PerformanceObserver !== 'function') {
       return { entries, startTime, spanUrl };
     }
 
-    const observer: PerformanceObserver = new PerformanceObserver(list => {
+    const observer = new PerformanceObserver(list => {
       const perfObsEntries = list.getEntries() as PerformanceResourceTiming[];
-      const parsedUrl = parseUrl(spanUrl);
       perfObsEntries.forEach(entry => {
         if (
           entry.initiatorType === 'fetch' &&
-          entry.name === parsedUrl.href
+          entry.name === spanUrl
         ) {
           entries.push(entry);
         }

@@ -19,12 +19,13 @@ import { getEnv, baggageUtils } from '@opentelemetry/core';
 import { OTLPExporterNodeBase } from '@opentelemetry/otlp-exporter-base';
 import {
   OTLPExporterNodeConfigBase,
-  appendResourcePathToUrlIfNotPresent
+  appendResourcePathToUrl,
+  appendRootPathToUrlIfNeeded
 } from '@opentelemetry/otlp-exporter-base';
 import { createExportTraceServiceRequest, IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
 
-const DEFAULT_COLLECTOR_RESOURCE_PATH = '/v1/traces';
-const DEFAULT_COLLECTOR_URL = `http://localhost:4318${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
+const DEFAULT_COLLECTOR_RESOURCE_PATH = 'v1/traces';
+const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURCE_PATH}`;
 
 /**
  * Collector Trace Exporter for Node
@@ -51,9 +52,9 @@ export class OTLPTraceExporter
     return typeof config.url === 'string'
       ? config.url
       : getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT.length > 0
-        ? getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+        ? appendRootPathToUrlIfNeeded(getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
         : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-          ? appendResourcePathToUrlIfNotPresent(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
+          ? appendResourcePathToUrl(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT, DEFAULT_COLLECTOR_RESOURCE_PATH)
           : DEFAULT_COLLECTOR_URL;
   }
 }

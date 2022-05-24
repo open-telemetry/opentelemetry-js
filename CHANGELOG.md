@@ -18,6 +18,8 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-web): parse url with relative url string [#2972](https://github.com/open-telemetry/opentelemetry-js/pull/2972) @legendecas
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)

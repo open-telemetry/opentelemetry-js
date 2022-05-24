@@ -490,12 +490,25 @@ describe('utils', () => {
         assert.strictEqual(typeof url[field], 'string');
       });
     });
+
+    it('should parse relative url', () => {
+      const url = parseUrl('/foo');
+      urlFields.forEach(field => {
+        assert.strictEqual(typeof url[field], 'string');
+      });
+    });
   });
 
   describe('normalizeUrl', () => {
     it('should normalize url', () => {
       const url = normalizeUrl('https://opentelemetry.io/你好');
       assert.strictEqual(url, 'https://opentelemetry.io/%E4%BD%A0%E5%A5%BD');
+    });
+
+    it('should normalize relative url', () => {
+      const url = normalizeUrl('/你好');
+      const urlObj = new URL(url);
+      assert.strictEqual(urlObj.pathname, '/%E4%BD%A0%E5%A5%BD');
     });
   });
 });
