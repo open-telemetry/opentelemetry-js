@@ -73,7 +73,6 @@ describe('OTLPTraceExporter - common', () => {
       onInitSpy = sinon.stub(OTLPTraceExporter.prototype, 'onInit');
       collectorExporterConfig = {
         hostname: 'foo',
-        attributes: {},
         url: 'http://foo.bar.com',
       };
       collectorExporter = new OTLPTraceExporter(collectorExporterConfig);
@@ -207,7 +206,6 @@ describe('OTLPTraceExporter - common', () => {
       );
       collectorExporterConfig = {
         hostname: 'foo',
-        attributes: {},
         url: 'http://foo.bar.com',
       };
       collectorExporter = new OTLPTraceExporter(collectorExporterConfig);
