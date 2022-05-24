@@ -40,13 +40,6 @@ export interface MetricOptions {
   valueType?: ValueType;
 }
 
-export type CounterOptions = MetricOptions;
-export type UpDownCounterOptions = MetricOptions;
-export type ObservableGaugeOptions = MetricOptions;
-export type ObservableCounterOptions = MetricOptions;
-export type ObservableUpDownCounterOptions = MetricOptions;
-export type HistogramOptions = MetricOptions;
-
 /** The Type of value. It describes how the data is reported. */
 export enum ValueType {
   INT,

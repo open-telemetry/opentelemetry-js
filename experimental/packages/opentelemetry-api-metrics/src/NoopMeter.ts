@@ -18,18 +18,13 @@ import { Meter } from './types/Meter';
 import {
   BatchObservableCallback,
   Counter,
-  CounterOptions,
   Histogram,
-  HistogramOptions,
+  MetricOptions,
   ObservableCallback,
   ObservableCounter,
-  ObservableCounterOptions,
   ObservableGauge,
-  ObservableGaugeOptions,
   ObservableUpDownCounter,
-  ObservableUpDownCounterOptions,
   UpDownCounter,
-  UpDownCounterOptions,
   MetricAttributes,
   Observable,
 } from './types/Metric';
@@ -44,21 +39,21 @@ export class NoopMeter implements Meter {
   /**
    * @see {@link Meter.createHistogram}
    */
-  createHistogram(_name: string, _options?: HistogramOptions): Histogram {
+  createHistogram(_name: string, _options?: MetricOptions): Histogram {
     return NOOP_HISTOGRAM_METRIC;
   }
 
   /**
    * @see {@link Meter.createCounter}
    */
-  createCounter(_name: string, _options?: CounterOptions): Counter {
+  createCounter(_name: string, _options?: MetricOptions): Counter {
     return NOOP_COUNTER_METRIC;
   }
 
   /**
    * @see {@link Meter.createUpDownCounter}
    */
-  createUpDownCounter(_name: string, _options?: UpDownCounterOptions): UpDownCounter {
+  createUpDownCounter(_name: string, _options?: MetricOptions): UpDownCounter {
     return NOOP_UP_DOWN_COUNTER_METRIC;
   }
 
@@ -67,7 +62,7 @@ export class NoopMeter implements Meter {
    */
   createObservableGauge(
     _name: string,
-    _options?: ObservableGaugeOptions,
+    _options?: MetricOptions,
   ): ObservableGauge {
     return NOOP_OBSERVABLE_GAUGE_METRIC;
   }
@@ -77,7 +72,7 @@ export class NoopMeter implements Meter {
    */
   createObservableCounter(
     _name: string,
-    _options?: ObservableCounterOptions,
+    _options?: MetricOptions,
   ): ObservableCounter {
     return NOOP_OBSERVABLE_COUNTER_METRIC;
   }
@@ -87,7 +82,7 @@ export class NoopMeter implements Meter {
    */
   createObservableUpDownCounter(
     _name: string,
-    _options?: ObservableUpDownCounterOptions,
+    _options?: MetricOptions,
   ): ObservableUpDownCounter {
     return NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC;
   }

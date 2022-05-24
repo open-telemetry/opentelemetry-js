@@ -17,18 +17,13 @@
 import {
   BatchObservableCallback,
   Counter,
-  CounterOptions,
   Histogram,
-  HistogramOptions,
+  MetricOptions,
   Observable,
   ObservableCounter,
-  ObservableCounterOptions,
   ObservableGauge,
-  ObservableGaugeOptions,
   ObservableUpDownCounter,
-  ObservableUpDownCounterOptions,
   UpDownCounter,
-  UpDownCounterOptions,
 } from './Metric';
 
 /**
@@ -54,7 +49,7 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createHistogram(name: string, options?: HistogramOptions): Histogram;
+  createHistogram(name: string, options?: MetricOptions): Histogram;
 
   /**
    * Creates a new `Counter` metric. Generally, this kind of metric when the
@@ -63,7 +58,7 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createCounter(name: string, options?: CounterOptions): Counter;
+  createCounter(name: string, options?: MetricOptions): Counter;
 
   /**
    * Creates a new `UpDownCounter` metric. UpDownCounter is a synchronous
@@ -82,7 +77,7 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createUpDownCounter(name: string, options?: UpDownCounterOptions): UpDownCounter;
+  createUpDownCounter(name: string, options?: MetricOptions): UpDownCounter;
 
   /**
    * Creates a new `ObservableGauge` metric.
@@ -94,7 +89,7 @@ export interface Meter {
    */
   createObservableGauge(
     name: string,
-    options?: ObservableGaugeOptions
+    options?: MetricOptions
   ): ObservableGauge;
 
   /**
@@ -107,7 +102,7 @@ export interface Meter {
    */
   createObservableCounter(
     name: string,
-    options?: ObservableCounterOptions
+    options?: MetricOptions
   ): ObservableCounter;
 
   /**
@@ -120,7 +115,7 @@ export interface Meter {
    */
   createObservableUpDownCounter(
     name: string,
-    options?: ObservableUpDownCounterOptions
+    options?: MetricOptions
   ): ObservableUpDownCounter;
 
   /**

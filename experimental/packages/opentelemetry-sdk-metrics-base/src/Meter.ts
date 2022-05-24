@@ -35,7 +35,7 @@ export class Meter implements metrics.Meter {
   /**
    * Create a {@link metrics.Histogram} instrument.
    */
-  createHistogram(name: string, options?: metrics.HistogramOptions): metrics.Histogram {
+  createHistogram(name: string, options?: metrics.MetricOptions): metrics.Histogram {
     const descriptor = createInstrumentDescriptor(name, InstrumentType.HISTOGRAM, options);
     const storage = this._meterSharedState.registerMetricStorage(descriptor);
     return new HistogramInstrument(storage, descriptor);
@@ -44,7 +44,7 @@ export class Meter implements metrics.Meter {
   /**
    * Create a {@link metrics.Counter} instrument.
    */
-  createCounter(name: string, options?: metrics.CounterOptions): metrics.Counter {
+  createCounter(name: string, options?: metrics.MetricOptions): metrics.Counter {
     const descriptor = createInstrumentDescriptor(name, InstrumentType.COUNTER, options);
     const storage = this._meterSharedState.registerMetricStorage(descriptor);
     return new CounterInstrument(storage, descriptor);
@@ -53,7 +53,7 @@ export class Meter implements metrics.Meter {
   /**
    * Create a {@link metrics.UpDownCounter} instrument.
    */
-  createUpDownCounter(name: string, options?: metrics.UpDownCounterOptions): metrics.UpDownCounter {
+  createUpDownCounter(name: string, options?: metrics.MetricOptions): metrics.UpDownCounter {
     const descriptor = createInstrumentDescriptor(name, InstrumentType.UP_DOWN_COUNTER, options);
     const storage = this._meterSharedState.registerMetricStorage(descriptor);
     return new UpDownCounterInstrument(storage, descriptor);
@@ -64,7 +64,7 @@ export class Meter implements metrics.Meter {
    */
   createObservableGauge(
     name: string,
-    options?: metrics.ObservableGaugeOptions,
+    options?: metrics.MetricOptions,
   ): metrics.ObservableGauge {
     const descriptor = createInstrumentDescriptor(name, InstrumentType.OBSERVABLE_GAUGE, options);
     const storages = this._meterSharedState.registerAsyncMetricStorage(descriptor);
@@ -76,7 +76,7 @@ export class Meter implements metrics.Meter {
    */
   createObservableCounter(
     name: string,
-    options?: metrics.ObservableCounterOptions,
+    options?: metrics.MetricOptions,
   ): metrics.ObservableCounter {
     const descriptor = createInstrumentDescriptor(name, InstrumentType.OBSERVABLE_COUNTER, options);
     const storages = this._meterSharedState.registerAsyncMetricStorage(descriptor);
@@ -88,7 +88,7 @@ export class Meter implements metrics.Meter {
    */
   createObservableUpDownCounter(
     name: string,
-    options?: metrics.ObservableUpDownCounterOptions,
+    options?: metrics.MetricOptions,
   ): metrics.ObservableUpDownCounter {
     const descriptor = createInstrumentDescriptor(name, InstrumentType.OBSERVABLE_UP_DOWN_COUNTER, options);
     const storages = this._meterSharedState.registerAsyncMetricStorage(descriptor);
