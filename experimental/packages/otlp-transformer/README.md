@@ -14,8 +14,7 @@ To get started you will need to install a compatible OpenTelemetry API.
 ### Install Peer Dependencies
 
 ```sh
-npm install \
-    @opentelemetry/api
+npm install @opentelemetry/api
 ```
 
 ### Serialize Traces and Metrics
