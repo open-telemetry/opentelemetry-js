@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { MetricAttributes, ValueType, ObservableCallback } from '@opentelemetry/api-metrics';
+import * as api from '@opentelemetry/api';
+import {
+  BatchObservableCallback,
+  MetricAttributes,
+  ObservableCallback,
+  ValueType,
+} from '@opentelemetry/api-metrics';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -25,11 +31,17 @@ import {
   DataPointType,
   ScopeMetrics
 } from '../src/export/MetricData';
-import { Measurement } from '../src/Measurement';
 import { isNotNullish } from '../src/utils';
 import { HrTime } from '@opentelemetry/api';
 import { Histogram } from '../src/aggregator/types';
 import { AggregationTemporality } from '../src/export/AggregationTemporality';
+
+export type Measurement = {
+  value: number;
+  // TODO: use common attributes
+  attributes: MetricAttributes
+  context?: api.Context;
+};
 
 export const defaultResource = new Resource({
   resourceKey: 'my-resource',
@@ -142,6 +154,19 @@ export class ObservableCallbackDelegate {
   }
 
   getCallback(): ObservableCallback {
+    return observableResult => {
+      return this._delegate?.(observableResult);
+    };
+  }
+}
+
+export class BatchObservableCallbackDelegate {
+  private _delegate?: BatchObservableCallback;
+  setDelegate(delegate: BatchObservableCallback) {
+    this._delegate = delegate;
+  }
+
+  getCallback(): BatchObservableCallback {
     return observableResult => {
       return this._delegate?.(observableResult);
     };

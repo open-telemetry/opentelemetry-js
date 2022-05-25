@@ -92,12 +92,17 @@ export class TemporalMetricProcessor<T> {
       // previous. We have the following four scenarios:
       // 1. Cumulative Aggregation (temporality) + Delta recording (sync instrument).
       //    Here we merge with our last record to get a cumulative aggregation.
-      // 2. Cumulative Aggregation + Cumulative recording - do nothing
-      // 3. Delta Aggregation + Delta recording - do nothing.
-      // 4. Delta Aggregation + Cumulative recording (async instrument) - do nothing
+      // 2. Cumulative Aggregation + Cumulative recording (async instrument).
+      //    Cumulative records are converted to delta recording with DeltaMetricProcessor.
+      //    Here we merge with our last record to get a cumulative aggregation.
+      // 3. Delta Aggregation + Delta recording
+      //    Do nothing here.
+      // 4. Delta Aggregation + Cumulative recording.
+      //    Cumulative records are converted to delta recording with DeltaMetricProcessor.
+      //    Do nothing here.
       if (aggregationTemporality === AggregationTemporality.CUMULATIVE) {
         // We need to make sure the current delta recording gets merged into the previous cumulative
-        // for the next cumulative measurement.
+        // for the next cumulative recording.
         result = TemporalMetricProcessor.merge(last.accumulations, unreportedAccumulations, this._aggregator);
       }
     } else {

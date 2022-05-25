@@ -106,7 +106,8 @@ describe('MeterSharedState', () => {
 
       /** creating metric events */
       let observableCalledCount = 0;
-      meter.createObservableCounter('test', observableResult => {
+      const observableCounter = meter.createObservableCounter('test');
+      observableCounter.addCallback(observableResult => {
         observableCalledCount++;
         observableResult.observe(1);
 
@@ -132,7 +133,7 @@ describe('MeterSharedState', () => {
       assert.strictEqual(observableCalledCount, 6);
     });
 
-    it('should call observable callback with view-ed async instruments', async () => {
+    it('should call observable callback once with view-ed async instruments', async () => {
       /** preparing test instrumentations */
       const { metricCollectors, meter, meterProvider } = setupInstruments();
 
@@ -149,7 +150,8 @@ describe('MeterSharedState', () => {
       });
 
       let observableCalledCount = 0;
-      meter.createObservableCounter('test', observableResult => {
+      const observableCounter = meter.createObservableCounter('test');
+      observableCounter.addCallback(observableResult => {
         observableCalledCount++;
         observableResult.observe(1);
 
@@ -176,7 +178,10 @@ describe('MeterSharedState', () => {
         ...metricCollectors.map(collector => collector.collect().then(verifyResult)),
         sleep(1).then(() => metricCollectors[0].collect().then(verifyResult)),
       ]);
-      assert.strictEqual(observableCalledCount, 6);
+      /**
+       * Two collectors, one collects 2 times, one collects 1 time.
+       */
+      assert.strictEqual(observableCalledCount, 3);
 
       /** collect metrics */
       await Promise.all([
@@ -184,7 +189,7 @@ describe('MeterSharedState', () => {
         ...metricCollectors.map(collector => collector.collect().then(verifyResult)),
         sleep(1).then(() => metricCollectors[0].collect().then(verifyResult)),
       ]);
-      assert.strictEqual(observableCalledCount, 12);
+      assert.strictEqual(observableCalledCount, 6);
     });
   });
 });

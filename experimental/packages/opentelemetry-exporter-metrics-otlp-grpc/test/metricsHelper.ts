@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Counter, Histogram, ObservableResult, ValueType } from '@opentelemetry/api-metrics';
+import { Counter, Histogram, ObservableGauge, ObservableResult, ValueType } from '@opentelemetry/api-metrics';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as grpc from '@grpc/grpc-js';
@@ -81,16 +81,18 @@ export function mockCounter(): Counter {
 
 export function mockObservableGauge(
   callback: (observableResult: ObservableResult) => void
-): void {
+): ObservableGauge {
   const name = 'double-observable-gauge';
-  return meter.createObservableGauge(
+  const observableGauge = meter.createObservableGauge(
     name,
-    callback,
     {
       description: 'sample observable gauge description',
       valueType: ValueType.DOUBLE,
     },
   );
+  observableGauge.addCallback(callback);
+
+  return observableGauge;
 }
 
 export function mockHistogram(): Histogram {
