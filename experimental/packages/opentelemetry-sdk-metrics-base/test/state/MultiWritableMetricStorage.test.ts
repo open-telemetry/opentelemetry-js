@@ -17,10 +17,9 @@
 import * as api from '@opentelemetry/api';
 import { MetricAttributes } from '@opentelemetry/api-metrics';
 import * as assert from 'assert';
-import { Measurement } from '../../src/Measurement';
 import { MultiMetricStorage } from '../../src/state/MultiWritableMetricStorage';
 import { WritableMetricStorage } from '../../src/state/WritableMetricStorage';
-import { assertMeasurementEqual, commonAttributes, commonValues } from '../util';
+import { assertMeasurementEqual, commonAttributes, commonValues, Measurement } from '../util';
 
 describe('MultiMetricStorage', () => {
   describe('record', () => {
