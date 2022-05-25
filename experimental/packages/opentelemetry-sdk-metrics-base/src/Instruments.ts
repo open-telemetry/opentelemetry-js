@@ -16,15 +16,13 @@
 
 import * as api from '@opentelemetry/api';
 import * as metrics from '@opentelemetry/api-metrics';
+import { ObservableCallback } from '@opentelemetry/api-metrics';
 import { InstrumentDescriptor } from './InstrumentDescriptor';
-import { WritableMetricStorage } from './state/WritableMetricStorage';
+import { ObservableRegistry } from './state/ObservableRegistry';
+import { AsyncWritableMetricStorage, WritableMetricStorage } from './state/WritableMetricStorage';
 
 export class SyncInstrument {
-  constructor(private _writableMetricStorage: WritableMetricStorage, private _descriptor: InstrumentDescriptor) {}
-
-  getName(): string {
-    return this._descriptor.name;
-  }
+  constructor(private _writableMetricStorage: WritableMetricStorage, protected _descriptor: InstrumentDescriptor) {}
 
   protected _record(value: number, attributes: metrics.MetricAttributes = {}, context: api.Context = api.context.active()) {
     if (this._descriptor.valueType === metrics.ValueType.INT && !Number.isInteger(value)) {
@@ -58,7 +56,7 @@ export class CounterInstrument extends SyncInstrument implements metrics.Counter
    */
   add(value: number, attributes?: metrics.MetricAttributes, ctx?: api.Context): void {
     if (value < 0) {
-      api.diag.warn(`negative value provided to counter ${this.getName()}: ${value}`);
+      api.diag.warn(`negative value provided to counter ${this._descriptor.name}: ${value}`);
       return;
     }
 
@@ -76,4 +74,38 @@ export class HistogramInstrument extends SyncInstrument implements metrics.Histo
   record(value: number, attributes?: metrics.MetricAttributes, ctx?: api.Context): void {
     this._record(value, attributes, ctx);
   }
+}
+
+export class ObservableInstrument implements metrics.Observable {
+  /** @internal */
+  _metricStorages: AsyncWritableMetricStorage[];
+  /** @internal */
+  _descriptor: InstrumentDescriptor;
+
+  constructor(descriptor: InstrumentDescriptor, metricStorages: AsyncWritableMetricStorage[], private _observableRegistry: ObservableRegistry) {
+    this._descriptor = descriptor;
+    this._metricStorages = metricStorages;
+  }
+
+  /**
+   * @see {metrics.Observable.addCallback}
+   */
+  addCallback(callback: ObservableCallback) {
+    this._observableRegistry.addCallback(callback, this);
+  }
+
+  /**
+   * @see {metrics.Observable.removeCallback}
+   */
+  removeCallback(callback: ObservableCallback) {
+    this._observableRegistry.removeCallback(callback, this);
+  }
+}
+
+export class ObservableCounterInstrument extends ObservableInstrument implements metrics.ObservableCounter {}
+export class ObservableGaugeInstrument extends ObservableInstrument implements metrics.ObservableGauge {}
+export class ObservableUpDownCounterInstrument extends ObservableInstrument implements metrics.ObservableUpDownCounter {}
+
+export function isObservableInstrument(it: unknown): it is ObservableInstrument {
+  return it instanceof ObservableInstrument;
 }

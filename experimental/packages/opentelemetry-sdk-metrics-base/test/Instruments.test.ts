@@ -348,7 +348,8 @@ describe('Instruments', () => {
           }
         }
       });
-      meter.createObservableCounter('test', callback);
+      const observableCounter = meter.createObservableCounter('test');
+      observableCounter.addCallback(callback);
 
       await deltaReader.collect();
       assert.strictEqual(callback.callCount, 1);
@@ -357,7 +358,8 @@ describe('Instruments', () => {
     it('should observe values', async () => {
       const { meter, cumulativeReader } = setup();
       let callCount = 0;
-      meter.createObservableCounter('test', observableResult => {
+      const observableCounter = meter.createObservableCounter('test');
+      observableCounter.addCallback(observableResult => {
         observableResult.observe(++callCount);
         observableResult.observe(1, { foo: 'bar' });
       });
@@ -401,7 +403,8 @@ describe('Instruments', () => {
           }
         }
       });
-      meter.createObservableUpDownCounter('test', callback);
+      const observableUpDownCounter = meter.createObservableUpDownCounter('test');
+      observableUpDownCounter.addCallback(callback);
 
       await deltaReader.collect();
       assert.strictEqual(callback.callCount, 1);
@@ -410,7 +413,8 @@ describe('Instruments', () => {
     it('should observe values', async () => {
       const { meter, cumulativeReader } = setup();
       let callCount = 0;
-      meter.createObservableUpDownCounter('test', observableResult => {
+      const observableUpDownCounter = meter.createObservableUpDownCounter('test');
+      observableUpDownCounter.addCallback(observableResult => {
         observableResult.observe(++callCount);
         observableResult.observe(1, { foo: 'bar' });
       });
@@ -454,7 +458,8 @@ describe('Instruments', () => {
           }
         }
       });
-      meter.createObservableGauge('test', callback);
+      const observableGauge = meter.createObservableGauge('test');
+      observableGauge.addCallback(callback);
 
       await deltaReader.collect();
       assert.strictEqual(callback.callCount, 1);
@@ -463,7 +468,8 @@ describe('Instruments', () => {
     it('should observe values', async () => {
       const { meter, cumulativeReader } = setup();
       let num = 0;
-      meter.createObservableGauge('test', observableResult => {
+      const observableGauge = meter.createObservableGauge('test');
+      observableGauge.addCallback(observableResult => {
         num += 10;
         if (num === 30) {
           observableResult.observe(-1);

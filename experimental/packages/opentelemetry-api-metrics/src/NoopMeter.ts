@@ -16,12 +16,17 @@
 
 import { Meter } from './types/Meter';
 import {
-  MetricOptions,
-  MetricAttributes,
+  BatchObservableCallback,
   Counter,
   Histogram,
-  UpDownCounter,
+  MetricOptions,
   ObservableCallback,
+  ObservableCounter,
+  ObservableGauge,
+  ObservableUpDownCounter,
+  UpDownCounter,
+  MetricAttributes,
+  Observable,
 } from './types/Metric';
 
 /**
@@ -32,67 +37,65 @@ export class NoopMeter implements Meter {
   constructor() {}
 
   /**
-   * Returns a constant noop histogram.
-   * @param name the name of the metric.
-   * @param [options] the metric options.
+   * @see {@link Meter.createHistogram}
    */
   createHistogram(_name: string, _options?: MetricOptions): Histogram {
     return NOOP_HISTOGRAM_METRIC;
   }
 
   /**
-   * Returns a constant noop counter.
-   * @param name the name of the metric.
-   * @param [options] the metric options.
+   * @see {@link Meter.createCounter}
    */
   createCounter(_name: string, _options?: MetricOptions): Counter {
     return NOOP_COUNTER_METRIC;
   }
 
   /**
-   * Returns a constant noop UpDownCounter.
-   * @param name the name of the metric.
-   * @param [options] the metric options.
+   * @see {@link Meter.createUpDownCounter}
    */
   createUpDownCounter(_name: string, _options?: MetricOptions): UpDownCounter {
     return NOOP_UP_DOWN_COUNTER_METRIC;
   }
 
   /**
-   * Returns a constant noop observable gauge.
-   * @param name the name of the metric.
-   * @param callback the observable gauge callback
-   * @param [options] the metric options.
+   * @see {@link Meter.createObservableGauge}
    */
   createObservableGauge(
     _name: string,
-    _callback: ObservableCallback,
     _options?: MetricOptions,
-  ): void {}
+  ): ObservableGauge {
+    return NOOP_OBSERVABLE_GAUGE_METRIC;
+  }
 
   /**
-   * Returns a constant noop observable counter.
-   * @param name the name of the metric.
-   * @param callback the observable counter callback
-   * @param [options] the metric options.
+   * @see {@link Meter.createObservableCounter}
    */
   createObservableCounter(
     _name: string,
-    _callback: ObservableCallback,
     _options?: MetricOptions,
-  ): void {}
+  ): ObservableCounter {
+    return NOOP_OBSERVABLE_COUNTER_METRIC;
+  }
 
   /**
-   * Returns a constant noop up down observable counter.
-   * @param name the name of the metric.
-   * @param callback the up down observable counter callback
-   * @param [options] the metric options.
+   * @see {@link Meter.createObservableUpDownCounter}
    */
   createObservableUpDownCounter(
     _name: string,
-    _callback: ObservableCallback,
     _options?: MetricOptions,
-  ): void {}
+  ): ObservableUpDownCounter {
+    return NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC;
+  }
+
+  /**
+   * @see {@link Meter.addBatchObservableCallback}
+   */
+  addBatchObservableCallback(_callback: BatchObservableCallback, _observables: Observable[]): void {}
+
+  /**
+   * @see {@link Meter.removeBatchObservableCallback}
+   */
+  removeBatchObservableCallback(_callback: BatchObservableCallback): void {}
 }
 
 export class NoopMetric {}
@@ -109,9 +112,23 @@ export class NoopHistogramMetric extends NoopMetric implements Histogram {
   record(_value: number, _attributes: MetricAttributes): void {}
 }
 
+export class NoopObservableMetric {
+  addCallback(_callback: ObservableCallback) {}
+  removeCallback(_callback: ObservableCallback) {}
+}
+
+export class NoopObservableCounterMetric extends NoopObservableMetric implements ObservableCounter {}
+export class NoopObservableGaugeMetric extends NoopObservableMetric implements ObservableGauge {}
+export class NoopObservableUpDownCounterMetric extends NoopObservableMetric implements ObservableUpDownCounter {}
+
 export const NOOP_METER = new NoopMeter();
 
 // Synchronous instruments
 export const NOOP_COUNTER_METRIC = new NoopCounterMetric();
 export const NOOP_HISTOGRAM_METRIC = new NoopHistogramMetric();
 export const NOOP_UP_DOWN_COUNTER_METRIC = new NoopUpDownCounterMetric();
+
+// Asynchronous instruments
+export const NOOP_OBSERVABLE_COUNTER_METRIC = new NoopObservableCounterMetric();
+export const NOOP_OBSERVABLE_GAUGE_METRIC = new NoopObservableGaugeMetric();
+export const NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC = new NoopObservableUpDownCounterMetric();

@@ -8,6 +8,11 @@ All notable changes to experimental packages in this project will be documented 
 
 * feat(metrics): metric readers and exporters now select aggregation temporality based on instrument type #2902 @seemk
 * refactor(metrics-sdk): rename InstrumentationLibrary -> InstrumentationScope #2959 @pichlermarc
+* feat(metrics): multi-instrument async callback support #2966 @legendecas
+  * changes on `meter.createObservableCounter`, `meter.createObservableGauge`, `meter.createObservableUpDownCounter`
+    * removed the second parameter `callback`
+    * returns an `Observable` object on which callbacks can be registered or unregistered.
+  * added `meter.addBatchObservableCallback` and `meter.removeBatchObservableCallback`.
 
 ### :rocket: (Enhancement)
 
