@@ -25,6 +25,7 @@ import { AsyncMetricStorage } from '../../src/state/AsyncMetricStorage';
 import { NoopAttributesProcessor } from '../../src/view/AttributesProcessor';
 import { ObservableRegistry } from '../../src/state/ObservableRegistry';
 import { assertMetricData, assertDataPoint, defaultInstrumentDescriptor, ObservableCallbackDelegate } from '../util';
+import { ObservableInstrument } from '../../src/Instruments';
 
 const deltaCollector: MetricCollectorHandle = {
   selectAggregationTemporality: () => AggregationTemporality.DELTA,
@@ -48,7 +49,13 @@ describe('AsyncMetricStorage', () => {
           new SumAggregator(),
           new NoopAttributesProcessor(),
         );
-        observableRegistry.addCallback(delegate.getCallback(), metricStorage);
+        const observable = new ObservableInstrument(
+          defaultInstrumentDescriptor,
+          [metricStorage],
+          observableRegistry
+        );
+
+        observableRegistry.addCallback(delegate.getCallback(), observable);
 
         delegate.setDelegate(observableResult => {
           observableResult.observe(1, { key: '1' });
@@ -117,7 +124,13 @@ describe('AsyncMetricStorage', () => {
           new SumAggregator(),
           new NoopAttributesProcessor(),
         );
-        observableRegistry.addCallback(delegate.getCallback(), metricStorage);
+        const observable = new ObservableInstrument(
+          defaultInstrumentDescriptor,
+          [metricStorage],
+          observableRegistry
+        );
+
+        observableRegistry.addCallback(delegate.getCallback(), observable);
 
         delegate.setDelegate(observableResult => {
           observableResult.observe(1, { key: '1' });

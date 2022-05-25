@@ -21,6 +21,57 @@ Please see the [version `0.27.0` README](https://github.com/open-telemetry/opent
 
 TODO: Add usage information for updated SDK
 
+## Installation of the Latest experimental version
+
+```bash
+npm install --save @opentelemetry/sdk-metrics-base
+```
+
+## Usage of the Latest experimental version
+
+The basic setup of the SDK can be seen as followings:
+
+```js
+const opentelemetry = require('@opentelemetry/api-metrics');
+const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
+
+// To create an instrument, you first need to initialize the Meter provider.
+// NOTE: The default OpenTelemetry meter provider does not record any metric instruments.
+//       Registering a working meter provider allows the API methods to record instruments.
+opentelemetry.setGlobalMeterProvider(new MeterProvider());
+
+// To record a metric event, we used the global singleton meter to create an instrument.
+const counter = opentelemetry.getMeter('default').createCounter('foo');
+
+// record a metric event.
+counter.add(1, { attributeKey: 'attribute-value' });
+```
+
+In conditions, we may need to setup an async instrument to observe costly events:
+
+```js
+// Creating an async instrument, similar to synchronous instruments
+const observableCounter = opentelemetry.getMeter('default')
+  .createObservableCounter('observable-counter');
+
+// Register a single-instrument callback to the async instrument.
+observableCounter.addCallback(async (observableResult) => {
+  // ... do async stuff
+  observableResult.observe(1, { attributeKey: 'attribute-value' });
+});
+
+// Register a multi-instrument callback and associate it with a set of async instruments.
+opentelemetry.getMeter('default')
+  .addBatchObservableCallback(batchObservableCallback, [ observableCounter ]);
+async function batchObservableCallback(batchObservableResult) {
+  // ... do async stuff
+  batchObservableResult.observe(observableCounter, 1, { attributeKey: 'attribute-value' });
+
+  // This is been dropped since the observable is not associated with the callback at registration.
+  batchObservableResult.observe(otherObservable, 2);
+}
+```
+
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

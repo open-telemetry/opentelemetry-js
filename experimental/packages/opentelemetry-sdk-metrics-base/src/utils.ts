@@ -138,3 +138,15 @@ export function FlatMap<T, R>(arr: T[], fn: (it: T) => R[]): R[] {
   });
   return result;
 }
+
+export function setEquals(lhs: Set<unknown>, rhs: Set<unknown>): boolean {
+  if (lhs.size !== rhs.size) {
+    return false;
+  }
+  for (const item of lhs) {
+    if (!rhs.has(item)) {
+      return false;
+    }
+  }
+  return true;
+}
