@@ -246,8 +246,7 @@ describe('fetch', () => {
         const response = await responsePromise;
         // this is a bit tricky as the only way to get all request headers from
         // fetch is to use json()
-        const json = await response.json();
-        lastResponse = json;
+        lastResponse = await response.json();
         const headers: { [key: string]: string } = {};
         Object.keys(lastResponse.headers).forEach(key => {
           headers[key.toLowerCase()] = lastResponse.headers[key];
