@@ -64,7 +64,7 @@ describe('Instruments', () => {
         descriptor: {
           name: 'test',
           description: '',
-          unit: '1',
+          unit: '',
           type: InstrumentType.COUNTER,
           valueType: ValueType.INT,
         },
@@ -180,7 +180,7 @@ describe('Instruments', () => {
         descriptor: {
           name: 'test',
           description: '',
-          unit: '1',
+          unit: '',
           type: InstrumentType.UP_DOWN_COUNTER,
           valueType: ValueType.INT,
         },
@@ -265,7 +265,7 @@ describe('Instruments', () => {
         descriptor: {
           name: 'test',
           description: '',
-          unit: '1',
+          unit: '',
           type: InstrumentType.HISTOGRAM,
           valueType: ValueType.INT,
         },
