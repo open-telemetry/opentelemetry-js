@@ -237,6 +237,18 @@ describe('fetch', () => {
       new tracing.SimpleSpanProcessor(dummySpanExporter)
     );
 
+    // endSpan is called after the whole response body is read
+    // this process is scheduled at the same time the fetch promise is resolved
+    // due to this we can't rely on getData resolution to know that the span has ended
+    let resolveEndSpan: (value: unknown) => void;
+    const spanEnded = new Promise(r => resolveEndSpan = r);
+    const readSpy = sinon.spy(window.ReadableStreamDefaultReader.prototype, 'read');
+    const endSpanStub: sinon.SinonStub<any> = sinon.stub(FetchInstrumentation.prototype, <any>'_endSpan')
+      .callsFake(async function (this: FetchInstrumentation, ...args: any[]) {
+        resolveEndSpan({});
+        return endSpanStub.wrappedMethod.apply(this, args);
+      });
+
     rootSpan = webTracerWithZone.startSpan('root');
     await api.context.with(api.trace.setSpan(api.context.active(), rootSpan), async () => {
       fakeNow = 0;
@@ -244,6 +256,11 @@ describe('fetch', () => {
         const responsePromise = getData(fileUrl, method);
         fakeNow = 300;
         const response = await responsePromise;
+
+        // if the url is not ignored, body.read should be called by now
+        // awaiting for the span to end
+        if (readSpy.callCount > 0) await spanEnded;
+
         // this is a bit tricky as the only way to get all request headers from
         // fetch is to use json()
         lastResponse = await response.json();
