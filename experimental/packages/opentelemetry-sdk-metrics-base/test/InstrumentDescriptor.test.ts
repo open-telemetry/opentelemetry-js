@@ -24,9 +24,8 @@ describe('InstrumentDescriptor', () => {
         const result = createInstrumentDescriptor('example', InstrumentType.COUNTER, {
           unit: val as any,
         });
-  
         assert.strictEqual(result.unit, '');
-      })
+      });
     }
   });
 });
