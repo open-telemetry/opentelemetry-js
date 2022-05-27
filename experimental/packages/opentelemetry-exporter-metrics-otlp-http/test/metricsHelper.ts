@@ -237,7 +237,7 @@ export function ensureCounterIsCorrect(
   assert.deepStrictEqual(metric, {
     name: 'int-counter',
     description: 'sample counter description',
-    unit: '1',
+    unit: '',
     sum: {
       dataPoints: [
         {
@@ -261,7 +261,7 @@ export function ensureDoubleCounterIsCorrect(
   assert.deepStrictEqual(metric, {
     name: 'double-counter',
     description: 'sample counter description',
-    unit: '1',
+    unit: '',
     doubleSum: {
       dataPoints: [
         {
@@ -287,7 +287,7 @@ export function ensureObservableGaugeIsCorrect(
   assert.deepStrictEqual(metric, {
     name,
     description: 'sample observable gauge description',
-    unit: '1',
+    unit: '',
     gauge: {
       dataPoints: [
         {
@@ -311,7 +311,7 @@ export function ensureObservableCounterIsCorrect(
   assert.deepStrictEqual(metric, {
     name,
     description: 'sample observable counter description',
-    unit: '1',
+    unit: '',
     doubleSum: {
       isMonotonic: true,
       dataPoints: [
@@ -337,7 +337,7 @@ export function ensureObservableUpDownCounterIsCorrect(
   assert.deepStrictEqual(metric, {
     name,
     description: 'sample observable up down counter description',
-    unit: '1',
+    unit: '',
     doubleSum: {
       isMonotonic: false,
       dataPoints: [
@@ -363,7 +363,7 @@ export function ensureHistogramIsCorrect(
   assert.deepStrictEqual(metric, {
     name: 'int-histogram',
     description: 'sample histogram description',
-    unit: '1',
+    unit: '',
     histogram: {
       dataPoints: [
         {

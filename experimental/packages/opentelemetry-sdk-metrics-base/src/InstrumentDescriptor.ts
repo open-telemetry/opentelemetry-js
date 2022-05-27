@@ -42,7 +42,7 @@ export function createInstrumentDescriptor(name: string, type: InstrumentType, o
     name,
     type,
     description: options?.description ?? '',
-    unit: options?.unit ?? '1',
+    unit: options?.unit ?? '',
     valueType: options?.valueType ?? ValueType.DOUBLE,
   };
 }
