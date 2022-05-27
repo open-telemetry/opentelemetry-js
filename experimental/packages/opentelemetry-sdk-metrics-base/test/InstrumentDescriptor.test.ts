@@ -18,36 +18,15 @@ import * as assert from 'assert';
 import {createInstrumentDescriptor, InstrumentType} from '../src/InstrumentDescriptor';
 
 describe('InstrumentDescriptor', () => {
-
   describe('createInstrumentDescriptor', () => {
-
-    // Spec compliance: https://github.com/open-telemetry/opentelemetry-js/issues/2910
-    it('should interpret a null unit value as a blank string', () => {
-      const result = createInstrumentDescriptor('example', InstrumentType.COUNTER, {
-        unit: null as any,
-      });
-
-      assert.strictEqual(result.unit, '');
-    });
-
-    // Spec compliance: https://github.com/open-telemetry/opentelemetry-js/issues/2910
-    it('should interpret an undefined unit value as a blank string', () => {
-      const result = createInstrumentDescriptor('example', InstrumentType.COUNTER, {
-        unit: undefined,
-      });
-
-      assert.strictEqual(result.unit, '');
-    });
-
-    // Spec compliance: https://github.com/open-telemetry/opentelemetry-js/issues/2910
-    it('should interpret a null unit value as a blank string', () => {
-      const result = createInstrumentDescriptor('example', InstrumentType.COUNTER, {
-        unit: '',
-      });
-
-      assert.strictEqual(result.unit, '1');
-    });
-
+    for (const val of [null, undefined]) {
+      it(`should interpret an empty unit value as a blank string (${val})`, () => {
+        const result = createInstrumentDescriptor('example', InstrumentType.COUNTER, {
+          unit: val as any,
+        });
+  
+        assert.strictEqual(result.unit, '');
+      })
+    }
   });
-
 });
