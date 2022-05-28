@@ -38,6 +38,7 @@ All notable changes to experimental packages in this project will be documented 
 * fix(opentelemetry-instrumentation-http): use correct origin when port is `null` #2948 @danielgblanco
 * fix(otlp-exporter-base): include esm and esnext in package files #2952 @dyladan
 * fix(otlp-http-exporter): update endpoint to match spec #2895 @svetlanabrennan
+* fix(instrumentation): only patch core modules if enabled #2993 @santigimeno
 * fix(otlp-transformer): include esm and esnext in package files and update README #2992 @pichlermarc
 * fix(metrics): specification compliant default metric unit #2983 @andyfleming
 
