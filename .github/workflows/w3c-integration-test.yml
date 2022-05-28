@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 🛎️
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: restore lock files
         uses: actions/cache@master # must use unreleased master to cache multiple paths

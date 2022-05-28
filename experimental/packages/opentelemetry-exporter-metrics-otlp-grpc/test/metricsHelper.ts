@@ -131,7 +131,7 @@ export function ensureExportedCounterIsCorrect(
   assert.deepStrictEqual(metric, {
     name: 'int-counter',
     description: 'sample counter description',
-    unit: '1',
+    unit: '',
     data: 'sum',
     sum: {
       dataPoints: [
@@ -159,7 +159,7 @@ export function ensureExportedObservableGaugeIsCorrect(
   assert.deepStrictEqual(metric, {
     name: 'double-observable-gauge',
     description: 'sample observable gauge description',
-    unit: '1',
+    unit: '',
     data: 'gauge',
     gauge: {
       dataPoints: [
@@ -187,7 +187,7 @@ export function ensureExportedHistogramIsCorrect(
   assert.deepStrictEqual(metric, {
     name: 'int-histogram',
     description: 'sample histogram description',
-    unit: '1',
+    unit: '',
     data: 'histogram',
     histogram: {
       dataPoints: [

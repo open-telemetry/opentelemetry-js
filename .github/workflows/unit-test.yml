@@ -16,7 +16,7 @@ jobs:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - uses: actions/setup-node@v3
         with:
@@ -59,7 +59,7 @@ jobs:
       - name: Permission Setup
         run: sudo chmod -R 777 /github /__w
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: restore lerna
         id: cache
@@ -92,14 +92,14 @@ jobs:
   webworker-tests:
     runs-on: ubuntu-latest
     container:
-      image: circleci/node:14-browsers
+      image: circleci/node:16-browsers
     env:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
-      - name: Checkout
-        uses: actions/checkout@v1
       - name: Permission Setup
         run: sudo chmod -R 777 /github /__w
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: restore lerna
         id: cache
