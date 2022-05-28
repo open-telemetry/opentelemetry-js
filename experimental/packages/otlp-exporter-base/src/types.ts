@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import { SpanAttributes } from '@opentelemetry/api';
-
 /**
  * Interface for handling error
  */
@@ -49,7 +47,6 @@ export interface ExportServiceError {
 export interface OTLPExporterConfigBase {
   headers?: Partial<Record<string, unknown>>;
   hostname?: string;
-  attributes?: SpanAttributes;
   url?: string;
   concurrencyLimit?: number;
   /** Maximum time the OTLP exporter will wait for each batch export.
