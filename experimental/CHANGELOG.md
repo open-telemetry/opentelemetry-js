@@ -25,6 +25,7 @@ All notable changes to experimental packages in this project will be documented 
     * removed the second parameter `callback`
     * returns an `Observable` object on which callbacks can be registered or unregistered.
   * added `meter.addBatchObservableCallback` and `meter.removeBatchObservableCallback`.
+* fix: remove attributes from OTLPExporterConfigBase #2991 @flarna
 
 ### :rocket: (Enhancement)
 
