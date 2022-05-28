@@ -6,6 +6,18 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.29.0
+
+### :boom: Breaking Change
+
 * feat(metrics): metric readers and exporters now select aggregation temporality based on instrument type #2902 @seemk
 * refactor(metrics-sdk): rename InstrumentationLibrary -> InstrumentationScope #2959 @pichlermarc
 * feat(metrics): multi-instrument async callback support #2966 @legendecas
