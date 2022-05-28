@@ -6,6 +6,18 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.29.0
+
+### :boom: Breaking Change
+
 * feat(metrics): metric readers and exporters now select aggregation temporality based on instrument type #2902 @seemk
 * refactor(metrics-sdk): rename InstrumentationLibrary -> InstrumentationScope #2959 @pichlermarc
 * feat(metrics): multi-instrument async callback support #2966 @legendecas
@@ -26,6 +38,7 @@ All notable changes to experimental packages in this project will be documented 
 * fix(opentelemetry-instrumentation-http): use correct origin when port is `null` #2948 @danielgblanco
 * fix(otlp-exporter-base): include esm and esnext in package files #2952 @dyladan
 * fix(otlp-http-exporter): update endpoint to match spec #2895 @svetlanabrennan
+* fix(instrumentation): only patch core modules if enabled #2993 @santigimeno
 * fix(otlp-transformer): include esm and esnext in package files and update README #2992 @pichlermarc
 * fix(metrics): specification compliant default metric unit #2983 @andyfleming
 

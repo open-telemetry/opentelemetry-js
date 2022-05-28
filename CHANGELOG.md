@@ -6,6 +6,18 @@ All notable changes to this project will be documented in this file.
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.3.0
+
+### :boom: Breaking Change
+
 * chore: remove unused InstrumentationConfig#path [#2944](https://github.com/open-telemetry/opentelemetry-js/pull/2944) @flarna
 
 ### :rocket: (Enhancement)
