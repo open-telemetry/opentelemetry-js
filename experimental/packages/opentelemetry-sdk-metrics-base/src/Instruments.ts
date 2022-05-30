@@ -72,6 +72,10 @@ export class HistogramInstrument extends SyncInstrument implements metrics.Histo
    * Records a measurement. Value of the measurement must not be negative.
    */
   record(value: number, attributes?: metrics.MetricAttributes, ctx?: api.Context): void {
+    if (value < 0) {
+      api.diag.warn(`negative value provided to histogram ${this._descriptor.name}: ${value}`);
+      return;
+    }
     this._record(value, attributes, ctx);
   }
 }
