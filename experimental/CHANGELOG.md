@@ -10,6 +10,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-metrics-base): only record non-negative histogram values #3002 @pichlermarc
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
