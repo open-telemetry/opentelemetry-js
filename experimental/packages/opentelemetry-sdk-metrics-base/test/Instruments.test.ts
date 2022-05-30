@@ -18,9 +18,24 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { AggregationTemporality, InstrumentDescriptor, InstrumentType, MeterProvider, MetricReader, DataPoint, DataPointType } from '../src';
+import {
+  AggregationTemporality,
+  InstrumentDescriptor,
+  InstrumentType,
+  MeterProvider,
+  MetricReader,
+  DataPoint,
+  DataPointType
+} from '../src';
 import { TestMetricReader } from './export/TestMetricReader';
-import { assertMetricData, assertDataPoint, commonValues, commonAttributes, defaultResource, defaultInstrumentationScope } from './util';
+import {
+  assertMetricData,
+  assertDataPoint,
+  commonValues,
+  commonAttributes,
+  defaultResource,
+  defaultInstrumentationScope
+} from './util';
 import { Histogram } from '../src/aggregator/types';
 import { ObservableResult, ValueType } from '@opentelemetry/api-metrics';
 
@@ -297,6 +312,18 @@ describe('Instruments', () => {
       });
     });
 
+    it('should not record negative INT values', async () => {
+      const { meter, deltaReader } = setup();
+      const histogram = meter.createHistogram('test', {
+        valueType: ValueType.DOUBLE,
+      });
+
+      histogram.record(-1, { foo: 'bar' });
+      await validateExport(deltaReader, {
+        dataPointType: DataPointType.HISTOGRAM,
+        dataPoints: [],
+      });
+    });
 
     it('should record DOUBLE values', async () => {
       const { meter, deltaReader } = setup();
@@ -334,6 +361,19 @@ describe('Instruments', () => {
             },
           },
         ],
+      });
+    });
+
+    it('should not record negative DOUBLE values', async () => {
+      const { meter, deltaReader } = setup();
+      const histogram = meter.createHistogram('test', {
+        valueType: ValueType.DOUBLE,
+      });
+
+      histogram.record(-0.5, { foo: 'bar' });
+      await validateExport(deltaReader, {
+        dataPointType: DataPointType.HISTOGRAM,
+        dataPoints: [],
       });
     });
   });
