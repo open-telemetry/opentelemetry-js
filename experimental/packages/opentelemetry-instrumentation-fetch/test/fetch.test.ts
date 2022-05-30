@@ -243,7 +243,7 @@ describe('fetch', () => {
     let resolveEndSpan: (value: unknown) => void;
     const spanEnded = new Promise(r => resolveEndSpan = r);
     const readSpy = sinon.spy(window.ReadableStreamDefaultReader.prototype, 'read');
-    const endSpanStub: sinon.SinonStub<any> = sinon.stub(FetchInstrumentation.prototype, <any>'_endSpan')
+    const endSpanStub: sinon.SinonStub<any> = sinon.stub(FetchInstrumentation.prototype, '_endSpan' as any)
       .callsFake(async function (this: FetchInstrumentation, ...args: any[]) {
         resolveEndSpan({});
         return endSpanStub.wrappedMethod.apply(this, args);
