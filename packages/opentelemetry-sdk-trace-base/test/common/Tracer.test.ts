@@ -44,9 +44,12 @@ import { invalidAttributes, validAttributes } from './util';
 
 describe('Tracer', () => {
   const tracerProvider = new BasicTracerProvider();
-  const envSource = (typeof window !== 'undefined'
-    ? window
-    : process.env) as any;
+  let envSource: Record<string, any>;
+  if (typeof process === 'undefined') {
+    envSource = (globalThis as unknown) as Record<string, any>;
+  } else {
+    envSource = process.env as Record<string, any>;
+  }
 
   class TestSampler implements Sampler {
     shouldSample(_context: Context, _traceId: string, _spanName: string, _spanKind: SpanKind, attributes: SpanAttributes, links: Link[]) {

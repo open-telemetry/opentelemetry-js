@@ -28,7 +28,7 @@ export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcesso
   }
 
   private onInit(config?: BatchSpanProcessorBrowserConfig): void {
-    if (config?.disableAutoFlushOnDocumentHide !== true && document != null) {
+    if (config?.disableAutoFlushOnDocumentHide !== true && typeof document !== 'undefined') {
       this._visibilityChangeListener = () => {
         if (document.visibilityState === 'hidden') {
           void this.forceFlush();
@@ -45,11 +45,13 @@ export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcesso
   }
 
   protected onShutdown(): void {
-    if (this._visibilityChangeListener) {
-      document.removeEventListener('visibilitychange', this._visibilityChangeListener);
-    }
-    if (this._pageHideListener) {
-      document.removeEventListener('pagehide', this._pageHideListener);
+    if (typeof document !== 'undefined') {
+      if (this._visibilityChangeListener) {
+        document.removeEventListener('visibilitychange', this._visibilityChangeListener);
+      }
+      if (this._pageHideListener) {
+        document.removeEventListener('pagehide', this._pageHideListener);
+      }
     }
   }
 }

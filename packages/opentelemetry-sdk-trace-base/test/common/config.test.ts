@@ -23,9 +23,12 @@ import * as assert from 'assert';
 import { buildSamplerFromEnv } from '../../src/config';
 
 describe('config', () => {
-  const envSource = (typeof window !== 'undefined'
-    ? window
-    : process.env) as any;
+  let envSource: Record<string, any>;
+  if (typeof process === 'undefined') {
+    envSource = (globalThis as unknown) as Record<string, any>;
+  } else {
+    envSource = process.env as Record<string, any>;
+  }
 
   describe('buildSamplerFromEnv()', () => {
     afterEach(() => {

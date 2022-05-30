@@ -20,7 +20,9 @@ import { SpanExporter } from '../../../src';
 import { BatchSpanProcessor } from '../../../src/platform/browser/export/BatchSpanProcessor';
 import { TestTracingSpanExporter } from '../../common/export/TestTracingSpanExporter';
 
-describe('BatchSpanProcessor - web', () => {
+const describeDocument = typeof document === 'object' ? describe : describe.skip;
+
+describeDocument('BatchSpanProcessor - web main context', () => {
   let visibilityState: VisibilityState = 'visible';
   let exporter: SpanExporter;
   let processor: BatchSpanProcessor;
@@ -98,5 +100,16 @@ describe('BatchSpanProcessor - web', () => {
       document.dispatchEvent(visibilityChangeEvent);
       assert.strictEqual(forceFlushSpy.callCount, 0);
     });
+  });
+});
+
+describe('BatchSpanProcessor', () => {
+  it('without exception', async () => {
+    const exporter = new TestTracingSpanExporter();
+    const spanProcessor = new BatchSpanProcessor(exporter);
+    assert.ok(spanProcessor instanceof BatchSpanProcessor);
+
+    await spanProcessor.forceFlush();
+    await spanProcessor.shutdown();
   });
 });
