@@ -257,10 +257,10 @@ describe('Instruments', () => {
       });
 
       histogram.record(10);
-      // -0.1 should be trunc-ed to -0
-      histogram.record(-0.1);
+      // 0.1 should be trunc-ed to 0
+      histogram.record(0.1);
       histogram.record(100, { foo: 'bar' });
-      histogram.record(-0.1, { foo: 'bar' });
+      histogram.record(0.1, { foo: 'bar' });
       await validateExport(deltaReader, {
         descriptor: {
           name: 'test',
@@ -305,9 +305,9 @@ describe('Instruments', () => {
       });
 
       histogram.record(10);
-      histogram.record(-0.1);
+      histogram.record(0.1);
       histogram.record(100, { foo: 'bar' });
-      histogram.record(-0.1, { foo: 'bar' });
+      histogram.record(0.1, { foo: 'bar' });
       await validateExport(deltaReader, {
         dataPointType: DataPointType.HISTOGRAM,
         dataPoints: [
@@ -316,10 +316,10 @@ describe('Instruments', () => {
             value: {
               buckets: {
                 boundaries: [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000],
-                counts: [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+                counts: [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
               },
               count: 2,
-              sum: 9.9,
+              sum: 10.1,
             },
           },
           {
@@ -327,10 +327,10 @@ describe('Instruments', () => {
             value: {
               buckets: {
                 boundaries: [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000],
-                counts: [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+                counts: [0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0],
               },
               count: 2,
-              sum: 99.9,
+              sum: 100.1,
             },
           },
         ],
