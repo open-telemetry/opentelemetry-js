@@ -259,6 +259,8 @@ describe('Utility', () => {
         attributes[AttributeNames.HTTP_ERROR_MESSAGE],
         errorMessage
       );
+      assert.strictEqual(span.events.length, 1);
+      assert.strictEqual(span.events[0].name, 'exception');
       assert.ok(attributes[AttributeNames.HTTP_ERROR_NAME]);
     });
   });
