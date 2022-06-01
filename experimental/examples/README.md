@@ -8,7 +8,7 @@ These examples are using work in progress metrics packages.
 
 |Name | Description | Complexity Level |
 ------------- | ------------- | ------------ |
-|[metrics](metrics/) | Basic metrics collection and exports those metrics to a Prometheus compatible endpoint | Beginner |
+|[prometheus](prometheus/) | Basic Metric use with Prometheus (`@opentelemetry/exporter-prometheus`) Exporter | Beginner |
 
 ## Contributing
 
