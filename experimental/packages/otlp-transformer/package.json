@@ -12,6 +12,7 @@
   "main": "build/src/index.js",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
+    "prepublishOnly": "npm run compile",
     "compile": "tsc --build tsconfig.all.json",
     "clean": "tsc --build --clean tsconfig.all.json",
     "lint": "eslint . --ext .ts",
