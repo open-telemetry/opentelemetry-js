@@ -10,9 +10,6 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
-* fix(sdk-metrics-base): only record non-negative histogram values #3002 @pichlermarc
-* fix(otlp-transformer): include missing prepublishOnly script which ensures esm and esnext build files are created and packaged @dyladan
-
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
@@ -22,6 +19,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(sdk-metrics-base): only record non-negative histogram values #3002 @pichlermarc
+* fix(otlp-transformer): include missing prepublishOnly script which ensures esm and esnext build files are created and packaged @dyladan
 
 ## 0.29.0
 
