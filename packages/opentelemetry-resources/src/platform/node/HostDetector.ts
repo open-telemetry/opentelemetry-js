@@ -15,9 +15,9 @@
  */
 
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { Resource } from '../Resource';
-import { Detector, ResourceAttributes } from '../types';
-import { ResourceDetectionConfig } from '../config';
+import { Resource } from '../../Resource';
+import { Detector, ResourceAttributes } from '../../types';
+import { ResourceDetectionConfig } from '../../config';
 import { arch, hostname } from 'os';
 
 /**

@@ -24,14 +24,14 @@ import { ResourceAttributes } from '../types';
  */
 class BrowserDetector implements Detector {
   async detect(config?: ResourceDetectionConfig): Promise<Resource> {
-    const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
+    const isBrowser = typeof navigator !== 'undefined';
     if (!isBrowser) {
       return Resource.empty();
     }
     const browserResource: ResourceAttributes = {
       [SemanticResourceAttributes.PROCESS_RUNTIME_NAME]: 'browser',
       [SemanticResourceAttributes.PROCESS_RUNTIME_DESCRIPTION]: 'Web Browser',
-      [SemanticResourceAttributes.PROCESS_RUNTIME_VERSION]: window.navigator.userAgent
+      [SemanticResourceAttributes.PROCESS_RUNTIME_VERSION]: navigator.userAgent
     };
     return this._getResourceAttributes(browserResource, config);
   }
