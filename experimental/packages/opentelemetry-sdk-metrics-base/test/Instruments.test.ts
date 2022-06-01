@@ -18,9 +18,24 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { AggregationTemporality, InstrumentDescriptor, InstrumentType, MeterProvider, MetricReader, DataPoint, DataPointType } from '../src';
+import {
+  AggregationTemporality,
+  InstrumentDescriptor,
+  InstrumentType,
+  MeterProvider,
+  MetricReader,
+  DataPoint,
+  DataPointType
+} from '../src';
 import { TestMetricReader } from './export/TestMetricReader';
-import { assertMetricData, assertDataPoint, commonValues, commonAttributes, defaultResource, defaultInstrumentationScope } from './util';
+import {
+  assertMetricData,
+  assertDataPoint,
+  commonValues,
+  commonAttributes,
+  defaultResource,
+  defaultInstrumentationScope
+} from './util';
 import { Histogram } from '../src/aggregator/types';
 import { ObservableResult, ValueType } from '@opentelemetry/api-metrics';
 
@@ -257,10 +272,10 @@ describe('Instruments', () => {
       });
 
       histogram.record(10);
-      // -0.1 should be trunc-ed to -0
-      histogram.record(-0.1);
+      // 0.1 should be trunc-ed to 0
+      histogram.record(0.1);
       histogram.record(100, { foo: 'bar' });
-      histogram.record(-0.1, { foo: 'bar' });
+      histogram.record(0.1, { foo: 'bar' });
       await validateExport(deltaReader, {
         descriptor: {
           name: 'test',
@@ -297,6 +312,18 @@ describe('Instruments', () => {
       });
     });
 
+    it('should not record negative INT values', async () => {
+      const { meter, deltaReader } = setup();
+      const histogram = meter.createHistogram('test', {
+        valueType: ValueType.DOUBLE,
+      });
+
+      histogram.record(-1, { foo: 'bar' });
+      await validateExport(deltaReader, {
+        dataPointType: DataPointType.HISTOGRAM,
+        dataPoints: [],
+      });
+    });
 
     it('should record DOUBLE values', async () => {
       const { meter, deltaReader } = setup();
@@ -305,9 +332,9 @@ describe('Instruments', () => {
       });
 
       histogram.record(10);
-      histogram.record(-0.1);
+      histogram.record(0.1);
       histogram.record(100, { foo: 'bar' });
-      histogram.record(-0.1, { foo: 'bar' });
+      histogram.record(0.1, { foo: 'bar' });
       await validateExport(deltaReader, {
         dataPointType: DataPointType.HISTOGRAM,
         dataPoints: [
@@ -316,10 +343,10 @@ describe('Instruments', () => {
             value: {
               buckets: {
                 boundaries: [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000],
-                counts: [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+                counts: [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
               },
               count: 2,
-              sum: 9.9,
+              sum: 10.1,
             },
           },
           {
@@ -327,13 +354,26 @@ describe('Instruments', () => {
             value: {
               buckets: {
                 boundaries: [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000],
-                counts: [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+                counts: [0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0],
               },
               count: 2,
-              sum: 99.9,
+              sum: 100.1,
             },
           },
         ],
+      });
+    });
+
+    it('should not record negative DOUBLE values', async () => {
+      const { meter, deltaReader } = setup();
+      const histogram = meter.createHistogram('test', {
+        valueType: ValueType.DOUBLE,
+      });
+
+      histogram.record(-0.5, { foo: 'bar' });
+      await validateExport(deltaReader, {
+        dataPointType: DataPointType.HISTOGRAM,
+        dataPoints: [],
       });
     });
   });

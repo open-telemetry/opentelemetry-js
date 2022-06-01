@@ -197,7 +197,6 @@ describe('OTLPMetricExporter - node with json over http', () => {
           foo: 'bar',
         },
         hostname: 'foo',
-        attributes: {},
         url: 'http://foo.bar.com',
         keepAlive: true,
         httpAgentOptions: { keepAliveMsecs: 2000 },

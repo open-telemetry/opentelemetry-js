@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanAttributes, diag } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import { ExportResult, ExportResultCode, BindOnceFuture } from '@opentelemetry/core';
 import {
   OTLPExporterError,
@@ -33,7 +33,6 @@ export abstract class OTLPExporterBase<
   > {
   public readonly url: string;
   public readonly hostname: string | undefined;
-  public readonly attributes?: SpanAttributes;
   public readonly timeoutMillis: number;
   protected _concurrencyLimit: number;
   protected _sendingPromises: Promise<unknown>[] = [];
@@ -47,8 +46,6 @@ export abstract class OTLPExporterBase<
     if (typeof config.hostname === 'string') {
       this.hostname = config.hostname;
     }
-
-    this.attributes = config.attributes;
 
     this.shutdown = this.shutdown.bind(this);
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
