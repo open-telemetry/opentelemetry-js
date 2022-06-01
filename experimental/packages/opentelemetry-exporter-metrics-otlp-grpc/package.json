@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-metrics-otlp-grpc",
-  "version": "0.29.0",
+  "version": "0.29.1",
   "description": "OpenTelemetry Collector Metrics Exporter allows user to send collected metrics to the OpenTelemetry Collector",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -49,7 +49,7 @@
   "devDependencies": {
     "@babel/core": "7.16.0",
     "@opentelemetry/api": "^1.0.0",
-    "@opentelemetry/api-metrics": "0.29.0",
+    "@opentelemetry/api-metrics": "0.29.1",
     "@types/mocha": "8.2.3",
     "@types/node": "14.17.33",
     "@types/sinon": "10.0.6",
@@ -70,10 +70,10 @@
     "@grpc/grpc-js": "^1.5.9",
     "@grpc/proto-loader": "^0.6.9",
     "@opentelemetry/core": "1.3.0",
-    "@opentelemetry/exporter-metrics-otlp-http": "0.29.0",
-    "@opentelemetry/otlp-grpc-exporter-base": "0.29.0",
-    "@opentelemetry/otlp-transformer": "0.29.0",
+    "@opentelemetry/exporter-metrics-otlp-http": "0.29.1",
+    "@opentelemetry/otlp-grpc-exporter-base": "0.29.1",
+    "@opentelemetry/otlp-transformer": "0.29.1",
     "@opentelemetry/resources": "1.3.0",
-    "@opentelemetry/sdk-metrics-base": "0.29.0"
+    "@opentelemetry/sdk-metrics-base": "0.29.1"
   }
 }

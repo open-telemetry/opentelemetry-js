@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/api-metrics",
-  "version": "0.29.0",
+  "version": "0.29.1",
   "description": "Public metrics API for OpenTelemetry",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",

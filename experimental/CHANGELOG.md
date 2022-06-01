@@ -16,6 +16,12 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :house: (Internal)
 
+## 0.29.1
+
+### :bug: (Bug Fix)
+
+* fix(sdk-metrics-base): only record non-negative histogram values #3002 @pichlermarc
+
 ## 0.29.0
 
 ### :boom: Breaking Change
