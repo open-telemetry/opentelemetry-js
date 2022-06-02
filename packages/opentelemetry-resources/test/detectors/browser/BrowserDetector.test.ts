@@ -22,15 +22,13 @@ import {
   assertEmptyResource,
 } from '../../util/resource-assertions';
 
-
 describeBrowser('browserDetector()', () => {
-
   afterEach(() => {
     sinon.restore();
   });
 
   it('should return browser information', async () => {
-    sinon.stub(window, 'navigator').value({
+    sinon.stub(globalThis, 'navigator').value({
       userAgent: 'dddd',
     });
 
@@ -42,11 +40,10 @@ describeBrowser('browserDetector()', () => {
     });
   });
   it('should return empty resources if version is missing', async () => {
-    sinon.stub(window, 'navigator').value({
+    sinon.stub(globalThis, 'navigator').value({
       userAgent: '',
     });
     const resource: Resource = await browserDetector.detect();
     assertEmptyResource(resource);
   });
 });
-
