@@ -14,6 +14,10 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :house: (Internal)
 
+## 0.29.2
+
+* Support for 1.3.1 of stable packages
+
 ## 0.29.1
 
 ### :bug: (Bug Fix)
