@@ -16,6 +16,12 @@ All notable changes to this project will be documented in this file.
 
 ### :house: (Internal)
 
+## 1.3.1
+
+### :bug: (Bug Fix)
+
+* fix(resources): fix browser compatibility for host and os detectors [#3004](https://github.com/open-telemetry/opentelemetry-js/pull/3004) @legendecas
+
 ## 1.3.0
 
 ### :boom: Breaking Change
