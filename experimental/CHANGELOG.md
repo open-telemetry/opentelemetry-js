@@ -6,6 +6,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* fix: remove aws and gcp detector from SDK #3024 @flarna
+
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
