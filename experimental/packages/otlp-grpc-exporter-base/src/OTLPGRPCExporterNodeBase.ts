@@ -116,4 +116,5 @@ export abstract class OTLPGRPCExporterNodeBase<
 
   abstract getServiceProtoPath(): string;
   abstract getServiceClientType(): ServiceClientType;
+  abstract getUrlFromConfig(config: OTLPGRPCExporterConfigNode): string;
 }

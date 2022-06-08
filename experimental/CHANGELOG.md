@@ -13,6 +13,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(otlp-transformer): remove type dependency on Long #3022 @legendecas
+* fix(grpc-exporter): use non-normalized URL to determine channel security #3019 @pichlermarc
 
 ### :books: (Refine Doc)
 

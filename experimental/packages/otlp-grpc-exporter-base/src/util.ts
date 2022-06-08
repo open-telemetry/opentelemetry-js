@@ -33,7 +33,7 @@ export function onInit<ExportItem, ServiceRequest>(
 ): void {
   collector.grpcQueue = [];
 
-  const credentials: grpc.ChannelCredentials = configureSecurity(config.credentials, collector.url);
+  const credentials: grpc.ChannelCredentials = configureSecurity(config.credentials, collector.getUrlFromConfig(config));
 
   const includeDirs = [path.resolve(__dirname, '..', 'protos')];
 
@@ -92,7 +92,7 @@ export function send<ExportItem, ServiceRequest>(
     collector.serviceClient.export(
       serviceRequest,
       collector.metadata || new grpc.Metadata(),
-      {deadline: deadline},
+      { deadline: deadline },
       (err: ExportServiceError) => {
         if (err) {
           diag.error('Service request', serviceRequest);
@@ -225,7 +225,7 @@ function retrieveCertChain(): Buffer | undefined {
 }
 
 function toGrpcCompression(compression: CompressionAlgorithm): GrpcCompressionAlgorithm {
-  if(compression === CompressionAlgorithm.NONE)
+  if (compression === CompressionAlgorithm.NONE)
     return GrpcCompressionAlgorithm.NONE;
   else if (compression === CompressionAlgorithm.GZIP)
     return GrpcCompressionAlgorithm.GZIP;
@@ -246,6 +246,6 @@ export function configureCompression(compression: CompressionAlgorithm | undefin
   } else {
     const definedCompression = getEnv().OTEL_EXPORTER_OTLP_TRACES_COMPRESSION || getEnv().OTEL_EXPORTER_OTLP_COMPRESSION;
 
-    return definedCompression === 'gzip' ? GrpcCompressionAlgorithm.GZIP: GrpcCompressionAlgorithm.NONE;
+    return definedCompression === 'gzip' ? GrpcCompressionAlgorithm.GZIP : GrpcCompressionAlgorithm.NONE;
   }
 }
