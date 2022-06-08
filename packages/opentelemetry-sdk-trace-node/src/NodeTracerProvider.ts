@@ -23,6 +23,7 @@ import {
   BasicTracerProvider,
   PROPAGATOR_FACTORY,
   SDKRegistrationConfig,
+  SpanExporter,
 } from '@opentelemetry/sdk-trace-base';
 import * as semver from 'semver';
 import { NodeTracerConfig } from './config';
@@ -40,6 +41,7 @@ export class NodeTracerProvider extends BasicTracerProvider {
     string,
     PROPAGATOR_FACTORY
   >([
+    ...BasicTracerProvider._registeredPropagators,
     [
       'b3',
       () =>
@@ -68,10 +70,22 @@ export class NodeTracerProvider extends BasicTracerProvider {
     super.register(config);
   }
 
-  protected override  _getPropagator(name: string): TextMapPropagator | undefined {
+  /**
+   * TS cannot yet infer the type of this.constructor:
+   * https://github.com/Microsoft/TypeScript/issues/3841#issuecomment-337560146
+   * Do not override either of the getters in your child class unless you really need to.
+   * We have to do it here because the previous version of BasicTracerProvider's getters
+   * had BasicTracerProvider's static method hardcoded and we want do undo that behavior.
+   */
+  protected override _getPropagator(name: string): TextMapPropagator | undefined {
     return (
-      super._getPropagator(name) ||
-      NodeTracerProvider._registeredPropagators.get(name)?.()
-    );
+      (this.constructor as typeof BasicTracerProvider)._registeredPropagators
+    ).get(name)?.();
+  }
+
+  protected override _getSpanExporter(name: string): SpanExporter | undefined {
+    return (
+      (this.constructor as typeof BasicTracerProvider)._registeredExporters
+    ).get(name)?.();
   }
 }
