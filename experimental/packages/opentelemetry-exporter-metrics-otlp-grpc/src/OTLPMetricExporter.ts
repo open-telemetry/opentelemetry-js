@@ -61,13 +61,11 @@ class OTLPMetricExporterProxy extends OTLPGRPCExporterNodeBase<ResourceMetrics, 
   getUrlFromConfig(config: OTLPGRPCExporterConfigNode): string {
     if (typeof config.url === 'string') {
       return config.url;
-    } else if (getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0) {
-      return getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT;
-    } else if (getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0) {
-      return getEnv().OTEL_EXPORTER_OTLP_ENDPOINT;
-    } else {
-      return DEFAULT_COLLECTOR_URL;
     }
+
+    return getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT ||
+      getEnv().OTEL_EXPORTER_OTLP_ENDPOINT ||
+      DEFAULT_COLLECTOR_URL;
   }
 }
 
