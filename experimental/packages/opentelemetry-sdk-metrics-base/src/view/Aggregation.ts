@@ -94,6 +94,7 @@ export class HistogramAggregation extends Aggregation {
  */
 export class ExplicitBucketHistogramAggregation extends Aggregation {
   private _boundaries: number[];
+
   /**
    * @param boundaries the bucket boundaries of the histogram aggregation
    */

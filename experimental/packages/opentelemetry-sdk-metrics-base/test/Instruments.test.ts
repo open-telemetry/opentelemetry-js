@@ -295,6 +295,8 @@ describe('Instruments', () => {
               },
               count: 2,
               sum: 10,
+              max: 10,
+              min: 0
             },
           },
           {
@@ -306,8 +308,79 @@ describe('Instruments', () => {
               },
               count: 2,
               sum: 100,
+              max: 100,
+              min: 0
             },
           },
+        ],
+      });
+    });
+
+    it('should collect min and max', async () => {
+      const { meter, deltaReader, cumulativeReader } = setup();
+      const histogram = meter.createHistogram('test', {
+        valueType: ValueType.INT,
+      });
+
+      histogram.record(10);
+      histogram.record(100);
+      await deltaReader.collect();
+      await cumulativeReader.collect();
+
+      histogram.record(20);
+      histogram.record(90);
+
+      // Delta should only have min/max of values recorded after the collection.
+      await validateExport(deltaReader, {
+        descriptor: {
+          name: 'test',
+          description: '',
+          unit: '',
+          type: InstrumentType.HISTOGRAM,
+          valueType: ValueType.INT,
+        },
+        dataPointType: DataPointType.HISTOGRAM,
+        dataPoints: [
+          {
+            attributes: {},
+            value: {
+              buckets: {
+                boundaries: [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000],
+                counts: [0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0],
+              },
+              count: 2,
+              sum: 110,
+              min: 20,
+              max: 90
+            },
+          }
+        ],
+      });
+
+      // Cumulative should have min/max of all recorded values.
+      await validateExport(cumulativeReader, {
+        descriptor: {
+          name: 'test',
+          description: '',
+          unit: '',
+          type: InstrumentType.HISTOGRAM,
+          valueType: ValueType.INT,
+        },
+        dataPointType: DataPointType.HISTOGRAM,
+        dataPoints: [
+          {
+            attributes: {},
+            value: {
+              buckets: {
+                boundaries: [0, 5, 10, 25, 50, 75, 100, 250, 500, 1000],
+                counts: [0, 0, 0, 2, 0, 0, 1, 1, 0, 0, 0],
+              },
+              count: 4,
+              sum: 220,
+              min: 10,
+              max: 100
+            },
+          }
         ],
       });
     });
@@ -347,6 +420,8 @@ describe('Instruments', () => {
               },
               count: 2,
               sum: 10.1,
+              max: 10,
+              min: 0.1
             },
           },
           {
@@ -358,6 +433,8 @@ describe('Instruments', () => {
               },
               count: 2,
               sum: 100.1,
+              max: 100,
+              min: 0.1
             },
           },
         ],

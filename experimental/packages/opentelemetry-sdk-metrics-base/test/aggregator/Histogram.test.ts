@@ -75,6 +75,8 @@ describe('HistogramAggregator', () => {
         },
         count: 2,
         sum: 13,
+        min: -1,
+        max: -1
       });
 
       assert.deepStrictEqual(aggregator.diff(prev, curr), expected);
@@ -108,6 +110,8 @@ describe('HistogramAggregator', () => {
               },
               count: 2,
               sum: 1,
+              min: 0,
+              max: 1
             },
           },
         ],

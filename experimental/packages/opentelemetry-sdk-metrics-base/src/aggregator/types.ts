@@ -59,6 +59,8 @@ export interface Histogram {
   };
   sum: number;
   count: number;
+  min: number;
+  max: number;
 }
 
 /**
