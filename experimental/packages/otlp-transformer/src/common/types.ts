@@ -41,7 +41,7 @@ export interface IAnyValue {
   boolValue?: (boolean | null);
 
   /** AnyValue intValue */
-  intValue?: (number | Long | null);
+  intValue?: (number | null);
 
   /** AnyValue doubleValue */
   doubleValue?: (number | null);

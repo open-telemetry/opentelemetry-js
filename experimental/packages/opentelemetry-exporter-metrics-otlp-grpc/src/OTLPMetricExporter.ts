@@ -51,17 +51,21 @@ class OTLPMetricExporterProxy extends OTLPGRPCExporterNodeBase<ResourceMetrics, 
   }
 
   getDefaultUrl(config: OTLPGRPCExporterConfigNode): string {
-    return typeof config.url === 'string'
-      ? validateAndNormalizeUrl(config.url)
-      : getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT.length > 0
-        ? validateAndNormalizeUrl(getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT)
-        : getEnv().OTEL_EXPORTER_OTLP_ENDPOINT.length > 0
-          ? validateAndNormalizeUrl(getEnv().OTEL_EXPORTER_OTLP_ENDPOINT)
-          : validateAndNormalizeUrl(DEFAULT_COLLECTOR_URL);
+    return validateAndNormalizeUrl(this.getUrlFromConfig(config));
   }
 
   convert(metrics: ResourceMetrics[]): IExportMetricsServiceRequest {
     return createExportMetricsServiceRequest(metrics);
+  }
+
+  getUrlFromConfig(config: OTLPGRPCExporterConfigNode): string {
+    if (typeof config.url === 'string') {
+      return config.url;
+    }
+
+    return getEnv().OTEL_EXPORTER_OTLP_METRICS_ENDPOINT ||
+      getEnv().OTEL_EXPORTER_OTLP_ENDPOINT ||
+      DEFAULT_COLLECTOR_URL;
   }
 }
 

@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
-export * from './BrowserDetector';
-export * from './EnvDetector';
-export * from './ProcessDetector';
+import { Resource } from '../Resource';
+import { Detector } from '../types';
+
+export class NoopDetector implements Detector {
+  async detect(): Promise<Resource> {
+    return new Resource({});
+  }
+}
+
+export const noopDetector = new NoopDetector();
