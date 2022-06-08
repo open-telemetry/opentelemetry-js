@@ -23,8 +23,6 @@ import {
   registerInstrumentations,
 } from '@opentelemetry/instrumentation';
 import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
-import { awsEc2Detector } from '@opentelemetry/resource-detector-aws';
-import { gcpDetector } from '@opentelemetry/resource-detector-gcp';
 import {
   detectResources,
   envDetector,
@@ -117,7 +115,7 @@ export class NodeSDK {
   /** Detect resource attributes */
   public async detectResources(config?: ResourceDetectionConfig): Promise<void> {
     const internalConfig: ResourceDetectionConfig = {
-      detectors: [awsEc2Detector, gcpDetector, envDetector, processDetector],
+      detectors: [ envDetector, processDetector],
       ...config,
     };
 

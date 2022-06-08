@@ -6,13 +6,22 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* fix: remove aws and gcp detector from SDK #3024 @flarna
+
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
 
+* fix(otlp-transformer): remove type dependency on Long #3022 @legendecas
+* fix(grpc-exporter): use non-normalized URL to determine channel security #3019 @pichlermarc
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 0.29.2
+
+* Support for 1.3.1 of stable packages
 
 ## 0.29.1
 
