@@ -127,5 +127,26 @@ describe('ExplicitBucketHistogramAggregation', () => {
       assert(aggregator2 instanceof HistogramAggregator);
       assert.deepStrictEqual(aggregator2['_boundaries'], [10, 100, 1000]);
     });
+
+    describe('should create histogram aggregators', () => {
+      it('with min/max recording by default', () => {
+        const aggregator = new ExplicitBucketHistogramAggregation([100, 10, 1])
+          .createAggregator(defaultInstrumentDescriptor);
+        assert.deepStrictEqual(aggregator['_recordMinMax'], true);
+      });
+
+      it('with min/max recording when _recordMinMax is set to true', () => {
+        const aggregator = new ExplicitBucketHistogramAggregation([100, 10, 1], true)
+          .createAggregator(defaultInstrumentDescriptor);
+        assert.deepStrictEqual(aggregator['_recordMinMax'], true);
+      });
+
+      it('without min/max recording when _recordMinMax is set to true', () => {
+        const aggregator = new ExplicitBucketHistogramAggregation([100, 10, 1], false)
+          .createAggregator(defaultInstrumentDescriptor);
+        assert.deepStrictEqual(aggregator['_recordMinMax'], false);
+      });
+
+    });
   });
 });

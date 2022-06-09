@@ -174,6 +174,12 @@ export interface IHistogramDataPoint {
 
   /** HistogramDataPoint flags */
   flags?: number;
+
+  /** HistogramDataPoint min */
+  min?: number;
+
+  /** HistogramDataPoint max */
+  max?: number;
 }
 
 /** Properties of an ExponentialHistogramDataPoint. */

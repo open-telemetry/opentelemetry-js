@@ -37,18 +37,20 @@ function createNewEmptyCheckpoint(boundaries: number[]): Histogram {
     },
     sum: 0,
     count: 0,
+    hasMinMax: false,
     min: Infinity,
     max: -1
   };
 }
 
 function hasMinMax(histogram: Histogram): boolean{
-  return histogram.count > 0;
+  return histogram.hasMinMax;
 }
 
 export class HistogramAccumulation implements Accumulation {
   constructor(
     private readonly _boundaries: number[],
+    private _recordMinMax = true,
     private _current: Histogram = createNewEmptyCheckpoint(_boundaries)
   ) {}
 
@@ -56,8 +58,11 @@ export class HistogramAccumulation implements Accumulation {
     this._current.count += 1;
     this._current.sum += value;
 
-    this._current.min = Math.min(value, this._current.min);
-    this._current.max = Math.max(value, this._current.max);
+    if(this._recordMinMax) {
+      this._current.min = Math.min(value, this._current.min);
+      this._current.max = Math.max(value, this._current.max);
+      this._current.hasMinMax = true;
+    }
 
     for (let i = 0; i < this._boundaries.length; i++) {
       if (value < this._boundaries[i]) {
@@ -83,11 +88,12 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
 
   /**
    * @param _boundaries upper bounds of recorded values.
+   * @param _recordMinMax If set to true, min and max will be recorded. Otherwise, min and max will not be recorded.
    */
-  constructor(private readonly _boundaries: number[]) {}
+  constructor(private readonly _boundaries: number[], private readonly _recordMinMax: boolean) {}
 
   createAccumulation() {
-    return new HistogramAccumulation(this._boundaries);
+    return new HistogramAccumulation(this._boundaries, this._recordMinMax);
   }
 
   /**
@@ -107,27 +113,30 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
       mergedCounts[idx] = previousCounts[idx] + deltaCounts[idx];
     }
 
-    let min = -1;
+    let min = Infinity;
     let max = -1;
 
-    if(hasMinMax(previousValue) && hasMinMax(deltaValue)){
-      min = Math.min(previousValue.min, deltaValue.min);
-      max = Math.max(previousValue.max, deltaValue.max);
-    } else if(hasMinMax(previousValue)){
-      min = previousValue.min;
-      max = previousValue.max;
-    } else if(hasMinMax(deltaValue)){
-      min = deltaValue.min;
-      max = deltaValue.max;
+    if(this._recordMinMax) {
+      if (hasMinMax(previousValue) && hasMinMax(deltaValue)) {
+        min = Math.min(previousValue.min, deltaValue.min);
+        max = Math.max(previousValue.max, deltaValue.max);
+      } else if (hasMinMax(previousValue)) {
+        min = previousValue.min;
+        max = previousValue.max;
+      } else if (hasMinMax(deltaValue)) {
+        min = deltaValue.min;
+        max = deltaValue.max;
+      }
     }
 
-    return new HistogramAccumulation(previousValue.buckets.boundaries, {
+    return new HistogramAccumulation(previousValue.buckets.boundaries, this._recordMinMax, {
       buckets: {
         boundaries: previousValue.buckets.boundaries,
         counts: mergedCounts,
       },
       count: previousValue.count + deltaValue.count,
       sum: previousValue.sum + deltaValue.sum,
+      hasMinMax: this._recordMinMax && (hasMinMax(previousValue) || hasMinMax(deltaValue)),
       min: min,
       max: max
     });
@@ -148,14 +157,15 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
       diffedCounts[idx] = currentCounts[idx] - previousCounts[idx];
     }
 
-    return new HistogramAccumulation(previousValue.buckets.boundaries, {
+    return new HistogramAccumulation(previousValue.buckets.boundaries, this._recordMinMax, {
       buckets: {
         boundaries: previousValue.buckets.boundaries,
         counts: diffedCounts,
       },
       count: currentValue.count - previousValue.count,
       sum: currentValue.sum - previousValue.sum,
-      min: -1,
+      hasMinMax: false,
+      min: Infinity,
       max: -1
     });
   }

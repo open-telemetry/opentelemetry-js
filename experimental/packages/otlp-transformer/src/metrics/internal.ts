@@ -129,17 +129,34 @@ function toHistogramDataPoints(
 ): IHistogramDataPoint[] {
   return metricData.dataPoints.map(dataPoint => {
     const histogram = dataPoint.value as Histogram;
-    return {
-      attributes: toAttributes(dataPoint.attributes),
-      bucketCounts: histogram.buckets.counts,
-      explicitBounds: histogram.buckets.boundaries,
-      count: histogram.count,
-      sum: histogram.sum,
-      startTimeUnixNano: hrTimeToNanoseconds(dataPoint.startTime),
-      timeUnixNano: hrTimeToNanoseconds(
-        dataPoint.endTime
-      ),
-    };
+    if(histogram.hasMinMax){
+      return {
+        attributes: toAttributes(dataPoint.attributes),
+        bucketCounts: histogram.buckets.counts,
+        explicitBounds: histogram.buckets.boundaries,
+        count: histogram.count,
+        sum: histogram.sum,
+        min: histogram.min,
+        max: histogram.max,
+        startTimeUnixNano: hrTimeToNanoseconds(dataPoint.startTime),
+        timeUnixNano: hrTimeToNanoseconds(
+          dataPoint.endTime
+        ),
+      };
+    } else {
+      return {
+        attributes: toAttributes(dataPoint.attributes),
+        bucketCounts: histogram.buckets.counts,
+        explicitBounds: histogram.buckets.boundaries,
+        count: histogram.count,
+        sum: histogram.sum,
+        startTimeUnixNano: hrTimeToNanoseconds(dataPoint.startTime),
+        timeUnixNano: hrTimeToNanoseconds(
+          dataPoint.endTime
+        ),
+      };
+    }
+
   });
 }
 

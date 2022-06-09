@@ -59,6 +59,7 @@ export interface Histogram {
   };
   sum: number;
   count: number;
+  hasMinMax: boolean;
   min: number;
   max: number;
 }
