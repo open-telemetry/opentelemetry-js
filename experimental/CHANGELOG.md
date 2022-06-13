@@ -11,6 +11,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :rocket: (Enhancement)
 
 * feat(http-instrumentation): record exceptions in http instrumentation #3008 @luismiramirez
+* feat(sdk-metrics-base): implement min/max recording for Histograms #3032 @pichlermarc
 
 ### :bug: (Bug Fix)
 
