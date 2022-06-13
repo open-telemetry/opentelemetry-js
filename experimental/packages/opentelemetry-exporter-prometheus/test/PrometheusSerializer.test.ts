@@ -27,7 +27,7 @@ import {
   Histogram,
 } from '@opentelemetry/sdk-metrics-base';
 import * as sinon from 'sinon';
-import { PrometheusSerializer } from '../src/PrometheusSerializer';
+import { PrometheusSerializer } from '../src';
 import { mockedHrTimeMs, mockHrTime } from './util';
 
 const attributes = {
