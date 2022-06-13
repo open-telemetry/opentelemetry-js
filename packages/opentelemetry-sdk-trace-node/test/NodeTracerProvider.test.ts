@@ -14,19 +14,32 @@
  * limitations under the License.
  */
 
+import * as sinon from 'sinon';
+import * as assert from 'assert';
+
 import {
   context,
+  Context,
+  ContextManager,
+  propagation,
+  ROOT_CONTEXT,
+  TextMapGetter,
+  TextMapPropagator,
+  TextMapSetter,
+  trace,
   TraceFlags,
-  propagation, trace,
 } from '@opentelemetry/api';
 import { AlwaysOnSampler, AlwaysOffSampler } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
-import { Span } from '@opentelemetry/sdk-trace-base';
+import {
+  BatchSpanProcessor,
+  InMemorySpanExporter,
+  Span,
+  SpanExporter,
+} from '@opentelemetry/sdk-trace-base';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import * as assert from 'assert';
-import * as path from 'path';
-import { ContextManager, ROOT_CONTEXT } from '@opentelemetry/api';
+
 import { NodeTracerProvider } from '../src/NodeTracerProvider';
 
 const sleep = (time: number) =>
@@ -230,6 +243,122 @@ describe('NodeTracerProvider', () => {
         'x-b3-parentspanid',
         'uber-trace-id',
       ]);
+    });
+  });
+
+
+  describe('Custom TracerProvider through inheritance', () => {
+    class DummyPropagator implements TextMapPropagator {
+      inject(
+        context: Context,
+        carrier: any,
+        setter: TextMapSetter<any>
+      ): void {
+        throw new Error('Method not implemented.');
+      }
+      extract(
+        context: Context,
+        carrier: any,
+        getter: TextMapGetter<any>
+      ): Context {
+        throw new Error('Method not implemented.');
+      }
+      fields(): string[] {
+        throw new Error('Method not implemented.');
+      }
+    }
+
+    class DummyExporter extends InMemorySpanExporter {}
+
+    let setGlobalPropagatorStub: sinon.SinonSpy<
+      [TextMapPropagator],
+      boolean
+    >;
+
+    beforeEach(() => {
+      // to avoid actually registering the TraceProvider and leaking env to other tests
+      sinon.stub(trace, 'setGlobalTracerProvider');
+      setGlobalPropagatorStub = sinon.spy(propagation, 'setGlobalPropagator');
+
+      process.env.OTEL_TRACES_EXPORTER = 'custom-exporter';
+      process.env.OTEL_PROPAGATORS = 'custom-propagator';
+    });
+
+    afterEach(() => {
+      delete process.env.OTEL_TRACES_EXPORTER;
+      delete process.env.OTEL_PROPAGATORS;
+      sinon.restore();
+    });
+
+    it('can be extended by overriding registered components', () => {
+      class CustomTracerProvider extends NodeTracerProvider {
+        protected static override readonly _registeredPropagators = new Map<
+          string,
+          () => TextMapPropagator
+            >([
+              ['custom-propagator', () => new DummyPropagator()],
+            ]);
+
+        protected static override readonly _registeredExporters = new Map<
+          string,
+          () => SpanExporter
+            >([
+              ['custom-exporter', () => new DummyExporter()],
+            ]);
+      }
+
+      const provider = new CustomTracerProvider({});
+      provider.register();
+      const processor = provider.getActiveSpanProcessor();
+      assert(processor instanceof BatchSpanProcessor);
+      // @ts-expect-error access configured to verify its the correct one
+      const exporter = processor._exporter;
+      assert(exporter instanceof DummyExporter);
+
+      sinon.assert.calledOnceWithExactly(setGlobalPropagatorStub, sinon.match.instanceOf(DummyPropagator));
+    });
+
+    it('the old way of extending still works', () => {
+      // this is an anti-pattern, but we test that for backwards compatibility
+      class CustomTracerProvider extends NodeTracerProvider {
+        protected static override readonly _registeredPropagators = new Map<
+          string,
+          () => TextMapPropagator
+            >([
+              ['custom-propagator', () => new DummyPropagator()],
+            ]);
+
+        protected static override readonly _registeredExporters = new Map<
+          string,
+          () => SpanExporter
+            >([
+              ['custom-exporter', () => new DummyExporter()],
+            ]);
+
+        protected override  _getPropagator(name: string): TextMapPropagator | undefined {
+          return (
+            super._getPropagator(name) ||
+            CustomTracerProvider._registeredPropagators.get(name)?.()
+          );
+        }
+
+        protected override _getSpanExporter(name: string): SpanExporter | undefined {
+          return (
+            super._getSpanExporter(name) ||
+            CustomTracerProvider._registeredExporters.get(name)?.()
+          );
+        }
+      }
+
+      const provider = new CustomTracerProvider({});
+      provider.register();
+      const processor = provider.getActiveSpanProcessor();
+      assert(processor instanceof BatchSpanProcessor);
+      // @ts-expect-error access configured to verify its the correct one
+      const exporter = processor._exporter;
+      assert(exporter instanceof DummyExporter);
+
+      sinon.assert.calledOnceWithExactly(setGlobalPropagatorStub, sinon.match.instanceOf(DummyPropagator));
     });
   });
 });
