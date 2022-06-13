@@ -34,18 +34,9 @@ const sleep = (time: number) =>
     return setTimeout(resolve, time);
   });
 
-const INSTALLED_PLUGINS_PATH = path.join(
-  __dirname,
-  'instrumentation',
-  'node_modules'
-);
-
 describe('NodeTracerProvider', () => {
   let provider: NodeTracerProvider;
   let contextManager: ContextManager;
-  before(() => {
-    module.paths.push(INSTALLED_PLUGINS_PATH);
-  });
 
   beforeEach(() => {
     contextManager = new AsyncHooksContextManager();
@@ -53,8 +44,6 @@ describe('NodeTracerProvider', () => {
   });
 
   afterEach(() => {
-    // clear require cache
-    Object.keys(require.cache).forEach(key => delete require.cache[key]);
     contextManager.disable();
     context.disable();
   });
