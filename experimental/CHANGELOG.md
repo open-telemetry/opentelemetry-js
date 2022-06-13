@@ -8,9 +8,10 @@ All notable changes to experimental packages in this project will be documented 
 
 * fix: remove aws and gcp detector from SDK #3024 @flarna
 * feat(sdk-metrics-base): implement min/max recording for Histograms #3032 @pichlermarc
-  - adds `min`/`max` recording to Histograms
-  - updates the proto to 0.18 so that `min` and `max` can be exported, this breaks the OTLP/JSON Metric Exporter for all
-    collector versions <0.52 due to https://github.com/open-telemetry/opentelemetry-collector/issues/5312.
+  * adds `min`/`max` recording to Histograms
+  * updates [opentelemetry-proto](https://github.com/open-telemetry/opentelemetry-proto) to `0.18` so that `min` and
+    `max` can be exported. This change breaks the OTLP/JSON Metric Exporter for all collector versions `<0.52` due to
+    [open-telemetry/opentelemetry-collector#5312](https://github.com/open-telemetry/opentelemetry-collector/issues/5312).
 
 ### :rocket: (Enhancement)
 
