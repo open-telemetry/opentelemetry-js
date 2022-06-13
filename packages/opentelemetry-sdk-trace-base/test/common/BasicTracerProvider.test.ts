@@ -267,7 +267,7 @@ describe('BasicTracerProvider', () => {
       });
 
       afterEach(() => {
-        setGlobalPropagatorStub.restore();
+        sinon.restore();
 
         // otherwise we may assign 'undefined' (a string)
         if (originalPropagators !== undefined) {
@@ -282,10 +282,10 @@ describe('BasicTracerProvider', () => {
         provider.register({
           propagator: new DummyPropagator(),
         });
-        assert.ok(
-          setGlobalPropagatorStub.calledOnceWithExactly(
-            sinon.match.instanceOf(DummyPropagator)
-          )
+
+        sinon.assert.calledOnceWithExactly(
+          setGlobalPropagatorStub,
+          sinon.match.instanceOf(DummyPropagator)
         );
       });
 
@@ -293,10 +293,9 @@ describe('BasicTracerProvider', () => {
         const provider = new BasicTracerProvider();
         provider.register();
 
-        assert.ok(
-          setGlobalPropagatorStub.calledOnceWithExactly(
-            sinon.match.instanceOf(CompositePropagator)
-          )
+        sinon.assert.calledOnceWithExactly(
+          setGlobalPropagatorStub,
+          sinon.match.instanceOf(CompositePropagator)
         );
         assert.deepStrictEqual(setGlobalPropagatorStub.args[0][0].fields(), [
           'traceparent',
@@ -312,13 +311,10 @@ describe('BasicTracerProvider', () => {
         const provider = new BasicTracerProvider({});
         provider.register();
 
-        assert.ok(
-          warnStub.calledOnceWithExactly(
-            'Propagator "missing-propagator" requested through environment variable is unavailable.'
-          )
+        sinon.assert.calledOnceWithExactly(
+          warnStub,
+          'Propagator "missing-propagator" requested through environment variable is unavailable.'
         );
-
-        warnStub.restore();
       });
     });
 
