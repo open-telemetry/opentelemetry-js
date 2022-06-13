@@ -7,11 +7,14 @@ All notable changes to experimental packages in this project will be documented 
 ### :boom: Breaking Change
 
 * fix: remove aws and gcp detector from SDK #3024 @flarna
+* feat(sdk-metrics-base): implement min/max recording for Histograms #3032 @pichlermarc
+  - adds `min`/`max` recording to Histograms
+  - updates the proto to 0.18 so that `min` and `max` can be exported, this breaks the OTLP/JSON Metric Exporter for all
+    collector versions <0.52 due to https://github.com/open-telemetry/opentelemetry-collector/issues/5312.
 
 ### :rocket: (Enhancement)
 
 * feat(http-instrumentation): record exceptions in http instrumentation #3008 @luismiramirez
-* feat(sdk-metrics-base): implement min/max recording for Histograms #3032 @pichlermarc
 
 ### :bug: (Bug Fix)
 
