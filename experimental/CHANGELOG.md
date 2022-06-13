@@ -10,6 +10,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(http-instrumentation): record exceptions in http instrumentation #3008 @luismiramirez
+
 ### :bug: (Bug Fix)
 
 * fix(otlp-transformer): remove type dependency on Long #3022 @legendecas
