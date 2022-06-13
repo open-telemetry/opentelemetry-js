@@ -11,6 +11,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :rocket: (Enhancement)
 
 * feat(http-instrumentation): record exceptions in http instrumentation #3008 @luismiramirez
+* feat(opentelemetry-exporter-prometheus): export PrometheusSerializer #3034 @matschaffer
 
 ### :bug: (Bug Fix)
 
