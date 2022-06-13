@@ -46,8 +46,6 @@ import {
 } from '../../src';
 
 describe('BasicTracerProvider', () => {
-  let removeEvent: (() => void) | undefined;
-
   let envSource: Record<string, any>;
   if (typeof process === 'undefined') {
     envSource = (globalThis as unknown) as Record<string, any>;
@@ -61,10 +59,6 @@ describe('BasicTracerProvider', () => {
 
   afterEach(() => {
     sinon.restore();
-    if (removeEvent) {
-      removeEvent();
-      removeEvent = undefined;
-    }
   });
 
   describe('constructor', () => {
