@@ -34,7 +34,7 @@ export function hashAttributes(attributes: MetricAttributes): string {
   keys = keys.sort();
   return keys.reduce((result, key) => {
     if (result.length > 2) {
-      result += ',';
+      result += '|#';
     }
     return (result += key + ':' + attributes[key]);
   }, '|#');

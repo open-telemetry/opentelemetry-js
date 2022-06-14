@@ -24,7 +24,7 @@ import {
   DataPoint,
   Histogram,
 } from '@opentelemetry/sdk-metrics-base';
-import type { MetricAttributes } from '@opentelemetry/api-metrics';
+import type { MetricAttributes, MetricAttributeValue } from '@opentelemetry/api-metrics';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
 
 type PrometheusDataTypeLiteral =
@@ -38,9 +38,15 @@ function escapeString(str: string) {
   return str.replace(/\\/g, '\\\\').replace(/\n/g, '\\n');
 }
 
-function escapeAttributeValue(str: string) {
+/**
+ * String Attribute values are converted directly to Prometheus attribute values.
+ * Non-string values are represented as JSON-encoded strings.
+ *
+ * `undefined` is converted to an empty string.
+ */
+function escapeAttributeValue(str: MetricAttributeValue = '') {
   if (typeof str !== 'string') {
-    str = String(str);
+    str = JSON.stringify(str);
   }
   return escapeString(str).replace(/"/g, '\\"');
 }
