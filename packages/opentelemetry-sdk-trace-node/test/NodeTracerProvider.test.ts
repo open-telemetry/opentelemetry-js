@@ -270,33 +270,33 @@ describe('NodeTracerProvider', () => {
 
     class DummyExporter extends InMemorySpanExporter {}
 
-    let setGlobalPropagatorStub: sinon.SinonSpy<
-      [TextMapPropagator],
-      boolean
-    >;
-
     beforeEach(() => {
-      // to avoid actually registering the TraceProvider and leaking env to other tests
-      sinon.stub(trace, 'setGlobalTracerProvider');
-      setGlobalPropagatorStub = sinon.spy(propagation, 'setGlobalPropagator');
-
       process.env.OTEL_TRACES_EXPORTER = 'custom-exporter';
       process.env.OTEL_PROPAGATORS = 'custom-propagator';
+
+      propagation.disable();
+      trace.disable();
     });
 
     afterEach(() => {
       delete process.env.OTEL_TRACES_EXPORTER;
       delete process.env.OTEL_PROPAGATORS;
+
+      propagation.disable();
+      trace.disable();
+
       sinon.restore();
     });
 
     it('can be extended by overriding registered components', () => {
+      const propagator = new DummyPropagator();
+
       class CustomTracerProvider extends NodeTracerProvider {
         protected static override readonly _registeredPropagators = new Map<
           string,
           () => TextMapPropagator
             >([
-              ['custom-propagator', () => new DummyPropagator()],
+              ['custom-propagator', () => propagator],
             ]);
 
         protected static override readonly _registeredExporters = new Map<
@@ -315,17 +315,19 @@ describe('NodeTracerProvider', () => {
       const exporter = processor._exporter;
       assert(exporter instanceof DummyExporter);
 
-      sinon.assert.calledOnceWithExactly(setGlobalPropagatorStub, sinon.match.instanceOf(DummyPropagator));
+      assert.strictEqual(propagation['_getGlobalPropagator'](), propagator);
     });
 
     it('the old way of extending still works', () => {
+      const propagator = new DummyPropagator();
+
       // this is an anti-pattern, but we test that for backwards compatibility
       class CustomTracerProvider extends NodeTracerProvider {
         protected static override readonly _registeredPropagators = new Map<
           string,
           () => TextMapPropagator
             >([
-              ['custom-propagator', () => new DummyPropagator()],
+              ['custom-propagator', () => propagator],
             ]);
 
         protected static override readonly _registeredExporters = new Map<
@@ -358,7 +360,7 @@ describe('NodeTracerProvider', () => {
       const exporter = processor._exporter;
       assert(exporter instanceof DummyExporter);
 
-      sinon.assert.calledOnceWithExactly(setGlobalPropagatorStub, sinon.match.instanceOf(DummyPropagator));
+      assert.strictEqual(propagation['_getGlobalPropagator'](), propagator);
     });
   });
 });
