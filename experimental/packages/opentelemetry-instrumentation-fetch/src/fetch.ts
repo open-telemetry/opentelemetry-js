@@ -63,6 +63,8 @@ export interface FetchInstrumentationConfig extends InstrumentationConfig {
   ignoreUrls?: Array<string | RegExp>;
   /** Function for adding custom attributes on the span */
   applyCustomAttributesOnSpan?: FetchCustomAttributeFunction;
+  // Ignore adding network events as span events
+  ignoreNetworkEvents?: boolean;
 }
 
 /**
@@ -105,7 +107,9 @@ export class FetchInstrumentation extends InstrumentationBase<Promise<Response>>
       },
       api.trace.setSpan(api.context.active(), span)
     );
-    web.addSpanNetworkEvents(childSpan, corsPreFlightRequest);
+    if (!this._getConfig().ignoreNetworkEvents) {
+      web.addSpanNetworkEvents(childSpan, corsPreFlightRequest);
+    }
     childSpan.end(
       corsPreFlightRequest[web.PerformanceTimingNames.RESPONSE_END]
     );
@@ -247,7 +251,9 @@ export class FetchInstrumentation extends InstrumentationBase<Promise<Response>>
         this._addChildSpan(span, corsPreFlightRequest);
         this._markResourceAsUsed(corsPreFlightRequest);
       }
-      web.addSpanNetworkEvents(span, mainRequest);
+      if (!this._getConfig().ignoreNetworkEvents) {
+        web.addSpanNetworkEvents(span, mainRequest);
+      }
     }
   }
 
