@@ -48,8 +48,8 @@ export class InMemoryMetricExporter implements PushMetricExporter {
   }
 
   /**
-   * Returns all the collected scope metrics
-   * @returns ScopeMetric[]
+   * Returns all the collected resource metrics
+   * @returns ResourceMetrics[]
    */
   public getMetrics(): ResourceMetrics[] {
     return this._metrics
