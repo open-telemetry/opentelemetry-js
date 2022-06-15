@@ -43,10 +43,6 @@ function createNewEmptyCheckpoint(boundaries: number[]): Histogram {
   };
 }
 
-function hasMinMax(histogram: Histogram): boolean{
-  return histogram.hasMinMax;
-}
-
 export class HistogramAccumulation implements Accumulation {
   constructor(
     private readonly _boundaries: number[],
@@ -58,7 +54,7 @@ export class HistogramAccumulation implements Accumulation {
     this._current.count += 1;
     this._current.sum += value;
 
-    if(this._recordMinMax) {
+    if (this._recordMinMax) {
       this._current.min = Math.min(value, this._current.min);
       this._current.max = Math.max(value, this._current.max);
       this._current.hasMinMax = true;
@@ -116,14 +112,14 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
     let min = Infinity;
     let max = -1;
 
-    if(this._recordMinMax) {
-      if (hasMinMax(previousValue) && hasMinMax(deltaValue)) {
+    if (this._recordMinMax) {
+      if (previousValue.hasMinMax && deltaValue.hasMinMax) {
         min = Math.min(previousValue.min, deltaValue.min);
         max = Math.max(previousValue.max, deltaValue.max);
-      } else if (hasMinMax(previousValue)) {
+      } else if (previousValue.hasMinMax) {
         min = previousValue.min;
         max = previousValue.max;
-      } else if (hasMinMax(deltaValue)) {
+      } else if (deltaValue.hasMinMax) {
         min = deltaValue.min;
         max = deltaValue.max;
       }
@@ -136,7 +132,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
       },
       count: previousValue.count + deltaValue.count,
       sum: previousValue.sum + deltaValue.sum,
-      hasMinMax: this._recordMinMax && (hasMinMax(previousValue) || hasMinMax(deltaValue)),
+      hasMinMax: this._recordMinMax && (previousValue.hasMinMax || deltaValue.hasMinMax),
       min: min,
       max: max
     });
