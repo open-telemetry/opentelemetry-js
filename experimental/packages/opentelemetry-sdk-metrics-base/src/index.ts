@@ -21,6 +21,7 @@ export * from './export/MetricExporter';
 export * from './export/MetricProducer';
 export * from './export/MetricReader';
 export * from './export/PeriodicExportingMetricReader';
+export * from './export/InMemoryMetricExporter';
 export { InstrumentDescriptor, InstrumentType } from './InstrumentDescriptor';
 export * from './Meter';
 export * from './MeterProvider';
