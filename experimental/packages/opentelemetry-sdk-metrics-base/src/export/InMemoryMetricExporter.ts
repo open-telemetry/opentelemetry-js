@@ -22,7 +22,9 @@ import { ResourceMetrics } from "./MetricData"
 import { PushMetricExporter } from "./MetricExporter"
 
 /**
- * TODO
+ * In-memory Metrics Exporter is a Push Metric Exporter
+ * which accumulates metrics data in the local memory and
+ * allows to inspect it (useful for e.g. unit tests).
  */
 export class InMemoryMetricExporter implements PushMetricExporter {
   protected _shutdown = false
