@@ -10,6 +10,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(opentelemetry-instrumentation-fetch): optionally ignore network events #3028 @gregolsen
 * feat(http-instrumentation): record exceptions in http instrumentation #3008 @luismiramirez
 
 ### :bug: (Bug Fix)
