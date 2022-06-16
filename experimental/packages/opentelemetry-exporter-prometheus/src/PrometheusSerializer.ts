@@ -209,6 +209,9 @@ export class PrometheusSerializer {
     const help = `# HELP ${name} ${escapeString(
       metricData.descriptor.description || 'description missing'
     )}`;
+    const unit = metricData.descriptor.unit ? `\n# UNIT ${name} ${escapeString(
+      metricData.descriptor.unit,
+    )}` : '';
     const type = `# TYPE ${name} ${toPrometheusType(
       metricData.descriptor.type,
       dataPointType
@@ -233,7 +236,7 @@ export class PrometheusSerializer {
       }
     }
 
-    return `${help}\n${type}\n${results}`.trim();
+    return `${help}${unit}\n${type}\n${results}`.trim();
   }
 
   serializeSingularDataPoint(name: string, type: InstrumentType, dataPoint: DataPoint<number>): string {
