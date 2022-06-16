@@ -355,7 +355,7 @@ clear whether the exception will escape.
   CODE_LINENO: 'code.lineno',
 
   /**
-   * The GraphQL document being executed
+   * The GraphQL document being executed.
    */
   GRAPHQL_DOCUMENT: 'graphql.document',
 
@@ -365,7 +365,7 @@ clear whether the exception will escape.
   GRAPHQL_OPERATION_NAME: 'graphql.operation.name',
 
   /**
-   * The type of the operation being executed
+   * The type of the operation being executed.
    */
   GRAPHQL_OPERATION_TYPE: 'graphql.operation.type',
 
