@@ -179,20 +179,20 @@ export class PrometheusSerializer {
   serialize(resourceMetrics: ResourceMetrics): string {
     let str = '';
     for (const scopeMetrics of resourceMetrics.scopeMetrics) {
-      str += this.serializeScopeMetrics(scopeMetrics);
+      str += this._serializeScopeMetrics(scopeMetrics);
     }
     return str;
   }
 
-  serializeScopeMetrics(scopeMetrics: ScopeMetrics) {
+  private _serializeScopeMetrics(scopeMetrics: ScopeMetrics) {
     let str = '';
     for (const metric of scopeMetrics.metrics) {
-      str += this.serializeMetricData(metric) + '\n';
+      str += this._serializeMetricData(metric) + '\n';
     }
     return str;
   }
 
-  serializeMetricData(metricData: MetricData) {
+  private _serializeMetricData(metricData: MetricData) {
     let name = sanitizePrometheusMetricName(
       escapeString(metricData.descriptor.name)
     );
@@ -218,13 +218,13 @@ export class PrometheusSerializer {
     switch (dataPointType) {
       case DataPointType.SINGULAR: {
         results = metricData.dataPoints
-          .map(it => this.serializeSingularDataPoint(name, metricData.descriptor.type, it))
+          .map(it => this._serializeSingularDataPoint(name, metricData.descriptor.type, it))
           .join('');
         break;
       }
       case DataPointType.HISTOGRAM: {
         results = metricData.dataPoints
-          .map(it => this.serializeHistogramDataPoint(name, metricData.descriptor.type, it))
+          .map(it => this._serializeHistogramDataPoint(name, metricData.descriptor.type, it))
           .join('');
         break;
       }
@@ -236,7 +236,7 @@ export class PrometheusSerializer {
     return `${help}\n${type}\n${results}`.trim();
   }
 
-  serializeSingularDataPoint(name: string, type: InstrumentType, dataPoint: DataPoint<number>): string {
+  private _serializeSingularDataPoint(name: string, type: InstrumentType, dataPoint: DataPoint<number>): string {
     let results = '';
 
     name = enforcePrometheusNamingConvention(name, type);
@@ -252,7 +252,7 @@ export class PrometheusSerializer {
     return results;
   }
 
-  serializeHistogramDataPoint(name: string, type: InstrumentType, dataPoint: DataPoint<Histogram>): string {
+  private _serializeHistogramDataPoint(name: string, type: InstrumentType, dataPoint: DataPoint<Histogram>): string {
     let results = '';
 
     name = enforcePrometheusNamingConvention(name, type);
