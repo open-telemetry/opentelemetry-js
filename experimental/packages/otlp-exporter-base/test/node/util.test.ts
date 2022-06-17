@@ -35,7 +35,7 @@ class HttpResponse extends PassThrough {
   statusCode: number;
   statusMessage: string;
 
-  constructor(statusCode: number = 200, statusMessage: string = 'OK') {
+  constructor(statusCode = 200, statusMessage = 'OK') {
     super();
     this.statusCode = statusCode;
     this.statusMessage = statusMessage;
@@ -171,7 +171,7 @@ describe('sendWithHttp', () => {
   let mockRequest: HttpRequest;
   let setHeaderSpy: sinon.SinonSpy;
 
-  let spanData: object = {
+  const spanData: object = {
     'foo': 'bar',
     'bar': 'baz',
   };
@@ -193,18 +193,18 @@ describe('sendWithHttp', () => {
     // Mock out response
     const response = new HttpResponse();
     response.end('OK');
- 
+
     // Stub out http.request so it calls our callback with the mocked response
     // and also so it returns our mocked request stream so we can observe. We don't
     // really care about the response for the purpose of this test, but we do want
     // to observe the request compression behavior.
-	  httpRequestStub.returns(mockRequest).callsArgWith(1, response);
+    httpRequestStub.returns(mockRequest).callsArgWith(1, response);
   });
 
   afterEach(function() {
-		httpRequestStub.restore();
+    httpRequestStub.restore();
     setHeaderSpy.restore();
-	});
+  });
 
   it('should send with no compression if configured to do so', () => {
     exporter = new Exporter(exporterConfig);
@@ -219,7 +219,7 @@ describe('sendWithHttp', () => {
 
     sendWithHttp(exporter, data, 'application/json', () => {
       // Show that we aren't setting the gzip encoding header
-      assert(setHeaderSpy.withArgs('Content-Encoding', 'gzip').notCalled)
+      assert(setHeaderSpy.withArgs('Content-Encoding', 'gzip').notCalled);
     }, (err: OTLPExporterError) => {
       assert.fail(err);
     });
@@ -267,7 +267,7 @@ describe('sendWithHttp', () => {
 
       const response = new HttpResponse();
       response.end('OK');
-  
+
       httpRequestStub.restore();
       httpRequestStub = sinon.stub(http, 'request');
       httpRequestStub.returns(mockRequest).callsArgWith(1, response);
