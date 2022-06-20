@@ -12,6 +12,7 @@ All notable changes to experimental packages in this project will be documented 
 
 * feat(opentelemetry-instrumentation-fetch): optionally ignore network events #3028 @gregolsen
 * feat(http-instrumentation): record exceptions in http instrumentation #3008 @luismiramirez
+* feat(node-sdk): add serviceName config option #2867 @naseemkullah
 * feat(opentelemetry-exporter-prometheus): export PrometheusSerializer #3034 @matschaffer
 
 ### :bug: (Bug Fix)
