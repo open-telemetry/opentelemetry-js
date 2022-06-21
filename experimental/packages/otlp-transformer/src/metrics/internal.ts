@@ -46,9 +46,9 @@ export function toResourceMetrics(resourceMetrics: ResourceMetrics): IResourceMe
   };
 }
 
-export function toScopeMetrics(scopeMetrics: ScopeMetrics[]): IScopeMetrics[]{
+export function toScopeMetrics(scopeMetrics: ScopeMetrics[]): IScopeMetrics[] {
   return Array.from(scopeMetrics.map(metrics => {
-    const scopeMetrics : IScopeMetrics = {
+    const scopeMetrics: IScopeMetrics = {
       scope: {
         name: metrics.scope.name,
         version: metrics.scope.version,
@@ -129,34 +129,19 @@ function toHistogramDataPoints(
 ): IHistogramDataPoint[] {
   return metricData.dataPoints.map(dataPoint => {
     const histogram = dataPoint.value as Histogram;
-    if(histogram.hasMinMax){
-      return {
-        attributes: toAttributes(dataPoint.attributes),
-        bucketCounts: histogram.buckets.counts,
-        explicitBounds: histogram.buckets.boundaries,
-        count: histogram.count,
-        sum: histogram.sum,
-        min: histogram.min,
-        max: histogram.max,
-        startTimeUnixNano: hrTimeToNanoseconds(dataPoint.startTime),
-        timeUnixNano: hrTimeToNanoseconds(
-          dataPoint.endTime
-        ),
-      };
-    } else {
-      return {
-        attributes: toAttributes(dataPoint.attributes),
-        bucketCounts: histogram.buckets.counts,
-        explicitBounds: histogram.buckets.boundaries,
-        count: histogram.count,
-        sum: histogram.sum,
-        startTimeUnixNano: hrTimeToNanoseconds(dataPoint.startTime),
-        timeUnixNano: hrTimeToNanoseconds(
-          dataPoint.endTime
-        ),
-      };
-    }
-
+    return {
+      attributes: toAttributes(dataPoint.attributes),
+      bucketCounts: histogram.buckets.counts,
+      explicitBounds: histogram.buckets.boundaries,
+      count: histogram.count,
+      sum: histogram.sum,
+      min: histogram.hasMinMax ? histogram.min : undefined,
+      max: histogram.hasMinMax ? histogram.max : undefined,
+      startTimeUnixNano: hrTimeToNanoseconds(dataPoint.startTime),
+      timeUnixNano: hrTimeToNanoseconds(
+        dataPoint.endTime
+      ),
+    };
   });
 }
 

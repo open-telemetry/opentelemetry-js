@@ -379,6 +379,8 @@ describe('Metrics', () => {
                             count: 2,
                             explicitBounds: [5],
                             sum: 9,
+                            min: undefined,
+                            max: undefined,
                             startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
                             timeUnixNano: hrTimeToNanoseconds(END_TIME),
                           },
