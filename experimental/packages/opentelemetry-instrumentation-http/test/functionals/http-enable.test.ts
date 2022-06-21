@@ -570,6 +570,7 @@ describe('HttpInstrumentation', () => {
             },
             component: 'http',
             noNetPeer: true,
+            error: err,
           };
           assertSpan(spans[0], SpanKind.CLIENT, validations);
           return true;

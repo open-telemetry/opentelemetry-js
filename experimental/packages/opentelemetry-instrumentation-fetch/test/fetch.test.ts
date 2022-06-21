@@ -155,8 +155,7 @@ describe('fetch', () => {
     lastResponse = undefined;
   };
 
-  const prepareData = (
-    done: any,
+  const prepareData = async (
     fileUrl: string,
     config: FetchInstrumentationConfig,
     method?: string,
@@ -238,37 +237,42 @@ describe('fetch', () => {
       new tracing.SimpleSpanProcessor(dummySpanExporter)
     );
 
+    // endSpan is called after the whole response body is read
+    // this process is scheduled at the same time the fetch promise is resolved
+    // due to this we can't rely on getData resolution to know that the span has ended
+    let resolveEndSpan: (value: unknown) => void;
+    const spanEnded = new Promise(r => resolveEndSpan = r);
+    const readSpy = sinon.spy(window.ReadableStreamDefaultReader.prototype, 'read');
+    const endSpanStub: sinon.SinonStub<any> = sinon.stub(FetchInstrumentation.prototype, '_endSpan' as any)
+      .callsFake(async function (this: FetchInstrumentation, ...args: any[]) {
+        resolveEndSpan({});
+        return endSpanStub.wrappedMethod.apply(this, args);
+      });
+
     rootSpan = webTracerWithZone.startSpan('root');
-    api.context.with(api.trace.setSpan(api.context.active(), rootSpan), () => {
+    await api.context.with(api.trace.setSpan(api.context.active(), rootSpan), async () => {
       fakeNow = 0;
-      void getData(fileUrl, method)
-        .then(
-          response => {
-            // this is a bit tricky as the only way to get all request headers from
-            // fetch is to use json()
-            return response.json().then(
-              json => {
-                lastResponse = json;
-                const headers: { [key: string]: string } = {};
-                Object.keys(lastResponse.headers).forEach(key => {
-                  headers[key.toLowerCase()] = lastResponse.headers[key];
-                });
-                lastResponse.headers = headers;
-              },
-              () => {
-                lastResponse = undefined;
-              }
-            );
-          },
-          () => {
-            lastResponse = undefined;
-          }
-        )
-        .then(sinon.clock.runAllAsync)
-        .then(() => {
-          done();
+      try {
+        const responsePromise = getData(fileUrl, method);
+        fakeNow = 300;
+        const response = await responsePromise;
+
+        // if the url is not ignored, body.read should be called by now
+        // awaiting for the span to end
+        if (readSpy.callCount > 0) await spanEnded;
+
+        // this is a bit tricky as the only way to get all request headers from
+        // fetch is to use json()
+        lastResponse = await response.json();
+        const headers: { [key: string]: string } = {};
+        Object.keys(lastResponse.headers).forEach(key => {
+          headers[key.toLowerCase()] = lastResponse.headers[key];
         });
-      fakeNow = 300;
+        lastResponse.headers = headers;
+      } catch (e) {
+        lastResponse = undefined;
+      }
+      await sinon.clock.runAllAsync();
     });
   };
 
@@ -290,9 +294,9 @@ describe('fetch', () => {
   });
 
   describe('when request is successful', () => {
-    beforeEach(done => {
+    beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = [url];
-      prepareData(done, url, { propagateTraceHeaderCorsUrls });
+      await prepareData(url, { propagateTraceHeaderCorsUrls });
     });
 
     afterEach(() => {
@@ -580,13 +584,13 @@ describe('fetch', () => {
 
     describe('when propagateTraceHeaderCorsUrls does NOT MATCH', () => {
       let spyDebug: sinon.SinonSpy;
-      beforeEach(done => {
+      beforeEach(async () => {
         const diagLogger = new api.DiagConsoleLogger();
         spyDebug = sinon.spy();
         diagLogger.debug = spyDebug;
         api.diag.setLogger(diagLogger, api.DiagLogLevel.ALL);
         clearData();
-        prepareData(done, url, {});
+        await prepareData(url, {});
       });
       afterEach(() => {
         sinon.restore();
@@ -619,15 +623,13 @@ describe('fetch', () => {
   });
 
   describe('applyCustomAttributesOnSpan option', () => {
-    const noop = () => {};
-    const prepare = (
+    const prepare = async (
       url: string,
       applyCustomAttributesOnSpan: FetchCustomAttributeFunction,
-      cb: VoidFunction = noop
     ) => {
       const propagateTraceHeaderCorsUrls = [url];
 
-      prepareData(cb, url, {
+      await prepareData(url, {
         propagateTraceHeaderCorsUrls,
         applyCustomAttributesOnSpan,
       });
@@ -637,74 +639,71 @@ describe('fetch', () => {
       clearData();
     });
 
-    it('applies attributes when the request is succesful', done => {
-      prepare(
+    it('applies attributes when the request is succesful', async () => {
+      await prepare(
         url,
         span => {
           span.setAttribute(CUSTOM_ATTRIBUTE_KEY, 'custom value');
         },
-        () => {
-          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-          const attributes = span.attributes;
-
-          assert.ok(attributes[CUSTOM_ATTRIBUTE_KEY] === 'custom value');
-          done();
-        }
       );
+      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      const attributes = span.attributes;
+
+      assert.ok(attributes[CUSTOM_ATTRIBUTE_KEY] === 'custom value');
     });
 
-    it('applies custom attributes when the request fails', done => {
-      prepare(
+    it('applies custom attributes when the request fails', async () => {
+      await prepare(
         badUrl,
         span => {
           span.setAttribute(CUSTOM_ATTRIBUTE_KEY, 'custom value');
         },
-        () => {
-          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-          const attributes = span.attributes;
-
-          assert.ok(attributes[CUSTOM_ATTRIBUTE_KEY] === 'custom value');
-          done();
-        }
       );
+      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      const attributes = span.attributes;
+
+      assert.ok(attributes[CUSTOM_ATTRIBUTE_KEY] === 'custom value');
     });
 
-    it('has request and response objects in callback arguments', done => {
+    it('has request and response objects in callback arguments', async () => {
+      let request: any;
+      let response: any;
       const applyCustomAttributes: FetchCustomAttributeFunction = (
         span,
-        request,
-        response
+        req,
+        res
       ) => {
-        assert.ok(request.method === 'GET');
-        assert.ok(response.status === 200);
-
-        done();
+        request = req;
+        response = res;
       };
 
-      prepare(url, applyCustomAttributes);
+      await prepare(url, applyCustomAttributes);
+      assert.ok(request.method === 'GET');
+      assert.ok(response.status === 200);
     });
 
-    it('get response body from callback arguments response', done => {
+    it('get response body from callback arguments response', async () => {
+      let response: any;
       const applyCustomAttributes: FetchCustomAttributeFunction = async (
         span,
-        request,
-        response
+        req,
+        res
       ) => {
-        if(response instanceof Response ){
-          const rsp = await response.json();
-          assert.deepStrictEqual(rsp.args, {});
-          done();
+        if (res instanceof Response) {
+          response = res;
         }
       };
 
-      prepare(url, applyCustomAttributes);
+      await prepare(url, applyCustomAttributes);
+      const rsp = await response.json();
+      assert.deepStrictEqual(rsp.args, {});
     });
   });
 
   describe('when url is ignored', () => {
-    beforeEach(done => {
+    beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = url;
-      prepareData(done, url, {
+      await prepareData(url, {
         propagateTraceHeaderCorsUrls,
         ignoreUrls: [propagateTraceHeaderCorsUrls],
       });
@@ -726,9 +725,9 @@ describe('fetch', () => {
   });
 
   describe('when clearTimingResources is TRUE', () => {
-    beforeEach(done => {
+    beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = url;
-      prepareData(done, url, {
+      await prepareData(url, {
         propagateTraceHeaderCorsUrls,
         clearTimingResources: true,
       });
@@ -746,9 +745,9 @@ describe('fetch', () => {
   });
 
   describe('when request is NOT successful (wrong url)', () => {
-    beforeEach(done => {
+    beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = badUrl;
-      prepareData(done, badUrl, { propagateTraceHeaderCorsUrls });
+      await prepareData(badUrl, { propagateTraceHeaderCorsUrls });
     });
     afterEach(() => {
       clearData();
@@ -764,9 +763,9 @@ describe('fetch', () => {
   });
 
   describe('when request is NOT successful (405)', () => {
-    beforeEach(done => {
+    beforeEach(async () => {
       const propagateTraceHeaderCorsUrls = url;
-      prepareData(done, url, { propagateTraceHeaderCorsUrls }, 'DELETE');
+      await prepareData(url, { propagateTraceHeaderCorsUrls }, 'DELETE');
     });
     afterEach(() => {
       clearData();
@@ -783,11 +782,11 @@ describe('fetch', () => {
   });
 
   describe('when PerformanceObserver is used by default', () => {
-    beforeEach(done => {
+    beforeEach(async () => {
       // All above tests test it already but just in case
       // lets explicitly turn getEntriesByType off so we can be sure
       // that the perf entries come from the observer.
-      prepareData(done, url, {}, undefined, false, true);
+      await prepareData(url, {}, undefined, false, true);
     });
     afterEach(() => {
       clearData();
@@ -813,8 +812,8 @@ describe('fetch', () => {
   });
 
   describe('when fetching with relative url', () => {
-    beforeEach(done => {
-      prepareData(done, '/get', {}, undefined, false, true);
+    beforeEach(async () => {
+      await prepareData('/get', {}, undefined, false, true);
     });
     afterEach(() => {
       clearData();
@@ -841,8 +840,8 @@ describe('fetch', () => {
   });
 
   describe('when PerformanceObserver is undefined', () => {
-    beforeEach(done => {
-      prepareData(done, url, {}, undefined, true, false);
+    beforeEach(async () => {
+      await prepareData(url, {}, undefined, true, false);
     });
 
     afterEach(() => {
@@ -868,8 +867,8 @@ describe('fetch', () => {
   });
 
   describe('when PerformanceObserver and performance.getEntriesByType are undefined', () => {
-    beforeEach(done => {
-      prepareData(done, url, {}, undefined, true, true);
+    beforeEach(async () => {
+      await prepareData(url, {}, undefined, true, true);
     });
     afterEach(() => {
       clearData();
@@ -899,6 +898,22 @@ describe('fetch', () => {
         200,
         `Missing basic attribute ${SemanticAttributes.HTTP_STATUS_CODE}`
       );
+    });
+  });
+
+  describe('when network events are ignored', () => {
+    beforeEach(async () => {
+      await prepareData(url, {
+        ignoreNetworkEvents: true,
+      });
+    });
+    afterEach(() => {
+      clearData();
+    });
+    it('should NOT add network events', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
+      const events = span.events;
+      assert.strictEqual(events.length, 0, 'number of events is wrong');
     });
   });
 });

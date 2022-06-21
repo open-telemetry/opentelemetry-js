@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-import { SpanAttributes, TextMapPropagator, Sampler } from '@opentelemetry/api';
-import type { ContextManager } from '@opentelemetry/api';
+import type { ContextManager, SpanAttributes } from '@opentelemetry/api';
+import { Sampler, TextMapPropagator } from '@opentelemetry/api';
 import { InstrumentationOption } from '@opentelemetry/instrumentation';
-import { MetricReader } from '@opentelemetry/sdk-metrics-base';
 import { Resource } from '@opentelemetry/resources';
+import { MetricReader } from '@opentelemetry/sdk-metrics-base';
 import {
   SpanExporter,
-  SpanProcessor,
   SpanLimits,
+  SpanProcessor
 } from '@opentelemetry/sdk-trace-base';
 
 export interface NodeSDKConfiguration {
@@ -34,6 +34,7 @@ export interface NodeSDKConfiguration {
   instrumentations: InstrumentationOption[];
   resource: Resource;
   sampler: Sampler;
+  serviceName?: string;
   spanProcessor: SpanProcessor;
   traceExporter: SpanExporter;
   spanLimits: SpanLimits;

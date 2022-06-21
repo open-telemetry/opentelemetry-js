@@ -62,7 +62,6 @@ describe('OTLPMetricExporter - common', () => {
       onInitSpy = sinon.stub(OTLPMetricExporter.prototype, 'onInit');
       collectorExporterConfig = {
         hostname: 'foo',
-        attributes: {},
         url: 'http://foo.bar.com',
       };
       collectorExporter = new OTLPMetricExporter(collectorExporterConfig);
@@ -182,7 +181,6 @@ describe('OTLPMetricExporter - common', () => {
       );
       collectorExporterConfig = {
         hostname: 'foo',
-        attributes: {},
         url: 'http://foo.bar.com',
       };
       collectorExporter = new OTLPMetricExporter(collectorExporterConfig);

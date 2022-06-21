@@ -19,6 +19,7 @@ import {
   ObservableResult,
   Histogram,
   ValueType,
+  ObservableGauge,
 } from '@opentelemetry/api-metrics';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -85,16 +86,18 @@ export function mockCounter(): Counter {
 
 export function mockObservableGauge(
   callback: (observableResult: ObservableResult) => void
-): void {
+): ObservableGauge {
   const name = 'double-observable-gauge';
-  return meter.createObservableGauge(
+  const observableGauge = meter.createObservableGauge(
     name,
-    callback,
     {
       description: 'sample observable gauge description',
       valueType: ValueType.DOUBLE,
     },
   );
+  observableGauge.addCallback(callback);
+
+  return observableGauge;
 }
 
 export function mockHistogram(): Histogram {
@@ -132,7 +135,7 @@ export function ensureExportedCounterIsCorrect(
   assert.deepStrictEqual(metric, {
     name: 'int-counter',
     description: 'sample counter description',
-    unit: '1',
+    unit: '',
     sum: {
       dataPoints: [
         {
@@ -155,7 +158,7 @@ export function ensureExportedObservableGaugeIsCorrect(
   assert.deepStrictEqual(metric, {
     name: 'double-observable-gauge',
     description: 'sample observable gauge description',
-    unit: '1',
+    unit: '',
     gauge: {
       dataPoints: [
         {
@@ -178,7 +181,7 @@ export function ensureExportedHistogramIsCorrect(
   assert.deepStrictEqual(metric, {
     name: 'int-histogram',
     description: 'sample histogram description',
-    unit: '1',
+    unit: '',
     histogram: {
       dataPoints: [
         {

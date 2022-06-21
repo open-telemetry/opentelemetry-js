@@ -95,7 +95,9 @@ export abstract class InstrumentationBase<T = any>
     if (!baseDir) {
       if (typeof module.patch === 'function') {
         module.moduleExports = exports;
-        return module.patch(exports);
+        if (this._enabled) {
+          return module.patch(exports);
+        }
       }
       return exports;
     }

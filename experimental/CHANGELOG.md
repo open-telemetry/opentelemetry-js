@@ -6,8 +6,47 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* fix: remove aws and gcp detector from SDK #3024 @flarna
+
+### :rocket: (Enhancement)
+
+* feat(opentelemetry-instrumentation-fetch): optionally ignore network events #3028 @gregolsen
+* feat(http-instrumentation): record exceptions in http instrumentation #3008 @luismiramirez
+* feat(node-sdk): add serviceName config option #2867 @naseemkullah
+* feat(opentelemetry-exporter-prometheus): export PrometheusSerializer #3034 @matschaffer
+
+### :bug: (Bug Fix)
+
+* fix(otlp-transformer): remove type dependency on Long #3022 @legendecas
+* fix(grpc-exporter): use non-normalized URL to determine channel security #3019 @pichlermarc
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.29.2
+
+* Support for 1.3.1 of stable packages
+
+## 0.29.1
+
+### :bug: (Bug Fix)
+
+* fix(sdk-metrics-base): only record non-negative histogram values #3002 @pichlermarc
+* fix(otlp-transformer): include missing prepublishOnly script which ensures esm and esnext build files are created and packaged @dyladan
+
+## 0.29.0
+
+### :boom: Breaking Change
+
 * feat(metrics): metric readers and exporters now select aggregation temporality based on instrument type #2902 @seemk
 * refactor(metrics-sdk): rename InstrumentationLibrary -> InstrumentationScope #2959 @pichlermarc
+* feat(metrics): multi-instrument async callback support #2966 @legendecas
+  * changes on `meter.createObservableCounter`, `meter.createObservableGauge`, `meter.createObservableUpDownCounter`
+    * removed the second parameter `callback`
+    * returns an `Observable` object on which callbacks can be registered or unregistered.
+  * added `meter.addBatchObservableCallback` and `meter.removeBatchObservableCallback`.
+* fix: remove attributes from OTLPExporterConfigBase #2991 @flarna
 
 ### :rocket: (Enhancement)
 
@@ -21,6 +60,9 @@ All notable changes to experimental packages in this project will be documented 
 * fix(opentelemetry-instrumentation-http): use correct origin when port is `null` #2948 @danielgblanco
 * fix(otlp-exporter-base): include esm and esnext in package files #2952 @dyladan
 * fix(otlp-http-exporter): update endpoint to match spec #2895 @svetlanabrennan
+* fix(instrumentation): only patch core modules if enabled #2993 @santigimeno
+* fix(otlp-transformer): include esm and esnext in package files and update README #2992 @pichlermarc
+* fix(metrics): specification compliant default metric unit #2983 @andyfleming
 
 ### :books: (Refine Doc)
 

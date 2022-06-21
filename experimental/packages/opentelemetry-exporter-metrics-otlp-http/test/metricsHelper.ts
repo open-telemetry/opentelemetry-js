@@ -19,6 +19,9 @@ import {
   ObservableResult,
   Histogram,
   ValueType,
+  ObservableCounter,
+  ObservableGauge,
+  ObservableUpDownCounter,
 } from '@opentelemetry/api-metrics';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -99,15 +102,17 @@ export function mockCounter(): Counter {
 export function mockObservableGauge(
   callback: (observableResult: ObservableResult) => void,
   name = 'double-observable-gauge'
-): void {
-  return meter.createObservableGauge(
+): ObservableGauge {
+  const observableGauge = meter.createObservableGauge(
     name,
-    callback,
     {
       description: 'sample observable gauge description',
       valueType: ValueType.DOUBLE,
     }
   );
+  observableGauge.addCallback(callback);
+
+  return observableGauge;
 }
 
 export function mockDoubleCounter(): Counter {
@@ -123,29 +128,33 @@ export function mockDoubleCounter(): Counter {
 export function mockObservableCounter(
   callback: (observableResult: ObservableResult) => void,
   name = 'double-observable-counter'
-): void {
-  meter.createObservableCounter(
+): ObservableCounter {
+  const observableCounter = meter.createObservableCounter(
     name,
-    callback,
     {
       description: 'sample observable counter description',
       valueType: ValueType.DOUBLE,
     }
   );
+  observableCounter.addCallback(callback);
+
+  return observableCounter;
 }
 
 export function mockObservableUpDownCounter(
   callback: (observableResult: ObservableResult) => void,
   name = 'double-up-down-observable-counter'
-): void {
-  meter.createObservableUpDownCounter(
+): ObservableUpDownCounter {
+  const observableUpDownCounter = meter.createObservableUpDownCounter(
     name,
-    callback,
     {
       description: 'sample observable up down counter description',
       valueType: ValueType.DOUBLE,
     },
   );
+  observableUpDownCounter.addCallback(callback);
+
+  return observableUpDownCounter;
 }
 
 export function mockHistogram(): Histogram {
@@ -228,7 +237,7 @@ export function ensureCounterIsCorrect(
   assert.deepStrictEqual(metric, {
     name: 'int-counter',
     description: 'sample counter description',
-    unit: '1',
+    unit: '',
     sum: {
       dataPoints: [
         {
@@ -252,7 +261,7 @@ export function ensureDoubleCounterIsCorrect(
   assert.deepStrictEqual(metric, {
     name: 'double-counter',
     description: 'sample counter description',
-    unit: '1',
+    unit: '',
     doubleSum: {
       dataPoints: [
         {
@@ -278,7 +287,7 @@ export function ensureObservableGaugeIsCorrect(
   assert.deepStrictEqual(metric, {
     name,
     description: 'sample observable gauge description',
-    unit: '1',
+    unit: '',
     gauge: {
       dataPoints: [
         {
@@ -302,7 +311,7 @@ export function ensureObservableCounterIsCorrect(
   assert.deepStrictEqual(metric, {
     name,
     description: 'sample observable counter description',
-    unit: '1',
+    unit: '',
     doubleSum: {
       isMonotonic: true,
       dataPoints: [
@@ -328,7 +337,7 @@ export function ensureObservableUpDownCounterIsCorrect(
   assert.deepStrictEqual(metric, {
     name,
     description: 'sample observable up down counter description',
-    unit: '1',
+    unit: '',
     doubleSum: {
       isMonotonic: false,
       dataPoints: [
@@ -354,7 +363,7 @@ export function ensureHistogramIsCorrect(
   assert.deepStrictEqual(metric, {
     name: 'int-histogram',
     description: 'sample histogram description',
-    unit: '1',
+    unit: '',
     histogram: {
       dataPoints: [
         {

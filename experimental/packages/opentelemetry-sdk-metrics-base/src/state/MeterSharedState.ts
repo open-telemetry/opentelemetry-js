@@ -15,7 +15,6 @@
  */
 
 import { HrTime } from '@opentelemetry/api';
-import * as metrics from '@opentelemetry/api-metrics';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { MetricCollectOptions } from '../export/MetricProducer';
 import { ScopeMetrics } from '../export/MetricData';
@@ -35,7 +34,7 @@ import { SyncMetricStorage } from './SyncMetricStorage';
  */
 export class MeterSharedState {
   private _metricStorageRegistry = new MetricStorageRegistry();
-  private _observableRegistry = new ObservableRegistry();
+  observableRegistry = new ObservableRegistry();
   meter: Meter;
 
   constructor(private _meterProviderSharedState: MeterProviderSharedState, private _instrumentationScope: InstrumentationScope) {
@@ -58,18 +57,17 @@ export class MeterSharedState {
     return new MultiMetricStorage(storages);
   }
 
-  registerAsyncMetricStorage(descriptor: InstrumentDescriptor, callback: metrics.ObservableCallback) {
+  registerAsyncMetricStorage(descriptor: InstrumentDescriptor) {
     const views = this._meterProviderSharedState.viewRegistry.findViews(descriptor, this._instrumentationScope);
-    views.forEach(view => {
-      const viewDescriptor = createInstrumentDescriptorWithView(view, descriptor);
-      const aggregator = view.aggregation.createAggregator(viewDescriptor);
-      const viewStorage = new AsyncMetricStorage(viewDescriptor, aggregator, view.attributesProcessor);
-      const storage = this._metricStorageRegistry.register(viewStorage);
-      if (storage == null) {
-        return;
-      }
-      this._observableRegistry.addCallback(callback, storage);
-    });
+    const storages = views
+      .map(view => {
+        const viewDescriptor = createInstrumentDescriptorWithView(view, descriptor);
+        const aggregator = view.aggregation.createAggregator(viewDescriptor);
+        const viewStorage = new AsyncMetricStorage(viewDescriptor, aggregator, view.attributesProcessor);
+        return this._metricStorageRegistry.register(viewStorage);
+      })
+      .filter(isNotNullish);
+    return storages;
   }
 
   /**
@@ -82,7 +80,7 @@ export class MeterSharedState {
      * 1. Call all observable callbacks first.
      * 2. Collect metric result for the collector.
      */
-    const errors = await this._observableRegistry.observe(options?.timeoutMillis);
+    const errors = await this.observableRegistry.observe(options?.timeoutMillis);
     const metricDataList = Array.from(this._metricStorageRegistry.getStorages())
       .map(metricStorage => {
         return metricStorage.collect(

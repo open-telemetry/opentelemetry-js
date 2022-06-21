@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-import { ObservableCallback } from '@opentelemetry/api-metrics';
+import { Observable } from '@opentelemetry/api-metrics';
 import * as assert from 'assert';
-import { CounterInstrument, HistogramInstrument, UpDownCounterInstrument } from '../src/Instruments';
+import {
+  CounterInstrument,
+  HistogramInstrument,
+  ObservableCounterInstrument,
+  ObservableGaugeInstrument,
+  ObservableUpDownCounterInstrument,
+  UpDownCounterInstrument,
+} from '../src/Instruments';
 import { Meter } from '../src/Meter';
 import { MeterProviderSharedState } from '../src/state/MeterProviderSharedState';
 import { MeterSharedState } from '../src/state/MeterSharedState';
 import { defaultInstrumentationScope, defaultResource } from './util';
-
-const noopObservableCallback: ObservableCallback = _observableResult => {};
 
 describe('Meter', () => {
   describe('createCounter', () => {
@@ -42,8 +47,8 @@ describe('Meter', () => {
         new MeterProviderSharedState(defaultResource),
         defaultInstrumentationScope);
       const meter = new Meter(meterSharedState);
-      const counter = meter.createUpDownCounter('foobar');
-      assert(counter instanceof UpDownCounterInstrument);
+      const upDownCounter = meter.createUpDownCounter('foobar');
+      assert(upDownCounter instanceof UpDownCounterInstrument);
     });
   });
 
@@ -53,8 +58,8 @@ describe('Meter', () => {
         new MeterProviderSharedState(defaultResource),
         defaultInstrumentationScope);
       const meter = new Meter(meterSharedState);
-      const counter = meter.createHistogram('foobar');
-      assert(counter instanceof HistogramInstrument);
+      const histogram = meter.createHistogram('foobar');
+      assert(histogram instanceof HistogramInstrument);
     });
   });
 
@@ -64,7 +69,8 @@ describe('Meter', () => {
         new MeterProviderSharedState(defaultResource),
         defaultInstrumentationScope);
       const meter = new Meter(meterSharedState);
-      meter.createObservableGauge('foobar', noopObservableCallback);
+      const observableGauge = meter.createObservableGauge('foobar');
+      assert(observableGauge instanceof ObservableGaugeInstrument);
     });
   });
 
@@ -74,7 +80,8 @@ describe('Meter', () => {
         new MeterProviderSharedState(defaultResource),
         defaultInstrumentationScope);
       const meter = new Meter(meterSharedState);
-      meter.createObservableCounter('foobar', noopObservableCallback);
+      const observableCounter = meter.createObservableCounter('foobar');
+      assert(observableCounter instanceof ObservableCounterInstrument);
     });
   });
 
@@ -84,7 +91,56 @@ describe('Meter', () => {
         new MeterProviderSharedState(defaultResource),
         defaultInstrumentationScope);
       const meter = new Meter(meterSharedState);
-      meter.createObservableUpDownCounter('foobar', noopObservableCallback);
+      const observableUpDownCounter = meter.createObservableUpDownCounter('foobar');
+      assert(observableUpDownCounter instanceof ObservableUpDownCounterInstrument);
+    });
+  });
+
+  describe('addBatchObservableCallback', () => {
+    it('should register callback without exception', () => {
+      const meterSharedState = new MeterSharedState(
+        new MeterProviderSharedState(defaultResource),
+        defaultInstrumentationScope);
+      const meter = new Meter(meterSharedState);
+      const observableGauge = meter.createObservableGauge('test-gauge');
+      const observableCounter = meter.createObservableCounter('test-counter');
+      const observableUpDownCounter = meter.createObservableUpDownCounter('test-up-down-counter');
+
+      meter.addBatchObservableCallback(() => {}, [ observableGauge, observableCounter, observableUpDownCounter ]);
+    });
+
+    it('should be tolerant with unknown observables', () => {
+      const meterSharedState = new MeterSharedState(
+        new MeterProviderSharedState(defaultResource),
+        defaultInstrumentationScope);
+      const meter = new Meter(meterSharedState);
+
+      const observables = [
+        {},
+        1,
+        'foo',
+        Symbol(),
+      ] as unknown as Observable[];
+      meter.addBatchObservableCallback(() => {}, observables);
+    });
+  });
+
+  describe('removeBatchObservableCallback', () => {
+    it('should remove callback without exception', () => {
+      const meterSharedState = new MeterSharedState(
+        new MeterProviderSharedState(defaultResource),
+        defaultInstrumentationScope);
+      const meter = new Meter(meterSharedState);
+      const observableGauge = meter.createObservableGauge('test-gauge');
+      const observableCounter = meter.createObservableCounter('test-counter');
+      const observableUpDownCounter = meter.createObservableUpDownCounter('test-up-down-counter');
+
+      const callback = () => {};
+      meter.addBatchObservableCallback(callback, [ observableGauge, observableCounter, observableUpDownCounter ]);
+      meter.removeBatchObservableCallback(callback, [ observableGauge, observableCounter, observableUpDownCounter ]);
+
+      // Remove a not registered callback.
+      meter.removeBatchObservableCallback(() => {}, []);
     });
   });
 });

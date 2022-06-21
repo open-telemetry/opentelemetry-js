@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-import { CounterOptions, HistogramOptions, UpDownCounterOptions } from '..';
 import {
+  BatchObservableCallback,
   Counter,
   Histogram,
-  ObservableCallback,
-  ObservableCounterOptions,
-  ObservableGaugeOptions,
-  ObservableUpDownCounterOptions,
+  MetricOptions,
+  Observable,
+  ObservableCounter,
+  ObservableGauge,
+  ObservableUpDownCounter,
   UpDownCounter,
 } from './Metric';
 
@@ -48,7 +49,7 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createHistogram(name: string, options?: HistogramOptions): Histogram;
+  createHistogram(name: string, options?: MetricOptions): Histogram;
 
   /**
    * Creates a new `Counter` metric. Generally, this kind of metric when the
@@ -57,7 +58,7 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createCounter(name: string, options?: CounterOptions): Counter;
+  createCounter(name: string, options?: MetricOptions): Counter;
 
   /**
    * Creates a new `UpDownCounter` metric. UpDownCounter is a synchronous
@@ -76,7 +77,7 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createUpDownCounter(name: string, options?: UpDownCounterOptions): UpDownCounter;
+  createUpDownCounter(name: string, options?: MetricOptions): UpDownCounter;
 
   /**
    * Creates a new `ObservableGauge` metric.
@@ -84,14 +85,12 @@ export interface Meter {
    * The callback SHOULD be safe to be invoked concurrently.
    *
    * @param name the name of the metric.
-   * @param callback the observable callback
    * @param [options] the metric options.
    */
   createObservableGauge(
     name: string,
-    callback: ObservableCallback,
-    options?: ObservableGaugeOptions
-  ): void;
+    options?: MetricOptions
+  ): ObservableGauge;
 
   /**
    * Creates a new `ObservableCounter` metric.
@@ -99,14 +98,12 @@ export interface Meter {
    * The callback SHOULD be safe to be invoked concurrently.
    *
    * @param name the name of the metric.
-   * @param callback the observable callback
    * @param [options] the metric options.
    */
   createObservableCounter(
     name: string,
-    callback: ObservableCallback,
-    options?: ObservableCounterOptions
-  ): void;
+    options?: MetricOptions
+  ): ObservableCounter;
 
   /**
    * Creates a new `ObservableUpDownCounter` metric.
@@ -114,12 +111,37 @@ export interface Meter {
    * The callback SHOULD be safe to be invoked concurrently.
    *
    * @param name the name of the metric.
-   * @param callback the observable callback
    * @param [options] the metric options.
    */
   createObservableUpDownCounter(
     name: string,
-    callback: ObservableCallback,
-    options?: ObservableUpDownCounterOptions
-  ): void;
+    options?: MetricOptions
+  ): ObservableUpDownCounter;
+
+  /**
+   * Sets up a function that will be called whenever a metric collection is
+   * initiated.
+   *
+   * If the function is already in the list of callbacks for this Observable,
+   * the function is not added a second time.
+   *
+   * Only the associated observables can be observed in the callback.
+   * Measurements of observables that are not associated observed in the
+   * callback are dropped.
+   *
+   * @param callback the batch observable callback
+   * @param observables the observables associated with this batch observable callback
+   */
+  addBatchObservableCallback(callback: BatchObservableCallback, observables: Observable[]): void;
+
+  /**
+   * Removes a callback previously registered with {@link Meter.addBatchObservableCallback}.
+   *
+   * The callback to be removed is identified using a combination of the callback itself,
+   * and the set of the observables associated with it.
+   *
+   * @param callback the batch observable callback
+   * @param observables the observables associated with this batch observable callback
+   */
+  removeBatchObservableCallback(callback: BatchObservableCallback, observables: Observable[]): void;
 }

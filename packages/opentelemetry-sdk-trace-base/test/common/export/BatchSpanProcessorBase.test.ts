@@ -97,7 +97,7 @@ describe('BatchSpanProcessorBase', () => {
 
       let env: Record<string, any>;
       if (typeof process === 'undefined') {
-        env = (window as unknown) as Record<string, any>;
+        env = (globalThis as unknown) as Record<string, any>;
       } else {
         env = process.env as Record<string, any>;
       }

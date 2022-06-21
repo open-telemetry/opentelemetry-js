@@ -23,6 +23,7 @@ const MODULE_FILE_NAME = 'test-module-file';
 const MODULE_VERSION = '0.1.0';
 const WILDCARD_VERSION = '*';
 const MODULE_DIR = '/random/dir';
+const CORE_MODULE = 'random_core';
 
 class TestInstrumentation extends InstrumentationBase {
   constructor() {
@@ -33,6 +34,61 @@ class TestInstrumentation extends InstrumentationBase {
 }
 
 describe('InstrumentationBase', () => {
+  describe('_onRequire - core module', () => {
+    let instrumentation: TestInstrumentation;
+    let modulePatchSpy: sinon.SinonSpy;
+    beforeEach(() => {
+      instrumentation = new TestInstrumentation();
+      modulePatchSpy = sinon.spy();
+    });
+
+    describe('AND module is not enabled', () => {
+      it('should not patch the module', () => {
+        // @ts-expect-error access internal property for testing
+        instrumentation._enabled = false;
+        const moduleExports = {};
+        const instrumentationModule = {
+          name: CORE_MODULE,
+          patch: modulePatchSpy as unknown,
+        } as InstrumentationModuleDefinition<unknown>;
+
+        // @ts-expect-error access internal property for testing
+        instrumentation._onRequire<unknown>(
+          instrumentationModule,
+          moduleExports,
+          CORE_MODULE,
+          undefined
+        );
+
+        assert.strictEqual(instrumentationModule.moduleExports, moduleExports);
+        sinon.assert.notCalled(modulePatchSpy);
+      });
+    });
+
+    describe('AND module is enabled', () => {
+      it('should patch the module', () => {
+        // @ts-expect-error access internal property for testing
+        instrumentation._enabled = true;
+        const moduleExports = {};
+        const instrumentationModule = {
+          name: CORE_MODULE,
+          patch: modulePatchSpy as unknown,
+        } as InstrumentationModuleDefinition<unknown>;
+
+        // @ts-expect-error access internal property for testing
+        instrumentation._onRequire<unknown>(
+          instrumentationModule,
+          moduleExports,
+          CORE_MODULE,
+          undefined
+        );
+
+        assert.strictEqual(instrumentationModule.moduleExports, moduleExports);
+        sinon.assert.calledOnceWithExactly(modulePatchSpy, moduleExports);
+      });
+    });
+  });
+
   describe('_onRequire - module version is not available', () => {
     // For all of these cases, there is no indication of the actual module version,
     // so we require there to be a wildcard supported version.
