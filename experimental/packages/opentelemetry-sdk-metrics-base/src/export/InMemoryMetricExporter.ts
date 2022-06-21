@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { ExportResultCode } from "@opentelemetry/core"
-import { ExportResult } from "@opentelemetry/core"
-import { InstrumentType } from "../InstrumentDescriptor"
-import { AggregationTemporality } from "./AggregationTemporality"
-import { ResourceMetrics } from "./MetricData"
-import { PushMetricExporter } from "./MetricExporter"
+import { ExportResultCode } from '@opentelemetry/core';
+import { ExportResult } from '@opentelemetry/core';
+import { InstrumentType } from '../InstrumentDescriptor';
+import { AggregationTemporality } from './AggregationTemporality';
+import { ResourceMetrics } from './MetricData';
+import { PushMetricExporter } from './MetricExporter';
 
 /**
  * In-memory Metrics Exporter is a Push Metric Exporter
@@ -27,12 +27,12 @@ import { PushMetricExporter } from "./MetricExporter"
  * allows to inspect it (useful for e.g. unit tests).
  */
 export class InMemoryMetricExporter implements PushMetricExporter {
-  protected _shutdown = false
-  protected _aggregationTemporality: AggregationTemporality
-  private _metrics: ResourceMetrics[] = []
+  protected _shutdown = false;
+  protected _aggregationTemporality: AggregationTemporality;
+  private _metrics: ResourceMetrics[] = [];
 
   constructor(aggregationTemporality: AggregationTemporality) {
-    this._aggregationTemporality = aggregationTemporality
+    this._aggregationTemporality = aggregationTemporality;
   }
 
   /**
@@ -42,10 +42,10 @@ export class InMemoryMetricExporter implements PushMetricExporter {
     // Avoid storing metrics when exporter is shutdown
     if (this. _shutdown) {
       process.nextTick(() => resultCallback({ code: ExportResultCode.FAILED }));
-      return
+      return;
     }
 
-    this._metrics.push(metrics)
+    this._metrics.push(metrics);
     process.nextTick(() => resultCallback({ code: ExportResultCode.SUCCESS }));
   }
 
@@ -54,20 +54,20 @@ export class InMemoryMetricExporter implements PushMetricExporter {
    * @returns ResourceMetrics[]
    */
   public getMetrics(): ResourceMetrics[] {
-    return this._metrics
+    return this._metrics;
   }
 
   async forceFlush() {
-    this._metrics = []
-    return Promise.resolve()
+    this._metrics = [];
+    return Promise.resolve();
   }
 
   selectAggregationTemporality(_instrumentType: InstrumentType): AggregationTemporality {
-    return this._aggregationTemporality
+    return this._aggregationTemporality;
   }
 
   shutdown(): Promise<void> {
-    this._shutdown = true
-    return Promise.resolve()
+    this._shutdown = true;
+    return Promise.resolve();
   }
 }
