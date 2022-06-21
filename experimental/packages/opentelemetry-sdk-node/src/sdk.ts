@@ -14,23 +14,26 @@
  * limitations under the License.
  */
 
-import { TextMapPropagator } from '@opentelemetry/api';
+import { ContextManager, TextMapPropagator } from '@opentelemetry/api';
 import { metrics } from '@opentelemetry/api-metrics';
-import { ContextManager } from '@opentelemetry/api';
-import { MeterProvider, MetricReader } from '@opentelemetry/sdk-metrics-base';
 import {
   InstrumentationOption,
-  registerInstrumentations,
+  registerInstrumentations
 } from '@opentelemetry/instrumentation';
-import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   detectResources,
   envDetector,
   processDetector,
   Resource,
-  ResourceDetectionConfig,
+  ResourceDetectionConfig
 } from '@opentelemetry/resources';
-import { BatchSpanProcessor, SpanProcessor } from '@opentelemetry/sdk-trace-base';
+import { MeterProvider, MetricReader } from '@opentelemetry/sdk-metrics-base';
+import {
+  BatchSpanProcessor,
+  SpanProcessor
+} from '@opentelemetry/sdk-trace-base';
+import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
@@ -50,12 +53,15 @@ export class NodeSDK {
 
   private _tracerProvider?: NodeTracerProvider;
   private _meterProvider?: MeterProvider;
+  private _serviceName?: string;
 
   /**
    * Create a new NodeJS SDK instance
    */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
     this._resource = configuration.resource ?? new Resource({});
+
+    this._serviceName = configuration.serviceName;
 
     this._autoDetectResources = configuration.autoDetectResources ?? true;
 
@@ -113,7 +119,9 @@ export class NodeSDK {
   }
 
   /** Detect resource attributes */
-  public async detectResources(config?: ResourceDetectionConfig): Promise<void> {
+  public async detectResources(
+    config?: ResourceDetectionConfig
+  ): Promise<void> {
     const internalConfig: ResourceDetectionConfig = {
       detectors: [ envDetector, processDetector],
       ...config,
@@ -134,6 +142,12 @@ export class NodeSDK {
     if (this._autoDetectResources) {
       await this.detectResources();
     }
+
+    this._resource = this._serviceName === undefined
+      ? this._resource
+      : this._resource.merge(new Resource(
+        {[SemanticResourceAttributes.SERVICE_NAME]: this._serviceName}
+      ));
 
     if (this._tracerProviderConfig) {
       const tracerProvider = new NodeTracerProvider({
