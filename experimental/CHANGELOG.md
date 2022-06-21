@@ -14,6 +14,7 @@ All notable changes to experimental packages in this project will be documented 
 * feat(http-instrumentation): record exceptions in http instrumentation #3008 @luismiramirez
 * feat(node-sdk): add serviceName config option #2867 @naseemkullah
 * feat(opentelemetry-exporter-prometheus): export PrometheusSerializer #3034 @matschaffer
+* feat(opentelemetry-sdk-metrics-base): added InMemoryMetricExporter #3039 @weyert
 
 ### :bug: (Bug Fix)
 
