@@ -16,6 +16,7 @@
 import assert = require('assert');
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { InMemoryMetricExporter } from "../../src/export/InMemoryMetricExporter"
+import { ResourceMetrics } from '../../src/export/MetricData';
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { MeterProvider } from '../../src/MeterProvider';
 import { defaultResource } from '../util';
