@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { ExportResultCode } from '@opentelemetry/core';
+import { Resource } from '@opentelemetry/resources';
 import assert = require('assert');
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { InMemoryMetricExporter } from '../../src/export/InMemoryMetricExporter';
@@ -56,6 +58,60 @@ async function waitForNumberOfExports(exporter: InMemoryMetricExporter , numberO
 
 describe('InMemoryMetricExporter', () => {
 
+  it('should return failed result code', done => {
+    const { exporter, meterReader } = setup();
+    exporter.shutdown().then(() => {
+      const resource = new Resource({
+        'resource-attribute': 'resource attribute value',
+      });
+      const resourceMetrics: ResourceMetrics = {
+        resource: resource,
+        scopeMetrics:
+          [
+            {
+              scope: {
+                name: 'mylib',
+                version: '0.1.0',
+                schemaUrl: 'http://url.to.schema'
+              },
+              metrics: [],
+            }
+          ]
+      };
+      exporter.export(resourceMetrics, result => {
+        assert.ok(result.code === ExportResultCode.FAILED);
+        meterReader.shutdown().then(() => {
+          done();
+        });
+      });
+    });
+  });
+
+  it('should reset metrics when forceFlush is called', async () => {
+    const {
+      meter,
+      meterReader,
+      exporter,
+    } = setup();
+
+    const counter = meter.createCounter('counter_total', {
+      description: 'a test description',
+    });
+    const counterAttribute = { key1: 'attributeValue1' };
+    counter.add(10, counterAttribute);
+
+    const exportedMetrics = await waitForNumberOfExports(exporter, 1);
+    assert.ok(exportedMetrics.length > 0);
+
+    await exporter.forceFlush();
+
+    const otherMetrics = exporter.getMetrics();
+    assert.ok(otherMetrics.length === 0);
+
+    await exporter.shutdown();
+    await meterReader.shutdown();
+  });
+
   it('should be able to access metric', async () => {
     const {
       meter,
@@ -97,4 +153,6 @@ describe('InMemoryMetricExporter', () => {
 
     await meterReader.shutdown();
   });
+
+
 });
