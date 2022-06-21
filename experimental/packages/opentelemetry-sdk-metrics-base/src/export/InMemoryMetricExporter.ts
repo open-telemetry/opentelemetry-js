@@ -57,13 +57,6 @@ export class InMemoryMetricExporter implements PushMetricExporter {
     return this._metrics
   }
 
-  /**
-   * Clear the collected metrics
-   */
-  public clear(): void {
-    this._metrics = []
-  }
-
   async forceFlush() {
     this._metrics = []
     return Promise.resolve()
