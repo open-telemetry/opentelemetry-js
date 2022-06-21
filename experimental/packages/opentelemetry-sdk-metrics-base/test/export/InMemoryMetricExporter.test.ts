@@ -54,7 +54,7 @@ async function waitForNumberOfExports(exporter: InMemoryMetricExporter , numberO
   return exporter.getMetrics();
 }
 
-describe.only('InMemoryMetricExporter', () => {
+describe('InMemoryMetricExporter', () => {
 
   it('should be able to access metric', async () => {
     const {
