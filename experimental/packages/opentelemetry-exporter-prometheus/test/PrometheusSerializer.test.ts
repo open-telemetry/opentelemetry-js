@@ -27,7 +27,7 @@ import {
   Histogram,
 } from '@opentelemetry/sdk-metrics-base';
 import * as sinon from 'sinon';
-import { PrometheusSerializer } from '../src/PrometheusSerializer';
+import { PrometheusSerializer } from '../src';
 import { mockedHrTimeMs, mockHrTime } from './util';
 
 const attributes = {
@@ -86,7 +86,7 @@ describe('PrometheusSerializer', () => {
         const pointData = metric.dataPoints as DataPoint<number>[];
         assert.strictEqual(pointData.length, 1);
 
-        const result = serializer.serializeSingularDataPoint(metric.descriptor.name, metric.descriptor.type, pointData[0]);
+        const result = serializer['_serializeSingularDataPoint'](metric.descriptor.name, metric.descriptor.type, pointData[0]);
         return result;
       }
 
@@ -129,7 +129,7 @@ describe('PrometheusSerializer', () => {
         const pointData = metric.dataPoints as DataPoint<Histogram>[];
         assert.strictEqual(pointData.length, 1);
 
-        const result = serializer.serializeHistogramDataPoint(metric.descriptor.name, metric.descriptor.type, pointData[0]);
+        const result = serializer['_serializeHistogramDataPoint'](metric.descriptor.name, metric.descriptor.type, pointData[0]);
         return result;
       }
 
@@ -184,7 +184,7 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
         const scopeMetrics = resourceMetrics.scopeMetrics[0];
 
-        const result = serializer.serializeScopeMetrics(scopeMetrics);
+        const result = serializer['_serializeScopeMetrics'](scopeMetrics);
         return result;
       }
 
@@ -236,7 +236,7 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
         const scopeMetrics = resourceMetrics.scopeMetrics[0];
 
-        const result = serializer.serializeScopeMetrics(scopeMetrics);
+        const result = serializer['_serializeScopeMetrics'](scopeMetrics);
         return result;
       }
 
@@ -284,7 +284,7 @@ describe('PrometheusSerializer', () => {
       const pointData = metric.dataPoints as DataPoint<number>[];
       assert.strictEqual(pointData.length, 1);
 
-      const result = serializer.serializeSingularDataPoint(metric.descriptor.name, metric.descriptor.type, pointData[0]);
+      const result = serializer['_serializeSingularDataPoint'](metric.descriptor.name, metric.descriptor.type, pointData[0]);
       return result;
     }
 
@@ -323,7 +323,7 @@ describe('PrometheusSerializer', () => {
       const pointData = metric.dataPoints as DataPoint<number>[];
       assert.strictEqual(pointData.length, 1);
 
-      const result = serializer.serializeSingularDataPoint(metric.descriptor.name, metric.descriptor.type, pointData[0]);
+      const result = serializer['_serializeSingularDataPoint'](metric.descriptor.name, metric.descriptor.type, pointData[0]);
       return result;
     }
 
