@@ -63,6 +63,7 @@ All notable changes to experimental packages in this project will be documented 
 * fix(instrumentation): only patch core modules if enabled #2993 @santigimeno
 * fix(otlp-transformer): include esm and esnext in package files and update README #2992 @pichlermarc
 * fix(metrics): specification compliant default metric unit #2983 @andyfleming
+* fix(opentelemetry-instrumentation): use all provided patches for the same file [#2963](https://github.com/open-telemetry/opentelemetry-js/pull/2963) @Ugzuzg
 
 ### :books: (Refine Doc)
 
