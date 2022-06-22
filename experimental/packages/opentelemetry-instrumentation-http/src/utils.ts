@@ -372,14 +372,12 @@ export const getAttributesFromHttpKind = (kind?: string): SpanAttributes => {
  */
 export const getOutgoingRequestAttributesOnResponse = (
   response: IncomingMessage,
-  options: { hostname: string }
 ): SpanAttributes => {
   const { statusCode, statusMessage, httpVersion, socket } = response;
   const { remoteAddress, remotePort } = socket;
   const attributes: SpanAttributes = {
     [SemanticAttributes.NET_PEER_IP]: remoteAddress,
     [SemanticAttributes.NET_PEER_PORT]: remotePort,
-    [SemanticAttributes.HTTP_HOST]: `${options.hostname}:${remotePort}`,
   };
   setResponseContentLengthAttribute(response, attributes);
 

@@ -292,7 +292,6 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       (response: http.IncomingMessage & { aborted?: boolean }) => {
         const responseAttributes = utils.getOutgoingRequestAttributesOnResponse(
           response,
-          { hostname }
         );
         span.setAttributes(responseAttributes);
         if (this._getConfig().responseHook) {
