@@ -33,7 +33,7 @@ import * as utils from '../../src/utils';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 import { RPCType, setRPCMetadata } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
-import {extractHostnameAndPort} from "../../src/utils";
+import {extractHostnameAndPort} from '../../src/utils';
 
 describe('Utility', () => {
   describe('parseResponseStatus()', () => {
