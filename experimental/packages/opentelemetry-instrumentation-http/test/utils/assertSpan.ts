@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { isValidSpanId, SpanKind, SpanStatus } from '@opentelemetry/api';
+import { isValidSpanId, SpanKind, SpanStatus, Exception } from '@opentelemetry/api';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
@@ -38,6 +38,7 @@ export const assertSpan = (
     serverName?: string;
     component: string;
     noNetPeer?: boolean; // we don't expect net peer info when request throw before being sent
+    error?: Exception;
   }
 ) => {
   assert.strictEqual(span.spanContext().traceId.length, 32);
@@ -65,7 +66,20 @@ export const assertSpan = (
   );
 
   assert.strictEqual(span.links.length, 0);
-  assert.strictEqual(span.events.length, 0);
+
+  if (validations.error) {
+    assert.strictEqual(span.events.length, 1);
+    assert.strictEqual(span.events[0].name, 'exception');
+
+    const eventAttributes = span.events[0].attributes;
+    assert.ok(eventAttributes != null);
+    assert.deepStrictEqual(
+      Object.keys(eventAttributes),
+      ['exception.type', 'exception.message', 'exception.stacktrace']
+    );
+  } else {
+    assert.strictEqual(span.events.length, 0);
+  }
 
   assert.deepStrictEqual(
     span.status,
