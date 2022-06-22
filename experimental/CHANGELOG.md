@@ -19,6 +19,7 @@ All notable changes to experimental packages in this project will be documented 
 
 * fix(otlp-transformer): remove type dependency on Long #3022 @legendecas
 * fix(grpc-exporter): use non-normalized URL to determine channel security #3019 @pichlermarc
+* fix(instrumentation-http): add `http.host` attribute before sending the request #3054 @cuichenli
 
 ### :books: (Refine Doc)
 
