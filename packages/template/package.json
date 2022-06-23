@@ -38,7 +38,7 @@
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
     "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
-    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "codecov": "nyc report --reporter=json",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../scripts/version-update.js",
@@ -48,7 +48,7 @@
     "compile": "tsc --build tsconfig.all.json",
     "clean": "tsc --build --clean tsconfig.all.json",
     "test:browser": "nyc karma start --single-run",
-    "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "codecov:browser": "nyc report --reporter=json",
     "watch": "tsc --build --watch tsconfig.all.json"
   },
   "keywords": [
@@ -83,7 +83,6 @@
   "Add these to devDependencies for testing": {
     "@types/mocha": "8.2.0",
     "@types/sinon": "9.0.9",
-    "codecov": "3.8.2",
     "istanbul-instrumenter-loader": "3.0.1",
     "mocha": "7.2.0",
     "nyc": "15.1.0",

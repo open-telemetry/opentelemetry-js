@@ -49,9 +49,14 @@ jobs:
 
       - name: Unit tests
         run: npm run test
-      - name: Report Coverage
+      - name: Generate Coverage Report
         run: npm run codecov
-        if: ${{ matrix.node_version == '14' }}
+        if: ${{ matrix.node_version == '18' }}
+      - name: Report Coverage
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./packages/*/coverage/*.json,.experimental/packages/*/coverage/*.json
+        if: ${{ matrix.node_version == '18' }}
   browser-tests:
     runs-on: ubuntu-latest
     container:
@@ -90,8 +95,12 @@ jobs:
 
       - name: Unit tests
         run: npm run test:browser
-      - name: Report Coverage
+      - name: Generate Coverage Report
         run: npm run codecov:browser
+      - name: Report Coverage
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./packages/*/coverage/*.json,.experimental/packages/*/coverage/*.json
   webworker-tests:
     runs-on: ubuntu-latest
     container:
@@ -130,5 +139,9 @@ jobs:
 
       - name: Unit tests
         run: npm run test:webworker
-      - name: Report Coverage
+      - name: Generate Coverage Report
         run: npm run codecov:webworker
+      - name: Report Coverage
+        uses: codecov/codecov-action@v2
+        with:
+          files: ./packages/*/coverage/*.json,.experimental/packages/*/coverage/*.json
