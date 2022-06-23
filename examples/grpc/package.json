@@ -20,7 +20,7 @@
     "tracing"
   ],
   "engines": {
-    "node": ">=8"
+    "node": ">=14"
   },
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",

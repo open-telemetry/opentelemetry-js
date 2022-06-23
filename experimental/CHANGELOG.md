@@ -24,6 +24,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :house: (Internal)
 
+* test: add node 18 and remove EoL node versions [#3048](https://github.com/open-telemetry/opentelemetry-js/pull/3048) @dyladan
+
 ## 0.29.2
 
 * Support for 1.3.1 of stable packages
