@@ -146,13 +146,10 @@
       "path": "experimental/packages/otlp-transformer"
     },
     {
-      "path": "experimental/backwards-compatability/node10"
+      "path": "experimental/backwards-compatability/node14"
     },
     {
-      "path": "experimental/backwards-compatability/node12"
-    },
-    {
-      "path": "experimental/backwards-compatability/node8"
+      "path": "experimental/backwards-compatability/node16"
     },
     {
       "path": "integration-tests/propagation-validation-server"
