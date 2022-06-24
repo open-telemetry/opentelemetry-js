@@ -52,6 +52,9 @@ jobs:
       - name: Generate Coverage Report
         run: npm run codecov
         if: ${{ matrix.node_version == '18' }}
+      - name: Log all coverage report files
+        run: ls -la packages/*/coverage/*.json
+        if: ${{ matrix.node_version == '18' }}
       - name: Report Coverage
         uses: codecov/codecov-action@v2
         with:
