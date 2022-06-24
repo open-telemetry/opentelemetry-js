@@ -165,7 +165,6 @@ describe('configureCompression', () => {
 });
 
 describe('sendWithHttp', () => {
-  let exporterConfig: ExporterConfig;
   let exporter: Exporter;
   let httpRequestStub: sinon.SinonStub;
   let mockRequest: HttpRequest;
@@ -177,11 +176,6 @@ describe('sendWithHttp', () => {
   };
 
   beforeEach(() => {
-    // Setup exporter config
-    exporterConfig = {
-      url: 'http://foobar.com',
-      compression: CompressionAlgorithm.NONE,
-    };
 
     // Create stub of http.request (used by sendWithHttp)
     httpRequestStub = sinon.stub(http, 'request');
@@ -207,7 +201,10 @@ describe('sendWithHttp', () => {
   });
 
   it('should send with no compression if configured to do so', () => {
-    exporter = new Exporter(exporterConfig);
+    exporter = new Exporter({
+      url: 'http://foobar.com',
+      compression: CompressionAlgorithm.NONE,
+    });
     const data = JSON.stringify(spanData);
 
     // Show that data is written to the request stream
@@ -226,11 +223,10 @@ describe('sendWithHttp', () => {
   });
 
   it('should send with gzip compression if configured to do so', () => {
-    exporterConfig = {
+    exporter = new Exporter({
       url: 'http://foobar.com',
       compression: CompressionAlgorithm.GZIP,
-    };
-    exporter = new Exporter(exporterConfig);
+    });
 
     const data = JSON.stringify(spanData);
     const compressedData = zlib.gzipSync(Buffer.from(data));
@@ -251,11 +247,10 @@ describe('sendWithHttp', () => {
   });
 
   it('should work with gzip compression enabled even after multiple requests', () => {
-    exporterConfig = {
+    exporter = new Exporter({
       url: 'http://foobar.com',
       compression: CompressionAlgorithm.GZIP,
-    };
-    exporter = new Exporter(exporterConfig);
+    });
 
     const data = JSON.stringify(spanData);
     const compressedData = zlib.gzipSync(Buffer.from(data));
