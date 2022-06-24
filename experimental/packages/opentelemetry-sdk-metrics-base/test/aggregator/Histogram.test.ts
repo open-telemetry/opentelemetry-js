@@ -24,7 +24,7 @@ import { commonValues, defaultInstrumentDescriptor } from '../util';
 describe('HistogramAggregator', () => {
   describe('createAccumulation', () => {
     it('no exceptions on createAccumulation', () => {
-      const aggregator = new HistogramAggregator([1, 10, 100]);
+      const aggregator = new HistogramAggregator([1, 10, 100], true);
       const accumulation = aggregator.createAccumulation();
       assert(accumulation instanceof HistogramAccumulation);
     });
@@ -32,7 +32,7 @@ describe('HistogramAggregator', () => {
 
   describe('merge', () => {
     it('no exceptions', () => {
-      const aggregator = new HistogramAggregator([1, 10, 100]);
+      const aggregator = new HistogramAggregator([1, 10, 100], true);
       const prev = aggregator.createAccumulation();
       prev.record(0);
       prev.record(1);
@@ -55,7 +55,7 @@ describe('HistogramAggregator', () => {
 
   describe('diff', () => {
     it('no exceptions', () => {
-      const aggregator = new HistogramAggregator([1, 10, 100]);
+      const aggregator = new HistogramAggregator([1, 10, 100], true);
       const prev = aggregator.createAccumulation();
       prev.record(0);
       prev.record(1);
@@ -68,13 +68,16 @@ describe('HistogramAggregator', () => {
       curr.record(2);
       curr.record(11);
 
-      const expected = new HistogramAccumulation([1, 10, 100], {
+      const expected = new HistogramAccumulation([1, 10, 100], true, {
         buckets: {
           boundaries: [1, 10, 100],
           counts: [0, 1, 1, 0],
         },
         count: 2,
         sum: 13,
+        hasMinMax: false,
+        min: Infinity,
+        max: -1
       });
 
       assert.deepStrictEqual(aggregator.diff(prev, curr), expected);
@@ -83,7 +86,7 @@ describe('HistogramAggregator', () => {
 
   describe('toMetricData', () => {
     it('transform without exception', () => {
-      const aggregator = new HistogramAggregator([1, 10, 100]);
+      const aggregator = new HistogramAggregator([1, 10, 100], true);
 
       const accumulation = aggregator.createAccumulation();
       accumulation.record(0);
@@ -108,6 +111,9 @@ describe('HistogramAggregator', () => {
               },
               count: 2,
               sum: 1,
+              hasMinMax: true,
+              min: 0,
+              max: 1
             },
           },
         ],
