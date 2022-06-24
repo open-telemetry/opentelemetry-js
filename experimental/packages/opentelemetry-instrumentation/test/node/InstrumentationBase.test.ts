@@ -155,7 +155,7 @@ describe('InstrumentationBase', () => {
       let filePatchSpy: sinon.SinonSpy;
 
       beforeEach(() => {
-        filePatchSpy = sinon.spy();
+        filePatchSpy = sinon.stub().callsFake(exports => exports);
       });
 
       describe('AND there is no wildcard supported version', () => {
@@ -215,6 +215,41 @@ describe('InstrumentationBase', () => {
           assert.strictEqual(instrumentationModule.files[0].moduleExports, moduleExports);
           sinon.assert.notCalled(modulePatchSpy);
           sinon.assert.calledOnceWithExactly(filePatchSpy, moduleExports, undefined);
+        });
+      });
+
+      describe('AND there is multiple patches for the same file', () => {
+        it('should patch the same file twice', () => {
+          const moduleExports = {};
+          const supportedVersions = [`^${MODULE_VERSION}`, WILDCARD_VERSION];
+          const instrumentationModule = {
+            supportedVersions,
+            name: MODULE_NAME,
+            patch: modulePatchSpy as unknown,
+            files: [{
+              name: MODULE_FILE_NAME,
+              supportedVersions,
+              patch: filePatchSpy as unknown
+            }, {
+              name: MODULE_FILE_NAME,
+              supportedVersions,
+              patch: filePatchSpy as unknown
+            }]
+          } as InstrumentationModuleDefinition<unknown>;
+
+          // @ts-expect-error access internal property for testing
+          instrumentation._onRequire<unknown>(
+            instrumentationModule,
+            moduleExports,
+            MODULE_FILE_NAME,
+            MODULE_DIR
+          );
+
+          assert.strictEqual(instrumentationModule.moduleVersion, undefined);
+          assert.strictEqual(instrumentationModule.files[0].moduleExports, moduleExports);
+          assert.strictEqual(instrumentationModule.files[1].moduleExports, moduleExports);
+          sinon.assert.notCalled(modulePatchSpy);
+          sinon.assert.calledTwice(filePatchSpy);
         });
       });
     });
