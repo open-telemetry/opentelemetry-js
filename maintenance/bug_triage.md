@@ -19,10 +19,10 @@ A bug is defined as code that does not work the way it was intended to work when
 A change required by specification may not be a bug if the code is working as intended.
 If a bug report is determined not to be a bug, remove the `bug` label and apply the appropriate labels as follows:
 
+- `documentation` feature is working as intended but documentation is incorrect or incomplete
+- `feature-request` new feature request which is not required by the specification, but is allowable by specification rules
 - `spec-feature` change required by the specification which adds a new feature or extends an existing feature with new functionality
-- `spec-inconsistency` An existing feature incorrectly or incompletely implements the specification - may or may not also be a bug
-- `feature-request` this label is applied if an issue is requesting a new feature which is not required by the specification, but is allowable by specification rules
-
+- `spec-inconsistency` an existing feature incorrectly or incompletely implements the specification - may or may not also be a bug
 
 ### Prioritize
 
