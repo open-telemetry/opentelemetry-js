@@ -1,11 +1,6 @@
 name: Bug Report
 description: File a bug report
 labels: ["bug", "triage"]
-assignees:
-  - dyladan
-  - legendecas
-  - Rauno56
-  - vmarchaud
 body:
   - type: markdown
     attributes:
