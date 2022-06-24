@@ -46,9 +46,9 @@ export function toResourceMetrics(resourceMetrics: ResourceMetrics): IResourceMe
   };
 }
 
-export function toScopeMetrics(scopeMetrics: ScopeMetrics[]): IScopeMetrics[]{
+export function toScopeMetrics(scopeMetrics: ScopeMetrics[]): IScopeMetrics[] {
   return Array.from(scopeMetrics.map(metrics => {
-    const scopeMetrics : IScopeMetrics = {
+    const scopeMetrics: IScopeMetrics = {
       scope: {
         name: metrics.scope.name,
         version: metrics.scope.version,
@@ -135,6 +135,8 @@ function toHistogramDataPoints(
       explicitBounds: histogram.buckets.boundaries,
       count: histogram.count,
       sum: histogram.sum,
+      min: histogram.hasMinMax ? histogram.min : undefined,
+      max: histogram.hasMinMax ? histogram.max : undefined,
       startTimeUnixNano: hrTimeToNanoseconds(dataPoint.startTime),
       timeUnixNano: hrTimeToNanoseconds(
         dataPoint.endTime
