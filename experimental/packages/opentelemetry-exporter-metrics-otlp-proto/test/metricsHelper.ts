@@ -187,6 +187,8 @@ export function ensureExportedHistogramIsCorrect(
         {
           sum: 21,
           count: '2',
+          min: 7,
+          max: 14,
           startTimeUnixNano: String(startTime),
           timeUnixNano: String(time),
           bucketCounts,

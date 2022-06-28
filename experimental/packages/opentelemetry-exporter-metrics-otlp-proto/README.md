@@ -4,7 +4,7 @@
 [![Apache License][license-image]][license-image]
 
 This module provides exporter for node to be used with [opentelemetry-collector][opentelemetry-collector-url].
-Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.32 <=0.50`.
+Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.32 <=0.53`.
 
 ## Installation
 

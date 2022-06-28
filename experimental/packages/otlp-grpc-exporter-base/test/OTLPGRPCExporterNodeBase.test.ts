@@ -52,6 +52,10 @@ class MockCollectorExporter extends OTLPGRPCExporterNodeBase<
   getServiceProtoPath(): string {
     return 'opentelemetry/proto/collector/trace/v1/trace_service.proto';
   }
+
+  getUrlFromConfig(config: OTLPGRPCExporterConfigNode): string {
+    return '';
+  }
 }
 
 // Mocked _send which just saves the callbacks for later

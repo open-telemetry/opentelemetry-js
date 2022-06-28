@@ -150,6 +150,7 @@ export const setSpanWithError = (
   });
 
   span.setStatus({ code: SpanStatusCode.ERROR, message });
+  span.recordException(error);
 };
 
 /**
