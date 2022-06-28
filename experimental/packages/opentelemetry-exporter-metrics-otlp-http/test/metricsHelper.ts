@@ -370,6 +370,8 @@ export function ensureHistogramIsCorrect(
           attributes: [],
           sum: 21,
           count: 2,
+          min: 7,
+          max: 14,
           startTimeUnixNano: startTime,
           timeUnixNano: time,
           bucketCounts,
