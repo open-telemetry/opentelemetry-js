@@ -15,7 +15,6 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { hrTime } from '@opentelemetry/core';
 import * as assert from 'assert';
 
 import { SumAggregator } from '../../src/aggregator';
@@ -34,16 +33,18 @@ const cumulativeCollector: MetricCollectorHandle = {
   selectAggregationTemporality: () => AggregationTemporality.CUMULATIVE,
 };
 
-const sdkStartTime = hrTime();
-
 describe('SyncMetricStorage', () => {
   describe('record', () => {
     it('no exceptions on record', () => {
-      const metricStorage = new SyncMetricStorage(defaultInstrumentDescriptor, new SumAggregator(), new NoopAttributesProcessor());
+      const metricStorage = new SyncMetricStorage(
+        defaultInstrumentDescriptor,
+        new SumAggregator(true),
+        new NoopAttributesProcessor()
+      );
 
       for (const value of commonValues) {
         for (const attributes of commonAttributes) {
-          metricStorage.record(value, attributes, api.context.active());
+          metricStorage.record(value, attributes, api.context.active(), [0, 0]);
         }
       }
     });
@@ -53,20 +54,23 @@ describe('SyncMetricStorage', () => {
     describe('Delta Collector', () => {
       const collectors = [deltaCollector];
       it('should collect and reset memos', async () => {
-        const metricStorage = new SyncMetricStorage(defaultInstrumentDescriptor, new SumAggregator(), new NoopAttributesProcessor());
-        metricStorage.record(1, {}, api.context.active());
-        metricStorage.record(2, {}, api.context.active());
-        metricStorage.record(3, {}, api.context.active());
+        const metricStorage = new SyncMetricStorage(
+          defaultInstrumentDescriptor,
+          new SumAggregator(true),
+          new NoopAttributesProcessor()
+        );
+        metricStorage.record(1, {}, api.context.active(), [0, 0]);
+        metricStorage.record(2, {}, api.context.active(), [1, 1]);
+        metricStorage.record(3, {}, api.context.active(), [2, 2]);
         {
           const metric = metricStorage.collect(
             deltaCollector,
             collectors,
-            sdkStartTime,
-            hrTime());
+            [3, 3]);
 
           assertMetricData(metric, DataPointType.SINGULAR);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 6);
+          assertDataPoint(metric.dataPoints[0], {}, 6, [0, 0], [3, 3]);
         }
 
         // The attributes should not be memorized.
@@ -74,24 +78,22 @@ describe('SyncMetricStorage', () => {
           const metric = metricStorage.collect(
             deltaCollector,
             collectors,
-            sdkStartTime,
-            hrTime());
+            [4, 4]);
 
           assertMetricData(metric, DataPointType.SINGULAR);
           assert.strictEqual(metric.dataPoints.length, 0);
         }
 
-        metricStorage.record(1, {}, api.context.active());
+        metricStorage.record(1, {}, api.context.active(), [5, 5]);
         {
           const metric = metricStorage.collect(
             deltaCollector,
             [deltaCollector],
-            sdkStartTime,
-            hrTime());
+            [6, 6]);
 
           assertMetricData(metric, DataPointType.SINGULAR);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 1);
+          assertDataPoint(metric.dataPoints[0], {}, 1, [5, 5], [6, 6]);
         }
       });
     });
@@ -99,20 +101,23 @@ describe('SyncMetricStorage', () => {
     describe('Cumulative Collector', () => {
       const collectors = [cumulativeCollector];
       it('should collect cumulative metrics', async () => {
-        const metricStorage = new SyncMetricStorage(defaultInstrumentDescriptor, new SumAggregator(), new NoopAttributesProcessor());
-        metricStorage.record(1, {}, api.context.active());
-        metricStorage.record(2, {}, api.context.active());
-        metricStorage.record(3, {}, api.context.active());
+        const metricStorage = new SyncMetricStorage(
+          defaultInstrumentDescriptor,
+          new SumAggregator(true),
+          new NoopAttributesProcessor()
+        );
+        metricStorage.record(1, {}, api.context.active(), [0, 0]);
+        metricStorage.record(2, {}, api.context.active(), [1, 1]);
+        metricStorage.record(3, {}, api.context.active(), [2, 2]);
         {
           const metric = metricStorage.collect(
             cumulativeCollector,
             collectors,
-            sdkStartTime,
-            hrTime());
+            [3, 3]);
 
           assertMetricData(metric, DataPointType.SINGULAR);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 6);
+          assertDataPoint(metric.dataPoints[0], {}, 6, [0, 0], [3, 3]);
         }
 
         // The attributes should be memorized.
@@ -120,25 +125,23 @@ describe('SyncMetricStorage', () => {
           const metric = metricStorage.collect(
             cumulativeCollector,
             collectors,
-            sdkStartTime,
-            hrTime());
+            [4, 4]);
 
           assertMetricData(metric, DataPointType.SINGULAR);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 6);
+          assertDataPoint(metric.dataPoints[0], {}, 6, [0, 0], [4, 4]);
         }
 
-        metricStorage.record(1, {}, api.context.active());
+        metricStorage.record(1, {}, api.context.active(), [5, 5]);
         {
           const metric = metricStorage.collect(
             cumulativeCollector,
             collectors,
-            sdkStartTime,
-            hrTime());
+            [6, 6]);
 
           assertMetricData(metric, DataPointType.SINGULAR);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 7);
+          assertDataPoint(metric.dataPoints[0], {}, 7, [0, 0], [6, 6]);
         }
       });
     });

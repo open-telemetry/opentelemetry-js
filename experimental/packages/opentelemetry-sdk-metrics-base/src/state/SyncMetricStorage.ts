@@ -46,9 +46,9 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>> extends MetricStor
     this._temporalMetricStorage = new TemporalMetricProcessor(aggregator);
   }
 
-  record(value: number, attributes: MetricAttributes, context: Context) {
+  record(value: number, attributes: MetricAttributes, context: Context, recordTime: HrTime) {
     attributes = this._attributesProcessor.process(attributes, context);
-    this._deltaMetricStorage.record(value, attributes, context);
+    this._deltaMetricStorage.record(value, attributes, context, recordTime);
   }
 
   /**
@@ -60,7 +60,6 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>> extends MetricStor
   collect(
     collector: MetricCollectorHandle,
     collectors: MetricCollectorHandle[],
-    sdkStartTime: HrTime,
     collectionTime: HrTime,
   ): Maybe<MetricData> {
     const accumulations = this._deltaMetricStorage.collect();
@@ -70,7 +69,6 @@ export class SyncMetricStorage<T extends Maybe<Accumulation>> extends MetricStor
       collectors,
       this._instrumentDescriptor,
       accumulations,
-      sdkStartTime,
       collectionTime
     );
   }

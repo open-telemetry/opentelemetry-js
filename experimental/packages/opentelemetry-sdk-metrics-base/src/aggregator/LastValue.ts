@@ -23,11 +23,15 @@ import { Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 
 export class LastValueAccumulation implements Accumulation {
-  constructor(private _current: number = 0, public sampleTime: HrTime = [0, 0]) {}
+  constructor(public startTime: HrTime, private _current: number = 0, public sampleTime: HrTime = [0, 0]) {}
 
   record(value: number): void {
     this._current = value;
     this.sampleTime = hrTime();
+  }
+
+  setStartTime(startTime: HrTime): void {
+    this.startTime = startTime;
   }
 
   toPointValue(): LastValue {
@@ -39,8 +43,8 @@ export class LastValueAccumulation implements Accumulation {
 export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
   public kind: AggregatorKind.LAST_VALUE = AggregatorKind.LAST_VALUE;
 
-  createAccumulation() {
-    return new LastValueAccumulation();
+  createAccumulation(startTime: HrTime) {
+    return new LastValueAccumulation(startTime);
   }
 
   /**
@@ -51,7 +55,7 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
   merge(previous: LastValueAccumulation, delta: LastValueAccumulation): LastValueAccumulation {
     // nanoseconds may lose precisions.
     const latestAccumulation = hrTimeToMicroseconds(delta.sampleTime) >= hrTimeToMicroseconds(previous.sampleTime) ? delta : previous;
-    return new LastValueAccumulation(latestAccumulation.toPointValue(), latestAccumulation.sampleTime);
+    return new LastValueAccumulation(previous.startTime, latestAccumulation.toPointValue(), latestAccumulation.sampleTime);
   }
 
   /**
@@ -63,14 +67,13 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
   diff(previous: LastValueAccumulation, current: LastValueAccumulation): LastValueAccumulation {
     // nanoseconds may lose precisions.
     const latestAccumulation = hrTimeToMicroseconds(current.sampleTime) >= hrTimeToMicroseconds(previous.sampleTime) ? current : previous;
-    return new LastValueAccumulation(latestAccumulation.toPointValue(), latestAccumulation.sampleTime);
+    return new LastValueAccumulation(current.startTime, latestAccumulation.toPointValue(), latestAccumulation.sampleTime);
   }
 
   toMetricData(
     descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<LastValueAccumulation>[],
-    startTime: HrTime,
     endTime: HrTime): Maybe<SingularMetricData> {
     return {
       descriptor,
@@ -79,7 +82,7 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
       dataPoints: accumulationByAttributes.map(([attributes, accumulation]) => {
         return {
           attributes,
-          startTime,
+          startTime: accumulation.startTime,
           endTime,
           value: accumulation.toPointValue(),
         };

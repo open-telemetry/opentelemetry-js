@@ -25,7 +25,7 @@ describe('HistogramAggregator', () => {
   describe('createAccumulation', () => {
     it('no exceptions on createAccumulation', () => {
       const aggregator = new HistogramAggregator([1, 10, 100], true);
-      const accumulation = aggregator.createAccumulation();
+      const accumulation = aggregator.createAccumulation([0, 0]);
       assert(accumulation instanceof HistogramAccumulation);
     });
   });
@@ -33,15 +33,15 @@ describe('HistogramAggregator', () => {
   describe('merge', () => {
     it('no exceptions', () => {
       const aggregator = new HistogramAggregator([1, 10, 100], true);
-      const prev = aggregator.createAccumulation();
+      const prev = aggregator.createAccumulation([0, 0]);
       prev.record(0);
       prev.record(1);
 
-      const delta = aggregator.createAccumulation();
+      const delta = aggregator.createAccumulation([1, 1]);
       delta.record(2);
       delta.record(11);
 
-      const expected = aggregator.createAccumulation();
+      const expected = aggregator.createAccumulation([0, 0]);
       // replay actions on prev
       expected.record(0);
       expected.record(1);
@@ -56,11 +56,11 @@ describe('HistogramAggregator', () => {
   describe('diff', () => {
     it('no exceptions', () => {
       const aggregator = new HistogramAggregator([1, 10, 100], true);
-      const prev = aggregator.createAccumulation();
+      const prev = aggregator.createAccumulation([0, 0]);
       prev.record(0);
       prev.record(1);
 
-      const curr = aggregator.createAccumulation();
+      const curr = aggregator.createAccumulation([1, 1]);
       // replay actions on prev
       curr.record(0);
       curr.record(1);
@@ -68,7 +68,7 @@ describe('HistogramAggregator', () => {
       curr.record(2);
       curr.record(11);
 
-      const expected = new HistogramAccumulation([1, 10, 100], true, {
+      const expected = new HistogramAccumulation([1, 1], [1, 10, 100], true, {
         buckets: {
           boundaries: [1, 10, 100],
           counts: [0, 1, 1, 0],
@@ -88,12 +88,11 @@ describe('HistogramAggregator', () => {
     it('transform without exception', () => {
       const aggregator = new HistogramAggregator([1, 10, 100], true);
 
-      const accumulation = aggregator.createAccumulation();
-      accumulation.record(0);
-      accumulation.record(1);
-
       const startTime: HrTime = [0, 0];
       const endTime: HrTime = [1, 1];
+      const accumulation = aggregator.createAccumulation(startTime);
+      accumulation.record(0);
+      accumulation.record(1);
 
       const expected: MetricData = {
         descriptor: defaultInstrumentDescriptor,
@@ -122,7 +121,6 @@ describe('HistogramAggregator', () => {
         defaultInstrumentDescriptor,
         AggregationTemporality.CUMULATIVE,
         [[{}, accumulation]],
-        startTime,
         endTime,
       ), expected);
     });
@@ -132,11 +130,19 @@ describe('HistogramAggregator', () => {
 describe('HistogramAccumulation', () => {
   describe('record', () => {
     it('no exceptions on record', () => {
-      const accumulation = new HistogramAccumulation([1, 10, 100]);
+      const accumulation = new HistogramAccumulation([0, 0], [1, 10, 100]);
 
       for (const value of commonValues) {
         accumulation.record(value);
       }
+    });
+  });
+
+  describe('setStartTime', () => {
+    it('should set start time', () => {
+      const accumulation = new HistogramAccumulation([0, 0], [1, 10, 100]);
+      accumulation.setStartTime([1, 1]);
+      assert.deepStrictEqual(accumulation.startTime, [1, 1]);
     });
   });
 });
