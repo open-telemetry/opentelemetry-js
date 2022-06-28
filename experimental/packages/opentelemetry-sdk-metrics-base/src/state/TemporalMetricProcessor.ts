@@ -153,7 +153,7 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
       const [key, record, hash] = next.value;
       if (last.has(key, hash)) {
         const lastAccumulation = last.get(key, hash);
-        // lastAccumulation must present.
+        // last.has() returned true, lastAccumulation is present.
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const accumulation = aggregator.merge(lastAccumulation!, record);
         result.set(key, accumulation, hash);
@@ -167,20 +167,13 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
   }
 
   /**
-   * Calibrate the reported metric streams's startTime to lastCollectionTime. Leaves
+   * Calibrate the reported metric streams' startTime to lastCollectionTime. Leaves
    * the new stream to be the initial observation time unchanged.
    */
   static calibrateStartTime<T extends Maybe<Accumulation>>(last: AttributeHashMap<T>, current: AttributeHashMap<T>, lastCollectionTime: HrTime) {
-    const iterator = last.keys();
-    let next = iterator.next();
-    while (next.done !== true) {
-      const [key, hash] = next.value;
-      if (current.has(key, hash)) {
-        const currentAccumulation = current.get(key, hash);
-        currentAccumulation?.setStartTime(lastCollectionTime);
-      }
-
-      next = iterator.next();
+    for (const [key, hash] of last.keys()) {
+      const currentAccumulation = current.get(key, hash);
+      currentAccumulation?.setStartTime(lastCollectionTime);
     }
     return current;
   }

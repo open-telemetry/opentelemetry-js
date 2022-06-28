@@ -70,7 +70,7 @@ describe('SumAggregator', () => {
       const prev = aggregator.createAccumulation([0, 0]);
       prev.record(10);
 
-      // A new record with the value been reset.
+      // Create a new record that indicates a reset.
       const curr = aggregator.createAccumulation([1, 1]);
       curr.record(3);
 

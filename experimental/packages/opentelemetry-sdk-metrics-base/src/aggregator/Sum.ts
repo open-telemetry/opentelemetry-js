@@ -54,10 +54,12 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
    * Returns the result of the merge of the given accumulations.
    */
   merge(previous: SumAccumulation, delta: SumAccumulation): SumAccumulation {
+    const prevPv = previous.toPointValue();
+    const deltaPv = delta.toPointValue();
     if (delta.reset) {
-      return new SumAccumulation(delta.startTime, this.monotonic, delta.toPointValue(), delta.reset);
+      return new SumAccumulation(delta.startTime, this.monotonic, deltaPv, delta.reset);
     }
-    return new SumAccumulation(previous.startTime, this.monotonic, previous.toPointValue() + delta.toPointValue());
+    return new SumAccumulation(previous.startTime, this.monotonic, prevPv + deltaPv);
   }
 
   /**
@@ -74,7 +76,7 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
     if (this.monotonic && (prevPv > currPv)) {
       return new SumAccumulation(current.startTime, this.monotonic, currPv, true);
     }
-    return new SumAccumulation(current.startTime, this.monotonic, current.toPointValue() - previous.toPointValue());
+    return new SumAccumulation(current.startTime, this.monotonic, currPv - prevPv);
   }
 
   toMetricData(

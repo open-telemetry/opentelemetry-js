@@ -49,7 +49,7 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
       accumulation?.record(value);
       let delta = accumulation;
       if (this._cumulativeMemoStorage.has(attributes, hashCode)) {
-        // previous must present.
+        // has() returned true, previous is present.
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const previous = this._cumulativeMemoStorage.get(attributes, hashCode)!;
         delta = this._aggregator.diff(previous, accumulation);
@@ -62,7 +62,7 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
   }
 
   /**
-   * Returns a collection of delta metrics. Their start time is the when first
+   * Returns a collection of delta metrics. Start time is the when first
    * time event collected.
    */
   collect() {
