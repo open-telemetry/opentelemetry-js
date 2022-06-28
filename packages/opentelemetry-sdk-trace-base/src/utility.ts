@@ -17,6 +17,10 @@
 import { Sampler } from '@opentelemetry/api';
 import { buildSamplerFromEnv, DEFAULT_CONFIG } from './config';
 import { SpanLimits, TracerConfig, GeneralLimits } from './types';
+import {
+  DEFAULT_ATTRIBUTE_COUNT_LIMIT,
+  DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT
+} from '@opentelemetry/core';
 
 /**
  * Function to merge Default configuration (as specified in './config') with
@@ -65,16 +69,38 @@ export function reconfigureLimits(userConfig: TracerConfig): TracerConfig {
    * When span attribute count limit is not defined, but general attribute count limit is defined
    * Then, span attribute count limit will be same as general one
    */
-  if (spanLimits.attributeCountLimit == null && userConfig.generalLimits?.attributeCountLimit != null) {
-    spanLimits.attributeCountLimit = userConfig.generalLimits.attributeCountLimit;
+  if (
+    spanLimits.attributeCountLimit == null &&
+    (DEFAULT_CONFIG.spanLimits.attributeCountLimit === DEFAULT_ATTRIBUTE_COUNT_LIMIT) &&
+    (
+      userConfig.generalLimits?.attributeCountLimit != null ||
+      DEFAULT_CONFIG.generalLimits.attributeCountLimit !== DEFAULT_ATTRIBUTE_COUNT_LIMIT
+    )
+  ) {
+    const attributeCountLimit =
+     userConfig.generalLimits?.attributeCountLimit ??
+      DEFAULT_CONFIG.generalLimits.attributeCountLimit;
+
+    spanLimits.attributeCountLimit = attributeCountLimit;
   }
 
   /**
    * When span attribute value length limit is not defined, but general attribute value length limit is defined
    * Then, span attribute value length limit will be same as general one
    */
-  if (spanLimits.attributeValueLengthLimit == null && userConfig.generalLimits?.attributeValueLengthLimit != null) {
-    spanLimits.attributeValueLengthLimit = userConfig.generalLimits.attributeValueLengthLimit;
+  if (
+    spanLimits.attributeValueLengthLimit == null &&
+    (DEFAULT_CONFIG.spanLimits.attributeValueLengthLimit === DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT) &&
+    (
+      userConfig.generalLimits?.attributeValueLengthLimit != null ||
+      DEFAULT_CONFIG.generalLimits.attributeValueLengthLimit !== DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT
+    )
+  ) {
+    const attributeValueLengthLimit =
+      userConfig.generalLimits?.attributeValueLengthLimit ??
+        DEFAULT_CONFIG.generalLimits.attributeValueLengthLimit;
+
+    spanLimits.attributeValueLengthLimit = attributeValueLengthLimit;
   }
 
   return Object.assign({}, userConfig, { spanLimits });
