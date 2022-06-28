@@ -7,20 +7,30 @@ All notable changes to experimental packages in this project will be documented 
 ### :boom: Breaking Change
 
 * fix: remove aws and gcp detector from SDK #3024 @flarna
+* feat(sdk-metrics-base): implement min/max recording for Histograms #3032 @pichlermarc
+  * adds `min`/`max` recording to Histograms
+  * updates [opentelemetry-proto](https://github.com/open-telemetry/opentelemetry-proto) to `0.18` so that `min` and
+    `max` can be exported. This change breaks the OTLP/JSON Metric Exporter for all collector versions `<0.52` due to
+    [open-telemetry/opentelemetry-collector#5312](https://github.com/open-telemetry/opentelemetry-collector/issues/5312).
 
 ### :rocket: (Enhancement)
 
 * feat(opentelemetry-instrumentation-fetch): optionally ignore network events #3028 @gregolsen
 * feat(http-instrumentation): record exceptions in http instrumentation #3008 @luismiramirez
+* feat(node-sdk): add serviceName config option #2867 @naseemkullah
+* feat(opentelemetry-exporter-prometheus): export PrometheusSerializer #3034 @matschaffer
 
 ### :bug: (Bug Fix)
 
 * fix(otlp-transformer): remove type dependency on Long #3022 @legendecas
 * fix(grpc-exporter): use non-normalized URL to determine channel security #3019 @pichlermarc
+* fix(otlp-exporter-base): fix gzip output stream in http otlp export #3046 @mattolson
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+* test: add node 18 and remove EoL node versions [#3048](https://github.com/open-telemetry/opentelemetry-js/pull/3048) @dyladan
 
 ## 0.29.2
 
@@ -61,6 +71,7 @@ All notable changes to experimental packages in this project will be documented 
 * fix(instrumentation): only patch core modules if enabled #2993 @santigimeno
 * fix(otlp-transformer): include esm and esnext in package files and update README #2992 @pichlermarc
 * fix(metrics): specification compliant default metric unit #2983 @andyfleming
+* fix(opentelemetry-instrumentation): use all provided patches for the same file [#2963](https://github.com/open-telemetry/opentelemetry-js/pull/2963) @Ugzuzg
 
 ### :books: (Refine Doc)
 

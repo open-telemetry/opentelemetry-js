@@ -46,7 +46,7 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 ## Compatibility Matrix
 
 | API Version | Core version | Experimental Packages |
-| ----------- |--------------| --------------------- |
+| ----------- | ------------ | --------------------- |
 | 1.1.x       | 1.1.x        | 0.28.x                |
 | 1.0.x       | 1.0.x        | 0.26.x, 0.27.x        |
 | 1.0.x       | 0.26.x       | -----                 |
@@ -138,19 +138,18 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 ## Supported Runtimes
 
-| Platform Version | Supported                                       |
-|------------------|-------------------------------------------------|
-| Node.JS `v16`    | ✅                                               |
-| Node.JS `v14`    | ✅                                               |
-| Node.JS `v12`    | ✅                                               |
-| Node.JS `v10`    | ✅                                               |
-| Node.JS `v8`     | See [Node Support](#node-support) below         |
-| Web Browsers     | ✅ See [Browser Support](#browser-support) below |
+| Platform Version    | Supported                                       |
+| ------------------- | ----------------------------------------------- |
+| Node.JS `v18`       | ✅                                               |
+| Node.JS `v16`       | ✅                                               |
+| Node.JS `v14`       | ✅                                               |
+| Older Node Versions | See [Node Support](#node-support)               |
+| Web Browsers        | ✅ See [Browser Support](#browser-support) below |
 
 ### Node Support
 
-Automated tests are run using the latest release of each currently active version of Node.JS.
-While Node.JS v8 and v10 are no longer supported by the Node.JS team, the latest versions of Node.JS v8 and v10 are still included in our testing suite.
+Only Node.js Active or Maintenance LTS versions are supported.
+Previous versions of node _may_ work, but they are not tested by OpenTelemetry and they are not guaranteed to work.
 Please note that versions of Node.JS v8 prior to `v8.12.0` will NOT work, because OpenTelemetry Node depends on the `perf_hooks` module introduced in `v8.5.0` and `performance.timeOrigin` that is set correctly starting in `v8.12.0`.
 
 ### Browser Support
@@ -161,7 +160,7 @@ There is currently no list of officially supported browsers, but OpenTelemetry i
 ## Feature Status
 
 | Signal  | API Status  | SDK Status        |
-|---------|-------------|-------------------|
+| ------- | ----------- | ----------------- |
 | Tracing | Stable      | Release Candidate |
 | Metrics | Development | Development       |
 | Logs    | Roadmap     | Roadmap           |
@@ -220,18 +219,18 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 ### API
 
 | Package                          | Description                                                                                                                                                                                    |
-|----------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [@opentelemetry/api][otel-api]   | This package provides TypeScript interfaces, enums and no-op implementations for the OpenTelemetry core trace and metrics model. It is intended for use both on the server and in the browser. |
 | [@opentelemetry/core][otel-core] | This package provides default and no-op implementations of the OpenTelemetry api for trace and metrics. It's intended for use both on the server and in the browser.                           |
 
 ### Implementation / SDKs
 
-| Package                                | Description                                                                                                                                                                                                                                                  |
-|----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [@opentelemetry/sdk-trace-base][otel-tracing] | This module provides a full control over instrumentation and span creation. It doesn't load [`async_hooks`](https://nodejs.org/api/async_hooks.html) or any instrumentation by default. It is intended for use both on the server and in the browser.        |
-| [@opentelemetry/sdk-metrics-base][otel-metrics] | This module provides instruments and meters for reporting of time series data.                                                                                                                                                                               |
-| [@opentelemetry/sdk-trace-node][otel-node]       | This module provides automatic tracing for Node.js applications. It is intended for use on the server only.                                                                                                                                                  |
-| [@opentelemetry/sdk-trace-web][otel-web]         | This module provides automated instrumentation and tracing for Web applications. It is intended for use in the browser only.                                                                                                                                 |
+| Package                                         | Description                                                                                                                                                                                                                                           |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [@opentelemetry/sdk-trace-base][otel-tracing]   | This module provides a full control over instrumentation and span creation. It doesn't load [`async_hooks`](https://nodejs.org/api/async_hooks.html) or any instrumentation by default. It is intended for use both on the server and in the browser. |
+| [@opentelemetry/sdk-metrics-base][otel-metrics] | This module provides instruments and meters for reporting of time series data.                                                                                                                                                                        |
+| [@opentelemetry/sdk-trace-node][otel-node]      | This module provides automatic tracing for Node.js applications. It is intended for use on the server only.                                                                                                                                           |
+| [@opentelemetry/sdk-trace-web][otel-web]        | This module provides automated instrumentation and tracing for Web applications. It is intended for use in the browser only.                                                                                                                          |
 
 ### Compatible Exporters
 
@@ -272,7 +271,7 @@ These instrumentations are hosted at <https://github.com/open-telemetry/opentele
 ### Shims
 
 | Package                                                  | Description                                                                             |
-|----------------------------------------------------------|-----------------------------------------------------------------------------------------|
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------- |
 | [@opentelemetry/shim-opentracing][otel-shim-opentracing] | OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry |
 
 ## Upgrade guidelines
