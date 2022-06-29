@@ -58,6 +58,15 @@ export class HashMap<KeyType, ValueType, HashCodeType> {
     return this._valueMap.has(hashCode);
   }
 
+  *keys(): IterableIterator<[KeyType, HashCodeType]> {
+    const keyIterator = this._keyMap.entries();
+    let next = keyIterator.next();
+    while (next.done !== true) {
+      yield [ next.value[1], next.value[0]];
+      next = keyIterator.next();
+    }
+  }
+
   *entries(): IterableIterator<[KeyType, ValueType, HashCodeType]> {
     const valueIterator = this._valueMap.entries();
     let next = valueIterator.next();

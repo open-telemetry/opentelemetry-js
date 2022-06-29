@@ -1,0 +1,97 @@
+name: Bug Report
+description: File a bug report
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+        Please make sure to fill out the entire form below,
+        providing as much context as you can in order to help us
+        triage and track down your bug as quickly as possible.
+
+        Before filing a bug, please be sure you have searched through
+        [existing bugs](https://github.com/open-telemetry/opentelemetry-js/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc+label%3Abug)
+        to see if your bug is already addressed.
+
+        If your bug is related to an instrumentation or plugin in [opentelemetry-js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib)
+        please be sure to file it there.
+  - type: textarea
+    attributes:
+      label: What happened?
+      description: Please provide as much detail as you reasonably can.
+      value: |
+        ## Steps to Reproduce
+
+        ## Expected Result
+
+        ## Actual Result
+
+        ## Additional Details
+
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: OpenTelemetry Setup Code
+      description: Please provide the code you use to set up OpenTelemetry
+      placeholder: | # This comes from our README.md
+        // tracing.js
+
+        'use strict'
+
+        const process = require('process');
+        const opentelemetry = require('@opentelemetry/sdk-node');
+        const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
+        const { ConsoleSpanExporter } = require('@opentelemetry/sdk-trace-base');
+        const { Resource } = require('@opentelemetry/resources');
+        const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
+
+        // configure the SDK to export telemetry data to the console
+        // enable all auto-instrumentations from the meta package
+        const traceExporter = new ConsoleSpanExporter();
+        const sdk = new opentelemetry.NodeSDK({
+          resource: new Resource({
+            [SemanticResourceAttributes.SERVICE_NAME]: 'my-service',
+          }),
+          traceExporter,
+          instrumentations: [getNodeAutoInstrumentations()]
+        });
+
+        // initialize the SDK and register with the OpenTelemetry API
+        // this enables the API to record telemetry
+        sdk.start()
+          .then(() => console.log('Tracing initialized'))
+          .catch((error) => console.log('Error initializing tracing', error));
+
+        // gracefully shut down the SDK on process exit
+        process.on('SIGTERM', () => {
+          sdk.shutdown()
+            .then(() => console.log('Tracing terminated'))
+            .catch((error) => console.log('Error terminating tracing', error))
+            .finally(() => process.exit(0));
+        });
+      render: "JavaScript"
+  - type: textarea
+    attributes:
+      label: package.json
+      description: If possible, please provide your full package.json. If not, please provide at least your list of dependencies and their versions, especially OpenTelemetry versions.
+      render: "JSON"
+      placeholder: |
+        {
+          "name": "my-app",
+          "scripts": {
+            "start": "node -r tracing.js app.js"
+          },
+          "dependencies": {
+            "@opentelemetry/api": "^1.2.0",
+            "@opentelemetry/sdk-trace-base": "~1.3.1",
+            ...
+          }
+        }
+  - type: textarea
+    attributes:
+      label: Relevant log output
+      description: |
+        Please copy and paste any relevant log output.
+      render: shell
