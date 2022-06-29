@@ -15,7 +15,7 @@
  */
 
 import { Sampler } from '@opentelemetry/api';
-import { buildSamplerFromEnv, DEFAULT_CONFIG } from './config';
+import { buildSamplerFromEnv, loadDefaultConfig } from './config';
 import { SpanLimits, TracerConfig, GeneralLimits } from './types';
 import {
   DEFAULT_ATTRIBUTE_COUNT_LIMIT,
@@ -34,6 +34,8 @@ export function mergeConfig(userConfig: TracerConfig): TracerConfig & {
   const perInstanceDefaults: Partial<TracerConfig> = {
     sampler: buildSamplerFromEnv(),
   };
+
+  const DEFAULT_CONFIG = loadDefaultConfig();
 
   const target = Object.assign(
     {},
@@ -64,6 +66,8 @@ export function mergeConfig(userConfig: TracerConfig): TracerConfig & {
  */
 export function reconfigureLimits(userConfig: TracerConfig): TracerConfig {
   const spanLimits = Object.assign({}, userConfig.spanLimits);
+
+  const DEFAULT_CONFIG = loadDefaultConfig();
 
   /**
    * When span attribute count limit is not defined, but general attribute count limit is defined
