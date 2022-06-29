@@ -15,7 +15,6 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { hrTime } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { SumAggregator } from '../../src/aggregator';
@@ -38,8 +37,6 @@ const cumulativeCollector1: MetricCollectorHandle = {
   selectAggregationTemporality: () => AggregationTemporality.CUMULATIVE,
 };
 
-const sdkStartTime = hrTime();
-
 describe('TemporalMetricProcessor', () => {
   afterEach(() => {
     sinon.restore();
@@ -49,47 +46,46 @@ describe('TemporalMetricProcessor', () => {
     describe('single delta collector', () => {
       const collectors = [ deltaCollector1 ];
 
-      it('should build metrics', () => {
+      it('should build delta recording metrics', () => {
         const spy = sinon.spy(deltaCollector1, 'selectAggregationTemporality');
 
-        const aggregator = new SumAggregator();
+        const aggregator = new SumAggregator(true);
         const deltaMetricStorage = new DeltaMetricProcessor(aggregator);
         const temporalMetricStorage = new TemporalMetricProcessor(aggregator);
 
-        deltaMetricStorage.record(1, {}, api.context.active());
+        deltaMetricStorage.record(1, {}, api.context.active(), [1, 1]);
         {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,
             collectors,
             defaultInstrumentDescriptor,
             deltaMetricStorage.collect(),
-            sdkStartTime,
-            hrTime());
+            [2, 2]);
 
           assertMetricData(metric,
             DataPointType.SINGULAR,
             defaultInstrumentDescriptor,
             AggregationTemporality.DELTA);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 1);
+          assertDataPoint(metric.dataPoints[0], {}, 1, [1, 1], [2, 2]);
         }
 
-        deltaMetricStorage.record(2, {}, api.context.active());
+        deltaMetricStorage.record(2, {}, api.context.active(), [3, 3]);
         {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,
             collectors,
             defaultInstrumentDescriptor,
             deltaMetricStorage.collect(),
-            sdkStartTime,
-            hrTime());
+            [4, 4]);
 
           assertMetricData(metric,
             DataPointType.SINGULAR,
             defaultInstrumentDescriptor,
             AggregationTemporality.DELTA);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 2);
+          // Time span: (lastCollectionTime, collectionTime)
+          assertDataPoint(metric.dataPoints[0], {}, 2, [2, 2], [4, 4]);
         }
 
         {
@@ -98,8 +94,7 @@ describe('TemporalMetricProcessor', () => {
             collectors,
             defaultInstrumentDescriptor,
             deltaMetricStorage.collect(),
-            sdkStartTime,
-            hrTime());
+            [5, 5]);
 
           assertMetricData(metric,
             DataPointType.SINGULAR,
@@ -116,27 +111,26 @@ describe('TemporalMetricProcessor', () => {
     describe('two delta collector', () => {
       const collectors = [ deltaCollector1, deltaCollector2 ];
 
-      it('should build metrics', () => {
-        const aggregator = new SumAggregator();
+      it('should build delta recording metrics', () => {
+        const aggregator = new SumAggregator(true);
         const deltaMetricStorage = new DeltaMetricProcessor(aggregator);
         const temporalMetricStorage = new TemporalMetricProcessor(aggregator);
 
-        deltaMetricStorage.record(1, {}, api.context.active());
+        deltaMetricStorage.record(1, {}, api.context.active(), [1, 1]);
         {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,
             collectors,
             defaultInstrumentDescriptor,
             deltaMetricStorage.collect(),
-            sdkStartTime,
-            hrTime());
+            [2, 2]);
 
           assertMetricData(metric,
             DataPointType.SINGULAR,
             defaultInstrumentDescriptor,
             AggregationTemporality.DELTA);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 1);
+          assertDataPoint(metric.dataPoints[0], {}, 1, [1, 1], [2, 2]);
         }
 
         {
@@ -145,62 +139,59 @@ describe('TemporalMetricProcessor', () => {
             collectors,
             defaultInstrumentDescriptor,
             deltaMetricStorage.collect(),
-            sdkStartTime,
-            hrTime());
+            [3, 3]);
 
           assertMetricData(metric,
             DataPointType.SINGULAR,
             defaultInstrumentDescriptor,
             AggregationTemporality.DELTA);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 1);
+          assertDataPoint(metric.dataPoints[0], {}, 1, [1, 1], [3, 3]);
         }
       });
     });
 
     describe('single cumulative collector', () => {
       const collectors = [ cumulativeCollector1 ];
-      it('should build metrics', () => {
+      it('should build delta recording metrics', () => {
         const spy = sinon.spy(cumulativeCollector1, 'selectAggregationTemporality');
 
-        const aggregator = new SumAggregator();
+        const aggregator = new SumAggregator(true);
         const deltaMetricStorage = new DeltaMetricProcessor(aggregator);
         const temporalMetricStorage = new TemporalMetricProcessor(aggregator);
 
-        deltaMetricStorage.record(1, {}, api.context.active());
+        deltaMetricStorage.record(1, {}, api.context.active(), [1, 1]);
         {
           const metric = temporalMetricStorage.buildMetrics(
             cumulativeCollector1,
             collectors,
             defaultInstrumentDescriptor,
             deltaMetricStorage.collect(),
-            sdkStartTime,
-            hrTime());
+            [2, 2]);
 
           assertMetricData(metric,
             DataPointType.SINGULAR,
             defaultInstrumentDescriptor,
             AggregationTemporality.CUMULATIVE);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 1);
+          assertDataPoint(metric.dataPoints[0], {}, 1, [1, 1], [2, 2]);
         }
 
-        deltaMetricStorage.record(2, {}, api.context.active());
+        deltaMetricStorage.record(2, {}, api.context.active(), [3, 3]);
         {
           const metric = temporalMetricStorage.buildMetrics(
             cumulativeCollector1,
             collectors,
             defaultInstrumentDescriptor,
             deltaMetricStorage.collect(),
-            sdkStartTime,
-            hrTime());
+            [4, 4]);
 
           assertMetricData(metric,
             DataPointType.SINGULAR,
             defaultInstrumentDescriptor,
             AggregationTemporality.CUMULATIVE);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 3);
+          assertDataPoint(metric.dataPoints[0], {}, 3, [1, 1], [4, 4]);
         }
 
         // selectAggregationTemporality should be called only once.
@@ -210,45 +201,43 @@ describe('TemporalMetricProcessor', () => {
 
     describe('cumulative collector with delta collector', () => {
       const collectors = [ deltaCollector1, cumulativeCollector1 ];
-      it('should build metrics', () => {
-        const aggregator = new SumAggregator();
+      it('should build delta recording metrics', () => {
+        const aggregator = new SumAggregator(true);
         const deltaMetricStorage = new DeltaMetricProcessor(aggregator);
         const temporalMetricStorage = new TemporalMetricProcessor(aggregator);
 
-        deltaMetricStorage.record(1, {}, api.context.active());
+        deltaMetricStorage.record(1, {}, api.context.active(), [1, 1]);
         {
           const metric = temporalMetricStorage.buildMetrics(
             cumulativeCollector1,
             collectors,
             defaultInstrumentDescriptor,
             deltaMetricStorage.collect(),
-            sdkStartTime,
-            hrTime());
+            [2, 2]);
 
           assertMetricData(metric,
             DataPointType.SINGULAR,
             defaultInstrumentDescriptor,
             AggregationTemporality.CUMULATIVE);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 1);
+          assertDataPoint(metric.dataPoints[0], {}, 1, [1, 1], [2, 2]);
         }
 
-        deltaMetricStorage.record(2, {}, api.context.active());
+        deltaMetricStorage.record(2, {}, api.context.active(), [3, 3]);
         {
           const metric = temporalMetricStorage.buildMetrics(
             deltaCollector1,
             collectors,
             defaultInstrumentDescriptor,
             deltaMetricStorage.collect(),
-            sdkStartTime,
-            hrTime());
+            [4, 4]);
 
           assertMetricData(metric,
             DataPointType.SINGULAR,
             defaultInstrumentDescriptor,
             AggregationTemporality.DELTA);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 3);
+          assertDataPoint(metric.dataPoints[0], {}, 3, [1, 1], [4, 4]);
         }
         {
           const metric = temporalMetricStorage.buildMetrics(
@@ -256,15 +245,14 @@ describe('TemporalMetricProcessor', () => {
             collectors,
             defaultInstrumentDescriptor,
             deltaMetricStorage.collect(),
-            sdkStartTime,
-            hrTime());
+            [5, 5]);
 
           assertMetricData(metric,
             DataPointType.SINGULAR,
             defaultInstrumentDescriptor,
             AggregationTemporality.CUMULATIVE);
           assert.strictEqual(metric.dataPoints.length, 1);
-          assertDataPoint(metric.dataPoints[0], {}, 3);
+          assertDataPoint(metric.dataPoints[0], {}, 3, [1, 1], [5, 5]);
         }
       });
     });

@@ -17,5 +17,5 @@ jobs:
           close-pr-message: 'This PR was closed because it has been stale for 14 days with no activity.'
           stale-issue-label: stale
           stale-pr-label: stale
-          exempt-issue-labels: never-stale
-          exempt-pr-labels: never-stale
+          exempt-issue-labels: never-stale,bug
+          exempt-pr-labels: never-stale,bug

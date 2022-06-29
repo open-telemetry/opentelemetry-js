@@ -32,6 +32,34 @@ const END_TIME = hrTime();
 
 describe('Metrics', () => {
   describe('createExportMetricsServiceRequest', () => {
+    const expectedResource = {
+      attributes: [
+        {
+          key: 'resource-attribute',
+          value: {
+            stringValue: 'resource attribute value',
+          },
+        },
+      ],
+      droppedAttributesCount: 0,
+    };
+
+    const expectedScope = {
+      name: 'mylib',
+      version: '0.1.0',
+    };
+
+    const expectedSchemaUrl = 'http://url.to.schema';
+
+    const expectedAttributes = [
+      {
+        key: 'string-attribute',
+        value: {
+          stringValue: 'some attribute value',
+        },
+      },
+    ];
+
     function createCounterData(value: number, aggregationTemporality: AggregationTemporality): MetricData {
       return {
         descriptor: {
@@ -98,7 +126,13 @@ describe('Metrics', () => {
       };
     }
 
-    function createHistogramMetrics(count: number, sum: number, boundaries: number[], counts: number[], aggregationTemporality: AggregationTemporality): MetricData {
+    function createHistogramMetrics(count: number,
+      sum: number,
+      boundaries: number[],
+      counts: number[], aggregationTemporality: AggregationTemporality,
+      hasMinMax: boolean,
+      min: number,
+      max: number): MetricData {
       return {
         descriptor: {
           description: 'this is a description',
@@ -114,6 +148,9 @@ describe('Metrics', () => {
             value: {
               sum: sum,
               count: count,
+              hasMinMax: hasMinMax,
+              min: min,
+              max: max,
               buckets: {
                 boundaries: boundaries,
                 counts: counts
@@ -139,7 +176,7 @@ describe('Metrics', () => {
               scope: {
                 name: 'mylib',
                 version: '0.1.0',
-                schemaUrl: 'http://url.to.schema'
+                schemaUrl: expectedSchemaUrl
               },
               metrics: metricData,
             }
@@ -155,25 +192,12 @@ describe('Metrics', () => {
       assert.deepStrictEqual(exportRequest, {
         resourceMetrics: [
           {
-            resource: {
-              attributes: [
-                {
-                  key: 'resource-attribute',
-                  value: {
-                    stringValue: 'resource attribute value',
-                  },
-                },
-              ],
-              droppedAttributesCount: 0,
-            },
+            resource: expectedResource,
             schemaUrl: undefined,
             scopeMetrics: [
               {
-                scope: {
-                  name: 'mylib',
-                  version: '0.1.0',
-                },
-                schemaUrl: 'http://url.to.schema',
+                scope: expectedScope,
+                schemaUrl: expectedSchemaUrl,
                 metrics: [
                   {
                     name: 'counter',
@@ -182,14 +206,7 @@ describe('Metrics', () => {
                     sum: {
                       dataPoints: [
                         {
-                          attributes: [
-                            {
-                              key: 'string-attribute',
-                              value: {
-                                stringValue: 'some attribute value',
-                              },
-                            },
-                          ],
+                          attributes: expectedAttributes,
                           startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
                           timeUnixNano: hrTimeToNanoseconds(END_TIME),
                           asInt: 10,
@@ -216,25 +233,12 @@ describe('Metrics', () => {
       assert.deepStrictEqual(exportRequest, {
         resourceMetrics: [
           {
-            resource: {
-              attributes: [
-                {
-                  key: 'resource-attribute',
-                  value: {
-                    stringValue: 'resource attribute value',
-                  },
-                },
-              ],
-              droppedAttributesCount: 0,
-            },
+            resource: expectedResource,
             schemaUrl: undefined,
             scopeMetrics: [
               {
-                scope: {
-                  name: 'mylib',
-                  version: '0.1.0',
-                },
-                schemaUrl: 'http://url.to.schema',
+                scope: expectedScope,
+                schemaUrl: expectedSchemaUrl,
                 metrics: [
                   {
                     name: 'observable-counter',
@@ -243,14 +247,7 @@ describe('Metrics', () => {
                     sum: {
                       dataPoints: [
                         {
-                          attributes: [
-                            {
-                              key: 'string-attribute',
-                              value: {
-                                stringValue: 'some attribute value',
-                              },
-                            },
-                          ],
+                          attributes: expectedAttributes,
                           startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
                           timeUnixNano: hrTimeToNanoseconds(END_TIME),
                           asInt: 10,
@@ -277,25 +274,12 @@ describe('Metrics', () => {
       assert.deepStrictEqual(exportRequest, {
         resourceMetrics: [
           {
-            resource: {
-              attributes: [
-                {
-                  key: 'resource-attribute',
-                  value: {
-                    stringValue: 'resource attribute value',
-                  },
-                },
-              ],
-              droppedAttributesCount: 0,
-            },
+            resource: expectedResource,
             schemaUrl: undefined,
             scopeMetrics: [
               {
-                scope: {
-                  name: 'mylib',
-                  version: '0.1.0',
-                },
-                schemaUrl: 'http://url.to.schema',
+                scope: expectedScope,
+                schemaUrl: expectedSchemaUrl,
                 metrics: [
                   {
                     name: 'gauge',
@@ -304,14 +288,7 @@ describe('Metrics', () => {
                     gauge: {
                       dataPoints: [
                         {
-                          attributes: [
-                            {
-                              key: 'string-attribute',
-                              value: {
-                                stringValue: 'some attribute value',
-                              },
-                            },
-                          ],
+                          attributes: expectedAttributes,
                           startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
                           timeUnixNano: hrTimeToNanoseconds(END_TIME),
                           asDouble: 10.5,
@@ -327,66 +304,95 @@ describe('Metrics', () => {
       });
     });
 
-    it('serializes a histogram metric record', () => {
-      const exportRequest = createExportMetricsServiceRequest(
-        [createResourceMetrics([createHistogramMetrics(2, 9, [5], [1,1], AggregationTemporality.CUMULATIVE)])]
-      );
-      assert.ok(exportRequest);
+    describe('serializes a histogram metric record', () => {
+      it('with min/max', () => {
+        const exportRequest = createExportMetricsServiceRequest(
+          [createResourceMetrics([createHistogramMetrics(2, 9, [5], [1, 1], AggregationTemporality.CUMULATIVE, true,1, 8)])]
+        );
+        assert.ok(exportRequest);
 
-      assert.deepStrictEqual(exportRequest, {
-        resourceMetrics: [
-          {
-            resource: {
-              attributes: [
+        assert.deepStrictEqual(exportRequest, {
+          resourceMetrics: [
+            {
+              resource: expectedResource,
+              schemaUrl: undefined,
+              scopeMetrics: [
                 {
-                  key: 'resource-attribute',
-                  value: {
-                    stringValue: 'resource attribute value',
-                  },
+                  scope: expectedScope,
+                  schemaUrl: expectedSchemaUrl,
+                  metrics: [
+                    {
+                      name: 'hist',
+                      description: 'this is a description',
+                      unit: '1',
+                      histogram: {
+                        aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
+                        dataPoints: [
+                          {
+                            attributes: expectedAttributes,
+                            bucketCounts: [1, 1],
+                            count: 2,
+                            explicitBounds: [5],
+                            sum: 9,
+                            min: 1,
+                            max: 8,
+                            startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
+                            timeUnixNano: hrTimeToNanoseconds(END_TIME),
+                          },
+                        ],
+                      },
+                    },
+                  ],
                 },
               ],
-              droppedAttributesCount: 0,
             },
-            schemaUrl: undefined,
-            scopeMetrics: [
-              {
-                scope: {
-                  name: 'mylib',
-                  version: '0.1.0',
-                },
-                schemaUrl: 'http://url.to.schema',
-                metrics: [
-                  {
-                    name: 'hist',
-                    description: 'this is a description',
-                    unit: '1',
-                    histogram: {
-                      aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
-                      dataPoints: [
-                        {
-                          attributes: [
-                            {
-                              key: 'string-attribute',
-                              value: {
-                                stringValue: 'some attribute value',
-                              },
-                            },
-                          ],
-                          bucketCounts: [1, 1],
-                          count: 2,
-                          explicitBounds: [5],
-                          sum: 9,
-                          startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
-                          timeUnixNano: hrTimeToNanoseconds(END_TIME),
-                        },
-                      ],
+          ],
+        });
+      });
+
+      it('without min/max', () => {
+        const exportRequest = createExportMetricsServiceRequest(
+          [createResourceMetrics([createHistogramMetrics(2, 9, [5], [1, 1], AggregationTemporality.CUMULATIVE, false, Infinity, -1)])]
+        );
+        assert.ok(exportRequest);
+
+        assert.deepStrictEqual(exportRequest, {
+          resourceMetrics: [
+            {
+              resource: expectedResource,
+              schemaUrl: undefined,
+              scopeMetrics: [
+                {
+                  scope: expectedScope,
+                  schemaUrl: expectedSchemaUrl,
+                  metrics: [
+                    {
+                      name: 'hist',
+                      description: 'this is a description',
+                      unit: '1',
+                      histogram: {
+                        aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
+                        dataPoints: [
+                          {
+                            attributes: expectedAttributes,
+                            bucketCounts: [1, 1],
+                            count: 2,
+                            explicitBounds: [5],
+                            sum: 9,
+                            min: undefined,
+                            max: undefined,
+                            startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
+                            timeUnixNano: hrTimeToNanoseconds(END_TIME),
+                          },
+                        ],
+                      },
                     },
-                  },
-                ],
-              },
-            ],
-          },
-        ],
+                  ],
+                },
+              ],
+            },
+          ],
+        });
       });
     });
   });

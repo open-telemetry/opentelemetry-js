@@ -59,12 +59,16 @@ export interface Histogram {
   };
   sum: number;
   count: number;
+  hasMinMax: boolean;
+  min: number;
+  max: number;
 }
 
 /**
  * An Aggregator accumulation state.
  */
 export interface Accumulation {
+  setStartTime(startTime: HrTime): void;
   record(value: number): void;
 }
 
@@ -81,7 +85,7 @@ export interface Aggregator<T> {
   /**
    * Create a clean state of accumulation.
    */
-  createAccumulation(): T;
+  createAccumulation(startTime: HrTime): T;
 
   /**
    * Returns the result of the merge of the given accumulations.
@@ -109,13 +113,11 @@ export interface Aggregator<T> {
    *
    * @param descriptor the metric instrument descriptor.
    * @param accumulationByAttributes the array of attributes and accumulation pairs.
-   * @param startTime the start time of the metric data.
    * @param endTime the end time of the metric data.
    * @return the {@link MetricData} that this {@link Aggregator} will produce.
    */
   toMetricData(descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<T>[],
-    startTime: HrTime,
     endTime: HrTime): Maybe<MetricData>;
 }

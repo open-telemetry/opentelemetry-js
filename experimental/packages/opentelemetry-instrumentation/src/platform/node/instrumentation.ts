@@ -116,18 +116,23 @@ export abstract class InstrumentationBase<T = any>
           }
         }
       }
-    } else {
-      // internal file
-      const files = module.files ?? [];
-      const file = files.find(f => f.name === name);
-      if (file && isSupported(file.supportedVersions, version, module.includePrerelease)) {
-        file.moduleExports = exports;
-        if (this._enabled) {
-          return file.patch(exports, module.moduleVersion);
-        }
-      }
+      return exports;
     }
-    return exports;
+    // internal file
+    const files = module.files ?? [];
+    const supportedFileInstrumentations = files
+      .filter(f => f.name === name)
+      .filter(f => isSupported(f.supportedVersions, version, module.includePrerelease));
+    return supportedFileInstrumentations.reduce<T>(
+      (patchedExports, file) => {
+        file.moduleExports = patchedExports;
+        if (this._enabled) {
+          return file.patch(patchedExports, module.moduleVersion);
+        }
+        return patchedExports;
+      },
+      exports,
+    );
   }
 
   public enable(): void {

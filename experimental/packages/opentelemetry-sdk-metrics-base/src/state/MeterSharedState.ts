@@ -80,13 +80,12 @@ export class MeterSharedState {
      * 1. Call all observable callbacks first.
      * 2. Collect metric result for the collector.
      */
-    const errors = await this.observableRegistry.observe(options?.timeoutMillis);
+    const errors = await this.observableRegistry.observe(collectionTime, options?.timeoutMillis);
     const metricDataList = Array.from(this._metricStorageRegistry.getStorages())
       .map(metricStorage => {
         return metricStorage.collect(
           collector,
           this._meterProviderSharedState.metricCollectors,
-          this._meterProviderSharedState.sdkStartTime,
           collectionTime);
       })
       .filter(isNotNullish);

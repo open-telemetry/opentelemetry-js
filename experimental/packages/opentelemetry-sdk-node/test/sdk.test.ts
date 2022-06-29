@@ -261,4 +261,76 @@ describe('Node SDK', () => {
       });
     });
   });
+
+  describe('configureServiceName', async () => {
+    it('should configure service name via config', async () => {
+      const sdk = new NodeSDK({
+        serviceName: 'config-set-name',
+      });
+
+      await sdk.start();
+      const resource = sdk['_resource'];
+
+      assertServiceResource(resource, {
+        name: 'config-set-name',
+      });
+    });
+
+    it('should configure service name via OTEL_SERVICE_NAME env var', async () => {
+      process.env.OTEL_SERVICE_NAME='env-set-name';
+      const sdk = new NodeSDK();
+
+      await sdk.start();
+      const resource = sdk['_resource'];
+
+      assertServiceResource(resource, {
+        name: 'env-set-name',
+      });
+      delete process.env.OTEL_SERVICE_NAME;
+    });
+
+    it('should favor config set service name over OTEL_SERVICE_NAME env set service name', async () => {
+      process.env.OTEL_SERVICE_NAME='env-set-name';
+      const sdk = new NodeSDK({
+        serviceName: 'config-set-name',
+      });
+
+      await sdk.start();
+      const resource = sdk['_resource'];
+
+      assertServiceResource(resource, {
+        name: 'config-set-name',
+      });
+      delete process.env.OTEL_SERVICE_NAME;
+    });
+
+
+    it('should configure service name via OTEL_RESOURCE_ATTRIBUTES env var', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES = 'service.name=resource-env-set-name';
+      const sdk = new NodeSDK();
+
+      await sdk.start();
+      const resource = sdk['_resource'];
+
+      assertServiceResource(resource, {
+        name: 'resource-env-set-name',
+      });
+      delete process.env.OTEL_RESOURCE_ATTRIBUTES;
+    });
+
+    it('should favor config set service name over OTEL_RESOURCE_ATTRIBUTES env set service name', async () => {
+      process.env.OTEL_RESOURCE_ATTRIBUTES = 'service.name=resource-env-set-name';
+      const sdk = new NodeSDK({
+        serviceName: 'config-set-name',
+      });
+
+      await sdk.start();
+      const resource = sdk['_resource'];
+
+      assertServiceResource(resource, {
+        name: 'config-set-name',
+      });
+      delete process.env.OTEL_RESOURCE_ATTRIBUTES;
+    });
+  });
 });

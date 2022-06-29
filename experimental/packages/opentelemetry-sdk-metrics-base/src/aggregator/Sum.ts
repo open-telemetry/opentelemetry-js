@@ -22,10 +22,17 @@ import { Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 
 export class SumAccumulation implements Accumulation {
-  constructor(private _current: number = 0) {}
+  constructor(public startTime: HrTime, public monotonic: boolean, private _current: number = 0, public reset = false) {}
 
   record(value: number): void {
+    if (this.monotonic && value < 0) {
+      return;
+    }
     this._current += value;
+  }
+
+  setStartTime(startTime: HrTime): void {
+    this.startTime = startTime;
   }
 
   toPointValue(): Sum {
@@ -37,29 +44,45 @@ export class SumAccumulation implements Accumulation {
 export class SumAggregator implements Aggregator<SumAccumulation> {
   public kind: AggregatorKind.SUM = AggregatorKind.SUM;
 
-  createAccumulation() {
-    return new SumAccumulation();
+  constructor (public monotonic: boolean) {}
+
+  createAccumulation(startTime: HrTime) {
+    return new SumAccumulation(startTime, this.monotonic);
   }
 
   /**
    * Returns the result of the merge of the given accumulations.
    */
   merge(previous: SumAccumulation, delta: SumAccumulation): SumAccumulation {
-    return new SumAccumulation(previous.toPointValue() + delta.toPointValue());
+    const prevPv = previous.toPointValue();
+    const deltaPv = delta.toPointValue();
+    if (delta.reset) {
+      return new SumAccumulation(delta.startTime, this.monotonic, deltaPv, delta.reset);
+    }
+    return new SumAccumulation(previous.startTime, this.monotonic, prevPv + deltaPv);
   }
 
   /**
    * Returns a new DELTA aggregation by comparing two cumulative measurements.
    */
   diff(previous: SumAccumulation, current: SumAccumulation): SumAccumulation {
-    return new SumAccumulation(current.toPointValue() - previous.toPointValue());
+    const prevPv = previous.toPointValue();
+    const currPv = current.toPointValue();
+    /**
+     * If the SumAggregator is a monotonic one and the previous point value is
+     * greater than the current one, a reset is deemed to be happened.
+     * Return the current point value to prevent the value from been reset.
+     */
+    if (this.monotonic && (prevPv > currPv)) {
+      return new SumAccumulation(current.startTime, this.monotonic, currPv, true);
+    }
+    return new SumAccumulation(current.startTime, this.monotonic, currPv - prevPv);
   }
 
   toMetricData(
     descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<SumAccumulation>[],
-    startTime: HrTime,
     endTime: HrTime): Maybe<SingularMetricData> {
     return {
       descriptor,
@@ -68,7 +91,7 @@ export class SumAggregator implements Aggregator<SumAccumulation> {
       dataPoints: accumulationByAttributes.map(([attributes, accumulation]) => {
         return {
           attributes,
-          startTime,
+          startTime: accumulation.startTime,
           endTime,
           value: accumulation.toPointValue(),
         };
