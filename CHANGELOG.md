@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
-* feat(SpanExpoter): Add optional forceFlush to SpanExporter interface #[3067] @sgracias1
+* feat(SpanExpoter): Add optional forceFlush to SpanExporter interface [#3067] @sgracias1
 
 ### :bug: (Bug Fix)
 
