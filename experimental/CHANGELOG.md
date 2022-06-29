@@ -31,6 +31,10 @@ All notable changes to experimental packages in this project will be documented 
 * feat(http-instrumentation): record exceptions in http instrumentation #3008 @luismiramirez
 * feat(node-sdk): add serviceName config option #2867 @naseemkullah
 * feat(opentelemetry-exporter-prometheus): export PrometheusSerializer #3034 @matschaffer
+* feat(sdk-metrics-base): detect resets on async metrics #2990 @legendecas
+  * Added monotonicity support in SumAggregator.
+  * Added reset and gaps detection for async metric instruments.
+  * Fixed the start time and end time of an exported metric with regarding to resets and gaps.
 
 ### :bug: (Bug Fix)
 
@@ -72,10 +76,6 @@ All notable changes to experimental packages in this project will be documented 
 * fix(sdk-metrics-base): misbehaving aggregation temporality selector tolerance #2958 @legendecas
 * feat(trace-otlp-grpc): configure security with env vars #2827 @svetlanabrennan
 * feat(sdk-metrics-base): async instruments callback timeout #2742 @legendecas
-* feat(sdk-metrics-base): detect resets on async metrics #2990 @legendecas
-  * Added monotonicity support in SumAggregator.
-  * Added reset and gaps detection for async metric instruments.
-  * Fixed the start time and end time of an exported metric with regarding to resets and gaps.
 
 ### :bug: (Bug Fix)
 
