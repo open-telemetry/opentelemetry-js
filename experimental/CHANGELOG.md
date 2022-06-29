@@ -6,6 +6,18 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.30.0
+
+### :boom: Breaking Change
+
 * fix: remove aws and gcp detector from SDK #3024 @flarna
 * feat(sdk-metrics-base): implement min/max recording for Histograms #3032 @pichlermarc
   * adds `min`/`max` recording to Histograms
@@ -25,8 +37,6 @@ All notable changes to experimental packages in this project will be documented 
 * fix(otlp-transformer): remove type dependency on Long #3022 @legendecas
 * fix(grpc-exporter): use non-normalized URL to determine channel security #3019 @pichlermarc
 * fix(otlp-exporter-base): fix gzip output stream in http otlp export #3046 @mattolson
-
-### :books: (Refine Doc)
 
 ### :house: (Internal)
 
