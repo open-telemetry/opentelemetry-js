@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* feat(SpanExpoter): Add optional forceFlush to SpanExporter interface #3067 @sgracias1
+
 ### :bug: (Bug Fix)
 
 * fix(resources): fix browser compatibility for host and os detectors [#3004](https://github.com/open-telemetry/opentelemetry-js/pull/3004) @legendecas
