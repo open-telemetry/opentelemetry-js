@@ -17,6 +17,8 @@ All notable changes to this project will be documented in this file.
 
 ### :house: (Internal)
 
+* test: add node 18 and remove EoL node versions [#3048](https://github.com/open-telemetry/opentelemetry-js/pull/3048) @dyladan
+
 ## 1.3.1
 
 ### :bug: (Bug Fix)

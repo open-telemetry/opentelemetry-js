@@ -25,8 +25,6 @@ import { CompressionAlgorithm } from './types';
 import { getEnv } from '@opentelemetry/core';
 import { OTLPExporterError } from '../../types';
 
-let gzip: zlib.Gzip | undefined;
-
 /**
  * Sends data using http
  * @param collector
@@ -116,13 +114,10 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
 
   switch (collector.compression) {
     case CompressionAlgorithm.GZIP: {
-      if (!gzip) {
-        gzip = zlib.createGzip();
-      }
       req.setHeader('Content-Encoding', 'gzip');
       const dataStream = readableFromBuffer(data);
       dataStream.on('error', onError)
-        .pipe(gzip).on('error', onError)
+        .pipe(zlib.createGzip()).on('error', onError)
         .pipe(req);
 
       break;

@@ -45,7 +45,6 @@ export class DropAggregator implements Aggregator<undefined> {
     _descriptor: InstrumentDescriptor,
     _aggregationTemporality: AggregationTemporality,
     _accumulationByAttributes: AccumulationRecord<undefined>[],
-    _startTime: HrTime,
     _endTime: HrTime): Maybe<MetricData> {
     return undefined;
   }
