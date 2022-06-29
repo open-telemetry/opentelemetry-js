@@ -1,6 +1,7 @@
 # CHANGELOG
 
 All notable changes to this project will be documented in this file.
+
 ## Unreleased
 
 ### :boom: Breaking Change
@@ -13,11 +14,9 @@ All notable changes to this project will be documented in this file.
 
 ### :house: (Internal)
 
-
 ## 1.4.0
 
 ### :rocket: (Enhancement)
-
 
 * fix(resources): fix browser compatibility for host and os detectors [#3004](https://github.com/open-telemetry/opentelemetry-js/pull/3004) @legendecas
 * fix(sdk-trace-base): fix crash on environments without global document [#3000](https://github.com/open-telemetry/opentelemetry-js/pull/3000) @legendecas
