@@ -30,7 +30,7 @@ import {
   AggregationTemporality,
   ExplicitBucketHistogramAggregation,
   MeterProvider,
-  MetricReader
+  MetricReader, ViewRegistrationOptions
 } from '@opentelemetry/sdk-metrics-base';
 import {
   IExportMetricsServiceRequest,
@@ -61,6 +61,17 @@ class TestMetricReader extends MetricReader {
   }
 }
 
+export const HISTOGRAM_AGGREGATION_VIEW = {
+  view: {
+    aggregation: new ExplicitBucketHistogramAggregation([0, 100])
+  },
+  selector: {
+    instrument: {
+      name: 'int-histogram'
+    }
+  }
+};
+
 const defaultResource = Resource.default().merge(new Resource({
   service: 'ui',
   version: 1,
@@ -78,8 +89,8 @@ export async function collect() {
   return (await reader.collect())!;
 }
 
-export function setUp() {
-  meterProvider = new MeterProvider({ resource: defaultResource });
+export function setUp(views?: ViewRegistrationOptions[]) {
+  meterProvider = new MeterProvider({ resource: defaultResource, views });
   reader = new TestMetricReader();
   meterProvider.addMetricReader(
     reader
@@ -158,18 +169,7 @@ export function mockObservableUpDownCounter(
 }
 
 export function mockHistogram(): Histogram {
-  const name = 'int-histogram';
-
-  meterProvider.addView({
-    aggregation: new ExplicitBucketHistogramAggregation([0, 100])
-  },
-  {
-    instrument: {
-      name: name
-    }
-  });
-
-  return meter.createHistogram(name, {
+  return meter.createHistogram('int-histogram', {
     description: 'sample histogram description',
     valueType: ValueType.INT,
   });

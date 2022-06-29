@@ -64,7 +64,19 @@ export async function collect() {
 }
 
 export function setUp() {
-  meterProvider = new MeterProvider({ resource: testResource });
+  meterProvider = new MeterProvider({
+    resource: testResource,
+    views: [{
+      view: {
+        aggregation: new ExplicitBucketHistogramAggregation([0, 100])
+      },
+      selector: {
+        instrument: {
+          name: 'int-histogram'
+        }
+      }
+    }]
+  });
   reader = new TestMetricReader();
   meterProvider.addMetricReader(
     reader
@@ -102,7 +114,6 @@ export function mockObservableGauge(
 
 export function mockHistogram(): Histogram {
   const name = 'int-histogram';
-  meterProvider.addView({ aggregation: new ExplicitBucketHistogramAggregation([0, 100]) });
 
   return meter.createHistogram(name, {
     description: 'sample histogram description',

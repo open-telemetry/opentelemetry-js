@@ -35,6 +35,12 @@ import { ForceFlushOptions, ShutdownOptions } from './types';
 export interface MeterProviderOptions {
   /** Resource associated with metric telemetry  */
   resource?: Resource;
+  views?: ViewRegistrationOptions[];
+}
+
+export interface ViewRegistrationOptions {
+  view: ViewOptions;
+  selector?: SelectorOptions;
 }
 
 export type ViewOptions = {
@@ -102,6 +108,11 @@ export class MeterProvider implements metrics.MeterProvider {
 
   constructor(options?: MeterProviderOptions) {
     this._sharedState = new MeterProviderSharedState(options?.resource ?? Resource.empty());
+    if(options?.views != null && options.views.length > 0){
+      for(const view of options.views){
+        this.addView(view);
+      }
+    }
   }
 
   /**
@@ -131,14 +142,17 @@ export class MeterProvider implements metrics.MeterProvider {
     this._sharedState.metricCollectors.push(collector);
   }
 
-  addView(options: ViewOptions, selectorOptions?: SelectorOptions) {
-    if (isViewOptionsEmpty(options)) {
+  private addView(registrationOptions: ViewRegistrationOptions) {
+    const viewOptions = registrationOptions.view;
+    const selectorOptions = registrationOptions.selector;
+
+    if (isViewOptionsEmpty(viewOptions)) {
       throw new Error('Cannot create view with no view arguments supplied');
     }
 
     // the SDK SHOULD NOT allow Views with a specified name to be declared with instrument selectors that
     // may select more than one instrument (e.g. wild card instrument name) in the same Meter.
-    if (options.name != null &&
+    if (viewOptions.name != null &&
       (selectorOptions?.instrument?.name == null ||
         PatternPredicate.hasWildcard(selectorOptions.instrument.name))) {
       throw new Error('Views with a specified name must be declared with an instrument selector that selects at most one instrument per meter.');
@@ -146,14 +160,14 @@ export class MeterProvider implements metrics.MeterProvider {
 
     // Create AttributesProcessor if attributeKeys are defined set.
     let attributesProcessor = undefined;
-    if (options.attributeKeys != null) {
-      attributesProcessor = new FilteringAttributesProcessor(options.attributeKeys);
+    if (viewOptions.attributeKeys != null) {
+      attributesProcessor = new FilteringAttributesProcessor(viewOptions.attributeKeys);
     }
 
     const view = new View({
-      name: options.name,
-      description: options.description,
-      aggregation: options.aggregation,
+      name: viewOptions.name,
+      description: viewOptions.description,
+      aggregation: viewOptions.aggregation,
       attributesProcessor: attributesProcessor
     });
     const instrument = new InstrumentSelector(selectorOptions?.instrument);

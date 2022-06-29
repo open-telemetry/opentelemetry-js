@@ -27,7 +27,7 @@ import {
   ensureExportMetricsServiceRequestIsSet, ensureHeadersContain,
   ensureHistogramIsCorrect,
   ensureObservableGaugeIsCorrect,
-  ensureWebResourceIsCorrect,
+  ensureWebResourceIsCorrect, HISTOGRAM_AGGREGATION_VIEW,
   mockCounter,
   mockHistogram,
   mockObservableGauge,
@@ -47,7 +47,7 @@ describe('OTLPMetricExporter - web', () => {
   let errorStub: sinon.SinonStub;
 
   beforeEach(async () => {
-    setUp();
+    setUp([HISTOGRAM_AGGREGATION_VIEW]);
     stubOpen = sinon.stub(XMLHttpRequest.prototype, 'open');
     sinon.stub(XMLHttpRequest.prototype, 'send');
     stubBeacon = sinon.stub(navigator, 'sendBeacon');
