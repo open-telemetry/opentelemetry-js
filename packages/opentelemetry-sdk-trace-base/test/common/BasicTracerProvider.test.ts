@@ -183,7 +183,6 @@ describe('BasicTracerProvider', () => {
       });
 
       describe('when attribute value length limit is defined via env', () => {
-        const envSource = process.env;
         it('should have general attribute value length limits value as defined with env', () => {
           envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '115';
           const tracer = new BasicTracerProvider().getTracer('default');
@@ -214,7 +213,6 @@ describe('BasicTracerProvider', () => {
       });
 
       describe('when attribute count limit is defined via env', () => {
-        const envSource = process.env;
         it('should general attribute count limit as defined with env', () => {
           envSource.OTEL_ATTRIBUTE_COUNT_LIMIT = '25';
           const tracer = new BasicTracerProvider({}).getTracer('default');
