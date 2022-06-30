@@ -28,7 +28,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :books: (Refine Doc)
 
-* docs(grpc-exporters): remove 'web' as supported from README.md #3070 @pichlermarc
+* docs(grpc-exporters): remove 'web' as supported from README.md [#3070](https://github.com/open-telemetry/opentelemetry-js/pull/3070) @pichlermarc
 
 ### :house: (Internal)
 
