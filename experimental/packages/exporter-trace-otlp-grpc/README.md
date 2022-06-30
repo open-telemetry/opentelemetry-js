@@ -3,7 +3,7 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-This module provides exporter for web and node to be used with [opentelemetry-collector][opentelemetry-collector-url].
+This module provides exporter for node to be used with [opentelemetry-collector][opentelemetry-collector-url].
 Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.16 <=0.50`.
 
 ## Installation
@@ -121,7 +121,7 @@ The OTLPTraceExporter has a timeout configuration option which is the maximum ti
     url: '<collector-hostname>:<port>',
     metadata, // // an optional grpc.Metadata object to be sent with each request
   };
-    
+
   const exporter = new OTLPTraceExporter(collectorOptions);
   ```
 
