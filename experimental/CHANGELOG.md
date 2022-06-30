@@ -41,7 +41,6 @@ All notable changes to experimental packages in this project will be documented 
 * fix(otlp-transformer): remove type dependency on Long [#3022](https://github.com/open-telemetry/opentelemetry-js/pull/3022) @legendecas
 * fix(grpc-exporter): use non-normalized URL to determine channel security [#3019](https://github.com/open-telemetry/opentelemetry-js/pull/3019) @pichlermarc
 * fix(otlp-exporter-base): fix gzip output stream in http otlp export [#3046](https://github.com/open-telemetry/opentelemetry-js/pull/3046) @mattolson
-
 * docs(grpc-exporters): remove 'web' as supported from README.md [#3070](https://github.com/open-telemetry/opentelemetry-js/pull/3070) @pichlermarc
 
 ### :house: (Internal)
