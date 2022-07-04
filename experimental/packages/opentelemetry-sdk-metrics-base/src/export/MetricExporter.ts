@@ -22,19 +22,33 @@ import {
 } from '@opentelemetry/core';
 import { InstrumentType } from '../InstrumentDescriptor';
 
-
-// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#metricexporter
-
+/**
+ * An interface that allows different metric services to export recorded data
+ * in their own format.
+ *
+ * To export data this MUST be register to the Metrics SDK with a MetricReader.
+ */
 export interface PushMetricExporter {
-
+  /**
+   * Called to export sampled {@link ResourceMetrics}s.
+   * @param metrics the metric data to be exported.
+   */
   export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): void;
 
+  /**
+   * Ensure that the export of any metrics the exporter has received is
+   * completed before the returned promise is settled.
+   */
   forceFlush(): Promise<void>;
 
+  /**
+   * Select the {@link AggregationTemporality} for the given
+   * {@link InstrumentType} for this exporter.
+   */
   selectAggregationTemporality(instrumentType: InstrumentType): AggregationTemporality;
 
+  /** Stops the exporter. */
   shutdown(): Promise<void>;
-
 }
 
 export class ConsoleMetricExporter implements PushMetricExporter {
