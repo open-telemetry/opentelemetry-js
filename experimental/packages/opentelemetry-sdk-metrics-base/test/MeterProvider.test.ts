@@ -25,6 +25,7 @@ import {
 } from './util';
 import { TestMetricReader } from './export/TestMetricReader';
 import * as sinon from 'sinon';
+import { View } from '../src/view/View';
 
 describe('MeterProvider', () => {
   afterEach(() => {
@@ -117,17 +118,15 @@ describe('MeterProvider', () => {
         resource: defaultResource,
         // Add view to rename 'non-renamed-instrument' to 'renamed-instrument'
         views: [
+          new View({
+            name: 'renamed-instrument',
+            description: 'my renamed instrument'
+          },
           {
-            view: {
-              name: 'renamed-instrument',
-              description: 'my renamed instrument'
+            instrument: {
+              name: 'non-renamed-instrument',
             },
-            selector: {
-              instrument: {
-                name: 'non-renamed-instrument',
-              },
-            }
-          }
+          })
         ]
       });
 
@@ -183,16 +182,9 @@ describe('MeterProvider', () => {
       const meterProvider = new MeterProvider({
         resource: defaultResource,
         views: [
-          {
-            view: {
-              attributeKeys: ['attrib1']
-            },
-            selector: {
-              instrument: {
-                name: 'non-renamed-instrument',
-              }
-            }
-          }
+          new View({ attributeKeys: ['attrib1'] },
+            { instrument: { name: 'non-renamed-instrument', } }
+          ),
         ]
       });
 
@@ -245,16 +237,7 @@ describe('MeterProvider', () => {
       const meterProvider = new MeterProvider({
         resource: defaultResource,
         views: [
-          {
-            view: {
-              name: 'renamed-instrument'
-            },
-            selector: {
-              instrument: {
-                name: 'test-counter'
-              }
-            }
-          }
+          new View({ name: 'renamed-instrument' }, { instrument: { name: 'test-counter' } })
         ]
       });
 
@@ -316,26 +299,24 @@ describe('MeterProvider', () => {
         resource: defaultResource,
         views: [
           // Add view that renames 'test-counter' to 'renamed-instrument' on 'meter1'
-          {
-            view: {
+          new View(
+            {
               name: 'renamed-instrument'
             },
-            selector:
-              {
-                instrument: {
-                  name: 'test-counter'
-                },
-                meter: {
-                  name: 'meter1'
-                }
+            {
+              instrument: {
+                name: 'test-counter'
+              },
+              meter: {
+                name: 'meter1'
               }
-          }
+            }
+          )
         ]
       });
 
       const reader = new TestMetricReader();
       meterProvider.addMetricReader(reader);
-
 
       // Create two meters.
       const meter1 = meterProvider.getMeter('meter1', 'v1.0.0');
@@ -392,32 +373,28 @@ describe('MeterProvider', () => {
         resource: defaultResource,
         // Add Views to rename both instruments (of different types) to the same name.
         views: [
-          {
-            view: {
-              name: 'renamed-instrument'
-            },
-            selector: {
-              instrument: {
-                name: 'test-counter',
-              },
-              meter: {
-                name: 'meter1'
-              }
-            }
+          new View({
+            name: 'renamed-instrument'
           },
           {
-            view: {
-              name: 'renamed-instrument'
+            instrument: {
+              name: 'test-counter',
             },
-            selector: {
-              instrument: {
-                name: 'test-histogram',
-              },
-              meter: {
-                name: 'meter1'
-              }
+            meter: {
+              name: 'meter1'
             }
-          }
+          }),
+          new View({
+            name: 'renamed-instrument'
+          },
+          {
+            instrument: {
+              name: 'test-histogram',
+            },
+            meter: {
+              name: 'meter1'
+            }
+          }),
         ]
       });
       const reader = new TestMetricReader();

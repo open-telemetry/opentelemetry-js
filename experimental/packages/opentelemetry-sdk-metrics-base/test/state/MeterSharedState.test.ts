@@ -21,7 +21,8 @@ import {
   Meter,
   MeterProvider,
   DataPointType,
-  CollectionResult, ViewRegistrationOptions
+  CollectionResult,
+  View
 } from '../../src';
 import { assertMetricData, defaultInstrumentationScope, defaultResource, sleep } from '../util';
 import { TestMetricReader } from '../export/TestMetricReader';
@@ -33,7 +34,7 @@ describe('MeterSharedState', () => {
   });
 
   describe('collect', () => {
-    function setupInstruments(views?: ViewRegistrationOptions[]) {
+    function setupInstruments(views?: View[]) {
       const meterProvider = new MeterProvider({ resource: defaultResource, views: views });
 
       const cumulativeReader = new TestMetricReader(() => AggregationTemporality.CUMULATIVE);
@@ -77,8 +78,8 @@ describe('MeterSharedState', () => {
     it('should collect sync metrics with views', async () => {
       /** preparing test instrumentations */
       const { metricCollectors, meter } = setupInstruments([
-        { view: { name: 'foo' }, selector: { instrument: { name: 'test' } } },
-        { view: { name: 'bar' }, selector: { instrument: { name: 'test' } } }
+        new View({ name: 'foo' }, { instrument: { name: 'test' } }),
+        new View({ name: 'bar' }, { instrument: { name: 'test' } }),
       ]);
 
       /** creating metric events */
@@ -136,26 +137,8 @@ describe('MeterSharedState', () => {
     it('should call observable callback once with view-ed async instruments', async () => {
       /** preparing test instrumentations */
       const { metricCollectors, meter } = setupInstruments([
-        {
-          view: {
-            name: 'foo'
-          },
-          selector: {
-            instrument: {
-              name: 'test'
-            }
-          }
-        },
-        {
-          view: {
-            name: 'bar'
-          },
-          selector: {
-            instrument: {
-              name: 'test'
-            }
-          }
-        }
+        new View({ name: 'foo' }, { instrument: { name: 'test' } }),
+        new View({ name: 'bar' }, { instrument: { name: 'test' } })
       ]);
 
       /** creating metric events */

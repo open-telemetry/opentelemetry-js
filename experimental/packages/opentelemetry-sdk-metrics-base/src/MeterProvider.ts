@@ -31,12 +31,7 @@ import { View } from './view/View';
 export interface MeterProviderOptions {
   /** Resource associated with metric telemetry  */
   resource?: Resource;
-  views?: ViewRegistrationOptions[];
-}
-
-export interface ViewRegistrationOptions {
-  view: ViewOptions;
-  selector?: SelectorOptions;
+  views?: View[];
 }
 
 export type ViewOptions = {
@@ -98,8 +93,8 @@ export class MeterProvider implements metrics.MeterProvider {
   constructor(options?: MeterProviderOptions) {
     this._sharedState = new MeterProviderSharedState(options?.resource ?? Resource.empty());
     if(options?.views != null && options.views.length > 0){
-      for(const viewOptions of options.views){
-        this.addView(new View(viewOptions.view, viewOptions.selector));
+      for(const view of options.views){
+        this.addView(view);
       }
     }
   }
