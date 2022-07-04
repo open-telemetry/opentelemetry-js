@@ -18,33 +18,29 @@ import { InstrumentationScope } from '@opentelemetry/core';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { InstrumentSelector } from './InstrumentSelector';
 import { MeterSelector } from './MeterSelector';
-import { View } from './View';
-
-interface RegisteredView {
-  instrumentSelector: InstrumentSelector;
-  meterSelector: MeterSelector;
-  view: View;
-}
+import { UserView } from './UserView';
 
 export class ViewRegistry {
-  private static DEFAULT_VIEW = new View();
-  private _registeredViews: RegisteredView[] = [];
+  private static DEFAULT_VIEW = new UserView({}, {
+    instrument: {
+      name: '*'
+    },
+    meter: {
+      name: '*'
+    }
+  });
+  private _registeredViews: UserView[] = [];
 
-  addView(view: View, instrumentSelector: InstrumentSelector = new InstrumentSelector(), meterSelector: MeterSelector = new MeterSelector()) {
-    this._registeredViews.push({
-      instrumentSelector,
-      meterSelector,
-      view,
-    });
+  addView(view: UserView) {
+    this._registeredViews.push(view);
   }
 
-  findViews(instrument: InstrumentDescriptor, meter: InstrumentationScope): View[] {
+  findViews(instrument: InstrumentDescriptor, meter: InstrumentationScope): UserView[] {
     const views = this._registeredViews
       .filter(registeredView => {
         return this._matchInstrument(registeredView.instrumentSelector, instrument) &&
           this._matchMeter(registeredView.meterSelector, meter);
-      })
-      .map(it => it.view);
+      });
 
     if (views.length === 0) {
       return [ViewRegistry.DEFAULT_VIEW];

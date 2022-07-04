@@ -176,16 +176,6 @@ describe('MeterProvider', () => {
       }));
     });
 
-    it('with no view parameters should throw', () => {
-      assert.throws(() => new MeterProvider({
-        resource: defaultResource, views: [
-          {
-            view: {}
-          }
-        ]
-      }));
-    });
-
     it('with existing instrument should rename', async () => {
       const meterProvider = new MeterProvider({
         resource: defaultResource,
