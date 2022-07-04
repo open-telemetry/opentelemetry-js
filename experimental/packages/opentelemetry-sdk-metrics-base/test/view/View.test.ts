@@ -16,13 +16,13 @@
 
 import * as assert from 'assert';
 import { AttributesProcessor } from '../../src/view/AttributesProcessor';
-import { UserView } from '../../src/view/UserView';
+import { View } from '../../src/view/View';
 import { InstrumentType, Aggregation} from '../../src';
 
 describe('View', () => {
   describe('constructor', () => {
     it('should construct view without arguments', () => {
-      const view = new UserView({});
+      const view = new View({});
       assert.strictEqual(view.name, undefined);
       assert.strictEqual(view.description, undefined);
       assert.strictEqual(view.aggregation, Aggregation.Default());
@@ -30,14 +30,14 @@ describe('View', () => {
     });
 
     it('with named view and no instrument selector should throw', () => {
-      assert.throws(() => new UserView({
+      assert.throws(() => new View({
         name: 'named-view'
       }));
     });
 
     it('with named view and instrument wildcard should throw', () => {
       // Throws with wildcard character only.
-      assert.throws(() => new UserView({ name: 'renamed-instrument' },
+      assert.throws(() => new View({ name: 'renamed-instrument' },
         {
           instrument: {
             name: '*'
@@ -46,7 +46,7 @@ describe('View', () => {
       ));
 
       // Throws with wildcard character in instrument name.
-      assert.throws(() => new UserView({ name: 'renamed-instrument' },
+      assert.throws(() => new View({ name: 'renamed-instrument' },
         {
           instrument: {
             name: 'instrument.name.*'
@@ -56,7 +56,7 @@ describe('View', () => {
     });
 
     it('with named view and instrument type selector should throw', () => {
-      assert.throws(() => new UserView({ name: 'renamed-instrument' },
+      assert.throws(() => new View({ name: 'renamed-instrument' },
         {
           instrument: {
             type: InstrumentType.COUNTER

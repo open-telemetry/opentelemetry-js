@@ -15,7 +15,7 @@
  */
 
 import { MetricOptions, ValueType } from '@opentelemetry/api-metrics';
-import { UserView } from './view/UserView';
+import { View } from './view/View';
 
 /**
  * Supported types of metric instruments.
@@ -47,7 +47,7 @@ export function createInstrumentDescriptor(name: string, type: InstrumentType, o
   };
 }
 
-export function createInstrumentDescriptorWithView(view: UserView, instrument: InstrumentDescriptor): InstrumentDescriptor {
+export function createInstrumentDescriptorWithView(view: View, instrument: InstrumentDescriptor): InstrumentDescriptor {
   return {
     name: view.name ?? instrument.name,
     description: view.description ?? instrument.description,

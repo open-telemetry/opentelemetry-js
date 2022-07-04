@@ -23,7 +23,7 @@ import { MetricCollector } from './state/MetricCollector';
 import { Aggregation } from './view/Aggregation';
 import { InstrumentType } from './InstrumentDescriptor';
 import { ForceFlushOptions, ShutdownOptions } from './types';
-import { UserView } from './view/UserView';
+import { View } from './view/View';
 
 /**
  * MeterProviderOptions provides an interface for configuring a MeterProvider.
@@ -99,7 +99,7 @@ export class MeterProvider implements metrics.MeterProvider {
     this._sharedState = new MeterProviderSharedState(options?.resource ?? Resource.empty());
     if(options?.views != null && options.views.length > 0){
       for(const viewOptions of options.views){
-        this.addView(new UserView(viewOptions.view, viewOptions.selector));
+        this.addView(new View(viewOptions.view, viewOptions.selector));
       }
     }
   }
@@ -131,7 +131,7 @@ export class MeterProvider implements metrics.MeterProvider {
     this._sharedState.metricCollectors.push(collector);
   }
 
-  private addView(view: UserView) {
+  private addView(view: View) {
     this._sharedState.viewRegistry.addView(view);
   }
 

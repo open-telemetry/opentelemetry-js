@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import { InstrumentType } from '../../src';
 import { ViewRegistry } from '../../src/view/ViewRegistry';
 import { defaultInstrumentationScope, defaultInstrumentDescriptor } from '../util';
-import { UserView } from '../../src/view/UserView';
+import { View } from '../../src/view/View';
 
 
 describe('ViewRegistry', () => {
@@ -33,12 +33,12 @@ describe('ViewRegistry', () => {
     describe('InstrumentSelector', () => {
       it('should match view with instrument name', () => {
         const registry = new ViewRegistry();
-        registry.addView(new UserView({ name: 'foo' }, {
+        registry.addView(new View({ name: 'foo' }, {
           instrument: {
             name: 'foo',
           }
         }));
-        registry.addView(new UserView({ name: 'bar' }, {
+        registry.addView(new View({ name: 'bar' }, {
           instrument: {
             name: 'bar',
           }
@@ -67,13 +67,13 @@ describe('ViewRegistry', () => {
 
       it('should match view with instrument type', () => {
         const registry = new ViewRegistry();
-        registry.addView(new UserView({ name: 'counter' }, {
+        registry.addView(new View({ name: 'counter' }, {
           instrument: {
             name: 'default_metric',
             type: InstrumentType.COUNTER
           }
         }));
-        registry.addView(new UserView({ name: 'histogram' }, {
+        registry.addView(new View({ name: 'histogram' }, {
           instrument: {
             name: 'default_metric',
             type: InstrumentType.HISTOGRAM
@@ -105,11 +105,11 @@ describe('ViewRegistry', () => {
     describe('MeterSelector', () => {
       it('should match view with meter name', () => {
         const registry = new ViewRegistry();
-        registry.addView(new UserView({ name: 'foo' }, {
+        registry.addView(new View({ name: 'foo' }, {
           instrument: { name: 'default_metric' },
           meter: { name: 'foo' }
         }));
-        registry.addView(new UserView({ name: 'bar' }, {
+        registry.addView(new View({ name: 'bar' }, {
           instrument: { name: 'default_metric' },
           meter: { name: 'bar' }
         }));

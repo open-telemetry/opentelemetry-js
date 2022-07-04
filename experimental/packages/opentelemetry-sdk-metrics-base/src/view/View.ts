@@ -21,7 +21,7 @@ import { MeterSelector } from './MeterSelector';
 import { SelectorOptions, ViewOptions } from '../MeterProvider';
 import { Aggregation } from './Aggregation';
 
-export class UserView {
+export class View {
   readonly name?: string;
   readonly description?: string;
   readonly aggregation: Aggregation;
