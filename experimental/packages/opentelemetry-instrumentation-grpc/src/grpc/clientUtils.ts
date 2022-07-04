@@ -139,7 +139,7 @@ export const makeGrpcClientRemoteCall = function (
 
       ((call as unknown) as events.EventEmitter).on(
         'status',
-        (status: SpanStatus) => {
+        (status: grpcTypes.StatusObject) => {
           span.setStatus({ code: SpanStatusCode.UNSET });
           span.setAttribute(
             SemanticAttributes.RPC_GRPC_STATUS_CODE,
