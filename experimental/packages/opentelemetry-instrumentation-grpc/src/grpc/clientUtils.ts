@@ -23,7 +23,6 @@ import {
   Span,
   SpanStatusCode,
   SpanKind,
-  SpanStatus,
   propagation,
 } from '@opentelemetry/api';
 import {
