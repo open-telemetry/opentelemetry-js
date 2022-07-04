@@ -30,7 +30,7 @@ export class UserView {
   readonly meterSelector: MeterSelector;
 
   constructor(viewOptions: ViewOptions, selectorOptions?: SelectorOptions) {
-    // TODO: spec says that: If no criteria is provided, the SDK SHOULD treat it as an error. This is regearding to selectorOptions, not viewOptions.
+    // TODO: spec says that: If no criteria is provided, the SDK SHOULD treat it as an error. This is regarding to selectorOptions, not viewOptions.
     /*if (isViewOptionsEmpty(viewOptions)) {
       throw new Error('Cannot create view with no view arguments supplied');
     }*/
