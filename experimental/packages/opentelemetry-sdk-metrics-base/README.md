@@ -18,8 +18,6 @@ npm install --save @opentelemetry/sdk-metrics-base
 
 ## Usage
 
-## Usage
-
 The basic setup of the SDK can be seen as followings:
 
 ```js
