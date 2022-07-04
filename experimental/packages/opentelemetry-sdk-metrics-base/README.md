@@ -7,7 +7,7 @@ OpenTelemetry metrics module contains the foundation for all metrics SDKs of [op
 
 Used standalone, this module provides methods for manual instrumentation of code, offering full control over recording metrics for client-side JavaScript (browser) and Node.js.
 
-It does **not** provide automated instrumentation of known libraries, host environment metrics out-of-the-box.
+It does **not** provide automated instrumentation of known libraries or host environment metrics out-of-the-box.
 
 ## Installation
 
