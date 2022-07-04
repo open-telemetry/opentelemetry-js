@@ -58,7 +58,7 @@ export const makeGrpcClientRemoteCall = function (
           span.setStatus(_grpcStatusCodeToSpanStatus(err.code));
           span.setAttribute(
             SemanticAttributes.RPC_GRPC_STATUS_CODE,
-            err.code.toString()
+            err.code
           );
         }
         span.setAttributes({
@@ -69,7 +69,7 @@ export const makeGrpcClientRemoteCall = function (
         span.setStatus({ code: SpanStatusCode.UNSET });
         span.setAttribute(
           SemanticAttributes.RPC_GRPC_STATUS_CODE,
-          GRPC_STATUS_CODE_OK.toString()
+          GRPC_STATUS_CODE_OK
         );
       }
 
@@ -140,7 +140,7 @@ export const makeGrpcClientRemoteCall = function (
           span.setStatus({ code: SpanStatusCode.UNSET });
           span.setAttribute(
             SemanticAttributes.RPC_GRPC_STATUS_CODE,
-            status.code.toString()
+            status.code
           );
           endSpan();
         }

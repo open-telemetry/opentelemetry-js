@@ -93,7 +93,7 @@ export function makeGrpcClientRemoteCall(
           span.setStatus(_grpcStatusCodeToSpanStatus(err.code));
           span.setAttribute(
             SemanticAttributes.RPC_GRPC_STATUS_CODE,
-            err.code.toString()
+            err.code
           );
         }
         span.setAttributes({
@@ -104,7 +104,7 @@ export function makeGrpcClientRemoteCall(
         span.setStatus({ code: SpanStatusCode.UNSET });
         span.setAttribute(
           SemanticAttributes.RPC_GRPC_STATUS_CODE,
-          GRPC_STATUS_CODE_OK.toString()
+          GRPC_STATUS_CODE_OK
         );
       }
 

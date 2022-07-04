@@ -73,7 +73,7 @@ function serverStreamAndBidiHandler<RequestType, ResponseType>(
     });
     span.setAttribute(
       SemanticAttributes.RPC_GRPC_STATUS_CODE,
-      GRPC_STATUS_CODE_OK.toString()
+      GRPC_STATUS_CODE_OK
     );
 
     endSpan();
@@ -125,7 +125,7 @@ function clientStreamAndUnaryHandler<RequestType, ResponseType>(
         });
         span.setAttribute(
           SemanticAttributes.RPC_GRPC_STATUS_CODE,
-          err.code.toString()
+          err.code
         );
       }
       span.setAttributes({
@@ -136,7 +136,7 @@ function clientStreamAndUnaryHandler<RequestType, ResponseType>(
       span.setStatus({ code: SpanStatusCode.UNSET });
       span.setAttribute(
         SemanticAttributes.RPC_GRPC_STATUS_CODE,
-        GRPC_STATUS_CODE_OK.toString()
+        GRPC_STATUS_CODE_OK
       );
     }
 
