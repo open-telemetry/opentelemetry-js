@@ -130,6 +130,9 @@ export const makeGrpcClientRemoteCall = function (
             [AttributeNames.GRPC_ERROR_NAME]: err.name,
             [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
           });
+          if(err.code != null) {
+            span.setAttribute(SemanticAttributes.RPC_GRPC_STATUS_CODE, err.code);
+          }
           endSpan();
         }
       );

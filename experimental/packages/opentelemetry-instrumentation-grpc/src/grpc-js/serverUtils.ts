@@ -94,6 +94,7 @@ function serverStreamAndBidiHandler<RequestType, ResponseType>(
     span.setAttributes({
       [AttributeNames.GRPC_ERROR_NAME]: err.name,
       [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
+      [SemanticAttributes.RPC_GRPC_STATUS_CODE]: err.code,
     });
     endSpan();
   });
