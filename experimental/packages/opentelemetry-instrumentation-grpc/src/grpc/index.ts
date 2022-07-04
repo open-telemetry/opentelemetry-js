@@ -206,7 +206,6 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
                       case 'unary':
                       case 'client_stream':
                         return clientStreamAndUnaryHandler(
-                          grpcModule,
                           span,
                           call,
                           callback,
@@ -297,7 +296,6 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
         });
         return context.with(trace.setSpan(context.active(), span), () =>
           makeGrpcClientRemoteCall(
-            grpcClient,
             original,
             args,
             metadata,

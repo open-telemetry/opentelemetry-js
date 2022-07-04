@@ -34,6 +34,7 @@ import { CALL_SPAN_ENDED } from './serverUtils';
 import { EventEmitter } from 'events';
 import { AttributeNames } from '../enums/AttributeNames';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import { GRPC_STATUS_CODE_OK } from '../status-code';
 
 /**
  * Parse a package method list and return a list of methods to patch
@@ -103,7 +104,7 @@ export function makeGrpcClientRemoteCall(
         span.setStatus({ code: SpanStatusCode.UNSET });
         span.setAttribute(
           SemanticAttributes.RPC_GRPC_STATUS_CODE,
-          SpanStatusCode.UNSET.toString()
+          GRPC_STATUS_CODE_OK.toString()
         );
       }
 

@@ -25,9 +25,9 @@ import {
 } from '../utils';
 import { AttributeNames } from '../enums/AttributeNames';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import { GRPC_STATUS_CODE_OK } from '../status-code';
 
 export const clientStreamAndUnaryHandler = function <RequestType, ResponseType>(
-  grpcClient: typeof grpcTypes,
   span: Span,
   call: ServerCallWithMeta,
   callback: SendUnaryDataCallback,
@@ -61,7 +61,7 @@ export const clientStreamAndUnaryHandler = function <RequestType, ResponseType>(
       span.setStatus({ code: SpanStatusCode.UNSET });
       span.setAttribute(
         SemanticAttributes.RPC_GRPC_STATUS_CODE,
-        grpcClient.status.OK.toString()
+        GRPC_STATUS_CODE_OK.toString()
       );
     }
     span.addEvent('received');

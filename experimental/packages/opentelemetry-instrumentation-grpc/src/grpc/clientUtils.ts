@@ -32,12 +32,12 @@ import {
   findIndex,
 } from '../utils';
 import { AttributeNames } from '../enums/AttributeNames';
+import { GRPC_STATUS_CODE_OK } from '../status-code';
 
 /**
  * This method handles the client remote call
  */
 export const makeGrpcClientRemoteCall = function (
-  grpcClient: typeof grpcTypes,
   original: GrpcClientFunc,
   args: any[],
   metadata: grpcTypes.Metadata,
@@ -69,7 +69,7 @@ export const makeGrpcClientRemoteCall = function (
         span.setStatus({ code: SpanStatusCode.UNSET });
         span.setAttribute(
           SemanticAttributes.RPC_GRPC_STATUS_CODE,
-          grpcClient.status.OK.toString()
+          GRPC_STATUS_CODE_OK.toString()
         );
       }
 
