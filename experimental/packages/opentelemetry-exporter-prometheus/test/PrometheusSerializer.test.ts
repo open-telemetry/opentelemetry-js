@@ -145,11 +145,11 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(
           result,
           `test_count{foo1="bar1",foo2="bar2"} 1 ${mockedHrTimeMs}\n` +
-          `test_sum{foo1="bar1",foo2="bar2"} 5 ${mockedHrTimeMs}\n` +
-          `test_bucket{foo1="bar1",foo2="bar2",le="1"} 0 ${mockedHrTimeMs}\n` +
-          `test_bucket{foo1="bar1",foo2="bar2",le="10"} 1 ${mockedHrTimeMs}\n` +
-          `test_bucket{foo1="bar1",foo2="bar2",le="100"} 1 ${mockedHrTimeMs}\n` +
-          `test_bucket{foo1="bar1",foo2="bar2",le="+Inf"} 1 ${mockedHrTimeMs}\n`
+            `test_sum{foo1="bar1",foo2="bar2"} 5 ${mockedHrTimeMs}\n` +
+            `test_bucket{foo1="bar1",foo2="bar2",le="1"} 0 ${mockedHrTimeMs}\n` +
+            `test_bucket{foo1="bar1",foo2="bar2",le="10"} 1 ${mockedHrTimeMs}\n` +
+            `test_bucket{foo1="bar1",foo2="bar2",le="100"} 1 ${mockedHrTimeMs}\n` +
+            `test_bucket{foo1="bar1",foo2="bar2",le="+Inf"} 1 ${mockedHrTimeMs}\n`
         );
       });
 
@@ -159,11 +159,11 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(
           result,
           'test_count{foo1="bar1",foo2="bar2"} 1\n' +
-          'test_sum{foo1="bar1",foo2="bar2"} 5\n' +
-          'test_bucket{foo1="bar1",foo2="bar2",le="1"} 0\n' +
-          'test_bucket{foo1="bar1",foo2="bar2",le="10"} 1\n' +
-          'test_bucket{foo1="bar1",foo2="bar2",le="100"} 1\n' +
-          'test_bucket{foo1="bar1",foo2="bar2",le="+Inf"} 1\n'
+            'test_sum{foo1="bar1",foo2="bar2"} 5\n' +
+            'test_bucket{foo1="bar1",foo2="bar2",le="1"} 0\n' +
+            'test_bucket{foo1="bar1",foo2="bar2",le="10"} 1\n' +
+            'test_bucket{foo1="bar1",foo2="bar2",le="100"} 1\n' +
+            'test_bucket{foo1="bar1",foo2="bar2",le="+Inf"} 1\n'
         );
       });
     });
@@ -201,9 +201,9 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(
           result,
           '# HELP test_total foobar\n' +
-          '# TYPE test_total counter\n' +
-          `test_total{val="1"} 1 ${mockedHrTimeMs}\n` +
-          `test_total{val="2"} 1 ${mockedHrTimeMs}\n`
+            '# TYPE test_total counter\n' +
+            `test_total{val="1"} 1 ${mockedHrTimeMs}\n` +
+            `test_total{val="2"} 1 ${mockedHrTimeMs}\n`
         );
       });
 
@@ -213,9 +213,9 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(
           result,
           '# HELP test_total foobar\n' +
-          '# TYPE test_total counter\n' +
-          'test_total{val="1"} 1\n' +
-          'test_total{val="2"} 1\n'
+            '# TYPE test_total counter\n' +
+            'test_total{val="1"} 1\n' +
+            'test_total{val="2"} 1\n'
         );
       });
     });
@@ -257,19 +257,19 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(
           result,
           '# HELP test foobar\n' +
-          '# TYPE test histogram\n' +
-          `test_count{val="1"} 3 ${mockedHrTimeMs}\n` +
-          `test_sum{val="1"} 175 ${mockedHrTimeMs}\n` +
-          `test_bucket{val="1",le="1"} 0 ${mockedHrTimeMs}\n` +
-          `test_bucket{val="1",le="10"} 1 ${mockedHrTimeMs}\n` +
-          `test_bucket{val="1",le="100"} 2 ${mockedHrTimeMs}\n` +
-          `test_bucket{val="1",le="+Inf"} 3 ${mockedHrTimeMs}\n` +
-          `test_count{val="2"} 1 ${mockedHrTimeMs}\n` +
-          `test_sum{val="2"} 5 ${mockedHrTimeMs}\n` +
-          `test_bucket{val="2",le="1"} 0 ${mockedHrTimeMs}\n` +
-          `test_bucket{val="2",le="10"} 1 ${mockedHrTimeMs}\n` +
-          `test_bucket{val="2",le="100"} 1 ${mockedHrTimeMs}\n` +
-          `test_bucket{val="2",le="+Inf"} 1 ${mockedHrTimeMs}\n`
+            '# TYPE test histogram\n' +
+            `test_count{val="1"} 3 ${mockedHrTimeMs}\n` +
+            `test_sum{val="1"} 175 ${mockedHrTimeMs}\n` +
+            `test_bucket{val="1",le="1"} 0 ${mockedHrTimeMs}\n` +
+            `test_bucket{val="1",le="10"} 1 ${mockedHrTimeMs}\n` +
+            `test_bucket{val="1",le="100"} 2 ${mockedHrTimeMs}\n` +
+            `test_bucket{val="1",le="+Inf"} 3 ${mockedHrTimeMs}\n` +
+            `test_count{val="2"} 1 ${mockedHrTimeMs}\n` +
+            `test_sum{val="2"} 5 ${mockedHrTimeMs}\n` +
+            `test_bucket{val="2",le="1"} 0 ${mockedHrTimeMs}\n` +
+            `test_bucket{val="2",le="10"} 1 ${mockedHrTimeMs}\n` +
+            `test_bucket{val="2",le="100"} 1 ${mockedHrTimeMs}\n` +
+            `test_bucket{val="2",le="+Inf"} 1 ${mockedHrTimeMs}\n`
         );
       });
     });
@@ -405,13 +405,13 @@ describe('PrometheusSerializer', () => {
       assert.strictEqual(
         result,
         'test_total{' +
-        'backslash="\u005c\u005c",' +
-        'doubleQuote="\u005c\u0022",' +
-        'lineFeed="\u005c\u006e",' +
-        'backslashN="\u005c\u005c\u006e",' +
-        'backslashDoubleQuote="\u005c\u005c\u005c\u0022",' +
-        'backslashLineFeed="\u005c\u005c\u005c\u006e"' +
-        `} 1 ${mockedHrTimeMs}\n`
+          'backslash="\u005c\u005c",' +
+          'doubleQuote="\u005c\u0022",' +
+          'lineFeed="\u005c\u006e",' +
+          'backslashN="\u005c\u005c\u006e",' +
+          'backslashDoubleQuote="\u005c\u005c\u005c\u0022",' +
+          'backslashLineFeed="\u005c\u005c\u005c\u006e"' +
+          `} 1 ${mockedHrTimeMs}\n`
       );
     });
 
