@@ -78,8 +78,8 @@ describe('MeterSharedState', () => {
     it('should collect sync metrics with views', async () => {
       /** preparing test instrumentations */
       const { metricCollectors, meter } = setupInstruments([
-        new View({ name: 'foo' }, { instrument: { name: 'test' } }),
-        new View({ name: 'bar' }, { instrument: { name: 'test' } }),
+        new View({ name: 'foo', instrumentName: 'test' }),
+        new View({ name: 'bar', instrumentName: 'test' })
       ]);
 
       /** creating metric events */
@@ -137,8 +137,8 @@ describe('MeterSharedState', () => {
     it('should call observable callback once with view-ed async instruments', async () => {
       /** preparing test instrumentations */
       const { metricCollectors, meter } = setupInstruments([
-        new View({ name: 'foo' }, { instrument: { name: 'test' } }),
-        new View({ name: 'bar' }, { instrument: { name: 'test' } })
+        new View({ name: 'foo', instrumentName: 'test' }),
+        new View({ name: 'bar', instrumentName: 'test' })
       ]);
 
       /** creating metric events */

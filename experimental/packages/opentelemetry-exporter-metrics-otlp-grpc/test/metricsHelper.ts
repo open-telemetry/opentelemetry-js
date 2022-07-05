@@ -62,8 +62,10 @@ export function setUp() {
   meterProvider = new MeterProvider({
     resource: testResource,
     views: [
-      new View({ aggregation: new ExplicitBucketHistogramAggregation([0, 100]) },
-        { instrument: { name: 'int-histogram' } })
+      new View({
+        aggregation: new ExplicitBucketHistogramAggregation([0, 100]),
+        instrumentName: 'int-histogram',
+      })
     ]
   });
   reader = new TestMetricReader();

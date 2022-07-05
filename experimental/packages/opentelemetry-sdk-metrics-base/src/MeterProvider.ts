@@ -20,8 +20,6 @@ import { Resource } from '@opentelemetry/resources';
 import { MetricReader } from './export/MetricReader';
 import { MeterProviderSharedState } from './state/MeterProviderSharedState';
 import { MetricCollector } from './state/MetricCollector';
-import { Aggregation } from './view/Aggregation';
-import { InstrumentType } from './InstrumentDescriptor';
 import { ForceFlushOptions, ShutdownOptions } from './types';
 import { View } from './view/View';
 
@@ -33,55 +31,6 @@ export interface MeterProviderOptions {
   resource?: Resource;
   views?: View[];
 }
-
-export type ViewOptions = {
-  /**
-   *  If not provided, the Instrument name will be used by default. This will be used as the name of the metrics stream.
-   */
-  name?: string,
-  /**
-   * If not provided, the Instrument description will be used by default.
-   */
-  description?: string,
-  /**
-   * If provided, the attributes that are not in the list will be ignored.
-   * If not provided, all the attribute keys will be used by default.
-   */
-  attributeKeys?: string[],
-  /**
-   * The {@link Aggregation} aggregation to be used.
-   */
-  aggregation?: Aggregation,
-
-  // TODO: Add ExemplarReservoir
-};
-
-export type SelectorOptions = {
-  instrument?: {
-    /**
-     * The type of the Instrument(s).
-     */
-    type?: InstrumentType,
-    /**
-     * Name of the Instrument(s) with wildcard support.
-     */
-    name?: string,
-  }
-  meter?: {
-    /**
-     * The name of the Meter.
-     */
-    name?: string;
-    /**
-     * The version of the Meter.
-     */
-    version?: string;
-    /**
-     * The schema URL of the Meter.
-     */
-    schemaUrl?: string;
-  }
-};
 
 /**
  * This class implements the {@link metrics.MeterProvider} interface.

@@ -120,12 +120,8 @@ describe('MeterProvider', () => {
         views: [
           new View({
             name: 'renamed-instrument',
-            description: 'my renamed instrument'
-          },
-          {
-            instrument: {
-              name: 'non-renamed-instrument',
-            },
+            description: 'my renamed instrument',
+            instrumentName: 'non-renamed-instrument',
           })
         ]
       });
@@ -182,9 +178,10 @@ describe('MeterProvider', () => {
       const meterProvider = new MeterProvider({
         resource: defaultResource,
         views: [
-          new View({ attributeKeys: ['attrib1'] },
-            { instrument: { name: 'non-renamed-instrument', } }
-          ),
+          new View({
+            attributeKeys: ['attrib1'],
+            instrumentName: 'non-renamed-instrument'
+          })
         ]
       });
 
@@ -237,7 +234,7 @@ describe('MeterProvider', () => {
       const meterProvider = new MeterProvider({
         resource: defaultResource,
         views: [
-          new View({ name: 'renamed-instrument' }, { instrument: { name: 'test-counter' } })
+          new View({ name: 'renamed-instrument', instrumentName: 'test-counter' })
         ]
       });
 
@@ -299,19 +296,11 @@ describe('MeterProvider', () => {
         resource: defaultResource,
         views: [
           // Add view that renames 'test-counter' to 'renamed-instrument' on 'meter1'
-          new View(
-            {
-              name: 'renamed-instrument'
-            },
-            {
-              instrument: {
-                name: 'test-counter'
-              },
-              meter: {
-                name: 'meter1'
-              }
-            }
-          )
+          new View({
+            name: 'renamed-instrument',
+            instrumentName: 'test-counter',
+            meterName: 'meter1'
+          })
         ]
       });
 
@@ -374,27 +363,15 @@ describe('MeterProvider', () => {
         // Add Views to rename both instruments (of different types) to the same name.
         views: [
           new View({
-            name: 'renamed-instrument'
-          },
-          {
-            instrument: {
-              name: 'test-counter',
-            },
-            meter: {
-              name: 'meter1'
-            }
+            name: 'renamed-instrument',
+            instrumentName: 'test-counter',
+            meterName: 'meter1'
           }),
           new View({
-            name: 'renamed-instrument'
-          },
-          {
-            instrument: {
-              name: 'test-histogram',
-            },
-            meter: {
-              name: 'meter1'
-            }
-          }),
+            name: 'renamed-instrument',
+            instrumentName: 'test-histogram',
+            meterName: 'meter1'
+          })
         ]
       });
       const reader = new TestMetricReader();

@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import { AttributesProcessor } from '../../src/view/AttributesProcessor';
 import { View } from '../../src/view/View';
-import { InstrumentType, Aggregation} from '../../src';
+import { InstrumentType, Aggregation } from '../../src';
 
 describe('View', () => {
   describe('constructor', () => {
@@ -37,32 +37,23 @@ describe('View', () => {
 
     it('with named view and instrument wildcard should throw', () => {
       // Throws with wildcard character only.
-      assert.throws(() => new View({ name: 'renamed-instrument' },
-        {
-          instrument: {
-            name: '*'
-          }
-        }
-      ));
+      assert.throws(() => new View({
+        name: 'renamed-instrument',
+        instrumentName: '*'
+      }));
 
       // Throws with wildcard character in instrument name.
-      assert.throws(() => new View({ name: 'renamed-instrument' },
-        {
-          instrument: {
-            name: 'instrument.name.*'
-          }
-        }
-      ));
+      assert.throws(() => new View({
+        name: 'renamed-instrument',
+        instrumentName: 'instrument.name.*'
+      }));
     });
 
     it('with named view and instrument type selector should throw', () => {
-      assert.throws(() => new View({ name: 'renamed-instrument' },
-        {
-          instrument: {
-            type: InstrumentType.COUNTER
-          }
-        }
-      ));
+      assert.throws(() => new View({
+        name: 'renamed-instrument',
+        instrumentType: InstrumentType.COUNTER
+      }));
     });
   });
 });

@@ -62,9 +62,10 @@ class TestMetricReader extends MetricReader {
   }
 }
 
-export const HISTOGRAM_AGGREGATION_VIEW =
-  new View({ aggregation: new ExplicitBucketHistogramAggregation([0, 100]) },
-    { instrument: { name: 'int-histogram' } });
+export const HISTOGRAM_AGGREGATION_VIEW = new View({
+  aggregation: new ExplicitBucketHistogramAggregation([0, 100]),
+  instrumentName: 'int-histogram',
+});
 
 const defaultResource = Resource.default().merge(new Resource({
   service: 'ui',

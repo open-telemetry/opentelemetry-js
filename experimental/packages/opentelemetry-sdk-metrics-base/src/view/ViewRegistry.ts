@@ -21,13 +21,9 @@ import { MeterSelector } from './MeterSelector';
 import { View } from './View';
 
 export class ViewRegistry {
-  private static DEFAULT_VIEW = new View({}, {
-    instrument: {
-      name: '*'
-    },
-    meter: {
-      name: '*'
-    }
+  private static DEFAULT_VIEW = new View({
+    instrumentName: '*',
+    meterName: '*'
   });
   private _registeredViews: View[] = [];
 

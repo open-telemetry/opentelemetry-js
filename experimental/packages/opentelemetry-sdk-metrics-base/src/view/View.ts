@@ -18,8 +18,53 @@ import { PatternPredicate } from './Predicate';
 import { AttributesProcessor, FilteringAttributesProcessor } from './AttributesProcessor';
 import { InstrumentSelector } from './InstrumentSelector';
 import { MeterSelector } from './MeterSelector';
-import { SelectorOptions, ViewOptions } from '../MeterProvider';
 import { Aggregation } from './Aggregation';
+import { InstrumentType } from '../InstrumentDescriptor';
+
+export type ViewOptions = {
+  // View
+  /**
+   *  If not provided, the Instrument name will be used by default. This will be used as the name of the metrics stream.
+   */
+  name?: string,
+  /**
+   * If not provided, the Instrument description will be used by default.
+   */
+  description?: string,
+  /**
+   * If provided, the attributes that are not in the list will be ignored.
+   * If not provided, all the attribute keys will be used by default.
+   */
+  attributeKeys?: string[],
+  /**
+   * The {@link Aggregation} aggregation to be used.
+   */
+  aggregation?: Aggregation,
+
+  // Instrument
+  /**
+   * The type of the Instrument(s).
+   */
+  instrumentType?: InstrumentType,
+  /**
+   * Name of the Instrument(s) with wildcard support.
+   */
+  instrumentName?: string,
+
+  // Meter
+  /**
+   * The name of the Meter.
+   */
+  meterName?: string;
+  /**
+   * The version of the Meter.
+   */
+  meterVersion?: string;
+  /**
+   * The schema URL of the Meter.
+   */
+  meterSchemaUrl?: string;
+};
 
 export class View {
   readonly name?: string;
@@ -29,7 +74,7 @@ export class View {
   readonly instrumentSelector: InstrumentSelector;
   readonly meterSelector: MeterSelector;
 
-  constructor(viewOptions: ViewOptions, selectorOptions?: SelectorOptions) {
+  constructor(viewOptions: ViewOptions) {
     // TODO: spec says that: If no criteria is provided, the SDK SHOULD treat it as an error. This is regarding to selectorOptions, not viewOptions.
     /*if (isViewOptionsEmpty(viewOptions)) {
       throw new Error('Cannot create view with no view arguments supplied');
@@ -38,8 +83,8 @@ export class View {
     // the SDK SHOULD NOT allow Views with a specified name to be declared with instrument selectors that
     // may select more than one instrument (e.g. wild card instrument name) in the same Meter.
     if (viewOptions.name != null &&
-      (selectorOptions?.instrument?.name == null ||
-        PatternPredicate.hasWildcard(selectorOptions.instrument.name))) {
+      (viewOptions?.instrumentName == null ||
+        PatternPredicate.hasWildcard(viewOptions.instrumentName))) {
       throw new Error('Views with a specified name must be declared with an instrument selector that selects at most one instrument per meter.');
     }
 
@@ -53,7 +98,14 @@ export class View {
     this.name = viewOptions.name;
     this.description = viewOptions.description;
     this.aggregation = viewOptions.aggregation ?? Aggregation.Default();
-    this.instrumentSelector = new InstrumentSelector(selectorOptions?.instrument);
-    this.meterSelector = new MeterSelector(selectorOptions?.meter);
+    this.instrumentSelector = new InstrumentSelector({
+      name: viewOptions.instrumentName,
+      type: viewOptions.instrumentType,
+    });
+    this.meterSelector = new MeterSelector({
+      name: viewOptions.meterName,
+      version: viewOptions.meterVersion,
+      schemaUrl: viewOptions.meterSchemaUrl
+    });
   }
 }
