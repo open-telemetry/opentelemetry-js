@@ -17,16 +17,39 @@
 import * as assert from 'assert';
 import { AttributesProcessor } from '../../src/view/AttributesProcessor';
 import { View } from '../../src/view/View';
-import { InstrumentType, Aggregation } from '../../src';
+import { InstrumentType, Aggregation, ExplicitBucketHistogramAggregation } from '../../src';
 
 describe('View', () => {
   describe('constructor', () => {
-    it('should construct view without arguments', () => {
-      const view = new View({});
-      assert.strictEqual(view.name, undefined);
-      assert.strictEqual(view.description, undefined);
-      assert.strictEqual(view.aggregation, Aggregation.Default());
-      assert.strictEqual(view.attributesProcessor, AttributesProcessor.Noop());
+    it('should construct default view with no view arguments provided', () => {
+      {
+        const view = new View({instrumentName: '*'});
+        assert.strictEqual(view.name, undefined);
+        assert.strictEqual(view.description, undefined);
+        assert.strictEqual(view.aggregation, Aggregation.Default());
+        assert.strictEqual(view.attributesProcessor, AttributesProcessor.Noop());
+      }
+      {
+        const view = new View({meterName: '*'});
+        assert.strictEqual(view.name, undefined);
+        assert.strictEqual(view.description, undefined);
+        assert.strictEqual(view.aggregation, Aggregation.Default());
+        assert.strictEqual(view.attributesProcessor, AttributesProcessor.Noop());
+      }
+    });
+
+    it('without at least one selector option should throw', () => {
+      assert.throws(() => new View({}));
+      // would implicitly rename all instruments to 'name'
+      assert.throws(() => new View({ name: 'name' }));
+      // would implicitly drop all attribute keys on all instruments except 'key'
+      assert.throws(() => new View({ attributeKeys: ['key'] }));
+      // would implicitly rename all instruments to description
+      assert.throws(() => new View({ description: 'description' }));
+      // would implicitly change all instruments to use histogram aggregation.
+      assert.throws(() => new View({
+        aggregation: new ExplicitBucketHistogramAggregation([1, 100])
+      }));
     });
 
     it('with named view and no instrument selector should throw', () => {

@@ -66,6 +66,14 @@ export type ViewOptions = {
   meterSchemaUrl?: string;
 };
 
+function isSelectorProvided(options: ViewOptions): boolean {
+  return (options.instrumentName == null &&
+    options.instrumentType == null &&
+    options.meterName == null &&
+    options.meterVersion == null &&
+    options.meterSchemaUrl == null);
+}
+
 export class View {
   readonly name?: string;
   readonly description?: string;
@@ -75,10 +83,11 @@ export class View {
   readonly meterSelector: MeterSelector;
 
   constructor(viewOptions: ViewOptions) {
-    // TODO: spec says that: If no criteria is provided, the SDK SHOULD treat it as an error. This is regarding to selectorOptions, not viewOptions.
-    /*if (isViewOptionsEmpty(viewOptions)) {
-      throw new Error('Cannot create view with no view arguments supplied');
-    }*/
+    // If no criteria is provided, the SDK SHOULD treat it as an error.
+    // It is recommended that the SDK implementations fail fast.
+    if (isSelectorProvided(viewOptions)) {
+      throw new Error('Cannot create view with no selector arguments supplied');
+    }
 
     // the SDK SHOULD NOT allow Views with a specified name to be declared with instrument selectors that
     // may select more than one instrument (e.g. wild card instrument name) in the same Meter.
