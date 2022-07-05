@@ -25,7 +25,7 @@ All notable changes to experimental packages in this project will be documented 
 * fix(otlp-transformer): remove type dependency on Long #3022 @legendecas
 * fix(grpc-exporter): use non-normalized URL to determine channel security #3019 @pichlermarc
 * fix(otlp-exporter-base): fix gzip output stream in http otlp export #3046 @mattolson
-* fix(instrumentation-grpc): always set status code attribute with numeric value #3076 @blumamir
+* fix(instrumentation-grpc): always set grpc semcov status code attribute with numeric value @blumamir
 
 ### :books: (Refine Doc)
 
