@@ -24,7 +24,8 @@ import {
   DataPointType,
   ExplicitBucketHistogramAggregation,
   SumAggregation,
-  Histogram, View,
+  Histogram,
+  View,
 } from '@opentelemetry/sdk-metrics-base';
 import * as sinon from 'sinon';
 import { PrometheusSerializer } from '../src';

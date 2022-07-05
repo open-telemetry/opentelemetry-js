@@ -27,7 +27,8 @@ import {
   AggregationTemporality,
   ExplicitBucketHistogramAggregation,
   MeterProvider,
-  MetricReader, View
+  MetricReader,
+  View
 } from '@opentelemetry/sdk-metrics-base';
 import { IExportMetricsServiceRequest, IKeyValue, IMetric } from '@opentelemetry/otlp-transformer';
 import { Stream } from 'stream';

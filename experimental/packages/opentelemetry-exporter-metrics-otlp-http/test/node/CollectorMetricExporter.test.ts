@@ -35,7 +35,10 @@ import {
   mockCounter,
   mockObservableGauge,
   mockHistogram,
-  collect, shutdown, setUp, HISTOGRAM_AGGREGATION_VIEW,
+  collect,
+  shutdown,
+  setUp,
+  HISTOGRAM_AGGREGATION_VIEW,
 } from '../metricsHelper';
 import { MockedResponse } from './nodeHelpers';
 import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';

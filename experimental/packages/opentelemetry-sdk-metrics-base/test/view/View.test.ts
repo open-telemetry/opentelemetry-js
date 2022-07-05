@@ -39,6 +39,7 @@ describe('View', () => {
     });
 
     it('without at least one selector option should throw', () => {
+      // would do nothing
       assert.throws(() => new View({}));
       // would implicitly rename all instruments to 'name'
       assert.throws(() => new View({ name: 'name' }));
@@ -46,7 +47,7 @@ describe('View', () => {
       assert.throws(() => new View({ attributeKeys: ['key'] }));
       // would implicitly rename all instruments to description
       assert.throws(() => new View({ description: 'description' }));
-      // would implicitly change all instruments to use histogram aggregation.
+      // would implicitly change all instruments to use histogram aggregation
       assert.throws(() => new View({
         aggregation: new ExplicitBucketHistogramAggregation([1, 100])
       }));
