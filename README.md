@@ -47,6 +47,8 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 
 | API Version | Core version | Experimental Packages |
 | ----------- | ------------ | --------------------- |
+| 1.1.x       | 1.3.x        | 0.30.x                |
+| 1.1.x       | 1.2.x        | 0.29.x                |
 | 1.1.x       | 1.1.x        | 0.28.x                |
 | 1.0.x       | 1.0.x        | 0.26.x, 0.27.x        |
 | 1.0.x       | 0.26.x       | -----                 |
