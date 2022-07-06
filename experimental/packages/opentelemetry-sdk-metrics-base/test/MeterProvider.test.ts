@@ -206,7 +206,7 @@ describe('MeterProvider', () => {
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
 
       // View updated name and description.
-      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SUM, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER,
         description: 'my renamed instrument'
@@ -265,7 +265,7 @@ describe('MeterProvider', () => {
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
 
       // View updated name and description.
-      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SUM, {
         name: 'non-renamed-instrument',
         type: InstrumentType.COUNTER,
       });
@@ -329,7 +329,7 @@ describe('MeterProvider', () => {
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
 
       // View updated the name to 'renamed-instrument' and instrument is still a Counter
-      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SUM, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER,
       });
@@ -344,7 +344,7 @@ describe('MeterProvider', () => {
       assert.strictEqual(resourceMetrics.scopeMetrics[1].metrics.length, 1);
 
       // View updated the name to 'renamed-instrument' and instrument is still a Counter
-      assertMetricData(resourceMetrics.scopeMetrics[1].metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(resourceMetrics.scopeMetrics[1].metrics[0], DataPointType.SUM, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER
       });
@@ -398,7 +398,7 @@ describe('MeterProvider', () => {
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
 
       // View updated the name to 'renamed-instrument' and instrument is still a Counter
-      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SUM, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER
       });
@@ -413,7 +413,7 @@ describe('MeterProvider', () => {
       assert.strictEqual(resourceMetrics.scopeMetrics[1].metrics.length, 1);
 
       // No updated name on 'test-counter'.
-      assertMetricData(resourceMetrics.scopeMetrics[1].metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(resourceMetrics.scopeMetrics[1].metrics[0], DataPointType.SUM, {
         name: 'test-counter',
         type: InstrumentType.COUNTER
       });
@@ -475,7 +475,7 @@ describe('MeterProvider', () => {
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 2);
 
       // Both 'renamed-instrument' are still exported with their types.
-      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SUM, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER
       });

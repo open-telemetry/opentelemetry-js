@@ -38,8 +38,14 @@ export interface BaseMetricData {
  * Represents a metric data aggregated by either a LastValueAggregation or
  * SumAggregation.
  */
-export interface SingularMetricData extends BaseMetricData {
-  readonly dataPointType: DataPointType.SINGULAR;
+export interface SumMetricData extends BaseMetricData {
+  readonly dataPointType: DataPointType.SUM;
+  readonly dataPoints: DataPoint<number>[];
+  readonly isMonotonic: boolean;
+}
+
+export interface GaugeMetricData extends BaseMetricData {
+  readonly dataPointType: DataPointType.GAUGE;
   readonly dataPoints: DataPoint<number>[];
 }
 
@@ -54,7 +60,7 @@ export interface HistogramMetricData extends BaseMetricData {
 /**
  * Represents an aggregated metric data.
  */
-export type MetricData = SingularMetricData | HistogramMetricData;
+export type MetricData = SumMetricData | GaugeMetricData | HistogramMetricData;
 
 export interface ScopeMetrics {
   scope: InstrumentationScope;
@@ -75,9 +81,10 @@ export interface CollectionResult {
  * The aggregated point data type.
  */
 export enum DataPointType {
-  SINGULAR,
   HISTOGRAM,
   EXPONENTIAL_HISTOGRAM,
+  GAUGE,
+  SUM
 }
 
 /**

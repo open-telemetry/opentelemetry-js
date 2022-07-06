@@ -63,7 +63,7 @@ describe('TemporalMetricProcessor', () => {
             [2, 2]);
 
           assertMetricData(metric,
-            DataPointType.SINGULAR,
+            DataPointType.SUM,
             defaultInstrumentDescriptor,
             AggregationTemporality.DELTA);
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -80,7 +80,7 @@ describe('TemporalMetricProcessor', () => {
             [4, 4]);
 
           assertMetricData(metric,
-            DataPointType.SINGULAR,
+            DataPointType.SUM,
             defaultInstrumentDescriptor,
             AggregationTemporality.DELTA);
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -97,7 +97,7 @@ describe('TemporalMetricProcessor', () => {
             [5, 5]);
 
           assertMetricData(metric,
-            DataPointType.SINGULAR,
+            DataPointType.SUM,
             defaultInstrumentDescriptor,
             AggregationTemporality.DELTA);
           assert.strictEqual(metric.dataPoints.length, 0);
@@ -126,7 +126,7 @@ describe('TemporalMetricProcessor', () => {
             [2, 2]);
 
           assertMetricData(metric,
-            DataPointType.SINGULAR,
+            DataPointType.SUM,
             defaultInstrumentDescriptor,
             AggregationTemporality.DELTA);
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -142,7 +142,7 @@ describe('TemporalMetricProcessor', () => {
             [3, 3]);
 
           assertMetricData(metric,
-            DataPointType.SINGULAR,
+            DataPointType.SUM,
             defaultInstrumentDescriptor,
             AggregationTemporality.DELTA);
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -170,7 +170,7 @@ describe('TemporalMetricProcessor', () => {
             [2, 2]);
 
           assertMetricData(metric,
-            DataPointType.SINGULAR,
+            DataPointType.SUM,
             defaultInstrumentDescriptor,
             AggregationTemporality.CUMULATIVE);
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -187,7 +187,7 @@ describe('TemporalMetricProcessor', () => {
             [4, 4]);
 
           assertMetricData(metric,
-            DataPointType.SINGULAR,
+            DataPointType.SUM,
             defaultInstrumentDescriptor,
             AggregationTemporality.CUMULATIVE);
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -216,7 +216,7 @@ describe('TemporalMetricProcessor', () => {
             [2, 2]);
 
           assertMetricData(metric,
-            DataPointType.SINGULAR,
+            DataPointType.SUM,
             defaultInstrumentDescriptor,
             AggregationTemporality.CUMULATIVE);
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -233,7 +233,7 @@ describe('TemporalMetricProcessor', () => {
             [4, 4]);
 
           assertMetricData(metric,
-            DataPointType.SINGULAR,
+            DataPointType.SUM,
             defaultInstrumentDescriptor,
             AggregationTemporality.DELTA);
           assert.strictEqual(metric.dataPoints.length, 1);
@@ -248,7 +248,7 @@ describe('TemporalMetricProcessor', () => {
             [5, 5]);
 
           assertMetricData(metric,
-            DataPointType.SINGULAR,
+            DataPointType.SUM,
             defaultInstrumentDescriptor,
             AggregationTemporality.CUMULATIVE);
           assert.strictEqual(metric.dataPoints.length, 1);

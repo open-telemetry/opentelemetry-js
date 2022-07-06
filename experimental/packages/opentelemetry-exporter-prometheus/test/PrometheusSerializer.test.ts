@@ -82,7 +82,7 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
         assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
         const metric = resourceMetrics.scopeMetrics[0].metrics[0];
-        assert.strictEqual(metric.dataPointType, DataPointType.SINGULAR);
+        assert.strictEqual(metric.dataPointType, DataPointType.SUM);
         const pointData = metric.dataPoints as DataPoint<number>[];
         assert.strictEqual(pointData.length, 1);
 
@@ -164,7 +164,7 @@ describe('PrometheusSerializer', () => {
   });
 
   describe('serialize an instrumentation metrics', () => {
-    describe('Singular', () => {
+    describe('Sum', () => {
       async function testSerializer(serializer: PrometheusSerializer) {
         const reader = new TestMetricReader();
         const meterProvider = new MeterProvider();
@@ -280,7 +280,7 @@ describe('PrometheusSerializer', () => {
       assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
       const metric = resourceMetrics.scopeMetrics[0].metrics[0];
-      assert.strictEqual(metric.dataPointType, DataPointType.SINGULAR);
+      assert.strictEqual(metric.dataPointType, DataPointType.SUM);
       const pointData = metric.dataPoints as DataPoint<number>[];
       assert.strictEqual(pointData.length, 1);
 
@@ -319,7 +319,7 @@ describe('PrometheusSerializer', () => {
       assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
       const metric = resourceMetrics.scopeMetrics[0].metrics[0];
-      assert.strictEqual(metric.dataPointType, DataPointType.SINGULAR);
+      assert.strictEqual(metric.dataPointType, DataPointType.SUM);
       const pointData = metric.dataPoints as DataPoint<number>[];
       assert.strictEqual(pointData.length, 1);
 

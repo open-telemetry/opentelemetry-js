@@ -70,7 +70,8 @@ describe('Metrics', () => {
           valueType: ValueType.INT,
         },
         aggregationTemporality,
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: true,
         dataPoints: [
           {
             value: value,
@@ -92,7 +93,8 @@ describe('Metrics', () => {
           valueType: ValueType.INT,
         },
         aggregationTemporality,
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: true,
         dataPoints: [
           {
             value: value,
@@ -114,7 +116,7 @@ describe('Metrics', () => {
           valueType: ValueType.DOUBLE,
         },
         aggregationTemporality: AggregationTemporality.CUMULATIVE,
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.GAUGE,
         dataPoints: [
           {
             value: value,

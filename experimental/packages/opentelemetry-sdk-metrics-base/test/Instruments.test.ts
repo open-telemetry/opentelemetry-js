@@ -83,7 +83,7 @@ describe('Instruments', () => {
           type: InstrumentType.COUNTER,
           valueType: ValueType.INT,
         },
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
         dataPoints: [
           {
             attributes: {},
@@ -99,7 +99,7 @@ describe('Instruments', () => {
       // add negative values should not be observable.
       counter.add(-1.1);
       await validateExport(cumulativeReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
         dataPoints: [
           {
             attributes: {},
@@ -125,7 +125,7 @@ describe('Instruments', () => {
       counter.add(1, { foo: 'bar' });
       counter.add(1.2, { foo: 'bar' });
       await validateExport(cumulativeReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
         dataPoints: [
           {
             attributes: {},
@@ -141,7 +141,7 @@ describe('Instruments', () => {
       // add negative values should not be observable.
       counter.add(-1.1);
       await validateExport(cumulativeReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
         dataPoints: [
           {
             attributes: {},
@@ -199,7 +199,7 @@ describe('Instruments', () => {
           type: InstrumentType.UP_DOWN_COUNTER,
           valueType: ValueType.INT,
         },
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
         dataPoints: [
           {
             attributes: {},
@@ -224,7 +224,7 @@ describe('Instruments', () => {
       upDownCounter.add(4, { foo: 'bar' });
       upDownCounter.add(1.1, { foo: 'bar' });
       await validateExport(deltaReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
         dataPoints: [
           {
             attributes: {},
@@ -488,7 +488,7 @@ describe('Instruments', () => {
       });
 
       await validateExport(cumulativeReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
         dataPoints: [
           {
             attributes: {},
@@ -501,7 +501,7 @@ describe('Instruments', () => {
         ],
       });
       await validateExport(cumulativeReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
         dataPoints: [
           {
             attributes: {},
@@ -543,7 +543,7 @@ describe('Instruments', () => {
       });
 
       await validateExport(cumulativeReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
         dataPoints: [
           {
             attributes: {},
@@ -556,7 +556,7 @@ describe('Instruments', () => {
         ],
       });
       await validateExport(cumulativeReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
         dataPoints: [
           {
             attributes: {},
@@ -603,7 +603,7 @@ describe('Instruments', () => {
       });
 
       await validateExport(cumulativeReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.GAUGE,
         dataPoints: [
           {
             attributes: {},
@@ -616,7 +616,7 @@ describe('Instruments', () => {
         ],
       });
       await validateExport(cumulativeReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.GAUGE,
         dataPoints: [
           {
             attributes: {},
@@ -629,7 +629,7 @@ describe('Instruments', () => {
         ],
       });
       await validateExport(cumulativeReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.GAUGE,
         dataPoints: [
           {
             attributes: {},
