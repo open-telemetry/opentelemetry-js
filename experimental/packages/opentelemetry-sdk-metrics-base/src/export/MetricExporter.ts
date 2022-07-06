@@ -26,11 +26,11 @@ import { InstrumentType } from '../InstrumentDescriptor';
  * An interface that allows different metric services to export recorded data
  * in their own format.
  *
- * To export data this MUST be register to the Metrics SDK with a MetricReader.
+ * To export data this MUST be registered to the Metrics SDK with a MetricReader.
  */
 export interface PushMetricExporter {
   /**
-   * Called to export sampled {@link ResourceMetrics}s.
+   * Called to export sampled {@link ResourceMetrics}.
    * @param metrics the metric data to be exported.
    */
   export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): void;
@@ -47,7 +47,11 @@ export interface PushMetricExporter {
    */
   selectAggregationTemporality(instrumentType: InstrumentType): AggregationTemporality;
 
-  /** Stops the exporter. */
+  /**
+   * Returns a promise which resolves when the last exportation is completed.
+   * Further calls to {@link PushMetricExporter.export} may not export the
+   * data.
+   */
   shutdown(): Promise<void>;
 }
 

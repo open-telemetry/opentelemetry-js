@@ -88,17 +88,20 @@ export interface CollectionResult {
  */
 export enum DataPointType {
   /**
-   * Singular data point. It can be the result of Sum and LastValue
-   * aggregation.
+   * A singular metric data point has only a single numeric value.
    */
   SINGULAR,
   /**
-   * Histogram data point. It can be the result of Histogram aggregation.
+   * A histogram data point contains a histogram statistics of collected
+   * values with a list of explicit bucket boundaries and statistics such
+   * as min, max, count, and sum of all collected values.
    */
   HISTOGRAM,
   /**
-   * Exponential histogram data point. It can be the result of Exponential
-   * histogram aggregation.
+   * An exponential histogram data point contains a histogram statistics of
+   * collected values where bucket boundaries are automatically calculated
+   * using an exponential function, and statistics such as min, max, count,
+   * and sum of all collected values.
    */
   EXPONENTIAL_HISTOGRAM,
 }

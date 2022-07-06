@@ -21,7 +21,7 @@ export interface MetricCollectOptions {
    * Timeout for the SDK to perform the involved asynchronous callback
    * functions.
    *
-   * If the callback functions are failed to finish the observation in time,
+   * If the callback functions failed to finish the observation in time,
    * their results are discarded and an error is appended in the
    * {@link CollectionResult.errors}.
    */
