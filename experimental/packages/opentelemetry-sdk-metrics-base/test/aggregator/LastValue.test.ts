@@ -114,8 +114,7 @@ describe('LastValueAggregator', () => {
       const expected: MetricData = {
         descriptor: defaultInstrumentDescriptor,
         aggregationTemporality: AggregationTemporality.CUMULATIVE,
-        dataPointType: DataPointType.SUM,
-        isMonotonic: true,
+        dataPointType: DataPointType.GAUGE,
         dataPoints: [
           {
             attributes: {},
