@@ -6,6 +6,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* feat(sdk-metrics-base): distinguish between Sum and Gauge in MetricData [#3079](https://github.com/open-telemetry/opentelemetry-js/pull/3079) @pichlermarc
+
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
