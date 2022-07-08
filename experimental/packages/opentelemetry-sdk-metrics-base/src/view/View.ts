@@ -109,6 +109,9 @@ function isSelectorNotProvided(options: ViewOptions): boolean {
     options.meterSchemaUrl == null);
 }
 
+/**
+ * Can be passed to a {@link MeterProvider} to select instruments and alter their metric stream.
+ */
 export class View {
   readonly name?: string;
   readonly description?: string;
@@ -119,7 +122,6 @@ export class View {
 
   /**
    * Create a new {@link View} instance.
-   * Can be passed to a {@link MeterProvider} to select instruments and alter their metric stream.
    *
    * Parameters can be categorized as two types:
    *  Instrument selection criteria: Used to describe the instrument(s) this view will be applied to.
