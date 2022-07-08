@@ -18,13 +18,13 @@ import * as assert from 'assert';
 import { MetricAttributes, UpDownCounter } from '@opentelemetry/api-metrics';
 import {
   AggregationTemporality,
-  MeterProvider,
-  MetricReader,
   DataPoint,
   DataPointType,
   ExplicitBucketHistogramAggregation,
-  SumAggregation,
   Histogram,
+  MeterProvider,
+  MetricReader,
+  SumAggregation,
 } from '@opentelemetry/sdk-metrics-base';
 import * as sinon from 'sinon';
 import { PrometheusSerializer } from '../src';
@@ -188,7 +188,7 @@ describe('PrometheusSerializer', () => {
         return result;
       }
 
-      it('should serialize metric record with sum aggregator', async () => {
+      it('should serialize metric record with monotonic sum aggregator', async () => {
         const serializer = new PrometheusSerializer();
         const result = await testSerializer(serializer);
         assert.strictEqual(
@@ -200,7 +200,7 @@ describe('PrometheusSerializer', () => {
         );
       });
 
-      it('serialize metric record with sum aggregator without timestamp', async () => {
+      it('serialize metric record with monotonic sum aggregator without timestamp', async () => {
         const serializer = new PrometheusSerializer(undefined, false);
         const result = await testSerializer(serializer);
         assert.strictEqual(
@@ -209,6 +209,54 @@ describe('PrometheusSerializer', () => {
             '# TYPE test_total counter\n' +
             'test_total{val="1"} 1\n' +
             'test_total{val="2"} 1\n'
+        );
+      });
+    });
+
+    describe('Gauge', () => {
+      async function testSerializer(serializer: PrometheusSerializer) {
+        const reader = new TestMetricReader();
+        const meterProvider = new MeterProvider();
+        meterProvider.addMetricReader(reader);
+        meterProvider.addView({ aggregation: new SumAggregation() });
+        const meter = meterProvider.getMeter('test');
+
+        const counter = meter.createUpDownCounter('test_total', {
+          description: 'foobar',
+        });
+        counter.add(1, { val: '1' });
+        counter.add(1, { val: '2' });
+
+        const { resourceMetrics, errors } = await reader.collect();
+        assert.strictEqual(errors.length, 0);
+        assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
+        assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
+        const scopeMetrics = resourceMetrics.scopeMetrics[0];
+
+        return serializer['_serializeScopeMetrics'](scopeMetrics);
+      }
+
+      it('should serialize metric record with non-monotonic aggregator', async () => {
+        const serializer = new PrometheusSerializer();
+        const result = await testSerializer(serializer);
+        assert.strictEqual(
+          result,
+          '# HELP test_total foobar\n' +
+          '# TYPE test_total gauge\n' +
+          `test_total{val="1"} 1 ${mockedHrTimeMs}\n` +
+          `test_total{val="2"} 1 ${mockedHrTimeMs}\n`
+        );
+      });
+
+      it('serialize metric record with non-monotonic aggregator without timestamp', async () => {
+        const serializer = new PrometheusSerializer(undefined, false);
+        const result = await testSerializer(serializer);
+        assert.strictEqual(
+          result,
+          '# HELP test_total foobar\n' +
+          '# TYPE test_total gauge\n' +
+          'test_total{val="1"} 1\n' +
+          'test_total{val="2"} 1\n'
         );
       });
     });
