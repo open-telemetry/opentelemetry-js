@@ -101,7 +101,7 @@ export type ViewOptions = {
   meterSchemaUrl?: string;
 };
 
-function isSelectorProvided(options: ViewOptions): boolean {
+function isSelectorNotProvided(options: ViewOptions): boolean {
   return (options.instrumentName == null &&
     options.instrumentType == null &&
     options.meterName == null &&
@@ -170,7 +170,7 @@ export class View {
   constructor(viewOptions: ViewOptions) {
     // If no criteria is provided, the SDK SHOULD treat it as an error.
     // It is recommended that the SDK implementations fail fast.
-    if (isSelectorProvided(viewOptions)) {
+    if (isSelectorNotProvided(viewOptions)) {
       throw new Error('Cannot create view with no selector arguments supplied');
     }
 
