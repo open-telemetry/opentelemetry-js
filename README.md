@@ -31,8 +31,6 @@
   <strong>
     <a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/CONTRIBUTING.md">Contributing</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/development-guide.md">Development Guide</a>
-    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
     <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/examples">Examples</a>
   </strong>
 </p>
