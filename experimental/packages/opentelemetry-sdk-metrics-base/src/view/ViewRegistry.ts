@@ -22,8 +22,7 @@ import { View } from './View';
 
 export class ViewRegistry {
   private static DEFAULT_VIEW = new View({
-    instrumentName: '*',
-    meterName: '*'
+    instrumentName: '*'
   });
   private _registeredViews: View[] = [];
 

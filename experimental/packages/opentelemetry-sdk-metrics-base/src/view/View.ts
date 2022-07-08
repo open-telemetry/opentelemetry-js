@@ -22,46 +22,81 @@ import { Aggregation } from './Aggregation';
 import { InstrumentType } from '../InstrumentDescriptor';
 
 export type ViewOptions = {
-  // View
   /**
-   *  If not provided, the Instrument name will be used by default. This will be used as the name of the metrics stream.
+   *  Alters the metric stream:
+   *  This will be used as the name of the metrics stream.
+   *  If not provided, the original Instrument name will be used.
    */
-  name?: string,
+  name?: string;
   /**
-   * If not provided, the Instrument description will be used by default.
+   * Alters the metric stream:
+   * This will be used as the description of the metrics stream.
+   * If not provided, the original Instrument description will be used by default.
+   *
+   * @example
+   * description: 'sample description' // changes the description of all selected instruments to 'sample description'
    */
-  description?: string,
+  description?: string;
   /**
+   * Alters the metric stream:
    * If provided, the attributes that are not in the list will be ignored.
-   * If not provided, all the attribute keys will be used by default.
+   * If not provided, all attribute keys will be used by default.
+   *
+   * @example
+   * attributeKeys: ['myAttr', 'myOtherAttr'] // drops all attributes with top-level keys except for 'myAttr' and 'myOtherAttr'
+   * attributeKeys: [] // drops all attributes
    */
-  attributeKeys?: string[],
+  attributeKeys?: string[];
   /**
-   * The {@link Aggregation} aggregation to be used.
+   * Alters the metric stream:
+   * Alters the {@link Aggregation} of the metric stream.
+   *
+   * @example
+   * aggregation: new ExplicitBucketHistogramAggregation([1, 10, 100]) // changes the aggregation of the selected instrument(s) to ExplicitBucketHistogramAggregation
+   * aggregation: new LastValueAggregation() // changes the aggregation of the selected instrument(s) to LastValueAggregation
    */
-  aggregation?: Aggregation,
-
-  // Instrument
+  aggregation?: Aggregation;
   /**
-   * The type of the Instrument(s).
+   * Instrument selection criteria:
+   * The original type of the Instrument(s).
+   *
+   * @example
+   * instrumentType: InstrumentType.COUNTER // selects all counters
+   * instrumentType: InstrumentType.HISTOGRAM // selects all histograms
    */
-  instrumentType?: InstrumentType,
+  instrumentType?: InstrumentType;
   /**
-   * Name of the Instrument(s) with wildcard support.
+   * Instrument selection criteria:
+   * Original name of the Instrument(s) with wildcard support.
+   *
+   * @example
+   * instrumentName: '*' // select all instruments
+   * instrumentName: 'my.instruments.*' // select all instruments starting with 'my.instruments.'
+   * instrumentName: 'my.instruments.requests' // select all instruments named 'my.instrument.requests' exactly
    */
-  instrumentName?: string,
-
-  // Meter
+  instrumentName?: string;
   /**
-   * The name of the Meter.
+   * Instrument selection criteria:
+   * The name of the Meter. No wildcard support, name must match the meter exactly.
+   *
+   * @example
+   * meterName: 'example.component.app' // select all meters named 'example.component.app' exactly
    */
   meterName?: string;
   /**
-   * The version of the Meter.
+   * Instrument selection criteria:
+   * The version of the Meter. No wildcard support, version must match exactly.
+   *
+   * @example
+   * meterVersion: '1.0.1'
    */
   meterVersion?: string;
   /**
-   * The schema URL of the Meter.
+   * Instrument selection criteria:
+   * The schema URL of the Meter. No wildcard support, schema URL must match exactly.
+   *
+   * @example
+   * meterSchemaUrl: 'https://example.com/schema' // select all meters with schema URL 'https://example.com/schema' exactly.
    */
   meterSchemaUrl?: string;
 };
@@ -82,6 +117,56 @@ export class View {
   readonly instrumentSelector: InstrumentSelector;
   readonly meterSelector: MeterSelector;
 
+  /**
+   * Create a new {@link View} instance.
+   * Can be passed to a {@link MeterProvider} to select instruments and alter their metric stream.
+   *
+   * Parameters can be categorized as two types:
+   *  Instrument selection criteria: Used to describe the instrument(s) this view will be applied to.
+   *  Will be treated as additive (the Instrument has to meet all the provided criteria to be selected).
+   *
+   *  Metric stream altering: Alter the metric stream of instruments selected by instrument selection criteria.
+   *
+   * @param viewOptions {@link ViewOptions} for altering the metric stream and instrument selection.
+   * @param viewOptions.name
+   * Alters the metric stream:
+   *  This will be used as the name of the metrics stream.
+   *  If not provided, the original Instrument name will be used.
+   * @param viewOptions.description
+   * Alters the metric stream:
+   *  This will be used as the description of the metrics stream.
+   *  If not provided, the original Instrument description will be used by default.
+   * @param viewOptions.attributeKeys
+   * Alters the metric stream:
+   *  If provided, the attributes that are not in the list will be ignored.
+   *  If not provided, all attribute keys will be used by default.
+   * @param viewOptions.aggregation
+   * Alters the metric stream:
+   *  Alters the {@link Aggregation} of the metric stream.
+   * @param viewOptions.instrumentName
+   * Instrument selection criteria:
+   *  Original name of the Instrument(s) with wildcard support.
+   * @param viewOptions.instrumentType
+   * Instrument selection criteria:
+   *  The original type of the Instrument(s).
+   * @param viewOptions.meterName
+   * Instrument selection criteria:
+   *  The name of the Meter. No wildcard support, name must match the meter exactly.
+   * @param viewOptions.meterVersion
+   * Instrument selection criteria:
+   *  The version of the Meter. No wildcard support, version must match exactly.
+   * @param viewOptions.meterSchemaUrl
+   * Instrument selection criteria:
+   *  The schema URL of the Meter. No wildcard support, schema URL must match exactly.
+   *
+   * @example
+   * // Create a view that changes the Instrument 'my.instrument' to use to an
+   * // ExplicitBucketHistogramAggregation with the boundaries [20, 30, 40]
+   * new View({
+   *   aggregation: new ExplicitBucketHistogramAggregation([20, 30, 40]),
+   *   instrumentName: 'my.instrument'
+   * })
+   */
   constructor(viewOptions: ViewOptions) {
     // If no criteria is provided, the SDK SHOULD treat it as an error.
     // It is recommended that the SDK implementations fail fast.
