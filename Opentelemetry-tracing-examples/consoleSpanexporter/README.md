@@ -1,7 +1,12 @@
 # Running the code -
+
 `node --require './tracing_books' books.js`
+
 Open http://localhost:3000/books in your web browser and reload the page a few times, after a while you should see the spans printed in the console by the ConsoleSpanExporter.
+
 ## Output -
+
+```javascript
 {
   traceId: '303c61f16423bcdb9d7ab3929176eed0',
   parentId: 'f168e05f3986e6b2',
@@ -99,3 +104,4 @@ Open http://localhost:3000/books in your web browser and reload the page a few t
   events: [],
   links: []
 }
+```

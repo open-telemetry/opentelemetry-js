@@ -41,7 +41,6 @@ const api = __importStar(require("@opentelemetry/api"));
 const express_1 = __importDefault(require("express"));
 const app = (0, express_1.default)();
 const port = 3000;
-//app.use(cors())
 app.get('/books', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {

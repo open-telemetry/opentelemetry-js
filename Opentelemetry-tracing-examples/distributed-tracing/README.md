@@ -27,13 +27,16 @@ const { sdk } = init('book-service')
 
 3. Run the application -
 
+Start zipkin container -
+`docker run -d -p 9411:9411  openzipkin/zipkin`
+
 Run both services: 
 
 - `npm run books`
--  `npm run dashboard`
+- `npm run dashboard`
 
 Send API calls: 
 
 - `http://localhost:3000/books`
--  `http://localhost:3001/dashboard`
+- `http://localhost:3001/dashboard`
 

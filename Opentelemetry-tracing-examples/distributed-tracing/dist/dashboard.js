@@ -41,7 +41,6 @@ const api = __importStar(require("@opentelemetry/api"));
 const express_1 = __importDefault(require("express"));
 const app = (0, express_1.default)();
 const port = 3001;
-//app.use(cors());
 const getUrlContents = (url, fetch) => {
     return new Promise((resolve, reject) => {
         fetch(url, resolve, reject)
@@ -49,10 +48,8 @@ const getUrlContents = (url, fetch) => {
             .then(body => resolve(body));
     });
 };
-//app.get('/dashboard',cors(), async (req, res) => {
 app.get('/dashboard', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        //fetch data running from second service
         const books = yield getUrlContents('http://localhost:3000/books', require('node-fetch'));
         res.type('json');
         res.send(JSON.stringify({ dashboard: books }));
