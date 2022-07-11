@@ -82,5 +82,6 @@
     "@opentelemetry/resources": "1.4.0",
     "@opentelemetry/sdk-metrics-base": "0.30.0",
     "@opentelemetry/sdk-trace-base": "1.4.0"
-  }
+  },
+  "sideEffects": false
 }

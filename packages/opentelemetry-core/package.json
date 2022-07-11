@@ -92,5 +92,6 @@
   },
   "dependencies": {
     "@opentelemetry/semantic-conventions": "1.4.0"
-  }
+  },
+  "sideEffects": false
 }

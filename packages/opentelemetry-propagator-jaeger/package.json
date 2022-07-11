@@ -81,5 +81,6 @@
   },
   "dependencies": {
     "@opentelemetry/core": "1.4.0"
-  }
+  },
+  "sideEffects": false
 }

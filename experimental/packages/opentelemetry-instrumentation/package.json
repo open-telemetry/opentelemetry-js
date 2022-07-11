@@ -73,6 +73,7 @@
     "semver": "^7.3.2",
     "shimmer": "^1.2.1"
   },
+  "sideEffects": false,
   "peerDependencies": {
     "@opentelemetry/api": "^1.0.0"
   },

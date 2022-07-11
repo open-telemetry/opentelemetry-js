@@ -63,6 +63,7 @@
   "dependencies": {
     "@opentelemetry/api": "^1.0.0"
   },
+  "sideEffects": false,
   "devDependencies": {
     "@types/mocha": "8.2.3",
     "@types/node": "14.17.33",

@@ -100,5 +100,6 @@
     "@opentelemetry/otlp-transformer": "0.30.0",
     "@opentelemetry/resources": "1.4.0",
     "@opentelemetry/sdk-metrics-base": "0.30.0"
-  }
+  },
+  "sideEffects": false
 }

@@ -53,6 +53,7 @@
   "dependencies": {
     "@opentelemetry/core": "1.4.0"
   },
+  "sideEffects": false,
   "peerDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.2.0"
   },
