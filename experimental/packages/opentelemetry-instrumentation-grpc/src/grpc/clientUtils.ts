@@ -100,7 +100,6 @@ export const makeGrpcClientRemoteCall = function (
 
     span.addEvent('sent');
     span.setAttributes({
-      [AttributeNames.GRPC_METHOD]: original.path,
       [AttributeNames.GRPC_KIND]: SpanKind.CLIENT,
     });
 

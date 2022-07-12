@@ -20,6 +20,8 @@
 export enum AttributeNames {
   GRPC_KIND = 'grpc.kind', // SERVER or CLIENT
   GRPC_METHOD = 'grpc.method',
+  RPC_SYSTEM = 'rpc.system',
+  RPC_SERVICE = 'rpc.service',
   GRPC_ERROR_NAME = 'grpc.error_name',
   GRPC_ERROR_MESSAGE = 'grpc.error_message',
 }

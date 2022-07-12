@@ -128,7 +128,6 @@ export function makeGrpcClientRemoteCall(
     }
 
     span.setAttributes({
-      [AttributeNames.GRPC_METHOD]: original.path,
       [AttributeNames.GRPC_KIND]: SpanKind.CLIENT,
     });
 

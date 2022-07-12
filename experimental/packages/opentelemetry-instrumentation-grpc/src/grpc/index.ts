@@ -41,7 +41,7 @@ import {
   serverStreamAndBidiHandler,
 } from './serverUtils';
 import { makeGrpcClientRemoteCall, getMetadata } from './clientUtils';
-import { _methodIsIgnored } from '../utils';
+import { _extractMethodAndService, _methodIsIgnored } from '../utils';
 import { AttributeNames } from '../enums/AttributeNames';
 
 /**
@@ -195,10 +195,15 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
                   keys: metadata => Object.keys(metadata.getMap()),
                 }),
                 () => {
+                  const { service, method } = _extractMethodAndService(name);
+
                   const span = instrumentation.tracer
                     .startSpan(spanName, spanOptions)
                     .setAttributes({
                       [AttributeNames.GRPC_KIND]: spanOptions.kind,
+                      [AttributeNames.RPC_SYSTEM]: 'grpc',
+                      [AttributeNames.GRPC_METHOD]: method,
+                      [AttributeNames.RPC_SERVICE]: service,
                     });
 
                   context.with(trace.setSpan(context.active(), span), () => {
@@ -292,9 +297,15 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
         )}`;
         const args = Array.prototype.slice.call(arguments);
         const metadata = getMetadata(grpcClient, original, args);
+        const { service, method } = _extractMethodAndService(original.path)
         const span = instrumentation.tracer.startSpan(name, {
           kind: SpanKind.CLIENT,
-        });
+        })
+          .setAttributes({
+            [AttributeNames.RPC_SYSTEM]: 'grpc',
+            [AttributeNames.GRPC_METHOD]: method,
+            [AttributeNames.RPC_SERVICE]: service,
+          });
         return context.with(trace.setSpan(context.active(), span), () =>
           makeGrpcClientRemoteCall(
             grpcClient,
