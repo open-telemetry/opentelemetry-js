@@ -29,6 +29,9 @@ export enum InstrumentType {
   OBSERVABLE_UP_DOWN_COUNTER = 'OBSERVABLE_UP_DOWN_COUNTER',
 }
 
+/**
+ * An interface describing the instrument.
+ */
 export interface InstrumentDescriptor {
   readonly name: string;
   readonly description: string;

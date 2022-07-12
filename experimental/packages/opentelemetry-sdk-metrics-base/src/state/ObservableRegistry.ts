@@ -15,6 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
+import { HrTime } from '@opentelemetry/api';
 import { BatchObservableCallback, Observable, ObservableCallback } from '@opentelemetry/api-metrics';
 import { isObservableInstrument, ObservableInstrument } from '../Instruments';
 import { BatchObservableResultImpl, ObservableResultImpl } from '../ObservableResult';
@@ -89,9 +90,9 @@ export class ObservableRegistry {
   /**
    * @returns a promise of rejected reasons for invoking callbacks.
    */
-  async observe(timeoutMillis?: number): Promise<unknown[]> {
-    const callbackFutures = this._observeCallbacks(timeoutMillis);
-    const batchCallbackFutures = this._observeBatchCallbacks(timeoutMillis);
+  async observe(collectionTime: HrTime, timeoutMillis?: number): Promise<unknown[]> {
+    const callbackFutures = this._observeCallbacks(collectionTime, timeoutMillis);
+    const batchCallbackFutures = this._observeBatchCallbacks(collectionTime, timeoutMillis);
 
     const results = await PromiseAllSettled([...callbackFutures, ...batchCallbackFutures]);
 
@@ -100,7 +101,7 @@ export class ObservableRegistry {
     return rejections;
   }
 
-  private _observeCallbacks(timeoutMillis?: number) {
+  private _observeCallbacks(observationTime: HrTime, timeoutMillis?: number) {
     return this._callbacks
       .map(async ({ callback, instrument }) => {
         const observableResult = new ObservableResultImpl(instrument._descriptor);
@@ -110,12 +111,12 @@ export class ObservableRegistry {
         }
         await callPromise;
         instrument._metricStorages.forEach(metricStorage => {
-          metricStorage.record(observableResult._buffer);
+          metricStorage.record(observableResult._buffer, observationTime);
         });
       });
   }
 
-  private _observeBatchCallbacks(timeoutMillis?: number) {
+  private _observeBatchCallbacks(observationTime: HrTime, timeoutMillis?: number) {
     return this._batchCallbacks
       .map(async ({ callback, instruments }) => {
         const observableResult = new BatchObservableResultImpl();
@@ -130,7 +131,7 @@ export class ObservableRegistry {
             return;
           }
           instrument._metricStorages.forEach(metricStorage => {
-            metricStorage.record(buffer);
+            metricStorage.record(buffer, observationTime);
           });
         });
       });

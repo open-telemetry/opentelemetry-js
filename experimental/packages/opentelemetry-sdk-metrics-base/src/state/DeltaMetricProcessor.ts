@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/api';
+import { Context, HrTime } from '@opentelemetry/api';
 import { MetricAttributes } from '@opentelemetry/api-metrics';
 import { Maybe } from '../utils';
 import { Accumulation, Aggregator } from '../aggregator/types';
@@ -35,31 +35,36 @@ export class DeltaMetricProcessor<T extends Maybe<Accumulation>> {
 
   constructor(private _aggregator: Aggregator<T>) {}
 
-  /** Bind an efficient storage handle for a set of attributes. */
-  private bind(attributes: MetricAttributes) {
-    return this._activeCollectionStorage.getOrDefault(attributes, () => this._aggregator.createAccumulation());
-  }
-
-  record(value: number, attributes: MetricAttributes, _context: Context) {
-    const accumulation = this.bind(attributes);
+  record(value: number, attributes: MetricAttributes, _context: Context, collectionTime: HrTime) {
+    const accumulation = this._activeCollectionStorage.getOrDefault(
+      attributes,
+      () => this._aggregator.createAccumulation(collectionTime)
+    );
     accumulation?.record(value);
   }
 
-  batchCumulate(measurements: AttributeHashMap<number>) {
+  batchCumulate(measurements: AttributeHashMap<number>, collectionTime: HrTime) {
     Array.from(measurements.entries()).forEach(([attributes, value, hashCode]) => {
-      let accumulation = this._aggregator.createAccumulation();
+      const accumulation = this._aggregator.createAccumulation(collectionTime);
       accumulation?.record(value);
+      let delta = accumulation;
       if (this._cumulativeMemoStorage.has(attributes, hashCode)) {
+        // has() returned true, previous is present.
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const previous = this._cumulativeMemoStorage.get(attributes, hashCode)!;
-        accumulation = this._aggregator.diff(previous, accumulation);
+        delta = this._aggregator.diff(previous, accumulation);
       }
 
+      // Save the current record and the delta record.
       this._cumulativeMemoStorage.set(attributes, accumulation, hashCode);
-      this._activeCollectionStorage.set(attributes, accumulation, hashCode);
+      this._activeCollectionStorage.set(attributes, delta, hashCode);
     });
   }
 
+  /**
+   * Returns a collection of delta metrics. Start time is the when first
+   * time event collected.
+   */
   collect() {
     const unreportedDelta = this._activeCollectionStorage;
     this._activeCollectionStorage = new AttributeHashMap();

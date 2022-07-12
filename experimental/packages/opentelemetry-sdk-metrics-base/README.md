@@ -3,31 +3,20 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-OpenTelemetry metrics allow a user to collect data and export it to a metrics backend like [Prometheus](https://prometheus.io/).
+OpenTelemetry metrics module contains the foundation for all metrics SDKs of [opentelemetry-js](https://github.com/open-telemetry/opentelemetry-js).
 
-## Work In Progress
+Used standalone, this module provides methods for manual instrumentation of code, offering full control over recording metrics for client-side JavaScript (browser) and Node.js.
 
-The OpenTelemetry SDK in this directory is undergoing drastic changes. If you need to use metrics, we recommend you use [version `0.27.0`](https://github.com/open-telemetry/opentelemetry-js/tree/experimental/v0.27.0/experimental/packages/opentelemetry-sdk-metrics-base).
+It does **not** provide automated instrumentation of known libraries or host environment metrics out-of-the-box.
 
 ## Installation
 
 ```bash
-npm install --save "@opentelemetry/sdk-metrics-base@~0.27.0"
-```
-
-## Usage
-
-Please see the [version `0.27.0` README](https://github.com/open-telemetry/opentelemetry-js/tree/experimental/v0.27.0/experimental/packages/opentelemetry-sdk-metrics-base#usage).
-
-TODO: Add usage information for updated SDK
-
-## Installation of the Latest experimental version
-
-```bash
+npm install --save @opentelemetry/api-metrics
 npm install --save @opentelemetry/sdk-metrics-base
 ```
 
-## Usage of the Latest experimental version
+## Usage
 
 The basic setup of the SDK can be seen as followings:
 
@@ -66,11 +55,12 @@ opentelemetry.getMeter('default')
 async function batchObservableCallback(batchObservableResult) {
   // ... do async stuff
   batchObservableResult.observe(observableCounter, 1, { attributeKey: 'attribute-value' });
-
-  // This is been dropped since the observable is not associated with the callback at registration.
-  batchObservableResult.observe(otherObservable, 2);
 }
 ```
+
+## Example
+
+See [examples/prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/examples/prometheus) for an end-to-end example, including exporting metrics.
 
 ## Useful links
 

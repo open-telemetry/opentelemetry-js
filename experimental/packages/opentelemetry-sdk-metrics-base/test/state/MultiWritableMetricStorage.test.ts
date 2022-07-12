@@ -16,6 +16,7 @@
 
 import * as api from '@opentelemetry/api';
 import { MetricAttributes } from '@opentelemetry/api-metrics';
+import { hrTime } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { MultiMetricStorage } from '../../src/state/MultiWritableMetricStorage';
 import { WritableMetricStorage } from '../../src/state/WritableMetricStorage';
@@ -28,7 +29,7 @@ describe('MultiMetricStorage', () => {
 
       for (const value of commonValues) {
         for (const attribute of commonAttributes) {
-          metricStorage.record(value, attribute, api.context.active());
+          metricStorage.record(value, attribute, api.context.active(), [0, 0]);
         }
       }
     });
@@ -50,7 +51,7 @@ describe('MultiMetricStorage', () => {
         for (const attributes of commonAttributes) {
           const context = api.context.active();
           expectedMeasurements.push({ value, attributes, context });
-          metricStorage.record(value, attributes, context);
+          metricStorage.record(value, attributes, context, hrTime());
         }
       }
 
