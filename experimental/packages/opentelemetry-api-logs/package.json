@@ -1,0 +1,48 @@
+{
+  "name": "@opentelemetry/api-logs",
+  "version": "0.0.1",
+  "description": "Public logs API for OpenTelemetry",
+  "main": "build/src/index.js",
+  "module": "build/esm/index.js",
+  "esnext": "build/esnext/index.js",
+  "types": "build/src/index.d.ts",
+  "browser": {
+    "./src/platform/index.ts": "./src/platform/browser/index.ts",
+    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
+    "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
+    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
+  },
+  "scripts": {
+    "prepublishOnly": "npm run compile",
+    "compile": "tsc --build tsconfig.all.json",
+    "clean": "tsc --build --clean tsconfig.all.json",
+    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
+    "test:browser": "nyc karma start --single-run",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
+    "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
+    "build": "npm run compile",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "version": "node ../../../scripts/version-update.js",
+    "watch": "tsc --build --watch tsconfig.all.json",
+    "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
+    "prewatch": "node ../../../scripts/version-update.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-telemetry/opentelemetry-js.git"
+  },
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+  "devDependencies": {
+    "typescript": "4.4.4",
+    "webpack": "4.46.0"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^1.1.0"
+  }
+}
