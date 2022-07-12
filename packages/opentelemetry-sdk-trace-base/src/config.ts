@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { diag, Sampler } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,
@@ -24,6 +24,7 @@ import {
   ENVIRONMENT,
   TraceIdRatioBasedSampler,
 } from '@opentelemetry/core';
+import { Sampler } from './Sampler';
 
 const env = getEnv();
 const FALLBACK_OTEL_TRACES_SAMPLER = TracesSamplerValues.AlwaysOn;

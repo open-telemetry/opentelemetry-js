@@ -23,7 +23,21 @@ export * from './export/ReadableSpan';
 export * from './export/SimpleSpanProcessor';
 export * from './export/SpanExporter';
 export * from './export/NoopSpanProcessor';
+export * from './Sampler';
 export * from './Span';
 export * from './SpanProcessor';
 export * from './TimedEvent';
 export * from './types';
+
+/**
+ * These definition should be moved to @opentelemetry/sdk-trace-base
+ * in the next major release.
+ */
+export {
+  AlwaysOffSampler,
+  AlwaysOnSampler,
+  ParentBasedSampler,
+  TraceIdRatioBasedSampler,
+  IdGenerator,
+  RandomIdGenerator,
+} from '@opentelemetry/core';
