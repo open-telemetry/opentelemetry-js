@@ -69,23 +69,4 @@ export class NodeTracerProvider extends BasicTracerProvider {
 
     super.register(config);
   }
-
-  /**
-   * TS cannot yet infer the type of this.constructor:
-   * https://github.com/Microsoft/TypeScript/issues/3841#issuecomment-337560146
-   * Do not override either of the getters in your child class unless you really need to.
-   * We have to do it here because the previous version of BasicTracerProvider's getters
-   * had BasicTracerProvider's static method hardcoded and we want do undo that behavior.
-   */
-  protected override _getPropagator(name: string): TextMapPropagator | undefined {
-    return (
-      (this.constructor as typeof BasicTracerProvider)._registeredPropagators
-    ).get(name)?.();
-  }
-
-  protected override _getSpanExporter(name: string): SpanExporter | undefined {
-    return (
-      (this.constructor as typeof BasicTracerProvider)._registeredExporters
-    ).get(name)?.();
-  }
 }
