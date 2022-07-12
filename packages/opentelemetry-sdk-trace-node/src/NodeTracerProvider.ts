@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { TextMapPropagator } from '@opentelemetry/api';
 import {
   AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
@@ -23,7 +22,6 @@ import {
   BasicTracerProvider,
   PROPAGATOR_FACTORY,
   SDKRegistrationConfig,
-  SpanExporter,
 } from '@opentelemetry/sdk-trace-base';
 import * as semver from 'semver';
 import { NodeTracerConfig } from './config';
