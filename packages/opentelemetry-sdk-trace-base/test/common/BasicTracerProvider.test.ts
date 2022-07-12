@@ -29,9 +29,10 @@ import {
 } from '@opentelemetry/api';
 import { CompositePropagator } from '@opentelemetry/core';
 import {
-  AlwaysOnSampler,
   AlwaysOffSampler,
+  AlwaysOnSampler,
   TraceState,
+  W3CTraceContextPropagator,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -283,6 +284,7 @@ describe('BasicTracerProvider', () => {
           string,
           () => TextMapPropagator
             >([
+              ...BasicTracerProvider._registeredPropagators,
               ['custom-propagator', () => new DummyPropagator()],
             ]);
 
@@ -290,11 +292,15 @@ describe('BasicTracerProvider', () => {
           string,
           () => SpanExporter
             >([
+              ...BasicTracerProvider._registeredExporters,
               ['custom-exporter', () => new DummyExporter()],
             ]);
       }
 
       const provider = new CustomTracerProvider({});
+      assert(provider['_getPropagator']('tracecontext') instanceof W3CTraceContextPropagator);
+      /* BasicTracerProvider has no exporters by default, so skipping testing the exporter getter */
+
       provider.register();
       const processor = provider.getActiveSpanProcessor();
       assert(processor instanceof BatchSpanProcessor);
