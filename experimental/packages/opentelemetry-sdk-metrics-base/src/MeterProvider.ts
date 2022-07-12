@@ -60,6 +60,9 @@ export type ViewOptions = {
 };
 
 export type SelectorOptions = {
+  /**
+   * Selects instrument by their fields.
+   */
   instrument?: {
     /**
      * The type of the Instrument(s).
@@ -70,6 +73,9 @@ export type SelectorOptions = {
      */
     name?: string,
   }
+  /**
+   * Selects instrument by fields of their meter.
+   */
   meter?: {
     /**
      * The name of the Meter.
