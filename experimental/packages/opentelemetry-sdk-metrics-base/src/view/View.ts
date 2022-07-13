@@ -33,8 +33,8 @@ export type ViewOptions = {
    * This will be used as the description of the metrics stream.
    * If not provided, the original Instrument description will be used by default.
    *
-   * @example
-   * description: 'sample description' // changes the description of all selected instruments to 'sample description'
+   * @example <caption>changes the description of all selected instruments to 'sample description'</caption>
+   * description: 'sample description'
    */
   description?: string;
   /**
@@ -42,45 +42,50 @@ export type ViewOptions = {
    * If provided, the attributes that are not in the list will be ignored.
    * If not provided, all attribute keys will be used by default.
    *
-   * @example
-   * attributeKeys: ['myAttr', 'myOtherAttr'] // drops all attributes with top-level keys except for 'myAttr' and 'myOtherAttr'
-   * attributeKeys: [] // drops all attributes
+   * @example <caption>drops all attributes with top-level keys except for 'myAttr' and 'myOtherAttr'</caption>
+   * attributeKeys: ['myAttr', 'myOtherAttr']
+   * @example <caption>drops all attributes</caption>
+   * attributeKeys: []
    */
   attributeKeys?: string[];
   /**
    * Alters the metric stream:
    * Alters the {@link Aggregation} of the metric stream.
    *
-   * @example
-   * aggregation: new ExplicitBucketHistogramAggregation([1, 10, 100]) // changes the aggregation of the selected instrument(s) to ExplicitBucketHistogramAggregation
-   * aggregation: new LastValueAggregation() // changes the aggregation of the selected instrument(s) to LastValueAggregation
+   * @example <caption>changes the aggregation of the selected instrument(s) to ExplicitBucketHistogramAggregation</caption>
+   * aggregation: new ExplicitBucketHistogramAggregation([1, 10, 100])
+   * @example <caption>changes the aggregation of the selected instrument(s) to LastValueAggregation</caption>
+   * aggregation: new LastValueAggregation()
    */
   aggregation?: Aggregation;
   /**
    * Instrument selection criteria:
    * The original type of the Instrument(s).
    *
-   * @example
-   * instrumentType: InstrumentType.COUNTER // selects all counters
-   * instrumentType: InstrumentType.HISTOGRAM // selects all histograms
+   * @example <caption>selects all counters</caption>
+   * instrumentType: InstrumentType.COUNTER
+   * @example <caption>selects all histograms</caption>
+   * instrumentType: InstrumentType.HISTOGRAM
    */
   instrumentType?: InstrumentType;
   /**
    * Instrument selection criteria:
    * Original name of the Instrument(s) with wildcard support.
    *
-   * @example
-   * instrumentName: '*' // select all instruments
-   * instrumentName: 'my.instruments.*' // select all instruments starting with 'my.instruments.'
-   * instrumentName: 'my.instruments.requests' // select all instruments named 'my.instrument.requests' exactly
+   * @example <caption>select all instruments</caption>
+   * instrumentName: '*'
+   * @example <caption>select all instruments starting with 'my.instruments.'</caption>
+   * instrumentName: 'my.instruments.*'
+   * @example <caption>select all instruments named 'my.instrument.requests' exactly</caption>
+   * instrumentName: 'my.instruments.requests'
    */
   instrumentName?: string;
   /**
    * Instrument selection criteria:
    * The name of the Meter. No wildcard support, name must match the meter exactly.
    *
-   * @example
-   * meterName: 'example.component.app' // select all meters named 'example.component.app' exactly
+   * @example <caption>select all meters named 'example.component.app' exactly</caption>
+   * meterName: 'example.component.app'
    */
   meterName?: string;
   /**
@@ -95,8 +100,8 @@ export type ViewOptions = {
    * Instrument selection criteria:
    * The schema URL of the Meter. No wildcard support, schema URL must match exactly.
    *
-   * @example
-   * meterSchemaUrl: 'https://example.com/schema' // select all meters with schema URL 'https://example.com/schema' exactly.
+   * @example <caption>Select all meters with schema URL 'https://example.com/schema' exactly.</caption>
+   * meterSchemaUrl: 'https://example.com/schema'
    */
   meterSchemaUrl?: string;
 };

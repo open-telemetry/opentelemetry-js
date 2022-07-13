@@ -43,7 +43,7 @@ export class MeterProvider implements metrics.MeterProvider {
     this._sharedState = new MeterProviderSharedState(options?.resource ?? Resource.empty());
     if(options?.views != null && options.views.length > 0){
       for(const view of options.views){
-        this._addView(view);
+        this._sharedState.viewRegistry.addView(view);
       }
     }
   }
@@ -73,10 +73,6 @@ export class MeterProvider implements metrics.MeterProvider {
     const collector = new MetricCollector(this._sharedState, metricReader);
     metricReader.setMetricProducer(collector);
     this._sharedState.metricCollectors.push(collector);
-  }
-
-  private _addView(view: View) {
-    this._sharedState.viewRegistry.addView(view);
   }
 
   /**
