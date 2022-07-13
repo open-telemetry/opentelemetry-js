@@ -71,8 +71,6 @@ const meterProvider = new MeterProvider({
 })
 ```
 
-
-
 ## Example
 
 See [examples/prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/examples/prometheus) for an end-to-end example, including exporting metrics.
