@@ -17,11 +17,26 @@
 /**
  * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/http.md
  */
-export enum AttributeNames {
-  GRPC_KIND = 'grpc.kind', // SERVER or CLIENT
-  GRPC_METHOD = 'rpc.method',
-  RPC_SYSTEM = 'rpc.system',
-  RPC_SERVICE = 'rpc.service',
-  GRPC_ERROR_NAME = 'grpc.error_name',
-  GRPC_ERROR_MESSAGE = 'grpc.error_message',
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+
+interface AttributesType {
+  GRPC_KIND: string;
+  RPC_SYSTEM: string;
+  GRPC_METHOD: string;
+  RPC_SERVICE: string;
+  GRPC_ERROR_NAME: string;
+  GRPC_ERROR_MESSAGE: string;
 }
+
+const RPC_METHOD  = SemanticAttributes.RPC_METHOD;
+const RPC_SYSTEM  = SemanticAttributes.RPC_SYSTEM;
+const RPC_SERVICE  = SemanticAttributes.RPC_SERVICE;
+
+export const AttributeNames: Readonly<AttributesType> = {
+  GRPC_KIND: 'grpc.kind', // SERVER or CLIENT
+  RPC_SYSTEM: RPC_SYSTEM,
+  GRPC_METHOD: RPC_METHOD,
+  RPC_SERVICE: RPC_SERVICE,
+  GRPC_ERROR_NAME: 'grpc.error_name',
+  GRPC_ERROR_MESSAGE: 'grpc.error_message',
+};
