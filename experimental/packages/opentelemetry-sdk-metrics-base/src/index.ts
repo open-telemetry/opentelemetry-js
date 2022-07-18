@@ -27,3 +27,4 @@ export * from './MeterProvider';
 export * from './ObservableResult';
 export { TimeoutError } from './utils';
 export * from './view/Aggregation';
+export * from './view/View';
