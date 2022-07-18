@@ -29,6 +29,7 @@ import { getConnectionOptions } from './util';
 export class OTLPTraceExporter implements SpanExporter {
   private _metadata: grpc.Metadata;
   private _serviceClient: TraceServiceClient;
+  private _timeoutMillis: number;
   public url: string;
   public compression: grpc.compressionAlgorithms;
 
@@ -37,6 +38,8 @@ export class OTLPTraceExporter implements SpanExporter {
     this.url = host;
     this.compression = compression;
     this._metadata = metadata;
+    // TODO is this the right default?
+    this._timeoutMillis = config.timeoutMillis ?? 1000;
 
     const packageDefinition = loadSync('opentelemetry/proto/collector/trace/v1/trace_service.proto', {
       keepCase: false,
@@ -63,19 +66,18 @@ export class OTLPTraceExporter implements SpanExporter {
   }
 
   export(spans: ReadableSpan[], resultCallback: (result: ExportResult) => void): void {
-    // TODO
-    const deadline = Date.now() + 1000;
+    const deadline = Date.now() + this._timeoutMillis;
 
     const req = createExportTraceServiceRequest(spans);
     this._serviceClient.export(
       req,
       this._metadata,
       { deadline },
-      (...args: unknown[]) => {
-        if (args[0]) {
+      (error: Error) => {
+        if (error) {
           resultCallback({
             code: ExportResultCode.FAILED,
-            error: args[0] as any,
+            error,
           });
         } else {
           resultCallback({
