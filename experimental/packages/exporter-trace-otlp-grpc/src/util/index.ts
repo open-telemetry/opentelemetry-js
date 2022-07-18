@@ -17,7 +17,8 @@
 import * as grpc from '@grpc/grpc-js';
 import { diag } from '@opentelemetry/api';
 import { baggageUtils, ENVIRONMENT } from '@opentelemetry/core';
-import { CompressionAlgorithm, ConnectionOptions, OTLPGRPCTraceExporterConfig } from '../types';
+import { ConnectionOptions } from '../internal/types';
+import { CompressionAlgorithm, OTLPGRPCTraceExporterConfig } from '../types';
 import { getCredentials } from './security';
 
 const DEFAULT_COLLECTOR_URL = 'http://localhost:4317';
@@ -65,10 +66,6 @@ function getMetadata(config: OTLPGRPCTraceExporterConfig, env: Required<ENVIRONM
 
   const envHeaders = baggageUtils.parseKeyPairsIntoRecord(env.OTEL_EXPORTER_OTLP_HEADERS);
   const envTraceHeaders = baggageUtils.parseKeyPairsIntoRecord(env.OTEL_EXPORTER_OTLP_TRACES_HEADERS);
-
-  if (config.headers) {
-    diag.warn('Headers cannot be set when using grpc');
-  }
 
   for (const [k, v] of Object.entries(envTraceHeaders)) {
     if (metadataMap[k] == null) {

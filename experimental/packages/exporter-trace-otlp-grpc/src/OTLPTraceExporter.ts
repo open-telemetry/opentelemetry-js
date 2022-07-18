@@ -21,7 +21,8 @@ import { createExportTraceServiceRequest } from '@opentelemetry/otlp-transformer
 import type { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import * as path from 'path';
 import { RequestCounter } from './internal/request-counter';
-import type { OTLPGRPCTraceExporterConfig, TraceServiceClient } from './types';
+import { TraceServiceClient } from './internal/types';
+import type { OTLPGRPCTraceExporterConfig } from './types';
 import { getConnectionOptions } from './util';
 
 /**
@@ -31,16 +32,11 @@ export class OTLPTraceExporter implements SpanExporter {
   private _metadata: grpc.Metadata;
   private _serviceClient: TraceServiceClient;
   private _timeoutMillis: number;
-  public url: string;
-  public compression: grpc.compressionAlgorithms;
-
   private _requestCounter = new RequestCounter();
   private _isShutdown = false;
 
   constructor(config: OTLPGRPCTraceExporterConfig = {}) {
     const { host, credentials, metadata, compression } = getConnectionOptions(config, getEnv());
-    this.url = host;
-    this.compression = compression;
     this._metadata = metadata;
     // TODO is this the right default?
     this._timeoutMillis = config.timeoutMillis ?? 10_000;
@@ -56,7 +52,7 @@ export class OTLPTraceExporter implements SpanExporter {
         path.resolve(__dirname, 'protos'),
         // When running typescript directly in tests or with ts-node, the protos/ directory is one level above the src/ directory
         path.resolve(__dirname, '..', 'protos'),
-        // When running the compiled js, the protos directory is two levels above the build/src/ directory
+        // When running the compiled `js, the protos directory is two levels above the build/src/ directory
         path.resolve(__dirname, '..', '..', 'protos'),
       ],
     });
@@ -64,7 +60,7 @@ export class OTLPTraceExporter implements SpanExporter {
     // any required here because
     const packageObject: any = grpc.loadPackageDefinition(packageDefinition);
     const channelOptions: grpc.ChannelOptions = {
-      'grpc.default_compression_algorithm': this.compression,
+      'grpc.default_compression_algorithm': compression,
     };
     this._serviceClient = new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(host, credentials, channelOptions);
   }
