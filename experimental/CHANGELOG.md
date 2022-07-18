@@ -6,6 +6,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* feature(views): move views registration to MeterProvider constructor [#3066](https://github.com/open-telemetry/opentelemetry-js/pull/3066) @pichlermarc
+
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
