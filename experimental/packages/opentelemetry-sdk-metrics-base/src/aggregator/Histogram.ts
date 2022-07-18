@@ -39,7 +39,7 @@ function createNewEmptyCheckpoint(boundaries: number[]): Histogram {
     count: 0,
     hasMinMax: false,
     min: Infinity,
-    max: -1
+    max: -Infinity
   };
 }
 
@@ -115,7 +115,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
     }
 
     let min = Infinity;
-    let max = -1;
+    let max = -Infinity;
 
     if (this._recordMinMax) {
       if (previousValue.hasMinMax && deltaValue.hasMinMax) {
@@ -167,7 +167,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
       sum: currentValue.sum - previousValue.sum,
       hasMinMax: false,
       min: Infinity,
-      max: -1
+      max: -Infinity
     });
   }
 
