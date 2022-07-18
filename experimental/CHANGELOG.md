@@ -11,6 +11,8 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(histogram): fix maximum when only values < -1 are provided [#3086](https://github.com/open-telemetry/opentelemetry-js/pull/3086) @pichlermarc
+* fix(exporter-grpc): prevent trace and metrics grpc service clients from interfering with each other [#3100](https://github.com/open-telemetry/opentelemetry-js/pull/3100) @dyladan
+  * refactor trace grpc exporter to not use the grpc exporter base class
 
 ### :books: (Refine Doc)
 
