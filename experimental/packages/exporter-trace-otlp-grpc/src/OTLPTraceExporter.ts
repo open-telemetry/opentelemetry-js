@@ -14,58 +14,82 @@
  * limitations under the License.
  */
 
-import { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
-import { baggageUtils, getEnv } from '@opentelemetry/core';
-import { Metadata } from '@grpc/grpc-js';
-import {
-  OTLPGRPCExporterConfigNode,
-  OTLPGRPCExporterNodeBase,
-  ServiceClientType,
-  validateAndNormalizeUrl,
-  DEFAULT_COLLECTOR_URL
-} from '@opentelemetry/otlp-grpc-exporter-base';
-import { createExportTraceServiceRequest, IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
+import * as grpc from '@grpc/grpc-js';
+import { loadSync } from '@grpc/proto-loader';
+import { ExportResult, ExportResultCode, getEnv } from '@opentelemetry/core';
+import { createExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
+import type { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
+import * as path from "path";
+import type { OTLPGRPCTraceExporterConfig, TraceServiceClient } from './types';
+import { getConnectionOptions } from './util';
 
 /**
  * OTLP Trace Exporter for Node
  */
-export class OTLPTraceExporter
-  extends OTLPGRPCExporterNodeBase<ReadableSpan,
-    IExportTraceServiceRequest>
-  implements SpanExporter {
+export class OTLPTraceExporter implements SpanExporter {
+  private _metadata: grpc.Metadata;
+  private _serviceClient: TraceServiceClient;
+  public url: string;
+  public compression: grpc.compressionAlgorithms;
 
-  constructor(config: OTLPGRPCExporterConfigNode = {}) {
-    super(config);
-    const headers = baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_TRACES_HEADERS);
-    this.metadata ||= new Metadata();
-    for (const [k, v] of Object.entries(headers)) {
-      this.metadata.set(k, v);
-    }
+  constructor(config: OTLPGRPCTraceExporterConfig = {}) {
+    const { host, credentials, metadata, compression } = getConnectionOptions(config, getEnv());
+    this.url = host;
+    this.compression = compression
+    this._metadata = metadata;
+
+    const packageDefinition = loadSync("opentelemetry/proto/collector/trace/v1/trace_service.proto", {
+      keepCase: false,
+      longs: String,
+      enums: String,
+      defaults: true,
+      oneofs: true,
+      includeDirs: [
+        // In webpack environments, the bundle may be at the same level as the protos/ directory
+        // path.resolve(__dirname, 'protos'),
+        // When running typescript directly in tests or with ts-node, the protos/ directory is one level above the src/ directory
+        path.resolve(__dirname, '..', 'protos'),
+        // When running the compiled js, the protos directory is two levels above the build/src/ directory
+        // path.resolve(__dirname, '..', '..', 'protos'),
+      ],
+    });
+
+    // any required here because 
+    const packageObject: any = grpc.loadPackageDefinition(packageDefinition);
+    const channelOptions: grpc.ChannelOptions = {
+      'grpc.default_compression_algorithm': this.compression,
+    };
+    console.log(host, credentials, channelOptions)
+    this._serviceClient = new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(host, credentials, channelOptions);
   }
 
-  convert(spans: ReadableSpan[]): IExportTraceServiceRequest {
-    return createExportTraceServiceRequest(spans);
+  export(spans: ReadableSpan[], resultCallback: (result: ExportResult) => void): void {
+    // TODO
+    const deadline = Date.now() + 1000;
+
+    const req = createExportTraceServiceRequest(spans);
+    console.log(req)
+    this._serviceClient.export(
+      req,
+      this._metadata,
+      { deadline },
+      (...args: unknown[]) => {
+        console.log(args)
+        if (args[0]) {
+          resultCallback({
+            code: ExportResultCode.FAILED,
+            error: args[0] as any,
+          });
+        } else {
+          resultCallback({
+            code: ExportResultCode.SUCCESS,
+          });
+        }
+      },
+    );
   }
 
-  getDefaultUrl(config: OTLPGRPCExporterConfigNode) {
-    return validateAndNormalizeUrl(this.getUrlFromConfig(config));
-  }
-
-  getServiceClientType() {
-    return ServiceClientType.SPANS;
-  }
-
-  getServiceProtoPath(): string {
-    return 'opentelemetry/proto/collector/trace/v1/trace_service.proto';
-  }
-
-  getUrlFromConfig(config: OTLPGRPCExporterConfigNode): string {
-    if (typeof config.url === 'string') {
-      return config.url;
-    }
-
-    return getEnv().OTEL_EXPORTER_OTLP_TRACES_ENDPOINT ||
-      getEnv().OTEL_EXPORTER_OTLP_ENDPOINT ||
-      DEFAULT_COLLECTOR_URL;
+  shutdown(): Promise<void> {
+    throw new Error('Method not implemented.');
   }
 }
