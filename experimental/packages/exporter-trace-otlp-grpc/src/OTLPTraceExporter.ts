@@ -46,11 +46,11 @@ export class OTLPTraceExporter implements SpanExporter {
       oneofs: true,
       includeDirs: [
         // In webpack environments, the bundle may be at the same level as the protos/ directory
-        // path.resolve(__dirname, 'protos'),
+        path.resolve(__dirname, 'protos'),
         // When running typescript directly in tests or with ts-node, the protos/ directory is one level above the src/ directory
         path.resolve(__dirname, '..', 'protos'),
         // When running the compiled js, the protos directory is two levels above the build/src/ directory
-        // path.resolve(__dirname, '..', '..', 'protos'),
+        path.resolve(__dirname, '..', '..', 'protos'),
       ],
     });
 
