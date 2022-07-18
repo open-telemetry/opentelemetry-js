@@ -16,18 +16,19 @@
 
 import type * as grpc from '@grpc/grpc-js';
 
-export type OTLPGRPCTraceExporterConfig = {
-  credentials?: grpc.ChannelCredentials;
-  metadata?: grpc.Metadata;
-  compression?: CompressionAlgorithm;
-
-  url?: string;
-  /** Maximum time the OTLP exporter will wait for each batch export.
-   * The default value is 10000ms. */
-  timeoutMillis?: number;
-};
-
-export enum CompressionAlgorithm {
-  NONE = 'none',
-  GZIP = 'gzip'
+export interface TraceServiceClient extends grpc.Client {
+  export: (
+    request: any,
+    metadata: grpc.Metadata,
+    options: grpc.CallOptions,
+    callback: Function
+  ) => {};
 }
+
+
+export type ConnectionOptions = {
+  host: string;
+  metadata: grpc.Metadata;
+  credentials: grpc.ChannelCredentials;
+  compression: grpc.compressionAlgorithms;
+};

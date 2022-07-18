@@ -20,6 +20,7 @@ import { ExportResult, ExportResultCode, getEnv } from '@opentelemetry/core';
 import { createExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
 import type { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
 import * as path from 'path';
+import { RequestCounter } from './internal/request-counter';
 import type { OTLPGRPCTraceExporterConfig, TraceServiceClient } from './types';
 import { getConnectionOptions } from './util';
 
@@ -33,13 +34,16 @@ export class OTLPTraceExporter implements SpanExporter {
   public url: string;
   public compression: grpc.compressionAlgorithms;
 
+  private _requestCounter = new RequestCounter();
+  private _isShutdown = false;
+
   constructor(config: OTLPGRPCTraceExporterConfig = {}) {
     const { host, credentials, metadata, compression } = getConnectionOptions(config, getEnv());
     this.url = host;
     this.compression = compression;
     this._metadata = metadata;
     // TODO is this the right default?
-    this._timeoutMillis = config.timeoutMillis ?? 1000;
+    this._timeoutMillis = config.timeoutMillis ?? 10_000;
 
     const packageDefinition = loadSync('opentelemetry/proto/collector/trace/v1/trace_service.proto', {
       keepCase: false,
@@ -66,7 +70,15 @@ export class OTLPTraceExporter implements SpanExporter {
   }
 
   export(spans: ReadableSpan[], resultCallback: (result: ExportResult) => void): void {
+    if (this._isShutdown) {
+      setImmediate(resultCallback, {
+        code: ExportResultCode.FAILED,
+        error: new Error('Cannot export after shutdown'),
+      });
+    }
+
     const deadline = Date.now() + this._timeoutMillis;
+    this._requestCounter.startRequest();
 
     const req = createExportTraceServiceRequest(spans);
     this._serviceClient.export(
@@ -74,6 +86,8 @@ export class OTLPTraceExporter implements SpanExporter {
       this._metadata,
       { deadline },
       (error: Error) => {
+        this._requestCounter.endRequest();
+
         if (error) {
           resultCallback({
             code: ExportResultCode.FAILED,
@@ -89,6 +103,14 @@ export class OTLPTraceExporter implements SpanExporter {
   }
 
   shutdown(): Promise<void> {
-    throw new Error('Method not implemented.');
+    return new Promise((resolve, _reject) => {
+      if (this._requestCounter.requests === 0) {
+        resolve();
+        return;
+      }
+
+      this._requestCounter.onEndLastRequest(resolve);
+    });
   }
 }
+
