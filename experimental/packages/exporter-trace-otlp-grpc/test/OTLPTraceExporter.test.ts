@@ -345,7 +345,7 @@ describe('when configuring via environment', () => {
     assert.deepStrictEqual(collectorExporter['_metadata']?.get('foo'), ['bar']);
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });
-  it('should override global headers config with signal headers defined via env', () => {
+  it.skip('should override global headers config with signal headers defined via env', () => {
     const metadata = new grpc.Metadata();
     metadata.set('foo', 'bar');
     metadata.set('goo', 'lol');

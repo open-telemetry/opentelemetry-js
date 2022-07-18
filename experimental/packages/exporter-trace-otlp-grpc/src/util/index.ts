@@ -65,12 +65,9 @@ function getMetadata(config: OTLPGRPCTraceExporterConfig, env: Required<ENVIRONM
 
   const envHeaders = baggageUtils.parseKeyPairsIntoRecord(env.OTEL_EXPORTER_OTLP_HEADERS);
   const envTraceHeaders = baggageUtils.parseKeyPairsIntoRecord(env.OTEL_EXPORTER_OTLP_TRACES_HEADERS);
-  const headers = config.headers ?? {};
 
-  for (const [k, v] of Object.entries(headers)) {
-    if (metadataMap[k] == null) {
-      metadata.set(k, String(v));
-    }
+  if (config.headers) {
+    diag.warn('Headers cannot be set when using grpc');
   }
 
   for (const [k, v] of Object.entries(envTraceHeaders)) {
