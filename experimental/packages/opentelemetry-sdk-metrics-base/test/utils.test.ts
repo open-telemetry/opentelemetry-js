@@ -38,14 +38,14 @@ describe('utils', () => {
   describe('hashAttributes', () => {
     it('should hash all types of attribute values', () => {
       const cases: [MetricAttributes, string][] = [
-        [{ 'string': 'bar' }, '|#string:bar'],
-        [{ 'number': 1 }, '|#number:1'],
-        [{ 'false': false, 'true': true }, '|#false:false|#true:true'],
-        [{ 'arrayOfString': ['foo','bar'] }, '|#arrayOfString:foo,bar'],
-        [{ 'arrayOfNumber': [1,2] }, '|#arrayOfNumber:1,2'],
-        [{ 'arrayOfBool': [false,true] }, '|#arrayOfBool:false,true'],
-        [{ 'undefined': undefined }, '|#undefined:undefined'],
-        [{ 'arrayOfHoles': [undefined, null] }, '|#arrayOfHoles:,'],
+        [{ 'string': 'bar' }, '[["string","bar"]]'],
+        [{ 'number': 1 }, '[["number",1]]'],
+        [{ 'false': false, 'true': true }, '[["false",false],["true",true]]'],
+        [{ 'arrayOfString': ['foo','bar'] }, '[["arrayOfString",["foo","bar"]]]'],
+        [{ 'arrayOfNumber': [1,2] }, '[["arrayOfNumber",[1,2]]]'],
+        [{ 'arrayOfBool': [false,true] }, '[["arrayOfBool",[false,true]]]'],
+        [{ 'undefined': undefined }, '[["undefined",null]]'],
+        [{ 'arrayOfHoles': [undefined, null] }, '[["arrayOfHoles",[null,null]]]'],
       ];
 
       for (const [idx, it] of cases.entries()) {
