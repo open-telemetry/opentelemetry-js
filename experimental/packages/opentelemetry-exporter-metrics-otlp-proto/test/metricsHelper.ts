@@ -27,7 +27,8 @@ import {
   AggregationTemporality,
   ExplicitBucketHistogramAggregation,
   MeterProvider,
-  MetricReader
+  MetricReader,
+  View
 } from '@opentelemetry/sdk-metrics-base';
 import { IExportMetricsServiceRequest, IKeyValue, IMetric } from '@opentelemetry/otlp-transformer';
 import { Stream } from 'stream';
@@ -64,7 +65,15 @@ export async function collect() {
 }
 
 export function setUp() {
-  meterProvider = new MeterProvider({ resource: testResource });
+  meterProvider = new MeterProvider({
+    resource: testResource,
+    views: [
+      new View({
+        aggregation: new ExplicitBucketHistogramAggregation([0, 100]),
+        instrumentName: 'int-histogram',
+      })
+    ]
+  });
   reader = new TestMetricReader();
   meterProvider.addMetricReader(
     reader
@@ -102,7 +111,6 @@ export function mockObservableGauge(
 
 export function mockHistogram(): Histogram {
   const name = 'int-histogram';
-  meterProvider.addView({ aggregation: new ExplicitBucketHistogramAggregation([0, 100]) });
 
   return meter.createHistogram(name, {
     description: 'sample histogram description',
