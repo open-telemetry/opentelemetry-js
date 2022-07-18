@@ -35,8 +35,7 @@ import {
   mockedReadableSpan,
 } from './traceHelper';
 import * as core from '@opentelemetry/core';
-import { CompressionAlgorithm } from '@opentelemetry/otlp-exporter-base';
-import { GrpcCompressionAlgorithm } from '@opentelemetry/otlp-grpc-exporter-base';
+import { CompressionAlgorithm } from '../src/types';
 import { IExportTraceServiceRequest, IResourceSpans } from '@opentelemetry/otlp-transformer';
 
 const traceServiceProtoPath =
@@ -294,7 +293,7 @@ const testCollectorExporter = (params: TestParams) =>
           credentials,
           metadata: params.metadata,
         });
-        assert.strictEqual(collectorExporter.compression, GrpcCompressionAlgorithm.GZIP);
+        assert.strictEqual(collectorExporter.compression, grpc.compressionAlgorithms.gzip);
         delete envSource.OTEL_EXPORTER_OTLP_COMPRESSION;
       });
     });
