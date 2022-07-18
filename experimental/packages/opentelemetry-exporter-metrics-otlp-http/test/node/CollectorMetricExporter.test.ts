@@ -35,7 +35,10 @@ import {
   mockCounter,
   mockObservableGauge,
   mockHistogram,
-  collect, shutdown, setUp,
+  collect,
+  shutdown,
+  setUp,
+  HISTOGRAM_AGGREGATION_VIEW,
 } from '../metricsHelper';
 import { MockedResponse } from './nodeHelpers';
 import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
@@ -54,7 +57,7 @@ describe('OTLPMetricExporter - node with json over http', () => {
   let metrics: ResourceMetrics;
 
   beforeEach(async () => {
-    setUp();
+    setUp([HISTOGRAM_AGGREGATION_VIEW]);
   });
 
   afterEach(async () => {
