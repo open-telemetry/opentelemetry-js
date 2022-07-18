@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import * as grpc from "@grpc/grpc-js";
-import { diag } from "@opentelemetry/api";
-import { baggageUtils, ENVIRONMENT } from "@opentelemetry/core";
-import { CompressionAlgorithm, ConnectionOptions, OTLPGRPCTraceExporterConfig } from "../types";
-import { getCredentials } from "./security";
+import * as grpc from '@grpc/grpc-js';
+import { diag } from '@opentelemetry/api';
+import { baggageUtils, ENVIRONMENT } from '@opentelemetry/core';
+import { CompressionAlgorithm, ConnectionOptions, OTLPGRPCTraceExporterConfig } from '../types';
+import { getCredentials } from './security';
 
-const DEFAULT_COLLECTOR_URL = 'http://localhost:4317'
+const DEFAULT_COLLECTOR_URL = 'http://localhost:4317';
 
 export function getConnectionOptions(config: OTLPGRPCTraceExporterConfig, env: Required<ENVIRONMENT>): ConnectionOptions {
   const metadata = getMetadata(config, env);
@@ -34,7 +34,7 @@ export function getConnectionOptions(config: OTLPGRPCTraceExporterConfig, env: R
       credentials: config.credentials ?? grpc.credentials.createInsecure(),
       host,
       compression,
-    }
+    };
   }
 
   const credentials = config.credentials ?? getCredentials(url, env);
@@ -44,15 +44,15 @@ export function getConnectionOptions(config: OTLPGRPCTraceExporterConfig, env: R
     credentials,
     host,
     compression,
-  }
+  };
 }
 
 export function configureCompression(config: OTLPGRPCTraceExporterConfig, env: Required<ENVIRONMENT>): grpc.compressionAlgorithms {
   switch (config.compression) {
     case CompressionAlgorithm.GZIP:
-      return grpc.compressionAlgorithms.gzip
+      return grpc.compressionAlgorithms.gzip;
     case CompressionAlgorithm.NONE:
-      return grpc.compressionAlgorithms.identity
+      return grpc.compressionAlgorithms.identity;
   }
 
   const definedCompression = env.OTEL_EXPORTER_OTLP_TRACES_COMPRESSION || env.OTEL_EXPORTER_OTLP_COMPRESSION;
@@ -66,10 +66,6 @@ function getMetadata(config: OTLPGRPCTraceExporterConfig, env: Required<ENVIRONM
   const envHeaders = baggageUtils.parseKeyPairsIntoRecord(env.OTEL_EXPORTER_OTLP_HEADERS);
   const envTraceHeaders = baggageUtils.parseKeyPairsIntoRecord(env.OTEL_EXPORTER_OTLP_TRACES_HEADERS);
   const headers = config.headers ?? {};
-
-  console.log('env', env.OTEL_EXPORTER_OTLP_TRACES_HEADERS)
-  console.log('config', config.headers)
-  console.log('env headers', envHeaders)
 
   for (const [k, v] of Object.entries(headers)) {
     if (metadataMap[k] == null) {

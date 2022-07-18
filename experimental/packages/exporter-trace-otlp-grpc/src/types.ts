@@ -21,7 +21,7 @@ export type ConnectionOptions = {
   metadata: grpc.Metadata;
   credentials: grpc.ChannelCredentials;
   compression: grpc.compressionAlgorithms;
-}
+};
 
 export type OTLPGRPCTraceExporterConfig = {
   credentials?: grpc.ChannelCredentials;
@@ -35,7 +35,7 @@ export type OTLPGRPCTraceExporterConfig = {
   /** Maximum time the OTLP exporter will wait for each batch export.
    * The default value is 10000ms. */
   timeoutMillis?: number;
-}
+};
 
 export enum CompressionAlgorithm {
   NONE = 'none',

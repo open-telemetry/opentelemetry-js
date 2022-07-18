@@ -19,7 +19,7 @@ import { loadSync } from '@grpc/proto-loader';
 import { ExportResult, ExportResultCode, getEnv } from '@opentelemetry/core';
 import { createExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
 import type { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base';
-import * as path from "path";
+import * as path from 'path';
 import type { OTLPGRPCTraceExporterConfig, TraceServiceClient } from './types';
 import { getConnectionOptions } from './util';
 
@@ -35,10 +35,10 @@ export class OTLPTraceExporter implements SpanExporter {
   constructor(config: OTLPGRPCTraceExporterConfig = {}) {
     const { host, credentials, metadata, compression } = getConnectionOptions(config, getEnv());
     this.url = host;
-    this.compression = compression
+    this.compression = compression;
     this._metadata = metadata;
 
-    const packageDefinition = loadSync("opentelemetry/proto/collector/trace/v1/trace_service.proto", {
+    const packageDefinition = loadSync('opentelemetry/proto/collector/trace/v1/trace_service.proto', {
       keepCase: false,
       longs: String,
       enums: String,
@@ -54,12 +54,11 @@ export class OTLPTraceExporter implements SpanExporter {
       ],
     });
 
-    // any required here because 
+    // any required here because
     const packageObject: any = grpc.loadPackageDefinition(packageDefinition);
     const channelOptions: grpc.ChannelOptions = {
       'grpc.default_compression_algorithm': this.compression,
     };
-    console.log(host, credentials, channelOptions)
     this._serviceClient = new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(host, credentials, channelOptions);
   }
 
@@ -68,13 +67,11 @@ export class OTLPTraceExporter implements SpanExporter {
     const deadline = Date.now() + 1000;
 
     const req = createExportTraceServiceRequest(spans);
-    console.log(req)
     this._serviceClient.export(
       req,
       this._metadata,
       { deadline },
       (...args: unknown[]) => {
-        console.log(args)
         if (args[0]) {
           resultCallback({
             code: ExportResultCode.FAILED,
