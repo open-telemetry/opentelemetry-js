@@ -66,8 +66,20 @@ export interface ResourceMetrics {
   scopeMetrics: ScopeMetrics[];
 }
 
+/**
+ * Represents the collection result of the metrics. If there are any
+ * non-critical errors in the collection, like throwing in a single observable
+ * callback, these errors are aggregated in the {@link CollectionResult.errors}
+ * array and other successfully collected metrics are returned.
+ */
 export interface CollectionResult {
+  /**
+   * Collected metrics.
+   */
   resourceMetrics: ResourceMetrics;
+  /**
+   * Arbitrary JavaScript exception values.
+   */
   errors: unknown[];
 }
 
@@ -75,8 +87,22 @@ export interface CollectionResult {
  * The aggregated point data type.
  */
 export enum DataPointType {
+  /**
+   * A singular metric data point has only a single numeric value.
+   */
   SINGULAR,
+  /**
+   * A histogram data point contains a histogram statistics of collected
+   * values with a list of explicit bucket boundaries and statistics such
+   * as min, max, count, and sum of all collected values.
+   */
   HISTOGRAM,
+  /**
+   * An exponential histogram data point contains a histogram statistics of
+   * collected values where bucket boundaries are automatically calculated
+   * using an exponential function, and statistics such as min, max, count,
+   * and sum of all collected values.
+   */
   EXPONENTIAL_HISTOGRAM,
 }
 
@@ -101,7 +127,8 @@ export interface DataPoint<T> {
    */
   readonly attributes: MetricAttributes;
   /**
-   * The value for this DataPoint.
+   * The value for this DataPoint. The type of the value is indicated by the
+   * {@link DataPointType}.
    */
   readonly value: T;
 }
