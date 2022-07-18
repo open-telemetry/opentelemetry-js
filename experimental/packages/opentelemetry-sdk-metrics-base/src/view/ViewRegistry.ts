@@ -20,22 +20,14 @@ import { InstrumentSelector } from './InstrumentSelector';
 import { MeterSelector } from './MeterSelector';
 import { View } from './View';
 
-interface RegisteredView {
-  instrumentSelector: InstrumentSelector;
-  meterSelector: MeterSelector;
-  view: View;
-}
-
 export class ViewRegistry {
-  private static DEFAULT_VIEW = new View();
-  private _registeredViews: RegisteredView[] = [];
+  private static DEFAULT_VIEW = new View({
+    instrumentName: '*'
+  });
+  private _registeredViews: View[] = [];
 
-  addView(view: View, instrumentSelector: InstrumentSelector = new InstrumentSelector(), meterSelector: MeterSelector = new MeterSelector()) {
-    this._registeredViews.push({
-      instrumentSelector,
-      meterSelector,
-      view,
-    });
+  addView(view: View) {
+    this._registeredViews.push(view);
   }
 
   findViews(instrument: InstrumentDescriptor, meter: InstrumentationScope): View[] {
@@ -43,8 +35,7 @@ export class ViewRegistry {
       .filter(registeredView => {
         return this._matchInstrument(registeredView.instrumentSelector, instrument) &&
           this._matchMeter(registeredView.meterSelector, meter);
-      })
-      .map(it => it.view);
+      });
 
     if (views.length === 0) {
       return [ViewRegistry.DEFAULT_VIEW];
