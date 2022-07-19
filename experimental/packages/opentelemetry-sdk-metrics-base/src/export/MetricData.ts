@@ -93,7 +93,6 @@ export interface CollectionResult {
  * The aggregated point data type.
  */
 export enum DataPointType {
-  SINGULAR,
   /**
    * A histogram data point contains a histogram statistics of collected
    * values with a list of explicit bucket boundaries and statistics such
