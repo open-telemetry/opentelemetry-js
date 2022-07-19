@@ -15,7 +15,7 @@
  */
 
 import assert = require('assert');
-import { RequestCounter } from '../src/internal/request-counter';
+import { RequestCounter } from '../../src/internal/request-counter';
 
 describe('RequestCounter', () => {
   let counter: RequestCounter;

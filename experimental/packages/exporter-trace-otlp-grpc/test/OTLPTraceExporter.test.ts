@@ -56,67 +56,181 @@ metadata.set('k', 'v');
 
 const testCollectorExporter = (params: TestParams) =>
   describe(`OTLPTraceExporter - node ${params.useTLS ? 'with' : 'without'
-    } TLS, ${params.metadata ? 'with' : 'without'} metadata`, () => {
-      let collectorExporter: OTLPTraceExporter;
-      let server: grpc.Server;
-      let exportedData:
+  } TLS, ${params.metadata ? 'with' : 'without'} metadata`, () => {
+    let collectorExporter: OTLPTraceExporter;
+    let server: grpc.Server;
+    let exportedData:
         | IResourceSpans
         | undefined;
-      let reqMetadata: grpc.Metadata | undefined;
+    let reqMetadata: grpc.Metadata | undefined;
 
-      before(done => {
-        server = new grpc.Server();
-        protoLoader
-          .load(traceServiceProtoPath, {
-            keepCase: false,
-            longs: String,
-            enums: String,
-            defaults: true,
-            oneofs: true,
-            includeDirs,
-          })
-          .then((packageDefinition: protoLoader.PackageDefinition) => {
-            const packageObject: any = grpc.loadPackageDefinition(
-              packageDefinition
-            );
-            server.addService(
-              packageObject.opentelemetry.proto.collector.trace.v1.TraceService
-                .service,
-              {
-                Export: (data: {
+    before(done => {
+      server = new grpc.Server();
+      protoLoader
+        .load(traceServiceProtoPath, {
+          keepCase: false,
+          longs: String,
+          enums: String,
+          defaults: true,
+          oneofs: true,
+          includeDirs,
+        })
+        .then((packageDefinition: protoLoader.PackageDefinition) => {
+          const packageObject: any = grpc.loadPackageDefinition(
+            packageDefinition
+          );
+          server.addService(
+            packageObject.opentelemetry.proto.collector.trace.v1.TraceService
+              .service,
+            {
+              Export: (data: {
                   request: IExportTraceServiceRequest;
                   metadata: grpc.Metadata;
                 }) => {
-                  if (data.request.resourceSpans != null) {
-                    exportedData = data.request.resourceSpans[0];
-                  }
-                  reqMetadata = data.metadata;
+                if (data.request.resourceSpans != null) {
+                  exportedData = data.request.resourceSpans[0];
+                }
+                reqMetadata = data.metadata;
+              },
+            }
+          );
+          const credentials = params.useTLS
+            ? grpc.ServerCredentials.createSsl(
+              fs.readFileSync('./test/certs/ca.crt'),
+              [
+                {
+                  cert_chain: fs.readFileSync('./test/certs/server.crt'),
+                  private_key: fs.readFileSync('./test/certs/server.key'),
                 },
-              }
-            );
-            const credentials = params.useTLS
-              ? grpc.ServerCredentials.createSsl(
-                fs.readFileSync('./test/certs/ca.crt'),
-                [
-                  {
-                    cert_chain: fs.readFileSync('./test/certs/server.crt'),
-                    private_key: fs.readFileSync('./test/certs/server.key'),
-                  },
-                ]
-              )
-              : grpc.ServerCredentials.createInsecure();
-            server.bindAsync(address, credentials, () => {
-              server.start();
-              done();
-            });
+              ]
+            )
+            : grpc.ServerCredentials.createInsecure();
+          server.bindAsync(address, credentials, () => {
+            server.start();
+            done();
           });
+        });
+    });
+
+    after(() => {
+      server.forceShutdown();
+    });
+
+    beforeEach(done => {
+      const credentials = params.useTLS
+        ? grpc.credentials.createSsl(
+          fs.readFileSync('./test/certs/ca.crt'),
+          fs.readFileSync('./test/certs/client.key'),
+          fs.readFileSync('./test/certs/client.crt')
+        )
+        : grpc.credentials.createInsecure();
+      collectorExporter = new OTLPTraceExporter({
+        url: 'https://' + address,
+        credentials,
+        metadata: params.metadata,
       });
 
-      after(() => {
-        server.forceShutdown();
+      const provider = new BasicTracerProvider();
+      provider.addSpanProcessor(new SimpleSpanProcessor(collectorExporter));
+      done();
+    });
+
+    afterEach(() => {
+      exportedData = undefined;
+      reqMetadata = undefined;
+      sinon.restore();
+    });
+
+    describe('instance', () => {
+      it('should warn about path in url', () => {
+        const spyLoggerWarn = sinon.stub(diag, 'warn');
+        collectorExporter = new OTLPTraceExporter({
+          url: `http://${address}/v1/trace`,
+        });
+        const args = spyLoggerWarn.args[0];
+        assert.strictEqual(
+          args[0],
+          'URL path should not be set when using grpc, the path part of the URL will be ignored.'
+        );
+      });
+    });
+
+    describe('export', () => {
+      it('should export spans', done => {
+        const responseSpy = sinon.spy();
+        const spans = [Object.assign({}, mockedReadableSpan)];
+        collectorExporter.export(spans, responseSpy);
+        setTimeout(() => {
+          assert.ok(
+            typeof exportedData !== 'undefined',
+            'resource' + " doesn't exist"
+          );
+
+          const spans = exportedData.scopeSpans[0].spans;
+          const resource = exportedData.resource;
+
+          assert.ok(
+            typeof spans !== 'undefined',
+            'spans do not exist'
+          );
+
+          ensureExportedSpanIsCorrect(spans[0]);
+
+          assert.ok(
+            typeof resource !== 'undefined',
+            "resource doesn't exist"
+          );
+
+          ensureResourceIsCorrect(resource);
+
+          ensureMetadataIsCorrect(reqMetadata, params?.metadata);
+
+          done();
+        }, 500);
+      });
+      it('should log deadline exceeded error', done => {
+        const credentials = params.useTLS
+          ? grpc.credentials.createSsl(
+            fs.readFileSync('./test/certs/ca.crt'),
+            fs.readFileSync('./test/certs/client.key'),
+            fs.readFileSync('./test/certs/client.crt')
+          )
+          : grpc.credentials.createInsecure();
+
+        const collectorExporterWithTimeout = new OTLPTraceExporter({
+          url: 'grpcs://' + address,
+          credentials,
+          metadata: params.metadata,
+          timeoutMillis: 100,
+        });
+
+        const responseSpy = sinon.spy();
+        const spans = [Object.assign({}, mockedReadableSpan)];
+        collectorExporterWithTimeout.export(spans, responseSpy);
+
+        setTimeout(() => {
+          const result = responseSpy.args[0][0] as core.ExportResult;
+          assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+          assert.strictEqual(responseSpy.args[0][0].error.details, 'Deadline exceeded');
+          done();
+        }, 300);
+      });
+    });
+
+    it('should not export after shutdown', done => {
+      const exportSpy = sinon.spy(collectorExporter['_serviceClient'], 'export');
+
+      const spans = [Object.assign({}, mockedReadableSpan)];
+      collectorExporter.shutdown();
+      collectorExporter.export(spans, () => {
+        sinon.assert.notCalled(exportSpy);
+        done();
       });
 
-      beforeEach(done => {
+    });
+
+    describe('export - with gzip compression', () => {
+      beforeEach(() => {
         const credentials = params.useTLS
           ? grpc.credentials.createSsl(
             fs.readFileSync('./test/certs/ca.crt'),
@@ -128,165 +242,51 @@ const testCollectorExporter = (params: TestParams) =>
           url: 'https://' + address,
           credentials,
           metadata: params.metadata,
+          compression: CompressionAlgorithm.GZIP,
         });
 
         const provider = new BasicTracerProvider();
         provider.addSpanProcessor(new SimpleSpanProcessor(collectorExporter));
-        done();
       });
-
-      afterEach(() => {
-        exportedData = undefined;
-        reqMetadata = undefined;
-        sinon.restore();
-      });
-
-      describe('instance', () => {
-        it('should warn about path in url', () => {
-          const spyLoggerWarn = sinon.stub(diag, 'warn');
-          collectorExporter = new OTLPTraceExporter({
-            url: `http://${address}/v1/trace`,
-          });
-          const args = spyLoggerWarn.args[0];
-          assert.strictEqual(
-            args[0],
-            'URL path should not be set when using grpc, the path part of the URL will be ignored.'
+      it('should successfully send the spans', done => {
+        const responseSpy = sinon.spy();
+        const spans = [Object.assign({}, mockedReadableSpan)];
+        collectorExporter.export(spans, responseSpy);
+        setTimeout(() => {
+          assert.ok(
+            typeof exportedData !== 'undefined',
+            'resource' + " doesn't exist"
           );
-        });
-      });
+          const spans = exportedData.scopeSpans[0].spans;
+          const resource = exportedData.resource;
 
-      describe('export', () => {
-        it('should export spans', done => {
-          const responseSpy = sinon.spy();
-          const spans = [Object.assign({}, mockedReadableSpan)];
-          collectorExporter.export(spans, responseSpy);
-          setTimeout(() => {
-            assert.ok(
-              typeof exportedData !== 'undefined',
-              'resource' + " doesn't exist"
-            );
+          assert.ok(
+            typeof spans !== 'undefined',
+            'spans do not exist'
+          );
+          ensureExportedSpanIsCorrect(spans[0]);
 
-            const spans = exportedData.scopeSpans[0].spans;
-            const resource = exportedData.resource;
+          assert.ok(
+            typeof resource !== 'undefined',
+            "resource doesn't exist"
+          );
+          ensureResourceIsCorrect(resource);
 
-            assert.ok(
-              typeof spans !== 'undefined',
-              'spans do not exist'
-            );
+          ensureMetadataIsCorrect(reqMetadata, params.metadata);
 
-            ensureExportedSpanIsCorrect(spans[0]);
-
-            assert.ok(
-              typeof resource !== 'undefined',
-              "resource doesn't exist"
-            );
-
-            ensureResourceIsCorrect(resource);
-
-            ensureMetadataIsCorrect(reqMetadata, params?.metadata);
-
-            done();
-          }, 500);
-        });
-        it('should log deadline exceeded error', done => {
-          const credentials = params.useTLS
-            ? grpc.credentials.createSsl(
-              fs.readFileSync('./test/certs/ca.crt'),
-              fs.readFileSync('./test/certs/client.key'),
-              fs.readFileSync('./test/certs/client.crt')
-            )
-            : grpc.credentials.createInsecure();
-
-          const collectorExporterWithTimeout = new OTLPTraceExporter({
-            url: 'grpcs://' + address,
-            credentials,
-            metadata: params.metadata,
-            timeoutMillis: 100,
-          });
-
-          const responseSpy = sinon.spy();
-          const spans = [Object.assign({}, mockedReadableSpan)];
-          collectorExporterWithTimeout.export(spans, responseSpy);
-
-          setTimeout(() => {
-            const result = responseSpy.args[0][0] as core.ExportResult;
-            assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-            assert.strictEqual(responseSpy.args[0][0].error.details, 'Deadline exceeded');
-            done();
-          }, 300);
-        });
-      });
-
-      it('should not export after shutdown', done => {
-        const exportSpy = sinon.spy(collectorExporter["_serviceClient"], "export");
-
-          const spans = [Object.assign({}, mockedReadableSpan)];
-          collectorExporter.shutdown()
-          collectorExporter.export(spans, () => {
-            sinon.assert.notCalled(exportSpy);
-            done();
-          });
-
-      });
-
-      describe('export - with gzip compression', () => {
-        beforeEach(() => {
-          const credentials = params.useTLS
-            ? grpc.credentials.createSsl(
-              fs.readFileSync('./test/certs/ca.crt'),
-              fs.readFileSync('./test/certs/client.key'),
-              fs.readFileSync('./test/certs/client.crt')
-            )
-            : grpc.credentials.createInsecure();
-          collectorExporter = new OTLPTraceExporter({
-            url: 'https://' + address,
-            credentials,
-            metadata: params.metadata,
-            compression: CompressionAlgorithm.GZIP,
-          });
-
-          const provider = new BasicTracerProvider();
-          provider.addSpanProcessor(new SimpleSpanProcessor(collectorExporter));
-        });
-        it('should successfully send the spans', done => {
-          const responseSpy = sinon.spy();
-          const spans = [Object.assign({}, mockedReadableSpan)];
-          collectorExporter.export(spans, responseSpy);
-          setTimeout(() => {
-            assert.ok(
-              typeof exportedData !== 'undefined',
-              'resource' + " doesn't exist"
-            );
-            const spans = exportedData.scopeSpans[0].spans;
-            const resource = exportedData.resource;
-
-            assert.ok(
-              typeof spans !== 'undefined',
-              'spans do not exist'
-            );
-            ensureExportedSpanIsCorrect(spans[0]);
-
-            assert.ok(
-              typeof resource !== 'undefined',
-              "resource doesn't exist"
-            );
-            ensureResourceIsCorrect(resource);
-
-            ensureMetadataIsCorrect(reqMetadata, params.metadata);
-
-            done();
-          }, 500);
-        });
-      });
-      describe('Trace Exporter with compression', () => {
-        it('should return gzip compression algorithm on exporter', () => {
-          const env = getEnv();
-          env.OTEL_EXPORTER_OTLP_COMPRESSION = 'gzip';
-          const { compression } = getConnectionOptions({}, env);
-          assert.strictEqual(compression, grpc.compressionAlgorithms.gzip);
-        });
+          done();
+        }, 500);
       });
     });
+    describe('Trace Exporter with compression', () => {
+      it('should return gzip compression algorithm on exporter', () => {
+        const env = getEnv();
+        env.OTEL_EXPORTER_OTLP_COMPRESSION = 'gzip';
+        const { compression } = getConnectionOptions({}, env);
+        assert.strictEqual(compression, grpc.compressionAlgorithms.gzip);
+      });
+    });
+  });
 
 describe('OTLPTraceExporter - node (getDefaultUrl)', () => {
   it('should default to insecure localhost', () => {
