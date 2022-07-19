@@ -52,7 +52,7 @@ async function pbjs(files) {
   return outFile;
 }
 
-;(async function main() {
+(async function main() {
   const pbjsOut = await pbjs(protos);
   await pbts(pbjsOut);
 })();
