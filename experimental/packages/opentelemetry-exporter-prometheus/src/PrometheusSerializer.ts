@@ -104,23 +104,15 @@ function valueString(value: number) {
 }
 
 function toPrometheusType(
-  instrumentType: InstrumentType,
-  dataPointType: DataPointType,
+  metricData: MetricData,
 ): PrometheusDataTypeLiteral {
-  switch (dataPointType) {
-    case DataPointType.SINGULAR:
-      if (
-        instrumentType === InstrumentType.COUNTER ||
-        instrumentType === InstrumentType.OBSERVABLE_COUNTER
-      ) {
+  switch (metricData.dataPointType) {
+    case DataPointType.SUM:
+      if (metricData.isMonotonic) {
         return 'counter';
       }
-      /**
-       * - HISTOGRAM
-       * - UP_DOWN_COUNTER
-       * - OBSERVABLE_GAUGE
-       * - OBSERVABLE_UP_DOWN_COUNTER
-       */
+      return 'gauge';
+    case DataPointType.GAUGE:
       return 'gauge';
     case DataPointType.HISTOGRAM:
       return 'histogram';
@@ -210,13 +202,13 @@ export class PrometheusSerializer {
       metricData.descriptor.description || 'description missing'
     )}`;
     const type = `# TYPE ${name} ${toPrometheusType(
-      metricData.descriptor.type,
-      dataPointType
+      metricData
     )}`;
 
     let results = '';
     switch (dataPointType) {
-      case DataPointType.SINGULAR: {
+      case DataPointType.SUM:
+      case DataPointType.GAUGE: {
         results = metricData.dataPoints
           .map(it => this._serializeSingularDataPoint(name, metricData.descriptor.type, it))
           .join('');

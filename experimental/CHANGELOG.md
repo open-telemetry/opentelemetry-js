@@ -7,6 +7,9 @@ All notable changes to experimental packages in this project will be documented 
 ### :boom: Breaking Change
 
 * feature(views): move views registration to MeterProvider constructor [#3066](https://github.com/open-telemetry/opentelemetry-js/pull/3066) @pichlermarc
+* feat(sdk-metrics-base): split up Singular into Sum and Gauge in MetricData [#3079](https://github.com/open-telemetry/opentelemetry-js/pull/3079) @pichlermarc
+  * removes `DataPointType.SINGULAR`, and replaces it with `DataPointType.SUM` and `DataPointType.GAUGE`
+  * removes `SingularMetricData` and replaces it with `SumMetricData` (including an additional `isMonotonic` flag) and `GaugeMetricData`
 
 ### :rocket: (Enhancement)
 
