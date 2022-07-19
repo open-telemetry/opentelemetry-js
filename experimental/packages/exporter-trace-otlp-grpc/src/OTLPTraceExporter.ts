@@ -38,7 +38,6 @@ export class OTLPTraceExporter implements SpanExporter {
   constructor(config: OTLPGRPCTraceExporterConfig = {}) {
     const { host, credentials, metadata, compression } = getConnectionOptions(config, getEnv());
     this._metadata = metadata;
-    // TODO is this the right default?
     this._timeoutMillis = config.timeoutMillis ?? 10_000;
 
     const packageDefinition = loadSync('opentelemetry/proto/collector/trace/v1/trace_service.proto', {
@@ -57,7 +56,7 @@ export class OTLPTraceExporter implements SpanExporter {
       ],
     });
 
-    // any required here because
+    // any required here because the types returned by loadSync don't know our package structure
     const packageObject: any = grpc.loadPackageDefinition(packageDefinition);
     const channelOptions: grpc.ChannelOptions = {
       'grpc.default_compression_algorithm': compression,
@@ -99,6 +98,7 @@ export class OTLPTraceExporter implements SpanExporter {
   }
 
   shutdown(): Promise<void> {
+    this._isShutdown = true;
     return new Promise((resolve, _reject) => {
       if (this._requestCounter.requests === 0) {
         resolve();
