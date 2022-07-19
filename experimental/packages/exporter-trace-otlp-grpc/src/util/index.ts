@@ -62,20 +62,15 @@ export function configureCompression(config: OTLPGRPCTraceExporterConfig, env: R
 
 function getMetadata(config: OTLPGRPCTraceExporterConfig, env: Required<ENVIRONMENT>) {
   const metadata = config.metadata ?? new grpc.Metadata();
-  const metadataMap = metadata.getMap();
 
-  const envHeaders = baggageUtils.parseKeyPairsIntoRecord(env.OTEL_EXPORTER_OTLP_HEADERS);
-  const envTraceHeaders = baggageUtils.parseKeyPairsIntoRecord(env.OTEL_EXPORTER_OTLP_TRACES_HEADERS);
+  const { OTEL_EXPORTER_OTLP_TRACES_HEADERS, OTEL_EXPORTER_OTLP_HEADERS } = env;
 
-  for (const [k, v] of Object.entries(envTraceHeaders)) {
-    if (metadataMap[k] == null) {
-      metadata.set(k, v);
-    }
-  }
 
-  for (const [k, v] of Object.entries(envHeaders)) {
-    if (metadataMap[k] == null) {
-      metadata.set(k, v);
+  for (const h of [OTEL_EXPORTER_OTLP_HEADERS, OTEL_EXPORTER_OTLP_TRACES_HEADERS]) {
+    if (h) {
+      for (const [k, v] of Object.entries(baggageUtils.parseKeyPairsIntoRecord(h))) {
+        metadata.set(k, v);
+      }
     }
   }
 
