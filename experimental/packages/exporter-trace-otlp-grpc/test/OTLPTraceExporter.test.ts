@@ -216,6 +216,19 @@ const testCollectorExporter = (params: TestParams) =>
           }, 300);
         });
       });
+
+      it('should not export after shutdown', done => {
+        const exportSpy = sinon.spy(collectorExporter["_serviceClient"], "export");
+
+          const spans = [Object.assign({}, mockedReadableSpan)];
+          collectorExporter.shutdown()
+          collectorExporter.export(spans, () => {
+            sinon.assert.notCalled(exportSpy);
+            done();
+          });
+
+      });
+
       describe('export - with gzip compression', () => {
         beforeEach(() => {
           const credentials = params.useTLS

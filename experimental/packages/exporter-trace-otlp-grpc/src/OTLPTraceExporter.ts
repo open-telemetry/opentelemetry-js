@@ -70,6 +70,7 @@ export class OTLPTraceExporter implements SpanExporter {
         code: ExportResultCode.FAILED,
         error: new Error('Cannot export after shutdown'),
       });
+      return;
     }
 
     const deadline = Date.now() + this._timeoutMillis;
