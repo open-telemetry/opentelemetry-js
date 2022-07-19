@@ -93,7 +93,8 @@ describe('SumAggregator', () => {
       const expected: MetricData = {
         descriptor: defaultInstrumentDescriptor,
         aggregationTemporality: AggregationTemporality.CUMULATIVE,
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: true,
         dataPoints: [
           {
             attributes: {},
