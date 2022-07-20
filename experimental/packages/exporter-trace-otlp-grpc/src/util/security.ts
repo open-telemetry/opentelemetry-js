@@ -15,7 +15,7 @@
  */
 import * as grpc from '@grpc/grpc-js';
 import { diag } from '@opentelemetry/api';
-import { ENVIRONMENT, getEnv } from '@opentelemetry/core';
+import { ENVIRONMENT } from '@opentelemetry/core';
 import path = require('path');
 import fs = require('fs');
 
@@ -25,14 +25,14 @@ export function getCredentials(endpoint: string, env: Required<ENVIRONMENT>): gr
   }
 
   if (endpoint.startsWith('https://')) {
-    return useSecureConnection();
+    return useSecureConnection(env);
   }
 
   if (envInsecureOption(env)) {
     return grpc.credentials.createInsecure();
   }
 
-  return useSecureConnection();
+  return useSecureConnection(env);
 }
 
 
@@ -48,18 +48,18 @@ function envInsecureOption(env: Required<ENVIRONMENT>): boolean {
   }
 }
 
-function useSecureConnection(): grpc.ChannelCredentials {
-  const rootCertPath = retrieveRootCert();
-  const privateKeyPath = retrievePrivateKey();
-  const certChainPath = retrieveCertChain();
+function useSecureConnection(env: Required<ENVIRONMENT>): grpc.ChannelCredentials {
+  const rootCert = retrieveRootCert(env);
+  const privateKey = retrievePrivateKey(env);
+  const certChain = retrieveCertChain(env);
 
-  return grpc.credentials.createSsl(rootCertPath, privateKeyPath, certChainPath);
+  return grpc.credentials.createSsl(rootCert, privateKey, certChain);
 }
 
-function retrieveRootCert(): Buffer | undefined {
+function retrieveRootCert(env: Required<ENVIRONMENT>): Buffer | undefined {
   const rootCertificate =
-        getEnv().OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE ||
-        getEnv().OTEL_EXPORTER_OTLP_CERTIFICATE;
+        env.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE ||
+        env.OTEL_EXPORTER_OTLP_CERTIFICATE;
 
   if (rootCertificate) {
     try {
@@ -73,10 +73,10 @@ function retrieveRootCert(): Buffer | undefined {
   }
 }
 
-function retrievePrivateKey(): Buffer | undefined {
+function retrievePrivateKey(env: Required<ENVIRONMENT>): Buffer | undefined {
   const clientKey =
-        getEnv().OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY ||
-        getEnv().OTEL_EXPORTER_OTLP_CLIENT_KEY;
+        env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY ||
+        env.OTEL_EXPORTER_OTLP_CLIENT_KEY;
 
   if (clientKey) {
     try {
@@ -90,10 +90,10 @@ function retrievePrivateKey(): Buffer | undefined {
   }
 }
 
-function retrieveCertChain(): Buffer | undefined {
+function retrieveCertChain(env: Required<ENVIRONMENT>): Buffer | undefined {
   const clientChain =
-        getEnv().OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE ||
-        getEnv().OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE;
+        env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE ||
+        env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE;
 
   if (clientChain) {
     try {
