@@ -454,12 +454,16 @@ describe('PrometheusSerializer', () => {
       assert.strictEqual(result, `test_total 1 ${mockedHrTimeMs}\n`);
     });
 
-    it('should serialize non-string attribute values', async () => {
+    it('should serialize non-string attribute values in JSON representations', async () => {
       const serializer = new PrometheusSerializer();
 
       const result = await testSerializer(serializer, 'test_total', counter => {
         counter.add(1, ({
+          true: true,
+          false: false,
+          array: [1, undefined, null, 2],
           object: {},
+          Infinity: Infinity,
           NaN: NaN,
           null: null,
           undefined: undefined,
@@ -468,7 +472,7 @@ describe('PrometheusSerializer', () => {
 
       assert.strictEqual(
         result,
-        `test_total{object="[object Object]",NaN="NaN",null="null",undefined="undefined"} 1 ${mockedHrTimeMs}\n`
+        `test_total{true="true",false="false",array="[1,null,null,2]",object="{}",Infinity="null",NaN="null",null="null",undefined=""} 1 ${mockedHrTimeMs}\n`
       );
     });
 

@@ -29,6 +29,13 @@ import { hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
 
 const START_TIME = hrTime();
 const END_TIME = hrTime();
+const ATTRIBUTES = {
+  'string-attribute': 'some attribute value',
+  'int-attribute': 1,
+  'double-attribute': 1.1,
+  'boolean-attribute': true,
+  'array-attribute': ['attribute value 1', 'attribute value 2'],
+};
 
 describe('Metrics', () => {
   describe('createExportMetricsServiceRequest', () => {
@@ -58,6 +65,39 @@ describe('Metrics', () => {
           stringValue: 'some attribute value',
         },
       },
+      {
+        key: 'int-attribute',
+        value: {
+          intValue: 1,
+        },
+      },
+      {
+        key: 'double-attribute',
+        value: {
+          doubleValue: 1.1,
+        },
+      },
+      {
+        key: 'boolean-attribute',
+        value: {
+          boolValue: true,
+        },
+      },
+      {
+        key: 'array-attribute',
+        value: {
+          arrayValue: {
+            values: [
+              {
+                stringValue: 'attribute value 1',
+              },
+              {
+                stringValue: 'attribute value 2',
+              }
+            ]
+          },
+        },
+      },
     ];
 
     function createCounterData(value: number, aggregationTemporality: AggregationTemporality): MetricData {
@@ -77,7 +117,7 @@ describe('Metrics', () => {
             value: value,
             startTime: START_TIME,
             endTime: END_TIME,
-            attributes: { 'string-attribute': 'some attribute value' }
+            attributes: ATTRIBUTES,
           }
         ]
       };
@@ -100,7 +140,7 @@ describe('Metrics', () => {
             value: value,
             startTime: START_TIME,
             endTime: END_TIME,
-            attributes: { 'string-attribute': 'some attribute value' }
+            attributes: ATTRIBUTES
           }
         ]
       };
@@ -123,7 +163,7 @@ describe('Metrics', () => {
             value: value,
             startTime: START_TIME,
             endTime: END_TIME,
-            attributes: { 'string-attribute': 'some attribute value' }
+            attributes: ATTRIBUTES,
           }
         ]
       };
@@ -146,7 +186,7 @@ describe('Metrics', () => {
             value: value,
             startTime: START_TIME,
             endTime: END_TIME,
-            attributes: { 'string-attribute': 'some attribute value' }
+            attributes: ATTRIBUTES,
           }
         ]
       };
@@ -169,7 +209,7 @@ describe('Metrics', () => {
             value: value,
             startTime: START_TIME,
             endTime: END_TIME,
-            attributes: { 'string-attribute': 'some attribute value' }
+            attributes: ATTRIBUTES,
           }
         ]
       };
@@ -207,7 +247,7 @@ describe('Metrics', () => {
             },
             startTime: START_TIME,
             endTime: END_TIME,
-            attributes: { 'string-attribute': 'some attribute value' },
+            attributes: ATTRIBUTES,
           }
         ]
       };
