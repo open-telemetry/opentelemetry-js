@@ -16,7 +16,7 @@
 
 import { diag } from '@opentelemetry/api';
 import { ExportResultCode } from '@opentelemetry/core';
-import { getExportRequestProto } from '@opentelemetry/otlp-proto-exporter-base';
+import { getExportRequestProto, ServiceClientType } from '@opentelemetry/otlp-proto-exporter-base';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';
@@ -236,8 +236,8 @@ describe('OTLPMetricExporter - node with proto over http', () => {
       let buff = Buffer.from('');
 
       fakeRequest.on('end', () => {
-        const ExportTraceServiceRequestProto = getExportRequestProto();
-        const data = ExportTraceServiceRequestProto?.decode(buff);
+        const ExportTraceServiceRequestProto = getExportRequestProto(ServiceClientType.METRICS);
+        const data = ExportTraceServiceRequestProto.decode(buff);
         const json = data?.toJSON() as IExportMetricsServiceRequest;
 
         const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[0];
