@@ -128,8 +128,8 @@ function toHistogramDataPoints(
       explicitBounds: histogram.buckets.boundaries,
       count: histogram.count,
       sum: histogram.sum,
-      min: histogram.hasMinMax ? histogram.min : undefined,
-      max: histogram.hasMinMax ? histogram.max : undefined,
+      min: histogram.min,
+      max: histogram.max,
       startTimeUnixNano: hrTimeToNanoseconds(dataPoint.startTime),
       timeUnixNano: hrTimeToNanoseconds(
         dataPoint.endTime

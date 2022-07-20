@@ -255,7 +255,7 @@ export class PrometheusSerializer {
       results += stringify(
         name + '_' + key,
         attributes,
-        value[key],
+        value[key] ?? 0,
         this._appendTimestamp ? timestamp : undefined,
         undefined
       );

@@ -19,8 +19,8 @@ import { MetricAttributes } from '@opentelemetry/api-metrics';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
-import { Histogram } from '../aggregator/types';
 import { AggregationTemporality } from './AggregationTemporality';
+import { Histogram } from '../aggregator/types';
 
 /**
  * Basic metric data fields.
