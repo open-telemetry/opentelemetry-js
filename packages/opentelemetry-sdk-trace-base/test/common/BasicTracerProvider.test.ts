@@ -29,9 +29,10 @@ import {
 } from '@opentelemetry/api';
 import { CompositePropagator } from '@opentelemetry/core';
 import {
-  AlwaysOnSampler,
   AlwaysOffSampler,
+  AlwaysOnSampler,
   TraceState,
+  W3CTraceContextPropagator,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -45,10 +46,35 @@ import {
   BatchSpanProcessor,
 } from '../../src';
 
-describe('BasicTracerProvider', () => {
-  let removeEvent: (() => void) | undefined;
+class DummyPropagator implements TextMapPropagator {
+  inject(
+    context: Context,
+    carrier: any,
+    setter: TextMapSetter<any>
+  ): void {
+    throw new Error('Method not implemented.');
+  }
+  extract(
+    context: Context,
+    carrier: any,
+    getter: TextMapGetter<any>
+  ): Context {
+    throw new Error('Method not implemented.');
+  }
+  fields(): string[] {
+    throw new Error('Method not implemented.');
+  }
+}
 
+class DummyExporter extends InMemorySpanExporter {}
+
+describe('BasicTracerProvider', () => {
   let envSource: Record<string, any>;
+  let setGlobalPropagatorStub: sinon.SinonSpy<
+    [TextMapPropagator],
+    boolean
+  >;
+
   if (typeof process === 'undefined') {
     envSource = (globalThis as unknown) as Record<string, any>;
   } else {
@@ -56,15 +82,15 @@ describe('BasicTracerProvider', () => {
   }
 
   beforeEach(() => {
+    // to avoid actually registering the TraceProvider and leaking env to other tests
+    sinon.stub(trace, 'setGlobalTracerProvider');
+    setGlobalPropagatorStub = sinon.spy(propagation, 'setGlobalPropagator');
+
     context.disable();
   });
 
   afterEach(() => {
     sinon.restore();
-    if (removeEvent) {
-      removeEvent();
-      removeEvent = undefined;
-    }
   });
 
   describe('constructor', () => {
@@ -240,40 +266,104 @@ describe('BasicTracerProvider', () => {
     });
   });
 
-  describe('.register()', () => {
-    describe('propagator', () => {
-      class DummyPropagator implements TextMapPropagator {
-        inject(
-          context: Context,
-          carrier: any,
-          setter: TextMapSetter<any>
-        ): void {
-          throw new Error('Method not implemented.');
+  describe('Custom TracerProvider through inheritance', () => {
+    beforeEach(() => {
+      envSource.OTEL_TRACES_EXPORTER = 'custom-exporter';
+      envSource.OTEL_PROPAGATORS = 'custom-propagator';
+    });
+
+    afterEach(() => {
+      delete envSource.OTEL_TRACES_EXPORTER;
+      delete envSource.OTEL_PROPAGATORS;
+      sinon.restore();
+    });
+
+    it('can be extended by overriding registered components', () => {
+      class CustomTracerProvider extends BasicTracerProvider {
+        protected static override readonly _registeredPropagators = new Map<
+          string,
+          () => TextMapPropagator
+            >([
+              ...BasicTracerProvider._registeredPropagators,
+              ['custom-propagator', () => new DummyPropagator()],
+            ]);
+
+        protected static override readonly _registeredExporters = new Map<
+          string,
+          () => SpanExporter
+            >([
+              ...BasicTracerProvider._registeredExporters,
+              ['custom-exporter', () => new DummyExporter()],
+            ]);
+      }
+
+      const provider = new CustomTracerProvider({});
+      assert(provider['_getPropagator']('tracecontext') instanceof W3CTraceContextPropagator);
+      /* BasicTracerProvider has no exporters by default, so skipping testing the exporter getter */
+
+      provider.register();
+      const processor = provider.getActiveSpanProcessor();
+      assert(processor instanceof BatchSpanProcessor);
+      // @ts-expect-error access configured to verify its the correct one
+      const exporter = processor._exporter;
+      assert(exporter instanceof DummyExporter);
+
+      sinon.assert.calledOnceWithExactly(setGlobalPropagatorStub, sinon.match.instanceOf(DummyPropagator));
+    });
+
+    it('the old way of extending still works', () => {
+      // this is an anti-pattern, but we test that for backwards compatibility
+      class CustomTracerProvider extends BasicTracerProvider {
+        protected static override readonly _registeredPropagators = new Map<
+          string,
+          () => TextMapPropagator
+            >([
+              ['custom-propagator', () => new DummyPropagator()],
+            ]);
+
+        protected static override readonly _registeredExporters = new Map<
+          string,
+          () => SpanExporter
+            >([
+              ['custom-exporter', () => new DummyExporter()],
+            ]);
+
+        protected override  _getPropagator(name: string): TextMapPropagator | undefined {
+          return (
+            super._getPropagator(name) ||
+            CustomTracerProvider._registeredPropagators.get(name)?.()
+          );
         }
-        extract(
-          context: Context,
-          carrier: any,
-          getter: TextMapGetter<any>
-        ): Context {
-          throw new Error('Method not implemented.');
-        }
-        fields(): string[] {
-          throw new Error('Method not implemented.');
+
+        protected override _getSpanExporter(name: string): SpanExporter | undefined {
+          return (
+            super._getSpanExporter(name) ||
+            CustomTracerProvider._registeredExporters.get(name)?.()
+          );
         }
       }
 
-      let setGlobalPropagatorStub: sinon.SinonSpy<
-        [TextMapPropagator],
-        boolean
-      >;
+      const provider = new CustomTracerProvider({});
+      provider.register();
+      const processor = provider.getActiveSpanProcessor();
+      assert(processor instanceof BatchSpanProcessor);
+      // @ts-expect-error access configured to verify its the correct one
+      const exporter = processor._exporter;
+      assert(exporter instanceof DummyExporter);
+
+      sinon.assert.calledOnceWithExactly(setGlobalPropagatorStub, sinon.match.instanceOf(DummyPropagator));
+    });
+  });
+
+  describe('.register()', () => {
+    describe('propagator', () => {
       let originalPropagators: string | number | undefined | string[];
       beforeEach(() => {
-        setGlobalPropagatorStub = sinon.spy(propagation, 'setGlobalPropagator');
         originalPropagators = envSource.OTEL_PROPAGATORS;
       });
 
       afterEach(() => {
-        setGlobalPropagatorStub.restore();
+        sinon.restore();
 
         // otherwise we may assign 'undefined' (a string)
         if (originalPropagators !== undefined) {
@@ -288,10 +378,10 @@ describe('BasicTracerProvider', () => {
         provider.register({
           propagator: new DummyPropagator(),
         });
-        assert.ok(
-          setGlobalPropagatorStub.calledOnceWithExactly(
-            sinon.match.instanceOf(DummyPropagator)
-          )
+
+        sinon.assert.calledOnceWithExactly(
+          setGlobalPropagatorStub,
+          sinon.match.instanceOf(DummyPropagator)
         );
       });
 
@@ -299,10 +389,9 @@ describe('BasicTracerProvider', () => {
         const provider = new BasicTracerProvider();
         provider.register();
 
-        assert.ok(
-          setGlobalPropagatorStub.calledOnceWithExactly(
-            sinon.match.instanceOf(CompositePropagator)
-          )
+        sinon.assert.calledOnceWithExactly(
+          setGlobalPropagatorStub,
+          sinon.match.instanceOf(CompositePropagator)
         );
         assert.deepStrictEqual(setGlobalPropagatorStub.args[0][0].fields(), [
           'traceparent',
@@ -318,13 +407,10 @@ describe('BasicTracerProvider', () => {
         const provider = new BasicTracerProvider({});
         provider.register();
 
-        assert.ok(
-          warnStub.calledOnceWithExactly(
-            'Propagator "missing-propagator" requested through environment variable is unavailable.'
-          )
+        sinon.assert.calledOnceWithExactly(
+          warnStub,
+          'Propagator "missing-propagator" requested through environment variable is unavailable.'
         );
-
-        warnStub.restore();
       });
     });
 
