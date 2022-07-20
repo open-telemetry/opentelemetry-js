@@ -86,7 +86,7 @@ describe('MetricCollector', () => {
 
       /** checking batch[0] */
       const metricData1 = metrics[0];
-      assertMetricData(metricData1, DataPointType.SINGULAR, {
+      assertMetricData(metricData1, DataPointType.SUM, {
         name: 'counter1'
       });
       assert.strictEqual(metricData1.dataPoints.length, 2);
@@ -95,7 +95,7 @@ describe('MetricCollector', () => {
 
       /** checking batch[1] */
       const metricData2 = metrics[1];
-      assertMetricData(metricData2, DataPointType.SINGULAR, {
+      assertMetricData(metricData2, DataPointType.SUM, {
         name: 'counter2'
       });
       assert.strictEqual(metricData2.dataPoints.length, 1);
@@ -136,7 +136,7 @@ describe('MetricCollector', () => {
 
       /** checking batch[0] */
       const metricData1 = metrics[0];
-      assertMetricData(metricData1, DataPointType.SINGULAR, {
+      assertMetricData(metricData1, DataPointType.SUM, {
         name: 'observable1'
       });
       assert.strictEqual(metricData1.dataPoints.length, 2);
@@ -145,7 +145,7 @@ describe('MetricCollector', () => {
 
       /** checking batch[1] */
       const metricData2 = metrics[1];
-      assertMetricData(metricData2, DataPointType.SINGULAR, {
+      assertMetricData(metricData2, DataPointType.SUM, {
         name: 'observable2'
       });
       assert.strictEqual(metricData2.dataPoints.length, 2);
@@ -154,7 +154,7 @@ describe('MetricCollector', () => {
 
       /** checking batch[2] */
       const metricData3 = metrics[2];
-      assertMetricData(metricData3, DataPointType.SINGULAR, {
+      assertMetricData(metricData3, DataPointType.SUM, {
         name: 'observable3'
       });
       assert.strictEqual(metricData3.dataPoints.length, 0);
@@ -200,13 +200,13 @@ describe('MetricCollector', () => {
         assert.strictEqual(metrics.length, 2);
 
         /** observer1 */
-        assertMetricData(metrics[0], DataPointType.SINGULAR, {
+        assertMetricData(metrics[0], DataPointType.SUM, {
           name: 'observer1'
         });
         assert.strictEqual(metrics[0].dataPoints.length, 0);
 
         /** observer2 */
-        assertMetricData(metrics[1], DataPointType.SINGULAR, {
+        assertMetricData(metrics[1], DataPointType.SUM, {
           name: 'observer2'
         });
         assert.strictEqual(metrics[1].dataPoints.length, 1);
@@ -230,14 +230,14 @@ describe('MetricCollector', () => {
         assert.strictEqual(metrics.length, 2);
 
         /** observer1 */
-        assertMetricData(metrics[0], DataPointType.SINGULAR, {
+        assertMetricData(metrics[0], DataPointType.SUM, {
           name: 'observer1'
         });
         assert.strictEqual(metrics[0].dataPoints.length, 1);
         assertDataPoint(metrics[0].dataPoints[0], {}, 100);
 
         /** observer2 */
-        assertMetricData(metrics[1], DataPointType.SINGULAR, {
+        assertMetricData(metrics[1], DataPointType.SUM, {
           name: 'observer2'
         });
         assert.strictEqual(metrics[1].dataPoints.length, 1);
@@ -268,13 +268,13 @@ describe('MetricCollector', () => {
       assert.strictEqual(metrics.length, 2);
 
       /** counter1 data points are collected */
-      assertMetricData(metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(metrics[0], DataPointType.SUM, {
         name: 'counter1'
       });
       assert.strictEqual(metrics[0].dataPoints.length, 1);
 
       /** observer1 data points are not collected */
-      assertMetricData(metrics[1], DataPointType.SINGULAR, {
+      assertMetricData(metrics[1], DataPointType.SUM, {
         name: 'observer1'
       });
       assert.strictEqual(metrics[1].dataPoints.length, 0);
@@ -320,13 +320,13 @@ describe('MetricCollector', () => {
         assert.strictEqual(metrics.length, 2);
 
         /** observer1 */
-        assertMetricData(metrics[0], DataPointType.SINGULAR, {
+        assertMetricData(metrics[0], DataPointType.SUM, {
           name: 'observer1'
         });
         assert.strictEqual(metrics[0].dataPoints.length, 0);
 
         /** observer2 */
-        assertMetricData(metrics[1], DataPointType.SINGULAR, {
+        assertMetricData(metrics[1], DataPointType.SUM, {
           name: 'observer2'
         });
         assert.strictEqual(metrics[1].dataPoints.length, 1);
@@ -350,14 +350,14 @@ describe('MetricCollector', () => {
         assert.strictEqual(metrics.length, 2);
 
         /** observer1 */
-        assertMetricData(metrics[0], DataPointType.SINGULAR, {
+        assertMetricData(metrics[0], DataPointType.SUM, {
           name: 'observer1'
         });
         assert.strictEqual(metrics[0].dataPoints.length, 1);
         assertDataPoint(metrics[0].dataPoints[0], {}, 100);
 
         /** observer2 */
-        assertMetricData(metrics[1], DataPointType.SINGULAR, {
+        assertMetricData(metrics[1], DataPointType.SUM, {
           name: 'observer2'
         });
         assert.strictEqual(metrics[1].dataPoints.length, 1);
@@ -390,13 +390,13 @@ describe('MetricCollector', () => {
       assert.strictEqual(metrics.length, 2);
 
       /** counter1 data points are collected */
-      assertMetricData(metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(metrics[0], DataPointType.SUM, {
         name: 'counter1'
       });
       assert.strictEqual(metrics[0].dataPoints.length, 1);
 
       /** observer1 data points are not collected */
-      assertMetricData(metrics[1], DataPointType.SINGULAR, {
+      assertMetricData(metrics[1], DataPointType.SUM, {
         name: 'observer1'
       });
       assert.strictEqual(metrics[1].dataPoints.length, 0);

@@ -14,50 +14,29 @@
  * limitations under the License.
  */
 
-import * as path from 'path';
-
 import { ServiceClientType } from './types';
 import { OTLPProtoExporterNodeBase } from './OTLPProtoExporterNodeBase';
-import type { Type } from 'protobufjs';
-import * as protobufjs from 'protobufjs';
 import {
   CompressionAlgorithm,
   OTLPExporterError,
-  OTLPExporterNodeConfigBase,
   sendWithHttp
 } from '@opentelemetry/otlp-exporter-base';
+import type * as protobuf from 'protobufjs';
+import * as root from './generated/root';
 
-let ExportRequestProto: Type | undefined;
-
-export function getExportRequestProto(): Type | undefined {
-  return ExportRequestProto;
+export interface ExportRequestType<T, R = T & { toJSON: () => unknown }> {
+  create(properties?: T): R;
+  encode(message: T, writer?: protobuf.Writer): protobuf.Writer;
+  decode(reader: (protobuf.Reader | Uint8Array), length?: number): R;
 }
 
-export function onInit<ExportItem, ServiceRequest>(
-  collector: OTLPProtoExporterNodeBase<ExportItem, ServiceRequest>,
-  _config: OTLPExporterNodeConfigBase
-): void {
-  const dir = path.resolve(__dirname, '..', 'protos');
-  const root = new protobufjs.Root();
-  root.resolvePath = function (origin, target) {
-    return `${dir}/${target}`;
-  };
-  if (collector.getServiceClientType() === ServiceClientType.SPANS) {
-    const proto = root.loadSync([
-      'opentelemetry/proto/common/v1/common.proto',
-      'opentelemetry/proto/resource/v1/resource.proto',
-      'opentelemetry/proto/trace/v1/trace.proto',
-      'opentelemetry/proto/collector/trace/v1/trace_service.proto',
-    ]);
-    ExportRequestProto = proto?.lookupType('ExportTraceServiceRequest');
+export function getExportRequestProto<ServiceRequest>(
+  clientType: ServiceClientType,
+): ExportRequestType<ServiceRequest> {
+  if (clientType === ServiceClientType.SPANS) {
+    return root.opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest as unknown as ExportRequestType<ServiceRequest>;
   } else {
-    const proto = root.loadSync([
-      'opentelemetry/proto/common/v1/common.proto',
-      'opentelemetry/proto/resource/v1/resource.proto',
-      'opentelemetry/proto/metrics/v1/metrics.proto',
-      'opentelemetry/proto/collector/metrics/v1/metrics_service.proto',
-    ]);
-    ExportRequestProto = proto?.lookupType('ExportMetricsServiceRequest');
+    return root.opentelemetry.proto.collector.metrics.v1.ExportMetricsServiceRequest as unknown as ExportRequestType<ServiceRequest>;
   }
 }
 
@@ -70,9 +49,10 @@ export function send<ExportItem, ServiceRequest>(
 ): void {
   const serviceRequest = collector.convert(objects);
 
-  const message = getExportRequestProto()?.create(serviceRequest);
+  const exportRequestType = getExportRequestProto<ServiceRequest>(collector.getServiceClientType());
+  const message = exportRequestType.create(serviceRequest);
   if (message) {
-    const body = getExportRequestProto()?.encode(message).finish();
+    const body = exportRequestType.encode(message).finish();
     if (body) {
       sendWithHttp(
         collector,

@@ -69,7 +69,7 @@ describe('MeterSharedState', () => {
         assert.strictEqual(errors.length, 0);
         assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
         assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
-        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
+        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SUM, {
           name: 'test',
         });
       }));
@@ -92,10 +92,10 @@ describe('MeterSharedState', () => {
         assert.strictEqual(errors.length, 0);
         assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
         assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 2);
-        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
+        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SUM, {
           name: 'foo',
         });
-        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[1], DataPointType.SINGULAR, {
+        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[1], DataPointType.SUM, {
           name: 'bar',
         });
       }));
@@ -157,10 +157,10 @@ describe('MeterSharedState', () => {
         assert.strictEqual(errors.length, 0);
         assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
         assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 2);
-        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
+        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SUM, {
           name: 'foo'
         });
-        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[1], DataPointType.SINGULAR, {
+        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[1], DataPointType.SUM, {
           name: 'bar'
         });
       }

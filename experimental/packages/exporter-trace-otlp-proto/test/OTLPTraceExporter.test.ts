@@ -30,7 +30,7 @@ import {
   MockedResponse,
 } from './traceHelper';
 import { CompressionAlgorithm, OTLPExporterNodeConfigBase, OTLPExporterError } from '@opentelemetry/otlp-exporter-base';
-import { getExportRequestProto } from '@opentelemetry/otlp-proto-exporter-base';
+import { getExportRequestProto, ServiceClientType } from '@opentelemetry/otlp-proto-exporter-base';
 import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
 
 let fakeRequest: PassThrough;
@@ -208,8 +208,8 @@ describe('OTLPTraceExporter - node with proto over http', () => {
 
       let buff = Buffer.from('');
       fakeRequest.on('end', () => {
-        const ExportTraceServiceRequestProto = getExportRequestProto();
-        const data = ExportTraceServiceRequestProto?.decode(buff);
+        const ExportTraceServiceRequestProto = getExportRequestProto(ServiceClientType.SPANS);
+        const data = ExportTraceServiceRequestProto.decode(buff);
         const json = data?.toJSON() as IExportTraceServiceRequest;
         const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
@@ -294,8 +294,8 @@ describe('OTLPTraceExporter - node with proto over http', () => {
       let buff = Buffer.from('');
       fakeRequest.on('end', () => {
         const unzippedBuff = zlib.gunzipSync(buff);
-        const ExportTraceServiceRequestProto = getExportRequestProto();
-        const data = ExportTraceServiceRequestProto?.decode(unzippedBuff);
+        const ExportTraceServiceRequestProto = getExportRequestProto(ServiceClientType.SPANS);
+        const data = ExportTraceServiceRequestProto.decode(unzippedBuff);
         const json = data?.toJSON() as IExportTraceServiceRequest;
         const span1 = json.resourceSpans?.[0].scopeSpans?.[0].spans?.[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
