@@ -114,6 +114,9 @@ export class PeriodicExportingMetricReader extends MetricReader {
     await this._exporter.shutdown();
   }
 
+  /**
+   * @inheritdoc
+   */
   selectAggregationTemporality(instrumentType: InstrumentType): AggregationTemporality {
     return this._exporter.selectAggregationTemporality(instrumentType);
   }

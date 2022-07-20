@@ -15,12 +15,10 @@
  */
 
 import * as assert from 'assert';
-import { InstrumentType } from '../../src/InstrumentDescriptor';
+import { InstrumentType } from '../../src';
 import { ViewRegistry } from '../../src/view/ViewRegistry';
-import { View } from '../../src/view/View';
-import { InstrumentSelector } from '../../src/view/InstrumentSelector';
-import { MeterSelector } from '../../src/view/MeterSelector';
 import { defaultInstrumentationScope, defaultInstrumentDescriptor } from '../util';
+import { View } from '../../src';
 
 
 describe('ViewRegistry', () => {
@@ -35,13 +33,8 @@ describe('ViewRegistry', () => {
     describe('InstrumentSelector', () => {
       it('should match view with instrument name', () => {
         const registry = new ViewRegistry();
-        registry.addView(new View({ name: 'no-filter' }));
-        registry.addView(new View({ name: 'foo' }), new InstrumentSelector({
-          name: 'foo',
-        }));
-        registry.addView(new View({ name: 'bar' }), new InstrumentSelector({
-          name: 'bar'
-        }));
+        registry.addView(new View({ name: 'foo', instrumentName: 'foo' }));
+        registry.addView(new View({ name: 'bar', instrumentName: 'bar' }));
 
         {
           const views = registry.findViews({
@@ -49,9 +42,8 @@ describe('ViewRegistry', () => {
             name: 'foo'
           }, defaultInstrumentationScope);
 
-          assert.strictEqual(views.length, 2);
-          assert.strictEqual(views[0].name, 'no-filter');
-          assert.strictEqual(views[1].name, 'foo');
+          assert.strictEqual(views.length, 1);
+          assert.strictEqual(views[0].name, 'foo');
         }
 
         {
@@ -60,20 +52,22 @@ describe('ViewRegistry', () => {
             name: 'bar'
           }, defaultInstrumentationScope);
 
-          assert.strictEqual(views.length, 2);
-          assert.strictEqual(views[0].name, 'no-filter');
-          assert.strictEqual(views[1].name, 'bar');
+          assert.strictEqual(views.length, 1);
+          assert.strictEqual(views[0].name, 'bar');
         }
       });
 
       it('should match view with instrument type', () => {
         const registry = new ViewRegistry();
-        registry.addView(new View({ name: 'no-filter' }));
-        registry.addView(new View({ name: 'counter' }), new InstrumentSelector({
-          type: InstrumentType.COUNTER,
+        registry.addView(new View({
+          name: 'counter',
+          instrumentName: 'default_metric',
+          instrumentType: InstrumentType.COUNTER
         }));
-        registry.addView(new View({ name: 'histogram' }), new InstrumentSelector({
-          type: InstrumentType.HISTOGRAM,
+        registry.addView(new View({
+          name: 'histogram',
+          instrumentName: 'default_metric',
+          instrumentType: InstrumentType.HISTOGRAM
         }));
 
         {
@@ -82,9 +76,8 @@ describe('ViewRegistry', () => {
             type: InstrumentType.COUNTER
           }, defaultInstrumentationScope);
 
-          assert.strictEqual(views.length, 2);
-          assert.strictEqual(views[0].name, 'no-filter');
-          assert.strictEqual(views[1].name, 'counter');
+          assert.strictEqual(views.length, 1);
+          assert.strictEqual(views[0].name, 'counter');
         }
 
         {
@@ -93,9 +86,8 @@ describe('ViewRegistry', () => {
             type: InstrumentType.HISTOGRAM
           }, defaultInstrumentationScope);
 
-          assert.strictEqual(views.length, 2);
-          assert.strictEqual(views[0].name, 'no-filter');
-          assert.strictEqual(views[1].name, 'histogram');
+          assert.strictEqual(views.length, 1);
+          assert.strictEqual(views[0].name, 'histogram');
         }
       });
     });
@@ -103,13 +95,8 @@ describe('ViewRegistry', () => {
     describe('MeterSelector', () => {
       it('should match view with meter name', () => {
         const registry = new ViewRegistry();
-        registry.addView(new View({ name: 'no-filter' }));
-        registry.addView(new View({ name: 'foo' }), undefined, new MeterSelector({
-          name: 'foo'
-        }));
-        registry.addView(new View({ name: 'bar' }), undefined, new MeterSelector({
-          name: 'bar'
-        }));
+        registry.addView(new View({ name: 'foo', instrumentName: 'default_metric', meterName: 'foo' }));
+        registry.addView(new View({ name: 'bar', instrumentName: 'default_metric', meterName: 'bar' }));
 
         {
           const views = registry.findViews(defaultInstrumentDescriptor, {
@@ -117,9 +104,8 @@ describe('ViewRegistry', () => {
             name: 'foo',
           });
 
-          assert.strictEqual(views.length, 2);
-          assert.strictEqual(views[0].name, 'no-filter');
-          assert.strictEqual(views[1].name, 'foo');
+          assert.strictEqual(views.length, 1);
+          assert.strictEqual(views[0].name, 'foo');
         }
 
         {
@@ -128,9 +114,8 @@ describe('ViewRegistry', () => {
             name: 'bar'
           });
 
-          assert.strictEqual(views.length, 2);
-          assert.strictEqual(views[0].name, 'no-filter');
-          assert.strictEqual(views[1].name, 'bar');
+          assert.strictEqual(views.length, 1);
+          assert.strictEqual(views[0].name, 'bar');
         }
       });
     });
