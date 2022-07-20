@@ -38,8 +38,14 @@ export interface BaseMetricData {
  * Represents a metric data aggregated by either a LastValueAggregation or
  * SumAggregation.
  */
-export interface SingularMetricData extends BaseMetricData {
-  readonly dataPointType: DataPointType.SINGULAR;
+export interface SumMetricData extends BaseMetricData {
+  readonly dataPointType: DataPointType.SUM;
+  readonly dataPoints: DataPoint<number>[];
+  readonly isMonotonic: boolean;
+}
+
+export interface GaugeMetricData extends BaseMetricData {
+  readonly dataPointType: DataPointType.GAUGE;
   readonly dataPoints: DataPoint<number>[];
 }
 
@@ -54,7 +60,7 @@ export interface HistogramMetricData extends BaseMetricData {
 /**
  * Represents an aggregated metric data.
  */
-export type MetricData = SingularMetricData | HistogramMetricData;
+export type MetricData = SumMetricData | GaugeMetricData | HistogramMetricData;
 
 export interface ScopeMetrics {
   scope: InstrumentationScope;
@@ -88,10 +94,6 @@ export interface CollectionResult {
  */
 export enum DataPointType {
   /**
-   * A singular metric data point has only a single numeric value.
-   */
-  SINGULAR,
-  /**
    * A histogram data point contains a histogram statistics of collected
    * values with a list of explicit bucket boundaries and statistics such
    * as min, max, count, and sum of all collected values.
@@ -104,6 +106,15 @@ export enum DataPointType {
    * and sum of all collected values.
    */
   EXPONENTIAL_HISTOGRAM,
+  /**
+   * A gauge metric data point has only a single numeric value.
+   */
+  GAUGE,
+  /**
+   * A sum metric data point has a single numeric value and a
+   * monotonicity-indicator.
+   */
+  SUM
 }
 
 /**

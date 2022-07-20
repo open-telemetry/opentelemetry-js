@@ -51,6 +51,29 @@ describe('HistogramAggregator', () => {
 
       assert.deepStrictEqual(aggregator.merge(prev, delta), expected);
     });
+
+    it('with only negatives', () => {
+      const aggregator = new HistogramAggregator([1, 10, 100], true);
+      const prev = aggregator.createAccumulation([0, 0]);
+      prev.record(-10);
+      prev.record(-20);
+
+      const delta = aggregator.createAccumulation([1, 1]);
+      delta.record(-5);
+      delta.record(-30);
+
+      assert.deepStrictEqual(aggregator.merge(prev, delta).toPointValue(), {
+        buckets: {
+          boundaries: [1, 10, 100],
+          counts: [4, 0, 0, 0]
+        },
+        count: 4,
+        hasMinMax: true,
+        max: -5,
+        min: -30,
+        sum: -65
+      });
+    });
   });
 
   describe('diff', () => {
@@ -77,7 +100,7 @@ describe('HistogramAggregator', () => {
         sum: 13,
         hasMinMax: false,
         min: Infinity,
-        max: -1
+        max: -Infinity
       });
 
       assert.deepStrictEqual(aggregator.diff(prev, curr), expected);

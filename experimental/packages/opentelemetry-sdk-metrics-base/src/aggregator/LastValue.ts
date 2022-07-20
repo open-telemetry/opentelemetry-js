@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { LastValue, AggregatorKind, Aggregator, Accumulation, AccumulationRecord } from './types';
+import { Accumulation, AccumulationRecord, Aggregator, AggregatorKind, LastValue } from './types';
 import { HrTime } from '@opentelemetry/api';
 import { hrTime, hrTimeToMicroseconds } from '@opentelemetry/core';
-import { DataPointType, SingularMetricData } from '../export/MetricData';
+import { DataPointType, GaugeMetricData } from '../export/MetricData';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
@@ -74,11 +74,11 @@ export class LastValueAggregator implements Aggregator<LastValueAccumulation> {
     descriptor: InstrumentDescriptor,
     aggregationTemporality: AggregationTemporality,
     accumulationByAttributes: AccumulationRecord<LastValueAccumulation>[],
-    endTime: HrTime): Maybe<SingularMetricData> {
+    endTime: HrTime): Maybe<GaugeMetricData> {
     return {
       descriptor,
       aggregationTemporality,
-      dataPointType: DataPointType.SINGULAR,
+      dataPointType: DataPointType.GAUGE,
       dataPoints: accumulationByAttributes.map(([attributes, accumulation]) => {
         return {
           attributes,

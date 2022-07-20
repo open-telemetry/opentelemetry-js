@@ -60,16 +60,6 @@ export abstract class OTLPProtoExporterNodeBase<
     promise.then(popPromise, popPromise);
   }
 
-  override onInit(config: OTLPExporterNodeConfigBase): void {
-    // defer to next tick and lazy load to avoid loading protobufjs too early
-    // and making this impossible to be instrumented
-    setImmediate(() => {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { onInit } = require('./util');
-      onInit(this, config);
-    });
-  }
-
   override send(
     objects: ExportItem[],
     onSuccess: () => void,
