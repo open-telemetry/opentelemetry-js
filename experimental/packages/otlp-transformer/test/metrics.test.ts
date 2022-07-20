@@ -117,7 +117,7 @@ describe('Metrics', () => {
             value: value,
             startTime: START_TIME,
             endTime: END_TIME,
-            attributes: { 'string-attribute': 'some attribute value' }
+            attributes: ATTRIBUTES,
           }
         ]
       };
@@ -186,7 +186,7 @@ describe('Metrics', () => {
             value: value,
             startTime: START_TIME,
             endTime: END_TIME,
-            attributes: { 'string-attribute': 'some attribute value' }
+            attributes: ATTRIBUTES,
           }
         ]
       };
