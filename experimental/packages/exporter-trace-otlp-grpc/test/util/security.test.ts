@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { diag, DiagAPI } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import { DEFAULT_ENVIRONMENT, ENVIRONMENT } from '@opentelemetry/core';
 import assert = require('assert');
 import Sinon = require('sinon');
@@ -28,12 +28,12 @@ describe('Security', () => {
 
     beforeEach(() => {
       env = Object.assign({}, DEFAULT_ENVIRONMENT);
-      diagSpy = Sinon.spy(diag, 'warn')
+      diagSpy = Sinon.spy(diag, 'warn');
     });
 
     afterEach(() => {
       Sinon.restore();
-    })
+    });
 
     it('should use an insecure connection with http://', () => {
       const { credentials } = getConnectionOptions({ url: 'http://foo.bar.baz' }, env);
@@ -46,61 +46,61 @@ describe('Security', () => {
     });
 
     it('should get certificate from traces env', () => {
-      env.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE = "./test/certs/ca.crt";
-      env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE = "./test/certs/client.crt";
-      env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY = "./test/certs/client.key";
+      env.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE = './test/certs/ca.crt';
+      env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE = './test/certs/client.crt';
+      env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY = './test/certs/client.key';
       const { credentials } = getConnectionOptions({ url: 'https://foo.bar.baz' }, env);
       const opts = credentials._getConnectionOptions();
       assert.ok(opts);
       assert.ok(opts.secureContext);
       // warning is logged if credentials fail to load
-      Sinon.assert.notCalled(diagSpy)
+      Sinon.assert.notCalled(diagSpy);
     });
 
     it('should get certificate from global env', () => {
-      env.OTEL_EXPORTER_OTLP_CERTIFICATE = "./test/certs/ca.crt";
-      env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE = "./test/certs/client.crt";
-      env.OTEL_EXPORTER_OTLP_CLIENT_KEY = "./test/certs/client.key";
+      env.OTEL_EXPORTER_OTLP_CERTIFICATE = './test/certs/ca.crt';
+      env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE = './test/certs/client.crt';
+      env.OTEL_EXPORTER_OTLP_CLIENT_KEY = './test/certs/client.key';
       const { credentials } = getConnectionOptions({ url: 'https://foo.bar.baz' }, env);
       const opts = credentials._getConnectionOptions();
       assert.ok(opts);
       assert.ok(opts.secureContext);
       // warning is logged if credentials fail to load
-      Sinon.assert.notCalled(diagSpy)
+      Sinon.assert.notCalled(diagSpy);
     });
 
     it('should prefer traces env over global', () => {
-      env.OTEL_EXPORTER_OTLP_CERTIFICATE = "./test/certs/ca.crt.doesnotexist";
-      env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE = "./test/certs/client.crt.doesnotexist";
-      env.OTEL_EXPORTER_OTLP_CLIENT_KEY = "./test/certs/client.key.doesnotexist";
-      env.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE = "./test/certs/ca.crt";
-      env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE = "./test/certs/client.crt";
-      env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY = "./test/certs/client.key";
+      env.OTEL_EXPORTER_OTLP_CERTIFICATE = './test/certs/ca.crt.doesnotexist';
+      env.OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE = './test/certs/client.crt.doesnotexist';
+      env.OTEL_EXPORTER_OTLP_CLIENT_KEY = './test/certs/client.key.doesnotexist';
+      env.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE = './test/certs/ca.crt';
+      env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE = './test/certs/client.crt';
+      env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY = './test/certs/client.key';
       const { credentials } = getConnectionOptions({ url: 'https://foo.bar.baz' }, env);
       const opts = credentials._getConnectionOptions();
       assert.ok(opts);
       assert.ok(opts.secureContext);
       // warning is logged if credentials fail to load
-      Sinon.assert.notCalled(diagSpy)
+      Sinon.assert.notCalled(diagSpy);
     });
 
     it('should log a warning if any credentials cannot be loaded', () => {
-      env.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE = "./test/certs/ca.crt.doesnotexist";
-      env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE = "./test/certs/client.crt.doesnotexist";
-      env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY = "./test/certs/client.key.doesnotexist";
+      env.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE = './test/certs/ca.crt.doesnotexist';
+      env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE = './test/certs/client.crt.doesnotexist';
+      env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY = './test/certs/client.key.doesnotexist';
       getConnectionOptions({ url: 'https://foo.bar.baz' }, env);
-      Sinon.assert.calledWithExactly(diagSpy.getCall(0), 'Failed to read root certificate file')
-      Sinon.assert.calledWithExactly(diagSpy.getCall(1), 'Failed to read client certificate private key file')
-      Sinon.assert.calledWithExactly(diagSpy.getCall(2), 'Failed to read client certificate chain file')
-    })
+      Sinon.assert.calledWithExactly(diagSpy.getCall(0), 'Failed to read root certificate file');
+      Sinon.assert.calledWithExactly(diagSpy.getCall(1), 'Failed to read client certificate private key file');
+      Sinon.assert.calledWithExactly(diagSpy.getCall(2), 'Failed to read client certificate chain file');
+    });
 
     it('should use provided credentials instead of env', () => {
-      env.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE = "./test/certs/ca.crt.doesnotexist";
-      env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE = "./test/certs/client.crt.doesnotexist";
-      env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY = "./test/certs/client.key.doesnotexist";
+      env.OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE = './test/certs/ca.crt.doesnotexist';
+      env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE = './test/certs/client.crt.doesnotexist';
+      env.OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY = './test/certs/client.key.doesnotexist';
       getConnectionOptions({ url: 'https://foo.bar.baz', credentials: grpc.credentials.createSsl() }, env);
       // warn would be called if credentials tried to load because files don't exist
-      Sinon.assert.notCalled(diagSpy)
-    })
+      Sinon.assert.notCalled(diagSpy);
+    });
   });
 });
