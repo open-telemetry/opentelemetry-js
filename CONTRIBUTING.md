@@ -175,7 +175,7 @@ npm run tdd
 
 ### Linting
 
-This project uses `eslint` to lint source codes. Just like tests and compilation, linting can be done for all packages or only a single package.
+This project uses `eslint` to lint source code. Just like tests and compilation, linting can be done for all packages or only a single package.
 
 ```sh
 # Lint all modules
