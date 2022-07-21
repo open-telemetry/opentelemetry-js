@@ -51,6 +51,7 @@ import {
 import { EventEmitter } from 'events';
 import { AttributeNames } from '../enums/AttributeNames';
 import { _extractMethodAndService } from '../utils';
+import {AttributeValues} from '../enums/AttributeValues';
 
 export class GrpcJsInstrumentation extends InstrumentationBase {
   constructor(
@@ -194,8 +195,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
                   const span = instrumentation.tracer
                     .startSpan(spanName, spanOptions)
                     .setAttributes({
-                      [AttributeNames.GRPC_KIND]: spanOptions.kind,
-                      [AttributeNames.RPC_SYSTEM]: 'grpc',
+                      [AttributeNames.RPC_SYSTEM]: AttributeValues.RPC_SYSTEM,
                       [AttributeNames.GRPC_METHOD]: method,
                       [AttributeNames.RPC_SERVICE]: service,
                     });

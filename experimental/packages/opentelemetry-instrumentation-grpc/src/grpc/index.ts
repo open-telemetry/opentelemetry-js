@@ -43,6 +43,7 @@ import {
 import { makeGrpcClientRemoteCall, getMetadata } from './clientUtils';
 import { _extractMethodAndService, _methodIsIgnored } from '../utils';
 import { AttributeNames } from '../enums/AttributeNames';
+import {AttributeValues} from "../enums/AttributeValues";
 
 /**
  * Holding reference to grpc module here to access constant of grpc modules
@@ -200,8 +201,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
                   const span = instrumentation.tracer
                     .startSpan(spanName, spanOptions)
                     .setAttributes({
-                      [AttributeNames.GRPC_KIND]: spanOptions.kind,
-                      [AttributeNames.RPC_SYSTEM]: 'grpc',
+                      [AttributeNames.RPC_SYSTEM]: AttributeValues.RPC_SYSTEM,
                       [AttributeNames.GRPC_METHOD]: method,
                       [AttributeNames.RPC_SERVICE]: service,
                     });
@@ -302,7 +302,7 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
           kind: SpanKind.CLIENT,
         })
           .setAttributes({
-            [AttributeNames.RPC_SYSTEM]: 'grpc',
+            [AttributeNames.RPC_SYSTEM]: AttributeValues.RPC_SYSTEM,
             [AttributeNames.GRPC_METHOD]: method,
             [AttributeNames.RPC_SERVICE]: service,
           });

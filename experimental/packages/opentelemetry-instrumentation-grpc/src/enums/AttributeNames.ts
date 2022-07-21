@@ -20,7 +20,6 @@
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 interface AttributesType {
-  GRPC_KIND: string;
   RPC_SYSTEM: string;
   GRPC_METHOD: string;
   RPC_SERVICE: string;
@@ -33,7 +32,6 @@ const RPC_SYSTEM  = SemanticAttributes.RPC_SYSTEM;
 const RPC_SERVICE  = SemanticAttributes.RPC_SERVICE;
 
 export const AttributeNames: Readonly<AttributesType> = {
-  GRPC_KIND: 'grpc.kind', // SERVER or CLIENT
   RPC_SYSTEM: RPC_SYSTEM,
   GRPC_METHOD: RPC_METHOD,
   RPC_SERVICE: RPC_SERVICE,
