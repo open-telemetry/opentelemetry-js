@@ -29,8 +29,6 @@ import {
 } from '@opentelemetry/api';
 import { CompositePropagator } from '@opentelemetry/core';
 import {
-  AlwaysOffSampler,
-  AlwaysOnSampler,
   TraceState,
   W3CTraceContextPropagator,
 } from '@opentelemetry/core';
@@ -44,6 +42,8 @@ import {
   InMemorySpanExporter,
   SpanExporter,
   BatchSpanProcessor,
+  AlwaysOnSampler,
+  AlwaysOffSampler,
 } from '../../src';
 
 class DummyPropagator implements TextMapPropagator {

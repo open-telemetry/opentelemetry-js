@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-/** IdGenerator provides an interface for generating Trace Id and Span Id */
+/**
+ * @deprecated Use the one defined in @opentelemetry/sdk-trace-base instead.
+ * IdGenerator provides an interface for generating Trace Id and Span Id.
+ */
 export interface IdGenerator {
   /** Returns a trace ID composed of 32 lowercase hex characters. */
   generateTraceId(): string;

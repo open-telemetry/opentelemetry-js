@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { Sampler } from '@opentelemetry/api';
 import { buildSamplerFromEnv, DEFAULT_CONFIG } from './config';
+import { Sampler } from './Sampler';
 import { SpanLimits, TracerConfig, GeneralLimits } from './types';
 
 /**

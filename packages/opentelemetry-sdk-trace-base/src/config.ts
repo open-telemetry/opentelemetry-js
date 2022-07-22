@@ -16,15 +16,15 @@
 
 import { diag } from '@opentelemetry/api';
 import {
-  AlwaysOffSampler,
-  AlwaysOnSampler,
   getEnv,
   TracesSamplerValues,
-  ParentBasedSampler,
   ENVIRONMENT,
-  TraceIdRatioBasedSampler,
 } from '@opentelemetry/core';
 import { Sampler } from './Sampler';
+import { AlwaysOffSampler } from './sampler/AlwaysOffSampler';
+import { AlwaysOnSampler } from './sampler/AlwaysOnSampler';
+import { ParentBasedSampler } from './sampler/ParentBasedSampler';
+import { TraceIdRatioBasedSampler } from './sampler/TraceIdRatioBasedSampler';
 
 const env = getEnv();
 const FALLBACK_OTEL_TRACES_SAMPLER = TracesSamplerValues.AlwaysOn;
