@@ -15,18 +15,69 @@
  */
 
 import * as assert from 'assert';
-import { Aggregation } from '../../src/view/Aggregation';
 import { AttributesProcessor } from '../../src/view/AttributesProcessor';
 import { View } from '../../src/view/View';
+import { InstrumentType, Aggregation, ExplicitBucketHistogramAggregation } from '../../src';
 
 describe('View', () => {
   describe('constructor', () => {
-    it('should construct view without arguments', () => {
-      const view = new View();
-      assert.strictEqual(view.name, undefined);
-      assert.strictEqual(view.description, undefined);
-      assert.strictEqual(view.aggregation, Aggregation.Default());
-      assert.strictEqual(view.attributesProcessor, AttributesProcessor.Noop());
+    it('should construct default view with no view arguments provided', () => {
+      {
+        const view = new View({instrumentName: '*'});
+        assert.strictEqual(view.name, undefined);
+        assert.strictEqual(view.description, undefined);
+        assert.strictEqual(view.aggregation, Aggregation.Default());
+        assert.strictEqual(view.attributesProcessor, AttributesProcessor.Noop());
+      }
+      {
+        const view = new View({meterName: '*'});
+        assert.strictEqual(view.name, undefined);
+        assert.strictEqual(view.description, undefined);
+        assert.strictEqual(view.aggregation, Aggregation.Default());
+        assert.strictEqual(view.attributesProcessor, AttributesProcessor.Noop());
+      }
+    });
+
+    it('without at least one selector option should throw', () => {
+      // would do nothing
+      assert.throws(() => new View({}));
+      // would implicitly rename all instruments to 'name'
+      assert.throws(() => new View({ name: 'name' }));
+      // would implicitly drop all attribute keys on all instruments except 'key'
+      assert.throws(() => new View({ attributeKeys: ['key'] }));
+      // would implicitly rename all instruments to description
+      assert.throws(() => new View({ description: 'description' }));
+      // would implicitly change all instruments to use histogram aggregation
+      assert.throws(() => new View({
+        aggregation: new ExplicitBucketHistogramAggregation([1, 100])
+      }));
+    });
+
+    it('with named view and no instrument selector should throw', () => {
+      assert.throws(() => new View({
+        name: 'named-view'
+      }));
+    });
+
+    it('with named view and instrument wildcard should throw', () => {
+      // Throws with wildcard character only.
+      assert.throws(() => new View({
+        name: 'renamed-instrument',
+        instrumentName: '*'
+      }));
+
+      // Throws with wildcard character in instrument name.
+      assert.throws(() => new View({
+        name: 'renamed-instrument',
+        instrumentName: 'instrument.name.*'
+      }));
+    });
+
+    it('with named view and instrument type selector should throw', () => {
+      assert.throws(() => new View({
+        name: 'renamed-instrument',
+        instrumentType: InstrumentType.COUNTER
+      }));
     });
   });
 });

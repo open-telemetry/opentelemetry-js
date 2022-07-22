@@ -68,7 +68,7 @@ describe('AsyncMetricStorage', () => {
             collectors,
             collectionTime);
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 3);
           assertDataPoint(metric.dataPoints[0], { key: '1' }, 1, collectionTime, collectionTime);
           assertDataPoint(metric.dataPoints[1], { key: '2' }, 2, collectionTime, collectionTime);
@@ -85,7 +85,7 @@ describe('AsyncMetricStorage', () => {
             collectors,
             collectionTime);
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 0);
         }
 
@@ -102,7 +102,7 @@ describe('AsyncMetricStorage', () => {
             collectors,
             collectionTime);
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 3);
           // All values were diffed. StartTime is being reset for gaps.
           assertDataPoint(metric.dataPoints[0], { key: '1' }, 3, collectionTime, collectionTime);
@@ -140,7 +140,7 @@ describe('AsyncMetricStorage', () => {
             collectors,
             collectionTime);
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], { key: '1' }, 100, collectionTime, collectionTime);
           lastCollectionTime = collectionTime;
@@ -159,7 +159,7 @@ describe('AsyncMetricStorage', () => {
             collectors,
             collectionTime);
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], { key: '1' }, 1, lastCollectionTime, collectionTime);
           lastCollectionTime = collectionTime;
@@ -178,7 +178,7 @@ describe('AsyncMetricStorage', () => {
             collectors,
             collectionTime);
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], { key: '1' }, 49, lastCollectionTime, collectionTime);
         }
@@ -213,7 +213,7 @@ describe('AsyncMetricStorage', () => {
             collectors,
             collectionTime);
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], { key: '1' }, 100, collectionTime, collectionTime);
           lastCollectionTime = collectionTime;
@@ -232,7 +232,7 @@ describe('AsyncMetricStorage', () => {
             collectors,
             collectionTime);
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], { key: '1' }, -99, lastCollectionTime, collectionTime);
           lastCollectionTime = collectionTime;
@@ -252,7 +252,7 @@ describe('AsyncMetricStorage', () => {
             collectors,
             collectionTime);
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], { key: '1' }, 49, lastCollectionTime, collectionTime);
         }
@@ -292,7 +292,7 @@ describe('AsyncMetricStorage', () => {
             collectionTime);
 
           startTime = collectionTime;
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 3);
           assertDataPoint(metric.dataPoints[0], { key: '1' }, 1, startTime, collectionTime);
           assertDataPoint(metric.dataPoints[1], { key: '2' }, 2, startTime, collectionTime);
@@ -309,7 +309,7 @@ describe('AsyncMetricStorage', () => {
             collectors,
             collectionTime);
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 3);
           assertDataPoint(metric.dataPoints[0], { key: '1' }, 1, startTime, collectionTime);
           assertDataPoint(metric.dataPoints[1], { key: '2' }, 2, startTime, collectionTime);
@@ -329,7 +329,7 @@ describe('AsyncMetricStorage', () => {
             collectors,
             collectionTime);
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 3);
           assertDataPoint(metric.dataPoints[0], { key: '1' }, 4, startTime, collectionTime);
           assertDataPoint(metric.dataPoints[1], { key: '2' }, 5, startTime, collectionTime);
@@ -367,7 +367,7 @@ describe('AsyncMetricStorage', () => {
             collectionTime);
 
           startTime = collectionTime;
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], { key: '1' }, 100, startTime, collectionTime);
         }
@@ -385,7 +385,7 @@ describe('AsyncMetricStorage', () => {
             collectors,
             collectionTime);
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
           // The startTime should be reset.
           assertDataPoint(metric.dataPoints[0], { key: '1' }, 1, collectionTime, collectionTime);
@@ -405,7 +405,7 @@ describe('AsyncMetricStorage', () => {
             collectors,
             collectionTime);
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], { key: '1' }, 50, startTime, collectionTime);
         }
@@ -441,7 +441,7 @@ describe('AsyncMetricStorage', () => {
             collectionTime);
 
           startTime = collectionTime;
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], { key: '1' }, 100, startTime, collectionTime);
         }
@@ -459,7 +459,7 @@ describe('AsyncMetricStorage', () => {
             collectors,
             collectionTime);
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
           // No reset on the value or the startTime
           assertDataPoint(metric.dataPoints[0], { key: '1' }, 1, startTime, collectionTime);
@@ -478,7 +478,7 @@ describe('AsyncMetricStorage', () => {
             collectors,
             collectionTime);
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], { key: '1' }, 50, startTime, collectionTime);
         }
