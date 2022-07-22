@@ -70,8 +70,10 @@ export function reconfigureLimits(userConfig: TracerConfig): TracerConfig {
   const DEFAULT_CONFIG = loadDefaultConfig();
 
   /**
-   * When span attribute count limit is not defined, but general attribute count limit is defined
-   * Then, span attribute count limit will be same as general one
+   * If span attribute count limit is not defined programatically and through the env variable
+   * And general attribute count limit was either defined programatically or through the env variable
+   * Then set the span attribute count limit to be equal to the general attribute value length limit
+   * that was set programitcally or through the env variable.
    */
   if (
     spanLimits.attributeCountLimit == null &&
@@ -89,8 +91,10 @@ export function reconfigureLimits(userConfig: TracerConfig): TracerConfig {
   }
 
   /**
-   * When span attribute value length limit is not defined, but general attribute value length limit is defined
-   * Then, span attribute value length limit will be same as general one
+   * If span attribute value length limit is not defined programatically and through the env variable
+   * And general attribute value length limit was either defined programatically or through the env variable
+   * Then set the span attribute value length limit to be equal to the general attribute value length limit
+   * that was set programitcally or through the env variable.
    */
   if (
     spanLimits.attributeValueLengthLimit == null &&
