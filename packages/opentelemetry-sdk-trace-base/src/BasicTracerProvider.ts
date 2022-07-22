@@ -202,12 +202,23 @@ export class BasicTracerProvider implements TracerProvider {
     return this.activeSpanProcessor.shutdown();
   }
 
+  /**
+   * TS cannot yet infer the type of this.constructor:
+   * https://github.com/Microsoft/TypeScript/issues/3841#issuecomment-337560146
+   * There is no need to override either of the getters in your child class.
+   * The type of the registered component maps should be the same across all
+   * classes in the inheritance tree.
+   */
   protected _getPropagator(name: string): TextMapPropagator | undefined {
-    return BasicTracerProvider._registeredPropagators.get(name)?.();
+    return (
+      (this.constructor as typeof BasicTracerProvider)._registeredPropagators
+    ).get(name)?.();
   }
 
   protected _getSpanExporter(name: string): SpanExporter | undefined {
-    return BasicTracerProvider._registeredExporters.get(name)?.();
+    return (
+      (this.constructor as typeof BasicTracerProvider)._registeredExporters
+    ).get(name)?.();
   }
 
   protected _buildPropagatorFromEnv(): TextMapPropagator | undefined {

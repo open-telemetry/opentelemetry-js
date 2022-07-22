@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { TextMapPropagator } from '@opentelemetry/api';
 import {
   AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
@@ -40,6 +39,7 @@ export class NodeTracerProvider extends BasicTracerProvider {
     string,
     PROPAGATOR_FACTORY
   >([
+    ...BasicTracerProvider._registeredPropagators,
     [
       'b3',
       () =>
@@ -66,12 +66,5 @@ export class NodeTracerProvider extends BasicTracerProvider {
     }
 
     super.register(config);
-  }
-
-  protected override  _getPropagator(name: string): TextMapPropagator | undefined {
-    return (
-      super._getPropagator(name) ||
-      NodeTracerProvider._registeredPropagators.get(name)?.()
-    );
   }
 }
