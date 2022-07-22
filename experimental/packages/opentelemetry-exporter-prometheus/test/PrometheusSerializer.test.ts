@@ -412,15 +412,11 @@ describe('PrometheusSerializer', () => {
           '# HELP test foobar\n' +
           '# TYPE test histogram\n' +
           `test_count{val="1"} 3 ${mockedHrTimeMs}\n` +
-          // undefined sum should be 0 (mimics collector exporter)
-          `test_sum{val="1"} 0 ${mockedHrTimeMs}\n` +
           `test_bucket{val="1",le="1"} 0 ${mockedHrTimeMs}\n` +
           `test_bucket{val="1",le="10"} 1 ${mockedHrTimeMs}\n` +
           `test_bucket{val="1",le="100"} 2 ${mockedHrTimeMs}\n` +
           `test_bucket{val="1",le="+Inf"} 3 ${mockedHrTimeMs}\n` +
           `test_count{val="2"} 1 ${mockedHrTimeMs}\n` +
-          // undefined sum should be 0 (mimics collector exporter)
-          `test_sum{val="2"} 0 ${mockedHrTimeMs}\n` +
           `test_bucket{val="2",le="1"} 0 ${mockedHrTimeMs}\n` +
           `test_bucket{val="2",le="10"} 1 ${mockedHrTimeMs}\n` +
           `test_bucket{val="2",le="100"} 1 ${mockedHrTimeMs}\n` +
