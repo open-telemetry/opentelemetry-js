@@ -190,7 +190,7 @@ describe('BasicTracerProvider', () => {
           assert.strictEqual(generalLimits.attributeValueLengthLimit, 115);
           delete envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
         });
-        it('should have span attribute value length limits value same as general limit value', () => {
+        it('should have span attribute value length limit value same as general limit value', () => {
           envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '125';
           const tracer = new BasicTracerProvider().getTracer('default');
           const generalLimits = tracer.getGeneralLimits();
@@ -220,7 +220,7 @@ describe('BasicTracerProvider', () => {
           assert.strictEqual(generalLimits.attributeCountLimit, 25);
           delete envSource.OTEL_ATTRIBUTE_COUNT_LIMIT;
         });
-        it('should have span attribute countlimits value same as general limit value', () => {
+        it('should have span attribute count limit value same as general limit value', () => {
           envSource.OTEL_ATTRIBUTE_COUNT_LIMIT = '20';
           const tracer = new BasicTracerProvider().getTracer('default');
           const generalLimits = tracer.getGeneralLimits();
