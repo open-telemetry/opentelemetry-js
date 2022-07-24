@@ -22,6 +22,7 @@ module.exports = (serviceName) => {
         resource: new Resource({
           [SemanticResourceAttributes.SERVICE_NAME]: serviceName,
         }),
+        //sampler is used to make decisions on span sampling
         sampler: new ParentBasedSampler({
           root : new TraceIdRatioBasedSampler(1)
         })
@@ -32,7 +33,11 @@ module.exports = (serviceName) => {
     provider.register();
     registerInstrumentations({
         instrumentations: [
-        new HttpInstrumentation(),
+        new HttpInstrumentation({
+          requestHook : (span,request) => {
+            span.setAttribute("Custom request hook attribute" , "request")
+          },
+        }),
         new ExpressInstrumentation(),
         ],
         tracerProvider: provider,
