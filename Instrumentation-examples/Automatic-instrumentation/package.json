@@ -1,0 +1,31 @@
+{
+  "name": "automatic-instrumentation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "books": "ENDPOINT=127.0.0.1:3001  ts-node-dev  ./books.ts",
+    "dashboard": "ENDPOINT=127.0.0.1:3002  ts-node-dev   ./dashboard.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@opentelemetry/api": "^1.1.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.31.0",
+    "@opentelemetry/core": "^1.4.0",
+    "@opentelemetry/exporter-zipkin": "^1.4.0",
+    "@opentelemetry/resources": "^1.4.0",
+    "@opentelemetry/sdk-node": "^0.30.0",
+    "@opentelemetry/sdk-trace-base": "^1.4.0",
+    "@opentelemetry/sdk-trace-node": "^1.4.0",
+    "@opentelemetry/semantic-conventions": "^1.4.0",
+    "@types/axios": "^0.14.0",
+    "@types/express": "^4.17.13",
+    "axios": "^0.27.2",
+    "express": "^4.18.1",
+    "node-fetch": "^2.6.7",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^4.7.4"
+  }
+}
