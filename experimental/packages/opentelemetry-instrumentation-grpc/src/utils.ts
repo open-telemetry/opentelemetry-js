@@ -108,5 +108,5 @@ export const _extractMethodAndService = (name: string): { service: string, metho
   return ({
     service,
     method
-  })
+  });
 };
