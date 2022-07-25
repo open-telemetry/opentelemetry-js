@@ -20,27 +20,10 @@ import { AggregationTemporality } from '../../src/export/AggregationTemporality'
 import { InMemoryMetricExporter } from '../../src/export/InMemoryMetricExporter';
 import { ResourceMetrics } from '../../src/export/MetricData';
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
+import { Meter } from '../../src/Meter';
 import { MeterProvider } from '../../src/MeterProvider';
 import { defaultResource } from '../util';
 
-function setup() {
-  const exporter = new InMemoryMetricExporter(AggregationTemporality.CUMULATIVE);
-  const meterProvider = new MeterProvider({ resource: defaultResource });
-  const meter = meterProvider.getMeter('InMemoryMetricExporter', '1.0.0');
-  const meterReader = new PeriodicExportingMetricReader({
-    exporter: exporter,
-    exportIntervalMillis: 100,
-    exportTimeoutMillis: 100
-  });
-  meterProvider.addMetricReader(meterReader);
-
-  return {
-    meterProvider,
-    meter,
-    meterReader,
-    exporter,
-  };
-}
 async function waitForNumberOfExports(exporter: InMemoryMetricExporter , numberOfExports: number): Promise<ResourceMetrics[]> {
   if (numberOfExports <= 0) {
     throw new Error('numberOfExports must be greater than or equal to 0');
@@ -57,6 +40,27 @@ async function waitForNumberOfExports(exporter: InMemoryMetricExporter , numberO
 }
 
 describe('InMemoryMetricExporter', () => {
+  let exporter: InMemoryMetricExporter;
+  let meterProvider: MeterProvider;
+  let meterReader: PeriodicExportingMetricReader;
+  let meter: MeterProvider;
+
+  beforeEach(() => {
+    exporter = new InMemoryMetricExporter(AggregationTemporality.CUMULATIVE);
+    meterProvider = new MeterProvider({ resource: defaultResource });
+    meter = meterProvider.getMeter('InMemoryMetricExporter', '1.0.0');
+    meterReader = new PeriodicExportingMetricReader({
+      exporter: exporter,
+      exportIntervalMillis: 100,
+      exportTimeoutMillis: 100
+    });
+    meterProvider.addMetricReader(meterReader);
+  });
+
+  afterEach(async () => {
+    await exporter.shutdown();
+    await meterReader.shutdown();
+  });
 
   it('should return failed result code', done => {
     const { exporter, meterReader } = setup();
@@ -87,7 +91,7 @@ describe('InMemoryMetricExporter', () => {
     });
   });
 
-  it('should reset metrics when forceFlush is called', async () => {
+  it('should reset metrics when reset is called', async () => {
     const {
       meter,
       meterReader,
@@ -103,7 +107,7 @@ describe('InMemoryMetricExporter', () => {
     const exportedMetrics = await waitForNumberOfExports(exporter, 1);
     assert.ok(exportedMetrics.length > 0);
 
-    await exporter.forceFlush();
+    exporter.reset();
 
     const otherMetrics = exporter.getMetrics();
     assert.ok(otherMetrics.length === 0);
@@ -153,6 +157,4 @@ describe('InMemoryMetricExporter', () => {
 
     await meterReader.shutdown();
   });
-
-
 });

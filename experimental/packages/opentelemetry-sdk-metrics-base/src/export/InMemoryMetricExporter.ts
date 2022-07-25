@@ -58,8 +58,11 @@ export class InMemoryMetricExporter implements PushMetricExporter {
   }
 
   async forceFlush() {
-    this._metrics = [];
     return Promise.resolve();
+  }
+
+  reset() {
+    this._metrics = [];
   }
 
   selectAggregationTemporality(_instrumentType: InstrumentType): AggregationTemporality {
