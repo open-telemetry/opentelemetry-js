@@ -112,16 +112,16 @@ export function assertDataPoint(
   assert.deepStrictEqual(it.attributes, attributes);
   assert.deepStrictEqual(it.value, point);
   if (startTime) {
-    assert.deepStrictEqual(it.startTime, startTime);
+    assert.deepStrictEqual(it.startTime, startTime, 'startTime should be equal');
   } else {
     assert(Array.isArray(it.startTime));
-    assert.strictEqual(it.startTime.length, 2);
+    assert.strictEqual(it.startTime.length, 2, 'startTime should be equal');
   }
   if (endTime) {
-    assert.deepStrictEqual(it.endTime, endTime);
+    assert.deepStrictEqual(it.endTime, endTime, 'endTime should be equal');
   } else {
     assert(Array.isArray(it.endTime));
-    assert.strictEqual(it.endTime.length, 2);
+    assert.strictEqual(it.endTime.length, 2, 'endTime should be equal');
   }
 }
 

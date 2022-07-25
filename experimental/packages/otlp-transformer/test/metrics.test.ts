@@ -29,9 +29,77 @@ import { hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
 
 const START_TIME = hrTime();
 const END_TIME = hrTime();
+const ATTRIBUTES = {
+  'string-attribute': 'some attribute value',
+  'int-attribute': 1,
+  'double-attribute': 1.1,
+  'boolean-attribute': true,
+  'array-attribute': ['attribute value 1', 'attribute value 2'],
+};
 
 describe('Metrics', () => {
   describe('createExportMetricsServiceRequest', () => {
+    const expectedResource = {
+      attributes: [
+        {
+          key: 'resource-attribute',
+          value: {
+            stringValue: 'resource attribute value',
+          },
+        },
+      ],
+      droppedAttributesCount: 0,
+    };
+
+    const expectedScope = {
+      name: 'mylib',
+      version: '0.1.0',
+    };
+
+    const expectedSchemaUrl = 'http://url.to.schema';
+
+    const expectedAttributes = [
+      {
+        key: 'string-attribute',
+        value: {
+          stringValue: 'some attribute value',
+        },
+      },
+      {
+        key: 'int-attribute',
+        value: {
+          intValue: 1,
+        },
+      },
+      {
+        key: 'double-attribute',
+        value: {
+          doubleValue: 1.1,
+        },
+      },
+      {
+        key: 'boolean-attribute',
+        value: {
+          boolValue: true,
+        },
+      },
+      {
+        key: 'array-attribute',
+        value: {
+          arrayValue: {
+            values: [
+              {
+                stringValue: 'attribute value 1',
+              },
+              {
+                stringValue: 'attribute value 2',
+              }
+            ]
+          },
+        },
+      },
+    ];
+
     function createCounterData(value: number, aggregationTemporality: AggregationTemporality): MetricData {
       return {
         descriptor: {
@@ -42,13 +110,37 @@ describe('Metrics', () => {
           valueType: ValueType.INT,
         },
         aggregationTemporality,
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: true,
         dataPoints: [
           {
             value: value,
             startTime: START_TIME,
             endTime: END_TIME,
-            attributes: { 'string-attribute': 'some attribute value' }
+            attributes: ATTRIBUTES,
+          }
+        ]
+      };
+    }
+
+    function createUpDownCounterData(value: number, aggregationTemporality: AggregationTemporality): MetricData {
+      return {
+        descriptor: {
+          description: 'this is a description',
+          type: InstrumentType.UP_DOWN_COUNTER,
+          name: 'up-down-counter',
+          unit: '1',
+          valueType: ValueType.INT,
+        },
+        aggregationTemporality,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: false,
+        dataPoints: [
+          {
+            value: value,
+            startTime: START_TIME,
+            endTime: END_TIME,
+            attributes: ATTRIBUTES
           }
         ]
       };
@@ -64,17 +156,42 @@ describe('Metrics', () => {
           valueType: ValueType.INT,
         },
         aggregationTemporality,
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: true,
         dataPoints: [
           {
             value: value,
             startTime: START_TIME,
             endTime: END_TIME,
-            attributes: { 'string-attribute': 'some attribute value' }
+            attributes: ATTRIBUTES,
           }
         ]
       };
     }
+
+    function createObservableUpDownCounterData(value: number, aggregationTemporality: AggregationTemporality): MetricData {
+      return {
+        descriptor: {
+          description: 'this is a description',
+          type: InstrumentType.OBSERVABLE_UP_DOWN_COUNTER,
+          name: 'observable-up-down-counter',
+          unit: '1',
+          valueType: ValueType.INT,
+        },
+        aggregationTemporality,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: false,
+        dataPoints: [
+          {
+            value: value,
+            startTime: START_TIME,
+            endTime: END_TIME,
+            attributes: ATTRIBUTES,
+          }
+        ]
+      };
+    }
+
 
     function createObservableGaugeData(value: number): MetricData {
       return {
@@ -86,19 +203,25 @@ describe('Metrics', () => {
           valueType: ValueType.DOUBLE,
         },
         aggregationTemporality: AggregationTemporality.CUMULATIVE,
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.GAUGE,
         dataPoints: [
           {
             value: value,
             startTime: START_TIME,
             endTime: END_TIME,
-            attributes: { 'string-attribute': 'some attribute value' }
+            attributes: ATTRIBUTES,
           }
         ]
       };
     }
 
-    function createHistogramMetrics(count: number, sum: number, boundaries: number[], counts: number[], aggregationTemporality: AggregationTemporality): MetricData {
+    function createHistogramMetrics(count: number,
+      sum: number,
+      boundaries: number[],
+      counts: number[], aggregationTemporality: AggregationTemporality,
+      hasMinMax: boolean,
+      min: number,
+      max: number): MetricData {
       return {
         descriptor: {
           description: 'this is a description',
@@ -114,6 +237,9 @@ describe('Metrics', () => {
             value: {
               sum: sum,
               count: count,
+              hasMinMax: hasMinMax,
+              min: min,
+              max: max,
               buckets: {
                 boundaries: boundaries,
                 counts: counts
@@ -121,7 +247,7 @@ describe('Metrics', () => {
             },
             startTime: START_TIME,
             endTime: END_TIME,
-            attributes: { 'string-attribute': 'some attribute value' },
+            attributes: ATTRIBUTES,
           }
         ]
       };
@@ -139,7 +265,7 @@ describe('Metrics', () => {
               scope: {
                 name: 'mylib',
                 version: '0.1.0',
-                schemaUrl: 'http://url.to.schema'
+                schemaUrl: expectedSchemaUrl
               },
               metrics: metricData,
             }
@@ -147,7 +273,7 @@ describe('Metrics', () => {
       };
     }
 
-    it('serializes a sum metric record', () => {
+    it('serializes a monotonic sum metric record', () => {
       const metrics = createResourceMetrics([createCounterData(10, AggregationTemporality.DELTA)]);
       const exportRequest = createExportMetricsServiceRequest([metrics]);
       assert.ok(exportRequest);
@@ -155,25 +281,12 @@ describe('Metrics', () => {
       assert.deepStrictEqual(exportRequest, {
         resourceMetrics: [
           {
-            resource: {
-              attributes: [
-                {
-                  key: 'resource-attribute',
-                  value: {
-                    stringValue: 'resource attribute value',
-                  },
-                },
-              ],
-              droppedAttributesCount: 0,
-            },
+            resource: expectedResource,
             schemaUrl: undefined,
             scopeMetrics: [
               {
-                scope: {
-                  name: 'mylib',
-                  version: '0.1.0',
-                },
-                schemaUrl: 'http://url.to.schema',
+                scope: expectedScope,
+                schemaUrl: expectedSchemaUrl,
                 metrics: [
                   {
                     name: 'counter',
@@ -182,14 +295,7 @@ describe('Metrics', () => {
                     sum: {
                       dataPoints: [
                         {
-                          attributes: [
-                            {
-                              key: 'string-attribute',
-                              value: {
-                                stringValue: 'some attribute value',
-                              },
-                            },
-                          ],
+                          attributes: expectedAttributes,
                           startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
                           timeUnixNano: hrTimeToNanoseconds(END_TIME),
                           asInt: 10,
@@ -207,7 +313,47 @@ describe('Metrics', () => {
       });
     });
 
-    it('serializes an observable sum metric record', () => {
+    it('serializes a non-monotonic sum metric record', () => {
+      const metrics = createResourceMetrics([createUpDownCounterData(10, AggregationTemporality.DELTA)]);
+      const exportRequest = createExportMetricsServiceRequest([metrics]);
+      assert.ok(exportRequest);
+
+      assert.deepStrictEqual(exportRequest, {
+        resourceMetrics: [
+          {
+            resource: expectedResource,
+            schemaUrl: undefined,
+            scopeMetrics: [
+              {
+                scope: expectedScope,
+                schemaUrl: expectedSchemaUrl,
+                metrics: [
+                  {
+                    name: 'up-down-counter',
+                    description: 'this is a description',
+                    unit: '1',
+                    sum: {
+                      dataPoints: [
+                        {
+                          attributes: expectedAttributes,
+                          startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
+                          timeUnixNano: hrTimeToNanoseconds(END_TIME),
+                          asInt: 10,
+                        },
+                      ],
+                      aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_DELTA,
+                      isMonotonic: false,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it('serializes an observable monotonic sum metric record', () => {
       const exportRequest = createExportMetricsServiceRequest(
         [createResourceMetrics([createObservableCounterData(10, AggregationTemporality.DELTA)])]
       );
@@ -216,25 +362,12 @@ describe('Metrics', () => {
       assert.deepStrictEqual(exportRequest, {
         resourceMetrics: [
           {
-            resource: {
-              attributes: [
-                {
-                  key: 'resource-attribute',
-                  value: {
-                    stringValue: 'resource attribute value',
-                  },
-                },
-              ],
-              droppedAttributesCount: 0,
-            },
+            resource: expectedResource,
             schemaUrl: undefined,
             scopeMetrics: [
               {
-                scope: {
-                  name: 'mylib',
-                  version: '0.1.0',
-                },
-                schemaUrl: 'http://url.to.schema',
+                scope: expectedScope,
+                schemaUrl: expectedSchemaUrl,
                 metrics: [
                   {
                     name: 'observable-counter',
@@ -243,14 +376,7 @@ describe('Metrics', () => {
                     sum: {
                       dataPoints: [
                         {
-                          attributes: [
-                            {
-                              key: 'string-attribute',
-                              value: {
-                                stringValue: 'some attribute value',
-                              },
-                            },
-                          ],
+                          attributes: expectedAttributes,
                           startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
                           timeUnixNano: hrTimeToNanoseconds(END_TIME),
                           asInt: 10,
@@ -258,6 +384,47 @@ describe('Metrics', () => {
                       ],
                       aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_DELTA,
                       isMonotonic: true,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it('serializes an observable non-monotonic sum metric record', () => {
+      const exportRequest = createExportMetricsServiceRequest(
+        [createResourceMetrics([createObservableUpDownCounterData(10, AggregationTemporality.DELTA)])]
+      );
+      assert.ok(exportRequest);
+
+      assert.deepStrictEqual(exportRequest, {
+        resourceMetrics: [
+          {
+            resource: expectedResource,
+            schemaUrl: undefined,
+            scopeMetrics: [
+              {
+                scope: expectedScope,
+                schemaUrl: expectedSchemaUrl,
+                metrics: [
+                  {
+                    name: 'observable-up-down-counter',
+                    description: 'this is a description',
+                    unit: '1',
+                    sum: {
+                      dataPoints: [
+                        {
+                          attributes: expectedAttributes,
+                          startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
+                          timeUnixNano: hrTimeToNanoseconds(END_TIME),
+                          asInt: 10,
+                        },
+                      ],
+                      aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_DELTA,
+                      isMonotonic: false,
                     },
                   },
                 ],
@@ -277,25 +444,12 @@ describe('Metrics', () => {
       assert.deepStrictEqual(exportRequest, {
         resourceMetrics: [
           {
-            resource: {
-              attributes: [
-                {
-                  key: 'resource-attribute',
-                  value: {
-                    stringValue: 'resource attribute value',
-                  },
-                },
-              ],
-              droppedAttributesCount: 0,
-            },
+            resource: expectedResource,
             schemaUrl: undefined,
             scopeMetrics: [
               {
-                scope: {
-                  name: 'mylib',
-                  version: '0.1.0',
-                },
-                schemaUrl: 'http://url.to.schema',
+                scope: expectedScope,
+                schemaUrl: expectedSchemaUrl,
                 metrics: [
                   {
                     name: 'gauge',
@@ -304,14 +458,7 @@ describe('Metrics', () => {
                     gauge: {
                       dataPoints: [
                         {
-                          attributes: [
-                            {
-                              key: 'string-attribute',
-                              value: {
-                                stringValue: 'some attribute value',
-                              },
-                            },
-                          ],
+                          attributes: expectedAttributes,
                           startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
                           timeUnixNano: hrTimeToNanoseconds(END_TIME),
                           asDouble: 10.5,
@@ -327,66 +474,95 @@ describe('Metrics', () => {
       });
     });
 
-    it('serializes a histogram metric record', () => {
-      const exportRequest = createExportMetricsServiceRequest(
-        [createResourceMetrics([createHistogramMetrics(2, 9, [5], [1,1], AggregationTemporality.CUMULATIVE)])]
-      );
-      assert.ok(exportRequest);
+    describe('serializes a histogram metric record', () => {
+      it('with min/max', () => {
+        const exportRequest = createExportMetricsServiceRequest(
+          [createResourceMetrics([createHistogramMetrics(2, 9, [5], [1, 1], AggregationTemporality.CUMULATIVE, true,1, 8)])]
+        );
+        assert.ok(exportRequest);
 
-      assert.deepStrictEqual(exportRequest, {
-        resourceMetrics: [
-          {
-            resource: {
-              attributes: [
+        assert.deepStrictEqual(exportRequest, {
+          resourceMetrics: [
+            {
+              resource: expectedResource,
+              schemaUrl: undefined,
+              scopeMetrics: [
                 {
-                  key: 'resource-attribute',
-                  value: {
-                    stringValue: 'resource attribute value',
-                  },
+                  scope: expectedScope,
+                  schemaUrl: expectedSchemaUrl,
+                  metrics: [
+                    {
+                      name: 'hist',
+                      description: 'this is a description',
+                      unit: '1',
+                      histogram: {
+                        aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
+                        dataPoints: [
+                          {
+                            attributes: expectedAttributes,
+                            bucketCounts: [1, 1],
+                            count: 2,
+                            explicitBounds: [5],
+                            sum: 9,
+                            min: 1,
+                            max: 8,
+                            startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
+                            timeUnixNano: hrTimeToNanoseconds(END_TIME),
+                          },
+                        ],
+                      },
+                    },
+                  ],
                 },
               ],
-              droppedAttributesCount: 0,
             },
-            schemaUrl: undefined,
-            scopeMetrics: [
-              {
-                scope: {
-                  name: 'mylib',
-                  version: '0.1.0',
-                },
-                schemaUrl: 'http://url.to.schema',
-                metrics: [
-                  {
-                    name: 'hist',
-                    description: 'this is a description',
-                    unit: '1',
-                    histogram: {
-                      aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
-                      dataPoints: [
-                        {
-                          attributes: [
-                            {
-                              key: 'string-attribute',
-                              value: {
-                                stringValue: 'some attribute value',
-                              },
-                            },
-                          ],
-                          bucketCounts: [1, 1],
-                          count: 2,
-                          explicitBounds: [5],
-                          sum: 9,
-                          startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
-                          timeUnixNano: hrTimeToNanoseconds(END_TIME),
-                        },
-                      ],
+          ],
+        });
+      });
+
+      it('without min/max', () => {
+        const exportRequest = createExportMetricsServiceRequest(
+          [createResourceMetrics([createHistogramMetrics(2, 9, [5], [1, 1], AggregationTemporality.CUMULATIVE, false, Infinity, -1)])]
+        );
+        assert.ok(exportRequest);
+
+        assert.deepStrictEqual(exportRequest, {
+          resourceMetrics: [
+            {
+              resource: expectedResource,
+              schemaUrl: undefined,
+              scopeMetrics: [
+                {
+                  scope: expectedScope,
+                  schemaUrl: expectedSchemaUrl,
+                  metrics: [
+                    {
+                      name: 'hist',
+                      description: 'this is a description',
+                      unit: '1',
+                      histogram: {
+                        aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_CUMULATIVE,
+                        dataPoints: [
+                          {
+                            attributes: expectedAttributes,
+                            bucketCounts: [1, 1],
+                            count: 2,
+                            explicitBounds: [5],
+                            sum: 9,
+                            min: undefined,
+                            max: undefined,
+                            startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
+                            timeUnixNano: hrTimeToNanoseconds(END_TIME),
+                          },
+                        ],
+                      },
                     },
-                  },
-                ],
-              },
-            ],
-          },
-        ],
+                  ],
+                },
+              ],
+            },
+          ],
+        });
       });
     });
   });

@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { HrTime } from '@opentelemetry/api';
-import { hrTime, InstrumentationScope } from '@opentelemetry/core';
+import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { instrumentationScopeId } from '../utils';
 import { ViewRegistry } from '../view/ViewRegistry';
@@ -27,7 +26,6 @@ import { MetricCollector } from './MetricCollector';
  */
 export class MeterProviderSharedState {
   viewRegistry = new ViewRegistry();
-  readonly sdkStartTime: HrTime = hrTime();
 
   metricCollectors: MetricCollector[] = [];
 

@@ -15,7 +15,7 @@
  */
 
 import { HrTime } from '@opentelemetry/api';
-import { AccumulationRecord, Aggregator } from '../aggregator/types';
+import { Accumulation, AccumulationRecord, Aggregator } from '../aggregator/types';
 import { MetricData } from '../export/MetricData';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { AggregationTemporality } from '../export/AggregationTemporality';
@@ -26,7 +26,7 @@ import { AttributeHashMap } from './HashMap';
 /**
  * Remembers what was presented to a specific exporter.
  */
-interface LastReportedHistory<T> {
+interface LastReportedHistory<T extends Maybe<Accumulation>> {
   /**
    * The last accumulation of metric data.
    */
@@ -47,7 +47,7 @@ interface LastReportedHistory<T> {
  * Provides unique reporting for each collectors. Allows synchronous collection
  * of metrics and reports given temporality values.
  */
-export class TemporalMetricProcessor<T> {
+export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
   private _unreportedAccumulations = new Map<MetricCollectorHandle, AttributeHashMap<T>[]>();
   private _reportHistory = new Map<MetricCollectorHandle, LastReportedHistory<T>>();
 
@@ -61,7 +61,6 @@ export class TemporalMetricProcessor<T> {
    * @param instrumentationScope The instrumentation scope that generated these metrics.
    * @param instrumentDescriptor The instrumentation descriptor that these metrics generated with.
    * @param currentAccumulations The current accumulation of metric data from instruments.
-   * @param sdkStartTime The sdk start timestamp.
    * @param collectionTime The current collection timestamp.
    * @returns The {@link MetricData} points or `null`.
    */
@@ -70,12 +69,8 @@ export class TemporalMetricProcessor<T> {
     collectors: MetricCollectorHandle[],
     instrumentDescriptor: InstrumentDescriptor,
     currentAccumulations: AttributeHashMap<T>,
-    sdkStartTime: HrTime,
     collectionTime: HrTime,
   ): Maybe<MetricData> {
-    // In case it's our first collection, default to start timestamp (see below for explanation).
-    let lastCollectionTime = sdkStartTime;
-
     this._stashAccumulations(collectors, currentAccumulations);
     const unreportedAccumulations = this._getMergedUnreportedAccumulations(collector);
 
@@ -85,7 +80,7 @@ export class TemporalMetricProcessor<T> {
     if (this._reportHistory.has(collector)) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const last = this._reportHistory.get(collector)!;
-      lastCollectionTime = last.collectionTime;
+      const lastCollectionTime = last.collectionTime;
       aggregationTemporality = last.aggregationTemporality;
 
       // Use aggregation temporality + instrument to determine if we do a merge or a diff of
@@ -96,14 +91,16 @@ export class TemporalMetricProcessor<T> {
       //    Cumulative records are converted to delta recording with DeltaMetricProcessor.
       //    Here we merge with our last record to get a cumulative aggregation.
       // 3. Delta Aggregation + Delta recording
-      //    Do nothing here.
+      //    Calibrate the startTime of metric streams to be the reader's lastCollectionTime.
       // 4. Delta Aggregation + Cumulative recording.
       //    Cumulative records are converted to delta recording with DeltaMetricProcessor.
-      //    Do nothing here.
+      //    Calibrate the startTime of metric streams to be the reader's lastCollectionTime.
       if (aggregationTemporality === AggregationTemporality.CUMULATIVE) {
         // We need to make sure the current delta recording gets merged into the previous cumulative
         // for the next cumulative recording.
         result = TemporalMetricProcessor.merge(last.accumulations, unreportedAccumulations, this._aggregator);
+      } else {
+        result = TemporalMetricProcessor.calibrateStartTime(last.accumulations, unreportedAccumulations, lastCollectionTime);
       }
     } else {
       // Call into user code to select aggregation temporality for the instrument.
@@ -117,14 +114,10 @@ export class TemporalMetricProcessor<T> {
       aggregationTemporality,
     });
 
-    // Metric data time span is determined as:
-    // 1. Cumulative Aggregation time span: (sdkStartTime, collectionTime]
-    // 2. Delta Aggregation time span: (lastCollectionTime, collectionTime]
     return this._aggregator.toMetricData(
       instrumentDescriptor,
       aggregationTemporality,
       AttributesMapToAccumulationRecords(result),
-      /* startTime */ aggregationTemporality === AggregationTemporality.CUMULATIVE ? sdkStartTime : lastCollectionTime,
       /* endTime */ collectionTime);
   }
 
@@ -152,18 +145,37 @@ export class TemporalMetricProcessor<T> {
     return result;
   }
 
-  static merge<T>(last: AttributeHashMap<T>, current: AttributeHashMap<T>, aggregator: Aggregator<T>) {
+  static merge<T extends Maybe<Accumulation>>(last: AttributeHashMap<T>, current: AttributeHashMap<T>, aggregator: Aggregator<T>) {
     const result = last;
     const iterator = current.entries();
     let next = iterator.next();
     while (next.done !== true) {
       const [key, record, hash] = next.value;
-      const lastAccumulation = last.get(key, hash) ?? aggregator.createAccumulation();
-      result.set(key, aggregator.merge(lastAccumulation, record), hash);
+      if (last.has(key, hash)) {
+        const lastAccumulation = last.get(key, hash);
+        // last.has() returned true, lastAccumulation is present.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const accumulation = aggregator.merge(lastAccumulation!, record);
+        result.set(key, accumulation, hash);
+      } else {
+        result.set(key, record, hash);
+      }
 
       next = iterator.next();
     }
     return result;
+  }
+
+  /**
+   * Calibrate the reported metric streams' startTime to lastCollectionTime. Leaves
+   * the new stream to be the initial observation time unchanged.
+   */
+  static calibrateStartTime<T extends Maybe<Accumulation>>(last: AttributeHashMap<T>, current: AttributeHashMap<T>, lastCollectionTime: HrTime) {
+    for (const [key, hash] of last.keys()) {
+      const currentAccumulation = current.get(key, hash);
+      currentAccumulation?.setStartTime(lastCollectionTime);
+    }
+    return current;
   }
 }
 

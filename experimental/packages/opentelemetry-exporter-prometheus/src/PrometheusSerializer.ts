@@ -24,7 +24,7 @@ import {
   DataPoint,
   Histogram,
 } from '@opentelemetry/sdk-metrics-base';
-import type { MetricAttributes } from '@opentelemetry/api-metrics';
+import type { MetricAttributes, MetricAttributeValue } from '@opentelemetry/api-metrics';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
 
 type PrometheusDataTypeLiteral =
@@ -38,9 +38,15 @@ function escapeString(str: string) {
   return str.replace(/\\/g, '\\\\').replace(/\n/g, '\\n');
 }
 
-function escapeAttributeValue(str: string) {
+/**
+ * String Attribute values are converted directly to Prometheus attribute values.
+ * Non-string values are represented as JSON-encoded strings.
+ *
+ * `undefined` is converted to an empty string.
+ */
+function escapeAttributeValue(str: MetricAttributeValue = '') {
   if (typeof str !== 'string') {
-    str = String(str);
+    str = JSON.stringify(str);
   }
   return escapeString(str).replace(/"/g, '\\"');
 }
@@ -104,23 +110,15 @@ function valueString(value: number) {
 }
 
 function toPrometheusType(
-  instrumentType: InstrumentType,
-  dataPointType: DataPointType,
+  metricData: MetricData,
 ): PrometheusDataTypeLiteral {
-  switch (dataPointType) {
-    case DataPointType.SINGULAR:
-      if (
-        instrumentType === InstrumentType.COUNTER ||
-        instrumentType === InstrumentType.OBSERVABLE_COUNTER
-      ) {
+  switch (metricData.dataPointType) {
+    case DataPointType.SUM:
+      if (metricData.isMonotonic) {
         return 'counter';
       }
-      /**
-       * - HISTOGRAM
-       * - UP_DOWN_COUNTER
-       * - OBSERVABLE_GAUGE
-       * - OBSERVABLE_UP_DOWN_COUNTER
-       */
+      return 'gauge';
+    case DataPointType.GAUGE:
       return 'gauge';
     case DataPointType.HISTOGRAM:
       return 'histogram';
@@ -210,13 +208,13 @@ export class PrometheusSerializer {
       metricData.descriptor.description || 'description missing'
     )}`;
     const type = `# TYPE ${name} ${toPrometheusType(
-      metricData.descriptor.type,
-      dataPointType
+      metricData
     )}`;
 
     let results = '';
     switch (dataPointType) {
-      case DataPointType.SINGULAR: {
+      case DataPointType.SUM:
+      case DataPointType.GAUGE: {
         results = metricData.dataPoints
           .map(it => this._serializeSingularDataPoint(name, metricData.descriptor.type, it))
           .join('');

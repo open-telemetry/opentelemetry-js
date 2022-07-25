@@ -63,9 +63,19 @@ export class DropAggregation extends Aggregation {
  * The default sum aggregation.
  */
 export class SumAggregation extends Aggregation {
-  private static DEFAULT_INSTANCE = new SumAggregator();
-  createAggregator(_instrument: InstrumentDescriptor) {
-    return SumAggregation.DEFAULT_INSTANCE;
+  private static MONOTONIC_INSTANCE = new SumAggregator(true);
+  private static NON_MONOTONIC_INSTANCE = new SumAggregator(false);
+  createAggregator(instrument: InstrumentDescriptor) {
+    switch (instrument.type) {
+      case InstrumentType.COUNTER:
+      case InstrumentType.OBSERVABLE_COUNTER:
+      case InstrumentType.HISTOGRAM: {
+        return SumAggregation.MONOTONIC_INSTANCE;
+      }
+      default: {
+        return SumAggregation.NON_MONOTONIC_INSTANCE;
+      }
+    }
   }
 }
 
@@ -83,7 +93,7 @@ export class LastValueAggregation extends Aggregation {
  * The default histogram aggregation.
  */
 export class HistogramAggregation extends Aggregation {
-  private static DEFAULT_INSTANCE = new HistogramAggregator([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000]);
+  private static DEFAULT_INSTANCE = new HistogramAggregator([0, 5, 10, 25, 50, 75, 100, 250, 500, 1000], true);
   createAggregator(_instrument: InstrumentDescriptor) {
     return HistogramAggregation.DEFAULT_INSTANCE;
   }
@@ -94,10 +104,12 @@ export class HistogramAggregation extends Aggregation {
  */
 export class ExplicitBucketHistogramAggregation extends Aggregation {
   private _boundaries: number[];
+
   /**
    * @param boundaries the bucket boundaries of the histogram aggregation
+   * @param _recordMinMax If set to true, min and max will be recorded. Otherwise, min and max will not be recorded.
    */
-  constructor(boundaries: number[]) {
+  constructor(boundaries: number[], private readonly _recordMinMax = true) {
     super();
     if (boundaries === undefined || boundaries.length === 0) {
       throw new Error('HistogramAggregator should be created with boundaries.');
@@ -117,7 +129,7 @@ export class ExplicitBucketHistogramAggregation extends Aggregation {
   }
 
   createAggregator(_instrument: InstrumentDescriptor) {
-    return new HistogramAggregator(this._boundaries);
+    return new HistogramAggregator(this._boundaries, this._recordMinMax);
   }
 }
 

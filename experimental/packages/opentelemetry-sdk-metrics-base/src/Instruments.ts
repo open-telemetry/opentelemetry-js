@@ -17,6 +17,7 @@
 import * as api from '@opentelemetry/api';
 import * as metrics from '@opentelemetry/api-metrics';
 import { ObservableCallback } from '@opentelemetry/api-metrics';
+import { hrTime } from '@opentelemetry/core';
 import { InstrumentDescriptor } from './InstrumentDescriptor';
 import { ObservableRegistry } from './state/ObservableRegistry';
 import { AsyncWritableMetricStorage, WritableMetricStorage } from './state/WritableMetricStorage';
@@ -31,7 +32,7 @@ export class SyncInstrument {
       );
       value = Math.trunc(value);
     }
-    this._writableMetricStorage.record(value, attributes, context);
+    this._writableMetricStorage.record(value, attributes, context, hrTime());
   }
 }
 
