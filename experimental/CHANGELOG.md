@@ -10,6 +10,10 @@ All notable changes to experimental packages in this project will be documented 
 * feat(sdk-metrics-base): split up Singular into Sum and Gauge in MetricData [#3079](https://github.com/open-telemetry/opentelemetry-js/pull/3079) @pichlermarc
   * removes `DataPointType.SINGULAR`, and replaces it with `DataPointType.SUM` and `DataPointType.GAUGE`
   * removes `SingularMetricData` and replaces it with `SumMetricData` (including an additional `isMonotonic` flag) and `GaugeMetricData`
+* feat(histogram): align collection of optional Histogram properties with spec [#3102](https://github.com/open-telemetry/opentelemetry-js/pull/3079) @pichlermarc
+  * changes type of `sum` property on `Histogram` to `number | undefined`
+  * changes type of `min` and `max` properties on `Histogram` to `number | undefined`
+  * removes `hasMinMax` flag on the exported `Histogram` - this is now indicated by `min` and `max` being `undefined`
 
 ### :rocket: (Enhancement)
 
@@ -19,6 +23,8 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(histogram): fix maximum when only values < -1 are provided [#3086](https://github.com/open-telemetry/opentelemetry-js/pull/3086) @pichlermarc
+* fix(sdk-metrics-base): fix PeriodicExportingMetricReader keeping Node.js process from exiting
+  [#3106](https://github.com/open-telemetry/opentelemetry-js/pull/3106) @seemk
 
 ### :books: (Refine Doc)
 

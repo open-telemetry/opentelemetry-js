@@ -57,11 +57,10 @@ export interface Histogram {
     boundaries: number[];
     counts: number[];
   };
-  sum: number;
+  sum?: number;
   count: number;
-  hasMinMax: boolean;
-  min: number;
-  max: number;
+  min?: number;
+  max?: number;
 }
 
 /**

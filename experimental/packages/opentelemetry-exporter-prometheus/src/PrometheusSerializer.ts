@@ -24,7 +24,10 @@ import {
   DataPoint,
   Histogram,
 } from '@opentelemetry/sdk-metrics-base';
-import type { MetricAttributes, MetricAttributeValue } from '@opentelemetry/api-metrics';
+import type {
+  MetricAttributes,
+  MetricAttributeValue
+} from '@opentelemetry/api-metrics';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
 
 type PrometheusDataTypeLiteral =
@@ -52,6 +55,7 @@ function escapeAttributeValue(str: MetricAttributeValue = '') {
 }
 
 const invalidCharacterRegex = /[^a-z0-9_]/gi;
+
 /**
  * Ensures metric names are valid Prometheus metric names by removing
  * characters allowed by OpenTelemetry but disallowed by Prometheus.
@@ -254,25 +258,28 @@ export class PrometheusSerializer {
     let results = '';
 
     name = enforcePrometheusNamingConvention(name, type);
-    const { value, attributes } = dataPoint;
+    const attributes = dataPoint.attributes;
+    const histogram = dataPoint.value;
     const timestamp = hrTimeToMilliseconds(dataPoint.endTime);
     /** Histogram["bucket"] is not typed with `number` */
     for (const key of ['count', 'sum'] as ('count' | 'sum')[]) {
-      results += stringify(
-        name + '_' + key,
-        attributes,
-        value[key],
-        this._appendTimestamp ? timestamp : undefined,
-        undefined
-      );
+      const value = histogram[key];
+      if (value != null)
+        results += stringify(
+          name + '_' + key,
+          attributes,
+          value,
+          this._appendTimestamp ? timestamp : undefined,
+          undefined
+        );
     }
 
     let cumulativeSum = 0;
-    const countEntries = value.buckets.counts.entries();
+    const countEntries = histogram.buckets.counts.entries();
     let infiniteBoundaryDefined = false;
     for (const [idx, val] of countEntries) {
       cumulativeSum += val;
-      const upperBound = value.buckets.boundaries[idx];
+      const upperBound = histogram.buckets.boundaries[idx];
       /** HistogramAggregator is producing different boundary output -
        * in one case not including infinity values, in other -
        * full, e.g. [0, 100] and [0, 100, Infinity]

@@ -15,7 +15,11 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ExportResultCode, globalErrorHandler } from '@opentelemetry/core';
+import {
+  ExportResultCode,
+  globalErrorHandler,
+  unrefTimer
+} from '@opentelemetry/core';
 import { MetricReader } from './MetricReader';
 import { AggregationTemporality } from './AggregationTemporality';
 import { InstrumentType } from '../InstrumentDescriptor';
@@ -100,6 +104,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
         globalErrorHandler(err);
       }
     }, this._exportInterval);
+    unrefTimer(this._interval);
   }
 
   protected async onForceFlush(): Promise<void> {
