@@ -29,6 +29,13 @@ import { hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
 
 const START_TIME = hrTime();
 const END_TIME = hrTime();
+const ATTRIBUTES = {
+  'string-attribute': 'some attribute value',
+  'int-attribute': 1,
+  'double-attribute': 1.1,
+  'boolean-attribute': true,
+  'array-attribute': ['attribute value 1', 'attribute value 2'],
+};
 
 describe('Metrics', () => {
   describe('createExportMetricsServiceRequest', () => {
@@ -58,6 +65,39 @@ describe('Metrics', () => {
           stringValue: 'some attribute value',
         },
       },
+      {
+        key: 'int-attribute',
+        value: {
+          intValue: 1,
+        },
+      },
+      {
+        key: 'double-attribute',
+        value: {
+          doubleValue: 1.1,
+        },
+      },
+      {
+        key: 'boolean-attribute',
+        value: {
+          boolValue: true,
+        },
+      },
+      {
+        key: 'array-attribute',
+        value: {
+          arrayValue: {
+            values: [
+              {
+                stringValue: 'attribute value 1',
+              },
+              {
+                stringValue: 'attribute value 2',
+              }
+            ]
+          },
+        },
+      },
     ];
 
     function createCounterData(value: number, aggregationTemporality: AggregationTemporality): MetricData {
@@ -70,13 +110,37 @@ describe('Metrics', () => {
           valueType: ValueType.INT,
         },
         aggregationTemporality,
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: true,
         dataPoints: [
           {
             value: value,
             startTime: START_TIME,
             endTime: END_TIME,
-            attributes: { 'string-attribute': 'some attribute value' }
+            attributes: ATTRIBUTES,
+          }
+        ]
+      };
+    }
+
+    function createUpDownCounterData(value: number, aggregationTemporality: AggregationTemporality): MetricData {
+      return {
+        descriptor: {
+          description: 'this is a description',
+          type: InstrumentType.UP_DOWN_COUNTER,
+          name: 'up-down-counter',
+          unit: '1',
+          valueType: ValueType.INT,
+        },
+        aggregationTemporality,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: false,
+        dataPoints: [
+          {
+            value: value,
+            startTime: START_TIME,
+            endTime: END_TIME,
+            attributes: ATTRIBUTES
           }
         ]
       };
@@ -92,17 +156,42 @@ describe('Metrics', () => {
           valueType: ValueType.INT,
         },
         aggregationTemporality,
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: true,
         dataPoints: [
           {
             value: value,
             startTime: START_TIME,
             endTime: END_TIME,
-            attributes: { 'string-attribute': 'some attribute value' }
+            attributes: ATTRIBUTES,
           }
         ]
       };
     }
+
+    function createObservableUpDownCounterData(value: number, aggregationTemporality: AggregationTemporality): MetricData {
+      return {
+        descriptor: {
+          description: 'this is a description',
+          type: InstrumentType.OBSERVABLE_UP_DOWN_COUNTER,
+          name: 'observable-up-down-counter',
+          unit: '1',
+          valueType: ValueType.INT,
+        },
+        aggregationTemporality,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: false,
+        dataPoints: [
+          {
+            value: value,
+            startTime: START_TIME,
+            endTime: END_TIME,
+            attributes: ATTRIBUTES,
+          }
+        ]
+      };
+    }
+
 
     function createObservableGaugeData(value: number): MetricData {
       return {
@@ -114,13 +203,13 @@ describe('Metrics', () => {
           valueType: ValueType.DOUBLE,
         },
         aggregationTemporality: AggregationTemporality.CUMULATIVE,
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.GAUGE,
         dataPoints: [
           {
             value: value,
             startTime: START_TIME,
             endTime: END_TIME,
-            attributes: { 'string-attribute': 'some attribute value' }
+            attributes: ATTRIBUTES,
           }
         ]
       };
@@ -158,7 +247,7 @@ describe('Metrics', () => {
             },
             startTime: START_TIME,
             endTime: END_TIME,
-            attributes: { 'string-attribute': 'some attribute value' },
+            attributes: ATTRIBUTES,
           }
         ]
       };
@@ -184,7 +273,7 @@ describe('Metrics', () => {
       };
     }
 
-    it('serializes a sum metric record', () => {
+    it('serializes a monotonic sum metric record', () => {
       const metrics = createResourceMetrics([createCounterData(10, AggregationTemporality.DELTA)]);
       const exportRequest = createExportMetricsServiceRequest([metrics]);
       assert.ok(exportRequest);
@@ -224,7 +313,47 @@ describe('Metrics', () => {
       });
     });
 
-    it('serializes an observable sum metric record', () => {
+    it('serializes a non-monotonic sum metric record', () => {
+      const metrics = createResourceMetrics([createUpDownCounterData(10, AggregationTemporality.DELTA)]);
+      const exportRequest = createExportMetricsServiceRequest([metrics]);
+      assert.ok(exportRequest);
+
+      assert.deepStrictEqual(exportRequest, {
+        resourceMetrics: [
+          {
+            resource: expectedResource,
+            schemaUrl: undefined,
+            scopeMetrics: [
+              {
+                scope: expectedScope,
+                schemaUrl: expectedSchemaUrl,
+                metrics: [
+                  {
+                    name: 'up-down-counter',
+                    description: 'this is a description',
+                    unit: '1',
+                    sum: {
+                      dataPoints: [
+                        {
+                          attributes: expectedAttributes,
+                          startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
+                          timeUnixNano: hrTimeToNanoseconds(END_TIME),
+                          asInt: 10,
+                        },
+                      ],
+                      aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_DELTA,
+                      isMonotonic: false,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it('serializes an observable monotonic sum metric record', () => {
       const exportRequest = createExportMetricsServiceRequest(
         [createResourceMetrics([createObservableCounterData(10, AggregationTemporality.DELTA)])]
       );
@@ -255,6 +384,47 @@ describe('Metrics', () => {
                       ],
                       aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_DELTA,
                       isMonotonic: true,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+    });
+
+    it('serializes an observable non-monotonic sum metric record', () => {
+      const exportRequest = createExportMetricsServiceRequest(
+        [createResourceMetrics([createObservableUpDownCounterData(10, AggregationTemporality.DELTA)])]
+      );
+      assert.ok(exportRequest);
+
+      assert.deepStrictEqual(exportRequest, {
+        resourceMetrics: [
+          {
+            resource: expectedResource,
+            schemaUrl: undefined,
+            scopeMetrics: [
+              {
+                scope: expectedScope,
+                schemaUrl: expectedSchemaUrl,
+                metrics: [
+                  {
+                    name: 'observable-up-down-counter',
+                    description: 'this is a description',
+                    unit: '1',
+                    sum: {
+                      dataPoints: [
+                        {
+                          attributes: expectedAttributes,
+                          startTimeUnixNano: hrTimeToNanoseconds(START_TIME),
+                          timeUnixNano: hrTimeToNanoseconds(END_TIME),
+                          asInt: 10,
+                        },
+                      ],
+                      aggregationTemporality: EAggregationTemporality.AGGREGATION_TEMPORALITY_DELTA,
+                      isMonotonic: false,
                     },
                   },
                 ],

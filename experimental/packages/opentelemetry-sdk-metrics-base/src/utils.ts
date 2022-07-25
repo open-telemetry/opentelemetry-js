@@ -31,13 +31,9 @@ export function hashAttributes(attributes: MetricAttributes): string {
   let keys = Object.keys(attributes);
   if (keys.length === 0) return '';
 
+  // Return a string that is stable on key orders.
   keys = keys.sort();
-  return keys.reduce((result, key) => {
-    if (result.length > 2) {
-      result += ',';
-    }
-    return (result += key + ':' + attributes[key]);
-  }, '|#');
+  return JSON.stringify(keys.map(key => [key, attributes[key]]));
 }
 
 /**
