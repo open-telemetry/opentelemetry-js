@@ -2,7 +2,19 @@
 
 All notable changes to experimental packages in this project will be documented in this file.
 
-## Unreleased
+# Unreleased
+
+### :boom: Breaking Change
+
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.31.0
 
 ### :boom: Breaking Change
 
@@ -25,10 +37,6 @@ All notable changes to experimental packages in this project will be documented 
 * fix(histogram): fix maximum when only values < -1 are provided [#3086](https://github.com/open-telemetry/opentelemetry-js/pull/3086) @pichlermarc
 * fix(sdk-metrics-base): fix PeriodicExportingMetricReader keeping Node.js process from exiting
   [#3106](https://github.com/open-telemetry/opentelemetry-js/pull/3106) @seemk
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
 
 ## 0.30.0
 
