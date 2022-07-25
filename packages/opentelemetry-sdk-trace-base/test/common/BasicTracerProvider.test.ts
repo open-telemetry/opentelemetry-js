@@ -210,17 +210,28 @@ describe('BasicTracerProvider', () => {
           delete envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
           delete envSource.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT;
         });
+        it('should have span attribute value length limit as deafult of Infinity', () => {
+          envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '125';
+          envSource.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT = 'Infinity';
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeValueLengthLimit, 125);
+          assert.strictEqual(spanLimits.attributeValueLengthLimit, Infinity);
+          delete envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
+          delete envSource.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT;
+        });
       });
 
       describe('when attribute value length limit is not defined via env', () => {
-        it.only('should use default value of Infinity', () => {
+        it('should use default value of Infinity', () => {
           const tracer = new BasicTracerProvider().getTracer('default');
           const spanLimits = tracer.getSpanLimits();
           const generalLimits = tracer.getGeneralLimits();
           assert.strictEqual(generalLimits.attributeValueLengthLimit, Infinity);
           assert.strictEqual(spanLimits.attributeValueLengthLimit, Infinity);
-        })
-      })
+        });
+      });
 
       describe('when attribute count limit is defined via env', () => {
         it('should general attribute count limit as defined with env', () => {
@@ -249,6 +260,27 @@ describe('BasicTracerProvider', () => {
           assert.strictEqual(spanLimits.attributeCountLimit, 35);
           delete envSource.OTEL_ATTRIBUTE_COUNT_LIMIT;
           delete envSource.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT;
+        });
+        it('should have span attribute count limit as default of 128', () => {
+          envSource.OTEL_ATTRIBUTE_COUNT_LIMIT = '20';
+          envSource.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT = '128';
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeCountLimit, 20);
+          assert.strictEqual(spanLimits.attributeCountLimit, 128);
+          delete envSource.OTEL_ATTRIBUTE_COUNT_LIMIT;
+          delete envSource.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT;
+        });
+      });
+
+      describe('when attribute count limit is not defined via env', () => {
+        it('should use default value of 128', () => {
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeCountLimit, 128);
+          assert.strictEqual(spanLimits.attributeCountLimit, 128);
         });
       });
 

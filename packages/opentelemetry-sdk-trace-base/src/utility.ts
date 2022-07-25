@@ -73,7 +73,6 @@ export function reconfigureLimits(userConfig: TracerConfig): TracerConfig {
   /**
    * Reassign span attribute count limit to use first non null value defined by user or use default value
    */
-
   spanLimits.attributeCountLimit =
     userConfig.spanLimits?.attributeCountLimit ??
     userConfig.generalLimits?.attributeCountLimit ??
@@ -84,7 +83,6 @@ export function reconfigureLimits(userConfig: TracerConfig): TracerConfig {
   /**
    * Reassign span attribute value length limit to use first non null value defined by user or use default value
    */
-
   spanLimits.attributeValueLengthLimit =
     userConfig.spanLimits?.attributeValueLengthLimit ??
     userConfig.generalLimits?.attributeValueLengthLimit ??
