@@ -15,8 +15,10 @@
  */
 
 import * as sinon from 'sinon';
-import { callWithTimeout, TimeoutError } from '../src/utils';
+import * as assert from 'assert';
+import { callWithTimeout, hashAttributes, TimeoutError } from '../src/utils';
 import { assertRejects } from './test-utils';
+import { MetricAttributes } from '@opentelemetry/api-metrics';
 
 describe('utils', () => {
   afterEach(() => {
@@ -30,6 +32,25 @@ describe('utils', () => {
         /** promise never settles */
       });
       assertRejects(callWithTimeout(promise, 100), TimeoutError);
+    });
+  });
+
+  describe('hashAttributes', () => {
+    it('should hash all types of attribute values', () => {
+      const cases: [MetricAttributes, string][] = [
+        [{ 'string': 'bar' }, '[["string","bar"]]'],
+        [{ 'number': 1 }, '[["number",1]]'],
+        [{ 'false': false, 'true': true }, '[["false",false],["true",true]]'],
+        [{ 'arrayOfString': ['foo','bar'] }, '[["arrayOfString",["foo","bar"]]]'],
+        [{ 'arrayOfNumber': [1,2] }, '[["arrayOfNumber",[1,2]]]'],
+        [{ 'arrayOfBool': [false,true] }, '[["arrayOfBool",[false,true]]]'],
+        [{ 'undefined': undefined }, '[["undefined",null]]'],
+        [{ 'arrayOfHoles': [undefined, null] }, '[["arrayOfHoles",[null,null]]]'],
+      ];
+
+      for (const [idx, it] of cases.entries()) {
+        assert.strictEqual(hashAttributes(it[0]), it[1], `cases[${idx}] failed`);
+      }
     });
   });
 });
