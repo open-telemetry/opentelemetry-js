@@ -43,7 +43,7 @@ describe('InMemoryMetricExporter', () => {
   let exporter: InMemoryMetricExporter;
   let meterProvider: MeterProvider;
   let meterReader: PeriodicExportingMetricReader;
-  let meter: MeterProvider;
+  let meter: Meter;
 
   beforeEach(() => {
     exporter = new InMemoryMetricExporter(AggregationTemporality.CUMULATIVE);
