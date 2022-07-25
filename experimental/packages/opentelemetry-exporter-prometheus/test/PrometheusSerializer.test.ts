@@ -355,7 +355,7 @@ describe('PrometheusSerializer', () => {
         return result;
       }
 
-      it('serialize metric record with ExplicitHistogramAggregation aggregator, cumulative', async () => {
+      it('serialize cumulative metric record', async () => {
         const serializer = new PrometheusSerializer();
         const result = await testSerializer(serializer);
         assert.strictEqual(
@@ -374,6 +374,53 @@ describe('PrometheusSerializer', () => {
             `test_bucket{val="2",le="10"} 1 ${mockedHrTimeMs}\n` +
             `test_bucket{val="2",le="100"} 1 ${mockedHrTimeMs}\n` +
             `test_bucket{val="2",le="+Inf"} 1 ${mockedHrTimeMs}\n`
+        );
+      });
+
+      it('serialize cumulative metric record on instrument that allows negative values', async () => {
+        const serializer = new PrometheusSerializer();
+        const reader = new TestMetricReader();
+        const meterProvider = new MeterProvider({
+          views: [
+            new View({
+              aggregation: new ExplicitBucketHistogramAggregation([1, 10, 100]),
+              instrumentName: '*'
+            })
+          ]
+        });
+        meterProvider.addMetricReader(reader);
+        const meter = meterProvider.getMeter('test');
+
+        const upDownCounter = meter.createUpDownCounter('test', {
+          description: 'foobar',
+        });
+        upDownCounter.add(5, { val: '1' });
+        upDownCounter.add(50, { val: '1' });
+        upDownCounter.add(120, { val: '1' });
+
+        upDownCounter.add(5, { val: '2' });
+
+        const { resourceMetrics, errors } = await reader.collect();
+        assert.strictEqual(errors.length, 0);
+        assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
+        assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
+        const scopeMetrics = resourceMetrics.scopeMetrics[0];
+
+        const result = serializer['_serializeScopeMetrics'](scopeMetrics);
+        assert.strictEqual(
+          result,
+          '# HELP test foobar\n' +
+          '# TYPE test histogram\n' +
+          `test_count{val="1"} 3 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="1",le="1"} 0 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="1",le="10"} 1 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="1",le="100"} 2 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="1",le="+Inf"} 3 ${mockedHrTimeMs}\n` +
+          `test_count{val="2"} 1 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="2",le="1"} 0 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="2",le="10"} 1 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="2",le="100"} 1 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="2",le="+Inf"} 1 ${mockedHrTimeMs}\n`
         );
       });
     });
