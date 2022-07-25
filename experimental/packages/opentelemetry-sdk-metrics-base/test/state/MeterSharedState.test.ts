@@ -21,7 +21,8 @@ import {
   Meter,
   MeterProvider,
   DataPointType,
-  CollectionResult
+  CollectionResult,
+  View
 } from '../../src';
 import { assertMetricData, defaultInstrumentationScope, defaultResource, sleep } from '../util';
 import { TestMetricReader } from '../export/TestMetricReader';
@@ -33,8 +34,8 @@ describe('MeterSharedState', () => {
   });
 
   describe('collect', () => {
-    function setupInstruments() {
-      const meterProvider = new MeterProvider({ resource: defaultResource });
+    function setupInstruments(views?: View[]) {
+      const meterProvider = new MeterProvider({ resource: defaultResource, views: views });
 
       const cumulativeReader = new TestMetricReader(() => AggregationTemporality.CUMULATIVE);
       meterProvider.addMetricReader(cumulativeReader);
@@ -51,7 +52,7 @@ describe('MeterSharedState', () => {
       }) as Meter;
       const meterSharedState = meter['_meterSharedState'] as MeterSharedState;
 
-      return { metricCollectors, cumulativeCollector, deltaCollector, meter, meterSharedState, meterProvider };
+      return { metricCollectors, cumulativeCollector, deltaCollector, meter, meterSharedState };
     }
 
     it('should collect sync metrics', async () => {
@@ -68,7 +69,7 @@ describe('MeterSharedState', () => {
         assert.strictEqual(errors.length, 0);
         assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
         assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
-        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
+        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SUM, {
           name: 'test',
         });
       }));
@@ -76,12 +77,12 @@ describe('MeterSharedState', () => {
 
     it('should collect sync metrics with views', async () => {
       /** preparing test instrumentations */
-      const { metricCollectors, meter, meterProvider } = setupInstruments();
+      const { metricCollectors, meter } = setupInstruments([
+        new View({ name: 'foo', instrumentName: 'test' }),
+        new View({ name: 'bar', instrumentName: 'test' })
+      ]);
 
       /** creating metric events */
-      meterProvider.addView({ name: 'foo' }, { instrument: { name: 'test' } });
-      meterProvider.addView({ name: 'bar' }, { instrument: { name: 'test' } });
-
       const counter = meter.createCounter('test');
 
       /** collect metrics */
@@ -91,10 +92,10 @@ describe('MeterSharedState', () => {
         assert.strictEqual(errors.length, 0);
         assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
         assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 2);
-        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
+        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SUM, {
           name: 'foo',
         });
-        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[1], DataPointType.SINGULAR, {
+        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[1], DataPointType.SUM, {
           name: 'bar',
         });
       }));
@@ -135,20 +136,12 @@ describe('MeterSharedState', () => {
 
     it('should call observable callback once with view-ed async instruments', async () => {
       /** preparing test instrumentations */
-      const { metricCollectors, meter, meterProvider } = setupInstruments();
+      const { metricCollectors, meter } = setupInstruments([
+        new View({ name: 'foo', instrumentName: 'test' }),
+        new View({ name: 'bar', instrumentName: 'test' })
+      ]);
 
       /** creating metric events */
-      meterProvider.addView({ name: 'foo' }, {
-        instrument: {
-          name: 'test',
-        },
-      });
-      meterProvider.addView({ name: 'bar' }, {
-        instrument: {
-          name: 'test',
-        },
-      });
-
       let observableCalledCount = 0;
       const observableCounter = meter.createObservableCounter('test');
       observableCounter.addCallback(observableResult => {
@@ -164,10 +157,10 @@ describe('MeterSharedState', () => {
         assert.strictEqual(errors.length, 0);
         assert.strictEqual(resourceMetrics.scopeMetrics.length, 1);
         assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 2);
-        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
+        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SUM, {
           name: 'foo'
         });
-        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[1], DataPointType.SINGULAR, {
+        assertMetricData(resourceMetrics.scopeMetrics[0].metrics[1], DataPointType.SUM, {
           name: 'bar'
         });
       }

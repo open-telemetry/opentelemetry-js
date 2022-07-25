@@ -51,14 +51,12 @@ describe('DropAggregator', () => {
     it('no exceptions', () => {
       const aggregator = new DropAggregator();
 
-      const startTime: HrTime = [0, 0];
       const endTime: HrTime = [1, 1];
 
       assert.strictEqual(aggregator.toMetricData(
         defaultInstrumentDescriptor,
         AggregationTemporality.CUMULATIVE,
         [[{}, undefined]],
-        startTime,
         endTime,
       ), undefined);
     });

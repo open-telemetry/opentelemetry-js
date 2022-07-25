@@ -22,8 +22,6 @@ import { callWithTimeout } from '../utils';
 import { InstrumentType } from '../InstrumentDescriptor';
 import { CollectionOptions, ForceFlushOptions, ShutdownOptions } from '../types';
 
-// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#metricreader
-
 /**
  * A registered reader of metrics that, when linked to a {@link MetricProducer}, offers global
  * control over metrics.
@@ -49,7 +47,8 @@ export abstract class MetricReader {
   }
 
   /**
-   * Get the default {@link AggregationTemporality} for the given {@link InstrumentType}
+   * Select the {@link AggregationTemporality} for the given
+   * {@link InstrumentType} for this reader.
    */
   abstract selectAggregationTemporality(instrumentType: InstrumentType): AggregationTemporality;
 
