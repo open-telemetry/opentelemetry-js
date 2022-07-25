@@ -99,5 +99,6 @@
     "@opentelemetry/otlp-transformer": "0.30.0",
     "@opentelemetry/resources": "1.4.0",
     "@opentelemetry/sdk-trace-base": "1.4.0"
-  }
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-trace-otlp-http"
 }
