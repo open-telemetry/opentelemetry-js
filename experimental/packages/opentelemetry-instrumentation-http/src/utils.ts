@@ -339,7 +339,7 @@ export const getOutgoingRequestAttributes = (
     [SemanticAttributes.HTTP_METHOD]: method,
     [SemanticAttributes.HTTP_TARGET]: requestOptions.path || '/',
     [SemanticAttributes.NET_PEER_NAME]: hostname,
-    [SemanticAttributes.HTTP_HOST]: requestOptions.host ?? `${hostname}:${port}`,
+    [SemanticAttributes.HTTP_HOST]: requestOptions.headers?.host ?? `${hostname}:${port}`,
   };
 
   if (userAgent !== undefined) {
