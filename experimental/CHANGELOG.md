@@ -13,6 +13,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(metrics-api): use common attributes definitions #3038 @legendecas
 * feat(otlp-proto): pre-compile proto files [#3098](https://github.com/open-telemetry/opentelemetry-js/pull/3098) @legendecas
 
 ### :bug: (Bug Fix)
@@ -20,6 +21,8 @@ All notable changes to experimental packages in this project will be documented 
 * fix(histogram): fix maximum when only values < -1 are provided [#3086](https://github.com/open-telemetry/opentelemetry-js/pull/3086) @pichlermarc
 * fix(exporter-grpc): prevent trace and metrics grpc service clients from interfering with each other [#3100](https://github.com/open-telemetry/opentelemetry-js/pull/3100) @dyladan
   * refactor trace grpc exporter to not use the grpc exporter base class
+* fix(sdk-metrics-base): fix PeriodicExportingMetricReader keeping Node.js process from exiting
+  [#3106](https://github.com/open-telemetry/opentelemetry-js/pull/3106) @seemk
 
 ### :books: (Refine Doc)
 
