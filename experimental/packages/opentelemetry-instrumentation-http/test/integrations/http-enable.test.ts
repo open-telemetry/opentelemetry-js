@@ -380,7 +380,6 @@ describe('HttpInstrumentation Integration tests', () => {
       spans = memoryExporter.getFinishedSpans();
       const span = spans.find(s => s.kind === SpanKind.CLIENT);
       assert.ok(span);
-      assert.strictEqual(spans.length, 1);
       assert.strictEqual(span.name, 'HTTP GET');
       assert.strictEqual(span.attributes[SemanticAttributes.HTTP_HOST], `localhost:${mockServerPort}`);
     });
