@@ -212,6 +212,16 @@ describe('BasicTracerProvider', () => {
         });
       });
 
+      describe('when attribute value length limit is not defined via env', () => {
+        it.only('should use default value of Infinity', () => {
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeValueLengthLimit, Infinity);
+          assert.strictEqual(spanLimits.attributeValueLengthLimit, Infinity);
+        })
+      })
+
       describe('when attribute count limit is defined via env', () => {
         it('should general attribute count limit as defined with env', () => {
           envSource.OTEL_ATTRIBUTE_COUNT_LIMIT = '25';
