@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+import * as assert from 'assert';
+import { inspect } from 'util';
+
 import {
   context,
   propagation,
@@ -25,9 +28,15 @@ import {
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
 import { CompositePropagator } from '@opentelemetry/core';
-import * as assert from 'assert';
 import { NodeTracerProvider } from '../src';
 import * as semver from 'semver';
+
+const assertInstanceOf = (actual: object, ExpectedInstance: Function) => {
+  assert.ok(
+    actual instanceof ExpectedInstance,
+    `Expected ${inspect(actual)} to be instance of ${ExpectedInstance.name}`
+  );
+};
 
 const DefaultContextManager = semver.gte(process.version, '14.8.0')
   ? AsyncLocalStorageContextManager
@@ -44,9 +53,9 @@ describe('API registration', () => {
     const tracerProvider = new NodeTracerProvider();
     tracerProvider.register();
 
-    assert.ok(context['_getContextManager']() instanceof DefaultContextManager);
-    assert.ok(
-      propagation['_getGlobalPropagator']() instanceof CompositePropagator
+    assertInstanceOf(context['_getContextManager'](), DefaultContextManager);
+    assertInstanceOf(
+      propagation['_getGlobalPropagator'](), CompositePropagator
     );
     const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
 
@@ -80,8 +89,8 @@ describe('API registration', () => {
 
     assert.strictEqual(context['_getContextManager'](), ctxManager, 'context manager should not change');
 
-    assert.ok(
-      propagation['_getGlobalPropagator']() instanceof CompositePropagator
+    assertInstanceOf(
+      propagation['_getGlobalPropagator'](), CompositePropagator
     );
 
     const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
@@ -98,7 +107,7 @@ describe('API registration', () => {
 
     assert.strictEqual(propagation['_getGlobalPropagator'](), propagator);
 
-    assert.ok(context['_getContextManager']() instanceof DefaultContextManager);
+    assertInstanceOf(context['_getContextManager'](), DefaultContextManager);
 
     const apiTracerProvider = trace.getTracerProvider() as ProxyTracerProvider;
     assert.ok(apiTracerProvider.getDelegate() === tracerProvider);

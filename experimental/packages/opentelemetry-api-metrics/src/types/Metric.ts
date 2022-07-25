@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/api';
+import { Context, SpanAttributes, SpanAttributeValue } from '@opentelemetry/api';
 import { BatchObservableResult, ObservableResult } from './ObservableResult';
 
 /**
@@ -82,10 +82,21 @@ export interface Histogram {
   record(value: number, attributes?: MetricAttributes, context?: Context): void;
 }
 
+// api.SpanAttributes instead of api.Attributes is used here for api package backward compatibility.
 /**
- * key-value pairs passed by the user.
+ * Attributes is a map from string to attribute values.
+ *
+ * Note: only the own enumerable keys are counted as valid attribute keys.
  */
-export type MetricAttributes = { [key: string]: string };
+export type MetricAttributes = SpanAttributes;
+
+// api.SpanAttributeValue instead of api.AttributeValue is used here for api package backward compatibility.
+/**
+ * Attribute values may be any non-nullish primitive value except an object.
+ *
+ * null or undefined attribute values are invalid and will result in undefined behavior.
+ */
+export type MetricAttributeValue = SpanAttributeValue;
 
 /**
  * The observable callback for Observable instruments.
