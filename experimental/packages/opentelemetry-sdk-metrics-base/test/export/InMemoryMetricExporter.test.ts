@@ -15,12 +15,12 @@
  */
 import { ExportResultCode } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
+import * as metrics from '@opentelemetry/api-metrics';
 import assert = require('assert');
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { InMemoryMetricExporter } from '../../src/export/InMemoryMetricExporter';
 import { ResourceMetrics } from '../../src/export/MetricData';
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
-import { Meter } from '../../src/Meter';
 import { MeterProvider } from '../../src/MeterProvider';
 import { defaultResource } from '../util';
 
@@ -43,7 +43,7 @@ describe('InMemoryMetricExporter', () => {
   let exporter: InMemoryMetricExporter;
   let meterProvider: MeterProvider;
   let meterReader: PeriodicExportingMetricReader;
-  let meter: Meter;
+  let meter: metrics.Meter;
 
   beforeEach(() => {
     exporter = new InMemoryMetricExporter(AggregationTemporality.CUMULATIVE);
