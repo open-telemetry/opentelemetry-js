@@ -63,7 +63,6 @@ describe('InMemoryMetricExporter', () => {
   });
 
   it('should return failed result code', done => {
-    const { exporter, meterReader } = setup();
     exporter.shutdown().then(() => {
       const resource = new Resource({
         'resource-attribute': 'resource attribute value',
@@ -92,12 +91,6 @@ describe('InMemoryMetricExporter', () => {
   });
 
   it('should reset metrics when reset is called', async () => {
-    const {
-      meter,
-      meterReader,
-      exporter,
-    } = setup();
-
     const counter = meter.createCounter('counter_total', {
       description: 'a test description',
     });
@@ -117,12 +110,6 @@ describe('InMemoryMetricExporter', () => {
   });
 
   it('should be able to access metric', async () => {
-    const {
-      meter,
-      meterReader,
-      exporter,
-    } = setup();
-
     const counter = meter.createCounter('counter_total', {
       description: 'a test description',
     });
