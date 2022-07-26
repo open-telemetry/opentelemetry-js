@@ -6,6 +6,18 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.31.0
+
+### :boom: Breaking Change
+
 * feature(views): move views registration to MeterProvider constructor [#3066](https://github.com/open-telemetry/opentelemetry-js/pull/3066) @pichlermarc
 * feat(sdk-metrics-base): split up Singular into Sum and Gauge in MetricData [#3079](https://github.com/open-telemetry/opentelemetry-js/pull/3079) @pichlermarc
   * removes `DataPointType.SINGULAR`, and replaces it with `DataPointType.SUM` and `DataPointType.GAUGE`
@@ -28,10 +40,6 @@ All notable changes to experimental packages in this project will be documented 
   [#3106](https://github.com/open-telemetry/opentelemetry-js/pull/3106) @seemk
 * fix(otlp-proto): fixes [#2791](https://github.com/open-telemetry/opentelemetry-js/issues/2791) otlp proto exporters no longer share a single global proto definition
   [#3098](https://github.com/open-telemetry/opentelemetry-js/pull/3098) @legendecas
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
 
 ## 0.30.0
 
