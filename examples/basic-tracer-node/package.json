@@ -30,5 +30,5 @@
     "@opentelemetry/semantic-conventions": "0.25.0",
     "@opentelemetry/sdk-trace-base": "0.25.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/basic-tracer-node"
 }
