@@ -19,6 +19,7 @@ All notable changes to experimental packages in this project will be documented 
 
 * feat(metrics-api): use common attributes definitions #3038 @legendecas
 * feat(otlp-proto): pre-compile proto files [#3098](https://github.com/open-telemetry/opentelemetry-js/pull/3098) @legendecas
+* feat(opentelemetry-sdk-metrics-base): added InMemoryMetricExporter [#3039](https://github.com/open-telemetry/opentelemetry-js/pull/3039) @weyert
 
 ### :bug: (Bug Fix)
 
