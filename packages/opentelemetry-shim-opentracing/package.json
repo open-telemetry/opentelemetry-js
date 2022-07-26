@@ -62,5 +62,6 @@
     "@opentelemetry/core": "1.4.0",
     "@opentelemetry/semantic-conventions": "1.4.0",
     "opentracing": "^0.14.4"
-  }
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-shim-opentracing"
 }

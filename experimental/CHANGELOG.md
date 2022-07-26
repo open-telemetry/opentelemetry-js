@@ -19,12 +19,15 @@ All notable changes to experimental packages in this project will be documented 
 
 * feat(metrics-api): use common attributes definitions #3038 @legendecas
 * feat(otlp-proto): pre-compile proto files [#3098](https://github.com/open-telemetry/opentelemetry-js/pull/3098) @legendecas
+* feat(opentelemetry-sdk-metrics-base): added InMemoryMetricExporter [#3039](https://github.com/open-telemetry/opentelemetry-js/pull/3039) @weyert
 
 ### :bug: (Bug Fix)
 
 * fix(histogram): fix maximum when only values < -1 are provided [#3086](https://github.com/open-telemetry/opentelemetry-js/pull/3086) @pichlermarc
 * fix(sdk-metrics-base): fix PeriodicExportingMetricReader keeping Node.js process from exiting
   [#3106](https://github.com/open-telemetry/opentelemetry-js/pull/3106) @seemk
+* fix(otlp-proto): fixes [#2791](https://github.com/open-telemetry/opentelemetry-js/issues/2791) otlp proto exporters no longer share a single global proto definition
+  [#3098](https://github.com/open-telemetry/opentelemetry-js/pull/3098) @legendecas
 
 ### :books: (Refine Doc)
 
