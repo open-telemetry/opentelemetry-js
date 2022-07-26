@@ -286,10 +286,10 @@ export function parseEnvironment(values: RAW_ENVIRONMENT): ENVIRONMENT {
 }
 
 /**
- * Parse environment in node or browser without
+ * Get environment in node or browser without
  * populating default values.
  */
-export function parseEnvWithoutDefaults(): ENVIRONMENT {
+export function getEnvWithoutDefaults(): ENVIRONMENT {
   return typeof process !== 'undefined' ?
     parseEnvironment(process.env as RAW_ENVIRONMENT) :
     parseEnvironment(_globalThis as typeof globalThis & RAW_ENVIRONMENT);
