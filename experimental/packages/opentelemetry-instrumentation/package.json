@@ -3,7 +3,7 @@
   "version": "0.30.0",
   "description": "Base class for node which OpenTelemetry instrumentation modules extend",
   "author": "OpenTelemetry Authors",
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation",
   "license": "Apache-2.0",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",

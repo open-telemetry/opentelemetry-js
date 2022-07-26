@@ -66,5 +66,6 @@
     "@opentelemetry/sdk-trace-base": "1.4.0",
     "@opentelemetry/semantic-conventions": "1.4.0",
     "jaeger-client": "^3.15.0"
-  }
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-exporter-jaeger"
 }
