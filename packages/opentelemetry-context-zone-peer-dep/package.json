@@ -85,6 +85,5 @@
     "zone.js": "^0.10.2 || ^0.11.0"
   },
   "sideEffects": false,
-  ,
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone-peer-dep"
 }
