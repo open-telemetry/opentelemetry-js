@@ -41,7 +41,7 @@
     "grpc": "^1.23.3",
     "node-pre-gyp": "0.14.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/grpc",
   "devDependencies": {
     "cross-env": "^6.0.0"
   }

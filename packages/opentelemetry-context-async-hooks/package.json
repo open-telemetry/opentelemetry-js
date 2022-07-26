@@ -56,5 +56,6 @@
   },
   "peerDependencies": {
     "@opentelemetry/api": ">=1.0.0 <1.2.0"
-  }
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-async-hooks"
 }
