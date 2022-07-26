@@ -41,16 +41,12 @@ export class InMemoryMetricExporter implements PushMetricExporter {
   export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): void {
     // Avoid storing metrics when exporter is shutdown
     if (this. _shutdown) {
-      setTimeout(() => {
-        resultCallback({ code: ExportResultCode.FAILED })
-      }, 0);
+      setTimeout(() => resultCallback({ code: ExportResultCode.FAILED }), 0);
       return;
     }
 
     this._metrics.push(metrics);
-    setTimeout(() => {
-      resultCallback({ code: ExportResultCode.SUCCESS })
-    }, 0);
+    setTimeout(() => resultCallback({ code: ExportResultCode.SUCCESS }), 0);
   }
 
   /**
@@ -61,7 +57,7 @@ export class InMemoryMetricExporter implements PushMetricExporter {
     return this._metrics;
   }
 
-  async forceFlush() {
+  forceFlush(): Promise<void> {
     return Promise.resolve();
   }
 
