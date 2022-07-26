@@ -286,7 +286,7 @@ export function parseEnvironment(values: RAW_ENVIRONMENT): ENVIRONMENT {
 }
 
 /**
- * Parse environment in node or browser without 
+ * Parse environment in node or browser without
  * populating default values.
  */
 export function parseEnvWithoutDefaults(): ENVIRONMENT {
