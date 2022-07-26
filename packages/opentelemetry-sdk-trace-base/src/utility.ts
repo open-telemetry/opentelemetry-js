@@ -20,9 +20,7 @@ import { SpanLimits, TracerConfig, GeneralLimits } from './types';
 import {
   DEFAULT_ATTRIBUTE_COUNT_LIMIT,
   DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
-  parseEnvironment,
-  RAW_ENVIRONMENT,
-  _globalThis
+  parseEnvWithoutDefaults,
 } from '@opentelemetry/core';
 
 /**
@@ -70,11 +68,7 @@ export function mergeConfig(userConfig: TracerConfig): TracerConfig & {
 export function reconfigureLimits(userConfig: TracerConfig): TracerConfig {
   const spanLimits = Object.assign({}, userConfig.spanLimits);
 
-  // parse environment in node or browser
-  const parsedEnvConfig =
-    typeof process !== 'undefined' ?
-      parseEnvironment(process.env as RAW_ENVIRONMENT) :
-      parseEnvironment(_globalThis as typeof globalThis & RAW_ENVIRONMENT);
+  const parsedEnvConfig = parseEnvWithoutDefaults();
 
   /**
    * Reassign span attribute count limit to use first non null value defined by user or use default value
