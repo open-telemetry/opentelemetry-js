@@ -14,6 +14,12 @@ All notable changes to this project will be documented in this file.
 
 ### :house: (Internal)
 
+## 1.5.0
+
+### :rocket: (Enhancement)
+
+* feat(sdk-trace-base): Improve extensibility of BasicTracerProvider [#3023](https://github.com/open-telemetry/opentelemetry-js/pull/3023) @Rauno56
+
 ## 1.4.0
 
 ### :rocket: (Enhancement)
