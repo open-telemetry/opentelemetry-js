@@ -19,8 +19,8 @@ import { MetricAttributes } from '@opentelemetry/api-metrics';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
-import { Histogram } from '../aggregator/types';
 import { AggregationTemporality } from './AggregationTemporality';
+import { Histogram } from '../aggregator/types';
 
 /**
  * Basic metric data fields.
@@ -38,8 +38,14 @@ export interface BaseMetricData {
  * Represents a metric data aggregated by either a LastValueAggregation or
  * SumAggregation.
  */
-export interface SingularMetricData extends BaseMetricData {
-  readonly dataPointType: DataPointType.SINGULAR;
+export interface SumMetricData extends BaseMetricData {
+  readonly dataPointType: DataPointType.SUM;
+  readonly dataPoints: DataPoint<number>[];
+  readonly isMonotonic: boolean;
+}
+
+export interface GaugeMetricData extends BaseMetricData {
+  readonly dataPointType: DataPointType.GAUGE;
   readonly dataPoints: DataPoint<number>[];
 }
 
@@ -54,7 +60,7 @@ export interface HistogramMetricData extends BaseMetricData {
 /**
  * Represents an aggregated metric data.
  */
-export type MetricData = SingularMetricData | HistogramMetricData;
+export type MetricData = SumMetricData | GaugeMetricData | HistogramMetricData;
 
 export interface ScopeMetrics {
   scope: InstrumentationScope;
@@ -66,8 +72,20 @@ export interface ResourceMetrics {
   scopeMetrics: ScopeMetrics[];
 }
 
+/**
+ * Represents the collection result of the metrics. If there are any
+ * non-critical errors in the collection, like throwing in a single observable
+ * callback, these errors are aggregated in the {@link CollectionResult.errors}
+ * array and other successfully collected metrics are returned.
+ */
 export interface CollectionResult {
+  /**
+   * Collected metrics.
+   */
   resourceMetrics: ResourceMetrics;
+  /**
+   * Arbitrary JavaScript exception values.
+   */
   errors: unknown[];
 }
 
@@ -75,9 +93,28 @@ export interface CollectionResult {
  * The aggregated point data type.
  */
 export enum DataPointType {
-  SINGULAR,
+  /**
+   * A histogram data point contains a histogram statistics of collected
+   * values with a list of explicit bucket boundaries and statistics such
+   * as min, max, count, and sum of all collected values.
+   */
   HISTOGRAM,
+  /**
+   * An exponential histogram data point contains a histogram statistics of
+   * collected values where bucket boundaries are automatically calculated
+   * using an exponential function, and statistics such as min, max, count,
+   * and sum of all collected values.
+   */
   EXPONENTIAL_HISTOGRAM,
+  /**
+   * A gauge metric data point has only a single numeric value.
+   */
+  GAUGE,
+  /**
+   * A sum metric data point has a single numeric value and a
+   * monotonicity-indicator.
+   */
+  SUM
 }
 
 /**
@@ -101,7 +138,8 @@ export interface DataPoint<T> {
    */
   readonly attributes: MetricAttributes;
   /**
-   * The value for this DataPoint.
+   * The value for this DataPoint. The type of the value is indicated by the
+   * {@link DataPointType}.
    */
   readonly value: T;
 }

@@ -24,7 +24,10 @@ import {
   DataPoint,
   Histogram,
 } from '@opentelemetry/sdk-metrics-base';
-import type { MetricAttributes } from '@opentelemetry/api-metrics';
+import type {
+  MetricAttributes,
+  MetricAttributeValue
+} from '@opentelemetry/api-metrics';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
 
 type PrometheusDataTypeLiteral =
@@ -38,14 +41,21 @@ function escapeString(str: string) {
   return str.replace(/\\/g, '\\\\').replace(/\n/g, '\\n');
 }
 
-function escapeAttributeValue(str: string) {
+/**
+ * String Attribute values are converted directly to Prometheus attribute values.
+ * Non-string values are represented as JSON-encoded strings.
+ *
+ * `undefined` is converted to an empty string.
+ */
+function escapeAttributeValue(str: MetricAttributeValue = '') {
   if (typeof str !== 'string') {
-    str = String(str);
+    str = JSON.stringify(str);
   }
   return escapeString(str).replace(/"/g, '\\"');
 }
 
 const invalidCharacterRegex = /[^a-z0-9_]/gi;
+
 /**
  * Ensures metric names are valid Prometheus metric names by removing
  * characters allowed by OpenTelemetry but disallowed by Prometheus.
@@ -104,23 +114,15 @@ function valueString(value: number) {
 }
 
 function toPrometheusType(
-  instrumentType: InstrumentType,
-  dataPointType: DataPointType,
+  metricData: MetricData,
 ): PrometheusDataTypeLiteral {
-  switch (dataPointType) {
-    case DataPointType.SINGULAR:
-      if (
-        instrumentType === InstrumentType.COUNTER ||
-        instrumentType === InstrumentType.OBSERVABLE_COUNTER
-      ) {
+  switch (metricData.dataPointType) {
+    case DataPointType.SUM:
+      if (metricData.isMonotonic) {
         return 'counter';
       }
-      /**
-       * - HISTOGRAM
-       * - UP_DOWN_COUNTER
-       * - OBSERVABLE_GAUGE
-       * - OBSERVABLE_UP_DOWN_COUNTER
-       */
+      return 'gauge';
+    case DataPointType.GAUGE:
       return 'gauge';
     case DataPointType.HISTOGRAM:
       return 'histogram';
@@ -210,13 +212,13 @@ export class PrometheusSerializer {
       metricData.descriptor.description || 'description missing'
     )}`;
     const type = `# TYPE ${name} ${toPrometheusType(
-      metricData.descriptor.type,
-      dataPointType
+      metricData
     )}`;
 
     let results = '';
     switch (dataPointType) {
-      case DataPointType.SINGULAR: {
+      case DataPointType.SUM:
+      case DataPointType.GAUGE: {
         results = metricData.dataPoints
           .map(it => this._serializeSingularDataPoint(name, metricData.descriptor.type, it))
           .join('');
@@ -256,25 +258,28 @@ export class PrometheusSerializer {
     let results = '';
 
     name = enforcePrometheusNamingConvention(name, type);
-    const { value, attributes } = dataPoint;
+    const attributes = dataPoint.attributes;
+    const histogram = dataPoint.value;
     const timestamp = hrTimeToMilliseconds(dataPoint.endTime);
     /** Histogram["bucket"] is not typed with `number` */
     for (const key of ['count', 'sum'] as ('count' | 'sum')[]) {
-      results += stringify(
-        name + '_' + key,
-        attributes,
-        value[key],
-        this._appendTimestamp ? timestamp : undefined,
-        undefined
-      );
+      const value = histogram[key];
+      if (value != null)
+        results += stringify(
+          name + '_' + key,
+          attributes,
+          value,
+          this._appendTimestamp ? timestamp : undefined,
+          undefined
+        );
     }
 
     let cumulativeSum = 0;
-    const countEntries = value.buckets.counts.entries();
+    const countEntries = histogram.buckets.counts.entries();
     let infiniteBoundaryDefined = false;
     for (const [idx, val] of countEntries) {
       cumulativeSum += val;
-      const upperBound = value.buckets.boundaries[idx];
+      const upperBound = histogram.buckets.boundaries[idx];
       /** HistogramAggregator is producing different boundary output -
        * in one case not including infinity values, in other -
        * full, e.g. [0, 100] and [0, 100, Infinity]

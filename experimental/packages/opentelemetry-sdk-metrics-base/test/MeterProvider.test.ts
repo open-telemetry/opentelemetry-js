@@ -25,6 +25,7 @@ import {
 } from './util';
 import { TestMetricReader } from './export/TestMetricReader';
 import * as sinon from 'sinon';
+import { View } from '../src/view/View';
 
 describe('MeterProvider', () => {
   afterEach(() => {
@@ -112,77 +113,21 @@ describe('MeterProvider', () => {
   });
 
   describe('addView', () => {
-    it('with named view and instrument wildcard should throw', () => {
-      const meterProvider = new MeterProvider({ resource: defaultResource });
-
-      // Throws with wildcard character only.
-      assert.throws(() => meterProvider.addView({
-        name: 'renamed-instrument'
-      },
-      {
-        instrument: {
-          name: '*'
-        }
-      }));
-
-      // Throws with wildcard character in instrument name.
-      assert.throws(() => meterProvider.addView({
-        name: 'renamed-instrument'
-      }, {
-        instrument: {
-          name: 'other.instrument.*'
-        }
-      }));
-    });
-
-    it('with named view and instrument type selector should throw', () => {
-      const meterProvider = new MeterProvider({ resource: defaultResource });
-
-      assert.throws(() => meterProvider.addView({
-        name: 'renamed-instrument'
-      },
-      {
-        instrument: {
-          type: InstrumentType.COUNTER
-        }
-      }));
-    });
-
-    it('with named view and no instrument selector should throw', () => {
-      const meterProvider = new MeterProvider({ resource: defaultResource });
-
-      assert.throws(() => meterProvider.addView({
-        name: 'renamed-instrument'
-      }));
-
-      assert.throws(() => meterProvider.addView({
-        name: 'renamed-instrument'
-      },
-      {}));
-    });
-
-    it('with no view parameters should throw', () => {
-      const meterProvider = new MeterProvider({ resource: defaultResource });
-
-      assert.throws(() => meterProvider.addView({}));
-    });
-
     it('with existing instrument should rename', async () => {
-      const meterProvider = new MeterProvider({ resource: defaultResource });
+      const meterProvider = new MeterProvider({
+        resource: defaultResource,
+        // Add view to rename 'non-renamed-instrument' to 'renamed-instrument'
+        views: [
+          new View({
+            name: 'renamed-instrument',
+            description: 'my renamed instrument',
+            instrumentName: 'non-renamed-instrument',
+          })
+        ]
+      });
 
       const reader = new TestMetricReader();
       meterProvider.addMetricReader(reader);
-
-      // Add view to rename 'non-renamed-instrument' to 'renamed-instrument'
-      meterProvider.addView({
-        name: 'renamed-instrument',
-        description: 'my renamed instrument'
-      },
-      {
-        instrument: {
-          name: 'non-renamed-instrument',
-        },
-      });
 
       // Create meter and instrument.
       const myMeter = meterProvider.getMeter('meter1', 'v1.0.0');
@@ -206,7 +151,7 @@ describe('MeterProvider', () => {
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
 
       // View updated name and description.
-      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SUM, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER,
         description: 'my renamed instrument'
@@ -228,20 +173,20 @@ describe('MeterProvider', () => {
     });
 
     it('with attributeKeys should drop non-listed attributes', async () => {
-      const meterProvider = new MeterProvider({ resource: defaultResource });
+
+      // Add view to drop all attributes except 'attrib1'
+      const meterProvider = new MeterProvider({
+        resource: defaultResource,
+        views: [
+          new View({
+            attributeKeys: ['attrib1'],
+            instrumentName: 'non-renamed-instrument'
+          })
+        ]
+      });
 
       const reader = new TestMetricReader();
       meterProvider.addMetricReader(reader);
-
-      // Add view to drop all attributes except 'attrib1'
-      meterProvider.addView({
-        attributeKeys: ['attrib1']
-      },
-      {
-        instrument: {
-          name: 'non-renamed-instrument',
-        }
-      });
 
       // Create meter and instrument.
       const myMeter = meterProvider.getMeter('meter1', 'v1.0.0');
@@ -265,7 +210,7 @@ describe('MeterProvider', () => {
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
 
       // View updated name and description.
-      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SUM, {
         name: 'non-renamed-instrument',
         type: InstrumentType.COUNTER,
       });
@@ -285,20 +230,16 @@ describe('MeterProvider', () => {
     });
 
     it('with no meter name should apply view to instruments of all meters', async () => {
-      const meterProvider = new MeterProvider({ resource: defaultResource });
+      // Add view that renames 'test-counter' to 'renamed-instrument'
+      const meterProvider = new MeterProvider({
+        resource: defaultResource,
+        views: [
+          new View({ name: 'renamed-instrument', instrumentName: 'test-counter' })
+        ]
+      });
 
       const reader = new TestMetricReader();
       meterProvider.addMetricReader(reader);
-
-      // Add view that renames 'test-counter' to 'renamed-instrument'
-      meterProvider.addView({
-        name: 'renamed-instrument'
-      },
-      {
-        instrument: {
-          name: 'test-counter'
-        }
-      });
 
       // Create two meters.
       const meter1 = meterProvider.getMeter('meter1', 'v1.0.0');
@@ -329,7 +270,7 @@ describe('MeterProvider', () => {
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
 
       // View updated the name to 'renamed-instrument' and instrument is still a Counter
-      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SUM, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER,
       });
@@ -344,30 +285,27 @@ describe('MeterProvider', () => {
       assert.strictEqual(resourceMetrics.scopeMetrics[1].metrics.length, 1);
 
       // View updated the name to 'renamed-instrument' and instrument is still a Counter
-      assertMetricData(resourceMetrics.scopeMetrics[1].metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(resourceMetrics.scopeMetrics[1].metrics[0], DataPointType.SUM, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER
       });
     });
 
     it('with meter name should apply view to only the selected meter', async () => {
-      const meterProvider = new MeterProvider({ resource: defaultResource });
+      const meterProvider = new MeterProvider({
+        resource: defaultResource,
+        views: [
+          // Add view that renames 'test-counter' to 'renamed-instrument' on 'meter1'
+          new View({
+            name: 'renamed-instrument',
+            instrumentName: 'test-counter',
+            meterName: 'meter1'
+          })
+        ]
+      });
 
       const reader = new TestMetricReader();
       meterProvider.addMetricReader(reader);
-
-      // Add view that renames 'test-counter' to 'renamed-instrument' on 'meter1'
-      meterProvider.addView({
-        name: 'renamed-instrument'
-      },
-      {
-        instrument: {
-          name: 'test-counter'
-        },
-        meter: {
-          name: 'meter1'
-        }
-      });
 
       // Create two meters.
       const meter1 = meterProvider.getMeter('meter1', 'v1.0.0');
@@ -398,7 +336,7 @@ describe('MeterProvider', () => {
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 1);
 
       // View updated the name to 'renamed-instrument' and instrument is still a Counter
-      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SUM, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER
       });
@@ -413,41 +351,31 @@ describe('MeterProvider', () => {
       assert.strictEqual(resourceMetrics.scopeMetrics[1].metrics.length, 1);
 
       // No updated name on 'test-counter'.
-      assertMetricData(resourceMetrics.scopeMetrics[1].metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(resourceMetrics.scopeMetrics[1].metrics[0], DataPointType.SUM, {
         name: 'test-counter',
         type: InstrumentType.COUNTER
       });
     });
 
     it('with different instrument types does not throw', async () => {
-      const meterProvider = new MeterProvider({ resource: defaultResource });
+      const meterProvider = new MeterProvider({
+        resource: defaultResource,
+        // Add Views to rename both instruments (of different types) to the same name.
+        views: [
+          new View({
+            name: 'renamed-instrument',
+            instrumentName: 'test-counter',
+            meterName: 'meter1'
+          }),
+          new View({
+            name: 'renamed-instrument',
+            instrumentName: 'test-histogram',
+            meterName: 'meter1'
+          })
+        ]
+      });
       const reader = new TestMetricReader();
       meterProvider.addMetricReader(reader);
-
-      // Add Views to rename both instruments (of different types) to the same name.
-      meterProvider.addView({
-        name: 'renamed-instrument'
-      },
-      {
-        instrument: {
-          name: 'test-counter'
-        },
-        meter: {
-          name: 'meter1'
-        }
-      });
-
-      meterProvider.addView({
-        name: 'renamed-instrument'
-      },
-      {
-        instrument: {
-          name: 'test-histogram'
-        },
-        meter: {
-          name: 'meter1'
-        }
-      });
 
       // Create meter and instruments.
       const meter = meterProvider.getMeter('meter1', 'v1.0.0');
@@ -475,7 +403,7 @@ describe('MeterProvider', () => {
       assert.strictEqual(resourceMetrics.scopeMetrics[0].metrics.length, 2);
 
       // Both 'renamed-instrument' are still exported with their types.
-      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SINGULAR, {
+      assertMetricData(resourceMetrics.scopeMetrics[0].metrics[0], DataPointType.SUM, {
         name: 'renamed-instrument',
         type: InstrumentType.COUNTER
       });

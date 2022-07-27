@@ -25,6 +25,8 @@ jobs:
         with:
           node-version: ${{ matrix.node_version }}
 
+      - run: npm install -g npm@latest
+
       - name: restore lerna
         id: cache
         uses: actions/cache@v3
