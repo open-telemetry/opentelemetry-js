@@ -38,5 +38,5 @@ export interface SpanExporter {
   shutdown(): Promise<void>;
 
   /** Immediately export all spans */
-  forceFlush?(): Promise<void>;
+  forceFlush(): Promise<void>;
 }

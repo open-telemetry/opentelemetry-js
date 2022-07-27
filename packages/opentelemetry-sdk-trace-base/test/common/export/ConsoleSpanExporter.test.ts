@@ -99,4 +99,15 @@ describe('ConsoleSpanExporter', () => {
       });
     });
   });
+
+  describe('force flush', () => {
+    describe('when flushing complete', () => {
+      it('should call an async callback', done => {
+        consoleExporter = new ConsoleSpanExporter();
+        consoleExporter.forceFlush().then(() => {
+          done();
+        });
+      });
+    });
+  });
 });

@@ -110,6 +110,10 @@ export abstract class OTLPExporterBase<
     return this._shutdownOnce.call();
   }
 
+  forceFlush(): Promise<void> {
+    return Promise.resolve();
+  }
+
   /**
    * Called by _shutdownOnce with BindOnceFuture
    */

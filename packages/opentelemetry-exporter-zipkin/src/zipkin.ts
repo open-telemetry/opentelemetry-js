@@ -109,6 +109,10 @@ export class ZipkinExporter implements SpanExporter {
     });
   }
 
+  forceFlush(): Promise<void> {
+    return Promise.resolve();
+  }
+
   /**
    * if user defines getExportRequestHeaders in config then this will be called
    * everytime before send, otherwise it will be replaced with noop in

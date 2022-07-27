@@ -80,6 +80,11 @@ describe('InMemorySpanExporter', () => {
     assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
   });
 
+  it('forceFlush should discard inmemory spans', () => {
+    memoryExporter.forceFlush();
+    assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
+  });
+
   it('should return the success result', () => {
     const exorter = new InMemorySpanExporter();
     exorter.export([], (result: ExportResult) => {

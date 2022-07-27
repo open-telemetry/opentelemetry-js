@@ -49,6 +49,11 @@ class DummySpanExporter implements tracing.SpanExporter {
   shutdown() {
     return Promise.resolve();
   }
+
+  forceFlush(): Promise<void> {
+    return Promise.resolve();
+  }
+
 }
 
 const getData = (url: string, method?: string) => {
