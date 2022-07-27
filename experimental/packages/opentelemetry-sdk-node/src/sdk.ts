@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ContextManager, TextMapPropagator } from '@opentelemetry/api';
+import { ContextManager, TextMapPropagator, diag } from '@opentelemetry/api';
 import { metrics } from '@opentelemetry/api-metrics';
 import {
   InstrumentationOption,
@@ -30,11 +30,14 @@ import {
 import { MeterProvider, MetricReader } from '@opentelemetry/sdk-metrics-base';
 import {
   BatchSpanProcessor,
-  SpanProcessor
+  SpanProcessor,
+  SpanExporter,
+  SimpleSpanProcessor
 } from '@opentelemetry/sdk-trace-base';
 import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
+import { getEnv } from '@opentelemetry/core';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 export class NodeSDK {
@@ -46,14 +49,12 @@ export class NodeSDK {
   };
   private _instrumentations: InstrumentationOption[];
   private _metricReader?: MetricReader;
-
   private _resource: Resource;
-
   private _autoDetectResources: boolean;
-
   private _tracerProvider?: NodeTracerProvider;
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
+  private _spanProcessors?: (BatchSpanProcessor | SimpleSpanProcessor)[];
 
   /**
    * Create a new NodeJS SDK instance
@@ -85,6 +86,9 @@ export class NodeSDK {
         configuration.contextManager,
         configuration.textMapPropagator
       );
+      // create trace exporter(s) from env
+    } else {
+      this.createTraceExportersFromEnv();
     }
 
     if (configuration.metricReader) {
@@ -96,6 +100,46 @@ export class NodeSDK {
       instrumentations = configuration.instrumentations;
     }
     this._instrumentations = instrumentations;
+  }
+
+  public createTraceExportersFromEnv() {
+    let traceExportersList = this.retrieveListOfTraceExporters();
+
+    if (traceExportersList.length === 0 || traceExportersList[0] === 'none') {
+      diag.warn('OTEL_TRACES_EXPORTER contains "none" or is empty. SDK will not be initialized.');
+    } else {
+      if (traceExportersList.length > 1 && traceExportersList.includes('none')) {
+        diag.warn('OTEL_TRACES_EXPORTER contains "none" along with other exporters. Using default otlp exporter.');
+        traceExportersList = ['otlp'];
+      }
+
+      const configuredExporters: SpanExporter[] =
+        traceExportersList.map(exporterName => {
+          return this.configureExporter(exporterName);
+        });
+
+      this._spanProcessors = this.configureSpanProcessors(configuredExporters);
+    }
+  }
+
+  // visible for testing
+  public retrieveListOfTraceExporters(): string[] {
+    const traceList = getEnv().OTEL_TRACES_EXPORTER.split(',');
+    const uniqueTraceExporters =  Array.from(new Set(traceList));
+
+    return this.filterBlanksAndNulls(uniqueTraceExporters);
+  }
+
+  private filterBlanksAndNulls(list: string[]): string[] {
+    return list.map(item => item.trim())
+      .filter(s => s !== 'null' && s !== '');
+  }
+
+  public configureExporter(name: string): SpanExporter {
+  }
+
+  // visible for testing
+  public configureSpanProcessors(exporters: SpanExporter[]): (BatchSpanProcessor | SimpleSpanProcessor)[] {
   }
 
   /** Set configurations required to register a NodeTracerProvider */
