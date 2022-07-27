@@ -40,8 +40,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
   }
 
   forceFlush(): Promise<void> {
-    // do nothing as all spans are being exported without waiting
-    return Promise.resolve();
+    return this._exporter.forceFlush();
   }
 
   // does nothing.
