@@ -436,7 +436,7 @@ describe('PrometheusSerializer', () => {
       meterProvider.addMetricReader(reader);
       const meter = meterProvider.getMeter('test');
 
-      const { unit, exportAll = false } = options
+      const { unit, exportAll = false } = options;
       const counter = meter.createCounter(name, { unit: unit });
       counter.add(1);
 
