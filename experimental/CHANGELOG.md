@@ -6,26 +6,41 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+* fix(instrumentation-http): add `http.host` attribute before sending the request #3054 @cuichenli
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.31.0
+
+### :boom: Breaking Change
+
 * feature(views): move views registration to MeterProvider constructor [#3066](https://github.com/open-telemetry/opentelemetry-js/pull/3066) @pichlermarc
 * feat(sdk-metrics-base): split up Singular into Sum and Gauge in MetricData [#3079](https://github.com/open-telemetry/opentelemetry-js/pull/3079) @pichlermarc
   * removes `DataPointType.SINGULAR`, and replaces it with `DataPointType.SUM` and `DataPointType.GAUGE`
   * removes `SingularMetricData` and replaces it with `SumMetricData` (including an additional `isMonotonic` flag) and `GaugeMetricData`
+* feat(histogram): align collection of optional Histogram properties with spec [#3102](https://github.com/open-telemetry/opentelemetry-js/pull/3079) @pichlermarc
+  * changes type of `sum` property on `Histogram` to `number | undefined`
+  * changes type of `min` and `max` properties on `Histogram` to `number | undefined`
+  * removes `hasMinMax` flag on the exported `Histogram` - this is now indicated by `min` and `max` being `undefined`
 
 ### :rocket: (Enhancement)
 
 * feat(metrics-api): use common attributes definitions #3038 @legendecas
 * feat(otlp-proto): pre-compile proto files [#3098](https://github.com/open-telemetry/opentelemetry-js/pull/3098) @legendecas
+* feat(opentelemetry-sdk-metrics-base): added InMemoryMetricExporter [#3039](https://github.com/open-telemetry/opentelemetry-js/pull/3039) @weyert
 
 ### :bug: (Bug Fix)
 
 * fix(histogram): fix maximum when only values < -1 are provided [#3086](https://github.com/open-telemetry/opentelemetry-js/pull/3086) @pichlermarc
 * fix(sdk-metrics-base): fix PeriodicExportingMetricReader keeping Node.js process from exiting
   [#3106](https://github.com/open-telemetry/opentelemetry-js/pull/3106) @seemk
-* fix(instrumentation-http): add `http.host` attribute before sending the request #3054 @cuichenli
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
+* fix(otlp-proto): fixes [#2791](https://github.com/open-telemetry/opentelemetry-js/issues/2791) otlp proto exporters no longer share a single global proto definition
+  [#3098](https://github.com/open-telemetry/opentelemetry-js/pull/3098) @legendecas
 
 ## 0.30.0
 

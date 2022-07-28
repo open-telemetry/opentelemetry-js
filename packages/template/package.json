@@ -1,13 +1,13 @@
 {
   "name": "@opentelemetry/template",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "private": true,
   "publishConfig": {
     "access": "restricted"
   },
   "description": "> TODO: description",
   "author": "OpenTelemetry Authors",
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+  "Update homepage location": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/template",
   "license": "Apache-2.0",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
