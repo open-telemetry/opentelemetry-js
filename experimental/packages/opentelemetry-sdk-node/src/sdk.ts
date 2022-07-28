@@ -129,7 +129,7 @@ export class NodeSDK {
 
   // visible for testing
   public retrieveListOfTraceExporters(): string[] {
-    // todo: change default back to otlp and use alternative to getEnv
+    // should we setup the default exporter when user doesn't provide specifc values
     const traceList = getEnv().OTEL_TRACES_EXPORTER.split(',');
     const uniqueTraceExporters =  Array.from(new Set(traceList));
 
@@ -161,16 +161,14 @@ export class NodeSDK {
     }
   }
 
-  // todo: update retrieval of env using alternative to getEnv and add defaults back to environment.ts file 
   public getOtlpProtocol(dataType: string): string {
-    const DEFAULT_OTLP_PROTOCOL = 'http/protobuf';
     switch (dataType) {
       case 'traces':
-        return getEnv().OTEL_EXPORTER_OTLP_TRACES_PROTOCOL || getEnv().OTEL_EXPORTER_OTLP_PROTOCOL || DEFAULT_OTLP_PROTOCOL;
+        return getEnv().OTEL_EXPORTER_OTLP_TRACES_PROTOCOL || getEnv().OTEL_EXPORTER_OTLP_PROTOCOL;
       case 'metrics':
-        return getEnv().OTEL_EXPORTER_OTLP_METRICS_PROTOCOL || getEnv().OTEL_EXPORTER_OTLP_PROTOCOL || DEFAULT_OTLP_PROTOCOL;
+        return getEnv().OTEL_EXPORTER_OTLP_METRICS_PROTOCOL || getEnv().OTEL_EXPORTER_OTLP_PROTOCOL;
       default:
-        return getEnv().OTEL_EXPORTER_OTLP_PROTOCOL || DEFAULT_OTLP_PROTOCOL;
+        return getEnv().OTEL_EXPORTER_OTLP_PROTOCOL;
     }
   }
 

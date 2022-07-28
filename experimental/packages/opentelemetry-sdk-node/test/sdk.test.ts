@@ -339,7 +339,7 @@ describe('Node SDK', () => {
   });
 });
 
-describe('setup exporter from env', () => {
+describe.only('setup exporter from env', () => {
   let spyExporterList: Sinon.SinonSpy;
   let spyConfigureExporter: Sinon.SinonSpy;
   let spyConfigureSpanProcessors: Sinon.SinonSpy;
@@ -360,10 +360,18 @@ describe('setup exporter from env', () => {
     stubLoggerError.restore();
   });
   describe('set up otlp exporter from env', () => {
-    it('do not set up any exporter(s) when no exporters listed', () => {
+    it('set up default exporter when user does not define otel trace exporter', () => {
       new NodeSDK();
-      assert(spyExporterList.returned([]));
-      assert(spyConfigureExporter.notCalled);
+      const listOfProcessors = spyConfigureSpanProcessors.returnValues[0];
+      const listOfExporters = spyConfigureSpanProcessors.args[0][0];
+
+      assert(spyExporterList.returned(['otlp']));
+      assert(spyConfigureExporter.calledWith('otlp'));
+      assert(spyGetOtlpProtocol.returned('http/protobuf'));
+      assert(listOfExporters.length === 1);
+      assert(listOfExporters[0] instanceof OTLPProtoTraceExporter);
+      assert(listOfProcessors.length === 1);
+      assert(listOfProcessors[0] instanceof BatchSpanProcessor);
     });
     it('use otlp exporter and defined exporter protocol env value', () => {
       env.OTEL_TRACES_EXPORTER = 'otlp';
