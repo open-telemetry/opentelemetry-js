@@ -38,6 +38,9 @@ import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/sdk-trace-n
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
 import { getEnv } from '@opentelemetry/core';
+import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
+import { OTLPTraceExporter as OTLPHttpTraceExporter} from '@opentelemetry/exporter-trace-otlp-http';
+import { OTLPTraceExporter as OTLPGrpcTraceExporter} from '@opentelemetry/exporter-trace-otlp-grpc';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 export class NodeSDK {
@@ -55,6 +58,7 @@ export class NodeSDK {
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
   private _spanProcessors?: (BatchSpanProcessor | SimpleSpanProcessor)[];
+  private DATA_TYPE_TRACES = 'traces';
 
   /**
    * Create a new NodeJS SDK instance
@@ -136,10 +140,30 @@ export class NodeSDK {
   }
 
   public configureExporter(name: string): SpanExporter {
+    switch (name) {
+      default:
+        return this.configureOtlp();
+    }
   }
 
-  // visible for testing
-  public configureSpanProcessors(exporters: SpanExporter[]): (BatchSpanProcessor | SimpleSpanProcessor)[] {
+  public configureOtlp(): SpanExporter {
+    const protocol = this.getOtlpProtocol(this.DATA_TYPE_TRACES);
+
+    switch (protocol) {
+      case 'grpc':
+        return new OTLPGrpcTraceExporter();
+      case 'http/json':
+        return new OTLPHttpTraceExporter();
+      default:
+        return new OTLPProtoTraceExporter();
+    }
+  }
+
+  public getOtlpProtocol(dataType: string): string {
+  }
+
+   // visible for testing
+   public configureSpanProcessors(exporters: SpanExporter[]): (BatchSpanProcessor | SimpleSpanProcessor)[] {
   }
 
   /** Set configurations required to register a NodeTracerProvider */
