@@ -427,7 +427,8 @@ describe('PrometheusSerializer', () => {
   });
 
   describe('validate against metric conventions', () => {
-    async function getCounterResult(name: string, unit: string | undefined = undefined, serializer: PrometheusSerializer, exportAll = false) {
+
+    async function getCounterResult(name: string, serializer: PrometheusSerializer, options: Partial<{ unit: string, exportAll: boolean }> = {}) {
       const reader = new TestMetricReader();
       const meterProvider = new MeterProvider({
         views: [new View({ aggregation: new SumAggregation(), instrumentName: '*' })]
@@ -435,6 +436,7 @@ describe('PrometheusSerializer', () => {
       meterProvider.addMetricReader(reader);
       const meter = meterProvider.getMeter('test');
 
+      const { unit, exportAll = false } = options
       const counter = meter.createCounter(name, { unit: unit });
       counter.add(1);
 
@@ -460,7 +462,7 @@ describe('PrometheusSerializer', () => {
       const serializer = new PrometheusSerializer();
 
       const unitOfMetric = 'seconds';
-      const result = await getCounterResult('test', unitOfMetric, serializer, true);
+      const result = await getCounterResult('test', serializer, { unit: unitOfMetric, exportAll: true });
       assert.strictEqual(
         result,
         '# HELP test_total description missing\n' +
@@ -473,7 +475,7 @@ describe('PrometheusSerializer', () => {
     it('should not export unit block when unit of metric is missing', async () => {
       const serializer = new PrometheusSerializer();
 
-      const result = await getCounterResult('test', undefined, serializer, true);
+      const result = await getCounterResult('test', serializer, { exportAll: true });
       assert.strictEqual(
         result,
         '# HELP test_total description missing\n' +
@@ -485,13 +487,13 @@ describe('PrometheusSerializer', () => {
     it('should rename metric of type counter when name misses _total suffix', async () => {
       const serializer = new PrometheusSerializer();
 
-      const result = await getCounterResult('test', undefined, serializer);
+      const result = await getCounterResult('test', serializer);
       assert.strictEqual(result, `test_total 1 ${mockedHrTimeMs}\n`);
     });
 
     it('should not rename metric of type counter when name contains _total suffix', async () => {
       const serializer = new PrometheusSerializer();
-      const result = await getCounterResult('test_total', undefined, serializer);
+      const result = await getCounterResult('test_total', serializer);
 
       assert.strictEqual(result, `test_total 1 ${mockedHrTimeMs}\n`);
     });
