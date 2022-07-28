@@ -8,6 +8,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feature(add-console-metrics-exporter): add ConsoleMetricExporter [#3120](https://github.com/open-telemetry/opentelemetry-js/pull/3120) @weyert
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
