@@ -8,8 +8,9 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
-### :bug: (Bug Fix)
+* feature(prometheus-serialiser): export the unit block when unit is set in metric descriptor [#3066](https://github.com/open-telemetry/opentelemetry-js/pull/3041) @weyert
 
+### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
 
