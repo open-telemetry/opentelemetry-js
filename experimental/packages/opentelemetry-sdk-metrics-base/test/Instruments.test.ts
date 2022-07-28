@@ -25,7 +25,8 @@ import {
   MeterProvider,
   MetricReader,
   DataPoint,
-  DataPointType
+  DataPointType,
+  Histogram
 } from '../src';
 import { TestMetricReader } from './export/TestMetricReader';
 import {
@@ -36,7 +37,6 @@ import {
   defaultResource,
   defaultInstrumentationScope
 } from './util';
-import { Histogram } from '../src/aggregator/types';
 import { ObservableResult, ValueType } from '@opentelemetry/api-metrics';
 
 describe('Instruments', () => {
@@ -301,7 +301,6 @@ describe('Instruments', () => {
               },
               count: 2,
               sum: 10,
-              hasMinMax: true,
               max: 10,
               min: 0
             },
@@ -315,7 +314,6 @@ describe('Instruments', () => {
               },
               count: 2,
               sum: 100,
-              hasMinMax: true,
               max: 100,
               min: 0
             },
@@ -358,7 +356,6 @@ describe('Instruments', () => {
               },
               count: 2,
               sum: 110,
-              hasMinMax: true,
               min: 20,
               max: 90
             },
@@ -386,7 +383,6 @@ describe('Instruments', () => {
               },
               count: 4,
               sum: 220,
-              hasMinMax: true,
               min: 10,
               max: 100
             },
@@ -430,7 +426,6 @@ describe('Instruments', () => {
               },
               count: 2,
               sum: 10.1,
-              hasMinMax: true,
               max: 10,
               min: 0.1
             },
@@ -444,7 +439,6 @@ describe('Instruments', () => {
               },
               count: 2,
               sum: 100.1,
-              hasMinMax: true,
               max: 100,
               min: 0.1
             },

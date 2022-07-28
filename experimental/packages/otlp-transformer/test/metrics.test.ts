@@ -219,9 +219,8 @@ describe('Metrics', () => {
       sum: number,
       boundaries: number[],
       counts: number[], aggregationTemporality: AggregationTemporality,
-      hasMinMax: boolean,
-      min: number,
-      max: number): MetricData {
+      min?: number,
+      max?: number): MetricData {
       return {
         descriptor: {
           description: 'this is a description',
@@ -237,7 +236,6 @@ describe('Metrics', () => {
             value: {
               sum: sum,
               count: count,
-              hasMinMax: hasMinMax,
               min: min,
               max: max,
               buckets: {
@@ -477,7 +475,7 @@ describe('Metrics', () => {
     describe('serializes a histogram metric record', () => {
       it('with min/max', () => {
         const exportRequest = createExportMetricsServiceRequest(
-          [createResourceMetrics([createHistogramMetrics(2, 9, [5], [1, 1], AggregationTemporality.CUMULATIVE, true,1, 8)])]
+          [createResourceMetrics([createHistogramMetrics(2, 9, [5], [1, 1], AggregationTemporality.CUMULATIVE, 1, 8)])]
         );
         assert.ok(exportRequest);
 
@@ -522,7 +520,7 @@ describe('Metrics', () => {
 
       it('without min/max', () => {
         const exportRequest = createExportMetricsServiceRequest(
-          [createResourceMetrics([createHistogramMetrics(2, 9, [5], [1, 1], AggregationTemporality.CUMULATIVE, false, Infinity, -1)])]
+          [createResourceMetrics([createHistogramMetrics(2, 9, [5], [1, 1], AggregationTemporality.CUMULATIVE)])]
         );
         assert.ok(exportRequest);
 

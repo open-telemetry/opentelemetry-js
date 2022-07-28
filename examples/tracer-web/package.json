@@ -54,5 +54,5 @@
     "@opentelemetry/exporter-metrics-otlp-http": "0.27.0",
     "@opentelemetry/sdk-metrics-base": "0.27.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/tracer-web"
 }

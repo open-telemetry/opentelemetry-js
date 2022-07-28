@@ -40,7 +40,7 @@
     "@opentelemetry/sdk-trace-node": "^1.0.1",
     "google-protobuf": "^3.9.2"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/grpc-js",
   "devDependencies": {
     "cross-env": "^6.0.0"
   }
