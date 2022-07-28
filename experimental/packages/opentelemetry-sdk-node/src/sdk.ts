@@ -159,7 +159,17 @@ export class NodeSDK {
     }
   }
 
+  // todo: update retrieval of env using alternative to getEnv and add defaults back to environment.ts file 
   public getOtlpProtocol(dataType: string): string {
+    const DEFAULT_OTLP_PROTOCOL = 'http/protobuf';
+    switch (dataType) {
+      case 'traces':
+        return getEnv().OTEL_EXPORTER_OTLP_TRACES_PROTOCOL || getEnv().OTEL_EXPORTER_OTLP_PROTOCOL || DEFAULT_OTLP_PROTOCOL;
+      case 'metrics':
+        return getEnv().OTEL_EXPORTER_OTLP_METRICS_PROTOCOL || getEnv().OTEL_EXPORTER_OTLP_PROTOCOL || DEFAULT_OTLP_PROTOCOL;
+      default:
+        return getEnv().OTEL_EXPORTER_OTLP_PROTOCOL || DEFAULT_OTLP_PROTOCOL;
+    }
   }
 
    // visible for testing
