@@ -15,8 +15,13 @@
  */
 
 import { Sampler } from '@opentelemetry/api';
-import { buildSamplerFromEnv, DEFAULT_CONFIG } from './config';
+import { buildSamplerFromEnv, loadDefaultConfig } from './config';
 import { SpanLimits, TracerConfig, GeneralLimits } from './types';
+import {
+  DEFAULT_ATTRIBUTE_COUNT_LIMIT,
+  DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
+  getEnvWithoutDefaults,
+} from '@opentelemetry/core';
 
 /**
  * Function to merge Default configuration (as specified in './config') with
@@ -30,6 +35,8 @@ export function mergeConfig(userConfig: TracerConfig): TracerConfig & {
   const perInstanceDefaults: Partial<TracerConfig> = {
     sampler: buildSamplerFromEnv(),
   };
+
+  const DEFAULT_CONFIG = loadDefaultConfig();
 
   const target = Object.assign(
     {},
@@ -61,21 +68,27 @@ export function mergeConfig(userConfig: TracerConfig): TracerConfig & {
 export function reconfigureLimits(userConfig: TracerConfig): TracerConfig {
   const spanLimits = Object.assign({}, userConfig.spanLimits);
 
-  /**
-   * When span attribute count limit is not defined, but general attribute count limit is defined
-   * Then, span attribute count limit will be same as general one
-   */
-  if (spanLimits.attributeCountLimit == null && userConfig.generalLimits?.attributeCountLimit != null) {
-    spanLimits.attributeCountLimit = userConfig.generalLimits.attributeCountLimit;
-  }
+  const parsedEnvConfig = getEnvWithoutDefaults();
 
   /**
-   * When span attribute value length limit is not defined, but general attribute value length limit is defined
-   * Then, span attribute value length limit will be same as general one
+   * Reassign span attribute count limit to use first non null value defined by user or use default value
    */
-  if (spanLimits.attributeValueLengthLimit == null && userConfig.generalLimits?.attributeValueLengthLimit != null) {
-    spanLimits.attributeValueLengthLimit = userConfig.generalLimits.attributeValueLengthLimit;
-  }
+  spanLimits.attributeCountLimit =
+    userConfig.spanLimits?.attributeCountLimit ??
+    userConfig.generalLimits?.attributeCountLimit ??
+    parsedEnvConfig.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT ??
+    parsedEnvConfig.OTEL_ATTRIBUTE_COUNT_LIMIT ??
+    DEFAULT_ATTRIBUTE_COUNT_LIMIT;
+
+  /**
+   * Reassign span attribute value length limit to use first non null value defined by user or use default value
+   */
+  spanLimits.attributeValueLengthLimit =
+    userConfig.spanLimits?.attributeValueLengthLimit ??
+    userConfig.generalLimits?.attributeValueLengthLimit ??
+    parsedEnvConfig.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT ??
+    parsedEnvConfig.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT ??
+    DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT;
 
   return Object.assign({}, userConfig, { spanLimits });
 }
