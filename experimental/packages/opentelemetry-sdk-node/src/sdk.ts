@@ -32,7 +32,8 @@ import {
   BatchSpanProcessor,
   SpanProcessor,
   SpanExporter,
-  SimpleSpanProcessor
+  SimpleSpanProcessor,
+  ConsoleSpanExporter
 } from '@opentelemetry/sdk-trace-base';
 import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
@@ -173,7 +174,14 @@ export class NodeSDK {
   }
 
    // visible for testing
-   public configureSpanProcessors(exporters: SpanExporter[]): (BatchSpanProcessor | SimpleSpanProcessor)[] {
+  public configureSpanProcessors(exporters: SpanExporter[]): (BatchSpanProcessor | SimpleSpanProcessor)[] {
+    return exporters.map(exporter => {
+      if (exporter instanceof ConsoleSpanExporter) {
+        return new SimpleSpanProcessor(exporter);
+      } else {
+        return new BatchSpanProcessor(exporter);
+      }
+    });
   }
 
   /** Set configurations required to register a NodeTracerProvider */
