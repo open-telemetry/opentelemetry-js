@@ -79,6 +79,12 @@ implements ContextManager {
       writable: false,
       value: target.length,
     });
+
+    // @ts-expect-error listener is not a property of type Function but it is actually used by the onceWrapper in events.js
+    if (target.listener) {
+      // @ts-expect-error listener is not a property of type Function but it is actually used by the onceWrapper in events.js
+      contextWrapper.listener = target.listener;
+    }
     /**
      * It isn't possible to tell Typescript that contextWrapper is the same as T
      * so we forced to cast as any here.
