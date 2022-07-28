@@ -351,12 +351,6 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       this._closeHttpSpan(span);
     });
 
-    request.on('timeout', (error: Err) => {
-      this._diag.debug('outgoingRequest on request timeout()', error);
-      utils.setSpanWithError(span, new Error('Timeout'));
-      this._closeHttpSpan(span);
-    });
-
     this._diag.debug('http.ClientRequest return request');
     return request;
   }

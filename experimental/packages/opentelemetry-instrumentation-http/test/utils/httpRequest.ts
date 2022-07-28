@@ -60,7 +60,9 @@ function get(input: any, options?: any): GetResult {
       reject(err);
     });
     req.on('timeout', () => {
-      reject(new Error('timeout'));
+      const err = new Error('timeout');
+      req.emit('error', err);
+      reject(err);
     });
     return req;
   });

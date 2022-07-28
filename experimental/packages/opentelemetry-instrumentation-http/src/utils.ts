@@ -312,7 +312,7 @@ export const extractHostnameAndPort = (
       port = requestOptions.protocol === 'https:' ? '443' : '80';
     }
   }
-  return {hostname, port,};
+  return {hostname, port};
 };
 
 /**
