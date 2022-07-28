@@ -177,6 +177,11 @@ implements ContextManager {
   ) {
     const contextManager = this;
     return function (this: never, event: string, listener: Func<void>) {
+      // @ts-expect-error listener is not a property of type Function but it is actually used by the onceWrapper in events.js
+      if (typeof listener === 'function' && typeof listener.listener === 'function' && listener.name === 'bound onceWrapper') {
+        return original.call(this, event, listener);
+      }
+
       let map = contextManager._getPatchMap(ee);
       if (map === undefined) {
         map = contextManager._createPatchMap(ee);
