@@ -248,6 +248,15 @@ export class NodeSDK {
         contextManager: this._tracerProviderConfig.contextManager,
         propagator: this._tracerProviderConfig.textMapPropagator,
       });
+    } else if (this._spanProcessors) {
+      const tracerProvider = new NodeTracerProvider();
+      this._tracerProvider = tracerProvider;
+
+      this._spanProcessors.forEach(processor => {
+        this._tracerProvider?.addSpanProcessor(processor);
+      });
+
+      tracerProvider.register();
     }
 
     if (this._metricReader) {
