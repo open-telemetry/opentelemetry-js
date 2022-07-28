@@ -92,20 +92,18 @@ describe('ConsoleMetricExporter', () => {
     const keys = Object.keys(consoleMetric).sort().join(',');
 
     const expectedKeys = [
-      'description',
-      'name',
-      'type',
-      'unit',
-      'valueType',
+      'dataPointType',
+      'dataPoints',
+      'descriptor',
     ].join(',');
 
     assert.ok(firstResourceMetric.resource.attributes.resourceKey === 'my-resource', 'resourceKey');
     assert.ok(keys === expectedKeys, 'expectedKeys');
-    assert.ok(consoleMetric.name === 'counter_total', 'name');
-    assert.ok(consoleMetric.description === 'a test description', 'description');
-    assert.ok(consoleMetric.type === 'COUNTER', 'type');
-    assert.ok(consoleMetric.unit === '', 'unit');
-    assert.ok(consoleMetric.valueType === 1, 'valueType');
+    assert.ok(consoleMetric.descriptor.name === 'counter_total', 'name');
+    assert.ok(consoleMetric.descriptor.description === 'a test description', 'description');
+    assert.ok(consoleMetric.descriptor.type === 'COUNTER', 'type');
+    assert.ok(consoleMetric.descriptor.unit === '', 'unit');
+    assert.ok(consoleMetric.descriptor.valueType === 1, 'valueType');
 
     assert.ok(spyExport.calledOnce);
   });

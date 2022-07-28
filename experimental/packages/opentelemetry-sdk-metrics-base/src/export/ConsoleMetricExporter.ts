@@ -16,7 +16,7 @@
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import { InstrumentType } from '../InstrumentDescriptor';
 import { AggregationTemporality } from './AggregationTemporality';
-import { ResourceMetrics, DataPointType } from './MetricData';
+import { ResourceMetrics } from './MetricData';
 import { PushMetricExporter } from './MetricExporter';
 
 /* eslint-disable no-console */
@@ -24,6 +24,11 @@ export class ConsoleMetricExporter implements PushMetricExporter {
   protected _shutdown = false;
 
   export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): void {
+    if (this._shutdown) {
+      setImmediate(resultCallback, { code: ExportResultCode.SUCCESS });
+      return;
+    }
+
     return ConsoleMetricExporter._sendMetrics(metrics, resultCallback);
   }
 
@@ -41,11 +46,11 @@ export class ConsoleMetricExporter implements PushMetricExporter {
   private static _sendMetrics(metrics: ResourceMetrics, done: (result: ExportResult) => void): void {
     for (const libraryMetrics of metrics.scopeMetrics) {
       for (const metric of libraryMetrics.metrics) {
-        console.dir(metric.descriptor);
-        console.dir(DataPointType[metric.dataPointType]);
-        for (const dataPoint of metric.dataPoints) {
-          console.dir(dataPoint);
-        }
+        console.dir({
+          descriptor: metric.descriptor,
+          dataPointType: metric.dataPointType,
+          dataPoints: metric.dataPoints
+        });
       }
     }
     done({ code: ExportResultCode.SUCCESS });
