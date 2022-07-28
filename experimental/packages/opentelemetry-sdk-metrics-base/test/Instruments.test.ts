@@ -25,7 +25,8 @@ import {
   MeterProvider,
   MetricReader,
   DataPoint,
-  DataPointType
+  DataPointType,
+  Histogram
 } from '../src';
 import { TestMetricReader } from './export/TestMetricReader';
 import {
@@ -36,7 +37,6 @@ import {
   defaultResource,
   defaultInstrumentationScope
 } from './util';
-import { Histogram } from '../src/aggregator/types';
 import { ObservableResult, ValueType } from '@opentelemetry/api-metrics';
 
 describe('Instruments', () => {
@@ -83,7 +83,8 @@ describe('Instruments', () => {
           type: InstrumentType.COUNTER,
           valueType: ValueType.INT,
         },
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: true,
         dataPoints: [
           {
             attributes: {},
@@ -99,7 +100,8 @@ describe('Instruments', () => {
       // add negative values should not be observable.
       counter.add(-1.1);
       await validateExport(cumulativeReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: true,
         dataPoints: [
           {
             attributes: {},
@@ -125,7 +127,8 @@ describe('Instruments', () => {
       counter.add(1, { foo: 'bar' });
       counter.add(1.2, { foo: 'bar' });
       await validateExport(cumulativeReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: true,
         dataPoints: [
           {
             attributes: {},
@@ -141,7 +144,8 @@ describe('Instruments', () => {
       // add negative values should not be observable.
       counter.add(-1.1);
       await validateExport(cumulativeReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: true,
         dataPoints: [
           {
             attributes: {},
@@ -199,7 +203,8 @@ describe('Instruments', () => {
           type: InstrumentType.UP_DOWN_COUNTER,
           valueType: ValueType.INT,
         },
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: false,
         dataPoints: [
           {
             attributes: {},
@@ -224,7 +229,8 @@ describe('Instruments', () => {
       upDownCounter.add(4, { foo: 'bar' });
       upDownCounter.add(1.1, { foo: 'bar' });
       await validateExport(deltaReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: false,
         dataPoints: [
           {
             attributes: {},
@@ -295,7 +301,6 @@ describe('Instruments', () => {
               },
               count: 2,
               sum: 10,
-              hasMinMax: true,
               max: 10,
               min: 0
             },
@@ -309,7 +314,6 @@ describe('Instruments', () => {
               },
               count: 2,
               sum: 100,
-              hasMinMax: true,
               max: 100,
               min: 0
             },
@@ -352,7 +356,6 @@ describe('Instruments', () => {
               },
               count: 2,
               sum: 110,
-              hasMinMax: true,
               min: 20,
               max: 90
             },
@@ -380,7 +383,6 @@ describe('Instruments', () => {
               },
               count: 4,
               sum: 220,
-              hasMinMax: true,
               min: 10,
               max: 100
             },
@@ -424,7 +426,6 @@ describe('Instruments', () => {
               },
               count: 2,
               sum: 10.1,
-              hasMinMax: true,
               max: 10,
               min: 0.1
             },
@@ -438,7 +439,6 @@ describe('Instruments', () => {
               },
               count: 2,
               sum: 100.1,
-              hasMinMax: true,
               max: 100,
               min: 0.1
             },
@@ -488,7 +488,8 @@ describe('Instruments', () => {
       });
 
       await validateExport(cumulativeReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: false,
         dataPoints: [
           {
             attributes: {},
@@ -501,7 +502,8 @@ describe('Instruments', () => {
         ],
       });
       await validateExport(cumulativeReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: false,
         dataPoints: [
           {
             attributes: {},
@@ -543,7 +545,8 @@ describe('Instruments', () => {
       });
 
       await validateExport(cumulativeReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: false,
         dataPoints: [
           {
             attributes: {},
@@ -556,7 +559,8 @@ describe('Instruments', () => {
         ],
       });
       await validateExport(cumulativeReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.SUM,
+        isMonotonic: false,
         dataPoints: [
           {
             attributes: {},
@@ -603,7 +607,7 @@ describe('Instruments', () => {
       });
 
       await validateExport(cumulativeReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.GAUGE,
         dataPoints: [
           {
             attributes: {},
@@ -616,7 +620,7 @@ describe('Instruments', () => {
         ],
       });
       await validateExport(cumulativeReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.GAUGE,
         dataPoints: [
           {
             attributes: {},
@@ -629,7 +633,7 @@ describe('Instruments', () => {
         ],
       });
       await validateExport(cumulativeReader, {
-        dataPointType: DataPointType.SINGULAR,
+        dataPointType: DataPointType.GAUGE,
         dataPoints: [
           {
             attributes: {},
@@ -667,8 +671,9 @@ interface ValidateMetricData {
   resource?: Resource;
   instrumentationScope?: InstrumentationScope;
   descriptor?: InstrumentDescriptor;
-  dataPointType?: DataPointType,
+  dataPointType?: DataPointType;
   dataPoints?: Partial<DataPoint<number | Partial<Histogram>>>[];
+  isMonotonic?: boolean;
 }
 
 async function validateExport(reader: MetricReader, expected: ValidateMetricData) {

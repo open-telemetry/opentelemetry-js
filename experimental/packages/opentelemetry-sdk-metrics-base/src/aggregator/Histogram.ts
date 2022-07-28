@@ -18,16 +18,38 @@ import {
   Accumulation,
   AccumulationRecord,
   Aggregator,
-  AggregatorKind,
-  Histogram,
+  AggregatorKind
 } from './types';
-import { HistogramMetricData, DataPointType } from '../export/MetricData';
+import {
+  DataPointType,
+  HistogramMetricData
+} from '../export/MetricData';
 import { HrTime } from '@opentelemetry/api';
-import { InstrumentDescriptor } from '../InstrumentDescriptor';
+import {
+  InstrumentDescriptor,
+  InstrumentType
+} from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 
-function createNewEmptyCheckpoint(boundaries: number[]): Histogram {
+/**
+ * Internal value type for HistogramAggregation.
+ * Differs from the exported type as undefined sum/min/max complicate arithmetic
+ * performed by this aggregation, but are required to be undefined in the exported types.
+ */
+interface InternalHistogram {
+  buckets: {
+    boundaries: number[];
+    counts: number[];
+  };
+  sum: number;
+  count: number;
+  hasMinMax: boolean;
+  min: number;
+  max: number;
+}
+
+function createNewEmptyCheckpoint(boundaries: number[]): InternalHistogram {
   const counts = boundaries.map(() => 0);
   counts.push(0);
   return {
@@ -39,7 +61,7 @@ function createNewEmptyCheckpoint(boundaries: number[]): Histogram {
     count: 0,
     hasMinMax: false,
     min: Infinity,
-    max: -1
+    max: -Infinity
   };
 }
 
@@ -48,7 +70,7 @@ export class HistogramAccumulation implements Accumulation {
     public startTime: HrTime,
     private readonly _boundaries: number[],
     private _recordMinMax = true,
-    private _current: Histogram = createNewEmptyCheckpoint(_boundaries)
+    private _current: InternalHistogram = createNewEmptyCheckpoint(_boundaries)
   ) {}
 
   record(value: number): void {
@@ -75,7 +97,7 @@ export class HistogramAccumulation implements Accumulation {
     this.startTime = startTime;
   }
 
-  toPointValue(): Histogram {
+  toPointValue(): InternalHistogram {
     return this._current;
   }
 }
@@ -115,7 +137,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
     }
 
     let min = Infinity;
-    let max = -1;
+    let max = -Infinity;
 
     if (this._recordMinMax) {
       if (previousValue.hasMinMax && deltaValue.hasMinMax) {
@@ -167,7 +189,7 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
       sum: currentValue.sum - previousValue.sum,
       hasMinMax: false,
       min: Infinity,
-      max: -1
+      max: -Infinity
     });
   }
 
@@ -181,11 +203,25 @@ export class HistogramAggregator implements Aggregator<HistogramAccumulation> {
       aggregationTemporality,
       dataPointType: DataPointType.HISTOGRAM,
       dataPoints: accumulationByAttributes.map(([attributes, accumulation]) => {
+        const pointValue = accumulation.toPointValue();
+
+        // determine if instrument allows negative values.
+        const allowsNegativeValues =
+          (descriptor.type === InstrumentType.UP_DOWN_COUNTER) ||
+          (descriptor.type === InstrumentType.OBSERVABLE_GAUGE) ||
+          (descriptor.type === InstrumentType.OBSERVABLE_UP_DOWN_COUNTER);
+
         return {
           attributes,
           startTime: accumulation.startTime,
           endTime,
-          value: accumulation.toPointValue(),
+          value: {
+            min: pointValue.hasMinMax ? pointValue.min : undefined,
+            max: pointValue.hasMinMax ? pointValue.max : undefined,
+            sum: !allowsNegativeValues ? pointValue.sum : undefined,
+            buckets: pointValue.buckets,
+            count: pointValue.count
+          },
         };
       })
     };

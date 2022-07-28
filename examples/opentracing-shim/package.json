@@ -40,7 +40,7 @@
     "@opentelemetry/sdk-trace-base": "0.25.0",
     "opentracing": "^0.14.4"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/opentracing-shim",
   "devDependencies": {
     "cross-env": "^6.0.0"
   }

@@ -16,10 +16,21 @@
 
 import { HrTime } from '@opentelemetry/api';
 import * as assert from 'assert';
-import { AggregationTemporality } from '../../src';
-import { HistogramAccumulation, HistogramAggregator } from '../../src/aggregator';
-import { MetricData, DataPointType } from '../../src/export/MetricData';
-import { commonValues, defaultInstrumentDescriptor } from '../util';
+import {
+  AggregationTemporality,
+  InstrumentType,
+  DataPointType,
+  MetricData
+} from '../../src';
+import {
+  HistogramAccumulation,
+  HistogramAggregator
+} from '../../src/aggregator';
+import {
+  commonValues,
+  defaultInstrumentDescriptor
+} from '../util';
+import { ValueType } from '@opentelemetry/api-metrics';
 
 describe('HistogramAggregator', () => {
   describe('createAccumulation', () => {
@@ -51,6 +62,29 @@ describe('HistogramAggregator', () => {
 
       assert.deepStrictEqual(aggregator.merge(prev, delta), expected);
     });
+
+    it('with only negatives', () => {
+      const aggregator = new HistogramAggregator([1, 10, 100], true);
+      const prev = aggregator.createAccumulation([0, 0]);
+      prev.record(-10);
+      prev.record(-20);
+
+      const delta = aggregator.createAccumulation([1, 1]);
+      delta.record(-5);
+      delta.record(-30);
+
+      assert.deepStrictEqual(aggregator.merge(prev, delta).toPointValue(), {
+        buckets: {
+          boundaries: [1, 10, 100],
+          counts: [4, 0, 0, 0]
+        },
+        count: 4,
+        hasMinMax: true,
+        max: -5,
+        min: -30,
+        sum: -65
+      });
+    });
   });
 
   describe('diff', () => {
@@ -77,7 +111,7 @@ describe('HistogramAggregator', () => {
         sum: 13,
         hasMinMax: false,
         min: Infinity,
-        max: -1
+        max: -Infinity
       });
 
       assert.deepStrictEqual(aggregator.diff(prev, curr), expected);
@@ -85,7 +119,7 @@ describe('HistogramAggregator', () => {
   });
 
   describe('toMetricData', () => {
-    it('transform without exception', () => {
+    it('should transform to expected data with recordMinMax = true', () => {
       const aggregator = new HistogramAggregator([1, 10, 100], true);
 
       const startTime: HrTime = [0, 0];
@@ -110,7 +144,6 @@ describe('HistogramAggregator', () => {
               },
               count: 2,
               sum: 1,
-              hasMinMax: true,
               min: 0,
               max: 1
             },
@@ -123,6 +156,85 @@ describe('HistogramAggregator', () => {
         [[{}, accumulation]],
         endTime,
       ), expected);
+    });
+
+    it('should transform to expected data with recordMinMax = false', () => {
+      const aggregator = new HistogramAggregator([1, 10, 100], false);
+
+      const startTime: HrTime = [0, 0];
+      const endTime: HrTime = [1, 1];
+      const accumulation = aggregator.createAccumulation(startTime);
+      accumulation.record(0);
+      accumulation.record(1);
+
+      const expected: MetricData = {
+        descriptor: defaultInstrumentDescriptor,
+        aggregationTemporality: AggregationTemporality.CUMULATIVE,
+        dataPointType: DataPointType.HISTOGRAM,
+        dataPoints: [
+          {
+            attributes: {},
+            startTime,
+            endTime,
+            value: {
+              buckets: {
+                boundaries: [1, 10, 100],
+                counts: [1, 1, 0, 0],
+              },
+              count: 2,
+              sum: 1,
+              min: undefined,
+              max: undefined
+            },
+          },
+        ],
+      };
+      assert.deepStrictEqual(aggregator.toMetricData(
+        defaultInstrumentDescriptor,
+        AggregationTemporality.CUMULATIVE,
+        [[{}, accumulation]],
+        endTime,
+      ), expected);
+    });
+
+    function testSum(instrumentType: InstrumentType, expectSum: boolean) {
+      const aggregator = new HistogramAggregator([1, 10, 100], true);
+
+      const startTime: HrTime = [0, 0];
+      const endTime: HrTime = [1, 1];
+
+      const accumulation = aggregator.createAccumulation(startTime);
+      accumulation.record(0);
+      accumulation.record(1);
+      accumulation.record(4);
+
+      const aggregatedData = aggregator.toMetricData(
+        {
+          name: 'default_metric',
+          description: 'a simple instrument',
+          type: instrumentType,
+          unit: '1',
+          valueType: ValueType.DOUBLE,
+        },
+        AggregationTemporality.CUMULATIVE,
+        [[{}, accumulation]],
+        endTime,
+      );
+
+      assert.notStrictEqual(aggregatedData, undefined);
+      assert.strictEqual(aggregatedData?.dataPoints[0].value.sum, expectSum ? 5 : undefined);
+    }
+
+    describe('should have undefined sum when used with', () => {
+      it('UpDownCounter', () => testSum(InstrumentType.UP_DOWN_COUNTER, false));
+      it('ObservableUpDownCounter', () => testSum(InstrumentType.OBSERVABLE_UP_DOWN_COUNTER, false));
+      it('ObservableUpDownCounter', () => testSum(InstrumentType.OBSERVABLE_GAUGE, false));
+    });
+
+    describe('should include sum with', () => {
+      it('UpDownCounter', () => testSum(InstrumentType.COUNTER, true));
+      it('ObservableUpDownCounter', () => testSum(InstrumentType.HISTOGRAM, true));
+      it('ObservableUpDownCounter', () => testSum(InstrumentType.OBSERVABLE_COUNTER, true));
     });
   });
 });

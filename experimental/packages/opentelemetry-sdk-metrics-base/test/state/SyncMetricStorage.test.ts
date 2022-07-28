@@ -68,7 +68,7 @@ describe('SyncMetricStorage', () => {
             collectors,
             [3, 3]);
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], {}, 6, [0, 0], [3, 3]);
         }
@@ -80,7 +80,7 @@ describe('SyncMetricStorage', () => {
             collectors,
             [4, 4]);
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 0);
         }
 
@@ -91,7 +91,7 @@ describe('SyncMetricStorage', () => {
             [deltaCollector],
             [6, 6]);
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], {}, 1, [5, 5], [6, 6]);
         }
@@ -115,7 +115,7 @@ describe('SyncMetricStorage', () => {
             collectors,
             [3, 3]);
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], {}, 6, [0, 0], [3, 3]);
         }
@@ -127,7 +127,7 @@ describe('SyncMetricStorage', () => {
             collectors,
             [4, 4]);
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], {}, 6, [0, 0], [4, 4]);
         }
@@ -139,7 +139,7 @@ describe('SyncMetricStorage', () => {
             collectors,
             [6, 6]);
 
-          assertMetricData(metric, DataPointType.SINGULAR);
+          assertMetricData(metric, DataPointType.SUM);
           assert.strictEqual(metric.dataPoints.length, 1);
           assertDataPoint(metric.dataPoints[0], {}, 7, [0, 0], [6, 6]);
         }
