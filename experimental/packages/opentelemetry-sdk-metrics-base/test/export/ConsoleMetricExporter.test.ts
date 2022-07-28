@@ -32,12 +32,13 @@ async function waitForNumberOfExports(exporter: sinon.SinonSpy<[metrics: Resourc
   let totalExports = 0;
   while (totalExports < numberOfExports) {
     await new Promise(resolve => setTimeout(resolve, 20));
-    totalExports = exporter.callCount
+    totalExports = exporter.callCount;
   }
 
-  return []
+  return [];
 }
 
+/* eslint-disable no-console */
 describe('ConsoleMetricExporter', () => {
   let previousConsoleDir: any;
   let exporter: ConsoleMetricExporter;
@@ -83,7 +84,7 @@ describe('ConsoleMetricExporter', () => {
     const spyConsole = sinon.spy(console, 'dir');
     const spyExport = sinon.spy(exporter, 'export');
 
-    await waitForNumberOfExports(spyExport, 1)
+    await waitForNumberOfExports(spyExport, 1);
     const resourceMetrics = spyExport.args[0];
     const firstResourceMetric = resourceMetrics[0];
     const consoleArgs = spyConsole.args[0];
@@ -98,13 +99,13 @@ describe('ConsoleMetricExporter', () => {
       'valueType',
     ].join(',');
 
-    assert.ok(firstResourceMetric.resource.attributes.resourceKey === 'my-resource', 'resourceKey')
+    assert.ok(firstResourceMetric.resource.attributes.resourceKey === 'my-resource', 'resourceKey');
     assert.ok(keys === expectedKeys, 'expectedKeys');
-    assert.ok(consoleMetric.name === 'counter_total', 'name')
-    assert.ok(consoleMetric.description === 'a test description', 'description')
-    assert.ok(consoleMetric.type === 'COUNTER', 'type')
-    assert.ok(consoleMetric.unit === '', 'unit')
-    assert.ok(consoleMetric.valueType === 1, 'valueType')
+    assert.ok(consoleMetric.name === 'counter_total', 'name');
+    assert.ok(consoleMetric.description === 'a test description', 'description');
+    assert.ok(consoleMetric.type === 'COUNTER', 'type');
+    assert.ok(consoleMetric.unit === '', 'unit');
+    assert.ok(consoleMetric.valueType === 1, 'valueType');
 
     assert.ok(spyExport.calledOnce);
   });
