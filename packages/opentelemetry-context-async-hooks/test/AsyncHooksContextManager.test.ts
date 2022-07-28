@@ -415,6 +415,28 @@ for (const contextManagerClass of [
         patchedEE.emit('test');
       });
 
+      it('should remove event handler enabled by .once using removeListener (when enabled)', () => {
+        const ee = new EventEmitter();
+        const context = ROOT_CONTEXT.setValue(key1, 1);
+        const patchedEE = contextManager.bind(context, ee);
+        function handler() {}
+        patchedEE.once('test', handler);
+        assert.strictEqual(patchedEE.listeners('test').length, 1);
+        patchedEE.removeListener('test', handler);
+        assert.strictEqual(patchedEE.listeners('test').length, 0);
+      });
+
+      it('should remove event handler enabled by .once using off (when enabled)', () => {
+        const ee = new EventEmitter();
+        const context = ROOT_CONTEXT.setValue(key1, 1);
+        const patchedEE = contextManager.bind(context, ee);
+        const handler = () => { };
+        patchedEE.once('test', handler);
+        assert.strictEqual(patchedEE.listeners('test').length, 1);
+        patchedEE.off('test', handler);
+        assert.strictEqual(patchedEE.listeners('test').length, 0);
+      });
+
       it('should return current context and removeAllListeners (when enabled)', done => {
         const ee = new EventEmitter();
         const context = ROOT_CONTEXT.setValue(key1, 1);
