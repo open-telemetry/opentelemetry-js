@@ -38,15 +38,15 @@ export interface Logger {
   /**
    * Emits a log record
    *
-   * @param logRecord 
+   * @param logRecord
    */
   emit(logRecord: LogRecord): void;
 
   /**
    * Emits an event
    *
-   * @param name 
-   * @param attributes 
+   * @param name
+   * @param attributes
    */
   emitEvent(name: string, attributes?: Attributes): void;
 }

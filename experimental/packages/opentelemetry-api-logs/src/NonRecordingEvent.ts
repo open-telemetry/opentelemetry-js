@@ -18,11 +18,11 @@ import { AttributeValue, Attributes } from '@opentelemetry/api';
 import { Event } from './types/Event';
 
 export class NonRecordingEvent extends Event {
-  setAttribute(key: string, value?: AttributeValue): this {
+  setAttribute(_key: string, _value?: AttributeValue): this {
     return this;
   }
 
-  setAttributes(attributes: Attributes): this {
+  setAttributes(_attributes: Attributes): this {
     return this;
   }
 }

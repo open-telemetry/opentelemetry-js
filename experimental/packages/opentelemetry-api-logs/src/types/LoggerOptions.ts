@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes } from "@opentelemetry/api";
+import { Attributes } from '@opentelemetry/api';
 
 export interface LoggerOptions {
   /**

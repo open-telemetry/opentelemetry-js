@@ -18,11 +18,11 @@ import { AttributeValue, Attributes } from '@opentelemetry/api';
 import { LogRecord } from './types/LogRecord';
 
 export class NonRecordingLogRecord implements LogRecord {
-  setAttribute(key: string, value?: AttributeValue | undefined): this {
+  setAttribute(_key: string, _value?: AttributeValue | undefined): this {
     return this;
   }
 
-  setAttributes(attributes: Attributes): this {
+  setAttributes(_attributes: Attributes): this {
     return this;
   }
 }

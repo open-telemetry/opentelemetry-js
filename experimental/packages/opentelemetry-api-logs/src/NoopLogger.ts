@@ -32,7 +32,7 @@ export class NoopLogger implements Logger {
 
   emit(logRecord: LogRecord): void;
   emit(event: Event): void;
-  emit(event: unknown): void {}
+  emit(_event: unknown): void {}
 
-  emitEvent(name: string, attributes?: Attributes): void {}
+  emitEvent(_name: string, _attributes?: Attributes): void {}
 }

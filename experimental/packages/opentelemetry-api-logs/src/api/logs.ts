@@ -70,6 +70,6 @@ export class LogsAPI {
    * @returns Logger
    */
   public getLogger(name: string, version?: string, options?: LoggerOptions): Logger {
-    return this.getLoggerProvider().getLogger(name, version);
+    return this.getLoggerProvider().getLogger(name, version, options);
   }
 }

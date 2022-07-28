@@ -31,7 +31,7 @@ export abstract class Event implements LogRecord {
     }
   }
 
-   /**
+  /**
    * Sets an attribute to the event.
    *
    * Sets a single Attribute with the key and value passed as arguments.
