@@ -45,13 +45,6 @@ export interface Logger {
   /**
    * Emits an event
    *
-   * @param event 
-   */
-  emit(event: Event): void;
-
-  /**
-   * Emits an event
-   *
    * @param name 
    * @param attributes 
    */

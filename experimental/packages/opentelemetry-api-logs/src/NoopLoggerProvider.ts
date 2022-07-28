@@ -17,10 +17,11 @@
 import { LoggerProvider } from './types/LoggerProvider';
 import { Logger } from './types/Logger';
 import { LoggerOptions } from './types/LoggerOptions';
+import { NoopLogger } from './NoopLogger';
 
 export class NoopLoggerProvider implements LoggerProvider {
   getLogger(name: string, version?: string | undefined, options?: LoggerOptions | undefined): Logger {
-    throw new Error('Method not implemented.');
+    return new NoopLogger();
   }
 }
 
