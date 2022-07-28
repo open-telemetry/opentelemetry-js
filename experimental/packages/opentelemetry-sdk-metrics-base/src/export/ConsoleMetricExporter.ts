@@ -32,7 +32,9 @@ export class ConsoleMetricExporter implements PushMetricExporter {
     return ConsoleMetricExporter._sendMetrics(metrics, resultCallback);
   }
 
-  async forceFlush() {}
+  forceFlush(): Promise<void> {
+    return Promise.resolve();
+  }
 
   selectAggregationTemporality(_instrumentType: InstrumentType): AggregationTemporality {
     return AggregationTemporality.CUMULATIVE;
