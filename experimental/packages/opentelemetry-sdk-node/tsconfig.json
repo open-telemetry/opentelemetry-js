@@ -28,6 +28,15 @@
       "path": "../../../packages/opentelemetry-semantic-conventions"
     },
     {
+      "path": "../exporter-trace-otlp-grpc"
+    },
+    {
+      "path": "../exporter-trace-otlp-http"
+    },
+    {
+      "path": "../exporter-trace-otlp-proto"
+    },
+    {
       "path": "../opentelemetry-api-metrics"
     },
     {

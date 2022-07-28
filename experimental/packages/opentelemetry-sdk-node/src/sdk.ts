@@ -129,6 +129,7 @@ export class NodeSDK {
 
   // visible for testing
   public retrieveListOfTraceExporters(): string[] {
+    // todo: change default back to otlp and use alternative to getEnv
     const traceList = getEnv().OTEL_TRACES_EXPORTER.split(',');
     const uniqueTraceExporters =  Array.from(new Set(traceList));
 
