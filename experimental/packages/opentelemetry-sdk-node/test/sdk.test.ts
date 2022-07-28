@@ -28,7 +28,7 @@ import {
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
 import { CompositePropagator } from '@opentelemetry/core';
-import { ConsoleMetricExporter, MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics-base';
+import { ConsoleMetricExporter, InstrumentType, MeterProvider, PeriodicExportingMetricReader, View } from '@opentelemetry/sdk-metrics-base';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   assertServiceResource,
@@ -145,6 +145,37 @@ describe('Node SDK', () => {
 
       await sdk.shutdown();
     });
+  });
+
+  it('should register meter views when provider', async () => {
+    const exporter = new ConsoleMetricExporter();
+    const metricReader = new PeriodicExportingMetricReader({
+      exporter: exporter,
+      exportIntervalMillis: 100,
+      exportTimeoutMillis: 100
+    });
+
+    const sdk = new NodeSDK({
+      metricReader: metricReader,
+      views: [
+        new View({
+          name: 'test-view',
+          instrumentName: 'test_counter',
+          instrumentType: InstrumentType.COUNTER,
+        })
+      ],
+      autoDetectResources: false,
+    });
+
+    await sdk.start();
+
+    assert.strictEqual(context['_getContextManager'](), ctxManager, 'context manager should not change');
+    assert.strictEqual(propagation['_getGlobalPropagator'](), propagator, 'propagator should not change');
+    assert.strictEqual((trace.getTracerProvider() as ProxyTracerProvider).getDelegate(), delegate, 'tracer provider should not have changed');
+
+    assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+
+    await sdk.shutdown();
   });
 
   describe('detectResources', async () => {

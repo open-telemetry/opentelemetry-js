@@ -27,7 +27,7 @@ import {
   Resource,
   ResourceDetectionConfig
 } from '@opentelemetry/resources';
-import { MeterProvider, MetricReader } from '@opentelemetry/sdk-metrics-base';
+import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics-base';
 import {
   BatchSpanProcessor,
   SpanProcessor
@@ -43,6 +43,9 @@ export class NodeSDK {
     spanProcessor: SpanProcessor;
     contextManager?: ContextManager;
     textMapPropagator?: TextMapPropagator;
+  };
+  private _meterProviderConfig?: {
+    views?: View[]
   };
   private _instrumentations: InstrumentationOption[];
   private _metricReader?: MetricReader;
@@ -114,8 +117,11 @@ export class NodeSDK {
   }
 
   /** Set configurations needed to register a MeterProvider */
-  public configureMeterProvider(reader: MetricReader): void {
+  public configureMeterProvider(reader: MetricReader, views?: View[]): void {
     this._metricReader = reader;
+    this._meterProviderConfig = {
+      views,
+    };
   }
 
   /** Detect resource attributes */
@@ -167,6 +173,7 @@ export class NodeSDK {
     if (this._metricReader) {
       const meterProvider = new MeterProvider({
         resource: this._resource,
+        views: this._meterProviderConfig?.views ?? [],
       });
 
       meterProvider.addMetricReader(this._metricReader);

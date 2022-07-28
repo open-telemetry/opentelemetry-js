@@ -18,7 +18,7 @@ import type { ContextManager, SpanAttributes } from '@opentelemetry/api';
 import { Sampler, TextMapPropagator } from '@opentelemetry/api';
 import { InstrumentationOption } from '@opentelemetry/instrumentation';
 import { Resource } from '@opentelemetry/resources';
-import { MetricReader } from '@opentelemetry/sdk-metrics-base';
+import { MetricReader, View } from '@opentelemetry/sdk-metrics-base';
 import {
   SpanExporter,
   SpanLimits,
@@ -31,6 +31,7 @@ export interface NodeSDKConfiguration {
   defaultAttributes: SpanAttributes;
   textMapPropagator: TextMapPropagator;
   metricReader: MetricReader;
+  views: View[]
   instrumentations: InstrumentationOption[];
   resource: Resource;
   sampler: Sampler;
