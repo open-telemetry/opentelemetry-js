@@ -10,6 +10,9 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-trace-base): make span start times resistant to hrtime clock drift
+  [#3129](https://github.com/open-telemetry/opentelemetry-js/issues/3129)
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
