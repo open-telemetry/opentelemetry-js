@@ -54,30 +54,3 @@ export interface PushMetricExporter {
    */
   shutdown(): Promise<void>;
 }
-
-export class ConsoleMetricExporter implements PushMetricExporter {
-  protected _shutdown = true;
-  private _aggregationTemporality: AggregationTemporality;
-
-  constructor(aggregationTemporality?: AggregationTemporality) {
-    this._aggregationTemporality = aggregationTemporality ?? AggregationTemporality.CUMULATIVE;
-  }
-
-  export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void) {
-    return resultCallback({
-      code: ExportResultCode.FAILED,
-      error: new Error('Method not implemented')
-    });
-  }
-
-  selectAggregationTemporality(_instrumentType: InstrumentType) {
-    return this._aggregationTemporality;
-  }
-
-  // nothing to do
-  async forceFlush() {}
-
-  async shutdown() {
-    this._shutdown = true;
-  }
-}
