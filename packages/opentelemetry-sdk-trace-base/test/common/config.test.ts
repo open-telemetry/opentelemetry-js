@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import * as assert from 'assert';
 import {
   AlwaysOffSampler,
   AlwaysOnSampler,
   ParentBasedSampler,
   TraceIdRatioBasedSampler,
-} from '@opentelemetry/core';
-import * as assert from 'assert';
+} from '../../src';
 import { buildSamplerFromEnv } from '../../src/config';
 
 describe('config', () => {
