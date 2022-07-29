@@ -452,6 +452,36 @@ describe('setup exporter from env', () => {
       );
       delete env.OTEL_TRACES_EXPORTER;
     });
+    it('do not set up span processor when there are no valid exporters', () => {
+      env.OTEL_TRACES_EXPORTER = 'otlp';
+      env.OTEL_EXPORTER_OTLP_PROTOCOL = 'invalid';
+      new NodeSDK();
+
+      assert(spyConfigureSpanProcessors.notCalled);
+      assert.strictEqual(
+        stubLoggerError.args[1][0], 'Unable to set up trace exporter(s) due to invalid exporter and/or protocol values.'
+      );
+      delete env.OTEL_TRACES_EXPORTER;
+      delete env.OTEL_EXPORTER_OTLP_PROTOCOL;
+    });
+    it('should ignore invalid exporters when remaining exporters are valid.', () => {
+      env.OTEL_TRACES_EXPORTER = 'otlp, zipkin';
+      env.OTEL_EXPORTER_OTLP_PROTOCOL = 'invalid';
+      new NodeSDK();
+      const listOfProcessors = spyConfigureSpanProcessors.returnValues[0];
+      const listOfExporters = spyConfigureSpanProcessors.args[0][0];
+
+      assert.strictEqual(
+        stubLoggerError.args[0][0], 'Unsupported OTLP traces protocol: invalid.'
+      );
+      assert(spyConfigureSpanProcessors.called);
+      assert(listOfExporters.length === 1);
+      assert(listOfExporters[0] instanceof ZipkinExporter);
+      assert(listOfProcessors.length === 1);
+      assert(listOfProcessors[0] instanceof BatchSpanProcessor);
+      delete env.OTEL_TRACES_EXPORTER;
+      delete env.OTEL_EXPORTER_OTLP_PROTOCOL;
+    });
   });
   describe('setup zipkin exporter from env', () => {
     it('use the zipkin exporter', () => {

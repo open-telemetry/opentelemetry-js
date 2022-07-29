@@ -38,11 +38,11 @@ import {
 import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
-import { getEnv } from '@opentelemetry/core';
+import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
 import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 import { OTLPTraceExporter as OTLPHttpTraceExporter} from '@opentelemetry/exporter-trace-otlp-http';
 import { OTLPTraceExporter as OTLPGrpcTraceExporter} from '@opentelemetry/exporter-trace-otlp-grpc';
-import { ZipkinExporter } from '@opentelemetry/exporter-zipkin'
+import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
@@ -120,7 +120,7 @@ export class NodeSDK {
         traceExportersList = ['otlp'];
       }
 
-      let configuredExporters: SpanExporter[] = [];
+      const configuredExporters: SpanExporter[] = [];
 
       traceExportersList.forEach(exporterName => {
         const exporter =  this.configureExporter(exporterName);
@@ -129,13 +129,16 @@ export class NodeSDK {
         }
       });
 
-      this._spanProcessors = this.configureSpanProcessors(configuredExporters);
+      if (configuredExporters.length > 0) {
+        this._spanProcessors = this.configureSpanProcessors(configuredExporters);
+      } else {
+        diag.warn('Unable to set up trace exporter(s) due to invalid exporter and/or protocol values.');
+      }
     }
   }
 
   // visible for testing
   public retrieveListOfTraceExporters(): string[] {
-    // should we setup the default exporter when user doesn't provide specifc values
     const traceList = getEnv().OTEL_TRACES_EXPORTER.split(',');
     const uniqueTraceExporters =  Array.from(new Set(traceList));
 
@@ -179,18 +182,22 @@ export class NodeSDK {
     }
   }
 
-  public getOtlpProtocol(dataType: string): string {
+  public getOtlpProtocol(dataType: string): string | null {
+    const parsedEnvValues = getEnvWithoutDefaults();
+
     switch (dataType) {
       case 'traces':
-        return getEnv().OTEL_EXPORTER_OTLP_TRACES_PROTOCOL || getEnv().OTEL_EXPORTER_OTLP_PROTOCOL;
-      case 'metrics':
-        return getEnv().OTEL_EXPORTER_OTLP_METRICS_PROTOCOL || getEnv().OTEL_EXPORTER_OTLP_PROTOCOL;
+        return parsedEnvValues.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL ??
+          parsedEnvValues.OTEL_EXPORTER_OTLP_PROTOCOL ??
+          getEnv().OTEL_EXPORTER_OTLP_TRACES_PROTOCOL ??
+          getEnv().OTEL_EXPORTER_OTLP_PROTOCOL;
       default:
-        return getEnv().OTEL_EXPORTER_OTLP_PROTOCOL;
+        diag.warn(`Data type not recognized: ${dataType}`);
+        return null;
     }
   }
 
-   // visible for testing
+  // visible for testing
   public configureSpanProcessors(exporters: SpanExporter[]): (BatchSpanProcessor | SimpleSpanProcessor)[] {
     return exporters.map(exporter => {
       if (exporter instanceof ConsoleSpanExporter) {
