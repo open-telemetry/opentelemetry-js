@@ -42,6 +42,8 @@ import { getEnv } from '@opentelemetry/core';
 import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 import { OTLPTraceExporter as OTLPHttpTraceExporter} from '@opentelemetry/exporter-trace-otlp-http';
 import { OTLPTraceExporter as OTLPGrpcTraceExporter} from '@opentelemetry/exporter-trace-otlp-grpc';
+import { ZipkinExporter } from '@opentelemetry/exporter-zipkin'
+import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 export class NodeSDK {
@@ -149,13 +151,17 @@ export class NodeSDK {
     switch (name) {
       case 'otlp':
         return this.configureOtlp();
+      case 'zipkin':
+        return new ZipkinExporter();
+      case 'jaeger':
+        return new JaegerExporter();
       default:
-        diag.warn(`Unrecognized OTEL_TRACES_EXPORTER value ${name}.`);
+        diag.warn(`Unrecognized OTEL_TRACES_EXPORTER value: ${name}.`);
         return null;
     }
   }
 
-  public configureOtlp(): SpanExporter {
+  public configureOtlp(): SpanExporter | null {
     const protocol = this.getOtlpProtocol(this.DATA_TYPE_TRACES);
 
     switch (protocol) {
@@ -163,8 +169,11 @@ export class NodeSDK {
         return new OTLPGrpcTraceExporter();
       case 'http/json':
         return new OTLPHttpTraceExporter();
-      default:
+      case 'http/protobuf':
         return new OTLPProtoTraceExporter();
+      default:
+        diag.warn(`Unsupported OTLP traces protocol: ${protocol}.`);
+        return null;
     }
   }
 

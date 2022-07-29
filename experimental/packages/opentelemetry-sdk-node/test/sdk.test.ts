@@ -47,6 +47,8 @@ import { env } from 'process';
 import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 import { OTLPTraceExporter as OTLPHttpTraceExporter} from '@opentelemetry/exporter-trace-otlp-http';
 import { OTLPTraceExporter as OTLPGrpcTraceExporter} from '@opentelemetry/exporter-trace-otlp-grpc';
+import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
+import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 
 const DefaultContextManager = semver.gte(process.version, '14.8.0')
   ? AsyncLocalStorageContextManager
@@ -449,6 +451,76 @@ describe.only('setup exporter from env', () => {
         stubLoggerError.args[0][0], 'OTEL_TRACES_EXPORTER contains "none" along with other exporters. Using default otlp exporter.'
       );
       delete env.OTEL_TRACES_EXPORTER;
+    });
+  });
+  describe('setup zipkin exporter from env', () => {
+    it('use the zipkin exporter', () => {
+      env.OTEL_TRACES_EXPORTER = 'zipkin';
+      new NodeSDK();
+      const listOfProcessors = spyConfigureSpanProcessors.returnValues[0];
+      const listOfExporters = spyConfigureSpanProcessors.args[0][0];
+
+      assert(spyExporterList.returned(['zipkin']));
+      assert(spyConfigureExporter.calledWith('zipkin'));
+      assert(listOfExporters.length === 1);
+      assert(listOfExporters[0] instanceof ZipkinExporter);
+      assert(listOfProcessors.length === 1);
+      assert(listOfProcessors[0] instanceof BatchSpanProcessor);
+      delete env.OTEL_TRACES_EXPORTER;
+    });
+    it('setup zipkin exporter and otlp exporter', () => {
+      env.OTEL_TRACES_EXPORTER = 'zipkin, otlp';
+      env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
+      new NodeSDK();
+      const listOfProcessors = spyConfigureSpanProcessors.returnValues[0];
+      const listOfExporters = spyConfigureSpanProcessors.args[0][0];
+
+      assert(spyExporterList.returned(['zipkin', 'otlp']));
+      assert(spyConfigureExporter.calledTwice);
+      assert(spyGetOtlpProtocol.returned('grpc'));
+      assert(listOfExporters.length === 2);
+      assert(listOfExporters[0] instanceof ZipkinExporter);
+      assert(listOfExporters[1] instanceof OTLPGrpcTraceExporter);
+      assert(listOfProcessors.length === 2);
+      assert(listOfProcessors[0] instanceof BatchSpanProcessor);
+      assert(listOfProcessors[1] instanceof BatchSpanProcessor);
+      delete env.OTEL_TRACES_EXPORTER;
+      delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
+    });
+  });
+  describe('setup jaeger exporter from env', () => {
+    it('use the jaeger exporter', () => {
+      env.OTEL_TRACES_EXPORTER = 'jaeger';
+      new NodeSDK();
+      const listOfProcessors = spyConfigureSpanProcessors.returnValues[0];
+      const listOfExporters = spyConfigureSpanProcessors.args[0][0];
+
+      assert(spyExporterList.returned(['jaeger']));
+      assert(spyConfigureExporter.calledWith('jaeger'));
+      assert(listOfExporters.length === 1);
+      assert(listOfExporters[0] instanceof JaegerExporter);
+      assert(listOfProcessors.length === 1);
+      assert(listOfProcessors[0] instanceof BatchSpanProcessor);
+      delete env.OTEL_TRACES_EXPORTER;
+    });
+    it('setup jaeger exporter and otlp exporter', () => {
+      env.OTEL_TRACES_EXPORTER = 'jaeger, otlp';
+      env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'http/json';
+      new NodeSDK().start();
+      const listOfProcessors = spyConfigureSpanProcessors.returnValues[0];
+      const listOfExporters = spyConfigureSpanProcessors.args[0][0];
+
+      assert(spyExporterList.returned(['jaeger', 'otlp']));
+      assert(spyConfigureExporter.calledTwice);
+      assert(spyGetOtlpProtocol.returned('http/json'));
+      assert(listOfExporters.length === 2);
+      assert(listOfExporters[0] instanceof JaegerExporter);
+      assert(listOfExporters[1] instanceof OTLPHttpTraceExporter);
+      assert(listOfProcessors.length === 2);
+      assert(listOfProcessors[0] instanceof BatchSpanProcessor);
+      assert(listOfProcessors[1] instanceof BatchSpanProcessor);
+      delete env.OTEL_TRACES_EXPORTER;
+      delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
     });
   });
 });
