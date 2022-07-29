@@ -9,6 +9,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
+
 * fix(instrumentation-http): add `http.host` attribute before sending the request #3054 @cuichenli
 
 ### :books: (Refine Doc)
