@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import { Sampler, SamplingDecision, SamplingResult } from '../../../src';
+import { Sampler, SamplingDecision, SamplingResult } from '../Sampler';
 
-/** Sampler that always records but doesn't sample spans. */
-export class TestRecordOnlySampler implements Sampler {
+/** Sampler that samples no traces. */
+export class AlwaysOffSampler implements Sampler {
   shouldSample(): SamplingResult {
     return {
-      decision: SamplingDecision.RECORD,
+      decision: SamplingDecision.NOT_RECORD,
     };
   }
 
   toString(): string {
-    return 'TestRecordOnlySampler';
+    return 'AlwaysOffSampler';
   }
 }
