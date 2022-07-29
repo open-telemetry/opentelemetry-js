@@ -10,6 +10,9 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: (Bug Fix)
 
+* fix(context-async-hooks): Ensure listeners added using `once` can be removed using `removeListener`
+  [#3122](https://github.com/open-telemetry/opentelemetry-js/issues/3122)
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
