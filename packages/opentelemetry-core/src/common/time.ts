@@ -122,6 +122,18 @@ export function hrTimeDuration(
 }
 
 /**
+ * Add an HrTime duration to an HrTime
+ */
+export function addHrTime(time: api.HrTime, duration: api.HrTime): api.HrTime {
+  const out: api.HrTime = [time[0] + duration[0], time[1] + duration[1]];
+  if (out[1] > 1e9) {
+    out[1] -= 1e9;
+    out[0] += 1;
+  }
+  return out;
+}
+
+/**
  * Convert hrTime to timestamp, for example "2019-05-14T17:00:00.000123456Z"
  * @param time
  */

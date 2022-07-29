@@ -23,6 +23,7 @@ import {
   isTimeInput,
   timeInputToHrTime,
   sanitizeAttributes,
+  addHrTime,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
@@ -59,6 +60,7 @@ export class Span implements api.Span, ReadableSpan {
   private readonly _spanProcessor: SpanProcessor;
   private readonly _spanLimits: SpanLimits;
   private readonly _attributeValueLengthLimit: number;
+  private readonly _hrStartTime: api.HrTime;
 
   /** Constructs a new Span instance. */
   constructor(
@@ -69,14 +71,15 @@ export class Span implements api.Span, ReadableSpan {
     kind: api.SpanKind,
     parentSpanId?: string,
     links: api.Link[] = [],
-    startTime: api.TimeInput = hrTime()
+    startTime?: api.TimeInput
   ) {
     this.name = spanName;
     this._spanContext = spanContext;
     this.parentSpanId = parentSpanId;
     this.kind = kind;
     this.links = links;
-    this.startTime = timeInputToHrTime(startTime);
+    this._hrStartTime = hrTime();
+    this.startTime = timeInputToHrTime(startTime ?? Date.now());
     this.resource = parentTracer.resource;
     this.instrumentationLibrary = parentTracer.instrumentationLibrary;
     this._spanLimits = parentTracer.getSpanLimits();
@@ -103,7 +106,7 @@ export class Span implements api.Span, ReadableSpan {
 
     if (
       Object.keys(this.attributes).length >=
-        this._spanLimits.attributeCountLimit! &&
+      this._spanLimits.attributeCountLimit! &&
       !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
       return this;
@@ -171,15 +174,22 @@ export class Span implements api.Span, ReadableSpan {
     return this;
   }
 
-  end(endTime: api.TimeInput = hrTime()): void {
+  end(endTime?: api.TimeInput): void {
     if (this._isSpanEnded()) {
       api.diag.error('You can only call end() on a span once.');
       return;
     }
     this._ended = true;
-    this.endTime = timeInputToHrTime(endTime);
 
-    this._duration = hrTimeDuration(this.startTime, this.endTime);
+
+    if (endTime != null) {
+      this.endTime = timeInputToHrTime(endTime);
+      this._duration = hrTimeDuration(this._hrStartTime, this.endTime);
+    } else {
+      this._duration = hrTimeDuration(this._hrStartTime, hrTime());
+      this.endTime = addHrTime(this.startTime, this._duration);
+    }
+
     if (this._duration[0] < 0) {
       api.diag.warn(
         'Inconsistent start and end time, startTime > endTime',
