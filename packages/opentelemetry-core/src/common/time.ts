@@ -126,7 +126,7 @@ export function hrTimeDuration(
  */
 export function addHrTime(time: api.HrTime, duration: api.HrTime): api.HrTime {
   const out: api.HrTime = [time[0] + duration[0], time[1] + duration[1]];
-  if (out[1] > 1e9) {
+  if (out[1] >= 1e9) {
     out[1] -= 1e9;
     out[0] += 1;
   }
