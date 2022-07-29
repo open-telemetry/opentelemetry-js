@@ -341,7 +341,7 @@ describe('Node SDK', () => {
   });
 });
 
-describe.only('setup exporter from env', () => {
+describe('setup exporter from env', () => {
   let spyExporterList: Sinon.SinonSpy;
   let spyConfigureExporter: Sinon.SinonSpy;
   let spyConfigureSpanProcessors: Sinon.SinonSpy;
