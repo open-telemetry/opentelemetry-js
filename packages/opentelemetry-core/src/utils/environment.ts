@@ -16,6 +16,7 @@
 
 import { DiagLogLevel } from '@opentelemetry/api';
 import { TracesSamplerValues } from './sampling';
+import { _globalThis } from '../platform/browser/globalThis';
 
 const DEFAULT_LIST_SEPARATOR = ',';
 
@@ -282,4 +283,14 @@ export function parseEnvironment(values: RAW_ENVIRONMENT): ENVIRONMENT {
   }
 
   return environment;
+}
+
+/**
+ * Get environment in node or browser without
+ * populating default values.
+ */
+export function getEnvWithoutDefaults(): ENVIRONMENT {
+  return typeof process !== 'undefined' ?
+    parseEnvironment(process.env as RAW_ENVIRONMENT) :
+    parseEnvironment(_globalThis as typeof globalThis & RAW_ENVIRONMENT);
 }

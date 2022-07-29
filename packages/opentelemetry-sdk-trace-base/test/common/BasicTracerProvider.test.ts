@@ -29,8 +29,6 @@ import {
 } from '@opentelemetry/api';
 import { CompositePropagator } from '@opentelemetry/core';
 import {
-  AlwaysOffSampler,
-  AlwaysOnSampler,
   TraceState,
   W3CTraceContextPropagator,
 } from '@opentelemetry/core';
@@ -44,6 +42,8 @@ import {
   InMemorySpanExporter,
   SpanExporter,
   BatchSpanProcessor,
+  AlwaysOnSampler,
+  AlwaysOffSampler,
 } from '../../src';
 
 class DummyPropagator implements TextMapPropagator {
@@ -205,6 +205,108 @@ describe('BasicTracerProvider', () => {
           }).getTracer('default');
           const spanLimits = tracer.getSpanLimits();
           assert.strictEqual(spanLimits.attributeValueLengthLimit, -10);
+        });
+      });
+
+      describe('when attribute value length limit is defined via env', () => {
+        it('should have general attribute value length limits value as defined with env', () => {
+          envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '115';
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeValueLengthLimit, 115);
+          delete envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
+        });
+        it('should have span attribute value length limit value same as general limit value', () => {
+          envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '125';
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const generalLimits = tracer.getGeneralLimits();
+          const spanLimits = tracer.getSpanLimits();
+          assert.strictEqual(generalLimits.attributeValueLengthLimit, 125);
+          assert.strictEqual(spanLimits.attributeValueLengthLimit, 125);
+          delete envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
+        });
+        it('should have span and general attribute value length limits as defined in env', () => {
+          envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '125';
+          envSource.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT = '109';
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeValueLengthLimit, 125);
+          assert.strictEqual(spanLimits.attributeValueLengthLimit, 109);
+          delete envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
+          delete envSource.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT;
+        });
+        it('should have span attribute value length limit as deafult of Infinity', () => {
+          envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT = '125';
+          envSource.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT = 'Infinity';
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeValueLengthLimit, 125);
+          assert.strictEqual(spanLimits.attributeValueLengthLimit, Infinity);
+          delete envSource.OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT;
+          delete envSource.OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT;
+        });
+      });
+
+      describe('when attribute value length limit is not defined via env', () => {
+        it('should use default value of Infinity', () => {
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeValueLengthLimit, Infinity);
+          assert.strictEqual(spanLimits.attributeValueLengthLimit, Infinity);
+        });
+      });
+
+      describe('when attribute count limit is defined via env', () => {
+        it('should general attribute count limit as defined with env', () => {
+          envSource.OTEL_ATTRIBUTE_COUNT_LIMIT = '25';
+          const tracer = new BasicTracerProvider({}).getTracer('default');
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeCountLimit, 25);
+          delete envSource.OTEL_ATTRIBUTE_COUNT_LIMIT;
+        });
+        it('should have span attribute count limit value same as general limit value', () => {
+          envSource.OTEL_ATTRIBUTE_COUNT_LIMIT = '20';
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const generalLimits = tracer.getGeneralLimits();
+          const spanLimits = tracer.getSpanLimits();
+          assert.strictEqual(generalLimits.attributeCountLimit, 20);
+          assert.strictEqual(spanLimits.attributeCountLimit, 20);
+          delete envSource.OTEL_ATTRIBUTE_COUNT_LIMIT;
+        });
+        it('should have span and general attribute count limits as defined in env', () => {
+          envSource.OTEL_ATTRIBUTE_COUNT_LIMIT = '20';
+          envSource.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT = '35';
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeCountLimit, 20);
+          assert.strictEqual(spanLimits.attributeCountLimit, 35);
+          delete envSource.OTEL_ATTRIBUTE_COUNT_LIMIT;
+          delete envSource.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT;
+        });
+        it('should have span attribute count limit as default of 128', () => {
+          envSource.OTEL_ATTRIBUTE_COUNT_LIMIT = '20';
+          envSource.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT = '128';
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeCountLimit, 20);
+          assert.strictEqual(spanLimits.attributeCountLimit, 128);
+          delete envSource.OTEL_ATTRIBUTE_COUNT_LIMIT;
+          delete envSource.OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT;
+        });
+      });
+
+      describe('when attribute count limit is not defined via env', () => {
+        it('should use default value of 128', () => {
+          const tracer = new BasicTracerProvider().getTracer('default');
+          const spanLimits = tracer.getSpanLimits();
+          const generalLimits = tracer.getGeneralLimits();
+          assert.strictEqual(generalLimits.attributeCountLimit, 128);
+          assert.strictEqual(spanLimits.attributeCountLimit, 128);
         });
       });
 
