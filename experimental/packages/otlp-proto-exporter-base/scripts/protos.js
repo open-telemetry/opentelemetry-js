@@ -18,7 +18,7 @@ const protos = [
 
 function exec(command, argv) {
   return new Promise((resolve, reject) => {
-    const child = cp.spawn(process.execPath, [command, ...argv], {
+    const child = cp.spawn(command, argv, {
       stdio: ['ignore', 'inherit', 'inherit'],
     });
     child.on('exit', (code, signal) => {
@@ -27,7 +27,7 @@ function exec(command, argv) {
         return;
       }
       resolve();
-    })
+    });
   });
 }
 
@@ -35,7 +35,7 @@ function pbts(pbjsOutFile) {
   const pbtsPath = path.resolve(__dirname, '../node_modules/.bin/pbts');
   const pbtsOptions = [
     '-o', path.join(generatedPath, 'root.d.ts'),
-  ]
+  ];
   return exec(pbtsPath, [...pbtsOptions, pbjsOutFile]);
 }
 
