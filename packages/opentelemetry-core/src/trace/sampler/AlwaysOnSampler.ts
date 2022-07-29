@@ -16,7 +16,10 @@
 
 import { Sampler, SamplingDecision, SamplingResult } from '@opentelemetry/api';
 
-/** Sampler that samples all traces. */
+/**
+ * @deprecated Use the one defined in @opentelemetry/sdk-trace-base instead.
+ * Sampler that samples all traces.
+ */
 export class AlwaysOnSampler implements Sampler {
   shouldSample(): SamplingResult {
     return {

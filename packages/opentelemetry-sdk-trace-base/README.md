@@ -46,6 +46,107 @@ Tracing configuration is a merge of user supplied configuration with both the de
 configuration as specified in [config.ts](./src/config.ts) and an
 environmentally configurable sampling (via `OTEL_TRACES_SAMPLER` and `OTEL_TRACES_SAMPLER_ARG`).
 
+## Built-in Samplers
+
+Sampler is used to make decisions on `Span` sampling.
+
+### AlwaysOn Sampler
+
+Samples every trace regardless of upstream sampling decisions.
+
+> This is used as a default Sampler
+
+```js
+const { NodeTracerProvider } = require("@opentelemetry/sdk-trace-node");
+const { AlwaysOnSampler } = require("@opentelemetry/core");
+
+const tracerProvider = new NodeTracerProvider({
+  sampler: new AlwaysOnSampler()
+});
+```
+
+### AlwaysOff Sampler
+
+Doesn't sample any trace, regardless of upstream sampling decisions.
+
+```js
+const { NodeTracerProvider } = require("@opentelemetry/sdk-trace-node");
+const { AlwaysOffSampler } = require("@opentelemetry/core");
+
+const tracerProvider = new NodeTracerProvider({
+  sampler: new AlwaysOffSampler()
+});
+```
+
+### TraceIdRatioBased Sampler
+
+Samples some percentage of traces, calculated deterministically using the trace ID.
+Any trace that would be sampled at a given percentage will also be sampled at any higher percentage.
+
+The `TraceIDRatioSampler` may be used with the `ParentBasedSampler` to respect the sampled flag of an incoming trace.
+
+```js
+const { NodeTracerProvider } = require("@opentelemetry/sdk-trace-node");
+const { TraceIdRatioBasedSampler } = require("@opentelemetry/core");
+
+const tracerProvider = new NodeTracerProvider({
+  // See details of ParentBasedSampler below
+  sampler: new ParentBasedSampler({
+    // Trace ID Ratio Sampler accepts a positional argument
+    // which represents the percentage of traces which should
+    // be sampled.
+    root: new TraceIdRatioBasedSampler(0.5)
+  });
+});
+```
+
+### ParentBased Sampler
+
+- This is a composite sampler. `ParentBased` helps distinguished between the
+following cases:
+  - No parent (root span).
+  - Remote parent with `sampled` flag `true`
+  - Remote parent with `sampled` flag `false`
+  - Local parent with `sampled` flag `true`
+  - Local parent with `sampled` flag `false`
+
+Required parameters:
+
+- `root(Sampler)` - Sampler called for spans with no parent (root spans)
+
+Optional parameters:
+
+- `remoteParentSampled(Sampler)` (default: `AlwaysOn`)
+- `remoteParentNotSampled(Sampler)` (default: `AlwaysOff`)
+- `localParentSampled(Sampler)` (default: `AlwaysOn`)
+- `localParentNotSampled(Sampler)` (default: `AlwaysOff`)
+
+|Parent| parent.isRemote() | parent.isSampled()| Invoke sampler|
+|--|--|--|--|
+|absent| n/a | n/a |`root()`|
+|present|true|true|`remoteParentSampled()`|
+|present|true|false|`remoteParentNotSampled()`|
+|present|false|true|`localParentSampled()`|
+|present|false|false|`localParentNotSampled()`|
+
+```js
+const { NodeTracerProvider } = require("@opentelemetry/sdk-trace-node");
+const { ParentBasedSampler, AlwaysOffSampler, TraceIdRatioBasedSampler } = require("@opentelemetry/core");
+
+const tracerProvider = new NodeTracerProvider({
+  sampler: new ParentBasedSampler({
+    // By default, the ParentBasedSampler will respect the parent span's sampling
+    // decision. This is configurable by providing a different sampler to use
+    // based on the situation. See configuration details above.
+    //
+    // This will delegate the sampling decision of all root traces (no parent)
+    // to the TraceIdRatioBasedSampler.
+    // See details of TraceIdRatioBasedSampler above.
+    root: new TraceIdRatioBasedSampler(0.5)
+  })
+});
+```
+
 ## Example
 
 See [examples/basic-tracer-node](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/basic-tracer-node) for an end-to-end example, including exporting created spans.

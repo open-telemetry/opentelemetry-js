@@ -29,9 +29,10 @@ import {
   trace,
   TraceFlags,
 } from '@opentelemetry/api';
-import { AlwaysOnSampler, AlwaysOffSampler } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import {
+  AlwaysOffSampler,
+  AlwaysOnSampler,
   BatchSpanProcessor,
   InMemorySpanExporter,
   Span,

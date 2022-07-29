@@ -29,6 +29,7 @@ import { AlwaysOffSampler } from './AlwaysOffSampler';
 import { AlwaysOnSampler } from './AlwaysOnSampler';
 
 /**
+ * @deprecated Use the one defined in @opentelemetry/sdk-trace-base instead.
  * A composite sampler that either respects the parent span's sampling decision
  * or delegates to `delegateSampler` for root spans.
  */

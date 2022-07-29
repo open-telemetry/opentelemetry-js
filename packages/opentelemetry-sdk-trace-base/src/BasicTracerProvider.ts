@@ -31,7 +31,7 @@ import {
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { SpanProcessor, Tracer } from '.';
-import { DEFAULT_CONFIG } from './config';
+import { loadDefaultConfig } from './config';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
 import { NoopSpanProcessor } from './export/NoopSpanProcessor';
 import { SDKRegistrationConfig, TracerConfig } from './types';
@@ -74,7 +74,7 @@ export class BasicTracerProvider implements TracerProvider {
   readonly resource: Resource;
 
   constructor(config: TracerConfig = {}) {
-    const mergedConfig = merge({}, DEFAULT_CONFIG, reconfigureLimits(config));
+    const mergedConfig = merge({}, loadDefaultConfig(), reconfigureLimits(config));
     this.resource = mergedConfig.resource ?? Resource.empty();
     this.resource = Resource.default().merge(this.resource);
     this._config = Object.assign({}, mergedConfig, {
