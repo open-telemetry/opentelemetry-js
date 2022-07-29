@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-import {
-  Sampler,
-  SamplingDecision,
-  SamplingResult,
-  isValidTraceId,
-} from '@opentelemetry/api';
+import { isValidTraceId } from '@opentelemetry/api';
+import { Sampler, SamplingDecision, SamplingResult } from '../Sampler';
 
-/**
- * @deprecated Use the one defined in @opentelemetry/sdk-trace-base instead.
- * Sampler that samples a given fraction of traces based of trace id deterministically.
- */
+
+/** Sampler that samples a given fraction of traces based of trace id deterministically. */
 export class TraceIdRatioBasedSampler implements Sampler {
   private _upperBound: number;
 
