@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-import { Sampler, SamplingDecision, SamplingResult } from '../../../src';
-
-/** Sampler that always records but doesn't sample spans. */
-export class TestRecordOnlySampler implements Sampler {
-  shouldSample(): SamplingResult {
-    return {
-      decision: SamplingDecision.RECORD,
-    };
-  }
-
-  toString(): string {
-    return 'TestRecordOnlySampler';
-  }
+/** IdGenerator provides an interface for generating Trace Id and Span Id */
+export interface IdGenerator {
+  /** Returns a trace ID composed of 32 lowercase hex characters. */
+  generateTraceId(): string;
+  /** Returns a span ID composed of 16 lowercase hex characters. */
+  generateSpanId(): string;
 }

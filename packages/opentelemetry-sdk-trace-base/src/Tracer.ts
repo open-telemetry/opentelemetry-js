@@ -16,9 +16,7 @@
 
 import * as api from '@opentelemetry/api';
 import {
-  IdGenerator,
   InstrumentationLibrary,
-  RandomIdGenerator,
   sanitizeAttributes,
   isTracingSuppressed,
 } from '@opentelemetry/core';
@@ -28,12 +26,15 @@ import { Span } from './Span';
 import { GeneralLimits, SpanLimits, TracerConfig } from './types';
 import { mergeConfig } from './utility';
 import { SpanProcessor } from './SpanProcessor';
+import { Sampler } from './Sampler';
+import { IdGenerator } from './IdGenerator';
+import { RandomIdGenerator } from './platform';
 
 /**
  * This class represents a basic tracer.
  */
 export class Tracer implements api.Tracer {
-  private readonly _sampler: api.Sampler;
+  private readonly _sampler: Sampler;
   private readonly _generalLimits: GeneralLimits;
   private readonly _spanLimits: SpanLimits;
   private readonly _idGenerator: IdGenerator;
