@@ -155,6 +155,8 @@ export class NodeSDK {
         return new ZipkinExporter();
       case 'jaeger':
         return new JaegerExporter();
+      case 'console':
+        return new ConsoleSpanExporter();
       default:
         diag.warn(`Unrecognized OTEL_TRACES_EXPORTER value: ${name}.`);
         return null;

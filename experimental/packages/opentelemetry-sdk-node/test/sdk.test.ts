@@ -523,4 +523,56 @@ describe.only('setup exporter from env', () => {
       delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
     });
   });
+  describe('setup console exporter from env', () => {
+    it('use the console exporter', () => {
+      env.OTEL_TRACES_EXPORTER = 'console';
+      new NodeSDK();
+      const listOfProcessors = spyConfigureSpanProcessors.returnValues[0];
+      const listOfExporters = spyConfigureSpanProcessors.args[0][0];
+
+      assert(spyExporterList.returned(['console']));
+      assert(spyConfigureExporter.calledWith('console'));
+      assert(listOfExporters.length === 1);
+      assert(listOfExporters[0] instanceof ConsoleSpanExporter);
+      assert(listOfProcessors.length === 1);
+      assert(listOfProcessors[0] instanceof SimpleSpanProcessor);
+      delete env.OTEL_TRACES_EXPORTER;
+    });
+    it('ignores the protocol', () => {
+      env.OTEL_TRACES_EXPORTER = 'console';
+      env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
+      new NodeSDK();
+      const listOfProcessors = spyConfigureSpanProcessors.returnValues[0];
+      const listOfExporters = spyConfigureSpanProcessors.args[0][0];
+
+      assert(spyExporterList.returned(['console']));
+      assert(spyConfigureExporter.calledWith('console'));
+      assert(spyGetOtlpProtocol.notCalled);
+      assert(listOfExporters.length === 1);
+      assert(listOfExporters[0] instanceof ConsoleSpanExporter);
+      assert(listOfProcessors.length === 1);
+      assert(listOfProcessors[0] instanceof SimpleSpanProcessor);
+      delete env.OTEL_TRACES_EXPORTER;
+      delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
+    });
+    it('setup console exporter and otlp exporter', () => {
+      env.OTEL_TRACES_EXPORTER = 'console, otlp';
+      env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
+      new NodeSDK();
+      const listOfProcessors = spyConfigureSpanProcessors.returnValues[0];
+      const listOfExporters = spyConfigureSpanProcessors.args[0][0];
+
+      assert(spyExporterList.returned(['console', 'otlp']));
+      assert(spyConfigureExporter.calledTwice);
+      assert(spyGetOtlpProtocol.returned('grpc'));
+      assert(listOfExporters.length === 2);
+      assert(listOfExporters[0] instanceof ConsoleSpanExporter);
+      assert(listOfExporters[1] instanceof OTLPGrpcTraceExporter);
+      assert(listOfProcessors.length === 2);
+      assert(listOfProcessors[0] instanceof SimpleSpanProcessor);
+      assert(listOfProcessors[1] instanceof BatchSpanProcessor);
+      delete env.OTEL_TRACES_EXPORTER;
+      delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
+    });
+  });
 });
