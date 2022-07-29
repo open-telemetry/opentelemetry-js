@@ -427,7 +427,8 @@ describe('PrometheusSerializer', () => {
   });
 
   describe('validate against metric conventions', () => {
-    async function getCounterResult(name: string, serializer: PrometheusSerializer) {
+
+    async function getCounterResult(name: string, serializer: PrometheusSerializer, options: Partial<{ unit: string, exportAll: boolean }> = {}) {
       const reader = new TestMetricReader();
       const meterProvider = new MeterProvider({
         views: [new View({ aggregation: new SumAggregation(), instrumentName: '*' })]
@@ -435,7 +436,8 @@ describe('PrometheusSerializer', () => {
       meterProvider.addMetricReader(reader);
       const meter = meterProvider.getMeter('test');
 
-      const counter = meter.createCounter(name);
+      const { unit, exportAll = false } = options;
+      const counter = meter.createCounter(name, { unit: unit });
       counter.add(1);
 
       const { resourceMetrics, errors } = await reader.collect();
@@ -447,9 +449,40 @@ describe('PrometheusSerializer', () => {
       const pointData = metric.dataPoints as DataPoint<number>[];
       assert.strictEqual(pointData.length, 1);
 
-      const result = serializer['_serializeSingularDataPoint'](metric.descriptor.name, metric.descriptor.type, pointData[0]);
-      return result;
+      if (exportAll) {
+        const result = serializer.serialize(resourceMetrics);
+        return result;
+      } else {
+        const result = serializer['_serializeSingularDataPoint'](metric.descriptor.name, metric.descriptor.type, pointData[0]);
+        return result;
+      }
     }
+
+    it('should export unit block when unit of metric is given', async () => {
+      const serializer = new PrometheusSerializer();
+
+      const unitOfMetric = 'seconds';
+      const result = await getCounterResult('test', serializer, { unit: unitOfMetric, exportAll: true });
+      assert.strictEqual(
+        result,
+        '# HELP test_total description missing\n' +
+        `# UNIT test_total ${unitOfMetric}\n` +
+        '# TYPE test_total counter\n' +
+        `test_total 1 ${mockedHrTimeMs}\n`
+      );
+    });
+
+    it('should not export unit block when unit of metric is missing', async () => {
+      const serializer = new PrometheusSerializer();
+
+      const result = await getCounterResult('test', serializer, { exportAll: true });
+      assert.strictEqual(
+        result,
+        '# HELP test_total description missing\n' +
+        '# TYPE test_total counter\n' +
+        `test_total 1 ${mockedHrTimeMs}\n`
+      );
+    });
 
     it('should rename metric of type counter when name misses _total suffix', async () => {
       const serializer = new PrometheusSerializer();
