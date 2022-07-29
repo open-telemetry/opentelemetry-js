@@ -118,10 +118,14 @@ export class NodeSDK {
         traceExportersList = ['otlp'];
       }
 
-      const configuredExporters: SpanExporter[] =
-        traceExportersList.map(exporterName => {
-          return this.configureExporter(exporterName);
-        });
+      let configuredExporters: SpanExporter[] = [];
+
+      traceExportersList.forEach(exporterName => {
+        const exporter =  this.configureExporter(exporterName);
+        if (exporter) {
+          configuredExporters.push(exporter);
+        }
+      });
 
       this._spanProcessors = this.configureSpanProcessors(configuredExporters);
     }
@@ -141,10 +145,13 @@ export class NodeSDK {
       .filter(s => s !== 'null' && s !== '');
   }
 
-  public configureExporter(name: string): SpanExporter {
+  public configureExporter(name: string): SpanExporter | null {
     switch (name) {
-      default:
+      case 'otlp':
         return this.configureOtlp();
+      default:
+        diag.warn(`Unrecognized OTEL_TRACES_EXPORTER value ${name}.`);
+        return null;
     }
   }
 
