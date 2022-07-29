@@ -13,18 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import * as assert from 'assert';
+import * as api from '@opentelemetry/api';
+import { AlwaysOnSampler } from '../../../src/sampler/AlwaysOnSampler';
 
-import { Sampler, SamplingDecision, SamplingResult } from '../../../src';
+describe('AlwaysOnSampler', () => {
+  it('should reflect sampler name', () => {
+    const sampler = new AlwaysOnSampler();
+    assert.strictEqual(sampler.toString(), 'AlwaysOnSampler');
+  });
 
-/** Sampler that always records but doesn't sample spans. */
-export class TestRecordOnlySampler implements Sampler {
-  shouldSample(): SamplingResult {
-    return {
-      decision: SamplingDecision.RECORD,
-    };
-  }
-
-  toString(): string {
-    return 'TestRecordOnlySampler';
-  }
-}
+  it('should return api.SamplingDecision.RECORD_AND_SAMPLED for AlwaysOnSampler', () => {
+    const sampler = new AlwaysOnSampler();
+    assert.deepStrictEqual(sampler.shouldSample(), {
+      decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+    });
+  });
+});

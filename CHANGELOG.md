@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+feat(sdk-trace-base): move Sampler declaration into sdk-trace-base [#3088](https://github.com/open-telemetry/opentelemetry-js/pull/3088) @legendecas
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
@@ -26,6 +28,7 @@ All notable changes to this project will be documented in this file.
 
 * fix(resources): fix browser compatibility for host and os detectors [#3004](https://github.com/open-telemetry/opentelemetry-js/pull/3004) @legendecas
 * fix(sdk-trace-base): fix crash on environments without global document [#3000](https://github.com/open-telemetry/opentelemetry-js/pull/3000) @legendecas
+* fix(sdk-trace-base): fix spanLimits attribute length/count to consider env values [#3068](https://github.com/open-telemetry/opentelemetry-js/pull/3068) @svetlanabrennan
 
 ### :house: (Internal)
 
