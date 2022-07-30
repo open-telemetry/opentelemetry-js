@@ -64,6 +64,31 @@ The following options are deprecated:
 | `ignoreIncomingPaths` | `IgnoreMatcher[]` | Http instrumentation will not trace all incoming requests that match paths |
 | `ignoreOutgoingUrls` | `IgnoreMatcher[]` | Http instrumentation will not trace all outgoing requests that match urls |
 
+## Semantic Conventions
+
+The Semantic Conventions define the keys and values which describe commonly observed concepts, protocols, and operations used by applications.
+
+- Resource Conventions : <https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md/>
+- Span Conventions : <https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/README.md/>
+- Metrics Conventions : <https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/semantic_conventions/README.md/>
+
+Refer above resource to know more about types of conventions.
+
+## semantic conventions for HTTP client and server Spans -
+
+1. Trace Semantic Conventions - 
+
+semantic conventions for HTTP client and server Spans -
+
+https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/http.md 
+
+For http server and client metrics -
+
+2. Metrics Semantic Conventions - 
+
+https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/semantic_conventions/http-metrics.md 
+
+
 ## Useful links
 
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
