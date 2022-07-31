@@ -16,14 +16,13 @@
 
 import { diag, ROOT_CONTEXT } from '@opentelemetry/api';
 import {
-  AlwaysOnSampler,
   ExportResultCode,
   loggingErrorHandler,
   setGlobalErrorHandler,
 } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { BasicTracerProvider, BufferConfig, InMemorySpanExporter, Span } from '../../../src';
+import { AlwaysOnSampler, BasicTracerProvider, BufferConfig, InMemorySpanExporter, Span } from '../../../src';
 import { context } from '@opentelemetry/api';
 import { TestRecordOnlySampler } from './TestRecordOnlySampler';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';

@@ -21,8 +21,6 @@ import {
   INVALID_TRACEID,
   Link,
   ROOT_CONTEXT,
-  Sampler,
-  SamplingDecision,
   SpanContext,
   SpanKind,
   trace,
@@ -30,14 +28,21 @@ import {
 } from '@opentelemetry/api';
 import { getSpan } from '@opentelemetry/api/build/src/trace/context-utils';
 import {
-  AlwaysOffSampler,
-  AlwaysOnSampler,
   InstrumentationLibrary,
   sanitizeAttributes,
   suppressTracing
 } from '@opentelemetry/core';
 import * as assert from 'assert';
-import { BasicTracerProvider, Span, SpanProcessor, Tracer } from '../../src';
+import {
+  AlwaysOffSampler,
+  AlwaysOnSampler,
+  BasicTracerProvider,
+  Sampler,
+  SamplingDecision,
+  Span,
+  SpanProcessor,
+  Tracer,
+} from '../../src';
 import { TestStackContextManager } from './export/TestStackContextManager';
 import * as sinon from 'sinon';
 import { invalidAttributes, validAttributes } from './util';

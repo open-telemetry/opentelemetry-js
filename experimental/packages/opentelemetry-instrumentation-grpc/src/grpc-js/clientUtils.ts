@@ -17,7 +17,6 @@
 import { GrpcJsInstrumentation } from './';
 import type { GrpcClientFunc, SendUnaryDataCallback } from './types';
 import {
-  SpanKind,
   Span,
   SpanStatusCode,
   SpanStatus,
@@ -126,11 +125,6 @@ export function makeGrpcClientRemoteCall(
         );
       }
     }
-
-    span.setAttributes({
-      [AttributeNames.GRPC_METHOD]: original.path,
-      [AttributeNames.GRPC_KIND]: SpanKind.CLIENT,
-    });
 
     setSpanContext(metadata);
     const call = original.apply(self, args);

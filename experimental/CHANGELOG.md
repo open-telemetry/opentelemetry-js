@@ -9,8 +9,11 @@ All notable changes to experimental packages in this project will be documented 
 ### :rocket: (Enhancement)
 
 * fix(add-views-to-node-sdk): added the ability to define meter views in `NodeSDK` [#3066](https://github.com/open-telemetry/opentelemetry-js/pull/3124) @weyert
+* feature(prometheus-serialiser): export the unit block when unit is set in metric descriptor [#3066](https://github.com/open-telemetry/opentelemetry-js/pull/3041) @weyert
 
 ### :bug: (Bug Fix)
+
+* fix(instrumentation-http): add `http.host` attribute before sending the request #3054 @cuichenli
 
 ### :books: (Refine Doc)
 
