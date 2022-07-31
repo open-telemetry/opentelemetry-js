@@ -18,7 +18,6 @@ import { AggregationTemporality } from './AggregationTemporality';
 import { ResourceMetrics } from './MetricData';
 import {
   ExportResult,
-  ExportResultCode,
 } from '@opentelemetry/core';
 import { InstrumentType } from '../InstrumentDescriptor';
 
