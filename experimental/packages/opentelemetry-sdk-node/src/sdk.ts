@@ -91,7 +91,7 @@ export class NodeSDK {
     }
 
     if (configuration.metricReader) {
-      this.configureMeterProvider(configuration.metricReader);
+      this.configureMeterProvider(configuration.metricReader, configuration.views);
     }
 
     let instrumentations: InstrumentationOption[] = [];

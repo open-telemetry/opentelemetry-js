@@ -22,13 +22,13 @@ import {
   diag,
   DiagLogLevel,
 } from '@opentelemetry/api';
-import { metrics, NoopMeterProvider } from '@opentelemetry/api-metrics';
+import { metrics, NoopMeterProvider, ValueType } from '@opentelemetry/api-metrics';
 import {
   AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
 import { CompositePropagator } from '@opentelemetry/core';
-import { ConsoleMetricExporter, InstrumentType, MeterProvider, PeriodicExportingMetricReader, View } from '@opentelemetry/sdk-metrics-base';
+import { ConsoleMetricExporter, InstrumentDescriptor, InstrumentType, MeterProvider, PeriodicExportingMetricReader, View } from '@opentelemetry/sdk-metrics-base';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   assertServiceResource,
@@ -147,13 +147,21 @@ describe('Node SDK', () => {
     });
   });
 
-  it('should register meter views when provider', async () => {
+  it('should register meter views when provided', async () => {
     const exporter = new ConsoleMetricExporter();
     const metricReader = new PeriodicExportingMetricReader({
       exporter: exporter,
       exportIntervalMillis: 100,
       exportTimeoutMillis: 100
     });
+
+    const metricDescriptor: InstrumentDescriptor = {
+      name: 'test-view',
+      description: 'Metric',
+      unit: '1',
+      type: InstrumentType.COUNTER,
+      valueType: ValueType.INT
+    };
 
     const sdk = new NodeSDK({
       metricReader: metricReader,
@@ -173,8 +181,11 @@ describe('Node SDK', () => {
     assert.strictEqual(propagation['_getGlobalPropagator'](), propagator, 'propagator should not change');
     assert.strictEqual((trace.getTracerProvider() as ProxyTracerProvider).getDelegate(), delegate, 'tracer provider should not have changed');
 
-    assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
-
+    const meterProvider = metrics.getMeterProvider() as MeterProvider;
+    assert.ok(meterProvider);
+    const viewRegistry = meterProvider['_sharedState'].viewRegistry;
+    assert.ok(viewRegistry['_registeredViews'].find(view => view.name === 'test-view'));
+    assert.ok(viewRegistry.findViews(metricDescriptor, { name: 'test-view' }));
     await sdk.shutdown();
   });
 
