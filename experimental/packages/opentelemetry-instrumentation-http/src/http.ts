@@ -292,7 +292,6 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       (response: http.IncomingMessage & { aborted?: boolean }) => {
         const responseAttributes = utils.getOutgoingRequestAttributesOnResponse(
           response,
-          { hostname }
         );
         span.setAttributes(responseAttributes);
         if (this._getConfig().responseHook) {
@@ -561,13 +560,11 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       }
 
       const operationName = `${component.toUpperCase()} ${method}`;
+      const { hostname, port } = utils.extractHostnameAndPort(optionsParsed);
 
-      const hostname =
-        optionsParsed.hostname ||
-        optionsParsed.host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') ||
-        'localhost';
       const attributes = utils.getOutgoingRequestAttributes(optionsParsed, {
         component,
+        port,
         hostname,
         hookAttributes: instrumentation._callStartSpanHook(
           optionsParsed,

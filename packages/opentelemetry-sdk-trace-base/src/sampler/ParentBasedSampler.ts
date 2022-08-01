@@ -18,18 +18,16 @@ import {
   Context,
   isSpanContextValid,
   Link,
-  Sampler,
-  SamplingResult,
   SpanAttributes,
   SpanKind,
   TraceFlags, trace,
 } from '@opentelemetry/api';
-import { globalErrorHandler } from '../../common/global-error-handler';
+import { globalErrorHandler } from '@opentelemetry/core';
 import { AlwaysOffSampler } from './AlwaysOffSampler';
 import { AlwaysOnSampler } from './AlwaysOnSampler';
+import { Sampler, SamplingResult } from '../Sampler';
 
 /**
- * @deprecated Use the one defined in @opentelemetry/sdk-trace-base instead.
  * A composite sampler that either respects the parent span's sampling decision
  * or delegates to `delegateSampler` for root spans.
  */

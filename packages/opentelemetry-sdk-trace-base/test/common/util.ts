@@ -31,3 +31,5 @@ export const invalidAttributes = {
   // This empty length attribute should not be set
   '': 'empty-key',
 };
+
+export function assertAssignable<T>(val: T): asserts val is T {}

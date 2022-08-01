@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-import { TextMapPropagator, Sampler } from '@opentelemetry/api';
-import { IdGenerator } from '@opentelemetry/core';
-
-import { ContextManager } from '@opentelemetry/api';
+import { ContextManager, TextMapPropagator } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
+import { IdGenerator } from './IdGenerator';
+import { Sampler } from './Sampler';
 
 /**
  * TracerConfig provides an interface for configuring a Basic Tracer.
