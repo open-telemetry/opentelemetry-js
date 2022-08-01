@@ -26,11 +26,13 @@ import {
   SpanAttributeValue,
 } from '@opentelemetry/api';
 import {
+  AnchoredClock,
   DEFAULT_ATTRIBUTE_COUNT_LIMIT,
   DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
   hrTimeDuration,
   hrTimeToMilliseconds,
   hrTimeToNanoseconds,
+  otperformance,
   otperformance as performance,
 } from '@opentelemetry/core';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
@@ -75,7 +77,8 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.SERVER
+      SpanKind.SERVER,
+      AnchoredClock.create(Date, otperformance)
     );
     assert.ok(span instanceof Span);
     span.end();
@@ -87,7 +90,8 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.SERVER
+      SpanKind.SERVER,
+      AnchoredClock.create(Date, otperformance)
     );
     assert.ok(
       hrTimeToMilliseconds(span.startTime) >
@@ -101,7 +105,8 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.SERVER
+      SpanKind.SERVER,
+      AnchoredClock.create(Date, otperformance)
     );
     span.end();
     assert.ok(
@@ -122,7 +127,8 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.SERVER
+      SpanKind.SERVER,
+      AnchoredClock.create(Date, otperformance)
     );
     span.end();
     assert.ok(hrTimeToNanoseconds(span.duration) >= 0);
@@ -134,7 +140,8 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.SERVER
+      SpanKind.SERVER,
+      AnchoredClock.create(Date, otperformance)
     );
     span.addEvent('my-event');
     assert.ok(
@@ -150,6 +157,7 @@ describe('Span', () => {
       name,
       spanContext,
       SpanKind.SERVER,
+      AnchoredClock.create(Date, otperformance),
       undefined,
       [],
       0
@@ -172,6 +180,7 @@ describe('Span', () => {
         name,
         spanContext,
         SpanKind.SERVER,
+        AnchoredClock.create(Date, otperformance),
         undefined,
         [],
         0
@@ -193,7 +202,8 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.CLIENT
+      SpanKind.CLIENT,
+      AnchoredClock.create(Date, otperformance),
     );
     const context = span.spanContext();
     assert.strictEqual(context.traceId, spanContext.traceId);
@@ -211,7 +221,8 @@ describe('Span', () => {
         ROOT_CONTEXT,
         name,
         spanContext,
-        SpanKind.CLIENT
+        SpanKind.CLIENT,
+        AnchoredClock.create(Date, otperformance),
       );
       assert.ok(span.isRecording());
       span.end();
@@ -222,7 +233,8 @@ describe('Span', () => {
         ROOT_CONTEXT,
         name,
         spanContext,
-        SpanKind.CLIENT
+        SpanKind.CLIENT,
+        AnchoredClock.create(Date, otperformance),
       );
       span.end();
       assert.ok(span.isRecording() === false);
@@ -237,7 +249,8 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT
+          SpanKind.CLIENT,
+          AnchoredClock.create(Date, otperformance),
         );
 
         for (const [k, v] of Object.entries(validAttributes)) {
@@ -256,7 +269,8 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT
+          SpanKind.CLIENT,
+          AnchoredClock.create(Date, otperformance),
         );
 
         span.setAttribute('overwrite', 'initial value');
@@ -282,7 +296,8 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT
+          SpanKind.CLIENT,
+          AnchoredClock.create(Date, otperformance),
         );
         for (let i = 0; i < 150; i++) {
           span.setAttribute('foo' + i, 'bar' + i);
@@ -310,7 +325,8 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT
+          SpanKind.CLIENT,
+          AnchoredClock.create(Date, otperformance),
         );
 
         it('should truncate value which length exceeds this limit', () => {
@@ -349,7 +365,8 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT
+          SpanKind.CLIENT,
+          AnchoredClock.create(Date, otperformance),
         );
 
         it('should not truncate any value', () => {
@@ -375,7 +392,8 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT
+          SpanKind.CLIENT,
+          AnchoredClock.create(Date, otperformance),
         );
         for (let i = 0; i < 150; i++) {
           span.setAttribute('foo' + i, 'bar' + i);
@@ -403,7 +421,8 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT
+          SpanKind.CLIENT,
+          AnchoredClock.create(Date, otperformance),
         );
 
         it('should truncate value which length exceeds this limit', () => {
@@ -442,7 +461,8 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT
+          SpanKind.CLIENT,
+          AnchoredClock.create(Date, otperformance),
         );
 
         it('should not truncate any value', () => {
@@ -471,7 +491,8 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT
+          SpanKind.CLIENT,
+          AnchoredClock.create(Date, otperformance),
         );
         for (let i = 0; i < 150; i++) {
           span.setAttribute('foo' + i, 'bar' + i);
@@ -503,7 +524,8 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT
+          SpanKind.CLIENT,
+          AnchoredClock.create(Date, otperformance),
         );
         for (let i = 0; i < 150; i++) {
           span.setAttribute('foo' + i, 'bar' + i);
@@ -536,7 +558,8 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT
+          SpanKind.CLIENT,
+          AnchoredClock.create(Date, otperformance),
         );
 
         it('should truncate value which length exceeds span limit', () => {
@@ -579,7 +602,8 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT
+          SpanKind.CLIENT,
+          AnchoredClock.create(Date, otperformance),
         );
 
         it('should not truncate value', () => {
@@ -609,7 +633,8 @@ describe('Span', () => {
         ROOT_CONTEXT,
         name,
         spanContext,
-        SpanKind.CLIENT
+        SpanKind.CLIENT,
+        AnchoredClock.create(Date, otperformance),
       );
 
       span.setAttributes(validAttributes);
@@ -626,7 +651,8 @@ describe('Span', () => {
         ROOT_CONTEXT,
         name,
         spanContext,
-        SpanKind.CLIENT
+        SpanKind.CLIENT,
+        AnchoredClock.create(Date, otperformance),
       );
       span.addEvent('sent');
       span.addEvent('rev', { attr1: 'value', attr2: 123, attr3: true });
@@ -639,7 +665,8 @@ describe('Span', () => {
         ROOT_CONTEXT,
         name,
         spanContext,
-        SpanKind.CLIENT
+        SpanKind.CLIENT,
+        AnchoredClock.create(Date, otperformance),
       );
       span.addEvent('rev', { ...validAttributes, ...invalidAttributes } as unknown as SpanAttributes);
       span.end();
@@ -668,6 +695,7 @@ describe('Span', () => {
       name,
       spanContext,
       SpanKind.CLIENT,
+      AnchoredClock.create(Date, otperformance),
       '12345',
       [{ context: linkContext }, { context: linkContext, attributes }]
     );
@@ -680,7 +708,8 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.CLIENT
+      SpanKind.CLIENT,
+      AnchoredClock.create(Date, otperformance),
     );
     for (let i = 0; i < 150; i++) {
       span.addEvent('sent' + i);
@@ -703,7 +732,8 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.CLIENT
+      SpanKind.CLIENT,
+      AnchoredClock.create(Date, otperformance),
     );
     for (let i = 0; i < 10; i++) {
       span.addEvent('sent' + i);
@@ -719,7 +749,8 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.CLIENT
+      SpanKind.CLIENT,
+      AnchoredClock.create(Date, otperformance),
     );
     span.setStatus({
       code: SpanStatusCode.ERROR,
@@ -736,6 +767,7 @@ describe('Span', () => {
       'my-span',
       spanContext,
       SpanKind.INTERNAL,
+      AnchoredClock.create(Date, otperformance),
       parentId
     );
 
@@ -762,7 +794,8 @@ describe('Span', () => {
       ROOT_CONTEXT,
       'my-span',
       spanContext,
-      SpanKind.CLIENT
+      SpanKind.CLIENT,
+      AnchoredClock.create(Date, otperformance),
     );
     span.setAttribute('attr1', 'value1');
     assert.deepStrictEqual(span.attributes, { attr1: 'value1' });
@@ -789,6 +822,7 @@ describe('Span', () => {
       'my-span',
       spanContext,
       SpanKind.CLIENT,
+      AnchoredClock.create(Date, otperformance),
       undefined,
       [
         { context: linkContext },
@@ -818,7 +852,8 @@ describe('Span', () => {
       ROOT_CONTEXT,
       'my-span',
       spanContext,
-      SpanKind.CLIENT
+      SpanKind.CLIENT,
+      AnchoredClock.create(Date, otperformance),
     );
     span.addEvent('sent');
     assert.strictEqual(span.events.length, 1);
@@ -853,7 +888,8 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.CLIENT
+      SpanKind.CLIENT,
+      AnchoredClock.create(Date, otperformance),
     );
     span.setStatus({
       code: SpanStatusCode.ERROR,
@@ -877,7 +913,8 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.SERVER
+      SpanKind.SERVER,
+      AnchoredClock.create(Date, otperformance)
     );
     const endTime = Date.now();
     span.end(endTime);
@@ -891,7 +928,8 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.SERVER
+      SpanKind.SERVER,
+      AnchoredClock.create(Date, otperformance)
     );
     span.updateName('foo-span');
     span.end();
@@ -907,7 +945,8 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.SERVER
+      SpanKind.SERVER,
+      AnchoredClock.create(Date, otperformance)
     );
     assert.strictEqual(span.ended, false);
     span.end();
@@ -990,7 +1029,8 @@ describe('Span', () => {
             ROOT_CONTEXT,
             name,
             spanContext,
-            SpanKind.CLIENT
+            SpanKind.CLIENT,
+            AnchoredClock.create(Date, otperformance),
           );
           assert.strictEqual(span.events.length, 0);
           span.recordException(key);
@@ -1010,7 +1050,8 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT
+          SpanKind.CLIENT,
+          AnchoredClock.create(Date, otperformance),
         );
         assert.strictEqual(span.events.length, 0);
         span.recordException(error);
@@ -1043,7 +1084,8 @@ describe('Span', () => {
             ROOT_CONTEXT,
             name,
             spanContext,
-            SpanKind.CLIENT
+            SpanKind.CLIENT,
+            AnchoredClock.create(Date, otperformance),
           );
           assert.strictEqual(span.events.length, 0);
           span.recordException(error);
@@ -1074,7 +1116,8 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT
+          SpanKind.CLIENT,
+          AnchoredClock.create(Date, otperformance),
         );
         assert.strictEqual(span.events.length, 0);
         span.recordException('boom', [0, 123]);
@@ -1090,7 +1133,8 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT
+          SpanKind.CLIENT,
+          AnchoredClock.create(Date, otperformance),
         );
         assert.strictEqual(span.events.length, 0);
         span.recordException({ code: 12 });

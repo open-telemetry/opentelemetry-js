@@ -19,12 +19,14 @@ import {
   ROOT_CONTEXT,
   SpanContext,
   SpanKind,
-  TraceFlags,
+  TraceFlags
 } from '@opentelemetry/api';
 import {
+  AnchoredClock,
   ExportResultCode,
   loggingErrorHandler,
-  setGlobalErrorHandler,
+  otperformance,
+  setGlobalErrorHandler
 } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -32,7 +34,7 @@ import {
   BasicTracerProvider,
   InMemorySpanExporter,
   SimpleSpanProcessor,
-  Span,
+  Span
 } from '../../../src';
 import { TestStackContextManager } from './TestStackContextManager';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
@@ -66,7 +68,9 @@ describe('SimpleSpanProcessor', () => {
         ROOT_CONTEXT,
         'span-name',
         spanContext,
-        SpanKind.CLIENT
+        SpanKind.CLIENT,
+        AnchoredClock.create(Date, otperformance),
+
       );
       processor.onStart(span, ROOT_CONTEXT);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
@@ -90,7 +94,9 @@ describe('SimpleSpanProcessor', () => {
         ROOT_CONTEXT,
         'span-name',
         spanContext,
-        SpanKind.CLIENT
+        SpanKind.CLIENT,
+        AnchoredClock.create(Date, otperformance),
+
       );
       processor.onStart(span, ROOT_CONTEXT);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
@@ -115,7 +121,9 @@ describe('SimpleSpanProcessor', () => {
         ROOT_CONTEXT,
         'span-name',
         spanContext,
-        SpanKind.CLIENT
+        SpanKind.CLIENT,
+        AnchoredClock.create(Date, otperformance),
+
       );
       processor.onStart(span, ROOT_CONTEXT);
 
@@ -192,7 +200,9 @@ describe('SimpleSpanProcessor', () => {
         ROOT_CONTEXT,
         'span-name',
         spanContext,
-        SpanKind.CLIENT
+        SpanKind.CLIENT,
+        AnchoredClock.create(Date, otperformance),
+
       );
 
       processor.onStart(span, ROOT_CONTEXT);

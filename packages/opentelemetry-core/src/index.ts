@@ -15,6 +15,7 @@
  */
 
 export * from './baggage/propagation/W3CBaggagePropagator';
+export * from './common/anchored-clock';
 export * from './common/attributes';
 export * from './common/global-error-handler';
 export * from './common/logging-error-handler';

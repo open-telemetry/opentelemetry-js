@@ -19,6 +19,8 @@ import {
   InstrumentationLibrary,
   sanitizeAttributes,
   isTracingSuppressed,
+  AnchoredClock,
+  otperformance,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BasicTracerProvider } from './BasicTracerProvider';
@@ -40,6 +42,7 @@ export class Tracer implements api.Tracer {
   private readonly _idGenerator: IdGenerator;
   readonly resource: Resource;
   readonly instrumentationLibrary: InstrumentationLibrary;
+  private clocks: WeakMap<api.Span, AnchoredClock> = new WeakMap();
 
   /**
    * Constructs a new Tracer instance.
@@ -77,7 +80,8 @@ export class Tracer implements api.Tracer {
       context = api.trace.deleteSpan(context);
     }
 
-    const parentSpanContext = api.trace.getSpanContext(context);
+    const parentSpan = api.trace.getSpan(context);
+    const parentSpanContext = parentSpan?.spanContext();
     const spanId = this._idGenerator.generateSpanId();
     let traceId;
     let traceState;
@@ -120,15 +124,23 @@ export class Tracer implements api.Tracer {
       return api.trace.wrapSpanContext(spanContext);
     }
 
+    let clock: AnchoredClock | undefined;
+    if (parentSpan) {
+      clock = this.clocks.get(parentSpan);
+    }
+
+    clock = clock ?? AnchoredClock.create(Date, otperformance);
+
     const span = new Span(
       this,
       context,
       name,
       spanContext,
       spanKind,
+      clock,
       parentSpanId,
       links,
-      options.startTime
+      options.startTime,
     );
     // Set initial span attributes. The attributes object may have been mutated
     // by the sampler, so we sanitize the merged attributes before setting them.

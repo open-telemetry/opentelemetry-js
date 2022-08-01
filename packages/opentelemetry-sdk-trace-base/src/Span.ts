@@ -17,13 +17,12 @@
 import * as api from '@opentelemetry/api';
 import {
   isAttributeValue,
-  hrTime,
-  hrTimeDuration,
   InstrumentationLibrary,
   isTimeInput,
-  timeInputToHrTime,
   sanitizeAttributes,
-  addHrTime,
+  AnchoredClock,
+  timeInputToHrTime,
+  hrTimeDuration,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
@@ -60,7 +59,7 @@ export class Span implements api.Span, ReadableSpan {
   private readonly _spanProcessor: SpanProcessor;
   private readonly _spanLimits: SpanLimits;
   private readonly _attributeValueLengthLimit: number;
-  private readonly _hrStartTime: api.HrTime;
+  private readonly clock: AnchoredClock;
 
   /** Constructs a new Span instance. */
   constructor(
@@ -69,17 +68,18 @@ export class Span implements api.Span, ReadableSpan {
     spanName: string,
     spanContext: api.SpanContext,
     kind: api.SpanKind,
+    clock: AnchoredClock,
     parentSpanId?: string,
     links: api.Link[] = [],
-    startTime?: api.TimeInput
+    startTime?: api.TimeInput,
   ) {
+    this.clock = clock;
     this.name = spanName;
     this._spanContext = spanContext;
     this.parentSpanId = parentSpanId;
     this.kind = kind;
     this.links = links;
-    this._hrStartTime = hrTime();
-    this.startTime = timeInputToHrTime(startTime ?? Date.now());
+    this.startTime = timeInputToHrTime(startTime ?? clock.now());
     this.resource = parentTracer.resource;
     this.instrumentationLibrary = parentTracer.instrumentationLibrary;
     this._spanLimits = parentTracer.getSpanLimits();
@@ -150,7 +150,7 @@ export class Span implements api.Span, ReadableSpan {
       attributesOrStartTime = undefined;
     }
     if (typeof startTime === 'undefined') {
-      startTime = hrTime();
+      startTime = this.clock.now();
     }
 
     const attributes = sanitizeAttributes(attributesOrStartTime);
@@ -181,14 +181,8 @@ export class Span implements api.Span, ReadableSpan {
     }
     this._ended = true;
 
-
-    if (endTime != null) {
-      this.endTime = timeInputToHrTime(endTime);
-      this._duration = hrTimeDuration(this._hrStartTime, this.endTime);
-    } else {
-      this._duration = hrTimeDuration(this._hrStartTime, hrTime());
-      this.endTime = addHrTime(this.startTime, this._duration);
-    }
+    this.endTime = timeInputToHrTime(endTime ?? this.clock.now());
+    this._duration = hrTimeDuration(this.startTime, this.endTime);
 
     if (this._duration[0] < 0) {
       api.diag.warn(
@@ -205,7 +199,7 @@ export class Span implements api.Span, ReadableSpan {
     return this._ended === false;
   }
 
-  recordException(exception: api.Exception, time: api.TimeInput = hrTime()): void {
+  recordException(exception: api.Exception, time: api.TimeInput = this.clock.now()): void {
     const attributes: api.SpanAttributes = {};
     if (typeof exception === 'string') {
       attributes[SemanticAttributes.EXCEPTION_MESSAGE] = exception;
