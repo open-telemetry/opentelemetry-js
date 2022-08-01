@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
+import { ExportResult } from '@opentelemetry/core';
 import {
   BasicTracerProvider,
   InMemorySpanExporter,
   ReadableSpan,
   Tracer,
   SpanProcessor,
+  AlwaysOnSampler,
 } from '../../../src';
-import { ExportResult, AlwaysOnSampler } from '@opentelemetry/core';
 
 /**
  * A test-only span exporter that naively simulates triggering instrumentation
