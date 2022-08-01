@@ -195,9 +195,11 @@ export abstract class AbstractAsyncHooksContextManager
       listeners.set(listener, patchedListener);
       
       contextManager._wrapped = true;
-      const val = original.call(this, event, patchedListener);
-      contextManager._wrapped = false;
-      return val;
+      try {
+        return original.call(this, event, patchedListener);;
+      } finally {
+        contextManager._wrapped = false;
+      }
     };
   }
 
