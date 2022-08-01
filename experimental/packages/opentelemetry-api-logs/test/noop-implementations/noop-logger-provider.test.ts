@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-export * from './types/Logger';
-export * from './types/LoggerProvider';
-export * from './types/LogRecord';
-export * from './types/Event';
-export * from './types/LoggerOptions';
-export * from './NoopLoggerProvider';
-export * from './NoopLogger';
+import * as assert from 'assert';
+import { NoopLogger } from '../../src/NoopLogger';
+import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
 
-import { LogsAPI } from './api/logs';
-export const logs = LogsAPI.getInstance();
+describe('NoopLoggerProvider', () => {
+  it('should not crash', () => {
+    const loggerProvider = new NoopLoggerProvider();
+
+    assert.ok(loggerProvider.getLogger('logger-name') instanceof NoopLogger);
+    assert.ok(loggerProvider.getLogger('logger-name', 'v1') instanceof NoopLogger);
+    assert.ok(loggerProvider.getLogger('logger-name', 'v1', {
+      schemaUrl: 'https://opentelemetry.io/schemas/1.7.0'
+    }) instanceof NoopLogger);
+  });
+});

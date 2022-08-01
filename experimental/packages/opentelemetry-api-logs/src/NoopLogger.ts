@@ -30,9 +30,7 @@ export class NoopLogger implements Logger {
     return new NonRecordingEvent(name, domain);
   }
 
-  emit(logRecord: LogRecord): void;
-  emit(event: Event): void;
-  emit(_event: unknown): void {}
+  emit(logRecord: LogRecord): void {};
 
   emitEvent(_name: string, _attributes?: Attributes): void {}
 }

@@ -16,7 +16,7 @@
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build tsconfig.all.json",
     "clean": "tsc --build --clean tsconfig.all.json",
-    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
+    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts -w --watch-files '**/*.ts'",
     "test:browser": "nyc karma start --single-run",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
@@ -39,6 +39,8 @@
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
   "devDependencies": {
+    "nyc": "^15.1.0",
+    "ts-mocha": "^10.0.0",
     "typescript": "4.4.4",
     "webpack": "4.46.0"
   },

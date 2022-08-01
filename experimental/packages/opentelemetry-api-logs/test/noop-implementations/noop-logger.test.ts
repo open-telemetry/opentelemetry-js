@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-export * from './types/Logger';
-export * from './types/LoggerProvider';
-export * from './types/LogRecord';
-export * from './types/Event';
-export * from './types/LoggerOptions';
-export * from './NoopLoggerProvider';
-export * from './NoopLogger';
+import * as assert from 'assert';
+import { NoopLogger } from '../../src/NoopLogger';
+import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
 
-import { LogsAPI } from './api/logs';
-export const logs = LogsAPI.getInstance();
+describe('NoopLogger', () => {
+
+});

@@ -72,4 +72,9 @@ export class LogsAPI {
   public getLogger(name: string, version?: string, options?: LoggerOptions): Logger {
     return this.getLoggerProvider().getLogger(name, version, options);
   }
+
+  /** Remove the global logger provider */
+  public disable(): void {
+    delete _global[GLOBAL_LOGS_API_KEY];
+  }
 }
