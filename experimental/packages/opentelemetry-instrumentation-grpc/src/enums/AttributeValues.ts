@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-import { Sampler, SamplingDecision, SamplingResult } from '../../../src';
-
-/** Sampler that always records but doesn't sample spans. */
-export class TestRecordOnlySampler implements Sampler {
-  shouldSample(): SamplingResult {
-    return {
-      decision: SamplingDecision.RECORD,
-    };
-  }
-
-  toString(): string {
-    return 'TestRecordOnlySampler';
-  }
+interface AttributeValuesType {
+  RPC_SYSTEM: string
 }
+
+export const AttributeValues: Readonly<AttributeValuesType> = {
+  RPC_SYSTEM: 'grpc'
+};
