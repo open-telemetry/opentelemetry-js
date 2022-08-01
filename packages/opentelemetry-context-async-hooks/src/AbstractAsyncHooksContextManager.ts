@@ -195,7 +195,7 @@ implements ContextManager {
       // store a weak reference of the user listener to ours
       listeners.set(listener, patchedListener);
       if (name === 'once') {
-        active = active.setValue(contextManager._inOnce, true)
+        active = active.setValue(contextManager._inOnce, true);
       }
       return contextManager.with(active, () => {
         return original.call(this, event, patchedListener);
