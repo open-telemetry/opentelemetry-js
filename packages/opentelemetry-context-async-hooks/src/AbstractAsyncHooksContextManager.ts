@@ -105,7 +105,7 @@ implements ContextManager {
     // patch methods that add a listener to propagate context
     ADD_LISTENER_METHODS.forEach(methodName => {
       if (ee[methodName] === undefined) return;
-      ee[methodName] = this._patchAddListener(ee, ee[methodName], context);
+      ee[methodName] = this._patchAddListener(ee, ee[methodName], methodName, context);
     });
     // patch methods that remove a listener
     if (typeof ee.removeListener === 'function') {
@@ -173,10 +173,15 @@ implements ContextManager {
   private _patchAddListener(
     ee: EventEmitter,
     original: Function,
+    name: string,
     context: Context
   ) {
     const contextManager = this;
     return function (this: never, event: string, listener: Func<void>) {
+      let active = contextManager.active();
+      if (active.getValue(contextManager._inOnce)) {
+        return original.call(this, event, listener);
+      }
       let map = contextManager._getPatchMap(ee);
       if (map === undefined) {
         map = contextManager._createPatchMap(ee);
@@ -189,7 +194,12 @@ implements ContextManager {
       const patchedListener = contextManager.bind(context, listener);
       // store a weak reference of the user listener to ours
       listeners.set(listener, patchedListener);
-      return original.call(this, event, patchedListener);
+      if (name === 'once') {
+        active = active.setValue(contextManager._inOnce, true)
+      }
+      return contextManager.with(active, () => {
+        return original.call(this, event, patchedListener);
+      });
     };
   }
 
@@ -204,4 +214,5 @@ implements ContextManager {
   }
 
   private readonly _kOtListeners = Symbol('OtListeners');
+  private readonly _inOnce = Symbol('OpenTelemetry once detection');
 }
