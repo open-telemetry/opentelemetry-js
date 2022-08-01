@@ -137,7 +137,7 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
     });
   }
 
-  private _flushOneBatch(): Promise<void> {
+  private async _flushOneBatch(): Promise<void> {
     this._clearTimer();
     if (this._finishedSpans.length === 0) {
       return Promise.resolve();

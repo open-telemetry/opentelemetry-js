@@ -82,8 +82,11 @@ export class JaegerExporter implements SpanExporter {
     return this._shutdownOnce.call();
   }
 
+  /**
+   * Exports any pending spans in exporter
+   */
   forceFlush(): Promise<void> {
-    return Promise.resolve();
+    return this._flush();
   }
 
   private _shutdown(): Promise<void> {

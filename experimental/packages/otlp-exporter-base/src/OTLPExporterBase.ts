@@ -110,8 +110,14 @@ export abstract class OTLPExporterBase<
     return this._shutdownOnce.call();
   }
 
+  /**
+   * Exports any pending spans in the exporter
+   */
   forceFlush(): Promise<void> {
-    return Promise.resolve();
+    return Promise.all(this._sendingPromises)
+      .then(() => {
+        /** ignore resolved values */
+      });
   }
 
   /**
@@ -120,10 +126,7 @@ export abstract class OTLPExporterBase<
   private _shutdown(): Promise<void> {
     diag.debug('shutdown started');
     this.onShutdown();
-    return Promise.all(this._sendingPromises)
-      .then(() => {
-        /** ignore resolved values */
-      });
+    return this.forceFlush();
   }
 
   abstract onShutdown(): void;

@@ -102,15 +102,18 @@ export class ZipkinExporter implements SpanExporter {
   shutdown(): Promise<void> {
     diag.debug('Zipkin exporter shutdown');
     this._isShutdown = true;
+    return this.forceFlush();
+  }
+
+  /**
+   * Exports any pending spans in exporter
+   */
+  forceFlush(): Promise<void> {
     return new Promise((resolve, reject) => {
       Promise.all(this._sendingPromises).then(() => {
         resolve();
       }, reject);
     });
-  }
-
-  forceFlush(): Promise<void> {
-    return Promise.resolve();
   }
 
   /**

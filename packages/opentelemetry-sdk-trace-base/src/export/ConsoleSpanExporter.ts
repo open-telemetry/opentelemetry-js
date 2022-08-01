@@ -45,15 +45,14 @@ export class ConsoleSpanExporter implements SpanExporter {
    * Shutdown the exporter.
    */
   shutdown(): Promise<void> {
-    return this._flush();
-  }
-
-  forceFlush(): Promise<void> {
-    return this._flush();
-  }
-
-  private _flush() : Promise<void> {
     this._sendSpans([]);
+    return this.forceFlush();
+  }
+
+  /**
+   * Exports any pending spans in exporter
+   */
+  forceFlush(): Promise<void> {
     return Promise.resolve();
   }
 

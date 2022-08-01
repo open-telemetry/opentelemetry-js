@@ -80,9 +80,15 @@ describe('InMemorySpanExporter', () => {
     assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
   });
 
-  it('forceFlush should discard inmemory spans', () => {
-    memoryExporter.forceFlush();
-    assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
+  describe('force flush', () => {
+    describe('when flushing complete', () => {
+      it('should call an async callback', done => {
+        memoryExporter = new InMemorySpanExporter();
+        memoryExporter.forceFlush().then(() => {
+          done();
+        });
+      });
+    });
   });
 
   it('should return the success result', () => {
