@@ -37,7 +37,7 @@ const ADD_LISTENER_METHODS = [
 ];
 
 export abstract class AbstractAsyncHooksContextManager
-implements ContextManager {
+  implements ContextManager {
   abstract active(): Context;
 
   abstract with<A extends unknown[], F extends (...args: A) => ReturnType<F>>(
@@ -177,6 +177,10 @@ implements ContextManager {
   ) {
     const contextManager = this;
     return function (this: never, event: string, listener: Func<void>) {
+      // do not double wrap. e.g. once calls on
+      if (contextManager._wrapped) {
+        return original.call(this, event, listener);
+      }
       let map = contextManager._getPatchMap(ee);
       if (map === undefined) {
         map = contextManager._createPatchMap(ee);
@@ -189,7 +193,11 @@ implements ContextManager {
       const patchedListener = contextManager.bind(context, listener);
       // store a weak reference of the user listener to ours
       listeners.set(listener, patchedListener);
-      return original.call(this, event, patchedListener);
+      
+      contextManager._wrapped = true;
+      const val = original.call(this, event, patchedListener);
+      contextManager._wrapped = false;
+      return val;
     };
   }
 
@@ -204,4 +212,5 @@ implements ContextManager {
   }
 
   private readonly _kOtListeners = Symbol('OtListeners');
+  private _wrapped = false;
 }
