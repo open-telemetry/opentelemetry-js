@@ -37,7 +37,7 @@ const ADD_LISTENER_METHODS = [
 ];
 
 export abstract class AbstractAsyncHooksContextManager
-  implements ContextManager {
+implements ContextManager {
   abstract active(): Context;
 
   abstract with<A extends unknown[], F extends (...args: A) => ReturnType<F>>(
@@ -193,10 +193,10 @@ export abstract class AbstractAsyncHooksContextManager
       const patchedListener = contextManager.bind(context, listener);
       // store a weak reference of the user listener to ours
       listeners.set(listener, patchedListener);
-      
+
       contextManager._wrapped = true;
       try {
-        return original.call(this, event, patchedListener);;
+        return original.call(this, event, patchedListener);
       } finally {
         contextManager._wrapped = false;
       }
