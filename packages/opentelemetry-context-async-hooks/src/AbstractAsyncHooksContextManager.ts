@@ -201,7 +201,7 @@ implements ContextManager {
       // store a weak reference of the user listener to ours
       listeners.set(listener, patchedListener);
 
-      /** 
+      /**
        * See comment at the start of this function for the explanation of this property.
        */
       contextManager._wrapped = true;
