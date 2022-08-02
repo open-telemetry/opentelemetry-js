@@ -8,7 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
-feat(sdk-trace-base): move Sampler declaration into sdk-trace-base [#3088](https://github.com/open-telemetry/opentelemetry-js/pull/3088) @legendecas
+* feat(sdk-trace-base): move Sampler declaration into sdk-trace-base [#3088](https://github.com/open-telemetry/opentelemetry-js/pull/3088) @legendecas
+* fix(grpc-instrumentation): added grpc attributes in instrumentation [#3127](https://github.com/open-telemetry/opentelemetry-js/pull/3127) @andrewzenkov
 
 ### :bug: (Bug Fix)
 

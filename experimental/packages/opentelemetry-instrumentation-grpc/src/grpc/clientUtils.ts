@@ -22,7 +22,6 @@ import {
   context,
   Span,
   SpanStatusCode,
-  SpanKind,
   SpanStatus,
   propagation,
 } from '@opentelemetry/api';
@@ -99,10 +98,6 @@ export const makeGrpcClientRemoteCall = function (
     }
 
     span.addEvent('sent');
-    span.setAttributes({
-      [AttributeNames.GRPC_METHOD]: original.path,
-      [AttributeNames.GRPC_KIND]: SpanKind.CLIENT,
-    });
 
     setSpanContext(metadata);
     const call = original.apply(self, args);
