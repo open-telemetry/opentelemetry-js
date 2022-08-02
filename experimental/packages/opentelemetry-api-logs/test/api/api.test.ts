@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert'; 
+import * as assert from 'assert';
 import { Logger, logs, NoopLogger, NoopLoggerProvider } from '../../src';
 
 describe('API', () => {
