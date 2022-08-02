@@ -19,6 +19,7 @@ const protos = [
 function exec(command, argv) {
   return new Promise((resolve, reject) => {
     const child = cp.spawn(command, argv, {
+      shell: true,
       stdio: ['ignore', 'inherit', 'inherit'],
     });
     child.on('exit', (code, signal) => {
