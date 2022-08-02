@@ -72,6 +72,9 @@ describe('Node SDK', () => {
 
   describe('Basic Registration', () => {
     it('should not register any unconfigured SDK components', async () => {
+      // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
+      // which sets up an exporter and affects the context manager
+      env.OTEL_TRACES_EXPORTER = 'none';
       const sdk = new NodeSDK({
         autoDetectResources: false,
       });
@@ -83,6 +86,7 @@ describe('Node SDK', () => {
       assert.strictEqual((trace.getTracerProvider() as ProxyTracerProvider).getDelegate(), delegate, 'tracer provider should not have changed');
 
       assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
+      delete env.OTEL_TRACES_EXPORTER;
     });
 
     it('should register a tracer provider if an exporter is provided', async () => {
@@ -129,6 +133,9 @@ describe('Node SDK', () => {
     });
 
     it('should register a meter provider if a reader is provided', async () => {
+      // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
+      // which sets up an exporter and affects the context manager
+      env.OTEL_TRACES_EXPORTER = 'none';
       const exporter = new ConsoleMetricExporter();
       const metricReader = new PeriodicExportingMetricReader({
         exporter: exporter,
@@ -150,6 +157,7 @@ describe('Node SDK', () => {
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
 
       await sdk.shutdown();
+      delete env.OTEL_TRACES_EXPORTER;
     });
   });
 
