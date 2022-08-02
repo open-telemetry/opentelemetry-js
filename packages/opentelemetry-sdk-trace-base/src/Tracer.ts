@@ -125,13 +125,13 @@ export class Tracer implements api.Tracer {
 
     let clock: AnchoredClock | undefined;
     if (parentSpan) {
-      clock = (parentSpan as any)["_clock"];
+      clock = (parentSpan as any)['_clock'];
     }
 
     if (!clock) {
       clock = new AnchoredClock(Date, otperformance);
       if (parentSpan) {
-        (parentSpan as any)["_clock"] = clock;
+        (parentSpan as any)['_clock'] = clock;
       }
     }
 
