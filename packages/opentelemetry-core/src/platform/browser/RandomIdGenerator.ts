@@ -18,6 +18,9 @@ import { IdGenerator } from '../../trace/IdGenerator';
 const SPAN_ID_BYTES = 8;
 const TRACE_ID_BYTES = 16;
 
+/**
+ * @deprecated Use the one defined in @opentelemetry/sdk-trace-base instead.
+ */
 export class RandomIdGenerator implements IdGenerator {
   /**
    * Returns a random 16-byte trace ID formatted/encoded as a 32 lowercase hex

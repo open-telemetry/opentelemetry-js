@@ -17,9 +17,13 @@
 /**
  * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/http.md
  */
-export enum AttributeNames {
-  GRPC_KIND = 'grpc.kind', // SERVER or CLIENT
-  GRPC_METHOD = 'grpc.method',
-  GRPC_ERROR_NAME = 'grpc.error_name',
-  GRPC_ERROR_MESSAGE = 'grpc.error_message',
+
+interface AttributesType {
+  GRPC_ERROR_NAME: string;
+  GRPC_ERROR_MESSAGE: string;
 }
+
+export const AttributeNames: Readonly<AttributesType> = {
+  GRPC_ERROR_NAME: 'grpc.error_name',
+  GRPC_ERROR_MESSAGE: 'grpc.error_message',
+};
