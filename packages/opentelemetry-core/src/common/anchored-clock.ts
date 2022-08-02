@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 
+export interface Clock {
+  /**
+   * Return the current time in milliseconds from some epoch such as the Unix epoch or process start
+   */
+  now(): number;
+}
+
+
 /**
  * A utility for returning wall times anchored to a given point in time. Wall time measurements will
  * not be taken from the system, but instead are computed by adding a monotonic clock time
@@ -30,7 +38,7 @@
  * Heavily inspired by the OTel Java anchored clock
  * https://github.com/open-telemetry/opentelemetry-java/blob/main/sdk/trace/src/main/java/io/opentelemetry/sdk/trace/AnchoredClock.java
  */
-export class AnchoredClock {
+export class AnchoredClock implements Clock {
   private _monotonicClock: Clock;
   private _epochMillis: number;
   private _performanceMillis: number;
@@ -47,8 +55,6 @@ export class AnchoredClock {
     this._performanceMillis = monotonicClock.now();
   }
 
-  /**  */
-
   /**
    * Returns the current time by adding the number of milliseconds since the
    * AnchoredClock was created to the creation epoch time
@@ -57,9 +63,4 @@ export class AnchoredClock {
     const delta = this._monotonicClock.now() - this._performanceMillis;
     return this._epochMillis + delta;
   }
-}
-
-export interface Clock {
-  /** Return the current time in milliseconds */
-  now(): number;
 }
