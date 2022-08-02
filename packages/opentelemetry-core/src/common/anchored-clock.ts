@@ -45,7 +45,7 @@ export class AnchoredClock implements Clock {
 
   /**
    * Create a new AnchoredClock anchored to the current time returned by systemClock.
-   * 
+   *
    * @param systemClock should be a clock that returns the number of milliseconds since January 1 1970 such as Date
    * @param monotonicClock should be a clock that counts milliseconds monotonically such as window.performance or perf_hooks.performance
    */
