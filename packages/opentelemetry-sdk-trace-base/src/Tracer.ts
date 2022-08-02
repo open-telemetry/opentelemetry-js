@@ -42,7 +42,6 @@ export class Tracer implements api.Tracer {
   private readonly _idGenerator: IdGenerator;
   readonly resource: Resource;
   readonly instrumentationLibrary: InstrumentationLibrary;
-  private clocks: WeakMap<api.Span, AnchoredClock> = new WeakMap();
 
   /**
    * Constructs a new Tracer instance.
@@ -126,10 +125,15 @@ export class Tracer implements api.Tracer {
 
     let clock: AnchoredClock | undefined;
     if (parentSpan) {
-      clock = this.clocks.get(parentSpan);
+      clock = (parentSpan as any)["_clock"];
     }
 
-    clock = clock ?? AnchoredClock.create(Date, otperformance);
+    if (!clock) {
+      clock = new AnchoredClock(Date, otperformance);
+      if (parentSpan) {
+        (parentSpan as any)["_clock"] = clock;
+      }
+    }
 
     const span = new Span(
       this,

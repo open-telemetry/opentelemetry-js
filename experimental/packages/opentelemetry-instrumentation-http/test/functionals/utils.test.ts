@@ -252,7 +252,7 @@ describe('Utility', () => {
         'test',
         { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
         SpanKind.INTERNAL,
-        AnchoredClock.create(Date, otperformance),
+        new AnchoredClock(Date, otperformance),
       );
       /* tslint:disable-next-line:no-any */
       utils.setSpanWithError(span, new Error(errorMessage));
@@ -488,7 +488,7 @@ describe('Utility', () => {
         'test',
         { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
         SpanKind.INTERNAL,
-        AnchoredClock.create(Date, otperformance),
+        new AnchoredClock(Date, otperformance),
       );
     });
 

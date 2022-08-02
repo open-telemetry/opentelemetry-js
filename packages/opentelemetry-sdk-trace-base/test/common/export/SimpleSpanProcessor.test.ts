@@ -69,7 +69,7 @@ describe('SimpleSpanProcessor', () => {
         'span-name',
         spanContext,
         SpanKind.CLIENT,
-        AnchoredClock.create(Date, otperformance),
+        new AnchoredClock(Date, otperformance),
 
       );
       processor.onStart(span, ROOT_CONTEXT);
@@ -95,7 +95,7 @@ describe('SimpleSpanProcessor', () => {
         'span-name',
         spanContext,
         SpanKind.CLIENT,
-        AnchoredClock.create(Date, otperformance),
+        new AnchoredClock(Date, otperformance),
 
       );
       processor.onStart(span, ROOT_CONTEXT);
@@ -122,7 +122,7 @@ describe('SimpleSpanProcessor', () => {
         'span-name',
         spanContext,
         SpanKind.CLIENT,
-        AnchoredClock.create(Date, otperformance),
+        new AnchoredClock(Date, otperformance),
 
       );
       processor.onStart(span, ROOT_CONTEXT);
@@ -201,7 +201,7 @@ describe('SimpleSpanProcessor', () => {
         'span-name',
         spanContext,
         SpanKind.CLIENT,
-        AnchoredClock.create(Date, otperformance),
+        new AnchoredClock(Date, otperformance),
 
       );
 

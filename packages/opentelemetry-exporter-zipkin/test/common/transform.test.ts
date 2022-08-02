@@ -68,7 +68,7 @@ describe('transform', () => {
         'my-span',
         spanContext,
         api.SpanKind.SERVER,
-        AnchoredClock.create(Date, otperformance),
+        new AnchoredClock(Date, otperformance),
         parentId
       );
       span.setAttributes({
@@ -120,7 +120,7 @@ describe('transform', () => {
         'my-span',
         spanContext,
         api.SpanKind.SERVER,
-        AnchoredClock.create(Date, otperformance)
+        new AnchoredClock(Date, otperformance)
       );
       span.end();
 
@@ -169,7 +169,7 @@ describe('transform', () => {
           'my-span',
           spanContext,
           item.ot,
-          AnchoredClock.create(Date, otperformance)
+          new AnchoredClock(Date, otperformance)
         );
         span.end();
 
@@ -212,7 +212,7 @@ describe('transform', () => {
         'my-span',
         spanContext,
         api.SpanKind.SERVER,
-        AnchoredClock.create(Date, otperformance),
+        new AnchoredClock(Date, otperformance),
         parentId
       );
       span.setAttributes({
@@ -243,7 +243,7 @@ describe('transform', () => {
         'my-span',
         spanContext,
         api.SpanKind.SERVER,
-        AnchoredClock.create(Date, otperformance),
+        new AnchoredClock(Date, otperformance),
         parentId
       );
       const status: api.SpanStatus = {
@@ -280,7 +280,7 @@ describe('transform', () => {
         'my-span',
         spanContext,
         api.SpanKind.SERVER,
-        AnchoredClock.create(Date, otperformance),
+        new AnchoredClock(Date, otperformance),
         parentId
       );
       const status: api.SpanStatus = {
@@ -322,7 +322,7 @@ describe('transform', () => {
         'my-span',
         spanContext,
         api.SpanKind.SERVER,
-        AnchoredClock.create(Date, otperformance),
+        new AnchoredClock(Date, otperformance),
         parentId
       );
       span.addEvent('my-event1');

@@ -59,7 +59,7 @@ export class Span implements api.Span, ReadableSpan {
   private readonly _spanProcessor: SpanProcessor;
   private readonly _spanLimits: SpanLimits;
   private readonly _attributeValueLengthLimit: number;
-  private readonly clock: AnchoredClock;
+  private readonly _clock: AnchoredClock;
 
   /** Constructs a new Span instance. */
   constructor(
@@ -73,7 +73,7 @@ export class Span implements api.Span, ReadableSpan {
     links: api.Link[] = [],
     startTime?: api.TimeInput,
   ) {
-    this.clock = clock;
+    this._clock = clock;
     this.name = spanName;
     this._spanContext = spanContext;
     this.parentSpanId = parentSpanId;
@@ -150,7 +150,7 @@ export class Span implements api.Span, ReadableSpan {
       attributesOrStartTime = undefined;
     }
     if (typeof startTime === 'undefined') {
-      startTime = this.clock.now();
+      startTime = this._clock.now();
     }
 
     const attributes = sanitizeAttributes(attributesOrStartTime);
@@ -181,7 +181,7 @@ export class Span implements api.Span, ReadableSpan {
     }
     this._ended = true;
 
-    this.endTime = timeInputToHrTime(endTime ?? this.clock.now());
+    this.endTime = timeInputToHrTime(endTime ?? this._clock.now());
     this._duration = hrTimeDuration(this.startTime, this.endTime);
 
     if (this._duration[0] < 0) {
@@ -199,7 +199,7 @@ export class Span implements api.Span, ReadableSpan {
     return this._ended === false;
   }
 
-  recordException(exception: api.Exception, time: api.TimeInput = this.clock.now()): void {
+  recordException(exception: api.Exception, time: api.TimeInput = this._clock.now()): void {
     const attributes: api.SpanAttributes = {};
     if (typeof exception === 'string') {
       attributes[SemanticAttributes.EXCEPTION_MESSAGE] = exception;
