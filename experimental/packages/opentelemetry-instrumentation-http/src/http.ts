@@ -15,6 +15,7 @@
  */
 import {
   context,
+  HrTime,
   INVALID_SPAN_CONTEXT,
   propagation,
   ROOT_CONTEXT,
@@ -25,7 +26,8 @@ import {
   SpanStatusCode,
   trace,
 } from '@opentelemetry/api';
-import { suppressTracing } from '@opentelemetry/core';
+import { Histogram, MetricAttributes, MetricOptions, ValueType } from '@opentelemetry/api-metrics';
+import { hrTime, hrTimeDuration, hrTimeToMilliseconds, suppressTracing } from '@opentelemetry/core';
 import type * as http from 'http';
 import type * as https from 'https';
 import { Socket } from 'net';
@@ -58,6 +60,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   private readonly _spanNotEnded: WeakSet<Span> = new WeakSet<Span>();
   private readonly _version = process.versions.node;
   private _headerCapture;
+  private _httpServerDurationHistogram: Histogram;
+  private _httpClientDurationHistogram: Histogram;
 
   constructor(config?: HttpInstrumentationConfig) {
     super(
@@ -67,6 +71,20 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     );
 
     this._headerCapture = this._createHeaderCapture();
+    const serverDurationMetricOptions: MetricOptions = {
+      description: 'measures the duration of the inbound HTTP requests',
+      unit: 'ms',
+      valueType: ValueType.DOUBLE
+    };
+    // TODO: Metrics Semantic Conventions are not available yet
+    this._httpServerDurationHistogram = this.meter.createHistogram('http.server.duration', serverDurationMetricOptions);
+    const clientDurationMetricOptions: MetricOptions = {
+      description: 'measures the duration of the outbound HTTP requests',
+      unit: 'ms',
+      valueType: ValueType.DOUBLE
+    };
+    // TODO: Metrics Semantic Conventions are not available yet
+    this._httpClientDurationHistogram = this.meter.createHistogram('http.client.duration', clientDurationMetricOptions);
   }
 
   private _getConfig(): HttpInstrumentationConfig {
@@ -272,11 +290,15 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
    * @param request The original request object.
    * @param options The arguments to the original function.
    * @param span representing the current operation
+   * @param startTime representing the start time of the request to calculate duration in Metric
+   * @param metricAttributes metric attributes
    */
   private _traceClientRequest(
     request: http.ClientRequest,
     hostname: string,
-    span: Span
+    span: Span,
+    startTime: HrTime,
+    metricAttributes: MetricAttributes
   ): http.ClientRequest {
     if (this._getConfig().requestHook) {
       this._callRequestHook(span, request);
@@ -295,6 +317,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           { hostname }
         );
         span.setAttributes(responseAttributes);
+        metricAttributes = Object.assign(metricAttributes, utils.getOutgoingRequestMetricAttributesOnResponse(responseAttributes));
+
         if (this._getConfig().responseHook) {
           this._callResponseHook(span, response);
         }
@@ -324,32 +348,32 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
                   request,
                   response
                 ),
-              () => {},
+              () => { },
               true
             );
           }
 
-          this._closeHttpSpan(span);
+          this._closeHttpSpan(span, SpanKind.CLIENT, startTime, metricAttributes);
         });
         response.on('error', (error: Err) => {
           this._diag.debug('outgoingRequest on error()', error);
           utils.setSpanWithError(span, error);
           const code = utils.parseResponseStatus(SpanKind.CLIENT, response.statusCode);
           span.setStatus({ code, message: error.message });
-          this._closeHttpSpan(span);
+          this._closeHttpSpan(span, SpanKind.CLIENT, startTime, metricAttributes);
         });
       }
     );
     request.on('close', () => {
       this._diag.debug('outgoingRequest on request close()');
       if (!request.aborted) {
-        this._closeHttpSpan(span);
+        this._closeHttpSpan(span, SpanKind.CLIENT, startTime, metricAttributes);
       }
     });
     request.on('error', (error: Err) => {
       this._diag.debug('outgoingRequest on request error()', error);
       utils.setSpanWithError(span, error);
-      this._closeHttpSpan(span);
+      this._closeHttpSpan(span, SpanKind.CLIENT, startTime, metricAttributes);
     });
 
     this._diag.debug('http.ClientRequest return request');
@@ -405,17 +429,22 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
       const headers = request.headers;
 
+      const spanAttributes = utils.getIncomingRequestAttributes(request, {
+        component: component,
+        serverName: instrumentation._getConfig().serverName,
+        hookAttributes: instrumentation._callStartSpanHook(
+          request,
+          instrumentation._getConfig().startIncomingSpanHook
+        ),
+      });
+
       const spanOptions: SpanOptions = {
         kind: SpanKind.SERVER,
-        attributes: utils.getIncomingRequestAttributes(request, {
-          component: component,
-          serverName: instrumentation._getConfig().serverName,
-          hookAttributes: instrumentation._callStartSpanHook(
-            request,
-            instrumentation._getConfig().startIncomingSpanHook
-          ),
-        }),
+        attributes: spanAttributes,
       };
+
+      const startTime = hrTime();
+      let metricAttributes: MetricAttributes = utils.getIncomingRequestMetricAttributes(spanAttributes, { component: component });
 
       const ctx = propagation.extract(ROOT_CONTEXT, headers);
       const span = instrumentation._startHttpSpan(
@@ -457,7 +486,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
               error => {
                 if (error) {
                   utils.setSpanWithError(span, error);
-                  instrumentation._closeHttpSpan(span);
+                  instrumentation._closeHttpSpan(span, SpanKind.SERVER, startTime, metricAttributes);
                   throw error;
                 }
               }
@@ -467,6 +496,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
               request,
               response
             );
+            metricAttributes = Object.assign(metricAttributes, utils.getIncomingRequestMetricAttributesOnResponse(attributes));
 
             instrumentation._headerCapture.server.captureResponseHeaders(span, header => response.getHeader(header));
 
@@ -482,12 +512,12 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
                     request,
                     response
                   ),
-                () => {},
+                () => { },
                 true
               );
             }
 
-            instrumentation._closeHttpSpan(span);
+            instrumentation._closeHttpSpan(span, SpanKind.SERVER, startTime, metricAttributes);
             return returned;
           };
 
@@ -496,7 +526,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
             error => {
               if (error) {
                 utils.setSpanWithError(span, error);
-                instrumentation._closeHttpSpan(span);
+                instrumentation._closeHttpSpan(span, SpanKind.SERVER, startTime, metricAttributes);
                 throw error;
               }
             }
@@ -521,7 +551,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       }
       const extraOptions =
         typeof args[0] === 'object' &&
-        (typeof options === 'string' || options instanceof url.URL)
+          (typeof options === 'string' || options instanceof url.URL)
           ? (args.shift() as http.RequestOptions)
           : undefined;
       const { origin, pathname, method, optionsParsed } = utils.getRequestInfo(
@@ -575,6 +605,9 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         ),
       });
 
+      const startTime = hrTime();
+      const metricAttributes: MetricAttributes = utils.getOutgoingRequestMetricAttributes(attributes);
+
       const spanOptions: SpanOptions = {
         kind: SpanKind.CLIENT,
         attributes,
@@ -604,7 +637,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           error => {
             if (error) {
               utils.setSpanWithError(span, error);
-              instrumentation._closeHttpSpan(span);
+              instrumentation._closeHttpSpan(span, SpanKind.CLIENT, startTime, metricAttributes);
               throw error;
             }
           }
@@ -615,7 +648,9 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         return instrumentation._traceClientRequest(
           request,
           hostname,
-          span
+          span,
+          startTime,
+          metricAttributes
         );
       });
     };
@@ -649,13 +684,21 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     return span;
   }
 
-  private _closeHttpSpan(span: Span) {
+  private _closeHttpSpan(span: Span, spanKind: SpanKind, startTime: HrTime, metricAttributes: MetricAttributes) {
     if (!this._spanNotEnded.has(span)) {
       return;
     }
 
     span.end();
     this._spanNotEnded.delete(span);
+
+    // Record metrics
+    const duration = hrTimeToMilliseconds(hrTimeDuration(startTime, hrTime()));
+    if (spanKind == SpanKind.SERVER) {
+      this._httpServerDurationHistogram.record(duration, metricAttributes);
+    } else if (spanKind == SpanKind.CLIENT) {
+      this._httpClientDurationHistogram.record(duration, metricAttributes);
+    }
   }
 
   private _callResponseHook(
@@ -664,7 +707,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   ) {
     safeExecuteInTheMiddle(
       () => this._getConfig().responseHook!(span, response),
-      () => {},
+      () => { },
       true
     );
   }
@@ -675,7 +718,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   ) {
     safeExecuteInTheMiddle(
       () => this._getConfig().requestHook!(span, request),
-      () => {},
+      () => { },
       true
     );
   }
@@ -684,7 +727,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
     request: http.IncomingMessage | http.RequestOptions,
     hookFunc: Function | undefined,
   ) {
-    if(typeof hookFunc === 'function'){
+    if (typeof hookFunc === 'function') {
       return safeExecuteInTheMiddle(
         () => hookFunc(request),
         () => { },
