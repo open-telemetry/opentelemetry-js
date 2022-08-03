@@ -93,7 +93,6 @@ export class NodeSDK {
         configuration.contextManager,
         configuration.textMapPropagator
       );
-      // create trace exporter(s) from env
     } else {
       this.createTraceExportersFromEnv();
     }
