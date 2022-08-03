@@ -12,11 +12,12 @@
     "./build/esnext/platform/index.js": "./build/esnext/platform/browser/index.js",
     "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
   },
+  "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build tsconfig.all.json",
     "clean": "tsc --build --clean tsconfig.all.json",
-    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts -w --watch-files '**/*.ts'",
+    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
     "test:browser": "nyc karma start --single-run",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
@@ -28,23 +29,45 @@
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "node ../../../scripts/version-update.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/open-telemetry/opentelemetry-js.git"
-  },
+  "keywords": [
+    "opentelemetry",
+    "nodejs",
+    "browser",
+    "profiling",
+    "metrics",
+    "stats",
+    "monitoring"
+  ],
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  "engines": {
+    "node": ">=14"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+  "files": [
+    "build/esm/**/*.js",
+    "build/esm/**/*.js.map",
+    "build/esm/**/*.d.ts",
+    "build/esnext/**/*.js",
+    "build/esnext/**/*.js.map",
+    "build/esnext/**/*.d.ts",
+    "build/src/**/*.js",
+    "build/src/**/*.js.map",
+    "build/src/**/*.d.ts",
+    "doc",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^1.1.0"
+  },
   "devDependencies": {
     "nyc": "^15.1.0",
     "ts-mocha": "^10.0.0",
     "typescript": "4.4.4",
     "webpack": "4.46.0"
   },
-  "dependencies": {
-    "@opentelemetry/api": "^1.1.0"
-  }
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-api-logs"
 }
