@@ -108,7 +108,7 @@ export class NodeSDK {
     this._instrumentations = instrumentations;
   }
 
-  public createTraceExportersFromEnv() {
+  private createTraceExportersFromEnv() {
     let traceExportersList = this.retrieveListOfTraceExporters();
 
     if (traceExportersList.length === 0 || traceExportersList[0] === 'none') {
@@ -149,6 +149,7 @@ export class NodeSDK {
       .filter(s => s !== 'null' && s !== '');
   }
 
+  // visible for testing
   public configureExporter(name: string): SpanExporter | null {
     switch (name) {
       case 'otlp':
@@ -165,6 +166,7 @@ export class NodeSDK {
     }
   }
 
+  // visible for testing
   public configureOtlp(): SpanExporter | null {
     const protocol = this.getOtlpProtocol(this.DATA_TYPE_TRACES);
 
@@ -181,6 +183,7 @@ export class NodeSDK {
     }
   }
 
+  // visible for testing
   public getOtlpProtocol(dataType: string): string | null {
     const parsedEnvValues = getEnvWithoutDefaults();
 
