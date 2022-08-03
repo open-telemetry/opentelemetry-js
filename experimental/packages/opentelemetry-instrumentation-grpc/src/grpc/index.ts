@@ -41,8 +41,9 @@ import {
   serverStreamAndBidiHandler,
 } from './serverUtils';
 import { makeGrpcClientRemoteCall, getMetadata } from './clientUtils';
-import { _methodIsIgnored } from '../utils';
-import { AttributeNames } from '../enums/AttributeNames';
+import { _extractMethodAndService, _methodIsIgnored } from '../utils';
+import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import {AttributeValues} from '../enums/AttributeValues';
 
 /**
  * Holding reference to grpc module here to access constant of grpc modules
@@ -52,7 +53,7 @@ let grpcClient: typeof grpcTypes;
 
 export class GrpcNativeInstrumentation extends InstrumentationBase<
   typeof grpcTypes
-> {
+  > {
   constructor(
     name: string,
     version: string,
@@ -195,10 +196,14 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
                   keys: metadata => Object.keys(metadata.getMap()),
                 }),
                 () => {
+                  const { service, method } = _extractMethodAndService(name);
+
                   const span = instrumentation.tracer
                     .startSpan(spanName, spanOptions)
                     .setAttributes({
-                      [AttributeNames.GRPC_KIND]: spanOptions.kind,
+                      [SemanticAttributes.RPC_SYSTEM]: AttributeValues.RPC_SYSTEM,
+                      [SemanticAttributes.RPC_METHOD]: method,
+                      [SemanticAttributes.RPC_SERVICE]: service,
                     });
 
                   context.with(trace.setSpan(context.active(), span), () => {
@@ -292,9 +297,15 @@ export class GrpcNativeInstrumentation extends InstrumentationBase<
         )}`;
         const args = Array.prototype.slice.call(arguments);
         const metadata = getMetadata(grpcClient, original, args);
+        const { service, method } = _extractMethodAndService(original.path);
         const span = instrumentation.tracer.startSpan(name, {
           kind: SpanKind.CLIENT,
-        });
+        })
+          .setAttributes({
+            [SemanticAttributes.RPC_SYSTEM]: AttributeValues.RPC_SYSTEM,
+            [SemanticAttributes.RPC_METHOD]: method,
+            [SemanticAttributes.RPC_SERVICE]: service,
+          });
         return context.with(trace.setSpan(context.active(), span), () =>
           makeGrpcClientRemoteCall(
             grpcClient,

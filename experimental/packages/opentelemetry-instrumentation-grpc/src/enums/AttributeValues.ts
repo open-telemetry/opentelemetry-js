@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-/**
- * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/http.md
- */
-
-interface AttributesType {
-  GRPC_ERROR_NAME: string;
-  GRPC_ERROR_MESSAGE: string;
+interface AttributeValuesType {
+  RPC_SYSTEM: string
 }
 
-export const AttributeNames: Readonly<AttributesType> = {
-  GRPC_ERROR_NAME: 'grpc.error_name',
-  GRPC_ERROR_MESSAGE: 'grpc.error_message',
+export const AttributeValues: Readonly<AttributeValuesType> = {
+  RPC_SYSTEM: 'grpc'
 };
