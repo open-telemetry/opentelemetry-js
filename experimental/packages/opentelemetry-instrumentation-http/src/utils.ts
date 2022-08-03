@@ -137,10 +137,13 @@ export const isIgnored = (
  * Sets the span with the error passed in params
  * @param {Span} span the span that need to be set
  * @param {Error} error error that will be set to span
+ * @param {SpanStatusCode} [statusCode] The status code to set up if the default error
+ *     one is not wanted
  */
 export const setSpanWithError = (
   span: Span,
-  error: Err
+  error: Err,
+  statusCode?: SpanStatusCode
 ): void => {
   const message = error.message;
 
@@ -149,7 +152,9 @@ export const setSpanWithError = (
     [AttributeNames.HTTP_ERROR_MESSAGE]: message,
   });
 
-  span.setStatus({ code: SpanStatusCode.ERROR, message });
+  const code = statusCode || SpanStatusCode.ERROR;
+
+  span.setStatus({ code, message });
   span.recordException(error);
 };
 
