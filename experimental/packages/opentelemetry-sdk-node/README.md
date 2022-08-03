@@ -134,7 +134,7 @@ Configure the [service name](https://github.com/open-telemetry/opentelemetry-spe
 
 ## Configure Trace Exporter from  Environment
 
-This is an alternative to programmatically configuring an exporter or span processor. This package will auto setup the default `otlp` exporter with `http/protobuf` protocol if `traceExporter` or `spanProcessor` hasn't been passed into the `NodeSDK` constructor. 
+This is an alternative to programmatically configuring an exporter or span processor. This package will auto setup the default `otlp` exporter with `http/protobuf` protocol if `traceExporter` or `spanProcessor` hasn't been passed into the `NodeSDK` constructor.
 
 ### Exporters
 | Environment variable | Description |
