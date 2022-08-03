@@ -152,9 +152,11 @@ export const setSpanWithError = (
     [AttributeNames.HTTP_ERROR_MESSAGE]: message,
   });
 
-  const code = statusCode || SpanStatusCode.ERROR;
+  if (span.status['code'] !== SpanStatusCode.ERROR) {
+    const code = statusCode || SpanStatusCode.ERROR;
+    span.setStatus({ code, message });
+  }
 
-  span.setStatus({ code, message });
   span.recordException(error);
 };
 

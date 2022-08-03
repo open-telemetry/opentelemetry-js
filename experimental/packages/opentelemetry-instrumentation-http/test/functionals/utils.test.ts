@@ -244,7 +244,7 @@ describe('Utility', () => {
   });
 
   describe('setSpanWithError()', () => {
-    it('should have error attributes', () => {
+    it('should set error attributes with the default error status code', () => {
       const errorMessage = 'test error';
       const span = new Span(
         new BasicTracerProvider().getTracer('default'),
@@ -262,6 +262,55 @@ describe('Utility', () => {
       );
       assert.strictEqual(span.events.length, 1);
       assert.strictEqual(span.events[0].name, 'exception');
+      assert.deepStrictEqual(span.status, { code: SpanStatusCode.ERROR, message: errorMessage });
+      assert.ok(attributes[AttributeNames.HTTP_ERROR_NAME]);
+    });
+
+    it('should set error attributes with the passed error status code', () => {
+      const errorMessage = 'test error';
+      const span = new Span(
+        new BasicTracerProvider().getTracer('default'),
+        ROOT_CONTEXT,
+        'test',
+        { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
+        SpanKind.INTERNAL
+      );
+      /* tslint:disable-next-line:no-any */
+      utils.setSpanWithError(span, new Error(errorMessage), SpanStatusCode.OK);
+      const attributes = span.attributes;
+      assert.strictEqual(
+        attributes[AttributeNames.HTTP_ERROR_MESSAGE],
+        errorMessage
+      );
+      assert.strictEqual(span.events.length, 1);
+      assert.strictEqual(span.events[0].name, 'exception');
+      assert.deepStrictEqual(span.status, { code: SpanStatusCode.OK, message: errorMessage });
+      assert.ok(attributes[AttributeNames.HTTP_ERROR_NAME]);
+    });
+
+    it('should not change span status code if it was previously set to error', () => {
+      const originalErrorMessage = 'first error';
+      const errorMessage = 'test error';
+      const span = new Span(
+        new BasicTracerProvider().getTracer('default'),
+        ROOT_CONTEXT,
+        'test',
+        { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
+        SpanKind.INTERNAL
+      );
+
+      utils.setSpanWithError(span, new Error(originalErrorMessage));
+      /* tslint:disable-next-line:no-any */
+      utils.setSpanWithError(span, new Error(errorMessage), SpanStatusCode.OK);
+      const attributes = span.attributes;
+      assert.strictEqual(
+        attributes[AttributeNames.HTTP_ERROR_MESSAGE],
+        errorMessage
+      );
+      assert.strictEqual(span.events.length, 2);
+      assert.strictEqual(span.events[0].name, 'exception');
+      assert.strictEqual(span.events[1].name, 'exception');
+      assert.deepStrictEqual(span.status, { code: SpanStatusCode.ERROR, message: originalErrorMessage });
       assert.ok(attributes[AttributeNames.HTTP_ERROR_NAME]);
     });
   });

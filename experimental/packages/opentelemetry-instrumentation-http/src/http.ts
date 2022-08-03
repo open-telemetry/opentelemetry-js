@@ -18,9 +18,9 @@ import {
   INVALID_SPAN_CONTEXT,
   propagation,
   ROOT_CONTEXT,
-  Span,
   SpanKind,
   SpanOptions,
+  Span,
   SpanStatus,
   SpanStatusCode,
   trace,
@@ -307,7 +307,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
           this._diag.debug('outgoingRequest on end()');
           let status: SpanStatus;
 
-          if (response.aborted && !response.complete) {
+          if (response.aborted && !response.complete && span.status['code'] !== SpanStatusCode.ERROR) {
             status = { code: SpanStatusCode.ERROR };
           } else {
             status = { code: utils.parseResponseStatus(SpanKind.CLIENT, response.statusCode) };

@@ -13,6 +13,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(instrumentation-http): add `http.host` attribute before sending the request #3054 @cuichenli
+* fix(instrumentation-http): don't overwrite span error status if already set [](https://github.com/open-telemetry/opentelemetry-js/pull/) @luismiramirez
 
 ### :books: (Refine Doc)
 
