@@ -27,7 +27,7 @@ import {
   AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
-import { CompositePropagator } from '@opentelemetry/core';
+import { CompositePropagator, ExportResultCode } from '@opentelemetry/core';
 import { ConsoleMetricExporter, MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics-base';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
@@ -36,7 +36,8 @@ import {
 import {
   ConsoleSpanExporter,
   SimpleSpanProcessor,
-  BatchSpanProcessor
+  BatchSpanProcessor,
+  ReadableSpan
 } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
 import * as semver from 'semver';
@@ -49,6 +50,8 @@ import { OTLPTraceExporter as OTLPHttpTraceExporter} from '@opentelemetry/export
 import { OTLPTraceExporter as OTLPGrpcTraceExporter} from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
+import * as http from 'http';
+import { mockedReadableSpan } from './traceHelper';
 
 const DefaultContextManager = semver.gte(process.version, '14.8.0')
   ? AsyncLocalStorageContextManager
@@ -623,6 +626,65 @@ describe('setup exporter from env', () => {
       assert(listOfProcessors.length === 2);
       assert(listOfProcessors[0] instanceof SimpleSpanProcessor);
       assert(listOfProcessors[1] instanceof BatchSpanProcessor);
+      delete env.OTEL_TRACES_EXPORTER;
+      delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
+    });
+  });
+  describe('export spans using exporter set up from environment', () => {
+    let spans: ReadableSpan[];
+
+    const server = http.createServer((_, res) => {
+      res.statusCode = 200;
+      res.end();
+    });
+    before(done => {
+      server.listen(8080, done);
+    });
+    after(done => {
+      server.close(done);
+    });
+    it('should export spans successfully using default otlp exporter', done => {
+      env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://localhost:8080';
+      const sdk = new NodeSDK();
+      sdk.start();
+      spans = [];
+      spans.push(Object.assign({}, mockedReadableSpan));
+
+      const collectorExporter = sdk._getSpanExporter()[0];
+
+      collectorExporter.export(spans, result => {
+        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
+        done();
+      });
+
+      delete env.OTEL_EXPORTER_OTLP_ENDPOINT;
+    });
+    it('should export spans successfully using otlp and console exporter', done => {
+      env.OTEL_EXPORTER_OTLP_ENDPOINT = 'http://localhost:8080';
+      env.OTEL_TRACES_EXPORTER = 'otlp, console';
+      env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'http/json';
+
+      const sdk = new NodeSDK();
+      sdk.start();
+      spans = [];
+      spans.push(Object.assign({}, mockedReadableSpan));
+
+      const OTLPExporter = sdk._getSpanExporter()[0];
+      const consoleExporter = sdk._getSpanExporter()[1];
+      const spyConsole = Sinon.spy(console, 'dir');
+
+      consoleExporter.export(spans, result => {
+        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
+      });
+
+      assert(spyConsole.args.length > 0);
+
+      OTLPExporter.export(spans, result => {
+        assert.strictEqual(result.code, ExportResultCode.SUCCESS);
+        done();
+      });
+
+      delete env.OTEL_EXPORTER_OTLP_ENDPOINT;
       delete env.OTEL_TRACES_EXPORTER;
       delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
     });

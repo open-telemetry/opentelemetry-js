@@ -61,6 +61,7 @@ export class NodeSDK {
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
   private _spanProcessors?: (BatchSpanProcessor | SimpleSpanProcessor)[];
+  private _configuredExporters: SpanExporter[] = [];
   private DATA_TYPE_TRACES = 'traces';
 
   /**
@@ -119,17 +120,17 @@ export class NodeSDK {
         traceExportersList = ['otlp'];
       }
 
-      const configuredExporters: SpanExporter[] = [];
+      // const configuredExporters: SpanExporter[] = [];
 
       traceExportersList.forEach(exporterName => {
         const exporter =  this.configureExporter(exporterName);
         if (exporter) {
-          configuredExporters.push(exporter);
+          this._configuredExporters.push(exporter);
         }
       });
 
-      if (configuredExporters.length > 0) {
-        this._spanProcessors = this.configureSpanProcessors(configuredExporters);
+      if (this._configuredExporters.length > 0) {
+        this._spanProcessors = this.configureSpanProcessors(this._configuredExporters);
       } else {
         diag.warn('Unable to set up trace exporter(s) due to invalid exporter and/or protocol values.');
       }
@@ -317,5 +318,10 @@ export class NodeSDK {
         .then(() => {
         })
     );
+  }
+
+  // visible for testing
+  public _getSpanExporter(): SpanExporter[] {
+    return this._configuredExporters;
   }
 }
