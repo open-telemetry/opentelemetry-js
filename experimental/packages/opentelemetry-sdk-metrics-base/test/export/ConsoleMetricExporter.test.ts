@@ -24,7 +24,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 
 
-async function waitForNumberOfExports(exporter: sinon.SinonSpy<[metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void], void>, numberOfExports: number): Promise<ResourceMetrics[]> {
+async function waitForNumberOfExports(exporter: sinon.SinonSpy<[metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void], void>, numberOfExports: number): Promise<void> {
   if (numberOfExports <= 0) {
     throw new Error('numberOfExports must be greater than or equal to 0');
   }
@@ -34,8 +34,6 @@ async function waitForNumberOfExports(exporter: sinon.SinonSpy<[metrics: Resourc
     await new Promise(resolve => setTimeout(resolve, 20));
     totalExports = exporter.callCount;
   }
-
-  return [];
 }
 
 /* eslint-disable no-console */
@@ -68,7 +66,7 @@ describe('ConsoleMetricExporter', () => {
     await meterReader.shutdown();
   });
 
-  it('should export information about span', async () => {
+  it('should export information about metric', async () => {
     const counter = meter.createCounter('counter_total', {
       description: 'a test description',
     });
@@ -104,6 +102,7 @@ describe('ConsoleMetricExporter', () => {
     assert.ok(consoleMetric.descriptor.type === 'COUNTER', 'type');
     assert.ok(consoleMetric.descriptor.unit === '', 'unit');
     assert.ok(consoleMetric.descriptor.valueType === 1, 'valueType');
+    assert.ok(consoleMetric.dataPoints[0].attributes.key1 === 'attributeValue1', 'ensure metric attributes exists');
 
     assert.ok(spyExport.calledOnce);
   });
