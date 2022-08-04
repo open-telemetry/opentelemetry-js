@@ -25,7 +25,8 @@ export class ConsoleMetricExporter implements PushMetricExporter {
 
   export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): void {
     if (this._shutdown) {
-      setImmediate(resultCallback, { code: ExportResultCode.SUCCESS });
+      // If the exporter is shutting down, by spec, we need to return FAILED as export result
+      setImmediate(resultCallback, { code: ExportResultCode.FAILED });
       return;
     }
 
@@ -46,8 +47,8 @@ export class ConsoleMetricExporter implements PushMetricExporter {
   }
 
   private static _sendMetrics(metrics: ResourceMetrics, done: (result: ExportResult) => void): void {
-    for (const libraryMetrics of metrics.scopeMetrics) {
-      for (const metric of libraryMetrics.metrics) {
+    for (const scopeMetrics of metrics.scopeMetrics) {
+      for (const metric of scopeMetrics.metrics) {
         console.dir({
           descriptor: metric.descriptor,
           dataPointType: metric.dataPointType,
@@ -55,6 +56,7 @@ export class ConsoleMetricExporter implements PushMetricExporter {
         });
       }
     }
+
     done({ code: ExportResultCode.SUCCESS });
   }
 }
