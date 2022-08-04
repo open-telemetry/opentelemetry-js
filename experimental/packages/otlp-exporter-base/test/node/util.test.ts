@@ -214,12 +214,17 @@ describe('sendWithHttp', () => {
       assert.strictEqual(requestData, data);
     });
 
+    // use fake timers to replace setTimeout in sendWithHttp function
+    let clock = sinon.useFakeTimers();
+
     sendWithHttp(exporter, data, 'application/json', () => {
       // Show that we aren't setting the gzip encoding header
       assert(setHeaderSpy.withArgs('Content-Encoding', 'gzip').notCalled);
     }, (err: OTLPExporterError) => {
       assert.fail(err);
     });
+
+    clock.restore();
   });
 
   it('should send with gzip compression if configured to do so', () => {
@@ -238,12 +243,17 @@ describe('sendWithHttp', () => {
       assert(Buffer.concat(buffers).equals(compressedData));
     });
 
+    // use fake timers to replace setTimeout in sendWithHttp function
+    let clock = sinon.useFakeTimers();
+
     sendWithHttp(exporter, data, 'application/json', () => {
       // Show that we are setting the gzip encoding header
       assert(setHeaderSpy.withArgs('Content-Encoding', 'gzip').calledOnce);
     }, (err: OTLPExporterError) => {
       assert.fail(err);
     });
+
+    clock.restore();
   });
 
   it('should work with gzip compression enabled even after multiple requests', () => {
@@ -274,12 +284,17 @@ describe('sendWithHttp', () => {
         assert(Buffer.concat(buffers).equals(compressedData));
       });
 
+      // use fake timers to replace setTimeout in sendWithHttp function
+      let clock = sinon.useFakeTimers();
+
       sendWithHttp(exporter, data, 'application/json', () => {
         // Show that we are setting the gzip encoding header
         assert(setHeaderSpy.withArgs('Content-Encoding', 'gzip').calledOnce);
       }, (err: OTLPExporterError) => {
         assert.fail(err);
       });
+
+      clock.restore();
     }
   });
 });

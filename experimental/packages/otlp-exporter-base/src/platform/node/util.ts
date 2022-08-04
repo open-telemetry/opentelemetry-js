@@ -25,6 +25,10 @@ import { CompressionAlgorithm } from './types';
 import { getEnv } from '@opentelemetry/core';
 import { OTLPExporterError } from '../../types';
 
+const DEFAULT_MAX_ATTEMPTS = 4;
+const DEFAULT_INITIAL_BACKOFF = 1000;
+const DEFAULT_BACKOFF_MULTIPLIER = 1.5;
+
 /**
  * Sends data using http
  * @param collector
@@ -44,8 +48,11 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
   const parsedUrl = new url.URL(collector.url);
   let reqIsDestroyed: boolean;
   const nodeVersion = Number(process.versions.node.split('.')[0]);
+  let retryTimer: ReturnType<typeof setTimeout>;
+  let req: http.ClientRequest;
 
   const exporterTimer = setTimeout(() => {
+    clearTimeout(retryTimer);
     reqIsDestroyed = true;
     // req.abort() was deprecated since v14
     if (nodeVersion >= 14) {
@@ -69,63 +76,79 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
 
   const request = parsedUrl.protocol === 'http:' ? http.request : https.request;
 
-  const req = request(options, (res: http.IncomingMessage) => {
-    let responseData = '';
-    res.on('data', chunk => (responseData += chunk));
+  const sendWithRetry = (retries = DEFAULT_MAX_ATTEMPTS, backoffMillis = DEFAULT_INITIAL_BACKOFF) => {
+    req = request(options, (res: http.IncomingMessage) => {
+      let responseData = '';
+      res.on('data', chunk => (responseData += chunk));
+  
+      res.on('aborted', () => {
+        if (reqIsDestroyed) {
+          const err = new OTLPExporterError(
+            'Request Timeout'
+          );
+          onError(err);
+        }
+      });
+  
+      res.on('end', () => {
+        if (!reqIsDestroyed) {
+          if (res.statusCode && res.statusCode < 299) {
+            diag.debug(`statusCode: ${res.statusCode}`, responseData);
+            onSuccess();
+          } else if (res.statusCode && isRetryable(res.statusCode) && retries > 0) {
+            retryTimer = setTimeout(() => {
+              return sendWithRetry(retries - 1, backoffMillis * DEFAULT_BACKOFF_MULTIPLIER);
+            }, backoffMillis);
+          } else {
+            const error = new OTLPExporterError(
+              res.statusMessage,
+              res.statusCode,
+              responseData
+            );
+            onError(error);
+          }
+           // clear all timers since request was completed and promise was resolved
+           clearTimeout(exporterTimer);
+           clearTimeout(retryTimer);
+        }
+      });
+    });
 
-    res.on('aborted', () => {
+    req.on('error', (error: Error | any) => {
       if (reqIsDestroyed) {
         const err = new OTLPExporterError(
-          'Request Timeout'
+          'Request Timeout', error.code
         );
         onError(err);
+      } else {
+        onError(error);
       }
-    });
-
-    res.on('end', () => {
-      if (!reqIsDestroyed) {
-        if (res.statusCode && res.statusCode < 299) {
-          diag.debug(`statusCode: ${res.statusCode}`, responseData);
-          onSuccess();
-        } else {
-          const error = new OTLPExporterError(
-            res.statusMessage,
-            res.statusCode,
-            responseData
-          );
-          onError(error);
-        }
-        clearTimeout(exporterTimer);
-      }
-    });
-  });
-
-  req.on('error', (error: Error | any) => {
-    if (reqIsDestroyed) {
-      const err = new OTLPExporterError(
-        'Request Timeout', error.code
-      );
-      onError(err);
-    } else {
       clearTimeout(exporterTimer);
-      onError(error);
+      clearTimeout(retryTimer);
+    });
+    
+    switch (collector.compression) {
+      case CompressionAlgorithm.GZIP: {
+        req.setHeader('Content-Encoding', 'gzip');
+        const dataStream = readableFromBuffer(data);
+        dataStream.on('error', onError)
+          .pipe(zlib.createGzip()).on('error', onError)
+          .pipe(req);
+  
+        break;
+      }
+      default:
+        req.end(data);
+        break;
     }
-  });
-
-  switch (collector.compression) {
-    case CompressionAlgorithm.GZIP: {
-      req.setHeader('Content-Encoding', 'gzip');
-      const dataStream = readableFromBuffer(data);
-      dataStream.on('error', onError)
-        .pipe(zlib.createGzip()).on('error', onError)
-        .pipe(req);
-
-      break;
-    }
-    default:
-      req.end(data);
-      break;
   }
+  sendWithRetry();
+}
+
+function isRetryable(statusCode: number) {
+  const retryCodes = [429, 502, 503, 504];
+
+  return retryCodes.includes(statusCode);
 }
 
 function readableFromBuffer(buff: string | Buffer): Readable {
