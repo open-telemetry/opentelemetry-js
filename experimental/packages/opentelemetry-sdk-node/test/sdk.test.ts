@@ -27,8 +27,8 @@ import {
   AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
-import { CompositePropagator } from '@opentelemetry/core';
-import { ConsoleMetricExporter, InstrumentDescriptor, InstrumentType, MeterProvider, PeriodicExportingMetricReader, View } from '@opentelemetry/sdk-metrics-base';
+import { CompositePropagator, ExportResult } from '@opentelemetry/core';
+import { AggregationTemporality, ConsoleMetricExporter, InMemoryMetricExporter, InstrumentDescriptor, InstrumentType, MeterProvider, PeriodicExportingMetricReader, ResourceMetrics, View } from '@opentelemetry/sdk-metrics-base';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   assertServiceResource,
@@ -148,20 +148,25 @@ describe('Node SDK', () => {
   });
 
   it('should register meter views when provided', async () => {
-    const exporter = new ConsoleMetricExporter();
+    async function waitForNumberOfMetrics(exporter: InMemoryMetricExporter, numberOfMetrics: number): Promise<void> {
+      if (numberOfMetrics <= 0) {
+        throw new Error('numberOfMetrics must be greater than or equal to 0');
+      }
+
+      let totalExports = 0;
+      while (totalExports < numberOfMetrics) {
+        await new Promise(resolve => setTimeout(resolve, 20));
+        const exportedMetrics = exporter.getMetrics()
+        totalExports = exportedMetrics.length;
+      }
+    }
+
+    const exporter = new InMemoryMetricExporter(AggregationTemporality.CUMULATIVE);
     const metricReader = new PeriodicExportingMetricReader({
       exporter: exporter,
       exportIntervalMillis: 100,
       exportTimeoutMillis: 100
     });
-
-    const metricDescriptor: InstrumentDescriptor = {
-      name: 'test-view',
-      description: 'Metric',
-      unit: '1',
-      type: InstrumentType.COUNTER,
-      valueType: ValueType.INT
-    };
 
     const sdk = new NodeSDK({
       metricReader: metricReader,
@@ -183,9 +188,24 @@ describe('Node SDK', () => {
 
     const meterProvider = metrics.getMeterProvider() as MeterProvider;
     assert.ok(meterProvider);
-    const viewRegistry = meterProvider['_sharedState'].viewRegistry;
-    assert.ok(viewRegistry['_registeredViews'].find(view => view.name === 'test-view'));
-    assert.ok(viewRegistry.findViews(metricDescriptor, { name: 'test-view' }));
+
+    const meter = meterProvider.getMeter('NodeSDKViews', '1.0.0');
+    const counter = meter.createCounter('test_counter', {
+      description: 'a test description',
+    });
+    counter.add(10)
+
+    await waitForNumberOfMetrics(exporter, 1)
+    const exportedMetrics = exporter.getMetrics()
+    const [firstExportedMetric] = exportedMetrics
+    assert.ok(firstExportedMetric, 'should have one exported metric')
+    const [firstScopeMetric] = firstExportedMetric.scopeMetrics
+    assert.ok(firstScopeMetric, 'should have one scope metric')
+    assert.ok(firstScopeMetric.scope.name === 'NodeSDKViews', 'scope should match created view')
+    assert.ok(firstScopeMetric.metrics.length > 0, 'should have at least one metrics entry')
+    const [firstMetricRecord] = firstScopeMetric.metrics
+    assert.ok(firstMetricRecord.descriptor.name === 'test-view', 'should have renamed counter metric')
+
     await sdk.shutdown();
   });
 
