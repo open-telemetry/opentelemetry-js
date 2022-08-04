@@ -62,7 +62,6 @@ describe('ConsoleMetricExporter', () => {
   afterEach(async () => {
     console.dir = previousConsoleDir;
 
-    await exporter.shutdown();
     await meterReader.shutdown();
   });
 
