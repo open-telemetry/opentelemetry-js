@@ -26,7 +26,7 @@ import {
   SpanStatusCode,
   trace,
 } from '@opentelemetry/api';
-import { Histogram, MetricAttributes, MetricOptions, ValueType } from '@opentelemetry/api-metrics';
+import { Histogram, MeterProvider, MetricAttributes, ValueType } from '@opentelemetry/api-metrics';
 import { hrTime, hrTimeDuration, hrTimeToMilliseconds, suppressTracing } from '@opentelemetry/core';
 import type * as http from 'http';
 import type * as https from 'https';
@@ -60,8 +60,8 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
   private readonly _spanNotEnded: WeakSet<Span> = new WeakSet<Span>();
   private readonly _version = process.versions.node;
   private _headerCapture;
-  private _httpServerDurationHistogram: Histogram;
-  private _httpClientDurationHistogram: Histogram;
+  private _httpServerDurationHistogram!: Histogram;
+  private _httpClientDurationHistogram!: Histogram;
 
   constructor(config?: HttpInstrumentationConfig) {
     super(
@@ -69,22 +69,26 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       VERSION,
       config
     );
-
     this._headerCapture = this._createHeaderCapture();
-    const serverDurationMetricOptions: MetricOptions = {
+    this._updateMetricInstruments();
+  }
+
+  override setMeterProvider(meterProvider: MeterProvider) {
+    super.setMeterProvider(meterProvider);
+    this._updateMetricInstruments();
+  }
+
+  private _updateMetricInstruments() {
+    this._httpServerDurationHistogram = this.meter.createHistogram('http.server.duration', {
       description: 'measures the duration of the inbound HTTP requests',
       unit: 'ms',
       valueType: ValueType.DOUBLE
-    };
-    // TODO: Metrics Semantic Conventions are not available yet
-    this._httpServerDurationHistogram = this.meter.createHistogram('http.server.duration', serverDurationMetricOptions);
-    const clientDurationMetricOptions: MetricOptions = {
+    });
+    this._httpClientDurationHistogram = this.meter.createHistogram('http.client.duration', {
       description: 'measures the duration of the outbound HTTP requests',
       unit: 'ms',
       valueType: ValueType.DOUBLE
-    };
-    // TODO: Metrics Semantic Conventions are not available yet
-    this._httpClientDurationHistogram = this.meter.createHistogram('http.client.duration', clientDurationMetricOptions);
+    });
   }
 
   private _getConfig(): HttpInstrumentationConfig {

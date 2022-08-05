@@ -341,8 +341,6 @@ export const getOutgoingRequestMetricAttributes = (
   const metricAttributes: MetricAttributes = {};
   metricAttributes[SemanticAttributes.HTTP_METHOD] = spanAttributes[SemanticAttributes.HTTP_METHOD];
   metricAttributes[SemanticAttributes.NET_PEER_NAME] = spanAttributes[SemanticAttributes.NET_PEER_NAME];
-  // TODO: If configured on
-  metricAttributes[SemanticAttributes.HTTP_TARGET] = spanAttributes[SemanticAttributes.HTTP_TARGET];
   metricAttributes[SemanticAttributes.HTTP_URL] = spanAttributes[SemanticAttributes.HTTP_URL];
   return metricAttributes;
 };
@@ -474,9 +472,7 @@ export const getIncomingRequestMetricAttributes = (
   metricAttributes[SemanticAttributes.HTTP_METHOD] = spanAttributes[SemanticAttributes.HTTP_METHOD];
   metricAttributes[SemanticAttributes.NET_HOST_NAME] = spanAttributes[SemanticAttributes.NET_HOST_NAME];
   metricAttributes[SemanticAttributes.HTTP_FLAVOR] = spanAttributes[SemanticAttributes.HTTP_FLAVOR];
-  // TODO: If configured on
   metricAttributes[SemanticAttributes.HTTP_TARGET] = spanAttributes[SemanticAttributes.HTTP_TARGET];
-  metricAttributes[SemanticAttributes.HTTP_URL] = spanAttributes[SemanticAttributes.HTTP_URL];
   return metricAttributes;
 };
 
