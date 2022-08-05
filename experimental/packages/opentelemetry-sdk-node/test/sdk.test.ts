@@ -230,7 +230,7 @@ describe('Node SDK', () => {
               throw new Error('Buggy detector');
             }
           },
-            envDetector]
+          envDetector]
         });
         const resource = sdk['_resource'];
 
