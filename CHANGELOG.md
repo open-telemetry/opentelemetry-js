@@ -15,6 +15,8 @@ All notable changes to this project will be documented in this file.
 
 * fix(sdk-trace-base): make span start times resistant to hrtime clock drift
   [#3129](https://github.com/open-telemetry/opentelemetry-js/issues/3129)
+* fix(context-async-hooks): Ensure listeners added using `once` can be removed using `removeListener`
+  [#3133](https://github.com/open-telemetry/opentelemetry-js/pull/3133)
 
 ### :books: (Refine Doc)
 
