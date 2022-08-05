@@ -695,9 +695,9 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
     // Record metrics
     const duration = hrTimeToMilliseconds(hrTimeDuration(startTime, hrTime()));
-    if (spanKind == SpanKind.SERVER) {
+    if (spanKind === SpanKind.SERVER) {
       this._httpServerDurationHistogram.record(duration, metricAttributes);
-    } else if (spanKind == SpanKind.CLIENT) {
+    } else if (spanKind === SpanKind.CLIENT) {
       this._httpClientDurationHistogram.record(duration, metricAttributes);
     }
   }
