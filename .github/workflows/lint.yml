@@ -61,4 +61,4 @@ jobs:
         run: |
           npm run compile
           NODE_OPTIONS=--max-old-space-size=4096 npm run docs
-          NODE_OPTIONS=--max-old-space-size=4096 npm run docs:test
+          npm run docs:test
