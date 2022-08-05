@@ -14,40 +14,26 @@
  * limitations under the License.
  */
 
-import { Attributes, AttributeValue } from '@opentelemetry/api';
-import { LogRecord } from './LogRecord';
+import { Attributes } from '@opentelemetry/api';
 
-export abstract class Event implements LogRecord {
+export interface Event {
+  /**
+   * The time when the event occurred as UNIX Epoch time in nanoseconds.
+   */
+  timestamp?: number;
+
+  /**
+   * The name of the event.
+   */
   name: string;
+
+  /**
+   * The domain the event belongs to.
+   */
   domain?: string;
 
-  constructor(name: string, domain?: string) {
-    this.name = name;
-    this.setAttribute('event.name', name);
-
-    if (domain) {
-      this.domain = domain;
-      this.setAttribute('event.domain', name);
-    }
-  }
-
   /**
-   * Sets an attribute to the event.
-   *
-   * Sets a single Attribute with the key and value passed as arguments.
-   *
-   * @param key the key for this attribute.
-   * @param value the value for this attribute. Setting a value null or
-   *              undefined is invalid and will result in undefined behavior.
+   * Additional attributes that describe the event.
    */
-  abstract setAttribute(key: string, value?: AttributeValue): this;
-
-  /**
-   * Sets attributes to the event.
-   *
-   * @param attributes the attributes that will be added.
-   *                   null or undefined attribute values
-   *                   are invalid and will result in undefined behavior.
-   */
-  abstract setAttributes(attributes: Attributes): this;
+  attributes?: Attributes;
 }

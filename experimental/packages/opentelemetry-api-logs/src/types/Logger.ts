@@ -14,39 +14,21 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api';
 import { LogRecord } from './LogRecord';
 import { Event } from './Event';
 
 export interface Logger {
   /**
-   * Creates a new LogRecord.
-   *
-   * @returns LogRecord
-   */
-  createLogRecord(): LogRecord;
-
-  /**
-   * Creates a new Event.
-   *
-   * @param name the name of the event
-   * @param [domain] the domain of the event
-   * @returns Event The newly created event
-   */
-  createEvent(name: string, domain?: string): Event;
-
-  /**
-   * Emits a log record
+   * Emit a log record. This method should only be used by log appenders.
    *
    * @param logRecord
    */
-  emit(logRecord: LogRecord): void;
+  emitLogRecord(logRecord: LogRecord): void;
 
   /**
-   * Emits an event
+   * Emit an event. This method should only be used by instrumentations emitting events.
    *
-   * @param name
-   * @param attributes
+   * @param event
    */
-  emitEvent(name: string, attributes?: Attributes): void;
+  emitEvent(event: Event): void;
 }

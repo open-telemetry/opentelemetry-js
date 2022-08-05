@@ -15,8 +15,6 @@
  */
 
 import * as assert from 'assert';
-import { NonRecordingEvent } from '../../src/NonRecordingEvent';
-import { NonRecordingLogRecord } from '../../src/NonRecordingLogRecord';
 import { NoopLogger } from '../../src/NoopLogger';
 import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
 
@@ -26,26 +24,13 @@ describe('NoopLogger', () => {
     assert(logger instanceof NoopLogger);
   });
 
-  it('calling emit should not crash', () => {
-    const logger = new NoopLoggerProvider().getLogger('test-noop');
-    const logRecord = new NonRecordingLogRecord();
-    logger.emit(logRecord);
-  });
-
   it('calling emitEvent should not crash', () => {
     const logger = new NoopLoggerProvider().getLogger('test-noop');
-    logger.emitEvent('test-event');
+    logger.emitEvent({ name: 'event-name', domain: 'event-domain' });
   });
 
-  it('calling createLogRecord should not crash', () => {
+  it('calling emitLogRecord should not crash', () => {
     const logger = new NoopLoggerProvider().getLogger('test-noop');
-    const logRecord = logger.createLogRecord();
-    assert(logRecord instanceof NonRecordingLogRecord);
-  });
-
-  it('calling createEvent should not crash', () => {
-    const logger = new NoopLoggerProvider().getLogger('test-noop');
-    const event = logger.createEvent('test-event', 'test-domain');
-    assert(event instanceof NonRecordingEvent);
+    logger.emitLogRecord({ severityNumber: 1, body: 'log body' });
   });
 });

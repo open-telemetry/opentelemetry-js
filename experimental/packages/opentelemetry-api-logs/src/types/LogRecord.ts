@@ -14,34 +14,46 @@
  * limitations under the License.
  */
 
-import { Attributes, AttributeValue } from '@opentelemetry/api';
+import { Attributes } from '@opentelemetry/api';
 
 export interface LogRecord {
    /**
-   * Sets an attribute to the log record.
-   *
-   * Sets a single Attribute with the key and value passed as arguments.
-   *
-   * @param key the key for this attribute.
-   * @param value the value for this attribute. Setting a value null or
-   *              undefined is invalid and will result in undefined behavior.
-   */
-  setAttribute(key: string, value?: AttributeValue): this;
+    * The time when the log record occurred as UNIX Epoch time in nanoseconds.
+    */
+   timestamp?: number;
 
-  /**
-   * Sets attributes to the span.
-   *
-   * @param attributes the attributes that will be added.
-   *                   null or undefined attribute values
-   *                   are invalid and will result in undefined behavior.
-   */
+   /**
+    * Numerical value of the severity.
+    */
+   severityNumber?: number;
 
-    /**
-   * Sets attributes to the event.
-   *
-   * @param attributes the attributes that will be added.
-   *                   null or undefined attribute values
-   *                   are invalid and will result in undefined behavior.
-   */
-   setAttributes(attributes: Attributes): this;
+   /**
+    * The severity text.
+    */
+   severityText?: string;
+
+   /**
+    * A value containing the body of the log record.
+    */
+   body?: string;
+
+   /**
+    * Attributes that define the log record.
+    */
+   attributes?: Attributes;
+
+   /**
+    * 8 least significant bits are the trace flags as defined in W3C Trace Context specification.
+    */
+   traceFlags?: number;
+
+   /**
+    * A unique identifier for a trace.
+    */
+   traceId?: string;
+
+   /**
+    * A unique identifier for a span within a trace.
+    */
+   spanId?: string;
 }
