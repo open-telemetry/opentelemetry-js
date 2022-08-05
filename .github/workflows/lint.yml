@@ -60,5 +60,5 @@ jobs:
       - name: Lint doc files
         run: |
           npm run compile
-          NODE_OPTIONS=--max-old-space-size=8192 npm run docs
-          NODE_OPTIONS=--max-old-space-size=8192 npm run docs:test
+          NODE_OPTIONS=--max-old-space-size=4096 npm run docs
+          NODE_OPTIONS=--max-old-space-size=4096 npm run docs:test
