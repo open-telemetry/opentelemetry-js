@@ -62,7 +62,11 @@ export class Span implements api.Span, ReadableSpan {
   private readonly _attributeValueLengthLimit: number;
   private readonly _clock: Clock;
 
-  /** Constructs a new Span instance. */
+  /**
+   * Constructs a new Span instance.
+   * 
+   * @deprecated calling Span constructor directly is not supported. Please use tracer.startSpan.
+   * */
   constructor(
     parentTracer: Tracer,
     context: Context,
