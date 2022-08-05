@@ -15,24 +15,25 @@
  */
 
 import * as api from '@opentelemetry/api';
+import { Context, SpanAttributeValue } from '@opentelemetry/api';
 import {
-  isAttributeValue,
-  InstrumentationLibrary,
-  isTimeInput,
-  sanitizeAttributes,
-  AnchoredClock,
-  timeInputToHrTime,
+  Clock,
   hrTimeDuration,
+  InstrumentationLibrary,
+  isAttributeValue,
+  isTimeInput,
+  otperformance,
+  sanitizeAttributes,
+  timeInputToHrTime
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import { ExceptionEventName } from './enums';
 import { ReadableSpan } from './export/ReadableSpan';
+import { SpanProcessor } from './SpanProcessor';
 import { TimedEvent } from './TimedEvent';
 import { Tracer } from './Tracer';
-import { SpanProcessor } from './SpanProcessor';
 import { SpanLimits } from './types';
-import { SpanAttributeValue, Context } from '@opentelemetry/api';
-import { ExceptionEventName } from './enums';
 
 /**
  * This class represents a span.
@@ -59,7 +60,7 @@ export class Span implements api.Span, ReadableSpan {
   private readonly _spanProcessor: SpanProcessor;
   private readonly _spanLimits: SpanLimits;
   private readonly _attributeValueLengthLimit: number;
-  private readonly _clock: AnchoredClock;
+  private readonly _clock: Clock;
 
   /** Constructs a new Span instance. */
   constructor(
@@ -68,10 +69,10 @@ export class Span implements api.Span, ReadableSpan {
     spanName: string,
     spanContext: api.SpanContext,
     kind: api.SpanKind,
-    clock: AnchoredClock,
     parentSpanId?: string,
     links: api.Link[] = [],
     startTime?: api.TimeInput,
+    clock: Clock = otperformance,
   ) {
     this._clock = clock;
     this.name = spanName;
