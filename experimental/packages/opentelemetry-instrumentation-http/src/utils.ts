@@ -35,6 +35,7 @@ import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 import * as url from 'url';
 import { AttributeNames } from './enums/AttributeNames';
 import { Err, IgnoreMatcher, ParsedRequestOptions } from './types';
+import { MetricAttributes } from '@opentelemetry/api-metrics';
 
 /**
  * Get an absolute url
@@ -349,6 +350,20 @@ export const getOutgoingRequestAttributes = (
 };
 
 /**
+ * Returns outgoing request Metric attributes scoped to the request data
+ * @param {SpanAttributes} spanAttributes the span attributes
+ */
+export const getOutgoingRequestMetricAttributes = (
+  spanAttributes: SpanAttributes
+): MetricAttributes => {
+  const metricAttributes: MetricAttributes = {};
+  metricAttributes[SemanticAttributes.HTTP_METHOD] = spanAttributes[SemanticAttributes.HTTP_METHOD];
+  metricAttributes[SemanticAttributes.NET_PEER_NAME] = spanAttributes[SemanticAttributes.NET_PEER_NAME];
+  metricAttributes[SemanticAttributes.HTTP_URL] = spanAttributes[SemanticAttributes.HTTP_URL];
+  return metricAttributes;
+};
+
+/**
  * Returns attributes related to the kind of HTTP protocol used
  * @param {string} [kind] Kind of HTTP protocol used: "1.0", "1.1", "2", "SPDY" or "QUIC".
  */
@@ -390,6 +405,20 @@ export const getOutgoingRequestAttributesOnResponse = (
 
   const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
   return Object.assign(attributes, httpKindAttributes);
+};
+
+/**
+ * Returns outgoing request Metric attributes scoped to the response data
+ * @param {SpanAttributes} spanAttributes the span attributes
+ */
+export const getOutgoingRequestMetricAttributesOnResponse = (
+  spanAttributes: SpanAttributes
+): MetricAttributes => {
+  const metricAttributes: MetricAttributes = {};
+  metricAttributes[SemanticAttributes.NET_PEER_PORT] = spanAttributes[SemanticAttributes.NET_PEER_PORT];
+  metricAttributes[SemanticAttributes.HTTP_STATUS_CODE] = spanAttributes[SemanticAttributes.HTTP_STATUS_CODE];
+  metricAttributes[SemanticAttributes.HTTP_FLAVOR] = spanAttributes[SemanticAttributes.HTTP_FLAVOR];
+  return metricAttributes;
 };
 
 /**
@@ -446,6 +475,24 @@ export const getIncomingRequestAttributes = (
 };
 
 /**
+ * Returns incoming request Metric attributes scoped to the request data
+ * @param {SpanAttributes} spanAttributes the span attributes
+ * @param {{ component: string }} options used to pass data needed to create attributes
+ */
+export const getIncomingRequestMetricAttributes = (
+  spanAttributes: SpanAttributes,
+  options: { component: string }
+): MetricAttributes => {
+  const metricAttributes: MetricAttributes = {};
+  metricAttributes[SemanticAttributes.HTTP_SCHEME] = options.component;
+  metricAttributes[SemanticAttributes.HTTP_METHOD] = spanAttributes[SemanticAttributes.HTTP_METHOD];
+  metricAttributes[SemanticAttributes.NET_HOST_NAME] = spanAttributes[SemanticAttributes.NET_HOST_NAME];
+  metricAttributes[SemanticAttributes.HTTP_FLAVOR] = spanAttributes[SemanticAttributes.HTTP_FLAVOR];
+  metricAttributes[SemanticAttributes.HTTP_TARGET] = spanAttributes[SemanticAttributes.HTTP_TARGET];
+  return metricAttributes;
+};
+
+/**
  * Returns incoming request attributes scoped to the response data
  * @param {(ServerResponse & { socket: Socket; })} response the response object
  */
@@ -473,6 +520,19 @@ export const getIncomingRequestAttributesOnResponse = (
     attributes[SemanticAttributes.HTTP_ROUTE] = rpcMetadata.route;
   }
   return attributes;
+};
+
+/**
+ * Returns incoming request Metric attributes scoped to the request data
+ * @param {SpanAttributes} spanAttributes the span attributes
+ */
+export const getIncomingRequestMetricAttributesOnResponse = (
+  spanAttributes: SpanAttributes
+): MetricAttributes => {
+  const metricAttributes: MetricAttributes = {};
+  metricAttributes[SemanticAttributes.HTTP_STATUS_CODE] = spanAttributes[SemanticAttributes.HTTP_STATUS_CODE];
+  metricAttributes[SemanticAttributes.NET_HOST_PORT] = spanAttributes[SemanticAttributes.NET_HOST_PORT];
+  return metricAttributes;
 };
 
 export function headerCapture(type: 'request' | 'response', headers: string[]) {

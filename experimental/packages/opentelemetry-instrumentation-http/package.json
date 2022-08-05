@@ -9,14 +9,13 @@
     "prepublishOnly": "npm run compile",
     "compile": "tsc --build",
     "clean": "tsc --build --clean",
-    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
+    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts ",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch",
-    "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "node ../../../scripts/version-update.js",
     "peer-api-check": "node ../../../scripts/peer-api-check.js"
   },
@@ -47,6 +46,7 @@
   "devDependencies": {
     "@opentelemetry/api": "^1.0.0",
     "@opentelemetry/context-async-hooks": "1.5.0",
+    "@opentelemetry/sdk-metrics-base": "0.31.0",
     "@opentelemetry/sdk-trace-base": "1.5.0",
     "@opentelemetry/sdk-trace-node": "1.5.0",
     "@types/got": "9.6.12",
@@ -74,6 +74,7 @@
     "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
+    "@opentelemetry/api-metrics": "0.31.0",
     "@opentelemetry/core": "1.5.0",
     "@opentelemetry/instrumentation": "0.31.0",
     "@opentelemetry/semantic-conventions": "1.5.0",
