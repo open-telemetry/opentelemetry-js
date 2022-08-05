@@ -31,7 +31,7 @@ import * as url from 'url';
 import {IgnoreMatcher, ParsedRequestOptions} from '../../src/types';
 import * as utils from '../../src/utils';
 import { AttributeNames } from '../../src/enums/AttributeNames';
-import { AnchoredClock, otperformance, RPCType, setRPCMetadata } from '@opentelemetry/core';
+import { RPCType, setRPCMetadata } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import {extractHostnameAndPort} from '../../src/utils';
 
@@ -252,7 +252,6 @@ describe('Utility', () => {
         'test',
         { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
         SpanKind.INTERNAL,
-        new AnchoredClock(Date, otperformance),
       );
       /* tslint:disable-next-line:no-any */
       utils.setSpanWithError(span, new Error(errorMessage));
@@ -488,7 +487,6 @@ describe('Utility', () => {
         'test',
         { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
         SpanKind.INTERNAL,
-        new AnchoredClock(Date, otperformance),
       );
     });
 

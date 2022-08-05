@@ -26,13 +26,11 @@ import {
   SpanAttributeValue,
 } from '@opentelemetry/api';
 import {
-  AnchoredClock,
   DEFAULT_ATTRIBUTE_COUNT_LIMIT,
   DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
   hrTimeDuration,
   hrTimeToMilliseconds,
   hrTimeToNanoseconds,
-  otperformance,
   otperformance as performance,
 } from '@opentelemetry/core';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
@@ -77,8 +75,7 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.SERVER,
-      new AnchoredClock(Date, otperformance)
+      SpanKind.SERVER
     );
     assert.ok(span instanceof Span);
     span.end();
@@ -90,8 +87,7 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.SERVER,
-      new AnchoredClock(Date, otperformance)
+      SpanKind.SERVER
     );
     assert.ok(
       hrTimeToMilliseconds(span.startTime) >
@@ -105,8 +101,7 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.SERVER,
-      new AnchoredClock(Date, otperformance)
+      SpanKind.SERVER
     );
     span.end();
     assert.ok(
@@ -127,8 +122,7 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.SERVER,
-      new AnchoredClock(Date, otperformance)
+      SpanKind.SERVER
     );
     span.end();
     assert.ok(hrTimeToNanoseconds(span.duration) >= 0);
@@ -140,8 +134,7 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.SERVER,
-      new AnchoredClock(Date, otperformance)
+      SpanKind.SERVER
     );
     span.addEvent('my-event');
     assert.ok(
@@ -157,7 +150,6 @@ describe('Span', () => {
       name,
       spanContext,
       SpanKind.SERVER,
-      new AnchoredClock(Date, otperformance),
       undefined,
       [],
       0
@@ -180,7 +172,6 @@ describe('Span', () => {
         name,
         spanContext,
         SpanKind.SERVER,
-        new AnchoredClock(Date, otperformance),
         undefined,
         [],
         0
@@ -202,8 +193,7 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.CLIENT,
-      new AnchoredClock(Date, otperformance),
+      SpanKind.CLIENT
     );
     const context = span.spanContext();
     assert.strictEqual(context.traceId, spanContext.traceId);
@@ -221,8 +211,7 @@ describe('Span', () => {
         ROOT_CONTEXT,
         name,
         spanContext,
-        SpanKind.CLIENT,
-        new AnchoredClock(Date, otperformance),
+        SpanKind.CLIENT
       );
       assert.ok(span.isRecording());
       span.end();
@@ -233,8 +222,7 @@ describe('Span', () => {
         ROOT_CONTEXT,
         name,
         spanContext,
-        SpanKind.CLIENT,
-        new AnchoredClock(Date, otperformance),
+        SpanKind.CLIENT
       );
       span.end();
       assert.ok(span.isRecording() === false);
@@ -249,8 +237,7 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT,
-          new AnchoredClock(Date, otperformance),
+          SpanKind.CLIENT
         );
 
         for (const [k, v] of Object.entries(validAttributes)) {
@@ -269,8 +256,7 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT,
-          new AnchoredClock(Date, otperformance),
+          SpanKind.CLIENT
         );
 
         span.setAttribute('overwrite', 'initial value');
@@ -296,8 +282,7 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT,
-          new AnchoredClock(Date, otperformance),
+          SpanKind.CLIENT
         );
         for (let i = 0; i < 150; i++) {
           span.setAttribute('foo' + i, 'bar' + i);
@@ -325,8 +310,7 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT,
-          new AnchoredClock(Date, otperformance),
+          SpanKind.CLIENT
         );
 
         it('should truncate value which length exceeds this limit', () => {
@@ -365,8 +349,7 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT,
-          new AnchoredClock(Date, otperformance),
+          SpanKind.CLIENT
         );
 
         it('should not truncate any value', () => {
@@ -392,8 +375,7 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT,
-          new AnchoredClock(Date, otperformance),
+          SpanKind.CLIENT
         );
         for (let i = 0; i < 150; i++) {
           span.setAttribute('foo' + i, 'bar' + i);
@@ -421,8 +403,7 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT,
-          new AnchoredClock(Date, otperformance),
+          SpanKind.CLIENT
         );
 
         it('should truncate value which length exceeds this limit', () => {
@@ -461,8 +442,7 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT,
-          new AnchoredClock(Date, otperformance),
+          SpanKind.CLIENT
         );
 
         it('should not truncate any value', () => {
@@ -491,8 +471,7 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT,
-          new AnchoredClock(Date, otperformance),
+          SpanKind.CLIENT
         );
         for (let i = 0; i < 150; i++) {
           span.setAttribute('foo' + i, 'bar' + i);
@@ -524,8 +503,7 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT,
-          new AnchoredClock(Date, otperformance),
+          SpanKind.CLIENT
         );
         for (let i = 0; i < 150; i++) {
           span.setAttribute('foo' + i, 'bar' + i);
@@ -558,8 +536,7 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT,
-          new AnchoredClock(Date, otperformance),
+          SpanKind.CLIENT
         );
 
         it('should truncate value which length exceeds span limit', () => {
@@ -602,8 +579,7 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT,
-          new AnchoredClock(Date, otperformance),
+          SpanKind.CLIENT
         );
 
         it('should not truncate value', () => {
@@ -633,8 +609,7 @@ describe('Span', () => {
         ROOT_CONTEXT,
         name,
         spanContext,
-        SpanKind.CLIENT,
-        new AnchoredClock(Date, otperformance),
+        SpanKind.CLIENT
       );
 
       span.setAttributes(validAttributes);
@@ -651,8 +626,7 @@ describe('Span', () => {
         ROOT_CONTEXT,
         name,
         spanContext,
-        SpanKind.CLIENT,
-        new AnchoredClock(Date, otperformance),
+        SpanKind.CLIENT
       );
       span.addEvent('sent');
       span.addEvent('rev', { attr1: 'value', attr2: 123, attr3: true });
@@ -665,8 +639,7 @@ describe('Span', () => {
         ROOT_CONTEXT,
         name,
         spanContext,
-        SpanKind.CLIENT,
-        new AnchoredClock(Date, otperformance),
+        SpanKind.CLIENT
       );
       span.addEvent('rev', { ...validAttributes, ...invalidAttributes } as unknown as SpanAttributes);
       span.end();
@@ -695,7 +668,6 @@ describe('Span', () => {
       name,
       spanContext,
       SpanKind.CLIENT,
-      new AnchoredClock(Date, otperformance),
       '12345',
       [{ context: linkContext }, { context: linkContext, attributes }]
     );
@@ -708,8 +680,7 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.CLIENT,
-      new AnchoredClock(Date, otperformance),
+      SpanKind.CLIENT
     );
     for (let i = 0; i < 150; i++) {
       span.addEvent('sent' + i);
@@ -732,8 +703,7 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.CLIENT,
-      new AnchoredClock(Date, otperformance),
+      SpanKind.CLIENT
     );
     for (let i = 0; i < 10; i++) {
       span.addEvent('sent' + i);
@@ -749,8 +719,7 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.CLIENT,
-      new AnchoredClock(Date, otperformance),
+      SpanKind.CLIENT
     );
     span.setStatus({
       code: SpanStatusCode.ERROR,
@@ -767,7 +736,6 @@ describe('Span', () => {
       'my-span',
       spanContext,
       SpanKind.INTERNAL,
-      new AnchoredClock(Date, otperformance),
       parentId
     );
 
@@ -794,8 +762,7 @@ describe('Span', () => {
       ROOT_CONTEXT,
       'my-span',
       spanContext,
-      SpanKind.CLIENT,
-      new AnchoredClock(Date, otperformance),
+      SpanKind.CLIENT
     );
     span.setAttribute('attr1', 'value1');
     assert.deepStrictEqual(span.attributes, { attr1: 'value1' });
@@ -822,7 +789,6 @@ describe('Span', () => {
       'my-span',
       spanContext,
       SpanKind.CLIENT,
-      new AnchoredClock(Date, otperformance),
       undefined,
       [
         { context: linkContext },
@@ -852,8 +818,7 @@ describe('Span', () => {
       ROOT_CONTEXT,
       'my-span',
       spanContext,
-      SpanKind.CLIENT,
-      new AnchoredClock(Date, otperformance),
+      SpanKind.CLIENT
     );
     span.addEvent('sent');
     assert.strictEqual(span.events.length, 1);
@@ -888,8 +853,7 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.CLIENT,
-      new AnchoredClock(Date, otperformance),
+      SpanKind.CLIENT
     );
     span.setStatus({
       code: SpanStatusCode.ERROR,
@@ -913,8 +877,7 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.SERVER,
-      new AnchoredClock(Date, otperformance)
+      SpanKind.SERVER
     );
     const endTime = Date.now();
     span.end(endTime);
@@ -928,8 +891,7 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.SERVER,
-      new AnchoredClock(Date, otperformance)
+      SpanKind.SERVER
     );
     span.updateName('foo-span');
     span.end();
@@ -945,8 +907,7 @@ describe('Span', () => {
       ROOT_CONTEXT,
       name,
       spanContext,
-      SpanKind.SERVER,
-      new AnchoredClock(Date, otperformance)
+      SpanKind.SERVER
     );
     assert.strictEqual(span.ended, false);
     span.end();
@@ -1029,8 +990,7 @@ describe('Span', () => {
             ROOT_CONTEXT,
             name,
             spanContext,
-            SpanKind.CLIENT,
-            new AnchoredClock(Date, otperformance),
+            SpanKind.CLIENT
           );
           assert.strictEqual(span.events.length, 0);
           span.recordException(key);
@@ -1050,8 +1010,7 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT,
-          new AnchoredClock(Date, otperformance),
+          SpanKind.CLIENT
         );
         assert.strictEqual(span.events.length, 0);
         span.recordException(error);
@@ -1084,8 +1043,7 @@ describe('Span', () => {
             ROOT_CONTEXT,
             name,
             spanContext,
-            SpanKind.CLIENT,
-            new AnchoredClock(Date, otperformance),
+            SpanKind.CLIENT
           );
           assert.strictEqual(span.events.length, 0);
           span.recordException(error);
@@ -1116,8 +1074,7 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT,
-          new AnchoredClock(Date, otperformance),
+          SpanKind.CLIENT
         );
         assert.strictEqual(span.events.length, 0);
         span.recordException('boom', [0, 123]);
@@ -1133,8 +1090,7 @@ describe('Span', () => {
           ROOT_CONTEXT,
           name,
           spanContext,
-          SpanKind.CLIENT,
-          new AnchoredClock(Date, otperformance),
+          SpanKind.CLIENT
         );
         assert.strictEqual(span.events.length, 0);
         span.recordException({ code: 12 });

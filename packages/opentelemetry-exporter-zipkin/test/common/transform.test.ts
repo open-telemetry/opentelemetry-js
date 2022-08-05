@@ -16,10 +16,8 @@
 
 import * as api from '@opentelemetry/api';
 import {
-  AnchoredClock,
   hrTimeDuration,
   hrTimeToMicroseconds,
-  otperformance,
   VERSION,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
@@ -68,7 +66,6 @@ describe('transform', () => {
         'my-span',
         spanContext,
         api.SpanKind.SERVER,
-        new AnchoredClock(Date, otperformance),
         parentId
       );
       span.setAttributes({
@@ -120,7 +117,6 @@ describe('transform', () => {
         'my-span',
         spanContext,
         api.SpanKind.SERVER,
-        new AnchoredClock(Date, otperformance)
       );
       span.end();
 
@@ -169,7 +165,6 @@ describe('transform', () => {
           'my-span',
           spanContext,
           item.ot,
-          new AnchoredClock(Date, otperformance)
         );
         span.end();
 
@@ -212,7 +207,6 @@ describe('transform', () => {
         'my-span',
         spanContext,
         api.SpanKind.SERVER,
-        new AnchoredClock(Date, otperformance),
         parentId
       );
       span.setAttributes({
@@ -243,7 +237,6 @@ describe('transform', () => {
         'my-span',
         spanContext,
         api.SpanKind.SERVER,
-        new AnchoredClock(Date, otperformance),
         parentId
       );
       const status: api.SpanStatus = {
@@ -280,7 +273,6 @@ describe('transform', () => {
         'my-span',
         spanContext,
         api.SpanKind.SERVER,
-        new AnchoredClock(Date, otperformance),
         parentId
       );
       const status: api.SpanStatus = {
@@ -322,7 +314,6 @@ describe('transform', () => {
         'my-span',
         spanContext,
         api.SpanKind.SERVER,
-        new AnchoredClock(Date, otperformance),
         parentId
       );
       span.addEvent('my-event1');

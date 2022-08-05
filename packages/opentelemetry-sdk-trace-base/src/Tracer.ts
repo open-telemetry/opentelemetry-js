@@ -141,10 +141,10 @@ export class Tracer implements api.Tracer {
       name,
       spanContext,
       spanKind,
-      clock,
       parentSpanId,
       links,
       options.startTime,
+      clock,
     );
     // Set initial span attributes. The attributes object may have been mutated
     // by the sampler, so we sanitize the merged attributes before setting them.
