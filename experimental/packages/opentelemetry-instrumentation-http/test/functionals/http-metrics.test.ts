@@ -71,7 +71,6 @@ describe('metrics', () => {
     }
     await new Promise(resolve => setTimeout(resolve, 120));
     const resourceMetrics = metricsMemoryExporter.getMetrics();
-    assert.strictEqual(resourceMetrics.length, 1, 'resourceMetrics count');
     const scopeMetrics = resourceMetrics[0].scopeMetrics;
     assert.strictEqual(scopeMetrics.length, 1, 'scopeMetrics count');
     const metrics = scopeMetrics[0].metrics;
