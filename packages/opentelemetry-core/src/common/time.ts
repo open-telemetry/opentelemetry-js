@@ -121,7 +121,6 @@ export function hrTimeDuration(
   return [seconds, nanos];
 }
 
-
 /**
  * Convert hrTime to timestamp, for example "2019-05-14T17:00:00.000123456Z"
  * @param time

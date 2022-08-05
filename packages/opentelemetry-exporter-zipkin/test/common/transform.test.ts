@@ -116,7 +116,7 @@ describe('transform', () => {
         api.ROOT_CONTEXT,
         'my-span',
         spanContext,
-        api.SpanKind.SERVER,
+        api.SpanKind.SERVER
       );
       span.end();
 
@@ -164,7 +164,7 @@ describe('transform', () => {
           api.ROOT_CONTEXT,
           'my-span',
           spanContext,
-          item.ot,
+          item.ot
         );
         span.end();
 

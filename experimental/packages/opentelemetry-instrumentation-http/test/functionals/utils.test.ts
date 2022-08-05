@@ -251,7 +251,7 @@ describe('Utility', () => {
         ROOT_CONTEXT,
         'test',
         { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
-        SpanKind.INTERNAL,
+        SpanKind.INTERNAL
       );
       /* tslint:disable-next-line:no-any */
       utils.setSpanWithError(span, new Error(errorMessage));
@@ -486,7 +486,7 @@ describe('Utility', () => {
         ROOT_CONTEXT,
         'test',
         { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
-        SpanKind.INTERNAL,
+        SpanKind.INTERNAL
       );
     });
 
