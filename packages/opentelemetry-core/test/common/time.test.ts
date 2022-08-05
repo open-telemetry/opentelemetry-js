@@ -27,7 +27,6 @@ import {
   hrTimeToMicroseconds,
   hrTimeToTimeStamp,
   isTimeInput,
-  addHrTime,
 } from '../../src/common/time';
 
 describe('time', () => {
@@ -149,23 +148,6 @@ describe('time', () => {
 
       const output = hrTimeDuration(startTime, endTime);
       assert.deepStrictEqual(output, [9, 800000000]);
-    });
-  });
-
-  describe('#addHrTime', () => {
-    it('should add two HrTimes', () => {
-      const startTime: api.HrTime = [22, 400000000];
-      const endTime: api.HrTime = [32, 200000000];
-
-      const output = addHrTime(startTime, endTime);
-      assert.deepStrictEqual(output, [54, 600000000]);
-    });
-    it('should overflow nanoseconds', () => {
-      const startTime: api.HrTime = [22, 600000000];
-      const endTime: api.HrTime = [32, 700000000];
-
-      const output = addHrTime(startTime, endTime);
-      assert.deepStrictEqual(output, [55, 300000000]);
     });
   });
 
