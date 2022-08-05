@@ -156,7 +156,7 @@ describe('Node SDK', () => {
       let totalExports = 0;
       while (totalExports < numberOfMetrics) {
         await new Promise(resolve => setTimeout(resolve, 20));
-        const exportedMetrics = exporter.getMetrics()
+        const exportedMetrics = exporter.getMetrics();
         totalExports = exportedMetrics.length;
       }
     }
@@ -193,18 +193,18 @@ describe('Node SDK', () => {
     const counter = meter.createCounter('test_counter', {
       description: 'a test description',
     });
-    counter.add(10)
+    counter.add(10);
 
-    await waitForNumberOfMetrics(exporter, 1)
-    const exportedMetrics = exporter.getMetrics()
-    const [firstExportedMetric] = exportedMetrics
-    assert.ok(firstExportedMetric, 'should have one exported metric')
-    const [firstScopeMetric] = firstExportedMetric.scopeMetrics
-    assert.ok(firstScopeMetric, 'should have one scope metric')
-    assert.ok(firstScopeMetric.scope.name === 'NodeSDKViews', 'scope should match created view')
-    assert.ok(firstScopeMetric.metrics.length > 0, 'should have at least one metrics entry')
-    const [firstMetricRecord] = firstScopeMetric.metrics
-    assert.ok(firstMetricRecord.descriptor.name === 'test-view', 'should have renamed counter metric')
+    await waitForNumberOfMetrics(exporter, 1);
+    const exportedMetrics = exporter.getMetrics();
+    const [firstExportedMetric] = exportedMetrics;
+    assert.ok(firstExportedMetric, 'should have one exported metric');
+    const [firstScopeMetric] = firstExportedMetric.scopeMetrics;
+    assert.ok(firstScopeMetric, 'should have one scope metric');
+    assert.ok(firstScopeMetric.scope.name === 'NodeSDKViews', 'scope should match created view');
+    assert.ok(firstScopeMetric.metrics.length > 0, 'should have at least one metrics entry');
+    const [firstMetricRecord] = firstScopeMetric.metrics;
+    assert.ok(firstMetricRecord.descriptor.name === 'test-view', 'should have renamed counter metric');
 
     await sdk.shutdown();
   });
