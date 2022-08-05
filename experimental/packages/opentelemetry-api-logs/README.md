@@ -23,7 +23,7 @@ Because the npm installer and node module resolution algorithm could potentially
 
 If you are writing an instrumentation library, or prefer to call the API methods directly rather than using the `register` method on the Tracer/Meter/Logger Provider, OpenTelemetry provides direct access to the underlying API methods through the `@opentelemetry/api-logs` package. API entry points are defined as global singleton objects `trace`, `metrics`, `logs`, `propagation`, and `context` which contain methods used to initialize SDK implementations and acquire resources from the API.
 
-- [Metrics API Documentation][metrics-api-docs]
+- [Logs API Documentation][logs-api-docs]
 
 ```javascript
 const api = require("@opentelemetry/api-logs");
@@ -33,7 +33,13 @@ api.logs.setGlobalLoggerProvider(loggerProvider);
 /* returns loggerProvider (no-op if a working provider has not been initialized) */
 api.logs.getLoggerProvider();
 /* returns a meter from the registered global meter provider (no-op if a working provider has not been initialized) */
-api.logs.getLogger(name, version);
+const logger = api.logs.getLogger(name, version);
+
+// logging an event in an instrumentation library
+logger.emitEvent({ name: 'event-name', domain: 'event-domain' });
+
+// logging an event in a log appender
+logger.emitLogRecord({ severityNumber: 1, body: 'log data' });
 ```
 
 ## Useful links

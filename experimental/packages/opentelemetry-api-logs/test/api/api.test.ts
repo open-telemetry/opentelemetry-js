@@ -15,7 +15,9 @@
  */
 
 import * as assert from 'assert';
-import { Logger, logs, NoopLogger, NoopLoggerProvider } from '../../src';
+import { Logger, logs } from '../../src';
+import { NoopLogger } from '../../src/NoopLogger';
+import { NoopLoggerProvider } from '../../src/NoopLoggerProvider';
 
 describe('API', () => {
   const dummyLogger = new NoopLogger();

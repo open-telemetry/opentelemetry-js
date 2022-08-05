@@ -19,8 +19,6 @@ export * from './types/LoggerProvider';
 export * from './types/LogRecord';
 export * from './types/Event';
 export * from './types/LoggerOptions';
-export * from './NoopLoggerProvider';
-export * from './NoopLogger';
 
 import { LogsAPI } from './api/logs';
 export const logs = LogsAPI.getInstance();
