@@ -37,6 +37,20 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { NodeSDKConfiguration } from './types';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
+
+export type MeterProviderConfig = {
+  /**
+   * Reference to the MetricReader instance by the NodeSDK
+   */
+  reader?: MetricReader
+  /**
+   * Lists the views that should be passed when meterProvider
+   *
+   * Note: This is only getting used when NodeSDK is responsible for
+   * instantiated an instance of MeterProvider
+   */
+  views?: View[]
+};
 export class NodeSDK {
   private _tracerProviderConfig?: {
     tracerConfig: NodeTracerConfig;
@@ -44,11 +58,8 @@ export class NodeSDK {
     contextManager?: ContextManager;
     textMapPropagator?: TextMapPropagator;
   };
-  private _meterProviderConfig?: {
-    views?: View[]
-  };
+  private _meterProviderConfig?: MeterProviderConfig;
   private _instrumentations: InstrumentationOption[];
-  private _metricReader?: MetricReader;
 
   private _resource: Resource;
 
@@ -90,9 +101,7 @@ export class NodeSDK {
       );
     }
 
-    if (configuration.metricReader) {
-      this.configureMeterProvider(configuration.metricReader, configuration.views);
-    }
+    this.configureMeterProvider({ reader: configuration.metricReader, views: configuration.views });
 
     let instrumentations: InstrumentationOption[] = [];
     if (configuration.instrumentations) {
@@ -117,11 +126,12 @@ export class NodeSDK {
   }
 
   /** Set configurations needed to register a MeterProvider */
-  public configureMeterProvider(reader: MetricReader, views?: View[]): void {
-    this._metricReader = reader;
-    this._meterProviderConfig = {
-      views,
-    };
+  public configureMeterProvider(config: MeterProviderConfig): void {
+    if (config?.views && !config.reader) {
+      throw new Error('A list of views have been passed but the NodeSDK expects that the MeterProvider is manually instantiated and can\'t attach Views to the MeterProvider');
+    }
+
+    this._meterProviderConfig = config;
   }
 
   /** Detect resource attributes */
@@ -129,7 +139,7 @@ export class NodeSDK {
     config?: ResourceDetectionConfig
   ): Promise<void> {
     const internalConfig: ResourceDetectionConfig = {
-      detectors: [ envDetector, processDetector],
+      detectors: [envDetector, processDetector],
       ...config,
     };
 
@@ -152,7 +162,7 @@ export class NodeSDK {
     this._resource = this._serviceName === undefined
       ? this._resource
       : this._resource.merge(new Resource(
-        {[SemanticResourceAttributes.SERVICE_NAME]: this._serviceName}
+        { [SemanticResourceAttributes.SERVICE_NAME]: this._serviceName }
       ));
 
     if (this._tracerProviderConfig) {
@@ -170,13 +180,13 @@ export class NodeSDK {
       });
     }
 
-    if (this._metricReader) {
+    if (this._meterProviderConfig?.reader) {
       const meterProvider = new MeterProvider({
         resource: this._resource,
         views: this._meterProviderConfig?.views ?? [],
       });
 
-      meterProvider.addMetricReader(this._metricReader);
+      meterProvider.addMetricReader(this._meterProviderConfig.reader);
 
       this._meterProvider = meterProvider;
 

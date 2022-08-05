@@ -209,6 +209,24 @@ describe('Node SDK', () => {
     await sdk.shutdown();
   });
 
+  it('should warn user when meter views are provided but not a MetricReader', async () => {
+    assert.throws(
+      () => {
+        new NodeSDK({
+          views: [
+            new View({
+              name: 'test-view',
+              instrumentName: 'test_counter',
+              instrumentType: InstrumentType.COUNTER,
+            })
+          ],
+          autoDetectResources: false,
+        });
+      }, (error: Error) => {
+        return error.message === 'A list of views have been passed but the NodeSDK expects that the MeterProvider is manually instantiated and can\'t attach Views to the MeterProvider';
+      });
+  });
+
   describe('detectResources', async () => {
     beforeEach(() => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
