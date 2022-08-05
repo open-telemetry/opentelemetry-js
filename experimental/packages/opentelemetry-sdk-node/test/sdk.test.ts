@@ -22,13 +22,13 @@ import {
   diag,
   DiagLogLevel,
 } from '@opentelemetry/api';
-import { metrics, NoopMeterProvider, ValueType } from '@opentelemetry/api-metrics';
+import { metrics, NoopMeterProvider } from '@opentelemetry/api-metrics';
 import {
   AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
-import { CompositePropagator, ExportResult } from '@opentelemetry/core';
-import { AggregationTemporality, ConsoleMetricExporter, InMemoryMetricExporter, InstrumentDescriptor, InstrumentType, MeterProvider, PeriodicExportingMetricReader, ResourceMetrics, View } from '@opentelemetry/sdk-metrics-base';
+import { CompositePropagator } from '@opentelemetry/core';
+import { AggregationTemporality, ConsoleMetricExporter, InMemoryMetricExporter, InstrumentType, MeterProvider, PeriodicExportingMetricReader, View } from '@opentelemetry/sdk-metrics-base';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   assertServiceResource,
@@ -225,12 +225,12 @@ describe('Node SDK', () => {
           autoDetectResources: true,
         });
         await sdk.detectResources({
-          detectors: [ processDetector, {
+          detectors: [processDetector, {
             detect() {
               throw new Error('Buggy detector');
             }
           },
-          envDetector ]
+            envDetector]
         });
         const resource = sdk['_resource'];
 
@@ -339,7 +339,7 @@ describe('Node SDK', () => {
     });
 
     it('should configure service name via OTEL_SERVICE_NAME env var', async () => {
-      process.env.OTEL_SERVICE_NAME='env-set-name';
+      process.env.OTEL_SERVICE_NAME = 'env-set-name';
       const sdk = new NodeSDK();
 
       await sdk.start();
@@ -352,7 +352,7 @@ describe('Node SDK', () => {
     });
 
     it('should favor config set service name over OTEL_SERVICE_NAME env set service name', async () => {
-      process.env.OTEL_SERVICE_NAME='env-set-name';
+      process.env.OTEL_SERVICE_NAME = 'env-set-name';
       const sdk = new NodeSDK({
         serviceName: 'config-set-name',
       });
