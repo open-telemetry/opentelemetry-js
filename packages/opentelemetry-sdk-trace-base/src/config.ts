@@ -14,41 +14,47 @@
  * limitations under the License.
  */
 
-import { diag, Sampler } from '@opentelemetry/api';
+import { diag } from '@opentelemetry/api';
 import {
-  AlwaysOffSampler,
-  AlwaysOnSampler,
   getEnv,
   TracesSamplerValues,
-  ParentBasedSampler,
   ENVIRONMENT,
-  TraceIdRatioBasedSampler,
 } from '@opentelemetry/core';
+import { Sampler } from './Sampler';
+import { AlwaysOffSampler } from './sampler/AlwaysOffSampler';
+import { AlwaysOnSampler } from './sampler/AlwaysOnSampler';
+import { ParentBasedSampler } from './sampler/ParentBasedSampler';
+import { TraceIdRatioBasedSampler } from './sampler/TraceIdRatioBasedSampler';
 
 const env = getEnv();
 const FALLBACK_OTEL_TRACES_SAMPLER = TracesSamplerValues.AlwaysOn;
 const DEFAULT_RATIO = 1;
 
 /**
- * Default configuration. For fields with primitive values, any user-provided
+ * Load default configuration. For fields with primitive values, any user-provided
  * value will override the corresponding default value. For fields with
  * non-primitive values (like `spanLimits`), the user-provided value will be
  * used to extend the default value.
  */
-export const DEFAULT_CONFIG = {
-  sampler: buildSamplerFromEnv(env),
-  forceFlushTimeoutMillis: 30000,
-  generalLimits: {
-    attributeValueLengthLimit: getEnv().OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT,
-    attributeCountLimit: getEnv().OTEL_ATTRIBUTE_COUNT_LIMIT,
-  },
-  spanLimits: {
-    attributeValueLengthLimit: getEnv().OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT,
-    attributeCountLimit: getEnv().OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT,
-    linkCountLimit: getEnv().OTEL_SPAN_LINK_COUNT_LIMIT,
-    eventCountLimit: getEnv().OTEL_SPAN_EVENT_COUNT_LIMIT,
-  },
-};
+
+// object needs to be wrapped in this function and called when needed otherwise
+// envs are parsed before tests are ran - causes tests using these envs to fail
+export function loadDefaultConfig() {
+  return {
+    sampler: buildSamplerFromEnv(env),
+    forceFlushTimeoutMillis: 30000,
+    generalLimits: {
+      attributeValueLengthLimit: getEnv().OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT,
+      attributeCountLimit: getEnv().OTEL_ATTRIBUTE_COUNT_LIMIT,
+    },
+    spanLimits: {
+      attributeValueLengthLimit: getEnv().OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT,
+      attributeCountLimit: getEnv().OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT,
+      linkCountLimit: getEnv().OTEL_SPAN_LINK_COUNT_LIMIT,
+      eventCountLimit: getEnv().OTEL_SPAN_EVENT_COUNT_LIMIT,
+    },
+  };
+}
 
 /**
  * Based on environment, builds a sampler, complies with specification.

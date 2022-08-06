@@ -57,6 +57,11 @@ describe('HttpInstrumentation Integration tests', () => {
   const sockets: Array<Socket> = [];
   before(done => {
     mockServer = http.createServer((req, res) => {
+      if (req.url === '/timeout') {
+        setTimeout(() => {
+          res.end();
+        }, 1000);
+      }
       res.statusCode = 200;
       res.setHeader('content-type', 'application/json');
       res.write(
@@ -358,6 +363,25 @@ describe('HttpInstrumentation Integration tests', () => {
       assert.ok(span);
       assert.strictEqual(spans.length, 2);
       assert.strictEqual(span.name, 'HTTP GET');
+    });
+
+    it('should have correct spans even when request timeout', async () => {
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      try {
+        await httpRequest.get(
+          `${protocol}://localhost:${mockServerPort}/timeout`, {timeout: 1}
+        );
+      } catch (err) {
+        assert.ok(err.message.startsWith('timeout'));
+      }
+
+      spans = memoryExporter.getFinishedSpans();
+      const span = spans.find(s => s.kind === SpanKind.CLIENT);
+      assert.ok(span);
+      assert.strictEqual(span.name, 'HTTP GET');
+      assert.strictEqual(span.attributes[SemanticAttributes.HTTP_HOST], `localhost:${mockServerPort}`);
     });
   });
 });

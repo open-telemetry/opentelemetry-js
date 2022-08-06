@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Sampler, SamplingDecision, SamplingResult } from '@opentelemetry/api';
+import { Sampler, SamplingDecision, SamplingResult } from '../../../src';
 
 /** Sampler that always records but doesn't sample spans. */
 export class TestRecordOnlySampler implements Sampler {

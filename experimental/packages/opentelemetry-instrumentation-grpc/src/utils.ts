@@ -95,3 +95,18 @@ export const _methodIsIgnored = (
 
   return false;
 };
+
+/**
+ * Return method and service values getting from grpc name/path
+ * @param name the grpc name/path
+ */
+export const _extractMethodAndService = (name: string): { service: string, method: string } => {
+  const serviceMethod = name.replace(/^\//, '').split('/');
+  const service = serviceMethod.shift() || '';
+  const method = serviceMethod.join('/');
+
+  return ({
+    service,
+    method
+  });
+};
