@@ -28,6 +28,9 @@ If you are writing an instrumentation library, or prefer to call the API methods
 ```javascript
 const api = require("@opentelemetry/api-logs");
 
+/* A specific implementation of LoggerProvider comes from an SDK */
+const loggerProvider = createLoggerProvider();
+
 /* Initialize LoggerProvider */
 api.logs.setGlobalLoggerProvider(loggerProvider);
 /* returns loggerProvider (no-op if a working provider has not been initialized) */
