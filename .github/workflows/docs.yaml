@@ -44,6 +44,8 @@ jobs:
 
       - name: Build Docs
         run: npm run docs
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
 
       - name: Deploy Documentation 🚀
         uses: JamesIves/github-pages-deploy-action@releases/v3
