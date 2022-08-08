@@ -64,7 +64,7 @@ export class Span implements api.Span, ReadableSpan {
 
   /**
    * Constructs a new Span instance.
-   * 
+   *
    * @deprecated calling Span constructor directly is not supported. Please use tracer.startSpan.
    * */
   constructor(
