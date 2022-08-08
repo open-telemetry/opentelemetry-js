@@ -24,6 +24,7 @@ Setup [Zipkin Tracing](https://zipkin.io/pages/quickstart.html)
 or
 Setup [Jaeger Tracing](https://www.jaegertracing.io/docs/latest/getting-started/#all-in-one)
 or
+
 ```sh
 # from this directory, requires docker and docker-compose
 npm run docker:start
