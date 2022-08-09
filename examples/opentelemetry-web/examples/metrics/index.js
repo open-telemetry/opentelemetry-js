@@ -9,11 +9,11 @@ diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
 let interval;
 let meter;
 
-async function stopMetrics() {
+function stopMetrics() {
   console.log('STOPPING METRICS');
   clearInterval(interval);
-  await metrics.getMeterProvider().shutdown();
-  metrics.disable();
+  metrics.getMeterProvider().shutdown()
+    .then(() => metrics.disable());
 }
 
 function startMetrics() {
