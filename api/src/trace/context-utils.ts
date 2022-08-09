@@ -19,6 +19,7 @@ import { Context } from '../context/types';
 import { Span } from './span';
 import { SpanContext } from './span_context';
 import { NonRecordingSpan } from './NonRecordingSpan';
+import { ContextAPI } from '../api/context';
 
 /**
  * span key
@@ -32,6 +33,13 @@ const SPAN_KEY = createContextKey('OpenTelemetry Context Key SPAN');
  */
 export function getSpan(context: Context): Span | undefined {
   return (context.getValue(SPAN_KEY) as Span) || undefined;
+}
+
+/**
+ * Gets the span from the current context, if one exists.
+ */
+export function getActiveSpan(): Span | undefined {
+  return getSpan(ContextAPI.getInstance().active());
 }
 
 /**

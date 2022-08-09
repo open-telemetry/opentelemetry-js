@@ -52,6 +52,17 @@ describe('API', () => {
     assert.strictEqual(typeof tracer, 'object');
   });
 
+  it('getActiveSpan should get the current span', () => {
+    const span = new NonRecordingSpan();
+    const ctx = trace.setSpan(ROOT_CONTEXT, span);
+    context.setGlobalContextManager({ active: () => ctx, disable: () => {} } as any);
+    
+    const active = trace.getActiveSpan();
+    assert.strictEqual(active, span);
+
+    context.disable();
+  });
+
   describe('Context', () => {
     it('with should forward this, arguments and return value', () => {
       function fnWithThis(this: string, a: string, b: number): string {
