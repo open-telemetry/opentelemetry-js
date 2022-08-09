@@ -17,6 +17,7 @@
 import { SpanAttributes } from './attributes';
 
 /**
+ * @deprecated use the one declared in @opentelemetry/sdk-trace-base instead.
  * A sampling decision that determines how a {@link Span} will be recorded
  * and collected.
  */
@@ -39,6 +40,7 @@ export enum SamplingDecision {
 }
 
 /**
+ * @deprecated use the one declared in @opentelemetry/sdk-trace-base instead.
  * A sampling result contains a decision for a {@link Span} and additional
  * attributes the sampler would like to added to the Span.
  */
