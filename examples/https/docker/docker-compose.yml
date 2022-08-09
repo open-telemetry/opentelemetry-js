@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  # Jaeger
+  jaeger-all-in-one:
+    image: jaegertracing/all-in-one:1.37.0
+    ports:
+      - "16686:16686" # frontend
+      - "14268:14268" # jaeger.thrift via HTTP
+      - "6832:6832/udp"   # jaeger.thrift via UDP (binary)
+  # Zipkin
+  zipkin-all-in-one:
+    image: openzipkin/zipkin:latest
+    ports:
+      - "9411:9411"
