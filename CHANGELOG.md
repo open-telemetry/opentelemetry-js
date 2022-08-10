@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 
 ### :books: (Refine Doc)
 
+* chore: update trace-web example and rename it to opentelemetry-web [#3145](https://github.com/open-telemetry/opentelemetry-js/pull/3145) @pichlermarc
 * chore: update https example [#3152](https://github.com/open-telemetry/opentelemetry-js/pull/3152) @pichlermarc
 
 ### :house: (Internal)
