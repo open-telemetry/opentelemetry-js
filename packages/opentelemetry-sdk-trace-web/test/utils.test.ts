@@ -213,8 +213,6 @@ describe('utils', () => {
       const time = createHrTime(startTime, 500);
       sinon.stub(performance, 'timeOrigin').value(0);
       sinon.stub(performance, 'now').callsFake(() => hrTimeToNanoseconds(time));
-
-      sinon.stub(core, 'hrTime').returns(time);
     });
 
     describe('when resources are empty', () => {
