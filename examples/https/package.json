@@ -1,7 +1,7 @@
 {
   "name": "https-example",
   "private": true,
-  "version": "0.25.0",
+  "version": "0.31.0",
   "description": "Example of HTTPs integration with OpenTelemetry",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -9,7 +9,10 @@
     "zipkin:server": "cross-env EXPORTER=zipkin node ./server.js",
     "zipkin:client": "cross-env EXPORTER=zipkin node ./client.js",
     "jaeger:server": "cross-env EXPORTER=jaeger node ./server.js",
-    "jaeger:client": "cross-env EXPORTER=jaeger node ./client.js"
+    "jaeger:client": "cross-env EXPORTER=jaeger node ./client.js",
+    "docker:start": "cd ./docker && docker-compose down && docker-compose up",
+    "docker:startd": "cd ./docker && docker-compose down && docker-compose up -d",
+    "docker:stop": "cd ./docker && docker-compose down"
   },
   "repository": {
     "type": "git",
@@ -29,15 +32,15 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/api": "^1.0.2",
-    "@opentelemetry/exporter-jaeger": "0.25.0",
-    "@opentelemetry/exporter-zipkin": "0.25.0",
-    "@opentelemetry/instrumentation": "0.25.0",
-    "@opentelemetry/instrumentation-http": "0.25.0",
-    "@opentelemetry/resources": "0.25.0",
-    "@opentelemetry/semantic-conventions": "0.25.0",
-    "@opentelemetry/sdk-trace-node": "0.25.0",
-    "@opentelemetry/sdk-trace-base": "0.25.0"
+    "@opentelemetry/api": "^1.0.0",
+    "@opentelemetry/exporter-jaeger": "1.5.0",
+    "@opentelemetry/exporter-zipkin": "1.5.0",
+    "@opentelemetry/instrumentation": "0.31.0",
+    "@opentelemetry/instrumentation-http": "0.31.0",
+    "@opentelemetry/resources": "1.5.0",
+    "@opentelemetry/semantic-conventions": "1.5.0",
+    "@opentelemetry/sdk-trace-node": "1.5.0",
+    "@opentelemetry/sdk-trace-base": "1.5.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/https",
   "devDependencies": {
