@@ -101,7 +101,9 @@ export class NodeSDK {
       );
     }
 
-    this.configureMeterProvider({ reader: configuration.metricReader, views: configuration.views });
+    if (configuration.metricReader || configuration.views) {
+      this.configureMeterProvider({ reader: configuration.metricReader, views: configuration.views });
+    }
 
     let instrumentations: InstrumentationOption[] = [];
     if (configuration.instrumentations) {
@@ -127,11 +129,11 @@ export class NodeSDK {
 
   /** Set configurations needed to register a MeterProvider */
   public configureMeterProvider(config: MeterProviderConfig): void {
-    if (config?.views && !config.reader) {
-      throw new Error('A list of views have been passed but the NodeSDK expects that the MeterProvider is manually instantiated and can\'t attach Views to the MeterProvider');
-    }
-
     this._meterProviderConfig = config;
+
+    if (!this._meterProviderConfig.reader && this._meterProviderConfig.views) {
+      throw new Error('You have not passed a MetricReader instance but have passed Views, you need to manually pass the Views to your MeterProvider instance.');
+    }
   }
 
   /** Detect resource attributes */

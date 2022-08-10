@@ -223,7 +223,27 @@ describe('Node SDK', () => {
           autoDetectResources: false,
         });
       }, (error: Error) => {
-        return error.message === 'A list of views have been passed but the NodeSDK expects that the MeterProvider is manually instantiated and can\'t attach Views to the MeterProvider';
+        return error.message === 'You have not passed a MetricReader instance but have passed Views, you need to manually pass the Views to your MeterProvider instance.';
+      });
+  });
+
+  it('should warn user when meter views are provided but not a MetricReader when calling configureMeterProvider', async () => {
+    assert.throws(
+      () => {
+        const sdk = new NodeSDK({
+          autoDetectResources: false,
+        });
+        sdk.configureMeterProvider({
+          views: [
+            new View({
+              name: 'test-view',
+              instrumentName: 'test_counter',
+              instrumentType: InstrumentType.COUNTER,
+            })
+          ],
+        })
+      }, (error: Error) => {
+        return error.message === 'You have not passed a MetricReader instance but have passed Views, you need to manually pass the Views to your MeterProvider instance.';
       });
   });
 
@@ -248,7 +268,7 @@ describe('Node SDK', () => {
               throw new Error('Buggy detector');
             }
           },
-          envDetector]
+            envDetector]
         });
         const resource = sdk['_resource'];
 
