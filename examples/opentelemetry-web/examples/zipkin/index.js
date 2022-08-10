@@ -1,6 +1,6 @@
-import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
-import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
-import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
+const { ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
+const { WebTracerProvider } = require('@opentelemetry/sdk-trace-web');
+const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 
 const provider = new WebTracerProvider();
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
