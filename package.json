@@ -59,7 +59,7 @@
     "linkinator": "3.0.3",
     "markdownlint-cli": "0.29.0",
     "semver": "7.3.5",
-    "typedoc": "0.22.10",
+    "typedoc": "0.23.10",
     "typescript": "4.7.4",
     "update-ts-references": "2.4.1"
   },
