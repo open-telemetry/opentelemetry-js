@@ -61,13 +61,9 @@ class Exporter extends OTLPExporterNodeBase<object,object> {
 }
 
 describe('force flush', () => {
-  describe('when flushing complete', () => {
-    it('should call an async callback', done => {
-      const exporter = new Exporter({});
-      exporter.forceFlush().then(() => {
-        done();
-      });
-    });
+  it('forceFlush should flush spans and return', async () => {
+    const exporter = new Exporter({});
+    await exporter.forceFlush();
   });
 });
 

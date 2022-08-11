@@ -168,13 +168,9 @@ describe('JaegerExporter', () => {
 
   describe('force flush', () => {
     let exporter: JaegerExporter;
-    describe('when flushing complete', () => {
-      it('should call an async callback', done => {
-        exporter = new JaegerExporter();
-        exporter.forceFlush().then(() => {
-          done();
-        });
-      });
+    it('forceFlush should flush spans and return', async () => {
+      exporter = new JaegerExporter();
+      await exporter.forceFlush();
     });
   });
 
