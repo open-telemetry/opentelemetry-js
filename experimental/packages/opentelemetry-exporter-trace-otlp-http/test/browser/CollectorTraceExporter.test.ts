@@ -146,12 +146,9 @@ describe('OTLPTraceExporter - web', () => {
           const spyLoggerError = sinon.stub(diag, 'error');
           stubBeacon.returns(true);
 
-          const callback = sinon.stub();
-          collectorTraceExporter.export(spans, callback);
+          collectorTraceExporter.export(spans, () => {});
 
           setTimeout(() => {
-            assert.deepStrictEqual(callback.args, [[{ code: ExportResultCode.SUCCESS }]]);
-
             const response: any = spyLoggerDebug.args[1][0];
             assert.strictEqual(response, 'sendBeacon - can send');
             assert.strictEqual(spyLoggerError.args.length, 0);
