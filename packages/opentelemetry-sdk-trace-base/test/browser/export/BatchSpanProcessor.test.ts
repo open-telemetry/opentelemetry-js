@@ -23,7 +23,7 @@ import { TestTracingSpanExporter } from '../../common/export/TestTracingSpanExpo
 const describeDocument = typeof document === 'object' ? describe : describe.skip;
 
 describeDocument('BatchSpanProcessor - web main context', () => {
-  let visibilityState: VisibilityState = 'visible';
+  let visibilityState: DocumentVisibilityState = 'visible';
   let exporter: SpanExporter;
   let processor: BatchSpanProcessor;
   let forceFlushSpy: sinon.SinonStub;

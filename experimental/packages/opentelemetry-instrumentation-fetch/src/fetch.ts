@@ -301,7 +301,16 @@ export class FetchInstrumentation extends InstrumentationBase<Promise<Response>>
         ...args: Parameters<typeof fetch>
       ): Promise<Response> {
         const self = this;
-        const url = web.parseUrl(args[0] instanceof Request ? args[0].url : args[0]).href;
+        let url: string
+        if (typeof args[0] === 'string') {
+          url = web.parseUrl(args[0]).href;
+        } else if (args[0] instanceof Request) {
+          url = web.parseUrl(args[0].url).href;
+        } else if (args[0] instanceof URL) {
+          url = args[0].href;
+        } else {
+          return original.apply(this, args);
+        }
 
         const options = args[0] instanceof Request ? args[0] : args[1] || {};
         const createdSpan = plugin._createSpan(url, options);
