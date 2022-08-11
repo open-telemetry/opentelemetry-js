@@ -554,9 +554,11 @@ describe('HttpInstrumentation', () => {
       }
 
       it('should have 1 ended span when request throw on bad "options" object', () => {
-        assert.throws(() => http.request({ headers: { cookie: undefined} }), err => {
+        assert.throws(() => http.request({ headers: { cookie: undefined} }), (err: unknown) => {
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
+
+          assert.ok(err instanceof Error);
 
           const validations = {
             httpStatusCode: undefined,
