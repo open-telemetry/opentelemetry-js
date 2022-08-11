@@ -57,10 +57,6 @@ jobs:
   node-windows-tests:
     strategy:
       fail-fast: false
-      matrix:
-        # Only run the latest LTS version to verify the test can be run on windows.
-        node_version:
-          - "16"
     runs-on: windows-latest
     env:
       NPM_CONFIG_UNSAFE_PERM: true
@@ -70,7 +66,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node_version }}
+          node-version: '16'
 
       - run: npm install -g npm@latest
 
@@ -85,7 +81,7 @@ jobs:
             packages/*/package-lock.json
             experimental/packages/*/node_modules
             experimental/packages/*/package-lock.json
-          key: node-windows-tests-${{ runner.os }}-${{ matrix.node_version }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}
+          key: node-windows-tests-${{ runner.os }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}
 
       - name: Bootstrap
         run: |
@@ -98,8 +94,6 @@ jobs:
 
       - name: Unit tests
         run: npm run test
-      - name: Report Coverage
-        run: npm run codecov
   browser-tests:
     runs-on: ubuntu-latest
     container:
