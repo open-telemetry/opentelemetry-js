@@ -60,7 +60,7 @@
     "markdownlint-cli": "0.29.0",
     "semver": "7.3.5",
     "typedoc": "0.22.10",
-    "typescript": "4.4.4",
+    "typescript": "4.7.4",
     "update-ts-references": "2.4.1"
   },
   "changelog": {
