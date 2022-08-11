@@ -1,13 +1,10 @@
 const { DiagConsoleLogger, DiagLogLevel, diag } = require('@opentelemetry/api');
+const { metrics } = require('@opentelemetry/api-metrics');
 const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-http');
-const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
-const { Resource } = require('@opentelemetry/resources');
-const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
+const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics-base');
 
 // Optional and only needed to see the internal diagnostic logging (during development)
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
-
-const metricExporter = new OTLPMetricExporter();
 
 let interval;
 let meter;
@@ -15,18 +12,22 @@ let meter;
 function stopMetrics() {
   console.log('STOPPING METRICS');
   clearInterval(interval);
-  meter.shutdown();
+  metrics.getMeterProvider().shutdown()
+    .then(() => metrics.disable());
 }
 
 function startMetrics() {
   console.log('STARTING METRICS');
-  meter = new MeterProvider({
-    exporter: metricExporter,
-    interval: 1000,
-    resource: new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: 'basic-metric-service',
-    }),
-  }).getMeter('example-exporter-collector');
+
+  const meterProvider = new MeterProvider();
+  metrics.setGlobalMeterProvider(meterProvider);
+
+  meterProvider.addMetricReader(new PeriodicExportingMetricReader({
+    exporter: new OTLPMetricExporter(),
+    exportIntervalMillis: 1000
+  }));
+
+  meter = meterProvider.getMeter('example-exporter-collector')
 
   const requestCounter = meter.createCounter('requests', {
     description: 'Example of a Counter',
@@ -36,11 +37,11 @@ function startMetrics() {
     description: 'Example of a UpDownCounter',
   });
 
-  const labels = { pid: process.pid, environment: 'staging' };
+  const attributes = { environment: 'staging' };
 
   interval = setInterval(() => {
-    requestCounter.add(1, labels);
-    upDownCounter.add(Math.random() > 0.5 ? 1 : -1, labels);
+    requestCounter.add(1, attributes);
+    upDownCounter.add(Math.random() > 0.5 ? 1 : -1, attributes);
   }, 1000);
 }
 

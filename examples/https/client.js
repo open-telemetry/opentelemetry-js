@@ -13,7 +13,7 @@ function makeRequest() {
   api.context.with(api.trace.setSpan(api.context.active(), span), () => {
     https.get({
       host: 'localhost',
-      port: 443,
+      port: 8443,
       path: '/helloworld',
     }, (response) => {
       const body = [];

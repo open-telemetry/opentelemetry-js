@@ -1,11 +1,11 @@
-import { context, trace } from '@opentelemetry/api';
-import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
-import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
-import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xml-http-request';
-import { ZoneContextManager } from '@opentelemetry/context-zone';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { B3Propagator } from '@opentelemetry/propagator-b3';
-import { registerInstrumentations } from '@opentelemetry/instrumentation';
+const { context, trace } = require('@opentelemetry/api');
+const { ConsoleSpanExporter, SimpleSpanProcessor } = require( '@opentelemetry/sdk-trace-base');
+const { WebTracerProvider } = require( '@opentelemetry/sdk-trace-web');
+const { XMLHttpRequestInstrumentation } = require( '@opentelemetry/instrumentation-xml-http-request');
+const { ZoneContextManager } = require( '@opentelemetry/context-zone');
+const { OTLPTraceExporter } = require( '@opentelemetry/exporter-trace-otlp-http');
+const { B3Propagator } = require( '@opentelemetry/propagator-b3');
+const { registerInstrumentations } = require( '@opentelemetry/instrumentation');
 
 const providerWithZone = new WebTracerProvider();
 
