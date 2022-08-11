@@ -19,7 +19,7 @@ import {
   OTLPMetricExporterBase,
   OTLPMetricExporterOptions
 } from '@opentelemetry/exporter-metrics-otlp-http';
-import { ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
+import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import {
   OTLPGRPCExporterConfigNode,
   OTLPGRPCExporterNodeBase,

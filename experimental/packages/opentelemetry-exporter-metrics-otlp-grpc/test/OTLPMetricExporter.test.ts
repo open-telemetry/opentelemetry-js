@@ -33,7 +33,7 @@ import {
   mockHistogram,
   mockObservableGauge, setUp, shutdown,
 } from './metricsHelper';
-import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
+import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import { IExportMetricsServiceRequest, IResourceMetrics } from '@opentelemetry/otlp-transformer';
 
 const metricsServiceProtoPath =
