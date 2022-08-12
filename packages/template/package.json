@@ -97,7 +97,7 @@
     "karma-coverage-istanbul-reporter": "3.0.3",
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.34",
-    "karma-webpack": "4.0.2",
+    "karma-webpack": "5.0.0",
     "ts-loader": "9.3.1",
     "webpack": "5.74.0"
   }
