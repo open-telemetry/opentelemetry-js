@@ -31,7 +31,7 @@ module.exports = {
         exclude: /(node_modules|\.test\.[tj]sx?$)/,
         test: /\.ts$/,
         use: {
-          loader: 'istanbul-instrumenter-loader',
+          loader: '@jsdevtools/coverage-istanbul-loader',
           options: { esModules: true }
         }
       },
