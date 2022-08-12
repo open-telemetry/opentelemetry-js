@@ -17,7 +17,8 @@
     "version": "node ../../scripts/version-update.js",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "npm run precompile",
-    "peer-api-check": "node ../../scripts/peer-api-check.js"
+    "peer-api-check": "node ../../scripts/peer-api-check.js",
+    "downlevel": "downlevel-dts . ts3.4"
   },
   "keywords": [
     "opentelemetry",
@@ -49,6 +50,7 @@
     "@types/mocha": "9.1.1",
     "@types/node": "18.6.5",
     "codecov": "3.8.3",
+    "downlevel-dts": "0.10.0",
     "mocha": "10.0.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
@@ -63,5 +65,12 @@
     "@opentelemetry/semantic-conventions": "1.5.0",
     "opentracing": "^0.14.4"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-shim-opentracing"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-shim-opentracing",
+  "typesVersions": {
+    "<4.0": {
+      "*": [
+        "ts3.4/*"
+      ]
+    }
+  }
 }

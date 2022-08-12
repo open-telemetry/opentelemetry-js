@@ -32,7 +32,8 @@
     "clean": "tsc --build --clean",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "npm run precompile",
-    "peer-api-check": "node ../../scripts/peer-api-check.js"
+    "peer-api-check": "node ../../scripts/peer-api-check.js",
+    "downlevel": "downlevel-dts . ts3.4"
   },
   "Add these to scripts": {
     "compile": "tsc --build",
@@ -78,6 +79,7 @@
   ],
   "devDependencies": {
     "@types/node": "18.6.5",
+    "downlevel-dts": "0.10.0",
     "typescript": "4.7.4"
   },
   "Add these to devDependencies for testing": {
@@ -100,5 +102,12 @@
     "karma-webpack": "4.0.2",
     "ts-loader": "8.4.0",
     "webpack": "4.46.0"
+  },
+  "typesVersions": {
+    "<4.0": {
+      "*": [
+        "ts3.4/*"
+      ]
+    }
   }
 }

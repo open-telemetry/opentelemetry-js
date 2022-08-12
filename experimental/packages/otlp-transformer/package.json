@@ -22,7 +22,8 @@
     "test:browser": "nyc karma start --single-run",
     "watch": "tsc --build -w tsconfig.all.json",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
-    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../"
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
+    "downlevel": "downlevel-dts . ts3.4"
   },
   "keywords": [
     "opentelemetry",
@@ -59,6 +60,7 @@
     "@types/mocha": "9.1.1",
     "@types/webpack-env": "1.16.3",
     "codecov": "3.8.3",
+    "downlevel-dts": "0.10.0",
     "istanbul-instrumenter-loader": "3.0.1",
     "karma": "6.3.16",
     "karma-chrome-launcher": "3.1.0",
@@ -83,5 +85,12 @@
     "@opentelemetry/sdk-metrics-base": "0.31.0",
     "@opentelemetry/sdk-trace-base": "1.5.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-transformer"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-transformer",
+  "typesVersions": {
+    "<4.0": {
+      "*": [
+        "ts3.4/*"
+      ]
+    }
+  }
 }

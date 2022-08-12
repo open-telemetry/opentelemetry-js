@@ -20,7 +20,8 @@
     "watch": "tsc --build --watch tsconfig.all.json",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "npm run precompile",
-    "peer-api-check": "node ../../scripts/peer-api-check.js"
+    "peer-api-check": "node ../../scripts/peer-api-check.js",
+    "downlevel": "downlevel-dts . ts3.4"
   },
   "keywords": [
     "opentelemetry",
@@ -62,6 +63,7 @@
     "@types/zone.js": "0.5.12",
     "babel-loader": "8.2.3",
     "codecov": "3.8.3",
+    "downlevel-dts": "0.10.0",
     "istanbul-instrumenter-loader": "3.0.1",
     "karma": "6.3.16",
     "karma-chrome-launcher": "3.1.0",
@@ -85,5 +87,12 @@
     "zone.js": "^0.10.2 || ^0.11.0"
   },
   "sideEffects": false,
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone-peer-dep"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone-peer-dep",
+  "typesVersions": {
+    "<4.0": {
+      "*": [
+        "ts3.4/*"
+      ]
+    }
+  }
 }

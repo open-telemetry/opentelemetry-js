@@ -9,7 +9,7 @@
     "watch": "tsc --build --watch",
     "clean": "tsc --build --clean",
     "postinstall": "npm run update-ts-references && npm run bootstrap",
-    "postcompile": "npm run submodule && npm run protos:copy",
+    "postcompile": "npm run submodule && npm run protos:copy && npm run downlevel",
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "protos:copy": "lerna run protos:copy",
     "version:update": "lerna run version:update",
@@ -35,7 +35,8 @@
     "lint:markdown": "./node_modules/.bin/markdownlint $(git ls-files '*.md') -i ./CHANGELOG.md",
     "lint:markdown:fix": "./node_modules/.bin/markdownlint $(git ls-files '*.md') -i ./CHANGELOG.md --fix",
     "reset": "lerna clean -y && rm -rf node_modules && npm i && npm run compile && npm run lint:fix",
-    "update-ts-references": "update-ts-references"
+    "update-ts-references": "update-ts-references",
+    "downlevel": "lerna run downlevel"
   },
   "repository": "open-telemetry/opentelemetry-js",
   "keywords": [
@@ -50,6 +51,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "5.3.1",
     "@typescript-eslint/parser": "5.3.1",
+    "downlevel-dts": "^0.10.0",
     "eslint": "7.32.0",
     "eslint-plugin-header": "3.1.1",
     "eslint-plugin-node": "11.1.0",
@@ -75,5 +77,12 @@
       "internal": ":house: (Internal)"
     },
     "cacheDir": ".changelog"
+  },
+  "typesVersions": {
+    "<4.0": {
+      "*": [
+        "ts3.4/*"
+      ]
+    }
   }
 }

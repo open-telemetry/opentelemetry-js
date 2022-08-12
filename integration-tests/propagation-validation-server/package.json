@@ -8,7 +8,8 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "scripts": {
-    "compile": "tsc --build"
+    "compile": "tsc --build",
+    "downlevel": "downlevel-dts . ts3.4"
   },
   "dependencies": {
     "@opentelemetry/api": "^1.0.0",
@@ -20,9 +21,17 @@
     "express": "4.17.1"
   },
   "devDependencies": {
+    "downlevel-dts": "0.10.0",
     "typescript": "4.7.4"
   },
   "engines": {
     "node": ">=14"
+  },
+  "typesVersions": {
+    "<4.0": {
+      "*": [
+        "ts3.4/*"
+      ]
+    }
   }
 }

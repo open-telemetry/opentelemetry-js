@@ -18,7 +18,8 @@
     "watch": "tsc --build --watch",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "node ../../../scripts/version-update.js",
-    "peer-api-check": "node ../../../scripts/peer-api-check.js"
+    "peer-api-check": "node ../../../scripts/peer-api-check.js",
+    "downlevel": "downlevel-dts . ts3.4"
   },
   "keywords": [
     "opentelemetry",
@@ -57,6 +58,7 @@
     "@types/semver": "7.3.9",
     "@types/sinon": "10.0.13",
     "codecov": "3.8.3",
+    "downlevel-dts": "0.10.0",
     "grpc": "1.24.11",
     "mocha": "10.0.0",
     "node-pre-gyp": "0.17.0",
@@ -75,5 +77,12 @@
     "@opentelemetry/instrumentation": "0.31.0",
     "@opentelemetry/semantic-conventions": "1.5.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-grpc"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-grpc",
+  "typesVersions": {
+    "<4.0": {
+      "*": [
+        "ts3.4/*"
+      ]
+    }
+  }
 }

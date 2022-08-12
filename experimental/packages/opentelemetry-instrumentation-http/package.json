@@ -18,7 +18,8 @@
     "watch": "tsc --build --watch",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "node ../../../scripts/version-update.js",
-    "peer-api-check": "node ../../../scripts/peer-api-check.js"
+    "peer-api-check": "node ../../../scripts/peer-api-check.js",
+    "downlevel": "downlevel-dts . ts3.4"
   },
   "keywords": [
     "opentelemetry",
@@ -58,6 +59,7 @@
     "@types/superagent": "4.1.13",
     "axios": "0.24.0",
     "codecov": "3.8.3",
+    "downlevel-dts": "0.10.0",
     "got": "9.6.0",
     "mocha": "10.0.0",
     "nock": "13.0.11",
@@ -79,5 +81,12 @@
     "@opentelemetry/semantic-conventions": "1.5.0",
     "semver": "^7.3.5"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-http"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-http",
+  "typesVersions": {
+    "<4.0": {
+      "*": [
+        "ts3.4/*"
+      ]
+    }
+  }
 }

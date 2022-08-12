@@ -18,7 +18,8 @@
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "npm run precompile",
     "peer-api-check": "node ../../../scripts/peer-api-check.js",
-    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../"
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
+    "downlevel": "downlevel-dts . ts3.4"
   },
   "keywords": [
     "opentelemetry",
@@ -55,6 +56,7 @@
     "@types/sinon": "10.0.13",
     "codecov": "3.8.3",
     "cpx": "1.5.0",
+    "downlevel-dts": "0.10.0",
     "mocha": "10.0.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
@@ -76,5 +78,12 @@
     "@opentelemetry/resources": "1.5.0",
     "@opentelemetry/sdk-metrics-base": "0.31.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-grpc"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-grpc",
+  "typesVersions": {
+    "<4.0": {
+      "*": [
+        "ts3.4/*"
+      ]
+    }
+  }
 }
