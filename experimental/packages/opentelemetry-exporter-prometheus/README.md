@@ -10,7 +10,7 @@ The OpenTelemetry Prometheus Metrics Exporter allows the user to send collected 
 ## Installation
 
 ```bash
-npm install --save @opentelemetry/sdk-metrics-base
+npm install --save @opentelemetry/sdk-metrics
 npm install --save @opentelemetry/exporter-prometheus
 ```
 
@@ -20,7 +20,7 @@ Create & register the exporter on your application.
 
 ```js
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
-const { MeterProvider }  = require('@opentelemetry/sdk-metrics-base');
+const { MeterProvider }  = require('@opentelemetry/sdk-metrics');
 
 // Add your port and startServer to the Prometheus options
 const options = {port: 9464, startServer: true};

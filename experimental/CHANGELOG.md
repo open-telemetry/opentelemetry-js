@@ -6,6 +6,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* Rename @opentelemetry/sdk-metrics-base package to @opentelemetry/sdk-metrics  [#](https://github.com/open-telemetry/opentelemetry-js/pull/) @hectorhdzg
+
 ### :rocket: (Enhancement)
 
 * feature(add-console-metrics-exporter): add ConsoleMetricExporter [#3120](https://github.com/open-telemetry/opentelemetry-js/pull/3120) @weyert

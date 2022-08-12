@@ -19,7 +19,7 @@ To get started you need to install the SDK and instrumentations, create a MeterP
 $ # Install metrics dependencies
 $ npm install \
     @opentelemetry/api-metrics \
-    @opentelemetry/sdk-metrics-base \
+    @opentelemetry/sdk-metrics \
     @opentelemetry/exporter-prometheus # add exporters as needed
 ```
 
@@ -35,7 +35,7 @@ To collect traces and metrics, you will have to tell the SDK where to export tel
 
 ```javascript
 const api = require("@opentelemetry/api-metrics");
-const { MeterProvider } = require("@opentelemetry/sdk-metrics-base");
+const { MeterProvider } = require("@opentelemetry/sdk-metrics");
 const { PrometheusExporter } = require("@opentelemetry/exporter-prometheus");
 
 const meterProvider = new MeterProvider({
