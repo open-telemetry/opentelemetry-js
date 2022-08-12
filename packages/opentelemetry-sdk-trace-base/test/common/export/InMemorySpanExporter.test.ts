@@ -81,10 +81,10 @@ describe('InMemorySpanExporter', () => {
   });
 
   describe('force flush', () => {
-      it('forceFlush should flush spans and return', async () => {
-        memoryExporter = new InMemorySpanExporter();
-        await memoryExporter.forceFlush();
-      });
+    it('forceFlush should flush spans and return', async () => {
+      memoryExporter = new InMemorySpanExporter();
+      await memoryExporter.forceFlush();
+    });
   });
 
   it('should return the success result', () => {
