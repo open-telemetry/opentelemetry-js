@@ -725,14 +725,16 @@ describe('HttpInstrumentation', () => {
         }
       });
 
-      it("should have 1 ended span when request doesn't listening response", done => {
+      it("should have 1 ended client span when request doesn't listening response", done => {
+        // nock doesn't emit close event.
         nock.cleanAll();
         nock.enableNetConnect();
-        const req = http.request(`${protocol}://${hostname}/`);
+
+        const req = http.request(`${protocol}://${hostname}:${serverPort}/`);
         req.on('close', () => {
-          const spans = memoryExporter.getFinishedSpans();
-          const [span] = spans;
+          const spans = memoryExporter.getFinishedSpans().filter(it => it.kind === SpanKind.CLIENT);
           assert.strictEqual(spans.length, 1);
+          const [span] = spans;
           assert.ok(Object.keys(span.attributes).length > 6);
           done();
         });
