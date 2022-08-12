@@ -54,6 +54,46 @@ jobs:
       - name: Report Coverage
         run: npm run codecov
         if: ${{ matrix.node_version == '14' }}
+  node-windows-tests:
+    strategy:
+      fail-fast: false
+    runs-on: windows-latest
+    env:
+      NPM_CONFIG_UNSAFE_PERM: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - run: npm install -g npm@latest
+
+      - name: restore lerna
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            package-lock.json
+            packages/*/node_modules
+            packages/*/package-lock.json
+            experimental/packages/*/node_modules
+            experimental/packages/*/package-lock.json
+          key: node-windows-tests-${{ runner.os }}-${{ hashFiles('package.json', 'packages/*/package.json', 'experimental/packages/*/package.json') }}
+
+      - name: Bootstrap
+        run: |
+          npm install --ignore-scripts
+          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js' --ignore @opentelemetry/selenium-tests
+
+      - name: Build 🔧
+        run: |
+          npm run compile
+
+      - name: Unit tests
+        run: npm run test
   browser-tests:
     runs-on: ubuntu-latest
     container:
