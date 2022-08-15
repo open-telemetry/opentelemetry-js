@@ -29,5 +29,9 @@ module.exports = {
   preprocessors: {
     'test/index-webpack*.ts': ['webpack']
   },
-  webpackMiddleware: { noInfo: true }
+  webpackMiddleware: { noInfo: true },
+  browserConsoleLogOptions: {
+    terminal: true,
+    level: ""
+  }
 };
