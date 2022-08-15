@@ -114,7 +114,7 @@ export const assertSpan = (
       } else {
         assert.strictEqual(
           span.attributes[
-          SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED
+            SemanticAttributes.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED
           ],
           contentLength
         );
@@ -157,7 +157,7 @@ export const assertSpan = (
       } else {
         assert.strictEqual(
           span.attributes[
-          SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
+            SemanticAttributes.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED
           ],
           contentLength
         );
