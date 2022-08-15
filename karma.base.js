@@ -30,8 +30,5 @@ module.exports = {
     'test/index-webpack*.ts': ['webpack']
   },
   webpackMiddleware: { noInfo: true },
-  browserConsoleLogOptions: {
-    terminal: true,
-    level: ""
-  }
+  logLevel: "DEBUG"
 };
