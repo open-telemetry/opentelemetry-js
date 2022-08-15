@@ -21,7 +21,7 @@ export class TestMetricExporter implements PushMetricExporter {
   resourceMetricsList: ResourceMetrics[] = [];
   export(resourceMetrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): void {
     this.resourceMetricsList.push(resourceMetrics);
-    process.nextTick(() => resultCallback({ code: ExportResultCode.SUCCESS }));
+    queueMicrotask(() => resultCallback({ code: ExportResultCode.SUCCESS }));
   }
 
   async forceFlush(): Promise<void> {}

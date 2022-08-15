@@ -15,7 +15,6 @@
  */
 
 const webpackNodePolyfills = require('./webpack.node-polyfills.js');
-const webpack = require('webpack');
 
 // This is the webpack configuration for browser Karma tests with coverage.
 module.exports = {
@@ -24,11 +23,6 @@ module.exports = {
   output: { filename: 'bundle.js' },
   resolve: { extensions: ['.ts', '.js'] },
   devtool: 'eval-source-map',
-  plugins: [
-    new webpack.ProvidePlugin({
-      process: 'process/browser',
-    }),
-  ],
   module: {
     rules: [
       { test: /\.ts$/, use: 'ts-loader' },

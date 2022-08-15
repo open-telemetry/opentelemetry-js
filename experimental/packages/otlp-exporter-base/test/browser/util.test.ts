@@ -16,7 +16,7 @@
 
 import * as sinon from 'sinon';
 import { sendWithXhr } from '../../src/platform/browser/util';
-import { nextTick } from 'process';
+import { queueMicrotask } from 'process';
 import { ensureHeadersContain } from '../testHelper';
 
 describe('util - browser', () => {
@@ -62,7 +62,7 @@ describe('util - browser', () => {
       });
       it('Request Headers should contain "Content-Type" header', done => {
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, expectedHeaders);
           clock.restore();
@@ -71,7 +71,7 @@ describe('util - browser', () => {
       });
       it('Request Headers should contain "Accept" header', done => {
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, expectedHeaders);
           clock.restore();
@@ -89,7 +89,7 @@ describe('util - browser', () => {
       });
       it('Request Headers should contain "Content-Type" header', done => {
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, expectedHeaders);
           clock.restore();
@@ -98,7 +98,7 @@ describe('util - browser', () => {
       });
       it('Request Headers should contain "Accept" header', done => {
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, expectedHeaders);
           clock.restore();
@@ -115,7 +115,7 @@ describe('util - browser', () => {
       });
       it('Request Headers should contain "Content-Type" header', done => {
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, expectedHeaders);
           clock.restore();
@@ -124,7 +124,7 @@ describe('util - browser', () => {
       });
       it('Request Headers should contain "Accept" header', done => {
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, expectedHeaders);
           clock.restore();
@@ -133,7 +133,7 @@ describe('util - browser', () => {
       });
       it('Request Headers should contain custom headers', done => {
 
-        nextTick(() => {
+        queueMicrotask(() => {
           const { requestHeaders } = server.requests[0];
           ensureHeadersContain(requestHeaders, customHeaders);
           clock.restore();
