@@ -447,7 +447,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       };
 
       const startTime = hrTime();
-      let metricAttributes: MetricAttributes = utils.getIncomingRequestMetricAttributes(spanAttributes, { component: component });
+      let metricAttributes: MetricAttributes = utils.getIncomingRequestMetricAttributes(spanAttributes);
 
       const ctx = propagation.extract(ROOT_CONTEXT, headers);
       const span = instrumentation._startHttpSpan(

@@ -85,7 +85,6 @@ describe('metrics', () => {
     assert.strictEqual(metrics[0].dataPoints[0].attributes[SemanticAttributes.HTTP_METHOD], 'GET');
     assert.strictEqual(metrics[0].dataPoints[0].attributes[SemanticAttributes.HTTP_FLAVOR], '1.1');
     assert.strictEqual(metrics[0].dataPoints[0].attributes[SemanticAttributes.NET_HOST_NAME], 'localhost');
-    assert.strictEqual(metrics[0].dataPoints[0].attributes[SemanticAttributes.HTTP_TARGET], '/test');
     assert.strictEqual(metrics[0].dataPoints[0].attributes[SemanticAttributes.HTTP_STATUS_CODE], 200);
     assert.strictEqual(metrics[0].dataPoints[0].attributes[SemanticAttributes.NET_HOST_PORT], 22346);
 
@@ -97,7 +96,6 @@ describe('metrics', () => {
     assert.strictEqual((metrics[1].dataPoints[0].value as any).count, requestCount);
     assert.strictEqual(metrics[1].dataPoints[0].attributes[SemanticAttributes.HTTP_METHOD], 'GET');
     assert.strictEqual(metrics[1].dataPoints[0].attributes[SemanticAttributes.NET_PEER_NAME], 'localhost');
-    assert.strictEqual(metrics[1].dataPoints[0].attributes[SemanticAttributes.HTTP_URL], 'http://localhost:22346/test');
     assert.strictEqual(metrics[1].dataPoints[0].attributes[SemanticAttributes.NET_PEER_PORT], 22346);
     assert.strictEqual(metrics[1].dataPoints[0].attributes[SemanticAttributes.HTTP_STATUS_CODE], 200);
     assert.strictEqual(metrics[1].dataPoints[0].attributes[SemanticAttributes.HTTP_FLAVOR], '1.1');

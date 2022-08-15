@@ -300,7 +300,7 @@ export const extractHostnameAndPort = (
   requestOptions: Pick<ParsedRequestOptions, 'hostname' | 'host' | 'port' | 'protocol'>
 ): { hostname: string, port: number | string } => {
   if (requestOptions.hostname && requestOptions.port) {
-    return {hostname: requestOptions.hostname, port: requestOptions.port};
+    return { hostname: requestOptions.hostname, port: requestOptions.port };
   }
   const matches = requestOptions.host?.match(/^([^:/ ]+)(:\d{1,5})?/) || null;
   const hostname = requestOptions.hostname || (matches === null ? 'localhost' : matches[1]);
@@ -313,7 +313,7 @@ export const extractHostnameAndPort = (
       port = requestOptions.protocol === 'https:' ? '443' : '80';
     }
   }
-  return {hostname, port};
+  return { hostname, port };
 };
 
 /**
@@ -359,7 +359,7 @@ export const getOutgoingRequestMetricAttributes = (
   const metricAttributes: MetricAttributes = {};
   metricAttributes[SemanticAttributes.HTTP_METHOD] = spanAttributes[SemanticAttributes.HTTP_METHOD];
   metricAttributes[SemanticAttributes.NET_PEER_NAME] = spanAttributes[SemanticAttributes.NET_PEER_NAME];
-  metricAttributes[SemanticAttributes.HTTP_URL] = spanAttributes[SemanticAttributes.HTTP_URL];
+  //TODO: http.url attribute, it should susbtitute any parameters to avoid high cardinality.
   return metricAttributes;
 };
 
@@ -451,6 +451,7 @@ export const getIncomingRequestAttributes = (
     [SemanticAttributes.HTTP_HOST]: host,
     [SemanticAttributes.NET_HOST_NAME]: hostname,
     [SemanticAttributes.HTTP_METHOD]: method,
+    [SemanticAttributes.HTTP_SCHEME]: options.component,
   };
 
   if (typeof ips === 'string') {
@@ -480,15 +481,14 @@ export const getIncomingRequestAttributes = (
  * @param {{ component: string }} options used to pass data needed to create attributes
  */
 export const getIncomingRequestMetricAttributes = (
-  spanAttributes: SpanAttributes,
-  options: { component: string }
+  spanAttributes: SpanAttributes
 ): MetricAttributes => {
   const metricAttributes: MetricAttributes = {};
-  metricAttributes[SemanticAttributes.HTTP_SCHEME] = options.component;
+  metricAttributes[SemanticAttributes.HTTP_SCHEME] = spanAttributes[SemanticAttributes.HTTP_SCHEME];
   metricAttributes[SemanticAttributes.HTTP_METHOD] = spanAttributes[SemanticAttributes.HTTP_METHOD];
   metricAttributes[SemanticAttributes.NET_HOST_NAME] = spanAttributes[SemanticAttributes.NET_HOST_NAME];
   metricAttributes[SemanticAttributes.HTTP_FLAVOR] = spanAttributes[SemanticAttributes.HTTP_FLAVOR];
-  metricAttributes[SemanticAttributes.HTTP_TARGET] = spanAttributes[SemanticAttributes.HTTP_TARGET];
+  //TODO: http.target attribute, it should susbtitute any parameters to avoid high cardinality.
   return metricAttributes;
 };
 
