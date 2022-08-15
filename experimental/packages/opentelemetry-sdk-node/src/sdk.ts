@@ -211,13 +211,15 @@ export class NodeSDK {
       });
     }
 
-    if (this._meterProviderConfig?.reader) {
+    if (this._meterProviderConfig) {
       const meterProvider = new MeterProvider({
         resource: this._resource,
         views: this._meterProviderConfig?.views ?? [],
       });
 
-      meterProvider.addMetricReader(this._meterProviderConfig.reader);
+      if (this._meterProviderConfig.reader) {
+        meterProvider.addMetricReader(this._meterProviderConfig.reader);
+      }
 
       this._meterProvider = meterProvider;
 
