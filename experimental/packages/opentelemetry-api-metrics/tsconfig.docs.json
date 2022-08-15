@@ -7,7 +7,7 @@
     "src/**/*.ts"
   ],
   "typedocOptions": {
-    "name": "OpenTelemetry Logs API for JavaScript",
+    "name": "OpenTelemetry API for JavaScript",
     "out": "docs/out",
     "mode": "file",
     "hideGenerator": true
