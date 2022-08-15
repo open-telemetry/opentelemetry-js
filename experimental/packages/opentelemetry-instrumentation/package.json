@@ -87,6 +87,7 @@
     "@types/sinon": "10.0.13",
     "@types/webpack-env": "1.17.0",
     "assert": "2.0.0",
+    "process": "0.11.10",
     "babel-loader": "8.2.3",
     "codecov": "3.8.3",
     "cpx": "1.5.0",

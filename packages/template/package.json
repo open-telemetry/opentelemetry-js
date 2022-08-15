@@ -93,6 +93,7 @@
     "@jsdevtools/coverage-istanbul-loader": "3.0.5",
     "@types/webpack-env": "1.17.0",
     "assert": "2.0.0",
+    "process": "0.11.10",
     "karma": "5.2.3",
     "karma-chrome-launcher": "3.1.1",
     "karma-coverage-istanbul-reporter": "3.0.3",
