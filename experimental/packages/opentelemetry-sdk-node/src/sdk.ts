@@ -102,7 +102,16 @@ export class NodeSDK {
     }
 
     if (configuration.metricReader || configuration.views) {
-      this.configureMeterProvider({ reader: configuration.metricReader, views: configuration.views });
+      const meterProviderConfig: MeterProviderConfig = {};
+      if (configuration.metricReader) {
+        meterProviderConfig.reader = configuration.metricReader;
+      }
+
+      if (configuration.views) {
+        meterProviderConfig.views = configuration.views;
+      }
+
+      this.configureMeterProvider(meterProviderConfig);
     }
 
     let instrumentations: InstrumentationOption[] = [];
@@ -129,10 +138,30 @@ export class NodeSDK {
 
   /** Set configurations needed to register a MeterProvider */
   public configureMeterProvider(config: MeterProviderConfig): void {
-    this._meterProviderConfig = config;
+    // nothing is set yet, we can set config and return.
+    if (this._meterProviderConfig == null) {
+      this._meterProviderConfig = config;
+      return;
+    }
 
-    if (!this._meterProviderConfig.reader && this._meterProviderConfig.views) {
-      throw new Error('You have not passed a MetricReader instance but have passed Views, you need to manually pass the Views to your MeterProvider instance.');
+    // make sure we do not override existing views with other views.
+    if (this._meterProviderConfig.views != null && config.views != null) {
+      throw new Error('Views passed but Views have already been configured.');
+    }
+
+    // set views, but make sure we do not override existing views with null/undefined.
+    if (config.views != null) {
+      this._meterProviderConfig.views = config.views;
+    }
+
+    // make sure we do not override existing reader with another reader.
+    if (this._meterProviderConfig.reader != null && config.reader != null) {
+      throw new Error('MetricReader passed but MetricReader has already been configured.');
+    }
+
+    // set reader, but make sure we do not override existing reader with null/undefined.
+    if (config.reader != null) {
+      this._meterProviderConfig.reader = config.reader;
     }
   }
 

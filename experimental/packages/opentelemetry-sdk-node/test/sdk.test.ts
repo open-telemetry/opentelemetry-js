@@ -209,44 +209,6 @@ describe('Node SDK', () => {
     await sdk.shutdown();
   });
 
-  it('should warn user when meter views are provided but not a MetricReader', async () => {
-    assert.throws(
-      () => {
-        new NodeSDK({
-          views: [
-            new View({
-              name: 'test-view',
-              instrumentName: 'test_counter',
-              instrumentType: InstrumentType.COUNTER,
-            })
-          ],
-          autoDetectResources: false,
-        });
-      }, (error: Error) => {
-        return error.message === 'You have not passed a MetricReader instance but have passed Views, you need to manually pass the Views to your MeterProvider instance.';
-      });
-  });
-
-  it('should warn user when meter views are provided but not a MetricReader when calling configureMeterProvider', async () => {
-    assert.throws(
-      () => {
-        const sdk = new NodeSDK({
-          autoDetectResources: false,
-        });
-        sdk.configureMeterProvider({
-          views: [
-            new View({
-              name: 'test-view',
-              instrumentName: 'test_counter',
-              instrumentType: InstrumentType.COUNTER,
-            })
-          ],
-        })
-      }, (error: Error) => {
-        return error.message === 'You have not passed a MetricReader instance but have passed Views, you need to manually pass the Views to your MeterProvider instance.';
-      });
-  });
-
   describe('detectResources', async () => {
     beforeEach(() => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
@@ -268,7 +230,7 @@ describe('Node SDK', () => {
               throw new Error('Buggy detector');
             }
           },
-            envDetector]
+          envDetector]
         });
         const resource = sdk['_resource'];
 
