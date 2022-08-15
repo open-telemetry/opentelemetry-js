@@ -147,20 +147,20 @@ describe('Node SDK', () => {
     });
   });
 
-  it('should register meter views when provided', async () => {
-    async function waitForNumberOfMetrics(exporter: InMemoryMetricExporter, numberOfMetrics: number): Promise<void> {
-      if (numberOfMetrics <= 0) {
-        throw new Error('numberOfMetrics must be greater than or equal to 0');
-      }
-
-      let totalExports = 0;
-      while (totalExports < numberOfMetrics) {
-        await new Promise(resolve => setTimeout(resolve, 20));
-        const exportedMetrics = exporter.getMetrics();
-        totalExports = exportedMetrics.length;
-      }
+  async function waitForNumberOfMetrics(exporter: InMemoryMetricExporter, numberOfMetrics: number): Promise<void> {
+    if (numberOfMetrics <= 0) {
+      throw new Error('numberOfMetrics must be greater than or equal to 0');
     }
 
+    let totalExports = 0;
+    while (totalExports < numberOfMetrics) {
+      await new Promise(resolve => setTimeout(resolve, 20));
+      const exportedMetrics = exporter.getMetrics();
+      totalExports = exportedMetrics.length;
+    }
+  }
+
+  it('should register meter views when provided', async () => {
     const exporter = new InMemoryMetricExporter(AggregationTemporality.CUMULATIVE);
     const metricReader = new PeriodicExportingMetricReader({
       exporter: exporter,
@@ -207,6 +207,71 @@ describe('Node SDK', () => {
     assert.ok(firstMetricRecord.descriptor.name === 'test-view', 'should have renamed counter metric');
 
     await sdk.shutdown();
+  });
+
+  it('should throw error when calling configureMeterProvider when views are already configured', () => {
+    const exporter = new InMemoryMetricExporter(AggregationTemporality.CUMULATIVE);
+    const metricReader = new PeriodicExportingMetricReader({
+      exporter: exporter,
+      exportIntervalMillis: 100,
+      exportTimeoutMillis: 100
+    });
+
+    const sdk = new NodeSDK({
+      metricReader: metricReader,
+      views: [
+        new View({
+          name: 'test-view',
+          instrumentName: 'test_counter',
+          instrumentType: InstrumentType.COUNTER,
+        })
+      ],
+      autoDetectResources: false,
+    });
+
+    assert.throws(() => {
+      sdk.configureMeterProvider({
+        reader: metricReader,
+        views: [
+          new View({
+            name: 'test-view',
+            instrumentName: 'test_counter',
+            instrumentType: InstrumentType.COUNTER,
+          })
+        ]
+      });
+    }, (error: Error) => {
+      return error.message.includes('Views passed but Views have already been configured');
+    });
+  });
+
+  it('should throw error when calling configureMeterProvider when metricReader is already configured', () => {
+    const exporter = new InMemoryMetricExporter(AggregationTemporality.CUMULATIVE);
+    const metricReader = new PeriodicExportingMetricReader({
+      exporter: exporter,
+      exportIntervalMillis: 100,
+      exportTimeoutMillis: 100
+    });
+
+    const sdk = new NodeSDK({
+      metricReader: metricReader,
+      views: [
+        new View({
+          name: 'test-view',
+          instrumentName: 'test_counter',
+          instrumentType: InstrumentType.COUNTER,
+        })
+      ],
+      autoDetectResources: false,
+    });
+
+    assert.throws(() => {
+      sdk.configureMeterProvider({
+        reader: metricReader,
+      });
+    }, (error: Error) => {
+      return error.message.includes('MetricReader passed but MetricReader has already been configured.');
+    });
   });
 
   describe('detectResources', async () => {
