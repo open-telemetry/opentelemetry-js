@@ -77,28 +77,28 @@
     "build/esnext/**/*.d.ts"
   ],
   "devDependencies": {
-    "@types/node": "14.17.33",
+    "@types/node": "18.6.5",
     "typescript": "4.4.4"
   },
   "Add these to devDependencies for testing": {
-    "@types/mocha": "8.2.0",
-    "@types/sinon": "9.0.9",
-    "codecov": "3.8.2",
-    "istanbul-instrumenter-loader": "3.0.1",
-    "mocha": "7.2.0",
+    "@types/mocha": "9.1.1",
+    "@types/sinon": "10.0.13",
+    "codecov": "3.8.3",
+    "mocha": "10.0.0",
     "nyc": "15.1.0",
-    "sinon": "9.2.2",
-    "ts-loader": "8.0.12",
-    "ts-mocha": "8.0.0"
+    "sinon": "14.0.0",
+    "ts-mocha": "10.0.0"
   },
   "Add these to devDependencies if browser is targeted": {
     "@types/webpack-env": "1.16.0",
+    "istanbul-instrumenter-loader": "3.0.1",
     "karma": "5.2.3",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage-istanbul-reporter": "3.0.3",
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "4.0.2",
+    "ts-loader": "8.4.0",
     "webpack": "4.46.0"
   }
 }
