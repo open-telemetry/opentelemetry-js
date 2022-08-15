@@ -1,11 +1,12 @@
-import { context, trace } from '@opentelemetry/api';
-import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
-import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch';
-import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xml-http-request';
-import { ZoneContextManager } from '@opentelemetry/context-zone';
-import { registerInstrumentations } from '@opentelemetry/instrumentation';
+const { context, trace } = require( '@opentelemetry/api');
+const { ConsoleSpanExporter, SimpleSpanProcessor } = require( '@opentelemetry/sdk-trace-base');
+const { OTLPTraceExporter } = require( '@opentelemetry/exporter-trace-otlp-http');
+const { WebTracerProvider } = require( '@opentelemetry/sdk-trace-web');
+const { FetchInstrumentation } = require( '@opentelemetry/instrumentation-fetch');
+const { XMLHttpRequestInstrumentation } = require( '@opentelemetry/instrumentation-xml-http-request');
+const { ZoneContextManager } = require( '@opentelemetry/context-zone');
+const { B3Propagator } = require( '@opentelemetry/propagator-b3');
+const { registerInstrumentations } = require( '@opentelemetry/instrumentation');
 
 const provider = new WebTracerProvider();
 
@@ -16,6 +17,7 @@ provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.addSpanProcessor(new SimpleSpanProcessor(new OTLPTraceExporter()));
 provider.register({
   contextManager: new ZoneContextManager(),
+  propagator: new B3Propagator(),
 });
 
 registerInstrumentations({
@@ -68,7 +70,7 @@ const prepareClickEvent = () => {
   const element1 = document.getElementById('button1');
   const element2 = document.getElementById('button2');
 
-  const clickHandler = (fetchFn) => {
+  const clickHandler = (fetchFn) => () => {
     const singleSpan = webTracerWithZone.startSpan('files-series-info');
     context.with(trace.setSpan(context.active(), singleSpan), () => {
       fetchFn(url).then((_data) => {
