@@ -16,7 +16,6 @@
 
 import * as sinon from 'sinon';
 import { sendWithXhr } from '../../src/platform/browser/util';
-import { queueMicrotask } from 'process';
 import { ensureHeadersContain } from '../testHelper';
 
 describe('util - browser', () => {
