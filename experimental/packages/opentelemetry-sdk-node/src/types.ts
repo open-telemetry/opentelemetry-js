@@ -18,7 +18,7 @@ import type { ContextManager, SpanAttributes } from '@opentelemetry/api';
 import { TextMapPropagator } from '@opentelemetry/api';
 import { InstrumentationOption } from '@opentelemetry/instrumentation';
 import { Resource } from '@opentelemetry/resources';
-import { MetricReader, View } from '@opentelemetry/sdk-metrics-base';
+import { MetricReader, View } from '@opentelemetry/sdk-metrics';
 import {
   Sampler,
   SpanExporter,

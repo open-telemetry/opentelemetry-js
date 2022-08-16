@@ -28,7 +28,7 @@ import {
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
 import { CompositePropagator } from '@opentelemetry/core';
-import { AggregationTemporality, ConsoleMetricExporter, InMemoryMetricExporter, InstrumentType, MeterProvider, PeriodicExportingMetricReader, View } from '@opentelemetry/sdk-metrics-base';
+import { AggregationTemporality, ConsoleMetricExporter, InMemoryMetricExporter, InstrumentType, MeterProvider, PeriodicExportingMetricReader, View } from '@opentelemetry/sdk-metrics';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   assertServiceResource,
