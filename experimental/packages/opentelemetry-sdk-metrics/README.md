@@ -13,7 +13,7 @@ It does **not** provide automated instrumentation of known libraries or host env
 
 ```bash
 npm install --save @opentelemetry/api-metrics
-npm install --save @opentelemetry/sdk-metrics-base
+npm install --save @opentelemetry/sdk-metrics
 ```
 
 ## Usage
@@ -22,7 +22,7 @@ The basic setup of the SDK can be seen as followings:
 
 ```js
 const opentelemetry = require('@opentelemetry/api-metrics');
-const { MeterProvider } = require('@opentelemetry/sdk-metrics-base');
+const { MeterProvider } = require('@opentelemetry/sdk-metrics');
 
 // To create an instrument, you first need to initialize the Meter provider.
 // NOTE: The default OpenTelemetry meter provider does not record any metric instruments.
@@ -88,5 +88,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[npm-url]: https://www.npmjs.com/package/@opentelemetry/sdk-metrics-base
+[npm-url]: https://www.npmjs.com/package/@opentelemetry/sdk-metrics
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fmetrics.svg

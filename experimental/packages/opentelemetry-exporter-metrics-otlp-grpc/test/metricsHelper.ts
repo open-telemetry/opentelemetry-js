@@ -25,7 +25,7 @@ import {
   MeterProvider,
   MetricReader,
   View,
-} from '@opentelemetry/sdk-metrics-base';
+} from '@opentelemetry/sdk-metrics';
 import { IKeyValue, IMetric, IResource } from '@opentelemetry/otlp-transformer';
 
 class TestMetricReader extends MetricReader {
