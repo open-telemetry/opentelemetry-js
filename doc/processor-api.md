@@ -11,7 +11,7 @@ Sometimes you may want to use a specific aggregator for one of your metric, expo
 Here is what an aggregator that does that would look like:
 
 ```ts
-import { Aggregator } from '@opentelemetry/sdk-metrics-base';
+import { Aggregator } from '@opentelemetry/sdk-metrics';
 import { hrTime } from '@opentelemetry/core';
 
 export class AverageAggregator implements Aggregator {
@@ -54,7 +54,7 @@ import {
   CounterSumAggregator,
   ObserverAggregator,
   MeasureExactAggregator,
-} from '@opentelemetry/sdk-metrics-base';
+} from '@opentelemetry/sdk-metrics';
 
 export class CustomProcessor extends UngroupedProcessor {
   aggregatorFor (metricDescriptor: MetricDescriptor) {
@@ -86,7 +86,7 @@ import {
   MeasureExactAggregator,
   MeterProvider,
   Aggregator,
-} from '@opentelemetry/sdk-metrics-base';
+} from '@opentelemetry/sdk-metrics';
 import { hrTime } from '@opentelemetry/core';
 
 export class AverageAggregator implements Aggregator {

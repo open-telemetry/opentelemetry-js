@@ -34,7 +34,7 @@
       "path": "../opentelemetry-instrumentation"
     },
     {
-      "path": "../opentelemetry-sdk-metrics-base"
+      "path": "../opentelemetry-sdk-metrics"
     }
   ]
 }

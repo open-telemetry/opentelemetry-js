@@ -128,7 +128,7 @@
       "path": "experimental/packages/opentelemetry-instrumentation"
     },
     {
-      "path": "experimental/packages/opentelemetry-sdk-metrics-base"
+      "path": "experimental/packages/opentelemetry-sdk-metrics"
     },
     {
       "path": "experimental/packages/opentelemetry-sdk-node"

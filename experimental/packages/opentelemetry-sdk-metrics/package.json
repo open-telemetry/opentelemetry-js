@@ -1,5 +1,5 @@
 {
-  "name": "@opentelemetry/sdk-metrics-base",
+  "name": "@opentelemetry/sdk-metrics",
   "version": "0.31.0",
   "description": "Work in progress OpenTelemetry metrics SDK",
   "main": "build/src/index.js",
@@ -82,5 +82,5 @@
     "@opentelemetry/resources": "1.5.0",
     "lodash.merge": "4.6.2"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-sdk-metrics-base"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-sdk-metrics"
 }
