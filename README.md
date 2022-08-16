@@ -228,7 +228,7 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 | Package                                         | Description                                                                                                                                                                                                                                           |
 | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [@opentelemetry/sdk-trace-base][otel-tracing]   | This module provides a full control over instrumentation and span creation. It doesn't load [`async_hooks`](https://nodejs.org/api/async_hooks.html) or any instrumentation by default. It is intended for use both on the server and in the browser. |
-| [@opentelemetry/sdk-metrics-base][otel-metrics] | This module provides instruments and meters for reporting of time series data.                                                                                                                                                                        |
+| [@opentelemetry/sdk-metrics][otel-metrics] | This module provides instruments and meters for reporting of time series data.                                                                                                                                                                        |
 | [@opentelemetry/sdk-trace-node][otel-node]      | This module provides automatic tracing for Node.js applications. It is intended for use on the server only.                                                                                                                                           |
 | [@opentelemetry/sdk-trace-web][otel-web]        | This module provides automated instrumentation and tracing for Web applications. It is intended for use in the browser only.                                                                                                                          |
 
@@ -540,7 +540,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [compliance-matrix]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/spec-compliance-matrix.md
 [CONTRIBUTING]: https://github.com/open-telemetry/opentelemetry-js/blob/main/CONTRIBUTING.md
 
-[otel-metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-sdk-metrics-base
+[otel-metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-sdk-metrics
 [otel-node]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node
 
 [otel-instrumentation-fetch]: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-fetch
