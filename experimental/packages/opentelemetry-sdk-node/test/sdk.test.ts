@@ -28,7 +28,7 @@ import {
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
 import { CompositePropagator } from '@opentelemetry/core';
-import { ConsoleMetricExporter, MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
+import { AggregationTemporality, ConsoleMetricExporter, InMemoryMetricExporter, InstrumentType, MeterProvider, PeriodicExportingMetricReader, View } from '@opentelemetry/sdk-metrics';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   assertServiceResource,
@@ -147,6 +147,133 @@ describe('Node SDK', () => {
     });
   });
 
+  async function waitForNumberOfMetrics(exporter: InMemoryMetricExporter, numberOfMetrics: number): Promise<void> {
+    if (numberOfMetrics <= 0) {
+      throw new Error('numberOfMetrics must be greater than or equal to 0');
+    }
+
+    let totalExports = 0;
+    while (totalExports < numberOfMetrics) {
+      await new Promise(resolve => setTimeout(resolve, 20));
+      const exportedMetrics = exporter.getMetrics();
+      totalExports = exportedMetrics.length;
+    }
+  }
+
+  it('should register meter views when provided', async () => {
+    const exporter = new InMemoryMetricExporter(AggregationTemporality.CUMULATIVE);
+    const metricReader = new PeriodicExportingMetricReader({
+      exporter: exporter,
+      exportIntervalMillis: 100,
+      exportTimeoutMillis: 100
+    });
+
+    const sdk = new NodeSDK({
+      metricReader: metricReader,
+      views: [
+        new View({
+          name: 'test-view',
+          instrumentName: 'test_counter',
+          instrumentType: InstrumentType.COUNTER,
+        })
+      ],
+      autoDetectResources: false,
+    });
+
+    await sdk.start();
+
+    assert.strictEqual(context['_getContextManager'](), ctxManager, 'context manager should not change');
+    assert.strictEqual(propagation['_getGlobalPropagator'](), propagator, 'propagator should not change');
+    assert.strictEqual((trace.getTracerProvider() as ProxyTracerProvider).getDelegate(), delegate, 'tracer provider should not have changed');
+
+    const meterProvider = metrics.getMeterProvider() as MeterProvider;
+    assert.ok(meterProvider);
+
+    const meter = meterProvider.getMeter('NodeSDKViews', '1.0.0');
+    const counter = meter.createCounter('test_counter', {
+      description: 'a test description',
+    });
+    counter.add(10);
+
+    await waitForNumberOfMetrics(exporter, 1);
+    const exportedMetrics = exporter.getMetrics();
+    const [firstExportedMetric] = exportedMetrics;
+    assert.ok(firstExportedMetric, 'should have one exported metric');
+    const [firstScopeMetric] = firstExportedMetric.scopeMetrics;
+    assert.ok(firstScopeMetric, 'should have one scope metric');
+    assert.ok(firstScopeMetric.scope.name === 'NodeSDKViews', 'scope should match created view');
+    assert.ok(firstScopeMetric.metrics.length > 0, 'should have at least one metrics entry');
+    const [firstMetricRecord] = firstScopeMetric.metrics;
+    assert.ok(firstMetricRecord.descriptor.name === 'test-view', 'should have renamed counter metric');
+
+    await sdk.shutdown();
+  });
+
+  it('should throw error when calling configureMeterProvider when views are already configured', () => {
+    const exporter = new InMemoryMetricExporter(AggregationTemporality.CUMULATIVE);
+    const metricReader = new PeriodicExportingMetricReader({
+      exporter: exporter,
+      exportIntervalMillis: 100,
+      exportTimeoutMillis: 100
+    });
+
+    const sdk = new NodeSDK({
+      metricReader: metricReader,
+      views: [
+        new View({
+          name: 'test-view',
+          instrumentName: 'test_counter',
+          instrumentType: InstrumentType.COUNTER,
+        })
+      ],
+      autoDetectResources: false,
+    });
+
+    assert.throws(() => {
+      sdk.configureMeterProvider({
+        reader: metricReader,
+        views: [
+          new View({
+            name: 'test-view',
+            instrumentName: 'test_counter',
+            instrumentType: InstrumentType.COUNTER,
+          })
+        ]
+      });
+    }, (error: Error) => {
+      return error.message.includes('Views passed but Views have already been configured');
+    });
+  });
+
+  it('should throw error when calling configureMeterProvider when metricReader is already configured', () => {
+    const exporter = new InMemoryMetricExporter(AggregationTemporality.CUMULATIVE);
+    const metricReader = new PeriodicExportingMetricReader({
+      exporter: exporter,
+      exportIntervalMillis: 100,
+      exportTimeoutMillis: 100
+    });
+
+    const sdk = new NodeSDK({
+      metricReader: metricReader,
+      views: [
+        new View({
+          name: 'test-view',
+          instrumentName: 'test_counter',
+          instrumentType: InstrumentType.COUNTER,
+        })
+      ],
+      autoDetectResources: false,
+    });
+
+    assert.throws(() => {
+      sdk.configureMeterProvider({
+        reader: metricReader,
+      });
+    }, (error: Error) => {
+      return error.message.includes('MetricReader passed but MetricReader has already been configured.');
+    });
+  });
+
   describe('detectResources', async () => {
     beforeEach(() => {
       process.env.OTEL_RESOURCE_ATTRIBUTES =
@@ -163,12 +290,12 @@ describe('Node SDK', () => {
           autoDetectResources: true,
         });
         await sdk.detectResources({
-          detectors: [ processDetector, {
+          detectors: [processDetector, {
             detect() {
               throw new Error('Buggy detector');
             }
           },
-          envDetector ]
+          envDetector]
         });
         const resource = sdk['_resource'];
 
@@ -277,7 +404,7 @@ describe('Node SDK', () => {
     });
 
     it('should configure service name via OTEL_SERVICE_NAME env var', async () => {
-      process.env.OTEL_SERVICE_NAME='env-set-name';
+      process.env.OTEL_SERVICE_NAME = 'env-set-name';
       const sdk = new NodeSDK();
 
       await sdk.start();
@@ -290,7 +417,7 @@ describe('Node SDK', () => {
     });
 
     it('should favor config set service name over OTEL_SERVICE_NAME env set service name', async () => {
-      process.env.OTEL_SERVICE_NAME='env-set-name';
+      process.env.OTEL_SERVICE_NAME = 'env-set-name';
       const sdk = new NodeSDK({
         serviceName: 'config-set-name',
       });
