@@ -69,7 +69,7 @@ describe('metrics', () => {
     for (let i = 0; i < requestCount; i++) {
       await httpRequest.get(`${protocol}://${hostname}:${serverPort}${pathname}`);
     }
-    await new Promise(resolve => setTimeout(resolve, 120));
+    await new Promise(resolve => setTimeout(resolve, 300));
     const resourceMetrics = metricsMemoryExporter.getMetrics();
     const scopeMetrics = resourceMetrics[0].scopeMetrics;
     assert.strictEqual(scopeMetrics.length, 1, 'scopeMetrics count');
