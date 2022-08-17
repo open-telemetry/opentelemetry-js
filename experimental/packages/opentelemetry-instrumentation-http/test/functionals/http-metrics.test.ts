@@ -19,7 +19,7 @@ import {
   InMemoryMetricExporter,
   MeterProvider,
   PeriodicExportingMetricReader,
-} from '@opentelemetry/sdk-metrics-base';
+} from '@opentelemetry/sdk-metrics';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
