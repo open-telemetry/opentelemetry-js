@@ -99,7 +99,7 @@
     "@opentelemetry/otlp-exporter-base": "0.31.0",
     "@opentelemetry/otlp-transformer": "0.31.0",
     "@opentelemetry/resources": "1.5.0",
-    "@opentelemetry/sdk-metrics-base": "0.31.0"
+    "@opentelemetry/sdk-metrics": "0.31.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-http"
 }

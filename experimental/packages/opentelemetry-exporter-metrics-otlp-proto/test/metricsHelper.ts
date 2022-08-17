@@ -29,7 +29,7 @@ import {
   MeterProvider,
   MetricReader,
   View
-} from '@opentelemetry/sdk-metrics-base';
+} from '@opentelemetry/sdk-metrics';
 import { IExportMetricsServiceRequest, IKeyValue, IMetric } from '@opentelemetry/otlp-transformer';
 import { Stream } from 'stream';
 

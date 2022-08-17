@@ -6,9 +6,12 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* Rename @opentelemetry/sdk-metrics-base package to @opentelemetry/sdk-metrics  [#3162](https://github.com/open-telemetry/opentelemetry-js/pull/3162) @hectorhdzg
+
 ### :rocket: (Enhancement)
 
 * feature(instrumentation-http): Add HTTP Server and Client duration Metrics in HTTP Node.js Instrumentation [#3149](https://github.com/open-telemetry/opentelemetry-js/pull/3149) @hectorhdzg
+* fix(add-views-to-node-sdk): added the ability to define meter views in `NodeSDK` [#3066](https://github.com/open-telemetry/opentelemetry-js/pull/3124) @weyert
 * feature(add-console-metrics-exporter): add ConsoleMetricExporter [#3120](https://github.com/open-telemetry/opentelemetry-js/pull/3120) @weyert
 * feature(prometheus-serialiser): export the unit block when unit is set in metric descriptor [#3066](https://github.com/open-telemetry/opentelemetry-js/pull/3041) @weyert
 

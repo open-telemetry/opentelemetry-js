@@ -21,7 +21,7 @@ import {
   InstrumentType,
   MetricData,
   ResourceMetrics
-} from '@opentelemetry/sdk-metrics-base';
+} from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import { createExportMetricsServiceRequest } from '../src/metrics';
 import { EAggregationTemporality } from '../src/metrics/types';
