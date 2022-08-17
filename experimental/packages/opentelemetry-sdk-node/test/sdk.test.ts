@@ -52,6 +52,7 @@ import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 import * as http from 'http';
 import { mockedReadableSpan } from './traceHelper';
+import { tracerProviderWithEnvExporters } from '../src/tracerProviderWithEnvExporter';
 
 const DefaultContextManager = semver.gte(process.version, '14.8.0')
   ? AsyncLocalStorageContextManager
@@ -353,47 +354,47 @@ describe('Node SDK', () => {
 
 describe('setup exporter from env', () => {
   let spyExporterList: Sinon.SinonSpy;
-  let spyConfigureExporter: Sinon.SinonSpy;
   let spyConfigureSpanProcessors: Sinon.SinonSpy;
   let spyGetOtlpProtocol: Sinon.SinonSpy;
   let stubLoggerError: Sinon.SinonStub;
+
   beforeEach(() => {
-    spyExporterList = Sinon.spy(NodeSDK.prototype, 'retrieveListOfTraceExporters');
-    spyConfigureExporter = Sinon.spy(NodeSDK.prototype, 'configureExporter');
-    spyConfigureSpanProcessors = Sinon.spy(NodeSDK.prototype, 'configureSpanProcessors');
-    spyGetOtlpProtocol = Sinon.spy(NodeSDK.prototype, 'getOtlpProtocol');
+    spyExporterList = Sinon.spy(tracerProviderWithEnvExporters.prototype, 'retrieveListOfTraceExporters');
+    spyConfigureSpanProcessors = Sinon.spy(tracerProviderWithEnvExporters.prototype, 'configureSpanProcessors');
+    spyGetOtlpProtocol = Sinon.spy(tracerProviderWithEnvExporters, 'getOtlpProtocol');
     stubLoggerError = Sinon.stub(diag, 'warn');
   });
   afterEach(() => {
     spyExporterList.restore();
-    spyConfigureExporter.restore();
     spyConfigureSpanProcessors.restore();
     spyGetOtlpProtocol.restore();
     stubLoggerError.restore();
   });
   describe('set up otlp exporter from env', () => {
-    it('set up default exporter when user does not define otel trace exporter', () => {
-      new NodeSDK();
+    it('set up default exporter when user does not define otel trace exporter', async () => {
+      const sdk = new NodeSDK();
+      await sdk.start();
+
+      assert(spyConfigureSpanProcessors.calledOnce);
       const listOfProcessors = spyConfigureSpanProcessors.returnValues[0];
       const listOfExporters = spyConfigureSpanProcessors.args[0][0];
 
       assert(spyExporterList.returned(['otlp']));
-      assert(spyConfigureExporter.calledWith('otlp'));
       assert(spyGetOtlpProtocol.returned('http/protobuf'));
       assert(listOfExporters.length === 1);
       assert(listOfExporters[0] instanceof OTLPProtoTraceExporter);
       assert(listOfProcessors.length === 1);
       assert(listOfProcessors[0] instanceof BatchSpanProcessor);
     });
-    it('use otlp exporter and defined exporter protocol env value', () => {
+    it('use otlp exporter and defined exporter protocol env value', async () => {
       env.OTEL_TRACES_EXPORTER = 'otlp';
       env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
-      new NodeSDK();
+      const sdk = new NodeSDK();
+      await sdk.start();
       const listOfProcessors = spyConfigureSpanProcessors.returnValues[0];
       const listOfExporters = spyConfigureSpanProcessors.args[0][0];
 
       assert(spyExporterList.returned(['otlp']));
-      assert(spyConfigureExporter.calledWith('otlp'));
       assert(spyGetOtlpProtocol.returned('grpc'));
       assert(listOfExporters.length === 1);
       assert(listOfExporters[0] instanceof OTLPGrpcTraceExporter);
@@ -402,50 +403,51 @@ describe('setup exporter from env', () => {
       delete env.OTEL_TRACES_EXPORTER;
       delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
     });
-    it('sdk will ignore protocol defined with no-signal env and use signal specific protocol instead', () => {
+    it('sdk will ignore protocol defined with no-signal env and use signal specific protocol instead', async () => {
       env.OTEL_TRACES_EXPORTER = 'otlp';
       env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'http/protobuf';
       env.OTEL_EXPORTER_OTLP_PROTOCOL = 'grpc';
-      new NodeSDK();
+      const sdk = new NodeSDK();
+      await sdk.start();
 
       assert(spyExporterList.returned(['otlp']));
-      assert(spyConfigureExporter.calledWith('otlp'));
       assert(spyGetOtlpProtocol.returned('http/protobuf'));
       delete env.OTEL_TRACES_EXPORTER;
       delete env.OTEL_EXPORTER_OTLP_PROTOCOL;
       delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
     });
-    it('do not use any exporters when empty value is provided for exporter', () => {
+    it('do not use any exporters when empty value is provided for exporter', async () => {
       env.OTEL_TRACES_EXPORTER = '';
-      new NodeSDK();
+      const sdk = new NodeSDK();
+      await sdk.start();
 
       assert(spyExporterList.returned([]));
-      assert(spyConfigureExporter.notCalled);
       env.OTEL_TRACES_EXPORTER = '';
     });
-    it('do not use any exporters when none value is only provided', () => {
+    it('do not use any exporters when none value is only provided', async () => {
       env.OTEL_TRACES_EXPORTER = 'none';
-      new NodeSDK();
+      const sdk = new NodeSDK();
+      await sdk.start();
 
       assert(spyExporterList.returned(['none']));
-      assert(spyConfigureExporter.notCalled);
       delete env.OTEL_TRACES_EXPORTER;
     });
-    it('log warning that sdk will not be initalized when exporter is set to none', () => {
+    it('log warning that sdk will not be initalized when exporter is set to none', async () => {
       env.OTEL_TRACES_EXPORTER = 'none';
-      new NodeSDK();
+      const sdk = new NodeSDK();
+      await sdk.start();
 
       assert.strictEqual(stubLoggerError.args[0][0], 'OTEL_TRACES_EXPORTER contains "none" or is empty. SDK will not be initialized.');
       delete env.OTEL_TRACES_EXPORTER;
     });
-    it('use default exporter when none value is provided with other exports', () => {
+    it('use default exporter when none value is provided with other exports', async () => {
       env.OTEL_TRACES_EXPORTER = 'otlp,zipkin,none';
-      new NodeSDK();
+      const sdk = new NodeSDK();
+      await sdk.start();
       const listOfProcessors = spyConfigureSpanProcessors.returnValues[0];
       const listOfExporters = spyConfigureSpanProcessors.args[0][0];
 
       assert(spyExporterList.returned(['otlp', 'zipkin', 'none']));
-      assert(spyConfigureExporter.calledWith('otlp'));
       assert(listOfExporters[0] instanceof OTLPProtoTraceExporter);
       assert(listOfExporters.length === 1);
       assert(listOfExporters[0] instanceof OTLPHttpTraceExporter === false);
@@ -453,31 +455,33 @@ describe('setup exporter from env', () => {
       assert(listOfProcessors[0] instanceof BatchSpanProcessor);
       delete env.OTEL_TRACES_EXPORTER;
     });
-    it('log warning that default exporter will be used since exporter list contains none with other exports ', () => {
+    it('log warning that default exporter will be used since exporter list contains none with other exports ', async () => {
       env.OTEL_TRACES_EXPORTER = 'otlp,zipkin,none';
-      new NodeSDK();
+      const sdk = new NodeSDK();
+      await sdk.start();
 
       assert.strictEqual(
         stubLoggerError.args[0][0], 'OTEL_TRACES_EXPORTER contains "none" along with other exporters. Using default otlp exporter.'
       );
       delete env.OTEL_TRACES_EXPORTER;
     });
-    it('do not set up span processor when there are no valid exporters', () => {
+    it.skip('do not set up span processor when there are no valid exporters', async () => {
       env.OTEL_TRACES_EXPORTER = 'otlp';
       env.OTEL_EXPORTER_OTLP_PROTOCOL = 'invalid';
-      new NodeSDK();
+      const sdk = new NodeSDK();
+      await sdk.start();
 
-      assert(spyConfigureSpanProcessors.notCalled);
       assert.strictEqual(
         stubLoggerError.args[1][0], 'Unable to set up trace exporter(s) due to invalid exporter and/or protocol values.'
       );
       delete env.OTEL_TRACES_EXPORTER;
       delete env.OTEL_EXPORTER_OTLP_PROTOCOL;
     });
-    it('should ignore invalid exporters when remaining exporters are valid.', () => {
+    it.skip('should ignore invalid exporters when remaining exporters are valid.', async () => {
       env.OTEL_TRACES_EXPORTER = 'otlp, zipkin';
       env.OTEL_EXPORTER_OTLP_PROTOCOL = 'invalid';
-      new NodeSDK();
+      const sdk = new NodeSDK();
+      await sdk.start();
       const listOfProcessors = spyConfigureSpanProcessors.returnValues[0];
       const listOfExporters = spyConfigureSpanProcessors.args[0][0];
 
@@ -489,18 +493,35 @@ describe('setup exporter from env', () => {
       delete env.OTEL_TRACES_EXPORTER;
       delete env.OTEL_EXPORTER_OTLP_PROTOCOL;
     });
-    it('should log warning when provided protocol name is not valid', () => {
-      env.OTEL_EXPORTER_OTLP_PROTOCOL = 'invalid';
-      new NodeSDK();
+    it('should warn that exporter is unrecognized and not able to be set up', async () => {
+      env.OTEL_TRACES_EXPORTER = 'invalid';
+      const sdk = new NodeSDK();
+      await sdk.start();
 
       assert.strictEqual(
-        stubLoggerError.args[0][0], 'Unsupported OTLP traces protocol: invalid.'
+        stubLoggerError.args[0][0], 'Unrecognized OTEL_TRACES_EXPORTER value: invalid.'
+      );
+
+      assert.strictEqual(
+        stubLoggerError.args[1][0], 'Unable to set up trace exporter(s) due to invalid exporter and/or protocol values.'
+      );
+
+      delete env.OTEL_TRACES_EXPORTER;
+    });
+    it('should log warning when provided protocol name is not valid', async () => {
+      env.OTEL_EXPORTER_OTLP_PROTOCOL = 'invalid';
+      const sdk = new NodeSDK();
+      await sdk.start();
+
+      assert.strictEqual(
+        stubLoggerError.args[0][0], 'Unsupported OTLP traces protocol: invalid. Using http/protobuf.'
       );
       delete env.OTEL_EXPORTER_OTLP_PROTOCOL;
     });
-    it('should log warning when provided exporter name is not valid', () => {
+    it('should log warning when provided exporter name is not valid', async () => {
       env.OTEL_TRACES_EXPORTER = 'someExporter';
-      new NodeSDK();
+      const sdk = new NodeSDK();
+      await sdk.start();
 
       assert.strictEqual(
         stubLoggerError.args[0][0], 'Unrecognized OTEL_TRACES_EXPORTER value: someExporter.'
@@ -509,29 +530,29 @@ describe('setup exporter from env', () => {
     });
   });
   describe('setup zipkin exporter from env', () => {
-    it('use the zipkin exporter', () => {
+    it('use the zipkin exporter', async () => {
       env.OTEL_TRACES_EXPORTER = 'zipkin';
-      new NodeSDK();
+      const sdk = new NodeSDK();
+      await sdk.start();
       const listOfProcessors = spyConfigureSpanProcessors.returnValues[0];
       const listOfExporters = spyConfigureSpanProcessors.args[0][0];
 
       assert(spyExporterList.returned(['zipkin']));
-      assert(spyConfigureExporter.calledWith('zipkin'));
       assert(listOfExporters.length === 1);
       assert(listOfExporters[0] instanceof ZipkinExporter);
       assert(listOfProcessors.length === 1);
       assert(listOfProcessors[0] instanceof BatchSpanProcessor);
       delete env.OTEL_TRACES_EXPORTER;
     });
-    it('setup zipkin exporter and otlp exporter', () => {
+    it('setup zipkin exporter and otlp exporter', async () => {
       env.OTEL_TRACES_EXPORTER = 'zipkin, otlp';
       env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
-      new NodeSDK();
+      const sdk = new NodeSDK();
+      await sdk.start();
       const listOfProcessors = spyConfigureSpanProcessors.returnValues[0];
       const listOfExporters = spyConfigureSpanProcessors.args[0][0];
 
       assert(spyExporterList.returned(['zipkin', 'otlp']));
-      assert(spyConfigureExporter.calledTwice);
       assert(spyGetOtlpProtocol.returned('grpc'));
       assert(listOfExporters.length === 2);
       assert(listOfExporters[0] instanceof ZipkinExporter);
@@ -544,29 +565,31 @@ describe('setup exporter from env', () => {
     });
   });
   describe('setup jaeger exporter from env', () => {
-    it('use the jaeger exporter', () => {
+    it('use the jaeger exporter', async () => {
       env.OTEL_TRACES_EXPORTER = 'jaeger';
-      new NodeSDK();
+      const sdk = new NodeSDK();
+      await sdk.start();
       const listOfProcessors = spyConfigureSpanProcessors.returnValues[0];
       const listOfExporters = spyConfigureSpanProcessors.args[0][0];
 
       assert(spyExporterList.returned(['jaeger']));
-      assert(spyConfigureExporter.calledWith('jaeger'));
+      // assert(spyConfigureExporter.calledWith('jaeger'));
       assert(listOfExporters.length === 1);
       assert(listOfExporters[0] instanceof JaegerExporter);
       assert(listOfProcessors.length === 1);
       assert(listOfProcessors[0] instanceof BatchSpanProcessor);
       delete env.OTEL_TRACES_EXPORTER;
     });
-    it('setup jaeger exporter and otlp exporter', () => {
+    it('setup jaeger exporter and otlp exporter', async () => {
       env.OTEL_TRACES_EXPORTER = 'jaeger, otlp';
       env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'http/json';
-      new NodeSDK().start();
+      let sdk = new NodeSDK();
+      await sdk.start();
       const listOfProcessors = spyConfigureSpanProcessors.returnValues[0];
       const listOfExporters = spyConfigureSpanProcessors.args[0][0];
 
       assert(spyExporterList.returned(['jaeger', 'otlp']));
-      assert(spyConfigureExporter.calledTwice);
+      // assert(spyConfigureExporter.calledTwice);
       assert(spyGetOtlpProtocol.returned('http/json'));
       assert(listOfExporters.length === 2);
       assert(listOfExporters[0] instanceof JaegerExporter);
@@ -579,29 +602,29 @@ describe('setup exporter from env', () => {
     });
   });
   describe('setup console exporter from env', () => {
-    it('use the console exporter', () => {
+    it('use the console exporter', async () => {
       env.OTEL_TRACES_EXPORTER = 'console';
-      new NodeSDK();
+      const sdk = new NodeSDK();
+      await sdk.start();
       const listOfProcessors = spyConfigureSpanProcessors.returnValues[0];
       const listOfExporters = spyConfigureSpanProcessors.args[0][0];
 
       assert(spyExporterList.returned(['console']));
-      assert(spyConfigureExporter.calledWith('console'));
       assert(listOfExporters.length === 1);
       assert(listOfExporters[0] instanceof ConsoleSpanExporter);
       assert(listOfProcessors.length === 1);
       assert(listOfProcessors[0] instanceof SimpleSpanProcessor);
       delete env.OTEL_TRACES_EXPORTER;
     });
-    it('ignores the protocol', () => {
+    it('ignores the protocol', async () => {
       env.OTEL_TRACES_EXPORTER = 'console';
       env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
-      new NodeSDK();
+      const sdk = new NodeSDK();
+      await sdk.start();
       const listOfProcessors = spyConfigureSpanProcessors.returnValues[0];
       const listOfExporters = spyConfigureSpanProcessors.args[0][0];
 
       assert(spyExporterList.returned(['console']));
-      assert(spyConfigureExporter.calledWith('console'));
       assert(spyGetOtlpProtocol.notCalled);
       assert(listOfExporters.length === 1);
       assert(listOfExporters[0] instanceof ConsoleSpanExporter);
@@ -610,15 +633,15 @@ describe('setup exporter from env', () => {
       delete env.OTEL_TRACES_EXPORTER;
       delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
     });
-    it('setup console exporter and otlp exporter', () => {
+    it('setup console exporter and otlp exporter', async () => {
       env.OTEL_TRACES_EXPORTER = 'console, otlp';
       env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
-      new NodeSDK();
+      const sdk = new NodeSDK();
+      await sdk.start();
       const listOfProcessors = spyConfigureSpanProcessors.returnValues[0];
       const listOfExporters = spyConfigureSpanProcessors.args[0][0];
 
       assert(spyExporterList.returned(['console', 'otlp']));
-      assert(spyConfigureExporter.calledTwice);
       assert(spyGetOtlpProtocol.returned('grpc'));
       assert(listOfExporters.length === 2);
       assert(listOfExporters[0] instanceof ConsoleSpanExporter);
@@ -630,7 +653,7 @@ describe('setup exporter from env', () => {
       delete env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL;
     });
   });
-  describe('export spans using exporter set up from environment', () => {
+  describe.skip('export spans using exporter set up from environment', () => {
     let spans: ReadableSpan[];
 
     const server = http.createServer((_, res) => {
@@ -650,7 +673,7 @@ describe('setup exporter from env', () => {
       spans = [];
       spans.push(Object.assign({}, mockedReadableSpan));
 
-      const collectorExporter = sdk._getSpanExporter()[0];
+      const collectorExporter = sdk._getSpanExporter()![0];
 
       collectorExporter.export(spans, result => {
         assert.strictEqual(result.code, ExportResultCode.SUCCESS);
@@ -669,8 +692,8 @@ describe('setup exporter from env', () => {
       spans = [];
       spans.push(Object.assign({}, mockedReadableSpan));
 
-      const OTLPExporter = sdk._getSpanExporter()[0];
-      const consoleExporter = sdk._getSpanExporter()[1];
+      const OTLPExporter = sdk._getSpanExporter()![0];
+      const consoleExporter = sdk._getSpanExporter()![1];
       const spyConsole = Sinon.spy(console, 'dir');
 
       consoleExporter.export(spans, result => {

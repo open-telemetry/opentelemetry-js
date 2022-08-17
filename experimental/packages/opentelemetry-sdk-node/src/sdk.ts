@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ContextManager, TextMapPropagator, diag } from '@opentelemetry/api';
+import { ContextManager, TextMapPropagator } from '@opentelemetry/api';
 import { metrics } from '@opentelemetry/api-metrics';
 import {
   InstrumentationOption,
@@ -32,18 +32,11 @@ import {
   BatchSpanProcessor,
   SpanProcessor,
   SpanExporter,
-  SimpleSpanProcessor,
-  ConsoleSpanExporter
 } from '@opentelemetry/sdk-trace-base';
 import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
-import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
-import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
-import { OTLPTraceExporter as OTLPHttpTraceExporter} from '@opentelemetry/exporter-trace-otlp-http';
-import { OTLPTraceExporter as OTLPGrpcTraceExporter} from '@opentelemetry/exporter-trace-otlp-grpc';
-import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
-import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
+import { tracerProviderWithEnvExporters } from './tracerProviderWithEnvExporter';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 export class NodeSDK {
@@ -60,9 +53,8 @@ export class NodeSDK {
   private _tracerProvider?: NodeTracerProvider;
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
-  private _spanProcessors?: (BatchSpanProcessor | SimpleSpanProcessor)[];
-  private _configuredExporters: SpanExporter[] = [];
-  private DATA_TYPE_TRACES = 'traces';
+  private _tracerProviderWithEnvExporters?: tracerProviderWithEnvExporters;
+  private _useEnvExporters = false;
 
   /**
    * Create a new NodeJS SDK instance
@@ -95,7 +87,7 @@ export class NodeSDK {
         configuration.textMapPropagator
       );
     } else {
-      this.createTraceExportersFromEnv();
+      this._useEnvExporters = true;
     }
 
     if (configuration.metricReader) {
@@ -107,108 +99,6 @@ export class NodeSDK {
       instrumentations = configuration.instrumentations;
     }
     this._instrumentations = instrumentations;
-  }
-
-  private createTraceExportersFromEnv() {
-    let traceExportersList = this.retrieveListOfTraceExporters();
-
-    if (traceExportersList.length === 0 || traceExportersList[0] === 'none') {
-      diag.warn('OTEL_TRACES_EXPORTER contains "none" or is empty. SDK will not be initialized.');
-    } else {
-      if (traceExportersList.length > 1 && traceExportersList.includes('none')) {
-        diag.warn('OTEL_TRACES_EXPORTER contains "none" along with other exporters. Using default otlp exporter.');
-        traceExportersList = ['otlp'];
-      }
-
-      // const configuredExporters: SpanExporter[] = [];
-
-      traceExportersList.forEach(exporterName => {
-        const exporter =  this.configureExporter(exporterName);
-        if (exporter) {
-          this._configuredExporters.push(exporter);
-        }
-      });
-
-      if (this._configuredExporters.length > 0) {
-        this._spanProcessors = this.configureSpanProcessors(this._configuredExporters);
-      } else {
-        diag.warn('Unable to set up trace exporter(s) due to invalid exporter and/or protocol values.');
-      }
-    }
-  }
-
-  // visible for testing
-  public retrieveListOfTraceExporters(): string[] {
-    const traceList = getEnv().OTEL_TRACES_EXPORTER.split(',');
-    const uniqueTraceExporters =  Array.from(new Set(traceList));
-
-    return this.filterBlanksAndNulls(uniqueTraceExporters);
-  }
-
-  private filterBlanksAndNulls(list: string[]): string[] {
-    return list.map(item => item.trim())
-      .filter(s => s !== 'null' && s !== '');
-  }
-
-  // visible for testing
-  public configureExporter(name: string): SpanExporter | null {
-    switch (name) {
-      case 'otlp':
-        return this.configureOtlp();
-      case 'zipkin':
-        return new ZipkinExporter();
-      case 'jaeger':
-        return new JaegerExporter();
-      case 'console':
-        return new ConsoleSpanExporter();
-      default:
-        diag.warn(`Unrecognized OTEL_TRACES_EXPORTER value: ${name}.`);
-        return null;
-    }
-  }
-
-  // visible for testing
-  public configureOtlp(): SpanExporter | null {
-    const protocol = this.getOtlpProtocol(this.DATA_TYPE_TRACES);
-
-    switch (protocol) {
-      case 'grpc':
-        return new OTLPGrpcTraceExporter();
-      case 'http/json':
-        return new OTLPHttpTraceExporter();
-      case 'http/protobuf':
-        return new OTLPProtoTraceExporter();
-      default:
-        diag.warn(`Unsupported OTLP traces protocol: ${protocol}.`);
-        return null;
-    }
-  }
-
-  // visible for testing
-  public getOtlpProtocol(dataType: string): string | null {
-    const parsedEnvValues = getEnvWithoutDefaults();
-
-    switch (dataType) {
-      case 'traces':
-        return parsedEnvValues.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL ??
-          parsedEnvValues.OTEL_EXPORTER_OTLP_PROTOCOL ??
-          getEnv().OTEL_EXPORTER_OTLP_TRACES_PROTOCOL ??
-          getEnv().OTEL_EXPORTER_OTLP_PROTOCOL;
-      default:
-        diag.warn(`Data type not recognized: ${dataType}`);
-        return null;
-    }
-  }
-
-  // visible for testing
-  public configureSpanProcessors(exporters: SpanExporter[]): (BatchSpanProcessor | SimpleSpanProcessor)[] {
-    return exporters.map(exporter => {
-      if (exporter instanceof ConsoleSpanExporter) {
-        return new SimpleSpanProcessor(exporter);
-      } else {
-        return new BatchSpanProcessor(exporter);
-      }
-    });
   }
 
   /** Set configurations required to register a NodeTracerProvider */
@@ -275,15 +165,19 @@ export class NodeSDK {
         contextManager: this._tracerProviderConfig.contextManager,
         propagator: this._tracerProviderConfig.textMapPropagator,
       });
-    } else if (this._spanProcessors) {
-      const tracerProvider = new NodeTracerProvider();
-      this._tracerProvider = tracerProvider;
-
-      this._spanProcessors.forEach(processor => {
-        this._tracerProvider?.addSpanProcessor(processor);
+    } else if (this._useEnvExporters) {
+      this._tracerProviderWithEnvExporters = new tracerProviderWithEnvExporters({
+        resource: this._resource
       });
+      this._tracerProvider = this._tracerProviderWithEnvExporters;
 
-      tracerProvider.register();
+      if (this._tracerProviderWithEnvExporters._spanProcessors) {
+        this._tracerProviderWithEnvExporters._spanProcessors.forEach(processor => {
+          this._tracerProviderWithEnvExporters?.addSpanProcessor(processor);
+        });
+
+        this._tracerProviderWithEnvExporters?.register();
+      }
     }
 
     if (this._metricReader) {
@@ -320,8 +214,8 @@ export class NodeSDK {
     );
   }
 
-  // visible for testing
-  public _getSpanExporter(): SpanExporter[] {
-    return this._configuredExporters;
+  // added for testing
+  public _getSpanExporter(): SpanExporter[] | undefined {
+    return this._tracerProviderWithEnvExporters?._configuredExporters
   }
 }
