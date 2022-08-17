@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
+import type { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import type { IExportMetricsServiceRequest } from './types';
 import { toResourceMetrics } from './internal';
 

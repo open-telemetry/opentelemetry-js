@@ -17,7 +17,7 @@
 import { Meter, ObservableResult } from '@opentelemetry/api-metrics';
 import {
   MeterProvider,
-} from '@opentelemetry/sdk-metrics-base';
+} from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as http from 'http';

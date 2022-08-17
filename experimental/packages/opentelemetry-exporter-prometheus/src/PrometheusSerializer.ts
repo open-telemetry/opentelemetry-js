@@ -23,7 +23,7 @@ import {
   MetricData,
   DataPoint,
   Histogram,
-} from '@opentelemetry/sdk-metrics-base';
+} from '@opentelemetry/sdk-metrics';
 import type {
   MetricAttributes,
   MetricAttributeValue
