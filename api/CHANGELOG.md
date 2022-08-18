@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0](https://www.github.com/open-telemetry/opentelemetry-js-api/compare/v1.1.0...v1.2.0) (2022-08-09)
+
+
+### Features
+
+* Add getActiveSpan to trace API ([#163](https://www.github.com/open-telemetry/opentelemetry-js-api/issues/163)) ([17ccb3a](https://www.github.com/open-telemetry/opentelemetry-js-api/commit/17ccb3a4e385bc5769ded6fc742c9782a93244a5))
+* deprecate Sampler ([#166](https://www.github.com/open-telemetry/opentelemetry-js-api/issues/166)) ([313b2e2](https://www.github.com/open-telemetry/opentelemetry-js-api/commit/313b2e2225f246a6a9518ec4da6942f7d61babce))
+
 ## [1.1.0](https://www.github.com/open-telemetry/opentelemetry-js-api/compare/v1.0.4...v1.1.0) (2022-01-25)
 
 
