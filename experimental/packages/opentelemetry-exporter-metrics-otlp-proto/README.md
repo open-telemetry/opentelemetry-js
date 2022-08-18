@@ -21,7 +21,7 @@ To see sample code and documentation for the traces exporter, visit the [Collect
 ## Metrics in Node - PROTO over http
 
 ```js
-const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics-base');
+const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
 const { OTLPMetricExporter } =  require('@opentelemetry/exporter-metrics-otlp-proto');
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics

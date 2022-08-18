@@ -22,7 +22,7 @@
       "path": "../opentelemetry-api-metrics"
     },
     {
-      "path": "../opentelemetry-sdk-metrics-base"
+      "path": "../opentelemetry-sdk-metrics"
     }
   ]
 }

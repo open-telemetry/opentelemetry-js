@@ -23,7 +23,7 @@ To see sample code and documentation for the traces exporter, visit the [Collect
 The OTLPMetricExporter in Web expects the endpoint to end in `/v1/metrics`.
 
 ```js
-import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics-base';
+import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
@@ -47,7 +47,7 @@ counter.add(10, { 'key': 'value' });
 ## Metrics in Node
 
 ```js
-const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics-base');
+const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
 const { OTLPMetricExporter } =  require('@opentelemetry/exporter-metrics-otlp-http');
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics

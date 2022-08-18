@@ -128,6 +128,10 @@ Configure a trace exporter. If an exporter OR span processor is not configured, 
 
 Configure tracing parameters. These are the same trace parameters used to [configure a tracer](../../../packages/opentelemetry-sdk-trace-base/src/types.ts#L71).
 
+### views
+
+Configure views of your instruments and accepts an array of [View](../opentelemetry-sdk-metrics-base/src/view/View.ts)-instances. The parameter can be used to configure the explicit bucket sizes of histogram metrics.
+
 ### serviceName
 
 Configure the [service name](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service).

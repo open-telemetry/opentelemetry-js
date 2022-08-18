@@ -27,7 +27,7 @@ import {
   MetricReader,
   SumAggregation,
   View,
-} from '@opentelemetry/sdk-metrics-base';
+} from '@opentelemetry/sdk-metrics';
 import * as sinon from 'sinon';
 import { PrometheusSerializer } from '../src';
 import { mockedHrTimeMs, mockHrTime } from './util';

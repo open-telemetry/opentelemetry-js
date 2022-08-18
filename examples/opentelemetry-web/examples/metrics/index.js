@@ -1,7 +1,7 @@
 const { DiagConsoleLogger, DiagLogLevel, diag } = require('@opentelemetry/api');
 const { metrics } = require('@opentelemetry/api-metrics');
 const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-http');
-const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics-base');
+const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
 
 // Optional and only needed to see the internal diagnostic logging (during development)
 diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG);
