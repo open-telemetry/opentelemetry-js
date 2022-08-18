@@ -1,0 +1,26 @@
+{
+  "name": "@opentelemetry/exporter-logs-otlp-http",
+  "version": "0.0.1",
+  "description": "",
+  "main": "build/esm/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-telemetry/opentelemetry-js.git"
+  },
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+  "dependencies": {
+    "@opentelemetry/api-logs": "file:../opentelemetry-api-logs",
+    "@opentelemetry/otlp-exporter-base": "^0.29.0",
+    "@opentelemetry/otlp-transformer": "^0.29.0",
+    "@opentelemetry/resources": "^1.2.0",
+    "@opentelemetry/sdk-logs-base": "file:../opentelemetry-sdk-logs-base"
+  }
+}
