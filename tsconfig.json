@@ -89,6 +89,9 @@
       "path": "packages/template"
     },
     {
+      "path": "experimental/packages/api-logs"
+    },
+    {
       "path": "experimental/packages/exporter-trace-otlp-grpc"
     },
     {
