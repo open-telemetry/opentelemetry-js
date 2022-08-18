@@ -13,14 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export function hexToBase64(hexStr: string): string {
-  const hexStrLen = hexStr.length;
-  let hexAsciiCharsStr = '';
-  for (let i = 0; i < hexStrLen; i += 2) {
-    const hexPair = hexStr.substring(i, i + 2);
-    const hexVal = parseInt(hexPair, 16);
-    hexAsciiCharsStr += String.fromCharCode(hexVal);
+function intValue(charCode: number): number {
+  // 0-9
+  if (charCode >= 48 && charCode <= 57) {
+    return charCode - 48;
   }
 
-  return Buffer.from(hexAsciiCharsStr, 'ascii').toString('base64');
+  // a-f
+  if (charCode >= 97 && charCode <= 102) {
+    return charCode - 87;
+  }
+
+  // A-F
+  return charCode - 55;
+}
+
+export function hexToBase64(hexStr: string): string {
+  const buf = Buffer.alloc(hexStr.length / 2);
+  let offset = 0;
+
+  for (let i = 0; i < hexStr.length; i += 2) {
+    const hi = intValue(hexStr.charCodeAt(i));
+    const lo = intValue(hexStr.charCodeAt(i + 1));
+    buf.writeUInt8((hi << 4) | lo, offset++);
+  }
+
+  return buf.toString('base64');
 }
