@@ -114,11 +114,7 @@ export abstract class OTLPExporterBase<
    * Exports any pending spans in the exporter
    */
   forceFlush(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      Promise.all(this._sendingPromises).then(() => {
-        resolve();
-      }, reject);
-    });
+    return Promise.all(this._sendingPromises).then(() => {});
   }
 
   /**
