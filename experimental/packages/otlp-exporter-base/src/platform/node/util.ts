@@ -56,7 +56,8 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
     reqIsDestroyed = true;
     // req.abort() was deprecated since v14
     if (nodeVersion >= 14) {
-      req.destroy();
+      // req.destroy();
+      req.abort();
     } else {
       req.abort();
     }
@@ -91,13 +92,16 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
       });
   
       res.on('end', () => {
-        if (!reqIsDestroyed) {
+        if (reqIsDestroyed === undefined) {
           if (res.statusCode && res.statusCode < 299) {
             diag.debug(`statusCode: ${res.statusCode}`, responseData);
             onSuccess();
+               // clear all timers since request was completed and promise was resolved
+           clearTimeout(exporterTimer);
+           clearTimeout(retryTimer);
           } else if (res.statusCode && isRetryable(res.statusCode) && retries > 0) {
             retryTimer = setTimeout(() => {
-              return sendWithRetry(retries - 1, backoffMillis * DEFAULT_BACKOFF_MULTIPLIER);
+              sendWithRetry(retries - 1, backoffMillis * DEFAULT_BACKOFF_MULTIPLIER);
             }, backoffMillis);
           } else {
             const error = new OTLPExporterError(
@@ -106,10 +110,10 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
               responseData
             );
             onError(error);
-          }
-           // clear all timers since request was completed and promise was resolved
+               // clear all timers since request was completed and promise was resolved
            clearTimeout(exporterTimer);
            clearTimeout(retryTimer);
+          }
         }
       });
     });
@@ -126,7 +130,18 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
       clearTimeout(exporterTimer);
       clearTimeout(retryTimer);
     });
-    
+
+    req.on('abort', () => {
+      if (reqIsDestroyed) {
+        const err = new OTLPExporterError(
+          'Request Timeout'
+        );
+        onError(err);
+      }
+      clearTimeout(exporterTimer);
+      clearTimeout(retryTimer);
+    });
+
     switch (collector.compression) {
       case CompressionAlgorithm.GZIP: {
         req.setHeader('Content-Encoding', 'gzip');
@@ -145,7 +160,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
   sendWithRetry();
 }
 
-function isRetryable(statusCode: number) {
+function isRetryable(statusCode: number): boolean {
   const retryCodes = [429, 502, 503, 504];
 
   return retryCodes.includes(statusCode);
