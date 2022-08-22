@@ -216,6 +216,6 @@ export class NodeSDK {
 
   // added for testing
   public _getSpanExporter(): SpanExporter[] | undefined {
-    return this._tracerProviderWithEnvExporters?._configuredExporters
+    return this._tracerProviderWithEnvExporters?._configuredExporters;
   }
 }

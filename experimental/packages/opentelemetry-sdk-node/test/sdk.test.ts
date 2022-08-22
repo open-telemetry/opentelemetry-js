@@ -583,7 +583,7 @@ describe('setup exporter from env', () => {
     it('setup jaeger exporter and otlp exporter', async () => {
       env.OTEL_TRACES_EXPORTER = 'jaeger, otlp';
       env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'http/json';
-      let sdk = new NodeSDK();
+      const sdk = new NodeSDK();
       await sdk.start();
       const listOfProcessors = spyConfigureSpanProcessors.returnValues[0];
       const listOfExporters = spyConfigureSpanProcessors.args[0][0];

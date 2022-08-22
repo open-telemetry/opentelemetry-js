@@ -64,12 +64,13 @@ export class tracerProviderWithEnvExporters extends NodeTracerProvider {
 
   protected static override _registeredExporters = new Map<
     string,
-    () => SpanExporter>([
-      ['otlp', () => this.configureOtlp()],
-      ['zipkin', () => new ZipkinExporter],
-      ['jaeger', () => new JaegerExporter],
-      ['console', () => new ConsoleSpanExporter]
-    ]);
+    () => SpanExporter
+      >([
+        ['otlp', () => this.configureOtlp()],
+        ['zipkin', () => new ZipkinExporter],
+        ['jaeger', () => new JaegerExporter],
+        ['console', () => new ConsoleSpanExporter]
+      ]);
 
   public constructor(config: NodeTracerConfig = {}) {
     super(config);
