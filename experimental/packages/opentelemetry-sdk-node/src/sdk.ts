@@ -27,7 +27,7 @@ import {
   Resource,
   ResourceDetectionConfig
 } from '@opentelemetry/resources';
-import { MeterProvider, MetricReader } from '@opentelemetry/sdk-metrics';
+import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics';
 import {
   BatchSpanProcessor,
   SpanProcessor
@@ -37,6 +37,20 @@ import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
 import { NodeSDKConfiguration } from './types';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
+
+export type MeterProviderConfig = {
+  /**
+   * Reference to the MetricReader instance by the NodeSDK
+   */
+  reader?: MetricReader
+  /**
+   * Lists the views that should be passed when meterProvider
+   *
+   * Note: This is only getting used when NodeSDK is responsible for
+   * instantiated an instance of MeterProvider
+   */
+  views?: View[]
+};
 export class NodeSDK {
   private _tracerProviderConfig?: {
     tracerConfig: NodeTracerConfig;
@@ -44,8 +58,8 @@ export class NodeSDK {
     contextManager?: ContextManager;
     textMapPropagator?: TextMapPropagator;
   };
+  private _meterProviderConfig?: MeterProviderConfig;
   private _instrumentations: InstrumentationOption[];
-  private _metricReader?: MetricReader;
 
   private _resource: Resource;
 
@@ -87,8 +101,17 @@ export class NodeSDK {
       );
     }
 
-    if (configuration.metricReader) {
-      this.configureMeterProvider(configuration.metricReader);
+    if (configuration.metricReader || configuration.views) {
+      const meterProviderConfig: MeterProviderConfig = {};
+      if (configuration.metricReader) {
+        meterProviderConfig.reader = configuration.metricReader;
+      }
+
+      if (configuration.views) {
+        meterProviderConfig.views = configuration.views;
+      }
+
+      this.configureMeterProvider(meterProviderConfig);
     }
 
     let instrumentations: InstrumentationOption[] = [];
@@ -114,8 +137,32 @@ export class NodeSDK {
   }
 
   /** Set configurations needed to register a MeterProvider */
-  public configureMeterProvider(reader: MetricReader): void {
-    this._metricReader = reader;
+  public configureMeterProvider(config: MeterProviderConfig): void {
+    // nothing is set yet, we can set config and return.
+    if (this._meterProviderConfig == null) {
+      this._meterProviderConfig = config;
+      return;
+    }
+
+    // make sure we do not override existing views with other views.
+    if (this._meterProviderConfig.views != null && config.views != null) {
+      throw new Error('Views passed but Views have already been configured.');
+    }
+
+    // set views, but make sure we do not override existing views with null/undefined.
+    if (config.views != null) {
+      this._meterProviderConfig.views = config.views;
+    }
+
+    // make sure we do not override existing reader with another reader.
+    if (this._meterProviderConfig.reader != null && config.reader != null) {
+      throw new Error('MetricReader passed but MetricReader has already been configured.');
+    }
+
+    // set reader, but make sure we do not override existing reader with null/undefined.
+    if (config.reader != null) {
+      this._meterProviderConfig.reader = config.reader;
+    }
   }
 
   /** Detect resource attributes */
@@ -123,7 +170,7 @@ export class NodeSDK {
     config?: ResourceDetectionConfig
   ): Promise<void> {
     const internalConfig: ResourceDetectionConfig = {
-      detectors: [ envDetector, processDetector],
+      detectors: [envDetector, processDetector],
       ...config,
     };
 
@@ -146,7 +193,7 @@ export class NodeSDK {
     this._resource = this._serviceName === undefined
       ? this._resource
       : this._resource.merge(new Resource(
-        {[SemanticResourceAttributes.SERVICE_NAME]: this._serviceName}
+        { [SemanticResourceAttributes.SERVICE_NAME]: this._serviceName }
       ));
 
     if (this._tracerProviderConfig) {
@@ -164,12 +211,15 @@ export class NodeSDK {
       });
     }
 
-    if (this._metricReader) {
+    if (this._meterProviderConfig) {
       const meterProvider = new MeterProvider({
         resource: this._resource,
+        views: this._meterProviderConfig?.views ?? [],
       });
 
-      meterProvider.addMetricReader(this._metricReader);
+      if (this._meterProviderConfig.reader) {
+        meterProvider.addMetricReader(this._meterProviderConfig.reader);
+      }
 
       this._meterProvider = meterProvider;
 

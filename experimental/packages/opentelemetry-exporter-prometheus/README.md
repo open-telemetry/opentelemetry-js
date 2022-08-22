@@ -26,11 +26,10 @@ const { MeterProvider }  = require('@opentelemetry/sdk-metrics');
 const options = {port: 9464, startServer: true};
 const exporter = new PrometheusExporter(options);
 
-// Register the exporter
-const meter = new MeterProvider({
-  exporter,
-  interval: 1000,
-}).getMeter('example-prometheus');
+// Creates MeterProvider and installs the exporter as a MetricReader
+const meterProvider = new MeterProvider();
+meterProvider.addMetricReader(exporter);
+const meter = meterProvider.getMeter('example-prometheus');
 
 // Now, start recording data
 const counter = meter.createCounter('metric_name', {
