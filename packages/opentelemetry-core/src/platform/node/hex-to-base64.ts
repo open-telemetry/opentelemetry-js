@@ -28,8 +28,18 @@ function intValue(charCode: number): number {
   return charCode - 55;
 }
 
+const buf8 = Buffer.alloc(8);
+const buf16 = Buffer.alloc(16);
+
 export function hexToBase64(hexStr: string): string {
-  const buf = Buffer.alloc(hexStr.length / 2);
+  let buf;
+  if (hexStr.length === 16) {
+    buf = buf8;
+  } else if (hexStr.length === 32) {
+    buf = buf16;
+  } else {
+    buf = Buffer.alloc(hexStr.length / 2);
+  }
   let offset = 0;
 
   for (let i = 0; i < hexStr.length; i += 2) {
