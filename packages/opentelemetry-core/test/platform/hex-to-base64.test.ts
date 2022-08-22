@@ -25,5 +25,7 @@ describe('hexToBase64', () => {
     assert.strictEqual(hexToBase64(id1), 'fetzngLkTvI=');
     assert.strictEqual(hexToBase64(id2), 'EqvANNVn6J/ybmCMjPQsgA==');
     assert.strictEqual(hexToBase64(id3), 'EqvANNVn6J/ybmCMjPQsgA==');
+    // Don't use the preallocated path
+    assert.strictEqual(hexToBase64(id2.repeat(2)), 'EqvANNVn6J/ybmCMjPQsgBKrwDTVZ+if8m5gjIz0LIA=');
   });
 });
