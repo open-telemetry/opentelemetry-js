@@ -13,7 +13,7 @@
     "@opentelemetry/sdk-trace-base": "1.5.0"
   },
   "devDependencies": {
-    "@types/node": "^16.0.0",
+    "@types/node": "16.11.52",
     "typescript": "4.4.4"
   },
   "author": "OpenTelemetry Authors",
