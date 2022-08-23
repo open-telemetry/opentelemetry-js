@@ -85,6 +85,12 @@ describe('Tracer', () => {
     }
   }
 
+  const spanContext: SpanContext = {
+    traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+    spanId: '6e0c63257de34c92',
+    traceFlags: TraceFlags.SAMPLED,
+  };
+
   beforeEach(() => {
     const contextManager = new TestStackContextManager().enable();
     context.setGlobalContextManager(contextManager);
@@ -399,5 +405,108 @@ describe('Tracer', () => {
     assert.deepStrictEqual(span.attributes, { ...validAttributes, testAttribute: 'foobar' });
     assert.strictEqual(span.links.length, 1);
     assert.deepStrictEqual(span.links[0].attributes, validAttributes);
+  });
+
+  it('should instrument with name and function args', async () => {
+    const tracer = new Tracer(
+      { name: 'default', version: '0.0.1' },
+      { sampler: new TestSampler() },
+      tracerProvider
+    );
+
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      'my-span',
+      spanContext,
+      SpanKind.INTERNAL);
+    const spySpanStart = sinon.stub(tracer,'startSpan');
+    spySpanStart.returns(span);
+    const spySpanEnd = sinon.spy(span,'end');
+
+    assert.strictEqual(await tracer.spanFn('my-span', async () => {
+      assert(spySpanStart.calledWith('my-span'));
+      return 1;
+    }),1);
+    assert(spySpanStart.calledOnce);
+    assert(spySpanEnd.calledOnce);
+  });
+
+  it('should instrument with name, options and function args', async () => {
+    const tracer = new Tracer(
+      {name: 'default', version: '0.0.1'},
+      {sampler: new TestSampler()},
+      tracerProvider
+    );
+
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      'my-span',
+      spanContext,
+      SpanKind.INTERNAL);
+    const spySpanStart = sinon.stub(tracer,'startSpan');
+    spySpanStart.returns(span);
+    const spySpanEnd = sinon.spy(span,'end');
+
+    assert.strictEqual(await tracer.spanFn('my-span', {attributes: {foo: 'bar'}}, async () => {
+      assert(spySpanStart.calledWith('my-span', {attributes: {foo: 'bar'}}));
+      return 1;
+    }), 1);
+    assert(spySpanStart.calledOnce);
+    assert(spySpanEnd.calledOnce);
+  });
+
+  it('should instrument with name, options, context and function args', async () => {
+    const tracer = new Tracer(
+      { name: 'default', version: '0.0.1' },
+      { sampler: new TestSampler() },
+      tracerProvider
+    );
+
+    const ctxKey = createContextKey('foo');
+
+    const ctx = context.active().setValue(ctxKey, 'bar');
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      'my-span',
+      spanContext,
+      SpanKind.INTERNAL);
+    const spySpanStart = sinon.stub(tracer,'startSpan');
+    spySpanStart.returns(span);
+    const spySpanEnd = sinon.spy(span,'end');
+
+    assert.strictEqual(await tracer.spanFn('my-span', {attributes: {foo: 'bar'}}, ctx, async () => {
+      assert(spySpanStart.calledWith('my-span', {attributes: {foo: 'bar'}}, ctx));
+      assert.strictEqual(ctx.getValue(ctxKey), 'bar');
+      return 1;
+    }), 1);
+    assert(spySpanStart.calledOnce);
+    assert(spySpanEnd.calledOnce);
+  });
+
+  it('should rethrow exception', async () => {
+    const tracer = new Tracer(
+      {name: 'default', version: '0.0.1'},
+      {sampler: new TestSampler()},
+      tracerProvider
+    );
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      'my-span',
+      spanContext,
+      SpanKind.INTERNAL);
+    const spySpanStart = sinon.stub(tracer,'startSpan');
+    spySpanStart.returns(span);
+    const spySpanEnd = sinon.spy(span,'end');
+
+    const testError = new Error('testError');
+    await assert.rejects(tracer.spanFn('my-span', async () => {
+      throw testError;
+    }), testError);
+    assert(spySpanStart.calledOnce);
+    assert(spySpanEnd.calledOnce);
   });
 });

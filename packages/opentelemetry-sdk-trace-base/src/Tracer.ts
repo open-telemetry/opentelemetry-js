@@ -225,6 +225,83 @@ export class Tracer implements api.Tracer {
     return api.context.with(contextWithSpanSet, fn, undefined, span);
   }
 
+  /**
+   * Starts a new {@link Span}, calls it and returns the result or rethrows errors.
+   * Spans are ended after the execution of the function and are guaranteed to end in any case.
+   * In case of an error the span status is set to 'ERROR'.
+   * Additionally, the new span gets set in context and this context is activated
+   * for the duration of the function call.
+   *
+   * @param name The name of the span
+   * @param [options] SpanOptions used for span creation
+   * @param [context] Context to use to extract parent
+   * @param fn function called in the context of the span
+   * @returns return value of fn
+   * @example
+   *   const something = tracer.spanFn('op', async () => {
+   *     do some work
+   *   });
+   */
+  async spanFn<F extends () => ReturnType<F>>(
+    name: string,
+    fn: F,
+  ): Promise<ReturnType<F>>
+  async spanFn<F extends () => ReturnType<F>>(
+    name: string,
+    opts: api.SpanOptions,
+    fn: F
+  ): Promise<ReturnType<F>>
+  async spanFn<F extends () => ReturnType<F>>(
+    name: string,
+    opts: api.SpanOptions,
+    ctx: api.Context,
+    fn: F
+  ): Promise<ReturnType<F>>
+  async spanFn<F extends () => ReturnType<F>>(
+    name: string,
+    arg2: F | api.SpanOptions,
+    arg3?: F | api.Context,
+    arg4?: F
+  ): Promise<ReturnType<F>> {
+    let opts: api.SpanOptions | undefined;
+    let ctx: api.Context | undefined;
+    let fn: F;
+
+    if (arguments.length === 2) {
+      fn = arg2 as F;
+    } else if (arguments.length === 3) {
+      opts = arg2 as api.SpanOptions | undefined;
+      fn = arg3 as F;
+    } else {
+      opts = arg2 as api.SpanOptions | undefined;
+      ctx = arg3 as api.Context | undefined;
+      fn = arg4 as F;
+    }
+    opts = opts ?? {};
+    ctx = ctx ?? api.context.active();
+
+    return await this.startActiveSpan(
+      name,
+      opts,
+      ctx,
+      async span => {
+        try {
+          const result = await fn();
+          span.setStatus({code: api.SpanStatusCode.OK});
+          return result;
+        } catch (e) {
+          span.setStatus({
+            code: api.SpanStatusCode.ERROR,
+            message: e.message,
+          });
+          throw e;
+        } finally {
+          span.end();
+        }
+      }
+    );
+  }
+
   /** Returns the active {@link GeneralLimits}. */
   getGeneralLimits(): GeneralLimits {
     return this._generalLimits;
