@@ -36,4 +36,19 @@ export interface Event {
    * Additional attributes that describe the event.
    */
   attributes?: Attributes;
+
+  /**
+   * 8 least significant bits are the trace flags as defined in W3C Trace Context specification.
+   */
+  traceFlags?: number;
+
+  /**
+   * A unique identifier for a trace.
+   */
+  traceId?: string;
+
+  /**
+   * A unique identifier for a span within a trace.
+   */
+  spanId?: string;
 }

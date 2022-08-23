@@ -24,7 +24,7 @@ export interface LoggerOptions {
   schemaUrl?: string;
 
   /**
-   * The domain for the events created
+   * The default domain for events created by the Logger. The default domain can be overridden when emitting an individual event.
    * @default ''
    */
   eventDomain?: string;
