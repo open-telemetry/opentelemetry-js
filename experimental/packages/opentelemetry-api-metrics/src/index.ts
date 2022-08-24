@@ -14,13 +14,45 @@
  * limitations under the License.
  */
 
-export * from './NoopMeter';
-export * from './NoopMeterProvider';
-export * from './types/Meter';
-export * from './types/MeterProvider';
-export * from './types/Metric';
-export * from './types/ObservableResult';
+export {
+  NOOP_METER
+} from './NoopMeter';
+
+export {
+  NOOP_METER_PROVIDER
+} from './NoopMeterProvider';
+
+export {
+  MeterOptions,
+  Meter,
+} from './types/Meter';
+
+export {
+  MeterProvider
+} from './types/MeterProvider';
+
+export {
+  ValueType,
+  Counter,
+  Histogram,
+  MetricOptions,
+  Observable,
+  ObservableCounter,
+  ObservableGauge,
+  ObservableUpDownCounter,
+  UpDownCounter,
+  BatchObservableCallback,
+  MetricAttributes,
+  MetricAttributeValue,
+  ObservableCallback
+} from './types/Metric';
+
+export {
+  BatchObservableResult,
+  ObservableResult
+} from './types/ObservableResult';
 
 import { MetricsAPI } from './api/metrics';
+
 /** Entrypoint for metrics API */
 export const metrics = MetricsAPI.getInstance();

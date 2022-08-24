@@ -17,14 +17,15 @@
 import * as assert from 'assert';
 import {
   NoopMeter,
-  NoopMeterProvider,
   NOOP_COUNTER_METRIC,
   NOOP_HISTOGRAM_METRIC,
   NOOP_OBSERVABLE_COUNTER_METRIC,
   NOOP_OBSERVABLE_GAUGE_METRIC,
   NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC,
   NOOP_UP_DOWN_COUNTER_METRIC,
-} from '../../src';
+} from '../../src/NoopMeter';
+import { NoopMeterProvider } from '../../src/NoopMeterProvider';
+
 
 const attributes = {};
 const options = {
