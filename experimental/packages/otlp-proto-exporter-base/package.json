@@ -5,6 +5,7 @@
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
+  "browser": "src/platform/browser/index.ts",
   "scripts": {
     "prepublishOnly": "npm run compile",
     "compile": "npm run protos && tsc --build",

@@ -2,6 +2,7 @@
   "extends": "./tsconfig.es5.json",
   "compilerOptions": {
     "module": "ES6",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "target": "ES6"
   }
 }
