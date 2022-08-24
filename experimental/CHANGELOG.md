@@ -6,6 +6,18 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.32.0
+
+### :boom: Breaking Change
+
 * Rename @opentelemetry/sdk-metrics-base package to @opentelemetry/sdk-metrics  [#3162](https://github.com/open-telemetry/opentelemetry-js/pull/3162) @hectorhdzg
 
 ### :rocket: (Enhancement)
@@ -18,10 +30,6 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(instrumentation-http): add `http.host` attribute before sending the request #3054 @cuichenli
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
 
 ## 0.31.0
 
