@@ -8,6 +8,23 @@ All notable changes to experimental packages in this project will be documented 
 
 * Rename @opentelemetry/sdk-metrics-base package to @opentelemetry/sdk-metrics  [#3162](https://github.com/open-telemetry/opentelemetry-js/pull/3162) @hectorhdzg
 * chore(api-metrics): clean up exports [#3198](https://github.com/open-telemetry/opentelemetry-js/pull/3198) @pichlermarc
+  * removes export for:
+    * `NoopMeter`
+    * `NoopMetric`
+    * `NoopCounterMetric`
+    * `NoopUpDownCounterMetric`
+    * `NoopHistogramMetric`
+    * `NoopObservableMetric`
+    * `NoopObservableCounterMetric`
+    * `NoopObservableGaugeMetric`
+    * `NoopObservableUpDownCounterMetric`
+    * `NOOP_COUNTER_METRIC`
+    * `NOOP_HISTOGRAM_METRIC`
+    * `NOOP_UP_DOWN_COUNTER_METRIC`
+    * `NOOP_OBSERVABLE_COUNTER_METRIC`
+    * `NOOP_OBSERVABLE_GAUGE_METRIC`
+    * `NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC`
+    * `NoopMeterProvider`
 
 ### :rocket: (Enhancement)
 
