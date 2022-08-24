@@ -15,11 +15,11 @@
  */
 
 export {
-  NOOP_METER
+  NOOP_METER,
 } from './NoopMeter';
 
 export {
-  NOOP_METER_PROVIDER
+  NOOP_METER_PROVIDER,
 } from './NoopMeterProvider';
 
 export {
@@ -28,7 +28,7 @@ export {
 } from './types/Meter';
 
 export {
-  MeterProvider
+  MeterProvider,
 } from './types/MeterProvider';
 
 export {
@@ -44,12 +44,12 @@ export {
   BatchObservableCallback,
   MetricAttributes,
   MetricAttributeValue,
-  ObservableCallback
+  ObservableCallback,
 } from './types/Metric';
 
 export {
   BatchObservableResult,
-  ObservableResult
+  ObservableResult,
 } from './types/ObservableResult';
 
 import { MetricsAPI } from './api/metrics';

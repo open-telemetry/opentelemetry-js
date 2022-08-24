@@ -7,6 +7,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :boom: Breaking Change
 
 * Rename @opentelemetry/sdk-metrics-base package to @opentelemetry/sdk-metrics  [#3162](https://github.com/open-telemetry/opentelemetry-js/pull/3162) @hectorhdzg
+* chore(api-metrics): clean up exports [#3198](https://github.com/open-telemetry/opentelemetry-js/pull/3198) @pichlermarc
 
 ### :rocket: (Enhancement)
 
