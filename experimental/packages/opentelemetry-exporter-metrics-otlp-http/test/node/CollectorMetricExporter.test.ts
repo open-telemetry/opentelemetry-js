@@ -288,29 +288,34 @@ describe('OTLPMetricExporter - node with json over http', () => {
         const responseBody = buff.toString();
 
         const json = JSON.parse(responseBody) as IExportMetricsServiceRequest;
-        const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[0];
-        const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[1];
-        const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[2];
+        // The order of the metrics is not guaranteed.
+        const counterIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'int-counter');
+        const observableIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'double-observable-gauge2');
+        const histogramIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'int-histogram');
+
+        const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[counterIndex];
+        const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[observableIndex];
+        const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[histogramIndex];
 
         assert.ok(typeof metric1 !== 'undefined', "counter doesn't exist");
         ensureCounterIsCorrect(
           metric1,
-          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[0].dataPoints[0].endTime),
-          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[0].dataPoints[0].startTime)
+          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].endTime),
+          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].startTime)
         );
         assert.ok(typeof metric2 !== 'undefined', "observable gauge doesn't exist");
         ensureObservableGaugeIsCorrect(
           metric2,
-          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[1].dataPoints[0].endTime),
-          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[1].dataPoints[0].startTime),
+          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0].endTime),
+          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0].startTime),
           6,
           'double-observable-gauge2'
         );
         assert.ok(typeof metric3 !== 'undefined', "histogram doesn't exist");
         ensureHistogramIsCorrect(
           metric3,
-          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[2].dataPoints[0].endTime),
-          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[2].dataPoints[0].startTime),
+          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0].endTime),
+          core.hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0].startTime),
           [0, 100],
           [0, 2, 0]
         );

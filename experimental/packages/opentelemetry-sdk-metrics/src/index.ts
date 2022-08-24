@@ -15,6 +15,7 @@
  */
 
 export { Sum, LastValue, Histogram } from './aggregator/types';
+export * from './export/AggregationSelector';
 export * from './export/AggregationTemporality';
 export * from './export/MetricData';
 export * from './export/MetricExporter';

@@ -18,7 +18,6 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MeterProvider, TimeoutError } from '../../src';
 import { DataPointType } from '../../src/export/MetricData';
-import { PushMetricExporter } from '../../src/export/MetricExporter';
 import { MeterProviderSharedState } from '../../src/state/MeterProviderSharedState';
 import { MetricCollector } from '../../src/state/MetricCollector';
 import {
@@ -29,8 +28,7 @@ import {
   ObservableCallbackDelegate,
   BatchObservableCallbackDelegate,
 } from '../util';
-import { TestMetricReader } from '../export/TestMetricReader';
-import { TestDeltaMetricExporter, TestMetricExporter } from '../export/TestMetricExporter';
+import { TestDeltaMetricReader, TestMetricReader } from '../export/TestMetricReader';
 
 describe('MetricCollector', () => {
   afterEach(() => {
@@ -40,20 +38,18 @@ describe('MetricCollector', () => {
   describe('constructor', () => {
     it('should construct MetricCollector without exceptions', () => {
       const meterProviderSharedState = new MeterProviderSharedState(defaultResource);
-      const exporters = [ new TestMetricExporter(), new TestDeltaMetricExporter() ];
-      for (const exporter of exporters) {
-        const reader = new TestMetricReader(exporter.selectAggregationTemporality);
+      const readers = [ new TestMetricReader(), new TestDeltaMetricReader() ];
+      for (const reader of readers) {
         assert.doesNotThrow(() => new MetricCollector(meterProviderSharedState, reader));
       }
     });
   });
 
   describe('collect', () => {
-
-    function setupInstruments(exporter: PushMetricExporter) {
+    function setupInstruments() {
       const meterProvider = new MeterProvider({ resource: defaultResource });
 
-      const reader = new TestMetricReader(exporter.selectAggregationTemporality);
+      const reader = new TestMetricReader();
       meterProvider.addMetricReader(reader);
       const metricCollector = reader.getMetricCollector();
 
@@ -66,8 +62,7 @@ describe('MetricCollector', () => {
 
     it('should collect sync metrics', async () => {
       /** preparing test instrumentations */
-      const exporter = new TestMetricExporter();
-      const { metricCollector, meter } = setupInstruments(exporter);
+      const { metricCollector, meter } = setupInstruments();
 
       /** creating metric events */
       const counter = meter.createCounter('counter1');
@@ -104,8 +99,7 @@ describe('MetricCollector', () => {
 
     it('should collect async metrics', async () => {
       /** preparing test instrumentations */
-      const exporter = new TestMetricExporter();
-      const { metricCollector, meter } = setupInstruments(exporter);
+      const { metricCollector, meter } = setupInstruments();
 
       /** creating metric events */
       /** observable */
@@ -163,8 +157,7 @@ describe('MetricCollector', () => {
     it('should collect observer metrics with timeout', async () => {
       sinon.useFakeTimers();
       /** preparing test instrumentations */
-      const exporter = new TestMetricExporter();
-      const { metricCollector, meter } = setupInstruments(exporter);
+      const { metricCollector, meter } = setupInstruments();
 
       /** creating metric events */
 
@@ -246,8 +239,7 @@ describe('MetricCollector', () => {
 
     it('should collect with throwing observable callbacks', async () => {
       /** preparing test instrumentations */
-      const exporter = new TestMetricExporter();
-      const { metricCollector, meter } = setupInstruments(exporter);
+      const { metricCollector, meter } = setupInstruments();
 
       /** creating metric events */
       const counter = meter.createCounter('counter1');
@@ -283,8 +275,7 @@ describe('MetricCollector', () => {
     it('should collect batch observer metrics with timeout', async () => {
       sinon.useFakeTimers();
       /** preparing test instrumentations */
-      const exporter = new TestMetricExporter();
-      const { metricCollector, meter } = setupInstruments(exporter);
+      const { metricCollector, meter } = setupInstruments();
 
       /** creating metric events */
 
@@ -366,8 +357,7 @@ describe('MetricCollector', () => {
 
     it('should collect with throwing batch observable callbacks', async () => {
       /** preparing test instrumentations */
-      const exporter = new TestMetricExporter();
-      const { metricCollector, meter } = setupInstruments(exporter);
+      const { metricCollector, meter } = setupInstruments();
 
       /** creating metric events */
       const counter = meter.createCounter('counter1');
