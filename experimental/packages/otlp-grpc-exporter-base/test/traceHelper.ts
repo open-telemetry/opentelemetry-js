@@ -42,7 +42,7 @@ const traceIdArr = [
 ];
 const spanIdArr = [94, 16, 114, 97, 246, 79, 165, 62];
 const parentIdArr = [120, 168, 145, 80, 152, 134, 67, 136];
-const scope = { name: 'default', version: '0.0.1' }
+const scope = { name: 'default', version: '0.0.1' };
 
 export const mockedReadableSpan: ReadableSpan = {
   name: 'documentFetch',

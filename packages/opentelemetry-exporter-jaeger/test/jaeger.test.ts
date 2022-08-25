@@ -29,7 +29,7 @@ describe('JaegerExporter', () => {
   const scope = {
     name: 'default',
     version: '0.0.1',
-  }
+  };
   const readableSpan: ReadableSpan = {
     name: 'my-span1',
     kind: api.SpanKind.CLIENT,

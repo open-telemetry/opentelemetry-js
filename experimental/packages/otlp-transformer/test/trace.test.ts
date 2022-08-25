@@ -115,7 +115,7 @@ describe('Trace', () => {
       name: 'myLib',
       version: '0.1.0',
       schemaUrl: 'http://url.to.schema',
-    }
+    };
 
     beforeEach(() => {
       resource = new Resource({

@@ -20,7 +20,7 @@ import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { Span } from '../src/types';
 
-const scope = { name: 'default', version: '0.0.1' }
+const scope = { name: 'default', version: '0.0.1' };
 export const mockedReadableSpan: ReadableSpan = {
   name: 'documentFetch',
   kind: 0,
