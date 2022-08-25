@@ -20,6 +20,7 @@ import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { Span } from '../src/types';
 
+const scope = { name: 'default', version: '0.0.1' }
 export const mockedReadableSpan: ReadableSpan = {
   name: 'documentFetch',
   kind: 0,
@@ -44,7 +45,8 @@ export const mockedReadableSpan: ReadableSpan = {
     version: 1,
     cost: 112.12,
   }),
-  instrumentationLibrary: { name: 'default', version: '0.0.1' },
+  instrumentationLibrary: scope,
+  instrumentationScope: scope,
 };
 
 export function ensureHeadersContain(

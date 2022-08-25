@@ -34,6 +34,7 @@ const MICROS_PER_SECS = 1e6;
 function getReadableSpan() {
   const startTime = 1566156729709;
   const duration = 2000;
+  const instrumentationScope = { name: 'default', version: '0.0.1' };
   const readableSpan: ReadableSpan = {
     name: 'my-span',
     kind: api.SpanKind.INTERNAL,
@@ -55,7 +56,8 @@ function getReadableSpan() {
     links: [],
     events: [],
     resource: Resource.empty(),
-    instrumentationLibrary: { name: 'default', version: '0.0.1' },
+    instrumentationLibrary: instrumentationScope,
+    instrumentationScope: instrumentationScope,
   };
   return readableSpan;
 }
@@ -131,7 +133,7 @@ describe('Zipkin Exporter - node', () => {
       const parentSpanId = '5c1c63257de34c67';
       const startTime = 1566156729709;
       const duration = 2000;
-
+      const instrumentationScope = { name: 'default', version: '0.0.1' };
       const span1: ReadableSpan = {
         name: 'my-span',
         kind: api.SpanKind.INTERNAL,
@@ -163,7 +165,8 @@ describe('Zipkin Exporter - node', () => {
           },
         ],
         resource: Resource.empty(),
-        instrumentationLibrary: { name: 'default', version: '0.0.1' },
+        instrumentationLibrary: instrumentationScope,
+        instrumentationScope: instrumentationScope,
       };
       const span2: ReadableSpan = {
         name: 'my-span',
@@ -186,7 +189,8 @@ describe('Zipkin Exporter - node', () => {
         links: [],
         events: [],
         resource: Resource.empty(),
-        instrumentationLibrary: { name: 'default', version: '0.0.1' },
+        instrumentationLibrary: instrumentationScope,
+        instrumentationScope: instrumentationScope,
       };
 
       const exporter = new ZipkinExporter({
@@ -347,7 +351,7 @@ describe('Zipkin Exporter - node', () => {
     const parentSpanId = '5c1c63257de34c67';
     const startTime = 1566156729709;
     const duration = 2000;
-
+    const instrumentationScope = { name: 'default', version: '0.0.1' };
     const span1: ReadableSpan = {
       name: 'my-span',
       kind: api.SpanKind.INTERNAL,
@@ -379,7 +383,8 @@ describe('Zipkin Exporter - node', () => {
       resource: new Resource({
         [SemanticResourceAttributes.SERVICE_NAME]: resource_service_name,
       }),
-      instrumentationLibrary: { name: 'default', version: '0.0.1' },
+      instrumentationLibrary: instrumentationScope,
+      instrumentationScope: instrumentationScope,
     };
     const span2: ReadableSpan = {
       name: 'my-span',
@@ -402,7 +407,8 @@ describe('Zipkin Exporter - node', () => {
       resource: new Resource({
         [SemanticResourceAttributes.SERVICE_NAME]: resource_service_name_prime,
       }),
-      instrumentationLibrary: { name: 'default', version: '0.0.1' },
+      instrumentationLibrary: instrumentationScope,
+      instrumentationScope: instrumentationScope,
     };
 
     const exporter = new ZipkinExporter({});
@@ -436,6 +442,7 @@ describe('Zipkin Exporter - node', () => {
     const parentSpanId = '5c1c63257de34c67';
     const startTime = 1566156729709;
     const duration = 2000;
+    const instrumentationScope = { name: 'default', version: '0.0.1' };
 
     const span1: ReadableSpan = {
       name: 'my-span',
@@ -467,7 +474,8 @@ describe('Zipkin Exporter - node', () => {
         },
       ],
       resource: Resource.empty(),
-      instrumentationLibrary: { name: 'default', version: '0.0.1' },
+      instrumentationLibrary: instrumentationScope,
+      instrumentationScope: instrumentationScope,
     };
     const span2: ReadableSpan = {
       name: 'my-span',
@@ -490,7 +498,8 @@ describe('Zipkin Exporter - node', () => {
       links: [],
       events: [],
       resource: Resource.empty(),
-      instrumentationLibrary: { name: 'default', version: '0.0.1' },
+      instrumentationLibrary: instrumentationScope,
+      instrumentationScope: instrumentationScope,
     };
 
     const exporter = new ZipkinExporter({});
