@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-trace-otlp-proto",
-  "version": "0.31.0",
+  "version": "0.32.0",
   "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector using protobuf over HTTP",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -67,12 +67,12 @@
   },
   "dependencies": {
     "@grpc/proto-loader": "^0.6.9",
-    "@opentelemetry/core": "1.5.0",
-    "@opentelemetry/otlp-exporter-base": "0.31.0",
-    "@opentelemetry/otlp-proto-exporter-base": "0.31.0",
-    "@opentelemetry/otlp-transformer": "0.31.0",
-    "@opentelemetry/resources": "1.5.0",
-    "@opentelemetry/sdk-trace-base": "1.5.0",
+    "@opentelemetry/core": "1.6.0",
+    "@opentelemetry/otlp-exporter-base": "0.32.0",
+    "@opentelemetry/otlp-proto-exporter-base": "0.32.0",
+    "@opentelemetry/otlp-transformer": "0.32.0",
+    "@opentelemetry/resources": "1.6.0",
+    "@opentelemetry/sdk-trace-base": "1.6.0",
     "protobufjs": "^6.9.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-trace-otlp-proto"

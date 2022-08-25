@@ -45,8 +45,10 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 
 | API Version | Core version | Experimental Packages |
 | ----------- | ------------ | --------------------- |
-| 1.1.x       | 1.3.x        | 0.30.x                |
-| 1.1.x       | 1.2.x        | 0.29.x                |
+| 1.2.x       | 1.6.x        | 0.32.x                |
+| 1.1.x       | 1.5.x        | 0.31.x                |
+| 1.1.x       | 1.4.x        | 0.30.x                |
+| 1.1.x       | 1.2.x, 1.3.x | 0.29.x                |
 | 1.1.x       | 1.1.x        | 0.28.x                |
 | 1.0.x       | 1.0.x        | 0.26.x, 0.27.x        |
 | 1.0.x       | 0.26.x       | -----                 |
@@ -186,7 +188,7 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 - [Naseem K. Ullah](https://github.com/naseemkullah), Transit
 - [Neville Wylie](https://github.com/MSNev), Microsoft
 - [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal
-- [Rauno Viskus](https://github.com/Rauno56), Splunk
+- [Svetlana Brennan](https://github.com/svetlanabrennan), New Relic
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/main/community-membership.md#approver).*
 
@@ -225,12 +227,12 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 
 ### Implementation / SDKs
 
-| Package                                         | Description                                                                                                                                                                                                                                           |
-| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [@opentelemetry/sdk-trace-base][otel-tracing]   | This module provides a full control over instrumentation and span creation. It doesn't load [`async_hooks`](https://nodejs.org/api/async_hooks.html) or any instrumentation by default. It is intended for use both on the server and in the browser. |
-| [@opentelemetry/sdk-metrics][otel-metrics] | This module provides instruments and meters for reporting of time series data.                                                                                                                                                                        |
-| [@opentelemetry/sdk-trace-node][otel-node]      | This module provides automatic tracing for Node.js applications. It is intended for use on the server only.                                                                                                                                           |
-| [@opentelemetry/sdk-trace-web][otel-web]        | This module provides automated instrumentation and tracing for Web applications. It is intended for use in the browser only.                                                                                                                          |
+| Package                                       | Description                                                                                                                                                                                                                                           |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [@opentelemetry/sdk-trace-base][otel-tracing] | This module provides a full control over instrumentation and span creation. It doesn't load [`async_hooks`](https://nodejs.org/api/async_hooks.html) or any instrumentation by default. It is intended for use both on the server and in the browser. |
+| [@opentelemetry/sdk-metrics][otel-metrics]    | This module provides instruments and meters for reporting of time series data.                                                                                                                                                                        |
+| [@opentelemetry/sdk-trace-node][otel-node]    | This module provides automatic tracing for Node.js applications. It is intended for use on the server only.                                                                                                                                           |
+| [@opentelemetry/sdk-trace-web][otel-web]      | This module provides automated instrumentation and tracing for Web applications. It is intended for use in the browser only.                                                                                                                          |
 
 ### Compatible Exporters
 
