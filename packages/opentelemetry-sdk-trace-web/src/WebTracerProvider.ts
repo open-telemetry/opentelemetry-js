@@ -63,7 +63,6 @@ export class WebTracerProvider extends BasicTracerProvider {
     if (config.contextManager) {
       config.contextManager.enable();
     }
-    //add browser related resource attributes to spans
     super.register(config);
   }
 }
@@ -76,9 +75,11 @@ function addBrowserAttributes(config:WebTracerConfig = {}):WebTracerConfig {
     browserAttribs['browser.platform']=userAgentData.platform;
     browserAttribs['browser.brands']=userAgentData.brands;
     browserAttribs['browser.mobile']=userAgentData.mobile;
-  } else {
-    browserAttribs['browser.user.agent']=navigator.userAgent;
   }
+  browserAttribs['browser.user_agent']=navigator.userAgent;
+  // const isTablet = /(ipad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch))|kindle|playbook|silk|(puffin(?!.*(IP|AP|WP))))/.test(navigator.userAgent);
+  // browserAttribs['browser.tablet']=isTablet;
+
   return Object.assign({},
     config,
     {resource: Object.assign({},config.resource,
