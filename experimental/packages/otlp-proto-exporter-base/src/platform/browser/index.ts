@@ -1,3 +1,1 @@
-export const OTLPExporter = () => {
-  console.log('browser exporter')
-}
+export * from './OTLPProtoExporterBrowserBase'
