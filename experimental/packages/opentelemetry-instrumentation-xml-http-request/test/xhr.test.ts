@@ -797,7 +797,7 @@ describe('xhr', () => {
               location.origin + '/get',
               `attributes ${SemanticAttributes.HTTP_URL} is wrong`
             );
-          })
+          });
         });
 
       });

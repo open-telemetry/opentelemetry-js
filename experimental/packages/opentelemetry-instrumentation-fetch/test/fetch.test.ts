@@ -847,7 +847,7 @@ describe('fetch', () => {
         location.origin + '/get',
         `attributes ${SemanticAttributes.HTTP_URL} is wrong`
       );
-    })
+    });
   });
 
   describe('when PerformanceObserver is undefined', () => {
