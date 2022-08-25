@@ -20,6 +20,7 @@ import {
   hrTime,
   hrTimeDuration,
   InstrumentationLibrary,
+  InstrumentationScope,
   isTimeInput,
   timeInputToHrTime,
   sanitizeAttributes,
@@ -48,6 +49,10 @@ export class Span implements api.Span, ReadableSpan {
   readonly events: TimedEvent[] = [];
   readonly startTime: api.HrTime;
   readonly resource: Resource;
+  readonly instrumentationScope: InstrumentationScope;
+  // instrumentationLibrary is an alias for instrumentationScope and
+  // is retained for backwards compatibility and to satisfy the
+  // ReadableSpan interface
   readonly instrumentationLibrary: InstrumentationLibrary;
   name: string;
   status: api.SpanStatus = {
@@ -78,7 +83,8 @@ export class Span implements api.Span, ReadableSpan {
     this.links = links;
     this.startTime = timeInputToHrTime(startTime);
     this.resource = parentTracer.resource;
-    this.instrumentationLibrary = parentTracer.instrumentationLibrary;
+    this.instrumentationLibrary = parentTracer.instrumentationScope as InstrumentationLibrary;
+    this.instrumentationScope = parentTracer.instrumentationScope;
     this._spanLimits = parentTracer.getSpanLimits();
     this._spanProcessor = parentTracer.getActiveSpanProcessor();
     this._spanProcessor.onStart(this, context);

@@ -25,6 +25,7 @@ import {
   SpanAttributes,
   SpanAttributeValue,
 } from '@opentelemetry/api';
+import { InstrumentationScope } from '@opentelemetry/core';
 import {
   DEFAULT_ATTRIBUTE_COUNT_LIMIT,
   DEFAULT_ATTRIBUTE_VALUE_LENGTH_LIMIT,
@@ -749,9 +750,10 @@ describe('Span', () => {
     assert.deepStrictEqual(span.attributes, {});
     assert.deepStrictEqual(span.links, []);
     assert.deepStrictEqual(span.events, []);
-
     assert.ok(span.instrumentationLibrary);
-    const { name, version } = span.instrumentationLibrary;
+    assert.ok(span.instrumentationScope);
+    assert.strictEqual(span.instrumentationScope, span.instrumentationLibrary as InstrumentationScope);
+    const { name, version } = span.instrumentationScope;
     assert.strictEqual(name, 'default');
     assert.strictEqual(version, undefined);
   });
