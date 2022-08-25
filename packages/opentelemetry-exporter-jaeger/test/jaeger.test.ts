@@ -26,6 +26,10 @@ import * as nock from 'nock';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 
 describe('JaegerExporter', () => {
+  const scope = {
+    name: 'default',
+    version: '0.0.1',
+  }
   const readableSpan: ReadableSpan = {
     name: 'my-span1',
     kind: api.SpanKind.CLIENT,
@@ -49,10 +53,8 @@ describe('JaegerExporter', () => {
     resource: new Resource({
       [SemanticResourceAttributes.SERVICE_NAME]: 'opentelemetry'
     }),
-    instrumentationLibrary: {
-      name: 'default',
-      version: '0.0.1',
-    },
+    instrumentationLibrary: scope,
+    instrumentationScope: scope,
   };
   describe('constructor', () => {
     afterEach(() => {

@@ -31,6 +31,10 @@ describe('transform', () => {
       traceFlags: TraceFlags.NONE,
     };
   };
+  const scope = {
+    name: 'default',
+    version: '0.0.1',
+  };
 
   describe('spanToThrift', () => {
     it('should convert an OpenTelemetry span to a Thrift', () => {
@@ -78,10 +82,8 @@ describe('transform', () => {
           version: 1,
           cost: 112.12,
         }),
-        instrumentationLibrary: {
-          name: 'default',
-          version: '0.0.1',
-        },
+        instrumentationLibrary: scope,
+        instrumentationScope: scope,
       };
 
       const thriftSpan = spanToThrift(readableSpan);
@@ -166,10 +168,8 @@ describe('transform', () => {
         events: [],
         duration: [32, 800000000],
         resource: Resource.empty(),
-        instrumentationLibrary: {
-          name: 'default',
-          version: '0.0.1',
-        },
+        instrumentationLibrary: scope,
+        instrumentationScope: scope,
       };
 
       const thriftSpan = spanToThrift(readableSpan);
@@ -233,10 +233,8 @@ describe('transform', () => {
         events: [],
         duration: [32, 800000000],
         resource: Resource.empty(),
-        instrumentationLibrary: {
-          name: 'default',
-          version: '0.0.1',
-        },
+        instrumentationLibrary: scope,
+        instrumentationScope: scope,
       };
 
       const thriftSpan = spanToThrift(readableSpan);
@@ -278,10 +276,8 @@ describe('transform', () => {
         events: [],
         duration: [32, 800000000],
         resource: Resource.empty(),
-        instrumentationLibrary: {
-          name: 'default',
-          version: '0.0.1',
-        },
+        instrumentationLibrary: scope,
+        instrumentationScope: scope,
       };
 
       const thriftSpan = spanToThrift(readableSpan);
@@ -340,10 +336,8 @@ describe('transform', () => {
           version: 1,
           cost: 112.12,
         }),
-        instrumentationLibrary: {
-          name: 'default',
-          version: '0.0.1',
-        },
+        instrumentationLibrary: scope,
+        instrumentationScope: scope,
       };
       let thriftSpan = spanToThrift(readableSpan);
       assert.strictEqual(
