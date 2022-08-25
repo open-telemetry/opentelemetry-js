@@ -85,3 +85,7 @@ export {
   View,
   ViewOptions,
 } from './view/View';
+
+export {
+  TimeoutError
+} from './utils';
