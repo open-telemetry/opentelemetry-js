@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-import { ServiceClientType } from './types';
+import { ServiceClientType } from '../types';
 import { OTLPProtoExporterBrowserBase } from './OTLPProtoExporterBrowserBase';
 import {
   // CompressionAlgorithm,
   OTLPExporterError,
-  // sendWithHttp,
   sendWithXhr
 } from '@opentelemetry/otlp-exporter-base';
 import type * as protobuf from 'protobufjs';
@@ -57,7 +56,7 @@ export function send<ExportItem, ServiceRequest>(
     const body = exportRequestType.encode(message).finish();
     if (body) {
       sendWithXhr(
-        Buffer.from(body),
+        body,
         collector.url,
         // probably need to add headers?
         {'Content-Type': 'application/x-protobuf'},

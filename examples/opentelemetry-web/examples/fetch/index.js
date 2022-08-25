@@ -17,15 +17,19 @@ const {
   OTLPTraceExporter: OTLPTraceExporterProto,
 } = require("@opentelemetry/exporter-trace-otlp-proto/build/src/platform");
 
-OTLPTraceExporterProto();
+console.log(OTLPTraceExporterProto);
 
 const provider = new WebTracerProvider();
 
 // Note: For production consider using the "BatchSpanProcessor" to reduce the number of requests
 // to your exporter. Using the SimpleSpanProcessor here as it sends the spans immediately to the
 // exporter without delay
-provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-provider.addSpanProcessor(new SimpleSpanProcessor(new OTLPTraceExporter()));
+// provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+provider.addSpanProcessor(
+  new SimpleSpanProcessor(new OTLPTraceExporterProto())
+);
+// provider.addSpanProcessor(new SimpleSpanProcessor(new OTLPTraceExporter()));
+
 provider.register({
   contextManager: new ZoneContextManager(),
   propagator: new B3Propagator(),

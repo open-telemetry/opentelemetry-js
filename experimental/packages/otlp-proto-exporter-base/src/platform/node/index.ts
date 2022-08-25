@@ -15,5 +15,5 @@
  */
 
 export { OTLPProtoExporterNodeBase } from './OTLPProtoExporterNodeBase';
-export * from './types';
+export * from '../types';
 export * from './util';

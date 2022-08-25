@@ -52,7 +52,7 @@ export function sendWithBeacon(
  * @param onError
  */
 export function sendWithXhr(
-  body: string | Buffer,
+  body: string | ArrayBuffer,
   url: string,
   headers: Record<string, string>,
   exporterTimeout: number,

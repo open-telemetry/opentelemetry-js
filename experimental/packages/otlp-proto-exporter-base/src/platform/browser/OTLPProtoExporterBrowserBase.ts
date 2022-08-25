@@ -19,7 +19,7 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { ServiceClientType } from './types';
+import { ServiceClientType } from '../types';
 import {
   OTLPExporterBrowserBase as OTLPExporterBaseMain,
   // CompressionAlgorithm,
@@ -75,13 +75,8 @@ override send(
     return;
   }
   if (!this._send) {
-    // defer to next tick and lazy load to avoid loading protobufjs too early
-    // and making this impossible to be instrumented
-    setImmediate(() => {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      this._send = send;
-      this._sendPromise(objects, onSuccess, onError);
-    });
+    this._send = send;
+    this._sendPromise(objects, onSuccess, onError);
   } else {
     this._sendPromise(objects, onSuccess, onError);
   }

@@ -15,7 +15,7 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { ServiceClientType } from './types';
+import { ServiceClientType } from '../types';
 import {
   OTLPExporterNodeBase as OTLPExporterBaseMain,
   CompressionAlgorithm,

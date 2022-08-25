@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ServiceClientType } from './types';
+import { ServiceClientType } from '../types';
 import { OTLPProtoExporterNodeBase } from './OTLPProtoExporterNodeBase';
 import {
   CompressionAlgorithm,
