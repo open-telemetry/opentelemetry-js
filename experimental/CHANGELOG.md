@@ -6,19 +6,6 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
-### :rocket: (Enhancement)
-
-### :bug: (Bug Fix)
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
-
-## 0.32.0
-
-### :boom: Breaking Change
-
-* Rename @opentelemetry/sdk-metrics-base package to @opentelemetry/sdk-metrics  [#3162](https://github.com/open-telemetry/opentelemetry-js/pull/3162) @hectorhdzg
 * chore(api-metrics): clean up exports [#3198](https://github.com/open-telemetry/opentelemetry-js/pull/3198) @pichlermarc
   * removes export for:
     * `NoopMeter`
@@ -37,6 +24,20 @@ All notable changes to experimental packages in this project will be documented 
     * `NOOP_OBSERVABLE_GAUGE_METRIC`
     * `NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC`
     * `NoopMeterProvider`
+
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.32.0
+
+### :boom: Breaking Change
+
+* Rename @opentelemetry/sdk-metrics-base package to @opentelemetry/sdk-metrics  [#3162](https://github.com/open-telemetry/opentelemetry-js/pull/3162) @hectorhdzg
 
 ### :rocket: (Enhancement)
 
