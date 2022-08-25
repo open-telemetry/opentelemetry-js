@@ -111,6 +111,11 @@ describe('Trace', () => {
   describe('createExportTraceServiceRequest', () => {
     let resource: Resource;
     let span: ReadableSpan;
+    const scope = {
+      name: 'myLib',
+      version: '0.1.0',
+      schemaUrl: 'http://url.to.schema',
+    }
 
     beforeEach(() => {
       resource = new Resource({
@@ -138,11 +143,8 @@ describe('Trace', () => {
             }
           }
         ],
-        instrumentationLibrary: {
-          name: 'myLib',
-          version: '0.1.0',
-          schemaUrl: 'http://url.to.schema',
-        },
+        instrumentationLibrary: scope,
+        instrumentationScope: scope,
         kind: SpanKind.CLIENT,
         links: [
           {

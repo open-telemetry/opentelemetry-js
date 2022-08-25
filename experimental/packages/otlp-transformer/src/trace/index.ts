@@ -36,12 +36,12 @@ function createResourceMap(readableSpans: ReadableSpan[]) {
     }
 
     // TODO this is duplicated in basic tracer. Consolidate on a common helper in core
-    const instrumentationLibraryKey = `${record.instrumentationLibrary.name}@${record.instrumentationLibrary.version || ''}:${record.instrumentationLibrary.schemaUrl || ''}`;
-    let records = ilmMap.get(instrumentationLibraryKey);
+    const instrumentationScopeKey = `${record.instrumentationScope.name}@${record.instrumentationScope.version || ''}:${record.instrumentationScope.schemaUrl || ''}`;
+    let records = ilmMap.get(instrumentationScopeKey);
 
     if (!records) {
       records = [];
-      ilmMap.set(instrumentationLibraryKey, records);
+      ilmMap.set(instrumentationScopeKey, records);
     }
 
     records.push(record);
@@ -64,7 +64,7 @@ function spanRecordsToResourceSpans(readableSpans: ReadableSpan[], useHex?: bool
     while (!ilmEntry.done) {
       const scopeSpans = ilmEntry.value;
       if (scopeSpans.length > 0) {
-        const { name, version, schemaUrl } = scopeSpans[0].instrumentationLibrary;
+        const { name, version, schemaUrl } = scopeSpans[0].instrumentationScope;
         const spans = scopeSpans.map(readableSpan => sdkSpanToOtlpSpan(readableSpan, useHex));
 
         scopeResourceSpans.push({

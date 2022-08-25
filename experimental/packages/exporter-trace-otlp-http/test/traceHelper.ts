@@ -15,7 +15,7 @@
  */
 
 import { SpanStatusCode, TraceFlags } from '@opentelemetry/api';
-import { hexToBase64, InstrumentationLibrary, VERSION } from '@opentelemetry/core';
+import { hexToBase64, InstrumentationScope, VERSION } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import * as assert from 'assert';
@@ -40,7 +40,7 @@ if (typeof Buffer === 'undefined') {
 const traceIdHex = '1f1008dc8e270e85c40a0d7c3939b278';
 const spanIdHex = '5e107261f64fa53e';
 const parentIdHex = '78a8915098864388';
-
+const scope = { name: 'default', version: '0.0.1' }
 export const mockedReadableSpan: ReadableSpan = {
   name: 'documentFetch',
   kind: 0,
@@ -96,7 +96,8 @@ export const mockedReadableSpan: ReadableSpan = {
       version: 1,
       cost: 112.12,
     })),
-  instrumentationLibrary: { name: 'default', version: '0.0.1' },
+  instrumentationLibrary: scope,
+  instrumentationScope: scope,
 };
 
 export const mockedResources: Resource[] = [
@@ -104,7 +105,7 @@ export const mockedResources: Resource[] = [
   new Resource({ name: 'resource 2' }),
 ];
 
-export const mockedInstrumentationLibraries: InstrumentationLibrary[] = [
+export const mockedInstrumentationScopes: InstrumentationScope[] = [
   {
     name: 'lib1',
     version: '0.0.1',
@@ -136,7 +137,8 @@ export const basicTrace: ReadableSpan[] = [
     events: [],
     duration: [0, 8885000],
     resource: mockedResources[0],
-    instrumentationLibrary: mockedInstrumentationLibraries[0],
+    instrumentationLibrary: mockedInstrumentationScopes[0],
+    instrumentationScope: mockedInstrumentationScopes[0],
   },
   {
     name: 'span2',
@@ -158,7 +160,8 @@ export const basicTrace: ReadableSpan[] = [
     events: [],
     duration: [0, 8775000],
     resource: mockedResources[0],
-    instrumentationLibrary: mockedInstrumentationLibraries[0],
+    instrumentationLibrary: mockedInstrumentationScopes[0],
+    instrumentationScope: mockedInstrumentationScopes[0],
   },
   {
     name: 'span3',
@@ -180,7 +183,8 @@ export const basicTrace: ReadableSpan[] = [
     events: [],
     duration: [0, 8775000],
     resource: mockedResources[0],
-    instrumentationLibrary: mockedInstrumentationLibraries[0],
+    instrumentationLibrary: mockedInstrumentationScopes[0],
+    instrumentationScope: mockedInstrumentationScopes[0],
   },
 ];
 
@@ -202,15 +206,18 @@ export const multiResourceTrace: ReadableSpan[] = [
 export const multiInstrumentationLibraryTrace: ReadableSpan[] = [
   {
     ...basicTrace[0],
-    instrumentationLibrary: mockedInstrumentationLibraries[0],
+    instrumentationLibrary: mockedInstrumentationScopes[0],
+    instrumentationScope: mockedInstrumentationScopes[0],
   },
   {
     ...basicTrace[1],
-    instrumentationLibrary: mockedInstrumentationLibraries[0],
+    instrumentationLibrary: mockedInstrumentationScopes[0],
+    instrumentationScope: mockedInstrumentationScopes[0],
   },
   {
     ...basicTrace[2],
-    instrumentationLibrary: mockedInstrumentationLibraries[1],
+    instrumentationLibrary: mockedInstrumentationScopes[1],
+    instrumentationScope: mockedInstrumentationScopes[1],
   },
 ];
 

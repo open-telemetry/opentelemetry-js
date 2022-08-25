@@ -25,6 +25,7 @@ import { IEvent, IExportTraceServiceRequest, IKeyValue, ILink, ISpan } from '@op
 const traceIdHex = '1f1008dc8e270e85c40a0d7c3939b278';
 const spanIdHex = '5e107261f64fa53e';
 const parentIdHex = '78a8915098864388';
+const scope = { name: 'default', version: '0.0.1' };
 
 export const mockedReadableSpan: ReadableSpan = {
   name: 'documentFetch',
@@ -80,7 +81,8 @@ export const mockedReadableSpan: ReadableSpan = {
     version: 1,
     cost: 112.12,
   }),
-  instrumentationLibrary: { name: 'default', version: '0.0.1' },
+  instrumentationLibrary: scope,
+  instrumentationScope: scope,
 };
 
 export function ensureProtoEventsAreCorrect(
