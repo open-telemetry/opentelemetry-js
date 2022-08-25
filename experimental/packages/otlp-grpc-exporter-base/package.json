@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/otlp-grpc-exporter-base",
-  "version": "0.31.0",
+  "version": "0.32.0",
   "description": "OpenTelemetry OTLP-gRPC Exporter base (for internal use only)",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -51,9 +51,9 @@
   "devDependencies": {
     "@babel/core": "7.16.0",
     "@opentelemetry/api": "^1.0.0",
-    "@opentelemetry/otlp-transformer": "0.31.0",
-    "@opentelemetry/resources": "1.5.0",
-    "@opentelemetry/sdk-trace-base": "1.5.0",
+    "@opentelemetry/otlp-transformer": "0.32.0",
+    "@opentelemetry/resources": "1.6.0",
+    "@opentelemetry/sdk-trace-base": "1.6.0",
     "@types/mocha": "9.1.1",
     "@types/node": "18.6.5",
     "@types/sinon": "10.0.13",
@@ -73,8 +73,8 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.5.9",
     "@grpc/proto-loader": "^0.6.9",
-    "@opentelemetry/core": "1.5.0",
-    "@opentelemetry/otlp-exporter-base": "0.31.0"
+    "@opentelemetry/core": "1.6.0",
+    "@opentelemetry/otlp-exporter-base": "0.32.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-grpc-exporter-base"
 }
