@@ -86,6 +86,6 @@ override send(
     this._sendPromise(objects, onSuccess, onError);
   }
 }
-
 abstract getServiceClientType(): ServiceClientType;
+
 }
