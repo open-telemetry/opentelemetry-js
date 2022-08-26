@@ -19,10 +19,6 @@ export {
 } from './NoopMeter';
 
 export {
-  NOOP_METER_PROVIDER,
-} from './NoopMeterProvider';
-
-export {
   MeterOptions,
   Meter,
 } from './types/Meter';

@@ -24,6 +24,7 @@ All notable changes to experimental packages in this project will be documented 
     * `NOOP_OBSERVABLE_GAUGE_METRIC`
     * `NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC`
     * `NoopMeterProvider`
+    * `NOOP_METER_PROVIDER`
 
 ### :rocket: (Enhancement)
 

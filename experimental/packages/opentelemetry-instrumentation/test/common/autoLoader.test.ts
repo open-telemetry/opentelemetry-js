@@ -15,16 +15,28 @@
  */
 
 import { Tracer, TracerProvider } from '@opentelemetry/api';
-import { NOOP_METER_PROVIDER } from '@opentelemetry/api-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { InstrumentationBase, registerInstrumentations } from '../../src';
+import {
+  Meter,
+  MeterOptions,
+  MeterProvider,
+  NOOP_METER
+} from '@opentelemetry/api-metrics';
 
 class DummyTracerProvider implements TracerProvider {
   getTracer(name: string, version?: string): Tracer {
     throw new Error('not implemented');
   }
 }
+
+class DummyMeterProvider implements MeterProvider {
+  getMeter(name: string, version?: string, options?: MeterOptions): Meter {
+    return NOOP_METER;
+  }
+}
+
 class FooInstrumentation extends InstrumentationBase {
   init() {
     return [];
@@ -50,14 +62,14 @@ describe('autoLoader', () => {
       let instrumentation: InstrumentationBase;
       let enableSpy: sinon.SinonSpy;
       let setTracerProviderSpy: sinon.SinonSpy;
-      let setsetMeterProvider: sinon.SinonSpy;
+      let setMeterProvider: sinon.SinonSpy;
       const tracerProvider = new DummyTracerProvider();
-      const meterProvider = NOOP_METER_PROVIDER;
+      const meterProvider = new DummyMeterProvider();
       beforeEach(() => {
         instrumentation = new FooInstrumentation('foo', '1', {});
         enableSpy = sinon.spy(instrumentation, 'enable');
         setTracerProviderSpy = sinon.stub(instrumentation, 'setTracerProvider');
-        setsetMeterProvider = sinon.stub(instrumentation, 'setMeterProvider');
+        setMeterProvider = sinon.stub(instrumentation, 'setMeterProvider');
         unload = registerInstrumentations({
           instrumentations: [instrumentation],
           tracerProvider,
@@ -104,9 +116,9 @@ describe('autoLoader', () => {
       });
 
       it('should set MeterProvider', () => {
-        assert.strictEqual(setsetMeterProvider.callCount, 1);
-        assert.ok(setsetMeterProvider.lastCall.args[0] === meterProvider);
-        assert.strictEqual(setsetMeterProvider.lastCall.args.length, 1);
+        assert.strictEqual(setMeterProvider.callCount, 1);
+        assert.ok(setMeterProvider.lastCall.args[0] === meterProvider);
+        assert.strictEqual(setMeterProvider.lastCall.args.length, 1);
       });
     });
   });
