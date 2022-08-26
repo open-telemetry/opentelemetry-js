@@ -31,12 +31,11 @@ import { MeterProvider, MetricReader } from '@opentelemetry/sdk-metrics-base';
 import {
   BatchSpanProcessor,
   SpanProcessor,
-  SpanExporter,
 } from '@opentelemetry/sdk-trace-base';
 import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
-import { tracerProviderWithEnvExporters } from './tracerProviderWithEnvExporter';
+import { TracerProviderWithEnvExporters } from './tracerProviderWithEnvExporter';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 export class NodeSDK {
@@ -50,10 +49,9 @@ export class NodeSDK {
   private _metricReader?: MetricReader;
   private _resource: Resource;
   private _autoDetectResources: boolean;
-  private _tracerProvider?: NodeTracerProvider;
+  private _tracerProvider?: NodeTracerProvider | TracerProviderWithEnvExporters;
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
-  private _tracerProviderWithEnvExporters?: tracerProviderWithEnvExporters;
   private _useEnvExporters = false;
 
   /**
@@ -152,31 +150,28 @@ export class NodeSDK {
         {[SemanticResourceAttributes.SERVICE_NAME]: this._serviceName}
       ));
 
-    if (this._tracerProviderConfig) {
-      const tracerProvider = new NodeTracerProvider({
-        ...this._tracerProviderConfig.tracerConfig,
+    if (this._tracerProviderConfig || this._useEnvExporters) {
+      const Provider =
+        this._tracerProviderConfig ? NodeTracerProvider : TracerProviderWithEnvExporters;
+
+      const tracerProvider = new Provider ({
+        ...this._tracerProviderConfig?.tracerConfig,
         resource: this._resource,
       });
 
       this._tracerProvider = tracerProvider;
 
-      tracerProvider.addSpanProcessor(this._tracerProviderConfig.spanProcessor);
-      tracerProvider.register({
-        contextManager: this._tracerProviderConfig.contextManager,
-        propagator: this._tracerProviderConfig.textMapPropagator,
-      });
-    } else if (this._useEnvExporters) {
-      this._tracerProviderWithEnvExporters = new tracerProviderWithEnvExporters({
-        resource: this._resource
-      });
-      this._tracerProvider = this._tracerProviderWithEnvExporters;
+      const processors = this.retrieveSpanProcessors(tracerProvider);
 
-      if (this._tracerProviderWithEnvExporters._spanProcessors) {
-        this._tracerProviderWithEnvExporters._spanProcessors.forEach(processor => {
-          this._tracerProviderWithEnvExporters?.addSpanProcessor(processor);
+      if (processors) {
+        processors.forEach((processor: SpanProcessor) => {
+          tracerProvider.addSpanProcessor(processor);
         });
 
-        this._tracerProviderWithEnvExporters?.register();
+        tracerProvider.register({
+          contextManager: this._tracerProviderConfig?.contextManager,
+          propagator: this._tracerProviderConfig?.textMapPropagator,
+        });
       }
     }
 
@@ -214,8 +209,15 @@ export class NodeSDK {
     );
   }
 
-  // added for testing
-  public _getSpanExporter(): SpanExporter[] | undefined {
-    return this._tracerProviderWithEnvExporters?._configuredExporters;
+  private retrieveSpanProcessors(provider: NodeTracerProvider): SpanProcessor[] | undefined {
+    if (this._tracerProviderConfig) {
+      return [this._tracerProviderConfig.spanProcessor];
+    }
+
+    if (provider instanceof TracerProviderWithEnvExporters) {
+      return provider.spanProcessors;
+    }
+
+    return undefined;
   }
 }

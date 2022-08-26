@@ -24,10 +24,10 @@ import { OTLPTraceExporter as OTLPGrpcTraceExporter} from '@opentelemetry/export
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 
-export class tracerProviderWithEnvExporters extends NodeTracerProvider {
+export class TracerProviderWithEnvExporters extends NodeTracerProvider {
   static DATA_TYPE_TRACES = 'traces';
-  public _configuredExporters: SpanExporter[] = [];
-  public _spanProcessors: (BatchSpanProcessor | SimpleSpanProcessor)[] | undefined;
+  public configuredExporters: SpanExporter[] = [];
+  public spanProcessors: (BatchSpanProcessor | SimpleSpanProcessor)[] | undefined;
 
   static configureOtlp(): SpanExporter {
     const protocol = this.getOtlpProtocol(this.DATA_TYPE_TRACES);
@@ -40,8 +40,6 @@ export class tracerProviderWithEnvExporters extends NodeTracerProvider {
       case 'http/protobuf':
         return new OTLPProtoTraceExporter;
       default:
-        // is this what we want the default to be?
-        // this is causing test on line 477 and 490 to fail because an exporter is still set up
         diag.warn(`Unsupported OTLP traces protocol: ${protocol}. Using http/protobuf.`);
         return new OTLPProtoTraceExporter;
     }
@@ -87,14 +85,14 @@ export class tracerProviderWithEnvExporters extends NodeTracerProvider {
       traceExportersList.forEach(exporterName => {
         const exporter = this._getSpanExporter(exporterName);
         if (exporter) {
-          this._configuredExporters.push(exporter);
+          this.configuredExporters.push(exporter);
         } else {
           diag.warn(`Unrecognized OTEL_TRACES_EXPORTER value: ${exporterName}.`);
         }
       });
 
-      if (this._configuredExporters.length > 0) {
-        this._spanProcessors = this.configureSpanProcessors(this._configuredExporters);
+      if (this.configuredExporters.length > 0) {
+        this.spanProcessors = this.configureSpanProcessors(this.configuredExporters);
       } else {
         diag.warn('Unable to set up trace exporter(s) due to invalid exporter and/or protocol values.');
       }
