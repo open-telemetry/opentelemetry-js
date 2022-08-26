@@ -97,7 +97,7 @@ jobs:
   browser-tests:
     runs-on: ubuntu-latest
     container:
-      image: circleci/node:16-browsers
+      image: circleci/node:17-browsers
     env:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
@@ -137,7 +137,7 @@ jobs:
   webworker-tests:
     runs-on: ubuntu-latest
     container:
-      image: circleci/node:16-browsers
+      image: circleci/node:17-browsers
     env:
       NPM_CONFIG_UNSAFE_PERM: true
     steps:
