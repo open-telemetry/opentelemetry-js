@@ -23,7 +23,7 @@ import {
   MetricData,
   ResourceMetrics,
   ScopeMetrics
-} from '@opentelemetry/sdk-metrics-base';
+} from '@opentelemetry/sdk-metrics';
 import { toAttributes } from '../common/internal';
 import {
   EAggregationTemporality,

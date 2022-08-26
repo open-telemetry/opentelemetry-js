@@ -41,7 +41,7 @@ import {
   HISTOGRAM_AGGREGATION_VIEW,
 } from '../metricsHelper';
 import { MockedResponse } from './nodeHelpers';
-import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
+import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import { Stream, PassThrough } from 'stream';
 import { OTLPExporterError, OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
