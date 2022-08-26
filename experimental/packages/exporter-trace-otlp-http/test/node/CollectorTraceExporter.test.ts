@@ -614,13 +614,13 @@ describe('export with retry - real http request destroyed after response receive
     spans = [];
     spans.push(Object.assign({}, mockedReadableSpan));
 
-      collectorExporter.export(spans, result => {
-        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-        const error = result.error as OTLPExporterError;
-        assert.ok(error !== undefined);
-        assert.strictEqual(error.message, 'Request Timeout');
-        done();
-      });
+    collectorExporter.export(spans, result => {
+      assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+      const error = result.error as OTLPExporterError;
+      assert.ok(error !== undefined);
+      assert.strictEqual(error.message, 'Request Timeout');
+      done();
+    });
   }).timeout(5000);
 });
 
@@ -628,10 +628,10 @@ describe('export with retry - real http request destroyed after response receive
   let collectorExporter: OTLPTraceExporter;
   let collectorExporterConfig: OTLPExporterNodeConfigBase;
   let spans: ReadableSpan[];
-  let attempts = -1
+  let attempts = -1;
 
   const server = http.createServer((_, res) => {
-    attempts++
+    attempts++;
     if (attempts >= 2) {
       res.statusCode = 200;
     } else {
@@ -655,9 +655,9 @@ describe('export with retry - real http request destroyed after response receive
     spans = [];
     spans.push(Object.assign({}, mockedReadableSpan));
 
-      collectorExporter.export(spans, result => {
-        assert.strictEqual(result.code, core.ExportResultCode.SUCCESS);
-        done();
-      });
+    collectorExporter.export(spans, result => {
+      assert.strictEqual(result.code, core.ExportResultCode.SUCCESS);
+      done();
+    });
   }).timeout(5000);
 });

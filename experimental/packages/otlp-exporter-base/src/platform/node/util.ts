@@ -81,7 +81,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
     req = request(options, (res: http.IncomingMessage) => {
       let responseData = '';
       res.on('data', chunk => (responseData += chunk));
-  
+
       res.on('aborted', () => {
         if (reqIsDestroyed) {
           const err = new OTLPExporterError(
@@ -90,15 +90,15 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
           onError(err);
         }
       });
-  
+
       res.on('end', () => {
         if (reqIsDestroyed === undefined) {
           if (res.statusCode && res.statusCode < 299) {
             diag.debug(`statusCode: ${res.statusCode}`, responseData);
             onSuccess();
-               // clear all timers since request was completed and promise was resolved
-           clearTimeout(exporterTimer);
-           clearTimeout(retryTimer);
+            // clear all timers since request was completed and promise was resolved
+            clearTimeout(exporterTimer);
+            clearTimeout(retryTimer);
           } else if (res.statusCode && isRetryable(res.statusCode) && retries > 0) {
             retryTimer = setTimeout(() => {
               sendWithRetry(retries - 1, backoffMillis * DEFAULT_BACKOFF_MULTIPLIER);
@@ -110,9 +110,9 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
               responseData
             );
             onError(error);
-               // clear all timers since request was completed and promise was resolved
-           clearTimeout(exporterTimer);
-           clearTimeout(retryTimer);
+            // clear all timers since request was completed and promise was resolved
+            clearTimeout(exporterTimer);
+            clearTimeout(retryTimer);
           }
         }
       });
@@ -149,14 +149,14 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
         dataStream.on('error', onError)
           .pipe(zlib.createGzip()).on('error', onError)
           .pipe(req);
-  
+
         break;
       }
       default:
         req.end(data);
         break;
     }
-  }
+  };
   sendWithRetry();
 }
 

@@ -215,7 +215,7 @@ describe('sendWithHttp', () => {
     });
 
     // use fake timers to replace setTimeout in sendWithHttp function
-    let clock = sinon.useFakeTimers();
+    const clock = sinon.useFakeTimers();
 
     sendWithHttp(exporter, data, 'application/json', () => {
       // Show that we aren't setting the gzip encoding header
@@ -244,7 +244,7 @@ describe('sendWithHttp', () => {
     });
 
     // use fake timers to replace setTimeout in sendWithHttp function
-    let clock = sinon.useFakeTimers();
+    const clock = sinon.useFakeTimers();
 
     sendWithHttp(exporter, data, 'application/json', () => {
       // Show that we are setting the gzip encoding header
@@ -285,7 +285,7 @@ describe('sendWithHttp', () => {
       });
 
       // use fake timers to replace setTimeout in sendWithHttp function
-      let clock = sinon.useFakeTimers();
+      const clock = sinon.useFakeTimers();
 
       sendWithHttp(exporter, data, 'application/json', () => {
         // Show that we are setting the gzip encoding header
