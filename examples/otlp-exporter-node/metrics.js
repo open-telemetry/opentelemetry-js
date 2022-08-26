@@ -4,7 +4,7 @@ const { DiagConsoleLogger, DiagLogLevel, diag } = require('@opentelemetry/api');
 const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-http');
 // const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-grpc');
 // const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-proto');
-const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics-base');
+const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
 const { Resource } = require('@opentelemetry/resources');
 const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
 

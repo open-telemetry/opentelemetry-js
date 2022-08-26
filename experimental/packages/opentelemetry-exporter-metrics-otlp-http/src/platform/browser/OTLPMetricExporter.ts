@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
+import { ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import { baggageUtils, getEnv } from '@opentelemetry/core';
 import { defaultOptions, OTLPMetricExporterOptions } from '../../OTLPMetricExporterOptions';
 import { OTLPMetricExporterBase } from '../../OTLPMetricExporterBase';

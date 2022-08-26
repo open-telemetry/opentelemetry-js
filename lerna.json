@@ -7,6 +7,8 @@
     "experimental/backwards-compatability/*",
     "integration-tests/*",
     "selenium-tests",
-    "examples/otlp-exporter-node"
+    "examples/otlp-exporter-node",
+    "examples/opentelemetry-web",
+    "examples/https"
   ]
 }

@@ -8,12 +8,30 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
-* feat(sdk-trace-base): move Sampler declaration into sdk-trace-base [#3088](https://github.com/open-telemetry/opentelemetry-js/pull/3088) @legendecas
-* fix(grpc-instrumentation): added grpc attributes in instrumentation [#3127](https://github.com/open-telemetry/opentelemetry-js/pull/3127) @andrewzenkov
-
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.6.0
+
+### :rocket: (Enhancement)
+
+* perf(opentelemetry-core): improve hexToBase64 performance [#3178](https://github.com/open-telemetry/opentelemetry-js/pull/3178)
+* feat(sdk-trace-base): move Sampler declaration into sdk-trace-base [#3088](https://github.com/open-telemetry/opentelemetry-js/pull/3088) @legendecas
+* fix(grpc-instrumentation): added grpc attributes in instrumentation [#3127](https://github.com/open-telemetry/opentelemetry-js/pull/3127) @andrewzenkov
+* feat: support latest `@opentelemetry/api` [#3177](https://github.com/open-telemetry/opentelemetry-js/pull/3177) @dyladan
+
+### :bug: (Bug Fix)
+
+* fix(context-async-hooks): Ensure listeners added using `once` can be removed using `removeListener`
+  [#3133](https://github.com/open-telemetry/opentelemetry-js/pull/3133)
+
+### :books: (Refine Doc)
+
+* chore: update trace-web example and rename it to opentelemetry-web [#3145](https://github.com/open-telemetry/opentelemetry-js/pull/3145) @pichlermarc
+* chore: update https example [#3152](https://github.com/open-telemetry/opentelemetry-js/pull/3152) @pichlermarc
 
 ### :house: (Internal)
 
