@@ -35,7 +35,7 @@ import {
 import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
-import { TracerProviderWithEnvExporters } from './tracerProviderWithEnvExporter';
+import { TracerProviderWithEnvExporters } from './TracerProviderWithEnvExporter';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 export class NodeSDK {
