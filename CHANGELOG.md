@@ -14,6 +14,8 @@ All notable changes to this project will be documented in this file.
 
 ### :house: (Internal)
 
+* Replace internal references to InstrumentationLibrary with InstrumentationScope [#3202](https://github.com/open-telemetry/opentelemetry-js/pull/3202) @mwear
+
 ## 1.6.0
 
 ### :rocket: (Enhancement)
