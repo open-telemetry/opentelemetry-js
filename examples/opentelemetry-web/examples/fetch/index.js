@@ -28,7 +28,13 @@ const provider = new WebTracerProvider();
 provider.addSpanProcessor(
   new SimpleSpanProcessor(new OTLPTraceExporterProto())
 );
-// provider.addSpanProcessor(new SimpleSpanProcessor(new OTLPTraceExporter()));
+// provider.addSpanProcessor(
+//   new SimpleSpanProcessor(
+//     new OTLPTraceExporter({
+//       url: "https://api.honeycomb.io",
+//     })
+//   )
+// );
 
 provider.register({
   contextManager: new ZoneContextManager(),

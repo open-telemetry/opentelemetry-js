@@ -56,10 +56,9 @@ export function send<ExportItem, ServiceRequest>(
     const body = exportRequestType.encode(message).finish();
     if (body) {
       sendWithXhr(
-        body,
+        new Blob([body], { type: 'application/x-protobuf'}),
         collector.url,
-        // probably need to add headers?
-        {'Content-Type': 'application/x-protobuf'},
+        {'Content-Type': 'application/x-protobuf', ...collector._headers},
         collector.timeoutMillis,
         onSuccess,
         onError

@@ -33,7 +33,7 @@ export abstract class OTLPExporterBrowserBase<
   ExportItem,
   ServiceRequest
   > {
-  protected _headers: Record<string, string>;
+  public _headers: Record<string, string>;
   private _useXHR: boolean = false;
 
   /**

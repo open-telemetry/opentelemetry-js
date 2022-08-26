@@ -52,7 +52,7 @@ export function sendWithBeacon(
  * @param onError
  */
 export function sendWithXhr(
-  body: string | ArrayBuffer,
+  body: string | Blob,
   url: string,
   headers: Record<string, string>,
   exporterTimeout: number,
@@ -67,7 +67,7 @@ export function sendWithXhr(
   }, exporterTimeout);
 
   const xhr = new XMLHttpRequest();
-  xhr.open('POST', url, false);
+  xhr.open('POST', url);
 
   const defaultHeaders = {
     'Accept': 'application/json',
