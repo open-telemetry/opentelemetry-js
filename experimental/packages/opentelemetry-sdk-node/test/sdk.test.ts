@@ -49,7 +49,7 @@ import { OTLPTraceExporter as OTLPHttpTraceExporter} from '@opentelemetry/export
 import { OTLPTraceExporter as OTLPGrpcTraceExporter} from '@opentelemetry/exporter-trace-otlp-grpc';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
-import { TracerProviderWithEnvExporters } from '../src/tracerProviderWithEnvExporter';
+import { TracerProviderWithEnvExporters } from '../src/TracerProviderWithEnvExporter';
 
 const DefaultContextManager = semver.gte(process.version, '14.8.0')
   ? AsyncLocalStorageContextManager
