@@ -12,11 +12,9 @@ All notable changes to experimental packages in this project will be documented 
     * `Aggregator`
     * `AggregatorKind`
     * `Accumulation`
-    * `CollectionResult`
     * `createInstrumentDescriptor`
     * `createInstrumentDescriptorWithView`
     * `isDescriptorCompatibleWith`
-    * `TimeoutError`
 
 ### :rocket: (Enhancement)
 

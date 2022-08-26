@@ -34,6 +34,7 @@ export {
   ResourceMetrics,
   ScopeMetrics,
   MetricData,
+  CollectionResult,
 } from './export/MetricData';
 
 export {
