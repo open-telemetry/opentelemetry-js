@@ -8,13 +8,13 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* Add `instrumentationScope` property to the `ReadableSpan` interface and deprecate `instrumentationLibrary` [#3202](https://github.com/open-telemetry/opentelemetry-js/pull/3202) @mwear
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
-
-* Replace internal references to InstrumentationLibrary with InstrumentationScope [#3202](https://github.com/open-telemetry/opentelemetry-js/pull/3202) @mwear
 
 ## 1.6.0
 
