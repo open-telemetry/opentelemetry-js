@@ -176,6 +176,9 @@ describe('Node SDK', () => {
   }
 
   it('should register meter views when provided', async () => {
+    // need to set OTEL_TRACES_EXPORTER to none since default value is otlp
+    // which sets up an exporter and affects the context manager
+      env.OTEL_TRACES_EXPORTER = 'none';
     const exporter = new InMemoryMetricExporter(AggregationTemporality.CUMULATIVE);
     const metricReader = new PeriodicExportingMetricReader({
       exporter: exporter,
