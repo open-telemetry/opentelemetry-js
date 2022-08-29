@@ -29,7 +29,7 @@ export class TracerProviderWithEnvExporters extends NodeTracerProvider {
   public spanProcessors: (BatchSpanProcessor | SimpleSpanProcessor)[] | undefined;
 
   static configureOtlp(): SpanExporter {
-    const protocol = this.getOtlpProtocol("traces");
+    const protocol = this.getOtlpProtocol();
 
     switch (protocol) {
       case 'grpc':
@@ -44,7 +44,7 @@ export class TracerProviderWithEnvExporters extends NodeTracerProvider {
     }
   }
 
-  static getOtlpProtocol(dataType: string): string | null {
+  static getOtlpProtocol(): string {
     const parsedEnvValues = getEnvWithoutDefaults();
 
     return parsedEnvValues.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL ??
