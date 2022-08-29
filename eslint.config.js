@@ -45,7 +45,6 @@ module.exports = {
             "leadingUnderscore": "require"
           }
         ],
-        "@typescript-eslint/no-shadow": ["warn"],
         "@typescript-eslint/no-unused-vars": ["error", {"argsIgnorePattern": "^_", "args": "after-used"}],
         "@typescript-eslint/no-inferrable-types": ["error", { ignoreProperties: true }],
         "@typescript-eslint/no-empty-function": ["off"],
@@ -65,7 +64,6 @@ module.exports = {
         "@typescript-eslint/ban-ts-ignore": "off",
         "@typescript-eslint/no-empty-function": "off",
         "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/no-floating-promises": 1,
         "@typescript-eslint/no-unused-vars": "off",
         "@typescript-eslint/no-var-requires": "off",
         "@typescript-eslint/no-shadow": ["off"],
