@@ -25,12 +25,11 @@ import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 
 export class TracerProviderWithEnvExporters extends NodeTracerProvider {
-  static DATA_TYPE_TRACES = 'traces';
   public configuredExporters: SpanExporter[] = [];
   public spanProcessors: (BatchSpanProcessor | SimpleSpanProcessor)[] | undefined;
 
   static configureOtlp(): SpanExporter {
-    const protocol = this.getOtlpProtocol(this.DATA_TYPE_TRACES);
+    const protocol = this.getOtlpProtocol("traces");
 
     switch (protocol) {
       case 'grpc':
@@ -48,16 +47,10 @@ export class TracerProviderWithEnvExporters extends NodeTracerProvider {
   static getOtlpProtocol(dataType: string): string | null {
     const parsedEnvValues = getEnvWithoutDefaults();
 
-    switch (dataType) {
-      case 'traces':
-        return parsedEnvValues.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL ??
+    return parsedEnvValues.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL ??
           parsedEnvValues.OTEL_EXPORTER_OTLP_PROTOCOL ??
           getEnv().OTEL_EXPORTER_OTLP_TRACES_PROTOCOL ??
           getEnv().OTEL_EXPORTER_OTLP_PROTOCOL;
-      default:
-        diag.warn(`Data type not recognized: ${dataType}`);
-        return null;
-    }
   }
 
   protected static override _registeredExporters = new Map<
@@ -72,7 +65,7 @@ export class TracerProviderWithEnvExporters extends NodeTracerProvider {
 
   public constructor(config: NodeTracerConfig = {}) {
     super(config);
-    let traceExportersList = this.retrieveListOfTraceExporters();
+    let traceExportersList = this.filterBlanksAndNulls(Array.from(new Set(getEnv().OTEL_TRACES_EXPORTER.split(','))));
 
     if (traceExportersList.length === 0 || traceExportersList[0] === 'none') {
       diag.warn('OTEL_TRACES_EXPORTER contains "none" or is empty. SDK will not be initialized.');
@@ -109,14 +102,7 @@ export class TracerProviderWithEnvExporters extends NodeTracerProvider {
     });
   }
 
-  public retrieveListOfTraceExporters(): string[] {
-    const traceList = getEnv().OTEL_TRACES_EXPORTER.split(',');
-    const uniqueTraceExporters =  Array.from(new Set(traceList));
-
-    return this.filterBlanksAndNulls(uniqueTraceExporters);
-  }
-
-  private filterBlanksAndNulls(list: string[]): string[] {
+  public filterBlanksAndNulls(list: string[]): string[] {
     return list.map(item => item.trim())
       .filter(s => s !== 'null' && s !== '');
   }
