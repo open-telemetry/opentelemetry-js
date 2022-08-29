@@ -21,12 +21,12 @@ import {
   Meter,
   MeterProvider,
   DataPointType,
-  CollectionResult,
   View
 } from '../../src';
 import { assertMetricData, defaultInstrumentationScope, defaultResource, sleep } from '../util';
 import { TestMetricReader } from '../export/TestMetricReader';
 import { MeterSharedState } from '../../src/state/MeterSharedState';
+import { CollectionResult } from '../../src/export/MetricData';
 
 describe('MeterSharedState', () => {
   afterEach(() => {
