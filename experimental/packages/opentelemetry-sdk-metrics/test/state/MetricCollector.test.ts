@@ -16,7 +16,8 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { MeterProvider, TimeoutError } from '../../src';
+import { MeterProvider } from '../../src';
+import { TimeoutError } from '../../src/utils';
 import { DataPointType } from '../../src/export/MetricData';
 import { PushMetricExporter } from '../../src/export/MetricExporter';
 import { MeterProviderSharedState } from '../../src/state/MeterProviderSharedState';
