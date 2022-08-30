@@ -31,7 +31,8 @@ class BrowserDetector implements Detector {
     const browserResource: ResourceAttributes = {
       [SemanticResourceAttributes.PROCESS_RUNTIME_NAME]: 'browser',
       [SemanticResourceAttributes.PROCESS_RUNTIME_DESCRIPTION]: 'Web Browser',
-      [SemanticResourceAttributes.PROCESS_RUNTIME_VERSION]: navigator.userAgent
+      [SemanticResourceAttributes.PROCESS_RUNTIME_VERSION]: navigator.userAgent,
+      ...getBrowserAttributes()
     };
     return this._getResourceAttributes(browserResource, config);
   }
@@ -59,6 +60,19 @@ class BrowserDetector implements Detector {
       });
     }
   }
+}
+
+//Add Browser related attributes to resources
+export function getBrowserAttributes():ResourceAttributes {
+  const browserAttribs:ResourceAttributes={};
+  const userAgentData=(navigator as any).userAgentData;
+  if(userAgentData) {
+    browserAttribs['browser.platform']=userAgentData.platform;
+    browserAttribs['browser.brands']=userAgentData.brands;
+    browserAttribs['browser.mobile']=userAgentData.mobile;
+  }
+  browserAttribs['browser.user_agent']=navigator.userAgent;
+  return browserAttribs;
 }
 
 

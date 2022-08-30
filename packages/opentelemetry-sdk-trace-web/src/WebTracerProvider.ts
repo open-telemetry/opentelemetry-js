@@ -35,8 +35,7 @@ export class WebTracerProvider extends BasicTracerProvider {
    * @param config Web Tracer config
    */
   constructor(config: WebTracerConfig = {}) {
-    const mergedConfig = addBrowserAttributes(config);
-    super(mergedConfig);
+    super(config);
 
     if ((config as SDKRegistrationConfig).contextManager) {
       throw (
@@ -63,27 +62,9 @@ export class WebTracerProvider extends BasicTracerProvider {
     if (config.contextManager) {
       config.contextManager.enable();
     }
+
     super.register(config);
   }
 }
 
-//Add Browser related attributes to resource span
-function addBrowserAttributes(config:WebTracerConfig = {}):WebTracerConfig {
-  const browserAttribs:any={};
-  const userAgentData=(navigator as any)['userAgentData'];
-  if(userAgentData) {
-    browserAttribs['browser.platform']=userAgentData.platform;
-    browserAttribs['browser.brands']=userAgentData.brands;
-    browserAttribs['browser.mobile']=userAgentData.mobile;
-  }
-  browserAttribs['browser.user_agent']=navigator.userAgent;
-  // const isTablet = /(ipad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch))|kindle|playbook|silk|(puffin(?!.*(IP|AP|WP))))/.test(navigator.userAgent);
-  // browserAttribs['browser.tablet']=isTablet;
-
-  return Object.assign({},
-    config,
-    {resource: Object.assign({},config.resource,
-      {attributes:Object.assign({},config?.resource?.attributes,
-        browserAttribs)})});
-}
 
