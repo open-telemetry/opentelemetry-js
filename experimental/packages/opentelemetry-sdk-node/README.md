@@ -114,7 +114,6 @@ or configure each instrumentation individually.
 
 Configure a resource. Resources may also be detected by using the `autoDetectResources` method of the SDK.
 
-
 ### resourceDetectors
 
 Configure a resource detectors. By default, the resource detectors are [envDetector, processDetector].
