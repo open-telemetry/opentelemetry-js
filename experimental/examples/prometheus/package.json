@@ -1,7 +1,7 @@
 {
   "name": "prometheus-example",
-  "version": "0.28.0",
-  "description": "Example of using @opentelemetry/sdk-metrics-base and  @opentelemetry/exporter-prometheus",
+  "version": "0.32.0",
+  "description": "Example of using @opentelemetry/sdk-metrics and @opentelemetry/exporter-prometheus",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -10,7 +10,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@opentelemetry/api": "^1.0.2",
-    "@opentelemetry/exporter-prometheus": "0.28.0",
-    "@opentelemetry/sdk-metrics-base": "0.28.0"
+    "@opentelemetry/exporter-prometheus": "0.32.0",
+    "@opentelemetry/sdk-metrics": "0.32.0"
   }
 }
