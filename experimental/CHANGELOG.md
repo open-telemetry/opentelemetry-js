@@ -18,6 +18,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* Add `resourceDetectors` option to `NodeSDK` [#3210](https://github.com/open-telemetry/opentelemetry-js/issues/3210)
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
