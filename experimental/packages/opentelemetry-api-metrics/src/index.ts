@@ -15,7 +15,7 @@
  */
 
 export {
-  NOOP_METER,
+  createNoopMeter,
 } from './NoopMeter';
 
 export {

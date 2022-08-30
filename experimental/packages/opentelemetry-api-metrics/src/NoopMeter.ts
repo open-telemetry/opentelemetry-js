@@ -132,3 +132,8 @@ export const NOOP_UP_DOWN_COUNTER_METRIC = new NoopUpDownCounterMetric();
 export const NOOP_OBSERVABLE_COUNTER_METRIC = new NoopObservableCounterMetric();
 export const NOOP_OBSERVABLE_GAUGE_METRIC = new NoopObservableGaugeMetric();
 export const NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC = new NoopObservableUpDownCounterMetric();
+
+// Utility functions
+export function createNoopMeter(): Meter{
+  return NOOP_METER;
+}
