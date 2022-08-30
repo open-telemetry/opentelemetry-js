@@ -290,7 +290,7 @@ describe('Node SDK', () => {
           autoDetectResources: true,
           resourceDetectors: [processDetector, {
             async detect(): Promise<Resource> {
-              return new Resource({'customAttr': 'value'});
+              return new Resource({'customAttr': 'someValue'});
             }
           },
           envDetector]
@@ -300,7 +300,7 @@ describe('Node SDK', () => {
 
         assert.strictEqual(
           resource.attributes['customAttr'],
-          'value'
+          'someValue'
         );
 
         assertServiceResource(resource, {
