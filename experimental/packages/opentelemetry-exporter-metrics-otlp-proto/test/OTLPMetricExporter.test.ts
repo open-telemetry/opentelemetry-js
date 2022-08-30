@@ -32,7 +32,7 @@ import {
   mockObservableGauge,
   mockHistogram, collect, setUp, shutdown,
 } from './metricsHelper';
-import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics-base';
+import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporterOptions } from '@opentelemetry/exporter-metrics-otlp-http';
 import { Stream, PassThrough } from 'stream';
 import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';

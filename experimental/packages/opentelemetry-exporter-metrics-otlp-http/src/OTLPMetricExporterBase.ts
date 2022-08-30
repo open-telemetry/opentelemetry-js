@@ -21,7 +21,7 @@ import {
   InstrumentType,
   PushMetricExporter,
   ResourceMetrics
-} from '@opentelemetry/sdk-metrics-base';
+} from '@opentelemetry/sdk-metrics';
 import { defaultOptions, OTLPMetricExporterOptions } from './OTLPMetricExporterOptions';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';

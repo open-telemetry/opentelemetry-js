@@ -6,17 +6,40 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* chore(metrics-sdk): clean up exports [#3197](https://github.com/open-telemetry/opentelemetry-js/pull/3197) @pichlermarc
+  * removes export for:
+    * `AccumulationRecord`
+    * `Aggregator`
+    * `AggregatorKind`
+    * `Accumulation`
+    * `createInstrumentDescriptor`
+    * `createInstrumentDescriptorWithView`
+    * `isDescriptorCompatibleWith`
+
 ### :rocket: (Enhancement)
 
-* feature(prometheus-serialiser): export the unit block when unit is set in metric descriptor [#3066](https://github.com/open-telemetry/opentelemetry-js/pull/3041) @weyert
-
 ### :bug: (Bug Fix)
-
-* fix(instrumentation-http): add `http.host` attribute before sending the request #3054 @cuichenli
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 0.32.0
+
+### :boom: Breaking Change
+
+* Rename @opentelemetry/sdk-metrics-base package to @opentelemetry/sdk-metrics  [#3162](https://github.com/open-telemetry/opentelemetry-js/pull/3162) @hectorhdzg
+
+### :rocket: (Enhancement)
+
+* fix(add-views-to-node-sdk): added the ability to define meter views in `NodeSDK` [#3066](https://github.com/open-telemetry/opentelemetry-js/pull/3124) @weyert
+* feature(add-console-metrics-exporter): add ConsoleMetricExporter [#3120](https://github.com/open-telemetry/opentelemetry-js/pull/3120) @weyert
+* feature(prometheus-serialiser): export the unit block when unit is set in metric descriptor [#3066](https://github.com/open-telemetry/opentelemetry-js/pull/3041) @weyert
+* feat: support latest `@opentelemetry/api` [#3177](https://github.com/open-telemetry/opentelemetry-js/pull/3177) @dyladan
+
+### :bug: (Bug Fix)
+
+* fix(instrumentation-http): add `http.host` attribute before sending the request #3054 @cuichenli
 
 ## 0.31.0
 
