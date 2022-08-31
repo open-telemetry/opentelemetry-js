@@ -6,6 +6,28 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* chore(metrics-sdk): clean up exports [#3197](https://github.com/open-telemetry/opentelemetry-js/pull/3197) @pichlermarc
+  * removes export for:
+    * `AccumulationRecord`
+    * `Aggregator`
+    * `AggregatorKind`
+    * `Accumulation`
+    * `createInstrumentDescriptor`
+    * `createInstrumentDescriptorWithView`
+    * `isDescriptorCompatibleWith`
+
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.32.0
+
+### :boom: Breaking Change
+
 * Rename @opentelemetry/sdk-metrics-base package to @opentelemetry/sdk-metrics  [#3162](https://github.com/open-telemetry/opentelemetry-js/pull/3162) @hectorhdzg
 
 ### :rocket: (Enhancement)
@@ -19,10 +41,6 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(instrumentation-http): add `http.host` attribute before sending the request #3054 @cuichenli
-
-### :books: (Refine Doc)
-
-### :house: (Internal)
 
 ## 0.31.0
 

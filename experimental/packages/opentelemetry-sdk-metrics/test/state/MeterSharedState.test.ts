@@ -20,7 +20,6 @@ import {
   Meter,
   MeterProvider,
   DataPointType,
-  CollectionResult,
   View,
   Aggregation,
   MetricReader,
@@ -29,6 +28,7 @@ import {
 import { assertMetricData, defaultInstrumentationScope, defaultResource, sleep } from '../util';
 import { TestDeltaMetricReader, TestMetricReader } from '../export/TestMetricReader';
 import { MeterSharedState } from '../../src/state/MeterSharedState';
+import { CollectionResult } from '../../src/export/MetricData';
 
 describe('MeterSharedState', () => {
   afterEach(() => {
