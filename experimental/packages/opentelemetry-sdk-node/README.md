@@ -116,7 +116,7 @@ Configure a resource. Resources may also be detected by using the `autoDetectRes
 
 ### resourceDetectors
 
-Configure a resource detectors. By default, the resource detectors are [envDetector, processDetector].
+Configure resource detectors. By default, the resource detectors are [envDetector, processDetector].
 NOTE: In order to enable the detection, the parameter `autoDetectResources` has to be `true`.
 
 ### sampler
