@@ -25,7 +25,7 @@ import { Histogram } from '../aggregator/types';
 /**
  * Basic metric data fields.
  */
-export interface BaseMetricData {
+interface BaseMetricData {
   readonly descriptor: InstrumentDescriptor;
   readonly aggregationTemporality: AggregationTemporality;
   /**
