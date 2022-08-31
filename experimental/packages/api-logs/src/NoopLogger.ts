@@ -15,10 +15,10 @@
  */
 
 import { Logger } from './types/Logger';
-import { Event } from './types/Event';
+import { LogEvent } from './types/LogEvent';
 import { LogRecord } from './types/LogRecord';
 
 export class NoopLogger implements Logger {
   emitLogRecord(_logRecord: LogRecord): void {}
-  emitEvent(_event: Event): void {}
+  emitEvent(_event: LogEvent): void {}
 }

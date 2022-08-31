@@ -15,7 +15,7 @@
  */
 
 import { LogRecord } from './LogRecord';
-import { Event } from './Event';
+import { LogEvent } from './LogEvent';
 
 export interface Logger {
   /**
@@ -30,5 +30,5 @@ export interface Logger {
    *
    * @param event
    */
-  emitEvent(event: Event): void;
+  emitEvent(event: LogEvent): void;
 }
