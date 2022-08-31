@@ -5,10 +5,10 @@ All notable changes to experimental packages in this project will be documented 
 ## Unreleased
 
 ### :boom: Breaking Change
+
 * Add `resourceDetectors` option to `NodeSDK` [#3210](https://github.com/open-telemetry/opentelemetry-js/issues/3210)
   * `NodeSDK.detect()` function, are no longer able to receive config as a parameter.
     Instead, the detectors are passed to the constructor.
-
 
 * chore(metrics-sdk): clean up exports [#3197](https://github.com/open-telemetry/opentelemetry-js/pull/3197) @pichlermarc
   * removes export for:
