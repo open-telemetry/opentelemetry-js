@@ -17,7 +17,7 @@
 import { diag } from '@opentelemetry/api';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { Detector, Resource, ResourceDetectionConfig } from '..';
-import { ResourceAttributes, UserAgentData } from '../types';
+import { ResourceAttributes, UserAgentData, BROWSER_ATTRIBUTES } from '../types';
 
 /**
  * BrowserDetector will be used to detect the resources related to browser.
@@ -63,15 +63,15 @@ class BrowserDetector implements Detector {
 }
 
 //Add Browser related attributes to resources
-function getBrowserAttributes():ResourceAttributes {
+function getBrowserAttributes(): ResourceAttributes {
   const browserAttribs : ResourceAttributes = {};
-  const userAgentData : UserAgentData = (navigator as any).userAgentData;
+  const userAgentData : UserAgentData | undefined = (navigator as any).userAgentData;
   if(userAgentData) {
-    browserAttribs['browser.platform'] = userAgentData.platform;
-    browserAttribs['browser.brands'] = userAgentData.brands;
-    browserAttribs['browser.mobile'] = userAgentData.mobile;
+    browserAttribs[BROWSER_ATTRIBUTES.PLATFORM] = userAgentData.platform;
+    browserAttribs[BROWSER_ATTRIBUTES.BRANDS] = userAgentData.brands;
+    browserAttribs[BROWSER_ATTRIBUTES.MOBILE] = userAgentData.mobile;
   }
-  browserAttribs['browser.user_agent'] = navigator.userAgent;
+  browserAttribs[BROWSER_ATTRIBUTES.USER_AGENT] = navigator.userAgent;
   return browserAttribs;
 }
 

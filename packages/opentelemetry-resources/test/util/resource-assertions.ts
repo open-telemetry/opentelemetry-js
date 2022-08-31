@@ -18,6 +18,7 @@ import { SDK_INFO } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { Resource } from '../../src/Resource';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { BROWSER_ATTRIBUTES } from '../../src/types';
 
 /**
  * Test utility method to validate a cloud resource
@@ -321,25 +322,26 @@ export const assertResource = (
   }
   if (validations.platform) {
     assert.strictEqual(
-      resource.attributes['browser.platform'],
+      resource.attributes[BROWSER_ATTRIBUTES.PLATFORM],
       validations.platform
     );
   }
   if (validations.brands) {
+    assert.ok(Array.isArray(resource.attributes[BROWSER_ATTRIBUTES.BRANDS]));
     assert.strictEqual(
-      (resource.attributes['browser.brands'] as Array<string>).join('.'),
+      (resource.attributes[BROWSER_ATTRIBUTES.BRANDS] as Array<string>).join('.'),
       validations.brands.join('.')
     );
   }
   if (validations.mobile) {
     assert.strictEqual(
-      (resource.attributes['browser.mobile']),
+      (resource.attributes[BROWSER_ATTRIBUTES.MOBILE]),
       validations.mobile
     );
   }
   if (validations.user_agent) {
     assert.strictEqual(
-      (resource.attributes['browser.user_agent']),
+      (resource.attributes[BROWSER_ATTRIBUTES.USER_AGENT]),
       validations.user_agent
     );
   }
