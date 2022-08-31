@@ -66,5 +66,3 @@ export class WebTracerProvider extends BasicTracerProvider {
     super.register(config);
   }
 }
-
-

@@ -30,6 +30,11 @@ describeBrowser('browserDetector()', () => {
   it('should return browser information', async () => {
     sinon.stub(globalThis, 'navigator').value({
       userAgent: 'dddd',
+      userAgentData:{
+        platform:'platform',
+        brands:['brand1'],
+        mobile:false
+      }
     });
 
     const resource: Resource = await browserDetector.detect();
@@ -37,6 +42,10 @@ describeBrowser('browserDetector()', () => {
       version: 'dddd',
       runtimeDescription: 'Web Browser',
       runtimeName: 'browser',
+      platform: 'platform',
+      brands: ['brand1'],
+      mobile: false,
+      user_agent: 'dddd'
     });
   });
   it('should return empty resources if version is missing', async () => {

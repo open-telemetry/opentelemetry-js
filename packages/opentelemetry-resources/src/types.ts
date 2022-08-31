@@ -32,3 +32,9 @@ export type ResourceAttributes = SpanAttributes;
 export interface Detector {
   detect(config?: ResourceDetectionConfig): Promise<Resource>;
 }
+
+export type UserAgentData = {
+  brands: string[],
+  platform: string,
+  mobile: boolean
+};

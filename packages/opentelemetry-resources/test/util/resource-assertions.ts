@@ -273,6 +273,10 @@ export const assertResource = (
     version?: string;
     runtimeName?: string;
     runtimeDescription?: string;
+    platform?: string,
+    brands?: string[],
+    mobile?: boolean,
+    user_agent?: string
   }
 ) => {
   assert.strictEqual(
@@ -313,6 +317,30 @@ export const assertResource = (
     assert.strictEqual(
       resource.attributes[SemanticResourceAttributes.PROCESS_RUNTIME_DESCRIPTION],
       validations.runtimeDescription
+    );
+  }
+  if (validations.platform) {
+    assert.strictEqual(
+      resource.attributes['browser.platform'],
+      validations.platform
+    );
+  }
+  if (validations.brands) {
+    assert.strictEqual(
+      (resource.attributes['browser.brands'] as Array<string>).join('.'),
+      validations.brands.join('.')
+    );
+  }
+  if (validations.mobile) {
+    assert.strictEqual(
+      (resource.attributes['browser.mobile']),
+      validations.mobile
+    );
+  }
+  if (validations.user_agent) {
+    assert.strictEqual(
+      (resource.attributes['browser.user_agent']),
+      validations.user_agent
     );
   }
 };
