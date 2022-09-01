@@ -47,6 +47,7 @@ export {
 
 export {
   MetricReader,
+  MetricReaderOptions
 } from './export/MetricReader';
 
 export {
