@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
+import { InstrumentType } from '../InstrumentDescriptor';
+import { Aggregation } from '../view/Aggregation';
+import { AggregationTemporality } from './AggregationTemporality';
+
 /**
- * AggregationTemporality indicates the way additive quantities are expressed.
+ * Aggregation selector based on metric instrument types.
  */
-export enum AggregationTemporality {
-  DELTA,
-  CUMULATIVE,
-}
+export type AggregationSelector = (instrumentType: InstrumentType) => Aggregation;
+
+/**
+  * Aggregation temporality selector based on metric instrument types.
+  */
+export type AggregationTemporalitySelector = (instrumentType: InstrumentType) => AggregationTemporality;
