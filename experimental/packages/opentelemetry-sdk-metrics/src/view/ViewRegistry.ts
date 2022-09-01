@@ -21,9 +21,6 @@ import { MeterSelector } from './MeterSelector';
 import { View } from './View';
 
 export class ViewRegistry {
-  private static DEFAULT_VIEW = new View({
-    instrumentName: '*'
-  });
   private _registeredViews: View[] = [];
 
   addView(view: View) {
@@ -37,9 +34,6 @@ export class ViewRegistry {
           this._matchMeter(registeredView.meterSelector, meter);
       });
 
-    if (views.length === 0) {
-      return [ViewRegistry.DEFAULT_VIEW];
-    }
     return views;
   }
 

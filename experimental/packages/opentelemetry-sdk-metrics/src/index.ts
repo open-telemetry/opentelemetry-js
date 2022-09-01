@@ -21,8 +21,12 @@ export {
 } from './aggregator/types';
 
 export {
-  AggregationTemporality,
+  AggregationSelector,
   AggregationTemporalitySelector,
+} from './export/AggregationSelector';
+
+export {
+  AggregationTemporality,
 } from './export/AggregationTemporality';
 
 export {

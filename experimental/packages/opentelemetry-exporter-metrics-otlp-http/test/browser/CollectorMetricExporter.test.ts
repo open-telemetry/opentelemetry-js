@@ -99,6 +99,7 @@ describe('OTLPMetricExporter - web', () => {
           temporalityPreference: AggregationTemporality.CUMULATIVE
         });
       });
+
       it('should successfully send metrics using sendBeacon', done => {
         collectorExporter.export(metrics, () => {
         });
@@ -109,16 +110,22 @@ describe('OTLPMetricExporter - web', () => {
           const blob: Blob = args[1];
           const body = await blob.text();
           const json = JSON.parse(body) as IExportMetricsServiceRequest;
-          const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[0];
-          const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[1];
-          const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[2];
+
+          // The order of the metrics is not guaranteed.
+          const counterIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'int-counter');
+          const observableIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'double-observable-gauge2');
+          const histogramIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'int-histogram');
+
+          const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[counterIndex];
+          const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[observableIndex];
+          const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[histogramIndex];
 
           assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
 
           ensureCounterIsCorrect(
             metric1,
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[0].dataPoints[0].endTime),
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[0].dataPoints[0].startTime)
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].endTime),
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].startTime)
           );
 
 
@@ -128,8 +135,8 @@ describe('OTLPMetricExporter - web', () => {
           );
           ensureObservableGaugeIsCorrect(
             metric2,
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[1].dataPoints[0].endTime),
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[1].dataPoints[0].startTime),
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0].endTime),
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0].startTime),
             6,
             'double-observable-gauge2'
           );
@@ -140,8 +147,8 @@ describe('OTLPMetricExporter - web', () => {
           );
           ensureHistogramIsCorrect(
             metric3,
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[2].dataPoints[0].endTime),
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[2].dataPoints[0].startTime),
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0].endTime),
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0].startTime),
             [0, 100],
             [0, 2, 0]
           );
@@ -216,15 +223,20 @@ describe('OTLPMetricExporter - web', () => {
 
           const body = request.requestBody;
           const json = JSON.parse(body) as IExportMetricsServiceRequest;
-          const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[0];
-          const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[1];
-          const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[2];
+          // The order of the metrics is not guaranteed.
+          const counterIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'int-counter');
+          const observableIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'double-observable-gauge2');
+          const histogramIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'int-histogram');
+
+          const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[counterIndex];
+          const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[observableIndex];
+          const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[histogramIndex];
 
           assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
           ensureCounterIsCorrect(
             metric1,
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[0].dataPoints[0].endTime),
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[0].dataPoints[0].startTime)
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].endTime),
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[counterIndex].dataPoints[0].startTime)
           );
 
           assert.ok(
@@ -233,8 +245,8 @@ describe('OTLPMetricExporter - web', () => {
           );
           ensureObservableGaugeIsCorrect(
             metric2,
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[1].dataPoints[0].endTime),
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[1].dataPoints[0].startTime),
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0].endTime),
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[observableIndex].dataPoints[0].startTime),
             6,
             'double-observable-gauge2'
           );
@@ -245,8 +257,8 @@ describe('OTLPMetricExporter - web', () => {
           );
           ensureHistogramIsCorrect(
             metric3,
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[2].dataPoints[0].endTime),
-            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[2].dataPoints[0].startTime),
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0].endTime),
+            hrTimeToNanoseconds(metrics.scopeMetrics[0].metrics[histogramIndex].dataPoints[0].startTime),
             [0, 100],
             [0, 2, 0]
           );

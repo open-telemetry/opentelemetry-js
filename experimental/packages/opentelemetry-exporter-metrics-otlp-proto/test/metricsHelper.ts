@@ -24,6 +24,7 @@ import {
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import {
+  Aggregation,
   AggregationTemporality,
   ExplicitBucketHistogramAggregation,
   MeterProvider,
@@ -34,6 +35,10 @@ import { IExportMetricsServiceRequest, IKeyValue, IMetric } from '@opentelemetry
 import { Stream } from 'stream';
 
 export class TestMetricReader extends MetricReader {
+  selectAggregation() {
+    return Aggregation.Default();
+  }
+
   selectAggregationTemporality() {
     return AggregationTemporality.CUMULATIVE;
   }
