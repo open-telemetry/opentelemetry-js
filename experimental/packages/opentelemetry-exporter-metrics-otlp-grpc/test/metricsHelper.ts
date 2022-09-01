@@ -20,6 +20,7 @@ import * as assert from 'assert';
 import * as grpc from '@grpc/grpc-js';
 import { VERSION } from '@opentelemetry/core';
 import {
+  Aggregation,
   AggregationTemporality,
   ExplicitBucketHistogramAggregation,
   MeterProvider,
@@ -29,6 +30,10 @@ import {
 import { IKeyValue, IMetric, IResource } from '@opentelemetry/otlp-transformer';
 
 class TestMetricReader extends MetricReader {
+  selectAggregation() {
+    return Aggregation.Default();
+  }
+
   selectAggregationTemporality() {
     return AggregationTemporality.CUMULATIVE;
   }
