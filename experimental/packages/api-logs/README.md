@@ -35,7 +35,7 @@ const loggerProvider = createLoggerProvider();
 api.logs.setGlobalLoggerProvider(loggerProvider);
 /* returns loggerProvider (no-op if a working provider has not been initialized) */
 api.logs.getLoggerProvider();
-/* returns a meter from the registered global meter provider (no-op if a working provider has not been initialized) */
+/* returns a logger from the registered global logger provider (no-op if a working provider has not been initialized) */
 const logger = api.logs.getLogger(name, version);
 
 // logging an event in an instrumentation library

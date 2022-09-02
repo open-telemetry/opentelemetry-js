@@ -40,7 +40,7 @@ describe('Global Utils', () => {
     api2.logs.disable();
   });
 
-  it('should change the global meter provider', () => {
+  it('should change the global logger provider', () => {
     const original = api1.logs.getLoggerProvider();
     const newLoggerProvider = new NoopLoggerProvider();
     api1.logs.setGlobalLoggerProvider(newLoggerProvider);
