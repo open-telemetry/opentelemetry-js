@@ -19,6 +19,7 @@ All notable changes to experimental packages in this project will be documented 
     * `createInstrumentDescriptor`
     * `createInstrumentDescriptorWithView`
     * `isDescriptorCompatibleWith`
+*  feat(sdk-metrics): align MetricReader with specification and other language implementations [#3225](https://github.com/open-telemetry/opentelemetry-js/pull/3225) @pichlermarc
 
 ### :rocket: (Enhancement)
 
