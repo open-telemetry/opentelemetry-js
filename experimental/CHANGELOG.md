@@ -6,6 +6,10 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* Add `resourceDetectors` option to `NodeSDK` [#3210](https://github.com/open-telemetry/opentelemetry-js/issues/3210)
+  * `NodeSDK.detectResources()` function is no longer able to receive config as a parameter.
+    Instead, the detectors are passed to the constructor.
+
 * chore(metrics-sdk): clean up exports [#3197](https://github.com/open-telemetry/opentelemetry-js/pull/3197) @pichlermarc
   * removes export for:
     * `AccumulationRecord`
@@ -37,6 +41,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* Add `resourceDetectors` option to `NodeSDK` [#3210](https://github.com/open-telemetry/opentelemetry-js/issues/3210)
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
@@ -55,6 +61,8 @@ All notable changes to experimental packages in this project will be documented 
 * feature(add-console-metrics-exporter): add ConsoleMetricExporter [#3120](https://github.com/open-telemetry/opentelemetry-js/pull/3120) @weyert
 * feature(prometheus-serialiser): export the unit block when unit is set in metric descriptor [#3066](https://github.com/open-telemetry/opentelemetry-js/pull/3041) @weyert
 * feat: support latest `@opentelemetry/api` [#3177](https://github.com/open-telemetry/opentelemetry-js/pull/3177) @dyladan
+* feat(sdk-metrics-base): add per metric-reader aggregation support [#3153](https://github.com/open-telemetry/opentelemetry-js/pull/3153) @legendecas
+* chore(deps): update prometheus example dependencies to 0.32 [#3126](https://github.com/open-telemetry/opentelemetry-js/pull/3216) @avzis
 
 ### :bug: (Bug Fix)
 

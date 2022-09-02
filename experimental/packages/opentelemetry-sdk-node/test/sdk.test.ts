@@ -51,7 +51,8 @@ import * as Sinon from 'sinon';
 import { NodeSDK } from '../src';
 import {
   envDetector,
-  processDetector
+  processDetector,
+  Resource
 } from '@opentelemetry/resources';
 
 
@@ -295,19 +296,47 @@ describe('Node SDK', () => {
       delete process.env.OTEL_RESOURCE_ATTRIBUTES;
     });
 
+    describe('with a custom resource', () => {
+      it('returns a merged resource', async () => {
+        const sdk = new NodeSDK({
+          autoDetectResources: true,
+          resourceDetectors: [processDetector, {
+            async detect(): Promise<Resource> {
+              return new Resource({'customAttr': 'someValue'});
+            }
+          },
+          envDetector]
+        });
+        await sdk.detectResources();
+        const resource = sdk['_resource'];
+
+        assert.strictEqual(
+          resource.attributes['customAttr'],
+          'someValue'
+        );
+
+        assertServiceResource(resource, {
+          instanceId: '627cc493',
+          name: 'my-service',
+          namespace: 'default',
+          version: '0.0.1',
+        });
+      });
+    });
+
     describe('with a buggy detector', () => {
       it('returns a merged resource', async () => {
         const sdk = new NodeSDK({
           autoDetectResources: true,
-        });
-        await sdk.detectResources({
-          detectors: [processDetector, {
+          resourceDetectors: [processDetector, {
             detect() {
               throw new Error('Buggy detector');
             }
           },
           envDetector]
         });
+
+        await sdk.detectResources();
         const resource = sdk['_resource'];
 
         assertServiceResource(resource, {
