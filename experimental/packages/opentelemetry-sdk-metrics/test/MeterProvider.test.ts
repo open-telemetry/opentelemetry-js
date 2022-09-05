@@ -15,7 +15,6 @@
  */
 
 import * as assert from 'assert';
-import { NOOP_METER } from '@opentelemetry/api-metrics';
 import { Meter, MeterProvider, InstrumentType, DataPointType } from '../src';
 import {
   assertScopeMetrics,
@@ -62,7 +61,8 @@ describe('MeterProvider', () => {
       const meterProvider = new MeterProvider();
       meterProvider.shutdown();
       const meter = meterProvider.getMeter('meter1', '1.0.0');
-      assert.strictEqual(meter, NOOP_METER);
+      // returned tracer should be no-op, not instance of Meter (from SDK)
+      assert.ok(!(meter instanceof Meter));
     });
 
     it('get meter with same identity', async () => {

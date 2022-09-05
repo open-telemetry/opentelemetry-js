@@ -19,6 +19,25 @@ All notable changes to experimental packages in this project will be documented 
     * `createInstrumentDescriptor`
     * `createInstrumentDescriptorWithView`
     * `isDescriptorCompatibleWith`
+* chore(api-metrics): clean up exports [#3198](https://github.com/open-telemetry/opentelemetry-js/pull/3198) @pichlermarc
+  * removes export for:
+    * `NOOP_COUNTER_METRIC`
+    * `NOOP_HISTOGRAM_METRIC`
+    * `NOOP_METER_PROVIDER`
+    * `NOOP_OBSERVABLE_COUNTER_METRIC`
+    * `NOOP_OBSERVABLE_GAUGE_METRIC`
+    * `NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC`
+    * `NOOP_UP_DOWN_COUNTER_METRIC`
+    * `NoopCounterMetric`
+    * `NoopHistogramMetric`
+    * `NoopMeter`
+    * `NoopMeterProvider`
+    * `NoopMetric`
+    * `NoopObservableCounterMetric`
+    * `NoopObservableGaugeMetric`
+    * `NoopObservableMetric`
+    * `NoopObservableUpDownCounterMetric`
+    * `NoopUpDownCounterMetric`
 
 ### :rocket: (Enhancement)
 
