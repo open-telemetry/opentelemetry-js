@@ -41,7 +41,7 @@ export abstract class MetricStorage {
     collectionTime: HrTime,
   ): Maybe<MetricData>;
 
-  getInstrumentDescriptor(): InstrumentDescriptor{
+  getInstrumentDescriptor(): Readonly<InstrumentDescriptor> {
     return this._instrumentDescriptor;
   }
 

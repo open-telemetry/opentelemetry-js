@@ -17,14 +17,13 @@
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';
 import { AggregationTemporality } from '../../src/export/AggregationTemporality';
 import { InstrumentType, PushMetricExporter } from '../../src';
-import { CollectionResult, ResourceMetrics } from '../../src/export/MetricData';
+import { ResourceMetrics } from '../../src/export/MetricData';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { MetricProducer } from '../../src/export/MetricProducer';
 import { TimeoutError } from '../../src/utils';
 import { ExportResult, ExportResultCode } from '@opentelemetry/core';
 import { assertRejects } from '../test-utils';
-import { defaultResource } from '../util';
+import { emptyResourceMetrics, TestMetricProducer } from './TestMetricProducer';
 
 const MAX_32_BIT_INT = 2 ** 31 - 1;
 
@@ -85,17 +84,6 @@ class TestMetricExporter implements PushMetricExporter {
 class TestDeltaMetricExporter extends TestMetricExporter {
   override selectAggregationTemporality(_instrumentType: InstrumentType): AggregationTemporality {
     return AggregationTemporality.DELTA;
-  }
-}
-
-const emptyResourceMetrics = { resource: defaultResource, scopeMetrics: [] };
-
-class TestMetricProducer implements MetricProducer {
-  async collect(): Promise<CollectionResult> {
-    return {
-      resourceMetrics: { resource: defaultResource, scopeMetrics: [] },
-      errors: [],
-    };
   }
 }
 
@@ -363,54 +351,6 @@ describe('PeriodicExportingMetricReader', () => {
       });
 
       await assertRejects(() => reader.shutdown(), /Error during forceFlush/);
-    });
-  })
-  ;
-
-  describe('collect', () => {
-    it('should throw on non-initialized instance', async () => {
-      const exporter = new TestMetricExporter();
-      const reader = new PeriodicExportingMetricReader({
-        exporter: exporter,
-        exportIntervalMillis: MAX_32_BIT_INT,
-        exportTimeoutMillis: 80,
-      });
-
-      await assertRejects(() => reader.collect(), /MetricReader is not bound to a MetricProducer/);
-    });
-
-    it('should return empty on shut-down instance', async () => {
-      const exporter = new TestMetricExporter();
-      const reader = new PeriodicExportingMetricReader({
-        exporter: exporter,
-        exportIntervalMillis: MAX_32_BIT_INT,
-        exportTimeoutMillis: 80,
-      });
-
-      reader.setMetricProducer(new TestMetricProducer());
-
-      await reader.shutdown();
-      assertRejects(reader.collect(), /MetricReader is shutdown/);
-    });
-
-    it('should call MetricProduce.collect with timeout', async () => {
-      const exporter = new TestMetricExporter();
-      const reader = new PeriodicExportingMetricReader({
-        exporter: exporter,
-        exportIntervalMillis: MAX_32_BIT_INT,
-        exportTimeoutMillis: 80,
-      });
-      const producer = new TestMetricProducer();
-      reader.setMetricProducer(producer);
-
-      const collectStub = sinon.stub(producer, 'collect');
-
-      await reader.collect({ timeoutMillis: 20 });
-      assert(collectStub.calledOnce);
-      const args = collectStub.args[0];
-      assert.deepStrictEqual(args, [{ timeoutMillis: 20 }]);
-
-      await reader.shutdown();
     });
   });
 });

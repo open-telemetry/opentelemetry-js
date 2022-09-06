@@ -20,8 +20,12 @@ import { hexToBase64 } from '../../src/platform';
 describe('hexToBase64', () => {
   it('convert hex to base64', () => {
     const id1 = '7deb739e02e44ef2';
-    const id2 = '46cef837b919a16ff26e608c8cf42c80';
+    const id2 = '12abc034d567e89ff26e608c8cf42c80';
+    const id3 = id2.toUpperCase();
     assert.strictEqual(hexToBase64(id1), 'fetzngLkTvI=');
-    assert.strictEqual(hexToBase64(id2), 'Rs74N7kZoW/ybmCMjPQsgA==');
+    assert.strictEqual(hexToBase64(id2), 'EqvANNVn6J/ybmCMjPQsgA==');
+    assert.strictEqual(hexToBase64(id3), 'EqvANNVn6J/ybmCMjPQsgA==');
+    // Don't use the preallocated path
+    assert.strictEqual(hexToBase64(id2.repeat(2)), 'EqvANNVn6J/ybmCMjPQsgBKrwDTVZ+if8m5gjIz0LIA=');
   });
 });

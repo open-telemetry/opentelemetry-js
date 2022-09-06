@@ -23,13 +23,6 @@ import { View } from '../../src';
 
 describe('ViewRegistry', () => {
   describe('findViews', () => {
-    it('should return default view if no view registered', () => {
-      const registry = new ViewRegistry();
-      const views = registry.findViews(defaultInstrumentDescriptor, defaultInstrumentationScope);
-      assert.strictEqual(views.length, 1);
-      assert.strictEqual(views[0], ViewRegistry['DEFAULT_VIEW']);
-    });
-
     describe('InstrumentSelector', () => {
       it('should match view with instrument name', () => {
         const registry = new ViewRegistry();

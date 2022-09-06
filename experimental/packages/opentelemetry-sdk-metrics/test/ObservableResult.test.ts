@@ -16,9 +16,12 @@
 
 import { ValueType } from '@opentelemetry/api-metrics';
 import * as assert from 'assert';
-import { BatchObservableResultImpl, InstrumentType } from '../src';
+import { InstrumentType } from '../src';
 import { ObservableInstrument } from '../src/Instruments';
-import { ObservableResultImpl } from '../src/ObservableResult';
+import {
+  BatchObservableResultImpl,
+  ObservableResultImpl
+} from '../src/ObservableResult';
 import { ObservableRegistry } from '../src/state/ObservableRegistry';
 import { commonAttributes, commonValues, defaultInstrumentDescriptor } from './util';
 
