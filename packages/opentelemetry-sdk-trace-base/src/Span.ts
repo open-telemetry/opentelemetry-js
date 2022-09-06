@@ -83,7 +83,7 @@ export class Span implements api.Span, ReadableSpan {
     this.links = links;
     this.startTime = timeInputToHrTime(startTime);
     this.resource = parentTracer.resource;
-    this.instrumentationLibrary = parentTracer.instrumentationScope as InstrumentationLibrary;
+    this.instrumentationLibrary = parentTracer.instrumentationScope;
     this.instrumentationScope = parentTracer.instrumentationScope;
     this._spanLimits = parentTracer.getSpanLimits();
     this._spanProcessor = parentTracer.getActiveSpanProcessor();
