@@ -3,6 +3,8 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
+**Note: This is an experimental package under active development. New releases may include breaking changes.**
+
 This module provides exporter for web and node to be used with OTLP (`http/json`) compatible receivers.
 Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.52 <=0.53`.
 
