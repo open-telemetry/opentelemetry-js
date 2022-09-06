@@ -18,7 +18,7 @@ import { diag } from '@opentelemetry/api';
 import {
   globalErrorHandler,
 } from '@opentelemetry/core';
-import { AggregationTemporality, MetricReader } from '@opentelemetry/sdk-metrics';
+import { Aggregation, AggregationTemporality, MetricReader } from '@opentelemetry/sdk-metrics';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
 import { ExporterConfig } from './export/types';
 import { PrometheusSerializer } from './PrometheusSerializer';
@@ -88,6 +88,10 @@ export class PrometheusExporter extends MetricReader {
     } else if (callback) {
       callback();
     }
+  }
+
+  selectAggregation(): Aggregation {
+    return Aggregation.Default();
   }
 
   selectAggregationTemporality(): AggregationTemporality {

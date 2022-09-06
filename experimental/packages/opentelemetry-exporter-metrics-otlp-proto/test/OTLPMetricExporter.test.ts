@@ -240,9 +240,14 @@ describe('OTLPMetricExporter - node with proto over http', () => {
         const data = ExportTraceServiceRequestProto.decode(buff);
         const json = data?.toJSON() as IExportMetricsServiceRequest;
 
-        const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[0];
-        const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[1];
-        const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[2];
+        // The order of the metrics is not guaranteed.
+        const counterIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'int-counter');
+        const observableIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'double-observable-gauge');
+        const histogramIndex = metrics.scopeMetrics[0].metrics.findIndex(it => it.descriptor.name === 'int-histogram');
+
+        const metric1 = json.resourceMetrics[0].scopeMetrics[0].metrics[counterIndex];
+        const metric2 = json.resourceMetrics[0].scopeMetrics[0].metrics[observableIndex];
+        const metric3 = json.resourceMetrics[0].scopeMetrics[0].metrics[histogramIndex];
 
         assert.ok(typeof metric1 !== 'undefined', "counter doesn't exist");
         ensureExportedCounterIsCorrect(

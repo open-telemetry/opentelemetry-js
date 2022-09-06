@@ -15,9 +15,11 @@
  */
 
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import { MeterProvider } from '../../src/MeterProvider';
+import { assertRejects } from '../test-utils';
+import { emptyResourceMetrics, TestMetricProducer } from './TestMetricProducer';
 import { TestMetricReader } from './TestMetricReader';
-
 
 describe('MetricReader', () => {
   describe('setMetricProducer', () => {
@@ -29,6 +31,53 @@ describe('MetricReader', () => {
       meterProvider1.addMetricReader(reader);
       assert.throws(() => meterProvider1.addMetricReader(reader), /MetricReader can not be bound to a MeterProvider again/);
       assert.throws(() => meterProvider2.addMetricReader(reader), /MetricReader can not be bound to a MeterProvider again/);
+    });
+  });
+
+  describe('setMetricProducer', () => {
+    it('should initialize the metric reader', async () => {
+      const reader = new TestMetricReader();
+
+      reader.setMetricProducer(new TestMetricProducer());
+      const result = await reader.collect();
+
+      assert.deepStrictEqual(result, {
+        resourceMetrics: emptyResourceMetrics,
+        errors: [],
+      });
+      await reader.shutdown();
+    });
+  });
+
+  describe('collect', () => {
+    it('should throw on non-initialized instance', async () => {
+      const reader = new TestMetricReader();
+
+      await assertRejects(() => reader.collect(), /MetricReader is not bound to a MetricProducer/);
+    });
+
+    it('should return empty on shut-down instance', async () => {
+      const reader = new TestMetricReader();
+
+      reader.setMetricProducer(new TestMetricProducer());
+
+      await reader.shutdown();
+      assertRejects(reader.collect(), /MetricReader is shutdown/);
+    });
+
+    it('should call MetricProduce.collect with timeout', async () => {
+      const reader = new TestMetricReader();
+      const producer = new TestMetricProducer();
+      reader.setMetricProducer(producer);
+
+      const collectStub = sinon.stub(producer, 'collect');
+
+      await reader.collect({ timeoutMillis: 20 });
+      assert(collectStub.calledOnce);
+      const args = collectStub.args[0];
+      assert.deepStrictEqual(args, [{ timeoutMillis: 20 }]);
+
+      await reader.shutdown();
     });
   });
 });

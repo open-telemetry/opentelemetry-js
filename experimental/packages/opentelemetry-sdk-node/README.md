@@ -3,6 +3,8 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
+**Note: This is an experimental package under active development. New releases may include breaking changes.**
+
 This package provides the full OpenTelemetry SDK for Node.js including tracing and metrics.
 
 ## Quick Start
@@ -114,9 +116,14 @@ or configure each instrumentation individually.
 
 Configure a resource. Resources may also be detected by using the `autoDetectResources` method of the SDK.
 
+### resourceDetectors
+
+Configure resource detectors. By default, the resource detectors are [envDetector, processDetector].
+NOTE: In order to enable the detection, the parameter `autoDetectResources` has to be `true`.
+
 ### sampler
 
-Configure a custom sampler. By default all traces will be sampled.
+Configure a custom sampler. By default, all traces will be sampled.
 
 ### spanProcessor
 

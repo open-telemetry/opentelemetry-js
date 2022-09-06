@@ -55,7 +55,7 @@ export class MeterProvider implements metrics.MeterProvider {
     // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#meter-creation
     if (this._shutdown) {
       api.diag.warn('A shutdown MeterProvider cannot provide a Meter');
-      return metrics.NOOP_METER;
+      return metrics.createNoopMeter();
     }
 
     return this._sharedState
