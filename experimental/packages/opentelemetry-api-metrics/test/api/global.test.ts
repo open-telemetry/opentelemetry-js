@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import { _global, GLOBAL_METRICS_API_KEY } from '../../src/api/global-utils';
-import { NoopMeterProvider } from '../../src';
+import { NoopMeterProvider } from '../../src/NoopMeterProvider';
 
 const api1 = require('../../src') as typeof import('../../src');
 
