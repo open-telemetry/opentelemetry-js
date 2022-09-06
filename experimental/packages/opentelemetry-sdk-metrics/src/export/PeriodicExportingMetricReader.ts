@@ -55,8 +55,8 @@ export class PeriodicExportingMetricReader extends MetricReader {
 
   constructor(options: PeriodicExportingMetricReaderOptions) {
     super({
-      aggregationSelector: options.exporter.selectAggregation,
-      aggregationTemporalitySelector: options.exporter.selectAggregationTemporality
+      aggregationSelector: options.exporter.selectAggregation?.bind(options.exporter),
+      aggregationTemporalitySelector: options.exporter.selectAggregationTemporality?.bind(options.exporter)
     });
 
     if (options.exportIntervalMillis !== undefined && options.exportIntervalMillis <= 0) {
