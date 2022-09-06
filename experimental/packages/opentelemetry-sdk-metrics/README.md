@@ -3,6 +3,8 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
+**Note: This is an experimental package under active development. New releases may include breaking changes.**
+
 OpenTelemetry metrics module contains the foundation for all metrics SDKs of [opentelemetry-js](https://github.com/open-telemetry/opentelemetry-js).
 
 Used standalone, this module provides methods for manual instrumentation of code, offering full control over recording metrics for client-side JavaScript (browser) and Node.js.
