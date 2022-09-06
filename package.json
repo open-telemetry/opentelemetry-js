@@ -56,7 +56,7 @@
     "gh-pages": "4.0.0",
     "lerna": "5.4.3",
     "lerna-changelog": "2.2.0",
-    "linkinator": "4.0.2",
+    "linkinator": "3.0.3",
     "markdownlint-cli": "0.29.0",
     "semver": "7.3.5",
     "typedoc": "0.22.10",
