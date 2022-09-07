@@ -20,7 +20,7 @@ $ npm install @opentelemetry/sdk-node
 $ # Install exporters and plugins
 $ npm install \
     @opentelemetry/exporter-jaeger \ # add tracing exporters as needed
-    @opentelemetry/exporter-prometheus # add metrics exporters as needed
+    @opentelemetry/exporter-prometheus \ # add metrics exporters as needed
     @opentelemetry/instrumentation-http # add instrumentations as needed
 
 $ # or install all officially supported core and contrib plugins
@@ -28,7 +28,7 @@ $ npm install @opentelemetry/auto-instrumentations-node
 
 ```
 
-> Note: this example is for Node.js. See [examples/tracer-web](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/tracer-web) for a browser example.
+> Note: this example is for Node.js. See [examples/opentelemetry-web](https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/opentelemetry-web) for a browser example.
 
 ### Initialize the SDK
 
@@ -52,7 +52,7 @@ const sdk = new opentelemetry.NodeSDK({
   // Optional - if omitted, the tracing SDK will not be initialized
   traceExporter: jaegerExporter,
   // Optional - If omitted, the metrics SDK will not be initialized
-  metricExporter: prometheusExporter,
+  metricReader: prometheusExporter,
   // Optional - you can use the metapackage or load each instrumentation individually
   instrumentations: [getNodeAutoInstrumentations()],
   // See the Configuration section below for additional  configuration options
@@ -94,17 +94,17 @@ Use a custom context manager. Default: [AsyncHooksContextManager](../../../packa
 
 Use a custom propagator. Default: [CompositePropagator](../../../packages/opentelemetry-core/src/propagation/composite.ts) using [W3C Trace Context](../../../packages/opentelemetry-core/README.md#w3ctracecontextpropagator-propagator) and [Baggage](../../../packages/opentelemetry-core/README.md#baggage-propagator)
 
-### metricProcessor
+### metricReader
 
-Use a custom processor for metrics. Default: UngroupedProcessor
+Add a [MetricReader](../opentelemetry-sdk-metrics/src/export/MetricReader.ts)
+that will be passed to the `MeterProvider`. If `metricReader` is not configured,
+the metrics SDK will not be initialized and registered.
 
-### metricExporter
+### views
 
-Configure a metric exporter. If an exporter is not configured, the metrics SDK will not be initialized and registered.
-
-### metricInterval
-
-Configure an interval for metrics export in ms. Default: 60,000 (60 seconds)
+A list of views to be passed to the `MeterProvider`.
+Accepts an array of [View](../opentelemetry-sdk-metrics/src/view/View.ts)-instances.
+This parameter can be used to configure explicit bucket sizes of histogram metrics.
 
 ### instrumentations
 
@@ -134,10 +134,6 @@ Configure a trace exporter. If an exporter OR span processor is not configured, 
 ### spanLimits
 
 Configure tracing parameters. These are the same trace parameters used to [configure a tracer](../../../packages/opentelemetry-sdk-trace-base/src/types.ts#L71).
-
-### views
-
-Configure views of your instruments and accepts an array of [View](../opentelemetry-sdk-metrics-base/src/view/View.ts)-instances. The parameter can be used to configure the explicit bucket sizes of histogram metrics.
 
 ### serviceName
 
