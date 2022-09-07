@@ -16,6 +16,19 @@
 
 import { diag, SpanAttributeValue, SpanAttributes } from '@opentelemetry/api';
 
+function serializeNonPrimitiveAttributeValue(
+  key: string,
+  value: unknown
+): SpanAttributeValue | undefined {
+  if (typeof value === 'object') {
+    try {
+      return JSON.stringify(value);
+    } catch (error) {
+      diag.warn(`Invalid attribute value set for key: ${key}`);
+    }
+  }
+}
+
 export function sanitizeAttributes(attributes: unknown): SpanAttributes {
   const out: SpanAttributes = {};
 
@@ -29,7 +42,7 @@ export function sanitizeAttributes(attributes: unknown): SpanAttributes {
       continue;
     }
     if (!isAttributeValue(val)) {
-      diag.warn(`Invalid attribute value set for key: ${key}`);
+      out[key] = serializeNonPrimitiveAttributeValue(key, val);
       continue;
     }
     if (Array.isArray(val)) {
