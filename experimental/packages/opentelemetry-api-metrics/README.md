@@ -3,6 +3,8 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
+**Note: This is an experimental package under active development. New releases may include breaking changes.**
+
 This package provides everything needed to interact with the unstable OpenTelemetry Metrics API, including all TypeScript interfaces, enums, and no-op implementations. It is intended for use both on the server and in the browser.
 
 ## Beta Software - Use at your own risk
