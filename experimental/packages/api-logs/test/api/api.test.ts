@@ -38,6 +38,15 @@ describe('API', () => {
       const logger = logs.getLoggerProvider().getLogger('name');
       assert.deepStrictEqual(logger, dummyLogger);
     });
+
+    it('should not allow overriding global provider if already set', () => {
+      const provider1 = new TestLoggerProvider();
+      const provider2 = new TestLoggerProvider();
+      logs.setGlobalLoggerProvider(provider1);
+      assert.equal(logs.getLoggerProvider(), provider1);
+      logs.setGlobalLoggerProvider(provider2);
+      assert.equal(logs.getLoggerProvider(), provider1);
+    });
   });
 
   describe('getLogger', () => {
