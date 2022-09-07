@@ -86,6 +86,9 @@ export class TracerProviderWithEnvExporters extends NodeTracerProvider {
 
       if (this.configuredExporters.length > 0) {
         this.spanProcessors = this.configureSpanProcessors(this.configuredExporters);
+        this.spanProcessors.forEach(processor => {
+          this.addSpanProcessor(processor);
+        });
       } else {
         diag.warn('Unable to set up trace exporter(s) due to invalid exporter and/or protocol values.');
       }

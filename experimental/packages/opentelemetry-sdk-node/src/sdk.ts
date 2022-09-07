@@ -30,6 +30,7 @@ import {
 import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics';
 import {
   BatchSpanProcessor,
+  NoopSpanProcessor,
   SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
@@ -208,13 +209,11 @@ export class NodeSDK {
 
       this._tracerProvider = tracerProvider;
 
-      const processors = this.retrieveSpanProcessors(tracerProvider);
+      if (this._tracerProviderConfig) {
+        tracerProvider.addSpanProcessor(this._tracerProviderConfig.spanProcessor);
+      }
 
-      if (processors) {
-        processors.forEach((processor: SpanProcessor) => {
-          tracerProvider.addSpanProcessor(processor);
-        });
-
+      if (!(tracerProvider.getActiveSpanProcessor() instanceof NoopSpanProcessor)) {
         tracerProvider.register({
           contextManager: this._tracerProviderConfig?.contextManager,
           propagator: this._tracerProviderConfig?.textMapPropagator,
@@ -257,17 +256,5 @@ export class NodeSDK {
         .then(() => {
         })
     );
-  }
-
-  private retrieveSpanProcessors(provider: NodeTracerProvider): SpanProcessor[] | undefined {
-    if (this._tracerProviderConfig) {
-      return [this._tracerProviderConfig.spanProcessor];
-    }
-
-    if (provider instanceof TracerProviderWithEnvExporters) {
-      return provider.spanProcessors;
-    }
-
-    return undefined;
   }
 }
