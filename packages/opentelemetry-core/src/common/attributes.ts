@@ -20,7 +20,7 @@ function serializeNonPrimitiveAttributeValue(
   key: string,
   value: unknown
 ): SpanAttributeValue | undefined {
-  if (typeof value === 'object') {
+  if (typeof value === 'object' && Array.isArray(value)) {
     try {
       return JSON.stringify(value);
     } catch (error) {
