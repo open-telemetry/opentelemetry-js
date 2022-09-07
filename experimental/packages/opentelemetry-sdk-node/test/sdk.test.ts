@@ -22,13 +22,21 @@ import {
   diag,
   DiagLogLevel,
 } from '@opentelemetry/api';
-import { metrics, NoopMeterProvider } from '@opentelemetry/api-metrics';
+import { metrics } from '@opentelemetry/api-metrics';
 import {
   AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
 } from '@opentelemetry/context-async-hooks';
 import { CompositePropagator } from '@opentelemetry/core';
-import { AggregationTemporality, ConsoleMetricExporter, InMemoryMetricExporter, InstrumentType, MeterProvider, PeriodicExportingMetricReader, View } from '@opentelemetry/sdk-metrics';
+import {
+  AggregationTemporality,
+  ConsoleMetricExporter,
+  InMemoryMetricExporter,
+  InstrumentType,
+  MeterProvider,
+  PeriodicExportingMetricReader,
+  View,
+} from '@opentelemetry/sdk-metrics';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import {
   assertServiceResource,
@@ -41,7 +49,11 @@ import * as assert from 'assert';
 import * as semver from 'semver';
 import * as Sinon from 'sinon';
 import { NodeSDK } from '../src';
-import {envDetector, processDetector, Resource} from '@opentelemetry/resources';
+import {
+  envDetector,
+  processDetector,
+  Resource
+} from '@opentelemetry/resources';
 
 
 const DefaultContextManager = semver.gte(process.version, '14.8.0')
@@ -76,7 +88,7 @@ describe('Node SDK', () => {
       assert.strictEqual(propagation['_getGlobalPropagator'](), propagator, 'propagator should not change');
       assert.strictEqual((trace.getTracerProvider() as ProxyTracerProvider).getDelegate(), delegate, 'tracer provider should not have changed');
 
-      assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
+      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
     });
 
     it('should register a tracer provider if an exporter is provided', async () => {
@@ -87,7 +99,7 @@ describe('Node SDK', () => {
 
       await sdk.start();
 
-      assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
+      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
 
       assert.ok(
         context['_getContextManager']().constructor.name === DefaultContextManager.name
@@ -110,7 +122,7 @@ describe('Node SDK', () => {
 
       await sdk.start();
 
-      assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
+      assert.ok(!(metrics.getMeterProvider() instanceof MeterProvider));
 
       assert.ok(
         context['_getContextManager']().constructor.name === DefaultContextManager.name

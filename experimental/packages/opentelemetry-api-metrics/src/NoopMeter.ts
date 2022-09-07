@@ -114,11 +114,14 @@ export class NoopHistogramMetric extends NoopMetric implements Histogram {
 
 export class NoopObservableMetric {
   addCallback(_callback: ObservableCallback) {}
+
   removeCallback(_callback: ObservableCallback) {}
 }
 
 export class NoopObservableCounterMetric extends NoopObservableMetric implements ObservableCounter {}
+
 export class NoopObservableGaugeMetric extends NoopObservableMetric implements ObservableGauge {}
+
 export class NoopObservableUpDownCounterMetric extends NoopObservableMetric implements ObservableUpDownCounter {}
 
 export const NOOP_METER = new NoopMeter();
@@ -132,3 +135,10 @@ export const NOOP_UP_DOWN_COUNTER_METRIC = new NoopUpDownCounterMetric();
 export const NOOP_OBSERVABLE_COUNTER_METRIC = new NoopObservableCounterMetric();
 export const NOOP_OBSERVABLE_GAUGE_METRIC = new NoopObservableGaugeMetric();
 export const NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC = new NoopObservableUpDownCounterMetric();
+
+/**
+ * Create a no-op Meter
+ */
+export function createNoopMeter(): Meter {
+  return NOOP_METER;
+}

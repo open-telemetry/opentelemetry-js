@@ -19,6 +19,25 @@ All notable changes to experimental packages in this project will be documented 
     * `createInstrumentDescriptor`
     * `createInstrumentDescriptorWithView`
     * `isDescriptorCompatibleWith`
+* chore(api-metrics): clean up exports [#3198](https://github.com/open-telemetry/opentelemetry-js/pull/3198) @pichlermarc
+  * removes export for:
+    * `NOOP_COUNTER_METRIC`
+    * `NOOP_HISTOGRAM_METRIC`
+    * `NOOP_METER_PROVIDER`
+    * `NOOP_OBSERVABLE_COUNTER_METRIC`
+    * `NOOP_OBSERVABLE_GAUGE_METRIC`
+    * `NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC`
+    * `NOOP_UP_DOWN_COUNTER_METRIC`
+    * `NoopCounterMetric`
+    * `NoopHistogramMetric`
+    * `NoopMeter`
+    * `NoopMeterProvider`
+    * `NoopMetric`
+    * `NoopObservableCounterMetric`
+    * `NoopObservableGaugeMetric`
+    * `NoopObservableMetric`
+    * `NoopObservableUpDownCounterMetric`
+    * `NoopUpDownCounterMetric`
 
 ### :rocket: (Enhancement)
 
@@ -38,6 +57,7 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feature(instrumentation-http): Add HTTP Server and Client duration Metrics in HTTP Node.js Instrumentation [#3149](https://github.com/open-telemetry/opentelemetry-js/pull/3149) @hectorhdzg
 * fix(add-views-to-node-sdk): added the ability to define meter views in `NodeSDK` [#3066](https://github.com/open-telemetry/opentelemetry-js/pull/3124) @weyert
 * feature(add-console-metrics-exporter): add ConsoleMetricExporter [#3120](https://github.com/open-telemetry/opentelemetry-js/pull/3120) @weyert
 * feature(prometheus-serialiser): export the unit block when unit is set in metric descriptor [#3066](https://github.com/open-telemetry/opentelemetry-js/pull/3041) @weyert
