@@ -19,6 +19,7 @@ import {
   ExportResultCode,
   loggingErrorHandler,
   setGlobalErrorHandler,
+  DEFAULT_ENVIRONMENT
 } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -432,6 +433,24 @@ describe('BatchSpanProcessorBase', () => {
           processor.onEnd(span);
         }
         assert.equal(processor['_finishedSpans'].length, 6);
+      });
+    });
+  });
+
+  describe('maxExportBatchSize', () => {
+    let processor: BatchSpanProcessor;
+
+    describe('when "maxExportBatchSize" is greater than "maxQueueSize"', () => {
+      beforeEach(() => {
+        processor = new BatchSpanProcessor(
+          exporter,{
+            maxExportBatchSize: 7,
+            maxQueueSize: 6,
+          });
+      });
+      it('should use default values', () => {
+        assert.equal(processor['_maxExportBatchSize'], DEFAULT_ENVIRONMENT.OTEL_BSP_MAX_EXPORT_BATCH_SIZE);
+        assert.equal(processor['_maxQueueSize'], DEFAULT_ENVIRONMENT.OTEL_BSP_MAX_QUEUE_SIZE);
       });
     });
   });
