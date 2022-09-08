@@ -69,9 +69,24 @@ export class Tracer implements api.Tracer {
     options: api.SpanOptions = {},
     context = api.context.active()
   ): api.Span {
+    const parentSpan = api.trace.getSpan(context);
+    let clock: AnchoredClock | undefined;
+    if (parentSpan) {
+      clock = (parentSpan as any)['_clock'];
+    }
+
+    if (!clock) {
+      clock = new AnchoredClock(Date, otperformance);
+      if (parentSpan) {
+        (parentSpan as any)['_clock'] = clock;
+      }
+    }
+
     if (isTracingSuppressed(context)) {
       api.diag.debug('Instrumentation suppressed, returning Noop Span');
-      return api.trace.wrapSpanContext(api.INVALID_SPAN_CONTEXT);
+      const nonRecordingSpan = api.trace.wrapSpanContext(api.INVALID_SPAN_CONTEXT);
+      (nonRecordingSpan as any)["_clock"] = clock;
+      return nonRecordingSpan;
     }
 
     // remove span from context in case a root span is requested via options
@@ -79,7 +94,6 @@ export class Tracer implements api.Tracer {
       context = api.trace.deleteSpan(context);
     }
 
-    const parentSpan = api.trace.getSpan(context);
     const parentSpanContext = parentSpan?.spanContext();
     const spanId = this._idGenerator.generateSpanId();
     let traceId;
@@ -120,19 +134,9 @@ export class Tracer implements api.Tracer {
     const spanContext = { traceId, spanId, traceFlags, traceState };
     if (samplingResult.decision === api.SamplingDecision.NOT_RECORD) {
       api.diag.debug('Recording is off, propagating context in a non-recording span');
-      return api.trace.wrapSpanContext(spanContext);
-    }
-
-    let clock: AnchoredClock | undefined;
-    if (parentSpan) {
-      clock = (parentSpan as any)['_clock'];
-    }
-
-    if (!clock) {
-      clock = new AnchoredClock(Date, otperformance);
-      if (parentSpan) {
-        (parentSpan as any)['_clock'] = clock;
-      }
+      const nonRecordingSpan = api.trace.wrapSpanContext(spanContext);
+      (nonRecordingSpan as any)["_clock"] = clock;
+      return nonRecordingSpan;
     }
 
     const span = new Span(
