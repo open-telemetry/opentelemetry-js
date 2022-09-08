@@ -69,6 +69,10 @@ export class Tracer implements api.Tracer {
     options: api.SpanOptions = {},
     context = api.context.active()
   ): api.Span {
+    // remove span from context in case a root span is requested via options
+    if (options.root) {
+      context = api.trace.deleteSpan(context);
+    }
     const parentSpan = api.trace.getSpan(context);
     let clock: AnchoredClock | undefined;
     if (parentSpan) {
@@ -87,11 +91,6 @@ export class Tracer implements api.Tracer {
       const nonRecordingSpan = api.trace.wrapSpanContext(api.INVALID_SPAN_CONTEXT);
       (nonRecordingSpan as any)['_clock'] = clock;
       return nonRecordingSpan;
-    }
-
-    // remove span from context in case a root span is requested via options
-    if (options.root) {
-      context = api.trace.deleteSpan(context);
     }
 
     const parentSpanContext = parentSpan?.spanContext();
