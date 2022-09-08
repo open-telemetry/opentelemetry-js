@@ -17,14 +17,15 @@
 import * as assert from 'assert';
 import {
   NoopMeter,
-  NoopMeterProvider,
   NOOP_COUNTER_METRIC,
   NOOP_HISTOGRAM_METRIC,
   NOOP_OBSERVABLE_COUNTER_METRIC,
   NOOP_OBSERVABLE_GAUGE_METRIC,
   NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC,
   NOOP_UP_DOWN_COUNTER_METRIC,
-} from '../../src';
+  createNoopMeter,
+} from '../../src/NoopMeter';
+import { NoopMeterProvider } from '../../src/NoopMeterProvider';
 
 const attributes = {};
 const options = {
@@ -131,5 +132,11 @@ describe('NoopMeter', () => {
     const meter = new NoopMeterProvider().getMeter('test-noop');
     meter.addBatchObservableCallback(() => {}, []);
     meter.removeBatchObservableCallback(() => {}, []);
+  });
+});
+
+describe('createNoopMeter', () => {
+  it('should return NoopMeter', () => {
+    assert.ok(createNoopMeter() instanceof NoopMeter);
   });
 });

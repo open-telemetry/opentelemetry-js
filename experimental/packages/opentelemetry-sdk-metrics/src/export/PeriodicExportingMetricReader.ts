@@ -25,12 +25,32 @@ import { AggregationTemporality } from './AggregationTemporality';
 import { InstrumentType } from '../InstrumentDescriptor';
 import { PushMetricExporter } from './MetricExporter';
 import { callWithTimeout, TimeoutError } from '../utils';
+import { Aggregation } from '../view/Aggregation';
+import { AggregationSelector } from './AggregationSelector';
 
 export type PeriodicExportingMetricReaderOptions = {
-  exporter: PushMetricExporter
-  exportIntervalMillis?: number,
-  exportTimeoutMillis?: number
+  /**
+   * Aggregation selector based on metric instrument types. If no views are
+   * configured for a metric instrument, a per-metric-reader aggregation is
+   * selected with this selector.
+   */
+  aggregationSelector?: AggregationSelector;
+  /**
+   * The backing exporter for the metric reader.
+   */
+  exporter: PushMetricExporter;
+  /**
+   * An internal milliseconds for the metric reader to initiate metric
+   * collection.
+   */
+  exportIntervalMillis?: number;
+  /**
+   * Milliseconds for the async observable callback to timeout.
+   */
+  exportTimeoutMillis?: number;
 };
+
+const DEFAULT_AGGREGATION_SELECTOR: AggregationSelector = Aggregation.Default;
 
 /**
  * {@link MetricReader} which collects metrics based on a user-configurable time interval, and passes the metrics to
@@ -38,12 +58,10 @@ export type PeriodicExportingMetricReaderOptions = {
  */
 export class PeriodicExportingMetricReader extends MetricReader {
   private _interval?: ReturnType<typeof setInterval>;
-
   private _exporter: PushMetricExporter;
-
   private readonly _exportInterval: number;
-
   private readonly _exportTimeout: number;
+  private readonly _aggregationSelector: AggregationSelector;
 
   constructor(options: PeriodicExportingMetricReaderOptions) {
     super();
@@ -65,6 +83,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
     this._exportInterval = options.exportIntervalMillis ?? 60000;
     this._exportTimeout = options.exportTimeoutMillis ?? 30000;
     this._exporter = options.exporter;
+    this._aggregationSelector = options.aggregationSelector ?? DEFAULT_AGGREGATION_SELECTOR;
   }
 
   private async _runOnce(): Promise<void> {
@@ -117,6 +136,13 @@ export class PeriodicExportingMetricReader extends MetricReader {
     }
 
     await this._exporter.shutdown();
+  }
+
+  /**
+   * @inheritdoc
+   */
+  selectAggregation(instrumentType: InstrumentType): Aggregation {
+    return this._aggregationSelector(instrumentType);
   }
 
   /**

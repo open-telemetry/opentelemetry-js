@@ -21,6 +21,7 @@ import { CollectionResult } from './MetricData';
 import { callWithTimeout } from '../utils';
 import { InstrumentType } from '../InstrumentDescriptor';
 import { CollectionOptions, ForceFlushOptions, ShutdownOptions } from '../types';
+import { Aggregation } from '../view/Aggregation';
 
 /**
  * A registered reader of metrics that, when linked to a {@link MetricProducer}, offers global
@@ -45,6 +46,12 @@ export abstract class MetricReader {
     this._metricProducer = metricProducer;
     this.onInitialized();
   }
+
+  /**
+   * Select the {@link Aggregation} for the given {@link InstrumentType} for this
+   * reader.
+   */
+  abstract selectAggregation(instrumentType: InstrumentType): Aggregation;
 
   /**
    * Select the {@link AggregationTemporality} for the given

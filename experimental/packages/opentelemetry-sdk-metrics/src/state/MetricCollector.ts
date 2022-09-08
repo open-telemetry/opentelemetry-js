@@ -15,7 +15,7 @@
  */
 
 import { hrTime } from '@opentelemetry/core';
-import { AggregationTemporalitySelector } from '../export/AggregationTemporality';
+import { AggregationTemporalitySelector } from '../export/AggregationSelector';
 import { CollectionResult } from '../export/MetricData';
 import { MetricProducer, MetricCollectOptions } from '../export/MetricProducer';
 import { MetricReader } from '../export/MetricReader';
@@ -64,6 +64,10 @@ export class MetricCollector implements MetricProducer {
 
   selectAggregationTemporality(instrumentType: InstrumentType) {
     return this._metricReader.selectAggregationTemporality(instrumentType);
+  }
+
+  selectAggregation(instrumentType: InstrumentType) {
+    return this._metricReader.selectAggregation(instrumentType);
   }
 }
 

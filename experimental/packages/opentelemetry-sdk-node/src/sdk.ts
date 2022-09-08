@@ -21,6 +21,7 @@ import {
   registerInstrumentations
 } from '@opentelemetry/instrumentation';
 import {
+  Detector,
   detectResources,
   envDetector,
   processDetector,
@@ -44,10 +45,7 @@ export type MeterProviderConfig = {
    */
   reader?: MetricReader
   /**
-   * Lists the views that should be passed when meterProvider
-   *
-   * Note: This is only getting used when NodeSDK is responsible for
-   * instantiated an instance of MeterProvider
+   * List of {@link View}s that should be passed to the MeterProvider
    */
   views?: View[]
 };
@@ -62,6 +60,7 @@ export class NodeSDK {
   private _instrumentations: InstrumentationOption[];
 
   private _resource: Resource;
+  private _resourceDetectors: Detector[];
 
   private _autoDetectResources: boolean;
 
@@ -74,6 +73,7 @@ export class NodeSDK {
    */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
     this._resource = configuration.resource ?? new Resource({});
+    this._resourceDetectors = configuration.resourceDetectors ?? [envDetector, processDetector];
 
     this._serviceName = configuration.serviceName;
 
@@ -166,12 +166,9 @@ export class NodeSDK {
   }
 
   /** Detect resource attributes */
-  public async detectResources(
-    config?: ResourceDetectionConfig
-  ): Promise<void> {
+  public async detectResources(): Promise<void> {
     const internalConfig: ResourceDetectionConfig = {
-      detectors: [envDetector, processDetector],
-      ...config,
+      detectors: this._resourceDetectors,
     };
 
     this.addResource(await detectResources(internalConfig));

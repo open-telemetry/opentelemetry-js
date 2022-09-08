@@ -6,22 +6,68 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
-* Rename @opentelemetry/sdk-metrics-base package to @opentelemetry/sdk-metrics  [#3162](https://github.com/open-telemetry/opentelemetry-js/pull/3162) @hectorhdzg
+* Add `resourceDetectors` option to `NodeSDK` [#3210](https://github.com/open-telemetry/opentelemetry-js/issues/3210)
+  * `NodeSDK.detectResources()` function is no longer able to receive config as a parameter.
+    Instead, the detectors are passed to the constructor.
+
+* chore(metrics-sdk): clean up exports [#3197](https://github.com/open-telemetry/opentelemetry-js/pull/3197) @pichlermarc
+  * removes export for:
+    * `AccumulationRecord`
+    * `Aggregator`
+    * `AggregatorKind`
+    * `Accumulation`
+    * `createInstrumentDescriptor`
+    * `createInstrumentDescriptorWithView`
+    * `isDescriptorCompatibleWith`
+* chore(api-metrics): clean up exports [#3198](https://github.com/open-telemetry/opentelemetry-js/pull/3198) @pichlermarc
+  * removes export for:
+    * `NOOP_COUNTER_METRIC`
+    * `NOOP_HISTOGRAM_METRIC`
+    * `NOOP_METER_PROVIDER`
+    * `NOOP_OBSERVABLE_COUNTER_METRIC`
+    * `NOOP_OBSERVABLE_GAUGE_METRIC`
+    * `NOOP_OBSERVABLE_UP_DOWN_COUNTER_METRIC`
+    * `NOOP_UP_DOWN_COUNTER_METRIC`
+    * `NoopCounterMetric`
+    * `NoopHistogramMetric`
+    * `NoopMeter`
+    * `NoopMeterProvider`
+    * `NoopMetric`
+    * `NoopObservableCounterMetric`
+    * `NoopObservableGaugeMetric`
+    * `NoopObservableMetric`
+    * `NoopObservableUpDownCounterMetric`
+    * `NoopUpDownCounterMetric`
 
 ### :rocket: (Enhancement)
 
-* fix(add-views-to-node-sdk): added the ability to define meter views in `NodeSDK` [#3066](https://github.com/open-telemetry/opentelemetry-js/pull/3124) @weyert
-* feature(add-console-metrics-exporter): add ConsoleMetricExporter [#3120](https://github.com/open-telemetry/opentelemetry-js/pull/3120) @weyert
-* feature(prometheus-serialiser): export the unit block when unit is set in metric descriptor [#3066](https://github.com/open-telemetry/opentelemetry-js/pull/3041) @weyert
-* feat: support latest `@opentelemetry/api` [#3177](https://github.com/open-telemetry/opentelemetry-js/pull/3177) @dyladan
+* Add `resourceDetectors` option to `NodeSDK` [#3210](https://github.com/open-telemetry/opentelemetry-js/issues/3210)
 
 ### :bug: (Bug Fix)
-
-* fix(instrumentation-http): add `http.host` attribute before sending the request #3054 @cuichenli
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+## 0.32.0
+
+### :boom: Breaking Change
+
+* Rename @opentelemetry/sdk-metrics-base package to @opentelemetry/sdk-metrics  [#3162](https://github.com/open-telemetry/opentelemetry-js/pull/3162) @hectorhdzg
+
+### :rocket: (Enhancement)
+
+* feature(instrumentation-http): Add HTTP Server and Client duration Metrics in HTTP Node.js Instrumentation [#3149](https://github.com/open-telemetry/opentelemetry-js/pull/3149) @hectorhdzg
+* fix(add-views-to-node-sdk): added the ability to define meter views in `NodeSDK` [#3066](https://github.com/open-telemetry/opentelemetry-js/pull/3124) @weyert
+* feature(add-console-metrics-exporter): add ConsoleMetricExporter [#3120](https://github.com/open-telemetry/opentelemetry-js/pull/3120) @weyert
+* feature(prometheus-serialiser): export the unit block when unit is set in metric descriptor [#3066](https://github.com/open-telemetry/opentelemetry-js/pull/3041) @weyert
+* feat: support latest `@opentelemetry/api` [#3177](https://github.com/open-telemetry/opentelemetry-js/pull/3177) @dyladan
+* feat(sdk-metrics-base): add per metric-reader aggregation support [#3153](https://github.com/open-telemetry/opentelemetry-js/pull/3153) @legendecas
+* chore(deps): update prometheus example dependencies to 0.32 [#3126](https://github.com/open-telemetry/opentelemetry-js/pull/3216) @avzis
+
+### :bug: (Bug Fix)
+
+* fix(instrumentation-http): add `http.host` attribute before sending the request #3054 @cuichenli
 
 ## 0.31.0
 
