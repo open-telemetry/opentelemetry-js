@@ -35,6 +35,7 @@ import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 import * as url from 'url';
 import { AttributeNames } from './enums/AttributeNames';
 import { Err, IgnoreMatcher, ParsedRequestOptions } from './types';
+import { MetricAttributes } from '@opentelemetry/api-metrics';
 
 /**
  * Get an absolute url
@@ -299,7 +300,7 @@ export const extractHostnameAndPort = (
   requestOptions: Pick<ParsedRequestOptions, 'hostname' | 'host' | 'port' | 'protocol'>
 ): { hostname: string, port: number | string } => {
   if (requestOptions.hostname && requestOptions.port) {
-    return {hostname: requestOptions.hostname, port: requestOptions.port};
+    return { hostname: requestOptions.hostname, port: requestOptions.port };
   }
   const matches = requestOptions.host?.match(/^([^:/ ]+)(:\d{1,5})?/) || null;
   const hostname = requestOptions.hostname || (matches === null ? 'localhost' : matches[1]);
@@ -312,7 +313,7 @@ export const extractHostnameAndPort = (
       port = requestOptions.protocol === 'https:' ? '443' : '80';
     }
   }
-  return {hostname, port};
+  return { hostname, port };
 };
 
 /**
@@ -346,6 +347,20 @@ export const getOutgoingRequestAttributes = (
     attributes[SemanticAttributes.HTTP_USER_AGENT] = userAgent;
   }
   return Object.assign(attributes, options.hookAttributes);
+};
+
+/**
+ * Returns outgoing request Metric attributes scoped to the request data
+ * @param {SpanAttributes} spanAttributes the span attributes
+ */
+export const getOutgoingRequestMetricAttributes = (
+  spanAttributes: SpanAttributes
+): MetricAttributes => {
+  const metricAttributes: MetricAttributes = {};
+  metricAttributes[SemanticAttributes.HTTP_METHOD] = spanAttributes[SemanticAttributes.HTTP_METHOD];
+  metricAttributes[SemanticAttributes.NET_PEER_NAME] = spanAttributes[SemanticAttributes.NET_PEER_NAME];
+  //TODO: http.url attribute, it should susbtitute any parameters to avoid high cardinality.
+  return metricAttributes;
 };
 
 /**
@@ -393,6 +408,20 @@ export const getOutgoingRequestAttributesOnResponse = (
 };
 
 /**
+ * Returns outgoing request Metric attributes scoped to the response data
+ * @param {SpanAttributes} spanAttributes the span attributes
+ */
+export const getOutgoingRequestMetricAttributesOnResponse = (
+  spanAttributes: SpanAttributes
+): MetricAttributes => {
+  const metricAttributes: MetricAttributes = {};
+  metricAttributes[SemanticAttributes.NET_PEER_PORT] = spanAttributes[SemanticAttributes.NET_PEER_PORT];
+  metricAttributes[SemanticAttributes.HTTP_STATUS_CODE] = spanAttributes[SemanticAttributes.HTTP_STATUS_CODE];
+  metricAttributes[SemanticAttributes.HTTP_FLAVOR] = spanAttributes[SemanticAttributes.HTTP_FLAVOR];
+  return metricAttributes;
+};
+
+/**
  * Returns incoming request attributes scoped to the request data
  * @param {IncomingMessage} request the request object
  * @param {{ component: string, serverName?: string, hookAttributes?: SpanAttributes }} options used to pass data needed to create attributes
@@ -422,6 +451,7 @@ export const getIncomingRequestAttributes = (
     [SemanticAttributes.HTTP_HOST]: host,
     [SemanticAttributes.NET_HOST_NAME]: hostname,
     [SemanticAttributes.HTTP_METHOD]: method,
+    [SemanticAttributes.HTTP_SCHEME]: options.component,
   };
 
   if (typeof ips === 'string') {
@@ -443,6 +473,23 @@ export const getIncomingRequestAttributes = (
 
   const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
   return Object.assign(attributes, httpKindAttributes, options.hookAttributes);
+};
+
+/**
+ * Returns incoming request Metric attributes scoped to the request data
+ * @param {SpanAttributes} spanAttributes the span attributes
+ * @param {{ component: string }} options used to pass data needed to create attributes
+ */
+export const getIncomingRequestMetricAttributes = (
+  spanAttributes: SpanAttributes
+): MetricAttributes => {
+  const metricAttributes: MetricAttributes = {};
+  metricAttributes[SemanticAttributes.HTTP_SCHEME] = spanAttributes[SemanticAttributes.HTTP_SCHEME];
+  metricAttributes[SemanticAttributes.HTTP_METHOD] = spanAttributes[SemanticAttributes.HTTP_METHOD];
+  metricAttributes[SemanticAttributes.NET_HOST_NAME] = spanAttributes[SemanticAttributes.NET_HOST_NAME];
+  metricAttributes[SemanticAttributes.HTTP_FLAVOR] = spanAttributes[SemanticAttributes.HTTP_FLAVOR];
+  //TODO: http.target attribute, it should susbtitute any parameters to avoid high cardinality.
+  return metricAttributes;
 };
 
 /**
@@ -473,6 +520,19 @@ export const getIncomingRequestAttributesOnResponse = (
     attributes[SemanticAttributes.HTTP_ROUTE] = rpcMetadata.route;
   }
   return attributes;
+};
+
+/**
+ * Returns incoming request Metric attributes scoped to the request data
+ * @param {SpanAttributes} spanAttributes the span attributes
+ */
+export const getIncomingRequestMetricAttributesOnResponse = (
+  spanAttributes: SpanAttributes
+): MetricAttributes => {
+  const metricAttributes: MetricAttributes = {};
+  metricAttributes[SemanticAttributes.HTTP_STATUS_CODE] = spanAttributes[SemanticAttributes.HTTP_STATUS_CODE];
+  metricAttributes[SemanticAttributes.NET_HOST_PORT] = spanAttributes[SemanticAttributes.NET_HOST_PORT];
+  return metricAttributes;
 };
 
 export function headerCapture(type: 'request' | 'response', headers: string[]) {
