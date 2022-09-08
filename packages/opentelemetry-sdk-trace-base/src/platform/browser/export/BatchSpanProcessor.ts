@@ -21,6 +21,7 @@ import { BatchSpanProcessorBrowserConfig } from '../../../types';
 export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcessorBrowserConfig> {
   private _visibilityChangeListener?: () => void;
   private _pageHideListener?: () => void;
+  // private _beforeUnloadListener?: ()=>void;
 
   constructor(_exporter: SpanExporter, config?: BatchSpanProcessorBrowserConfig) {
     super(_exporter, config);
@@ -41,10 +42,16 @@ export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcesso
 
       // use 'pagehide' event as a fallback for Safari; see https://bugs.webkit.org/show_bug.cgi?id=116769
       document.addEventListener('pagehide', this._pageHideListener);
+
+      // this._beforeUnloadListener= ()=> {
+      //   void this.forceFlush();
+      // };
+      // window.addEventListener('beforeunload',this._beforeUnloadListener);
     }
   }
 
   protected onShutdown(): void {
+    void this.forceFlush();
     if (typeof document !== 'undefined') {
       if (this._visibilityChangeListener) {
         document.removeEventListener('visibilitychange', this._visibilityChangeListener);
@@ -53,5 +60,8 @@ export class BatchSpanProcessor extends BatchSpanProcessorBase<BatchSpanProcesso
         document.removeEventListener('pagehide', this._pageHideListener);
       }
     }
+    // if (this._beforeUnloadListener) {
+    //   window.removeEventListener('beforeunload', this._beforeUnloadListener);
+    // }
   }
 }
