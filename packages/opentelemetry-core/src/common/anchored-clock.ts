@@ -32,8 +32,9 @@ export interface Clock {
  * ensures that span timings and durations are accurate while preventing span times from drifting
  * too far from the system clock.
  *
- * Only creating an anchored clock once per local trace ensures we minimize the performance
- * impact of accessing the system clock.
+ * Only creating an anchored clock once per local trace ensures span times are correct relative
+ * to each other. For example, a child span will never have a start time before its parent even
+ * if the system clock is corrected during the local trace.
  *
  * Heavily inspired by the OTel Java anchored clock
  * https://github.com/open-telemetry/opentelemetry-java/blob/main/sdk/trace/src/main/java/io/opentelemetry/sdk/trace/AnchoredClock.java
