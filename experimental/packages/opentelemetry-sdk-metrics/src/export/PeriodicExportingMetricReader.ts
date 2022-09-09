@@ -54,7 +54,7 @@ const DEFAULT_AGGREGATION_SELECTOR: AggregationSelector = Aggregation.Default;
 
 /**
  * {@link MetricReader} which collects metrics based on a user-configurable time interval, and passes the metrics to
- * the configured {@link MetricExporter}
+ * the configured {@link PushMetricExporter}
  */
 export class PeriodicExportingMetricReader extends MetricReader {
   private _interval?: ReturnType<typeof setInterval>;
