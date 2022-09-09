@@ -4,7 +4,6 @@ All notable changes to this project will be documented in this file.
 
 ## [1.2.0](https://www.github.com/open-telemetry/opentelemetry-js-api/compare/v1.1.0...v1.2.0) (2022-08-09)
 
-
 ### Features
 
 * Add getActiveSpan to trace API ([#163](https://www.github.com/open-telemetry/opentelemetry-js-api/issues/163)) ([17ccb3a](https://www.github.com/open-telemetry/opentelemetry-js-api/commit/17ccb3a4e385bc5769ded6fc742c9782a93244a5))
@@ -12,13 +11,11 @@ All notable changes to this project will be documented in this file.
 
 ## [1.1.0](https://www.github.com/open-telemetry/opentelemetry-js-api/compare/v1.0.4...v1.1.0) (2022-01-25)
 
-
 ### Features
 
 * add tracestate implementation to api ([#147](https://www.github.com/open-telemetry/opentelemetry-js-api/issues/147)) ([82842c7](https://www.github.com/open-telemetry/opentelemetry-js-api/commit/82842c7097614e6ece99e73838ac5e94ff5460b7))
 * define common attributes type ([#142](https://www.github.com/open-telemetry/opentelemetry-js-api/issues/142)) ([ae9bead](https://www.github.com/open-telemetry/opentelemetry-js-api/commit/ae9bead17750d35dec4b63cfae098087666abc85))
 * **trace:** add optional schema url to TracerProvider.getTracer ([#129](https://www.github.com/open-telemetry/opentelemetry-js-api/issues/129)) ([aa65fc6](https://www.github.com/open-telemetry/opentelemetry-js-api/commit/aa65fc66809d45090d6e4951c265386d17ccc6f6))
-
 
 ### Bug Fixes
 
@@ -26,13 +23,11 @@ All notable changes to this project will be documented in this file.
 
 ### [1.0.4](https://www.github.com/open-telemetry/opentelemetry-js-api/compare/v1.0.3...v1.0.4) (2021-12-18)
 
-
 ### Bug Fixes
 
 * align globalThis fallbacks with otel-core ([#126](https://www.github.com/open-telemetry/opentelemetry-js-api/issues/126)) ([3507de7](https://www.github.com/open-telemetry/opentelemetry-js-api/commit/3507de7c3b95396696657c021953b0b24a63a029))
 
 ### [1.0.3](https://www.github.com/open-telemetry/opentelemetry-js-api/compare/v1.0.2...v1.0.3) (2021-08-30)
-
 
 ### Bug Fixes
 
