@@ -46,6 +46,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :bug: (Bug Fix)
 
+* fix(instrumentation-http): improve metrics test stability [#3242](https://github.com/open-telemetry/opentelemetry-js/pull/3242) @pichlermarc
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
