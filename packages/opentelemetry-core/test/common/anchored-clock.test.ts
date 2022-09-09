@@ -15,12 +15,11 @@
  */
 
 import assert = require('assert');
-import { performance } from 'perf_hooks';
-import { AnchoredClock } from '../../src';
+import { AnchoredClock, otperformance } from '../../src';
 
 describe('AnchoredClock', () => {
   it('should keep time', done => {
-    const clock = new AnchoredClock(Date, performance);
+    const clock = new AnchoredClock(Date, otperformance);
     setTimeout(() => {
       // after about 100ms, the clocks are within 10ms of each other
       assert.ok(Math.abs(Date.now() - clock.now()) < 10);
