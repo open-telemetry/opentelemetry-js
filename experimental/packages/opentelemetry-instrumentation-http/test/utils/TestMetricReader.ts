@@ -41,7 +41,6 @@ export class TestMetricReader extends MetricReader {
       this._exporter.export(result.resourceMetrics, result => {
         if (result.error != null) {
           reject(result.error);
-          return;
         } else {
           resolve();
         }
