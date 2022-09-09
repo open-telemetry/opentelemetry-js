@@ -4,22 +4,28 @@
   "typedocOptions": {
     "entryPointStrategy": "packages",
     "entryPoints": [
+      "experimental/packages/exporter-trace-otlp-grpc",
+      "experimental/packages/exporter-trace-otlp-http",
+      "experimental/packages/exporter-trace-otlp-proto",
+      "experimental/packages/opentelemetry-api-metrics",
       "experimental/packages/opentelemetry-exporter-metrics-otlp-grpc",
       "experimental/packages/opentelemetry-exporter-metrics-otlp-http",
       "experimental/packages/opentelemetry-exporter-metrics-otlp-proto",
       "experimental/packages/opentelemetry-exporter-prometheus",
-      "experimental/packages/opentelemetry-instrumentation",
       "experimental/packages/opentelemetry-instrumentation-fetch",
       "experimental/packages/opentelemetry-instrumentation-grpc",
       "experimental/packages/opentelemetry-instrumentation-http",
       "experimental/packages/opentelemetry-instrumentation-xml-http-request",
+      "experimental/packages/opentelemetry-instrumentation",
+      "experimental/packages/opentelemetry-sdk-metrics",
       "experimental/packages/opentelemetry-sdk-node",
-      "packages/exporter-trace-otlp-grpc",
-      "packages/exporter-trace-otlp-http",
-      "packages/exporter-trace-otlp-proto",
+      "experimental/packages/otlp-exporter-base",
+      "experimental/packages/otlp-grpc-exporter-base",
+      "experimental/packages/otlp-proto-exporter-base",
+      "experimental/packages/otlp-transformer",
       "packages/opentelemetry-context-async-hooks",
-      "packages/opentelemetry-context-zone",
       "packages/opentelemetry-context-zone-peer-dep",
+      "packages/opentelemetry-context-zone",
       "packages/opentelemetry-core",
       "packages/opentelemetry-exporter-jaeger",
       "packages/opentelemetry-exporter-zipkin",
@@ -87,6 +93,9 @@
     },
     {
       "path": "packages/template"
+    },
+    {
+      "path": "experimental/packages/api-logs"
     },
     {
       "path": "experimental/packages/exporter-trace-otlp-grpc"
