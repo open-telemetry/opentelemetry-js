@@ -10,6 +10,9 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-trace-base): make span start times resistant to hrtime clock drift
+  [#3129](https://github.com/open-telemetry/opentelemetry-js/issues/3129)
+
 ### :books: (Refine Doc)
 
 * docs(metrics): add missing metrics packages to SDK reference documentation [#3239](https://github.com/open-telemetry/opentelemetry-js/pull/3239) @dyladan
@@ -27,8 +30,6 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: (Bug Fix)
 
-* fix(sdk-trace-base): make span start times resistant to hrtime clock drift
-  [#3129](https://github.com/open-telemetry/opentelemetry-js/issues/3129)
 * fix(context-async-hooks): Ensure listeners added using `once` can be removed using `removeListener`
   [#3133](https://github.com/open-telemetry/opentelemetry-js/pull/3133)
 
