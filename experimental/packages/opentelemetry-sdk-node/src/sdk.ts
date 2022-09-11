@@ -45,10 +45,7 @@ export type MeterProviderConfig = {
    */
   reader?: MetricReader
   /**
-   * Lists the views that should be passed when meterProvider
-   *
-   * Note: This is only getting used when NodeSDK is responsible for
-   * instantiated an instance of MeterProvider
+   * List of {@link View}s that should be passed to the MeterProvider
    */
   views?: View[]
 };

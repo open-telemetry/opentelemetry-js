@@ -125,7 +125,7 @@ export const assertSpan = (
       validations.hostname,
       'must be consistent (PEER_NAME and hostname)'
     );
-    if(!validations.noNetPeer) {
+    if (!validations.noNetPeer) {
       assert.ok(
         span.attributes[SemanticAttributes.NET_PEER_IP],
         'must have PEER_IP'
@@ -178,6 +178,11 @@ export const assertSpan = (
         'must have HOST_IP'
       );
     }
+    assert.strictEqual(
+      span.attributes[SemanticAttributes.HTTP_SCHEME],
+      validations.component,
+      ' must have http.scheme attribute'
+    );
     assert.ok(typeof span.parentSpanId === 'string');
     assert.ok(isValidSpanId(span.parentSpanId));
   } else if (validations.reqHeaders) {

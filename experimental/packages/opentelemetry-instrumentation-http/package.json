@@ -74,8 +74,10 @@
     "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
+    "@opentelemetry/api-metrics": "0.32.0",
     "@opentelemetry/core": "1.6.0",
     "@opentelemetry/instrumentation": "0.32.0",
+    "@opentelemetry/sdk-metrics": "0.32.0",
     "@opentelemetry/semantic-conventions": "1.6.0",
     "semver": "^7.3.5"
   },
