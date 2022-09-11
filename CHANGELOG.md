@@ -13,6 +13,8 @@ All notable changes to this project will be documented in this file.
 * fix(sdk-trace-base): make span start times resistant to hrtime clock drift
   [#3129](https://github.com/open-telemetry/opentelemetry-js/issues/3129)
 
+* fix(param-validation): validate maxExportBatchSize in BatchSpanProcessorBase
+  [#3232](https://github.com/open-telemetry/opentelemetry-js/issues/3232)
 ### :books: (Refine Doc)
 
 * docs(metrics): add missing metrics packages to SDK reference documentation [#3239](https://github.com/open-telemetry/opentelemetry-js/pull/3239) @dyladan
