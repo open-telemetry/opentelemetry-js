@@ -18,8 +18,23 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MeterProvider } from '../../src/MeterProvider';
 import { assertRejects } from '../test-utils';
-import { emptyResourceMetrics, TestMetricProducer } from './TestMetricProducer';
+import {
+  emptyResourceMetrics,
+  TestMetricProducer
+} from './TestMetricProducer';
 import { TestMetricReader } from './TestMetricReader';
+import {
+  Aggregation,
+  AggregationTemporality
+} from '../../src';
+import {
+  DEFAULT_AGGREGATION_SELECTOR,
+  DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
+} from '../../src/export/AggregationSelector';
+import {
+  assertAggregationSelector,
+  assertAggregationTemporalitySelector
+} from './utils';
 
 describe('MetricReader', () => {
   describe('setMetricProducer', () => {
@@ -78,6 +93,36 @@ describe('MetricReader', () => {
       assert.deepStrictEqual(args, [{ timeoutMillis: 20 }]);
 
       await reader.shutdown();
+    });
+  });
+
+  describe('selectAggregation', () => {
+    it('should override default when not provided with a selector', () => {
+      assertAggregationSelector(new TestMetricReader(), DEFAULT_AGGREGATION_SELECTOR);
+      assertAggregationSelector(new TestMetricReader({}), DEFAULT_AGGREGATION_SELECTOR);
+    });
+
+    it('should override default when provided with a selector', () => {
+      const reader = new TestMetricReader({
+        aggregationSelector: _instrumentType => Aggregation.Sum()
+      });
+      assertAggregationSelector(reader, _instrumentType => Aggregation.Sum());
+      reader.shutdown();
+    });
+  });
+
+  describe('selectAggregationTemporality', () => {
+    it('should override default when not provided with a selector', () => {
+      assertAggregationTemporalitySelector(new TestMetricReader(), DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR);
+      assertAggregationTemporalitySelector(new TestMetricReader({}), DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR);
+    });
+
+    it('should override default when provided with a selector', () => {
+      const reader = new TestMetricReader({
+        aggregationTemporalitySelector: _instrumentType => AggregationTemporality.DELTA
+      });
+      assertAggregationTemporalitySelector(reader, _instrumentType => AggregationTemporality.DELTA);
+      reader.shutdown();
     });
   });
 });
