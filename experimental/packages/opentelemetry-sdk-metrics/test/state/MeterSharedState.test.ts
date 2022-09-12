@@ -17,7 +17,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
-  Meter,
   MeterProvider,
   DataPointType,
   View,
@@ -29,6 +28,7 @@ import { assertMetricData, defaultInstrumentationScope, defaultResource, sleep }
 import { TestDeltaMetricReader, TestMetricReader } from '../export/TestMetricReader';
 import { MeterSharedState } from '../../src/state/MeterSharedState';
 import { CollectionResult } from '../../src/export/MetricData';
+import { Meter } from '../../src/Meter';
 
 describe('MeterSharedState', () => {
   afterEach(() => {

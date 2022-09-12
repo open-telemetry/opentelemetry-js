@@ -69,10 +69,6 @@ export {
 } from './InstrumentDescriptor';
 
 export {
-  Meter,
-} from './Meter';
-
-export {
   MeterProvider,
   MeterProviderOptions,
 } from './MeterProvider';
