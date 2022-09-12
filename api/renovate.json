@@ -1,0 +1,25 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "packageRules": [
+    {
+      "groupName": "all non-major dependencies",
+      "updateTypes": ["patch", "minor"],
+      "groupSlug": "all-minor-patch"
+    }
+  ],
+  "ignoreDeps": [
+    "gcp-metadata",
+    "got",
+    "mocha"
+  ],
+  "assignees": [
+    "@dyladan",
+    "@vmarchaud"
+  ],
+  "schedule": [
+    "before 3am on Friday"
+  ],
+  "labels": ["dependencies"]
+}
