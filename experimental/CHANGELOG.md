@@ -38,6 +38,7 @@ All notable changes to experimental packages in this project will be documented 
     * `NoopObservableMetric`
     * `NoopObservableUpDownCounterMetric`
     * `NoopUpDownCounterMetric`
+* feat(sdk-metrics): align MetricReader with specification and other language implementations [#3225](https://github.com/open-telemetry/opentelemetry-js/pull/3225) @pichlermarc
 * chore(sdk-metrics): remove accidental export of the SDK `Meter` class [#3243](https://github.com/open-telemetry/opentelemetry-js/pull/3243) @pichlermarc
 
 ### :rocket: (Enhancement)
@@ -66,6 +67,7 @@ All notable changes to experimental packages in this project will be documented 
 * feat: support latest `@opentelemetry/api` [#3177](https://github.com/open-telemetry/opentelemetry-js/pull/3177) @dyladan
 * feat(sdk-metrics-base): add per metric-reader aggregation support [#3153](https://github.com/open-telemetry/opentelemetry-js/pull/3153) @legendecas
 * chore(deps): update prometheus example dependencies to 0.32 [#3126](https://github.com/open-telemetry/opentelemetry-js/pull/3216) @avzis
+* feature(opentelemetry-api-metrics): Adding generics to `create{metricType}` [#3151](https://github.com/open-telemetry/opentelemetry-js/issues/3151) @tomerghelber-tm
 
 ### :bug: (Bug Fix)
 
