@@ -38,6 +38,7 @@ All notable changes to experimental packages in this project will be documented 
     * `NoopObservableMetric`
     * `NoopObservableUpDownCounterMetric`
     * `NoopUpDownCounterMetric`
+* chore(sdk-metrics): remove accidental export of the SDK `Meter` class [#3243](https://github.com/open-telemetry/opentelemetry-js/pull/3243) @pichlermarc
 
 ### :rocket: (Enhancement)
 
