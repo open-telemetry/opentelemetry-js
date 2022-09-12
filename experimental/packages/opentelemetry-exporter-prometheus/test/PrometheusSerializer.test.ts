@@ -40,15 +40,10 @@ const attributes = {
 
 class TestMetricReader extends MetricReader {
   constructor() {
-    super();
-  }
-
-  selectAggregationTemporality() {
-    return AggregationTemporality.CUMULATIVE;
-  }
-
-  selectAggregation() {
-    return Aggregation.Default();
+    super({
+      aggregationTemporalitySelector: _instrumentType => AggregationTemporality.CUMULATIVE,
+      aggregationSelector: _instrumentType => Aggregation.Default()
+    });
   }
 
   async onForceFlush() {}
