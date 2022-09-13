@@ -54,6 +54,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :house: (Internal)
 
+* ci(instrumentation-http): improve metrics test stability [#3242](https://github.com/open-telemetry/opentelemetry-js/pull/3242) @pichlermarc
+
 ## 0.32.0
 
 ### :boom: Breaking Change

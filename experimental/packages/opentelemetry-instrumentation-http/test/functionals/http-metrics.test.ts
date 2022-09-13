@@ -18,13 +18,13 @@ import {
   DataPointType,
   InMemoryMetricExporter,
   MeterProvider,
-  PeriodicExportingMetricReader,
 } from '@opentelemetry/sdk-metrics';
 import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import { HttpInstrumentation } from '../../src/http';
 import { httpRequest } from '../utils/httpRequest';
+import { TestMetricReader } from '../utils/TestMetricReader';
 
 const instrumentation = new HttpInstrumentation();
 instrumentation.enable();
@@ -40,7 +40,8 @@ const pathname = '/test';
 const tracerProvider = new NodeTracerProvider();
 const meterProvider = new MeterProvider();
 const metricsMemoryExporter = new InMemoryMetricExporter(AggregationTemporality.DELTA);
-const metricReader = new PeriodicExportingMetricReader({ exporter: metricsMemoryExporter, exportIntervalMillis: 100 });
+const metricReader = new TestMetricReader(metricsMemoryExporter);
+
 meterProvider.addMetricReader(metricReader);
 instrumentation.setTracerProvider(tracerProvider);
 instrumentation.setMeterProvider(meterProvider);
@@ -69,7 +70,7 @@ describe('metrics', () => {
     for (let i = 0; i < requestCount; i++) {
       await httpRequest.get(`${protocol}://${hostname}:${serverPort}${pathname}`);
     }
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await metricReader.collectAndExport();
     const resourceMetrics = metricsMemoryExporter.getMetrics();
     const scopeMetrics = resourceMetrics[0].scopeMetrics;
     assert.strictEqual(scopeMetrics.length, 1, 'scopeMetrics count');
