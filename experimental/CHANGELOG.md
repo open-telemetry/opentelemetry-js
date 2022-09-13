@@ -50,6 +50,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :books: (Refine Doc)
 
+* docs(sdk-metrics): fix typos and add missing parameter docs. [#3244](https://github.com/open-telemetry/opentelemetry-js/pull/3244) @pichlermarc
+
 ### :house: (Internal)
 
 ## 0.32.0
