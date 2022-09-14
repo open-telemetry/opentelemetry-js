@@ -60,7 +60,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/api-metrics
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fapi-metrics.svg
-
-[metrics-api-docs]: https://open-telemetry.github.io/opentelemetry-js/modules/_opentelemetry_api_metrics.html
-
-[other-tracing-backends]: https://github.com/open-telemetry/opentelemetry-js#trace-exporters
+[logs-api-docs]: https://open-telemetry.github.io/opentelemetry-js/modules/_opentelemetry_api_logs.html

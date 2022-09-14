@@ -18,4 +18,4 @@ browsing context only.
 
 [`window`]: https://developer.mozilla.org/en-US/docs/Web/API/window
 [`document`]: https://developer.mozilla.org/en-US/docs/Web/API/Document
-[`navigator]: https://developer.mozilla.org/en-US/docs/Web/API/Navigator
+[`navigator`]: https://developer.mozilla.org/en-US/docs/Web/API/Navigator
