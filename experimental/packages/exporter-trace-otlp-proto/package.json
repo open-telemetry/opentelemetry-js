@@ -72,8 +72,7 @@
     "@opentelemetry/otlp-proto-exporter-base": "0.32.0",
     "@opentelemetry/otlp-transformer": "0.32.0",
     "@opentelemetry/resources": "1.6.0",
-    "@opentelemetry/sdk-trace-base": "1.6.0",
-    "protobufjs": "^6.9.0"
+    "@opentelemetry/sdk-trace-base": "1.6.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-trace-otlp-proto"
 }
