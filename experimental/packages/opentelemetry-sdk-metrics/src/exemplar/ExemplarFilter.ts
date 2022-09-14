@@ -29,7 +29,7 @@ export interface ExemplarFilter {
    * @param value The value of the measurement
    * @param timestamp A timestamp that best represents when the measurement was taken
    * @param attributes The complete set of MetricAttributes of the measurement
-   * @param context The Context of the measurement
+   * @param ctx The Context of the measurement
    */
   shouldSample(
     value: number,

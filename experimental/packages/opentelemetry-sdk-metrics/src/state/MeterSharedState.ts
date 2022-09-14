@@ -62,6 +62,7 @@ export class MeterSharedState {
   /**
    * @param collector opaque handle of {@link MetricCollector} which initiated the collection.
    * @param collectionTime the HrTime at which the collection was initiated.
+   * @param options options for collection.
    * @returns the list of metric data collected.
    */
   async collect(collector: MetricCollectorHandle, collectionTime: HrTime, options?: MetricCollectOptions): Promise<ScopeMetricsResult> {

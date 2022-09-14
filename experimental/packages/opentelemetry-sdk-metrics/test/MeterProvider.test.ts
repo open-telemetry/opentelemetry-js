@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { Meter, MeterProvider, InstrumentType, DataPointType } from '../src';
+import { MeterProvider, InstrumentType, DataPointType } from '../src';
 import {
   assertScopeMetrics,
   assertMetricData,
@@ -25,6 +25,7 @@ import {
 import { TestMetricReader } from './export/TestMetricReader';
 import * as sinon from 'sinon';
 import { View } from '../src/view/View';
+import { Meter } from '../src/Meter';
 
 describe('MeterProvider', () => {
   afterEach(() => {

@@ -16,7 +16,7 @@
 
 // https://tc39.es/proposal-regex-escaping
 // escape ^ $ \ .  + ? ( ) [ ] { } |
-// do not need to escape * as we are interpret it as wildcard
+// do not need to escape * as we interpret it as wildcard
 const ESCAPE = /[\^$\\.+?()[\]{}|]/g;
 
 export interface Predicate {
@@ -24,7 +24,7 @@ export interface Predicate {
 }
 
 /**
- * Wildcard pattern predicate, support patterns like `*`, `foo*`, `*bar`.
+ * Wildcard pattern predicate, supports patterns like `*`, `foo*`, `*bar`.
  */
 export class PatternPredicate implements Predicate {
   private _matchAll: boolean;

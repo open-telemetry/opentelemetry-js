@@ -1,0 +1,37 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Lint markdown files
+        uses: docker://avtodev/markdown-lint:v1
+        with:
+          args: "./**/*.md -i ./CHANGELOG.md"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build 🔧
+        run: npm run compile
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check for Circular Dependencies
+        run: npm run cycle-check
+
+      - name: Generate Documentation 📜
+        run: npm run docs
+
+      - name: Test Docs
+        run: npm run docs:test
