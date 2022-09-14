@@ -57,7 +57,7 @@
     "lerna": "5.4.3",
     "lerna-changelog": "2.2.0",
     "linkinator": "4.0.3",
-    "markdownlint-cli": "0.29.0",
+    "markdownlint-cli": "0.32.2",
     "semver": "7.3.5",
     "typedoc": "0.22.10",
     "typescript": "4.4.4",
