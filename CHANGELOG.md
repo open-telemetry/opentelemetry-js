@@ -19,6 +19,8 @@ All notable changes to this project will be documented in this file.
 
 ### :house: (Internal)
 
+* deps: update markdownlint-cli to 0.32.2 [#3253](https://github.com/open-telemetry/opentelemetry-js/pull/3253) @pichlermarc
+
 ## 1.6.0
 
 ### :rocket: (Enhancement)
