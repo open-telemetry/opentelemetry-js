@@ -55,6 +55,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :house: (Internal)
 
 * ci(instrumentation-http): improve metrics test stability [#3242](https://github.com/open-telemetry/opentelemetry-js/pull/3242) @pichlermarc
+* deps: remove unused protobufjs and update used ones to 7.1.1 #3251 [#3251](https://github.com/open-telemetry/opentelemetry-js/pull/3251) @pichlermarc
 
 ## 0.32.0
 
