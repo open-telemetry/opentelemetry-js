@@ -10,7 +10,7 @@
     "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
     "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
   },
-  "repository": "https://github.com/open-telemetry/opentelemetry-js-api.git",
+  "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p .",
@@ -86,5 +86,6 @@
     "typedoc": "0.21.2",
     "typescript": "4.3.5",
     "webpack": "4.46.0"
-  }
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/api"
 }

@@ -15,7 +15,7 @@
   <a href="https://codecov.io/gh/open-telemetry/opentelemetry-js-api/branch/main/">
     <img alt="Codecov Status" src="https://img.shields.io/codecov/c/github/open-telemetry/opentelemetry-js-api?style=for-the-badge">
   </a>
-  <a href="https://github.com/open-telemetry/opentelemetry-js-api/blob/main/LICENSE">
+  <a href="https://github.com/open-telemetry/opentelemetry-js/blob/main/api/LICENSE">
     <img alt="license" src="https://img.shields.io/badge/license-Apache_2.0-green.svg?style=for-the-badge">
   </a>
   <br/>
@@ -132,9 +132,9 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [opentelemetry-js]: https://github.com/open-telemetry/opentelemetry-js
 
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
-[license-url]: https://github.com/open-telemetry/opentelemetry-js-api/blob/main/LICENSE
+[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/api/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/api
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fapi.svg
-[docs-tracing]: https://github.com/open-telemetry/opentelemetry-js-api/blob/main/docs/tracing.md
-[docs-sdk-registration]: https://github.com/open-telemetry/opentelemetry-js-api/blob/main/docs/sdk-registration.md
+[docs-tracing]: https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/tracing.md
+[docs-sdk-registration]: https://github.com/open-telemetry/opentelemetry-js/blob/main/doc/sdk-registration.md
