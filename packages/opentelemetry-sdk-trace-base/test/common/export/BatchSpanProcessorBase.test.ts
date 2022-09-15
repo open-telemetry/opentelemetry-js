@@ -18,8 +18,7 @@ import { diag, ROOT_CONTEXT } from '@opentelemetry/api';
 import {
   ExportResultCode,
   loggingErrorHandler,
-  setGlobalErrorHandler,
-  DEFAULT_ENVIRONMENT
+  setGlobalErrorHandler
 } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -448,9 +447,8 @@ describe('BatchSpanProcessorBase', () => {
             maxQueueSize: 6,
           });
       });
-      it('should use default values', () => {
-        assert.equal(processor['_maxExportBatchSize'], DEFAULT_ENVIRONMENT.OTEL_BSP_MAX_EXPORT_BATCH_SIZE);
-        assert.equal(processor['_maxQueueSize'], DEFAULT_ENVIRONMENT.OTEL_BSP_MAX_QUEUE_SIZE);
+      it('should match maxQueueSize', () => {
+        assert.equal(processor['_maxExportBatchSize'], processor['_maxQueueSize']);
       });
     });
   });

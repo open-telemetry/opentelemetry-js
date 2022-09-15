@@ -21,8 +21,7 @@ import {
   getEnv,
   globalErrorHandler,
   suppressTracing,
-  unrefTimer,
-  DEFAULT_ENVIRONMENT
+  unrefTimer
 } from '@opentelemetry/core';
 import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
@@ -66,9 +65,8 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
 
     if (this._maxExportBatchSize > this._maxQueueSize) {
-      diag.warn('BatchSpanProcessor: maxExportBatchSize must be smaller or equal to maxQueueSize, using default values');
-      this._maxExportBatchSize = DEFAULT_ENVIRONMENT.OTEL_BSP_MAX_EXPORT_BATCH_SIZE;
-      this._maxQueueSize = DEFAULT_ENVIRONMENT.OTEL_BSP_MAX_QUEUE_SIZE;
+      diag.warn('BatchSpanProcessor: maxExportBatchSize must be smaller or equal to maxQueueSize, setting maxExportBatchSize to match maxQueueSize');
+      this._maxExportBatchSize = this._maxQueueSize;
     }
   }
 
