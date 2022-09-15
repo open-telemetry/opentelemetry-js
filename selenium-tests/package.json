@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/selenium-tests",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "private": true,
   "description": "OpenTelemetry Selenium Tests",
   "main": "index.js",
@@ -56,16 +56,16 @@
     "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
-    "@opentelemetry/context-zone-peer-dep": "1.6.0",
-    "@opentelemetry/core": "1.6.0",
-    "@opentelemetry/exporter-trace-otlp-http": "0.32.0",
-    "@opentelemetry/exporter-zipkin": "1.6.0",
-    "@opentelemetry/instrumentation": "0.32.0",
-    "@opentelemetry/instrumentation-fetch": "0.32.0",
-    "@opentelemetry/instrumentation-xml-http-request": "0.32.0",
-    "@opentelemetry/sdk-metrics": "0.32.0",
-    "@opentelemetry/sdk-trace-base": "1.6.0",
-    "@opentelemetry/sdk-trace-web": "1.6.0",
+    "@opentelemetry/context-zone-peer-dep": "1.7.0",
+    "@opentelemetry/core": "1.7.0",
+    "@opentelemetry/exporter-trace-otlp-http": "0.33.0",
+    "@opentelemetry/exporter-zipkin": "1.7.0",
+    "@opentelemetry/instrumentation": "0.33.0",
+    "@opentelemetry/instrumentation-fetch": "0.33.0",
+    "@opentelemetry/instrumentation-xml-http-request": "0.33.0",
+    "@opentelemetry/sdk-metrics": "0.33.0",
+    "@opentelemetry/sdk-trace-base": "1.7.0",
+    "@opentelemetry/sdk-trace-web": "1.7.0",
     "zone.js": "0.11.4"
   }
 }
