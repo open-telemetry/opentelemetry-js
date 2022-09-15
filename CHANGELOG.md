@@ -16,10 +16,6 @@ All notable changes to this project will be documented in this file.
 
 ## 1.7.0
 
-### :boom: Breaking Change
-
-### :rocket: (Enhancement)
-
 ### :bug: (Bug Fix)
 
 * fix(sdk-trace-base): make span start times resistant to hrtime clock drift
@@ -51,8 +47,6 @@ All notable changes to this project will be documented in this file.
 
 * chore: update trace-web example and rename it to opentelemetry-web [#3145](https://github.com/open-telemetry/opentelemetry-js/pull/3145) @pichlermarc
 * chore: update https example [#3152](https://github.com/open-telemetry/opentelemetry-js/pull/3152) @pichlermarc
-
-### :house: (Internal)
 
 ## 1.5.0
 
