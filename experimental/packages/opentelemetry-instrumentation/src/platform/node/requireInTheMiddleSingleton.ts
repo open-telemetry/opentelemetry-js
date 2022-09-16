@@ -23,6 +23,17 @@ export type Hooked = {
 };
 
 /**
+ * Whether Mocha is running in this process
+ * Inspired by https://github.com/AndreasPizsa/detect-mocha
+ *
+ * @type {boolean}
+ */
+const isMocha = ['afterEach','after','beforeEach','before','describe','it'].every(fn => {
+  // @ts-expect-error TS7053: Element implicitly has an 'any' type
+  return typeof global[fn] === 'function';
+});
+
+/**
  * Singleton class for `require-in-the-middle`
  * Allows instrumentation plugins to patch modules with only a single `require` patch
  * WARNING: Because this class will create its own `require-in-the-middle` (RITM) instance,
@@ -67,6 +78,10 @@ export class RequireInTheMiddleSingleton {
   }
 
   static getInstance(): RequireInTheMiddleSingleton {
+    // Mocha runs all test suites in the same process
+    // This prevents test suites from sharing a singleton
+    if (isMocha) return new RequireInTheMiddleSingleton();
+
     return this._instance = this._instance ?? new RequireInTheMiddleSingleton();
   }
 }
