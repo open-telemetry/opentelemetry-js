@@ -7,16 +7,12 @@
       "matchUpdateTypes": ["patch", "minor"]
     },
     {
-      "matchPackageNames": ["@opentelemetry/api"],
-      "rangeStrategy": "bump"
-    },
-    {
       "matchPaths": ["backwards-compatibility"],
       "matchPackageNames": ["@types/node"],
       "enabled": false
     }
   ],
-  "ignoreDeps": ["gcp-metadata", "got", "mocha", "husky", "karma-webpack"],
+  "ignoreDeps": ["gcp-metadata", "got", "mocha", "husky", "karma-webpack", "@opentelemetry/api"],
   "assignees": ["@blumamir", "@dyladan", "@legendecas", "@Rauno56", "@vmarchaud"],
   "schedule": ["before 3am on Friday"],
   "labels": ["dependencies"]
