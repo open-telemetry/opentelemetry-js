@@ -22,21 +22,18 @@ export type Hooked = {
   onRequire: RequireInTheMiddle.OnRequireFn
 };
 
-// The version number at the end of this symbol should be incremented whenever there are
-// changes (even non-breaking) to the `RequireInTheMiddleSingleton` class's public interface
-const RITM_SINGLETON_SYM = Symbol.for('OpenTelemetry.js.sdk.require-in-the-middle.v1');
-
 /**
  * Singleton class for `require-in-the-middle`
  * Allows instrumentation plugins to patch modules with only a single `require` patch
- * WARNING: Because this class will be used to create a process-global singleton,
- * any change to the public interface of the class (even a non-breaking change like adding a method or argument)
- * could break the integration with different versions of `InstrumentationBase`.
- * When a change to the public interface of the class is made,
- * we should increment the version number at the end of the `RITM_SINGLETON_SYM` symbol.
+ * WARNING: Because this class will create its own `require-in-the-middle` (RITM) instance,
+ * we should minimize the number of new instances of this class.
+ * Multiple instances of `@opentelemetry/instrumentation` (e.g. multiple versions) in a single process
+ * will result in multiple instances of RITM, which will have an impact
+ * on the performance of instrumentation hooks being applied.
  */
 export class RequireInTheMiddleSingleton {
   private _modulesToHook: Hooked[] = [];
+  private static _instance?: RequireInTheMiddleSingleton;
 
   constructor() {
     this._initialize();
@@ -69,9 +66,8 @@ export class RequireInTheMiddleSingleton {
     return hooked;
   }
 
-  static getGlobalInstance(): RequireInTheMiddleSingleton {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (global as any)[RITM_SINGLETON_SYM] = (global as any)[RITM_SINGLETON_SYM] ?? new RequireInTheMiddleSingleton();
+  static getInstance(): RequireInTheMiddleSingleton {
+    return this._instance = this._instance ?? new RequireInTheMiddleSingleton();
   }
 }
 

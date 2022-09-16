@@ -20,7 +20,7 @@ import * as path from 'path';
 import * as RequireInTheMiddle from 'require-in-the-middle';
 import { RequireInTheMiddleSingleton, shouldHook } from '../../src/platform/node/requireInTheMiddleSingleton';
 
-const requireInTheMiddleSingleton = RequireInTheMiddleSingleton.getGlobalInstance();
+const requireInTheMiddleSingleton = RequireInTheMiddleSingleton.getInstance();
 
 type AugmentedExports = {
   __ritmOnRequires?: string[]

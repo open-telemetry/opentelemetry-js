@@ -30,6 +30,7 @@ export abstract class InstrumentationBase<T = any>
   implements types.Instrumentation {
   private _modules: InstrumentationModuleDefinition<T>[];
   private _hooks: Hooked[] = [];
+  private _requireInTheMiddleSingleton: RequireInTheMiddleSingleton = RequireInTheMiddleSingleton.getInstance();
   private _enabled = false;
 
   constructor(
@@ -159,7 +160,7 @@ export abstract class InstrumentationBase<T = any>
     this._warnOnPreloadedModules();
     for (const module of this._modules) {
       this._hooks.push(
-        RequireInTheMiddleSingleton.getGlobalInstance().register(
+        this._requireInTheMiddleSingleton.register(
           module.name,
           (exports, name, baseDir) => {
             return this._onRequire<typeof exports>(
