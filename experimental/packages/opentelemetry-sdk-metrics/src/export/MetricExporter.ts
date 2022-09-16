@@ -32,6 +32,7 @@ export interface PushMetricExporter {
   /**
    * Called to export sampled {@link ResourceMetrics}.
    * @param metrics the metric data to be exported.
+   * @param resultCallback callback for when the export has completed
    */
   export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): void;
 

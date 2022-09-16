@@ -51,7 +51,12 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :books: (Refine Doc)
 
+* docs(sdk-metrics): fix typos and add missing parameter docs. [#3244](https://github.com/open-telemetry/opentelemetry-js/pull/3244) @pichlermarc
+
 ### :house: (Internal)
+
+* ci(instrumentation-http): improve metrics test stability [#3242](https://github.com/open-telemetry/opentelemetry-js/pull/3242) @pichlermarc
+* deps: remove unused protobufjs and update used ones to 7.1.1 #3251 [#3251](https://github.com/open-telemetry/opentelemetry-js/pull/3251) @pichlermarc
 
 ## 0.32.0
 

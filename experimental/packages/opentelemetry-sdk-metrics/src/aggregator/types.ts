@@ -111,6 +111,7 @@ export interface Aggregator<T> {
    * Returns the {@link MetricData} that this {@link Aggregator} will produce.
    *
    * @param descriptor the metric instrument descriptor.
+   * @param aggregationTemporality the temporality of the resulting {@link MetricData}
    * @param accumulationByAttributes the array of attributes and accumulation pairs.
    * @param endTime the end time of the metric data.
    * @return the {@link MetricData} that this {@link Aggregator} will produce.

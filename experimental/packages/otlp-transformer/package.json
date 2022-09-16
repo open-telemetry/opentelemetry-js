@@ -69,7 +69,6 @@
     "mkdirp": "1.0.4",
     "mocha": "10.0.0",
     "nyc": "15.1.0",
-    "protobufjs": "6.11.3",
     "rimraf": "3.0.2",
     "ts-loader": "8.4.0",
     "ts-mocha": "10.0.0",

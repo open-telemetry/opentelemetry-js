@@ -1,0 +1,58 @@
+name: Unit Tests
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  unit-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ["8", "10", "12", "14", "16"]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Compile 🔧
+        run: npm run compile
+
+      - name: Unit tests
+        run: npm run test
+
+      - name: Report Coverage
+        run: npm run codecov
+        if: ${{ matrix.node == '14' }}
+
+  browser-tests:
+    runs-on: ubuntu-latest
+    container:
+      image: circleci/node:12-browsers
+    steps:
+      - name: Permission Setup
+        run: sudo chmod -R 777 /github /__w
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Compile 🔧
+        run: npm run compile
+
+      - name: Unit tests
+        run: npm run test:browser
+
+      - name: Report Coverage
+        run: npm run codecov:browser
