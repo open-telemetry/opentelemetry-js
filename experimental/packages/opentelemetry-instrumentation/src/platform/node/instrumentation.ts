@@ -18,7 +18,7 @@ import * as types from '../../types';
 import * as path from 'path';
 import { satisfies } from 'semver';
 import { InstrumentationAbstract } from '../../instrumentation';
-import { requireInTheMiddleSingleton, Hooked } from './requireInTheMiddleSingleton';
+import { RequireInTheMiddleSingleton, Hooked } from './requireInTheMiddleSingleton';
 import { InstrumentationModuleDefinition } from './types';
 import { diag } from '@opentelemetry/api';
 
@@ -159,7 +159,7 @@ export abstract class InstrumentationBase<T = any>
     this._warnOnPreloadedModules();
     for (const module of this._modules) {
       this._hooks.push(
-        requireInTheMiddleSingleton.register(
+        RequireInTheMiddleSingleton.getGlobalInstance().register(
           module.name,
           (exports, name, baseDir) => {
             return this._onRequire<typeof exports>(

@@ -18,7 +18,9 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as path from 'path';
 import * as RequireInTheMiddle from 'require-in-the-middle';
-import { requireInTheMiddleSingleton, shouldHook } from '../../src/platform/node/requireInTheMiddleSingleton';
+import { RequireInTheMiddleSingleton, shouldHook } from '../../src/platform/node/requireInTheMiddleSingleton';
+
+const requireInTheMiddleSingleton = RequireInTheMiddleSingleton.getGlobalInstance();
 
 type AugmentedExports = {
   __ritmOnRequires?: string[]

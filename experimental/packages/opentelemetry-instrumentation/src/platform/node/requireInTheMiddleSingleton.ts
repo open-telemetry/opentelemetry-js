@@ -35,7 +35,7 @@ const RITM_SINGLETON_SYM = Symbol.for('OpenTelemetry.js.sdk.require-in-the-middl
  * When a change to the public interface of the class is made,
  * we should increment the version number at the end of the `RITM_SINGLETON_SYM` symbol.
  */
-class RequireInTheMiddleSingleton {
+export class RequireInTheMiddleSingleton {
   private _modulesToHook: Hooked[] = [];
 
   constructor() {
@@ -98,5 +98,3 @@ function normalizePathSeparators(moduleNameOrPath: string): string {
     ? moduleNameOrPath.split(path.sep).join('/')
     : moduleNameOrPath;
 }
-
-export const requireInTheMiddleSingleton = RequireInTheMiddleSingleton.getGlobalInstance();
