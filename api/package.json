@@ -76,7 +76,7 @@
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.32",
     "karma-webpack": "4.0.2",
-    "lerna-changelog": "1.0.1",
+    "lerna-changelog": "2.2.0",
     "linkinator": "2.13.6",
     "mocha": "7.2.0",
     "nyc": "15.1.0",
