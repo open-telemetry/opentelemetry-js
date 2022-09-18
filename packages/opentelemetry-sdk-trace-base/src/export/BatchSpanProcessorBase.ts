@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { context, Context, TraceFlags } from '@opentelemetry/api';
+import {context, Context, diag, TraceFlags} from '@opentelemetry/api';
 import {
   BindOnceFuture,
   ExportResultCode,
   getEnv,
   globalErrorHandler,
   suppressTracing,
-  unrefTimer,
+  unrefTimer
 } from '@opentelemetry/core';
 import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
@@ -63,6 +63,11 @@ export abstract class BatchSpanProcessorBase<T extends BufferConfig> implements 
         : env.OTEL_BSP_EXPORT_TIMEOUT;
 
     this._shutdownOnce = new BindOnceFuture(this._shutdown, this);
+
+    if (this._maxExportBatchSize > this._maxQueueSize) {
+      diag.warn('BatchSpanProcessor: maxExportBatchSize must be smaller or equal to maxQueueSize, setting maxExportBatchSize to match maxQueueSize');
+      this._maxExportBatchSize = this._maxQueueSize;
+    }
   }
 
   forceFlush(): Promise<void> {
