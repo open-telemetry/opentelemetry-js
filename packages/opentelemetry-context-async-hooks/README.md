@@ -5,7 +5,7 @@
 
 This package provides two [`ContextManager`](https://open-telemetry.github.io/opentelemetry-js-api/interfaces/contextmanager.html) implementations built on APIs from Node.js's [`async_hooks`][async-hooks-doc] module. If you're looking for a `ContextManager` to use in browser environments, consider [opentelemetry-context-zone](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone) or [opentelemetry-context-zone-peer-dep](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-zone-peer-dep).
 
-The definition of the `ContextManager` interface and the problem it solves can be found [here](def-context-manager).
+The definition of the `ContextManager` interface and the problem it solves can be found [here][def-context-manager].
 
 ## API
 

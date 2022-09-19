@@ -3,7 +3,9 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
-**NOTE: This package is intended for internal use only.**
+**Note: This package is intended for internal use only.**
+
+**Note: This is an experimental package under active development. New releases may include breaking changes.**
 
 This package provides everything needed to serialize [OpenTelemetry SDK][sdk] traces and metrics into the [OpenTelemetry Protocol][otlp] format.
 

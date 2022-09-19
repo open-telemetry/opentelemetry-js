@@ -1,0 +1,90 @@
+{
+  "name": "@opentelemetry/api",
+  "version": "1.2.0",
+  "description": "Public API for OpenTelemetry",
+  "main": "build/src/index.js",
+  "module": "build/esm/index.js",
+  "types": "build/src/index.d.ts",
+  "browser": {
+    "./src/platform/index.ts": "./src/platform/browser/index.ts",
+    "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
+    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
+  },
+  "repository": "https://github.com/open-telemetry/opentelemetry-js-api.git",
+  "scripts": {
+    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json",
+    "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p .",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p .",
+    "precompile": "npm run version",
+    "compile": "tsc --build tsconfig.json tsconfig.esm.json",
+    "docs": "typedoc",
+    "docs:deploy": "gh-pages --dist docs/out",
+    "docs:test": "linkinator docs/out --silent && linkinator docs/*.md *.md --markdown --silent",
+    "lint:fix": "eslint src test --ext .ts --fix",
+    "lint": "eslint src test --ext .ts",
+    "test:browser": "nyc karma start --single-run",
+    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
+    "cycle-check": "dpdm --exit-code circular:1 src/index.ts",
+    "version": "node scripts/version-update.js",
+    "prewatch": "npm run version",
+    "watch": "tsc --build --watch"
+  },
+  "keywords": [
+    "opentelemetry",
+    "nodejs",
+    "browser",
+    "tracing",
+    "profiling",
+    "stats",
+    "monitoring"
+  ],
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "build/esm/**/*.js",
+    "build/esm/**/*.js.map",
+    "build/esm/**/*.d.ts",
+    "build/src/**/*.js",
+    "build/src/**/*.js.map",
+    "build/src/**/*.d.ts",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/mocha": "8.2.2",
+    "@types/node": "14.17.4",
+    "@types/sinon": "10.0.2",
+    "@types/webpack-env": "1.16.0",
+    "@typescript-eslint/eslint-plugin": "5.0.0",
+    "@typescript-eslint/parser": "5.0.0",
+    "codecov": "3.8.2",
+    "dpdm": "3.7.1",
+    "eslint": "7.32.0",
+    "eslint-plugin-header": "3.1.1",
+    "eslint-plugin-node": "11.1.0",
+    "gh-pages": "3.2.0",
+    "istanbul-instrumenter-loader": "3.0.1",
+    "karma": "5.2.3",
+    "karma-chrome-launcher": "3.1.0",
+    "karma-coverage-istanbul-reporter": "3.0.3",
+    "karma-mocha": "2.0.1",
+    "karma-spec-reporter": "0.0.32",
+    "karma-webpack": "4.0.2",
+    "lerna-changelog": "1.0.1",
+    "linkinator": "2.13.6",
+    "mocha": "7.2.0",
+    "nyc": "15.1.0",
+    "sinon": "11.1.1",
+    "ts-loader": "8.2.0",
+    "ts-mocha": "8.0.0",
+    "typedoc": "0.21.2",
+    "typescript": "4.3.5",
+    "webpack": "4.46.0"
+  }
+}

@@ -25,7 +25,13 @@
       "path": "../../../packages/opentelemetry-semantic-conventions"
     },
     {
+      "path": "../opentelemetry-api-metrics"
+    },
+    {
       "path": "../opentelemetry-instrumentation"
+    },
+    {
+      "path": "../opentelemetry-sdk-metrics"
     }
   ]
 }
