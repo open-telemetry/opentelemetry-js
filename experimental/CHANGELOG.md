@@ -6,6 +6,18 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.33.0
+
+### :boom: Breaking Change
+
 * Add `resourceDetectors` option to `NodeSDK` [#3210](https://github.com/open-telemetry/opentelemetry-js/issues/3210)
   * `NodeSDK.detectResources()` function is no longer able to receive config as a parameter.
     Instead, the detectors are passed to the constructor.
@@ -45,8 +57,6 @@ All notable changes to experimental packages in this project will be documented 
 
 * Add `resourceDetectors` option to `NodeSDK` [#3210](https://github.com/open-telemetry/opentelemetry-js/issues/3210)
 * feat: add Logs API @mkuba [#3117](https://github.com/open-telemetry/opentelemetry-js/pull/3117)
-
-### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
 
