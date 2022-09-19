@@ -95,7 +95,7 @@ export class TracerProviderWithEnvExporters extends NodeTracerProvider {
     }
   }
 
-  public configureSpanProcessors(exporters: SpanExporter[]): (BatchSpanProcessor | SimpleSpanProcessor)[] {
+  private configureSpanProcessors(exporters: SpanExporter[]): (BatchSpanProcessor | SimpleSpanProcessor)[] {
     return exporters.map(exporter => {
       if (exporter instanceof ConsoleSpanExporter) {
         return new SimpleSpanProcessor(exporter);
@@ -105,7 +105,7 @@ export class TracerProviderWithEnvExporters extends NodeTracerProvider {
     });
   }
 
-  public filterBlanksAndNulls(list: string[]): string[] {
+  private filterBlanksAndNulls(list: string[]): string[] {
     return list.map(item => item.trim())
       .filter(s => s !== 'null' && s !== '');
   }
