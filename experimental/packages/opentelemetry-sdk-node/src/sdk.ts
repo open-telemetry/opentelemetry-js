@@ -60,12 +60,12 @@ export class NodeSDK {
   };
   private _meterProviderConfig?: MeterProviderConfig;
   private _instrumentations: InstrumentationOption[];
-  
+
   private _resource: Resource;
   private _resourceDetectors: Detector[];
 
   private _autoDetectResources: boolean;
-  
+
   private _tracerProvider?: NodeTracerProvider | TracerProviderWithEnvExporters;
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
