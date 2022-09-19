@@ -127,7 +127,7 @@ describe('DiagConsoleLogger', () => {
 
       consoleFuncs.forEach(cName => {
         it(`should log ${fName} message even when console doesn't support ${cName} call before construction`, () => {
-          // @ts-ignore removing a console property is not allowed by types
+          // @ts-expect-error removing a console property is not allowed by types
           console[cName] = undefined;
           const consoleLogger: any = new DiagConsoleLogger();
           consoleLogger[fName](`${fName} called %s`, 'param1');
@@ -143,7 +143,7 @@ describe('DiagConsoleLogger', () => {
 
         it(`should log ${fName} message even when console doesn't support ${cName} call after construction`, () => {
           const consoleLogger: any = new DiagConsoleLogger();
-          // @ts-ignore removing a console property is not allowed by types
+          // @ts-expect-error removing a console property is not allowed by types
           console[cName] = undefined;
           consoleLogger[fName](`${fName} called %s`, 'param1');
           if (cName !== expectedConsoleMap[fName]) {
