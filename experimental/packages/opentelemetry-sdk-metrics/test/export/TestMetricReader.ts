@@ -15,32 +15,16 @@
  */
 
 import {
-  Aggregation,
-  AggregationSelector,
   AggregationTemporality,
-  AggregationTemporalitySelector,
-  InstrumentType,
   MetricReader,
 } from '../../src';
 import { MetricCollector } from '../../src/state/MetricCollector';
-
-export interface TestMetricReaderOptions {
-  aggregationTemporalitySelector?: AggregationTemporalitySelector;
-  aggregationSelector?: AggregationSelector;
-}
+import { MetricReaderOptions } from '../../src/export/MetricReader';
 
 /**
  * A test metric reader that implements no-op onForceFlush() and onShutdown() handlers.
  */
 export class TestMetricReader extends MetricReader {
-  private _aggregationTemporalitySelector: AggregationTemporalitySelector;
-  private _aggregationSelector: AggregationSelector;
-
-  constructor(options?: TestMetricReaderOptions) {
-    super();
-    this._aggregationTemporalitySelector = options?.aggregationTemporalitySelector ?? (() => AggregationTemporality.CUMULATIVE);
-    this._aggregationSelector = options?.aggregationSelector ?? Aggregation.Default;
-  }
 
   protected onForceFlush(): Promise<void> {
     return Promise.resolve(undefined);
@@ -50,21 +34,13 @@ export class TestMetricReader extends MetricReader {
     return Promise.resolve(undefined);
   }
 
-  selectAggregationTemporality(instrumentType: InstrumentType) {
-    return this._aggregationTemporalitySelector(instrumentType);
-  }
-
-  selectAggregation(instrumentType: InstrumentType) {
-    return this._aggregationSelector(instrumentType);
-  }
-
   getMetricCollector(): MetricCollector {
     return this['_metricProducer'] as MetricCollector;
   }
 }
 
 export class TestDeltaMetricReader extends TestMetricReader {
-  constructor(options: TestMetricReaderOptions = {}) {
+  constructor(options: MetricReaderOptions = {}) {
     super({
       ...options,
       aggregationTemporalitySelector: () => AggregationTemporality.DELTA,

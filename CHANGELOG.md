@@ -14,11 +14,29 @@ All notable changes to this project will be documented in this file.
 
 ### :house: (Internal)
 
+## 1.7.0
+
+### :bug: (Bug Fix)
+
+* fix(sdk-trace-base): make span start times resistant to hrtime clock drift
+  [#3129](https://github.com/open-telemetry/opentelemetry-js/issues/3129)
+
+* fix(sdk-trace-base): validate maxExportBatchSize in BatchSpanProcessorBase
+  [#3232](https://github.com/open-telemetry/opentelemetry-js/issues/3232)
+
+### :books: (Refine Doc)
+
+* docs(metrics): add missing metrics packages to SDK reference documentation [#3239](https://github.com/open-telemetry/opentelemetry-js/pull/3239) @dyladan
+
+### :house: (Internal)
+
+* deps: update markdownlint-cli to 0.32.2 [#3253](https://github.com/open-telemetry/opentelemetry-js/pull/3253) @pichlermarc
+
 ## 1.6.0
 
 ### :rocket: (Enhancement)
 
-* perf(opentelemetry-core): improve hexToBase64 performance [#3178](https://github.com/open-telemetry/opentelemetry-js/pull/3178)
+* perf(opentelemetry-core): improve hexToBase64 performance [#3178](https://github.com/open-telemetry/opentelemetry-js/pull/3178) @seemk
 * feat(sdk-trace-base): move Sampler declaration into sdk-trace-base [#3088](https://github.com/open-telemetry/opentelemetry-js/pull/3088) @legendecas
 * fix(grpc-instrumentation): added grpc attributes in instrumentation [#3127](https://github.com/open-telemetry/opentelemetry-js/pull/3127) @andrewzenkov
 * feat: support latest `@opentelemetry/api` [#3177](https://github.com/open-telemetry/opentelemetry-js/pull/3177) @dyladan
@@ -32,8 +50,6 @@ All notable changes to this project will be documented in this file.
 
 * chore: update trace-web example and rename it to opentelemetry-web [#3145](https://github.com/open-telemetry/opentelemetry-js/pull/3145) @pichlermarc
 * chore: update https example [#3152](https://github.com/open-telemetry/opentelemetry-js/pull/3152) @pichlermarc
-
-### :house: (Internal)
 
 ## 1.5.0
 

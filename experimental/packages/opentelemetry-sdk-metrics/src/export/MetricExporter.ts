@@ -20,6 +20,7 @@ import {
   ExportResult,
 } from '@opentelemetry/core';
 import { InstrumentType } from '../InstrumentDescriptor';
+import { Aggregation } from '../view/Aggregation';
 
 /**
  * An interface that allows different metric services to export recorded data
@@ -31,6 +32,7 @@ export interface PushMetricExporter {
   /**
    * Called to export sampled {@link ResourceMetrics}.
    * @param metrics the metric data to be exported.
+   * @param resultCallback callback for when the export has completed
    */
   export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): void;
 
@@ -44,7 +46,13 @@ export interface PushMetricExporter {
    * Select the {@link AggregationTemporality} for the given
    * {@link InstrumentType} for this exporter.
    */
-  selectAggregationTemporality(instrumentType: InstrumentType): AggregationTemporality;
+  selectAggregationTemporality?(instrumentType: InstrumentType): AggregationTemporality;
+
+  /**
+   * Select the {@link Aggregation} for the given
+   * {@link InstrumentType} for this exporter.
+   */
+  selectAggregation?(instrumentType: InstrumentType): Aggregation;
 
   /**
    * Returns a promise which resolves when the last exportation is completed.

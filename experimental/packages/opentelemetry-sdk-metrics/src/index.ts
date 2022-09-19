@@ -47,6 +47,7 @@ export {
 
 export {
   MetricReader,
+  MetricReaderOptions
 } from './export/MetricReader';
 
 export {
@@ -66,10 +67,6 @@ export {
   InstrumentDescriptor,
   InstrumentType,
 } from './InstrumentDescriptor';
-
-export {
-  Meter,
-} from './Meter';
 
 export {
   MeterProvider,

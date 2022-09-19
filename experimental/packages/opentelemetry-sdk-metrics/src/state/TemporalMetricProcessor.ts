@@ -44,7 +44,7 @@ interface LastReportedHistory<T extends Maybe<Accumulation>> {
 /**
  * Internal interface.
  *
- * Provides unique reporting for each collectors. Allows synchronous collection
+ * Provides unique reporting for each collector. Allows synchronous collection
  * of metrics and reports given temporality values.
  */
 export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
@@ -57,8 +57,6 @@ export class TemporalMetricProcessor<T extends Maybe<Accumulation>> {
    * Builds the {@link MetricData} streams to report against a specific MetricCollector.
    * @param collector The information of the MetricCollector.
    * @param collectors The registered collectors.
-   * @param resource The resource to attach these metrics against.
-   * @param instrumentationScope The instrumentation scope that generated these metrics.
    * @param instrumentDescriptor The instrumentation descriptor that these metrics generated with.
    * @param currentAccumulations The current accumulation of metric data from instruments.
    * @param collectionTime The current collection timestamp.
