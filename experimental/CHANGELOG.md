@@ -4,6 +4,9 @@ All notable changes to experimental packages in this project will be documented 
 
 ## Unreleased
 
+* feat(instrumentation): add new `_setMeterInstruments` protected method that update the meter instruments every
+                         meter provider update.
+*
 ### :boom: Breaking Change
 
 ### :rocket: (Enhancement)
