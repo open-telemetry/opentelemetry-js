@@ -221,6 +221,7 @@ describe('Node SDK', () => {
     assert.ok(firstMetricRecord.descriptor.name === 'test-view', 'should have renamed counter metric');
 
     await sdk.shutdown();
+    delete env.OTEL_TRACES_EXPORTER;
   });
 
   it('should throw error when calling configureMeterProvider when views are already configured', () => {
