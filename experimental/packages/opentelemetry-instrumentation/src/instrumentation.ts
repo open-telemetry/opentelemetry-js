@@ -85,7 +85,7 @@ implements types.Instrumentation {
   }
 
   /**
-   * Sets the new meter instruments with the current Meter Provider.
+   * Sets the new metric instruments with the current Meter.
    */
   protected _setMeterInstruments(): void {
     return;
