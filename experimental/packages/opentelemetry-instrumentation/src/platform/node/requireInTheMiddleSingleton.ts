@@ -46,7 +46,7 @@ export class RequireInTheMiddleSingleton {
   private _modulesToHook: Hooked[] = [];
   private static _instance?: RequireInTheMiddleSingleton;
 
-  constructor() {
+  private constructor() {
     this._initialize();
   }
 
