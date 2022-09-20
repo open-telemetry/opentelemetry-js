@@ -56,7 +56,7 @@ describe('API', () => {
     const span = new NonRecordingSpan();
     const ctx = trace.setSpan(ROOT_CONTEXT, span);
     context.setGlobalContextManager({ active: () => ctx, disable: () => {} } as any);
-    
+
     const active = trace.getActiveSpan();
     assert.strictEqual(active, span);
 
