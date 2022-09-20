@@ -54,7 +54,7 @@ implements types.Instrumentation {
     this._tracer = trace.getTracer(instrumentationName, instrumentationVersion);
 
     this._meter = metrics.getMeter(instrumentationName, instrumentationVersion);
-    this._setMeterInstruments();
+    this._updateMetricInstruments();
   }
 
   /* Api to wrap instrumented method */
@@ -81,7 +81,7 @@ implements types.Instrumentation {
       this.instrumentationVersion
     );
 
-    this._setMeterInstruments();
+    this._updateMetricInstruments();
   }
 
   /**
