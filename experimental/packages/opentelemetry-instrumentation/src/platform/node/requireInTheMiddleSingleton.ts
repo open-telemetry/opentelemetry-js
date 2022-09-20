@@ -16,6 +16,7 @@
 
 import * as RequireInTheMiddle from 'require-in-the-middle';
 import * as path from 'path';
+import { ModuleNameTrie, ModuleNameSeparator } from './ModuleNameTrie';
 
 export type Hooked = {
   moduleName: string
@@ -43,7 +44,7 @@ const isMocha = ['afterEach','after','beforeEach','before','describe','it'].ever
  * on the performance of instrumentation hooks being applied.
  */
 export class RequireInTheMiddleSingleton {
-  private _modulesToHook: Hooked[] = [];
+  private _moduleNameTrie: ModuleNameTrie = new ModuleNameTrie();
   private static _instance?: RequireInTheMiddleSingleton;
 
   private constructor() {
@@ -58,9 +59,8 @@ export class RequireInTheMiddleSingleton {
       (exports, name, basedir) => {
         // For internal files on Windows, `name` will use backslash as the path separator
         const normalizedModuleName = normalizePathSeparators(name);
-        const matches = this._modulesToHook.filter(({ moduleName: hookedModuleName }) => {
-          return shouldHook(hookedModuleName, normalizedModuleName);
-        });
+
+        const matches = this._moduleNameTrie.search(normalizedModuleName, { maintainInsertionOrder: true });
 
         for (const { onRequire } of matches) {
           exports = onRequire(exports, name, basedir);
@@ -73,7 +73,7 @@ export class RequireInTheMiddleSingleton {
 
   register(moduleName: string, onRequire: RequireInTheMiddle.OnRequireFn): Hooked {
     const hooked = { moduleName, onRequire };
-    this._modulesToHook.push(hooked);
+    this._moduleNameTrie.insert(hooked);
     return hooked;
   }
 
@@ -87,25 +87,13 @@ export class RequireInTheMiddleSingleton {
 }
 
 /**
- * Determine whether a `require`d module should be hooked
- *
- * @param {string} hookedModuleName Hooked module name
- * @param {string} requiredModuleName Required module name
- * @returns {boolean} Whether to hook the required module
- * @private
- */
-export function shouldHook(hookedModuleName: string, requiredModuleName: string): boolean {
-  return requiredModuleName === hookedModuleName || requiredModuleName.startsWith(hookedModuleName + '/');
-}
-
-/**
  * Normalize the path separators to forward slash in a module name or path
  *
  * @param {string} moduleNameOrPath Module name or path
  * @returns {string} Normalized module name or path
  */
 function normalizePathSeparators(moduleNameOrPath: string): string {
-  return path.sep !== '/'
-    ? moduleNameOrPath.split(path.sep).join('/')
+  return path.sep !== ModuleNameSeparator
+    ? moduleNameOrPath.split(path.sep).join(ModuleNameSeparator)
     : moduleNameOrPath;
 }

@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as path from 'path';
 import * as RequireInTheMiddle from 'require-in-the-middle';
-import { RequireInTheMiddleSingleton, shouldHook } from '../../src/platform/node/requireInTheMiddleSingleton';
+import { RequireInTheMiddleSingleton } from '../../src/platform/node/requireInTheMiddleSingleton';
 
 const requireInTheMiddleSingleton = RequireInTheMiddleSingleton.getInstance();
 
@@ -120,23 +120,6 @@ describe('requireInTheMiddleSingleton', () => {
           sinon.assert.calledWithExactly(onRequireCpxStub, exports, modulePath, baseDir);
           sinon.assert.calledWithExactly(onRequireCpxLibStub, exports, modulePath, baseDir);
         });
-      });
-    });
-  });
-
-  describe('shouldHook', () => {
-    describe('module that matches', () => {
-      it('should be hooked', () => {
-        assert.equal(shouldHook('c', 'c'), true);
-        assert.equal(shouldHook('c', 'c/d'), true);
-        assert.equal(shouldHook('c.js', 'c.js'), true);
-      });
-    });
-    describe('module that does not match', () => {
-      it('should not be hooked', () => {
-        assert.equal(shouldHook('c', 'c.js'), false);
-        assert.equal(shouldHook('c', 'e'), false);
-        assert.equal(shouldHook('c.js', 'c'), false);
       });
     });
   });
