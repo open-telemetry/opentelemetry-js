@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as path from 'path';
 import * as RequireInTheMiddle from 'require-in-the-middle';
-import { RequireInTheMiddleSingleton } from '../../src/platform/node/requireInTheMiddleSingleton';
+import { RequireInTheMiddleSingleton } from '../../src/platform/node/RequireInTheMiddleSingleton';
 
 const requireInTheMiddleSingleton = RequireInTheMiddleSingleton.getInstance();
 
@@ -32,7 +32,7 @@ const makeOnRequiresStub = (label: string): sinon.SinonStub => sinon.stub().call
   return exports;
 }) as RequireInTheMiddle.OnRequireFn);
 
-describe('requireInTheMiddleSingleton', () => {
+describe('RequireInTheMiddleSingleton', () => {
   describe('register', () => {
     const onRequireFsStub = makeOnRequiresStub('fs');
     const onRequireFsPromisesStub = makeOnRequiresStub('fs-promises');

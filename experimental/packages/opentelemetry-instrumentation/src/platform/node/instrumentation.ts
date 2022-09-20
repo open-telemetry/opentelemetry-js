@@ -18,7 +18,7 @@ import * as types from '../../types';
 import * as path from 'path';
 import { satisfies } from 'semver';
 import { InstrumentationAbstract } from '../../instrumentation';
-import { RequireInTheMiddleSingleton, Hooked } from './requireInTheMiddleSingleton';
+import { RequireInTheMiddleSingleton, Hooked } from './RequireInTheMiddleSingleton';
 import { InstrumentationModuleDefinition } from './types';
 import { diag } from '@opentelemetry/api';
 

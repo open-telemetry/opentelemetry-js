@@ -71,12 +71,24 @@ export class RequireInTheMiddleSingleton {
     );
   }
 
+  /**
+   * Register a hook with `require-in-the-middle`
+   *
+   * @param {string} moduleName Module name
+   * @param {RequireInTheMiddle.OnRequireFn} onRequire Hook function
+   * @returns {Hooked} Registered hook
+   */
   register(moduleName: string, onRequire: RequireInTheMiddle.OnRequireFn): Hooked {
     const hooked = { moduleName, onRequire };
     this._moduleNameTrie.insert(hooked);
     return hooked;
   }
 
+  /**
+   * Get the `RequireInTheMiddleSingleton` singleton
+   *
+   * @returns {RequireInTheMiddleSingleton} Singleton of `RequireInTheMiddleSingleton`
+   */
   static getInstance(): RequireInTheMiddleSingleton {
     // Mocha runs all test suites in the same process
     // This prevents test suites from sharing a singleton
