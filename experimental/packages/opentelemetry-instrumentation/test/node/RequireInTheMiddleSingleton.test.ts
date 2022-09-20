@@ -105,7 +105,7 @@ describe('RequireInTheMiddleSingleton', () => {
           sinon.assert.calledWithExactly(onRequireCodecovStub, exports, 'codecov', baseDir);
           sinon.assert.calledWithMatch(onRequireCodecovStub, { __ritmOnRequires: ['codecov', 'codecov-lib'] }, modulePath, baseDir);
           sinon.assert.calledWithMatch(onRequireCodecovLibStub, { __ritmOnRequires: ['codecov', 'codecov-lib'] }, modulePath, baseDir);
-        });
+        }).timeout(30000);
       });
     });
 
