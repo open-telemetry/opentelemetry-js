@@ -554,102 +554,32 @@ describe('export - real http request destroyed before response received', () => 
   });
 });
 
-describe('export - real http request destroyed after response received', () => {
-  let collectorExporter: OTLPTraceExporter;
-  let collectorExporterConfig: OTLPExporterNodeConfigBase;
-  let spans: ReadableSpan[];
-
-  const server = http.createServer((_, res) => {
-    res.write('writing something');
-  });
-  before(done => {
-    server.listen(8081, done);
-  });
-  after(done => {
-    server.close(done);
-  });
-  it('should log the timeout request error message', done => {
-    collectorExporterConfig = {
-      url: 'http://localhost:8081',
-      timeoutMillis: 300,
-    };
-    collectorExporter = new OTLPTraceExporter(collectorExporterConfig);
-    spans = [];
-    spans.push(Object.assign({}, mockedReadableSpan));
-
-    setTimeout(() => {
-      collectorExporter.export(spans, result => {
-        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-        const error = result.error as OTLPExporterError;
-        assert.ok(error !== undefined);
-        assert.strictEqual(error.message, 'Request Timeout');
-        done();
-      });
-    }, 0);
-  });
-});
-
 describe('export with retry - real http request destroyed after response received', () => {
   let collectorExporter: OTLPTraceExporter;
   let collectorExporterConfig: OTLPExporterNodeConfigBase;
   let spans: ReadableSpan[];
+  let retries = 0;
 
   const server = http.createServer((_, res) => {
-    res.statusCode = 502;
-    res.end();
-  });
-
-  before(done => {
-    server.listen(8081, done);
-  });
-  after(done => {
-    server.close(done);
-  });
-  it('should log the timeout request error message', done => {
-    collectorExporterConfig = {
-      url: 'http://localhost:8081',
-      timeoutMillis: 3000,
-    };
-    collectorExporter = new OTLPTraceExporter(collectorExporterConfig);
-    spans = [];
-    spans.push(Object.assign({}, mockedReadableSpan));
-
-    collectorExporter.export(spans, result => {
-      assert.strictEqual(result.code, core.ExportResultCode.FAILED);
-      const error = result.error as OTLPExporterError;
-      assert.ok(error !== undefined);
-      assert.strictEqual(error.message, 'Request Timeout');
-      done();
-    });
-  }).timeout(5000);
-});
-
-describe('export with retry - real http request destroyed after response received', () => {
-  let collectorExporter: OTLPTraceExporter;
-  let collectorExporterConfig: OTLPExporterNodeConfigBase;
-  let spans: ReadableSpan[];
-  let attempts = -1;
-
-  const server = http.createServer((_, res) => {
-    attempts++;
-    if (attempts >= 2) {
+    retries++;
+    if (retries >= 2) {
       res.statusCode = 200;
     } else {
       res.statusCode = 502;
     }
     res.end();
   });
-
   before(done => {
     server.listen(8081, done);
   });
-  after(done => {
+  after(function (done) {
+    this.timeout(3000)
     server.close(done);
   });
-  it('should log the timeout request error message', done => {
+  it.only('should log the timeout request error message', done => {
     collectorExporterConfig = {
       url: 'http://localhost:8081',
-      timeoutMillis: 3000,
+      timeoutMillis: 2500,
     };
     collectorExporter = new OTLPTraceExporter(collectorExporterConfig);
     spans = [];
@@ -657,7 +587,9 @@ describe('export with retry - real http request destroyed after response receive
 
     collectorExporter.export(spans, result => {
       assert.strictEqual(result.code, core.ExportResultCode.SUCCESS);
+      assert.strictEqual(retries, 2)
       done();
     });
-  }).timeout(5000);
+  }).timeout(3000);
 });
+

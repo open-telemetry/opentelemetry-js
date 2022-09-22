@@ -54,12 +54,15 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
   const exporterTimer = setTimeout(() => {
     clearTimeout(retryTimer);
     reqIsDestroyed = true;
-    // req.abort() was deprecated since v14
-    if (nodeVersion >= 14) {
-      // req.destroy();
-      req.abort();
+
+    if (req.destroyed) {
+      const err = new OTLPExporterError(
+        'Request Timeout'
+        );
+        onError(err);
     } else {
-      req.abort();
+      // req.abort() was deprecated since v14
+      nodeVersion >= 14 ? req.destroy() : req.abort();
     }
   }, exporterTimeout);
 
