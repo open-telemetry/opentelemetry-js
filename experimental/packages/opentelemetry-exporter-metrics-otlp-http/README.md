@@ -32,7 +32,7 @@ const collectorOptions = {
   headers: {}, // an optional object containing custom headers to be sent with each request
   concurrencyLimit: 1, // an optional limit on pending requests
 };
-const exporter = new OTLPMetricExporter(collectorOptions);
+const metricExporter = new OTLPMetricExporter(collectorOptions);
 const meterProvider = new MeterProvider({});
 
 meterProvider.addMetricReader(new PeriodicExportingMetricReader({

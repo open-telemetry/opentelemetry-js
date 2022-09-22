@@ -32,7 +32,7 @@ const collectorOptions = {
   url: 'http://<collector-hostname>:<port>',
 };
 
-const exporter = new OTLPMetricExporter(collectorOptions);
+const metricExporter = new OTLPMetricExporter(collectorOptions);
 const meterProvider = new MeterProvider({});
 
 meterProvider.addMetricReader(new PeriodicExportingMetricReader({
