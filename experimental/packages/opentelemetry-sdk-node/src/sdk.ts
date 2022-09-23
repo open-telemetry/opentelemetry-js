@@ -31,7 +31,6 @@ import {
 import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics';
 import {
   BatchSpanProcessor,
-  NoopSpanProcessor,
   SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
@@ -69,7 +68,6 @@ export class NodeSDK {
   private _tracerProvider?: NodeTracerProvider | TracerProviderWithEnvExporters;
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
-  private _useEnvExporters = false;
 
   /**
    * Create a new NodeJS SDK instance
@@ -102,8 +100,6 @@ export class NodeSDK {
         configuration.contextManager,
         configuration.textMapPropagator
       );
-    } else {
-      this._useEnvExporters = true;
     }
 
     if (configuration.metricReader || configuration.views) {
@@ -198,28 +194,24 @@ export class NodeSDK {
         { [SemanticResourceAttributes.SERVICE_NAME]: this._serviceName }
       ));
 
-    if (this._tracerProviderConfig || this._useEnvExporters) {
-      const Provider =
-        this._tracerProviderConfig ? NodeTracerProvider : TracerProviderWithEnvExporters;
+    const Provider =
+      this._tracerProviderConfig ? NodeTracerProvider : TracerProviderWithEnvExporters;
 
-      const tracerProvider = new Provider ({
-        ...this._tracerProviderConfig?.tracerConfig,
-        resource: this._resource,
-      });
+    const tracerProvider = new Provider ({
+      ...this._tracerProviderConfig?.tracerConfig,
+      resource: this._resource,
+    });
 
-      this._tracerProvider = tracerProvider;
+    this._tracerProvider = tracerProvider;
 
-      if (this._tracerProviderConfig) {
-        tracerProvider.addSpanProcessor(this._tracerProviderConfig.spanProcessor);
-      }
-
-      if (!(tracerProvider.getActiveSpanProcessor() instanceof NoopSpanProcessor)) {
-        tracerProvider.register({
-          contextManager: this._tracerProviderConfig?.contextManager,
-          propagator: this._tracerProviderConfig?.textMapPropagator,
-        });
-      }
+    if (this._tracerProviderConfig) {
+      tracerProvider.addSpanProcessor(this._tracerProviderConfig.spanProcessor);
     }
+
+    tracerProvider.register({
+      contextManager: this._tracerProviderConfig?.contextManager,
+      propagator: this._tracerProviderConfig?.textMapPropagator,
+    });
 
     if (this._meterProviderConfig) {
       const meterProvider = new MeterProvider({

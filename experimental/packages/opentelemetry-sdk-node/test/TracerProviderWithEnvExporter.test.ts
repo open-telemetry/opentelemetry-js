@@ -47,8 +47,8 @@ describe('set up trace exporter with env exporters', () => {
   describe('setup otlp exporter from env', () => {
     it('set up default exporter when user does not define otel trace exporter', async () => {
       const sdk = new TracerProviderWithEnvExporters();
-      const listOfProcessors = sdk.spanProcessors!;
-      const listOfExporters = sdk.configuredExporters;
+      const listOfProcessors = sdk['_spanProcessors']!;
+      const listOfExporters = sdk['_configuredExporters'];
 
       assert(spyGetOtlpProtocol.returned('http/protobuf'));
       assert(listOfExporters.length === 1);
@@ -61,8 +61,8 @@ describe('set up trace exporter with env exporters', () => {
       env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
 
       const sdk = new TracerProviderWithEnvExporters();
-      const listOfProcessors = sdk.spanProcessors!;
-      const listOfExporters = sdk.configuredExporters;
+      const listOfProcessors = sdk['_spanProcessors']!;
+      const listOfExporters = sdk['_configuredExporters'];
 
       assert(spyGetOtlpProtocol.returned('grpc'));
       assert(listOfExporters.length === 1);
@@ -79,8 +79,8 @@ describe('set up trace exporter with env exporters', () => {
       env.OTEL_EXPORTER_OTLP_PROTOCOL = 'grpc';
 
       const sdk = new TracerProviderWithEnvExporters();
-      const listOfProcessors = sdk.spanProcessors!;
-      const listOfExporters = sdk.configuredExporters;
+      const listOfProcessors = sdk['_spanProcessors']!;
+      const listOfExporters = sdk['_configuredExporters'];
 
       assert(spyGetOtlpProtocol.returned('http/protobuf'));
       assert(listOfExporters.length === 1);
@@ -95,8 +95,8 @@ describe('set up trace exporter with env exporters', () => {
     it('do not use any exporters when empty value is provided for exporter', async () => {
       env.OTEL_TRACES_EXPORTER = '';
       const sdk = new TracerProviderWithEnvExporters();
-      const listOfProcessors = sdk.spanProcessors;
-      const listOfExporters = sdk.configuredExporters;
+      const listOfProcessors = sdk['_spanProcessors'];
+      const listOfExporters = sdk['_configuredExporters'];
 
       assert(spyGetOtlpProtocol.notCalled);
       assert(listOfExporters.length === 0);
@@ -106,8 +106,8 @@ describe('set up trace exporter with env exporters', () => {
     it('do not use any exporters when none value is only provided', async () => {
       env.OTEL_TRACES_EXPORTER = 'none';
       const sdk = new TracerProviderWithEnvExporters();
-      const listOfProcessors = sdk.spanProcessors;
-      const listOfExporters = sdk.configuredExporters;
+      const listOfProcessors = sdk['_spanProcessors'];
+      const listOfExporters = sdk['_configuredExporters'];
 
       assert(spyGetOtlpProtocol.notCalled);
       assert(listOfExporters.length === 0);
@@ -124,8 +124,8 @@ describe('set up trace exporter with env exporters', () => {
     it('use default exporter when none value is provided with other exports', async () => {
       env.OTEL_TRACES_EXPORTER = 'otlp,zipkin,none';
       const sdk = new TracerProviderWithEnvExporters();
-      const listOfProcessors = sdk.spanProcessors!;
-      const listOfExporters = sdk.configuredExporters;
+      const listOfProcessors = sdk['_spanProcessors']!;
+      const listOfExporters = sdk['_configuredExporters'];
 
       assert(listOfExporters[0] instanceof OTLPProtoTraceExporter);
       assert(listOfExporters.length === 1);
@@ -172,8 +172,8 @@ describe('set up trace exporter with env exporters', () => {
     it('use the zipkin exporter', async () => {
       env.OTEL_TRACES_EXPORTER = 'zipkin';
       const sdk = new TracerProviderWithEnvExporters();
-      const listOfProcessors = sdk.spanProcessors!;
-      const listOfExporters = sdk.configuredExporters;
+      const listOfProcessors = sdk['_spanProcessors']!;
+      const listOfExporters = sdk['_configuredExporters'];
 
       assert(listOfExporters.length === 1);
       assert(listOfExporters[0] instanceof ZipkinExporter);
@@ -186,8 +186,8 @@ describe('set up trace exporter with env exporters', () => {
       env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
 
       const sdk = new TracerProviderWithEnvExporters();
-      const listOfProcessors = sdk.spanProcessors!;
-      const listOfExporters = sdk.configuredExporters;
+      const listOfProcessors = sdk['_spanProcessors']!;
+      const listOfExporters = sdk['_configuredExporters'];
 
       assert(spyGetOtlpProtocol.returned('grpc'));
       assert(listOfExporters.length === 2);
@@ -204,8 +204,8 @@ describe('set up trace exporter with env exporters', () => {
     it('use the jaeger exporter', async () => {
       env.OTEL_TRACES_EXPORTER = 'jaeger';
       const sdk = new TracerProviderWithEnvExporters();
-      const listOfProcessors = sdk.spanProcessors!;
-      const listOfExporters = sdk.configuredExporters;
+      const listOfProcessors = sdk['_spanProcessors']!;
+      const listOfExporters = sdk['_configuredExporters'];
 
       assert(listOfExporters.length === 1);
       assert(listOfExporters[0] instanceof JaegerExporter);
@@ -217,8 +217,8 @@ describe('set up trace exporter with env exporters', () => {
       env.OTEL_TRACES_EXPORTER = 'jaeger, otlp';
       env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'http/json';
       const sdk = new TracerProviderWithEnvExporters();
-      const listOfProcessors = sdk.spanProcessors!;
-      const listOfExporters = sdk.configuredExporters;
+      const listOfProcessors = sdk['_spanProcessors']!;
+      const listOfExporters = sdk['_configuredExporters'];
 
       assert(spyGetOtlpProtocol.returned('http/json'));
       assert(listOfExporters.length === 2);
@@ -236,8 +236,8 @@ describe('set up trace exporter with env exporters', () => {
     it('use the console exporter', async () => {
       env.OTEL_TRACES_EXPORTER = 'console';
       const sdk = new TracerProviderWithEnvExporters();
-      const listOfProcessors = sdk.spanProcessors!;
-      const listOfExporters = sdk.configuredExporters;
+      const listOfProcessors = sdk['_spanProcessors']!;
+      const listOfExporters = sdk['_configuredExporters'];
 
       assert(listOfExporters.length === 1);
       assert(listOfExporters[0] instanceof ConsoleSpanExporter);
@@ -249,8 +249,8 @@ describe('set up trace exporter with env exporters', () => {
       env.OTEL_TRACES_EXPORTER = 'console';
       env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
       const sdk = new TracerProviderWithEnvExporters();
-      const listOfProcessors = sdk.spanProcessors!;
-      const listOfExporters = sdk.configuredExporters;
+      const listOfProcessors = sdk['_spanProcessors']!;
+      const listOfExporters = sdk['_configuredExporters'];
 
       assert(spyGetOtlpProtocol.notCalled);
       assert(listOfExporters.length === 1);
@@ -265,8 +265,8 @@ describe('set up trace exporter with env exporters', () => {
       env.OTEL_TRACES_EXPORTER = 'console, otlp';
       env.OTEL_EXPORTER_OTLP_TRACES_PROTOCOL = 'grpc';
       const sdk = new TracerProviderWithEnvExporters();
-      const listOfProcessors = sdk.spanProcessors!;
-      const listOfExporters = sdk.configuredExporters;
+      const listOfProcessors = sdk['_spanProcessors']!;
+      const listOfExporters = sdk['_configuredExporters'];
 
       assert(spyGetOtlpProtocol.returned('grpc'));
       assert(listOfExporters.length === 2);

@@ -58,6 +58,7 @@ import {
   processDetector,
   Resource
 } from '@opentelemetry/resources';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 
 const DefaultContextManager = semver.gte(process.version, '14.8.0')
   ? AsyncLocalStorageContextManager
@@ -527,7 +528,7 @@ describe('setup exporter from env', () => {
     spyGetOtlpProtocol.restore();
     stubLoggerError.restore();
   });
-  it('use default exporter - TracerProviderWithEnvExporters', async () => {
+  it('use default exporter TracerProviderWithEnvExporters when user does not provide span processor or trace exporter to sdk config', async () => {
     const sdk = new NodeSDK();
     await sdk.start();
     const listOfProcessors = sdk['_tracerProvider']!['_registeredSpanProcessors']!;
@@ -549,7 +550,7 @@ describe('setup exporter from env', () => {
     assert(listOfProcessors[0] instanceof SimpleSpanProcessor === false);
     assert(listOfProcessors[0] instanceof BatchSpanProcessor);
   });
-  it('ignore env exporter when user provides span processor to sdk config', async () => {
+  it('ignores default env exporter when user provides span processor to sdk config', async () => {
     const traceExporter = new ConsoleSpanExporter();
     const spanProcessor = new SimpleSpanProcessor(traceExporter);
     const sdk = new NodeSDK({
@@ -562,6 +563,21 @@ describe('setup exporter from env', () => {
     assert(listOfProcessors.length === 1);
     assert(listOfProcessors[0] instanceof SimpleSpanProcessor);
     assert(listOfProcessors[0] instanceof BatchSpanProcessor === false);
+  });
+  it('ignores env exporter when user provides tracer exporter to sdk config and sets exporter via env', async () => {
+    env.OTEL_TRACES_EXPORTER = 'console';
+    const traceExporter = new OTLPTraceExporter();
+    const sdk = new NodeSDK({
+      traceExporter
+    });
+    await sdk.start();
+    const listOfProcessors = sdk['_tracerProvider']!['_registeredSpanProcessors']!;
+
+    assert(sdk['_tracerProvider'] instanceof TracerProviderWithEnvExporters === false);
+    assert(listOfProcessors.length === 1);
+    assert(listOfProcessors[0] instanceof SimpleSpanProcessor === false);
+    assert(listOfProcessors[0] instanceof BatchSpanProcessor);
+    delete env.OTEL_TRACES_EXPORTER;
   });
   it('use otlp exporter and defined exporter protocol env value', async () => {
     env.OTEL_TRACES_EXPORTER = 'otlp';

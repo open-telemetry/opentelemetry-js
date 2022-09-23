@@ -16,7 +16,7 @@
 
 import { diag } from '@opentelemetry/api';
 import { getEnv, getEnvWithoutDefaults } from '@opentelemetry/core';
-import { ConsoleSpanExporter, SpanExporter, BatchSpanProcessor, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
+import { ConsoleSpanExporter, SpanExporter, BatchSpanProcessor, SimpleSpanProcessor, SDKRegistrationConfig, SpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { OTLPTraceExporter as OTLPProtoTraceExporter } from '@opentelemetry/exporter-trace-otlp-proto';
 import { OTLPTraceExporter as OTLPHttpTraceExporter} from '@opentelemetry/exporter-trace-otlp-http';
@@ -25,8 +25,8 @@ import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 
 export class TracerProviderWithEnvExporters extends NodeTracerProvider {
-  public configuredExporters: SpanExporter[] = [];
-  public spanProcessors: (BatchSpanProcessor | SimpleSpanProcessor)[] | undefined;
+  private _configuredExporters: SpanExporter[] = [];
+  private _spanProcessors: SpanProcessor[] | undefined;
 
   static configureOtlp(): SpanExporter {
     const protocol = this.getOtlpProtocol();
@@ -78,20 +78,26 @@ export class TracerProviderWithEnvExporters extends NodeTracerProvider {
       traceExportersList.forEach(exporterName => {
         const exporter = this._getSpanExporter(exporterName);
         if (exporter) {
-          this.configuredExporters.push(exporter);
+          this._configuredExporters.push(exporter);
         } else {
           diag.warn(`Unrecognized OTEL_TRACES_EXPORTER value: ${exporterName}.`);
         }
       });
 
-      if (this.configuredExporters.length > 0) {
-        this.spanProcessors = this.configureSpanProcessors(this.configuredExporters);
-        this.spanProcessors.forEach(processor => {
+      if (this._configuredExporters.length > 0) {
+        this._spanProcessors = this.configureSpanProcessors(this._configuredExporters);
+        this._spanProcessors.forEach(processor => {
           this.addSpanProcessor(processor);
         });
       } else {
         diag.warn('Unable to set up trace exporter(s) due to invalid exporter and/or protocol values.');
       }
+    }
+  }
+
+  override register(config?: SDKRegistrationConfig) {
+    if (this._spanProcessors) {
+      super.register(config);
     }
   }
 
