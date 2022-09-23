@@ -110,7 +110,7 @@ describe('utils', () => {
     });
 
     it('should not change string when url is not parseable', () => {
-      const url = 'this is not an URL';
+      const url = 'this is not a URL';
 
       const finalUrl = appendRootPathToUrlIfNeeded(url);
       assert.strictEqual(finalUrl, url);
