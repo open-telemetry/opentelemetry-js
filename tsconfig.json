@@ -4,6 +4,7 @@
   "typedocOptions": {
     "entryPointStrategy": "packages",
     "entryPoints": [
+      "api",
       "experimental/packages/exporter-trace-otlp-grpc",
       "experimental/packages/exporter-trace-otlp-http",
       "experimental/packages/exporter-trace-otlp-proto",
@@ -49,6 +50,9 @@
     "excludePrivate": true
   },
   "references": [
+    {
+      "path": "api"
+    },
     {
       "path": "packages/opentelemetry-context-async-hooks"
     },
