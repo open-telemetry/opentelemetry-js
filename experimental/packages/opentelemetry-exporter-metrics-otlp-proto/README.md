@@ -28,7 +28,7 @@ const { OTLPMetricExporter } =  require('@opentelemetry/exporter-metrics-otlp-pr
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
 };
-const exporter = new OTLPMetricExporter(collectorOptions);
+const metricExporter = new OTLPMetricExporter(collectorOptions);
 const meterProvider = new MeterProvider({});
 
 meterProvider.addMetricReader(new PeriodicExportingMetricReader({
