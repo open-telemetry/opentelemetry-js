@@ -3,9 +3,9 @@
 These tasks must be completed before the API package can be released from this repository.
 
 - [x] remove files specific to the API git repo
-- [ ] add to lerna monorepo
-  - [ ] add tsconfig files
-  - [ ] add web testing
-  - [ ] build esm versions
+- [x] add to lerna monorepo
+  - [x] add tsconfig files
+  - [x] add web testing
+  - [x] build esm versions
 - [ ] test node versions 8, 10, and 12
-- [ ] add to auto published docs
+- [x] add to auto published docs

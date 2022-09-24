@@ -24,7 +24,7 @@ import { SpanOptions } from './SpanOptions';
 import { SpanContext } from './span_context';
 import { Tracer } from './tracer';
 
-const context = ContextAPI.getInstance();
+const contextApi = ContextAPI.getInstance();
 
 /**
  * No-op implementations of {@link Tracer}.
@@ -87,11 +87,11 @@ export class NoopTracer implements Tracer {
       fn = arg4 as F;
     }
 
-    const parentContext = ctx ?? context.active();
+    const parentContext = ctx ?? contextApi.active();
     const span = this.startSpan(name, opts, parentContext);
     const contextWithSpanSet = setSpan(parentContext, span);
 
-    return context.with(contextWithSpanSet, fn, undefined, span);
+    return contextApi.with(contextWithSpanSet, fn, undefined, span);
   }
 }
 
