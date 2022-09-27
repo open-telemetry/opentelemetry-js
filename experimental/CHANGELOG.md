@@ -62,8 +62,6 @@ All notable changes to experimental packages in this project will be documented 
 * Add `resourceDetectors` option to `NodeSDK` [#3210](https://github.com/open-telemetry/opentelemetry-js/issues/3210)
 * feat: add Logs API @mkuba [#3117](https://github.com/open-telemetry/opentelemetry-js/pull/3117)
 
-### :bug: (Bug Fix)
-
 ### :books: (Refine Doc)
 
 * docs(sdk-metrics): fix typos and add missing parameter docs. [#3244](https://github.com/open-telemetry/opentelemetry-js/pull/3244) @pichlermarc
