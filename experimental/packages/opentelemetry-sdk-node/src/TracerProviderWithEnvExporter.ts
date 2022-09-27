@@ -27,6 +27,7 @@ import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 export class TracerProviderWithEnvExporters extends NodeTracerProvider {
   private _configuredExporters: SpanExporter[] = [];
   private _spanProcessors: SpanProcessor[] | undefined;
+  private _hasSpanProcessors: boolean = false;
 
   static configureOtlp(): SpanExporter {
     const protocol = this.getOtlpProtocol();
@@ -95,8 +96,13 @@ export class TracerProviderWithEnvExporters extends NodeTracerProvider {
     }
   }
 
+  override addSpanProcessor(spanProcessor: SpanProcessor) {
+    super.addSpanProcessor(spanProcessor);
+    this._hasSpanProcessors = true;
+  }
+
   override register(config?: SDKRegistrationConfig) {
-    if (this._spanProcessors) {
+    if (this._hasSpanProcessors) {
       super.register(config);
     }
   }
