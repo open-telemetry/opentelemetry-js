@@ -12,6 +12,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :books: (Refine Doc)
 
+* docs(metrics-exporters): fix wrong exporter const name in example [#3270](https://github.com/open-telemetry/opentelemetry-js/issues/3270) @pichlermarc
+
 ### :house: (Internal)
 
 ## 0.33.0
