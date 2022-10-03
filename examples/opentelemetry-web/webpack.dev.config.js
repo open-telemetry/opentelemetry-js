@@ -7,11 +7,12 @@ const directory = path.resolve(__dirname);
 const common = {
   mode: "development",
   entry: {
-    // metrics: 'examples/metrics/index.js',
+    metrics: "examples/metrics/index.js",
     fetch: "examples/fetch/index.js",
     "xml-http-request": "examples/xml-http-request/index.js",
     fetchXhr: "examples/fetchXhr/index.js",
     fetchXhrB3: "examples/fetchXhrB3/index.js",
+    fetchProtoExporter: "examples/fetchProtoExporter/index.js",
     zipkin: "examples/zipkin/index.js",
   },
   output: {
