@@ -15,4 +15,4 @@
  */
 
 export * from './OTLPExporterBrowserBase';
-export { sendWithXhr } from './util'
+export { sendWithXhr } from './util';
