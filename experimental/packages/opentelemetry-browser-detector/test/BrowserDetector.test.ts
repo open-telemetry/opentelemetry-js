@@ -39,16 +39,13 @@ describeBrowser('browserDetector()', () => {
 
     const resource: Resource = await browserDetector.detect();
     assertResource(resource, {
-      version: 'dddd',
-      runtimeDescription: 'Web Browser',
-      runtimeName: 'browser',
       platform: 'platform',
       brands: ['brand1'],
       mobile: false,
       user_agent: 'dddd'
     });
   });
-  it('should return empty resources if version is missing', async () => {
+  it('should return empty resources if user agent is missing', async () => {
     sinon.stub(globalThis, 'navigator').value({
       userAgent: '',
     });
