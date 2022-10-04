@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import { InstrumentType } from '../InstrumentDescriptor';
-
 /**
  * AggregationTemporality indicates the way additive quantities are expressed.
  */
@@ -23,5 +21,3 @@ export enum AggregationTemporality {
   DELTA,
   CUMULATIVE,
 }
-
-export type AggregationTemporalitySelector = (instrumentType: InstrumentType) => AggregationTemporality;

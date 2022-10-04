@@ -15,9 +15,26 @@
  */
 
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import { MeterProvider } from '../../src/MeterProvider';
+import { assertRejects } from '../test-utils';
+import {
+  emptyResourceMetrics,
+  TestMetricProducer
+} from './TestMetricProducer';
 import { TestMetricReader } from './TestMetricReader';
-
+import {
+  Aggregation,
+  AggregationTemporality
+} from '../../src';
+import {
+  DEFAULT_AGGREGATION_SELECTOR,
+  DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
+} from '../../src/export/AggregationSelector';
+import {
+  assertAggregationSelector,
+  assertAggregationTemporalitySelector
+} from './utils';
 
 describe('MetricReader', () => {
   describe('setMetricProducer', () => {
@@ -29,6 +46,83 @@ describe('MetricReader', () => {
       meterProvider1.addMetricReader(reader);
       assert.throws(() => meterProvider1.addMetricReader(reader), /MetricReader can not be bound to a MeterProvider again/);
       assert.throws(() => meterProvider2.addMetricReader(reader), /MetricReader can not be bound to a MeterProvider again/);
+    });
+  });
+
+  describe('setMetricProducer', () => {
+    it('should initialize the metric reader', async () => {
+      const reader = new TestMetricReader();
+
+      reader.setMetricProducer(new TestMetricProducer());
+      const result = await reader.collect();
+
+      assert.deepStrictEqual(result, {
+        resourceMetrics: emptyResourceMetrics,
+        errors: [],
+      });
+      await reader.shutdown();
+    });
+  });
+
+  describe('collect', () => {
+    it('should throw on non-initialized instance', async () => {
+      const reader = new TestMetricReader();
+
+      await assertRejects(() => reader.collect(), /MetricReader is not bound to a MetricProducer/);
+    });
+
+    it('should return empty on shut-down instance', async () => {
+      const reader = new TestMetricReader();
+
+      reader.setMetricProducer(new TestMetricProducer());
+
+      await reader.shutdown();
+      assertRejects(reader.collect(), /MetricReader is shutdown/);
+    });
+
+    it('should call MetricProduce.collect with timeout', async () => {
+      const reader = new TestMetricReader();
+      const producer = new TestMetricProducer();
+      reader.setMetricProducer(producer);
+
+      const collectStub = sinon.stub(producer, 'collect');
+
+      await reader.collect({ timeoutMillis: 20 });
+      assert(collectStub.calledOnce);
+      const args = collectStub.args[0];
+      assert.deepStrictEqual(args, [{ timeoutMillis: 20 }]);
+
+      await reader.shutdown();
+    });
+  });
+
+  describe('selectAggregation', () => {
+    it('should override default when not provided with a selector', () => {
+      assertAggregationSelector(new TestMetricReader(), DEFAULT_AGGREGATION_SELECTOR);
+      assertAggregationSelector(new TestMetricReader({}), DEFAULT_AGGREGATION_SELECTOR);
+    });
+
+    it('should override default when provided with a selector', () => {
+      const reader = new TestMetricReader({
+        aggregationSelector: _instrumentType => Aggregation.Sum()
+      });
+      assertAggregationSelector(reader, _instrumentType => Aggregation.Sum());
+      reader.shutdown();
+    });
+  });
+
+  describe('selectAggregationTemporality', () => {
+    it('should override default when not provided with a selector', () => {
+      assertAggregationTemporalitySelector(new TestMetricReader(), DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR);
+      assertAggregationTemporalitySelector(new TestMetricReader({}), DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR);
+    });
+
+    it('should override default when provided with a selector', () => {
+      const reader = new TestMetricReader({
+        aggregationTemporalitySelector: _instrumentType => AggregationTemporality.DELTA
+      });
+      assertAggregationTemporalitySelector(reader, _instrumentType => AggregationTemporality.DELTA);
+      reader.shutdown();
     });
   });
 });

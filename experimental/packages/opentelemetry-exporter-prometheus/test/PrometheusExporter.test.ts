@@ -15,9 +15,7 @@
  */
 
 import { Meter, ObservableResult } from '@opentelemetry/api-metrics';
-import {
-  MeterProvider,
-} from '@opentelemetry/sdk-metrics';
+import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as http from 'http';
@@ -480,22 +478,19 @@ describe('PrometheusExporter', () => {
     let meter: Meter;
     let meterProvider: MeterProvider;
     let counter: Counter;
-    let exporter: PrometheusExporter | undefined;
+    let exporter: PrometheusExporter;
 
-    beforeEach(() => {
+    function setup(reader: PrometheusExporter) {
       meterProvider = new MeterProvider();
+      meterProvider.addMetricReader(reader);
+
       meter = meterProvider.getMeter('test-prometheus');
       counter = meter.createCounter('counter');
       counter.add(10, { key1: 'attributeValue1' });
-    });
+    }
 
-    afterEach(done => {
-      if (exporter) {
-        exporter.shutdown().then(done);
-        exporter = undefined;
-      } else {
-        done();
-      }
+    afterEach(async () => {
+      await exporter.shutdown();
     });
 
     it('should use a configured name prefix', done => {
@@ -504,7 +499,7 @@ describe('PrometheusExporter', () => {
           prefix: 'test_prefix',
         },
         async () => {
-          meterProvider.addMetricReader(exporter!);
+          setup(exporter);
           http
             .get('http://localhost:9464/metrics', res => {
               res.on('data', chunk => {
@@ -532,7 +527,7 @@ describe('PrometheusExporter', () => {
           port: 8080,
         },
         async () => {
-          meterProvider.addMetricReader(exporter!);
+          setup(exporter);
           http
             .get('http://localhost:8080/metrics', res => {
               res.on('data', chunk => {
@@ -560,7 +555,7 @@ describe('PrometheusExporter', () => {
           endpoint: '/test',
         },
         async () => {
-          meterProvider.addMetricReader(exporter!);
+          setup(exporter);
           http
             .get('http://localhost:9464/test', res => {
               res.on('data', chunk => {
@@ -588,7 +583,7 @@ describe('PrometheusExporter', () => {
           appendTimestamp: false,
         },
         async () => {
-          meterProvider.addMetricReader(exporter!);
+          setup(exporter);
           http
             .get('http://localhost:9464/metrics', res => {
               res.on('data', chunk => {

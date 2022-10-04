@@ -17,31 +17,140 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
-  AggregationTemporality,
-  Meter,
   MeterProvider,
   DataPointType,
-  CollectionResult,
-  View
+  View,
+  Aggregation,
+  MetricReader,
+  InstrumentType
 } from '../../src';
 import { assertMetricData, defaultInstrumentationScope, defaultResource, sleep } from '../util';
-import { TestMetricReader } from '../export/TestMetricReader';
+import { TestDeltaMetricReader, TestMetricReader } from '../export/TestMetricReader';
 import { MeterSharedState } from '../../src/state/MeterSharedState';
+import { CollectionResult } from '../../src/export/MetricData';
+import { Meter } from '../../src/Meter';
 
 describe('MeterSharedState', () => {
   afterEach(() => {
     sinon.restore();
   });
 
+  describe('registerMetricStorage', () => {
+    function setupMeter(views?: View[], readers?: MetricReader[]) {
+      const meterProvider = new MeterProvider({
+        resource: defaultResource,
+        views,
+      });
+      readers?.forEach(reader => meterProvider.addMetricReader(reader));
+
+      const meter = meterProvider.getMeter('test-meter');
+
+      return {
+        meter,
+        meterSharedState: meterProvider['_sharedState'].getMeterSharedState({ name: 'test-meter' }),
+        collectors: Array.from(meterProvider['_sharedState'].metricCollectors),
+      };
+    }
+
+    it('should register metric storages with views', () => {
+      const reader = new TestMetricReader({
+        aggregationSelector: () => {
+          throw new Error('should not be called');
+        },
+      });
+      const { meter, meterSharedState, collectors } = setupMeter(
+        [ new View({ instrumentName: 'test-counter' }) ],
+        [reader],
+      );
+
+      meter.createCounter('test-counter');
+      const metricStorages = meterSharedState.metricStorageRegistry.getStorages(collectors[0]);
+
+      assert.strictEqual(metricStorages.length, 1);
+      assert.strictEqual(metricStorages[0].getInstrumentDescriptor().name, 'test-counter');
+    });
+
+    it('should register metric storages with views', () => {
+      const reader = new TestMetricReader({
+        aggregationSelector: () => {
+          throw new Error('should not be called');
+        },
+      });
+      const { meter, meterSharedState, collectors } = setupMeter(
+        [ new View({ instrumentName: 'test-counter' }) ],
+        [reader],
+      );
+
+      meter.createCounter('test-counter');
+      const metricStorages = meterSharedState.metricStorageRegistry.getStorages(collectors[0]);
+
+      assert.strictEqual(metricStorages.length, 1);
+      assert.strictEqual(metricStorages[0].getInstrumentDescriptor().name, 'test-counter');
+    });
+
+    it('should register metric storages with the collector', () => {
+      const reader = new TestMetricReader({
+        aggregationSelector: (instrumentType: InstrumentType) => {
+          return Aggregation.Drop();
+        },
+      });
+      const readerAggregationSelectorSpy = sinon.spy(reader, 'selectAggregation');
+
+      const { meter, meterSharedState, collectors } = setupMeter(
+        [], /** no views registered */
+        [reader],
+      );
+
+      meter.createCounter('test-counter');
+      const metricStorages = meterSharedState.metricStorageRegistry.getStorages(collectors[0]);
+
+      // Should select aggregation with the metric reader.
+      assert.strictEqual(readerAggregationSelectorSpy.callCount, 1);
+      assert.strictEqual(metricStorages.length, 1);
+      assert.strictEqual(metricStorages[0].getInstrumentDescriptor().name, 'test-counter');
+    });
+
+    it('should register metric storages with collectors', () => {
+      const reader = new TestMetricReader({
+        aggregationSelector: (instrumentType: InstrumentType) => {
+          return Aggregation.Drop();
+        },
+      });
+      const reader2 = new TestMetricReader({
+        aggregationSelector: (instrumentType: InstrumentType) => {
+          return Aggregation.LastValue();
+        },
+      });
+
+      const { meter, meterSharedState, collectors } = setupMeter(
+        [], /** no views registered */
+        [reader, reader2],
+      );
+
+      meter.createCounter('test-counter');
+      const metricStorages = meterSharedState.metricStorageRegistry.getStorages(collectors[0]);
+      const metricStorages2 = meterSharedState.metricStorageRegistry.getStorages(collectors[1]);
+
+      // Should select aggregation with the metric reader.
+      assert.strictEqual(metricStorages.length, 1);
+      assert.strictEqual(metricStorages[0].getInstrumentDescriptor().name, 'test-counter');
+
+      assert.strictEqual(metricStorages2.length, 1);
+      assert.strictEqual(metricStorages2[0].getInstrumentDescriptor().name, 'test-counter');
+
+      assert.notStrictEqual(metricStorages[0], metricStorages2[0], 'should create a distinct metric storage for each metric reader');
+    });
+  });
+
   describe('collect', () => {
     function setupInstruments(views?: View[]) {
       const meterProvider = new MeterProvider({ resource: defaultResource, views: views });
 
-      const cumulativeReader = new TestMetricReader(() => AggregationTemporality.CUMULATIVE);
+      const cumulativeReader = new TestMetricReader();
       meterProvider.addMetricReader(cumulativeReader);
       const cumulativeCollector = cumulativeReader.getMetricCollector();
 
-      const deltaReader = new TestMetricReader(() => AggregationTemporality.DELTA);
+      const deltaReader = new TestDeltaMetricReader();
       meterProvider.addMetricReader(deltaReader);
       const deltaCollector = deltaReader.getMetricCollector();
 

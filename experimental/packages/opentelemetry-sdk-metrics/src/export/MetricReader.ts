@@ -20,7 +20,32 @@ import { MetricProducer } from './MetricProducer';
 import { CollectionResult } from './MetricData';
 import { callWithTimeout } from '../utils';
 import { InstrumentType } from '../InstrumentDescriptor';
-import { CollectionOptions, ForceFlushOptions, ShutdownOptions } from '../types';
+import {
+  CollectionOptions,
+  ForceFlushOptions,
+  ShutdownOptions
+} from '../types';
+import { Aggregation } from '../view/Aggregation';
+import {
+  AggregationSelector,
+  AggregationTemporalitySelector,
+  DEFAULT_AGGREGATION_SELECTOR,
+  DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR
+} from './AggregationSelector';
+
+export interface MetricReaderOptions {
+  /**
+   * Aggregation selector based on metric instrument types. If no views are
+   * configured for a metric instrument, a per-metric-reader aggregation is
+   * selected with this selector.
+   */
+  aggregationSelector?: AggregationSelector;
+  /**
+   * Aggregation temporality selector based on metric instrument types. If
+   * not configured, cumulative is used for all instruments.
+   */
+  aggregationTemporalitySelector?: AggregationTemporalitySelector;
+}
 
 /**
  * A registered reader of metrics that, when linked to a {@link MetricProducer}, offers global
@@ -32,6 +57,15 @@ export abstract class MetricReader {
   private _shutdown = false;
   // MetricProducer used by this instance.
   private _metricProducer?: MetricProducer;
+  private readonly _aggregationTemporalitySelector: AggregationTemporalitySelector;
+  private readonly _aggregationSelector: AggregationSelector;
+
+  constructor(options?: MetricReaderOptions) {
+    this._aggregationSelector = options?.aggregationSelector ??
+      DEFAULT_AGGREGATION_SELECTOR;
+    this._aggregationTemporalitySelector = options?.aggregationTemporalitySelector ??
+      DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR;
+  }
 
   /**
    * Set the {@link MetricProducer} used by this instance.
@@ -47,10 +81,20 @@ export abstract class MetricReader {
   }
 
   /**
+   * Select the {@link Aggregation} for the given {@link InstrumentType} for this
+   * reader.
+   */
+  selectAggregation(instrumentType: InstrumentType): Aggregation {
+    return this._aggregationSelector(instrumentType);
+  }
+
+  /**
    * Select the {@link AggregationTemporality} for the given
    * {@link InstrumentType} for this reader.
    */
-  abstract selectAggregationTemporality(instrumentType: InstrumentType): AggregationTemporality;
+  selectAggregationTemporality(instrumentType: InstrumentType): AggregationTemporality {
+    return this._aggregationTemporalitySelector(instrumentType);
+  }
 
   /**
    * Handle once the SDK has initialized this {@link MetricReader}

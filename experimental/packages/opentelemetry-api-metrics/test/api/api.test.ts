@@ -15,7 +15,10 @@
  */
 
 import * as assert from 'assert';
-import { metrics, NoopMeter, NoopMeterProvider } from '../../src';
+import { metrics } from '../../src';
+import { NoopMeter } from '../../src/NoopMeter';
+import { NoopMeterProvider } from '../../src/NoopMeterProvider';
+
 
 describe('API', () => {
   it('should expose a meter provider via getMeterProvider', () => {

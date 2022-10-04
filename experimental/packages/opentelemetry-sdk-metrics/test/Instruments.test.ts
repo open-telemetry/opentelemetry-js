@@ -19,7 +19,6 @@ import * as sinon from 'sinon';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import {
-  AggregationTemporality,
   InstrumentDescriptor,
   InstrumentType,
   MeterProvider,
@@ -28,7 +27,7 @@ import {
   DataPointType,
   Histogram
 } from '../src';
-import { TestMetricReader } from './export/TestMetricReader';
+import { TestDeltaMetricReader, TestMetricReader } from './export/TestMetricReader';
 import {
   assertMetricData,
   assertDataPoint,
@@ -654,9 +653,9 @@ function setup() {
   const meter = meterProvider.getMeter(defaultInstrumentationScope.name, defaultInstrumentationScope.version, {
     schemaUrl: defaultInstrumentationScope.schemaUrl,
   });
-  const deltaReader = new TestMetricReader(() => AggregationTemporality.DELTA);
+  const deltaReader = new TestDeltaMetricReader();
   meterProvider.addMetricReader(deltaReader);
-  const cumulativeReader = new TestMetricReader(() => AggregationTemporality.CUMULATIVE);
+  const cumulativeReader = new TestMetricReader();
   meterProvider.addMetricReader(cumulativeReader);
 
   return {

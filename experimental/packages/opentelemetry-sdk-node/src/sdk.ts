@@ -21,6 +21,7 @@ import {
   registerInstrumentations
 } from '@opentelemetry/instrumentation';
 import {
+  Detector,
   detectResources,
   envDetector,
   processDetector,
@@ -30,11 +31,12 @@ import {
 import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics';
 import {
   BatchSpanProcessor,
-  SpanProcessor
+  SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
+import { TracerProviderWithEnvExporters } from './TracerProviderWithEnvExporter';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 
@@ -44,10 +46,7 @@ export type MeterProviderConfig = {
    */
   reader?: MetricReader
   /**
-   * Lists the views that should be passed when meterProvider
-   *
-   * Note: This is only getting used when NodeSDK is responsible for
-   * instantiated an instance of MeterProvider
+   * List of {@link View}s that should be passed to the MeterProvider
    */
   views?: View[]
 };
@@ -62,10 +61,11 @@ export class NodeSDK {
   private _instrumentations: InstrumentationOption[];
 
   private _resource: Resource;
+  private _resourceDetectors: Detector[];
 
   private _autoDetectResources: boolean;
 
-  private _tracerProvider?: NodeTracerProvider;
+  private _tracerProvider?: NodeTracerProvider | TracerProviderWithEnvExporters;
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
 
@@ -74,6 +74,7 @@ export class NodeSDK {
    */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
     this._resource = configuration.resource ?? new Resource({});
+    this._resourceDetectors = configuration.resourceDetectors ?? [envDetector, processDetector];
 
     this._serviceName = configuration.serviceName;
 
@@ -166,12 +167,9 @@ export class NodeSDK {
   }
 
   /** Detect resource attributes */
-  public async detectResources(
-    config?: ResourceDetectionConfig
-  ): Promise<void> {
+  public async detectResources(): Promise<void> {
     const internalConfig: ResourceDetectionConfig = {
-      detectors: [envDetector, processDetector],
-      ...config,
+      detectors: this._resourceDetectors,
     };
 
     this.addResource(await detectResources(internalConfig));
@@ -196,20 +194,24 @@ export class NodeSDK {
         { [SemanticResourceAttributes.SERVICE_NAME]: this._serviceName }
       ));
 
+    const Provider =
+      this._tracerProviderConfig ? NodeTracerProvider : TracerProviderWithEnvExporters;
+
+    const tracerProvider = new Provider ({
+      ...this._tracerProviderConfig?.tracerConfig,
+      resource: this._resource,
+    });
+
+    this._tracerProvider = tracerProvider;
+
     if (this._tracerProviderConfig) {
-      const tracerProvider = new NodeTracerProvider({
-        ...this._tracerProviderConfig.tracerConfig,
-        resource: this._resource,
-      });
-
-      this._tracerProvider = tracerProvider;
-
       tracerProvider.addSpanProcessor(this._tracerProviderConfig.spanProcessor);
-      tracerProvider.register({
-        contextManager: this._tracerProviderConfig.contextManager,
-        propagator: this._tracerProviderConfig.textMapPropagator,
-      });
     }
+
+    tracerProvider.register({
+      contextManager: this._tracerProviderConfig?.contextManager,
+      propagator: this._tracerProviderConfig?.textMapPropagator,
+    });
 
     if (this._meterProviderConfig) {
       const meterProvider = new MeterProvider({

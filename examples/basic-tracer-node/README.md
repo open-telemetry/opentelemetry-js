@@ -40,5 +40,3 @@ Click on the trace to view its details.
 ## LICENSE
 
 Apache License 2.0
-
-[opentelemetry-collector-url]: https://github.com/open-telemetry/opentelemetry-exporter-otlp-http

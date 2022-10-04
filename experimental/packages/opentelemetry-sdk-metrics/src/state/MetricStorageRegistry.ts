@@ -15,40 +15,93 @@
  */
 
 import { MetricStorage } from './MetricStorage';
-import { isDescriptorCompatibleWith } from '../InstrumentDescriptor';
+import { InstrumentDescriptor, isDescriptorCompatibleWith } from '../InstrumentDescriptor';
 import * as api from '@opentelemetry/api';
-import { Maybe } from '../utils';
 import { getConflictResolutionRecipe, getIncompatibilityDetails } from '../view/RegistrationConflicts';
+import { MetricCollectorHandle } from './MetricCollector';
+
+type StorageMap = Map<string, MetricStorage[]>;
 
 /**
  * Internal class for storing {@link MetricStorage}
  */
 export class MetricStorageRegistry {
-  private readonly _metricStorageRegistry = new Map<string, MetricStorage[]>();
+  private readonly _sharedRegistry: StorageMap = new Map();
+  private readonly _perCollectorRegistry = new Map<MetricCollectorHandle, StorageMap>();
 
   static create(){
     return new MetricStorageRegistry();
   }
 
-  getStorages(): MetricStorage[] {
+  getStorages(collector: MetricCollectorHandle): MetricStorage[] {
     let storages: MetricStorage[] = [];
-    for (const metricStorages of this._metricStorageRegistry.values()) {
+    for (const metricStorages of this._sharedRegistry.values()) {
       storages = storages.concat(metricStorages);
+    }
+
+    const perCollectorStorages = this._perCollectorRegistry.get(collector);
+    if (perCollectorStorages != null) {
+      for (const metricStorages of perCollectorStorages.values()) {
+        storages = storages.concat(metricStorages);
+      }
     }
 
     return storages;
   }
 
-  register<T extends MetricStorage>(storage: T): Maybe<T> {
-    const expectedDescriptor = storage.getInstrumentDescriptor();
-    const existingStorages = this._metricStorageRegistry.get(expectedDescriptor.name);
+  register(storage: MetricStorage) {
+    this._registerStorage(storage, this._sharedRegistry);
+  }
 
-    // Add storage if it does not exist.
-    if (existingStorages === undefined) {
-      this._metricStorageRegistry.set(expectedDescriptor.name, [storage]);
-      return storage;
+  registerForCollector(collector: MetricCollectorHandle, storage: MetricStorage) {
+    let storageMap = this._perCollectorRegistry.get(collector);
+    if (storageMap == null) {
+      storageMap = new Map();
+      this._perCollectorRegistry.set(collector, storageMap);
+    }
+    this._registerStorage(storage, storageMap);
+  }
+
+  findOrUpdateCompatibleStorage<T extends MetricStorage>(expectedDescriptor: InstrumentDescriptor): T | null {
+    const storages = this._sharedRegistry.get(expectedDescriptor.name);
+    if (storages === undefined) {
+      return null;
     }
 
+    // If the descriptor is compatible, the type of their metric storage
+    // (either SyncMetricStorage or AsyncMetricStorage) must be compatible.
+    return this._findOrUpdateCompatibleStorage<T>(expectedDescriptor, storages);
+  }
+
+  findOrUpdateCompatibleCollectorStorage<T extends MetricStorage>(collector: MetricCollectorHandle, expectedDescriptor: InstrumentDescriptor): T | null {
+    const storageMap = this._perCollectorRegistry.get(collector);
+    if (storageMap === undefined) {
+      return null;
+    }
+
+    const storages = this._sharedRegistry.get(expectedDescriptor.name);
+    if (storages === undefined) {
+      return null;
+    }
+
+    // If the descriptor is compatible, the type of their metric storage
+    // (either SyncMetricStorage or AsyncMetricStorage) must be compatible.
+    return this._findOrUpdateCompatibleStorage<T>(expectedDescriptor, storages);
+  }
+
+  private _registerStorage(storage: MetricStorage, storageMap: StorageMap) {
+    const descriptor = storage.getInstrumentDescriptor();
+    const storages = storageMap.get(descriptor.name);
+
+    if (storages === undefined) {
+      storageMap.set(descriptor.name, [storage]);
+      return;
+    }
+
+    storages.push(storage);
+  }
+
+  private _findOrUpdateCompatibleStorage<T extends MetricStorage>(expectedDescriptor: InstrumentDescriptor, existingStorages: MetricStorage[]): T | null {
     let compatibleStorage = null;
 
     for (const existingStorage of existingStorages) {
@@ -84,12 +137,6 @@ export class MetricStorageRegistry {
       }
     }
 
-    if (compatibleStorage != null) {
-      return compatibleStorage;
-    }
-
-    // None of the storages were compatible, add the current one to the list.
-    existingStorages.push(storage);
-    return storage;
+    return compatibleStorage;
   }
 }

@@ -11,6 +11,9 @@
   ],
   "references": [
     {
+      "path": "../../../api"
+    },
+    {
       "path": "../../../packages/opentelemetry-context-zone"
     },
     {
