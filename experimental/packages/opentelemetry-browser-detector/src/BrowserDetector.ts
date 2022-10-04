@@ -15,7 +15,7 @@
  */
 
 import { diag } from '@opentelemetry/api';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+// import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { Detector, Resource, ResourceDetectionConfig } from '@opentelemetry/resources';
 import { ResourceAttributes } from '@opentelemetry/resources';
 import { BROWSER_ATTRIBUTES, UserAgentData } from './types';
@@ -29,18 +29,13 @@ class BrowserDetector implements Detector {
     if (!isBrowser) {
       return Resource.empty();
     }
-    const browserResource: ResourceAttributes = {
-      [SemanticResourceAttributes.PROCESS_RUNTIME_NAME]: 'browser',
-      [SemanticResourceAttributes.PROCESS_RUNTIME_DESCRIPTION]: 'Web Browser',
-      [SemanticResourceAttributes.PROCESS_RUNTIME_VERSION]: navigator.userAgent,
-      ...getBrowserAttributes()
-    };
+    const browserResource: ResourceAttributes = getBrowserAttributes();
     return this._getResourceAttributes(browserResource, config);
   }
   /**
-   * Validates process resource attribute map from process variables
+   * Validates browser resource attribute map from browser variables
    *
-   * @param browserResource The un-sanitized resource attributes from process as key/value pairs.
+   * @param browserResource The un-sanitized resource attributes from browser as key/value pairs.
    * @param config: Config
    * @returns The sanitized resource attributes.
    */
@@ -49,7 +44,7 @@ class BrowserDetector implements Detector {
     _config?: ResourceDetectionConfig
   ) {
     if (
-      browserResource[SemanticResourceAttributes.PROCESS_RUNTIME_VERSION] === ''
+      !browserResource[BROWSER_ATTRIBUTES.USER_AGENT] && !browserResource[BROWSER_ATTRIBUTES.PLATFORM]
     ) {
       diag.debug(
         'BrowserDetector failed: Unable to find required browser resources. '
@@ -71,8 +66,7 @@ function getBrowserAttributes(): ResourceAttributes {
     browserAttribs[BROWSER_ATTRIBUTES.PLATFORM] = userAgentData.platform;
     browserAttribs[BROWSER_ATTRIBUTES.BRANDS] = userAgentData.brands;
     browserAttribs[BROWSER_ATTRIBUTES.MOBILE] = userAgentData.mobile;
-  }
-  else {
+  } else {
     browserAttribs[BROWSER_ATTRIBUTES.USER_AGENT] = navigator.userAgent;
   }
   return browserAttribs;

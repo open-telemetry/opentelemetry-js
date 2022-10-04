@@ -15,7 +15,6 @@
  */
 import {Suite} from 'mocha';
 import * as assert from 'assert';
-import {SemanticResourceAttributes} from '@opentelemetry/semantic-conventions';
 import {BROWSER_ATTRIBUTES} from './types';
 import {Resource} from '@opentelemetry/resources';
 
@@ -30,59 +29,12 @@ export function describeBrowser(title: string, fn: (this: Suite) => void) {
 export const assertResource = (
   resource: Resource,
   validations: {
-    pid?: number;
-    name?: string;
-    command?: string;
-    commandLine?: string;
-    version?: string;
-    runtimeName?: string;
-    runtimeDescription?: string;
     platform?: string,
     brands?: string[],
     mobile?: boolean,
     user_agent?: string
   }
 ) => {
-  assert.strictEqual(
-    resource.attributes[SemanticResourceAttributes.PROCESS_PID],
-    validations.pid
-  );
-  if (validations.name) {
-    assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.PROCESS_EXECUTABLE_NAME],
-      validations.name
-    );
-  }
-  if (validations.command) {
-    assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.PROCESS_COMMAND],
-      validations.command
-    );
-  }
-  if (validations.commandLine) {
-    assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.PROCESS_COMMAND_LINE],
-      validations.commandLine
-    );
-  }
-  if (validations.version) {
-    assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.PROCESS_RUNTIME_VERSION],
-      validations.version
-    );
-  }
-  if (validations.runtimeName) {
-    assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.PROCESS_RUNTIME_NAME],
-      validations.runtimeName
-    );
-  }
-  if (validations.runtimeDescription) {
-    assert.strictEqual(
-      resource.attributes[SemanticResourceAttributes.PROCESS_RUNTIME_DESCRIPTION],
-      validations.runtimeDescription
-    );
-  }
   if (validations.platform) {
     assert.strictEqual(
       resource.attributes[BROWSER_ATTRIBUTES.PLATFORM],
