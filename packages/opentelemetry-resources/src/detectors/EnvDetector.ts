@@ -136,7 +136,7 @@ class EnvDetector implements Detector {
   private _isPrintableString(str: string): boolean {
     for (let i = 0; i < str.length; i++) {
       const ch: string = str.charAt(i);
-      if (ch <= ' ' || ch >= '~') {
+      if (ch < ' ' || ch >= '~') {
         return false;
       }
     }
