@@ -9,8 +9,11 @@ All notable changes to experimental packages in this project will be documented 
 ### :rocket: (Enhancement)
 
 * feat(instrumentation): implement `require-in-the-middle` singleton [#3161](https://github.com/open-telemetry/opentelemetry-js/pull/3161) @mhassan1
+* feat(sdk-node): configure trace exporter with environment variables [#3143](https://github.com/open-telemetry/opentelemetry-js/pull/3143) @svetlanabrennan
 
 ### :bug: (Bug Fix)
+
+* fix(node-sdk): move `@opentelemetry/semantic-conventions` to `dependencies` [#3283](https://github.com/open-telemetry/opentelemetry-js/pull/3283) @mhassan1
 
 ### :books: (Refine Doc)
 
