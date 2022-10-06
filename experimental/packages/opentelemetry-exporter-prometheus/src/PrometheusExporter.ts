@@ -18,8 +18,17 @@ import { diag } from '@opentelemetry/api';
 import {
   globalErrorHandler,
 } from '@opentelemetry/core';
-import { Aggregation, AggregationTemporality, MetricReader } from '@opentelemetry/sdk-metrics';
-import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
+import {
+  Aggregation,
+  AggregationTemporality,
+  MetricReader
+} from '@opentelemetry/sdk-metrics';
+import {
+  createServer,
+  IncomingMessage,
+  Server,
+  ServerResponse
+} from 'http';
 import { ExporterConfig } from './export/types';
 import { PrometheusSerializer } from './PrometheusSerializer';
 /** Node.js v8.x compat */
@@ -154,7 +163,7 @@ export class PrometheusExporter extends MetricReader {
 
   /**
    * Request handler that responds with the current state of metrics
-   * @param request Incoming HTTP request of server instance
+   * @param _request Incoming HTTP request of server instance
    * @param response HTTP response objet used to response to request
    */
   public getMetricsRequestHandler(

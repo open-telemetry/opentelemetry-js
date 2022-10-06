@@ -15,7 +15,10 @@
  */
 
 import * as assert from 'assert';
-import { MetricAttributes, UpDownCounter } from '@opentelemetry/api-metrics';
+import {
+  MetricAttributes,
+  UpDownCounter
+} from '@opentelemetry/api-metrics';
 import {
   Aggregation,
   AggregationTemporality,
@@ -31,12 +34,21 @@ import {
 } from '@opentelemetry/sdk-metrics';
 import * as sinon from 'sinon';
 import { PrometheusSerializer } from '../src';
-import { mockedHrTimeMs, mockHrTime } from './util';
+import {
+  mockedHrTimeMs,
+  mockHrTime
+} from './util';
+import { Resource } from '@opentelemetry/resources';
 
 const attributes = {
   foo1: 'bar1',
   foo2: 'bar2',
 };
+
+const serializedEmptyResource =
+  '# HELP target_info Target metadata\n' +
+  '# TYPE target_info gauge\n' +
+  'target_info{job="",instance=""} 1\n';
 
 class TestMetricReader extends MetricReader {
   constructor() {
@@ -147,11 +159,11 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(
           result,
           `test_count{foo1="bar1",foo2="bar2"} 1 ${mockedHrTimeMs}\n` +
-            `test_sum{foo1="bar1",foo2="bar2"} 5 ${mockedHrTimeMs}\n` +
-            `test_bucket{foo1="bar1",foo2="bar2",le="1"} 0 ${mockedHrTimeMs}\n` +
-            `test_bucket{foo1="bar1",foo2="bar2",le="10"} 1 ${mockedHrTimeMs}\n` +
-            `test_bucket{foo1="bar1",foo2="bar2",le="100"} 1 ${mockedHrTimeMs}\n` +
-            `test_bucket{foo1="bar1",foo2="bar2",le="+Inf"} 1 ${mockedHrTimeMs}\n`
+          `test_sum{foo1="bar1",foo2="bar2"} 5 ${mockedHrTimeMs}\n` +
+          `test_bucket{foo1="bar1",foo2="bar2",le="1"} 0 ${mockedHrTimeMs}\n` +
+          `test_bucket{foo1="bar1",foo2="bar2",le="10"} 1 ${mockedHrTimeMs}\n` +
+          `test_bucket{foo1="bar1",foo2="bar2",le="100"} 1 ${mockedHrTimeMs}\n` +
+          `test_bucket{foo1="bar1",foo2="bar2",le="+Inf"} 1 ${mockedHrTimeMs}\n`
         );
       });
 
@@ -161,11 +173,11 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(
           result,
           'test_count{foo1="bar1",foo2="bar2"} 1\n' +
-            'test_sum{foo1="bar1",foo2="bar2"} 5\n' +
-            'test_bucket{foo1="bar1",foo2="bar2",le="1"} 0\n' +
-            'test_bucket{foo1="bar1",foo2="bar2",le="10"} 1\n' +
-            'test_bucket{foo1="bar1",foo2="bar2",le="100"} 1\n' +
-            'test_bucket{foo1="bar1",foo2="bar2",le="+Inf"} 1\n'
+          'test_sum{foo1="bar1",foo2="bar2"} 5\n' +
+          'test_bucket{foo1="bar1",foo2="bar2",le="1"} 0\n' +
+          'test_bucket{foo1="bar1",foo2="bar2",le="10"} 1\n' +
+          'test_bucket{foo1="bar1",foo2="bar2",le="100"} 1\n' +
+          'test_bucket{foo1="bar1",foo2="bar2",le="+Inf"} 1\n'
         );
       });
     });
@@ -203,9 +215,9 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(
           result,
           '# HELP test_total foobar\n' +
-            '# TYPE test_total counter\n' +
-            `test_total{val="1"} 1 ${mockedHrTimeMs}\n` +
-            `test_total{val="2"} 1 ${mockedHrTimeMs}\n`
+          '# TYPE test_total counter\n' +
+          `test_total{val="1"} 1 ${mockedHrTimeMs}\n` +
+          `test_total{val="2"} 1 ${mockedHrTimeMs}\n`
         );
       });
 
@@ -215,9 +227,9 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(
           result,
           '# HELP test_total foobar\n' +
-            '# TYPE test_total counter\n' +
-            'test_total{val="1"} 1\n' +
-            'test_total{val="2"} 1\n'
+          '# TYPE test_total counter\n' +
+          'test_total{val="1"} 1\n' +
+          'test_total{val="2"} 1\n'
         );
       });
     });
@@ -278,7 +290,7 @@ describe('PrometheusSerializer', () => {
         const reader = new TestMetricReader();
         const meterProvider = new MeterProvider({
           views: [
-            new View({aggregation: new LastValueAggregation(), instrumentName: '*' })
+            new View({ aggregation: new LastValueAggregation(), instrumentName: '*' })
           ]
         });
         meterProvider.addMetricReader(reader);
@@ -361,19 +373,19 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(
           result,
           '# HELP test foobar\n' +
-            '# TYPE test histogram\n' +
-            `test_count{val="1"} 3 ${mockedHrTimeMs}\n` +
-            `test_sum{val="1"} 175 ${mockedHrTimeMs}\n` +
-            `test_bucket{val="1",le="1"} 0 ${mockedHrTimeMs}\n` +
-            `test_bucket{val="1",le="10"} 1 ${mockedHrTimeMs}\n` +
-            `test_bucket{val="1",le="100"} 2 ${mockedHrTimeMs}\n` +
-            `test_bucket{val="1",le="+Inf"} 3 ${mockedHrTimeMs}\n` +
-            `test_count{val="2"} 1 ${mockedHrTimeMs}\n` +
-            `test_sum{val="2"} 5 ${mockedHrTimeMs}\n` +
-            `test_bucket{val="2",le="1"} 0 ${mockedHrTimeMs}\n` +
-            `test_bucket{val="2",le="10"} 1 ${mockedHrTimeMs}\n` +
-            `test_bucket{val="2",le="100"} 1 ${mockedHrTimeMs}\n` +
-            `test_bucket{val="2",le="+Inf"} 1 ${mockedHrTimeMs}\n`
+          '# TYPE test histogram\n' +
+          `test_count{val="1"} 3 ${mockedHrTimeMs}\n` +
+          `test_sum{val="1"} 175 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="1",le="1"} 0 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="1",le="10"} 1 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="1",le="100"} 2 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="1",le="+Inf"} 3 ${mockedHrTimeMs}\n` +
+          `test_count{val="2"} 1 ${mockedHrTimeMs}\n` +
+          `test_sum{val="2"} 5 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="2",le="1"} 0 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="2",le="10"} 1 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="2",le="100"} 1 ${mockedHrTimeMs}\n` +
+          `test_bucket{val="2",le="+Inf"} 1 ${mockedHrTimeMs}\n`
         );
       });
 
@@ -465,6 +477,7 @@ describe('PrometheusSerializer', () => {
       const result = await getCounterResult('test', serializer, { unit: unitOfMetric, exportAll: true });
       assert.strictEqual(
         result,
+        serializedEmptyResource +
         '# HELP test_total description missing\n' +
         `# UNIT test_total ${unitOfMetric}\n` +
         '# TYPE test_total counter\n' +
@@ -478,6 +491,7 @@ describe('PrometheusSerializer', () => {
       const result = await getCounterResult('test', serializer, { exportAll: true });
       assert.strictEqual(
         result,
+        serializedEmptyResource +
         '# HELP test_total description missing\n' +
         '# TYPE test_total counter\n' +
         `test_total 1 ${mockedHrTimeMs}\n`
@@ -593,13 +607,13 @@ describe('PrometheusSerializer', () => {
       assert.strictEqual(
         result,
         'test_total{' +
-          'backslash="\u005c\u005c",' +
-          'doubleQuote="\u005c\u0022",' +
-          'lineFeed="\u005c\u006e",' +
-          'backslashN="\u005c\u005c\u006e",' +
-          'backslashDoubleQuote="\u005c\u005c\u005c\u0022",' +
-          'backslashLineFeed="\u005c\u005c\u005c\u006e"' +
-          `} 1 ${mockedHrTimeMs}\n`
+        'backslash="\u005c\u005c",' +
+        'doubleQuote="\u005c\u0022",' +
+        'lineFeed="\u005c\u006e",' +
+        'backslashN="\u005c\u005c\u006e",' +
+        'backslashDoubleQuote="\u005c\u005c\u005c\u0022",' +
+        'backslashLineFeed="\u005c\u005c\u005c\u006e"' +
+        `} 1 ${mockedHrTimeMs}\n`
       );
     });
 
@@ -607,7 +621,7 @@ describe('PrometheusSerializer', () => {
       const serializer = new PrometheusSerializer();
 
       const result = await testSerializer(serializer, 'test_total', counter => {
-        // if you try to use a attribute name like account-id prometheus will complain
+        // if you try to use an attribute name like account-id prometheus will complain
         // with an error like:
         // error while linting: text format parsing error in line 282: expected '=' after label name, found '-'
         counter.add(1, ({
@@ -618,6 +632,130 @@ describe('PrometheusSerializer', () => {
       assert.strictEqual(
         result,
         `test_total{account_id="123456"} 1 ${mockedHrTimeMs}\n`
+      );
+    });
+  });
+
+  describe('_serializeResource', () => {
+    it('should serialize resource', () => {
+      const serializer = new PrometheusSerializer(undefined, true);
+      const result = serializer['_serializeResource'](new Resource({
+        env: 'prod',
+        hostname: 'myhost',
+        datacenter: 'sdc',
+        region: 'europe',
+        owner: 'frontend'
+      }));
+
+      assert.strictEqual(
+        result,
+        '# HELP target_info Target metadata\n' +
+        '# TYPE target_info gauge\n' +
+        'target_info{env="prod",hostname="myhost",datacenter="sdc",region="europe",owner="frontend",job="",instance=""} 1\n'
+      );
+    });
+
+    it('should drop service attributes', () => {
+      const serializer = new PrometheusSerializer(undefined, true);
+      const result = serializer['_serializeResource'](new Resource({
+        env: 'prod',
+        hostname: 'myhost',
+        datacenter: 'sdc',
+        region: 'europe',
+        owner: 'frontend',
+        'service.name': 'name',
+        'service.namespace': 'namespace',
+        'service.instance.id': 'instance id'
+      }));
+
+      assert.strictEqual(
+        result,
+        '# HELP target_info Target metadata\n' +
+        '# TYPE target_info gauge\n' +
+        'target_info{env="prod",hostname="myhost",datacenter="sdc",region="europe",owner="frontend",job="namespace/name",instance="instance id"} 1\n'
+      );
+    });
+
+    it('with undefined service.instance.id should add empty instance id', () => {
+      const serializer = new PrometheusSerializer(undefined, true);
+      const result = serializer['_serializeResource'](new Resource({
+        foo: 'bar',
+        'service.name': 'name',
+        'service.namespace': 'namespace',
+      }));
+
+      assert.strictEqual(
+        result,
+        '# HELP target_info Target metadata\n' +
+        '# TYPE target_info gauge\n' +
+        'target_info{foo="bar",job="namespace/name",instance=""} 1\n'
+      );
+    });
+
+    it('with undefined service.instance.id should add empty instance id', () => {
+      const serializer = new PrometheusSerializer(undefined, true);
+      const result = serializer['_serializeResource'](new Resource({
+        foo: 'bar',
+        'service.name': 'name',
+        'service.namespace': 'namespace',
+      }));
+
+      assert.strictEqual(
+        result,
+        '# HELP target_info Target metadata\n' +
+        '# TYPE target_info gauge\n' +
+        'target_info{foo="bar",job="namespace/name",instance=""} 1\n'
+      );
+    });
+
+    it('with undefined service.namespace should only use service.name for "job"', () => {
+      const serializer = new PrometheusSerializer(undefined, true);
+      const result = serializer['_serializeResource'](new Resource({
+        foo: 'bar',
+        'service.name': 'name',
+        'service.instance.id': '123'
+      }));
+
+      assert.strictEqual(
+        result,
+        '# HELP target_info Target metadata\n' +
+        '# TYPE target_info gauge\n' +
+        'target_info{foo="bar",job="name",instance="123"} 1\n'
+      );
+    });
+
+    it('with undefined service.namespace and service.name should add empty "job"', () => {
+      // service.name MUST exist. But PrometheusSerializer is exported and used by non-SDK packages.
+      // In case semantic conventions are not adhered to, add empty as a fallback.
+      const serializer = new PrometheusSerializer(undefined, true);
+      const result = serializer['_serializeResource'](new Resource({
+        foo: 'bar',
+        'service.instance.id': '123'
+      }));
+
+      assert.strictEqual(
+        result,
+        '# HELP target_info Target metadata\n' +
+        '# TYPE target_info gauge\n' +
+        'target_info{foo="bar",job="",instance="123"} 1\n'
+      );
+    });
+
+    it('with defined service.namespace and undefined service.name should add empty "job"', () => {
+      // service.name MUST exist. But PrometheusSerializer is exported and used by non-SDK packages.
+      // In case semantic conventions are not adhered to, add empty as a fallback.
+      const serializer = new PrometheusSerializer(undefined, true);
+      const result = serializer['_serializeResource'](new Resource({
+        foo: 'bar',
+        'service.instance.id': '123',
+        'service.namespace': 'namespace'
+      }));
+
+      assert.strictEqual(
+        result,
+        '# HELP target_info Target metadata\n' +
+        '# TYPE target_info gauge\n' +
+        'target_info{foo="bar",job="",instance="123"} 1\n'
       );
     });
   });

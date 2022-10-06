@@ -24,11 +24,15 @@ import {
   DataPoint,
   Histogram,
 } from '@opentelemetry/sdk-metrics';
-import type {
+import { hrTimeToMilliseconds } from '@opentelemetry/core';
+import {
+  Resource,
+} from '@opentelemetry/resources';
+
+import {
   MetricAttributes,
   MetricAttributeValue
 } from '@opentelemetry/api-metrics';
-import { hrTimeToMilliseconds } from '@opentelemetry/core';
 
 type PrometheusDataTypeLiteral =
   | 'counter'
@@ -167,6 +171,43 @@ function stringify(
   }\n`;
 }
 
+export function filterReservedResourceAttributes(resource: Resource): MetricAttributes {
+  return Object.fromEntries(
+    Object.entries(resource.attributes)
+      .filter(([key]) => {
+        if (key === 'job') {
+          diag.warn('Cannot serialize reserved resource attribute "job".');
+          return true;
+        }
+        if (key === 'instance') {
+          diag.warn('Cannot serialize reserved resource attribute "instance".');
+          return true;
+        }
+
+        // drop any entries that will be used to construct 'job' and 'instance'
+        return key !== 'service.name' && key !== 'service.namespace' && key !== 'service.instance.id';
+      }
+      ));
+}
+
+function extractJobLabel(resource: Resource): string | undefined {
+  const serviceName = resource.attributes['service.name'];
+  const serviceNamespace = resource.attributes['service.namespace'];
+
+  if (serviceNamespace != null && serviceName != null) {
+    return `${serviceNamespace.toString()}/${serviceName.toString()}`;
+  } else if (serviceName != null) {
+    return serviceName.toString();
+  }
+
+  return undefined;
+}
+
+function extractInstanceLabel(resource: Resource): string | undefined {
+  const instance = resource.attributes['service.instance.id'];
+  return instance?.toString();
+}
+
 export class PrometheusSerializer {
   private _prefix: string | undefined;
   private _appendTimestamp: boolean;
@@ -179,7 +220,7 @@ export class PrometheusSerializer {
   }
 
   serialize(resourceMetrics: ResourceMetrics): string {
-    let str = '';
+    let str = this._serializeResource(resourceMetrics.resource);
     for (const scopeMetrics of resourceMetrics.scopeMetrics) {
       str += this._serializeScopeMetrics(scopeMetrics);
     }
@@ -310,5 +351,21 @@ export class PrometheusSerializer {
     }
 
     return results;
+  }
+
+  protected _serializeResource(resource: Resource): string {
+    const name = 'target_info';
+    const help = `# HELP ${name} Target metadata`;
+    const type = `# TYPE ${name} gauge`;
+
+    const resourceAttributes = filterReservedResourceAttributes(resource);
+
+    const otherAttributes = {
+      job: extractJobLabel(resource),
+      instance: extractInstanceLabel(resource)
+    };
+
+    const results = stringify(name, resourceAttributes, 1, undefined, otherAttributes).trim();
+    return `${help}\n${type}\n${results}\n`;
   }
 }
