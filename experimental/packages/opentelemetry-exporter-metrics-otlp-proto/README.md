@@ -3,6 +3,8 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
+**Note: This is an experimental package under active development. New releases may include breaking changes.**
+
 This module provides exporter for node to be used with OTLP (`http/protobuf`) compatible receivers.
 Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.32 <=0.53`.
 
@@ -26,7 +28,7 @@ const { OTLPMetricExporter } =  require('@opentelemetry/exporter-metrics-otlp-pr
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
 };
-const exporter = new OTLPMetricExporter(collectorOptions);
+const metricExporter = new OTLPMetricExporter(collectorOptions);
 const meterProvider = new MeterProvider({});
 
 meterProvider.addMetricReader(new PeriodicExportingMetricReader({

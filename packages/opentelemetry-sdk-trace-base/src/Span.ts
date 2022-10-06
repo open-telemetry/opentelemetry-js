@@ -15,24 +15,25 @@
  */
 
 import * as api from '@opentelemetry/api';
+import { Context, SpanAttributeValue } from '@opentelemetry/api';
 import {
-  isAttributeValue,
-  hrTime,
+  Clock,
   hrTimeDuration,
   InstrumentationLibrary,
+  isAttributeValue,
   isTimeInput,
-  timeInputToHrTime,
+  otperformance,
   sanitizeAttributes,
+  timeInputToHrTime
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
+import { ExceptionEventName } from './enums';
 import { ReadableSpan } from './export/ReadableSpan';
+import { SpanProcessor } from './SpanProcessor';
 import { TimedEvent } from './TimedEvent';
 import { Tracer } from './Tracer';
-import { SpanProcessor } from './SpanProcessor';
 import { SpanLimits } from './types';
-import { SpanAttributeValue, Context } from '@opentelemetry/api';
-import { ExceptionEventName } from './enums';
 
 /**
  * This class represents a span.
@@ -59,8 +60,13 @@ export class Span implements api.Span, ReadableSpan {
   private readonly _spanProcessor: SpanProcessor;
   private readonly _spanLimits: SpanLimits;
   private readonly _attributeValueLengthLimit: number;
+  private readonly _clock: Clock;
 
-  /** Constructs a new Span instance. */
+  /**
+   * Constructs a new Span instance.
+   *
+   * @deprecated calling Span constructor directly is not supported. Please use tracer.startSpan.
+   * */
   constructor(
     parentTracer: Tracer,
     context: Context,
@@ -69,14 +75,16 @@ export class Span implements api.Span, ReadableSpan {
     kind: api.SpanKind,
     parentSpanId?: string,
     links: api.Link[] = [],
-    startTime: api.TimeInput = hrTime()
+    startTime?: api.TimeInput,
+    clock: Clock = otperformance,
   ) {
+    this._clock = clock;
     this.name = spanName;
     this._spanContext = spanContext;
     this.parentSpanId = parentSpanId;
     this.kind = kind;
     this.links = links;
-    this.startTime = timeInputToHrTime(startTime);
+    this.startTime = timeInputToHrTime(startTime ?? clock.now());
     this.resource = parentTracer.resource;
     this.instrumentationLibrary = parentTracer.instrumentationLibrary;
     this._spanLimits = parentTracer.getSpanLimits();
@@ -103,7 +111,7 @@ export class Span implements api.Span, ReadableSpan {
 
     if (
       Object.keys(this.attributes).length >=
-        this._spanLimits.attributeCountLimit! &&
+      this._spanLimits.attributeCountLimit! &&
       !Object.prototype.hasOwnProperty.call(this.attributes, key)
     ) {
       return this;
@@ -147,7 +155,7 @@ export class Span implements api.Span, ReadableSpan {
       attributesOrStartTime = undefined;
     }
     if (typeof startTime === 'undefined') {
-      startTime = hrTime();
+      startTime = this._clock.now();
     }
 
     const attributes = sanitizeAttributes(attributesOrStartTime);
@@ -171,15 +179,16 @@ export class Span implements api.Span, ReadableSpan {
     return this;
   }
 
-  end(endTime: api.TimeInput = hrTime()): void {
+  end(endTime?: api.TimeInput): void {
     if (this._isSpanEnded()) {
       api.diag.error('You can only call end() on a span once.');
       return;
     }
     this._ended = true;
-    this.endTime = timeInputToHrTime(endTime);
 
+    this.endTime = timeInputToHrTime(endTime ?? this._clock.now());
     this._duration = hrTimeDuration(this.startTime, this.endTime);
+
     if (this._duration[0] < 0) {
       api.diag.warn(
         'Inconsistent start and end time, startTime > endTime',
@@ -195,7 +204,7 @@ export class Span implements api.Span, ReadableSpan {
     return this._ended === false;
   }
 
-  recordException(exception: api.Exception, time: api.TimeInput = hrTime()): void {
+  recordException(exception: api.Exception, time: api.TimeInput = this._clock.now()): void {
     const attributes: api.SpanAttributes = {};
     if (typeof exception === 'string') {
       attributes[SemanticAttributes.EXCEPTION_MESSAGE] = exception;

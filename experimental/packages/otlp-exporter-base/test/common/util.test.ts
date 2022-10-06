@@ -20,7 +20,7 @@ import { diag } from '@opentelemetry/api';
 import {
   parseHeaders,
   appendResourcePathToUrl,
-  appendRootPathToUrlIfNeeded
+  appendRootPathToUrlIfNeeded,
 } from '../../src/util';
 
 describe('utils', () => {
@@ -84,23 +84,35 @@ describe('utils', () => {
   describe('appendRootPathToUrlIfNeeded - specifc signal http endpoint', () => {
     it('should append root path when missing', () => {
       const url = 'http://foo.bar';
-      const resourcePath = 'v1/traces';
 
-      const finalUrl = appendRootPathToUrlIfNeeded(url, resourcePath);
+      const finalUrl = appendRootPathToUrlIfNeeded(url);
       assert.strictEqual(finalUrl, url + '/');
     });
     it('should not append root path and return same url', () => {
       const url = 'http://foo.bar/';
-      const resourcePath = 'v1/traces';
 
-      const finalUrl = appendRootPathToUrlIfNeeded(url, resourcePath);
+      const finalUrl = appendRootPathToUrlIfNeeded(url);
       assert.strictEqual(finalUrl, url);
     });
-    it('should append root path when url contains resource path', () => {
-      const url = 'http://foo.bar/v1/traces';
-      const resourcePath = 'v1/traces';
+    it('should not append root path when url contains resource path', () => {
+      {
+        const url = 'http://foo.bar/v1/traces';
 
-      const finalUrl = appendRootPathToUrlIfNeeded(url, resourcePath);
+        const finalUrl = appendRootPathToUrlIfNeeded(url);
+        assert.strictEqual(finalUrl, url);
+      }
+      {
+        const url = 'https://endpoint/something';
+
+        const finalUrl = appendRootPathToUrlIfNeeded(url);
+        assert.strictEqual(finalUrl, url);
+      }
+    });
+
+    it('should not change string when url is not parseable', () => {
+      const url = 'this is not a URL';
+
+      const finalUrl = appendRootPathToUrlIfNeeded(url);
       assert.strictEqual(finalUrl, url);
     });
   });

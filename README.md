@@ -45,6 +45,7 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 
 | API Version | Core version | Experimental Packages |
 | ----------- | ------------ | --------------------- |
+| 1.2.x       | 1.7.x        | 0.33.x                |
 | 1.2.x       | 1.6.x        | 0.32.x                |
 | 1.1.x       | 1.5.x        | 0.31.x                |
 | 1.1.x       | 1.4.x        | 0.30.x                |
@@ -151,7 +152,7 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 ### Node Support
 
 Only Node.js Active or Maintenance LTS versions are supported.
-Previous versions of node _may_ work, but they are not tested by OpenTelemetry and they are not guaranteed to work.
+Previous versions of node *may* work, but they are not tested by OpenTelemetry and they are not guaranteed to work.
 Please note that versions of Node.JS v8 prior to `v8.12.0` will NOT work, because OpenTelemetry Node depends on the `perf_hooks` module introduced in `v8.5.0` and `performance.timeOrigin` that is set correctly starting in `v8.12.0`.
 
 ### Browser Support
@@ -556,6 +557,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-api]: https://github.com/open-telemetry/opentelemetry-js-api
 [otel-core]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-core
 [otel-propagator-b3]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-propagator-b3
-[generate-api-documentation]: https://github.com/open-telemetry/opentelemetry-js/blob/main/CONTRIBUTING.md#generating-api-documentation
 
 [spec-versioning]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/versioning-and-stability.md

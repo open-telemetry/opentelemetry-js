@@ -10,10 +10,19 @@
   ],
   "references": [
     {
+      "path": "../../../api"
+    },
+    {
       "path": "../../../packages/opentelemetry-context-async-hooks"
     },
     {
       "path": "../../../packages/opentelemetry-core"
+    },
+    {
+      "path": "../../../packages/opentelemetry-exporter-jaeger"
+    },
+    {
+      "path": "../../../packages/opentelemetry-exporter-zipkin"
     },
     {
       "path": "../../../packages/opentelemetry-resources"
@@ -26,6 +35,15 @@
     },
     {
       "path": "../../../packages/opentelemetry-semantic-conventions"
+    },
+    {
+      "path": "../exporter-trace-otlp-grpc"
+    },
+    {
+      "path": "../exporter-trace-otlp-http"
+    },
+    {
+      "path": "../exporter-trace-otlp-proto"
     },
     {
       "path": "../opentelemetry-api-metrics"
