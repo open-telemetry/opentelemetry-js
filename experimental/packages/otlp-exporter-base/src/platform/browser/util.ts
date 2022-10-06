@@ -15,6 +15,11 @@
  */
 import { diag } from '@opentelemetry/api';
 import { OTLPExporterError } from '../../types';
+import {
+  DEFAULT_EXPORT_MAX_ATTEMPTS,
+  DEFAULT_EXPORT_INITIAL_BACKOFF,
+  DEFAULT_EXPORT_BACKOFF_MULTIPLIER
+} from '../../util';
 
 /**
  * Send metrics/spans using browser navigator.sendBeacon
@@ -60,48 +65,92 @@ export function sendWithXhr(
   onError: (error: OTLPExporterError) => void
 ): void {
   let reqIsDestroyed: boolean;
+  let retryTimer: ReturnType<typeof setTimeout>;
+  let xhr: XMLHttpRequest;
 
   const exporterTimer = setTimeout(() => {
+    clearTimeout(retryTimer);
     reqIsDestroyed = true;
-    xhr.abort();
+
+    if (xhr.readyState === XMLHttpRequest.DONE) {
+      const err = new OTLPExporterError(
+        'Request Timeout'
+      );
+      onError(err);
+    } else {
+      xhr.abort();
+    }
   }, exporterTimeout);
 
-  const xhr = new XMLHttpRequest();
-  xhr.open('POST', url);
+  const sendWithRetry = (retries = DEFAULT_EXPORT_MAX_ATTEMPTS, backoffMillis = DEFAULT_EXPORT_INITIAL_BACKOFF) => {
+    xhr = new XMLHttpRequest();
+    xhr.open('POST', url);
 
-  const defaultHeaders = {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json',
-  };
+    const defaultHeaders = {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    };
 
-  Object.entries({
-    ...defaultHeaders,
-    ...headers,
-  }).forEach(([k, v]) => {
-    xhr.setRequestHeader(k, v);
-  });
+    Object.entries({
+      ...defaultHeaders,
+      ...headers,
+    }).forEach(([k, v]) => {
+      xhr.setRequestHeader(k, v);
+    });
 
-  xhr.send(body);
+    xhr.send(body);
 
-  xhr.onreadystatechange = () => {
-    if (xhr.readyState === XMLHttpRequest.DONE) {
-      if (xhr.status >= 200 && xhr.status <= 299) {
-        clearTimeout(exporterTimer);
-        diag.debug('xhr success', body);
-        onSuccess();
-      } else if (reqIsDestroyed) {
-        const error = new OTLPExporterError(
-          'Request Timeout', xhr.status
-        );
-        onError(error);
-      } else {
-        const error = new OTLPExporterError(
-          `Failed to export with XHR (status: ${xhr.status})`,
-          xhr.status
-        );
-        clearTimeout(exporterTimer);
-        onError(error);
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === XMLHttpRequest.DONE && reqIsDestroyed === undefined) {
+        if (xhr.status >= 200 && xhr.status <= 299) {
+          clearTimeout(exporterTimer);
+          clearTimeout(retryTimer);
+          diag.debug('xhr success', body);
+          onSuccess();
+        } else if (xhr.status && isRetryable(xhr.status) && retries > 0) {
+          retryTimer = setTimeout(() => {
+            sendWithRetry(retries - 1, backoffMillis * DEFAULT_EXPORT_BACKOFF_MULTIPLIER);
+          }, backoffMillis);
+        } else {
+          const error = new OTLPExporterError(
+            `Failed to export with XHR (status: ${xhr.status})`,
+            xhr.status
+          );
+          clearTimeout(exporterTimer);
+          clearTimeout(retryTimer);
+          onError(error);
+        }
       }
-    }
+    };
+
+    xhr.onabort = () => {
+      if (reqIsDestroyed) {
+        const err = new OTLPExporterError(
+          'Request Timeout'
+        );
+        onError(err);
+      }
+      clearTimeout(exporterTimer);
+      clearTimeout(retryTimer);
+    };
+
+    xhr.onerror = () => {
+      if (reqIsDestroyed) {
+        const err = new OTLPExporterError(
+          'Request Timeout'
+        );
+        onError(err);
+      }
+      clearTimeout(exporterTimer);
+      clearTimeout(retryTimer);
+    };
   };
+
+  sendWithRetry();
+}
+
+function isRetryable(statusCode: number): boolean {
+  const retryCodes = [429, 502, 503, 504];
+
+  return retryCodes.includes(statusCode);
 }

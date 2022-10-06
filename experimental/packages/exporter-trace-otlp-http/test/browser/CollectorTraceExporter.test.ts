@@ -599,3 +599,48 @@ describe('when configuring via environment', () => {
     envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
   });
 });
+
+
+describe('export with retry - real http request destroyed', () => {
+  let server: any;
+  let collectorTraceExporter: OTLPTraceExporter;
+  let collectorExporterConfig: OTLPExporterConfigBase;
+  let spans: ReadableSpan[];
+
+  beforeEach(() => {
+    server = sinon.fakeServer.create({
+      autoRespond: true
+    });
+    collectorExporterConfig = {
+      timeoutMillis: 1500
+    };
+  });
+
+  afterEach(() => {
+    server.restore();
+  });
+
+  describe('when "sendBeacon" is NOT available', () => {
+    beforeEach(() => {
+      (window.navigator as any).sendBeacon = false;
+      collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig);
+    });
+
+    it('should log the timeout request error message', done => {
+      spans = [];
+      spans.push(Object.assign({}, mockedReadableSpan));
+
+      let retry = 0;
+      server.respondWith('http://localhost:4318/v1/traces', function (xhr: any, id: any) {
+        retry++;
+        xhr.respond(502);
+      });
+
+      collectorTraceExporter.export(spans, result => {
+        assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+        assert.strictEqual(retry, 2);
+        done();
+      });
+    }).timeout(3000);
+  });
+});

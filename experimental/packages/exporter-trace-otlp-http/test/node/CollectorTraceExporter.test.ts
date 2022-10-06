@@ -573,13 +573,12 @@ describe('export with retry - real http request destroyed after response receive
     server.listen(8081, done);
   });
   after(function (done) {
-    this.timeout(3000)
     server.close(done);
   });
-  it.only('should log the timeout request error message', done => {
+  it('should log the timeout request error message', done => {
     collectorExporterConfig = {
       url: 'http://localhost:8081',
-      timeoutMillis: 2500,
+      timeoutMillis: 1500,
     };
     collectorExporter = new OTLPTraceExporter(collectorExporterConfig);
     spans = [];
@@ -587,7 +586,7 @@ describe('export with retry - real http request destroyed after response receive
 
     collectorExporter.export(spans, result => {
       assert.strictEqual(result.code, core.ExportResultCode.SUCCESS);
-      assert.strictEqual(retries, 2)
+      assert.strictEqual(retries, 2);
       done();
     });
   }).timeout(3000);

@@ -24,10 +24,11 @@ import { diag } from '@opentelemetry/api';
 import { CompressionAlgorithm } from './types';
 import { getEnv } from '@opentelemetry/core';
 import { OTLPExporterError } from '../../types';
-
-const DEFAULT_MAX_ATTEMPTS = 4;
-const DEFAULT_INITIAL_BACKOFF = 1000;
-const DEFAULT_BACKOFF_MULTIPLIER = 1.5;
+import {
+  DEFAULT_EXPORT_MAX_ATTEMPTS,
+  DEFAULT_EXPORT_INITIAL_BACKOFF,
+  DEFAULT_EXPORT_BACKOFF_MULTIPLIER
+} from '../../util';
 
 /**
  * Sends data using http
@@ -58,8 +59,8 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
     if (req.destroyed) {
       const err = new OTLPExporterError(
         'Request Timeout'
-        );
-        onError(err);
+      );
+      onError(err);
     } else {
       // req.abort() was deprecated since v14
       nodeVersion >= 14 ? req.destroy() : req.abort();
@@ -80,7 +81,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
 
   const request = parsedUrl.protocol === 'http:' ? http.request : https.request;
 
-  const sendWithRetry = (retries = DEFAULT_MAX_ATTEMPTS, backoffMillis = DEFAULT_INITIAL_BACKOFF) => {
+  const sendWithRetry = (retries = DEFAULT_EXPORT_MAX_ATTEMPTS, backoffMillis = DEFAULT_EXPORT_INITIAL_BACKOFF) => {
     req = request(options, (res: http.IncomingMessage) => {
       let responseData = '';
       res.on('data', chunk => (responseData += chunk));
@@ -104,7 +105,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
             clearTimeout(retryTimer);
           } else if (res.statusCode && isRetryable(res.statusCode) && retries > 0) {
             retryTimer = setTimeout(() => {
-              sendWithRetry(retries - 1, backoffMillis * DEFAULT_BACKOFF_MULTIPLIER);
+              sendWithRetry(retries - 1, backoffMillis * DEFAULT_EXPORT_BACKOFF_MULTIPLIER);
             }, backoffMillis);
           } else {
             const error = new OTLPExporterError(
