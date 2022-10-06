@@ -18,7 +18,8 @@ import { OTLPExporterError } from '../../types';
 import {
   DEFAULT_EXPORT_MAX_ATTEMPTS,
   DEFAULT_EXPORT_INITIAL_BACKOFF,
-  DEFAULT_EXPORT_BACKOFF_MULTIPLIER
+  DEFAULT_EXPORT_BACKOFF_MULTIPLIER,
+  isExportRetryable
 } from '../../util';
 
 /**
@@ -103,11 +104,11 @@ export function sendWithXhr(
     xhr.onreadystatechange = () => {
       if (xhr.readyState === XMLHttpRequest.DONE && reqIsDestroyed === undefined) {
         if (xhr.status >= 200 && xhr.status <= 299) {
-          clearTimeout(exporterTimer);
-          clearTimeout(retryTimer);
           diag.debug('xhr success', body);
           onSuccess();
-        } else if (xhr.status && isRetryable(xhr.status) && retries > 0) {
+          clearTimeout(exporterTimer);
+          clearTimeout(retryTimer);
+        } else if (xhr.status && isExportRetryable(xhr.status) && retries > 0) {
           retryTimer = setTimeout(() => {
             sendWithRetry(retries - 1, backoffMillis * DEFAULT_EXPORT_BACKOFF_MULTIPLIER);
           }, backoffMillis);
@@ -116,9 +117,9 @@ export function sendWithXhr(
             `Failed to export with XHR (status: ${xhr.status})`,
             xhr.status
           );
+          onError(error);
           clearTimeout(exporterTimer);
           clearTimeout(retryTimer);
-          onError(error);
         }
       }
     };
@@ -147,10 +148,4 @@ export function sendWithXhr(
   };
 
   sendWithRetry();
-}
-
-function isRetryable(statusCode: number): boolean {
-  const retryCodes = [429, 502, 503, 504];
-
-  return retryCodes.includes(statusCode);
 }

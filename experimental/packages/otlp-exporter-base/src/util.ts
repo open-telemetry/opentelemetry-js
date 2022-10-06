@@ -102,3 +102,9 @@ export function invalidTimeout(timeout: number, defaultTimeout: number): number 
 
   return defaultTimeout;
 }
+
+export function isExportRetryable(statusCode: number): boolean {
+  const retryCodes = [429, 502, 503, 504];
+
+  return retryCodes.includes(statusCode);
+}

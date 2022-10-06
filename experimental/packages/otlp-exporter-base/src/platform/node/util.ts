@@ -27,7 +27,8 @@ import { OTLPExporterError } from '../../types';
 import {
   DEFAULT_EXPORT_MAX_ATTEMPTS,
   DEFAULT_EXPORT_INITIAL_BACKOFF,
-  DEFAULT_EXPORT_BACKOFF_MULTIPLIER
+  DEFAULT_EXPORT_BACKOFF_MULTIPLIER,
+  isExportRetryable
 } from '../../util';
 
 /**
@@ -103,7 +104,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
             // clear all timers since request was completed and promise was resolved
             clearTimeout(exporterTimer);
             clearTimeout(retryTimer);
-          } else if (res.statusCode && isRetryable(res.statusCode) && retries > 0) {
+          } else if (res.statusCode && isExportRetryable(res.statusCode) && retries > 0) {
             retryTimer = setTimeout(() => {
               sendWithRetry(retries - 1, backoffMillis * DEFAULT_EXPORT_BACKOFF_MULTIPLIER);
             }, backoffMillis);
@@ -162,12 +163,6 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
     }
   };
   sendWithRetry();
-}
-
-function isRetryable(statusCode: number): boolean {
-  const retryCodes = [429, 502, 503, 504];
-
-  return retryCodes.includes(statusCode);
 }
 
 function readableFromBuffer(buff: string | Buffer): Readable {

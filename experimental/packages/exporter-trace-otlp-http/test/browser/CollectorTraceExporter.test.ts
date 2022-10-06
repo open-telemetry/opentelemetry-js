@@ -600,7 +600,6 @@ describe('when configuring via environment', () => {
   });
 });
 
-
 describe('export with retry - real http request destroyed', () => {
   let server: any;
   let collectorTraceExporter: OTLPTraceExporter;
@@ -638,6 +637,9 @@ describe('export with retry - real http request destroyed', () => {
 
       collectorTraceExporter.export(spans, result => {
         assert.strictEqual(result.code, core.ExportResultCode.FAILED);
+        const error = result.error as OTLPExporterError;
+        assert.ok(error !== undefined);
+        assert.strictEqual(error.message, 'Request Timeout');
         assert.strictEqual(retry, 2);
         done();
       });
