@@ -171,7 +171,7 @@ function stringify(
   }\n`;
 }
 
-export function filterReservedResourceAttributes(resource: Resource): MetricAttributes {
+function filterReservedResourceAttributes(resource: Resource): MetricAttributes {
   return Object.fromEntries(
     Object.entries(resource.attributes)
       .filter(([key]) => {
