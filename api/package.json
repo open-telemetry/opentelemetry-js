@@ -10,7 +10,7 @@
     "./build/esm/platform/index.js": "./build/esm/platform/browser/index.js",
     "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
   },
-  "repository": "https://github.com/open-telemetry/opentelemetry-js-api.git",
+  "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "clean": "tsc --build --clean",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../",
