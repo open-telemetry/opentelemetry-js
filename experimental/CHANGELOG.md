@@ -13,6 +13,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :bug: (Bug Fix)
 
 * fix(node-sdk): move `@opentelemetry/semantic-conventions` to `dependencies` [#3283](https://github.com/open-telemetry/opentelemetry-js/pull/3283) @mhassan1
+* fix(exporters): do not append trailing '/' when URL contains path [#3274](https://github.com/open-telemetry/opentelemetry-js/pull/3274) @pichlermarc
 
 ### :books: (Refine Doc)
 

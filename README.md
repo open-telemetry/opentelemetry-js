@@ -394,13 +394,13 @@ Collector exporter packages and types are renamed:
 
 [PR-1925](https://github.com/open-telemetry/opentelemetry-js/pull/1925) feat(diag-logger): part 2 - breaking changes - remove api.Logger, api.NoopLogger, core.LogLevel, core.ConsoleLogger
 
-- These PR's remove the previous ```Logger``` and ```LogLevel``` implementations and change the way you should use the replacement ```DiagLogger``` and ```DiagLogLevel```, below are simple examples of how to change your existing usages.
+- These PR's remove the previous `Logger` and `LogLevel` implementations and change the way you should use the replacement `DiagLogger` and `DiagLogLevel`, below are simple examples of how to change your existing usages.
 
 #### Setting the global diagnostic logger
 
-The new global [```api.diag```](https://github.com/open-telemetry/opentelemetry-js-api/blob/main/src/api/diag.ts) provides the ability to set the global diagnostic logger ```setLogger()``` and logging level ```setLogLevel()```, it is also a ```DiagLogger``` implementation and should be directly to log diagnostic messages.
+The new global [`api.diag`](https://github.com/open-telemetry/opentelemetry-js/blob/main/api/src/api/diag.ts) provides the ability to set the global diagnostic logger `setLogger()` and logging level `setLogLevel()`, it is also a `DiagLogger` implementation and should be directly to log diagnostic messages.
 
-All included logger references have been removed in preference to using the global ```api.diag``` directly, so you no longer need to pass around the logger instance via function parameters or included as part of the configuration for a component.
+All included logger references have been removed in preference to using the global `api.diag` directly, so you no longer need to pass around the logger instance via function parameters or included as part of the configuration for a component.
 
 ```javascript
 import { diag, DiagConsoleLogger, DiagLogLevel } from "@opentelemetry/api";
