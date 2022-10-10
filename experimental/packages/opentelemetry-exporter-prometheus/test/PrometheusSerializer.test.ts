@@ -215,9 +215,9 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(
           result,
           '# HELP test_total foobar\n' +
-          '# TYPE test_total counter\n' +
-          `test_total{val="1"} 1 ${mockedHrTimeMs}\n` +
-          `test_total{val="2"} 1 ${mockedHrTimeMs}\n`
+            '# TYPE test_total counter\n' +
+            `test_total{val="1"} 1 ${mockedHrTimeMs}\n` +
+            `test_total{val="2"} 1 ${mockedHrTimeMs}\n`
         );
       });
 
@@ -227,9 +227,9 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(
           result,
           '# HELP test_total foobar\n' +
-          '# TYPE test_total counter\n' +
-          'test_total{val="1"} 1\n' +
-          'test_total{val="2"} 1\n'
+            '# TYPE test_total counter\n' +
+            'test_total{val="1"} 1\n' +
+            'test_total{val="2"} 1\n'
         );
       });
     });
@@ -266,9 +266,9 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(
           result,
           '# HELP test_total foobar\n' +
-            '# TYPE test_total gauge\n' +
-            `test_total{val="1"} 1 ${mockedHrTimeMs}\n` +
-            `test_total{val="2"} 1 ${mockedHrTimeMs}\n`
+          '# TYPE test_total gauge\n' +
+          `test_total{val="1"} 1 ${mockedHrTimeMs}\n` +
+          `test_total{val="2"} 1 ${mockedHrTimeMs}\n`
         );
       });
 
@@ -278,9 +278,9 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(
           result,
           '# HELP test_total foobar\n' +
-            '# TYPE test_total gauge\n' +
-            'test_total{val="1"} 1\n' +
-            'test_total{val="2"} 1\n'
+          '# TYPE test_total gauge\n' +
+          'test_total{val="1"} 1\n' +
+          'test_total{val="2"} 1\n'
         );
       });
     });
