@@ -24,15 +24,12 @@ import {
   DataPoint,
   Histogram,
 } from '@opentelemetry/sdk-metrics';
-import { hrTimeToMilliseconds } from '@opentelemetry/core';
-import {
-  Resource,
-} from '@opentelemetry/resources';
-
-import {
+import type {
   MetricAttributes,
   MetricAttributeValue
 } from '@opentelemetry/api-metrics';
+import { hrTimeToMilliseconds } from '@opentelemetry/core';
+import { Resource } from '@opentelemetry/resources';
 
 type PrometheusDataTypeLiteral =
   | 'counter'
