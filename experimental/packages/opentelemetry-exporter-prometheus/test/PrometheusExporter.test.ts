@@ -352,7 +352,7 @@ describe('PrometheusExporter', () => {
 
       assert.deepStrictEqual(lines, [
         ...serializedEmptyResourceLines,
-        ''
+        '# no registered metrics'
       ]);
     });
 

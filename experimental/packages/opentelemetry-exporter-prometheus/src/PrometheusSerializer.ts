@@ -168,6 +168,8 @@ function stringify(
   }\n`;
 }
 
+const NO_REGISTERED_METRICS = '# no registered metrics';
+
 export class PrometheusSerializer {
   private _prefix: string | undefined;
   private _appendTimestamp: boolean;
@@ -180,11 +182,17 @@ export class PrometheusSerializer {
   }
 
   serialize(resourceMetrics: ResourceMetrics): string {
-    let str = this._serializeResource(resourceMetrics.resource);
+    let str = '';
+
     for (const scopeMetrics of resourceMetrics.scopeMetrics) {
       str += this._serializeScopeMetrics(scopeMetrics);
     }
-    return str;
+
+    if (str === '') {
+      str += NO_REGISTERED_METRICS;
+    }
+
+    return this._serializeResource(resourceMetrics.resource) + str;
   }
 
   private _serializeScopeMetrics(scopeMetrics: ScopeMetrics) {
