@@ -9,6 +9,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :rocket: (Enhancement)
 
 * feat(sdk-node): configure trace exporter with environment variables [#3143](https://github.com/open-telemetry/opentelemetry-js/pull/3143) @svetlanabrennan
+* feat(metrics-exporters): configure temporality via environment variable [#3305](https://github.com/open-telemetry/opentelemetry-js/pull/3143) @pichlermarc
 
 ### :bug: (Bug Fix)
 
