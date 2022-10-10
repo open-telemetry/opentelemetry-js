@@ -48,7 +48,7 @@ const attributes = {
 const serializedEmptyResource =
   '# HELP target_info Target metadata\n' +
   '# TYPE target_info gauge\n' +
-  'target_info{job="",instance=""} 1\n';
+  'target_info 1\n';
 
 class TestMetricReader extends MetricReader {
   constructor() {
@@ -651,111 +651,7 @@ describe('PrometheusSerializer', () => {
         result,
         '# HELP target_info Target metadata\n' +
         '# TYPE target_info gauge\n' +
-        'target_info{env="prod",hostname="myhost",datacenter="sdc",region="europe",owner="frontend",job="",instance=""} 1\n'
-      );
-    });
-
-    it('should drop service attributes', () => {
-      const serializer = new PrometheusSerializer(undefined, true);
-      const result = serializer['_serializeResource'](new Resource({
-        env: 'prod',
-        hostname: 'myhost',
-        datacenter: 'sdc',
-        region: 'europe',
-        owner: 'frontend',
-        'service.name': 'name',
-        'service.namespace': 'namespace',
-        'service.instance.id': 'instance id'
-      }));
-
-      assert.strictEqual(
-        result,
-        '# HELP target_info Target metadata\n' +
-        '# TYPE target_info gauge\n' +
-        'target_info{env="prod",hostname="myhost",datacenter="sdc",region="europe",owner="frontend",job="namespace/name",instance="instance id"} 1\n'
-      );
-    });
-
-    it('with undefined service.instance.id should add empty instance id', () => {
-      const serializer = new PrometheusSerializer(undefined, true);
-      const result = serializer['_serializeResource'](new Resource({
-        foo: 'bar',
-        'service.name': 'name',
-        'service.namespace': 'namespace',
-      }));
-
-      assert.strictEqual(
-        result,
-        '# HELP target_info Target metadata\n' +
-        '# TYPE target_info gauge\n' +
-        'target_info{foo="bar",job="namespace/name",instance=""} 1\n'
-      );
-    });
-
-    it('with undefined service.instance.id should add empty instance id', () => {
-      const serializer = new PrometheusSerializer(undefined, true);
-      const result = serializer['_serializeResource'](new Resource({
-        foo: 'bar',
-        'service.name': 'name',
-        'service.namespace': 'namespace',
-      }));
-
-      assert.strictEqual(
-        result,
-        '# HELP target_info Target metadata\n' +
-        '# TYPE target_info gauge\n' +
-        'target_info{foo="bar",job="namespace/name",instance=""} 1\n'
-      );
-    });
-
-    it('with undefined service.namespace should only use service.name for "job"', () => {
-      const serializer = new PrometheusSerializer(undefined, true);
-      const result = serializer['_serializeResource'](new Resource({
-        foo: 'bar',
-        'service.name': 'name',
-        'service.instance.id': '123'
-      }));
-
-      assert.strictEqual(
-        result,
-        '# HELP target_info Target metadata\n' +
-        '# TYPE target_info gauge\n' +
-        'target_info{foo="bar",job="name",instance="123"} 1\n'
-      );
-    });
-
-    it('with undefined service.namespace and service.name should add empty "job"', () => {
-      // service.name MUST exist. But PrometheusSerializer is exported and used by non-SDK packages.
-      // In case semantic conventions are not adhered to, add empty as a fallback.
-      const serializer = new PrometheusSerializer(undefined, true);
-      const result = serializer['_serializeResource'](new Resource({
-        foo: 'bar',
-        'service.instance.id': '123'
-      }));
-
-      assert.strictEqual(
-        result,
-        '# HELP target_info Target metadata\n' +
-        '# TYPE target_info gauge\n' +
-        'target_info{foo="bar",job="",instance="123"} 1\n'
-      );
-    });
-
-    it('with defined service.namespace and undefined service.name should add empty "job"', () => {
-      // service.name MUST exist. But PrometheusSerializer is exported and used by non-SDK packages.
-      // In case semantic conventions are not adhered to, add empty as a fallback.
-      const serializer = new PrometheusSerializer(undefined, true);
-      const result = serializer['_serializeResource'](new Resource({
-        foo: 'bar',
-        'service.instance.id': '123',
-        'service.namespace': 'namespace'
-      }));
-
-      assert.strictEqual(
-        result,
-        '# HELP target_info Target metadata\n' +
-        '# TYPE target_info gauge\n' +
-        'target_info{foo="bar",job="",instance="123"} 1\n'
+        'target_info{env="prod",hostname="myhost",datacenter="sdc",region="europe",owner="frontend"} 1\n'
       );
     });
   });

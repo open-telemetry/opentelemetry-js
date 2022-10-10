@@ -33,7 +33,7 @@ import { Counter } from '@opentelemetry/api-metrics';
 const serializedEmptyResourceLines = [
   '# HELP target_info Target metadata',
   '# TYPE target_info gauge',
-  'target_info{job="",instance=""} 1'
+  'target_info 1'
 ];
 
 describe('PrometheusExporter', () => {
