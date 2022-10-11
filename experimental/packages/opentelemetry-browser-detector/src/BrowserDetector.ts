@@ -51,7 +51,7 @@ class BrowserDetector implements Detector {
       );
       return Resource.empty();
     } else {
-      return new Resource({
+      return new Resource(browserResource);
         ...browserResource,
       });
     }
