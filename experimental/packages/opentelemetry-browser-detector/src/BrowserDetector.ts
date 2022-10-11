@@ -67,6 +67,7 @@ function getBrowserAttributes(): ResourceAttributes {
   } else {
     browserAttribs[BROWSER_ATTRIBUTES.USER_AGENT] = navigator.userAgent;
   }
+  browserAttribs[BROWSER_ATTRIBUTES.LANGUAGE]=navigator.language;
   return browserAttribs;
 }
 

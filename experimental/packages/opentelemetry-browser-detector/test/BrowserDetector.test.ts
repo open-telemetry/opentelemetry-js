@@ -30,6 +30,7 @@ describeBrowser('browserDetector()', () => {
   it('should return browser information', async () => {
     sinon.stub(globalThis, 'navigator').value({
       userAgent: 'dddd',
+      language:'en-US',
       userAgentData:{
         platform:'platform',
         brands:['brand1'],
@@ -42,6 +43,7 @@ describeBrowser('browserDetector()', () => {
       platform: 'platform',
       brands: ['brand1'],
       mobile: false,
+      language: 'en-US',
       user_agent: 'dddd'
     });
   });

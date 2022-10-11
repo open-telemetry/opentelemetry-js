@@ -32,6 +32,7 @@ export const assertResource = (
     platform?: string,
     brands?: string[],
     mobile?: boolean,
+    language?: string,
     user_agent?: string
   }
 ) => {
@@ -52,6 +53,12 @@ export const assertResource = (
     assert.strictEqual(
       (resource.attributes[BROWSER_ATTRIBUTES.MOBILE]),
       validations.mobile
+    );
+  }
+  if (validations.language) {
+    assert.strictEqual(
+      (resource.attributes[BROWSER_ATTRIBUTES.LANGUAGE]),
+      validations.language
     );
   }
   if (validations.user_agent) {

@@ -23,5 +23,6 @@ export const BROWSER_ATTRIBUTES = {
   PLATFORM: 'browser.platform', //TODO replace with SemantecConventions attribute when available
   BRANDS: 'browser.brands',
   MOBILE: 'browser.mobile',
+  LANGUAGE: 'browser.language',
   USER_AGENT: 'browser.user_agent'
 };
