@@ -43,9 +43,9 @@ export const assertResource = (
   }
   if (validations.brands) {
     assert.ok(Array.isArray(resource.attributes[BROWSER_ATTRIBUTES.BRANDS]));
-    assert.strictEqual(
-      (resource.attributes[BROWSER_ATTRIBUTES.BRANDS] as string[]).join('.'),
-      validations.brands.join('.')
+    assert.deepStrictEqual(
+      (resource.attributes[BROWSER_ATTRIBUTES.BRANDS] as string[]),
+      validations.brands
     );
   }
   if (validations.mobile) {
