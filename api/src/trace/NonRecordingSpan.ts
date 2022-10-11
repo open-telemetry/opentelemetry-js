@@ -15,7 +15,7 @@
  */
 
 import { Exception } from '../common/Exception';
-import { TimeInput } from '../common/Time';
+import { HrTime, TimeInput } from '../common/Time';
 import { SpanAttributes } from './attributes';
 import { INVALID_SPAN_CONTEXT } from './invalid-span-constants';
 import { Span } from './span';
@@ -72,4 +72,8 @@ export class NonRecordingSpan implements Span {
 
   // By default does nothing
   recordException(_exception: Exception, _time?: TimeInput): void {}
+
+  currentTime(): HrTime {
+    return [0, 0];
+  }
 }

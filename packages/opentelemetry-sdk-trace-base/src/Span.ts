@@ -243,6 +243,10 @@ export class Span implements api.Span, ReadableSpan {
     return this._ended;
   }
 
+  currentTime(): api.HrTime {
+    return timeInputToHrTime(this._clock.now());
+  }
+
   private _isSpanEnded(): boolean {
     if (this._ended) {
       api.diag.warn(`Can not execute the operation on ended Span {traceId: ${this._spanContext.traceId}, spanId: ${this._spanContext.spanId}}`);

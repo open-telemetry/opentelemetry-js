@@ -21,7 +21,7 @@ import {
   InstrumentationConfig,
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
-import { hrTime, isUrlIgnored, otperformance } from '@opentelemetry/core';
+import { isUrlIgnored, otperformance } from '@opentelemetry/core';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 import {
   addSpanNetworkEvents,
@@ -431,7 +431,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
       if (xhrMem.span) {
         plugin._applyAttributesAfterXHR(xhrMem.span, xhr);
       }
-      const endTime = hrTime();
+      const endTime = xhrMem.span?.currentTime();
 
       // the timeout is needed as observer doesn't have yet information
       // when event "load" is called. Also the time may differ depends on
@@ -486,7 +486,7 @@ export class XMLHttpRequestInstrumentation extends InstrumentationBase<XMLHttpRe
             api.trace.setSpan(api.context.active(), currentSpan),
             () => {
               plugin._tasksCount++;
-              xhrMem.sendStartTime = hrTime();
+              xhrMem.sendStartTime = currentSpan.currentTime();
               currentSpan.addEvent(EventNames.METHOD_SEND);
 
               this.addEventListener('abort', onAbort);

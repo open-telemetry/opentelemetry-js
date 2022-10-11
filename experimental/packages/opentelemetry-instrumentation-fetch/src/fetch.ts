@@ -278,7 +278,7 @@ export class FetchInstrumentation extends InstrumentationBase<Promise<Response>>
     spanData: SpanData,
     response: FetchResponse
   ) {
-    const endTime = core.hrTime();
+    const endTime = span.currentTime();
     this._addFinalSpanAttributes(span, response);
 
     setTimeout(() => {
@@ -308,7 +308,8 @@ export class FetchInstrumentation extends InstrumentationBase<Promise<Response>>
         if (!createdSpan) {
           return original.apply(this, args);
         }
-        const spanData = plugin._prepareSpanData(url);
+        const startTime = createdSpan.currentTime();
+        const spanData = plugin._prepareSpanData(url, startTime);
 
         function endSpanOnError(span: api.Span, error: FetchError) {
           plugin._applyAttributesAfterFetch(span, options, error);
@@ -427,8 +428,7 @@ export class FetchInstrumentation extends InstrumentationBase<Promise<Response>>
    *     resources
    * @param spanUrl
    */
-  private _prepareSpanData(spanUrl: string): SpanData {
-    const startTime = core.hrTime();
+  private _prepareSpanData(spanUrl: string, startTime: api.HrTime): SpanData {
     const entries: PerformanceResourceTiming[] = [];
     if (typeof PerformanceObserver !== 'function') {
       return { entries, startTime, spanUrl };

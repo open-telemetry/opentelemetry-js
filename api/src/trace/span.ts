@@ -15,7 +15,7 @@
  */
 
 import { Exception } from '../common/Exception';
-import { TimeInput } from '../common/Time';
+import { HrTime, TimeInput } from '../common/Time';
 import { SpanAttributes, SpanAttributeValue } from './attributes';
 import { SpanContext } from './span_context';
 import { SpanStatus } from './status';
@@ -126,4 +126,10 @@ export interface Span {
    *     use the current time.
    */
   recordException(exception: Exception, time?: TimeInput): void;
+
+  /**
+   * Returns current time based on the anchored clock.
+   * Used to snapshot time when the span has to be ended later.
+   */
+  currentTime(): HrTime;
 }
