@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* feat(sdk-trace): re-export sdk-trace-base in sdk-trace-node and web [#3319](https://github.com/open-telemetry/opentelemetry-js/pull/3319) @legendecas
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
