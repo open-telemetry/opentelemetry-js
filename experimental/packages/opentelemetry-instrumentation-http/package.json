@@ -50,7 +50,7 @@
     "@opentelemetry/sdk-trace-base": "1.7.0",
     "@opentelemetry/sdk-trace-node": "1.7.0",
     "@types/got": "9.6.12",
-    "@types/mocha": "9.1.1",
+    "@types/mocha": "10.0.0",
     "@types/node": "18.6.5",
     "@types/request-promise-native": "1.0.18",
     "@types/semver": "7.3.9",
