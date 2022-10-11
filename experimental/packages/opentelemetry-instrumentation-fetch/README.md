@@ -16,9 +16,11 @@ npm install --save @opentelemetry/instrumentation-fetch
 ## Usage
 
 ```js
-'use strict';
-import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
-import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
+import {
+  ConsoleSpanExporter,
+  SimpleSpanProcessor,
+  WebTracerProvider,
+} from '@opentelemetry/sdk-trace-web';
 import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
