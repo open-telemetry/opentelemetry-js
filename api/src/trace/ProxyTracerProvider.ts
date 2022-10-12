@@ -44,11 +44,11 @@ export class ProxyTracerProvider implements TracerProvider {
   }
 
   shutdown(): Promise<void> {
-    return this.getDelegate().shutdown();
+    return Promise.resolve(this.getDelegate().shutdown?.());
   }
 
   forceFlush(): Promise<void> {
-    return this.getDelegate().forceFlush();
+    return Promise.resolve(this.getDelegate().forceFlush?.()) ;
   }
 
   getDelegate(): TracerProvider {
