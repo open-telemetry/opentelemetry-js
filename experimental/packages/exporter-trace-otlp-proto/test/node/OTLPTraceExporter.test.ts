@@ -22,13 +22,13 @@ import * as http from 'http';
 import * as sinon from 'sinon';
 import { Stream, PassThrough } from 'stream';
 import * as zlib from 'zlib';
-import { OTLPTraceExporter } from '../src';
+import { OTLPTraceExporter } from '../../src/platform/node';
 import {
   ensureExportTraceServiceRequestIsSet,
   ensureProtoSpanIsCorrect,
   mockedReadableSpan,
   MockedResponse,
-} from './traceHelper';
+} from '../traceHelper';
 import { CompressionAlgorithm, OTLPExporterNodeConfigBase, OTLPExporterError } from '@opentelemetry/otlp-exporter-base';
 import { getExportRequestProto, ServiceClientType } from '@opentelemetry/otlp-proto-exporter-base';
 import { IExportTraceServiceRequest } from '@opentelemetry/otlp-transformer';
