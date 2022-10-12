@@ -33,4 +33,12 @@ export class NoopTracerProvider implements TracerProvider {
   ): Tracer {
     return new NoopTracer();
   }
+
+  shutdown(): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+
+  forceFlush(): Promise<void> {
+    return Promise.resolve(undefined);
+  }
 }

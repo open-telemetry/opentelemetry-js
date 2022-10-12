@@ -43,6 +43,14 @@ export class ProxyTracerProvider implements TracerProvider {
     );
   }
 
+  shutdown(): Promise<void> {
+    return this.getDelegate().shutdown();
+  }
+
+  forceFlush(): Promise<void> {
+    return this.getDelegate().forceFlush();
+  }
+
   getDelegate(): TracerProvider {
     return this._delegate ?? NOOP_TRACER_PROVIDER;
   }

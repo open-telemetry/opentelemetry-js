@@ -34,4 +34,14 @@ export interface TracerProvider {
    * @returns Tracer A Tracer with the given name and version
    */
   getTracer(name: string, version?: string, options?: TracerOptions): Tracer;
+
+  /**
+   * Shutdown all internal processors and blocks until all data is flushed
+   */
+  shutdown(): Promise<void>;
+
+  /**
+   * Flushes all data hold in span processors to the configured exporters
+   */
+  forceFlush(): Promise<void>
 }
