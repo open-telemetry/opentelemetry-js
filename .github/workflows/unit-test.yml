@@ -104,7 +104,7 @@ jobs:
       - name: Permission Setup
         run: sudo chmod -R 777 /github /__w
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.0.2
 
       - name: restore lerna
         id: cache
@@ -144,7 +144,7 @@ jobs:
       - name: Permission Setup
         run: sudo chmod -R 777 /github /__w
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.0.2
 
       - name: restore lerna
         id: cache
