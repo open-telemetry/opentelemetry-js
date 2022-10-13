@@ -124,18 +124,18 @@ jobs:
       - name: Bootstrap
         run: |
           npm install --ignore-scripts
-          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js' --ignore @opentelemetry/selenium-tests
+          npx lerna bootstrap --no-ci --hoist --nohoist='zone.js' --ignore @opentelemetry/selenium-tests --scope @opentelemetry/core --include-dependencies
 
       - name: Build 🔧
         run: |
-          npm run compile
+          # npm run compile
           # run additional compilation variants
-          npx lerna run compile
+          npx lerna run compile --scope @opentelemetry/core --include-dependencies
 
       - name: Unit tests
-        run: npm run test:browser
-      - name: Report Coverage
-        run: npm run codecov:browser
+        run: npm run test:browser --scope @opentelemetry/core --include-dependencies
+      # - name: Report Coverage
+      #   run: npm run codecov:browser
   # webworker-tests:
   #   runs-on: ubuntu-latest
   #   container:

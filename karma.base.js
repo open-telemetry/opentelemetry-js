@@ -17,13 +17,7 @@
 module.exports = {
   listenAddress: 'localhost',
   hostname: 'localhost',
-  browsers: ['Chrome', 'ChromeHeadless', 'ChromeHeadlessCI'],
-  customLaunchers: {
-    ChromeHeadlessCI: {
-      base: 'ChromeHeadless',
-      flags: ['--no-sandbox']
-    }
-  },
+  browsers: ['ChromeHeadless'],
   frameworks: ['mocha'],
   coverageIstanbulReporter: {
     reports: ['html', 'json'],
