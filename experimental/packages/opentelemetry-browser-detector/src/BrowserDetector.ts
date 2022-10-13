@@ -62,7 +62,7 @@ function getBrowserAttributes(): ResourceAttributes {
   const userAgentData : UserAgentData | undefined = (navigator as any).userAgentData;
   if(userAgentData) {
     browserAttribs[BROWSER_ATTRIBUTES.PLATFORM] = userAgentData.platform;
-    browserAttribs[BROWSER_ATTRIBUTES.BRANDS] = userAgentData.brands;
+    browserAttribs[BROWSER_ATTRIBUTES.BRANDS] = userAgentData.brands.map(b => `${b.brand} ${b.version}`);
     browserAttribs[BROWSER_ATTRIBUTES.MOBILE] = userAgentData.mobile;
   } else {
     browserAttribs[BROWSER_ATTRIBUTES.USER_AGENT] = navigator.userAgent;
