@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { envDetector, Resource } from '../../../src';
 import {
   assertK8sResource,
