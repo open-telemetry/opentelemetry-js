@@ -138,7 +138,7 @@ describe('Span', () => {
     );
     span.end(hrTimeToMilliseconds(span.startTime) - 1);
     assert.ok(hrTimeToNanoseconds(span.duration) >= 0);
-  })
+  });
 
   it('should have valid event.time', () => {
     const span = new Span(

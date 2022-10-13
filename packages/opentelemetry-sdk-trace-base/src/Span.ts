@@ -18,9 +18,7 @@ import * as api from '@opentelemetry/api';
 import { Context, HrTime, SpanAttributeValue } from '@opentelemetry/api';
 import {
   Clock,
-  hrTime,
   hrTimeDuration,
-  hrTimeToMilliseconds,
   InstrumentationLibrary,
   isAttributeValue,
   isTimeInput,
@@ -30,7 +28,6 @@ import {
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
-import { hrtime } from 'process';
 import { ExceptionEventName } from './enums';
 import { ReadableSpan } from './export/ReadableSpan';
 import { SpanProcessor } from './SpanProcessor';
@@ -198,7 +195,6 @@ export class Span implements api.Span, ReadableSpan {
         this.startTime,
         this.endTime
       );
-      // 
       this.endTime = this.startTime.slice() as HrTime;
       this._duration = [0, 0];
     }
