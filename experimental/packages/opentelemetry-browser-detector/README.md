@@ -14,7 +14,7 @@ npm install --save @opentelemetry/opentelemetry-browser-detector
 
 ```js
 import { Resource, detectResources } from '@opentelemetry/resources';
-import   { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 //...
 import { browserDetector } from '@opentelemetry/opentelemetry-browser-detector';
 

@@ -33,7 +33,20 @@ describeBrowser('browserDetector()', () => {
       language:'en-US',
       userAgentData:{
         platform:'platform',
-        brands:['brand1'],
+        brands:[
+          {
+            brand: 'Chromium',
+            version: '106'
+          },
+          {
+            brand: 'Google Chrome',
+            version: '106'
+          },
+          {
+            brand: 'Not;A=Brand',
+            version: '99'
+          }
+        ],
         mobile:false
       }
     });
@@ -41,7 +54,11 @@ describeBrowser('browserDetector()', () => {
     const resource: Resource = await browserDetector.detect();
     assertResource(resource, {
       platform: 'platform',
-      brands: ['brand1'],
+      brands: [
+        'Chromium 106',
+        'Google Chrome 106',
+        'Not;A=Brand 99'
+      ],
       mobile: false,
       language: 'en-US',
       user_agent: 'dddd'
