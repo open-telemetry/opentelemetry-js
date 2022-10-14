@@ -104,23 +104,13 @@ In addition to settings passed to the constructor, the exporter also supports co
 Apache 2.0 - See [LICENSE][license-url] for more information.
 
 [discussions-url]: https://github.com/open-telemetry/opentelemetry-js/discussions
-
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/main/LICENSE
-
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-metrics-otlp-http
-
 [npm-url-grpc]: https://www.npmjs.com/package/@opentelemetry/exporter-metrics-otlp-grpc
-
 [npm-url-proto]: https://www.npmjs.com/package/@opentelemetry/exporter-metrics-otlp-proto
-
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-metrics-otlp-http.svg
-
 [opentelemetry-collector-url]: https://github.com/open-telemetry/opentelemetry-collector
-
 [opentelemetry-spec-protocol-exporter]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options
-
 [semconv-resource-service-name]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service
-
 [trace-exporter-url]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/exporter-trace-otlp-http
