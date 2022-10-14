@@ -191,7 +191,7 @@ export class Span implements api.Span, ReadableSpan {
 
     if (this._duration[0] < 0) {
       api.diag.warn(
-        'Inconsistent start and end time, startTime > endTime. Setting end time 1ms after start time.',
+        'Inconsistent start and end time, startTime > endTime. Setting span duration to 0ms.',
         this.startTime,
         this.endTime
       );
