@@ -167,3 +167,31 @@ jobs:
         run: npm run test:webworker
       - name: Report Coverage
         run: npm run codecov:webworker
+  api-eol-node-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        node_version:
+          - "8"
+          - "10"
+          - "12"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node_version }}
+
+      - name: Build
+        working-directory: ./api
+        run: |
+          npm install --ignore-scripts
+          npm install @types/mocha@^7 mocha@^7 ts-loader@^8 ts-mocha@^8
+          node ../scripts/version-update.js
+          tsc --build tsconfig.json tsconfig.esm.json
+
+      - name: Test
+        working-directory: ./api
+        run: npm test
