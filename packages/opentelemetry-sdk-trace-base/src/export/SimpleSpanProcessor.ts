@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { context, Context, TraceFlags } from '@opentelemetry/api';
+import { Context, TraceFlags } from '@opentelemetry/api';
 import {
   ExportResultCode,
   globalErrorHandler,
-  suppressTracing,
   BindOnceFuture,
+  coreExport,
 } from '@opentelemetry/core';
 import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
@@ -45,7 +45,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
   }
 
   // does nothing.
-  onStart(_span: Span, _parentContext: Context): void {}
+  onStart(_span: Span, _parentContext: Context): void { }
 
   onEnd(span: ReadableSpan): void {
     if (this._shutdownOnce.isCalled) {
@@ -56,18 +56,15 @@ export class SimpleSpanProcessor implements SpanProcessor {
       return;
     }
 
-    // prevent downstream exporter calls from generating spans
-    context.with(suppressTracing(context.active()), () => {
-      this._exporter.export([span], result => {
-        if (result.code !== ExportResultCode.SUCCESS) {
-          globalErrorHandler(
-            result.error ??
-              new Error(
-                `SimpleSpanProcessor: span export failed (status ${result})`
-              )
-          );
-        }
-      });
+    coreExport(this._exporter, [span], result => {
+      if (result.code !== ExportResultCode.SUCCESS) {
+        globalErrorHandler(
+          result.error ??
+          new Error(
+            `SimpleSpanProcessor: span export failed (status ${result})`
+          )
+        );
+      }
     });
   }
 

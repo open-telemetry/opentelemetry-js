@@ -17,8 +17,8 @@
 import * as api from '@opentelemetry/api';
 import {
   ExportResultCode,
+  coreExport,
   globalErrorHandler,
-  suppressTracing,
   unrefTimer
 } from '@opentelemetry/core';
 import { MetricReader } from './MetricReader';
@@ -87,19 +87,17 @@ export class PeriodicExportingMetricReader extends MetricReader {
     }
 
     return new Promise((resolve, reject) => {
-      api.context.with(suppressTracing(api.context.active()), () => {
-        this._exporter.export(resourceMetrics, result => {
-          if (result.code !== ExportResultCode.SUCCESS) {
-            reject(
-              result.error ??
-              new Error(
-                `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`
-              )
-            );
-          } else {
-            resolve();
-          }
-        });
+      coreExport(this._exporter, resourceMetrics, result => {
+        if (result.code !== ExportResultCode.SUCCESS) {
+          reject(
+            result.error ??
+            new Error(
+              `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`
+            )
+          );
+        } else {
+          resolve();
+        }
       });
     });
   }
