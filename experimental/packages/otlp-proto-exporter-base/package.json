@@ -63,7 +63,6 @@
     "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
-    "@grpc/proto-loader": "^0.6.9",
     "@opentelemetry/core": "1.7.0",
     "@opentelemetry/otlp-exporter-base": "0.33.0",
     "protobufjs": "7.1.1"
