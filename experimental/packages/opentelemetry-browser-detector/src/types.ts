@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 export type UserAgentData = {
-  brands: string[],
+  brands: {brand:string,version:string}[],
   platform: string,
   mobile: boolean
 };
