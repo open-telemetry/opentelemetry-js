@@ -16,6 +16,8 @@ All notable changes to this project will be documented in this file.
 
 ### :house: (Internal)
 
+* ci: run browser tests without circle [#3328](https://github.com/open-telemetry/opentelemetry-js/pull/3328) @dyladan
+
 ## 1.7.0
 
 ### :bug: (Bug Fix)
