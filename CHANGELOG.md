@@ -12,6 +12,9 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: (Bug Fix)
 
+* fix(resources): fix EnvDetector throwing errors when attribute values contain spaces
+  [#3295](https://github.com/open-telemetry/opentelemetry-js/issues/3295)
+
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
