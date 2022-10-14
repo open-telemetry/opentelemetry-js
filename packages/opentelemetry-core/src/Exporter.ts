@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { context } from "@opentelemetry/api";
-import { ExportResult } from "./ExportResult";
-import { suppressTracing } from "./trace/suppress-tracing";
+import { context } from '@opentelemetry/api';
+import { ExportResult } from './ExportResult';
+import { suppressTracing } from './trace/suppress-tracing';
 
 export interface Exporter<T> {
   export(arg: T, resultCallback: (result: ExportResult) => void): void;
