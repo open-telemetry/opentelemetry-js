@@ -110,7 +110,7 @@ class EnvDetector implements Detector {
       let [key, value] = keyValuePair;
       // Leading and trailing whitespaces are trimmed.
       key = key.trim();
-      value = value.trim().split('^"|"$').join('');
+      value = value.trim().split(/^"|"$/).join('');
       if (!this._isValidAndNotEmpty(key)) {
         throw new Error(`Attribute key ${this._ERROR_MESSAGE_INVALID_CHARS}`);
       }
@@ -136,7 +136,7 @@ class EnvDetector implements Detector {
   private _isPrintableString(str: string): boolean {
     for (let i = 0; i < str.length; i++) {
       const ch: string = str.charAt(i);
-      if (ch <= ' ' || ch >= '~') {
+      if (ch < ' ' || ch >= '~') {
         return false;
       }
     }
