@@ -106,7 +106,7 @@ jobs:
 
       - name: restore lerna
         id: cache
-        uses: actions/cache@v3.0.4 # Pin version for now to prevent permissions issues
+        uses: actions/cache@v3
         with:
           path: |
             node_modules
@@ -143,7 +143,7 @@ jobs:
 
       - name: restore lerna
         id: cache
-        uses: actions/cache@v3.0.4 # Pin version for now to prevent permissions issues
+        uses: actions/cache@v3
         with:
           path: |
             node_modules
