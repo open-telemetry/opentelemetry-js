@@ -22,7 +22,11 @@ export interface Exporter<T> {
   export(arg: T, resultCallback: (result: ExportResult) => void): void;
 }
 
-export function coreExport<T>(exporter: Exporter<T>, arg: T, resultCallback: (result: ExportResult) => void): void {
+/**
+* @internal
+* Shared functionality used by Exporters while exporting data, including suppresion of Traces.
+*/
+export function _export<T>(exporter: Exporter<T>, arg: T, resultCallback: (result: ExportResult) => void): void {
   // prevent downstream exporter calls from generating spans
   context.with(suppressTracing(context.active()), () => {
     exporter.export(arg, resultCallback);
