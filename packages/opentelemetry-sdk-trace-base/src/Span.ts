@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { Context, SpanAttributeValue } from '@opentelemetry/api';
+import { Context, HrTime, SpanAttributeValue } from '@opentelemetry/api';
 import {
   Clock,
   hrTimeDuration,
@@ -191,10 +191,12 @@ export class Span implements api.Span, ReadableSpan {
 
     if (this._duration[0] < 0) {
       api.diag.warn(
-        'Inconsistent start and end time, startTime > endTime',
+        'Inconsistent start and end time, startTime > endTime. Setting span duration to 0ms.',
         this.startTime,
         this.endTime
       );
+      this.endTime = this.startTime.slice() as HrTime;
+      this._duration = [0, 0];
     }
 
     this._spanProcessor.onEnd(this);
