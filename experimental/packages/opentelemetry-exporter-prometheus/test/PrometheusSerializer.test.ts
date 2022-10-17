@@ -15,7 +15,10 @@
  */
 
 import * as assert from 'assert';
-import { MetricAttributes, UpDownCounter } from '@opentelemetry/api-metrics';
+import {
+  MetricAttributes,
+  UpDownCounter
+} from '@opentelemetry/api-metrics';
 import {
   Aggregation,
   AggregationTemporality,
@@ -31,12 +34,21 @@ import {
 } from '@opentelemetry/sdk-metrics';
 import * as sinon from 'sinon';
 import { PrometheusSerializer } from '../src';
-import { mockedHrTimeMs, mockHrTime } from './util';
+import {
+  mockedHrTimeMs,
+  mockHrTime
+} from './util';
+import { Resource } from '@opentelemetry/resources';
 
 const attributes = {
   foo1: 'bar1',
   foo2: 'bar2',
 };
+
+const serializedEmptyResource =
+  '# HELP target_info Target metadata\n' +
+  '# TYPE target_info gauge\n' +
+  'target_info 1\n';
 
 class TestMetricReader extends MetricReader {
   constructor() {
@@ -278,7 +290,7 @@ describe('PrometheusSerializer', () => {
         const reader = new TestMetricReader();
         const meterProvider = new MeterProvider({
           views: [
-            new View({aggregation: new LastValueAggregation(), instrumentName: '*' })
+            new View({ aggregation: new LastValueAggregation(), instrumentName: '*' })
           ]
         });
         meterProvider.addMetricReader(reader);
@@ -361,7 +373,7 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(
           result,
           '# HELP test foobar\n' +
-            '# TYPE test histogram\n' +
+          '# TYPE test histogram\n' +
             `test_count{val="1"} 3 ${mockedHrTimeMs}\n` +
             `test_sum{val="1"} 175 ${mockedHrTimeMs}\n` +
             `test_bucket{val="1",le="1"} 0 ${mockedHrTimeMs}\n` +
@@ -465,6 +477,7 @@ describe('PrometheusSerializer', () => {
       const result = await getCounterResult('test', serializer, { unit: unitOfMetric, exportAll: true });
       assert.strictEqual(
         result,
+        serializedEmptyResource +
         '# HELP test_total description missing\n' +
         `# UNIT test_total ${unitOfMetric}\n` +
         '# TYPE test_total counter\n' +
@@ -478,6 +491,7 @@ describe('PrometheusSerializer', () => {
       const result = await getCounterResult('test', serializer, { exportAll: true });
       assert.strictEqual(
         result,
+        serializedEmptyResource +
         '# HELP test_total description missing\n' +
         '# TYPE test_total counter\n' +
         `test_total 1 ${mockedHrTimeMs}\n`
@@ -607,7 +621,7 @@ describe('PrometheusSerializer', () => {
       const serializer = new PrometheusSerializer();
 
       const result = await testSerializer(serializer, 'test_total', counter => {
-        // if you try to use a attribute name like account-id prometheus will complain
+        // if you try to use an attribute name like account-id prometheus will complain
         // with an error like:
         // error while linting: text format parsing error in line 282: expected '=' after label name, found '-'
         counter.add(1, ({
@@ -618,6 +632,26 @@ describe('PrometheusSerializer', () => {
       assert.strictEqual(
         result,
         `test_total{account_id="123456"} 1 ${mockedHrTimeMs}\n`
+      );
+    });
+  });
+
+  describe('_serializeResource', () => {
+    it('should serialize resource', () => {
+      const serializer = new PrometheusSerializer(undefined, true);
+      const result = serializer['_serializeResource'](new Resource({
+        env: 'prod',
+        hostname: 'myhost',
+        datacenter: 'sdc',
+        region: 'europe',
+        owner: 'frontend'
+      }));
+
+      assert.strictEqual(
+        result,
+        '# HELP target_info Target metadata\n' +
+        '# TYPE target_info gauge\n' +
+        'target_info{env="prod",hostname="myhost",datacenter="sdc",region="europe",owner="frontend"} 1\n'
       );
     });
   });
