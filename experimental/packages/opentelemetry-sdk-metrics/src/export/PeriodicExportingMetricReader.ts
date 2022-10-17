@@ -16,8 +16,8 @@
 
 import * as api from '@opentelemetry/api';
 import {
+  _export,
   ExportResultCode,
-  coreExport,
   globalErrorHandler,
   unrefTimer
 } from '@opentelemetry/core';
@@ -87,7 +87,7 @@ export class PeriodicExportingMetricReader extends MetricReader {
     }
 
     return new Promise((resolve, reject) => {
-      coreExport(this._exporter, resourceMetrics, result => {
+      _export(this._exporter, resourceMetrics, result => {
         if (result.code !== ExportResultCode.SUCCESS) {
           reject(
             result.error ??

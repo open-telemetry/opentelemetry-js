@@ -16,10 +16,10 @@
 
 import { Context, TraceFlags } from '@opentelemetry/api';
 import {
+  _export,
   ExportResultCode,
   globalErrorHandler,
-  BindOnceFuture,
-  coreExport,
+  BindOnceFuture
 } from '@opentelemetry/core';
 import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
@@ -56,7 +56,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
       return;
     }
 
-    coreExport(this._exporter, [span], result => {
+    _export(this._exporter, [span], result => {
       if (result.code !== ExportResultCode.SUCCESS) {
         globalErrorHandler(
           result.error ??
