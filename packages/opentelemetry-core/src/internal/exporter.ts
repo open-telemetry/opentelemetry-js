@@ -15,16 +15,15 @@
  */
 
 import { context } from '@opentelemetry/api';
-import { ExportResult } from './ExportResult';
-import { suppressTracing } from './trace/suppress-tracing';
+import { ExportResult } from '../ExportResult';
+import { suppressTracing } from '../trace/suppress-tracing';
 
 export interface Exporter<T> {
   export(arg: T, resultCallback: (result: ExportResult) => void): void;
 }
 
 /**
-* @internal
-* Shared functionality used by Exporters while exporting data, including suppresion of Traces.
+* Internal shared functionality used by Exporters while exporting data, including suppresion of Traces.
 */
 export function _export<T>(exporter: Exporter<T>, arg: T, resultCallback: (result: ExportResult) => void): void {
   // prevent downstream exporter calls from generating spans
