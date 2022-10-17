@@ -5,6 +5,7 @@
     "api",
     "packages/*",
     "experimental/packages/*",
+    "experimental/examples/*",
     "experimental/backwards-compatability/*",
     "integration-tests/*",
     "selenium-tests",
