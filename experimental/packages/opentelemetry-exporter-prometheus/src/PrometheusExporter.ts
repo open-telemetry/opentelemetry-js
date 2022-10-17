@@ -18,14 +18,21 @@ import { diag } from '@opentelemetry/api';
 import {
   globalErrorHandler,
 } from '@opentelemetry/core';
-import { Aggregation, AggregationTemporality, MetricReader } from '@opentelemetry/sdk-metrics';
-import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
+import {
+  Aggregation,
+  AggregationTemporality,
+  MetricReader
+} from '@opentelemetry/sdk-metrics';
+import {
+  createServer,
+  IncomingMessage,
+  Server,
+  ServerResponse
+} from 'http';
 import { ExporterConfig } from './export/types';
 import { PrometheusSerializer } from './PrometheusSerializer';
 /** Node.js v8.x compat */
 import { URL } from 'url';
-
-const NO_REGISTERED_METRICS = '# no registered metrics';
 
 export class PrometheusExporter extends MetricReader {
   static readonly DEFAULT_OPTIONS = {
@@ -154,7 +161,7 @@ export class PrometheusExporter extends MetricReader {
 
   /**
    * Request handler that responds with the current state of metrics
-   * @param request Incoming HTTP request of server instance
+   * @param _request Incoming HTTP request of server instance
    * @param response HTTP response objet used to response to request
    */
   public getMetricsRequestHandler(
@@ -195,11 +202,7 @@ export class PrometheusExporter extends MetricReader {
           if (errors.length) {
             diag.error('PrometheusExporter: metrics collection errors', ...errors);
           }
-          let result = this._serializer.serialize(resourceMetrics);
-          if (result === '') {
-            result = NO_REGISTERED_METRICS;
-          }
-          response.end(result);
+          response.end(this._serializer.serialize(resourceMetrics));
         },
         err => {
           response.end(`# failed to export metrics: ${err}`);

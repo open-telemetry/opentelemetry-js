@@ -10,11 +10,13 @@ All notable changes to experimental packages in this project will be documented 
 
 * feat(metrics-sdk): Add tracing suppresing for Metrics Export [#3332](https://github.com/open-telemetry/opentelemetry-js/pull/3332) @hectorhdzg
 * feat(sdk-node): configure trace exporter with environment variables [#3143](https://github.com/open-telemetry/opentelemetry-js/pull/3143) @svetlanabrennan
+* feat(prometheus): serialize resource as target_info gauge [#3300](https://github.com/open-telemetry/opentelemetry-js/pull/3300) @pichlermarc
 
 ### :bug: (Bug Fix)
 
 * fix(node-sdk): move `@opentelemetry/semantic-conventions` to `dependencies` [#3283](https://github.com/open-telemetry/opentelemetry-js/pull/3283) @mhassan1
 * fix(exporters): do not append trailing '/' when URL contains path [#3274](https://github.com/open-telemetry/opentelemetry-js/pull/3274) @pichlermarc
+* fix(instrumentation): debug log on no modules defined for instrumentation [#3308](https://github.com/open-telemetry/opentelemetry-js/pull/3308) @legendecas
 
 ### :books: (Refine Doc)
 
