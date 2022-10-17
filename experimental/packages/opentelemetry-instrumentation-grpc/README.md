@@ -46,13 +46,6 @@ gRPC instrumentation accepts the following configuration:
 | ------- | ---- | ----------- |
 | [`ignoreGrpcMethods`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-grpc/src/types.ts#L25) | `IgnoreMatcher[]` | gRPC instrumentation will not trace any methods that match anything in this list. You may pass a string (case-insensitive match), a `RegExp` object, or a filter function. |
 
-## Semantic conventions for RPC spans -
-
-For more information on how to describe remote procedure calls -
-
-https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/rpc.md
-
-
 
 ## Useful links
 
