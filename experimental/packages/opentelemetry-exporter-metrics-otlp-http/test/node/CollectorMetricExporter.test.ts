@@ -205,57 +205,22 @@ describe('OTLPMetricExporter - node with json over http', () => {
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
     });
     it('should use delta temporality defined via env', () => {
-      {
-        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'delta';
-        const exporter = new OTLPMetricExporter();
-        assert.strictEqual(exporter['_aggregationTemporalitySelector'], DeltaTemporalitySelector);
-      }
-      {
-        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'DELTA';
-        const exporter = new OTLPMetricExporter();
-        assert.strictEqual(exporter['_aggregationTemporalitySelector'], DeltaTemporalitySelector);
-      }
-      {
-        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'DeLTa';
-        const exporter = new OTLPMetricExporter();
-        assert.strictEqual(exporter['_aggregationTemporalitySelector'], DeltaTemporalitySelector);
-      }
-      {
-        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'delta    ';
+      for (const envValue of ['delta', 'DELTA', 'DeLTa', 'delta     ']) {
+        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = envValue;
         const exporter = new OTLPMetricExporter();
         assert.strictEqual(exporter['_aggregationTemporalitySelector'], DeltaTemporalitySelector);
       }
     });
     it('should use cumulative temporality defined via env', () => {
-      {
-        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'cumulative';
-        const exporter = new OTLPMetricExporter();
-        assert.strictEqual(exporter['_aggregationTemporalitySelector'], CumulativeTemporalitySelector);
-      }
-      {
-        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'CUMULATIVE';
-        const exporter = new OTLPMetricExporter();
-        assert.strictEqual(exporter['_aggregationTemporalitySelector'], CumulativeTemporalitySelector);
-      }
-      {
-        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'CuMULaTIvE';
-        const exporter = new OTLPMetricExporter();
-        assert.strictEqual(exporter['_aggregationTemporalitySelector'], CumulativeTemporalitySelector);
-      }
-      {
-        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'cumulative    ';
+      for (const envValue of ['cumulative', 'CUMULATIVE', 'CuMULaTIvE', 'cumulative    ']) {
+        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = envValue;
         const exporter = new OTLPMetricExporter();
         assert.strictEqual(exporter['_aggregationTemporalitySelector'], CumulativeTemporalitySelector);
       }
     });
     it('should configure cumulative temporality with invalid value in env', () => {
-      {
-        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'invalid';
-        const exporter = new OTLPMetricExporter();
-        assert.strictEqual(exporter['_aggregationTemporalitySelector'], CumulativeTemporalitySelector);
-      }
-      {
-        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = ' ';
+      for (const envValue of ['invalid', ' ']) {
+        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = envValue;
         const exporter = new OTLPMetricExporter();
         assert.strictEqual(exporter['_aggregationTemporalitySelector'], CumulativeTemporalitySelector);
       }
