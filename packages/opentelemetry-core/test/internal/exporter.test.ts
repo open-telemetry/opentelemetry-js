@@ -34,11 +34,9 @@ describe('exporter', () => {
   }
 
   it('_export should suppress tracing', done => {
-    const suppressSpy = sandbox.spy(suppress, "suppressTracing");
+    const suppressSpy = sandbox.spy(suppress, 'suppressTracing');
     const exporter = new TestExporter();
-    let data = ["Test1", "Test2"];
-
-    _export(exporter, data, (result: ExportResult) => {
+    _export(exporter, ['Test1'], (result: ExportResult) => {
       assert.ok(suppressSpy.calledOnce);
       done();
     });
