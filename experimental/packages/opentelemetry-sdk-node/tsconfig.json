@@ -40,6 +40,9 @@
       "path": "../../../packages/opentelemetry-semantic-conventions"
     },
     {
+      "path": "../../../packages/sdk-metrics"
+    },
+    {
       "path": "../exporter-trace-otlp-grpc"
     },
     {
@@ -50,9 +53,6 @@
     },
     {
       "path": "../opentelemetry-instrumentation"
-    },
-    {
-      "path": "../opentelemetry-sdk-metrics"
     }
   ]
 }
