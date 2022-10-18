@@ -66,7 +66,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
           )
         );
       }
-    }).catch((error) => {
+    }).catch(error => {
       globalErrorHandler(error);
     });
   }
