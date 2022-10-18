@@ -86,19 +86,18 @@ export class PeriodicExportingMetricReader extends MetricReader {
       api.diag.error('PeriodicExportingMetricReader: metrics collection errors', ...errors);
     }
 
-    return new Promise((resolve, reject) => {
-      internal._export(this._exporter, resourceMetrics, result => {
-        if (result.code !== ExportResultCode.SUCCESS) {
-          reject(
-            result.error ??
-            new Error(
-              `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`
-            )
-          );
-        } else {
-          resolve();
-        }
-      });
+    return new Promise(async (resolve, reject) => {
+      const result = await internal._export(this._exporter, resourceMetrics);
+      if (result.code !== ExportResultCode.SUCCESS) {
+        reject(
+          result.error ??
+          new Error(
+            `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`
+          )
+        );
+      } else {
+        resolve();
+      }
     });
   }
 

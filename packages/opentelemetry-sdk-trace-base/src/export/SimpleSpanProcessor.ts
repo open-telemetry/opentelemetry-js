@@ -19,7 +19,8 @@ import {
   internal,
   ExportResultCode,
   globalErrorHandler,
-  BindOnceFuture
+  BindOnceFuture,
+  ExportResult
 } from '@opentelemetry/core';
 import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
@@ -56,7 +57,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
       return;
     }
 
-    internal._export(this._exporter, [span], result => {
+    internal._export(this._exporter, [span]).then((result: ExportResult) => {
       if (result.code !== ExportResultCode.SUCCESS) {
         globalErrorHandler(
           result.error ??
