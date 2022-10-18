@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
 
 ### :bug: (Bug Fix)
 
+* fix(sdk-trace): enforce consistent span durations
+  [#3327](https://github.com/open-telemetry/opentelemetry-js/pull/3327) @dyladan
 * fix(resources): fix EnvDetector throwing errors when attribute values contain spaces
   [#3295](https://github.com/open-telemetry/opentelemetry-js/issues/3295)
 
