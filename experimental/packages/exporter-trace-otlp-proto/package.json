@@ -74,5 +74,6 @@
     "@opentelemetry/resources": "1.7.0",
     "@opentelemetry/sdk-trace-base": "1.7.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-trace-otlp-proto"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-trace-otlp-proto",
+  "sideEffects": false
 }
