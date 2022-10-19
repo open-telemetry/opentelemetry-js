@@ -35,7 +35,8 @@ instrumentation.disable();
 import * as http from 'http';
 import * as request from 'request-promise-native';
 import * as superagent from 'superagent';
-import * as got from 'got';
+// Temporarily removed. See https://github.com/open-telemetry/opentelemetry-js/issues/3344
+// import * as got from 'got';
 import * as nock from 'nock';
 import axios, { AxiosResponse } from 'axios';
 
@@ -80,7 +81,7 @@ describe('Packages', () => {
     [
       { name: 'axios', httpPackage: axios }, //keep first
       { name: 'superagent', httpPackage: superagent },
-      { name: 'got', httpPackage: { get: (url: string) => got(url) } },
+      // { name: 'got', httpPackage: { get: (url: string) => got(url) } },
       {
         name: 'request',
         httpPackage: { get: (url: string) => request(url) },

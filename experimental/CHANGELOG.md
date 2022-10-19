@@ -23,6 +23,9 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :house: (Internal)
 
+* ci(instrumentation-http): remove got devDependency
+  [#3347](https://github.com/open-telemetry/opentelemetry-js/issues/3347) @dyladan
+
 ## 0.33.0
 
 ### :boom: Breaking Change
