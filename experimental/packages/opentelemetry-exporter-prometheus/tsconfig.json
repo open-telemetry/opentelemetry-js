@@ -16,6 +16,9 @@
       "path": "../../../packages/opentelemetry-core"
     },
     {
+      "path": "../../../packages/opentelemetry-resources"
+    },
+    {
       "path": "../opentelemetry-api-metrics"
     },
     {
