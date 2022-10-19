@@ -76,7 +76,7 @@
   "dependencies": {
     "@opentelemetry/core": "1.7.0",
     "@opentelemetry/instrumentation": "0.33.0",
-    "@opentelemetry/sdk-metrics": "0.33.0",
+    "@opentelemetry/sdk-metrics": "1.7.0",
     "@opentelemetry/semantic-conventions": "1.7.0",
     "semver": "^7.3.5"
   },

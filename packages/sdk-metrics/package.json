@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sdk-metrics",
-  "version": "0.33.0",
+  "version": "1.7.0",
   "description": "Work in progress OpenTelemetry metrics SDK",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
