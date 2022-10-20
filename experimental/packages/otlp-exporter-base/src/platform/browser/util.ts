@@ -66,9 +66,9 @@ export function sendWithXhr(
   onSuccess: () => void,
   onError: (error: OTLPExporterError) => void
 ): void {
-  let reqIsDestroyed: boolean;
   let retryTimer: ReturnType<typeof setTimeout>;
   let xhr: XMLHttpRequest;
+  let reqIsDestroyed = false;
 
   const exporterTimer = setTimeout(() => {
     clearTimeout(retryTimer);
@@ -103,7 +103,7 @@ export function sendWithXhr(
     xhr.send(body);
 
     xhr.onreadystatechange = () => {
-      if (xhr.readyState === XMLHttpRequest.DONE && reqIsDestroyed === undefined) {
+      if (xhr.readyState === XMLHttpRequest.DONE && reqIsDestroyed === false) {
         if (xhr.status >= 200 && xhr.status <= 299) {
           diag.debug('xhr success', body);
           onSuccess();

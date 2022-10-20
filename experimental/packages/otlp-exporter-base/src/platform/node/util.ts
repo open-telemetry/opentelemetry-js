@@ -49,11 +49,11 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
 ): void {
   const exporterTimeout = collector.timeoutMillis;
   const parsedUrl = new url.URL(collector.url);
-  let reqIsDestroyed: boolean;
   const nodeVersion = Number(process.versions.node.split('.')[0]);
   let retryTimer: ReturnType<typeof setTimeout>;
   let req: http.ClientRequest;
-
+  let reqIsDestroyed = false;
+  
   const exporterTimer = setTimeout(() => {
     clearTimeout(retryTimer);
     reqIsDestroyed = true;
@@ -98,7 +98,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
       });
 
       res.on('end', () => {
-        if (reqIsDestroyed === undefined) {
+        if (reqIsDestroyed === false) {
           if (res.statusCode && res.statusCode < 299) {
             diag.debug(`statusCode: ${res.statusCode}`, responseData);
             onSuccess();

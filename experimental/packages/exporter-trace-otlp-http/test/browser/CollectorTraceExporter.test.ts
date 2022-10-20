@@ -640,7 +640,7 @@ describe('export with retry - real http request destroyed', () => {
         const error = result.error as OTLPExporterError;
         assert.ok(error !== undefined);
         assert.strictEqual(error.message, 'Request Timeout');
-        assert.strictEqual(retry, 2);
+        assert.strictEqual(retry, 1);
         done();
       });
     }).timeout(3000);
