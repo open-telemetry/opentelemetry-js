@@ -68,5 +68,6 @@
     "@opentelemetry/otlp-exporter-base": "0.33.0",
     "protobufjs": "7.1.1"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-proto-exporter-base"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-proto-exporter-base",
+  "sideEffects": false
 }
