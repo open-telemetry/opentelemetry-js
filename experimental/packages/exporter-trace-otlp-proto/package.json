@@ -49,7 +49,7 @@
   "devDependencies": {
     "@babel/core": "7.16.0",
     "@opentelemetry/api": "^1.0.0",
-    "@types/mocha": "9.1.1",
+    "@types/mocha": "10.0.0",
     "@types/node": "18.6.5",
     "@types/sinon": "10.0.13",
     "codecov": "3.8.3",
@@ -74,5 +74,6 @@
     "@opentelemetry/resources": "1.7.0",
     "@opentelemetry/sdk-trace-base": "1.7.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-trace-otlp-proto"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-trace-otlp-proto",
+  "sideEffects": false
 }

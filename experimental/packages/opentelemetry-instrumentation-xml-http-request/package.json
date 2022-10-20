@@ -59,7 +59,7 @@
     "@opentelemetry/context-zone": "1.7.0",
     "@opentelemetry/propagator-b3": "1.7.0",
     "@opentelemetry/sdk-trace-base": "1.7.0",
-    "@types/mocha": "9.1.1",
+    "@types/mocha": "10.0.0",
     "@types/node": "18.6.5",
     "@types/sinon": "10.0.13",
     "@types/webpack-env": "1.16.3",
@@ -92,5 +92,6 @@
     "@opentelemetry/sdk-trace-web": "1.7.0",
     "@opentelemetry/semantic-conventions": "1.7.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-xml-http-request"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-xml-http-request",
+  "sideEffects": false
 }
