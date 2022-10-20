@@ -18,8 +18,9 @@ import { diag } from '@opentelemetry/api';
 import { getEnv } from '@opentelemetry/core';
 
 const DEFAULT_TRACE_TIMEOUT = 10000;
-export const DEFAULT_EXPORT_MAX_ATTEMPTS = 4;
+export const DEFAULT_EXPORT_MAX_ATTEMPTS = 5;
 export const DEFAULT_EXPORT_INITIAL_BACKOFF = 1000;
+export const DEFAULT_EXPORT_MAX_BACKOFF = 5000;
 export const DEFAULT_EXPORT_BACKOFF_MULTIPLIER = 1.5;
 
 /**

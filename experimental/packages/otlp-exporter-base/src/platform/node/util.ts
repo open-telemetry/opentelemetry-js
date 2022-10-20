@@ -28,6 +28,7 @@ import {
   DEFAULT_EXPORT_MAX_ATTEMPTS,
   DEFAULT_EXPORT_INITIAL_BACKOFF,
   DEFAULT_EXPORT_BACKOFF_MULTIPLIER,
+  DEFAULT_EXPORT_MAX_BACKOFF,
   isExportRetryable
 } from '../../util';
 
@@ -82,7 +83,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
 
   const request = parsedUrl.protocol === 'http:' ? http.request : https.request;
 
-  const sendWithRetry = (retries = DEFAULT_EXPORT_MAX_ATTEMPTS, backoffMillis = DEFAULT_EXPORT_INITIAL_BACKOFF) => {
+  const sendWithRetry = (retries = DEFAULT_EXPORT_MAX_ATTEMPTS, minDelay = DEFAULT_EXPORT_INITIAL_BACKOFF) => {
     req = request(options, (res: http.IncomingMessage) => {
       let responseData = '';
       res.on('data', chunk => (responseData += chunk));
@@ -105,9 +106,12 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
             clearTimeout(exporterTimer);
             clearTimeout(retryTimer);
           } else if (res.statusCode && isExportRetryable(res.statusCode) && retries > 0) {
+            minDelay = DEFAULT_EXPORT_BACKOFF_MULTIPLIER * minDelay;
+            const delayWithJitter = Math.round(Math.random() * (DEFAULT_EXPORT_MAX_BACKOFF - minDelay) + minDelay);
+
             retryTimer = setTimeout(() => {
-              sendWithRetry(retries - 1, backoffMillis * DEFAULT_EXPORT_BACKOFF_MULTIPLIER);
-            }, backoffMillis);
+              sendWithRetry(retries - 1, minDelay);
+            }, delayWithJitter);
           } else {
             const error = new OTLPExporterError(
               res.statusMessage,

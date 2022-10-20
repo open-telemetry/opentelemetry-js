@@ -630,7 +630,7 @@ describe('export with retry - real http request destroyed', () => {
       spans.push(Object.assign({}, mockedReadableSpan));
 
       let retry = 0;
-      server.respondWith('http://localhost:4318/v1/traces', function (xhr: any, id: any) {
+      server.respondWith('http://localhost:4318/v1/traces', function (xhr: any) {
         retry++;
         xhr.respond(502);
       });
