@@ -110,12 +110,20 @@ export function sendWithXhr(
           clearTimeout(exporterTimer);
           clearTimeout(retryTimer);
         } else if (xhr.status && isExportRetryable(xhr.status) && retries > 0) {
+          let retryTime: number;
           minDelay = DEFAULT_EXPORT_BACKOFF_MULTIPLIER * minDelay;
-          const delayWithJitter = Math.round(Math.random() * (DEFAULT_EXPORT_MAX_BACKOFF - minDelay) + minDelay);
+
+          // retry after interval specified in Retry-After header
+          if (xhr.getResponseHeader('Retry-After') !== null) {
+            retryTime = retrieveThrottleTime(xhr.getResponseHeader('Retry-After')!);
+          } else {
+            // exponential backoff with jitter
+            retryTime = Math.round(Math.random() * (DEFAULT_EXPORT_MAX_BACKOFF - minDelay) + minDelay);
+          }
 
           retryTimer = setTimeout(() => {
             sendWithRetry(retries - 1, minDelay);
-          }, delayWithJitter);
+          }, retryTime);
         } else {
           const error = new OTLPExporterError(
             `Failed to export with XHR (status: ${xhr.status})`,
@@ -152,4 +160,18 @@ export function sendWithXhr(
   };
 
   sendWithRetry();
+}
+
+function retrieveThrottleTime(retryAfter: string): number {
+  // it's a Date object
+  if (typeof retryAfter === 'object') {
+    const currentTime = new Date();
+    const retryAfterDate = new Date(retryAfter);
+
+    const secondsDiff = Math.round((retryAfterDate.getTime() - currentTime.getTime()) / 1000);
+    return secondsDiff * 1000;
+  // it's an integer
+  } else {
+    return Number(retryAfter) * 1000;
+  }
 }

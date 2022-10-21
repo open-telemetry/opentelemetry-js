@@ -53,7 +53,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
   let retryTimer: ReturnType<typeof setTimeout>;
   let req: http.ClientRequest;
   let reqIsDestroyed = false;
-  
+
   const exporterTimer = setTimeout(() => {
     clearTimeout(retryTimer);
     reqIsDestroyed = true;
@@ -106,12 +106,20 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
             clearTimeout(exporterTimer);
             clearTimeout(retryTimer);
           } else if (res.statusCode && isExportRetryable(res.statusCode) && retries > 0) {
+            let retryTime: number;
             minDelay = DEFAULT_EXPORT_BACKOFF_MULTIPLIER * minDelay;
-            const delayWithJitter = Math.round(Math.random() * (DEFAULT_EXPORT_MAX_BACKOFF - minDelay) + minDelay);
+
+            // retry after interval specified in Retry-After header
+            if (res.headers['retry-after'] !== null) {
+              retryTime = retrieveThrottleTime(res.headers['retry-after']!);
+            } else {
+              // exponential backoff with jitter
+              retryTime = Math.round(Math.random() * (DEFAULT_EXPORT_MAX_BACKOFF - minDelay) + minDelay);
+            }
 
             retryTimer = setTimeout(() => {
               sendWithRetry(retries - 1, minDelay);
-            }, delayWithJitter);
+            }, retryTime);
           } else {
             const error = new OTLPExporterError(
               res.statusMessage,
@@ -205,5 +213,20 @@ export function configureCompression(compression: CompressionAlgorithm | undefin
   } else {
     const definedCompression = getEnv().OTEL_EXPORTER_OTLP_TRACES_COMPRESSION || getEnv().OTEL_EXPORTER_OTLP_COMPRESSION;
     return definedCompression === CompressionAlgorithm.GZIP ? CompressionAlgorithm.GZIP : CompressionAlgorithm.NONE;
+  }
+}
+
+function retrieveThrottleTime(retryAfter: string): number {
+  // it's a Date object
+  // a string representing a date will return NaN when converted to a number
+  if (isNaN(Number(retryAfter))) {
+    const currentTime = new Date();
+    const retryAfterDate = new Date(retryAfter);
+
+    const secondsDiff = Math.round((retryAfterDate.getTime() - currentTime.getTime()) / 1000);
+    return secondsDiff * 1000;
+  // it's an integer
+  } else {
+    return Number(retryAfter) * 1000;
   }
 }
