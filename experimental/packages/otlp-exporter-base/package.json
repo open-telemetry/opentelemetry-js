@@ -81,5 +81,6 @@
   "peerDependencies": {
     "@opentelemetry/api": "^1.0.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-exporter-base"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-exporter-base",
+  "sideEffects": false
 }

@@ -67,5 +67,6 @@
     "@opentelemetry/semantic-conventions": "1.7.0",
     "jaeger-client": "^3.15.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-exporter-jaeger"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-exporter-jaeger",
+  "sideEffects": false
 }

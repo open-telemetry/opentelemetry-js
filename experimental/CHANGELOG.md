@@ -8,9 +8,13 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(metrics-sdk): Add tracing suppresing for Metrics Export [#3332](https://github.com/open-telemetry/opentelemetry-js/pull/3332) @hectorhdzg
+* feat(instrumentation): implement `require-in-the-middle` singleton [#3161](https://github.com/open-telemetry/opentelemetry-js/pull/3161) @mhassan1
 * feat(sdk-node): configure trace exporter with environment variables [#3143](https://github.com/open-telemetry/opentelemetry-js/pull/3143) @svetlanabrennan
-* deps: remove unused proto-loader dependencies and update grpc-js and proto-loader versions [#3337](https://github.com/open-telemetry/opentelemetry-js/pull/3337) @seemk
+* feat: enable tree shaking [#3329](https://github.com/open-telemetry/opentelemetry-js/pull/3329) @pkanal
 * feat(prometheus): serialize resource as target_info gauge [#3300](https://github.com/open-telemetry/opentelemetry-js/pull/3300) @pichlermarc
+* deps: remove unused proto-loader dependencies and update grpc-js and proto-loader versions [#3337](https://github.com/open-telemetry/opentelemetry-js/pull/3337) @seemk
+
 
 ### :bug: (Bug Fix)
 
@@ -23,6 +27,9 @@ All notable changes to experimental packages in this project will be documented 
 * docs(metrics-exporters): fix wrong exporter const name in example [#3270](https://github.com/open-telemetry/opentelemetry-js/issues/3270) @pichlermarc
 
 ### :house: (Internal)
+
+* ci(instrumentation-http): remove got devDependency
+  [#3347](https://github.com/open-telemetry/opentelemetry-js/issues/3347) @dyladan
 
 ## 0.33.0
 

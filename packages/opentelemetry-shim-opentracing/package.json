@@ -63,5 +63,6 @@
     "@opentelemetry/semantic-conventions": "1.7.0",
     "opentracing": "^0.14.4"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-shim-opentracing"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-shim-opentracing",
+  "sideEffects": false
 }
