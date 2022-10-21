@@ -15,7 +15,6 @@ npm install --save @opentelemetry/opentelemetry-browser-detector
 ```js
 import { Resource, detectResources } from '@opentelemetry/resources';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-//...
 import { browserDetector } from '@opentelemetry/opentelemetry-browser-detector';
 
 async function start(){
@@ -34,7 +33,6 @@ async function start(){
     contextManager: new ZoneContextManager(),
   });
 
-
 // Registering instrumentations
 
   registerInstrumentations({
@@ -44,7 +42,6 @@ async function start(){
       new FetchInstrumentation(),
     ],
   });
-
 }
 
 
@@ -54,5 +51,4 @@ start().then(()=> console.log("Instrumentation started"));
 
 The browser identification attributes will be added to the resource spans when traces are created.
 These attributes include platform, brands, mobile, language if the browser supports
-the userAgentData api, otherwise it will contain only the user_agent information
-
+the userAgentData api, otherwise it will contain only the user_agent informations

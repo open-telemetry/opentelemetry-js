@@ -10,6 +10,7 @@ All notable changes to experimental packages in this project will be documented 
 
 * feat(sdk-node): configure trace exporter with environment variables [#3143](https://github.com/open-telemetry/opentelemetry-js/pull/3143) @svetlanabrennan
 * feat(prometheus): serialize resource as target_info gauge [#3300](https://github.com/open-telemetry/opentelemetry-js/pull/3300) @pichlermarc
+* feat(detectors): add browser detector module [#3292](https://github.com/open-telemetry/opentelemetry-js/pull/3292) @abinet18
 
 ### :bug: (Bug Fix)
 
