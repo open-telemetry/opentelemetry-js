@@ -48,6 +48,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.16.0",
+    "@grpc/proto-loader": "^0.7.3",
     "@opentelemetry/api": "^1.0.0",
     "@opentelemetry/otlp-exporter-base": "0.33.0",
     "@types/mocha": "10.0.0",
@@ -67,8 +68,7 @@
     "@opentelemetry/api": "^1.0.0"
   },
   "dependencies": {
-    "@grpc/grpc-js": "^1.5.9",
-    "@grpc/proto-loader": "^0.6.9",
+    "@grpc/grpc-js": "^1.7.1",
     "@opentelemetry/core": "1.7.0",
     "@opentelemetry/otlp-grpc-exporter-base": "0.33.0",
     "@opentelemetry/otlp-transformer": "0.33.0",
