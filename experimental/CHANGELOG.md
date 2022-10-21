@@ -15,7 +15,6 @@ All notable changes to experimental packages in this project will be documented 
 * feat(prometheus): serialize resource as target_info gauge [#3300](https://github.com/open-telemetry/opentelemetry-js/pull/3300) @pichlermarc
 * deps: remove unused proto-loader dependencies and update grpc-js and proto-loader versions [#3337](https://github.com/open-telemetry/opentelemetry-js/pull/3337) @seemk
 
-
 ### :bug: (Bug Fix)
 
 * fix(node-sdk): move `@opentelemetry/semantic-conventions` to `dependencies` [#3283](https://github.com/open-telemetry/opentelemetry-js/pull/3283) @mhassan1
