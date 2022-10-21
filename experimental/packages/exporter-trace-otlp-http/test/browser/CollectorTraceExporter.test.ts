@@ -653,7 +653,7 @@ describe('export with retry - real http request destroyed', () => {
         retry++;
         xhr.respond(
           503,
-          {"Retry-After": 3}
+          {'Retry-After': 3}
         );
       });
 
@@ -670,15 +670,14 @@ describe('export with retry - real http request destroyed', () => {
       spans = [];
       spans.push(Object.assign({}, mockedReadableSpan));
 
-  
       let retry = 0;
       server.respondWith('http://localhost:4318/v1/traces', function (xhr: any) {
         retry++;
-        let d = new Date();
-        d.setSeconds(d.getSeconds() + 1)
+        const d = new Date();
+        d.setSeconds(d.getSeconds() + 1);
         xhr.respond(
           503,
-          {"Retry-After": d}
+          {'Retry-After': d}
         );
       });
 
@@ -698,11 +697,11 @@ describe('export with retry - real http request destroyed', () => {
       let retry = 0;
       server.respondWith('http://localhost:4318/v1/traces', function (xhr: any) {
         retry++;
-        let d = new Date();
-        d.setSeconds(d.getSeconds() + 120)
+        const d = new Date();
+        d.setSeconds(d.getSeconds() + 120);
         xhr.respond(
           503,
-          {"Retry-After": d}
+          {'Retry-After': d}
         );
       });
 
