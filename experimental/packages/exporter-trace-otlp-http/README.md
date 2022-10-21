@@ -25,8 +25,10 @@ To see documentation and sample code for the metric exporter, see the [exporter-
 The OTLPTraceExporter in Web expects the endpoint to end in `/v1/traces`.
 
 ```js
-import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
-import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
+import {
+  BatchSpanProcessor,
+  WebTracerProvider,
+} from '@opentelemetry/sdk-trace-web';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 
 const collectorOptions = {

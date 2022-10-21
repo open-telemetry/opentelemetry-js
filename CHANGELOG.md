@@ -8,11 +8,21 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* feat(sdk-trace): re-export sdk-trace-base in sdk-trace-node and web [#3319](https://github.com/open-telemetry/opentelemetry-js/pull/3319) @legendecas
+* feat: enable tree shaking [#3329](https://github.com/open-telemetry/opentelemetry-js/pull/3329) @pkanal
+
 ### :bug: (Bug Fix)
+
+* fix(sdk-trace): enforce consistent span durations
+  [#3327](https://github.com/open-telemetry/opentelemetry-js/pull/3327) @dyladan
+* fix(resources): fix EnvDetector throwing errors when attribute values contain spaces
+  [#3295](https://github.com/open-telemetry/opentelemetry-js/issues/3295)
 
 ### :books: (Refine Doc)
 
 ### :house: (Internal)
+
+* ci: run browser tests without circle [#3328](https://github.com/open-telemetry/opentelemetry-js/pull/3328) @dyladan
 
 ## 1.7.0
 

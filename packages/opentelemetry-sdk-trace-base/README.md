@@ -57,10 +57,12 @@ Samples every trace regardless of upstream sampling decisions.
 > This is used as a default Sampler
 
 ```js
-const { NodeTracerProvider } = require("@opentelemetry/sdk-trace-node");
-const { AlwaysOnSampler } = require("@opentelemetry/core");
+const {
+  AlwaysOnSampler,
+  BasicTracerProvider,
+} = require("@opentelemetry/sdk-trace-base");
 
-const tracerProvider = new NodeTracerProvider({
+const tracerProvider = new BasicTracerProvider({
   sampler: new AlwaysOnSampler()
 });
 ```
@@ -70,10 +72,12 @@ const tracerProvider = new NodeTracerProvider({
 Doesn't sample any trace, regardless of upstream sampling decisions.
 
 ```js
-const { NodeTracerProvider } = require("@opentelemetry/sdk-trace-node");
-const { AlwaysOffSampler } = require("@opentelemetry/core");
+const {
+  AlwaysOffSampler,
+  BasicTracerProvider,
+} = require("@opentelemetry/sdk-trace-base");
 
-const tracerProvider = new NodeTracerProvider({
+const tracerProvider = new BasicTracerProvider({
   sampler: new AlwaysOffSampler()
 });
 ```
@@ -86,10 +90,12 @@ Any trace that would be sampled at a given percentage will also be sampled at an
 The `TraceIDRatioSampler` may be used with the `ParentBasedSampler` to respect the sampled flag of an incoming trace.
 
 ```js
-const { NodeTracerProvider } = require("@opentelemetry/sdk-trace-node");
-const { TraceIdRatioBasedSampler } = require("@opentelemetry/core");
+const {
+  BasicTracerProvider,
+  TraceIdRatioBasedSampler,
+} = require("@opentelemetry/sdk-trace-base");
 
-const tracerProvider = new NodeTracerProvider({
+const tracerProvider = new BasicTracerProvider({
   // See details of ParentBasedSampler below
   sampler: new ParentBasedSampler({
     // Trace ID Ratio Sampler accepts a positional argument
@@ -130,10 +136,14 @@ Optional parameters:
 |present|false|false|`localParentNotSampled()`|
 
 ```js
-const { NodeTracerProvider } = require("@opentelemetry/sdk-trace-node");
-const { ParentBasedSampler, AlwaysOffSampler, TraceIdRatioBasedSampler } = require("@opentelemetry/core");
+const {
+  AlwaysOffSampler,
+  BasicTracerProvider,
+  ParentBasedSampler,
+  TraceIdRatioBasedSampler,
+} = require("@opentelemetry/sdk-trace-base");
 
-const tracerProvider = new NodeTracerProvider({
+const tracerProvider = new BasicTracerProvider({
   sampler: new ParentBasedSampler({
     // By default, the ParentBasedSampler will respect the parent span's sampling
     // decision. This is configurable by providing a different sampler to use
