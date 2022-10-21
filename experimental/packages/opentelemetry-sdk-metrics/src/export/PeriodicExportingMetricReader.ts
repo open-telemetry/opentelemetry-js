@@ -21,32 +21,43 @@ import {
   unrefTimer
 } from '@opentelemetry/core';
 import { MetricReader } from './MetricReader';
-import { AggregationTemporality } from './AggregationTemporality';
-import { InstrumentType } from '../InstrumentDescriptor';
 import { PushMetricExporter } from './MetricExporter';
-import { callWithTimeout, TimeoutError } from '../utils';
+import {
+  callWithTimeout,
+  TimeoutError
+} from '../utils';
 
 export type PeriodicExportingMetricReaderOptions = {
-  exporter: PushMetricExporter
-  exportIntervalMillis?: number,
-  exportTimeoutMillis?: number
+  /**
+   * The backing exporter for the metric reader.
+   */
+  exporter: PushMetricExporter;
+  /**
+   * An internal milliseconds for the metric reader to initiate metric
+   * collection.
+   */
+  exportIntervalMillis?: number;
+  /**
+   * Milliseconds for the async observable callback to timeout.
+   */
+  exportTimeoutMillis?: number;
 };
 
 /**
  * {@link MetricReader} which collects metrics based on a user-configurable time interval, and passes the metrics to
- * the configured {@link MetricExporter}
+ * the configured {@link PushMetricExporter}
  */
 export class PeriodicExportingMetricReader extends MetricReader {
   private _interval?: ReturnType<typeof setInterval>;
-
   private _exporter: PushMetricExporter;
-
   private readonly _exportInterval: number;
-
   private readonly _exportTimeout: number;
 
   constructor(options: PeriodicExportingMetricReaderOptions) {
-    super();
+    super({
+      aggregationSelector: options.exporter.selectAggregation?.bind(options.exporter),
+      aggregationTemporalitySelector: options.exporter.selectAggregationTemporality?.bind(options.exporter)
+    });
 
     if (options.exportIntervalMillis !== undefined && options.exportIntervalMillis <= 0) {
       throw Error('exportIntervalMillis must be greater than 0');
@@ -79,9 +90,9 @@ export class PeriodicExportingMetricReader extends MetricReader {
         if (result.code !== ExportResultCode.SUCCESS) {
           reject(
             result.error ??
-              new Error(
-                `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`
-              )
+            new Error(
+              `PeriodicExportingMetricReader: metrics export failed (error ${result.error})`
+            )
           );
         } else {
           resolve();
@@ -117,12 +128,5 @@ export class PeriodicExportingMetricReader extends MetricReader {
     }
 
     await this._exporter.shutdown();
-  }
-
-  /**
-   * @inheritdoc
-   */
-  selectAggregationTemporality(instrumentType: InstrumentType): AggregationTemporality {
-    return this._exporter.selectAggregationTemporality(instrumentType);
   }
 }

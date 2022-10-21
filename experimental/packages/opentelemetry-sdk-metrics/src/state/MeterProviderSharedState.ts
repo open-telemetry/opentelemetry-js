@@ -16,10 +16,11 @@
 
 import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
+import { Aggregation, InstrumentType } from '..';
 import { instrumentationScopeId } from '../utils';
 import { ViewRegistry } from '../view/ViewRegistry';
 import { MeterSharedState } from './MeterSharedState';
-import { MetricCollector } from './MetricCollector';
+import { MetricCollector, MetricCollectorHandle } from './MetricCollector';
 
 /**
  * An internal record for shared meter provider states.
@@ -41,5 +42,13 @@ export class MeterProviderSharedState {
       this.meterSharedStates.set(id, meterSharedState);
     }
     return meterSharedState;
+  }
+
+  selectAggregations(instrumentType: InstrumentType) {
+    const result: [MetricCollectorHandle, Aggregation][] = [];
+    for (const collector of this.metricCollectors) {
+      result.push([collector, collector.selectAggregation(instrumentType)]);
+    }
+    return result;
   }
 }

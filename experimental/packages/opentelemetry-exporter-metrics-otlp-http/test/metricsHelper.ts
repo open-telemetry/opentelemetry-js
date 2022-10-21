@@ -27,7 +27,6 @@ import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { InstrumentationScope, VERSION } from '@opentelemetry/core';
 import {
-  AggregationTemporality,
   ExplicitBucketHistogramAggregation,
   MeterProvider,
   MetricReader,
@@ -55,10 +54,6 @@ class TestMetricReader extends MetricReader {
 
   protected onShutdown(): Promise<void> {
     return Promise.resolve(undefined);
-  }
-
-  selectAggregationTemporality() {
-    return AggregationTemporality.CUMULATIVE;
   }
 }
 

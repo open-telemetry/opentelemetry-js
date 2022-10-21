@@ -21,8 +21,12 @@ export {
 } from './aggregator/types';
 
 export {
-  AggregationTemporality,
+  AggregationSelector,
   AggregationTemporalitySelector,
+} from './export/AggregationSelector';
+
+export {
+  AggregationTemporality,
 } from './export/AggregationTemporality';
 
 export {
@@ -43,6 +47,7 @@ export {
 
 export {
   MetricReader,
+  MetricReaderOptions
 } from './export/MetricReader';
 
 export {
@@ -62,10 +67,6 @@ export {
   InstrumentDescriptor,
   InstrumentType,
 } from './InstrumentDescriptor';
-
-export {
-  Meter,
-} from './Meter';
 
 export {
   MeterProvider,

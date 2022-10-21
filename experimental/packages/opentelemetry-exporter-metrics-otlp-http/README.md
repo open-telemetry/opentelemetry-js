@@ -3,6 +3,8 @@
 [![NPM Published Version][npm-img]][npm-url]
 [![Apache License][license-image]][license-image]
 
+**Note: This is an experimental package under active development. New releases may include breaking changes.**
+
 This module provides exporter for web and node to be used with OTLP (`http/json`) compatible receivers.
 Compatible with [opentelemetry-collector][opentelemetry-collector-url] versions `>=0.52 <=0.53`.
 
@@ -30,7 +32,7 @@ const collectorOptions = {
   headers: {}, // an optional object containing custom headers to be sent with each request
   concurrencyLimit: 1, // an optional limit on pending requests
 };
-const exporter = new OTLPMetricExporter(collectorOptions);
+const metricExporter = new OTLPMetricExporter(collectorOptions);
 const meterProvider = new MeterProvider({});
 
 meterProvider.addMetricReader(new PeriodicExportingMetricReader({

@@ -17,6 +17,7 @@
 import * as assert from 'assert';
 import { MetricAttributes, UpDownCounter } from '@opentelemetry/api-metrics';
 import {
+  Aggregation,
   AggregationTemporality,
   DataPoint,
   DataPointType,
@@ -39,11 +40,10 @@ const attributes = {
 
 class TestMetricReader extends MetricReader {
   constructor() {
-    super();
-  }
-
-  selectAggregationTemporality() {
-    return AggregationTemporality.CUMULATIVE;
+    super({
+      aggregationTemporalitySelector: _instrumentType => AggregationTemporality.CUMULATIVE,
+      aggregationSelector: _instrumentType => Aggregation.Default()
+    });
   }
 
   async onForceFlush() {}
