@@ -110,7 +110,7 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
             minDelay = DEFAULT_EXPORT_BACKOFF_MULTIPLIER * minDelay;
 
             // retry after interval specified in Retry-After header
-            if (res.headers['retry-after'] !== null) {
+            if (res.headers['retry-after']) {
               retryTime = retrieveThrottleTime(res.headers['retry-after']!);
             } else {
               // exponential backoff with jitter
@@ -217,13 +217,16 @@ export function configureCompression(compression: CompressionAlgorithm | undefin
 }
 
 function retrieveThrottleTime(retryAfter: string): number {
-  // it's a Date object
-  // a string representing a date will return NaN when converted to a number
+  // it's a Date object - a string representing a date will return NaN when converted to a number
   if (isNaN(Number(retryAfter))) {
     const currentTime = new Date();
     const retryAfterDate = new Date(retryAfter);
+    let secondsDiff = Math.ceil((retryAfterDate.getTime() - currentTime.getTime()) / 1000);
 
-    const secondsDiff = Math.round((retryAfterDate.getTime() - currentTime.getTime()) / 1000);
+    // if throttle date is set to now, difference in seconds might be less than 0
+    if (secondsDiff <= 0) {
+      secondsDiff = 0;
+    }
     return secondsDiff * 1000;
   // it's an integer
   } else {

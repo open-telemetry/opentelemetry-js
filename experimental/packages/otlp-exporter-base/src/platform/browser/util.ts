@@ -114,7 +114,7 @@ export function sendWithXhr(
           minDelay = DEFAULT_EXPORT_BACKOFF_MULTIPLIER * minDelay;
 
           // retry after interval specified in Retry-After header
-          if (xhr.getResponseHeader('Retry-After') !== null) {
+          if (xhr.getResponseHeader('Retry-After')) {
             retryTime = retrieveThrottleTime(xhr.getResponseHeader('Retry-After')!);
           } else {
             // exponential backoff with jitter
@@ -167,8 +167,12 @@ function retrieveThrottleTime(retryAfter: string): number {
   if (typeof retryAfter === 'object') {
     const currentTime = new Date();
     const retryAfterDate = new Date(retryAfter);
+    let secondsDiff = Math.ceil((retryAfterDate.getTime() - currentTime.getTime()) / 1000);
 
-    const secondsDiff = Math.round((retryAfterDate.getTime() - currentTime.getTime()) / 1000);
+    // if throttle date is set to now, difference in seconds might be less than 0
+    if (secondsDiff <= 0) {
+      secondsDiff = 0;
+    }
     return secondsDiff * 1000;
   // it's an integer
   } else {
