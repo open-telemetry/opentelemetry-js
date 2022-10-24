@@ -17,13 +17,13 @@ _Metrics API Reference: <https://open-telemetry.github.io/opentelemetry-js-api/c
 - [Configuring metric views](#configuring-metric-views)
   - [Configuring explicit bucket sizes for the Histogram instrument](#configuring-explicit-bucket-sizes-for-the-histogram-instrument)
   - [Dropping instrument from being exported](#dropping-instrument-from-being-exported)
-  - [Customising the metric attributes of instrument](#customising-the-metric-attributes-of-instrument)
+  - [Customizing the metric attributes of instrument](#customising-the-metric-attributes-of-instrument)
 - [Exporting measurements](#exporting-measurements)
   - [Exporting measurements to Prometheus](#exporting-measurements-to-prometheus)
   - [Exporting measurements to Opentelemetry Protocol](#exporting-measurements-to-opentelemetry-protocol)
 
 ## Getting Started
-In this page, you'll learn how to setup OpenTelemetry JS to export metrics from an HTTP server with Fastify. If you're not using Fastify, the concepts in this guide will still apply.
+In this page, you'll learn how to setup OpenTelemetry JS to export metrics from an HTTP server with Fastify. If you're not using Fastify, that's fine -- this guide will also work with Express, etc.
 
 ### Installation
 To begin, set up an environment in a new directory:
@@ -105,7 +105,7 @@ process.on("SIGTERM", () => {
 });
 ```
 
-In the above example we are initialising the Node SDK to enable the Metrics SDK
+In the above example we are initializing the Node SDK to enable the Metrics SDK
 and configure it to export the metrics in Prometheus format by registering the
 `PrometheusExporter`.
 
@@ -127,12 +127,12 @@ see the following:
 
 Automatic instrumentation is powerful but it doesn't capture what's going  on in
 your application. For that you'll need to write some manual instrumentation. Below
-we will show you how you can count thu number of times a HTTP endpoint has been
+we will show you how you can count the number of times a HTTP endpoint has been
 accessed.
 
 #### Counting number of incoming http requests
 
-First, modify `app.js` to include code that initializes a meter and uses it to 
+First, modify `app.js` to include code that initializes a meter and uses it to
 create a counter instrument which counts the number of times the `/` http endpoint
 has been requested.
 
@@ -208,7 +208,7 @@ node app.js
 
 When you navigate to http://localhost:3000, the counter instrument will be increased
 each time the page is accessed. If you want to see the exporter instruments, you
-can access via the dedicates metrics endpoint for Prometheus by accessing: 
+can access via the dedicates metrics endpoint for Prometheus by accessing:
 http://localhost:9464/metrics the contents will look similar to:
 
 ```
@@ -224,7 +224,7 @@ name `request_counter_total`:
 request_counter_total 6 1666624810428
 ```
 
-The postfixe `_total` get automatically to the instrument name for each counter insturment
+The postfixed `_total` get automatically to the instrument name for each counter instrument
 when the measurements are getting exported in the Prometheus format. In the above
 example you see that we access our `/` endpoint six times.
 
@@ -347,17 +347,17 @@ _See the current metrics semantic conventions in the OpenTelemetry Specification
 
 ## Configuring metric views
 
-A [Metric View](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#view) provides the ability to customise the metrics that are exposed by the
+A [Metric View](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#view) provides the ability to customize the metrics that are exposed by the
 Metrics SDK. Metric Views allows you to do:
 
-- Customise which Metric Attributes are reported on metrics
-- Customise which instruments get processed/ignored
-- Change the aggregration of a metric
+- Customize which Metric Attributes are reported on metrics
+- Customize which instruments get processed/ignored
+- Change the aggregation of a metric
 - Define explicit bucket sizes to Histogram instruments
 
 The Metric view requires the instrument selection query, and the configuration
 for the resulting metric. The first step is select to the metrics to whom the View
-is relevant, the second step is to configure the customisations for the the selected
+is relevant, the second step is to configure the customizations for the the selected
 metrics.
 
 A Metric View is a class that can be instantiated via:
@@ -381,14 +381,14 @@ The `instrumentName` has support for wildcards, so you can select all instrument
 using `*` or select all instruments starting with 'http.' by using `http.*`.
 
 _Note_: The Views can only be defined when the `MeterProvider` instance gets
-instantiated. A proposal is submitted to ease the ability to define Metris Views:
+instantiated. A proposal is submitted to ease the ability to define Metrics Views:
 <https://github.com/open-telemetry/oteps/issues/209>
 
 ### Configuring explicit bucket sizes for the Histogram instrument
 
 The Histogram instruments has default set of bucket sizes defined which not might
-not all suit your needs. The bucket sizes can be overriden by configuring a different
-aggregration for the Histogram instrument. The `ExplicitBucketHistogramAggregation`
+not all suit your needs. The bucket sizes can be overridden by configuring a different
+aggregation for the Histogram instrument. The `ExplicitBucketHistogramAggregation`
 should be used to define the bucket sizes for the Histogram instrument.
 
 Below an example is given how you can define explicit buckets for a histogram.
@@ -456,7 +456,7 @@ const dropView = new View({
 });
 ```
 
-### Customising the metric attributes of instrument
+### Customizing the metric attributes of instrument
 
 If you want to limit the Metric Attributes that get exported in measurements of
 an instrument, you can create a Metric View which defines which attributes should
@@ -490,7 +490,7 @@ exporters for different formats, such as [Cloud Monitoring](https://github.com/G
 
 ## Exporting measurements to Prometheus
 
-If you want to export your metrics to Prometheus you need to initialise Opentelemetry
+If you want to export your metrics to Prometheus you need to initialize Opentelemetry
 to use the Prometheus exporter `PrometheusExporter` which is included in the
 `@opentelemetry/exporter-prometheus`-package.
 
