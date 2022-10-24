@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+* doc: Added Metrics documentation [#1745](https://github.com/open-telemetry/opentelemetry-js/pull/1745) @weyert
+
 ### :boom: Breaking Change
 
 ### :rocket: (Enhancement)
