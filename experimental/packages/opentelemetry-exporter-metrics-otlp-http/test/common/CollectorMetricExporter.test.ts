@@ -20,22 +20,34 @@ import {
 } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { collect, mockCounter, mockObservableGauge, setUp, shutdown } from '../metricsHelper';
-import { OTLPExporterBase, OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
+import {
+  collect,
+  mockCounter,
+  mockObservableGauge,
+  setUp,
+  shutdown
+} from '../metricsHelper';
+import {
+  OTLPExporterBase,
+  OTLPExporterConfigBase
+} from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 
 type CollectorExporterConfig = OTLPExporterConfigBase;
-class OTLPMetricExporter extends OTLPExporterBase<
-  CollectorExporterConfig,
+
+class OTLPMetricExporter extends OTLPExporterBase<CollectorExporterConfig,
   ResourceMetrics,
-  IExportMetricsServiceRequest
-> {
+  IExportMetricsServiceRequest> {
   onInit() {}
+
   onShutdown() {}
+
   send() {}
+
   getDefaultUrl(config: CollectorExporterConfig) {
     return config.url || '';
   }
+
   convert(metrics: ResourceMetrics[]): IExportMetricsServiceRequest {
     return { resourceMetrics: [] };
   }
@@ -125,7 +137,7 @@ describe('OTLPMetricExporter - common', () => {
     describe('when exporter is shutdown', () => {
       it(
         'should not export anything but return callback with code' +
-          ' "FailedNotRetryable"',
+        ' "FailedNotRetryable"',
         async () => {
           await collectorExporter.shutdown();
           spySend.resetHistory();

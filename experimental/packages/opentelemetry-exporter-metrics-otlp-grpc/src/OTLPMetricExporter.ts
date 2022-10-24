@@ -15,7 +15,6 @@
  */
 
 import {
-  defaultOptions,
   OTLPMetricExporterBase,
   OTLPMetricExporterOptions
 } from '@opentelemetry/exporter-metrics-otlp-http';
@@ -33,7 +32,7 @@ import { createExportMetricsServiceRequest, IExportMetricsServiceRequest } from 
 
 class OTLPMetricExporterProxy extends OTLPGRPCExporterNodeBase<ResourceMetrics, IExportMetricsServiceRequest> {
 
-  constructor(config: OTLPGRPCExporterConfigNode & OTLPMetricExporterOptions= defaultOptions) {
+  constructor(config?: OTLPGRPCExporterConfigNode & OTLPMetricExporterOptions) {
     super(config);
     const headers = baggageUtils.parseKeyPairsIntoRecord(getEnv().OTEL_EXPORTER_OTLP_METRICS_HEADERS);
     this.metadata ||= new Metadata();
@@ -73,7 +72,7 @@ class OTLPMetricExporterProxy extends OTLPGRPCExporterNodeBase<ResourceMetrics, 
  * OTLP-gRPC metric exporter
  */
 export class OTLPMetricExporter extends OTLPMetricExporterBase<OTLPMetricExporterProxy>{
-  constructor(config: OTLPGRPCExporterConfigNode & OTLPMetricExporterOptions = defaultOptions) {
+  constructor(config?: OTLPGRPCExporterConfigNode & OTLPMetricExporterOptions) {
     super(new OTLPMetricExporterProxy(config), config);
   }
 }
