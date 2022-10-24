@@ -225,9 +225,10 @@ function retrieveThrottleTime(retryAfter: string): number {
 
     // if throttle date is set to now, difference in seconds might be less than 0
     if (secondsDiff <= 0) {
-      secondsDiff = 0;
+      return 0;
+    } else {
+      return secondsDiff * 1000;
     }
-    return secondsDiff * 1000;
   // it's an integer
   } else {
     return Number(retryAfter) * 1000;
