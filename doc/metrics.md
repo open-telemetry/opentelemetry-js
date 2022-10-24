@@ -8,6 +8,7 @@ _Metrics API Specification: <https://github.com/open-telemetry/opentelemetry-spe
 
 _Metrics API Reference: <https://open-telemetry.github.io/opentelemetry-js-api/classes/metricseapi.html>_
 
+- [Getting Started](#getting-started)
 - [Acquiring a Meter](#acquiring-a-meter)
 - [Create a metric instrument](#create-a-metric-instrument)
 - [Describing a instrument measurement](#describing-a-instrument-measurement)
@@ -20,6 +21,211 @@ _Metrics API Reference: <https://open-telemetry.github.io/opentelemetry-js-api/c
 - [Exporting measurements](#exporting-measurements)
   - [Exporting measurements to Prometheus](#exporting-measurements-to-prometheus)
   - [Exporting measurements to Opentelemetry Protocol](#exporting-measurements-to-opentelemetry-protocol)
+
+## Getting Started
+In thie page, you'll leaarn how to setup and metrics from an HTTP server with Fastify. If you're not using Fastify, that's fine -- this guide will also work with Express, etc.
+
+### Installation
+To begin, set up an environment in a new directory:
+
+```bash
+mkdir otel-getting-started
+cd otel-getting-started
+npm init -y
+```
+
+Now install Fastify and OpenTelemetry:
+
+```bash
+npm install fastify @opentelemetry/sdk-node @opentelemetry/exporter-prometheus @opentelemetry/auto-instrumentations-node
+```
+
+The `@opentelemetry/sdk-node` and `@opentelemetry/auto-instrumentations-node` will install allt he
+necessary packages to start with Opentelemetry including instrumentation for a wide variety of popular
+packages, such as `http`, `fetch` etc.
+
+### Create the sample HTTP Server
+Create a file `app.js`:
+
+```javascript
+const api = require('@opentelemetry/api-metrics')
+const opentelemetry = require("@opentelemetry/sdk-node");
+const { PrometheusExporter } = require("@opentelemetry/exporter-prometheus");
+const {
+  getNodeAutoInstrumentations,
+} = require("@opentelemetry/auto-instrumentations-node");
+
+const prometheusExporter = new PrometheusExporter({ startServer: true });
+
+const sdk = new opentelemetry.NodeSDK({
+  // Optional - If omitted, the metrics SDK will not be initialized
+  metricReader: prometheusExporter,
+  // Optional - you can use the metapackage or load each instrumentation individually
+  instrumentations: [getNodeAutoInstrumentations()],
+  // See the Configuration section below for additional  configuration options
+});
+
+// You can optionally detect resources asynchronously from the environment.
+// Detected resources are merged with the resources provided in the SDK configuration.
+sdk.start().then(() => {
+  // Resources have been detected and SDK is started
+  console.log(`SDK started`)
+
+// Start the http server
+  const fastify = require('fastify')({
+    logger: true
+  })
+
+  fastify.get('/', function (request, reply) {
+    reply.send({ hello: 'world' })
+  })
+
+  fastify.listen({ port: 3000 }, function (err, address) {
+    if (err) {
+      fastify.log.error(err)
+      process.exit(1)
+    }
+
+    console.log(`Server is now listening on ${address}`)
+  })
+});
+
+// You can also use the shutdown method to gracefully shut down the SDK before process shutdown
+// or on some operating system signal.
+const process = require("process");
+process.on("SIGTERM", () => {
+  sdk
+    .shutdown()
+    .then(
+      () => console.log("SDK shut down successfully"),
+      (err) => console.log("Error shutting down SDK", err)
+    )
+    .finally(() => process.exit(0));
+});
+```
+
+In the above example we are initialising the Node SDK to enable the Metrics SDK
+and configure it to export the metrics in Prometheus format by registering the
+`PrometheusExporter`.
+
+You can now run the instrument application and it will run the HTTP server on
+port 3000 with command:
+
+```bash
+node app.js
+```
+
+Now when accessing the HTTP server via http://localhost:3000 you will
+see the following:
+
+```
+{"hello":"world"}
+```
+
+### Add manual instrumentation
+
+Automatic instrumentation is powerful but it doesn't capture what's going  on in
+your application. For that you'll need to write some manual instrumentation. Below
+we will show you how you can count thu number of times a HTTP endpoint has been
+accessed.
+
+#### Counting number of incoming http requests
+
+First, modify `app.js` to include code that initializes a meter and uses it to 
+create a counter instrument which counts the number of times the `/` http endpoint
+has been requested.
+
+```javascript
+const api = require('@opentelemetry/api-metrics')
+const opentelemetry = require("@opentelemetry/sdk-node");
+const { PrometheusExporter } = require("@opentelemetry/exporter-prometheus");
+const {
+  getNodeAutoInstrumentations,
+} = require("@opentelemetry/auto-instrumentations-node");
+
+const prometheusExporter = new PrometheusExporter({ startServer: true });
+
+const sdk = new opentelemetry.NodeSDK({
+  // Optional - If omitted, the metrics SDK will not be initialized
+  metricReader: prometheusExporter,
+  // Optional - you can use the metapackage or load each instrumentation individually
+  instrumentations: [getNodeAutoInstrumentations()],
+  // See the Configuration section below for additional  configuration options
+});
+
+// You can optionally detect resources asynchronously from the environment.
+// Detected resources are merged with the resources provided in the SDK configuration.
+sdk.start().then(() => {
+  // Resources have been detected and SDK is started
+  console.log(`SDK started`)
+
+  // Create Meter with the name `http-server`
+  const appMeter = api.metrics.getMeter('http-server')
+  // Use the created Meter to create a counter instrument
+  const numberOfRequests = appMeter.createCounter('request-counter')
+
+  // Start the http server
+  const fastify = require('fastify')({
+    logger: true
+  })
+
+  fastify.get('/', function (request, reply) {
+    // Increase the counter by 1 each time the `/` endpoint is requested
+    numberOfRequests.add(1)
+    reply.send({ hello: 'world' })
+  })
+
+  fastify.listen({ port: 3000 }, function (err, address) {
+    if (err) {
+      fastify.log.error(err)
+      process.exit(1)
+    }
+
+    console.log(`Server is now listening on ${address}`)
+  })
+});
+
+// You can also use the shutdown method to gracefully shut down the SDK before process shutdown
+// or on some operating system signal.
+const process = require("process");
+process.on("SIGTERM", () => {
+  sdk
+    .shutdown()
+    .then(
+      () => console.log("SDK shut down successfully"),
+      (err) => console.log("Error shutting down SDK", err)
+    )
+    .finally(() => process.exit(0));
+});
+```
+
+Now run the application again:
+
+```bash
+node app.js
+```
+
+When you navigate to http://localhost:3000, the counter instrument will be increased
+each time the page is accessed. If you want to see the exporter instruments, you
+can access via the dedicates metrics endpoint for Prometheus by accessing: 
+http://localhost:9464/metrics the contents will look similar to:
+
+```
+# HELP request_counter_total description missing
+# TYPE request_counter_total counter
+request_counter_total 6 1666624810428
+```
+
+In the above example output you can that one instrument is available with the
+name `request_counter_total`:
+
+```
+request_counter_total 6 1666624810428
+```
+
+The postfixe `_total` get automatically to the instrument name for each counter insturment
+when the measurements are getting exported in the Prometheus format. In the above
+example you see that we access our `/` endpoint six times.
 
 ## Acquiring a Meter
 
