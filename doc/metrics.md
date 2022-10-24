@@ -40,7 +40,7 @@ Now install Fastify and OpenTelemetry:
 npm install fastify @opentelemetry/sdk-node @opentelemetry/exporter-prometheus @opentelemetry/auto-instrumentations-node
 ```
 
-The `@opentelemetry/sdk-node` and `@opentelemetry/auto-instrumentations-node` will install allt he
+The `@opentelemetry/sdk-node` and `@opentelemetry/auto-instrumentations-node` will install all the
 necessary packages to start with Opentelemetry including instrumentation for a wide variety of popular
 packages, such as `http`, `fetch` etc. The package `@opentelemetry/exporter-prometheus` is installed
 to export our measured metrics in the Prometheus format as popular approach to expose metrics.
