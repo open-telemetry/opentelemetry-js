@@ -20,6 +20,7 @@ _Metrics API Reference: <https://open-telemetry.github.io/opentelemetry-js-api/c
 - [Exporting measurements](#exporting-measurements)
   - [Exporting measurements to Prometheus](#exporting-measurements-to-prometheus)
   - [Exporting measurements to Opentelemetry Protocol](#exporting-measurements-to-opentelemetry-protocol)
+
 ## Acquiring a Meter
 
 In OpenTelemetry, Metrics measurement operations are performed using methods on a _meter_. You can get a meter by calling [`getMeter`](https://open-telemetry.github.io/opentelemetry-js-api/classes/metricsapi.html#getmetrics) on the global meter provider. `getMeter` takes the name and version of the application or library acquiring the meter, and provides a meter which can be used to create instruments.
@@ -35,12 +36,12 @@ const meter = metrics.getMeter("my-application", "0.1.0");
 In OpenTelemetry, all _metrics_ are composed of [`Instruments`](https://open-telemetry.github.io/opentelemetry-js-api/interfaces/instrument.html). A instrument is responsible for reporting measurements,
 there are four types of instruments that can be created:
 
-  - Counter, a synchronous instrument which supports non-negative increments
-  - Asynchronous Counter, a asynchronous instrument which supports non-negative increments
-  - Histogram,a synchronous instrument which supports arbitrary values that are statistically meaningful, such as histograms, summaries or percentile
-  - Asynchronous Gauge, asynchronous instrument which supports non-additive values, such as room temperature
-  - UpDownCounter, a synchronous instrument which supports increments and decrements, such as number of active requests
-  - Asynchronous UpDownCounter, a asynchronous instrument which supports increments and decrements
+- Counter, a synchronous instrument which supports non-negative increments
+- Asynchronous Counter, a asynchronous instrument which supports non-negative increments
+- Histogram,a synchronous instrument which supports arbitrary values that are statistically meaningful, such as histograms, summaries or percentile
+- Asynchronous Gauge, asynchronous instrument which supports non-additive values, such as room temperature
+- UpDownCounter, a synchronous instrument which supports increments and decrements, such as number of active requests
+- Asynchronous UpDownCounter, a asynchronous instrument which supports increments and decrements
 
 You can create a Counter instrument by calling [`Meter#createCounter`](https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api_metrics.Meter.html#createCounter). The only required argument to `createCounter` is the _instrument name_, which should describe the item that is being measurement.
 
@@ -153,6 +154,7 @@ is relevant, the second step is to configure the customisations for the the sele
 metrics.
 
 A Metric View is a class that can be instantiated via:
+
 ````typescript
 const view = new View({
   name: 'metric-view', // optionally, give the view a unique name
@@ -163,23 +165,23 @@ const view = new View({
 
 In the above example a View is created which select instruments with the name `http.server.duration` other options to select instruments are:
 
-  - By Instrument Type: use `instrumentType` to select instruments of the given type
-  - By Meter: use `meterName` to select meters with the given name
-  - By Meter Version: use `meterVersion` to select meters with the given version
-  - By Meter Schema URL: use `meterSchemaUrl` to select meters with given schema url
+- By Instrument Type: use `instrumentType` to select instruments of the given type
+- By Meter: use `meterName` to select meters with the given name
+- By Meter Version: use `meterVersion` to select meters with the given version
+- By Meter Schema URL: use `meterSchemaUrl` to select meters with given schema url
 
 The `instrumentName` has support for wildcards, so you can select all instruments
 using `*` or select all instruments starting with 'http.' by using `http.*`.
 
-*Note*: The Views can only be defined when the `MeterProvider` instance gets
+_Note_: The Views can only be defined when the `MeterProvider` instance gets
 instantiated. A proposal is submitted to ease the ability to define Metris Views:
-https://github.com/open-telemetry/oteps/issues/209
+<https://github.com/open-telemetry/oteps/issues/209>
 
 ### Configuring explicit bucket sizes for the Histogram instrument
 
 The Histogram instruments has default set of bucket sizes defined which not might
 not all suit your needs. The bucket sizes can be overriden by configuring a different
-aggregration for the Histogram instrument. The `ExplicitBucketHistogramAggregation` 
+aggregration for the Histogram instrument. The `ExplicitBucketHistogramAggregation`
 should be used to define the bucket sizes for the Histogram instrument.
 
 Below an example is given how you can define explicit buckets for a histogram.
@@ -237,7 +239,7 @@ const dropView = new View({
 });
 ```
 
-Alternatively, you can also drop instruments with a specific instrument name, 
+Alternatively, you can also drop instruments with a specific instrument name,
 for example, all instruments of which the name starts with `http`:
 
 ```typescript
@@ -254,7 +256,7 @@ an instrument, you can create a Metric View which defines which attributes shoul
 be exported. Attributes that are missing in the list will not be exported.
 
 In the example below will drop all attributes except attribute `environment` for
-all instruments. 
+all instruments.
 
 ```typescript
 new View({
@@ -265,25 +267,25 @@ new View({
 })
 ```
 
-# Exporting measurements
+## Exporting measurements
 
 After you have instrumented your application with metrics, you also need to make
 sure that the metrics get collected by your metrics backend. The most common formats
-that are used are Prometheus and OLTP. 
+that are used are Prometheus and OLTP.
 
 The latter is the [Opentelemetry protocol format](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/otlp.md)
 which is supported by the Opentelemetry Collector. The former is based on the [OpenMetrics
 format](https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md) can be consumed by Prometheus and Thanos or other OpenMetrics compatible
 backends.
 
-*Note*: Both Opentelemetry Javascript and Opentelemetry Collector support
+_Note_: Both Opentelemetry Javascript and Opentelemetry Collector support
 exporters for different formats, such as [Cloud Monitoring](https://github.com/GoogleCloudPlatform/opentelemetry-operations-js/tree/master/packages/opentelemetry-cloud-monitoring-exporter).
 
 ## Exporting measurements to Prometheus
 
 If you want to export your metrics to Prometheus you need to initialise Opentelemetry
-to use the Prometheus exporter `PrometheusExporter` which is included in the 
-`@opentelemetry/exporter-prometheus`-package. 
+to use the Prometheus exporter `PrometheusExporter` which is included in the
+`@opentelemetry/exporter-prometheus`-package.
 
 ```typescript
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
@@ -307,13 +309,13 @@ counter.add(10, { pid: process.pid });
 
 In the above example the instantiated `PrometheusExporter` is configured to expose
 a new http server on port 9464. You can now access the metrics at the endpoint
-http://localhost:9464/metrics.  This is the url that can be scraped by Prometheus so it can consumed the metrics collected by Opentelemetry in your application.
+<http://localhost:9464/metrics>.  This is the url that can be scraped by Prometheus so it can consumed the metrics collected by Opentelemetry in your application.
 
 More information about Prometheus and how to configure can be found at:
 [https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config](Prometheus Scraping Config)
 
 For a fully functioning code example for using this exporter, please have a look
-at: https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/examples/prometheus
+at: <https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/examples/prometheus>
 
 ## Exporting measurements to Opentelemetry Protocol
 
@@ -323,7 +325,7 @@ different in the transport method to send the metrics to a backend that supports
 the OTLP protocol, (a) [https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-http](over HTTP) (b) [https://www.npmjs.com/package/@opentelemetry/exporter-metrics-otlp-grpc](over GRPC) (c) [https://www.npmjs.com/package/@opentelemetry/exporter-metrics-otlp-proto](over Protofbuf).
 
 In the example below shows how you can configure Opentelemetry Javascript to use
-the OTLP exporter over HTTP. 
+the OTLP exporter over HTTP.
 
 ```typescript
 const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
@@ -347,4 +349,4 @@ counter.add(10, { 'key': 'value' });
 ```
 
 For a fully functioning code example for using this exporter, please have a look
-at: https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/otlp-exporter-node
+at: <https://github.com/open-telemetry/opentelemetry-js/tree/main/examples/otlp-exporter-node>
