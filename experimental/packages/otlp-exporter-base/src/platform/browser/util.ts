@@ -167,7 +167,7 @@ function retrieveThrottleTime(retryAfter: string): number {
   if (typeof retryAfter === 'object') {
     const currentTime = new Date();
     const retryAfterDate = new Date(retryAfter);
-    let secondsDiff = Math.ceil((retryAfterDate.getTime() - currentTime.getTime()) / 1000);
+    const secondsDiff = Math.ceil((retryAfterDate.getTime() - currentTime.getTime()) / 1000);
 
     // if throttle date is set to now, difference in seconds might be less than 0
     if (secondsDiff <= 0) {
