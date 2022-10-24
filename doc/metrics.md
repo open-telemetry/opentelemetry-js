@@ -13,7 +13,13 @@ _Metrics API Reference: <https://open-telemetry.github.io/opentelemetry-js-api/c
 - [Describing a instrument measurement](#describing-a-instrument-measurement)
   - [Metric Attributes](#metric-attributes)
   - [Semantic Conventions](#semantic-conventions)
-
+- [Configuring metric views](#configuring-metric-views)
+  - [Configuring explicit bucket sizes for the Histogram instrument](#configuring-explicit-bucket-sizes-for-the-histogram-instrument)
+  - [Dropping instrument from being exported](#dropping-instrument-from-being-exported)
+  - [Customising the metric attributes of instrument](#customising-the-metric-attributes-of-instrument)
+- [Exporting measurements](#exporting-measurements)
+  - [Exporting measurements to Prometheus](#exporting-measurements-to-prometheus)
+  - [Exporting measurements to Opentelemetry Protocol](#exporting-measurements-to-opentelemetry-protocol)
 ## Acquiring a Meter
 
 In OpenTelemetry, Metrics measurement operations are performed using methods on a _meter_. You can get a meter by calling [`getMeter`](https://open-telemetry.github.io/opentelemetry-js-api/classes/metricsapi.html#getmetrics) on the global meter provider. `getMeter` takes the name and version of the application or library acquiring the meter, and provides a meter which can be used to create instruments.
@@ -131,7 +137,7 @@ _See the current metrics semantic conventions in the OpenTelemetry Specification
 
 [spec-overview]: https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/overview.md
 
-### Configuring metric views
+## Configuring metric views
 
 A [Metric View](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#view) provides the ability to customise the metrics that are exposed by the
 Metrics SDK. Metric Views allows you to do:
@@ -258,8 +264,6 @@ new View({
   instrumentName: '*',
 })
 ```
-
-### 
 
 # Exporting measurements
 
