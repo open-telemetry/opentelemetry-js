@@ -23,7 +23,7 @@ _Metrics API Reference: <https://open-telemetry.github.io/opentelemetry-js-api/c
   - [Exporting measurements to Opentelemetry Protocol](#exporting-measurements-to-opentelemetry-protocol)
 
 ## Getting Started
-In thie page, you'll leaarn how to setup and metrics from an HTTP server with Fastify. If you're not using Fastify, that's fine -- this guide will also work with Express, etc.
+In thie page, you'll leaarn how to setup Opentelemetry and metrics from an HTTP server with Fastify. If you're not using Fastify, that's fine -- this guide will also work with Express, etc.
 
 ### Installation
 To begin, set up an environment in a new directory:
