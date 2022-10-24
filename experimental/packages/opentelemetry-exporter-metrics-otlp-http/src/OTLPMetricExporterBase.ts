@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import { ExportResult } from '@opentelemetry/core';
+import {
+  ExportResult,
+  getEnv
+} from '@opentelemetry/core';
 import {
   AggregationTemporality,
   AggregationTemporalitySelector,
@@ -22,9 +25,12 @@ import {
   PushMetricExporter,
   ResourceMetrics
 } from '@opentelemetry/sdk-metrics';
-import { defaultOptions, OTLPMetricExporterOptions } from './OTLPMetricExporterOptions';
+import {
+  OTLPMetricExporterOptions
+} from './OTLPMetricExporterOptions';
 import { OTLPExporterBase } from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
+import { diag } from '@opentelemetry/api';
 
 export const CumulativeTemporalitySelector: AggregationTemporalitySelector = () => AggregationTemporality.CUMULATIVE;
 
@@ -41,12 +47,31 @@ export const DeltaTemporalitySelector: AggregationTemporalitySelector = (instrum
   }
 };
 
-function chooseTemporalitySelector(temporalityPreference?: AggregationTemporality): AggregationTemporalitySelector {
-  if (temporalityPreference === AggregationTemporality.DELTA) {
+function chooseTemporalitySelectorFromEnvironment() {
+  const env = getEnv();
+  const configuredTemporality = env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE.trim().toLowerCase();
+
+  if (configuredTemporality === 'cumulative') {
+    return CumulativeTemporalitySelector;
+  }
+  if (configuredTemporality === 'delta') {
     return DeltaTemporalitySelector;
   }
 
+  diag.warn(`OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE is set to '${env.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE}', but only 'cumulative' and 'delta' are allowed. Using default ('cumulative') instead.`);
   return CumulativeTemporalitySelector;
+}
+
+function chooseTemporalitySelector(temporalityPreference?: AggregationTemporality): AggregationTemporalitySelector {
+  // Directly passed preference has priority.
+  if (temporalityPreference != null) {
+    if (temporalityPreference === AggregationTemporality.DELTA) {
+      return DeltaTemporalitySelector;
+    }
+    return CumulativeTemporalitySelector;
+  }
+
+  return chooseTemporalitySelectorFromEnvironment();
 }
 
 export class OTLPMetricExporterBase<T extends OTLPExporterBase<OTLPMetricExporterOptions,
@@ -57,9 +82,9 @@ implements PushMetricExporter {
   protected _aggregationTemporalitySelector: AggregationTemporalitySelector;
 
   constructor(exporter: T,
-    config: OTLPMetricExporterOptions = defaultOptions) {
+    config?: OTLPMetricExporterOptions) {
     this._otlpExporter = exporter;
-    this._aggregationTemporalitySelector = chooseTemporalitySelector(config.temporalityPreference);
+    this._aggregationTemporalitySelector = chooseTemporalitySelector(config?.temporalityPreference);
   }
 
   export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): void {

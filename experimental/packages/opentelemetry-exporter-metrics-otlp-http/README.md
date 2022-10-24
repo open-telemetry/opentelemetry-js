@@ -17,8 +17,10 @@ npm install --save @opentelemetry/exporter-metrics-otlp-http
 ## Service Name
 
 The OpenTelemetry Collector Metrics Exporter does not have a service name configuration.
-In order to set the service name, use the `service.name` resource attribute as prescribed in the [OpenTelemetry Resource Semantic Conventions][semconv-resource-service-name].
-To see sample code and documentation for the traces exporter, visit the [Collector Trace Exporter for web and node][trace-exporter-url].
+In order to set the service name, use the `service.name` resource attribute as prescribed in
+the [OpenTelemetry Resource Semantic Conventions][semconv-resource-service-name].
+To see sample code and documentation for the traces exporter, visit
+the [Collector Trace Exporter for web and node][trace-exporter-url].
 
 ## Metrics in Web
 
@@ -27,6 +29,7 @@ The OTLPMetricExporter in Web expects the endpoint to end in `/v1/metrics`.
 ```js
 import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
+
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
   headers: {}, // an optional object containing custom headers to be sent with each request
@@ -50,7 +53,7 @@ counter.add(10, { 'key': 'value' });
 
 ```js
 const { MeterProvider, PeriodicExportingMetricReader } = require('@opentelemetry/sdk-metrics');
-const { OTLPMetricExporter } =  require('@opentelemetry/exporter-metrics-otlp-http');
+const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-http');
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:4318/v1/metrics
   concurrencyLimit: 1, // an optional limit on pending requests
@@ -70,35 +73,18 @@ counter.add(10, { 'key': 'value' });
 
 ```
 
-## GRPC
+## Environment Variable Configuration
 
-For exporting metrics with GRPC please check [exporter-metrics-otlp-grpc][npm-url-grpc]
+In addition to settings passed to the constructor, the exporter also supports configuration via environment variables:
 
-## PROTOBUF
+| Environment variable                              | Description                                                                                                                                                                                                                                                                                                                                                                                                                |
+|---------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| OTEL_EXPORTER_OTLP_ENDPOINT                       | The endpoint to send metrics to. This will also be used for the traces exporter if `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` is not configured. By default `http://localhost:4318` will be used. `/v1/metrics` will be automatically appended to configured values.                                                                                                                                                             |
+| OTEL_EXPORTER_OTLP_METRICS_ENDPOINT               | The endpoint to send metrics to. By default `https://localhost:4318/v1/metrics` will be used. `v1/metrics` will not be appended automatically and has to be added explicitly.                                                                                                                                                                                                                                              |
+| OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE | The exporters aggregation temporality preference. Valid values are `cumulative`, and `delta`. `cumulative` selects cumulative temporality for all instrument kinds. `delta` selects delta aggregation temporality for Counter, Asynchronous Counter and Histogram instrument kinds, and selects cumulative aggregation for UpDownCounter and Asynchronous UpDownCounter instrument kinds. By default `cumulative` is used. |
 
-For exporting metrics with PROTOBUF please check [exporter-metrics-otlp-proto][npm-url-proto]
-
-## Configuration options as environment variables
-
-Instead of providing options to `OTLPMetricExporter` and `OTLPTraceExporter` explicitly, environment variables may be provided instead.
-
-```sh
-OTEL_EXPORTER_OTLP_ENDPOINT=https://localhost:4318
-# this will automatically append the version and signal path
-# e.g. https://localhost:4318/v1/traces for `OTLPTraceExporter` and https://localhost:4318/v1/metrics for `OTLPMetricExporter`
-```
-
-If the trace and metric exporter endpoints have different providers, the env var for per-signal endpoints are available to use
-
-```sh
-OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=https://trace-service:4318/v1/traces
-OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=https://metric-service:4318/v1/metrics
-# version and signal needs to be explicit
-```
-
-> The per-signal endpoints take precedence and overrides `OTEL_EXPORTER_OTLP_ENDPOINT`
-
-For more details, see [OpenTelemetry Specification on Protocol Exporter][opentelemetry-spec-protocol-exporter].
+> Settings configured programmatically take precedence over environment variables. Per-signal environment variables take
+> precedence over non-per-signal environment variables.
 
 ## Running opentelemetry-collector locally to see the metrics
 
@@ -110,6 +96,8 @@ For more details, see [OpenTelemetry Specification on Protocol Exporter][opentel
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
 - For help or feedback on this project, join us in [GitHub Discussions][discussions-url]
+- For exporting metrics via gRPC please check [exporter-metrics-otlp-grpc][npm-url-grpc]
+- For exporting metrics via protobuf please check [exporter-metrics-otlp-proto][npm-url-proto]
 
 ## License
 
