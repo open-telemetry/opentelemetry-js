@@ -15,7 +15,11 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { InstrumentationLibrary, isTracingSuppressed, sanitizeAttributes } from '@opentelemetry/core';
+import {
+  InstrumentationLibrary,
+  isTracingSuppressed,
+  sanitizeAttributes
+} from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BasicTracerProvider } from './BasicTracerProvider';
 import { IdGenerator } from './IdGenerator';
