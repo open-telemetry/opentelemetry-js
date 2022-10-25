@@ -17,18 +17,18 @@
 import * as api from '@opentelemetry/api';
 import {
   InstrumentationLibrary,
+  sanitizeAttributes,
   isTracingSuppressed,
-  sanitizeAttributes
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BasicTracerProvider } from './BasicTracerProvider';
-import { IdGenerator } from './IdGenerator';
-import { RandomIdGenerator } from './platform';
-import { Sampler } from './Sampler';
 import { Span } from './Span';
-import { SpanProcessor } from './SpanProcessor';
 import { GeneralLimits, SpanLimits, TracerConfig } from './types';
 import { mergeConfig } from './utility';
+import { SpanProcessor } from './SpanProcessor';
+import { Sampler } from './Sampler';
+import { IdGenerator } from './IdGenerator';
+import { RandomIdGenerator } from './platform';
 
 /**
  * This class represents a basic tracer.
