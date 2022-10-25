@@ -6,7 +6,7 @@ For a high-level overview of OpenTelemetry metrics in general and definitions of
 
 _Metrics API Specification: <https://github.com/open-telemetry/opentelemetry-specification/blob/v1.14.0/specification/metrics/api.md>_
 
-_Metrics API Reference: <https://open-telemetry.github.io/opentelemetry-js-api/classes/metricseapi.html>_
+_Metrics API Reference: <https://open-telemetry.github.io/opentelemetry-js/modules/_opentelemetry_api_metrics.html>_
 
 - [Getting Started](#getting-started)
 - [Acquiring a Meter](#acquiring-a-meter)
@@ -233,7 +233,7 @@ example you see that we accessed our `/` endpoint six times.
 
 ## Acquiring a Meter
 
-In OpenTelemetry, Instruments that allow for measurement operations are acquired through a _meter_. You can get a meter by calling [`getMeter`](https://open-telemetry.github.io/opentelemetry-js-api/classes/metricsapi.html#getmetrics) on the global meter provider. `getMeter` takes the name and version of the application or library acquiring the meter, and provides a meter which can be used to create instruments.
+In OpenTelemetry, Instruments that allow for measurement operations are acquired through a _meter_. You can get a meter by calling [`getMeter`](hhttps://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api_metrics.MeterProvider.html#getMeter) on the global meter provider. `getMeter` takes the name and version of the application or library acquiring the meter, and provides a meter which can be used to create instruments.
 
 ```typescript
 import { metrics } from '@opentelemetry/api-metrics';
@@ -243,7 +243,7 @@ const meter = metrics.getMeter("my-application", "0.1.0");
 
 ## Create a metric instrument
 
-In OpenTelemetry, all _metrics_ are composed of [`Instruments`](https://open-telemetry.github.io/opentelemetry-js-api/interfaces/instrument.html). An instrument is responsible for reporting measurements,
+In OpenTelemetry, all _metrics_ are composed of [`Instruments`](https://open-telemetry.github.io/opentelemetry-js/enums/_opentelemetry_sdk_metrics.InstrumentType.html). An instrument is responsible for reporting measurements,
 there are four types of instruments that can be created:
 
 - Counter, a synchronous instrument which supports non-negative increments
