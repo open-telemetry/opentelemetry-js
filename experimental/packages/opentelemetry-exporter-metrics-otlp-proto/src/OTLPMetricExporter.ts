@@ -15,7 +15,6 @@
  */
 
 import {
-  defaultOptions,
   OTLPMetricExporterOptions
 } from '@opentelemetry/exporter-metrics-otlp-http';
 import { ServiceClientType, OTLPProtoExporterNodeBase } from '@opentelemetry/otlp-proto-exporter-base';
@@ -34,7 +33,7 @@ const DEFAULT_COLLECTOR_URL = `http://localhost:4318/${DEFAULT_COLLECTOR_RESOURC
 
 class OTLPMetricExporterNodeProxy extends OTLPProtoExporterNodeBase<ResourceMetrics, IExportMetricsServiceRequest> {
 
-  constructor(config: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions = defaultOptions) {
+  constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {
     super(config);
     this.headers = Object.assign(
       this.headers,
@@ -64,7 +63,7 @@ class OTLPMetricExporterNodeProxy extends OTLPProtoExporterNodeBase<ResourceMetr
 }
 
 export class OTLPMetricExporter extends OTLPMetricExporterBase<OTLPMetricExporterNodeProxy> {
-  constructor(config: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions = defaultOptions) {
+  constructor(config?: OTLPExporterNodeConfigBase & OTLPMetricExporterOptions) {
     super(new OTLPMetricExporterNodeProxy(config), config);
   }
 }

@@ -15,12 +15,17 @@
  */
 
 
-import { diag, DiagLogger } from '@opentelemetry/api';
+import {
+  diag,
+  DiagLogger
+} from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';
 import {
+  CumulativeTemporalitySelector,
+  DeltaTemporalitySelector,
   OTLPMetricExporterOptions
 } from '../../src';
 
@@ -28,22 +33,31 @@ import {
   OTLPMetricExporter
 } from '../../src/platform/node';
 import {
+  collect,
   ensureCounterIsCorrect,
   ensureExportMetricsServiceRequestIsSet,
-  ensureObservableGaugeIsCorrect,
   ensureHistogramIsCorrect,
-  mockCounter,
-  mockObservableGauge,
-  mockHistogram,
-  collect,
-  shutdown,
-  setUp,
+  ensureObservableGaugeIsCorrect,
   HISTOGRAM_AGGREGATION_VIEW,
+  mockCounter,
+  mockHistogram,
+  mockObservableGauge,
+  setUp,
+  shutdown,
 } from '../metricsHelper';
 import { MockedResponse } from './nodeHelpers';
-import { AggregationTemporality, ResourceMetrics } from '@opentelemetry/sdk-metrics';
-import { Stream, PassThrough } from 'stream';
-import { OTLPExporterError, OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
+import {
+  AggregationTemporality,
+  ResourceMetrics
+} from '@opentelemetry/sdk-metrics';
+import {
+  PassThrough,
+  Stream
+} from 'stream';
+import {
+  OTLPExporterError,
+  OTLPExporterNodeConfigBase
+} from '@opentelemetry/otlp-exporter-base';
 import { IExportMetricsServiceRequest } from '@opentelemetry/otlp-transformer';
 
 let fakeRequest: PassThrough;
@@ -189,6 +203,34 @@ describe('OTLPMetricExporter - node with json over http', () => {
       assert.strictEqual(collectorExporter._otlpExporter.headers.bar, 'foo');
       envSource.OTEL_EXPORTER_OTLP_METRICS_HEADERS = '';
       envSource.OTEL_EXPORTER_OTLP_HEADERS = '';
+    });
+    it('should use delta temporality defined via env', () => {
+      for (const envValue of ['delta', 'DELTA', 'DeLTa', 'delta     ']) {
+        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = envValue;
+        const exporter = new OTLPMetricExporter();
+        assert.strictEqual(exporter['_aggregationTemporalitySelector'], DeltaTemporalitySelector);
+      }
+    });
+    it('should use cumulative temporality defined via env', () => {
+      for (const envValue of ['cumulative', 'CUMULATIVE', 'CuMULaTIvE', 'cumulative    ']) {
+        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = envValue;
+        const exporter = new OTLPMetricExporter();
+        assert.strictEqual(exporter['_aggregationTemporalitySelector'], CumulativeTemporalitySelector);
+      }
+    });
+    it('should configure cumulative temporality with invalid value in env', () => {
+      for (const envValue of ['invalid', ' ']) {
+        envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = envValue;
+        const exporter = new OTLPMetricExporter();
+        assert.strictEqual(exporter['_aggregationTemporalitySelector'], CumulativeTemporalitySelector);
+      }
+    });
+    it('should respect explicit config over environment variable', () => {
+      envSource.OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = 'cumulative';
+      const exporter = new OTLPMetricExporter({
+        temporalityPreference: AggregationTemporality.DELTA
+      });
+      assert.strictEqual(exporter['_aggregationTemporalitySelector'], DeltaTemporalitySelector);
     });
   });
 

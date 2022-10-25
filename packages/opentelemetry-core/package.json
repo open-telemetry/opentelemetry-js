@@ -93,5 +93,6 @@
   "dependencies": {
     "@opentelemetry/semantic-conventions": "1.7.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-core"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-core",
+  "sideEffects": false
 }
