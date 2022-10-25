@@ -17,6 +17,8 @@ All notable changes to this project will be documented in this file.
   [#3327](https://github.com/open-telemetry/opentelemetry-js/pull/3327) @dyladan
 * fix(resources): fix EnvDetector throwing errors when attribute values contain spaces
   [#3295](https://github.com/open-telemetry/opentelemetry-js/issues/3295)
+* fix(trace): fix an issue which caused negative span durations in web based spans
+  [#3359](https://github.com/open-telemetry/opentelemetry-js/pull/3359) @dyladan
 
 ### :books: (Refine Doc)
 
