@@ -17,15 +17,17 @@ _Metrics API Reference: <https://open-telemetry.github.io/opentelemetry-js-api/c
 - [Configuring metric views](#configuring-metric-views)
   - [Configuring explicit bucket sizes for the Histogram instrument](#configuring-explicit-bucket-sizes-for-the-histogram-instrument)
   - [Dropping instrument from being exported](#dropping-instrument-from-being-exported)
-  - [Customizing the metric attributes of instrument](#customising-the-metric-attributes-of-instrument)
+  - [Customizing the metric attributes of instrument](#customizing-the-metric-attributes-of-instrument)
 - [Exporting measurements](#exporting-measurements)
   - [Exporting measurements to Prometheus](#exporting-measurements-to-prometheus)
   - [Exporting measurements to Opentelemetry Protocol](#exporting-measurements-to-opentelemetry-protocol)
 
 ## Getting Started
+
 In this page, you'll learn how to setup OpenTelemetry JS to export metrics from an HTTP server with Fastify. If you're not using Fastify, that's fine -- this guide will also work with Express, etc.
 
 ### Installation
+
 To begin, set up an environment in a new directory:
 
 ```bash
@@ -46,6 +48,7 @@ packages, such as `http`, `fetch` etc. The package `@opentelemetry/exporter-prom
 to export our collected metrics to Prometheus.
 
 ### Create the sample HTTP Server
+
 Create a file `app.js`:
 
 ```javaScript
@@ -116,10 +119,10 @@ port 3000 with command:
 node app.js
 ```
 
-Now when accessing the HTTP server via http://localhost:3000 you will
+Now when accessing the HTTP server via [http://localhost:3000](http://localhost:3000) you will
 see the following:
 
-```
+```json
 {"hello":"world"}
 ```
 
@@ -206,12 +209,12 @@ Now run the application again:
 node app.js
 ```
 
-When you navigate to http://localhost:3000, the counter instrument will be increased
+When you navigate to [http://localhost:3000](http://localhost:3000), the counter instrument will be increased
 each time the page is accessed. If you want to see the exporter instruments, you
 can access via the dedicates metrics endpoint for Prometheus by accessing:
-http://localhost:9464/metrics the contents will look similar to:
+[http://localhost:9464/metrics](http://localhost:9464/metrics) the contents will look similar to:
 
-```
+```text
 # HELP request_counter_total description missing
 # TYPE request_counter_total counter
 request_counter_total 6 1666624810428
@@ -220,7 +223,7 @@ request_counter_total 6 1666624810428
 In the above example output you can that one instrument is available with the
 name `request_counter_total`:
 
-```
+```text
 request_counter_total 6 1666624810428
 ```
 
@@ -257,7 +260,6 @@ const counter = meter.createCounter("events.counter");
 
 // increase the counter
 counter.add(1);
-
 ```
 
 Most of the time, instruments will be used to measure operations in your application. The following example shows what it might look like to manually measure a function's duration.
