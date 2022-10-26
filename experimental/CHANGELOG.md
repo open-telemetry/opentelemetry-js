@@ -6,6 +6,9 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
+* Add semver check to metrics API [#3357](https://github.com/open-telemetry/opentelemetry-js/pull/3357) @dyladan
+  * Previously API versions were only considered compatible if the API was exactly the same
+
 ### :rocket: (Enhancement)
 
 * feat(metrics-sdk): Add tracing suppresing for Metrics Export [#3332](https://github.com/open-telemetry/opentelemetry-js/pull/3332) @hectorhdzg
