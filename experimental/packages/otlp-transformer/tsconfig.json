@@ -25,11 +25,7 @@
       "path": "../../../packages/opentelemetry-sdk-trace-base"
     },
     {
-<<<<<<< HEAD
       "path": "../../../packages/sdk-metrics"
-=======
-      "path": "../opentelemetry-sdk-metrics"
->>>>>>> origin/main
     }
   ]
 }
