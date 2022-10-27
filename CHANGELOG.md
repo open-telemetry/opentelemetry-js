@@ -24,6 +24,11 @@ All notable changes to this project will be documented in this file.
 
 * ci: run browser tests without circle [#3328](https://github.com/open-telemetry/opentelemetry-js/pull/3328) @dyladan
 
+## Metrics API 1.0.0
+
+Metrics API is now stable and generally available.
+There are no changes between 1.0.0 and the previous 0.33.0 version.
+
 ## 1.7.0
 
 ### :bug: (Bug Fix)

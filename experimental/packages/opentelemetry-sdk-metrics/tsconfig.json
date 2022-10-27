@@ -13,13 +13,13 @@
       "path": "../../../api"
     },
     {
+      "path": "../../../api-metrics"
+    },
+    {
       "path": "../../../packages/opentelemetry-core"
     },
     {
       "path": "../../../packages/opentelemetry-resources"
-    },
-    {
-      "path": "../opentelemetry-api-metrics"
     }
   ]
 }
