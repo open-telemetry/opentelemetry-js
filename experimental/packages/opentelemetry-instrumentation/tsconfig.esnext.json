@@ -10,7 +10,7 @@
   ],
   "references": [
     {
-      "path": "../opentelemetry-api-metrics/tsconfig.esnext.json"
+      "path": "../../../api-metrics/tsconfig.esnext.json"
     }
   ]
 }
