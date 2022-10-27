@@ -1,6 +1,7 @@
 {
   "name": "prometheus-example",
   "version": "0.34.0",
+  "private": true,
   "description": "Example of using @opentelemetry/sdk-metrics and @opentelemetry/exporter-prometheus",
   "main": "index.js",
   "scripts": {
