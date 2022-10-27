@@ -2,14 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## 1.8.0
 
 ### :boom: Breaking Change
 
 ### :rocket: (Enhancement)
 
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.8.0
+
+* `@opentelemetry/sdk-metrics` has been promoted to stable
+
+### :rocket: (Enhancement)
+
 * feat(sdk-trace): re-export sdk-trace-base in sdk-trace-node and web [#3319](https://github.com/open-telemetry/opentelemetry-js/pull/3319) @legendecas
 * feat: enable tree shaking [#3329](https://github.com/open-telemetry/opentelemetry-js/pull/3329) @pkanal
+* feat(metrics-sdk): Add tracing suppresing for Metrics Export [#3332](https://github.com/open-telemetry/opentelemetry-js/pull/3332) @hectorhdzg
 
 ### :bug: (Bug Fix)
 
@@ -17,8 +30,6 @@ All notable changes to this project will be documented in this file.
   [#3327](https://github.com/open-telemetry/opentelemetry-js/pull/3327) @dyladan
 * fix(resources): fix EnvDetector throwing errors when attribute values contain spaces
   [#3295](https://github.com/open-telemetry/opentelemetry-js/issues/3295)
-
-### :books: (Refine Doc)
 
 ### :house: (Internal)
 
@@ -28,6 +39,11 @@ All notable changes to this project will be documented in this file.
 
 Metrics API is now stable and generally available.
 There are no changes between 1.0.0 and the previous 0.33.0 version.
+
+### :boom: Breaking Change
+
+* Add semver check to metrics API [#3357](https://github.com/open-telemetry/opentelemetry-js/pull/3357) @dyladan
+  * Previously API versions were only considered compatible if the API was exactly the same
 
 ## 1.7.0
 
