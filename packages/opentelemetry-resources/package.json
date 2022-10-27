@@ -15,8 +15,8 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build tsconfig.all.json",
-    "clean": "tsc --build --clean tsconfig.all.json",
+    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "codecov:webworker": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "lint": "eslint . --ext .ts",

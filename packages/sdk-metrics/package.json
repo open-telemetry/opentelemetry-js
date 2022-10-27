@@ -9,8 +9,8 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "prepublishOnly": "npm run compile",
-    "compile": "tsc --build tsconfig.all.json",
-    "clean": "tsc --build --clean tsconfig.all.json",
+    "compile": "tsc --build tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
+    "clean": "tsc --build --clean tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "test:browser": "nyc karma start --single-run",
     "tdd": "npm run test -- --watch-extensions ts --watch",
@@ -19,7 +19,7 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "version": "node ../../scripts/version-update.js",
-    "watch": "tsc --build --watch tsconfig.all.json",
+    "watch": "tsc --build --watch tsconfig.json tsconfig.esm.json tsconfig.esnext.json",
     "precompile": "lerna run version --scope $(npm pkg get name) --include-dependencies",
     "prewatch": "node ../../scripts/version-update.js",
     "peer-api-check": "node ../../scripts/peer-api-check.js"

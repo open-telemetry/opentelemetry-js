@@ -26,6 +26,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :house: (Internal)
 
+* chore: automatically generate tsconfigs [#3432](https://github.com/open-telemetry/opentelemetry-js/pull/3432) @legendecas
+
 ## 1.8.0
 
 * `@opentelemetry/sdk-metrics` has been promoted to stable
