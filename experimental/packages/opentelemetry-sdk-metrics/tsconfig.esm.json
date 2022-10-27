@@ -7,10 +7,5 @@
   },
   "include": [
     "src/**/*.ts"
-  ],
-  "references": [
-    {
-      "path": "../opentelemetry-api-metrics/tsconfig.esm.json"
-    }
   ]
 }

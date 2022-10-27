@@ -1,8 +1,15 @@
 {
-  "extends": "../../tsconfig.es5.json",
-  "compilerOptions": {
-    "rootDir": ".",
-    "outDir": "build"
-  },
-  "include": ["src/**/*.ts", "test/**/*.ts"]
+  "extends": "../../tsconfig.base.json",
+  "files": [],
+  "references": [
+    {
+      "path": "tsconfig.default.json"
+    },
+    {
+      "path": "tsconfig.esm.json"
+    },
+    {
+      "path": "tsconfig.esnext.json"
+    }
+  ]
 }

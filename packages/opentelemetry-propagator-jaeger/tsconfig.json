@@ -1,14 +1,16 @@
 {
   "extends": "../../tsconfig.base",
-  "compilerOptions": {
-    "rootDir": ".",
-    "outDir": "build"
-  },
-  "include": [
-    "src/**/*.ts",
-    "test/**/*.ts"
-  ],
+  "files": [],
   "references": [
+    {
+      "path": "tsconfig.default.json"
+    },
+    {
+      "path": "tsconfig.esm.json"
+    },
+    {
+      "path": "tsconfig.esnext.json"
+    },
     {
       "path": "../../api"
     },

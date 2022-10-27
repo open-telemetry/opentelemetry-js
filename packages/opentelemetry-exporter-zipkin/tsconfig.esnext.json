@@ -7,19 +7,5 @@
   },
   "include": [
     "src/**/*.ts"
-  ],
-  "references": [
-    {
-      "path": "../opentelemetry-core/tsconfig.esnext.json"
-    },
-    {
-      "path": "../opentelemetry-resources/tsconfig.esnext.json"
-    },
-    {
-      "path": "../opentelemetry-sdk-trace-base/tsconfig.esnext.json"
-    },
-    {
-      "path": "../opentelemetry-semantic-conventions/tsconfig.esnext.json"
-    }
   ]
 }
