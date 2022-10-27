@@ -45,8 +45,8 @@
     "access": "public"
   },
   "devDependencies": {
-    "@grpc/grpc-js": "1.5.9",
-    "@grpc/proto-loader": "0.6.9",
+    "@grpc/grpc-js": "^1.7.1",
+    "@grpc/proto-loader": "^0.7.3",
     "@opentelemetry/api": "^1.0.0",
     "@opentelemetry/api-metrics": "^1.0.0",
     "@opentelemetry/context-async-hooks": "1.8.0",
@@ -76,5 +76,6 @@
     "@opentelemetry/instrumentation": "0.34.0",
     "@opentelemetry/semantic-conventions": "1.8.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-grpc"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-grpc",
+  "sideEffects": false
 }

@@ -65,5 +65,6 @@
     "@opentelemetry/resources": "1.8.0",
     "@opentelemetry/sdk-metrics": "1.8.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-prometheus"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-prometheus",
+  "sideEffects": false
 }

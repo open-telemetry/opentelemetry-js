@@ -14,9 +14,17 @@
  * limitations under the License.
  */
 
-import { AggregationTemporality } from '@opentelemetry/sdk-metrics';
-import { OTLPExporterConfigBase } from '@opentelemetry/otlp-exporter-base';
+import * as assert from 'assert';
+import { VERSION } from '../../src/version';
 
-export interface OTLPMetricExporterOptions extends OTLPExporterConfigBase {
-  temporalityPreference?: AggregationTemporality
-}
+describe('version', () => {
+  it('should have generated VERSION.ts', () => {
+    const pjson = require('../../package.json');
+    assert.strictEqual(pjson.version, VERSION);
+  });
+
+  it('prerelease tag versions are banned', () => {
+    // see https://github.com/open-telemetry/opentelemetry-js-api/issues/74
+    assert.ok(VERSION.match(/^\d+\.\d+\.\d+$/));
+  });
+});

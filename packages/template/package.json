@@ -68,6 +68,7 @@
     "LICENSE",
     "README.md"
   ],
+  "sideEffects": false,
   "Add these to files if browser is supported": [
     "build/esm/**/*.js",
     "build/esm/**/*.js.map",
