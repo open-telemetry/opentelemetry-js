@@ -54,6 +54,9 @@
       "path": "api"
     },
     {
+      "path": "api-metrics"
+    },
+    {
       "path": "packages/opentelemetry-context-async-hooks"
     },
     {
@@ -109,9 +112,6 @@
     },
     {
       "path": "experimental/packages/exporter-trace-otlp-proto"
-    },
-    {
-      "path": "experimental/packages/opentelemetry-api-metrics"
     },
     {
       "path": "experimental/packages/opentelemetry-exporter-metrics-otlp-grpc"
