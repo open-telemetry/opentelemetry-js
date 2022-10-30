@@ -263,9 +263,10 @@ If nothing is specified the global registered provider is used. Usually this is 
 There might be usecase where someone has the need for more providers within an application. Please note that special care must be takes in such setups
 to avoid leaking information from one provider to the other because there are a lot places where e.g. the global `ContextManager` or `Propagator` is used.
 
-## ESM within Node.JS
+## Instrumentation for ESM Module In NodeJS (experimental)
 
-As the module loading mechanism for ESM is different than CJS, you need to select a custom loader so instrumentation can load hook on the esm module it want to patch, to do so you need to provide `--loader=import-in-the-middle/hook.mjs` to the `node` binary. This only works for Node.JS > 12.
+As the module loading mechanism for ESM is different than CJS, you need to select a custom loader so instrumentation can load hook on the esm module it want to patch. To do so, you must provide the `--experimental-loader=import-in-the-middle/hook.mjs` flag to the `node` binary, alternatively you can set the `NODE_OPTIONS` environment variable to `--experimental-loader=import-in-the-middle/hook.mjs`.
+As the ESM module loader from NodeJS is experimental, so is our support for it. Feel free to provide feedback or report issues about it.
 
 ## License
 
