@@ -28,7 +28,7 @@ export type Hooked = {
  * We are forced to re-type there because ImportInTheMiddle is exported as normal CJS
  * in the JS files but transpiled ESM (with a default export) in its typing.
  */
- const ESMHook = ImportInTheMiddle as unknown as typeof ImportInTheMiddle.default;
+const ESMHook = ImportInTheMiddle as unknown as typeof ImportInTheMiddle.default;
 
 /**
  * Whether Mocha is running in this process
@@ -59,7 +59,6 @@ export class RequireInTheMiddleSingleton {
   }
 
   private _initialize() {
-    // 
     const onHook = (exports: any, name: string, basedir: string | undefined | void) => {
       // For internal files on Windows, `name` will use backslash as the path separator
       const normalizedModuleName = normalizePathSeparators(name);
@@ -71,11 +70,11 @@ export class RequireInTheMiddleSingleton {
       }
 
       return exports;
-    }
+    };
     // Intercept all `require` calls; we will filter the matching ones below
     RequireInTheMiddle(null, { internals: true }, onHook);
     // We can give no module to patch but this signature isn't exposed in typings
-    new ESMHook(null as any, { internals: true }, onHook)
+    new ESMHook(null as any, { internals: true }, onHook);
   }
 
   /**

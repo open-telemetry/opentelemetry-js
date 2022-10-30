@@ -32,7 +32,6 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 * feat: enable tree shaking [#3329](https://github.com/open-telemetry/opentelemetry-js/pull/3329) @pkanal
 * feat(instrumentation): add support for esm module [#2846](https://github.com/open-telemetry/opentelemetry-js/pull/2846) @vmarchaud
 
-
 ### :bug: (Bug Fix)
 
 * fix(sdk-trace): enforce consistent span durations
