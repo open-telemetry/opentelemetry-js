@@ -47,7 +47,9 @@
     "tdd": "npm run tdd:node",
     "tdd:node": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
-    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
+    "test:cjs": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
+    "test:esm": "nyc node --loader=import-in-the-middle/hook.mjs node_modules/.bin/_mocha test/node/*.test.mjs",
+    "test": "npm run test:cjs && npm run test:esm",
     "test:browser": "nyc karma start --single-run",
     "version": "node ../../../scripts/version-update.js",
     "watch": "tsc --build --watch tsconfig.all.json",
@@ -68,6 +70,7 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
+    "import-in-the-middle": "^1.3.4",
     "require-in-the-middle": "^5.0.3",
     "semver": "^7.3.2",
     "shimmer": "^1.2.1"
