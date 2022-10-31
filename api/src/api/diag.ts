@@ -30,6 +30,10 @@ import {
 
 const API_NAME = 'diag';
 
+interface LoggerOptions {
+  suppressOverrideMessage?: boolean;
+}
+
 /**
  * Singleton object which represents the entry point to the OpenTelemetry internal
  * diagnostic API
@@ -68,7 +72,7 @@ export class DiagAPI implements DiagLogger {
     self.setLogger = (
       logger: DiagLogger,
       logLevel: DiagLogLevel = DiagLogLevel.INFO,
-      suppressOverrideMessage = false
+      options: LoggerOptions = {}
     ) => {
       if (logger === self) {
         // There isn't much we can do here.
@@ -84,7 +88,7 @@ export class DiagAPI implements DiagLogger {
       const oldLogger = getGlobal('diag');
       const newLogger = createLogLevelDiagLogger(logLevel, logger);
       // There already is an logger registered. We'll let it know before overwriting it.
-      if (oldLogger && !suppressOverrideMessage) {
+      if (oldLogger && !options.suppressOverrideMessage) {
         const stack = new Error().stack ?? '<failed to generate stacktrace>';
         oldLogger.warn(`Current logger will be overwritten from ${stack}`);
         newLogger.warn(
