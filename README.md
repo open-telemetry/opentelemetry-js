@@ -44,7 +44,7 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 ## Quick Start
 
 The following describes how to set up tracing for a basic web application.
-For more detailed documentation, see the website at https://opentelemetry.io/docs/instrumentation/js/.
+For more detailed documentation, see the website at <https://opentelemetry.io/docs/instrumentation/js/>.
 
 ### Installation
 
