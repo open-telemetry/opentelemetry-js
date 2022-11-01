@@ -13,7 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
-  const testsContext = require.context('./common', true);
-  testsContext.keys().forEach(testsContext);
-}
+
+export { DiagConsoleLogger } from './diag/consoleLogger';
+export {
+  DiagLogFunction,
+  DiagLogger,
+  DiagLogLevel,
+  ComponentLoggerOptions,
+} from './diag/types';
+
+import { DiagAPI } from './api/diag';
+export type { DiagAPI } from './api/diag';
+
+/**
+ * Entrypoint for Diag API.
+ * Defines Diagnostic handler used for internal diagnostic logging operations.
+ * The default provides a Noop DiagLogger implementation which may be changed via the
+ * diag.setLogger(logger: DiagLogger) function.
+ */
+export const diag = DiagAPI.instance();

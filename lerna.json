@@ -3,7 +3,6 @@
   "npmClient": "npm",
   "packages": [
     "api",
-    "api-metrics",
     "packages/*",
     "experimental/packages/*",
     "experimental/examples/*",

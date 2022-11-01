@@ -13,7 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
-  const testsContext = require.context('./common', true);
-  testsContext.keys().forEach(testsContext);
-}
+
+export {
+  createContextKey,
+  ROOT_CONTEXT,
+} from './context/context';
+export {
+  Context,
+  ContextManager,
+} from './context/types';
+
+import { ContextAPI } from './api/context';
+export type { ContextAPI } from './api/context';
+/** Entrypoint for context API */
+export const context = ContextAPI.getInstance();

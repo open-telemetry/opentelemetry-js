@@ -13,7 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
-  const testsContext = require.context('./common', true);
-  testsContext.keys().forEach(testsContext);
-}
+
+import * as assert from 'assert';
+import { VERSION } from '../../../src/version';
+
+describe('version', () => {
+  it('should have generated VERSION.ts', () => {
+    const pjson = require('../../../package.json');
+    assert.strictEqual(pjson.version, VERSION);
+  });
+
+  it('prerelease tag versions are banned', () => {
+    // see https://github.com/open-telemetry/opentelemetry-js-api/issues/74
+    assert.ok(VERSION.match(/^\d+\.\d+\.\d+$/));
+  });
+});

@@ -13,7 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-{
-  const testsContext = require.context('./common', true);
-  testsContext.keys().forEach(testsContext);
-}
+
+export {
+  TextMapPropagator,
+  TextMapSetter,
+  TextMapGetter,
+  defaultTextMapGetter,
+  defaultTextMapSetter,
+} from './propagation/TextMapPropagator';
+
+import { PropagationAPI } from './api/propagation';
+export type { PropagationAPI } from './api/propagation';
+/** Entrypoint for propagation API */
+export const propagation = PropagationAPI.getInstance();
