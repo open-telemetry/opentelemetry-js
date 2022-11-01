@@ -15,9 +15,10 @@
  */
 
 import {
+  Counter,
   Meter,
   ObservableResult
-} from '@opentelemetry/api-metrics';
+} from '@opentelemetry/api';
 import { MeterProvider } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -28,7 +29,6 @@ import {
   mockHrTime
 } from './util';
 import { SinonStubbedInstance } from 'sinon';
-import { Counter } from '@opentelemetry/api-metrics';
 
 const serializedEmptyResourceLines = [
   '# HELP target_info Target metadata',

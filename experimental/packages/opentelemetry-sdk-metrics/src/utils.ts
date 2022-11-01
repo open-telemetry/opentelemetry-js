@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { MetricAttributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
 
 export type Maybe<T> = T | undefined;

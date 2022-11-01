@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import {
   MetricAttributes,
   UpDownCounter
-} from '@opentelemetry/api-metrics';
+} from '@opentelemetry/api';
 import {
   Aggregation,
   AggregationTemporality,

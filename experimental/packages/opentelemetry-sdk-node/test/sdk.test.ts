@@ -21,8 +21,8 @@ import {
   trace,
   diag,
   DiagLogLevel,
+  metrics,
 } from '@opentelemetry/api';
-import { metrics } from '@opentelemetry/api-metrics';
 import {
   AsyncHooksContextManager,
   AsyncLocalStorageContextManager,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Observable } from '@opentelemetry/api-metrics';
+import { Observable } from '@opentelemetry/api';
 import * as assert from 'assert';
 import {
   CounterInstrument,
