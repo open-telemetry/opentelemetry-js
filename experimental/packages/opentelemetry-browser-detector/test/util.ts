@@ -15,7 +15,7 @@
  */
 import {Suite} from 'mocha';
 import * as assert from 'assert';
-import {BROWSER_ATTRIBUTES} from './types';
+import {BROWSER_ATTRIBUTES} from '../src/types';
 import {Resource} from '@opentelemetry/resources';
 
 export function describeBrowser(title: string, fn: (this: Suite) => void) {

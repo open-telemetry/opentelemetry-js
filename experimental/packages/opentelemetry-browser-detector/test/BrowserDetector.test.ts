@@ -16,23 +16,23 @@
 import * as sinon from 'sinon';
 import { Resource } from '@opentelemetry/resources';
 import { browserDetector } from '../src/BrowserDetector';
-import { describeBrowser } from '../src/util';
 import {
+  describeBrowser,
   assertResource,
   assertEmptyResource
-} from '../src/util';
+} from './util';
 
 describeBrowser('browserDetector()', () => {
   afterEach(() => {
     sinon.restore();
   });
 
-  it('should return browser information', async () => {
+  it('should return browser information with userAgentData', async () => {
     sinon.stub(globalThis, 'navigator').value({
       userAgent: 'dddd',
-      language:'en-US',
-      userAgentData:{
-        platform:'platform',
+      language: 'en-US',
+      userAgentData: {
+        platform: 'platform',
         brands:[
           {
             brand: 'Chromium',
@@ -47,7 +47,7 @@ describeBrowser('browserDetector()', () => {
             version: '99'
           }
         ],
-        mobile:false
+        mobile: false
       }
     });
 
@@ -61,9 +61,23 @@ describeBrowser('browserDetector()', () => {
       ],
       mobile: false,
       language: 'en-US',
+    });
+  });
+
+  it('should return browser information with userAgent', async () => {
+    sinon.stub(globalThis, 'navigator').value({
+      userAgent: 'dddd',
+      language: 'en-US',
+      userAgentData: undefined,
+    });
+
+    const resource: Resource = await browserDetector.detect();
+    assertResource(resource, {
+      language: 'en-US',
       user_agent: 'dddd'
     });
   });
+
   it('should return empty resources if user agent is missing', async () => {
     sinon.stub(globalThis, 'navigator').value({
       userAgent: '',
