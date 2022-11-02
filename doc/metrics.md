@@ -119,7 +119,7 @@ port 3000 with command:
 node app.js
 ```
 
-Now when accessing the HTTP server via [http://localhost:3000](http://localhost:3000) you will
+Now when accessing the HTTP server via <http://localhost:3000> you will
 see the following:
 
 ```json
