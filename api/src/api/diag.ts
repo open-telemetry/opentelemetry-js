@@ -122,7 +122,7 @@ export class DiagAPI implements DiagLogger {
    * @param logLevel - [Optional] The DiagLogLevel used to filter logs sent to the logger. If not provided it will default to INFO.
    * @returns true if the logger was successfully registered, else false
    */
-  public setLogger!: (logger: DiagLogger, logLevel?: DiagLogLevel) => boolean;
+  public setLogger!: (logger: DiagLogger, logLevel?: DiagLogLevel, options?: LoggerOptions) => boolean;
   /**
    *
    */
