@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+### Features
+
+* Add ForceFlush and Shutdown as optional functions to TraceProvider ([#3323](https://github.com/open-telemetry/opentelemetry-js/pull/3323))
+
 ## [1.2.0](https://www.github.com/open-telemetry/opentelemetry-js-api/compare/v1.1.0...v1.2.0) (2022-08-09)
 
 ### Features
