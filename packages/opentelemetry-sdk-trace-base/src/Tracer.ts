@@ -19,8 +19,6 @@ import {
   InstrumentationLibrary,
   sanitizeAttributes,
   isTracingSuppressed,
-  AnchoredClock,
-  otperformance,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BasicTracerProvider } from './BasicTracerProvider';
@@ -74,22 +72,10 @@ export class Tracer implements api.Tracer {
       context = api.trace.deleteSpan(context);
     }
     const parentSpan = api.trace.getSpan(context);
-    let clock: AnchoredClock | undefined;
-    if (parentSpan) {
-      clock = (parentSpan as any)['_clock'];
-    }
-
-    if (!clock) {
-      clock = new AnchoredClock(Date, otperformance);
-      if (parentSpan) {
-        (parentSpan as any)['_clock'] = clock;
-      }
-    }
 
     if (isTracingSuppressed(context)) {
       api.diag.debug('Instrumentation suppressed, returning Noop Span');
       const nonRecordingSpan = api.trace.wrapSpanContext(api.INVALID_SPAN_CONTEXT);
-      (nonRecordingSpan as any)['_clock'] = clock;
       return nonRecordingSpan;
     }
 
@@ -134,7 +120,6 @@ export class Tracer implements api.Tracer {
     if (samplingResult.decision === api.SamplingDecision.NOT_RECORD) {
       api.diag.debug('Recording is off, propagating context in a non-recording span');
       const nonRecordingSpan = api.trace.wrapSpanContext(spanContext);
-      (nonRecordingSpan as any)['_clock'] = clock;
       return nonRecordingSpan;
     }
 
@@ -147,7 +132,6 @@ export class Tracer implements api.Tracer {
       parentSpanId,
       links,
       options.startTime,
-      clock,
     );
     // Set initial span attributes. The attributes object may have been mutated
     // by the sampler, so we sanitize the merged attributes before setting them.
