@@ -120,6 +120,7 @@ export class DiagAPI implements DiagLogger {
    *
    * @param logger - [Optional] The DiagLogger instance to set as the default logger.
    * @param logLevel - [Optional] The DiagLogLevel used to filter logs sent to the logger. If not provided it will default to INFO.
+   * @param options - [Optional] And object which can contain `suppressOverrideMessage: boolean` which will suppress the warning normally logged when a logger is already registered.
    * @returns true if the logger was successfully registered, else false
    */
   public setLogger!: (logger: DiagLogger, logLevel?: DiagLogLevel, options?: LoggerOptions) => boolean;
