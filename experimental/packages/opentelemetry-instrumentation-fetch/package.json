@@ -92,5 +92,6 @@
     "@opentelemetry/sdk-trace-web": "1.7.0",
     "@opentelemetry/semantic-conventions": "1.7.0"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-fetch"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-instrumentation-fetch",
+  "sideEffects": false
 }

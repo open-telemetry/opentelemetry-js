@@ -3,8 +3,10 @@
   "npmClient": "npm",
   "packages": [
     "api",
+    "api-metrics",
     "packages/*",
     "experimental/packages/*",
+    "experimental/examples/*",
     "experimental/backwards-compatability/*",
     "integration-tests/*",
     "selenium-tests",

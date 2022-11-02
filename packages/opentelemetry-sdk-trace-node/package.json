@@ -71,5 +71,6 @@
     "@opentelemetry/sdk-trace-base": "1.7.0",
     "semver": "^7.3.5"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node",
+  "sideEffects": false
 }

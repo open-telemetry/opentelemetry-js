@@ -29,6 +29,7 @@ import type {
   MetricAttributeValue
 } from '@opentelemetry/api-metrics';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
+import { Resource } from '@opentelemetry/resources';
 
 type PrometheusDataTypeLiteral =
   | 'counter'
@@ -167,6 +168,8 @@ function stringify(
   }\n`;
 }
 
+const NO_REGISTERED_METRICS = '# no registered metrics';
+
 export class PrometheusSerializer {
   private _prefix: string | undefined;
   private _appendTimestamp: boolean;
@@ -180,10 +183,16 @@ export class PrometheusSerializer {
 
   serialize(resourceMetrics: ResourceMetrics): string {
     let str = '';
+
     for (const scopeMetrics of resourceMetrics.scopeMetrics) {
       str += this._serializeScopeMetrics(scopeMetrics);
     }
-    return str;
+
+    if (str === '') {
+      str += NO_REGISTERED_METRICS;
+    }
+
+    return this._serializeResource(resourceMetrics.resource) + str;
   }
 
   private _serializeScopeMetrics(scopeMetrics: ScopeMetrics) {
@@ -310,5 +319,14 @@ export class PrometheusSerializer {
     }
 
     return results;
+  }
+
+  protected _serializeResource(resource: Resource): string {
+    const name = 'target_info';
+    const help = `# HELP ${name} Target metadata`;
+    const type = `# TYPE ${name} gauge`;
+
+    const results = stringify(name, resource.attributes, 1).trim();
+    return `${help}\n${type}\n${results}\n`;
   }
 }
