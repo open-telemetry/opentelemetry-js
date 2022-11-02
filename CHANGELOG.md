@@ -24,7 +24,7 @@ All notable changes to this project will be documented in this file.
 
 ### :books: (Refine Doc)
 
-* doc: Added Metrics documentation [#1745](https://github.com/open-telemetry/opentelemetry-js/pull/1745) @weyert
+* doc: Added Metrics documentation [#3360](https://github.com/open-telemetry/opentelemetry-js/pull/3360) @weyert
 
 ### :house: (Internal)
 
