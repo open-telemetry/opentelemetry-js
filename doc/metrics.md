@@ -209,10 +209,10 @@ Now run the application again:
 node app.js
 ```
 
-When you navigate to [http://localhost:3000](http://localhost:3000), the counter instrument will be increased
+When you navigate to <http://localhost:3000>, the counter instrument will be increased
 each time the page is accessed. If you want to see the exporter instruments, you
 can access via the dedicates metrics endpoint for Prometheus by accessing:
-[http://localhost:9464/metrics](http://localhost:9464/metrics) the contents will look similar to:
+<http://localhost:9464/metrics> the contents will look similar to:
 
 ```text
 # HELP request_counter_total description missing
