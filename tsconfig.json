@@ -114,6 +114,9 @@
       "path": "experimental/packages/exporter-trace-otlp-proto"
     },
     {
+      "path": "experimental/packages/opentelemetry-browser-detector"
+    },
+    {
       "path": "experimental/packages/opentelemetry-exporter-metrics-otlp-grpc"
     },
     {
