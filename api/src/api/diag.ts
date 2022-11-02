@@ -31,6 +31,7 @@ import {
 const API_NAME = 'diag';
 
 interface LoggerOptions {
+  logLevel?: DiagLogLevel;
   suppressOverrideMessage?: boolean;
 }
 
@@ -71,8 +72,7 @@ export class DiagAPI implements DiagLogger {
 
     self.setLogger = (
       logger: DiagLogger,
-      logLevel: DiagLogLevel = DiagLogLevel.INFO,
-      options: LoggerOptions = {}
+      optionsOrLogLevel: DiagLogLevel | LoggerOptions = { logLevel: DiagLogLevel.INFO },
     ) => {
       if (logger === self) {
         // There isn't much we can do here.
@@ -85,10 +85,16 @@ export class DiagAPI implements DiagLogger {
         return false;
       }
 
+      if (typeof optionsOrLogLevel === 'number') {
+        optionsOrLogLevel = {
+          logLevel: optionsOrLogLevel,
+        }
+      }
+
       const oldLogger = getGlobal('diag');
-      const newLogger = createLogLevelDiagLogger(logLevel, logger);
+      const newLogger = createLogLevelDiagLogger(optionsOrLogLevel.logLevel ?? DiagLogLevel.INFO, logger);
       // There already is an logger registered. We'll let it know before overwriting it.
-      if (oldLogger && !options.suppressOverrideMessage) {
+      if (oldLogger && !optionsOrLogLevel.suppressOverrideMessage) {
         const stack = new Error().stack ?? '<failed to generate stacktrace>';
         oldLogger.warn(`Current logger will be overwritten from ${stack}`);
         newLogger.warn(
@@ -120,10 +126,18 @@ export class DiagAPI implements DiagLogger {
    *
    * @param logger - [Optional] The DiagLogger instance to set as the default logger.
    * @param logLevel - [Optional] The DiagLogLevel used to filter logs sent to the logger. If not provided it will default to INFO.
-   * @param options - [Optional] And object which can contain `suppressOverrideMessage: boolean` which will suppress the warning normally logged when a logger is already registered.
    * @returns true if the logger was successfully registered, else false
    */
-  public setLogger!: (logger: DiagLogger, logLevel?: DiagLogLevel, options?: LoggerOptions) => boolean;
+  public setLogger!: (logger: DiagLogger, logLevel?: DiagLogLevel) => boolean;
+  /**
+  * Set the global DiagLogger and DiagLogLevel.
+  * If a global diag logger is already set, this will override it.
+  *
+  * @param logger - [Optional] The DiagLogger instance to set as the default logger.
+  * @param options - [Optional] And object which can contain `logLevel: DiagLogLevel` used to filter logs sent to the logger. If not provided it will default to INFO. The object may also contain `suppressOverrideMessage: boolean` which will suppress the warning normally logged when a logger is already registered.
+  * @returns true if the logger was successfully registered, else false
+  */
+  public setLogger!: (logger: DiagLogger, options?: LoggerOptions) => boolean;
   /**
    *
    */
