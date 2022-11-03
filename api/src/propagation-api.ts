@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-export {
-  TextMapPropagator,
-  TextMapSetter,
-  TextMapGetter,
-  defaultTextMapGetter,
-  defaultTextMapSetter,
-} from './propagation/TextMapPropagator';
-
+// Split module-level variable definition into separate files to allow
+// tree-shaking on each api instance.
 import { PropagationAPI } from './api/propagation';
-export type { PropagationAPI } from './api/propagation';
 /** Entrypoint for propagation API */
 export const propagation = PropagationAPI.getInstance();

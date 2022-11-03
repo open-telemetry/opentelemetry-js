@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-export {
-  createContextKey,
-  ROOT_CONTEXT,
-} from './context/context';
-export {
-  Context,
-  ContextManager,
-} from './context/types';
-
+// Split module-level variable definition into separate files to allow
+// tree-shaking on each api instance.
 import { ContextAPI } from './api/context';
-export type { ContextAPI } from './api/context';
 /** Entrypoint for context API */
 export const context = ContextAPI.getInstance();

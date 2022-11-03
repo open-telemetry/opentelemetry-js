@@ -14,41 +14,8 @@
  * limitations under the License.
  */
 
-export {
-  createNoopMeter,
-} from './metrics/NoopMeter';
-
-export {
-  MeterOptions,
-  Meter,
-} from './metrics/Meter';
-
-export {
-  MeterProvider,
-} from './metrics/MeterProvider';
-
-export {
-  ValueType,
-  Counter,
-  Histogram,
-  MetricOptions,
-  Observable,
-  ObservableCounter,
-  ObservableGauge,
-  ObservableUpDownCounter,
-  UpDownCounter,
-  BatchObservableCallback,
-  MetricAttributes,
-  MetricAttributeValue,
-  ObservableCallback,
-} from './metrics/Metric';
-
-export {
-  BatchObservableResult,
-  ObservableResult,
-} from './metrics/ObservableResult';
-
+// Split module-level variable definition into separate files to allow
+// tree-shaking on each api instance.
 import { MetricsAPI } from './api/metrics';
-
 /** Entrypoint for metrics API */
 export const metrics = MetricsAPI.getInstance();
