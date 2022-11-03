@@ -38,7 +38,7 @@ export class Logger implements api.Logger {
   emitLogRecord(logRecord: api.LogRecord): void {
     const data = new LogData(logRecord, this.instrumentationLibrary);
     this.provider.processors.forEach(processor => {
-      processor.emit(data);
+      processor.onEmit(data);
     });
   }
 
