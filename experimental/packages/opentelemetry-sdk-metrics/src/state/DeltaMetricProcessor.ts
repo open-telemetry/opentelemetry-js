@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { Context, HrTime } from '@opentelemetry/api';
-import { MetricAttributes } from '@opentelemetry/api-metrics';
+import { Context, HrTime, MetricAttributes } from '@opentelemetry/api';
 import { Maybe } from '../utils';
 import { Accumulation, Aggregator } from '../aggregator/types';
 import { AttributeHashMap } from './HashMap';

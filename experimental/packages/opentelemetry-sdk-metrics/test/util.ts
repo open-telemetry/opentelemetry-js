@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
 import {
+  Context,
   BatchObservableCallback,
   MetricAttributes,
   ObservableCallback,
   ValueType,
-} from '@opentelemetry/api-metrics';
+} from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -40,7 +40,7 @@ export type Measurement = {
   value: number;
   // TODO: use common attributes
   attributes: MetricAttributes
-  context?: api.Context;
+  context?: Context;
 };
 
 export const defaultResource = new Resource({
