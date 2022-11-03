@@ -20,7 +20,7 @@ import {
   Histogram,
   ValueType,
   ObservableGauge,
-} from '@opentelemetry/api-metrics';
+} from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import {

@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
-import * as metrics from '@opentelemetry/api-metrics';
+import {
+  diag,
+  MeterProvider as IMeterProvider,
+  Meter as IMeter,
+  MeterOptions,
+  createNoopMeter,
+} from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import { MetricReader } from './export/MetricReader';
 import { MeterProviderSharedState } from './state/MeterProviderSharedState';
@@ -33,9 +38,9 @@ export interface MeterProviderOptions {
 }
 
 /**
- * This class implements the {@link metrics.MeterProvider} interface.
+ * This class implements the {@link MeterProvider} interface.
  */
-export class MeterProvider implements metrics.MeterProvider {
+export class MeterProvider implements IMeterProvider {
   private _sharedState: MeterProviderSharedState;
   private _shutdown = false;
 
@@ -51,11 +56,11 @@ export class MeterProvider implements metrics.MeterProvider {
   /**
    * Get a meter with the configuration of the MeterProvider.
    */
-  getMeter(name: string, version = '', options: metrics.MeterOptions = {}): metrics.Meter {
+  getMeter(name: string, version = '', options: MeterOptions = {}): IMeter {
     // https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/sdk.md#meter-creation
     if (this._shutdown) {
-      api.diag.warn('A shutdown MeterProvider cannot provide a Meter');
-      return metrics.createNoopMeter();
+      diag.warn('A shutdown MeterProvider cannot provide a Meter');
+      return createNoopMeter();
     }
 
     return this._sharedState
@@ -83,7 +88,7 @@ export class MeterProvider implements metrics.MeterProvider {
    */
   async shutdown(options?: ShutdownOptions): Promise<void> {
     if (this._shutdown) {
-      api.diag.warn('shutdown may only be called once per MeterProvider');
+      diag.warn('shutdown may only be called once per MeterProvider');
       return;
     }
 
@@ -102,7 +107,7 @@ export class MeterProvider implements metrics.MeterProvider {
   async forceFlush(options?: ForceFlushOptions): Promise<void> {
     // do not flush after shutdown
     if (this._shutdown) {
-      api.diag.warn('invalid attempt to force flush after MeterProvider shutdown');
+      diag.warn('invalid attempt to force flush after MeterProvider shutdown');
       return;
     }
 
