@@ -17,6 +17,7 @@
 import * as api from '@opentelemetry/api';
 import { Context, HrTime, SpanAttributeValue } from '@opentelemetry/api';
 import {
+  addHrTimes,
   Clock,
   hrTimeDuration,
   InstrumentationLibrary,
@@ -56,11 +57,15 @@ export class Span implements api.Span, ReadableSpan {
   };
   endTime: api.HrTime = [0, 0];
   private _ended = false;
-  private _duration: api.HrTime = [-1, -1];
+  private _duration: HrTime = [-1, -1];
   private readonly _spanProcessor: SpanProcessor;
   private readonly _spanLimits: SpanLimits;
   private readonly _attributeValueLengthLimit: number;
   private readonly _clock: Clock;
+
+  private readonly _providedStartTime?: HrTime;
+  private readonly _performanceStartTime: number;
+  private readonly _performanceOffset: number;
 
   /**
    * Constructs a new Span instance.
@@ -71,11 +76,11 @@ export class Span implements api.Span, ReadableSpan {
     parentTracer: Tracer,
     context: Context,
     spanName: string,
-    spanContext: api.SpanContext,
-    kind: api.SpanKind,
+    spanContext: SpanContext,
+    kind: SpanKind,
     parentSpanId?: string,
-    links: api.Link[] = [],
-    startTime?: api.TimeInput,
+    links: Link[] = [],
+    startTime?: TimeInput,
     clock: Clock = otperformance,
   ) {
     this._clock = clock;
@@ -84,7 +89,16 @@ export class Span implements api.Span, ReadableSpan {
     this.parentSpanId = parentSpanId;
     this.kind = kind;
     this.links = links;
-    this.startTime = timeInputToHrTime(startTime ?? clock.now());
+
+    this._performanceStartTime = otperformance.now();
+    this._performanceOffset = Date.now() - otperformance.now() + otperformance.timeOrigin;
+
+    if (startTime != null) {
+      this.startTime = this._providedStartTime = timeInputToHrTime(startTime);
+    } else {
+      this.startTime = timeInputToHrTime(Date.now());
+    }
+
     this.resource = parentTracer.resource;
     this.instrumentationLibrary = parentTracer.instrumentationLibrary;
     this._spanLimits = parentTracer.getSpanLimits();
@@ -186,8 +200,27 @@ export class Span implements api.Span, ReadableSpan {
     }
     this._ended = true;
 
-    this.endTime = timeInputToHrTime(endTime ?? this._clock.now());
-    this._duration = hrTimeDuration(this.startTime, this.endTime);
+    const providedEndTime = endTime != null ? timeInputToHrTime(endTime) : undefined;
+
+    if (this._providedStartTime != null) {
+      if (providedEndTime != null) {
+        this.endTime = providedEndTime;
+      } else {
+        this.endTime = timeInputToHrTime(Date.now());
+      }
+      this._duration = hrTimeDuration(this.startTime, this.endTime);
+    } else {
+      if (providedEndTime != null) {
+        const duration = hrTimeDuration(this.startTime, providedEndTime);
+        if (duration[0] < 0) {
+          this.endTime = addHrTimes(providedEndTime, [0, this._performanceOffset]);
+          this._duration = hrTimeDuration(this.startTime, this.endTime);
+        }
+      } else {
+        this.endTime = addHrTimes(this.startTime, [0, otperformance.now() - this._performanceStartTime]);
+        this._duration = hrTimeDuration(this.startTime, this.endTime);
+      }
+    }
 
     if (this._duration[0] < 0) {
       api.diag.warn(

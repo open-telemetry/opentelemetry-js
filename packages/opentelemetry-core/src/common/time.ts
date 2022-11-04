@@ -63,16 +63,7 @@ export function hrTime(performanceNow?: number): api.HrTime {
     typeof performanceNow === 'number' ? performanceNow : performance.now()
   );
 
-  let seconds = timeOrigin[0] + now[0];
-  let nanos = timeOrigin[1] + now[1];
-
-  // Nanoseconds
-  if (nanos > SECOND_TO_NANOSECONDS) {
-    nanos -= SECOND_TO_NANOSECONDS;
-    seconds += 1;
-  }
-
-  return [seconds, nanos];
+  return addHrTimes(timeOrigin, now);
 }
 
 /**
@@ -180,4 +171,15 @@ export function isTimeInput(value: unknown): value is api.HrTime | number | Date
     typeof value === 'number' ||
     value instanceof Date
   );
+}
+
+export function addHrTimes(time1: api.HrTime, time2: api.HrTime): api.HrTime {
+  const out: api.HrTime = [time1[0] + time2[0], time1[1] + time2[1]];
+
+  while(out[1] > SECOND_TO_NANOSECONDS) {
+    out[0] += 1;
+    out[1] -= SECOND_TO_NANOSECONDS;
+  }
+
+  return out;
 }
