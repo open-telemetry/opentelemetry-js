@@ -6,8 +6,6 @@ All notable changes to this project will be documented in this file.
 
 ### :boom: Breaking Change
 
-* feat(api): merge api-metrics into api [#3374](https://github.com/open-telemetry/opentelemetry-js/pull/3374) @legendecas
-
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
@@ -24,7 +22,6 @@ All notable changes to this project will be documented in this file.
 
 * feat(sdk-trace): re-export sdk-trace-base in sdk-trace-node and web [#3319](https://github.com/open-telemetry/opentelemetry-js/pull/3319) @legendecas
 * feat: enable tree shaking [#3329](https://github.com/open-telemetry/opentelemetry-js/pull/3329) @pkanal
-* feat(metrics-sdk): Add tracing suppresing for Metrics Export [#3332](https://github.com/open-telemetry/opentelemetry-js/pull/3332) @hectorhdzg
 
 ### :bug: (Bug Fix)
 
