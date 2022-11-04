@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/api';
-import { MetricAttributes } from '@opentelemetry/api-metrics';
+import { Context, MetricAttributes } from '@opentelemetry/api';
 
 /**
  * The {@link AttributesProcessor} is responsible for customizing which

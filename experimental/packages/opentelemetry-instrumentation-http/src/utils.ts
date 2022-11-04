@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import {
+  MetricAttributes,
   SpanAttributes,
   SpanStatusCode,
   Span,
@@ -35,7 +36,6 @@ import { getRPCMetadata, RPCType } from '@opentelemetry/core';
 import * as url from 'url';
 import { AttributeNames } from './enums/AttributeNames';
 import { Err, IgnoreMatcher, ParsedRequestOptions } from './types';
-import { MetricAttributes } from '@opentelemetry/api-metrics';
 
 /**
  * Get an absolute url

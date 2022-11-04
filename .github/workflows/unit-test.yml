@@ -47,10 +47,15 @@ jobs:
 
       - name: Build 🔧
         run: |
-          npm run compile
+          npx lerna run compile
 
       - name: Unit tests
-        run: npm run test
+        run: |
+          # TODO(legendecas): webpack https://stackoverflow.com/questions/69692842/error-message-error0308010cdigital-envelope-routinesunsupported
+          if [ "${{ matrix.node_version }}" = "18" ]; then
+            export NODE_OPTIONS=--openssl-legacy-provider
+          fi
+          npm run test
       - name: Report Coverage
         run: npm run codecov
         if: ${{ matrix.node_version == '14' }}
@@ -88,7 +93,8 @@ jobs:
 
       - name: Build 🔧
         run: |
-          npm run compile
+          npm config set script-shell "C:\\Program Files\\git\\bin\\bash.exe"
+          npx lerna run compile
 
       - name: Unit tests
         run: npm run test

@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ### :boom: Breaking Change
 
+* feat(api): merge api-metrics into api [#3374](https://github.com/open-telemetry/opentelemetry-js/pull/3374) @legendecas
+
 ### :rocket: (Enhancement)
 
 ### :bug: (Bug Fix)
