@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { MetricAttributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api';
 import { hashAttributes } from '../utils';
 
 export interface Hash<ValueType, HashCodeType> {

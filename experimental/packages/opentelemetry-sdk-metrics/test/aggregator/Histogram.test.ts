@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { HrTime } from '@opentelemetry/api';
+import { HrTime, ValueType } from '@opentelemetry/api';
 import * as assert from 'assert';
 import {
   AggregationTemporality,
@@ -30,7 +30,6 @@ import {
   commonValues,
   defaultInstrumentDescriptor
 } from '../util';
-import { ValueType } from '@opentelemetry/api-metrics';
 
 describe('HistogramAggregator', () => {
   describe('createAccumulation', () => {

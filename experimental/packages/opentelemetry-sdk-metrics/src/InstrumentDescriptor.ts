@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { MetricOptions, ValueType } from '@opentelemetry/api-metrics';
+import { MetricOptions, ValueType } from '@opentelemetry/api';
 import { View } from './view/View';
 
 /**

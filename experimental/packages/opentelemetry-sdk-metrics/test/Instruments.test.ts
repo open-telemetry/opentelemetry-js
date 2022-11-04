@@ -36,7 +36,7 @@ import {
   defaultResource,
   defaultInstrumentationScope
 } from './util';
-import { ObservableResult, ValueType } from '@opentelemetry/api-metrics';
+import { ObservableResult, ValueType } from '@opentelemetry/api';
 
 describe('Instruments', () => {
   describe('Counter', () => {

@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { MetricAttributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api';
 import { hrTime } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { MultiMetricStorage } from '../../src/state/MultiWritableMetricStorage';
