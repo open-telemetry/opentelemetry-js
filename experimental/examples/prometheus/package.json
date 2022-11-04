@@ -12,6 +12,6 @@
   "dependencies": {
     "@opentelemetry/api": "^1.2.0",
     "@opentelemetry/exporter-prometheus": "0.34.0",
-    "@opentelemetry/sdk-metrics": "0.34.0"
+    "@opentelemetry/sdk-metrics": "1.8.0"
   }
 }

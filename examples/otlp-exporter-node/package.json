@@ -37,7 +37,7 @@
     "@opentelemetry/exporter-trace-otlp-http": "0.34.0",
     "@opentelemetry/exporter-trace-otlp-proto": "0.34.0",
     "@opentelemetry/resources": "1.8.0",
-    "@opentelemetry/sdk-metrics": "0.34.0",
+    "@opentelemetry/sdk-metrics": "1.8.0",
     "@opentelemetry/sdk-trace-base": "1.8.0",
     "@opentelemetry/semantic-conventions": "1.8.0"
   },
