@@ -70,6 +70,41 @@ export class DiagAPI implements DiagLogger {
 
     // DiagAPI specific functions
 
+    self.setLogger = (
+      logger: DiagLogger,
+      optionsOrLogLevel: DiagLogLevel | LoggerOptions = { logLevel: DiagLogLevel.INFO },
+    ) => {
+      if (logger === self) {
+        // There isn't much we can do here.
+        // Logging to the console might break the user application.
+        // Try to log to self. If a logger was previously registered it will receive the log.
+        const err = new Error(
+          'Cannot use diag as the logger for itself. Please use a DiagLogger implementation like ConsoleDiagLogger or a custom implementation'
+        );
+        self.error(err.stack ?? err.message);
+        return false;
+      }
+
+      if (typeof optionsOrLogLevel === 'number') {
+        optionsOrLogLevel = {
+          logLevel: optionsOrLogLevel,
+        }
+      }
+
+      const oldLogger = getGlobal('diag');
+      const newLogger = createLogLevelDiagLogger(optionsOrLogLevel.logLevel ?? DiagLogLevel.INFO, logger);
+      // There already is an logger registered. We'll let it know before overwriting it.
+      if (oldLogger && !optionsOrLogLevel.suppressOverrideMessage) {
+        const stack = new Error().stack ?? '<failed to generate stacktrace>';
+        oldLogger.warn(`Current logger will be overwritten from ${stack}`);
+        newLogger.warn(
+          `Current logger will overwrite one already registered from ${stack}`
+        );
+      }
+
+      return registerGlobal('diag', newLogger, self, true);
+    };
+
     self.disable = () => {
       unregisterGlobal(API_NAME, self);
     };
@@ -93,7 +128,7 @@ export class DiagAPI implements DiagLogger {
    * @param logLevel - [Optional] The DiagLogLevel used to filter logs sent to the logger. If not provided it will default to INFO.
    * @returns true if the logger was successfully registered, else false
    */
-  public setLogger(logger: DiagLogger, logLevel?: DiagLogLevel): boolean;
+  public setLogger!: (logger: DiagLogger, logLevel?: DiagLogLevel) => boolean;
   /**
   * Set the global DiagLogger and DiagLogLevel.
   * If a global diag logger is already set, this will override it.
@@ -102,38 +137,7 @@ export class DiagAPI implements DiagLogger {
   * @param options - [Optional] And object which can contain `logLevel: DiagLogLevel` used to filter logs sent to the logger. If not provided it will default to INFO. The object may also contain `suppressOverrideMessage: boolean` which will suppress the warning normally logged when a logger is already registered.
   * @returns true if the logger was successfully registered, else false
   */
-  public setLogger(logger: DiagLogger, options?: LoggerOptions): boolean;
-  public setLogger(logger: DiagLogger, optionsOrLogLevel: DiagLogLevel | LoggerOptions = { logLevel: DiagLogLevel.INFO }) {
-    if (logger === this) {
-      // There isn't much we can do here.
-      // Logging to the console might break the user application.
-      // Try to log to self. If a logger was previously registered it will receive the log.
-      const err = new Error(
-        'Cannot use diag as the logger for itself. Please use a DiagLogger implementation like ConsoleDiagLogger or a custom implementation'
-      );
-      this.error(err.stack ?? err.message);
-      return false;
-    }
-
-    if (typeof optionsOrLogLevel === 'number') {
-      optionsOrLogLevel = {
-        logLevel: optionsOrLogLevel,
-      }
-    }
-
-    const oldLogger = getGlobal('diag');
-    const newLogger = createLogLevelDiagLogger(optionsOrLogLevel.logLevel ?? DiagLogLevel.INFO, logger);
-    // There already is an logger registered. We'll let it know before overwriting it.
-    if (oldLogger && !optionsOrLogLevel.suppressOverrideMessage) {
-      const stack = new Error().stack ?? '<failed to generate stacktrace>';
-      oldLogger.warn(`Current logger will be overwritten from ${stack}`);
-      newLogger.warn(
-        `Current logger will overwrite one already registered from ${stack}`
-      );
-    }
-
-    return registerGlobal('diag', newLogger, this, true);
-  }
+  public setLogger!: (logger: DiagLogger, options?: LoggerOptions) => boolean;
   /**
    *
    */
