@@ -72,7 +72,7 @@ export class DiagAPI implements DiagLogger {
 
     self.setLogger = (
       logger: DiagLogger,
-      optionsOrLogLevel: DiagLogLevel | LoggerOptions = { logLevel: DiagLogLevel.INFO },
+      optionsOrLogLevel: LoggerOptions | DiagLogLevel = { logLevel: DiagLogLevel.INFO },
     ) => {
       if (logger === self) {
         // There isn't much we can do here.
@@ -125,19 +125,10 @@ export class DiagAPI implements DiagLogger {
    * If a global diag logger is already set, this will override it.
    *
    * @param logger - [Optional] The DiagLogger instance to set as the default logger.
-   * @param logLevel - [Optional] The DiagLogLevel used to filter logs sent to the logger. If not provided it will default to INFO.
+   * @param optionsOrLogLevel - [Optional] And object which can contain `logLevel: DiagLogLevel` used to filter logs sent to the logger. If not provided it will default to INFO. The object may also contain `suppressOverrideMessage: boolean` which will suppress the warning normally logged when a logger is already registered. Can also be just the `DiagLogLevel` for backwards compatibility.
    * @returns true if the logger was successfully registered, else false
    */
-  public setLogger!: (logger: DiagLogger, logLevel?: DiagLogLevel) => boolean;
-  /**
-  * Set the global DiagLogger and DiagLogLevel.
-  * If a global diag logger is already set, this will override it.
-  *
-  * @param logger - [Optional] The DiagLogger instance to set as the default logger.
-  * @param options - [Optional] And object which can contain `logLevel: DiagLogLevel` used to filter logs sent to the logger. If not provided it will default to INFO. The object may also contain `suppressOverrideMessage: boolean` which will suppress the warning normally logged when a logger is already registered.
-  * @returns true if the logger was successfully registered, else false
-  */
-  public setLogger!: (logger: DiagLogger, options?: LoggerOptions) => boolean;
+  public setLogger!: (logger: DiagLogger, optionsOrLogLevel?: LoggerOptions | DiagLogLevel) => boolean;
   /**
    *
    */
