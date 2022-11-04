@@ -39,7 +39,7 @@ export function getBaggage(context: Context): Baggage | undefined {
  *
  * @returns {Baggage} Extracted baggage from the context
  */
- export function getActiveBaggage(): Baggage | undefined {
+export function getActiveBaggage(): Baggage | undefined {
   return getBaggage(ContextAPI.getInstance().active());
 }
 

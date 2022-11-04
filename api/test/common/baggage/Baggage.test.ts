@@ -134,9 +134,9 @@ describe('Baggage', () => {
     });
 
     it('should get the current baggage', () => {
-      let entries = {
-        "banana": {value: "boats"}
-      }
+      const entries = {
+        'banana': {value: 'boats'}
+      };
       const bag = propagation.createBaggage(entries);
       const ctx = propagation.setBaggage(ROOT_CONTEXT, bag);
 
