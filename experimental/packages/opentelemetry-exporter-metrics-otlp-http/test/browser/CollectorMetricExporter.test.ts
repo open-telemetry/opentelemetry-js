@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { diag, DiagLogger, DiagLogLevel } from '@opentelemetry/api';
-import { Counter, Histogram, } from '@opentelemetry/api-metrics';
+import { diag, DiagLogger, DiagLogLevel, Counter, Histogram } from '@opentelemetry/api';
 import { ExportResultCode, hrTimeToNanoseconds } from '@opentelemetry/core';
 import { AggregationTemporality, ResourceMetrics, } from '@opentelemetry/sdk-metrics';
 import * as assert from 'assert';

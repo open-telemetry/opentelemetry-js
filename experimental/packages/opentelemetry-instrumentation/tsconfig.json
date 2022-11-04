@@ -11,9 +11,6 @@
   "references": [
     {
       "path": "../../../api"
-    },
-    {
-      "path": "../../../api-metrics"
     }
   ]
 }

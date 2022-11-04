@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
-import * as metrics from '@opentelemetry/api-metrics';
+import {
+  diag,
+  ObservableResult,
+  MetricAttributes,
+  ValueType,
+  BatchObservableResult,
+  Observable,
+} from '@opentelemetry/api';
 import { AttributeHashMap } from './state/HashMap';
 import { isObservableInstrument, ObservableInstrument } from './Instruments';
 import { InstrumentDescriptor } from '.';
 
 /**
- * The class implements {@link metrics.ObservableResult} interface.
+ * The class implements {@link ObservableResult} interface.
  */
-export class ObservableResultImpl implements metrics.ObservableResult {
+export class ObservableResultImpl implements ObservableResult {
   /**
    * @internal
    */
@@ -34,9 +40,9 @@ export class ObservableResultImpl implements metrics.ObservableResult {
   /**
    * Observe a measurement of the value associated with the given attributes.
    */
-  observe(value: number, attributes: metrics.MetricAttributes = {}): void {
-    if (this._descriptor.valueType === metrics.ValueType.INT && !Number.isInteger(value)) {
-      api.diag.warn(
+  observe(value: number, attributes: MetricAttributes = {}): void {
+    if (this._descriptor.valueType === ValueType.INT && !Number.isInteger(value)) {
+      diag.warn(
         `INT value type cannot accept a floating-point value for ${this._descriptor.name}, ignoring the fractional digits.`
       );
       value = Math.trunc(value);
@@ -46,9 +52,9 @@ export class ObservableResultImpl implements metrics.ObservableResult {
 }
 
 /**
- * The class implements {@link metrics.BatchObservableCallback} interface.
+ * The class implements {@link BatchObservableCallback} interface.
  */
-export class BatchObservableResultImpl implements metrics.BatchObservableResult {
+export class BatchObservableResultImpl implements BatchObservableResult {
   /**
    * @internal
    */
@@ -57,7 +63,7 @@ export class BatchObservableResultImpl implements metrics.BatchObservableResult 
   /**
    * Observe a measurement of the value associated with the given attributes.
    */
-  observe(metric: metrics.Observable, value: number, attributes: metrics.MetricAttributes = {}): void {
+  observe(metric: Observable, value: number, attributes: MetricAttributes = {}): void {
     if (!isObservableInstrument(metric)) {
       return;
     }
@@ -66,8 +72,8 @@ export class BatchObservableResultImpl implements metrics.BatchObservableResult 
       map = new AttributeHashMap();
       this._buffer.set(metric, map);
     }
-    if (metric._descriptor.valueType === metrics.ValueType.INT && !Number.isInteger(value)) {
-      api.diag.warn(
+    if (metric._descriptor.valueType === ValueType.INT && !Number.isInteger(value)) {
+      diag.warn(
         `INT value type cannot accept a floating-point value for ${metric._descriptor.name}, ignoring the fractional digits.`
       );
       value = Math.trunc(value);
