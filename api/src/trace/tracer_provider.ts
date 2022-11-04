@@ -37,11 +37,15 @@ export interface TracerProvider {
 
   /**
    * Shutdown all internal processors and blocks until all data is flushed
+   *
+   * The promise resolves after finishing the shutdown or is going to be rejected if running into an error
    */
   shutdown?(): Promise<void>;
 
   /**
    * Flushes all data hold in span processors to the configured exporters
+   *
+   * The promise resolves after finishing the flush or is going to be rejected if running into a timeout or error
    */
   forceFlush?(): Promise<void>
 }
