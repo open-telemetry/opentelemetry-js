@@ -34,6 +34,7 @@ All notable changes to experimental packages in this project will be documented 
 
 * ci(instrumentation-http): remove got devDependency
   [#3347](https://github.com/open-telemetry/opentelemetry-js/issues/3347) @dyladan
+* deps(instrumentation-http): move sdk-metrics to dev dependencies [#3380](https://github.com/open-telemetry/opentelemetry-js/issues/3380) @pichlermarc
 
 ## 0.33.0
 

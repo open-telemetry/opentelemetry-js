@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { MetricAttributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api';
 import { HashMap } from '../../src/state/HashMap';
 import { hashAttributes } from '../../src/utils';
 

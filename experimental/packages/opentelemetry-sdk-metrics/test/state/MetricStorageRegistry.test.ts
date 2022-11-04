@@ -15,13 +15,12 @@
  */
 
 import { MetricStorageRegistry } from '../../src/state/MetricStorageRegistry';
-import { ValueType } from '@opentelemetry/api-metrics';
+import { diag, ValueType } from '@opentelemetry/api';
 import { MetricStorage } from '../../src/state/MetricStorage';
 import { HrTime } from '@opentelemetry/api';
 import { MetricCollectorHandle } from '../../src/state/MetricCollector';
 import { MetricData, InstrumentDescriptor, InstrumentType } from '../../src';
 import { Maybe } from '../../src/utils';
-import * as api from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
@@ -44,7 +43,7 @@ describe('MetricStorageRegistry', () => {
   let spyLoggerWarn: sinon.SinonStub<[message: string, ...args: unknown[]], void>;
 
   beforeEach(() => {
-    spyLoggerWarn = sinon.stub(api.diag, 'warn');
+    spyLoggerWarn = sinon.stub(diag, 'warn');
   });
 
   afterEach(() => {

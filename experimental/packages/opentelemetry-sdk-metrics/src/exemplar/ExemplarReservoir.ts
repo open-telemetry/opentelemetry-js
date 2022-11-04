@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { MetricAttributes } from '@opentelemetry/api-metrics';
-import { Context, HrTime, isSpanContextValid, trace } from '@opentelemetry/api';
+import { Context, HrTime, isSpanContextValid, trace, MetricAttributes } from '@opentelemetry/api';
 import { Exemplar } from './Exemplar';
 
 

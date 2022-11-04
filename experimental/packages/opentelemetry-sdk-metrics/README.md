@@ -14,7 +14,7 @@ It does **not** provide automated instrumentation of known libraries or host env
 ## Installation
 
 ```bash
-npm install --save @opentelemetry/api-metrics
+npm install --save @opentelemetry/api
 npm install --save @opentelemetry/sdk-metrics
 ```
 
@@ -23,7 +23,7 @@ npm install --save @opentelemetry/sdk-metrics
 The basic setup of the SDK can be seen as followings:
 
 ```js
-const opentelemetry = require('@opentelemetry/api-metrics');
+const opentelemetry = require('@opentelemetry/api');
 const { MeterProvider } = require('@opentelemetry/sdk-metrics');
 
 // To create an instrument, you first need to initialize the Meter provider.

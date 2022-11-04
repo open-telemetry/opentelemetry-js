@@ -14,9 +14,21 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
-import * as metrics from '@opentelemetry/api-metrics';
-import { ObservableCallback } from '@opentelemetry/api-metrics';
+import {
+  context as contextApi,
+  diag,
+  Context,
+  MetricAttributes,
+  ValueType,
+  UpDownCounter,
+  Counter,
+  Histogram,
+  Observable,
+  ObservableCallback,
+  ObservableCounter,
+  ObservableGauge,
+  ObservableUpDownCounter,
+} from '@opentelemetry/api';
 import { hrTime } from '@opentelemetry/core';
 import { InstrumentDescriptor } from './InstrumentDescriptor';
 import { ObservableRegistry } from './state/ObservableRegistry';
@@ -25,9 +37,9 @@ import { AsyncWritableMetricStorage, WritableMetricStorage } from './state/Writa
 export class SyncInstrument {
   constructor(private _writableMetricStorage: WritableMetricStorage, protected _descriptor: InstrumentDescriptor) {}
 
-  protected _record(value: number, attributes: metrics.MetricAttributes = {}, context: api.Context = api.context.active()) {
-    if (this._descriptor.valueType === metrics.ValueType.INT && !Number.isInteger(value)) {
-      api.diag.warn(
+  protected _record(value: number, attributes: MetricAttributes = {}, context: Context = contextApi.active()) {
+    if (this._descriptor.valueType === ValueType.INT && !Number.isInteger(value)) {
+      diag.warn(
         `INT value type cannot accept a floating-point value for ${this._descriptor.name}, ignoring the fractional digits.`
       );
       value = Math.trunc(value);
@@ -37,27 +49,27 @@ export class SyncInstrument {
 }
 
 /**
- * The class implements {@link metrics.UpDownCounter} interface.
+ * The class implements {@link UpDownCounter} interface.
  */
-export class UpDownCounterInstrument extends SyncInstrument implements metrics.UpDownCounter {
+export class UpDownCounterInstrument extends SyncInstrument implements UpDownCounter {
   /**
    * Increment value of counter by the input. Inputs may be negative.
    */
-  add(value: number, attributes?: metrics.MetricAttributes, ctx?: api.Context): void {
+  add(value: number, attributes?: MetricAttributes, ctx?: Context): void {
     this._record(value, attributes, ctx);
   }
 }
 
 /**
- * The class implements {@link metrics.Counter} interface.
+ * The class implements {@link Counter} interface.
  */
-export class CounterInstrument extends SyncInstrument implements metrics.Counter {
+export class CounterInstrument extends SyncInstrument implements Counter {
   /**
    * Increment value of counter by the input. Inputs may not be negative.
    */
-  add(value: number, attributes?: metrics.MetricAttributes, ctx?: api.Context): void {
+  add(value: number, attributes?: MetricAttributes, ctx?: Context): void {
     if (value < 0) {
-      api.diag.warn(`negative value provided to counter ${this._descriptor.name}: ${value}`);
+      diag.warn(`negative value provided to counter ${this._descriptor.name}: ${value}`);
       return;
     }
 
@@ -66,22 +78,22 @@ export class CounterInstrument extends SyncInstrument implements metrics.Counter
 }
 
 /**
- * The class implements {@link metrics.Histogram} interface.
+ * The class implements {@link Histogram} interface.
  */
-export class HistogramInstrument extends SyncInstrument implements metrics.Histogram {
+export class HistogramInstrument extends SyncInstrument implements Histogram {
   /**
    * Records a measurement. Value of the measurement must not be negative.
    */
-  record(value: number, attributes?: metrics.MetricAttributes, ctx?: api.Context): void {
+  record(value: number, attributes?: MetricAttributes, ctx?: Context): void {
     if (value < 0) {
-      api.diag.warn(`negative value provided to histogram ${this._descriptor.name}: ${value}`);
+      diag.warn(`negative value provided to histogram ${this._descriptor.name}: ${value}`);
       return;
     }
     this._record(value, attributes, ctx);
   }
 }
 
-export class ObservableInstrument implements metrics.Observable {
+export class ObservableInstrument implements Observable {
   /** @internal */
   _metricStorages: AsyncWritableMetricStorage[];
   /** @internal */
@@ -93,23 +105,23 @@ export class ObservableInstrument implements metrics.Observable {
   }
 
   /**
-   * @see {metrics.Observable.addCallback}
+   * @see {Observable.addCallback}
    */
   addCallback(callback: ObservableCallback) {
     this._observableRegistry.addCallback(callback, this);
   }
 
   /**
-   * @see {metrics.Observable.removeCallback}
+   * @see {Observable.removeCallback}
    */
   removeCallback(callback: ObservableCallback) {
     this._observableRegistry.removeCallback(callback, this);
   }
 }
 
-export class ObservableCounterInstrument extends ObservableInstrument implements metrics.ObservableCounter {}
-export class ObservableGaugeInstrument extends ObservableInstrument implements metrics.ObservableGauge {}
-export class ObservableUpDownCounterInstrument extends ObservableInstrument implements metrics.ObservableUpDownCounter {}
+export class ObservableCounterInstrument extends ObservableInstrument implements ObservableCounter {}
+export class ObservableGaugeInstrument extends ObservableInstrument implements ObservableGauge {}
+export class ObservableUpDownCounterInstrument extends ObservableInstrument implements ObservableUpDownCounter {}
 
 export function isObservableInstrument(it: unknown): it is ObservableInstrument {
   return it instanceof ObservableInstrument;
