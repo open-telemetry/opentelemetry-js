@@ -129,7 +129,7 @@ Configure a custom sampler. By default, all traces will be sampled.
 
 ### traceExporter
 
-Configure a trace exporter. If an exporter OR span processor is not configured, the tracing SDK will not be initialized and registered. If an exporter is configured, it will be used with a [BatchSpanProcessor](../../../packages/opentelemetry-sdk-trace-base/src/platform/node/export/BatchSpanProcessor.ts).
+Configure a trace exporter. If an exporter is configured, it will be used with a [BatchSpanProcessor](../../../packages/opentelemetry-sdk-trace-base/src/platform/node/export/BatchSpanProcessor.ts). If an exporter OR span processor is not configured programatically, this package will auto setup the default `otlp` exporter  with `http/protobuf` protocol with a `BatchSpanProcessor`.
 
 ### spanLimits
 
@@ -138,6 +138,30 @@ Configure tracing parameters. These are the same trace parameters used to [confi
 ### serviceName
 
 Configure the [service name](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/resource/semantic_conventions/README.md#service).
+
+## Configure Trace Exporter from  Environment
+
+This is an alternative to programmatically configuring an exporter or span processor. This package will auto setup the default `otlp` exporter with `http/protobuf` protocol if `traceExporter` or `spanProcessor` hasn't been passed into the `NodeSDK` constructor.
+
+### Exporters
+
+| Environment variable | Description |
+|----------------------|-------------|
+| OTEL_TRACES_EXPORTER | List of exporters to be used for tracing, separated by commas. Options include `otlp`, `jaeger`, `zipkin`, and `none`. Default is `otlp`. `none` means no autoconfigured exporter.
+
+### OTLP Exporter
+
+| Environment variable | Description |
+|----------------------|-------------|
+| OTEL_EXPORTER_OTLP_PROTOCOL | The transport protocol to use on OTLP trace, metric, and log requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`. |
+| OTEL_EXPORTER_OTLP_TRACES_PROTOCOL | The transport protocol to use on OTLP trace requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`. |
+| OTEL_EXPORTER_OTLP_METRICS_PROTOCOL | The transport protocol to use on OTLP metric requests. Options include `grpc`, `http/protobuf`, and `http/json`. Default is `http/protobuf`. |
+
+Additionally, you can specify other applicable environment variables that apply to each exporter such as the following:
+
+- [OTLP exporter environment configuration](https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/protocol/exporter.md#configuration-options)
+- [Zipkin exporter environment configuration](https://github.com/open-telemetry/opentelemetry-specification/blob/6ce62202e5407518e19c56c445c13682ef51a51d/specification/sdk-environment-variables.md#zipkin-exporter)
+- [Jaeger exporter environment configuration](https://github.com/open-telemetry/opentelemetry-specification/blob/6ce62202e5407518e19c56c445c13682ef51a51d/specification/sdk-environment-variables.md#jaeger-exporter)
 
 ## Useful links
 

@@ -4,10 +4,10 @@
   "typedocOptions": {
     "entryPointStrategy": "packages",
     "entryPoints": [
+      "api",
       "experimental/packages/exporter-trace-otlp-grpc",
       "experimental/packages/exporter-trace-otlp-http",
       "experimental/packages/exporter-trace-otlp-proto",
-      "experimental/packages/opentelemetry-api-metrics",
       "experimental/packages/opentelemetry-exporter-metrics-otlp-grpc",
       "experimental/packages/opentelemetry-exporter-metrics-otlp-http",
       "experimental/packages/opentelemetry-exporter-metrics-otlp-proto",
@@ -49,6 +49,9 @@
     "excludePrivate": true
   },
   "references": [
+    {
+      "path": "api"
+    },
     {
       "path": "packages/opentelemetry-context-async-hooks"
     },
@@ -107,7 +110,7 @@
       "path": "experimental/packages/exporter-trace-otlp-proto"
     },
     {
-      "path": "experimental/packages/opentelemetry-api-metrics"
+      "path": "experimental/packages/opentelemetry-browser-detector"
     },
     {
       "path": "experimental/packages/opentelemetry-exporter-metrics-otlp-grpc"

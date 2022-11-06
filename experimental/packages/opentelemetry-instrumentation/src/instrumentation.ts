@@ -17,11 +17,13 @@
 import {
   diag,
   DiagLogger,
+  metrics,
+  Meter,
+  MeterProvider,
   trace,
   Tracer,
   TracerProvider,
 } from '@opentelemetry/api';
-import { Meter, MeterProvider, metrics } from '@opentelemetry/api-metrics';
 import * as shimmer from 'shimmer';
 import { InstrumentationModuleDefinition } from './platform/node';
 import * as types from './types';

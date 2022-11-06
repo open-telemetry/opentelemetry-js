@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
+import { MeterProvider } from '../metrics/MeterProvider';
 import { ContextManager } from '../context/types';
-import { DiagLogger } from '../diag';
+import { DiagLogger } from '../diag/types';
 import { _globalThis } from '../platform';
 import { TextMapPropagator } from '../propagation/TextMapPropagator';
 import type { TracerProvider } from '../trace/tracer_provider';
@@ -98,5 +99,6 @@ type OTelGlobalAPI = {
   diag?: DiagLogger;
   trace?: TracerProvider;
   context?: ContextManager;
+  metrics?: MeterProvider;
   propagation?: TextMapPropagator;
 };

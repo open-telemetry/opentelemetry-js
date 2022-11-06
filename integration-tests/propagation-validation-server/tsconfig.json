@@ -7,6 +7,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../api"
+    },
+    {
       "path": "../../packages/opentelemetry-context-async-hooks"
     },
     {
