@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { ContextManager, TextMapPropagator } from '@opentelemetry/api';
-import { metrics } from '@opentelemetry/api-metrics';
+import { ContextManager, TextMapPropagator, metrics } from '@opentelemetry/api';
 import {
   InstrumentationOption,
   registerInstrumentations
@@ -31,11 +30,12 @@ import {
 import { MeterProvider, MetricReader, View } from '@opentelemetry/sdk-metrics';
 import {
   BatchSpanProcessor,
-  SpanProcessor
+  SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
 import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/sdk-trace-node';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 import { NodeSDKConfiguration } from './types';
+import { TracerProviderWithEnvExporters } from './TracerProviderWithEnvExporter';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 
@@ -64,7 +64,7 @@ export class NodeSDK {
 
   private _autoDetectResources: boolean;
 
-  private _tracerProvider?: NodeTracerProvider;
+  private _tracerProvider?: NodeTracerProvider | TracerProviderWithEnvExporters;
   private _meterProvider?: MeterProvider;
   private _serviceName?: string;
 
@@ -193,20 +193,24 @@ export class NodeSDK {
         { [SemanticResourceAttributes.SERVICE_NAME]: this._serviceName }
       ));
 
+    const Provider =
+      this._tracerProviderConfig ? NodeTracerProvider : TracerProviderWithEnvExporters;
+
+    const tracerProvider = new Provider ({
+      ...this._tracerProviderConfig?.tracerConfig,
+      resource: this._resource,
+    });
+
+    this._tracerProvider = tracerProvider;
+
     if (this._tracerProviderConfig) {
-      const tracerProvider = new NodeTracerProvider({
-        ...this._tracerProviderConfig.tracerConfig,
-        resource: this._resource,
-      });
-
-      this._tracerProvider = tracerProvider;
-
       tracerProvider.addSpanProcessor(this._tracerProviderConfig.spanProcessor);
-      tracerProvider.register({
-        contextManager: this._tracerProviderConfig.contextManager,
-        propagator: this._tracerProviderConfig.textMapPropagator,
-      });
     }
+
+    tracerProvider.register({
+      contextManager: this._tracerProviderConfig?.contextManager,
+      propagator: this._tracerProviderConfig?.textMapPropagator,
+    });
 
     if (this._meterProviderConfig) {
       const meterProvider = new MeterProvider({

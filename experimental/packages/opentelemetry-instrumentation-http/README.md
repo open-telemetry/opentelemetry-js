@@ -24,8 +24,11 @@ To load a specific instrumentation (HTTP in this case), specify it in the Node T
 
 ```js
 const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
-const { ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/sdk-trace-base');
-const { NodeTracerProvider } = require('@opentelemetry/sdk-trace-node');
+const {
+  ConsoleSpanExporter,
+  NodeTracerProvider,
+  SimpleSpanProcessor,
+} = require('@opentelemetry/sdk-trace-node');
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 
 const provider = new NodeTracerProvider();

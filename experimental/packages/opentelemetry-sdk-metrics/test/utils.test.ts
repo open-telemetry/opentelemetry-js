@@ -18,7 +18,7 @@ import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { callWithTimeout, hashAttributes, TimeoutError } from '../src/utils';
 import { assertRejects } from './test-utils';
-import { MetricAttributes } from '@opentelemetry/api-metrics';
+import { MetricAttributes } from '@opentelemetry/api';
 
 describe('utils', () => {
   afterEach(() => {

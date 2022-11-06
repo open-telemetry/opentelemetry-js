@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { HrTime } from '@opentelemetry/api';
-import { MetricAttributes } from '@opentelemetry/api-metrics';
+import { HrTime, MetricAttributes } from '@opentelemetry/api';
 import { AggregationTemporality } from '../export/AggregationTemporality';
 import { MetricData } from '../export/MetricData';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';

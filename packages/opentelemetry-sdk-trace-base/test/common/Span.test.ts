@@ -128,6 +128,18 @@ describe('Span', () => {
     assert.ok(hrTimeToNanoseconds(span.duration) >= 0);
   });
 
+  it('should ensure duration is never negative even if provided with inconsistent times', () => {
+    const span = new Span(
+      tracer,
+      ROOT_CONTEXT,
+      name,
+      spanContext,
+      SpanKind.SERVER
+    );
+    span.end(hrTimeToMilliseconds(span.startTime) - 1);
+    assert.ok(hrTimeToNanoseconds(span.duration) >= 0);
+  });
+
   it('should have valid event.time', () => {
     const span = new Span(
       tracer,

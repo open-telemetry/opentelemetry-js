@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { HrTime } from '@opentelemetry/api';
-import { MetricAttributes } from '@opentelemetry/api-metrics';
+import { HrTime, MetricAttributes } from '@opentelemetry/api';
 import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';

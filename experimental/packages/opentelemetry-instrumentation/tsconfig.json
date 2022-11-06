@@ -10,7 +10,7 @@
   ],
   "references": [
     {
-      "path": "../opentelemetry-api-metrics"
+      "path": "../../../api"
     }
   ]
 }

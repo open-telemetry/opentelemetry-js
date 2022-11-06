@@ -10,6 +10,9 @@
   ],
   "references": [
     {
+      "path": "../../../api"
+    },
+    {
       "path": "../../../packages/opentelemetry-context-async-hooks"
     },
     {
@@ -23,9 +26,6 @@
     },
     {
       "path": "../../../packages/opentelemetry-semantic-conventions"
-    },
-    {
-      "path": "../opentelemetry-api-metrics"
     },
     {
       "path": "../opentelemetry-instrumentation"

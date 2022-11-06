@@ -25,6 +25,10 @@ import {
   SpanStatus,
   SpanStatusCode,
   trace,
+  Histogram,
+  MeterProvider,
+  MetricAttributes,
+  ValueType,
 } from '@opentelemetry/api';
 import { Histogram, MetricAttributes, ValueType } from '@opentelemetry/api-metrics';
 import { hrTime, hrTimeDuration, hrTimeToMilliseconds, suppressTracing } from '@opentelemetry/core';
