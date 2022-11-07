@@ -44,9 +44,10 @@ See [examples/grpc](https://github.com/open-telemetry/opentelemetry-js/tree/main
 
 gRPC instrumentation accepts the following configuration:
 
-| Options | Type | Description |
-| ------- | ---- | ----------- |
-| [`ignoreGrpcMethods`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-grpc/src/types.ts#L25) | `IgnoreMatcher[]` | gRPC instrumentation will not trace any methods that match anything in this list. You may pass a string (case-insensitive match), a `RegExp` object, or a filter function. |
+| Options                                                                                                                                                              | Type              | Description                                                                                                                                                                                                                                                               |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`ignoreGrpcMethods`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-grpc/src/types.ts#L25)        | `IgnoreMatcher[]` | gRPC instrumentation will not trace any methods that match anything in this list. You may pass a string (case-insensitive match), a `RegExp` object, or a filter function.                                                                                                |
+| [`metadataToSpanAttributes`](https://github.com/open-telemetry/opentelemetry-js/blob/main/experimental/packages/opentelemetry-instrumentation-grpc/src/types.ts#L27) | `object`          | List of case insensitive metadata to convert to span attributes. Client (outgoing requests, incoming responses) metadata attributes will be converted to span attributes in the form of `rpc.{request\response}.metadata.metadata_key`, e.g. `rpc.response.metadata.date` |
 
 ## Useful links
 
