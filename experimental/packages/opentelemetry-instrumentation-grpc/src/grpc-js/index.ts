@@ -357,11 +357,7 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
       client: {
         captureRequestMetadata: metadataCapture('request', config.metadataToSpanAttributes?.client?.requestMetadata ?? []),
         captureResponseMetadata: metadataCapture('response', config.metadataToSpanAttributes?.client?.responseMetadata ?? [])
-      },
-      server: {
-        captureRequestMetadata: metadataCapture('request', config.metadataToSpanAttributes?.server?.requestMetadata ?? []),
-        captureResponseMetadata: metadataCapture('response', config.metadataToSpanAttributes?.server?.responseMetadata ?? [])
-      },
+      }
     };
   }
 }
