@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-// Updates to this file should also be replicated to @opentelemetry/api and
-// @opentelemetry/api-metrics too.
+// Updates to this file should also be replicated to @opentelemetry/api too.
 
 /**
  * - globalThis (New standard)

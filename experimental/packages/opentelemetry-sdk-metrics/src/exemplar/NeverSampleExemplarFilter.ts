@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { MetricAttributes } from '@opentelemetry/api-metrics';
-import { Context, HrTime } from '@opentelemetry/api';
+import { Context, HrTime, MetricAttributes } from '@opentelemetry/api';
 import { ExemplarFilter } from './ExemplarFilter';
 
 export class NeverSampleExemplarFilter implements ExemplarFilter {
