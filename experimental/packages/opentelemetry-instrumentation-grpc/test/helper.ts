@@ -17,7 +17,6 @@
 import {
   Attributes,
   context,
-  // SpanKind,
   propagation, SpanKind, trace,
 } from '@opentelemetry/api';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
