@@ -88,7 +88,7 @@ export class DiagAPI implements DiagLogger {
       if (typeof optionsOrLogLevel === 'number') {
         optionsOrLogLevel = {
           logLevel: optionsOrLogLevel,
-        }
+        };
       }
 
       const oldLogger = getGlobal('diag');
