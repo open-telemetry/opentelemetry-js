@@ -1,18 +1,11 @@
-const { context, trace } = require("@opentelemetry/api");
-const {
-  ConsoleSpanExporter,
-  SimpleSpanProcessor,
-} = require("@opentelemetry/sdk-trace-base");
-const {
-  OTLPTraceExporter,
-} = require("@opentelemetry/exporter-trace-otlp-http");
-const { WebTracerProvider } = require("@opentelemetry/sdk-trace-web");
-const {
-  FetchInstrumentation,
-} = require("@opentelemetry/instrumentation-fetch");
-const { ZoneContextManager } = require("@opentelemetry/context-zone");
-const { B3Propagator } = require("@opentelemetry/propagator-b3");
-const { registerInstrumentations } = require("@opentelemetry/instrumentation");
+const { context, trace } = require( '@opentelemetry/api');
+const { ConsoleSpanExporter, SimpleSpanProcessor } = require( '@opentelemetry/sdk-trace-base');
+const { OTLPTraceExporter } = require( '@opentelemetry/exporter-trace-otlp-http');
+const { WebTracerProvider } = require( '@opentelemetry/sdk-trace-web');
+const { FetchInstrumentation } = require( '@opentelemetry/instrumentation-fetch');
+const { ZoneContextManager } = require( '@opentelemetry/context-zone');
+const { B3Propagator } = require( '@opentelemetry/propagator-b3');
+const { registerInstrumentations } = require( '@opentelemetry/instrumentation');
 
 const provider = new WebTracerProvider();
 
@@ -21,7 +14,6 @@ const provider = new WebTracerProvider();
 // exporter without delay
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.addSpanProcessor(new SimpleSpanProcessor(new OTLPTraceExporter()));
-
 provider.register({
   contextManager: new ZoneContextManager(),
   propagator: new B3Propagator(),
@@ -32,38 +24,35 @@ registerInstrumentations({
     new FetchInstrumentation({
       ignoreUrls: [/localhost:8090\/sockjs-node/],
       propagateTraceHeaderCorsUrls: [
-        "https://cors-test.appspot.com/test",
-        "https://httpbin.org/get",
+        'https://cors-test.appspot.com/test',
+        'https://httpbin.org/get',
       ],
       clearTimingResources: true,
     }),
   ],
 });
 
-const webTracerWithZone = provider.getTracer("example-tracer-web");
+const webTracerWithZone = provider.getTracer('example-tracer-web');
 
-const getData = (url) =>
-  fetch(url, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-  });
+const getData = (url) => fetch(url, {
+  method: 'GET',
+  headers: {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
+});
 
 // example of keeping track of context between async operations
 const prepareClickEvent = () => {
-  const url = "https://httpbin.org/get";
+  const url = 'https://httpbin.org/get';
 
-  const element = document.getElementById("button1");
+  const element = document.getElementById('button1');
 
   const onClick = () => {
-    const singleSpan = webTracerWithZone.startSpan("files-series-info");
+    const singleSpan = webTracerWithZone.startSpan('files-series-info');
     context.with(trace.setSpan(context.active(), singleSpan), () => {
       getData(url).then((_data) => {
-        trace
-          .getSpan(context.active())
-          .addEvent("fetching-single-span-completed");
+        trace.getSpan(context.active()).addEvent('fetching-single-span-completed');
         singleSpan.end();
       });
     });
@@ -71,15 +60,13 @@ const prepareClickEvent = () => {
       const span = webTracerWithZone.startSpan(`files-series-info-${i}`);
       context.with(trace.setSpan(context.active(), span), () => {
         getData(url).then((_data) => {
-          trace
-            .getSpan(context.active())
-            .addEvent(`fetching-span-${i}-completed`);
+          trace.getSpan(context.active()).addEvent(`fetching-span-${i}-completed`);
           span.end();
         });
       });
     }
   };
-  element.addEventListener("click", onClick);
+  element.addEventListener('click', onClick);
 };
 
-window.addEventListener("load", prepareClickEvent);
+window.addEventListener('load', prepareClickEvent);
