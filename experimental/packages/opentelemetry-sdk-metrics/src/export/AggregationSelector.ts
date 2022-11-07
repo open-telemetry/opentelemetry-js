@@ -29,4 +29,17 @@ export type AggregationSelector = (instrumentType: InstrumentType) => Aggregatio
 export type AggregationTemporalitySelector = (instrumentType: InstrumentType) => AggregationTemporality;
 
 export const DEFAULT_AGGREGATION_SELECTOR: AggregationSelector = _instrumentType => Aggregation.Default();
-export const DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR: AggregationTemporalitySelector = _instrumentType => AggregationTemporality.CUMULATIVE;
+export const CUMULATIVE_AGGREGATION_TEMPORALITY_SELECTOR: AggregationTemporalitySelector = _instrumentType => AggregationTemporality.CUMULATIVE;
+export const DELTA_AGGREGATION_TEMPORALITY_SELECTOR: AggregationTemporalitySelector = (instrumentType: InstrumentType) => {
+  switch (instrumentType) {
+    case InstrumentType.COUNTER:
+    case InstrumentType.OBSERVABLE_COUNTER:
+    case InstrumentType.HISTOGRAM:
+    case InstrumentType.OBSERVABLE_GAUGE:
+      return AggregationTemporality.DELTA;
+    case InstrumentType.UP_DOWN_COUNTER:
+    case InstrumentType.OBSERVABLE_UP_DOWN_COUNTER:
+      return AggregationTemporality.CUMULATIVE;
+  }
+};
+export const DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR: AggregationTemporalitySelector = CUMULATIVE_AGGREGATION_TEMPORALITY_SELECTOR;

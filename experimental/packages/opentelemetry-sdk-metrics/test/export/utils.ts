@@ -18,7 +18,8 @@ import {
   AggregationSelector,
   AggregationTemporalitySelector,
   InstrumentType,
-  MetricReader
+  MetricReader,
+  PushMetricExporter
 } from '../../src';
 import * as assert from 'assert';
 
@@ -36,9 +37,9 @@ const instrumentTypes = [
  * @param reader
  * @param expectedSelector
  */
-export function assertAggregationSelector(reader: MetricReader, expectedSelector: AggregationSelector) {
+export function assertAggregationSelector(reader: MetricReader | PushMetricExporter, expectedSelector: AggregationSelector) {
   for (const instrumentType of instrumentTypes) {
-    assert.strictEqual(reader.selectAggregation(instrumentType),
+    assert.strictEqual(reader.selectAggregation?.(instrumentType),
       expectedSelector(instrumentType),
       `incorrect aggregation selection for ${InstrumentType[instrumentType]}`);
   }
@@ -49,9 +50,9 @@ export function assertAggregationSelector(reader: MetricReader, expectedSelector
  * @param reader
  * @param expectedSelector
  */
-export function assertAggregationTemporalitySelector(reader: MetricReader, expectedSelector: AggregationTemporalitySelector) {
+export function assertAggregationTemporalitySelector(reader: MetricReader | PushMetricExporter, expectedSelector: AggregationTemporalitySelector) {
   for (const instrumentType of instrumentTypes) {
-    assert.strictEqual(reader.selectAggregationTemporality(instrumentType),
+    assert.strictEqual(reader.selectAggregationTemporality?.(instrumentType),
       expectedSelector(instrumentType),
       `incorrect aggregation temporality selection for ${InstrumentType[instrumentType]}`);
   }
