@@ -17,7 +17,7 @@
 import {SpanStatusCode, SpanStatus, Span} from '@opentelemetry/api';
 import type * as grpcTypes from 'grpc';
 import type * as grpcJsTypes from '@grpc/grpc-js';
-import { IgnoreMatcher } from './types';
+import {IgnoreMatcher} from './types';
 
 // Equivalent to lodash _.findIndex
 export const findIndex: <T>(args: T[], fn: (arg: T) => boolean) => number = (
@@ -135,3 +135,4 @@ export function metadataCapture(type: 'request' | 'response', metadata: string[]
     }
   };
 }
+

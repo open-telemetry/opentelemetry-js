@@ -36,6 +36,7 @@ import { AttributeNames } from '../enums/AttributeNames';
  * This method handles the client remote call
  */
 export const makeGrpcClientRemoteCall = function (
+  metadataCapture: any,
   grpcClient: typeof grpcTypes,
   original: GrpcClientFunc,
   args: any[],
@@ -101,6 +102,16 @@ export const makeGrpcClientRemoteCall = function (
 
     setSpanContext(metadata);
     const call = original.apply(self, args);
+
+    ((call as unknown) as events.EventEmitter).on(
+      'metadata',
+      responseMetadata => {
+        const metadataMap = responseMetadata.getMap();
+
+        metadataCapture.client.captureResponseMetadata(span, (metadataKey: string) => {
+          return metadataMap[metadataKey];
+        });
+      });
 
     // if server stream or bidi
     if (original.responseStream) {
