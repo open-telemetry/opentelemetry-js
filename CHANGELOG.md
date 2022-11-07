@@ -6,6 +6,18 @@ All notable changes to this project will be documented in this file.
 
 ### :boom: Breaking Change
 
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 1.8.0
+
+### :boom: Breaking Change
+
 * feat(api): merge api-metrics into api [#3374](https://github.com/open-telemetry/opentelemetry-js/pull/3374) @legendecas
 
 ### :rocket: (Enhancement)
@@ -23,8 +35,6 @@ All notable changes to this project will be documented in this file.
   [#3359](https://github.com/open-telemetry/opentelemetry-js/pull/3359) @dyladan
 * fix(resources): strict OTEL_RESOURCE_ATTRIBUTES baggage octet decoding
   [#3341](https://github.com/open-telemetry/opentelemetry-js/pull/3341) @legendecas
-
-### :books: (Refine Doc)
 
 ### :house: (Internal)
 
