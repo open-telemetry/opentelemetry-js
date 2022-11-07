@@ -20,6 +20,7 @@ import {
   ComponentLoggerOptions,
   DiagLogFunction,
   DiagLogger,
+  DiagLoggerApi,
   DiagLogLevel,
 } from '../diag/types';
 import {
@@ -30,16 +31,11 @@ import {
 
 const API_NAME = 'diag';
 
-interface LoggerOptions {
-  logLevel?: DiagLogLevel;
-  suppressOverrideMessage?: boolean;
-}
-
 /**
  * Singleton object which represents the entry point to the OpenTelemetry internal
  * diagnostic API
  */
-export class DiagAPI implements DiagLogger {
+export class DiagAPI implements DiagLogger, DiagLoggerApi {
   private static _instance?: DiagAPI;
 
   /** Get the singleton instance of the DiagAPI API */
@@ -70,9 +66,9 @@ export class DiagAPI implements DiagLogger {
 
     // DiagAPI specific functions
 
-    self.setLogger = (
-      logger: DiagLogger,
-      optionsOrLogLevel: LoggerOptions | DiagLogLevel = { logLevel: DiagLogLevel.INFO },
+    const setLogger: DiagLoggerApi['setLogger'] = (
+      logger,
+      optionsOrLogLevel = { logLevel: DiagLogLevel.INFO },
     ) => {
       if (logger === self) {
         // There isn't much we can do here.
@@ -105,6 +101,8 @@ export class DiagAPI implements DiagLogger {
       return registerGlobal('diag', newLogger, self, true);
     };
 
+    self.setLogger = setLogger;
+
     self.disable = () => {
       unregisterGlobal(API_NAME, self);
     };
@@ -120,15 +118,7 @@ export class DiagAPI implements DiagLogger {
     self.error = _logProxy('error');
   }
 
-  /**
-   * Set the global DiagLogger and DiagLogLevel.
-   * If a global diag logger is already set, this will override it.
-   *
-   * @param logger - [Optional] The DiagLogger instance to set as the default logger.
-   * @param optionsOrLogLevel - [Optional] And object which can contain `logLevel: DiagLogLevel` used to filter logs sent to the logger. If not provided it will default to INFO. The object may also contain `suppressOverrideMessage: boolean` which will suppress the warning normally logged when a logger is already registered. Can also be just the `DiagLogLevel` for backwards compatibility.
-   * @returns true if the logger was successfully registered, else false
-   */
-  public setLogger!: (logger: DiagLogger, optionsOrLogLevel?: LoggerOptions | DiagLogLevel) => boolean;
+  public setLogger!: DiagLoggerApi['setLogger'];
   /**
    *
    */

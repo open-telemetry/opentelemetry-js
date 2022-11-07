@@ -96,3 +96,28 @@ export enum DiagLogLevel {
 export interface ComponentLoggerOptions {
   namespace: string;
 }
+
+export interface LoggerOptions {
+  logLevel?: DiagLogLevel;
+  suppressOverrideMessage?: boolean;
+}
+
+export interface DiagLoggerApi {
+  /**
+  * Set the global DiagLogger and DiagLogLevel.
+  * If a global diag logger is already set, this will override it.
+  *
+  * @param logger - [Optional] The DiagLogger instance to set as the default logger.
+  * @param options - [Optional] And object which can contain `logLevel: DiagLogLevel` used to filter logs sent to the logger. If not provided it will default to INFO. The object may also contain `suppressOverrideMessage: boolean` which will suppress the warning normally logged when a logger is already registered.
+  * @returns true if the logger was successfully registered, else false
+  */
+  setLogger(logger: DiagLogger, options?: LoggerOptions): boolean;
+
+  /**
+   *
+   * @param logger - [Optional] The DiagLogger instance to set as the default logger.
+   * @param logLevel - [Optional] The DiagLogLevel used to filter logs sent to the logger. If not provided it will default to INFO.
+   * @returns true if the logger was successfully registered, else false
+   */
+  setLogger(logger: DiagLogger, logLevel?: DiagLogLevel): boolean;
+}
