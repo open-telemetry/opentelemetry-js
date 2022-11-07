@@ -23,7 +23,7 @@
     "codecov:browser": "lerna run codecov:browser",
     "codecov:webworker": "lerna run codecov:webworker",
     "predocs-test": "npm run docs",
-    "docs": "typedoc && touch docs/.nojekyll",
+    "docs": "typedoc --readme none && touch docs/.nojekyll",
     "docs-deploy": "gh-pages --dotfiles --dist docs",
     "docs:test": "linkinator docs --silent --retry && linkinator doc/*.md --silent --retry",
     "lint": "lerna run lint",

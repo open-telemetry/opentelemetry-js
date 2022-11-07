@@ -21,8 +21,8 @@ import {
   trace,
   diag,
   DiagLogLevel,
+  metrics,
 } from '@opentelemetry/api';
-import { metrics } from '@opentelemetry/api-metrics';
 import {
   AsyncHooksContextManager,
   AsyncLocalStorageContextManager,
@@ -416,7 +416,7 @@ describe('Node SDK', () => {
 
       describe('with a faulty environment variable', () => {
         beforeEach(() => {
-          process.env.OTEL_RESOURCE_ATTRIBUTES = 'bad=~attribute';
+          process.env.OTEL_RESOURCE_ATTRIBUTES = 'bad=\\attribute';
         });
 
         it('prints correct error messages when EnvDetector has an invalid variable', async () => {

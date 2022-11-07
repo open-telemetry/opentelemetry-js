@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Counter, Histogram, ObservableGauge, ObservableResult, ValueType } from '@opentelemetry/api-metrics';
+import { Counter, Histogram, ObservableGauge, ObservableResult, ValueType } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as grpc from '@grpc/grpc-js';

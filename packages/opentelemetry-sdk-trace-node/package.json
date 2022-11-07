@@ -48,7 +48,7 @@
     "@opentelemetry/api": ">=1.0.0 <1.3.0",
     "@opentelemetry/resources": "1.7.0",
     "@opentelemetry/semantic-conventions": "1.7.0",
-    "@types/mocha": "9.1.1",
+    "@types/mocha": "10.0.0",
     "@types/node": "18.6.5",
     "@types/semver": "7.3.9",
     "@types/sinon": "10.0.13",
@@ -71,5 +71,6 @@
     "@opentelemetry/sdk-trace-base": "1.7.0",
     "semver": "^7.3.5"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-node",
+  "sideEffects": false
 }

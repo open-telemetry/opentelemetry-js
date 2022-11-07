@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as metrics from '@opentelemetry/api-metrics';
+import * as metrics from '@opentelemetry/api';
 import { ExportResult } from '@opentelemetry/core';
 import { ConsoleMetricExporter } from '../../src/export/ConsoleMetricExporter';
 import { PeriodicExportingMetricReader } from '../../src/export/PeriodicExportingMetricReader';

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ValueType } from '@opentelemetry/api-metrics';
+import { ValueType } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { InstrumentType } from '../src';
 import { ObservableInstrument } from '../src/Instruments';

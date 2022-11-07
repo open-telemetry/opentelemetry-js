@@ -46,7 +46,7 @@
     "@opentelemetry/propagator-b3": "1.7.0",
     "@opentelemetry/propagator-jaeger": "1.7.0",
     "@opentelemetry/sdk-trace-base": "1.7.0",
-    "@types/mocha": "9.1.1",
+    "@types/mocha": "10.0.0",
     "@types/node": "18.6.5",
     "codecov": "3.8.3",
     "mocha": "10.0.0",
@@ -63,5 +63,6 @@
     "@opentelemetry/semantic-conventions": "1.7.0",
     "opentracing": "^0.14.4"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-shim-opentracing"
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-shim-opentracing",
+  "sideEffects": false
 }

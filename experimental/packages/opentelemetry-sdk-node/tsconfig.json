@@ -46,9 +46,6 @@
       "path": "../exporter-trace-otlp-proto"
     },
     {
-      "path": "../opentelemetry-api-metrics"
-    },
-    {
       "path": "../opentelemetry-instrumentation"
     },
     {

@@ -16,9 +16,9 @@
 
 import * as types from '../../types';
 import * as path from 'path';
-import * as RequireInTheMiddle from 'require-in-the-middle';
 import { satisfies } from 'semver';
 import { InstrumentationAbstract } from '../../instrumentation';
+import { RequireInTheMiddleSingleton, Hooked } from './RequireInTheMiddleSingleton';
 import { InstrumentationModuleDefinition } from './types';
 import { diag } from '@opentelemetry/api';
 
@@ -29,7 +29,8 @@ export abstract class InstrumentationBase<T = any>
   extends InstrumentationAbstract
   implements types.Instrumentation {
   private _modules: InstrumentationModuleDefinition<T>[];
-  private _hooks: RequireInTheMiddle.Hooked[] = [];
+  private _hooks: Hooked[] = [];
+  private _requireInTheMiddleSingleton: RequireInTheMiddleSingleton = RequireInTheMiddleSingleton.getInstance();
   private _enabled = false;
 
   constructor(
@@ -48,9 +49,10 @@ export abstract class InstrumentationBase<T = any>
     this._modules = (modules as InstrumentationModuleDefinition<T>[]) || [];
 
     if (this._modules.length === 0) {
-      diag.warn(
-        'No modules instrumentation has been defined,' +
-        ' nothing will be patched'
+      diag.debug(
+        'No modules instrumentation has been defined for ' +
+        `'${this.instrumentationName}@${this.instrumentationVersion}'` +
+        ', nothing will be patched'
       );
     }
 
@@ -159,9 +161,8 @@ export abstract class InstrumentationBase<T = any>
     this._warnOnPreloadedModules();
     for (const module of this._modules) {
       this._hooks.push(
-        RequireInTheMiddle(
-          [module.name],
-          { internals: true },
+        this._requireInTheMiddleSingleton.register(
+          module.name,
           (exports, name, baseDir) => {
             return this._onRequire<typeof exports>(
               (module as unknown) as InstrumentationModuleDefinition<
