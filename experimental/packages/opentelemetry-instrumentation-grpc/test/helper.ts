@@ -71,6 +71,7 @@ type ServerDuplexStream =
 type Metadata = grpcNapi.Metadata | grpcJs.Metadata;
 
 type TestGrpcClient = (typeof grpcJs | typeof grpcNapi)['Client'] & {
+  unaryMethodWithMetadata: any;
   unaryMethod: any;
   UnaryMethod: any;
   camelCaseMethod: any;
@@ -117,6 +118,26 @@ export const runTests = (
   const MAX_ERROR_STATUS = grpc.status.UNAUTHENTICATED;
 
   const grpcClient = {
+    unaryMethodWithMetadata: (
+      client: TestGrpcClient,
+      request: TestRequestResponse,
+      metadata: Metadata
+    ): Promise<TestRequestResponse> => {
+      return new Promise((resolve, reject) => {
+        return client.unaryMethodWithMetadata(
+          request,
+          metadata,
+          (err: ServiceError, response: TestRequestResponse) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(response);
+            }
+          }
+        );
+      });
+    },
+
     unaryMethod: (
       client: TestGrpcClient,
       request: TestRequestResponse,
@@ -286,12 +307,24 @@ export const runTests = (
       // in those cases, erro.code = request.num
 
       // This method returns the request
-      unaryMethod(call: ServerUnaryCall, callback: RequestCallback) {
+      unaryMethodWithMetadata(call: ServerUnaryCall, callback: RequestCallback) {
         const serverMetadata: any = new grpc.Metadata();
         serverMetadata.add('server_metadata_key', 'server_metadata_value');
 
         call.sendMetadata(serverMetadata);
 
+        call.request.num <= MAX_ERROR_STATUS
+          ? callback(
+            getError(
+              'Unary Method with Metadata Error',
+              call.request.num
+            ) as grpcJs.ServiceError
+          )
+          : callback(null, { num: call.request.num });
+      },
+
+      // This method returns the request
+      unaryMethod(call: ServerUnaryCall, callback: RequestCallback) {
         call.request.num <= MAX_ERROR_STATUS
           ? callback(
             getError(
@@ -904,9 +937,9 @@ export const runTests = (
       clientMetadata.add('client_metadata_key', 'client_metadata_value');
 
       const customMetadataMethod: TestGrpcCall = {
-        description: 'unary call',
-        methodName: 'UnaryMethod',
-        method: grpcClient.unaryMethod,
+        description: 'unary call with metadata',
+        methodName: 'unaryMethodWithMetadata',
+        method: grpcClient.unaryMethodWithMetadata,
         request: requestList[0],
         result: requestList[0],
         metadata: clientMetadata
@@ -926,6 +959,7 @@ export const runTests = (
             }
           }
         });
+
         plugin.setTracerProvider(provider);
         plugin.enable();
 
