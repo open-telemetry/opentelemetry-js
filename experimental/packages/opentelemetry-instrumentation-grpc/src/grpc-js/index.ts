@@ -49,17 +49,20 @@ import {
   getMetadata,
 } from './clientUtils';
 import { EventEmitter } from 'events';
-import { _extractMethodAndService } from '../utils';
+import {_extractMethodAndService, metadataCapture} from '../utils';
 import { AttributeValues } from '../enums/AttributeValues';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
 
 export class GrpcJsInstrumentation extends InstrumentationBase {
+  private _metadataCapture;
+
   constructor(
     name: string,
     version: string,
     config?: GrpcInstrumentationConfig,
   ) {
     super(name, version, config);
+    this._metadataCapture = this._createMetadataCapture();
   }
 
   init() {
@@ -120,6 +123,11 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
 
   override getConfig(): GrpcInstrumentationConfig {
     return super.getConfig();
+  }
+
+  override setConfig(config?: GrpcInstrumentationConfig): void {
+    super.setConfig(config);
+    this._metadataCapture = this._createMetadataCapture();
   }
 
   /**
@@ -298,8 +306,15 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
             [SemanticAttributes.RPC_METHOD]: method,
             [SemanticAttributes.RPC_SERVICE]: service,
           });
+
+        instrumentation._metadataCapture.client.captureRequestMetadata(span, (metadataKey: string) => {
+          const metadataMap = metadata.getMap();
+
+          return metadataMap[metadataKey];
+        });
+
         return context.with(trace.setSpan(context.active(), span), () =>
-          makeGrpcClientRemoteCall(original, args, metadata, this)(span)
+          makeGrpcClientRemoteCall(instrumentation._metadataCapture, original, args, metadata, this)(span)
         );
       }
       Object.assign(clientMethodTrace, original);
@@ -333,5 +348,20 @@ export class GrpcJsInstrumentation extends InstrumentationBase {
         );
       }
     });
+  }
+
+  private _createMetadataCapture() {
+    const config = this.getConfig();
+
+    return {
+      client: {
+        captureRequestMetadata: metadataCapture('request', config.metadataToSpanAttributes?.client?.requestMetadata ?? []),
+        captureResponseMetadata: metadataCapture('response', config.metadataToSpanAttributes?.client?.responseMetadata ?? [])
+      },
+      server: {
+        captureRequestMetadata: metadataCapture('request', config.metadataToSpanAttributes?.server?.requestMetadata ?? []),
+        captureResponseMetadata: metadataCapture('response', config.metadataToSpanAttributes?.server?.responseMetadata ?? [])
+      },
+    };
   }
 }

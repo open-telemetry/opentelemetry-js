@@ -69,6 +69,7 @@ export function getMethodsToWrap(
  * span on callback or receiving an emitted event.
  */
 export function makeGrpcClientRemoteCall(
+  metadataCapture: any,
   original: GrpcClientFunc,
   args: unknown[],
   metadata: grpcJs.Metadata,
@@ -128,6 +129,14 @@ export function makeGrpcClientRemoteCall(
 
     setSpanContext(metadata);
     const call = original.apply(self, args);
+
+    call.on('metadata', responseMetadata => {
+      const metadataMap = responseMetadata.getMap();
+
+      metadataCapture.client.captureResponseMetadata(span, (metadataKey: string) => {
+        return metadataMap[metadataKey];
+      });
+    });
 
     // if server stream or bidi
     if (original.responseStream) {

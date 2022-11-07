@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanStatusCode, SpanStatus } from '@opentelemetry/api';
+import {SpanStatusCode, SpanStatus, Span} from '@opentelemetry/api';
 import type * as grpcTypes from 'grpc';
 import type * as grpcJsTypes from '@grpc/grpc-js';
 import { IgnoreMatcher } from './types';
@@ -110,3 +110,28 @@ export const _extractMethodAndService = (name: string): { service: string, metho
     method
   });
 };
+
+
+export function metadataCapture(type: 'request' | 'response', metadata: string[]) {
+  const normalizedMetadataAttributes = new Map(metadata.map(value => [value.toLowerCase(), value.toLowerCase().replace(/-/g, '_')]));
+
+  return (span: Span, getMetadata: (key: string) => undefined | string | string[] | Buffer) => {
+    for (const [capturedMetadata, normalizedMetadata] of normalizedMetadataAttributes) {
+      const value = getMetadata(capturedMetadata);
+
+      if (value === undefined || value instanceof Buffer) {
+        continue;
+      }
+
+      const key = `rpc.${type}.metadata.${normalizedMetadata}`;
+
+      if (typeof value === 'string') {
+        span.setAttribute(key, [value]);
+      } else if (Array.isArray(value)) {
+        span.setAttribute(key, value);
+      } else {
+        span.setAttribute(key, [value]);
+      }
+    }
+  };
+}
