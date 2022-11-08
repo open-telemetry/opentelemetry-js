@@ -9,7 +9,7 @@ This is commonly achieved with HTTP headers, RPC metadata, with well-known forma
 - [B3][]: Supported with [B3Propagator][].
 - Jaeger: Supported with [JaegerPropagator][].
 
-If none of above format meet your needs, you can implement your own propagator.
+If none of the above formats meet your needs, you can implement your own propagator.
 
 ## Implement your own propagator
 
