@@ -100,7 +100,7 @@ export interface ComponentLoggerOptions {
 export interface LoggerOptions {
   /**
    * The {@link DiagLogLevel} used to filter logs sent to the logger.
-   * 
+   *
    * @defaultValue DiagLogLevel.INFO
    */
   logLevel?: DiagLogLevel;
