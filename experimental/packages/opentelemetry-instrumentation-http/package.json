@@ -47,6 +47,7 @@
   "devDependencies": {
     "@opentelemetry/api": "^1.2.0",
     "@opentelemetry/context-async-hooks": "1.7.0",
+    "@opentelemetry/sdk-metrics": "0.33.0",
     "@opentelemetry/sdk-trace-base": "1.7.0",
     "@opentelemetry/sdk-trace-node": "1.7.0",
     "@types/mocha": "10.0.0",
@@ -74,7 +75,6 @@
   "dependencies": {
     "@opentelemetry/core": "1.7.0",
     "@opentelemetry/instrumentation": "0.33.0",
-    "@opentelemetry/sdk-metrics": "0.33.0",
     "@opentelemetry/semantic-conventions": "1.7.0",
     "semver": "^7.3.5"
   },
