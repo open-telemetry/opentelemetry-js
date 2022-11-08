@@ -64,7 +64,7 @@ export enum ValueType {
  */
 export interface Counter<AttributesTypes extends MetricAttributes = MetricAttributes> {
   /**
-   * Increment value of counter by the input. Inputs may not be negative.
+   * Increment value of counter by the input. Inputs must not be negative.
    */
   add(value: number, attributes?: AttributesTypes, context?: Context): void;
 }
