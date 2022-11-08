@@ -54,7 +54,7 @@ describe('OTLPTraceExporter - web', () => {
         hostname: 'foo',
         url: 'http://foo.bar.com',
       };
-      collectorTraceExporter = new OTLPTraceExporter(collectorConfig)
+      collectorTraceExporter = new OTLPTraceExporter(collectorExporterConfig)
     });
   });
 
