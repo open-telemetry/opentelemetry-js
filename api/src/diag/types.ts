@@ -116,16 +116,16 @@ export interface DiagLoggerApi {
   * Set the global DiagLogger and DiagLogLevel.
   * If a global diag logger is already set, this will override it.
   *
-  * @param logger - [Optional] The {@link DiagLogger} instance to set as the default logger.
-  * @param options - [Optional] A {@link LoggerOptions} object.
+  * @param logger - The {@link DiagLogger} instance to set as the default logger.
+  * @param options - A {@link LoggerOptions} object. If not provided, default values will be set.
   * @returns `true` if the logger was successfully registered, else `false`
   */
   setLogger(logger: DiagLogger, options?: LoggerOptions): boolean;
 
   /**
    *
-   * @param logger - [Optional] The {@link DiagLogger} instance to set as the default logger.
-   * @param logLevel - [Optional] The {@link DiagLogLevel} used to filter logs sent to the logger. If not provided it will default to {@link DiagLogLevel.INFO}.
+   * @param logger - The {@link DiagLogger} instance to set as the default logger.
+   * @param logLevel - The {@link DiagLogLevel} used to filter logs sent to the logger. If not provided it will default to {@link DiagLogLevel.INFO}.
    * @returns `true` if the logger was successfully registered, else `false`
    */
   setLogger(logger: DiagLogger, logLevel?: DiagLogLevel): boolean;
