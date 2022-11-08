@@ -98,7 +98,16 @@ export interface ComponentLoggerOptions {
 }
 
 export interface LoggerOptions {
+  /**
+   * The {@link DiagLogLevel} used to filter logs sent to the logger.
+   * 
+   * @defaultValue DiagLogLevel.INFO
+   */
   logLevel?: DiagLogLevel;
+
+  /**
+   * Setting this value to `true` will suppress the warning message normally emitted when registering a logger when another logger is already registered.
+   */
   suppressOverrideMessage?: boolean;
 }
 
@@ -107,17 +116,17 @@ export interface DiagLoggerApi {
   * Set the global DiagLogger and DiagLogLevel.
   * If a global diag logger is already set, this will override it.
   *
-  * @param logger - [Optional] The DiagLogger instance to set as the default logger.
-  * @param options - [Optional] And object which can contain `logLevel: DiagLogLevel` used to filter logs sent to the logger. If not provided it will default to INFO. The object may also contain `suppressOverrideMessage: boolean` which will suppress the warning normally logged when a logger is already registered.
-  * @returns true if the logger was successfully registered, else false
+  * @param logger - [Optional] The {@link DiagLogger} instance to set as the default logger.
+  * @param options - [Optional] A {@link LoggerOptions} object.
+  * @returns `true` if the logger was successfully registered, else `false`
   */
   setLogger(logger: DiagLogger, options?: LoggerOptions): boolean;
 
   /**
    *
-   * @param logger - [Optional] The DiagLogger instance to set as the default logger.
-   * @param logLevel - [Optional] The DiagLogLevel used to filter logs sent to the logger. If not provided it will default to INFO.
-   * @returns true if the logger was successfully registered, else false
+   * @param logger - [Optional] The {@link DiagLogger} instance to set as the default logger.
+   * @param logLevel - [Optional] The {@link DiagLogLevel} used to filter logs sent to the logger. If not provided it will default to {@link DiagLogLevel.INFO}.
+   * @returns `true` if the logger was successfully registered, else `false`
    */
   setLogger(logger: DiagLogger, logLevel?: DiagLogLevel): boolean;
 }
