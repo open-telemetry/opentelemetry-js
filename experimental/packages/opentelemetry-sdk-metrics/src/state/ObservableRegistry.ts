@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
-import { HrTime } from '@opentelemetry/api';
-import { BatchObservableCallback, Observable, ObservableCallback } from '@opentelemetry/api-metrics';
+import { diag, HrTime, BatchObservableCallback, Observable, ObservableCallback } from '@opentelemetry/api';
 import { isObservableInstrument, ObservableInstrument } from '../Instruments';
 import { BatchObservableResultImpl, ObservableResultImpl } from '../ObservableResult';
 import { callWithTimeout, PromiseAllSettled, isPromiseAllSettledRejectionResult, setEquals } from '../utils';
@@ -67,7 +65,7 @@ export class ObservableRegistry {
     // Create a set of unique instruments.
     const observableInstruments = new Set(instruments.filter(isObservableInstrument));
     if (observableInstruments.size === 0) {
-      api.diag.error('BatchObservableCallback is not associated with valid instruments', instruments);
+      diag.error('BatchObservableCallback is not associated with valid instruments', instruments);
       return;
     }
     const idx = this._findBatchCallback(callback, observableInstruments);

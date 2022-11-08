@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ### :boom: Breaking Change
 
+* feat(api): merge api-metrics into api [#3374](https://github.com/open-telemetry/opentelemetry-js/pull/3374) @legendecas
+
 ### :rocket: (Enhancement)
 
 * feat(sdk-trace): re-export sdk-trace-base in sdk-trace-node and web [#3319](https://github.com/open-telemetry/opentelemetry-js/pull/3319) @legendecas
@@ -25,6 +27,7 @@ All notable changes to this project will be documented in this file.
 ### :books: (Refine Doc)
 
 * doc: Added Metrics documentation [#3360](https://github.com/open-telemetry/opentelemetry-js/pull/3360) @weyert
+* docs(api): fix counter negative value wording [#3396](https://github.com/open-telemetry/opentelemetry-js/pull/3396) @legendecas
 
 ### :house: (Internal)
 

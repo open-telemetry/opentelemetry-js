@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { diag } from '@opentelemetry/api';
+import {
+  diag,
+  MetricAttributes,
+  MetricAttributeValue,
+} from '@opentelemetry/api';
 import {
   ResourceMetrics,
   InstrumentType,
@@ -24,10 +28,6 @@ import {
   DataPoint,
   Histogram,
 } from '@opentelemetry/sdk-metrics';
-import type {
-  MetricAttributes,
-  MetricAttributeValue
-} from '@opentelemetry/api-metrics';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 
