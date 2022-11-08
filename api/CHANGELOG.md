@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## 1.3.0
+## [1.2.0](https://www.github.com/open-telemetry/opentelemetry-js-api/compare/v1.2.0...v1.3.0)
 
 * feat(api): merge api-metrics into api [#3374](https://github.com/open-telemetry/opentelemetry-js/pull/3374) @legendecas
 * Optionally suppress warning about logger being overwritten ([#3366](https://www.github.com/open-telemetry/opentelemetry-js-api/pull/3366))
