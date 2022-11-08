@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+### Features
+
+* Optionally suppress warning about logger being overwritten ([#3366](https://www.github.com/open-telemetry/opentelemetry-js-api/pull/3366))
+
 ## [1.2.0](https://www.github.com/open-telemetry/opentelemetry-js-api/compare/v1.1.0...v1.2.0) (2022-08-09)
 
 ### Features
