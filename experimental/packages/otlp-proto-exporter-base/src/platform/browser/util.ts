@@ -17,7 +17,6 @@
 import { ServiceClientType } from '../types';
 import { OTLPProtoExporterBrowserBase } from './OTLPProtoExporterBrowserBase';
 import {
-  // CompressionAlgorithm,
   OTLPExporterError,
   sendWithXhr
 } from '@opentelemetry/otlp-exporter-base';
@@ -44,7 +43,6 @@ export function getExportRequestProto<ServiceRequest>(
 export function send<ExportItem, ServiceRequest>(
   collector: OTLPProtoExporterBrowserBase<ExportItem, ServiceRequest>,
   objects: ExportItem[],
-  // compression: CompressionAlgorithm,
   onSuccess: () => void,
   onError: (error: OTLPExporterError) => void
 ): void {

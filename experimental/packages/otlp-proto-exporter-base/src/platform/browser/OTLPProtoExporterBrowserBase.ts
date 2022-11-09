@@ -18,7 +18,6 @@ import { diag } from '@opentelemetry/api';
 import { ServiceClientType } from '../types';
 import {
   OTLPExporterBrowserBase as OTLPExporterBaseMain,
-  // CompressionAlgorithm,
   OTLPExporterError,
   OTLPExporterConfigBase
 } from '@opentelemetry/otlp-exporter-base';
@@ -26,7 +25,6 @@ import { send } from './util';
 
 type SendFn = <ExportItem, ServiceRequest>(collector: OTLPProtoExporterBrowserBase<ExportItem, ServiceRequest>,
   objects: ExportItem[],
-  // compression: CompressionAlgorithm,
   onSuccess: () => void,
   onError: (error: OTLPExporterError) => void) => void;
 

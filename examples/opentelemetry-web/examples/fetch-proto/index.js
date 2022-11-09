@@ -1,18 +1,11 @@
 const { context, trace } = require("@opentelemetry/api");
-const {
-  ConsoleSpanExporter,
-  SimpleSpanProcessor,
-} = require("@opentelemetry/sdk-trace-base");
+const { ConsoleSpanExporter, SimpleSpanProcessor} = require("@opentelemetry/sdk-trace-base");
 const { WebTracerProvider } = require("@opentelemetry/sdk-trace-web");
-const {
-  FetchInstrumentation,
-} = require("@opentelemetry/instrumentation-fetch");
+const { FetchInstrumentation } = require("@opentelemetry/instrumentation-fetch");
 const { ZoneContextManager } = require("@opentelemetry/context-zone");
 const { B3Propagator } = require("@opentelemetry/propagator-b3");
 const { registerInstrumentations } = require("@opentelemetry/instrumentation");
-const {
-  OTLPTraceExporter: OTLPTraceExporterProto,
-} = require("@opentelemetry/exporter-trace-otlp-proto/build/src/platform");
+const { OTLPTraceExporter: OTLPTraceExporterProto } = require("@opentelemetry/exporter-trace-otlp-proto");
 
 const provider = new WebTracerProvider();
 
@@ -23,16 +16,6 @@ provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.addSpanProcessor(
   new SimpleSpanProcessor(new OTLPTraceExporterProto())
 );
-
-// provider.addSpanProcessor(
-//   new SimpleSpanProcessor(
-//     new OTLPTraceExporterProto({
-//       url: "https://api.honeycomb.io/v1/traces",
-//       headers: {
-//       },
-//     })
-//   )
-// );
 
 provider.register({
   contextManager: new ZoneContextManager(),
