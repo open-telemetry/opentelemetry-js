@@ -19,7 +19,7 @@
       "path": "../../../packages/opentelemetry-resources"
     },
     {
-      "path": "../opentelemetry-sdk-metrics"
+      "path": "../../../packages/sdk-metrics"
     },
     {
       "path": "../otlp-exporter-base"

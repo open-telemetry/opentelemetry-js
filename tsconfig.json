@@ -95,6 +95,9 @@
       "path": "packages/opentelemetry-shim-opentracing"
     },
     {
+      "path": "packages/sdk-metrics"
+    },
+    {
       "path": "packages/template"
     },
     {
@@ -138,9 +141,6 @@
     },
     {
       "path": "experimental/packages/opentelemetry-instrumentation"
-    },
-    {
-      "path": "experimental/packages/opentelemetry-sdk-metrics"
     },
     {
       "path": "experimental/packages/opentelemetry-sdk-node"
