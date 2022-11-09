@@ -1,13 +1,13 @@
-import { LogProcessor } from "../LogProcessor";
-import { LogData } from "./LogData";
+import { LogRecord } from "../LogRecord";
+import { LogRecordProcessor } from "../LogRecordProcessor";
 import { LogExporter } from "./LogExporter";
 
-export class SimpleLogProcessor implements LogProcessor {
+export class SimpleLogProcessor implements LogRecordProcessor {
   constructor(private exporter: LogExporter) {
   } 
 
-  emit(data: LogData): void {
-    this.exporter.export([data], result => {});
+  onEmit(logRecord: LogRecord): void {
+    this.exporter.export([logRecord], result => {});
   } 
 
   shutdown(): Promise<void> {

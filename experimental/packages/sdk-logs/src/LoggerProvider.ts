@@ -16,28 +16,69 @@
 
 import * as api from '@opentelemetry/api-logs';
 import { Resource } from '@opentelemetry/resources';
-import { LogProcessor } from './LogProcessor';
-import { LogEmitterConfig } from './LoggerConfig';
+import { LogRecordProcessor } from './LogRecordProcessor';
 import { Logger } from './Logger';
+import { ForceFlushOptions, LoggerProviderOptions, ShutdownOptions } from './types';
+import { diag } from '@opentelemetry/api';
 
 export class LoggerProvider implements api.LoggerProvider {
-  readonly processors: LogProcessor[] = [];
+  readonly processors: LogRecordProcessor[] = [];
   readonly resource: Resource;
+  private _shutdown = false;
 
-  constructor(config: LogEmitterConfig) {
-    this.resource = config.resource || Resource.empty();
+  constructor(options: LoggerProviderOptions) {
+    this.resource = options.resource || Resource.empty();
     this.resource = Resource.default().merge(this.resource);
   }
 
   getLogger(name: string, version?: string | undefined, options?: api.LoggerOptions | undefined): api.Logger {
-    const instrumentationLibrary = {
+    const instrumentationScope = {
       name: name,
       version: version
     }
-    return new Logger(this.resource, instrumentationLibrary, this);
+    return new Logger(this.resource, instrumentationScope, this);
   }
 
-  addLogProcessor(logProcessor: LogProcessor): void {
+  /**
+   * Adds a new {@link LoggerProcessors} to this tracer.
+   * @param spanProcessor the new SpanProcessor to be added.
+   */
+  addLogProcessor(logProcessor: LogRecordProcessor): void {
     this.processors.push(logProcessor);
   }
+
+  /**
+   * Flush all buffered data and shut down the LoggerProvider and all registered
+   * LogProcessors.
+   *
+   * Returns a promise which is resolved when all flushes are complete.
+   */
+  async shutdown(options?: ShutdownOptions): Promise<void> {
+    if (this._shutdown) {
+      return;
+    }
+
+    this._shutdown = true;
+
+    await Promise.all(this.processors.map(processor => {
+      return processor.shutdown(options);
+    }));
+  }
+  
+    /**
+     * Notifies all registered LoggerProcessors to flush any buffered data.
+     *
+     * Returns a promise which is resolved when all flushes are complete.
+     */
+    async forceFlush(options?: ForceFlushOptions): Promise<void> {
+      // do not flush after shutdown
+      if (this._shutdown) {
+        diag.warn('invalid attempt to force flush after LoggerProvider shutdown');
+        return;
+      }
+  
+      await Promise.all(this.processors.map(processor => {
+        return processor.forceFlush(options);
+      }));
+    }
 }

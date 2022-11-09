@@ -16,47 +16,62 @@
 
 import * as api from '@opentelemetry/api-logs';
 import { LoggerProvider } from './LoggerProvider';
-import { InstrumentationLibrary } from '@opentelemetry/core';
+import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { LogData } from './export/LogData';
+import { LogRecord } from './LogRecord';
 
 export class Logger implements api.Logger {
   readonly resource: Resource;
-  readonly instrumentationLibrary: InstrumentationLibrary;
+  readonly instrumentationScope: InstrumentationScope;
   readonly provider: LoggerProvider;
 
   constructor(
     resource: Resource,
-    instrumentationLibrary: InstrumentationLibrary,
+    instrumentationScope: InstrumentationScope,
     provider: LoggerProvider
   ) {
     this.resource = resource;
-    this.instrumentationLibrary = instrumentationLibrary;
+    this.instrumentationScope = instrumentationScope;
     this.provider = provider;
   }
 
   emitLogRecord(logRecord: api.LogRecord): void {
-    const data = new LogData(logRecord, this.instrumentationLibrary);
-    this.provider.processors.forEach(processor => {
-      processor.onEmit(data);
-    });
+    this._emit(new LogRecord(
+      this.resource,
+      this.instrumentationScope,
+      logRecord.timestamp,
+      logRecord.severityNumber,
+      logRecord.severityText,
+      logRecord.body,
+      logRecord.attributes,
+      logRecord.traceFlags,
+      logRecord.traceId,
+      logRecord.spanId
+    ));
   }
 
   emitEvent(event: api.LogEvent): void {
-    const log: api.LogRecord = {
-      timestamp: event.timestamp,
-      traceFlags: event.traceFlags,
-      spanId: event.spanId,
-      traceId: event.traceId,
-      attributes: event.attributes
-    };
+    const logRecord = new LogRecord(
+      this.resource,
+      this.instrumentationScope,
+      event.timestamp,
+      undefined,
+      undefined,
+      undefined,
+      event.attributes,
+      event.traceFlags,
+      event.traceId,
+      event.spanId
+    );
 
-    if (!log.attributes) {
-      log.attributes = {};
-    }
+    logRecord.setAttribute('event.name', event.name);
 
-    log.attributes['event.name'] = event.name;    
+    this._emit(logRecord);
+  }
 
-    this.emitLogRecord(log);
+  _emit(logRecord: LogRecord): void {
+    this.provider.processors.forEach(processor => {
+      processor.onEmit(logRecord);
+    });
   }
 }

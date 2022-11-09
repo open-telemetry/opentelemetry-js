@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-import { LogRecord } from "@opentelemetry/api-logs";
-import { InstrumentationLibrary } from '@opentelemetry/core';
+import { Resource } from '@opentelemetry/resources';
+  
+/**
+ * LoggerProviderOptions provides an interface for configuring a LoggerProvider.
+ */
+ export interface LoggerProviderOptions {
+  /** Resource associated with metric telemetry  */
+  resource?: Resource;
+}
+  
+export interface ShutdownOptions {
+    timeoutMillis?: number;
+}
 
-export class LogData {
-  logRecord: LogRecord;
-  instrumentationLibrary: InstrumentationLibrary;
-
-  constructor(
-    logRecord: LogRecord,
-    instrumentationLibrary: InstrumentationLibrary
-  ) {
-    this.logRecord = logRecord;
-    this.instrumentationLibrary = instrumentationLibrary;
-  }
+export interface ForceFlushOptions {
+  timeoutMillis?: number;
 }

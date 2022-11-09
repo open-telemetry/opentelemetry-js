@@ -1,17 +1,17 @@
 import { LogExporter } from "./LogExporter";
-import { LogData } from "./LogData";
 import {
   ExportResult,
   ExportResultCode,
 } from '@opentelemetry/core';
+import { ReadableLogRecord } from "./ReadableLogRecord";
 
 export class ConsoleLogExporter implements LogExporter {
   export(
-    logs: LogData[],
+    logRecords: ReadableLogRecord[],
     resultCallback: (result: ExportResult) => void
   ): void {
-    for (const log of logs) {
-      console.log(this._exportInfo(log));
+    for (const logRecord of logRecords) {
+      console.log(this._exportInfo(logRecord));
     }
     if (resultCallback) {
       return resultCallback({ code: ExportResultCode.SUCCESS });
@@ -22,12 +22,20 @@ export class ConsoleLogExporter implements LogExporter {
     return Promise.resolve();
   }
 
-  private _exportInfo(data: LogData) {
+  forceFlush(): Promise<void> {
+    return Promise.resolve();
+  }
+
+  private _exportInfo(logRecord: ReadableLogRecord) {
     return {
-      traceId: data.logRecord.traceId,
-      spanId: data.logRecord.spanId,
-      timestamp: data.logRecord.timestamp,
-      attributes: data.logRecord.attributes
+      timestamp: logRecord.timestamp,
+      severityNumber: logRecord.severityNumber,
+      severityText: logRecord.severityText,
+      body: logRecord.body,
+      attributes: logRecord.getAttributes(),
+      traceFlags: logRecord.traceFlags,
+      traceId: logRecord.traceId,
+      spanId: logRecord.spanId
     };
   }
 }
