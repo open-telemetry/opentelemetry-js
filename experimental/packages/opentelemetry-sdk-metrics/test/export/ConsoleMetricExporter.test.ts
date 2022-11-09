@@ -24,10 +24,12 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { assertAggregationTemporalitySelector } from './utils';
 import {
-  CUMULATIVE_AGGREGATION_TEMPORALITY_SELECTOR,
-  DELTA_AGGREGATION_TEMPORALITY_SELECTOR
+  DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR
 } from '../../src/export/AggregationSelector';
-import { AggregationTemporality } from '../../src';
+import {
+  AggregationTemporality,
+  InstrumentType
+} from '../../src';
 
 
 async function waitForNumberOfExports(exporter: sinon.SinonSpy<[metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void], void>, numberOfExports: number): Promise<void> {
@@ -117,22 +119,35 @@ describe('ConsoleMetricExporter', () => {
   describe('constructor', () => {
     it('with no arguments should select cumulative temporality', () => {
       const exporter = new ConsoleMetricExporter();
-      assertAggregationTemporalitySelector(exporter, CUMULATIVE_AGGREGATION_TEMPORALITY_SELECTOR);
+      assertAggregationTemporalitySelector(exporter, DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR);
     });
 
     it('with empty options should select cumulative temporality', () => {
       const exporter = new ConsoleMetricExporter({});
-      assertAggregationTemporalitySelector(exporter, CUMULATIVE_AGGREGATION_TEMPORALITY_SELECTOR);
+      assertAggregationTemporalitySelector(exporter, DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR);
     });
 
     it('with cumulative preference should select cumulative temporality', () => {
-      const exporter = new ConsoleMetricExporter({ temporalityPreference: AggregationTemporality.CUMULATIVE });
-      assertAggregationTemporalitySelector(exporter, CUMULATIVE_AGGREGATION_TEMPORALITY_SELECTOR);
+      const exporter = new ConsoleMetricExporter({ temporalitySelector: _ => AggregationTemporality.CUMULATIVE });
+      assertAggregationTemporalitySelector(exporter, _ => AggregationTemporality.CUMULATIVE);
     });
 
-    it('with delta preference should select delta temporality', () => {
-      const exporter = new ConsoleMetricExporter({ temporalityPreference: AggregationTemporality.DELTA });
-      assertAggregationTemporalitySelector(exporter, DELTA_AGGREGATION_TEMPORALITY_SELECTOR);
+    it('with mixed preference should select matching temporality', () => {
+      // use delta-ish example as a representation of a commonly used "mixed" preference.
+      const selector = (instrumentType: InstrumentType) => {
+        switch (instrumentType) {
+          case InstrumentType.COUNTER:
+          case InstrumentType.OBSERVABLE_COUNTER:
+          case InstrumentType.HISTOGRAM:
+          case InstrumentType.OBSERVABLE_GAUGE:
+            return AggregationTemporality.DELTA;
+          case InstrumentType.UP_DOWN_COUNTER:
+          case InstrumentType.OBSERVABLE_UP_DOWN_COUNTER:
+            return AggregationTemporality.CUMULATIVE;
+        }
+      };
+      const exporter = new ConsoleMetricExporter({ temporalitySelector: selector });
+      assertAggregationTemporalitySelector(exporter, selector);
     });
   });
 });

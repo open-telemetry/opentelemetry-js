@@ -23,12 +23,11 @@ import { ResourceMetrics } from './MetricData';
 import { PushMetricExporter } from './MetricExporter';
 import {
   AggregationTemporalitySelector,
-  CUMULATIVE_AGGREGATION_TEMPORALITY_SELECTOR,
-  DELTA_AGGREGATION_TEMPORALITY_SELECTOR
+  DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
 } from './AggregationSelector';
 
 interface ConsoleMetricExporterOptions {
-  temporalityPreference?: AggregationTemporality
+  temporalitySelector?: AggregationTemporalitySelector
 }
 
 /* eslint-disable no-console */
@@ -37,9 +36,7 @@ export class ConsoleMetricExporter implements PushMetricExporter {
   protected _temporalitySelector: AggregationTemporalitySelector;
 
   constructor(options?: ConsoleMetricExporterOptions) {
-    this._temporalitySelector = options?.temporalityPreference === AggregationTemporality.DELTA ?
-      DELTA_AGGREGATION_TEMPORALITY_SELECTOR :
-      CUMULATIVE_AGGREGATION_TEMPORALITY_SELECTOR;
+    this._temporalitySelector = options?.temporalitySelector ?? DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR;
   }
 
   export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): void {
