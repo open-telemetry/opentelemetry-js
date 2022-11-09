@@ -6,8 +6,18 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
-* Add semver check to metrics API [#3357](https://github.com/open-telemetry/opentelemetry-js/pull/3357) @dyladan
-  * Previously API versions were only considered compatible if the API was exactly the same
+### :rocket: (Enhancement)
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.34.0
+
+* `@opentelemetry/sdk-metrics` moved to [packages/sdk-metrics](../packages/sdk-metrics)
+* `@opentelemetry/api-metrics` deprecated and merged into [api](../api)
 
 ### :rocket: (Enhancement)
 
