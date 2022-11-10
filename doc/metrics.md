@@ -6,7 +6,7 @@ For a high-level overview of OpenTelemetry metrics in general and definitions of
 
 _Metrics API Specification: <https://github.com/open-telemetry/opentelemetry-specification/blob/v1.14.0/specification/metrics/api.md>_
 
-_Metrics API Reference: <https://open-telemetry.github.io/opentelemetry-js/modules/_opentelemetry_api_metrics.html>_
+_Metrics API Reference: <https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_api.MetricsAPI.html>_
 
 - [Getting Started](#getting-started)
 - [Acquiring a Meter](#acquiring-a-meter)
