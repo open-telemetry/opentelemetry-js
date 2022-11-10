@@ -6,7 +6,7 @@ For a high-level overview of OpenTelemetry tracing in general and definitions of
 
 _Trace API Specification: <https://github.com/open-telemetry/opentelemetry-specification/blob/v1.6.0/specification/trace/api.md>_
 
-_Trace API Reference: <https://open-telemetry.github.io/opentelemetry-js-api/classes/traceapi.html>_
+_Trace API Reference: <https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_api.TraceAPI.html>_
 
 - [Acquiring a Tracer](#acquiring-a-tracer)
 - [Starting and Ending a Span](#starting-and-ending-a-span)
@@ -23,7 +23,7 @@ _Trace API Reference: <https://open-telemetry.github.io/opentelemetry-js-api/cla
 
 ## Acquiring a Tracer
 
-In OpenTelemetry, tracing operations are performed using methods on a _tracer_. You can get a tracer by calling [`getTracer`](https://open-telemetry.github.io/opentelemetry-js-api/classes/traceapi.html#gettracer) on the global tracer provider. `getTracer` takes the name and version of the application or library acquiring the tracer, and provides a tracer which can be used to trace operations.
+In OpenTelemetry, tracing operations are performed using methods on a _tracer_. You can get a tracer by calling [`getTracer`](https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_api.TraceAPI.html#getTracer) on the global tracer provider. `getTracer` takes the name and version of the application or library acquiring the tracer, and provides a tracer which can be used to trace operations.
 
 ```typescript
 import { trace } from '@opentelemetry/api';
@@ -33,9 +33,9 @@ const tracer = trace.getTracer("my-application", "0.1.0");
 
 ## Starting and Ending a Span
 
-In OpenTelemetry, all _traces_ are composed of [`Spans`](https://open-telemetry.github.io/opentelemetry-js-api/interfaces/span.html). A span describes a single operation with a start time and and end time like a database request, outgoing remote request, or a function invocation. These spans are linked together by parent-child relationships to form a tree. The resultant tree is your trace, and the root of the tree is commonly called the _root span_.
+In OpenTelemetry, all _traces_ are composed of [`Spans`](https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api.Span.html). A span describes a single operation with a start time and and end time like a database request, outgoing remote request, or a function invocation. These spans are linked together by parent-child relationships to form a tree. The resultant tree is your trace, and the root of the tree is commonly called the _root span_.
 
-You can create a span by calling [`Tracer#startSpan`](https://open-telemetry.github.io/opentelemetry-js-api/interfaces/tracer.html#startspan). The only required argument to `startSpan` is the _span name_, which should describe the operation being performed with low cardinality.
+You can create a span by calling [`Tracer#startSpan`](https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api.Tracer.html#startSpan). The only required argument to `startSpan` is the _span name_, which should describe the operation being performed with low cardinality.
 
 ```typescript
 const span = tracer.startSpan("my-span-name");
