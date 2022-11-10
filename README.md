@@ -4,9 +4,7 @@
   <strong>
     <a href="https://opentelemetry.io/docs/js/getting-started/">Getting Started</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="https://open-telemetry.github.io/opentelemetry-js-api">API Reference</a>
-    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="https://open-telemetry.github.io/opentelemetry-js">SDK Reference</a>
+    <a href="https://open-telemetry.github.io/opentelemetry-js">API and SDK Reference</a>
   </strong>
 </p>
 
