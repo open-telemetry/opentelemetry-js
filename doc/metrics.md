@@ -233,7 +233,7 @@ example you see that we accessed our `/` endpoint six times.
 
 ## Acquiring a Meter
 
-In OpenTelemetry, Instruments that allow for measurement operations are acquired through a _meter_. You can get a meter by calling [`getMeter`](hhttps://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api_metrics.MeterProvider.html#getMeter) on the global meter provider. `getMeter` takes the name and version of the application or library acquiring the meter, and provides a meter which can be used to create instruments.
+In OpenTelemetry, Instruments that allow for measurement operations are acquired through a _meter_. You can get a meter by calling [`getMeter`](https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api.MeterProvider.html#getMeter) on the global meter provider. `getMeter` takes the name and version of the application or library acquiring the meter, and provides a meter which can be used to create instruments.
 
 ```typescript
 import { metrics } from '@opentelemetry/api';
@@ -253,7 +253,7 @@ there are four types of instruments that can be created:
 - UpDownCounter, a synchronous instrument which supports increments and decrements, such as number of active requests
 - Asynchronous UpDownCounter, an asynchronous instrument which supports increments and decrements
 
-You can create a Counter instrument by calling [`Meter#createCounter`](https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api_metrics.Meter.html#createCounter). The only required argument to `createCounter` is the _instrument name_, which should describe the item that is being measurement.
+You can create a Counter instrument by calling [`Meter#createCounter`](https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api.Meter.html#createCounter). The only required argument to `createCounter` is the _instrument name_, which should describe the item that is being measurement.
 
 ```typescript
 const counter = meter.createCounter("events.counter");
