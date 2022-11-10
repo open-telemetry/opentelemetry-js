@@ -13,15 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ExportResult, ExportResultCode } from '@opentelemetry/core';
+import {
+  ExportResult,
+  ExportResultCode
+} from '@opentelemetry/core';
 import { InstrumentType } from '../InstrumentDescriptor';
 import { AggregationTemporality } from './AggregationTemporality';
 import { ResourceMetrics } from './MetricData';
 import { PushMetricExporter } from './MetricExporter';
+import {
+  AggregationTemporalitySelector,
+  DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR,
+} from './AggregationSelector';
+
+interface ConsoleMetricExporterOptions {
+  temporalitySelector?: AggregationTemporalitySelector
+}
 
 /* eslint-disable no-console */
 export class ConsoleMetricExporter implements PushMetricExporter {
   protected _shutdown = false;
+  protected _temporalitySelector: AggregationTemporalitySelector;
+
+  constructor(options?: ConsoleMetricExporterOptions) {
+    this._temporalitySelector = options?.temporalitySelector ?? DEFAULT_AGGREGATION_TEMPORALITY_SELECTOR;
+  }
 
   export(metrics: ResourceMetrics, resultCallback: (result: ExportResult) => void): void {
     if (this._shutdown) {
@@ -38,7 +54,7 @@ export class ConsoleMetricExporter implements PushMetricExporter {
   }
 
   selectAggregationTemporality(_instrumentType: InstrumentType): AggregationTemporality {
-    return AggregationTemporality.CUMULATIVE;
+    return this._temporalitySelector(_instrumentType);
   }
 
   shutdown(): Promise<void> {
