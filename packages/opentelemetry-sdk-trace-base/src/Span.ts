@@ -15,7 +15,15 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { Context, HrTime, SpanAttributeValue } from '@opentelemetry/api';
+import {
+  Context,
+  HrTime,
+  SpanAttributeValue,
+  SpanContext,
+  SpanKind,
+  Link,
+  TimeInput
+} from '@opentelemetry/api';
 import {
   addHrTimes,
   Clock,
