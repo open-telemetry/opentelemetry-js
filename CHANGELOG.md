@@ -11,6 +11,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+* feat(exporter-trace-otlp-proto): Add protobuf otlp trace exporter support for browser [#3208](https://github.com/open-telemetry/opentelemetry-js/pull/3208) @pkanal
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
