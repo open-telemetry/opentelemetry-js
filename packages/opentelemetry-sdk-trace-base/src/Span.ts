@@ -99,7 +99,7 @@ export class Span implements api.Span, ReadableSpan {
     this.links = links;
 
     this._performanceStartTime = otperformance.now();
-    this._performanceOffset = Date.now() - otperformance.now() + otperformance.timeOrigin;
+    this._performanceOffset = Date.now() - this._performanceStartTime + otperformance.timeOrigin;
 
     if (startTime != null) {
       this.startTime = this._providedStartTime = timeInputToHrTime(startTime);
