@@ -43,7 +43,6 @@ import {
   HttpInstrumentationConfig,
   HttpRequestArgs,
   Https,
-  ResponseEndArgs,
 } from './types';
 import * as utils from './utils';
 import { VERSION } from './version';
@@ -451,7 +450,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
       };
 
       const startTime = hrTime();
-      let metricAttributes: MetricAttributes = utils.getIncomingRequestMetricAttributes(spanAttributes);
+      const metricAttributes = utils.getIncomingRequestMetricAttributes(spanAttributes);
 
       const ctx = propagation.extract(ROOT_CONTEXT, headers);
       const span = instrumentation._startHttpSpan(
@@ -479,54 +478,13 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
           instrumentation._headerCapture.server.captureRequestHeaders(span, header => request.headers[header]);
 
-          // Wraps end (inspired by:
-          // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/instrumentations/instrumentation-connect.ts#L75)
-          const originalEnd = response.end;
-          response.end = function (
-            this: http.ServerResponse,
-            ..._args: ResponseEndArgs
-          ) {
-            response.end = originalEnd;
-            // Cannot pass args of type ResponseEndArgs,
-            const returned = safeExecuteInTheMiddle(
-              () => response.end.apply(this, arguments as never),
-              error => {
-                if (error) {
-                  utils.setSpanWithError(span, error);
-                  instrumentation._closeHttpSpan(span, SpanKind.SERVER, startTime, metricAttributes);
-                  throw error;
-                }
-              }
-            );
-
-            const attributes = utils.getIncomingRequestAttributesOnResponse(
-              request,
-              response
-            );
-            metricAttributes = Object.assign(metricAttributes, utils.getIncomingRequestMetricAttributesOnResponse(attributes));
-
-            instrumentation._headerCapture.server.captureResponseHeaders(span, header => response.getHeader(header));
-
-            span
-              .setAttributes(attributes)
-              .setStatus({ code: utils.parseResponseStatus(SpanKind.SERVER, response.statusCode) });
-
-            if (instrumentation._getConfig().applyCustomAttributesOnSpan) {
-              safeExecuteInTheMiddle(
-                () =>
-                  instrumentation._getConfig().applyCustomAttributesOnSpan!(
-                    span,
-                    request,
-                    response
-                  ),
-                () => { },
-                true
-              );
-            }
-
-            instrumentation._closeHttpSpan(span, SpanKind.SERVER, startTime, metricAttributes);
-            return returned;
-          };
+          // After 'error', no further events other than 'close' should be emitted.
+          response.on('finish', () => {
+            instrumentation._onServerResponseFinish(request, response, span, metricAttributes, startTime);
+          });
+          response.on(errorMonitor, (err: Err) => {
+            instrumentation._onServerResponseError(span, metricAttributes, startTime, err);
+          });
 
           return safeExecuteInTheMiddle(
             () => original.apply(this, [event, ...args]),
@@ -659,6 +617,40 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         );
       });
     };
+  }
+
+  private _onServerResponseFinish(request: http.IncomingMessage, response: http.ServerResponse, span: Span, metricAttributes: MetricAttributes, startTime: HrTime) {
+    const attributes = utils.getIncomingRequestAttributesOnResponse(
+      request,
+      response
+    );
+    metricAttributes = Object.assign(metricAttributes, utils.getIncomingRequestMetricAttributesOnResponse(attributes));
+
+    this._headerCapture.server.captureResponseHeaders(span, header => response.getHeader(header));
+
+    span
+      .setAttributes(attributes)
+      .setStatus({ code: utils.parseResponseStatus(SpanKind.SERVER, response.statusCode) });
+
+    if (this._getConfig().applyCustomAttributesOnSpan) {
+      safeExecuteInTheMiddle(
+        () =>
+          this._getConfig().applyCustomAttributesOnSpan!(
+            span,
+            request,
+            response
+          ),
+        () => { },
+        true
+      );
+    }
+
+    this._closeHttpSpan(span, SpanKind.SERVER, startTime, metricAttributes);
+  }
+
+  private _onServerResponseError(span: Span, metricAttributes: MetricAttributes, startTime: HrTime, error: Err) {
+    utils.setSpanWithError(span, error);
+    this._closeHttpSpan(span, SpanKind.SERVER, startTime, metricAttributes);
   }
 
   private _startHttpSpan(

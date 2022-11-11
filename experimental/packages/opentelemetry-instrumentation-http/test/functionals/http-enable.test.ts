@@ -95,6 +95,14 @@ export const responseHookFunction = (
   response: IncomingMessage | ServerResponse
 ): void => {
   span.setAttribute('custom response hook attribute', 'response');
+  // IncomingMessage (Readable) 'end'.
+  response.on('end', () => {
+    span.setAttribute('custom incoming message attribute', 'end');
+  });
+  // ServerResponse (writable) 'finish'.
+  response.on('finish', () => {
+    span.setAttribute('custom server response attribute', 'finish');
+  });
 };
 
 export const startIncomingSpanHookFunction = (
@@ -772,6 +780,7 @@ describe('HttpInstrumentation', () => {
         const spans = memoryExporter.getFinishedSpans();
         const [incomingSpan, outgoingSpan] = spans;
 
+        // server request
         assert.strictEqual(
           incomingSpan.attributes['custom request hook attribute'],
           'request'
@@ -779,6 +788,10 @@ describe('HttpInstrumentation', () => {
         assert.strictEqual(
           incomingSpan.attributes['custom response hook attribute'],
           'response'
+        );
+        assert.strictEqual(
+          incomingSpan.attributes['custom server response attribute'],
+          'finish'
         );
         assert.strictEqual(
           incomingSpan.attributes['guid'],
@@ -789,6 +802,7 @@ describe('HttpInstrumentation', () => {
           SpanKind.CLIENT
         );
 
+        // client request
         assert.strictEqual(
           outgoingSpan.attributes['custom request hook attribute'],
           'request'
@@ -796,6 +810,10 @@ describe('HttpInstrumentation', () => {
         assert.strictEqual(
           outgoingSpan.attributes['custom response hook attribute'],
           'response'
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes['custom incoming message attribute'],
+          'end'
         );
         assert.strictEqual(
           outgoingSpan.attributes['guid'],
