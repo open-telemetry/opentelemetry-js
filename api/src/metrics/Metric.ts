@@ -83,7 +83,7 @@ export interface Histogram<AttributesTypes extends MetricAttributes = MetricAttr
   record(value: number, attributes?: AttributesTypes, context?: Context): void;
 }
 
-// api.SpanAttributes instead of api.Attributes is used here for api package backward compatibility.
+// api.MetricAttributes instead of api.Attributes is used here for api package backward compatibility.
 /**
  * Attributes is a map from string to attribute values.
  *
@@ -91,7 +91,7 @@ export interface Histogram<AttributesTypes extends MetricAttributes = MetricAttr
  */
 export type MetricAttributes = Attributes;
 
-// api.SpanAttributeValue instead of api.AttributeValue is used here for api package backward compatibility.
+// api.MetricAttributeValue instead of api.AttributeValue is used here for api package backward compatibility.
 /**
  * Attribute values may be any non-nullish primitive value except an object.
  *
