@@ -30,7 +30,6 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 * feat(sdk-trace): re-export sdk-trace-base in sdk-trace-node and web [#3319](https://github.com/open-telemetry/opentelemetry-js/pull/3319) @legendecas
 * feat: enable tree shaking [#3329](https://github.com/open-telemetry/opentelemetry-js/pull/3329) @pkanal
-* feat(grpc-instrumentation): added grpc metadata client side attributes in instrumentation [#3389](https://github.com/open-telemetry/opentelemetry-js/pull/3386)
 
 ### :bug: (Bug Fix)
 
