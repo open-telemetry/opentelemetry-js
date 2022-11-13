@@ -28,10 +28,10 @@
       "path": "../../../packages/opentelemetry-semantic-conventions"
     },
     {
-      "path": "../opentelemetry-instrumentation"
+      "path": "../../../packages/sdk-metrics"
     },
     {
-      "path": "../opentelemetry-sdk-metrics"
+      "path": "../opentelemetry-instrumentation"
     }
   ]
 }
