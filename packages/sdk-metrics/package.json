@@ -1,7 +1,7 @@
 {
   "name": "@opentelemetry/sdk-metrics",
   "version": "1.8.0",
-  "description": "Work in progress OpenTelemetry metrics SDK",
+  "description": "OpenTelemetry metrics SDK",
   "main": "build/src/index.js",
   "module": "build/esm/index.js",
   "esnext": "build/esnext/index.js",
@@ -81,6 +81,6 @@
     "@opentelemetry/resources": "1.8.0",
     "lodash.merge": "4.6.2"
   },
-  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-sdk-metrics",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-metrics",
   "sideEffects": false
 }
