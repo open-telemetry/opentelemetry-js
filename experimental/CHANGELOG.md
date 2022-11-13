@@ -8,6 +8,8 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
+* feat(instrumentation-http): monitor error events with events.errorMonitor [#3402](https://github.com/open-telemetry/opentelemetry-js/pull/3402) @legendecas
+
 ### :bug: (Bug Fix)
 
 ### :books: (Refine Doc)
