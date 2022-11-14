@@ -36,10 +36,13 @@ import * as sinon from 'sinon';
 import { PrometheusSerializer } from '../src';
 import {
   mockedHrTimeMs,
-  mockHrTime
+  mockHrTime,
+  sdkLanguage,
+  sdkName,
+  sdkVersion,
+  serviceName
 } from './util';
 import { Resource } from '@opentelemetry/resources';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 
 const attributes = {
   foo1: 'bar1',
@@ -49,7 +52,7 @@ const attributes = {
 const serializedDefaultResource =
   '# HELP target_info Target metadata\n' +
   '# TYPE target_info gauge\n' +
-  `target_info{service_name="${Resource.default().attributes[SemanticResourceAttributes.SERVICE_NAME]}",telemetry_sdk_language="${Resource.default().attributes[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]}",telemetry_sdk_name="${Resource.default().attributes[SemanticResourceAttributes.TELEMETRY_SDK_NAME]}",telemetry_sdk_version="${Resource.default().attributes[SemanticResourceAttributes.TELEMETRY_SDK_VERSION]}"} 1\n`;
+  `target_info{service_name="${serviceName}",telemetry_sdk_language="${sdkLanguage}",telemetry_sdk_name="${sdkName}",telemetry_sdk_version="${sdkVersion}"} 1\n`;
 
 class TestMetricReader extends MetricReader {
   constructor() {

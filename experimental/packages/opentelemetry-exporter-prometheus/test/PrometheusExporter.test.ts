@@ -26,13 +26,15 @@ import * as http from 'http';
 import { PrometheusExporter } from '../src';
 import {
   mockedHrTimeMs,
-  mockHrTime
+  mockHrTime,
+  sdkLanguage,
+  sdkName,
+  sdkVersion,
+  serviceName
 } from './util';
 import { SinonStubbedInstance } from 'sinon';
-import { Resource } from '@opentelemetry/resources';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 
-const infoLine = `target_info{service_name="${Resource.default().attributes[SemanticResourceAttributes.SERVICE_NAME]}",telemetry_sdk_language="${Resource.default().attributes[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]}",telemetry_sdk_name="${Resource.default().attributes[SemanticResourceAttributes.TELEMETRY_SDK_NAME]}",telemetry_sdk_version="${Resource.default().attributes[SemanticResourceAttributes.TELEMETRY_SDK_VERSION]}"} 1`;
+const infoLine = `target_info{service_name="${serviceName}",telemetry_sdk_language="${sdkLanguage}",telemetry_sdk_name="${sdkName}",telemetry_sdk_version="${sdkVersion}"} 1`;
 
 const serializedDefaultResourceLines = [
   '# HELP target_info Target metadata',
