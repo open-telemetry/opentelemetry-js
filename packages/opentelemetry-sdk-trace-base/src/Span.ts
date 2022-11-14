@@ -221,11 +221,12 @@ export class Span implements api.Span, ReadableSpan {
       if (providedEndTime != null) {
         const duration = hrTimeDuration(this.startTime, providedEndTime);
         if (duration[0] < 0) {
-          this.endTime = addHrTimes(providedEndTime, [0, this._performanceOffset]);
+          this.endTime = addHrTimes(providedEndTime, [0, this._performanceOffset * 1000000]);
           this._duration = hrTimeDuration(this.startTime, this.endTime);
         }
       } else {
-        this.endTime = addHrTimes(this.startTime, [0, otperformance.now() - this._performanceStartTime]);
+        const msDrift = otperformance.now() - this._performanceStartTime;
+        this.endTime = addHrTimes(this.startTime, [0, msDrift * 1000000]);
         this._duration = hrTimeDuration(this.startTime, this.endTime);
       }
     }
