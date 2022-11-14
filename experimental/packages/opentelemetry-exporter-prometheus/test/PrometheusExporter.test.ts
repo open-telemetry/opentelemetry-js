@@ -29,11 +29,15 @@ import {
   mockHrTime
 } from './util';
 import { SinonStubbedInstance } from 'sinon';
+import { Resource } from '@opentelemetry/resources';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 
-const serializedEmptyResourceLines = [
+const infoLine = `target_info{service_name="${Resource.default().attributes[SemanticResourceAttributes.SERVICE_NAME]}",telemetry_sdk_language="${Resource.default().attributes[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]}",telemetry_sdk_name="${Resource.default().attributes[SemanticResourceAttributes.TELEMETRY_SDK_NAME]}",telemetry_sdk_version="${Resource.default().attributes[SemanticResourceAttributes.TELEMETRY_SDK_VERSION]}"} 1`;
+
+const serializedDefaultResourceLines = [
   '# HELP target_info Target metadata',
   '# TYPE target_info gauge',
-  'target_info 1'
+  infoLine
 ];
 
 describe('PrometheusExporter', () => {
@@ -261,12 +265,12 @@ describe('PrometheusExporter', () => {
       const lines = body.split('\n');
 
       assert.strictEqual(
-        lines[serializedEmptyResourceLines.length],
+        lines[serializedDefaultResourceLines.length],
         '# HELP counter_total a test description'
       );
 
       assert.deepStrictEqual(lines, [
-        ...serializedEmptyResourceLines,
+        ...serializedDefaultResourceLines,
         '# HELP counter_total a test description',
         '# TYPE counter_total counter',
         `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
@@ -296,7 +300,7 @@ describe('PrometheusExporter', () => {
       const lines = body.split('\n');
 
       assert.deepStrictEqual(lines, [
-        ...serializedEmptyResourceLines,
+        ...serializedDefaultResourceLines,
         '# HELP metric_observable_gauge a test description',
         '# TYPE metric_observable_gauge gauge',
         `metric_observable_gauge{pid="123",core="1"} 0.999 ${mockedHrTimeMs}`,
@@ -316,7 +320,7 @@ describe('PrometheusExporter', () => {
       const lines = body.split('\n');
 
       assert.deepStrictEqual(lines, [
-        ...serializedEmptyResourceLines,
+        ...serializedDefaultResourceLines,
         '# HELP counter_total a test description',
         '# TYPE counter_total counter',
         `counter_total{counterKey1="attributeValue1"} 10 ${mockedHrTimeMs}`,
@@ -351,7 +355,7 @@ describe('PrometheusExporter', () => {
       const lines = body.split('\n');
 
       assert.deepStrictEqual(lines, [
-        ...serializedEmptyResourceLines,
+        ...serializedDefaultResourceLines,
         '# no registered metrics'
       ]);
     });
@@ -365,7 +369,7 @@ describe('PrometheusExporter', () => {
       const lines = body.split('\n');
 
       assert.deepStrictEqual(lines, [
-        ...serializedEmptyResourceLines,
+        ...serializedDefaultResourceLines,
         '# HELP counter_total description missing',
         '# TYPE counter_total counter',
         `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
@@ -382,7 +386,7 @@ describe('PrometheusExporter', () => {
       const lines = body.split('\n');
 
       assert.deepStrictEqual(lines, [
-        ...serializedEmptyResourceLines,
+        ...serializedDefaultResourceLines,
         '# HELP counter_bad_name_total description missing',
         '# TYPE counter_bad_name_total counter',
         `counter_bad_name_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
@@ -400,7 +404,7 @@ describe('PrometheusExporter', () => {
       const body = await request('http://localhost:9464/metrics');
       const lines = body.split('\n');
       assert.deepStrictEqual(lines, [
-        ...serializedEmptyResourceLines,
+        ...serializedDefaultResourceLines,
         '# HELP counter a test description',
         '# TYPE counter gauge',
         `counter{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
@@ -429,7 +433,7 @@ describe('PrometheusExporter', () => {
       const lines = body.split('\n');
 
       assert.deepStrictEqual(lines, [
-        ...serializedEmptyResourceLines,
+        ...serializedDefaultResourceLines,
         '# HELP metric_observable_counter a test description',
         '# TYPE metric_observable_counter counter',
         `metric_observable_counter{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
@@ -458,7 +462,7 @@ describe('PrometheusExporter', () => {
       const lines = body.split('\n');
 
       assert.deepStrictEqual(lines, [
-        ...serializedEmptyResourceLines,
+        ...serializedDefaultResourceLines,
         '# HELP metric_observable_up_down_counter a test description',
         '# TYPE metric_observable_up_down_counter gauge',
         `metric_observable_up_down_counter{key1="attributeValue1"} 20 ${mockedHrTimeMs}`,
@@ -477,7 +481,7 @@ describe('PrometheusExporter', () => {
       const lines = body.split('\n');
 
       assert.deepStrictEqual(lines, [
-        ...serializedEmptyResourceLines,
+        ...serializedDefaultResourceLines,
         '# HELP test_histogram a test description',
         '# TYPE test_histogram histogram',
         `test_histogram_count{key1="attributeValue1"} 1 ${mockedHrTimeMs}`,
@@ -531,7 +535,7 @@ describe('PrometheusExporter', () => {
                 const lines = body.split('\n');
 
                 assert.deepStrictEqual(lines, [
-                  ...serializedEmptyResourceLines,
+                  ...serializedDefaultResourceLines,
                   '# HELP test_prefix_counter_total description missing',
                   '# TYPE test_prefix_counter_total counter',
                   `test_prefix_counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
@@ -560,7 +564,7 @@ describe('PrometheusExporter', () => {
                 const lines = body.split('\n');
 
                 assert.deepStrictEqual(lines, [
-                  ...serializedEmptyResourceLines,
+                  ...serializedDefaultResourceLines,
                   '# HELP counter_total description missing',
                   '# TYPE counter_total counter',
                   `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
@@ -589,7 +593,7 @@ describe('PrometheusExporter', () => {
                 const lines = body.split('\n');
 
                 assert.deepStrictEqual(lines, [
-                  ...serializedEmptyResourceLines,
+                  ...serializedDefaultResourceLines,
                   '# HELP counter_total description missing',
                   '# TYPE counter_total counter',
                   `counter_total{key1="attributeValue1"} 10 ${mockedHrTimeMs}`,
@@ -618,7 +622,7 @@ describe('PrometheusExporter', () => {
                 const lines = body.split('\n');
 
                 assert.deepStrictEqual(lines, [
-                  ...serializedEmptyResourceLines,
+                  ...serializedDefaultResourceLines,
                   '# HELP counter_total description missing',
                   '# TYPE counter_total counter',
                   'counter_total{key1="attributeValue1"} 10',

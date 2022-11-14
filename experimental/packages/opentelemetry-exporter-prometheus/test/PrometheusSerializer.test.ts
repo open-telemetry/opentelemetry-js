@@ -39,16 +39,17 @@ import {
   mockHrTime
 } from './util';
 import { Resource } from '@opentelemetry/resources';
+import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 
 const attributes = {
   foo1: 'bar1',
   foo2: 'bar2',
 };
 
-const serializedEmptyResource =
+const serializedDefaultResource =
   '# HELP target_info Target metadata\n' +
   '# TYPE target_info gauge\n' +
-  'target_info 1\n';
+  `target_info{service_name="${Resource.default().attributes[SemanticResourceAttributes.SERVICE_NAME]}",telemetry_sdk_language="${Resource.default().attributes[SemanticResourceAttributes.TELEMETRY_SDK_LANGUAGE]}",telemetry_sdk_name="${Resource.default().attributes[SemanticResourceAttributes.TELEMETRY_SDK_NAME]}",telemetry_sdk_version="${Resource.default().attributes[SemanticResourceAttributes.TELEMETRY_SDK_VERSION]}"} 1\n`;
 
 class TestMetricReader extends MetricReader {
   constructor() {
@@ -477,7 +478,7 @@ describe('PrometheusSerializer', () => {
       const result = await getCounterResult('test', serializer, { unit: unitOfMetric, exportAll: true });
       assert.strictEqual(
         result,
-        serializedEmptyResource +
+        serializedDefaultResource +
         '# HELP test_total description missing\n' +
         `# UNIT test_total ${unitOfMetric}\n` +
         '# TYPE test_total counter\n' +
@@ -491,7 +492,7 @@ describe('PrometheusSerializer', () => {
       const result = await getCounterResult('test', serializer, { exportAll: true });
       assert.strictEqual(
         result,
-        serializedEmptyResource +
+        serializedDefaultResource +
         '# HELP test_total description missing\n' +
         '# TYPE test_total counter\n' +
         `test_total 1 ${mockedHrTimeMs}\n`
