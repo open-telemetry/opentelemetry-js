@@ -53,6 +53,7 @@ import {
   safeExecuteInTheMiddle,
 } from '@opentelemetry/instrumentation';
 import { RPCMetadata, RPCType, setRPCMetadata } from '@opentelemetry/core';
+import { errorMonitor } from 'events';
 
 /**
  * Http instrumentation instrumentation for Opentelemetry
@@ -354,7 +355,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
 
           this._closeHttpSpan(span, SpanKind.CLIENT, startTime, metricAttributes);
         });
-        response.on('error', (error: Err) => {
+        response.on(errorMonitor, (error: Err) => {
           this._diag.debug('outgoingRequest on error()', error);
           utils.setSpanWithError(span, error);
           const code = utils.parseResponseStatus(SpanKind.CLIENT, response.statusCode);
@@ -369,7 +370,7 @@ export class HttpInstrumentation extends InstrumentationBase<Http> {
         this._closeHttpSpan(span, SpanKind.CLIENT, startTime, metricAttributes);
       }
     });
-    request.on('error', (error: Err) => {
+    request.on(errorMonitor, (error: Err) => {
       this._diag.debug('outgoingRequest on request error()', error);
       utils.setSpanWithError(span, error);
       this._closeHttpSpan(span, SpanKind.CLIENT, startTime, metricAttributes);
