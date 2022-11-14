@@ -670,21 +670,21 @@ describe('HttpInstrumentation', () => {
           );
           req.setTimeout(10, () => {
             req.abort();
-            reject('timeout');
+          });
+          // Instrumentation should not swallow error event.
+          assert.strictEqual(req.listeners('error').length, 0);
+          req.on('error', err => {
+            reject(err);
           });
           return req.end();
         });
 
-        try {
-          await promiseRequest;
-          assert.fail();
-        } catch (error) {
-          const spans = memoryExporter.getFinishedSpans();
-          const [span] = spans;
-          assert.strictEqual(spans.length, 1);
-          assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
-          assert.ok(Object.keys(span.attributes).length >= 6);
-        }
+        await assert.rejects(promiseRequest, /Error: socket hang up/);
+        const spans = memoryExporter.getFinishedSpans();
+        const [span] = spans;
+        assert.strictEqual(spans.length, 1);
+        assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
+        assert.ok(Object.keys(span.attributes).length >= 6);
       });
 
       it('should have 1 ended span when request is aborted after receiving response', async () => {
@@ -701,7 +701,7 @@ describe('HttpInstrumentation', () => {
             (resp: http.IncomingMessage) => {
               let data = '';
               resp.on('data', chunk => {
-                req.destroy(Error());
+                req.destroy(Error('request destroyed'));
                 data += chunk;
               });
               resp.on('end', () => {
@@ -709,20 +709,21 @@ describe('HttpInstrumentation', () => {
               });
             }
           );
+          // Instrumentation should not swallow error event.
+          assert.strictEqual(req.listeners('error').length, 0);
+          req.on('error', err => {
+            reject(err);
+          });
 
           return req.end();
         });
 
-        try {
-          await promiseRequest;
-          assert.fail();
-        } catch (error) {
-          const spans = memoryExporter.getFinishedSpans();
-          const [span] = spans;
-          assert.strictEqual(spans.length, 1);
-          assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
-          assert.ok(Object.keys(span.attributes).length > 7);
-        }
+        await assert.rejects(promiseRequest, /Error: request destroyed/);
+        const spans = memoryExporter.getFinishedSpans();
+        const [span] = spans;
+        assert.strictEqual(spans.length, 1);
+        assert.strictEqual(span.status.code, SpanStatusCode.ERROR);
+        assert.ok(Object.keys(span.attributes).length > 7);
       });
 
       it("should have 1 ended client span when request doesn't listening response", done => {
