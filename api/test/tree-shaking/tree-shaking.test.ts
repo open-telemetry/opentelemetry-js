@@ -74,6 +74,8 @@ describe('tree-shaking', () => {
         optimization: {
           // disable minimization so that we can inspect the output easily.
           minimize: false,
+          // disable module concatenation so that variable names will not be mangled.
+          concatenateModules: false,
         }
       });
 
