@@ -9,6 +9,7 @@ All notable changes to experimental packages in this project will be documented 
 ### :rocket: (Enhancement)
 
 * feat(instrumentation-http): monitor error events with events.errorMonitor [#3402](https://github.com/open-telemetry/opentelemetry-js/pull/3402) @legendecas
+* feat(instrumentation): add new `_setMeterInstruments` protected method that update the meter instruments every meter provider update.
 
 ### :bug: (Bug Fix)
 
@@ -23,7 +24,6 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :rocket: (Enhancement)
 
-* feat(instrumentation): add new `_setMeterInstruments` protected method that update the meter instruments every meter provider update.
 * feat(metrics-sdk): Add tracing suppresing for Metrics Export [#3332](https://github.com/open-telemetry/opentelemetry-js/pull/3332) @hectorhdzg
 * feat(instrumentation): implement `require-in-the-middle` singleton [#3161](https://github.com/open-telemetry/opentelemetry-js/pull/3161) @mhassan1
 * feat(sdk-node): configure trace exporter with environment variables [#3143](https://github.com/open-telemetry/opentelemetry-js/pull/3143) @svetlanabrennan
