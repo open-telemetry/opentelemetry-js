@@ -13,7 +13,7 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :bug: (Bug Fix)
 
-* fix(sdk-metrics): use default Resource to comply with semantic conventions [#3410](https://github.com/open-telemetry/opentelemetry-js/pull/3410) @pichlermarc
+* fix(sdk-metrics): use default Resource to comply with semantic conventions [#3411](https://github.com/open-telemetry/opentelemetry-js/pull/3411) @pichlermarc
   * Metrics exported by the SDK now contain the following resource attributes by default:
     * `service.name`
     * `telemetry.sdk.name`
