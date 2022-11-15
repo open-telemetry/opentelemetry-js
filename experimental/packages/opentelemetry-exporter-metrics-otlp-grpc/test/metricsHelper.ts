@@ -37,11 +37,11 @@ class TestMetricReader extends MetricReader {
   }
 }
 
-const testResource = Resource.default().merge(new Resource({
+const testResource = new Resource({
   service: 'ui',
   version: 1,
   cost: 112.12,
-}));
+});
 
 let meterProvider = new MeterProvider({ resource: testResource });
 
