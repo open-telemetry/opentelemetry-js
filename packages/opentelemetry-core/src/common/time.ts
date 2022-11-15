@@ -176,7 +176,7 @@ export function isTimeInput(value: unknown): value is api.HrTime | number | Date
 export function addHrTimes(time1: api.HrTime, time2: api.HrTime): api.HrTime {
   const out: api.HrTime = [time1[0] + time2[0], time1[1] + time2[1]];
 
-  if(out[1 > SECOND_TO_NANOSECONDS]) {
+  if(out[1] > SECOND_TO_NANOSECONDS) {
     out[0] = out[0] + Math.floor(out[1] / SECOND_TO_NANOSECONDS);
     out[1] = out[1] % SECOND_TO_NANOSECONDS;
   }
