@@ -1090,6 +1090,8 @@ describe('Span', () => {
           spanContext,
           SpanKind.CLIENT
         );
+        // @ts-expect-error writing readonly property. performance time origin is mocked to return ms value of [1,1]
+        span['_performanceOffset'] = 0;
         assert.strictEqual(span.events.length, 0);
         span.recordException('boom', [0, 123]);
         const event = span.events[0];

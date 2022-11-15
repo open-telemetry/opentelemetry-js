@@ -154,12 +154,12 @@ export class Span implements api.Span, ReadableSpan {
    * @param name Span Name
    * @param [attributesOrStartTime] Span attributes or start time
    *     if type is {@type TimeInput} and 3rd param is undefined
-   * @param [startTime] Specified start time for the event
+   * @param [timeStamp] Specified time stamp for the event
    */
   addEvent(
     name: string,
     attributesOrStartTime?: api.SpanAttributes | api.TimeInput,
-    startTime?: api.TimeInput
+    timeStamp?: api.TimeInput
   ): this {
     if (this._isSpanEnded()) return this;
     if (this._spanLimits.eventCountLimit === 0) {
@@ -170,21 +170,19 @@ export class Span implements api.Span, ReadableSpan {
       api.diag.warn('Dropping extra events.');
       this.events.shift();
     }
-    if (isTimeInput(attributesOrStartTime)) {
-      if (typeof startTime === 'undefined') {
-        startTime = attributesOrStartTime as api.TimeInput;
+
+    if (isTimeInput(attributesOrStartTime)){
+      if (!isTimeInput(timeStamp)) {
+        timeStamp = attributesOrStartTime;
       }
       attributesOrStartTime = undefined;
-    }
-    if (typeof startTime === 'undefined') {
-      startTime = this._clock.now();
     }
 
     const attributes = sanitizeAttributes(attributesOrStartTime);
     this.events.push({
       name,
       attributes,
-      time: timeInputToHrTime(startTime),
+      time: this._getTimeAfterStart(timeStamp),
     });
     return this;
   }
@@ -208,28 +206,8 @@ export class Span implements api.Span, ReadableSpan {
     }
     this._ended = true;
 
-    const providedEndTime = endTime != null ? timeInputToHrTime(endTime) : undefined;
-
-    if (this._providedStartTime != null) {
-      if (providedEndTime != null) {
-        this.endTime = providedEndTime;
-      } else {
-        this.endTime = timeInputToHrTime(Date.now());
-      }
-      this._duration = hrTimeDuration(this.startTime, this.endTime);
-    } else {
-      if (providedEndTime != null) {
-        const duration = hrTimeDuration(this.startTime, providedEndTime);
-        if (duration[0] < 0) {
-          this.endTime = addHrTimes(providedEndTime, [0, this._performanceOffset * 1000000]);
-          this._duration = hrTimeDuration(this.startTime, this.endTime);
-        }
-      } else {
-        const msDrift = otperformance.now() - this._performanceStartTime;
-        this.endTime = addHrTimes(this.startTime, [0, msDrift * 1000000]);
-        this._duration = hrTimeDuration(this.startTime, this.endTime);
-      }
-    }
+    this.endTime = this._getTimeAfterStart(endTime);
+    this._duration = hrTimeDuration(this.startTime, this.endTime);
 
     if (this._duration[0] < 0) {
       api.diag.warn(
@@ -242,6 +220,31 @@ export class Span implements api.Span, ReadableSpan {
     }
 
     this._spanProcessor.onEnd(this);
+  }
+
+  private _getTimeAfterStart(inp?: api.TimeInput): api.HrTime {
+    const provided = inp != null ? timeInputToHrTime(inp) : undefined;
+
+    if (this._providedStartTime != null) {
+      if (provided != null) {
+        // both start and current time provided by user
+        return provided;
+      }
+
+      // start time provided but current time not provided by user
+      return timeInputToHrTime(Date.now());
+    }
+
+    if (provided != null) {
+      const duration = hrTimeDuration(this.startTime, provided);
+      if (duration[0] < 0) {
+        return addHrTimes(provided, [0, this._performanceOffset * 1000000]);
+      }
+      return provided;
+    }
+
+    const msDrift = otperformance.now() - this._performanceStartTime;
+    return addHrTimes(this.startTime, [0, msDrift * 1000000]);
   }
 
   isRecording(): boolean {
