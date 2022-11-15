@@ -137,7 +137,7 @@ describe('Span', () => {
       SpanKind.SERVER
     );
     // @ts-expect-error writing readonly property. performance time origin is mocked to return ms value of [1,1]
-    span["_performanceOffset"] = 0;
+    span['_performanceOffset'] = 0;
     span.end(hrTimeToMilliseconds(span.startTime) - 1);
     assert.ok(hrTimeToNanoseconds(span.duration) >= 0);
   });
