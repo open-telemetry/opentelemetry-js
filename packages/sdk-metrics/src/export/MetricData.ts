@@ -19,7 +19,7 @@ import { InstrumentationScope } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { InstrumentDescriptor } from '../InstrumentDescriptor';
 import { AggregationTemporality } from './AggregationTemporality';
-import { Histogram } from '../aggregator/types';
+import { Histogram, ExponentialHistogram } from '../aggregator/types';
 
 /**
  * Basic metric data fields.
@@ -57,9 +57,17 @@ export interface HistogramMetricData extends BaseMetricData {
 }
 
 /**
+ * Represents a metric data aggregated by a HistogramAggregation.
+ */
+export interface ExponentialHistogramMetricData extends BaseMetricData {
+  readonly dataPointType: DataPointType.EXPONENTIAL_HISTOGRAM;
+  readonly dataPoints: DataPoint<ExponentialHistogram>[];
+}
+
+/**
  * Represents an aggregated metric data.
  */
-export type MetricData = SumMetricData | GaugeMetricData | HistogramMetricData;
+export type MetricData = SumMetricData | GaugeMetricData | HistogramMetricData | ExponentialHistogramMetricData;
 
 export interface ScopeMetrics {
   scope: InstrumentationScope;
