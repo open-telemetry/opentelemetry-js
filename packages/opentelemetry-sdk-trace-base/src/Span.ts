@@ -26,7 +26,6 @@ import {
 } from '@opentelemetry/api';
 import {
   addHrTimes,
-  Clock,
   hrTimeDuration,
   InstrumentationLibrary,
   isAttributeValue,
@@ -69,7 +68,6 @@ export class Span implements api.Span, ReadableSpan {
   private readonly _spanProcessor: SpanProcessor;
   private readonly _spanLimits: SpanLimits;
   private readonly _attributeValueLengthLimit: number;
-  private readonly _clock: Clock;
 
   private readonly _providedStartTime?: HrTime;
   private readonly _performanceStartTime: number;
@@ -89,23 +87,25 @@ export class Span implements api.Span, ReadableSpan {
     parentSpanId?: string,
     links: Link[] = [],
     startTime?: TimeInput,
-    clock: Clock = otperformance,
+    _deprecatedClock?: unknown, // keeping this argument even though it is unused to ensure backwards compatibility
   ) {
-    this._clock = clock;
     this.name = spanName;
     this._spanContext = spanContext;
     this.parentSpanId = parentSpanId;
     this.kind = kind;
     this.links = links;
 
+    const now = Date.now();
     this._performanceStartTime = otperformance.now();
-    this._performanceOffset = Date.now() - (this._performanceStartTime + otperformance.timeOrigin);
+    this._performanceOffset = now - (this._performanceStartTime + otperformance.timeOrigin);
 
-    if (startTime != null) {
-      this.startTime = this._providedStartTime = timeInputToHrTime(startTime);
-    } else {
-      this.startTime = timeInputToHrTime(Date.now());
+    // if startTime is a number smaller than the start of the process
+    // assume it is a performance API timestamp and apply correction as needed
+    if (typeof startTime === 'number' && startTime < otperformance.timeOrigin) {
+      startTime += this._performanceOffset;
     }
+
+    this.startTime = timeInputToHrTime(startTime ?? now);
 
     this.resource = parentTracer.resource;
     this.instrumentationLibrary = parentTracer.instrumentationLibrary;
@@ -171,7 +171,7 @@ export class Span implements api.Span, ReadableSpan {
       this.events.shift();
     }
 
-    if (isTimeInput(attributesOrStartTime)){
+    if (isTimeInput(attributesOrStartTime)) {
       if (!isTimeInput(timeStamp)) {
         timeStamp = attributesOrStartTime;
       }
@@ -251,7 +251,7 @@ export class Span implements api.Span, ReadableSpan {
     return this._ended === false;
   }
 
-  recordException(exception: api.Exception, time: api.TimeInput = this._clock.now()): void {
+  recordException(exception: api.Exception, time?: api.TimeInput): void {
     const attributes: api.SpanAttributes = {};
     if (typeof exception === 'string') {
       attributes[SemanticAttributes.EXCEPTION_MESSAGE] = exception;
