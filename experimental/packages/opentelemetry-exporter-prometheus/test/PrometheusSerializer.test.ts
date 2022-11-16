@@ -36,7 +36,11 @@ import * as sinon from 'sinon';
 import { PrometheusSerializer } from '../src';
 import {
   mockedHrTimeMs,
-  mockHrTime
+  mockHrTime,
+  sdkLanguage,
+  sdkName,
+  sdkVersion,
+  serviceName
 } from './util';
 import { Resource } from '@opentelemetry/resources';
 
@@ -45,10 +49,10 @@ const attributes = {
   foo2: 'bar2',
 };
 
-const serializedEmptyResource =
+const serializedDefaultResource =
   '# HELP target_info Target metadata\n' +
   '# TYPE target_info gauge\n' +
-  'target_info 1\n';
+  `target_info{service_name="${serviceName}",telemetry_sdk_language="${sdkLanguage}",telemetry_sdk_name="${sdkName}",telemetry_sdk_version="${sdkVersion}"} 1\n`;
 
 class TestMetricReader extends MetricReader {
   constructor() {
@@ -477,7 +481,7 @@ describe('PrometheusSerializer', () => {
       const result = await getCounterResult('test', serializer, { unit: unitOfMetric, exportAll: true });
       assert.strictEqual(
         result,
-        serializedEmptyResource +
+        serializedDefaultResource +
         '# HELP test_total description missing\n' +
         `# UNIT test_total ${unitOfMetric}\n` +
         '# TYPE test_total counter\n' +
@@ -491,7 +495,7 @@ describe('PrometheusSerializer', () => {
       const result = await getCounterResult('test', serializer, { exportAll: true });
       assert.strictEqual(
         result,
-        serializedEmptyResource +
+        serializedDefaultResource +
         '# HELP test_total description missing\n' +
         '# TYPE test_total counter\n' +
         `test_total 1 ${mockedHrTimeMs}\n`
