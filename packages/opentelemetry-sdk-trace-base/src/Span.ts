@@ -243,8 +243,8 @@ export class Span implements api.Span, ReadableSpan {
       return provided;
     }
 
-    const msDrift = otperformance.now() - this._performanceStartTime;
-    return addHrTimes(this.startTime, [0, msDrift * 1000000]);
+    const msDuration = otperformance.now() - this._performanceStartTime;
+    return addHrTimes(this.startTime, [0, msDuration * 1000000]);
   }
 
   isRecording(): boolean {
