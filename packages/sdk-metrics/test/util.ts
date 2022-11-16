@@ -43,9 +43,9 @@ export type Measurement = {
   context?: Context;
 };
 
-export const defaultResource = new Resource({
+export const defaultResource = Resource.default().merge(new Resource({
   resourceKey: 'my-resource',
-});
+}));
 
 export const defaultInstrumentDescriptor: InstrumentDescriptor = {
   name: 'default_metric',
