@@ -28,12 +28,11 @@ import { HrTime } from '@opentelemetry/api';
 import { InstrumentDescriptor, InstrumentType } from '../InstrumentDescriptor';
 import { Maybe } from '../utils';
 import { AggregationTemporality } from '../export/AggregationTemporality';
-
-/**
- * default max size for exponential histogram bucket counts in each of the positive
- * and negative ranges
- */
-export const DEFAULT_MAX_SIZE = 160;
+import { Buckets } from './exponential-histogram/Buckets';
+import { Mapping } from './exponential-histogram/mapping/types';
+import { ExponentMapping } from './exponential-histogram/mapping/ExponentMapping';
+import { LogarithmMapping } from './exponential-histogram/mapping/LogarithmMapping';
+import * as util from './exponential-histogram//util';
 
 /**
  * Internal value type for ExponentialHistogramAggregation.
@@ -58,17 +57,55 @@ interface InternalHistogram {
   zeroCount: number;
 }
 
-export class ExponentialHistogramAccumulation implements Accumulation {
-  constructor(
-    public startTime: HrTime,
-    private _maxSize: number = DEFAULT_MAX_SIZE,
-    private _recordMinMax = true,
-  ) {}
+type HighLow = {
+  high: number;
+  low: number;
+};
 
-  record(_value: number): void {
-    //todo: implement
-    this._recordMinMax;
-    this._maxSize;
+type IncrementResult = {
+  success: boolean;
+  highLow?: HighLow;
+};
+
+export class ExponentialHistogramAccumulation implements Accumulation {
+  static DEFAULT_MAX_SIZE = 160;
+  public startTime: HrTime;
+  private _maxSize: number;
+  //private _recordMinMax: boolean;
+  private _sum: number;
+  private _count: number;
+  private _zeroCount: number;
+  private _min: number;
+  private _max: number;
+  private _positive: Buckets;
+  private _negative: Buckets;
+  private _mapping: Mapping;
+
+  constructor(
+    startTime: HrTime,
+    maxSize: number = ExponentialHistogramAccumulation.DEFAULT_MAX_SIZE,
+    _recordMinMax = true,
+  ) {
+    this.startTime = startTime;
+    this._maxSize =
+      maxSize || ExponentialHistogramAccumulation.DEFAULT_MAX_SIZE;
+    //this._recordMinMax = recordMinMax;
+    this._sum = 0;
+    this._count = 0;
+    this._zeroCount = 0;
+    this._min = Number.POSITIVE_INFINITY;
+    this._max = Number.NEGATIVE_INFINITY;
+    this._positive = new Buckets();
+    this._negative = new Buckets();
+    this._mapping = LogarithmMapping.get(LogarithmMapping.MAX_SCALE);
+  }
+
+  /**
+   * record supports updating a histogram with a single count.
+   * @param {Number} value
+   */
+  record(value: number) {
+    this.updateByIncrement(value, 1);
   }
 
   setStartTime(startTime: HrTime): void {
@@ -94,6 +131,228 @@ export class ExponentialHistogramAccumulation implements Accumulation {
       scale: 0,
       zeroCount: 0,
     };
+  }
+
+  sum(): number {
+    return this._sum;
+  }
+
+  min(): number {
+    return this._min;
+  }
+
+  max(): number {
+    return this._max;
+  }
+
+  count(): number {
+    return this._count;
+  }
+
+  scale(): number {
+    if (this._count === this._zeroCount) {
+      // all zeros! scale doesn't matter, use zero
+      return 0;
+    }
+    return this._mapping.scale();
+  }
+
+  positive(): Buckets {
+    return this._positive;
+  }
+
+  negative(): Buckets {
+    return this._negative;
+  }
+
+  /**
+   * Clear resets a histogram to the empty state without changing backing array.
+   */
+  clear() {
+    this._sum = 0;
+    this._count = 0;
+    this._zeroCount = 0;
+    this._min = 0;
+    this._max = 0;
+    this._positive.clear();
+    this._negative.clear();
+    this._mapping = LogarithmMapping.get(LogarithmMapping.MAX_SCALE);
+  }
+
+  /**
+   * uppdateByIncr supports updating a histogram with a non-negative
+   * increment.
+   * todo: private? / fold into record?
+   * @param value
+   * @param increment
+   */
+  updateByIncrement(value: number, increment: number) {
+    if (value > this._max) {
+      this._max = value;
+    }
+    if (value < this._min) {
+      this._min = value;
+    }
+
+    // Note: Not checking for overflow here. TODO.
+    this._count += increment;
+
+    if (value === 0) {
+      this._zeroCount += increment;
+      return;
+    }
+
+    this._sum += value * increment;
+
+    if (value > 0) {
+      this._update(this._positive, value, increment);
+    } else {
+      this._update(this._negative, -value, increment);
+    }
+  }
+
+  /**
+   * Merge combines data from other into self
+   * @param other
+   */
+  mergeFrom(_other: ExponentialHistogramAccumulation) {}
+
+  // todo: rename?
+  private _update(buckets: Buckets, value: number, increment: number) {
+    let index = this._mapping.mapToIndex(value);
+    let result = this._incrementIndexby(buckets, index, increment);
+    if (result.success) {
+      return;
+    }
+
+    this._downscale(this._changeScale(result.highLow!, this._maxSize));
+
+    index = this._mapping.mapToIndex(value);
+
+    result = this._incrementIndexby(buckets, index, increment);
+    if (!result.success) {
+      throw new Error('downscale logic error');
+    }
+  }
+
+  private _incrementIndexby(
+    buckets: Buckets,
+    index: number,
+    increment: number
+  ): IncrementResult {
+    if (increment === 0) {
+      // Skipping a bunch of work for 0 increment.
+      return {success: true};
+    }
+    if (buckets.length() === 0) {
+      buckets.indexStart = index;
+      buckets.indexEnd = buckets.indexStart;
+      buckets.indexBase = buckets.indexStart;
+    } else if (index < buckets.indexStart) {
+      const span = buckets.indexEnd - index;
+      if (span >= this._maxSize) {
+        // rescale needed: mapped value to right
+        return {
+          success: false,
+          highLow: {
+            low: index,
+            high: buckets.indexEnd,
+          },
+        };
+      } else if (span >= buckets.backing.size()) {
+        this._grow(buckets, span + 1);
+      }
+      buckets.indexStart = index;
+    } else if (index > buckets.indexEnd) {
+      const span = index - buckets.indexStart;
+      if (span >= this._maxSize) {
+        //rescale needed: mapped value to the left
+        return {
+          success: false,
+          highLow: {
+            low: buckets.indexStart,
+            high: index,
+          },
+        };
+      } else if (span >= buckets.backing.size()) {
+        this._grow(buckets, span + 1);
+      }
+      buckets.indexEnd = index;
+    }
+
+    let bucketIndex = index - buckets.indexBase;
+    if (bucketIndex < 0) {
+      bucketIndex += buckets.backing.size();
+    }
+    buckets.incrementBucket(bucketIndex, increment);
+    return {success: true};
+  }
+
+  private _grow(buckets: Buckets, needed: number) {
+    const size = buckets.backing.size();
+    const bias = buckets.indexBase - buckets.indexStart;
+    const oldPositiveLimit = size - bias;
+    let newSize = util.powTwoRoundedUp(needed);
+    if (newSize > this._maxSize) {
+      newSize = this._maxSize;
+    }
+    const newPositiveLimit = newSize - bias;
+    buckets.backing.growTo(newSize, oldPositiveLimit, newPositiveLimit);
+  }
+
+  private _changeScale(hl: HighLow, size: number): number {
+    let change = 0;
+    while (hl.high - hl.low >= size) {
+      hl.high >>= 1;
+      hl.low >>= 1;
+      change++;
+    }
+    return change;
+  }
+
+  private _downscale(change: number) {
+    if (change === 0) {
+      return;
+    }
+    if (change < 0) {
+      // todo: do not throw
+      throw new Error(`impossible change of scale: ${this.scale}`);
+    }
+    const newScale = this._mapping.scale() - change;
+
+    this._positive.downscale(change);
+    this._negative.downscale(change);
+
+    if (newScale <= 0) {
+      this._mapping = ExponentMapping.get(newScale);
+    } else {
+      this._mapping = LogarithmMapping.get(newScale);
+    }
+  }
+
+  // todo: delete, for debugging
+  printBuckets() {
+    console.log('positive:');
+    this._printBuckets(this._positive);
+    console.log('negative:');
+    this._printBuckets(this._negative);
+  }
+
+  // todo: delete, for debugging
+  private _printBuckets(buckets: Buckets) {
+    if (buckets.length() === 0) {
+      console.log('[]');
+      return;
+    }
+    let result = '[';
+    for (let i = 0; i < buckets.length(); i++) {
+      const index = buckets.offset() + i;
+      const lower = this._mapping.lowerBoundary(index);
+      const count = buckets.at(i);
+      result += `${index}=${count}(${lower.toFixed(2)}),`;
+    }
+    result = result.replace(/,$/, ']');
+    console.log(result);
   }
 }
 

@@ -1,0 +1,227 @@
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { ExponentialHistogramAccumulation } from '../../src/aggregator/ExponentialHistogram';
+import { Buckets } from '../../src/aggregator/exponential-histogram/Buckets';
+import { Mapping } from '../../src/aggregator/exponential-histogram//mapping/types';
+import { ExponentMapping } from '../../src/aggregator/exponential-histogram//mapping/ExponentMapping';
+import { LogarithmMapping } from '../../src/aggregator/exponential-histogram/mapping/LogarithmMapping';
+import * as assert from 'assert';
+
+describe('ExponentialHistogramAccumulation', () => {
+  describe('record', () => {
+    /**
+     *  Tests insertion of [2, 4, 1].  The index of 2 (i.e., 0) becomes
+     * `indexBase`, the 4 goes to its right and the 1 goes in the last
+     * position of the backing array.  With 3 binary orders of magnitude
+     * and MaxSize=4, this must finish with scale=0; with minimum value 1
+     * this must finish with offset=-1 (all scales).
+     */
+    it('handles alternating growth: scenario 1', () => {
+      const accumulation = new ExponentialHistogramAccumulation([0, 0], 4);
+      accumulation.record(2);
+      accumulation.record(4);
+      accumulation.record(1);
+
+      assert.strictEqual(accumulation.positive().offset(), -1);
+      assert.strictEqual(accumulation.scale(), 0);
+      assert.deepStrictEqual(getCounts(accumulation.positive()), [1, 1, 1]);
+    });
+
+    /**
+     * Tests insertion of [2, 2, 4, 1, 8, 0.5].  The test proceeds as
+     * above but then downscales once further to scale=-1, thus index -1
+     * holds range [0.25, 1.0), index 0 holds range [1.0, 4), index 1
+     * holds range [4, 16).
+     */
+    it('handles alternating growth: scenario 2', () => {
+      const accumulation = new ExponentialHistogramAccumulation([0, 0], 4);
+      accumulation.record(2);
+      accumulation.record(2);
+      accumulation.record(2);
+      accumulation.record(1);
+      accumulation.record(8);
+      accumulation.record(0.5);
+
+      assert.strictEqual(accumulation.positive().offset(), -1);
+      assert.strictEqual(accumulation.scale(), -1);
+      assert.deepStrictEqual(getCounts(accumulation.positive()), [2, 3, 1]);
+    });
+
+    it('handles permutations of [1/2, 1, 2] with maxSize: 2', () => {
+      [
+        [1, 0.5, 2],
+        [1, 2, 0.5],
+        [2, 0.5, 1],
+        [2, 1, 0.5],
+        [0.5, 1, 2],
+        [0.5, 2, 1],
+      ].forEach(row => {
+        const accumulation = new ExponentialHistogramAccumulation([0, 0], 2);
+        row.forEach(value => {
+          accumulation.record(value);
+        });
+
+        assert.strictEqual(accumulation.scale(), -1);
+        assert.strictEqual(accumulation.positive().offset(), -1);
+        assert.strictEqual(accumulation.positive().length(), 2);
+        assert.strictEqual(accumulation.positive().at(0), 2);
+        assert.strictEqual(accumulation.positive().at(1), 1);
+      });
+    });
+
+    it('handles permutations of [1, 2, 4] with maxSize: 2', () => {
+      [
+        [1, 2, 4],
+        [1, 4, 2],
+        [2, 4, 1],
+        [2, 1, 4],
+        [4, 1, 2],
+        [4, 2, 1],
+      ].forEach(row => {
+        const accumulation = new ExponentialHistogramAccumulation([0, 0], 2);
+        row.forEach(value => {
+          accumulation.record(value);
+        });
+
+        assert.strictEqual(accumulation.scale(), -1);
+        assert.strictEqual(accumulation.positive().offset(), -1);
+        assert.strictEqual(accumulation.positive().length(), 2);
+        assert.strictEqual(accumulation.positive().at(0), 1);
+        assert.strictEqual(accumulation.positive().at(1), 2);
+      });
+
+      // Tests that every permutation of {1, 1/2, 1/4} with maxSize=2
+      // results in the same scale=-1 histogram.
+      it('handles permutations of [1, 1/2, 1/4] with maxSize: 2', () => {
+        [
+          [1, 0.5, 0.25],
+          [1, 0.25, 0.5],
+          [0.5, 0.25, 1],
+          [0.5, 1, 0.25],
+          [0.25, 1, 0.5],
+          [0.25, 0.5, 1],
+        ].forEach(row => {
+          const accumulation = new ExponentialHistogramAccumulation([0, 0], 2);
+          row.forEach(value => {
+            accumulation.record(value);
+          });
+
+          assert.strictEqual(accumulation.scale(), -1);
+          assert.strictEqual(accumulation.positive().offset(), -2);
+          assert.strictEqual(accumulation.positive().length(), 2);
+          assert.strictEqual(accumulation.positive().at(0), 1);
+          assert.strictEqual(accumulation.positive().at(1), 2);
+        });
+      });
+
+      // Tests a variety of ascending sequences, calculated using known
+      // index ranges.  For example, with maxSize=3, using scale=0 and
+      // offset -5, add a sequence of numbers. Because the numbers have
+      // known range, we know the expected scale.
+      it('handles ascending sequences', () => {
+        for (const maxSize of [3, 4, 6, 9]) {
+          for (let offset = -5; offset <= 5; offset++) {
+            for (const initScale of [0, 4]) {
+              for (let step = maxSize; step < 4 * maxSize; step++) {
+                const accumulation = new ExponentialHistogramAccumulation(
+                  [0, 0],
+                  maxSize,
+                );
+                let mapper = getMapping(initScale);
+
+                const minValue = centerValue(mapper, offset);
+                const maxValue = centerValue(mapper, offset + step);
+                let sum = 0.0;
+
+                for (let i = 0; i < maxSize; i++) {
+                  const value = centerValue(mapper, offset + i);
+                  accumulation.record(value);
+                  sum += value;
+                }
+
+                assert.strictEqual(accumulation.scale(), initScale);
+                assert.strictEqual(accumulation.positive().offset(), offset);
+
+                accumulation.record(maxValue);
+                sum += maxValue;
+
+                // The zeroth bucket is not empty
+                assert.notStrictEqual(accumulation.positive().at(0), 0);
+
+                // The maximum-index is at or above the midpoint,
+                // otherwise we downscaled too much.
+
+                let maxFill = 0;
+                let totalCount = 0;
+
+                for (let i = 0; i < accumulation.positive().length(); i++) {
+                  totalCount += accumulation.positive().at(i);
+                  if (accumulation.positive().at(i) !== 0) {
+                    maxFill = 0;
+                  }
+                }
+                assert.ok(maxFill >= maxSize / 2);
+
+                // count is correct
+                assert.ok(maxSize + 1 >= totalCount);
+                assert.ok(maxSize + 1 >= accumulation.count());
+                // sum is correct
+                assert.ok(sum >= accumulation.sum());
+
+                // the offset is correct at the computed scale
+                mapper = getMapping(accumulation.scale());
+                let index = mapper.mapToIndex(minValue);
+                assert.strictEqual(accumulation.positive().offset(), index);
+
+                // the maximum range is correct at the computed scale
+                index = mapper.mapToIndex(maxValue);
+                assert.strictEqual(
+                  accumulation.positive().offset() +
+                    accumulation.positive().length() -
+                    1,
+                  index
+                );
+              }
+            }
+          }
+        }
+      });
+    });
+  });
+});
+
+function getCounts(buckets: Buckets): Array<number> {
+  const counts = new Array<number>(buckets.length());
+  for (let i = 0; i < buckets.length(); i++) {
+    counts[i] = buckets.at(i);
+  }
+  return counts;
+}
+
+function centerValue(mapper: Mapping, x: number): number {
+  const lower = mapper.lowerBoundary(x);
+  const upper = mapper.lowerBoundary(x + 1);
+  return (lower + upper) / 2;
+}
+
+function getMapping(scale: number): Mapping {
+  if (scale <= 0) {
+    return ExponentMapping.get(scale);
+  } else {
+    return LogarithmMapping.get(scale);
+  }
+}
