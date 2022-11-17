@@ -37,7 +37,8 @@ import {
   isTimeInput,
   otperformance,
   sanitizeAttributes,
-  timeInputToHrTime
+  timeInputToHrTime,
+  getTimeOrigin
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { SemanticAttributes } from '@opentelemetry/semantic-conventions';
@@ -102,11 +103,11 @@ export class Span implements APISpan, ReadableSpan {
 
     const now = Date.now();
     this._performanceStartTime = otperformance.now();
-    this._performanceOffset = now - (this._performanceStartTime + otperformance.timeOrigin);
+    this._performanceOffset = now - (this._performanceStartTime + getTimeOrigin());
 
     // if startTime is a number smaller than the start of the process
     // assume it is a performance API timestamp and apply correction as needed
-    if (typeof startTime === 'number' && startTime < otperformance.timeOrigin) {
+    if (typeof startTime === 'number' && startTime < getTimeOrigin()) {
       startTime += this._performanceOffset;
     }
 
