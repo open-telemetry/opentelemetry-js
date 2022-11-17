@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+* fix(api): deprecate MetricAttributes and MetricAttributeValue [#3406](https://github.com/open-telemetry/opentelemetry-js/pull/3406) @blumamir
 * test(api): disable module concatenation in tree-shaking test [#3409](https://github.com/open-telemetry/opentelemetry-js/pull/3409) @legendecas
 
 ## [1.3.0](https://www.github.com/open-telemetry/opentelemetry-js-api/compare/v1.2.0...v1.3.0)
