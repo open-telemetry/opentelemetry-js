@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-const karmaWebpackConfig = require('../../../karma.webpack');
-const karmaBaseConfig = require('../../../karma.base');
+const karmaWebpackConfig = require('../../karma.webpack');
+const karmaBaseConfig = require('../../karma.base');
 
 module.exports = (config) => {
   config.set(Object.assign({}, karmaBaseConfig, {

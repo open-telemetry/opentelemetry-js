@@ -6,8 +6,20 @@ All notable changes to experimental packages in this project will be documented 
 
 ### :boom: Breaking Change
 
-* Add semver check to metrics API [#3357](https://github.com/open-telemetry/opentelemetry-js/pull/3357) @dyladan
-  * Previously API versions were only considered compatible if the API was exactly the same
+### :rocket: (Enhancement)
+
+* feat(instrumentation-http): monitor error events with events.errorMonitor [#3402](https://github.com/open-telemetry/opentelemetry-js/pull/3402) @legendecas
+
+### :bug: (Bug Fix)
+
+### :books: (Refine Doc)
+
+### :house: (Internal)
+
+## 0.34.0
+
+* `@opentelemetry/sdk-metrics` moved to [packages/sdk-metrics](../packages/sdk-metrics)
+* `@opentelemetry/api-metrics` deprecated and merged into [api](../api)
 
 ### :rocket: (Enhancement)
 
@@ -19,6 +31,7 @@ All notable changes to experimental packages in this project will be documented 
 * feat(detectors): add browser detector module [#3292](https://github.com/open-telemetry/opentelemetry-js/pull/3292) @abinet18
 * deps: remove unused proto-loader dependencies and update grpc-js and proto-loader versions [#3337](https://github.com/open-telemetry/opentelemetry-js/pull/3337) @seemk
 * feat(metrics-exporters): configure temporality via environment variable [#3305](https://github.com/open-telemetry/opentelemetry-js/pull/3305) @pichlermarc
+* feat(console-metric-exporter): add temporality configuration [#3387](https://github.com/open-telemetry/opentelemetry-js/pull/3387) @pichlermarc
 
 ### :bug: (Bug Fix)
 

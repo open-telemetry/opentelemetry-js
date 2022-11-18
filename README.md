@@ -4,9 +4,7 @@
   <strong>
     <a href="https://opentelemetry.io/docs/js/getting-started/">Getting Started</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="https://open-telemetry.github.io/opentelemetry-js-api">API Reference</a>
-    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="https://open-telemetry.github.io/opentelemetry-js">SDK Reference</a>
+    <a href="https://open-telemetry.github.io/opentelemetry-js">API and SDK Reference</a>
   </strong>
 </p>
 
@@ -142,6 +140,7 @@ The below table describes which versions of each set of packages are expected to
 
 | API   | Stable Packages | Experimental Packages |
 | ----- | --------------- | --------------------- |
+| 1.3.x | 1.8.x           | 0.34.x                |
 | 1.2.x | 1.7.x           | 0.33.x                |
 | 1.2.x | 1.6.x           | 0.32.x                |
 | 1.1.x | 1.5.x           | 0.31.x                |
@@ -158,11 +157,11 @@ The current version for each package can be found in the respective `package.jso
 
 ## Feature Status
 
-| Signal  | API Status  | SDK Status        |
-| ------- | ----------- | ----------------- |
-| Tracing | Stable      | Release Candidate |
-| Metrics | Development | Development       |
-| Logs    | Roadmap     | Roadmap           |
+| Signal  | API Status  | SDK Status  |
+| ------- | ----------- | ----------- |
+| Tracing | Stable      | Stable      |
+| Metrics | Stable      | Stable      |
+| Logs    | Development | Development |
 
 For a more detailed breakdown of feature support see the [specification compliance matrix][compliance-matrix].
 
@@ -550,7 +549,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-shim-opentracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-shim-opentracing
 [otel-tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base
 [otel-web]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-web
-[otel-api]: https://github.com/open-telemetry/opentelemetry-js-api
+[otel-api]: https://github.com/open-telemetry/opentelemetry-js/tree/main/api
 [otel-core]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-core
 [otel-propagator-b3]: https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-propagator-b3
 
