@@ -20,6 +20,7 @@ import { Mapping } from '../../src/aggregator/exponential-histogram//mapping/typ
 import { ExponentMapping } from '../../src/aggregator/exponential-histogram//mapping/ExponentMapping';
 import { LogarithmMapping } from '../../src/aggregator/exponential-histogram/mapping/LogarithmMapping';
 import * as assert from 'assert';
+import { assertInEpsilon, assertInDelta } from './exponential-histogram/helpers';
 
 describe('ExponentialHistogramAccumulation', () => {
   describe('record', () => {
@@ -202,6 +203,122 @@ describe('ExponentialHistogramAccumulation', () => {
       });
     });
   });
+  describe('merge', () => {
+    it('handles simple (even) case', () => {
+      const acc0 = new ExponentialHistogramAccumulation([0, 0], 4);
+      const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
+      const acc2 = new ExponentialHistogramAccumulation([0, 0], 4);
+
+      for(let i = 0; i < 4; i++) {
+        const v1 = 2 << i;
+        const v2 = 1 / (1 << i);
+
+        acc0.record(v1);
+        acc1.record(v2);
+        acc2.record(v1);
+        acc2.record(v2);
+      }
+
+      assert.strictEqual(acc0.scale(), 0);
+      assert.strictEqual(acc1.scale(), 0);
+      assert.strictEqual(acc2.scale(), -1);
+
+      assert.strictEqual(acc0.positive().offset(), 0);
+      assert.strictEqual(acc1.positive().offset(), -4);
+      assert.strictEqual(acc2.positive().offset(), -2);
+
+      assert.deepStrictEqual(getCounts(acc0.positive()), [1, 1, 1, 1]);
+      assert.deepStrictEqual(getCounts(acc1.positive()), [1, 1, 1, 1]);
+      assert.deepStrictEqual(getCounts(acc2.positive()), [2, 2, 2, 2]);
+
+      acc0.merge(acc1);
+
+      assert.strictEqual(acc0.scale(), -1);
+      assert.strictEqual(acc2.scale(), -1);
+
+      assertHistogramsEqual(acc0, acc2);
+    });
+
+    it('handles simple (odd) case', () => {
+      const acc0 = new ExponentialHistogramAccumulation([0, 0], 4);
+      const acc1 = new ExponentialHistogramAccumulation([0, 0], 4);
+      const acc2 = new ExponentialHistogramAccumulation([0, 0], 4);
+
+      for(let i = 0; i < 4; i++) {
+        const v1 = 2 << i;
+        const v2 = 2 / (1 << i);
+
+        acc0.record(v1);
+        acc1.record(v2);
+        acc2.record(v1);
+        acc2.record(v2);
+      }
+
+      assert.strictEqual(acc0.count(), 4);
+      assert.strictEqual(acc1.count(), 4);
+      assert.strictEqual(acc2.count(), 8);
+
+      assert.strictEqual(acc0.scale(), 0);
+      assert.strictEqual(acc1.scale(), 0);
+      assert.strictEqual(acc2.scale(), -1);
+
+      assert.strictEqual(acc0.positive().offset(), 0);
+      assert.strictEqual(acc1.positive().offset(), -3);
+      assert.strictEqual(acc2.positive().offset(), -2);
+
+      assert.deepStrictEqual(getCounts(acc0.positive()), [1, 1, 1, 1]);
+      assert.deepStrictEqual(getCounts(acc1.positive()), [1, 1, 1, 1]);
+      assert.deepStrictEqual(getCounts(acc2.positive()), [1, 2, 3, 2]);
+
+      acc0.merge(acc1);
+
+      assert.strictEqual(acc0.scale(), -1);
+      assert.strictEqual(acc2.scale(), -1);
+
+      assertHistogramsEqual(acc0, acc2);
+    });
+
+    it('handles exhaustive test case', () => {
+      const testMergeExhaustive =  (a: number[], b: number[], size: number, incr: number) => {
+        const aHist = new ExponentialHistogramAccumulation([0, 0], size);
+        const bHist = new ExponentialHistogramAccumulation([0, 0], size);
+        const cHist = new ExponentialHistogramAccumulation([0, 0], size);
+
+        a.forEach(av => {
+          aHist.updateByIncrement(av, incr);
+          cHist.updateByIncrement(av, incr);
+        });
+        b.forEach(bv => {
+          bHist.updateByIncrement(bv, incr);
+          cHist.updateByIncrement(bv, incr);
+        });
+
+        aHist.merge(bHist);
+
+        assertHistogramsEqual(aHist, cHist);
+      }
+
+      const factor = 1024.0;
+      const count = 16;
+      const means = [0, factor];
+      const stddevs = [1, factor];
+      const sizes = [2, 6, 8, 9, 16];
+      const increments = [1, 0x100, 0x10000, 0x100000000];
+
+      for(let mean of means) {
+        for(let stddev of stddevs) {
+          const values = Array.from({length: count}, () => mean + Math.random() * stddev);
+          for(let part = 1; part < count; part++) {
+            for(let size of sizes) {
+              for (let incr of increments) {
+                testMergeExhaustive(values.slice(0, part), values.slice(part, count), size, incr);
+              }
+            }
+          }
+        }
+      }
+    });
+  });
 });
 
 function getCounts(buckets: Buckets): Array<number> {
@@ -224,4 +341,41 @@ function getMapping(scale: number): Mapping {
   } else {
     return LogarithmMapping.get(scale);
   }
+}
+
+function assertHistogramsEqual(
+  actual: ExponentialHistogramAccumulation,
+  expected: ExponentialHistogramAccumulation,
+) {
+  const actualSum = actual.sum();
+  const expectedSum = expected.sum();
+
+  if(actualSum === 0 || expectedSum === 0) {
+    assertInDelta(actualSum, expectedSum, 1e-6);
+  } else {
+    assertInEpsilon(actualSum, expectedSum, 1e-6);
+  }
+
+  assert.strictEqual(actual.count(), expected.count());
+  assert.strictEqual(actual.zeroCount(), expected.zeroCount());
+  assert.strictEqual(actual.scale(), expected.scale());
+
+  assert.strictEqual(
+    bucketsToString(actual.positive()),
+    bucketsToString(expected.positive())
+  );
+
+  assert.strictEqual(
+    bucketsToString(actual.negative()),
+    bucketsToString(expected.negative())
+  );
+}
+
+function bucketsToString(buckets: Buckets): string {
+  let str = `[@${buckets.offset()}`;
+  for(let i = 0; i < buckets.length(); i++) {
+    str += buckets.at(i).toString();
+  }
+  str += ']\n';
+  return str;
 }
