@@ -11,6 +11,8 @@ For experimental package changes, see the [experimental CHANGELOG](experimental/
 
 ### :rocket: (Enhancement)
 
+* feat(api): add `getActiveBaggage` API [#3385](https://github.com/open-telemetry/opentelemetry-js/pull/3385)
+
 ### :bug: (Bug Fix)
 
 * fix(sdk-metrics): use default Resource to comply with semantic conventions [#3411](https://github.com/open-telemetry/opentelemetry-js/pull/3411) @pichlermarc
